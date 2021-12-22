@@ -882,6 +882,80 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     return usePrimary ? dotLocs1 : dotLocs2;
 }
 
+std::pair<int, int> LayerElement::CalculateXOffset(FunctorParams *functorParams)
+{
+    AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
+    assert(params);
+
+    int selfLeft;
+    const int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
+    // Nested alignment of bounding boxes is performed only when both the previous alignment and the current one allow
+    // it. For example, when one of them is a barline, we do not look how bounding boxes can be nested but instead only
+    // look at the horizontal position
+    bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment
+        && params->m_previousAlignment.m_alignment->PerfomBoundingBoxAlignment()
+        && this->GetAlignment()->PerfomBoundingBoxAlignment());
+
+    if (!this->HasSelfBB() || this->HasEmptyBB()) {
+        // If nothing was drawn, do not take it into account. This should happen for barline position none but also
+        // chords in beam. Otherwise the BB should be set to empty with Object::SetEmptyBB()
+        selfLeft = this->GetAlignment()->GetXRel();
+        return { 0, selfLeft };
+    }
+
+    // We add it to the upcoming bouding boxes
+    params->m_upcomingBoundingBoxes.push_back(this);
+    params->m_currentAlignment.m_alignment = this->GetAlignment();
+
+    // only look at the horizontal position
+    if (!performBoundingBoxAlignment) {
+        selfLeft = this->GetSelfLeft();
+        selfLeft -= params->m_doc->GetLeftMargin(this) * drawingUnit;
+        return { 0, selfLeft };
+    }
+
+    // Here we look how bounding boxes overlap and adjust the position only when necessary
+    selfLeft = this->GetAlignment()->GetXRel();
+    // If we want the nesting to be reduced, we can set to:
+    // selfLeft = this->GetSelfLeft();
+    // This could be made an option (--spacing-limited-nesting)
+    const int selfLeftMargin = params->m_doc->GetLeftMargin(this);
+    int overlap = 0;
+    for (const auto &boundingBox : params->m_boundingBoxes) {
+        LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
+        assert(element);
+        const int margin = (params->m_doc->GetRightMargin(element) + selfLeftMargin) * drawingUnit;
+        const bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
+        if (!hasOverlap) continue;
+
+        // For note to note alignment, make sure there is a standard spacing even if they to not overlap vertically
+        if (this->Is(NOTE) && element->Is(NOTE)) {
+            overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
+        }
+        else if (this->Is(ACCID) && element->Is(NOTE)) {
+            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            const int staffTop = staff->GetDrawingY();
+            const int staffBottom = staffTop - params->m_doc->GetDrawingStaffSize(params->m_staffSize);
+            int verticalMargin = 0;
+            if ((this->GetContentTop() > staffTop + 2 * drawingUnit) && (element->GetDrawingY() > staffTop)
+                && (element->GetDrawingY() > this->GetDrawingY())) {
+                verticalMargin = element->GetDrawingY() - this->GetDrawingY();
+            }
+            else if ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
+                && (element->GetDrawingY() < staffBottom) && (element->GetDrawingY() < this->GetDrawingY())) {
+                verticalMargin = this->GetDrawingY() - element->GetDrawingY();
+            }
+            overlap = std::max(
+                overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin, verticalMargin));
+        }
+        else {
+            overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
+        }
+    }
+
+    return { -overlap, selfLeft };
+}
+
 //----------------------------------------------------------------------------
 // Static methods for LayerElement
 //----------------------------------------------------------------------------
@@ -1838,76 +1912,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int selfLeft;
     const int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
 
-    // Nested alignment of bounding boxes is performed only when both the previous alignment and
-    // the current one allow it. For example, when one of them is a barline, we do not look how
-    // bounding boxes can be nested but instead only look at the horizontal position
-    bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment
-        && params->m_previousAlignment.m_alignment->PerfomBoundingBoxAlignment()
-        && this->GetAlignment()->PerfomBoundingBoxAlignment());
-
-    if (!this->HasSelfBB() || this->HasEmptyBB()) {
-        // if nothing was drawn, do not take it into account
-        // This should happen for barline position none but also chords in beam. Otherwise the BB should be set to
-        // empty with
-        // Object::SetEmptyBB()
-        // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
-        selfLeft = this->GetAlignment()->GetXRel();
-    }
-    else {
-        // We add it to the upcoming bouding boxes
-        params->m_upcomingBoundingBoxes.push_back(this);
-        params->m_currentAlignment.m_alignment = this->GetAlignment();
-        // Here we look how bounding boxes overlap and adjust the position only when necessary
-        if (performBoundingBoxAlignment) {
-            selfLeft = this->GetAlignment()->GetXRel();
-            // If we want the nesting to be reduced, we can set to:
-            // selfLeft = this->GetSelfLeft();
-            // This could be made an option (--spacing-limited-nesting)
-            int selfLeftMargin = params->m_doc->GetLeftMargin(this);
-            int overlap = 0;
-            for (auto &boundingBox : params->m_boundingBoxes) {
-                LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
-                assert(element);
-                int margin = (params->m_doc->GetRightMargin(element) + selfLeftMargin) * drawingUnit;
-                bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
-
-                if (hasOverlap) {
-                    // For note to note alignment, make sure there is a standard spacing even if they to not overlap
-                    // vertically
-                    if (this->Is(NOTE) && element->Is(NOTE)) {
-                        overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
-                    }
-                    else if (this->Is(ACCID) && element->Is(NOTE)) {
-                        Staff *staff = this->GetAncestorStaff();
-                        const int staffTop = staff->GetDrawingY();
-                        const int staffBottom = staffTop - params->m_doc->GetDrawingStaffSize(params->m_staffSize);
-                        int verticalMargin = 0;
-                        if ((this->GetContentTop() > staffTop + 2 * drawingUnit) && (element->GetDrawingY() > staffTop)
-                            && (element->GetDrawingY() > this->GetDrawingY())) {
-                            verticalMargin = element->GetDrawingY() - this->GetDrawingY();
-                        }
-                        else if ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
-                            && (element->GetDrawingY() < staffBottom)
-                            && (element->GetDrawingY() < this->GetDrawingY())) {
-                            verticalMargin = this->GetDrawingY() - element->GetDrawingY();
-                        }
-                        overlap = std::max(
-                            overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin, verticalMargin));
-                    }
-                    else {
-                        overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
-                    }
-                    // LogDebug("%s overlaps of %d, margin %d", this->GetClassName().c_str(), overlap, margin);
-                }
-            }
-            offset -= overlap;
-        }
-        // Otherwise only look at the horizontal position
-        else {
-            selfLeft = this->GetSelfLeft();
-            selfLeft -= params->m_doc->GetLeftMargin(this) * drawingUnit;
-        }
-    }
+    std::tie(offset, selfLeft) = this->CalculateXOffset(params);
 
     offset = std::min(offset, selfLeft - params->m_minPos);
     if (offset < 0) {
