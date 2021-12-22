@@ -137,7 +137,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     // the normal case or start
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        start->FindAllDescendantByComparison(&artics, &matchType);
+        start->FindAllDescendantsByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (auto &object : artics) {
             Artic *artic = vrv_cast<Artic *>(object);
@@ -154,7 +154,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     }
     // normal case or end
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        end->FindAllDescendantByComparison(&artics, &matchType);
+        end->FindAllDescendantsByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (auto &object : artics) {
             Artic *artic = vrv_cast<Artic *>(object);

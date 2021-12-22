@@ -28,7 +28,7 @@ namespace vrv {
 
 static const ClassRegistrar<Mdiv> s_factory("mdiv", MDIV);
 
-Mdiv::Mdiv() : PageElement(MDIV, "mdiv-"), PageElementStartInterface(), AttLabelled(), AttNNumberLike()
+Mdiv::Mdiv() : PageElement(MDIV, "mdiv-"), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_NNUMBERLIKE);
@@ -82,8 +82,8 @@ int Mdiv::Save(FunctorParams *functorParams)
 
     MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
     if (m_visibility == Hidden && meiOutput) {
-        // Do not output hidden mdivs in page-based MEI or when saving a single score-based MEI page
-        if (!meiOutput->GetScoreBasedMEI() || meiOutput->IsSavingSinglePage()) return FUNCTOR_SIBLINGS;
+        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
+        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
     }
     return Object::Save(functorParams);
 }
@@ -95,8 +95,8 @@ int Mdiv::SaveEnd(FunctorParams *functorParams)
 
     MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
     if (m_visibility == Hidden && meiOutput) {
-        // Do not output hidden mdivs in page-based MEI or when saving a single score-based MEI page
-        if (!meiOutput->GetScoreBasedMEI() || meiOutput->IsSavingSinglePage()) return FUNCTOR_SIBLINGS;
+        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
+        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
     }
     return Object::SaveEnd(functorParams);
 }
@@ -116,7 +116,7 @@ int Mdiv::ConvertToPageBasedEnd(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    if (m_visibility == Visible) ConvertToPageBasedBoundary(this, params->m_page);
+    if (m_visibility == Visible) ConvertToPageBasedMilestone(this, params->m_page);
 
     return FUNCTOR_CONTINUE;
 }

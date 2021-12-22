@@ -41,6 +41,7 @@
 #include "note.h"
 #include "octave.h"
 #include "options.h"
+#include "page.h"
 #include "pedal.h"
 #include "pitchinflection.h"
 #include "reh.h"
@@ -186,6 +187,15 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         }
     }
     if (!start || !end) return;
+    if (!interface->IsOrdered(start, end)) {
+        // To avoid showing the same warning multiple times, display a warning only during actual drawing
+        if (!dc->Is(BBOX_DEVICE_CONTEXT) && (m_currentPage == vrv_cast<Page *>(start->GetFirstAncestor(PAGE)))) {
+            LogWarning("%s '%s' is ignored, since start '%s' does not occur temporally before end '%s'.",
+                element->GetClassName().c_str(), element->GetUuid().c_str(), start->GetUuid().c_str(),
+                end->GetUuid().c_str());
+        }
+        return;
+    }
 
     // Get the parent system of the first and last note
     System *parentSystem1 = dynamic_cast<System *>(start->GetFirstAncestor(SYSTEM));
@@ -1712,16 +1722,16 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
         if (enclosingFront) {
             const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3
                 + m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
-            DrawSmuflCode(
-                dc, x - xCorrEncl, y + enclosureYCorr, enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
+            DrawSmuflCode(dc, x - xCorrEncl, y + enclosureYCorr + yCorr, enclosingFront, staff->m_drawingStaffSize,
+                drawingCueSize);
         }
 
-        DrawSmuflCode(dc, x - xCorr, y - yCorr, code, staff->m_drawingStaffSize, drawingCueSize);
+        DrawSmuflCode(dc, x - xCorr, y, code, staff->m_drawingStaffSize, drawingCueSize);
 
         if (enclosingBack) {
             const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3;
-            DrawSmuflCode(
-                dc, x + xCorrEncl, y + enclosureYCorr, enclosingBack, staff->m_drawingStaffSize, drawingCueSize);
+            DrawSmuflCode(dc, x + xCorrEncl, y + enclosureYCorr + yCorr, enclosingBack, staff->m_drawingStaffSize,
+                drawingCueSize);
         }
 
         dc->ResetFont();
@@ -2439,18 +2449,18 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
     assert(element);
     assert(system);
 
-    if (element->Is(SYSTEM_ELEMENT_END)) {
-        SystemElementEnd *elementEnd = vrv_cast<SystemElementEnd *>(element);
+    if (element->Is(SYSTEM_MILESTONE_END)) {
+        SystemMilestoneEnd *elementEnd = vrv_cast<SystemMilestoneEnd *>(element);
         assert(elementEnd);
         assert(elementEnd->GetStart());
         dc->StartGraphic(element, elementEnd->GetStart()->GetUuid(), element->GetUuid());
         dc->EndGraphic(element, this);
     }
     else if (element->Is(ENDING)) {
-        // Create placeholder - A graphic for the end boundary will be created
+        // Create placeholder - A graphic for the end milestone will be created
         // but only if it is on a different system - See View::DrawEnding
         // The Ending is added to the System drawing list by View::DrawMeasure
-        dc->StartGraphic(element, "systemElementStart", element->GetUuid());
+        dc->StartGraphic(element, "systemMilestone", element->GetUuid());
         dc->EndGraphic(element, this);
     }
     else if (element->Is(PB)) {
@@ -2462,7 +2472,7 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
         dc->EndGraphic(element, this);
     }
     else if (element->Is(SECTION)) {
-        dc->StartGraphic(element, "systemElementStart", element->GetUuid());
+        dc->StartGraphic(element, "systemMilestone", element->GetUuid());
         dc->EndGraphic(element, this);
     }
 }
@@ -2481,18 +2491,18 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         }
     }
 
-    SystemElementEnd *endingEndBoundary = ending->GetEnd();
+    SystemMilestoneEnd *endingEndMilestone = ending->GetEnd();
 
     // We need to make sure we have the end boudary and a measure (first and last) in each of them
-    assert(endingEndBoundary);
-    assert(ending->GetMeasure() && endingEndBoundary->GetMeasure());
+    assert(endingEndMilestone);
+    assert(ending->GetMeasure() && endingEndMilestone->GetMeasure());
     // in non debug mode
-    if (!endingEndBoundary) return;
-    if (!ending->GetMeasure() || !endingEndBoundary->GetMeasure()) return;
+    if (!endingEndMilestone) return;
+    if (!ending->GetMeasure() || !endingEndMilestone->GetMeasure()) return;
 
     // Get the parent system of the first and last note
     System *parentSystem1 = dynamic_cast<System *>(ending->GetFirstAncestor(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(endingEndBoundary->GetFirstAncestor(SYSTEM));
+    System *parentSystem2 = dynamic_cast<System *>(endingEndMilestone->GetFirstAncestor(SYSTEM));
 
     assert(parentSystem1 && parentSystem2);
     // in non debug mode
@@ -2510,8 +2520,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         objectX = measure;
         // if it is the first measure of the system use the left barline position
         if (system->GetFirst(MEASURE) == measure) x1 += measure->GetLeftBarLineXRel();
-        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel()
-            + endingEndBoundary->GetMeasure()->GetRightBarLineWidth(m_doc);
+        x2 = endingEndMilestone->GetMeasure()->GetDrawingX() + endingEndMilestone->GetMeasure()->GetRightBarLineXRel()
+            + endingEndMilestone->GetMeasure()->GetRightBarLineWidth(m_doc);
     }
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
     else if (system == parentSystem1) {
@@ -2532,8 +2542,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
-        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel()
-            + endingEndBoundary->GetMeasure()->GetRightBarLineWidth(m_doc);
+        x2 = endingEndMilestone->GetMeasure()->GetDrawingX() + endingEndMilestone->GetMeasure()->GetRightBarLineXRel()
+            + endingEndMilestone->GetMeasure()->GetRightBarLineWidth(m_doc);
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector

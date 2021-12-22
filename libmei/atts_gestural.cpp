@@ -286,6 +286,52 @@ bool AttDurationGestural::HasDurRecip() const
 /* include <attdur.recip> */
 
 //----------------------------------------------------------------------------
+// AttMdivGes
+//----------------------------------------------------------------------------
+
+AttMdivGes::AttMdivGes() : Att()
+{
+    ResetMdivGes();
+}
+
+AttMdivGes::~AttMdivGes()
+{
+}
+
+void AttMdivGes::ResetMdivGes()
+{
+    m_attacca = BOOLEAN_NONE;
+}
+
+bool AttMdivGes::ReadMdivGes(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("attacca")) {
+        this->SetAttacca(StrToBoolean(element.attribute("attacca").value()));
+        element.remove_attribute("attacca");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttMdivGes::WriteMdivGes(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasAttacca()) {
+        element.append_attribute("attacca") = BooleanToStr(this->GetAttacca()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttMdivGes::HasAttacca() const
+{
+    return (m_attacca != BOOLEAN_NONE);
+}
+
+/* include <attattacca> */
+
+//----------------------------------------------------------------------------
 // AttNcGes
 //----------------------------------------------------------------------------
 
@@ -811,6 +857,14 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
             return true;
         }
     }
+    if (element->HasAttClass(ATT_MDIVGES)) {
+        AttMdivGes *att = dynamic_cast<AttMdivGes *>(element);
+        assert(att);
+        if (attrType == "attacca") {
+            att->SetAttacca(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_NCGES)) {
         AttNcGes *att = dynamic_cast<AttNcGes *>(element);
         assert(att);
@@ -954,6 +1008,13 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasDurRecip()) {
             attributes->push_back({ "dur.recip", att->StrToStr(att->GetDurRecip()) });
+        }
+    }
+    if (element->HasAttClass(ATT_MDIVGES)) {
+        const AttMdivGes *att = dynamic_cast<const AttMdivGes *>(element);
+        assert(att);
+        if (att->HasAttacca()) {
+            attributes->push_back({ "attacca", att->BooleanToStr(att->GetAttacca()) });
         }
     }
     if (element->HasAttClass(ATT_NCGES)) {

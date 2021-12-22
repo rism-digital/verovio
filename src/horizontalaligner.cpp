@@ -358,12 +358,12 @@ void GraceAligner::AlignStack()
 
         ClassIdsComparison matchType({ ACCID, FLAG, NOTE, STEM });
         ListOfObjects children;
-        element->FindAllDescendantByComparison(&children, &matchType);
+        element->FindAllDescendantsByComparison(&children, &matchType);
         alignment->AddLayerElementRef(element);
 
         // Set the grace alignment to all children
         for (auto &child : children) {
-            // Trick : FindAllDescendantByComparison include the element, which is probably a problem.
+            // Trick : FindAllDescendantsByComparison include the element, which is probably a problem.
             // With note, we want to set only accid, so make sure we do not set it twice
             if (child == element) continue;
             LayerElement *childElement = vrv_cast<LayerElement *>(child);

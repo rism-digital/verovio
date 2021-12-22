@@ -145,9 +145,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
     /*******/
 
-    ListOfObjects syls;
-    ClassIdComparison matchTypeSyl(SYL);
-    this->FindAllDescendantByComparison(&syls, &matchTypeSyl);
+    ListOfObjects syls = this->FindAllDescendantsByType(SYL);
 
     int shift = params->m_doc->GetDrawingUnit(params->m_staffSize);
     // Adjust it proportionally to the lyric size

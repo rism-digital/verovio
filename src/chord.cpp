@@ -369,6 +369,44 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
+data_STEMDIRECTION Chord::CalcStemDirection(int verticalCenter)
+{
+    const ArrayOfObjects *childList = this->GetList(this);
+    ArrayOfObjects topNotes, bottomNotes;
+
+    // split notes into two vectors - notes above vertical center and below
+    std::partition_copy(childList->begin(), childList->end(), std::back_inserter(topNotes),
+        std::back_inserter(bottomNotes),
+        [verticalCenter](const Object *note) { return note->GetDrawingY() > verticalCenter; });
+
+    auto bottomIter = bottomNotes.begin();
+    auto topIter = topNotes.rbegin();
+    for (; bottomIter != bottomNotes.end() && topIter != topNotes.rend(); ++bottomIter, ++topIter) {
+        const int bottomY = (*bottomIter)->GetDrawingY();
+        const int topY = (*topIter)->GetDrawingY();
+        const int middlePoint = (topY + bottomY) / 2;
+
+        // if notes are equidistant - proceed to the next pair of notes
+        if (middlePoint == verticalCenter) {
+            continue;
+        }
+        // otherwise return corresponding stem direction
+        else if (middlePoint > verticalCenter) {
+            return STEMDIRECTION_down;
+        }
+        else if (middlePoint < verticalCenter) {
+            return STEMDIRECTION_up;
+        }
+    }
+
+    // if there are still unprocessed notes left on the bottom that are not on the center - stem direction should be up
+    if ((bottomIter != bottomNotes.end()) && ((*bottomIter)->GetDrawingY() != verticalCenter)) {
+        return STEMDIRECTION_up;
+    }
+    // otherwise place it down
+    return STEMDIRECTION_down;
+}
+
 int Chord::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 {
     assert(staff);
@@ -431,15 +469,11 @@ bool Chord::HasNoteWithDots()
     const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
 
-    for (auto &iter : *notes) {
-        Note *note = vrv_cast<Note *>(iter);
+    return std::any_of(notes->cbegin(), notes->cend(), [](Object *object) {
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
-        if (note->GetDots() > 0) {
-            return true;
-        }
-    }
-
-    return false;
+        return (note->GetDots() > 0);
+    });
 }
 
 int Chord::AdjustOverlappingLayers(
@@ -489,6 +523,30 @@ int Chord::AdjustOverlappingLayers(
         return margin;
     }
     return 0;
+}
+
+std::list<Note *> Chord::GetAdjacentNotesList(Staff *staff, int loc)
+{
+    const ArrayOfObjects *notes = this->GetList(this);
+    assert(notes);
+
+    std::list<Note *> adjacentNotes;
+    for (Object *obj : *notes) {
+        Note *note = vrv_cast<Note *>(obj);
+        assert(note);
+
+        Layer *layer = NULL;
+        Staff *noteStaff = note->GetCrossStaff(layer);
+        if (!noteStaff) noteStaff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(noteStaff);
+        if (noteStaff != staff) continue;
+
+        const int locDiff = note->GetDrawingLoc() - loc;
+        if ((std::abs(locDiff) <= 2) && (locDiff != 0)) {
+            adjacentNotes.push_back(note);
+        }
+    }
+    return adjacentNotes;
 }
 
 //----------------------------------------------------------------------------
@@ -663,8 +721,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
         stemDir = layerStemDir;
     }
     else {
-        stemDir = (yMax - params->m_verticalCenter >= params->m_verticalCenter - yMin) ? STEMDIRECTION_down
-                                                                                       : STEMDIRECTION_up;
+        stemDir = this->CalcStemDirection(params->m_verticalCenter);
     }
 
     this->SetDrawingStemDir(stemDir);
@@ -678,7 +735,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-MapOfNoteLocs Chord::CalcNoteLocations()
+MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate)
 {
     const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
@@ -687,6 +744,8 @@ MapOfNoteLocs Chord::CalcNoteLocations()
     for (Object *obj : *notes) {
         Note *note = vrv_cast<Note *>(obj);
         assert(note);
+
+        if (predicate && !predicate(note)) continue;
 
         Layer *layer = NULL;
         Staff *staff = note->GetCrossStaff(layer);
@@ -701,8 +760,8 @@ MapOfNoteLocs Chord::CalcNoteLocations()
 MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary)
 {
     const bool isUpwardDirection = (this->GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
-    const bool useReverseOrder = (isUpwardDirection && !primary) || (!isUpwardDirection && primary);
-    MapOfNoteLocs noteLocs = this->CalcNoteLocations();
+    const bool useReverseOrder = (isUpwardDirection != primary);
+    MapOfNoteLocs noteLocs = this->CalcNoteLocations([](Note *note) { return !note->HasDots(); });
     MapOfDotLocs dotLocs;
     for (const auto &mapEntry : noteLocs) {
         if (useReverseOrder)

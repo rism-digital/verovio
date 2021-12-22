@@ -179,12 +179,21 @@ public:
     void SetUuidStr();
 
     /**
+     * Check if the end points are temporally ordered
+     * @Return true if end temporally occurs after start
+     */
+    ///@{
+    bool IsOrdered();
+    bool IsOrdered(LayerElement *start, LayerElement *end);
+    ///@}
+
+    /**
      * Check if the slur or tie needs to be taken into account as overflow above or below in case of cross-staff end
      * points. This methods assumes staff@n to be greater for the staff below.
      */
 
     void GetCrossStaffOverflows(
-        StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow);
+        StaffAlignment *alignment, curvature_CURVEDIR curveDir, bool &skipAbove, bool &skipBelow);
 
     //-----------------//
     // Pseudo functors //

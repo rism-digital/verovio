@@ -255,17 +255,11 @@ public:
     ///@}
 
 private:
-    /**
-     * Contains an accidental for the tonic key, if one is required, e.g., if key.pname
-     * equals 'c' and key.accid equals 's', then a tonic of C# is indicated.
-     **/
+    /** Contains an accidental for the tonic key, if one is required, **/
     data_ACCIDENTAL_GESTURAL m_keyAccid;
     /** Indicates major, minor, or other tonality. **/
     data_MODE m_keyMode;
-    /**
-     * Holds the pitch name of the tonic key, e.g.
-     * 'c' for the key of C.
-     **/
+    /** Holds the pitch name of the tonic key, **/
     data_PITCHNAME m_keyPname;
 
     /* include <attkey.pname> */
@@ -373,10 +367,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Contains sol-fa designation, e.g., do, re, mi, etc., in either a fixed or
-     * movable Do system.
-     **/
+    /** Contains sol-fa designation, **/
     std::string m_psolfa;
 
     /* include <attpsolfa> */

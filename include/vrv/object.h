@@ -81,11 +81,11 @@ public:
     bool IsFloatingObject() const { return (this->IsSystemElement() || this->IsControlElement()); }
 
     /**
-     * Wrapper for checking if an element has a boundary start interface and also if is set as a boundary element
+     * Wrapper for checking if an element has a milestone start interface and also if is set as a milestone element
      */
     ///@{
-    bool IsBoundaryElement();
-    Object *GetBoundaryEnd();
+    bool IsMilestoneElement();
+    Object *GetMilestoneEnd();
     ///@}
 
     /**
@@ -232,7 +232,7 @@ public:
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }
     int GetChildCount(const ClassId classId) const;
-    int GetChildCount(const ClassId classId, int deepth);
+    int GetChildCount(const ClassId classId, int depth);
     ///@}
 
     /**
@@ -348,7 +348,7 @@ public:
     /**
      * Look for all Objects of a class and return its position (-1 if not found)
      */
-    int GetDescendantIndex(const Object *child, const ClassId classId, int deepth);
+    int GetDescendantIndex(const Object *child, const ClassId classId, int depth);
 
     /**
      * Insert an element at the idx position.
@@ -394,17 +394,23 @@ public:
         Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
+     * Return all the objects with specified type
+     */
+    ListOfObjects FindAllDescendantsByType(
+        ClassId classId, bool continueDepthSearchForMatches = true, int deepness = UNLIMITED_DEPTH);
+
+    /**
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    void FindAllDescendantByComparison(ListOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
+    void FindAllDescendantsByComparison(ListOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
         bool direction = FORWARD, bool clear = true);
 
     /**
      * Return all the objects matching the Comparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
-    void FindAllDescendantBetween(
+    void FindAllDescendantsBetween(
         ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
 
     /**
@@ -434,6 +440,11 @@ public:
      * Return false if the child could not be found. In that case it will not be deleted.
      */
     bool DeleteChild(Object *child);
+
+    /**
+     * Returns all ancestors
+     */
+    ListOfObjects GetAncestors() const;
 
     /**
      * Return the first ancestor of the specified type.
@@ -540,6 +551,11 @@ public:
 
     static bool sortByUlx(Object *a, Object *b);
 
+    /**
+     * @Return true if left appears before right in preorder traversal
+     */
+    static bool IsPreOrdered(Object *left, Object *right);
+
     //----------//
     // Functors //
     //----------//
@@ -615,7 +631,7 @@ public:
     ///@{
 
     /**
-     * Convert top-level all container (section, endings) and editorial elements to boundary elements.
+     * Convert top-level all container (section, endings) and editorial elements to milestone elements.
      */
     ///@{
     virtual int ConvertToPageBased(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1126,7 +1142,7 @@ public:
     /**
      * Functor for setting Measure of Ending
      */
-    virtual int PrepareBoundaries(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareMilestones(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * @name Functor for grouping FloatingObject by drawingGrpId.

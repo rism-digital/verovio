@@ -40,6 +40,7 @@ class StaffAlignment;
 class LayerElement : public Object,
                      public FacsimileInterface,
                      public LinkingInterface,
+                     public AttCoordX1,
                      public AttLabelled,
                      public AttTyped {
 public:
@@ -129,6 +130,11 @@ public:
     int GetAlignmentLayerN() const { return m_alignmentLayerN; }
     void SetAlignmentLayerN(int alignmentLayerN) { m_alignmentLayerN = alignmentLayerN; }
     ///@}
+
+    /**
+     * @return (cross) layer number, parent layer number for cross staff elements
+     */
+    int GetOriginalLayerN();
 
     /**
      * @name Get the X and Y drawing position
@@ -405,14 +411,14 @@ protected:
     /**
      * The note locations w.r.t. each staff, implemented for note and chord
      */
-    virtual MapOfNoteLocs CalcNoteLocations() { return {}; };
+    virtual MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) { return {}; }
 
     /**
      * The dot locations w.r.t. each staff, implemented for note and chord
      * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
      * secondary
      */
-    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; };
+    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; }
 
     /**
      * Calculate the optimal dot location for a note or chord

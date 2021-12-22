@@ -552,6 +552,14 @@ bool Note::IsVisible() const
     return true;
 }
 
+bool Note::IsEnharmonicWith(Note *note)
+{
+    this->CalcMIDIPitch(0);
+    note->CalcMIDIPitch(0);
+
+    return (this->GetMIDIPitch() == note->GetMIDIPitch());
+}
+
 void Note::SetScoreTimeOnset(double scoreTime)
 {
     m_scoreTimeOnset = scoreTime;
@@ -1050,8 +1058,10 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-MapOfNoteLocs Note::CalcNoteLocations()
+MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate)
 {
+    if (predicate && !predicate(this)) return {};
+
     Layer *layer = NULL;
     Staff *staff = this->GetCrossStaff(layer);
     if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
@@ -1065,7 +1075,7 @@ MapOfNoteLocs Note::CalcNoteLocations()
 MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary)
 {
     const bool isUpwardDirection = (GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
-    const bool shiftUpwards = (isUpwardDirection && primary) || (!isUpwardDirection && !primary);
+    const bool shiftUpwards = (isUpwardDirection == primary);
     MapOfNoteLocs noteLocs = this->CalcNoteLocations();
     assert(noteLocs.size() == 1);
 

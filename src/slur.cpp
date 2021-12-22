@@ -187,10 +187,7 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
     }
     else {
         for (LayerElement *element : { this->GetStart(), this->GetEnd() }) {
-            int layerN = element->GetAlignmentLayerN();
-            if (layerN < 0) {
-                layerN = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER))->GetN();
-            }
+            const int layerN = element->GetOriginalLayerN();
             layersN.insert(layerN);
         }
     }
@@ -200,10 +197,7 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
     // Check whether outside layers exist
     const bool hasOutsideLayers = std::any_of(findSpannedLayerElementsParams.m_elements.cbegin(),
         findSpannedLayerElementsParams.m_elements.cend(), [minLayerN, maxLayerN](LayerElement *element) {
-            int layerN = element->GetAlignmentLayerN();
-            if (layerN < 0) {
-                layerN = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER))->GetN();
-            }
+            const int layerN = element->GetOriginalLayerN();
             return ((layerN < minLayerN) || (layerN > maxLayerN));
         });
 
@@ -218,13 +212,13 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
             notes.push_back(this->GetStart());
         }
         else {
-            this->GetStart()->FindAllDescendantByComparison(&notes, &cmp, 1, FORWARD, false);
+            this->GetStart()->FindAllDescendantsByComparison(&notes, &cmp, 1, FORWARD, false);
         }
         if (this->GetEnd()->Is(NOTE)) {
             notes.push_back(this->GetEnd());
         }
         else {
-            this->GetEnd()->FindAllDescendantByComparison(&notes, &cmp, 1, FORWARD, false);
+            this->GetEnd()->FindAllDescendantsByComparison(&notes, &cmp, 1, FORWARD, false);
         }
 
         // Determine the minimal and maximal diatonic pitch
@@ -233,10 +227,7 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
         for (Object *object : notes) {
             Note *note = vrv_cast<Note *>(object);
             assert(note);
-            int layerN = note->GetAlignmentLayerN();
-            if (layerN < 0) {
-                layerN = vrv_cast<Layer *>(note->GetFirstAncestor(LAYER))->GetN();
-            }
+            const int layerN = note->GetOriginalLayerN();
             if (layerN == maxLayerN) {
                 minPitch = std::min(note->GetDiatonicPitch(), minPitch);
             }
@@ -249,10 +240,7 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
         const bool layersAreSeparated
             = std::all_of(notes.cbegin(), notes.cend(), [minLayerN, maxLayerN, minPitch, maxPitch](Object *object) {
                   Note *note = vrv_cast<Note *>(object);
-                  int layerN = note->GetAlignmentLayerN();
-                  if (layerN < 0) {
-                      layerN = vrv_cast<Layer *>(note->GetFirstAncestor(LAYER))->GetN();
-                  }
+                  const int layerN = note->GetOriginalLayerN();
                   if (layerN < minLayerN) {
                       return (note->GetDiatonicPitch() > maxPitch);
                   }
@@ -584,7 +572,7 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
             const int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
             float distanceRatio = float(xLeft - bezierCurve.p1.x) / float(dist);
             // Ignore obstacles close to the endpoints, because this would result in very large shifts
-            if (std::abs(0.5 - distanceRatio) < 0.45) {
+            if ((std::abs(0.5 - distanceRatio) < 0.45) && (intersectionLeft > 0)) {
                 const double t = BoundingBox::CalcBezierParamAtPosition(points, xLeft);
                 constraints.push_back(
                     { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), double(intersectionLeft) });
@@ -594,7 +582,7 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
             const int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
             distanceRatio = float(xRight - bezierCurve.p1.x) / float(dist);
             // Ignore obstacles close to the endpoints, because this would result in very large shifts
-            if (std::abs(0.5 - distanceRatio) < 0.45) {
+            if ((std::abs(0.5 - distanceRatio) < 0.45) && (intersectionRight > 0)) {
                 const double t = BoundingBox::CalcBezierParamAtPosition(points, xRight);
                 constraints.push_back(
                     { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), double(intersectionRight) });
@@ -893,24 +881,14 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     bool isShortSlur = false;
     if (x2 - x1 < doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
 
-    /************** calculate the radius for adjusting the x position **************/
-
-    int startRadius = 0;
-    if (!start->Is(TIMESTAMP_ATTR)) {
-        startRadius = start->GetDrawingRadius(doc);
-    }
-
-    int endRadius = 0;
-    if (!end->Is(TIMESTAMP_ATTR)) {
-        endRadius = end->GetDrawingRadius(doc);
-    }
-
     Beam *parentBeam = NULL;
     FTrem *parentFTrem = NULL;
     int yChordMax = 0, yChordMin = 0;
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        // first get the min max of the chord (if any)
+    if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) && !start->Is(TIMESTAMP_ATTR)) {
+        // get the radius for adjusting the x position
+        const int startRadius = start->GetDrawingRadius(doc);
+        // get the min max of the chord (if any)
         if (startChord) {
             startChord->GetYExtremes(yChordMax, yChordMin);
         }
@@ -942,8 +920,8 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             }
             // d(^)
             else {
-                // put it on the side, move it left, but not if we have a @tstamp
-                if (!start->Is(TIMESTAMP_ATTR) && (startStemLen != 0)) x1 += unit * 2;
+                // put it on the side, move it right
+                if (startStemLen != 0) x1 += unit * 2;
                 if (startChord)
                     y1 = yChordMax + unit * 3;
                 else
@@ -987,7 +965,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             }
             // P(_)
             else {
-                // put it on the side, but no need to move it left
+                // put it on the side, but no need to move it right
                 if (startChord) {
                     y1 = yChordMin - unit * 3;
                 }
@@ -997,7 +975,9 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             }
         }
     }
-    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+    if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) && !end->Is(TIMESTAMP_ATTR)) {
+        // get the radius for adjusting the x position
+        const int endRadius = end->GetDrawingRadius(doc);
         // get the min max of the chord if any
         if (endChord) {
             endChord->GetYExtremes(yChordMax, yChordMin);
@@ -1014,7 +994,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             else if (isGraceToNoteSlur) {
-                if (start->IsInBeam()) {
+                if (end->IsInBeam()) {
                     x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
                 else if (parentBeam || parentFTrem) {
@@ -1052,7 +1032,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             }
             // (^)d
             else {
-                // put it on the side, no need to move it right
+                // put it on the side, no need to move it left
                 if (endChord) {
                     y2 = yChordMax + unit * 3;
                 }
@@ -1071,7 +1051,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             else if (isGraceToNoteSlur) {
-                if (start->IsInBeam()) {
+                if (end->IsInBeam()) {
                     x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
                 else if (parentBeam || parentFTrem) {
@@ -1085,8 +1065,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     }
                 }
                 else {
-                    y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-                    x2 -= endRadius;
+                    x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
             }
             // portato slurs
@@ -1107,8 +1086,8 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             }
             // (_)P
             else {
-                // put it on the side, move it right, but not if we have a @tstamp2
-                if (!end->Is(TIMESTAMP_ATTR)) x2 -= unit * 2;
+                // put it on the side, move it left
+                if (endStemLen != 0) x2 -= unit * 2;
                 if (endChord) {
                     y2 = yChordMin - unit * 3;
                 }
@@ -1238,12 +1217,11 @@ std::pair<int, int> Slur::CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, 
 PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord, curvature_CURVEDIR curveDir) const
 {
     ListOfObjects artics;
-    ClassIdComparison cmp(ARTIC);
     if (startChord) {
-        startChord->FindAllDescendantByComparison(&artics, &cmp, 1);
+        artics = startChord->FindAllDescendantsByType(ARTIC, true, 1);
     }
     else if (startNote) {
-        startNote->FindAllDescendantByComparison(&artics, &cmp, 1);
+        artics = startNote->FindAllDescendantsByType(ARTIC, true, 1);
     }
 
     PortatoSlurType type = PortatoSlurType::None;

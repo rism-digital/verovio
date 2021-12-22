@@ -2,11 +2,11 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20201107 at Wed Nov 17 16:37:14 2021
+Created by FontForge 20201107 at Tue Nov 23 15:17:13 2021
  By Klaus Rettinghaus
-Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
+Created by Etienne Darbellay, Jean-Francois Marti, Laurent Pugin, and Klaus Rettinghaus.
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.63
+Version 5.2.64
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="1000" >
@@ -679,8 +679,8 @@ s-7 -7 -10 -9c-5 -5 -12 -7 -21 -7c-15 0 -22 8 -22 25l1 12zM495 9c10 0 20 5 29 15
 M86 180c-15 17 -25 40 -28 67c0 11 3 22 8 33s13 21 23 29c21 15 47 23 78 23c29 0 53 -9 71 -27s27 -37 28 -58c0 -17 -6 -32 -17 -45s-28 -25 -51 -36c21 -25 32 -52 32 -80c0 -23 -10 -44 -30 -61c-21 -16 -51 -24 -90 -24c-34 0 -61 8 -80 25s-29 37 -30 60
 c0 18 7 36 22 55c13 16 34 29 64 39zM98 168c-19 -12 -34 -25 -43 -38s-14 -28 -15 -44c2 -23 9 -38 21 -47s30 -15 55 -18c17 0 29 4 38 12s13 21 14 38c-3 21 -26 54 -70 97zM187 180c26 20 39 44 39 71c0 17 -5 31 -16 44s-25 19 -42 20c-28 0 -44 -15 -47 -44l2 -12
 c7 -22 29 -48 64 -79z" />
-    <glyph glyph-name="uniE504" unicode="&#xe504;" horiz-adv-x="991" 
- />
+    <glyph glyph-name="uniE504" unicode="&#xe504;" horiz-adv-x="508" 
+d="M508 242l-362 -484h-146l362 484h146z" />
     <glyph glyph-name="uniE069" unicode="&#xe069;" horiz-adv-x="325" 
 d="M200 250h125v-500h-125v500zM0 250h125v-500h-125v500z" />
     <glyph glyph-name="uniE06A" unicode="&#xe06a;" horiz-adv-x="257" 
@@ -1596,5 +1596,23 @@ d="M537 233h-64v-233h-187v-73h-35v73h-186v199v34h-65v40h65v233h186v74h35v-74h187
 d="M365 375c0 28 22 50 50 50s50 -22 50 -50s-22 -50 -50 -50s-50 22 -50 50zM365 625c0 28 22 50 50 50s50 -22 50 -50s-22 -50 -50 -50s-50 22 -50 50zM225 875h40l-1 -750h-39v750zM0 875h125v-750h-125v750z" />
     <glyph glyph-name="uniE04D" unicode="&#xe04d;" horiz-adv-x="465" 
 d="M0 375c0 28 22 50 50 50s50 -22 50 -50s-22 -50 -50 -50s-50 22 -50 50zM0 625c0 28 22 50 50 50s50 -22 50 -50s-22 -50 -50 -50s-50 22 -50 50zM340 875h125v-750h-125v750zM200 875h40l-1 -750h-39v750z" />
+    <glyph glyph-name="uniE503" unicode="&#xe503;" horiz-adv-x="95" 
+d="M0 118c0 13 4 25 13 34s19 14 32 15c14 0 26 -4 35 -12s14 -19 15 -33c0 -13 -4 -25 -13 -34s-19 -14 -32 -15c-14 0 -26 4 -35 12s-14 19 -15 33z" />
+    <glyph glyph-name="uniE505" unicode="&#xe505;" horiz-adv-x="95" 
+d="M0 -121c0 13 4 25 13 34s19 14 32 15c14 0 26 -4 35 -12s14 -19 15 -33c0 -13 -4 -25 -13 -34s-19 -14 -32 -15c-14 0 -26 4 -35 12s-14 19 -15 33z" />
+    <glyph glyph-name="uniE4F3" unicode="&#xe4f3;" horiz-adv-x="261" 
+d="M0 246v8c0 8 0 12 8 12h245c8 0 8 -4 8 -12v-8c0 -8 0 -12 -8 -12h-60v-218h60c8 0 8 -4 8 -12v-8c0 -8 0 -12 -8 -12h-235c-8 0 -8 4 -8 12v8c0 8 0 12 8 12h50v218h-60c-8 0 -8 4 -8 12z" />
+    <glyph glyph-name="uniE4F4" unicode="&#xe4f4;" horiz-adv-x="436" 
+d="M8 16h420c8 0 8 -4 8 -12v-8c0 -8 0 -12 -8 -12h-60v-99c0 -9 -1 -10 -10 -10h-280c-9 0 -10 1 -10 10v99h-60c-8 0 -8 4 -8 12v8c0 8 0 12 8 12z" />
+    <glyph glyph-name="uniE4F5" unicode="&#xe4f5;" horiz-adv-x="436" 
+d="M0 -4v8c0 8 0 12 8 12h60v99c0 9 1 10 10 10h280c9 0 10 -1 10 -10v-99h60c8 0 8 -4 8 -12v-8c0 -8 0 -12 -8 -12h-420c-8 0 -8 4 -8 12z" />
+    <glyph glyph-name="uniE4EE" unicode="&#xe4ee;" horiz-adv-x="750" 
+d="M0 -240v480c0 8 2 10 10 10h30c8 0 10 -2 10 -10v-115h650v115c0 8 2 10 10 10h30c8 0 10 -2 10 -10v-480c0 -8 -2 -10 -10 -10h-30c-8 0 -10 2 -10 10v115h-650v-115c0 -8 -2 -10 -10 -10h-30c-8 0 -10 2 -10 10z" />
+    <glyph glyph-name="uniE4F0" unicode="&#xe4f0;" horiz-adv-x="500" 
+d="M-30 125h570v-250h-570v250z" />
+    <glyph glyph-name="uniE4EF" unicode="&#xe4ef;" horiz-adv-x="500" 
+d="M0 -240v480c0 8 2 10 10 10h30c8 0 10 -2 10 -10v-115h450v-250h-450v-115c0 -8 -2 -10 -10 -10h-30c-8 0 -10 2 -10 10z" />
+    <glyph glyph-name="uniE4F1" unicode="&#xe4f1;" horiz-adv-x="500" 
+d="M0 -125v250h450v115c0 8 2 10 10 10h30c8 0 10 -2 10 -10v-480c0 -8 -2 -10 -10 -10h-30c-8 0 -10 2 -10 10v115h-450z" />
   </font>
 </defs></svg>
