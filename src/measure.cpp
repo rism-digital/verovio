@@ -20,8 +20,10 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "f.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "harm.h"
 #include "multirest.h"
 #include "page.h"
 #include "pedal.h"
@@ -1487,6 +1489,32 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
         else {
             (*iter).second.first--;
             ++iter;
+        }
+    }
+
+    // Here we can also set the start for F within Harm that have no @startid or @tstamp but might have an extender
+    // In the future, we can do something similar to handle Dir within other types of control events
+    // Basically, a child control event should use the start (and end) of its parent.
+    // In the case of F, we still expect the @tstamp2 to be given in F, but this could be changed
+    // Eventually, this could be done in another functor if it becomes a more common way to set start / end because it
+    // is a bit weird to iterate over F objects here.
+    ListOfObjects fs = this->FindAllDescendantsByType(FIGURE);
+    for (auto &object : fs) {
+        F *f = vrv_cast<F *>(object);
+        assert(f);
+        // Nothing to do if the f has as start or has not end
+        if (f->GetStart() || !f->GetEnd()) continue;
+
+        Harm *harm = vrv_cast<Harm *>(f->GetFirstAncestor(HARM));
+        if (harm) {
+            f->SetStart(harm->GetStart());
+            // We should also remove the f from the list because we can consider it as being mapped now
+            auto item = std::find_if(params->m_timeSpanningInterfaces.begin(), params->m_timeSpanningInterfaces.end(),
+                [f](std::pair<TimeSpanningInterface *, ClassId> pair) { return (pair.first == f); });
+            if (item != params->m_timeSpanningInterfaces.end()) {
+                // LogDebug("Found it!");
+                params->m_timeSpanningInterfaces.erase(item);
+            }
         }
     }
 
