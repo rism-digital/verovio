@@ -668,6 +668,7 @@ public:
     OptionInt m_measureMinWidth;
     OptionInt m_mnumInterval;
     OptionIntMap m_multiRestStyle;
+    OptionDbl m_multiRestThickness;
     OptionBool m_octaveAlternativeSymbols;
     OptionDbl m_octaveLineThickness;
     OptionDbl m_pedalLineThickness;

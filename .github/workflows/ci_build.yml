@@ -229,7 +229,7 @@ jobs:
           key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}
 
       - name: Set up emsdk
-        uses: mymindstorm/setup-emsdk@v7
+        uses: mymindstorm/setup-emsdk@v11
         with:
           version: ${{ env.EM_VERSION }}
           actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}

@@ -67,7 +67,18 @@ public:
      */
     int GetAdjacentElementsDuration(int elementX) const;
 
+    /**
+     * @name Getters for the X and Y starting value of the beam;
+     */
+    ///@{
+    int GetStartingX() const;
+    int GetStartingY() const;
+    ///@}
+
 private:
+    // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)
+    void AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
+
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     bool CalcBeamSlope(
@@ -77,12 +88,13 @@ private:
 
     void CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
 
-    void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+    // Helper to adjust position of starting point to make sure that beam start-/endpoints touch the staff lines
+    void CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     // Helper to calculate the longest stem length of the beam (which will be used uniformely)
-    void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place);
+    void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal);
 
     // Helper to calculate relative position of the beam to for each of the coordinates
     void CalcMixedBeamPlace(Staff *staff);
@@ -101,8 +113,6 @@ private:
 
 public:
     // values set by CalcBeam
-    int m_startingX; // the initial X position of the beam
-    int m_startingY; // the initial Y position of the beam
     int m_nbNotesOrChords;
     bool m_extendedToCenter; // the stem where extended to touch the center staff line
     double m_beamSlope; // the slope of the beam
@@ -233,7 +243,7 @@ public:
         data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
     void SetClosestNote(data_STEMDIRECTION stemDir);
 
-    int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir);
+    int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal);
 
     /**
      * Return stem length adjustment in half units, depending on the @stem.mode attribute
@@ -247,7 +257,6 @@ public:
     int m_overlapMargin;
     int m_maxShortening; // maximum allowed shortening in half units
     bool m_centered; // beam is centered on the line
-    bool m_shortened; // stem is shortened because pointing oustide the staff
     data_BEAMPLACE m_beamRelativePlace;
     char m_partialFlags[MAX_DURATION_PARTIALS];
     data_BEAMPLACE m_partialFlagPlace;

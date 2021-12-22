@@ -1,10 +1,17 @@
 # Changelog
 
+## [unreleased]
+* Support for figured-bass extenders on `f` without `@tstamp` or `@startid` 
+* Improved page-based MEI output with validation with a customized MEI Schema
+* Improved layout with beams and control events (ornaments, fingering, etc.) (@eNote-GmBH)
+* Improve enharmonic tie overlap with accidentals (@eNote-GmBH)
+* Improved Plaine and Easie validation output with error codes and values
+* Improved adjacent note tie and enharmonic tie overlap (eNote-GmBH)
+* Additional parameters to the getMEI method for exporting selected content (@eNote-GmBH)
+* Option --multi-rest-thickness to control the thickness of measure rests (@eNote-GmBH)
+
 ## [3.7.0] - 2021-11-22
 * Complete refactoring of the Plaine and Easie parser
-* Support for `arpeg@enclose` (@eNote-GmBH)
-* Support for `clef@enclose` (@eNote-GmBH)
-* Support for `metersig@enclose` (@eNote-GmBH)
 * Support for `multiRest@num.place` (@eNote-GmBH)
 * Support for `meterSig@enclose`, `clef@enclose` and `arpeg@enclose` (@eNote-GmBH)
 * Support for `accid@loc` and `accid@oloc`/`accid@ploc` (@eNote-GmBH)

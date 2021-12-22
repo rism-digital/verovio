@@ -122,6 +122,12 @@ public:
     bool HasOneStepHeight();
 
     /**
+     * Get total beam width with regards to the shortest duration of the beam (counting both beams and whitespace
+     * between them)
+     */
+    int GetTotalBeamWidth() const;
+
+    /**
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
     void ClearCoords();

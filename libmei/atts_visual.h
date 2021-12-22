@@ -434,7 +434,7 @@ public:
 private:
     /** Indicates the number of beams present. **/
     int m_beams;
-    /** Captures the number of "floating" beams, i.e., those not attached to stems. **/
+    /** Captures the number of "floating" beams, **/
     int m_beamsFloat;
     /** Records the amount of separation between floating beams and stems. **/
     data_MEASUREMENTABS m_floatGap;
@@ -1411,10 +1411,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Indicates whether a space is 'compressible', i.e., if it may be removed at the
-     * discretion of processing software.
-     **/
+    /** Indicates whether a space is 'compressible', **/
     data_BOOLEAN m_compressable;
 
     /* include <attcompressable> */

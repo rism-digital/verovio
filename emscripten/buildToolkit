@@ -80,13 +80,13 @@ GetOptions (
 # This can be disabled in the light version, which uses the default memory settings.
 my $FLAGS = "-O3";
 $FLAGS .= " -DNDEBUG";
-$FLAGS .= " --memory-init-file 0";
 $FLAGS .= " -std=c++$cpp";
 
 my $LFLAGS =  " -s ASM_JS=1";
 $LFLAGS .= " -s INITIAL_MEMORY=256MB";
 $LFLAGS .= " -s TOTAL_STACK=128MB";
 $LFLAGS .= " -s WASM=0";
+$LFLAGS .= " --memory-init-file 0";
 
 # Process command-line options:
 
@@ -108,6 +108,7 @@ if ($wasmQ) {
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
 	$LFLAGS = " -s ASM_JS=1 -s WASM=0";
+	$LFLAGS .= " --memory-init-file 0";
 	$FLAGS_NAME = "-light";
 }
 

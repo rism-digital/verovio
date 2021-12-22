@@ -41,8 +41,8 @@
 #include "note.h"
 #include "options.h"
 #include "page.h"
-#include "pageboundary.h"
 #include "pageelement.h"
+#include "pagemilestone.h"
 #include "reh.h"
 #include "smufl.h"
 #include "staff.h"
@@ -158,8 +158,8 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
     assert(dc);
     assert(element);
 
-    if (element->Is(PAGE_ELEMENT_END)) {
-        PageElementEnd *elementEnd = vrv_cast<PageElementEnd *>(element);
+    if (element->Is(PAGE_MILESTONE_END)) {
+        PageMilestoneEnd *elementEnd = vrv_cast<PageMilestoneEnd *>(element);
         assert(elementEnd);
         assert(elementEnd->GetStart());
         dc->StartGraphic(element, elementEnd->GetStart()->GetUuid(), element->GetUuid());
@@ -167,12 +167,12 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
     }
     else if (element->Is(MDIV)) {
         // When the mdiv is not visible, then there is no start / end element
-        std::string elementStart = (element->IsBoundaryElement()) ? "pageElementStart" : "";
+        std::string elementStart = (element->IsMilestoneElement()) ? "pageMilestone" : "";
         dc->StartGraphic(element, elementStart, element->GetUuid());
         dc->EndGraphic(element, this);
     }
     else if (element->Is(SCORE)) {
-        dc->StartGraphic(element, "pageElementStart", element->GetUuid());
+        dc->StartGraphic(element, "pageMilestone", element->GetUuid());
         dc->EndGraphic(element, this);
     }
 }
@@ -789,9 +789,15 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
 
         int yTop = first->GetDrawingY();
+        if (firstDef->GetLines() <= 1) {
+            yTop += m_doc->GetDrawingDoubleUnit(first->m_drawingStaffSize);
+        }
         // for the bottom position we need to take into account the number of lines and the staff size
         int yBottom
             = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+        if (lastDef->GetLines() <= 1) {
+            yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+        }
 
         // erase intersections only if we have more than one staff
         bool eraseIntersections = (first != last) ? true : false;
@@ -1226,9 +1232,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
                 fullLine.UpdateContentBBoxY(y1 + (lineWidth / 2), y1 - (lineWidth / 2));
                 fullLine.UpdateContentBBoxX(x1, x2);
                 int margin = m_doc->GetDrawingUnit(100) / 2;
-                ListOfObjects notes;
-                ClassIdComparison matchClassId(NOTE);
-                staff->FindAllDescendantByComparison(&notes, &matchClassId);
+                ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
                 for (auto &note : notes) {
                     if (note->VerticalContentOverlap(&fullLine, margin / 2)) {
                         line.AddGap(note->GetContentLeft() - margin, note->GetContentRight() + margin);
@@ -1720,7 +1724,7 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
     }
     std::string elementStart;
-    if (element->IsBoundaryElement()) elementStart = "systemeElementStart";
+    if (element->IsMilestoneElement()) elementStart = "systemElementStart";
 
     dc->StartGraphic(element, elementStart, element->GetUuid());
     // EditorialElements at the system level that are visible have no children

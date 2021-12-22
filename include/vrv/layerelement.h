@@ -40,6 +40,7 @@ class StaffAlignment;
 class LayerElement : public Object,
                      public FacsimileInterface,
                      public LinkingInterface,
+                     public AttCoordX1,
                      public AttLabelled,
                      public AttTyped {
 public:
@@ -129,6 +130,11 @@ public:
     int GetAlignmentLayerN() const { return m_alignmentLayerN; }
     void SetAlignmentLayerN(int alignmentLayerN) { m_alignmentLayerN = alignmentLayerN; }
     ///@}
+
+    /**
+     * @return (cross) layer number, parent layer number for cross staff elements
+     */
+    int GetOriginalLayerN();
 
     /**
      * @name Get the X and Y drawing position

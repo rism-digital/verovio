@@ -93,6 +93,11 @@ void BeamDrawingInterface::Reset()
     m_beamWidthWhite = 0;
 }
 
+int BeamDrawingInterface::GetTotalBeamWidth() const
+{
+    return m_beamWidthBlack + (m_shortestDur - DUR_8) * m_beamWidth;
+}
+
 void BeamDrawingInterface::ClearCoords()
 {
     ArrayOfBeamElementCoords::iterator iter;

@@ -226,7 +226,7 @@ Clef *Layer::GetClefFacs(LayerElement *test)
     if (doc->GetType() == Facs) {
         ListOfObjects clefs;
         ClassIdComparison ac(CLEF);
-        doc->FindAllDescendantBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
+        doc->FindAllDescendantsBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
         if (clefs.size() > 0) {
             return dynamic_cast<Clef *>(*clefs.rbegin());
         }

@@ -1211,9 +1211,9 @@
             <glyph glyph-code="E500" smufl-name="repeat1Bar" />
             <glyph glyph-code="E501" smufl-name="repeat2Bars" />
             <glyph glyph-code="E502" smufl-name="repeat4Bars" />
-            <!--<glyph glyph-code="E503" smufl-name="repeatBarUpperDot" />-->
-            <!--<glyph glyph-code="E504" smufl-name="repeatBarSlash" />-->
-            <!--<glyph glyph-code="E505" smufl-name="repeatBarLowerDot" />-->
+            <glyph glyph-code="E503" smufl-name="repeatBarUpperDot" />
+            <glyph glyph-code="E504" smufl-name="repeatBarSlash" />
+            <glyph glyph-code="E505" smufl-name="repeatBarLowerDot" />
             <range_end>U+E50F</range_end>
             <range_start>U+E500</range_start>
         </barRepeats>

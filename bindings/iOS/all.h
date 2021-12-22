@@ -107,6 +107,7 @@
 #import <VerovioFramework/iomusxml.h>
 #import <VerovioFramework/git_commit.h>
 #import <VerovioFramework/rend.h>
+#import <VerovioFramework/pagemilestone.h>
 #import <VerovioFramework/sic.h>
 #import <VerovioFramework/grpsym.h>
 #import <VerovioFramework/fig.h>
@@ -133,6 +134,7 @@
 #import <VerovioFramework/object.h>
 #import <VerovioFramework/orig.h>
 #import <VerovioFramework/artic.h>
+#import <VerovioFramework/systemmilestone.h>
 #import <VerovioFramework/pedal.h>
 #import <VerovioFramework/iopae.h>
 #import <VerovioFramework/instrdef.h>

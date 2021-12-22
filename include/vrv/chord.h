@@ -157,6 +157,13 @@ public:
     int AdjustOverlappingLayers(
         Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison) override;
 
+    /**
+     * Helper to get list of notes that are adjacent to the specified location.
+     * Diatonic step difference is take up to 2 points, so HasAdjacentNotesInStaff() needs to be called first, to make
+     * sure there actually are adjacent notes.
+     */
+    std::list<Note *> GetAdjacentNotesList(Staff *staff, int loc);
+
     //----------//
     // Functors //
     //----------//
@@ -226,6 +233,12 @@ protected:
      * secondary
      */
     MapOfDotLocs CalcDotLocations(int layerCount, bool primary) override;
+
+    /**
+     * Calculate stem direction based on the position of the notes in chord. Notes are compared in pairs starting from
+     * the top-/bottommost and moving inward towards the center of the chord
+     */
+    data_STEMDIRECTION CalcStemDirection(int verticalCenter);
 
     /**
      * Clear the m_clusters vector and delete all the objects.

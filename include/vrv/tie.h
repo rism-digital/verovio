@@ -54,6 +54,12 @@ public:
 
     virtual bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);
 
+    /**
+     * Calculate starting/ending point for the ties in the chords with adjacent notes
+     */
+    int CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChord, Note *note,
+        curvature_CURVEDIR drawingCurveDir, int initialX, bool isStartPoint);
+
     //----------//
     // Functors //
     //----------//
@@ -66,16 +72,20 @@ public:
     ///@}
 
 private:
+    // Update tie positioning based overlaps with accidentals in cases with enharmonic ties
+    bool AdjustEnharmonicTies(Doc *doc, FloatingCurvePositioner *curve, Point bezier[4], Note *startNote, Note *endNote,
+        curvature_CURVEDIR drawingCurveDir);
+
     // Calculate initial position X position and return stem direction of the startNote
     void CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
-        bool isOuterChordNote, Point &startPoint, Point &endPoint);
+        bool isOuterChordNote, Point &startPoint, Point &endPoint, curvature_CURVEDIR drawingCurveDir);
 
     // Helper function to get preferred curve direction based on the number of conditions (like note direction, position
     // on the staff, etc.)
     curvature_CURVEDIR GetPreferredCurveDirection(
         Layer *layer, Note *note, Chord *startParentChord, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
 
-    // Update tie positioning based on the overlaps with posible layerElements such as dots/flags
+    // Update tie positioning based on the overlaps with possible layerElements such as dots/flags
     void UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], LayerElement *durElement,
         Note *startNote, int height, curvature_CURVEDIR drawingCurveDir);
 

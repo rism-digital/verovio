@@ -20,8 +20,10 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "f.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "harm.h"
 #include "multirest.h"
 #include "page.h"
 #include "pedal.h"
@@ -30,7 +32,7 @@
 #include "staffdef.h"
 #include "syl.h"
 #include "system.h"
-#include "systemboundary.h"
+#include "systemmilestone.h"
 #include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
@@ -52,6 +54,8 @@ static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 Measure::Measure(bool measureMusic, int logMeasureNb)
     : Object(MEASURE, "measure-")
     , AttBarring()
+    , AttCoordX1()
+    , AttCoordX2()
     , AttMeasureLog()
     , AttMeterConformanceBar()
     , AttNNumberLike()
@@ -59,6 +63,8 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     , AttTyped()
 {
     RegisterAttClass(ATT_BARRING);
+    RegisterAttClass(ATT_COORDX1);
+    RegisterAttClass(ATT_COORDX2);
     RegisterAttClass(ATT_MEASURELOG);
     RegisterAttClass(ATT_METERCONFORMANCEBAR);
     RegisterAttClass(ATT_NNUMBERLIKE);
@@ -111,6 +117,8 @@ void Measure::CloneReset()
 void Measure::Reset()
 {
     Object::Reset();
+    ResetCoordX1();
+    ResetCoordX2();
     ResetMeasureLog();
     ResetMeterConformanceBar();
     ResetNNumberLike();
@@ -371,9 +379,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     std::vector<int> staffList;
 
     // First get all the staffGrps
-    ClassIdComparison matchType(STAFFGRP);
-    ListOfObjects staffGrps;
-    scoreDef->FindAllDescendantByComparison(&staffGrps, &matchType);
+    ListOfObjects staffGrps = scoreDef->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
     for (auto &staffGrp : staffGrps) {
@@ -398,9 +404,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 Staff *Measure::GetTopVisibleStaff()
 {
     Staff *staff = NULL;
-    ListOfObjects staves;
-    ClassIdComparison matchType(STAFF);
-    this->FindAllDescendantByComparison(&staves, &matchType, 1);
+    ListOfObjects staves = this->FindAllDescendantsByType(STAFF, false);
     for (auto &child : staves) {
         staff = vrv_cast<Staff *>(child);
         assert(staff);
@@ -415,9 +419,7 @@ Staff *Measure::GetTopVisibleStaff()
 Staff *Measure::GetBottomVisibleStaff()
 {
     Staff *bottomStaff = NULL;
-    ListOfObjects staves;
-    ClassIdComparison matchType(STAFF);
-    this->FindAllDescendantByComparison(&staves, &matchType, 1);
+    ListOfObjects staves = this->FindAllDescendantsByType(STAFF, false);
     for (const auto child : staves) {
         Staff *staff = vrv_cast<Staff *>(child);
         assert(staff);
@@ -625,9 +627,7 @@ void Measure::SetInvisibleStaffBarlines(
 
 std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEndpoints()
 {
-    ListOfObjects children;
-    ClassIdComparison comp(TIE);
-    this->FindAllDescendantByComparison(&children, &comp);
+    ListOfObjects children = this->FindAllDescendantsByType(TIE);
 
     std::vector<std::pair<LayerElement *, LayerElement *>> endpoints;
     for (Object *object : children) {
@@ -1299,23 +1299,23 @@ int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareBoundaries(FunctorParams *functorParams)
+int Measure::PrepareMilestones(FunctorParams *functorParams)
 {
-    PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
+    PrepareMilestonesParams *params = vrv_params_cast<PrepareMilestonesParams *>(functorParams);
     assert(params);
 
-    std::vector<SystemElementStartInterface *>::iterator iter;
-    for (iter = params->m_startBoundaries.begin(); iter != params->m_startBoundaries.end(); ++iter) {
+    std::vector<SystemMilestoneInterface *>::iterator iter;
+    for (iter = params->m_startMilestones.begin(); iter != params->m_startMilestones.end(); ++iter) {
         (*iter)->SetMeasure(this);
     }
-    params->m_startBoundaries.clear();
+    params->m_startMilestones.clear();
 
     if (params->m_currentEnding) {
         // Set the ending to each measure in between
         m_drawingEnding = params->m_currentEnding;
     }
 
-    // Keep a pointer to the measure for when we are reaching the end (see SystemElementEnd::PrepareBoundaries)
+    // Keep a pointer to the measure for when we are reaching the end (see SystemMilestoneEnd::PrepareMilestones)
     params->m_lastMeasure = this;
 
     return FUNCTOR_CONTINUE;
@@ -1489,6 +1489,32 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
         else {
             (*iter).second.first--;
             ++iter;
+        }
+    }
+
+    // Here we can also set the start for F within Harm that have no @startid or @tstamp but might have an extender
+    // In the future, we can do something similar to handle Dir within other types of control events
+    // Basically, a child control event should use the start (and end) of its parent.
+    // In the case of F, we still expect the @tstamp2 to be given in F, but this could be changed
+    // Eventually, this could be done in another functor if it becomes a more common way to set start / end because it
+    // is a bit weird to iterate over F objects here.
+    ListOfObjects fs = this->FindAllDescendantsByType(FIGURE);
+    for (auto &object : fs) {
+        F *f = vrv_cast<F *>(object);
+        assert(f);
+        // Nothing to do if the f has as start or has not end
+        if (f->GetStart() || !f->GetEnd()) continue;
+
+        Harm *harm = vrv_cast<Harm *>(f->GetFirstAncestor(HARM));
+        if (harm) {
+            f->SetStart(harm->GetStart());
+            // We should also remove the f from the list because we can consider it as being mapped now
+            auto item = std::find_if(params->m_timeSpanningInterfaces.begin(), params->m_timeSpanningInterfaces.end(),
+                [f](std::pair<TimeSpanningInterface *, ClassId> pair) { return (pair.first == f); });
+            if (item != params->m_timeSpanningInterfaces.end()) {
+                // LogDebug("Found it!");
+                params->m_timeSpanningInterfaces.erase(item);
+            }
         }
     }
 

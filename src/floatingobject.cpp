@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "beam.h"
 #include "bracketspan.h"
 #include "breath.h"
 #include "dir.h"
@@ -219,7 +220,11 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         assert(harm);
         // harm above by default
         m_place = (harm->GetPlace() != STAFFREL_NONE) ? harm->GetPlace() : STAFFREL_above;
-        if ((harm->GetPlace() == STAFFREL_NONE) && object->GetFirst()->Is(FB)) m_place = STAFFREL_below;
+        // fb below by default
+        if (harm->GetPlace() == STAFFREL_NONE) {
+            Object *firstChild = harm->GetFirst();
+            if (firstChild && firstChild->Is(FB)) m_place = STAFFREL_below;
+        }
     }
     else if (object->Is(MORDENT)) {
         Mordent *mordent = vrv_cast<Mordent *>(object);
@@ -350,20 +355,24 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     int staffSize = staffAlignment->GetStaffSize();
     int yRel;
 
+    const int unit = doc->GetDrawingUnit(staffSize);
     if (horizOverlapingBBox == NULL) {
         // Apply element margin and enforce minimal staff distance
         int staffIndex = staffAlignment->GetStaff()->GetN();
         int minStaffDistance
             = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place) * doc->GetDrawingUnit(staffSize);
+        if (this->GetObject()->Is(FERMATA) && (staffAlignment->GetStaff()->m_drawingLines == 1)) {
+            minStaffDistance = 2.5 * doc->GetDrawingUnit(staffAlignment->GetStaff()->m_drawingStaffSize);
+        }
         if (m_place == STAFFREL_above) {
             yRel = this->GetContentY1();
-            yRel -= doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+            yRel -= doc->GetBottomMargin(m_object->GetClassId()) * unit;
             this->SetDrawingYRel(yRel);
             this->SetDrawingYRel(-minStaffDistance);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + this->GetContentY2();
-            yRel += doc->GetTopMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+            yRel += doc->GetTopMargin(m_object->GetClassId()) * unit;
             this->SetDrawingYRel(yRel);
             this->SetDrawingYRel(minStaffDistance + staffAlignment->GetStaffHeight());
         }
@@ -373,19 +382,22 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (curve) {
             assert(curve->m_object);
         }
-        int margin = doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+        int margin = doc->GetBottomMargin(m_object->GetClassId()) * unit;
+        const bool isExtender = m_object->Is({ DIR, DYNAM }) && m_object->IsExtenderElement();
 
         if (m_place == STAFFREL_above) {
             if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
-                const int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
+                const int shift = this->Intersects(curve, CONTENT, unit);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }
                 return true;
             }
-            else if (m_object->Is(DYNAM) && horizOverlapingBBox->Is(BEAM)) {
-                // Try to avoid comparing with BEAM BB since it might be much larger overlap while having a lot of
-                // whitespace. For such cases, DYNAM should be compared to individual elements of BEAM instead
+            else if (horizOverlapingBBox->Is(BEAM) && !isExtender) {
+                const int shift = this->Intersects(vrv_cast<Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
+                if (shift != 0) {
+                    this->SetDrawingYRel(this->GetDrawingYRel() - shift);
+                }
                 return true;
             }
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + this->GetContentY1() - margin;
@@ -393,7 +405,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
-            if (m_object->Is({ DIR, DYNAM }) && m_object->IsExtenderElement()) {
+            if (isExtender) {
                 m_object->SetMaxDrawingYRel(yRel);
                 this->SetDrawingYRel(std::min(yRel, m_object->GetMaxDrawingYRel()));
             }
@@ -408,7 +420,14 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         }
         else {
             if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
-                const int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
+                const int shift = this->Intersects(curve, CONTENT, unit);
+                if (shift != 0) {
+                    this->SetDrawingYRel(this->GetDrawingYRel() - shift);
+                }
+                return true;
+            }
+            else if (horizOverlapingBBox->Is(BEAM) && !isExtender) {
+                const int shift = this->Intersects(vrv_cast<Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }
@@ -420,7 +439,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
-            if (m_object->Is({ DIR, DYNAM }) && m_object->IsExtenderElement()) {
+            if (isExtender) {
                 m_object->SetMaxDrawingYRel(yRel);
                 this->SetDrawingYRel(std::max(yRel, m_object->GetMaxDrawingYRel()));
             }
@@ -527,6 +546,18 @@ void FloatingCurvePositioner::UpdatePoints(const BezierCurve &bezier)
     points[2] = bezier.c2;
     points[3] = bezier.p2;
     this->UpdateCurveParams(points, m_angle, m_thickness, m_dir);
+}
+
+void FloatingCurvePositioner::MoveFrontHorizontal(int distance)
+{
+    m_points[0].x += distance;
+    m_points[1].x += distance;
+}
+
+void FloatingCurvePositioner::MoveBackHorizontal(int distance)
+{
+    m_points[2].x += distance;
+    m_points[3].x += distance;
 }
 
 void FloatingCurvePositioner::MoveFrontVertical(int distance)

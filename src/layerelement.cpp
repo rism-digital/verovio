@@ -70,10 +70,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 LayerElement::LayerElement()
-    : Object(LAYER_ELEMENT, "le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : Object(LAYER_ELEMENT, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_COORDX1);
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -81,10 +82,11 @@ LayerElement::LayerElement()
 }
 
 LayerElement::LayerElement(ClassId classId)
-    : Object(classId, "le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : Object(classId, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_COORDX1);
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -92,10 +94,11 @@ LayerElement::LayerElement(ClassId classId)
 }
 
 LayerElement::LayerElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : Object(classId, classIdStr), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_COORDX1);
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -107,6 +110,7 @@ void LayerElement::Reset()
     Object::Reset();
     FacsimileInterface::Reset();
     LinkingInterface::Reset();
+    ResetCoordX1();
     ResetLabelled();
     ResetTyped();
 
@@ -207,29 +211,35 @@ FTrem *LayerElement::IsInFTrem()
 Beam *LayerElement::IsInBeam()
 {
     if (!this->Is({ CHORD, NOTE, STEM })) return NULL;
-    Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
+    Beam *beamParent = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
     if (beamParent != NULL) {
+        if (!this->IsGraceNote()) return beamParent;
         // This note is beamed and cue-sized - we will be able to get rid of this once MEI has a better modeling for
         // beamed grace notes
-        if (this->IsGraceNote()) {
-            LayerElement *graceNote = this;
-            if (this->Is(STEM)) graceNote = dynamic_cast<LayerElement *>(this->GetFirstAncestor(NOTE, MAX_BEAM_DEPTH));
-            // Make sure the object list is set
-            beamParent->GetList(beamParent);
-            // If the note is part of the beam parent, this means we have a beam of graced notes
-            if (beamParent->GetListIndex(graceNote) > -1) {
-                return beamParent;
-            }
-            // otherwise it is a non-beamed grace note within a beam - return NULL
-            else {
-                return NULL;
-            }
+        LayerElement *graceElement = this;
+        if (this->Is(STEM)) {
+            graceElement = vrv_cast<LayerElement *>(this->GetFirstAncestor(NOTE));
+            if (!graceElement) graceElement = vrv_cast<LayerElement *>(this->GetFirstAncestor(CHORD));
+            assert(graceElement);
         }
-        else {
+        // Make sure the object list is set
+        beamParent->GetList(beamParent);
+        // If the note is part of the beam parent, this means we have a beam of graced notes
+        if (beamParent->GetListIndex(graceElement) > -1) {
             return beamParent;
         }
+        // otherwise it is a non-beamed grace note within a beam - return NULL
     }
     return NULL;
+}
+
+int LayerElement::GetOriginalLayerN()
+{
+    int layerN = this->GetAlignmentLayerN();
+    if (layerN < 0) {
+        layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
+    }
+    return layerN;
 }
 
 Staff *LayerElement::GetCrossStaff(Layer *&layer) const
@@ -430,7 +440,7 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticTy
     ClassIdComparison isArtic(ARTIC);
     ListOfObjects artics;
     // Process backward because we want the farest away artic
-    this->FindAllDescendantByComparison(&artics, &isArtic, UNLIMITED_DEPTH, BACKWARD);
+    this->FindAllDescendantsByComparison(&artics, &isArtic, UNLIMITED_DEPTH, BACKWARD);
 
     Artic *artic = NULL;
     for (auto &child : artics) {
@@ -730,7 +740,7 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
     *lry = INT_MIN;
     ListOfObjects childrenWithFacsimileInterface;
     InterfaceComparison ic(INTERFACE_FACSIMILE);
-    this->FindAllDescendantByComparison(&childrenWithFacsimileInterface, &ic);
+    this->FindAllDescendantsByComparison(&childrenWithFacsimileInterface, &ic);
     bool result = false;
     for (auto it = childrenWithFacsimileInterface.begin(); it != childrenWithFacsimileInterface.end(); ++it) {
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(*it);
@@ -824,9 +834,7 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
         // Find the first note on the other layer
         Alignment *alignment = this->GetAlignment();
         const int currentLayerN = abs(this->GetAlignmentLayerN());
-        ListOfObjects notes;
-        ClassIdComparison noteCmp(NOTE);
-        alignment->FindAllDescendantByComparison(&notes, &noteCmp, 2);
+        ListOfObjects notes = alignment->FindAllDescendantsByType(NOTE, false);
         auto noteIt = std::find_if(notes.cbegin(), notes.cend(), [currentLayerN](Object *obj) {
             const int otherLayerN = abs(vrv_cast<Note *>(obj)->GetAlignmentLayerN());
             return (currentLayerN != otherLayerN);
@@ -2117,7 +2125,7 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
         // If yes, make them cross-staff themselves.
         ListOfObjects durations;
         InterfaceComparison hasInterface(INTERFACE_DURATION);
-        this->FindAllDescendantByComparison(&durations, &hasInterface);
+        this->FindAllDescendantsByComparison(&durations, &hasInterface);
         Staff *crossStaff = NULL;
         Layer *crossLayer = NULL;
         for (auto object : durations) {
@@ -2323,7 +2331,9 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         && (this->GetContentLeft() < params->m_maxPos)) {
 
         // We skip the start or end of the slur
-        if ((this == params->m_interface->GetStart()) || (this == params->m_interface->GetEnd())) {
+        LayerElement *start = params->m_interface->GetStart();
+        LayerElement *end = params->m_interface->GetEnd();
+        if ((this == start) || (this == end)) {
             return FUNCTOR_CONTINUE;
         }
 
@@ -2341,15 +2351,34 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         }
 
         // Skip if layer number is outside given bounds
-        int layerN = this->GetAlignmentLayerN();
-        if (layerN < 0) {
-            layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
-        }
+        const int layerN = this->GetOriginalLayerN();
         if (params->m_minLayerN && (params->m_minLayerN > layerN)) {
             return FUNCTOR_CONTINUE;
         }
         if (params->m_maxLayerN && (params->m_maxLayerN < layerN)) {
             return FUNCTOR_CONTINUE;
+        }
+
+        // Skip elements aligned at start/end, but on a different staff
+        if ((this->GetAlignment() == start->GetAlignment()) && !start->Is(TIMESTAMP_ATTR)) {
+            Layer *layer = NULL;
+            Staff *staff = this->GetCrossStaff(layer);
+            if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            Staff *startStaff = start->GetCrossStaff(layer);
+            if (!startStaff) startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
+            if (staff->GetN() != startStaff->GetN()) {
+                return FUNCTOR_CONTINUE;
+            }
+        }
+        if ((this->GetAlignment() == end->GetAlignment()) && !end->Is(TIMESTAMP_ATTR)) {
+            Layer *layer = NULL;
+            Staff *staff = this->GetCrossStaff(layer);
+            if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            Staff *endStaff = end->GetCrossStaff(layer);
+            if (!endStaff) endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
+            if (staff->GetN() != endStaff->GetN()) {
+                return FUNCTOR_CONTINUE;
+            }
         }
 
         params->m_elements.push_back(this);
