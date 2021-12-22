@@ -51,12 +51,12 @@ public:
     /**
      * Add a page to the document
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Clear the content of the document.
      */
-    virtual void Reset();
+    void Reset() override;
 
     /**
      * Refreshes the views from Doc.
@@ -176,6 +176,7 @@ public:
     ///@{
     FontInfo *GetDrawingSmuflFont(int staffSize, bool graceSize);
     FontInfo *GetDrawingLyricFont(int staffSize);
+    FontInfo *GetFingeringFont(int staffSize);
     ///@}
 
     /**
@@ -305,7 +306,7 @@ public:
 
     /**
      * Convert the doc from score-based to page-based MEI.
-     * Containers will be converted to systemElementStart / systemElementEnd.
+     * Containers will be converted to systemMilestone / systemMilestoneEnd.
      * Does not perform any check if the data needs or can be converted.
      */
     void ConvertToPageBasedDoc();
@@ -401,7 +402,7 @@ public:
      * @name Setter and getter for the current Score/ScoreDef.
      * If not set, then looks for the first Score in the Document and use that.
      * The currentScoreDef is also changed by the Object::Process whenever as Score is reached.
-     * When processing backward, the ScoreDef is changed when reaching the corresponding PageElementEnd
+     * When processing backward, the ScoreDef is changed when reaching the corresponding PageMilestoneEnd
      */
     ///@{
     Score *GetCurrentScore();
@@ -416,12 +417,12 @@ public:
     /**
      * See Object::PrepareLyricsEnd
      */
-    virtual int PrepareLyricsEnd(FunctorParams *functorParams);
+    int PrepareLyricsEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimestampsEnd
      */
-    virtual int PrepareTimestampsEnd(FunctorParams *functorParams);
+    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
 
 private:
     /**
@@ -519,10 +520,14 @@ private:
     int m_drawingSmuflFontSize;
     /** Lyric font size  */
     int m_drawingLyricFontSize;
+    /** Fingering font size*/
+    int m_fingeringFontSize;
     /** Current music font */
     FontInfo m_drawingSmuflFont;
     /** Current lyric font */
     FontInfo m_drawingLyricFont;
+    /** Current fingering font */
+    FontInfo m_fingeringFont;
 
     /**
      * A flag to indicate whether the currentScoreDef has been set or not.

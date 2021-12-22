@@ -358,12 +358,12 @@ void GraceAligner::AlignStack()
 
         ClassIdsComparison matchType({ ACCID, FLAG, NOTE, STEM });
         ListOfObjects children;
-        element->FindAllDescendantByComparison(&children, &matchType);
+        element->FindAllDescendantsByComparison(&children, &matchType);
         alignment->AddLayerElementRef(element);
 
         // Set the grace alignment to all children
         for (auto &child : children) {
-            // Trick : FindAllDescendantByComparison include the element, which is probably a problem.
+            // Trick : FindAllDescendantsByComparison include the element, which is probably a problem.
             // With note, we want to set only accid, so make sure we do not set it twice
             if (child == element) continue;
             LayerElement *childElement = vrv_cast<LayerElement *>(child);
@@ -475,6 +475,20 @@ bool Alignment::IsSupportedChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
     return true;
+}
+
+bool Alignment::HasAccidVerticalOverlap(Alignment *otherAlignment, int staffN)
+{
+    if (!otherAlignment) return false;
+
+    AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+    // get alignment references for both alignments
+    AlignmentReference *currentRef = vrv_cast<AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
+    AlignmentReference *otherRef
+        = vrv_cast<AlignmentReference *>(otherAlignment->FindDescendantByComparison(&matchStaff, 1));
+    if (!currentRef || !otherRef) return false;
+
+    return otherRef->HasAccidVerticalOverlap(currentRef->GetChildren());
 }
 
 bool Alignment::HasAlignmentReference(int staffN)
@@ -740,14 +754,34 @@ void AlignmentReference::AddToAccidSpace(Accid *accid)
     m_accidSpace.push_back(accid);
 }
 
-void AlignmentReference::AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize)
+void AlignmentReference::AdjustAccidWithAccidSpace(
+    Accid *accid, Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids)
 {
     std::vector<Accid *> leftAccids;
 
     // bottom one
     for (auto child : *this->GetChildren()) {
-        accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids);
+        accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids, adjustedAccids);
     }
+
+    // if current accidental is not in the list then XRel wasn't adjusted and position is fine as it is - add it to the
+    // list. Generally this would happen with octave accidentals, that are processed first and most likely have no
+    // overlaps with other elements
+    if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) == adjustedAccids.end())
+        adjustedAccids.push_back(accid);
+}
+
+bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfObjects *objects)
+{
+    for (const auto child : *this->GetChildren()) {
+        if (!child->Is(ACCID)) continue;
+        Accid *accid = vrv_cast<Accid *>(child);
+        if (!accid->HasAccid()) continue;
+        for (const auto object : *objects) {
+            if (accid->VerticalContentOverlap(object)) return true;
+        }
+    }
+    return false;
 }
 
 //----------------------------------------------------------------------------
@@ -879,6 +913,20 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
             }
         }
 
+        // Make sure that there is no overlap with grace notes (since they are handled separately by graceAligner)
+        if (m_type == ALIGNMENT_GRACENOTE) {
+            int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : std::get<2>(*iter);
+            if (this->HasGraceAligner(graceAlignerId)) {
+                GraceAligner *graceAligner = this->GetGraceAligner(graceAlignerId);
+                maxRight = graceAligner->GetGraceGroupRight(std::get<2>(*iter));
+                const int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
+                if (overlap > 0) {
+                    const int drawingUnit = params->m_doc->GetDrawingUnit(100);
+                    this->SetXRel(this->GetXRel() - drawingUnit / 6);
+                }
+            }
+        }
+
         // Nothing, just continue
         if (maxRight == VRV_UNSET) {
             ++iter;
@@ -943,6 +991,18 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         std::vector<int>::iterator iter;
         ArrayOfComparisons filters;
         for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
+            const int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
+
+            std::vector<ClassId> exclude;
+            if (this->HasGraceAligner(graceAlignerId) && params->m_rightDefaultAlignment) {
+                GraceAligner *graceAligner = this->GetGraceAligner(graceAlignerId);
+                // last alignment of GraceAligner is rightmost one, so get it
+                Alignment *alignment = vrv_cast<Alignment *>(graceAligner->GetLast(ALIGNMENT));
+                // if there is no overlap with accidentals, exclude them when getting left-right margins of alignment
+                if (alignment && !alignment->HasAccidVerticalOverlap(params->m_rightDefaultAlignment, graceAlignerId)) {
+                    exclude.push_back(ACCID);
+                }
+            }
 
             // Rescue value, used at the end of a measure without a barline
             int graceMaxPos = this->GetXRel() - params->m_doc->GetDrawingUnit(100);
@@ -950,7 +1010,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             // Get its minimum left and make it the max right position of the grace group
             if (params->m_rightDefaultAlignment) {
                 int minLeft, maxRight;
-                params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight);
+                params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight, exclude);
                 if (minLeft != -VRV_UNSET)
                     graceMaxPos = minLeft - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
             }
@@ -959,7 +1019,8 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 int minLeft, maxRight;
                 assert(measureAligner->GetRightBarLineAlignment());
                 // staffN -1 is barline
-                measureAligner->GetRightBarLineAlignment()->GetLeftRight(BARLINE_REFERENCES, minLeft, maxRight);
+                measureAligner->GetRightBarLineAlignment()->GetLeftRight(
+                    BARLINE_REFERENCES, minLeft, maxRight, exclude);
                 if (minLeft != -VRV_UNSET)
                     graceMaxPos = minLeft - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
             }
@@ -971,8 +1032,6 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
             filters.push_back(&matchStaff);
-
-            int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
 
             if (HasGraceAligner(graceAlignerId)) {
                 GetGraceAligner(graceAlignerId)
@@ -1379,11 +1438,13 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     int count = (int)m_accidSpace.size();
     int i, j;
 
+    std::vector<Accid *> adjustedAccids;
     // Align the octaves
     for (i = 0; i < count - 1; ++i) {
         if (m_accidSpace.at(i)->GetDrawingOctaveAccid() != NULL) {
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i)->GetDrawingOctaveAccid(), params->m_doc, staffSize);
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize, adjustedAccids);
+            this->AdjustAccidWithAccidSpace(
+                m_accidSpace.at(i)->GetDrawingOctaveAccid(), params->m_doc, staffSize, adjustedAccids);
             int dist = m_accidSpace.at(i)->GetDrawingX() - m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingX();
             if (dist > 0)
                 m_accidSpace.at(i)->SetDrawingXRel(m_accidSpace.at(i)->GetDrawingXRel() - dist);
@@ -1404,14 +1465,14 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     for (i = 0, j = count - 1; i < middle; i++, j--) {
         // top one - but skip octaves
         if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize);
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize, adjustedAccids);
 
         // Break with odd number of elements once the middle is reached
         if (i == j) break;
 
         // bottom one - but skip octaves
         if (!m_accidSpace.at(i)->GetDrawingOctaveAccid() && !m_accidSpace.at(i)->GetDrawingOctave())
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize, adjustedAccids);
     }
 
     return FUNCTOR_SIBLINGS;

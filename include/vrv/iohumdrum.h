@@ -375,8 +375,10 @@ public:
     std::vector<char> textmark;
     std::vector<std::string> textcolor;
 
+    // Articulation signfiers
     char hairpinAccent = '\0'; // For <> accent on a note.
     char verticalStroke = '\0'; // For horizontal stroke ornament
+    char lhpizz = '\0'; // For left-hand pizzicato
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
@@ -391,7 +393,7 @@ public:
     HumdrumInput(vrv::Doc *doc);
     virtual ~HumdrumInput();
 
-    virtual bool Import(const std::string &humdrum);
+    bool Import(const std::string &humdrum) override;
 
     void parseEmbeddedOptions(vrv::Doc *doc);
     void finalizeDocument(vrv::Doc *doc);

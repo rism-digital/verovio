@@ -83,6 +83,9 @@ class TupletBracket;
 class TupletNum;
 class Verse;
 
+// Helper enums
+enum class SlurHandling { Ignore, Initialize, Drawing };
+
 //----------------------------------------------------------------------------
 // View
 //----------------------------------------------------------------------------
@@ -179,6 +182,14 @@ public:
     int CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave);
     ///@}
 
+    /**
+     * Control how slurs are handled
+     */
+    ///@{
+    SlurHandling GetSlurHandling() const { return m_slurHandling; }
+    void SetSlurHandling(SlurHandling slurHandling) { m_slurHandling = slurHandling; }
+    ///@}
+
 protected:
     /**
      * @name Methods for drawing System, ScoreDef, StaffDef, Staff, and Layer.
@@ -203,7 +214,7 @@ protected:
     void DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure);
-    void DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine, data_BARRENDITION form,
+    void DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, const data_BARRENDITION form,
         bool eraseIntersections = false);
     void DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine);
     void DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerLines &lines, bool below, bool cueSize);
@@ -368,7 +379,7 @@ protected:
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
     void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
-    void DrawTextBoxes(DeviceContext *dc, const std::vector<TextElement *> &boxedRend, int staffSize);
+    void DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params, int staffSize);
 
     /**
      * @name Method for drawing Beam and FTrem.
@@ -534,6 +545,7 @@ protected:
         int staffSize = 100, bool dimin = false, bool setBBGlyph = false);
     void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100,
         std::optional<TextDrawingParams> params = std::nullopt);
+    void DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness, int radius);
     void DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int radius);
@@ -620,12 +632,17 @@ protected:
     int m_currentColour;
 
     /**
-     * Values to adjust tie/slur thickness by to have proper MEI values for thickness
+     * Values to adjust tie/slur thickness to have proper MEI values for thickness
      */
     ///@{
-    double m_tieThicknessCoeficient;
-    double m_slurThicknessCoeficient;
+    double m_tieThicknessCoefficient;
+    double m_slurThicknessCoefficient;
     ///@}
+
+    /**
+     * Control the handling of slurs
+     */
+    SlurHandling m_slurHandling;
 
     /**
      * The current drawing score def.

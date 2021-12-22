@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        systemboundary.h
+// Name:        systemmilestone.h
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_SYSTEM_BOUNDARY_H__
-#define __VRV_SYSTEM_BOUNDARY_H__
+#ifndef __VRV_SYSTEM_MILESTONE_H__
+#define __VRV_SYSTEM_MILESTONE_H__
 
 #include "systemelement.h"
 #include "vrvdef.h"
@@ -17,30 +17,30 @@ class Measure;
 class Object;
 
 //----------------------------------------------------------------------------
-// SystemElementEnd
+// SystemMilestoneEnd
 //----------------------------------------------------------------------------
 
 /**
- * This class models an end milestone element and has no MEI equivalent.
+ * This class models an end milestone element milesoneEnd at the system level.
  */
-class SystemElementEnd : public SystemElement {
+class SystemMilestoneEnd : public SystemElement {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    SystemElementEnd(Object *start);
-    virtual ~SystemElementEnd();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "systemElementEnd"; }
+    SystemMilestoneEnd(Object *start);
+    virtual ~SystemMilestoneEnd();
+    void Reset() override;
+    std::string GetClassName() const override { return "SystemMilestoneEnd"; }
     ///@}
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
     Measure *GetMeasure() { return m_drawingMeasure; }
 
     /**
-     * @name Get the corresponding boundary start
+     * @name Get the corresponding milestone start
      */
     ///@{
     Object *GetStart() { return m_start; }
@@ -52,24 +52,24 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareBoundaries
+     * See Object::PrepareMilestones
      */
-    virtual int PrepareBoundaries(FunctorParams *functorParams);
+    int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffSystems
      */
-    virtual int CastOffSystems(FunctorParams *functorParams);
+    int CastOffSystems(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareFloatingGrps
      */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
 protected:
     //
@@ -88,21 +88,21 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// SystemElementStartInterface
+// SystemMilestoneInterface
 //----------------------------------------------------------------------------
 
 /**
  * This class is an interface for container elements that have to be turned to milestones in a page-base representation.
  */
-class SystemElementStartInterface {
+class SystemMilestoneInterface {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    SystemElementStartInterface();
-    virtual ~SystemElementStartInterface();
+    SystemMilestoneInterface();
+    virtual ~SystemMilestoneInterface();
     virtual void Reset();
     ///@}
 
@@ -114,25 +114,25 @@ public:
      * The setter asserts that no LayerElement was previously set.
      */
     ///@{
-    void SetEnd(SystemElementEnd *end);
-    SystemElementEnd *GetEnd() { return m_end; }
-    bool IsSystemBoundary() { return (m_end != NULL); }
+    void SetEnd(SystemMilestoneEnd *end);
+    SystemMilestoneEnd *GetEnd() { return m_end; }
+    bool IsSystemMilestone() { return (m_end != NULL); }
     ///@}
 
     /**
      *
      */
-    void ConvertToPageBasedBoundary(Object *object, Object *parent);
+    void ConvertToPageBasedMilestone(Object *object, Object *parent);
 
     //-----------------//
     // Pseudo functors //
     //-----------------//
 
     /**
-     * See Object::PrepareBoundaries
-     * Called from Ending::PrepareBoundaries and EditorialElement::PrepareBoundaries
+     * See Object::PrepareMilestones
+     * Called from Ending::PrepareMilestones and EditorialElement::PrepareMilestones
      */
-    virtual int InterfacePrepareBoundaries(FunctorParams *functorParams);
+    virtual int InterfacePrepareMilestones(FunctorParams *functorParams);
 
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
@@ -147,7 +147,7 @@ private:
 public:
     //
 protected:
-    SystemElementEnd *m_end;
+    SystemMilestoneEnd *m_end;
 
 private:
     /** The first measure child of the element */

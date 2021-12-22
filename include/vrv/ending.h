@@ -9,8 +9,8 @@
 #define __VRV_ENDING_H__
 
 #include "atts_shared.h"
-#include "systemboundary.h"
 #include "systemelement.h"
+#include "systemmilestone.h"
 
 namespace vrv {
 
@@ -22,10 +22,10 @@ class Measure;
 
 /**
  * This class represents a MEI ending.
- * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
+ * It can be both a container (in score-based MEI) and a milestone (in page-based MEI).
  * It inherits from FloatingElement for spanning drawing features.
  */
-class Ending : public SystemElement, public SystemElementStartInterface, public AttLineRend, public AttNNumberLike {
+class Ending : public SystemElement, public SystemMilestoneInterface, public AttLineRend, public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -34,15 +34,15 @@ public:
     ///@{
     Ending();
     virtual ~Ending();
-    virtual Object *Clone() const { return new Ending(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Ending"; }
+    Object *Clone() const override { return new Ending(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Ending"; }
     ///@}
 
     /**
      * Method for adding allowed content
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //
@@ -52,34 +52,34 @@ public:
      * See Object::ConvertToPageBased
      */
     ///@{
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
-    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+    int ConvertToPageBased(FunctorParams *functorParams) override;
+    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
-     * See Object::PrepareBoundaries
+     * See Object::PrepareMilestones
      */
-    virtual int PrepareBoundaries(FunctorParams *functorParams);
+    int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffSystems
      */
-    virtual int CastOffSystems(FunctorParams *functorParams);
+    int CastOffSystems(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffEncoding
      */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
+    int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareFloatingGrps
      */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
 private:
     //

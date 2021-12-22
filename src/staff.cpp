@@ -41,8 +41,10 @@ namespace vrv {
 
 static const ClassRegistrar<Staff> s_factory("staff", STAFF);
 
-Staff::Staff(int n) : Object(STAFF, "staff-"), FacsimileInterface(), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n)
+    : Object(STAFF, "staff-"), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
 {
+    RegisterAttClass(ATT_COORDY1);
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_VISIBILITY);
@@ -58,6 +60,7 @@ void Staff::Reset()
 {
     Object::Reset();
     FacsimileInterface::Reset();
+    ResetCoordY1();
     ResetNInteger();
     ResetTyped();
     ResetVisibility();
@@ -473,11 +476,9 @@ int Staff::ScoreDefOptimize(FunctorParams *functorParams)
     ListOfObjects layers;
     IsEmptyComparison matchTypeLayer(LAYER);
     matchTypeLayer.ReverseComparison();
-    this->FindAllDescendantByComparison(&layers, &matchTypeLayer);
+    this->FindAllDescendantsByComparison(&layers, &matchTypeLayer);
 
-    ListOfObjects mRests;
-    ClassIdComparison matchTypeMRest(MREST);
-    this->FindAllDescendantByComparison(&mRests, &matchTypeMRest);
+    ListOfObjects mRests = this->FindAllDescendantsByType(MREST);
 
     // Show the staff only if no layer with content or only mRests
     if (layers.empty() || (mRests.size() != layers.size())) {
@@ -593,6 +594,13 @@ int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Staff::CastOffEncoding(FunctorParams *functorParams)
+{
+    // Staff alignments must be reset, otherwise they would dangle whenever they belong to a deleted system
+    m_staffAlignment = NULL;
+    return FUNCTOR_SIBLINGS;
+}
+
 int Staff::ResetDrawing(FunctorParams *functorParams)
 {
     m_timeSpanningElements.clear();
@@ -642,10 +650,7 @@ int Staff::CalcOnsetOffset(FunctorParams *functorParams)
 
 int Staff::CalcStem(FunctorParams *)
 {
-    ClassIdComparison isLayer(LAYER);
-    ListOfObjects layers;
-    this->FindAllDescendantByComparison(&layers, &isLayer);
-
+    ListOfObjects layers = this->FindAllDescendantsByType(LAYER, false);
     if (layers.empty()) {
         return FUNCTOR_CONTINUE;
     }
@@ -666,7 +671,7 @@ int Staff::CalcStem(FunctorParams *)
     // Detecting empty layers (empty layers can also have @sameas) which have to be ignored for stem direction
     IsEmptyComparison isEmptyElement(LAYER);
     ListOfObjects emptyLayers;
-    this->FindAllDescendantByComparison(&emptyLayers, &isEmptyElement);
+    this->FindAllDescendantsByComparison(&emptyLayers, &isEmptyElement);
 
     // We have only one layer (or less) with content - drawing stem dir remains unset
     if ((layers.size() < 3) && (emptyLayers.size() > 0)) {

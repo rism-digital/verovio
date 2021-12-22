@@ -10,8 +10,8 @@
 
 #include "atts_shared.h"
 #include "options.h"
-#include "pageboundary.h"
 #include "pageelement.h"
+#include "pagemilestone.h"
 #include "scoredef.h"
 
 namespace vrv {
@@ -25,7 +25,7 @@ namespace vrv {
  * It is used only for loading score-based MEI documents before they are
  * converted to page-based MEI.
  */
-class Score : public PageElement, public PageElementStartInterface, public AttLabelled, public AttNNumberLike {
+class Score : public PageElement, public PageMilestoneInterface, public AttLabelled, public AttNNumberLike {
 
 public:
     /**
@@ -35,15 +35,15 @@ public:
     ///@{
     Score();
     virtual ~Score();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Score"; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Score"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
@@ -76,45 +76,45 @@ public:
     /**
      * See Object::AdjustDots
      */
-    virtual int AdjustDots(FunctorParams *);
+    int AdjustDots(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustLayers
      */
-    virtual int AdjustLayers(FunctorParams *functorParams);
+    int AdjustLayers(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustXPos
      */
-    virtual int AdjustXPos(FunctorParams *functorParams);
+    int AdjustXPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustGraceXPos
      */
-    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+    int AdjustGraceXPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertToPageBased
      */
     ///@{
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
-    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+    int ConvertToPageBased(FunctorParams *functorParams) override;
+    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::CastOffPages
      */
-    virtual int CastOffPages(FunctorParams *functorParams);
+    int CastOffPages(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnCastOff
      */
-    virtual int UnCastOff(FunctorParams *functorParams);
+    int UnCastOff(FunctorParams *functorParams) override;
 
     /**
      * See Object::ScoreDefOptimize
      */
-    virtual int ScoreDefOptimize(FunctorParams *functorParams);
+    int ScoreDefOptimize(FunctorParams *functorParams) override;
 
 private:
     /**

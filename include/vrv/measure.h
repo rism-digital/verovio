@@ -35,6 +35,8 @@ class TimestampAttr;
  */
 class Measure : public Object,
                 public AttBarring,
+                public AttCoordX1,
+                public AttCoordX2,
                 public AttMeasureLog,
                 public AttMeterConformanceBar,
                 public AttNNumberLike,
@@ -51,15 +53,15 @@ public:
     ///@{
     Measure(bool measuredMusic = true, int logMeasureNb = -1);
     virtual ~Measure();
-    virtual Object *Clone() const { return new Measure(*this); };
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Measure"; }
+    Object *Clone() const override { return new Measure(*this); };
+    void Reset() override;
+    std::string GetClassName() const override { return "Measure"; }
     ///@}
 
     /**
      * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual void CloneReset();
+    void CloneReset() override;
 
     /**
      * Return true if measured music (otherwise we have fake measures)
@@ -69,7 +71,7 @@ public:
     /**
      * Methods for adding allowed content
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Specific method for measures
@@ -85,12 +87,12 @@ public:
     /**
      * Get the X drawing position
      */
-    virtual int GetDrawingX() const;
+    int GetDrawingX() const override;
 
     /**
      * Reset the cached values of the drawingX values.
      */
-    virtual void ResetCachedDrawingX() const;
+    void ResetCachedDrawingX() const override;
 
     /**
      * @name Get and set the X drawing relative positions
@@ -255,207 +257,215 @@ public:
     //----------//
 
     /**
+     * See Object::FindSpannedLayerElements
+     */
+    ///@{
+    int FindSpannedLayerElements(FunctorParams *functorParams) override;
+    int FindSpannedLayerElementsEnd(FunctorParams *functorParams) override;
+    ///@}
+
+    /**
      * See Object::ConvertMarkupAnalytical
      */
-    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams);
+    int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertToPageBased
      */
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
+    int ConvertToPageBased(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertToCastOffMensural
      */
-    virtual int ConvertToCastOffMensural(FunctorParams *params);
+    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertToUnCastOffMensural
      */
-    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+    int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
 
     /**
      * See Object::Save
      */
     ///@{
-    virtual int Save(FunctorParams *functorParams);
-    virtual int SaveEnd(FunctorParams *functorParams);
+    int Save(FunctorParams *functorParams) override;
+    int SaveEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::UnscoreDefSetCurrent
      */
-    virtual int ScoreDefUnsetCurrent(FunctorParams *functorParams);
+    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
 
     /**
      * See Object::ScoreDefOptimize
      */
-    virtual int ScoreDefOptimize(FunctorParams *functorParams);
+    int ScoreDefOptimize(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ApplyPPUFactor
      */
-    virtual int ApplyPPUFactor(FunctorParams *functorParams);
+    int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignHorizontally
      */
-    virtual int AlignHorizontally(FunctorParams *functorParams);
-    virtual int AlignHorizontallyEnd(FunctorParams *functorParams);
+    int AlignHorizontally(FunctorParams *functorParams) override;
+    int AlignHorizontallyEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignVertically
      */
-    virtual int AlignVertically(FunctorParams *functorParams);
+    int AlignVertically(FunctorParams *functorParams) override;
 
     /**
      * See Object::SetAlignmentXPos
      */
-    virtual int SetAlignmentXPos(FunctorParams *functorParams);
+    int SetAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustArpeg
      */
-    virtual int AdjustArpegEnd(FunctorParams *functorParams);
+    int AdjustArpegEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustClefChanges
      */
-    virtual int AdjustClefChanges(FunctorParams *functorParams);
+    int AdjustClefChanges(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustDots
      */
-    virtual int AdjustDots(FunctorParams *);
+    int AdjustDots(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustLayers
      */
-    virtual int AdjustLayers(FunctorParams *functorParams);
+    int AdjustLayers(FunctorParams *functorParams) override;
 
     /**
      * See Object::AjustAccidX
      */
-    virtual int AdjustAccidX(FunctorParams *functorParams);
+    int AdjustAccidX(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustGraceXPos
      */
-    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+    int AdjustGraceXPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustXOverflow
      */
-    virtual int AdjustXOverflow(FunctorParams *functorParams);
+    int AdjustXOverflow(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustXPos
      */
-    virtual int AdjustXPos(FunctorParams *functorParams);
+    int AdjustXPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustHarmGrpsSpacing
      */
-    virtual int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams);
+    int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustSylSpacing
      */
-    virtual int AdjustSylSpacingEnd(FunctorParams *functorParams);
+    int AdjustSylSpacingEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignMeasures
      */
-    virtual int AlignMeasures(FunctorParams *functorParams);
+    int AlignMeasures(FunctorParams *functorParams) override;
 
     /**
      * See Object::JustifyX
      */
-    virtual int JustifyX(FunctorParams *functorParams);
+    int JustifyX(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffSystems
      */
-    virtual int CastOffSystems(FunctorParams *functorParams);
+    int CastOffSystems(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffEncoding
      */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
+    int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::FillStaffCurrentTimeSpanningEnd
      */
-    virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams);
+    int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareCrossStaff
      */
-    virtual int PrepareCrossStaff(FunctorParams *functorParams);
+    int PrepareCrossStaff(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::PrepareFloatingGrps
      */
     ///@{
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
-    virtual int PrepareFloatingGrpsEnd(FunctorParams *functoParams);
+    int PrepareFloatingGrps(FunctorParams *functorParams) override;
+    int PrepareFloatingGrpsEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::PrepareTimePointingEnd
      */
-    virtual int PrepareTimePointingEnd(FunctorParams *functorParams);
+    int PrepareTimePointingEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimeSpanningEnd
      */
-    virtual int PrepareTimeSpanningEnd(FunctorParams *functorParams);
+    int PrepareTimeSpanningEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareBoundaries
+     * See Object::PrepareMilestones
      */
-    virtual int PrepareBoundaries(FunctorParams *functorParams);
+    int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::GenerateMIDI
      */
     ///@{
-    virtual int GenerateMIDI(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * @name See Object::GenerateTimemap
      */
     ///@{
-    virtual int GenerateTimemap(FunctorParams *functorParams);
+    int GenerateTimemap(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::CalcMaxMeasureDuration
      */
-    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
+    int CalcMaxMeasureDuration(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcOnsetOffset
      */
     ///@{
-    virtual int CalcOnsetOffset(FunctorParams *functorParams);
+    int CalcOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int PrepareTimestampsEnd(FunctorParams *functorParams);
+    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
 
 public:
     // flags for drawing measure barline based on visibility or other conditions
@@ -507,7 +517,7 @@ private:
     ScoreDef *m_drawingScoreDef;
 
     /**
-     * A pointer to the ending to which the measure belongs. Set by PrepareBoundaries and passed to the System drawing
+     * A pointer to the ending to which the measure belongs. Set by PrepareMilestones and passed to the System drawing
      * list
      * in DrawMeasure
      */

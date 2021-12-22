@@ -31,13 +31,13 @@ public:
     ///@{
     BeatRpt();
     virtual ~BeatRpt();
-    virtual Object *Clone() const { return new BeatRpt(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "BeatRpt"; }
+    Object *Clone() const override { return new BeatRpt(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "BeatRpt"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Returns the duration (in double) for the BeatRpt.
@@ -60,7 +60,7 @@ public:
      * @name See Object::GenerateMIDI
      */
     ///@{
-    virtual int GenerateMIDI(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
     ///@}
 
 private:

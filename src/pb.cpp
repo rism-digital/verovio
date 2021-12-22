@@ -53,10 +53,10 @@ int Pb::CastOffEncoding(FunctorParams *functorParams)
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
-    // We look if the current system has a least one measure - if yes, we assume that the <pb>
+    // We look if the current system has a pb or at least one measure - if yes, we assume that the <pb>
     // is not the one at the beginning of the content. This is not very robust but at least make it
     // work when rendering a <mdiv> that does not start with a <pb> (which we cannot force)
-    if (params->m_currentPage->GetChildCount(SYSTEM) > 0) {
+    if (params->m_currentSystem->GetChildCount(PB) > 0 || params->m_currentSystem->GetChildCount(MEASURE) > 0) {
         params->m_currentPage->AddChild(params->m_currentSystem);
         params->m_currentSystem = new System();
         if (params->m_usePages) {

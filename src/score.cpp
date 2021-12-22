@@ -36,7 +36,7 @@ namespace vrv {
 
 static const ClassRegistrar<Score> s_factory("score", SCORE);
 
-Score::Score() : PageElement(SCORE, "score-"), PageElementStartInterface(), AttLabelled(), AttNNumberLike()
+Score::Score() : PageElement(SCORE, "score-"), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_NNUMBERLIKE);
@@ -143,9 +143,7 @@ bool Score::ScoreDefNeedsOptimization(int optionCondense)
     bool optimize = (m_scoreDef.HasOptimize() && m_scoreDef.GetOptimize() == BOOLEAN_true);
     // if nothing specified, do not if there is only one grpSym
     if ((optionCondense == CONDENSE_auto) && !m_scoreDef.HasOptimize()) {
-        ListOfObjects symbols;
-        ClassIdComparison matchClassId(GRPSYM);
-        m_scoreDef.FindAllDescendantByComparison(&symbols, &matchClassId);
+        ListOfObjects symbols = m_scoreDef.FindAllDescendantsByType(GRPSYM);
         optimize = (symbols.size() > 1);
     }
 
@@ -215,7 +213,7 @@ int Score::ConvertToPageBasedEnd(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    ConvertToPageBasedBoundary(this, params->m_page);
+    ConvertToPageBasedMilestone(this, params->m_page);
     params->m_currentSystem = NULL;
 
     return FUNCTOR_CONTINUE;

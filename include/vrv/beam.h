@@ -9,6 +9,7 @@
 #define __VRV_BEAM_H__
 
 #include "atts_cmn.h"
+#include "atts_shared.h"
 #include "drawinginterface.h"
 #include "layerelement.h"
 
@@ -66,7 +67,18 @@ public:
      */
     int GetAdjacentElementsDuration(int elementX) const;
 
+    /**
+     * @name Getters for the X and Y starting value of the beam;
+     */
+    ///@{
+    int GetStartingX() const;
+    int GetStartingY() const;
+    ///@}
+
 private:
+    // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)
+    void AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
+
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     bool CalcBeamSlope(
@@ -76,12 +88,13 @@ private:
 
     void CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
 
-    void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+    // Helper to adjust position of starting point to make sure that beam start-/endpoints touch the staff lines
+    void CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     // Helper to calculate the longest stem length of the beam (which will be used uniformely)
-    void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place);
+    void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal);
 
     // Helper to calculate relative position of the beam to for each of the coordinates
     void CalcMixedBeamPlace(Staff *staff);
@@ -100,16 +113,14 @@ private:
 
 public:
     // values set by CalcBeam
-    int m_startingX; // the initial X position of the beam
-    int m_startingY; // the initial Y position of the beam
     int m_nbNotesOrChords;
     bool m_extendedToCenter; // the stem where extended to touch the center staff line
     double m_beamSlope; // the slope of the beam
     int m_verticalCenter;
-    int m_avgY;
     int m_ledgerLinesAbove;
     int m_ledgerLinesBelow;
     int m_uniformStemLength;
+    data_BEAMPLACE m_weightedPlace;
 
     BeamElementCoord *m_firstNoteOrChord;
     BeamElementCoord *m_lastNoteOrChord;
@@ -126,9 +137,10 @@ public:
 
 class Beam : public LayerElement,
              public BeamDrawingInterface,
-             public AttColor,
              public AttBeamedWith,
-             public AttBeamRend {
+             public AttBeamRend,
+             public AttColor,
+             public AttCue {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -137,9 +149,9 @@ public:
     ///@{
     Beam();
     virtual ~Beam();
-    virtual Object *Clone() const { return new Beam(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Beam"; }
+    Object *Clone() const override { return new Beam(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Beam"; }
     ///@}
 
     int GetNoteCount() const { return this->GetChildCount(NOTE); }
@@ -148,7 +160,7 @@ public:
      * Add an element (a note or a rest) to a beam.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      *
@@ -162,29 +174,29 @@ public:
     /**
      * See Object::AdjustBeams
      */
-    virtual int AdjustBeams(FunctorParams *);
+    int AdjustBeams(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustBeamsEnd
      */
-    virtual int AdjustBeamsEnd(FunctorParams *);
+    int AdjustBeamsEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *functorParams);
+    int CalcStem(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 protected:
     /**
      * Filter the flat list and keep only Note and Chords elements.
      * This also initializes the m_beamElementCoords vector
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfObjects *childList) override;
 
     /**
      * Helper function to calculate overlap with layer elements that
@@ -231,7 +243,7 @@ public:
         data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
     void SetClosestNote(data_STEMDIRECTION stemDir);
 
-    int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir);
+    int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal);
 
     /**
      * Return stem length adjustment in half units, depending on the @stem.mode attribute
@@ -245,7 +257,6 @@ public:
     int m_overlapMargin;
     int m_maxShortening; // maximum allowed shortening in half units
     bool m_centered; // beam is centered on the line
-    bool m_shortened; // stem is shortened because pointing oustide the staff
     data_BEAMPLACE m_beamRelativePlace;
     char m_partialFlags[MAX_DURATION_PARTIALS];
     data_BEAMPLACE m_partialFlagPlace;

@@ -991,6 +991,144 @@ bool AttColoration::HasColored() const
 /* include <attcolored> */
 
 //----------------------------------------------------------------------------
+// AttCoordX1
+//----------------------------------------------------------------------------
+
+AttCoordX1::AttCoordX1() : Att()
+{
+    ResetCoordX1();
+}
+
+AttCoordX1::~AttCoordX1()
+{
+}
+
+void AttCoordX1::ResetCoordX1()
+{
+    m_coordX1 = 0.0;
+}
+
+bool AttCoordX1::ReadCoordX1(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("coord.x1")) {
+        this->SetCoordX1(StrToDbl(element.attribute("coord.x1").value()));
+        element.remove_attribute("coord.x1");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttCoordX1::WriteCoordX1(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasCoordX1()) {
+        element.append_attribute("coord.x1") = DblToStr(this->GetCoordX1()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttCoordX1::HasCoordX1() const
+{
+    return (m_coordX1 != 0.0);
+}
+
+/* include <attcoord.x1> */
+
+//----------------------------------------------------------------------------
+// AttCoordX2
+//----------------------------------------------------------------------------
+
+AttCoordX2::AttCoordX2() : Att()
+{
+    ResetCoordX2();
+}
+
+AttCoordX2::~AttCoordX2()
+{
+}
+
+void AttCoordX2::ResetCoordX2()
+{
+    m_coordX2 = 0.0;
+}
+
+bool AttCoordX2::ReadCoordX2(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("coord.x2")) {
+        this->SetCoordX2(StrToDbl(element.attribute("coord.x2").value()));
+        element.remove_attribute("coord.x2");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttCoordX2::WriteCoordX2(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasCoordX2()) {
+        element.append_attribute("coord.x2") = DblToStr(this->GetCoordX2()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttCoordX2::HasCoordX2() const
+{
+    return (m_coordX2 != 0.0);
+}
+
+/* include <attcoord.x2> */
+
+//----------------------------------------------------------------------------
+// AttCoordY1
+//----------------------------------------------------------------------------
+
+AttCoordY1::AttCoordY1() : Att()
+{
+    ResetCoordY1();
+}
+
+AttCoordY1::~AttCoordY1()
+{
+}
+
+void AttCoordY1::ResetCoordY1()
+{
+    m_coordY1 = 0.0;
+}
+
+bool AttCoordY1::ReadCoordY1(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("coord.y1")) {
+        this->SetCoordY1(StrToDbl(element.attribute("coord.y1").value()));
+        element.remove_attribute("coord.y1");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttCoordY1::WriteCoordY1(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasCoordY1()) {
+        element.append_attribute("coord.y1") = DblToStr(this->GetCoordY1()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttCoordY1::HasCoordY1() const
+{
+    return (m_coordY1 != 0.0);
+}
+
+/* include <attcoord.y1> */
+
+//----------------------------------------------------------------------------
 // AttCoordinated
 //----------------------------------------------------------------------------
 
@@ -8217,6 +8355,30 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
+    if (element->HasAttClass(ATT_COORDX1)) {
+        AttCoordX1 *att = dynamic_cast<AttCoordX1 *>(element);
+        assert(att);
+        if (attrType == "coord.x1") {
+            att->SetCoordX1(att->StrToDbl(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_COORDX2)) {
+        AttCoordX2 *att = dynamic_cast<AttCoordX2 *>(element);
+        assert(att);
+        if (attrType == "coord.x2") {
+            att->SetCoordX2(att->StrToDbl(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_COORDY1)) {
+        AttCoordY1 *att = dynamic_cast<AttCoordY1 *>(element);
+        assert(att);
+        if (attrType == "coord.y1") {
+            att->SetCoordY1(att->StrToDbl(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_COORDINATED)) {
         AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
         assert(att);
@@ -9744,6 +9906,27 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasColored()) {
             attributes->push_back({ "colored", att->BooleanToStr(att->GetColored()) });
+        }
+    }
+    if (element->HasAttClass(ATT_COORDX1)) {
+        const AttCoordX1 *att = dynamic_cast<const AttCoordX1 *>(element);
+        assert(att);
+        if (att->HasCoordX1()) {
+            attributes->push_back({ "coord.x1", att->DblToStr(att->GetCoordX1()) });
+        }
+    }
+    if (element->HasAttClass(ATT_COORDX2)) {
+        const AttCoordX2 *att = dynamic_cast<const AttCoordX2 *>(element);
+        assert(att);
+        if (att->HasCoordX2()) {
+            attributes->push_back({ "coord.x2", att->DblToStr(att->GetCoordX2()) });
+        }
+    }
+    if (element->HasAttClass(ATT_COORDY1)) {
+        const AttCoordY1 *att = dynamic_cast<const AttCoordY1 *>(element);
+        assert(att);
+        if (att->HasCoordY1()) {
+            attributes->push_back({ "coord.y1", att->DblToStr(att->GetCoordY1()) });
         }
     }
     if (element->HasAttClass(ATT_COORDINATED)) {

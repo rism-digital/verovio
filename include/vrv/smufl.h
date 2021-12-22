@@ -25,10 +25,13 @@ enum {
     SMUFL_E000_brace = 0xE000,
     SMUFL_E003_bracketTop = 0xE003,
     SMUFL_E004_bracketBottom = 0xE004,
+    SMUFL_E043_repeatDots = 0xE043,
+    SMUFL_E044_repeatDot = 0xE044,
     SMUFL_E045_dalSegno = 0xE045,
     SMUFL_E046_daCapo = 0xE046,
     SMUFL_E047_segno = 0xE047,
     SMUFL_E048_coda = 0xE048,
+    SMUFL_E049_codaSquare = 0xE049,
     SMUFL_E04B_segnoSerpent2 = 0xE04B,
     SMUFL_E050_gClef = 0xE050,
     SMUFL_E051_gClef15mb = 0xE051,
@@ -73,6 +76,8 @@ enum {
     SMUFL_E093_timeSigParensRightSmall = 0xE093,
     SMUFL_E094_timeSigParensLeft = 0xE094,
     SMUFL_E095_timeSigParensRight = 0xE095,
+    SMUFL_E0A0_noteheadDoubleWhole = 0xE0A0,
+    SMUFL_E0A1_noteheadDoubleWholeSquare = 0xE0A1,
     SMUFL_E0A2_noteheadWhole = 0xE0A2,
     SMUFL_E0A3_noteheadHalf = 0xE0A3,
     SMUFL_E0A4_noteheadBlack = 0xE0A4,
@@ -208,6 +213,9 @@ enum {
     SMUFL_E500_repeat1Bar = 0xE500,
     SMUFL_E501_repeat2Bars = 0xE501,
     SMUFL_E502_repeat4Bars = 0xE502,
+    SMUFL_E503_repeatBarUpperDot = 0xE503,
+    SMUFL_E504_repeatBarSlash = 0xE504,
+    SMUFL_E505_repeatBarLowerDot = 0xE505,
     SMUFL_E510_ottava = 0xE510,
     SMUFL_E511_ottavaAlta = 0xE511,
     SMUFL_E512_ottavaBassa = 0xE512,
@@ -292,6 +300,9 @@ enum {
     SMUFL_E5C6_ornamentPrecompMordentUpperPrefix = 0xE5C6,
     SMUFL_E5C7_ornamentPrecompInvertedMordentUpperPrefix = 0xE5C7,
     SMUFL_E5C8_ornamentPrecompTrillLowerSuffix = 0xE5C8,
+    SMUFL_E5E5_brassMuteClosed = 0xE5E5,
+    SMUFL_E5E6_brassMuteHalfClosed = 0xE5E6,
+    SMUFL_E5E7_brassMuteOpen = 0xE5E7,
     SMUFL_E610_stringsDownBow = 0xE610,
     SMUFL_E611_stringsDownBowTurned = 0xE611,
     SMUFL_E612_stringsUpBow = 0xE612,
@@ -385,10 +396,12 @@ enum {
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
     SMUFL_EA02_mensuralCustosUp = 0xEA02,
     SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
+    SMUFL_EAA4_wiggleTrill = 0xEAA4,
     SMUFL_EAA9_wiggleArpeggiatoUp = 0xEAA9,
     SMUFL_EAAA_wiggleArpeggiatoDown = 0xEAAA,
     SMUFL_EAAD_wiggleArpeggiatoUpArrow = 0xEAAD,
     SMUFL_EAAE_wiggleArpeggiatoDownArrow = 0xEAAE,
+    SMUFL_EAAF_wiggleGlissando = 0xEAAF,
     SMUFL_EBA7_luteDurationWhole = 0xEBA7,
     SMUFL_EBA8_luteDurationHalf = 0xEBA8,
     SMUFL_EBA9_luteDurationQuarter = 0xEBA9,
@@ -423,7 +436,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 398
+#define SMUFL_COUNT 411
 
 } // namespace vrv
 

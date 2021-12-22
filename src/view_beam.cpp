@@ -308,10 +308,15 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                         beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_THROUGH;
                     }
                     // not needed for the next one or break
-                    else if (!beamElementCoords->at(idx)->m_element->Is(REST)) {
+                    else {
                         // we are starting a beam or after a beam break - put it right
                         if (start) {
-                            beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_RIGHT;
+                            if ((idx != 0) && (beamElementCoords->at(idx - 1)->m_element->Is(REST))) {
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
+                            }
+                            else {
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_RIGHT;
+                            }
                         }
                         // or the previous one had no partial
                         else if (beamElementCoords->at(noteIndexes.at(i - 1))->m_dur < (char)testDur) {
@@ -384,15 +389,15 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_RIGHT) {
                     y1 = beamElementCoords->at(idx)->m_yBeam + barYPos;
                     int x2 = beamElementCoords->at(idx)->m_x + fractBeamWidth;
-                    y2 = beamSegment->m_startingY + barYPos
-                        + beamSegment->m_beamSlope * (x2 - beamSegment->m_startingX);
+                    y2 = beamSegment->m_firstNoteOrChord->m_yBeam + barYPos
+                        + beamSegment->m_beamSlope * (x2 - beamSegment->m_firstNoteOrChord->m_x);
                     DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1, x2, y2, polygonHeight);
                 }
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_LEFT) {
                     y2 = beamElementCoords->at(idx)->m_yBeam + barYPos;
                     int x1 = beamElementCoords->at(idx)->m_x - fractBeamWidth;
-                    y1 = beamSegment->m_startingY + barYPos
-                        + beamSegment->m_beamSlope * (x1 - beamSegment->m_startingX);
+                    y1 = beamSegment->m_firstNoteOrChord->m_yBeam + barYPos
+                        + beamSegment->m_beamSlope * (x1 - beamSegment->m_firstNoteOrChord->m_x);
                     DrawObliquePolygon(dc, x1, y1, beamElementCoords->at(idx)->m_x, y2, polygonHeight);
                 }
             }

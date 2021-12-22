@@ -29,9 +29,9 @@ public:
     ///@{
     Text();
     virtual ~Text();
-    virtual Object *Clone() const { return new Text(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Text"; }
+    Object *Clone() const override { return new Text(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Text"; }
     ///@}
 
     /**
@@ -40,7 +40,7 @@ public:
      * See MEIInput::ReadText and MEIInput ::WriteText
      */
     ///@{
-    void SetText(std::wstring text) { m_text = text; }
+    void SetText(const std::wstring &text) { m_text = text; }
     std::wstring GetText() const { return m_text; }
     ///@}
 

@@ -1,12 +1,34 @@
 # Changelog
 
 ## [unreleased]
+
+## [3.8.0] - 2021-12-22
+* Support for figured-bass extenders on `f` without `@tstamp` or `@startid` 
+* Improved page-based MEI output with validation with a customized MEI Schema
+* Improved layout with beams and control events (ornaments, fingering, etc.) (@eNote-GmBH)
+* Improve enharmonic tie overlap with accidentals (@eNote-GmBH)
+* Improved Plaine and Easie validation output with error codes and values
+* Improved adjacent note tie and enharmonic tie overlap (eNote-GmBH)
+* Additional parameters to the getMEI method for exporting selected content (@eNote-GmBH)
+* Option --multi-rest-thickness to control the thickness of measure rests (@eNote-GmBH)
+
+## [3.7.0] - 2021-11-22
 * Complete refactoring of the Plaine and Easie parser
-* Support for `arpeg@enclose` (@eNote-GmBH)
-* Support for `clef@enclose` (@eNote-GmBH)
-* Support for `metersig@enclose` (@eNote-GmBH)
-* Option --tie-min-length to control the minimum length of ties (@eNote-GmBH)
+* Support for `multiRest@num.place` (@eNote-GmBH)
+* Support for `meterSig@enclose`, `clef@enclose` and `arpeg@enclose` (@eNote-GmBH)
+* Support for `accid@loc` and `accid@oloc`/`accid@ploc` (@eNote-GmBH)
+* Support for text circle enclosure (@eNote-GmBH)
+* Support for wavy glissandi (@eNote-GmBH)
+* Improved slurs in cross-staff context and with grace notes (@eNote-GmBH)
+* Preliminary support for tablature MIDI output (@paul-bayleaf)
+* Option --fingering-scale to control the size of fingering (@eNote-GmBH)
+* Option --handwritten-font for spcific glyph positioning (@eNote-GmBH)
+* Option --pedal-style (auto|line) to control styling (@eNote-GmBH)
+* Option --slur-margin to control positioning ofr slurs (@eNote-GmBH)
+* Option --show-runtime to display the total runtime on command-line (@eNote-GmBH)
 * Option --svg-additional-attribute to make MEI attributes appear in the SVG (@wergo)
+* Option --tie-min-length to control the minimum length of ties (@eNote-GmBH)
+* Fix MEI output for single page output and page-based MEI output
 
 ## [3.6.0] - 2021-08-24
 * Support for `section@restart`

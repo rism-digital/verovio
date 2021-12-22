@@ -213,8 +213,28 @@ bool TimeSpanningInterface::IsSpanningMeasures()
     return (this->GetStartMeasure() != this->GetEndMeasure());
 }
 
+bool TimeSpanningInterface::IsOrdered()
+{
+    return this->IsOrdered(m_start, m_end);
+}
+
+bool TimeSpanningInterface::IsOrdered(LayerElement *start, LayerElement *end)
+{
+    if (!start || !end) return true;
+    Measure *startMeasure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
+    Measure *endMeasure = vrv_cast<Measure *>(end->GetFirstAncestor(MEASURE));
+
+    if (startMeasure == endMeasure) {
+        if (!start->GetAlignment() || !end->GetAlignment()) return true;
+        return Object::IsPreOrdered(start->GetAlignment(), end->GetAlignment());
+    }
+    else {
+        return Object::IsPreOrdered(startMeasure, endMeasure);
+    }
+}
+
 void TimeSpanningInterface::GetCrossStaffOverflows(
-    StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow)
+    StaffAlignment *alignment, curvature_CURVEDIR curveDir, bool &skipAbove, bool &skipBelow)
 {
     assert(alignment);
 
@@ -237,7 +257,7 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
             Staff *staffAbove = NULL;
             Staff *staffBelow = NULL;
             chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-            startStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+            startStaff = (curveDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
         }
     }
     else {
@@ -256,7 +276,7 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
             Staff *staffAbove = NULL;
             Staff *staffBelow = NULL;
             chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-            endStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+            endStaff = (curveDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
         }
     }
     else {

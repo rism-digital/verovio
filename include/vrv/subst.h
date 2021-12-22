@@ -11,7 +11,7 @@
 #include "atts_critapp.h"
 #include "atts_shared.h"
 #include "editorial.h"
-#include "systemboundary.h"
+#include "systemmilestone.h"
 
 namespace vrv {
 
@@ -29,9 +29,9 @@ public:
     Subst();
     Subst(EditorialLevel level);
     virtual ~Subst();
-    virtual Object *Clone() const { return new Subst(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Subst"; }
+    Object *Clone() const override { return new Subst(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Subst"; }
     ///@}
 
     /** Getter for level **/
@@ -40,7 +40,7 @@ public:
     /**
      * Add children to a apparatus.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
 protected:
     /** We store the level of the <subst> for integrity check */

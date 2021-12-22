@@ -256,6 +256,8 @@ StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
     m_overflowBelow = 0;
     m_staffHeight = 0;
     m_overlap = 0;
+    m_overflowBBoxAbove = NULL;
+    m_overflowBBoxBelow = NULL;
 }
 
 StaffAlignment::~StaffAlignment()
@@ -313,6 +315,13 @@ void StaffAlignment::SetOverflowAbove(int overflowAbove)
     }
 }
 
+void StaffAlignment::SetOverflowBBoxAbove(BoundingBox *bboxAbove, int overflowAbove)
+{
+    if (overflowAbove > m_overflowAbove) {
+        m_overflowBBoxAbove = bboxAbove;
+    }
+}
+
 void StaffAlignment::SetOverlap(int overlap)
 {
     if (overlap > m_overlap) {
@@ -324,6 +333,13 @@ void StaffAlignment::SetOverflowBelow(int overflowBottom)
 {
     if (overflowBottom > m_overflowBelow) {
         m_overflowBelow = overflowBottom;
+    }
+}
+
+void StaffAlignment::SetOverflowBBoxBelow(BoundingBox *bboxBelow, int overflowBottom)
+{
+    if (overflowBottom > m_overflowBelow) {
+        m_overflowBBoxBelow = bboxBelow;
     }
 }
 
@@ -490,6 +506,15 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
 
     // Add a margin
     overflowSum += doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(GetStaffSize());
+
+    BoundingBox *previous = prevAlignment->GetOverflowBBoxBelow();
+    BoundingBox *current = GetOverflowBBoxAbove();
+    if (previous && current) {
+        if ((current->Is(ARTIC) && previous->Is(ARTIC)) || (previous->Is(ARTIC) && current->Is(NOTE))
+            || (current->Is(ARTIC) && previous->Is(NOTE))) {
+            if (current->HorizontalContentOverlap(previous)) overflowSum += doc->GetDrawingUnit(GetStaffSize());
+        }
+    }
 
     return overflowSum;
 }
@@ -705,9 +730,10 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         while (i != end) {
             // find all the overflowing elements from the staff that overlap horizontally (and, in case of extender
             // elements - vertically)
-            const int margin = ((*iter)->GetObject()->Is(DYNAM) && GetFirstAncestor(BEAM))
-                ? params->m_doc->GetDrawingDoubleUnit(m_staff->m_drawingStaffSize)
-                : 0;
+            LayerElement *element = dynamic_cast<LayerElement *>(*i);
+            const bool additionalMargin
+                = ((*iter)->GetObject()->Is(DYNAM) && element && element->GetFirstAncestor(BEAM));
+            const int margin = additionalMargin ? params->m_doc->GetDrawingDoubleUnit(m_staff->m_drawingStaffSize) : 0;
             i = std::find_if(i, end, [iter, drawingUnit, margin](BoundingBox *elem) {
                 if ((*iter)->GetObject()->IsExtenderElement() && !elem->Is(FLOATING_POSITIONER)) {
                     return (*iter)->HorizontalContentOverlap(elem, drawingUnit * 8)
@@ -901,34 +927,43 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
         if (!curve->HasContentBB()) continue;
         positioners.push_back(curve);
 
-        bool adjusted = slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
-        if (adjusted) {
-            params->m_adjusted = true;
-        }
+        slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
+
         if (curve->IsCrossStaff()) {
             params->m_crossStaffSlurs = true;
         }
     }
 
+    // Adjust positioning of slurs with common start/end
     Staff *staff = GetStaff();
     if (staff) {
-        const int slurShift = staff->m_drawingStaffSize / 2;
-        for (size_t i = 0; i + 1 < positioners.size(); i++) {
+        const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        for (size_t i = 0; i + 1 < positioners.size(); ++i) {
             Slur *firstSlur = vrv_cast<Slur *>(positioners[i]->GetObject());
-            for (auto j = i + 1; j < positioners.size(); j++) {
+            for (size_t j = i + 1; j < positioners.size(); ++j) {
                 Slur *secondSlur = vrv_cast<Slur *>(positioners[j]->GetObject());
                 Point points1[4], points2[4];
                 positioners[i]->GetPoints(points1);
                 positioners[j]->GetPoints(points2);
-                if (firstSlur->GetStart() == secondSlur->GetStart()) {
-                    FloatingCurvePositioner *positioner = positioners[points1[2].x > points2[2].x ? i : j];
-                    positioner->MoveFrontVertical(
-                        positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
+                if ((firstSlur->GetStart() == secondSlur->GetStart())
+                    && BoundingBox::ArePointsClose(points1[0], points2[0], unit)) {
+                    FloatingCurvePositioner *positioner = positioners[points1[3].x > points2[3].x ? i : j];
+                    positioner->MoveFrontVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -unit : unit);
                 }
-                else if (firstSlur->GetEnd() == secondSlur->GetEnd()) {
+                else if ((firstSlur->GetEnd() == secondSlur->GetEnd())
+                    && BoundingBox::ArePointsClose(points1[3], points2[3], unit)) {
                     FloatingCurvePositioner *positioner = positioners[points1[0].x < points2[0].x ? i : j];
-                    positioner->MoveBackVertical(
-                        positioner->GetDir() == curvature_CURVEDIR_below ? -slurShift : slurShift);
+                    positioner->MoveBackVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -unit : unit);
+                }
+                else if ((firstSlur->GetStart() == secondSlur->GetEnd())
+                    && BoundingBox::ArePointsClose(points1[0], points2[3], unit)) {
+                    positioners[i]->MoveFrontHorizontal(unit / 2);
+                    positioners[j]->MoveBackHorizontal(-unit / 2);
+                }
+                else if ((firstSlur->GetEnd() == secondSlur->GetStart())
+                    && BoundingBox::ArePointsClose(points1[3], points2[0], unit)) {
+                    positioners[i]->MoveBackHorizontal(-unit / 2);
+                    positioners[j]->MoveFrontHorizontal(unit / 2);
                 }
             }
         }

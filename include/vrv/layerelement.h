@@ -40,6 +40,7 @@ class StaffAlignment;
 class LayerElement : public Object,
                      public FacsimileInterface,
                      public LinkingInterface,
+                     public AttCoordX1,
                      public AttLabelled,
                      public AttTyped {
 public:
@@ -52,20 +53,20 @@ public:
     LayerElement(ClassId classId);
     LayerElement(ClassId classId, const std::string &classIdStr);
     virtual ~LayerElement();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual void CloneReset();
+    void CloneReset() override;
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
-    virtual LinkingInterface *GetLinkingInterface() { return dynamic_cast<LinkingInterface *>(this); }
+    FacsimileInterface *GetFacsimileInterface() override { return dynamic_cast<FacsimileInterface *>(this); }
+    LinkingInterface *GetLinkingInterface() override { return dynamic_cast<LinkingInterface *>(this); }
     ///@}
 
     /**
@@ -131,11 +132,16 @@ public:
     ///@}
 
     /**
+     * @return (cross) layer number, parent layer number for cross staff elements
+     */
+    int GetOriginalLayerN();
+
+    /**
      * @name Get the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     /**
@@ -244,148 +250,153 @@ public:
     /**
      * See Object::AdjustBeams
      */
-    virtual int AdjustBeams(FunctorParams *);
+    int AdjustBeams(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustDots
      */
-    virtual int AdjustDots(FunctorParams *);
+    int AdjustDots(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetHorizontalAlignment
+     * See Object::ResetVerticalAlignment
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ApplyPPUFactor
      */
-    virtual int ApplyPPUFactor(FunctorParams *functorParams);
+    int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
      * See Object::AlignHorizontally
      */
-    virtual int AlignHorizontally(FunctorParams *functorParams);
+    int AlignHorizontally(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustLayers
      */
-    virtual int AdjustLayers(FunctorParams *functorParams);
+    int AdjustLayers(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustGraceXPos
      */
     ///@{
-    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+    int AdjustGraceXPos(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::AdjustTupletNumOverlap
      */
-    virtual int AdjustTupletNumOverlap(FunctorParams *functorParams);
+    int AdjustTupletNumOverlap(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustXPos
      */
-    virtual int AdjustXPos(FunctorParams *functorParams);
+    int AdjustXPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustXRelForTranscription
      */
-    virtual int AdjustXRelForTranscription(FunctorParams *);
+    int AdjustXRelForTranscription(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareDrawingCueSize
      */
-    virtual int PrepareDrawingCueSize(FunctorParams *functorParams);
+    int PrepareDrawingCueSize(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareCrossStaff
      */
     ///@{
-    virtual int PrepareCrossStaff(FunctorParams *functorParams);
-    virtual int PrepareCrossStaffEnd(FunctorParams *functorParams);
+    int PrepareCrossStaff(FunctorParams *functorParams) override;
+    int PrepareCrossStaffEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer(FunctorParams *functorParams);
+    int PreparePointersByLayer(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareDelayedTurns
      */
-    virtual int PrepareDelayedTurns(FunctorParams *functorParams);
+    int PrepareDelayedTurns(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimePointing
      */
-    virtual int PrepareTimePointing(FunctorParams *functorParams);
+    int PrepareTimePointing(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning(FunctorParams *functorParams);
+    int PrepareTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::SetAlignmentPitchPos
      */
-    virtual int SetAlignmentPitchPos(FunctorParams *functorParams);
+    int SetAlignmentPitchPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::FindSpannedLayerElements
      */
-    virtual int FindSpannedLayerElements(FunctorParams *functorParams);
+    int FindSpannedLayerElements(FunctorParams *functorParams) override;
 
     /**
      * See Object::LayerCountInTimeSpan
      */
-    virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
+    int LayerCountInTimeSpan(FunctorParams *functorParams) override;
 
     /**
      * See Object::LayerElementsInTimeSpan
      */
-    virtual int LayerElementsInTimeSpan(FunctorParams *functorParams);
+    int LayerElementsInTimeSpan(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcOnsetOffset
      */
     ///@{
-    virtual int CalcOnsetOffset(FunctorParams *functorParams);
+    int CalcOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::ResolveMIDITies
      */
     ///@{
-    virtual int ResolveMIDITies(FunctorParams *);
+    int ResolveMIDITies(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * @name See Object::GenerateMIDI
      */
     ///@{
-    virtual int GenerateMIDI(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::GenerateTimemap
      */
-    virtual int GenerateTimemap(FunctorParams *functorParams);
+    int GenerateTimemap(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::GetRelativeLayerElement
      */
-    virtual int GetRelativeLayerElement(FunctorParams *functorParams);
+    int GetRelativeLayerElement(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::PrepareSlurs
+     */
+    int PrepareSlurs(FunctorParams *functorParams) override;
 
 protected:
     /**
@@ -400,14 +411,14 @@ protected:
     /**
      * The note locations w.r.t. each staff, implemented for note and chord
      */
-    virtual MapOfNoteLocs CalcNoteLocations() { return {}; };
+    virtual MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) { return {}; }
 
     /**
      * The dot locations w.r.t. each staff, implemented for note and chord
      * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
      * secondary
      */
-    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; };
+    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; }
 
     /**
      * Calculate the optimal dot location for a note or chord

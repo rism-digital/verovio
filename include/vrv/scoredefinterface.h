@@ -9,6 +9,7 @@
 #define __VRV_SCOREDEF_INTERFACE_H__
 
 #include "atts_analytical.h"
+#include "atts_cmn.h"
 #include "atts_mensural.h"
 #include "atts_midi.h"
 #include "atts_shared.h"
@@ -31,6 +32,7 @@ class ScoreDefInterface : public Interface,
                           public AttMeasureNumbers,
                           public AttMidiTempo,
                           public AttMultinumMeasures,
+                          public AttPianoPedals,
                           public AttSpacing,
                           public AttSystems {
 public:
@@ -41,8 +43,8 @@ public:
     ///@{
     ScoreDefInterface();
     virtual ~ScoreDefInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_SCOREDEF; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_SCOREDEF; }
     ///@}
 
 private:

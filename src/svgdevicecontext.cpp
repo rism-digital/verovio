@@ -401,7 +401,7 @@ void SvgDeviceContext::StartPage()
                        //"g.page-margin{background: pink;} "
                        //"g.bounding-box{stroke:red; stroke-width:10} "
                        //"g.content-bounding-box{stroke:blue; stroke-width:10} "
-                       "g.ending, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
+                       "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
                        "g.mNum{font-style:italic;} g.label{font-weight:normal;}");
         m_currentNode = m_svgNodeStack.back();
     }
@@ -812,7 +812,7 @@ void SvgDeviceContext::EndText()
 
 // draw text element with optional parameters to specify the bounding box of the text
 // if the bounding box is specified then append a rect child
-void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
+void SvgDeviceContext::DrawText(const std::string &text, const std::wstring &wtext, int x, int y, int width, int height)
 {
     assert(m_fontStack.top());
 

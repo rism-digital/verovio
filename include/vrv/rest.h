@@ -48,32 +48,32 @@ public:
     ///@{
     Rest();
     virtual ~Rest();
-    virtual Object *Clone() const { return new Rest(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Rest"; }
+    Object *Clone() const override { return new Rest(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Rest"; }
     ///@}
 
     /**
      * Add an element to a rest.
      * Only Dots elements will be actually added to the rest.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Overwritten method for rest
      */
-    virtual void AddChild(Object *object);
+    void AddChild(Object *object) override;
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
+    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Get the SMuFL glyph or a rest considering its actual duration.
@@ -88,37 +88,37 @@ public:
     /**
      * See Object::AdjustBeams
      */
-    virtual int AdjustBeams(FunctorParams *functorParams);
+    int AdjustBeams(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertMarkupAnalytical
      */
-    virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
+    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcDots
      */
-    virtual int CalcDots(FunctorParams *functorParams);
+    int CalcDots(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareLayerElementParts
      */
-    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
+    int PrepareLayerElementParts(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::Transpose
      */
-    virtual int Transpose(FunctorParams *);
+    int Transpose(FunctorParams *functorParams) override;
 
     /**
      * Get the vertical location for the rests that are located on other layers

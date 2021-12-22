@@ -74,10 +74,7 @@ private:
     std::string m_glyphAuth;
     /** Glyph name. **/
     std::string m_glyphName;
-    /**
-     * Numeric glyph reference in hexadecimal notation, e.g.
-     * "#xE000" or "U+E000". N.B. SMuFL version 1.18 uses the range U+E000 - U+ECBF.
-     **/
+    /** Numeric glyph reference in hexadecimal notation, **/
     data_HEXNUM m_glyphNum;
     /** The web-accessible location of the controlled vocabulary from which the value of **/
     std::string m_glyphUri;

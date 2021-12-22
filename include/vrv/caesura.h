@@ -30,16 +30,16 @@ public:
     ///@{
     Caesura();
     virtual ~Caesura();
-    virtual Object *Clone() const { return new Caesura(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Caesura"; }
+    Object *Clone() const override { return new Caesura(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Caesura"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
 
     //----------//

@@ -226,7 +226,7 @@ Clef *Layer::GetClefFacs(LayerElement *test)
     if (doc->GetType() == Facs) {
         ListOfObjects clefs;
         ClassIdComparison ac(CLEF);
-        doc->FindAllDescendantBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
+        doc->FindAllDescendantsBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
         if (clefs.size() > 0) {
             return dynamic_cast<Clef *>(*clefs.rbegin());
         }
@@ -733,33 +733,5 @@ int Layer::ResetDrawing(FunctorParams *functorParams)
     m_crossStaffFromAbove = false;
     return FUNCTOR_CONTINUE;
 }
-
-/*
-int Layer::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    if (this->HasSameasLink()) {
-        assert(this->GetSameasLink());
-        this->GetSameasLink()->Process(params->m_functor, functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::GenerateTimemap(FunctorParams *functorParams)
-{
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
-    if (this->HasSameasLink()) {
-        assert(this->GetSameasLink());
-        this->GetSameasLink()->Process(params->m_functor, functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
- }
- */
 
 } // namespace vrv

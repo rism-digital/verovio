@@ -14,8 +14,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "beam.h"
 #include "devicecontextbase.h"
 #include "doc.h"
+#include "drawinginterface.h"
 #include "floatingobject.h"
 #include "glyph.h"
 #include "vrv.h"
@@ -652,6 +654,73 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     return 0;
 }
 
+int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, int additionalOffset) const
+{
+    assert(beamInterface);
+    assert(!beamInterface->m_beamElementCoords.empty());
+
+    const Point beamLeft(
+        beamInterface->m_beamElementCoords.front()->m_x, beamInterface->m_beamElementCoords.front()->m_yBeam);
+    const Point beamRight(
+        beamInterface->m_beamElementCoords.back()->m_x, beamInterface->m_beamElementCoords.back()->m_yBeam);
+
+    Point leftIntersection(0, 0);
+    Point rightIntersection(0, 0);
+    const double beamSlope = BoundingBox::CalcSlope(beamLeft, beamRight);
+    if (this->GetLeftBy(type) <= beamLeft.x) {
+        // BB does not overlap horizontally with beam (left side of the beam)
+        if (this->GetRightBy(type) < beamLeft.x) {
+            return 0;
+        }
+        // BB overlaps with left side of the beam
+        else if (this->GetRightBy(type) < beamRight.x) {
+            leftIntersection = beamLeft;
+            rightIntersection.x = this->GetRightBy(type);
+            rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
+        }
+        // BB covers the whole beam
+        else {
+            leftIntersection = beamLeft;
+            rightIntersection = beamRight;
+        }
+    }
+    else {
+        if (this->GetRightBy(type) > beamRight.x) {
+            // BB overlaps with right side of the beam
+            if (this->GetLeftBy(type) <= beamRight.x) {
+                leftIntersection.x = this->GetLeftBy(type);
+                leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
+                rightIntersection = beamRight;
+            }
+            // BB does not overlap horizontally with beam (right side of the beam)
+            else {
+                return 0;
+            }
+        }
+        // BB is inside of the beam
+        else {
+            leftIntersection.x = this->GetLeftBy(type);
+            leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
+            rightIntersection.x = this->GetRightBy(type);
+            rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
+        }
+    }
+
+    // calculate vertical overlap of the BB with beam section
+    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+        const int topY = std::max(leftIntersection.y, rightIntersection.y);
+        const int shift = topY - this->GetBottomBy(type);
+        if (shift > 0) return shift + additionalOffset;
+    }
+    else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+        const int bottomY = std::min(leftIntersection.y, rightIntersection.y);
+        const int shift = bottomY - this->GetTopBy(type);
+        if (shift < 0) return shift - additionalOffset;
+    }
+
+    return 0;
+}
+
 //----------------------------------------------------------------------------
 // Static methods for BoundingBox
 //----------------------------------------------------------------------------
@@ -691,35 +760,38 @@ Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point cen
     return point;
 }
 
-double BoundingBox::CalcSlope(Point const &p1, Point const &p2)
+bool BoundingBox::ArePointsClose(const Point &p1, const Point &p2, int margin)
+{
+    return (hypot(p1.x - p2.x, p1.y - p2.y) <= margin);
+}
+
+double BoundingBox::CalcSlope(const Point &p1, const Point &p2)
 {
     if ((p1.y == p2.y) || (p1.x == p2.x)) return 0.0;
 
     return (double)(p2.y - p1.y) / (double)(p2.x - p1.x);
 }
 
-/*
-int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x) {
+double BoundingBox::CalcBezierParamAtPosition(const Point bezier[4], int x)
+{
+    // Calculate coefficients of cubic polynomial
+    const double a = -bezier[0].x + 3.0 * bezier[1].x - 3.0 * bezier[2].x + bezier[3].x;
+    const double b = 3.0 * bezier[0].x - 6.0 * bezier[1].x + 3.0 * bezier[2].x;
+    const double c = -3.0 * bezier[0].x + 3.0 * bezier[1].x;
+    const double d = bezier[0].x - x;
 
-    Point P;
-    double t = 0.0;
-    // avoid division by 0
-    if (bezier[3].x != bezier[0].x) t = (double)(x - bezier[0].x) / (double)(bezier[3].x - bezier[0].x);
-    t = std::min(1.0, std::max(0.0, t));
+    // Solve the polynomial
+    const std::set<double> roots = BoundingBox::SolveCubicPolynomial(a, b, c, d);
 
-    P.y = pow((1 - t), 3) * bezier[0].y + 3 * t * pow((1 -t), 2) * bezier[1].y + 3 * (1-t) * pow(t, 2)* bezier[2].y +
-pow (t, 3)* bezier[3].y;
-    LogDebug("%f - %d - %d", t, x, P.y);
-    return P.y;
+    // Return the first root in [0,1]
+    auto iter
+        = std::find_if(roots.begin(), roots.end(), [](double value) { return ((value >= 0.0) && (value <= 1.0)); });
+    return (iter != roots.end()) ? *iter : 0.0;
 }
-*/
 
 int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x)
 {
-    double t = 0.0;
-    // avoid division by 0
-    if (bezier[3].x != bezier[0].x) t = (double)(x - bezier[0].x) / (double)(bezier[3].x - bezier[0].x);
-    t = std::min(1.0, std::max(0.0, t));
+    const double t = BoundingBox::CalcBezierParamAtPosition(bezier, x);
 
     Point p = BoundingBox::CalcDeCasteljau(bezier, t);
 
@@ -745,7 +817,7 @@ Point BoundingBox::CalcPointAtBezier(const Point bezier[4], double t)
     return midPoint;
 }
 
-double BoundingBox::GetBezierThicknessCoeficient(
+double BoundingBox::GetBezierThicknessCoefficient(
     const Point bezier[4], int currentThickness, double angle, int penWidth)
 {
     Point top[4], bottom[4];
@@ -771,6 +843,67 @@ Point BoundingBox::CalcDeCasteljau(const Point bezier[4], double t)
         + pow(t, 3) * bezier[3].y;
 
     return p;
+}
+
+std::set<double> BoundingBox::SolveCubicPolynomial(double a, double b, double c, double d)
+{
+    // Implementation of Cardano's algorithm
+    // See https://pomax.github.io/bezierinfo/#extremities
+
+    // Check whether we need cubic solving
+    if (abs(a) < 10e-10) {
+        // This is not a cubic curve.
+        if (abs(b) < 10e-10) {
+            // This is not a quadratic curve either.
+            if (abs(c) < 10e-10) {
+                return {};
+            }
+            // Linear solution
+            return { -d / c };
+        }
+        // Quadratic solution
+        const double q = sqrt(c * c - 4.0 * b * d);
+        return { (q - c) / (2.0 * b), (-c - q) / (2.0 * b) };
+    }
+
+    // We know that we need a cubic solution.
+    b /= a;
+    c /= a;
+    d /= a;
+
+    const double p = (3.0 * c - b * b) / 3.0;
+    const double p3 = p / 3.0;
+    const double q = (2.0 * b * b * b - 9.0 * b * c + 27.0 * d) / 27.0;
+    const double q2 = q / 2.0;
+    const double discriminant = q2 * q2 + p3 * p3 * p3;
+
+    if (discriminant < 0.0) {
+        // three possible real roots
+        const double mp3 = -p / 3.0;
+        const double r = sqrt(mp3 * mp3 * mp3);
+        const double t = -q / (2.0 * r);
+        const double cosphi = (t < -1.0) ? -1.0 : ((t > 1.0) ? 1.0 : t);
+        const double phi = acos(cosphi);
+        const double u = 2.0 * cbrt(r);
+        const double root1 = u * cos(phi / 3.0) - b / 3.0;
+        const double root2 = u * cos((phi + 2.0 * M_PI) / 3.0) - b / 3.0;
+        const double root3 = u * cos((phi + 4.0 * M_PI) / 3.0) - b / 3.0;
+        return { root1, root2, root3 };
+    }
+
+    if (discriminant == 0.0) {
+        // three real roots, but two of them are equal
+        const double u = -cbrt(q2);
+        const double root1 = 2.0 * u - b / 3.0;
+        const double root2 = -u - b / 3.0;
+        return { root1, root2 };
+    }
+
+    // one real root, two complex roots
+    const double sd = sqrt(discriminant);
+    const double u = cbrt(sd - q2);
+    const double v = cbrt(sd + q2);
+    return { u - v - b / 3.0 };
 }
 
 void BoundingBox::CalcThickBezier(

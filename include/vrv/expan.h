@@ -26,9 +26,9 @@ public:
     ///@{
     Expan();
     virtual ~Expan();
-    virtual Object *Clone() const { return new Expan(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Expan"; }
+    Object *Clone() const override { return new Expan(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Expan"; }
     ///@}
 
 private:

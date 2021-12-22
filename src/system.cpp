@@ -29,7 +29,7 @@
 #include "slur.h"
 #include "staff.h"
 #include "syl.h"
-#include "systemboundary.h"
+#include "systemmilestone.h"
 #include "trill.h"
 #include "verse.h"
 #include "vrv.h"
@@ -226,7 +226,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
     for (auto &measure : measures) {
         Object *curStart = (measure == measureStart) ? start : measure->GetFirst();
         Object *curEnd = (measure == measureEnd) ? end : measure->GetLast();
-        measure->FindAllDescendantBetween(&children, &matchType, curStart, curEnd, false);
+        measure->FindAllDescendantsBetween(&children, &matchType, curStart, curEnd, false);
     }
 
     Layer *layerStart = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));
@@ -276,7 +276,8 @@ curvature_CURVEDIR System::GetPreferredCurveDirection(LayerElement *start, Layer
     assert(layerStart);
 
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-    Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL);
+    Functor findSpannedLayerElementsEnd(&Object::FindSpannedLayerElementsEnd);
+    this->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
 
     curvature_CURVEDIR preferredDirection = curvature_CURVEDIR_NONE;
     for (auto element : findSpannedLayerElementsParams.m_elements) {
@@ -756,7 +757,9 @@ int System::AlignSystems(FunctorParams *functorParams)
     if (systemMargin) {
         const int margin
             = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc));
-        params->m_shift -= margin > 0 ? margin : 0;
+        // Ensure minimal white space between consecutive systems by adding one staff space
+        const int unit = params->m_doc->GetDrawingUnit(100);
+        params->m_shift -= std::max(margin, 2 * unit);
     }
 
     SetDrawingYRel(params->m_shift);
@@ -799,7 +802,7 @@ int System::JustifyX(FunctorParams *functorParams)
     if (this->IsLastOfMdiv()) {
         double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
         if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
-            return FUNCTOR_STOP;
+            return FUNCTOR_SIBLINGS;
         }
     }
 
@@ -873,6 +876,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
 
+    params->m_classId = FING;
+    m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DYNAM;
     m_systemAligner.Process(params->m_functor, params);
 
@@ -897,9 +903,6 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = FERMATA;
-    m_systemAligner.Process(params->m_functor, params);
-
-    params->m_classId = FING;
     m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = DIR;
@@ -1084,7 +1087,7 @@ int System::CastOffEncoding(FunctorParams *functorParams)
     // We are starting a new system we need to cast off
     params->m_contentSystem = this;
     // Create the new system but do not add it to the page yet.
-    // It will be added when reaching a pb / sb or at the end of the score in PageElementEnd::CastOffEncoding
+    // It will be added when reaching a pb / sb or at the end of the score in PageMilestoneEnd::CastOffEncoding
     assert(!params->m_currentSystem);
     params->m_currentSystem = new System();
 

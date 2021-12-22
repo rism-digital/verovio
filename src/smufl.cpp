@@ -26,10 +26,13 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "brace", SMUFL_E000_brace },
     { "bracketTop", SMUFL_E003_bracketTop },
     { "bracketBottom", SMUFL_E004_bracketBottom },
+    { "repeatDots", SMUFL_E043_repeatDots },
+    { "repeatDot", SMUFL_E044_repeatDot },
     { "dalSegno", SMUFL_E045_dalSegno },
     { "daCapo", SMUFL_E046_daCapo },
     { "segno", SMUFL_E047_segno },
     { "coda", SMUFL_E048_coda },
+    { "codaSquare", SMUFL_E049_codaSquare },
     { "segnoSerpent2", SMUFL_E04B_segnoSerpent2 },
     { "gClef", SMUFL_E050_gClef },
     { "gClef15mb", SMUFL_E051_gClef15mb },
@@ -74,6 +77,8 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "timeSigParensRightSmall", SMUFL_E093_timeSigParensRightSmall },
     { "timeSigParensLeft", SMUFL_E094_timeSigParensLeft },
     { "timeSigParensRight", SMUFL_E095_timeSigParensRight },
+    { "noteheadDoubleWhole", SMUFL_E0A0_noteheadDoubleWhole },
+    { "noteheadDoubleWholeSquare", SMUFL_E0A1_noteheadDoubleWholeSquare },
     { "noteheadWhole", SMUFL_E0A2_noteheadWhole },
     { "noteheadHalf", SMUFL_E0A3_noteheadHalf },
     { "noteheadBlack", SMUFL_E0A4_noteheadBlack },
@@ -209,6 +214,9 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "repeat1Bar", SMUFL_E500_repeat1Bar },
     { "repeat2Bars", SMUFL_E501_repeat2Bars },
     { "repeat4Bars", SMUFL_E502_repeat4Bars },
+    { "repeatBarUpperDot", SMUFL_E503_repeatBarUpperDot },
+    { "repeatBarSlash", SMUFL_E504_repeatBarSlash },
+    { "repeatBarLowerDot", SMUFL_E505_repeatBarLowerDot },
     { "ottava", SMUFL_E510_ottava },
     { "ottavaAlta", SMUFL_E511_ottavaAlta },
     { "ottavaBassa", SMUFL_E512_ottavaBassa },
@@ -293,6 +301,9 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "ornamentPrecompMordentUpperPrefix", SMUFL_E5C6_ornamentPrecompMordentUpperPrefix },
     { "ornamentPrecompInvertedMordentUpperPrefix", SMUFL_E5C7_ornamentPrecompInvertedMordentUpperPrefix },
     { "ornamentPrecompTrillLowerSuffix", SMUFL_E5C8_ornamentPrecompTrillLowerSuffix },
+    { "brassMuteClosed", SMUFL_E5E5_brassMuteClosed },
+    { "brassMuteHalfClosed", SMUFL_E5E6_brassMuteHalfClosed },
+    { "brassMuteOpen", SMUFL_E5E7_brassMuteOpen },
     { "stringsDownBow", SMUFL_E610_stringsDownBow },
     { "stringsDownBowTurned", SMUFL_E611_stringsDownBowTurned },
     { "stringsUpBow", SMUFL_E612_stringsUpBow },
@@ -386,10 +397,12 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "mensuralRestSemifusa", SMUFL_E9F8_mensuralRestSemifusa },
     { "mensuralCustosUp", SMUFL_EA02_mensuralCustosUp },
     { "chantCustosStemUpPosMiddle", SMUFL_EA06_chantCustosStemUpPosMiddle },
+    { "wiggleTrill", SMUFL_EAA4_wiggleTrill },
     { "wiggleArpeggiatoUp", SMUFL_EAA9_wiggleArpeggiatoUp },
     { "wiggleArpeggiatoDown", SMUFL_EAAA_wiggleArpeggiatoDown },
     { "wiggleArpeggiatoUpArrow", SMUFL_EAAD_wiggleArpeggiatoUpArrow },
     { "wiggleArpeggiatoDownArrow", SMUFL_EAAE_wiggleArpeggiatoDownArrow },
+    { "wiggleGlissando", SMUFL_EAAF_wiggleGlissando },
     { "luteDurationWhole", SMUFL_EBA7_luteDurationWhole },
     { "luteDurationHalf", SMUFL_EBA8_luteDurationHalf },
     { "luteDurationQuarter", SMUFL_EBA9_luteDurationQuarter },
@@ -424,6 +437,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 398
+// 411
 
 } // namespace vrv

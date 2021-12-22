@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        systemboundary.cpp
+// Name:        systemmilestone.cpp
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "systemboundary.h"
+#include "systemmilestone.h"
 
 //----------------------------------------------------------------------------
 
@@ -21,76 +21,76 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// SystemElementEnd
+// SystemMilestoneEnd
 //----------------------------------------------------------------------------
 
-SystemElementEnd::SystemElementEnd(Object *start) : SystemElement(SYSTEM_ELEMENT_END, "system-element-end-")
+SystemMilestoneEnd::SystemMilestoneEnd(Object *start) : SystemElement(SYSTEM_MILESTONE_END, "system-milestone-end-")
 {
     Reset();
     m_start = start;
     m_startClassName = start->GetClassName();
 }
 
-SystemElementEnd::~SystemElementEnd() {}
+SystemMilestoneEnd::~SystemMilestoneEnd() {}
 
-void SystemElementEnd::Reset()
+void SystemMilestoneEnd::Reset()
 {
     m_start = NULL;
     m_drawingMeasure = NULL;
 }
 
 //----------------------------------------------------------------------------
-// SystemElementStartInterface
+// SystemMilestoneInterface
 //----------------------------------------------------------------------------
 
-SystemElementStartInterface::SystemElementStartInterface()
+SystemMilestoneInterface::SystemMilestoneInterface()
 {
     Reset();
 }
 
-SystemElementStartInterface::~SystemElementStartInterface() {}
+SystemMilestoneInterface::~SystemMilestoneInterface() {}
 
-void SystemElementStartInterface::Reset()
+void SystemMilestoneInterface::Reset()
 {
     m_end = NULL;
     m_drawingMeasure = NULL;
 }
 
-void SystemElementStartInterface::SetEnd(SystemElementEnd *end)
+void SystemMilestoneInterface::SetEnd(SystemMilestoneEnd *end)
 {
     assert(!m_end);
     m_end = end;
 }
 
-void SystemElementStartInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
+void SystemMilestoneInterface::ConvertToPageBasedMilestone(Object *object, Object *parent)
 {
     assert(object);
     assert(parent);
 
-    // Then add a SystemElementEnd
-    SystemElementEnd *systemElementEnd = new SystemElementEnd(object);
-    this->SetEnd(systemElementEnd);
-    parent->AddChild(systemElementEnd);
+    // Then add a SystemMilestoneEnd
+    SystemMilestoneEnd *systemMilestoneEnd = new SystemMilestoneEnd(object);
+    this->SetEnd(systemMilestoneEnd);
+    parent->AddChild(systemMilestoneEnd);
 
     // Also clear the relinquished children
     object->ClearRelinquishedChildren();
 }
 
 //----------------------------------------------------------------------------
-// SystemElementEnd functor methods
+// SystemMilestoneEnd functor methods
 //----------------------------------------------------------------------------
 
-int SystemElementEnd::PrepareBoundaries(FunctorParams *functorParams)
+int SystemMilestoneEnd::PrepareMilestones(FunctorParams *functorParams)
 {
-    PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
+    PrepareMilestonesParams *params = vrv_params_cast<PrepareMilestonesParams *>(functorParams);
     assert(params);
 
     // We set its pointer to the last measure we have encountered - this can be NULL in case no measure exists before
-    // the end boundary
+    // the end milestone
     // This can happen with a editorial container around a scoreDef at the beginning
     this->SetMeasure(params->m_lastMeasure);
 
-    // Endings are also set as Measure::m_drawingEnding for all measures in between - when we reach the end boundary of
+    // Endings are also set as Measure::m_drawingEnding for all measures in between - when we reach the end milestone of
     // an ending, we need to set the m_currentEnding to NULL
     if (params->m_currentEnding && this->GetStart()->Is(ENDING)) {
         params->m_currentEnding = NULL;
@@ -101,7 +101,7 @@ int SystemElementEnd::PrepareBoundaries(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemElementEnd::ResetDrawing(FunctorParams *functorParams)
+int SystemMilestoneEnd::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
@@ -110,7 +110,7 @@ int SystemElementEnd::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemElementEnd::CastOffSystems(FunctorParams *functorParams)
+int SystemMilestoneEnd::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
@@ -122,19 +122,21 @@ int SystemElementEnd::CastOffSystems(FunctorParams *functorParams)
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    SystemElementEnd *endBoundary
-        = dynamic_cast<SystemElementEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
+    SystemMilestoneEnd *endMilestone
+        = dynamic_cast<SystemMilestoneEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    // End milestones are not added to the pending objects because we do not want them to be placed at the beginning of
     // the next system but only if the pending object array it empty (otherwise it will mess up the MEI tree)
-    if (params->m_pendingElements.empty())
-        params->m_currentSystem->AddChild(endBoundary);
-    else
-        params->m_pendingElements.push_back(endBoundary);
+    if (params->m_pendingElements.empty()) {
+        params->m_currentSystem->AddChild(endMilestone);
+    }
+    else {
+        params->m_pendingElements.push_back(endMilestone);
+    }
 
     return FUNCTOR_SIBLINGS;
 }
 
-int SystemElementEnd::PrepareFloatingGrps(FunctorParams *functorParams)
+int SystemMilestoneEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 {
     PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
@@ -159,20 +161,20 @@ int SystemElementEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int SystemElementStartInterface::InterfacePrepareBoundaries(FunctorParams *functorParams)
+int SystemMilestoneInterface::InterfacePrepareMilestones(FunctorParams *functorParams)
 {
-    PrepareBoundariesParams *params = vrv_params_cast<PrepareBoundariesParams *>(functorParams);
+    PrepareMilestonesParams *params = vrv_params_cast<PrepareMilestonesParams *>(functorParams);
     assert(params);
 
-    // We have to be in a boundary start element
+    // We have to be in a milestone start element
     assert(m_end);
 
-    params->m_startBoundaries.push_back(this);
+    params->m_startMilestones.push_back(this);
 
     return FUNCTOR_CONTINUE;
 }
 
-int SystemElementStartInterface::InterfaceResetDrawing(FunctorParams *functorParams)
+int SystemMilestoneInterface::InterfaceResetDrawing(FunctorParams *functorParams)
 {
     m_drawingMeasure = NULL;
 

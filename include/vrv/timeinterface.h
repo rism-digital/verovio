@@ -36,8 +36,8 @@ public:
     ///@{
     TimePointInterface();
     virtual ~TimePointInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_TIME_POINT; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_TIME_POINT; }
     ///@}
 
     /**
@@ -140,11 +140,9 @@ public:
     ///@{
     TimeSpanningInterface();
     virtual ~TimeSpanningInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_TIME_SPANNING; }
     ///@}
-
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
 
     /**
      * @name Set and get the first and second LayerElement
@@ -181,12 +179,21 @@ public:
     void SetUuidStr();
 
     /**
+     * Check if the end points are temporally ordered
+     * @Return true if end temporally occurs after start
+     */
+    ///@{
+    bool IsOrdered();
+    bool IsOrdered(LayerElement *start, LayerElement *end);
+    ///@}
+
+    /**
      * Check if the slur or tie needs to be taken into account as overflow above or below in case of cross-staff end
      * points. This methods assumes staff@n to be greater for the staff below.
      */
 
     void GetCrossStaffOverflows(
-        StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow);
+        StaffAlignment *alignment, curvature_CURVEDIR curveDir, bool &skipAbove, bool &skipBelow);
 
     //-----------------//
     // Pseudo functors //
@@ -212,12 +219,12 @@ public:
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
+    int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
+    int InterfaceResetDrawing(FunctorParams *functorParams, Object *object) override;
 
 private:
     //

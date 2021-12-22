@@ -37,17 +37,17 @@ public:
     ///@{
     Hairpin();
     virtual ~Hairpin();
-    virtual Object *Clone() const { return new Hairpin(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Hairpin"; }
+    Object *Clone() const override { return new Hairpin(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Hairpin"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     /**
@@ -85,12 +85,12 @@ public:
     /**
      * See Object::PrepareFloatingGrps
      */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ResetDrawing(FunctorParams *functorParams) override;
 
 protected:
     //

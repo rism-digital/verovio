@@ -174,7 +174,7 @@ public:
     virtual ~MusicXmlInput();
 
 #ifndef NO_MUSICXML_SUPPORT
-    virtual bool Import(std::string const &musicxml);
+    bool Import(const std::string &musicxml) override;
 
 private:
     /*
@@ -394,6 +394,13 @@ private:
      */
     ///@{
     void SetChordStaff(Layer *layer);
+    ///@}
+
+    /*
+     * @name Helper method for comparing written/gestural accidental attributes
+     */
+    ///@{
+    static bool IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, data_ACCIDENTAL_GESTURAL gestural);
     ///@}
 
     /*

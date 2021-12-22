@@ -374,7 +374,7 @@ private:
     /**
      * States the length of barlines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
-     * of staff lines - 1); e.g., a value of '8' for a 5-line staff.
+     * of staff lines - 1);
      **/
     double m_barLen;
     /** Records the method of barring. **/
@@ -797,6 +797,114 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttCoordX1
+//----------------------------------------------------------------------------
+
+class AttCoordX1 : public Att {
+public:
+    AttCoordX1();
+    virtual ~AttCoordX1();
+
+    /** Reset the default values for the attribute class **/
+    void ResetCoordX1();
+
+    /** Read the values for the attribute class **/
+    bool ReadCoordX1(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteCoordX1(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetCoordX1(double coordX1_) { m_coordX1 = coordX1_; }
+    double GetCoordX1() const { return m_coordX1; }
+    bool HasCoordX1() const;
+    ///@}
+
+private:
+    /** Gives coordinates for the left side of a feature. **/
+    double m_coordX1;
+
+    /* include <attcoord.x1> */
+};
+
+//----------------------------------------------------------------------------
+// AttCoordX2
+//----------------------------------------------------------------------------
+
+class AttCoordX2 : public Att {
+public:
+    AttCoordX2();
+    virtual ~AttCoordX2();
+
+    /** Reset the default values for the attribute class **/
+    void ResetCoordX2();
+
+    /** Read the values for the attribute class **/
+    bool ReadCoordX2(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteCoordX2(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetCoordX2(double coordX2_) { m_coordX2 = coordX2_; }
+    double GetCoordX2() const { return m_coordX2; }
+    bool HasCoordX2() const;
+    ///@}
+
+private:
+    /** Gives coordinates for the right side of a feature. **/
+    double m_coordX2;
+
+    /* include <attcoord.x2> */
+};
+
+//----------------------------------------------------------------------------
+// AttCoordY1
+//----------------------------------------------------------------------------
+
+class AttCoordY1 : public Att {
+public:
+    AttCoordY1();
+    virtual ~AttCoordY1();
+
+    /** Reset the default values for the attribute class **/
+    void ResetCoordY1();
+
+    /** Read the values for the attribute class **/
+    bool ReadCoordY1(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteCoordY1(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetCoordY1(double coordY1_) { m_coordY1 = coordY1_; }
+    double GetCoordY1() const { return m_coordY1; }
+    bool HasCoordY1() const;
+    ///@}
+
+private:
+    /** Gives y coordinates for the top left of a feature. **/
+    double m_coordY1;
+
+    /* include <attcoord.y1> */
+};
+
+//----------------------------------------------------------------------------
 // AttCoordinated
 //----------------------------------------------------------------------------
 
@@ -937,7 +1045,7 @@ public:
 private:
     /**
      * Records the placement of Bezier control points as a series of pairs of space-
-     * separated values; e.g., 19 45 -32 118.
+     * separated values;
      **/
     std::string m_bezier;
     /**
@@ -3594,16 +3702,9 @@ public:
     ///@}
 
 private:
-    /**
-     * Encodes the starting point of musical material in terms of musical time, i.e., a
-     * (potentially negative) count of measures plus a beat location.
-     **/
+    /** Encodes the starting point of musical material in terms of musical time, **/
     data_MEASUREBEAT m_originTstamp;
-    /**
-     * Encodes the ending point of musical material in terms of musical time, i.e., a
-     * count of measures plus a beat location.
-     * The values are relative to the measure identified by
-     **/
+    /** Encodes the ending point of musical material in terms of musical time, **/
     data_MEASUREBEAT m_originTstamp2;
 
     /* include <attorigin.tstamp2> */
@@ -5291,10 +5392,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Encodes the onset time in terms of musical time, i.e., beats[.fractional beat
-     * part], as expressed in the written time signature.
-     **/
+    /** Encodes the onset time in terms of musical time, **/
     double m_tstamp;
 
     /* include <atttstamp> */
@@ -5330,10 +5428,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Encodes the ending point of an event, i.e., a count of measures plus a beat
-     * location in the ending measure.
-     **/
+    /** Encodes the ending point of an event, **/
     data_MEASUREBEAT m_tstamp2;
 
     /* include <atttstamp2> */
@@ -5373,15 +5468,9 @@ public:
     ///@}
 
 private:
-    /**
-     * Records the amount of diatonic pitch shift, e.g., C to C♯ = 0, C to D♭ = 1,
-     * necessary to calculate the sounded pitch from the written one.
-     **/
+    /** Records the amount of diatonic pitch shift, **/
     double m_transDiat;
-    /**
-     * Records the amount of pitch shift in semitones, e.g., C to C♯ = 1, C to D♭ = 1,
-     * necessary to calculate the sounded pitch from the written one.
-     **/
+    /** Records the amount of pitch shift in semitones, **/
     double m_transSemi;
 
     /* include <atttrans.semi> */
@@ -5517,11 +5606,7 @@ private:
     std::string m_fontfam;
     /** Holds the name of a font. **/
     std::string m_fontname;
-    /**
-     * Indicates the size of a font expressed in printers' points, i.e., 1/72nd of an
-     * inch, relative terms, e.g., "small", "larger", etc., or percentage values
-     * relative to "normal" size, e.g., "125%".
-     **/
+    /** Indicates the size of a font expressed in printers' points, **/
     data_FONTSIZE m_fontsize;
     /** Records the style of a font, i.e, italic, oblique, or normal. **/
     data_FONTSTYLE m_fontstyle;

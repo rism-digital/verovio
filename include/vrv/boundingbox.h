@@ -16,6 +16,7 @@ namespace vrv {
 
 #define BEZIER_APPROXIMATION 50.0
 
+class BeamDrawingInterface;
 class Doc;
 class FloatingCurvePositioner;
 class Glyph;
@@ -156,10 +157,17 @@ public:
     bool Encloses(const Point point) const;
 
     /**
-     * Return true if the bounding box intersects with the curve represented by the FloatingPositioner.
+     * Return intersection between the bounding box and the curve represented by the FloatingPositioner.
      * The Object pointed by the FloatingPositioner is expected to be a SLUR or a TIE
      */
     int Intersects(FloatingCurvePositioner *curve, Accessor type, int margin = 0) const;
+
+    /**
+     * Return intersection between the bounding box and the beam represented by the BeamDrawingInterface.
+     * A segment of the beam that matches horizontal position of the bounding box is taken to find whether there is
+     * intersection.
+     */
+    int Intersects(BeamDrawingInterface *beamInterface, Accessor type, int additionalOffset = 0) const;
 
     //----------------//
     // Static methods //
@@ -181,14 +189,24 @@ public:
         const Point bezier[4], bool isMaxExtrema, int approximationSteps = BEZIER_APPROXIMATION);
 
     /**
+     * @return true if the distance between the points does not exceed margin
+     */
+    static bool ArePointsClose(const Point &p1, const Point &p2, int margin);
+
+    /**
      * Calculate the slope represented by two points
      */
-    static double CalcSlope(Point const &p1, Point const &p2);
+    static double CalcSlope(const Point &p1, const Point &p2);
 
     /**
      * Calculate the position of a point after a rotation of alpha (in radian) around the center
      */
     static Point CalcPositionAfterRotation(Point point, float alpha, Point center);
+
+    /**
+     * Calculate the t parameter of a bezier at position x
+     */
+    static double CalcBezierParamAtPosition(const Point bezier[4], int x);
 
     /**
      * Calculate the y position of a bezier at position x
@@ -206,9 +224,10 @@ public:
     static Point CalcPointAtBezier(const Point bezier[4], double t);
 
     /**
-     * Calculate thickness coeficient to be applient for bezier curve to fit MEI units thickness
+     * Calculate thickness coefficient to be applient for bezier curve to fit MEI units thickness
      */
-    static double GetBezierThicknessCoeficient(const Point bezier[4], int currentThickness, double angle, int penWidth);
+    static double GetBezierThicknessCoefficient(
+        const Point bezier[4], int currentThickness, double angle, int penWidth);
 
     /**
      * Calculate the point bezier point position for a t between 0.0 and 1.0
@@ -236,6 +255,12 @@ public:
     static int RectTopOverlap(const Point rect1[2], const Point rect2[2], int margin, int hMargin);
     static int RectBottomOverlap(const Point rect1[2], const Point rect2[2], int margin, int hMargin);
     ///@}
+
+    /**
+     * Solve the cubic equation ax^3 + bx^2 + cx + d = 0
+     * Returns up to three real roots
+     */
+    static std::set<double> SolveCubicPolynomial(double a, double b, double c, double d);
 
 private:
     /**

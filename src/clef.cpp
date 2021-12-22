@@ -94,7 +94,7 @@ int Clef::GetClefLocOffset() const
 // Static methods for Clef
 //----------------------------------------------------------------------------
 
-wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
+wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
 {
     // If there is glyph.num, prioritize it
     if (HasGlyphNum()) {
@@ -110,18 +110,18 @@ wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
     switch (notationtype) {
         case NOTATIONTYPE_neume:
             // neume clefs
-            return (this->GetShape() == CLEFSHAPE_F) ? SMUFL_E902_chantFclef : SMUFL_E906_chantCclef;
+            return (GetShape() == CLEFSHAPE_F) ? SMUFL_E902_chantFclef : SMUFL_E906_chantCclef;
             break;
         case NOTATIONTYPE_mensural:
         case NOTATIONTYPE_mensural_white:
             // mensural clefs
-            switch (this->GetShape()) {
+            switch (GetShape()) {
                 case CLEFSHAPE_G: return SMUFL_E901_mensuralGclefPetrucci; break;
                 case CLEFSHAPE_F: return SMUFL_E904_mensuralFclefPetrucci; break;
                 default: return SMUFL_E909_mensuralCclefPetrucciPosMiddle; break;
             }
         case NOTATIONTYPE_mensural_black:
-            switch (this->GetShape()) {
+            switch (GetShape()) {
                 case CLEFSHAPE_C: return SMUFL_E906_chantCclef; break;
                 case CLEFSHAPE_F: return SMUFL_E902_chantFclef; break;
                 default:
@@ -131,9 +131,9 @@ wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
             [[fallthrough]];
         default:
             // cmn clefs
-            switch (this->GetShape()) {
+            switch (GetShape()) {
                 case CLEFSHAPE_G:
-                    switch (this->GetDis()) {
+                    switch (GetDis()) {
                         case OCTAVE_DIS_8:
                             return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E053_gClef8va
                                                                                  : SMUFL_E052_gClef8vb;
@@ -146,7 +146,7 @@ wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
                     }
                 case CLEFSHAPE_GG: return SMUFL_E055_gClef8vbOld;
                 case CLEFSHAPE_F:
-                    switch (this->GetDis()) {
+                    switch (GetDis()) {
                         case OCTAVE_DIS_8:
                             return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E065_fClef8va
                                                                                  : SMUFL_E064_fClef8vb;
@@ -158,7 +158,7 @@ wchar_t Clef::GetClefGlyph(data_NOTATIONTYPE notationtype) const
                         default: return SMUFL_E062_fClef; break;
                     }
                 case CLEFSHAPE_C:
-                    switch (this->GetDis()) {
+                    switch (GetDis()) {
                         case OCTAVE_DIS_8: return SMUFL_E05D_cClef8vb; break;
                         default: return SMUFL_E05C_cClef; break;
                     }
@@ -282,7 +282,7 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
 
     // This should never happen because we always have at least barline alignments - even empty
     if (!previousAlignment || !nextAlignment) {
-        LogDebug("No aligment found before and after the clef change");
+        LogDebug("No alignment found before and after the clef change");
         return FUNCTOR_CONTINUE;
     }
 

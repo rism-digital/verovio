@@ -34,7 +34,6 @@ class Artic;
 class BarLine;
 class Beam;
 class BeatRpt;
-class SystemElementEnd;
 class BracketSpan;
 class Breath;
 class BTrem;
@@ -101,7 +100,7 @@ class Octave;
 class Orig;
 class Page;
 class PageElement;
-class PageElementEnd;
+class PageMilestoneEnd;
 class Pages;
 class Pb;
 class Pedal;
@@ -142,6 +141,7 @@ class Syl;
 class Syllable;
 class System;
 class SystemElement;
+class SystemMilestoneEnd;
 class TabDurSym;
 class TabGrp;
 class Tempo;
@@ -158,6 +158,12 @@ class Tuplet;
 class Unclear;
 class Verse;
 class Zone;
+
+// Helper enums
+///@{
+enum class MatchLocation { Before, Here, After };
+enum class RangeMatchLocation { BeforeStart, AtStart, BetweenStartEnd, AtEnd, AfterEnd };
+///@}
 
 //----------------------------------------------------------------------------
 // MEIOutput
@@ -182,24 +188,46 @@ public:
     bool Export();
 
     /**
-     * The main method for write objects.
+     * The main method for writing objects.
      */
-    virtual bool WriteObject(Object *object);
-
-    /**
-     * Writing object method that must be overridden in the child class.
-     */
-    virtual bool WriteObjectEnd(Object *object);
+    ///@{
+    bool WriteObject(Object *object) override;
+    bool WriteObjectEnd(Object *object) override;
+    ///@}
 
     /**
      * Return the output as a string by writing it to the stringstream member.
      */
-    std::string GetOutput(int page = -1);
+    std::string GetOutput();
 
     /**
-     * Setter for score-based MEI output
+     * @name Setter and getter for score-based MEI output
      */
+    ///@{
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
+    bool GetScoreBasedMEI() const { return m_scoreBasedMEI; }
+    ///@}
+
+    /**
+     * Score based filtering by measure, page or mdiv
+     */
+    ///@{
+    bool HasFilter() const;
+    void SetFirstPage(int page);
+    void SetLastPage(int page);
+    void SetFirstMeasure(const std::string &uuid);
+    void SetLastMeasure(const std::string &uuid);
+    void SetMdiv(const std::string &uuid);
+    void ResetFilter();
+    ///@}
+
+    /**
+     * @name Gettersto improve code readability
+     */
+    ///@{
+    bool IsScoreBasedMEI() const { return m_scoreBasedMEI; }
+    bool IsPageBasedMEI() const { return !m_scoreBasedMEI; }
+    ///@}
 
     /**
      * Setter for indent for the MEI output (default is 3, -1 for tabs)
@@ -207,11 +235,57 @@ public:
     void SetIndent(int indent) { m_indent = indent; }
 
     /**
-     * Setter for remove Ids flag for the MEI output (default is false)
+     * Setter for ignore header flag for the MEI output (default is false)
+     */
+    void SetIgnoreHeader(bool ignoreHeader) { m_ignoreHeader = ignoreHeader; }
+
+    /**
+     * Setter for remove ids flag for the MEI output (default is false)
      */
     void SetRemoveIds(bool removeIds) { m_removeIds = removeIds; }
 
 private:
+    /**
+     * Reset
+     */
+    void Reset();
+
+    /**
+     * Score based filtering
+     */
+    ///@{
+    bool HasValidFilter() const;
+    bool IsMatchingFilter() const;
+    void UpdateFilter(Object *object);
+    void UpdatePageFilter(Object *object);
+    void UpdateMeasureFilter(Object *object);
+    void UpdateMdivFilter(Object *object);
+    bool ProcessScoreBasedFilter(Object *object);
+    bool ProcessScoreBasedFilterEnd(Object *object);
+    ///@}
+
+    /**
+     * Writing objects
+     */
+    ///@{
+    bool WriteObjectInternal(Object *object, bool useCustomScoreDef);
+    bool WriteObjectInternalEnd(Object *object);
+    void WriteStackedObjects();
+    void WriteStackedObjectsEnd();
+    ///@}
+
+    /**
+     * Scoredef manipulation
+     */
+    ///@{
+    void WriteCustomScoreDef();
+    void AdjustStaffDef(StaffDef *staffDef, Measure *measure);
+    bool AdjustLabel(Label *label);
+    ///@}
+
+    /**
+     * Write the document
+     */
     bool WriteDoc(Doc *doc);
 
     /**
@@ -245,9 +319,9 @@ private:
     ///@{
     void WritePage(pugi::xml_node currentNode, Page *page);
     void WritePageElement(pugi::xml_node element, PageElement *object);
-    void WritePageElementEnd(pugi::xml_node currentNode, PageElementEnd *elementEnd);
+    void WritePageMilestoneEnd(pugi::xml_node currentNode, PageMilestoneEnd *milestoneEnd);
     void WriteSystem(pugi::xml_node currentNode, System *system);
-    void WriteSystemElementEnd(pugi::xml_node currentNode, SystemElementEnd *elementEnd);
+    void WriteSystemMilestoneEnd(pugi::xml_node currentNode, SystemMilestoneEnd *milestoneEnd);
     void WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
     void WriteGrpSym(pugi::xml_node currentNode, GrpSym *grmSym);
     void WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot);
@@ -439,13 +513,34 @@ public:
 private:
     std::ostringstream m_streamStringOutput;
     int m_indent;
-    int m_page;
     bool m_scoreBasedMEI;
     pugi::xml_node m_mei;
-    /** @name Current element */
+
+    /** Current xml element */
     pugi::xml_node m_currentNode;
+    /** Xml node stack */
     std::list<pugi::xml_node> m_nodeStack;
+    /** Boundary objects which are merged into one xml element */
     std::stack<Object *> m_boundaries;
+    /** The object stack */
+    std::deque<Object *> m_objectStack;
+
+    /** Score based filtering */
+    ///@{
+    bool m_hasFilter;
+    MatchLocation m_filterMatchLocation;
+    Object *m_firstFilterMatch;
+    int m_firstPage;
+    int m_currentPage;
+    int m_lastPage;
+    std::string m_firstMeasureUuid;
+    std::string m_lastMeasureUuid;
+    RangeMatchLocation m_measureFilterMatchLocation;
+    std::string m_mdivUuid;
+    MatchLocation m_mdivFilterMatchLocation;
+    ///@}
+
+    bool m_ignoreHeader;
     bool m_removeIds;
     ListOfObjects m_referredObjects;
 };
@@ -465,7 +560,7 @@ public:
     MEIInput(Doc *doc);
     virtual ~MEIInput();
 
-    virtual bool Import(const std::string &mei);
+    bool Import(const std::string &mei) override;
 
 private:
     bool ReadDoc(pugi::xml_node root);
@@ -473,8 +568,20 @@ private:
     ///@{
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
     bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
-    bool ReadPages(Object *parent, pugi::xml_node parentNode);
     bool ReadScore(Object *parent, pugi::xml_node parentNode);
+    ///@}
+
+    /**
+     * @name Methods for reading MEI page-based elements
+     */
+    ///@{
+    bool ReadPages(Object *parent, pugi::xml_node parentNode);
+    bool ReadPage(Object *parent, pugi::xml_node parentNode);
+    bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadPageMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd);
+    bool ReadSystem(Object *parent, pugi::xml_node system);
+    bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadSystemMilestoneEnd(Object *parent, pugi::xml_node milestoneEnd);
     ///@}
 
     /**
@@ -491,18 +598,13 @@ private:
 
     /**
      * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related.
-     * For each container (page, system, measure, staff and layer) there is one method for
+     * For each container (measure, staff and layer) there is one method for
      * reading the element and one method for reading its children. The method for reading
      * the children can also be called when reading EditorialElement objects (<lem> or <rdg>
      * for example. The filter object is optional and can be set for filtering the allowed
      * children (see MEIInput::IsAllowed)
      */
     ///@{
-    bool ReadPage(Object *parent, pugi::xml_node parentNode);
-    bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadSystem(Object *parent, pugi::xml_node system);
-    bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
-    bool ReadSystemElementEnd(Object *parent, pugi::xml_node elementEnd);
     bool ReadScoreDef(Object *parent, pugi::xml_node scoreDef);
     bool ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadGrpSym(Object *parent, pugi::xml_node grpSym);
@@ -720,6 +822,11 @@ private:
      * @name Various methods for upgrading older MEI files
      */
     ///@{
+    // to MEI 5.0.0
+    void UpgradePageTo_5_0_0(Page *page);
+    void UpgradeMeasureTo_5_0_0(pugi::xml_node measure);
+    void UpgradeStaffTo_5_0_0(pugi::xml_node staff);
+    void UpgradeLayerElementTo_5_0_0(pugi::xml_node element);
     // to MEI 4.0.0
     void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
     void UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *interface);

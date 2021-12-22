@@ -57,8 +57,7 @@ public:
 private:
     /**
      * Encodes the durational quality of a mensural note using the values provided by
-     * the data.DURQUALITY.mensural datatype (i.e., the perfect / imperfect / altered /
-     * major / minor / duplex quality of a note).
+     * the data.DURQUALITY.mensural datatype (
      **/
     data_DURQUALITY_mensural m_durQuality;
 
@@ -101,14 +100,12 @@ public:
 private:
     /**
      * Together, proport.num and proport.numbase specify a proportional change as a
-     * ratio, e.g., 1:3.
-     * Proport.num is for the first value in the ratio.
+     * ratio,
      **/
     int m_proportNum;
     /**
      * Together, proport.num and proport.numbase specify a proportional change as a
-     * ratio, e.g., 1:3.
-     * Proport.numbase is for the second value in the ratio.
+     * ratio,
      **/
     int m_proportNumbase;
 

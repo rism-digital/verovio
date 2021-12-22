@@ -38,16 +38,16 @@ public:
     ///@{
     Mordent();
     virtual ~Mordent();
-    virtual Object *Clone() const { return new Mordent(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Mordent"; }
+    Object *Clone() const override { return new Mordent(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Mordent"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
 
     /**

@@ -32,8 +32,7 @@ namespace vrv {
 
 static const ClassRegistrar<Section> s_factory("section", SECTION);
 
-Section::Section()
-    : SystemElement(SECTION, "section-"), SystemElementStartInterface(), AttNNumberLike(), AttSectionVis()
+Section::Section() : SystemElement(SECTION, "section-"), SystemMilestoneInterface(), AttNNumberLike(), AttSectionVis()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_SECTIONVIS);
@@ -46,7 +45,7 @@ Section::~Section() {}
 void Section::Reset()
 {
     SystemElement::Reset();
-    SystemElementStartInterface::Reset();
+    SystemMilestoneInterface::Reset();
     ResetNNumberLike();
     ResetSectionVis();
 }
@@ -91,7 +90,7 @@ int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    ConvertToPageBasedBoundary(this, params->m_currentSystem);
+    ConvertToPageBasedMilestone(this, params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
 }
@@ -107,10 +106,10 @@ int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Section::PrepareBoundaries(FunctorParams *functorParams)
+int Section::PrepareMilestones(FunctorParams *functorParams)
 {
-    if (this->IsSystemBoundary()) {
-        this->SystemElementStartInterface::InterfacePrepareBoundaries(functorParams);
+    if (this->IsSystemMilestone()) {
+        this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
     }
 
     return FUNCTOR_CONTINUE;
@@ -120,8 +119,8 @@ int Section::ResetDrawing(FunctorParams *functorParams)
 {
     FloatingObject::ResetDrawing(functorParams);
 
-    if (this->IsSystemBoundary()) {
-        this->SystemElementStartInterface::InterfaceResetDrawing(functorParams);
+    if (this->IsSystemMilestone()) {
+        this->SystemMilestoneInterface::InterfaceResetDrawing(functorParams);
     }
 
     return FUNCTOR_CONTINUE;

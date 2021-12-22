@@ -1082,8 +1082,14 @@ std::string AttConverter::CoursetuningToStr(data_COURSETUNING data) const
 {
     std::string value;
     switch (data) {
-        case COURSETUNING_guitar_drop_D: value = "guitar-drop-D"; break;
-        case COURSETUNING_lute_renaissance_6: value = "lute-renaissance-6"; break;
+        case COURSETUNING_guitar_standard: value = "guitar.standard"; break;
+        case COURSETUNING_guitar_drop_D: value = "guitar.drop.D"; break;
+        case COURSETUNING_guitar_open_D: value = "guitar.open.D"; break;
+        case COURSETUNING_guitar_open_G: value = "guitar.open.G"; break;
+        case COURSETUNING_guitar_open_A: value = "guitar.open.A"; break;
+        case COURSETUNING_lute_renaissance_6: value = "lute.renaissance.6"; break;
+        case COURSETUNING_lute_baroque_d_major: value = "lute.baroque.d.major"; break;
+        case COURSETUNING_lute_baroque_d_minor: value = "lute.baroque.d.minor"; break;
         default:
             LogWarning("Unknown value '%d' for data.COURSETUNING", data);
             value = "";
@@ -1094,8 +1100,14 @@ std::string AttConverter::CoursetuningToStr(data_COURSETUNING data) const
 
 data_COURSETUNING AttConverter::StrToCoursetuning(const std::string &value, bool logWarning) const
 {
-    if (value == "guitar-drop-D") return COURSETUNING_guitar_drop_D;
-    if (value == "lute-renaissance-6") return COURSETUNING_lute_renaissance_6;
+    if (value == "guitar.standard") return COURSETUNING_guitar_standard;
+    if (value == "guitar.drop.D") return COURSETUNING_guitar_drop_D;
+    if (value == "guitar.open.D") return COURSETUNING_guitar_open_D;
+    if (value == "guitar.open.G") return COURSETUNING_guitar_open_G;
+    if (value == "guitar.open.A") return COURSETUNING_guitar_open_A;
+    if (value == "lute.renaissance.6") return COURSETUNING_lute_renaissance_6;
+    if (value == "lute.baroque.d.major") return COURSETUNING_lute_baroque_d_major;
+    if (value == "lute.baroque.d.minor") return COURSETUNING_lute_baroque_d_minor;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.COURSETUNING", value.c_str());
     return COURSETUNING_NONE;

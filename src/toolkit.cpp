@@ -33,6 +33,7 @@
 #include "note.h"
 #include "options.h"
 #include "page.h"
+#include "runtimeclock.h"
 #include "slur.h"
 #include "staff.h"
 #include "svgdevicecontext.h"
@@ -70,6 +71,7 @@ char *Toolkit::m_humdrumBuffer = NULL;
 Toolkit::Toolkit(bool initFont)
 {
     m_inputFrom = AUTO;
+    m_outputTo = UNKNOWN;
 
     m_humdrumBuffer = NULL;
     m_cString = NULL;
@@ -81,6 +83,10 @@ Toolkit::Toolkit(bool initFont)
     m_options = m_doc.GetOptions();
 
     m_editorToolkit = NULL;
+
+#ifndef NO_RUNTIME
+    m_runtimeClock = NULL;
+#endif
 }
 
 Toolkit::~Toolkit()
@@ -97,6 +103,12 @@ Toolkit::~Toolkit()
         delete m_editorToolkit;
         m_editorToolkit = NULL;
     }
+#ifndef NO_RUNTIME
+    if (m_runtimeClock) {
+        delete m_runtimeClock;
+        m_runtimeClock = NULL;
+    }
+#endif
 }
 
 bool Toolkit::SetResourcePath(const std::string &path)
@@ -682,11 +694,23 @@ bool Toolkit::LoadData(const std::string &data)
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
     int breaks = m_options->m_breaks.GetValue();
+
+    // When loading page-based MEI, the layout is marked as done
+    // In this case, we do not cast-off the document (breaks is expected to be not set)
+    if (input->GetLayoutInformation() == LAYOUT_DONE) {
+        if (breaks != BREAKS_auto) {
+            LogWarning("Requesting layout with specific breaks but the layout is already done");
+        }
+        // We set it to 'none' for no cast-off process to be triggered
+        breaks = BREAKS_none;
+    }
+
     // Always set breaks to 'none' with Transcription or Facs rendering - rendering them differenty requires the MEI
     // to be converted
     if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
+
     if (breaks != BREAKS_none) {
-        if (input->HasLayoutInformation()
+        if (input->GetLayoutInformation() == LAYOUT_ENCODED
             && (breaks == BREAKS_encoded || breaks == BREAKS_line || breaks == BREAKS_smart)) {
             if (breaks == BREAKS_encoded) {
                 // LogElapsedTimeStart();
@@ -740,8 +764,13 @@ bool Toolkit::LoadData(const std::string &data)
 std::string Toolkit::GetMEI(const std::string &jsonOptions)
 {
     bool scoreBased = true;
-    int pageNo = 0;
+    bool ignoreHeader = false;
     bool removeIds = m_options->m_removeIds.GetValue();
+    int firstPage = 0;
+    int lastPage = 0;
+    std::string firstMeasure;
+    std::string lastMeasure;
+    std::string mdiv;
 
     jsonxx::Object json;
 
@@ -752,28 +781,42 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
         }
         else {
             if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
-            if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
+            if (json.has<jsonxx::Boolean>("ignoreHeader")) ignoreHeader = json.get<jsonxx::Boolean>("ignoreHeader");
             if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
+            if (json.has<jsonxx::Number>("firstPage")) firstPage = json.get<jsonxx::Number>("firstPage");
+            if (json.has<jsonxx::Number>("lastPage")) lastPage = json.get<jsonxx::Number>("lastPage");
+            if (json.has<jsonxx::Number>("pageNo")) {
+                firstPage = json.get<jsonxx::Number>("pageNo");
+                lastPage = firstPage;
+            }
+            if (json.has<jsonxx::String>("firstMeasure")) firstMeasure = json.get<jsonxx::String>("firstMeasure");
+            if (json.has<jsonxx::String>("lastMeasure")) lastMeasure = json.get<jsonxx::String>("lastMeasure");
+            if (json.has<jsonxx::String>("mdiv")) mdiv = json.get<jsonxx::String>("mdiv");
         }
     }
 
-    if (GetPageCount() == 0) {
+    if (this->GetPageCount() == 0) {
         LogWarning("No data loaded");
         return "";
     }
 
     int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
-    // Page number is one-based - correct it to 0-based first
-    pageNo--;
 
     MEIOutput meioutput(&m_doc);
     meioutput.SetScoreBasedMEI(scoreBased);
 
     int indent = (m_options->m_outputIndentTab.GetValue()) ? -1 : m_options->m_outputIndent.GetValue();
     meioutput.SetIndent(indent);
+    meioutput.SetIgnoreHeader(ignoreHeader);
     meioutput.SetRemoveIds(removeIds);
 
-    std::string output = meioutput.GetOutput(pageNo);
+    if (firstPage > 0) meioutput.SetFirstPage(firstPage);
+    if (lastPage > 0) meioutput.SetLastPage(lastPage);
+    if (!firstMeasure.empty()) meioutput.SetFirstMeasure(firstMeasure);
+    if (!lastMeasure.empty()) meioutput.SetLastMeasure(lastMeasure);
+    if (!mdiv.empty()) meioutput.SetMdiv(mdiv);
+
+    std::string output = meioutput.GetOutput();
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return output;
 }
@@ -799,12 +842,15 @@ std::string Toolkit::ValidatePAE(const std::string &data)
 bool Toolkit::SaveFile(const std::string &filename, const std::string &jsonOptions)
 {
     std::string output = GetMEI(jsonOptions);
+    if (output.empty()) {
+        return false;
+    }
 
     std::ofstream outfile;
     outfile.open(filename.c_str());
 
     if (!outfile.is_open()) {
-        // add message?
+        LogError("Unable to write MEI to %s", filename.c_str());
         return false;
     }
 
@@ -1141,6 +1187,9 @@ void Toolkit::RedoLayout()
     if (m_options->m_breaks.GetValue() == BREAKS_line) {
         m_doc.CastOffLineDoc();
     }
+    else if (m_options->m_breaks.GetValue() == BREAKS_encoded) {
+        m_doc.CastOffEncodingDoc();
+    }
     else if (m_options->m_breaks.GetValue() == BREAKS_smart) {
         m_doc.CastOffSmartDoc();
     }
@@ -1392,7 +1441,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     ListOfObjects notes;
     ListOfObjects chords;
 
-    measure->FindAllDescendantByComparison(&notes, &matchNoteTime);
+    measure->FindAllDescendantsByComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
     for (auto const item : notes) {
@@ -1744,6 +1793,69 @@ std::string Toolkit::ConvertHumdrumToHumdrum(const std::string &humdrumData)
     return humout.str();
 #else
     return "";
+#endif
+}
+
+void Toolkit::InitClock()
+{
+#ifndef NO_RUNTIME
+    if (!m_runtimeClock) {
+        m_runtimeClock = new RuntimeClock();
+    }
+#else
+    LogError("Runtime clock is not supported in this build.");
+#endif
+}
+
+void Toolkit::ResetClock()
+{
+#ifndef NO_RUNTIME
+    if (m_runtimeClock) {
+        m_runtimeClock->Reset();
+    }
+    else {
+        LogWarning("No clock available. Please call 'InitClock' to create one.");
+    }
+#else
+    LogError("Runtime clock is not supported in this build.");
+#endif
+}
+
+double Toolkit::GetRuntimeInSeconds() const
+{
+#ifndef NO_RUNTIME
+    if (m_runtimeClock) {
+        return m_runtimeClock->GetSeconds();
+    }
+    else {
+        LogWarning("No clock available. Please call 'InitClock' to create one.");
+        return 0.0;
+    }
+#else
+    LogError("Runtime clock is not supported in this build.");
+    return 0.0;
+#endif
+}
+
+void Toolkit::LogRuntime() const
+{
+#ifndef NO_RUNTIME
+    if (m_runtimeClock) {
+        double seconds = m_runtimeClock->GetSeconds();
+        const int minutes = seconds / 60.0;
+        if (minutes > 0) {
+            seconds -= 60.0 * minutes;
+            LogMessage("Total runtime is %d min %.3f s.", minutes, seconds);
+        }
+        else {
+            LogMessage("Total runtime is %.3f s.", seconds);
+        }
+    }
+    else {
+        LogWarning("No clock available. Please call 'InitClock' to create one.");
+    }
+#else
+    LogError("Runtime clock is not supported in this build.");
 #endif
 }
 

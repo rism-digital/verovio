@@ -84,12 +84,12 @@ public:
     /**
      * The main method for write objects.
      */
-    virtual bool WriteObject(Object *object);
+    bool WriteObject(Object *object) override;
 
     /**
      * Writing object method that must be overridden in the child class.
      */
-    virtual bool WriteObjectEnd(Object *object);
+    bool WriteObjectEnd(Object *object) override;
 
 private:
     bool WriteDoc(Doc *doc);
@@ -405,7 +405,7 @@ public:
     virtual ~PAEInput();
 
 #ifndef NO_PAE_SUPPORT
-    virtual bool Import(const std::string &pae);
+    bool Import(const std::string &pae) override;
 
 private:
     // function declarations:
@@ -518,7 +518,7 @@ public:
     jsonxx::Object GetValidationLog();
 
 #ifndef NO_PAE_SUPPORT
-    virtual bool Import(const std::string &input);
+    bool Import(const std::string &input) override;
 
 private:
     /**
@@ -598,6 +598,15 @@ private:
     ///@}
 
     /**
+     * @name Check if the input string contains any invalid characters.
+     * Invalid characters are put in invalidChars.
+     * Return false if invalid characters are found.
+     */
+    ///@{
+    bool CheckPAEChars(const std::string &input, std::string &invalidChars, const std::string &validChars = "");
+    ///@}
+
+    /**
      * When repeated content is inserted we set the position of all token
      * to the one of the repetition marker (f or i).
      * We also need to clone all objects in the tokens
@@ -620,13 +629,13 @@ private:
     /**
      * A helper to remove a token when checking the hierarchy and it is not valid
      */
-    void RemoveContainerToken(Object *);
+    void RemoveContainerToken(Object *object);
 
     /**
      * @name Some logging methods specific to the PAE parser
      */
     ///@{
-    void LogPAE(std::string msg, pae::Token &token);
+    void LogPAE(int errCode, pae::Token &token, std::string value = "");
     void LogDebugTokens(bool vertical = false);
     ///@}
 
@@ -639,7 +648,8 @@ private:
     void ClearTokenObjects();
 
 public:
-    //
+    static const std::map<int, std::string> s_errCodes;
+
 private:
     /**
      * The list of tokens representing the incipit

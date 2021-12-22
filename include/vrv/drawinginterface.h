@@ -106,6 +106,12 @@ public:
      */
     void InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
 
+    /**
+     * Initialize m_cueSize value based on the @cue attribute and presence of child elements with @cue/@grace
+     * attributes
+     */
+    void InitCue(bool beamCue);
+
     bool IsHorizontal();
 
     bool IsRepeatedPattern();
@@ -114,6 +120,12 @@ public:
      * Checks whether difference between highest and lowest notes of the beam is just one step
      */
     bool HasOneStepHeight();
+
+    /**
+     * Get total beam width with regards to the shortest duration of the beam (counting both beams and whitespace
+     * between them)
+     */
+    int GetTotalBeamWidth() const;
 
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.

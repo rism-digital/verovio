@@ -36,7 +36,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 7
+#define VERSION_MINOR 9
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -147,13 +147,13 @@ enum ClassId : uint16_t {
     RUNNING_ELEMENT_max,
     // Ids for PageElement child classes
     PAGE_ELEMENT,
-    PAGE_ELEMENT_END,
+    PAGE_MILESTONE_END,
     MDIV,
     SCORE,
     PAGE_ELEMENT_max,
     // Ids for SystemElement child classes
     SYSTEM_ELEMENT,
-    SYSTEM_ELEMENT_END,
+    SYSTEM_MILESTONE_END,
     ENDING,
     EXPANSION,
     PB,
@@ -356,6 +356,8 @@ typedef std::vector<std::pair<std::wstring, bool>> ArrayOfStringDynamTypePairs;
 typedef std::map<std::string, std::function<Object *(void)>> MapOfStrConstructors;
 
 typedef std::map<std::string, ClassId> MapOfStrClassIds;
+
+typedef bool (*NotePredicate)(Note *);
 
 /**
  * Generic int map recursive structure for storing hierachy of values
@@ -578,6 +580,12 @@ enum {
     MARKUP_GRACE_ATTRIBUTE = 4,
     MARKUP_ARTIC_MULTIVAL = 8
 };
+
+//----------------------------------------------------------------------------
+// Layout information
+//----------------------------------------------------------------------------
+
+enum LayoutInformation { LAYOUT_NONE = 0, LAYOUT_ENCODED, LAYOUT_DONE };
 
 //----------------------------------------------------------------------------
 // Bounding box access

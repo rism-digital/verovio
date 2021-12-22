@@ -30,15 +30,15 @@ public:
     TextElement(ClassId classId);
     TextElement(ClassId classId, const std::string &classIdStr);
     virtual ~TextElement();
-    virtual void Reset();
+    void Reset() override;
     ///@}
 
     /**
      * @name Get the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     /**
@@ -58,7 +58,7 @@ public:
     /**
      * See Object::ResetVerticalAlignment
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
 private:
     //
@@ -97,6 +97,7 @@ public:
         m_alignment = HORIZONTALALIGNMENT_left;
         m_pointSize = 0;
         m_actualWidth = 0;
+        m_enclose = TEXTRENDITION_NONE;
     }
     virtual ~TextDrawingParams(){};
 
@@ -112,7 +113,8 @@ public:
     bool m_verticalShift;
     data_HORIZONTALALIGNMENT m_alignment;
     int m_pointSize;
-    std::vector<TextElement *> m_boxedRend;
+    std::vector<TextElement *> m_enclosedRend;
+    data_TEXTRENDITION m_enclose;
 };
 
 } // namespace vrv

@@ -20,7 +20,7 @@ class MidiFile;
 namespace vrv {
 
 class Artic;
-class SystemElementStartInterface;
+class SystemMilestoneInterface;
 class Chord;
 class ClassIdComparison;
 class Clef;
@@ -495,22 +495,19 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a flag indicating that at least one slur had to be adjusted
- * member 1: a flag indicating that there is at least one cross-staff slur
- * member 2: the doc
- * member 3: a pointer to the functor for passing it to the system aligner
+ * member 0: a flag indicating that there is at least one cross-staff slur
+ * member 1: the doc
+ * member 2: a pointer to the functor for passing it to the system aligner
  **/
 
 class AdjustSlursParams : public FunctorParams {
 public:
     AdjustSlursParams(Doc *doc, Functor *functor)
     {
-        m_adjusted = false;
         m_crossStaffSlurs = false;
         m_doc = doc;
         m_functor = functor;
     }
-    bool m_adjusted;
     bool m_crossStaffSlurs;
     Doc *m_doc;
     Functor *m_functor;
@@ -600,18 +597,18 @@ public:
  * member 0: tupletNum relative position for which is being calculatied
  * member 1: drawing position of tupletNum
  * member 2: margin for tupletNum vertical overlap
- * member 3: flag to indicate whether cross-staff elements should be considered
+ * member 3: staff relevant to positioning of tuplet
  * member 4: resulting relative Y for the tupletNum
  **/
 class AdjustTupletNumOverlapParams : public FunctorParams {
 public:
-    AdjustTupletNumOverlapParams(TupletNum *tupletNum)
+    AdjustTupletNumOverlapParams(TupletNum *tupletNum, Staff *staff)
     {
         m_tupletNum = tupletNum;
         m_drawingNumPos = STAFFREL_basic_NONE;
         m_horizontalMargin = 0;
         m_verticalMargin = 0;
-        m_ignoreCrossStaff = false;
+        m_staff = staff;
         m_yRel = 0;
     }
 
@@ -619,7 +616,7 @@ public:
     data_STAFFREL_basic m_drawingNumPos;
     int m_horizontalMargin;
     int m_verticalMargin;
-    bool m_ignoreCrossStaff;
+    Staff *m_staff;
     int m_yRel;
 };
 
@@ -811,14 +808,16 @@ public:
 
 class AlignMeasuresParams : public FunctorParams {
 public:
-    AlignMeasuresParams()
+    AlignMeasuresParams(Doc *doc)
     {
         m_shift = 0;
         m_justifiableWidth = 0;
+        m_doc = doc;
     }
 
     int m_shift;
     int m_justifiableWidth;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1368,12 +1367,18 @@ public:
 
 /**
  * member 0: an array of all matching objects
+ * member 1: a flag indicating if milestone references should be included as well
  **/
 
 class FindAllReferencedObjectsParams : public FunctorParams {
 public:
-    FindAllReferencedObjectsParams(ListOfObjects *elements) { m_elements = elements; }
+    FindAllReferencedObjectsParams(ListOfObjects *elements)
+    {
+        m_elements = elements;
+        m_milestoneReferences = false;
+    }
     ListOfObjects *m_elements;
+    bool m_milestoneReferences;
 };
 
 //----------------------------------------------------------------------------
@@ -1383,6 +1388,7 @@ public:
 /**
  * member 0: the attComparision text
  * member 1: an array of all matching objects
+ * member 2: flag indicating whether descendants of matches should be searched as well
  **/
 
 class FindAllByComparisonParams : public FunctorParams {
@@ -1391,9 +1397,11 @@ public:
     {
         m_comparison = comparison;
         m_elements = elements;
+        m_continueDepthSearchForMatches = true;
     }
     Comparison *m_comparison;
     ListOfObjects *m_elements;
+    bool m_continueDepthSearchForMatches;
 };
 
 //----------------------------------------------------------------------------
@@ -1482,8 +1490,12 @@ public:
  * member 0: a pointer to the vector of LayerElement pointer to fill
  * member 1: the minimum position
  * member 2: the maximum position
- * member 3: the timespanning interface
- * member 4: the class Ids to keep
+ * member 3: the staff numbers to consider, any staff if empty
+ * member 4: the minimal layerN to consider, unbounded below if zero
+ * member 5: the maximal layerN to consider, unbounded above if zero
+ * member 6: true if within measure range of timespanning interface, only this is searched
+ * member 7: the timespanning interface
+ * member 8: the class ids to keep
  **/
 
 class FindSpannedLayerElementsParams : public FunctorParams {
@@ -1493,10 +1505,17 @@ public:
         m_interface = interface;
         m_minPos = 0;
         m_maxPos = 0;
+        m_minLayerN = 0;
+        m_maxLayerN = 0;
+        m_inMeasureRange = false;
     }
     std::vector<LayerElement *> m_elements;
     int m_minPos;
     int m_maxPos;
+    std::set<int> m_staffNs;
+    int m_minLayerN;
+    int m_maxLayerN;
+    bool m_inMeasureRange;
     TimeSpanningInterface *m_interface;
     std::vector<ClassId> m_classIds;
 };
@@ -1783,27 +1802,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareBoundariesParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the last measure
- * member 1: the current boundary
- **/
-
-class PrepareBoundariesParams : public FunctorParams {
-public:
-    PrepareBoundariesParams()
-    {
-        m_lastMeasure = NULL;
-        m_currentEnding = NULL;
-    }
-    Measure *m_lastMeasure;
-    Ending *m_currentEnding;
-    std::vector<SystemElementStartInterface *> m_startBoundaries;
-};
-
-//----------------------------------------------------------------------------
 // PrepareDelayedTurnsParams
 //----------------------------------------------------------------------------
 
@@ -1853,20 +1851,22 @@ public:
  * member 2: the dynam in the current measure
  * member 3: the current hairpins to be linked / grouped
  * member 4: the map of existing harms (based on @n)
+ * member 5: a pointer to the doc scoreDef
  **/
 
 class PrepareFloatingGrpsParams : public FunctorParams {
 public:
-    PrepareFloatingGrpsParams()
+    PrepareFloatingGrpsParams(Doc *doc)
     {
         m_previousEnding = NULL;
-        m_pedalLine = NULL;
+        m_doc = doc;
     }
     Ending *m_previousEnding;
-    Pedal *m_pedalLine;
+    std::list<Pedal *> m_pedalLines;
     std::vector<Dynam *> m_dynams;
     std::vector<Hairpin *> m_hairpins;
     std::map<std::string, Harm *> m_harms;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1927,6 +1927,27 @@ public:
     MapOfLinkingInterfaceUuidPairs m_nextUuidPairs;
     MapOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
     bool m_fillList;
+};
+
+//----------------------------------------------------------------------------
+// PrepareMilestonesParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the last measure
+ * member 1: the current milestone
+ **/
+
+class PrepareMilestonesParams : public FunctorParams {
+public:
+    PrepareMilestonesParams()
+    {
+        m_lastMeasure = NULL;
+        m_currentEnding = NULL;
+    }
+    Measure *m_lastMeasure;
+    Ending *m_currentEnding;
+    std::vector<SystemMilestoneInterface *> m_startMilestones;
 };
 
 //----------------------------------------------------------------------------
@@ -2373,6 +2394,20 @@ public:
 class ReorderByXPosParams : public FunctorParams {
 public:
     int modifications = 0;
+};
+
+//----------------------------------------------------------------------------
+// PrepareSlursParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the doc
+ **/
+
+class PrepareSlursParams : public FunctorParams {
+public:
+    PrepareSlursParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
 };
 
 } // namespace vrv

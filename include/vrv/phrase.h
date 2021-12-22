@@ -25,9 +25,9 @@ public:
     ///@{
     Phrase();
     virtual ~Phrase();
-    virtual Object *Clone() const { return new Phrase(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Phrase"; }
+    Object *Clone() const override { return new Phrase(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Phrase"; }
     ///@}
 
     //----------//
