@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for figured-bass extenders on `f` without `@tstamp` or `@startid` 
 * Improved page-based MEI output with validation with a customized MEI Schema
 * Improved layout with beams and control events (ornaments, fingering, etc.) (@eNote-GmBH)
 * Improve enharmonic tie overlap with accidentals (@eNote-GmBH)
