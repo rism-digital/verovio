@@ -72,7 +72,6 @@
 #import <VerovioFramework/proport.h>
 #import <VerovioFramework/choice.h>
 #import <VerovioFramework/fermata.h>
-#import <VerovioFramework/systemboundary.h>
 #import <VerovioFramework/facsimile.h>
 #import <VerovioFramework/tabdursym.h>
 #import <VerovioFramework/pgfoot.h>
@@ -138,7 +137,6 @@
 #import <VerovioFramework/pedal.h>
 #import <VerovioFramework/iopae.h>
 #import <VerovioFramework/instrdef.h>
-#import <VerovioFramework/pageboundary.h>
 #import <VerovioFramework/barline.h>
 #import <VerovioFramework/transposition.h>
 #import <VerovioFramework/nc.h>
