@@ -624,6 +624,11 @@ public:
      */
     virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
 
+    /**
+     * Retrieve the count for all class ids for the object
+     */
+    virtual int GetClassIdCount(FunctorParams *functorParams);
+
     ///@}
 
     /**

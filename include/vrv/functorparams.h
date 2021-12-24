@@ -1333,6 +1333,30 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CountClassIdsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a map with classId/count pairs
+ * member 1: whitelist, a vector of classIds that should only be added
+ * member 2: blacklist, a vector of classIds that should be ignored
+ **/
+
+class CountClassIdsParams : public FunctorParams {
+public:
+    CountClassIdsParams()
+    {
+        m_elementClassIdCount.clear();
+        m_include.clear();
+        m_exlude.clear();
+    }
+
+    MapOfClassIdCount m_elementClassIdCount;
+    std::vector<ClassId> m_include;
+    std::vector<ClassId> m_exlude;
+};
+
+//----------------------------------------------------------------------------
 // FillStaffCurrentTimeSpanningParams
 //----------------------------------------------------------------------------
 

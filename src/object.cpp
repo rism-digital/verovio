@@ -1868,6 +1868,28 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Object::GetClassIdCount(FunctorParams *functorParams)
+{
+    CountClassIdsParams *params = vrv_params_cast<CountClassIdsParams *>(functorParams);
+    assert(params);
+
+    // process include list
+    if (!params->m_include.empty()
+        && (params->m_include.end()
+            == std::find(params->m_include.begin(), params->m_include.end(), this->GetClassId()))) {
+        return FUNCTOR_CONTINUE;
+    }
+    // process exclude list
+    if (!params->m_exlude.empty()
+        && (params->m_exlude.end()
+            != std::find(params->m_exlude.begin(), params->m_exlude.end(), this->GetClassId()))) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    params->m_elementClassIdCount[this->GetClassId()]++;
+    return FUNCTOR_CONTINUE;
+}
+
 int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 {
     SetOverflowBBoxesParams *params = vrv_params_cast<SetOverflowBBoxesParams *>(functorParams);
