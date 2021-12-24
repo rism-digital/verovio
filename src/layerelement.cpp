@@ -882,7 +882,7 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     return usePrimary ? dotLocs1 : dotLocs2;
 }
 
-std::pair<int, int> LayerElement::CalculateXOffset(FunctorParams *functorParams)
+std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorParams)
 {
     AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
     assert(params);
@@ -893,8 +893,8 @@ std::pair<int, int> LayerElement::CalculateXOffset(FunctorParams *functorParams)
     // it. For example, when one of them is a barline, we do not look how bounding boxes can be nested but instead only
     // look at the horizontal position
     bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment
-        && params->m_previousAlignment.m_alignment->PerfomBoundingBoxAlignment()
-        && this->GetAlignment()->PerfomBoundingBoxAlignment());
+        && params->m_previousAlignment.m_alignment->PerformBoundingBoxAlignment()
+        && this->GetAlignment()->PerformBoundingBoxAlignment());
 
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // If nothing was drawn, do not take it into account. This should happen for barline position none but also
@@ -903,7 +903,7 @@ std::pair<int, int> LayerElement::CalculateXOffset(FunctorParams *functorParams)
         return { 0, selfLeft };
     }
 
-    // We add it to the upcoming bouding boxes
+    // We add it to the upcoming bounding boxes
     params->m_upcomingBoundingBoxes.push_back(this);
     params->m_currentAlignment.m_alignment = this->GetAlignment();
 
@@ -928,9 +928,12 @@ std::pair<int, int> LayerElement::CalculateXOffset(FunctorParams *functorParams)
         const bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
         if (!hasOverlap) continue;
 
-        // For note to note alignment, make sure there is a standard spacing even if they to not overlap vertically
+        // For note to note alignment, make sure there is a standard spacing even if they do not overlap vertically
         if (this->Is(NOTE) && element->Is(NOTE)) {
-            overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
+            Beam *beam = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
+            if (!beam || (beam != element->GetFirstAncestor(BEAM)) || (beam->m_drawingPlace != BEAMPLACE_mixed)) {
+                overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
+            }
         }
         else if (this->Is(ACCID) && element->Is(NOTE)) {
             Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
@@ -1912,7 +1915,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int selfLeft;
     const int drawingUnit = params->m_doc->GetDrawingUnit(params->m_staffSize);
 
-    std::tie(offset, selfLeft) = this->CalculateXOffset(params);
+    std::tie(offset, selfLeft) = this->CalculateXPosOffset(params);
 
     offset = std::min(offset, selfLeft - params->m_minPos);
     if (offset < 0) {
@@ -1947,25 +1950,73 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
     }
 
-    auto it = std::find_if(params->m_measureTieEndpoints.begin(), params->m_measureTieEndpoints.end(),
-        [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.second == this; });
-    if (it != params->m_measureTieEndpoints.end()) {
-        const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * drawingUnit;
-        const int leftXPos = it->first->HasContentBB() ? it->first->GetContentRight() : it->first->GetDrawingX();
-        const int rightXPos = it->second->HasContentBB() ? it->second->GetContentLeft() : it->second->GetDrawingX();
-        const int currentTieLength = rightXPos - leftXPos - drawingUnit;
-        if ((currentTieLength < minTieLength)
-            && ((it->first->GetFirstAncestor(CHORD) != NULL) || (this->GetFirstAncestor(CHORD) != NULL)
-                || (it->first->FindDescendantByType(FLAG) != NULL))) {
-            const int adjust = minTieLength - currentTieLength;
-            this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() + adjust);
-            // Also move the accumulated x shift and the minimum position for the next alignment accordingly
-            params->m_cumulatedXShift += adjust;
-            params->m_upcomingMinPos += adjust;
-        }
-    }
+    // adjust x pos if in the mixed beam
+    this->AdjustMixedBeamXPos(params->m_doc, drawingUnit, params->m_upcomingMinPos, params->m_cumulatedXShift);
+
+    // adjust x pos if has tied element
+    this->AdjustMinimumTieXPos(
+        params->m_doc, params->m_measureTieEndpoints, drawingUnit, params->m_upcomingMinPos, params->m_cumulatedXShift);
 
     return FUNCTOR_SIBLINGS;
+}
+
+void LayerElement::AdjustMixedBeamXPos(Doc *doc, int drawingUnit, int &upcomingPos, int &cumulatedShift)
+{
+    if (!this->Is(CHORD) && (!this->Is(NOTE) || this->GetFirstAncestor(CHORD))) return;
+
+    Beam *beam = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
+    if (!beam || (beam->m_drawingPlace != BEAMPLACE_mixed)) return;
+
+    // Find count of the elements for the alignment and store them in map by the class id
+    Functor getClassIdCount(&Object::GetClassIdCount);
+    CountClassIdsParams params;
+    this->GetAlignment()->Process(&getClassIdCount, &params, NULL, NULL, 3);
+
+    const MapOfClassIdCount::iterator noteIter = params.m_elementClassIdCount.find(NOTE);
+    const MapOfClassIdCount::iterator restIter = params.m_elementClassIdCount.find(REST);
+    const int noteCount = (noteIter != params.m_elementClassIdCount.end()) ? noteIter->second : 0;
+    const int restCount = (restIter != params.m_elementClassIdCount.end()) ? restIter->second : 0;
+
+    // For now, adjust mixed beams only if there are no other duration elements (notes, rests) on the same alignment, so
+    // that it doesn't mess up positioning for other elements, that might not be a part of the mixed beam. If there are
+    // any rests (guaranteed to be on the other layer/staff), if there is more than one note (if current element is
+    // note) or if there are more notes in the aligmnet than there are in current chord (if current element is chord)
+    if (restCount || (this->Is(NOTE) && (noteCount != 1))
+        || (this->Is(CHORD) && this->GetChildCount(NOTE) != noteCount))
+        return;
+    
+    StemmedDrawingInterface *stemInterface = this->GetStemmedDrawingInterface();
+    DurationInterface *duration = this->GetDurationInterface();
+    if (stemInterface && duration) {
+        if (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
+            upcomingPos += 2 * this->GetDrawingRadius(doc, false) + 0.5 * drawingUnit;
+            cumulatedShift += drawingUnit;
+        }
+        else {
+            upcomingPos -= 2 * this->GetDrawingRadius(doc, false);
+            cumulatedShift -= (0.5 + abs(duration->GetDur() - DURATION_64)) * drawingUnit;
+        }
+    }
+}
+
+void LayerElement::AdjustMinimumTieXPos(
+    Doc *doc, const TieEndpointsPairs &measureTieEndpoints, int drawingUnit, int &upcomingPos, int &cumulatedShift)
+{
+    const auto it = std::find_if(measureTieEndpoints.begin(), measureTieEndpoints.end(),
+        [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.second == this; });
+    if (it == measureTieEndpoints.end()) return;
+
+    const int minTieLength = doc->GetOptions()->m_tieMinLength.GetValue() * drawingUnit;
+    const int currentTieLength = it->second->GetContentLeft() - it->first->GetContentRight() - drawingUnit;
+    if ((currentTieLength < minTieLength)
+        && (!it->first->GetFirstAncestor(CHORD) || !this->GetFirstAncestor(CHORD)
+            || !it->first->FindDescendantByType(FLAG))) {
+        const int adjust = minTieLength - currentTieLength;
+        this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() + adjust);
+        // Also move the accumulated x shift and the minimum position for the next alignment accordingly
+        cumulatedShift += adjust;
+        upcomingPos += adjust;
+    }
 }
 
 int LayerElement::AdjustXRelForTranscription(FunctorParams *)

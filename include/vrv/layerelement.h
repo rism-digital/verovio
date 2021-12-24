@@ -477,6 +477,18 @@ private:
      */
     std::pair<int, int> CalculateXPosOffset(FunctorParams *functorParams);
 
+    /**
+     * Adjust x position of elements in mixed beam, prioritizing equal distance between stems (only in cases where there
+     * are no other elements for current alignmnet in other staves/layers)
+     */
+    void AdjustMixedBeamXPos(Doc *doc, int drawingUnit, int &upcomingPos, int &cumulatedShift);
+
+    /**
+     * Adjust minimum tie x position based on option and distance between elements connected with tie
+     */
+    void AdjustMinimumTieXPos(
+        Doc *doc, const TieEndpointsPairs &measureTieEndpoints, int drawingUnit, int &upcomingPos, int &cumulatedShift);
+
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
