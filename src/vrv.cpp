@@ -218,15 +218,15 @@ bool Resources::LoadFont(const std::string &fontName)
     for (current = root.child("g"); current; current = current.next_sibling("g")) {
         Glyph *glyph = NULL;
         if (current.attribute("c")) {
-            wchar_t smuflCode = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);
+            const wchar_t smuflCode = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);
             if (!s_font.count(smuflCode)) {
-                LogWarning("Glyph with code '%d' not found.", smuflCode);
+                LogWarning("Glyph with code point U+%X not found.", smuflCode);
                 continue;
             }
             glyph = &s_font[smuflCode];
             if (glyph->GetUnitsPerEm() != unitsPerEm * 10) {
-                LogWarning("Glyph and bounding box units-per-em for code '%d' miss-match (bounding box: %d)", smuflCode,
-                    unitsPerEm);
+                LogWarning("Glyph and bounding box units-per-em for code point U+%X miss-match (bounding box: %d)",
+                    smuflCode, unitsPerEm);
                 continue;
             }
             double x = 0.0, y = 0.0, width = 0.0, height = 0.0;

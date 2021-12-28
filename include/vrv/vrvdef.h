@@ -36,7 +36,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 7
+#define VERSION_MINOR 8
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -356,6 +356,8 @@ typedef std::vector<std::pair<std::wstring, bool>> ArrayOfStringDynamTypePairs;
 typedef std::map<std::string, std::function<Object *(void)>> MapOfStrConstructors;
 
 typedef std::map<std::string, ClassId> MapOfStrClassIds;
+
+typedef bool (*NotePredicate)(Note *);
 
 /**
  * Generic int map recursive structure for storing hierachy of values

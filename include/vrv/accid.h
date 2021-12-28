@@ -45,6 +45,9 @@ public:
     std::string GetClassName() const override { return "Accid"; }
     ///@}
 
+    /** Override the method since it is align to the staff */
+    bool IsRelativeToStaff() const override { return (this->HasLoc() || (this->HasOloc() && this->HasPloc())); }
+
     PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
 
     /** Override the method since alignment is required */
@@ -72,7 +75,7 @@ public:
      * Retrieve SMuFL string for the accidental.
      * This will include brackets
      */
-    std::wstring GetSymbolStr() const;
+    std::wstring GetSymbolStr(const data_NOTATIONTYPE notationType) const;
 
     /**
      * Adjust X position of accid in relation to other element

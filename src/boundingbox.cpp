@@ -14,8 +14,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "beam.h"
 #include "devicecontextbase.h"
 #include "doc.h"
+#include "drawinginterface.h"
 #include "floatingobject.h"
 #include "glyph.h"
 #include "vrv.h"
@@ -652,6 +654,73 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     return 0;
 }
 
+int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, int additionalOffset) const
+{
+    assert(beamInterface);
+    assert(!beamInterface->m_beamElementCoords.empty());
+
+    const Point beamLeft(
+        beamInterface->m_beamElementCoords.front()->m_x, beamInterface->m_beamElementCoords.front()->m_yBeam);
+    const Point beamRight(
+        beamInterface->m_beamElementCoords.back()->m_x, beamInterface->m_beamElementCoords.back()->m_yBeam);
+
+    Point leftIntersection(0, 0);
+    Point rightIntersection(0, 0);
+    const double beamSlope = BoundingBox::CalcSlope(beamLeft, beamRight);
+    if (this->GetLeftBy(type) <= beamLeft.x) {
+        // BB does not overlap horizontally with beam (left side of the beam)
+        if (this->GetRightBy(type) < beamLeft.x) {
+            return 0;
+        }
+        // BB overlaps with left side of the beam
+        else if (this->GetRightBy(type) < beamRight.x) {
+            leftIntersection = beamLeft;
+            rightIntersection.x = this->GetRightBy(type);
+            rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
+        }
+        // BB covers the whole beam
+        else {
+            leftIntersection = beamLeft;
+            rightIntersection = beamRight;
+        }
+    }
+    else {
+        if (this->GetRightBy(type) > beamRight.x) {
+            // BB overlaps with right side of the beam
+            if (this->GetLeftBy(type) <= beamRight.x) {
+                leftIntersection.x = this->GetLeftBy(type);
+                leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
+                rightIntersection = beamRight;
+            }
+            // BB does not overlap horizontally with beam (right side of the beam)
+            else {
+                return 0;
+            }
+        }
+        // BB is inside of the beam
+        else {
+            leftIntersection.x = this->GetLeftBy(type);
+            leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
+            rightIntersection.x = this->GetRightBy(type);
+            rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
+        }
+    }
+
+    // calculate vertical overlap of the BB with beam section
+    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+        const int topY = std::max(leftIntersection.y, rightIntersection.y);
+        const int shift = topY - this->GetBottomBy(type);
+        if (shift > 0) return shift + additionalOffset;
+    }
+    else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+        const int bottomY = std::min(leftIntersection.y, rightIntersection.y);
+        const int shift = bottomY - this->GetTopBy(type);
+        if (shift < 0) return shift - additionalOffset;
+    }
+
+    return 0;
+}
+
 //----------------------------------------------------------------------------
 // Static methods for BoundingBox
 //----------------------------------------------------------------------------
@@ -691,7 +760,12 @@ Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point cen
     return point;
 }
 
-double BoundingBox::CalcSlope(Point const &p1, Point const &p2)
+bool BoundingBox::ArePointsClose(const Point &p1, const Point &p2, int margin)
+{
+    return (hypot(p1.x - p2.x, p1.y - p2.y) <= margin);
+}
+
+double BoundingBox::CalcSlope(const Point &p1, const Point &p2)
 {
     if ((p1.y == p2.y) || (p1.x == p2.x)) return 0.0;
 

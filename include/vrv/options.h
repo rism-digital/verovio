@@ -468,10 +468,17 @@ public:
     /**
      * Accessing all keys
      */
+    ///@{
     std::set<std::string> GetKeys() const;
+    std::set<std::string> GetKeysByNode(const std::string &nodeName, std::list<std::string> &jsonNodePath) const;
+    ///@}
 
 protected:
     JsonPath StringPath2NodePath(const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const;
+
+    // Find node by recursively processing all elements within. Only nodes of OBJECT_ type are processed
+    const jsonxx::Object *FindNodeByName(
+        const jsonxx::Object &obj, const std::string &jsonNodeName, std::list<std::string> &jsonNodePath) const;
 
     /// Read json from string or file
     bool ReadJson(jsonxx::Object &output, const std::string &input) const;
@@ -661,6 +668,7 @@ public:
     OptionInt m_measureMinWidth;
     OptionInt m_mnumInterval;
     OptionIntMap m_multiRestStyle;
+    OptionDbl m_multiRestThickness;
     OptionBool m_octaveAlternativeSymbols;
     OptionDbl m_octaveLineThickness;
     OptionDbl m_pedalLineThickness;

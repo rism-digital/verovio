@@ -138,7 +138,7 @@ void Artic::GetAllArtics(bool direction, std::vector<Artic *> &artics)
     Object *last = (direction == BACKWARD) ? this : parentNoteOrChord->GetLast();
     ClassIdComparison matchType(ARTIC);
     ListOfObjects children;
-    parentNoteOrChord->FindAllDescendantBetween(&children, &matchType, first, last);
+    parentNoteOrChord->FindAllDescendantsBetween(&children, &matchType, first, last);
     for (auto &child : children) {
         if (child == this) continue;
         Artic *artic = vrv_cast<Artic *>(child);

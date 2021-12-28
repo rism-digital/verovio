@@ -41,6 +41,7 @@
 #include "note.h"
 #include "octave.h"
 #include "options.h"
+#include "page.h"
 #include "pedal.h"
 #include "pitchinflection.h"
 #include "reh.h"
@@ -186,6 +187,15 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         }
     }
     if (!start || !end) return;
+    if (!interface->IsOrdered(start, end)) {
+        // To avoid showing the same warning multiple times, display a warning only during actual drawing
+        if (!dc->Is(BBOX_DEVICE_CONTEXT) && (m_currentPage == vrv_cast<Page *>(start->GetFirstAncestor(PAGE)))) {
+            LogWarning("%s '%s' is ignored, since start '%s' does not occur temporally before end '%s'.",
+                element->GetClassName().c_str(), element->GetUuid().c_str(), start->GetUuid().c_str(),
+                end->GetUuid().c_str());
+        }
+        return;
+    }
 
     // Get the parent system of the first and last note
     System *parentSystem1 = dynamic_cast<System *>(start->GetFirstAncestor(SYSTEM));
@@ -1712,16 +1722,16 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
         if (enclosingFront) {
             const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3
                 + m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
-            DrawSmuflCode(
-                dc, x - xCorrEncl, y + enclosureYCorr, enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
+            DrawSmuflCode(dc, x - xCorrEncl, y + enclosureYCorr + yCorr, enclosingFront, staff->m_drawingStaffSize,
+                drawingCueSize);
         }
 
-        DrawSmuflCode(dc, x - xCorr, y - yCorr, code, staff->m_drawingStaffSize, drawingCueSize);
+        DrawSmuflCode(dc, x - xCorr, y, code, staff->m_drawingStaffSize, drawingCueSize);
 
         if (enclosingBack) {
             const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3;
-            DrawSmuflCode(
-                dc, x + xCorrEncl, y + enclosureYCorr, enclosingBack, staff->m_drawingStaffSize, drawingCueSize);
+            DrawSmuflCode(dc, x + xCorrEncl, y + enclosureYCorr + yCorr, enclosingBack, staff->m_drawingStaffSize,
+                drawingCueSize);
         }
 
         dc->ResetFont();

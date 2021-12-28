@@ -66,13 +66,13 @@
             <!--<glyph glyph-code="E040" smufl-name="repeatLeft" />-->
             <!--<glyph glyph-code="E041" smufl-name="repeatRight" />-->
             <!--<glyph glyph-code="E042" smufl-name="repeatRightLeft" />-->
-            <!--<glyph glyph-code="E043" smufl-name="repeatDots" />-->
-            <!--<glyph glyph-code="E044" smufl-name="repeatDot" />-->
+            <glyph glyph-code="E043" smufl-name="repeatDots" />
+            <glyph glyph-code="E044" smufl-name="repeatDot" />
             <glyph glyph-code="E045" smufl-name="dalSegno" />
             <glyph glyph-code="E046" smufl-name="daCapo" />
             <glyph glyph-code="E047" smufl-name="segno" />
             <glyph glyph-code="E048" smufl-name="coda" />
-            <!--<glyph glyph-code="E049" smufl-name="codaSquare" />-->
+            <glyph glyph-code="E049" smufl-name="codaSquare" />
             <!--<glyph glyph-code="E04A" smufl-name="segnoSerpent1" />-->
             <glyph glyph-code="E04B" smufl-name="segnoSerpent2" />
             <!--<glyph glyph-code="E04C" smufl-name="leftRepeatSmall" />-->
@@ -1211,9 +1211,9 @@
             <glyph glyph-code="E500" smufl-name="repeat1Bar" />
             <glyph glyph-code="E501" smufl-name="repeat2Bars" />
             <glyph glyph-code="E502" smufl-name="repeat4Bars" />
-            <!--<glyph glyph-code="E503" smufl-name="repeatBarUpperDot" />-->
-            <!--<glyph glyph-code="E504" smufl-name="repeatBarSlash" />-->
-            <!--<glyph glyph-code="E505" smufl-name="repeatBarLowerDot" />-->
+            <glyph glyph-code="E503" smufl-name="repeatBarUpperDot" />
+            <glyph glyph-code="E504" smufl-name="repeatBarSlash" />
+            <glyph glyph-code="E505" smufl-name="repeatBarLowerDot" />
             <range_end>U+E50F</range_end>
             <range_start>U+E500</range_start>
         </barRepeats>

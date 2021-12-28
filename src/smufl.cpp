@@ -26,10 +26,13 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "brace", SMUFL_E000_brace },
     { "bracketTop", SMUFL_E003_bracketTop },
     { "bracketBottom", SMUFL_E004_bracketBottom },
+    { "repeatDots", SMUFL_E043_repeatDots },
+    { "repeatDot", SMUFL_E044_repeatDot },
     { "dalSegno", SMUFL_E045_dalSegno },
     { "daCapo", SMUFL_E046_daCapo },
     { "segno", SMUFL_E047_segno },
     { "coda", SMUFL_E048_coda },
+    { "codaSquare", SMUFL_E049_codaSquare },
     { "segnoSerpent2", SMUFL_E04B_segnoSerpent2 },
     { "gClef", SMUFL_E050_gClef },
     { "gClef15mb", SMUFL_E051_gClef15mb },
@@ -211,6 +214,9 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "repeat1Bar", SMUFL_E500_repeat1Bar },
     { "repeat2Bars", SMUFL_E501_repeat2Bars },
     { "repeat4Bars", SMUFL_E502_repeat4Bars },
+    { "repeatBarUpperDot", SMUFL_E503_repeatBarUpperDot },
+    { "repeatBarSlash", SMUFL_E504_repeatBarSlash },
+    { "repeatBarLowerDot", SMUFL_E505_repeatBarLowerDot },
     { "ottava", SMUFL_E510_ottava },
     { "ottavaAlta", SMUFL_E511_ottavaAlta },
     { "ottavaBassa", SMUFL_E512_ottavaBassa },
@@ -431,6 +437,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 405
+// 411
 
 } // namespace vrv

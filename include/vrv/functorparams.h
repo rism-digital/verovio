@@ -808,14 +808,16 @@ public:
 
 class AlignMeasuresParams : public FunctorParams {
 public:
-    AlignMeasuresParams()
+    AlignMeasuresParams(Doc *doc)
     {
         m_shift = 0;
         m_justifiableWidth = 0;
+        m_doc = doc;
     }
 
     int m_shift;
     int m_justifiableWidth;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1380,6 +1382,7 @@ public:
 /**
  * member 0: the attComparision text
  * member 1: an array of all matching objects
+ * member 2: flag indicating whether descendants of matches should be searched as well
  **/
 
 class FindAllByComparisonParams : public FunctorParams {
@@ -1388,9 +1391,11 @@ public:
     {
         m_comparison = comparison;
         m_elements = elements;
+        m_continueDepthSearchForMatches = true;
     }
     Comparison *m_comparison;
     ListOfObjects *m_elements;
+    bool m_continueDepthSearchForMatches;
 };
 
 //----------------------------------------------------------------------------
@@ -2383,6 +2388,20 @@ public:
 class ReorderByXPosParams : public FunctorParams {
 public:
     int modifications = 0;
+};
+
+//----------------------------------------------------------------------------
+// PrepareSlursParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the doc
+ **/
+
+class PrepareSlursParams : public FunctorParams {
+public:
+    PrepareSlursParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
 };
 
 } // namespace vrv

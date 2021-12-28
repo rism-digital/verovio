@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Nov 11 20:41:04 PST 2021
+// Last Modified: Fri Nov 26 22:38:47 CET 2021
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4010,7 +4010,7 @@ class PixelColor {
 		void         writePpm3      (std::ostream& out);
 
 	public:
-		unsigned char   Red; 
+		unsigned char   Red;
 		unsigned char   Green;
 		unsigned char   Blue;
 
@@ -5833,6 +5833,7 @@ class Tool_composite : public HumTool {
 		void        prepareMultipleGroups(HumdrumFile& infile);
 		void        prepareSingleGroup   (HumdrumFile& infile);
 		void        initialize           (void);
+		void        initializeAnalysisArrays(HumdrumFile& infile);
 		int         typeStringToInt      (const std::string& value);
 		HumNum      getLineDuration      (HumdrumFile& infile, int index, std::vector<bool>& isNull);
 		void        getGroupStates       (std::vector<std::vector<int>>& groupstates, HumdrumFile& infile);
@@ -5858,7 +5859,9 @@ class Tool_composite : public HumTool {
 		bool        areAllEqual          (std::vector<HTp>& notes);
 		void        getBeamedNotes       (std::vector<HTp>& notes, HTp starting);
 		void        getPitches           (std::vector<int>& pitches, HTp token);
-		void        addLabels            (HumdrumFile& infile, int amount);
+		void        addLabelsAndStria    (HumdrumFile& infile);
+		void        addLabels            (HTp sstart, int labelIndex, const string& label,
+		                                  int abbrIndex, const string& abbr);
 		void        addStria             (HumdrumFile& infile, int amount);
 		bool        pitchesEqual         (vector<int>& pitches1, vector<int>& pitches2);
 		void        mergeTremoloGroup    (vector<HTp>& notes, vector<int> groups, int group);
@@ -5867,7 +5870,7 @@ class Tool_composite : public HumTool {
 		void        markTogether         (HumdrumFile& infile, int direction);
 		void        markCoincidences     (HumdrumFile& infile, int direction);
 		void        markCoincidencesMusic(HumdrumFile& infile);
-		bool        isAttackInBothGroups (HumdrumFile& infile, int line);
+		bool        isOnsetInBothGroups (HumdrumFile& infile, int line);
 		void        extractNestingData   (HumdrumFile& infile);
 		void        analyzeNestingDataGroups(HumdrumFile& infile, int direction);
 		void        analyzeNestingDataAll(HumdrumFile& infile, int direction);
@@ -5883,10 +5886,11 @@ class Tool_composite : public HumTool {
 		                                  int line, int track, int subtrack, const string& group);
 
 		void        analyzeComposite      (HumdrumFile& infile);
-		void        analyzeCompositeAttacks(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
-		void        analyzeCompositeArticulations(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
+		void        analyzeCompositeOnsets(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
+		void        analyzeCompositeAccents(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
 		void        analyzeCompositeOrnaments(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
 		void        analyzeCompositeSlurs(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
+		void        analyzeCompositeTotals(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
 
 		void        getCompositeSpineStarts(std::vector<HTp>& groups, HumdrumFile& infile);
 		std::vector<int> getExpansionList(vector<bool>& tracks, int maxtrack, int count);
@@ -5895,18 +5899,17 @@ class Tool_composite : public HumTool {
 		                                  int ctrack, HTp compositeStart);
 		void        doTotalAnalysis(HumdrumFile& outfile, HumdrumFile& infile, int ctrack);
 		void        doGroupAnalyses(HumdrumFile& outfile, HumdrumFile& infile);
-		int         countNoteAttacks(HTp token);
-		void        doTotalAttackAnalysis(vector<double>& analysis, HumdrumFile& infile,
+		int         countNoteOnsets(HTp token);
+		void        doTotalOnsetAnalysis(vector<double>& analysis, HumdrumFile& infile,
 		                                  int track, vector<bool>& tracks);
-		void        doGroupAttackAnalyses(vector<double>& analysisA,
+		void        doGroupOnsetAnalyses(vector<double>& analysisA,
 		                                  vector<double>& analysisB,
 		                                  HumdrumFile& infile);
-		void        doCoincidenceAttackAnalysis(vector<vector<double>>& analysis);
+		void        doCoincidenceOnsetAnalysis(vector<vector<double>>& analysis);
 		void        insertAnalysesIntoFile(HumdrumFile& outfile, vector<string>& spines,
 		                                   vector<int>& trackMap, vector<bool>& tracks);
-		void        assignAnalysesToTextTracks(vector<vector<double>*>& data,
-		                                   vector<string>& spines, vector<bool>& tracks,
-		                                   vector<int>& trackMap);
+		void        assignAnalysesToVdataTracks(vector<vector<double>*>& data,
+		                                   vector<string>& spines, HumdrumFile& outfile);
 
 	private:
 		std::string m_pitch     = "eR";   // pitch to display for composite rhythm
@@ -5929,16 +5932,17 @@ class Tool_composite : public HumTool {
 		bool        m_coincideDisplayQ = true; // used with m_together and m_togetherInScore
 
 		// Analysis variables:
-		bool        m_analysisAttacksQ       = false;  // used with -A option
-		bool        m_analysisArticulationsQ = false;  // used with -R option
-		bool        m_analysisOrnamentsQ     = false;  // used with -O option
-		bool        m_analysisSlursQ         = false;  // used with -S option
-		bool        m_analysisQ              = false;  // union of -AROS options
-		vector<vector<double>> m_analysisNoteAttacks;       // used with -A
-		vector<vector<double>> m_analysisNoteArticulations; // used with -R
-		vector<vector<double>> m_analysisNoteOrnaments;     // used with -O
-		vector<vector<double>> m_analysisNoteSlurs;         // used with -S
-		vector<vector<double>> m_analysisTotals;            // Sum when multiple features are analyzed.
+		bool        m_analysisOnsetsQ    = false;   // used with -P option
+		bool        m_analysisAccentsQ   = false;   // used with -A option
+		bool        m_analysisOrnamentsQ = false;   // used with -O option
+		bool        m_analysisSlursQ     = false;   // used with -S option
+		bool        m_analysisTotalsQ    = false;   // used with -T option
+		bool        m_analysisQ          = false;   // union of -paost options
+		vector<vector<double>> m_analysisOnsets;    // used with -P
+		vector<vector<double>> m_analysisAccents;   // used with -A
+		vector<vector<double>> m_analysisOrnaments; // used with -O
+		vector<vector<double>> m_analysisSlurs;     // used with -S
+		vector<vector<double>> m_analysisTotals;    // used with -T
 
 };
 
@@ -7010,6 +7014,9 @@ class Tool_mei2hum : public HumTool {
 		void   parseReh             (xml_node reh, HumNum starttime);
 		HumNum parseLayer           (xml_node layer, HumNum starttime, vector<bool>& layerPresent);
 		HumNum parseLayer_mensural  (xml_node layer, HumNum starttime, vector<bool>& layerPresent);
+		HumNum parseCorr_mensural   (xml_node corr, HumNum starttime);
+		HumNum parseChoice_mensural (xml_node corr, HumNum starttime);
+		HumNum parseLigature        (xml_node staff, HumNum starttime);
 		int    extractStaffCountByFirstMeasure    (xml_node element);
 		int    extractStaffCountByScoreDef        (xml_node element);
 		HumNum parseRest            (xml_node chord, HumNum starttime);
@@ -7632,6 +7639,7 @@ class Tool_msearch : public HumTool {
 		                            vector<NoteCell*>& match);
 		void    markMatch          (HumdrumFile& infile,
 		                            vector<NoteCell*>& match);
+		void    storeMatch         (vector<NoteCell*>& match);
 		void    markTextMatch      (HumdrumFile& infile, TextInfo& word);
 		void    fillWords          (HumdrumFile& infile,
 		                            vector<TextInfo*>& words);
@@ -7640,6 +7648,7 @@ class Tool_msearch : public HumTool {
 		void    printQuery         (vector<MSearchQueryToken>& query);
 		void    addMusicSearchSummary(HumdrumFile& infile, int mcount, const std::string& marker);
 		void    addTextSearchSummary(HumdrumFile& infile, int mcount, const std::string& marker);
+		void    addMatch           (HumdrumFile& infile, vector<NoteCell*>& match);
 		int     makeBase40Interval (int diatonic, const std::string& alteration);
 		std::string convertPitchesToIntervals(const std::string& input);
 		void    markNote           (HTp token, int index);
@@ -7657,6 +7666,8 @@ class Tool_msearch : public HumTool {
 		bool        m_quietQ     = false;
 		bool        m_debugQ     = false;
 		bool        m_nooverlapQ = false;
+		std::vector<int> m_barnums;
+		std::vector<std::vector<NoteCell*>> m_matches;
 		std::vector<SonorityDatabase> m_sonorities;
 		std::vector<bool> m_sonoritiesChecked;
 		std::vector<pair<HTp, int>> m_tomark;
@@ -7688,7 +7699,7 @@ class Tool_musedata2hum : public HumTool {
 		void    setMeasureStyle      (GridMeasure* gm, MuseRecord& mr);
 		void    setMeasureNumber     (GridMeasure* gm, MuseRecord& mr);
 		void    storePartName        (HumGrid& outdata, MuseData& part, int index);
-		void    addNoteDynamics      (GridSlice* slice, int part, 
+		void    addNoteDynamics      (GridSlice* slice, int part,
 		                              MuseRecord& mr);
 		void    addLyrics            (GridSlice* slice, int part, int staff, MuseRecord& mr);
 		void    addFiguredHarmony    (MuseRecord& mr, GridMeasure* gm,
@@ -8126,7 +8137,7 @@ class Tool_pccount : public HumTool {
 		bool  run                       (HumdrumFile& infile);
 		bool  run                       (const string& indata, ostream& out);
 		bool  run                       (HumdrumFile& infile, ostream& out);
- 
+
 	protected:
 		void   initialize               (HumdrumFile& infile);
 		void   processFile              (HumdrumFile& infile);
@@ -8579,7 +8590,7 @@ class Tool_shed : public HumTool {
 		bool m_modified       = false;
 
 		// list of exclusive interpretations to process
-		std::vector<std::string> m_exinterps; 
+		std::vector<std::string> m_exinterps;
 		std::string m_exclusion;
 
 		std::vector<bool> m_spines; // usar with -s option
@@ -8811,8 +8822,8 @@ class Tool_strophe : public HumTool {
 
 	private:
 		bool         m_listQ;      // boolean for showing a list of variants
-		bool         m_markQ;      // boolean for marking strophes 
-		std::string  m_marker;     // character for marking strophes 
+		bool         m_markQ;      // boolean for marking strophes
+		std::string  m_marker;     // character for marking strophes
 		std::string  m_color;      // color for strphe notes/rests
       std::set<std::string> m_variants;  // used for --list option
 

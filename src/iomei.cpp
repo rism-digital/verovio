@@ -1368,6 +1368,7 @@ void MEIOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
+    dynam->WriteEnclosingChars(currentNode);
     dynam->WriteExtender(currentNode);
     dynam->WriteLineRendBase(currentNode);
     dynam->WriteMidiValue(currentNode);
@@ -1759,6 +1760,7 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     WritePositionInterface(currentNode, custos);
     WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
+    custos->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -4585,6 +4587,7 @@ bool MEIInput::ReadDynam(Object *parent, pugi::xml_node dynam)
 
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
+    vrvDynam->ReadEnclosingChars(dynam);
     vrvDynam->ReadExtender(dynam);
     vrvDynam->ReadLineRendBase(dynam);
     vrvDynam->ReadMidiValue(dynam);
@@ -5352,6 +5355,7 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     ReadPitchInterface(custos, vrvCustos);
     ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
+    vrvCustos->ReadExtSym(custos);
 
     ReadAccidAttr(custos, vrvCustos);
 

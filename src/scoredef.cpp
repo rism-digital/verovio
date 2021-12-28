@@ -432,9 +432,7 @@ StaffDef *ScoreDef::GetStaffDef(int n)
 StaffGrp *ScoreDef::GetStaffGrp(const std::string &n)
 {
     // First get all the staffGrps
-    ClassIdComparison matchType(STAFFGRP);
-    ListOfObjects staffGrps;
-    this->FindAllDescendantByComparison(&staffGrps, &matchType);
+    ListOfObjects staffGrps = this->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
     for (auto &item : staffGrps) {
@@ -595,6 +593,9 @@ int ScoreDef::AlignMeasures(FunctorParams *functorParams)
 
     // SetDrawingXRel(m_systemLeftMar + this->GetDrawingWidth());
     params->m_shift += m_drawingLabelsWidth;
+    if (!this->DrawLabels() && this->IsSectionRestart()) {
+        params->m_shift += 5 * params->m_doc->GetDrawingDoubleUnit(100);
+    }
 
     return FUNCTOR_CONTINUE;
 }

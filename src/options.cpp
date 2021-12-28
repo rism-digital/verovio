@@ -751,6 +751,21 @@ std::set<std::string> OptionJson::GetKeys() const
     return keys;
 }
 
+std::set<std::string> OptionJson::GetKeysByNode(const std::string &nodeName, std::list<std::string> &jsonNodePath) const
+{
+    std::set<std::string> keys;
+
+    // Try to find node by the name, otherwise use root node
+    const jsonxx::Object *node = FindNodeByName(m_values, nodeName, jsonNodePath);
+    if (!node) node = &m_values;
+
+    for (const auto &mapEntry : node->kv_map()) {
+        keys.insert(mapEntry.first);
+    }
+
+    return keys;
+}
+
 OptionJson::JsonPath OptionJson::StringPath2NodePath(
     const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const
 {
@@ -780,6 +795,31 @@ OptionJson::JsonPath OptionJson::StringPath2NodePath(
     }
 
     return path;
+}
+
+const jsonxx::Object *OptionJson::FindNodeByName(
+    const jsonxx::Object &obj, const std::string &jsonNodeName, std::list<std::string> &jsonNodePath) const
+{
+    for (const auto &mapEntry : obj.kv_map()) {
+        // skip non-objects
+        if (!mapEntry.second->is<jsonxx::Object>()) continue;
+        // return current object if name matches
+        if (mapEntry.first == jsonNodeName) {
+            jsonNodePath.emplace_back(mapEntry.first);
+            return &mapEntry.second->get<jsonxx::Object>();
+        }
+        // otherwise recursively process current object
+        else {
+            const jsonxx::Object *result
+                = FindNodeByName(mapEntry.second->get<jsonxx::Object>(), jsonNodeName, jsonNodePath);
+            if (result) {
+                jsonNodePath.emplace_front(mapEntry.first);
+                return result;
+            }
+        }
+    }
+
+    return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -1229,6 +1269,10 @@ Options::Options()
     m_multiRestStyle.Init(MULTIRESTSTYLE_auto, &Option::s_multiRestStyle);
     this->Register(&m_multiRestStyle, "multiRestStyle", &m_generalLayout);
 
+    m_multiRestThickness.SetInfo("Multi rest thickness", "The thickness of the multi rest in unit");
+    m_multiRestThickness.Init(2.0, 0.50, 6.00);
+    this->Register(&m_multiRestThickness, "multiRestThickness", &m_generalLayout);
+
     m_octaveAlternativeSymbols.SetInfo("Alternative octave symbols", "Use alternative symbols for displaying octaves");
     m_octaveAlternativeSymbols.Init(false);
     this->Register(&m_octaveAlternativeSymbols, "octaveAlternativeSymbols", &m_generalLayout);
@@ -1243,7 +1287,7 @@ Options::Options()
 
     m_repeatBarLineDotSeparation.SetInfo("Repeat barline dot separation",
         "The default horizontal distance between the dots and the inner barline of a repeat barline");
-    m_repeatBarLineDotSeparation.Init(0.30, 0.10, 1.00);
+    m_repeatBarLineDotSeparation.Init(0.36, 0.10, 1.00);
     this->Register(&m_repeatBarLineDotSeparation, "repeatBarLineDotSeparation", &m_generalLayout);
 
     m_repeatEndingLineThickness.SetInfo("Repeat ending line thickness", "Repeat and ending line thickness");
@@ -1631,7 +1675,8 @@ void Options::Sync()
 
     // We track all unmatched keys to generate appropriate errors later on
     std::set<std::string> unmatchedKeys = m_engravingDefaults.GetKeys();
-    std::set<std::string> otherKeys = m_engravingDefaultsFile.GetKeys();
+    std::list<std::string> engravingDefaultsPath;
+    std::set<std::string> otherKeys = m_engravingDefaultsFile.GetKeysByNode("engravingDefaults", engravingDefaultsPath);
     std::set_union(unmatchedKeys.begin(), unmatchedKeys.end(), otherKeys.begin(), otherKeys.end(),
         std::inserter(unmatchedKeys, unmatchedKeys.end()));
 
@@ -1657,17 +1702,20 @@ void Options::Sync()
         { "repeatEndingLineThickness", &m_repeatEndingLineThickness }, //
         { "lyricLineThickness", &m_lyricLineThickness }, //
         { "tupletBracketThickness", &m_tupletBracketThickness }, //
-        { "textEnclosureThickness", &m_textEnclosureThickness } //
+        { "textEnclosureThickness", &m_textEnclosureThickness }, //
+        { "hBarThickness", &m_multiRestThickness } //
     };
 
     for (const auto &pair : engravingDefaults) {
-        const std::vector<std::string> jsonNodePath = { pair.first };
+        std::vector<std::string> jsonNodePath = { engravingDefaultsPath.begin(), engravingDefaultsPath.end() };
+        jsonNodePath.emplace_back(pair.first);
+
         double jsonValue = 0.0;
         if (m_engravingDefaultsFile.HasValue(jsonNodePath)) {
             jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
         }
-        else if (m_engravingDefaults.HasValue(jsonNodePath)) {
-            jsonValue = m_engravingDefaults.GetDoubleValue(jsonNodePath);
+        else if (m_engravingDefaults.HasValue({ pair.first })) {
+            jsonValue = m_engravingDefaults.GetDoubleValue({ pair.first });
         }
         else
             continue;

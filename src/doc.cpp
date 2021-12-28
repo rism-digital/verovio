@@ -155,9 +155,7 @@ bool Doc::GenerateDocumentScoreDef()
         return false;
     }
 
-    ListOfObjects staves;
-    ClassIdComparison matchType(STAFF);
-    measure->FindAllDescendantByComparison(&staves, &matchType);
+    ListOfObjects staves = measure->FindAllDescendantsByType(STAFF, false);
 
     if (staves.empty()) {
         LogError("No staff found for generating a scoreDef");
@@ -226,9 +224,7 @@ bool Doc::GenerateHeader()
 
 bool Doc::GenerateMeasureNumbers()
 {
-    ClassIdComparison matchType(MEASURE);
-    ListOfObjects measures;
-    this->FindAllDescendantByComparison(&measures, &matchType);
+    ListOfObjects measures = this->FindAllDescendantsByType(MEASURE, false);
 
     // run through all measures and generate missing mNum from attribute
     for (auto &object : measures) {
@@ -516,7 +512,7 @@ void Doc::PrepareDrawing()
         this->Process(&resetDrawing, NULL);
     }
 
-    /************ Resolve @starid / @endid ************/
+    /************ Resolve @startid / @endid ************/
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
     PrepareTimeSpanningParams prepareTimeSpanningParams;
@@ -535,7 +531,17 @@ void Doc::PrepareDrawing()
         this->Process(&prepareTimeSpanning, &prepareTimeSpanningParams);
     }
 
-    /************ Resolve @starid (only) ************/
+    // Display warning if some elements were not matched
+    const size_t unmatchedElements = std::count_if(prepareTimeSpanningParams.m_timeSpanningInterfaces.cbegin(),
+        prepareTimeSpanningParams.m_timeSpanningInterfaces.cend(),
+        [](const ListOfSpanningInterClassIdPairs::value_type &entry) {
+            return (entry.first->HasStartid() && entry.first->HasEndid());
+        });
+    if (unmatchedElements > 0) {
+        LogWarning("%d time spanning element(s) with startid and endid could not be matched.", unmatchedElements);
+    }
+
+    /************ Resolve @startid (only) ************/
 
     // Resolve <reh> elements first, since they can be encoded without @startid or @tstamp, but we need one internally
     // for placement
@@ -559,7 +565,7 @@ void Doc::PrepareDrawing()
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareTimestampsParams.m_timeSpanningInterfaces.empty()) {
-        LogWarning("%d time spanning element(s) could not be matched",
+        LogWarning("%d time spanning element(s) with timestamps could not be matched.",
             prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
@@ -795,9 +801,7 @@ void Doc::PrepareDrawing()
     */
 
     /************ Add default syl for syllables (if applicable) ************/
-    ListOfObjects syllables;
-    ClassIdComparison comp(SYLLABLE);
-    this->FindAllDescendantByComparison(&syllables, &comp);
+    ListOfObjects syllables = this->FindAllDescendantsByType(SYLLABLE);
     for (auto it = syllables.begin(); it != syllables.end(); ++it) {
         Syllable *syllable = dynamic_cast<Syllable *>(*it);
         syllable->MarkupAddSyl();
@@ -817,6 +821,10 @@ void Doc::PrepareDrawing()
             syl->CreateDefaultZone(this);
         }
     }
+
+    /************ Resolve @enclose for dynamics ************/
+    Functor prepareDynamEnclosure(&Object::PrepareDynamEnclosure);
+    this->Process(&prepareDynamEnclosure, NULL);
 
     Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
     GetCurrentScoreDef()->Process(&scoreDefSetGrpSym, NULL);
@@ -1093,9 +1101,7 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
 
     contentPage->LayOutHorizontally();
 
-    ListOfObjects systems;
-    ClassIdComparison cmp(SYSTEM);
-    contentPage->FindAllDescendantByComparison(&systems, &cmp, 1);
+    ListOfObjects systems = contentPage->FindAllDescendantsByType(SYSTEM, false, 1);
     for (const auto item : systems) {
         System *system = vrv_cast<System *>(item);
         assert(system);
@@ -1295,9 +1301,7 @@ bool Doc::HasPage(int pageIdx)
 std::list<Score *> Doc::GetScores()
 {
     std::list<Score *> scores;
-    ListOfObjects objects;
-    ClassIdComparison cmp(SCORE);
-    this->FindAllDescendantByComparison(&objects, &cmp, 3);
+    ListOfObjects objects = this->FindAllDescendantsByType(SCORE, false, 3);
     for (const auto object : objects) {
         Score *score = vrv_cast<Score *>(object);
         assert(score);

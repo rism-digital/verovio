@@ -361,11 +361,9 @@ int Object::GetChildCount(const ClassId classId) const
     return (int)count_if(m_children.begin(), m_children.end(), ObjectComparison(classId));
 }
 
-int Object::GetChildCount(const ClassId classId, int deepth)
+int Object::GetChildCount(const ClassId classId, int depth)
 {
-    ListOfObjects objects;
-    ClassIdComparison matchClassId(classId);
-    this->FindAllDescendantByComparison(&objects, &matchClassId);
+    ListOfObjects objects = this->FindAllDescendantsByType(classId, true, depth);
     return (int)objects.size();
 }
 
@@ -562,7 +560,18 @@ Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int de
     return findExtremeByComparisonParams.m_element;
 }
 
-void Object::FindAllDescendantByComparison(
+ListOfObjects Object::FindAllDescendantsByType(ClassId classId, bool continueDepthSearchForMatches, int deepness)
+{
+    ListOfObjects objects;
+    ClassIdComparison comparison(classId);
+    Functor findAllByComparison(&Object::FindAllByComparison);
+    FindAllByComparisonParams findAllByComparisonParams(&comparison, &objects);
+    findAllByComparisonParams.m_continueDepthSearchForMatches = continueDepthSearchForMatches;
+    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness);
+    return objects;
+}
+
+void Object::FindAllDescendantsByComparison(
     ListOfObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear)
 {
     assert(objects);
@@ -573,7 +582,7 @@ void Object::FindAllDescendantByComparison(
     this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction, true);
 }
 
-void Object::FindAllDescendantBetween(
+void Object::FindAllDescendantsBetween(
     ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear)
 {
     assert(objects);
@@ -594,9 +603,7 @@ Object *Object::GetChild(int idx) const
 
 Object *Object::GetChild(int idx, const ClassId classId)
 {
-    ListOfObjects objects;
-    ClassIdComparison matchClassId(classId);
-    this->FindAllDescendantByComparison(&objects, &matchClassId, 1);
+    ListOfObjects objects = this->FindAllDescendantsByType(classId, true, 1);
     if ((idx < 0) || (idx >= (int)objects.size())) {
         return NULL;
     }
@@ -706,11 +713,9 @@ int Object::GetChildIndex(const Object *child)
     return -1;
 }
 
-int Object::GetDescendantIndex(const Object *child, const ClassId classId, int deepth)
+int Object::GetDescendantIndex(const Object *child, const ClassId classId, int depth)
 {
-    ListOfObjects objects;
-    ClassIdComparison matchClassId(classId);
-    this->FindAllDescendantByComparison(&objects, &matchClassId);
+    ListOfObjects objects = this->FindAllDescendantsByType(classId, true, depth);
     int i = 0;
     for (auto &object : objects) {
         if (child == object) return i;
@@ -733,6 +738,17 @@ void Object::FillFlatList(ArrayOfObjects *flatList)
     Functor addToFlatList(&Object::AddLayerElementToFlatList);
     AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
+}
+
+ListOfObjects Object::GetAncestors() const
+{
+    ListOfObjects ancestors;
+    Object *object = m_parent;
+    while (object) {
+        ancestors.push_back(object);
+        object = object->m_parent;
+    }
+    return ancestors;
 }
 
 Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
@@ -792,7 +808,7 @@ bool Object::HasEditorialContent()
 {
     ListOfObjects editorial;
     IsEditorialElementComparison editorialComparison;
-    this->FindAllDescendantByComparison(&editorial, &editorialComparison);
+    this->FindAllDescendantsByComparison(&editorial, &editorialComparison);
     return (!editorial.empty());
 }
 
@@ -801,7 +817,7 @@ bool Object::HasNonEditorialContent()
     ListOfObjects nonEditorial;
     IsEditorialElementComparison editorialComparison;
     editorialComparison.ReverseComparison();
-    this->FindAllDescendantByComparison(&nonEditorial, &editorialComparison);
+    this->FindAllDescendantsByComparison(&nonEditorial, &editorialComparison);
     return (!nonEditorial.empty());
 }
 
@@ -993,7 +1009,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         fa = a->GetFacsimileInterface();
     else {
         ListOfObjects children;
-        a->FindAllDescendantByComparison(&children, &comp);
+        a->FindAllDescendantsByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
             if ((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
@@ -1007,7 +1023,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         fb = b->GetFacsimileInterface();
     else {
         ListOfObjects children;
-        b->FindAllDescendantByComparison(&children, &comp);
+        b->FindAllDescendantsByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
             if ((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
@@ -1043,6 +1059,26 @@ bool Object::sortByUlx(Object *a, Object *b)
     }
 
     return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
+}
+
+bool Object::IsPreOrdered(Object *left, Object *right)
+{
+    ListOfObjects ancestorsLeft = left->GetAncestors();
+    ancestorsLeft.push_front(left);
+    // Check if right is an ancestor of left
+    if (std::find(ancestorsLeft.begin(), ancestorsLeft.end(), right) != ancestorsLeft.end()) return false;
+    ListOfObjects ancestorsRight = right->GetAncestors();
+    ancestorsRight.push_front(right);
+    // Check if left is an ancestor of right
+    if (std::find(ancestorsRight.begin(), ancestorsRight.end(), left) != ancestorsRight.end()) return true;
+
+    // Now there must be mismatches since we included left and right into the ancestor lists above
+    auto iterPair = std::mismatch(ancestorsLeft.rbegin(), ancestorsLeft.rend(), ancestorsRight.rbegin());
+    Object *commonParent = (*iterPair.first)->m_parent;
+    if (commonParent) {
+        return (commonParent->GetChildIndex(*iterPair.first) < commonParent->GetChildIndex(*iterPair.second));
+    }
+    return false;
 }
 
 //----------------------------------------------------------------------------
@@ -1361,6 +1397,9 @@ int Object::FindAllByComparison(FunctorParams *functorParams)
     // evaluate by applying the Comparison operator()
     if ((*params->m_comparison)(this)) {
         params->m_elements->push_back(this);
+        if (!params->m_continueDepthSearchForMatches) {
+            return FUNCTOR_SIBLINGS;
+        }
     }
     // continue until the end
     return FUNCTOR_CONTINUE;
@@ -1654,12 +1693,12 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         // them)
         ListOfObjects currentObjects, previousObjects;
         AttVisibilityComparison comparison(STAFF, BOOLEAN_false);
-        measure->FindAllDescendantByComparison(&currentObjects, &comparison);
+        measure->FindAllDescendantsByComparison(&currentObjects, &comparison);
         if ((int)currentObjects.size() == measure->GetChildCount(STAFF)) {
             drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT;
         }
         if (params->m_previousMeasure) {
-            params->m_previousMeasure->FindAllDescendantByComparison(&previousObjects, &comparison);
+            params->m_previousMeasure->FindAllDescendantsByComparison(&previousObjects, &comparison);
             if ((int)previousObjects.size() == params->m_previousMeasure->GetChildCount(STAFF))
                 drawingFlags |= Measure::BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS;
         }
@@ -1688,11 +1727,13 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         }
         if (scoreDef->IsSectionRestart()) {
             // Trigger the redrawing of the labels - including for the system scoreDef if at the beginning
-            params->m_drawLabels = true;
+            const bool hasLabel = (NULL != scoreDef->FindDescendantByType(LABEL))
+                || (NULL != scoreDef->FindDescendantByType(LABELABBR));
+            params->m_drawLabels = hasLabel;
             params->m_restart = true;
             // Redraw the labels only if we already have a mesure in the system. Otherwise this will be
             // done through the system scoreDef
-            scoreDef->SetDrawLabels(params->m_hasMeasure);
+            scoreDef->SetDrawLabels(params->m_hasMeasure && hasLabel);
             // If we have a previous measure, we need to set the cautionary scoreDef indenpendently from the
             // presence of a system break
             if (params->m_previousMeasure) {

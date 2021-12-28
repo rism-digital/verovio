@@ -25,6 +25,7 @@
 #include "multirest.h"
 #include "page.h"
 #include "pedal.h"
+#include "section.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "syl.h"
@@ -370,9 +371,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     std::vector<int> staffList;
 
     // First get all the staffGrps
-    ClassIdComparison matchType(STAFFGRP);
-    ListOfObjects staffGrps;
-    scoreDef->FindAllDescendantByComparison(&staffGrps, &matchType);
+    ListOfObjects staffGrps = scoreDef->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
     for (auto &staffGrp : staffGrps) {
@@ -397,9 +396,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 Staff *Measure::GetTopVisibleStaff()
 {
     Staff *staff = NULL;
-    ListOfObjects staves;
-    ClassIdComparison matchType(STAFF);
-    this->FindAllDescendantByComparison(&staves, &matchType, 1);
+    ListOfObjects staves = this->FindAllDescendantsByType(STAFF, false);
     for (auto &child : staves) {
         staff = vrv_cast<Staff *>(child);
         assert(staff);
@@ -414,9 +411,7 @@ Staff *Measure::GetTopVisibleStaff()
 Staff *Measure::GetBottomVisibleStaff()
 {
     Staff *bottomStaff = NULL;
-    ListOfObjects staves;
-    ClassIdComparison matchType(STAFF);
-    this->FindAllDescendantByComparison(&staves, &matchType, 1);
+    ListOfObjects staves = this->FindAllDescendantsByType(STAFF, false);
     for (const auto child : staves) {
         Staff *staff = vrv_cast<Staff *>(child);
         assert(staff);
@@ -624,9 +619,7 @@ void Measure::SetInvisibleStaffBarlines(
 
 std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEndpoints()
 {
-    ListOfObjects children;
-    ClassIdComparison comp(TIE);
-    this->FindAllDescendantByComparison(&children, &comp);
+    ListOfObjects children = this->FindAllDescendantsByType(TIE);
 
     std::vector<std::pair<LayerElement *, LayerElement *>> endpoints;
     for (Object *object : children) {
@@ -1167,6 +1160,15 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
 {
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
+
+    assert(this->GetParent());
+    Object *object = this->GetParent()->GetPrevious(this);
+    if (object && object->Is(SECTION)) {
+        Section *section = vrv_cast<Section *>(object);
+        if (section && (section->GetRestart() == BOOLEAN_true)) {
+            params->m_shift += 5 * params->m_doc->GetDrawingDoubleUnit(100);
+        }
+    }
 
     SetDrawingXRel(params->m_shift);
 

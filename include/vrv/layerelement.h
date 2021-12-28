@@ -131,6 +131,11 @@ public:
     ///@}
 
     /**
+     * @return (cross) layer number, parent layer number for cross staff elements
+     */
+    int GetOriginalLayerN();
+
+    /**
      * @name Get the X and Y drawing position
      */
     ///@{
@@ -387,6 +392,11 @@ public:
      */
     int GetRelativeLayerElement(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::PrepareSlurs
+     */
+    int PrepareSlurs(FunctorParams *functorParams) override;
+
 protected:
     /**
      * Helper to figure whether two chords are in fully in unison based on the locations of the notes.
@@ -400,14 +410,14 @@ protected:
     /**
      * The note locations w.r.t. each staff, implemented for note and chord
      */
-    virtual MapOfNoteLocs CalcNoteLocations() { return {}; };
+    virtual MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) { return {}; }
 
     /**
      * The dot locations w.r.t. each staff, implemented for note and chord
      * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
      * secondary
      */
-    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; };
+    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; }
 
     /**
      * Calculate the optimal dot location for a note or chord

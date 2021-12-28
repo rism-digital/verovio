@@ -55,23 +55,23 @@ my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
 my $cpp = 17;             # c++ version to compile (11, 14, 17)
-my $VEROVIO_ROOT  = ".."; 
+my $VEROVIO_ROOT  = "..";
 
 Getopt::Long::Configure("bundling");
 GetOptions (
-   'C|cpp=s'       => \$cpp,
-   'c|chatty'      => \$chattyQ,
-   'h|?|help'      => \$helpQ,
-   'l|light'       => \$lightQ,
-   'r|root=s'      => \$VEROVIO_ROOT,
-   'v|version=s'   => \$VERSION,
-   'x|exclusion=s' => \$exclusion,
-   'w|wasm'        => \$wasmQ,
-   'D|no-darms'    => \$nodarms,
-   'H|no-humdrum'  => \$nohumdrum,
-   'P|no-pae'      => \$nopae,
-   'X|no-musicxml' => \$nomusicxml,
-   'M|make' => \$makeQ
+	'C|cpp=s'       => \$cpp,
+	'c|chatty'      => \$chattyQ,
+	'h|?|help'      => \$helpQ,
+	'l|light'       => \$lightQ,
+	'r|root=s'      => \$VEROVIO_ROOT,
+	'v|version=s'   => \$VERSION,
+	'x|exclusion=s' => \$exclusion,
+	'w|wasm'        => \$wasmQ,
+	'D|no-darms'    => \$nodarms,
+	'H|no-humdrum'  => \$nohumdrum,
+	'P|no-pae'      => \$nopae,
+	'X|no-musicxml' => \$nomusicxml,
+	'M|make' => \$makeQ
 );
 
 # Default compiling uses ASM and large file support.
@@ -80,34 +80,46 @@ GetOptions (
 # This can be disabled in the light version, which uses the default memory settings.
 my $FLAGS = "-O3";
 $FLAGS .= " -DNDEBUG";
-$FLAGS .= " --memory-init-file 0";
 $FLAGS .= " -std=c++$cpp";
 
 my $LFLAGS =  " -s ASM_JS=1";
 $LFLAGS .= " -s INITIAL_MEMORY=256MB";
 $LFLAGS .= " -s TOTAL_STACK=128MB";
 $LFLAGS .= " -s WASM=0";
+$LFLAGS .= " --memory-init-file 0";
 
 # Process command-line options:
 
 if ($wasmQ) {
 	print "Creating WASM toolkit version\n";
+
+	# Debugging flags, see:
+	#    https://emscripten.org/docs/porting/Debugging.html
+
 	# We can try to find the cause of integer overflow runtime errors with
 	# $FLAGS = " -g4 -O0 --emit-symbol-map";
-    # For now, trapping them (followign option does not work with Safari)
+
+	# SAFEHEAP=1 :: Adds additional memory access checks,
+	# and will give clear errors for problems like
+	# dereferencing 0 and memory alignment issues.
+	#$LFLAGS .= " -s SAFEHEAP=1";
+
+	# For now, trapping them (followign option does not work with Safari)
 	#$FLAGS .= " -mnontrapping-fptoint";
-	$FLAGS .= " -s STRICT=1"; 
+
+	$FLAGS .= " -s STRICT=1";
 	# Linker flags
 	$LFLAGS = " -s WASM=1";
 	$LFLAGS .= " -s INITIAL_MEMORY=512MB";
 	$LFLAGS .= " -s TOTAL_STACK=256MB";
-    $LFLAGS .= " -s SINGLE_FILE=1";
+	$LFLAGS .= " -s SINGLE_FILE=1";
 	$FLAGS_NAME = "-wasm";
 }
 
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
 	$LFLAGS = " -s ASM_JS=1 -s WASM=0";
+	$LFLAGS .= " --memory-init-file 0";
 	$FLAGS_NAME = "-light";
 }
 
@@ -116,7 +128,7 @@ if ($chattyQ) {
 }
 
 if (!$nohumdrum) {
-    $FLAGS_NAME .= "-hum";
+	$FLAGS_NAME .= "-hum";
 }
 
 if ($helpQ) {
@@ -198,13 +210,13 @@ $exports .= "]\"";
 my $extra_exports = "-s EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
 
 if ($makeQ) {
-    system("rm -rf CMakeFiles/");
-    system("rm CMakeCache.txt");
+	system("rm -rf CMakeFiles/");
+	system("rm CMakeCache.txt");
 }
- 
- print "*************\nBuilding makefile...\n";
- my $cmakeCmd = "$EMCMAKE cmake ../cmake $cmake -DCMAKE_CXX_FLAGS=\"$FLAGS\"";
- system($cmakeCmd);
+
+print "*************\nBuilding makefile...\n";
+my $cmakeCmd = "$EMCMAKE cmake ../cmake $cmake -DCMAKE_CXX_FLAGS=\"$FLAGS\"";
+system($cmakeCmd);
 
 print "*************\nCompiling...\n";
 my $makeCmd = "$EMMAKE make -j 8";

@@ -5585,9 +5585,29 @@ void HumdrumInput::setMensurationSymbol(
 
     if (metersig.find('C') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_C);
+        if (metersig.find("3/2") != std::string::npos) {
+            vrvmensur->SetNum(3);
+            vrvmensur->SetNumbase(2);
+        }
+        else if (metersig.find("C2") != std::string::npos) {
+            vrvmensur->SetNum(2);
+        }
+        else if (metersig.find("C3") != std::string::npos) {
+            vrvmensur->SetNum(3);
+        }
     }
     else if (metersig.find('O') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_O);
+        if (metersig.find("3/2") != std::string::npos) {
+            vrvmensur->SetNum(3);
+            vrvmensur->SetNumbase(2);
+        }
+        else if (metersig.find("O2") != std::string::npos) {
+            vrvmensur->SetNum(2);
+        }
+        else if (metersig.find("O3") != std::string::npos) {
+            vrvmensur->SetNum(3);
+        }
     }
     else {
         std::cerr << "Warning: do not understand mensuration " << metersig << std::endl;
@@ -8737,7 +8757,7 @@ void HumdrumInput::checkForVerseLabels(hum::HTp token)
         current = current->getNextFieldToken();
     }
     while (current && !current->isStaff()) {
-        if (!current->isDataTypeLike("**text")) {
+        if (!(current->isDataTypeLike("**text") || current->isDataTypeLike("**vdata"))) {
             current = current->getNextFieldToken();
             continue;
         }
@@ -11274,7 +11294,15 @@ void HumdrumInput::processTerminalLong(hum::HTp token)
     if (token->find(m_signifiers.terminallong) == std::string::npos) {
         return;
     }
-    token->setValue("LO", "N", "vis", "00");
+    string doublelong;
+    doublelong += m_signifiers.terminallong;
+    doublelong += m_signifiers.terminallong;
+    if (token->find(doublelong) != std::string::npos) {
+        token->setValue("LO", "N", "vis", "000");
+    }
+    else {
+        token->setValue("LO", "N", "vis", "00");
+    }
     if ((token->find('[') != std::string::npos) || (token->find('_') != std::string::npos)) {
         removeCharacter(token, '[');
         removeCharacter(token, '_');

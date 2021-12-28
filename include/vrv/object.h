@@ -232,7 +232,7 @@ public:
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }
     int GetChildCount(const ClassId classId) const;
-    int GetChildCount(const ClassId classId, int deepth);
+    int GetChildCount(const ClassId classId, int depth);
     ///@}
 
     /**
@@ -348,7 +348,7 @@ public:
     /**
      * Look for all Objects of a class and return its position (-1 if not found)
      */
-    int GetDescendantIndex(const Object *child, const ClassId classId, int deepth);
+    int GetDescendantIndex(const Object *child, const ClassId classId, int depth);
 
     /**
      * Insert an element at the idx position.
@@ -394,17 +394,23 @@ public:
         Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
+     * Return all the objects with specified type
+     */
+    ListOfObjects FindAllDescendantsByType(
+        ClassId classId, bool continueDepthSearchForMatches = true, int deepness = UNLIMITED_DEPTH);
+
+    /**
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    void FindAllDescendantByComparison(ListOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
+    void FindAllDescendantsByComparison(ListOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
         bool direction = FORWARD, bool clear = true);
 
     /**
      * Return all the objects matching the Comparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
-    void FindAllDescendantBetween(
+    void FindAllDescendantsBetween(
         ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
 
     /**
@@ -434,6 +440,11 @@ public:
      * Return false if the child could not be found. In that case it will not be deleted.
      */
     bool DeleteChild(Object *child);
+
+    /**
+     * Returns all ancestors
+     */
+    ListOfObjects GetAncestors() const;
 
     /**
      * Return the first ancestor of the specified type.
@@ -539,6 +550,11 @@ public:
     static std::string GenerateRandUuid();
 
     static bool sortByUlx(Object *a, Object *b);
+
+    /**
+     * @Return true if left appears before right in preorder traversal
+     */
+    static bool IsPreOrdered(Object *left, Object *right);
 
     //----------//
     // Functors //
@@ -802,6 +818,11 @@ public:
      * Calculate the x position of tuplet brackets and num
      */
     virtual int AdjustTupletsX(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Calculate the slur direction
+     */
+    virtual int PrepareSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -1112,6 +1133,11 @@ public:
      * Processed by staff/layer after that
      */
     virtual int PrepareDelayedTurns(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Functor for setting enlosure for the dynamics by adding corresponding text children to it
+     */
+    virtual int PrepareDynamEnclosure(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Functor for setting Measure of Ending
