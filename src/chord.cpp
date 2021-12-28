@@ -525,6 +525,30 @@ int Chord::AdjustOverlappingLayers(
     return 0;
 }
 
+std::list<Note *> Chord::GetAdjacentNotesList(Staff *staff, int loc)
+{
+    const ArrayOfObjects *notes = this->GetList(this);
+    assert(notes);
+
+    std::list<Note *> adjacentNotes;
+    for (Object *obj : *notes) {
+        Note *note = vrv_cast<Note *>(obj);
+        assert(note);
+
+        Layer *layer = NULL;
+        Staff *noteStaff = note->GetCrossStaff(layer);
+        if (!noteStaff) noteStaff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(noteStaff);
+        if (noteStaff != staff) continue;
+
+        const int locDiff = note->GetDrawingLoc() - loc;
+        if ((std::abs(locDiff) <= 2) && (locDiff != 0)) {
+            adjacentNotes.push_back(note);
+        }
+    }
+    return adjacentNotes;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

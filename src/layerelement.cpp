@@ -70,10 +70,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 LayerElement::LayerElement()
-    : Object(LAYER_ELEMENT, "le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : Object(LAYER_ELEMENT, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_COORDX1);
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -81,10 +82,11 @@ LayerElement::LayerElement()
 }
 
 LayerElement::LayerElement(ClassId classId)
-    : Object(classId, "le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : Object(classId, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_COORDX1);
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -92,10 +94,11 @@ LayerElement::LayerElement(ClassId classId)
 }
 
 LayerElement::LayerElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+    : Object(classId, classIdStr), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    RegisterAttClass(ATT_COORDX1);
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -107,6 +110,7 @@ void LayerElement::Reset()
     Object::Reset();
     FacsimileInterface::Reset();
     LinkingInterface::Reset();
+    ResetCoordX1();
     ResetLabelled();
     ResetTyped();
 
@@ -207,27 +211,24 @@ FTrem *LayerElement::IsInFTrem()
 Beam *LayerElement::IsInBeam()
 {
     if (!this->Is({ CHORD, NOTE, STEM })) return NULL;
-    Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
+    Beam *beamParent = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
     if (beamParent != NULL) {
+        if (!this->IsGraceNote()) return beamParent;
         // This note is beamed and cue-sized - we will be able to get rid of this once MEI has a better modeling for
         // beamed grace notes
-        if (this->IsGraceNote()) {
-            LayerElement *graceNote = this;
-            if (this->Is(STEM)) graceNote = dynamic_cast<LayerElement *>(this->GetFirstAncestor(NOTE, MAX_BEAM_DEPTH));
-            // Make sure the object list is set
-            beamParent->GetList(beamParent);
-            // If the note is part of the beam parent, this means we have a beam of graced notes
-            if (beamParent->GetListIndex(graceNote) > -1) {
-                return beamParent;
-            }
-            // otherwise it is a non-beamed grace note within a beam - return NULL
-            else {
-                return NULL;
-            }
+        LayerElement *graceElement = this;
+        if (this->Is(STEM)) {
+            graceElement = vrv_cast<LayerElement *>(this->GetFirstAncestor(NOTE));
+            if (!graceElement) graceElement = vrv_cast<LayerElement *>(this->GetFirstAncestor(CHORD));
+            assert(graceElement);
         }
-        else {
+        // Make sure the object list is set
+        beamParent->GetList(beamParent);
+        // If the note is part of the beam parent, this means we have a beam of graced notes
+        if (beamParent->GetListIndex(graceElement) > -1) {
             return beamParent;
         }
+        // otherwise it is a non-beamed grace note within a beam - return NULL
     }
     return NULL;
 }

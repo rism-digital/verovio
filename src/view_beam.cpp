@@ -308,10 +308,15 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                         beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_THROUGH;
                     }
                     // not needed for the next one or break
-                    else if (!beamElementCoords->at(idx)->m_element->Is(REST)) {
+                    else {
                         // we are starting a beam or after a beam break - put it right
                         if (start) {
-                            beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_RIGHT;
+                            if ((idx != 0) && (beamElementCoords->at(idx - 1)->m_element->Is(REST))) {
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
+                            }
+                            else {
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_RIGHT;
+                            }
                         }
                         // or the previous one had no partial
                         else if (beamElementCoords->at(noteIndexes.at(i - 1))->m_dur < (char)testDur) {

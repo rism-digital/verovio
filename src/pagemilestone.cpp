@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pageboundary.cpp
+// Name:        pagemilestone.cpp
 // Author:      Laurent Pugin
 // Created:     2021
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "pageboundary.h"
+#include "pagemilestone.h"
 
 //----------------------------------------------------------------------------
 
@@ -22,65 +22,65 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// PageElementEnd
+// PageMilestoneEnd
 //----------------------------------------------------------------------------
 
-PageElementEnd::PageElementEnd(Object *start) : PageElement(PAGE_ELEMENT_END, "page-element-end-")
+PageMilestoneEnd::PageMilestoneEnd(Object *start) : PageElement(PAGE_MILESTONE_END, "page-milestone-end-")
 {
     Reset();
     m_start = start;
     m_startClassName = start->GetClassName();
 }
 
-PageElementEnd::~PageElementEnd() {}
+PageMilestoneEnd::~PageMilestoneEnd() {}
 
-void PageElementEnd::Reset()
+void PageMilestoneEnd::Reset()
 {
     m_start = NULL;
 }
 
 //----------------------------------------------------------------------------
-// PageElementStartInterface
+// PageMilestoneInterface
 //----------------------------------------------------------------------------
 
-PageElementStartInterface::PageElementStartInterface()
+PageMilestoneInterface::PageMilestoneInterface()
 {
     Reset();
 }
 
-PageElementStartInterface::~PageElementStartInterface() {}
+PageMilestoneInterface::~PageMilestoneInterface() {}
 
-void PageElementStartInterface::Reset()
+void PageMilestoneInterface::Reset()
 {
     m_end = NULL;
     // m_drawingMeasure = NULL;
 }
 
-void PageElementStartInterface::SetEnd(PageElementEnd *end)
+void PageMilestoneInterface::SetEnd(PageMilestoneEnd *end)
 {
     assert(!m_end);
     m_end = end;
 }
 
-void PageElementStartInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
+void PageMilestoneInterface::ConvertToPageBasedMilestone(Object *object, Object *parent)
 {
     assert(object);
     assert(parent);
 
-    // Then add a PageElementEnd
-    PageElementEnd *pageElementEnd = new PageElementEnd(object);
-    this->SetEnd(pageElementEnd);
-    parent->AddChild(pageElementEnd);
+    // Then add a PageMilestoneEnd
+    PageMilestoneEnd *pageMilestoneEnd = new PageMilestoneEnd(object);
+    this->SetEnd(pageMilestoneEnd);
+    parent->AddChild(pageMilestoneEnd);
 
     // Also clear the relinquished children
     object->ClearRelinquishedChildren();
 }
 
 //----------------------------------------------------------------------------
-// PageElementEnd functor methods
+// PageMilestoneEnd functor methods
 //----------------------------------------------------------------------------
 
-int PageElementEnd::CastOffSystems(FunctorParams *functorParams)
+int PageMilestoneEnd::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
@@ -91,27 +91,28 @@ int PageElementEnd::CastOffSystems(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int PageElementEnd::CastOffPages(FunctorParams *functorParams)
+int PageMilestoneEnd::CastOffPages(FunctorParams *functorParams)
 {
     CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
     assert(params);
 
     assert(params->m_currentPage);
 
-    PageElementEnd *endBoundary = dynamic_cast<PageElementEnd *>(params->m_contentPage->Relinquish(this->GetIdx()));
-    // End boundaries can be added to the page only if the pending list is empty
+    PageMilestoneEnd *endMilestone
+        = dynamic_cast<PageMilestoneEnd *>(params->m_contentPage->Relinquish(this->GetIdx()));
+    // End milestones can be added to the page only if the pending list is empty
     // Otherwise we are going to mess up the order
     if (params->m_pendingPageElements.empty()) {
-        params->m_currentPage->AddChild(endBoundary);
+        params->m_currentPage->AddChild(endMilestone);
     }
     else {
-        params->m_pendingPageElements.push_back(endBoundary);
+        params->m_pendingPageElements.push_back(endMilestone);
     }
 
     return FUNCTOR_SIBLINGS;
 }
 
-int PageElementEnd::CastOffEncoding(FunctorParams *functorParams)
+int PageMilestoneEnd::CastOffEncoding(FunctorParams *functorParams)
 {
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
@@ -129,7 +130,7 @@ int PageElementEnd::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int PageElementEnd::UnCastOff(FunctorParams *functorParams)
+int PageMilestoneEnd::UnCastOff(FunctorParams *functorParams)
 {
     UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
     assert(params);

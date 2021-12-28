@@ -220,7 +220,11 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         assert(harm);
         // harm above by default
         m_place = (harm->GetPlace() != STAFFREL_NONE) ? harm->GetPlace() : STAFFREL_above;
-        if ((harm->GetPlace() == STAFFREL_NONE) && object->GetFirst()->Is(FB)) m_place = STAFFREL_below;
+        // fb below by default
+        if (harm->GetPlace() == STAFFREL_NONE) {
+            Object *firstChild = harm->GetFirst();
+            if (firstChild && firstChild->Is(FB)) m_place = STAFFREL_below;
+        }
     }
     else if (object->Is(MORDENT)) {
         Mordent *mordent = vrv_cast<Mordent *>(object);

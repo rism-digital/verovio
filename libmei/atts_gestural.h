@@ -196,20 +196,53 @@ private:
     int m_dotsGes;
     /** Duration as a count of units provided in the time signature denominator. **/
     double m_durMetrical;
-    /**
-     * Duration recorded as pulses-per-quarter note, e.g.
-     * MIDI clicks or MusicXML divisions.
-     **/
+    /** Duration recorded as pulses-per-quarter note, **/
     int m_durPpq;
-    /**
-     * Duration in seconds, e.g.
-     * '1.732'.
-     **/
+    /** Duration in seconds, **/
     double m_durReal;
     /** Duration as an optionally dotted Humdrum *recip value. **/
     std::string m_durRecip;
 
     /* include <attdur.recip> */
+};
+
+//----------------------------------------------------------------------------
+// AttMdivGes
+//----------------------------------------------------------------------------
+
+class AttMdivGes : public Att {
+public:
+    AttMdivGes();
+    virtual ~AttMdivGes();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMdivGes();
+
+    /** Read the values for the attribute class **/
+    bool ReadMdivGes(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMdivGes(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAttacca(data_BOOLEAN attacca_) { m_attacca = attacca_; }
+    data_BOOLEAN GetAttacca() const { return m_attacca; }
+    bool HasAttacca() const;
+    ///@}
+
+private:
+    /**
+     * Indicates that the performance of the next musical division should begin
+     * immediately following this one.
+     **/
+    data_BOOLEAN m_attacca;
+
+    /* include <attattacca> */
 };
 
 //----------------------------------------------------------------------------
@@ -354,7 +387,7 @@ public:
 private:
     /** Holds the pitch name of a tuning reference pitch. **/
     data_PITCHNAME m_tunePname;
-    /** Holds a value for cycles per second, i.e., Hertz, for a tuning reference pitch. **/
+    /** Holds a value for cycles per second, **/
     double m_tuneHz;
     /** Provides an indication of the tuning system, 'just', for example. **/
     data_TEMPERAMENT m_tuneTemper;
@@ -393,8 +426,8 @@ public:
 
 private:
     /**
-     * Indicates that the performance of the next section should begin immediately
-     * following this one.
+     * Indicates that the performance of the next musical division should begin
+     * immediately following this one.
      **/
     data_BOOLEAN m_attacca;
 
@@ -477,10 +510,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Encodes the onset time in terms of musical time, i.e., beats[.fractional beat
-     * part], as expressed in the written time signature.
-     **/
+    /** Encodes the onset time in terms of musical time, **/
     double m_tstampGes;
     /** Records the onset time in terms of ISO time. **/
     std::string m_tstampReal;
@@ -522,10 +552,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Encodes the ending point of an event, i.e., a count of measures plus a beat
-     * location in the ending measure.
-     **/
+    /** Encodes the ending point of an event, **/
     data_MEASUREBEAT m_tstamp2Ges;
     /** Records the ending point of an event in terms of ISO time. **/
     std::string m_tstamp2Real;

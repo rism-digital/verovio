@@ -20,7 +20,7 @@ class MidiFile;
 namespace vrv {
 
 class Artic;
-class SystemElementStartInterface;
+class SystemMilestoneInterface;
 class Chord;
 class ClassIdComparison;
 class Clef;
@@ -1367,12 +1367,18 @@ public:
 
 /**
  * member 0: an array of all matching objects
+ * member 1: a flag indicating if milestone references should be included as well
  **/
 
 class FindAllReferencedObjectsParams : public FunctorParams {
 public:
-    FindAllReferencedObjectsParams(ListOfObjects *elements) { m_elements = elements; }
+    FindAllReferencedObjectsParams(ListOfObjects *elements)
+    {
+        m_elements = elements;
+        m_milestoneReferences = false;
+    }
     ListOfObjects *m_elements;
+    bool m_milestoneReferences;
 };
 
 //----------------------------------------------------------------------------
@@ -1796,27 +1802,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareBoundariesParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the last measure
- * member 1: the current boundary
- **/
-
-class PrepareBoundariesParams : public FunctorParams {
-public:
-    PrepareBoundariesParams()
-    {
-        m_lastMeasure = NULL;
-        m_currentEnding = NULL;
-    }
-    Measure *m_lastMeasure;
-    Ending *m_currentEnding;
-    std::vector<SystemElementStartInterface *> m_startBoundaries;
-};
-
-//----------------------------------------------------------------------------
 // PrepareDelayedTurnsParams
 //----------------------------------------------------------------------------
 
@@ -1942,6 +1927,27 @@ public:
     MapOfLinkingInterfaceUuidPairs m_nextUuidPairs;
     MapOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
     bool m_fillList;
+};
+
+//----------------------------------------------------------------------------
+// PrepareMilestonesParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the last measure
+ * member 1: the current milestone
+ **/
+
+class PrepareMilestonesParams : public FunctorParams {
+public:
+    PrepareMilestonesParams()
+    {
+        m_lastMeasure = NULL;
+        m_currentEnding = NULL;
+    }
+    Measure *m_lastMeasure;
+    Ending *m_currentEnding;
+    std::vector<SystemMilestoneInterface *> m_startMilestones;
 };
 
 //----------------------------------------------------------------------------

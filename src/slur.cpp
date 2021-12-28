@@ -994,7 +994,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             else if (isGraceToNoteSlur) {
-                if (start->IsInBeam()) {
+                if (end->IsInBeam()) {
                     x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
                 else if (parentBeam || parentFTrem) {
@@ -1051,7 +1051,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             else if (isGraceToNoteSlur) {
-                if (start->IsInBeam()) {
+                if (end->IsInBeam()) {
                     x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
                 else if (parentBeam || parentFTrem) {
@@ -1065,8 +1065,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     }
                 }
                 else {
-                    y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-                    x2 -= endRadius;
+                    x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
             }
             // portato slurs

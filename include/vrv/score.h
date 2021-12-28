@@ -10,8 +10,8 @@
 
 #include "atts_shared.h"
 #include "options.h"
-#include "pageboundary.h"
 #include "pageelement.h"
+#include "pagemilestone.h"
 #include "scoredef.h"
 
 namespace vrv {
@@ -25,7 +25,7 @@ namespace vrv {
  * It is used only for loading score-based MEI documents before they are
  * converted to page-based MEI.
  */
-class Score : public PageElement, public PageElementStartInterface, public AttLabelled, public AttNNumberLike {
+class Score : public PageElement, public PageMilestoneInterface, public AttLabelled, public AttNNumberLike {
 
 public:
     /**

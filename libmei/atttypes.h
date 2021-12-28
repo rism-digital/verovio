@@ -526,6 +526,7 @@ enum data_COURSETUNING {
     COURSETUNING_guitar_open_A,
     COURSETUNING_lute_renaissance_6,
     COURSETUNING_lute_baroque_d_major,
+    COURSETUNING_lute_baroque_d_minor,
     COURSETUNING_MAX
 };
 

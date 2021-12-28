@@ -1,8 +1,14 @@
 # Changelog
 
 ## [unreleased]
+
+## [3.8.0] - 2021-12-22
+* Support for figured-bass extenders on `f` without `@tstamp` or `@startid` 
+* Improved page-based MEI output with validation with a customized MEI Schema
 * Improved layout with beams and control events (ornaments, fingering, etc.) (@eNote-GmBH)
 * Improve enharmonic tie overlap with accidentals (@eNote-GmBH)
+* Improved Plaine and Easie validation output with error codes and values
+* Additional parameters to the getMEI method for exporting selected content (@eNote-GmBH)
 * Option --multi-rest-thickness to control the thickness of measure rests (@eNote-GmBH)
 
 ## [3.7.0] - 2021-11-22
