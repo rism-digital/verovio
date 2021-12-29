@@ -270,6 +270,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     if ((m_doc->GetType() == Facs) && (accid->HasFacs())){
         x = accid->GetDrawingX();
         y = ToLogicalY(staff->GetDrawingY());
+        // y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
     }
     else{
         x = element->GetDrawingX();
@@ -278,18 +279,18 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // if ((accid->GetFunc() == accidLog_FUNC_edit) && (!accid->HasEnclose())) {
-    //     //y = staff->GetDrawingY();
-    //     // look at the note position and adjust it if necessary
-    //     // Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
-    //     // if (note) {
-    //     //     // Check if the note is on the top line or above (add a unit for the note head half size)
-    //     //     if (note->GetDrawingY() >= y) y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    //     //     // Check if the top of the stem is above
-    //     //     if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y))
-    //     //         y = note->GetDrawingStemEnd(note).y;
-    //     //     // Increase the x position of the accid
-    //     //     x += note->GetDrawingRadius(m_doc);
-    //     // }
+    //     y = staff->GetDrawingY();
+    //     look at the note position and adjust it if necessary
+    //     Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
+    //     if (note) {
+    //         // Check if the note is on the top line or above (add a unit for the note head half size)
+    //         if (note->GetDrawingY() >= y) y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    //         // Check if the top of the stem is above
+    //         if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y))
+    //             y = note->GetDrawingStemEnd(note).y;
+    //         // Increase the x position of the accid
+    //         x += note->GetDrawingRadius(m_doc);
+    //     }
     //     TextExtend extend;
     //     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->GetDrawingCueSize()));
     //     dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
@@ -313,17 +314,6 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     y -= rotateOffset;
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
-
-    if ((m_doc->GetType() == Facs) && element->HasFacs()) {
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
-        fi->GetZone()->SetUlx(x);
-        fi->GetZone()->SetUly(y);
-        fi->GetZone()->SetLrx(x + noteWidth);
-        fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
-    }
 
     dc->EndGraphic(element, this);
 }
@@ -930,24 +920,7 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
-    if ((m_doc->GetType() == Facs) && element->HasFacs()) {
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
-        fi->GetZone()->SetUlx(x);
-        fi->GetZone()->SetUly(y);
-        fi->GetZone()->SetLrx(x + noteWidth);
-        fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
-    }
-
     dc->EndGraphic(element, this);
-    // std::wstring divLineStr = divLine->GetSymbolStr();
-    // // int y = staff->GetDrawingY();
-    // // DrawSmuflCode(dc, x, y, SMUFL_E8F5_chantDivisioMaxima, staff->m_drawingStaffSize, divLine->GetDrawingCueSize());   dc, y, y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), divLine);
-    // DrawSmuflString(dc, x, y, divLineStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, divLine->GetDrawingCueSize(), true);
-
-    // dc->EndGraphic(element, this);
 }
 
 void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
