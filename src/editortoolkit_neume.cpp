@@ -569,15 +569,18 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             return false;
         }
         FacsimileInterface *fi = (*accid).GetFacsimileInterface();
-        assert(fi);
+        assert(fi);       
         if (fi->GetZone() != NULL) {
-            fi->GetZone()->ShiftByXY(x, -y);
+            Zone *zone = fi->GetZone();
+            assert(zone);
+            zone->ShiftByXY(x, -y);
         }
+        ChangeStaff(elementId);
     }
     else if (element->Is(DIVLINE)) {
         DivLine *divLine = dynamic_cast<DivLine *>(element);
         if (!divLine->HasFacs()) {
-            LogError("Divline dragging is only supported for divLine with facsimiles!");
+            LogError("DivLine dragging is only supported for divLine with facsimiles!");
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "DivLine dragging is only supported for divLine with facsimiles.");
             return false;
@@ -585,8 +588,11 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         FacsimileInterface *fi = (*divLine).GetFacsimileInterface();
         assert(fi);
         if (fi->GetZone() != NULL) {
-            fi->GetZone()->ShiftByXY(x, -y);
+            Zone *zone = fi->GetZone();
+            assert(zone);
+            zone->ShiftByXY(x, -y);
         }
+        ChangeStaff(elementId);
     }
     else {
         LogWarning("Unsupported element for dragging.");
@@ -2566,7 +2572,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message",
             "Element is of type " + element->GetClassName()
-                + ", but only Syllables, Custos, Clefs, Divlines, and Accids can change staves.");
+                + ", but only Syllables, Custos, Clefs, DivLines, and Accids can change staves.");
         return false;
     }
 
@@ -2594,7 +2600,6 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         comp.x = (lrx + ulx) / 2;
         comp.y = (uly + lry) / 2;
     }
-
     else {
         LogError("This element does not have a facsimile.");
         m_infoObject.import("status", "FAILURE");
@@ -2603,7 +2608,8 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     }
 
     Staff *staff = NULL;
-
+    
+    // find the nearest staff line
     if (staves.size() > 0) {
         std::sort(staves.begin(), staves.end(), comp);
         staff = dynamic_cast<Staff *>(staves.front());
@@ -2701,19 +2707,20 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
             pi->AdjustPitchForNewClef(previousClefAfter, clef);
         }
     }
-    // custos or syllable or accid
     else {
         element->MoveItselfTo(layer);
         layer->ReorderByXPos();
         parent->ClearRelinquishedChildren();
         parent->ReorderByXPos();
-        if (!AdjustPitchFromPosition(element)) {
-            LogError("Could not adjust pitch of %s", element->GetUuid().c_str());
-            m_infoObject.import("status", "FAILURE");
-            m_infoObject.import("message", "Failed to properly set pitch.");
-            m_infoObject.import("elementId", element->GetUuid());
-            m_infoObject.import("newStaffId", staff->GetUuid());
-            return false;
+        if (!(element->Is(ACCID) || element->Is(DIVLINE))){
+            if (!AdjustPitchFromPosition(element)) {
+                        LogError("Could not adjust pitch of %s", element->GetUuid().c_str());
+                        m_infoObject.import("status", "FAILURE");
+                        m_infoObject.import("message", "Failed to properly set pitch.");
+                        m_infoObject.import("elementId", element->GetUuid());
+                        m_infoObject.import("newStaffId", staff->GetUuid());
+                        return false;
+                    }
         }
     }
 
