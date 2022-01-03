@@ -4295,7 +4295,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
     }
 
     // Just in case
-    altNumber = std::min(6, altNumber);
+    altNumber = std::min(7, altNumber);
 
     if (alterationType != ACCIDENTAL_WRITTEN_NONE) {
         if (hasEnclosed == true) {
