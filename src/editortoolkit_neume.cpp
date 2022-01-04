@@ -1766,6 +1766,16 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         elements.insert(el);
     }
 
+    auto it = elementIds.begin();
+    Object *el = m_doc->GetDrawingPage()->FindDescendantByUuid(*it);
+    Layer *layer = dynamic_cast<Layer *>(el->GetFirstAncestor(LAYER));
+    if (!layer) {
+        LogError("Elements does not have Layer parent. This should not happen.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Elements does not have Layer parent.");
+        return false;
+    }
+
     std::copy(elements.begin(), elements.end(), std::back_inserter(sortedElements));
     std::stable_sort(sortedElements.begin(), sortedElements.end(), Object::sortByUlx);
 
@@ -2064,6 +2074,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             doubleParent->DeleteChild(obj);
         }
     }
+
+    layer->ReorderByXPos();
 
     m_infoObject.import("uuid", parent->GetUuid());
     m_infoObject.import("status", status);

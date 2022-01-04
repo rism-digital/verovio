@@ -1719,7 +1719,12 @@ bool Object::sortByUlx(Object *a, Object *b)
         return false;
     }
 
-    return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
+    if (std::abs(fa->GetZone()->GetUlx() - fb->GetZone()->GetUlx()) > 5) {
+        return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
+    } 
+    else {
+        return (fa->GetZone()->GetUly() > fb->GetZone()->GetUly());
+    }   
 }
 
 int Object::ReorderByXPos(FunctorParams *functorParams)
