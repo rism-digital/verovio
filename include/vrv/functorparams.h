@@ -1848,6 +1848,28 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// PrepareDurationParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current scoredef default duration
+ * member 1: the current staffdef default durations
+ * member 2: the functor for redirection
+ **/
+
+class PrepareDurationParams : public FunctorParams {
+public:
+    PrepareDurationParams(Functor *functor)
+    {
+        m_durDefault = DURATION_NONE;
+        m_functor = functor;
+    }
+    data_DURATION m_durDefault;
+    std::map<int, data_DURATION> m_durDefaultForStaffN;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
 // PrepareFacsimileParams
 //----------------------------------------------------------------------------
 
