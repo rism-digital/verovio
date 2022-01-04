@@ -691,7 +691,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
                 // find separator or use end() if there is no separator
                 const auto separator = std::find_if(iter, metronomeElements.end(),
                     [](const auto pair) { return pair.first == MetronomeElements::SEPARATOR; });
-                const short int dotCount = (int)std::count_if(
+                const short int dotCount = (short int)std::count_if(
                     iter, separator, [](const auto pair) { return pair.first == MetronomeElements::BEAT_UNIT_DOT; });
                 for (short int i = 0; i < dotCount; i++) {
                     verovioText += L"\xE1E7"; // SMUFL augmentation dot
@@ -1201,7 +1201,8 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     app.append_attribute("version").set_value(GetVersion().c_str());
 }
 
-int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, StaffGrp *staffGrp, short int staffOffset)
+short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
+    pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset)
 {
     assert(node);
     assert(staffGrp);
@@ -1471,7 +1472,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
 }
 
 bool MusicXmlInput::ReadMusicXmlMeasure(
-    pugi::xml_node node, Section *section, Measure *measure, short int nbStaves, short int staffOffset, int index)
+    pugi::xml_node node, Section *section, Measure *measure, short int nbStaves, const short int staffOffset, int index)
 {
     assert(node);
     assert(measure);

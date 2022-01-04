@@ -64,7 +64,7 @@ namespace musicxml {
 
     class OpenSlur {
     public:
-        OpenSlur(const std::string &measureNum, const short int &number)
+        OpenSlur(const std::string &measureNum, short int number)
         {
             m_measureNum = measureNum;
             m_number = number;
@@ -76,7 +76,7 @@ namespace musicxml {
 
     class CloseSlur {
     public:
-        CloseSlur(const std::string &measureNum, const short int &number)
+        CloseSlur(const std::string &measureNum, short int number)
         {
             m_measureNum = measureNum;
             m_number = number;
@@ -200,7 +200,8 @@ private:
      * Methods for reading the first MusicXML attributes element as MEI staffDef.
      * Returns the number of staves in the part.
      */
-    int ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset);
+    short int ReadMusicXmlPartAttributesAsStaffDef(
+        pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset);
 
     /*
      * @name Methods for reading the content of a MusicXML measure.
