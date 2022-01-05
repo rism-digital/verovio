@@ -69,6 +69,7 @@ void DurationInterface::Reset()
 double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase)
 {
     int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
+    if (noteDur == DUR_NONE) noteDur = DUR_4;
 
     if (this->HasNum()) num *= this->GetNum();
     if (this->HasNumbase()) numBase *= this->GetNumbase();
@@ -86,6 +87,7 @@ double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase)
 double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numBase, Mensur *currentMensur)
 {
     int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
+    if (noteDur == DUR_NONE) noteDur = DUR_4;
 
     if (!currentMensur) {
         LogWarning("No current mensur for calculating duration");
@@ -190,7 +192,7 @@ int DurationInterface::GetActualDurGes() const
 
 int DurationInterface::CalcActualDur(data_DURATION dur) const
 {
-    if (dur == DURATION_NONE) return dur;
+    if (dur == DURATION_NONE) return DUR_NONE;
     // maxima (-1) is a mensural only value
     if (dur == DURATION_maxima) return DUR_MX;
     return (dur & DUR_MENSURAL_MASK);
