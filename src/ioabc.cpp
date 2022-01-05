@@ -146,7 +146,7 @@ void ABCInput::parseABC(std::istream &infile)
         // create score
         assert(m_mdiv != NULL);
         Score *score = new Score();
-        if (!m_doc->GetCurrentScoreDef()->GetFirst(STAFFGRP)) {
+        if (!m_doc->HasCurrentScore() || !m_doc->GetCurrentScoreDef()->GetFirst(STAFFGRP)) {
             m_mdiv->AddChild(score);
 
             // create page head
@@ -185,6 +185,7 @@ void ABCInput::parseABC(std::istream &infile)
         if (m_durDefault == DURATION_NONE) {
             CalcUnitNoteLength();
         }
+        m_doc->GetCurrentScoreDef()->SetDurDefault(m_durDefault);
 
         // read music code
         m_layer = new Layer();
@@ -295,12 +296,10 @@ void ABCInput::CalcUnitNoteLength()
     if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetTotalCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
-        // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
     }
     else {
         m_unitDur = 16;
         m_durDefault = DURATION_16;
-        // m_doc->m_scoreDef.SetDurDefault(DURATION_16);
     }
 }
 
@@ -744,7 +743,6 @@ void ABCInput::parseUnitNoteLength(const std::string &unitNoteLength)
         case 256: m_durDefault = DURATION_256; break;
         default: break;
     }
-    // m_doc->m_scoreDef.SetDurDefault(m_durDefault);
 }
 
 void ABCInput::parseMeter(const std::string &meterString)

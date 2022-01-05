@@ -408,6 +408,7 @@ public:
     Score *GetCurrentScore();
     ScoreDef *GetCurrentScoreDef();
     void SetCurrentScore(Score *score);
+    bool HasCurrentScore() const { return m_currentScore != NULL; }
     ///@}
 
     //----------//
