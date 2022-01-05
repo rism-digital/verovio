@@ -98,30 +98,59 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         int pitchDifference = 0;
         bool isFirst;
         // Check if this is the first or second part of a ligature
-        Object *nextSibling = neume->GetChild(position + 1);
-        if (nextSibling != NULL) {
-            Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
-            assert(nextNc);
-            if (nextNc->GetLigated() == BOOLEAN_true) { // first part of the ligature
-                isFirst = true;
-                pitchDifference = nextNc->PitchDifferenceTo(nc);
-                params.at(0).yOffset = pitchDifference;
-            }
-            else {
-                isFirst = false;
+        // Object *nextSibling = neume->GetChild(position + 1);
+        // if (nextSibling != NULL) {
+        //     Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
+        //     assert(nextNc);
+        //     if (nextNc->GetLigated() == BOOLEAN_true) { // first part of the ligature
+        //         isFirst = true;
+        //         pitchDifference = nextNc->PitchDifferenceTo(nc);
+        //         params.at(0).yOffset = pitchDifference;
+        //     }
+        //     else {
+        //         isFirst = false;
+        //     }
+        // }
+        // else {
+        //     isFirst = false;
+        // }
+        int ligCount = 0;
+        for (int pos = 0; pos <= position; pos++) {
+            Object *posObj = neume->GetChild(pos);
+            if (posObj != NULL) {
+                Nc *posNc = dynamic_cast<Nc *>(posObj);
+                assert(posNc);
+                if (posNc->GetLigated() == BOOLEAN_true) { // first part of the ligature
+                    ligCount += 1;
+                }
             }
         }
-        else {
+        if (ligCount % 2 == 0){
             isFirst = false;
-        }
-
-        if (!isFirst) { // still need to get pitchDifference
             Nc *lastnc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
             assert(lastnc);
             pitchDifference = nc->PitchDifferenceTo(lastnc);
             params.at(0).xOffset = -1;
             params.at(0).yOffset = -pitchDifference;
         }
+        else {
+            isFirst = true;
+            Object *nextSibling = neume->GetChild(position + 1);
+            if (nextSibling != NULL) {
+                Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
+                assert(nextNc);     
+                pitchDifference = nextNc->PitchDifferenceTo(nc);
+                params.at(0).yOffset = pitchDifference;    
+            }   
+        }
+
+        // if (!isFirst) { // still need to get pitchDifference
+        //     Nc *lastnc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
+        //     assert(lastnc);
+        //     pitchDifference = nc->PitchDifferenceTo(lastnc);
+        //     params.at(0).xOffset = -1;
+        //     params.at(0).yOffset = -pitchDifference;
+        // }
 
         // set the glyph
         switch (pitchDifference) {
