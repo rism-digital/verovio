@@ -74,6 +74,22 @@ int Neume::GetPosition(LayerElement *element)
     return position;
 }
 
+int Neume::GetLigatureCount(int position) {
+    int ligCount = 0;
+    this->GetList(this);
+    for (int pos = 0; pos <= position; pos++) {
+            Object *posObj = this->GetChild(pos);
+            if (posObj != NULL) {
+                Nc *posNc = dynamic_cast<Nc *>(posObj);
+                assert(posNc);
+                if (posNc->GetLigated() == BOOLEAN_true) { // first part of the ligature
+                    ligCount += 1;
+                }
+            }
+    }
+    return ligCount;
+}
+
 bool Neume::IsLastInNeume(LayerElement *element)
 {
     int size = (int)this->GetList(this)->size();

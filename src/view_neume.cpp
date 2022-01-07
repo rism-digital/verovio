@@ -114,22 +114,13 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         // else {
         //     isFirst = false;
         // }
-        int ligCount = 0;
-        for (int pos = 0; pos <= position; pos++) {
-            Object *posObj = neume->GetChild(pos);
-            if (posObj != NULL) {
-                Nc *posNc = dynamic_cast<Nc *>(posObj);
-                assert(posNc);
-                if (posNc->GetLigated() == BOOLEAN_true) { // first part of the ligature
-                    ligCount += 1;
-                }
-            }
-        }
+        int ligCount = neume->GetLigatureCount(position);
+        
         if (ligCount % 2 == 0){
             isFirst = false;
-            Nc *lastnc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
-            assert(lastnc);
-            pitchDifference = nc->PitchDifferenceTo(lastnc);
+            Nc *lastNc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
+            assert(lastNc);
+            pitchDifference = nc->PitchDifferenceTo(lastNc);
             params.at(0).xOffset = -1;
             params.at(0).yOffset = -pitchDifference;
         }

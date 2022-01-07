@@ -79,6 +79,7 @@ public:
     virtual bool IsSupportedChild(Object *object);
 
     virtual int GetPosition(LayerElement *element);
+    virtual int GetLigatureCount(int position);
     virtual bool IsLastInNeume(LayerElement *element);
 
     bool GenerateChildMelodic();
