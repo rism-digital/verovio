@@ -1700,7 +1700,7 @@ bool Object::sortByUlx(Object *a, Object *b)
     if (a->Is(NC) && b->Is(NC)) {
         Nc *nca = dynamic_cast<Nc *>(a);
         Nc *ncb = dynamic_cast<Nc *>(b);
-        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())) {
+        if (nca->HasLigated() && ncb->HasLigated() && nca->GetLigated() == BOOLEAN_true && ncb->GetLigated() == BOOLEAN_true && (a->GetParent() == b->GetParent())) {
             Object *parent = a->GetParent();
             assert(parent);
             Neume *neume = dynamic_cast<Neume *>(parent);
