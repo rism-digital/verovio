@@ -8,7 +8,6 @@
 * Improved layout with beams and control events (ornaments, fingering, etc.) (@eNote-GmBH)
 * Improve enharmonic tie overlap with accidentals (@eNote-GmBH)
 * Improved Plaine and Easie validation output with error codes and values
-* Improved adjacent note tie and enharmonic tie overlap (eNote-GmBH)
 * Additional parameters to the getMEI method for exporting selected content (@eNote-GmBH)
 * Option --multi-rest-thickness to control the thickness of measure rests (@eNote-GmBH)
 
