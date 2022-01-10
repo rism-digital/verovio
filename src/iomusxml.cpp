@@ -2557,7 +2557,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 element = mRest;
                 if (cue) mRest->SetCue(BOOLEAN_true);
                 if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
-                if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
+                if (!octaveStr.empty()) mRest->SetOloc(std::stoi(octaveStr));
                 if (!noteID.empty()) {
                     mRest->SetUuid(noteID);
                 }
@@ -2573,7 +2573,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (dots > 0) rest->SetDots(dots);
             if (cue) rest->SetCue(BOOLEAN_true);
             if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
-            if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
+            if (!octaveStr.empty()) rest->SetOloc(std::stoi(octaveStr));
             if (!noteID.empty()) {
                 rest->SetUuid(noteID);
             }
@@ -3075,7 +3075,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             short int extNumber = xmlGlissando.attribute("number").as_int();
             std::vector<Gliss *>::iterator iter = m_glissStack.begin();
             while (iter != m_glissStack.end()) {
-                if ((atoi(((*iter)->GetN()).c_str()) == extNumber) && ((*iter)->GetType() == xmlGlissando.name())) {
+                if ((std::stoi((*iter)->GetN()) == extNumber) && ((*iter)->GetType() == xmlGlissando.name())) {
                     (*iter)->SetEndid(noteID);
                     iter = m_glissStack.erase(iter);
                 }
@@ -3190,7 +3190,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         std::vector<std::pair<Trill *, musicxml::OpenSpanner>>::iterator iter = m_trillStack.begin();
         while (iter != m_trillStack.end()) {
             const int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
-            if (atoi(((iter->first)->GetN()).c_str()) == extNumber) {
+            if (std::stoi((iter->first)->GetN()) == extNumber) {
                 (iter->first)
                     ->SetTstamp2(std::pair<int, double>(
                         measureDifference, (double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1));
