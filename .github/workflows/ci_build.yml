@@ -45,6 +45,7 @@ env:
   # emscripten
   EM_VERSION: latest
   EM_CACHE_FOLDER: "emsdk-cache"
+  EM_CACHE_ID: 1
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works from rism-digital and from forks
@@ -226,7 +227,7 @@ jobs:
           # path for cache
           path: ${{ env.EM_CACHE_FOLDER }}
           # key for cache
-          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}-${{ env.EM_CACHE_ID }}
 
       - name: Set up emsdk
         uses: mymindstorm/setup-emsdk@v11
@@ -282,7 +283,7 @@ jobs:
           # path for cache
           path: ${{ env.EM_CACHE_FOLDER }}
           # key for cache
-          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}
+          key: ${{ runner.os }}-emsdk-${{ env.EM_VERSION }}-${{ env.EM_CACHE_ID }}
 
       # Install and/or activate emsdk
       - name: Set up emsdk
