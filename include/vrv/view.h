@@ -602,6 +602,12 @@ private:
     void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,
         Staff *staff, Measure *measure);
 
+    /**
+     * Internal method for drawing a BeamSegment in a tablature
+     */
+    void DrawTabBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,
+        Staff *staff, Measure *measure);
+
 public:
     /** Document */
     Doc *m_doc;

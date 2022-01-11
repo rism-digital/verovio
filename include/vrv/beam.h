@@ -44,7 +44,7 @@ public:
     void Reset();
 
     void CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface,
-        data_BEAMPLACE place = BEAMPLACE_NONE, bool init = true);
+        data_BEAMPLACE place = BEAMPLACE_NONE, bool init = true, bool isTabBeam = false);
 
     /**
      *
@@ -79,7 +79,8 @@ private:
     // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)
     void AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
 
-    void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
+    void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place,
+        bool isTabBeam);
 
     bool CalcBeamSlope(
         Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step);
@@ -166,6 +167,12 @@ public:
      *
      */
     const ArrayOfBeamElementCoords *GetElementCoords();
+
+    /**
+     * Return true if the beam has a tabGrp child.
+     * In that case, the ObjectList will only have tabGrp elements. See Beam::FilterList
+     */
+    bool IsTabBeam();
 
     //----------//
     // Functors //

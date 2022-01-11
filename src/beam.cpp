@@ -28,6 +28,7 @@
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
+#include "tabgrp.h"
 #include "tuplet.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -80,8 +81,8 @@ void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoord
     m_beamElementCoordRefs = *beamElementCoords;
 }
 
-void BeamSegment::CalcBeam(
-    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool init)
+void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface,
+    data_BEAMPLACE place, bool init, bool isTabBeam)
 {
     assert(layer);
     assert(staff);
@@ -92,8 +93,10 @@ void BeamSegment::CalcBeam(
 
     // For recursive calls, avoid to re-init values
     if (init) {
-        this->CalcBeamInit(layer, staff, doc, beamInterface, place);
+        this->CalcBeamInit(layer, staff, doc, beamInterface, place, isTabBeam);
     }
+
+    if (isTabBeam) return;
 
     bool horizontal = beamInterface->IsHorizontal();
 
@@ -112,7 +115,7 @@ void BeamSegment::CalcBeam(
     CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         if (!beamInterface->m_crossStaffContent && NeedToResetPosition(staff, doc, beamInterface)) {
-            CalcBeamInit(layer, staff, doc, beamInterface, place);
+            CalcBeamInit(layer, staff, doc, beamInterface, place, false);
             CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
             CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
         }
@@ -320,7 +323,7 @@ void BeamSegment::AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInt
 }
 
 void BeamSegment::CalcBeamInit(
-    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
+    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool isTabBeam)
 {
     assert(layer);
     assert(staff);
@@ -373,6 +376,8 @@ void BeamSegment::CalcBeamInit(
     // somebody might want to have a beam with only rest of space elements...
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
+
+    if (isTabBeam) return;
 
     int yMax = m_verticalCenter;
     int yMin = m_verticalCenter;
@@ -1197,6 +1202,8 @@ void Beam::FilterList(ArrayOfObjects *childList)
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
     ArrayOfObjects::iterator iter = childList->begin();
 
+    const bool isTabBeam = this->IsTabBeam();
+
     while (iter != childList->end()) {
         if (!(*iter)->IsLayerElement()) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
@@ -1206,6 +1213,15 @@ void Beam::FilterList(ArrayOfObjects *childList)
         if (!(*iter)->HasInterface(INTERFACE_DURATION)) {
             // remove anything that has not a DurationInterface
             iter = childList->erase(iter);
+            continue;
+        }
+        else if (isTabBeam) {
+            if (!(*iter)->Is(TABGRP)) {
+                iter = childList->erase(iter);
+            }
+            else {
+                ++iter;
+            }
             continue;
         }
         else {
@@ -1276,6 +1292,11 @@ const ArrayOfBeamElementCoords *Beam::GetElementCoords()
 {
     this->GetList(this);
     return &m_beamElementCoords;
+}
+
+bool Beam::IsTabBeam()
+{
+    return (this->FindDescendantByType(TABGRP));
 }
 
 //----------------------------------------------------------------------------
@@ -1516,7 +1537,8 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
     AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
     assert(params);
 
-    if (this->HasSameas() || !this->GetChildCount() || m_beamSegment.m_beamElementCoordRefs.empty()) {
+    if (this->IsTabBeam() || this->HasSameas() || !this->GetChildCount()
+        || m_beamSegment.m_beamElementCoordRefs.empty()) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -1553,6 +1575,8 @@ int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
     AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
     assert(params);
 
+    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
+
     if (params->m_beam != this) return FUNCTOR_CONTINUE;
 
     if (m_drawingPlace == BEAMPLACE_mixed) return FUNCTOR_CONTINUE;
@@ -1587,6 +1611,8 @@ int Beam::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
+
+    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
 
     const ArrayOfObjects *beamChildren = this->GetList(this);
 

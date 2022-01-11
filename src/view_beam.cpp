@@ -41,6 +41,8 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Beam *beam = dynamic_cast<Beam *>(element);
     assert(beam);
 
+    const bool isTabBeam = beam->IsTabBeam();
+
     /******************************************************************/
     // initialization
 
@@ -56,7 +58,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // Calculate the beam slope and position
 
-    beam->m_beamSegment.CalcBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace());
+    beam->m_beamSegment.CalcBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace(), true, isTabBeam);
 
     /******************************************************************/
     // Start the Beam graphic and draw the children
@@ -71,7 +73,12 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // Draw the beamSegment
 
-    DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
+    if (isTabBeam) {
+        DrawTabBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
+    }
+    else {
+        DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
+    }
 
     dc->EndGraphic(element, this);
 }
