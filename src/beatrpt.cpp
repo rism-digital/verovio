@@ -34,8 +34,9 @@ namespace vrv {
 
 static const ClassRegistrar<BeatRpt> s_factory("beatRpt", BEATRPT);
 
-BeatRpt::BeatRpt() : LayerElement(BEATRPT, "beatrpt-"), AttColor(), AttBeatRptVis()
+BeatRpt::BeatRpt() : LayerElement(BEATRPT, "beatrpt-"), AttColor(), AttBeatRptLog(), AttBeatRptVis()
 {
+    RegisterAttClass(ATT_BEATRPTLOG);
     RegisterAttClass(ATT_BEATRPTVIS);
     RegisterAttClass(ATT_COLOR);
     Reset();
@@ -46,6 +47,7 @@ BeatRpt::~BeatRpt() {}
 void BeatRpt::Reset()
 {
     LayerElement::Reset();
+    ResetBeatRptLog();
     ResetBeatRptVis();
     ResetColor();
 
@@ -54,7 +56,9 @@ void BeatRpt::Reset()
 
 double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit) const
 {
-    return DUR_MAX / meterUnit;
+    double dur = DUR_MAX / meterUnit;
+    if (this->HasBeatdef()) dur *= this->GetBeatdef();
+    return dur;
 }
 
 void BeatRpt::SetScoreTimeOnset(double scoreTime)

@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `beatRpt@beatdef`
 
 ## [3.8.1] - 2022-01-10
 * Fix bug in PAE importer for durations and for key signatures
