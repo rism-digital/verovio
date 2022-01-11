@@ -2778,14 +2778,16 @@ void MusicXmlInput::ReadMusicXmlNote(
             // verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
-            for (pugi::xml_node textNode : lyric.children("text")) {
-                if (!HasAttributeWithValue(lyric, "print-object", "no")) {
+            std::string syllabic = "single";
+            for (pugi::xml_node childNode : lyric.children()) {
+                if (!strcmp(childNode.name(), "syllabic")) syllabic = GetContent(childNode);
+                if (!strcmp(childNode.name(), "text") && !HasAttributeWithValue(lyric, "print-object", "no")) {
                     // const std::string textColor = textNode.attribute("color").as_string();
-                    const std::string textStyle = textNode.attribute("font-style").as_string();
-                    const std::string textWeight = textNode.attribute("font-weight").as_string();
-                    short int lineThrough = textNode.attribute("line-through").as_int();
-                    const std::string lang = textNode.attribute("xml:lang").as_string();
-                    std::string textStr = textNode.text().as_string();
+                    const std::string textStyle = childNode.attribute("font-style").as_string();
+                    const std::string textWeight = childNode.attribute("font-weight").as_string();
+                    int lineThrough = childNode.attribute("line-through").as_int();
+                    const std::string lang = childNode.attribute("xml:lang").as_string();
+                    std::string textStr = childNode.text().as_string();
 
                     // convert verse numbers to labels
                     std::regex labelSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)$");
@@ -2793,7 +2795,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     std::regex labelPrefixSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)[\\s\\u00A0]+");
                     std::smatch labelPrefixSearchMatches;
                     if (!textStr.empty() && std::regex_search(textStr, labelSearchMatches, labelSearch)
-                        && labelSearchMatches.ready() && textNode.next_sibling("elision")) {
+                        && labelSearchMatches.ready() && childNode.next_sibling("elision")) {
                         // entire textStr is a label (MusicXML from Finale)
 
                         Label *label = new Label();
@@ -2822,25 +2824,25 @@ void MusicXmlInput::ReadMusicXmlNote(
 
                     Syl *syl = new Syl();
                     syl->SetLang(lang.c_str());
-                    if (GetContentOfChild(lyric, "syllabic") == "single") {
+                    if (syllabic == "single") {
                         syl->SetWordpos(sylLog_WORDPOS_s);
                         syl->SetCon(sylLog_CON_s);
                     }
-                    else if (GetContentOfChild(lyric, "syllabic") == "begin") {
+                    else if (syllabic == "begin") {
                         syl->SetWordpos(sylLog_WORDPOS_i);
                         syl->SetCon(sylLog_CON_d);
                     }
-                    else if (GetContentOfChild(lyric, "syllabic") == "middle") {
+                    else if (syllabic == "middle") {
                         syl->SetWordpos(sylLog_WORDPOS_m);
                         syl->SetCon(sylLog_CON_d);
                     }
-                    else if (GetContentOfChild(lyric, "syllabic") == "end") {
+                    else if (syllabic == "end") {
                         syl->SetWordpos(sylLog_WORDPOS_t);
                         syl->SetCon(sylLog_CON_s);
                     }
 
                     // override @con if we have elisions or extensions
-                    if (textNode.next_sibling("elision")) {
+                    if (childNode.next_sibling("elision")) {
                         syl->SetCon(sylLog_CON_b);
                     }
                     else if (lyric.child("extend")) {
