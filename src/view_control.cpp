@@ -187,7 +187,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         }
     }
     if (!start || !end) return;
-    if (!interface->IsOrdered(start, end)) {
+    if (!interface->IsOrdered(start, end) && !element->Is(SYL)) {
         // To avoid showing the same warning multiple times, display a warning only during actual drawing
         if (!dc->Is(BBOX_DEVICE_CONTEXT) && (m_currentPage == vrv_cast<Page *>(start->GetFirstAncestor(PAGE)))) {
             LogWarning("%s '%s' is ignored, since start '%s' does not occur temporally before end '%s'.",
