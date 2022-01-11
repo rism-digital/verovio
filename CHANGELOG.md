@@ -2,6 +2,9 @@
 
 ## [unreleased]
 
+## [3.8.1] - 2022-01-10
+* Fix bug in PAE importer for durations and for key signatures
+
 ## [3.8.0] - 2021-12-22
 * Support for figured-bass extenders on `f` without `@tstamp` or `@startid` 
 * Improved page-based MEI output with validation with a customized MEI Schema
