@@ -156,6 +156,7 @@ public:
     int m_beamWidth;
     int m_beamWidthBlack;
     int m_beamWidthWhite;
+    int m_fractionSize;
 
     // position x for the stem (normal and cue-sized)
     int m_stemXAbove[2];

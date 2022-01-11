@@ -81,6 +81,7 @@ void BeamDrawingInterface::Reset()
     m_beamHasChord = false;
     m_hasMultipleStemDir = false;
     m_cueSize = false;
+    m_fractionSize = 100;
     m_crossStaffContent = NULL;
     m_crossStaffRel = STAFFREL_basic_NONE;
     m_shortestDur = 0;
