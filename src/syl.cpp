@@ -150,16 +150,16 @@ int Syl::PrepareLyrics(FunctorParams *functorParams)
         // The previous syl was an initial or median -> The note we just parsed is the end
         if ((params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_i)
             || (params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
-            params->m_currentSyl->SetEnd(params->m_lastNote);
+            params->m_currentSyl->SetEnd(params->m_lastNoteOrChord);
             params->m_currentSyl->m_nextWordSyl = this;
         }
         // The previous syl was a underscore -> the previous but one was the end
         else if (params->m_currentSyl->GetCon() == sylLog_CON_u) {
-            if (params->m_currentSyl->GetStart() == params->m_lastButOneNote)
+            if (params->m_currentSyl->GetStart() == params->m_penultimateNoteOrChord)
                 LogWarning("Syllable with underline extender under one single note '%s'",
                     params->m_currentSyl->GetStart()->GetUuid().c_str());
             else
-                params->m_currentSyl->SetEnd(params->m_lastButOneNote);
+                params->m_currentSyl->SetEnd(params->m_penultimateNoteOrChord);
         }
     }
 

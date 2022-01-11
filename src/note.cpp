@@ -1273,8 +1273,10 @@ int Note::PrepareLyrics(FunctorParams *functorParams)
     PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
 
-    params->m_lastButOneNote = params->m_lastNote;
-    params->m_lastNote = this;
+    if (!this->IsChordTone()) {
+        params->m_penultimateNoteOrChord = params->m_lastNoteOrChord;
+        params->m_lastNoteOrChord = this;
+    }
 
     return FUNCTOR_CONTINUE;
 }
