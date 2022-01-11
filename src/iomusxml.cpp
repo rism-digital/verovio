@@ -3075,7 +3075,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             short int extNumber = xmlGlissando.attribute("number").as_int();
             std::vector<Gliss *>::iterator iter = m_glissStack.begin();
             while (iter != m_glissStack.end()) {
-                if ((std::stoi((*iter)->GetN()) == extNumber) && ((*iter)->GetType() == xmlGlissando.name())) {
+                if ((atoi(((*iter)->GetN()).c_str()) == extNumber) && ((*iter)->GetType() == xmlGlissando.name())) {
                     (*iter)->SetEndid(noteID);
                     iter = m_glissStack.erase(iter);
                 }
@@ -3190,7 +3190,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         std::vector<std::pair<Trill *, musicxml::OpenSpanner>>::iterator iter = m_trillStack.begin();
         while (iter != m_trillStack.end()) {
             const int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
-            if (std::stoi((iter->first)->GetN()) == extNumber) {
+            if (atoi(((iter->first)->GetN()).c_str()) == extNumber) {
                 (iter->first)
                     ->SetTstamp2(std::pair<int, double>(
                         measureDifference, (double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1));
