@@ -3138,6 +3138,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "space") {
             return true;
         }
+        else if (element == "tabGrp") {
+            return true;
+        }
         else if (element == "tuplet") {
             return true;
         }

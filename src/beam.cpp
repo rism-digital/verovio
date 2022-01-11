@@ -1175,6 +1175,9 @@ bool Beam::IsSupportedChild(Object *child)
     else if (child->Is(SPACE)) {
         assert(dynamic_cast<Space *>(child));
     }
+    else if (child->Is(TABGRP)) {
+        assert(dynamic_cast<TabGrp *>(child));
+    }
     else if (child->Is(TUPLET)) {
         assert(dynamic_cast<Tuplet *>(child));
     }
