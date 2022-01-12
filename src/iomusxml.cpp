@@ -2785,7 +2785,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     // const std::string textColor = textNode.attribute("color").as_string();
                     const std::string textStyle = childNode.attribute("font-style").as_string();
                     const std::string textWeight = childNode.attribute("font-weight").as_string();
-                    const int lineThrough = childNode.attribute("line-through").as_int();
+                    const short int lineThrough = childNode.attribute("line-through").as_int();
                     const std::string lang = childNode.attribute("xml:lang").as_string();
                     std::string textStr = childNode.text().as_string();
 
