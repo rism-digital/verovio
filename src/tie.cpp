@@ -368,8 +368,8 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
         isShortTie = true;
     }
 
-    int r1 = drawingUnit;
-    int r2 = r1;
+    int r1 = 0;
+    int r2 = 0;
     // the normal case
     if (spanningType == SPANNING_START_END) {
         if (startNote) {
