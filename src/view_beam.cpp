@@ -58,7 +58,12 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // Calculate the beam slope and position
 
-    beam->m_beamSegment.CalcBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace(), true, isTabBeam);
+    if (isTabBeam) {
+        beam->m_beamSegment.CalcTabBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace());
+    }
+    else {
+        beam->m_beamSegment.CalcBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace());
+    }
 
     /******************************************************************/
     // Start the Beam graphic and draw the children
@@ -73,12 +78,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // Draw the beamSegment
 
-    if (isTabBeam) {
-        DrawTabBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
-    }
-    else {
-        DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
-    }
+    DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
@@ -291,7 +291,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
         }
 
         int fractBeamWidth
-            = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, beamInterface->m_cueSize);
+            = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, beamInterface->m_fractionSize, beamInterface->m_cueSize);
 
         // loop
         while (testDur <= beamInterface->m_shortestDur) {
