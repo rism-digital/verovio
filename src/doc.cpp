@@ -1865,8 +1865,8 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     if (!params->m_currentSyl) {
         return FUNCTOR_STOP; // early return
     }
-    if (params->m_lastNote && (params->m_currentSyl->GetStart() != params->m_lastNote)) {
-        params->m_currentSyl->SetEnd(params->m_lastNote);
+    if (params->m_lastNoteOrChord && (params->m_currentSyl->GetStart() != params->m_lastNoteOrChord)) {
+        params->m_currentSyl->SetEnd(params->m_lastNoteOrChord);
     }
     else if (m_options->m_openControlEvents.GetValue()) {
         sylLog_WORDPOS wordpos = params->m_currentSyl->GetWordpos();
