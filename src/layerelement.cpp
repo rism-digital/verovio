@@ -1947,7 +1947,9 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.second == this; });
     if (it != params->m_measureTieEndpoints.end()) {
         const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * drawingUnit;
-        const int currentTieLength = it->second->GetContentLeft() - it->first->GetContentRight() - drawingUnit;
+        const int leftXPos = it->first->HasContentBB() ? it->first->GetContentRight() : it->first->GetDrawingX();
+        const int rightXPos = it->second->HasContentBB() ? it->second->GetContentLeft() : it->second->GetDrawingX();
+        const int currentTieLength = rightXPos - leftXPos - drawingUnit;
         if ((currentTieLength < minTieLength)
             && ((it->first->GetFirstAncestor(CHORD) != NULL) || (this->GetFirstAncestor(CHORD) != NULL)
                 || (it->first->FindDescendantByType(FLAG) != NULL))) {
