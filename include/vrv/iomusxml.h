@@ -430,6 +430,13 @@ private:
     static std::string ConvertFigureGlyph(const std::string &value);
     ///@}
 
+    /*
+     * @name Methods for converting between MusicXML <pitch> and MIDI note numbers.
+     */
+    ///@{
+    static int PitchToMidi(const std::string &step, int alter, int octave);
+    static void MidiToPitch(int midi, std::string &step, int &alter, int &octave);
+    ///@}
 private:
     /* octave offset */
     std::vector<int> m_octDis;

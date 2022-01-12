@@ -26,6 +26,7 @@
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
+#include "course.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -73,10 +74,13 @@
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "syl.h"
+#include "tabdursym.h"
+#include "tabgrp.h"
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
 #include "trill.h"
+#include "tuning.h"
 #include "tuplet.h"
 #include "turn.h"
 #include "verse.h"
@@ -314,7 +318,7 @@ void MusicXmlInput::InsertClefIntoObject(
     }
     else {
         Object *parent = layerElement->GetParent();
-        if (parent->Is({ CHORD, FTREM })) {
+        if (parent->Is({ CHORD, FTREM, TABGRP })) {
             InsertClefIntoObject(parent->GetParent(), clef, parent, insertAfter);
         }
         else {
@@ -1270,7 +1274,11 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 if (nbStaves > 1) clef.node().remove_attribute("id");
             }
             Clef *meiClef = ConvertClef(clef.node());
-            if (meiClef) staffDef->AddChild(meiClef);
+            if (meiClef) {
+                staffDef->AddChild(meiClef);
+                // if TAB assume guitar tablature until we examine <staff-details>, if any
+                if (meiClef->GetShape() == CLEFSHAPE_TAB) staffDef->SetNotationtype(NOTATIONTYPE_tab_guitar);
+            }
 
             // key sig
             xpath = StringFormat("key[@number='%d']", i + 1);
@@ -1302,9 +1310,69 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (!scaleStr.empty()) {
                 staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr + "%"));
             }
-            pugi::xpath_node staffTuning = staffDetails.node().select_node("staff-tuning");
-            if (staffTuning) {
-                staffDef->SetNotationtype(NOTATIONTYPE_tab);
+            // Tablature?
+            if (staffDetails.node().child("staff-tuning") || staffDef->GetNotationtype() == NOTATIONTYPE_tab_guitar) {
+                // tablature type.  MusicXML does not support German tablature.
+                if (HasAttributeWithValue(staffDetails.node(), "show-frets", "letters")) {
+                    staffDef->SetNotationtype(NOTATIONTYPE_tab_lute_french);
+                }
+                else {
+                    // Frets are notated with numbers.
+                    // Italian tablature if the top staff line has a lower pitch than the bottom line
+                    // else guitar tablature.
+                    pugi::xml_node topLine = staffDetails.node().find_child_by_attribute(
+                        "staff-tuning", "line", std::to_string(staffLines).c_str());
+                    pugi::xml_node botLine = staffDetails.node().find_child_by_attribute("staff-tuning", "line", "1");
+                    if (topLine && botLine
+                        && PitchToMidi(topLine.child("tuning-step").text().as_string(),
+                               topLine.child("tuning-alter").text().as_int(),
+                               topLine.child("tuning-octave").text().as_int())
+                            < PitchToMidi(botLine.child("tuning-step").text().as_string(),
+                                botLine.child("tuning-alter").text().as_int(),
+                                botLine.child("tuning-octave").text().as_int())) {
+                        staffDef->SetNotationtype(NOTATIONTYPE_tab_lute_italian);
+                    }
+                    else {
+                        staffDef->SetNotationtype(NOTATIONTYPE_tab_guitar);
+                    }
+                }
+
+                // MusicXML specifies the tuning of the staff rather than the instrument,
+                // but this will at least give the tuning of some of the courses.
+                // For French tablature MusicXML ought to allow zero and negative values
+                // of @line to give the tuning for diapasons: 0 => 7, -1 => 8 etc.  But it doesn't.
+                // However, we can add the tuning of diapasons as we encounter them in <note>s.
+                Tuning *tuning = new Tuning();
+                staffDef->AddChild(tuning);
+
+                for (pugi::xml_node staffTuning : staffDetails.node().children("staff-tuning")) {
+                    Course *courseTuning = new Course();
+                    tuning->AddChild(courseTuning);
+
+                    const int line = staffTuning.attribute("line").as_int();
+                    const std::string stepStr = staffTuning.child("tuning-step").text().as_string();
+                    const int alterNum = staffTuning.child("tuning-alter").text().as_int();
+                    const int octaveNum = staffTuning.child("tuning-octave").text().as_int();
+
+                    if (staffDef->GetNotationtype() == NOTATIONTYPE_tab_lute_italian) {
+                        // Italian tablature, line 1 is course 1
+                        courseTuning->SetN(std::to_string(line));
+                    }
+                    else {
+                        // guitar and French tablature, line 1 is course = staffLines (typically 6)
+                        courseTuning->SetN(std::to_string(staffLines - line + 1));
+                    }
+                    courseTuning->SetPname(ConvertStepToPitchName(stepStr));
+                    courseTuning->SetOct(octaveNum);
+
+                    if (alterNum != 0) {
+                        static_assert(
+                            static_cast<int>(ACCIDENTAL_WRITTEN_f) == static_cast<int>(ACCIDENTAL_GESTURAL_f));
+                        static_assert(
+                            static_cast<int>(ACCIDENTAL_WRITTEN_s) == static_cast<int>(ACCIDENTAL_GESTURAL_s));
+                        courseTuning->SetAccid(static_cast<data_ACCIDENTAL_WRITTEN>(ConvertAlterToAccid(alterNum)));
+                    }
+                }
             }
 
             // time
@@ -2438,6 +2506,20 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
+    // find staff's staffDef
+    // TODO Tablature: is this the correct way to find a staff's staffDef?
+    AttNIntegerComparison cnc(STAFFDEF, staff->GetN());
+    StaffDef *staffDef = vrv_cast<StaffDef *>(m_doc->GetCurrentScoreDef()->FindDescendantByComparison(&cnc));
+    bool isTablature = false;
+    Tuning *tuning = NULL;
+
+    if (staffDef) {
+        tuning = vrv_cast<Tuning *>(staffDef->FindDescendantByType(TUNING));
+        const data_NOTATIONTYPE notationType = staffDef->GetNotationtype();
+        isTablature = (notationType == NOTATIONTYPE_tab || notationType == NOTATIONTYPE_tab_guitar
+            || notationType == NOTATIONTYPE_tab_lute_italian || notationType == NOTATIONTYPE_tab_lute_french
+            || notationType == NOTATIONTYPE_tab_lute_german);
+    }
 
     bool isChord = node.child("chord");
 
@@ -2468,43 +2550,49 @@ void MusicXmlInput::ReadMusicXmlNote(
     const std::string typeStr = node.child("type").text().as_string();
     const int dots = (int)node.select_nodes("dot").size();
 
-    ReadMusicXmlBeamsAndTuplets(node, layer, isChord);
-
-    // beam start
-    bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
-    // tremolos
-    pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
     int tremSlashNum = -1;
-    if (tremolo) {
-        if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
-            if (!isChord) {
-                FTrem *fTrem = new FTrem();
-                AddLayerElement(layer, fTrem);
-                m_elementStackMap.at(layer).push_back(fTrem);
-                int beamFloatNum = tremolo.node().text().as_int(); // number of floating beams
-                int beamAttachedNum = 0; // number of attached beams
-                while (beamStart && beamAttachedNum < 8) { // count number of (attached) beams, max 8
-                    std::ostringstream o;
-                    o << "beam[@number='" << ++beamAttachedNum + 1 << "'][text()='begin']";
-                    beamStart = node.select_node(o.str().c_str());
+    pugi::xpath_node tremolo;
+
+    // TODO Tablature: support beams and tuplets.  Neither <beam> nor <tuple> support child <tabGrp>.
+    if (!isTablature) {
+        ReadMusicXmlBeamsAndTuplets(node, layer, isChord);
+
+        // beam start
+        bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
+        // tremolos
+        tremolo = notations.node().select_node("ornaments/tremolo");
+
+        if (tremolo) {
+            if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
+                if (!isChord) {
+                    FTrem *fTrem = new FTrem();
+                    AddLayerElement(layer, fTrem);
+                    m_elementStackMap.at(layer).push_back(fTrem);
+                    int beamFloatNum = tremolo.node().text().as_int(); // number of floating beams
+                    int beamAttachedNum = 0; // number of attached beams
+                    while (beamStart && beamAttachedNum < 8) { // count number of (attached) beams, max 8
+                        std::ostringstream o;
+                        o << "beam[@number='" << ++beamAttachedNum + 1 << "'][text()='begin']";
+                        beamStart = node.select_node(o.str().c_str());
+                    }
+                    fTrem->SetBeams(beamFloatNum + beamAttachedNum);
+                    fTrem->SetBeamsFloat(beamFloatNum);
                 }
-                fTrem->SetBeams(beamFloatNum + beamAttachedNum);
-                fTrem->SetBeamsFloat(beamFloatNum);
             }
-        }
-        else if (!HasAttributeWithValue(tremolo.node(), "type", "stop")) {
-            // this is default tremolo type in MusicXML
-            tremSlashNum = tremolo.node().text().as_int();
-            if (!isChord) {
-                BTrem *bTrem = new BTrem();
-                AddLayerElement(layer, bTrem);
-                m_elementStackMap.at(layer).push_back(bTrem);
-                if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) {
-                    bTrem->SetForm(bTremLog_FORM_unmeas);
-                    tremSlashNum = 0;
-                }
-                else {
-                    bTrem->SetForm(bTremLog_FORM_meas);
+            else if (!HasAttributeWithValue(tremolo.node(), "type", "stop")) {
+                // this is default tremolo type in MusicXML
+                tremSlashNum = tremolo.node().text().as_int();
+                if (!isChord) {
+                    BTrem *bTrem = new BTrem();
+                    AddLayerElement(layer, bTrem);
+                    m_elementStackMap.at(layer).push_back(bTrem);
+                    if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) {
+                        bTrem->SetForm(bTremLog_FORM_unmeas);
+                        tremSlashNum = 0;
+                    }
+                    else {
+                        bTrem->SetForm(bTremLog_FORM_meas);
+                    }
                 }
             }
         }
@@ -2564,23 +2652,35 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         else {
-            Rest *rest = new Rest();
-            element = rest;
-            rest->SetColor(node.attribute("color").as_string());
-            rest->SetDur(ConvertTypeToDur(typeStr));
-            rest->SetDurPpq(duration);
-            if (dots > 0) rest->SetDots(dots);
-            if (cue) rest->SetCue(BOOLEAN_true);
-            if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
-            if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
-            if (!noteID.empty()) {
-                rest->SetUuid(noteID);
+            if (isTablature) {
+                // rest
+                TabGrp *tabGrp = new TabGrp();
+                element = tabGrp;
+                tabGrp->SetDur(ConvertTypeToDur(typeStr));
+                tabGrp->SetDurPpq(duration);
+                if (dots > 0) tabGrp->SetDots(dots);
+                tabGrp->AddChild(new TabDurSym());
+                AddLayerElement(layer, tabGrp, duration);
             }
-            // set @staff attribute, if existing and different from parent staff number
-            if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
-                rest->SetStaff(
-                    rest->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
-            AddLayerElement(layer, rest, duration);
+            else {
+                Rest *rest = new Rest();
+                element = rest;
+                rest->SetColor(node.attribute("color").as_string());
+                rest->SetDur(ConvertTypeToDur(typeStr));
+                rest->SetDurPpq(duration);
+                if (dots > 0) rest->SetDots(dots);
+                if (cue) rest->SetCue(BOOLEAN_true);
+                if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
+                if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
+                if (!noteID.empty()) {
+                    rest->SetUuid(noteID);
+                }
+                // set @staff attribute, if existing and different from parent staff number
+                if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
+                    rest->SetStaff(
+                        rest->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
+                AddLayerElement(layer, rest, duration);
+            }
         }
     }
     else {
@@ -2635,9 +2735,9 @@ void MusicXmlInput::ReadMusicXmlNote(
             stemDir = STEMDIRECTION_up;
         }
 
-        // pitch and octave
+        // pitch and octave, optional, not needed for tablature
         pugi::xml_node pitch = node.child("pitch");
-        if (pitch) {
+        if (pitch && !isTablature) {
             const std::string stepStr = pitch.child("step").text().as_string();
             const std::string alterStr = pitch.child("alter").text().as_string();
             const int octaveNum = pitch.child("octave").text().as_int();
@@ -2685,7 +2785,21 @@ void MusicXmlInput::ReadMusicXmlNote(
         pugi::xpath_node nextNote = node.select_node("./following-sibling::note");
         if (nextNote.node().child("chord")) nextIsChord = true;
         Chord *chord = NULL;
-        if (nextIsChord) {
+        TabGrp *tabGrp = NULL;
+        if (isTablature) {
+            // create the tabGrp if we are starting a new tabGrp
+            if (m_elementStackMap.at(layer).empty() || !m_elementStackMap.at(layer).back()->Is(TABGRP)) {
+                tabGrp = new TabGrp();
+                tabGrp->SetDur(ConvertTypeToDur(typeStr));
+                tabGrp->SetDurPpq(duration);
+                if (dots > 0) tabGrp->SetDots(dots);
+                tabGrp->AddChild(new TabDurSym());
+                AddLayerElement(layer, tabGrp, duration);
+                m_elementStackMap.at(layer).push_back(tabGrp);
+                element = tabGrp;
+            }
+        }
+        else if (nextIsChord) {
             // create the chord if we are starting a new chord
             if (m_elementStackMap.at(layer).empty() || !m_elementStackMap.at(layer).back()->Is(CHORD)) {
                 chord = new Chord();
@@ -2716,7 +2830,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         // If the current note is part of a chord.
-        if (nextIsChord || node.child("chord")) {
+        if (!isTablature && (nextIsChord || node.child("chord"))) {
             if (chord == NULL && m_elementStackMap.at(layer).size() > 0
                 && m_elementStackMap.at(layer).back()->Is(CHORD)) {
                 chord = dynamic_cast<Chord *>(m_elementStackMap.at(layer).back());
@@ -2749,7 +2863,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (cue) note->SetCue(BOOLEAN_true);
 
         // set attributes to the note if we are not in a chord
-        if (m_elementStackMap.at(layer).empty() || !m_elementStackMap.at(layer).back()->Is(CHORD)) {
+        if (!isTablature && (m_elementStackMap.at(layer).empty() || !m_elementStackMap.at(layer).back()->Is(CHORD))) {
             if (!typeStr.empty()) note->SetDur(ConvertTypeToDur(typeStr));
             note->SetDurPpq(duration);
             if (dots > 0) note->SetDots(dots);
@@ -2864,6 +2978,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     verse->AddChild(syl);
                 }
             }
+            // TODO Tablature: <tabGrp> does not support child <verse>
             if (element->Is(CHORD) || element->Is(NOTE)) {
                 element->AddChild(verse);
             }
@@ -2933,13 +3048,61 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // technical
         for (pugi::xml_node technical : notations.node().children("technical")) {
-            // fingering is handled on the same level as breath marks, dynamics, etc. so we skip it here
-            if (technical.child("fingering")) continue;
-            if (technical.child("fret")) {
-                // set @tab.string and @tab.fret
-            }
-            else {
-                for (pugi::xml_node articulation : technical.children()) {
+            for (pugi::xml_node technicalChild : technical.children()) {
+                const std::string technicalChildName = technicalChild.name();
+
+                // fingering is handled on the same level as breath marks, dynamics, etc. so we skip it here
+                if (technicalChildName == "fingering") continue;
+                if (technicalChildName == "string") continue; // handled with fret
+
+                if (technicalChildName == "fret") {
+                    assert(isTablature);
+
+                    // set @tab.string and @tab.fret
+                    const int fret = technicalChild.text().as_int();
+                    const int course = technical.child("string").text().as_int();
+                    note->SetTabFret(fret);
+                    note->SetTabCourse(course);
+
+                    // Do we have the pitch for this note, if so do we have the tuning for this course?
+                    pugi::xml_node pitch = node.child("pitch");
+                    if (tuning && pitch) {
+                        AttNNumberLikeComparison cnc(COURSE, std::to_string(course));
+                        Course *courseTuning = vrv_cast<Course *>(tuning->FindDescendantByComparison(&cnc));
+
+                        if (!courseTuning) {
+                            // we have the note's pitch, but not the course's tuning, set it
+
+                            const int midi = PitchToMidi(pitch.child("step").text().as_string(),
+                                pitch.child("alter").text().as_int(),
+                                pitch.child("octave").text().as_int()); // note's midi note number
+
+                            // course's pitch
+                            std::string stepStr;
+                            int alterNum = 0;
+                            int octaveNum = 0;
+                            MidiToPitch(midi - fret, stepStr, alterNum, octaveNum);
+
+                            courseTuning = new Course();
+                            tuning->AddChild(courseTuning);
+
+                            courseTuning->SetN(std::to_string(course));
+                            courseTuning->SetPname(ConvertStepToPitchName(stepStr));
+                            courseTuning->SetOct(octaveNum);
+
+                            if (alterNum != 0) {
+                                static_assert(
+                                    static_cast<int>(ACCIDENTAL_WRITTEN_f) == static_cast<int>(ACCIDENTAL_GESTURAL_f));
+                                static_assert(
+                                    static_cast<int>(ACCIDENTAL_WRITTEN_s) == static_cast<int>(ACCIDENTAL_GESTURAL_s));
+                                courseTuning->SetAccid(
+                                    static_cast<data_ACCIDENTAL_WRITTEN>(ConvertAlterToAccid(alterNum)));
+                            }
+                        }
+                    }
+                }
+                else {
+                    pugi::xml_node articulation = technicalChild;
                     Artic *artic = new Artic();
                     artics.push_back(ConvertArticulations(articulation.name()));
                     if (artics.back() == ARTICULATION_NONE) {
@@ -2960,12 +3123,13 @@ void MusicXmlInput::ReadMusicXmlNote(
         // add the note to the layer or to the current container
         AddLayerElement(layer, note, duration);
 
-        // if we are ending a chord remove it from the stack
+        // if we are ending a chord or tabGrp remove it from the stack
         if (!nextIsChord) {
-            if (!m_elementStackMap.at(layer).empty() && m_elementStackMap.at(layer).back()->Is(CHORD)) {
+            const ClassId classId = isTablature ? TABGRP : CHORD;
+            if (!m_elementStackMap.at(layer).empty() && m_elementStackMap.at(layer).back()->Is(classId)) {
                 SetChordStaff(layer);
 
-                RemoveLastFromStack(CHORD, layer);
+                RemoveLastFromStack(classId, layer);
             }
         }
     }
@@ -3055,8 +3219,8 @@ void MusicXmlInput::ReadMusicXmlNote(
     pugi::xpath_node_set glissandi = notations.node().select_nodes("glissando|slide");
     for (pugi::xpath_node_set::const_iterator it = glissandi.begin(); it != glissandi.end(); ++it) {
         std::string noteID = m_ID;
-        // prevent from using chords
-        if (element->Is(CHORD)) noteID = "#" + element->GetChild(0)->GetUuid();
+        // prevent from using chords or tabGrps
+        if (element->Is(CHORD) || element->Is(TABGRP)) noteID = "#" + element->GetChild(0)->GetUuid();
         pugi::xml_node xmlGlissando = it->node();
         if (HasAttributeWithValue(xmlGlissando, "type", "start")) {
             Gliss *gliss = new Gliss();
@@ -3313,6 +3477,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 Chord *chord = dynamic_cast<Chord *>(element);
                 chord->SetBreaksec(breakSec);
             }
+            // TODO Tablature: support beams, <beam> does not support child <tabGrp>
         }
         else {
             RemoveLastFromStack(BEAM, layer);
@@ -4384,6 +4549,31 @@ void MusicXmlInput::SetChordStaff(Layer *layer)
         Note *note = vrv_cast<Note *>(object);
         note->ResetStaffIdent();
     });
+}
+
+int MusicXmlInput::PitchToMidi(const std::string &step, int alter, int octave)
+{
+    if (step.empty() || step[0] < 'A' || step[0] > 'G') return 0;
+
+    // Distance in semitones from the octave's starting C to the given step
+    //                                 A   B  C  D  E  F  G
+    static const int octaveStart[] = { 9, 11, 0, 2, 4, 5, 7 };
+    const int semitones = octave * 12 + octaveStart[step[0] - 'A'] + alter; // semitones from C0
+    return semitones + 12; // MIDI note C4 = 60
+}
+
+void MusicXmlInput::MidiToPitch(int midi, std::string &step, int &alter, int &octave)
+{
+    const int semitones = midi - 12; // C0 = 0
+
+    // 12 notes in an octave.  Ignore enharmonics, prefer B flat over A sharp.
+    static const std::pair<const char *, int> octaveNotes[] = { { "C", 0 }, { "C", 1 }, { "D", 0 }, { "D", 1 },
+        { "E", 0 }, { "F", 0 }, { "F", 1 }, { "G", 0 }, { "G", 1 }, { "A", 0 }, { "B", -1 }, { "B", 0 } };
+    static_assert(sizeof(octaveNotes) / sizeof(octaveNotes[0]) == 12);
+
+    octave = semitones / 12;
+    step = octaveNotes[semitones % 12].first;
+    alter = octaveNotes[semitones % 12].second;
 }
 
 #endif // NO_MUSICXML_SUPPORT
