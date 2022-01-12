@@ -1535,6 +1535,14 @@ struct MIDINote {
 using MIDINoteSequence = std::list<MIDINote>;
 
 /**
+ * Helper struct for held notes in tablature
+ */
+struct MIDIHeldNote {
+    char m_pitch = 0;
+    double m_stoptime = 0;
+};
+
+/**
  * member 0: MidiFile*: the MidiFile we are writing to
  * member 1: int: the midi track number
  * member 3: double: the score time from the start of the music to the start of the current measure
@@ -1563,6 +1571,7 @@ public:
     double m_currentTempo;
     std::map<Note *, MIDINoteSequence> m_expandedNotes;
     Functor *m_functor;
+    std::vector<MIDIHeldNote> m_heldNotes; ///< Tablature held notes indexed by (course - 1)
 };
 
 //----------------------------------------------------------------------------
