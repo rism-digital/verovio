@@ -1997,6 +1997,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 // ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
                 FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
                 if (facsInter != NULL) {
+                    LogMessage("here");
                     if (ulx == -1) {
                         ulx = facsInter->GetDrawingX();
                         uly = facsInter->GetDrawingY();
@@ -2004,8 +2005,19 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                         lry = facsInter->GetHeight() + uly;
                     }
                     else {
-                        lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
-                        lry = facsInter->GetHeight() + facsInter->GetDrawingY();
+                        if (facsInter->GetDrawingX() >= ulx) {
+                            lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
+                        } 
+                        else {
+                            ulx = facsInter->GetDrawingX();
+                        }
+
+                        if (facsInter->GetDrawingY() <= uly){
+                            lry = facsInter->GetHeight() + facsInter->GetDrawingY();
+                        }
+                        else {
+                            uly = facsInter->GetDrawingY();
+                        }                        
                     }
                 }
             }
