@@ -502,10 +502,10 @@ int Chord::AdjustOverlappingLayers(
 
     std::vector<int> locationsInUnison
         = this->GetElementsInUnison(chordElementLocations, otherElementLocations, this->GetDrawingStemDir());
-    const size_t expectedElementsInUnison = locationsInUnison.size();
+    const int expectedElementsInUnison = locationsInUnison.size();
     const bool isLowerPosition = (STEMDIRECTION_down == this->GetDrawingStemDir() && (otherElementLocations.size() > 0)
         && (*chordElementLocations.begin() >= *otherElementLocations.begin()));
-    size_t actualElementsInUnison = 0;
+    int actualElementsInUnison = 0;
     // process each note of the chord separately, storing locations in the set
     for (auto iter : *notes) {
         Note *note = vrv_cast<Note *>(iter);
