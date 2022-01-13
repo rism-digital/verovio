@@ -16,9 +16,9 @@ cd build
 # Moves the needed verovio.js into Neon
 cp verovio.js verovio_new.js
 
-mv verovio_new.js /Volumes/ANA/McGill/SIMSSA/web/Neon/verovio-util
+mv verovio_new.js /Users/yinanzhou/SIMSSA/Neon/verovio-util
 
-cd /Volumes/ANA/McGill/SIMSSA/web//Neon/verovio-util
+cd /Users/yinanzhou/SIMSSA/Neon/verovio-util
 
 rm verovio.js; mv verovio_new.js verovio.js
 

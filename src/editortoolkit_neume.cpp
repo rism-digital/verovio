@@ -1651,10 +1651,24 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         }
         Zone *zone = syl->GetZone();
         assert(zone);
-        zone->SetUlx(ulx);
-        zone->SetUly(uly);
-        zone->SetLrx(lrx);
-        zone->SetLry(lry);
+        if (ulx < lrx) {
+            zone->SetUlx(ulx);
+            zone->SetLrx(lrx);
+        }
+        else {
+            zone->SetUlx(lrx);
+            zone->SetLrx(ulx);
+        }
+        
+        if (uly < lry) {
+            zone->SetUly(uly);
+            zone->SetLry(lry);
+        }
+        else {
+            zone->SetUly(lry);
+            zone->SetLry(uly);
+        }
+        
         if (!isnan(rotate)) {
             zone->SetRotate(rotate);
         }
@@ -1997,7 +2011,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 // ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
                 FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
                 if (facsInter != NULL) {
-                    LogMessage("here");
                     if (ulx == -1) {
                         ulx = facsInter->GetDrawingX();
                         uly = facsInter->GetDrawingY();
