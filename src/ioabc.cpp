@@ -1556,7 +1556,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             section->AddChild(scoreDef);
             m_meter = NULL;
         }
-        
+
         if (m_durDefault != DURATION_NONE) {
             ScoreDef *scoreDef = new ScoreDef();
             scoreDef->SetDurDefault(m_durDefault);
