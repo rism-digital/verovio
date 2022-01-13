@@ -2090,6 +2090,7 @@ void MEIOutput::WriteBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt)
 
     WriteLayerElement(currentNode, beatRpt);
     beatRpt->WriteColor(currentNode);
+    beatRpt->WriteBeatRptLog(currentNode);
     beatRpt->WriteBeatRptVis(currentNode);
 }
 
@@ -5669,6 +5670,7 @@ bool MEIInput::ReadBeatRpt(Object *parent, pugi::xml_node beatRpt)
     ReadLayerElement(beatRpt, vrvBeatRpt);
 
     vrvBeatRpt->ReadColor(beatRpt);
+    vrvBeatRpt->ReadBeatRptLog(beatRpt);
     vrvBeatRpt->ReadBeatRptVis(beatRpt);
 
     if (m_version < MEI_4_0_0) {
