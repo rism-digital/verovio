@@ -1356,7 +1356,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         int drawingDur = note->GetDrawingDur();
         if (drawingDur == DUR_NONE) {
             if (note->IsInBeam() && !dc->Is(BBOX_DEVICE_CONTEXT)) {
-                LogWarning("Missing duration for note '%s'", note->GetUuid().c_str());
+                LogWarning("Missing duration for note '%s' in beam", note->GetUuid().c_str());
             }
             drawingDur = DUR_4;
         }
