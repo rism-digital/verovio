@@ -186,6 +186,7 @@ void ABCInput::parseABC(std::istream &infile)
             CalcUnitNoteLength();
         }
         m_doc->GetCurrentScoreDef()->SetDurDefault(m_durDefault);
+        m_durDefault = DURATION_NONE;
 
         // read music code
         m_layer = new Layer();
@@ -1554,6 +1555,13 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             scoreDef->AddChild(m_meter);
             section->AddChild(scoreDef);
             m_meter = NULL;
+        }
+        
+        if (m_durDefault != DURATION_NONE) {
+            ScoreDef *scoreDef = new ScoreDef();
+            scoreDef->SetDurDefault(m_durDefault);
+            section->AddChild(scoreDef);
+            m_durDefault = DURATION_NONE;
         }
     }
 
