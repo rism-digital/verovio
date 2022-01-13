@@ -2012,7 +2012,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                             ulx = facsInter->GetDrawingX();
                         }
 
-                        if (facsInter->GetDrawingY() <= uly){
+                        if (facsInter->GetDrawingY() >= uly){
                             lry = facsInter->GetHeight() + facsInter->GetDrawingY();
                         }
                         else {
