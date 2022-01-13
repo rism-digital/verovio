@@ -210,7 +210,7 @@ FTrem *LayerElement::IsInFTrem()
 
 Beam *LayerElement::IsInBeam()
 {
-    if (!this->Is({ CHORD, NOTE, STEM })) return NULL;
+    if (!this->Is({ CHORD, NOTE, TABGRP, STEM })) return NULL;
     Beam *beamParent = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
     if (beamParent != NULL) {
         if (!this->IsGraceNote()) return beamParent;
@@ -2415,11 +2415,16 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         if (note->IsGraceNote()) return FUNCTOR_CONTINUE;
 
         Chord *chord = note->IsChordTone();
+        TabGrp *tabGrp = note->IsTabGrpNote();
 
         // If the note has a @dur or a @dur.ges, take it into account
         // This means that overwriting only @dots or @dots.ges will not be taken into account
         if (chord && !note->HasDur() && !note->HasDurGes()) {
             incrementScoreTime = chord->GetAlignmentDuration(
+                params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        }
+        else if (tabGrp && !note->HasDur() && !note->HasDurGes()) {
+            incrementScoreTime = tabGrp->GetAlignmentDuration(
                 params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         }
         else {
@@ -2444,8 +2449,9 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         storeNote->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
         storeNote->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
 
-        // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
-        if (!(note->IsChordTone())) {
+        // increase the currentTime accordingly, but only if not in a chord or tabGrp - checkit with note->IsChordTone()
+        // or note->IsTabGrpNote()
+        if (!(note->IsChordTone()) && !(note->IsTabGrpNote())) {
             params->m_currentScoreTime += incrementScoreTime;
             params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
         }

@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functorparams.h"
 #include "note.h"
 #include "tabdursym.h"
 
@@ -55,6 +56,28 @@ bool TabGrp::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
+
+int TabGrp::CalcOnsetOffsetEnd(FunctorParams *functorParams)
+{
+    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    assert(params);
+
+    LayerElement *element = this->ThisOrSameasAsLink();
+
+    double incrementScoreTime = element->GetAlignmentDuration(
+        params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+    incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
+    double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
+
+    params->m_currentScoreTime += incrementScoreTime;
+    params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

@@ -28,6 +28,7 @@
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
+#include "tabgrp.h"
 #include "tuplet.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -80,6 +81,42 @@ void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoord
     m_beamElementCoordRefs = *beamElementCoords;
 }
 
+void BeamSegment::CalcTabBeam(
+    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
+{
+    assert(layer);
+    assert(staff);
+    assert(doc);
+
+    // Calculate the y position of the beam - this currently need to be inline with the code in View::DrawTabGrp that
+    // draws the stems.
+    int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
+    beamInterface->m_fractionSize = glyphSize * 2 / 3;
+    int height = doc->GetGlyphHeight(SMUFL_EBA8_luteDurationHalf, glyphSize, true);
+    int y = staff->GetDrawingY() + height;
+    y += doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
+
+    assert(m_beamElementCoordRefs.size() > 0);
+
+    // For recursive calls, avoid to re-init values
+    this->CalcBeamInit(layer, staff, doc, beamInterface, place);
+
+    // Adjust the height and spacing of the beams
+    beamInterface->m_beamWidthBlack /= 2;
+    beamInterface->m_beamWidthWhite /= 2;
+    beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
+
+    beamInterface->m_drawingPlace = (place == BEAMPLACE_below) ? BEAMPLACE_below : BEAMPLACE_above;
+
+    for (auto coord : m_beamElementCoordRefs) {
+        // All notes and chords get their stem value stored
+        LayerElement *el = coord->m_element;
+        if (el->Is(TABGRP)) {
+            coord->m_yBeam = y;
+        }
+    }
+}
+
 void BeamSegment::CalcBeam(
     Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool init)
 {
@@ -94,6 +131,8 @@ void BeamSegment::CalcBeam(
     if (init) {
         this->CalcBeamInit(layer, staff, doc, beamInterface, place);
     }
+
+    beamInterface->m_fractionSize = staff->m_drawingStaffSize;
 
     bool horizontal = beamInterface->IsHorizontal();
 
@@ -386,7 +425,7 @@ void BeamSegment::CalcBeamInit(
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         coord->m_yBeam = 0;
 
-        if (coord->m_element->Is({ CHORD, NOTE })) {
+        if (coord->m_element->Is({ CHORD, NOTE, TABGRP })) {
             if (!m_firstNoteOrChord) m_firstNoteOrChord = coord;
             m_lastNoteOrChord = coord;
             m_nbNotesOrChords++;
@@ -1175,6 +1214,9 @@ bool Beam::IsSupportedChild(Object *child)
     else if (child->Is(SPACE)) {
         assert(dynamic_cast<Space *>(child));
     }
+    else if (child->Is(TABGRP)) {
+        assert(dynamic_cast<TabGrp *>(child));
+    }
     else if (child->Is(TUPLET)) {
         assert(dynamic_cast<Tuplet *>(child));
     }
@@ -1194,6 +1236,8 @@ void Beam::FilterList(ArrayOfObjects *childList)
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
     ArrayOfObjects::iterator iter = childList->begin();
 
+    const bool isTabBeam = this->IsTabBeam();
+
     while (iter != childList->end()) {
         if (!(*iter)->IsLayerElement()) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
@@ -1203,6 +1247,15 @@ void Beam::FilterList(ArrayOfObjects *childList)
         if (!(*iter)->HasInterface(INTERFACE_DURATION)) {
             // remove anything that has not a DurationInterface
             iter = childList->erase(iter);
+            continue;
+        }
+        else if (isTabBeam) {
+            if (!(*iter)->Is(TABGRP)) {
+                iter = childList->erase(iter);
+            }
+            else {
+                ++iter;
+            }
             continue;
         }
         else {
@@ -1273,6 +1326,11 @@ const ArrayOfBeamElementCoords *Beam::GetElementCoords()
 {
     this->GetList(this);
     return &m_beamElementCoords;
+}
+
+bool Beam::IsTabBeam()
+{
+    return (this->FindDescendantByType(TABGRP));
 }
 
 //----------------------------------------------------------------------------
@@ -1513,7 +1571,8 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
     AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
     assert(params);
 
-    if (this->HasSameas() || !this->GetChildCount() || m_beamSegment.m_beamElementCoordRefs.empty()) {
+    if (this->IsTabBeam() || this->HasSameas() || !this->GetChildCount()
+        || m_beamSegment.m_beamElementCoordRefs.empty()) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -1550,6 +1609,8 @@ int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
     AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
     assert(params);
 
+    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
+
     if (params->m_beam != this) return FUNCTOR_CONTINUE;
 
     if (m_drawingPlace == BEAMPLACE_mixed) return FUNCTOR_CONTINUE;
@@ -1584,6 +1645,8 @@ int Beam::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
+
+    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
 
     const ArrayOfObjects *beamChildren = this->GetList(this);
 

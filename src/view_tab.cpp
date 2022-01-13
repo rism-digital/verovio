@@ -142,28 +142,38 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
     int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
     int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
-    int radius = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false) / 2;
-    x += radius;
 
-    int symc = 0;
-    switch (drawingDur) {
-        case DUR_2: symc = SMUFL_EBA7_luteDurationWhole; break;
-        case DUR_4: symc = SMUFL_EBA8_luteDurationHalf; break;
-        case DUR_8: symc = SMUFL_EBA9_luteDurationQuarter; break;
-        case DUR_16: symc = SMUFL_EBAA_luteDuration8th; break;
-        case DUR_32: symc = SMUFL_EBAB_luteDuration16th; break;
-        default: symc = SMUFL_EBA9_luteDurationQuarter;
+    // We only need to draw the stems
+    // Do we also need to draw the dots?
+    if (tabGrp->IsInBeam()) {
+        const int height = m_doc->GetGlyphHeight(SMUFL_EBA8_luteDurationHalf, glyphSize, true);
+        DrawFilledRectangle(dc, x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y,
+            x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y + height);
     }
+    else {
+        int radius = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false) / 2;
+        x += radius;
 
-    DrawSmuflCode(dc, x, y, symc, glyphSize, true);
+        int symc = 0;
+        switch (drawingDur) {
+            case DUR_2: symc = SMUFL_EBA7_luteDurationWhole; break;
+            case DUR_4: symc = SMUFL_EBA8_luteDurationHalf; break;
+            case DUR_8: symc = SMUFL_EBA9_luteDurationQuarter; break;
+            case DUR_16: symc = SMUFL_EBAA_luteDuration8th; break;
+            case DUR_32: symc = SMUFL_EBAB_luteDuration16th; break;
+            default: symc = SMUFL_EBA9_luteDurationQuarter;
+        }
 
-    if (tabGrp->HasDots()) {
-        y += m_doc->GetDrawingUnit(glyphSize) * 0.5;
-        x += m_doc->GetDrawingUnit(glyphSize);
-        for (int i = 0; i < tabGrp->GetDots(); ++i) {
-            DrawDot(dc, x, y, glyphSize / 2);
-            // HARDCODED
-            x += m_doc->GetDrawingUnit(glyphSize) * 0.75;
+        DrawSmuflCode(dc, x, y, symc, glyphSize, true);
+
+        if (tabGrp->HasDots()) {
+            y += m_doc->GetDrawingUnit(glyphSize) * 0.5;
+            x += m_doc->GetDrawingUnit(glyphSize);
+            for (int i = 0; i < tabGrp->GetDots(); ++i) {
+                DrawDot(dc, x, y, glyphSize / 2);
+                // HARDCODED
+                x += m_doc->GetDrawingUnit(glyphSize) * 0.75;
+            }
         }
     }
 
