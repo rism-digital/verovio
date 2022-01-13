@@ -161,15 +161,15 @@ void ABCInput::parseABC(std::istream &infile)
                 staffDef->AddChild(m_clef);
                 m_clef = NULL;
             }
+            if (m_meter) {
+                staffDef->AddChild(m_meter);
+                m_meter = NULL;
+            }
             staffGrp->AddChild(staffDef);
             m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
             if (m_key) {
                 m_doc->GetCurrentScoreDef()->AddChild(m_key);
                 m_key = NULL;
-            }
-            if (m_meter) {
-                m_doc->GetCurrentScoreDef()->AddChild(m_meter);
-                m_meter = NULL;
             }
         }
 
@@ -577,7 +577,6 @@ void ABCInput::parseKey(std::string &keyString)
     m_key = new KeySig();
     m_key->IsAttribute(true);
     m_clef = new Clef();
-    m_clef->IsAttribute(true);
     while (isspace(keyString[i])) ++i;
 
     // set key.pname
@@ -767,7 +766,6 @@ void ABCInput::parseMeter(const std::string &meterString)
         // this is a little "hack", until libMEI is fixed
         m_meter->SetCount({ atoi(meterCount.c_str()) });
         m_meter->SetUnit(atoi(&meterString[meterString.find('/') + 1]));
-        m_meter->IsAttribute(true);
     }
 }
 
