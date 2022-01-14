@@ -1192,9 +1192,6 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
     const int extension = params->m_doc->GetDrawingLedgerLineExtension(staffSize, drawingCueSize);
     const int left = this->GetDrawingX() - extension - staffX;
     int right = this->GetDrawingX() + 2 * radius + extension - staffX;
-    if (this->GetDrawingDur() == DUR_MX) {
-        right += 2 * radius;
-    }
 
     if (linesAbove > 0) {
         staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize);
