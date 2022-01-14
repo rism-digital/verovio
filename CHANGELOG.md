@@ -2,6 +2,7 @@
 
 ## [unreleased]
 * Support for `beatRpt@beatdef`
+* Support for `scoreDef` and `staffDef` `@dur.default` (@eNote-GmBH)
 
 ## [3.8.1] - 2022-01-10
 * Fix bug in PAE importer for durations and for key signatures
