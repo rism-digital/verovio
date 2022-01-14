@@ -583,10 +583,12 @@ void Note::SetScoreTimeTiedDuration(double scoreTime)
     m_scoreTimeTiedDuration = scoreTime;
 }
 
-int Note::GetMIDIPitch(int shift)
+int Note::GetMIDIPitch(const int shift)
 {
+    int pitch = 0;
+
     if (this->HasPnum()) {
-        return this->GetPnum();
+        pitch = this->GetPnum();
     }
     else if (this->HasPname() || this->HasPnameGes()) {
         int midiBase = 0;
@@ -606,26 +608,23 @@ int Note::GetMIDIPitch(int shift)
         // Check for accidentals
         midiBase += this->GetChromaticAlteration();
 
-        // Apply shift, i.e. from transposition instruments
-        midiBase += shift;
-
         int oct = this->GetOct();
         if (this->HasOctGes()) oct = this->GetOctGes();
 
-        return midiBase + (oct + 1) * 12;
+        pitch = midiBase + (oct + 1) * 12;
     }
     else if (this->HasTabCourse()) {
         // tablature
         Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
         assert(staff);
         if (staff->m_drawingTuning) {
-            m_MIDIPitch = staff->m_drawingTuning->CalcPitchNumber(
+            pitch = staff->m_drawingTuning->CalcPitchNumber(
                 this->GetTabCourse(), this->GetTabFret(), staff->m_drawingNotationType);
         }
     }
-    else {
-        m_MIDIPitch = 0;
-    }
+
+    // Apply shift, i.e. from transposition instruments
+    return pitch + shift;
 }
 
 double Note::GetScoreTimeOnset() const
