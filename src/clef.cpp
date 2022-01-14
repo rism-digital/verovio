@@ -57,9 +57,9 @@ void Clef::Reset()
 
 int Clef::GetClefLocOffset() const
 {
-    if (this->HasSameasLink() && this->GetSameasLink()->Is(CLEF)) {
-        Clef *sameas = vrv_cast<Clef *>(this->GetSameasLink());
-        assert(sameas);
+    // Only resolve simple sameas links to avoid infinite recursion
+    Clef *sameas = dynamic_cast<Clef *>(this->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
         return sameas->GetClefLocOffset();
     }
 

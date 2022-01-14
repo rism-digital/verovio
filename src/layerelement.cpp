@@ -625,12 +625,13 @@ double LayerElement::GetAlignmentDuration(
         return 0.0;
     }
 
-    if (this->HasSameasLink() && this->GetSameasLink()->IsLayerElement()) {
-        LayerElement *sameas = vrv_cast<LayerElement *>(this->GetSameasLink());
-        assert(sameas);
+    // Only resolve simple sameas links to avoid infinite recursion
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
         return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
-    else if (this->HasInterface(INTERFACE_DURATION)) {
+
+    if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
         Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
@@ -2489,9 +2490,10 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (this->HasSameasLink()) {
-        assert(this->GetSameasLink());
-        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    // Only resolve simple sameas links to avoid infinite recursion
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
+        sameas->Process(params->m_functor, functorParams);
     }
 
     return FUNCTOR_CONTINUE;
@@ -2504,9 +2506,10 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (this->HasSameasLink()) {
-        assert(this->GetSameasLink());
-        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    // Only resolve simple sameas links to avoid infinite recursion
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
+        sameas->Process(params->m_functor, functorParams);
     }
 
     return FUNCTOR_CONTINUE;
