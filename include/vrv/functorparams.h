@@ -295,48 +295,6 @@ public:
 // Use FunctorDocParams
 
 //----------------------------------------------------------------------------
-// AdjustGraceXPosParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the maximum position
- * member 1: the upcoming maximum position (i.e., the min pos for the next element)
- * member 2: the cumulated shift on the previous aligners
- * member 3: the list of staffN in the top-level scoreDef
- * member 4: the flag indicating whereas the alignment is in a Measure or in a Grace
- * member 5: the pointer to the right ALIGNMENT_DEFAULT (if any)
- * member 6: the Doc
- * member 7: the Functor to be redirected to MeasureAligner and GraceAligner
- * member 8: the end Functor for redirection
- **/
-
-class AdjustGraceXPosParams : public FunctorParams {
-public:
-    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
-    {
-        m_graceMaxPos = 0;
-        m_graceUpcomingMaxPos = -VRV_UNSET;
-        m_graceCumulatedXShift = 0;
-        m_staffNs = staffNs;
-        m_isGraceAlignment = false;
-        m_rightDefaultAlignment = NULL;
-        m_doc = doc;
-        m_functor = functor;
-        m_functorEnd = functorEnd;
-        m_staffNs = staffNs;
-    }
-    int m_graceMaxPos;
-    int m_graceUpcomingMaxPos;
-    int m_graceCumulatedXShift;
-    std::vector<int> m_staffNs;
-    bool m_isGraceAlignment;
-    Alignment *m_rightDefaultAlignment;
-    Doc *m_doc;
-    Functor *m_functor;
-    Functor *m_functorEnd;
-};
-
-//----------------------------------------------------------------------------
 // AdjustFloatingPositionersParams
 //----------------------------------------------------------------------------
 
@@ -405,6 +363,48 @@ public:
     std::vector<ClassId> m_classIds;
     data_STAFFREL m_place;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustGraceXPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the maximum position
+ * member 1: the upcoming maximum position (i.e., the min pos for the next element)
+ * member 2: the cumulated shift on the previous aligners
+ * member 3: the list of staffN in the top-level scoreDef
+ * member 4: the flag indicating whereas the alignment is in a Measure or in a Grace
+ * member 5: the pointer to the right ALIGNMENT_DEFAULT (if any)
+ * member 6: the Doc
+ * member 7: the Functor to be redirected to MeasureAligner and GraceAligner
+ * member 8: the end Functor for redirection
+ **/
+
+class AdjustGraceXPosParams : public FunctorParams {
+public:
+    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
+    {
+        m_graceMaxPos = 0;
+        m_graceUpcomingMaxPos = -VRV_UNSET;
+        m_graceCumulatedXShift = 0;
+        m_staffNs = staffNs;
+        m_isGraceAlignment = false;
+        m_rightDefaultAlignment = NULL;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+        m_staffNs = staffNs;
+    }
+    int m_graceMaxPos;
+    int m_graceUpcomingMaxPos;
+    int m_graceCumulatedXShift;
+    std::vector<int> m_staffNs;
+    bool m_isGraceAlignment;
+    Alignment *m_rightDefaultAlignment;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -1521,6 +1521,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// GenerateFeaturesParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the Doc
+ * member 1: a pointer to the FeatureExtractor to which extraction is delegated
+ **/
+
+class GenerateFeaturesParams : public FunctorParams {
+public:
+    GenerateFeaturesParams(Doc *doc, FeatureExtractor *extractor)
+    {
+        m_doc = doc;
+        m_extractor = extractor;
+    }
+    Doc *m_doc;
+    FeatureExtractor *m_extractor;
+};
+
+//----------------------------------------------------------------------------
 // GenerateMIDIParams
 //----------------------------------------------------------------------------
 
@@ -1596,26 +1616,6 @@ public:
     double m_realTimeOffsetMilliseconds;
     double m_currentTempo;
     Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// GenerateFeaturesParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the Doc
- * member 1: a pointer to the FeatureExtractor to which extraction is delegated
- **/
-
-class GenerateFeaturesParams : public FunctorParams {
-public:
-    GenerateFeaturesParams(Doc *doc, FeatureExtractor *extractor)
-    {
-        m_doc = doc;
-        m_extractor = extractor;
-    }
-    Doc *m_doc;
-    FeatureExtractor *m_extractor;
 };
 
 //----------------------------------------------------------------------------
@@ -1802,6 +1802,27 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// PrepareCrossStaffParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the current measure
+ **/
+
+class PrepareCrossStaffParams : public FunctorParams {
+public:
+    PrepareCrossStaffParams()
+    {
+        m_currentMeasure = NULL;
+        m_currentCrossStaff = NULL;
+        m_currentCrossLayer = NULL;
+    }
+    Measure *m_currentMeasure;
+    Staff *m_currentCrossStaff;
+    Layer *m_currentCrossLayer;
+};
+
+//----------------------------------------------------------------------------
 // PrepareDelayedTurnsParams
 //----------------------------------------------------------------------------
 
@@ -1824,6 +1845,28 @@ public:
     LayerElement *m_previousElement;
     Turn *m_currentTurn;
     std::map<LayerElement *, Turn *> m_delayedTurns;
+};
+
+//----------------------------------------------------------------------------
+// PrepareDurationParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current scoredef default duration
+ * member 1: the current staffdef default durations
+ * member 2: the functor for redirection
+ **/
+
+class PrepareDurationParams : public FunctorParams {
+public:
+    PrepareDurationParams(Functor *functor)
+    {
+        m_durDefault = DURATION_NONE;
+        m_functor = functor;
+    }
+    data_DURATION m_durDefault;
+    std::map<int, data_DURATION> m_durDefaultForStaffN;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------
@@ -1867,27 +1910,6 @@ public:
     std::vector<Hairpin *> m_hairpins;
     std::map<std::string, Harm *> m_harms;
     Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
-// PrepareCrossStaffParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the current measure
- **/
-
-class PrepareCrossStaffParams : public FunctorParams {
-public:
-    PrepareCrossStaffParams()
-    {
-        m_currentMeasure = NULL;
-        m_currentCrossStaff = NULL;
-        m_currentCrossLayer = NULL;
-    }
-    Measure *m_currentMeasure;
-    Staff *m_currentCrossStaff;
-    Layer *m_currentCrossLayer;
 };
 
 //----------------------------------------------------------------------------
@@ -2027,6 +2049,20 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// PrepareSlursParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the doc
+ **/
+
+class PrepareSlursParams : public FunctorParams {
+public:
+    PrepareSlursParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // PrepareTimePointingParams
 //----------------------------------------------------------------------------
 
@@ -2070,6 +2106,18 @@ public:
     PrepareTimestampsParams() {}
     ListOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
     ListOfObjectBeatPairs m_tstamps;
+};
+
+//----------------------------------------------------------------------------
+// ReorderByXPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the current object whose children we (may) reorder
+ **/
+class ReorderByXPosParams : public FunctorParams {
+public:
+    int modifications = 0;
 };
 
 //----------------------------------------------------------------------------
@@ -2383,32 +2431,6 @@ public:
     }
     Page *m_page;
     System *m_currentSystem;
-};
-
-//----------------------------------------------------------------------------
-// ReorderByXPosParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the current object whose children we (may) reorder
- **/
-class ReorderByXPosParams : public FunctorParams {
-public:
-    int modifications = 0;
-};
-
-//----------------------------------------------------------------------------
-// PrepareSlursParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the doc
- **/
-
-class PrepareSlursParams : public FunctorParams {
-public:
-    PrepareSlursParams(Doc *doc) { m_doc = doc; }
-    Doc *m_doc;
 };
 
 } // namespace vrv
