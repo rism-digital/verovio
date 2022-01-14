@@ -1432,17 +1432,17 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (rest->m_crossStaff) staff = rest->m_crossStaff;
 
     const bool drawingCueSize = rest->GetDrawingCueSize();
-    const int drawingDur = rest->GetActualDur();
+    int drawingDur = rest->GetActualDur();
     if (drawingDur == DUR_NONE) {
         if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
             LogWarning("Missing duration for rest '%s'", rest->GetUuid().c_str());
         }
-        return;
+        drawingDur = DUR_4;
     }
-    const wchar_t drawingGlyph = rest->GetRestGlyph();
+    const wchar_t drawingGlyph = rest->GetRestGlyph(drawingDur);
 
-    int x = element->GetDrawingX();
-    int y = element->GetDrawingY();
+    const int x = element->GetDrawingX();
+    const int y = element->GetDrawingY();
 
     DrawSmuflCode(dc, x, y, drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
 

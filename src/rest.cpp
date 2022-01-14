@@ -220,6 +220,11 @@ void Rest::AddChild(Object *child)
 
 wchar_t Rest::GetRestGlyph() const
 {
+    return this->GetRestGlyph(this->GetActualDur());
+}
+
+wchar_t Rest::GetRestGlyph(const int duration) const
+{
     // If there is glyph.num, prioritize it
     if (HasGlyphNum()) {
         wchar_t code = GetGlyphNum();
@@ -231,7 +236,7 @@ wchar_t Rest::GetRestGlyph() const
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 
-    switch (this->GetActualDur()) {
+    switch (duration) {
         case DUR_LG: return SMUFL_E4E1_restLonga; break;
         case DUR_BR: return SMUFL_E4E2_restDoubleWhole; break;
         case DUR_1: return SMUFL_E4E3_restWhole; break;
