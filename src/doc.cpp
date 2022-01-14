@@ -512,6 +512,12 @@ void Doc::PrepareDrawing()
         this->Process(&resetDrawing, NULL);
     }
 
+    /************ Store default durations ************/
+
+    Functor prepareDuration(&Object::PrepareDuration);
+    PrepareDurationParams prepareDurationParams(&prepareDuration);
+    this->Process(&prepareDuration, &prepareDurationParams);
+
     /************ Resolve @startid / @endid ************/
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards

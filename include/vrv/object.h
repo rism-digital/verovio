@@ -1072,6 +1072,11 @@ public:
     ///@}
 
     /**
+     * Extract default duration from scoredef/staffdef
+     */
+    virtual int PrepareDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Match start for TimePointingInterface elements (such as fermata or harm).
      */
     ///@{

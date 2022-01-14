@@ -74,6 +74,11 @@ public:
      */
     int SetStaffDefRedrawFlags(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::PrepareDuration
+     */
+    int PrepareDuration(FunctorParams *functorParams) override;
+
 private:
     //
 public:

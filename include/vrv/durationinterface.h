@@ -45,7 +45,15 @@ public:
     virtual ~DurationInterface();
     void Reset() override;
     InterfaceId IsInterface() const override { return INTERFACE_DURATION; }
-    ///@}SetDurationGes
+    ///@}
+
+    /**
+     * @name Set and get the default duration
+     */
+    ///@{
+    void SetDurDefault(data_DURATION dur) { m_durDefault = dur; }
+    data_DURATION GetDurDefault() const { return m_durDefault; }
+    ///@}
 
     /**
      * Returns the duration (in double) for the element.
@@ -101,10 +109,18 @@ public:
     bool HasIdenticalDurationInterface(DurationInterface *otherDurationInterface);
 
 private:
-    //
+    /**
+     * Calculate the actual duration => translate mensural values
+     */
+    int CalcActualDur(data_DURATION dur) const;
+
 public:
     //
 private:
+    /**
+     * The default duration: extracted from scoreDef/staffDef and used when no duration attribute is given
+     */
+    data_DURATION m_durDefault;
 };
 
 } // namespace vrv

@@ -2554,4 +2554,28 @@ int LayerElement::PrepareSlurs(FunctorParams *)
     return FUNCTOR_SIBLINGS;
 }
 
+int LayerElement::PrepareDuration(FunctorParams *functorParams)
+{
+    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
+    assert(params);
+
+    DurationInterface *durInterface = this->GetDurationInterface();
+    if (durInterface) {
+        durInterface->SetDurDefault(params->m_durDefault);
+        // Check if there is a duration default for the staff
+        if (!params->m_durDefaultForStaffN.empty()) {
+            Layer *layer = NULL;
+            Staff *staff = this->GetCrossStaff(layer);
+            if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            assert(staff);
+
+            if (params->m_durDefaultForStaffN.count(staff->GetN()) > 0) {
+                durInterface->SetDurDefault(params->m_durDefaultForStaffN.at(staff->GetN()));
+            }
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

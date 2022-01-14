@@ -102,7 +102,7 @@ private:
     MeterSig *m_meter = NULL;
     Layer *m_layer = NULL;
 
-    data_DURATION m_durDefault; // todo: switch to MEI
+    data_DURATION m_durDefault;
     std::string m_ID;
     int m_unitDur;
     std::pair<data_BARRENDITION, data_BARRENDITION> m_barLines

@@ -234,7 +234,6 @@ public:
     int CastOffSystems(FunctorParams *functorParams) override;
 
     /**
-
      * See Object::CastOffEncoding
      */
     int CastOffEncoding(FunctorParams *functorParams) override;
@@ -248,6 +247,11 @@ public:
      * See Object::JustifyX
      */
     int JustifyX(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::PrepareDuration
+     */
+    int PrepareDuration(FunctorParams *functorParams) override;
 
 protected:
     /**
