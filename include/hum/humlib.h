@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Nov 26 22:38:47 CET 2021
+// Last Modified: Mon Jan  3 16:49:11 PST 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5862,7 +5862,9 @@ class Tool_composite : public HumTool {
 		void        addLabelsAndStria    (HumdrumFile& infile);
 		void        addLabels            (HTp sstart, int labelIndex, const string& label,
 		                                  int abbrIndex, const string& abbr);
-		void        addStria             (HumdrumFile& infile, int amount);
+		void        addStria             (HumdrumFile& infile, HTp spinestart);
+		void        addVerseLabels       (HumdrumFile& infile, HTp spinestart);
+		void        addVerseLabels2      (HumdrumFile& infile, HTp spinestart);
 		bool        pitchesEqual         (vector<int>& pitches1, vector<int>& pitches2);
 		void        mergeTremoloGroup    (vector<HTp>& notes, vector<int> groups, int group);
 		bool        onlyAuxTremoloNotes  (HumdrumFile& infile, int line);
@@ -5890,7 +5892,7 @@ class Tool_composite : public HumTool {
 		void        analyzeCompositeAccents(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
 		void        analyzeCompositeOrnaments(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
 		void        analyzeCompositeSlurs(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
-		void        analyzeCompositeTotals(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
+		void        analyzeCompositeTotal(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
 
 		void        getCompositeSpineStarts(std::vector<HTp>& groups, HumdrumFile& infile);
 		std::vector<int> getExpansionList(vector<bool>& tracks, int maxtrack, int count);
@@ -5912,18 +5914,20 @@ class Tool_composite : public HumTool {
 		                                   vector<string>& spines, HumdrumFile& outfile);
 
 	private:
-		std::string m_pitch     = "eR";   // pitch to display for composite rhythm
-		bool        m_nogroupsQ = false;  // do not split composite rhythms into markup groups
-		bool        m_extractQ  = false;  // output only composite rhythm analysis (not input data)
-		bool        m_appendQ   = false;  // display analysis at top of system
-		bool        m_debugQ    = false;  // display debug information
-		bool        m_graceQ    = false;  // include grace notes in composite rhythm
-		bool        m_tremoloQ  = false;  // preserve tremolos
-		bool        m_upQ       = false;  // force stem up
-		bool        m_hasGroupsQ = false; // used with -M, -N option
-		bool        m_nestQ     = false;  // used with --nest option
-		bool        m_onlyQ     = false;  // used with --only option
-		std::string m_only;               // used with --only option
+		std::string m_pitch       = "eR";   // pitch to display for composite rhythm
+		bool        m_onlygroupsQ = false;  // only split composite rhythms into markup groups
+		bool        m_addgroupsQ  = false;  // do not split composite rhythms into markup groups
+		bool        m_nogroupsQ   = false;  // has no groups in output
+		bool        m_extractQ    = false;  // output only composite rhythm analysis (not input data)
+		bool        m_appendQ     = false;  // display analysis at top of system
+		bool        m_debugQ      = false;  // display debug information
+		bool        m_graceQ      = false;  // include grace notes in composite rhythm
+		bool        m_tremoloQ    = false;  // preserve tremolos
+		bool        m_upQ         = false;  // force stem up
+		bool        m_hasGroupsQ  = false;  // used with -M, -N option
+		bool        m_nestQ       = false;  // used with --nest option
+		bool        m_onlyQ       = false;  // used with --only option
+		std::string m_only;                 // used with --only option
 		bool        m_coincidenceQ = false; // used with -c option
 		bool        m_assignedGroups = false;
 		bool        m_suppressCMarkQ = false; // used with -c option when -M -m -N and -n not present
@@ -5936,13 +5940,14 @@ class Tool_composite : public HumTool {
 		bool        m_analysisAccentsQ   = false;   // used with -A option
 		bool        m_analysisOrnamentsQ = false;   // used with -O option
 		bool        m_analysisSlursQ     = false;   // used with -S option
-		bool        m_analysisTotalsQ    = false;   // used with -T option
+		bool        m_analysisTotalQ    = false;   // used with -T option
 		bool        m_analysisQ          = false;   // union of -paost options
+		bool        m_nozerosQ           = false;   // used with -Z option
 		vector<vector<double>> m_analysisOnsets;    // used with -P
 		vector<vector<double>> m_analysisAccents;   // used with -A
 		vector<vector<double>> m_analysisOrnaments; // used with -O
 		vector<vector<double>> m_analysisSlurs;     // used with -S
-		vector<vector<double>> m_analysisTotals;    // used with -T
+		vector<vector<double>> m_analysisTotal;    // used with -T
 
 };
 
