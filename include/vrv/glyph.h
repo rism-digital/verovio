@@ -50,14 +50,24 @@ public:
      */
     void SetBoundingBox(double x, double y, double w, double h);
 
-    /** Get the units per EM */
+    /**
+     * @name Setter and getter for the units per EM
+     */
+    ///@{
     int GetUnitsPerEm() const { return m_unitsPerEm; }
+    void SetUnitsPerEm(int units) { m_unitsPerEm = units; }
+    ///@}
 
     /** Get the path */
     std::string GetPath() { return m_path; }
 
-    /** Get the code string */
+    /**
+     * @name Setter and getter for the code string
+     */
+    ///@{
     std::string GetCodeStr() { return m_codeStr; }
+    void SetCodeStr(const std::string &codeStr) { m_codeStr = codeStr; }
+    ///@}
 
     /**
      * @name Setter and getter for the horizAdvX
