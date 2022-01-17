@@ -242,6 +242,18 @@ int LayerElement::GetOriginalLayerN()
     return layerN;
 }
 
+Staff *LayerElement::FindStaff(const StaffSearch strategy)
+{
+    Staff *staff = NULL;
+    if (strategy == RESOLVE_CROSSSTAFF) {
+        Layer *layer = NULL;
+        staff = this->GetCrossStaff(layer);
+    }
+    if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    return staff;
+}
+
 Staff *LayerElement::GetCrossStaff(Layer *&layer) const
 {
     if (m_crossStaff) {

@@ -29,6 +29,9 @@ class MeterSig;
 class Staff;
 class StaffAlignment;
 
+// Helper enums
+enum StaffSearch { ANCESTOR_ONLY = 0, RESOLVE_CROSSSTAFF };
+
 //----------------------------------------------------------------------------
 // LayerElement
 //----------------------------------------------------------------------------
@@ -178,6 +181,11 @@ public:
      * Alignment getter
      */
     Alignment *GetAlignment() const { return m_alignment; }
+
+    /**
+     * Find the ancestor or cross staff
+     */
+    Staff *FindStaff(StaffSearch strategy);
 
     /**
      * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff.
