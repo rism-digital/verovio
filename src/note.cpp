@@ -779,7 +779,7 @@ void Note::GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime,
 
     for (const MIDIChord &chord : params->m_graceNotes) {
         const double stopTime = startTime + graceNoteDur;
-        for (char pitch : chord.pitches) {
+        for (int pitch : chord.pitches) {
             params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, pitch, velocity);
             params->m_midiFile->addNoteOff(params->m_midiTrack, stopTime * tpq, channel, pitch);
         }
