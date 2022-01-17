@@ -24,6 +24,7 @@
 #include "elementpart.h"
 #include "fermata.h"
 #include "functorparams.h"
+#include "gracegrp.h"
 #include "horizontalaligner.h"
 #include "layer.h"
 #include "note.h"
@@ -965,6 +966,41 @@ int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
             const int sign = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? 1 : -1;
             flag->SetDrawingYRel(flag->GetDrawingYRel() + sign * shift);
         }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    // Handle grace chords
+    if (this->IsGraceNote()) {
+        std::set<int> pitches;
+        const ArrayOfObjects *notes = this->GetList(this);
+        assert(notes);
+        for (Object *obj : *notes) {
+            Note *note = vrv_cast<Note *>(obj);
+            assert(note);
+            pitches.insert(note->GetMIDIPitch(params->m_transSemi));
+        }
+
+        double quarterDuration = 0.0;
+        const data_DURATION dur = this->GetDur();
+        if ((dur >= DURATION_long) && (dur <= DURATION_1024)) {
+            quarterDuration = pow(2.0, (DURATION_4 - dur));
+        }
+
+        params->m_graceNotes.push_back({ pitches, quarterDuration });
+
+        bool accented = (this->GetGrace() == GRACE_acc);
+        GraceGrp *graceGrp = vrv_cast<GraceGrp *>(this->GetFirstAncestor(GRACEGRP));
+        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
+        params->m_accentedGraceNote = accented;
+
+        return FUNCTOR_SIBLINGS;
     }
 
     return FUNCTOR_CONTINUE;

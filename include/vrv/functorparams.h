@@ -1548,11 +1548,21 @@ public:
  * Helper struct to store note sequences which replace notes in MIDI output due to expanded ornaments and tremolandi
  */
 struct MIDINote {
-    char pitch;
+    int pitch;
     double duration;
 };
 
 using MIDINoteSequence = std::list<MIDINote>;
+
+/**
+ * Helper struct to store chord sequences in MIDI output due to grace notes
+ */
+struct MIDIChord {
+    std::set<int> pitches;
+    double duration;
+};
+
+using MIDIChordSequence = std::list<MIDIChord>;
 
 /**
  * member 0: MidiFile*: the MidiFile we are writing to
@@ -1560,7 +1570,12 @@ using MIDINoteSequence = std::list<MIDINote>;
  * member 3: double: the score time from the start of the music to the start of the current measure
  * member 4: int: the semi tone transposition for the current track
  * member 5: double with the current tempo
- * member 6: expanded notes due to ornaments and tremolandi
+ * member 6: the last (non grace) note that was performed
+ * member 7: expanded notes due to ornaments and tremolandi
+ * member 8: deferred notes which start slightly later
+ * member 9: grace note sequence
+ * member 10: flag indicating whether the last grace note/chord was accented
+ * member 11: the functor
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1573,6 +1588,8 @@ public:
         m_totalTime = 0.0;
         m_transSemi = 0;
         m_currentTempo = 120.0;
+        m_lastNote = NULL;
+        m_accentedGraceNote = false;
         m_functor = functor;
     }
     smf::MidiFile *m_midiFile;
@@ -1581,7 +1598,11 @@ public:
     double m_totalTime;
     int m_transSemi;
     double m_currentTempo;
+    Note *m_lastNote;
     std::map<Note *, MIDINoteSequence> m_expandedNotes;
+    std::map<Note *, double> m_deferredNotes;
+    MIDIChordSequence m_graceNotes;
+    bool m_accentedGraceNote;
     Functor *m_functor;
 };
 

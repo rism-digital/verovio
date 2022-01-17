@@ -226,6 +226,11 @@ public:
      */
     int AdjustCrossStaffContent(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::GenerateMIDI
+     */
+    int GenerateMIDI(FunctorParams *functorParams) override;
+
 protected:
     /**
      * The note locations w.r.t. each staff
