@@ -4295,7 +4295,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
     }
 
     // Just in case
-    altNumber = std::min(6, altNumber);
+    altNumber = std::min(7, altNumber);
 
     if (alterationType != ACCIDENTAL_WRITTEN_NONE) {
         if (hasEnclosed == true) {
@@ -4552,7 +4552,7 @@ bool PAEInput::ParseDuration(
     durations.clear();
 
     if (paeStr.size() < 1 || paeStr.at(0) == '.') {
-        LogPAE(ERR_051_BARLINE, token);
+        LogPAE(ERR_052_DURATION, token);
         // Default to quarter note
         if (m_pedanticMode) return false;
         durations.push_back({ DURATION_4, 0 });

@@ -81,6 +81,7 @@ void BeamDrawingInterface::Reset()
     m_beamHasChord = false;
     m_hasMultipleStemDir = false;
     m_cueSize = false;
+    m_fractionSize = 100;
     m_crossStaffContent = NULL;
     m_crossStaffRel = STAFFREL_basic_NONE;
     m_shortestDur = 0;
@@ -183,8 +184,8 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
             }
         }
 
-        // Skip rests
-        if (current->Is({ NOTE, CHORD })) {
+        // Skip rests and tabGrp
+        if (current->Is({ CHORD, NOTE })) {
             // Look at the stemDir to see if we have multiple stem Dir
             if (!m_hasMultipleStemDir) {
                 // At this stage, BeamCoord::m_stem is not necessary set, so we need to look at the Note / Chord
@@ -201,9 +202,13 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
                     }
                 }
             }
+        }
+        // Skip rests
+        if (current->Is({ CHORD, NOTE, TABGRP })) {
             // keep the shortest dur in the beam
             m_shortestDur = std::max(currentDur, m_shortestDur);
         }
+
         // check if we have more than duration in the beam
         if (!m_changingDur && currentDur != lastDur) m_changingDur = true;
         lastDur = currentDur;

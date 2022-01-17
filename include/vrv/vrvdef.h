@@ -65,6 +65,8 @@ enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1, 
 #define MIDI_VELOCITY 90
 #define MIDI_TEMPO 120
 
+#define UNACC_GRACENOTE_DUR 27 // in milliseconds
+
 //----------------------------------------------------------------------------
 // Object defines
 //----------------------------------------------------------------------------

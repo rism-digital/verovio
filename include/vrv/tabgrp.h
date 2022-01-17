@@ -45,6 +45,15 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::CalcOnsetOffsetEnd
+     */
+    virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
+
 protected:
     //
 private:

@@ -1007,23 +1007,24 @@ int System::CastOffPages(FunctorParams *functorParams)
     const int childCount = params->m_currentPage->GetChildCount();
     if ((systemMaxPerPage && systemMaxPerPage == childCount)
         || (childCount > 0 && (this->m_drawingYRel - this->GetHeight() - currentShift < 0))) {
-        // If this is last system in the list, it doesn't fit the page and it's leftover system (has just one last
-        // measure) - get measure out of that system and try adding it to the previous system
+        // If this is the last system in the list, it doesn't fit the page and it's leftover system (has just one
+        // measure) => add the system content to the previous system
         Object *nextSystem = params->m_contentPage->GetNext(this, SYSTEM);
-        if ((NULL == nextSystem) && (this == params->m_leftoverSystem)) {
-            Measure *measure = dynamic_cast<Measure *>(Relinquish(GetFirst(MEASURE)->GetIdx()));
-            System *lastSystem = dynamic_cast<System *>(params->m_currentPage->GetLast());
-            if (measure && lastSystem) lastSystem->AddChild(measure);
+        Object *lastSystem = params->m_currentPage->GetLast(SYSTEM);
+        if (!nextSystem && lastSystem && (this == params->m_leftoverSystem)) {
+            ArrayOfObjects *children = this->GetChildrenForModification();
+            for (Object *child : *children) {
+                child->MoveItselfTo(lastSystem);
+            }
             return FUNCTOR_SIBLINGS;
         }
-        else {
-            params->m_currentPage = new Page();
-            // Use VRV_UNSET value as a flag
-            params->m_pgHeadHeight = VRV_UNSET;
-            assert(params->m_doc->GetPages());
-            params->m_doc->GetPages()->AddChild(params->m_currentPage);
-            params->m_shift = this->m_drawingYRel - params->m_pageHeight;
-        }
+
+        params->m_currentPage = new Page();
+        // Use VRV_UNSET value as a flag
+        params->m_pgHeadHeight = VRV_UNSET;
+        assert(params->m_doc->GetPages());
+        params->m_doc->GetPages()->AddChild(params->m_currentPage);
+        params->m_shift = this->m_drawingYRel - params->m_pageHeight;
     }
 
     // First add all pending objects

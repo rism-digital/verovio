@@ -263,4 +263,17 @@ int Score::ScoreDefOptimize(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Score::PrepareDuration(FunctorParams *functorParams)
+{
+    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
+    assert(params);
+
+    ScoreDef *scoreDef = this->GetScoreDef();
+    if (scoreDef) {
+        scoreDef->Process(params->m_functor, params);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

@@ -46,6 +46,8 @@ public:
     void CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface,
         data_BEAMPLACE place = BEAMPLACE_NONE, bool init = true);
 
+    void CalcTabBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
+
     /**
      *
      */
@@ -166,6 +168,12 @@ public:
      *
      */
     const ArrayOfBeamElementCoords *GetElementCoords();
+
+    /**
+     * Return true if the beam has a tabGrp child.
+     * In that case, the ObjectList will only have tabGrp elements. See Beam::FilterList
+     */
+    bool IsTabBeam();
 
     //----------//
     // Functors //

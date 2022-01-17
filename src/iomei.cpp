@@ -1633,7 +1633,10 @@ void MEIOutput::WriteCourse(pugi::xml_node currentNode, Course *course)
     assert(course);
 
     WriteXmlId(currentNode, course);
+    course->WriteAccidental(currentNode);
     course->WriteNNumberLike(currentNode);
+    course->WriteOctave(currentNode);
+    course->WritePitch(currentNode);
 }
 
 void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
@@ -2087,6 +2090,7 @@ void MEIOutput::WriteBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt)
 
     WriteLayerElement(currentNode, beatRpt);
     beatRpt->WriteColor(currentNode);
+    beatRpt->WriteBeatRptLog(currentNode);
     beatRpt->WriteBeatRptVis(currentNode);
 }
 
@@ -2684,6 +2688,7 @@ void MEIOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
 {
     assert(interface);
 
+    interface->WriteDurationDefault(element);
     interface->WriteLyricStyle(element);
     interface->WriteMidiTempo(element);
     interface->WriteMultinumMeasures(element);
@@ -3133,6 +3138,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "space") {
+            return true;
+        }
+        else if (element == "tabGrp") {
             return true;
         }
         else if (element == "tuplet") {
@@ -4651,7 +4659,10 @@ bool MEIInput::ReadCourse(Object *parent, pugi::xml_node course)
     SetMeiUuid(course, vrvCourse);
 
     parent->AddChild(vrvCourse);
+    vrvCourse->ReadAccidental(course);
     vrvCourse->ReadNNumberLike(course);
+    vrvCourse->ReadOctave(course);
+    vrvCourse->ReadPitch(course);
 
     ReadUnsupportedAttr(course, vrvCourse);
 
@@ -5660,6 +5671,7 @@ bool MEIInput::ReadBeatRpt(Object *parent, pugi::xml_node beatRpt)
     ReadLayerElement(beatRpt, vrvBeatRpt);
 
     vrvBeatRpt->ReadColor(beatRpt);
+    vrvBeatRpt->ReadBeatRptLog(beatRpt);
     vrvBeatRpt->ReadBeatRptVis(beatRpt);
 
     if (m_version < MEI_4_0_0) {
@@ -6472,6 +6484,7 @@ bool MEIInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *
 
 bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface)
 {
+    interface->ReadDurationDefault(element);
     interface->ReadLyricStyle(element);
     interface->ReadMidiTempo(element);
     interface->ReadMultinumMeasures(element);

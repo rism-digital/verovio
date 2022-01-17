@@ -219,15 +219,18 @@ public:
     void SetScoreTimeOffset(double scoreTime);
     void SetRealTimeOffsetSeconds(double timeInSeconds);
     void SetScoreTimeTiedDuration(double timeInSeconds);
-    void CalcMIDIPitch(int shift);
     double GetScoreTimeOnset() const;
     double GetRealTimeOnsetMilliseconds() const;
     double GetScoreTimeOffset() const;
     double GetScoreTimeTiedDuration() const;
     double GetRealTimeOffsetMilliseconds() const;
     double GetScoreTimeDuration() const;
-    char GetMIDIPitch() const;
     ///@}
+
+    /**
+     * MIDI pitch
+     */
+    int GetMIDIPitch(int shift = 0);
 
 public:
     //----------------//
@@ -343,6 +346,16 @@ private:
      */
     bool IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted);
 
+    /**
+     * Register deferred notes for MIDI
+     */
+    void DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings);
+
+    /**
+     * Create the MIDI output of the grace note sequence stored in params
+     */
+    void GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime, int tpq, int channel, int velocity);
+
 public:
     //
 private:
@@ -401,11 +414,6 @@ private:
      * indicate that it should not be written to MIDI output.
      */
     double m_scoreTimeTiedDuration;
-
-    /**
-     * The MIDI pitch of the note.
-     */
-    char m_MIDIPitch;
 };
 
 //----------------------------------------------------------------------------
