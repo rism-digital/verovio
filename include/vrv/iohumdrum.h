@@ -191,6 +191,10 @@ namespace humaux {
         // current staff.
         std::vector<hum::HTp> verse_labels;
 
+        // verse_abbr_labels == List of verse abbreviation labels that
+        // need to be added to the current staff.
+        std::vector<hum::HTp> verse_abbr_labels;
+
         // suppress_tuplet_number == keeps track of whether or not beams should
         // display beam tuplet numbers.
         bool suppress_tuplet_number;
@@ -719,6 +723,7 @@ protected:
     hum::HTp getPreviousStaffToken(hum::HTp parttok);
     void checkForVerseLabels(hum::HTp token);
     std::vector<hum::HTp> getVerseLabels(hum::HTp token, int staff);
+    std::vector<hum::HTp> getVerseAbbrLabels(hum::HTp token, int staff);
     std::string getVerseLabelText(hum::HTp token);
     void addPlicaUp(Note *note);
     void addPlicaDown(Note *note);

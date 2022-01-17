@@ -393,6 +393,7 @@ namespace humaux {
         suppress_manual_custos = false;
 
         verse_labels.clear();
+        verse_abbr_labels.clear();
 
         std::fill(cue_size.begin(), cue_size.end(), false);
         std::fill(stem_type.begin(), stem_type.end(), 'X');
@@ -8764,8 +8765,12 @@ void HumdrumInput::checkForVerseLabels(hum::HTp token)
         if (current->compare(0, 3, "*v:") == 0) {
             ss[staffindex].verse_labels.push_back(current);
         }
-        if (current->compare(0, 4, "*vv:") == 0) {
+        else if (current->compare(0, 4, "*vv:") == 0) {
             ss[staffindex].verse_labels.push_back(current);
+            ss[staffindex].verse_abbr_labels.push_back(current);
+        }
+        if (current->compare(0, 4, "*V:") == 0) {
+            ss[staffindex].verse_abbr_labels.push_back(current);
         }
         current = current->getNextFieldToken();
     }
@@ -19976,6 +19981,7 @@ std::vector<hum::HTp> HumdrumInput::getVerseLabels(hum::HTp token, int staff)
     }
     std::vector<hum::HTp> remainder;
     std::string spineinfo = token->getSpineInfo();
+
     for (int i = 0; i < (int)ss[staff].verse_labels.size(); i++) {
         if (ss[staff].verse_labels[i]->getSpineInfo() == spineinfo) {
             output.push_back(ss[staff].verse_labels[i]);
@@ -19984,11 +19990,43 @@ std::vector<hum::HTp> HumdrumInput::getVerseLabels(hum::HTp token, int staff)
             remainder.push_back(ss[staff].verse_labels[i]);
         }
     }
+
     if (output.empty()) {
         return output;
     }
     else {
         ss[staff].verse_labels = remainder;
+    }
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getVerseAbbrLabels --
+//
+
+std::vector<hum::HTp> HumdrumInput::getVerseAbbrLabels(hum::HTp token, int staff)
+{
+    std::vector<hum::HTp> output;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    if (ss[staff].verse_abbr_labels.empty()) {
+        return output;
+    }
+    std::vector<hum::HTp> remainder;
+    std::string spineinfo = token->getSpineInfo();
+    for (int i = 0; i < (int)ss[staff].verse_abbr_labels.size(); i++) {
+        if (ss[staff].verse_abbr_labels[i]->getSpineInfo() == spineinfo) {
+            output.push_back(ss[staff].verse_abbr_labels[i]);
+        }
+        else {
+            remainder.push_back(ss[staff].verse_abbr_labels[i]);
+        }
+    }
+    if (output.empty()) {
+        return output;
+    }
+    else {
+        ss[staff].verse_abbr_labels = remainder;
     }
     return output;
 }
@@ -20084,14 +20122,20 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
 
         std::vector<hum::HTp> labels;
         std::string verselabel;
-        std::string verselabelabbr;
+
         if (!ss[staff].verse_labels.empty()) {
             labels = getVerseLabels(line.token(i), staff);
             if (!labels.empty()) {
                 verselabel = getVerseLabelText(labels[0]);
-                if (labels[0]->compare(0, 4, "*vv:") == 0) {
-                    verselabelabbr = verselabel;
-                }
+            }
+        }
+
+        std::vector<hum::HTp> abbrlabels;
+        std::string verseabbrlabel;
+        if (!ss[staff].verse_abbr_labels.empty()) {
+            abbrlabels = getVerseAbbrLabels(line.token(i), staff);
+            if (!abbrlabels.empty()) {
+                verseabbrlabel = getVerseLabelText(abbrlabels[0]);
             }
         }
 
@@ -20158,13 +20202,13 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
                 verse->AddChild(label);
                 label->AddChild(text);
             }
-            if (!verselabelabbr.empty()) {
-                LabelAbbr *label = new LabelAbbr();
+            if (!verseabbrlabel.empty()) {
+                LabelAbbr *labelabbr = new LabelAbbr();
                 Text *text = new Text();
-                std::wstring wtext = UTF8to16(verselabel);
+                std::wstring wtext = UTF8to16(verseabbrlabel);
                 text->SetText(wtext);
-                verse->AddChild(label);
-                label->AddChild(text);
+                verse->AddChild(labelabbr);
+                labelabbr->AddChild(text);
             }
 
             Syl *syl = new Syl();
@@ -20379,7 +20423,7 @@ std::string HumdrumInput::getVerseLabelText(hum::HTp token)
         return "";
     }
     hum::HumRegex hre;
-    if (hre.search(token, "^\\*vv?:(.*)")) {
+    if (hre.search(token, "^\\*vv?:(.*)", "i")) {
         std::string output = hre.getMatch(1);
         if (hre.search(output, "^\\d+$")) {
             output += ".";
