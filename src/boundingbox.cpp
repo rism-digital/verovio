@@ -654,7 +654,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     return 0;
 }
 
-int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, int additionalOffset) const
+int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
 {
     assert(beamInterface);
     assert(!beamInterface->m_beamElementCoords.empty());
@@ -664,18 +664,21 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, 
     const Point beamRight(
         beamInterface->m_beamElementCoords.back()->m_x, beamInterface->m_beamElementCoords.back()->m_yBeam);
 
+    const int leftX = this->GetLeftBy(type) - margin;
+    const int rightX = this->GetRightBy(type) + margin;
+
     Point leftIntersection(0, 0);
     Point rightIntersection(0, 0);
     const double beamSlope = BoundingBox::CalcSlope(beamLeft, beamRight);
-    if (this->GetLeftBy(type) <= beamLeft.x) {
+    if (leftX <= beamLeft.x) {
         // BB does not overlap horizontally with beam (left side of the beam)
-        if (this->GetRightBy(type) < beamLeft.x) {
+        if (rightX < beamLeft.x) {
             return 0;
         }
         // BB overlaps with left side of the beam
-        else if (this->GetRightBy(type) < beamRight.x) {
+        else if (rightX < beamRight.x) {
             leftIntersection = beamLeft;
-            rightIntersection.x = this->GetRightBy(type);
+            rightIntersection.x = rightX;
             rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
         }
         // BB covers the whole beam
@@ -685,10 +688,10 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, 
         }
     }
     else {
-        if (this->GetRightBy(type) > beamRight.x) {
+        if (rightX > beamRight.x) {
             // BB overlaps with right side of the beam
-            if (this->GetLeftBy(type) <= beamRight.x) {
-                leftIntersection.x = this->GetLeftBy(type);
+            if (leftX <= beamRight.x) {
+                leftIntersection.x = leftX;
                 leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
                 rightIntersection = beamRight;
             }
@@ -699,9 +702,9 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, 
         }
         // BB is inside of the beam
         else {
-            leftIntersection.x = this->GetLeftBy(type);
+            leftIntersection.x = leftX;
             leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
-            rightIntersection.x = this->GetRightBy(type);
+            rightIntersection.x = rightX;
             rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
         }
     }
@@ -709,13 +712,13 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, 
     // calculate vertical overlap of the BB with beam section
     if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
         const int topY = std::max(leftIntersection.y, rightIntersection.y);
-        const int shift = topY - this->GetBottomBy(type);
-        if (shift > 0) return shift + additionalOffset;
+        const int shift = topY - this->GetBottomBy(type) + margin;
+        return std::max(shift, 0);
     }
     else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
         const int bottomY = std::min(leftIntersection.y, rightIntersection.y);
-        const int shift = bottomY - this->GetTopBy(type);
-        if (shift < 0) return shift - additionalOffset;
+        const int shift = bottomY - this->GetTopBy(type) - margin;
+        return std::min(shift, 0);
     }
 
     return 0;
