@@ -44,6 +44,7 @@ if __name__ == '__main__':
     defaultOptions = json.loads(tk.getOptions(True))
 
     tk.setResourcePath('../../data')
+    tk.initClock()
 
     # look if we have a shortlist file and read it
     if len(args.shortlist) > 0:
@@ -104,3 +105,4 @@ if __name__ == '__main__':
                 "overflow=\"inherit\"", "overflow=\"visible\"")
             ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
             cairosvg.svg2png(bytestring=svgString, scale=2, write_to=pngFile)
+            tk.logRuntime()
