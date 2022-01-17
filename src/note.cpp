@@ -553,7 +553,7 @@ bool Note::IsVisible() const
 
 bool Note::IsEnharmonicWith(Note *note)
 {
-    return (this->GetMIDIPitch(0) == note->GetMIDIPitch(0));
+    return (this->GetMIDIPitch() == note->GetMIDIPitch());
 }
 
 void Note::SetScoreTimeOnset(double scoreTime)

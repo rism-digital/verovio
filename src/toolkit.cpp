@@ -1644,7 +1644,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
         Note *note = vrv_cast<Note *>(element);
         assert(note);
         const int timeOfElement = this->GetTimeForElement(xmlId);
-        const int pitchOfElement = note->GetMIDIPitch(0);
+        const int pitchOfElement = note->GetMIDIPitch();
         const int durationOfElement = note->GetRealTimeOffsetMilliseconds() - note->GetRealTimeOnsetMilliseconds();
         o << "time" << timeOfElement;
         o << "pitch" << pitchOfElement;

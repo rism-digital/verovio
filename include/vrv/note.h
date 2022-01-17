@@ -230,7 +230,7 @@ public:
     /**
      * MIDI pitch
      */
-    int GetMIDIPitch(int shift);
+    int GetMIDIPitch(int shift = 0);
 
 public:
     //----------------//
