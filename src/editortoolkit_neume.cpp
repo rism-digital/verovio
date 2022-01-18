@@ -1285,10 +1285,12 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
                 Zone *zone = new Zone();
                 int ulx, uly, lrx, lry;
                 if (syllable->GenerateZoneBounds(&ulx, &uly, &lrx, &lry)) {
-                    zone->SetUlx(ulx);
-                    zone->SetUly(uly);
-                    zone->SetLrx(lrx);
-                    zone->SetLry(lry);
+                    int width = lrx - ulx;
+                    int height = lry - uly;
+                    zone->SetUlx(ulx - width);
+                    zone->SetUly(uly + 2 * height);
+                    zone->SetLrx(lrx + 2 * width);
+                    zone->SetLry(lry + 6 * height);
                     Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
                     surface->AddChild(zone);
                     syl->SetZone(zone);
