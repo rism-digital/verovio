@@ -111,6 +111,13 @@ void BeamSegment::CalcTabBeam(
     // Adjust the height and spacing of the beams
     beamInterface->m_beamWidthBlack /= 2;
     beamInterface->m_beamWidthWhite /= 2;
+
+    // Adjust it further for tab.lute.french and tab.lute.italian
+    if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
+        beamInterface->m_beamWidthBlack /= 2;
+        beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 2 / 3;
+    }
+
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
     beamInterface->m_drawingPlace = (place == BEAMPLACE_below) ? BEAMPLACE_below : BEAMPLACE_above;
