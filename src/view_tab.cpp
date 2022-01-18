@@ -83,7 +83,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
-        params.m_pointSize = m_doc->GetDrawingLyricFont(glyphSize)->GetPointSize() * 3 / 5;
+        params.m_pointSize = m_doc->GetDrawingLyricFont(glyphSize)->GetPointSize();
         fretTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
