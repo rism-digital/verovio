@@ -1,0 +1,209 @@
+{
+	"glyphRanges" : [
+	{
+		"rangeName" : "Staff brackets and dividers",
+		"rangeStart" : "E000",
+		"rangeEnd" : "E004"
+	},
+	{
+		"rangeName" : "Repeats",
+		"rangeStart" : "E043",
+		"rangeEnd" : "E04B"
+	},
+	{
+		"rangeName" : "Clefs",
+		"rangeStart" : "E050",
+		"rangeEnd" : "E077"
+	},
+	{
+		"rangeName" : "Time signatures",
+		"rangeStart" : "E080",
+		"rangeEnd" : "E095"
+	},
+	{
+		"rangeName" : "Noteheads",
+		"rangeStart" : "E0A0",
+		"rangeEnd" : "E0FA"
+	},
+	{
+		"rangeName" : "Slash noteheads",
+		"rangeStart" : "E101",
+		"rangeEnd" : "E103"
+	},
+	{
+		"rangeName" : "Tremolos",
+		"rangeStart" : "E220",
+		"rangeEnd" : "E22A"
+	},
+	{
+		"rangeName" : "Flags",
+		"rangeStart" : "E240",
+		"rangeEnd" : "E24F"
+	},
+	{
+		"rangeName" : "Standard accidentals (12-EDO)",
+		"rangeStart" : "E260",
+		"rangeEnd" : "E26D"
+	},
+	{
+		"rangeName" : "Gould arrow quartertone accidentals (24-EDO)",
+		"rangeStart" : "E270",
+		"rangeEnd" : "E275"
+	},
+	{
+		"rangeName" : "Stein-Zimmermann accidentals (24-EDO)",
+		"rangeStart" : "E280",
+		"rangeEnd" : "E283"
+	},
+	{
+		"rangeName" : "Arel-Ezgi-Uzdilek (AEU) accidentals",
+		"rangeStart" : "E440",
+		"rangeEnd" : "E447"
+	},
+	{
+		"rangeName" : "Articulation",
+		"rangeStart" : "E4A0",
+		"rangeEnd" : "E4BD"
+	},
+	{
+		"rangeName" : "Holds and pauses",
+		"rangeStart" : "E4C0",
+		"rangeEnd" : "E4CE"
+	},
+	{
+		"rangeName" : "Rests",
+		"rangeStart" : "E4E0",
+		"rangeEnd" : "E4F6"
+	},
+	{
+		"rangeName" : "Bar repeats",
+		"rangeStart" : "E500",
+		"rangeEnd" : "E505"
+	},
+	{
+		"rangeName" : "Octaves",
+		"rangeStart" : "E510",
+		"rangeEnd" : "E51E"
+	},
+	{
+		"rangeName" : "Dynamics",
+		"rangeStart" : "E520",
+		"rangeEnd" : "E53D"
+	},
+	{
+		"rangeName" : "Common ornaments",
+		"rangeStart" : "E566",
+		"rangeEnd" : "E56F"
+	},
+	{
+		"rangeName" : "Other baroque ornaments",
+		"rangeStart" : "E583",
+		"rangeEnd" : "E587"
+	},
+	{
+		"rangeName" : "Combining strokes for trills and mordents",
+		"rangeStart" : "E59D",
+		"rangeEnd" : "E59E"
+	},
+	{
+		"rangeName" : "Precomposed trills and mordents",
+		"rangeStart" : "E5B0",
+		"rangeEnd" : "E5C8"
+	},
+	{
+		"rangeName" : "Brass techniques",
+		"rangeStart" : "E5E5",
+		"rangeEnd" : "E5E7"
+	},
+	{
+		"rangeName" : "String techniques",
+		"rangeStart" : "E610",
+		"rangeEnd" : "E614"
+	},
+	{
+		"rangeName" : "Plucked techniques",
+		"rangeStart" : "E630",
+		"rangeEnd" : "E638"
+	},
+	{
+		"rangeName" : "Vocal techniques",
+		"rangeStart" : "E645",
+		"rangeEnd" : "E645"
+	},
+	{
+		"rangeName" : "Keyboard techniques",
+		"rangeStart" : "E650",
+		"rangeEnd" : "E65A"
+	},
+	{
+		"rangeName" : "Tuplets",
+		"rangeStart" : "E880",
+		"rangeEnd" : "E88A"
+	},
+	{
+		"rangeName" : "Medieval and Renaissance clefs",
+		"rangeStart" : "E901",
+		"rangeEnd" : "E909"
+	},
+	{
+		"rangeName" : "Medieval and Renaissance prolations",
+		"rangeStart" : "E910",
+		"rangeEnd" : "E925"
+	},
+	{
+		"rangeName" : "Medieval and Renaissance noteheads and stems",
+		"rangeStart" : "E938",
+		"rangeEnd" : "E94C"
+	},
+	{
+		"rangeName" : "Medieval and Renaissance plainchant single-note forms",
+		"rangeStart" : "E990",
+		"rangeEnd" : "E99F"
+	},
+	{
+		"rangeName" : "Medieval and Renaissance plainchant multiple-note forms",
+		"rangeStart" : "E9B4",
+		"rangeEnd" : "E9BC"
+	},
+	{
+		"rangeName" : "Medieval and Renaissance accidentals",
+		"rangeStart" : "E9E0",
+		"rangeEnd" : "E9E3"
+	},
+	{
+		"rangeName" : "Medieval and Renaissance rests",
+		"rangeStart" : "E9F0",
+		"rangeEnd" : "E9F8"
+	},
+	{
+		"rangeName" : "Medieval and Renaissance miscellany",
+		"rangeStart" : "EA02",
+		"rangeEnd" : "EA06"
+	},
+	{
+		"rangeName" : "Multi-segment lines",
+		"rangeStart" : "EAA4",
+		"rangeEnd" : "EAAF"
+	},
+	{
+		"rangeName" : "Renaissance lute tablature",
+		"rangeStart" : "EBA7",
+		"rangeEnd" : "EBAC"
+	},
+	{
+		"rangeName" : "French and English Renaissance lute tablature",
+		"rangeStart" : "EBC0",
+		"rangeEnd" : "EBCC"
+	},
+	{
+		"rangeName" : "Italian and Spanish Renaissance lute tablature",
+		"rangeStart" : "EBE0",
+		"rangeEnd" : "EBE9"
+	},
+	{
+		"rangeName" : "Articulation supplement",
+		"rangeStart" : "ED40",
+		"rangeEnd" : "ED41"
+	}
+	]
+}
