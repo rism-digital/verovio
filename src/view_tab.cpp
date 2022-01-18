@@ -144,12 +144,6 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    double spacingRatio = 1.0;
-    if (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_french) {
-        spacingRatio = 2.0;
-    }
-    y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * spacingRatio;
-
     int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
     int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
 
