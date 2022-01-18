@@ -105,12 +105,15 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     else {
 
         std::wstring fret = note->GetTabFretString(staff->m_drawingNotationType);
-        wchar_t code = (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_french) ? SMUFL_EBC0_luteFrenchFretA
-                                                                                      : SMUFL_EBE0_luteItalianFret0;
-        int radius = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false);
-        y -= (m_doc->GetGlyphHeight(code, glyphSize, drawingCueSize) / 2);
-        x += radius - (m_doc->GetGlyphWidth(code, glyphSize, drawingCueSize) / 2);
-
+        // Center for italian tablature
+        if (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_italian) {
+            y -= (m_doc->GetGlyphHeight(SMUFL_EBE0_luteItalianFret0, glyphSize, drawingCueSize) / 2);
+        }
+        // Above the line for french tablature
+        else if (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_french) {
+            y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) - m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
+        }
+        
         dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
         DrawSmuflString(dc, x, y, fret, HORIZONTALALIGNMENT_center, glyphSize);
         dc->ResetFont();
@@ -139,7 +142,13 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
-    y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
+    
+    double spacingRatio = 1.0;
+    if (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_french) {
+        spacingRatio = 2.0;
+    }
+    y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * spacingRatio;
+    
     int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
     int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
 
@@ -151,9 +160,6 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
             x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y + height);
     }
     else {
-        int radius = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false) / 2;
-        x += radius;
-
         int symc = 0;
         switch (drawingDur) {
             case DUR_2: symc = SMUFL_EBA7_luteDurationWhole; break;
@@ -170,7 +176,7 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
             y += m_doc->GetDrawingUnit(glyphSize) * 0.5;
             x += m_doc->GetDrawingUnit(glyphSize);
             for (int i = 0; i < tabGrp->GetDots(); ++i) {
-                DrawDot(dc, x, y, glyphSize / 2);
+                DrawDot(dc, x, y, glyphSize * 2 / 3);
                 // HARDCODED
                 x += m_doc->GetDrawingUnit(glyphSize) * 0.75;
             }
