@@ -58,9 +58,6 @@ public:
     void SetUnitsPerEm(int units) { m_unitsPerEm = units; }
     ///@}
 
-    /** Get the path */
-    std::string GetPath() { return m_path; }
-
     /**
      * @name Setter and getter for the code string
      */
@@ -107,8 +104,6 @@ private:
     int m_horizAdvX;
     /** Units per EM for the glyph */
     int m_unitsPerEm;
-    /** Path to the file */
-    std::string m_path;
     /** The Unicode code in hexa as string */
     std::string m_codeStr;
     /** A map of the available anchors */
