@@ -105,7 +105,7 @@ public:
     bool IsNeume();
     bool IsTablature();
     bool IsTabLuteFrench() { return m_drawingNotationType == NOTATIONTYPE_tab_lute_french; }
-    bool IsTablatureGerman() { return m_drawingNotationType == NOTATIONTYPE_tab_lute_german; }
+    bool IsTabLuteGerman() { return m_drawingNotationType == NOTATIONTYPE_tab_lute_german; }
     bool IsTabLuteItalian() { return m_drawingNotationType == NOTATIONTYPE_tab_lute_italian; }
     ///@}
 
