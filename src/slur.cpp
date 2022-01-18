@@ -313,7 +313,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     bezier.UpdateControlPointParams(curve->GetDir());
 
     const int unit = doc->GetDrawingUnit(100);
-    const int margin = doc->GetOptions()->m_slurMargin.GetValue() * doc->GetDrawingUnit(100);
+    const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
 
     // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
     this->FilterSpannedElements(curve, bezier, margin);
@@ -369,7 +369,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // STEP 5: Adjust the slur shape
     // Through the control point adjustments in step 3 and 4 it can happen that the slur looses its desired shape.
     // We correct the shape if the slur is too flat or not convex.
-    this->AdjustSlurShape(bezier, curve->GetDir(), doc->GetDrawingUnit(100));
+    this->AdjustSlurShape(bezier, curve->GetDir(), unit);
     curve->UpdatePoints(bezier);
 
     // Since we are going to redraw it, reset its bounding box
