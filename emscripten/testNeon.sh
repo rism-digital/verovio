@@ -9,7 +9,7 @@
 
 
 # Builds verovio for Neon
-./buildToolkit -x "Gootville,Leipzig,Petaluma" -DHPX
+./buildToolkit -x "Gootville,Petaluma" -DHPX 
 
 cd build
 
