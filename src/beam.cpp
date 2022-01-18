@@ -811,16 +811,26 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
     // We can actually tolerate a stem slightly shorter within the beam
     refLen -= unit;
 
-    int lengthen = 0;
+    bool lengthen = false;
     for (auto coord : m_beamElementCoordRefs) {
         if (coord->m_stem && coord->m_closestNote) {
-            // Here we should look at duration to because longer values in the middle could actually be OK as they are
-            int len = abs(coord->m_yBeam - coord->m_closestNote->GetDrawingY());
-            if (len < refLen) lengthen = std::max(lengthen, refLen - len);
+            const int len = abs(coord->m_yBeam - coord->m_closestNote->GetDrawingY());
+            if (len < refLen) {
+                lengthen = true;
+                break;
+            }
+            // Here we should look at duration too because longer values in the middle could actually be OK as they are
+            else if ((coord != m_lastNoteOrChord) || (coord != m_firstNoteOrChord)) {
+                const int durLen = len - (coord->m_dur - DUR_8) * beamInterface->m_beamWidthBlack;
+                if (durLen < refLen) {
+                    lengthen = true;
+                    break;
+                }
+            }
         }
     }
     // We need to legthen the stems
-    if (lengthen > 0) {
+    if (lengthen) {
         // First if the slope step is 4 units (or more?) reduce it to 2 units and try again (recursive call)
         if (step >= 4 * unit) {
             step = 2 * unit;
