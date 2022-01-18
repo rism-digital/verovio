@@ -275,11 +275,7 @@ Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spann
     // The floating curve positioner of cross staff slurs should live in the upper/lower staff alignment
     // corresponding to whether the slur is curved above/below
     auto adaptStaff = [&extremalStaff, curveDir](LayerElement *element) {
-        Layer *elementLayer = NULL;
-        Staff *elementStaff = element->GetCrossStaff(elementLayer);
-        if (!elementStaff) elementStaff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
-        assert(elementStaff);
-
+        Staff *elementStaff = element->FindStaff(RESOLVE_CROSSSTAFF);
         if ((curveDir == curvature_CURVEDIR_above) && (elementStaff->GetN() < extremalStaff->GetN())) {
             extremalStaff = elementStaff;
         }

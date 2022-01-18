@@ -1062,10 +1062,7 @@ MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate)
 {
     if (predicate && !predicate(this)) return {};
 
-    Layer *layer = NULL;
-    Staff *staff = this->GetCrossStaff(layer);
-    if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
 
     MapOfNoteLocs noteLocations;
     noteLocations[staff] = { this->GetDrawingLoc() };

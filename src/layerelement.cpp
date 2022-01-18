@@ -282,11 +282,7 @@ data_STAFFREL_basic LayerElement::GetCrossStaffRel()
 
 void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlignment *&below)
 {
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    Layer *crossLayer = NULL;
-    Staff *crossStaff = this->GetCrossStaff(crossLayer);
-    if (crossStaff) staff = crossStaff;
-    assert(staff);
+    Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
 
     // By default use the alignment of the staff
     above = staff->GetAlignment();
@@ -2375,21 +2371,15 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 
         // Skip elements aligned at start/end, but on a different staff
         if ((this->GetAlignment() == start->GetAlignment()) && !start->Is(TIMESTAMP_ATTR)) {
-            Layer *layer = NULL;
-            Staff *staff = this->GetCrossStaff(layer);
-            if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            Staff *startStaff = start->GetCrossStaff(layer);
-            if (!startStaff) startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
+            Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
+            Staff *startStaff = start->FindStaff(RESOLVE_CROSSSTAFF);
             if (staff->GetN() != startStaff->GetN()) {
                 return FUNCTOR_CONTINUE;
             }
         }
         if ((this->GetAlignment() == end->GetAlignment()) && !end->Is(TIMESTAMP_ATTR)) {
-            Layer *layer = NULL;
-            Staff *staff = this->GetCrossStaff(layer);
-            if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            Staff *endStaff = end->GetCrossStaff(layer);
-            if (!endStaff) endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
+            Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
+            Staff *endStaff = end->FindStaff(RESOLVE_CROSSSTAFF);
             if (staff->GetN() != endStaff->GetN()) {
                 return FUNCTOR_CONTINUE;
             }
@@ -2576,11 +2566,7 @@ int LayerElement::PrepareDuration(FunctorParams *functorParams)
         durInterface->SetDurDefault(params->m_durDefault);
         // Check if there is a duration default for the staff
         if (!params->m_durDefaultForStaffN.empty()) {
-            Layer *layer = NULL;
-            Staff *staff = this->GetCrossStaff(layer);
-            if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            assert(staff);
-
+            Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
             if (params->m_durDefaultForStaffN.count(staff->GetN()) > 0) {
                 durInterface->SetDurDefault(params->m_durDefaultForStaffN.at(staff->GetN()));
             }
