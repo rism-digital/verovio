@@ -74,26 +74,17 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
         std::wstring fret = note->GetTabFretString(staff->m_drawingNotationType);
 
         FontInfo fretTxt;
-        // global styling for fret is missing
-        // if (!dc->UseGlobalStyling()) {
         fretTxt.SetFaceName("Times");
-        fretTxt.SetWeight(FONTWEIGHT_bold);
-        //}
 
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
-        params.m_pointSize = m_doc->GetDrawingLyricFont(glyphSize)->GetPointSize();
+        params.m_pointSize = m_doc->GetDrawingLyricFont(glyphSize)->GetPointSize() * 4 / 5;
         fretTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&fretTxt);
 
-        // TextExtend extend;
-        // dc->GetTextExtent(fret, &extend, false);
-        // params.m_x -= (extend.m_width / 2);
-
-        params.m_x += (m_doc->GetTextGlyphWidth(L'0', &fretTxt, drawingCueSize));
         params.m_y -= (m_doc->GetTextGlyphHeight(L'0', &fretTxt, drawingCueSize) / 2);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
