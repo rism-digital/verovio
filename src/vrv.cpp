@@ -230,11 +230,13 @@ bool Resources::LoadFont(const std::string &fontName)
         if (!c_attribute || !n_attribute) continue;
 
         const wchar_t smuflCode = (wchar_t)strtol(c_attribute.value(), NULL, 16);
-        const auto it
-            = std::find_if(ranges.begin(), ranges.end(), [smuflCode](const std::pair<wchar_t, wchar_t> &keyValue) {
-                  return (smuflCode >= keyValue.first) && (smuflCode <= keyValue.second);
-              });
-        if (it == ranges.end()) continue;
+        if (!ranges.empty()) {
+            const auto it
+                = std::find_if(ranges.begin(), ranges.end(), [smuflCode](const std::pair<wchar_t, wchar_t> &keyValue) {
+                      return (smuflCode >= keyValue.first) && (smuflCode <= keyValue.second);
+                  });
+            if (it == ranges.end()) continue;
+        }
 
         Glyph glyph;
         glyph.SetUnitsPerEm(unitsPerEm * 10);
