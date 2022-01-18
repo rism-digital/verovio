@@ -116,7 +116,6 @@ private:
 public:
     // values set by CalcBeam
     int m_nbNotesOrChords;
-    bool m_extendedToCenter; // the stem where extended to touch the center staff line
     double m_beamSlope; // the slope of the beam
     int m_verticalCenter;
     int m_ledgerLinesAbove;
