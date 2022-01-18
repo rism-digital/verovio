@@ -106,11 +106,11 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
         std::wstring fret = note->GetTabFretString(staff->m_drawingNotationType);
         // Center for italian tablature
-        if (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_italian) {
+        if (staff->IsTabLuteItalian()) {
             y -= (m_doc->GetGlyphHeight(SMUFL_EBE0_luteItalianFret0, glyphSize, drawingCueSize) / 2);
         }
         // Above the line for french tablature
-        else if (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_french) {
+        else if (staff->IsTabLuteFrench()) {
             y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
                 - m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
         }
