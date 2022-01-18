@@ -33,8 +33,6 @@
 #include "vrv.h"
 #include "zone.h"
 
-#include "MidiFile.h"
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -714,24 +712,6 @@ int Staff::GenerateMIDI(FunctorParams *functorParams)
     assert(params);
 
     params->m_expandedNotes.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Staff::GenerateMIDIEnd(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // stop all previously held notes
-    for (auto &held : params->m_heldNotes) {
-        if (held.m_pitch > 0) {
-            params->m_midiFile->addNoteOff(params->m_midiTrack, held.m_stopTime * params->m_midiFile->getTPQ(),
-                params->m_midiChannel, held.m_pitch);
-        }
-    }
-
-    params->m_heldNotes.clear();
 
     return FUNCTOR_CONTINUE;
 }
