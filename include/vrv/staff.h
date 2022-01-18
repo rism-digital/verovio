@@ -247,11 +247,12 @@ public:
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;
-    
+
     /**
      * See Object::GenerateMIDIEnd
      */
     int GenerateMIDIEnd(FunctorParams *functorParams) override;
+
 private:
     /**
      * Add the ledger line dashes to the legderline array.
