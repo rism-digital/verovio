@@ -92,6 +92,11 @@ public:
     void AdjustDrawingStaffSize();
 
     /**
+     * Return the drawing staff size for staff notation, including for tablature staves
+     */
+    int GetDrawingStaffNotationSize();
+
+    /**
      * Check if the staff is currently visible.
      * Looks for the parent system and its current drawing scoreDef
      */

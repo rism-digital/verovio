@@ -90,7 +90,7 @@ void BeamSegment::CalcTabBeam(
 
     // Calculate the y position of the beam - this currently need to be inline with the code in View::DrawTabGrp that
     // draws the stems.
-    int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
+    int glyphSize = staff->GetDrawingStaffNotationSize();
     beamInterface->m_fractionSize = glyphSize * 2 / 3;
 
     assert(m_beamElementCoordRefs.size() > 0);
@@ -114,8 +114,8 @@ void BeamSegment::CalcTabBeam(
 
     // Adjust it further for tab.lute.french and tab.lute.italian
     if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
-        beamInterface->m_beamWidthBlack /= 2;
-        beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 2 / 3;
+        beamInterface->m_beamWidthBlack = beamInterface->m_beamWidthBlack * 2 / 5;
+        beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 3 / 5;
     }
 
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
