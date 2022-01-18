@@ -382,6 +382,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             filters.push_back(&matchLayer);
 
             Functor generateMIDI(&Object::GenerateMIDI);
+            Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
             GenerateMIDIParams generateMIDIParams(midiFile, &generateMIDI);
             generateMIDIParams.m_midiChannel = midiChannel;
             generateMIDIParams.m_midiTrack = midiTrack;
@@ -389,7 +390,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDIParams.m_currentTempo = tempo;
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
-            this->Process(&generateMIDI, &generateMIDIParams, NULL, &filters);
+            this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);
         }
     }
 }
@@ -511,6 +512,12 @@ void Doc::PrepareDrawing()
         Functor resetDrawing(&Object::ResetDrawing);
         this->Process(&resetDrawing, NULL);
     }
+
+    /************ Store default durations ************/
+
+    Functor prepareDuration(&Object::PrepareDuration);
+    PrepareDurationParams prepareDurationParams(&prepareDuration);
+    this->Process(&prepareDuration, &prepareDurationParams);
 
     /************ Resolve @startid / @endid ************/
 
@@ -1865,8 +1872,8 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     if (!params->m_currentSyl) {
         return FUNCTOR_STOP; // early return
     }
-    if (params->m_lastNote && (params->m_currentSyl->GetStart() != params->m_lastNote)) {
-        params->m_currentSyl->SetEnd(params->m_lastNote);
+    if (params->m_lastNoteOrChord && (params->m_currentSyl->GetStart() != params->m_lastNoteOrChord)) {
+        params->m_currentSyl->SetEnd(params->m_lastNoteOrChord);
     }
     else if (m_options->m_openControlEvents.GetValue()) {
         sylLog_WORDPOS wordpos = params->m_currentSyl->GetWordpos();

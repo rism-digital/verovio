@@ -116,6 +116,11 @@ public:
      */
     int ScoreDefOptimize(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::PrepareDuration
+     */
+    int PrepareDuration(FunctorParams *functorParams) override;
+
 private:
     /**
      * The score/scoreDef (first child of the score)

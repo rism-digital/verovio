@@ -62,11 +62,14 @@ void DurationInterface::Reset()
     ResetDurationRatio();
     ResetFermataPresent();
     ResetStaffIdent();
+
+    m_durDefault = DURATION_NONE;
 }
 
 double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase)
 {
     int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
+    if (noteDur == DUR_NONE) noteDur = DUR_4;
 
     if (this->HasNum()) num *= this->GetNum();
     if (this->HasNumbase()) numBase *= this->GetNumbase();
@@ -84,6 +87,7 @@ double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase)
 double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numBase, Mensur *currentMensur)
 {
     int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
+    if (noteDur == DUR_NONE) noteDur = DUR_4;
 
     if (!currentMensur) {
         LogWarning("No current mensur for calculating duration");
@@ -176,16 +180,22 @@ bool DurationInterface::IsLastInBeam(LayerElement *noteOrRest)
 
 int DurationInterface::GetActualDur() const
 {
-    // maxima (-1) is a mensural only value
-    if (this->GetDur() == DURATION_maxima) return DUR_MX;
-    return (this->GetDur() & DUR_MENSURAL_MASK);
+    const data_DURATION dur = this->HasDur() ? this->GetDur() : this->GetDurDefault();
+    return this->CalcActualDur(dur);
 }
 
 int DurationInterface::GetActualDurGes() const
 {
+    const data_DURATION dur = this->HasDurGes() ? this->GetDurGes() : DURATION_NONE;
+    return this->CalcActualDur(dur);
+}
+
+int DurationInterface::CalcActualDur(data_DURATION dur) const
+{
+    if (dur == DURATION_NONE) return DUR_NONE;
     // maxima (-1) is a mensural only value
-    if (this->GetDurGes() == DURATION_maxima) return DUR_MX;
-    return (this->GetDurGes() & DUR_MENSURAL_MASK);
+    if (dur == DURATION_maxima) return DUR_MX;
+    return (dur & DUR_MENSURAL_MASK);
 }
 
 int DurationInterface::GetNoteOrChordDur(LayerElement *element)

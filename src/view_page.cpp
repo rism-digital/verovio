@@ -1224,9 +1224,12 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
             y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         }
         else {
+            const bool isFrenchOrItalianTablature = (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_french
+                || staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_italian);
             SegmentedLine line(x1, x2);
-            // We do not need to do this during layout calculation - and only with tablature
-            if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature()) {
+            // We do not need to do this during layout calculation - and only with tablature but not for French or
+            // Italian tablature
+            if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature() && !isFrenchOrItalianTablature) {
                 Object fullLine;
                 fullLine.SetParent(system);
                 fullLine.UpdateContentBBoxY(y1 + (lineWidth / 2), y1 - (lineWidth / 2));

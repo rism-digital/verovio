@@ -146,7 +146,7 @@ void ABCInput::parseABC(std::istream &infile)
         // create score
         assert(m_mdiv != NULL);
         Score *score = new Score();
-        if (!m_doc->GetCurrentScoreDef()->GetFirst(STAFFGRP)) {
+        if (!m_doc->HasCurrentScore() || !m_doc->GetCurrentScoreDef()->GetFirst(STAFFGRP)) {
             m_mdiv->AddChild(score);
 
             // create page head
@@ -161,15 +161,15 @@ void ABCInput::parseABC(std::istream &infile)
                 staffDef->AddChild(m_clef);
                 m_clef = NULL;
             }
+            if (m_meter) {
+                staffDef->AddChild(m_meter);
+                m_meter = NULL;
+            }
             staffGrp->AddChild(staffDef);
             m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
             if (m_key) {
                 m_doc->GetCurrentScoreDef()->AddChild(m_key);
                 m_key = NULL;
-            }
-            if (m_meter) {
-                m_doc->GetCurrentScoreDef()->AddChild(m_meter);
-                m_meter = NULL;
             }
         }
 
@@ -185,6 +185,8 @@ void ABCInput::parseABC(std::istream &infile)
         if (m_durDefault == DURATION_NONE) {
             CalcUnitNoteLength();
         }
+        m_doc->GetCurrentScoreDef()->SetDurDefault(m_durDefault);
+        m_durDefault = DURATION_NONE;
 
         // read music code
         m_layer = new Layer();
@@ -295,12 +297,10 @@ void ABCInput::CalcUnitNoteLength()
     if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetTotalCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
-        // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
     }
     else {
         m_unitDur = 16;
         m_durDefault = DURATION_16;
-        // m_doc->m_scoreDef.SetDurDefault(DURATION_16);
     }
 }
 
@@ -578,7 +578,6 @@ void ABCInput::parseKey(std::string &keyString)
     m_key = new KeySig();
     m_key->IsAttribute(true);
     m_clef = new Clef();
-    m_clef->IsAttribute(true);
     while (isspace(keyString[i])) ++i;
 
     // set key.pname
@@ -744,7 +743,6 @@ void ABCInput::parseUnitNoteLength(const std::string &unitNoteLength)
         case 256: m_durDefault = DURATION_256; break;
         default: break;
     }
-    // m_doc->m_scoreDef.SetDurDefault(m_durDefault);
 }
 
 void ABCInput::parseMeter(const std::string &meterString)
@@ -769,7 +767,6 @@ void ABCInput::parseMeter(const std::string &meterString)
         // this is a little "hack", until libMEI is fixed
         m_meter->SetCount({ atoi(meterCount.c_str()) });
         m_meter->SetUnit(atoi(&meterString[meterString.find('/') + 1]));
-        m_meter->IsAttribute(true);
     }
 }
 
@@ -1558,6 +1555,13 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             scoreDef->AddChild(m_meter);
             section->AddChild(scoreDef);
             m_meter = NULL;
+        }
+
+        if (m_durDefault != DURATION_NONE) {
+            ScoreDef *scoreDef = new ScoreDef();
+            scoreDef->SetDurDefault(m_durDefault);
+            section->AddChild(scoreDef);
+            m_durDefault = DURATION_NONE;
         }
     }
 

@@ -2090,6 +2090,7 @@ void MEIOutput::WriteBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt)
 
     WriteLayerElement(currentNode, beatRpt);
     beatRpt->WriteColor(currentNode);
+    beatRpt->WriteBeatRptLog(currentNode);
     beatRpt->WriteBeatRptVis(currentNode);
 }
 
@@ -2687,6 +2688,7 @@ void MEIOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
 {
     assert(interface);
 
+    interface->WriteDurationDefault(element);
     interface->WriteLyricStyle(element);
     interface->WriteMidiTempo(element);
     interface->WriteMultinumMeasures(element);
@@ -5669,6 +5671,7 @@ bool MEIInput::ReadBeatRpt(Object *parent, pugi::xml_node beatRpt)
     ReadLayerElement(beatRpt, vrvBeatRpt);
 
     vrvBeatRpt->ReadColor(beatRpt);
+    vrvBeatRpt->ReadBeatRptLog(beatRpt);
     vrvBeatRpt->ReadBeatRptVis(beatRpt);
 
     if (m_version < MEI_4_0_0) {
@@ -6481,6 +6484,7 @@ bool MEIInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *
 
 bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface)
 {
+    interface->ReadDurationDefault(element);
     interface->ReadLyricStyle(element);
     interface->ReadMidiTempo(element);
     interface->ReadMultinumMeasures(element);

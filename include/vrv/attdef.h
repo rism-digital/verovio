@@ -38,6 +38,7 @@ typedef double data_VU;
  * These duration values are used for internal calculation and differ from the
  * MEI data.DURATION types (see below)
  */
+#define DUR_NONE -32
 #define DUR_MX -1 // maxima
 #define DUR_LG 0 // longa
 #define DUR_BR 1 // brevis
@@ -96,7 +97,7 @@ enum data_BEATRPT_REND {
  * MEI data.DURATION
  */
 enum data_DURATION {
-    DURATION_NONE = VRV_UNSET,
+    DURATION_NONE = DUR_NONE,
     DURATION_long = DUR_LG,
     DURATION_breve,
     DURATION_1,

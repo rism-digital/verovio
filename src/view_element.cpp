@@ -1354,6 +1354,12 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (!(note->GetHeadVisible() == BOOLEAN_false)) {
         /************** Noteheads: **************/
         int drawingDur = note->GetDrawingDur();
+        if (drawingDur == DUR_NONE) {
+            if (note->IsInBeam() && !dc->Is(BBOX_DEVICE_CONTEXT)) {
+                LogWarning("Missing duration for note '%s' in beam", note->GetUuid().c_str());
+            }
+            drawingDur = DUR_4;
+        }
         drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
 
         if (drawingDur < DUR_BR) {
@@ -1426,11 +1432,17 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (rest->m_crossStaff) staff = rest->m_crossStaff;
 
     const bool drawingCueSize = rest->GetDrawingCueSize();
-    const int drawingDur = rest->GetActualDur();
-    const wchar_t drawingGlyph = rest->GetRestGlyph();
+    int drawingDur = rest->GetActualDur();
+    if (drawingDur == DUR_NONE) {
+        if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
+            LogWarning("Missing duration for rest '%s'", rest->GetUuid().c_str());
+        }
+        drawingDur = DUR_4;
+    }
+    const wchar_t drawingGlyph = rest->GetRestGlyph(drawingDur);
 
-    int x = element->GetDrawingX();
-    int y = element->GetDrawingY();
+    const int x = element->GetDrawingX();
+    const int y = element->GetDrawingY();
 
     DrawSmuflCode(dc, x, y, drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
 

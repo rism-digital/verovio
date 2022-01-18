@@ -207,6 +207,11 @@ public:
     int PrepareLayerElementParts(FunctorParams *functorParams) override;
 
     /**
+     * See Object::PrepareLyrics
+     */
+    int PrepareLyrics(FunctorParams *functorParams) override;
+
+    /**
      * See Object::CalcOnsetOffsetEnd
      */
     int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
@@ -220,6 +225,11 @@ public:
      * See Object::AdjustCrossStaffContent
      */
     int AdjustCrossStaffContent(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::GenerateMIDI
+     */
+    int GenerateMIDI(FunctorParams *functorParams) override;
 
 protected:
     /**

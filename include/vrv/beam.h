@@ -44,7 +44,9 @@ public:
     void Reset();
 
     void CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface,
-        data_BEAMPLACE place = BEAMPLACE_NONE, bool init = true, bool isTabBeam = false);
+        data_BEAMPLACE place = BEAMPLACE_NONE, bool init = true);
+
+    void CalcTabBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     /**
      *
@@ -79,8 +81,7 @@ private:
     // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)
     void AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
 
-    void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place,
-        bool isTabBeam);
+    void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     bool CalcBeamSlope(
         Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step);

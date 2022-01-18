@@ -81,8 +81,44 @@ void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoord
     m_beamElementCoordRefs = *beamElementCoords;
 }
 
-void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface,
-    data_BEAMPLACE place, bool init, bool isTabBeam)
+void BeamSegment::CalcTabBeam(
+    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
+{
+    assert(layer);
+    assert(staff);
+    assert(doc);
+
+    // Calculate the y position of the beam - this currently need to be inline with the code in View::DrawTabGrp that
+    // draws the stems.
+    int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
+    beamInterface->m_fractionSize = glyphSize * 2 / 3;
+    int height = doc->GetGlyphHeight(SMUFL_EBA8_luteDurationHalf, glyphSize, true);
+    int y = staff->GetDrawingY() + height;
+    y += doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
+
+    assert(m_beamElementCoordRefs.size() > 0);
+
+    // For recursive calls, avoid to re-init values
+    this->CalcBeamInit(layer, staff, doc, beamInterface, place);
+
+    // Adjust the height and spacing of the beams
+    beamInterface->m_beamWidthBlack /= 2;
+    beamInterface->m_beamWidthWhite /= 2;
+    beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
+
+    beamInterface->m_drawingPlace = (place == BEAMPLACE_below) ? BEAMPLACE_below : BEAMPLACE_above;
+
+    for (auto coord : m_beamElementCoordRefs) {
+        // All notes and chords get their stem value stored
+        LayerElement *el = coord->m_element;
+        if (el->Is(TABGRP)) {
+            coord->m_yBeam = y;
+        }
+    }
+}
+
+void BeamSegment::CalcBeam(
+    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool init)
 {
     assert(layer);
     assert(staff);
@@ -93,10 +129,10 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
 
     // For recursive calls, avoid to re-init values
     if (init) {
-        this->CalcBeamInit(layer, staff, doc, beamInterface, place, isTabBeam);
+        this->CalcBeamInit(layer, staff, doc, beamInterface, place);
     }
 
-    if (isTabBeam) return;
+    beamInterface->m_fractionSize = staff->m_drawingStaffSize;
 
     bool horizontal = beamInterface->IsHorizontal();
 
@@ -115,7 +151,7 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         if (!beamInterface->m_crossStaffContent && NeedToResetPosition(staff, doc, beamInterface)) {
-            CalcBeamInit(layer, staff, doc, beamInterface, place, false);
+            CalcBeamInit(layer, staff, doc, beamInterface, place);
             CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
             CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
         }
@@ -323,7 +359,7 @@ void BeamSegment::AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInt
 }
 
 void BeamSegment::CalcBeamInit(
-    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool isTabBeam)
+    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
 {
     assert(layer);
     assert(staff);
@@ -377,8 +413,6 @@ void BeamSegment::CalcBeamInit(
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
 
-    if (isTabBeam) return;
-
     int yMax = m_verticalCenter;
     int yMin = m_verticalCenter;
     auto SetExtrema = [&yMax, &yMin](int currentY) {
@@ -391,7 +425,7 @@ void BeamSegment::CalcBeamInit(
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         coord->m_yBeam = 0;
 
-        if (coord->m_element->Is({ CHORD, NOTE })) {
+        if (coord->m_element->Is({ CHORD, NOTE, TABGRP })) {
             if (!m_firstNoteOrChord) m_firstNoteOrChord = coord;
             m_lastNoteOrChord = coord;
             m_nbNotesOrChords++;

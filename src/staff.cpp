@@ -715,10 +715,18 @@ int Staff::GenerateMIDI(FunctorParams *functorParams)
 
     params->m_expandedNotes.clear();
 
-    // Tablature: end any remaining held notes
+    return FUNCTOR_CONTINUE;
+}
+
+int Staff::GenerateMIDIEnd(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    // stop all previously held notes
     for (auto &held : params->m_heldNotes) {
         if (held.m_pitch > 0) {
-            params->m_midiFile->addNoteOff(params->m_midiTrack, held.m_stoptime * params->m_midiFile->getTPQ(),
+            params->m_midiFile->addNoteOff(params->m_midiTrack, held.m_stopTime * params->m_midiFile->getTPQ(),
                 params->m_midiChannel, held.m_pitch);
         }
     }

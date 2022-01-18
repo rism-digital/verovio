@@ -625,12 +625,13 @@ double LayerElement::GetAlignmentDuration(
         return 0.0;
     }
 
-    if (this->HasSameasLink() && this->GetSameasLink()->IsLayerElement()) {
-        LayerElement *sameas = vrv_cast<LayerElement *>(this->GetSameasLink());
-        assert(sameas);
+    // Only resolve simple sameas links to avoid infinite recursion
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
         return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
-    else if (this->HasInterface(INTERFACE_DURATION)) {
+
+    if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
         Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
@@ -1947,7 +1948,9 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.second == this; });
     if (it != params->m_measureTieEndpoints.end()) {
         const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * drawingUnit;
-        const int currentTieLength = it->second->GetContentLeft() - it->first->GetContentRight() - drawingUnit;
+        const int leftXPos = it->first->HasContentBB() ? it->first->GetContentRight() : it->first->GetDrawingX();
+        const int rightXPos = it->second->HasContentBB() ? it->second->GetContentLeft() : it->second->GetDrawingX();
+        const int currentTieLength = rightXPos - leftXPos - drawingUnit;
         if ((currentTieLength < minTieLength)
             && ((it->first->GetFirstAncestor(CHORD) != NULL) || (this->GetFirstAncestor(CHORD) != NULL)
                 || (it->first->FindDescendantByType(FLAG) != NULL))) {
@@ -2487,9 +2490,10 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (this->HasSameasLink()) {
-        assert(this->GetSameasLink());
-        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    // Only resolve simple sameas links to avoid infinite recursion
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
+        sameas->Process(params->m_functor, functorParams);
     }
 
     return FUNCTOR_CONTINUE;
@@ -2502,9 +2506,10 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (this->HasSameasLink()) {
-        assert(this->GetSameasLink());
-        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    // Only resolve simple sameas links to avoid infinite recursion
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
+        sameas->Process(params->m_functor, functorParams);
     }
 
     return FUNCTOR_CONTINUE;
@@ -2550,6 +2555,30 @@ int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
 int LayerElement::PrepareSlurs(FunctorParams *)
 {
     return FUNCTOR_SIBLINGS;
+}
+
+int LayerElement::PrepareDuration(FunctorParams *functorParams)
+{
+    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
+    assert(params);
+
+    DurationInterface *durInterface = this->GetDurationInterface();
+    if (durInterface) {
+        durInterface->SetDurDefault(params->m_durDefault);
+        // Check if there is a duration default for the staff
+        if (!params->m_durDefaultForStaffN.empty()) {
+            Layer *layer = NULL;
+            Staff *staff = this->GetCrossStaff(layer);
+            if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+            assert(staff);
+
+            if (params->m_durDefaultForStaffN.count(staff->GetN()) > 0) {
+                durInterface->SetDurDefault(params->m_durDefaultForStaffN.at(staff->GetN()));
+            }
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

@@ -168,4 +168,16 @@ int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int StaffDef::PrepareDuration(FunctorParams *functorParams)
+{
+    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
+    assert(params);
+
+    if (this->HasDurDefault() && this->HasN()) {
+        params->m_durDefaultForStaffN[this->GetN()] = this->GetDurDefault();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

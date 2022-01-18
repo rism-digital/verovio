@@ -64,26 +64,26 @@ namespace musicxml {
 
     class OpenSlur {
     public:
-        OpenSlur(const std::string &measureNum, const int &number)
+        OpenSlur(const std::string &measureNum, short int number)
         {
             m_measureNum = measureNum;
             m_number = number;
         }
 
         std::string m_measureNum;
-        int m_number;
+        short int m_number;
     };
 
     class CloseSlur {
     public:
-        CloseSlur(const std::string &measureNum, const int &number)
+        CloseSlur(const std::string &measureNum, short int number)
         {
             m_measureNum = measureNum;
             m_number = number;
         }
 
         std::string m_measureNum;
-        int m_number;
+        short int m_number;
     };
 
     class OpenSpanner {
@@ -191,16 +191,17 @@ private:
      * @name Top level methods for reading MusicXML part and measure elements.
      */
     ///@{
-    bool ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset);
-    bool ReadMusicXmlMeasure(
-        pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset, int index);
+    bool ReadMusicXmlPart(pugi::xml_node node, Section *section, short int nbStaves, const short int staffOffset);
+    bool ReadMusicXmlMeasure(pugi::xml_node node, Section *section, Measure *measure, short int nbStaves,
+        const short int staffOffset, int index);
     ///@}
 
     /*
      * Methods for reading the first MusicXML attributes element as MEI staffDef.
      * Returns the number of staves in the part.
      */
-    int ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, StaffGrp *staffGrp, int staffOffset);
+    short int ReadMusicXmlPartAttributesAsStaffDef(
+        pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset);
 
     /*
      * @name Methods for reading the content of a MusicXML measure.
@@ -209,12 +210,13 @@ private:
     void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, const std::string &measureNum);
-    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, const std::string &measureNum, const int staffOffset);
+    void ReadMusicXmlDirection(
+        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset);
     void ReadMusicXmlFigures(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlNote(
-        pugi::xml_node, Measure *measure, const std::string &measureNum, const int staffOffset, Section *section);
+        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
     void ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
     void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
@@ -267,13 +269,13 @@ private:
     /*
      * Returns the appropriate first layer of a staff.
      */
-    Layer *SelectLayer(int staffNb, Measure *measure);
+    Layer *SelectLayer(short int staffNb, Measure *measure);
 
     /*
      * Returns the layer with @n=layerNb on the staff.
      * Creates the layer if not found.
      */
-    Layer *SelectLayer(int layerNb, Staff *staff);
+    Layer *SelectLayer(short int layerNb, Staff *staff);
 
     /*
      * @name Methods for converting the content of MusicXML attributes.
@@ -323,8 +325,8 @@ private:
     ///@{
     void OpenTie(Note *note, Tie *tie);
     void CloseTie(Note *note);
-    void OpenSlur(Measure *measure, int number, Slur *slur);
-    void CloseSlur(Measure *measure, int number, LayerElement *element);
+    void OpenSlur(Measure *measure, short int number, Slur *slur);
+    void CloseSlur(Measure *measure, short int number, LayerElement *element);
     ///@}
 
     /*
@@ -430,6 +432,13 @@ private:
     static std::string ConvertFigureGlyph(const std::string &value);
     ///@}
 
+    /*
+     * @name Methods for converting between MusicXML <pitch> and MIDI note numbers.
+     */
+    ///@{
+    static int PitchToMidi(const std::string &step, int alter, int octave);
+    static void MidiToPitch(int midi, std::string &step, int &alter, int &octave);
+    ///@}
 private:
     /* octave offset */
     std::vector<int> m_octDis;
