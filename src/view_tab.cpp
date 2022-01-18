@@ -66,7 +66,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
+    int glyphSize = staff->GetDrawingStaffNotationSize();
     bool drawingCueSize = false;
 
     if (staff->m_drawingNotationType == NOTATIONTYPE_tab_guitar) {
@@ -74,26 +74,17 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
         std::wstring fret = note->GetTabFretString(staff->m_drawingNotationType);
 
         FontInfo fretTxt;
-        // global styling for fret is missing
-        // if (!dc->UseGlobalStyling()) {
         fretTxt.SetFaceName("Times");
-        fretTxt.SetWeight(FONTWEIGHT_bold);
-        //}
 
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
-        params.m_pointSize = m_doc->GetDrawingLyricFont(glyphSize)->GetPointSize() * 3 / 5;
+        params.m_pointSize = m_doc->GetDrawingLyricFont(glyphSize)->GetPointSize() * 4 / 5;
         fretTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&fretTxt);
 
-        // TextExtend extend;
-        // dc->GetTextExtent(fret, &extend, false);
-        // params.m_x -= (extend.m_width / 2);
-
-        params.m_x += (m_doc->GetTextGlyphWidth(L'0', &fretTxt, drawingCueSize));
         params.m_y -= (m_doc->GetTextGlyphHeight(L'0', &fretTxt, drawingCueSize) / 2);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
@@ -105,11 +96,15 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     else {
 
         std::wstring fret = note->GetTabFretString(staff->m_drawingNotationType);
-        wchar_t code = (staff->m_drawingNotationType == NOTATIONTYPE_tab_lute_french) ? SMUFL_EBC0_luteFrenchFretA
-                                                                                      : SMUFL_EBE0_luteItalianFret0;
-        int radius = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false);
-        y -= (m_doc->GetGlyphHeight(code, glyphSize, drawingCueSize) / 2);
-        x += radius - (m_doc->GetGlyphWidth(code, glyphSize, drawingCueSize) / 2);
+        // Center for italian tablature
+        if (staff->IsTabLuteItalian()) {
+            y -= (m_doc->GetGlyphHeight(SMUFL_EBE0_luteItalianFret0, glyphSize, drawingCueSize) / 2);
+        }
+        // Above the line for french tablature
+        else if (staff->IsTabLuteFrench()) {
+            y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+                - m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
+        }
 
         dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
         DrawSmuflString(dc, x, y, fret, HORIZONTALALIGNMENT_center, glyphSize);
@@ -139,9 +134,9 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
-    y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
+
     int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
-    int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
+    int glyphSize = staff->GetDrawingStaffNotationSize();
 
     // We only need to draw the stems
     // Do we also need to draw the dots?
@@ -151,9 +146,6 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
             x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y + height);
     }
     else {
-        int radius = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false) / 2;
-        x += radius;
-
         int symc = 0;
         switch (drawingDur) {
             case DUR_2: symc = SMUFL_EBA7_luteDurationWhole; break;
@@ -170,7 +162,7 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
             y += m_doc->GetDrawingUnit(glyphSize) * 0.5;
             x += m_doc->GetDrawingUnit(glyphSize);
             for (int i = 0; i < tabGrp->GetDots(); ++i) {
-                DrawDot(dc, x, y, glyphSize / 2);
+                DrawDot(dc, x, y, glyphSize * 2 / 3);
                 // HARDCODED
                 x += m_doc->GetDrawingUnit(glyphSize) * 0.75;
             }

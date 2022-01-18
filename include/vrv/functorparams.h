@@ -1555,6 +1555,14 @@ struct MIDINote {
 using MIDINoteSequence = std::list<MIDINote>;
 
 /**
+ * Helper struct for held notes in tablature
+ */
+struct MIDIHeldNote {
+    int m_pitch = 0;
+    double m_stopTime = 0;
+};
+
+/**
  * Helper struct to store chord sequences in MIDI output due to grace notes
  */
 struct MIDIChord {
@@ -1567,6 +1575,7 @@ using MIDIChordSequence = std::list<MIDIChord>;
 /**
  * member 0: MidiFile*: the MidiFile we are writing to
  * member 1: int: the midi track number
+ * member 2: int: the midi channel number
  * member 3: double: the score time from the start of the music to the start of the current measure
  * member 4: int: the semi tone transposition for the current track
  * member 5: double with the current tempo
@@ -1576,6 +1585,7 @@ using MIDIChordSequence = std::list<MIDIChord>;
  * member 9: grace note sequence
  * member 10: flag indicating whether the last grace note/chord was accented
  * member 11: the functor
+ * member 12: Tablature held notes indexed by (course - 1)
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1604,6 +1614,7 @@ public:
     MIDIChordSequence m_graceNotes;
     bool m_accentedGraceNote;
     Functor *m_functor;
+    std::vector<MIDIHeldNote> m_heldNotes;
 };
 
 //----------------------------------------------------------------------------

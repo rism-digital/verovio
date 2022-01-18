@@ -1428,11 +1428,45 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         }
     }
     else {
-        const double stopTime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
         const int pitch = this->GetMIDIPitch(params->m_transSemi);
 
-        params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, pitch, velocity);
-        params->m_midiFile->addNoteOff(params->m_midiTrack, stopTime * tpq, channel, pitch);
+        if (this->HasTabCourse() && this->GetTabCourse() >= 1) {
+            // Tablature 'rule of holds'.  A note on a course is held until the next note
+            // on that course is required, or until a default hold duration is reached.
+
+            const int course = this->GetTabCourse();
+            if (params->m_heldNotes.size() < static_cast<size_t>(course))
+                params->m_heldNotes.resize(course); // make room
+
+            // if a previously held note on this course is already sounding, end it now.
+            if (params->m_heldNotes[course - 1].m_pitch > 0)
+                params->m_heldNotes[course - 1].m_stopTime = startTime; // stop now
+
+            // end all previously held notes that have reached their stoptime
+            for (auto &held : params->m_heldNotes) {
+                if (held.m_pitch > 0 && held.m_stopTime <= startTime) {
+                    params->m_midiFile->addNoteOff(params->m_midiTrack, held.m_stopTime * tpq, channel, held.m_pitch);
+                    held.m_pitch = 0;
+                    held.m_stopTime = 0;
+                }
+            }
+
+            // hold this note until the greater of its rhythm sign and the default duration.
+            // TODO optimize the default hold duration
+            const double defaultHoldTime = 4; // quarter notes
+            params->m_heldNotes[course - 1].m_pitch = pitch;
+            params->m_heldNotes[course - 1].m_stopTime = params->m_totalTime
+                + std::max(defaultHoldTime, this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration());
+
+            // start this note
+            params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, pitch, velocity);
+        }
+        else {
+            const double stopTime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
+
+            params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, pitch, velocity);
+            params->m_midiFile->addNoteOff(params->m_midiTrack, stopTime * tpq, channel, pitch);
+        }
     }
 
     // Store reference, i.e. for Nachschlag

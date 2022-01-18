@@ -187,6 +187,11 @@ void Staff::AdjustDrawingStaffSize()
     }
 }
 
+int Staff::GetDrawingStaffNotationSize()
+{
+    return (this->IsTablature()) ? m_drawingStaffSize / TABLATURE_STAFF_RATIO : m_drawingStaffSize;
+}
+
 bool Staff::DrawingIsVisible()
 {
     System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));

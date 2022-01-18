@@ -89,20 +89,34 @@ void BeamSegment::CalcTabBeam(
 
     // Calculate the y position of the beam - this currently need to be inline with the code in View::DrawTabGrp that
     // draws the stems.
-    int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
+    int glyphSize = staff->GetDrawingStaffNotationSize();
     beamInterface->m_fractionSize = glyphSize * 2 / 3;
-    int height = doc->GetGlyphHeight(SMUFL_EBA8_luteDurationHalf, glyphSize, true);
-    int y = staff->GetDrawingY() + height;
-    y += doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
 
     assert(m_beamElementCoordRefs.size() > 0);
 
-    // For recursive calls, avoid to re-init values
+    int y = staff->GetDrawingY();
+
+    // Get the y position of the first tabDurSym
+    assert(m_beamElementCoordRefs.at(0)->m_element);
+    LayerElement *tabDurSym
+        = vrv_cast<LayerElement *>(m_beamElementCoordRefs.at(0)->m_element->FindDescendantByType(TABDURSYM));
+    if (tabDurSym) y = tabDurSym->GetDrawingY();
+
+    const int height = doc->GetGlyphHeight(SMUFL_EBA8_luteDurationHalf, glyphSize, true);
+    y += height;
+
     this->CalcBeamInit(layer, staff, doc, beamInterface, place);
 
     // Adjust the height and spacing of the beams
     beamInterface->m_beamWidthBlack /= 2;
     beamInterface->m_beamWidthWhite /= 2;
+
+    // Adjust it further for tab.lute.french and tab.lute.italian
+    if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
+        beamInterface->m_beamWidthBlack = beamInterface->m_beamWidthBlack * 2 / 5;
+        beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 3 / 5;
+    }
+
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
     beamInterface->m_drawingPlace = (place == BEAMPLACE_below) ? BEAMPLACE_below : BEAMPLACE_above;

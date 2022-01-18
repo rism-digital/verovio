@@ -246,6 +246,11 @@ public:
      */
     int ResetDrawing(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::GenerateMIDIEnd
+     */
+    int GenerateMIDIEnd(FunctorParams *functorParams) override;
+
 private:
     //
 public:
