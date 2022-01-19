@@ -282,8 +282,7 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     assert(alignmentLast);
 
     // We are ignoring cross-staff situation here because this should not be called if we have one
-    Staff *staff = vrv_cast<Staff *>(first->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = first->FindStaff(ANCESTOR_ONLY);
 
     double time = alignmentFirst->GetTime();
     double duration = alignmentLast->GetTime() - time + last->GetAlignmentDuration();

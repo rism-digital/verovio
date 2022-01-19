@@ -610,8 +610,7 @@ int Chord::CalcArtic(FunctorParams *functorParams)
     params->m_parent = this;
     params->m_stemDir = this->GetDrawingStemDir();
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
@@ -681,8 +680,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
@@ -944,8 +942,7 @@ int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
         }
 
         // Reposition the stem
-        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = this->FindStaff(ANCESTOR_ONLY);
         Staff *rootStaff
             = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? extremalStaves.back() : extremalStaves.front();
         stem->SetDrawingYRel(stem->GetDrawingYRel() + getShift(staff) - getShift(rootStaff));

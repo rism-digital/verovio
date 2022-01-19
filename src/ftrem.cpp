@@ -101,8 +101,7 @@ void FTrem::FilterList(ArrayOfObjects *childList)
         ++iter;
     }
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
 
     this->InitCoords(childList, staff, BEAMPLACE_NONE);
     this->InitCue(false);

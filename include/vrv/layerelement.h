@@ -185,7 +185,7 @@ public:
     /**
      * Find the ancestor or cross staff
      */
-    Staff *FindStaff(StaffSearch strategy);
+    Staff *FindStaff(StaffSearch strategy, bool assertExistence = true) const;
 
     /**
      * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff.

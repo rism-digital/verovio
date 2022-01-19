@@ -211,8 +211,7 @@ Accid *Note::GetDrawingAccid()
 bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
 {
     if (!staff) {
-        staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
+        staff = this->FindStaff(ANCESTOR_ONLY);
     }
 
     linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
@@ -456,8 +455,7 @@ wchar_t Note::GetMensuralNoteheadGlyph() const
         return 0;
     }
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     wchar_t code = 0;
@@ -620,8 +618,7 @@ void Note::CalcMIDIPitch(int shift)
     }
     else if (this->HasTabCourse()) {
         // tablature
-        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = this->FindStaff(ANCESTOR_ONLY);
         if (staff->m_drawingTuning) {
             m_MIDIPitch = staff->m_drawingTuning->CalcPitchNumber(
                 this->GetTabCourse(), this->GetTabFret(), staff->m_drawingNotationType);
@@ -865,8 +862,7 @@ int Note::CalcArtic(FunctorParams *functorParams)
     params->m_parent = this;
     params->m_stemDir = this->GetDrawingStemDir();
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
@@ -934,8 +930,7 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
@@ -987,8 +982,8 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
+    const int staffSize = staff->m_drawingStaffSize;
 
     bool mixedCue = false;
     if (Chord *chord = this->IsChordTone(); chord != NULL) {
@@ -997,10 +992,6 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 
     // Nothing to do for notes that are not in a cluster and without cue mixing
     if (!m_cluster && !mixedCue) return FUNCTOR_SIBLINGS;
-
-    if (m_crossStaff) staff = m_crossStaff;
-
-    int staffSize = staff->m_drawingStaffSize;
 
     int diameter = 2 * this->GetDrawingRadius(params->m_doc);
 
@@ -1097,13 +1088,9 @@ int Note::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-
-    if (m_crossStaff) staff = m_crossStaff;
-
-    bool drawingCueSize = this->GetDrawingCueSize();
-    int staffSize = staff->m_drawingStaffSize;
+    Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
+    const int staffSize = staff->m_drawingStaffSize;
+    const bool drawingCueSize = this->GetDrawingCueSize();
 
     Dots *dots = NULL;
     Chord *chord = this->IsChordTone();
@@ -1165,19 +1152,15 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-
     if (!this->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }
 
-    if (m_crossStaff) staff = m_crossStaff;
-
-    bool drawingCueSize = this->GetDrawingCueSize();
-    int staffSize = staff->m_drawingStaffSize;
-    int staffX = staff->GetDrawingX();
-    int radius = GetDrawingRadius(params->m_doc);
+    Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
+    const int staffSize = staff->m_drawingStaffSize;
+    const int staffX = staff->GetDrawingX();
+    const bool drawingCueSize = this->GetDrawingCueSize();
+    const int radius = this->GetDrawingRadius(params->m_doc);
 
     /************** Ledger lines: **************/
 

@@ -136,8 +136,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     m_drawingShapes.clear();
 
     Note *lastNote = dynamic_cast<Note *>(this->GetList(this)->back());
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
 
     const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);

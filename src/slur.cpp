@@ -137,8 +137,8 @@ Staff *Slur::GetBoundaryCrossStaff()
     }
     else {
         // Check if the two elements are in different staves (but themselves not cross-staff)
-        Staff *startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
-        Staff *endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
+        Staff *startStaff = start->FindStaff(ANCESTOR_ONLY, false);
+        Staff *endStaff = end->FindStaff(ANCESTOR_ONLY, false);
         if (startStaff && endStaff && (startStaff->GetN() != endStaff->GetN())) {
             return endStaff;
         }
@@ -163,10 +163,8 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
 
     std::set<int> staffNumbers;
     staffNumbers.emplace(staff->GetN());
-    Staff *startStaff = this->GetStart()->m_crossStaff ? this->GetStart()->m_crossStaff
-                                                       : vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
-    Staff *endStaff = this->GetEnd()->m_crossStaff ? this->GetEnd()->m_crossStaff
-                                                   : vrv_cast<Staff *>(this->GetEnd()->GetFirstAncestor(STAFF));
+    Staff *startStaff = this->GetStart()->FindStaff(RESOLVE_CROSSSTAFF, false);
+    Staff *endStaff = this->GetEnd()->FindStaff(RESOLVE_CROSSSTAFF, false);
     if (startStaff && (startStaff != staff)) {
         staffNumbers.emplace(startStaff->GetN());
     }

@@ -1163,9 +1163,7 @@ int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
         // otherwise they should be kept separate
         for (auto dot : params->m_dots) {
             // A third staff size will be used as required margin
-            const Staff *staff
-                = vrv_cast<Staff *>(dot->m_crossStaff ? dot->m_crossStaff : dot->GetFirstAncestor(STAFF));
-            assert(staff);
+            const Staff *staff = dot->FindStaff(RESOLVE_CROSSSTAFF);
             const int staffSize = staff->m_drawingStaffSize;
             const int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
 
