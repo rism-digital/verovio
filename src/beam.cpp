@@ -267,8 +267,8 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
 {
     const int unit = doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     // find shortest duration for above/below beams for the sake of calculating overlap with additional beams
-    int topShortestDur = DUR_8;
-    int bottomShortestDur = DUR_8;
+    short topShortestDur = DUR_8;
+    short bottomShortestDur = DUR_8;
     std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
         if (coord->m_partialFlagPlace == BEAMPLACE_above) {
             topShortestDur = std::max(topShortestDur, coord->m_dur);
@@ -1058,14 +1058,17 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         }
     }
 
+    short minDuration = DUR_4;
     for (auto coord : m_beamElementCoordRefs) {
-        const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
         if (!coord->m_closestNote) continue;
         // if location matches, or if current elements duration is shorter than 8th. This ensures that beams with
         // partial beams will not be shorted when lowest/highest note is 8th and can be shortened
-        if ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
-            || (!isHorizontal && (coord->m_dur > DUR_8) && (std::abs(m_uniformStemLength) < 13)))
-            m_uniformStemLength = coordStemLength;
+        if ((coord->m_dur > minDuration)
+            && ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
+                || (!isHorizontal && (std::abs(m_uniformStemLength) < 13)))) {
+            m_uniformStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
+            minDuration = coord->m_dur;
+        }
     }
     // make adjustments for the grace notes length
     for (auto coord : m_beamElementCoordRefs) {
