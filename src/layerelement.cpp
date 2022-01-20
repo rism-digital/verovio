@@ -1965,7 +1965,8 @@ void LayerElement::AdjustMixedBeamXPos(Doc *doc, int drawingUnit, int &upcomingP
     if (!this->Is(CHORD) && (!this->Is(NOTE) || this->GetFirstAncestor(CHORD))) return;
 
     Beam *beam = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
-    if (!beam || (beam->m_drawingPlace != BEAMPLACE_mixed)) return;
+    if (!beam || (beam->m_drawingPlace != BEAMPLACE_mixed) || beam->m_crossStaffContent) return;
+    if (this == beam->m_beamSegment.m_lastNoteOrChord->m_element) return;
 
     // Find count of the elements for the alignment and store them in map by the class id
     Functor getClassIdCount(&Object::GetClassIdCount);
