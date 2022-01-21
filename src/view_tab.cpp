@@ -135,15 +135,18 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
-    int glyphSize = staff->GetDrawingStaffNotationSize();
-
+    const int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
+    const int glyphSize = staff->GetDrawingStaffNotationSize();
+    const int halfStemWidth =  m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+    
     // We only need to draw the stems
     // Do we also need to draw the dots?
     if (tabGrp->IsInBeam()) {
         const int height = m_doc->GetGlyphHeight(SMUFL_EBA8_luteDurationHalf, glyphSize, true);
-        DrawFilledRectangle(dc, x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y,
-            x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y + height);
+        DrawFilledRectangle(dc, x - halfStemWidth, y, x + halfStemWidth, y + height);
+    }
+    else if (staff->m_drawingNotationType == NOTATIONTYPE_tab_guitar) {
+    
     }
     else {
         int symc = 0;
