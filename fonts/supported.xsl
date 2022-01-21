@@ -2160,11 +2160,11 @@
             <glyph glyph-code="E904" smufl-name="mensuralFclefPetrucci" />
             <!--<glyph glyph-code="E905" smufl-name="mensuralCclef" />-->
             <glyph glyph-code="E906" smufl-name="chantCclef" />
-            <!--<glyph glyph-code="E907" smufl-name="mensuralCclefPetrucciPosLowest" />-->
-            <!--<glyph glyph-code="E908" smufl-name="mensuralCclefPetrucciPosLow" />-->
+            <glyph glyph-code="E907" smufl-name="mensuralCclefPetrucciPosLowest" />
+            <glyph glyph-code="E908" smufl-name="mensuralCclefPetrucciPosLow" />
             <glyph glyph-code="E909" smufl-name="mensuralCclefPetrucciPosMiddle" />
-            <!--<glyph glyph-code="E90A" smufl-name="mensuralCclefPetrucciPosHigh" />-->
-            <!--<glyph glyph-code="E90B" smufl-name="mensuralCclefPetrucciPosHighest" />-->
+            <glyph glyph-code="E90A" smufl-name="mensuralCclefPetrucciPosHigh" />
+            <glyph glyph-code="E90B" smufl-name="mensuralCclefPetrucciPosHighest" />
             <range_end>U+E90F</range_end>
             <range_start>U+E900</range_start>
         </medievalAndRenaissanceClefs>
