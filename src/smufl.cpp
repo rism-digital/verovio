@@ -335,7 +335,11 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "chantFclef", SMUFL_E902_chantFclef },
     { "mensuralFclefPetrucci", SMUFL_E904_mensuralFclefPetrucci },
     { "chantCclef", SMUFL_E906_chantCclef },
+    { "mensuralCclefPetrucciPosLowest", SMUFL_E907_mensuralCclefPetrucciPosLowest },
+    { "mensuralCclefPetrucciPosLow", SMUFL_E908_mensuralCclefPetrucciPosLow },
     { "mensuralCclefPetrucciPosMiddle", SMUFL_E909_mensuralCclefPetrucciPosMiddle },
+    { "mensuralCclefPetrucciPosHigh", SMUFL_E90A_mensuralCclefPetrucciPosHigh },
+    { "mensuralCclefPetrucciPosHighest", SMUFL_E90B_mensuralCclefPetrucciPosHighest },
     { "mensuralProlation1", SMUFL_E910_mensuralProlation1 },
     { "mensuralProlation2", SMUFL_E911_mensuralProlation2 },
     { "mensuralProlation3", SMUFL_E912_mensuralProlation3 },
@@ -437,6 +441,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 411
+// 415
 
 } // namespace vrv
