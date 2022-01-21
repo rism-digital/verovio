@@ -536,10 +536,7 @@ std::list<Note *> Chord::GetAdjacentNotesList(Staff *staff, int loc)
         Note *note = vrv_cast<Note *>(obj);
         assert(note);
 
-        Layer *layer = NULL;
-        Staff *noteStaff = note->GetCrossStaff(layer);
-        if (!noteStaff) noteStaff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(noteStaff);
+        Staff *noteStaff = note->GetAncestorStaff(RESOLVE_CROSSSTAFF);
         if (noteStaff != staff) continue;
 
         const int locDiff = note->GetDrawingLoc() - loc;
@@ -614,8 +611,7 @@ int Chord::CalcArtic(FunctorParams *functorParams)
     params->m_parent = this;
     params->m_stemDir = this->GetDrawingStemDir();
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
@@ -685,8 +681,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
@@ -748,10 +743,7 @@ MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate)
 
         if (predicate && !predicate(note)) continue;
 
-        Layer *layer = NULL;
-        Staff *staff = note->GetCrossStaff(layer);
-        if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = note->GetAncestorStaff(RESOLVE_CROSSSTAFF);
 
         noteLocations[staff].insert(note->GetDrawingLoc());
     }
@@ -919,10 +911,7 @@ int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
     // Check if chord spreads across several staves
     std::list<Staff *> extremalStaves;
     for (Note *note : { this->GetTopNote(), this->GetBottomNote() }) {
-        Layer *layer = NULL;
-        Staff *staff = note->GetCrossStaff(layer);
-        if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = note->GetAncestorStaff(RESOLVE_CROSSSTAFF);
         extremalStaves.push_back(staff);
     }
     assert(extremalStaves.size() == 2);
@@ -954,8 +943,7 @@ int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
         }
 
         // Reposition the stem
-        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = this->GetAncestorStaff();
         Staff *rootStaff
             = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? extremalStaves.back() : extremalStaves.front();
         stem->SetDrawingYRel(stem->GetDrawingYRel() + getShift(staff) - getShift(rootStaff));

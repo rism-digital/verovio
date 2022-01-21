@@ -1336,8 +1336,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     const int bottom = bottomNote->GetDrawingY();
 
     // We arbitrarily look at the top note
-    Staff *staff = vrv_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = topNote->GetAncestorStaff();
     const bool drawingCueSize = topNote->GetDrawingCueSize();
 
     // We are going to have only one FloatingPositioner - staff will be the top note one

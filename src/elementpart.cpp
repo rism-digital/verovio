@@ -307,8 +307,7 @@ bool Stem::IsSupportedChild(Object *child)
 
 int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int margin)
 {
-    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
 
     // check if there is an overlap on the left or on the right and displace stem's parent correspondingly
     const int right = HorizontalLeftOverlap(otherElement, doc, margin, 0);

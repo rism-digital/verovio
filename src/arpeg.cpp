@@ -226,13 +226,10 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     // We should have call DrawArpeg before
     assert(this->GetCurrentFloatingPositioner());
 
-    Staff *topStaff = vrv_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
-    assert(topStaff);
+    Staff *topStaff = topNote->GetAncestorStaff();
+    Staff *bottomStaff = bottomNote->GetAncestorStaff();
 
-    Staff *bottomStaff = vrv_cast<Staff *>(bottomNote->GetFirstAncestor(STAFF));
-    assert(bottomStaff);
-
-    Staff *crossStaff = GetCrossStaff();
+    Staff *crossStaff = this->GetCrossStaff();
     const int staffN = (crossStaff != NULL) ? crossStaff->GetN() : topStaff->GetN();
 
     int minTopLeft, maxTopRight;

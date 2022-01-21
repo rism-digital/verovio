@@ -320,8 +320,7 @@ void Tuplet::CalculateTupletNumCrossStaff(LayerElement *layerElement)
         return;
     };
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
     // Find if there is a mix of cross-staff and non-cross-staff elements in the tuplet
     ListOfObjects descendants;
     ClassIdsComparison comparison({ CHORD, NOTE, REST });
@@ -644,9 +643,8 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-    int staffSize = staff->m_drawingStaffSize;
+    Staff *staff = this->GetAncestorStaff();
+    const int staffSize = staff->m_drawingStaffSize;
 
     assert(m_drawingBracketPos != STAFFREL_basic_NONE);
 

@@ -835,7 +835,7 @@ void View::DrawBarLine(
     assert(dc);
     assert(barLine);
 
-    Staff *staff = dynamic_cast<Staff *>(barLine->GetFirstAncestor(STAFF));
+    Staff *staff = barLine->GetAncestorStaff(ANCESTOR_ONLY, false);
     const int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
 
     const int x = barLine->GetDrawingX();
