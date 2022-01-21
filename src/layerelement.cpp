@@ -1714,7 +1714,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
         else if (this->Is(NOTE)) {
             Note *currentNote = vrv_cast<Note *>(this);
             assert(currentNote);
-            if ((currentNote->GetDrawingDur() == DUR_1) && otherElements.at(i)->Is(STEM)) {
+            if ((currentNote->GetDrawingDur() == DUR_1) && otherElements.at(i)->Is(STEM) && (shift == 0)) {
                 const int horizontalMargin = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
                 data_STEMDIRECTION stemDir = stem->GetDrawingStemDir();
