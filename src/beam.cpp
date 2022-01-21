@@ -1058,7 +1058,7 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         }
     }
 
-    short minDuration = DUR_4;
+    int minDuration = DUR_4;
     for (auto coord : m_beamElementCoordRefs) {
         if (!coord->m_closestNote) continue;
         // if location matches, or if current elements duration is shorter than 8th. This ensures that beams with
