@@ -267,8 +267,8 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
 {
     const int unit = doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     // find shortest duration for above/below beams for the sake of calculating overlap with additional beams
-    short topShortestDur = DUR_8;
-    short bottomShortestDur = DUR_8;
+    int topShortestDur = DUR_8;
+    int bottomShortestDur = DUR_8;
     std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
         if (coord->m_partialFlagPlace == BEAMPLACE_above) {
             topShortestDur = std::max(topShortestDur, coord->m_dur);

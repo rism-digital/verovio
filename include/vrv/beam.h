@@ -259,7 +259,7 @@ public:
 
     int m_x;
     int m_yBeam; // y value of stem top position
-    short m_dur; // drawing duration
+    int m_dur; // drawing duration
     int m_breaksec;
     int m_overlapMargin;
     int m_maxShortening; // maximum allowed shortening in half units
