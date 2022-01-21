@@ -240,7 +240,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // This can happen with accid within note with only accid.ges
     // We still create an graphic in the output
-    if (!accid->HasAccid()) {
+    if (!accid->HasAccid() || staff->IsTablature()) {
         dc->StartGraphic(element, "", element->GetUuid());
         accid->SetEmptyBB();
         dc->EndGraphic(element, this);
