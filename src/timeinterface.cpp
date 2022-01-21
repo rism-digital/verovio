@@ -97,7 +97,7 @@ bool TimePointInterface::IsOnStaff(int n)
         return false;
     }
     else if (m_start) {
-        Staff *staff = m_start->FindStaff(ANCESTOR_ONLY, false);
+        Staff *staff = m_start->GetAncestorStaff(ANCESTOR_ONLY, false);
         if (staff && (staff->GetN() == n)) return true;
     }
     return false;
@@ -129,7 +129,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
         }
     }
     else if (m_start && !m_start->Is(TIMESTAMP_ATTR)) {
-        Staff *staff = m_start->FindStaff(ANCESTOR_ONLY);
+        Staff *staff = m_start->GetAncestorStaff();
         staffList.push_back(staff->GetN());
     }
     else if (measure->GetChildCount(STAFF) == 1) {
@@ -285,10 +285,10 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
 
     // No cross-staff endpoints, check if the slur itself crosses staves
     if (!startStaff) {
-        startStaff = this->GetStart()->FindStaff(ANCESTOR_ONLY, false);
+        startStaff = this->GetStart()->GetAncestorStaff(ANCESTOR_ONLY, false);
     }
     if (!endStaff) {
-        endStaff = this->GetEnd()->FindStaff(ANCESTOR_ONLY, false);
+        endStaff = this->GetEnd()->GetAncestorStaff(ANCESTOR_ONLY, false);
     }
 
     // This happens with slurs starting or ending with a timestamp

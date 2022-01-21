@@ -101,7 +101,7 @@ void FTrem::FilterList(ArrayOfObjects *childList)
         ++iter;
     }
 
-    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
+    Staff *staff = this->GetAncestorStaff();
 
     this->InitCoords(childList, staff, BEAMPLACE_NONE);
     this->InitCue(false);

@@ -184,7 +184,7 @@ int Clef::AdjustBeams(FunctorParams *functorParams)
     assert(params);
     if (!params->m_beam) return FUNCTOR_SIBLINGS;
 
-    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
+    Staff *staff = this->GetAncestorStaff();
 
     auto currentShapeIter = topToMiddleProportions.find(GetShape());
     if (currentShapeIter == topToMiddleProportions.end()) return FUNCTOR_CONTINUE;
@@ -234,7 +234,7 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
 
     assert(params->m_aligner);
 
-    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
+    Staff *staff = this->GetAncestorStaff();
 
     // Create ad comparison object for each type / @n
     std::vector<int> ns;

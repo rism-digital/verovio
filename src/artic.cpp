@@ -399,7 +399,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
     int yIn, yOut, yRel;
 
-    Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
     Beam *beam = dynamic_cast<Beam *>(GetFirstAncestor(BEAM));
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
 
@@ -543,7 +543,7 @@ int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIR
     switch (artic) {
         case ARTICULATION_stacc:
         case ARTICULATION_stacciss: {
-            Staff *staff = this->FindStaff(ANCESTOR_ONLY);
+            Staff *staff = this->GetAncestorStaff();
             const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             if ((stemDir == STEMDIRECTION_up) && (m_drawingPlace == STAFFREL_above)) {
                 shift += shift - stemWidth / 2;

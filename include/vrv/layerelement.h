@@ -183,9 +183,9 @@ public:
     Alignment *GetAlignment() const { return m_alignment; }
 
     /**
-     * Find the ancestor or cross staff
+     * Get the ancestor or cross staff
      */
-    Staff *FindStaff(StaffSearch strategy, bool assertExistence = true) const;
+    Staff *GetAncestorStaff(StaffSearch strategy = ANCESTOR_ONLY, bool assertExistence = true) const;
 
     /**
      * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff.

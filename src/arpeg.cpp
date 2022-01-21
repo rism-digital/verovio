@@ -226,8 +226,8 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     // We should have call DrawArpeg before
     assert(this->GetCurrentFloatingPositioner());
 
-    Staff *topStaff = topNote->FindStaff(ANCESTOR_ONLY);
-    Staff *bottomStaff = bottomNote->FindStaff(ANCESTOR_ONLY);
+    Staff *topStaff = topNote->GetAncestorStaff();
+    Staff *bottomStaff = bottomNote->GetAncestorStaff();
 
     Staff *crossStaff = this->GetCrossStaff();
     const int staffN = (crossStaff != NULL) ? crossStaff->GetN() : topStaff->GetN();

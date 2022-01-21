@@ -211,7 +211,7 @@ Accid *Note::GetDrawingAccid()
 bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
 {
     if (!staff) {
-        staff = this->FindStaff(ANCESTOR_ONLY);
+        staff = this->GetAncestorStaff();
     }
 
     linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
@@ -455,7 +455,7 @@ wchar_t Note::GetMensuralNoteheadGlyph() const
         return 0;
     }
 
-    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
+    Staff *staff = this->GetAncestorStaff();
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     wchar_t code = 0;
@@ -618,7 +618,7 @@ void Note::CalcMIDIPitch(int shift)
     }
     else if (this->HasTabCourse()) {
         // tablature
-        Staff *staff = this->FindStaff(ANCESTOR_ONLY);
+        Staff *staff = this->GetAncestorStaff();
         if (staff->m_drawingTuning) {
             m_MIDIPitch = staff->m_drawingTuning->CalcPitchNumber(
                 this->GetTabCourse(), this->GetTabFret(), staff->m_drawingNotationType);
@@ -862,7 +862,7 @@ int Note::CalcArtic(FunctorParams *functorParams)
     params->m_parent = this;
     params->m_stemDir = this->GetDrawingStemDir();
 
-    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
+    Staff *staff = this->GetAncestorStaff();
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
@@ -930,7 +930,7 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
+    Staff *staff = this->GetAncestorStaff();
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
@@ -982,7 +982,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
-    Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
     const int staffSize = staff->m_drawingStaffSize;
 
     bool mixedCue = false;
@@ -1053,7 +1053,7 @@ MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate)
 {
     if (predicate && !predicate(this)) return {};
 
-    Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
 
     MapOfNoteLocs noteLocations;
     noteLocations[staff] = { this->GetDrawingLoc() };
@@ -1088,7 +1088,7 @@ int Note::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
     const int staffSize = staff->m_drawingStaffSize;
     const bool drawingCueSize = this->GetDrawingCueSize();
 
@@ -1156,7 +1156,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = this->FindStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
     const int staffSize = staff->m_drawingStaffSize;
     const int staffX = staff->GetDrawingX();
     const bool drawingCueSize = this->GetDrawingCueSize();

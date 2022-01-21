@@ -1292,7 +1292,7 @@ void Beam::FilterList(ArrayOfObjects *childList)
         }
     }
 
-    Staff *beamStaff = this->FindStaff(ANCESTOR_ONLY);
+    Staff *beamStaff = this->GetAncestorStaff();
     /*
     if (this->HasBeamWith()) {
         Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
@@ -1516,7 +1516,7 @@ int Beam::CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, in
     auto collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
     if (collidingElementsList.empty()) return 0;
 
-    Staff *staff = this->FindStaff(ANCESTOR_ONLY);
+    Staff *staff = this->GetAncestorStaff();
 
     int leftMargin = 0;
     int rightMargin = 0;
@@ -1593,7 +1593,7 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
 
     const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
     if (overlapMargin >= params->m_overlapMargin) {
-        Staff *staff = this->FindStaff(ANCESTOR_ONLY);
+        Staff *staff = this->GetAncestorStaff();
         const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         params->m_overlapMargin = (overlapMargin + staffOffset) * params->m_directionBias;
     }

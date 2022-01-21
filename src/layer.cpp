@@ -282,7 +282,7 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     assert(alignmentLast);
 
     // We are ignoring cross-staff situation here because this should not be called if we have one
-    Staff *staff = first->FindStaff(ANCESTOR_ONLY);
+    Staff *staff = first->GetAncestorStaff();
 
     double time = alignmentFirst->GetTime();
     double duration = alignmentLast->GetTime() - time + last->GetAlignmentDuration();
@@ -306,7 +306,7 @@ std::set<int> Layer::GetLayersNForTimeSpanOf(LayerElement *element)
     Alignment *alignment = element->GetAlignment();
     assert(alignment);
 
-    Staff *staff = element->FindStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = element->GetAncestorStaff(RESOLVE_CROSSSTAFF);
 
     return this->GetLayersNInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
 }
@@ -374,7 +374,7 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool e
         return {};
     }
 
-    Staff *staff = element->FindStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = element->GetAncestorStaff(RESOLVE_CROSSSTAFF);
 
     return GetLayerElementsInTimeSpan(time, duration, measure, staff->GetN(), excludeCurrent);
 }

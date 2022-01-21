@@ -182,8 +182,8 @@ float View::CalcInitialSlur(
     const std::vector<LayerElement *> elements
         = slur->CollectSpannedElements(staff, bezier.p1.x, bezier.p2.x, curve->GetSpanningType());
 
-    Staff *startStaff = slur->GetStart()->FindStaff(RESOLVE_CROSSSTAFF, false);
-    Staff *endStaff = slur->GetEnd()->FindStaff(RESOLVE_CROSSSTAFF, false);
+    Staff *startStaff = slur->GetStart()->GetAncestorStaff(RESOLVE_CROSSSTAFF, false);
+    Staff *endStaff = slur->GetEnd()->GetAncestorStaff(RESOLVE_CROSSSTAFF, false);
 
     curve->ClearSpannedElements();
     for (auto element : elements) {

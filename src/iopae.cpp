@@ -498,7 +498,7 @@ void PAEOutput::WriteTuplet(Tuplet *tuplet)
 {
     assert(tuplet);
 
-    Staff *staff = tuplet->FindStaff(ANCESTOR_ONLY);
+    Staff *staff = tuplet->GetAncestorStaff();
 
     double content = tuplet->GetContentAlignmentDuration(NULL, NULL, true, staff->m_drawingNotationType);
     // content = DUR_MAX / 2^(dur - 2)
