@@ -118,6 +118,14 @@ wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
             switch (GetShape()) {
                 case CLEFSHAPE_G: return SMUFL_E901_mensuralGclefPetrucci; break;
                 case CLEFSHAPE_F: return SMUFL_E904_mensuralFclefPetrucci; break;
+                case CLEFSHAPE_C:
+                    switch (GetLine()) {
+                        case 1: return SMUFL_E907_mensuralCclefPetrucciPosLowest; break;
+                        case 2: return SMUFL_E908_mensuralCclefPetrucciPosLow; break;
+                        case 3: return SMUFL_E909_mensuralCclefPetrucciPosMiddle; break;
+                        case 4: return SMUFL_E90A_mensuralCclefPetrucciPosHigh; break;
+                        case 5: return SMUFL_E90B_mensuralCclefPetrucciPosHighest; break;
+                    }
                 default: return SMUFL_E909_mensuralCclefPetrucciPosMiddle; break;
             }
         case NOTATIONTYPE_mensural_black:
