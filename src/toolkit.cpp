@@ -736,7 +736,7 @@ bool Toolkit::LoadData(const std::string &data)
             }
             // LogElapsedTimeStart();
             m_doc.CastOffDoc();
-            // LogElapsedTimeEnd("layout");
+            // LogElapsedTimeEnd("cast-off");
         }
     }
 

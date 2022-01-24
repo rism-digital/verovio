@@ -134,6 +134,10 @@ void Measure::Reset()
     m_xAbs = VRV_UNSET;
     m_xAbs2 = VRV_UNSET;
     m_drawingXRel = 0;
+    
+    m_cachedCastOffOverflow = VRV_UNSET;
+    m_cachedCastOffDrawingXRel = VRV_UNSET;
+    m_cachedCastOffWidth = VRV_UNSET;
 
     // by default, we have a single barLine on the right (none on the left)
     m_rightBarLine.SetForm(this->GetRight());
@@ -1197,9 +1201,17 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
-
-    // Check if the measure has some overflowing control elements
-    int overflow = this->GetDrawingOverflow();
+    
+    if (m_cachedCastOffWidth == VRV_UNSET) {
+        // Check if the measure has some overflowing control elements
+        m_cachedCastOffOverflow = this->GetDrawingOverflow();
+        m_cachedCastOffWidth = this->GetWidth();
+        m_cachedCastOffDrawingXRel = this->m_drawingXRel;
+        
+    }
+    int overflow = this->m_cachedCastOffOverflow;
+    int width = this->m_cachedCastOffWidth;
+    int drawingXRel = this->m_cachedCastOffDrawingXRel;
 
     Object *nextMeasure = params->m_contentSystem->GetNext(this, MEASURE);
     const bool isLeftoverMeasure = ((NULL == nextMeasure) && params->m_doc->GetOptions()->m_breaksNoWidow.GetValue()
@@ -1215,11 +1227,11 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if (m_drawingXRel + GetWidth() + params->m_currentScoreDefWidth - params->m_shift
+        else if (drawingXRel + width + params->m_currentScoreDefWidth - params->m_shift
             > params->m_systemWidth) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
-            params->m_shift = this->m_drawingXRel;
+            params->m_shift = drawingXRel;
             // If last measure requires separate system - mark that system as leftover for the future CastOffPages call
             if (isLeftoverMeasure) {
                 params->m_leftoverSystem = params->m_currentSystem;
@@ -1228,8 +1240,8 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
                     assert(firstPendingMesure);
+                    params->m_shift = firstPendingMesure->m_cachedCastOffDrawingXRel;
                     params->m_leftoverSystem = NULL;
-                    params->m_shift = firstPendingMesure->m_drawingXRel;
                     // it has to be first measure
                     break;
                 }

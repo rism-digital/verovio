@@ -490,6 +490,10 @@ public:
     mutable MeasureAligner m_measureAligner;
 
     TimestampAligner m_timestampAligner;
+                    
+    int m_cachedCastOffOverflow;
+    int m_cachedCastOffDrawingXRel;
+    int m_cachedCastOffWidth;
 
 protected:
     /**
