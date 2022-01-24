@@ -264,7 +264,7 @@ private:
 public:
     bool m_setAsDrawing;
     bool m_insertScoreDef;
-                     
+
     int m_cacheCastOffWidth;
     //
 private:

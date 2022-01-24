@@ -1003,6 +1003,8 @@ int System::CastOffPages(FunctorParams *functorParams)
         currentShift += params->m_pgHead2Height + params->m_pgFoot2Height;
     }
 
+    // LogMessage("System: %d", this->GetHeight());
+
     const int systemMaxPerPage = params->m_doc->GetOptions()->m_systemMaxPerPage.GetValue();
     const int childCount = params->m_currentPage->GetChildCount();
     if ((systemMaxPerPage && systemMaxPerPage == childCount)
