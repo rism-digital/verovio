@@ -79,7 +79,7 @@ verovio.vrvToolkit.loadZipDataBase64 = Module.cwrap( 'vrvToolkit_loadZipDataBase
 verovio.vrvToolkit.loadZipDataBuffer = Module.cwrap( 'vrvToolkit_loadZipDataBuffer', 'number', ['number', 'number', 'number'] );
 
 // void redoLayout(Toolkit *ic)
-verovio.vrvToolkit.redoLayout = Module.cwrap( 'vrvToolkit_redoLayout', null, ['number'] );
+verovio.vrvToolkit.redoLayout = Module.cwrap( 'vrvToolkit_redoLayout', null, ['number', 'string'] );
 
 // void redoPagePitchPosLayout(Toolkit *ic)
 verovio.vrvToolkit.redoPagePitchPosLayout = Module.cwrap( 'vrvToolkit_redoPagePitchPosLayout', null, ['number'] );
@@ -253,9 +253,9 @@ verovio.toolkit.prototype.loadZipDataBuffer = function ( data )
     return res;
 };
 
-verovio.toolkit.prototype.redoLayout = function ()
+verovio.toolkit.prototype.redoLayout = function ( options = {} )
 {
-    verovio.vrvToolkit.redoLayout( this.ptr );
+    verovio.vrvToolkit.redoLayout( this.ptr, JSON.stringify( options ) );
 }
 
 verovio.toolkit.prototype.redoPagePitchPosLayout = function ()
