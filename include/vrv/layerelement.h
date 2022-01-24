@@ -30,7 +30,7 @@ class Staff;
 class StaffAlignment;
 
 // Helper enums
-enum StaffSearch { ANCESTOR_ONLY = 0, RESOLVE_CROSSSTAFF };
+enum StaffSearch { ANCESTOR_ONLY = 0, RESOLVE_CROSS_STAFF };
 
 //----------------------------------------------------------------------------
 // LayerElement

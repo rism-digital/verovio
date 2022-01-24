@@ -1029,7 +1029,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     const int staffSize = staff->m_drawingStaffSize;
 
     bool mixedCue = false;
@@ -1100,7 +1100,7 @@ MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate)
 {
     if (predicate && !predicate(this)) return {};
 
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
     MapOfNoteLocs noteLocations;
     noteLocations[staff] = { this->GetDrawingLoc() };
@@ -1135,7 +1135,7 @@ int Note::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     const int staffSize = staff->m_drawingStaffSize;
     const bool drawingCueSize = this->GetDrawingCueSize();
 
@@ -1203,7 +1203,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     const int staffSize = staff->m_drawingStaffSize;
     const int staffX = staff->GetDrawingX();
     const bool drawingCueSize = this->GetDrawingCueSize();

@@ -163,8 +163,8 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
 
     std::set<int> staffNumbers;
     staffNumbers.emplace(staff->GetN());
-    Staff *startStaff = this->GetStart()->GetAncestorStaff(RESOLVE_CROSSSTAFF, false);
-    Staff *endStaff = this->GetEnd()->GetAncestorStaff(RESOLVE_CROSSSTAFF, false);
+    Staff *startStaff = this->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+    Staff *endStaff = this->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
     if (startStaff && (startStaff != staff)) {
         staffNumbers.emplace(startStaff->GetN());
     }
@@ -273,7 +273,7 @@ Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spann
     // The floating curve positioner of cross staff slurs should live in the upper/lower staff alignment
     // corresponding to whether the slur is curved above/below
     auto adaptStaff = [&extremalStaff, curveDir](LayerElement *element) {
-        Staff *elementStaff = element->GetAncestorStaff(RESOLVE_CROSSSTAFF);
+        Staff *elementStaff = element->GetAncestorStaff(RESOLVE_CROSS_STAFF);
         if ((curveDir == curvature_CURVEDIR_above) && (elementStaff->GetN() < extremalStaff->GetN())) {
             extremalStaff = elementStaff;
         }

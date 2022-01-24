@@ -245,7 +245,7 @@ int LayerElement::GetOriginalLayerN()
 Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence) const
 {
     Staff *staff = NULL;
-    if (strategy == RESOLVE_CROSSSTAFF) {
+    if (strategy == RESOLVE_CROSS_STAFF) {
         Layer *layer = NULL;
         staff = this->GetCrossStaff(layer);
     }
@@ -281,7 +281,7 @@ data_STAFFREL_basic LayerElement::GetCrossStaffRel()
 
 void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlignment *&below)
 {
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
     // By default use the alignment of the staff
     above = staff->GetAlignment();
@@ -2369,15 +2369,15 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 
         // Skip elements aligned at start/end, but on a different staff
         if ((this->GetAlignment() == start->GetAlignment()) && !start->Is(TIMESTAMP_ATTR)) {
-            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
-            Staff *startStaff = start->GetAncestorStaff(RESOLVE_CROSSSTAFF);
+            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            Staff *startStaff = start->GetAncestorStaff(RESOLVE_CROSS_STAFF);
             if (staff->GetN() != startStaff->GetN()) {
                 return FUNCTOR_CONTINUE;
             }
         }
         if ((this->GetAlignment() == end->GetAlignment()) && !end->Is(TIMESTAMP_ATTR)) {
-            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
-            Staff *endStaff = end->GetAncestorStaff(RESOLVE_CROSSSTAFF);
+            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            Staff *endStaff = end->GetAncestorStaff(RESOLVE_CROSS_STAFF);
             if (staff->GetN() != endStaff->GetN()) {
                 return FUNCTOR_CONTINUE;
             }
@@ -2566,7 +2566,7 @@ int LayerElement::PrepareDuration(FunctorParams *functorParams)
         durInterface->SetDurDefault(params->m_durDefault);
         // Check if there is a duration default for the staff
         if (!params->m_durDefaultForStaffN.empty()) {
-            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
+            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
             if (params->m_durDefaultForStaffN.count(staff->GetN()) > 0) {
                 durInterface->SetDurDefault(params->m_durDefaultForStaffN.at(staff->GetN()));
             }
