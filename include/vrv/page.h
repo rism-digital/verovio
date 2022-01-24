@@ -100,6 +100,13 @@ public:
     void LayOutHorizontally();
 
     /**
+     * Layout out the measures horizontally using the cached values.
+     * This should be done in preparation of cast-off which it based on measure positioning.
+     * The content of the measures it not layout out and keeps previous relative positioning.
+     */
+    void HorizontalLayoutCachePage(bool restore = false);
+
+    /**
      * Justifiy the content of the page (measures and their content) horizontally
      */
     void JustifyHorizontally();

@@ -254,7 +254,7 @@ void Page::LayOutHorizontally()
     Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
     AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
-    
+
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
@@ -424,6 +424,17 @@ void Page::LayOutHorizontally()
     PrepareSlursParams prepareSlursParams(doc);
     Functor prepareSlurs(&Object::PrepareSlurs);
     this->Process(&prepareSlurs, &prepareSlursParams);
+}
+
+void Page::HorizontalLayoutCachePage(bool restore)
+{
+    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
+    assert(doc);
+
+    HorizontalLayoutCacheParams horizontalLayoutCacheParams(doc);
+    horizontalLayoutCacheParams.m_restore = restore;
+    Functor horizontalLayoutCache(&Object::HorizontalLayoutCache);
+    this->Process(&horizontalLayoutCache, &horizontalLayoutCacheParams);
 }
 
 void Page::LayOutVertically()
