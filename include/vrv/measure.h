@@ -467,6 +467,11 @@ public:
      */
     int PrepareTimestampsEnd(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::HorizontalLayoutCache
+     */
+    int HorizontalLayoutCache(FunctorParams *functorParams) override;
+
 public:
     // flags for drawing measure barline based on visibility or other conditions
     enum BarlineDrawingFlags {
@@ -490,10 +495,14 @@ public:
     mutable MeasureAligner m_measureAligner;
 
     TimestampAligner m_timestampAligner;
-                    
-    int m_cachedCastOffOverflow;
-    int m_cachedCastOffDrawingXRel;
-    int m_cachedCastOffWidth;
+
+    /**
+     * @name Cached values of overflow and width for caching the horizontal layout
+     */
+    ///@{
+    int m_cachedOverflow;
+    int m_cachedWidth;
+    ///@}
 
 protected:
     /**
@@ -501,6 +510,11 @@ protected:
      * It is used internally when calculating the layout and it is not stored in the file.
      */
     int m_drawingXRel;
+
+    /**
+     * The cached value for m_darwingXRel for caching horizontal layout
+     */
+    int m_cachedXRel;
 
 private:
     bool m_measuredMusic;

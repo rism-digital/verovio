@@ -134,10 +134,10 @@ void Measure::Reset()
     m_xAbs = VRV_UNSET;
     m_xAbs2 = VRV_UNSET;
     m_drawingXRel = 0;
-    
-    m_cachedCastOffOverflow = VRV_UNSET;
-    m_cachedCastOffDrawingXRel = VRV_UNSET;
-    m_cachedCastOffWidth = VRV_UNSET;
+
+    m_cachedXRel = VRV_UNSET;
+    m_cachedOverflow = VRV_UNSET;
+    m_cachedWidth = VRV_UNSET;
 
     // by default, we have a single barLine on the right (none on the left)
     m_rightBarLine.SetForm(this->GetRight());
@@ -1201,17 +1201,11 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
-    
-    if (m_cachedCastOffWidth == VRV_UNSET) {
-        // Check if the measure has some overflowing control elements
-        m_cachedCastOffOverflow = this->GetDrawingOverflow();
-        m_cachedCastOffWidth = this->GetWidth();
-        m_cachedCastOffDrawingXRel = this->m_drawingXRel;
-        
-    }
-    int overflow = this->m_cachedCastOffOverflow;
-    int width = this->m_cachedCastOffWidth;
-    int drawingXRel = this->m_cachedCastOffDrawingXRel;
+
+    const bool hasCache = (m_cachedWidth == VRV_UNSET);
+    int overflow = hasCache ? this->m_cachedOverflow : this->GetDrawingOverflow();
+    int width = hasCache ? this->m_cachedWidth : this->GetWidth();
+    int drawingXRel = this->m_drawingXRel;
 
     Object *nextMeasure = params->m_contentSystem->GetNext(this, MEASURE);
     const bool isLeftoverMeasure = ((NULL == nextMeasure) && params->m_doc->GetOptions()->m_breaksNoWidow.GetValue()
@@ -1227,8 +1221,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if (drawingXRel + width + params->m_currentScoreDefWidth - params->m_shift
-            > params->m_systemWidth) {
+        else if (drawingXRel + width + params->m_currentScoreDefWidth - params->m_shift > params->m_systemWidth) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
             params->m_shift = drawingXRel;
@@ -1240,7 +1233,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
                     assert(firstPendingMesure);
-                    params->m_shift = firstPendingMesure->m_cachedCastOffDrawingXRel;
+                    params->m_shift = firstPendingMesure->m_cachedXRel;
                     params->m_leftoverSystem = NULL;
                     // it has to be first measure
                     break;
@@ -1604,6 +1597,25 @@ int Measure::CalcOnsetOffset(FunctorParams *functorParams)
     assert(params);
 
     params->m_currentTempo = m_currentTempo;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::HorizontalLayoutCache(FunctorParams *functorParams)
+{
+    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    assert(params);
+
+    if (params->m_restore) {
+        m_drawingXRel = m_cachedXRel;
+    }
+    else {
+        m_cachedWidth = this->GetWidth();
+        m_cachedOverflow = this->GetDrawingOverflow();
+        m_cachedXRel = m_drawingXRel;
+    }
+    if (this->GetLeftBarLine()) this->GetLeftBarLine()->HorizontalLayoutCache(functorParams);
+    if (this->GetRightBarLine()) this->GetRightBarLine()->HorizontalLayoutCache(functorParams);
 
     return FUNCTOR_CONTINUE;
 }

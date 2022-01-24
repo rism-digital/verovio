@@ -411,6 +411,11 @@ public:
      */
     int PrepareDuration(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::HorizontalLayoutCache
+     */
+    int HorizontalLayoutCache(FunctorParams *functorParams) override;
+
 protected:
     /**
      * Helper to figure whether two chords are in fully in unison based on the locations of the notes.
@@ -482,10 +487,20 @@ protected:
     int m_drawingYRel;
 
     /**
+     * The cached value for m_darwingYRel for caching horizontal layout
+     */
+    int m_cachedYRel;
+
+    /**
      * The X drawing relative position of the object.
      * It is re-computed everytime the object is drawn and it is not stored in the file.
      */
     int m_drawingXRel;
+
+    /**
+     * The cached value for m_darwingXRel for caching horizontal layout
+     */
+    int m_cachedXRel;
 
     /**
      * The cached drawing cue size set by PrepareDrawingCueSize
