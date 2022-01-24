@@ -3,6 +3,9 @@
 ## [unreleased]
 * Support for `beatRpt@beatdef`
 * Support for `scoreDef` and `staffDef` `@dur.default` (@eNote-GmBH)
+* Support for MIDI output of grace notes (@eNote-GmBH)
+* Improved tablature MIDI output (@paul-bayleaf)
+* Preliminary support for tablature MusicXML import (@paul-bayleaf)
 
 ## [3.8.1] - 2022-01-10
 * Fix bug in PAE importer for durations and for key signatures
