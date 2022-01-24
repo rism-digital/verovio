@@ -859,6 +859,13 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
         contentPage->LayOutHorizontally();
         LogMessage("Horizontal Layout Done");
     }
+    else {
+        // Adjust measure X position
+        AlignMeasuresParams alignMeasuresParams;
+        Functor alignMeasures(&Object::AlignMeasures);
+        Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
+        contentPage->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
+    }
 
     System *contentSystem = vrv_cast<System *>(contentPage->DetachChild(0));
     assert(contentSystem);
