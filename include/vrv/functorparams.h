@@ -804,6 +804,7 @@ public:
 /**
  * member 0: the cumulated shift
  * member 1: the cumulated justifiable width
+ * member 2: the doc
  **/
 
 class AlignMeasuresParams : public FunctorParams {
@@ -1538,6 +1539,26 @@ public:
     }
     Doc *m_doc;
     FeatureExtractor *m_extractor;
+};
+
+//----------------------------------------------------------------------------
+// HorizontalLayoutCacheParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a flag indicating if the cache should be stored (default) or restored
+ * member 1: a pointer to the Doc
+ **/
+
+class HorizontalLayoutCacheParams : public FunctorParams {
+public:
+    HorizontalLayoutCacheParams(Doc *doc)
+    {
+        m_restore = false;
+        m_doc = doc;
+    }
+    bool m_restore;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
