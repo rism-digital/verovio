@@ -931,16 +931,13 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 
     // Check if the the horizontal layout is cached by looking at the first measure
     Measure *firstMeasure = vrv_cast<Measure *>(unCastOffPage->FindDescendantByType(MEASURE));
-    if (!firstMeasure || firstMeasure->m_cachedCastOffWidth == VRV_UNSET) {
+    if (!firstMeasure || firstMeasure->m_cachedWidth == VRV_UNSET) {
         LogDebug("Performing the horizontal layout");
         unCastOffPage->LayOutHorizontally();
+        unCastOffPage->HorizontalLayoutCachePage();
     }
     else {
-        // Adjust measure X position
-        AlignMeasuresParams alignMeasuresParams(this);
-        Functor alignMeasures(&Object::AlignMeasures);
-        Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
-        unCastOffPage->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
+        unCastOffPage->HorizontalLayoutCachePage(true);
     }
 
     Page *castOffSinglePage = new Page();
