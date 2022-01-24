@@ -930,8 +930,9 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     assert(unCastOffPage);
 
     // Check if the the horizontal layout is cached by looking at the first measure
+    // The cache is not set the first time, or can be reset by Doc::UnCastOffDoc
     Measure *firstMeasure = vrv_cast<Measure *>(unCastOffPage->FindDescendantByType(MEASURE));
-    if (!firstMeasure || firstMeasure->m_cachedWidth == VRV_UNSET) {
+    if (!firstMeasure || !firstMeasure->HasCachedHorizontalLayout()) {
         LogDebug("Performing the horizontal layout");
         unCastOffPage->LayOutHorizontally();
         unCastOffPage->HorizontalLayoutCachePage();

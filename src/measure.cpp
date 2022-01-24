@@ -1202,7 +1202,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
-    const bool hasCache = (m_cachedWidth == VRV_UNSET);
+    const bool hasCache = this->HasCachedHorizontalLayout();
     int overflow = hasCache ? this->m_cachedOverflow : this->GetDrawingOverflow();
     int width = hasCache ? this->m_cachedWidth : this->GetWidth();
     int drawingXRel = this->m_drawingXRel;

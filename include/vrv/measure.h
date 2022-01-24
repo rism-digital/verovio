@@ -85,6 +85,11 @@ public:
     void AddTimestamp(TimestampAttr *timestampAttr);
 
     /**
+     * Return true if the Measure has cached values for the horizontal layout
+     */
+    bool HasCachedHorizontalLayout() const { return (m_cachedWidth != VRV_UNSET); }
+
+    /**
      * Get the X drawing position
      */
     int GetDrawingX() const override;
@@ -501,14 +506,6 @@ public:
 
     TimestampAligner m_timestampAligner;
 
-    /**
-     * @name Cached values of overflow and width for caching the horizontal layout
-     */
-    ///@{
-    int m_cachedOverflow;
-    int m_cachedWidth;
-    ///@}
-
 protected:
     /**
      * The X relative position of the measure.
@@ -520,6 +517,14 @@ protected:
      * The cached value for m_darwingXRel for caching horizontal layout
      */
     int m_cachedXRel;
+
+    /**
+     * @name Cached values of overflow and width for caching the horizontal layout
+     */
+    ///@{
+    int m_cachedOverflow;
+    int m_cachedWidth;
+    ///@}
 
 private:
     bool m_measuredMusic;
