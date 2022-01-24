@@ -296,7 +296,7 @@ public:
      * Undo the cast off of the entire document.
      * The document will then contain one single page with one single system.
      */
-    void UnCastOffDoc();
+    void UnCastOffDoc(bool resetCache = true);
 
     /**
      * Cast off of the entire document according to the encoded data (pb and sb).

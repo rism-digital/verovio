@@ -1174,8 +1174,22 @@ void Toolkit::ResetLogBuffer()
     logBuffer.clear();
 }
 
-void Toolkit::RedoLayout()
+void Toolkit::RedoLayout(const std::string &jsonOptions)
 {
+    bool resetCache = true;
+
+    jsonxx::Object json;
+
+    // Read JSON options if not empty
+    if (!jsonOptions.empty()) {
+        if (!json.parse(jsonOptions)) {
+            LogWarning("Cannot parse JSON std::string. Using default options.");
+        }
+        else {
+            if (json.has<jsonxx::Boolean>("resetCache")) resetCache = json.get<jsonxx::Boolean>("resetCache");
+        }
+    }
+
     this->ResetLogBuffer();
 
     if ((GetPageCount() == 0) || (m_doc.GetType() == Transcription) || (m_doc.GetType() == Facs)) {
@@ -1183,7 +1197,7 @@ void Toolkit::RedoLayout()
         return;
     }
 
-    m_doc.UnCastOffDoc();
+    m_doc.UnCastOffDoc(resetCache);
     if (m_options->m_breaks.GetValue() == BREAKS_line) {
         m_doc.CastOffLineDoc();
     }

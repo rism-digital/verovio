@@ -1013,13 +1013,14 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     }
 }
 
-void Doc::UnCastOffDoc()
+void Doc::UnCastOffDoc(bool resetCache)
 {
     Pages *pages = this->GetPages();
     assert(pages);
 
     Page *unCastOffPage = new Page();
     UnCastOffParams unCastOffParams(unCastOffPage);
+    unCastOffParams.m_resetCache = resetCache;
 
     Functor unCastOff(&Object::UnCastOff);
     this->Process(&unCastOff, &unCastOffParams);
