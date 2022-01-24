@@ -468,6 +468,11 @@ public:
     int PrepareTimestampsEnd(FunctorParams *functorParams) override;
 
     /**
+     * See Object::UnCastOff
+     */
+    int UnCastOff(FunctorParams *functorParams) override;
+
+    /**
      * See Object::HorizontalLayoutCache
      */
     int HorizontalLayoutCache(FunctorParams *functorParams) override;
