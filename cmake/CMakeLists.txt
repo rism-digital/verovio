@@ -215,9 +215,9 @@ elseif (BUILD_AS_PYTHON)
     ### For building for specific version of Python (example for 3.4 on OS X with MacPorts installation)
     #set(Python_INCLUDE_DIRS /opt/local/Library/Frameworks/Python.framework/Versions/3.4/include/python3.4m)
     #set(Python_LIBRARIES /opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/libpython3.4.dylib)
-    #include_directories(${PYTHON_INCLUDE_DIR})
+    #include_directories(${Python_INCLUDE_DIRS})
     #swig_add_library(verovio_module_custom LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
-    #swig_link_libraries(verovio_module_custom verovio ${PYTHON_LIBRARY})
+    #swig_link_libraries(verovio_module_custom verovio ${Python_LIBRARIES})
 
     ### For building on Apple Silicon with Homebrew version of Python 
     # set(Python_INCLUDE_DIRS /opt/homebrew/Frameworks/Python.framework/Versions/Current/include/python3.9)
