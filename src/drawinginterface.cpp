@@ -92,6 +92,8 @@ void BeamDrawingInterface::Reset()
     m_beamWidth = 0;
     m_beamWidthBlack = 0;
     m_beamWidthWhite = 0;
+
+    m_stemSameAsNotes = false;
 }
 
 int BeamDrawingInterface::GetTotalBeamWidth() const
