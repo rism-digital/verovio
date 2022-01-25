@@ -174,6 +174,14 @@ public:
      */
     bool IsTabBeam();
 
+    /**
+     * @name Setter and getter for the stemSameasNote flag
+     */
+    ///@{
+    void SetStemSameasNotes(bool stemSameasNotes) { m_stemSameAsNotes = stemSameasNotes; }
+    bool GetStemSameasNotes() const { return m_stemSameAsNotes; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -212,7 +220,9 @@ protected:
     int CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, int y2);
 
 private:
-    //
+    /** A flag indicating that we have notes with stem shared and that it should not be drawn */
+    bool m_stemSameAsNotes;
+
 public:
     /** */
     BeamSegment m_beamSegment;

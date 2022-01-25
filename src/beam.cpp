@@ -1214,6 +1214,8 @@ void Beam::Reset()
     ResetBeamRend();
     ResetColor();
     ResetCue();
+
+    m_stemSameAsNotes = false;
 }
 
 bool Beam::IsSupportedChild(Object *child)

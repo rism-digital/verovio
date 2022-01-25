@@ -132,14 +132,6 @@ public:
      */
     void ClearCoords();
 
-    /**
-     * @name Setter and getter for the stemSameasNote flag
-     */
-    ///@{
-    void SetStemSameasNotes(bool stemSameasNotes) { m_stemSameAsNotes = stemSameasNotes; }
-    bool GetStemSameasNotes() const { return m_stemSameAsNotes; }
-    ///@}
-
 protected:
     /**
      * Return the position of the element in the beam.
@@ -176,8 +168,7 @@ public:
     ArrayOfBeamElementCoords m_beamElementCoords;
 
 private:
-    /** A flag indicating that we have notes with stem shared and that it should not be drawn */
-    bool m_stemSameAsNotes;
+    //
 };
 
 //----------------------------------------------------------------------------
