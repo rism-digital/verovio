@@ -94,5 +94,3 @@ Release/
 *.vcxproj*
 *.sln
 
-# Fonts
-fonts/tmp/

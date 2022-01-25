@@ -1,37 +1,22 @@
-#!/bin/zsh
+# Requires python
+# Requires svgpathtools and lxml python libraries (install with 'pip3 install %name%')
 
-# Requires phantomjs and python
-
-if [ ! -e tmp ]; then
-    mkdir tmp
-fi
-
-if ! command -v phantomjs >/dev/null 2>&1 ; then
-	echo >&2 "Phantomjs is required.  Aborting.";
-	exit 1;
-fi
-
-echo "Generating C++ header and implementation file ..."
+echo "Generating C++ header file ..."
 python3 generate-smufl-code.py
 
 echo "Generating Bravura files ..."
-python3 extract-glyphs.py Bravura.svg > tmp/Bravura-bounding-boxes.svg
-phantomjs generate-bbox.js tmp/Bravura-bounding-boxes.svg ../data/Bravura.xml json/bravura_metadata.json
+python3 extract-bounding-boxes.py Bravura.svg json/bravura_metadata.json ../data/Bravura.xml
 
 echo "Generating Leipzig files ..."
-python3 extract-glyphs.py Leipzig.svg > tmp/Leipzig-bounding-boxes.svg
-phantomjs generate-bbox.js tmp/Leipzig-bounding-boxes.svg ../data/Leipzig.xml json/leipzig_metadata.json
+python3 extract-bounding-boxes.py Leipzig.svg json/leipzig_metadata.json ../data/Leipzig.xml
 
 echo "Generating Gootville files ..."
-python3 extract-glyphs.py Gootville.svg > tmp/Gootville-bounding-boxes.svg
-phantomjs generate-bbox.js tmp/Gootville-bounding-boxes.svg ../data/Gootville.xml json/gootville-1.2_metadata.json
+python3 extract-bounding-boxes.py Gootville.svg json/gootville-1.2_metadata.json ../data/Gootville.xml
 
 echo "Generating Petaluma files ..."
-python3 extract-glyphs.py Petaluma.svg > tmp/Petaluma-bounding-boxes.svg
-phantomjs generate-bbox.js tmp/Petaluma-bounding-boxes.svg ../data/Petaluma.xml json/petaluma_metadata.json
+python3 extract-bounding-boxes.py Petaluma.svg json/petaluma_metadata.json ../data/Petaluma.xml
 
 echo "Generating Leland files ..."
-python3 extract-glyphs.py Leland.svg > tmp/Leland-bounding-boxes.svg
-phantomjs generate-bbox.js tmp/Leland-bounding-boxes.svg ../data/Leland.xml json/leland_metadata.json
+python3 extract-bounding-boxes.py Leland.svg json/leland_metadata.json ../data/Leland.xml
 
 echo "Done!"
