@@ -554,6 +554,33 @@ bool Note::IsVisible() const
 void Note::ResolveStemSameas(PrepareLinkingParams *params)
 {
     assert(params);
+
+    // First pass we fill m_stemSameasUuidPairs
+    if (params->m_fillList) {
+        if (this->HasStemSameas()) {
+            std::string uuidTarget = ExtractUuidFragment(this->GetStemSameas());
+            params->m_stemSameasUuidPairs[uuidTarget] = this;
+        }
+    }
+    // Second pass we resolve links
+    else {
+        const std::string uuid = this->GetUuid();
+        if (params->m_stemSameasUuidPairs.count(uuid)) {
+            Note *noteWithStemSameas = params->m_stemSameasUuidPairs.at(uuid);
+            // By default (stem up) the pointing note is the one with @stem.sameas (lower)
+            Note *targetNote = noteWithStemSameas;
+            if (this->HasStemDir() && this->GetStemDir() == STEMDIRECTION_down) {
+                this->SetStemSameasNote(noteWithStemSameas);
+                targetNote = this;
+            }
+            else {
+                noteWithStemSameas->SetStemSameasNote(this);
+            }
+            Beam *beam = targetNote->IsInBeam();
+            if (beam) beam->SetStemSameasNotes(true);
+            params->m_stemSameasUuidPairs.erase(uuid);
+        }
+    }
 }
 
 bool Note::IsEnharmonicWith(Note *note)

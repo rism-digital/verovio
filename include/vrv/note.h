@@ -234,11 +234,12 @@ public:
     int GetMIDIPitch(int shift = 0);
 
     /**
-     * @name Checker and getter for a note with which the stem is shared
+     * @name Checker, getter and setter for a note with which the stem is shared
      */
     ///@{
     bool HasStemSameasNote() const { return (m_stemSameas); }
     Note *GetStemSameasNote() const { return m_stemSameas; }
+    void SetStemSameasNote(Note *stemSameas) { m_stemSameas = stemSameas; }
     ///@}
 
     /**
