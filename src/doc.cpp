@@ -584,7 +584,7 @@ void Doc::PrepareDrawing()
     this->Process(&prepareLinking, &prepareLinkingParams);
 
     // If we have some left process again backward
-    if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
+    if (!prepareLinkingParams.m_sameasUuidPairs.empty() || !prepareLinkingParams.m_stemSameasUuidPairs.empty()) {
         prepareLinkingParams.m_fillList = false;
         this->Process(&prepareLinking, &prepareLinkingParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
     }
@@ -596,6 +596,10 @@ void Doc::PrepareDrawing()
     if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
         LogWarning(
             "%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasUuidPairs.size());
+    }
+    if (!prepareLinkingParams.m_stemSameasUuidPairs.empty()) {
+        LogWarning("%d element(s) with a @stem.sameas could match the target",
+            prepareLinkingParams.m_stemSameasUuidPairs.size());
     }
 
     /************ Resolve @plist ************/
