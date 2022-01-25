@@ -1694,6 +1694,7 @@ int Beam::ResetDrawing(FunctorParams *functorParams)
     LayerElement::ResetDrawing(functorParams);
 
     m_beamSegment.Reset();
+    m_stemSameAsNotes = false;
 
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();

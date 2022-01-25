@@ -1370,6 +1370,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
+    m_stemSameas = NULL;
 
     return FUNCTOR_CONTINUE;
 }
