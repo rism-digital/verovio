@@ -123,6 +123,8 @@ void Note::Reset()
     m_realTimeOnsetMilliseconds = 0;
     m_realTimeOffsetMilliseconds = 0;
     m_scoreTimeTiedDuration = 0.0;
+
+    m_stemSameas = NULL;
 }
 
 bool Note::IsSupportedChild(Object *child)
