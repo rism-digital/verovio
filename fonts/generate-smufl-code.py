@@ -2,7 +2,6 @@
 
 import os
 import xml.etree.ElementTree as ET
-from typing import Dict
 
 # Define file output paths
 SMUFL_HEADER = "../include/vrv/smufl.h"
@@ -15,7 +14,7 @@ SMUFL_SOURCE = "../src/smufl.cpp"
 # Open file in same directory as script and retrieve its content
 
 
-def get_file_content(filepath):
+def get_file_content(filepath) -> str:
     location = os.path.realpath(os.path.dirname(__file__))
     file = open(os.path.join(location, filepath), "r")
     content = file.read()
@@ -38,7 +37,7 @@ def write_file_content(filepath, content):
 # Retrieve dictionary mapping glyph code to smufl name
 
 
-def get_supported_glyph_codes() -> Dict:
+def get_supported_glyph_codes() -> dict:
     """Retrieve dictionary with supported SMuFL codepoints and name."""
     supported_xsl = ET.parse("supported.xsl")
     glyphs = supported_xsl.findall(".//glyph")

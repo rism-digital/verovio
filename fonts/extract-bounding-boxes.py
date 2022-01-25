@@ -3,7 +3,6 @@
 import json
 import os
 import sys
-from typing import Dict
 # We can 1-to-1 replace ElementTree with lxml to support such features like
 # pretty_print and retaining order of attributes during the output
 # import xml.etree.ElementTree as ET
@@ -11,14 +10,14 @@ from lxml import etree as ET
 from svgpathtools import Path
 
 # Define svg namespace
-svg_ns = "http://www.w3.org/2000/svg"
+SVG_NS = "http://www.w3.org/2000/svg"
 
 ######################
 #  Helper Functions  #
 ######################
 
 
-def get_file_content(filepath):
+def get_file_content(filepath) -> str:
     """Open file in same directory as script and retrieve its content."""
     location = os.path.realpath(os.path.dirname(__file__))
     file = open(os.path.join(location, filepath), "r")
@@ -37,7 +36,7 @@ def write_file_content(filepath, content):
 
 def get_svg_elements(root, tag):
     """Retrieve all elements with given tag name from svg."""
-    return root.findall(".//svg:" + tag, {"svg": svg_ns})  # XPath, recursive
+    return root.findall(".//svg:" + tag, {"svg": SVG_NS})  # XPath, recursive
 
 ########################
 #  Parse Fontname.svg  #
@@ -56,7 +55,7 @@ def read_svg_font_file(font_file_name: str):
     if len(font_faces) != 1:
         print(
             f"Error: the file {font_file_name} should have a unique font-face element!")
-        print(f"Please check that the svg has correct namespace: {svg_ns}")
+        print(f"Please check that the svg has correct namespace: {SVG_NS}")
         sys.exit(1)
     font_family = font_faces[0].get("font-family")
     units_per_em = font_faces[0].get("units-per-em")
@@ -68,7 +67,7 @@ def read_svg_font_file(font_file_name: str):
 #   Write xml glyphs   #
 ########################
 
-def write_xml_glyphs(glyphnames: Dict):
+def write_xml_glyphs(glyphnames: dict):
     """Etracts glyphs from SVG font as specified in glyphnames."""
     rel_path = f"../data/{font_family}"
     for glyph in glyphs:
@@ -94,7 +93,7 @@ def write_xml_glyphs(glyphnames: Dict):
 #########################
 
 
-def get_json_content(filepath: str) -> Dict:
+def get_json_content(filepath: str) -> dict:
     """Retrieve dictionary with supported SMuFL codepoints and name."""
     json_content = get_file_content(filepath)
     json_items = json.loads(json_content)
@@ -105,7 +104,7 @@ def get_json_content(filepath: str) -> Dict:
 #########################
 
 
-def get_supported_glyph_codes() -> Dict:
+def get_supported_glyph_codes() -> dict:
     """Retrieve dictionary with supported SMuFL codepoints and name."""
     supported_xsl = ET.parse("supported.xsl")
     glyphs = supported_xsl.findall(".//glyph")
@@ -120,7 +119,7 @@ def get_supported_glyph_codes() -> Dict:
 #########################
 
 
-def get_text_names_to_codes(filepath: str) -> Dict:
+def get_text_names_to_codes(filepath: str) -> dict:
     """Retrieve dictionary mapping glyph code to SMuFL name."""
     result = {}
     with open(filepath, "r") as fin:
