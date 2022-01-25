@@ -608,7 +608,10 @@ int ScoreDef::JustifyX(FunctorParams *functorParams)
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
     assert(params);
 
-    params->m_measureXRel += m_drawingLabelsWidth;
+    if (m_drawingLabelsWidth > 0) {
+        params->m_measureXRel += m_drawingLabelsWidth;
+        params->m_applySectionRestartShift = false;
+    }
 
     return FUNCTOR_SIBLINGS;
 }

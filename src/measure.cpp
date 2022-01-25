@@ -1157,8 +1157,13 @@ int Measure::JustifyX(FunctorParams *functorParams)
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
     assert(params);
 
+    if (params->m_applySectionRestartShift) {
+        params->m_measureXRel += this->GetSectionRestartShift(params->m_doc);
+        params->m_applySectionRestartShift = false;
+    }
+
     if (params->m_measureXRel > 0) {
-        SetDrawingXRel(params->m_measureXRel);
+        this->SetDrawingXRel(params->m_measureXRel);
     }
     else {
         params->m_measureXRel = GetDrawingXRel();
