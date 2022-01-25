@@ -42,6 +42,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(beam);
 
     const bool isTabBeam = beam->IsTabBeam();
+    const bool hasStemSameas = beam->GetStemSameasNotes();
 
     /******************************************************************/
     // initialization
@@ -61,7 +62,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (isTabBeam) {
         beam->m_beamSegment.CalcTabBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace());
     }
-    else {
+    else if (!hasStemSameas) {
         beam->m_beamSegment.CalcBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace());
     }
 
@@ -78,7 +79,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // Draw the beamSegment
 
-    DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
+    if (!hasStemSameas) DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
