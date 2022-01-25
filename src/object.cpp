@@ -1464,6 +1464,19 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
         if (interface->GetEnd() && !interface->GetEnd()->Is(TIMESTAMP_ATTR))
             params->m_elements->push_back(interface->GetEnd());
     }
+    if (this->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(this);
+        assert(note);
+        if (note->HasStemSameasNote()) {
+            // We need to check where the @stem.sameas attribute actually is because of the handling
+            // of share stem pointers depending on the stem direction.
+            // If it is on this note, then the reference we want to keep is the other note.
+            // Otherwise it means that the @stem.sameas is on the other note that we already have
+            // the one that is actually referenced
+            if (note->HasStemSameas()) note = note->GetStemSameasNote();
+            params->m_elements->push_back(note);
+        }
+    }
     // These will also be referred to as milestones in page-based MEI
     if (params->m_milestoneReferences && this->IsMilestoneElement()) {
         params->m_elements->push_back(this);
