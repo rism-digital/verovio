@@ -6,7 +6,7 @@ from typing import Dict
 
 # Define file output paths
 SMUFL_HEADER = "../include/vrv/smufl.h"
-SMUFL_SOURCE = '../src/smufl.cpp'
+SMUFL_SOURCE = "../src/smufl.cpp"
 
 ######################
 #  Helper Functions  #
