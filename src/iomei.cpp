@@ -7399,15 +7399,15 @@ void MEIInput::UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *
     if (element.attribute("dur.ges")) {
         std::string durGes = element.attribute("dur.ges").as_string();
         if (durGes.back() == 'p') {
-            interface->SetDurPpq(std::atoi(durGes.c_str()));
+            interface->SetDurPpq(std::stoi(durGes));
         }
         else if (durGes.back() == 'r') {
             durGes.pop_back();
-            interface->SetDurRecip(durGes.c_str());
+            interface->SetDurRecip(durGes);
         }
         else if (durGes.back() == 's') {
             durGes.pop_back();
-            interface->SetDurReal(std::atof(durGes.c_str()));
+            interface->SetDurReal(std::stof(durGes));
         }
         element.remove_attribute("dur.ges");
     }
