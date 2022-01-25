@@ -71,6 +71,11 @@ public:
      */
     int ResetDrawing(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::AlignMeasures
+     */
+    int AlignMeasures(FunctorParams *functorParams) override;
+
 private:
     //
 public:

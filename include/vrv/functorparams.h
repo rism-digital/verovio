@@ -804,6 +804,8 @@ public:
 /**
  * member 0: the cumulated shift
  * member 1: the cumulated justifiable width
+ * member 2: shift next measure due to section restart
+ * member 3: the doc
  **/
 
 class AlignMeasuresParams : public FunctorParams {
@@ -812,11 +814,13 @@ public:
     {
         m_shift = 0;
         m_justifiableWidth = 0;
+        m_applySectionRestartShift = false;
         m_doc = doc;
     }
 
     int m_shift;
     int m_justifiableWidth;
+    bool m_applySectionRestartShift;
     Doc *m_doc;
 };
 
