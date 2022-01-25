@@ -1052,10 +1052,11 @@ public:
  * member 1: the vertical center of the staff
  * member 2: the actual duration of the chord / note
  * member 3: the flag for grace notes (stem is not extended)
- * member 4: the current staff (to avoid additional lookup)
- * member 5: the current layer (ditto)
- * member 6: the chord or note to which the stem belongs
- * member 7: the doc
+ * member 4: the flag for stem.sameas notes
+ * member 5: the current staff (to avoid additional lookup)
+ * member 6: the current layer (ditto)
+ * member 7: the chord or note to which the stem belongs
+ * member 8: the doc
  **/
 
 class CalcStemParams : public FunctorParams {
@@ -1066,6 +1067,7 @@ public:
         m_verticalCenter = 0;
         m_dur = DUR_1;
         m_isGraceNote = false;
+        m_stemSameas = false;
         m_staff = NULL;
         m_layer = NULL;
         m_interface = NULL;
@@ -1075,6 +1077,7 @@ public:
     int m_verticalCenter;
     int m_dur;
     bool m_isGraceNote;
+    bool m_stemSameas;
     Staff *m_staff;
     Layer *m_layer;
     StemmedDrawingInterface *m_interface;

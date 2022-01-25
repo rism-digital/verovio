@@ -1667,7 +1667,7 @@ int Beam::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
+    if (this->IsTabBeam() || this->GetStemSameasNotes()) return FUNCTOR_CONTINUE;
 
     const ArrayOfObjects *beamChildren = this->GetList(this);
 
