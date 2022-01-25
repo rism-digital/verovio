@@ -243,7 +243,10 @@ public:
     ///@}
 
     /**
-     *
+     * Resovle @stem.sameas links by instanciating Note::m_stemSameas (*Note).
+     * Called twice from Object::PrepareLinks. Once to fill uuid / note pairs,
+     * and once to resolve the link. The direction of the link depends on the
+     * stem direction and not on the presence of the @stem.sameas
      */
     void ResolveStemSameas(PrepareLinkingParams *params);
 

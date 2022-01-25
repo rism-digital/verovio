@@ -1062,7 +1062,7 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     // Use the params->m_chordStemLength for the length of the stem beetween the notes
     if (this->HasStemSameasNote()) {
-        params->m_chordStemLength = this->GetDrawingY() - this->GetStemSameasNote()->GetDrawingY();
+        params->m_chordStemLength = -std::abs(this->GetDrawingY() - this->GetStemSameasNote()->GetDrawingY());
     }
 
     return FUNCTOR_CONTINUE;
