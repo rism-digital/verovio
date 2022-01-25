@@ -462,7 +462,8 @@ public:
  * member 5: a pointer to the functor for passing it to the system aligner
  * member 6: a pointer to the end functor for passing it to the system aligner
  * member 7: flag whether element is in unison
- * member 8: the total shift of the current note or chord
+ * member 8: flag whether element (note) has as stem same as note
+ * member 9: the total shift of the current note or chord
  **/
 
 class AdjustLayersParams : public FunctorParams {
@@ -476,6 +477,7 @@ public:
         m_staffNs = staffNs;
         m_unison = false;
         m_ignoreDots = true;
+        m_stemSameas = false;
         m_accumulatedShift = 0;
     }
     std::vector<int> m_staffNs;
@@ -487,6 +489,7 @@ public:
     Functor *m_functorEnd;
     bool m_unison;
     bool m_ignoreDots;
+    bool m_stemSameas;
     int m_accumulatedShift;
 };
 

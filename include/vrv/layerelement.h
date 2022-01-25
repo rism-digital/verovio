@@ -241,8 +241,8 @@ public:
      * Helper to adjust overlapping layers for notes, chords, stems, etc.
      * Returns the shift of the adjustment
      */
-    virtual int AdjustOverlappingLayers(
-        Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison);
+    virtual int AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements,
+        bool areDotsAdjusted, bool &isUnison, bool &stemSameAs);
 
     /**
      * Calculate note horizontal overlap with elemenents from another layers. Returns overlapMargin and index of other

@@ -478,7 +478,7 @@ bool Chord::HasNoteWithDots()
 }
 
 int Chord::AdjustOverlappingLayers(
-    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison)
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison, bool &stemSameas)
 {
     int margin = 0;
     // get positions of other elements
