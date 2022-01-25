@@ -551,6 +551,11 @@ bool Note::IsVisible() const
     return true;
 }
 
+void Note::ResolveStemSameas(PrepareLinkingParams *params)
+{
+    assert(params);
+}
+
 bool Note::IsEnharmonicWith(Note *note)
 {
     return (this->GetMIDIPitch() == note->GetMIDIPitch());

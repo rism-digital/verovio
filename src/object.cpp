@@ -1526,6 +1526,14 @@ int Object::PrepareLinking(FunctorParams *functorParams)
         interface->InterfacePrepareLinking(functorParams, this);
     }
 
+    if (params->m_fillList && this->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(this);
+        assert(note);
+        PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
+        assert(params);
+        note->ResolveStemSameas(params);
+    }
+
     // @next
     std::string uuid = this->GetUuid();
     auto r1 = params->m_nextUuidPairs.equal_range(uuid);

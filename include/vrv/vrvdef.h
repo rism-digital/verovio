@@ -325,6 +325,8 @@ typedef std::vector<std::pair<int, int>> ArrayOfIntPairs;
 
 typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceUuidPairs;
 
+typedef std::map<std::string, Note *> MapOfNoteUuidPairs;
+
 typedef std::vector<std::pair<PlistInterface *, std::string>> ArrayOfPlistInterfaceUuidPairs;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;

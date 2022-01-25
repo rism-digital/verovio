@@ -1972,8 +1972,11 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: ArrayOfInterfaceUuidPairs holds the interface / uuid pairs to match
- * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
+ * member 0: MapOfLinkingInterfaceUuidPairs holds the interface / uuid pairs to match for links
+ * member 1: MapOfLinkingInterfaceUuidPairs holds the interface / uuid pairs to match for sameas
+ * member 2: MapOfNoteUuidPairs holds the note / uuid pairs to match for stem.sameas
+ * member 3: bool* fillList for indicating whether the pairs have to be stacked or not
+ *
  **/
 
 class PrepareLinkingParams : public FunctorParams {
@@ -1981,6 +1984,7 @@ public:
     PrepareLinkingParams() { m_fillList = true; }
     MapOfLinkingInterfaceUuidPairs m_nextUuidPairs;
     MapOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
+    MapOfNoteUuidPairs m_stemSameasUuidPairs;
     bool m_fillList;
 };
 

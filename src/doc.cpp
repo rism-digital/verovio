@@ -578,7 +578,7 @@ void Doc::PrepareDrawing()
 
     /************ Resolve linking (@next) ************/
 
-    // Try to match all pointing elements using @next and @sameas
+    // Try to match all pointing elements using @next, @sameas and @stem.sameas
     PrepareLinkingParams prepareLinkingParams;
     Functor prepareLinking(&Object::PrepareLinking);
     this->Process(&prepareLinking, &prepareLinkingParams);

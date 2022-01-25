@@ -30,6 +30,7 @@ namespace vrv {
 class Accid;
 class Chord;
 class Note;
+class PrepareLinkingParams;
 class Slur;
 class TabGrp;
 class Tie;
@@ -239,6 +240,11 @@ public:
     bool HasStemSameasNote() const { return (m_stemSameas); }
     Note *GetStemSameasNote() const { return m_stemSameas; }
     ///@}
+
+    /**
+     *
+     */
+    void ResolveStemSameas(PrepareLinkingParams *params);
 
 public:
     //----------------//
