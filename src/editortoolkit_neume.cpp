@@ -1581,6 +1581,19 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         obj = parent;
         parent = parent->GetParent();
         if (obj->FindDescendantByType(NC) == NULL) {
+            // Check if it is part of a linked/split syllable and unlink
+            Syllable *li = dynamic_cast<Syllable *>(obj);
+            assert(li);
+            if (li->HasPrecedes() || li->HasFollows()) {
+                std::string linkedID = (li->HasPrecedes() ? li->GetPrecedes() : li->GetFollows());
+                if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
+                Syllable *linkedSyllable
+                    = dynamic_cast<Syllable *>(m_doc->GetDrawingPage()->FindDescendantByUuid(linkedID));
+                if (linkedSyllable != NULL) {
+                    if (linkedSyllable->HasPrecedes()) linkedSyllable->SetPrecedes("");
+                    if (linkedSyllable->HasFollows()) linkedSyllable->SetFollows("");
+                }
+            }
             // Delete the syllable empty of neumes
             std::string syllableId = obj->GetUuid();
             result &= parent->DeleteChild(obj);
