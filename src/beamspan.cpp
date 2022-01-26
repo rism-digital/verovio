@@ -93,33 +93,40 @@ ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
     ArrayOfObjects beamSpanElements(objects.begin(), objects.end());
     // If last element is not equal to the end, there is high chance that this beamSpan is cross-measure.
     // Look for the same N-staff N-layer in next measure and try finding end there
-    if (beamSpanElements.back() != this->GetEnd()) {
-        Measure *measure = vrv_cast<Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
-        Object *parent = measure->GetParent();
+    Measure *startMeasure = vrv_cast<Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
+    Measure *endMeasure = vrv_cast<Measure *>(this->GetEnd()->GetFirstAncestor(MEASURE));
+    Measure *nextMeasure = NULL;
+    while ((beamSpanElements.back() != this->GetEnd()) && (startMeasure != endMeasure)) {
+        Object *parent = startMeasure->GetParent();
 
-        const int index = parent->GetChildIndex(measure);
-        Measure *nextMeasure = vrv_cast<Measure *>(parent->GetNext(measure, MEASURE));
-        if (nextMeasure) {
-            AttNIntegerComparison snc(STAFF, staff->GetN());
-            Staff *nextStaff = vrv_cast<Staff *>(nextMeasure->FindDescendantByComparison(&snc));
-            if (nextStaff) {
-                AttNIntegerComparison lnc(LAYER, layer->GetN());
-                Layer *nextStaffLayer = vrv_cast<Layer *>(nextStaff->FindDescendantByComparison(&lnc));
-                if (nextStaffLayer) {
-                    // find all elements between startId and endId of the beamSpan
-                    ClassIdsComparison classIds({ NOTE, CHORD });
-                    ListOfObjects nextLayerObjects;
-                    // pass NULL as starting element to add all elements until end is reached
-                    nextStaffLayer->FindAllDescendantsBetween(
-                        &nextLayerObjects, &classIds, NULL, this->GetEnd(), true, false);
-                    // Handle only next measure for the time being
-                    if (nextLayerObjects.back() == this->GetEnd()) {
-                        beamSpanElements.insert(
-                            beamSpanElements.end(), nextLayerObjects.begin(), nextLayerObjects.end());
-                    }
-                }
+        nextMeasure = vrv_cast<Measure *>(parent->GetNext(startMeasure, MEASURE));
+        if (!nextMeasure) break;
+
+        AttNIntegerComparison snc(STAFF, staff->GetN());
+        Staff *nextStaff = vrv_cast<Staff *>(nextMeasure->FindDescendantByComparison(&snc));
+        if (!nextStaff) break;
+
+        AttNIntegerComparison lnc(LAYER, layer->GetN());
+        Layer *nextStaffLayer = vrv_cast<Layer *>(nextStaff->FindDescendantByComparison(&lnc));
+        if (!nextStaffLayer) break;
+
+        // find all elements between startId and endId of the beamSpan
+        ClassIdsComparison classIds({ NOTE, CHORD });
+        ListOfObjects nextLayerObjects;
+        // pass NULL as starting element to add all elements until end is reached
+        if (endMeasure == nextMeasure) {
+            nextStaffLayer->FindAllDescendantsBetween(&nextLayerObjects, &classIds, NULL, this->GetEnd(), true, false);
+            // Handle only next measure for the time being
+            if (nextLayerObjects.back() == this->GetEnd()) {
+                beamSpanElements.insert(beamSpanElements.end(), nextLayerObjects.begin(), nextLayerObjects.end());
             }
         }
+        else {
+            nextStaffLayer->FindAllDescendantsByComparison(&nextLayerObjects, &classIds);
+            beamSpanElements.insert(beamSpanElements.end(), nextLayerObjects.begin(), nextLayerObjects.end());
+        }        
+
+        startMeasure = nextMeasure;
     }
 
     return beamSpanElements;

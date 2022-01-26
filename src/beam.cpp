@@ -123,7 +123,10 @@ void BeamSegment::AppendSpanningCoordinates(Measure *measure)
     const int rightSide = bar->GetDrawingX();
     BeamElementCoord *front = m_beamElementCoordRefs.front();
     BeamElementCoord *back = m_beamElementCoordRefs.back();
-    const double slope = (double)(back->m_yBeam - front->m_yBeam) / (double)(back->m_x - front->m_x);
+    double slope = 0.0;
+    if (m_beamElementCoordRefs.size() > 1) {
+        slope = (double)(back->m_yBeam - front->m_yBeam) / (double)(back->m_x - front->m_x);
+    }
 
     // in case if beamSpan starts in current system - stretch beam to the right barline
     if ((SPANNING_START == spanningType) || (SPANNING_MIDDLE == spanningType)) {
@@ -137,7 +140,15 @@ void BeamSegment::AppendSpanningCoordinates(Measure *measure)
     if ((SPANNING_END == spanningType) || (SPANNING_MIDDLE == spanningType)) {
         BeamElementCoord *left = new BeamElementCoord(*front);
         const int width = measure->GetInnerWidth();
-        const int offset = (back->m_x - front->m_x) / (m_beamElementCoordRefs.size() - 1) / 2;
+        int offset = 0;
+        if (m_beamElementCoordRefs.size() > 1) {
+            const int divideBy = 2 * (m_beamElementCoordRefs.size() - 1);
+            offset = (back->m_x - front->m_x) / divideBy;
+        }
+        else {
+            // 1.5 * unit offset in this case (harcoded for the time being)
+            offset = 270;
+        }
         left->m_x -= offset;
         left->m_yBeam -= offset * slope;
         m_beamElementCoordRefs.insert(m_beamElementCoordRefs.begin(), left);
