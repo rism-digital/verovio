@@ -487,7 +487,7 @@ protected:
     int m_drawingYRel;
 
     /**
-     * The cached value for m_darwingYRel for caching horizontal layout
+     * The cached value for m_drawingYRel for caching horizontal layout
      */
     int m_cachedYRel;
 
@@ -498,7 +498,7 @@ protected:
     int m_drawingXRel;
 
     /**
-     * The cached value for m_darwingXRel for caching horizontal layout
+     * The cached value for m_drawingXRel for caching horizontal layout
      */
     int m_cachedXRel;
 

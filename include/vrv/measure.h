@@ -514,7 +514,7 @@ protected:
     int m_drawingXRel;
 
     /**
-     * The cached value for m_darwingXRel for caching horizontal layout
+     * The cached value for m_drawingXRel for caching horizontal layout
      */
     int m_cachedXRel;
 

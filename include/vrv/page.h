@@ -101,8 +101,8 @@ public:
 
     /**
      * Layout out the measures horizontally using the cached values.
-     * This should be done in preparation of cast-off which it based on measure positioning.
-     * The content of the measures it not layout out and keeps previous relative positioning.
+     * This should be done in preparation of cast-off which is based on measure positioning.
+     * The content of the measures is not laid out and keeps previously cached positioning.
      */
     void HorizontalLayoutCachePage(bool restore = false);
 
