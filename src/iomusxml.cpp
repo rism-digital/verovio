@@ -18,6 +18,7 @@
 
 #include "arpeg.h"
 #include "beam.h"
+#include "beamspan.h"
 #include "beatrpt.h"
 #include "bracketspan.h"
 #include "breath.h"
@@ -480,6 +481,13 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId, Layer *layer)
     }
 }
 
+bool MusicXmlInput::IsInStack(ClassId classId, Layer *layer)
+{
+    return (m_elementStackMap.at(layer).end()
+        != std::find_if(m_elementStackMap.at(layer).begin(), m_elementStackMap.at(layer).end(),
+            [classId](LayerElement *element) { return element->Is(classId); }));
+}
+
 void MusicXmlInput::FillSpace(Layer *layer, int dur)
 {
     assert(layer);
@@ -559,6 +567,17 @@ void MusicXmlInput::CloseSlur(Measure *measure, short int number, LayerElement *
     // add to m_slurStopStack, if not able to be closed
     musicxml::CloseSlur closeSlur(measure->GetN(), number);
     m_slurStopStack.push_back({ element, closeSlur });
+}
+
+void MusicXmlInput::CloseBeamSpan(Staff* staff, Layer* layer, LayerElement* element) 
+{
+    for (auto riter = m_beamspanStack.rbegin(); riter != m_beamspanStack.rend(); ++riter) {
+        if ((riter->second.first == staff->GetN()) || (riter->second.second == layer->GetN())) {
+            riter->first->SetEndid("#" + element->GetUuid());
+            m_beamspanStack.erase(std::next(riter).base());
+            return;
+        }
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1085,6 +1104,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     m_doc->ConvertToPageBasedDoc();
 
     // clean up stacks
+    if (!m_beamspanStack.empty()) {
+        LogWarning("MusicXML import: There are %d beamspans left without ending", m_beamspanStack.size());
+        m_beamspanStack.clear();
+    }
+
     if (!m_tieStack.empty()) {
         LogWarning("MusicXML import: There are %d ties left open", m_tieStack.size());
         m_tieStack.clear();
@@ -2553,8 +2577,6 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     short int tremSlashNum = -1;
 
-    ReadMusicXmlBeamsAndTuplets(node, layer, isChord);
-
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
     // tremolos
@@ -2877,6 +2899,14 @@ void MusicXmlInput::ReadMusicXmlNote(
             else if (tremSlashNum == 0) {
                 note->SetStemMod(STEMMODIFIER_z);
             }
+        }
+
+        // beam / beamspan
+        if (!ReadMusicXmlBeamsAndTuplets(node, layer, isChord)) {
+            BeamSpan *meiBeamSpan = new BeamSpan();
+            meiBeamSpan->SetStartid("#" + element->GetUuid());
+            m_controlElements.push_back({ measureNum, meiBeamSpan });
+            m_beamspanStack.push_back({ meiBeamSpan, { staff->GetN(), layer->GetN() } });
         }
 
         // verse / syl
@@ -3482,7 +3512,12 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         else {
-            RemoveLastFromStack(BEAM, layer);
+            if (IsInStack(BEAM, layer)) {
+                RemoveLastFromStack(BEAM, layer);
+            }
+            else {
+                CloseBeamSpan(staff, layer, element);
+            }
         }
     }
 
@@ -3552,7 +3587,7 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     }
 }
 
-void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord)
+bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord)
 {
     pugi::xpath_node beamStart = node.select_node("beam[@number='1' and text()='begin']");
     pugi::xpath_node tupletStart = node.select_node("notations/tuplet[@type='start']");
@@ -3591,12 +3626,19 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
         const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
         const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
 
-        if (beamEndIterator == currentMeasureNodes.end()) {
+        // find staff number for the corresponding elements - we do not want to match beam start on one staff with beam
+        // end on another
+        pugi::xpath_node nodeStaff = node.select_node("staff");
+        pugi::xpath_node endBeamStaff = beamEnd.select_node("staff");
+
+        if (beamEndIterator == currentMeasureNodes.end()
+            || (nodeStaff && endBeamStaff
+                && (nodeStaff.node().text().as_int() != endBeamStaff.node().text().as_int()))) {
             std::string measureName = (currentMeasure.node().attribute("id"))
                 ? currentMeasure.node().attribute("id").as_string()
                 : currentMeasure.node().attribute("number").as_string();
-            LogError("MusicXML import: Beam without end in measure %s", measureName.c_str());
-            return;
+            LogWarning("MusicXML import: Beam without end in measure %s treated as <beamSpan>", measureName.c_str());
+            return false;
         }
         // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
         std::vector<pugi::xml_node> beamNodes(beamStartIterator, beamEndIterator + 1);
@@ -3618,6 +3660,8 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
     else if (tupletStart) {
         if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
     }
+
+    return true;
 }
 
 void MusicXmlInput::ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer)
