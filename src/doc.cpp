@@ -395,7 +395,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     }
 }
 
-bool Doc::ExportTimemap(std::string &output)
+bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures)
 {
     if (!Doc::HasMidiTimemap()) {
         // generate MIDI timemap before progressing
@@ -410,8 +410,62 @@ bool Doc::ExportTimemap(std::string &output)
     GenerateTimemapParams generateTimemapParams(&generateTimemap);
     this->Process(&generateTimemap, &generateTimemapParams);
 
-    PrepareJsonTimemap(output, generateTimemapParams.realTimeToScoreTime, generateTimemapParams.realTimeToOnElements,
-        generateTimemapParams.realTimeToOffElements, generateTimemapParams.realTimeToTempo);
+    includeRests = true;
+    includeMeasures = true;
+
+    double currentTempo = -1000.0;
+    double newTempo;
+
+    jsonxx::Array timemap;
+
+    for (auto &[tstamp, entry] : generateTimemapParams.m_timemap) {
+        jsonxx::Object o;
+        o << "tstamp" << tstamp;
+        o << "qstamp" << entry.qstamp;
+
+        // on / off
+        if (!entry.notesOn.empty()) {
+            jsonxx::Array notesOn;
+            for (auto note : entry.notesOn) notesOn << note;
+            o << "on" << notesOn;
+        }
+        if (!entry.notesOff.empty()) {
+            jsonxx::Array notesOff;
+            for (auto note : entry.notesOff) notesOff << note;
+            o << "off" << notesOff;
+        }
+
+        // restsOn / restsOff
+        if (includeRests) {
+            if (!entry.restsOn.empty()) {
+                jsonxx::Array restsOn;
+                for (auto rest : entry.restsOn) restsOn << rest;
+                o << "restsOn" << restsOn;
+            }
+            if (!entry.restsOff.empty()) {
+                jsonxx::Array restsOff;
+                for (auto rest : entry.restsOff) restsOff << rest;
+                o << "restsOff" << restsOff;
+            }
+        }
+
+        // tempo
+        if (entry.tempo != -1000.0) {
+            newTempo = entry.tempo;
+            if (newTempo != currentTempo) {
+                currentTempo = newTempo;
+                o << "tempo" << std::to_string(currentTempo);
+            }
+        }
+
+        // measureOn
+        if (includeMeasures && !entry.measureOn.empty()) {
+            o << "measureOn" << entry.measureOn;
+        }
+
+        timemap << o;
+    }
+    output = timemap.json();
 
     return true;
 }
@@ -434,76 +488,6 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
     extractor.ToJson(output);
 
     return true;
-}
-
-void Doc::PrepareJsonTimemap(std::string &output, std::map<double, double> &realTimeToScoreTime,
-    std::map<double, std::vector<std::string>> &realTimeToOnElements,
-    std::map<double, std::vector<std::string>> &realTimeToOffElements, std::map<double, double> &realTimeToTempo)
-{
-
-    double currentTempo = -1000.0;
-    double newTempo;
-    int mapsize = (int)realTimeToScoreTime.size();
-    output = "";
-    output.reserve(mapsize * 100); // Estimate 100 characters for each entry.
-    output += "[\n";
-    auto lastit = realTimeToScoreTime.end();
-    lastit--;
-    for (auto it = realTimeToScoreTime.begin(); it != realTimeToScoreTime.end(); ++it) {
-        output += "\t{\n";
-        output += "\t\t\"tstamp\":\t";
-        output += std::to_string(it->first);
-        output += ",\n";
-        output += "\t\t\"qstamp\":\t";
-        output += std::to_string(it->second);
-
-        auto ittempo = realTimeToTempo.find(it->first);
-        if (ittempo != realTimeToTempo.end()) {
-            newTempo = ittempo->second;
-            if (newTempo != currentTempo) {
-                currentTempo = newTempo;
-                output += ",\n\t\t\"tempo\":\t";
-                output += std::to_string(currentTempo);
-            }
-        }
-
-        auto iton = realTimeToOnElements.find(it->first);
-        if (iton != realTimeToOnElements.end()) {
-            output += ",\n\t\t\"on\":\t[";
-            for (int ion = 0; ion < (int)iton->second.size(); ++ion) {
-                output += "\"";
-                output += iton->second[ion];
-                output += "\"";
-                if (ion < (int)iton->second.size() - 1) {
-                    output += ", ";
-                }
-            }
-            output += "]";
-        }
-
-        auto itoff = realTimeToOffElements.find(it->first);
-        if (itoff != realTimeToOffElements.end()) {
-            output += ",\n\t\t\"off\":\t[";
-            for (int ioff = 0; ioff < (int)itoff->second.size(); ++ioff) {
-                output += "\"";
-                output += itoff->second[ioff];
-                output += "\"";
-                if (ioff < (int)itoff->second.size() - 1) {
-                    output += ", ";
-                }
-            }
-            output += "]";
-        }
-
-        output += "\n\t}";
-        if (it == lastit) {
-            output += "\n";
-        }
-        else {
-            output += ",\n";
-        }
-    }
-    output += "]\n";
 }
 
 void Doc::PrepareDrawing()

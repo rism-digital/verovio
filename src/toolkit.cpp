@@ -1399,12 +1399,29 @@ bool Toolkit::RenderToPAEFile(const std::string &filename)
     return true;
 }
 
-std::string Toolkit::RenderToTimemap()
+std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
 {
+    bool includeMeasures = true;
+    bool includeRests = true;
+
+    jsonxx::Object json;
+
+    // Read JSON options if not empty
+    if (!jsonOptions.empty()) {
+        if (!json.parse(jsonOptions)) {
+            LogWarning("Cannot parse JSON std::string. Using default options.");
+        }
+        else {
+            if (json.has<jsonxx::Boolean>("includeMeasures"))
+                includeMeasures = json.get<jsonxx::Boolean>("includeMeasures");
+            if (json.has<jsonxx::Boolean>("includeRests")) includeRests = json.get<jsonxx::Boolean>("includeRests");
+        }
+    }
+
     this->ResetLogBuffer();
 
     std::string output;
-    m_doc.ExportTimemap(output);
+    m_doc.ExportTimemap(output, includeRests, includeMeasures);
     return output;
 }
 
@@ -1476,12 +1493,9 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
     return true;
 }
 
-bool Toolkit::RenderToTimemapFile(const std::string &filename)
+bool Toolkit::RenderToTimemapFile(const std::string &filename, const std::string &jsonOptions)
 {
-    this->ResetLogBuffer();
-
-    std::string outputString;
-    m_doc.ExportTimemap(outputString);
+    std::string outputString = this->RenderToTimemap(jsonOptions);
 
     std::ofstream output(filename.c_str());
     if (!output.is_open()) {

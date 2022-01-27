@@ -1553,6 +1553,22 @@ int Measure::GenerateTimemap(FunctorParams *functorParams)
     params->m_realTimeOffsetMilliseconds = m_realTimeOffsetMilliseconds.back();
     params->m_currentTempo = m_currentTempo;
 
+    double scoreTimeStart = params->m_scoreTimeOffset;
+    double realTimeStart = params->m_realTimeOffsetMilliseconds;
+
+    TimemapEntry startEntry;
+    if (params->m_timemap.count(realTimeStart) > 0) startEntry = params->m_timemap.at(realTimeStart);
+
+    // Should check if value for realTimeStart already exists and if so, then
+    // ensure that it is equal to scoreTimeStart:
+    startEntry.qstamp = scoreTimeStart;
+
+    // Add the measureOn
+    startEntry.measureOn = this->GetUuid();
+
+    // Update the timemap
+    params->m_timemap[realTimeStart] = startEntry;
+
     return FUNCTOR_CONTINUE;
 }
 

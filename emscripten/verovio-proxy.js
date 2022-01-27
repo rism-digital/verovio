@@ -97,7 +97,7 @@ verovio.vrvToolkit.renderToPAE = Module.cwrap( 'vrvToolkit_renderToPAE', 'string
 verovio.vrvToolkit.renderToSVG = Module.cwrap( 'vrvToolkit_renderToSVG', 'string', ['number', 'number', 'string'] );
 
 // char *renderToTimemap(Toolkit *ic)
-verovio.vrvToolkit.renderToTimemap = Module.cwrap( 'vrvToolkit_renderToTimemap', 'string', ['number'] );
+verovio.vrvToolkit.renderToTimemap = Module.cwrap( 'vrvToolkit_renderToTimemap', 'string', ['number', 'string'] );
 
 // void resetXmlIdSeed(Toolkit *ic, int seed) 
 verovio.vrvToolkit.resetXmlIdSeed = Module.cwrap( 'vrvToolkit_resetXmlIdSeed', null, ['number', 'number'] );
@@ -295,9 +295,9 @@ verovio.toolkit.prototype.renderToSVG = function ( pageNo, options )
     return verovio.vrvToolkit.renderToSVG( this.ptr, pageNo, JSON.stringify( options ) );
 };
 
-verovio.toolkit.prototype.renderToTimemap = function ()
+verovio.toolkit.prototype.renderToTimemap = function ( options = {})
 {
-    return JSON.parse( verovio.vrvToolkit.renderToTimemap( this.ptr ) );
+    return JSON.parse( verovio.vrvToolkit.renderToTimemap( this.ptr, JSON.stringify( options ) ) );
 };
 
 verovio.toolkit.prototype.resetXmlIdSeed = function ( seed )

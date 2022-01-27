@@ -222,10 +222,7 @@ public:
      * Extract a timemap from the document to a JSON string.
      * Run trough all the layers and fill the timemap file content.
      */
-    bool ExportTimemap(std::string &output);
-    void PrepareJsonTimemap(std::string &output, std::map<double, double> &realTimeToScoreTime,
-        std::map<double, std::vector<std::string>> &realTimeToOnElements,
-        std::map<double, std::vector<std::string>> &realTimeToOffElements, std::map<double, double> &realTimeToTempo);
+    bool ExportTimemap(std::string &output, bool includeRests, bool includeMeasures);
 
     /**
      * Extract music features to JSON string.

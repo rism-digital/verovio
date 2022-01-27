@@ -1626,13 +1626,24 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: mapping of real times to score times
- * member 1: mapping of real times to elements which should be highlighted at time
- * member 2: mapping of real times to elements which should be unhighlighted at time
- * member 3: mapping of real times to tempos
- * member 4: Score time from the start of the piece to previous barline in quarter notes
- * member 5: Real time from the start of the piece to previous barline in ms
- * member 6: Currently active tempo
+ * Helper struct to store timemap entries
+ */
+struct TimemapEntry {
+    double tempo = -1000.0;
+    double qstamp;
+    std::vector<std::string> notesOn;
+    std::vector<std::string> notesOff;
+    std::vector<std::string> restsOn;
+    std::vector<std::string> restsOff;
+    std::string measureOn;
+};
+
+/**
+ * member 0: mapping of real times with TimemapEntry
+ * member 1: Score time from the start of the piece to previous barline in quarter notes
+ * member 2: Real time from the start of the piece to previous barline in ms
+ * member 3: Currently active tempo
+ * member 4: The functor for redirection
  **/
 
 class GenerateTimemapParams : public FunctorParams {
@@ -1644,10 +1655,7 @@ public:
         m_currentTempo = 120.0;
         m_functor = functor;
     }
-    std::map<double, double> realTimeToScoreTime;
-    std::map<double, std::vector<std::string>> realTimeToOnElements;
-    std::map<double, std::vector<std::string>> realTimeToOffElements;
-    std::map<double, double> realTimeToTempo;
+    std::map<double, TimemapEntry> m_timemap;
     double m_scoreTimeOffset;
     double m_realTimeOffsetMilliseconds;
     double m_currentTempo;
