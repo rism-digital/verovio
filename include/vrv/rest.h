@@ -84,6 +84,11 @@ public:
     wchar_t GetRestGlyph(int duration) const;
     ///@}
 
+    /**
+     * Get the vertical location for the rests that are located on other layers
+     */
+    int GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation);
+
     //----------//
     // Functors //
     //----------//
@@ -124,9 +129,9 @@ public:
     int Transpose(FunctorParams *functorParams) override;
 
     /**
-     * Get the vertical location for the rests that are located on other layers
+     * See Object::GenerateTimemap
      */
-    int GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation);
+    int GenerateTimemap(FunctorParams *functorParams) override;
 
 private:
     /**

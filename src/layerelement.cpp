@@ -2406,6 +2406,15 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
+        // For rests to be possibly added to the timemap
+        if (element->Is(REST)) {
+            Rest *rest = vrv_cast<Rest *>(element);
+            double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
+            rest->SetScoreTimeOnset(params->m_currentScoreTime);
+            rest->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
+            rest->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
+            rest->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
+        }
     }
     else if (element->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(element);

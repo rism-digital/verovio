@@ -732,4 +732,12 @@ int Rest::Transpose(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Rest::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    return this->InterfaceGenerateTimemap(functorParams, this);
+}
+
 } // namespace vrv

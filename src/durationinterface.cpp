@@ -17,6 +17,7 @@
 
 #include "beam.h"
 #include "chord.h"
+#include "functorparams.h"
 #include "mensur.h"
 #include "note.h"
 #include "vrv.h"
@@ -64,6 +65,12 @@ void DurationInterface::Reset()
     ResetStaffIdent();
 
     m_durDefault = DURATION_NONE;
+
+    m_scoreTimeOnset = 0.0;
+    m_scoreTimeOffset = 0.0;
+    m_realTimeOnsetMilliseconds = 0;
+    m_realTimeOffsetMilliseconds = 0;
+    m_scoreTimeTiedDuration = 0.0;
 }
 
 double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase)
@@ -233,6 +240,111 @@ bool DurationInterface::HasIdenticalDurationInterface(DurationInterface *otherDu
         return false;
     }
     */
+}
+
+void DurationInterface::SetScoreTimeOnset(double scoreTime)
+{
+    m_scoreTimeOnset = scoreTime;
+}
+
+void DurationInterface::SetRealTimeOnsetSeconds(double timeInSeconds)
+{
+    // m_realTimeOnsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+    m_realTimeOnsetMilliseconds = timeInSeconds * 1000.0;
+}
+
+void DurationInterface::SetScoreTimeOffset(double scoreTime)
+{
+    m_scoreTimeOffset = scoreTime;
+}
+
+void DurationInterface::SetRealTimeOffsetSeconds(double timeInSeconds)
+{
+    // m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+    m_realTimeOffsetMilliseconds = timeInSeconds * 1000.0;
+}
+
+void DurationInterface::SetScoreTimeTiedDuration(double scoreTime)
+{
+    m_scoreTimeTiedDuration = scoreTime;
+}
+
+double DurationInterface::GetScoreTimeOnset() const
+{
+    return m_scoreTimeOnset;
+}
+
+double DurationInterface::GetRealTimeOnsetMilliseconds() const
+{
+    return m_realTimeOnsetMilliseconds;
+}
+
+double DurationInterface::GetScoreTimeOffset() const
+{
+    return m_scoreTimeOffset;
+}
+
+double DurationInterface::GetRealTimeOffsetMilliseconds() const
+{
+    return m_realTimeOffsetMilliseconds;
+}
+
+double DurationInterface::GetScoreTimeTiedDuration() const
+{
+    return m_scoreTimeTiedDuration;
+}
+
+double DurationInterface::GetScoreTimeDuration() const
+{
+    return this->GetScoreTimeOffset() - this->GetScoreTimeOnset();
+}
+
+//----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+
+int DurationInterface::InterfaceGenerateTimemap(FunctorParams *functorParams, Object *object)
+{
+    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    double realTimeStart = params->m_realTimeOffsetMilliseconds + this->GetRealTimeOnsetMilliseconds();
+    double scoreTimeStart = params->m_scoreTimeOffset + this->GetScoreTimeOnset();
+
+    double realTimeEnd = params->m_realTimeOffsetMilliseconds + this->GetRealTimeOffsetMilliseconds();
+    double scoreTimeEnd = params->m_scoreTimeOffset + this->GetScoreTimeOffset();
+
+    bool isRest = (object->Is(REST));
+
+    TimemapEntry startEntry;
+    if (params->m_timemap.count(realTimeStart) > 0) startEntry = params->m_timemap.at(realTimeStart);
+
+    // Should check if value for realTimeStart already exists and if so, then
+    // ensure that it is equal to scoreTimeStart:
+    startEntry.qstamp = scoreTimeStart;
+
+    // Store the element ID in list to turn on at given time - note or rest
+    if (!isRest) startEntry.notesOn.push_back(object->GetUuid());
+    if (isRest) startEntry.restsOn.push_back(object->GetUuid());
+
+    TimemapEntry endEntry;
+    if (params->m_timemap.count(realTimeEnd) > 0) endEntry = params->m_timemap.at(realTimeEnd);
+
+    // Should check if value for realTimeEnd already exists and if so, then
+    // ensure that it is equal to scoreTimeEnd:
+    endEntry.qstamp = scoreTimeEnd;
+
+    // Store the element ID in list to turn off at given time - notes or rest
+    if (!isRest) endEntry.notesOff.push_back(object->GetUuid());
+    if (isRest) endEntry.restsOff.push_back(object->GetUuid());
+
+    startEntry.tempo = params->m_currentTempo;
+
+    // Update the timemap
+    params->m_timemap[realTimeStart] = startEntry;
+    params->m_timemap[realTimeEnd] = endEntry;
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
