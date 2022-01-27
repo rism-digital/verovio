@@ -187,14 +187,40 @@ void BeamSegment::CalcBeam(
             assert(beamInterface);
 
             assert(coord->m_closestNote);
+
             y1 = coord->m_yBeam;
+            bool isStemSameas = false;
+
+            // With stem.sameas the y is not the beam one but the one of the other note
+            // We also need to adjust the length differently (below)
+            if (this->StemSameasIsSecondary() && el->Is(NOTE)) {
+                Note *note = vrv_cast<Note *>(el);
+                assert(note);
+                if (note->HasStemSameasNote()) {
+                    y1 = note->GetStemSameasNote()->GetDrawingY();
+                    isStemSameas = true;
+                }
+            }
+
             y2 = coord->m_closestNote->GetDrawingY();
             if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
-                y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                if (isStemSameas) {
+                    // Move up according to the cut-outs
+                    y1 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
+                }
+                else {
+                    // Move down to ensure the stem is slightly shorter than the top-beam
+                    y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                }
                 y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
             else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
-                y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                if (isStemSameas) {
+                    y1 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
+                }
+                else {
+                    y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                }
                 y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
             else if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
