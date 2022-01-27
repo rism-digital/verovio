@@ -220,8 +220,12 @@ protected:
     int CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, int y2);
 
 private:
-    /** A flag indicating that we have notes with stem shared and that it should not be drawn */
-    bool m_stemSameAsNotes;
+    /**
+     * A pointer to the beam with which stem are shared.
+     * The pointer is bi-directional (each beam points to the other one.
+     * It is the in Note::ResovleStemSameas()
+     */
+    Beam *m_stemSameas;
 
 public:
     /** */

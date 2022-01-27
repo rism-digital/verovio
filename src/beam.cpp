@@ -1215,7 +1215,7 @@ void Beam::Reset()
     ResetColor();
     ResetCue();
 
-    m_stemSameAsNotes = false;
+    m_stemSameas = NULL;
 }
 
 bool Beam::IsSupportedChild(Object *child)
@@ -1692,9 +1692,10 @@ int Beam::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
+    BeamDrawingInterface::Reset();
 
     m_beamSegment.Reset();
-    m_stemSameAsNotes = false;
+    m_stemSameas = NULL;
 
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
