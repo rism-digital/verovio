@@ -461,8 +461,8 @@ public:
  * member 4: the doc
  * member 5: a pointer to the functor for passing it to the system aligner
  * member 6: a pointer to the end functor for passing it to the system aligner
- * member 7: flag whether element is in unison
- * member 8: flag whether element (note) has as stem same as note
+ * member 7: flag whether the element is in unison
+ * member 8: flag whether the element (note) has as stem.sameas note
  * member 9: the total shift of the current note or chord
  **/
 

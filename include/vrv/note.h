@@ -443,12 +443,8 @@ private:
 
     /**
      * A pointer to a note with which the note shares its stem and implementing @stem.sameas.
-     * The other note is always the one with the stem going outward (up or down). This means
-     * that the note pointing to it will have a stem linking the two notes.
-     * The current implementation requires the notes with the @stem.sameas to be in a lower layer.
-     * The note in the upper layer has no attribute. By default, stems go up but the @stem.dir
-     * value is supported. If the stem is going down, the upper note will have a m_stemSameas Note.
-     * It means that the pointing note is not necessary the note carrying the @stem.sameas.
+     * The pointer is bi-directional (both notes point to each other).
+     * It is set in Note::ResolveStemSameas
      */
     Note *m_stemSameas;
 

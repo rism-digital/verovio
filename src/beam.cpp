@@ -1250,7 +1250,7 @@ void BeamSegment::InitSameasRoles(Beam *sameasBeam, data_BEAMPLACE &initialPlace
 
     // This is the first time and the first beam for which we are calling it.
     // All we need to do is setting the pointer to the role of the other beam
-    // and make both of them as unset
+    // and mark both of them as unset
     if (m_stemSameasRole == SAMEAS_NONE) {
         m_stemSameasReverseRole = &sameasBeam->m_beamSegment.m_stemSameasRole;
         m_stemSameasRole = SAMEAS_UNSET;

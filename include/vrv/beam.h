@@ -157,10 +157,10 @@ public:
      * @name The role in a stem.sameas situation.
      * Set in BeamSegment::InitSameasRoles and then in UpdateSameasRoles
      * Used to determine if the beam is the primary one (normal stems and beams)
-     * or the secondary one (linking both notes). This depends on the drawing stem direction,
+     * or the secondary one (linking both notes). This depends on the drawing beam place,
      * which can be encoded but otherwise calculated by CalcBeamPlace.
      * The pointer to the other beam m_stemSameasReverseRole is set only for the first of the
-     * two beam and is not bi-directional. Is is set in InitSameasRoles.
+     * two beams and is not bi-directional. Is is set in InitSameasRoles.
      */
     ///@{
     StemSameasDrawingRole m_stemSameasRole;
@@ -263,9 +263,9 @@ protected:
 
 private:
     /**
-     * A pointer to the beam with which stem are shared.
-     * The pointer is bi-directional (each beam points to the other one.
-     * It is the in Note::ResovleStemSameas()
+     * A pointer to the beam with which stems are shared.
+     * The pointer is bi-directional – each beam points to the other one.
+     * It is set in Note::ResovleStemSameas()
      */
     Beam *m_stemSameas;
 
