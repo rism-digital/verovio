@@ -1562,8 +1562,8 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     assert(params);
 
     m_scoreTimeOffset.clear();
-    m_scoreTimeOffset.push_back(params->m_maxCurrentScoreTime);
-    params->m_maxCurrentScoreTime += m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX;
+    m_scoreTimeOffset.push_back(params->m_currentScoreTime);
+    params->m_currentScoreTime += m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX;
 
     // search for tempo marks in the measure
     Tempo *tempo = dynamic_cast<Tempo *>(this->FindDescendantByType(TEMPO));
@@ -1585,8 +1585,8 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
 
     m_realTimeOffsetMilliseconds.clear();
     // m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
-    m_realTimeOffsetMilliseconds.push_back(params->m_maxCurrentRealTimeSeconds * 1000.0);
-    params->m_maxCurrentRealTimeSeconds
+    m_realTimeOffsetMilliseconds.push_back(params->m_currentRealTimeSeconds * 1000.0);
+    params->m_currentRealTimeSeconds
         += (m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX) * 60.0 / m_currentTempo;
 
     return FUNCTOR_CONTINUE;
