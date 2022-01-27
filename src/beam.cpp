@@ -62,6 +62,9 @@ void BeamSegment::Reset()
 
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
+
+    m_stemSameasRole = SAMEAS_NONE;
+    m_stemSameasReverseRole = NULL;
 }
 
 const ArrayOfBeamElementCoords *BeamSegment::GetElementCoordRefs() const
@@ -443,39 +446,37 @@ void BeamSegment::CalcBeamInit(
             m_nbNotesOrChords++;
         }
 
+        int chordYMax = 0;
+        int chordYMin = 0;
+
         if (coord->m_element->Is(CHORD)) {
-            int max = 0;
-            int min = 0;
             Chord *chord = vrv_cast<Chord *>(coord->m_element);
             assert(chord);
-            chord->GetYExtremes(max, min);
-
-            SetExtrema(max);
-            SetExtrema(min);
-
-            int linesAbove = 0;
-            int linesBelow = 0;
             Note *bottomNote = chord->GetBottomNote();
             assert(bottomNote);
-            if (bottomNote->HasLedgerLines(linesAbove, linesBelow, staff)) {
-                m_ledgerLinesBelow += linesBelow;
-            }
             Note *topNote = chord->GetTopNote();
             assert(topNote);
-            if (topNote->HasLedgerLines(linesAbove, linesBelow, staff)) {
-                m_ledgerLinesAbove += linesAbove;
-            }
+            this->CalcBeamInitForNotePair(bottomNote, topNote, staff, chordYMax, chordYMin);
+            SetExtrema(chordYMax);
+            SetExtrema(chordYMin);
         }
         else if (coord->m_element->Is(NOTE)) {
             Note *note = vrv_cast<Note *>(coord->m_element);
             assert(note);
-            SetExtrema(note->GetDrawingY());
-
-            int linesAbove = 0;
-            int linesBelow = 0;
-            if (note->HasLedgerLines(linesAbove, linesBelow, staff)) {
-                m_ledgerLinesBelow += linesBelow;
-                m_ledgerLinesAbove += linesAbove;
+            // In a stem.sameas context, use both notes to determine the beam place (e,g, same as a chord)
+            if (note->HasStemSameasNote()) {
+                this->CalcBeamInitForNotePair(note, note->GetStemSameasNote(), staff, chordYMax, chordYMin);
+                SetExtrema(chordYMax);
+                SetExtrema(chordYMin);
+            }
+            else {
+                SetExtrema(note->GetDrawingY());
+                int linesAbove = 0;
+                int linesBelow = 0;
+                if (note->HasLedgerLines(linesAbove, linesBelow, staff)) {
+                    m_ledgerLinesBelow += linesBelow;
+                    m_ledgerLinesAbove += linesAbove;
+                }
             }
         }
         else {
@@ -484,6 +485,27 @@ void BeamSegment::CalcBeamInit(
     }
 
     m_weightedPlace = ((m_verticalCenter - yMin) > (yMax - m_verticalCenter)) ? BEAMPLACE_above : BEAMPLACE_below;
+}
+
+void BeamSegment::CalcBeamInitForNotePair(Note *note1, Note *note2, Staff *staff, int &yMax, int &yMin)
+{
+    assert(note1);
+    assert(note2);
+
+    Note *bottomNote = (note1->GetDrawingY() > note2->GetDrawingY()) ? note2 : note1;
+    Note *topNote = (note1->GetDrawingY() > note2->GetDrawingY()) ? note1 : note2;
+
+    yMax = bottomNote->GetDrawingY();
+    yMin = topNote->GetDrawingY();
+
+    int linesAbove = 0;
+    int linesBelow = 0;
+    if (bottomNote->HasLedgerLines(linesAbove, linesBelow, staff)) {
+        m_ledgerLinesBelow += linesBelow;
+    }
+    if (topNote->HasLedgerLines(linesAbove, linesBelow, staff)) {
+        m_ledgerLinesAbove += linesAbove;
+    }
 }
 
 bool BeamSegment::CalcBeamSlope(
@@ -1020,7 +1042,9 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     }
     // Look at the layer direction or, finally, at the note position
     else {
-        data_STEMDIRECTION layerStemDir = layer->GetDrawingStemDir(&m_beamElementCoordRefs);
+        data_STEMDIRECTION layerStemDir = STEMDIRECTION_NONE;
+        // Do not look at the layer context when notes from different layers are stemmed together
+        if (!this->StemSameas()) layerStemDir = layer->GetDrawingStemDir(&m_beamElementCoordRefs);
         // Layer direction ?
         if (layerStemDir == STEMDIRECTION_NONE) {
             if (m_ledgerLinesBelow != m_ledgerLinesAbove) {
@@ -1035,6 +1059,12 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
         else {
             beamInterface->m_drawingPlace = (layerStemDir == STEMDIRECTION_up) ? BEAMPLACE_above : BEAMPLACE_below;
         }
+    }
+
+    // If we have a stem.sameas context and it is unset, update the roles.
+    // This will update the roles for both beams
+    if (this->StemSameasIsUnset()) {
+        this->UpdateSameasRoles(beamInterface->m_drawingPlace);
     }
 
     // For now force it above
@@ -1186,6 +1216,46 @@ int BeamSegment::GetStartingX() const
 int BeamSegment::GetStartingY() const
 {
     return (m_beamElementCoordRefs.empty() ? 0 : m_beamElementCoordRefs.at(0)->m_yBeam);
+}
+
+void BeamSegment::InitSameasRoles(Beam *sameasBeam, data_BEAMPLACE &initialPlace)
+{
+    if (!sameasBeam) return;
+
+    // This is the first time and the first beam for which we are calling it.
+    // All we need to do is setting the pointer to the role of the other beam
+    // and make both of them as unset
+    if (m_stemSameasRole == SAMEAS_NONE) {
+        m_stemSameasReverseRole = &sameasBeam->m_beamSegment.m_stemSameasRole;
+        m_stemSameasRole = SAMEAS_UNSET;
+        (*m_stemSameasReverseRole) = SAMEAS_UNSET;
+    }
+    // The reverse role is not set, which means we are calling it from the second beam.
+    // We need to set the initial place of the beam as previously calculated for the first one.
+    // If the role of the second beam (this) has been mark as is primary, it means the beam
+    // has been place below, above if secondary.
+    else if (!m_stemSameasReverseRole) {
+        initialPlace = (this->StemSameasIsPrimary()) ? BEAMPLACE_below : BEAMPLACE_above;
+    }
+    // Otherwise, calling it (again) from the first beam, nothing to do.
+}
+
+void BeamSegment::UpdateSameasRoles(data_BEAMPLACE place)
+{
+    if (!m_stemSameasReverseRole || !this->StemSameasIsUnset()) return;
+
+    // Because m_stemSameasReverseRole is instanciated, then it means we are in
+    // the first of the beams sharing the stems.
+    // The beam is placed above, this one is primary, the other secondary.
+    if (place == BEAMPLACE_above) {
+        m_stemSameasRole = SAMEAS_PRIMARY;
+        (*m_stemSameasReverseRole) = SAMEAS_SECONDARY;
+    }
+    // The beam is placed below, this one is secondary, the other primary.
+    else {
+        m_stemSameasRole = SAMEAS_SECONDARY;
+        (*m_stemSameasReverseRole) = SAMEAS_PRIMARY;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1667,7 +1737,7 @@ int Beam::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    if (this->IsTabBeam() || this->GetStemSameasNotes()) return FUNCTOR_CONTINUE;
+    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
 
     const ArrayOfObjects *beamChildren = this->GetList(this);
 
@@ -1678,12 +1748,25 @@ int Beam::CalcStem(FunctorParams *functorParams)
 
     m_beamSegment.InitCoordRefs(this->GetElementCoords());
 
+    data_BEAMPLACE initialPlace = this->GetPlace();
+    if (this->HasStemSameasBeam()) m_beamSegment.InitSameasRoles(this->GetStemSameasBeam(), initialPlace);
+
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
-    m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, this->GetPlace());
+    m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, initialPlace);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Beam::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    LayerElement::ResetHorizontalAlignment(functorParams);
+
+    m_beamSegment.m_stemSameasRole = SAMEAS_NONE;
+    m_beamSegment.m_stemSameasReverseRole = NULL;
 
     return FUNCTOR_CONTINUE;
 }
