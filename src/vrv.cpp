@@ -223,7 +223,6 @@ bool Resources::LoadFont(const std::string &fontName)
     const int unitsPerEm = atoi(root.attribute("units-per-em").value());
 
     const std::map<wchar_t, wchar_t> ranges = GetGlyphRanges();
-
     for (pugi::xml_node current = root.child("g"); current; current = current.next_sibling("g")) {
         pugi::xml_attribute c_attribute = current.attribute("c");
         pugi::xml_attribute n_attribute = current.attribute("n");
@@ -242,12 +241,12 @@ bool Resources::LoadFont(const std::string &fontName)
         glyph.SetUnitsPerEm(unitsPerEm * 10);
         glyph.SetCodeStr(c_attribute.value());
         float x = 0.0, y = 0.0, width = 0.0, height = 0.0;
-        if (current.attribute("x")) x = atof(current.attribute("x").value());
-        if (current.attribute("y")) y = atof(current.attribute("y").value());
-        if (current.attribute("w")) width = atof(current.attribute("w").value());
-        if (current.attribute("h")) height = atof(current.attribute("h").value());
+        if (current.attribute("x")) x = current.attribute("x").as_float();
+        if (current.attribute("y")) y = current.attribute("y").as_float();
+        if (current.attribute("w")) width = current.attribute("w").as_float();
+        if (current.attribute("h")) height = current.attribute("h").as_float();
         glyph.SetBoundingBox(x, y, width, height);
-        if (current.attribute("h-a-x")) glyph.SetHorizAdvX(atof(current.attribute("h-a-x").value()));
+        if (current.attribute("h-a-x")) glyph.SetHorizAdvX(current.attribute("h-a-x").as_float());
 
         // load anchors
         pugi::xml_node anchor;
@@ -256,7 +255,7 @@ bool Resources::LoadFont(const std::string &fontName)
                 std::string name = std::string(anchor.attribute("n").value());
                 // No check for possible x and y missing attributes - not very safe.
 
-                glyph.SetAnchor(name, atof(anchor.attribute("x").value()), atof(anchor.attribute("y").value()));
+                glyph.SetAnchor(name, anchor.attribute("x").as_float(), anchor.attribute("y").as_float());
             }
         }
 
