@@ -229,7 +229,7 @@ bool Resources::LoadFont(const std::string &fontName)
                     smuflCode, unitsPerEm);
                 continue;
             }
-            double x = 0.0, y = 0.0, width = 0.0, height = 0.0;
+            float x = 0.0, y = 0.0, width = 0.0, height = 0.0;
             // Not check for missing values...
             if (current.attribute("x")) x = current.attribute("x").as_float();
             if (current.attribute("y")) y = current.attribute("y").as_float();
@@ -285,7 +285,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
             // We create a glyph with only the units per em which is the only info we need for
             // the bounding boxes; path and codeStr will remain [unset]
             Glyph glyph(unitsPerEm);
-            double x = 0.0, y = 0.0, width = 0.0, height = 0.0;
+            float x = 0.0, y = 0.0, width = 0.0, height = 0.0;
             // Not check for missing values...
             if (current.attribute("x")) x = current.attribute("x").as_float();
             if (current.attribute("y")) y = current.attribute("y").as_float();

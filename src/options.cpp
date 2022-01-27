@@ -240,7 +240,7 @@ void OptionDbl::Init(double defaultValue, double minValue, double maxValue)
 
 bool OptionDbl::SetValue(const std::string &value)
 {
-    return SetValue(std::stof(value));
+    return SetValue(std::stod(value));
 }
 
 std::string OptionDbl::GetStrValue() const
