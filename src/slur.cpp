@@ -1029,7 +1029,10 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     const int yMin = y1 - unit * 4;
                     const int yTop = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
                     y2 = std::max(end->GetDrawingY() + unit * 2, yMin);
-                    y2 = std::min(yTop - unit, y2);
+                    if (y2 > yTop - unit * 2) {
+                        y2 = yTop;
+                        x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    }
                 }
             }
             // portato slurs
@@ -1086,7 +1089,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     const int yBottom = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                     y2 = std::min(end->GetDrawingY(), yMax);
                     if (y2 < yBottom + unit) {
-                        y2 = yBottom + unit;
+                        y2 = yBottom + unit * 2;
                     }
                     else {
                         x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
