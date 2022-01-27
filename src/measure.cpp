@@ -1564,24 +1564,6 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     m_scoreTimeOffset.clear();
     m_scoreTimeOffset.push_back(params->m_currentScoreTime);
 
-    // search for tempo marks in the measure
-    Tempo *tempo = dynamic_cast<Tempo *>(this->FindDescendantByType(TEMPO));
-    if (tempo && tempo->HasMidiBpm()) {
-        params->m_currentTempo = tempo->GetMidiBpm();
-    }
-    else if (tempo && tempo->HasMm()) {
-        double mm = tempo->GetMm();
-        int mmUnit = 4;
-        if (tempo->HasMmUnit() && (tempo->GetMmUnit() > DURATION_breve)) {
-            mmUnit = pow(2, (int)tempo->GetMmUnit() - 2);
-        }
-        if (tempo->HasMmDots()) {
-            mmUnit = 2 * mmUnit - (mmUnit / pow(2, tempo->GetMmDots()));
-        }
-        params->m_currentTempo = mm * 4.0 / mmUnit + 0.5;
-    }
-    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
-
     m_realTimeOffsetMilliseconds.clear();
     // m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
     m_realTimeOffsetMilliseconds.push_back(params->m_currentRealTimeSeconds * 1000.0);
@@ -1596,6 +1578,7 @@ int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
 
     const double scoreTimeIncrement
         = m_measureAligner.GetRightAlignment()->GetTime() * params->m_multiRestFactor * DURATION_4 / DUR_MAX;
+    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
     params->m_currentScoreTime += scoreTimeIncrement;
     params->m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / m_currentTempo;
     params->m_multiRestFactor = 1;

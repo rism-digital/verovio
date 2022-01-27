@@ -127,4 +127,27 @@ int Tempo::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Tempo::CalcMaxMeasureDuration(FunctorParams *functorParams)
+{
+    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    if (this->HasMidiBpm()) {
+        params->m_currentTempo = this->GetMidiBpm();
+    }
+    else if (this->HasMm()) {
+        double mm = this->GetMm();
+        int mmUnit = 4;
+        if (this->HasMmUnit() && (this->GetMmUnit() > DURATION_breve)) {
+            mmUnit = pow(2, (int)this->GetMmUnit() - 2);
+        }
+        if (this->HasMmDots()) {
+            mmUnit = 2 * mmUnit - (mmUnit / pow(2, this->GetMmDots()));
+        }
+        params->m_currentTempo = mm * 4.0 / mmUnit + 0.5;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
