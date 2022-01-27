@@ -1563,7 +1563,6 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
 
     m_scoreTimeOffset.clear();
     m_scoreTimeOffset.push_back(params->m_currentScoreTime);
-    params->m_currentScoreTime += m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX;
 
     // search for tempo marks in the measure
     Tempo *tempo = dynamic_cast<Tempo *>(this->FindDescendantByType(TEMPO));
@@ -1586,8 +1585,20 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     m_realTimeOffsetMilliseconds.clear();
     // m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
     m_realTimeOffsetMilliseconds.push_back(params->m_currentRealTimeSeconds * 1000.0);
-    params->m_currentRealTimeSeconds
-        += (m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX) * 60.0 / m_currentTempo;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
+{
+    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    const double scoreTimeIncrement
+        = m_measureAligner.GetRightAlignment()->GetTime() * params->m_multiRestFactor * DURATION_4 / DUR_MAX;
+    params->m_currentScoreTime += scoreTimeIncrement;
+    params->m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / m_currentTempo;
+    params->m_multiRestFactor = 1;
 
     return FUNCTOR_CONTINUE;
 }

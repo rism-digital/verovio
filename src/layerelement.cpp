@@ -2514,6 +2514,20 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
+{
+    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    if (this->Is(MULTIREST)) {
+        MultiRest *multiRest = vrv_cast<MultiRest *>(this);
+        assert(multiRest);
+        params->m_multiRestFactor = multiRest->GetNum();
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int LayerElement::ResetDrawing(FunctorParams *functorParams)
 {
     m_drawingCueSize = false;
