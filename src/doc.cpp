@@ -410,9 +410,6 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
     GenerateTimemapParams generateTimemapParams(&generateTimemap);
     this->Process(&generateTimemap, &generateTimemapParams);
 
-    includeRests = true;
-    includeMeasures = true;
-
     double currentTempo = -1000.0;
     double newTempo;
 
