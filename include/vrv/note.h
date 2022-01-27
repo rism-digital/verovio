@@ -250,6 +250,14 @@ public:
      */
     void ResolveStemSameas(PrepareLinkingParams *params);
 
+    /**
+     * Calculate the stem direction of the pair of notes.
+     * The presence of a StemSameasNote() needs to be check before calling it.
+     * Encoded stem direction on the calling note is taken into account.
+     * Called from Note::CalcStem
+     */
+    data_STEMDIRECTION CalcStemDirForSameasNote(int verticalCenter);
+
 public:
     //----------------//
     // Static methods //

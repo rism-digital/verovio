@@ -1034,7 +1034,7 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     // Stems have been calculated previously in Beam or fTrem - siblings because flags do not need to
     // be processed either - except when there is a stemSameasNote
-    if ((this->IsInBeam() || this->IsInFTrem()) && !this->HasStemSameasNote()) {
+    if ((this->IsInBeam() || this->IsInFTrem())) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -1069,7 +1069,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     params->m_interface = this;
     params->m_dur = this->GetActualDur();
     params->m_isGraceNote = this->IsGraceNote();
-    params->m_stemSameas = this->HasStemSameasNote();
+    params->m_stemSameas = false;
 
     int staffSize = staff->m_drawingStaffSize;
 
@@ -1082,8 +1082,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     if (this->HasStemSameasNote()) {
-        // for stem same as notes, the direction is up if the note also carries the @stem.sameas attribute (default)
-        stemDir = (this->HasStemSameas()) ? STEMDIRECTION_up : STEMDIRECTION_down;
+        stemDir = this->CalcStemDirForSameasNote(params->m_verticalCenter);
     }
     else if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();
@@ -1104,8 +1103,10 @@ int Note::CalcStem(FunctorParams *functorParams)
     stem->SetDrawingYRel(0);
 
     // Use the params->m_chordStemLength for the length of the stem beetween the notes
-    if (this->HasStemSameasNote()) {
+    // The value of m_stemSameasRole is set by Note::CalcStemDirForSameasNote
+    if (this->HasStemSameasNote() && m_stemSameasRole == SAMEAS_SECONDARY) {
         params->m_chordStemLength = -std::abs(this->GetDrawingY() - this->GetStemSameasNote()->GetDrawingY());
+        params->m_stemSameas = true;
     }
 
     return FUNCTOR_CONTINUE;
