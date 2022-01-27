@@ -604,6 +604,12 @@ enum Accessor { SELF = 0, CONTENT };
 enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
 
 //----------------------------------------------------------------------------
+// Stem sameas drawing role
+//----------------------------------------------------------------------------
+
+enum StemSameasDrawingRole { SAMEAS_NONE = 0, SAMEAS_UNSET, SAMEAS_PRIMARY, SAMEAS_SECONDARY };
+
+//----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
 

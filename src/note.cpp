@@ -125,6 +125,7 @@ void Note::Reset()
     m_scoreTimeTiedDuration = 0.0;
 
     m_stemSameas = NULL;
+    m_stemSameasRole = SAMEAS_NONE;
 }
 
 bool Note::IsSupportedChild(Object *child)
@@ -566,20 +567,62 @@ void Note::ResolveStemSameas(PrepareLinkingParams *params)
     else {
         const std::string uuid = this->GetUuid();
         if (params->m_stemSameasUuidPairs.count(uuid)) {
-            Note *noteWithStemSameas = params->m_stemSameasUuidPairs.at(uuid);
-            // By default (stem up) the pointing note is the one with @stem.sameas (lower)
-            Note *targetNote = noteWithStemSameas;
-            if (this->HasStemDir() && this->GetStemDir() == STEMDIRECTION_down) {
-                this->SetStemSameasNote(noteWithStemSameas);
-                targetNote = this;
+            Note *noteStemSameas = params->m_stemSameasUuidPairs.at(uuid);
+            // Instanciate the bi-directional references and mark the roles as unset
+            this->SetStemSameasNote(noteStemSameas);
+            this->m_stemSameasRole = SAMEAS_UNSET;
+            noteStemSameas->SetStemSameasNote(this);
+            noteStemSameas->m_stemSameasRole = SAMEAS_UNSET;
+            // Also resovle beams and instanciate the bi-directional references
+            Beam *beamStemSameas = noteStemSameas->IsInBeam();
+            if (beamStemSameas) {
+                Beam *thisBeam = this->IsInBeam();
+                if (!thisBeam) {
+                    // This is one thing that can go wrong. We can have many others here...
+                    // E.g., not the same number of notes, conflicting durations, not all notes sharing stems, ...
+                    // Not sure everything could be checked here.
+                    LogError("Notes with @stem.sameas in a beam should refer only to a note also in beam.");
+                }
+                else {
+                    thisBeam->SetStemSameasBeam(beamStemSameas);
+                    beamStemSameas->SetStemSameasBeam(thisBeam);
+                }
             }
-            else {
-                noteWithStemSameas->SetStemSameasNote(this);
-            }
-            Beam *beam = targetNote->IsInBeam();
-            if (beam) beam->SetStemSameasNotes(true);
             params->m_stemSameasUuidPairs.erase(uuid);
         }
+    }
+}
+
+data_STEMDIRECTION Note::CalcStemDirForSameasNote(int verticalCenter)
+{
+    assert(m_stemSameas);
+    assert(m_stemSameas->HasStemSameasNote());
+    assert(m_stemSameas->GetStemSameasNote() == this);
+
+    // This is the first of the of the note pair, we need to calculate and set the stem direction
+    if (m_stemSameasRole == SAMEAS_UNSET) {
+        data_STEMDIRECTION stemDir = STEMDIRECTION_up;
+        Note *topNote = (this->GetDrawingY() > m_stemSameas->GetDrawingY()) ? this : m_stemSameas;
+        Note *bottomNote = (this->GetDrawingY() > m_stemSameas->GetDrawingY()) ? m_stemSameas : this;
+        // First check if we have an encoded stem direction
+        if (this->HasStemDir()) {
+            stemDir = this->GetStemDir();
+        }
+        // Otherwise auto determine it
+        else {
+            const int topY = topNote->GetDrawingY();
+            const int bottomY = bottomNote->GetDrawingY();
+            const int middlePoint = (topY + bottomY) / 2;
+            stemDir = (middlePoint > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        }
+        // We also set the role to both notes accordingly
+        topNote->m_stemSameasRole = (stemDir == STEMDIRECTION_up) ? SAMEAS_PRIMARY : SAMEAS_SECONDARY;
+        bottomNote->m_stemSameasRole = (stemDir == STEMDIRECTION_up) ? SAMEAS_SECONDARY : SAMEAS_PRIMARY;
+        return stemDir;
+    }
+    else {
+        // Otherwise use the stem direction set for the other note previously when this method was called for it
+        return m_stemSameas->GetDrawingStemDir();
     }
 }
 
@@ -1371,6 +1414,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
     m_drawingLoc = 0;
     m_flippedNotehead = false;
     m_stemSameas = NULL;
+    m_stemSameasRole = SAMEAS_NONE;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1382,6 +1426,8 @@ int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
+    // Re-mark the role as unsed if we have a shared stem
+    if (this->HasStemSameasNote()) m_stemSameasRole = SAMEAS_UNSET;
 
     return FUNCTOR_CONTINUE;
 }

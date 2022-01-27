@@ -245,8 +245,8 @@ public:
     /**
      * Resovle @stem.sameas links by instanciating Note::m_stemSameas (*Note).
      * Called twice from Object::PrepareLinks. Once to fill uuid / note pairs,
-     * and once to resolve the link. The direction of the link depends on the
-     * stem direction and not on the presence of the @stem.sameas
+     * and once to resolve the link. The link is bi-directional, which means
+     * that both notes have their m_stemSameas pointer instanciated.
      */
     void ResolveStemSameas(PrepareLinkingParams *params);
 
@@ -443,6 +443,15 @@ private:
      * It means that the pointing note is not necessary the note carrying the @stem.sameas.
      */
     Note *m_stemSameas;
+
+    /**
+     * The role in a stem.sameas situation.
+     * Set in Note::ResolveStemSameas and then in Note::CalcStemDirForSameasNote
+     * Used to determine if the note is the primary one (normal stem, e.g., with flag)
+     * or the secondary one (linking both notes). This depends on the drawing stem direction,
+     * which can be encoded but otherwise calculated by CalcStemDirForSameasNote
+     */
+    StemSameasDrawingRole m_stemSameasRole;
 };
 
 //----------------------------------------------------------------------------
