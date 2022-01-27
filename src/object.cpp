@@ -1467,14 +1467,9 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
     if (this->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(this);
         assert(note);
-        if (note->HasStemSameasNote()) {
-            // We need to check where the @stem.sameas attribute actually is because of the handling
-            // of share stem pointers depending on the stem direction.
-            // If it is on this note, then the reference we want to keep is the other note.
-            // Otherwise it means that the @stem.sameas is on the other note that we already have
-            // the one that is actually referenced
-            if (note->HasStemSameas()) note = note->GetStemSameasNote();
-            params->m_elements->push_back(note);
+        // The note has a stem.sameas that was resolved the a note, then that one is referenced
+        if (note->HasStemSameas() && note->HasStemSameasNote()) {
+            params->m_elements->push_back(note->GetStemSameasNote());
         }
     }
     // These will also be referred to as milestones in page-based MEI
