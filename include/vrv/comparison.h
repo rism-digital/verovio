@@ -454,25 +454,26 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// NoteOnsetOffsetComparison
+// NoteOrRestOnsetOffsetComparison
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is a note being played at the given time.
  */
-class NoteOnsetOffsetComparison : public ClassIdComparison {
+class NoteOrRestOnsetOffsetComparison : public ClassIdsComparison {
 
 public:
-    NoteOnsetOffsetComparison(const int time) : ClassIdComparison(NOTE) { m_time = time; }
+    NoteOrRestOnsetOffsetComparison(const int time) : ClassIdsComparison({ NOTE, REST }) { m_time = time; }
 
     void SetTime(int time) { m_time = time; }
 
     bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
-        Note *note = vrv_cast<Note *>(object);
-        assert(note);
-        return ((m_time >= note->GetRealTimeOnsetMilliseconds()) && (m_time <= note->GetRealTimeOffsetMilliseconds()));
+        DurationInterface *interface = object->GetDurationInterface();
+        assert(interface);
+        return ((m_time >= interface->GetRealTimeOnsetMilliseconds())
+            && (m_time <= interface->GetRealTimeOffsetMilliseconds()));
     }
 
 private:
