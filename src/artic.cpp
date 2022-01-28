@@ -399,7 +399,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
     int yIn, yOut, yRel;
 
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     Beam *beam = dynamic_cast<Beam *>(GetFirstAncestor(BEAM));
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
 

@@ -126,6 +126,7 @@ wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
                         case 4: return SMUFL_E90A_mensuralCclefPetrucciPosHigh; break;
                         case 5: return SMUFL_E90B_mensuralCclefPetrucciPosHighest; break;
                     }
+                    [[fallthrough]];
                 default: return SMUFL_E909_mensuralCclefPetrucciPosMiddle; break;
             }
         case NOTATIONTYPE_mensural_black:

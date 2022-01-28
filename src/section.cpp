@@ -126,4 +126,28 @@ int Section::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Section::AlignMeasures(FunctorParams *functorParams)
+{
+    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
+    assert(params);
+
+    if (this->GetRestart() == BOOLEAN_true) {
+        params->m_applySectionRestartShift = true;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Section::JustifyX(FunctorParams *functorParams)
+{
+    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
+    assert(params);
+
+    if (this->GetRestart() == BOOLEAN_true) {
+        params->m_applySectionRestartShift = true;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

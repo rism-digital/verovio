@@ -407,7 +407,7 @@ protected:
      */
     ///@{
     void DrawControlElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
-    void DrawTimeSpanningElement(DeviceContext *dc, Object *object, System *system);
+    void DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *system);
     void DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *system);
     void DrawArpegEnclosing(DeviceContext *dc, Arpeg *arpeg, Staff *staff, wchar_t startGlyph, wchar_t fillGlyph,
         wchar_t endGlyph, int x, int y, int height, bool cueSize);
@@ -601,6 +601,11 @@ private:
      */
     void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,
         Staff *staff, Measure *measure);
+
+    /**
+     * Internal methods for drawing time spanning elements
+     */
+    bool HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerElement *start, LayerElement *end) const;
 
 public:
     /** Document */

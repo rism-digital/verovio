@@ -3634,27 +3634,27 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     }
 
     if (page.attribute("page.height")) {
-        vrvPage->m_pageHeight = atoi(page.attribute("page.height").value()) * DEFINITION_FACTOR;
+        vrvPage->m_pageHeight = page.attribute("page.height").as_int() * DEFINITION_FACTOR;
         page.remove_attribute("page.height");
     }
     if (page.attribute("page.width")) {
-        vrvPage->m_pageWidth = atoi(page.attribute("page.width").value()) * DEFINITION_FACTOR;
+        vrvPage->m_pageWidth = page.attribute("page.width").as_int() * DEFINITION_FACTOR;
         page.remove_attribute("page.width");
     }
     if (page.attribute("page.botmar")) {
-        vrvPage->m_pageMarginBottom = atoi(page.attribute("page.botmar").value()) * DEFINITION_FACTOR;
+        vrvPage->m_pageMarginBottom = page.attribute("page.botmar").as_int() * DEFINITION_FACTOR;
         page.remove_attribute("page.botmar");
     }
     if (page.attribute("page.leftmar")) {
-        vrvPage->m_pageMarginLeft = atoi(page.attribute("page.leftmar").value()) * DEFINITION_FACTOR;
+        vrvPage->m_pageMarginLeft = page.attribute("page.leftmar").as_int() * DEFINITION_FACTOR;
         page.remove_attribute("page.leftmar");
     }
     if (page.attribute("page.rightmar")) {
-        vrvPage->m_pageMarginRight = atoi(page.attribute("page.rightmar").value()) * DEFINITION_FACTOR;
+        vrvPage->m_pageMarginRight = page.attribute("page.rightmar").as_int() * DEFINITION_FACTOR;
         page.remove_attribute("page.rightmar");
     }
     if (page.attribute("page.topmar")) {
-        vrvPage->m_pageMarginTop = atoi(page.attribute("page.topmar").value()) * DEFINITION_FACTOR;
+        vrvPage->m_pageMarginTop = page.attribute("page.topmar").as_int() * DEFINITION_FACTOR;
         page.remove_attribute("page.topmar");
     }
     if (page.attribute("surface")) {
@@ -3662,7 +3662,7 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
         page.remove_attribute("surface");
     }
     if (page.attribute("ppu")) {
-        vrvPage->m_PPUFactor = atof(page.attribute("ppu").value());
+        vrvPage->m_PPUFactor = page.attribute("ppu").as_double();
     }
 
     parent->AddChild(vrvPage);
@@ -4035,15 +4035,15 @@ bool MEIInput::ReadSystem(Object *parent, pugi::xml_node system)
     vrvSystem->ReadTyped(system);
 
     if (system.attribute("system.leftmar")) {
-        vrvSystem->m_systemLeftMar = atoi(system.attribute("system.leftmar").value());
+        vrvSystem->m_systemLeftMar = system.attribute("system.leftmar").as_int();
         system.remove_attribute("system.leftmar");
     }
     if (system.attribute("system.rightmar")) {
-        vrvSystem->m_systemRightMar = atoi(system.attribute("system.rightmar").value());
+        vrvSystem->m_systemRightMar = system.attribute("system.rightmar").as_int();
         system.remove_attribute("system.rightmar");
     }
     if (system.attribute("uly") && (m_doc->GetType() == Transcription)) {
-        vrvSystem->m_yAbs = atoi(system.attribute("uly").value()) * DEFINITION_FACTOR;
+        vrvSystem->m_yAbs = system.attribute("uly").as_int() * DEFINITION_FACTOR;
         system.remove_attribute("uly");
     }
 
@@ -7183,10 +7183,10 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
     // att.duration.ratio
     if (tupletSpan.attribute("num")) {
-        tuplet->SetNum(atoi(tupletSpan.attribute("num").value()));
+        tuplet->SetNum(tupletSpan.attribute("num").as_int());
     }
     if (tupletSpan.attribute("numbase")) {
-        tuplet->SetNumbase(atoi(tupletSpan.attribute("numbase").value()));
+        tuplet->SetNumbase(tupletSpan.attribute("numbase").as_int());
     }
 
     // att.tuplet.vis
@@ -7399,15 +7399,15 @@ void MEIInput::UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *
     if (element.attribute("dur.ges")) {
         std::string durGes = element.attribute("dur.ges").as_string();
         if (durGes.back() == 'p') {
-            interface->SetDurPpq(std::atoi(durGes.c_str()));
+            interface->SetDurPpq(std::stoi(durGes));
         }
         else if (durGes.back() == 'r') {
             durGes.pop_back();
-            interface->SetDurRecip(durGes.c_str());
+            interface->SetDurRecip(durGes);
         }
         else if (durGes.back() == 's') {
             durGes.pop_back();
-            interface->SetDurReal(std::atof(durGes.c_str()));
+            interface->SetDurReal(std::stof(durGes));
         }
         element.remove_attribute("dur.ges");
     }

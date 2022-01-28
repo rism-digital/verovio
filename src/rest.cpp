@@ -607,7 +607,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSSSTAFF);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     const bool drawingCueSize = this->GetDrawingCueSize();
     const int staffSize = staff->m_drawingStaffSize;
 

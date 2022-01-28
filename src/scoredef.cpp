@@ -591,13 +591,13 @@ int ScoreDef::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    // SetDrawingXRel(m_systemLeftMar + this->GetDrawingWidth());
     params->m_shift += m_drawingLabelsWidth;
-    if (this->IsSectionRestart()) {
-        const bool hasLabel
-            = (NULL != this->FindDescendantByType(LABEL)) || (NULL != this->FindDescendantByType(LABELABBR));
-        // Add space if we have no label/labelAbbr and no grpSym
-        if (!hasLabel) params->m_shift += 5 * params->m_doc->GetDrawingDoubleUnit(100);
+
+    if (params->m_applySectionRestartShift) {
+        ClassIdsComparison comparison({ LABEL, LABELABBR });
+        if (this->FindDescendantByComparison(&comparison)) {
+            params->m_applySectionRestartShift = false;
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -608,7 +608,10 @@ int ScoreDef::JustifyX(FunctorParams *functorParams)
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
     assert(params);
 
-    params->m_measureXRel += m_drawingLabelsWidth;
+    if (m_drawingLabelsWidth > 0) {
+        params->m_measureXRel += m_drawingLabelsWidth;
+        params->m_applySectionRestartShift = false;
+    }
 
     return FUNCTOR_SIBLINGS;
 }

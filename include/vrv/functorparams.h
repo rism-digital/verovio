@@ -804,7 +804,8 @@ public:
 /**
  * member 0: the cumulated shift
  * member 1: the cumulated justifiable width
- * member 2: the doc
+ * member 2: shift next measure due to section restart
+ * member 3: the doc
  **/
 
 class AlignMeasuresParams : public FunctorParams {
@@ -813,11 +814,13 @@ public:
     {
         m_shift = 0;
         m_justifiableWidth = 0;
+        m_applySectionRestartShift = false;
         m_doc = doc;
     }
 
     int m_shift;
     int m_justifiableWidth;
+    bool m_applySectionRestartShift;
     Doc *m_doc;
 };
 
@@ -1725,12 +1728,14 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the justification ratio
- * member 1: the justification ratio for the measure (depends on the margin)
- * member 2: the non justifiable margin
- * member 3: the system full width (without system margins)
- * member 4: the functor to be redirected to the MeasureAligner
- * member 5: the doc
+ * member 0: the relative X position of the next measure
+ * member 1: the justification ratio
+ * member 2: the left barline X position
+ * member 3: the right barline X position
+ * member 4: the system full width (without system margins)
+ * member 5: shift next measure due to section restart
+ * member 6: the functor to be redirected to the MeasureAligner
+ * member 7: the doc
  **/
 
 class JustifyXParams : public FunctorParams {
@@ -1742,6 +1747,7 @@ public:
         m_leftBarLineX = 0;
         m_rightBarLineX = 0;
         m_systemFullWidth = 0;
+        m_applySectionRestartShift = false;
         m_functor = functor;
         m_doc = doc;
     }
@@ -1750,6 +1756,7 @@ public:
     int m_leftBarLineX;
     int m_rightBarLineX;
     int m_systemFullWidth;
+    bool m_applySectionRestartShift;
     Functor *m_functor;
     Doc *m_doc;
 };
