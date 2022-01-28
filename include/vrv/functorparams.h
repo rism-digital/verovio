@@ -461,8 +461,9 @@ public:
  * member 4: the doc
  * member 5: a pointer to the functor for passing it to the system aligner
  * member 6: a pointer to the end functor for passing it to the system aligner
- * member 7: flag whether element is in unison
- * member 8: the total shift of the current note or chord
+ * member 7: flag whether the element is in unison
+ * member 8: flag whether the element (note) has as stem.sameas note
+ * member 9: the total shift of the current note or chord
  **/
 
 class AdjustLayersParams : public FunctorParams {
@@ -476,6 +477,7 @@ public:
         m_staffNs = staffNs;
         m_unison = false;
         m_ignoreDots = true;
+        m_stemSameas = false;
         m_accumulatedShift = 0;
     }
     std::vector<int> m_staffNs;
@@ -487,6 +489,7 @@ public:
     Functor *m_functorEnd;
     bool m_unison;
     bool m_ignoreDots;
+    bool m_stemSameas;
     int m_accumulatedShift;
 };
 
@@ -1053,10 +1056,11 @@ public:
  * member 1: the vertical center of the staff
  * member 2: the actual duration of the chord / note
  * member 3: the flag for grace notes (stem is not extended)
- * member 4: the current staff (to avoid additional lookup)
- * member 5: the current layer (ditto)
- * member 6: the chord or note to which the stem belongs
- * member 7: the doc
+ * member 4: the flag for stem.sameas notes
+ * member 5: the current staff (to avoid additional lookup)
+ * member 6: the current layer (ditto)
+ * member 7: the chord or note to which the stem belongs
+ * member 8: the doc
  **/
 
 class CalcStemParams : public FunctorParams {
@@ -1067,6 +1071,7 @@ public:
         m_verticalCenter = 0;
         m_dur = DUR_1;
         m_isGraceNote = false;
+        m_stemSameas = false;
         m_staff = NULL;
         m_layer = NULL;
         m_interface = NULL;
@@ -1076,6 +1081,7 @@ public:
     int m_verticalCenter;
     int m_dur;
     bool m_isGraceNote;
+    bool m_stemSameas;
     Staff *m_staff;
     Layer *m_layer;
     StemmedDrawingInterface *m_interface;
@@ -1980,8 +1986,11 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: ArrayOfInterfaceUuidPairs holds the interface / uuid pairs to match
- * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
+ * member 0: MapOfLinkingInterfaceUuidPairs holds the interface / uuid pairs to match for links
+ * member 1: MapOfLinkingInterfaceUuidPairs holds the interface / uuid pairs to match for sameas
+ * member 2: MapOfNoteUuidPairs holds the note / uuid pairs to match for stem.sameas
+ * member 3: bool* fillList for indicating whether the pairs have to be stacked or not
+ *
  **/
 
 class PrepareLinkingParams : public FunctorParams {
@@ -1989,6 +1998,7 @@ public:
     PrepareLinkingParams() { m_fillList = true; }
     MapOfLinkingInterfaceUuidPairs m_nextUuidPairs;
     MapOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
+    MapOfNoteUuidPairs m_stemSameasUuidPairs;
     bool m_fillList;
 };
 

@@ -30,6 +30,7 @@ namespace vrv {
 class Accid;
 class Chord;
 class Note;
+class PrepareLinkingParams;
 class Slur;
 class TabGrp;
 class Tie;
@@ -232,6 +233,31 @@ public:
      */
     int GetMIDIPitch(int shift = 0);
 
+    /**
+     * @name Checker, getter and setter for a note with which the stem is shared
+     */
+    ///@{
+    bool HasStemSameasNote() const { return (m_stemSameas); }
+    Note *GetStemSameasNote() const { return m_stemSameas; }
+    void SetStemSameasNote(Note *stemSameas) { m_stemSameas = stemSameas; }
+    ///@}
+
+    /**
+     * Resovle @stem.sameas links by instanciating Note::m_stemSameas (*Note).
+     * Called twice from Object::PrepareLinks. Once to fill uuid / note pairs,
+     * and once to resolve the link. The link is bi-directional, which means
+     * that both notes have their m_stemSameas pointer instanciated.
+     */
+    void ResolveStemSameas(PrepareLinkingParams *params);
+
+    /**
+     * Calculate the stem direction of the pair of notes.
+     * The presence of a StemSameasNote() needs to be check before calling it.
+     * Encoded stem direction on the calling note is taken into account.
+     * Called from Note::CalcStem
+     */
+    data_STEMDIRECTION CalcStemDirForSameasNote(int verticalCenter);
+
 public:
     //----------------//
     // Static methods //
@@ -414,6 +440,22 @@ private:
      * indicate that it should not be written to MIDI output.
      */
     double m_scoreTimeTiedDuration;
+
+    /**
+     * A pointer to a note with which the note shares its stem and implementing @stem.sameas.
+     * The pointer is bi-directional (both notes point to each other).
+     * It is set in Note::ResolveStemSameas
+     */
+    Note *m_stemSameas;
+
+    /**
+     * The role in a stem.sameas situation.
+     * Set in Note::ResolveStemSameas and then in Note::CalcStemDirForSameasNote
+     * Used to determine if the note is the primary one (normal stem, e.g., with flag)
+     * or the secondary one (linking both notes). This depends on the drawing stem direction,
+     * which can be encoded but otherwise calculated by CalcStemDirForSameasNote
+     */
+    StemSameasDrawingRole m_stemSameasRole;
 };
 
 //----------------------------------------------------------------------------
