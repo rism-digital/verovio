@@ -734,9 +734,6 @@ int Rest::Transpose(FunctorParams *functorParams)
 
 int Rest::GenerateTimemap(FunctorParams *functorParams)
 {
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
     return this->InterfaceGenerateTimemap(functorParams, this);
 }
 
