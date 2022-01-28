@@ -458,7 +458,10 @@ public:
     /**
      * See Object::CalcMaxMeasureDuration
      */
+    ///@{
     int CalcMaxMeasureDuration(FunctorParams *functorParams) override;
+    int CalcMaxMeasureDurationEnd(FunctorParams *functorParams) override;
+    ///@}
 
     /**
      * See Object::CalcOnsetOffset

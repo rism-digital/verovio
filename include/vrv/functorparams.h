@@ -991,9 +991,11 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: std::vector<double>: a stack of maximum duration filled by the functor
- * member 1: double: the duration of the current measure
- * member 2: the current bpm
+ * member 0: the current score time
+ * member 1: the current time in seconds
+ * member 2: the current tempo
+ * member 3: the tempo adjustment
+ * member 4: factor for multibar rests
  **/
 
 class CalcMaxMeasureDurationParams : public FunctorParams {
@@ -1002,17 +1004,15 @@ public:
     {
         m_currentScoreTime = 0.0;
         m_currentRealTimeSeconds = 0.0;
-        m_maxCurrentScoreTime = 0.0;
-        m_maxCurrentRealTimeSeconds = 0.0;
         m_currentTempo = 120.0;
         m_tempoAdjustment = 1.0;
+        m_multiRestFactor = 1;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
-    double m_maxCurrentScoreTime;
-    double m_maxCurrentRealTimeSeconds;
     double m_currentTempo;
     double m_tempoAdjustment;
+    int m_multiRestFactor;
 };
 
 //----------------------------------------------------------------------------

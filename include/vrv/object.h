@@ -1289,8 +1289,9 @@ public:
     /**
      * Calculate the maximum duration of each measure.
      */
+    ///@{
     virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
+    virtual int CalcMaxMeasureDurationEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

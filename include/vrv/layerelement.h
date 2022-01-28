@@ -392,6 +392,11 @@ public:
     int GenerateTimemap(FunctorParams *functorParams) override;
 
     /**
+     * See Object::CalcMaxMeasureDuration
+     */
+    int CalcMaxMeasureDuration(FunctorParams *functorParams) override;
+
+    /**
      * See Object::ResetDrawing
      */
     int ResetDrawing(FunctorParams *functorParams) override;

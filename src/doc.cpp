@@ -274,7 +274,8 @@ void Doc::CalculateMidiTimemap()
     calcMaxMeasureDurationParams.m_currentTempo = tempo;
     calcMaxMeasureDurationParams.m_tempoAdjustment = m_options->m_midiTempoAdjustment.GetValue();
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
-    this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams);
+    Functor calcMaxMeasureDurationEnd(&Object::CalcMaxMeasureDurationEnd);
+    this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams, &calcMaxMeasureDurationEnd);
 
     // Then calculate the onset and offset times (w.r.t. the measure) for every note
     CalcOnsetOffsetParams calcOnsetOffsetParams;
