@@ -1,5 +1,4 @@
 {
-    "_comment": "Automatically generated Metadata for the Leipzig font. Most (but not all) of these metadata come from the SMuFL specifications.",
     "engravingDefaults": {
         "arrowShaftThickness": 0.16,
         "barlineSeparation": 0.4,
@@ -31,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.64",
+    "fontVersion": "5.2.66",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -113,6 +112,36 @@
                 -1.356
             ]
         },
+        "accidentalDoubleFlat": {
+            "bBoxNE": [
+                1.552,
+                1.876
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.7
+            ]
+        },
+        "accidentalDoubleSharp": {
+            "bBoxNE": [
+                1.028,
+                0.48
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.48
+            ]
+        },
+        "accidentalFlat": {
+            "bBoxNE": [
+                0.792,
+                1.876
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.7
+            ]
+        },
         "accidentalKomaFlat": {
             "bBoxNE": [
                 0.792,
@@ -151,6 +180,16 @@
             "bBoxSW": [
                 0.0,
                 -1.356
+            ]
+        },
+        "accidentalNatural": {
+            "bBoxNE": [
+                0.628,
+                1.404
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.404
             ]
         },
         "accidentalNaturalFlat": {
@@ -193,6 +232,26 @@
                 -1.0
             ]
         },
+        "accidentalQuarterToneFlatArrowUp": {
+            "bBoxNE": [
+                0.88,
+                2.408
+            ],
+            "bBoxSW": [
+                -0.172,
+                -0.736
+            ]
+        },
+        "accidentalQuarterToneFlatNaturalArrowDown": {
+            "bBoxNE": [
+                0.884,
+                1.508
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.94
+            ]
+        },
         "accidentalQuarterToneFlatStein": {
             "bBoxNE": [
                 0.792,
@@ -203,10 +262,40 @@
                 -0.7
             ]
         },
+        "accidentalQuarterToneSharpArrowDown": {
+            "bBoxNE": [
+                0.788,
+                1.528
+            ],
+            "bBoxSW": [
+                -0.1,
+                -1.892
+            ]
+        },
+        "accidentalQuarterToneSharpNaturalArrowUp": {
+            "bBoxNE": [
+                0.708,
+                1.94
+            ],
+            "bBoxSW": [
+                -0.184,
+                -1.508
+            ]
+        },
         "accidentalQuarterToneSharpStein": {
             "bBoxNE": [
                 0.424,
                 1.312
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.356
+            ]
+        },
+        "accidentalSharp": {
+            "bBoxNE": [
+                0.788,
+                1.42
             ],
             "bBoxSW": [
                 0.0,
@@ -223,6 +312,16 @@
                 -1.356
             ]
         },
+        "accidentalThreeQuarterTonesFlatArrowDown": {
+            "bBoxNE": [
+                0.88,
+                1.976
+            ],
+            "bBoxSW": [
+                -0.184,
+                -1.416
+            ]
+        },
         "accidentalThreeQuarterTonesFlatZimmermann": {
             "bBoxNE": [
                 1.664,
@@ -231,6 +330,16 @@
             "bBoxSW": [
                 0.0,
                 -0.7
+            ]
+        },
+        "accidentalThreeQuarterTonesSharpArrowUp": {
+            "bBoxNE": [
+                0.788,
+                1.844
+            ],
+            "bBoxSW": [
+                -0.096,
+                -1.456
             ]
         },
         "accidentalThreeQuarterTonesSharpStein": {
@@ -263,6 +372,16 @@
                 -1.356
             ]
         },
+        "articAccentAbove": {
+            "bBoxNE": [
+                1.388,
+                0.944
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "articAccentBelow": {
             "bBoxNE": [
                 1.388,
@@ -271,6 +390,16 @@
             "bBoxSW": [
                 0.0,
                 -0.944
+            ]
+        },
+        "articAccentStaccatoAbove": {
+            "bBoxNE": [
+                1.388,
+                1.384
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
             ]
         },
         "articAccentStaccatoBelow": {
@@ -303,6 +432,16 @@
                 -0.384
             ]
         },
+        "articMarcatoAbove": {
+            "bBoxNE": [
+                1.092,
+                1.06
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "articMarcatoBelow": {
             "bBoxNE": [
                 1.096,
@@ -311,6 +450,16 @@
             "bBoxSW": [
                 0.004,
                 -1.06
+            ]
+        },
+        "articMarcatoStaccatoAbove": {
+            "bBoxNE": [
+                1.092,
+                1.5
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
             ]
         },
         "articMarcatoStaccatoBelow": {
@@ -363,6 +512,16 @@
                 -0.944
             ]
         },
+        "articStaccatissimoAbove": {
+            "bBoxNE": [
+                0.4422,
+                0.976
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "articStaccatissimoBelow": {
             "bBoxNE": [
                 0.4422,
@@ -413,6 +572,16 @@
                 -0.896
             ]
         },
+        "articStaccatoAbove": {
+            "bBoxNE": [
+                0.38,
+                0.376
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "articStaccatoBelow": {
             "bBoxNE": [
                 0.38,
@@ -441,6 +610,16 @@
             "bBoxSW": [
                 0.0,
                 -0.7781
+            ]
+        },
+        "articTenutoAbove": {
+            "bBoxNE": [
+                1.384,
+                0.144
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
             ]
         },
         "articTenutoAccentAbove": {
@@ -473,6 +652,16 @@
                 -0.144
             ]
         },
+        "articTenutoStaccatoAbove": {
+            "bBoxNE": [
+                1.388,
+                0.692
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "articTenutoStaccatoBelow": {
             "bBoxNE": [
                 1.388,
@@ -503,6 +692,26 @@
                 -0.668
             ]
         },
+        "barlineDouble": {
+            "bBoxNE": [
+                0.704,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "barlineFinal": {
+            "bBoxNE": [
+                1.052,
+                4.0
+            ],
+            "bBoxSW": [
+                0.004,
+                0.0
+            ]
+        },
         "barlineHeavy": {
             "bBoxNE": [
                 0.5,
@@ -523,6 +732,36 @@
                 0.0
             ]
         },
+        "barlineReverseFinal": {
+            "bBoxNE": [
+                1.052,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "barlineShort": {
+            "bBoxNE": [
+                0.152,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                2.0
+            ]
+        },
+        "barlineSingle": {
+            "bBoxNE": [
+                0.152,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "barlineTick": {
             "bBoxNE": [
                 0.152,
@@ -531,6 +770,16 @@
             "bBoxSW": [
                 0.0,
                 3.0
+            ]
+        },
+        "brace": {
+            "bBoxNE": [
+                0.3709,
+                3.9954
+            ],
+            "bBoxSW": [
+                0.0004,
+                0.0046
             ]
         },
         "bracketBottom": {
@@ -583,6 +832,16 @@
                 0.0
             ]
         },
+        "breathMarkComma": {
+            "bBoxNE": [
+                0.72,
+                1.2
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "buzzRoll": {
             "bBoxNE": [
                 0.624,
@@ -591,6 +850,16 @@
             "bBoxSW": [
                 -0.62,
                 -0.464
+            ]
+        },
+        "cClef": {
+            "bBoxNE": [
+                2.424,
+                2.008
+            ],
+            "bBoxSW": [
+                0.0,
+                -2.008
             ]
         },
         "cClef8vb": {
@@ -631,6 +900,16 @@
             "bBoxSW": [
                 0.0,
                 -2.008
+            ]
+        },
+        "chantCclef": {
+            "bBoxNE": [
+                0.724,
+                0.808
+            ],
+            "bBoxSW": [
+                -0.004,
+                -0.808
             ]
         },
         "chantCustosStemDownPosHigh": {
@@ -693,6 +972,16 @@
                 -0.384
             ]
         },
+        "chantFclef": {
+            "bBoxNE": [
+                0.724,
+                0.808
+            ],
+            "bBoxSW": [
+                -0.756,
+                -1.072
+            ]
+        },
         "clef15": {
             "bBoxNE": [
                 0.92,
@@ -713,6 +1002,16 @@
                 0.0
             ]
         },
+        "coda": {
+            "bBoxNE": [
+                2.148,
+                2.32
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.292
+            ]
+        },
         "codaSquare": {
             "bBoxNE": [
                 2.148,
@@ -721,6 +1020,26 @@
             "bBoxSW": [
                 0.0,
                 -0.292
+            ]
+        },
+        "daCapo": {
+            "bBoxNE": [
+                3.74,
+                1.624
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.088
+            ]
+        },
+        "dalSegno": {
+            "bBoxNE": [
+                3.44,
+                1.616
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.056
             ]
         },
         "dynamicFF": {
@@ -773,6 +1092,16 @@
                 -0.892
             ]
         },
+        "dynamicForte": {
+            "bBoxNE": [
+                1.22,
+                1.768
+            ],
+            "bBoxSW": [
+                -0.572,
+                -0.892
+            ]
+        },
         "dynamicFortePiano": {
             "bBoxNE": [
                 2.26,
@@ -811,6 +1140,16 @@
             "bBoxSW": [
                 -0.176,
                 -0.668
+            ]
+        },
+        "dynamicMezzo": {
+            "bBoxNE": [
+                1.712,
+                1.048
+            ],
+            "bBoxSW": [
+                -0.176,
+                -0.072
             ]
         },
         "dynamicNiente": {
@@ -883,6 +1222,26 @@
                 -0.668
             ]
         },
+        "dynamicPiano": {
+            "bBoxNE": [
+                1.332,
+                1.052
+            ],
+            "bBoxSW": [
+                -0.196,
+                -0.668
+            ]
+        },
+        "dynamicRinforzando": {
+            "bBoxNE": [
+                0.9,
+                1.036
+            ],
+            "bBoxSW": [
+                -0.08,
+                0.0
+            ]
+        },
         "dynamicRinforzando1": {
             "bBoxNE": [
                 2.12,
@@ -901,6 +1260,16 @@
             "bBoxSW": [
                 -0.08,
                 -0.892
+            ]
+        },
+        "dynamicSforzando": {
+            "bBoxNE": [
+                0.776,
+                1.08
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
             ]
         },
         "dynamicSforzando1": {
@@ -963,6 +1332,26 @@
                 -0.892
             ]
         },
+        "dynamicZ": {
+            "bBoxNE": [
+                1.04,
+                0.996
+            ],
+            "bBoxSW": [
+                -0.144,
+                -0.064
+            ]
+        },
+        "fClef": {
+            "bBoxNE": [
+                2.792,
+                1.004
+            ],
+            "bBoxSW": [
+                0.016,
+                -2.324
+            ]
+        },
         "fClef15ma": {
             "bBoxNE": [
                 2.792,
@@ -981,6 +1370,26 @@
             "bBoxSW": [
                 0.016,
                 -3.02
+            ]
+        },
+        "fClef8va": {
+            "bBoxNE": [
+                2.792,
+                1.868
+            ],
+            "bBoxSW": [
+                0.016,
+                -2.324
+            ]
+        },
+        "fClef8vb": {
+            "bBoxNE": [
+                2.792,
+                1.004
+            ],
+            "bBoxSW": [
+                0.016,
+                -3.0
             ]
         },
         "fClefChange": {
@@ -1011,6 +1420,26 @@
             "bBoxSW": [
                 0.016,
                 -2.324
+            ]
+        },
+        "fermataAbove": {
+            "bBoxNE": [
+                2.42,
+                1.28
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.012
+            ]
+        },
+        "fermataBelow": {
+            "bBoxNE": [
+                2.42,
+                0.012
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.28
             ]
         },
         "fermataLongAbove": {
@@ -1263,6 +1692,16 @@
                 -2.28
             ]
         },
+        "flag128thUp": {
+            "bBoxNE": [
+                1.104,
+                2.28
+            ],
+            "bBoxSW": [
+                0.0,
+                -3.116
+            ]
+        },
         "flag16thDown": {
             "bBoxNE": [
                 1.104,
@@ -1271,6 +1710,16 @@
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "flag16thUp": {
+            "bBoxNE": [
+                1.104,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -3.116
             ]
         },
         "flag256thDown": {
@@ -1303,6 +1752,16 @@
                 -0.76
             ]
         },
+        "flag32ndUp": {
+            "bBoxNE": [
+                1.104,
+                0.76
+            ],
+            "bBoxSW": [
+                0.0,
+                -3.116
+            ]
+        },
         "flag512thDown": {
             "bBoxNE": [
                 1.108,
@@ -1333,6 +1792,16 @@
                 -1.52
             ]
         },
+        "flag64thUp": {
+            "bBoxNE": [
+                1.104,
+                1.52
+            ],
+            "bBoxSW": [
+                0.0,
+                -3.116
+            ]
+        },
         "flag8thDown": {
             "bBoxNE": [
                 1.104,
@@ -1341,6 +1810,26 @@
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "flag8thUp": {
+            "bBoxNE": [
+                1.104,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -2.776
+            ]
+        },
+        "gClef": {
+            "bBoxNE": [
+                2.584,
+                4.332
+            ],
+            "bBoxSW": [
+                -0.004,
+                -2.62
             ]
         },
         "gClef15ma": {
@@ -1361,6 +1850,26 @@
             "bBoxSW": [
                 -0.004,
                 -3.572
+            ]
+        },
+        "gClef8va": {
+            "bBoxNE": [
+                2.584,
+                5.268
+            ],
+            "bBoxSW": [
+                -0.004,
+                -2.62
+            ]
+        },
+        "gClef8vb": {
+            "bBoxNE": [
+                2.584,
+                4.332
+            ],
+            "bBoxSW": [
+                -0.004,
+                -3.56
             ]
         },
         "gClef8vbCClef": {
@@ -1433,6 +1942,16 @@
                 0.0
             ]
         },
+        "keyboardPedalPed": {
+            "bBoxNE": [
+                2.78,
+                2.056
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "keyboardPedalS": {
             "bBoxNE": [
                 1.512,
@@ -1453,6 +1972,16 @@
                 -0.056
             ]
         },
+        "keyboardPedalUp": {
+            "bBoxNE": [
+                1.724,
+                1.672
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "leftRepeatSmall": {
             "bBoxNE": [
                 1.86,
@@ -1466,297 +1995,317 @@
         "luteDuration16th": {
             "bBoxNE": [
                 1.568,
-                2.544
+                3.144
             ],
             "bBoxSW": [
-                -0.0,
-                0.0
+                0.0,
+                -0.004
             ]
         },
         "luteDuration32nd": {
             "bBoxNE": [
                 1.544,
-                2.812
+                3.412
             ],
             "bBoxSW": [
-                0.004,
+                0.0,
                 -0.004
             ]
         },
         "luteDuration8th": {
             "bBoxNE": [
                 1.568,
-                2.524
+                3.124
             ],
             "bBoxSW": [
-                -0.0,
-                -0.0
+                0.0,
+                0.0
+            ]
+        },
+        "luteDurationDoubleWhole": {
+            "bBoxNE": [
+                0.368,
+                3.164
+            ],
+            "bBoxSW": [
+                -0.328,
+                0.0
             ]
         },
         "luteDurationHalf": {
             "bBoxNE": [
                 1.616,
-                2.58
+                3.18
             ],
             "bBoxSW": [
-                -0.0,
-                -0.004
+                -0.004,
+                0.0
             ]
         },
         "luteDurationQuarter": {
             "bBoxNE": [
                 1.56,
-                2.54
+                3.14
             ],
             "bBoxSW": [
-                -0.0,
-                -0.0
+                0.0,
+                0.0
             ]
         },
         "luteDurationWhole": {
             "bBoxNE": [
                 0.352,
-                2.564
+                3.164
             ],
             "bBoxSW": [
-                -0.328,
-                -0.0
+                0.0,
+                0.0
             ]
         },
         "luteFrenchFretA": {
             "bBoxNE": [
-                1.34,
-                0.924
+                1.116,
+                0.8112
             ],
             "bBoxSW": [
-                -0.0,
-                -0.04
+                -0.0024,
+                0.0
             ]
         },
         "luteFrenchFretB": {
             "bBoxNE": [
-                0.944,
-                1.5
+                0.9064,
+                1.2528
             ],
             "bBoxSW": [
-                -0.144,
-                -0.016
+                -0.004,
+                -0.0
             ]
         },
         "luteFrenchFretC": {
             "bBoxNE": [
-                0.892,
-                1.116
+                1.0088,
+                0.936
             ],
             "bBoxSW": [
-                -0.316,
-                0.0
+                0.0024,
+                0.0032
             ]
         },
         "luteFrenchFretD": {
             "bBoxNE": [
-                1.028,
-                1.48
+                1.6536,
+                1.2256
             ],
             "bBoxSW": [
-                -0.988,
-                -0.0
+                0.0008,
+                0.0016
             ]
         },
         "luteFrenchFretE": {
             "bBoxNE": [
-                0.888,
-                1.332
+                0.7504,
+                1.1056
             ],
             "bBoxSW": [
-                -0.0,
+                0.0,
                 0.0
             ]
         },
         "luteFrenchFretF": {
             "bBoxNE": [
-                1.016,
-                1.416
+                0.847,
+                1.42
             ],
             "bBoxSW": [
-                0.0,
-                -0.388
+                -0.0,
+                0.0
             ]
         },
         "luteFrenchFretG": {
             "bBoxNE": [
-                1.192,
-                0.768
+                1.284,
+                1.2776
             ],
             "bBoxSW": [
-                -0.364,
-                -0.78
+                -0.0008,
+                -0.0009
             ]
         },
         "luteFrenchFretH": {
             "bBoxNE": [
-                0.996,
-                1.408
+                1.156,
+                1.312
             ],
             "bBoxSW": [
-                -0.4,
-                -0.184
+                0.0,
+                -0.0
             ]
         },
         "luteFrenchFretI": {
             "bBoxNE": [
-                0.492,
-                1.272
+                0.608,
+                1.068
             ],
             "bBoxSW": [
-                -0.216,
-                -0.012
+                0.004,
+                0.0
             ]
         },
         "luteFrenchFretK": {
             "bBoxNE": [
-                0.748,
-                1.764
+                0.644,
+                1.42
             ],
             "bBoxSW": [
-                -0.004,
-                -0.008
+                0.0,
+                0.0
             ]
         },
         "luteFrenchFretL": {
             "bBoxNE": [
-                0.788,
-                1.692
+                0.932,
+                1.392
             ],
             "bBoxSW": [
-                -0.324,
+                0.004,
                 -0.0
             ]
         },
         "luteFrenchFretM": {
             "bBoxNE": [
-                2.156,
-                1.088
+                2.196,
+                0.9128
             ],
             "bBoxSW": [
-                -0.544,
-                -0.008
+                -0.004,
+                -0.004
             ]
         },
         "luteFrenchFretN": {
             "bBoxNE": [
-                1.224,
-                1.004
+                1.3656,
+                0.8424
             ],
             "bBoxSW": [
-                -0.432,
-                0.0
+                0.0008,
+                -0.0008
             ]
         },
         "luteItalianFret0": {
             "bBoxNE": [
-                0.88,
-                0.984
+                0.892,
+                0.996
             ],
             "bBoxSW": [
-                -0.0,
-                -0.0
+                -0.012,
+                -0.012
             ]
         },
         "luteItalianFret1": {
             "bBoxNE": [
-                0.6,
-                0.984
+                0.612,
+                0.996
             ],
             "bBoxSW": [
-                0.004,
-                -0.004
+                -0.0084,
+                -0.016
             ]
         },
         "luteItalianFret2": {
             "bBoxNE": [
-                0.664,
-                0.984
+                0.676,
+                0.996
             ],
             "bBoxSW": [
-                -0.0038,
-                0.0
+                -0.0156,
+                -0.012
             ]
         },
         "luteItalianFret3": {
             "bBoxNE": [
-                0.664,
-                0.984
+                0.676,
+                0.996
             ],
             "bBoxSW": [
-                0.0,
-                0.0
+                -0.012,
+                -0.012
             ]
         },
         "luteItalianFret4": {
             "bBoxNE": [
-                0.792,
-                0.984
+                0.804,
+                0.996
             ],
             "bBoxSW": [
-                -0.004,
-                0.0
+                -0.016,
+                -0.0121
             ]
         },
         "luteItalianFret5": {
             "bBoxNE": [
-                0.596,
-                1.004
+                0.608,
+                1.016
             ],
             "bBoxSW": [
-                -0.0,
-                -0.0
+                -0.012,
+                -0.012
             ]
         },
         "luteItalianFret6": {
             "bBoxNE": [
-                0.704,
-                0.984
+                0.716,
+                0.996
             ],
             "bBoxSW": [
-                0.0,
-                -0.0
+                -0.012,
+                -0.012
             ]
         },
         "luteItalianFret7": {
             "bBoxNE": [
-                0.648,
-                0.984
+                0.66,
+                0.996
             ],
             "bBoxSW": [
-                0.0,
-                0.0
+                -0.0121,
+                -0.012
             ]
         },
         "luteItalianFret8": {
             "bBoxNE": [
-                0.752,
-                0.984
+                0.764,
+                0.996
             ],
             "bBoxSW": [
-                -0.0,
-                0.0
+                -0.012,
+                -0.012
             ]
         },
         "luteItalianFret9": {
             "bBoxNE": [
-                0.716,
-                0.984
+                0.728,
+                0.996
             ],
             "bBoxSW": [
-                -0.0,
-                -0.0006
+                -0.012,
+                -0.0126
             ]
         },
         "medRenFlatHardB": {
             "bBoxNE": [
                 0.744,
                 1.68
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.56
+            ]
+        },
+        "medRenFlatSoftB": {
+            "bBoxNE": [
+                0.868,
+                1.652
             ],
             "bBoxSW": [
                 0.0,
@@ -1771,6 +2320,16 @@
             "bBoxSW": [
                 0.0,
                 -1.016
+            ]
+        },
+        "medRenSharpCroix": {
+            "bBoxNE": [
+                1.168,
+                0.4963
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.4963
             ]
         },
         "mensuralCclefPetrucciPosHigh": {
@@ -1943,6 +2502,26 @@
                 -0.768
             ]
         },
+        "mensuralNoteheadSemibrevisBlack": {
+            "bBoxNE": [
+                1.248,
+                0.776
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.768
+            ]
+        },
+        "mensuralNoteheadSemibrevisVoid": {
+            "bBoxNE": [
+                1.248,
+                0.776
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.768
+            ]
+        },
         "mensuralNoteheadSemiminimaWhite": {
             "bBoxNE": [
                 1.248,
@@ -1951,6 +2530,26 @@
             "bBoxSW": [
                 0.0,
                 -0.768
+            ]
+        },
+        "mensuralProlation1": {
+            "bBoxNE": [
+                1.92,
+                0.96
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.96
+            ]
+        },
+        "mensuralProlation10": {
+            "bBoxNE": [
+                1.92,
+                1.632
+            ],
+            "bBoxSW": [
+                0.12,
+                -1.632
             ]
         },
         "mensuralProlation11": {
@@ -1963,6 +2562,26 @@
                 -0.96
             ]
         },
+        "mensuralProlation2": {
+            "bBoxNE": [
+                1.92,
+                0.96
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.96
+            ]
+        },
+        "mensuralProlation3": {
+            "bBoxNE": [
+                1.92,
+                1.632
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.632
+            ]
+        },
         "mensuralProlation4": {
             "bBoxNE": [
                 1.92,
@@ -1973,7 +2592,47 @@
                 -1.632
             ]
         },
+        "mensuralProlation5": {
+            "bBoxNE": [
+                1.8,
+                0.96
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.96
+            ]
+        },
+        "mensuralProlation6": {
+            "bBoxNE": [
+                1.8,
+                0.96
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.96
+            ]
+        },
+        "mensuralProlation7": {
+            "bBoxNE": [
+                1.92,
+                0.96
+            ],
+            "bBoxSW": [
+                0.12,
+                -0.96
+            ]
+        },
         "mensuralProlation8": {
+            "bBoxNE": [
+                1.8,
+                1.632
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.632
+            ]
+        },
+        "mensuralProlation9": {
             "bBoxNE": [
                 1.8,
                 1.632
@@ -2093,6 +2752,16 @@
                 -1.064
             ]
         },
+        "mensuralRestBrevis": {
+            "bBoxNE": [
+                0.16,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "mensuralRestFusa": {
             "bBoxNE": [
                 0.472,
@@ -2101,6 +2770,26 @@
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "mensuralRestLongaImperfecta": {
+            "bBoxNE": [
+                0.16,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "mensuralRestLongaPerfecta": {
+            "bBoxNE": [
+                0.16,
+                2.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -2.0
             ]
         },
         "mensuralRestMaxima": {
@@ -2113,6 +2802,26 @@
                 -2.0
             ]
         },
+        "mensuralRestMinima": {
+            "bBoxNE": [
+                0.16,
+                0.56
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "mensuralRestSemibrevis": {
+            "bBoxNE": [
+                0.16,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.44
+            ]
+        },
         "mensuralRestSemifusa": {
             "bBoxNE": [
                 0.472,
@@ -2121,6 +2830,26 @@
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "mensuralRestSemiminima": {
+            "bBoxNE": [
+                0.472,
+                0.56
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "noteheadBlack": {
+            "bBoxNE": [
+                1.256,
+                0.532
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.532
             ]
         },
         "noteheadDiamondBlack": {
@@ -2203,6 +2932,16 @@
                 -0.68
             ]
         },
+        "noteheadHalf": {
+            "bBoxNE": [
+                1.256,
+                0.552
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.528
+            ]
+        },
         "noteheadHalfWithX": {
             "bBoxNE": [
                 1.256,
@@ -2231,6 +2970,26 @@
             "bBoxSW": [
                 -0.212,
                 -0.96
+            ]
+        },
+        "noteheadPlusBlack": {
+            "bBoxNE": [
+                1.064,
+                0.532
+            ],
+            "bBoxSW": [
+                -0.004,
+                -0.532
+            ]
+        },
+        "noteheadSlashHorizontalEnds": {
+            "bBoxNE": [
+                1.84,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
             ]
         },
         "noteheadSlashWhiteHalf": {
@@ -2303,6 +3062,16 @@
                 -0.532
             ]
         },
+        "noteheadXBlack": {
+            "bBoxNE": [
+                1.16,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
+            ]
+        },
         "octaveParensLeft": {
             "bBoxNE": [
                 0.46,
@@ -2331,6 +3100,16 @@
             "bBoxSW": [
                 0.0,
                 -0.428
+            ]
+        },
+        "ornamentLeftVerticalStroke": {
+            "bBoxNE": [
+                0.12,
+                1.6
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
             ]
         },
         "ornamentMordent": {
@@ -2623,6 +3402,56 @@
                 -0.004
             ]
         },
+        "ornamentTrill": {
+            "bBoxNE": [
+                1.728,
+                1.456
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "ornamentTurn": {
+            "bBoxNE": [
+                1.872,
+                0.976
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "ornamentTurnInverted": {
+            "bBoxNE": [
+                1.872,
+                0.976
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "ornamentTurnSlash": {
+            "bBoxNE": [
+                1.872,
+                1.276
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.324
+            ]
+        },
+        "ornamentTurnUp": {
+            "bBoxNE": [
+                0.976,
+                1.872
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "ornamentTurnUpS": {
             "bBoxNE": [
                 0.976,
@@ -2643,6 +3472,26 @@
                 0.0
             ]
         },
+        "ornamentZigZagLineNoRightEnd": {
+            "bBoxNE": [
+                1.224,
+                0.768
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "ornamentZigZagLineWithRightEnd": {
+            "bBoxNE": [
+                1.5,
+                0.768
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "ottava": {
             "bBoxNE": [
                 1.064,
@@ -2651,6 +3500,26 @@
             "bBoxSW": [
                 0.0,
                 0.004
+            ]
+        },
+        "ottavaAlta": {
+            "bBoxNE": [
+                2.628,
+                1.4
+            ],
+            "bBoxSW": [
+                0.0,
+                0.004
+            ]
+        },
+        "ottavaBassa": {
+            "bBoxNE": [
+                2.6,
+                1.328
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
             ]
         },
         "ottavaBassaBa": {
@@ -2683,6 +3552,16 @@
                 0.0
             ]
         },
+        "pluckedDamp": {
+            "bBoxNE": [
+                1.32,
+                1.32
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "pluckedLeftHandPizzicato": {
             "bBoxNE": [
                 1.32,
@@ -2703,9 +3582,39 @@
                 0.0
             ]
         },
+        "pluckedSnapPizzicatoBelow": {
+            "bBoxNE": [
+                0.824,
+                1.064
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "quindicesima": {
             "bBoxNE": [
                 1.704,
+                1.284
+            ],
+            "bBoxSW": [
+                0.012,
+                -0.032
+            ]
+        },
+        "quindicesimaAlta": {
+            "bBoxNE": [
+                3.704,
+                1.308
+            ],
+            "bBoxSW": [
+                0.012,
+                -0.032
+            ]
+        },
+        "quindicesimaBassa": {
+            "bBoxNE": [
+                3.664,
                 1.284
             ],
             "bBoxSW": [
@@ -2721,6 +3630,26 @@
             "bBoxSW": [
                 0.012,
                 -0.032
+            ]
+        },
+        "repeat1Bar": {
+            "bBoxNE": [
+                2.032,
+                0.968
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.968
+            ]
+        },
+        "repeat2Bars": {
+            "bBoxNE": [
+                3.0,
+                0.968
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.968
             ]
         },
         "repeat4Bars": {
@@ -2773,6 +3702,36 @@
                 -0.2
             ]
         },
+        "repeatDots": {
+            "bBoxNE": [
+                0.4,
+                2.7
+            ],
+            "bBoxSW": [
+                0.0,
+                1.3
+            ]
+        },
+        "repeatLeft": {
+            "bBoxNE": [
+                1.812,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "repeatRight": {
+            "bBoxNE": [
+                1.812,
+                4.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "repeatRightLeft": {
             "bBoxNE": [
                 3.124,
@@ -2793,6 +3752,26 @@
                 -3.82
             ]
         },
+        "rest128th": {
+            "bBoxNE": [
+                2.316,
+                2.708
+            ],
+            "bBoxSW": [
+                0.028,
+                -2.936
+            ]
+        },
+        "rest16th": {
+            "bBoxNE": [
+                1.3,
+                0.696
+            ],
+            "bBoxSW": [
+                0.004,
+                -1.968
+            ]
+        },
         "rest256th": {
             "bBoxNE": [
                 2.564,
@@ -2801,6 +3780,16 @@
             "bBoxSW": [
                 -0.004,
                 -3.82
+            ]
+        },
+        "rest32nd": {
+            "bBoxNE": [
+                1.596,
+                1.652
+            ],
+            "bBoxSW": [
+                0.004,
+                -1.94
             ]
         },
         "rest512th": {
@@ -2813,6 +3802,36 @@
                 -3.82
             ]
         },
+        "rest64th": {
+            "bBoxNE": [
+                1.92,
+                1.652
+            ],
+            "bBoxSW": [
+                0.008,
+                -2.872
+            ]
+        },
+        "rest8th": {
+            "bBoxNE": [
+                1.104,
+                0.732
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "restDoubleWhole": {
+            "bBoxNE": [
+                0.5,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "restDoubleWholeLegerLine": {
             "bBoxNE": [
                 1.044,
@@ -2821,6 +3840,16 @@
             "bBoxSW": [
                 0.0,
                 -0.064
+            ]
+        },
+        "restHBar": {
+            "bBoxNE": [
+                3.0,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
             ]
         },
         "restHBarLeft": {
@@ -2853,6 +3882,16 @@
                 -1.0
             ]
         },
+        "restHalf": {
+            "bBoxNE": [
+                1.2,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "restHalfLegerLine": {
             "bBoxNE": [
                 1.744,
@@ -2883,6 +3922,16 @@
                 -1.0
             ]
         },
+        "restQuarter": {
+            "bBoxNE": [
+                1.22,
+                1.488
+            ],
+            "bBoxSW": [
+                -0.0,
+                -1.552
+            ]
+        },
         "restQuarterOld": {
             "bBoxNE": [
                 1.104,
@@ -2901,6 +3950,16 @@
             "bBoxSW": [
                 0.0,
                 -1.04
+            ]
+        },
+        "restWhole": {
+            "bBoxNE": [
+                1.2,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
             ]
         },
         "restWholeLegerLine": {
@@ -2923,6 +3982,16 @@
                 0.5
             ]
         },
+        "segno": {
+            "bBoxNE": [
+                1.644,
+                2.052
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "segnoSerpent2": {
             "bBoxNE": [
                 1.8,
@@ -2933,10 +4002,40 @@
                 -0.136
             ]
         },
+        "stringsDownBow": {
+            "bBoxNE": [
+                1.24,
+                0.96
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "stringsDownBowTurned": {
             "bBoxNE": [
                 1.24,
                 0.96
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "stringsHarmonic": {
+            "bBoxNE": [
+                0.824,
+                0.824
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "stringsUpBow": {
+            "bBoxNE": [
+                1.132,
+                1.352
             ],
             "bBoxSW": [
                 0.0,
@@ -3053,6 +4152,26 @@
                 -1.0
             ]
         },
+        "timeSigCommon": {
+            "bBoxNE": [
+                1.656,
+                1.004
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.996
+            ]
+        },
+        "timeSigCutCommon": {
+            "bBoxNE": [
+                1.668,
+                1.272
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.276
+            ]
+        },
         "timeSigEquals": {
             "bBoxNE": [
                 1.368,
@@ -3151,6 +4270,36 @@
             "bBoxSW": [
                 0.0,
                 -0.504
+            ]
+        },
+        "tremolo1": {
+            "bBoxNE": [
+                0.652,
+                0.5
+            ],
+            "bBoxSW": [
+                -0.652,
+                -0.496
+            ]
+        },
+        "tremolo2": {
+            "bBoxNE": [
+                0.652,
+                0.772
+            ],
+            "bBoxSW": [
+                -0.652,
+                -0.772
+            ]
+        },
+        "tremolo3": {
+            "bBoxNE": [
+                0.648,
+                1.032
+            ],
+            "bBoxSW": [
+                -0.648,
+                -1.032
             ]
         },
         "tremolo4": {
@@ -3283,207 +4432,7 @@
                 0.2
             ]
         },
-        "uniE000": {
-            "bBoxNE": [
-                0.3709,
-                3.9954
-            ],
-            "bBoxSW": [
-                0.0004,
-                0.0046
-            ]
-        },
-        "uniE030": {
-            "bBoxNE": [
-                0.152,
-                4.0
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE031": {
-            "bBoxNE": [
-                0.704,
-                4.0
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE032": {
-            "bBoxNE": [
-                1.052,
-                4.0
-            ],
-            "bBoxSW": [
-                0.004,
-                0.0
-            ]
-        },
-        "uniE033": {
-            "bBoxNE": [
-                1.052,
-                4.0
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE038": {
-            "bBoxNE": [
-                0.152,
-                4.0
-            ],
-            "bBoxSW": [
-                0.0,
-                2.0
-            ]
-        },
-        "uniE040": {
-            "bBoxNE": [
-                1.812,
-                4.0
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE041": {
-            "bBoxNE": [
-                1.812,
-                4.0
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE043": {
-            "bBoxNE": [
-                0.4,
-                2.7
-            ],
-            "bBoxSW": [
-                0.0,
-                1.3
-            ]
-        },
-        "uniE045": {
-            "bBoxNE": [
-                3.44,
-                1.616
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.056
-            ]
-        },
-        "uniE046": {
-            "bBoxNE": [
-                3.74,
-                1.624
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.088
-            ]
-        },
-        "uniE047": {
-            "bBoxNE": [
-                1.644,
-                2.052
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE048": {
-            "bBoxNE": [
-                2.148,
-                2.32
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.292
-            ]
-        },
-        "uniE050": {
-            "bBoxNE": [
-                2.584,
-                4.332
-            ],
-            "bBoxSW": [
-                -0.004,
-                -2.62
-            ]
-        },
-        "uniE052": {
-            "bBoxNE": [
-                2.584,
-                4.332
-            ],
-            "bBoxSW": [
-                -0.004,
-                -3.56
-            ]
-        },
-        "uniE053": {
-            "bBoxNE": [
-                2.584,
-                5.268
-            ],
-            "bBoxSW": [
-                -0.004,
-                -2.62
-            ]
-        },
-        "uniE05C": {
-            "bBoxNE": [
-                2.424,
-                2.008
-            ],
-            "bBoxSW": [
-                0.0,
-                -2.008
-            ]
-        },
-        "uniE062": {
-            "bBoxNE": [
-                2.792,
-                1.004
-            ],
-            "bBoxSW": [
-                0.016,
-                -2.324
-            ]
-        },
-        "uniE064": {
-            "bBoxNE": [
-                2.792,
-                1.004
-            ],
-            "bBoxSW": [
-                0.016,
-                -3.0
-            ]
-        },
-        "uniE065": {
-            "bBoxNE": [
-                2.792,
-                1.868
-            ],
-            "bBoxSW": [
-                0.016,
-                -2.324
-            ]
-        },
-        "uniE069": {
+        "unpitchedPercussionClef1": {
             "bBoxNE": [
                 1.3,
                 1.0
@@ -3493,7 +4442,7 @@
                 -1.0
             ]
         },
-        "uniE06A": {
+        "unpitchedPercussionClef2": {
             "bBoxNE": [
                 1.028,
                 1.58
@@ -3501,966 +4450,6 @@
             "bBoxSW": [
                 0.0,
                 -1.584
-            ]
-        },
-        "uniE08A": {
-            "bBoxNE": [
-                1.656,
-                1.004
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.996
-            ]
-        },
-        "uniE08B": {
-            "bBoxNE": [
-                1.668,
-                1.272
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.276
-            ]
-        },
-        "uniE0A3": {
-            "bBoxNE": [
-                1.256,
-                0.552
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.528
-            ]
-        },
-        "uniE0A4": {
-            "bBoxNE": [
-                1.256,
-                0.532
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.532
-            ]
-        },
-        "uniE0A5": {
-            "bBoxNE": [
-                0.0,
-                0.0
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE0A9": {
-            "bBoxNE": [
-                1.16,
-                0.5
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.5
-            ]
-        },
-        "uniE0AF": {
-            "bBoxNE": [
-                1.064,
-                0.532
-            ],
-            "bBoxSW": [
-                -0.004,
-                -0.532
-            ]
-        },
-        "uniE101": {
-            "bBoxNE": [
-                1.84,
-                1.0
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.0
-            ]
-        },
-        "uniE220": {
-            "bBoxNE": [
-                0.652,
-                0.5
-            ],
-            "bBoxSW": [
-                -0.652,
-                -0.496
-            ]
-        },
-        "uniE221": {
-            "bBoxNE": [
-                0.652,
-                0.772
-            ],
-            "bBoxSW": [
-                -0.652,
-                -0.772
-            ]
-        },
-        "uniE222": {
-            "bBoxNE": [
-                0.648,
-                1.032
-            ],
-            "bBoxSW": [
-                -0.648,
-                -1.032
-            ]
-        },
-        "uniE240": {
-            "bBoxNE": [
-                1.104,
-                0.0
-            ],
-            "bBoxSW": [
-                0.0,
-                -2.776
-            ]
-        },
-        "uniE242": {
-            "bBoxNE": [
-                1.104,
-                0.0
-            ],
-            "bBoxSW": [
-                0.0,
-                -3.116
-            ]
-        },
-        "uniE244": {
-            "bBoxNE": [
-                1.104,
-                0.76
-            ],
-            "bBoxSW": [
-                0.0,
-                -3.116
-            ]
-        },
-        "uniE246": {
-            "bBoxNE": [
-                1.104,
-                1.52
-            ],
-            "bBoxSW": [
-                0.0,
-                -3.116
-            ]
-        },
-        "uniE248": {
-            "bBoxNE": [
-                1.104,
-                2.28
-            ],
-            "bBoxSW": [
-                0.0,
-                -3.116
-            ]
-        },
-        "uniE260": {
-            "bBoxNE": [
-                0.792,
-                1.876
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.7
-            ]
-        },
-        "uniE261": {
-            "bBoxNE": [
-                0.628,
-                1.404
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.404
-            ]
-        },
-        "uniE262": {
-            "bBoxNE": [
-                0.788,
-                1.42
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.356
-            ]
-        },
-        "uniE263": {
-            "bBoxNE": [
-                1.028,
-                0.48
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.48
-            ]
-        },
-        "uniE264": {
-            "bBoxNE": [
-                1.552,
-                1.876
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.7
-            ]
-        },
-        "uniE270": {
-            "bBoxNE": [
-                0.88,
-                2.408
-            ],
-            "bBoxSW": [
-                -0.172,
-                -0.736
-            ]
-        },
-        "uniE271": {
-            "bBoxNE": [
-                0.88,
-                1.976
-            ],
-            "bBoxSW": [
-                -0.184,
-                -1.416
-            ]
-        },
-        "uniE272": {
-            "bBoxNE": [
-                0.708,
-                1.94
-            ],
-            "bBoxSW": [
-                -0.184,
-                -1.508
-            ]
-        },
-        "uniE273": {
-            "bBoxNE": [
-                0.884,
-                1.508
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.94
-            ]
-        },
-        "uniE274": {
-            "bBoxNE": [
-                0.788,
-                1.844
-            ],
-            "bBoxSW": [
-                -0.096,
-                -1.456
-            ]
-        },
-        "uniE275": {
-            "bBoxNE": [
-                0.788,
-                1.528
-            ],
-            "bBoxSW": [
-                -0.1,
-                -1.892
-            ]
-        },
-        "uniE4A0": {
-            "bBoxNE": [
-                1.388,
-                0.944
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE4A2": {
-            "bBoxNE": [
-                0.38,
-                0.376
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE4A4": {
-            "bBoxNE": [
-                1.384,
-                0.144
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE4A6": {
-            "bBoxNE": [
-                0.4422,
-                0.976
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE4AC": {
-            "bBoxNE": [
-                1.092,
-                1.06
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE4AE": {
-            "bBoxNE": [
-                1.092,
-                1.5
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE4B0": {
-            "bBoxNE": [
-                1.388,
-                1.384
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE4B2": {
-            "bBoxNE": [
-                1.388,
-                0.692
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE4C0": {
-            "bBoxNE": [
-                2.42,
-                1.28
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.012
-            ]
-        },
-        "uniE4C1": {
-            "bBoxNE": [
-                2.42,
-                0.012
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.28
-            ]
-        },
-        "uniE4CE": {
-            "bBoxNE": [
-                0.72,
-                1.2
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE4E2": {
-            "bBoxNE": [
-                0.5,
-                1.0
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE4E3": {
-            "bBoxNE": [
-                1.2,
-                0.0
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.5
-            ]
-        },
-        "uniE4E4": {
-            "bBoxNE": [
-                1.2,
-                0.5
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE4E5": {
-            "bBoxNE": [
-                1.22,
-                1.488
-            ],
-            "bBoxSW": [
-                -0.0,
-                -1.552
-            ]
-        },
-        "uniE4E6": {
-            "bBoxNE": [
-                1.104,
-                0.732
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.0
-            ]
-        },
-        "uniE4E7": {
-            "bBoxNE": [
-                1.3,
-                0.696
-            ],
-            "bBoxSW": [
-                0.004,
-                -1.968
-            ]
-        },
-        "uniE4E8": {
-            "bBoxNE": [
-                1.596,
-                1.652
-            ],
-            "bBoxSW": [
-                0.004,
-                -1.94
-            ]
-        },
-        "uniE4E9": {
-            "bBoxNE": [
-                1.92,
-                1.652
-            ],
-            "bBoxSW": [
-                0.008,
-                -2.872
-            ]
-        },
-        "uniE4EA": {
-            "bBoxNE": [
-                2.316,
-                2.708
-            ],
-            "bBoxSW": [
-                0.028,
-                -2.936
-            ]
-        },
-        "uniE4EE": {
-            "bBoxNE": [
-                3.0,
-                1.0
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.0
-            ]
-        },
-        "uniE500": {
-            "bBoxNE": [
-                2.032,
-                0.968
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.968
-            ]
-        },
-        "uniE501": {
-            "bBoxNE": [
-                3.0,
-                0.968
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.968
-            ]
-        },
-        "uniE511": {
-            "bBoxNE": [
-                2.628,
-                1.4
-            ],
-            "bBoxSW": [
-                0.0,
-                0.004
-            ]
-        },
-        "uniE512": {
-            "bBoxNE": [
-                2.6,
-                1.328
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE515": {
-            "bBoxNE": [
-                3.704,
-                1.308
-            ],
-            "bBoxSW": [
-                0.012,
-                -0.032
-            ]
-        },
-        "uniE516": {
-            "bBoxNE": [
-                3.664,
-                1.284
-            ],
-            "bBoxSW": [
-                0.012,
-                -0.032
-            ]
-        },
-        "uniE520": {
-            "bBoxNE": [
-                1.332,
-                1.052
-            ],
-            "bBoxSW": [
-                -0.196,
-                -0.668
-            ]
-        },
-        "uniE521": {
-            "bBoxNE": [
-                1.712,
-                1.048
-            ],
-            "bBoxSW": [
-                -0.176,
-                -0.072
-            ]
-        },
-        "uniE522": {
-            "bBoxNE": [
-                1.22,
-                1.768
-            ],
-            "bBoxSW": [
-                -0.572,
-                -0.892
-            ]
-        },
-        "uniE523": {
-            "bBoxNE": [
-                0.9,
-                1.036
-            ],
-            "bBoxSW": [
-                -0.08,
-                0.0
-            ]
-        },
-        "uniE524": {
-            "bBoxNE": [
-                0.776,
-                1.08
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE525": {
-            "bBoxNE": [
-                1.04,
-                0.996
-            ],
-            "bBoxSW": [
-                -0.144,
-                -0.064
-            ]
-        },
-        "uniE566": {
-            "bBoxNE": [
-                1.728,
-                1.456
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE567": {
-            "bBoxNE": [
-                1.872,
-                0.976
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE568": {
-            "bBoxNE": [
-                1.872,
-                0.976
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE569": {
-            "bBoxNE": [
-                1.872,
-                1.276
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.324
-            ]
-        },
-        "uniE56A": {
-            "bBoxNE": [
-                0.976,
-                1.872
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE594": {
-            "bBoxNE": [
-                0.12,
-                1.6
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE59D": {
-            "bBoxNE": [
-                1.224,
-                0.768
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE59E": {
-            "bBoxNE": [
-                1.5,
-                0.768
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE610": {
-            "bBoxNE": [
-                1.24,
-                0.96
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE612": {
-            "bBoxNE": [
-                1.132,
-                1.352
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE614": {
-            "bBoxNE": [
-                0.824,
-                0.824
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE630": {
-            "bBoxNE": [
-                0.824,
-                1.064
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE638": {
-            "bBoxNE": [
-                1.32,
-                1.32
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE650": {
-            "bBoxNE": [
-                2.78,
-                2.056
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE655": {
-            "bBoxNE": [
-                1.724,
-                1.672
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE902": {
-            "bBoxNE": [
-                0.724,
-                0.808
-            ],
-            "bBoxSW": [
-                -0.756,
-                -1.072
-            ]
-        },
-        "uniE906": {
-            "bBoxNE": [
-                0.724,
-                0.808
-            ],
-            "bBoxSW": [
-                -0.004,
-                -0.808
-            ]
-        },
-        "uniE910": {
-            "bBoxNE": [
-                1.92,
-                0.96
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.96
-            ]
-        },
-        "uniE911": {
-            "bBoxNE": [
-                1.92,
-                0.96
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.96
-            ]
-        },
-        "uniE912": {
-            "bBoxNE": [
-                1.92,
-                1.632
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.632
-            ]
-        },
-        "uniE914": {
-            "bBoxNE": [
-                1.8,
-                0.96
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.96
-            ]
-        },
-        "uniE915": {
-            "bBoxNE": [
-                1.8,
-                0.96
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.96
-            ]
-        },
-        "uniE916": {
-            "bBoxNE": [
-                1.92,
-                0.96
-            ],
-            "bBoxSW": [
-                0.12,
-                -0.96
-            ]
-        },
-        "uniE918": {
-            "bBoxNE": [
-                1.8,
-                1.632
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.632
-            ]
-        },
-        "uniE919": {
-            "bBoxNE": [
-                1.92,
-                1.632
-            ],
-            "bBoxSW": [
-                0.12,
-                -1.632
-            ]
-        },
-        "uniE938": {
-            "bBoxNE": [
-                1.248,
-                0.776
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.768
-            ]
-        },
-        "uniE939": {
-            "bBoxNE": [
-                1.248,
-                0.776
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.768
-            ]
-        },
-        "uniE9E0": {
-            "bBoxNE": [
-                0.868,
-                1.652
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.56
-            ]
-        },
-        "uniE9E3": {
-            "bBoxNE": [
-                1.168,
-                0.4963
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.4963
-            ]
-        },
-        "uniE9F1": {
-            "bBoxNE": [
-                0.16,
-                2.0
-            ],
-            "bBoxSW": [
-                0.0,
-                -2.0
-            ]
-        },
-        "uniE9F2": {
-            "bBoxNE": [
-                0.16,
-                1.0
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.0
-            ]
-        },
-        "uniE9F3": {
-            "bBoxNE": [
-                0.16,
-                1.0
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE9F4": {
-            "bBoxNE": [
-                0.16,
-                1.0
-            ],
-            "bBoxSW": [
-                0.0,
-                0.44
-            ]
-        },
-        "uniE9F5": {
-            "bBoxNE": [
-                0.16,
-                0.56
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE9F6": {
-            "bBoxNE": [
-                0.472,
-                0.56
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
-            ]
-        },
-        "uniE9F9": {
-            "bBoxNE": [
-                0.0,
-                0.0
-            ],
-            "bBoxSW": [
-                0.0,
-                0.0
             ]
         },
         "ventiduesima": {
@@ -4631,6 +4620,26 @@
                 -0.82
             ]
         },
+        "accidentalDoubleFlat": {
+            "cutOutNE": [
+                0.856,
+                0.56
+            ],
+            "cutOutSE": [
+                1.232,
+                -0.3
+            ]
+        },
+        "accidentalFlat": {
+            "cutOutNE": [
+                0.096,
+                0.564
+            ],
+            "cutOutSE": [
+                0.432,
+                -0.344
+            ]
+        },
         "accidentalKomaFlat": {
             "cutOutNW": [
                 0.7,
@@ -4687,6 +4696,16 @@
                 -0.812
             ]
         },
+        "accidentalNatural": {
+            "cutOutNE": [
+                0.08,
+                0.736
+            ],
+            "cutOutSW": [
+                0.548,
+                -0.76
+            ]
+        },
         "accidentalNaturalFlat": {
             "cutOutNE": [
                 0.816,
@@ -4715,6 +4734,26 @@
                 -0.772
             ]
         },
+        "accidentalQuarterToneFlatArrowUp": {
+            "cutOutNE": [
+                0.564,
+                0.572
+            ],
+            "cutOutSE": [
+                0.504,
+                -0.364
+            ]
+        },
+        "accidentalQuarterToneFlatNaturalArrowDown": {
+            "cutOutNE": [
+                0.08,
+                0.772
+            ],
+            "cutOutSW": [
+                0.268,
+                -0.828
+            ]
+        },
         "accidentalQuarterToneFlatStein": {
             "cutOutNW": [
                 0.7,
@@ -4723,6 +4762,30 @@
             "cutOutSW": [
                 0.368,
                 -0.332
+            ]
+        },
+        "accidentalQuarterToneSharpArrowDown": {
+            "cutOutNE": [
+                0.624,
+                0.864
+            ],
+            "cutOutNW": [
+                0.16,
+                0.696
+            ],
+            "cutOutSE": [
+                0.62,
+                -0.684
+            ]
+        },
+        "accidentalQuarterToneSharpNaturalArrowUp": {
+            "cutOutNE": [
+                0.468,
+                0.784
+            ],
+            "cutOutSW": [
+                0.632,
+                -0.828
             ]
         },
         "accidentalQuarterToneSharpStein": {
@@ -4743,6 +4806,24 @@
                 -0.812
             ]
         },
+        "accidentalSharp": {
+            "cutOutNE": [
+                0.624,
+                0.844
+            ],
+            "cutOutNW": [
+                0.16,
+                0.644
+            ],
+            "cutOutSE": [
+                0.624,
+                -0.64
+            ],
+            "cutOutSW": [
+                0.16,
+                -0.82
+            ]
+        },
         "accidentalSharpSharp": {
             "cutOutNE": [
                 1.48,
@@ -4761,6 +4842,16 @@
                 -0.82
             ]
         },
+        "accidentalThreeQuarterTonesFlatArrowDown": {
+            "cutOutNE": [
+                0.188,
+                0.58
+            ],
+            "cutOutSE": [
+                0.588,
+                -0.272
+            ]
+        },
         "accidentalThreeQuarterTonesFlatZimmermann": {
             "cutOutNE": [
                 0.972,
@@ -4777,6 +4868,20 @@
             "cutOutSW": [
                 0.344,
                 -0.32
+            ]
+        },
+        "accidentalThreeQuarterTonesSharpArrowUp": {
+            "cutOutNE": [
+                0.62,
+                0.88
+            ],
+            "cutOutSE": [
+                0.624,
+                -0.688
+            ],
+            "cutOutSW": [
+                0.164,
+                -0.872
             ]
         },
         "accidentalThreeQuarterTonesSharpStein": {
@@ -4823,6 +4928,24 @@
             "cutOutSW": [
                 1.096,
                 -0.5
+            ]
+        },
+        "noteheadBlack": {
+            "cutOutNW": [
+                0.144,
+                0.24
+            ],
+            "cutOutSE": [
+                1.088,
+                -0.244
+            ],
+            "stemDownNW": [
+                -0.0,
+                -0.156
+            ],
+            "stemUpSE": [
+                1.256,
+                0.156
             ]
         },
         "noteheadDiamondBlack": {
@@ -4885,6 +5008,24 @@
                 -0.0
             ]
         },
+        "noteheadHalf": {
+            "cutOutNW": [
+                0.14,
+                0.24
+            ],
+            "cutOutSE": [
+                1.076,
+                -0.24
+            ],
+            "stemDownNW": [
+                0.0,
+                -0.144
+            ],
+            "stemUpSE": [
+                1.256,
+                0.164
+            ]
+        },
         "noteheadHalfWithX": {
             "cutOutNW": [
                 0.14,
@@ -4901,6 +5042,26 @@
             "stemUpSE": [
                 1.256,
                 0.164
+            ]
+        },
+        "noteheadPlusBlack": {
+            "stemDownNW": [
+                0.0,
+                0.0
+            ],
+            "stemUpSE": [
+                1.064,
+                0.0
+            ]
+        },
+        "noteheadSlashHorizontalEnds": {
+            "stemDownNW": [
+                0.0,
+                -1.0
+            ],
+            "stemUpSE": [
+                1.84,
+                1.0
             ]
         },
         "noteheadSlashWhiteHalf": {
@@ -4989,43 +5150,7 @@
                 0.0
             ]
         },
-        "uniE0A3": {
-            "cutOutNW": [
-                0.14,
-                0.24
-            ],
-            "cutOutSE": [
-                1.076,
-                -0.24
-            ],
-            "stemDownNW": [
-                0.0,
-                -0.144
-            ],
-            "stemUpSE": [
-                1.256,
-                0.164
-            ]
-        },
-        "uniE0A4": {
-            "cutOutNW": [
-                0.144,
-                0.24
-            ],
-            "cutOutSE": [
-                1.088,
-                -0.244
-            ],
-            "stemDownNW": [
-                -0.0,
-                -0.156
-            ],
-            "stemUpSE": [
-                1.256,
-                0.156
-            ]
-        },
-        "uniE0A9": {
+        "noteheadXBlack": {
             "stemDownNW": [
                 0.0,
                 -0.44
@@ -5033,142 +5158,6 @@
             "stemUpSE": [
                 1.16,
                 0.444
-            ]
-        },
-        "uniE0AF": {
-            "stemDownNW": [
-                0.0,
-                0.0
-            ],
-            "stemUpSE": [
-                1.064,
-                0.0
-            ]
-        },
-        "uniE101": {
-            "stemDownNW": [
-                0.0,
-                -1.0
-            ],
-            "stemUpSE": [
-                1.84,
-                1.0
-            ]
-        },
-        "uniE260": {
-            "cutOutNE": [
-                0.096,
-                0.564
-            ],
-            "cutOutSE": [
-                0.432,
-                -0.344
-            ]
-        },
-        "uniE261": {
-            "cutOutNE": [
-                0.08,
-                0.736
-            ],
-            "cutOutSW": [
-                0.548,
-                -0.76
-            ]
-        },
-        "uniE262": {
-            "cutOutNE": [
-                0.624,
-                0.844
-            ],
-            "cutOutNW": [
-                0.16,
-                0.644
-            ],
-            "cutOutSE": [
-                0.624,
-                -0.64
-            ],
-            "cutOutSW": [
-                0.16,
-                -0.82
-            ]
-        },
-        "uniE264": {
-            "cutOutNE": [
-                0.856,
-                0.56
-            ],
-            "cutOutSE": [
-                1.232,
-                -0.3
-            ]
-        },
-        "uniE270": {
-            "cutOutNE": [
-                0.564,
-                0.572
-            ],
-            "cutOutSE": [
-                0.504,
-                -0.364
-            ]
-        },
-        "uniE271": {
-            "cutOutNE": [
-                0.188,
-                0.58
-            ],
-            "cutOutSE": [
-                0.588,
-                -0.272
-            ]
-        },
-        "uniE272": {
-            "cutOutNE": [
-                0.468,
-                0.784
-            ],
-            "cutOutSW": [
-                0.632,
-                -0.828
-            ]
-        },
-        "uniE273": {
-            "cutOutNE": [
-                0.08,
-                0.772
-            ],
-            "cutOutSW": [
-                0.268,
-                -0.828
-            ]
-        },
-        "uniE274": {
-            "cutOutNE": [
-                0.62,
-                0.88
-            ],
-            "cutOutSE": [
-                0.624,
-                -0.688
-            ],
-            "cutOutSW": [
-                0.164,
-                -0.872
-            ]
-        },
-        "uniE275": {
-            "cutOutNE": [
-                0.624,
-                0.864
-            ],
-            "cutOutNW": [
-                0.16,
-                0.696
-            ],
-            "cutOutSE": [
-                0.62,
-                -0.684
             ]
         }
     }

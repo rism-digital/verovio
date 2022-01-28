@@ -362,6 +362,11 @@ int Measure::GetDrawingOverflow()
     return std::max(0, overflow);
 }
 
+int Measure::GetSectionRestartShift(Doc *doc) const
+{
+    return 5 * doc->GetDrawingDoubleUnit(100);
+}
+
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
     assert(!m_drawingScoreDef); // We should always call UnscoreDefSetCurrent before
@@ -1152,8 +1157,13 @@ int Measure::JustifyX(FunctorParams *functorParams)
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
     assert(params);
 
+    if (params->m_applySectionRestartShift) {
+        params->m_measureXRel += this->GetSectionRestartShift(params->m_doc);
+        params->m_applySectionRestartShift = false;
+    }
+
     if (params->m_measureXRel > 0) {
-        SetDrawingXRel(params->m_measureXRel);
+        this->SetDrawingXRel(params->m_measureXRel);
     }
     else {
         params->m_measureXRel = GetDrawingXRel();
@@ -1169,16 +1179,12 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    assert(this->GetParent());
-    Object *object = this->GetParent()->GetPrevious(this);
-    if (object && object->Is(SECTION)) {
-        Section *section = vrv_cast<Section *>(object);
-        if (section && (section->GetRestart() == BOOLEAN_true)) {
-            params->m_shift += 5 * params->m_doc->GetDrawingDoubleUnit(100);
-        }
+    if (params->m_applySectionRestartShift) {
+        params->m_shift += this->GetSectionRestartShift(params->m_doc);
+        params->m_applySectionRestartShift = false;
     }
 
-    SetDrawingXRel(params->m_shift);
+    this->SetDrawingXRel(params->m_shift);
 
     params->m_shift += this->GetWidth();
     params->m_justifiableWidth += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();

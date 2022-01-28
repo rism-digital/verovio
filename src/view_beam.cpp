@@ -55,14 +55,17 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     beam->m_beamSegment.InitCoordRefs(beam->GetElementCoords());
 
+    data_BEAMPLACE initialPlace = beam->GetPlace();
+    if (beam->HasStemSameasBeam()) beam->m_beamSegment.InitSameasRoles(beam->GetStemSameasBeam(), initialPlace);
+
     /******************************************************************/
     // Calculate the beam slope and position
 
     if (isTabBeam) {
-        beam->m_beamSegment.CalcTabBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace());
+        beam->m_beamSegment.CalcTabBeam(layer, beam->m_beamStaff, m_doc, beam, initialPlace);
     }
-    else {
-        beam->m_beamSegment.CalcBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace());
+    else if (!beam->m_beamSegment.StemSameasIsSecondary()) {
+        beam->m_beamSegment.CalcBeam(layer, beam->m_beamStaff, m_doc, beam, initialPlace);
     }
 
     /******************************************************************/
@@ -76,9 +79,10 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     DrawLayerChildren(dc, beam, layer, staff, measure);
 
     /******************************************************************/
-    // Draw the beamSegment
+    // Draw the beamSegment - but not if it is a secondary beam in a stem.sameas
 
-    DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
+    if (!beam->m_beamSegment.StemSameasIsSecondary())
+        DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
@@ -282,13 +286,18 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
     }
     int noteCount = (int)noteIndexes.size();
 
-    if (noteCount > 0) {
-        int testDur = DUR_16;
-        int barY = beamInterface->m_beamWidth;
+    int durRef = DUR_8;
+    int durRef2 = DUR_16;
 
-        if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
-            barY = -barY;
-        }
+    if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
+        durRef = DUR_4;
+        durRef2 = DUR_8;
+    }
+
+    int barY = 0;
+
+    if (noteCount > 0) {
+        int testDur = durRef2;
 
         int fractBeamWidth
             = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, beamInterface->m_fractionSize, beamInterface->m_cueSize);
@@ -299,6 +308,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
             bool start = true;
 
             int idx = 0;
+            barY += beamInterface->m_beamWidth;
 
             // all but the last one
             for (i = 0; i < noteCount - 1; ++i) {
@@ -306,43 +316,43 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                 int nextIdx = noteIndexes.at(i + 1);
 
                 bool breakSec = ((beamElementCoords->at(idx)->m_breaksec)
-                    && (testDur - DUR_8 >= beamElementCoords->at(idx)->m_breaksec));
-                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_NONE;
+                    && (testDur - durRef >= beamElementCoords->at(idx)->m_breaksec));
+                beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] = PARTIAL_NONE;
                 // partial is needed
                 if (beamElementCoords->at(idx)->m_dur >= (char)testDur) {
                     // and for the next one too, but no break - through
                     if ((beamElementCoords->at(nextIdx)->m_dur >= (char)testDur) && !breakSec) {
-                        beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_THROUGH;
+                        beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] = PARTIAL_THROUGH;
                     }
                     // not needed for the next one or break
                     else {
                         // we are starting a beam or after a beam break - put it right
                         if (start) {
                             if ((idx != 0) && (beamElementCoords->at(idx - 1)->m_element->Is(REST))) {
-                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] = PARTIAL_LEFT;
                             }
                             else {
-                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_RIGHT;
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] = PARTIAL_RIGHT;
                             }
                         }
                         // or the previous one had no partial
                         else if (beamElementCoords->at(noteIndexes.at(i - 1))->m_dur < (char)testDur) {
                             // if we are at the full bar level, put it left
-                            if (testDur == DUR_16) {
-                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
+                            if (testDur == durRef2) {
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] = PARTIAL_LEFT;
                             }
                             // if the previous level underneath was a partial through, put it left
-                            else if (beamElementCoords->at(noteIndexes.at(i - 1))->m_partialFlags[testDur - 1 - DUR_8]
+                            else if (beamElementCoords->at(noteIndexes.at(i - 1))->m_partialFlags[testDur - 1 - durRef]
                                 == PARTIAL_THROUGH) {
-                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] = PARTIAL_LEFT;
                             }
                             // if the level underneath was not left (right or through), put it right
-                            else if (beamElementCoords->at(idx)->m_partialFlags[testDur - 1 - DUR_8] != PARTIAL_LEFT) {
-                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_RIGHT;
+                            else if (beamElementCoords->at(idx)->m_partialFlags[testDur - 1 - durRef] != PARTIAL_LEFT) {
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] = PARTIAL_RIGHT;
                             }
                             // it was put left before, put it left
                             else {
-                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] = PARTIAL_LEFT;
                             }
                         }
                     }
@@ -352,17 +362,15 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
             }
             // last one
             idx = (int)noteIndexes.back();
-            beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_NONE;
+            beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] = PARTIAL_NONE;
             // partial is needed
             if ((beamElementCoords->at(idx)->m_dur >= (char)testDur)) {
                 // and the previous one had no partial - put it left
                 if ((noteCount == 1) || (beamElementCoords->at(noteIndexes.at(i - 1))->m_dur < (char)testDur)
                     || start) {
-                    beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
+                    beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] = PARTIAL_LEFT;
                 }
             }
-
-            barY = beamInterface->m_beamWidth * (testDur - DUR_8);
 
             // draw them
             for (i = 0; i < noteCount; ++i) {
@@ -384,7 +392,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                 else {
                     barYPos = shiftY * barY;
                 }
-                if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_THROUGH) {
+                if (beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] == PARTIAL_THROUGH) {
                     // through should never be set on the last one
                     assert(i < noteCount - 1);
                     if (i >= noteCount - 1) continue; // assert for debug and skip otherwise
@@ -393,14 +401,14 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                     DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1,
                         beamElementCoords->at(noteIndexes.at(i + 1))->m_x, y2, polygonHeight);
                 }
-                else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_RIGHT) {
+                else if (beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] == PARTIAL_RIGHT) {
                     y1 = beamElementCoords->at(idx)->m_yBeam + barYPos;
                     int x2 = beamElementCoords->at(idx)->m_x + fractBeamWidth;
                     y2 = beamSegment->m_firstNoteOrChord->m_yBeam + barYPos
                         + beamSegment->m_beamSlope * (x2 - beamSegment->m_firstNoteOrChord->m_x);
                     DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1, x2, y2, polygonHeight);
                 }
-                else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_LEFT) {
+                else if (beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] == PARTIAL_LEFT) {
                     y2 = beamElementCoords->at(idx)->m_yBeam + barYPos;
                     int x1 = beamElementCoords->at(idx)->m_x - fractBeamWidth;
                     y1 = beamSegment->m_firstNoteOrChord->m_yBeam + barYPos

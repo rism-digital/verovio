@@ -2,48 +2,25 @@
 
 font="VerovioText-1.0.sfd"
 
-shopt -s expand_aliases
-[[ -f ~/.bash_profile ]] && source ~/.bash_profile
+# Generate bounding boxes for the VerovioText and move to ../data/text
+echo "Generating bounding-box file ..."
+./generate_text_font $font
 
-# Requires saxon9ee and phantomjs
-# saxon9ee can be aliased from Oxygen in ~/.bash_profile
-# alias saxon9ee="java -jar /Applications/oxygen/lib/saxon9ee.jar"
-
-if [ ! -e tmp ]; then
-    mkdir tmp
-fi
-
-if ! command -v saxon9ee >/dev/null 2>&1 ; then
-	echo >&2 "Saxon9ee is required.  Aborting.";
-	exit 1;
-fi
-
-if ! command -v phantomjs >/dev/null 2>&1 ; then
-	echo >&2 "Phantomjs is required.  Aborting.";
-	exit 1;
-fi
-
-#./generate_ff.sh $1
+# Generate woff.xml
 fontforge generate_ff.py $font
 
-# base64
+# base64 and ouput woff font
 woffFont=${font%.sfd}.woff
 w=$(base64 $woffFont)
 
-# output
 cat woff-1.txt > woff.xml
 echo $w >> woff.xml
 cat woff-2.txt >> woff.xml
 
+# move woff to data folder
 mv woff.xml ../data
 
-# base64
+# base64 and output ttf font
 ttfFont=${font%.sfd}.ttf
 t=$(base64 $ttfFont)
 echo "var vrvTTF = \"$t\";" > vrv-ttf.js
-
-svgFont=${font%.sfd}.svg
-baseFont=${font%.sfd}
-echo "Generating bounding-box file ..."
-saxon9ee $svgFont extract-glyphs-verovio-text.xsl > tmp/${baseFont}-bounding-boxes.svg
-phantomjs generate-bbox.js tmp/${baseFont}-bounding-boxes.svg ../data/text/${baseFont}.xml json/verovio-text.json

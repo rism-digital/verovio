@@ -461,8 +461,9 @@ public:
  * member 4: the doc
  * member 5: a pointer to the functor for passing it to the system aligner
  * member 6: a pointer to the end functor for passing it to the system aligner
- * member 7: flag whether element is in unison
- * member 8: the total shift of the current note or chord
+ * member 7: flag whether the element is in unison
+ * member 8: flag whether the element (note) has as stem.sameas note
+ * member 9: the total shift of the current note or chord
  **/
 
 class AdjustLayersParams : public FunctorParams {
@@ -476,6 +477,7 @@ public:
         m_staffNs = staffNs;
         m_unison = false;
         m_ignoreDots = true;
+        m_stemSameas = false;
         m_accumulatedShift = 0;
     }
     std::vector<int> m_staffNs;
@@ -487,6 +489,7 @@ public:
     Functor *m_functorEnd;
     bool m_unison;
     bool m_ignoreDots;
+    bool m_stemSameas;
     int m_accumulatedShift;
 };
 
@@ -804,6 +807,8 @@ public:
 /**
  * member 0: the cumulated shift
  * member 1: the cumulated justifiable width
+ * member 2: shift next measure due to section restart
+ * member 3: the doc
  **/
 
 class AlignMeasuresParams : public FunctorParams {
@@ -812,11 +817,13 @@ public:
     {
         m_shift = 0;
         m_justifiableWidth = 0;
+        m_applySectionRestartShift = false;
         m_doc = doc;
     }
 
     int m_shift;
     int m_justifiableWidth;
+    bool m_applySectionRestartShift;
     Doc *m_doc;
 };
 
@@ -1049,10 +1056,11 @@ public:
  * member 1: the vertical center of the staff
  * member 2: the actual duration of the chord / note
  * member 3: the flag for grace notes (stem is not extended)
- * member 4: the current staff (to avoid additional lookup)
- * member 5: the current layer (ditto)
- * member 6: the chord or note to which the stem belongs
- * member 7: the doc
+ * member 4: the flag for stem.sameas notes
+ * member 5: the current staff (to avoid additional lookup)
+ * member 6: the current layer (ditto)
+ * member 7: the chord or note to which the stem belongs
+ * member 8: the doc
  **/
 
 class CalcStemParams : public FunctorParams {
@@ -1063,6 +1071,7 @@ public:
         m_verticalCenter = 0;
         m_dur = DUR_1;
         m_isGraceNote = false;
+        m_stemSameas = false;
         m_staff = NULL;
         m_layer = NULL;
         m_interface = NULL;
@@ -1072,6 +1081,7 @@ public:
     int m_verticalCenter;
     int m_dur;
     bool m_isGraceNote;
+    bool m_stemSameas;
     Staff *m_staff;
     Layer *m_layer;
     StemmedDrawingInterface *m_interface;
@@ -1555,6 +1565,14 @@ struct MIDINote {
 using MIDINoteSequence = std::list<MIDINote>;
 
 /**
+ * Helper struct for held notes in tablature
+ */
+struct MIDIHeldNote {
+    int m_pitch = 0;
+    double m_stopTime = 0;
+};
+
+/**
  * Helper struct to store chord sequences in MIDI output due to grace notes
  */
 struct MIDIChord {
@@ -1567,6 +1585,7 @@ using MIDIChordSequence = std::list<MIDIChord>;
 /**
  * member 0: MidiFile*: the MidiFile we are writing to
  * member 1: int: the midi track number
+ * member 2: int: the midi channel number
  * member 3: double: the score time from the start of the music to the start of the current measure
  * member 4: int: the semi tone transposition for the current track
  * member 5: double with the current tempo
@@ -1576,6 +1595,7 @@ using MIDIChordSequence = std::list<MIDIChord>;
  * member 9: grace note sequence
  * member 10: flag indicating whether the last grace note/chord was accented
  * member 11: the functor
+ * member 12: Tablature held notes indexed by (course - 1)
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1604,6 +1624,7 @@ public:
     MIDIChordSequence m_graceNotes;
     bool m_accentedGraceNote;
     Functor *m_functor;
+    std::vector<MIDIHeldNote> m_heldNotes;
 };
 
 //----------------------------------------------------------------------------
@@ -1693,12 +1714,14 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the justification ratio
- * member 1: the justification ratio for the measure (depends on the margin)
- * member 2: the non justifiable margin
- * member 3: the system full width (without system margins)
- * member 4: the functor to be redirected to the MeasureAligner
- * member 5: the doc
+ * member 0: the relative X position of the next measure
+ * member 1: the justification ratio
+ * member 2: the left barline X position
+ * member 3: the right barline X position
+ * member 4: the system full width (without system margins)
+ * member 5: shift next measure due to section restart
+ * member 6: the functor to be redirected to the MeasureAligner
+ * member 7: the doc
  **/
 
 class JustifyXParams : public FunctorParams {
@@ -1710,6 +1733,7 @@ public:
         m_leftBarLineX = 0;
         m_rightBarLineX = 0;
         m_systemFullWidth = 0;
+        m_applySectionRestartShift = false;
         m_functor = functor;
         m_doc = doc;
     }
@@ -1718,6 +1742,7 @@ public:
     int m_leftBarLineX;
     int m_rightBarLineX;
     int m_systemFullWidth;
+    bool m_applySectionRestartShift;
     Functor *m_functor;
     Doc *m_doc;
 };
@@ -1961,8 +1986,11 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: ArrayOfInterfaceUuidPairs holds the interface / uuid pairs to match
- * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
+ * member 0: MapOfLinkingInterfaceUuidPairs holds the interface / uuid pairs to match for links
+ * member 1: MapOfLinkingInterfaceUuidPairs holds the interface / uuid pairs to match for sameas
+ * member 2: MapOfNoteUuidPairs holds the note / uuid pairs to match for stem.sameas
+ * member 3: bool* fillList for indicating whether the pairs have to be stacked or not
+ *
  **/
 
 class PrepareLinkingParams : public FunctorParams {
@@ -1970,6 +1998,7 @@ public:
     PrepareLinkingParams() { m_fillList = true; }
     MapOfLinkingInterfaceUuidPairs m_nextUuidPairs;
     MapOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
+    MapOfNoteUuidPairs m_stemSameasUuidPairs;
     bool m_fillList;
 };
 

@@ -92,6 +92,11 @@ public:
     void AdjustDrawingStaffSize();
 
     /**
+     * Return the drawing staff size for staff notation, including for tablature staves
+     */
+    int GetDrawingStaffNotationSize();
+
+    /**
      * Check if the staff is currently visible.
      * Looks for the parent system and its current drawing scoreDef
      */
@@ -104,6 +109,9 @@ public:
     bool IsMensural();
     bool IsNeume();
     bool IsTablature();
+    bool IsTabLuteFrench() { return m_drawingNotationType == NOTATIONTYPE_tab_lute_french; }
+    bool IsTabLuteGerman() { return m_drawingNotationType == NOTATIONTYPE_tab_lute_german; }
+    bool IsTabLuteItalian() { return m_drawingNotationType == NOTATIONTYPE_tab_lute_italian; }
     ///@}
 
     /**

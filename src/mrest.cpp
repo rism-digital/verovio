@@ -90,8 +90,7 @@ int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
 int MRest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation)
 {
     if (!layer) return defaultLocation;
-    Staff *parentStaff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
-    assert(parentStaff);
+    Staff *parentStaff = this->GetAncestorStaff();
 
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
     if (parentStaff->GetChildCount(LAYER) != 2) return defaultLocation;

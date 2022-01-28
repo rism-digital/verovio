@@ -1464,6 +1464,14 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
         if (interface->GetEnd() && !interface->GetEnd()->Is(TIMESTAMP_ATTR))
             params->m_elements->push_back(interface->GetEnd());
     }
+    if (this->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(this);
+        assert(note);
+        // The note has a stem.sameas that was resolved the a note, then that one is referenced
+        if (note->HasStemSameas() && note->HasStemSameasNote()) {
+            params->m_elements->push_back(note->GetStemSameasNote());
+        }
+    }
     // These will also be referred to as milestones in page-based MEI
     if (params->m_milestoneReferences && this->IsMilestoneElement()) {
         params->m_elements->push_back(this);
@@ -1524,6 +1532,14 @@ int Object::PrepareLinking(FunctorParams *functorParams)
         LinkingInterface *interface = this->GetLinkingInterface();
         assert(interface);
         interface->InterfacePrepareLinking(functorParams, this);
+    }
+
+    if (this->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(this);
+        assert(note);
+        PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
+        assert(params);
+        note->ResolveStemSameas(params);
     }
 
     // @next

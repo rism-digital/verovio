@@ -29,6 +29,9 @@ class MeterSig;
 class Staff;
 class StaffAlignment;
 
+// Helper enums
+enum StaffSearch { ANCESTOR_ONLY = 0, RESOLVE_CROSS_STAFF };
+
 //----------------------------------------------------------------------------
 // LayerElement
 //----------------------------------------------------------------------------
@@ -180,6 +183,11 @@ public:
     Alignment *GetAlignment() const { return m_alignment; }
 
     /**
+     * Get the ancestor or cross staff
+     */
+    Staff *GetAncestorStaff(StaffSearch strategy = ANCESTOR_ONLY, bool assertExistence = true) const;
+
+    /**
      * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff.
      * Also set the corresponding m_crossLayer to layer if a cross staff is found.
      * Return NULL if there is no cross-staff in the element or a parent.
@@ -233,8 +241,8 @@ public:
      * Helper to adjust overlapping layers for notes, chords, stems, etc.
      * Returns the shift of the adjustment
      */
-    virtual int AdjustOverlappingLayers(
-        Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison);
+    virtual int AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements,
+        bool areDotsAdjusted, bool &isUnison, bool &stemSameAs);
 
     /**
      * Calculate note horizontal overlap with elemenents from another layers. Returns overlapMargin and index of other

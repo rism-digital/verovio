@@ -108,29 +108,72 @@ int Tuning::CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType
     }
 
     // no <tuning><course> specified, fall back to @tuning.standard
-    // TODO what other values for @tuning.standard will there be?
 
-    //                                 E4  B3  G3  D3  A2  E2
-    static const int guitarPitch[] = { 64, 59, 55, 50, 45, 40 }; // modern guitar
+    // modern guitar                           E4  B3  G3  D3  A2  E2
+    static const int guitarStandardPitch[] = { 64, 59, 55, 50, 45, 40 };
 
-    //                                      E4  B3  G3  D3  A2  D2
-    static const int guitarDropDPitch[] = { 64, 59, 55, 50, 45, 38 }; // modern guitar drop D
+    // modern guitar drop D                 E4  B3  G3  D3  A2  D2
+    static const int guitarDropDPitch[] = { 64, 59, 55, 50, 45, 38 };
 
-    //                               G4  D4  A3  F3  C3  G2
-    static const int lutePitch[] = { 67, 62, 57, 53, 48, 43 }; // 6 course renaissance lute
+    // modern guitar open D                 D4  A3  F#3 D3  A2  D2
+    static const int guitarOpenDPitch[] = { 62, 57, 54, 50, 45, 38 };
+
+    // modern guitar open G                 D4  B3  G3  D3  G2  D2
+    static const int guitarOpenGPitch[] = { 62, 59, 55, 50, 43, 38 };
+
+    // modern guitar open A                 E4  C#4 A3  E3  A2  E2
+    static const int guitarOpenAPitch[] = { 64, 61, 57, 52, 45, 40 };
+
+    // 6 course renaissance lute                 G4  D4  A3  F3  C3  G2
+    static const int luteRenaissance6Pitch[] = { 67, 62, 57, 53, 48, 43 };
+
+    // baroque lute D major                  F#4 D4  A3  F#3 D3  A2  G2  F#2 E2  D2  C#2 B1  A1
+    static const int luteBaroqueDMajor[] = { 66, 62, 57, 54, 50, 45, 43, 42, 40, 38, 37, 35, 33 };
+
+    // baroque lute D minor                  F4  D4  A3  F3  D3  A2  G2  F2  E2  D2  C2  B1  A1
+    static const int luteBaroqueDMinor[] = { 65, 62, 57, 53, 50, 45, 43, 41, 40, 38, 36, 35, 33 };
 
     const int *pitch = nullptr;
     int pitchSize = 0;
 
     switch (GetTuningStandard()) {
+        case COURSETUNING_guitar_standard:
+            pitch = guitarStandardPitch;
+            pitchSize = sizeof(guitarStandardPitch);
+            break;
         case COURSETUNING_guitar_drop_D:
             pitch = guitarDropDPitch;
             pitchSize = sizeof(guitarDropDPitch);
             break;
 
+        case COURSETUNING_guitar_open_D:
+            pitch = guitarOpenDPitch;
+            pitchSize = sizeof(guitarOpenDPitch);
+            break;
+
+        case COURSETUNING_guitar_open_G:
+            pitch = guitarOpenGPitch;
+            pitchSize = sizeof(guitarOpenGPitch);
+            break;
+
+        case COURSETUNING_guitar_open_A:
+            pitch = guitarOpenAPitch;
+            pitchSize = sizeof(guitarOpenAPitch);
+            break;
+
         case COURSETUNING_lute_renaissance_6:
-            pitch = lutePitch;
-            pitchSize = sizeof(lutePitch);
+            pitch = luteRenaissance6Pitch;
+            pitchSize = sizeof(luteRenaissance6Pitch);
+            break;
+
+        case COURSETUNING_lute_baroque_d_major:
+            pitch = luteBaroqueDMajor;
+            pitchSize = sizeof(luteBaroqueDMajor);
+            break;
+
+        case COURSETUNING_lute_baroque_d_minor:
+            pitch = luteBaroqueDMinor;
+            pitchSize = sizeof(luteBaroqueDMinor);
             break;
 
         case COURSETUNING_NONE: [[fallthrough]];
@@ -141,13 +184,13 @@ int Tuning::CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType
             if (notationType == NOTATIONTYPE_tab_lute_french || notationType == NOTATIONTYPE_tab_lute_italian
                 || notationType == NOTATIONTYPE_tab_lute_german) {
                 // lute tablature, assume 6 course renaissance lute
-                pitch = lutePitch;
-                pitchSize = sizeof(lutePitch);
+                pitch = luteRenaissance6Pitch;
+                pitchSize = sizeof(luteRenaissance6Pitch);
             }
             else {
                 // assume modern guitar
-                pitch = guitarPitch;
-                pitchSize = sizeof(guitarPitch);
+                pitch = guitarStandardPitch;
+                pitchSize = sizeof(guitarStandardPitch);
             }
             break;
     }

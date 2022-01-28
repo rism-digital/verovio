@@ -77,11 +77,33 @@ public:
     int GetStartingY() const;
     ///@}
 
+    /**
+     * @name Getters for the stem same as role.
+     */
+    ///@{
+    bool StemSameas() const { return (m_stemSameasRole != SAMEAS_NONE); }
+    bool StemSameasIsUnset() const { return (m_stemSameasRole == SAMEAS_UNSET); }
+    bool StemSameasIsPrimary() const { return (m_stemSameasRole == SAMEAS_PRIMARY); }
+    bool StemSameasIsSecondary() const { return (m_stemSameasRole == SAMEAS_SECONDARY); }
+    ///@}
+
+    /**
+     * @name Methods to intialize and update the role for stem.sameas context
+     * Before the drawing beam place has been calculated, the role is marked as unset.
+     * Then it is marked as primary or secondary depending on the beam place.
+     */
+    ///@{
+    void InitSameasRoles(Beam *sameasBeam, data_BEAMPLACE &drawingPlace);
+    void UpdateSameasRoles(data_BEAMPLACE place);
+    ///@}
+
 private:
     // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)
     void AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
 
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
+
+    void CalcBeamInitForNotePair(Note *note1, Note *note2, Staff *staff, int &yMax, int &yMin);
 
     bool CalcBeamSlope(
         Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step);
@@ -116,7 +138,6 @@ private:
 public:
     // values set by CalcBeam
     int m_nbNotesOrChords;
-    bool m_extendedToCenter; // the stem where extended to touch the center staff line
     double m_beamSlope; // the slope of the beam
     int m_verticalCenter;
     int m_ledgerLinesAbove;
@@ -131,6 +152,20 @@ public:
      * An array of coordinates for each element
      **/
     ArrayOfBeamElementCoords m_beamElementCoordRefs;
+
+    /**
+     * @name The role in a stem.sameas situation.
+     * Set in BeamSegment::InitSameasRoles and then in UpdateSameasRoles
+     * Used to determine if the beam is the primary one (normal stems and beams)
+     * or the secondary one (linking both notes). This depends on the drawing beam place,
+     * which can be encoded but otherwise calculated by CalcBeamPlace.
+     * The pointer to the other beam m_stemSameasReverseRole is set only for the first of the
+     * two beams and is not bi-directional. Is is set in InitSameasRoles.
+     */
+    ///@{
+    StemSameasDrawingRole m_stemSameasRole;
+    StemSameasDrawingRole *m_stemSameasReverseRole;
+    ///@}
 };
 
 //----------------------------------------------------------------------------
@@ -175,6 +210,15 @@ public:
      */
     bool IsTabBeam();
 
+    /**
+     * @name Checker, getter and setter for a beam with which the stems are shared
+     */
+    ///@{
+    bool HasStemSameasBeam() const { return (m_stemSameas); }
+    Beam *GetStemSameasBeam() const { return m_stemSameas; }
+    void SetStemSameasBeam(Beam *stemSameas) { m_stemSameas = stemSameas; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -195,6 +239,11 @@ public:
     int CalcStem(FunctorParams *functorParams) override;
 
     /**
+     * See Object::ResetHorizontalAlignment
+     */
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
+
+    /**
      * See Object::ResetDrawing
      */
     int ResetDrawing(FunctorParams *functorParams) override;
@@ -213,7 +262,13 @@ protected:
     int CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, int y2);
 
 private:
-    //
+    /**
+     * A pointer to the beam with which stems are shared.
+     * The pointer is bi-directional – each beam points to the other one.
+     * It is set in Note::ResovleStemSameas()
+     */
+    Beam *m_stemSameas;
+
 public:
     /** */
     BeamSegment m_beamSegment;

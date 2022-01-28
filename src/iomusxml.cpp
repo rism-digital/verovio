@@ -2552,48 +2552,44 @@ void MusicXmlInput::ReadMusicXmlNote(
     const int dots = (int)node.select_nodes("dot").size();
 
     short int tremSlashNum = -1;
-    pugi::xpath_node tremolo;
 
-    // TODO Tablature: support beams and tuplets.  Neither <beam> nor <tuple> support child <tabGrp>.
-    if (!isTablature) {
-        ReadMusicXmlBeamsAndTuplets(node, layer, isChord);
+    ReadMusicXmlBeamsAndTuplets(node, layer, isChord);
 
-        // beam start
-        bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
-        // tremolos
-        tremolo = notations.node().select_node("ornaments/tremolo");
+    // beam start
+    bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
+    // tremolos
+    pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
 
-        if (tremolo) {
-            if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
-                if (!isChord) {
-                    FTrem *fTrem = new FTrem();
-                    AddLayerElement(layer, fTrem);
-                    m_elementStackMap.at(layer).push_back(fTrem);
-                    int beamFloatNum = tremolo.node().text().as_int(); // number of floating beams
-                    int beamAttachedNum = 0; // number of attached beams
-                    while (beamStart && beamAttachedNum < 8) { // count number of (attached) beams, max 8
-                        std::ostringstream o;
-                        o << "beam[@number='" << ++beamAttachedNum + 1 << "'][text()='begin']";
-                        beamStart = node.select_node(o.str().c_str());
-                    }
-                    fTrem->SetBeams(beamFloatNum + beamAttachedNum);
-                    fTrem->SetBeamsFloat(beamFloatNum);
+    if (tremolo) {
+        if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
+            if (!isChord) {
+                FTrem *fTrem = new FTrem();
+                AddLayerElement(layer, fTrem);
+                m_elementStackMap.at(layer).push_back(fTrem);
+                int beamFloatNum = tremolo.node().text().as_int(); // number of floating beams
+                int beamAttachedNum = 0; // number of attached beams
+                while (beamStart && beamAttachedNum < 8) { // count number of (attached) beams, max 8
+                    std::ostringstream o;
+                    o << "beam[@number='" << ++beamAttachedNum + 1 << "'][text()='begin']";
+                    beamStart = node.select_node(o.str().c_str());
                 }
+                fTrem->SetBeams(beamFloatNum + beamAttachedNum);
+                fTrem->SetBeamsFloat(beamFloatNum);
             }
-            else if (!HasAttributeWithValue(tremolo.node(), "type", "stop")) {
-                // this is default tremolo type in MusicXML
-                tremSlashNum = tremolo.node().text().as_int();
-                if (!isChord) {
-                    BTrem *bTrem = new BTrem();
-                    AddLayerElement(layer, bTrem);
-                    m_elementStackMap.at(layer).push_back(bTrem);
-                    if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) {
-                        bTrem->SetForm(bTremLog_FORM_unmeas);
-                        tremSlashNum = 0;
-                    }
-                    else {
-                        bTrem->SetForm(bTremLog_FORM_meas);
-                    }
+        }
+        else if (!HasAttributeWithValue(tremolo.node(), "type", "stop")) {
+            // this is default tremolo type in MusicXML
+            tremSlashNum = tremolo.node().text().as_int();
+            if (!isChord) {
+                BTrem *bTrem = new BTrem();
+                AddLayerElement(layer, bTrem);
+                m_elementStackMap.at(layer).push_back(bTrem);
+                if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) {
+                    bTrem->SetForm(bTremLog_FORM_unmeas);
+                    tremSlashNum = 0;
+                }
+                else {
+                    bTrem->SetForm(bTremLog_FORM_meas);
                 }
             }
         }
@@ -2740,17 +2736,17 @@ void MusicXmlInput::ReadMusicXmlNote(
         pugi::xml_node pitch = node.child("pitch");
         if (pitch && !isTablature) {
             const std::string stepStr = pitch.child("step").text().as_string();
-            const std::string alterStr = pitch.child("alter").text().as_string();
+            const float alterVal = pitch.child("alter").text().as_float();
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
-            if (!alterStr.empty()) {
+            if (pitch.child("alter")) {
                 Accid *accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
                     note->AddChild(accid);
                     accid->IsAttribute(true);
                 }
-                const data_ACCIDENTAL_GESTURAL accidGes = ConvertAlterToAccid(std::atof(alterStr.c_str()));
+                const data_ACCIDENTAL_GESTURAL accidGes = ConvertAlterToAccid(alterVal);
                 if (!IsSameAccidWrittenGestural(accid->GetAccid(), accidGes)) {
                     accid->SetAccidGes(accidGes);
                 }
@@ -3480,7 +3476,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 Chord *chord = dynamic_cast<Chord *>(element);
                 chord->SetBreaksec(breakSec);
             }
-            // TODO Tablature: support beams, <beam> does not support child <tabGrp>
+            else if (element->Is(TABGRP)) {
+                TabGrp *tabGrp = vrv_cast<TabGrp *>(element);
+                tabGrp->SetBreaksec(breakSec);
+            }
         }
         else {
             RemoveLastFromStack(BEAM, layer);
@@ -3623,6 +3622,8 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
 
 void MusicXmlInput::ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer)
 {
+    // TODO <tuplet> does not support child <tabGrp>
+
     if (!tupletStart) return;
 
     Tuplet *tuplet = new Tuplet();
@@ -3794,8 +3795,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
             KeyAccid *keyAccid = new KeyAccid();
             keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
             if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
-                data_ACCIDENTAL_GESTURAL accidValue
-                    = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
+                data_ACCIDENTAL_GESTURAL accidValue = ConvertAlterToAccid(keyStep.next_sibling().text().as_float());
                 keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
                 if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
                     keyAccid->SetAccid(
@@ -4105,7 +4105,7 @@ data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(const std::string &value)
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported pitch name '%s'", value.c_str());
+    LogWarning("MusicXML import: Unsupported step value '%s'", value.c_str());
     return PITCHNAME_NONE;
 }
 

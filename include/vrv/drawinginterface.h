@@ -166,6 +166,9 @@ public:
      * An array of coordinates for each element
      **/
     ArrayOfBeamElementCoords m_beamElementCoords;
+
+private:
+    //
 };
 
 //----------------------------------------------------------------------------

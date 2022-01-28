@@ -33,6 +33,8 @@
 #include "staffdef.h"
 #include "vrv.h"
 
+#include "MidiFile.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -282,8 +284,7 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     assert(alignmentLast);
 
     // We are ignoring cross-staff situation here because this should not be called if we have one
-    Staff *staff = vrv_cast<Staff *>(first->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = first->GetAncestorStaff();
 
     double time = alignmentFirst->GetTime();
     double duration = alignmentLast->GetTime() - time + last->GetAlignmentDuration();
@@ -307,13 +308,7 @@ std::set<int> Layer::GetLayersNForTimeSpanOf(LayerElement *element)
     Alignment *alignment = element->GetAlignment();
     assert(alignment);
 
-    Layer *layer = NULL;
-    Staff *staff = element->GetCrossStaff(layer);
-    if (!staff) {
-        staff = dynamic_cast<Staff *>(element->GetFirstAncestor(STAFF));
-    }
-    // At this stage we have the parent or the cross-staff
-    assert(staff);
+    Staff *staff = element->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
     return this->GetLayersNInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
 }
@@ -381,13 +376,7 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool e
         return {};
     }
 
-    Layer *layer = NULL;
-    Staff *staff = element->GetCrossStaff(layer);
-    if (!staff) {
-        staff = static_cast<Staff *>(element->GetFirstAncestor(STAFF));
-    }
-    // At this stage we have the parent or the cross-staff
-    assert(staff);
+    Staff *staff = element->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
     return GetLayerElementsInTimeSpan(time, duration, measure, staff->GetN(), excludeCurrent);
 }
@@ -731,6 +720,24 @@ int Layer::ResetDrawing(FunctorParams *functorParams)
 {
     m_crossStaffFromBelow = false;
     m_crossStaffFromAbove = false;
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::GenerateMIDIEnd(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    // stop all previously held notes
+    for (auto &held : params->m_heldNotes) {
+        if (held.m_pitch > 0) {
+            params->m_midiFile->addNoteOff(params->m_midiTrack, held.m_stopTime * params->m_midiFile->getTPQ(),
+                params->m_midiChannel, held.m_pitch);
+        }
+    }
+
+    params->m_heldNotes.clear();
+
     return FUNCTOR_CONTINUE;
 }
 
