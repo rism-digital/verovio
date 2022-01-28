@@ -1258,6 +1258,12 @@ public:
     ///@}
 
     /**
+     * Cache or restore cached horizontal layout for faster layout redoing
+     */
+    ///@{
+    virtual int HorizontalLayoutCache(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust note timings based on ties
      */
     ///@{

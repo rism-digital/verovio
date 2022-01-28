@@ -1551,6 +1551,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// HorizontalLayoutCacheParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a flag indicating if the cache should be stored (default) or restored
+ * member 1: a pointer to the Doc
+ **/
+
+class HorizontalLayoutCacheParams : public FunctorParams {
+public:
+    HorizontalLayoutCacheParams(Doc *doc)
+    {
+        m_restore = false;
+        m_doc = doc;
+    }
+    bool m_restore;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // GenerateMIDIParams
 //----------------------------------------------------------------------------
 
@@ -2470,6 +2490,7 @@ public:
 /**
  * member 0: a pointer to the page we are adding system to
  * member 1: a pointer to the system we are adding content to
+ * member 2: a flag indicating if we need to reset the horizontal layout cache
  **/
 
 class UnCastOffParams : public FunctorParams {
@@ -2478,9 +2499,11 @@ public:
     {
         m_page = page;
         m_currentSystem = NULL;
+        m_resetCache = true;
     }
     Page *m_page;
     System *m_currentSystem;
+    bool m_resetCache;
 };
 
 } // namespace vrv
