@@ -559,13 +559,13 @@ void Doc::PrepareDrawing()
 
     /************ Resolve linking (@next) ************/
 
-    // Try to match all pointing elements using @next and @sameas
+    // Try to match all pointing elements using @next, @sameas and @stem.sameas
     PrepareLinkingParams prepareLinkingParams;
     Functor prepareLinking(&Object::PrepareLinking);
     this->Process(&prepareLinking, &prepareLinkingParams);
 
     // If we have some left process again backward
-    if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
+    if (!prepareLinkingParams.m_sameasUuidPairs.empty() || !prepareLinkingParams.m_stemSameasUuidPairs.empty()) {
         prepareLinkingParams.m_fillList = false;
         this->Process(&prepareLinking, &prepareLinkingParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
     }
@@ -577,6 +577,10 @@ void Doc::PrepareDrawing()
     if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
         LogWarning(
             "%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasUuidPairs.size());
+    }
+    if (!prepareLinkingParams.m_stemSameasUuidPairs.empty()) {
+        LogWarning("%d element(s) with a @stem.sameas could match the target",
+            prepareLinkingParams.m_stemSameasUuidPairs.size());
     }
 
     /************ Resolve @plist ************/

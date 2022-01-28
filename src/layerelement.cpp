@@ -1542,15 +1542,15 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     // We are processing the first layer, nothing to do yet
     if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
 
-    const int shift
-        = AdjustOverlappingLayers(params->m_doc, params->m_previous, !params->m_ignoreDots, params->m_unison);
+    const int shift = AdjustOverlappingLayers(
+        params->m_doc, params->m_previous, !params->m_ignoreDots, params->m_unison, params->m_stemSameas);
     params->m_accumulatedShift += shift;
 
     return FUNCTOR_SIBLINGS;
 }
 
 int LayerElement::AdjustOverlappingLayers(
-    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison)
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison, bool &stemSameas)
 {
     if (Is(NOTE) && GetParent()->Is(CHORD))
         return 0;
@@ -1558,11 +1558,18 @@ int LayerElement::AdjustOverlappingLayers(
         isUnison = false;
         return 0;
     }
+    else if (Is(STEM) && stemSameas) {
+        stemSameas = false;
+        return 0;
+    }
 
     auto [margin, isInUnison] = CalcElementHorizontalOverlap(doc, otherElements, areDotsAdjusted, false);
     if (Is(NOTE)) {
         isUnison = isInUnison;
         if (isUnison) return 0;
+        Note *note = vrv_cast<Note *>(this);
+        assert(note);
+        stemSameas = note->HasStemSameasNote();
     }
 
     if (Is({ DOTS, STEM })) {
