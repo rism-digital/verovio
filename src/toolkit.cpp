@@ -1446,6 +1446,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     jsonxx::Object o;
     jsonxx::Array noteArray;
     jsonxx::Array chordArray;
+    jsonxx::Array restArray;
 
     // Here we need to check that the midi timemap is done
     if (!m_doc.HasMidiTimemap()) {
@@ -1468,19 +1469,24 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     Page *page = dynamic_cast<Page *>(measure->GetFirstAncestor(PAGE));
     if (page) pageNo = page->GetIdx() + 1;
 
-    NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
-    ListOfObjects notes;
+    NoteOrRestOnsetOffsetComparison matchTime(millisec - measureTimeOffset);
+    ListOfObjects notesOrRests;
     ListOfObjects chords;
 
-    measure->FindAllDescendantsByComparison(&notes, &matchNoteTime);
+    measure->FindAllDescendantsByComparison(&notesOrRests, &matchTime);
 
     // Fill the JSON object
-    for (auto const item : notes) {
-        noteArray << item->GetUuid();
-        Note *note = vrv_cast<Note *>(item);
-        assert(note);
-        Chord *chord = note->IsChordTone();
-        if (chord) chords.push_back(chord);
+    for (auto const item : notesOrRests) {
+        if (item->Is(NOTE)) {
+            noteArray << item->GetUuid();
+            Note *note = vrv_cast<Note *>(item);
+            assert(note);
+            Chord *chord = note->IsChordTone();
+            if (chord) chords.push_back(chord);
+        }
+        else if (item->Is(REST)) {
+            restArray << item->GetUuid();
+        }
     }
     chords.unique();
     for (auto const item : chords) {
@@ -1489,7 +1495,9 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     o << "notes" << noteArray;
     o << "chords" << chordArray;
+    o << "rests" << restArray;
     o << "page" << pageNo;
+    o << "measure" << measure->GetUuid();
 
     return o.json();
 }
