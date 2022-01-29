@@ -32,7 +32,10 @@ Timemap::Timemap()
 
 Timemap::~Timemap() {}
 
-void Timemap::Reset() {}
+void Timemap::Reset()
+{
+    m_map.clear();
+}
 
 void Timemap::AddEntry(Object *object, GenerateTimemapParams *params)
 {

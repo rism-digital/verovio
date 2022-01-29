@@ -1633,10 +1633,10 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: mapping of real times with TimemapEntry
- * member 1: Score time from the start of the piece to previous barline in quarter notes
- * member 2: Real time from the start of the piece to previous barline in ms
- * member 3: Currently active tempo
+ * member 0: Score time from the start of the piece to previous barline in quarter notes
+ * member 1: Real time from the start of the piece to previous barline in ms
+ * member 2: Currently active tempo
+ * member 3: A pointer to the Timemap
  * member 4: The functor for redirection
  **/
 
