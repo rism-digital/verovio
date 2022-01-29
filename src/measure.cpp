@@ -36,6 +36,7 @@
 #include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
+#include "timemap.h"
 #include "timestamp.h"
 #include "vrv.h"
 
@@ -1553,10 +1554,11 @@ int Measure::GenerateTimemap(FunctorParams *functorParams)
     GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
-    // Deal with repeated music later, for now get the last times.
-    params->m_scoreTimeOffset = m_scoreTimeOffset.back();
-    params->m_realTimeOffsetMilliseconds = m_realTimeOffsetMilliseconds.back();
-    params->m_currentTempo = m_currentTempo;
+    params->m_scoreTimeOffset = this->m_scoreTimeOffset.back();
+    params->m_realTimeOffsetMilliseconds = this->m_realTimeOffsetMilliseconds.back();
+    params->m_currentTempo = this->m_currentTempo;
+
+    params->m_timemap->AddEntry(this, params);
 
     return FUNCTOR_CONTINUE;
 }

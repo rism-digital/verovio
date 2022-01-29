@@ -32,6 +32,7 @@
 #include "syl.h"
 #include "tabgrp.h"
 #include "tie.h"
+#include "timemap.h"
 #include "transposition.h"
 #include "tuning.h"
 #include "verse.h"
@@ -117,12 +118,6 @@ void Note::Reset()
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
-
-    m_scoreTimeOnset = 0.0;
-    m_scoreTimeOffset = 0.0;
-    m_realTimeOnsetMilliseconds = 0;
-    m_realTimeOffsetMilliseconds = 0;
-    m_scoreTimeTiedDuration = 0.0;
 
     m_stemSameas = NULL;
     m_stemSameasRole = SAMEAS_NONE;
@@ -631,33 +626,6 @@ bool Note::IsEnharmonicWith(Note *note)
     return (this->GetMIDIPitch() == note->GetMIDIPitch());
 }
 
-void Note::SetScoreTimeOnset(double scoreTime)
-{
-    m_scoreTimeOnset = scoreTime;
-}
-
-void Note::SetRealTimeOnsetSeconds(double timeInSeconds)
-{
-    // m_realTimeOnsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
-    m_realTimeOnsetMilliseconds = timeInSeconds * 1000.0;
-}
-
-void Note::SetScoreTimeOffset(double scoreTime)
-{
-    m_scoreTimeOffset = scoreTime;
-}
-
-void Note::SetRealTimeOffsetSeconds(double timeInSeconds)
-{
-    // m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
-    m_realTimeOffsetMilliseconds = timeInSeconds * 1000.0;
-}
-
-void Note::SetScoreTimeTiedDuration(double scoreTime)
-{
-    m_scoreTimeTiedDuration = scoreTime;
-}
-
 int Note::GetMIDIPitch(const int shift)
 {
     int pitch = 0;
@@ -699,36 +667,6 @@ int Note::GetMIDIPitch(const int shift)
 
     // Apply shift, i.e. from transposition instruments
     return pitch + shift;
-}
-
-double Note::GetScoreTimeOnset() const
-{
-    return m_scoreTimeOnset;
-}
-
-double Note::GetRealTimeOnsetMilliseconds() const
-{
-    return m_realTimeOnsetMilliseconds;
-}
-
-double Note::GetScoreTimeOffset() const
-{
-    return m_scoreTimeOffset;
-}
-
-double Note::GetRealTimeOffsetMilliseconds() const
-{
-    return m_realTimeOffsetMilliseconds;
-}
-
-double Note::GetScoreTimeTiedDuration() const
-{
-    return m_scoreTimeTiedDuration;
-}
-
-double Note::GetScoreTimeDuration() const
-{
-    return this->GetScoreTimeOffset() - this->GetScoreTimeOnset();
 }
 
 int Note::GetChromaticAlteration()
@@ -1555,27 +1493,7 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
     Note *note = vrv_cast<Note *>(this->ThisOrSameasAsLink());
     assert(note);
 
-    double realTimeStart = params->m_realTimeOffsetMilliseconds + note->GetRealTimeOnsetMilliseconds();
-    double scoreTimeStart = params->m_scoreTimeOffset + note->GetScoreTimeOnset();
-
-    double realTimeEnd = params->m_realTimeOffsetMilliseconds + note->GetRealTimeOffsetMilliseconds();
-    double scoreTimeEnd = params->m_scoreTimeOffset + note->GetScoreTimeOffset();
-
-    // Should check if value for realTimeStart already exists and if so, then
-    // ensure that it is equal to scoreTimeStart:
-    params->realTimeToScoreTime[realTimeStart] = scoreTimeStart;
-
-    // Store the element ID in list to turn on at given time.
-    params->realTimeToOnElements[realTimeStart].push_back(this->GetUuid());
-
-    // Should check if value for realTimeEnd already exists and if so, then
-    // ensure that it is equal to scoreTimeEnd:
-    params->realTimeToScoreTime[realTimeEnd] = scoreTimeEnd;
-
-    // Store the element ID in list to turn off at given time.
-    params->realTimeToOffElements[realTimeEnd].push_back(this->GetUuid());
-
-    params->realTimeToTempo[realTimeStart] = params->m_currentTempo;
+    params->m_timemap->AddEntry(note, params);
 
     return FUNCTOR_SIBLINGS;
 }

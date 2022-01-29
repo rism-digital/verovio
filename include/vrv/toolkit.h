@@ -380,9 +380,10 @@ public:
     /**
      * Render a document to a timemap
      *
+     * @param jsonOptions A stringified JSON objects with the timemap options
      * @return The timemap as a string
      */
-    std::string RenderToTimemap();
+    std::string RenderToTimemap(const std::string &jsonOptions = "");
 
     /**
      * Render a document to timemap and save it to the file
@@ -390,9 +391,10 @@ public:
      * This methods is not available in the JavaScript version of the toolkit.
      *
      * @param @filename The output filename
+     * @param jsonOptions A stringified JSON objects with the timemap options
      * @return True if the file was successfully written
      */
-    bool RenderToTimemapFile(const std::string &filename);
+    bool RenderToTimemapFile(const std::string &filename, const std::string &jsonOptions = "");
 
     //@}
 

@@ -57,6 +57,7 @@ class StemmedDrawingInterface;
 class Syl;
 class System;
 class SystemAligner;
+class Timemap;
 class Transposer;
 class TupletNum;
 class Turn;
@@ -1652,31 +1653,27 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: mapping of real times to score times
- * member 1: mapping of real times to elements which should be highlighted at time
- * member 2: mapping of real times to elements which should be unhighlighted at time
- * member 3: mapping of real times to tempos
- * member 4: Score time from the start of the piece to previous barline in quarter notes
- * member 5: Real time from the start of the piece to previous barline in ms
- * member 6: Currently active tempo
+ * member 0: Score time from the start of the piece to previous barline in quarter notes
+ * member 1: Real time from the start of the piece to previous barline in ms
+ * member 2: Currently active tempo
+ * member 3: A pointer to the Timemap
+ * member 4: The functor for redirection
  **/
 
 class GenerateTimemapParams : public FunctorParams {
 public:
-    GenerateTimemapParams(Functor *functor)
+    GenerateTimemapParams(Timemap *timemap, Functor *functor)
     {
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;
         m_currentTempo = 120.0;
+        m_timemap = timemap;
         m_functor = functor;
     }
-    std::map<double, double> realTimeToScoreTime;
-    std::map<double, std::vector<std::string>> realTimeToOnElements;
-    std::map<double, std::vector<std::string>> realTimeToOffElements;
-    std::map<double, double> realTimeToTempo;
     double m_scoreTimeOffset;
     double m_realTimeOffsetMilliseconds;
     double m_currentTempo;
+    Timemap *m_timemap;
     Functor *m_functor;
 };
 
