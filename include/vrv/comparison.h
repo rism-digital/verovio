@@ -60,23 +60,11 @@ class ClassIdComparison : public Comparison {
 public:
     ClassIdComparison(ClassId classId) { m_classId = classId; }
 
-    bool operator()(Object *object) override
-    {
-        if (object->Is(m_classId)) {
-            return true;
-        }
-        return false;
-    }
+    bool operator()(Object *object) override { return this->MatchesType(object); }
 
     ClassId GetType() { return m_classId; }
 
-    bool MatchesType(Object *object) override
-    {
-        if (object->Is(m_classId)) {
-            return true;
-        }
-        return false;
-    }
+    bool MatchesType(Object *object) override { return (object->Is(m_classId)); }
 
 protected:
     ClassId m_classId;
@@ -95,15 +83,9 @@ public:
         m_supportReverse = true;
     }
 
-    bool operator()(Object *object) override
-    {
-        if (object->Is(m_classIds)) {
-            return Result(true);
-        }
-        return Result(false);
-    }
+    bool operator()(Object *object) override { return Result(this->MatchesType(object)); }
 
-    bool MatchesType(Object *object) override { return true; }
+    bool MatchesType(Object *object) override { return (object->Is(m_classIds)); }
 
 protected:
     std::vector<ClassId> m_classIds;
