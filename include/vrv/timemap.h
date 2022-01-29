@@ -42,7 +42,7 @@ struct TimemapEntry {
 //----------------------------------------------------------------------------
 
 /**
- * This class represents a clock to measure runtime.
+ * This class holds a timemap for exporting onset / offset values.
  */
 class Timemap {
 public:
@@ -54,26 +54,30 @@ public:
     virtual ~Timemap();
     ///@}
 
-    /** Resets the clock */
+    /** Resets the timemap */
     void Reset();
 
+    /**
+     * Add an entry to the timemap.
+     * Currently support note and rest (duration interfaces) and measure.
+     */
     void AddEntry(Object *object, GenerateTimemapParams *params);
 
     /**
      * Write the current timemap to a JSON string
      */
-    void ToJson(std::string &output);
+    void ToJson(std::string &output, bool includetRests, bool includetMeasures);
 
 private:
     //
 public:
     //
 private:
-    /** The time point at which the clock was started */
+    /** The map with time values as keys */
     std::map<double, TimemapEntry> m_map;
 
 }; // class Timemap
 
 } // namespace vrv
 
-#endif // __VRV_RUNTIMECLOCK_H__
+#endif // __VRV_TIMEMAP_H__

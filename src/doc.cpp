@@ -412,7 +412,7 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
     GenerateTimemapParams generateTimemapParams(&timemap, &generateTimemap);
     this->Process(&generateTimemap, &generateTimemapParams);
 
-    timemap.ToJson(output);
+    timemap.ToJson(output, includeRests, includeMeasures);
 
     return true;
 }

@@ -113,12 +113,8 @@ void Timemap::AddEntry(Object *object, GenerateTimemapParams *params)
     }
 }
 
-void Timemap::ToJson(std::string &output)
+void Timemap::ToJson(std::string &output, bool includeRests, bool includeMeasures)
 {
-
-    bool includeRests = true;
-    bool includeMeasures = true;
-
     double currentTempo = -1000.0;
     double newTempo;
 

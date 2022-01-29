@@ -1401,8 +1401,8 @@ bool Toolkit::RenderToPAEFile(const std::string &filename)
 
 std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
 {
-    bool includeMeasures = true;
-    bool includeRests = true;
+    bool includeMeasures = false;
+    bool includeRests = false;
 
     jsonxx::Object json;
 
