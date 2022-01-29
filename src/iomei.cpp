@@ -3356,6 +3356,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "tuplet") {
             return true;
         }
+        else if (element == "tuplet") {
+            return true;
+        }
         else {
             return false;
         }

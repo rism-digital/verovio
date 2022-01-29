@@ -26,6 +26,7 @@
 #include "rest.h"
 #include "space.h"
 #include "staff.h"
+#include "tabgrp.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -100,6 +101,9 @@ bool Tuplet::IsSupportedChild(Object *child)
     }
     else if (child->Is(SPACE)) {
         assert(dynamic_cast<Space *>(child));
+    }
+    else if (child->Is(TABGRP)) {
+        assert(dynamic_cast<TabGrp *>(child));
     }
     else if (child->Is(TUPLET)) {
         assert(dynamic_cast<Tuplet *>(child));
