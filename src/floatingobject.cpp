@@ -53,17 +53,17 @@ thread_local std::vector<void *> FloatingObject::s_drawingObjectIds;
 
 FloatingObject::FloatingObject() : Object(FLOATING_OBJECT, "fe")
 {
-    Reset();
+    this->Reset();
 }
 
 FloatingObject::FloatingObject(ClassId classId) : Object(classId, "fe")
 {
-    Reset();
+    this->Reset();
 }
 
 FloatingObject::FloatingObject(ClassId classId, const std::string &classIdStr) : Object(classId, classIdStr)
 {
-    Reset();
+    this->Reset();
 
     m_currentPositioner = NULL;
     m_maxDrawingYRel = VRV_UNSET;
@@ -279,14 +279,14 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
     else {
         m_place = STAFFREL_NONE;
     }
-    ResetPositioner();
+    this->ResetPositioner();
 }
 
 void FloatingPositioner::ResetPositioner()
 {
     BoundingBox::ResetBoundingBox();
-    ResetCachedDrawingX();
-    ResetCachedDrawingY();
+    this->ResetCachedDrawingX();
+    this->ResetCachedDrawingY();
 
     m_objectX = NULL;
     m_objectY = NULL;
@@ -328,7 +328,7 @@ void FloatingPositioner::SetObjectXY(Object *objectX, Object *objectY)
 
 void FloatingPositioner::SetDrawingXRel(int drawingXRel)
 {
-    ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
 }
 
@@ -343,7 +343,7 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel, bool force)
     }
 
     if (setValue) {
-        ResetCachedDrawingY();
+        this->ResetCachedDrawingY();
         m_drawingYRel = drawingYRel;
     }
 }
@@ -484,7 +484,7 @@ int FloatingPositioner::GetSpaceBelow(Doc *doc, StaffAlignment *staffAlignment, 
 FloatingCurvePositioner::FloatingCurvePositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType)
     : FloatingPositioner(object, alignment, spanningType)
 {
-    ResetCurveParams();
+    this->ResetCurveParams();
 }
 
 FloatingCurvePositioner::~FloatingCurvePositioner()
@@ -496,7 +496,7 @@ void FloatingCurvePositioner::ResetPositioner()
 {
     FloatingPositioner::ResetPositioner();
 
-    ResetCurveParams();
+    this->ResetCurveParams();
 }
 
 void FloatingCurvePositioner::ClearSpannedElements()

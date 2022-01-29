@@ -34,28 +34,28 @@ namespace vrv {
 RunningElement::RunningElement()
     : Object(RUNNING_ELEMENT, "re"), ObjectListInterface(), AttHorizontalAlign(), AttTyped()
 {
-    RegisterAttClass(ATT_HORIZONTALALIGN);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_HORIZONTALALIGN);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 RunningElement::RunningElement(ClassId classId)
     : Object(classId, "re"), ObjectListInterface(), AttHorizontalAlign(), AttTyped()
 {
-    RegisterAttClass(ATT_HORIZONTALALIGN);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_HORIZONTALALIGN);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 RunningElement::RunningElement(ClassId classId, const std::string &classIdStr)
     : Object(classId, classIdStr), AttHorizontalAlign(), AttTyped()
 {
-    RegisterAttClass(ATT_HORIZONTALALIGN);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_HORIZONTALALIGN);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 RunningElement::~RunningElement() {}
@@ -63,8 +63,8 @@ RunningElement::~RunningElement() {}
 void RunningElement::Reset()
 {
     Object::Reset();
-    ResetHorizontalAlign();
-    ResetTyped();
+    this->ResetHorizontalAlign();
+    this->ResetTyped();
 
     m_isGenerated = false;
 
@@ -157,7 +157,7 @@ int RunningElement::GetDrawingY() const
 
 void RunningElement::SetDrawingYRel(int drawingYRel)
 {
-    ResetCachedDrawingY();
+    this->ResetCachedDrawingY();
     m_drawingYRel = drawingYRel;
 }
 
@@ -175,9 +175,9 @@ int RunningElement::GetWidth() const
 void RunningElement::SetDrawingPage(Page *page)
 {
 
-    ResetList(this);
+    this->ResetList(this);
 
-    ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
     m_drawingPage = page;
 
     if (page) {

@@ -40,14 +40,14 @@ Hairpin::Hairpin()
     , AttPlacementRelStaff()
     , AttVerticalGroup()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_HAIRPINLOG);
-    RegisterAttClass(ATT_HAIRPINVIS);
-    RegisterAttClass(ATT_PLACEMENTRELSTAFF);
-    RegisterAttClass(ATT_VERTICALGROUP);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_HAIRPINLOG);
+    this->RegisterAttClass(ATT_HAIRPINVIS);
+    this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
-    Reset();
+    this->Reset();
 }
 
 Hairpin::~Hairpin() {}
@@ -56,11 +56,11 @@ void Hairpin::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    ResetColor();
-    ResetHairpinLog();
-    ResetHairpinVis();
-    ResetPlacementRelStaff();
-    ResetVerticalGroup();
+    this->ResetColor();
+    this->ResetHairpinLog();
+    this->ResetHairpinVis();
+    this->ResetPlacementRelStaff();
+    this->ResetVerticalGroup();
 
     m_leftLink = NULL;
     m_rightLink = NULL;
@@ -160,8 +160,8 @@ void Hairpin::SetRightLink(ControlElement *rightLink)
 
 std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int leftX, int rightX, int spanningType)
 {
-    Measure *startMeasure = vrv_cast<Measure *>(GetStart()->GetFirstAncestor(MEASURE));
-    Measure *endMeasure = vrv_cast<Measure *>(GetEnd()->GetFirstAncestor(MEASURE));
+    Measure *startMeasure = vrv_cast<Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
+    Measure *endMeasure = vrv_cast<Measure *>(this->GetEnd()->GetFirstAncestor(MEASURE));
 
     if (!startMeasure || !endMeasure) return { 0, 0 };
 
@@ -187,7 +187,7 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
         rightBarline = endMeasure->GetRightBarLine();
     }
     else if (spanningType == SPANNING_START) {
-        System *startSystem = vrv_cast<System *>(GetStart()->GetFirstAncestor(SYSTEM));
+        System *startSystem = vrv_cast<System *>(this->GetStart()->GetFirstAncestor(SYSTEM));
         if (startSystem) {
             ClassIdComparison cmp(MEASURE);
             Measure *measure

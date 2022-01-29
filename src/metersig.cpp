@@ -29,11 +29,11 @@ static const ClassRegistrar<MeterSig> s_factory("meterSig", METERSIG);
 
 MeterSig::MeterSig() : LayerElement(METERSIG, "msig-"), AttEnclosingChars(), AttMeterSigLog(), AttMeterSigVis()
 {
-    RegisterAttClass(ATT_ENCLOSINGCHARS);
-    RegisterAttClass(ATT_METERSIGLOG);
-    RegisterAttClass(ATT_METERSIGVIS);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
+    this->RegisterAttClass(ATT_METERSIGLOG);
+    this->RegisterAttClass(ATT_METERSIGVIS);
 
-    Reset();
+    this->Reset();
 }
 
 MeterSig::~MeterSig() {}
@@ -41,9 +41,9 @@ MeterSig::~MeterSig() {}
 void MeterSig::Reset()
 {
     LayerElement::Reset();
-    ResetEnclosingChars();
-    ResetMeterSigLog();
-    ResetMeterSigVis();
+    this->ResetEnclosingChars();
+    this->ResetMeterSigLog();
+    this->ResetMeterSigVis();
 }
 
 int MeterSig::GetTotalCount() const

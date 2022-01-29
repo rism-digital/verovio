@@ -78,14 +78,14 @@ KeySig::KeySig()
     , AttKeySigVis()
     , AttVisibility()
 {
-    RegisterAttClass(ATT_ACCIDENTAL);
-    RegisterAttClass(ATT_PITCH);
-    RegisterAttClass(ATT_KEYSIGANL);
-    RegisterAttClass(ATT_KEYSIGLOG);
-    RegisterAttClass(ATT_KEYSIGVIS);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterAttClass(ATT_ACCIDENTAL);
+    this->RegisterAttClass(ATT_PITCH);
+    this->RegisterAttClass(ATT_KEYSIGANL);
+    this->RegisterAttClass(ATT_KEYSIGLOG);
+    this->RegisterAttClass(ATT_KEYSIGVIS);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
-    Reset();
+    this->Reset();
 }
 
 KeySig::~KeySig() {}
@@ -93,12 +93,12 @@ KeySig::~KeySig() {}
 void KeySig::Reset()
 {
     LayerElement::Reset();
-    ResetAccidental();
-    ResetPitch();
-    ResetKeySigAnl();
-    ResetKeySigLog();
-    ResetKeySigVis();
-    ResetVisibility();
+    this->ResetAccidental();
+    this->ResetPitch();
+    this->ResetKeySigAnl();
+    this->ResetKeySigLog();
+    this->ResetKeySigVis();
+    this->ResetVisibility();
 
     m_mixedChildrenAccidType = false;
 

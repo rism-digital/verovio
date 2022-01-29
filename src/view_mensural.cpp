@@ -81,27 +81,27 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     // Ligature, maxima,longa, and brevis
     if (note->IsInLigature() && !m_options->m_ligatureAsBracket.GetValue()) {
-        DrawLigatureNote(dc, element, layer, staff);
+        this->DrawLigatureNote(dc, element, layer, staff);
     }
     else if (drawingDur < DUR_1) {
-        DrawMaximaToBrevis(dc, yNote, element, layer, staff);
+        this->DrawMaximaToBrevis(dc, yNote, element, layer, staff);
     }
     // Semibrevis and shorter
     else {
         wchar_t code = note->GetMensuralNoteheadGlyph();
         dc->StartCustomGraphic("notehead");
-        DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
+        this->DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
         dc->EndCustomGraphic();
         // For semibrevis with stem in black notation, encoded with an explicit stem direction
         if (((drawingDur > DUR_1) || ((note->GetStemDir() != STEMDIRECTION_NONE) && mensural_black))
             && note->GetStemVisible() != BOOLEAN_false) {
-            DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
+            this->DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
         }
     }
 
     /************ Draw children (verse / syl) ************/
 
-    DrawLayerChildren(dc, note, layer, staff, measure);
+    this->DrawLayerChildren(dc, note, layer, staff, measure);
 }
 
 void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -133,7 +133,7 @@ void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *lay
         case DUR_16: charCode = SMUFL_E9F8_mensuralRestSemifusa; break;
         default: charCode = 0; // This should never happen
     }
-    DrawSmuflCode(dc, x, y, charCode, staff->m_drawingStaffSize, drawingCueSize);
+    this->DrawSmuflCode(dc, x, y, charCode, staff->m_drawingStaffSize, drawingCueSize);
 }
 
 void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -179,17 +179,17 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
+    this->DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
 
     x += perfectRadius;
     // only one slash supported
     if (mensur->HasSlash()) {
-        DrawSmuflCode(dc,
+        this->DrawSmuflCode(dc,
             x - m_doc->GetGlyphWidth(SMUFL_E925_mensuralProlationCombiningStroke, staff->m_drawingStaffSize, false) / 2,
             y, SMUFL_E925_mensuralProlationCombiningStroke, staff->m_drawingStaffSize, false);
     }
     if (mensur->GetDot() == BOOLEAN_true) {
-        DrawSmuflCode(dc,
+        this->DrawSmuflCode(dc,
             x - m_doc->GetGlyphWidth(SMUFL_E920_mensuralProlationCombiningDot, staff->m_drawingStaffSize, false) / 2, y,
             SMUFL_E920_mensuralProlationCombiningDot, staff->m_drawingStaffSize, false);
     }
@@ -201,7 +201,7 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
                 * 6; // step forward because we have a sign or a meter symbol
         }
         int numbase = mensur->HasNumbase() ? mensur->GetNumbase() : 0;
-        DrawProportFigures(dc, x, y, mensur->GetNum(), numbase, staff);
+        this->DrawProportFigures(dc, x, y, mensur->GetNum(), numbase, staff);
     }
 
     dc->EndGraphic(element, this);
@@ -282,23 +282,23 @@ void View::DrawMensuralStem(
 
         if (nbFlags > 0) {
             for (int i = 0; i < nbFlags; ++i) {
-                DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 - i * flagStemHeight,
+                this->DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 - i * flagStemHeight,
                     SMUFL_E949_mensuralCombStemUpFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
             }
         }
         else {
-            DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+            this->DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
         }
     }
     else {
         if (nbFlags > 0) {
             for (int i = 0; i < nbFlags; ++i) {
-                DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 + i * flagStemHeight,
+                this->DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 + i * flagStemHeight,
                     SMUFL_E94A_mensuralCombStemDownFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
             }
         }
         else {
-            DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+            this->DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
         }
     }
     dc->EndCustomGraphic();
@@ -345,12 +345,13 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
 
     if (!fillNotehead) {
         // double the bases of rectangles
-        DrawObliquePolygon(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, topLeft.y, -strokeWidth);
-        DrawObliquePolygon(
+        this->DrawObliquePolygon(
+            dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, topLeft.y, -strokeWidth);
+        this->DrawObliquePolygon(
             dc, topLeft.x + stemWidth, bottomRight.y, bottomRight.x - stemWidth, bottomRight.y, strokeWidth);
     }
     else {
-        DrawFilledRectangle(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, bottomRight.y);
+        this->DrawFilledRectangle(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, bottomRight.y);
     }
 
     if (note->FindDescendantByType(PLICA)) {
@@ -360,18 +361,18 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     }
 
     // serifs and / or stem
-    DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[1]);
+    this->DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[1]);
 
     if (note->GetActualDur() != DUR_BR) {
         // Right side is a stem - end the notehead first
         dc->EndCustomGraphic();
         dc->StartCustomGraphic("stem");
-        DrawFilledRectangle(dc, bottomRight.x - stemWidth, sides[2], bottomRight.x, sides[3]);
+        this->DrawFilledRectangle(dc, bottomRight.x - stemWidth, sides[2], bottomRight.x, sides[3]);
         dc->EndCustomGraphic();
     }
     else {
         // Right side is a serif
-        DrawFilledRectangle(dc, bottomRight.x - stemWidth, sides[2], bottomRight.x, sides[3]);
+        this->DrawFilledRectangle(dc, bottomRight.x - stemWidth, sides[2], bottomRight.x, sides[3]);
         dc->EndCustomGraphic();
     }
 
@@ -391,7 +392,7 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
     dc->StartGraphic(ligature, "", ligature->GetUuid());
 
     // Draw children (notes)
-    DrawLayerChildren(dc, ligature, layer, staff, measure);
+    this->DrawLayerChildren(dc, ligature, layer, staff, measure);
 
     // Render a bracket for the ligature
     if (m_options->m_ligatureAsBracket.GetValue()) {
@@ -414,9 +415,9 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
             // move the bracket up
             y += bracketSize + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-            DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y - bracketSize);
-            DrawFilledRectangle(dc, x1, y, x2, y - lineWidth);
-            DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y - bracketSize);
+            this->DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y - bracketSize);
+            this->DrawFilledRectangle(dc, x1, y, x2, y - lineWidth);
+            this->DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y - bracketSize);
         }
     }
 
@@ -485,11 +486,11 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     if (!fillNotehead) {
         // double the bases of rectangles
-        DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, -strokeWidth);
-        DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
+        this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, -strokeWidth);
+        this->DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
     }
     else {
-        DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y - topLeft->y);
+        this->DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y - topLeft->y);
     }
 
     // Do not draw a left connector with obliques
@@ -511,11 +512,12 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
                 sides[3] = prevSides[3];
             }
         }
-        DrawFilledRoundedRectangle(dc, topLeft->x, sideTop, topLeft->x + stemWidth, sideBottom, stemWidth / 3);
+        this->DrawFilledRoundedRectangle(dc, topLeft->x, sideTop, topLeft->x + stemWidth, sideBottom, stemWidth / 3);
     }
 
     if (!nextNote) {
-        DrawFilledRoundedRectangle(dc, bottomRight->x - stemWidth, sides[2], bottomRight->x, sides[3], stemWidth / 3);
+        this->DrawFilledRoundedRectangle(
+            dc, bottomRight->x - stemWidth, sides[2], bottomRight->x, sides[3], stemWidth / 3);
     }
 
     return;
@@ -562,7 +564,7 @@ void View::DrawDotInLigature(DeviceContext *dc, LayerElement *element, Layer *la
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    DrawDotsPart(dc, x, y, 1, staff);
+    this->DrawDotsPart(dc, x, y, 1, staff);
 
     return;
 }
@@ -600,23 +602,23 @@ void View::DrawPlica(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     if (isLonga) {
         if (up) {
-            DrawFilledRectangle(dc, topLeft.x, sides[1], topLeft.x + stemWidth, sides[1] + shortStem);
-            DrawFilledRectangle(dc, bottomRight.x, sides[1], bottomRight.x - stemWidth, sides[1] + stem);
+            this->DrawFilledRectangle(dc, topLeft.x, sides[1], topLeft.x + stemWidth, sides[1] + shortStem);
+            this->DrawFilledRectangle(dc, bottomRight.x, sides[1], bottomRight.x - stemWidth, sides[1] + stem);
         }
         else {
-            DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[0] - shortStem);
-            DrawFilledRectangle(dc, bottomRight.x, sides[0], bottomRight.x - stemWidth, sides[0] - stem);
+            this->DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[0] - shortStem);
+            this->DrawFilledRectangle(dc, bottomRight.x, sides[0], bottomRight.x - stemWidth, sides[0] - stem);
         }
     }
     // brevis
     else {
         if (up) {
-            DrawFilledRectangle(dc, topLeft.x, sides[1], topLeft.x + stemWidth, sides[1] + stem);
-            DrawFilledRectangle(dc, bottomRight.x, sides[1], bottomRight.x - stemWidth, sides[1] + shortStem);
+            this->DrawFilledRectangle(dc, topLeft.x, sides[1], topLeft.x + stemWidth, sides[1] + stem);
+            this->DrawFilledRectangle(dc, bottomRight.x, sides[1], bottomRight.x - stemWidth, sides[1] + shortStem);
         }
         else {
-            DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[0] - stem);
-            DrawFilledRectangle(dc, bottomRight.x, sides[0], bottomRight.x - stemWidth, sides[0] - shortStem);
+            this->DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[0] - stem);
+            this->DrawFilledRectangle(dc, bottomRight.x, sides[0], bottomRight.x - stemWidth, sides[0] - shortStem);
         }
     }
 
@@ -646,11 +648,11 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
     dc->SetFont(m_doc->GetDrawingSmuflFont(textSize, false));
 
     wtext = IntToTimeSigFigures(num);
-    DrawSmuflString(dc, x, ynum, wtext, HORIZONTALALIGNMENT_center, textSize); // true = center
+    this->DrawSmuflString(dc, x, ynum, wtext, HORIZONTALALIGNMENT_center, textSize); // true = center
 
     if (numBase) {
         wtext = IntToTimeSigFigures(numBase);
-        DrawSmuflString(dc, x, yden, wtext, HORIZONTALALIGNMENT_center, textSize); // true = center
+        this->DrawSmuflString(dc, x, yden, wtext, HORIZONTALALIGNMENT_center, textSize); // true = center
     }
 
     dc->ResetFont();
@@ -678,7 +680,7 @@ void View::DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, S
     y1 = y;
     y2 = y + 50 + (50 * proport->GetNum());
     // DrawFilledRectangle(dc,x1,y1,x2,y2);
-    DrawPartFilledRectangle(dc, x1, y1, x2, y2, 0);
+    this->DrawPartFilledRectangle(dc, x1, y1, x2, y2, 0);
 
     if (proport->HasNum()) {
         x = element->GetDrawingX();
@@ -688,7 +690,7 @@ void View::DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, S
                 * 5; // step forward because we have a sign or a meter symbol
         }
         int numbase = proport->HasNumbase() ? proport->GetNumbase() : 0;
-        DrawProportFigures(dc, x,
+        this->DrawProportFigures(dc, x,
             staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1),
             proport->GetNum(), numbase, staff);
     }

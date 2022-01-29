@@ -33,21 +33,21 @@ static const ClassRegistrar<BarLine> s_factory("barLine", BARLINE);
 
 BarLine::BarLine() : LayerElement(BARLINE, "bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
 {
-    RegisterAttClass(ATT_BARLINELOG);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterAttClass(ATT_BARLINELOG);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
-    Reset();
+    this->Reset();
 }
 
 BarLine::BarLine(ClassId classId)
     : LayerElement(classId, "bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
 {
-    RegisterAttClass(ATT_BARLINELOG);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterAttClass(ATT_BARLINELOG);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
-    Reset();
+    this->Reset();
 }
 
 BarLine::~BarLine() {}
@@ -56,9 +56,9 @@ void BarLine::Reset()
 {
     LayerElement::Reset();
 
-    ResetBarLineLog();
-    ResetColor();
-    ResetVisibility();
+    this->ResetBarLineLog();
+    this->ResetColor();
+    this->ResetVisibility();
 
     m_position = BarLinePosition::None;
 }
@@ -71,7 +71,8 @@ bool BarLine::SetAlignment(Alignment *alignment)
 
 bool BarLine::HasRepetitionDots() const
 {
-    if (GetForm() == BARRENDITION_rptstart || GetForm() == BARRENDITION_rptend || GetForm() == BARRENDITION_rptboth) {
+    if (this->GetForm() == BARRENDITION_rptstart || this->GetForm() == BARRENDITION_rptend
+        || this->GetForm() == BARRENDITION_rptboth) {
         return true;
     }
     return false;

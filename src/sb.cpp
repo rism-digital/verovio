@@ -31,9 +31,9 @@ static const ClassRegistrar<Sb> s_factory("sb", SB);
 
 Sb::Sb() : SystemElement(SB, "sb-"), AttNNumberLike()
 {
-    RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
 
-    Reset();
+    this->Reset();
 }
 
 Sb::~Sb() {}
@@ -41,7 +41,7 @@ Sb::~Sb() {}
 void Sb::Reset()
 {
     SystemElement::Reset();
-    ResetNNumberLike();
+    this->ResetNNumberLike();
 }
 
 //----------------------------------------------------------------------------

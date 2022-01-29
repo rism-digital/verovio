@@ -25,7 +25,7 @@ static const ClassRegistrar<Phrase> s_factory("phrase", PHRASE);
 
 Phrase::Phrase() : Slur(PHRASE, "phrase-")
 {
-    Reset();
+    this->Reset();
 }
 
 Phrase::~Phrase() {}

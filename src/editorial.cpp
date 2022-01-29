@@ -36,36 +36,36 @@ namespace vrv {
 EditorialElement::EditorialElement()
     : Object(EDITORIAL_ELEMENT, "ee-"), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 EditorialElement::EditorialElement(ClassId classId)
     : Object(classId, "ee-"), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 EditorialElement::EditorialElement(ClassId classId, const std::string &classIdStr)
     : Object(classId, classIdStr), SystemMilestoneInterface(), AttLabelled(), AttTyped()
 {
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 void EditorialElement::Reset()
 {
     Object::Reset();
     SystemMilestoneInterface::Reset();
-    ResetLabelled();
-    ResetTyped();
+    this->ResetLabelled();
+    this->ResetTyped();
 
     m_visibility = Visible;
 }

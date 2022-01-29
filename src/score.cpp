@@ -38,10 +38,10 @@ static const ClassRegistrar<Score> s_factory("score", SCORE);
 
 Score::Score() : PageElement(SCORE, "score-"), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
 {
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
 
-    Reset();
+    this->Reset();
 }
 
 Score::~Score() {}
@@ -49,8 +49,8 @@ Score::~Score() {}
 void Score::Reset()
 {
     Object::Reset();
-    ResetLabelled();
-    ResetNNumberLike();
+    this->ResetLabelled();
+    this->ResetNNumberLike();
 
     m_scoreDef.Reset();
 

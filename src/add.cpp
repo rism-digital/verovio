@@ -25,9 +25,9 @@ static const ClassRegistrar<Add> s_factory("add", ADD);
 
 Add::Add() : EditorialElement(ADD, "add-"), AttSource()
 {
-    RegisterAttClass(ATT_SOURCE);
+    this->RegisterAttClass(ATT_SOURCE);
 
-    Reset();
+    this->Reset();
 }
 
 Add::~Add() {}
@@ -35,7 +35,7 @@ Add::~Add() {}
 void Add::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

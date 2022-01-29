@@ -27,12 +27,12 @@ static const ClassRegistrar<InstrDef> s_factory("instrDef", INSTRDEF);
 InstrDef::InstrDef()
     : Object(INSTRDEF, "instrdef-"), AttChannelized(), AttLabelled(), AttMidiInstrument(), AttNNumberLike()
 {
-    RegisterAttClass(ATT_CHANNELIZED);
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_MIDIINSTRUMENT);
-    RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_CHANNELIZED);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_MIDIINSTRUMENT);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
 
-    Reset();
+    this->Reset();
 }
 
 InstrDef::~InstrDef() {}
@@ -40,10 +40,10 @@ InstrDef::~InstrDef() {}
 void InstrDef::Reset()
 {
     Object::Reset();
-    ResetChannelized();
-    ResetLabelled();
-    ResetMidiInstrument();
-    ResetNNumberLike();
+    this->ResetChannelized();
+    this->ResetLabelled();
+    this->ResetMidiInstrument();
+    this->ResetNNumberLike();
 }
 
 //----------------------------------------------------------------------------

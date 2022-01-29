@@ -35,12 +35,12 @@ static const ClassRegistrar<Verse> s_factory("verse", VERSE);
 
 Verse::Verse() : LayerElement(VERSE, "verse-"), AttColor(), AttLang(), AttNInteger(), AttTypography()
 {
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_LANG);
-    RegisterAttClass(ATT_NINTEGER);
-    RegisterAttClass(ATT_TYPOGRAPHY);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_LANG);
+    this->RegisterAttClass(ATT_NINTEGER);
+    this->RegisterAttClass(ATT_TYPOGRAPHY);
 
-    Reset();
+    this->Reset();
 }
 
 Verse::~Verse() {}
@@ -48,10 +48,10 @@ Verse::~Verse() {}
 void Verse::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
-    ResetLang();
-    ResetNInteger();
-    ResetTypography();
+    this->ResetColor();
+    this->ResetLang();
+    this->ResetNInteger();
+    this->ResetTypography();
 
     m_drawingLabelAbbr = NULL;
 }

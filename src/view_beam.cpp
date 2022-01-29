@@ -76,13 +76,13 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // Draw the children
 
-    DrawLayerChildren(dc, beam, layer, staff, measure);
+    this->DrawLayerChildren(dc, beam, layer, staff, measure);
 
     /******************************************************************/
     // Draw the beamSegment - but not if it is a secondary beam in a stem.sameas
 
     if (!beam->m_beamSegment.StemSameasIsSecondary())
-        DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
+        this->DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
@@ -137,7 +137,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Draw the children
 
-    DrawLayerChildren(dc, fTrem, layer, staff, measure);
+    this->DrawLayerChildren(dc, fTrem, layer, staff, measure);
 
     /******************************************************************/
     // Draw the stems and the bars
@@ -187,7 +187,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     for (int j = 0; j < fullBars; ++j) {
-        DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
+        this->DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
         y1 += polygonHeight;
         y2 += polygonHeight;
         y1 += dy1 * fTrem->m_beamWidthWhite;
@@ -207,7 +207,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     y2 -= space * fTrem->m_beamSegment.m_beamSlope;
 
     for (int j = 0; j < floatingBars; ++j) {
-        DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
+        this->DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
         y1 += polygonHeight;
         y2 += polygonHeight;
         y1 += dy1 * fTrem->m_beamWidthWhite;
@@ -261,7 +261,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
     // s_y = 0 and s_y2 = 0 respectively
 
     const int polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
-    DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
+    this->DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
 
     /******************************************************************/
     // Draw the beam for partial bars (if any)
@@ -398,7 +398,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                     if (i >= noteCount - 1) continue; // assert for debug and skip otherwise
                     y1 = beamElementCoords->at(idx)->m_yBeam + barYPos;
                     y2 = beamElementCoords->at(noteIndexes.at(i + 1))->m_yBeam + barYPos;
-                    DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1,
+                    this->DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1,
                         beamElementCoords->at(noteIndexes.at(i + 1))->m_x, y2, polygonHeight);
                 }
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] == PARTIAL_RIGHT) {
@@ -406,14 +406,14 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                     int x2 = beamElementCoords->at(idx)->m_x + fractBeamWidth;
                     y2 = beamSegment->m_firstNoteOrChord->m_yBeam + barYPos
                         + beamSegment->m_beamSlope * (x2 - beamSegment->m_firstNoteOrChord->m_x);
-                    DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1, x2, y2, polygonHeight);
+                    this->DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1, x2, y2, polygonHeight);
                 }
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - durRef] == PARTIAL_LEFT) {
                     y2 = beamElementCoords->at(idx)->m_yBeam + barYPos;
                     int x1 = beamElementCoords->at(idx)->m_x - fractBeamWidth;
                     y1 = beamSegment->m_firstNoteOrChord->m_yBeam + barYPos
                         + beamSegment->m_beamSlope * (x1 - beamSegment->m_firstNoteOrChord->m_x);
-                    DrawObliquePolygon(dc, x1, y1, beamElementCoords->at(idx)->m_x, y2, polygonHeight);
+                    this->DrawObliquePolygon(dc, x1, y1, beamElementCoords->at(idx)->m_x, y2, polygonHeight);
                 }
             }
 

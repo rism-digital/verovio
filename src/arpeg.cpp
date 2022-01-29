@@ -32,14 +32,14 @@ static const ClassRegistrar<Arpeg> s_factory("arpeg", ARPEG);
 Arpeg::Arpeg()
     : ControlElement(ARPEG, "arpeg-"), PlistInterface(), TimePointInterface(), AttArpegLog(), AttArpegVis(), AttColor()
 {
-    RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
-    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    RegisterAttClass(ATT_ARPEGLOG);
-    RegisterAttClass(ATT_ARPEGVIS);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_ENCLOSINGCHARS);
+    this->RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
+    this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterAttClass(ATT_ARPEGLOG);
+    this->RegisterAttClass(ATT_ARPEGVIS);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
 
-    Reset();
+    this->Reset();
 }
 
 Arpeg::~Arpeg() {}
@@ -49,10 +49,10 @@ void Arpeg::Reset()
     ControlElement::Reset();
     PlistInterface::Reset();
     TimePointInterface::Reset();
-    ResetArpegLog();
-    ResetArpegVis();
-    ResetColor();
-    ResetEnclosingChars();
+    this->ResetArpegLog();
+    this->ResetArpegVis();
+    this->ResetColor();
+    this->ResetEnclosingChars();
 
     m_drawingXRel = 0;
     m_cachedXRel = VRV_UNSET;
@@ -64,7 +64,7 @@ int Arpeg::GetDrawingX() const
     // @staff are not taken into account for arpeg (only @plist)
     // The positioner for Arpeg uses the top note as objectX
     if (this->GetCurrentFloatingPositioner()) {
-        return (GetCurrentFloatingPositioner()->GetDrawingX());
+        return (this->GetCurrentFloatingPositioner()->GetDrawingX());
     }
 
     // Otherwise get the measure - no cast to Measure is necessary
@@ -89,14 +89,14 @@ bool Arpeg::IsValidRef(Object *ref) const
 void Arpeg::SetDrawingXRel(int drawingXRel)
 {
     // Cache is currently not used for Arpeg
-    ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
 
     m_drawingXRel = drawingXRel;
     // Also update the positioner drawingXRel - this is a duplication but we need it in
     // the positioner too for the bounding box calculation and for the DrawingX value
     // See GetDrawingX
-    if (GetCurrentFloatingPositioner()) {
-        GetCurrentFloatingPositioner()->SetDrawingXRel(m_drawingXRel);
+    if (this->GetCurrentFloatingPositioner()) {
+        this->GetCurrentFloatingPositioner()->SetDrawingXRel(m_drawingXRel);
     }
 }
 
@@ -181,7 +181,7 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
 
 Staff *Arpeg::GetCrossStaff()
 {
-    const ArrayOfObjects *refs = GetRefs();
+    const ArrayOfObjects *refs = this->GetRefs();
     if (refs->empty()) return NULL;
 
     // Find if there is at least one element that is not cross staff

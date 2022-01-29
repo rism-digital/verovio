@@ -34,32 +34,32 @@ ScoreDefInterface::ScoreDefInterface()
     , AttSpacing()
     , AttSystems()
 {
-    RegisterInterfaceAttClass(ATT_DURATIONDEFAULT);
-    RegisterInterfaceAttClass(ATT_LYRICSTYLE);
-    RegisterInterfaceAttClass(ATT_MEASURENUMBERS);
-    RegisterInterfaceAttClass(ATT_METERSIGDEFAULTLOG);
-    RegisterInterfaceAttClass(ATT_METERSIGDEFAULTVIS);
-    RegisterInterfaceAttClass(ATT_MIDITEMPO);
-    RegisterInterfaceAttClass(ATT_MULTINUMMEASURES);
-    RegisterInterfaceAttClass(ATT_PIANOPEDALS);
-    RegisterInterfaceAttClass(ATT_SPACING);
-    RegisterInterfaceAttClass(ATT_SYSTEMS);
+    this->RegisterInterfaceAttClass(ATT_DURATIONDEFAULT);
+    this->RegisterInterfaceAttClass(ATT_LYRICSTYLE);
+    this->RegisterInterfaceAttClass(ATT_MEASURENUMBERS);
+    this->RegisterInterfaceAttClass(ATT_METERSIGDEFAULTLOG);
+    this->RegisterInterfaceAttClass(ATT_METERSIGDEFAULTVIS);
+    this->RegisterInterfaceAttClass(ATT_MIDITEMPO);
+    this->RegisterInterfaceAttClass(ATT_MULTINUMMEASURES);
+    this->RegisterInterfaceAttClass(ATT_PIANOPEDALS);
+    this->RegisterInterfaceAttClass(ATT_SPACING);
+    this->RegisterInterfaceAttClass(ATT_SYSTEMS);
 
-    Reset();
+    this->Reset();
 }
 
 ScoreDefInterface::~ScoreDefInterface() {}
 
 void ScoreDefInterface::Reset()
 {
-    ResetDurationDefault();
-    ResetLyricStyle();
-    ResetMeasureNumbers();
-    ResetMidiTempo();
-    ResetMultinumMeasures();
-    ResetPianoPedals();
-    ResetSpacing();
-    ResetSystems();
+    this->ResetDurationDefault();
+    this->ResetLyricStyle();
+    this->ResetMeasureNumbers();
+    this->ResetMidiTempo();
+    this->ResetMultinumMeasures();
+    this->ResetPianoPedals();
+    this->ResetSpacing();
+    this->ResetSystems();
 }
 
 } // namespace vrv

@@ -27,9 +27,9 @@ static const ClassRegistrar<Space> s_factory("space", SPACE);
 
 Space::Space() : LayerElement(SPACE, "space-"), DurationInterface()
 {
-    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
 
-    Reset();
+    this->Reset();
 }
 
 Space::~Space() {}

@@ -70,24 +70,24 @@ Note::Note()
     , AttTiePresent()
     , AttVisibility()
 {
-    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_COLORATION);
-    RegisterAttClass(ATT_CUE);
-    RegisterAttClass(ATT_EXTSYM);
-    RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_NOTEGESTAB);
-    RegisterAttClass(ATT_NOTEHEADS);
-    RegisterAttClass(ATT_NOTEVISMENSURAL);
-    RegisterAttClass(ATT_MIDIVELOCITY);
-    RegisterAttClass(ATT_STEMS);
-    RegisterAttClass(ATT_STEMSCMN);
-    RegisterAttClass(ATT_TIEPRESENT);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_COLORATION);
+    this->RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_GRACED);
+    this->RegisterAttClass(ATT_NOTEGESTAB);
+    this->RegisterAttClass(ATT_NOTEHEADS);
+    this->RegisterAttClass(ATT_NOTEVISMENSURAL);
+    this->RegisterAttClass(ATT_MIDIVELOCITY);
+    this->RegisterAttClass(ATT_STEMS);
+    this->RegisterAttClass(ATT_STEMSCMN);
+    this->RegisterAttClass(ATT_TIEPRESENT);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
-    Reset();
+    this->Reset();
 }
 
 Note::~Note() {}
@@ -99,19 +99,19 @@ void Note::Reset()
     DurationInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
-    ResetColor();
-    ResetColoration();
-    ResetCue();
-    ResetExtSym();
-    ResetGraced();
-    ResetNoteGesTab();
-    ResetNoteHeads();
-    ResetNoteVisMensural();
-    ResetMidiVelocity();
-    ResetStems();
-    ResetStemsCmn();
-    ResetTiePresent();
-    ResetVisibility();
+    this->ResetColor();
+    this->ResetColoration();
+    this->ResetCue();
+    this->ResetExtSym();
+    this->ResetGraced();
+    this->ResetNoteGesTab();
+    this->ResetNoteHeads();
+    this->ResetNoteVisMensural();
+    this->ResetMidiVelocity();
+    this->ResetStems();
+    this->ResetStemsCmn();
+    this->ResetTiePresent();
+    this->ResetVisibility();
 
     m_clusterPosition = 0;
     m_cluster = NULL;
@@ -232,7 +232,7 @@ int Note::GetDrawingDur() const
         return chordParent->GetActualDur();
     }
     else {
-        return GetActualDur();
+        return this->GetActualDur();
     }
 }
 
@@ -275,8 +275,8 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
     }
     else if (notationType == NOTATIONTYPE_tab_lute_french) {
         std::wstring fretStr;
-        const int fret = GetTabFret();
-        const int course = GetTabCourse();
+        const int fret = this->GetTabFret();
+        const int course = this->GetTabCourse();
         if (course >= 11) {
             // french tab uses number 4 ... for courses 11 ..., always open fret a.
             // TODO need Baroque font SMUFL_xxxx_luteDiapason4, 5, 6 ... or somesuch.
@@ -347,7 +347,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     Point p(defaultXShift, defaultYShift);
 
     // Here we should get the notehead value
-    wchar_t code = GetNoteheadGlyph(GetDrawingDur());
+    wchar_t code = this->GetNoteheadGlyph(this->GetDrawingDur());
 
     // This is never called for now because mensural notes do not have stem/flag children
     // For changing this, change Note::CalcStem and Note::PrepareLayerElementParts
@@ -378,7 +378,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     Point p(0, -defaultYShift);
 
     // Here we should get the notehead value
-    wchar_t code = GetNoteheadGlyph(GetDrawingDur());
+    wchar_t code = this->GetNoteheadGlyph(this->GetDrawingDur());
 
     // This is never called for now because mensural notes do not have stem/flag children
     // See comment above
@@ -487,15 +487,15 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
               { "noteheadDiamondWhiteWide", SMUFL_E0DE_noteheadDiamondWhiteWide },
               { "noteheadNull", SMUFL_E0A5_noteheadNull } };
 
-    if (HasGlyphName()) {
-        const std::string glyph = GetGlyphName();
+    if (this->HasGlyphName()) {
+        const std::string glyph = this->GetGlyphName();
         if (additionalNoteheadSymbols.end() == additionalNoteheadSymbols.find(glyph)) {
             return SMUFL_E0A4_noteheadBlack;
         }
         return additionalNoteheadSymbols[glyph];
     }
 
-    switch (GetHeadShape()) {
+    switch (this->GetHeadShape()) {
         case HEADSHAPE_quarter: return SMUFL_E0A4_noteheadBlack;
         case HEADSHAPE_half: return SMUFL_E0A3_noteheadHalf;
         case HEADSHAPE_whole: return SMUFL_E0A2_noteheadWhole;
@@ -504,7 +504,7 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         case HEADSHAPE_plus: return SMUFL_E0AF_noteheadPlusBlack;
         case HEADSHAPE_diamond: {
             if (DUR_1 == duration) return SMUFL_E0D9_noteheadDiamondHalf;
-            return GetHeadFill() == FILL_void ? SMUFL_E0DD_noteheadDiamondWhite : SMUFL_E0DB_noteheadDiamondBlack;
+            return this->GetHeadFill() == FILL_void ? SMUFL_E0DD_noteheadDiamondWhite : SMUFL_E0DB_noteheadDiamondBlack;
         }
         // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
         // case HEADSHAPE_oval: return SMUFL_noteheadOval;
@@ -522,7 +522,7 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         default: break;
     }
 
-    switch (GetHeadMod()) {
+    switch (this->GetHeadMod()) {
         case NOTEHEADMODIFIER_dblwhole: return SMUFL_E0A0_noteheadDoubleWhole;
         default: break;
     }
@@ -1135,7 +1135,7 @@ MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate)
 
 MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary)
 {
-    const bool isUpwardDirection = (GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
+    const bool isUpwardDirection = (this->GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
     const bool shiftUpwards = (isUpwardDirection == primary);
     MapOfNoteLocs noteLocs = this->CalcNoteLocations();
     assert(noteLocs.size() == 1);
@@ -1201,8 +1201,8 @@ int Note::CalcDots(FunctorParams *functorParams)
         if (const int shift = dots->GetFlagShift(); shift) {
             flagShift += shift;
         }
-        else if ((GetDrawingStemDir() == STEMDIRECTION_up) && (!this->IsInBeam()) && (GetDrawingStemLen() < 3)
-            && (IsDotOverlappingWithFlag(params->m_doc, staffSize, isDotShifted))) {
+        else if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (!this->IsInBeam())
+            && (this->GetDrawingStemLen() < 3) && (IsDotOverlappingWithFlag(params->m_doc, staffSize, isDotShifted))) {
             // HARDCODED
             const int shift = params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
             flagShift += shift;
@@ -1299,7 +1299,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
         if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
     }
 
-    if (!chord) SetDrawingStem(currentStem);
+    if (!chord) this->SetDrawingStem(currentStem);
 
     /************ dots ***********/
 

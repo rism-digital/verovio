@@ -108,7 +108,7 @@ void View::Next(bool forward)
     else if (!forward && this->HasNext(false)) {
         m_pageIdx--;
     }
-    SetPage(m_pageIdx);
+    this->SetPage(m_pageIdx);
 }
 
 int View::ToDeviceContextX(int i)

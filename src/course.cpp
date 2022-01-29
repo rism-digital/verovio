@@ -23,12 +23,12 @@ static const ClassRegistrar<Course> s_factory("course", COURSE);
 
 Course::Course() : Object(COURSE, "course-"), AttAccidental(), AttNNumberLike(), AttOctave(), AttPitch()
 {
-    RegisterAttClass(ATT_ACCIDENTAL);
-    RegisterAttClass(ATT_NNUMBERLIKE);
-    RegisterAttClass(ATT_OCTAVE);
-    RegisterAttClass(ATT_PITCH);
+    this->RegisterAttClass(ATT_ACCIDENTAL);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_OCTAVE);
+    this->RegisterAttClass(ATT_PITCH);
 
-    Reset();
+    this->Reset();
 }
 
 Course::~Course() {}
@@ -36,10 +36,10 @@ Course::~Course() {}
 void Course::Reset()
 {
     Object::Reset();
-    ResetAccidental();
-    ResetNNumberLike();
-    ResetOctave();
-    ResetPitch();
+    this->ResetAccidental();
+    this->ResetNNumberLike();
+    this->ResetOctave();
+    this->ResetPitch();
 }
 
 bool Course::IsSupportedChild(Object *child)

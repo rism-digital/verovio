@@ -36,11 +36,11 @@ static const ClassRegistrar<GraceGrp> s_factory("graceGrp", GRACEGRP);
 
 GraceGrp::GraceGrp() : LayerElement(GRACEGRP, "gracegrp-"), AttColor(), AttGraced(), AttGraceGrpLog()
 {
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_GRACEGRPLOG);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_GRACED);
+    this->RegisterAttClass(ATT_GRACEGRPLOG);
 
-    Reset();
+    this->Reset();
 }
 
 GraceGrp::~GraceGrp() {}
@@ -48,9 +48,9 @@ GraceGrp::~GraceGrp() {}
 void GraceGrp::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
-    ResetGraced();
-    ResetGraceGrpLog();
+    this->ResetColor();
+    this->ResetGraced();
+    this->ResetGraceGrpLog();
 }
 
 bool GraceGrp::IsSupportedChild(Object *child)

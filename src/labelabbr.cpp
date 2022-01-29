@@ -27,7 +27,7 @@ static const ClassRegistrar<LabelAbbr> s_factory("labelAbbr", LABELABBR);
 
 LabelAbbr::LabelAbbr() : Object(LABELABBR, "labelAbbr-"), TextListInterface()
 {
-    Reset();
+    this->Reset();
 }
 
 LabelAbbr::~LabelAbbr() {}

@@ -28,16 +28,16 @@ namespace vrv {
 
 PlistInterface::PlistInterface() : Interface(), AttPlist()
 {
-    RegisterInterfaceAttClass(ATT_PLIST);
+    this->RegisterInterfaceAttClass(ATT_PLIST);
 
-    Reset();
+    this->Reset();
 }
 
 PlistInterface::~PlistInterface() {}
 
 void PlistInterface::Reset()
 {
-    ResetPlist();
+    this->ResetPlist();
 }
 
 void PlistInterface::AddRef(std::string ref)

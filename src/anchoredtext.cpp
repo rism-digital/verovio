@@ -28,9 +28,9 @@ static const ClassRegistrar<AnchoredText> s_factory("anchoredText", ANCHOREDTEXT
 
 AnchoredText::AnchoredText() : ControlElement(ANCHOREDTEXT, "anchtxt-"), TextDirInterface()
 {
-    RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
+    this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
 
-    Reset();
+    this->Reset();
 }
 
 AnchoredText::~AnchoredText() {}

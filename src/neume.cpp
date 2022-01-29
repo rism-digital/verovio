@@ -46,8 +46,8 @@ static const ClassRegistrar<Neume> s_factory("neume", NEUME);
 
 Neume::Neume() : LayerElement(NEUME, "neume-"), ObjectListInterface(), AttColor()
 {
-    RegisterAttClass(ATT_COLOR);
-    Reset();
+    this->RegisterAttClass(ATT_COLOR);
+    this->Reset();
 }
 
 Neume::~Neume() {}
@@ -55,7 +55,7 @@ Neume::~Neume() {}
 void Neume::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
+    this->ResetColor();
 }
 
 bool Neume::IsSupportedChild(Object *child)
