@@ -32,9 +32,9 @@ static const ClassRegistrar<Ligature> s_factory("ligature", LIGATURE);
 
 Ligature::Ligature() : LayerElement(LIGATURE, "ligature-"), ObjectListInterface(), AttLigatureVis()
 {
-    RegisterAttClass(ATT_LIGATUREVIS);
+    this->RegisterAttClass(ATT_LIGATUREVIS);
 
-    Reset();
+    this->Reset();
 }
 
 Ligature::~Ligature()
@@ -45,7 +45,7 @@ Ligature::~Ligature()
 void Ligature::Reset()
 {
     LayerElement::Reset();
-    ResetLigatureVis();
+    this->ResetLigatureVis();
 
     ClearClusters();
 }

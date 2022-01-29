@@ -36,10 +36,10 @@ Syllable::Syllable() : LayerElement(SYLLABLE, "syllable-"), ObjectListInterface(
 
 void Syllable::Init()
 {
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_SLASHCOUNT);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_SLASHCOUNT);
 
-    Reset();
+    this->Reset();
 }
 
 bool Syllable::IsSupportedChild(Object *child)
@@ -61,8 +61,8 @@ Syllable::~Syllable() {}
 void Syllable::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
-    ResetSlashCount();
+    this->ResetColor();
+    this->ResetSlashCount();
 }
 
 bool Syllable::MarkupAddSyl()

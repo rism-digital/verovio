@@ -23,7 +23,7 @@ static const ClassRegistrar<PgHead2> s_factory("pgHead2", PGHEAD2);
 
 PgHead2::PgHead2() : RunningElement(PGHEAD2, "pghead2-")
 {
-    Reset();
+    this->Reset();
 }
 
 PgHead2::~PgHead2() {}

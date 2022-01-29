@@ -3,8 +3,12 @@
 ## [unreleased]
 * Support for `beatRpt@beatdef`
 * Support for `scoreDef` and `staffDef` `@dur.default` (@eNote-GmBH)
-* Support for MIDI output of grace notes (@eNote-GmBH)
+* Support for MIDI output of grace notes and multi-measure rests (@eNote-GmBH)
+* Support for `@stem.sameas` on notes for orchestra scores
 * Improved tablature MIDI output (@paul-bayleaf)
+* Additional parameters to the redoLayout method for faster cached layout redoing
+* Additional parameters to the renderToTimemap method for including rests and measure
+* Additional ids for rests and measure added to the getElementsAtTime methods
 * Preliminary support for tablature MusicXML import (@paul-bayleaf)
 
 ## [3.8.1] - 2022-01-10

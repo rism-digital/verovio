@@ -34,10 +34,10 @@ static const ClassRegistrar<Section> s_factory("section", SECTION);
 
 Section::Section() : SystemElement(SECTION, "section-"), SystemMilestoneInterface(), AttNNumberLike(), AttSectionVis()
 {
-    RegisterAttClass(ATT_NNUMBERLIKE);
-    RegisterAttClass(ATT_SECTIONVIS);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_SECTIONVIS);
 
-    Reset();
+    this->Reset();
 }
 
 Section::~Section() {}
@@ -46,8 +46,8 @@ void Section::Reset()
 {
     SystemElement::Reset();
     SystemMilestoneInterface::Reset();
-    ResetNNumberLike();
-    ResetSectionVis();
+    this->ResetNNumberLike();
+    this->ResetSectionVis();
 }
 
 bool Section::IsSupportedChild(Object *child)

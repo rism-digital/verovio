@@ -29,14 +29,14 @@ App::App() : EditorialElement(APP, "app-")
 {
     m_level = EDITORIAL_UNDEFINED;
 
-    Reset();
+    this->Reset();
 }
 
 App::App(EditorialLevel level) : EditorialElement(APP, "app-")
 {
     m_level = level;
 
-    Reset();
+    this->Reset();
 }
 
 void App::Reset()

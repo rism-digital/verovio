@@ -25,9 +25,9 @@ static const ClassRegistrar<Expan> s_factory("expan", EXPAN);
 
 Expan::Expan() : EditorialElement(EXPAN, "expan-"), AttSource()
 {
-    RegisterAttClass(ATT_SOURCE);
+    this->RegisterAttClass(ATT_SOURCE);
 
-    Reset();
+    this->Reset();
 }
 
 Expan::~Expan() {}
@@ -35,7 +35,7 @@ Expan::~Expan() {}
 void Expan::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

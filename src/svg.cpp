@@ -26,7 +26,7 @@ static const ClassRegistrar<Svg> s_factory("svg", SVG);
 
 Svg::Svg() : Object(SVG, "svg-")
 {
-    Reset();
+    this->Reset();
 }
 
 Svg::~Svg() {}

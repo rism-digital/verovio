@@ -42,27 +42,27 @@ namespace vrv {
 
 ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT, "scoredefelement-"), ScoreDefInterface(), AttTyped()
 {
-    RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId, "scoredefelement-"), ScoreDefInterface(), AttTyped()
 {
-    RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 ScoreDefElement::ScoreDefElement(ClassId classId, const std::string &classIdStr)
     : Object(classId, classIdStr), ScoreDefInterface(), AttTyped()
 {
-    RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 ScoreDefElement::~ScoreDefElement() {}
@@ -71,7 +71,7 @@ void ScoreDefElement::Reset()
 {
     Object::Reset();
     ScoreDefInterface::Reset();
-    ResetTyped();
+    this->ResetTyped();
 }
 
 bool ScoreDefElement::HasClefInfo(int depth)
@@ -198,12 +198,12 @@ ScoreDef::ScoreDef()
     , AttOptimization()
     , AttTimeBase()
 {
-    RegisterAttClass(ATT_DISTANCES);
-    RegisterAttClass(ATT_ENDINGS);
-    RegisterAttClass(ATT_OPTIMIZATION);
-    RegisterAttClass(ATT_TIMEBASE);
+    this->RegisterAttClass(ATT_DISTANCES);
+    this->RegisterAttClass(ATT_ENDINGS);
+    this->RegisterAttClass(ATT_OPTIMIZATION);
+    this->RegisterAttClass(ATT_TIMEBASE);
 
-    Reset();
+    this->Reset();
 }
 
 ScoreDef::~ScoreDef() {}
@@ -211,9 +211,9 @@ ScoreDef::~ScoreDef() {}
 void ScoreDef::Reset()
 {
     ScoreDefElement::Reset();
-    ResetDistances();
-    ResetEndings();
-    ResetOptimization();
+    this->ResetDistances();
+    this->ResetEndings();
+    this->ResetOptimization();
 
     m_drawLabels = false;
     m_drawingWidth = 0;

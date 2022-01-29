@@ -46,9 +46,9 @@ static const ClassRegistrar<Layer> s_factory("layer", LAYER);
 Layer::Layer()
     : Object(LAYER, "layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
-    RegisterAttClass(ATT_NINTEGER);
-    RegisterAttClass(ATT_TYPED);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterAttClass(ATT_NINTEGER);
+    this->RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
     // owned pointers need to be set to NULL;
     m_staffDefClef = NULL;
@@ -61,24 +61,24 @@ Layer::Layer()
     m_cautionStaffDefMensur = NULL;
     m_cautionStaffDefMeterSig = NULL;
 
-    Reset();
+    this->Reset();
 }
 
 Layer::~Layer()
 {
     // We need to delete own objects
-    Reset();
+    this->Reset();
 }
 
 void Layer::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
-    ResetNInteger();
-    ResetTyped();
-    ResetVisibility();
+    this->ResetNInteger();
+    this->ResetTyped();
+    this->ResetVisibility();
 
-    ResetStaffDefObjects();
+    this->ResetStaffDefObjects();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_crossStaffFromAbove = false;
@@ -171,7 +171,7 @@ LayerElement *Layer::GetPrevious(LayerElement *element)
     this->ResetList(this);
     if (!element || this->GetList(this)->empty()) return NULL;
 
-    return dynamic_cast<LayerElement *>(GetListPrevious(element));
+    return dynamic_cast<LayerElement *>(this->GetListPrevious(element));
 }
 
 LayerElement *Layer::GetAtPos(int x)
@@ -200,13 +200,13 @@ Clef *Layer::GetClef(LayerElement *test)
     Object *testObject = test;
 
     if (!test) {
-        return GetCurrentClef();
+        return this->GetCurrentClef();
     }
 
     // make sure list is set
-    ResetList(this);
+    this->ResetList(this);
     if (!test->Is(CLEF)) {
-        testObject = GetListFirstBackward(testObject, CLEF);
+        testObject = this->GetListFirstBackward(testObject, CLEF);
     }
 
     if (testObject && testObject->Is(CLEF)) {
@@ -218,7 +218,7 @@ Clef *Layer::GetClef(LayerElement *test)
     if (facsClef != NULL) {
         return facsClef;
     }
-    return GetCurrentClef();
+    return this->GetCurrentClef();
 }
 
 Clef *Layer::GetClefFacs(LayerElement *test)
@@ -238,7 +238,7 @@ Clef *Layer::GetClefFacs(LayerElement *test)
 
 int Layer::GetClefLocOffset(LayerElement *test)
 {
-    Clef *clef = GetClef(test);
+    Clef *clef = this->GetClef(test);
     if (!clef) return 0;
     return clef->GetClefLocOffset();
 }
@@ -324,7 +324,7 @@ std::set<int> Layer::GetLayersNInTimeSpan(double time, double duration, Measure 
 
     Functor layerCountInTimeSpan(&Object::LayerCountInTimeSpan);
     LayerCountInTimeSpanParams layerCountInTimeSpanParams(
-        GetCurrentMeterSig(), GetCurrentMensur(), &layerCountInTimeSpan);
+        this->GetCurrentMeterSig(), this->GetCurrentMensur(), &layerCountInTimeSpan);
     layerCountInTimeSpanParams.m_time = time;
     layerCountInTimeSpanParams.m_duration = duration;
 
@@ -378,7 +378,7 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool e
 
     Staff *staff = element->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
-    return GetLayerElementsInTimeSpan(time, duration, measure, staff->GetN(), excludeCurrent);
+    return this->GetLayerElementsInTimeSpan(time, duration, measure, staff->GetN(), excludeCurrent);
 }
 
 ListOfObjects Layer::GetLayerElementsInTimeSpan(
@@ -387,7 +387,8 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(
     assert(measure);
 
     Functor layerElementsInTimeSpan(&Object::LayerElementsInTimeSpan);
-    LayerElementsInTimeSpanParams layerElementsInTimeSpanParams(GetCurrentMeterSig(), GetCurrentMensur(), this);
+    LayerElementsInTimeSpanParams layerElementsInTimeSpanParams(
+        this->GetCurrentMeterSig(), this->GetCurrentMensur(), this);
     layerElementsInTimeSpanParams.m_time = time;
     layerElementsInTimeSpanParams.m_duration = duration;
     layerElementsInTimeSpanParams.m_allLayersButCurrent = excludeCurrent;
@@ -552,7 +553,7 @@ int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 
 int Layer::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
-    ResetStaffDefObjects();
+    this->ResetStaffDefObjects();
 
     return FUNCTOR_CONTINUE;
 }
@@ -560,29 +561,29 @@ int Layer::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 int Layer::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     if (this->GetStaffDefClef()) {
-        GetStaffDefClef()->ResetHorizontalAlignment(functorParams);
+        this->GetStaffDefClef()->ResetHorizontalAlignment(functorParams);
     }
     if (this->GetStaffDefKeySig()) {
-        GetStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
+        this->GetStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
     }
     if (this->GetStaffDefMensur()) {
-        GetStaffDefMensur()->ResetHorizontalAlignment(functorParams);
+        this->GetStaffDefMensur()->ResetHorizontalAlignment(functorParams);
     }
     if (this->GetStaffDefMeterSig()) {
-        GetStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
+        this->GetStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
     }
 
     if (this->GetCautionStaffDefClef()) {
-        GetCautionStaffDefClef()->ResetHorizontalAlignment(functorParams);
+        this->GetCautionStaffDefClef()->ResetHorizontalAlignment(functorParams);
     }
     if (this->GetCautionStaffDefKeySig()) {
-        GetCautionStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
+        this->GetCautionStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
     }
     if (this->GetCautionStaffDefMensur()) {
-        GetCautionStaffDefMensur()->ResetHorizontalAlignment(functorParams);
+        this->GetCautionStaffDefMensur()->ResetHorizontalAlignment(functorParams);
     }
     if (this->GetCautionStaffDefMeterSig()) {
-        GetCautionStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
+        this->GetCautionStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
     }
 
     return FUNCTOR_CONTINUE;
@@ -593,8 +594,8 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
     AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
-    params->m_currentMensur = GetCurrentMensur();
-    params->m_currentMeterSig = GetCurrentMeterSig();
+    params->m_currentMensur = this->GetCurrentMensur();
+    params->m_currentMeterSig = this->GetCurrentMeterSig();
 
     // We are starting a new layer, reset the time;
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
@@ -606,25 +607,25 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
         params->m_scoreDefRole = SCOREDEF_INTERMEDIATE;
 
     if (this->GetStaffDefClef()) {
-        if (GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
-            GetStaffDefClef()->AlignHorizontally(params);
+        if (this->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
+            this->GetStaffDefClef()->AlignHorizontally(params);
         }
     }
     if (this->GetStaffDefKeySig()) {
-        if (GetStaffDefKeySig()->GetVisible() != BOOLEAN_false) {
-            GetStaffDefKeySig()->AlignHorizontally(params);
+        if (this->GetStaffDefKeySig()->GetVisible() != BOOLEAN_false) {
+            this->GetStaffDefKeySig()->AlignHorizontally(params);
         }
     }
     if (this->GetStaffDefMensur()) {
-        GetStaffDefMensur()->AlignHorizontally(params);
+        this->GetStaffDefMensur()->AlignHorizontally(params);
     }
     if (this->GetStaffDefMeterSigGrp()) {
         Functor alignHorizontally(&Object::AlignHorizontally);
-        GetStaffDefMeterSigGrp()->Process(&alignHorizontally, params);
+        this->GetStaffDefMeterSigGrp()->Process(&alignHorizontally, params);
     }
     else if (this->GetStaffDefMeterSig()) {
-        if (GetStaffDefMeterSig()->GetForm() != METERFORM_invis) {
-            GetStaffDefMeterSig()->AlignHorizontally(params);
+        if (this->GetStaffDefMeterSig()->GetForm() != METERFORM_invis) {
+            this->GetStaffDefMeterSig()->AlignHorizontally(params);
         }
     }
 
@@ -645,16 +646,16 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     params->m_time = params->m_measureAligner->GetMaxTime();
 
     if (this->GetCautionStaffDefClef()) {
-        GetCautionStaffDefClef()->AlignHorizontally(params);
+        this->GetCautionStaffDefClef()->AlignHorizontally(params);
     }
     if (this->GetCautionStaffDefKeySig()) {
-        GetCautionStaffDefKeySig()->AlignHorizontally(params);
+        this->GetCautionStaffDefKeySig()->AlignHorizontally(params);
     }
     if (this->GetCautionStaffDefMensur()) {
-        GetCautionStaffDefMensur()->AlignHorizontally(params);
+        this->GetCautionStaffDefMensur()->AlignHorizontally(params);
     }
     if (this->GetCautionStaffDefMeterSig()) {
-        GetCautionStaffDefMeterSig()->AlignHorizontally(params);
+        this->GetCautionStaffDefMeterSig()->AlignHorizontally(params);
     }
 
     params->m_scoreDefRole = SCOREDEF_NONE;
@@ -710,8 +711,8 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
     params->m_currentScoreTime = 0.0;
     params->m_currentRealTimeSeconds = 0.0;
 
-    params->m_currentMensur = GetCurrentMensur();
-    params->m_currentMeterSig = GetCurrentMeterSig();
+    params->m_currentMensur = this->GetCurrentMensur();
+    params->m_currentMeterSig = this->GetCurrentMeterSig();
 
     return FUNCTOR_CONTINUE;
 }

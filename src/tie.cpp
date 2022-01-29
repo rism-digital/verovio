@@ -34,34 +34,34 @@ static const ClassRegistrar<Tie> s_factory("tie", TIE);
 
 Tie::Tie() : ControlElement(TIE, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CURVATURE);
-    RegisterAttClass(ATT_CURVEREND);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CURVATURE);
+    this->RegisterAttClass(ATT_CURVEREND);
 
-    Reset();
+    this->Reset();
 }
 
 Tie::Tie(ClassId classId)
     : ControlElement(classId, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CURVATURE);
-    RegisterAttClass(ATT_CURVEREND);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CURVATURE);
+    this->RegisterAttClass(ATT_CURVEREND);
 
-    Reset();
+    this->Reset();
 }
 
 Tie::Tie(ClassId classId, const std::string &classIdStr)
     : ControlElement(classId, classIdStr), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CURVATURE);
-    RegisterAttClass(ATT_CURVEREND);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CURVATURE);
+    this->RegisterAttClass(ATT_CURVEREND);
 
-    Reset();
+    this->Reset();
 }
 
 Tie::~Tie() {}
@@ -70,9 +70,9 @@ void Tie::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    ResetColor();
-    ResetCurvature();
-    ResetCurveRend();
+    this->ResetColor();
+    this->ResetCurvature();
+    this->ResetCurveRend();
 }
 
 bool Tie::AdjustEnharmonicTies(Doc *doc, FloatingCurvePositioner *curve, Point bezier[4], Note *startNote,
@@ -151,8 +151,8 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
         return false;
     }
 
-    Note *note1 = dynamic_cast<Note *>(GetStart());
-    Note *note2 = dynamic_cast<Note *>(GetEnd());
+    Note *note1 = dynamic_cast<Note *>(this->GetStart());
+    Note *note2 = dynamic_cast<Note *>(this->GetEnd());
 
     if (!note1 && !note2) {
         // no note, obviously nothing to do...
@@ -201,7 +201,7 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
 
     bool isAboveStaffCenter = startPoint.y > (staff->GetDrawingY() - 4 * drawingUnit);
     curvature_CURVEDIR drawingCurveDir
-        = GetPreferredCurveDirection(layer1, note1, startParentChord, noteStemDir, isAboveStaffCenter);
+        = this->GetPreferredCurveDirection(layer1, note1, startParentChord, noteStemDir, isAboveStaffCenter);
     if (startParentChord) {
         if (((curvature_CURVEDIR_above == drawingCurveDir) && (note1 == startParentChord->GetTopNote()))
             || ((curvature_CURVEDIR_below == drawingCurveDir) && (note1 == startParentChord->GetBottomNote()))) {
@@ -254,8 +254,8 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     bezier[2] = c2;
     bezier[3] = endPoint;
 
-    assert(GetCurrentFloatingPositioner());
-    FloatingPositioner *positioner = GetCurrentFloatingPositioner();
+    assert(this->GetCurrentFloatingPositioner());
+    FloatingPositioner *positioner = this->GetCurrentFloatingPositioner();
     assert(positioner && positioner->Is(FLOATING_CURVE_POSITIONER));
     FloatingCurvePositioner *curve = vrv_cast<FloatingCurvePositioner *>(positioner);
     assert(curve);
@@ -358,8 +358,8 @@ int Tie::CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChor
 void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
     bool isOuterChordNote, Point &startPoint, Point &endPoint, curvature_CURVEDIR drawingCurveDir)
 {
-    Note *startNote = dynamic_cast<Note *>(GetStart());
-    Note *endNote = dynamic_cast<Note *>(GetEnd());
+    Note *startNote = dynamic_cast<Note *>(this->GetStart());
+    Note *endNote = dynamic_cast<Note *>(this->GetEnd());
 
     const int drawingUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     bool isShortTie = false;
@@ -472,9 +472,9 @@ curvature_CURVEDIR Tie::GetPreferredCurveDirection(
     data_STEMDIRECTION layerStemDir;
     curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     // first should be the tie @curvedir
-    if (HasCurvedir()) {
+    if (this->HasCurvedir()) {
         drawingCurveDir
-            = (GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+            = (this->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
     else if (layer && ((layerStemDir = layer->GetDrawingStemDir(note)) != STEMDIRECTION_NONE)) {

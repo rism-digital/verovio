@@ -86,71 +86,71 @@ bool PAEOutput::Export(std::string &output)
 bool PAEOutput::WriteObject(Object *object)
 {
     if (object->Is(MDIV)) {
-        WriteMdiv(dynamic_cast<Mdiv *>(object));
+        this->WriteMdiv(dynamic_cast<Mdiv *>(object));
     }
     if (object->Is(SCOREDEF)) {
-        WriteScoreDef(dynamic_cast<ScoreDef *>(object));
+        this->WriteScoreDef(dynamic_cast<ScoreDef *>(object));
     }
     else if (object->Is(STAFFDEF)) {
-        WriteStaffDef(dynamic_cast<StaffDef *>(object));
+        this->WriteStaffDef(dynamic_cast<StaffDef *>(object));
     }
     else if (object->Is(MEASURE)) {
-        WriteMeasure(dynamic_cast<Measure *>(object));
+        this->WriteMeasure(dynamic_cast<Measure *>(object));
     }
     else if (object->Is(STAFF)) {
-        WriteStaff(dynamic_cast<Staff *>(object));
+        this->WriteStaff(dynamic_cast<Staff *>(object));
     }
     else if (object->Is(LAYER)) {
-        WriteLayer(dynamic_cast<Layer *>(object));
+        this->WriteLayer(dynamic_cast<Layer *>(object));
     }
 
     // Measure elements
 
     // Layer elements
     else if (object->Is(BARLINE)) {
-        WriteBarLine(dynamic_cast<BarLine *>(object));
+        this->WriteBarLine(dynamic_cast<BarLine *>(object));
     }
     else if (object->Is(BEAM)) {
-        WriteBeam(dynamic_cast<Beam *>(object));
+        this->WriteBeam(dynamic_cast<Beam *>(object));
     }
     else if (object->Is(CHORD)) {
-        WriteChord(dynamic_cast<Chord *>(object));
+        this->WriteChord(dynamic_cast<Chord *>(object));
     }
     else if (object->Is(CLEF)) {
-        WriteClef(dynamic_cast<Clef *>(object));
+        this->WriteClef(dynamic_cast<Clef *>(object));
     }
     else if (object->Is(GRACEGRP)) {
-        WriteGraceGrp(dynamic_cast<GraceGrp *>(object));
+        this->WriteGraceGrp(dynamic_cast<GraceGrp *>(object));
     }
     else if (object->Is(KEYACCID)) {
-        WriteKeyAccid(dynamic_cast<KeyAccid *>(object));
+        this->WriteKeyAccid(dynamic_cast<KeyAccid *>(object));
     }
     else if (object->Is(KEYSIG)) {
-        WriteKeySig(dynamic_cast<KeySig *>(object));
+        this->WriteKeySig(dynamic_cast<KeySig *>(object));
     }
     else if (object->Is(MENSUR)) {
-        WriteMensur(dynamic_cast<Mensur *>(object));
+        this->WriteMensur(dynamic_cast<Mensur *>(object));
     }
     else if (object->Is(METERSIG)) {
-        WriteMeterSig(dynamic_cast<MeterSig *>(object));
+        this->WriteMeterSig(dynamic_cast<MeterSig *>(object));
     }
     else if (object->Is(MREST)) {
-        WriteMRest(dynamic_cast<MRest *>(object));
+        this->WriteMRest(dynamic_cast<MRest *>(object));
     }
     else if (object->Is(MULTIREST)) {
-        WriteMultiRest(dynamic_cast<MultiRest *>(object));
+        this->WriteMultiRest(dynamic_cast<MultiRest *>(object));
     }
     else if (object->Is(NOTE)) {
-        WriteNote(dynamic_cast<Note *>(object));
+        this->WriteNote(dynamic_cast<Note *>(object));
     }
     else if (object->Is(REST)) {
-        WriteRest(dynamic_cast<Rest *>(object));
+        this->WriteRest(dynamic_cast<Rest *>(object));
     }
     else if (object->Is(SPACE)) {
-        WriteSpace(dynamic_cast<Space *>(object));
+        this->WriteSpace(dynamic_cast<Space *>(object));
     }
     else if (object->Is(TUPLET)) {
-        WriteTuplet(dynamic_cast<Tuplet *>(object));
+        this->WriteTuplet(dynamic_cast<Tuplet *>(object));
     }
     else {
         // Log something?
@@ -162,13 +162,13 @@ bool PAEOutput::WriteObject(Object *object)
 bool PAEOutput::WriteObjectEnd(Object *object)
 {
     if (object->Is(MEASURE)) {
-        WriteMeasureEnd(dynamic_cast<Measure *>(object));
+        this->WriteMeasureEnd(dynamic_cast<Measure *>(object));
     }
     else if (object->Is(BEAM)) {
-        WriteBeamEnd(dynamic_cast<Beam *>(object));
+        this->WriteBeamEnd(dynamic_cast<Beam *>(object));
     }
     else if (object->Is(TUPLET)) {
-        WriteTupletEnd(dynamic_cast<Tuplet *>(object));
+        this->WriteTupletEnd(dynamic_cast<Tuplet *>(object));
     }
 
     return true;
@@ -300,8 +300,8 @@ void PAEOutput::WriteChord(Chord *chord)
 
     std::string oct;
 
-    WriteDur(chord);
-    WriteGrace(chord);
+    this->WriteDur(chord);
+    this->WriteGrace(chord);
 }
 
 void PAEOutput::WriteClef(Clef *clef)
@@ -427,8 +427,8 @@ void PAEOutput::WriteNote(Note *note)
         if (note != chord->GetTopNote()) return;
     }
     else {
-        WriteDur(note);
-        WriteGrace(note);
+        this->WriteDur(note);
+        this->WriteGrace(note);
     }
 
     if (note->GetOct() != m_currentOct) {
@@ -479,7 +479,7 @@ void PAEOutput::WriteRest(Rest *rest)
 
     if (m_skip) return;
 
-    WriteDur(rest);
+    this->WriteDur(rest);
     m_streamStringOutput << "-";
 }
 
@@ -489,7 +489,7 @@ void PAEOutput::WriteSpace(Space *space)
 
     if (m_skip) return;
 
-    WriteDur(space);
+    this->WriteDur(space);
     // Simply make it a rest - no other option in PAE
     m_streamStringOutput << "-";
 }
@@ -3368,7 +3368,7 @@ bool PAEInput::ConvertPitch()
     for (auto &token : m_pae) {
         if (token.IsVoid()) continue;
 
-        if (Is(token, pae::NOTENAME)) {
+        if (this->Is(token, pae::NOTENAME)) {
             Note *note = new Note();
             data_PITCHNAME pitch = PITCHNAME_c;
             switch (token.m_char) {
@@ -3544,7 +3544,7 @@ bool PAEInput::ConvertAccidental()
     for (auto &token : m_pae) {
         if (token.IsVoid()) continue;
 
-        if (Is(token, pae::ACCIDENTAL_INTERNAL)) {
+        if (this->Is(token, pae::ACCIDENTAL_INTERNAL)) {
             switch (token.m_char) {
                 case 'x': accidental = ACCIDENTAL_WRITTEN_s; break;
                 case 'b': accidental = ACCIDENTAL_WRITTEN_f; break;

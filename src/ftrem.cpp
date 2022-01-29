@@ -36,10 +36,10 @@ static const ClassRegistrar<FTrem> s_factory("fTrem", FTREM);
 
 FTrem::FTrem() : LayerElement(FTREM, "ftrem-"), BeamDrawingInterface(), AttFTremVis(), AttTremMeasured()
 {
-    RegisterAttClass(ATT_FTREMVIS);
-    RegisterAttClass(ATT_TREMMEASURED);
+    this->RegisterAttClass(ATT_FTREMVIS);
+    this->RegisterAttClass(ATT_TREMMEASURED);
 
-    Reset();
+    this->Reset();
 }
 
 FTrem::~FTrem() {}
@@ -48,8 +48,8 @@ void FTrem::Reset()
 {
     LayerElement::Reset();
     BeamDrawingInterface::Reset();
-    ResetFTremVis();
-    ResetTremMeasured();
+    this->ResetFTremVis();
+    this->ResetTremMeasured();
 }
 
 bool FTrem::IsSupportedChild(Object *child)
@@ -123,7 +123,7 @@ int FTrem::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (GetElementCoords()->size() != 2) {
+    if (this->GetElementCoords()->size() != 2) {
         LogError("Stem calculation: <fTrem> element has invalid number of descendants.");
         return FUNCTOR_CONTINUE;
     }

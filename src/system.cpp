@@ -42,7 +42,7 @@ namespace vrv {
 
 System::System() : Object(SYSTEM, "system-"), DrawingListInterface(), AttTyped()
 {
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_TYPED);
 
     // We set parent to it because we want to access the parent doc from the aligners
     m_systemAligner.SetParent(this);
@@ -50,20 +50,20 @@ System::System() : Object(SYSTEM, "system-"), DrawingListInterface(), AttTyped()
     // owned pointers need to be set to NULL;
     m_drawingScoreDef = NULL;
 
-    Reset();
+    this->Reset();
 }
 
 System::~System()
 {
     // We need to delete own objects
-    Reset();
+    this->Reset();
 }
 
 void System::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
-    ResetTyped();
+    this->ResetTyped();
 
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
@@ -120,13 +120,13 @@ int System::GetDrawingY() const
 
 void System::SetDrawingXRel(int drawingXRel)
 {
-    ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
 }
 
 void System::SetDrawingYRel(int drawingYRel)
 {
-    ResetCachedDrawingY();
+    this->ResetCachedDrawingY();
     m_drawingYRel = drawingYRel;
 }
 
@@ -489,7 +489,7 @@ int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
-    SetDrawingXRel(0);
+    this->SetDrawingXRel(0);
     m_drawingAbbrLabelsWidth = 0;
 
     return FUNCTOR_CONTINUE;
@@ -497,7 +497,7 @@ int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int System::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    SetDrawingYRel(0);
+    this->SetDrawingYRel(0);
 
     m_systemAligner.Reset();
 
@@ -729,7 +729,7 @@ int System::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    SetDrawingXRel(m_systemLeftMar + this->GetDrawingLabelsWidth());
+    this->SetDrawingXRel(m_systemLeftMar + this->GetDrawingLabelsWidth());
     params->m_shift = 0;
     params->m_justifiableWidth = 0;
 
@@ -762,7 +762,7 @@ int System::AlignSystems(FunctorParams *functorParams)
         params->m_shift -= std::max(margin, 2 * unit);
     }
 
-    SetDrawingYRel(params->m_shift);
+    this->SetDrawingYRel(params->m_shift);
 
     params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel();
 

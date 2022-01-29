@@ -39,15 +39,15 @@ Mensur::Mensur()
     , AttSlashCount()
     , AttStaffLoc()
 {
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CUE);
-    RegisterAttClass(ATT_DURATIONRATIO);
-    RegisterAttClass(ATT_MENSURALSHARED);
-    RegisterAttClass(ATT_MENSURVIS);
-    RegisterAttClass(ATT_SLASHCOUNT);
-    RegisterAttClass(ATT_STAFFLOC);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_DURATIONRATIO);
+    this->RegisterAttClass(ATT_MENSURALSHARED);
+    this->RegisterAttClass(ATT_MENSURVIS);
+    this->RegisterAttClass(ATT_SLASHCOUNT);
+    this->RegisterAttClass(ATT_STAFFLOC);
 
-    Reset();
+    this->Reset();
 }
 
 Mensur::~Mensur() {}
@@ -55,13 +55,13 @@ Mensur::~Mensur() {}
 void Mensur::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
-    ResetCue();
-    ResetDurationRatio();
-    ResetMensuralShared();
-    ResetMensurVis();
-    ResetSlashCount();
-    ResetStaffLoc();
+    this->ResetColor();
+    this->ResetCue();
+    this->ResetDurationRatio();
+    this->ResetMensuralShared();
+    this->ResetMensurVis();
+    this->ResetSlashCount();
+    this->ResetStaffLoc();
 }
 
 //----------------------------------------------------------------------------

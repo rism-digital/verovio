@@ -41,7 +41,7 @@ namespace vrv {
 
 BeamSegment::BeamSegment()
 {
-    Reset();
+    this->Reset();
 }
 
 BeamSegment::~BeamSegment()
@@ -1292,12 +1292,12 @@ static const ClassRegistrar<Beam> s_factory("beam", BEAM);
 
 Beam::Beam() : LayerElement(BEAM, "beam-"), BeamDrawingInterface(), AttBeamedWith(), AttBeamRend(), AttColor(), AttCue()
 {
-    RegisterAttClass(ATT_BEAMEDWITH);
-    RegisterAttClass(ATT_BEAMREND);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_BEAMEDWITH);
+    this->RegisterAttClass(ATT_BEAMREND);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CUE);
 
-    Reset();
+    this->Reset();
 }
 
 Beam::~Beam() {}
@@ -1306,10 +1306,10 @@ void Beam::Reset()
 {
     LayerElement::Reset();
     BeamDrawingInterface::Reset();
-    ResetBeamedWith();
-    ResetBeamRend();
-    ResetColor();
-    ResetCue();
+    this->ResetBeamedWith();
+    this->ResetBeamRend();
+    this->ResetColor();
+    this->ResetCue();
 
     m_stemSameas = NULL;
 }
@@ -1630,7 +1630,7 @@ void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
 
 int Beam::CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, int y2)
 {
-    Layer *parentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
+    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     if (!parentLayer) return 0;
     // Check whether there are elements on other layer in the duration of the current beam. If there are none - stop
     // here, there's nothing to be done

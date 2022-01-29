@@ -25,9 +25,9 @@ static const ClassRegistrar<TabDurSym> s_factory("tabDurSym", TABDURSYM);
 
 TabDurSym::TabDurSym() : LayerElement(TABDURSYM, "tabdursym-"), AttNNumberLike()
 {
-    RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
 
-    Reset();
+    this->Reset();
 }
 
 TabDurSym::~TabDurSym() {}
@@ -35,7 +35,7 @@ TabDurSym::~TabDurSym() {}
 void TabDurSym::Reset()
 {
     LayerElement::Reset();
-    ResetNNumberLike();
+    this->ResetNNumberLike();
 }
 
 bool TabDurSym::IsSupportedChild(Object *child)

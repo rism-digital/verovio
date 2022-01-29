@@ -45,13 +45,13 @@ Slur::Slur()
     , AttCurveRend()
     , AttLayerIdent()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CURVATURE);
-    RegisterAttClass(ATT_CURVEREND);
-    RegisterAttClass(ATT_LAYERIDENT);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CURVATURE);
+    this->RegisterAttClass(ATT_CURVEREND);
+    this->RegisterAttClass(ATT_LAYERIDENT);
 
-    Reset();
+    this->Reset();
 }
 
 Slur::Slur(ClassId classId)
@@ -62,13 +62,13 @@ Slur::Slur(ClassId classId)
     , AttCurveRend()
     , AttLayerIdent()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CURVATURE);
-    RegisterAttClass(ATT_CURVEREND);
-    RegisterAttClass(ATT_LAYERIDENT);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CURVATURE);
+    this->RegisterAttClass(ATT_CURVEREND);
+    this->RegisterAttClass(ATT_LAYERIDENT);
 
-    Reset();
+    this->Reset();
 }
 
 Slur::Slur(ClassId classId, const std::string &classIdStr)
@@ -79,13 +79,13 @@ Slur::Slur(ClassId classId, const std::string &classIdStr)
     , AttCurveRend()
     , AttLayerIdent()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CURVATURE);
-    RegisterAttClass(ATT_CURVEREND);
-    RegisterAttClass(ATT_LAYERIDENT);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CURVATURE);
+    this->RegisterAttClass(ATT_CURVEREND);
+    this->RegisterAttClass(ATT_LAYERIDENT);
 
-    Reset();
+    this->Reset();
 }
 
 Slur::~Slur() {}
@@ -94,10 +94,10 @@ void Slur::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    ResetColor();
-    ResetCurvature();
-    ResetCurveRend();
-    ResetLayerIdent();
+    this->ResetColor();
+    this->ResetCurvature();
+    this->ResetCurveRend();
+    this->ResetLayerIdent();
 
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
 }

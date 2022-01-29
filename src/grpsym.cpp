@@ -30,13 +30,13 @@ static const ClassRegistrar<GrpSym> s_factory("grpSym", GRPSYM);
 GrpSym::GrpSym()
     : Object(GRPSYM, "grpsym-"), AttColor(), AttGrpSymLog(), AttStaffGroupingSym(), AttStartId(), AttStartEndId()
 {
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_GRPSYMLOG);
-    RegisterAttClass(ATT_STAFFGROUPINGSYM);
-    RegisterAttClass(ATT_STARTID);
-    RegisterAttClass(ATT_STARTENDID);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_GRPSYMLOG);
+    this->RegisterAttClass(ATT_STAFFGROUPINGSYM);
+    this->RegisterAttClass(ATT_STARTID);
+    this->RegisterAttClass(ATT_STARTENDID);
 
-    Reset();
+    this->Reset();
 }
 
 GrpSym::~GrpSym() {}
@@ -44,11 +44,11 @@ GrpSym::~GrpSym() {}
 void GrpSym::Reset()
 {
     Object::Reset();
-    ResetColor();
-    ResetGrpSymLog();
-    ResetStaffGroupingSym();
-    ResetStartId();
-    ResetStartEndId();
+    this->ResetColor();
+    this->ResetGrpSymLog();
+    this->ResetStaffGroupingSym();
+    this->ResetStartId();
+    this->ResetStartEndId();
 
     m_startDef = NULL;
     m_endDef = NULL;
@@ -84,13 +84,13 @@ int GrpSym::ScoreDefSetGrpSym(FunctorParams *)
 {
     // For the grpSym that is encoded in the scope of the staffGrp just get first and last staffDefs and set then as
     // starting and ending points
-    if (GetParent()->Is(STAFFGRP)) {
-        StaffGrp *staffGrp = vrv_cast<StaffGrp *>(GetParent());
+    if (this->GetParent()->Is(STAFFGRP)) {
+        StaffGrp *staffGrp = vrv_cast<StaffGrp *>(this->GetParent());
         assert(staffGrp);
         auto [firstDef, lastDef] = staffGrp->GetFirstLastStaffDef();
         if (firstDef && lastDef) {
-            SetStartDef(firstDef);
-            SetEndDef(lastDef);
+            this->SetStartDef(firstDef);
+            this->SetEndDef(lastDef);
             staffGrp->SetGroupSymbol(this);
         }
     }
@@ -98,13 +98,13 @@ int GrpSym::ScoreDefSetGrpSym(FunctorParams *)
     // @startid and @endid. We also need to make sure that @level attribute is adhered to, hence we limit search depth.
     // Finally, we need to make sure that both starting and ending elements have the same parent (since we cannot draw
     // cross-group grpSym)
-    else if (GetParent()->Is(SCOREDEF)) {
-        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(GetParent());
+    else if (this->GetParent()->Is(SCOREDEF)) {
+        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(this->GetParent());
         assert(scoreDef);
 
-        const std::string startId = ExtractUuidFragment(GetStartid());
-        const std::string endId = ExtractUuidFragment(GetEndid());
-        const int level = GetLevel();
+        const std::string startId = ExtractUuidFragment(this->GetStartid());
+        const std::string endId = ExtractUuidFragment(this->GetEndid());
+        const int level = this->GetLevel();
 
         UuidComparison compare(STAFFDEF, startId);
         StaffDef *start = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&compare, level));
@@ -112,18 +112,18 @@ int GrpSym::ScoreDefSetGrpSym(FunctorParams *)
         StaffDef *end = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&compare, level));
 
         if (!start || !end) {
-            LogWarning("Could not find startid/endid on level %d for <'%s'>", level, GetUuid().c_str());
+            LogWarning("Could not find startid/endid on level %d for <'%s'>", level, this->GetUuid().c_str());
             return FUNCTOR_CONTINUE;
         }
 
         if (start->GetParent() != end->GetParent()) {
-            LogWarning("<'%s'> has mismatching parents for startid:<'%s'> and endid:<'%s'>", GetUuid().c_str(),
+            LogWarning("<'%s'> has mismatching parents for startid:<'%s'> and endid:<'%s'>", this->GetUuid().c_str(),
                 startId.c_str(), endId.c_str());
             return FUNCTOR_CONTINUE;
         }
 
-        SetStartDef(start);
-        SetEndDef(end);
+        this->SetStartDef(start);
+        this->SetEndDef(end);
         StaffGrp *staffGrp = vrv_cast<StaffGrp *>(start->GetParent());
         staffGrp->SetGroupSymbol(this);
     }

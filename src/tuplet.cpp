@@ -45,12 +45,12 @@ Tuplet::Tuplet()
     , AttNumberPlacement()
     , AttTupletVis()
 {
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_DURATIONRATIO);
-    RegisterAttClass(ATT_NUMBERPLACEMENT);
-    RegisterAttClass(ATT_TUPLETVIS);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_DURATIONRATIO);
+    this->RegisterAttClass(ATT_NUMBERPLACEMENT);
+    this->RegisterAttClass(ATT_TUPLETVIS);
 
-    Reset();
+    this->Reset();
 }
 
 Tuplet::~Tuplet() {}
@@ -58,10 +58,10 @@ Tuplet::~Tuplet() {}
 void Tuplet::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
-    ResetDurationRatio();
-    ResetNumberPlacement();
-    ResetTupletVis();
+    this->ResetColor();
+    this->ResetDurationRatio();
+    this->ResetNumberPlacement();
+    this->ResetTupletVis();
 
     m_drawingLeft = NULL;
     m_drawingRight = NULL;
@@ -241,7 +241,7 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize)
 void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff, int staffSize)
 {
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
-    if (!tupletNum || (GetNumVisible() == BOOLEAN_false)) return;
+    if (!tupletNum || (this->GetNumVisible() == BOOLEAN_false)) return;
 
     this->CalculateTupletNumCrossStaff(tupletNum);
 

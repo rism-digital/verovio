@@ -32,10 +32,10 @@ static const ClassRegistrar<BTrem> s_factory("btrem", BTREM);
 
 BTrem::BTrem() : LayerElement(BTREM, "btrem-"), AttBTremLog(), AttTremMeasured()
 {
-    RegisterAttClass(ATT_BTREMLOG);
-    RegisterAttClass(ATT_TREMMEASURED);
+    this->RegisterAttClass(ATT_BTREMLOG);
+    this->RegisterAttClass(ATT_TREMMEASURED);
 
-    Reset();
+    this->Reset();
 }
 
 BTrem::~BTrem() {}
@@ -43,8 +43,8 @@ BTrem::~BTrem() {}
 void BTrem::Reset()
 {
     LayerElement::Reset();
-    ResetBTremLog();
-    ResetTremMeasured();
+    this->ResetBTremLog();
+    this->ResetTremMeasured();
 }
 
 bool BTrem::IsSupportedChild(Object *child)

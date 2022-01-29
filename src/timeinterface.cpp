@@ -29,20 +29,20 @@ namespace vrv {
 
 TimePointInterface::TimePointInterface() : Interface(), AttStaffIdent(), AttStartId(), AttTimestampLogical()
 {
-    RegisterInterfaceAttClass(ATT_STAFFIDENT);
-    RegisterInterfaceAttClass(ATT_STARTID);
-    RegisterInterfaceAttClass(ATT_TIMESTAMPLOGICAL);
+    this->RegisterInterfaceAttClass(ATT_STAFFIDENT);
+    this->RegisterInterfaceAttClass(ATT_STARTID);
+    this->RegisterInterfaceAttClass(ATT_TIMESTAMPLOGICAL);
 
-    Reset();
+    this->Reset();
 }
 
 TimePointInterface::~TimePointInterface() {}
 
 void TimePointInterface::Reset()
 {
-    ResetStaffIdent();
-    ResetStartId();
-    ResetTimestampLogical();
+    this->ResetStaffIdent();
+    this->ResetStartId();
+    this->ResetTimestampLogical();
 
     m_start = NULL;
     m_startUuid = "";
@@ -157,10 +157,10 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
 
 TimeSpanningInterface::TimeSpanningInterface() : TimePointInterface(), AttStartEndId(), AttTimestamp2Logical()
 {
-    RegisterInterfaceAttClass(ATT_STARTENDID);
-    RegisterInterfaceAttClass(ATT_TIMESTAMP2LOGICAL);
+    this->RegisterInterfaceAttClass(ATT_STARTENDID);
+    this->RegisterInterfaceAttClass(ATT_TIMESTAMP2LOGICAL);
 
-    Reset();
+    this->Reset();
 }
 
 TimeSpanningInterface::~TimeSpanningInterface() {}
@@ -168,8 +168,8 @@ TimeSpanningInterface::~TimeSpanningInterface() {}
 void TimeSpanningInterface::Reset()
 {
     TimePointInterface::Reset();
-    ResetStartEndId();
-    ResetTimestamp2Logical();
+    this->ResetStartEndId();
+    this->ResetTimestamp2Logical();
 
     m_end = NULL;
     m_endUuid = "";
@@ -323,7 +323,7 @@ int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams,
                 object->GetClassName().c_str(), object->GetUuid().c_str());
         return FUNCTOR_CONTINUE;
     }
-    else if (!HasTstamp()) {
+    else if (!this->HasTstamp()) {
         return FUNCTOR_CONTINUE; // This file is quite likely invalid?
     }
 
@@ -388,7 +388,7 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
         }
         return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
     }
-    else if (!HasTstamp2()) {
+    else if (!this->HasTstamp2()) {
         // We won't be able to do anything, just try to prepare the tstamp (start)
         return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
     }

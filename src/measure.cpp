@@ -63,14 +63,14 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     , AttPointing()
     , AttTyped()
 {
-    RegisterAttClass(ATT_BARRING);
-    RegisterAttClass(ATT_COORDX1);
-    RegisterAttClass(ATT_COORDX2);
-    RegisterAttClass(ATT_MEASURELOG);
-    RegisterAttClass(ATT_METERCONFORMANCEBAR);
-    RegisterAttClass(ATT_NNUMBERLIKE);
-    RegisterAttClass(ATT_POINTING);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_BARRING);
+    this->RegisterAttClass(ATT_COORDX1);
+    this->RegisterAttClass(ATT_COORDX2);
+    this->RegisterAttClass(ATT_MEASURELOG);
+    this->RegisterAttClass(ATT_METERCONFORMANCEBAR);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_POINTING);
+    this->RegisterAttClass(ATT_TYPED);
 
     m_measuredMusic = measureMusic;
     // We set parent to it because we want to access the parent doc from the aligners
@@ -88,7 +88,7 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     m_leftBarLine.SetPosition(BarLinePosition::Left);
     m_rightBarLine.SetPosition(BarLinePosition::Right);
 
-    Reset();
+    this->Reset();
 
     if (!measureMusic) this->SetRight(BARRENDITION_invis);
 }
@@ -96,7 +96,7 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
 Measure::~Measure()
 {
     // We need to delete own objects
-    Reset();
+    this->Reset();
 }
 
 void Measure::CloneReset()
@@ -118,13 +118,13 @@ void Measure::CloneReset()
 void Measure::Reset()
 {
     Object::Reset();
-    ResetCoordX1();
-    ResetCoordX2();
-    ResetMeasureLog();
-    ResetMeterConformanceBar();
-    ResetNNumberLike();
-    ResetPointing();
-    ResetTyped();
+    this->ResetCoordX1();
+    this->ResetCoordX2();
+    this->ResetMeasureLog();
+    this->ResetMeterConformanceBar();
+    this->ResetNNumberLike();
+    this->ResetPointing();
+    this->ResetTyped();
 
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
@@ -234,7 +234,7 @@ void Measure::ResetCachedDrawingX() const
 
 void Measure::SetDrawingXRel(int drawingXRel)
 {
-    ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
 }
 
@@ -248,7 +248,7 @@ int Measure::GetLeftBarLineXRel() const
 
 int Measure::GetLeftBarLineLeft() const
 {
-    int x = GetLeftBarLineXRel();
+    int x = this->GetLeftBarLineXRel();
     if (m_leftBarLine.HasSelfBB()) {
         x += m_leftBarLine.GetContentX1();
     }
@@ -257,7 +257,7 @@ int Measure::GetLeftBarLineLeft() const
 
 int Measure::GetLeftBarLineRight() const
 {
-    int x = GetLeftBarLineXRel();
+    int x = this->GetLeftBarLineXRel();
     if (m_leftBarLine.HasSelfBB()) {
         x += m_leftBarLine.GetContentX2();
     }
@@ -274,7 +274,7 @@ int Measure::GetRightBarLineXRel() const
 
 int Measure::GetRightBarLineWidth(Doc *doc)
 {
-    const BarLine *barline = GetRightBarLine();
+    const BarLine *barline = this->GetRightBarLine();
     if (!barline) return 0;
 
     const int staffSize = 100;
@@ -306,7 +306,7 @@ int Measure::GetRightBarLineWidth(Doc *doc)
 
 int Measure::GetRightBarLineLeft() const
 {
-    int x = GetRightBarLineXRel();
+    int x = this->GetRightBarLineXRel();
     if (m_rightBarLine.HasSelfBB()) {
         x += m_rightBarLine.GetContentX1();
     }
@@ -315,7 +315,7 @@ int Measure::GetRightBarLineLeft() const
 
 int Measure::GetRightBarLineRight() const
 {
-    int x = GetRightBarLineXRel();
+    int x = this->GetRightBarLineXRel();
     if (m_rightBarLine.HasSelfBB()) {
         x += m_rightBarLine.GetContentX2();
     }
@@ -464,14 +464,14 @@ data_BARRENDITION Measure::GetDrawingLeftBarLineByStaffN(int staffN) const
 {
     auto elementIter = m_invisibleStaffBarlines.find(staffN);
     if (elementIter != m_invisibleStaffBarlines.end()) return elementIter->second.first;
-    return GetDrawingLeftBarLine();
+    return this->GetDrawingLeftBarLine();
 }
 
 data_BARRENDITION Measure::GetDrawingRightBarLineByStaffN(int staffN) const
 {
     auto elementIter = m_invisibleStaffBarlines.find(staffN);
     if (elementIter != m_invisibleStaffBarlines.end()) return elementIter->second.second;
-    return GetDrawingRightBarLine();
+    return this->GetDrawingRightBarLine();
 }
 
 Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
@@ -529,11 +529,11 @@ Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
                 { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
     };
 
-    const BarlineRenditionPair defaultValue = { previous->GetRight(), GetLeft() };
+    const BarlineRenditionPair defaultValue = { previous->GetRight(), this->GetLeft() };
     auto previousRight = drawingLines.find(previous->GetRight());
     if (previousRight == drawingLines.end()) return defaultValue;
 
-    auto currentLeft = previousRight->second.find(GetLeft());
+    auto currentLeft = previousRight->second.find(this->GetLeft());
     if (currentLeft == previousRight->second.end()) return defaultValue;
 
     return currentLeft->second;
@@ -627,7 +627,7 @@ void Measure::SetInvisibleStaffBarlines(
     for (const auto object : previousInvisible) {
         Staff *staff = vrv_cast<Staff *>(object);
         assert(staff);
-        data_BARRENDITION left = GetLeft();
+        data_BARRENDITION left = this->GetLeft();
         if ((left == BARRENDITION_NONE) && !(barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT))
             left = BARRENDITION_single;
         auto [iter, result] = m_invisibleStaffBarlines.insert({ staff->GetN(), { left, BARRENDITION_NONE } });
@@ -829,7 +829,7 @@ int Measure::ScoreDefOptimize(FunctorParams *functorParams)
 
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
-    SetDrawingXRel(0);
+    this->SetDrawingXRel(0);
     if (m_measureAligner.GetLeftAlignment()) {
         m_measureAligner.GetLeftAlignment()->SetXRel(0);
     }
@@ -1171,7 +1171,7 @@ int Measure::JustifyX(FunctorParams *functorParams)
         this->SetDrawingXRel(params->m_measureXRel);
     }
     else {
-        params->m_measureXRel = GetDrawingXRel();
+        params->m_measureXRel = this->GetDrawingXRel();
     }
 
     m_measureAligner.Process(params->m_functor, params);

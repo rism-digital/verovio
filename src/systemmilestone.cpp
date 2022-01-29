@@ -26,7 +26,7 @@ namespace vrv {
 
 SystemMilestoneEnd::SystemMilestoneEnd(Object *start) : SystemElement(SYSTEM_MILESTONE_END, "system-milestone-end-")
 {
-    Reset();
+    this->Reset();
     m_start = start;
     m_startClassName = start->GetClassName();
 }
@@ -45,7 +45,7 @@ void SystemMilestoneEnd::Reset()
 
 SystemMilestoneInterface::SystemMilestoneInterface()
 {
-    Reset();
+    this->Reset();
 }
 
 SystemMilestoneInterface::~SystemMilestoneInterface() {}

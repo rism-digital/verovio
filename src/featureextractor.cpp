@@ -37,7 +37,7 @@ namespace vrv {
 FeatureExtractor::FeatureExtractor(const std::string &options)
 {
     // We currently have no option support
-    Reset();
+    this->Reset();
 }
 
 FeatureExtractor::~FeatureExtractor() {}

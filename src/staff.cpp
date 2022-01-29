@@ -44,14 +44,14 @@ static const ClassRegistrar<Staff> s_factory("staff", STAFF);
 Staff::Staff(int n)
     : Object(STAFF, "staff-"), FacsimileInterface(), AttCoordY1(), AttNInteger(), AttTyped(), AttVisibility()
 {
-    RegisterAttClass(ATT_COORDY1);
-    RegisterAttClass(ATT_NINTEGER);
-    RegisterAttClass(ATT_TYPED);
-    RegisterAttClass(ATT_VISIBILITY);
-    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
+    this->RegisterAttClass(ATT_COORDY1);
+    this->RegisterAttClass(ATT_NINTEGER);
+    this->RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
 
-    Reset();
-    SetN(n);
+    this->Reset();
+    this->SetN(n);
 }
 
 Staff::~Staff() {}
@@ -60,10 +60,10 @@ void Staff::Reset()
 {
     Object::Reset();
     FacsimileInterface::Reset();
-    ResetCoordY1();
-    ResetNInteger();
-    ResetTyped();
-    ResetVisibility();
+    this->ResetCoordY1();
+    this->ResetNInteger();
+    this->ResetTyped();
+    this->ResetVisibility();
 
     m_yAbs = VRV_UNSET;
 
@@ -383,7 +383,7 @@ int Staff::GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place)
 
 LedgerLine::LedgerLine()
 {
-    Reset();
+    this->Reset();
 }
 
 LedgerLine::~LedgerLine() {}
@@ -525,7 +525,7 @@ int Staff::AlignHorizontally(FunctorParams *functorParams)
     else {
         params->m_notationType = NOTATIONTYPE_cmn;
     }
-    Measure *parentMeasure = vrv_cast<Measure *>(GetFirstAncestor(MEASURE));
+    Measure *parentMeasure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
     if (parentMeasure) m_drawingStaffDef->AlternateCurrentMeterSig(parentMeasure);
 
     return FUNCTOR_CONTINUE;

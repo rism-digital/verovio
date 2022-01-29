@@ -32,9 +32,9 @@ namespace vrv {
 
 Dots::Dots() : LayerElement(DOTS, "dots-"), AttAugmentDots()
 {
-    RegisterAttClass(ATT_AUGMENTDOTS);
+    this->RegisterAttClass(ATT_AUGMENTDOTS);
 
-    Reset();
+    this->Reset();
 }
 
 Dots::~Dots() {}
@@ -42,7 +42,7 @@ Dots::~Dots() {}
 void Dots::Reset()
 {
     LayerElement::Reset();
-    ResetAugmentDots();
+    this->ResetAugmentDots();
 
     m_isAdjusted = false;
     m_flagShift = 0;
@@ -69,7 +69,7 @@ std::set<int> &Dots::ModifyDotLocsForStaff(Staff *staff)
 Flag::Flag() : LayerElement(FLAG, "flag-")
 {
 
-    Reset();
+    this->Reset();
 }
 
 Flag::~Flag() {}
@@ -131,9 +131,9 @@ Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code
 
 TupletBracket::TupletBracket() : LayerElement(TUPLET_BRACKET, "bracket-"), AttTupletVis()
 {
-    RegisterAttClass(ATT_TUPLETVIS);
+    this->RegisterAttClass(ATT_TUPLETVIS);
 
-    Reset();
+    this->Reset();
 }
 
 TupletBracket::~TupletBracket() {}
@@ -141,7 +141,7 @@ TupletBracket::~TupletBracket() {}
 void TupletBracket::Reset()
 {
     LayerElement::Reset();
-    ResetTupletVis();
+    this->ResetTupletVis();
 
     m_drawingXRelLeft = 0;
     m_drawingXRelRight = 0;
@@ -204,10 +204,10 @@ int TupletBracket::GetDrawingYRight()
 
 TupletNum::TupletNum() : LayerElement(TUPLET_NUM, "num-"), AttNumberPlacement(), AttTupletVis()
 {
-    RegisterAttClass(ATT_NUMBERPLACEMENT);
-    RegisterAttClass(ATT_TUPLETVIS);
+    this->RegisterAttClass(ATT_NUMBERPLACEMENT);
+    this->RegisterAttClass(ATT_TUPLETVIS);
 
-    Reset();
+    this->Reset();
 }
 
 TupletNum::~TupletNum() {}
@@ -215,8 +215,8 @@ TupletNum::~TupletNum() {}
 void TupletNum::Reset()
 {
     LayerElement::Reset();
-    ResetNumberPlacement();
-    ResetTupletVis();
+    this->ResetNumberPlacement();
+    this->ResetTupletVis();
 
     m_alignedBracket = NULL;
 }
@@ -273,11 +273,11 @@ void TupletNum::SetAlignedBracket(TupletBracket *alignedBracket)
 
 Stem::Stem() : LayerElement(STEM, "stem-"), AttGraced(), AttStems(), AttStemsCmn()
 {
-    RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_STEMS);
-    RegisterAttClass(ATT_STEMSCMN);
+    this->RegisterAttClass(ATT_GRACED);
+    this->RegisterAttClass(ATT_STEMS);
+    this->RegisterAttClass(ATT_STEMSCMN);
 
-    Reset();
+    this->Reset();
 }
 
 Stem::~Stem() {}
@@ -285,9 +285,9 @@ Stem::~Stem() {}
 void Stem::Reset()
 {
     LayerElement::Reset();
-    ResetGraced();
-    ResetStems();
-    ResetStemsCmn();
+    this->ResetGraced();
+    this->ResetStems();
+    this->ResetStemsCmn();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingStemLen = 0;
@@ -319,7 +319,7 @@ int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int mar
     currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
     if (currentFlag && currentFlag->m_drawingNbFlags) {
         wchar_t flagGlyph = currentFlag->GetFlagGlyph(STEMDIRECTION_down);
-        const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, GetDrawingCueSize());
+        const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, this->GetDrawingCueSize());
         horizontalMargin += flagWidth;
     }
 
@@ -333,26 +333,26 @@ int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int mar
 
 void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
 {
-    LayerElement *parent = vrv_cast<LayerElement *>(GetParent());
+    LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
     if (!parent) return;
 
-    const data_STEMDIRECTION stemDirection = GetDrawingStemDir();
+    const data_STEMDIRECTION stemDirection = this->GetDrawingStemDir();
     // For overlapping purposes we don't care for flags shorter than 16th since they grow in opposite direction
     wchar_t flagGlyph = SMUFL_E242_flag16thUp;
     if (duration < DURATION_16) flagGlyph = flag->GetFlagGlyph(stemDirection);
-    const int glyphHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
+    const int glyphHeight = doc->GetGlyphHeight(flagGlyph, staffSize, this->GetDrawingCueSize());
 
     // Make sure that flags don't overlap with notehead. Upward flags cannot overlap with noteheads so check
     // only downward ones
     const int adjustmentStep = doc->GetDrawingUnit(staffSize);
     if (stemDirection == STEMDIRECTION_down) {
-        const int noteheadMargin = GetDrawingStemLen() - (glyphHeight + parent->GetDrawingRadius(doc));
+        const int noteheadMargin = this->GetDrawingStemLen() - (glyphHeight + parent->GetDrawingRadius(doc));
         if ((duration > DURATION_16) && (noteheadMargin < 0)) {
             int offset = 0;
             if (noteheadMargin % adjustmentStep < -adjustmentStep / 3 * 2) offset = adjustmentStep / 2;
             const int heightToAdjust = (noteheadMargin / adjustmentStep) * adjustmentStep - offset;
-            SetDrawingStemLen(GetDrawingStemLen() - heightToAdjust);
-            flag->SetDrawingYRel(-GetDrawingStemLen());
+            this->SetDrawingStemLen(this->GetDrawingStemLen() - heightToAdjust);
+            flag->SetDrawingYRel(-this->GetDrawingStemLen());
         }
     }
 
@@ -372,7 +372,7 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
 
     // Make sure that flags don't overlap with first (top or bottom) ledger line (effectively avoiding all ledgers)
     const int directionBias = (stemDirection == STEMDIRECTION_down) ? -1 : 1;
-    const int position = GetDrawingY() - GetDrawingStemLen() - directionBias * glyphHeight;
+    const int position = this->GetDrawingY() - this->GetDrawingStemLen() - directionBias * glyphHeight;
     const int ledgerPosition = verticalCenter - 6 * directionBias * adjustmentStep;
     const int displacementMargin = (position - ledgerPosition) * directionBias;
 
@@ -382,8 +382,8 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
             offset = adjustmentStep / 2;
         }
         const int heightToAdjust = (displacementMargin / adjustmentStep - 1) * adjustmentStep * directionBias - offset;
-        SetDrawingStemLen(GetDrawingStemLen() + heightToAdjust);
-        flag->SetDrawingYRel(-GetDrawingStemLen());
+        this->SetDrawingStemLen(this->GetDrawingStemLen() + heightToAdjust);
+        flag->SetDrawingYRel(-this->GetDrawingStemLen());
     }
 }
 
