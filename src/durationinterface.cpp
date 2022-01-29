@@ -303,48 +303,4 @@ double DurationInterface::GetScoreTimeDuration() const
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int DurationInterface::InterfaceGenerateTimemap(FunctorParams *functorParams, Object *object)
-{
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
-    double realTimeStart = params->m_realTimeOffsetMilliseconds + this->GetRealTimeOnsetMilliseconds();
-    double scoreTimeStart = params->m_scoreTimeOffset + this->GetScoreTimeOnset();
-
-    double realTimeEnd = params->m_realTimeOffsetMilliseconds + this->GetRealTimeOffsetMilliseconds();
-    double scoreTimeEnd = params->m_scoreTimeOffset + this->GetScoreTimeOffset();
-
-    bool isRest = (object->Is(REST));
-
-    TimemapEntry startEntry;
-    if (params->m_timemap.count(realTimeStart) > 0) startEntry = params->m_timemap.at(realTimeStart);
-
-    // Should check if value for realTimeStart already exists and if so, then
-    // ensure that it is equal to scoreTimeStart:
-    startEntry.qstamp = scoreTimeStart;
-
-    // Store the element ID in list to turn on at given time - note or rest
-    if (!isRest) startEntry.notesOn.push_back(object->GetUuid());
-    if (isRest) startEntry.restsOn.push_back(object->GetUuid());
-
-    TimemapEntry endEntry;
-    if (params->m_timemap.count(realTimeEnd) > 0) endEntry = params->m_timemap.at(realTimeEnd);
-
-    // Should check if value for realTimeEnd already exists and if so, then
-    // ensure that it is equal to scoreTimeEnd:
-    endEntry.qstamp = scoreTimeEnd;
-
-    // Store the element ID in list to turn off at given time - notes or rest
-    if (!isRest) endEntry.notesOff.push_back(object->GetUuid());
-    if (isRest) endEntry.restsOff.push_back(object->GetUuid());
-
-    startEntry.tempo = params->m_currentTempo;
-
-    // Update the timemap
-    params->m_timemap[realTimeStart] = startEntry;
-    params->m_timemap[realTimeEnd] = endEntry;
-
-    return FUNCTOR_SIBLINGS;
-}
-
 } // namespace vrv

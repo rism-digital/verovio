@@ -137,11 +137,6 @@ public:
      * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
      */
 
-    /**
-     * See Object::GenerateTimemap
-     */
-    virtual int InterfaceGenerateTimemap(FunctorParams *functorParams, Object *object);
-
 private:
     /**
      * Calculate the actual duration => translate mensural values
