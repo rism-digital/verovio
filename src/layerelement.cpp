@@ -119,6 +119,9 @@ void LayerElement::Reset()
     m_drawingXRel = 0;
     m_drawingCueSize = false;
 
+    m_cachedYRel = VRV_UNSET;
+    m_cachedXRel = VRV_UNSET;
+
     m_scoreDefRole = SCOREDEF_NONE;
     m_alignment = NULL;
     m_graceAlignment = NULL;
@@ -2530,6 +2533,20 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
+{
+    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    if (this->Is(MULTIREST)) {
+        MultiRest *multiRest = vrv_cast<MultiRest *>(this);
+        assert(multiRest);
+        params->m_multiRestFactor = multiRest->GetNum();
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int LayerElement::ResetDrawing(FunctorParams *functorParams)
 {
     m_drawingCueSize = false;
@@ -2587,6 +2604,23 @@ int LayerElement::PrepareDuration(FunctorParams *functorParams)
                 durInterface->SetDurDefault(params->m_durDefaultForStaffN.at(staff->GetN()));
             }
         }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::HorizontalLayoutCache(FunctorParams *functorParams)
+{
+    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    assert(params);
+
+    if (params->m_restore) {
+        m_drawingXRel = m_cachedXRel;
+        m_drawingYRel = m_cachedYRel;
+    }
+    else {
+        m_cachedXRel = m_drawingXRel;
+        m_cachedYRel = m_drawingYRel;
     }
 
     return FUNCTOR_CONTINUE;

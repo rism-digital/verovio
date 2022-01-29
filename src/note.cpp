@@ -32,6 +32,7 @@
 #include "syl.h"
 #include "tabgrp.h"
 #include "tie.h"
+#include "timemap.h"
 #include "transposition.h"
 #include "tuning.h"
 #include "verse.h"
@@ -1486,10 +1487,15 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
 
 int Note::GenerateTimemap(FunctorParams *functorParams)
 {
+    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
     Note *note = vrv_cast<Note *>(this->ThisOrSameasAsLink());
     assert(note);
 
-    return note->InterfaceGenerateTimemap(functorParams, note);
+    params->m_timemap->AddEntry(note, params);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int Note::Transpose(FunctorParams *functorParams)

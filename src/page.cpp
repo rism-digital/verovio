@@ -426,6 +426,17 @@ void Page::LayOutHorizontally()
     this->Process(&prepareSlurs, &prepareSlursParams);
 }
 
+void Page::HorizontalLayoutCachePage(bool restore)
+{
+    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
+    assert(doc);
+
+    HorizontalLayoutCacheParams horizontalLayoutCacheParams(doc);
+    horizontalLayoutCacheParams.m_restore = restore;
+    Functor horizontalLayoutCache(&Object::HorizontalLayoutCache);
+    this->Process(&horizontalLayoutCache, &horizontalLayoutCacheParams);
+}
+
 void Page::LayOutVertically()
 {
     Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));

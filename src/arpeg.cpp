@@ -55,6 +55,7 @@ void Arpeg::Reset()
     ResetEnclosingChars();
 
     m_drawingXRel = 0;
+    m_cachedXRel = VRV_UNSET;
 }
 
 int Arpeg::GetDrawingX() const
@@ -267,6 +268,21 @@ int Arpeg::ResetDrawing(FunctorParams *functorParams)
     PlistInterface *interface = this->GetPlistInterface();
     assert(interface);
     return interface->InterfaceResetDrawing(functorParams, this);
+}
+
+int Arpeg::HorizontalLayoutCache(FunctorParams *functorParams)
+{
+    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    assert(params);
+
+    if (params->m_restore) {
+        m_drawingXRel = m_cachedXRel;
+    }
+    else {
+        m_cachedXRel = m_drawingXRel;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

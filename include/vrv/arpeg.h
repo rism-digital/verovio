@@ -103,6 +103,11 @@ public:
      */
     int ResetDrawing(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::HorizontalLayoutCache
+     */
+    int HorizontalLayoutCache(FunctorParams *functorParams) override;
+
 protected:
     //
 private:
@@ -116,6 +121,11 @@ private:
      * (See View::DrawArpeg that sets the FloatingPositioner)
      */
     int m_drawingXRel;
+
+    /**
+     * The cached value for m_drawingXRel for caching horizontal layout
+     */
+    int m_cachedXRel;
 };
 
 } // namespace vrv

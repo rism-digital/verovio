@@ -572,8 +572,11 @@ public:
      *
      * This can be called once the rendering option were changed, for example with a new page (sceen) height or a new
      * zoom level.
+     *
+     * @param jsonOptions A stringified JSON object with the action options
+     * resetCache: true or false; true by default;
      */
-    void RedoLayout();
+    void RedoLayout(const std::string &jsonOptions = "");
 
     /**
      * Redo the layout of the pitch postitions of the current drawing page

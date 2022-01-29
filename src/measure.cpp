@@ -36,6 +36,7 @@
 #include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
+#include "timemap.h"
 #include "timestamp.h"
 #include "vrv.h"
 
@@ -134,6 +135,10 @@ void Measure::Reset()
     m_xAbs = VRV_UNSET;
     m_xAbs2 = VRV_UNSET;
     m_drawingXRel = 0;
+
+    m_cachedXRel = VRV_UNSET;
+    m_cachedOverflow = VRV_UNSET;
+    m_cachedWidth = VRV_UNSET;
 
     // by default, we have a single barLine on the right (none on the left)
     m_rightBarLine.SetForm(this->GetRight());
@@ -1204,8 +1209,10 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
-    // Check if the measure has some overflowing control elements
-    int overflow = this->GetDrawingOverflow();
+    const bool hasCache = this->HasCachedHorizontalLayout();
+    int overflow = hasCache ? this->m_cachedOverflow : this->GetDrawingOverflow();
+    int width = hasCache ? this->m_cachedWidth : this->GetWidth();
+    int drawingXRel = this->m_drawingXRel;
 
     Object *nextMeasure = params->m_contentSystem->GetNext(this, MEASURE);
     const bool isLeftoverMeasure = ((NULL == nextMeasure) && params->m_doc->GetOptions()->m_breaksNoWidow.GetValue()
@@ -1221,11 +1228,10 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if (m_drawingXRel + GetWidth() + params->m_currentScoreDefWidth - params->m_shift
-            > params->m_systemWidth) {
+        else if (drawingXRel + width + params->m_currentScoreDefWidth - params->m_shift > params->m_systemWidth) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
-            params->m_shift = this->m_drawingXRel;
+            params->m_shift = drawingXRel;
             // If last measure requires separate system - mark that system as leftover for the future CastOffPages call
             if (isLeftoverMeasure) {
                 params->m_leftoverSystem = params->m_currentSystem;
@@ -1234,8 +1240,8 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
                     assert(firstPendingMesure);
+                    params->m_shift = firstPendingMesure->m_cachedXRel;
                     params->m_leftoverSystem = NULL;
-                    params->m_shift = firstPendingMesure->m_drawingXRel;
                     // it has to be first measure
                     break;
                 }
@@ -1548,26 +1554,11 @@ int Measure::GenerateTimemap(FunctorParams *functorParams)
     GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
-    // Deal with repeated music later, for now get the last times.
-    params->m_scoreTimeOffset = m_scoreTimeOffset.back();
-    params->m_realTimeOffsetMilliseconds = m_realTimeOffsetMilliseconds.back();
-    params->m_currentTempo = m_currentTempo;
+    params->m_scoreTimeOffset = this->m_scoreTimeOffset.back();
+    params->m_realTimeOffsetMilliseconds = this->m_realTimeOffsetMilliseconds.back();
+    params->m_currentTempo = this->m_currentTempo;
 
-    double scoreTimeStart = params->m_scoreTimeOffset;
-    double realTimeStart = params->m_realTimeOffsetMilliseconds;
-
-    TimemapEntry startEntry;
-    if (params->m_timemap.count(realTimeStart) > 0) startEntry = params->m_timemap.at(realTimeStart);
-
-    // Should check if value for realTimeStart already exists and if so, then
-    // ensure that it is equal to scoreTimeStart:
-    startEntry.qstamp = scoreTimeStart;
-
-    // Add the measureOn
-    startEntry.measureOn = this->GetUuid();
-
-    // Update the timemap
-    params->m_timemap[realTimeStart] = startEntry;
+    params->m_timemap->AddEntry(this, params);
 
     return FUNCTOR_CONTINUE;
 }
@@ -1578,32 +1569,26 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     assert(params);
 
     m_scoreTimeOffset.clear();
-    m_scoreTimeOffset.push_back(params->m_maxCurrentScoreTime);
-    params->m_maxCurrentScoreTime += m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX;
-
-    // search for tempo marks in the measure
-    Tempo *tempo = dynamic_cast<Tempo *>(this->FindDescendantByType(TEMPO));
-    if (tempo && tempo->HasMidiBpm()) {
-        params->m_currentTempo = tempo->GetMidiBpm();
-    }
-    else if (tempo && tempo->HasMm()) {
-        double mm = tempo->GetMm();
-        int mmUnit = 4;
-        if (tempo->HasMmUnit() && (tempo->GetMmUnit() > DURATION_breve)) {
-            mmUnit = pow(2, (int)tempo->GetMmUnit() - 2);
-        }
-        if (tempo->HasMmDots()) {
-            mmUnit = 2 * mmUnit - (mmUnit / pow(2, tempo->GetMmDots()));
-        }
-        params->m_currentTempo = mm * 4.0 / mmUnit + 0.5;
-    }
-    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
+    m_scoreTimeOffset.push_back(params->m_currentScoreTime);
 
     m_realTimeOffsetMilliseconds.clear();
     // m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
-    m_realTimeOffsetMilliseconds.push_back(params->m_maxCurrentRealTimeSeconds * 1000.0);
-    params->m_maxCurrentRealTimeSeconds
-        += (m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX) * 60.0 / m_currentTempo;
+    m_realTimeOffsetMilliseconds.push_back(params->m_currentRealTimeSeconds * 1000.0);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
+{
+    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    const double scoreTimeIncrement
+        = m_measureAligner.GetRightAlignment()->GetTime() * params->m_multiRestFactor * DURATION_4 / DUR_MAX;
+    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
+    params->m_currentScoreTime += scoreTimeIncrement;
+    params->m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / m_currentTempo;
+    params->m_multiRestFactor = 1;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1614,6 +1599,39 @@ int Measure::CalcOnsetOffset(FunctorParams *functorParams)
     assert(params);
 
     params->m_currentTempo = m_currentTempo;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::UnCastOff(FunctorParams *functorParams)
+{
+    UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
+    assert(params);
+
+    if (params->m_resetCache) {
+        m_cachedXRel = VRV_UNSET;
+        m_cachedWidth = VRV_UNSET;
+        m_cachedOverflow = VRV_UNSET;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::HorizontalLayoutCache(FunctorParams *functorParams)
+{
+    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    assert(params);
+
+    if (params->m_restore) {
+        m_drawingXRel = m_cachedXRel;
+    }
+    else {
+        m_cachedWidth = this->GetWidth();
+        m_cachedOverflow = this->GetDrawingOverflow();
+        m_cachedXRel = m_drawingXRel;
+    }
+    if (this->GetLeftBarLine()) this->GetLeftBarLine()->HorizontalLayoutCache(functorParams);
+    if (this->GetRightBarLine()) this->GetRightBarLine()->HorizontalLayoutCache(functorParams);
 
     return FUNCTOR_CONTINUE;
 }

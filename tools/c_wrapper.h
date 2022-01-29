@@ -42,7 +42,7 @@ const char *vrvToolkit_renderToMIDI(void *tkPtr, const char *c_options);
 const char *vrvToolkit_renderToPAE(void *tkPtr);
 const char *vrvToolkit_renderToSVG(void *tkPtr, int page_no, const char *c_options);
 const char *vrvToolkit_renderToTimemap(void *tkPtr);
-void vrvToolkit_redoLayout(void *tkPtr);
+void vrvToolkit_redoLayout(void *tkPtr, const char *c_options);
 void vrvToolkit_redoPagePitchPosLayout(void *tkPtr);
 const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *options);
 void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed);

@@ -57,6 +57,7 @@ class StemmedDrawingInterface;
 class Syl;
 class System;
 class SystemAligner;
+class Timemap;
 class Transposer;
 class TupletNum;
 class Turn;
@@ -991,9 +992,11 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: std::vector<double>: a stack of maximum duration filled by the functor
- * member 1: double: the duration of the current measure
- * member 2: the current bpm
+ * member 0: the current score time
+ * member 1: the current time in seconds
+ * member 2: the current tempo
+ * member 3: the tempo adjustment
+ * member 4: factor for multibar rests
  **/
 
 class CalcMaxMeasureDurationParams : public FunctorParams {
@@ -1002,17 +1005,15 @@ public:
     {
         m_currentScoreTime = 0.0;
         m_currentRealTimeSeconds = 0.0;
-        m_maxCurrentScoreTime = 0.0;
-        m_maxCurrentRealTimeSeconds = 0.0;
         m_currentTempo = 120.0;
         m_tempoAdjustment = 1.0;
+        m_multiRestFactor = 1;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
-    double m_maxCurrentScoreTime;
-    double m_maxCurrentRealTimeSeconds;
     double m_currentTempo;
     double m_tempoAdjustment;
+    int m_multiRestFactor;
 };
 
 //----------------------------------------------------------------------------
@@ -1551,6 +1552,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// HorizontalLayoutCacheParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a flag indicating if the cache should be stored (default) or restored
+ * member 1: a pointer to the Doc
+ **/
+
+class HorizontalLayoutCacheParams : public FunctorParams {
+public:
+    HorizontalLayoutCacheParams(Doc *doc)
+    {
+        m_restore = false;
+        m_doc = doc;
+    }
+    bool m_restore;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // GenerateMIDIParams
 //----------------------------------------------------------------------------
 
@@ -1632,39 +1653,27 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * Helper struct to store timemap entries
- */
-struct TimemapEntry {
-    double tempo = -1000.0;
-    double qstamp;
-    std::vector<std::string> notesOn;
-    std::vector<std::string> notesOff;
-    std::vector<std::string> restsOn;
-    std::vector<std::string> restsOff;
-    std::string measureOn;
-};
-
-/**
- * member 0: mapping of real times with TimemapEntry
- * member 1: Score time from the start of the piece to previous barline in quarter notes
- * member 2: Real time from the start of the piece to previous barline in ms
- * member 3: Currently active tempo
+ * member 0: Score time from the start of the piece to previous barline in quarter notes
+ * member 1: Real time from the start of the piece to previous barline in ms
+ * member 2: Currently active tempo
+ * member 3: A pointer to the Timemap
  * member 4: The functor for redirection
  **/
 
 class GenerateTimemapParams : public FunctorParams {
 public:
-    GenerateTimemapParams(Functor *functor)
+    GenerateTimemapParams(Timemap *timemap, Functor *functor)
     {
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;
         m_currentTempo = 120.0;
+        m_timemap = timemap;
         m_functor = functor;
     }
-    std::map<double, TimemapEntry> m_timemap;
     double m_scoreTimeOffset;
     double m_realTimeOffsetMilliseconds;
     double m_currentTempo;
+    Timemap *m_timemap;
     Functor *m_functor;
 };
 
@@ -2478,6 +2487,7 @@ public:
 /**
  * member 0: a pointer to the page we are adding system to
  * member 1: a pointer to the system we are adding content to
+ * member 2: a flag indicating if we need to reset the horizontal layout cache
  **/
 
 class UnCastOffParams : public FunctorParams {
@@ -2486,9 +2496,11 @@ public:
     {
         m_page = page;
         m_currentSystem = NULL;
+        m_resetCache = true;
     }
     Page *m_page;
     System *m_currentSystem;
+    bool m_resetCache;
 };
 
 } // namespace vrv
