@@ -30,6 +30,7 @@ namespace vrv {
 class Accid;
 class Chord;
 class Note;
+class PrepareLinkingParams;
 class Slur;
 class TabGrp;
 class Tie;
@@ -211,26 +212,34 @@ public:
     bool IsVisible() const;
 
     /**
-     * MIDI timing information
-     */
-    ///@{
-    void SetScoreTimeOnset(double scoreTime);
-    void SetRealTimeOnsetSeconds(double timeInSeconds);
-    void SetScoreTimeOffset(double scoreTime);
-    void SetRealTimeOffsetSeconds(double timeInSeconds);
-    void SetScoreTimeTiedDuration(double timeInSeconds);
-    double GetScoreTimeOnset() const;
-    double GetRealTimeOnsetMilliseconds() const;
-    double GetScoreTimeOffset() const;
-    double GetScoreTimeTiedDuration() const;
-    double GetRealTimeOffsetMilliseconds() const;
-    double GetScoreTimeDuration() const;
-    ///@}
-
-    /**
      * MIDI pitch
      */
     int GetMIDIPitch(int shift = 0);
+
+    /**
+     * @name Checker, getter and setter for a note with which the stem is shared
+     */
+    ///@{
+    bool HasStemSameasNote() const { return (m_stemSameas); }
+    Note *GetStemSameasNote() const { return m_stemSameas; }
+    void SetStemSameasNote(Note *stemSameas) { m_stemSameas = stemSameas; }
+    ///@}
+
+    /**
+     * Resovle @stem.sameas links by instanciating Note::m_stemSameas (*Note).
+     * Called twice from Object::PrepareLinks. Once to fill uuid / note pairs,
+     * and once to resolve the link. The link is bi-directional, which means
+     * that both notes have their m_stemSameas pointer instanciated.
+     */
+    void ResolveStemSameas(PrepareLinkingParams *params);
+
+    /**
+     * Calculate the stem direction of the pair of notes.
+     * The presence of a StemSameasNote() needs to be check before calling it.
+     * Encoded stem direction on the calling note is taken into account.
+     * Called from Note::CalcStem
+     */
+    data_STEMDIRECTION CalcStemDirForSameasNote(int verticalCenter);
 
 public:
     //----------------//
@@ -380,40 +389,20 @@ private:
     int m_clusterPosition;
 
     /**
-     * The score-time onset of the note in the measure (duration from the start of measure in
-     * quarter notes).
+     * A pointer to a note with which the note shares its stem and implementing @stem.sameas.
+     * The pointer is bi-directional (both notes point to each other).
+     * It is set in Note::ResolveStemSameas
      */
-    double m_scoreTimeOnset;
+    Note *m_stemSameas;
 
     /**
-     * The score-time off-time of the note in the measure (duration from the start of the measure
-     * in quarter notes).  This is the duration of the printed note.  If the note is the start of
-     * a tied group, the score time of the tied group is this variable plus m_scoreTimeTiedDuration.
-     * If this note is a secondary note in a tied group, then this value is the score time end
-     * of the printed note, and the m_scoreTimeTiedDuration is -1.0 to indicate that it should not
-     * be exported when creating a MIDI file.
+     * The role in a stem.sameas situation.
+     * Set in Note::ResolveStemSameas and then in Note::CalcStemDirForSameasNote
+     * Used to determine if the note is the primary one (normal stem, e.g., with flag)
+     * or the secondary one (linking both notes). This depends on the drawing stem direction,
+     * which can be encoded but otherwise calculated by CalcStemDirForSameasNote
      */
-    double m_scoreTimeOffset;
-
-    /**
-     * The time in milliseconds since the start of the measure element that contains the note.
-     */
-    double m_realTimeOnsetMilliseconds;
-
-    /**
-     * The time in milliseconds since the start of the measure element to end of printed note.
-     * The real-time duration of a tied group is not currently tracked (this gets complicated
-     * if there is a tempo change during a note sustain, which is currently not supported).
-     */
-    double m_realTimeOffsetMilliseconds;
-
-    /**
-     * If the note is the first in a tied group, then m_scoreTimeTiedDuration contains the
-     * score-time duration (in quarter notes) of all tied notes in the group after this note.
-     * If the note is a secondary note in a tied group, then this variable is set to -1.0 to
-     * indicate that it should not be written to MIDI output.
-     */
-    double m_scoreTimeTiedDuration;
+    StemSameasDrawingRole m_stemSameasRole;
 };
 
 //----------------------------------------------------------------------------

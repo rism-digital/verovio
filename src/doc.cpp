@@ -55,6 +55,7 @@
 #include "syllable.h"
 #include "system.h"
 #include "text.h"
+#include "timemap.h"
 #include "timestamp.h"
 #include "transposition.h"
 #include "verse.h"
@@ -274,7 +275,8 @@ void Doc::CalculateMidiTimemap()
     calcMaxMeasureDurationParams.m_currentTempo = tempo;
     calcMaxMeasureDurationParams.m_tempoAdjustment = m_options->m_midiTempoAdjustment.GetValue();
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
-    this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams);
+    Functor calcMaxMeasureDurationEnd(&Object::CalcMaxMeasureDurationEnd);
+    this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams, &calcMaxMeasureDurationEnd);
 
     // Then calculate the onset and offset times (w.r.t. the measure) for every note
     CalcOnsetOffsetParams calcOnsetOffsetParams;
@@ -395,7 +397,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     }
 }
 
-bool Doc::ExportTimemap(std::string &output)
+bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures)
 {
     if (!Doc::HasMidiTimemap()) {
         // generate MIDI timemap before progressing
@@ -406,12 +408,12 @@ bool Doc::ExportTimemap(std::string &output)
         output = "";
         return false;
     }
+    Timemap timemap;
     Functor generateTimemap(&Object::GenerateTimemap);
-    GenerateTimemapParams generateTimemapParams(&generateTimemap);
+    GenerateTimemapParams generateTimemapParams(&timemap, &generateTimemap);
     this->Process(&generateTimemap, &generateTimemapParams);
 
-    PrepareJsonTimemap(output, generateTimemapParams.realTimeToScoreTime, generateTimemapParams.realTimeToOnElements,
-        generateTimemapParams.realTimeToOffElements, generateTimemapParams.realTimeToTempo);
+    timemap.ToJson(output, includeRests, includeMeasures);
 
     return true;
 }
@@ -434,76 +436,6 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
     extractor.ToJson(output);
 
     return true;
-}
-
-void Doc::PrepareJsonTimemap(std::string &output, std::map<double, double> &realTimeToScoreTime,
-    std::map<double, std::vector<std::string>> &realTimeToOnElements,
-    std::map<double, std::vector<std::string>> &realTimeToOffElements, std::map<double, double> &realTimeToTempo)
-{
-
-    double currentTempo = -1000.0;
-    double newTempo;
-    int mapsize = (int)realTimeToScoreTime.size();
-    output = "";
-    output.reserve(mapsize * 100); // Estimate 100 characters for each entry.
-    output += "[\n";
-    auto lastit = realTimeToScoreTime.end();
-    lastit--;
-    for (auto it = realTimeToScoreTime.begin(); it != realTimeToScoreTime.end(); ++it) {
-        output += "\t{\n";
-        output += "\t\t\"tstamp\":\t";
-        output += std::to_string(it->first);
-        output += ",\n";
-        output += "\t\t\"qstamp\":\t";
-        output += std::to_string(it->second);
-
-        auto ittempo = realTimeToTempo.find(it->first);
-        if (ittempo != realTimeToTempo.end()) {
-            newTempo = ittempo->second;
-            if (newTempo != currentTempo) {
-                currentTempo = newTempo;
-                output += ",\n\t\t\"tempo\":\t";
-                output += std::to_string(currentTempo);
-            }
-        }
-
-        auto iton = realTimeToOnElements.find(it->first);
-        if (iton != realTimeToOnElements.end()) {
-            output += ",\n\t\t\"on\":\t[";
-            for (int ion = 0; ion < (int)iton->second.size(); ++ion) {
-                output += "\"";
-                output += iton->second[ion];
-                output += "\"";
-                if (ion < (int)iton->second.size() - 1) {
-                    output += ", ";
-                }
-            }
-            output += "]";
-        }
-
-        auto itoff = realTimeToOffElements.find(it->first);
-        if (itoff != realTimeToOffElements.end()) {
-            output += ",\n\t\t\"off\":\t[";
-            for (int ioff = 0; ioff < (int)itoff->second.size(); ++ioff) {
-                output += "\"";
-                output += itoff->second[ioff];
-                output += "\"";
-                if (ioff < (int)itoff->second.size() - 1) {
-                    output += ", ";
-                }
-            }
-            output += "]";
-        }
-
-        output += "\n\t}";
-        if (it == lastit) {
-            output += "\n";
-        }
-        else {
-            output += ",\n";
-        }
-    }
-    output += "]\n";
 }
 
 void Doc::PrepareDrawing()
@@ -578,13 +510,13 @@ void Doc::PrepareDrawing()
 
     /************ Resolve linking (@next) ************/
 
-    // Try to match all pointing elements using @next and @sameas
+    // Try to match all pointing elements using @next, @sameas and @stem.sameas
     PrepareLinkingParams prepareLinkingParams;
     Functor prepareLinking(&Object::PrepareLinking);
     this->Process(&prepareLinking, &prepareLinkingParams);
 
     // If we have some left process again backward
-    if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
+    if (!prepareLinkingParams.m_sameasUuidPairs.empty() || !prepareLinkingParams.m_stemSameasUuidPairs.empty()) {
         prepareLinkingParams.m_fillList = false;
         this->Process(&prepareLinking, &prepareLinkingParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
     }
@@ -596,6 +528,10 @@ void Doc::PrepareDrawing()
     if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
         LogWarning(
             "%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasUuidPairs.size());
+    }
+    if (!prepareLinkingParams.m_stemSameasUuidPairs.empty()) {
+        LogWarning("%d element(s) with a @stem.sameas could match the target",
+            prepareLinkingParams.m_stemSameasUuidPairs.size());
     }
 
     /************ Resolve @plist ************/
@@ -928,7 +864,18 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 
     Page *unCastOffPage = this->SetDrawingPage(0);
     assert(unCastOffPage);
-    unCastOffPage->LayOutHorizontally();
+
+    // Check if the the horizontal layout is cached by looking at the first measure
+    // The cache is not set the first time, or can be reset by Doc::UnCastOffDoc
+    Measure *firstMeasure = vrv_cast<Measure *>(unCastOffPage->FindDescendantByType(MEASURE));
+    if (!firstMeasure || !firstMeasure->HasCachedHorizontalLayout()) {
+        LogDebug("Performing the horizontal layout");
+        unCastOffPage->LayOutHorizontally();
+        unCastOffPage->HorizontalLayoutCachePage();
+    }
+    else {
+        unCastOffPage->HorizontalLayoutCachePage(true);
+    }
 
     Page *castOffSinglePage = new Page();
 
@@ -1003,13 +950,14 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     }
 }
 
-void Doc::UnCastOffDoc()
+void Doc::UnCastOffDoc(bool resetCache)
 {
     Pages *pages = this->GetPages();
     assert(pages);
 
     Page *unCastOffPage = new Page();
     UnCastOffParams unCastOffParams(unCastOffPage);
+    unCastOffParams.m_resetCache = resetCache;
 
     Functor unCastOff(&Object::UnCastOff);
     this->Process(&unCastOff, &unCastOffParams);

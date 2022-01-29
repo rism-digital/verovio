@@ -399,17 +399,10 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
     int yIn, yOut, yRel;
 
-    // Get the parent or cross-staff / layer
-
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-
-    if (m_crossStaff) {
-        staff = m_crossStaff;
-    }
-
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     Beam *beam = dynamic_cast<Beam *>(GetFirstAncestor(BEAM));
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+
     // Avoid in artic to be in legder lines
     if (this->GetDrawingPlace() == STAFFREL_above) {
         yIn = std::max(
@@ -550,8 +543,7 @@ int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIR
     switch (artic) {
         case ARTICULATION_stacc:
         case ARTICULATION_stacciss: {
-            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            assert(staff);
+            Staff *staff = this->GetAncestorStaff();
             const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             if ((stemDir == STEMDIRECTION_up) && (m_drawingPlace == STAFFREL_above)) {
                 shift += shift - stemWidth / 2;

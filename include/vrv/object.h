@@ -1258,6 +1258,12 @@ public:
     ///@}
 
     /**
+     * Cache or restore cached horizontal layout for faster layout redoing
+     */
+    ///@{
+    virtual int HorizontalLayoutCache(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust note timings based on ties
      */
     ///@{
@@ -1289,8 +1295,9 @@ public:
     /**
      * Calculate the maximum duration of each measure.
      */
+    ///@{
     virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
+    virtual int CalcMaxMeasureDurationEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

@@ -23,6 +23,7 @@
 #include "smufl.h"
 #include "staff.h"
 #include "system.h"
+#include "timemap.h"
 #include "transposition.h"
 #include "vrv.h"
 
@@ -521,8 +522,7 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
     // Adjustment should be an even number, so that the rest is positioned properly
     const int overlapMargin = std::min(leftMargin, rightMargin);
     if (overlapMargin < 0) {
-        Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = this->GetAncestorStaff();
         if ((!HasOloc() || !HasPloc()) && !HasLoc()) {
             const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
@@ -608,11 +608,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-
-    if (m_crossStaff) staff = m_crossStaff;
-
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     const bool drawingCueSize = this->GetDrawingCueSize();
     const int staffSize = staff->m_drawingStaffSize;
 
@@ -676,9 +672,7 @@ int Rest::Transpose(FunctorParams *functorParams)
     if ((!HasOloc() || !HasPloc()) && !HasLoc()) return FUNCTOR_SIBLINGS;
 
     // Find whether current layer is top, middle (either one if multiple) or bottom
-    Staff *parentStaff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
-    assert(parentStaff);
-
+    Staff *parentStaff = this->GetAncestorStaff();
     Layer *parentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
     assert(parentLayer);
 
@@ -735,6 +729,16 @@ int Rest::Transpose(FunctorParams *functorParams)
         }
         SetLoc(transposedLoc);
     }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Rest::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    params->m_timemap->AddEntry(this, params);
 
     return FUNCTOR_SIBLINGS;
 }

@@ -285,6 +285,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
 void FloatingPositioner::ResetPositioner()
 {
     BoundingBox::ResetBoundingBox();
+    ResetCachedDrawingX();
     ResetCachedDrawingY();
 
     m_objectX = NULL;

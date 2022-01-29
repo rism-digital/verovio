@@ -55,14 +55,17 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     beam->m_beamSegment.InitCoordRefs(beam->GetElementCoords());
 
+    data_BEAMPLACE initialPlace = beam->GetPlace();
+    if (beam->HasStemSameasBeam()) beam->m_beamSegment.InitSameasRoles(beam->GetStemSameasBeam(), initialPlace);
+
     /******************************************************************/
     // Calculate the beam slope and position
 
     if (isTabBeam) {
-        beam->m_beamSegment.CalcTabBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace());
+        beam->m_beamSegment.CalcTabBeam(layer, beam->m_beamStaff, m_doc, beam, initialPlace);
     }
-    else {
-        beam->m_beamSegment.CalcBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace());
+    else if (!beam->m_beamSegment.StemSameasIsSecondary()) {
+        beam->m_beamSegment.CalcBeam(layer, beam->m_beamStaff, m_doc, beam, initialPlace);
     }
 
     /******************************************************************/
@@ -76,9 +79,10 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     DrawLayerChildren(dc, beam, layer, staff, measure);
 
     /******************************************************************/
-    // Draw the beamSegment
+    // Draw the beamSegment - but not if it is a secondary beam in a stem.sameas
 
-    DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
+    if (!beam->m_beamSegment.StemSameasIsSecondary())
+        DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }

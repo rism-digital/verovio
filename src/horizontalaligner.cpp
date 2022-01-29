@@ -1163,9 +1163,7 @@ int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
         // otherwise they should be kept separate
         for (auto dot : params->m_dots) {
             // A third staff size will be used as required margin
-            const Staff *staff
-                = vrv_cast<Staff *>(dot->m_crossStaff ? dot->m_crossStaff : dot->GetFirstAncestor(STAFF));
-            assert(staff);
+            const Staff *staff = dot->GetAncestorStaff(RESOLVE_CROSS_STAFF);
             const int staffSize = staff->m_drawingStaffSize;
             const int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
 
@@ -1339,12 +1337,7 @@ int AlignmentReference::AdjustLayersEnd(FunctorParams *functorParams)
     // Determine staff
     if (params->m_current.empty()) return FUNCTOR_CONTINUE;
     LayerElement *firstElem = params->m_current.at(0);
-    Layer *layer = NULL;
-    Staff *staff = firstElem->GetCrossStaff(layer);
-    if (!staff) {
-        staff = vrv_cast<Staff *>(firstElem->GetFirstAncestor(STAFF));
-    }
-    assert(staff);
+    Staff *staff = firstElem->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
     const int extension
         = params->m_doc->GetDrawingLedgerLineExtension(staff->m_drawingStaffSize, firstElem->GetDrawingCueSize());

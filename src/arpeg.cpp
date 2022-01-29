@@ -55,6 +55,7 @@ void Arpeg::Reset()
     ResetEnclosingChars();
 
     m_drawingXRel = 0;
+    m_cachedXRel = VRV_UNSET;
 }
 
 int Arpeg::GetDrawingX() const
@@ -226,13 +227,10 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     // We should have call DrawArpeg before
     assert(this->GetCurrentFloatingPositioner());
 
-    Staff *topStaff = vrv_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
-    assert(topStaff);
+    Staff *topStaff = topNote->GetAncestorStaff();
+    Staff *bottomStaff = bottomNote->GetAncestorStaff();
 
-    Staff *bottomStaff = vrv_cast<Staff *>(bottomNote->GetFirstAncestor(STAFF));
-    assert(bottomStaff);
-
-    Staff *crossStaff = GetCrossStaff();
+    Staff *crossStaff = this->GetCrossStaff();
     const int staffN = (crossStaff != NULL) ? crossStaff->GetN() : topStaff->GetN();
 
     int minTopLeft, maxTopRight;
@@ -270,6 +268,21 @@ int Arpeg::ResetDrawing(FunctorParams *functorParams)
     PlistInterface *interface = this->GetPlistInterface();
     assert(interface);
     return interface->InterfaceResetDrawing(functorParams, this);
+}
+
+int Arpeg::HorizontalLayoutCache(FunctorParams *functorParams)
+{
+    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    assert(params);
+
+    if (params->m_restore) {
+        m_drawingXRel = m_cachedXRel;
+    }
+    else {
+        m_cachedXRel = m_drawingXRel;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

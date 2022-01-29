@@ -307,8 +307,7 @@ bool Stem::IsSupportedChild(Object *child)
 
 int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int margin)
 {
-    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
 
     // check if there is an overlap on the left or on the right and displace stem's parent correspondingly
     const int right = HorizontalLeftOverlap(otherElement, doc, margin, 0);
@@ -488,7 +487,8 @@ int Stem::CalcStem(FunctorParams *functorParams)
     if (this->HasStemLen()) {
         baseStem = this->GetStemLen() * -params->m_doc->GetDrawingUnit(staffSize);
     }
-    else {
+    // Do not adjust the baseStem for stem sameas notes (its length is in m_chordStemLength)
+    else if (!params->m_stemSameas) {
         int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
         const data_STEMDIRECTION stemDir = params->m_interface->GetDrawingStemDir();
         baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff, stemDir) * thirdUnit);
@@ -497,7 +497,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // Even if a stem length is given we add the length of the chord content (however only if not 0)
     // Also, the given stem length is understood as being measured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
-    if (!this->HasStemLen() || (this->GetStemLen() != 0)) {
+    if (!params->m_staff || !this->HasStemLen() || (this->GetStemLen() != 0)) {
         Point p;
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             if (this->GetStemPos() == STEMPOSITION_left) {
@@ -508,7 +508,8 @@ int Stem::CalcStem(FunctorParams *functorParams)
                 p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
                 p.x -= stemShift;
             }
-            this->SetDrawingStemLen(baseStem + params->m_chordStemLength + p.y);
+            const int stemShotening = (params->m_stemSameas) ? 0 : p.y;
+            this->SetDrawingStemLen(baseStem + params->m_chordStemLength + stemShotening);
         }
         else {
             if (this->GetStemPos() == STEMPOSITION_right) {
@@ -519,7 +520,8 @@ int Stem::CalcStem(FunctorParams *functorParams)
                 p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
                 p.x += stemShift;
             }
-            this->SetDrawingStemLen(-(baseStem + params->m_chordStemLength - p.y));
+            const int stemShotening = (params->m_stemSameas) ? 0 : p.y;
+            this->SetDrawingStemLen(-(baseStem + params->m_chordStemLength - stemShotening));
         }
         this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
         this->SetDrawingXRel(p.x);
@@ -542,7 +544,8 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
 
     Flag *flag = NULL;
-    if (params->m_dur > DUR_4) {
+    // There is never a flag with stem sameas notes or with a duration longer than 8th notes
+    if (!params->m_stemSameas && params->m_dur > DUR_4) {
         flag = vrv_cast<Flag *>(this->GetFirst(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
@@ -571,9 +574,9 @@ int Stem::CalcStem(FunctorParams *functorParams)
         flag->SetDrawingYRel(-this->GetDrawingStemLen());
     }
 
-    // Do not adjust the length if given in the encoding - however, the stem will be extend with the SMuFL
-    // extension from 32th - this can be improved
-    if (this->HasStemLen()) {
+    // Do not adjust the length with stem sameas notes or if given in the encoding
+    // however, the stem will be extend with the SMuFL extension from 32th - this can be improved
+    if (params->m_stemSameas || this->HasStemLen()) {
         if ((this->GetStemLen() == 0) && flag) flag->m_drawingNbFlags = 0;
         return FUNCTOR_CONTINUE;
     }

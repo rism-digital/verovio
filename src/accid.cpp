@@ -121,11 +121,9 @@ std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
 
 void Accid::AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize)
 {
-    Layer *layer = NULL;
-    Staff *staff = element->GetCrossStaff(layer);
-    if (!staff) staff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
-
+    Staff *staff = element->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
+
     if (element->Is(NOTE) && chord && chord->HasAdjacentNotesInStaff(staff)) {
         const int horizontalMargin = 4 * doc->GetDrawingStemWidth(staffSize);
         const int drawingUnit = doc->GetDrawingUnit(staffSize);

@@ -2736,17 +2736,17 @@ void MusicXmlInput::ReadMusicXmlNote(
         pugi::xml_node pitch = node.child("pitch");
         if (pitch && !isTablature) {
             const std::string stepStr = pitch.child("step").text().as_string();
-            const std::string alterStr = pitch.child("alter").text().as_string();
+            const float alterVal = pitch.child("alter").text().as_float();
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
-            if (!alterStr.empty()) {
+            if (pitch.child("alter")) {
                 Accid *accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
                     note->AddChild(accid);
                     accid->IsAttribute(true);
                 }
-                const data_ACCIDENTAL_GESTURAL accidGes = ConvertAlterToAccid(std::atof(alterStr.c_str()));
+                const data_ACCIDENTAL_GESTURAL accidGes = ConvertAlterToAccid(alterVal);
                 if (!IsSameAccidWrittenGestural(accid->GetAccid(), accidGes)) {
                     accid->SetAccidGes(accidGes);
                 }
@@ -3795,8 +3795,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
             KeyAccid *keyAccid = new KeyAccid();
             keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
             if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
-                data_ACCIDENTAL_GESTURAL accidValue
-                    = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
+                data_ACCIDENTAL_GESTURAL accidValue = ConvertAlterToAccid(keyStep.next_sibling().text().as_float());
                 keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
                 if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
                     keyAccid->SetAccid(
@@ -4106,7 +4105,7 @@ data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(const std::string &value)
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported pitch name '%s'", value.c_str());
+    LogWarning("MusicXML import: Unsupported step value '%s'", value.c_str());
     return PITCHNAME_NONE;
 }
 

@@ -213,7 +213,7 @@ bool Resources::LoadFont(const std::string &fontName)
         LogWarning("No units-per-em attribute in bouding box file");
         return true;
     }
-    int unitsPerEm = atoi(root.attribute("units-per-em").value());
+    const int unitsPerEm = root.attribute("units-per-em").as_int();
     pugi::xml_node current;
     for (current = root.child("g"); current; current = current.next_sibling("g")) {
         Glyph *glyph = NULL;
@@ -229,14 +229,14 @@ bool Resources::LoadFont(const std::string &fontName)
                     smuflCode, unitsPerEm);
                 continue;
             }
-            double x = 0.0, y = 0.0, width = 0.0, height = 0.0;
+            float x = 0.0, y = 0.0, width = 0.0, height = 0.0;
             // Not check for missing values...
-            if (current.attribute("x")) x = atof(current.attribute("x").value());
-            if (current.attribute("y")) y = atof(current.attribute("y").value());
-            if (current.attribute("w")) width = atof(current.attribute("w").value());
-            if (current.attribute("h")) height = atof(current.attribute("h").value());
+            if (current.attribute("x")) x = current.attribute("x").as_float();
+            if (current.attribute("y")) y = current.attribute("y").as_float();
+            if (current.attribute("w")) width = current.attribute("w").as_float();
+            if (current.attribute("h")) height = current.attribute("h").as_float();
             glyph->SetBoundingBox(x, y, width, height);
-            if (current.attribute("h-a-x")) glyph->SetHorizAdvX(atof(current.attribute("h-a-x").value()));
+            if (current.attribute("h-a-x")) glyph->SetHorizAdvX(current.attribute("h-a-x").as_float());
         }
 
         if (!glyph) continue;
@@ -247,7 +247,7 @@ bool Resources::LoadFont(const std::string &fontName)
             if (anchor.attribute("n")) {
                 std::string name = std::string(anchor.attribute("n").value());
                 // No check for possible x and y missing attributes - not very safe.
-                glyph->SetAnchor(name, atof(anchor.attribute("x").value()), atof(anchor.attribute("y").value()));
+                glyph->SetAnchor(name, anchor.attribute("x").as_float(), anchor.attribute("y").as_float());
             }
         }
     }
@@ -273,7 +273,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
         LogWarning("No units-per-em attribute in bouding box file");
         return false;
     }
-    int unitsPerEm = atoi(root.attribute("units-per-em").value());
+    const int unitsPerEm = root.attribute("units-per-em").as_int();
     pugi::xml_node current;
     if (s_textFont.count(style) == 0) {
         s_textFont[style] = GlyphMap{};
@@ -285,14 +285,14 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
             // We create a glyph with only the units per em which is the only info we need for
             // the bounding boxes; path and codeStr will remain [unset]
             Glyph glyph(unitsPerEm);
-            double x = 0.0, y = 0.0, width = 0.0, height = 0.0;
+            float x = 0.0, y = 0.0, width = 0.0, height = 0.0;
             // Not check for missing values...
-            if (current.attribute("x")) x = atof(current.attribute("x").value());
-            if (current.attribute("y")) y = atof(current.attribute("y").value());
-            if (current.attribute("w")) width = atof(current.attribute("w").value());
-            if (current.attribute("h")) height = atof(current.attribute("h").value());
+            if (current.attribute("x")) x = current.attribute("x").as_float();
+            if (current.attribute("y")) y = current.attribute("y").as_float();
+            if (current.attribute("w")) width = current.attribute("w").as_float();
+            if (current.attribute("h")) height = current.attribute("h").as_float();
             glyph.SetBoundingBox(x, y, width, height);
-            if (current.attribute("h-a-x")) glyph.SetHorizAdvX(atof(current.attribute("h-a-x").value()));
+            if (current.attribute("h-a-x")) glyph.SetHorizAdvX(current.attribute("h-a-x").as_float());
             if (currentMap.count(code) > 0) {
                 LogDebug("Redefining %d with %s", code, fontName.c_str());
             }

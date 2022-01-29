@@ -238,9 +238,9 @@ int Verse::PrepareProcessingLists(FunctorParams *functorParams)
     assert(params);
     // StaffN_LayerN_VerseN_t *tree = vrv_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = this->GetAncestorStaff();
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(staff && layer);
+    assert(layer);
 
     params->m_verseTree.child[staff->GetN()].child[layer->GetN()].child[this->GetN()];
     // Alternate solution with StaffN_LayerN_VerseN_t

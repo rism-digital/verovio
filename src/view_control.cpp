@@ -186,14 +186,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             end = nextInterface->GetStart();
         }
     }
-    if (!start || !end) return;
-    if (!interface->IsOrdered(start, end) && !element->Is(SYL)) {
-        // To avoid showing the same warning multiple times, display a warning only during actual drawing
-        if (!dc->Is(BBOX_DEVICE_CONTEXT) && (m_currentPage == vrv_cast<Page *>(start->GetFirstAncestor(PAGE)))) {
-            LogWarning("%s '%s' is ignored, since start '%s' does not occur temporally before end '%s'.",
-                element->GetClassName().c_str(), element->GetUuid().c_str(), start->GetUuid().c_str(),
-                end->GetUuid().c_str());
-        }
+
+    if (!this->HasValidTimeSpanningOrder(dc, element, start, end)) {
         return;
     }
 
@@ -384,6 +378,35 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             DrawTrillExtension(dc, dynamic_cast<Trill *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
     }
+}
+
+bool View::HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerElement *start, LayerElement *end) const
+{
+    if (!start || !end) return false;
+
+    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
+    if (interface && !interface->IsOrdered(start, end)) {
+        // Handle exceptional cases
+        if (element->Is(SLUR)) {
+            if (start->GetAlignment() == end->GetAlignment()) {
+                if (start->IsGraceNote() || end->IsGraceNote()) {
+                    return true;
+                }
+            }
+        }
+        else if (element->Is(SYL)) {
+            return true;
+        }
+        // To avoid showing the same warning multiple times, display a warning only during actual drawing
+        if (!dc->Is(BBOX_DEVICE_CONTEXT) && (m_currentPage == vrv_cast<Page *>(start->GetFirstAncestor(PAGE)))) {
+            LogWarning("%s '%s' is ignored, since start '%s' does not occur temporally before end '%s'.",
+                element->GetClassName().c_str(), element->GetUuid().c_str(), start->GetUuid().c_str(),
+                end->GetUuid().c_str());
+        }
+        return false;
+    }
+
+    return true;
 }
 
 void View::DrawBracketSpan(
@@ -1336,8 +1359,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     const int bottom = bottomNote->GetDrawingY();
 
     // We arbitrarily look at the top note
-    Staff *staff = vrv_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = topNote->GetAncestorStaff();
     const bool drawingCueSize = topNote->GetDrawingCueSize();
 
     // We are going to have only one FloatingPositioner - staff will be the top note one

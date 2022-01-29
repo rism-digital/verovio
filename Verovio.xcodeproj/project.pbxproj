@@ -648,6 +648,12 @@
 		4DCB7AA426D3C9600047F01D /* crc.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DCB7AA226D3C9600047F01D /* crc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DD11DC42240E78B00A405D8 /* c_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */; };
 		4DD11DC52240E78B00A405D8 /* c_wrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD11DC32240E78B00A405D8 /* c_wrapper.h */; };
+		4DD7C0FC27A55CEA00B9C017 /* timemap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD7C0FB27A55CEA00B9C017 /* timemap.cpp */; };
+		4DD7C0FD27A55CEA00B9C017 /* timemap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD7C0FB27A55CEA00B9C017 /* timemap.cpp */; };
+		4DD7C0FF27A55CFD00B9C017 /* timemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD7C0FE27A55CFD00B9C017 /* timemap.h */; };
+		4DD7C10027A55CFD00B9C017 /* timemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD7C0FE27A55CFD00B9C017 /* timemap.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DD7C10127A5650600B9C017 /* timemap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD7C0FB27A55CEA00B9C017 /* timemap.cpp */; };
+		4DD7C10227A5650600B9C017 /* timemap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD7C0FB27A55CEA00B9C017 /* timemap.cpp */; };
 		4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDBBB551C7AE43E00054AFF /* hairpin.h */; };
 		4DDBBB581C7AE43E00054AFF /* dynam.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDBBB561C7AE43E00054AFF /* dynam.h */; };
 		4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBB591C7AE45900054AFF /* dynam.cpp */; };
@@ -1547,6 +1553,8 @@
 		4DCB7AA226D3C9600047F01D /* crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc.h; path = include/crc/crc.h; sourceTree = SOURCE_ROOT; };
 		4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = c_wrapper.cpp; path = tools/c_wrapper.cpp; sourceTree = "<group>"; };
 		4DD11DC32240E78B00A405D8 /* c_wrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c_wrapper.h; path = tools/c_wrapper.h; sourceTree = "<group>"; };
+		4DD7C0FB27A55CEA00B9C017 /* timemap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timemap.cpp; path = src/timemap.cpp; sourceTree = "<group>"; };
+		4DD7C0FE27A55CFD00B9C017 /* timemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = timemap.h; path = include/vrv/timemap.h; sourceTree = "<group>"; };
 		4DDBBB551C7AE43E00054AFF /* hairpin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hairpin.h; path = include/vrv/hairpin.h; sourceTree = "<group>"; };
 		4DDBBB561C7AE43E00054AFF /* dynam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dynam.h; path = include/vrv/dynam.h; sourceTree = "<group>"; };
 		4DDBBB591C7AE45900054AFF /* dynam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynam.cpp; path = src/dynam.cpp; sourceTree = "<group>"; };
@@ -2208,8 +2216,10 @@
 				4DA80D941A6940120089802D /* options.h */,
 				E79ADDC626BD645B00527E4B /* runtimeclock.cpp */,
 				E79ADDC326BD1AE900527E4B /* runtimeclock.h */,
-				4D1D733B1A1D0390001E08F6 /* smufl.h */,
 				4D98CCDA25D26E3C00DC7A2C /* smufl.cpp */,
+				4D1D733B1A1D0390001E08F6 /* smufl.h */,
+				4DD7C0FB27A55CEA00B9C017 /* timemap.cpp */,
+				4DD7C0FE27A55CFD00B9C017 /* timemap.h */,
 				8F086EBF188539540037FD8E /* toolkit.cpp */,
 				8F59291618854BF800FE51AD /* toolkit.h */,
 				4DC3B9E4239E2ABE007F185E /* transposition.cpp */,
@@ -2618,6 +2628,7 @@
 				4D1BE7821C69434C0086DC0E /* MidiFile.h in Headers */,
 				4D9C53121B52E4AE0003C6EC /* core.h in Headers */,
 				4DEC4DD221C8295700D1D273 /* supplied.h in Headers */,
+				4DD7C0FF27A55CFD00B9C017 /* timemap.h in Headers */,
 				4D1BD1B921908D78000D35B2 /* halfmrpt.h in Headers */,
 				4DF4407A1D3D085600152B7E /* functorparams.h in Headers */,
 				4DA0EADD22BB77AF00A7EBEB /* zone.h in Headers */,
@@ -2709,6 +2720,7 @@
 				4D79642726C167200026288B /* pagemilestone.h in Headers */,
 				BB4C4B1C22A932CF001F6AF0 /* arpeg.h in Headers */,
 				BB4C4B2A22A932CF001F6AF0 /* harm.h in Headers */,
+				4DD7C10027A55CFD00B9C017 /* timemap.h in Headers */,
 				BB4C4AAC22A932A0001F6AF0 /* svgdevicecontext.h in Headers */,
 				BB4C4ADE22A932BC001F6AF0 /* add.h in Headers */,
 				BB4C4B4C22A932D7001F6AF0 /* custos.h in Headers */,
@@ -3066,6 +3078,7 @@
 				4D1694071E3A44F300569BF4 /* iomusxml.cpp in Sources */,
 				4D7927D120ECCC6D0002A45D /* view_slur.cpp in Sources */,
 				4DF21D1322B3D17D009821DE /* ioabc.cpp in Sources */,
+				4DD7C10127A5650600B9C017 /* timemap.cpp in Sources */,
 				4D1694081E3A44F300569BF4 /* iopae.cpp in Sources */,
 				4D1694091E3A44F300569BF4 /* atts_critapp.cpp in Sources */,
 				4D16940A1E3A44F300569BF4 /* fermata.cpp in Sources */,
@@ -3323,6 +3336,7 @@
 				4D5FA9111E16A93F00F3B919 /* boundingbox.cpp in Sources */,
 				4DC12A841F741110000440E9 /* pgfoot2.cpp in Sources */,
 				8F086EF9188539540037FD8E /* object.cpp in Sources */,
+				4DD7C10227A5650600B9C017 /* timemap.cpp in Sources */,
 				8F086EFA188539540037FD8E /* page.cpp in Sources */,
 				8F086EFB188539540037FD8E /* pitchinterface.cpp in Sources */,
 				BDEF9EC726725234008A3A47 /* caesura.cpp in Sources */,
@@ -3495,6 +3509,7 @@
 				4D4FCD141F54570E0009C455 /* staffdef.cpp in Sources */,
 				4DEC4D7C21C8048700D1D273 /* abbr.cpp in Sources */,
 				403BEFF9206C00FF00D022D5 /* beatrpt.cpp in Sources */,
+				4DD7C0FC27A55CEA00B9C017 /* timemap.cpp in Sources */,
 				8F3DD33C18854B2E0051330C /* barline.cpp in Sources */,
 				4DB3D8D51F83D12B00B5FC2B /* tempo.cpp in Sources */,
 				4DEC4DA021C81E9400D1D273 /* orig.cpp in Sources */,
@@ -3710,6 +3725,7 @@
 				BB4C4B9922A932E5001F6AF0 /* linkinginterface.cpp in Sources */,
 				BB4C4A6A22A9321F001F6AF0 /* atts_externalsymbols.cpp in Sources */,
 				BB4C4AAD22A932A6001F6AF0 /* io.cpp in Sources */,
+				4DD7C0FD27A55CEA00B9C017 /* timemap.cpp in Sources */,
 				BB4C4B2322A932CF001F6AF0 /* dynam.cpp in Sources */,
 				BB4C4B6522A932D7001F6AF0 /* multirest.cpp in Sources */,
 				BB4C4AB322A932A6001F6AF0 /* iohumdrum.cpp in Sources */,

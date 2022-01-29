@@ -394,7 +394,7 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
             }
             // endPoint
             Staff *endStaff = staff;
-            if (endParentChord) endStaff = vrv_cast<Staff *>(endParentChord->GetFirstAncestor(STAFF));
+            if (endParentChord) endStaff = endParentChord->GetAncestorStaff();
             if (endParentChord && endParentChord->HasAdjacentNotesInStaff(endStaff)) {
                 endPoint.x = this->CalculateAdjacentChordXOffset(
                     doc, endStaff, endParentChord, endNote, drawingCurveDir, endPoint.x, false);
@@ -454,7 +454,7 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
         if (!isShortTie) {
             // endPoint
             Staff *endStaff = staff;
-            if (endParentChord) endStaff = vrv_cast<Staff *>(endParentChord->GetFirstAncestor(STAFF));
+            if (endParentChord) endStaff = endParentChord->GetAncestorStaff();
             if (endParentChord && endParentChord->HasAdjacentNotesInStaff(endStaff)) {
                 endPoint.x = this->CalculateAdjacentChordXOffset(
                     doc, endStaff, endParentChord, endNote, drawingCurveDir, endPoint.x, false);
