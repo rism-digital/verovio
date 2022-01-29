@@ -31,7 +31,6 @@ class Comparison {
 
 public:
     virtual bool operator()(Object *object) = 0;
-    virtual bool MatchesType(Object *object) = 0;
     // For classes that do a reverse comparison, return reversed result
     bool Result(bool comparison) { return (m_reverse) ? !comparison : comparison; }
     // Set reverse comparison.
@@ -64,7 +63,7 @@ public:
 
     ClassId GetType() { return m_classId; }
 
-    bool MatchesType(Object *object) override { return (object->Is(m_classId)); }
+    bool MatchesType(Object *object) { return (object->Is(m_classId)); }
 
 protected:
     ClassId m_classId;
@@ -85,7 +84,7 @@ public:
 
     bool operator()(Object *object) override { return Result(this->MatchesType(object)); }
 
-    bool MatchesType(Object *object) override { return (object->Is(m_classIds)); }
+    bool MatchesType(Object *object) { return (object->Is(m_classIds)); }
 
 protected:
     std::vector<ClassId> m_classIds;
@@ -107,8 +106,6 @@ public:
         }
         return false;
     }
-
-    bool MatchesType(Object *object) override { return true; }
 
 protected:
     InterfaceId m_interfaceId;
@@ -179,8 +176,6 @@ public:
         if (object->IsEditorialElement()) return Result(true);
         return Result(false);
     }
-
-    bool MatchesType(Object *object) override { return true; }
 };
 
 //----------------------------------------------------------------------------
