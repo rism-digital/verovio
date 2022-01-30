@@ -541,7 +541,7 @@ Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direct
 Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction)
 {
     ClassIdComparison comparison(classId);
-    return FindDescendantByComparison(&comparison, deepness, direction);
+    return this->FindDescendantByComparison(&comparison, deepness, direction);
 }
 
 Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction)
