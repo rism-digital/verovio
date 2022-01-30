@@ -50,6 +50,8 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
     { "fClef15ma", SMUFL_E066_fClef15ma },
     { "unpitchedPercussionClef1", SMUFL_E069_unpitchedPercussionClef1 },
     { "unpitchedPercussionClef2", SMUFL_E06A_unpitchedPercussionClef2 },
+    { "6stringTabClef", SMUFL_E06D_6stringTabClef },
+    { "4stringTabClef", SMUFL_E06E_4stringTabClef },
     { "gClefReversed", SMUFL_E073_gClefReversed },
     { "gClefTurned", SMUFL_E074_gClefTurned },
     { "cClefReversed", SMUFL_E075_cClefReversed },
@@ -441,6 +443,6 @@ const std::map<std::string, wchar_t> Resources::s_smuflNames = {
 };
 
 /** The number of glyphs for verification **/
-// 415
+// 417
 
 } // namespace vrv
