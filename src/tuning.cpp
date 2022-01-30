@@ -75,7 +75,7 @@ int Tuning::CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType
 
     // Do we have the tuning for this course?
     AttNNumberLikeComparison cnc(COURSE, std::to_string(course));
-    Course *courseTuning = vrv_cast<Course *>(FindDescendantByComparison(&cnc));
+    Course *courseTuning = vrv_cast<Course *>(this->FindDescendantByComparison(&cnc));
 
     if (courseTuning && courseTuning->HasPname() && courseTuning->HasOct()) {
 
