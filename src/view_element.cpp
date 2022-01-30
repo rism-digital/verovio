@@ -616,6 +616,11 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
 
+    if (staff->IsTablature()) {
+        this->DrawTabClef(dc, element, layer, staff, measure);
+        return;
+    }
+
     int x, y;
     if (m_doc->GetType() == Facs && clef->HasFacs()) {
         y = ToLogicalY(staff->GetDrawingY());
@@ -683,14 +688,15 @@ void View::DrawClefEnclosing(
 {
     if ((clef->GetEnclose() == ENCLOSURE_brack) || (clef->GetEnclose() == ENCLOSURE_box)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        x += sizeFactor * m_doc->GetGlyphLeft(glyph, staff->m_drawingStaffSize, false);
-        y += sizeFactor * m_doc->GetGlyphBottom(glyph, staff->m_drawingStaffSize, false);
-        const int height = sizeFactor * m_doc->GetGlyphHeight(glyph, staff->m_drawingStaffSize, false);
-        const int width = sizeFactor * m_doc->GetGlyphWidth(glyph, staff->m_drawingStaffSize, false);
+        const int glyphSize = staff->GetDrawingStaffNotationSize();
+        x += sizeFactor * m_doc->GetGlyphLeft(glyph, glyphSize, false);
+        y += sizeFactor * m_doc->GetGlyphBottom(glyph, glyphSize, false);
+        const int height = sizeFactor * m_doc->GetGlyphHeight(glyph, glyphSize, false);
+        const int width = sizeFactor * m_doc->GetGlyphWidth(glyph, glyphSize, false);
         const int offset = 3 * unit / 4;
         // We use overlapping brackets to draw boxes :)
         const int bracketWidth = (clef->GetEnclose() == ENCLOSURE_brack) ? unit : (width + offset);
-        const int verticalThickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        const int verticalThickness = m_doc->GetDrawingStemWidth(glyphSize);
         const int horizontalThickness = ((clef->GetEnclose() == ENCLOSURE_brack) ? 2 : 1) * verticalThickness;
 
         this->DrawEnclosingBrackets(
