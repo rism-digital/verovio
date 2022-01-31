@@ -119,6 +119,54 @@ int TabDurSym::PrepareLayerElementParts(FunctorParams *functorParams)
 
 int TabDurSym::CalcStem(FunctorParams *functorParams)
 {
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
+    assert(params);
+
+    // Stems have been calculated previously in Beam
+    if (this->IsInBeam()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // This now need should be NULL and the chord stem length will be 0
+    params->m_interface = NULL;
+    params->m_chordStemLength = 0;
+
+    Stem *stem = this->GetDrawingStem();
+    assert(stem);
+
+    // Cache the in params to avoid further lookup
+    params->m_staff = this->GetAncestorStaff();
+    assert(params->m_staff);
+    params->m_layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(params->m_layer);
+    params->m_interface = this;
+    // Grace an stem sameas not supported in tablature
+    params->m_isGraceNote = false;
+    params->m_stemSameas = false;
+
+    int staffSize = params->m_staff->m_drawingStaffSize;
+
+    /************ Set the direction ************/
+
+    data_STEMDIRECTION layerStemDir;
+    // Up by default with tablature
+    data_STEMDIRECTION stemDir = STEMDIRECTION_up;
+
+    if (stem->HasStemDir()) {
+        stemDir = stem->GetStemDir();
+    }
+    else if ((layerStemDir = params->m_layer->GetDrawingStemDir()) != STEMDIRECTION_NONE) {
+        stemDir = layerStemDir;
+    }
+
+    this->SetDrawingStemDir(stemDir);
+
+    // Make sure the relative position of the stem is the same
+    stem->SetDrawingYRel(0);
+    // WIP for now set a default stem length
+    stem->SetDrawingStemLen(4 * params->m_doc->GetDrawingUnit(staffSize));
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
