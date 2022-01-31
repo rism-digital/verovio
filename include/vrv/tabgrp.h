@@ -54,6 +54,11 @@ public:
      */
     virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::CalcStem
+     */
+    int CalcStem(FunctorParams *functorParams) override;
+
 protected:
     //
 private:

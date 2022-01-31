@@ -80,4 +80,14 @@ int TabGrp::CalcOnsetOffsetEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int TabGrp::CalcStem(FunctorParams *functorParams)
+{
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
+    assert(params);
+
+    params->m_dur = this->GetActualDur();
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
