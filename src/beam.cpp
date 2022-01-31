@@ -122,7 +122,16 @@ void BeamSegment::CalcTabBeam(
 
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
-    beamInterface->m_drawingPlace = (place == BEAMPLACE_below) ? BEAMPLACE_below : BEAMPLACE_above;
+    if (place != BEAMPLACE_NONE) {
+        beamInterface->m_drawingPlace = (place == BEAMPLACE_below) ? BEAMPLACE_below : BEAMPLACE_above;
+    }
+    // Do we have more that one layer?
+    else {
+        data_STEMDIRECTION layerStemDir = layer->GetDrawingStemDir();
+        // The layerStemDir can be none (single layer), up (1st layer), or down (2n layer)
+        // Is is put above by default with tablature with a single layer
+        beamInterface->m_drawingPlace = (layerStemDir == STEMDIRECTION_down) ? BEAMPLACE_below : BEAMPLACE_above;
+    }
 
     for (auto coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
