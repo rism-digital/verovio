@@ -59,8 +59,8 @@ private:
     int SetBarLine(const std::string &musicCode, int index);
     void CalcUnitNoteLength();
     void AddAnnot(const std::string &remark);
-    void AddBeam();
-    void AddTuplet();
+    void AddLayerElement();
+    int AddTuplet(const std::string &musicCode, int i);
     void AddTie();
     void StartSlur();
     void EndSlur();
@@ -95,6 +95,11 @@ private:
 public:
     //
 private:
+    enum class ElementType {
+        Default,
+        Tuplet
+    };
+
     std::string m_filename;
     Mdiv *m_mdiv = NULL;
     Clef *m_clef = NULL;
@@ -117,6 +122,8 @@ private:
     int m_gracecount = 0;
     int m_stafflines = 5;
     int m_transpose = 0;
+    ElementType m_type = ElementType::Default;
+    std::pair<ElementType, LayerElement *> m_containerPair = { ElementType::Default, NULL };
     /*
      * ABC metadata stacks
      */
