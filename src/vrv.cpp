@@ -68,10 +68,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 thread_local std::string Resources::s_path = "/usr/local/share/verovio";
-thread_local std::string Resources::m_smuflFontName = "";
+thread_local std::string Resources::s_smuflFontName = "";
 thread_local Resources::GlyphTextMap Resources::s_textFont;
-thread_local Resources::GlyphTable Resources::m_fontGlyphTable;
-thread_local Resources::GlyphNameTable Resources::m_glyphNameTable;
+thread_local Resources::GlyphTable Resources::s_fontGlyphTable;
+thread_local Resources::GlyphNameTable Resources::s_glyphNameTable;
 thread_local Resources::StyleAttributes Resources::s_currentStyle;
 const Resources::StyleAttributes Resources::k_defaultStyle{ data_FONTWEIGHT::FONTWEIGHT_normal,
     data_FONTSTYLE::FONTSTYLE_normal };
@@ -121,17 +121,17 @@ bool Resources::SetFont(const std::string &fontName)
 
 Glyph *Resources::GetGlyph(wchar_t smuflCode)
 {
-    return m_fontGlyphTable.count(smuflCode) ? &m_fontGlyphTable.at(smuflCode) : NULL;
+    return s_fontGlyphTable.count(smuflCode) ? &s_fontGlyphTable.at(smuflCode) : NULL;
 }
 
 Glyph *Resources::GetGlyph(const std::string &smuflName)
 {
-    return m_glyphNameTable.count(smuflName) ? &m_fontGlyphTable.at(m_glyphNameTable.at(smuflName)) : NULL;
+    return s_glyphNameTable.count(smuflName) ? &s_fontGlyphTable.at(s_glyphNameTable.at(smuflName)) : NULL;
 }
 
 wchar_t Resources::GetGlyphCode(const std::string &smuflName)
 {
-    return m_glyphNameTable.count(smuflName) ? m_glyphNameTable.at(smuflName) : 0;
+    return s_glyphNameTable.count(smuflName) ? s_glyphNameTable.at(smuflName) : 0;
 }
 
 std::map<wchar_t, wchar_t> Resources::GetGlyphRanges()
@@ -204,19 +204,19 @@ Glyph *Resources::GetTextGlyph(wchar_t code)
 bool Resources::LoadFont(const std::string &fontName)
 {
     // set font name
-    m_smuflFontName = fontName;
+    s_smuflFontName = fontName;
 
     pugi::xml_document doc;
     const std::string filename = Resources::GetPath() + "/" + fontName + ".xml";
     pugi::xml_parse_result parseResult = doc.load_file(filename.c_str());
     if (!parseResult) {
         // File not found, default bounding boxes will be used
-        LogMessage("Font loaded without bounding boxes");
+        LogError("Failed to load font and glyph bounding boxes");
         return false;
     }
     pugi::xml_node root = doc.first_child();
     if (!root.attribute("units-per-em")) {
-        LogWarning("No units-per-em attribute in bouding box file");
+        LogError("No units-per-em attribute in bouding box file");
         return false;
     }
 
@@ -259,8 +259,8 @@ bool Resources::LoadFont(const std::string &fontName)
             }
         }
 
-        m_fontGlyphTable[smuflCode] = glyph;
-        m_glyphNameTable[n_attribute.value()] = smuflCode;
+        s_fontGlyphTable[smuflCode] = glyph;
+        s_glyphNameTable[n_attribute.value()] = smuflCode;
     }
 
     return true;
