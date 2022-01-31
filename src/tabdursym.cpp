@@ -44,7 +44,37 @@ void TabDurSym::Reset()
 
 bool TabDurSym::IsSupportedChild(Object *child)
 {
-    return false;
+    if (child->Is(STEM)) {
+        assert(dynamic_cast<Stem *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
+}
+
+void TabDurSym::AddChild(Object *child)
+{
+    if (!this->IsSupportedChild(child)) {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        return;
+    }
+
+    child->SetParent(this);
+
+    ArrayOfObjects *children = this->GetChildrenForModification();
+
+    // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
+    // for the drawing order in the SVG output
+    if (child->Is(STEM)) {
+        children->insert(children->begin(), child);
+    }
+    else {
+        children->push_back(child);
+    }
+    Modify();
+}
+
 Point TabDurSym::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
 {
     Point p(0, 0);
