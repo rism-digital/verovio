@@ -106,6 +106,15 @@ int TabDurSym::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 
 int TabDurSym::PrepareLayerElementParts(FunctorParams *functorParams)
 {
+    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
+
+    if (!currentStem) {
+        currentStem = new Stem();
+        this->AddChild(currentStem);
+    }
+    this->SetDrawingStem(currentStem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int TabDurSym::CalcStem(FunctorParams *functorParams)
