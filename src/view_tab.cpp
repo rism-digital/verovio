@@ -207,7 +207,7 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
         }
     }
 
-    // Draw children (nothing yet)
+    // Draw children (stems)
     this->DrawLayerChildren(dc, tabDurSym, layer, staff, measure);
 
     dc->EndGraphic(tabDurSym, this);
