@@ -447,18 +447,19 @@ public:
     int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
-     * @name See Object::GenerateMIDI
+     * See Object::PrepareMIDI
      */
-    ///@{
-    int GenerateMIDI(FunctorParams *functorParams) override;
-    ///@}
+    int PrepareMIDI(FunctorParams *functorParams) override;
 
     /**
-     * @name See Object::GenerateTimemap
+     * See Object::GenerateMIDI
      */
-    ///@{
+    int GenerateMIDI(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::GenerateTimemap
+     */
     int GenerateTimemap(FunctorParams *functorParams) override;
-    ///@}
 
     /**
      * See Object::CalcMaxMeasureDuration
@@ -471,9 +472,7 @@ public:
     /**
      * See Object::CalcOnsetOffset
      */
-    ///@{
     int CalcOnsetOffset(FunctorParams *functorParams) override;
-    ///@}
 
     /**
      * See Object::PrepareTimestamps

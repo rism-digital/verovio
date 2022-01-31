@@ -113,6 +113,11 @@ public:
      */
     int HorizontalLayoutCache(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::PrepareMIDI
+     */
+    int PrepareMIDI(FunctorParams *functorParams) override;
+
 protected:
     //
 private:

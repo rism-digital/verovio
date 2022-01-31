@@ -386,6 +386,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             Functor prepareMIDI(&Object::PrepareMIDI);
             PrepareMIDIParams prepareMIDIParams;
             prepareMIDIParams.m_transSemi = transSemi;
+            prepareMIDIParams.m_currentTempo = tempo;
             this->Process(&prepareMIDI, &prepareMIDIParams, NULL, &filters);
 
             Functor generateMIDI(&Object::GenerateMIDI);
