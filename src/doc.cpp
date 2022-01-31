@@ -383,6 +383,11 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
+            Functor prepareMIDI(&Object::PrepareMIDI);
+            PrepareMIDIParams prepareMIDIParams;
+            prepareMIDIParams.m_transSemi = transSemi;
+            this->Process(&prepareMIDI, &prepareMIDIParams, NULL, &filters);
+
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
             GenerateMIDIParams generateMIDIParams(midiFile, &generateMIDI);
@@ -390,6 +395,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;
+            generateMIDIParams.m_deferredNotes = prepareMIDIParams.m_deferredNotes;
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);

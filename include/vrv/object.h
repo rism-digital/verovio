@@ -1262,12 +1262,20 @@ public:
      */
     ///@{
     virtual int HorizontalLayoutCache(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Adjust note timings based on ties
      */
     ///@{
     virtual int ResolveMIDITies(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Prepare the MIDI export
+     */
+    ///@{
+    virtual int PrepareMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

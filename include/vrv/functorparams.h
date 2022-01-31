@@ -2020,6 +2020,22 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// PrepareMIDIParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the semi tone transposition
+ * member 1: deferred notes which start slightly later
+ **/
+
+class PrepareMIDIParams : public FunctorParams {
+public:
+    PrepareMIDIParams() { m_transSemi = 0; }
+    int m_transSemi;
+    std::map<Note *, double> m_deferredNotes;
+};
+
+//----------------------------------------------------------------------------
 // PrepareMilestonesParams
 //----------------------------------------------------------------------------
 
