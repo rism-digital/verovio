@@ -169,7 +169,8 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     std::wstring notes;
 
     const bool drawingCueSize = tuplet->GetDrawingCueSize();
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
+    const int glyphSize = staff->GetDrawingStaffNotationSize();
+    dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, drawingCueSize));
     notes = IntToTupletFigures((short int)tuplet->GetNum());
     if (tuplet->GetNumFormat() == tupletVis_NUMFORMAT_ratio) {
         notes.push_back(SMUFL_E88A_tupletColon);
@@ -183,11 +184,11 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     int y = tupletNum->GetDrawingYMid();
     // adjust the baseline (to be improved with slanted brackets
-    y -= m_doc->GetGlyphHeight(notes.back(), staff->m_drawingStaffSize, drawingCueSize) / 2;
+    y -= m_doc->GetGlyphHeight(notes.back(), glyphSize, drawingCueSize) / 2;
 
     dc->ResumeGraphic(tupletNum, tupletNum->GetUuid());
 
-    this->DrawSmuflString(dc, x, y, notes, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, drawingCueSize);
+    this->DrawSmuflString(dc, x, y, notes, HORIZONTALALIGNMENT_left, glyphSize, drawingCueSize);
 
     dc->EndResumedGraphic(tupletNum, this);
 
