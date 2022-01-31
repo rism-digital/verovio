@@ -108,6 +108,8 @@ wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
     }
 
     switch (notationtype) {
+        case NOTATIONTYPE_tab:
+        case NOTATIONTYPE_tab_guitar: return SMUFL_E06D_6stringTabClef; break;
         case NOTATIONTYPE_neume:
             // neume clefs
             return (this->GetShape() == CLEFSHAPE_F) ? SMUFL_E902_chantFclef : SMUFL_E906_chantCclef;

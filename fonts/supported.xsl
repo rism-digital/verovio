@@ -111,6 +111,8 @@
             <glyph glyph-code="E06A" smufl-name="unpitchedPercussionClef2" />
             <!--<glyph glyph-code="E06B" smufl-name="semipitchedPercussionClef1" />-->
             <!--<glyph glyph-code="E06C" smufl-name="semipitchedPercussionClef2" />-->
+            <glyph glyph-code="E06D" smufl-name="6stringTabClef" />
+            <glyph glyph-code="E06E" smufl-name="4stringTabClef" />
             <!--<glyph glyph-code="E06F" smufl-name="cClefTriangular" />-->
             <!--<glyph glyph-code="E070" smufl-name="fClefTriangular" />-->
             <!--<glyph glyph-code="E071" smufl-name="cClefTriangularToFClef" />-->
