@@ -28,6 +28,7 @@
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
+#include "tabdursym.h"
 #include "tabgrp.h"
 #include "tuplet.h"
 #include "verticalaligner.h"
@@ -1634,6 +1635,11 @@ void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
         Chord *chord = vrv_cast<Chord *>(m_element);
         assert(chord);
         m_closestNote = (STEMDIRECTION_up == stemDir) ? chord->GetTopNote() : chord->GetBottomNote();
+    }
+    else if (m_element->Is(TABGRP)) {
+        TabGrp *tabGrp = vrv_cast<TabGrp *>(m_element);
+        assert(tabGrp);
+        m_closestNote = (STEMDIRECTION_up == stemDir) ? tabGrp->GetTopNote() : tabGrp->GetBottomNote();
     }
 }
 
