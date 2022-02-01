@@ -45,6 +45,16 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
+    /**
+     * Return the top or bottom note or their Y position
+     */
+    ///@{
+    Note *GetTopNote();
+    Note *GetBottomNote();
+    int GetYTop();
+    int GetYBottom();
+    ///@}
+
     //----------//
     // Functors //
     //----------//
