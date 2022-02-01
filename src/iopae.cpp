@@ -3670,6 +3670,8 @@ bool PAEInput::ConvertChord()
 bool PAEInput::ConvertBeam()
 {
     Beam *beam = NULL;
+    Beam *graceBeam = NULL;
+    bool withinGrace = false;
 
     // Here we need an iterator because we might have to add a missing closing tag
     std::list<pae::Token>::iterator token = m_pae.begin();
@@ -3688,13 +3690,29 @@ bool PAEInput::ConvertBeam()
                 continue;
             }
             if (beam) {
-                LogPAE(ERR_023_BEAM_NESTED, *token);
-                if (m_pedanticMode) return false;
-                ++token;
-                continue;
+                // Nested beams only allowed if the second one is in a grace group
+                if (!withinGrace) {
+                    LogPAE(ERR_023_BEAM_NESTED, *token);
+                    if (m_pedanticMode) return false;
+                    ++token;
+                    continue;
+                }
+                // No nested beams within a grace group
+                else if (graceBeam) {
+                    LogPAE(ERR_023_BEAM_NESTED, *token);
+                    if (m_pedanticMode) return false;
+                    ++token;
+                    continue;
+                }
+                // Create a grace beam
+                graceBeam = new Beam();
+                token->m_object = graceBeam;
             }
-            beam = new Beam();
-            token->m_object = beam;
+            else {
+                // Create a beam
+                beam = new Beam();
+                token->m_object = beam;
+            }
         }
         else if (token->m_char == '}') {
             token->m_char = 0;
@@ -3703,17 +3721,40 @@ bool PAEInput::ConvertBeam()
                 ++token;
                 continue;
             }
-            if (!beam) {
+            // Closing while no beam or grace beam have been open
+            if (!beam && !graceBeam) {
                 LogPAE(ERR_024_BEAM_CLOSING, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
             }
-            token->m_object = beam;
-            token->m_char = pae::CONTAINER_END;
-            beam = NULL;
+            if (graceBeam) {
+                token->m_object = graceBeam;
+                token->m_char = pae::CONTAINER_END;
+                graceBeam = NULL;
+            }
+            else {
+                token->m_object = beam;
+                token->m_char = pae::CONTAINER_END;
+                beam = NULL;
+            }
         }
+        // Flag the beginning of a grace group
+        else if (token->m_char == 'Q') {
+            withinGrace = true;
+        }
+        // Flag the end
+        else if (token->m_char == 'r') {
+            withinGrace = false;
+        }
+        // Close beams left open
         else if (token->IsEnd() || token->Is(MEASURE)) {
+            if (graceBeam) {
+                LogPAE(ERR_025_BEAM_OPEN, *token);
+                if (m_pedanticMode) return false;
+                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, graceBeam));
+                graceBeam = NULL;
+            }
             if (beam) {
                 LogPAE(ERR_025_BEAM_OPEN, *token);
                 if (m_pedanticMode) return false;
