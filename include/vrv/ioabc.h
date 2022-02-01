@@ -31,6 +31,7 @@ class Mdiv;
 class Measure;
 class MeterSig;
 class Note;
+class Score;
 class Section;
 class Slur;
 class Staff;
@@ -53,7 +54,7 @@ public:
 private:
     // function declarations:
 
-    void parseABC(std::istream &infile);
+    void ParseABC(std::istream &infile);
 
     // parsing functions
     int SetBarLine(const std::string &musicCode, int index);
@@ -86,9 +87,11 @@ private:
     void AddOrnaments(LayerElement *element);
 
     // additional functions
-    void PrintInformationFields();
+    void PrintInformationFields(Score *score);
     void CreateHeader();
     void CreateWorkEntry();
+    void FlushControlElements(Score *score, Section *section);
+    void InitScoreAndSection(Score *&score, Section *&section);
 
 #endif // NO_ABC_SUPPORT
 
