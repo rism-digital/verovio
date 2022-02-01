@@ -2256,7 +2256,8 @@ enum {
     ERR_055_KEYSIG_CHANGE,
     ERR_056_TIMESIG_CHANGE,
     ERR_057_MENSUR_CHANGE,
-    ERR_058_FERMATA_MREST
+    ERR_058_FERMATA_MREST,
+    ERR_059_DOUBLE_DOTS_MENS
 };
 
 // clang-format off
@@ -2318,7 +2319,8 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_055_KEYSIG_CHANGE, "The key signature cannot be changed more than once in a measure." },
     { ERR_056_TIMESIG_CHANGE, "The time signature cannot be changed more than once in a measure." },
     { ERR_057_MENSUR_CHANGE, "The mensur sign cannot be changed more than once in a measure." },
-    { ERR_058_FERMATA_MREST, "A fermata on measure with extra '%s' is invalid." }
+    { ERR_058_FERMATA_MREST, "A fermata on measure rest with extra '%s' is invalid." },
+    { ERR_059_DOUBLE_DOTS_MENS, "Double-dotted notes are invalid with mensural notation." }
 };
 // clang-format on
 
@@ -3668,6 +3670,8 @@ bool PAEInput::ConvertChord()
 bool PAEInput::ConvertBeam()
 {
     Beam *beam = NULL;
+    Beam *graceBeam = NULL;
+    bool withinGrace = false;
 
     // Here we need an iterator because we might have to add a missing closing tag
     std::list<pae::Token>::iterator token = m_pae.begin();
@@ -3686,13 +3690,29 @@ bool PAEInput::ConvertBeam()
                 continue;
             }
             if (beam) {
-                LogPAE(ERR_023_BEAM_NESTED, *token);
-                if (m_pedanticMode) return false;
-                ++token;
-                continue;
+                // Nested beams only allowed if the second one is in a grace group
+                if (!withinGrace) {
+                    LogPAE(ERR_023_BEAM_NESTED, *token);
+                    if (m_pedanticMode) return false;
+                    ++token;
+                    continue;
+                }
+                // No nested beams within a grace group
+                else if (graceBeam) {
+                    LogPAE(ERR_023_BEAM_NESTED, *token);
+                    if (m_pedanticMode) return false;
+                    ++token;
+                    continue;
+                }
+                // Create a grace beam
+                graceBeam = new Beam();
+                token->m_object = graceBeam;
             }
-            beam = new Beam();
-            token->m_object = beam;
+            else {
+                // Create a beam
+                beam = new Beam();
+                token->m_object = beam;
+            }
         }
         else if (token->m_char == '}') {
             token->m_char = 0;
@@ -3701,17 +3721,40 @@ bool PAEInput::ConvertBeam()
                 ++token;
                 continue;
             }
-            if (!beam) {
+            // Closing while no beam or grace beam have been open
+            if (!beam && !graceBeam) {
                 LogPAE(ERR_024_BEAM_CLOSING, *token);
                 if (m_pedanticMode) return false;
                 ++token;
                 continue;
             }
-            token->m_object = beam;
-            token->m_char = pae::CONTAINER_END;
-            beam = NULL;
+            if (graceBeam) {
+                token->m_object = graceBeam;
+                token->m_char = pae::CONTAINER_END;
+                graceBeam = NULL;
+            }
+            else {
+                token->m_object = beam;
+                token->m_char = pae::CONTAINER_END;
+                beam = NULL;
+            }
         }
+        // Flag the beginning of a grace group
+        else if (token->m_char == 'Q') {
+            withinGrace = true;
+        }
+        // Flag the end
+        else if (token->m_char == 'r') {
+            withinGrace = false;
+        }
+        // Close beams left open
         else if (token->IsEnd() || token->Is(MEASURE)) {
+            if (graceBeam) {
+                LogPAE(ERR_025_BEAM_OPEN, *token);
+                if (m_pedanticMode) return false;
+                token = m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, graceBeam));
+                graceBeam = NULL;
+            }
             if (beam) {
                 LogPAE(ERR_025_BEAM_OPEN, *token);
                 if (m_pedanticMode) return false;
@@ -3956,17 +3999,23 @@ bool PAEInput::ConvertDuration()
     std::string paeStr;
     bool isChord = false;
 
-    for (auto &token : m_pae) {
-        if (token.IsVoid()) continue;
+    // Here we need an iterator because we might have to add a mensural dots
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
 
         // Extract duration string we can then convert in one go
-        if (this->Is(token, pae::DURATION)) {
+        if (this->Is(*token, pae::DURATION)) {
             if (!durationToken) {
-                durationToken = &token;
+                durationToken = &(*token);
                 paeStr.clear();
             }
-            paeStr.push_back(token.m_char);
-            token.m_char = 0;
+            paeStr.push_back(token->m_char);
+            token->m_char = 0;
+            ++token;
             continue;
         }
         // We have reach the end of a duration string - convert it, including patterns
@@ -3978,24 +4027,47 @@ bool PAEInput::ConvertDuration()
             currentDur = durations.begin();
         }
         // For chords we don't want to set the duration on the child notes so we need to keep a flag
-        if (token.Is(CHORD)) {
-            isChord = !token.IsContainerEnd();
-            if (token.IsContainerEnd()) continue;
+        if (token->Is(CHORD)) {
+            isChord = !token->IsContainerEnd();
+            if (token->IsContainerEnd()) {
+                ++token;
+                continue;
+            }
         }
         // Apply the current duration
-        if ((token.Is(NOTE) && !isChord) || token.Is(CHORD) || token.Is(REST)) {
+        if ((token->Is(NOTE) && !isChord) || token->Is(CHORD) || token->Is(REST)) {
             // We should also skip acciaccature
-            if (token.Is(NOTE)) {
-                Note *note = vrv_cast<Note *>(token.m_object);
+            if (token->Is(NOTE)) {
+                Note *note = vrv_cast<Note *>(token->m_object);
                 assert(note);
-                if (note->GetGrace() == GRACE_unacc) continue;
+                if (note->GetGrace() == GRACE_unacc) {
+                    ++token;
+                    continue;
+                }
             }
             // Set the duration to the note, chord or rest
-            DurationInterface *interface = dynamic_cast<DurationInterface *>(token.m_object);
+            DurationInterface *interface = dynamic_cast<DurationInterface *>(token->m_object);
             assert(interface);
             interface->SetDur(currentDur->first);
             if (currentDur->second) {
-                interface->SetDots(currentDur->second);
+                if (interface->GetDur() == DURATION_128 && token->Is(NOTE)) {
+                    Note *note = vrv_cast<Note *>(token->m_object);
+                    assert(note);
+                    note->SetDur(DURATION_NONE);
+                }
+                else if (m_isMensural) {
+                    if (currentDur->second > 1) {
+                        LogPAE(ERR_059_DOUBLE_DOTS_MENS, *token);
+                        if (m_pedanticMode) return false;
+                    }
+                    Dot *dot = new Dot();
+                    // We need to insert it before the next one
+                    ++token;
+                    token = m_pae.insert(token, pae::Token(0, pae::UNKOWN_POS, dot));
+                }
+                else {
+                    interface->SetDots(currentDur->second);
+                }
             }
             // Move to the next on the stack - but this is meanless if we have a single value
             if (durations.size() > 1) {
@@ -4004,6 +4076,7 @@ bool PAEInput::ConvertDuration()
                 if (currentDur == durations.end()) currentDur = durations.begin();
             }
         }
+        ++token;
     }
 
     return true;
