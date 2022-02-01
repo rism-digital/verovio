@@ -134,6 +134,10 @@ void BeamSegment::CalcTabBeam(
         beamInterface->m_drawingPlace = (layerStemDir == STEMDIRECTION_down) ? BEAMPLACE_below : BEAMPLACE_above;
     }
 
+    bool horizontal = false;
+    CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
+
+    CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
     for (auto coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
