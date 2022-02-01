@@ -138,11 +138,46 @@ void BeamSegment::CalcTabBeam(
     CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
 
     CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
+
+    data_STEMDIRECTION stemDir
+        = (beamInterface->m_drawingPlace == BEAMPLACE_above) ? STEMDIRECTION_up : STEMDIRECTION_down;
     for (auto coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
         if (el->Is(TABGRP)) {
-            coord->m_yBeam = y;
+            TabGrp *tabGrp = vrv_cast<TabGrp *>(el);
+            assert(tabGrp);
+            TabDurSym *tabDurSym = vrv_cast<TabDurSym *>(tabGrp->FindDescendantByType(TABDURSYM));
+
+            if (!tabDurSym) continue;
+
+            tabDurSym->CalcDrawingYRel(stemDir);
+            // coord->m_yBeam = y;
+
+            StemmedDrawingInterface *stemmedInterface = tabDurSym->GetStemmedDrawingInterface();
+            assert(beamInterface);
+
+            assert(coord->m_closestNote);
+
+            int y1 = coord->m_yBeam;
+
+            int y2 = coord->m_closestNote->GetDrawingY();
+            if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+                // Move down to ensure the stem is slightly shorter than the top-beam
+                y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            else {
+                y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+
+            Stem *stem = stemmedInterface->GetDrawingStem();
+            // This is the case with fTrem on whole notes
+            if (!stem) continue;
+
+            stem->SetDrawingStemDir(stemDir);
+            stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
+            stem->SetDrawingYRel(y2 - el->GetDrawingY());
+            stem->SetDrawingStemLen(y2 - y1);
         }
     }
 }
