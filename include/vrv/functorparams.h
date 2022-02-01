@@ -1005,7 +1005,7 @@ public:
     {
         m_currentScoreTime = 0.0;
         m_currentRealTimeSeconds = 0.0;
-        m_currentTempo = 120.0;
+        m_currentTempo = MIDI_TEMPO;
         m_tempoAdjustment = 1.0;
         m_multiRestFactor = 1;
     }
@@ -1038,7 +1038,7 @@ public:
         m_currentMensur = NULL;
         m_currentMeterSig = NULL;
         m_notationType = NOTATIONTYPE_cmn;
-        m_currentTempo = 120.0;
+        m_currentTempo = MIDI_TEMPO;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
@@ -1628,7 +1628,7 @@ public:
         m_midiTrack = 1;
         m_totalTime = 0.0;
         m_transSemi = 0;
-        m_currentTempo = 120.0;
+        m_currentTempo = MIDI_TEMPO;
         m_lastNote = NULL;
         m_accentedGraceNote = false;
         m_functor = functor;
@@ -1666,7 +1666,7 @@ public:
     {
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;
-        m_currentTempo = 120.0;
+        m_currentTempo = MIDI_TEMPO;
         m_timemap = timemap;
         m_functor = functor;
     }
@@ -2034,7 +2034,7 @@ public:
     PrepareMIDIParams()
     {
         m_transSemi = 0;
-        m_currentTempo = 120.0;
+        m_currentTempo = MIDI_TEMPO;
     }
     int m_transSemi;
     double m_currentTempo;

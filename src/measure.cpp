@@ -154,7 +154,7 @@ void Measure::Reset()
 
     m_scoreTimeOffset.clear();
     m_realTimeOffsetMilliseconds.clear();
-    m_currentTempo = 120.0;
+    m_currentTempo = MIDI_TEMPO;
 }
 
 bool Measure::IsSupportedChild(Object *child)
