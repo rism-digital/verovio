@@ -970,14 +970,15 @@ int Note::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // Stems have been calculated previously in Beam or fTrem - siblings because flags do not need to
-    // be processed either - except when there is a stemSameasNote
+    // Stems have been calculated previously in Beam or fTrem
+    // Return to siblings because flags do not need to be processed either in that case
     if ((this->IsInBeam() || this->IsInFTrem())) {
         return FUNCTOR_SIBLINGS;
     }
 
     // We currently have no stem object with mensural notes
-    if (this->IsMensuralDur()) {
+    // We also have no stem  with tab because it belongs to tabDurSym in this case
+    if (this->IsMensuralDur() || this->IsTabGrpNote()) {
         return FUNCTOR_SIBLINGS;
     }
 
