@@ -2319,7 +2319,7 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_055_KEYSIG_CHANGE, "The key signature cannot be changed more than once in a measure." },
     { ERR_056_TIMESIG_CHANGE, "The time signature cannot be changed more than once in a measure." },
     { ERR_057_MENSUR_CHANGE, "The mensur sign cannot be changed more than once in a measure." },
-    { ERR_058_FERMATA_MREST, "A fermata on measure with extra '%s' is invalid." },
+    { ERR_058_FERMATA_MREST, "A fermata on measure rest with extra '%s' is invalid." },
     { ERR_059_DOUBLE_DOTS_MENS, "Double-dotted notes are invalid with mensural notation." }
 };
 // clang-format on
