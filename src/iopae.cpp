@@ -3995,7 +3995,16 @@ bool PAEInput::ConvertDuration()
             assert(interface);
             interface->SetDur(currentDur->first);
             if (currentDur->second) {
-                interface->SetDots(currentDur->second);
+                if (interface->GetDur() == DURATION_128 && token.Is(NOTE)) {
+                    Note *note = vrv_cast<Note *>(token.m_object);
+                    assert(note);
+                    note->SetDur(DURATION_4);
+                    note->SetStemLen(0);
+                    note->SetStemVisible(BOOLEAN_false);
+                }
+                else {
+                    interface->SetDots(currentDur->second);
+                }
             }
             // Move to the next on the stack - but this is meanless if we have a single value
             if (durations.size() > 1) {
