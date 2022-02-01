@@ -2256,7 +2256,8 @@ enum {
     ERR_055_KEYSIG_CHANGE,
     ERR_056_TIMESIG_CHANGE,
     ERR_057_MENSUR_CHANGE,
-    ERR_058_FERMATA_MREST
+    ERR_058_FERMATA_MREST,
+    ERR_059_DOUBLE_DOTS_MENS
 };
 
 // clang-format off
@@ -2318,7 +2319,8 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_055_KEYSIG_CHANGE, "The key signature cannot be changed more than once in a measure." },
     { ERR_056_TIMESIG_CHANGE, "The time signature cannot be changed more than once in a measure." },
     { ERR_057_MENSUR_CHANGE, "The mensur sign cannot be changed more than once in a measure." },
-    { ERR_058_FERMATA_MREST, "A fermata on measure with extra '%s' is invalid." }
+    { ERR_058_FERMATA_MREST, "A fermata on measure with extra '%s' is invalid." },
+    { ERR_059_DOUBLE_DOTS_MENS, "Double-dotted notes are invalid with mensural notation." }
 };
 // clang-format on
 
@@ -4013,6 +4015,16 @@ bool PAEInput::ConvertDuration()
                     note->SetDur(DURATION_4);
                     note->SetStemLen(0);
                     note->SetStemVisible(BOOLEAN_false);
+                }
+                else if (m_isMensural) {
+                    if (currentDur->second > 1) {
+                        LogPAE(ERR_059_DOUBLE_DOTS_MENS, *token);
+                        if (m_pedanticMode) return false;
+                    }
+                    Dot *dot = new Dot();
+                    // We need to insert it before the next one
+                    ++token;
+                    token = m_pae.insert(token, pae::Token(0, pae::UNKOWN_POS, dot));
                 }
                 else {
                     interface->SetDots(currentDur->second);
