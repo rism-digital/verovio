@@ -3956,17 +3956,23 @@ bool PAEInput::ConvertDuration()
     std::string paeStr;
     bool isChord = false;
 
-    for (auto &token : m_pae) {
-        if (token.IsVoid()) continue;
+    // Here we need an iterator because we might have to add a mensural dots
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
 
         // Extract duration string we can then convert in one go
-        if (this->Is(token, pae::DURATION)) {
+        if (this->Is(*token, pae::DURATION)) {
             if (!durationToken) {
-                durationToken = &token;
+                durationToken = &(*token);
                 paeStr.clear();
             }
-            paeStr.push_back(token.m_char);
-            token.m_char = 0;
+            paeStr.push_back(token->m_char);
+            token->m_char = 0;
+            ++token;
             continue;
         }
         // We have reach the end of a duration string - convert it, including patterns
@@ -3978,25 +3984,31 @@ bool PAEInput::ConvertDuration()
             currentDur = durations.begin();
         }
         // For chords we don't want to set the duration on the child notes so we need to keep a flag
-        if (token.Is(CHORD)) {
-            isChord = !token.IsContainerEnd();
-            if (token.IsContainerEnd()) continue;
+        if (token->Is(CHORD)) {
+            isChord = !token->IsContainerEnd();
+            if (token->IsContainerEnd()) {
+                ++token;
+                continue;
+            }
         }
         // Apply the current duration
-        if ((token.Is(NOTE) && !isChord) || token.Is(CHORD) || token.Is(REST)) {
+        if ((token->Is(NOTE) && !isChord) || token->Is(CHORD) || token->Is(REST)) {
             // We should also skip acciaccature
-            if (token.Is(NOTE)) {
-                Note *note = vrv_cast<Note *>(token.m_object);
+            if (token->Is(NOTE)) {
+                Note *note = vrv_cast<Note *>(token->m_object);
                 assert(note);
-                if (note->GetGrace() == GRACE_unacc) continue;
+                if (note->GetGrace() == GRACE_unacc) {
+                    ++token;
+                    continue;
+                }
             }
             // Set the duration to the note, chord or rest
-            DurationInterface *interface = dynamic_cast<DurationInterface *>(token.m_object);
+            DurationInterface *interface = dynamic_cast<DurationInterface *>(token->m_object);
             assert(interface);
             interface->SetDur(currentDur->first);
             if (currentDur->second) {
-                if (interface->GetDur() == DURATION_128 && token.Is(NOTE)) {
-                    Note *note = vrv_cast<Note *>(token.m_object);
+                if (interface->GetDur() == DURATION_128 && token->Is(NOTE)) {
+                    Note *note = vrv_cast<Note *>(token->m_object);
                     assert(note);
                     note->SetDur(DURATION_4);
                     note->SetStemLen(0);
@@ -4013,6 +4025,7 @@ bool PAEInput::ConvertDuration()
                 if (currentDur == durations.end()) currentDur = durations.begin();
             }
         }
+        ++token;
     }
 
     return true;
