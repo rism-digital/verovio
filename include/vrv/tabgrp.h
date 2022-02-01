@@ -20,7 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <tabGrp> element.
  */
-class TabGrp : public LayerElement, public DurationInterface {
+class TabGrp : public LayerElement, public ObjectListInterface, public DurationInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -60,7 +60,11 @@ public:
     int CalcStem(FunctorParams *functorParams) override;
 
 protected:
-    //
+    /**
+     * Filter the flat list and keep only Note elements.
+     */
+    void FilterList(ArrayOfObjects *childList) override;
+
 private:
     //
 public:

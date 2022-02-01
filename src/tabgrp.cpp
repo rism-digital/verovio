@@ -26,7 +26,7 @@ namespace vrv {
 
 static const ClassRegistrar<TabGrp> s_factory("tabGrp", TABGRP);
 
-TabGrp::TabGrp() : LayerElement(TABGRP, "tabgrp-"), DurationInterface()
+TabGrp::TabGrp() : LayerElement(TABGRP, "tabgrp-"), ObjectListInterface(), DurationInterface()
 {
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
 
@@ -56,6 +56,18 @@ bool TabGrp::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+void TabGrp::FilterList(ArrayOfObjects *childList)
+{
+    // Retain only note children of chords
+    ArrayOfObjects::iterator iter = childList->begin();
+
+    while (iter != childList->end()) {
+        iter = ((*iter)->Is(NOTE)) ? iter + 1 : childList->erase(iter);
+    }
+
+    std::sort(childList->begin(), childList->end(), TabFretSort());
 }
 
 //----------------------------------------------------------------------------
