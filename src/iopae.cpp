@@ -4053,9 +4053,7 @@ bool PAEInput::ConvertDuration()
                 if (interface->GetDur() == DURATION_128 && token->Is(NOTE)) {
                     Note *note = vrv_cast<Note *>(token->m_object);
                     assert(note);
-                    note->SetDur(DURATION_4);
-                    note->SetStemLen(0);
-                    note->SetStemVisible(BOOLEAN_false);
+                    note->SetDur(DURATION_NONE);
                 }
                 else if (m_isMensural) {
                     if (currentDur->second > 1) {
