@@ -67,6 +67,15 @@ public:
     int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) override;
     ///@}
 
+    /**
+     * Adjust the drawing y relative value for TabDurSym placed below the staff.
+     * The value is originally set in LayerElement::SetAlignmentPosPitch.
+     * However, setting it below the staff for a TabDurSym can be done only once the stem
+     * direction has been determined. This is why we have this method called from
+     * Beam::CalcTabBeamPlace
+     */
+    void AdjustDrawingYRel(Staff *staff, Doc *doc);
+
     //----------//
     // Functors //
     //----------//

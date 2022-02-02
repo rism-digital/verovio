@@ -75,6 +75,19 @@ void TabDurSym::AddChild(Object *child)
     Modify();
 }
 
+void TabDurSym::AdjustDrawingYRel(Staff *staff, Doc *doc)
+{
+    assert(staff);
+    assert(doc);
+
+    int yRel = (staff->m_drawingLines - 1) * doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+    double spacingRatio = (staff->IsTabLuteFrench()) ? 2.0 : 1.0;
+    yRel += doc->GetDrawingUnit(staff->m_drawingStaffSize) * spacingRatio;
+
+    this->SetDrawingYRel(-yRel);
+}
+
 Point TabDurSym::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
 {
     Point p(0, 0);
