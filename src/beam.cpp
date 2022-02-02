@@ -1566,6 +1566,20 @@ int BeamElementCoord::CalculateStemModAdjustment(int stemLength, int directionBi
     return 0;
 }
 
+StemmedDrawingInterface *BeamElementCoord::GetStemHolderInterface()
+{
+    if (!m_element || !m_element->Is({ CHORD, NOTE, TABGRP })) return NULL;
+
+    if (m_element->Is({ CHORD, NOTE })) return m_element->GetStemmedDrawingInterface();
+
+    TabGrp *tabGrp = vrv_cast<TabGrp *>(m_element);
+    assert(tabGrp);
+    TabDurSym *tabDurSym = vrv_cast<TabDurSym *>(tabGrp->FindDescendantByType(TABDURSYM));
+    if (tabDurSym) return tabDurSym->GetStemmedDrawingInterface();
+
+    return NULL;
+}
+
 void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
 {
     m_closestNote = NULL;

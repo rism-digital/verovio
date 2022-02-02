@@ -311,6 +311,14 @@ public:
      */
     int CalculateStemModAdjustment(int stemLength, int directionBias);
 
+    /**
+     * Helper to get the StemmedDrawingInterface associated with the m_element (if any)
+     * Return the Chord or Note interface if the element if of that type.
+     * Return the TabDurSym interface if the element is TabDurGrp and has a TabDurSym descendant.
+     * Return NULL otherwise.
+     */
+    StemmedDrawingInterface *GetStemHolderInterface();
+
     int m_x;
     int m_yBeam; // y value of stem top position
     int m_dur; // drawing duration
