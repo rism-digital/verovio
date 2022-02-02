@@ -441,13 +441,31 @@ void BeamSegment::CalcBeamInit(
     }
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
-    // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-    beamInterface->m_stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, false)
-        - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    beamInterface->m_stemXAbove[1] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, true)
-        - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    beamInterface->m_stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    beamInterface->m_stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    if (staff->IsTablature()) {
+        // Adjust the height and spacing of the beams
+        beamInterface->m_beamWidthBlack /= 2;
+        beamInterface->m_beamWidthWhite /= 2;
+
+        // Adjust it further for tab.lute.french and tab.lute.italian
+        if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
+            beamInterface->m_beamWidthBlack = beamInterface->m_beamWidthBlack * 2 / 5;
+            beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 3 / 5;
+        }
+
+        beamInterface->m_stemXAbove[0] = 0;
+        beamInterface->m_stemXAbove[1] = 0;
+        beamInterface->m_stemXBelow[0] = 0;
+        beamInterface->m_stemXBelow[1] = 0;
+    }
+    else {
+        // x-offset values for stem bases, dx[y] where y = element->m_cueSize
+        beamInterface->m_stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, false)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        beamInterface->m_stemXAbove[1] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, true)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        beamInterface->m_stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        beamInterface->m_stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    }
 
     /******************************************************************/
     // Calculate the extreme values
