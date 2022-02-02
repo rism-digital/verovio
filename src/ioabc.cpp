@@ -347,6 +347,11 @@ void ABCInput::AddLayerElement()
             m_layer->AddChild(*iter);
         }
     }
+    // clean-up leftover data, if any
+    if (beam && !beam->GetChildCount()) delete beam;
+    if (m_containerElement.m_element && !m_containerElement.m_element->GetChildCount())
+        delete m_containerElement.m_element;
+
     m_containerElement = {};
     m_noteStack.clear();
 }
