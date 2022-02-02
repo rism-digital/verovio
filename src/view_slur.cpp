@@ -76,14 +76,14 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         m_slurThicknessCoefficient
             = BoundingBox::GetBezierThicknessCoefficient(points, curve->GetThickness(), curve->GetAngle(), penWidth);
     }
-    DrawThickBezierCurve(dc, points, m_slurThicknessCoefficient * curve->GetThickness(), staff->m_drawingStaffSize,
-        penWidth, curve->GetAngle(), penStyle);
+    this->DrawThickBezierCurve(dc, points, m_slurThicknessCoefficient * curve->GetThickness(),
+        staff->m_drawingStaffSize, penWidth, curve->GetAngle(), penStyle);
 
     /*
     int i;
     for (i = 0; i <= 10; ++i) {
         Point p = BoundingBox::CalcDeCasteljau(points, (double)i / 10.0);
-        DrawDot(dc, p.x, p.y, staff->m_drawingStaffSize);
+        this->DrawDot(dc, p.x, p.y, staff->m_drawingStaffSize);
     }
     */
 

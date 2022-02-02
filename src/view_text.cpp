@@ -45,7 +45,7 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
 
     dc->StartTextGraphic(f, "", f->GetUuid());
 
-    DrawTextChildren(dc, f, params);
+    this->DrawTextChildren(dc, f, params);
 
     if (f->GetStart() && f->GetEnd()) {
         System *currentSystem = dynamic_cast<System *>(f->GetFirstAncestor(SYSTEM));
@@ -70,7 +70,7 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
     assert(dc);
 
     if (rend && rend->HasFontfam()) {
-        DrawTextString(dc, str, params);
+        this->DrawTextString(dc, str, params);
         return;
     }
 
@@ -79,7 +79,7 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
         int first = true;
         for (auto &token : tokens) {
             if (!first) {
-                // DrawTextString(dc, L" ", params);
+                // this->DrawTextString(dc, L" ", params);
             }
             first = false;
 
@@ -89,16 +89,16 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
                 vrvTxt.SetFaceName("VerovioText");
                 vrvTxt.SetStyle(FONTSTYLE_normal);
                 dc->SetFont(&vrvTxt);
-                DrawTextString(dc, smuflStr, params);
+                this->DrawTextString(dc, smuflStr, params);
                 dc->ResetFont();
             }
             else {
-                DrawTextString(dc, token.first, params);
+                this->DrawTextString(dc, token.first, params);
             }
         }
     }
     else {
-        DrawTextString(dc, str, params);
+        this->DrawTextString(dc, str, params);
     }
 }
 
@@ -169,27 +169,27 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
     if (element->Is(FIGURE)) {
         F *f = vrv_cast<F *>(element);
         assert(f);
-        DrawF(dc, f, params);
+        this->DrawF(dc, f, params);
     }
     else if (element->Is(LB)) {
         Lb *lb = vrv_cast<Lb *>(element);
         assert(lb);
-        DrawLb(dc, lb, params);
+        this->DrawLb(dc, lb, params);
     }
     else if (element->Is(NUM)) {
         Num *num = vrv_cast<Num *>(element);
         assert(num);
-        DrawNum(dc, num, params);
+        this->DrawNum(dc, num, params);
     }
     else if (element->Is(REND)) {
         Rend *rend = vrv_cast<Rend *>(element);
         assert(rend);
-        DrawRend(dc, rend, params);
+        this->DrawRend(dc, rend, params);
     }
     else if (element->Is(TEXT)) {
         Text *text = vrv_cast<Text *>(element);
         assert(text);
-        DrawText(dc, text, params);
+        this->DrawText(dc, text, params);
     }
     else {
         assert(false);
@@ -260,10 +260,10 @@ void View::DrawNum(DeviceContext *dc, Num *num, TextDrawingParams &params)
 
     Text *currentText = num->GetCurrentText();
     if (currentText && (currentText->GetText().length() > 0)) {
-        DrawText(dc, num->GetCurrentText(), params);
+        this->DrawText(dc, num->GetCurrentText(), params);
     }
     else {
-        DrawTextChildren(dc, num, params);
+        this->DrawTextChildren(dc, num, params);
     }
 
     dc->EndTextGraphic(num, this);
@@ -280,7 +280,7 @@ void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)
     if (svg) {
         params.m_x = fig->GetDrawingX();
         params.m_y = fig->GetDrawingY();
-        DrawSvg(dc, svg, params);
+        this->DrawSvg(dc, svg, params);
     }
 
     dc->EndGraphic(fig, this);
@@ -348,7 +348,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         params.m_explicitPosition = true;
     }
 
-    DrawTextChildren(dc, rend, params);
+    this->DrawTextChildren(dc, rend, params);
 
     if ((rend->GetRend() == TEXTRENDITION_sup) || (rend->GetRend() == TEXTRENDITION_sub)) {
         params.m_y -= yShift;
@@ -389,23 +389,23 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
     if (text->GetFirstAncestor(DYNAM)) {
-        DrawDynamString(dc, text->GetText(), params, dynamic_cast<Rend *>(text->GetFirstAncestor(REND)));
+        this->DrawDynamString(dc, text->GetText(), params, dynamic_cast<Rend *>(text->GetFirstAncestor(REND)));
     }
     else if (text->GetFirstAncestor(HARM)) {
-        DrawHarmString(dc, text->GetText(), params);
+        this->DrawHarmString(dc, text->GetText(), params);
     }
     // special case where we want to replace the '_' with a lyric connector
     // '_' are produce with the SibMEI plugin
     else if (text->GetFirstAncestor(SYL)) {
         if (params.m_height != VRV_UNSET && params.m_height != 0) {
-            DrawLyricString(dc, text->GetText(), 100, params);
+            this->DrawLyricString(dc, text->GetText(), 100, params);
         }
         else {
-            DrawLyricString(dc, text->GetText());
+            this->DrawLyricString(dc, text->GetText());
         }
     }
     else {
-        DrawTextString(dc, text->GetText(), params);
+        this->DrawTextString(dc, text->GetText(), params);
     }
 
     params.m_actualWidth = text->GetContentRight();

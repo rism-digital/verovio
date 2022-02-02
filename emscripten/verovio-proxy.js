@@ -82,7 +82,7 @@ verovio.vrvToolkit.loadZipDataBase64 = Module.cwrap( 'vrvToolkit_loadZipDataBase
 verovio.vrvToolkit.loadZipDataBuffer = Module.cwrap( 'vrvToolkit_loadZipDataBuffer', 'number', ['number', 'number', 'number'] );
 
 // void redoLayout(Toolkit *ic)
-verovio.vrvToolkit.redoLayout = Module.cwrap( 'vrvToolkit_redoLayout', null, ['number'] );
+verovio.vrvToolkit.redoLayout = Module.cwrap( 'vrvToolkit_redoLayout', null, ['number', 'string'] );
 
 // void redoPagePitchPosLayout(Toolkit *ic)
 verovio.vrvToolkit.redoPagePitchPosLayout = Module.cwrap( 'vrvToolkit_redoPagePitchPosLayout', null, ['number'] );
@@ -100,7 +100,7 @@ verovio.vrvToolkit.renderToPAE = Module.cwrap( 'vrvToolkit_renderToPAE', 'string
 verovio.vrvToolkit.renderToSVG = Module.cwrap( 'vrvToolkit_renderToSVG', 'string', ['number', 'number', 'string'] );
 
 // char *renderToTimemap(Toolkit *ic)
-verovio.vrvToolkit.renderToTimemap = Module.cwrap( 'vrvToolkit_renderToTimemap', 'string', ['number'] );
+verovio.vrvToolkit.renderToTimemap = Module.cwrap( 'vrvToolkit_renderToTimemap', 'string', ['number', 'string'] );
 
 // void resetXmlIdSeed(Toolkit *ic, int seed) 
 verovio.vrvToolkit.resetXmlIdSeed = Module.cwrap( 'vrvToolkit_resetXmlIdSeed', null, ['number', 'number'] );
@@ -261,9 +261,9 @@ verovio.toolkit.prototype.loadZipDataBuffer = function ( data )
     return res;
 };
 
-verovio.toolkit.prototype.redoLayout = function ()
+verovio.toolkit.prototype.redoLayout = function ( options = {} )
 {
-    verovio.vrvToolkit.redoLayout( this.ptr );
+    verovio.vrvToolkit.redoLayout( this.ptr, JSON.stringify( options ) );
 }
 
 verovio.toolkit.prototype.redoPagePitchPosLayout = function ()
@@ -303,9 +303,9 @@ verovio.toolkit.prototype.renderToSVG = function ( pageNo, options )
     return verovio.vrvToolkit.renderToSVG( this.ptr, pageNo, JSON.stringify( options ) );
 };
 
-verovio.toolkit.prototype.renderToTimemap = function ()
+verovio.toolkit.prototype.renderToTimemap = function ( options = {})
 {
-    return JSON.parse( verovio.vrvToolkit.renderToTimemap( this.ptr ) );
+    return JSON.parse( verovio.vrvToolkit.renderToTimemap( this.ptr, JSON.stringify( options ) ) );
 };
 
 verovio.toolkit.prototype.resetXmlIdSeed = function ( seed )

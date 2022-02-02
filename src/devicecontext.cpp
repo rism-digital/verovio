@@ -175,7 +175,7 @@ void DeviceContext::ReactivateGraphic()
 void DeviceContext::GetTextExtent(const std::string &string, TextExtend *extend, bool typeSize)
 {
     std::wstring wtext(string.begin(), string.end());
-    GetTextExtent(wtext, extend, typeSize);
+    this->GetTextExtent(wtext, extend, typeSize);
 }
 
 void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend, bool typeSize)

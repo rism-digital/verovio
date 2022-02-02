@@ -23,7 +23,7 @@ static const ClassRegistrar<PgFoot2> s_factory("pgFoot2", PGFOOT2);
 
 PgFoot2::PgFoot2() : RunningElement(PGFOOT2, "pgfoot2-")
 {
-    Reset();
+    this->Reset();
 }
 
 PgFoot2::~PgFoot2() {}

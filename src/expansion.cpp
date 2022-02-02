@@ -23,9 +23,9 @@ static const ClassRegistrar<Expansion> s_factory("expansion", EXPANSION);
 
 Expansion::Expansion() : SystemElement(EXPANSION, "expansion-"), PlistInterface()
 {
-    RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
+    this->RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
 
-    Reset();
+    this->Reset();
 }
 
 Expansion::~Expansion() {}

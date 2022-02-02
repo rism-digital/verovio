@@ -28,9 +28,9 @@ static const ClassRegistrar<TabGrp> s_factory("tabGrp", TABGRP);
 
 TabGrp::TabGrp() : LayerElement(TABGRP, "tabgrp-"), DurationInterface()
 {
-    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
 
-    Reset();
+    this->Reset();
 }
 
 TabGrp::~TabGrp() {}

@@ -264,7 +264,7 @@ private:
 public:
     bool m_setAsDrawing;
     bool m_insertScoreDef;
-    //
+
 private:
     /** Flags for indicating whether labels need to be drawn or not */
     bool m_drawLabels;

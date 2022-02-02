@@ -25,16 +25,16 @@ namespace vrv {
 
 LinkingInterface::LinkingInterface() : Interface(), AttLinking()
 {
-    RegisterInterfaceAttClass(ATT_LINKING);
+    this->RegisterInterfaceAttClass(ATT_LINKING);
 
-    Reset();
+    this->Reset();
 }
 
 LinkingInterface::~LinkingInterface() {}
 
 void LinkingInterface::Reset()
 {
-    ResetLinking();
+    this->ResetLinking();
 
     m_next = NULL;
     m_nextUuid = "";

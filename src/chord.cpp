@@ -78,16 +78,16 @@ Chord::Chord()
     , AttTiePresent()
     , AttVisibility()
 {
-    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CUE);
-    RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_STEMS);
-    RegisterAttClass(ATT_STEMSCMN);
-    RegisterAttClass(ATT_TIEPRESENT);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_GRACED);
+    this->RegisterAttClass(ATT_STEMS);
+    this->RegisterAttClass(ATT_STEMSCMN);
+    this->RegisterAttClass(ATT_TIEPRESENT);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
-    Reset();
+    this->Reset();
 }
 
 Chord::~Chord()
@@ -101,13 +101,13 @@ void Chord::Reset()
     DrawingListInterface::Reset();
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
-    ResetColor();
-    ResetCue();
-    ResetGraced();
-    ResetStems();
-    ResetStemsCmn();
-    ResetTiePresent();
-    ResetVisibility();
+    this->ResetColor();
+    this->ResetCue();
+    this->ResetGraced();
+    this->ResetStems();
+    this->ResetStemsCmn();
+    this->ResetTiePresent();
+    this->ResetVisibility();
 
     ClearClusters();
 }
@@ -490,7 +490,7 @@ int Chord::AdjustOverlappingLayers(
             otherElementLocations.insert(note->GetDrawingLoc());
         }
     }
-    const ArrayOfObjects *notes = GetList(this);
+    const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
     // get current chord positions
     std::set<int> chordElementLocations;
@@ -500,8 +500,8 @@ int Chord::AdjustOverlappingLayers(
         chordElementLocations.insert(note->GetDrawingLoc());
     }
     const int expectedElementsInUnison
-        = CountElementsInUnison(chordElementLocations, otherElementLocations, GetDrawingStemDir());
-    const bool isLowerPosition = (STEMDIRECTION_down == GetDrawingStemDir() && (otherElementLocations.size() > 0)
+        = CountElementsInUnison(chordElementLocations, otherElementLocations, this->GetDrawingStemDir());
+    const bool isLowerPosition = (STEMDIRECTION_down == this->GetDrawingStemDir() && (otherElementLocations.size() > 0)
         && (*chordElementLocations.begin() >= *otherElementLocations.begin()));
     int actualElementsInUnison = 0;
     // process each note of the chord separately, storing locations in the set
@@ -520,7 +520,7 @@ int Chord::AdjustOverlappingLayers(
         isUnison = true;
     }
     else if (margin) {
-        SetDrawingXRel(GetDrawingXRel() + margin);
+        this->SetDrawingXRel(this->GetDrawingXRel() + margin);
         return margin;
     }
     return 0;
@@ -828,7 +828,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
         if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
     }
 
-    SetDrawingStem(currentStem);
+    this->SetDrawingStem(currentStem);
 
     // Also set the drawing stem object (or NULL) to all child notes
     const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized

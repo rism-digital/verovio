@@ -236,10 +236,10 @@ const char *vrvToolkit_renderToTimemap(void *tkPtr)
     return tk->GetCString();
 }
 
-void vrvToolkit_redoLayout(void *tkPtr)
+void vrvToolkit_redoLayout(void *tkPtr, const char *c_options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->RedoLayout();
+    tk->RedoLayout(c_options);
 }
 
 void vrvToolkit_redoPagePitchPosLayout(void *tkPtr)

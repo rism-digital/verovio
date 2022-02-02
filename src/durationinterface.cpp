@@ -17,6 +17,7 @@
 
 #include "beam.h"
 #include "chord.h"
+#include "functorparams.h"
 #include "mensur.h"
 #include "note.h"
 #include "vrv.h"
@@ -38,32 +39,38 @@ DurationInterface::DurationInterface()
     , AttFermataPresent()
     , AttStaffIdent()
 {
-    RegisterInterfaceAttClass(ATT_AUGMENTDOTS);
-    RegisterInterfaceAttClass(ATT_BEAMSECONDARY);
-    RegisterInterfaceAttClass(ATT_DURATIONGESTURAL);
-    RegisterInterfaceAttClass(ATT_DURATIONLOGICAL);
-    RegisterInterfaceAttClass(ATT_DURATIONQUALITY);
-    RegisterInterfaceAttClass(ATT_DURATIONRATIO);
-    RegisterInterfaceAttClass(ATT_FERMATAPRESENT);
-    RegisterInterfaceAttClass(ATT_STAFFIDENT);
+    this->RegisterInterfaceAttClass(ATT_AUGMENTDOTS);
+    this->RegisterInterfaceAttClass(ATT_BEAMSECONDARY);
+    this->RegisterInterfaceAttClass(ATT_DURATIONGESTURAL);
+    this->RegisterInterfaceAttClass(ATT_DURATIONLOGICAL);
+    this->RegisterInterfaceAttClass(ATT_DURATIONQUALITY);
+    this->RegisterInterfaceAttClass(ATT_DURATIONRATIO);
+    this->RegisterInterfaceAttClass(ATT_FERMATAPRESENT);
+    this->RegisterInterfaceAttClass(ATT_STAFFIDENT);
 
-    Reset();
+    this->Reset();
 }
 
 DurationInterface::~DurationInterface() {}
 
 void DurationInterface::Reset()
 {
-    ResetAugmentDots();
-    ResetBeamSecondary();
-    ResetDurationGestural();
-    ResetDurationLogical();
-    ResetDurationQuality();
-    ResetDurationRatio();
-    ResetFermataPresent();
-    ResetStaffIdent();
+    this->ResetAugmentDots();
+    this->ResetBeamSecondary();
+    this->ResetDurationGestural();
+    this->ResetDurationLogical();
+    this->ResetDurationQuality();
+    this->ResetDurationRatio();
+    this->ResetFermataPresent();
+    this->ResetStaffIdent();
 
     m_durDefault = DURATION_NONE;
+
+    m_scoreTimeOnset = 0.0;
+    m_scoreTimeOffset = 0.0;
+    m_realTimeOnsetMilliseconds = 0;
+    m_realTimeOffsetMilliseconds = 0;
+    m_scoreTimeTiedDuration = 0.0;
 }
 
 double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase)
@@ -80,7 +87,7 @@ double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase)
     if (noteDots != -1) {
         duration = 2 * duration - (duration / pow(2, noteDots));
     }
-    // LogDebug("Duration %d; Dot %d; Alignment %f", noteDur, GetDots(), duration);
+    // LogDebug("Duration %d; Dot %d; Alignment %f", noteDur, this->GetDots(), duration);
     return duration;
 }
 
@@ -234,5 +241,66 @@ bool DurationInterface::HasIdenticalDurationInterface(DurationInterface *otherDu
     }
     */
 }
+
+void DurationInterface::SetScoreTimeOnset(double scoreTime)
+{
+    m_scoreTimeOnset = scoreTime;
+}
+
+void DurationInterface::SetRealTimeOnsetSeconds(double timeInSeconds)
+{
+    // m_realTimeOnsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+    m_realTimeOnsetMilliseconds = timeInSeconds * 1000.0;
+}
+
+void DurationInterface::SetScoreTimeOffset(double scoreTime)
+{
+    m_scoreTimeOffset = scoreTime;
+}
+
+void DurationInterface::SetRealTimeOffsetSeconds(double timeInSeconds)
+{
+    // m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+    m_realTimeOffsetMilliseconds = timeInSeconds * 1000.0;
+}
+
+void DurationInterface::SetScoreTimeTiedDuration(double scoreTime)
+{
+    m_scoreTimeTiedDuration = scoreTime;
+}
+
+double DurationInterface::GetScoreTimeOnset() const
+{
+    return m_scoreTimeOnset;
+}
+
+double DurationInterface::GetRealTimeOnsetMilliseconds() const
+{
+    return m_realTimeOnsetMilliseconds;
+}
+
+double DurationInterface::GetScoreTimeOffset() const
+{
+    return m_scoreTimeOffset;
+}
+
+double DurationInterface::GetRealTimeOffsetMilliseconds() const
+{
+    return m_realTimeOffsetMilliseconds;
+}
+
+double DurationInterface::GetScoreTimeTiedDuration() const
+{
+    return m_scoreTimeTiedDuration;
+}
+
+double DurationInterface::GetScoreTimeDuration() const
+{
+    return this->GetScoreTimeOffset() - this->GetScoreTimeOnset();
+}
+
+//----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
 
 } // namespace vrv

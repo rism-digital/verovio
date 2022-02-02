@@ -30,6 +30,42 @@
 
 namespace vrv {
 
+void View::DrawTabClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Clef *clef = vrv_cast<Clef *>(element);
+    assert(clef);
+
+    const int glyphSize = staff->GetDrawingStaffNotationSize();
+
+    int x, y;
+    y = staff->GetDrawingY();
+    x = element->GetDrawingX();
+
+    wchar_t sym = clef->GetClefGlyph(staff->m_drawingNotationType);
+
+    if (sym == 0) {
+        clef->SetEmptyBB();
+        return;
+    }
+
+    y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    this->DrawSmuflCode(dc, x, y, sym, glyphSize, false);
+
+    // Possibly draw enclosing brackets
+    this->DrawClefEnclosing(dc, clef, staff, sym, x, y, 1.0);
+
+    dc->EndGraphic(element, this);
+}
+
 void View::DrawTabGrp(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -43,7 +79,7 @@ void View::DrawTabGrp(DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->StartGraphic(tabGrp, "", tabGrp->GetUuid());
 
     // Draw children (rhyhtm, notes)
-    DrawLayerChildren(dc, tabGrp, layer, staff, measure);
+    this->DrawLayerChildren(dc, tabGrp, layer, staff, measure);
 
     dc->EndGraphic(tabGrp, this);
 }
@@ -88,7 +124,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
         params.m_y -= (m_doc->GetTextGlyphHeight(L'0', &fretTxt, drawingCueSize) / 2);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
-        DrawTextString(dc, fret, params);
+        this->DrawTextString(dc, fret, params);
         dc->EndText();
 
         dc->ResetFont();
@@ -107,12 +143,12 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
         }
 
         dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
-        DrawSmuflString(dc, x, y, fret, HORIZONTALALIGNMENT_center, glyphSize);
+        this->DrawSmuflString(dc, x, y, fret, HORIZONTALALIGNMENT_center, glyphSize);
         dc->ResetFont();
     }
 
     // Draw children (nothing yet)
-    DrawLayerChildren(dc, note, layer, staff, measure);
+    this->DrawLayerChildren(dc, note, layer, staff, measure);
 
     dc->EndGraphic(note, this);
 }
@@ -135,15 +171,17 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
-    int glyphSize = staff->GetDrawingStaffNotationSize();
+    const int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
+    const int glyphSize = staff->GetDrawingStaffNotationSize();
+    const int halfStemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
 
     // We only need to draw the stems
     // Do we also need to draw the dots?
     if (tabGrp->IsInBeam()) {
         const int height = m_doc->GetGlyphHeight(SMUFL_EBA8_luteDurationHalf, glyphSize, true);
-        DrawFilledRectangle(dc, x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y,
-            x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y + height);
+        this->DrawFilledRectangle(dc, x - halfStemWidth, y, x + halfStemWidth, y + height);
+    }
+    else if (staff->m_drawingNotationType == NOTATIONTYPE_tab_guitar) {
     }
     else {
         int symc = 0;
@@ -156,13 +194,13 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
             default: symc = SMUFL_EBA9_luteDurationQuarter;
         }
 
-        DrawSmuflCode(dc, x, y, symc, glyphSize, true);
+        this->DrawSmuflCode(dc, x, y, symc, glyphSize, true);
 
         if (tabGrp->HasDots()) {
             y += m_doc->GetDrawingUnit(glyphSize) * 0.5;
             x += m_doc->GetDrawingUnit(glyphSize);
             for (int i = 0; i < tabGrp->GetDots(); ++i) {
-                DrawDot(dc, x, y, glyphSize * 2 / 3);
+                this->DrawDot(dc, x, y, glyphSize * 2 / 3);
                 // HARDCODED
                 x += m_doc->GetDrawingUnit(glyphSize) * 0.75;
             }
@@ -170,7 +208,7 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
 
     // Draw children (nothing yet)
-    DrawLayerChildren(dc, tabDurSym, layer, staff, measure);
+    this->DrawLayerChildren(dc, tabDurSym, layer, staff, measure);
 
     dc->EndGraphic(tabDurSym, this);
 }

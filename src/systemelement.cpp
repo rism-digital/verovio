@@ -24,24 +24,24 @@ namespace vrv {
 
 SystemElement::SystemElement() : FloatingObject(SYSTEM_ELEMENT, "se"), AttTyped()
 {
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 SystemElement::SystemElement(ClassId classId) : FloatingObject(classId, "se"), AttTyped()
 {
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 SystemElement::SystemElement(ClassId classId, const std::string &classIdStr)
     : FloatingObject(classId, classIdStr), AttTyped()
 {
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 SystemElement::~SystemElement() {}
@@ -49,7 +49,7 @@ SystemElement::~SystemElement() {}
 void SystemElement::Reset()
 {
     FloatingObject::Reset();
-    ResetTyped();
+    this->ResetTyped();
 
     m_visibility = Visible;
 }

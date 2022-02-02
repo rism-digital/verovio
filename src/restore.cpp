@@ -25,9 +25,9 @@ static const ClassRegistrar<Restore> s_factory("restore", RESTORE);
 
 Restore::Restore() : EditorialElement(RESTORE, "restore-"), AttSource()
 {
-    RegisterAttClass(ATT_SOURCE);
+    this->RegisterAttClass(ATT_SOURCE);
 
-    Reset();
+    this->Reset();
 }
 
 Restore::~Restore() {}
@@ -35,7 +35,7 @@ Restore::~Restore() {}
 void Restore::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

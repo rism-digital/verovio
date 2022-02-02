@@ -57,6 +57,7 @@ class StemmedDrawingInterface;
 class Syl;
 class System;
 class SystemAligner;
+class Timemap;
 class Transposer;
 class TupletNum;
 class Turn;
@@ -991,9 +992,11 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: std::vector<double>: a stack of maximum duration filled by the functor
- * member 1: double: the duration of the current measure
- * member 2: the current bpm
+ * member 0: the current score time
+ * member 1: the current time in seconds
+ * member 2: the current tempo
+ * member 3: the tempo adjustment
+ * member 4: factor for multibar rests
  **/
 
 class CalcMaxMeasureDurationParams : public FunctorParams {
@@ -1002,17 +1005,15 @@ public:
     {
         m_currentScoreTime = 0.0;
         m_currentRealTimeSeconds = 0.0;
-        m_maxCurrentScoreTime = 0.0;
-        m_maxCurrentRealTimeSeconds = 0.0;
-        m_currentTempo = 120.0;
+        m_currentTempo = MIDI_TEMPO;
         m_tempoAdjustment = 1.0;
+        m_multiRestFactor = 1;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
-    double m_maxCurrentScoreTime;
-    double m_maxCurrentRealTimeSeconds;
     double m_currentTempo;
     double m_tempoAdjustment;
+    int m_multiRestFactor;
 };
 
 //----------------------------------------------------------------------------
@@ -1037,7 +1038,7 @@ public:
         m_currentMensur = NULL;
         m_currentMeterSig = NULL;
         m_notationType = NOTATIONTYPE_cmn;
-        m_currentTempo = 120.0;
+        m_currentTempo = MIDI_TEMPO;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
@@ -1551,6 +1552,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// HorizontalLayoutCacheParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a flag indicating if the cache should be stored (default) or restored
+ * member 1: a pointer to the Doc
+ **/
+
+class HorizontalLayoutCacheParams : public FunctorParams {
+public:
+    HorizontalLayoutCacheParams(Doc *doc)
+    {
+        m_restore = false;
+        m_doc = doc;
+    }
+    bool m_restore;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // GenerateMIDIParams
 //----------------------------------------------------------------------------
 
@@ -1607,7 +1628,7 @@ public:
         m_midiTrack = 1;
         m_totalTime = 0.0;
         m_transSemi = 0;
-        m_currentTempo = 120.0;
+        m_currentTempo = MIDI_TEMPO;
         m_lastNote = NULL;
         m_accentedGraceNote = false;
         m_functor = functor;
@@ -1632,31 +1653,27 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: mapping of real times to score times
- * member 1: mapping of real times to elements which should be highlighted at time
- * member 2: mapping of real times to elements which should be unhighlighted at time
- * member 3: mapping of real times to tempos
- * member 4: Score time from the start of the piece to previous barline in quarter notes
- * member 5: Real time from the start of the piece to previous barline in ms
- * member 6: Currently active tempo
+ * member 0: Score time from the start of the piece to previous barline in quarter notes
+ * member 1: Real time from the start of the piece to previous barline in ms
+ * member 2: Currently active tempo
+ * member 3: A pointer to the Timemap
+ * member 4: The functor for redirection
  **/
 
 class GenerateTimemapParams : public FunctorParams {
 public:
-    GenerateTimemapParams(Functor *functor)
+    GenerateTimemapParams(Timemap *timemap, Functor *functor)
     {
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;
-        m_currentTempo = 120.0;
+        m_currentTempo = MIDI_TEMPO;
+        m_timemap = timemap;
         m_functor = functor;
     }
-    std::map<double, double> realTimeToScoreTime;
-    std::map<double, std::vector<std::string>> realTimeToOnElements;
-    std::map<double, std::vector<std::string>> realTimeToOffElements;
-    std::map<double, double> realTimeToTempo;
     double m_scoreTimeOffset;
     double m_realTimeOffsetMilliseconds;
     double m_currentTempo;
+    Timemap *m_timemap;
     Functor *m_functor;
 };
 
@@ -2000,6 +2017,22 @@ public:
     MapOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
     MapOfNoteUuidPairs m_stemSameasUuidPairs;
     bool m_fillList;
+};
+
+//----------------------------------------------------------------------------
+// PrepareMIDIParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current tempo
+ * member 1: deferred notes which start slightly later
+ **/
+
+class PrepareMIDIParams : public FunctorParams {
+public:
+    PrepareMIDIParams() { m_currentTempo = MIDI_TEMPO; }
+    double m_currentTempo;
+    std::map<Note *, double> m_deferredNotes;
 };
 
 //----------------------------------------------------------------------------
@@ -2470,6 +2503,7 @@ public:
 /**
  * member 0: a pointer to the page we are adding system to
  * member 1: a pointer to the system we are adding content to
+ * member 2: a flag indicating if we need to reset the horizontal layout cache
  **/
 
 class UnCastOffParams : public FunctorParams {
@@ -2478,9 +2512,11 @@ public:
     {
         m_page = page;
         m_currentSystem = NULL;
+        m_resetCache = true;
     }
     Page *m_page;
     System *m_currentSystem;
+    bool m_resetCache;
 };
 
 } // namespace vrv

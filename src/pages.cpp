@@ -25,10 +25,10 @@ namespace vrv {
 
 Pages::Pages() : Object(PAGES, "pages-"), AttLabelled(), AttNNumberLike()
 {
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
 
-    Reset();
+    this->Reset();
 }
 
 Pages::~Pages() {}
@@ -36,8 +36,8 @@ Pages::~Pages() {}
 void Pages::Reset()
 {
     Object::Reset();
-    ResetLabelled();
-    ResetNNumberLike();
+    this->ResetLabelled();
+    this->ResetNNumberLike();
 }
 
 bool Pages::IsSupportedChild(Object *child)

@@ -33,14 +33,14 @@ Fermata::Fermata()
     , AttFermataVis()
     , AttPlacementRelStaff()
 {
-    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_ENCLOSINGCHARS);
-    RegisterAttClass(ATT_EXTSYM);
-    RegisterAttClass(ATT_FERMATAVIS);
-    RegisterAttClass(ATT_PLACEMENTRELSTAFF);
+    this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
+    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_FERMATAVIS);
+    this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
 
-    Reset();
+    this->Reset();
 }
 
 Fermata::~Fermata() {}
@@ -49,11 +49,11 @@ void Fermata::Reset()
 {
     ControlElement::Reset();
     TimePointInterface::Reset();
-    ResetColor();
-    ResetEnclosingChars();
-    ResetExtSym();
-    ResetFermataVis();
-    ResetPlacementRelStaff();
+    this->ResetColor();
+    this->ResetEnclosingChars();
+    this->ResetExtSym();
+    this->ResetFermataVis();
+    this->ResetPlacementRelStaff();
 }
 
 void Fermata::ConvertFromAnalyticalMarkup(
@@ -73,28 +73,31 @@ void Fermata::ConvertFromAnalyticalMarkup(
 wchar_t Fermata::GetFermataGlyph() const
 {
     // If there is glyph.num, prioritize it
-    if (HasGlyphNum()) {
-        wchar_t code = GetGlyphNum();
+    if (this->HasGlyphNum()) {
+        wchar_t code = this->GetGlyphNum();
         if (NULL != Resources::GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
-    else if (HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+    else if (this->HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 
     // check for shape
-    if (GetShape() == fermataVis_SHAPE_angular) {
-        if (GetForm() == fermataVis_FORM_inv || (GetPlace() == STAFFREL_below && !(GetForm() == fermataVis_FORM_norm)))
+    if (this->GetShape() == fermataVis_SHAPE_angular) {
+        if (this->GetForm() == fermataVis_FORM_inv
+            || (this->GetPlace() == STAFFREL_below && !(this->GetForm() == fermataVis_FORM_norm)))
             return SMUFL_E4C5_fermataShortBelow;
         return SMUFL_E4C4_fermataShortAbove;
     }
-    else if (GetShape() == fermataVis_SHAPE_square) {
-        if (GetForm() == fermataVis_FORM_inv || (GetPlace() == STAFFREL_below && !(GetForm() == fermataVis_FORM_norm)))
+    else if (this->GetShape() == fermataVis_SHAPE_square) {
+        if (this->GetForm() == fermataVis_FORM_inv
+            || (this->GetPlace() == STAFFREL_below && !(this->GetForm() == fermataVis_FORM_norm)))
             return SMUFL_E4C7_fermataLongBelow;
         return SMUFL_E4C6_fermataLongAbove;
     }
-    else if (GetForm() == fermataVis_FORM_inv || (GetPlace() == STAFFREL_below && !(GetForm() == fermataVis_FORM_norm)))
+    else if (this->GetForm() == fermataVis_FORM_inv
+        || (this->GetPlace() == STAFFREL_below && !(this->GetForm() == fermataVis_FORM_norm)))
         return SMUFL_E4C1_fermataBelow;
 
     // If no other attributes match, return default one (fermataAbove)

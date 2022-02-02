@@ -35,12 +35,12 @@ static const ClassRegistrar<Syl> s_factory("syl", SYL);
 Syl::Syl()
     : LayerElement(SYL, "syl-"), TextListInterface(), TimeSpanningInterface(), AttLang(), AttTypography(), AttSylLog()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_LANG);
-    RegisterAttClass(ATT_TYPOGRAPHY);
-    RegisterAttClass(ATT_SYLLOG);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_LANG);
+    this->RegisterAttClass(ATT_TYPOGRAPHY);
+    this->RegisterAttClass(ATT_SYLLOG);
 
-    Reset();
+    this->Reset();
 }
 
 Syl::~Syl() {}
@@ -49,9 +49,9 @@ void Syl::Reset()
 {
     LayerElement::Reset();
     TimeSpanningInterface::Reset();
-    ResetLang();
-    ResetTypography();
-    ResetSylLog();
+    this->ResetLang();
+    this->ResetTypography();
+    this->ResetSylLog();
 
     m_drawingVerse = 1;
     m_nextWordSyl = NULL;

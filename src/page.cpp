@@ -37,7 +37,7 @@ namespace vrv {
 
 Page::Page() : Object(PAGE, "page-")
 {
-    Reset();
+    this->Reset();
 }
 
 Page::~Page() {}
@@ -135,7 +135,7 @@ void Page::LayOut(bool force)
     this->LayOutVertically();
     this->JustifyVertically();
 
-    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
     if (doc->GetOptions()->m_svgBoundingBoxes.GetValue()) {
         View view;
@@ -155,7 +155,7 @@ void Page::LayOutTranscription(bool force)
         return;
     }
 
-    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -224,7 +224,7 @@ void Page::LayOutTranscription(bool force)
 
 void Page::LayOutHorizontally()
 {
-    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -426,9 +426,20 @@ void Page::LayOutHorizontally()
     this->Process(&prepareSlurs, &prepareSlursParams);
 }
 
+void Page::HorizontalLayoutCachePage(bool restore)
+{
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+
+    HorizontalLayoutCacheParams horizontalLayoutCacheParams(doc);
+    horizontalLayoutCacheParams.m_restore = restore;
+    Functor horizontalLayoutCache(&Object::HorizontalLayoutCache);
+    this->Process(&horizontalLayoutCache, &horizontalLayoutCacheParams);
+}
+
 void Page::LayOutVertically()
 {
-    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -547,7 +558,7 @@ void Page::LayOutVertically()
 
 void Page::JustifyHorizontally()
 {
-    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
     if ((doc->GetOptions()->m_breaks.GetValue() == BREAKS_none) || doc->GetOptions()->m_noJustification.GetValue()) {
@@ -574,7 +585,7 @@ void Page::JustifyHorizontally()
 
 void Page::JustifyVertically()
 {
-    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -596,7 +607,7 @@ void Page::JustifyVertically()
     assert(pages);
     if (pages->GetLast() == this) {
         int idx = this->GetIdx();
-        const int childSystems = GetChildCount(SYSTEM);
+        const int childSystems = this->GetChildCount(SYSTEM);
         if (idx > 0) {
             Page *penultimatePage = dynamic_cast<Page *>(pages->GetPrevious(this));
             assert(penultimatePage);
@@ -634,7 +645,7 @@ void Page::JustifyVertically()
 
 void Page::LayOutPitchPos()
 {
-    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -653,14 +664,14 @@ void Page::LayOutPitchPos()
 
 int Page::GetContentHeight() const
 {
-    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    if (!GetChildCount()) {
+    if (!this->GetChildCount()) {
         return 0;
     }
 
@@ -677,7 +688,7 @@ int Page::GetContentHeight() const
 
 int Page::GetContentWidth() const
 {
-    Doc *doc = vrv_cast<Doc *>(GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
     // in non debug
     if (!doc) return 0;
@@ -853,7 +864,7 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
 
         // Move it up below the last system
         if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
-            if (GetChildCount()) {
+            if (this->GetChildCount()) {
                 System *last = dynamic_cast<System *>(this->GetLast(SYSTEM));
                 assert(last);
                 footer->SetDrawingYRel(last->GetDrawingYRel() - last->GetHeight());

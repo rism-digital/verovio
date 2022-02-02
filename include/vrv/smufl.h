@@ -49,6 +49,8 @@ enum {
     SMUFL_E066_fClef15ma = 0xE066,
     SMUFL_E069_unpitchedPercussionClef1 = 0xE069,
     SMUFL_E06A_unpitchedPercussionClef2 = 0xE06A,
+    SMUFL_E06D_6stringTabClef = 0xE06D,
+    SMUFL_E06E_4stringTabClef = 0xE06E,
     SMUFL_E073_gClefReversed = 0xE073,
     SMUFL_E074_gClefTurned = 0xE074,
     SMUFL_E075_cClefReversed = 0xE075,
@@ -440,7 +442,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 415
+#define SMUFL_COUNT 417
 
 } // namespace vrv
 

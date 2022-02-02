@@ -26,10 +26,10 @@ static const ClassRegistrar<Annot> s_factory("annot", ANNOT);
 
 Annot::Annot() : EditorialElement(ANNOT, "annot-"), TextListInterface(), AttPlist(), AttSource()
 {
-    RegisterAttClass(ATT_PLIST);
-    RegisterAttClass(ATT_SOURCE);
+    this->RegisterAttClass(ATT_PLIST);
+    this->RegisterAttClass(ATT_SOURCE);
 
-    Reset();
+    this->Reset();
 }
 
 Annot::~Annot() {}
@@ -37,8 +37,8 @@ Annot::~Annot() {}
 void Annot::Reset()
 {
     EditorialElement::Reset();
-    ResetPlist();
-    ResetSource();
+    this->ResetPlist();
+    this->ResetSource();
 }
 
 bool Annot::IsSupportedChild(Object *child)

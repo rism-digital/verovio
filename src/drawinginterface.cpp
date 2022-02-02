@@ -27,7 +27,7 @@ namespace vrv {
 
 DrawingListInterface::DrawingListInterface()
 {
-    Reset();
+    this->Reset();
 }
 
 DrawingListInterface::~DrawingListInterface() {}
@@ -67,7 +67,7 @@ void DrawingListInterface::ResetDrawingList()
 
 BeamDrawingInterface::BeamDrawingInterface() : ObjectListInterface()
 {
-    Reset();
+    this->Reset();
 }
 
 BeamDrawingInterface::~BeamDrawingInterface()
@@ -259,7 +259,7 @@ bool BeamDrawingInterface::IsHorizontal()
         return true;
     }
 
-    if (HasOneStepHeight()) return true;
+    if (this->HasOneStepHeight()) return true;
 
     // if (m_drawingPlace == BEAMPLACE_mixed) return true;
 
@@ -442,7 +442,7 @@ int BeamDrawingInterface::GetPosition(Object *object, LayerElement *element)
 
 StaffDefDrawingInterface::StaffDefDrawingInterface()
 {
-    Reset();
+    this->Reset();
 }
 
 StaffDefDrawingInterface::~StaffDefDrawingInterface() {}
@@ -517,10 +517,11 @@ bool StaffDefDrawingInterface::DrawMeterSigGrp()
 
 void StaffDefDrawingInterface::AlternateCurrentMeterSig(Measure *measure)
 {
-    if (MeterSigGrp *meterSigGrp = GetCurrentMeterSigGrp(); meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
+    if (MeterSigGrp *meterSigGrp = this->GetCurrentMeterSigGrp();
+        meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
         meterSigGrp->SetMeasureBasedCount(measure);
         MeterSig *meter = meterSigGrp->GetSimplifiedMeterSig();
-        SetCurrentMeterSig(meter);
+        this->SetCurrentMeterSig(meter);
         delete meter;
     }
 }
@@ -531,7 +532,7 @@ void StaffDefDrawingInterface::AlternateCurrentMeterSig(Measure *measure)
 
 StemmedDrawingInterface::StemmedDrawingInterface()
 {
-    Reset();
+    this->Reset();
 }
 
 StemmedDrawingInterface::~StemmedDrawingInterface() {}
@@ -593,7 +594,7 @@ Point StemmedDrawingInterface::GetDrawingStemEnd(Object *object)
             return Point(object->GetDrawingX(), object->GetDrawingY());
         }
     }
-    return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY() - GetDrawingStemLen());
+    return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY() - this->GetDrawingStemLen());
 }
 
 } // namespace vrv

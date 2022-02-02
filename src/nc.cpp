@@ -37,14 +37,14 @@ Nc::Nc()
     , AttNcForm()
 
 {
-    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_INTERVALMELODIC);
-    RegisterAttClass(ATT_NCFORM);
+    this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_INTERVALMELODIC);
+    this->RegisterAttClass(ATT_NCFORM);
 
-    Reset();
+    this->Reset();
 }
 
 Nc::~Nc() {}
@@ -55,9 +55,9 @@ void Nc::Reset()
     DurationInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
-    ResetColor();
-    ResetIntervalMelodic();
-    ResetNcForm();
+    this->ResetColor();
+    this->ResetIntervalMelodic();
+    this->ResetNcForm();
 }
 
 } // namespace vrv

@@ -478,7 +478,7 @@ bool Toolkit::LoadData(const std::string &data)
 
         // HumdrumInput *input = new HumdrumInput(&m_doc);
         input = new HumdrumInput(&m_doc);
-        if (GetOutputTo() == HUMDRUM) {
+        if (this->GetOutputTo() == HUMDRUM) {
             input->SetOutputFormat("humdrum");
         }
 
@@ -487,8 +487,8 @@ bool Toolkit::LoadData(const std::string &data)
             delete input;
             return false;
         }
-        SetHumdrumBuffer(((HumdrumInput *)input)->GetHumdrumString().c_str());
-        if (GetOutputTo() == HUMDRUM) {
+        this->SetHumdrumBuffer(((HumdrumInput *)input)->GetHumdrumString().c_str());
+        if (this->GetOutputTo() == HUMDRUM) {
             // Humdrum data will be output (post-filtering data),
             // So not continuing converting to SVG.
             return true;
@@ -504,7 +504,7 @@ bool Toolkit::LoadData(const std::string &data)
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
         HumdrumInput *tempinput = new HumdrumInput(&tempdoc);
-        if (GetOutputTo() == HUMDRUM) {
+        if (this->GetOutputTo() == HUMDRUM) {
             tempinput->SetOutputFormat("humdrum");
         }
 
@@ -514,9 +514,9 @@ bool Toolkit::LoadData(const std::string &data)
             return false;
         }
 
-        SetHumdrumBuffer(tempinput->GetHumdrumString().c_str());
+        this->SetHumdrumBuffer(tempinput->GetHumdrumString().c_str());
 
-        if (GetOutputTo() == HUMDRUM) {
+        if (this->GetOutputTo() == HUMDRUM) {
             return true;
         }
 
@@ -551,7 +551,7 @@ bool Toolkit::LoadData(const std::string &data)
             return false;
         }
         std::string buffer = conversion.str();
-        SetHumdrumBuffer(buffer.c_str());
+        this->SetHumdrumBuffer(buffer.c_str());
 
         // Now convert Humdrum into MEI:
         Doc tempdoc;
@@ -573,7 +573,7 @@ bool Toolkit::LoadData(const std::string &data)
         ConvertMEIToHumdrum(data);
 
         // Now convert Humdrum into MEI:
-        std::string conversion = GetHumdrumBuffer();
+        std::string conversion = this->GetHumdrumBuffer();
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
         Input *tempinput = new HumdrumInput(&tempdoc);
@@ -599,7 +599,7 @@ bool Toolkit::LoadData(const std::string &data)
             return false;
         }
         std::string buffer = conversion.str();
-        SetHumdrumBuffer(buffer.c_str());
+        this->SetHumdrumBuffer(buffer.c_str());
 
         // Now convert Humdrum into MEI:
         Doc tempdoc;
@@ -627,7 +627,7 @@ bool Toolkit::LoadData(const std::string &data)
             return false;
         }
         std::string buffer = conversion.str();
-        SetHumdrumBuffer(buffer.c_str());
+        this->SetHumdrumBuffer(buffer.c_str());
 
         // Now convert Humdrum into MEI:
         Doc tempdoc;
@@ -739,7 +739,7 @@ bool Toolkit::LoadData(const std::string &data)
             }
             // LogElapsedTimeStart();
             m_doc.CastOffDoc();
-            // LogElapsedTimeEnd("layout");
+            // LogElapsedTimeEnd("cast-off");
         }
     }
 
@@ -844,7 +844,7 @@ std::string Toolkit::ValidatePAE(const std::string &data)
 
 bool Toolkit::SaveFile(const std::string &filename, const std::string &jsonOptions)
 {
-    std::string output = GetMEI(jsonOptions);
+    std::string output = this->GetMEI(jsonOptions);
     if (output.empty()) {
         return false;
     }
@@ -965,17 +965,17 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             // Base options
             if (iter->first == "inputFrom") {
                 if (json.has<jsonxx::String>("inputFrom")) {
-                    SetInputFrom(json.get<jsonxx::String>("inputFrom"));
+                    this->SetInputFrom(json.get<jsonxx::String>("inputFrom"));
                 }
             }
             else if (iter->first == "outputTo") {
                 if (json.has<jsonxx::String>("outputTo")) {
-                    SetOutputTo(json.get<jsonxx::String>("outputTo"));
+                    this->SetOutputTo(json.get<jsonxx::String>("outputTo"));
                 }
             }
             else if (iter->first == "scale") {
                 if (json.has<jsonxx::Number>("scale")) {
-                    SetScale(json.get<jsonxx::Number>("scale"));
+                    this->SetScale(json.get<jsonxx::Number>("scale"));
                 }
             }
             else if (iter->first == "xmlIdSeed") {
@@ -1177,16 +1177,30 @@ void Toolkit::ResetLogBuffer()
     logBuffer.clear();
 }
 
-void Toolkit::RedoLayout()
+void Toolkit::RedoLayout(const std::string &jsonOptions)
 {
+    bool resetCache = true;
+
+    jsonxx::Object json;
+
+    // Read JSON options if not empty
+    if (!jsonOptions.empty()) {
+        if (!json.parse(jsonOptions)) {
+            LogWarning("Cannot parse JSON std::string. Using default options.");
+        }
+        else {
+            if (json.has<jsonxx::Boolean>("resetCache")) resetCache = json.get<jsonxx::Boolean>("resetCache");
+        }
+    }
+
     this->ResetLogBuffer();
 
-    if ((GetPageCount() == 0) || (m_doc.GetType() == Transcription) || (m_doc.GetType() == Facs)) {
+    if ((this->GetPageCount() == 0) || (m_doc.GetType() == Transcription) || (m_doc.GetType() == Facs)) {
         LogWarning("No data to re-layout");
         return;
     }
 
-    m_doc.UnCastOffDoc();
+    m_doc.UnCastOffDoc(resetCache);
     if (m_options->m_breaks.GetValue() == BREAKS_line) {
         m_doc.CastOffLineDoc();
     }
@@ -1217,7 +1231,7 @@ void Toolkit::RedoPagePitchPosLayout()
 
 bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 {
-    if (pageNo > GetPageCount()) {
+    if (pageNo > this->GetPageCount()) {
         LogWarning("Page %d does not exist", pageNo);
         return false;
     }
@@ -1330,7 +1344,7 @@ bool Toolkit::RenderToSVGFile(const std::string &filename, int pageNo)
 
 std::string Toolkit::GetHumdrum()
 {
-    return GetHumdrumBuffer();
+    return this->GetHumdrumBuffer();
 }
 
 bool Toolkit::GetHumdrumFile(const std::string &filename)
@@ -1343,14 +1357,14 @@ bool Toolkit::GetHumdrumFile(const std::string &filename)
         return false;
     }
 
-    GetHumdrum(output);
+    this->GetHumdrum(output);
     output.close();
     return true;
 }
 
 void Toolkit::GetHumdrum(std::ostream &output)
 {
-    output << GetHumdrumBuffer();
+    output << this->GetHumdrumBuffer();
 }
 
 std::string Toolkit::RenderToMIDI()
@@ -1374,7 +1388,7 @@ std::string Toolkit::RenderToPAE()
 {
     this->ResetLogBuffer();
 
-    if (GetPageCount() == 0) {
+    if (this->GetPageCount() == 0) {
         LogWarning("No data loaded");
         return "";
     }
@@ -1402,12 +1416,29 @@ bool Toolkit::RenderToPAEFile(const std::string &filename)
     return true;
 }
 
-std::string Toolkit::RenderToTimemap()
+std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
 {
+    bool includeMeasures = false;
+    bool includeRests = false;
+
+    jsonxx::Object json;
+
+    // Read JSON options if not empty
+    if (!jsonOptions.empty()) {
+        if (!json.parse(jsonOptions)) {
+            LogWarning("Cannot parse JSON std::string. Using default options.");
+        }
+        else {
+            if (json.has<jsonxx::Boolean>("includeMeasures"))
+                includeMeasures = json.get<jsonxx::Boolean>("includeMeasures");
+            if (json.has<jsonxx::Boolean>("includeRests")) includeRests = json.get<jsonxx::Boolean>("includeRests");
+        }
+    }
+
     this->ResetLogBuffer();
 
     std::string output;
-    m_doc.ExportTimemap(output);
+    m_doc.ExportTimemap(output, includeRests, includeMeasures);
     return output;
 }
 
@@ -1418,6 +1449,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     jsonxx::Object o;
     jsonxx::Array noteArray;
     jsonxx::Array chordArray;
+    jsonxx::Array restArray;
 
     // Here we need to check that the midi timemap is done
     if (!m_doc.HasMidiTimemap()) {
@@ -1440,19 +1472,24 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     Page *page = dynamic_cast<Page *>(measure->GetFirstAncestor(PAGE));
     if (page) pageNo = page->GetIdx() + 1;
 
-    NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
-    ListOfObjects notes;
+    NoteOrRestOnsetOffsetComparison matchTime(millisec - measureTimeOffset);
+    ListOfObjects notesOrRests;
     ListOfObjects chords;
 
-    measure->FindAllDescendantsByComparison(&notes, &matchNoteTime);
+    measure->FindAllDescendantsByComparison(&notesOrRests, &matchTime);
 
     // Fill the JSON object
-    for (auto const item : notes) {
-        noteArray << item->GetUuid();
-        Note *note = vrv_cast<Note *>(item);
-        assert(note);
-        Chord *chord = note->IsChordTone();
-        if (chord) chords.push_back(chord);
+    for (auto const item : notesOrRests) {
+        if (item->Is(NOTE)) {
+            noteArray << item->GetUuid();
+            Note *note = vrv_cast<Note *>(item);
+            assert(note);
+            Chord *chord = note->IsChordTone();
+            if (chord) chords.push_back(chord);
+        }
+        else if (item->Is(REST)) {
+            restArray << item->GetUuid();
+        }
     }
     chords.unique();
     for (auto const item : chords) {
@@ -1461,7 +1498,9 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     o << "notes" << noteArray;
     o << "chords" << chordArray;
+    o << "rests" << restArray;
     o << "page" << pageNo;
+    o << "measure" << measure->GetUuid();
 
     return o.json();
 }
@@ -1479,12 +1518,9 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
     return true;
 }
 
-bool Toolkit::RenderToTimemapFile(const std::string &filename)
+bool Toolkit::RenderToTimemapFile(const std::string &filename, const std::string &jsonOptions)
 {
-    this->ResetLogBuffer();
-
-    std::string outputString;
-    m_doc.ExportTimemap(outputString);
+    std::string outputString = this->RenderToTimemap(jsonOptions);
 
     std::ofstream output(filename.c_str());
     if (!output.is_open()) {
@@ -1684,7 +1720,7 @@ const char *Toolkit::GetHumdrumBuffer()
         stringstream out;
         hum::Tool_mei2hum converter;
         converter.convert(out, infile);
-        SetHumdrumBuffer(out.str().c_str());
+        this->SetHumdrumBuffer(out.str().c_str());
 #endif
         if (m_humdrumBuffer) {
             return m_humdrumBuffer;
@@ -1742,7 +1778,7 @@ std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
     if (!status) {
         LogError("Error converting MEI data to Humdrum: %s", conversion.str().c_str());
     }
-    SetHumdrumBuffer(conversion.str().c_str());
+    this->SetHumdrumBuffer(conversion.str().c_str());
     return conversion.str();
 #else
     return "";
@@ -1757,11 +1793,11 @@ std::string Toolkit::ConvertHumdrumToHumdrum(const std::string &humdrumData)
     // bool result = infiles.readString(humdrumData);
     bool result = infiles.readString(humdrumData);
     if (!result) {
-        SetHumdrumBuffer("");
+        this->SetHumdrumBuffer("");
         return "";
     }
     if (infiles.getCount() == 0) {
-        SetHumdrumBuffer("");
+        this->SetHumdrumBuffer("");
         return "";
     }
 
@@ -1791,7 +1827,7 @@ std::string Toolkit::ConvertHumdrumToHumdrum(const std::string &humdrumData)
     hum::HumdrumFile &infile = infiles[0];
     std::stringstream humout;
     humout << infile;
-    SetHumdrumBuffer(humout.str().c_str());
+    this->SetHumdrumBuffer(humout.str().c_str());
     return humout.str();
 #else
     return "";

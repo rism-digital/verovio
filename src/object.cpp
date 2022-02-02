@@ -94,7 +94,7 @@ Object *Object::Clone() const
 
 Object::Object(const Object &object) : BoundingBox(object)
 {
-    ResetBoundingBox(); // It does not make sense to keep the values of the BBox
+    this->ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
     m_classId = object.m_classId;
     m_classIdStr = object.m_classIdStr;
@@ -141,7 +141,7 @@ Object &Object::operator=(const Object &object)
     // not self assignement
     if (this != &object) {
         ClearChildren();
-        ResetBoundingBox(); // It does not make sense to keep the values of the BBox
+        this->ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
         m_classId = object.m_classId;
         m_classIdStr = object.m_classIdStr;
@@ -197,7 +197,7 @@ void Object::Init(ClassId classId, const std::string &classIdStr)
 
     this->GenerateUuid();
 
-    Reset();
+    this->Reset();
 }
 
 void Object::SetAsReferenceObject()
@@ -210,7 +210,7 @@ void Object::SetAsReferenceObject()
 void Object::Reset()
 {
     ClearChildren();
-    ResetBoundingBox();
+    this->ResetBoundingBox();
 }
 
 void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId interfaceId)
@@ -541,7 +541,7 @@ Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direct
 Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction)
 {
     ClassIdComparison comparison(classId);
-    return FindDescendantByComparison(&comparison, deepness, direction);
+    return this->FindDescendantByComparison(&comparison, deepness, direction);
 }
 
 Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction)
@@ -719,7 +719,7 @@ int Object::GetDescendantIndex(const Object *child, const ClassId classId, int d
     int i = 0;
     for (auto &object : objects) {
         if (child == object) return i;
-        i++;
+        ++i;
     }
     return -1;
 }
@@ -1115,7 +1115,7 @@ void ObjectListInterface::ResetList(Object *node)
 
 const ArrayOfObjects *ObjectListInterface::GetList(Object *node)
 {
-    ResetList(node);
+    this->ResetList(node);
     return &m_list;
 }
 
@@ -1134,7 +1134,7 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
     ArrayOfObjects::iterator it = m_list.begin();
-    int idx = GetListIndex(startFrom);
+    int idx = this->GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
     it = std::find_if(it, m_list.end(), ObjectComparison(classId));
@@ -1144,7 +1144,7 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
 Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
 {
     ArrayOfObjects::iterator it = m_list.begin();
-    int idx = GetListIndex(startFrom);
+    int idx = this->GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
     ArrayOfObjects::reverse_iterator rit(it);

@@ -131,7 +131,7 @@ bool ExpansionMap::UpdateIds(Object *object)
             // @startid
             std::string oldStartId = interface->GetStartid();
             if (oldStartId.rfind("#", 0) == 0) oldStartId = oldStartId.substr(1, oldStartId.size() - 1);
-            std::string newStartId = GetExpansionIdsForElement(oldStartId).back();
+            std::string newStartId = this->GetExpansionIdsForElement(oldStartId).back();
             if (!newStartId.empty()) interface->SetStartid("#" + newStartId);
         }
         if (o->HasInterface(INTERFACE_TIME_SPANNING)) {
@@ -140,12 +140,12 @@ bool ExpansionMap::UpdateIds(Object *object)
             // @startid
             std::string oldStartId = interface->GetStartid();
             if (oldStartId.rfind("#", 0) == 0) oldStartId = oldStartId.substr(1, oldStartId.size() - 1);
-            std::string newStartId = GetExpansionIdsForElement(oldStartId).back();
+            std::string newStartId = this->GetExpansionIdsForElement(oldStartId).back();
             if (!newStartId.empty()) interface->SetStartid("#" + newStartId);
             // @endid
             oldStartId = interface->GetEndid();
             if (oldStartId.rfind("#", 0) == 0) oldStartId = oldStartId.substr(1, oldStartId.size() - 1);
-            std::string newEndId = GetExpansionIdsForElement(oldStartId).back();
+            std::string newEndId = this->GetExpansionIdsForElement(oldStartId).back();
             if (!newEndId.empty()) interface->SetEndid("#" + newEndId);
         }
         if (o->HasInterface(INTERFACE_PLIST)) {
@@ -155,7 +155,7 @@ bool ExpansionMap::UpdateIds(Object *object)
             xsdAnyURI_List newList;
             for (std::string oldRefString : oldList) {
                 if (oldRefString.rfind("#", 0) == 0) oldRefString = oldRefString.substr(1, oldRefString.size() - 1);
-                newList.push_back("#" + GetExpansionIdsForElement(oldRefString).back());
+                newList.push_back("#" + this->GetExpansionIdsForElement(oldRefString).back());
             }
             interface->SetPlist(newList);
         }
@@ -165,32 +165,32 @@ bool ExpansionMap::UpdateIds(Object *object)
             // @sameas
             std::string oldIdString = interface->GetSameas();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            std::string newIdString = GetExpansionIdsForElement(oldIdString).back();
+            std::string newIdString = this->GetExpansionIdsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetSameas("#" + newIdString);
             // @next
             oldIdString = interface->GetNext();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = GetExpansionIdsForElement(oldIdString).back();
+            newIdString = this->GetExpansionIdsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetNext("#" + newIdString);
             // @prev
             oldIdString = interface->GetPrev();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = GetExpansionIdsForElement(oldIdString).back();
+            newIdString = this->GetExpansionIdsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetPrev("#" + newIdString);
             // @copyof
             oldIdString = interface->GetCopyof();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = GetExpansionIdsForElement(oldIdString).back();
+            newIdString = this->GetExpansionIdsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetCopyof("#" + newIdString);
             // @corresp
             oldIdString = interface->GetCorresp();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = GetExpansionIdsForElement(oldIdString).back();
+            newIdString = this->GetExpansionIdsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetCorresp("#" + newIdString);
             // @synch
             oldIdString = interface->GetSynch();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = GetExpansionIdsForElement(oldIdString).back();
+            newIdString = this->GetExpansionIdsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetSynch("#" + newIdString);
         }
         UpdateIds(o);
