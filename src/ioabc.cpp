@@ -305,7 +305,7 @@ void ABCInput::CalcUnitNoteLength()
     }
 }
 
-void ABCInput::AddLayerElement() 
+void ABCInput::AddLayerElement()
 {
     // exit if there is nothing to add
     if (!m_noteStack.size()) return;
@@ -346,7 +346,7 @@ int ABCInput::ParseTuplet(const std::string &musicCode, int index)
     const size_t tupletEnd = musicCode.find_first_not_of(tupletElements, ++index);
     const std::string tupletStr = musicCode.substr(index, tupletEnd - index);
 
-    Tuplet *tuplet = new Tuplet();    
+    Tuplet *tuplet = new Tuplet();
     size_t separator = tupletStr.find_first_of(":");
     // Get tuplet number first 9:_:_
     int tupletNum = 0;

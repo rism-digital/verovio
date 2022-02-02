@@ -95,10 +95,7 @@ private:
 public:
     //
 private:
-    enum class ElementType {
-        Default,
-        Tuplet
-    };
+    enum class ElementType { Default, Tuplet };
 
     std::string m_filename;
     Mdiv *m_mdiv = NULL;
