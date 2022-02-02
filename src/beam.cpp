@@ -266,9 +266,11 @@ void BeamSegment::CalcSetStemValuesTab(Layer *layer, Staff *staff, Doc *doc, Bea
             if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
                 // Move down to ensure the stem is slightly shorter than the top-beam
                 y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                if (coord->m_closestNote) y2 += doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
             else {
                 y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                if (coord->m_closestNote) y2 -= doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
 
             Stem *stem = stemmedInterface->GetDrawingStem();
@@ -277,7 +279,9 @@ void BeamSegment::CalcSetStemValuesTab(Layer *layer, Staff *staff, Doc *doc, Bea
 
             // stem->SetDrawingStemDir(stemDir);
             stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
-            if (coord->m_closestNote) stem->SetDrawingYRel(y2 - el->GetDrawingY());
+            if (coord->m_closestNote) {
+                stem->SetDrawingYRel(y2 - el->GetDrawingY());
+            }
             stem->SetDrawingStemLen(y2 - y1);
         }
     }
@@ -1587,7 +1591,7 @@ void BeamElementCoord::SetDrawingStemDir(
     m_x += (STEMDIRECTION_up == stemDir) ? interface->m_stemXAbove[interface->m_cueSize]
                                          : interface->m_stemXBelow[interface->m_cueSize];
 
-    if (m_tabDurSym) {
+    if (m_tabDurSym && !m_closestNote) {
         m_yBeam = m_tabDurSym->GetDrawingY();
         m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
         return;
@@ -1725,10 +1729,8 @@ void BeamElementCoord::SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, boo
     else if (m_element->Is(TABGRP)) {
         TabGrp *tabGrp = vrv_cast<TabGrp *>(m_element);
         assert(tabGrp);
-        if (outsideStaff) {
-            m_tabDurSym = vrv_cast<TabDurSym *>(tabGrp->FindDescendantByType(TABDURSYM));
-        }
-        else {
+        m_tabDurSym = vrv_cast<TabDurSym *>(tabGrp->FindDescendantByType(TABDURSYM));
+        if (!outsideStaff) {
             m_closestNote = (STEMDIRECTION_up == stemDir) ? tabGrp->GetTopNote() : tabGrp->GetBottomNote();
         }
     }
