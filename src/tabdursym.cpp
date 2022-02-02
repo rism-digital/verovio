@@ -110,6 +110,8 @@ int TabDurSym::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 
     int baseStem = STANDARD_STEMLENGTH_TAB * 3;
 
+    if (!staff->IsTabWithBeamOutside()) baseStem += 6;
+
     return baseStem;
 }
 
