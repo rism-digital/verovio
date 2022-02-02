@@ -60,10 +60,10 @@ private:
     void CalcUnitNoteLength();
     void AddAnnot(const std::string &remark);
     void AddLayerElement();
-    int AddTuplet(const std::string &musicCode, int i);
     void AddTie();
     void StartSlur();
     void EndSlur();
+    int ParseTuplet(const std::string &musicCode, int index);
 
     // parse information fields
     void parseInstruction(const std::string &keyString); // I:

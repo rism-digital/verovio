@@ -340,11 +340,11 @@ void ABCInput::AddLayerElement()
     m_noteStack.clear();
 }
 
-int ABCInput::AddTuplet(const std::string &musicCode, int i)
+int ABCInput::ParseTuplet(const std::string &musicCode, int index)
 {
     constexpr std::string_view tupletElements = "(:0123456789 ";
-    const size_t tupletEnd = musicCode.find_first_not_of(tupletElements, ++i);
-    const std::string tupletStr = musicCode.substr(i, tupletEnd - i);
+    const size_t tupletEnd = musicCode.find_first_not_of(tupletElements, ++index);
+    const std::string tupletStr = musicCode.substr(index, tupletEnd - index);
 
     Tuplet *tuplet = new Tuplet();    
     size_t separator = tupletStr.find_first_of(":");
@@ -1138,7 +1138,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
 
         // tuplets
         else if ((i + 2 < (int)musicCode.length()) && musicCode.at(i) == '(' && isdigit(musicCode.at(i + 1))) {
-            i = AddTuplet(musicCode, i);
+            i = ParseTuplet(musicCode, i);
         }
 
         // slurs and ties
