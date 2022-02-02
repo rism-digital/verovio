@@ -137,6 +137,7 @@ int TabGrp::CalcStem(FunctorParams *functorParams)
     assert(params);
 
     params->m_dur = this->GetActualDur();
+    params->m_tabGrpWithNoNote = (!this->FindDescendantByType(NOTE));
 
     return FUNCTOR_CONTINUE;
 }
