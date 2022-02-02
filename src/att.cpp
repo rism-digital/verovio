@@ -312,7 +312,7 @@ data_KEYSIGNATURE Att::StrToKeysignature(const std::string &value, bool logWarni
     int alterationNumber = 0;
     data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
 
-    std::regex test("mixed|0|[1-7][s|f]");
+    std::regex test("mixed|0|([1-9]|1[0-2])[f|s]");
     if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.KEYSIGNATURE '%s'", value.c_str());
         return { -1, ACCIDENTAL_WRITTEN_NONE };
@@ -322,7 +322,7 @@ data_KEYSIGNATURE Att::StrToKeysignature(const std::string &value, bool logWarni
         return { VRV_UNSET, ACCIDENTAL_WRITTEN_NONE };
     }
     else if (value != "0") {
-        alterationNumber = atoi(value.substr(0, 1).c_str());
+        alterationNumber = std::stoi(value);
         alterationType = (value.at(1) == 's') ? ACCIDENTAL_WRITTEN_s : ACCIDENTAL_WRITTEN_f;
     }
     else {
