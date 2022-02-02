@@ -43,7 +43,7 @@ public:
      * @name Get the corresponding milestone start
      */
     ///@{
-    Object *GetStart() { return m_start; }
+    Object *GetStart() const { return m_start; }
     std::string GetStartClassName() const { return m_startClassName; }
     ///@}
 

@@ -828,47 +828,8 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         return;
     }
 
-    bool processChildren = true;
-    if (functor->m_visibleOnly) {
-        if (this->IsEditorialElement()) {
-            EditorialElement *editorialElement = vrv_cast<EditorialElement *>(this);
-            assert(editorialElement);
-            if (editorialElement->m_visibility == Hidden) {
-                processChildren = false;
-            }
-        }
-        else if (this->Is(MDIV)) {
-            Mdiv *mdiv = vrv_cast<Mdiv *>(this);
-            assert(mdiv);
-            if (mdiv->m_visibility == Hidden) {
-                processChildren = false;
-            }
-        }
-        else if (this->IsSystemElement()) {
-            SystemElement *systemElement = vrv_cast<SystemElement *>(this);
-            assert(systemElement);
-            if (systemElement->m_visibility == Hidden) {
-                processChildren = false;
-            }
-        }
-    }
-
-    // When we are starting a new Score, we need to update to Doc current ScoreDef
-    if (direction == FORWARD && this->Is(SCORE)) {
-        Score *score = vrv_cast<Score *>(this);
-        assert(score);
-        score->SetAsCurrent();
-    }
-    // We need to do the same in backward direction through the PageMilestoneEnd::m_start
-    else if (direction == BACKWARD && this->Is(PAGE_MILESTONE_END)) {
-        PageMilestoneEnd *elementEnd = vrv_cast<PageMilestoneEnd *>(this);
-        assert(elementEnd);
-        if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
-            Score *score = vrv_cast<Score *>(elementEnd->GetStart());
-            assert(score);
-            score->SetAsCurrent();
-        }
-    }
+    // Update the current score stored in the document
+    this->UpdateDocumentScore(direction);
 
     if (!skipFirst) {
         functor->Call(this, functorParams);
@@ -889,35 +850,13 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
     deepness--;
 
-    if (processChildren) {
-        auto filterPredicate = [filters](Object *iter) -> bool {
-            if (filters && !filters->empty()) {
-                // first we look if there is a comparison object for the object type (e.g., a Staff)
-                ClassId classId = iter->m_classId;
-                ArrayOfComparisons::iterator comparisonIter
-                    = std::find_if(filters->begin(), filters->end(), [classId](Comparison *iter) -> bool {
-                          ClassIdComparison *attComparison = vrv_cast<ClassIdComparison *>(iter);
-                          assert(attComparison);
-                          return classId == attComparison->GetType();
-                      });
-
-                if (comparisonIter != filters->end()) {
-                    // use the operator of the Comparison object to evaluate the attribute
-                    if (!(**comparisonIter)(iter)) {
-                        // the attribute value doesn't match
-                        return false;
-                    }
-                }
-            }
-            return true;
-        };
-
+    if (!this->SkipChildren(functor)) {
         // We need a pointer to the array for the option to work on a reversed copy
         ArrayOfObjects *children = &m_children;
         if (direction == BACKWARD) {
             for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
-                if (filterPredicate(*iter)) {
+                if (this->FiltersApply(filters, *iter)) {
                     (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
                 }
             }
@@ -925,7 +864,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         else {
             for (ArrayOfObjects::iterator iter = children->begin(); iter != children->end(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
-                if (filterPredicate(*iter)) {
+                if (this->FiltersApply(filters, *iter)) {
                     (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
                 }
             }
@@ -935,8 +874,69 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     if (endFunctor && !skipFirst) {
         endFunctor->Call(this, functorParams);
     }
+}
 
-    skipFirst = false;
+void Object::UpdateDocumentScore(bool direction) const
+{
+    // When we are starting a new score, we need to update the current score in the document
+    if (direction == FORWARD && this->Is(SCORE)) {
+        const Score *score = vrv_cast<const Score *>(this);
+        assert(score);
+        score->SetAsCurrent();
+    }
+    // We need to do the same in backward direction through the PageMilestoneEnd::m_start
+    else if (direction == BACKWARD && this->Is(PAGE_MILESTONE_END)) {
+        const PageMilestoneEnd *elementEnd = vrv_cast<const PageMilestoneEnd *>(this);
+        assert(elementEnd);
+        if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
+            const Score *score = vrv_cast<const Score *>(elementEnd->GetStart());
+            assert(score);
+            score->SetAsCurrent();
+        }
+    }
+}
+
+bool Object::SkipChildren(Functor *functor) const
+{
+    if (functor->m_visibleOnly) {
+        if (this->IsEditorialElement()) {
+            const EditorialElement *editorialElement = vrv_cast<const EditorialElement *>(this);
+            assert(editorialElement);
+            if (editorialElement->m_visibility == Hidden) {
+                return true;
+            }
+        }
+        else if (this->Is(MDIV)) {
+            const Mdiv *mdiv = vrv_cast<const Mdiv *>(this);
+            assert(mdiv);
+            if (mdiv->m_visibility == Hidden) {
+                return true;
+            }
+        }
+        else if (this->IsSystemElement()) {
+            const SystemElement *systemElement = vrv_cast<const SystemElement *>(this);
+            assert(systemElement);
+            if (systemElement->m_visibility == Hidden) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Object::FiltersApply(const ArrayOfComparisons *filters, Object *object) const
+{
+    if (filters) {
+        return std::all_of(filters->begin(), filters->end(), [object](Comparison *iter) {
+            // ignore any class comparison which does not match the object class
+            ClassIdComparison *cmp = dynamic_cast<ClassIdComparison *>(iter);
+            if (!cmp || (cmp->GetType() != object->m_classId)) {
+                return true;
+            }
+            return (*iter)(object);
+        });
+    }
+    return true;
 }
 
 int Object::Save(Output *output)

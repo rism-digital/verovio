@@ -1359,6 +1359,15 @@ private:
      */
     void Init(ClassId classId, const std::string &classIdStr);
 
+    /**
+     * Helper methods for functor processing
+     */
+    ///@{
+    void UpdateDocumentScore(bool direction) const;
+    bool SkipChildren(Functor *functor) const;
+    bool FiltersApply(const ArrayOfComparisons *filters, Object *object) const;
+    ///@}
+
 public:
     /**
      * Keep an array of unsupported attributes as pairs.

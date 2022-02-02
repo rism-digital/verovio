@@ -86,13 +86,13 @@ bool Score::IsSupportedChild(Object *child)
     return true;
 }
 
-void Score::SetAsCurrent()
+void Score::SetAsCurrent() const
 {
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     // The doc can be NULL when doing the castoff and the pages are no attached to the doc
     // If such cases, it will not matter not to have the current scoreDef in the doc
     if (doc) {
-        doc->SetCurrentScore(this);
+        doc->SetCurrentScore(const_cast<Score *>(this));
     }
 }
 
