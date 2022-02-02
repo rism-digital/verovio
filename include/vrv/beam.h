@@ -16,6 +16,7 @@
 namespace vrv {
 
 class BeamElementCoord;
+class TabDurSym;
 class StaffAlignment;
 
 // the maximum allowed number of partials
@@ -294,6 +295,7 @@ public:
     {
         m_element = NULL;
         m_closestNote = NULL;
+        m_tabDurSym = NULL;
         m_stem = NULL;
         m_overlapMargin = 0;
         m_maxShortening = -1;
@@ -339,6 +341,7 @@ public:
     data_BEAMPLACE m_partialFlagPlace;
     LayerElement *m_element;
     Note *m_closestNote;
+    TabDurSym *m_tabDurSym;
     Stem *m_stem; // a pointer to the stem in order to avoid to have to re-cast it
 };
 
