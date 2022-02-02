@@ -1135,7 +1135,8 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
     const data_STEMDIRECTION stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     int relevantNoteLoc = VRV_UNSET;
     for (auto coord : m_beamElementCoordRefs) {
-        coord->SetClosestNote(stemDir);
+        coord->SetClosestNoteOrTabDurSym(stemDir, staff->IsTabWithBeamOutside());
+        // Nothing else to do if we have no closest note (that includes tab beams outside the staff)
         if (!coord->m_closestNote) continue;
         if (relevantNoteLoc == VRV_UNSET) {
             relevantNoteLoc = coord->m_closestNote->GetDrawingLoc();
@@ -1671,7 +1672,7 @@ StemmedDrawingInterface *BeamElementCoord::GetStemHolderInterface()
     return NULL;
 }
 
-void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
+void BeamElementCoord::SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, bool outsideStaff)
 {
     m_closestNote = NULL;
     if (m_element->Is(NOTE)) {
@@ -1685,7 +1686,12 @@ void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
     else if (m_element->Is(TABGRP)) {
         TabGrp *tabGrp = vrv_cast<TabGrp *>(m_element);
         assert(tabGrp);
-        m_closestNote = (STEMDIRECTION_up == stemDir) ? tabGrp->GetTopNote() : tabGrp->GetBottomNote();
+        if (outsideStaff) {
+            m_tabDurSym = vrv_cast<TabDurSym *>(tabGrp->FindDescendantByType(TABDURSYM));
+        }
+        else {
+            m_closestNote = (STEMDIRECTION_up == stemDir) ? tabGrp->GetTopNote() : tabGrp->GetBottomNote();
+        }
     }
 }
 

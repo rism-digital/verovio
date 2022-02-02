@@ -312,8 +312,9 @@ public:
 
     void SetDrawingStemDir(
         data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
-    void SetClosestNote(data_STEMDIRECTION stemDir);
 
+    /** Set the note or closest note for chord or tabdursym for tablature beams placed outside the staff */
+    void SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, bool outsideStaff);
     int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal);
 
     /** Helper for calculating the stem length for tablature beam placed outside the staff */
