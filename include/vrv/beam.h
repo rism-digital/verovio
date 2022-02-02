@@ -316,6 +316,8 @@ public:
 
     int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal);
 
+    /** Helper for calculating the stem length for tablature beam placed outside the staff */
+    int CalculateStemLengthTab(Staff *staff, data_STEMDIRECTION stemDir);
     /**
      * Return stem length adjustment in half units, depending on the @stem.mode attribute
      */

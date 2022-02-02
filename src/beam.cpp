@@ -1628,6 +1628,14 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
     return stemLen + CalculateStemModAdjustment(stemLen, directionBias);
 }
 
+int BeamElementCoord::CalculateStemLengthTab(Staff *staff, data_STEMDIRECTION stemDir)
+{
+    if (!m_tabDurSym) return 0;
+    
+    const int directionBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    return m_tabDurSym->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3 * directionBias;
+}
+
 int BeamElementCoord::CalculateStemModAdjustment(int stemLength, int directionBias)
 {
     // handle @stem.mod attribute to properly draw beams with tremolos
