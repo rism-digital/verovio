@@ -149,6 +149,12 @@ int TabDurSym::CalcStem(FunctorParams *functorParams)
     Stem *stem = this->GetDrawingStem();
     assert(stem);
 
+    // Do not draw virtual (e.g., whole note) stems
+    if (params->m_dur < DUR_2 || params->m_tabGrpWithNoNote) {
+        stem->IsVirtual(true);
+        return FUNCTOR_SIBLINGS;
+    }
+
     // Cache the in params to avoid further lookup
     params->m_staff = this->GetAncestorStaff();
     assert(params->m_staff);
@@ -176,10 +182,22 @@ int TabDurSym::CalcStem(FunctorParams *functorParams)
 
     this->SetDrawingStemDir(stemDir);
 
+    int stemDirFactor = -1;
+    if (stemDir == STEMDIRECTION_down) {
+        this->AdjustDrawingYRel(params->m_staff, params->m_doc);
+        stemDirFactor = 1;
+    }
+
     // Make sure the relative position of the stem is the same
     stem->SetDrawingYRel(0);
-    // WIP for now set a default stem length
-    stem->SetDrawingStemLen(4 * params->m_doc->GetDrawingUnit(staffSize));
+    int stemSize = this->CalcStemLenInThirdUnits(params->m_staff, stemDir) * params->m_doc->GetDrawingUnit(staffSize);
+    stemSize /= (3 * stemDirFactor);
+
+    if (params->m_dur == DUR_2) {
+        stemSize /= 2;
+    }
+
+    stem->SetDrawingStemLen(stemSize);
 
     return FUNCTOR_SIBLINGS;
 }
