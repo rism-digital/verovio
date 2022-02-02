@@ -310,6 +310,12 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     }
     midiFile->addTempo(0, 0, tempo);
 
+    // Capture information for MIDI generation, i.e. from control elements
+    Functor prepareMIDI(&Object::PrepareMIDI);
+    PrepareMIDIParams prepareMIDIParams;
+    prepareMIDIParams.m_currentTempo = tempo;
+    this->Process(&prepareMIDI, &prepareMIDIParams);
+
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
     PrepareProcessingListsParams prepareProcessingListsParams;
     // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
@@ -382,12 +388,6 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             AttNIntegerComparison matchLayer(LAYER, layers->first);
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
-
-            Functor prepareMIDI(&Object::PrepareMIDI);
-            PrepareMIDIParams prepareMIDIParams;
-            prepareMIDIParams.m_transSemi = transSemi;
-            prepareMIDIParams.m_currentTempo = tempo;
-            this->Process(&prepareMIDI, &prepareMIDIParams, NULL, &filters);
 
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);

@@ -2031,12 +2031,7 @@ public:
 
 class PrepareMIDIParams : public FunctorParams {
 public:
-    PrepareMIDIParams()
-    {
-        m_transSemi = 0;
-        m_currentTempo = MIDI_TEMPO;
-    }
-    int m_transSemi;
+    PrepareMIDIParams() { m_currentTempo = MIDI_TEMPO; }
     double m_currentTempo;
     std::map<Note *, double> m_deferredNotes;
 };

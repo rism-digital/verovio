@@ -1273,6 +1273,8 @@ public:
 
     /**
      * Prepare the MIDI export
+     * Captures information (i.e. from control elements) for MIDI interpretation
+     * This information is usually required beforehand in GenerateMIDI
      */
     ///@{
     virtual int PrepareMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }

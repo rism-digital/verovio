@@ -260,9 +260,9 @@ int Arpeg::PrepareMIDI(FunctorParams *functorParams)
     std::set<Note *> notes = this->GetNotes();
     std::vector<Note *> sortedNotes;
     std::copy(notes.begin(), notes.end(), std::back_inserter(sortedNotes));
-    std::sort(sortedNotes.begin(), sortedNotes.end(), [params, playTopDown](Note *note1, Note *note2) {
-        const int pitch1 = note1->GetMIDIPitch(params->m_transSemi);
-        const int pitch2 = note2->GetMIDIPitch(params->m_transSemi);
+    std::sort(sortedNotes.begin(), sortedNotes.end(), [playTopDown](Note *note1, Note *note2) {
+        const int pitch1 = note1->GetMIDIPitch();
+        const int pitch2 = note2->GetMIDIPitch();
         return playTopDown ? (pitch1 > pitch2) : (pitch1 < pitch2);
     });
 
