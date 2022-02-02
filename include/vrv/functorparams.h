@@ -2024,9 +2024,8 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the semi tone transposition
- * member 1: the current tempo
- * member 2: deferred notes which start slightly later
+ * member 0: the current tempo
+ * member 1: deferred notes which start slightly later
  **/
 
 class PrepareMIDIParams : public FunctorParams {
