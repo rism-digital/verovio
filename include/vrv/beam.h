@@ -120,6 +120,12 @@ private:
     // Helper to calculate the longest stem length of the beam (which will be used uniformely)
     void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal);
 
+    // Helper to set the stem values
+    void CalcSetStemValues(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+
+    // Helper to set the stem values for tablature
+    void CalcSetStemValuesTab(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+
     // Helper to calculate relative position of the beam to for each of the coordinates
     void CalcMixedBeamPlace(Staff *staff);
 

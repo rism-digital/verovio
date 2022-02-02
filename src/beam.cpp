@@ -91,7 +91,6 @@ void BeamSegment::CalcBeam(
     assert(staff);
     assert(doc);
 
-    int y1, y2;
     assert(m_beamElementCoordRefs.size() > 0);
 
     // For recursive calls, avoid to re-init values
@@ -124,18 +123,34 @@ void BeamSegment::CalcBeam(
         }
     }
 
-    // ArrayOfBeamElementCoords stemUps;
-    // ArrayOfBeamElementCoords stemDowns;
-
     /******************************************************************/
     // Set the stem lengths to stem objects
+
+    if (staff->IsTablature()) {
+        this->CalcSetStemValuesTab(layer, staff, doc, beamInterface);
+    }
+    else {
+        this->CalcSetStemValues(layer, staff, doc, beamInterface);
+    }
+}
+
+void BeamSegment::CalcSetStemValues(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+{
+    assert(layer);
+    assert(staff);
+    assert(doc);
+    assert(beamInterface);
+    
+    int y1, y2;
 
     for (auto coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
-        if ((el->Is(NOTE)) || (el->Is(CHORD))) {
-            StemmedDrawingInterface *stemmedInterface = el->GetStemmedDrawingInterface();
-            assert(beamInterface);
+        if (el->Is({ CHORD, NOTE })) {
+
+            // Get the interface for the chord or note
+            StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
+            if (!stemmedInterface) continue;
 
             assert(coord->m_closestNote);
 
@@ -208,6 +223,48 @@ void BeamSegment::CalcBeam(
 
             // stem->SetDrawingStemDir(beamInterface->m_stemDir);
             // Since the value were calculated relatively to the element position, adjust them
+            stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
+            stem->SetDrawingYRel(y2 - el->GetDrawingY());
+            stem->SetDrawingStemLen(y2 - y1);
+        }
+    }
+}
+
+void BeamSegment::CalcSetStemValuesTab(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+{
+    assert(layer);
+    assert(staff);
+    assert(doc);
+    assert(beamInterface);
+    
+    int y1, y2;
+
+    for (auto coord : m_beamElementCoordRefs) {
+        // All notes and chords get their stem value stored
+        LayerElement *el = coord->m_element;
+        if (el->Is(TABGRP)) {
+            // Get the interface from child tabDurSym
+            StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
+            if (!stemmedInterface) continue;
+
+            assert(coord->m_closestNote);
+
+            y1 = coord->m_yBeam;
+
+            y2 = coord->m_closestNote->GetDrawingY();
+            if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+                // Move down to ensure the stem is slightly shorter than the top-beam
+                y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            else {
+                y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+
+            Stem *stem = stemmedInterface->GetDrawingStem();
+            // This is the case with fTrem on whole notes
+            if (!stem) continue;
+
+            // stem->SetDrawingStemDir(stemDir);
             stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
             stem->SetDrawingYRel(y2 - el->GetDrawingY());
             stem->SetDrawingStemLen(y2 - y1);
