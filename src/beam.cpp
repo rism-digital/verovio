@@ -277,7 +277,7 @@ void BeamSegment::CalcSetStemValuesTab(Layer *layer, Staff *staff, Doc *doc, Bea
 
             // stem->SetDrawingStemDir(stemDir);
             stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
-            stem->SetDrawingYRel(y2 - el->GetDrawingY());
+            if (coord->m_closestNote) stem->SetDrawingYRel(y2 - el->GetDrawingY());
             stem->SetDrawingStemLen(y2 - y1);
         }
     }
@@ -476,7 +476,7 @@ void BeamSegment::CalcBeamInit(
         beamInterface->m_stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
         beamInterface->m_stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     }
-    
+
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
     /******************************************************************/
@@ -829,6 +829,9 @@ void BeamSegment::CalcBeamPosition(
         }
     }
 
+    // Nothing else to do with tab beams outside the staff
+    if (staff->IsTabWithBeamOutside()) return;
+
     /******************************************************************/
     // Calculate the slope is necessary
 
@@ -1174,7 +1177,11 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
 
     int minDuration = DUR_4;
     for (auto coord : m_beamElementCoordRefs) {
-        if (!coord->m_closestNote) continue;
+        // Get the tabDurSym stem length (if any)
+        if (!coord->m_closestNote) {
+            m_uniformStemLength = coord->CalculateStemLengthTab(staff, stemDir);
+            continue;
+        }
         // if location matches, or if current elements duration is shorter than 8th. This ensures that beams with
         // partial beams will not be shorted when lowest/highest note is 8th and can be shortened
         if ((coord->m_dur > minDuration)
@@ -1578,6 +1585,13 @@ void BeamElementCoord::SetDrawingStemDir(
     m_yBeam = m_element->GetDrawingY();
     m_x += (STEMDIRECTION_up == stemDir) ? interface->m_stemXAbove[interface->m_cueSize]
                                          : interface->m_stemXBelow[interface->m_cueSize];
+
+    if (m_tabDurSym) {
+        m_yBeam = m_tabDurSym->GetDrawingY();
+        m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
+        return;
+    }
+
     if (!m_closestNote) return;
 
     if (!interface->m_cueSize && (m_element->IsGraceNote() || m_element->GetDrawingCueSize())
