@@ -213,7 +213,7 @@ FTrem *LayerElement::IsInFTrem()
 
 Beam *LayerElement::IsInBeam()
 {
-    if (!this->Is({ CHORD, NOTE, TABGRP, STEM })) return NULL;
+    if (!this->Is({ CHORD, NOTE, TABGRP, TABDURSYM, STEM })) return NULL;
     Beam *beamParent = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
     if (beamParent != NULL) {
         if (!this->IsGraceNote()) return beamParent;
