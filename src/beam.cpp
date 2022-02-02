@@ -1065,17 +1065,6 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     assert(beamInterface);
 
     if (place != BEAMPLACE_NONE) {
-        /*
-        if (beamInterface->m_hasMultipleStemDir && (place != BEAMPLACE_mixed)) {
-            LogDebug("Stem directions (mixed) contradict beam placement (below or above)");
-        }
-        else if ((beamInterface->m_notesStemDir == STEMDIRECTION_up) && (place == BEAMPLACE_below)) {
-            LogDebug("Stem directions (up) contradict beam placement (below)");
-        }
-        else if ((beamInterface->m_notesStemDir == STEMDIRECTION_down) && (place == BEAMPLACE_above)) {
-            LogDebug("Stem directions (down) contradict beam placement (above)");
-        }
-        */
         beamInterface->m_drawingPlace = place;
     }
     // Default with cross-staff
