@@ -98,17 +98,19 @@ void BeamSegment::CalcBeam(
         this->CalcBeamInit(layer, staff, doc, beamInterface, place);
     }
 
-    beamInterface->m_fractionSize = staff->m_drawingStaffSize;
-
-    // Always horizontal when placed outside a tablature staff
     bool horizontal = true;
     if (staff->IsTablature()) {
-        // Alwyas not horizontal when inside the staff
-        // Eventually we will need to look at the content to pre-determine if horizontal
+        int glyphSize = staff->GetDrawingStaffNotationSize();
+        beamInterface->m_fractionSize = glyphSize * 2 / 3;
+
+        // Alwyas horizontal when outside the staff and not when inside the staff
+        // Eventually we will need to look at the content to pre-determine if horizontal for inside beams
         horizontal = staff->IsTabWithBeamOutside();
         this->CalcBeamPlaceTab(layer, staff, doc, beamInterface, place);
     }
     else {
+        beamInterface->m_fractionSize = staff->m_drawingStaffSize;
+
         horizontal = beamInterface->IsHorizontal();
         // Beam@place has precedence - however, in some cases, CalcBeam is called recursively because we need to change
         // the place This occurs when mixed makes no sense and the beam is placed above or below instead.
