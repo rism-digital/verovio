@@ -113,10 +113,10 @@
             <!--<glyph glyph-code="E06C" smufl-name="semipitchedPercussionClef2" />-->
             <glyph glyph-code="E06D" smufl-name="6stringTabClef" />
             <glyph glyph-code="E06E" smufl-name="4stringTabClef" />
-            <!--<glyph glyph-code="E06F" smufl-name="cClefTriangular" />-->
-            <!--<glyph glyph-code="E070" smufl-name="fClefTriangular" />-->
-            <!--<glyph glyph-code="E071" smufl-name="cClefTriangularToFClef" />-->
-            <!--<glyph glyph-code="E072" smufl-name="fClefTriangularToCClef" />-->
+            <!--<glyph glyph-code="E06F" smufl-name="schaefferClef" />-->
+            <!--<glyph glyph-code="E070" smufl-name="schaefferPreviousClef" />-->
+            <!--<glyph glyph-code="E071" smufl-name="schaefferGClefToFClef" />-->
+            <!--<glyph glyph-code="E072" smufl-name="schaefferFClefToGClef" />-->
             <glyph glyph-code="E073" smufl-name="gClefReversed" />
             <glyph glyph-code="E074" smufl-name="gClefTurned" />
             <glyph glyph-code="E075" smufl-name="cClefReversed" />
