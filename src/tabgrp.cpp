@@ -67,7 +67,7 @@ void TabGrp::FilterList(ArrayOfObjects *childList)
         iter = ((*iter)->Is(NOTE)) ? iter + 1 : childList->erase(iter);
     }
 
-    std::sort(childList->begin(), childList->end(), TabFretSort());
+    std::sort(childList->begin(), childList->end(), TabCourseSort());
 }
 
 int TabGrp::GetYTop()
