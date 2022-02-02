@@ -1178,10 +1178,11 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
     int minDuration = DUR_4;
     for (auto coord : m_beamElementCoordRefs) {
         // Get the tabDurSym stem length (if any)
-        if (!coord->m_closestNote) {
+        if (coord->m_tabDurSym) {
             m_uniformStemLength = coord->CalculateStemLengthTab(staff, stemDir);
             continue;
         }
+        if (!coord->m_closestNote) continue;
         // if location matches, or if current elements duration is shorter than 8th. This ensures that beams with
         // partial beams will not be shorted when lowest/highest note is 8th and can be shortened
         if ((coord->m_dur > minDuration)
