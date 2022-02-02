@@ -316,12 +316,12 @@ std::ostream &operator<<(std::ostream &out, const TransPitch &pitch)
         default: out << "X";
     }
     if (pitch.m_accid > 0) {
-        for (int i = 0; i < pitch.m_accid; i++) {
+        for (int i = 0; i < pitch.m_accid; ++i) {
             out << "#";
         }
     }
     else if (pitch.m_accid < 0) {
-        for (int i = 0; i < abs(pitch.m_accid); i++) {
+        for (int i = 0; i < abs(pitch.m_accid); ++i) {
             out << "b";
         }
     }
@@ -693,7 +693,7 @@ bool Transposer::GetKeyTonic(const std::string &keyTonic, TransPitch &tonic)
     int pitch = 0;
     int accid = 0;
     int state = 0;
-    for (unsigned int i = 0; i < (unsigned int)keyTonic.size(); i++) {
+    for (unsigned int i = 0; i < (unsigned int)keyTonic.size(); ++i) {
         switch (state) {
             case 0:
                 switch (keyTonic[i]) {
@@ -760,7 +760,7 @@ int Transposer::GetInterval(const std::string &intervalName)
     std::string number;
     int state = 0;
 
-    for (int i = 0; i < (int)intervalName.size(); i++) {
+    for (int i = 0; i < (int)intervalName.size(); ++i) {
         switch (state) {
             case 0: // direction or quality expected
                 switch (intervalName[i]) {
@@ -1142,7 +1142,7 @@ TransPitch Transposer::IntegerPitchToTransPitch(int ipitch)
         // search from C upwards
         mindiff = chroma - m_diatonicMapping[0];
         mini = 0;
-        for (int i = 1; i < (int)m_diatonicMapping.size(); i++) {
+        for (int i = 1; i < (int)m_diatonicMapping.size(); ++i) {
             int diff = chroma - m_diatonicMapping[i];
             if (abs(diff) < abs(mindiff)) {
                 mindiff = diff;
@@ -1212,7 +1212,7 @@ std::string Transposer::GetIntervalName(int intervalClass)
 
     int mindiff = chroma;
     int mini = 0;
-    for (int i = 1; i < (int)m_diatonicMapping.size(); i++) {
+    for (int i = 1; i < (int)m_diatonicMapping.size(); ++i) {
         int diff = chroma - (m_diatonicMapping[i] - m_diatonicMapping[0]);
         if (abs(diff) < abs(mindiff)) {
             mindiff = diff;
@@ -1329,12 +1329,12 @@ std::string Transposer::GetIntervalName(int intervalClass)
 
     if (quality.empty()) {
         if (augmented) {
-            for (int i = 0; i < augmented; i++) {
+            for (int i = 0; i < augmented; ++i) {
                 quality += "A";
             }
         }
         else if (diminished) {
-            for (int i = 0; i < diminished; i++) {
+            for (int i = 0; i < diminished; ++i) {
                 quality += "d";
             }
         }
@@ -1391,7 +1391,7 @@ int Transposer::IntervalToCircleOfFifths(int transval)
 
     int p5 = this->PerfectFifthClass();
     int p4 = this->PerfectFourthClass();
-    for (int i = 1; i < m_base; i++) {
+    for (int i = 1; i < m_base; ++i) {
         if ((p5 * i) % m_base == transval) {
             return i;
         }
@@ -1549,12 +1549,12 @@ std::string Transposer::DiatonicChromaticToIntervalName(int diatonic, int chroma
             output += "P";
         }
         else if (chromatic > 0) {
-            for (int i = 0; i < chromatic; i++) {
+            for (int i = 0; i < chromatic; ++i) {
                 output += "A";
             }
         }
         else {
-            for (int i = 0; i < -chromatic; i++) {
+            for (int i = 0; i < -chromatic; ++i) {
                 output += "d";
             }
         }
@@ -1676,12 +1676,12 @@ std::string Transposer::DiatonicChromaticToIntervalName(int diatonic, int chroma
 
     if (quality.empty()) {
         if (augmented) {
-            for (int i = 0; i < augmented; i++) {
+            for (int i = 0; i < augmented; ++i) {
                 quality += "A";
             }
         }
         else if (diminished) {
-            for (int i = 0; i < diminished; i++) {
+            for (int i = 0; i < diminished; ++i) {
                 quality += "d";
             }
         }
@@ -1719,7 +1719,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
     std::string number;
     int state = 0;
 
-    for (int i = 0; i < (int)intervalName.size(); i++) {
+    for (int i = 0; i < (int)intervalName.size(); ++i) {
         switch (state) {
             case 0: // direction or quality expected
                 switch (intervalName[i]) {

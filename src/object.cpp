@@ -719,7 +719,7 @@ int Object::GetDescendantIndex(const Object *child, const ClassId classId, int d
     int i = 0;
     for (auto &object : objects) {
         if (child == object) return i;
-        i++;
+        ++i;
     }
     return -1;
 }
