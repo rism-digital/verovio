@@ -439,7 +439,6 @@ void BeamSegment::CalcBeamInit(
         beamInterface->m_beamWidthWhite *= 4;
         beamInterface->m_beamWidthWhite /= 3;
     }
-    beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
     if (staff->IsTablature()) {
         // Adjust the height and spacing of the beams
@@ -466,6 +465,8 @@ void BeamSegment::CalcBeamInit(
         beamInterface->m_stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
         beamInterface->m_stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     }
+    
+    beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
     /******************************************************************/
     // Calculate the extreme values
