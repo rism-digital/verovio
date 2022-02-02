@@ -117,11 +117,11 @@
             <!--<glyph glyph-code="E070" smufl-name="schaefferPreviousClef" />-->
             <!--<glyph glyph-code="E071" smufl-name="schaefferGClefToFClef" />-->
             <!--<glyph glyph-code="E072" smufl-name="schaefferFClefToGClef" />-->
-            <!--<glyph glyph-code="E073" smufl-name="gClefReversed" />-->
-            <!--<glyph glyph-code="E074" smufl-name="gClefTurned" />-->
-            <!--<glyph glyph-code="E075" smufl-name="cClefReversed" />-->
-            <!--<glyph glyph-code="E076" smufl-name="fClefReversed" />-->
-            <!--<glyph glyph-code="E077" smufl-name="fClefTurned" />-->
+            <glyph glyph-code="E073" smufl-name="gClefReversed" />
+            <glyph glyph-code="E074" smufl-name="gClefTurned" />
+            <glyph glyph-code="E075" smufl-name="cClefReversed" />
+            <glyph glyph-code="E076" smufl-name="fClefReversed" />
+            <glyph glyph-code="E077" smufl-name="fClefTurned" />
             <!--<glyph glyph-code="E078" smufl-name="bridgeClef" />-->
             <!--<glyph glyph-code="E079" smufl-name="accdnDiatonicClef" />-->
             <!--<glyph glyph-code="E07A" smufl-name="gClefChange" />-->
