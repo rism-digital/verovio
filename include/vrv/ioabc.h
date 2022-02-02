@@ -96,6 +96,11 @@ public:
     //
 private:
     enum class ElementType { Default, Tuplet };
+    struct ContainerElement {
+        ElementType m_type = ElementType::Default;
+        LayerElement *m_element = NULL;
+        int m_count = 0;
+    };
 
     std::string m_filename;
     Mdiv *m_mdiv = NULL;
@@ -119,8 +124,7 @@ private:
     int m_gracecount = 0;
     int m_stafflines = 5;
     int m_transpose = 0;
-    ElementType m_type = ElementType::Default;
-    std::pair<ElementType, LayerElement *> m_containerPair = { ElementType::Default, NULL };
+    ContainerElement m_containerElement;
     /*
      * ABC metadata stacks
      */

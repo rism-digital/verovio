@@ -311,24 +311,35 @@ void ABCInput::AddLayerElement()
     if (!m_noteStack.size()) return;
     // if just one note in the stack - add it do the layer directly
     if (m_noteStack.size() == 1) {
-        m_layer->AddChild(m_noteStack.back());
+        if (m_containerElement.m_element && (ElementType::Tuplet == m_containerElement.m_type)) {
+            m_containerElement.m_element->AddChild(m_noteStack.back());
+            if (!--m_containerElement.m_count) {
+                m_layer->AddChild(m_containerElement.m_element);
+                m_containerElement = {};
+            }
+        }
+        else {
+            m_layer->AddChild(m_noteStack.back());
+        }
         m_noteStack.clear();
+        return;
     }
     // otherwise we can have beam or tuplet (for now)
-    LayerElement *element = NULL;
-    // if container pair key is set to Tuplet - proceed with it
-    if (m_containerPair.second && (ElementType::Tuplet == m_containerPair.first)) {
-        element = m_containerPair.second;
-    }
-    // otherwise default to it being beam
-    else {
-        element = new Beam();
-    }
+    Beam *beam = new Beam();
     // add stacked notes to the current element
     for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
-        element->AddChild(*iter);
+        beam->AddChild(*iter);
     }
-    if (element->FindDescendantByType(NOTE)) {
+    if (beam->FindDescendantByType(NOTE)) {
+        LayerElement *element = NULL;
+        if (m_containerElement.m_element && (ElementType::Tuplet == m_containerElement.m_type)) {
+            element = m_containerElement.m_element;
+            element->AddChild(beam);
+        }
+        // otherwise default to it being beam
+        else {
+            element = beam;
+        }
         m_layer->AddChild(element);
     }
     else {
@@ -336,7 +347,7 @@ void ABCInput::AddLayerElement()
             m_layer->AddChild(*iter);
         }
     }
-    m_containerPair = { ElementType::Default, NULL };
+    m_containerElement = {};
     m_noteStack.clear();
 }
 
@@ -384,7 +395,7 @@ int ABCInput::ParseTuplet(const std::string &musicCode, int index)
     // Ignore this for the time being
     tuplet->SetNum(tupletNum);
     tuplet->SetNumbase(tupletNumbase);
-    m_containerPair = { ElementType::Tuplet, tuplet };
+    m_containerElement = { ElementType::Tuplet, tuplet, tupletNum };
 
     // return index of the last element in tuplet, so that we point to the actual notes when incrementing 'i'
     return tupletEnd - 1;
