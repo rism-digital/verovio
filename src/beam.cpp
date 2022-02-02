@@ -100,11 +100,20 @@ void BeamSegment::CalcBeam(
 
     beamInterface->m_fractionSize = staff->m_drawingStaffSize;
 
-    bool horizontal = beamInterface->IsHorizontal();
-
-    // Beam@place has precedence - however, in some cases, CalcBeam is called recursively because we need to change the
-    // place This occurs when mixed makes no sense and the beam is placed above or below instead.
-    this->CalcBeamPlace(layer, beamInterface, place);
+    // Always horizontal when placed outside a tablature staff
+    bool horizontal = true;
+    if (staff->IsTablature()) {
+        // Alwyas not horizontal when inside the staff
+        // Eventually we will need to look at the content to pre-determine if horizontal
+        horizontal = staff->IsTabWithBeamOutside();
+        this->CalcBeamPlaceTab(layer, staff, doc, beamInterface, place);
+    }
+    else {
+        horizontal = beamInterface->IsHorizontal();
+        // Beam@place has precedence - however, in some cases, CalcBeam is called recursively because we need to change
+        // the place This occurs when mixed makes no sense and the beam is placed above or below instead.
+        this->CalcBeamPlace(layer, beamInterface, place);
+    }
 
     CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
 
@@ -1113,9 +1122,12 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     // if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
-void BeamSegment::CalcBeamPlaceTab(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
+void BeamSegment::CalcBeamPlaceTab(
+    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
 {
     assert(layer);
+    assert(staff);
+    assert(doc);
     assert(beamInterface);
 
     if (place != BEAMPLACE_NONE) {
@@ -1127,6 +1139,16 @@ void BeamSegment::CalcBeamPlaceTab(Layer *layer, BeamDrawingInterface *beamInter
         // The layerStemDir can be none (single layer), up (1st layer), or down (2n layer)
         // Is is put above by default with tablature with a single layer
         beamInterface->m_drawingPlace = (layerStemDir == STEMDIRECTION_down) ? BEAMPLACE_below : BEAMPLACE_above;
+    }
+
+    if (beamInterface->m_drawingPlace == BEAMPLACE_below && staff->IsTabWithBeamOutside()) {
+        for (auto coord : m_beamElementCoordRefs) {
+            if (!coord->m_element || !coord->m_element->Is(TABGRP)) continue;
+            TabGrp *tabGrp = vrv_cast<TabGrp *>(coord->m_element);
+            assert(tabGrp);
+            TabDurSym *tabDurSym = vrv_cast<TabDurSym *>(tabGrp->FindDescendantByType(TABDURSYM));
+            if (tabDurSym) tabDurSym->AdjustDrawingYRel(staff, doc);
+        }
     }
 }
 

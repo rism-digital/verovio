@@ -116,7 +116,12 @@ private:
 
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
-    void CalcBeamPlaceTab(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
+    /**
+     * Helper to calculate the beam position for a beam in tablature.
+     * Also adjust the drawingYRel of the TabDurSym if necessary.
+     */
+    void CalcBeamPlaceTab(
+        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     // Helper to calculate the longest stem length of the beam (which will be used uniformely)
     void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal);
