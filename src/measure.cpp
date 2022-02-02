@@ -154,7 +154,7 @@ void Measure::Reset()
 
     m_scoreTimeOffset.clear();
     m_realTimeOffsetMilliseconds.clear();
-    m_currentTempo = 120.0;
+    m_currentTempo = MIDI_TEMPO;
 }
 
 bool Measure::IsSupportedChild(Object *child)
@@ -1529,6 +1529,16 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
             }
         }
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::PrepareMIDI(FunctorParams *functorParams)
+{
+    PrepareMIDIParams *params = vrv_params_cast<PrepareMIDIParams *>(functorParams);
+    assert(params);
+
+    params->m_currentTempo = m_currentTempo;
 
     return FUNCTOR_CONTINUE;
 }

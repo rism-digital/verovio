@@ -100,82 +100,47 @@ void Arpeg::SetDrawingXRel(int drawingXRel)
     }
 }
 
+std::set<Note *> Arpeg::GetNotes()
+{
+    std::set<Note *> notes;
+    auto extractNotes = [&notes](Object *object) {
+        if (!object) return;
+        if (object->Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(object);
+            assert(note);
+            notes.insert(note);
+        }
+        else if (object->Is(CHORD)) {
+            Chord *chord = vrv_cast<Chord *>(object);
+            const ArrayOfObjects *childList = chord->GetList(chord);
+            for (Object *child : *childList) {
+                Note *note = vrv_cast<Note *>(child);
+                assert(note);
+                notes.insert(note);
+            }
+        }
+    };
+    extractNotes(this->GetStart());
+    std::for_each(this->GetRefs()->begin(), this->GetRefs()->end(), extractNotes);
+    return notes;
+}
+
 void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
 {
-    top = NULL;
-    bottom = NULL;
+    std::set<Note *> notes = this->GetNotes();
+    if (notes.size() > 1) {
+        // Sort the involved notes by drawing Y position
+        std::vector<Note *> sortedNotes;
+        std::copy(notes.begin(), notes.end(), std::back_inserter(sortedNotes));
+        std::sort(sortedNotes.begin(), sortedNotes.end(),
+            [](Note *note1, Note *note2) { return (note1->GetDrawingY() > note2->GetDrawingY()); });
 
-    Object *front = NULL;
-    Object *back = NULL;
-
-    if (this->GetStart()) {
-        front = this->GetStart();
-        back = this->GetStart();
-    }
-    else if (!this->GetRefs()->empty()) {
-        front = this->GetRefs()->front();
-        back = this->GetRefs()->back();
-    }
-
-    // Cannot draw an arpeg that has no target
-    if (!front || !back) return;
-
-    // Cannot draw an arpeg not pointing to a chord or a note
-    if (!front->Is({ CHORD, NOTE }) || !back->Is({ CHORD, NOTE })) return;
-
-    // Pointing to a single element
-    if (front == back) {
-        // It has to be a chord in this case
-        if (front->Is(NOTE)) return;
-        Chord *chord = vrv_cast<Chord *>(front);
-        assert(chord);
-        top = chord->GetTopNote();
-        bottom = chord->GetBottomNote();
-        return;
-    }
-
-    Chord *chord1 = NULL;
-    Chord *chord2 = NULL;
-    Note *note1 = NULL;
-    Note *note2 = NULL;
-
-    // Get the first and second chord or note
-    if (front->Is(CHORD)) {
-        chord1 = vrv_cast<Chord *>(front);
-        assert(chord1);
+        top = sortedNotes.front();
+        bottom = sortedNotes.back();
     }
     else {
-        note1 = vrv_cast<Note *>(front);
-        assert(note1);
-    }
-    if (back->Is(CHORD)) {
-        chord2 = vrv_cast<Chord *>(back);
-        assert(chord2);
-    }
-    else {
-        note2 = vrv_cast<Note *>(back);
-        assert(note2);
-    }
-
-    // Note get the top and bottom note accordingly
-    if (chord1 && chord2) {
-        top = (chord1->GetTopNote()->GetDrawingY() > chord2->GetTopNote()->GetDrawingY()) ? chord1->GetTopNote()
-                                                                                          : chord2->GetTopNote();
-        bottom = (chord1->GetBottomNote()->GetDrawingY() < chord2->GetBottomNote()->GetDrawingY())
-            ? chord1->GetBottomNote()
-            : chord2->GetBottomNote();
-    }
-    else if (chord1 && note2) {
-        top = (chord1->GetTopNote()->GetDrawingY() > note2->GetDrawingY()) ? chord1->GetTopNote() : note2;
-        bottom = (chord1->GetBottomNote()->GetDrawingY() < note2->GetDrawingY()) ? chord1->GetBottomNote() : note2;
-    }
-    else if (note1 && chord2) {
-        top = (note1->GetDrawingY() > chord2->GetTopNote()->GetDrawingY()) ? note1 : chord2->GetTopNote();
-        bottom = (note1->GetDrawingY() < chord2->GetBottomNote()->GetDrawingY()) ? note1 : chord2->GetBottomNote();
-    }
-    else {
-        top = (note1->GetDrawingY() > note2->GetDrawingY()) ? note1 : note2;
-        bottom = (note1->GetDrawingY() < note2->GetDrawingY()) ? note1 : note2;
+        top = NULL;
+        bottom = NULL;
     }
 }
 
@@ -280,6 +245,33 @@ int Arpeg::HorizontalLayoutCache(FunctorParams *functorParams)
     }
     else {
         m_cachedXRel = m_drawingXRel;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Arpeg::PrepareMIDI(FunctorParams *functorParams)
+{
+    PrepareMIDIParams *params = vrv_params_cast<PrepareMIDIParams *>(functorParams);
+    assert(params);
+
+    // Sort the involved notes by playing order
+    const bool playTopDown = (this->GetOrder() == arpegLog_ORDER_down);
+    std::set<Note *> notes = this->GetNotes();
+    std::vector<Note *> sortedNotes;
+    std::copy(notes.begin(), notes.end(), std::back_inserter(sortedNotes));
+    std::sort(sortedNotes.begin(), sortedNotes.end(), [playTopDown](Note *note1, Note *note2) {
+        const int pitch1 = note1->GetMIDIPitch();
+        const int pitch2 = note2->GetMIDIPitch();
+        return playTopDown ? (pitch1 > pitch2) : (pitch1 < pitch2);
+    });
+
+    // Defer the notes in playing order
+    double shift = 0.0;
+    const double increment = UNACC_GRACENOTE_DUR * params->m_currentTempo / 60000.0;
+    for (Note *note : sortedNotes) {
+        if (shift > 0.0) params->m_deferredNotes[note] = shift;
+        shift += increment;
     }
 
     return FUNCTOR_CONTINUE;

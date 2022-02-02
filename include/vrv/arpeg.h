@@ -51,8 +51,13 @@ public:
     ///@}
 
     /**
+     * Get all notes of the arpeggio
+     */
+    std::set<Note *> GetNotes();
+
+    /**
      * Set the top and bottom note of the arpeg.
-     * Pointers will be NULL if resovling fails (e.g., pointing to one single note)
+     * Pointers will be NULL if resolving fails (e.g., pointing to one single note)
      */
     void GetDrawingTopBottomNotes(Note *&top, Note *&bottom);
 
@@ -107,6 +112,11 @@ public:
      * See Object::HorizontalLayoutCache
      */
     int HorizontalLayoutCache(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::PrepareMIDI
+     */
+    int PrepareMIDI(FunctorParams *functorParams) override;
 
 protected:
     //
