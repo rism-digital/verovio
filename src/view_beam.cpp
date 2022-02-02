@@ -41,8 +41,6 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Beam *beam = dynamic_cast<Beam *>(element);
     assert(beam);
 
-    const bool isTabBeam = beam->IsTabBeam();
-
     /******************************************************************/
     // initialization
 
