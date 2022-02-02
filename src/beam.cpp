@@ -830,7 +830,7 @@ void BeamSegment::CalcBeamPosition(
     }
 
     // Nothing else to do with tab beams outside the staff
-    if (staff->IsTabWithBeamOutside()) return;
+    if (staff->IsTablature() && staff->IsTabWithBeamOutside()) return;
 
     /******************************************************************/
     // Calculate the slope is necessary
