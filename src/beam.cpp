@@ -1048,6 +1048,23 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     // if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
+void BeamSegment::CalcBeamPlaceTab(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
+{
+    assert(layer);
+    assert(beamInterface);
+
+    if (place != BEAMPLACE_NONE) {
+        beamInterface->m_drawingPlace = (place == BEAMPLACE_below) ? BEAMPLACE_below : BEAMPLACE_above;
+    }
+    // Do we have more that one layer?
+    else {
+        data_STEMDIRECTION layerStemDir = layer->GetDrawingStemDir();
+        // The layerStemDir can be none (single layer), up (1st layer), or down (2n layer)
+        // Is is put above by default with tablature with a single layer
+        beamInterface->m_drawingPlace = (layerStemDir == STEMDIRECTION_down) ? BEAMPLACE_below : BEAMPLACE_above;
+    }
+}
+
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
     const data_STEMDIRECTION stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
