@@ -149,7 +149,7 @@ void BeamSegment::CalcSetStemValues(Layer *layer, Staff *staff, Doc *doc, BeamDr
     assert(staff);
     assert(doc);
     assert(beamInterface);
-    
+
     int y1, y2;
 
     for (auto coord : m_beamElementCoordRefs) {
@@ -245,22 +245,24 @@ void BeamSegment::CalcSetStemValuesTab(Layer *layer, Staff *staff, Doc *doc, Bea
     assert(staff);
     assert(doc);
     assert(beamInterface);
-    
+
     int y1, y2;
 
     for (auto coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
         if (el->Is(TABGRP)) {
+            // Just in case
+            if (!coord->m_closestNote && !coord->m_tabDurSym) continue;
+
             // Get the interface from child tabDurSym
             StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
             if (!stemmedInterface) continue;
 
-            assert(coord->m_closestNote);
-
             y1 = coord->m_yBeam;
 
-            y2 = coord->m_closestNote->GetDrawingY();
+            y2 = (coord->m_closestNote) ? coord->m_closestNote->GetDrawingY() : coord->m_tabDurSym->GetDrawingY();
+
             if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
                 // Move down to ensure the stem is slightly shorter than the top-beam
                 y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
@@ -1654,7 +1656,7 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
 int BeamElementCoord::CalculateStemLengthTab(Staff *staff, data_STEMDIRECTION stemDir)
 {
     if (!m_tabDurSym) return 0;
-    
+
     const int directionBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     return m_tabDurSym->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3 * directionBias;
 }

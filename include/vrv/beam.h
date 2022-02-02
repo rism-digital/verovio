@@ -320,10 +320,13 @@ public:
 
     /** Set the note or closest note for chord or tabdursym for tablature beams placed outside the staff */
     void SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, bool outsideStaff);
+
+    /** Heleper for calculating the stem length for staff notation and tablature beams within the staff */
     int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal);
 
     /** Helper for calculating the stem length for tablature beam placed outside the staff */
     int CalculateStemLengthTab(Staff *staff, data_STEMDIRECTION stemDir);
+
     /**
      * Return stem length adjustment in half units, depending on the @stem.mode attribute
      */

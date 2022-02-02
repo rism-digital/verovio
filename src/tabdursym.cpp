@@ -95,7 +95,7 @@ int TabDurSym::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
         return 0;
     }
 
-    int baseStem = STANDARD_STEMLENGTH * 3;
+    int baseStem = STANDARD_STEMLENGTH_TAB * 3;
 
     return baseStem;
 }

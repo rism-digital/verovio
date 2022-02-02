@@ -409,7 +409,8 @@ int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
         return 0;
     }
 
-    int baseStem = STANDARD_STEMLENGTH * 3;
+    int baseStem = (staff->IsTablature()) ? STANDARD_STEMLENGTH_TAB : STANDARD_STEMLENGTH;
+    baseStem *= 3;
 
     int shortening = 0;
 
