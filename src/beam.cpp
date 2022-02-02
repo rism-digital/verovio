@@ -1540,10 +1540,11 @@ void BeamElementCoord::SetDrawingStemDir(
         return;
     }
 
-    if (!m_element->Is({ CHORD, NOTE })) return;
+    // Get the interface from the chord (if any)
+    StemmedDrawingInterface *stemInterface = this->GetStemHolderInterface();
+    // Not a Chord or a Note or no TabDurSym in TabGrp
+    if (!stemInterface) return;
 
-    StemmedDrawingInterface *stemInterface = m_element->GetStemmedDrawingInterface();
-    assert(stemInterface);
     m_stem = stemInterface->GetDrawingStem();
     assert(m_stem);
 
