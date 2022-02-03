@@ -131,7 +131,7 @@ void ABCInput::ParseABC(std::istream &infile)
             // if m_div is not initialized - we didn't read X element, so continue until we do
             continue;
         }
-        if (std::string(abcLine).find_first_not_of(' ') == std::string::npos) {
+        if (abcLine.empty() || (abcLine.find_first_not_of(' ') == std::string::npos)) {
             // abc tunes are separated from each other by empty lines
             this->FlushControlElements(score, section);
             continue;
@@ -150,6 +150,10 @@ void ABCInput::ParseABC(std::istream &infile)
         else {
             this->readMusicCode(abcLine, section);
         }
+    }
+
+    if (!section->GetParent()) {
+        score->AddChild(section);
     }
 
     m_controlElements.clear();
@@ -891,8 +895,10 @@ void ABCInput::FlushControlElements(Score *score, Section *section)
         assert(measure);
         measure->AddChild(iter->second);
     }
+    if (!section->GetParent()) {
+        score->AddChild(section);
+    }
 
-    score->AddChild(section);
     m_controlElements.clear();
 }
 
