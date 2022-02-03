@@ -385,7 +385,8 @@ double System::EstimateJustificationRatio(Doc *doc)
     double estimatedRatio
         = (double)(doc->m_drawingPageContentWidth - nonJustifiableWidth) / ((double)m_castOffJustifiableWidth);
 
-    // Bounded compression
+    // Apply dampening and bound compression
+    estimatedRatio *= 0.95;
     estimatedRatio = std::max(estimatedRatio, 0.8);
 
     return estimatedRatio;
