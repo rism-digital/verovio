@@ -334,6 +334,15 @@ public:
     int m_drawingTotalWidth;
     int m_drawingJustifiableWidth;
     ///@}
+    /**
+     * @name The cast off width of the system.
+     * It is computed during castoff and used for adjusting the horizontal spacing for a given duration.
+     * This technique prevents large justification ratios and improves the horizontal layout.
+     */
+    ///@{
+    int m_castOffTotalWidth;
+    int m_castOffJustifiableWidth;
+    ///@}
 
 protected:
     /**

@@ -78,6 +78,8 @@ void System::Reset()
     m_drawingYRel = 0;
     m_drawingTotalWidth = 0;
     m_drawingJustifiableWidth = 0;
+    m_castOffTotalWidth = 0;
+    m_castOffJustifiableWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
     m_drawingIsOptimized = false;
 }
@@ -741,8 +743,14 @@ int System::AlignMeasuresEnd(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    m_drawingTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
-    m_drawingJustifiableWidth = params->m_justifiableWidth;
+    if (params->m_storeCastOffSystemWidths) {
+        m_castOffTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
+        m_castOffJustifiableWidth = params->m_justifiableWidth;
+    }
+    else {
+        m_drawingTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
+        m_drawingJustifiableWidth = params->m_justifiableWidth;
+    }
 
     return FUNCTOR_CONTINUE;
 }
