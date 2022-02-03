@@ -13,6 +13,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 
 //----------------------------------------------------------------------------
 
@@ -304,44 +305,106 @@ void ABCInput::CalcUnitNoteLength()
     }
 }
 
-void ABCInput::AddBeam()
+void ABCInput::AddLayerElement()
 {
-    if (!m_noteStack.size()) {
-        return;
-    }
-    else if (m_noteStack.size() == 1) {
-        m_layer->AddChild(m_noteStack.back());
-    }
-    else {
-        Beam *beam = new Beam();
-        for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
-            beam->AddChild(*iter);
-        }
-        if (beam->FindDescendantByType(NOTE)) {
-            m_layer->AddChild(beam);
-        }
-        else {
-            for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
-                m_layer->AddChild(*iter);
+    // exit if there is nothing to add
+    if (!m_noteStack.size()) return;
+    // if just one note in the stack - add it do the layer directly
+    if (m_noteStack.size() == 1) {
+        if (m_containerElement.m_element && (ElementType::Tuplet == m_containerElement.m_type)) {
+            m_containerElement.m_element->AddChild(m_noteStack.back());
+            if (!--m_containerElement.m_count) {
+                m_layer->AddChild(m_containerElement.m_element);
+                m_containerElement = {};
             }
         }
+        else {
+            m_layer->AddChild(m_noteStack.back());
+        }
+        m_noteStack.clear();
+        return;
     }
+    // otherwise we can have beam or tuplet (for now)
+    Beam *beam = new Beam();
+    // add stacked notes to the current element
+    for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
+        beam->AddChild(*iter);
+    }
+    if (beam->FindDescendantByType(NOTE)) {
+        LayerElement *element = NULL;
+        if (m_containerElement.m_element && (ElementType::Tuplet == m_containerElement.m_type)) {
+            element = m_containerElement.m_element;
+            element->AddChild(beam);
+            m_containerElement.m_element = NULL;
+        }
+        // otherwise default to it being beam
+        else {
+            element = beam;
+        }
+        m_layer->AddChild(element);
+        beam = NULL;
+    }
+    else {
+        for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
+            m_layer->AddChild(*iter);
+        }
+    }
+    // clean-up leftover data, if any
+    if (beam) delete beam;
+    if (m_containerElement.m_element) delete m_containerElement.m_element;
+
+    m_containerElement = {};
     m_noteStack.clear();
 }
 
-void ABCInput::AddTuplet()
+int ABCInput::ParseTuplet(const std::string &musicCode, int index)
 {
-    if (!m_noteStack.size()) {
-        return;
+    constexpr std::string_view tupletElements = "(:0123456789 ";
+    const size_t tupletEnd = musicCode.find_first_not_of(tupletElements, ++index);
+    const std::string tupletStr = musicCode.substr(index, tupletEnd - index);
+
+    Tuplet *tuplet = new Tuplet();
+    size_t separator = tupletStr.find_first_of(":");
+    // Get tuplet number first 9:_:_
+    int tupletNum = 0;
+    if (separator != std::string::npos) {
+        const std::string tupletNumStr = tupletStr.substr(0, separator);
+        tupletNum = atoi(tupletNumStr.data());
+        ++separator;
     }
     else {
-        Tuplet *tuplet = new Tuplet();
-        for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
-            tuplet->AddChild(*iter);
-        }
-        m_layer->AddChild(tuplet);
+        tupletNum = atoi(tupletStr.c_str());
     }
-    m_noteStack.clear();
+    // Get tuplet number base _:3:_
+    int tupletNumbase = 0;
+    if (separator != std::string::npos) {
+        size_t secondSeparator = tupletStr.find_first_of(":", separator);
+        if (secondSeparator != std::string::npos) {
+            if (secondSeparator != separator) {
+                std::string tupletNumbaseStr = tupletStr.substr(separator, secondSeparator - separator);
+                tupletNumbase = atoi(tupletNumbaseStr.data());
+                separator = secondSeparator + 1;
+            }
+        }
+        else {
+            std::string tupletNumbaseStr = tupletStr.substr(separator);
+            tupletNumbase = atoi(tupletNumbaseStr.data());
+            separator = secondSeparator + 1;
+        }
+    }
+    // List of tuplets with default base of 3
+    const std::unordered_set<int> threeBase = { 2, 4, 8, 9 };
+    if (!tupletNumbase) {
+        tupletNumbase = threeBase.count(tupletNum) ? 3 : 2;
+    }
+    // Get number of elements supposed to be in the tuplet _:_:9
+    // Ignore this for the time being
+    tuplet->SetNum(tupletNum);
+    tuplet->SetNumbase(tupletNumbase);
+    m_containerElement = { ElementType::Tuplet, tuplet, tupletNum };
+
+    // return index of the last element in tuplet, so that we point to the actual notes when incrementing 'i'
+    return tupletEnd - 1;
 }
 
 void ABCInput::AddAnnot(const std::string &remark)
@@ -1032,7 +1095,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
         }
         if (isspace(musicCode.at(i))) {
             // always ends a beam
-            AddBeam();
+            AddLayerElement();
         }
 
         // comments
@@ -1067,7 +1130,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
 
         // linebreaks
         else if (musicCode.at(i) == m_linebreak) {
-            AddBeam();
+            AddLayerElement();
             Sb *sb = new Sb();
             section->AddChild(sb);
         }
@@ -1092,8 +1155,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
 
         // tuplets
         else if ((i + 2 < (int)musicCode.length()) && musicCode.at(i) == '(' && isdigit(musicCode.at(i + 1))) {
-            LogWarning("ABC import: Tuplets not supported yet");
-            // AddTuplet();
+            i = ParseTuplet(musicCode, i);
         }
 
         // slurs and ties
@@ -1136,7 +1198,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             // end chord
             if (chord->GetDur() < DURATION_8) {
                 // if chord cannot be beamed, write it directly to the layer
-                if (m_noteStack.size() > 0) AddBeam();
+                if (m_noteStack.size() > 0) AddLayerElement();
                 m_layer->AddChild(chord);
             }
             else
@@ -1157,7 +1219,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             }
             // end grace group
             else {
-                if ((m_gracecount > 1) || (grace == GRACE_unacc)) AddBeam();
+                if ((m_gracecount > 1) || (grace == GRACE_unacc)) AddLayerElement();
                 grace = GRACE_NONE;
                 m_gracecount = 0;
             }
@@ -1315,7 +1377,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 note->SetDur(meiDur);
                 if (note->GetDur() < DURATION_8) {
                     // if note cannot be beamed, write it directly to the layer
-                    if (m_noteStack.size() > 0) AddBeam();
+                    if (m_noteStack.size() > 0) AddLayerElement();
                     m_layer->AddChild(note);
                 }
                 else
@@ -1395,7 +1457,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             space->SetDur(meiDur);
 
             // spaces cannot be beamed
-            AddBeam();
+            AddLayerElement();
             m_layer->AddChild(space);
         }
 
@@ -1472,7 +1534,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             rest->SetDur(meiDur);
 
             // rests cannot be beamed
-            AddBeam();
+            AddLayerElement();
             m_layer->AddChild(rest);
         }
 
@@ -1517,7 +1579,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
         // barLine
         else if (musicCode.at(i) == '|') {
             // add stacked elements to layer
-            AddBeam();
+            AddLayerElement();
             i = SetBarLine(musicCode, i);
 
             if (m_barLines.second != BARRENDITION_NONE) {
@@ -1569,7 +1631,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
     // Verovio does not support line-breaks within a layer
     // has to be refined later
     if (sysBreak && (m_linebreak != '\0') && !(section->GetLast())->Is(SB)) {
-        AddBeam();
+        AddLayerElement();
         Sb *sb = new Sb();
         sb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
         section->AddChild(sb);
