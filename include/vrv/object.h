@@ -538,9 +538,14 @@ public:
      * limit (EditorialElement objects do not count).
      * skipFirst does not call the functor or endFunctor on the first (calling) level
      */
+    ///@{
     void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
         ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
         bool skipFirst = false);
+    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
+        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
+        bool skipFirst = false) const;
+    ///@}
 
     //----------------//
     // Static methods //
@@ -1579,15 +1584,18 @@ private:
 class Functor {
 private:
     int (Object::*obj_fpt)(FunctorParams *functorParams); // pointer to member function
+    int (Object::*const_obj_fpt)(FunctorParams *functorParams) const;
 
 public:
     // constructor - takes pointer to a functor method and stores it
     Functor();
     Functor(int (Object::*_obj_fpt)(FunctorParams *));
+    Functor(int (Object::*_const_obj_fpt)(FunctorParams *) const);
     virtual ~Functor(){};
 
     // Call the internal functor method
     void Call(Object *ptr, FunctorParams *functorParams);
+    void Call(const Object *ptr, FunctorParams *functorParams);
 
 private:
     //

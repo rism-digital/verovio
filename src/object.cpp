@@ -876,6 +876,61 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
 }
 
+void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
+    int deepness, bool direction, bool skipFirst) const
+{
+    if (functor->m_returnCode == FUNCTOR_STOP) {
+        return;
+    }
+
+    // Update the current score stored in the document
+    this->UpdateDocumentScore(direction);
+
+    if (!skipFirst) {
+        functor->Call(this, functorParams);
+    }
+
+    // do not go any deeper in this case
+    if (functor->m_returnCode == FUNCTOR_SIBLINGS) {
+        functor->m_returnCode = FUNCTOR_CONTINUE;
+        return;
+    }
+    else if (this->IsEditorialElement()) {
+        // since editorial object doesn't count, we increase the deepness limit
+        deepness++;
+    }
+    if (deepness == 0) {
+        // any need to change the functor m_returnCode?
+        return;
+    }
+    deepness--;
+
+    if (!this->SkipChildren(functor)) {
+        // We need a pointer to the array for the option to work on a reversed copy
+        const ArrayOfObjects *children = &m_children;
+        if (direction == BACKWARD) {
+            for (ArrayOfObjects::const_reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
+                // we will end here if there is no filter at all or for the current child type
+                if (this->FiltersApply(filters, *iter)) {
+                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+                }
+            }
+        }
+        else {
+            for (ArrayOfObjects::const_iterator iter = children->begin(); iter != children->end(); ++iter) {
+                // we will end here if there is no filter at all or for the current child type
+                if (this->FiltersApply(filters, *iter)) {
+                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+                }
+            }
+        }
+    }
+
+    if (endFunctor && !skipFirst) {
+        endFunctor->Call(this, functorParams);
+    }
+}
+
 void Object::UpdateDocumentScore(bool direction) const
 {
     // When we are starting a new score, we need to update the current score in the document
@@ -1248,6 +1303,7 @@ Functor::Functor()
     m_returnCode = FUNCTOR_CONTINUE;
     m_visibleOnly = true;
     obj_fpt = NULL;
+    const_obj_fpt = NULL;
 }
 
 Functor::Functor(int (Object::*_obj_fpt)(FunctorParams *))
@@ -1255,12 +1311,34 @@ Functor::Functor(int (Object::*_obj_fpt)(FunctorParams *))
     m_returnCode = FUNCTOR_CONTINUE;
     m_visibleOnly = true;
     obj_fpt = _obj_fpt;
+    const_obj_fpt = NULL;
+}
+
+Functor::Functor(int (Object::*_const_obj_fpt)(FunctorParams *) const)
+{
+    m_returnCode = FUNCTOR_CONTINUE;
+    m_visibleOnly = true;
+    obj_fpt = NULL;
+    const_obj_fpt = _const_obj_fpt;
 }
 
 void Functor::Call(Object *ptr, FunctorParams *functorParams)
 {
-    // we should have return codes (not just bool) for avoiding to go further down the tree in some cases
-    m_returnCode = (*ptr.*obj_fpt)(functorParams);
+    if (const_obj_fpt) {
+        m_returnCode = (ptr->*const_obj_fpt)(functorParams);
+    }
+    else {
+        m_returnCode = (ptr->*obj_fpt)(functorParams);
+    }
+}
+
+void Functor::Call(const Object *ptr, FunctorParams *functorParams)
+{
+    if (!const_obj_fpt && obj_fpt) {
+        LogError("Non-const functor cannot be called from a const method!");
+        assert(false);
+    }
+    m_returnCode = (ptr->*const_obj_fpt)(functorParams);
 }
 
 //----------------------------------------------------------------------------
