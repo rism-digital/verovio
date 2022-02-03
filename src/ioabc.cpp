@@ -1041,12 +1041,15 @@ void ABCInput::parseLyrics()
                 ++counter;
                 ++found;
             }
+            --found;
         }
         // separate syllable from delimeters to form syl that we want to add
         syl = abcLine.substr(start, found - start);
         syl.erase(std::remove_if(syl.begin(), syl.end(), [](unsigned char x) { return x == '_'; }), syl.end());
         std::replace(syl.begin(), syl.end(), '~', ' ');
-        syllables.push_back({ syl, counter });
+        if (!syl.empty()) {
+            syllables.push_back({ syl, counter });
+        }
 
         // find next delimeter in the string
         start = found + 1;
@@ -1062,10 +1065,10 @@ void ABCInput::parseLyrics()
     // Iterate over notes and syllables simultaneously. Move through note array using counters for each syllable, moving
     // for several notes if syllable needs to be held
     for (int i = 0, j = 0; (i < m_lineNoteArray.size()) && (j < syllables.size()); ++j) {
-        if (m_lineNoteArray.at(i)->IsGraceNote()) {
+        while (m_lineNoteArray.at(i)->IsGraceNote() && (i < m_lineNoteArray.size())) {
             ++i;
-            continue;
         }
+        if (i >= m_lineNoteArray.size()) break;
         Text *sylText = new Text();
         sylText->SetText(UTF8to16(syllables.at(j).first));
         Syl *syl = new Syl();
