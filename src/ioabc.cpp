@@ -335,12 +335,14 @@ void ABCInput::AddLayerElement()
         if (m_containerElement.m_element && (ElementType::Tuplet == m_containerElement.m_type)) {
             element = m_containerElement.m_element;
             element->AddChild(beam);
+            m_containerElement.m_element = NULL;
         }
         // otherwise default to it being beam
         else {
             element = beam;
         }
         m_layer->AddChild(element);
+        beam = NULL;
     }
     else {
         for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
@@ -348,9 +350,8 @@ void ABCInput::AddLayerElement()
         }
     }
     // clean-up leftover data, if any
-    if (beam && !beam->GetChildCount()) delete beam;
-    if (m_containerElement.m_element && !m_containerElement.m_element->GetChildCount())
-        delete m_containerElement.m_element;
+    if (beam) delete beam;
+    if (m_containerElement.m_element) delete m_containerElement.m_element;
 
     m_containerElement = {};
     m_noteStack.clear();
