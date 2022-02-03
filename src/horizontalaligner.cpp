@@ -1252,7 +1252,7 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         iter->second->SetGraceAligmentXPos(params->m_doc);
     }
 
-    this->SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
+    this->SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR * params->m_estimatedJustificationRatio);
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
 

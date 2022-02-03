@@ -371,6 +371,26 @@ bool System::IsLastOfMdiv()
     return (nextSibling && nextSibling->IsPageElement());
 }
 
+double System::EstimateJustificationRatio(Doc *doc)
+{
+    assert(doc);
+
+    // We can only estimate if cast off system widths are available
+    if ((m_castOffTotalWidth == 0) || (m_castOffJustifiableWidth == 0)) {
+        return 1.0;
+    }
+
+    const double nonJustifiableWidth
+        = m_systemLeftMar + m_systemRightMar + m_castOffTotalWidth - m_castOffJustifiableWidth;
+    double estimatedRatio
+        = (double)(doc->m_drawingPageContentWidth - nonJustifiableWidth) / ((double)m_castOffJustifiableWidth);
+
+    // Bounded compression
+    estimatedRatio = std::max(estimatedRatio, 0.8);
+
+    return estimatedRatio;
+}
+
 void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
 {
     assert(doc);
@@ -551,6 +571,19 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functorEnd, params);
 
     return FUNCTOR_SIBLINGS;
+}
+
+int System::SetAlignmentXPos(FunctorParams *functorParams)
+{
+    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    assert(params);
+
+    const double ratio = this->EstimateJustificationRatio(params->m_doc);
+    if (!this->IsLastOfMdiv() || (ratio < params->m_estimatedJustificationRatio)) {
+        params->m_estimatedJustificationRatio = ratio;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 int System::AdjustXOverflow(FunctorParams *functorParams)
