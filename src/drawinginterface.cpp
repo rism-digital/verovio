@@ -18,6 +18,7 @@
 #include "layerelement.h"
 #include "note.h"
 #include "object.h"
+#include "staff.h"
 
 namespace vrv {
 
@@ -498,6 +499,20 @@ int BeamDrawingInterface::GetPosition(Object *object, LayerElement *element)
         if (chord) position = this->GetListIndex(chord);
     }
     return position;
+}
+
+void BeamDrawingInterface::GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below)
+{
+    if (m_beamStaff && m_crossStaffContent) {
+        if (m_crossStaffRel == STAFFREL_basic_above) {
+            above = m_crossStaffContent->GetAlignment();
+            below = m_beamStaff->GetAlignment();
+        }
+        else {
+            above = m_beamStaff->GetAlignment();
+            below = m_crossStaffContent->GetAlignment();
+        }
+    }
 }
 
 //----------------------------------------------------------------------------
