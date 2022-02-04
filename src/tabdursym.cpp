@@ -131,12 +131,34 @@ int TabDurSym::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 int TabDurSym::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
+    Flag *currentFlag = NULL;
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!currentStem) {
         currentStem = new Stem();
         this->AddChild(currentStem);
     }
     this->SetDrawingStem(currentStem);
+    
+    /************ flags ***********/
+
+    TabGrp *tabGrp = vrv_cast<TabGrp *>(this->GetFirstAncestor(TABGRP));
+    assert(tabGrp);
+
+    // No flag within beam of for durations longer than 8th notes
+    if (!this->IsInBeam() && tabGrp->GetActualDur() > DUR_4) {
+        // We must have a stem at this stage
+        assert(currentStem);
+        if (!currentFlag) {
+            currentFlag = new Flag();
+            currentStem->AddChild(currentFlag);
+        }
+    }
+    // This will happen only if the duration has changed (no flag required anymore)
+    else if (currentFlag) {
+        assert(currentStem);
+        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
+    }
 
     return FUNCTOR_SIBLINGS;
 }
@@ -223,6 +245,15 @@ int TabDurSym::CalcStem(FunctorParams *functorParams)
     }
 
     stem->SetDrawingStemLen(stemSize);
+
+    // Flag currently used only for gitar tablature because it is included in the glyphs for lute tab
+    if (params->m_staff->IsTabGuitar()) {
+        Flag *flag = vrv_cast<Flag *>(stem->GetFirst(FLAG));
+        if (flag) {
+            flag->m_drawingNbFlags = params->m_dur - DUR_4;
+            flag->SetDrawingYRel(-stemSize);
+        }
+    }
 
     // Do not call Stem::CalcStem with TabDurSym because everything is done here
     return FUNCTOR_SIBLINGS;

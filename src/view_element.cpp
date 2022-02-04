@@ -890,7 +890,7 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     dc->StartGraphic(element, "", element->GetUuid());
 
     wchar_t code = flag->GetFlagGlyph(stem->GetDrawingStemDir());
-    this->DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, flag->GetDrawingCueSize());
+    this->DrawSmuflCode(dc, x, y, code, staff->GetDrawingStaffNotationSize(), flag->GetDrawingCueSize());
 
     dc->EndGraphic(element, this);
 }
