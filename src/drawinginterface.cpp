@@ -503,7 +503,6 @@ int BeamDrawingInterface::GetPosition(Object *object, LayerElement *element)
 
 void BeamDrawingInterface::GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below)
 {
-
     if (!m_beamStaff || !m_crossStaffContent) return;
 
     if (m_drawingPlace == BEAMPLACE_mixed) {
