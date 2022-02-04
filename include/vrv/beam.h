@@ -227,12 +227,11 @@ public:
     Beam *GetStemSameasBeam() const { return m_stemSameas; }
     void SetStemSameasBeam(Beam *stemSameas) { m_stemSameas = stemSameas; }
     ///@}
-	
+
     /**
      * See DrawingInterface::GetAdditionalBeamCount
      */
     std::pair<int, int> GetAdditionalBeamCount() const override;
-
 
     //----------//
     // Functors //

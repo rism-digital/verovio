@@ -510,7 +510,6 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
         overflowSum += adjust;
     }
 
-
     BoundingBox *previous = prevAlignment->GetOverflowBBoxBelow();
     BoundingBox *current = this->GetOverflowBBoxAbove();
     if (previous && current) {
