@@ -120,6 +120,7 @@ public:
     }
     ///@}
 
+    virtual BeamDrawingInterface *GetBeamDrawingInterface() { return NULL; }
     virtual DurationInterface *GetDurationInterface() { return NULL; }
     virtual LinkingInterface *GetLinkingInterface() { return NULL; }
     virtual FacsimileInterface *GetFacsimileInterface() { return NULL; }
