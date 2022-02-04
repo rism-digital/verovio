@@ -99,7 +99,7 @@ bool ABCInput::Import(const std::string &abc)
 // parseABC --
 //
 
-void ABCInput::ParseABC(std::istream &infile) 
+void ABCInput::ParseABC(std::istream &infile)
 {
     // initialize doc
     m_doc->Reset();
@@ -107,6 +107,7 @@ void ABCInput::ParseABC(std::istream &infile)
 
     Score *score = NULL;
     Section *section = NULL;
+    CreateHeader();
     while (!infile.eof()) {
         std::getline(infile, abcLine);
         ++m_lineNum;
@@ -902,7 +903,6 @@ void ABCInput::FlushControlElements(Score *score, Section *section)
     m_controlElements.clear();
 }
 
-
 void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
 {
     // create score
@@ -925,13 +925,13 @@ void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
         m_meter = NULL;
     }
     staffGrp->AddChild(staffDef);
+    // create page head
+    this->PrintInformationFields(score);
     score->GetScoreDef()->AddChild(staffGrp);
     if (m_key) {
         score->GetScoreDef()->AddChild(m_key);
         m_key = NULL;
     }
-    // create page head
-    this->PrintInformationFields(score);
 
     // create section
     section = new Section();
@@ -982,7 +982,7 @@ void ABCInput::readInformationField(const char &dataKey, std::string value)
         case 'B': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
         case 'C': m_composer.push_back(std::make_pair(value, m_lineNum)); break;
         case 'D': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
-        case 'F': m_filename = value; break;
+        case 'F': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
         case 'H': m_history.push_back(std::make_pair(value, m_lineNum)); break;
         case 'I': parseInstruction(value); break;
         case 'K': parseKey(value); break;
