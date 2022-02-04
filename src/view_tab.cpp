@@ -192,7 +192,8 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
 
     if (tabGrp->HasDots()) {
-        y += m_doc->GetDrawingUnit(glyphSize) * 0.5;
+        const int stemDirFactor = (tabDurSym->GetDrawingStemDir() == STEMDIRECTION_down) ? -1 : 1;
+        y += m_doc->GetDrawingUnit(glyphSize) * 0.5 * stemDirFactor;
         x += m_doc->GetDrawingUnit(glyphSize);
         for (int i = 0; i < tabGrp->GetDots(); ++i) {
             this->DrawDot(dc, x, y, glyphSize * 2 / 3);
