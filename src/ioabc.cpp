@@ -404,7 +404,7 @@ int ABCInput::ParseTuplet(const std::string &musicCode, int index)
     m_containerElement = { ElementType::Tuplet, tuplet, tupletNum };
 
     // return index of the last element in tuplet, so that we point to the actual notes when incrementing 'i'
-    return tupletEnd - 1;
+    return static_cast<int>(tupletEnd) - 1;
 }
 
 void ABCInput::AddAnnot(const std::string &remark)
