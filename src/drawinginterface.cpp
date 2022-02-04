@@ -501,6 +501,37 @@ int BeamDrawingInterface::GetPosition(Object *object, LayerElement *element)
     return position;
 }
 
+void BeamDrawingInterface::GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below)
+{
+
+    if (!m_beamStaff || !m_crossStaffContent) return;
+
+    if (m_drawingPlace == BEAMPLACE_mixed) {
+        above = NULL;
+        below = NULL;
+    }
+    // Beam below - ignore above and find the appropriate below staff
+    else if (m_drawingPlace == BEAMPLACE_below) {
+        above = NULL;
+        if (m_crossStaffRel == STAFFREL_basic_above) {
+            below = m_beamStaff->GetAlignment();
+        }
+        else {
+            below = m_crossStaffContent->GetAlignment();
+        }
+    }
+    // Beam above - ignore below and find the appropriate above staff
+    else if (m_drawingPlace == BEAMPLACE_above) {
+        below = NULL;
+        if (m_crossStaffRel == STAFFREL_basic_below) {
+            above = m_beamStaff->GetAlignment();
+        }
+        else {
+            above = m_crossStaffContent->GetAlignment();
+        }
+    }
+}
+
 void BeamDrawingInterface::GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below)
 {
     if (m_beamStaff && m_crossStaffContent) {

@@ -468,11 +468,6 @@ private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticType type);
 
     /**
-     * Template for getting above/below overflow for BeamType elements (BEAM or FTREM)
-     */
-    template <class BeamType> void GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below);
-
-    /**
      * Get above/below overflow for the chord elements
      */
     void GetChordOverflow(StaffAlignment *&above, StaffAlignment *&below, int staffN);

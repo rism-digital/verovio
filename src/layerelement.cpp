@@ -305,49 +305,10 @@ void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlign
         }
     }
     // Beams in cross-staff situation need special treatment
-    else if (this->Is(BEAM)) {
-        this->GetBeamOverflow<Beam>(above, below);
-    }
-    else if (this->Is(FTREM)) {
-        this->GetBeamOverflow<FTrem>(above, below);
-    }
-}
-
-template <class BeamType> void LayerElement::GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below)
-{
-    if (!this->Is({ BEAM, FTREM })) return;
-
-    BeamType *beam = vrv_cast<BeamType *>(this);
-    assert(beam);
-    // Beam between the staves - ignore both above and below
-    if (!beam->m_crossStaffContent || beam->m_crossStaff) return;
-
-    data_STAFFREL_basic direction = beam->m_crossStaffRel;
-    if (beam->m_drawingPlace == BEAMPLACE_mixed) {
-        above = NULL;
-        below = NULL;
-    }
-    // Beam below - ignore above and find the appropriate below staff
-    else if (beam->m_drawingPlace == BEAMPLACE_below) {
-        above = NULL;
-        if (direction == STAFFREL_basic_above) {
-            below = beam->m_beamStaff->GetAlignment();
-        }
-        else {
-            below = beam->m_crossStaffContent->GetAlignment();
-        }
-    }
-    // Beam above - ignore below and find the appropriate above staff
-    else if (beam->m_drawingPlace == BEAMPLACE_above) {
-        below = NULL;
-        if (direction == STAFFREL_basic_below) {
-            above = beam->m_beamStaff->GetAlignment();
-        }
-        else {
-            above = beam->m_crossStaffContent->GetAlignment();
-        }
-    }
-}
+    else if (this->Is({ BEAM, FTREM }) && !m_crossStaff) {
+        BeamDrawingInterface *interface = this->GetBeamDrawingInterface();
+        assert(interface);
+        interface->GetBeamOverflow(above, below);
     }
 }
 
