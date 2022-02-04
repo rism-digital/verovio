@@ -21,13 +21,11 @@
 
 namespace vrv {
 
-enum class NoteDirection { none, upward, downward };
-
 // helper for determining note direction
-NoteDirection GetNoteDirection(int leftNoteX, int rightNoteX)
+data_STEMDIRECTION GetNoteDirection(int leftNoteY, int rightNoteY)
 {
-    if (leftNoteX == rightNoteX) return NoteDirection::none;
-    return (leftNoteX < rightNoteX) ? NoteDirection::upward : NoteDirection::downward;
+    if (leftNoteY == rightNoteY) return STEMDIRECTION_NONE;
+    return (leftNoteY < rightNoteY) ? STEMDIRECTION_up : STEMDIRECTION_down;
 }
 
 //----------------------------------------------------------------------------
@@ -359,10 +357,10 @@ bool BeamDrawingInterface::IsHorizontalMixedBeam(
 
     int previousTop = VRV_UNSET;
     int previousBottom = VRV_UNSET;
-    NoteDirection outsidePitchDirection = GetNoteDirection(items.front(), items.back());
-    std::map<NoteDirection, int> beamDirections{ { NoteDirection::none, 0 }, { NoteDirection::upward, 0 },
-        { NoteDirection::downward, 0 } };
-    for (int i = 0; i < items.size(); ++i) {
+    data_STEMDIRECTION outsidePitchDirection = GetNoteDirection(items.front(), items.back());
+    std::map<data_STEMDIRECTION, int> beamDirections{ { STEMDIRECTION_NONE, 0 }, { STEMDIRECTION_up, 0 },
+        { STEMDIRECTION_down, 0 } };
+    for (int i = 0; i < (int)items.size(); ++i) {
         if (directions[i] == BEAMPLACE_above) {
             if (previousTop == VRV_UNSET) {
                 previousTop = items[i];
