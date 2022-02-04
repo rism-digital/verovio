@@ -141,12 +141,12 @@ public:
      * Helper to get number of beams represented by attributes @beam and @beam.float
      */
     virtual std::pair<int, int> GetFloatingBeamCount() const { return { 0, 0 }; }
-    
+
     /**
      * Get above/below overflow
      */
     void GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below);
-    
+
     /**
      * Get above/below overflow for the children
      */
@@ -159,7 +159,6 @@ protected:
      */
     int GetPosition(Object *object, LayerElement *element);
 
-    
     //
 private:
     /**
