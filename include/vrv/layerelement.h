@@ -467,6 +467,22 @@ protected:
 private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticType type);
 
+    /**
+     * Template for getting above/below overflow for BeamType elements (BEAM or FTREM)
+     */
+    template <class BeamType> void GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below);
+
+    /**
+     * Template for getting above/below overflow for children of BeamType elements (BEAM or FTREM)
+     */
+    template <class BeamType>
+    void GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below, BeamType *parent);
+
+    /**
+     * Get above/below overflow for the chord elements
+     */
+    void GetChordOverflow(StaffAlignment *&above, StaffAlignment *&below, int staffN);
+
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;

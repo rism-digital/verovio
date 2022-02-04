@@ -132,12 +132,30 @@ public:
      */
     void ClearCoords();
 
+    /**
+     * Helper to find number of additional beams. Return { additional beams above main beam, additional beams below }
+     */
+    virtual std::pair<int, int> GetAdditionalBeamCount() const { return { 0, 0 }; }
+
+    /**
+     * Helper to get number of beams represented by attributes @beam and @beam.float
+     */
+    virtual std::pair<int, int> GetFloatingBeamCount() const { return { 0, 0 }; }
+
 protected:
     /**
      * Return the position of the element in the beam.
      * For notes, lookup the position of the parent chord.
      */
     int GetPosition(Object *object, LayerElement *element);
+
+    //
+private:
+    /**
+     * Determines whether beam should be horizontal based on item positions and relative beam place. Should be used with
+     * mixed beams, where beam place can be different for separate elements
+     */
+    bool IsHorizontal(const std::vector<int> &items, const std::vector<data_BEAMPLACE> &directions) const;
 
 public:
     // values to be set before calling CalcBeam
