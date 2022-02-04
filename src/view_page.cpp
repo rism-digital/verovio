@@ -1052,9 +1052,9 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
 
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
     const ArrayOfObjects *childList = meterSigGrp->GetList(meterSigGrp);
-    
+
     const int glyphSize = staff->GetDrawingStaffNotationSize();
-    
+
     const int unit = m_doc->GetDrawingUnit(glyphSize);
     int offset = 0;
     dc->StartGraphic(meterSigGrp, "", meterSigGrp->GetUuid());

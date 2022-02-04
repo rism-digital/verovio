@@ -1073,7 +1073,7 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
 
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = meterSig->GetDrawingX() + horizOffset;
-    
+
     const int glyphSize = staff->GetDrawingStaffNotationSize();
 
     if (enclosingFront) {
@@ -1775,7 +1775,7 @@ int View::DrawMeterSigFigures(
         timeSigCombNumerator += IntToTimeSigFigures(summand);
     }
     if (den) timeSigCombDenominator = IntToTimeSigFigures(den);
-    
+
     const int glyphSize = staff->GetDrawingStaffNotationSize();
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
@@ -1806,8 +1806,7 @@ int View::DrawMeterSigFigures(
             yDen = y - denExtend.m_height / 2;
         }
         this->DrawSmuflString(dc, x, yNum, timeSigCombNumerator, HORIZONTALALIGNMENT_center, glyphSize);
-        this->DrawSmuflString(
-            dc, x, yDen, timeSigCombDenominator, HORIZONTALALIGNMENT_center, glyphSize);
+        this->DrawSmuflString(dc, x, yDen, timeSigCombDenominator, HORIZONTALALIGNMENT_center, glyphSize);
     }
     else {
         this->DrawSmuflString(dc, x, y, timeSigCombNumerator, HORIZONTALALIGNMENT_center, glyphSize);

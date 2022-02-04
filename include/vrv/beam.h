@@ -107,6 +107,8 @@ private:
     bool CalcBeamSlope(
         Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step);
 
+    void CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int step);
+
     void CalcBeamPosition(Doc *doc, Staff *staff, Layer *layer, BeamDrawingInterface *beamInterface, bool isHorizontal);
 
     void CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
@@ -132,6 +134,12 @@ private:
     // Helper to set the stem values for tablature
     void CalcSetStemValuesTab(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
+    // Helper to calculate max/min beam points for the relative beam place
+    std::pair<int, int> CalcBeamRelativeMinMax(data_BEAMPLACE place) const;
+
+    // Calculate positioning for the horizontal beams
+    void CalcHorizontalBeam(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
+
     // Helper to calculate relative position of the beam to for each of the coordinates
     void CalcMixedBeamPlace(Staff *staff);
 
@@ -142,7 +150,7 @@ private:
     void CalcSetValues();
 
     // Helper to check wheter beam fits within certain bounds
-    bool DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, int bottomOffset);
+    bool DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, int bottomOffset, bool isCrossStaff = false);
 
     // Helper to check mixed beam positioning compared to other elements (ledger lines, staff) and adjust it accordingly
     bool NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
@@ -217,6 +225,7 @@ public:
     const ArrayOfBeamElementCoords *GetElementCoords();
 
     /**
+
      * Return true if the beam has a tabGrp child.
      * In that case, the ObjectList will only have tabGrp elements. See Beam::FilterList
      */
@@ -230,6 +239,11 @@ public:
     Beam *GetStemSameasBeam() const { return m_stemSameas; }
     void SetStemSameasBeam(Beam *stemSameas) { m_stemSameas = stemSameas; }
     ///@}
+
+    /**
+     * See DrawingInterface::GetAdditionalBeamCount
+     */
+    std::pair<int, int> GetAdditionalBeamCount() const override;
 
     //----------//
     // Functors //
