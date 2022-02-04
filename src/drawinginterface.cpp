@@ -299,7 +299,7 @@ bool BeamDrawingInterface::IsHorizontal()
     if (first == last) return true;
 
     // If drawing place is mixed and is should be drawn horizontal based on mixed rules
-    if ((m_drawingPlace == BEAMPLACE_mixed) && (IsHorizontal(items, directions))) return true;
+    if ((m_drawingPlace == BEAMPLACE_mixed) && (this->IsHorizontalMixedBeam(items, directions))) return true;
 
     // Detect beam with two pitches only and as step at the beginning or at the end
     const bool firstStep = (first != items.at(1));
@@ -335,7 +335,7 @@ bool BeamDrawingInterface::IsHorizontal()
     return false;
 }
 
-bool BeamDrawingInterface::IsHorizontal(
+bool BeamDrawingInterface::IsHorizontalMixedBeam(
     const std::vector<int> &items, const std::vector<data_BEAMPLACE> &directions) const
 {
     // items and directions should be of the same size, otherwise something is wrong
