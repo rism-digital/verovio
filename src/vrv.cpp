@@ -46,7 +46,6 @@
 //----------------------------------------------------------------------------
 
 #include "checked.h"
-#include "jsonxx.h"
 #include "pugixml.hpp"
 #include "unchecked.h"
 
@@ -134,45 +133,6 @@ wchar_t Resources::GetGlyphCode(const std::string &smuflName)
     return s_glyphNameTable.count(smuflName) ? s_glyphNameTable.at(smuflName) : 0;
 }
 
-std::map<wchar_t, wchar_t> Resources::GetGlyphRanges()
-{
-    constexpr std::string_view input = "fontmetadata.json";
-    constexpr std::string_view glyphRanges = "glyphRanges";
-    constexpr std::string_view rangeStart = "rangeStart";
-    constexpr std::string_view rangeEnd = "rangeEnd";
-
-    jsonxx::Object content;
-    // Input is file path
-    std::ifstream in(Resources::GetPath() + "/" + input.data());
-    if (!in.is_open()) {
-        return {};
-    }
-    const bool parseResult = content.parse(in);
-    in.close();
-    if (!parseResult) return {};
-
-    if (content.kv_map().empty() || !content.kv_map().count(glyphRanges.data())
-        || !content.kv_map().at(glyphRanges.data())->is<jsonxx::Array>())
-        return {};
-
-    const jsonxx::Array jsonRanges = content.kv_map().at(glyphRanges.data())->get<jsonxx::Array>();
-    std::map<wchar_t, wchar_t> result;
-    for (const auto element : jsonRanges.values()) {
-        if (!element->is<jsonxx::Object>()) continue;
-
-        auto range = element->get<jsonxx::Object>().kv_map();
-        if (!range.count(rangeStart.data()) || !range.at(rangeStart.data())->is<jsonxx::String>()) continue;
-        if (!range.count(rangeEnd.data()) || !range.at(rangeEnd.data())->is<jsonxx::String>()) continue;
-
-        const wchar_t start = (wchar_t)strtol(range.at(rangeStart.data())->get<jsonxx::String>().c_str(), NULL, 16);
-        const wchar_t end = (wchar_t)strtol(range.at(rangeEnd.data())->get<jsonxx::String>().c_str(), NULL, 16);
-
-        result[start] = end;
-    }
-
-    return result;
-}
-
 void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle)
 {
     if (fontWeight == FONTWEIGHT_NONE) {
@@ -222,20 +182,10 @@ bool Resources::LoadFont(const std::string &fontName)
 
     const int unitsPerEm = atoi(root.attribute("units-per-em").value());
 
-    const std::map<wchar_t, wchar_t> ranges = GetGlyphRanges();
     for (pugi::xml_node current = root.child("g"); current; current = current.next_sibling("g")) {
         pugi::xml_attribute c_attribute = current.attribute("c");
         pugi::xml_attribute n_attribute = current.attribute("n");
         if (!c_attribute || !n_attribute) continue;
-
-        const wchar_t smuflCode = (wchar_t)strtol(c_attribute.value(), NULL, 16);
-        if (!ranges.empty()) {
-            const auto it
-                = std::find_if(ranges.begin(), ranges.end(), [smuflCode](const std::pair<wchar_t, wchar_t> &keyValue) {
-                      return (smuflCode >= keyValue.first) && (smuflCode <= keyValue.second);
-                  });
-            if (it == ranges.end()) continue;
-        }
 
         Glyph glyph;
         glyph.SetUnitsPerEm(unitsPerEm * 10);
@@ -259,6 +209,7 @@ bool Resources::LoadFont(const std::string &fontName)
             }
         }
 
+        const wchar_t smuflCode = (wchar_t)strtol(c_attribute.value(), NULL, 16);
         s_fontGlyphTable[smuflCode] = glyph;
         s_glyphNameTable[n_attribute.value()] = smuflCode;
     }
