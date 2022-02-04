@@ -1436,7 +1436,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     }
     else if (this->Is(TABDURSYM)) {
         int yRel = 0;
-        if (staffY->IsTabWithBeamOutside()) {
+        if (staffY->IsTabWithStemsOutside()) {
             double spacingRatio = (staffY->IsTabLuteFrench()) ? 2.0 : 1.0;
             yRel += params->m_doc->GetDrawingUnit(staffY->m_drawingStaffSize) * spacingRatio;
         }

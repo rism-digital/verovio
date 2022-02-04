@@ -226,7 +226,7 @@ bool Staff::IsTablature()
     return isTablature;
 }
 
-bool Staff::IsTabWithBeamOutside()
+bool Staff::IsTabWithStemsOutside()
 {
     if (!m_drawingStaffDef) return false;
     // Temporary implementation looking at staffDef@type

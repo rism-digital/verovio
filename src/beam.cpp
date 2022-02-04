@@ -105,7 +105,7 @@ void BeamSegment::CalcBeam(
 
         // Alwyas horizontal when outside the staff and not when inside the staff
         // Eventually we will need to look at the content to pre-determine if horizontal for inside beams
-        horizontal = staff->IsTabWithBeamOutside();
+        horizontal = staff->IsTabWithStemsOutside();
         this->CalcBeamPlaceTab(layer, staff, doc, beamInterface, place);
     }
     else {
@@ -836,7 +836,7 @@ void BeamSegment::CalcBeamPosition(
     }
 
     // Nothing else to do with tab beams outside the staff
-    if (staff->IsTablature() && staff->IsTabWithBeamOutside()) return;
+    if (staff->IsTablature() && staff->IsTabWithStemsOutside()) return;
 
     /******************************************************************/
     // Calculate the slope is necessary
@@ -1152,7 +1152,7 @@ void BeamSegment::CalcBeamPlaceTab(
         beamInterface->m_drawingPlace = (layerStemDir == STEMDIRECTION_down) ? BEAMPLACE_below : BEAMPLACE_above;
     }
 
-    if (beamInterface->m_drawingPlace == BEAMPLACE_below && staff->IsTabWithBeamOutside()) {
+    if (beamInterface->m_drawingPlace == BEAMPLACE_below && staff->IsTabWithStemsOutside()) {
         for (auto coord : m_beamElementCoordRefs) {
             if (!coord->m_element || !coord->m_element->Is(TABGRP)) continue;
             TabGrp *tabGrp = vrv_cast<TabGrp *>(coord->m_element);
@@ -1168,7 +1168,7 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
     const data_STEMDIRECTION stemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     int relevantNoteLoc = VRV_UNSET;
     for (auto coord : m_beamElementCoordRefs) {
-        coord->SetClosestNoteOrTabDurSym(stemDir, staff->IsTabWithBeamOutside());
+        coord->SetClosestNoteOrTabDurSym(stemDir, staff->IsTabWithStemsOutside());
         // Nothing else to do if we have no closest note (that includes tab beams outside the staff)
         if (!coord->m_closestNote) continue;
         if (relevantNoteLoc == VRV_UNSET) {

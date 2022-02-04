@@ -85,7 +85,7 @@ void TabDurSym::AdjustDrawingYRel(Staff *staff, Doc *doc)
     int yRel = (staff->m_drawingLines - 1) * doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     // For stems outside add a margin to the tabDurSym - otherwise attached to the staff line
-    if (staff->IsTabWithBeamOutside()) {
+    if (staff->IsTabWithStemsOutside()) {
         double spacingRatio = (staff->IsTabLuteFrench()) ? 2.0 : 1.0;
         yRel += doc->GetDrawingUnit(staff->m_drawingStaffSize) * spacingRatio;
     }
@@ -119,7 +119,7 @@ int TabDurSym::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
     if (staff->IsTabGuitar()) baseStem += 3;
 
     // One unit longer for stems inside the staff
-    if (!staff->IsTabWithBeamOutside()) baseStem += 3;
+    if (!staff->IsTabWithStemsOutside()) baseStem += 3;
 
     return baseStem;
 }
@@ -197,7 +197,7 @@ int TabDurSym::CalcStem(FunctorParams *functorParams)
         stemDirFactor = 1;
     }
 
-    if (params->m_staff->IsTabWithBeamOutside()) {
+    if (params->m_staff->IsTabWithStemsOutside()) {
         // Make sure the relative position of the stem is the same
         stem->SetDrawingYRel(0);
     }
