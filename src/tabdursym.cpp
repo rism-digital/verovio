@@ -16,7 +16,9 @@
 #include "elementpart.h"
 #include "functorparams.h"
 #include "layer.h"
+#include "note.h"
 #include "staff.h"
+#include "tabgrp.h"
 
 namespace vrv {
 
@@ -82,8 +84,11 @@ void TabDurSym::AdjustDrawingYRel(Staff *staff, Doc *doc)
 
     int yRel = (staff->m_drawingLines - 1) * doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-    double spacingRatio = (staff->IsTabLuteFrench()) ? 2.0 : 1.0;
-    yRel += doc->GetDrawingUnit(staff->m_drawingStaffSize) * spacingRatio;
+    // For stems outside add a margin to the tabDurSym - otherwise attached to the staff line
+    if (staff->IsTabWithBeamOutside()) {
+        double spacingRatio = (staff->IsTabLuteFrench()) ? 2.0 : 1.0;
+        yRel += doc->GetDrawingUnit(staff->m_drawingStaffSize) * spacingRatio;
+    }
 
     this->SetDrawingYRel(-yRel);
 }
@@ -110,7 +115,11 @@ int TabDurSym::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
 
     int baseStem = STANDARD_STEMLENGTH_TAB * 3;
 
-    if (!staff->IsTabWithBeamOutside()) baseStem += 6;
+    // One unit longer for guitar tablature
+    if (staff->IsTabGuitar()) baseStem += 3;
+
+    // One unit longer for stems inside the staff
+    if (!staff->IsTabWithBeamOutside()) baseStem += 3;
 
     return baseStem;
 }
@@ -188,17 +197,34 @@ int TabDurSym::CalcStem(FunctorParams *functorParams)
         stemDirFactor = 1;
     }
 
-    // Make sure the relative position of the stem is the same
-    stem->SetDrawingYRel(0);
+    if (params->m_staff->IsTabWithBeamOutside()) {
+        // Make sure the relative position of the stem is the same
+        stem->SetDrawingYRel(0);
+    }
+    else {
+        // Other wise attach it to the closest note
+        TabGrp *tabGrp = vrv_cast<TabGrp *>(this->GetFirstAncestor(TABGRP));
+        assert(tabGrp);
+        Note *note = (stemDir == STEMDIRECTION_down) ? tabGrp->GetBottomNote() : tabGrp->GetTopNote();
+        int yRel = (note) ? note->GetDrawingY() : 0;
+        // Because the tabDurSym is relative to the top or bottom staff line, remove its relative value
+        yRel -= this->GetDrawingYRel();
+        // Remove a unit for the stem not to go to the center of the note
+        yRel -= params->m_doc->GetDrawingUnit(params->m_staff->m_drawingStaffSize) * stemDirFactor;
+        stem->SetDrawingYRel(yRel);
+    }
+
     int stemSize = this->CalcStemLenInThirdUnits(params->m_staff, stemDir) * params->m_doc->GetDrawingUnit(staffSize);
     stemSize /= (3 * stemDirFactor);
 
     if (params->m_dur == DUR_2) {
+        // Stems for half notes twice shorter
         stemSize /= 2;
     }
 
     stem->SetDrawingStemLen(stemSize);
 
+    // Do not call Stem::CalcStem with TabDurSym because everything is done here
     return FUNCTOR_SIBLINGS;
 }
 
