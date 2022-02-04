@@ -139,7 +139,7 @@ int TabDurSym::PrepareLayerElementParts(FunctorParams *functorParams)
         this->AddChild(currentStem);
     }
     this->SetDrawingStem(currentStem);
-    
+
     /************ flags ***********/
 
     TabGrp *tabGrp = vrv_cast<TabGrp *>(this->GetFirstAncestor(TABGRP));
@@ -228,7 +228,7 @@ int TabDurSym::CalcStem(FunctorParams *functorParams)
         TabGrp *tabGrp = vrv_cast<TabGrp *>(this->GetFirstAncestor(TABGRP));
         assert(tabGrp);
         Note *note = (stemDir == STEMDIRECTION_down) ? tabGrp->GetBottomNote() : tabGrp->GetTopNote();
-        int yRel = (note) ? note->GetDrawingY() : 0;
+        int yRel = (note) ? note->GetDrawingYRel() : 0;
         // Because the tabDurSym is relative to the top or bottom staff line, remove its relative value
         yRel -= this->GetDrawingYRel();
         // Remove a unit for the stem not to go to the center of the note

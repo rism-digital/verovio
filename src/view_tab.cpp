@@ -17,6 +17,7 @@
 
 #include "devicecontext.h"
 #include "doc.h"
+#include "elementpart.h"
 #include "note.h"
 #include "options.h"
 #include "rend.h"
@@ -193,6 +194,9 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     if (tabGrp->HasDots()) {
         const int stemDirFactor = (tabDurSym->GetDrawingStemDir() == STEMDIRECTION_down) ? -1 : 1;
+        if (tabDurSym->GetDrawingStem()) {
+            y = tabDurSym->GetDrawingStem()->GetDrawingY();
+        }
         y += m_doc->GetDrawingUnit(glyphSize) * 0.5 * stemDirFactor;
         x += m_doc->GetDrawingUnit(glyphSize);
         for (int i = 0; i < tabGrp->GetDots(); ++i) {
