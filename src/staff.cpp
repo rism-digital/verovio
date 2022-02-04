@@ -230,7 +230,7 @@ bool Staff::IsTabWithStemsOutside()
 {
     if (!m_drawingStaffDef) return false;
     // Temporary implementation looking at staffDef@type
-    return (!this->IsTabGuitar() || !m_drawingStaffDef->HasType() || m_drawingStaffDef->GetType() != "within");
+    return (!this->IsTabGuitar() || !m_drawingStaffDef->HasType() || m_drawingStaffDef->GetType() != "stems.within");
 }
 
 int Staff::CalcPitchPosYRel(Doc *doc, int loc)
