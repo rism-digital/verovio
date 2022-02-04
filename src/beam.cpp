@@ -1172,7 +1172,7 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         if ((coord->m_dur > minDuration)
             && ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
                 || (!isHorizontal && (std::abs(m_uniformStemLength) < 13)))) {
-            m_uniformStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
+            m_uniformStemLength = coordStemLength;
             minDuration = coord->m_dur;
         }
     }
