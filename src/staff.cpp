@@ -226,6 +226,13 @@ bool Staff::IsTablature()
     return isTablature;
 }
 
+bool Staff::IsTabWithBeamOutside()
+{
+    if (!m_drawingStaffDef) return false;
+    // Temporary implementation looking at staffDef@type
+    return (!this->IsTabGuitar() || !m_drawingStaffDef->HasType() || m_drawingStaffDef->GetType() != "within");
+}
+
 int Staff::CalcPitchPosYRel(Doc *doc, int loc)
 {
     assert(doc);
