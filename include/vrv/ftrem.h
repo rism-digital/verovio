@@ -47,6 +47,16 @@ public:
      */
     const ArrayOfBeamElementCoords *GetElementCoords();
 
+    /**
+     * See DrawingInterface::GetAdditionalBeamCount
+     */
+    std::pair<int, int> GetAdditionalBeamCount() const override;
+
+    /**
+     * See DrawingInterface::GetFloatingBeamCount
+     */
+    std::pair<int, int> GetFloatingBeamCount() const override;
+
     //----------//
     // Functors //
     //----------//

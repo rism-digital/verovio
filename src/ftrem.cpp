@@ -107,6 +107,16 @@ void FTrem::FilterList(ArrayOfObjects *childList)
     this->InitCue(false);
 }
 
+std::pair<int, int> FTrem::GetAdditionalBeamCount() const
+{
+    return { std::max(this->GetBeams(), this->GetBeamsFloat()), 0 };
+}
+
+std::pair<int, int> FTrem::GetFloatingBeamCount() const
+{
+    return { this->GetBeams(), this->GetBeamsFloat() };
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

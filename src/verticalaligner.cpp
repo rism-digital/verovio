@@ -506,6 +506,9 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
 
     // Add a margin
     overflowSum += doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(this->GetStaffSize());
+    if (const int adjust = prevAlignment->GetBeamAdjust()) {
+        overflowSum += adjust;
+    }
 
     BoundingBox *previous = prevAlignment->GetOverflowBBoxBelow();
     BoundingBox *current = this->GetOverflowBBoxAbove();
