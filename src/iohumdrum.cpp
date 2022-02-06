@@ -5747,7 +5747,11 @@ void HumdrumInput::setTimeSig(
     int bot2 = -1000;
     if (sscanf(timesig.c_str(), "*M%d/%d%%%d", &top, &bot, &bot2) == 3) {
         // Such as three-triplet whole notes in a 2/1 measure
-        // deal with this later
+        if ((metersig == "3") && (bot == 3) && (bot2 == 2)) {
+            vrvmeter->SetCount({ 3 });
+            vrvmeter->SetUnit(1);
+            vrvmeter->SetForm(METERFORM_num);
+        }
     }
     else if (sscanf(timesig.c_str(), "*M%d/%d", &top, &bot) == 2) {
         if (bot == 0) {
@@ -5763,13 +5767,124 @@ void HumdrumInput::setTimeSig(
                 // Can't add if there is a mensuration; otherwise,
                 // a time signature will be shown.
                 vrvmeter->SetForm(METERFORM_invis);
+                vrvmeter->SetCount({ top });
+                vrvmeter->SetUnit(bot);
             }
-            vrvmeter->SetCount({ top });
-            vrvmeter->SetUnit(bot);
+            else if (metersig == "3") {
+                vrvmeter->SetCount({ 3 });
+                vrvmeter->SetUnit(bot);
+                vrvmeter->SetForm(METERFORM_num);
+            }
+            else if (metersig == "2") {
+                vrvmeter->SetCount({ 2 });
+                vrvmeter->SetUnit(bot);
+                vrvmeter->SetForm(METERFORM_num);
+            }
+            else {
+                vrvmeter->SetCount({ top });
+                vrvmeter->SetUnit(bot);
+            }
         }
     }
     else {
         // some strange time signature which should never occur.
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setTimeSig --
+//
+
+template <class ELEMENT>
+void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp metersigtok, int staffindex)
+{
+    if (!timesigtok) {
+        // Not allowing meter signatures without a time signature.
+        return;
+    }
+
+    std::smatch matches;
+    std::string metersig;
+    if (regex_search(*metersigtok, matches, regex("met\\((.*)\\)"))) {
+        metersig = matches[1];
+    }
+
+    int count = -1;
+    int unit = -1;
+    if (regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)%(\\d+)"))) {
+        // int top = stoi(matches[1]);
+        int bot = stoi(matches[2]);
+        int bot2 = stoi(matches[3]);
+        if ((metersig == "3") && (bot == 3) && (bot2 == 2)) {
+            MeterSig *vrvmetersig = getMeterSig(element);
+            vrvmetersig->SetCount({ 3 });
+            vrvmetersig->SetUnit(1);
+            vrvmetersig->SetForm(METERFORM_num);
+        }
+    }
+    else if (regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
+        if (!metersigtok) {
+            count = stoi(matches[1]);
+            unit = stoi(matches[2]);
+            MeterSig *vrvmetersig = getMeterSig(element);
+            vrvmetersig->SetCount({ count });
+            vrvmetersig->SetUnit(unit);
+        }
+        else if (metersig == "3") {
+            MeterSig *vrvmetersig = getMeterSig(element);
+            vrvmetersig->SetCount({ 3 });
+            vrvmetersig->SetUnit(unit);
+            vrvmetersig->SetForm(METERFORM_num);
+        }
+        else if (metersig == "2") {
+            MeterSig *vrvmetersig = getMeterSig(element);
+            vrvmetersig->SetCount({ 2 });
+            vrvmetersig->SetUnit(unit);
+            vrvmetersig->SetForm(METERFORM_num);
+        }
+        else if (metersigtok && (metersigtok->find('C') == std::string::npos)
+            && (metersigtok->find('O') == std::string::npos)) {
+            // Only storing the time signature if there is no mensuration
+            // otherwise verovio will display both.
+            count = stoi(matches[1]);
+            unit = stoi(matches[2]);
+            MeterSig *vrvmetersig = getMeterSig(element);
+            vrvmetersig->SetCount({ count });
+            vrvmetersig->SetUnit(unit);
+        }
+        else {
+            // But always need to provide @meter.unit since timestamps
+            // are in reference to it (can't add meter.count since
+            // this will also print a time signature.
+            unit = stoi(matches[2]);
+            MeterSig *vrvmetersig = getMeterSig(element);
+            vrvmetersig->SetForm(METERFORM_invis);
+            vrvmetersig->SetCount({ count });
+            vrvmetersig->SetUnit(unit);
+        }
+        if (metersigtok) {
+            auto ploc = metersigtok->rfind(")");
+            if (ploc != std::string::npos) {
+                std::string mstring = metersigtok->substr(5, ploc - 5);
+                setMeterSymbol(element, mstring, staffindex, NULL, metersigtok);
+            }
+        }
+    }
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+
+    if (staffindex < 0) {
+        // store time signature change for all staves:
+        for (int i = 0; i < (int)ss.size(); ++i) {
+            // assuming only a single time sig. at a time.
+            ss[i].meter_top = count;
+            ss[i].meter_bottom = unit;
+        }
+    }
+    else {
+        ss.at(staffindex).meter_top = count;
+        ss.at(staffindex).meter_bottom = unit;
     }
 }
 
@@ -15759,75 +15874,6 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             continue;
         }
         setTransposition(staves[i], *transposetok[i]);
-    }
-}
-
-//////////////////////////////
-//
-// HumdrumInput::setTimeSig --
-//
-
-template <class ELEMENT>
-void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp metersigtok, int staffindex)
-{
-    if (!timesigtok) {
-        // Not allowing meter signatures without a time signature.
-        return;
-    }
-
-    int count = -1;
-    int unit = -1;
-    std::smatch matches;
-    if (regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
-        if (!metersigtok) {
-            count = stoi(matches[1]);
-            unit = stoi(matches[2]);
-            MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetCount({ count });
-            vrvmetersig->SetUnit(unit);
-        }
-        else if (metersigtok && (metersigtok->find('C') == std::string::npos)
-            && (metersigtok->find('O') == std::string::npos)) {
-            // Only storing the time signature if there is no mensuration
-            // otherwise verovio will display both.
-            count = stoi(matches[1]);
-            unit = stoi(matches[2]);
-            MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetCount({ count });
-            vrvmetersig->SetUnit(unit);
-        }
-        else {
-            // But always need to provide @meter.unit since timestamps
-            // are in reference to it (can't add meter.count since
-            // this will also print a time signature.
-            unit = stoi(matches[2]);
-            MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetForm(METERFORM_invis);
-            vrvmetersig->SetCount({ count });
-            vrvmetersig->SetUnit(unit);
-        }
-        if (metersigtok) {
-            auto ploc = metersigtok->rfind(")");
-            if (ploc != std::string::npos) {
-                std::string mstring = metersigtok->substr(5, ploc - 5);
-                setMeterSymbol(element, mstring, staffindex, NULL, metersigtok);
-            }
-        }
-    }
-
-    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
-
-    if (staffindex < 0) {
-        // store time signature change for all staves:
-        for (int i = 0; i < (int)ss.size(); ++i) {
-            // assuming only a single time sig. at a time.
-            ss[i].meter_top = count;
-            ss[i].meter_bottom = unit;
-        }
-    }
-    else {
-        ss.at(staffindex).meter_top = count;
-        ss.at(staffindex).meter_bottom = unit;
     }
 }
 
