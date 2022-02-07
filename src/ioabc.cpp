@@ -1050,13 +1050,13 @@ void ABCInput::parseLyrics()
             sylType = sylLog_CON_s;
         }
         else if (abcLine.at(found) == '-') {
-            sylType = sylLog_CON_b;
+            sylType = sylLog_CON_d;
         }
         else if (abcLine.at(found) == '\\') {
             if ((found + 1 < abcLine.size()) && (abcLine.at(found + 1) == '-')) {
                 counter = 0;
                 ++found;
-                sylType = sylLog_CON_b;
+                sylType = sylLog_CON_d;
             }
         }
         // separate syllable from delimeters to form syl that we want to add
@@ -1070,7 +1070,7 @@ void ABCInput::parseLyrics()
             Syl *syl = new Syl();
             syl->AddChild(sylText);
             syl->SetCon(sylType);
-            if (sylType == sylLog_CON_b) {
+            if (sylType == sylLog_CON_d) {
                 syl->SetWordpos(sylLog_WORDPOS_m);
             }
             syllables.push_back({ syl, counter });
@@ -1082,6 +1082,7 @@ void ABCInput::parseLyrics()
         // if none found, the rest of the string is going to server as last syl
         if ((found == std::string::npos) && (start < abcLine.size())) {
             std::string syllable = abcLine.substr(start);
+            if (!syllable.empty() && syllable[syllable.size() - 1] == '\r') syllable.erase(syllable.size() - 1);
             Text *sylText = new Text();
             sylText->SetText(UTF8to16(syllable));
             Syl *syl = new Syl();
@@ -1093,7 +1094,7 @@ void ABCInput::parseLyrics()
 
     // Iterate over notes and syllables simultaneously. Move through note array using counters for each syllable, moving
     // for several notes if syllable needs to be held
-    for (int i = 0, j = 0; (i < m_lineNoteArray.size()) && (j < syllables.size()); ++j) {
+    for (size_t i = 0, j = 0; (i < m_lineNoteArray.size()) && (j < syllables.size()); ++j) {
         while (m_lineNoteArray.at(i)->IsGraceNote() && (i < m_lineNoteArray.size())) {
             ++i;
         }
