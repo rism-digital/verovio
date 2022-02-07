@@ -1027,27 +1027,52 @@ void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
 
 void ABCInput::parseLyrics()
 {
-    std::vector<std::pair<std::string, int>> syllables;
-    constexpr std::string_view delimeters = "-_ ";
-    // skipping w:, so start from third element 
+    std::vector<std::pair<Syl *, int>> syllables;
+    constexpr std::string_view delimeters = "~\\-_ ";
+    // skipping w:, so start from third element
     std::size_t start = 2;
     std::size_t found = abcLine.find_first_of(delimeters, 2);
     while (found != std::string::npos) {
         // Counter indicates for how many notes verse should be held. This defaults to 1, unless '_' is found
         int counter = 1;
-        std::string syl = "";
+        std::string syllable = "";
+        sylLog_CON sylType = sylLog_CON_NONE;
         if (abcLine.at(found) == '_') {
-            while ((found < abcLine.size()) && (abcLine[found] == '_')) {
+            while ((found < abcLine.size()) && (abcLine.at(found) == '_')) {
                 ++counter;
                 ++found;
             }
             --found;
+            sylType = sylLog_CON_u;
+        }
+        else if (abcLine.at(found) == '~') {
+            counter = 0;
+            sylType = sylLog_CON_s;
+        }
+        else if (abcLine.at(found) == '-') {
+            sylType = sylLog_CON_b;
+        }
+        else if (abcLine.at(found) == '\\') {
+            if ((found + 1 < abcLine.size()) && (abcLine.at(found + 1) == '-')) {
+                counter = 0;
+                ++found;
+                sylType = sylLog_CON_b;
+            }
         }
         // separate syllable from delimeters to form syl that we want to add
-        syl = abcLine.substr(start, found - start);
-        syl.erase(std::remove_if(syl.begin(), syl.end(), [](unsigned char x) { return x == '_'; }), syl.end());
-        std::replace(syl.begin(), syl.end(), '~', ' ');
-        if (!syl.empty()) {
+        syllable = abcLine.substr(start, found - start);
+        syllable.erase(
+            std::remove_if(syllable.begin(), syllable.end(), [](unsigned char x) { return (x == '_') || (x == '\\'); }),
+            syllable.end());
+        if (!syllable.empty()) {
+            Text *sylText = new Text();
+            sylText->SetText(UTF8to16(syllable));
+            Syl *syl = new Syl();
+            syl->AddChild(sylText);
+            syl->SetCon(sylType);
+            if (sylType == sylLog_CON_b) {
+                syl->SetWordpos(sylLog_WORDPOS_m);
+            }
             syllables.push_back({ syl, counter });
         }
 
@@ -1056,9 +1081,13 @@ void ABCInput::parseLyrics()
         found = abcLine.find_first_of(delimeters, start);
         // if none found, the rest of the string is going to server as last syl
         if ((found == std::string::npos) && (start < abcLine.size())) {
-            std::string syl = abcLine.substr(start);
-            std::replace(syl.begin(), syl.end(), '~', ' ');
-            syllables.push_back({ syl, 1 });
+            std::string syllable = abcLine.substr(start);
+            Text *sylText = new Text();
+            sylText->SetText(UTF8to16(syllable));
+            Syl *syl = new Syl();
+            syl->AddChild(sylText);
+            syl->SetCon(sylType);
+            syllables.push_back({ syl, counter });
         }
     }
 
@@ -1069,17 +1098,14 @@ void ABCInput::parseLyrics()
             ++i;
         }
         if (i >= m_lineNoteArray.size()) break;
-        Text *sylText = new Text();
-        sylText->SetText(UTF8to16(syllables.at(j).first));
-        Syl *syl = new Syl();
-        syl->AddChild(sylText);
-        Verse *verse = new Verse();
-        verse->SetN(m_verseNumber);
-        verse->AddChild(syl);
-        m_lineNoteArray.at(i)->AddChild(verse);
-        if (syllables.at(j).second > 1) {
-            syl->SetCon(sylLog_CON_u);
+        Verse *verse = NULL;
+        verse = vrv_cast<Verse *>(m_lineNoteArray.at(i)->GetChild(0, VERSE));
+        if (!verse) {
+            verse = new Verse();
+            verse->SetN(m_verseNumber);
+            m_lineNoteArray.at(i)->AddChild(verse);
         }
+        verse->AddChild(syllables.at(j).first);
         i += syllables.at(j).second;
     }
     // increment verse number, in case next line in file is also w:
