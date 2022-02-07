@@ -7,7 +7,9 @@
 * Support for `@stem.sameas` on notes for orchestra scores
 * Support for MIDI output of arpeggios (@eNote-GmBH)
 * Support for tuplets in ABC importer (@eNote-GmBH)
+* Improved double stemmed beams (@eNote-GmBH)
 * Improved tablature MIDI output (@paul-bayleaf)
+* Improved PAE importer (nested beams, mensural dots, stemless notes)
 * Additional parameters to the redoLayout method for faster cached layout redoing
 * Additional parameters to the renderToTimemap method for including rests and measure
 * Additional ids for rests and measure added to the getElementsAtTime methods
