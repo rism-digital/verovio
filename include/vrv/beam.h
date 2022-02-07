@@ -199,6 +199,13 @@ public:
     std::string GetClassName() const override { return "Beam"; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    BeamDrawingInterface *GetBeamDrawingInterface() override { return dynamic_cast<BeamDrawingInterface *>(this); }
+    ///@}
+
     int GetNoteCount() const { return this->GetChildCount(NOTE); }
 
     /**
