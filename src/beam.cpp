@@ -1165,11 +1165,11 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
             : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
                                                                       : STEMDIRECTION_up;
-        const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
         if (!coord->m_closestNote) continue;
         // skip current element if it's longer that minDuration and is not a part of fTrem
         if ((coord->m_dur <= minDuration) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
-        // if location matches or if current stem length is too short - adjust stem length 
+        // if location matches or if current stem length is too short - adjust stem length
+        const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
         if ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
             || (!isHorizontal && (std::abs(m_uniformStemLength) < 13))) {
             m_uniformStemLength = coordStemLength;
