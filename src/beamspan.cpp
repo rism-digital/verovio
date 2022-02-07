@@ -45,10 +45,10 @@ BeamSpan::BeamSpan()
     RegisterAttClass(ATT_PLIST);
 
     Reset();
-    InitBeamSegments();   
+    InitBeamSegments();
 }
 
-BeamSpan::~BeamSpan() 
+BeamSpan::~BeamSpan()
 {
     ClearBeamSegments();
 }
@@ -67,7 +67,7 @@ void BeamSpan::Reset()
     ClearBeamSegments();
 }
 
-void BeamSpan::InitBeamSegments() 
+void BeamSpan::InitBeamSegments()
 {
     // BeamSpan should have at least one segment to begin with
     m_beamSegments.emplace_back(new BeamSegment());
@@ -124,7 +124,7 @@ ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
         else {
             nextStaffLayer->FindAllDescendantsByComparison(&nextLayerObjects, &classIds);
             beamSpanElements.insert(beamSpanElements.end(), nextLayerObjects.begin(), nextLayerObjects.end());
-        }        
+        }
 
         startMeasure = nextMeasure;
     }
@@ -146,7 +146,6 @@ bool BeamSpan::AddSpanningSegment(Doc *doc, const SpanIndexVector &elements, int
         [&](BeamElementCoord *coord) { return coord->m_element == *(elements.at(index + 1).first - 1); });
     if ((coordsFirst == m_beamElementCoords.end()) || (coordsLast == m_beamElementCoords.end())) return false;
 
-    
     BeamSegment *segment = NULL;
     if (newSegment) {
         segment = new BeamSegment();
@@ -180,7 +179,7 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    if (!this->GetStart()) return FUNCTOR_CONTINUE;
+    if (!this->GetStart() || !this->GetEnd()) return FUNCTOR_CONTINUE;
 
     Layer *layer = vrv_cast<Layer *>(this->GetStart()->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
@@ -194,17 +193,17 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
     ArrayOfBeamElementCoords coord(
         m_beamSegments.at(0)->m_placementInfo->m_begin, m_beamSegments.at(0)->m_placementInfo->m_end);
     m_beamSegments.at(0)->InitCoordRefs(&coord);
-    m_beamSegments.at(0)->CalcBeam(layer, staff, params->m_doc, this, GetPlace());
+    m_beamSegments.at(0)->CalcBeam(layer, staff, params->m_doc, this, this->GetPlace());
 
     return FUNCTOR_CONTINUE;
 }
 
 int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams)
 {
-    if (!m_beamedElements.empty() || !this->GetStart()) return FUNCTOR_CONTINUE;
+    if (!m_beamedElements.empty() || !this->GetStart() || !this->GetEnd()) return FUNCTOR_CONTINUE;
 
-    Layer *layer = vrv_cast<Layer *>(GetStart()->GetFirstAncestor(LAYER));
-    Staff *staff = vrv_cast<Staff *>(GetStart()->GetFirstAncestor(STAFF));
+    Layer *layer = vrv_cast<Layer *>(this->GetStart()->GetFirstAncestor(LAYER));
+    Staff *staff = vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
     if (!layer || !staff) return FUNCTOR_SIBLINGS;
 
     m_beamedElements = this->HasPlist() ? *this->GetRefs() : this->GetBeamSpanElementList(layer, staff);
@@ -234,7 +233,7 @@ int BeamSpan::ResolveSpanningBeamSpans(FunctorParams *functorParams)
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
-    if (m_beamedElements.empty() || !GetStart() || !GetEnd()) return FUNCTOR_CONTINUE;
+    if (m_beamedElements.empty() || !this->GetStart() || !this->GetEnd()) return FUNCTOR_CONTINUE;
 
     Object *startSystem = this->GetStart()->GetFirstAncestor(SYSTEM);
     Object *endSystem = this->GetEnd()->GetFirstAncestor(SYSTEM);
@@ -248,7 +247,7 @@ int BeamSpan::ResolveSpanningBeamSpans(FunctorParams *functorParams)
     Object *firstSystem = startSystem;
     while (iter != m_beamedElements.end()) {
         elements.push_back({ iter, firstSystem });
-        iter = find_if(iter, m_beamedElements.end(), [&firstSystem](Object *element) {
+        iter = std::find_if(iter, m_beamedElements.end(), [&firstSystem](Object *element) {
             Object *parentSystem = element->GetFirstAncestor(SYSTEM);
             if (firstSystem == parentSystem) return false;
             firstSystem = parentSystem;

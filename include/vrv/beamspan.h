@@ -35,7 +35,8 @@ class BeamSpan : public ControlElement,
                  public AttBeamRend,
                  public AttColor {
 private:
-    using SpanIndexVector = std::vector<std::pair<vrv::ArrayOfObjects::iterator, Object *> >;
+    using SpanIndexVector = std::vector<std::pair<vrv::ArrayOfObjects::iterator, Object *>>;
+
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -60,7 +61,7 @@ public:
 
     // Helper to get element list for the beamSpan - elements are acquired from all layerElements that are located
     // in between start and end of the beamSpan
-    ArrayOfObjects GetBeamSpanElementList(Layer* layer, Staff* staff);
+    ArrayOfObjects GetBeamSpanElementList(Layer *layer, Staff *staff);
 
     /**
      * @name Initialize and cleam beam segments
