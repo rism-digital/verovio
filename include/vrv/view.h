@@ -602,8 +602,8 @@ private:
     /**
      * Internal method for drawing a BeamSegment
      */
-    void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,
-        Staff *staff, Measure *measure);
+    void DrawBeamSegment(
+        DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer, Staff *staff);
 
     /**
      * Internal methods for drawing time spanning elements

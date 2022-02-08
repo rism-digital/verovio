@@ -136,8 +136,7 @@ bool BeamSpan::AddSpanningSegment(Doc *doc, const SpanIndexVector &elements, int
 {
     Layer *layer = vrv_cast<Layer *>((*elements.at(index).first)->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>((*elements.at(index).first)->GetFirstAncestor(STAFF));
-    Measure *measure = vrv_cast<Measure *>((*elements.at(index).first)->GetFirstAncestor(MEASURE));
-    if (!layer || !staff || !measure) return false;
+    if (!layer || !staff) return false;
 
     // get iterators for first and last coordinates in the range for the segment
     auto coordsFirst = std::find_if(m_beamElementCoords.begin(), m_beamElementCoords.end(),
@@ -156,12 +155,24 @@ bool BeamSpan::AddSpanningSegment(Doc *doc, const SpanIndexVector &elements, int
 
     // Init segment with placement information (measure, staff, etc.) as well as begin/end coordinates
     ArrayOfBeamElementCoords coords(coordsFirst, coordsLast + 1);
-    segment->InitPlacementInformation(measure, staff, layer);
+    segment->InitPlacementInformation(staff, layer);
     segment->m_placementInfo->m_begin = coordsFirst;
     segment->m_placementInfo->m_end = coordsLast + 1;
     segment->InitCoordRefs(&coords);
     segment->CalcBeam(layer, staff, doc, this, m_drawingPlace);
     segment->m_placementInfo->SetSpanningType(index, elements.size() - 1);
+    Measure *measure = NULL;
+    Object *currentSystem = layer->GetFirstAncestor(SYSTEM);
+    if (segment->m_placementInfo->m_spanningType == SPANNING_START) {
+        segment->m_placementInfo->m_measure = vrv_cast<Measure *>(currentSystem->GetLast(MEASURE));
+    }
+    else if (segment->m_placementInfo->m_spanningType == SPANNING_END) {
+        segment->m_placementInfo->m_measure = vrv_cast<Measure *>(currentSystem->GetFirst(MEASURE));
+    }
+    else {
+        segment->m_placementInfo->m_measure
+            = vrv_cast<Measure *>((*elements.at(index).first)->GetFirstAncestor(MEASURE));
+    }
 
     if (newSegment) {
         m_beamSegments.push_back(segment);
@@ -187,7 +198,8 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
 
     this->InitCoords(&m_beamedElements, staff, this->GetPlace());
 
-    m_beamSegments.at(0)->InitPlacementInformation(measure, staff, layer);
+    m_beamSegments.at(0)->InitPlacementInformation(staff, layer);
+    m_beamSegments.at(0)->m_placementInfo->m_measure = measure;
     m_beamSegments.at(0)->m_placementInfo->m_begin = m_beamElementCoords.begin();
     m_beamSegments.at(0)->m_placementInfo->m_end = m_beamElementCoords.end();
     ArrayOfBeamElementCoords coord(
@@ -258,10 +270,10 @@ int BeamSpan::ResolveSpanningBeamSpans(FunctorParams *functorParams)
 
     // Iterator for the elements are based on the initial order of the elements, so skip current system when
     // found and process it separatelly in the end
-    Object *currentSystemn = this->GetFirstAncestor(SYSTEM);
+    Object *currentSystem = this->GetFirstAncestor(SYSTEM);
     int currentSystemIndex = 0;
     for (int i = 0; i < elements.size() - 1; ++i) {
-        if (elements.at(i).second == currentSystemn) {
+        if (elements.at(i).second == currentSystem) {
             currentSystemIndex = i;
             continue;
         }

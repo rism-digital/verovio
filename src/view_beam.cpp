@@ -79,7 +79,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // Draw the beamSegment - but not if it is a secondary beam in a stem.sameas
 
     if (!beam->m_beamSegment.StemSameasIsSecondary())
-        this->DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
+        this->DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff);
 
     dc->EndGraphic(element, this);
 }
@@ -214,15 +214,14 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->EndGraphic(element, this);
 }
 
-void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDrawingInterface *beamInterface,
-    Layer *layer, Staff *staff, Measure *measure)
+void View::DrawBeamSegment(
+    DeviceContext *dc, BeamSegment *beamSegment, BeamDrawingInterface *beamInterface, Layer *layer, Staff *staff)
 {
     assert(dc);
     assert(beamSegment);
     assert(beamInterface);
     assert(layer);
     assert(staff);
-    assert(measure);
 
     // temporary coordinates
     int x1, x2, y1, y2;
@@ -438,8 +437,8 @@ void View::DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, Measure *measure)
         segment->AppendSpanningCoordinates(segment->m_placementInfo->m_measure);
 
         // Draw corresponding beam segment
-        this->DrawBeamSegment(dc, segment, beamSpan, segment->m_placementInfo->m_layer,
-            segment->m_placementInfo->m_staff, segment->m_placementInfo->m_measure);
+        this->DrawBeamSegment(
+            dc, segment, beamSpan, segment->m_placementInfo->m_layer, segment->m_placementInfo->m_staff);
     }
 
     dc->EndGraphic(beamSpan, this);

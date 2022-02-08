@@ -84,7 +84,7 @@ public:
      * Initialize placement information for the segment. Should be used with beamSpan to specify which staff/layer it
      * belongs to
      */
-    void InitPlacementInformation(Measure *measure, Staff *staff, Layer *layer);
+    void InitPlacementInformation(Staff *staff, Layer *layer);
 
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.

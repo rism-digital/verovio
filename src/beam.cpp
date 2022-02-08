@@ -103,12 +103,11 @@ void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoord
     m_beamElementCoordRefs = *beamElementCoords;
 }
 
-void BeamSegment::InitPlacementInformation(Measure* measure, Staff* staff, Layer* layer)
+void BeamSegment::InitPlacementInformation(Staff *staff, Layer *layer)
 {
     if (!m_placementInfo) {
         m_placementInfo = new BeamSegmentPlacementInfo();
     }
-    m_placementInfo->m_measure = measure;
     m_placementInfo->m_staff = staff;
     m_placementInfo->m_layer = layer;
 }
