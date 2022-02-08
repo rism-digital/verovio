@@ -85,7 +85,7 @@ bool Resources::InitFonts()
     if (!LoadFont("Bravura")) LogError("Bravura font could not be loaded.");
     // The Leipzig as the default font
     if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded.");
-    
+
     if (s_fontGlyphTable.size() < SMUFL_COUNT) {
         LogError("Expected %d default SMuFL glyphs but could load only %d.", SMUFL_COUNT, s_fontGlyphTable.size());
         return false;
