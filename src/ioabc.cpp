@@ -111,12 +111,14 @@ void ABCInput::ParseABC(std::istream &infile)
     while (!infile.eof()) {
         std::getline(infile, abcLine);
         ++m_lineNum;
-        if (abcLine[0] == 'X') {
-            this->readInformationField('X', &abcLine[2]);
-            while (abcLine[0] != 'K' && !infile.eof()) {
+        if (!abcLine.empty() && (abcLine.at(0) == 'X')) {
+            while (!infile.eof()) {
+                if (abcLine.length() >= 3) {
+                    this->readInformationField(abcLine.at(0), &abcLine.at(2));
+                    if (abcLine.at(0) == 'K') break;
+                }
                 std::getline(infile, abcLine);
                 ++m_lineNum;
-                this->readInformationField(abcLine[0], &abcLine[2]);
             }
             if (infile.eof()) break;
             if (m_title.empty()) {
@@ -127,6 +129,8 @@ void ABCInput::ParseABC(std::istream &infile)
             this->CreateWorkEntry();
 
             this->InitScoreAndSection(score, section);
+
+            continue;
         }
         else if (!m_mdiv || !score || !section) {
             // if m_div is not initialized - we didn't read X element, so continue until we do
@@ -137,15 +141,15 @@ void ABCInput::ParseABC(std::istream &infile)
             this->FlushControlElements(score, section);
             continue;
         }
-        else if (abcLine[0] == '%')
+        else if (abcLine.at(0)  == '%')
             // skipping comments and stylesheet directives
             continue;
-        else if (abcLine[1] == ':' && abcLine[0] != '|') {
-            if (abcLine[0] != 'K') {
-                this->readInformationField(abcLine[0], &abcLine[2]);
+        else if ((abcLine.length() >= 3) && (abcLine.at(1) == ':') && (abcLine.at(0) != '|')) {
+            if (abcLine.at(0) != 'K') {
+                this->readInformationField(abcLine.at(0), &abcLine.at(2));
             }
             else {
-                LogWarning("ABC import: Key changes not supported", abcLine[0]);
+                LogWarning("ABC import: Key changes not supported");
             }
         }
         else {
@@ -153,7 +157,7 @@ void ABCInput::ParseABC(std::istream &infile)
         }
     }
 
-    if (!section->GetParent()) {
+    if (section && score && !section->GetParent()) {
         score->AddChild(section);
     }
 
@@ -890,6 +894,7 @@ void ABCInput::FlushControlElements(Score *score, Section *section)
             LogWarning("ABC import: Element '%s' could not be assigned to layer '%s'",
                 iter->second->GetClassName().c_str(), iter->first.c_str());
             delete iter->second;
+            iter->second = NULL;
             continue;
         }
         measure = vrv_cast<Measure *>(layer->GetFirstAncestor(MEASURE));
