@@ -948,8 +948,8 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
                 && (element->GetDrawingY() < staffBottom) && (element->GetDrawingY() < this->GetDrawingY())) {
                 verticalMargin = this->GetDrawingY() - element->GetDrawingY();
             }
-            overlap = std::max(
-                overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin, verticalMargin));
+            overlap
+                = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin, verticalMargin));
         }
         else {
             overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
@@ -1985,7 +1985,7 @@ void LayerElement::AdjustMixedBeamXPos(Doc *doc, int drawingUnit, int &upcomingP
     if (restCount || (this->Is(NOTE) && (noteCount != 1))
         || (this->Is(CHORD) && this->GetChildCount(NOTE) != noteCount))
         return;
-    
+
     StemmedDrawingInterface *stemInterface = this->GetStemmedDrawingInterface();
     DurationInterface *duration = this->GetDurationInterface();
     if (stemInterface && duration) {
