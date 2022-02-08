@@ -5,7 +5,6 @@ import xml.etree.ElementTree as ET
 
 # Define file output paths
 SMUFL_HEADER = "../include/vrv/smufl.h"
-SMUFL_SOURCE = "../src/smufl.cpp"
 
 ######################
 #  Helper Functions  #
@@ -68,16 +67,3 @@ if __name__ == "__main__":
     smufl_h_content += "} // namespace vrv\n\n"
     smufl_h_content += "#endif\n"
     write_file_content(SMUFL_HEADER, smufl_h_content)
-
-    # (2) Create cpp file
-    smufl_cpp_content = get_file_content("smufl.cpp.inc") + "\n"
-    smufl_cpp_content += "const std::map<std::string, wchar_t> Resources::s_smuflNames = {\n"
-    for glyph_code in smufl_names:
-        # { "brace", SMUFL_E000_brace },
-        smufl_cpp_content += " " * 4 + \
-            f"{{ \"{smufl_names[glyph_code]}\", SMUFL_{glyph_code}_{smufl_names[glyph_code]} }}," + "\n"
-    smufl_cpp_content += "};\n\n"
-    smufl_cpp_content += "/** The number of glyphs for verification **/\n"
-    smufl_cpp_content += f"// {len(smufl_names)}" + "\n\n"
-    smufl_cpp_content += "} // namespace vrv\n"
-    write_file_content(SMUFL_SOURCE, smufl_cpp_content)
