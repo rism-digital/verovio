@@ -141,7 +141,7 @@ void ABCInput::ParseABC(std::istream &infile)
             this->FlushControlElements(score, section);
             continue;
         }
-        else if (abcLine.at(0)  == '%')
+        else if (abcLine.at(0) == '%')
             // skipping comments and stylesheet directives
             continue;
         else if ((abcLine.length() >= 3) && (abcLine.at(1) == ':') && (abcLine.at(0) != '|')) {
