@@ -173,10 +173,6 @@ public:
 
 private:
     static bool LoadFont(const std::string &fontName);
-    /**
-     * Returns ranges of the glyphs to be parsed
-     */
-    static std::map<wchar_t, wchar_t> GetGlyphRanges();
 
 private:
     //----------------//
