@@ -114,7 +114,7 @@ void ABCInput::ParseABC(std::istream &infile)
         if (!abcLine.empty() && (abcLine.at(0) == 'X')) {
             while (!infile.eof()) {
                 if (abcLine.length() >= 3) {
-                    this->readInformationField(abcLine.at(0), &abcLine.at(2));
+                    this->readInformationField(abcLine.at(0), abcLine.substr(2));
                     if (abcLine.at(0) == 'K') break;
                 }
                 std::getline(infile, abcLine);
@@ -146,7 +146,7 @@ void ABCInput::ParseABC(std::istream &infile)
             continue;
         else if ((abcLine.length() >= 3) && (abcLine.at(1) == ':') && (abcLine.at(0) != '|')) {
             if (abcLine.at(0) != 'K') {
-                this->readInformationField(abcLine.at(0), &abcLine.at(2));
+                this->readInformationField(abcLine.at(0), abcLine.substr(2));
             }
             else {
                 LogWarning("ABC import: Key changes not supported");
