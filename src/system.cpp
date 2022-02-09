@@ -753,16 +753,17 @@ int System::AlignSystems(FunctorParams *functorParams)
     assert(params);
     assert(m_systemAligner.GetBottomAlignment());
 
-    int systemMargin = this->IsFirstInPage() ? params->m_systemFirstMargin : params->m_systemMargin;
-    if (systemMargin) {
+    // No spacing for the first system
+    int systemSpacing = this->IsFirstInPage() ? 0 : params->m_systemSpacing;
+    if (systemSpacing) {
         const int contentOverflow = params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc);
         const int clefOverflow
             = params->m_prevBottomClefOverflow + m_systemAligner.GetOverflowAbove(params->m_doc, true);
         // Alignment is already pre-determined with staff alignment overflow
-        // We need to subtract them from the desired margin
-        const int actualMargin = systemMargin - std::max(contentOverflow, clefOverflow);
-        // Set the margin if it exsits (greater than 0)
-        if (actualMargin > 0) params->m_shift -= actualMargin;
+        // We need to subtract them from the desired spacing
+        const int actualSpacing = systemSpacing - std::max(contentOverflow, clefOverflow);
+        // Set the spacing if it exsits (greater than 0)
+        if (actualSpacing > 0) params->m_shift -= actualSpacing;
     }
 
     this->SetDrawingYRel(params->m_shift);
