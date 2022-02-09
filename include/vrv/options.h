@@ -686,7 +686,6 @@ public:
     OptionDbl m_spacingNonLinear;
     OptionInt m_spacingStaff;
     OptionInt m_spacingSystem;
-    OptionInt m_spacingSystemFirst;
     OptionDbl m_staffLineWidth;
     OptionDbl m_stemWidth;
     OptionDbl m_subBracketThickness;
@@ -765,6 +764,7 @@ public:
     //
     OptionDbl m_topMarginArtic;
     OptionDbl m_topMarginHarm;
+    OptionDbl m_topMarginPgFooter;
 
     /**
      * Deprecated options

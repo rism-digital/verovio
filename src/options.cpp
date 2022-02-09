@@ -1344,10 +1344,6 @@ Options::Options()
     m_spacingSystem.Init(12, 0, 48);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
 
-    m_spacingSystemFirst.SetInfo("Spacing system first", "The first system minimal spacing in MEI units");
-    m_spacingSystemFirst.Init(0, 0, 48);
-    this->Register(&m_spacingSystemFirst, "spacingSystemFirst", &m_generalLayout);
-
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
     m_staffLineWidth.Init(0.15, 0.10, 0.30);
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);
@@ -1622,6 +1618,10 @@ Options::Options()
     m_topMarginHarm.SetInfo("Top margin harm", "The margin for harm in MEI units");
     m_topMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_topMarginHarm, "topMarginHarm", &m_elementMargins);
+
+    m_topMarginPgFooter.SetInfo("Top margin footer", "The margin for footer in MEI units");
+    m_topMarginPgFooter.Init(2.0, 0.0, 24.0);
+    this->Register(&m_topMarginPgFooter, "topMarginPgFooter", &m_elementMargins);
 
     /********* Deprecated options *********/
 
