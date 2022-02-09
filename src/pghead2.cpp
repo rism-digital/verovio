@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -31,6 +33,18 @@ PgHead2::~PgHead2() {}
 void PgHead2::Reset()
 {
     RunningElement::Reset();
+}
+
+int PgHead2::GetTotalHeight(Doc *doc)
+{
+    assert(doc);
+
+    int height = this->GetContentHeight();
+    if (height > 0) {
+        const int unit = doc->GetDrawingUnit(100);
+        height += doc->GetOptions()->m_bottomMarginPgHead.GetValue() * unit;
+    }
+    return height;
 }
 
 //----------------------------------------------------------------------------
