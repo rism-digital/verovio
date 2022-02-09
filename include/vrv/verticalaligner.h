@@ -90,8 +90,8 @@ public:
     /**
      * Get System Overflows
      */
-    int GetOverflowAbove(const Doc *doc, bool scoreDefClef = false) const;
-    int GetOverflowBelow(const Doc *doc, bool scoreDefClef = false) const;
+    int GetOverflowAbove(const Doc *doc) const;
+    int GetOverflowBelow(const Doc *doc) const;
 
     /**
      * Get justification sum
