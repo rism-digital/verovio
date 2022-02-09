@@ -982,12 +982,24 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
     AdjustStaffOverlapParams *params = vrv_params_cast<AdjustStaffOverlapParams *>(functorParams);
     assert(params);
 
-    // This is the bottom alignment (or something is wrong)
-    if (!m_staff) return FUNCTOR_STOP;
-
+    // This is the first alignment
     if (params->m_previous == NULL) {
         params->m_previous = this;
         return FUNCTOR_SIBLINGS;
+    }
+
+    const int spacing = std::max(params->m_previous->m_overflowBelow, m_overflowAbove);
+
+    // Calculate the overlap for scoreDef clefs
+    int overflowBelow = params->m_previous->GetScoreDefClefOverflowBelow();
+    int overflowAbove = this->GetScoreDefClefOverflowAbove();
+    if (spacing < (overflowBelow + overflowAbove)) {
+        this->SetOverlap((overflowBelow + overflowAbove) - spacing);
+    }
+
+    // This is the bottom alignment (or something is wrong) - this is all we need to do
+    if (!m_staff) {
+        return FUNCTOR_STOP;
     }
 
     const int staffSize = this->GetStaffSize();
@@ -1015,7 +1027,6 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
                 // calculate the vertical overlap and see if this is more than the expected space
                 int overflowBelow = params->m_previous->CalcOverflowBelow(*iter);
                 int overflowAbove = this->CalcOverflowAbove(*i);
-                int spacing = std::max(params->m_previous->m_overflowBelow, m_overflowAbove);
                 if (spacing < (overflowBelow + overflowAbove)) {
                     // LogDebug("Overlap %d", (overflowBelow + overflowAbove) - spacing);
                     this->SetOverlap((overflowBelow + overflowAbove) - spacing);
