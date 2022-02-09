@@ -138,7 +138,6 @@ int SystemAligner::GetOverflowAbove(const Doc *, bool scoreDefClef) const
 
     StaffAlignment *alignment = vrv_cast<StaffAlignment *>(this->GetChild(0));
     assert(alignment);
-    return alignment->GetOverflowAbove();
     int overflowAbove = scoreDefClef ? alignment->GetScoreDefClefOverflowAbove() : alignment->GetOverflowAbove();
     return overflowAbove;
 }
@@ -149,7 +148,6 @@ int SystemAligner::GetOverflowBelow(const Doc *doc, bool scoreDefClef) const
 
     StaffAlignment *alignment = vrv_cast<StaffAlignment *>(this->GetChild(this->GetChildCount() - 2));
     assert(alignment);
-    return alignment->GetOverflowBelow() + doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(alignment->GetStaffSize());
     int overflowBelow = scoreDefClef ? alignment->GetScoreDefClefOverflowBelow() : alignment->GetOverflowBelow();
     return overflowBelow;
 }
