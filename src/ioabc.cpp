@@ -91,7 +91,7 @@ ABCInput::~ABCInput() {}
 bool ABCInput::Import(const std::string &abc)
 {
     std::istringstream in_stream(abc);
-    parseABC(in_stream);
+    ParseABC(in_stream);
     return true;
 }
 
@@ -100,143 +100,66 @@ bool ABCInput::Import(const std::string &abc)
 // parseABC --
 //
 
-void ABCInput::parseABC(std::istream &infile)
+void ABCInput::ParseABC(std::istream &infile)
 {
     // initialize doc
     m_doc->Reset();
     m_doc->SetType(Raw);
 
-    // read file header
-    std::getline(infile, abcLine);
-    while (abcLine[0] != 'X') {
-        if (infile.eof()) {
-            LogError("ABC import: No tune found");
-            exit(0);
-        }
-        if ((abcLine[0] == '%') && (abcLine[1] == '%'))
-            LogWarning("ABC import: Stylesheet directives are ignored");
-        else if (abcLine[1] == ':')
-            readInformationField(abcLine[0], &abcLine[2]);
+    Score *score = NULL;
+    Section *section = NULL;
+    CreateHeader();
+    while (!infile.eof()) {
         std::getline(infile, abcLine);
         ++m_lineNum;
-    }
-    CreateHeader();
-
-    while (!infile.eof()) {
-        while (!(abcLine[0] == 'X' && abcLine[1] == ':') && !infile.eof()) {
-            std::getline(infile, abcLine);
-            ++m_lineNum;
-        }
-        if (infile.eof()) break;
-
-        // read tune header
-        readInformationField('X', &abcLine[2]);
-        while (abcLine[0] != 'K' && !infile.eof()) {
-            std::getline(infile, abcLine);
-            ++m_lineNum;
-            readInformationField(abcLine[0], &abcLine[2]);
-        }
-        if (infile.eof()) break;
-        if (m_title.empty()) {
-            LogWarning("ABC import: Title field missing, creating empty title");
-            m_title.push_back(std::make_pair("", 0));
-        }
-        // add work entry to meiHead
-        CreateWorkEntry();
-
-        // create score
-        assert(m_mdiv != NULL);
-        Score *score = new Score();
-        if (!m_doc->HasCurrentScore() || !m_doc->GetCurrentScoreDef()->GetFirst(STAFFGRP)) {
-            m_mdiv->AddChild(score);
-
-            // create page head
-            PrintInformationFields();
-            StaffGrp *staffGrp = new StaffGrp();
-            // create staff
-            StaffDef *staffDef = new StaffDef();
-            staffDef->SetN(1);
-            staffDef->SetLines(m_stafflines);
-            staffDef->SetTransSemi(m_transpose);
-            if (m_clef) {
-                staffDef->AddChild(m_clef);
-                m_clef = NULL;
-            }
-            if (m_meter) {
-                staffDef->AddChild(m_meter);
-                m_meter = NULL;
-            }
-            staffGrp->AddChild(staffDef);
-            m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
-            if (m_key) {
-                m_doc->GetCurrentScoreDef()->AddChild(m_key);
-                m_key = NULL;
-            }
-        }
-
-        // create section
-        Section *section = new Section();
-        // start with a new page
-        if (m_linebreak != '\0') {
-            Pb *pb = new Pb();
-            pb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
-            section->AddChild(pb);
-        }
-        // calculate default unit note length
-        if (m_durDefault == DURATION_NONE) {
-            CalcUnitNoteLength();
-        }
-        m_doc->GetCurrentScoreDef()->SetDurDefault(m_durDefault);
-        m_durDefault = DURATION_NONE;
-
-        // read music code
-        m_layer = new Layer();
-        m_layer->SetN(1);
-        while (!infile.eof()) {
-            std::getline(infile, abcLine);
-            ++m_lineNum;
-            if (std::string(abcLine).find_first_not_of(' ') == std::string::npos) {
-                // abc tunes are separated from each other by empty lines
-                break;
-            }
-            else if (abcLine[0] == '%')
-                // skipping comments and stylesheet directives
-                continue;
-            else if (abcLine[1] == ':' && abcLine[0] != '|') {
-                if (abcLine[0] != 'K') {
-                    readInformationField(abcLine[0], &abcLine[2]);
+        if (!abcLine.empty() && (abcLine.at(0) == 'X')) {
+            while (!infile.eof()) {
+                if (abcLine.length() >= 3) {
+                    this->readInformationField(abcLine.at(0), abcLine.substr(2));
+                    if (abcLine.at(0) == 'K') break;
                 }
-                else {
-                    LogWarning("ABC import: Key changes not supported", abcLine[0]);
-                }
+                std::getline(infile, abcLine);
+                ++m_lineNum;
+            }
+            if (infile.eof()) break;
+            if (m_title.empty()) {
+                LogWarning("ABC import: Title field missing, creating empty title");
+                m_title.push_back(std::make_pair("", 0));
+            }
+            // add work entry to meiHead
+            this->CreateWorkEntry();
+
+            this->InitScoreAndSection(score, section);
+
+            continue;
+        }
+        else if (!m_mdiv || !score || !section) {
+            // if m_div is not initialized - we didn't read X element, so continue until we do
+            continue;
+        }
+        if (abcLine.empty() || (abcLine.find_first_not_of(' ') == std::string::npos)) {
+            // abc tunes are separated from each other by empty lines
+            this->FlushControlElements(score, section);
+            continue;
+        }
+        else if (abcLine.at(0) == '%')
+            // skipping comments and stylesheet directives
+            continue;
+        else if ((abcLine.length() >= 3) && (abcLine.at(1) == ':') && (abcLine.at(0) != '|')) {
+            if (abcLine.at(0) != 'K') {
+                this->readInformationField(abcLine.at(0), abcLine.substr(2));
             }
             else {
-                readMusicCode(abcLine, section);
+                LogWarning("ABC import: Key changes not supported");
             }
         }
-
-        // add ornaments, ties, and slur
-        Layer *layer = NULL;
-        Measure *measure = NULL;
-        for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
-            if (!measure || (layer && layer->GetUuid() != iter->first)) {
-                layer = dynamic_cast<Layer *>(section->FindDescendantByUuid(iter->first));
-            }
-            if (!layer) {
-                LogWarning("ABC import: Element '%s' could not be assigned to layer '%s'",
-                    iter->second->GetClassName().c_str(), iter->first.c_str());
-                delete iter->second;
-                continue;
-            }
-            measure = vrv_cast<Measure *>(layer->GetFirstAncestor(MEASURE));
-            assert(measure);
-            measure->AddChild(iter->second);
+        else {
+            this->readMusicCode(abcLine, section);
         }
+    }
 
+    if (section && score && !section->GetParent()) {
         score->AddChild(section);
-
-        // only append first tune in file
-        if (!score->GetFirstAncestor(MDIV)) delete score;
     }
 
     m_controlElements.clear();
@@ -880,7 +803,7 @@ void ABCInput::parseReferenceNumber(const std::string &referenceNumberString)
     m_title.clear();
 }
 
-void ABCInput::PrintInformationFields()
+void ABCInput::PrintInformationFields(Score *score)
 {
     PgHead *pgHead = new PgHead();
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
@@ -920,7 +843,7 @@ void ABCInput::PrintInformationFields()
         originRend->AddChild(origin);
         pgHead->AddChild(originRend);
     }
-    m_doc->GetCurrentScoreDef()->AddChild(pgHead);
+    score->GetScoreDef()->AddChild(pgHead);
 }
 
 void ABCInput::CreateHeader()
@@ -1022,6 +945,82 @@ void ABCInput::CreateWorkEntry()
     }
 }
 
+void ABCInput::FlushControlElements(Score *score, Section *section)
+{
+    Layer *layer = NULL;
+    Measure *measure = NULL;
+    for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
+        if (!measure || (layer && layer->GetUuid() != iter->first)) {
+            layer = dynamic_cast<Layer *>(section->FindDescendantByUuid(iter->first));
+        }
+        if (!layer) {
+            LogWarning("ABC import: Element '%s' could not be assigned to layer '%s'",
+                iter->second->GetClassName().c_str(), iter->first.c_str());
+            delete iter->second;
+            iter->second = NULL;
+            continue;
+        }
+        measure = vrv_cast<Measure *>(layer->GetFirstAncestor(MEASURE));
+        assert(measure);
+        measure->AddChild(iter->second);
+    }
+    if (!section->GetParent()) {
+        score->AddChild(section);
+    }
+
+    m_controlElements.clear();
+}
+
+void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
+{
+    // create score
+    assert(m_mdiv != NULL);
+    score = new Score();
+    m_mdiv->AddChild(score);
+
+    StaffGrp *staffGrp = new StaffGrp();
+    // create staff
+    StaffDef *staffDef = new StaffDef();
+    staffDef->SetN(1);
+    staffDef->SetLines(m_stafflines);
+    staffDef->SetTransSemi(m_transpose);
+    if (m_clef) {
+        staffDef->AddChild(m_clef);
+        m_clef = NULL;
+    }
+    if (m_meter) {
+        staffDef->AddChild(m_meter);
+        m_meter = NULL;
+    }
+    staffGrp->AddChild(staffDef);
+    // create page head
+    this->PrintInformationFields(score);
+    score->GetScoreDef()->AddChild(staffGrp);
+    if (m_key) {
+        score->GetScoreDef()->AddChild(m_key);
+        m_key = NULL;
+    }
+
+    // create section
+    section = new Section();
+    // start with a new page
+    if (m_linebreak != '\0') {
+        Pb *pb = new Pb();
+        pb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
+        section->AddChild(pb);
+    }
+    // calculate default unit note length
+    if (m_durDefault == DURATION_NONE) {
+        CalcUnitNoteLength();
+    }
+    score->GetScoreDef()->SetDurDefault(m_durDefault);
+    m_durDefault = DURATION_NONE;
+
+    // read music code
+    m_layer = new Layer();
+    m_layer->SetN(1);
+}
+
 //////////////////////////////
 //
 // readInformationField --
@@ -1051,7 +1050,7 @@ void ABCInput::readInformationField(const char &dataKey, std::string value)
         case 'B': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
         case 'C': m_composer.push_back(std::make_pair(value, m_lineNum)); break;
         case 'D': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
-        case 'F': m_filename = value; break;
+        case 'F': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
         case 'H': m_history.push_back(std::make_pair(value, m_lineNum)); break;
         case 'I': parseInstruction(value); break;
         case 'K': parseKey(value); break;
