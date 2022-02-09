@@ -83,7 +83,7 @@ RunningElement *Page::GetHeader() const
 {
     assert(m_score);
 
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    Doc *doc = dynamic_cast<Doc *>(const_cast<Page *>(this)->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
         return NULL;
     }
@@ -104,7 +104,7 @@ RunningElement *Page::GetFooter() const
 {
     assert(m_scoreEnd);
 
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    Doc *doc = dynamic_cast<Doc *>(const_cast<Page *>(this)->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
         return NULL;
     }
@@ -668,7 +668,7 @@ void Page::LayOutPitchPos()
 
 int Page::GetContentHeight() const
 {
-    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -692,7 +692,7 @@ int Page::GetContentHeight() const
 
 int Page::GetContentWidth() const
 {
-    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
     // in non debug
     if (!doc) return 0;

@@ -344,7 +344,7 @@ public:
     /**
      * Look for the Object in the children and return its position (-1 if not found)
      */
-    int GetChildIndex(const Object *child);
+    int GetChildIndex(const Object *child) const;
 
     /**
      * Look for all Objects of a class and return its position (-1 if not found)
@@ -445,15 +445,24 @@ public:
     /**
      * Returns all ancestors
      */
-    ListOfObjects GetAncestors() const;
+    ///@{
+    ListOfObjects GetAncestors();
+    ListOfConstObjects GetAncestors() const;
+    ///@}
 
     /**
      * Return the first ancestor of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
-    Object *GetFirstAncestor(const ClassId classId, int maxSteps = -1) const;
+    ///@{
+    Object *GetFirstAncestor(const ClassId classId, int maxSteps = -1);
+    const Object *GetFirstAncestor(const ClassId classId, int maxSteps = -1) const;
+    ///@}
 
-    Object *GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
+    ///@{
+    Object *GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1);
+    const Object *GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
+    ///@}
 
     /**
      * Return the last ancestor that is NOT of the specified type.
@@ -560,7 +569,7 @@ public:
     /**
      * @Return true if left appears before right in preorder traversal
      */
-    static bool IsPreOrdered(Object *left, Object *right);
+    static bool IsPreOrdered(const Object *left, const Object *right);
 
     //----------//
     // Functors //
@@ -1368,7 +1377,7 @@ private:
      * Helper methods for functor processing
      */
     ///@{
-    void UpdateDocumentScore(bool direction) const;
+    void UpdateDocumentScore(bool direction);
     bool SkipChildren(Functor *functor) const;
     bool FiltersApply(const ArrayOfComparisons *filters, Object *object) const;
     ///@}

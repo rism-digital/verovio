@@ -311,7 +311,11 @@ class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
 
+typedef std::vector<const Object *> ArrayOfConstObjects;
+
 typedef std::list<Object *> ListOfObjects;
+
+typedef std::list<const Object *> ListOfConstObjects;
 
 typedef std::vector<Comparison *> ArrayOfComparisons;
 

@@ -262,7 +262,7 @@ Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool ass
         Layer *layer = NULL;
         staff = this->GetCrossStaff(layer);
     }
-    if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<Staff *>(const_cast<LayerElement *>(this)->GetFirstAncestor(STAFF));
     if (assertExistence) assert(staff);
     return staff;
 }
@@ -275,8 +275,8 @@ Staff *LayerElement::GetCrossStaff(Layer *&layer) const
         return m_crossStaff;
     }
 
-    LayerElement *parent
-        = dynamic_cast<LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
+    LayerElement *parent = dynamic_cast<LayerElement *>(
+        const_cast<LayerElement *>(this)->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
 
     if (parent) return parent->GetCrossStaff(layer);
 
@@ -355,7 +355,7 @@ int LayerElement::GetDrawingX() const
 {
     // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingX
     if (this->HasFacs()) {
-        Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingX();
@@ -370,22 +370,22 @@ int LayerElement::GetDrawingX() const
     if (!m_alignment) {
         // assert(this->Is({ BEAM, FTREM, TUPLET }));
         // Here we just get the measure position - no cast to Measure is necessary
-        Object *measure = this->GetFirstAncestor(MEASURE);
+        const Object *measure = this->GetFirstAncestor(MEASURE);
         assert(measure);
         m_cachedDrawingX = measure->GetDrawingX();
         return m_cachedDrawingX;
     }
 
     // First get the first layerElement parent (if any) and use its position if they share the same alignment
-    LayerElement *parent
-        = dynamic_cast<LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
+    const LayerElement *parent
+        = dynamic_cast<const LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
     if (parent && (parent->GetAlignment() == this->GetAlignment())) {
         m_cachedDrawingX = (parent->GetDrawingX() + this->GetDrawingXRel());
         return m_cachedDrawingX;
     }
 
     // Otherwise get the measure - no cast to Measure is necessary
-    Object *measure = this->GetFirstAncestor(MEASURE);
+    const Object *measure = this->GetFirstAncestor(MEASURE);
     assert(measure);
 
     int graceNoteShift = 0;
@@ -403,7 +403,7 @@ int LayerElement::GetDrawingY() const
 {
     // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingY
     if (this->HasFacs()) {
-        Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingY();
@@ -413,7 +413,7 @@ int LayerElement::GetDrawingY() const
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
     // Look if we have a crossStaff situation
-    Object *object = m_crossStaff; // GetCrossStaff();
+    const Object *object = m_crossStaff; // GetCrossStaff();
     // First get the first layerElement parent (if any) but only if the element is not directly relative to staff
     // (e.g. artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);

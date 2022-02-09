@@ -127,7 +127,7 @@ bool Staff::IsSupportedChild(Object *child)
 int Staff::GetDrawingX() const
 {
     if (this->HasFacs()) {
-        Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingX();
@@ -139,7 +139,7 @@ int Staff::GetDrawingX() const
 int Staff::GetDrawingY() const
 {
     if (this->HasFacs()) {
-        Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(DOC);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingY();
@@ -152,7 +152,7 @@ int Staff::GetDrawingY() const
 
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
-    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
 
     m_cachedDrawingY = system->GetDrawingY() + m_staffAlignment->GetYRel();
@@ -162,7 +162,7 @@ int Staff::GetDrawingY() const
 double Staff::GetDrawingRotate() const
 {
     if (this->HasFacs()) {
-        Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingRotate();

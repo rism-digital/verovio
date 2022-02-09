@@ -86,7 +86,7 @@ bool Score::IsSupportedChild(Object *child)
     return true;
 }
 
-void Score::SetAsCurrent() const
+void Score::SetAsCurrent()
 {
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     // The doc can be NULL when doing the castoff and the pages are no attached to the doc

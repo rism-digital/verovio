@@ -701,9 +701,9 @@ void Object::ResetCachedDrawingY() const
     }
 }
 
-int Object::GetChildIndex(const Object *child)
+int Object::GetChildIndex(const Object *child) const
 {
-    ArrayOfObjects::iterator iter;
+    ArrayOfObjects::const_iterator iter;
     int i;
     for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, ++i) {
         if (child == *iter) {
@@ -740,7 +740,7 @@ void Object::FillFlatList(ArrayOfObjects *flatList)
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
 
-ListOfObjects Object::GetAncestors() const
+ListOfObjects Object::GetAncestors()
 {
     ListOfObjects ancestors;
     Object *object = m_parent;
@@ -751,7 +751,23 @@ ListOfObjects Object::GetAncestors() const
     return ancestors;
 }
 
-Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
+ListOfConstObjects Object::GetAncestors() const
+{
+    ListOfConstObjects ancestors;
+    const Object *object = m_parent;
+    while (object) {
+        ancestors.push_back(object);
+        object = object->m_parent;
+    }
+    return ancestors;
+}
+
+Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth)
+{
+    return const_cast<Object *>(std::as_const(*this).GetFirstAncestor(classId, maxDepth));
+}
+
+const Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
@@ -765,7 +781,12 @@ Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
     }
 }
 
-Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
+Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth)
+{
+    return const_cast<Object *>(std::as_const(*this).GetFirstAncestorInRange(classIdMin, classIdMax, maxDepth));
+}
+
+const Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
@@ -884,7 +905,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
 
     // Update the current score stored in the document
-    this->UpdateDocumentScore(direction);
+    const_cast<Object *>(this)->UpdateDocumentScore(direction);
 
     if (!skipFirst) {
         functor->Call(this, functorParams);
@@ -931,20 +952,20 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
 }
 
-void Object::UpdateDocumentScore(bool direction) const
+void Object::UpdateDocumentScore(bool direction)
 {
     // When we are starting a new score, we need to update the current score in the document
     if (direction == FORWARD && this->Is(SCORE)) {
-        const Score *score = vrv_cast<const Score *>(this);
+        Score *score = vrv_cast<Score *>(this);
         assert(score);
         score->SetAsCurrent();
     }
     // We need to do the same in backward direction through the PageMilestoneEnd::m_start
     else if (direction == BACKWARD && this->Is(PAGE_MILESTONE_END)) {
-        const PageMilestoneEnd *elementEnd = vrv_cast<const PageMilestoneEnd *>(this);
+        PageMilestoneEnd *elementEnd = vrv_cast<PageMilestoneEnd *>(this);
         assert(elementEnd);
         if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
-            const Score *score = vrv_cast<const Score *>(elementEnd->GetStart());
+            Score *score = vrv_cast<Score *>(elementEnd->GetStart());
             assert(score);
             score->SetAsCurrent();
         }
@@ -1116,20 +1137,20 @@ bool Object::sortByUlx(Object *a, Object *b)
     return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
 }
 
-bool Object::IsPreOrdered(Object *left, Object *right)
+bool Object::IsPreOrdered(const Object *left, const Object *right)
 {
-    ListOfObjects ancestorsLeft = left->GetAncestors();
+    ListOfConstObjects ancestorsLeft = left->GetAncestors();
     ancestorsLeft.push_front(left);
     // Check if right is an ancestor of left
     if (std::find(ancestorsLeft.begin(), ancestorsLeft.end(), right) != ancestorsLeft.end()) return false;
-    ListOfObjects ancestorsRight = right->GetAncestors();
+    ListOfConstObjects ancestorsRight = right->GetAncestors();
     ancestorsRight.push_front(right);
     // Check if left is an ancestor of right
     if (std::find(ancestorsRight.begin(), ancestorsRight.end(), left) != ancestorsRight.end()) return true;
 
     // Now there must be mismatches since we included left and right into the ancestor lists above
     auto iterPair = std::mismatch(ancestorsLeft.rbegin(), ancestorsLeft.rend(), ancestorsRight.rbegin());
-    Object *commonParent = (*iterPair.first)->m_parent;
+    const Object *commonParent = (*iterPair.first)->m_parent;
     if (commonParent) {
         return (commonParent->GetChildIndex(*iterPair.first) < commonParent->GetChildIndex(*iterPair.second));
     }
