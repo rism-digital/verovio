@@ -250,6 +250,10 @@ public:
     BoundingBox *GetOverflowBBoxAbove() const { return m_overflowBBoxAbove; }
     void SetOverflowBBoxBelow(BoundingBox *bboxBelow, int overflowBottom);
     BoundingBox *GetOverflowBBoxBelow() const { return m_overflowBBoxBelow; }
+    void SetScoreDefClefOverflowAbove(int overflowAbove) { m_scoreDefClefOverflowAbove = overflowAbove; }
+    int GetScoreDefClefOverflowAbove() const { return m_scoreDefClefOverflowAbove; }
+    void SetScoreDefClefOverflowBelow(int overflowBelow) { m_scoreDefClefOverflowBelow = overflowBelow; }
+    int GetScoreDefClefOverflowBelow() const { return m_scoreDefClefOverflowBelow; }
     ///@}
 
     /**
@@ -380,6 +384,8 @@ private:
     int m_staffHeight;
     BoundingBox *m_overflowBBoxAbove;
     BoundingBox *m_overflowBBoxBelow;
+    int m_scoreDefClefOverflowAbove;
+    int m_scoreDefClefOverflowBelow;
     ///@}
 
     // Value to store required beam adjustment for cross-staff beams
