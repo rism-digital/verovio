@@ -551,6 +551,7 @@ void Page::LayOutVertically()
     AlignSystemsParams alignSystemsParams(doc);
     alignSystemsParams.m_shift = doc->m_drawingPageContentHeight;
     alignSystemsParams.m_systemMargin = (doc->GetOptions()->m_spacingSystem.GetValue()) * doc->GetDrawingUnit(100);
+    alignSystemsParams.m_systemFirstMargin = (doc->GetOptions()->m_spacingSystemFirst.GetValue()) * doc->GetDrawingUnit(100);
     Functor alignSystems(&Object::AlignSystems);
     Functor alignSystemsEnd(&Object::AlignSystemsEnd);
     this->Process(&alignSystems, &alignSystemsParams, &alignSystemsEnd);

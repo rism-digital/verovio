@@ -1345,7 +1345,7 @@ Options::Options()
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
     
     m_spacingSystemFirst.SetInfo("Spacing system first", "The first system minimal spacing in MEI units");
-    m_spacingSystemFirst.Init(6, 0, 48);
+    m_spacingSystemFirst.Init(0, 0, 48);
     this->Register(&m_spacingSystemFirst, "spacingSystemFirst", &m_generalLayout);
 
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");

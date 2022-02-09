@@ -846,6 +846,7 @@ public:
     {
         m_shift = 0;
         m_systemMargin = 0;
+        m_systemFirstMargin = 0;
         m_prevBottomOverflow = 0;
         m_prevBottomClefOverflow = 0;
         m_justificationSum = 0.;
@@ -853,6 +854,7 @@ public:
     }
     int m_shift;
     int m_systemMargin;
+    int m_systemFirstMargin;
     int m_prevBottomOverflow;
     int m_prevBottomClefOverflow;
     double m_justificationSum;
