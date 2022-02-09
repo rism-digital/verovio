@@ -773,6 +773,7 @@ int System::AlignSystems(FunctorParams *functorParams)
     }
 
     params->m_prevBottomOverflow = m_systemAligner.GetOverflowBelow(params->m_doc);
+    params->m_prevBottomClefOverflow = m_systemAligner.GetOverflowBelow(params->m_doc, true);
 
     return FUNCTOR_SIBLINGS;
 }

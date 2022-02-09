@@ -847,12 +847,14 @@ public:
         m_shift = 0;
         m_systemMargin = 0;
         m_prevBottomOverflow = 0;
+        m_prevBottomClefOverflow = 0;
         m_justificationSum = 0.;
         m_doc = doc;
     }
     int m_shift;
     int m_systemMargin;
     int m_prevBottomOverflow;
+    int m_prevBottomClefOverflow;
     double m_justificationSum;
     Doc *m_doc;
 };
