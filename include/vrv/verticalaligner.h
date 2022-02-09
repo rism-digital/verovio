@@ -380,6 +380,8 @@ private:
     int m_staffHeight;
     BoundingBox *m_overflowBBoxAbove;
     BoundingBox *m_overflowBBoxBelow;
+    int m_scoreDefClefOverflowAbove;
+    int m_scoreDefClefOverflowBelow;
     ///@}
 
     // Value to store required beam adjustment for cross-staff beams

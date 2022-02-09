@@ -258,6 +258,8 @@ StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
     m_overlap = 0;
     m_overflowBBoxAbove = NULL;
     m_overflowBBoxBelow = NULL;
+    m_scoreDefClefOverflowAbove = 0;
+    m_scoreDefClefOverflowBelow = 0;
 }
 
 StaffAlignment::~StaffAlignment()
