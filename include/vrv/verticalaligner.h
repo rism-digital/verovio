@@ -90,8 +90,8 @@ public:
     /**
      * Get System Overflows
      */
-    int GetOverflowAbove(const Doc *doc) const;
-    int GetOverflowBelow(const Doc *doc) const;
+    int GetOverflowAbove(const Doc *doc, bool scoreDefClef = false) const;
+    int GetOverflowBelow(const Doc *doc, bool scoreDefClef = false) const;
 
     /**
      * Get justification sum
@@ -250,6 +250,10 @@ public:
     BoundingBox *GetOverflowBBoxAbove() const { return m_overflowBBoxAbove; }
     void SetOverflowBBoxBelow(BoundingBox *bboxBelow, int overflowBottom);
     BoundingBox *GetOverflowBBoxBelow() const { return m_overflowBBoxBelow; }
+    void SetScoreDefClefOverflowAbove(int overflowAbove) { m_scoreDefClefOverflowAbove = overflowAbove; }
+    int GetScoreDefClefOverflowAbove() const { return m_scoreDefClefOverflowAbove; }
+    void SetScoreDefClefOverflowBelow(int overflowBelow) { m_scoreDefClefOverflowBelow = overflowBelow; }
+    int GetScoreDefClefOverflowBelow() const { return m_scoreDefClefOverflowBelow; }
     ///@}
 
     /**
