@@ -753,13 +753,16 @@ int System::AlignSystems(FunctorParams *functorParams)
     assert(params);
     assert(m_systemAligner.GetBottomAlignment());
 
-    int systemMargin = this->IsFirstInPage() ? 0 : params->m_systemMargin;
+    int systemMargin = this->IsFirstInPage() ? params->m_systemFirstMargin : params->m_systemMargin;
     if (systemMargin) {
+        const int contentOverflow = params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc);
+        const int clefOverflow = params->m_prevBottomClefOverflow + m_systemAligner.GetOverflowAbove(params->m_doc, true);
         const int margin
-            = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc));
+            = systemMargin - std::max(contentOverflow, clefOverflow);
         // Ensure minimal white space between consecutive systems by adding one staff space
         const int unit = params->m_doc->GetDrawingUnit(100);
-        params->m_shift -= std::max(margin, 2 * unit);
+        if (margin > 0) params->m_shift -= margin;
+        //params->m_shift -= std::max(margin, 2 * unit);
     }
 
     this->SetDrawingYRel(params->m_shift);

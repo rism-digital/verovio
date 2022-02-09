@@ -493,7 +493,8 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
     StaffAlignment *prevAlignment = dynamic_cast<StaffAlignment *>(parent->GetPrevious(this));
 
     if (!prevAlignment) {
-        return this->GetOverflowAbove() + this->GetOverlap();
+        const int maxOverflow = std::max(this->GetOverflowAbove(), this->GetScoreDefClefOverflowAbove());
+        return maxOverflow + this->GetOverlap();
     }
 
     int overflowSum = 0;
