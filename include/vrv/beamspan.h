@@ -59,12 +59,8 @@ public:
     TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
     ////@}
 
-    // Helper to get element list for the beamSpan - elements are acquired from all layerElements that are located
-    // in between start and end of the beamSpan
-    ArrayOfObjects GetBeamSpanElementList(Layer *layer, Staff *staff);
-
     /**
-     * @name Initialize and cleam beam segments
+     * @name Initialize and clear beam segments
      */
     ///@{
     void InitBeamSegments();
@@ -93,6 +89,10 @@ public:
 private:
     // Helper for breaking one big spanning beamSpan into smaller beamSpans
     bool AddSpanningSegment(Doc *doc, const SpanIndexVector &elements, int index, bool newSegment = true);
+
+    // Helper to get element list for the beamSpan - elements are acquired from all layerElements that are located
+    // in between start and end of the beamSpan
+    ArrayOfObjects GetBeamSpanElementList(Layer *layer, Staff *staff);
 
 public:
     //

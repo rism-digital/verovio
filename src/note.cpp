@@ -974,7 +974,7 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     // Stems have been calculated previously in Beam or fTrem - siblings because flags do not need to
     // be processed either
-    if (IsInBeam() || IsInFTrem() || IsInBeamSpan()) {
+    if (this->IsInBeam() || this->IsInFTrem() || this->IsInBeamSpan()) {
         return FUNCTOR_SIBLINGS;
     }
 

@@ -425,12 +425,20 @@ void View::DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, Measure *measure)
     assert(beamSpan);
     assert(measure);
 
-    // Draw all segements for the beamSpan
+    // Draw all segments for the beamSpan
     dc->StartGraphic(beamSpan, "", beamSpan->GetUuid());
     for (auto segment : beamSpan->m_beamSegments) {
         // Reset current segment and set coordinates based on stored begin/end iterators for the ElementCoords
         segment->Reset();
-        ArrayOfBeamElementCoords coord(segment->m_placementInfo->m_begin, segment->m_placementInfo->m_end);
+
+        const auto coordsFirst = std::find(beamSpan->m_beamElementCoords.begin(), beamSpan->m_beamElementCoords.end(),
+            segment->m_placementInfo->m_begin);
+        const auto coordsLast = std::find(beamSpan->m_beamElementCoords.begin(), beamSpan->m_beamElementCoords.end(),
+            segment->m_placementInfo->m_end);
+        if ((coordsFirst == beamSpan->m_beamElementCoords.end()) || (coordsLast == beamSpan->m_beamElementCoords.end()))
+            continue;
+
+        ArrayOfBeamElementCoords coord(coordsFirst, coordsLast + 1);
         segment->InitCoordRefs(&coord);
         segment->CalcBeam(segment->m_placementInfo->m_layer, segment->m_placementInfo->m_staff, m_doc, beamSpan,
             beamSpan->m_drawingPlace);

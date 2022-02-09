@@ -4791,10 +4791,10 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "breath") {
             success = this->ReadBreath(parent, current);
         }
-        else if (std::string(current.name()) == "caesura") {
+        else if (currentName == "caesura") {
             success = this->ReadCaesura(parent, current);
         }
-        else if (std::string(current.name()) == "dir") {
+        else if (currentName == "dir") {
             success = this->ReadDir(parent, current);
         }
         else if (currentName == "dynam") {
@@ -4815,10 +4815,10 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "harm") {
             success = this->ReadHarm(parent, current);
         }
-        else if (std::string(current.name()) == "lv") {
+        else if (currentName == "lv") {
             success = this->ReadLv(parent, current);
         }
-        else if (std::string(current.name()) == "mNum") {
+        else if (currentName == "mNum") {
             success = this->ReadMNum(parent, current);
         }
         else if (currentName == "mordent") {
@@ -4833,10 +4833,10 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "phrase") {
             success = this->ReadPhrase(parent, current);
         }
-        else if (std::string(current.name()) == "pitchInflection") {
+        else if (currentName == "pitchInflection") {
             success = this->ReadPitchInflection(parent, current);
         }
-        else if (std::string(current.name()) == "reh") {
+        else if (currentName == "reh") {
             success = this->ReadReh(parent, current);
         }
         else if (currentName == "slur") {
@@ -7109,83 +7109,6 @@ bool MEIInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
     else {
         return false;
     }
-}
-
-bool MEIInput::ReadBeamSpanAsBeam(Measure *measure, pugi::xml_node beamSpan)
-{
-    if (!measure) {
-        LogWarning("Cannot read <beamSpan> within editorial markup");
-        return false;
-    }
-
-    Beam *beam = new Beam();
-    this->SetMeiUuid(beamSpan, beam);
-
-    LayerElement *start = NULL;
-    LayerElement *end = NULL;
-
-    // att.labelled
-    if (beamSpan.attribute("label")) {
-        beam->SetLabel(beamSpan.attribute("label").value());
-    }
-
-    // att.typed
-    if (beamSpan.attribute("type")) {
-        beam->SetType(beamSpan.attribute("type").value());
-    }
-    else {
-        beam->SetType("beamSpan");
-    }
-
-    // att.beam.vis
-    if (beamSpan.attribute("color")) {
-        beam->SetColor(beamSpan.attribute("color").value());
-    }
-
-    // position (pitch)
-    if (beamSpan.attribute("startid")) {
-        std::string refId = ExtractUuidFragment(beamSpan.attribute("startid").value());
-        start = dynamic_cast<LayerElement *>(measure->FindDescendantByUuid(refId));
-        if (!start) {
-            LogWarning("Element with @startid '%s' not found when trying to read the <beamSpan>", refId.c_str());
-        }
-    }
-    if (beamSpan.attribute("endid")) {
-        std::string refId = ExtractUuidFragment(beamSpan.attribute("endid").value());
-        end = dynamic_cast<LayerElement *>(measure->FindDescendantByUuid(refId));
-        if (!end) {
-            LogWarning("Element with @endid '%s' not found when trying to read the <beamSpan>", refId.c_str());
-        }
-    }
-    if (!start || !end) {
-        delete beam;
-        return false;
-    }
-
-    LayerElement *startChild = dynamic_cast<LayerElement *>(start->GetLastAncestorNot(LAYER));
-    LayerElement *endChild = dynamic_cast<LayerElement *>(end->GetLastAncestorNot(LAYER));
-
-    if (!startChild || !endChild || (startChild->GetParent() != endChild->GetParent())) {
-        LogWarning("Start and end elements for <beamSpan> '%s' not in the same layer", beam->GetUuid().c_str());
-        delete beam;
-        return false;
-    }
-
-    Layer *parentLayer = dynamic_cast<Layer *>(startChild->GetParent());
-    assert(parentLayer);
-
-    int startIdx = startChild->GetIdx();
-    int endIdx = endChild->GetIdx();
-    // LogDebug("%d %d %s!", startIdx, endIdx, start->GetUuid().c_str());
-    int i;
-    for (i = endIdx; i >= startIdx; i--) {
-        LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
-        if (element) beam->AddChild(element);
-    }
-    beam->SetParent(parentLayer);
-    parentLayer->InsertChild(beam, startIdx);
-
-    return true;
 }
 
 bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan)

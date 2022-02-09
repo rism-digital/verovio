@@ -1588,7 +1588,7 @@ int Object::ProcessPlist(FunctorParams *functorParams)
 
     std::string uuid = this->GetUuid();
     auto i = std::find_if(params->m_interfaceUuidTuples.begin(), params->m_interfaceUuidTuples.end(),
-        [uuid](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == uuid); });
+        [&uuid](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == uuid); });
     if (i != params->m_interfaceUuidTuples.end()) {
         std::get<2>(*i) = this;
     }

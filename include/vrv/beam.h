@@ -31,16 +31,14 @@ enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
 // Structure for storing additional information regarding beamSegment placement (in case of beam/beamSpan spanning over
 // the systems
 struct BeamSegmentPlacementInfo {
-private:
-    using CoordIter = ArrayOfBeamElementCoords::iterator;
 public:
-    BeamSegmentPlacementInfo() : m_measure(NULL), m_staff(NULL), m_layer(NULL), m_spanningType(SPANNING_START_END) {}
+    BeamSegmentPlacementInfo() = default;
     Measure *m_measure;
     Staff *m_staff;
     Layer *m_layer;
-    int m_spanningType;
-    CoordIter m_begin;
-    CoordIter m_end;
+    int m_spanningType = SPANNING_START_END;
+    BeamElementCoord *m_begin;
+    BeamElementCoord *m_end;
 
     // Set spanning type based on the positioning of the beam segment
     void SetSpanningType(int systemIndex, int systemCount);
@@ -79,7 +77,7 @@ public:
      * This is called by Beam::FilterList
      */
     void InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords);
-    
+
     /**
      * Initialize placement information for the segment. Should be used with beamSpan to specify which staff/layer it
      * belongs to

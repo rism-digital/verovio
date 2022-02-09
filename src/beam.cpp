@@ -36,7 +36,6 @@
 
 namespace vrv {
 
-
 void BeamSegmentPlacementInfo::SetSpanningType(int systemIndex, int systemCount)
 {
     if (0 == systemIndex) {
@@ -65,7 +64,6 @@ BeamSegment::~BeamSegment()
     this->ClearCoordRefs();
     if (m_placementInfo) {
         delete m_placementInfo;
-        m_placementInfo = NULL;
     }
 }
 
@@ -138,10 +136,9 @@ void BeamSegment::AppendSpanningCoordinates(Measure *measure)
     // otherwise start beam closer to the start of the Measure, to indicate spanning
     if ((SPANNING_END == spanningType) || (SPANNING_MIDDLE == spanningType)) {
         BeamElementCoord *left = new BeamElementCoord(*front);
-        const int width = measure->GetInnerWidth();
         int offset = 0;
         if (m_beamElementCoordRefs.size() > 1) {
-            const int divideBy = 2 * (m_beamElementCoordRefs.size() - 1);
+            const int divideBy = 2 * ((int)m_beamElementCoordRefs.size() - 1);
             offset = (back->m_x - front->m_x) / divideBy;
         }
         else {
@@ -449,7 +446,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
                 [midpointOffset](BeamElementCoord *coord) { coord->m_yBeam += midpointOffset; });
             if (!this->DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset)) return false;
         }
-        // If midpoint if above the staff, try to place beam at the top edge of the staff
+        // If midpoint is above the staff, try to place beam at the top edge of the staff
         if (!isMidpointWithinBounds && (midpoint > staffBottom)) {
             const int offset = (m_beamElementCoordRefs.front()->m_yBeam + m_beamElementCoordRefs.back()->m_yBeam
                                    - 2 * (staffTop - topOffset))

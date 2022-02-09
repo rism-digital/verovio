@@ -130,7 +130,6 @@ void LayerElement::Reset()
 
     m_crossStaff = NULL;
     m_crossLayer = NULL;
-    m_referencedElement = NULL;
 }
 
 LayerElement::~LayerElement() {}
@@ -146,7 +145,6 @@ void LayerElement::CloneReset()
 
     m_crossStaff = NULL;
     m_crossLayer = NULL;
-    m_referencedElement = NULL;
 }
 
 LayerElement *LayerElement::ThisOrSameasAsLink()
@@ -239,7 +237,6 @@ Beam *LayerElement::IsInBeam()
     return NULL;
 }
 
-
 int LayerElement::GetOriginalLayerN()
 {
     int layerN = this->GetAlignmentLayerN();
@@ -252,8 +249,10 @@ int LayerElement::GetOriginalLayerN()
 bool LayerElement::IsInBeamSpan() const
 {
     if (!this->Is({ CHORD, NOTE })) return false;
+    Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
+    if (measure) return measure->IsInSpanningObjects(this);
 
-    return m_referencedElement != NULL;
+    return false;
 }
 
 Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence) const

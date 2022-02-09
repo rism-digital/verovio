@@ -563,7 +563,7 @@ void Doc::PrepareDrawing()
     // If some are still there, then it is probably an issue in the encoding
     if (!preparePlistParams.m_interfaceUuidTuples.empty()) {
         LogWarning(
-            "%d element(s) with a @plist could match the target", preparePlistParams.m_interfaceUuidTuples.size());
+            "%d element(s) with a @plist could not match the target", preparePlistParams.m_interfaceUuidTuples.size());
     }
 
     /************ Resolve cross staff ************/

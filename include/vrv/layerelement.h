@@ -484,11 +484,6 @@ public:
     Staff *m_crossStaff;
     Layer *m_crossLayer;
 
-    /**
-     * This stores a pointer to the beamSpan (if any) that covers this LayerElement
-     */
-    Object *m_referencedElement;
-
 protected:
     Alignment *m_alignment;
 
