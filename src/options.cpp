@@ -1343,6 +1343,10 @@ Options::Options()
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing in MEI units");
     m_spacingSystem.Init(12, 0, 48);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
+    
+    m_spacingSystemFirst.SetInfo("Spacing system first", "The first system minimal spacing in MEI units");
+    m_spacingSystemFirst.Init(6, 0, 48);
+    this->Register(&m_spacingSystemFirst, "spacingSystemFirst", &m_generalLayout);
 
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
     m_staffLineWidth.Init(0.15, 0.10, 0.30);
@@ -1466,7 +1470,7 @@ Options::Options()
     this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
 
     m_bottomMarginPgHead.SetInfo("Bottom margin header", "The margin for header in MEI units");
-    m_bottomMarginPgHead.Init(8.0, 0.0, 24.0);
+    m_bottomMarginPgHead.Init(2.0, 0.0, 24.0);
     this->Register(&m_bottomMarginPgHead, "bottomMarginHeader", &m_elementMargins);
 
     /// custom left
