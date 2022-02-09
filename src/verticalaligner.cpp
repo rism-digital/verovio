@@ -132,22 +132,26 @@ void SystemAligner::FindAllIntersectionPoints(
     }
 }
 
-int SystemAligner::GetOverflowAbove(const Doc *) const
+int SystemAligner::GetOverflowAbove(const Doc *, bool scoreDefClef) const
 {
     if (!this->GetChildCount() || this->GetChild(0) == m_bottomAlignment) return 0;
 
     StaffAlignment *alignment = vrv_cast<StaffAlignment *>(this->GetChild(0));
     assert(alignment);
     return alignment->GetOverflowAbove();
+    int overflowAbove = scoreDefClef ? alignment->GetScoreDefClefOverflowAbove() : alignment->GetOverflowAbove();
+    return overflowAbove;
 }
 
-int SystemAligner::GetOverflowBelow(const Doc *doc) const
+int SystemAligner::GetOverflowBelow(const Doc *doc, bool scoreDefClef) const
 {
     if (!this->GetChildCount() || this->GetChild(0) == m_bottomAlignment) return 0;
 
     StaffAlignment *alignment = vrv_cast<StaffAlignment *>(this->GetChild(this->GetChildCount() - 2));
     assert(alignment);
     return alignment->GetOverflowBelow() + doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(alignment->GetStaffSize());
+    int overflowBelow = scoreDefClef ? alignment->GetScoreDefClefOverflowBelow() : alignment->GetOverflowBelow();
+    return overflowBelow;
 }
 
 double SystemAligner::GetJustificationSum(const Doc *doc) const
