@@ -127,7 +127,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         std::set<std::string>::const_iterator it;
         for (it = m_smuflGlyphs.begin(); it != m_smuflGlyphs.end(); ++it) {
             // load the XML file that contains it as a pugi::xml_document
-            std::ifstream source((*it).c_str());
+            const std::string path = Resources::GetPath() + "/" + Resources::GetSmuflFontName() + "/" + *it + ".xml";
+            std::ifstream source(path);
             sourceDoc.load(source);
 
             // copy all the nodes inside into the master document
@@ -904,10 +905,8 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
             continue;
         }
 
-        std::string path = glyph->GetPath();
-
         // Add the glyph to the array for the <defs>
-        m_smuflGlyphs.insert(path);
+        m_smuflGlyphs.insert(glyph->GetCodeStr());
 
         // Write the char in the SVG
         pugi::xml_node useChild = AppendChild("use");
