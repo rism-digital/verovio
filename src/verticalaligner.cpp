@@ -1055,9 +1055,7 @@ int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    if (m_spacingType != SystemAligner::SpacingType::System) {
-        params->m_cumulatedShift += this->GetMinimumSpacing(params->m_doc);
-    }
+    params->m_cumulatedShift += this->GetMinimumSpacing(params->m_doc);
 
     this->SetYRel(-params->m_cumulatedShift);
 
@@ -1075,10 +1073,7 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
     const int defaultSpacing = this->GetMinimumSpacing(params->m_doc);
     const int minSpacing = this->CalcMinimumRequiredSpacing(params->m_doc);
 
-    if (m_spacingType == SystemAligner::SpacingType::System) {
-        params->m_cumulatedShift += minSpacing;
-    }
-    else if (minSpacing > defaultSpacing) {
+    if (minSpacing > defaultSpacing) {
         params->m_cumulatedShift += minSpacing - defaultSpacing;
     }
 
