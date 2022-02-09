@@ -445,6 +445,8 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
 {
     assert(doc);
 
+    const AttSpacing *scoreDefSpacing = this->GetAttSpacing();
+
     int spacing = 0;
     if (m_staff && m_staff->m_drawingStaffDef) {
         // Default or staffDef spacing
@@ -452,10 +454,10 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
             spacing = m_staff->m_drawingStaffDef->GetSpacing() * doc->GetDrawingUnit(100);
         }
         else {
-            const AttSpacing *scoreDefSpacing = this->GetAttSpacing();
             switch (m_spacingType) {
                 case SystemAligner::SpacingType::System: {
-                    spacing = this->GetParentSystem()->GetMinimumSystemSpacing(doc);
+                    // Top staff spacing (above) is half of a staff spacing
+                    spacing = this->GetMinimumStaffSpacing(doc, scoreDefSpacing) / 2;
                     break;
                 }
                 case SystemAligner::SpacingType::Staff: {
@@ -478,6 +480,10 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
                 default: assert(false);
             }
         }
+    }
+    // This is the bottom aligner - spacing is half of a staff spacing
+    else {
+        spacing = this->GetMinimumStaffSpacing(doc, scoreDefSpacing) / 2;
     }
 
     return spacing;
