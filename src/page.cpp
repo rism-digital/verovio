@@ -841,11 +841,13 @@ int Page::AlignSystems(FunctorParams *functorParams)
 
     RunningElement *header = this->GetHeader();
     if (header) {
-        const int bottomMarginPgHead
-            = params->m_doc->GetOptions()->m_bottomMarginPgHead.GetValue() * params->m_doc->GetDrawingUnit(100);
-
         header->SetDrawingYRel(params->m_shift);
-        params->m_shift -= header->GetTotalHeight() + bottomMarginPgHead;
+        const int headerHeight = header->GetTotalHeight();
+        if (headerHeight > 0) {
+            const int bottomMarginPgHead
+                = params->m_doc->GetOptions()->m_bottomMarginPgHead.GetValue() * params->m_doc->GetDrawingUnit(100);
+            params->m_shift -= header->GetTotalHeight() + bottomMarginPgHead;
+        }
     }
     return FUNCTOR_CONTINUE;
 }
