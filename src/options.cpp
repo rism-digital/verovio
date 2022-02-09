@@ -1343,7 +1343,7 @@ Options::Options()
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing in MEI units");
     m_spacingSystem.Init(12, 0, 48);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
-    
+
     m_spacingSystemFirst.SetInfo("Spacing system first", "The first system minimal spacing in MEI units");
     m_spacingSystemFirst.Init(0, 0, 48);
     this->Register(&m_spacingSystemFirst, "spacingSystemFirst", &m_generalLayout);
