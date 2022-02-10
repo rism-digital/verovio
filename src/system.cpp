@@ -762,7 +762,7 @@ int System::AlignSystems(FunctorParams *functorParams)
         // Alignment is already pre-determined with staff alignment overflow
         // We need to subtract them from the desired spacing
         const int actualSpacing = systemSpacing - std::max(contentOverflow, clefOverflow);
-        // Set the spacing if it exsits (greater than 0)
+        // Set the spacing if it exists (greater than 0)
         if (actualSpacing > 0) params->m_shift -= actualSpacing;
     }
 
