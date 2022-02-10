@@ -4901,7 +4901,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
 
     if (primarymensuration.empty()) {
         if (timesig.size() > 0) {
-            setTimeSig(m_staffdef.back(), timesig, metersig, staffstart, timetok);
+            setTimeSig(m_staffdef.back(), timesig, metersig, staffstart, timetok, metertok);
         }
         if (!m_mens && (metersig.size() > 0)) {
             setMeterSymbol(m_staffdef.back(), metersig, staffindex, staffstart, metertok);
@@ -5715,8 +5715,8 @@ void HumdrumInput::setMensurationSymbol(
 // HumdrumInput::setTimeSig -- Convert a Humdrum timesig to an MEI timesig.
 //
 
-void HumdrumInput::setTimeSig(
-    StaffDef *part, const std::string &timesig, const std::string &metersig, hum::HTp partstart, hum::HTp timetok)
+void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const std::string &metersig,
+    hum::HTp partstart, hum::HTp timetok, hum::HTp metertok)
 {
     if ((partstart != NULL) && partstart->isMens()) {
         // Don't display time signatures in mensural notation.
@@ -5730,6 +5730,11 @@ void HumdrumInput::setTimeSig(
     }
     if (timetok) {
         setLocationId(vrvmeter, timetok);
+    }
+
+    if (*metertok == "*met()") {
+        // set time signature to be invisible
+        vrvmeter->SetForm(METERFORM_invis);
     }
 
     // Don't store time signature if there is a mensuration to show
@@ -5830,6 +5835,14 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             MeterSig *vrvmetersig = getMeterSig(element);
             vrvmetersig->SetCount({ count });
             vrvmetersig->SetUnit(unit);
+        }
+        else if (*metersigtok == "*met()") {
+            count = stoi(matches[1]);
+            unit = stoi(matches[2]);
+            MeterSig *vrvmetersig = getMeterSig(element);
+            vrvmetersig->SetCount({ count });
+            vrvmetersig->SetUnit(unit);
+            vrvmetersig->SetForm(METERFORM_invis);
         }
         else if (metersig == "3") {
             MeterSig *vrvmetersig = getMeterSig(element);

@@ -444,7 +444,7 @@ protected:
     void setDynamicTransposition(int staffindex, StaffDef *staff, const std::string &itranspose);
     void setTransposition(StaffDef *staffDef, const std::string &transpose);
     void setTimeSig(StaffDef *part, const std::string &timesig, const std::string &metersig = "",
-        hum::HTp partstart = NULL, hum::HTp timetok = NULL);
+        hum::HTp partstart = NULL, hum::HTp timetok = NULL, hum::HTp metertok = NULL);
     void fillStaffInfo(hum::HTp staffstart, int staffnumber, int staffcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex();
