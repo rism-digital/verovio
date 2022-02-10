@@ -469,6 +469,11 @@ void Page::LayOutVertically()
     Functor calcLedgerLinesEnd(&Object::CalcLedgerLinesEnd);
     this->Process(&calcLedgerLines, &calcLedgerLinesParams, &calcLedgerLinesEnd);
 
+    // Calculate the slur direction
+    PrepareSlursParams prepareSlursParams(doc);
+    Functor prepareSlurs(&Object::PrepareSlurs);
+    this->Process(&prepareSlurs, &prepareSlursParams);
+
     // Align the content of the page using system aligners
     // After this:
     // - each Staff object will then have its StaffAlignment pointer initialized

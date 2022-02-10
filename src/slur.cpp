@@ -1265,14 +1265,14 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
     PrepareSlursParams *params = vrv_params_cast<PrepareSlursParams *>(functorParams);
     assert(params);
 
-    // If curve direction is prescribed or was calculated before, use it
-    if (this->HasCurvedir()) {
+    // If curve direction is prescribed as above or below, use it
+    if (this->HasCurvedir() && (this->GetCurvedir() != curvature_CURVEDIR_mixed)) {
         this->SetDrawingCurvedir(
             (this->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below);
     }
     if (this->HasDrawingCurvedir()) return FUNCTOR_CONTINUE;
 
-    // Retrieve boundary, staves and system
+    // Retrieve boundary
     LayerElement *start = this->GetStart();
     LayerElement *end = this->GetEnd();
     if (!start || !end) {
@@ -1280,6 +1280,20 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    // If curve direction is prescribed as mixed, use it if boundary lies in different staves
+    if (this->GetCurvedir() == curvature_CURVEDIR_mixed) {
+        const int startStaffN = start->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
+        const int endStaffN = end->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
+        if (startStaffN != endStaffN) {
+            this->SetDrawingCurvedir(curvature_CURVEDIR_mixed);
+            return FUNCTOR_CONTINUE;
+        }
+        else {
+            LogWarning("Mixed curve direction is ignored for slurs starting and ending on the same staff.");
+        }
+    }
+
+    // Retrieve staves and system
     std::vector<Staff *> staffList = this->GetTstampStaves(this->GetStartMeasure(), this);
     if (staffList.empty()) {
         this->SetDrawingCurvedir(curvature_CURVEDIR_above);
