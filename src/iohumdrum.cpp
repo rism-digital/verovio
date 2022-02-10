@@ -5488,6 +5488,18 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 2;
         prolatio = 2;
     }
+    else if (metersig == "*met(C|3)" || metersig == "C|3") {
+        if (m_mens) {
+            vrvmensur->SetTempus(TEMPUS_2);
+            vrvmensur->SetProlatio(PROLATIO_2);
+        }
+        vrvmensur->SetSlash(1);
+        vrvmensur->SetNum(3);
+        maximodus = 2;
+        modus = 2;
+        tempus = 2;
+        prolatio = 2;
+    }
     else if (metersig == "*met(O)" || metersig == "O") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_3);
