@@ -46,6 +46,7 @@ public:
     bool SetText(std::string elementId, std::string text);
     bool SetClef(std::string elementId, std::string shape);
     bool Split(std::string elementId, int x);
+    bool SplitNeume(std::string elementId, std::string ncId);
     bool Remove(std::string elementId);
     bool Resize(std::string elementId, int ulx, int uly, int lrx, int lry, float resize = NAN);
     bool Group(std::string groupType, std::vector<std::string> elementIds);
@@ -68,6 +69,7 @@ protected:
     bool ParseSetTextAction(jsonxx::Object param, std::string *elementId, std::string *text);
     bool ParseSetClefAction(jsonxx::Object param, std::string *elementId, std::string *shape);
     bool ParseSplitAction(jsonxx::Object param, std::string *elementId, int *x);
+    bool ParseSplitNeumeAction(jsonxx::Object param, std::string *elementId, std::string *ncId);
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);
     bool ParseResizeAction(jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry);
     bool ParseResizeRotateAction(
