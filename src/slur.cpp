@@ -301,6 +301,9 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     assert(curve);
     assert(staff);
 
+    // For now we disable collision avoidance for s-slurs
+    if (curve->GetDir() == curvature_CURVEDIR_mixed) return;
+
     Point points[4];
     curve->GetPoints(points);
     BezierCurve bezier(points[0], points[1], points[2], points[3]);
