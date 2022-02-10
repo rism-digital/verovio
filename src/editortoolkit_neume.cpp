@@ -2446,19 +2446,6 @@ bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId)
     Object *sparent = fparent->GetFirstAncestor(SYLLABLE);
     assert(sparent);
 
-    // find all nc in the neume
-    ListOfObjects neumeChildren;
-    ClassIdComparison ac(NC);
-    fparent->FindAllDescendantByComparison(&neumeChildren, &ac);
-    assert(neumeChildren);
-    // if no children, report error
-    if (neumeChildren.empty()) {
-        LogError("The selected neume has no children.");
-        m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "The selected neume has no children.");
-        return false;
-    }
-
     // get index
     int nLen = fparent->GetChildCount();
     if (nLen == 0) {
