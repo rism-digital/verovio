@@ -95,11 +95,11 @@ public:
     /** Content height */
     int GetContentHeight();
     /** Row from 0 to 2 */
-    int GetRowHeight(int row);
+    int GetRowHeight(int row) const;
     /** Col from 0 to 2 */
-    int GetColHeight(int col);
+    int GetColHeight(int col) const;
     /** Row from 0 to 8 */
-    int GetCellHeight(int cell);
+    int GetCellHeight(int cell) const;
     ///@}
 
     /**

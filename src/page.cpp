@@ -79,16 +79,21 @@ bool Page::IsSupportedChild(Object *child)
     return true;
 }
 
-RunningElement *Page::GetHeader() const
+RunningElement *Page::GetHeader()
+{
+    return const_cast<RunningElement *>(std::as_const(*this).GetHeader());
+}
+
+const RunningElement *Page::GetHeader() const
 {
     assert(m_score);
 
-    Doc *doc = dynamic_cast<Doc *>(const_cast<Page *>(this)->GetFirstAncestor(DOC));
+    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
         return NULL;
     }
 
-    Pages *pages = doc->GetPages();
+    Pages *pages = const_cast<Doc *>(doc)->GetPages();
     assert(pages);
 
     // first page or use the pgHeader for all pages?
@@ -100,16 +105,21 @@ RunningElement *Page::GetHeader() const
     }
 }
 
-RunningElement *Page::GetFooter() const
+RunningElement *Page::GetFooter()
+{
+    return const_cast<RunningElement *>(std::as_const(*this).GetFooter());
+}
+
+const RunningElement *Page::GetFooter() const
 {
     assert(m_scoreEnd);
 
-    Doc *doc = dynamic_cast<Doc *>(const_cast<Page *>(this)->GetFirstAncestor(DOC));
+    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
         return NULL;
     }
 
-    Pages *pages = doc->GetPages();
+    Pages *pages = const_cast<Doc *>(doc)->GetPages();
     assert(pages);
 
     // first page or use the pgFooter for all pages?

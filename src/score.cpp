@@ -92,7 +92,7 @@ void Score::SetAsCurrent()
     // The doc can be NULL when doing the castoff and the pages are no attached to the doc
     // If such cases, it will not matter not to have the current scoreDef in the doc
     if (doc) {
-        doc->SetCurrentScore(const_cast<Score *>(this));
+        doc->SetCurrentScore(this);
     }
 }
 

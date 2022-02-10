@@ -67,8 +67,10 @@ public:
      * Looks if the page is the first one or not
      */
     ///@{
-    RunningElement *GetHeader() const;
-    RunningElement *GetFooter() const;
+    RunningElement *GetHeader();
+    const RunningElement *GetHeader() const;
+    RunningElement *GetFooter();
+    const RunningElement *GetFooter() const;
     ///@}
 
     /**
