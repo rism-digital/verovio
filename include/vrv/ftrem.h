@@ -37,6 +37,13 @@ public:
     ///@}
 
     /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    BeamDrawingInterface *GetBeamDrawingInterface() override { return dynamic_cast<BeamDrawingInterface *>(this); }
+    ///@}
+
+    /**
      * Add an element (a note or a chord) to a fTrem.
      * Only Note or Chord elements will be actually added to the fTrem.
      */

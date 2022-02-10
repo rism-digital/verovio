@@ -1892,10 +1892,8 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         assert(currentLayer);
         // set scoreDef attr
         if (currentLayer->GetStaffDefClef()) {
-            // Ignore system scoreDef clefs - clefs changes withing a staff are still taken into account
-            if (currentLayer->GetStaffDefClef()->GetScoreDefRole() != SCOREDEF_SYSTEM) {
-                currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
-            }
+            // System scoreDef clefs are taken into account but treated separately (see below)
+            currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
         }
         if (currentLayer->GetStaffDefKeySig()) {
             currentLayer->GetStaffDefKeySig()->SetOverflowBBoxes(params);
@@ -1944,14 +1942,26 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     StaffAlignment *below = NULL;
     current->GetOverflowStaffAlignments(above, below);
 
+    bool isScoreDefClef = false;
+    // Exception for the scoreDef clef where we do not want to take into account the general overflow
+    // We have instead distinct members in StaffAlignment to store them
+    if (current->Is(CLEF) && current->GetScoreDefRole() == SCOREDEF_SYSTEM) {
+        isScoreDefClef = true;
+    }
+
     if (above) {
         int overflowAbove = above->CalcOverflowAbove(current);
         int staffSize = above->GetStaffSize();
         if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
-            above->SetOverflowBBoxAbove(current, overflowAbove);
-            above->SetOverflowAbove(overflowAbove);
-            above->AddBBoxAbove(current);
+            if (isScoreDefClef) {
+                above->SetScoreDefClefOverflowAbove(overflowAbove);
+            }
+            else {
+                above->SetOverflowBBoxAbove(current, overflowAbove);
+                above->SetOverflowAbove(overflowAbove);
+                above->AddBBoxAbove(current);
+            }
         }
     }
 
@@ -1960,9 +1970,14 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         int staffSize = below->GetStaffSize();
         if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
-            below->SetOverflowBBoxBelow(current, overflowBelow);
-            below->SetOverflowBelow(overflowBelow);
-            below->AddBBoxBelow(current);
+            if (isScoreDefClef) {
+                below->SetScoreDefClefOverflowBelow(overflowBelow);
+            }
+            else {
+                below->SetOverflowBBoxBelow(current, overflowBelow);
+                below->SetOverflowBelow(overflowBelow);
+                below->AddBBoxBelow(current);
+            }
         }
     }
 

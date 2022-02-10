@@ -907,6 +907,14 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     delete unCastOffPage;
     unCastOffPage = NULL;
 
+    // Store the cast off system widths => these are used to adjust the horizontal spacing
+    // for a given duration during page layout
+    AlignMeasuresParams alignMeasuresParams(this);
+    alignMeasuresParams.m_storeCastOffSystemWidths = true;
+    Functor alignMeasures(&Object::AlignMeasures);
+    Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
+    castOffSinglePage->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
+
     // Replace it with the castOffSinglePage
     pages->AddChild(castOffSinglePage);
     this->ResetDrawingPage();

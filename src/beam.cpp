@@ -1238,12 +1238,12 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
             continue;
         }
         if (!coord->m_closestNote) continue;
+        // skip current element if it's longer that minDuration and is not a part of fTrem
+        if ((coord->m_dur <= minDuration) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
+        // if location matches or if current stem length is too short - adjust stem length
         const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
-        // if location matches, or if current elements duration is shorter than 8th. This ensures that beams with
-        // partial beams will not be shorted when lowest/highest note is 8th and can be shortened
-        if ((coord->m_dur > minDuration)
-            && ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
-                || (!isHorizontal && (std::abs(m_uniformStemLength) < 13)))) {
+        if ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
+            || (!isHorizontal && (std::abs(m_uniformStemLength) < 13))) {
             m_uniformStemLength = coordStemLength;
             minDuration = coord->m_dur;
         }

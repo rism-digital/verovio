@@ -78,6 +78,8 @@ void System::Reset()
     m_drawingYRel = 0;
     m_drawingTotalWidth = 0;
     m_drawingJustifiableWidth = 0;
+    m_castOffTotalWidth = 0;
+    m_castOffJustifiableWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
     m_drawingIsOptimized = false;
 }
@@ -369,6 +371,27 @@ bool System::IsLastOfMdiv()
     return (nextSibling && nextSibling->IsPageElement());
 }
 
+double System::EstimateJustificationRatio(Doc *doc)
+{
+    assert(doc);
+
+    // We can only estimate if cast off system widths are available
+    if ((m_castOffTotalWidth == 0) || (m_castOffJustifiableWidth == 0)) {
+        return 1.0;
+    }
+
+    const double nonJustifiableWidth
+        = m_systemLeftMar + m_systemRightMar + m_castOffTotalWidth - m_castOffJustifiableWidth;
+    double estimatedRatio
+        = (double)(doc->m_drawingPageContentWidth - nonJustifiableWidth) / ((double)m_castOffJustifiableWidth);
+
+    // Apply dampening and bound compression
+    estimatedRatio *= 0.95;
+    estimatedRatio = std::max(estimatedRatio, 0.8);
+
+    return estimatedRatio;
+}
+
 void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
 {
     assert(doc);
@@ -549,6 +572,19 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functorEnd, params);
 
     return FUNCTOR_SIBLINGS;
+}
+
+int System::SetAlignmentXPos(FunctorParams *functorParams)
+{
+    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    assert(params);
+
+    const double ratio = this->EstimateJustificationRatio(params->m_doc);
+    if (!this->IsLastOfMdiv() || (ratio < params->m_estimatedJustificationRatio)) {
+        params->m_estimatedJustificationRatio = ratio;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 int System::AdjustXOverflow(FunctorParams *functorParams)
@@ -741,8 +777,14 @@ int System::AlignMeasuresEnd(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    m_drawingTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
-    m_drawingJustifiableWidth = params->m_justifiableWidth;
+    if (params->m_storeCastOffSystemWidths) {
+        m_castOffTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
+        m_castOffJustifiableWidth = params->m_justifiableWidth;
+    }
+    else {
+        m_drawingTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
+        m_drawingJustifiableWidth = params->m_justifiableWidth;
+    }
 
     return FUNCTOR_CONTINUE;
 }
