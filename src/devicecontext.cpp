@@ -30,28 +30,45 @@ void BezierCurve::Rotate(float angle, const Point &rotationPoint)
     c2 = BoundingBox::CalcPositionAfterRotation(c2, angle, rotationPoint);
 }
 
-void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staffSize)
+void BezierCurve::CalcInitialControlPointParams(Doc *doc, bool isConvex, float angle, int staffSize)
 {
+    // Note: For convex curves we assume that the curve is rotated such that p1.y == p2.y,
+    // but for curves with mixed curvature we assume that the curve is unrotated
     const int dist = abs(p2.x - p1.x);
     const int unit = doc->GetDrawingUnit(staffSize);
 
     // Initialize offset
-    const double ratio = double(dist) / double(unit);
-    double baseVal = (ratio > 4.0) ? 3.0 : 6.0;
-    if ((ratio > 4.0) && (ratio < 32.0)) {
-        // interpolate baseVal between 6.0 and 3.0
-        baseVal = 8.0 - log2(ratio);
+    int offset = 0;
+    if (isConvex) {
+        const double ratio = double(dist) / double(unit);
+        double baseVal = (ratio > 4.0) ? 3.0 : 6.0;
+        if ((ratio > 4.0) && (ratio < 32.0)) {
+            // interpolate baseVal between 6.0 and 3.0
+            baseVal = 8.0 - log2(ratio);
+        }
+        offset = dist / baseVal;
     }
-    const int offset = dist / baseVal;
+    else {
+        offset = dist / 12.0;
+        offset = std::min(offset, 4 * unit);
+    }
+
     m_leftControlPointOffset = offset;
     m_rightControlPointOffset = offset;
 
     // Initialize height
-    int height = std::max<int>(1.2 * unit, dist / 5);
-    height = std::min<int>(3.0 * unit, height);
-    height *= doc->GetOptions()->m_slurCurveFactor.GetValue();
-    height = std::min(height, 2 * doc->GetDrawingOctaveSize(staffSize));
-    height = std::min<int>(height, 2 * offset * cos(angle));
+    int height = 1.2 * unit;
+    if (isConvex) {
+        height = std::max(dist / 5, height);
+        height = std::min(3 * unit, height);
+        height *= doc->GetOptions()->m_slurCurveFactor.GetValue();
+        height = std::min(height, 2 * doc->GetDrawingOctaveSize(staffSize));
+        height = std::min<int>(height, 2 * offset * cos(angle));
+    }
+    else {
+        height = std::max(height, std::abs(p2.y - p1.y));
+        height *= doc->GetOptions()->m_slurCurveFactor.GetValue();
+    }
     this->SetControlHeight(height);
 }
 

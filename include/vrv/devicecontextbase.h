@@ -265,7 +265,7 @@ public:
     /**
      * @name Initialize control point height and offset from end point positions
      */
-    void CalcInitialControlPointParams(Doc *doc, float angle, int staffSize);
+    void CalcInitialControlPointParams(Doc *doc, bool isConvex, float angle, int staffSize);
 
     /**
      * Calculate control point offset and height from points or vice versa
