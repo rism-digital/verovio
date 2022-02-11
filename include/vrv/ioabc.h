@@ -73,6 +73,7 @@ private:
     void parseMeter(const std::string &meterString); // M:
     void parseTempo(const std::string &tempoString); // Q:
     void parseReferenceNumber(const std::string &referenceNumberString); // X:
+    void parseLyrics(); // w:
 
     // input functions
     void readInformationField(const char &dataKey, std::string dataValue);
@@ -145,6 +146,9 @@ private:
 
     std::vector<LayerElement *> m_layerElements;
     std::vector<LayerElement *> m_noteStack;
+    // Array of added notes in one line of ABC file. Used to track elements that might require adding verse to
+    std::vector<LayerElement *> m_lineNoteArray;
+    int m_verseNumber = 1;
     /*
      * ABC decoration stacks
      */
