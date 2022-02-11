@@ -186,14 +186,20 @@ public:
     /**
      * Get the ancestor or cross staff
      */
-    Staff *GetAncestorStaff(StaffSearch strategy = ANCESTOR_ONLY, bool assertExistence = true) const;
+    ///@{
+    Staff *GetAncestorStaff(StaffSearch strategy = ANCESTOR_ONLY, bool assertExistence = true);
+    const Staff *GetAncestorStaff(StaffSearch strategy = ANCESTOR_ONLY, bool assertExistence = true) const;
+    ///@}
 
     /**
      * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff.
      * Also set the corresponding m_crossLayer to layer if a cross staff is found.
      * Return NULL if there is no cross-staff in the element or a parent.
      */
-    Staff *GetCrossStaff(Layer *&layer) const;
+    ///@{
+    Staff *GetCrossStaff(Layer *&layer);
+    const Staff *GetCrossStaff(Layer *&layer) const;
+    ///@}
 
     /**
      * Retrieve the direction of a cross-staff situation

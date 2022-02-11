@@ -454,7 +454,7 @@ wchar_t Note::GetMensuralNoteheadGlyph() const
         return 0;
     }
 
-    Staff *staff = this->GetAncestorStaff();
+    const Staff *staff = this->GetAncestorStaff();
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     wchar_t code = 0;

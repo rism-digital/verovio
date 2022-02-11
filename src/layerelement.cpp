@@ -257,17 +257,27 @@ bool LayerElement::IsInBeamSpan() const
 
 Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence) const
 {
-    Staff *staff = NULL;
+    return const_cast<Staff *>(std::as_const(*this).GetAncestorStaff(strategy, assertExistence));
+}
+
+const Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence) const
+{
+    const Staff *staff = NULL;
     if (strategy == RESOLVE_CROSS_STAFF) {
         Layer *layer = NULL;
         staff = this->GetCrossStaff(layer);
     }
-    if (!staff) staff = vrv_cast<Staff *>(const_cast<LayerElement *>(this)->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
     if (assertExistence) assert(staff);
     return staff;
 }
 
-Staff *LayerElement::GetCrossStaff(Layer *&layer) const
+Staff *LayerElement::GetCrossStaff(Layer *&layer)
+{
+    return const_cast<Staff *>(std::as_const(*this).GetCrossStaff(layer));
+}
+
+const Staff *LayerElement::GetCrossStaff(Layer *&layer) const
 {
     if (m_crossStaff) {
         assert(m_crossLayer);
@@ -275,8 +285,8 @@ Staff *LayerElement::GetCrossStaff(Layer *&layer) const
         return m_crossStaff;
     }
 
-    LayerElement *parent = dynamic_cast<LayerElement *>(
-        const_cast<LayerElement *>(this)->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
+    const LayerElement *parent
+        = dynamic_cast<const LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
 
     if (parent) return parent->GetCrossStaff(layer);
 
