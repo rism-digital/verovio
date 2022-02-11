@@ -204,6 +204,17 @@ public:
     }
 };
 
+//----------------------------------------------------------------------------
+// RelPositions
+//----------------------------------------------------------------------------
+/**
+ * This indicates positions for point pairs
+ */
+struct RelPositions {
+    bool isStartAbove;
+    bool isEndAbove;
+};
+
 // ---------------------------------------------------------------------------
 // BezierCurve
 // ---------------------------------------------------------------------------
@@ -260,8 +271,8 @@ public:
      * Calculate control point offset and height from points or vice versa
      */
     ///@{
-    void UpdateControlPointParams(curvature_CURVEDIR dir);
-    void UpdateControlPoints(curvature_CURVEDIR dir);
+    void UpdateControlPointParams(const RelPositions &controlPointPos);
+    void UpdateControlPoints(const RelPositions &controlPointPos);
     ///@}
 
 private:

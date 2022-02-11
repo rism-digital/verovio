@@ -101,7 +101,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     if (!start || !end) return;
 
     const curvature_CURVEDIR drawingCurveDir = slur->GetDrawingCurvedir();
-    const RelBoundaryPositions boundaryPos = slur->GetRelBoundaryPositions();
+    const RelPositions boundaryPos = slur->GetRelBoundaryPositions();
 
     /************** adjusting y position **************/
 
@@ -243,8 +243,9 @@ float View::CalcInitialSlur(
 
     /************** control points **************/
 
+    const RelPositions controlPointPos = slur->GetRelBoundaryPositions();
     bezier.CalcInitialControlPointParams(m_doc, slurAngle, staff->m_drawingStaffSize);
-    bezier.UpdateControlPoints(curveDir);
+    bezier.UpdateControlPoints(controlPointPos);
     bezier.Rotate(slurAngle, bezier.p1);
 
     points[0] = bezier.p1;

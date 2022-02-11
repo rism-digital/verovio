@@ -55,21 +55,23 @@ void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staff
     this->SetControlHeight(height);
 }
 
-void BezierCurve::UpdateControlPointParams(curvature_CURVEDIR dir)
+void BezierCurve::UpdateControlPointParams(const RelPositions &controlPointPos)
 {
     m_leftControlPointOffset = c1.x - p1.x;
     m_rightControlPointOffset = p2.x - c2.x;
-    const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
+    int sign = controlPointPos.isStartAbove ? 1 : -1;
     m_leftControlHeight = sign * (c1.y - p1.y);
+    sign = controlPointPos.isEndAbove ? 1 : -1;
     m_rightControlHeight = sign * (c2.y - p2.y);
 }
 
-void BezierCurve::UpdateControlPoints(curvature_CURVEDIR dir)
+void BezierCurve::UpdateControlPoints(const RelPositions &controlPointPos)
 {
     c1.x = p1.x + m_leftControlPointOffset;
     c2.x = p2.x - m_rightControlPointOffset;
-    const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
+    int sign = controlPointPos.isStartAbove ? 1 : -1;
     c1.y = p1.y + sign * m_leftControlHeight;
+    sign = controlPointPos.isEndAbove ? 1 : -1;
     c2.y = p2.y + sign * m_rightControlHeight;
 }
 

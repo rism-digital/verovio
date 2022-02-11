@@ -102,7 +102,7 @@ void Slur::Reset()
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
 }
 
-RelBoundaryPositions Slur::GetRelBoundaryPositions()
+RelPositions Slur::GetRelBoundaryPositions()
 {
     switch (m_drawingCurvedir) {
         case curvature_CURVEDIR_above: return { true, true };
@@ -326,7 +326,8 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     Point points[4];
     curve->GetPoints(points);
     BezierCurve bezier(points[0], points[1], points[2], points[3]);
-    bezier.UpdateControlPointParams(curve->GetDir());
+    const RelPositions controlPointPos = this->GetRelBoundaryPositions();
+    bezier.UpdateControlPointParams(controlPointPos);
 
     const int unit = doc->GetDrawingUnit(100);
     const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
@@ -349,7 +350,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
             lambda = double(bezier.c2.x - bezier.p1.x) / double(bezier.p2.x - bezier.p1.x);
             bezier.c2.y += sign * ((1.0 - lambda) * endPointShiftLeft + lambda * endPointShiftRight);
         }
-        bezier.UpdateControlPointParams(curve->GetDir());
+        bezier.UpdateControlPointParams(controlPointPos);
         curve->UpdatePoints(bezier);
     }
 
@@ -364,7 +365,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     if (ok) {
         bezier.SetLeftControlPointOffset(controlPointOffsetLeft);
         bezier.SetRightControlPointOffset(controlPointOffsetRight);
-        bezier.UpdateControlPoints(curve->GetDir());
+        bezier.UpdateControlPoints(controlPointPos);
         curve->UpdatePoints(bezier);
     }
 
@@ -379,7 +380,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         = this->CalcControlPointVerticalShift(curve, bezier, margin);
     bezier.SetLeftControlHeight(bezier.GetLeftControlHeight() + controlPointShiftLeft);
     bezier.SetRightControlHeight(bezier.GetRightControlHeight() + controlPointShiftRight);
-    bezier.UpdateControlPoints(curve->GetDir());
+    bezier.UpdateControlPoints(controlPointPos);
     curve->UpdatePoints(bezier);
 
     // STEP 5: Adjust the slur shape
@@ -698,9 +699,10 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
     }
 
     // Update control points
+    const RelPositions controlPointPos = this->GetRelBoundaryPositions();
     if (!ignoreLeft) bezierCurve.SetLeftControlHeight(slopeLeft * sign * bezierCurve.GetLeftControlPointOffset());
     if (!ignoreRight) bezierCurve.SetRightControlHeight(slopeRight * -sign * bezierCurve.GetRightControlPointOffset());
-    bezierCurve.UpdateControlPoints(dir);
+    bezierCurve.UpdateControlPoints(controlPointPos);
 
     // *** STEP 2: Ensure CONVEXITY ***
     // <)C1P1C2 and <)C1P2C2 should be at least 3 degree
@@ -724,7 +726,7 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
     // Update control points
     if (!ignoreLeft) bezierCurve.SetLeftControlHeight(slopeLeft * sign * bezierCurve.GetLeftControlPointOffset());
     if (!ignoreRight) bezierCurve.SetRightControlHeight(slopeRight * -sign * bezierCurve.GetRightControlPointOffset());
-    bezierCurve.UpdateControlPoints(dir);
+    bezierCurve.UpdateControlPoints(controlPointPos);
 }
 
 double Slur::RotateSlope(double slope, double degrees, double doublingBound, bool upwards) const
@@ -865,7 +867,7 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION
 }
 
 std::pair<Point, Point> Slur::AdjustCoordinates(
-    Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, const RelBoundaryPositions &boundaryPos)
+    Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, const RelPositions &boundaryPos)
 {
     StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetStart());
     StemmedDrawingInterface *endStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetEnd());
@@ -1193,7 +1195,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
 }
 
 std::pair<int, int> Slur::GetStartEndLocs(
-    Note *startNote, Chord *startChord, Note *endNote, Chord *endChord, const RelBoundaryPositions &boundaryPos) const
+    Note *startNote, Chord *startChord, Note *endNote, Chord *endChord, const RelPositions &boundaryPos) const
 {
     int startLoc = startNote ? startNote->GetDrawingLoc() : 0;
     if (startChord) {
@@ -1218,8 +1220,7 @@ std::pair<int, int> Slur::GetStartEndLocs(
     return { startLoc, endLoc };
 }
 
-std::pair<int, int> Slur::CalcBrokenLoc(
-    Staff *staff, int startLoc, int endLoc, const RelBoundaryPositions &boundaryPos) const
+std::pair<int, int> Slur::CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, const RelPositions &boundaryPos) const
 {
     assert(staff);
 
@@ -1230,8 +1231,7 @@ std::pair<int, int> Slur::CalcBrokenLoc(
     return { (loc1 + loc2) / 2, loc2 - loc1 };
 }
 
-PortatoSlurType Slur::IsPortatoSlur(
-    Doc *doc, Note *startNote, Chord *startChord, const RelBoundaryPositions &boundaryPos) const
+PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord, const RelPositions &boundaryPos) const
 {
     ListOfObjects artics;
     if (startChord) {
