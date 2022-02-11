@@ -32,6 +32,17 @@ struct ControlPointConstraint {
     double c;
 };
 
+//----------------------------------------------------------------------------
+// RelBoundaryPositions
+//----------------------------------------------------------------------------
+/**
+ * This indicates the slur endpoint positions with respect to the targeted elements
+ */
+struct RelBoundaryPositions {
+    bool isStartAbove;
+    bool isEndAbove;
+};
+
 // Helper enum classes
 enum class PortatoSlurType { None, StemSide, Centered };
 
@@ -78,10 +89,15 @@ public:
     ///@}
 
     /**
+     * Determines the relative boundary positions from the drawing curve direction
+     */
+    RelBoundaryPositions GetRelBoundaryPositions();
+
+    /**
      * Adjust starting coordinates for the slurs depending on the curve direction and spanning type of the slur
      */
-    std::pair<Point, Point> AdjustCoordinates(
-        Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, curvature_CURVEDIR drawingCurveDir);
+    std::pair<Point, Point> AdjustCoordinates(Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType,
+        const RelBoundaryPositions &boundaryPos);
 
     /**
      * Determine layer elements spanned by the slur
@@ -134,12 +150,14 @@ private:
      */
     ///@{
     // Retrieve the start and end note locations of the slur
-    std::pair<int, int> GetStartEndLocs(
-        Note *startNote, Chord *startChord, Note *endNote, Chord *endChord, curvature_CURVEDIR dir) const;
+    std::pair<int, int> GetStartEndLocs(Note *startNote, Chord *startChord, Note *endNote, Chord *endChord,
+        const RelBoundaryPositions &boundaryPos) const;
     // Calculate the break location at system start/end and the pitch difference
-    std::pair<int, int> CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, curvature_CURVEDIR dir) const;
+    std::pair<int, int> CalcBrokenLoc(
+        Staff *staff, int startLoc, int endLoc, const RelBoundaryPositions &boundaryPos) const;
     // Check if the slur resembles portato
-    PortatoSlurType IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord, curvature_CURVEDIR curveDir) const;
+    PortatoSlurType IsPortatoSlur(
+        Doc *doc, Note *startNote, Chord *startChord, const RelBoundaryPositions &boundaryPos) const;
     ///@}
 
     /**

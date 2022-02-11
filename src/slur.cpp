@@ -102,6 +102,25 @@ void Slur::Reset()
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
 }
 
+RelBoundaryPositions Slur::GetRelBoundaryPositions()
+{
+    switch (m_drawingCurvedir) {
+        case curvature_CURVEDIR_above: return { true, true };
+        case curvature_CURVEDIR_below: return { false, false };
+        case curvature_CURVEDIR_mixed: {
+            const int startStaffN = this->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
+            const int endStaffN = this->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
+            if (startStaffN < endStaffN) {
+                return { false, true };
+            }
+            else {
+                return { true, false };
+            }
+        }
+        default: return { true, true };
+    }
+}
+
 std::pair<Layer *, LayerElement *> Slur::GetBoundaryLayer()
 {
     LayerElement *start = this->GetStart();
@@ -846,7 +865,7 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION
 }
 
 std::pair<Point, Point> Slur::AdjustCoordinates(
-    Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, curvature_CURVEDIR drawingCurveDir)
+    Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, const RelBoundaryPositions &boundaryPos)
 {
     StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetStart());
     StemmedDrawingInterface *endStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetEnd());
@@ -895,7 +914,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     const bool isGraceToNoteSlur
         = !start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && start->IsGraceNote() && !end->IsGraceNote();
 
-    const PortatoSlurType portatoSlurType = this->IsPortatoSlur(doc, startNote, startChord, drawingCurveDir);
+    const PortatoSlurType portatoSlurType = this->IsPortatoSlur(doc, startNote, startChord, boundaryPos);
 
     int x1, x2, y1, y2;
     std::tie(x1, x2, y1, y2) = std::tie(points.first.x, points.second.x, points.first.y, points.second.y);
@@ -915,7 +934,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             startChord->GetYExtremes(yChordMax, yChordMin);
         }
         // slur is up
-        if (drawingCurveDir == curvature_CURVEDIR_above) {
+        if (boundaryPos.isStartAbove) {
             // P(^)
             if (startStemDir == STEMDIRECTION_down || startStemLen == 0) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
@@ -1006,7 +1025,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         }
         // get the stem direction of the end
         // slur is up
-        if (drawingCurveDir == curvature_CURVEDIR_above) {
+        if (boundaryPos.isEndAbove) {
             // (^)P
             if (endStemDir == STEMDIRECTION_down || endStemLen == 0) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
@@ -1103,18 +1122,17 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     // Positions not attached to a note
     int startLoc = 0;
     int endLoc = 0;
-    std::tie(startLoc, endLoc) = this->GetStartEndLocs(startNote, startChord, endNote, endChord, drawingCurveDir);
+    std::tie(startLoc, endLoc) = this->GetStartEndLocs(startNote, startChord, endNote, endChord, boundaryPos);
 
-    const int sign = (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
     const int staffSize = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     const int staffTop = staff->GetDrawingY();
     const int staffBottom = staffTop - staffSize;
 
     int brokenLoc = 0;
     int pitchDiff = 0;
-    std::tie(brokenLoc, pitchDiff) = this->CalcBrokenLoc(staff, startLoc, endLoc, drawingCurveDir);
+    std::tie(brokenLoc, pitchDiff) = this->CalcBrokenLoc(staff, startLoc, endLoc, boundaryPos);
     if (spanningType == SPANNING_START) {
-        if (drawingCurveDir == curvature_CURVEDIR_above) {
+        if (boundaryPos.isStartAbove) {
             y2 = std::max(staffTop, y1);
             y2 += pitchDiff * unit / 2;
             y2 = std::max(staffTop, y2);
@@ -1126,13 +1144,14 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         }
         // Make sure that broken slurs do not look like ties
         if ((std::abs(y1 - y2) < 2 * unit) && (std::abs(x1 - x2) < 2 * staffSize)) {
+            const int sign = boundaryPos.isStartAbove ? 1 : -1;
             y2 = y1 + 2 * sign * unit;
         }
         // At the end of a system, the slur finishes just short of the last barline
         x2 -= (doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize) + unit) / 2;
     }
     if (end->Is(TIMESTAMP_ATTR)) {
-        if (drawingCurveDir == curvature_CURVEDIR_above) {
+        if (boundaryPos.isStartAbove) {
             y2 = std::max(staffTop, y1);
         }
         else {
@@ -1140,7 +1159,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         }
     }
     if (spanningType == SPANNING_END) {
-        if (drawingCurveDir == curvature_CURVEDIR_above) {
+        if (boundaryPos.isEndAbove) {
             y1 = std::max(staffTop, y2);
             y1 -= pitchDiff * unit / 2;
             y1 = std::max(staffTop, y1);
@@ -1152,11 +1171,12 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         }
         // Make sure that broken slurs do not look like ties
         if ((std::abs(y1 - y2) < 2 * unit) && (std::abs(x1 - x2) < 2 * staffSize)) {
+            const int sign = boundaryPos.isEndAbove ? 1 : -1;
             y1 = y2 + 2 * sign * unit;
         }
     }
     if (start->Is(TIMESTAMP_ATTR)) {
-        if (drawingCurveDir == curvature_CURVEDIR_above) {
+        if (boundaryPos.isEndAbove) {
             y1 = std::max(staffTop, y2);
         }
         else {
@@ -1173,11 +1193,11 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
 }
 
 std::pair<int, int> Slur::GetStartEndLocs(
-    Note *startNote, Chord *startChord, Note *endNote, Chord *endChord, curvature_CURVEDIR dir) const
+    Note *startNote, Chord *startChord, Note *endNote, Chord *endChord, const RelBoundaryPositions &boundaryPos) const
 {
     int startLoc = startNote ? startNote->GetDrawingLoc() : 0;
     if (startChord) {
-        if (dir == curvature_CURVEDIR_above) {
+        if (boundaryPos.isStartAbove) {
             startLoc = startChord->GetTopNote()->GetDrawingLoc();
         }
         else {
@@ -1187,7 +1207,7 @@ std::pair<int, int> Slur::GetStartEndLocs(
 
     int endLoc = endNote ? endNote->GetDrawingLoc() : 0;
     if (endChord) {
-        if (dir == curvature_CURVEDIR_above) {
+        if (boundaryPos.isEndAbove) {
             endLoc = endChord->GetTopNote()->GetDrawingLoc();
         }
         else {
@@ -1198,25 +1218,20 @@ std::pair<int, int> Slur::GetStartEndLocs(
     return { startLoc, endLoc };
 }
 
-std::pair<int, int> Slur::CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, curvature_CURVEDIR dir) const
+std::pair<int, int> Slur::CalcBrokenLoc(
+    Staff *staff, int startLoc, int endLoc, const RelBoundaryPositions &boundaryPos) const
 {
     assert(staff);
 
-    int loc1, loc2;
-    if (dir == curvature_CURVEDIR_above) {
-        const int staffTopLoc = 2 * (staff->m_drawingLines - 1);
-        loc1 = std::max(startLoc, staffTopLoc - 1);
-        loc2 = std::max(endLoc, staffTopLoc - 1);
-    }
-    else {
-        loc1 = std::min(startLoc, 1);
-        loc2 = std::min(endLoc, 1);
-    }
+    const int staffTopLoc = 2 * (staff->m_drawingLines - 1);
+    const int loc1 = boundaryPos.isStartAbove ? std::max(startLoc, staffTopLoc - 1) : std::min(startLoc, 1);
+    const int loc2 = boundaryPos.isEndAbove ? std::max(endLoc, staffTopLoc - 1) : std::min(endLoc, 1);
 
     return { (loc1 + loc2) / 2, loc2 - loc1 };
 }
 
-PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord, curvature_CURVEDIR curveDir) const
+PortatoSlurType Slur::IsPortatoSlur(
+    Doc *doc, Note *startNote, Chord *startChord, const RelBoundaryPositions &boundaryPos) const
 {
     ListOfObjects artics;
     if (startChord) {
@@ -1231,9 +1246,8 @@ PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord
         type = PortatoSlurType::Centered;
         Artic *artic = vrv_cast<Artic *>(artics.front());
         // Various cases where portato slurs shouldn't be applied
-        if (!artic->IsInsideArtic()
-            || ((artic->GetDrawingPlace() == STAFFREL_above) && (curveDir == curvature_CURVEDIR_below))
-            || ((artic->GetDrawingPlace() == STAFFREL_below) && (curveDir == curvature_CURVEDIR_above))) {
+        if (!artic->IsInsideArtic() || ((artic->GetDrawingPlace() == STAFFREL_above) && !boundaryPos.isStartAbove)
+            || ((artic->GetDrawingPlace() == STAFFREL_below) && boundaryPos.isStartAbove)) {
             return PortatoSlurType::None;
         }
         // Check for stem side staccato

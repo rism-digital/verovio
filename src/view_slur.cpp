@@ -101,24 +101,22 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     if (!start || !end) return;
 
     const curvature_CURVEDIR drawingCurveDir = slur->GetDrawingCurvedir();
+    const RelBoundaryPositions boundaryPos = slur->GetRelBoundaryPositions();
 
     /************** adjusting y position **************/
 
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
     std::pair<Point, Point> adjustedPoints = slur->AdjustCoordinates(
-        m_doc, staff, std::make_pair(Point(x1, y1), Point(x2, y2)), spanningType, drawingCurveDir);
+        m_doc, staff, std::make_pair(Point(x1, y1), Point(x2, y2)), spanningType, boundaryPos);
 
     /************** y position **************/
 
-    if (drawingCurveDir == curvature_CURVEDIR_above) {
-        adjustedPoints.first.y += 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        adjustedPoints.second.y += 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
-    else {
-        adjustedPoints.first.y -= 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        adjustedPoints.second.y -= 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
+    int sign = boundaryPos.isStartAbove ? 1 : -1;
+    adjustedPoints.first.y += 1.25 * sign * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+    sign = boundaryPos.isEndAbove ? 1 : -1;
+    adjustedPoints.second.y += 1.25 * sign * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     Point points[4];
     points[0] = adjustedPoints.first;
