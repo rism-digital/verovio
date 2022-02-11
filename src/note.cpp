@@ -220,9 +220,14 @@ bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
     return ((linesAbove > 0) || (linesBelow > 0));
 }
 
-Chord *Note::IsChordTone() const
+Chord *Note::IsChordTone()
 {
-    return dynamic_cast<Chord *>(const_cast<Note *>(this)->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    return dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+}
+
+const Chord *Note::IsChordTone() const
+{
+    return dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
 int Note::GetDrawingDur() const
@@ -246,9 +251,14 @@ bool Note::IsClusterExtreme() const
         return false;
 }
 
-TabGrp *Note::IsTabGrpNote() const
+TabGrp *Note::IsTabGrpNote()
 {
-    return dynamic_cast<TabGrp *>(const_cast<Note *>(this)->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+    return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+}
+
+const TabGrp *Note::IsTabGrpNote() const
+{
+    return dynamic_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
 std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const

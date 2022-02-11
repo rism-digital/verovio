@@ -110,7 +110,7 @@ public:
      */
     ///@{
     /** Return true if the element is a grace note */
-    bool IsGraceNote();
+    bool IsGraceNote() const;
     /** Return true if the element is has to be rederred as cue sized */
     bool GetDrawingCueSize() const;
     /** Return true if the element is a note within a ligature */

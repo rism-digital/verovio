@@ -137,7 +137,8 @@ public:
      * Overriding functions to return information from chord parent if any
      */
     ///@{
-    Chord *IsChordTone() const;
+    Chord *IsChordTone();
+    const Chord *IsChordTone() const;
     int GetDrawingDur() const;
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
@@ -145,7 +146,10 @@ public:
     /**
      * Return the parent TabGrp is the note is part of one.
      */
-    TabGrp *IsTabGrpNote() const;
+    ///@{
+    TabGrp *IsTabGrpNote();
+    const TabGrp *IsTabGrpNote() const;
+    ///@}
 
     /**
      * @name Return the smufl string to use for a note give the notation type

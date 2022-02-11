@@ -160,38 +160,39 @@ LayerElement *LayerElement::ThisOrSameasAsLink()
     return dynamic_cast<LayerElement *>(this->GetSameasLink());
 }
 
-bool LayerElement::IsGraceNote()
+bool LayerElement::IsGraceNote() const
 {
     // First, regardless of the type, check whether it's part of GRACEGRP
     if (this->GetFirstAncestor(GRACEGRP)) return true;
     // For note, we need to look at it or at the parent chord
     if (this->Is(NOTE)) {
-        Note const *note = vrv_cast<Note const *>(this);
+        const Note *note = vrv_cast<const Note *>(this);
         assert(note);
-        Chord *chord = note->IsChordTone();
+        const Chord *chord = note->IsChordTone();
         if (chord)
             return chord->HasGrace();
         else
             return (note->HasGrace());
     }
     else if (this->Is(CHORD)) {
-        Chord const *chord = vrv_cast<Chord const *>(this);
+        const Chord *chord = vrv_cast<const Chord *>(this);
         assert(chord);
         return (chord->HasGrace());
     }
     else if (this->Is(TUPLET)) {
         ClassIdsComparison matchType({ NOTE, CHORD });
         ArrayOfObjects children;
-        LayerElement *child = dynamic_cast<LayerElement *>(this->FindDescendantByComparison(&matchType));
+        LayerElement *child
+            = dynamic_cast<LayerElement *>(const_cast<LayerElement *>(this)->FindDescendantByComparison(&matchType));
         if (child) return child->IsGraceNote();
     }
     // For accid, artic, etc.. look at the parent note / chord
     else {
         // For an accid we expect to be the child of a note - the note will lookup at the chord parent in necessary
-        Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
+        const Note *note = dynamic_cast<const Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) return note->IsGraceNote();
         // For an artic we can be direct child of a chord
-        Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_ACCID_DEPTH));
+        const Chord *chord = dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_ACCID_DEPTH));
         if (chord) return chord->IsGraceNote();
     }
     return false;
@@ -2006,7 +2007,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     }
     // For note, we also need to look at the parent chord
     else if (this->Is(NOTE)) {
-        Note const *note = vrv_cast<Note const *>(this);
+        Note *note = vrv_cast<Note *>(this);
         assert(note);
         Chord *chord = note->IsChordTone();
         if (chord) m_drawingCueSize = chord->GetDrawingCueSize();
@@ -2020,7 +2021,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     }
     // For accid, look at the parent if @func="edit" or otherwise to the parent note
     else if (this->Is(ACCID)) {
-        Accid const *accid = vrv_cast<Accid *>(this);
+        Accid *accid = vrv_cast<Accid *>(this);
         assert(accid);
         if (accid->GetFunc() == accidLog_FUNC_edit)
             m_drawingCueSize = true;
