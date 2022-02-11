@@ -795,13 +795,17 @@ int System::AlignSystems(FunctorParams *functorParams)
     assert(params);
     assert(m_systemAligner.GetBottomAlignment());
 
-    int systemMargin = this->IsFirstInPage() ? 0 : params->m_systemMargin;
-    if (systemMargin) {
-        const int margin
-            = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc));
-        // Ensure minimal white space between consecutive systems by adding one staff space
-        const int unit = params->m_doc->GetDrawingUnit(100);
-        params->m_shift -= std::max(margin, 2 * unit);
+    // No spacing for the first system
+    int systemSpacing = this->IsFirstInPage() ? 0 : params->m_systemSpacing;
+    if (systemSpacing) {
+        const int contentOverflow = params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc);
+        const int clefOverflow
+            = params->m_prevBottomClefOverflow + m_systemAligner.GetOverflowAbove(params->m_doc, true);
+        // Alignment is already pre-determined with staff alignment overflow
+        // We need to subtract them from the desired spacing
+        const int actualSpacing = systemSpacing - std::max(contentOverflow, clefOverflow);
+        // Set the spacing if it exists (greater than 0)
+        if (actualSpacing > 0) params->m_shift -= actualSpacing;
     }
 
     this->SetDrawingYRel(params->m_shift);
@@ -815,6 +819,7 @@ int System::AlignSystems(FunctorParams *functorParams)
     }
 
     params->m_prevBottomOverflow = m_systemAligner.GetOverflowBelow(params->m_doc);
+    params->m_prevBottomClefOverflow = m_systemAligner.GetOverflowBelow(params->m_doc, true);
 
     return FUNCTOR_SIBLINGS;
 }

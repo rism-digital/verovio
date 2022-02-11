@@ -114,8 +114,8 @@ void Score::CalcRunningElementHeight(Doc *doc)
     RunningElement *page1Header = page1->GetHeader();
     RunningElement *page1Footer = page1->GetFooter();
 
-    m_drawingPgHeadHeight = (page1Header) ? page1Header->GetTotalHeight() : 0;
-    m_drawingPgFootHeight = (page1Footer) ? page1Footer->GetTotalHeight() : 0;
+    m_drawingPgHeadHeight = (page1Header) ? page1Header->GetTotalHeight(doc) : 0;
+    m_drawingPgFootHeight = (page1Footer) ? page1Footer->GetTotalHeight(doc) : 0;
 
     Page *page2 = new Page();
     page2->m_score = this;
@@ -127,8 +127,8 @@ void Score::CalcRunningElementHeight(Doc *doc)
     RunningElement *page2Header = page2->GetHeader();
     RunningElement *page2Footer = page2->GetFooter();
 
-    m_drawingPgHead2Height = (page2Header) ? page2Header->GetTotalHeight() : 0;
-    m_drawingPgFoot2Height = (page2Footer) ? page2Footer->GetTotalHeight() : 0;
+    m_drawingPgHead2Height = (page2Header) ? page2Header->GetTotalHeight(doc) : 0;
+    m_drawingPgFoot2Height = (page2Footer) ? page2Footer->GetTotalHeight(doc) : 0;
 
     pages->DeleteChild(page1);
     pages->DeleteChild(page2);

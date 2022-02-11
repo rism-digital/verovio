@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -33,6 +34,18 @@ PgFoot::~PgFoot() {}
 void PgFoot::Reset()
 {
     RunningElement::Reset();
+}
+
+int PgFoot::GetTotalHeight(Doc *doc)
+{
+    assert(doc);
+
+    int height = this->GetContentHeight();
+    if (height > 0) {
+        const int unit = doc->GetDrawingUnit(100);
+        height += doc->GetOptions()->m_topMarginPgFooter.GetValue() * unit;
+    }
+    return height;
 }
 
 //----------------------------------------------------------------------------

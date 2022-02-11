@@ -550,7 +550,7 @@ void Page::LayOutVertically()
     // Adjust system Y position
     AlignSystemsParams alignSystemsParams(doc);
     alignSystemsParams.m_shift = doc->m_drawingPageContentHeight;
-    alignSystemsParams.m_systemMargin = (doc->GetOptions()->m_spacingSystem.GetValue()) * doc->GetDrawingUnit(100);
+    alignSystemsParams.m_systemSpacing = (doc->GetOptions()->m_spacingSystem.GetValue()) * doc->GetDrawingUnit(100);
     Functor alignSystems(&Object::AlignSystems);
     Functor alignSystemsEnd(&Object::AlignSystemsEnd);
     this->Process(&alignSystems, &alignSystemsParams, &alignSystemsEnd);
@@ -680,7 +680,7 @@ int Page::GetContentHeight() const
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
     if (this->GetFooter()) {
-        height += this->GetFooter()->GetTotalHeight();
+        height += this->GetFooter()->GetTotalHeight(doc);
     }
 
     return height;
@@ -841,11 +841,11 @@ int Page::AlignSystems(FunctorParams *functorParams)
 
     RunningElement *header = this->GetHeader();
     if (header) {
-        const int bottomMarginPgHead
-            = params->m_doc->GetOptions()->m_bottomMarginPgHead.GetValue() * params->m_doc->GetDrawingUnit(100);
-
         header->SetDrawingYRel(params->m_shift);
-        params->m_shift -= header->GetTotalHeight() + bottomMarginPgHead;
+        const int headerHeight = header->GetTotalHeight(params->m_doc);
+        if (headerHeight > 0) {
+            params->m_shift -= headerHeight;
+        }
     }
     return FUNCTOR_CONTINUE;
 }
@@ -860,18 +860,20 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
 
     RunningElement *footer = this->GetFooter();
     if (footer) {
-        m_drawingJustifiableHeight -= footer->GetTotalHeight();
+        m_drawingJustifiableHeight -= footer->GetTotalHeight(params->m_doc);
 
         // Move it up below the last system
         if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
             if (this->GetChildCount()) {
                 System *last = dynamic_cast<System *>(this->GetLast(SYSTEM));
                 assert(last);
-                footer->SetDrawingYRel(last->GetDrawingYRel() - last->GetHeight());
+                const int unit = params->m_doc->GetDrawingUnit(100);
+                const int topMargin = params->m_doc->GetOptions()->m_topMarginPgFooter.GetValue() * unit;
+                footer->SetDrawingYRel(last->GetDrawingYRel() - last->GetHeight() - topMargin);
             }
         }
         else {
-            footer->SetDrawingYRel(footer->GetTotalHeight());
+            footer->SetDrawingYRel(footer->GetContentHeight());
         }
     }
 

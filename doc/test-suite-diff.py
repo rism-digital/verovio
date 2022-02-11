@@ -207,7 +207,7 @@ if __name__ == "__main__":
             span = etree.SubElement(link, 'span', attrib={'class': 'badge'})
             span.text = str(nbChanges)
 
-            log.append("* {}: {}".format(item1, nbChanges))
+            log.append("****** {}: {} ******".format(item1, nbChanges))
             categoryChanges += 1
             totalChanges += nbChanges
 
