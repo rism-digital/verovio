@@ -21,7 +21,7 @@ jobs:
     strategy:
       # Ensure that a wheel builder finishes even if another fails
       fail-fast: false
-      # Build the wheels for Linux, Windows and macOS for Python 3.9
+      # Build the wheels for Linux, Windows and macOS for Python 3.10
       matrix:
         os: [macos-latest, windows-latest, ubuntu-20.04]
         python-version: ["3.7", "3.8", "3.9", "3.10"]
@@ -82,15 +82,14 @@ jobs:
       #===============================================#
       # wheels
       - name: Build wheels
-        uses: joerick/cibuildwheel@f3dae81e82da2a2a36338269e32f3adb7b42dc8c
+        uses: pypa/cibuildwheel@v2.3.1
         with:
           output-dir: wheelhouse
         env:
           CIBW_SKIP: cp27-* # manylinux2014 not compatible with python 2.7
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
-          # TODO: change back to "manylinux2014" when cibuildwheel releases new version
-          CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:2021-02-17-8d1372a
-          CIBW_MANYLINUX_I686_IMAGE: quay.io/pypa/manylinux2014_i686:2021-02-17-8d1372a
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_MANYLINUX_I686_IMAGE: manylinux2014
           CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
           CIBW_BEFORE_ALL_WINDOWS: choco install swig -f -y
           CIBW_BEFORE_BUILD: swig -version && bash -c 'cd tools; ./get_git_commit.sh' && swig -c++ -python -py3 ./bindings/python/verovio.i
