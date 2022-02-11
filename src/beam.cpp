@@ -151,17 +151,6 @@ void BeamSegment::AppendSpanningCoordinates(Measure *measure)
     }
 }
 
-std::vector<int> BeamSegment::GetSegmentYPositions() const
-{
-    std::vector<int> items;
-    for (auto coord : m_beamElementCoordRefs) {
-        if (!coord->m_stem || !coord->m_closestNote) continue;
-
-        items.push_back(coord->m_closestNote->GetDrawingY());
-    }
-    return items;
-}
-
 void BeamSegment::CalcBeam(
     Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool init)
 {
@@ -189,7 +178,7 @@ void BeamSegment::CalcBeam(
     else {
         beamInterface->m_fractionSize = staff->m_drawingStaffSize;
 
-        horizontal = beamInterface->IsHorizontal(this->GetSegmentYPositions());
+        horizontal = beamInterface->IsHorizontal();
         // Beam@place has precedence - however, in some cases, CalcBeam is called recursively because we need to change
         // the place This occurs when mixed makes no sense and the beam is placed above or below instead.
         this->CalcBeamPlace(layer, beamInterface, place);

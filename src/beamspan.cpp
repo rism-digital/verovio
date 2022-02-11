@@ -212,7 +212,6 @@ int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams)
 
     Layer *layer = vrv_cast<Layer *>(this->GetStart()->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
-    Measure *measure = vrv_cast<Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
     if (!layer || !staff) return FUNCTOR_SIBLINGS;
 
     m_beamedElements = this->HasPlist() ? *this->GetRefs() : this->GetBeamSpanElementList(layer, staff);
@@ -223,6 +222,8 @@ int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams)
         LayerElement *layerElem = vrv_cast<LayerElement *>(element);
         if (!layerElem) continue;
 
+        Measure *measure = vrv_cast<Measure *>(layerElem->GetFirstAncestor(MEASURE));
+        if (!measure) continue;
         measure->AddToSpanningObjects(layerElem);
 
         Staff *elementStaff = vrv_cast<Staff *>(layerElem->GetFirstAncestor(STAFF));

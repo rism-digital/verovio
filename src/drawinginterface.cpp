@@ -262,7 +262,7 @@ void BeamDrawingInterface::InitCue(bool beamCue)
     }
 }
 
-bool BeamDrawingInterface::IsHorizontal(const std::vector<int> &items)
+bool BeamDrawingInterface::IsHorizontal()
 {
     if (this->IsRepeatedPattern()) {
         return true;

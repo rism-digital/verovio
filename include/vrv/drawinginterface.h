@@ -112,7 +112,7 @@ public:
      */
     void InitCue(bool beamCue);
 
-    bool IsHorizontal(const std::vector<int>& items);
+    bool IsHorizontal();
 
     bool IsRepeatedPattern();
 
