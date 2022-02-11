@@ -569,7 +569,7 @@ void MusicXmlInput::CloseSlur(Measure *measure, short int number, LayerElement *
     m_slurStopStack.push_back({ element, closeSlur });
 }
 
-void MusicXmlInput::CloseBeamSpan(Staff* staff, Layer* layer, LayerElement* element) 
+void MusicXmlInput::CloseBeamSpan(Staff *staff, Layer *layer, LayerElement *element)
 {
     for (auto riter = m_beamspanStack.rbegin(); riter != m_beamspanStack.rend(); ++riter) {
         if ((riter->second.first == staff->GetN()) || (riter->second.second == layer->GetN())) {

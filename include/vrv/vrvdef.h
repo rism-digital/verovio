@@ -329,7 +329,7 @@ typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceUuid
 
 typedef std::map<std::string, Note *> MapOfNoteUuidPairs;
 
-typedef std::vector<std::tuple<PlistInterface *, std::string, Object *> > ArrayOfPlistInterfaceUuidTuples;
+typedef std::vector<std::tuple<PlistInterface *, std::string, Object *>> ArrayOfPlistInterfaceUuidTuples;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
