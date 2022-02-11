@@ -226,6 +226,11 @@ public:
     ///@}
 
     /**
+     * Getter for stem sameas role
+     */
+    StemSameasDrawingRole GetStemSameasRole() const { return m_stemSameasRole; }
+
+    /**
      * Resovle @stem.sameas links by instanciating Note::m_stemSameas (*Note).
      * Called twice from Object::PrepareLinks. Once to fill uuid / note pairs,
      * and once to resolve the link. The link is bi-directional, which means
