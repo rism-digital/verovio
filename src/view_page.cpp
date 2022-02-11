@@ -202,7 +202,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     this->DrawSystemChildren(dc, system, system);
 
     this->DrawSystemList(dc, system, SYL);
-	this->DrawSystemList(dc, system, BEAMSPAN);
+    this->DrawSystemList(dc, system, BEAMSPAN);
     this->DrawSystemList(dc, system, BRACKETSPAN);
     this->DrawSystemList(dc, system, DYNAM);
     this->DrawSystemList(dc, system, DIR);
@@ -232,7 +232,7 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
         if ((*iter)->Is(classId) && (classId == BEAMSPAN)) {
-            DrawTimeSpanningElement(dc, *iter, system);
+            this->DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == BRACKETSPAN)) {
             this->DrawTimeSpanningElement(dc, *iter, system);
