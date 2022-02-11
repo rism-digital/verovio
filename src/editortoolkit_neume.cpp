@@ -2457,6 +2457,12 @@ bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId)
 
     // get the index of selected nc in the neume
     int fIdx = fparent->GetChildIndex(elNc); 
+    if (fIdx == -1) {
+        LogError("The selected neume component is not a child of the selected neume.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "The selected neume component is not a child of the selected neume.");
+        return false;
+    }
     // if click on a ligature, ncId point to the second nc in the ligature, thus minus 1
     if  (elNc->HasAttribute("ligated", "true")) fIdx -= 1;
 
@@ -2464,16 +2470,25 @@ bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId)
     newParent->CloneReset();
     assert(newParent);
 
-    int i = fIdx;
-    while (i > 0) {
-        newParent->DeleteChild(newParent->GetChild(0));
-        i -= 1;
-    }
+    // old method
+    // int i = fIdx;
+    // while (i > 0) {
+    //     newParent->DeleteChild(newParent->GetChild(0));
+    //     i -= 1;
+    // }
 
-    i = nLen - fIdx;
-    while (i > 0) {
-        fparent->DeleteChild(fparent->GetLast());
-        i -= 1;
+    // i = nLen - fIdx;
+    // while (i > 0) {
+    //     fparent->DeleteChild(fparent->GetLast());
+    //     i -= 1;
+    // }
+
+    newParent->ClearChildren();
+    Object *it = fparent->GetChild(fIdx);
+    while (it) {
+        it->MoveItselfTo(newParent);
+        fparent->ClearRelinquishedChildren();
+        it = fparent->GetChild(fIdx);
     }
 
     // insert newParent to sparent
