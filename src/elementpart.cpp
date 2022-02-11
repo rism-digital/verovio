@@ -531,11 +531,11 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     int slashFactor = 0;
     // In case there is explicitly specified stem mod for slashes
-    if (this->HasStemMod() && (this->GetStemMod() < 8)) {
+    if (!params->m_stemSameas && this->HasStemMod() && (this->GetStemMod() < 8)) {
         slashFactor = this->GetStemMod() - 1;
     }
     // otherwise check whether it's trem and its @unitdir attribute is shorter than duration
-    else if (this->GetFirstAncestor(BTREM)) {
+    else if (!params->m_stemSameas && this->GetFirstAncestor(BTREM)) {
         BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
         assert(bTrem);
         if (bTrem->HasUnitdur() && (bTrem->GetUnitdur() > DURATION_4)) {

@@ -481,6 +481,12 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     this->DrawLayerChildren(dc, bTrem, layer, staff, measure);
 
+    if (childNote && childNote->HasStemSameasNote() && childNote->GetStemSameasRole() == SAMEAS_SECONDARY) {
+        bTrem->SetEmptyBB();
+        dc->EndGraphic(element, this);
+        return;
+    }
+
     // Get stem values from the chord or note child
     if (childChord) {
         Stem *stem = childChord->GetDrawingStem();
