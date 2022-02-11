@@ -16,6 +16,7 @@
 namespace vrv {
 
 class BeamElementCoord;
+class TabDurSym;
 class StaffAlignment;
 
 // the maximum allowed number of partials
@@ -45,8 +46,6 @@ public:
 
     void CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface,
         data_BEAMPLACE place = BEAMPLACE_NONE, bool init = true);
-
-    void CalcTabBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     /**
      *
@@ -119,8 +118,21 @@ private:
 
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
+    /**
+     * Helper to calculate the beam position for a beam in tablature.
+     * Also adjust the drawingYRel of the TabDurSym if necessary.
+     */
+    void CalcBeamPlaceTab(
+        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
+
     // Helper to calculate the longest stem length of the beam (which will be used uniformely)
     void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal);
+
+    // Helper to set the stem values
+    void CalcSetStemValues(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+
+    // Helper to set the stem values for tablature
+    void CalcSetStemValuesTab(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
     // Helper to calculate max/min beam points for the relative beam place
     std::pair<int, int> CalcBeamRelativeMinMax(data_BEAMPLACE place) const;
@@ -309,6 +321,7 @@ public:
     {
         m_element = NULL;
         m_closestNote = NULL;
+        m_tabDurSym = NULL;
         m_stem = NULL;
         m_overlapMargin = 0;
         m_maxShortening = -1;
@@ -325,14 +338,28 @@ public:
 
     void SetDrawingStemDir(
         data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
-    void SetClosestNote(data_STEMDIRECTION stemDir);
 
+    /** Set the note or closest note for chord or tabdursym for tablature beams placed outside the staff */
+    void SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, bool outsideStaff);
+
+    /** Heleper for calculating the stem length for staff notation and tablature beams within the staff */
     int CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal);
+
+    /** Helper for calculating the stem length for tablature beam placed outside the staff */
+    int CalculateStemLengthTab(Staff *staff, data_STEMDIRECTION stemDir);
 
     /**
      * Return stem length adjustment in half units, depending on the @stem.mode attribute
      */
     int CalculateStemModAdjustment(int stemLength, int directionBias);
+
+    /**
+     * Helper to get the StemmedDrawingInterface associated with the m_element (if any)
+     * Return the Chord or Note interface if the element if of that type.
+     * Return the TabDurSym interface if the element is TabDurGrp and has a TabDurSym descendant.
+     * Return NULL otherwise.
+     */
+    StemmedDrawingInterface *GetStemHolderInterface();
 
     int m_x;
     int m_yBeam; // y value of stem top position
@@ -346,6 +373,7 @@ public:
     data_BEAMPLACE m_partialFlagPlace;
     LayerElement *m_element;
     Note *m_closestNote;
+    TabDurSym *m_tabDurSym;
     Stem *m_stem; // a pointer to the stem in order to avoid to have to re-cast it
 };
 

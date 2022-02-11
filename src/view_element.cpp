@@ -890,7 +890,7 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     dc->StartGraphic(element, "", element->GetUuid());
 
     wchar_t code = flag->GetFlagGlyph(stem->GetDrawingStemDir());
-    this->DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, flag->GetDrawingCueSize());
+    this->DrawSmuflCode(dc, x, y, code, staff->GetDrawingStaffNotationSize(), flag->GetDrawingCueSize());
 
     dc->EndGraphic(element, this);
 }
@@ -1074,15 +1074,17 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = meterSig->GetDrawingX() + horizOffset;
 
+    const int glyphSize = staff->GetDrawingStaffNotationSize();
+
     if (enclosingFront) {
-        this->DrawSmuflCode(dc, x, y, enclosingFront, staff->m_drawingStaffSize, false);
-        x += m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, false);
+        this->DrawSmuflCode(dc, x, y, enclosingFront, glyphSize, false);
+        x += m_doc->GetGlyphWidth(enclosingFront, glyphSize, false);
     }
 
     if (meterSig->HasSym()) {
         const wchar_t code = meterSig->GetSymbolGlyph();
-        this->DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
-        x += m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, false);
+        this->DrawSmuflCode(dc, x, y, code, glyphSize, false);
+        x += m_doc->GetGlyphWidth(code, glyphSize, false);
     }
     else if (meterSig->GetForm() == METERFORM_num) {
         x += this->DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
@@ -1092,7 +1094,7 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
     }
 
     if (enclosingBack) {
-        this->DrawSmuflCode(dc, x, y, enclosingBack, staff->m_drawingStaffSize, false);
+        this->DrawSmuflCode(dc, x, y, enclosingBack, glyphSize, false);
     }
 
     dc->EndGraphic(meterSig, this);
@@ -1774,7 +1776,9 @@ int View::DrawMeterSigFigures(
     }
     if (den) timeSigCombDenominator = IntToTimeSigFigures(den);
 
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+    const int glyphSize = staff->GetDrawingStaffNotationSize();
+
+    dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
 
     std::wstring widthText = (timeSigCombNumerator.length() > timeSigCombDenominator.length()) ? timeSigCombNumerator
                                                                                                : timeSigCombDenominator;
@@ -1785,8 +1789,8 @@ int View::DrawMeterSigFigures(
     x += width / 2;
 
     if (den) {
-        int yNum = y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        int yDen = y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        int yNum = y + m_doc->GetDrawingDoubleUnit(glyphSize);
+        int yDen = y - m_doc->GetDrawingDoubleUnit(glyphSize);
         // In case when one of the handwritten fonts is used, we need to make sure that meterSig is displayed properly
         // for it, based on the height of corresponding glyphs
         FontInfo *fontInfo = dc->GetFont();
@@ -1801,12 +1805,11 @@ int View::DrawMeterSigFigures(
             dc->GetSmuflTextExtent(timeSigCombDenominator, &denExtend);
             yDen = y - denExtend.m_height / 2;
         }
-        this->DrawSmuflString(dc, x, yNum, timeSigCombNumerator, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
-        this->DrawSmuflString(
-            dc, x, yDen, timeSigCombDenominator, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
+        this->DrawSmuflString(dc, x, yNum, timeSigCombNumerator, HORIZONTALALIGNMENT_center, glyphSize);
+        this->DrawSmuflString(dc, x, yDen, timeSigCombDenominator, HORIZONTALALIGNMENT_center, glyphSize);
     }
     else {
-        this->DrawSmuflString(dc, x, y, timeSigCombNumerator, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
+        this->DrawSmuflString(dc, x, y, timeSigCombNumerator, HORIZONTALALIGNMENT_center, glyphSize);
     }
 
     dc->ResetFont();

@@ -100,6 +100,7 @@ public:
     void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; }
     data_STEMDIRECTION GetDrawingStemDir(LayerElement *element);
     data_STEMDIRECTION GetDrawingStemDir(const ArrayOfBeamElementCoords *coords);
+    data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; }
     ///@}
 
     /**

@@ -26,7 +26,7 @@ namespace vrv {
 
 static const ClassRegistrar<TabGrp> s_factory("tabGrp", TABGRP);
 
-TabGrp::TabGrp() : LayerElement(TABGRP, "tabgrp-"), DurationInterface()
+TabGrp::TabGrp() : LayerElement(TABGRP, "tabgrp-"), ObjectListInterface(), DurationInterface()
 {
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
 
@@ -58,6 +58,57 @@ bool TabGrp::IsSupportedChild(Object *child)
     return true;
 }
 
+void TabGrp::FilterList(ArrayOfObjects *childList)
+{
+    // Retain only note children of chords
+    ArrayOfObjects::iterator iter = childList->begin();
+
+    while (iter != childList->end()) {
+        iter = ((*iter)->Is(NOTE)) ? iter + 1 : childList->erase(iter);
+    }
+
+    std::sort(childList->begin(), childList->end(), TabCourseSort());
+}
+
+int TabGrp::GetYTop()
+{
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    // The last note is the top
+    return childList->back()->GetDrawingY();
+}
+
+int TabGrp::GetYBottom()
+{
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    // The first note is the bottom
+    return childList->front()->GetDrawingY();
+}
+
+Note *TabGrp::GetTopNote()
+{
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    Note *topNote = vrv_cast<Note *>(childList->back());
+    assert(topNote);
+    return topNote;
+}
+
+Note *TabGrp::GetBottomNote()
+{
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    // The first note is the bottom
+    Note *bottomNote = vrv_cast<Note *>(childList->front());
+    assert(bottomNote);
+    return bottomNote;
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
@@ -76,6 +127,17 @@ int TabGrp::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 
     params->m_currentScoreTime += incrementScoreTime;
     params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int TabGrp::CalcStem(FunctorParams *functorParams)
+{
+    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
+    assert(params);
+
+    params->m_dur = this->GetActualDur();
+    params->m_tabGrpWithNoNote = (!this->FindDescendantByType(NOTE));
 
     return FUNCTOR_CONTINUE;
 }

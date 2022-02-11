@@ -410,9 +410,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * Unary predicate for comparing object types.
- * This is used for example in std::find_if.
- * See Object::GetFirst or Object::GetNext
+ * Unary predicate for sorting notes by diatonic pitch
  */
 class DiatonicSort {
 
@@ -425,6 +423,27 @@ public:
         const Note *n2 = dynamic_cast<const Note *>(second);
         assert(n1 && n2);
         return (n1->GetDiatonicPitch() < n2->GetDiatonicPitch());
+    }
+};
+
+//----------------------------------------------------------------------------
+// TabCourseSort
+//----------------------------------------------------------------------------
+
+/**
+ * Unary predicate for sorting notes by course number
+ */
+class TabCourseSort {
+
+public:
+    TabCourseSort() {}
+
+    bool operator()(const Object *first, const Object *second) const
+    {
+        const Note *n1 = dynamic_cast<const Note *>(first);
+        const Note *n2 = dynamic_cast<const Note *>(second);
+        assert(n1 && n2);
+        return (n1->GetTabCourse() > n2->GetTabCourse());
     }
 };
 

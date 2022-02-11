@@ -617,6 +617,7 @@ enum StemSameasDrawingRole { SAMEAS_NONE = 0, SAMEAS_UNSET, SAMEAS_PRIMARY, SAME
 
 // in half staff spaces (but should be 6 in two-voice notation)
 #define STANDARD_STEMLENGTH 7
+#define STANDARD_STEMLENGTH_TAB 3
 
 //----------------------------------------------------------------------------
 // Temporary - to be made an option?

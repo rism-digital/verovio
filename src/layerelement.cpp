@@ -213,7 +213,7 @@ FTrem *LayerElement::IsInFTrem()
 
 Beam *LayerElement::IsInBeam()
 {
-    if (!this->Is({ CHORD, NOTE, TABGRP, STEM })) return NULL;
+    if (!this->Is({ CHORD, NOTE, TABGRP, TABDURSYM, STEM })) return NULL;
     Beam *beamParent = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
     if (beamParent != NULL) {
         if (!this->IsGraceNote()) return beamParent;
@@ -1412,11 +1412,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     }
     else if (this->Is(TABDURSYM)) {
         int yRel = 0;
-        double spacingRatio = 1.0;
-        if (staffY->IsTabLuteFrench()) {
-            spacingRatio = 2.0;
+        if (staffY->IsTabWithStemsOutside()) {
+            double spacingRatio = (staffY->IsTabLuteFrench()) ? 2.0 : 1.0;
+            yRel += params->m_doc->GetDrawingUnit(staffY->m_drawingStaffSize) * spacingRatio;
         }
-        yRel += params->m_doc->GetDrawingUnit(staffY->m_drawingStaffSize) * spacingRatio;
         this->SetDrawingYRel(yRel);
     }
 
