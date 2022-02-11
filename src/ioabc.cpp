@@ -1028,10 +1028,10 @@ void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
 void ABCInput::parseLyrics()
 {
     std::vector<std::pair<Syl *, int>> syllables;
-    constexpr std::string_view delimeters = "~\\-_ ";
+    constexpr std::string_view delimiters = "~\\-_ ";
     // skipping w:, so start from third element
     std::size_t start = 2;
-    std::size_t found = abcLine.find_first_of(delimeters, 2);
+    std::size_t found = abcLine.find_first_of(delimiters, 2);
     while (found != std::string::npos) {
         // Counter indicates for how many notes verse should be held. This defaults to 1, unless '_' is found
         int counter = 1;
@@ -1059,7 +1059,7 @@ void ABCInput::parseLyrics()
                 sylType = sylLog_CON_d;
             }
         }
-        // separate syllable from delimeters to form syl that we want to add
+        // separate syllable from delimiters to form syl that we want to add
         syllable = abcLine.substr(start, found - start);
         syllable.erase(
             std::remove_if(syllable.begin(), syllable.end(), [](unsigned char x) { return (x == '_') || (x == '\\'); }),
@@ -1078,8 +1078,8 @@ void ABCInput::parseLyrics()
 
         // find next delimeter in the string
         start = found + 1;
-        found = abcLine.find_first_of(delimeters, start);
-        // if none found, the rest of the string is going to server as last syl
+        found = abcLine.find_first_of(delimiters, start);
+        // if none found, the rest of the string is going to serve as last syl
         if ((found == std::string::npos) && (start < abcLine.size())) {
             std::string syllable = abcLine.substr(start);
             if (!syllable.empty() && syllable[syllable.size() - 1] == '\r') syllable.erase(syllable.size() - 1);
@@ -1109,6 +1109,11 @@ void ABCInput::parseLyrics()
         verse->AddChild(syllables.at(j).first);
         i += syllables.at(j).second;
     }
+    // clean up syllables that were not added to any of the layer elements
+    for (const auto syl : syllables) {
+        if (!syl.first->GetParent()) delete syl.first;
+    }
+
     // increment verse number, in case next line in file is also w:
     ++m_verseNumber;
 }
