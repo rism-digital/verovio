@@ -26,9 +26,9 @@ static const ClassRegistrar<PitchInflection> s_factory("pitchInflection", PITCHI
 
 PitchInflection::PitchInflection() : ControlElement(PITCHINFLECTION, "pinflexion-"), TimeSpanningInterface()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
 
-    Reset();
+    this->Reset();
 }
 
 PitchInflection::~PitchInflection() {}

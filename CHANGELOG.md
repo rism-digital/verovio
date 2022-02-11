@@ -1,6 +1,23 @@
 # Changelog
 
 ## [unreleased]
+* Support for `beatRpt@beatdef`
+* Support for `scoreDef` and `staffDef` `@dur.default` (@eNote-GmBH)
+* Support for MIDI output of grace notes and multi-measure rests (@eNote-GmBH)
+* Support for `@stem.sameas` on notes for orchestra scores
+* Support for MIDI output of arpeggios (@eNote-GmBH)
+* Support for tuplets in ABC importer (@eNote-GmBH)
+* Improved double stemmed beams (@eNote-GmBH)
+* Improved tablature MIDI output (@paul-bayleaf)
+* Improved PAE importer (nested beams, mensural dots, stemless notes)
+* Additional parameters to the redoLayout method for faster cached layout redoing
+* Additional parameters to the renderToTimemap method for including rests and measure
+* Additional ids for rests and measure added to the getElementsAtTime methods
+* Preliminary support for stems and beam for guitar tablature
+* Preliminary support for tablature MusicXML import (@paul-bayleaf)
+
+## [3.8.1] - 2022-01-10
+* Fix bug in PAE importer for durations and for key signatures
 
 ## [3.8.0] - 2021-12-22
 * Support for figured-bass extenders on `f` without `@tstamp` or `@startid` 

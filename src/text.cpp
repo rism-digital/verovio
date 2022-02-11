@@ -24,7 +24,7 @@ namespace vrv {
 
 Text::Text() : TextElement(TEXT, "text-")
 {
-    Reset();
+    this->Reset();
 }
 
 Text::~Text() {}

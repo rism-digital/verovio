@@ -222,10 +222,7 @@ public:
      * Extract a timemap from the document to a JSON string.
      * Run trough all the layers and fill the timemap file content.
      */
-    bool ExportTimemap(std::string &output);
-    void PrepareJsonTimemap(std::string &output, std::map<double, double> &realTimeToScoreTime,
-        std::map<double, std::vector<std::string>> &realTimeToOnElements,
-        std::map<double, std::vector<std::string>> &realTimeToOffElements, std::map<double, double> &realTimeToTempo);
+    bool ExportTimemap(std::string &output, bool includeRests, bool includeMeasures);
 
     /**
      * Extract music features to JSON string.
@@ -296,7 +293,7 @@ public:
      * Undo the cast off of the entire document.
      * The document will then contain one single page with one single system.
      */
-    void UnCastOffDoc();
+    void UnCastOffDoc(bool resetCache = true);
 
     /**
      * Cast off of the entire document according to the encoded data (pb and sb).
@@ -408,6 +405,7 @@ public:
     Score *GetCurrentScore();
     ScoreDef *GetCurrentScoreDef();
     void SetCurrentScore(Score *score);
+    bool HasCurrentScore() const { return m_currentScore != NULL; }
     ///@}
 
     //----------//

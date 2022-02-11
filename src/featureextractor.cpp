@@ -37,7 +37,7 @@ namespace vrv {
 FeatureExtractor::FeatureExtractor(const std::string &options)
 {
     // We currently have no option support
-    Reset();
+    this->Reset();
 }
 
 FeatureExtractor::~FeatureExtractor() {}
@@ -60,10 +60,7 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         // Check if the note is tied to a previous one and skip it if yes
         if (note->GetScoreTimeTiedDuration() == -1.0) return;
 
-        note->CalcMIDIPitch(0);
-
         std::stringstream pitch;
-
         data_OCTAVE oct = note->GetOct();
         char octSign = (oct > 3) ? '\'' : ',';
         int signCount = (oct > 3) ? (oct - 3) : (4 - oct);

@@ -34,7 +34,6 @@ Glyph::Glyph()
     m_height = 0;
     m_horizAdvX = 0;
     m_unitsPerEm = 20480;
-    m_path = "[unset]";
     m_codeStr = "[unset]";
 }
 
@@ -46,7 +45,6 @@ Glyph::Glyph(std::string path, std::string codeStr)
     m_height = 0;
     m_horizAdvX = 0;
     m_unitsPerEm = 20480;
-    m_path = path;
     m_codeStr = codeStr;
 
     pugi::xml_document doc;
@@ -82,7 +80,6 @@ Glyph::Glyph(int unitsPerEm)
     m_height = 0;
     m_horizAdvX = 0;
     m_unitsPerEm = unitsPerEm * 10;
-    m_path = "[unset]";
     m_codeStr = "[unset]";
 }
 

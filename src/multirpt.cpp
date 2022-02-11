@@ -32,8 +32,8 @@ static const ClassRegistrar<MultiRpt> s_factory("multiRpt", MULTIRPT);
 
 MultiRpt::MultiRpt() : LayerElement(MULTIRPT, "multirpt-"), AttNumbered()
 {
-    RegisterAttClass(ATT_NUMBERED);
-    Reset();
+    this->RegisterAttClass(ATT_NUMBERED);
+    this->Reset();
 }
 
 MultiRpt::~MultiRpt() {}
@@ -41,7 +41,7 @@ MultiRpt::~MultiRpt() {}
 void MultiRpt::Reset()
 {
     LayerElement::Reset();
-    ResetNumbered();
+    this->ResetNumbered();
 }
 
 } // namespace vrv

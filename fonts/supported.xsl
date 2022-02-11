@@ -111,10 +111,12 @@
             <glyph glyph-code="E06A" smufl-name="unpitchedPercussionClef2" />
             <!--<glyph glyph-code="E06B" smufl-name="semipitchedPercussionClef1" />-->
             <!--<glyph glyph-code="E06C" smufl-name="semipitchedPercussionClef2" />-->
-            <!--<glyph glyph-code="E06F" smufl-name="cClefTriangular" />-->
-            <!--<glyph glyph-code="E070" smufl-name="fClefTriangular" />-->
-            <!--<glyph glyph-code="E071" smufl-name="cClefTriangularToFClef" />-->
-            <!--<glyph glyph-code="E072" smufl-name="fClefTriangularToCClef" />-->
+            <glyph glyph-code="E06D" smufl-name="6stringTabClef" />
+            <glyph glyph-code="E06E" smufl-name="4stringTabClef" />
+            <!--<glyph glyph-code="E06F" smufl-name="schaefferClef" />-->
+            <!--<glyph glyph-code="E070" smufl-name="schaefferPreviousClef" />-->
+            <!--<glyph glyph-code="E071" smufl-name="schaefferGClefToFClef" />-->
+            <!--<glyph glyph-code="E072" smufl-name="schaefferFClefToGClef" />-->
             <glyph glyph-code="E073" smufl-name="gClefReversed" />
             <glyph glyph-code="E074" smufl-name="gClefTurned" />
             <glyph glyph-code="E075" smufl-name="cClefReversed" />
@@ -2160,11 +2162,11 @@
             <glyph glyph-code="E904" smufl-name="mensuralFclefPetrucci" />
             <!--<glyph glyph-code="E905" smufl-name="mensuralCclef" />-->
             <glyph glyph-code="E906" smufl-name="chantCclef" />
-            <!--<glyph glyph-code="E907" smufl-name="mensuralCclefPetrucciPosLowest" />-->
-            <!--<glyph glyph-code="E908" smufl-name="mensuralCclefPetrucciPosLow" />-->
+            <glyph glyph-code="E907" smufl-name="mensuralCclefPetrucciPosLowest" />
+            <glyph glyph-code="E908" smufl-name="mensuralCclefPetrucciPosLow" />
             <glyph glyph-code="E909" smufl-name="mensuralCclefPetrucciPosMiddle" />
-            <!--<glyph glyph-code="E90A" smufl-name="mensuralCclefPetrucciPosHigh" />-->
-            <!--<glyph glyph-code="E90B" smufl-name="mensuralCclefPetrucciPosHighest" />-->
+            <glyph glyph-code="E90A" smufl-name="mensuralCclefPetrucciPosHigh" />
+            <glyph glyph-code="E90B" smufl-name="mensuralCclefPetrucciPosHighest" />
             <range_end>U+E90F</range_end>
             <range_start>U+E900</range_start>
         </medievalAndRenaissanceClefs>

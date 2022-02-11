@@ -21,11 +21,14 @@ namespace vrv {
 
 static const ClassRegistrar<Course> s_factory("course", COURSE);
 
-Course::Course() : Object(COURSE, "course-"), AttNNumberLike()
+Course::Course() : Object(COURSE, "course-"), AttAccidental(), AttNNumberLike(), AttOctave(), AttPitch()
 {
-    RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_ACCIDENTAL);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_OCTAVE);
+    this->RegisterAttClass(ATT_PITCH);
 
-    Reset();
+    this->Reset();
 }
 
 Course::~Course() {}
@@ -33,7 +36,10 @@ Course::~Course() {}
 void Course::Reset()
 {
     Object::Reset();
-    ResetNNumberLike();
+    this->ResetAccidental();
+    this->ResetNNumberLike();
+    this->ResetOctave();
+    this->ResetPitch();
 }
 
 bool Course::IsSupportedChild(Object *child)
@@ -41,5 +47,9 @@ bool Course::IsSupportedChild(Object *child)
     // Nothing for now
     return false;
 }
+
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
 
 } // namespace vrv

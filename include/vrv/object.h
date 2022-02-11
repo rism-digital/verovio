@@ -120,6 +120,7 @@ public:
     }
     ///@}
 
+    virtual BeamDrawingInterface *GetBeamDrawingInterface() { return NULL; }
     virtual DurationInterface *GetDurationInterface() { return NULL; }
     virtual LinkingInterface *GetLinkingInterface() { return NULL; }
     virtual FacsimileInterface *GetFacsimileInterface() { return NULL; }
@@ -1072,6 +1073,11 @@ public:
     ///@}
 
     /**
+     * Extract default duration from scoredef/staffdef
+     */
+    virtual int PrepareDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Match start for TimePointingInterface elements (such as fermata or harm).
      */
     ///@{
@@ -1253,6 +1259,13 @@ public:
     ///@}
 
     /**
+     * Cache or restore cached horizontal layout for faster layout redoing
+     */
+    ///@{
+    virtual int HorizontalLayoutCache(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Adjust note timings based on ties
      */
     ///@{
@@ -1260,10 +1273,20 @@ public:
     ///@}
 
     /**
+     * Prepare the MIDI export
+     * Captures information (i.e. from control elements) for MIDI interpretation
+     * This information is usually required beforehand in GenerateMIDI
+     */
+    ///@{
+    virtual int PrepareMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Export the object to a MidiFile
      */
     ///@{
     virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int GenerateMIDIEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -1283,8 +1306,9 @@ public:
     /**
      * Calculate the maximum duration of each measure.
      */
+    ///@{
     virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
+    virtual int CalcMaxMeasureDurationEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

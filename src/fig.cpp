@@ -27,9 +27,9 @@ static const ClassRegistrar<Fig> s_factory("fig", FIG);
 
 Fig::Fig() : TextElement(FIG, "fig-"), AreaPosInterface()
 {
-    RegisterInterface(AreaPosInterface::GetAttClasses(), AreaPosInterface::IsInterface());
+    this->RegisterInterface(AreaPosInterface::GetAttClasses(), AreaPosInterface::IsInterface());
 
-    Reset();
+    this->Reset();
 }
 
 Fig::~Fig() {}

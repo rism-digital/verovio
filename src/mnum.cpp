@@ -33,13 +33,13 @@ MNum::MNum()
     , AttLang()
     , AttTypography()
 {
-    RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_LANG);
-    RegisterAttClass(ATT_TYPOGRAPHY);
+    this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
+    this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_LANG);
+    this->RegisterAttClass(ATT_TYPOGRAPHY);
 
-    Reset();
+    this->Reset();
 }
 
 MNum::~MNum() {}
@@ -49,9 +49,9 @@ void MNum::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimePointInterface::Reset();
-    ResetColor();
-    ResetLang();
-    ResetTypography();
+    this->ResetColor();
+    this->ResetLang();
+    this->ResetTypography();
 
     m_isGenerated = false;
 }

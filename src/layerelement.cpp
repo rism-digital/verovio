@@ -72,37 +72,37 @@ namespace vrv {
 LayerElement::LayerElement()
     : Object(LAYER_ELEMENT, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
-    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
-    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
-    RegisterAttClass(ATT_COORDX1);
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
+    this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    this->RegisterAttClass(ATT_COORDX1);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 LayerElement::LayerElement(ClassId classId)
     : Object(classId, "le-"), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
-    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
-    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
-    RegisterAttClass(ATT_COORDX1);
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
+    this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    this->RegisterAttClass(ATT_COORDX1);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 LayerElement::LayerElement(ClassId classId, const std::string &classIdStr)
     : Object(classId, classIdStr), FacsimileInterface(), LinkingInterface(), AttCoordX1(), AttLabelled(), AttTyped()
 {
-    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
-    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
-    RegisterAttClass(ATT_COORDX1);
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
+    this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    this->RegisterAttClass(ATT_COORDX1);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 void LayerElement::Reset()
@@ -110,14 +110,17 @@ void LayerElement::Reset()
     Object::Reset();
     FacsimileInterface::Reset();
     LinkingInterface::Reset();
-    ResetCoordX1();
-    ResetLabelled();
-    ResetTyped();
+    this->ResetCoordX1();
+    this->ResetLabelled();
+    this->ResetTyped();
 
     m_xAbs = VRV_UNSET;
     m_drawingYRel = 0;
     m_drawingXRel = 0;
     m_drawingCueSize = false;
+
+    m_cachedYRel = VRV_UNSET;
+    m_cachedXRel = VRV_UNSET;
 
     m_scoreDefRole = SCOREDEF_NONE;
     m_alignment = NULL;
@@ -210,7 +213,7 @@ FTrem *LayerElement::IsInFTrem()
 
 Beam *LayerElement::IsInBeam()
 {
-    if (!this->Is({ CHORD, NOTE, STEM })) return NULL;
+    if (!this->Is({ CHORD, NOTE, TABGRP, TABDURSYM, STEM })) return NULL;
     Beam *beamParent = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
     if (beamParent != NULL) {
         if (!this->IsGraceNote()) return beamParent;
@@ -242,6 +245,18 @@ int LayerElement::GetOriginalLayerN()
     return layerN;
 }
 
+Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence) const
+{
+    Staff *staff = NULL;
+    if (strategy == RESOLVE_CROSS_STAFF) {
+        Layer *layer = NULL;
+        staff = this->GetCrossStaff(layer);
+    }
+    if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    if (assertExistence) assert(staff);
+    return staff;
+}
+
 Staff *LayerElement::GetCrossStaff(Layer *&layer) const
 {
     if (m_crossStaff) {
@@ -262,83 +277,54 @@ data_STAFFREL_basic LayerElement::GetCrossStaffRel()
 {
     if (!m_crossStaff) return STAFFREL_basic_NONE;
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
 
     return (m_crossStaff->GetN() < staff->GetN()) ? STAFFREL_basic_above : STAFFREL_basic_below;
 }
 
 void LayerElement::GetOverflowStaffAlignments(StaffAlignment *&above, StaffAlignment *&below)
 {
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    Layer *crossLayer = NULL;
-    Staff *crossStaff = this->GetCrossStaff(crossLayer);
-    if (crossStaff) staff = crossStaff;
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
     // By default use the alignment of the staff
     above = staff->GetAlignment();
     below = above;
 
-    // Chord and beam parent (if any)
-    Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
-    Beam *beam = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
+    // Dots, flags and stems with cross-staff chords need special treatment
+    this->GetChordOverflow(above, below, staff->GetN());
 
+    // Stems cross-staff beam need special treatment but only if the beam itself is not cross-staff
+    if (this->Is({ ARTIC, STEM })) {
+        if (this->GetFirstAncestor(BEAM)) {
+            Beam *beam = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
+            if (!beam->m_crossStaff) beam->GetBeamChildOverflow(above, below);
+        }
+        else if (this->GetFirstAncestor(FTREM)) {
+            FTrem *fTrem = vrv_cast<FTrem *>(this->GetFirstAncestor(FTREM));
+            if (!fTrem->m_crossStaff) fTrem->GetBeamChildOverflow(above, below);
+        }
+    }
+    // Beams in cross-staff situation need special treatment
+    else if (this->Is({ BEAM, FTREM }) && !m_crossStaff) {
+        BeamDrawingInterface *interface = this->GetBeamDrawingInterface();
+        assert(interface);
+        interface->GetBeamOverflow(above, below);
+    }
+}
+
+void LayerElement::GetChordOverflow(StaffAlignment *&above, StaffAlignment *&below, int staffN)
+{
+    Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
     // Dots, flags and stems with cross-staff chords need special treatment
     if (this->Is({ DOTS, FLAG, STEM }) && chord && chord->HasCrossStaff()) {
         Staff *staffAbove = NULL;
         Staff *staffBelow = NULL;
         chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-        if (staffAbove && (staffAbove->GetN() < staff->GetN())) {
+        if (staffAbove && (staffAbove->GetN() < staffN)) {
             above = staffAbove->GetAlignment();
         }
-        if (staffBelow && (staffBelow->GetN() > staff->GetN())) {
+        if (staffBelow && (staffBelow->GetN() > staffN)) {
             below = staffBelow->GetAlignment();
-        }
-    }
-    // Stems cross-staff beam need special treatment but only if the beam itself is not cross-staff
-    if (this->Is({ ARTIC, STEM }) && beam && beam->m_crossStaffContent && !beam->m_crossStaff) {
-        data_STAFFREL_basic direction = beam->m_crossStaffRel;
-        if (direction == STAFFREL_basic_above) {
-            above = beam->m_crossStaffContent->GetAlignment();
-            below = beam->m_beamStaff->GetAlignment();
-        }
-        else {
-            above = beam->m_beamStaff->GetAlignment();
-            below = beam->m_crossStaffContent->GetAlignment();
-        }
-    }
-    // Beams in cross-staff situation need special treatment
-    if (this->Is(BEAM)) {
-        beam = vrv_cast<Beam *>(this);
-        assert(beam);
-        // Beam between the staves - ignore both above and below
-        if (beam->m_crossStaffContent && !beam->m_crossStaff) {
-            data_STAFFREL_basic direction = beam->m_crossStaffRel;
-            if (beam->m_drawingPlace == BEAMPLACE_mixed) {
-                above = NULL;
-                below = NULL;
-            }
-            // Beam below - ignore above and find the appropriate below staff
-            else if (beam->m_drawingPlace == BEAMPLACE_below) {
-                above = NULL;
-                if (direction == STAFFREL_basic_above) {
-                    below = beam->m_beamStaff->GetAlignment();
-                }
-                else {
-                    below = beam->m_crossStaffContent->GetAlignment();
-                }
-            }
-            // Beam above - ignore below and find the appropriate above staff
-            else if (beam->m_drawingPlace == BEAMPLACE_above) {
-                below = NULL;
-                if (direction == STAFFREL_basic_below) {
-                    above = beam->m_beamStaff->GetAlignment();
-                }
-                else {
-                    above = beam->m_crossStaffContent->GetAlignment();
-                }
-            }
         }
     }
 }
@@ -461,13 +447,13 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticTy
 
 void LayerElement::SetDrawingXRel(int drawingXRel)
 {
-    ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
 }
 
 void LayerElement::SetDrawingYRel(int drawingYRel)
 {
-    ResetCachedDrawingY();
+    this->ResetCachedDrawingY();
     m_drawingYRel = drawingYRel;
 }
 
@@ -475,12 +461,12 @@ void LayerElement::CenterDrawingX()
 {
     if (m_xAbs != VRV_UNSET) return;
 
-    SetDrawingXRel(0);
+    this->SetDrawingXRel(0);
 
     Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
     assert(measure);
 
-    SetDrawingXRel(measure->GetInnerCenterX() - this->GetDrawingX());
+    this->SetDrawingXRel(measure->GetInnerCenterX() - this->GetDrawingX());
 }
 
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticType type)
@@ -567,9 +553,8 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
 
     wchar_t code = 0;
     int dur = DUR_4;
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = this->GetAncestorStaff();
     bool isMensuralDur = false;
-    assert(staff);
     if (this->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(this);
         assert(note);
@@ -625,12 +610,13 @@ double LayerElement::GetAlignmentDuration(
         return 0.0;
     }
 
-    if (this->HasSameasLink() && this->GetSameasLink()->IsLayerElement()) {
-        LayerElement *sameas = vrv_cast<LayerElement *>(this->GetSameasLink());
-        assert(sameas);
+    // Only resolve simple sameas links to avoid infinite recursion
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
         return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
-    else if (this->HasInterface(INTERFACE_DURATION)) {
+
+    if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
         Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
@@ -822,7 +808,7 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
         return {};
     }
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = this->GetAncestorStaff();
     const int layerCount = staff->GetChildCount(LAYER);
 
     // Calculate primary/secondary dot locations
@@ -869,10 +855,10 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
             }
 
             // Count collisions between each pair of dot choices
-            const int collisions11 = GetCollisionCount(dotLocs1, otherDotLocs1);
-            const int collisions12 = GetCollisionCount(dotLocs1, otherDotLocs2);
-            const int collisions21 = GetCollisionCount(dotLocs2, otherDotLocs1);
-            const int collisions22 = GetCollisionCount(dotLocs2, otherDotLocs2);
+            const int collisions11 = this->GetCollisionCount(dotLocs1, otherDotLocs1);
+            const int collisions12 = this->GetCollisionCount(dotLocs1, otherDotLocs2);
+            const int collisions21 = this->GetCollisionCount(dotLocs2, otherDotLocs1);
+            const int collisions22 = this->GetCollisionCount(dotLocs2, otherDotLocs2);
             const int maxCollisions = std::max({ collisions11, collisions12, collisions21, collisions22 });
 
             if (maxCollisions > 0) {
@@ -892,7 +878,7 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     }
 
     // Count dots to decide which set is used
-    const bool usePrimary = (GetDotCount(dotLocs1) >= GetDotCount(dotLocs2));
+    const bool usePrimary = (this->GetDotCount(dotLocs1) >= this->GetDotCount(dotLocs2));
     return usePrimary ? dotLocs1 : dotLocs2;
 }
 
@@ -927,10 +913,10 @@ int LayerElement::GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDot
 
 int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
-    SetDrawingXRel(0);
+    this->SetDrawingXRel(0);
     // Exception here: the LayerElement::m_drawingYRel position is already set for horizontal alignment
     // See Object::SetAlignmentPitchPos - for this reason we need to reset it here and not in ResetVerticalAlignment
-    SetDrawingYRel(0);
+    this->SetDrawingYRel(0);
 
     m_alignment = NULL;
     m_graceAlignment = NULL;
@@ -1096,9 +1082,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         m_alignment = note->GetAlignment();
     }
     else if (this->Is(SYL)) {
-        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
-
+        Staff *staff = this->GetAncestorStaff();
         if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
             type = ALIGNMENT_DEFAULT;
         }
@@ -1150,8 +1134,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else {
         assert(this->IsGraceNote());
         if (this->Is(CHORD) || (this->Is(NOTE) && !chordParent)) {
-            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            assert(staff);
+            Staff *staff = this->GetAncestorStaff();
             int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
             GraceAligner *graceAligner = m_alignment->GetGraceAligner(graceAlignerId);
             // We know that this is a note or a chord - we stack them and they will be added at the end of the layer
@@ -1178,8 +1161,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     LayerElement *layerElementY = this;
-    Staff *staffY = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staffY);
+    Staff *staffY = this->GetAncestorStaff();
     Layer *layerY = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layerY);
 
@@ -1277,8 +1259,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         // Automatically calculate rest position
         else {
             // set default location to the middle of the staff
-            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            assert(staff);
+            Staff *staff = this->GetAncestorStaff();
             loc = staff->m_drawingLines - 1;
             if (loc % 2 != 0) --loc;
             if (staff->m_drawingLines > 1) loc += 2;
@@ -1306,8 +1287,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         // Automatically calculate rest position
         else {
             // set default location to the middle of the staff
-            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            assert(staff);
+            Staff *staff = this->GetAncestorStaff();
             loc = staff->m_drawingLines - 1;
             if ((rest->GetDur() < DUR_4) && (loc % 2 != 0)) --loc;
             // Adjust special cases
@@ -1430,6 +1410,14 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         rest->SetDrawingLoc(loc);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
+    else if (this->Is(TABDURSYM)) {
+        int yRel = 0;
+        if (staffY->IsTabWithStemsOutside()) {
+            double spacingRatio = (staffY->IsTabLuteFrench()) ? 2.0 : 1.0;
+            yRel += params->m_doc->GetDrawingUnit(staffY->m_drawingStaffSize) * spacingRatio;
+        }
+        this->SetDrawingYRel(yRel);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -1441,7 +1429,8 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
 
     // ignore elements that are not in the beam or are direct children of the beam
     if (!params->m_beam) return FUNCTOR_CONTINUE;
-    if (!params->m_isOtherLayer && !Is(ACCID) && (GetFirstAncestor(BEAM) == params->m_beam) && !IsGraceNote())
+    if (!params->m_isOtherLayer && !this->Is(ACCID) && (this->GetFirstAncestor(BEAM) == params->m_beam)
+        && !this->IsGraceNote())
         return FUNCTOR_CONTINUE;
     // ignore elements that are both on other layer and cross-staff
     if (params->m_isOtherLayer && m_crossStaff) return FUNCTOR_CONTINUE;
@@ -1459,22 +1448,24 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
         if (accid->GetFunc() == accidLog_FUNC_edit) return FUNCTOR_CONTINUE;
     }
 
-    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
 
     // check if top/bottom of the element overlaps with beam coordinates
     int leftMargin = 0, rightMargin = 0;
     Beam *beam = vrv_cast<Beam *>(params->m_beam);
-    const int beamCount = beam->m_beamSegment.GetAdjacentElementsDuration(GetDrawingX()) - DUR_8;
+    const int beamCount = beam->m_beamSegment.GetAdjacentElementsDuration(this->GetDrawingX()) - DUR_8;
     const int currentBeamYLeft = params->m_y1 + params->m_beamSlope * (this->GetContentLeft() - params->m_x1);
     const int currentBeamYRight = params->m_y1 + params->m_beamSlope * (this->GetContentRight() - params->m_x1);
     if (params->m_directionBias > 0) {
-        leftMargin = GetContentTop() - currentBeamYLeft + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
-        rightMargin = GetContentTop() - currentBeamYRight + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
+        leftMargin = this->GetContentTop() - currentBeamYLeft + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
+        rightMargin
+            = this->GetContentTop() - currentBeamYRight + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
     }
     else {
-        leftMargin = GetContentBottom() - currentBeamYLeft - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
-        rightMargin = GetContentBottom() - currentBeamYRight - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
+        leftMargin
+            = this->GetContentBottom() - currentBeamYLeft - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
+        rightMargin
+            = this->GetContentBottom() - currentBeamYRight - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
     }
 
     const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
@@ -1492,8 +1483,8 @@ int LayerElement::AdjustDots(FunctorParams *functorParams)
     AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);
     assert(params);
 
-    if (Is(NOTE) && GetParent()->Is(CHORD)) return FUNCTOR_SIBLINGS;
-    if (Is(DOTS)) {
+    if (this->Is(NOTE) && this->GetParent()->Is(CHORD)) return FUNCTOR_SIBLINGS;
+    if (this->Is(DOTS)) {
         params->m_dots.push_back(this);
     }
     else {
@@ -1533,36 +1524,43 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     // We are processing the first layer, nothing to do yet
     if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
 
-    const int shift
-        = AdjustOverlappingLayers(params->m_doc, params->m_previous, !params->m_ignoreDots, params->m_unison);
+    const int shift = AdjustOverlappingLayers(
+        params->m_doc, params->m_previous, !params->m_ignoreDots, params->m_unison, params->m_stemSameas);
     params->m_accumulatedShift += shift;
 
     return FUNCTOR_SIBLINGS;
 }
 
 int LayerElement::AdjustOverlappingLayers(
-    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison)
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison, bool &stemSameas)
 {
-    if (Is(NOTE) && GetParent()->Is(CHORD))
+    if (this->Is(NOTE) && this->GetParent()->Is(CHORD))
         return 0;
-    else if (Is(STEM) && isUnison) {
+    else if (this->Is(STEM) && isUnison) {
         isUnison = false;
+        return 0;
+    }
+    else if (this->Is(STEM) && stemSameas) {
+        stemSameas = false;
         return 0;
     }
 
     auto [margin, isInUnison] = CalcElementHorizontalOverlap(doc, otherElements, areDotsAdjusted, false);
-    if (Is(NOTE)) {
+    if (this->Is(NOTE)) {
         isUnison = isInUnison;
         if (isUnison) return 0;
+        Note *note = vrv_cast<Note *>(this);
+        assert(note);
+        stemSameas = note->HasStemSameasNote();
     }
 
-    if (Is({ DOTS, STEM })) {
-        LayerElement *parent = vrv_cast<LayerElement *>(GetParent());
+    if (this->Is({ DOTS, STEM })) {
+        LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
         assert(parent);
         parent->SetDrawingXRel(parent->GetDrawingXRel() + margin);
     }
     else {
-        SetDrawingXRel(GetDrawingXRel() + margin);
+        this->SetDrawingXRel(this->GetDrawingXRel() + margin);
     }
     return margin;
 }
@@ -1571,8 +1569,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
     const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool isChordElement, bool isLowerElement,
     bool unison)
 {
-    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
 
     bool isInUnison = false;
     int shift = 0;
@@ -1582,7 +1579,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
         int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         bool isUnisonElement = false;
         // Handle stem collisions
-        if (Is(STEM)) {
+        if (this->Is(STEM)) {
             Stem *stem = vrv_cast<Stem *>(this);
             if (otherElements.at(i)->Is(NOTE)) {
                 shift += stem->CompareToElementPosition(doc, otherElements.at(i), -shift);
@@ -1593,7 +1590,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             if (shift) break;
         }
         // handle note collisions
-        else if (Is(NOTE) && otherElements.at(i)->Is(NOTE)) {
+        else if (this->Is(NOTE) && otherElements.at(i)->Is(NOTE)) {
             Note *currentNote = vrv_cast<Note *>(this);
             Note *previousNote = vrv_cast<Note *>(otherElements.at(i));
             assert(previousNote);
@@ -1664,7 +1661,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             }
         }
         // handle dot collisions
-        else if (Is(DOTS) && !otherElements.at(i)->Is(DOTS) && areDotsAdjusted) {
+        else if (this->Is(DOTS) && !otherElements.at(i)->Is(DOTS) && areDotsAdjusted) {
             // No need for shift if dot is adjusted
             Dots *dot = vrv_cast<Dots *>(this);
             if (dot->IsAdjusted() || !HorizontalSelfOverlap(otherElements.at(i), horizontalMargin)) continue;
@@ -1677,7 +1674,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             }
         }
 
-        if (Is(NOTE) && !otherElements.at(i)->Is(STEM)) {
+        if (this->Is(NOTE) && !otherElements.at(i)->Is(STEM)) {
             // Nothing to do if we have no vertical overlap
             if (!VerticalSelfOverlap(otherElements.at(i), verticalMargin)) continue;
 
@@ -1704,7 +1701,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
         else if (this->Is(NOTE)) {
             Note *currentNote = vrv_cast<Note *>(this);
             assert(currentNote);
-            if ((currentNote->GetDrawingDur() == DUR_1) && otherElements.at(i)->Is(STEM)) {
+            if ((currentNote->GetDrawingDur() == DUR_1) && otherElements.at(i)->Is(STEM) && (shift == 0)) {
                 const int horizontalMargin = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
                 data_STEMDIRECTION stemDir = stem->GetDrawingStemDir();
@@ -1720,7 +1717,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
 
     // If note is not in unison, has accidental and were to be shifted to the right - shift it to the left
     // That way accidental will be near note that actually has accidental and not near lowest-layer note
-    if (Is(NOTE) && isChordElement && unison && (shift > 0)) {
+    if (this->Is(NOTE) && isChordElement && unison && (shift > 0)) {
         Note *currentNote = vrv_cast<Note *>(this);
         if (currentNote->GetDrawingAccid()) shift *= -1;
     }
@@ -1783,11 +1780,11 @@ int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams)
     }
 
     if (params->m_drawingNumPos == STAFFREL_basic_above) {
-        int dist = GetSelfTop();
+        int dist = this->GetSelfTop();
         if (params->m_yRel < dist) params->m_yRel = dist;
     }
     else {
-        int dist = GetSelfBottom();
+        int dist = this->GetSelfBottom();
         if (params->m_yRel > dist) params->m_yRel = dist;
     }
 
@@ -1858,7 +1855,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     else {
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
-        params->m_currentAlignment.m_alignment = GetAlignment();
+        params->m_currentAlignment.m_alignment = this->GetAlignment();
         // Here we look how bounding boxes overlap and adjust the position only when necessary
         if (performBoundingBoxAlignment) {
             selfLeft = this->GetAlignment()->GetXRel();
@@ -1880,7 +1877,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
                         overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
                     }
                     else if (this->Is(ACCID) && element->Is(NOTE)) {
-                        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+                        Staff *staff = this->GetAncestorStaff();
                         const int staffTop = staff->GetDrawingY();
                         const int staffBottom = staffTop - params->m_doc->GetDrawingStaffSize(params->m_staffSize);
                         int verticalMargin = 0;
@@ -1929,10 +1926,11 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     // In case of dots/flags we need to hold off of adjusting upcoming min position right away - if it happens that
     // these elements do not overlap with other elements we can draw them as is and save space
-    AlignmentReference *currentReference = GetAlignment()->GetReferenceWithElement(this, params->m_staffN);
-    Alignment *nextAlignment = vrv_cast<Alignment *>(GetAlignment()->GetParent()->GetNext(GetAlignment(), ALIGNMENT));
+    AlignmentReference *currentReference = this->GetAlignment()->GetReferenceWithElement(this, params->m_staffN);
+    Alignment *nextAlignment
+        = vrv_cast<Alignment *>(this->GetAlignment()->GetParent()->GetNext(this->GetAlignment(), ALIGNMENT));
     AlignmentType next = nextAlignment ? nextAlignment->GetType() : ALIGNMENT_DEFAULT;
-    if (Is({ DOTS, FLAG }) && currentReference->HasMultipleLayer() && (next != ALIGNMENT_MEASURE_RIGHT_BARLINE)) {
+    if (this->Is({ DOTS, FLAG }) && currentReference->HasMultipleLayer() && (next != ALIGNMENT_MEASURE_RIGHT_BARLINE)) {
         const int additionalOffset = selfRight - params->m_upcomingMinPos;
         if (additionalOffset > params->m_currentAlignment.m_offset) {
             params->m_currentAlignment.m_offset = additionalOffset;
@@ -1947,7 +1945,9 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.second == this; });
     if (it != params->m_measureTieEndpoints.end()) {
         const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * drawingUnit;
-        const int currentTieLength = it->second->GetContentLeft() - it->first->GetContentRight() - drawingUnit;
+        const int leftXPos = it->first->HasContentBB() ? it->first->GetContentRight() : it->first->GetDrawingX();
+        const int rightXPos = it->second->HasContentBB() ? it->second->GetContentLeft() : it->second->GetDrawingX();
+        const int currentTieLength = rightXPos - leftXPos - drawingUnit;
         if ((currentTieLength < minTieLength)
             && ((it->first->GetFirstAncestor(CHORD) != NULL) || (this->GetFirstAncestor(CHORD) != NULL)
                 || (it->first->FindDescendantByType(FLAG) != NULL))) {
@@ -2060,8 +2060,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    Staff *parentStaff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(parentStaff);
+    Staff *parentStaff = this->GetAncestorStaff();
     // Check if we have a cross-staff to itself...
     if (m_crossStaff == parentStaff) {
         LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff",
@@ -2290,18 +2289,18 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
     LayerElementsInTimeSpanParams *params = vrv_params_cast<LayerElementsInTimeSpanParams *>(functorParams);
     assert(params);
 
-    Layer *currentLayer = vrv_cast<Layer *>(GetFirstAncestor(LAYER));
+    Layer *currentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     // Either get layer refernced by @m_layer or all layers but it, depending on the @m_allLayersButCurrent flag
     if ((!params->m_allLayersButCurrent && (currentLayer != params->m_layer))
         || (params->m_allLayersButCurrent && (currentLayer == params->m_layer))) {
         return FUNCTOR_SIBLINGS;
     }
-    if (!currentLayer || IsScoreDefElement() || Is(MREST)) return FUNCTOR_SIBLINGS;
-    if (!GetDurationInterface() || Is(MSPACE) || Is(SPACE) || HasSameasLink()) return FUNCTOR_CONTINUE;
+    if (!currentLayer || this->IsScoreDefElement() || this->Is(MREST)) return FUNCTOR_SIBLINGS;
+    if (!this->GetDurationInterface() || this->Is({ MSPACE, SPACE }) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
 
-    const double duration = !GetParent()->Is(CHORD)
-        ? GetAlignmentDuration(params->m_mensur, params->m_meterSig)
-        : vrv_cast<Chord *>(GetParent())->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+    const double duration = !this->GetParent()->Is(CHORD)
+        ? this->GetAlignmentDuration(params->m_mensur, params->m_meterSig)
+        : vrv_cast<Chord *>(this->GetParent())->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
 
     const double time = m_alignment->GetTime();
 
@@ -2313,7 +2312,7 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
     params->m_elements.push_back(this);
 
     // Not need to recurse for chords
-    return Is(CHORD) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
+    return this->Is(CHORD) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
 int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
@@ -2339,8 +2338,7 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 
         // Skip if neither parent staff nor cross staff matches the given staff number
         if (!params->m_staffNs.empty()) {
-            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            assert(staff);
+            Staff *staff = this->GetAncestorStaff();
             if (params->m_staffNs.find(staff->GetN()) == params->m_staffNs.end()) {
                 Layer *layer = NULL;
                 staff = this->GetCrossStaff(layer);
@@ -2361,21 +2359,15 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 
         // Skip elements aligned at start/end, but on a different staff
         if ((this->GetAlignment() == start->GetAlignment()) && !start->Is(TIMESTAMP_ATTR)) {
-            Layer *layer = NULL;
-            Staff *staff = this->GetCrossStaff(layer);
-            if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            Staff *startStaff = start->GetCrossStaff(layer);
-            if (!startStaff) startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
+            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            Staff *startStaff = start->GetAncestorStaff(RESOLVE_CROSS_STAFF);
             if (staff->GetN() != startStaff->GetN()) {
                 return FUNCTOR_CONTINUE;
             }
         }
         if ((this->GetAlignment() == end->GetAlignment()) && !end->Is(TIMESTAMP_ATTR)) {
-            Layer *layer = NULL;
-            Staff *staff = this->GetCrossStaff(layer);
-            if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            Staff *endStaff = end->GetCrossStaff(layer);
-            if (!endStaff) endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
+            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            Staff *endStaff = end->GetAncestorStaff(RESOLVE_CROSS_STAFF);
             if (staff->GetN() != endStaff->GetN()) {
                 return FUNCTOR_CONTINUE;
             }
@@ -2402,6 +2394,15 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         incrementScoreTime = element->GetAlignmentDuration(
             params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
+        // For rests to be possibly added to the timemap
+        if (element->Is(REST)) {
+            Rest *rest = vrv_cast<Rest *>(element);
+            double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
+            rest->SetScoreTimeOnset(params->m_currentScoreTime);
+            rest->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
+            rest->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
+            rest->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
+        }
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
@@ -2413,11 +2414,16 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         if (note->IsGraceNote()) return FUNCTOR_CONTINUE;
 
         Chord *chord = note->IsChordTone();
+        TabGrp *tabGrp = note->IsTabGrpNote();
 
         // If the note has a @dur or a @dur.ges, take it into account
         // This means that overwriting only @dots or @dots.ges will not be taken into account
         if (chord && !note->HasDur() && !note->HasDurGes()) {
             incrementScoreTime = chord->GetAlignmentDuration(
+                params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        }
+        else if (tabGrp && !note->HasDur() && !note->HasDurGes()) {
+            incrementScoreTime = tabGrp->GetAlignmentDuration(
                 params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         }
         else {
@@ -2442,8 +2448,9 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         storeNote->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
         storeNote->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
 
-        // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
-        if (!(note->IsChordTone())) {
+        // increase the currentTime accordingly, but only if not in a chord or tabGrp - checkit with note->IsChordTone()
+        // or note->IsTabGrpNote()
+        if (!(note->IsChordTone()) && !(note->IsTabGrpNote())) {
             params->m_currentScoreTime += incrementScoreTime;
             params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
         }
@@ -2481,9 +2488,10 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (this->HasSameasLink()) {
-        assert(this->GetSameasLink());
-        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    // Only resolve simple sameas links to avoid infinite recursion
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
+        sameas->Process(params->m_functor, functorParams);
     }
 
     return FUNCTOR_CONTINUE;
@@ -2496,12 +2504,27 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (this->HasSameasLink()) {
-        assert(this->GetSameasLink());
-        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    // Only resolve simple sameas links to avoid infinite recursion
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
+        sameas->Process(params->m_functor, functorParams);
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
+{
+    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    if (this->Is(MULTIREST)) {
+        MultiRest *multiRest = vrv_cast<MultiRest *>(this);
+        assert(multiRest);
+        params->m_multiRestFactor = multiRest->GetNum();
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int LayerElement::ResetDrawing(FunctorParams *functorParams)
@@ -2526,17 +2549,19 @@ int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
     // Do not check for index of the element if we're looking into neighboring layer or if nested element is being
     // processed (e.g. ignore index children of beams, since they have their own indices irrelevant to the one that
     // has been passed inside this functor)
-    if (!params->m_isInNeighboringLayer && GetParent()->Is(LAYER)) {
-        if (params->m_searchDirection == FORWARD && (GetIdx() < params->m_initialElementId)) return FUNCTOR_SIBLINGS;
-        if (params->m_searchDirection == BACKWARD && (GetIdx() > params->m_initialElementId)) return FUNCTOR_SIBLINGS;
+    if (!params->m_isInNeighboringLayer && this->GetParent()->Is(LAYER)) {
+        if (params->m_searchDirection == FORWARD && (this->GetIdx() < params->m_initialElementId))
+            return FUNCTOR_SIBLINGS;
+        if (params->m_searchDirection == BACKWARD && (this->GetIdx() > params->m_initialElementId))
+            return FUNCTOR_SIBLINGS;
     }
 
-    if (Is({ NOTE, CHORD, FTREM })) {
+    if (this->Is({ NOTE, CHORD, FTREM })) {
         params->m_relativeElement = this;
         return FUNCTOR_STOP;
     }
 
-    if (Is(REST)) return params->m_isInNeighboringLayer ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
+    if (this->Is(REST)) return params->m_isInNeighboringLayer ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }
@@ -2544,6 +2569,43 @@ int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
 int LayerElement::PrepareSlurs(FunctorParams *)
 {
     return FUNCTOR_SIBLINGS;
+}
+
+int LayerElement::PrepareDuration(FunctorParams *functorParams)
+{
+    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
+    assert(params);
+
+    DurationInterface *durInterface = this->GetDurationInterface();
+    if (durInterface) {
+        durInterface->SetDurDefault(params->m_durDefault);
+        // Check if there is a duration default for the staff
+        if (!params->m_durDefaultForStaffN.empty()) {
+            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            if (params->m_durDefaultForStaffN.count(staff->GetN()) > 0) {
+                durInterface->SetDurDefault(params->m_durDefaultForStaffN.at(staff->GetN()));
+            }
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::HorizontalLayoutCache(FunctorParams *functorParams)
+{
+    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    assert(params);
+
+    if (params->m_restore) {
+        m_drawingXRel = m_cachedXRel;
+        m_drawingYRel = m_cachedYRel;
+    }
+    else {
+        m_cachedXRel = m_drawingXRel;
+        m_cachedYRel = m_drawingYRel;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

@@ -37,14 +37,14 @@ Dir::Dir()
     , AttLineRendBase()
     , AttVerticalGroup()
 {
-    RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_LANG);
-    RegisterAttClass(ATT_EXTENDER);
-    RegisterAttClass(ATT_LINERENDBASE);
-    RegisterAttClass(ATT_VERTICALGROUP);
+    this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_LANG);
+    this->RegisterAttClass(ATT_EXTENDER);
+    this->RegisterAttClass(ATT_LINERENDBASE);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
-    Reset();
+    this->Reset();
 }
 
 Dir::~Dir() {}
@@ -54,10 +54,10 @@ void Dir::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
-    ResetExtender();
-    ResetLang();
-    ResetLineRendBase();
-    ResetVerticalGroup();
+    this->ResetExtender();
+    this->ResetLang();
+    this->ResetLineRendBase();
+    this->ResetVerticalGroup();
 }
 
 bool Dir::IsSupportedChild(Object *child)
@@ -76,7 +76,7 @@ bool Dir::IsSupportedChild(Object *child)
 
 bool Dir::AreChildrenAlignedTo(data_HORIZONTALALIGNMENT alignment) const
 {
-    const ArrayOfObjects *children = GetChildren();
+    const ArrayOfObjects *children = this->GetChildren();
     bool hasHalign = std::any_of(children->begin(), children->end(), [&alignment](Object *child) {
         AttHorizontalAlign *hAlign = dynamic_cast<AttHorizontalAlign *>(child);
         return (hAlign && (hAlign->GetHalign() == alignment));

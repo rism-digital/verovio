@@ -32,9 +32,9 @@ static const ClassRegistrar<Ligature> s_factory("ligature", LIGATURE);
 
 Ligature::Ligature() : LayerElement(LIGATURE, "ligature-"), ObjectListInterface(), AttLigatureVis()
 {
-    RegisterAttClass(ATT_LIGATUREVIS);
+    this->RegisterAttClass(ATT_LIGATUREVIS);
 
-    Reset();
+    this->Reset();
 }
 
 Ligature::~Ligature()
@@ -45,7 +45,7 @@ Ligature::~Ligature()
 void Ligature::Reset()
 {
     LayerElement::Reset();
-    ResetLigatureVis();
+    this->ResetLigatureVis();
 
     ClearClusters();
 }
@@ -136,8 +136,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     m_drawingShapes.clear();
 
     Note *lastNote = dynamic_cast<Note *>(this->GetList(this)->back());
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
 
     const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);

@@ -15,6 +15,7 @@
 
 namespace vrv {
 
+class FunctorParams;
 class Mensur;
 class Object;
 
@@ -45,7 +46,15 @@ public:
     virtual ~DurationInterface();
     void Reset() override;
     InterfaceId IsInterface() const override { return INTERFACE_DURATION; }
-    ///@}SetDurationGes
+    ///@}
+
+    /**
+     * @name Set and get the default duration
+     */
+    ///@{
+    void SetDurDefault(data_DURATION dur) { m_durDefault = dur; }
+    data_DURATION GetDurDefault() const { return m_durDefault; }
+    ///@}
 
     /**
      * Returns the duration (in double) for the element.
@@ -100,11 +109,83 @@ public:
      */
     bool HasIdenticalDurationInterface(DurationInterface *otherDurationInterface);
 
+    /**
+     * MIDI timing information
+     */
+    ///@{
+    void SetScoreTimeOnset(double scoreTime);
+    void SetRealTimeOnsetSeconds(double timeInSeconds);
+    void SetScoreTimeOffset(double scoreTime);
+    void SetRealTimeOffsetSeconds(double timeInSeconds);
+    void SetScoreTimeTiedDuration(double timeInSeconds);
+    double GetScoreTimeOnset() const;
+    double GetRealTimeOnsetMilliseconds() const;
+    double GetScoreTimeOffset() const;
+    double GetScoreTimeTiedDuration() const;
+    double GetRealTimeOffsetMilliseconds() const;
+    double GetScoreTimeDuration() const;
+    ///@}
+
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * We have functors in the interface for avoiding code duplication in each implementation class.
+     * Since we are in an interface, we need to pass the  Object (implementation) to
+     * the functor methods. These are not called by the Process/Call loop but by the implementation
+     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
+     */
+
 private:
-    //
+    /**
+     * Calculate the actual duration => translate mensural values
+     */
+    int CalcActualDur(data_DURATION dur) const;
+
 public:
     //
 private:
+    /**
+     * The score-time onset of the note in the measure (duration from the start of measure in
+     * quarter notes).
+     */
+    double m_scoreTimeOnset;
+
+    /**
+     * The score-time off-time of the note in the measure (duration from the start of the measure
+     * in quarter notes).  This is the duration of the printed note.  If the note is the start of
+     * a tied group, the score time of the tied group is this variable plus m_scoreTimeTiedDuration.
+     * If this note is a secondary note in a tied group, then this value is the score time end
+     * of the printed note, and the m_scoreTimeTiedDuration is -1.0 to indicate that it should not
+     * be exported when creating a MIDI file.
+     */
+    double m_scoreTimeOffset;
+
+    /**
+     * The time in milliseconds since the start of the measure element that contains the note.
+     */
+    double m_realTimeOnsetMilliseconds;
+
+    /**
+     * The time in milliseconds since the start of the measure element to end of printed note.
+     * The real-time duration of a tied group is not currently tracked (this gets complicated
+     * if there is a tempo change during a note sustain, which is currently not supported).
+     */
+    double m_realTimeOffsetMilliseconds;
+
+    /**
+     * If the note is the first in a tied group, then m_scoreTimeTiedDuration contains the
+     * score-time duration (in quarter notes) of all tied notes in the group after this note.
+     * If the note is a secondary note in a tied group, then this variable is set to -1.0 to
+     * indicate that it should not be written to MIDI output.
+     */
+    double m_scoreTimeTiedDuration;
+
+    /**
+     * The default duration: extracted from scoreDef/staffDef and used when no duration attribute is given
+     */
+    data_DURATION m_durDefault;
 };
 
 } // namespace vrv

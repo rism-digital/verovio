@@ -36,6 +36,7 @@
 #include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
+#include "timemap.h"
 #include "timestamp.h"
 #include "vrv.h"
 
@@ -62,14 +63,14 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     , AttPointing()
     , AttTyped()
 {
-    RegisterAttClass(ATT_BARRING);
-    RegisterAttClass(ATT_COORDX1);
-    RegisterAttClass(ATT_COORDX2);
-    RegisterAttClass(ATT_MEASURELOG);
-    RegisterAttClass(ATT_METERCONFORMANCEBAR);
-    RegisterAttClass(ATT_NNUMBERLIKE);
-    RegisterAttClass(ATT_POINTING);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_BARRING);
+    this->RegisterAttClass(ATT_COORDX1);
+    this->RegisterAttClass(ATT_COORDX2);
+    this->RegisterAttClass(ATT_MEASURELOG);
+    this->RegisterAttClass(ATT_METERCONFORMANCEBAR);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_POINTING);
+    this->RegisterAttClass(ATT_TYPED);
 
     m_measuredMusic = measureMusic;
     // We set parent to it because we want to access the parent doc from the aligners
@@ -87,7 +88,7 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     m_leftBarLine.SetPosition(BarLinePosition::Left);
     m_rightBarLine.SetPosition(BarLinePosition::Right);
 
-    Reset();
+    this->Reset();
 
     if (!measureMusic) this->SetRight(BARRENDITION_invis);
 }
@@ -95,7 +96,7 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
 Measure::~Measure()
 {
     // We need to delete own objects
-    Reset();
+    this->Reset();
 }
 
 void Measure::CloneReset()
@@ -117,13 +118,13 @@ void Measure::CloneReset()
 void Measure::Reset()
 {
     Object::Reset();
-    ResetCoordX1();
-    ResetCoordX2();
-    ResetMeasureLog();
-    ResetMeterConformanceBar();
-    ResetNNumberLike();
-    ResetPointing();
-    ResetTyped();
+    this->ResetCoordX1();
+    this->ResetCoordX2();
+    this->ResetMeasureLog();
+    this->ResetMeterConformanceBar();
+    this->ResetNNumberLike();
+    this->ResetPointing();
+    this->ResetTyped();
 
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
@@ -134,6 +135,10 @@ void Measure::Reset()
     m_xAbs = VRV_UNSET;
     m_xAbs2 = VRV_UNSET;
     m_drawingXRel = 0;
+
+    m_cachedXRel = VRV_UNSET;
+    m_cachedOverflow = VRV_UNSET;
+    m_cachedWidth = VRV_UNSET;
 
     // by default, we have a single barLine on the right (none on the left)
     m_rightBarLine.SetForm(this->GetRight());
@@ -149,7 +154,7 @@ void Measure::Reset()
 
     m_scoreTimeOffset.clear();
     m_realTimeOffsetMilliseconds.clear();
-    m_currentTempo = 120.0;
+    m_currentTempo = MIDI_TEMPO;
 }
 
 bool Measure::IsSupportedChild(Object *child)
@@ -229,7 +234,7 @@ void Measure::ResetCachedDrawingX() const
 
 void Measure::SetDrawingXRel(int drawingXRel)
 {
-    ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
 }
 
@@ -243,7 +248,7 @@ int Measure::GetLeftBarLineXRel() const
 
 int Measure::GetLeftBarLineLeft() const
 {
-    int x = GetLeftBarLineXRel();
+    int x = this->GetLeftBarLineXRel();
     if (m_leftBarLine.HasSelfBB()) {
         x += m_leftBarLine.GetContentX1();
     }
@@ -252,7 +257,7 @@ int Measure::GetLeftBarLineLeft() const
 
 int Measure::GetLeftBarLineRight() const
 {
-    int x = GetLeftBarLineXRel();
+    int x = this->GetLeftBarLineXRel();
     if (m_leftBarLine.HasSelfBB()) {
         x += m_leftBarLine.GetContentX2();
     }
@@ -269,7 +274,7 @@ int Measure::GetRightBarLineXRel() const
 
 int Measure::GetRightBarLineWidth(Doc *doc)
 {
-    const BarLine *barline = GetRightBarLine();
+    const BarLine *barline = this->GetRightBarLine();
     if (!barline) return 0;
 
     const int staffSize = 100;
@@ -301,7 +306,7 @@ int Measure::GetRightBarLineWidth(Doc *doc)
 
 int Measure::GetRightBarLineLeft() const
 {
-    int x = GetRightBarLineXRel();
+    int x = this->GetRightBarLineXRel();
     if (m_rightBarLine.HasSelfBB()) {
         x += m_rightBarLine.GetContentX1();
     }
@@ -310,7 +315,7 @@ int Measure::GetRightBarLineLeft() const
 
 int Measure::GetRightBarLineRight() const
 {
-    int x = GetRightBarLineXRel();
+    int x = this->GetRightBarLineXRel();
     if (m_rightBarLine.HasSelfBB()) {
         x += m_rightBarLine.GetContentX2();
     }
@@ -360,6 +365,11 @@ int Measure::GetDrawingOverflow()
     int measureRightX = this->GetDrawingX() + this->GetWidth();
     int overflow = adjustXOverflowParams.m_currentWidest->GetContentRight() - measureRightX;
     return std::max(0, overflow);
+}
+
+int Measure::GetSectionRestartShift(Doc *doc) const
+{
+    return 5 * doc->GetDrawingDoubleUnit(100);
 }
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
@@ -454,14 +464,14 @@ data_BARRENDITION Measure::GetDrawingLeftBarLineByStaffN(int staffN) const
 {
     auto elementIter = m_invisibleStaffBarlines.find(staffN);
     if (elementIter != m_invisibleStaffBarlines.end()) return elementIter->second.first;
-    return GetDrawingLeftBarLine();
+    return this->GetDrawingLeftBarLine();
 }
 
 data_BARRENDITION Measure::GetDrawingRightBarLineByStaffN(int staffN) const
 {
     auto elementIter = m_invisibleStaffBarlines.find(staffN);
     if (elementIter != m_invisibleStaffBarlines.end()) return elementIter->second.second;
-    return GetDrawingRightBarLine();
+    return this->GetDrawingRightBarLine();
 }
 
 Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
@@ -519,11 +529,11 @@ Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
                 { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
     };
 
-    const BarlineRenditionPair defaultValue = { previous->GetRight(), GetLeft() };
+    const BarlineRenditionPair defaultValue = { previous->GetRight(), this->GetLeft() };
     auto previousRight = drawingLines.find(previous->GetRight());
     if (previousRight == drawingLines.end()) return defaultValue;
 
-    auto currentLeft = previousRight->second.find(GetLeft());
+    auto currentLeft = previousRight->second.find(this->GetLeft());
     if (currentLeft == previousRight->second.end()) return defaultValue;
 
     return currentLeft->second;
@@ -617,7 +627,7 @@ void Measure::SetInvisibleStaffBarlines(
     for (const auto object : previousInvisible) {
         Staff *staff = vrv_cast<Staff *>(object);
         assert(staff);
-        data_BARRENDITION left = GetLeft();
+        data_BARRENDITION left = this->GetLeft();
         if ((left == BARRENDITION_NONE) && !(barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT))
             left = BARRENDITION_single;
         auto [iter, result] = m_invisibleStaffBarlines.insert({ staff->GetN(), { left, BARRENDITION_NONE } });
@@ -819,7 +829,7 @@ int Measure::ScoreDefOptimize(FunctorParams *functorParams)
 
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
-    SetDrawingXRel(0);
+    this->SetDrawingXRel(0);
     if (m_measureAligner.GetLeftAlignment()) {
         m_measureAligner.GetLeftAlignment()->SetXRel(0);
     }
@@ -1152,11 +1162,16 @@ int Measure::JustifyX(FunctorParams *functorParams)
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
     assert(params);
 
+    if (params->m_applySectionRestartShift) {
+        params->m_measureXRel += this->GetSectionRestartShift(params->m_doc);
+        params->m_applySectionRestartShift = false;
+    }
+
     if (params->m_measureXRel > 0) {
-        SetDrawingXRel(params->m_measureXRel);
+        this->SetDrawingXRel(params->m_measureXRel);
     }
     else {
-        params->m_measureXRel = GetDrawingXRel();
+        params->m_measureXRel = this->GetDrawingXRel();
     }
 
     m_measureAligner.Process(params->m_functor, params);
@@ -1169,16 +1184,12 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    assert(this->GetParent());
-    Object *object = this->GetParent()->GetPrevious(this);
-    if (object && object->Is(SECTION)) {
-        Section *section = vrv_cast<Section *>(object);
-        if (section && (section->GetRestart() == BOOLEAN_true)) {
-            params->m_shift += 5 * params->m_doc->GetDrawingDoubleUnit(100);
-        }
+    if (params->m_applySectionRestartShift) {
+        params->m_shift += this->GetSectionRestartShift(params->m_doc);
+        params->m_applySectionRestartShift = false;
     }
 
-    SetDrawingXRel(params->m_shift);
+    this->SetDrawingXRel(params->m_shift);
 
     params->m_shift += this->GetWidth();
     params->m_justifiableWidth += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();
@@ -1198,8 +1209,10 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
 
-    // Check if the measure has some overflowing control elements
-    int overflow = this->GetDrawingOverflow();
+    const bool hasCache = this->HasCachedHorizontalLayout();
+    int overflow = hasCache ? this->m_cachedOverflow : this->GetDrawingOverflow();
+    int width = hasCache ? this->m_cachedWidth : this->GetWidth();
+    int drawingXRel = this->m_drawingXRel;
 
     Object *nextMeasure = params->m_contentSystem->GetNext(this, MEASURE);
     const bool isLeftoverMeasure = ((NULL == nextMeasure) && params->m_doc->GetOptions()->m_breaksNoWidow.GetValue()
@@ -1215,11 +1228,10 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if (m_drawingXRel + GetWidth() + params->m_currentScoreDefWidth - params->m_shift
-            > params->m_systemWidth) {
+        else if (drawingXRel + width + params->m_currentScoreDefWidth - params->m_shift > params->m_systemWidth) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
-            params->m_shift = this->m_drawingXRel;
+            params->m_shift = drawingXRel;
             // If last measure requires separate system - mark that system as leftover for the future CastOffPages call
             if (isLeftoverMeasure) {
                 params->m_leftoverSystem = params->m_currentSystem;
@@ -1228,8 +1240,8 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
                 if (oneOfPendingObjects->Is(MEASURE)) {
                     Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
                     assert(firstPendingMesure);
+                    params->m_shift = firstPendingMesure->m_cachedXRel;
                     params->m_leftoverSystem = NULL;
-                    params->m_shift = firstPendingMesure->m_drawingXRel;
                     // it has to be first measure
                     break;
                 }
@@ -1521,6 +1533,16 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::PrepareMIDI(FunctorParams *functorParams)
+{
+    PrepareMIDIParams *params = vrv_params_cast<PrepareMIDIParams *>(functorParams);
+    assert(params);
+
+    params->m_currentTempo = m_currentTempo;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
@@ -1542,10 +1564,11 @@ int Measure::GenerateTimemap(FunctorParams *functorParams)
     GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
-    // Deal with repeated music later, for now get the last times.
-    params->m_scoreTimeOffset = m_scoreTimeOffset.back();
-    params->m_realTimeOffsetMilliseconds = m_realTimeOffsetMilliseconds.back();
-    params->m_currentTempo = m_currentTempo;
+    params->m_scoreTimeOffset = this->m_scoreTimeOffset.back();
+    params->m_realTimeOffsetMilliseconds = this->m_realTimeOffsetMilliseconds.back();
+    params->m_currentTempo = this->m_currentTempo;
+
+    params->m_timemap->AddEntry(this, params);
 
     return FUNCTOR_CONTINUE;
 }
@@ -1556,32 +1579,26 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     assert(params);
 
     m_scoreTimeOffset.clear();
-    m_scoreTimeOffset.push_back(params->m_maxCurrentScoreTime);
-    params->m_maxCurrentScoreTime += m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX;
-
-    // search for tempo marks in the measure
-    Tempo *tempo = dynamic_cast<Tempo *>(this->FindDescendantByType(TEMPO));
-    if (tempo && tempo->HasMidiBpm()) {
-        params->m_currentTempo = tempo->GetMidiBpm();
-    }
-    else if (tempo && tempo->HasMm()) {
-        double mm = tempo->GetMm();
-        int mmUnit = 4;
-        if (tempo->HasMmUnit() && (tempo->GetMmUnit() > DURATION_breve)) {
-            mmUnit = pow(2, (int)tempo->GetMmUnit() - 2);
-        }
-        if (tempo->HasMmDots()) {
-            mmUnit = 2 * mmUnit - (mmUnit / pow(2, tempo->GetMmDots()));
-        }
-        params->m_currentTempo = mm * 4.0 / mmUnit + 0.5;
-    }
-    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
+    m_scoreTimeOffset.push_back(params->m_currentScoreTime);
 
     m_realTimeOffsetMilliseconds.clear();
     // m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
-    m_realTimeOffsetMilliseconds.push_back(params->m_maxCurrentRealTimeSeconds * 1000.0);
-    params->m_maxCurrentRealTimeSeconds
-        += (m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX) * 60.0 / m_currentTempo;
+    m_realTimeOffsetMilliseconds.push_back(params->m_currentRealTimeSeconds * 1000.0);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
+{
+    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    const double scoreTimeIncrement
+        = m_measureAligner.GetRightAlignment()->GetTime() * params->m_multiRestFactor * DURATION_4 / DUR_MAX;
+    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
+    params->m_currentScoreTime += scoreTimeIncrement;
+    params->m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / m_currentTempo;
+    params->m_multiRestFactor = 1;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1592,6 +1609,39 @@ int Measure::CalcOnsetOffset(FunctorParams *functorParams)
     assert(params);
 
     params->m_currentTempo = m_currentTempo;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::UnCastOff(FunctorParams *functorParams)
+{
+    UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
+    assert(params);
+
+    if (params->m_resetCache) {
+        m_cachedXRel = VRV_UNSET;
+        m_cachedWidth = VRV_UNSET;
+        m_cachedOverflow = VRV_UNSET;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::HorizontalLayoutCache(FunctorParams *functorParams)
+{
+    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    assert(params);
+
+    if (params->m_restore) {
+        m_drawingXRel = m_cachedXRel;
+    }
+    else {
+        m_cachedWidth = this->GetWidth();
+        m_cachedOverflow = this->GetDrawingOverflow();
+        m_cachedXRel = m_drawingXRel;
+    }
+    if (this->GetLeftBarLine()) this->GetLeftBarLine()->HorizontalLayoutCache(functorParams);
+    if (this->GetRightBarLine()) this->GetRightBarLine()->HorizontalLayoutCache(functorParams);
 
     return FUNCTOR_CONTINUE;
 }

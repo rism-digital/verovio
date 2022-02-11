@@ -36,10 +36,10 @@ static const ClassRegistrar<FTrem> s_factory("fTrem", FTREM);
 
 FTrem::FTrem() : LayerElement(FTREM, "ftrem-"), BeamDrawingInterface(), AttFTremVis(), AttTremMeasured()
 {
-    RegisterAttClass(ATT_FTREMVIS);
-    RegisterAttClass(ATT_TREMMEASURED);
+    this->RegisterAttClass(ATT_FTREMVIS);
+    this->RegisterAttClass(ATT_TREMMEASURED);
 
-    Reset();
+    this->Reset();
 }
 
 FTrem::~FTrem() {}
@@ -48,8 +48,8 @@ void FTrem::Reset()
 {
     LayerElement::Reset();
     BeamDrawingInterface::Reset();
-    ResetFTremVis();
-    ResetTremMeasured();
+    this->ResetFTremVis();
+    this->ResetTremMeasured();
 }
 
 bool FTrem::IsSupportedChild(Object *child)
@@ -101,64 +101,21 @@ void FTrem::FilterList(ArrayOfObjects *childList)
         ++iter;
     }
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
 
     this->InitCoords(childList, staff, BEAMPLACE_NONE);
     this->InitCue(false);
 }
 
-/*
-void FTrem::InitCoords(ArrayOfObjects *childList)
+std::pair<int, int> FTrem::GetAdditionalBeamCount() const
 {
-    ClearCoords();
+    return { std::max(this->GetBeams(), this->GetBeamsFloat()), 0 };
+}
 
-    if (childList->empty()) {
-        return;
-    }
-
-    BeamElementCoord *firstElement = new BeamElementCoord;
-    BeamElementCoord *secondElement = new BeamElementCoord;
-
-    m_beamElementCoords.push_back(firstElement);
-    m_beamElementCoords.push_back(secondElement);
-
-    // current point to the first Note in the layed out layer
-    firstElement->m_element = dynamic_cast<LayerElement *>(childList->front());
-    // fTrem list should contain only DurationInterface objects
-    assert(firstElement->m_element->GetDurationInterface());
-    // current point to the first Note in the layed out layer
-    secondElement->m_element = dynamic_cast<LayerElement *>(childList->back());
-    // fTrem list should contain only DurationInterface objects
-    assert(secondElement->m_element->GetDurationInterface());
-    // Should we assert this at the beginning?
-    if (firstElement->m_element == secondElement->m_element) {
-        return;
-    }
-
-    m_changingDur = false;
-    m_beamHasChord = false;
-    m_hasMultipleStemDir = false;
-    m_cueSize = false;
-    // adjust beam->m_drawingParams.m_shortestDur depending on the number of slashes
-    m_shortestDur = std::max(DUR_8, DUR_1 + this->GetBeams());
-    m_stemDir = STEMDIRECTION_NONE;
-
-    if (firstElement->m_element->Is(CHORD)) {
-        m_beamHasChord = true;
-    }
-    if (secondElement->m_element->Is(CHORD)) {
-        m_beamHasChord = true;
-    }
-
-    // For now look at the stemDir only on the first note
-    assert(dynamic_cast<AttStems *>(firstElement->m_element));
-    m_stemDir = (dynamic_cast<AttStems *>(firstElement->m_element))->GetStemDir();
-
-    // We look only at the first note for checking if cue-sized. Somehow arbitrarily
-    m_cueSize = firstElement->m_element->GetDrawingCueSize();
- }
- */
+std::pair<int, int> FTrem::GetFloatingBeamCount() const
+{
+    return { this->GetBeams(), this->GetBeamsFloat() };
+}
 
 //----------------------------------------------------------------------------
 // Functors methods
@@ -176,7 +133,7 @@ int FTrem::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (GetElementCoords()->size() != 2) {
+    if (this->GetElementCoords()->size() != 2) {
         LogError("Stem calculation: <fTrem> element has invalid number of descendants.");
         return FUNCTOR_CONTINUE;
     }

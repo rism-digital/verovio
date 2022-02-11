@@ -20,7 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <tabGrp> element.
  */
-class TabGrp : public LayerElement, public DurationInterface {
+class TabGrp : public LayerElement, public ObjectListInterface, public DurationInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -45,8 +45,36 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
+    /**
+     * Return the top or bottom note or their Y position
+     */
+    ///@{
+    Note *GetTopNote();
+    Note *GetBottomNote();
+    int GetYTop();
+    int GetYBottom();
+    ///@}
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::CalcOnsetOffsetEnd
+     */
+    virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::CalcStem
+     */
+    int CalcStem(FunctorParams *functorParams) override;
+
 protected:
-    //
+    /**
+     * Filter the flat list and keep only Note elements.
+     */
+    void FilterList(ArrayOfObjects *childList) override;
+
 private:
     //
 public:

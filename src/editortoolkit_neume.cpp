@@ -2194,8 +2194,7 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
     int initialLrx = firstChild->GetZone()->GetLrx();
     int initialLry = firstChild->GetZone()->GetLry();
 
-    Staff *staff = vrv_cast<Staff *>(el->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = el->GetAncestorStaff();
     Facsimile *facsimile = m_doc->GetFacsimile();
 
     const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
@@ -2294,8 +2293,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         int ligLrx = firstNc->GetZone()->GetLrx();
         int ligLry = firstNc->GetZone()->GetLry();
 
-        Staff *staff = vrv_cast<Staff *>(firstNc->GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = firstNc->GetAncestorStaff();
 
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
@@ -2782,8 +2780,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
     if (obj->Is(CUSTOS)) {
         Custos *custos = dynamic_cast<Custos *>(obj);
-        Staff *staff = vrv_cast<Staff *>(custos->GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = custos->GetAncestorStaff();
 
         // Check interfaces
         if ((custos->GetPitchInterface() == NULL) || (custos->GetFacsimileInterface() == NULL)) {
@@ -2843,8 +2840,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
     else if (obj->Is(SYLLABLE)) {
         Syllable *syl = dynamic_cast<Syllable *>(obj);
-        Staff *staff = vrv_cast<Staff *>(syl->GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = syl->GetAncestorStaff();
 
         ListOfObjects pitchedChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
@@ -2921,9 +2917,8 @@ bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
     assert(clef);
 
     if (staff == NULL) {
-        staff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
+        staff = clef->GetAncestorStaff();
     }
-    assert(staff);
 
     if (!clef->HasFacs() || !staff->HasFacs()) {
         return false;

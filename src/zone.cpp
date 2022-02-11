@@ -27,17 +27,17 @@ static const ClassRegistrar<Zone> s_factory("zone", ZONE);
 
 Zone::Zone() : Object(ZONE, "zone-"), AttTyped(), AttCoordinated()
 {
-    RegisterAttClass(ATT_TYPED);
-    RegisterAttClass(ATT_COORDINATED);
-    Reset();
+    this->RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_COORDINATED);
+    this->Reset();
 }
 
 Zone::~Zone() {}
 
 void Zone::Reset()
 {
-    ResetTyped();
-    ResetCoordinated();
+    this->ResetTyped();
+    this->ResetCoordinated();
 }
 
 void Zone::ShiftByXY(int xDiff, int yDiff)

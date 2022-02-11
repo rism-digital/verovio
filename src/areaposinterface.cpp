@@ -21,18 +21,18 @@ namespace vrv {
 
 AreaPosInterface::AreaPosInterface() : Interface(), AttHorizontalAlign(), AttVerticalAlign()
 {
-    RegisterInterfaceAttClass(ATT_HORIZONTALALIGN);
-    RegisterInterfaceAttClass(ATT_VERTICALALIGN);
+    this->RegisterInterfaceAttClass(ATT_HORIZONTALALIGN);
+    this->RegisterInterfaceAttClass(ATT_VERTICALALIGN);
 
-    Reset();
+    this->Reset();
 }
 
 AreaPosInterface::~AreaPosInterface() {}
 
 void AreaPosInterface::Reset()
 {
-    ResetHorizontalAlign();
-    ResetVerticalAlign();
+    this->ResetHorizontalAlign();
+    this->ResetVerticalAlign();
 }
 
 } // namespace vrv

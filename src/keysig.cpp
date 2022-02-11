@@ -78,14 +78,14 @@ KeySig::KeySig()
     , AttKeySigVis()
     , AttVisibility()
 {
-    RegisterAttClass(ATT_ACCIDENTAL);
-    RegisterAttClass(ATT_PITCH);
-    RegisterAttClass(ATT_KEYSIGANL);
-    RegisterAttClass(ATT_KEYSIGLOG);
-    RegisterAttClass(ATT_KEYSIGVIS);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterAttClass(ATT_ACCIDENTAL);
+    this->RegisterAttClass(ATT_PITCH);
+    this->RegisterAttClass(ATT_KEYSIGANL);
+    this->RegisterAttClass(ATT_KEYSIGLOG);
+    this->RegisterAttClass(ATT_KEYSIGVIS);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
-    Reset();
+    this->Reset();
 }
 
 KeySig::~KeySig() {}
@@ -93,12 +93,12 @@ KeySig::~KeySig() {}
 void KeySig::Reset()
 {
     LayerElement::Reset();
-    ResetAccidental();
-    ResetPitch();
-    ResetKeySigAnl();
-    ResetKeySigLog();
-    ResetKeySigVis();
-    ResetVisibility();
+    this->ResetAccidental();
+    this->ResetPitch();
+    this->ResetKeySigAnl();
+    this->ResetKeySigLog();
+    this->ResetKeySigVis();
+    this->ResetVisibility();
 
     m_mixedChildrenAccidType = false;
 
@@ -179,7 +179,7 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid)
 
     int i;
     data_ACCIDENTAL_WRITTEN accidType = this->GetAccidType();
-    for (i = 0; i < this->GetAccidCount(); i++) {
+    for (i = 0; i < this->GetAccidCount(); ++i) {
         mapOfPitchAccid[KeySig::GetAccidPnameAt(accidType, i)] = accidType;
     }
 }
@@ -200,17 +200,17 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
         return keyAccid->GetSymbolStr();
     }
 
-    if (pos > 6) return symbolStr;
+    if (pos > 12) return symbolStr;
 
     int symb;
     accid = this->GetAccidType();
     if (accid == ACCIDENTAL_WRITTEN_f) {
-        symb = SMUFL_E260_accidentalFlat;
-        pname = s_pnameForFlats[pos];
+        symb = (pos < 7) ? SMUFL_E260_accidentalFlat : SMUFL_E264_accidentalDoubleFlat;
+        pname = s_pnameForFlats[pos % 7];
     }
     else {
-        symb = SMUFL_E262_accidentalSharp;
-        pname = s_pnameForSharps[pos];
+        symb = (pos < 7) ? SMUFL_E262_accidentalSharp : SMUFL_E263_accidentalDoubleSharp;
+        pname = s_pnameForSharps[pos % 7];
     }
 
     symbolStr.push_back(symb);

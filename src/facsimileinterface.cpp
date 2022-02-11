@@ -26,15 +26,15 @@ namespace vrv {
 
 FacsimileInterface::FacsimileInterface() : Interface(), AttFacsimile()
 {
-    RegisterInterfaceAttClass(ATT_FACSIMILE);
-    Reset();
+    this->RegisterInterfaceAttClass(ATT_FACSIMILE);
+    this->Reset();
 }
 
 FacsimileInterface::~FacsimileInterface() {}
 
 void FacsimileInterface::Reset()
 {
-    ResetFacsimile();
+    this->ResetFacsimile();
     this->SetZone(NULL);
 }
 

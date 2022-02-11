@@ -29,14 +29,14 @@ Subst::Subst() : EditorialElement(SUBST, "subst-")
 {
     m_level = EDITORIAL_UNDEFINED;
 
-    Reset();
+    this->Reset();
 }
 
 Subst::Subst(EditorialLevel level) : EditorialElement(SUBST, "subst-")
 {
     m_level = level;
 
-    Reset();
+    this->Reset();
 }
 
 void Subst::Reset()

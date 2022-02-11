@@ -24,16 +24,16 @@ namespace vrv {
 
 TextDirInterface::TextDirInterface() : Interface(), AttPlacementRelStaff()
 {
-    RegisterInterfaceAttClass(ATT_PLACEMENTRELSTAFF);
+    this->RegisterInterfaceAttClass(ATT_PLACEMENTRELSTAFF);
 
-    Reset();
+    this->Reset();
 }
 
 TextDirInterface::~TextDirInterface() {}
 
 void TextDirInterface::Reset()
 {
-    ResetPlacementRelStaff();
+    this->ResetPlacementRelStaff();
 }
 
 int TextDirInterface::GetNumberOfLines(Object *object)

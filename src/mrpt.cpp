@@ -32,9 +32,9 @@ static const ClassRegistrar<MRpt> s_factory("mRpt", MRPT);
 
 MRpt::MRpt() : LayerElement(MRPT, "mrpt-"), AttColor()
 {
-    RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_COLOR);
 
-    Reset();
+    this->Reset();
 }
 
 MRpt::~MRpt() {}
@@ -42,7 +42,7 @@ MRpt::~MRpt() {}
 void MRpt::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
+    this->ResetColor();
 
     m_drawingMeasureCount = 0;
 }

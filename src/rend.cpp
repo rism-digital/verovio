@@ -37,14 +37,14 @@ Rend::Rend()
     , AttTypography()
     , AttWhitespace()
 {
-    RegisterInterface(AreaPosInterface::GetAttClasses(), AreaPosInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_LANG);
-    RegisterAttClass(ATT_TEXTRENDITION);
-    RegisterAttClass(ATT_TYPOGRAPHY);
-    RegisterAttClass(ATT_WHITESPACE);
+    this->RegisterInterface(AreaPosInterface::GetAttClasses(), AreaPosInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_LANG);
+    this->RegisterAttClass(ATT_TEXTRENDITION);
+    this->RegisterAttClass(ATT_TYPOGRAPHY);
+    this->RegisterAttClass(ATT_WHITESPACE);
 
-    Reset();
+    this->Reset();
 }
 
 Rend::~Rend() {}
@@ -53,11 +53,11 @@ void Rend::Reset()
 {
     TextElement::Reset();
     AreaPosInterface::Reset();
-    ResetColor();
-    ResetLang();
-    ResetTextRendition();
-    ResetTypography();
-    ResetWhitespace();
+    this->ResetColor();
+    this->ResetLang();
+    this->ResetTextRendition();
+    this->ResetTypography();
+    this->ResetWhitespace();
 }
 
 bool Rend::IsSupportedChild(Object *child)

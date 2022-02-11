@@ -42,15 +42,15 @@ Pedal::Pedal()
     , AttPlacementRelStaff()
     , AttVerticalGroup()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_EXTSYM);
-    RegisterAttClass(ATT_PEDALLOG);
-    RegisterAttClass(ATT_PEDALVIS);
-    RegisterAttClass(ATT_PLACEMENTRELSTAFF);
-    RegisterAttClass(ATT_VERTICALGROUP);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_PEDALLOG);
+    this->RegisterAttClass(ATT_PEDALVIS);
+    this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
-    Reset();
+    this->Reset();
 }
 
 Pedal::~Pedal() {}
@@ -59,12 +59,12 @@ void Pedal::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    ResetColor();
-    ResetExtSym();
-    ResetPedalLog();
-    ResetPedalVis();
-    ResetPlacementRelStaff();
-    ResetVerticalGroup();
+    this->ResetColor();
+    this->ResetExtSym();
+    this->ResetPedalLog();
+    this->ResetPedalVis();
+    this->ResetPlacementRelStaff();
+    this->ResetVerticalGroup();
 
     m_endsWithBounce = false;
 }
@@ -72,17 +72,17 @@ void Pedal::Reset()
 wchar_t Pedal::GetPedalGlyph() const
 {
     // If there is glyph.num, prioritize it
-    if (HasGlyphNum()) {
-        wchar_t code = GetGlyphNum();
+    if (this->HasGlyphNum()) {
+        wchar_t code = this->GetGlyphNum();
         if (NULL != Resources::GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
-    else if (HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+    else if (this->HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 
-    return (GetFunc() == "sostenuto") ? SMUFL_E659_keyboardPedalSost : SMUFL_E650_keyboardPedalPed;
+    return (this->GetFunc() == "sostenuto") ? SMUFL_E659_keyboardPedalSost : SMUFL_E650_keyboardPedalPed;
 }
 
 pedalVis_FORM Pedal::GetPedalForm(Doc *doc, System *system) const
@@ -120,14 +120,14 @@ int Pedal::GenerateMIDI(FunctorParams *functorParams)
     assert(params);
 
     // Sameas not taken into account for now
-    if (!HasDir()) return FUNCTOR_CONTINUE;
+    if (!this->HasDir()) return FUNCTOR_CONTINUE;
 
-    double pedalTime = GetStart()->GetAlignment()->GetTime() * DURATION_4 / DUR_MAX;
+    double pedalTime = this->GetStart()->GetAlignment()->GetTime() * DURATION_4 / DUR_MAX;
     double starttime = params->m_totalTime + pedalTime;
     int tpq = params->m_midiFile->getTPQ();
 
     // todo: check pedal @func to switch between sustain/soften/damper pedals?
-    switch (GetDir()) {
+    switch (this->GetDir()) {
         case pedalLog_DIR_down:
             params->m_midiFile->addSustainPedalOn(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
             break;

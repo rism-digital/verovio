@@ -29,20 +29,20 @@ namespace vrv {
 
 PitchInterface::PitchInterface() : Interface(), AttNoteGes(), AttOctave(), AttPitch()
 {
-    RegisterInterfaceAttClass(ATT_NOTEGES);
-    RegisterInterfaceAttClass(ATT_OCTAVE);
-    RegisterInterfaceAttClass(ATT_PITCH);
+    this->RegisterInterfaceAttClass(ATT_NOTEGES);
+    this->RegisterInterfaceAttClass(ATT_OCTAVE);
+    this->RegisterInterfaceAttClass(ATT_PITCH);
 
-    Reset();
+    this->Reset();
 }
 
 PitchInterface::~PitchInterface() {}
 
 void PitchInterface::Reset()
 {
-    ResetNoteGes();
-    ResetOctave();
-    ResetPitch();
+    this->ResetNoteGes();
+    this->ResetOctave();
+    this->ResetPitch();
 }
 
 bool PitchInterface::HasIdenticalPitchInterface(PitchInterface *otherPitchInterface)

@@ -33,15 +33,15 @@ Octave::Octave()
     , AttNNumberLike()
     , AttOctaveDisplacement()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_EXTENDER);
-    RegisterAttClass(ATT_LINEREND);
-    RegisterAttClass(ATT_LINERENDBASE);
-    RegisterAttClass(ATT_NNUMBERLIKE);
-    RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_EXTENDER);
+    this->RegisterAttClass(ATT_LINEREND);
+    this->RegisterAttClass(ATT_LINERENDBASE);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
 
-    Reset();
+    this->Reset();
 }
 
 Octave::~Octave() {}
@@ -50,12 +50,12 @@ void Octave::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    ResetColor();
-    ResetExtender();
-    ResetLineRend();
-    ResetLineRendBase();
-    ResetNNumberLike();
-    ResetOctaveDisplacement();
+    this->ResetColor();
+    this->ResetExtender();
+    this->ResetLineRend();
+    this->ResetLineRendBase();
+    this->ResetNNumberLike();
+    this->ResetOctaveDisplacement();
 }
 
 //----------------------------------------------------------------------------

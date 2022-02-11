@@ -29,6 +29,9 @@ class MeterSig;
 class Staff;
 class StaffAlignment;
 
+// Helper enums
+enum StaffSearch { ANCESTOR_ONLY = 0, RESOLVE_CROSS_STAFF };
+
 //----------------------------------------------------------------------------
 // LayerElement
 //----------------------------------------------------------------------------
@@ -180,6 +183,11 @@ public:
     Alignment *GetAlignment() const { return m_alignment; }
 
     /**
+     * Get the ancestor or cross staff
+     */
+    Staff *GetAncestorStaff(StaffSearch strategy = ANCESTOR_ONLY, bool assertExistence = true) const;
+
+    /**
      * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff.
      * Also set the corresponding m_crossLayer to layer if a cross staff is found.
      * Return NULL if there is no cross-staff in the element or a parent.
@@ -233,8 +241,8 @@ public:
      * Helper to adjust overlapping layers for notes, chords, stems, etc.
      * Returns the shift of the adjustment
      */
-    virtual int AdjustOverlappingLayers(
-        Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison);
+    virtual int AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements,
+        bool areDotsAdjusted, bool &isUnison, bool &stemSameAs);
 
     /**
      * Calculate note horizontal overlap with elemenents from another layers. Returns overlapMargin and index of other
@@ -384,6 +392,11 @@ public:
     int GenerateTimemap(FunctorParams *functorParams) override;
 
     /**
+     * See Object::CalcMaxMeasureDuration
+     */
+    int CalcMaxMeasureDuration(FunctorParams *functorParams) override;
+
+    /**
      * See Object::ResetDrawing
      */
     int ResetDrawing(FunctorParams *functorParams) override;
@@ -397,6 +410,16 @@ public:
      * See Object::PrepareSlurs
      */
     int PrepareSlurs(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::PrepareDuration
+     */
+    int PrepareDuration(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::HorizontalLayoutCache
+     */
+    int HorizontalLayoutCache(FunctorParams *functorParams) override;
 
 protected:
     /**
@@ -444,6 +467,11 @@ protected:
 private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticType type);
 
+    /**
+     * Get above/below overflow for the chord elements
+     */
+    void GetChordOverflow(StaffAlignment *&above, StaffAlignment *&below, int staffN);
+
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
@@ -469,10 +497,20 @@ protected:
     int m_drawingYRel;
 
     /**
+     * The cached value for m_drawingYRel for caching horizontal layout
+     */
+    int m_cachedYRel;
+
+    /**
      * The X drawing relative position of the object.
      * It is re-computed everytime the object is drawn and it is not stored in the file.
      */
     int m_drawingXRel;
+
+    /**
+     * The cached value for m_drawingXRel for caching horizontal layout
+     */
+    int m_cachedXRel;
 
     /**
      * The cached drawing cue size set by PrepareDrawingCueSize

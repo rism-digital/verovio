@@ -47,16 +47,16 @@ Dynam::Dynam()
     , AttMidiValue2()
     , AttVerticalGroup()
 {
-    RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_ENCLOSINGCHARS);
-    RegisterAttClass(ATT_EXTENDER);
-    RegisterAttClass(ATT_LINERENDBASE);
-    RegisterAttClass(ATT_MIDIVALUE);
-    RegisterAttClass(ATT_MIDIVALUE2);
-    RegisterAttClass(ATT_VERTICALGROUP);
+    this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
+    this->RegisterAttClass(ATT_EXTENDER);
+    this->RegisterAttClass(ATT_LINERENDBASE);
+    this->RegisterAttClass(ATT_MIDIVALUE);
+    this->RegisterAttClass(ATT_MIDIVALUE2);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
-    Reset();
+    this->Reset();
 }
 
 Dynam::~Dynam() {}
@@ -66,10 +66,10 @@ void Dynam::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
-    ResetEnclosingChars();
-    ResetExtender();
-    ResetLineRendBase();
-    ResetVerticalGroup();
+    this->ResetEnclosingChars();
+    this->ResetExtender();
+    this->ResetLineRendBase();
+    this->ResetVerticalGroup();
 }
 
 bool Dynam::IsSupportedChild(Object *child)

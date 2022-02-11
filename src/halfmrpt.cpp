@@ -32,9 +32,9 @@ static const ClassRegistrar<HalfmRpt> s_factory("halfmRpt", HALFMRPT);
 
 HalfmRpt::HalfmRpt() : LayerElement(HALFMRPT, "mrpt-")
 {
-    RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_COLOR);
 
-    Reset();
+    this->Reset();
 }
 
 HalfmRpt::~HalfmRpt() {}
@@ -42,7 +42,7 @@ HalfmRpt::~HalfmRpt() {}
 void HalfmRpt::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
+    this->ResetColor();
 }
 
 //----------------------------------------------------------------------------
