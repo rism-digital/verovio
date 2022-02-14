@@ -121,14 +121,14 @@ void BeamSegment::CalcBeam(
         CalcMixedBeamPlace(staff);
         CalcPartialFlagPlace();
     }
-    CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
+    CalcBeamStemLength(doc, staff, beamInterface->m_drawingPlace, horizontal);
 
     // Set drawing stem positions
     CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         if (NeedToResetPosition(staff, doc, beamInterface)) {
             CalcBeamInit(layer, staff, doc, beamInterface, place);
-            CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
+            CalcBeamStemLength(doc, staff, beamInterface->m_drawingPlace, horizontal);
             CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
         }
     }
@@ -1206,7 +1206,7 @@ void BeamSegment::CalcBeamPlaceTab(
     }
 }
 
-void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal)
+void BeamSegment::CalcBeamStemLength(Doc *doc, Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
     int relevantNoteLoc = VRV_UNSET;
     const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
@@ -1251,12 +1251,8 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
     // make adjustments for the grace notes length
     for (auto coord : m_beamElementCoordRefs) {
         if (coord->m_element) {
-            if (coord->m_element->IsGraceNote()) {
-                m_uniformStemLength *= 0.75;
-                break;
-            }
-            if (coord->m_element->GetDrawingCueSize()) {
-                m_uniformStemLength *= 0.75;
+            if (coord->m_element->IsGraceNote() || coord->m_element->GetDrawingCueSize()) {
+                m_uniformStemLength *= doc->GetOptions()->m_graceFactor.GetValue();
                 break;
             }
         }

@@ -244,15 +244,26 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
 
 void BeamDrawingInterface::InitCue(bool beamCue)
 {
+    bool hasGraceNotes = false;
     if (beamCue) {
         m_cueSize = beamCue;
     }
     else {
-        m_cueSize = std::all_of(m_beamElementCoords.begin(), m_beamElementCoords.end(), [](BeamElementCoord *coord) {
-            if (!coord->m_element) return false;
-            if (coord->m_element->IsGraceNote() || coord->m_element->GetDrawingCueSize()) return true;
-            return false;
-        });
+        m_cueSize = std::all_of(
+            m_beamElementCoords.begin(), m_beamElementCoords.end(), [&hasGraceNotes](BeamElementCoord *coord) {
+                if (!coord->m_element) return false;
+                if (coord->m_element->IsGraceNote()) {
+                    hasGraceNotes = true;
+                    return true;
+                }
+                if (coord->m_element->GetDrawingCueSize()) return true;
+                return false;
+            });
+    }
+
+    // Always set stem direction to up for grace note beam unless stem direction is provided
+    if (hasGraceNotes && (m_notesStemDir == STEMDIRECTION_NONE)) {
+        m_notesStemDir = STEMDIRECTION_up;
     }
 }
 

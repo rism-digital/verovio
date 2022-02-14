@@ -126,7 +126,7 @@ private:
         Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     // Helper to calculate the longest stem length of the beam (which will be used uniformely)
-    void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal);
+    void CalcBeamStemLength(Doc *doc, Staff *staff, data_BEAMPLACE place, bool isHorizontal);
 
     // Helper to set the stem values
     void CalcSetStemValues(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
