@@ -696,7 +696,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     params->m_interface = this;
     params->m_dur = this->GetActualDur();
     params->m_isGraceNote = this->IsGraceNote();
-    params->m_stemSameas = false;
+    params->m_isStemSameasSecondary = false;
 
     /************ Set the direction ************/
 

@@ -47,12 +47,14 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "syl.h"
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
 #include "trill.h"
 #include "tuplet.h"
 #include "turn.h"
+#include "verse.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -154,6 +156,8 @@ void ABCInput::ParseABC(std::istream &infile)
             }
         }
         else {
+            m_verseNumber = 1;
+            m_lineNoteArray.clear();
             this->readMusicCode(abcLine, section);
         }
     }
@@ -1021,6 +1025,99 @@ void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
     m_layer->SetN(1);
 }
 
+void ABCInput::parseLyrics()
+{
+    std::vector<std::pair<Syl *, int>> syllables;
+    constexpr std::string_view delimiters = "~\\-_ ";
+    // skipping w:, so start from third element
+    std::size_t start = 2;
+    std::size_t found = abcLine.find_first_of(delimiters, 2);
+    while (found != std::string::npos) {
+        // Counter indicates for how many notes verse should be held. This defaults to 1, unless '_' is found
+        int counter = 1;
+        std::string syllable = "";
+        sylLog_CON sylType = sylLog_CON_NONE;
+        if (abcLine.at(found) == '_') {
+            while ((found < abcLine.size()) && (abcLine.at(found) == '_')) {
+                ++counter;
+                ++found;
+            }
+            --found;
+            sylType = sylLog_CON_u;
+        }
+        else if (abcLine.at(found) == '~') {
+            counter = 0;
+            sylType = sylLog_CON_s;
+        }
+        else if (abcLine.at(found) == '-') {
+            sylType = sylLog_CON_d;
+        }
+        else if (abcLine.at(found) == '\\') {
+            if ((found + 1 < abcLine.size()) && (abcLine.at(found + 1) == '-')) {
+                counter = 0;
+                ++found;
+                sylType = sylLog_CON_d;
+            }
+        }
+        // separate syllable from delimiters to form syl that we want to add
+        syllable = abcLine.substr(start, found - start);
+        syllable.erase(
+            std::remove_if(syllable.begin(), syllable.end(), [](unsigned char x) { return (x == '_') || (x == '\\'); }),
+            syllable.end());
+        if (!syllable.empty()) {
+            Text *sylText = new Text();
+            sylText->SetText(UTF8to16(syllable));
+            Syl *syl = new Syl();
+            syl->AddChild(sylText);
+            syl->SetCon(sylType);
+            if (sylType == sylLog_CON_d) {
+                syl->SetWordpos(sylLog_WORDPOS_m);
+            }
+            syllables.push_back({ syl, counter });
+        }
+
+        // find next delimeter in the string
+        start = found + 1;
+        found = abcLine.find_first_of(delimiters, start);
+        // if none found, the rest of the string is going to serve as last syl
+        if ((found == std::string::npos) && (start < abcLine.size())) {
+            std::string syllable = abcLine.substr(start);
+            if (!syllable.empty() && syllable[syllable.size() - 1] == '\r') syllable.erase(syllable.size() - 1);
+            Text *sylText = new Text();
+            sylText->SetText(UTF8to16(syllable));
+            Syl *syl = new Syl();
+            syl->AddChild(sylText);
+            syl->SetCon(sylType);
+            syllables.push_back({ syl, counter });
+        }
+    }
+
+    // Iterate over notes and syllables simultaneously. Move through note array using counters for each syllable, moving
+    // for several notes if syllable needs to be held
+    for (size_t i = 0, j = 0; (i < m_lineNoteArray.size()) && (j < syllables.size()); ++j) {
+        while (m_lineNoteArray.at(i)->IsGraceNote() && (i < m_lineNoteArray.size())) {
+            ++i;
+        }
+        if (i >= m_lineNoteArray.size()) break;
+        Verse *verse = NULL;
+        verse = vrv_cast<Verse *>(m_lineNoteArray.at(i)->GetChild(0, VERSE));
+        if (!verse) {
+            verse = new Verse();
+            verse->SetN(m_verseNumber);
+            m_lineNoteArray.at(i)->AddChild(verse);
+        }
+        verse->AddChild(syllables.at(j).first);
+        i += syllables.at(j).second;
+    }
+    // clean up syllables that were not added to any of the layer elements
+    for (const auto &syl : syllables) {
+        if (!syl.first->GetParent()) delete syl.first;
+    }
+
+    // increment verse number, in case next line in file is also w:
+    ++m_verseNumber;
+}
+
 //////////////////////////////
 //
 // readInformationField --
@@ -1063,6 +1160,7 @@ void ABCInput::readInformationField(const char &dataKey, std::string value)
         case 'T': m_title.push_back(std::make_pair(value, m_lineNum)); break;
         case 'U': LogWarning("ABC import: User defined sympols are not supported"); break;
         case 'V': LogWarning("ABC import: Multi-voice music is not supported"); break;
+        case 'w': parseLyrics(); break;
         case 'W': LogWarning("ABC import: Lyrics are not supported yet"); break;
         case 'X': parseReferenceNumber(value); break;
         case 'Z': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
@@ -1199,9 +1297,12 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 // if chord cannot be beamed, write it directly to the layer
                 if (m_noteStack.size() > 0) AddLayerElement();
                 m_layer->AddChild(chord);
+                m_lineNoteArray.push_back(chord);
             }
-            else
+            else {
                 m_noteStack.push_back(chord);
+                m_lineNoteArray.push_back(chord);
+            }
             chord = NULL;
         }
 
@@ -1378,9 +1479,12 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                     // if note cannot be beamed, write it directly to the layer
                     if (m_noteStack.size() > 0) AddLayerElement();
                     m_layer->AddChild(note);
+                    m_lineNoteArray.push_back(note);
                 }
-                else
+                else {
                     m_noteStack.push_back(note);
+                    m_lineNoteArray.push_back(note);
+                }
             }
 
             if (!m_tieStack.empty()) {

@@ -194,7 +194,7 @@ int TabDurSym::CalcStem(FunctorParams *functorParams)
     params->m_interface = this;
     // Grace an stem sameas not supported in tablature
     params->m_isGraceNote = false;
-    params->m_stemSameas = false;
+    params->m_isStemSameasSecondary = false;
 
     int staffSize = params->m_staff->m_drawingStaffSize;
 

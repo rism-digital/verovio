@@ -1009,7 +1009,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     params->m_interface = this;
     params->m_dur = this->GetActualDur();
     params->m_isGraceNote = this->IsGraceNote();
-    params->m_stemSameas = false;
+    params->m_isStemSameasSecondary = false;
 
     int staffSize = staff->m_drawingStaffSize;
 
@@ -1046,7 +1046,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     // The value of m_stemSameasRole is set by Note::CalcStemDirForSameasNote
     if (this->HasStemSameasNote() && m_stemSameasRole == SAMEAS_SECONDARY) {
         params->m_chordStemLength = -std::abs(this->GetDrawingY() - this->GetStemSameasNote()->GetDrawingY());
-        params->m_stemSameas = true;
+        params->m_isStemSameasSecondary = true;
     }
 
     return FUNCTOR_CONTINUE;
@@ -1287,7 +1287,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     }
 
     if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem() && !this->IsChordTone()
-        && !this->IsMensuralDur() && !this->HasStemSameasNote() && !this->IsTabGrpNote()) {
+        && !this->IsMensuralDur() && !this->IsTabGrpNote()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {
