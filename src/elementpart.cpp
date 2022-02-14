@@ -488,7 +488,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
         baseStem = this->GetStemLen() * -params->m_doc->GetDrawingUnit(staffSize);
     }
     // Do not adjust the baseStem for stem sameas notes (its length is in m_chordStemLength)
-    else if (!params->m_stemSameas) {
+    else if (!params->m_isStemSameasSecondary) {
         int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
         const data_STEMDIRECTION stemDir = params->m_interface->GetDrawingStemDir();
         baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff, stemDir) * thirdUnit);
@@ -508,7 +508,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
                 p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
                 p.x -= stemShift;
             }
-            const int stemShotening = (params->m_stemSameas) ? 0 : p.y;
+            const int stemShotening = (params->m_isStemSameasSecondary) ? 0 : p.y;
             this->SetDrawingStemLen(baseStem + params->m_chordStemLength + stemShotening);
         }
         else {
@@ -520,7 +520,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
                 p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
                 p.x += stemShift;
             }
-            const int stemShotening = (params->m_stemSameas) ? 0 : p.y;
+            const int stemShotening = (params->m_isStemSameasSecondary) ? 0 : p.y;
             this->SetDrawingStemLen(-(baseStem + params->m_chordStemLength - stemShotening));
         }
         this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
@@ -531,11 +531,11 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     int slashFactor = 0;
     // In case there is explicitly specified stem mod for slashes
-    if (!params->m_stemSameas && this->HasStemMod() && (this->GetStemMod() < 8)) {
+    if (!params->m_isStemSameasSecondary && this->HasStemMod() && (this->GetStemMod() < 8)) {
         slashFactor = this->GetStemMod() - 1;
     }
     // otherwise check whether it's trem and its @unitdir attribute is shorter than duration
-    else if (!params->m_stemSameas && this->GetFirstAncestor(BTREM)) {
+    else if (!params->m_isStemSameasSecondary && this->GetFirstAncestor(BTREM)) {
         BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
         assert(bTrem);
         if (bTrem->HasUnitdur() && (bTrem->GetUnitdur() > DURATION_4)) {
@@ -549,7 +549,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
         flag = vrv_cast<Flag *>(this->GetFirst(FLAG));
         assert(flag);
         // There is never a flag with stem sameas notes
-        if (params->m_stemSameas) {
+        if (params->m_isStemSameasSecondary) {
             flag->m_drawingNbFlags = 0;
         }
         else {
@@ -582,7 +582,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     // Do not adjust the length with stem sameas notes or if given in the encoding
     // however, the stem will be extend with the SMuFL extension from 32th - this can be improved
-    if (params->m_stemSameas || this->HasStemLen()) {
+    if (params->m_isStemSameasSecondary || this->HasStemLen()) {
         if ((this->GetStemLen() == 0) && flag) flag->m_drawingNbFlags = 0;
         return FUNCTOR_CONTINUE;
     }
