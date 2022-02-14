@@ -197,10 +197,23 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
         if (tabDurSym->GetDrawingStem()) {
             y = tabDurSym->GetDrawingStem()->GetDrawingY();
         }
-        y += m_doc->GetDrawingUnit(glyphSize) * 0.5 * stemDirFactor;
-        x += m_doc->GetDrawingUnit(glyphSize);
+
+        int dotSize = 0;
+
+        if (staff->IsTabGuitar()) {
+            y += m_doc->GetDrawingUnit(glyphSize) * 0.5 * stemDirFactor;
+            x += m_doc->GetDrawingUnit(glyphSize);
+            dotSize = glyphSize * 2 / 3;
+        }
+        else {
+            // lute tablature
+            y += m_doc->GetDrawingUnit(glyphSize) * stemDirFactor * 3 / 2;
+            x += m_doc->GetDrawingUnit(glyphSize) * 3 / 2;
+            dotSize = glyphSize * 9 / 10;
+        }
+
         for (int i = 0; i < tabGrp->GetDots(); ++i) {
-            this->DrawDot(dc, x, y, glyphSize * 2 / 3);
+            this->DrawDot(dc, x, y, dotSize);
             // HARDCODED
             x += m_doc->GetDrawingUnit(glyphSize) * 0.75;
         }
