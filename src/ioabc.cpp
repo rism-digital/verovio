@@ -1110,7 +1110,7 @@ void ABCInput::parseLyrics()
         i += syllables.at(j).second;
     }
     // clean up syllables that were not added to any of the layer elements
-    for (const auto syl : syllables) {
+    for (const auto &syl : syllables) {
         if (!syl.first->GetParent()) delete syl.first;
     }
 
