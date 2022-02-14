@@ -544,13 +544,19 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
 
     Flag *flag = NULL;
-    // There is never a flag with stem sameas notes or with a duration longer than 8th notes
-    if (!params->m_stemSameas && params->m_dur > DUR_4) {
+    // There is never a flag with a duration longer than 8th notes
+    if (params->m_dur > DUR_4) {
         flag = vrv_cast<Flag *>(this->GetFirst(FLAG));
         assert(flag);
-        flag->m_drawingNbFlags = params->m_dur - DUR_4;
-        if (!this->HasStemLen() && !this->IsGraceNote() && this->HasStemMod()) {
-            slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
+        // There is never a flag with stem sameas notes
+        if (params->m_stemSameas) {
+            flag->m_drawingNbFlags = 0;
+        }
+        else {
+            flag->m_drawingNbFlags = params->m_dur - DUR_4;
+            if (!this->HasStemLen() && !this->IsGraceNote() && this->HasStemMod()) {
+                slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
+            }
         }
     }
 

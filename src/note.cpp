@@ -1287,7 +1287,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     }
 
     if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem() && !this->IsChordTone()
-        && !this->IsMensuralDur() && !this->HasStemSameasNote() && !this->IsTabGrpNote()) {
+        && !this->IsMensuralDur() && !this->IsTabGrpNote()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {
