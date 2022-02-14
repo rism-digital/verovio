@@ -1255,6 +1255,10 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
                 m_uniformStemLength *= 0.75;
                 break;
             }
+            if (coord->m_element->GetDrawingCueSize()) {
+                m_uniformStemLength *= 0.75;
+                break;
+            }
         }
     }
 }

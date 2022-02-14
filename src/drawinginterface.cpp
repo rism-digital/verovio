@@ -254,11 +254,6 @@ void BeamDrawingInterface::InitCue(bool beamCue)
             return false;
         });
     }
-
-    // Always set stem direction to up for grace note beam unless stem direction is provided
-    if (m_cueSize && (m_notesStemDir == STEMDIRECTION_NONE)) {
-        m_notesStemDir = STEMDIRECTION_up;
-    }
 }
 
 bool BeamDrawingInterface::IsHorizontal()
