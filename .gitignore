@@ -35,6 +35,7 @@ emscripten/build/
 emscripten/CMakeFiles/
 emscripten/CMakeCache.txt
 emscripten/testNeon.sh
+emscripten/emsdk/
 
 # python build
 bindings/python/verovio_wrap.cpp
@@ -70,7 +71,6 @@ output.svg
 output.mei
 index.js
 emscripten/npm-dev/node_modules
-emscripten/testNeon.sh
 
 # VS Code files
 .vscode/settings.json

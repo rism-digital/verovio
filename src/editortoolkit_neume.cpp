@@ -157,6 +157,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
             return this->Ungroup(groupType, elementIds);
         }
     }
+    else if (action == "splitNeume") {
+        std::string elementId;
+        std::string ncId;
+        if (this->ParseSplitNeumeAction(json.get<jsonxx::Object>("param"), &elementId, &ncId)) {
+            return this->SplitNeume(elementId, ncId);
+        }
+    }
     else if (action == "merge") {
         std::vector<std::string> elementIds;
         if (this->ParseMergeAction(json.get<jsonxx::Object>("param"), &elementIds)) {
@@ -2139,7 +2146,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     Object *sparent = NULL;
     Object *currentParent = NULL;
     Object *newParent = NULL;
-    // Object *ligParent = NULL;
+
     Nc *firstNc = NULL;
     Nc *secondNc = NULL;
     bool success1, success2;
@@ -2160,6 +2167,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
+
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
         Object *el = m_doc->GetDrawingPage()->FindDescendantByUuid(*it);
 
@@ -2412,6 +2420,85 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     m_infoObject.import("message", "");
     m_infoObject.import("uuid", uuidArray);
     return true;
+}
+
+bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId) 
+{
+    // Check if you can get drawing page
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
+        return false;
+    }
+
+    jsonxx::Array uuidArray;
+
+    // target nc
+    Object *elNc = m_doc->GetDrawingPage()->FindDescendantByUuid(ncId);
+
+    // neume: first parent
+    Object *fparent = m_doc->GetDrawingPage()->FindDescendantByUuid(neumeId);
+    assert(fparent);
+    uuidArray << fparent->GetUuid();
+    
+    // syllable: second parent
+    Object *sparent = fparent->GetFirstAncestor(SYLLABLE);
+    assert(sparent);
+
+    // get index
+    int nLen = fparent->GetChildCount();
+    if (nLen == 0) {
+        LogError("The selected neume has no children.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "The selected neume has no children.");
+        return false;
+    }
+
+    // get the index of selected nc in the neume
+    int fIdx = fparent->GetChildIndex(elNc); 
+    if (fIdx == -1) {
+        LogError("The selected neume component is not a child of the selected neume.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "The selected neume component is not a child of the selected neume.");
+        return false;
+    }
+    // if click on a ligature, ncId point to the second nc in the ligature, thus minus 1
+    if  (elNc->HasAttribute("ligated", "true")) fIdx -= 1;
+
+    Object *newParent = fparent->Clone();
+    newParent->CloneReset();
+    assert(newParent);
+
+    // old method
+    // int i = fIdx;
+    // while (i > 0) {
+    //     newParent->DeleteChild(newParent->GetChild(0));
+    //     i -= 1;
+    // }
+
+    // i = nLen - fIdx;
+    // while (i > 0) {
+    //     fparent->DeleteChild(fparent->GetLast());
+    //     i -= 1;
+    // }
+
+    newParent->ClearChildren();
+    Object *it = fparent->GetChild(fIdx);
+    while (it) {
+        it->MoveItselfTo(newParent);
+        fparent->ClearRelinquishedChildren();
+        it = fparent->GetChild(fIdx);
+    }
+
+    // insert newParent to sparent
+    sparent->InsertAfter(fparent, newParent);
+
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    m_infoObject.import("uuid", uuidArray);
+    return true;
+    
 }
 
 bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
@@ -2995,6 +3082,23 @@ bool EditorToolkitNeume::ParseUngroupAction(
     for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
+
+    return true;
+}
+
+bool EditorToolkitNeume::ParseSplitNeumeAction(jsonxx::Object param, std::string *elementId, std::string *ncId)
+{
+    if (!param.has<jsonxx::String>("elementId")) {
+        LogWarning("Could not parse 'elementId'.");
+        return false;
+    }
+    (*elementId) = param.get<jsonxx::String>("elementId");
+
+    if (!param.has<jsonxx::String>("ncId")) {
+        LogWarning("Could not parse 'ncId'.");
+        return false;
+    }
+    (*ncId) = param.get<jsonxx::String>("ncId");
 
     return true;
 }
