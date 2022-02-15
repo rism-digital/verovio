@@ -372,27 +372,42 @@ public:
      * Look for a descendant with the specified uuid (returns NULL if not found)
      * This method is a wrapper for the Object::FindByUuid functor.
      */
-    Object *FindDescendantByUuid(std::string uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    ///@{
+    Object *FindDescendantByUuid(const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    const Object *FindDescendantByUuid(
+        const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
+    ///@}
 
     /**
      * Look for a descendant with the specified type (returns NULL if not found)
      * This method is a wrapper for the Object::FindByType functor.
      */
+    ///@{
     Object *FindDescendantByType(ClassId classId, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    const Object *FindDescendantByType(ClassId classId, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
+    ///@}
 
     /**
      * Return the first element matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
+    ///@{
     Object *FindDescendantByComparison(
         Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    const Object *FindDescendantByComparison(
+        Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
+    ///@}
 
     /**
      * Return the element matching the extreme value with an Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
+    ///@{
     Object *FindDescendantExtremeByComparison(
         Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    const Object *FindDescendantExtremeByComparison(
+        Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
+    ///@}
 
     /**
      * Return all the objects with specified type
@@ -588,16 +603,16 @@ public:
     /**
      * Find a Object with a specified uuid.
      */
-    virtual int FindByUuid(FunctorParams *functorParams);
+    virtual int FindByUuid(FunctorParams *functorParams) const;
 
     /**
      * Find a Object with a Comparison functor .     */
-    virtual int FindByComparison(FunctorParams *functorParams);
+    virtual int FindByComparison(FunctorParams *functorParams) const;
 
     /**
      * Find a Object with the extreme value with a Comparison functor .
      */
-    virtual int FindExtremeByComparison(FunctorParams *functorParams);
+    virtual int FindExtremeByComparison(FunctorParams *functorParams) const;
 
     /**
      * Find a all Object with an Comparison functor.

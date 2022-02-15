@@ -529,7 +529,12 @@ void Object::ClearRelinquishedChildren()
     }
 }
 
-Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direction)
+Object *Object::FindDescendantByUuid(const std::string &uuid, int deepness, bool direction)
+{
+    return const_cast<Object *>(std::as_const(*this).FindDescendantByUuid(uuid, deepness, direction));
+}
+
+const Object *Object::FindDescendantByUuid(const std::string &uuid, int deepness, bool direction) const
 {
     Functor findByUuid(&Object::FindByUuid);
     FindByUuidParams findbyUuidParams;
@@ -540,11 +545,21 @@ Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direct
 
 Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction)
 {
+    return const_cast<Object *>(std::as_const(*this).FindDescendantByType(classId, deepness, direction));
+}
+
+const Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction) const
+{
     ClassIdComparison comparison(classId);
     return this->FindDescendantByComparison(&comparison, deepness, direction);
 }
 
 Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction)
+{
+    return const_cast<Object *>(std::as_const(*this).FindDescendantByComparison(comparison, deepness, direction));
+}
+
+const Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction) const
 {
     Functor findByComparison(&Object::FindByComparison);
     FindByComparisonParams findByComparisonParams(comparison);
@@ -553,6 +568,12 @@ Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness,
 }
 
 Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int deepness, bool direction)
+{
+    return const_cast<Object *>(
+        std::as_const(*this).FindDescendantExtremeByComparison(comparison, deepness, direction));
+}
+
+const Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int deepness, bool direction) const
 {
     Functor findExtremeByComparison(&Object::FindExtremeByComparison);
     FindExtremeByComparisonParams findExtremeByComparisonParams(comparison);
@@ -1436,7 +1457,7 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByUuid(FunctorParams *functorParams)
+int Object::FindByUuid(FunctorParams *functorParams) const
 {
     FindByUuidParams *params = vrv_params_cast<FindByUuidParams *>(functorParams);
     assert(params);
@@ -1455,7 +1476,7 @@ int Object::FindByUuid(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByComparison(FunctorParams *functorParams)
+int Object::FindByComparison(FunctorParams *functorParams) const
 {
     FindByComparisonParams *params = vrv_params_cast<FindByComparisonParams *>(functorParams);
     assert(params);
@@ -1475,7 +1496,7 @@ int Object::FindByComparison(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindExtremeByComparison(FunctorParams *functorParams)
+int Object::FindExtremeByComparison(FunctorParams *functorParams) const
 {
     FindExtremeByComparisonParams *params = vrv_params_cast<FindExtremeByComparisonParams *>(functorParams);
     assert(params);

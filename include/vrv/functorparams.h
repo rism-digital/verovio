@@ -1440,7 +1440,7 @@ public:
         m_element = NULL;
     }
     Comparison *m_comparison;
-    Object *m_element;
+    const Object *m_element;
 };
 
 //----------------------------------------------------------------------------
@@ -1456,7 +1456,7 @@ class FindByUuidParams : public FunctorParams {
 public:
     FindByUuidParams() { m_element = NULL; }
     std::string m_uuid;
-    Object *m_element;
+    const Object *m_element;
 };
 
 //----------------------------------------------------------------------------
@@ -1498,7 +1498,7 @@ public:
         m_element = NULL;
     }
     Comparison *m_comparison;
-    Object *m_element;
+    const Object *m_element;
 };
 
 //----------------------------------------------------------------------------
