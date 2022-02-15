@@ -93,7 +93,7 @@ const RunningElement *Page::GetHeader() const
         return NULL;
     }
 
-    Pages *pages = const_cast<Doc *>(doc)->GetPages();
+    const Pages *pages = doc->GetPages();
     assert(pages);
 
     // first page or use the pgHeader for all pages?
@@ -119,7 +119,7 @@ const RunningElement *Page::GetFooter() const
         return NULL;
     }
 
-    Pages *pages = const_cast<Doc *>(doc)->GetPages();
+    const Pages *pages = doc->GetPages();
     assert(pages);
 
     // first page or use the pgFooter for all pages?
@@ -689,7 +689,7 @@ int Page::GetContentHeight() const
         return 0;
     }
 
-    System *last = dynamic_cast<System *>(this->GetLast(SYSTEM));
+    const System *last = dynamic_cast<const System *>(this->GetLast(SYSTEM));
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 

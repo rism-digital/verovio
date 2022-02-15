@@ -273,7 +273,9 @@ public:
      */
     ///@{
     Object *GetFirst(const ClassId classId = UNSPECIFIED);
+    const Object *GetFirst(const ClassId classId = UNSPECIFIED) const;
     Object *GetNext();
+    const Object *GetNext() const;
     ///@}
 
     /**
@@ -282,13 +284,18 @@ public:
      */
     ///@{
     Object *GetNext(const Object *child, const ClassId classId = UNSPECIFIED);
+    const Object *GetNext(const Object *child, const ClassId classId = UNSPECIFIED) const;
     Object *GetPrevious(const Object *child, const ClassId classId = UNSPECIFIED);
+    const Object *GetPrevious(const Object *child, const ClassId classId = UNSPECIFIED) const;
     ///@}
 
     /**
      * Return the last child of the object (if any, NULL otherwise)
      */
-    Object *GetLast(const ClassId classId = UNSPECIFIED) const;
+    ///@{
+    Object *GetLast(const ClassId classId = UNSPECIFIED);
+    const Object *GetLast(const ClassId classId = UNSPECIFIED) const;
+    ///@}
 
     /**
      * Get the parent of the Object
@@ -1451,8 +1458,8 @@ private:
      * Values are set when GetFirst is called (which is mandatory)
      */
     ///@{
-    ArrayOfObjects::iterator m_iteratorEnd, m_iteratorCurrent;
-    ClassId m_iteratorElementType;
+    mutable ArrayOfObjects::const_iterator m_iteratorEnd, m_iteratorCurrent;
+    mutable ClassId m_iteratorElementType;
     ///@}
 
     /**

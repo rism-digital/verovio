@@ -112,12 +112,15 @@ public:
      * Will find it only when having read a pages-based MEI file,
      * or when a file was converted to page-based MEI.
      */
+    ///@{
     Pages *GetPages();
+    const Pages *GetPages() const;
+    ///@}
 
     /**
      * Get the total page count
      */
-    int GetPageCount();
+    int GetPageCount() const;
 
     /**
      * Return true if the MIDI generation is already done

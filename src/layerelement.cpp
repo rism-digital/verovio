@@ -182,8 +182,7 @@ bool LayerElement::IsGraceNote() const
     else if (this->Is(TUPLET)) {
         ClassIdsComparison matchType({ NOTE, CHORD });
         ArrayOfObjects children;
-        LayerElement *child
-            = dynamic_cast<LayerElement *>(const_cast<LayerElement *>(this)->FindDescendantByComparison(&matchType));
+        const LayerElement *child = dynamic_cast<const LayerElement *>(this->FindDescendantByComparison(&matchType));
         if (child) return child->IsGraceNote();
     }
     // For accid, artic, etc.. look at the parent note / chord

@@ -415,6 +415,11 @@ bool Object::HasAttribute(std::string attribute, std::string value) const
 
 Object *Object::GetFirst(const ClassId classId)
 {
+    return const_cast<Object *>(std::as_const(*this).GetFirst(classId));
+}
+
+const Object *Object::GetFirst(const ClassId classId) const
+{
     m_iteratorElementType = classId;
     m_iteratorEnd = m_children.end();
     m_iteratorCurrent = std::find_if(m_children.begin(), m_iteratorEnd, ObjectComparison(m_iteratorElementType));
@@ -423,14 +428,24 @@ Object *Object::GetFirst(const ClassId classId)
 
 Object *Object::GetNext()
 {
-    m_iteratorCurrent++;
+    return const_cast<Object *>(std::as_const(*this).GetNext());
+}
+
+const Object *Object::GetNext() const
+{
+    ++m_iteratorCurrent;
     m_iteratorCurrent = std::find_if(m_iteratorCurrent, m_iteratorEnd, ObjectComparison(m_iteratorElementType));
     return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
 }
 
 Object *Object::GetNext(const Object *child, const ClassId classId)
 {
-    ArrayOfObjects::iterator iteratorEnd, iteratorCurrent;
+    return const_cast<Object *>(std::as_const(*this).GetNext(child, classId));
+}
+
+const Object *Object::GetNext(const Object *child, const ClassId classId) const
+{
+    ArrayOfObjects::const_iterator iteratorEnd, iteratorCurrent;
     iteratorEnd = m_children.end();
     iteratorCurrent = std::find(m_children.begin(), iteratorEnd, child);
     if (iteratorCurrent != iteratorEnd) {
@@ -442,7 +457,12 @@ Object *Object::GetNext(const Object *child, const ClassId classId)
 
 Object *Object::GetPrevious(const Object *child, const ClassId classId)
 {
-    ArrayOfObjects::reverse_iterator riteratorEnd, riteratorCurrent;
+    return const_cast<Object *>(std::as_const(*this).GetPrevious(child, classId));
+}
+
+const Object *Object::GetPrevious(const Object *child, const ClassId classId) const
+{
+    ArrayOfObjects::const_reverse_iterator riteratorEnd, riteratorCurrent;
     riteratorEnd = m_children.rend();
     riteratorCurrent = std::find(m_children.rbegin(), riteratorEnd, child);
     if (riteratorCurrent != riteratorEnd) {
@@ -452,7 +472,12 @@ Object *Object::GetPrevious(const Object *child, const ClassId classId)
     return (riteratorCurrent == riteratorEnd) ? NULL : *riteratorCurrent;
 }
 
-Object *Object::GetLast(const ClassId classId) const
+Object *Object::GetLast(const ClassId classId)
+{
+    return const_cast<Object *>(std::as_const(*this).GetLast(classId));
+}
+
+const Object *Object::GetLast(const ClassId classId) const
 {
     ArrayOfObjects::const_reverse_iterator riter
         = std::find_if(m_children.rbegin(), m_children.rend(), ObjectComparison(classId));
