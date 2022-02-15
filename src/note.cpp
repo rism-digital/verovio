@@ -545,7 +545,7 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
     return SMUFL_E0A4_noteheadBlack;
 }
 
-bool Note::IsVisible() const
+bool Note::IsVisible()
 {
     if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;

@@ -300,7 +300,10 @@ public:
     /**
      * Get the parent of the Object
      */
-    Object *GetParent() const { return m_parent; }
+    ///@{
+    Object *GetParent() { return m_parent; }
+    const Object *GetParent() const { return m_parent; }
+    ///@}
 
     /**
      * Set the parent of the Object.
