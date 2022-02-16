@@ -1013,26 +1013,12 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             else if (isGraceToNoteSlur) {
-                if (end->IsInBeam()) {
-                    x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                }
-                else if (parentBeam || parentFTrem) {
-                    if (end->GetDrawingY() > y1) {
-                        y2 = end->GetDrawingY() + unit * 3;
-                    }
-                    else {
-                        y2 = y1;
-                        x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                    }
-                }
-                else {
-                    const int yMin = y1 - unit * 4;
-                    const int yTop = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
-                    y2 = std::max(end->GetDrawingY() + unit * 2, yMin);
-                    if (y2 > yTop - unit * 2) {
-                        y2 = yTop;
-                        x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                    }
+                const int yMin = y1 - unit * 4;
+                const int yTop = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                y2 = std::max(end->GetDrawingY() + unit * 2, yMin);
+                if (y2 > yTop - unit * 2) {
+                    y2 = yTop;
+                    x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
             }
             // portato slurs
@@ -1071,29 +1057,14 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             else if (isGraceToNoteSlur) {
-                if (end->IsInBeam()) {
-                    x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                }
-                else if (parentBeam || parentFTrem) {
-                    if (end->GetDrawingY() < y1) {
-                        y2 = end->GetDrawingY();
-                        x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                    }
-                    else {
-                        y2 = y1;
-                        x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                    }
+                const int yMax = y1 + unit;
+                const int yBottom = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                y2 = std::min(end->GetDrawingY(), yMax);
+                if (y2 < yBottom + unit) {
+                    y2 = yBottom + unit * 2;
                 }
                 else {
-                    const int yMax = y1 + unit;
-                    const int yBottom = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-                    y2 = std::min(end->GetDrawingY(), yMax);
-                    if (y2 < yBottom + unit) {
-                        y2 = yBottom + unit * 2;
-                    }
-                    else {
-                        x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                    }
+                    x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
             }
             // portato slurs
