@@ -124,9 +124,8 @@ public:
      * Looking in the content list is necessary for grace notes or imbricated beams.
      */
     Beam *IsInBeam();
-    ///@}
-
     bool IsInBeamSpan() const;
+    ///@}
 
     /**
      * @name Get and set the layerN drawing value
@@ -483,6 +482,8 @@ public:
      */
     Staff *m_crossStaff;
     Layer *m_crossLayer;
+
+    bool m_isInBeamspan = false;
 
 protected:
     Alignment *m_alignment;

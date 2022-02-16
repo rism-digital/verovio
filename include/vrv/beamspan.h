@@ -96,7 +96,7 @@ private:
 
 public:
     //
-    std::vector<BeamSegment *> m_beamSegments;
+    std::vector<BeamSpanSegment *> m_beamSegments;
 
 private:
     //

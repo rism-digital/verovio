@@ -248,11 +248,9 @@ int LayerElement::GetOriginalLayerN()
 
 bool LayerElement::IsInBeamSpan() const
 {
-    if (!this->Is({ CHORD, NOTE })) return false;
-    Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-    if (measure) return measure->IsInSpanningObjects(this);
+    if (!this->Is({ CHORD, NOTE, REST })) return false;
 
-    return false;
+    return m_isInBeamspan;
 }
 
 Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence) const

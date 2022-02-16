@@ -25,26 +25,6 @@ class StaffAlignment;
 enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
 
 //----------------------------------------------------------------------------
-// BeamSegmentPlacementInfo
-//----------------------------------------------------------------------------
-
-// Structure for storing additional information regarding beamSegment placement (in case of beam/beamSpan spanning over
-// the systems
-struct BeamSegmentPlacementInfo {
-public:
-    BeamSegmentPlacementInfo() = default;
-    Measure *m_measure;
-    Staff *m_staff;
-    Layer *m_layer;
-    int m_spanningType = SPANNING_START_END;
-    BeamElementCoord *m_begin;
-    BeamElementCoord *m_end;
-
-    // Set spanning type based on the positioning of the beam segment
-    void SetSpanningType(int systemIndex, int systemCount);
-};
-
-//----------------------------------------------------------------------------
 // BeamSegment
 //----------------------------------------------------------------------------
 
@@ -77,12 +57,6 @@ public:
      * This is called by Beam::FilterList
      */
     void InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords);
-
-    /**
-     * Initialize placement information for the segment. Should be used with beamSpan to specify which staff/layer it
-     * belongs to
-     */
-    void InitPlacementInformation(Staff *staff, Layer *layer);
 
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.
@@ -121,9 +95,6 @@ public:
     void InitSameasRoles(Beam *sameasBeam, data_BEAMPLACE &drawingPlace);
     void UpdateSameasRoles(data_BEAMPLACE place);
     ///@}
-
-    // Helper to append coordinates for the beamSpans that are drawn over systems
-    void AppendSpanningCoordinates(Measure *measure);
 
 private:
     // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)
@@ -215,11 +186,57 @@ public:
     StemSameasDrawingRole m_stemSameasRole;
     StemSameasDrawingRole *m_stemSameasReverseRole;
     ///@}
+};
+
+//----------------------------------------------------------------------------
+// BeamSpanSegment
+//----------------------------------------------------------------------------
+
+// Class for storing additional information regarding beamSegment placement (in case of beamSpan spanning over
+// the systems)
+class BeamSpanSegment : public BeamSegment {
+public:
+    BeamSpanSegment() = default;
+    virtual ~BeamSpanSegment(){};
 
     /**
-     * Additional information on the relevant measure/staff/layer. Optional for plain beams
+     * Set/get methods for member variables
      */
-    BeamSegmentPlacementInfo *m_placementInfo;
+    ///@{
+    Measure *GetMeasure() const { return m_measure; }
+    void SetMeasure(Measure *measure) { m_measure = measure; }
+    Staff *GetStaff() const { return m_staff; }
+    void SetStaff(Staff *staff) { m_staff = staff; }
+    Layer *GetLayer() const { return m_layer; }
+    void SetLayer(Layer *layer) { m_layer = layer; }
+    BeamElementCoord *GetBeginCoord() const { return m_begin; }
+    void SetBeginCoord(BeamElementCoord *begin) { m_begin = begin; }
+    BeamElementCoord *GetEndCoord() const { return m_end; }
+    void SetEndCoord(BeamElementCoord *end) { m_end = end; }
+    ///@}
+
+    /**
+     * Set/get methods for spanning type of segment.
+     * Set spanning type based on the positioning of the beam segment
+     */
+    ///@{
+    void SetSpanningType(int systemIndex, int systemCount);
+    int GetSpanningType() const { return m_spanningType; }
+    ///@}
+
+    // Helper to append coordinates for the beamSpans that are drawn over systems
+    void AppendSpanningCoordinates(Measure *measure);
+
+private:
+    // main values to track positioning of the segment
+    Measure *m_measure;
+    Staff *m_staff;
+    Layer *m_layer;
+    BeamElementCoord *m_begin;
+    BeamElementCoord *m_end;
+
+    // spanning type for purposes of adding additional coordinates to segment
+    int m_spanningType = SPANNING_START_END;
 };
 
 //----------------------------------------------------------------------------

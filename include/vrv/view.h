@@ -389,7 +389,7 @@ protected:
     ///@{
     void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
-    void DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, Measure *measure);
+    void DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, System *system, Object *graphic = NULL);
     ///@}
 
     /**

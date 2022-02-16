@@ -412,7 +412,7 @@ public:
      * The start and end objects are included in the result set.
      */
     void FindAllDescendantsBetween(ListOfObjects *objects, Comparison *comparison, Object *start, Object *end,
-        bool clear = true, bool includeChildren = true);
+        bool clear = true, int depth = UNLIMITED_DEPTH);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -1066,12 +1066,16 @@ public:
     virtual int PrepareProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Match elements of @plist.
+     * Prepare list of elements in the @plist.
      */
     ///@{
     virtual int PreparePlist(FunctorParams *functorParams);
-    virtual int ProcessPlist(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * Match elements of @plist
+     */
+    virtual int ProcessPlist(FunctorParams *functorParams);
 
     /**
      * Extract default duration from scoredef/staffdef

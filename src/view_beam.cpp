@@ -29,6 +29,7 @@
 #include "options.h"
 #include "smufl.h"
 #include "staff.h"
+#include "system.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -419,37 +420,49 @@ void View::DrawBeamSegment(
     } // end of drawing partial bars
 }
 
-void View::DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, Measure *measure)
+void View::DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, System *system, Object *graphic)
 {
     assert(dc);
     assert(beamSpan);
-    assert(measure);
+    assert(system);
 
-    // Draw all segments for the beamSpan
-    dc->StartGraphic(beamSpan, "", beamSpan->GetUuid());
+    // Draw segments for the beamSpan
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
+    else {
+        dc->StartGraphic(beamSpan, "", beamSpan->GetUuid(), false);
+    }
+
     for (auto segment : beamSpan->m_beamSegments) {
+        // make sure to process only segments for current system
+        Measure *segmentSystem = segment->GetMeasure();
+        if (vrv_cast<System *>(segmentSystem->GetFirstAncestor(SYSTEM)) != system) continue;
         // Reset current segment and set coordinates based on stored begin/end iterators for the ElementCoords
         segment->Reset();
 
-        const auto coordsFirst = std::find(beamSpan->m_beamElementCoords.begin(), beamSpan->m_beamElementCoords.end(),
-            segment->m_placementInfo->m_begin);
-        const auto coordsLast = std::find(beamSpan->m_beamElementCoords.begin(), beamSpan->m_beamElementCoords.end(),
-            segment->m_placementInfo->m_end);
+        const auto coordsFirst = std::find(
+            beamSpan->m_beamElementCoords.begin(), beamSpan->m_beamElementCoords.end(), segment->GetBeginCoord());
+        const auto coordsLast = std::find(
+            beamSpan->m_beamElementCoords.begin(), beamSpan->m_beamElementCoords.end(), segment->GetEndCoord());
         if ((coordsFirst == beamSpan->m_beamElementCoords.end()) || (coordsLast == beamSpan->m_beamElementCoords.end()))
             continue;
 
         ArrayOfBeamElementCoords coord(coordsFirst, coordsLast + 1);
         segment->InitCoordRefs(&coord);
-        segment->CalcBeam(segment->m_placementInfo->m_layer, segment->m_placementInfo->m_staff, m_doc, beamSpan,
-            beamSpan->m_drawingPlace);
-        segment->AppendSpanningCoordinates(segment->m_placementInfo->m_measure);
+        segment->CalcBeam(segment->GetLayer(), segment->GetStaff(), m_doc, beamSpan, beamSpan->m_drawingPlace);
+        segment->AppendSpanningCoordinates(segment->GetMeasure());
 
         // Draw corresponding beam segment
-        this->DrawBeamSegment(
-            dc, segment, beamSpan, segment->m_placementInfo->m_layer, segment->m_placementInfo->m_staff);
+        this->DrawBeamSegment(dc, segment, beamSpan, segment->GetLayer(), segment->GetStaff());
     }
 
-    dc->EndGraphic(beamSpan, this);
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else {
+        dc->EndGraphic(beamSpan, this);
+    }
 }
 
 } // namespace vrv

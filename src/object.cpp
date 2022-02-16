@@ -583,15 +583,14 @@ void Object::FindAllDescendantsByComparison(
 }
 
 void Object::FindAllDescendantsBetween(
-    ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear, bool includeChildren)
+    ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear, int depth)
 {
     assert(objects);
     if (clear) objects->clear();
 
     Functor findAllBetween(&Object::FindAllBetween);
     FindAllBetweenParams findAllBetweenParams(comparison, objects, start, end);
-    findAllBetweenParams.m_includeChildren = includeChildren;
-    this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD, true);
+    this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, depth, FORWARD, true);
 }
 
 Object *Object::GetChild(int idx) const
@@ -1424,7 +1423,6 @@ int Object::FindAllBetween(FunctorParams *functorParams)
     // evaluate by applying the Comparison operator()
     if ((*params->m_comparison)(this)) {
         params->m_elements->push_back(this);
-        if ((params->m_end != this) && !params->m_includeChildren) return FUNCTOR_SIBLINGS;
     }
 
     // We have reached the end of the range
@@ -1584,7 +1582,7 @@ int Object::ProcessPlist(FunctorParams *functorParams)
     PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
     assert(params);
 
-    if (!IsLayerElement()) return FUNCTOR_CONTINUE;
+    if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
 
     std::string uuid = this->GetUuid();
     auto i = std::find_if(params->m_interfaceUuidTuples.begin(), params->m_interfaceUuidTuples.end(),

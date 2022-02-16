@@ -155,8 +155,6 @@ void Measure::Reset()
     m_scoreTimeOffset.clear();
     m_realTimeOffsetMilliseconds.clear();
     m_currentTempo = MIDI_TEMPO;
-
-    m_spanningObjects.clear();
 }
 
 bool Measure::IsSupportedChild(Object *child)
@@ -653,16 +651,6 @@ std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEn
     }
 
     return endpoints;
-}
-
-bool Measure::IsInSpanningObjects(const Object *object) const
-{
-    return (std::find(m_spanningObjects.begin(), m_spanningObjects.end(), object) != m_spanningObjects.end());
-}
-
-void Measure::AddToSpanningObjects(Object *object)
-{
-    m_spanningObjects.push_back(object);
 }
 
 //----------------------------------------------------------------------------

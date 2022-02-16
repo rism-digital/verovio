@@ -36,35 +36,18 @@
 
 namespace vrv {
 
-void BeamSegmentPlacementInfo::SetSpanningType(int systemIndex, int systemCount)
-{
-    if (0 == systemIndex) {
-        m_spanningType = SPANNING_START;
-    }
-    else if ((systemCount - 1) == systemIndex) {
-        m_spanningType = SPANNING_END;
-    }
-    else {
-        m_spanningType = SPANNING_MIDDLE;
-    }
-}
-
 //----------------------------------------------------------------------------
 // BeamSegment
 //----------------------------------------------------------------------------
 
 BeamSegment::BeamSegment()
 {
-    m_placementInfo = NULL;
     this->Reset();
 }
 
 BeamSegment::~BeamSegment()
 {
     this->ClearCoordRefs();
-    if (m_placementInfo) {
-        delete m_placementInfo;
-    }
 }
 
 void BeamSegment::Reset()
@@ -99,56 +82,6 @@ void BeamSegment::ClearCoordRefs()
 void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords)
 {
     m_beamElementCoordRefs = *beamElementCoords;
-}
-
-void BeamSegment::InitPlacementInformation(Staff *staff, Layer *layer)
-{
-    if (!m_placementInfo) {
-        m_placementInfo = new BeamSegmentPlacementInfo();
-    }
-    m_placementInfo->m_staff = staff;
-    m_placementInfo->m_layer = layer;
-}
-
-void BeamSegment::AppendSpanningCoordinates(Measure *measure)
-{
-    if (NULL == m_placementInfo) return;
-    const int spanningType = m_placementInfo->m_spanningType;
-    if (SPANNING_START_END == spanningType) return;
-
-    BarLine *bar = measure->GetRightBarLine();
-    const int rightSide = bar->GetDrawingX();
-    BeamElementCoord *front = m_beamElementCoordRefs.front();
-    BeamElementCoord *back = m_beamElementCoordRefs.back();
-    double slope = 0.0;
-    if (m_beamElementCoordRefs.size() > 1) {
-        slope = (double)(back->m_yBeam - front->m_yBeam) / (double)(back->m_x - front->m_x);
-    }
-
-    // in case if beamSpan starts in current system - stretch beam to the right barline
-    if ((SPANNING_START == spanningType) || (SPANNING_MIDDLE == spanningType)) {
-        BeamElementCoord *right = new BeamElementCoord(*back);
-        const int distance = rightSide - back->m_x;
-        right->m_x = rightSide;
-        right->m_yBeam += distance * slope;
-        m_beamElementCoordRefs.push_back(right);
-    }
-    // otherwise start beam closer to the start of the Measure, to indicate spanning
-    if ((SPANNING_END == spanningType) || (SPANNING_MIDDLE == spanningType)) {
-        BeamElementCoord *left = new BeamElementCoord(*front);
-        int offset = 0;
-        if (m_beamElementCoordRefs.size() > 1) {
-            const int divideBy = 2 * ((int)m_beamElementCoordRefs.size() - 1);
-            offset = (back->m_x - front->m_x) / divideBy;
-        }
-        else {
-            // 1.5 * unit offset in this case (harcoded for the time being)
-            offset = 270;
-        }
-        left->m_x -= offset;
-        left->m_yBeam -= offset * slope;
-        m_beamElementCoordRefs.insert(m_beamElementCoordRefs.begin(), left);
-    }
 }
 
 void BeamSegment::CalcBeam(
@@ -1689,6 +1622,63 @@ const ArrayOfBeamElementCoords *Beam::GetElementCoords()
 bool Beam::IsTabBeam()
 {
     return (this->FindDescendantByType(TABGRP));
+}
+
+//----------------------------------------------------------------------------
+// BeamSpanSegment
+//----------------------------------------------------------------------------
+
+void BeamSpanSegment::SetSpanningType(int systemIndex, int systemCount)
+{
+    if (0 == systemIndex) {
+        m_spanningType = SPANNING_START;
+    }
+    else if ((systemCount - 1) == systemIndex) {
+        m_spanningType = SPANNING_END;
+    }
+    else {
+        m_spanningType = SPANNING_MIDDLE;
+    }
+}
+
+void BeamSpanSegment::AppendSpanningCoordinates(Measure *measure)
+{
+    const int spanningType = m_spanningType;
+    if (SPANNING_START_END == spanningType) return;
+
+    BarLine *bar = measure->GetRightBarLine();
+    const int rightSide = bar->GetDrawingX();
+    BeamElementCoord *front = m_beamElementCoordRefs.front();
+    BeamElementCoord *back = m_beamElementCoordRefs.back();
+    double slope = 0.0;
+    if (m_beamElementCoordRefs.size() > 1) {
+        slope = (double)(back->m_yBeam - front->m_yBeam) / (double)(back->m_x - front->m_x);
+    }
+
+    // in case if beamSpan starts in current system - stretch beam to the right barline
+    if ((SPANNING_START == spanningType) || (SPANNING_MIDDLE == spanningType)) {
+        BeamElementCoord *right = new BeamElementCoord(*back);
+        const int distance = rightSide - back->m_x;
+        right->m_x = rightSide;
+        right->m_yBeam += distance * slope;
+        m_beamElementCoordRefs.push_back(right);
+    }
+    // otherwise start beam closer to the start of the Measure, to indicate spanning
+    if ((SPANNING_END == spanningType) || (SPANNING_MIDDLE == spanningType)) {
+        BeamElementCoord *left = new BeamElementCoord(*front);
+        int offset = 0;
+        if (m_beamElementCoordRefs.size() > 1) {
+            const int divideBy = 2 * ((int)m_beamElementCoordRefs.size() - 1);
+            offset = (back->m_x - front->m_x) / divideBy;
+        }
+        else {
+            // 1.5 * unit offset in this case (harcoded for the time being)
+            offset = 270;
+        }
+        left->m_x -= offset;
+        left->m_yBeam -= offset * slope;
+        m_beamElementCoordRefs.insert(m_beamElementCoordRefs.begin(), left);
+    }
 }
 
 //----------------------------------------------------------------------------

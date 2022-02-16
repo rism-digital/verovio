@@ -1363,7 +1363,6 @@ public:
  * member 1: an array of all matching objects
  * member 2: the start object range
  * member 3: the end object range
- * member 4: flag to decide whether to add children of the found elements
  **/
 
 class FindAllBetweenParams : public FunctorParams {
@@ -1374,13 +1373,11 @@ public:
         m_elements = elements;
         m_start = start;
         m_end = end;
-        m_includeChildren = true;
     }
     Comparison *m_comparison;
     ListOfObjects *m_elements;
     Object *m_start;
     Object *m_end;
-    bool m_includeChildren;
 };
 
 //----------------------------------------------------------------------------

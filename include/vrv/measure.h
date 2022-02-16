@@ -262,14 +262,6 @@ public:
      */
     std::vector<std::pair<LayerElement *, LayerElement *>> GetInternalTieEndpoints();
 
-    /**
-     * Add element to the list of spanning objects or check if element is in the list
-     */
-    ///@{
-    bool IsInSpanningObjects(const Object *object) const;
-    void AddToSpanningObjects(Object *object);
-    ///@}
-
     //----------//
     // Functors //
     //----------//
@@ -579,8 +571,6 @@ private:
     double m_currentTempo;
 
     std::map<int, BarlineRenditionPair> m_invisibleStaffBarlines;
-    // vector containing pointers to elements that belong to any of the beamspans in measure
-    std::vector<Object *> m_spanningObjects;
 };
 
 } // namespace vrv

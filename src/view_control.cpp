@@ -319,7 +319,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         }
         else if (element->Is(BEAMSPAN)) {
             // cast to BeamSpan check in DrawBeamSpan
-            DrawBeamSpan(dc, vrv_cast<BeamSpan *>(element), measure);
+            this->DrawBeamSpan(dc, vrv_cast<BeamSpan *>(element), system, graphic);
         }
         else if (element->Is(BRACKETSPAN)) {
             // cast to BracketSpan check in DrawBracketSpan
