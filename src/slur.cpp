@@ -904,6 +904,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         assert(endChord);
     }
 
+    const bool isSshaped = this->HasMixedCurveDir();
     const bool isGraceToNoteSlur
         = !start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && start->IsGraceNote() && !end->IsGraceNote();
 
@@ -933,7 +934,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             //  d(^)d
-            else if (isShortSlur) {
+            else if (isSshaped || isShortSlur) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             // portato slurs
@@ -979,7 +980,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             // P(_)P
-            else if (isShortSlur) {
+            else if (isSshaped || isShortSlur) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             // portato slurs
@@ -1024,7 +1025,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             // d(^)d
-            else if (isShortSlur) {
+            else if (isSshaped || isShortSlur) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             else if (isGraceToNoteSlur) {
@@ -1068,9 +1069,6 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             // P(_)P
-            else if (isShortSlur && !isGraceToNoteSlur) {
-                y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-            }
             else if (isGraceToNoteSlur) {
                 const int yMax = y1 + unit;
                 const int yBottom = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
@@ -1081,6 +1079,9 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 else {
                     x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
+            }
+            else if (isSshaped || isShortSlur) {
+                y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             // portato slurs
             else if (portatoSlurType != PortatoSlurType::None) {
