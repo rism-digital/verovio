@@ -32,6 +32,11 @@ public:
     std::string GetClassName() const override { return "PgHead"; }
     ///@}
 
+    /**
+     * Overriden to get the appropriate margin
+     */
+    int GetTotalHeight(Doc *doc) override;
+
     bool GenerateFromMEIHeader(pugi::xml_document &header);
 
     //----------//

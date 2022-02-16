@@ -409,7 +409,8 @@ int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
         return 0;
     }
 
-    int baseStem = STANDARD_STEMLENGTH * 3;
+    int baseStem = (staff->IsTablature()) ? STANDARD_STEMLENGTH_TAB : STANDARD_STEMLENGTH;
+    baseStem *= 3;
 
     int shortening = 0;
 
@@ -970,14 +971,15 @@ int Note::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // Stems have been calculated previously in Beam or fTrem - siblings because flags do not need to
-    // be processed either - except when there is a stemSameasNote
+    // Stems have been calculated previously in Beam or fTrem
+    // Return to siblings because flags do not need to be processed either in that case
     if ((this->IsInBeam() || this->IsInFTrem())) {
         return FUNCTOR_SIBLINGS;
     }
 
     // We currently have no stem object with mensural notes
-    if (this->IsMensuralDur()) {
+    // We also have no stem  with tab because it belongs to tabDurSym in this case
+    if (this->IsMensuralDur() || this->IsTabGrpNote()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -1007,7 +1009,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     params->m_interface = this;
     params->m_dur = this->GetActualDur();
     params->m_isGraceNote = this->IsGraceNote();
-    params->m_stemSameas = false;
+    params->m_isStemSameasSecondary = false;
 
     int staffSize = staff->m_drawingStaffSize;
 
@@ -1044,7 +1046,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     // The value of m_stemSameasRole is set by Note::CalcStemDirForSameasNote
     if (this->HasStemSameasNote() && m_stemSameasRole == SAMEAS_SECONDARY) {
         params->m_chordStemLength = -std::abs(this->GetDrawingY() - this->GetStemSameasNote()->GetDrawingY());
-        params->m_stemSameas = true;
+        params->m_isStemSameasSecondary = true;
     }
 
     return FUNCTOR_CONTINUE;
@@ -1263,7 +1265,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Chord *chord = this->IsChordTone();
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
 
-    if (!this->IsChordTone() && !this->IsMensuralDur()) {
+    if (!this->IsChordTone() && !this->IsMensuralDur() && !this->IsTabGrpNote()) {
         if (!currentStem) {
             currentStem = new Stem();
             this->AddChild(currentStem);
@@ -1285,7 +1287,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     }
 
     if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem() && !this->IsChordTone()
-        && !this->IsMensuralDur() && !this->HasStemSameasNote()) {
+        && !this->IsMensuralDur() && !this->IsTabGrpNote()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {

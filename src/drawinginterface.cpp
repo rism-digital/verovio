@@ -18,6 +18,7 @@
 #include "layerelement.h"
 #include "note.h"
 #include "object.h"
+#include "staff.h"
 
 namespace vrv {
 
@@ -498,6 +499,50 @@ int BeamDrawingInterface::GetPosition(Object *object, LayerElement *element)
         if (chord) position = this->GetListIndex(chord);
     }
     return position;
+}
+
+void BeamDrawingInterface::GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below)
+{
+    if (!m_beamStaff || !m_crossStaffContent) return;
+
+    if (m_drawingPlace == BEAMPLACE_mixed) {
+        above = NULL;
+        below = NULL;
+    }
+    // Beam below - ignore above and find the appropriate below staff
+    else if (m_drawingPlace == BEAMPLACE_below) {
+        above = NULL;
+        if (m_crossStaffRel == STAFFREL_basic_above) {
+            below = m_beamStaff->GetAlignment();
+        }
+        else {
+            below = m_crossStaffContent->GetAlignment();
+        }
+    }
+    // Beam above - ignore below and find the appropriate above staff
+    else if (m_drawingPlace == BEAMPLACE_above) {
+        below = NULL;
+        if (m_crossStaffRel == STAFFREL_basic_below) {
+            above = m_beamStaff->GetAlignment();
+        }
+        else {
+            above = m_crossStaffContent->GetAlignment();
+        }
+    }
+}
+
+void BeamDrawingInterface::GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below)
+{
+    if (m_beamStaff && m_crossStaffContent) {
+        if (m_crossStaffRel == STAFFREL_basic_above) {
+            above = m_crossStaffContent->GetAlignment();
+            below = m_beamStaff->GetAlignment();
+        }
+        else {
+            above = m_beamStaff->GetAlignment();
+            below = m_crossStaffContent->GetAlignment();
+        }
+    }
 }
 
 //----------------------------------------------------------------------------

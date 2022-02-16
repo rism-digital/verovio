@@ -41,8 +41,6 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Beam *beam = dynamic_cast<Beam *>(element);
     assert(beam);
 
-    const bool isTabBeam = beam->IsTabBeam();
-
     /******************************************************************/
     // initialization
 
@@ -61,10 +59,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // Calculate the beam slope and position
 
-    if (isTabBeam) {
-        beam->m_beamSegment.CalcTabBeam(layer, beam->m_beamStaff, m_doc, beam, initialPlace);
-    }
-    else if (!beam->m_beamSegment.StemSameasIsSecondary()) {
+    if (!beam->m_beamSegment.StemSameasIsSecondary()) {
         beam->m_beamSegment.CalcBeam(layer, beam->m_beamStaff, m_doc, beam, initialPlace);
     }
 

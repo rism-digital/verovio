@@ -90,7 +90,10 @@ public:
      * @name Get the size of row, cols or cells
      */
     ///@{
-    int GetTotalHeight();
+    /** Height including margins */
+    virtual int GetTotalHeight(Doc *doc) = 0;
+    /** Content height */
+    int GetContentHeight();
     /** Row from 0 to 2 */
     int GetRowHeight(int row);
     /** Col from 0 to 2 */

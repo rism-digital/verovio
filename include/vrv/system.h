@@ -143,6 +143,11 @@ public:
     ///@}
 
     /**
+     * Estimate the justification ratio from the castoff system widths and the desired page width
+     */
+    double EstimateJustificationRatio(Doc *doc);
+
+    /**
      * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
      * Segment positions occur where a barLine is set on all staves.
      */
@@ -194,6 +199,11 @@ public:
      * See Object::AlignHorizontally
      */
     int AlignHorizontally(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::SetAlignmentXPos
+     */
+    int SetAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::AdjustXOverflow
@@ -333,6 +343,15 @@ public:
     ///@{
     int m_drawingTotalWidth;
     int m_drawingJustifiableWidth;
+    ///@}
+    /**
+     * @name The cast off width of the system.
+     * It is computed during castoff and used for adjusting the horizontal spacing for a given duration.
+     * This technique prevents large justification ratios and improves the horizontal layout.
+     */
+    ///@{
+    int m_castOffTotalWidth;
+    int m_castOffJustifiableWidth;
     ///@}
 
 protected:

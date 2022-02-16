@@ -31,6 +31,7 @@ class Mdiv;
 class Measure;
 class MeterSig;
 class Note;
+class Score;
 class Section;
 class Slur;
 class Staff;
@@ -53,7 +54,7 @@ public:
 private:
     // function declarations:
 
-    void parseABC(std::istream &infile);
+    void ParseABC(std::istream &infile);
 
     // parsing functions
     int SetBarLine(const std::string &musicCode, int index);
@@ -72,6 +73,7 @@ private:
     void parseMeter(const std::string &meterString); // M:
     void parseTempo(const std::string &tempoString); // Q:
     void parseReferenceNumber(const std::string &referenceNumberString); // X:
+    void parseLyrics(); // w:
 
     // input functions
     void readInformationField(const char &dataKey, std::string dataValue);
@@ -86,9 +88,11 @@ private:
     void AddOrnaments(LayerElement *element);
 
     // additional functions
-    void PrintInformationFields();
+    void PrintInformationFields(Score *score);
     void CreateHeader();
     void CreateWorkEntry();
+    void FlushControlElements(Score *score, Section *section);
+    void InitScoreAndSection(Score *&score, Section *&section);
 
 #endif // NO_ABC_SUPPORT
 
@@ -142,6 +146,9 @@ private:
 
     std::vector<LayerElement *> m_layerElements;
     std::vector<LayerElement *> m_noteStack;
+    // Array of added notes in one line of ABC file. Used to track elements that might require adding verse to
+    std::vector<LayerElement *> m_lineNoteArray;
+    int m_verseNumber = 1;
     /*
      * ABC decoration stacks
      */

@@ -28,6 +28,7 @@
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
+#include "tabdursym.h"
 #include "tabgrp.h"
 #include "tuplet.h"
 #include "verticalaligner.h"
@@ -83,56 +84,6 @@ void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoord
     m_beamElementCoordRefs = *beamElementCoords;
 }
 
-void BeamSegment::CalcTabBeam(
-    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
-{
-    assert(layer);
-    assert(staff);
-    assert(doc);
-
-    // Calculate the y position of the beam - this currently need to be inline with the code in View::DrawTabGrp that
-    // draws the stems.
-    int glyphSize = staff->GetDrawingStaffNotationSize();
-    beamInterface->m_fractionSize = glyphSize * 2 / 3;
-
-    assert(m_beamElementCoordRefs.size() > 0);
-
-    int y = staff->GetDrawingY();
-
-    // Get the y position of the first tabDurSym
-    assert(m_beamElementCoordRefs.at(0)->m_element);
-    LayerElement *tabDurSym
-        = vrv_cast<LayerElement *>(m_beamElementCoordRefs.at(0)->m_element->FindDescendantByType(TABDURSYM));
-    if (tabDurSym) y = tabDurSym->GetDrawingY();
-
-    const int height = doc->GetGlyphHeight(SMUFL_EBA8_luteDurationHalf, glyphSize, true);
-    y += height;
-
-    this->CalcBeamInit(layer, staff, doc, beamInterface, place);
-
-    // Adjust the height and spacing of the beams
-    beamInterface->m_beamWidthBlack /= 2;
-    beamInterface->m_beamWidthWhite /= 2;
-
-    // Adjust it further for tab.lute.french and tab.lute.italian
-    if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
-        beamInterface->m_beamWidthBlack = beamInterface->m_beamWidthBlack * 2 / 5;
-        beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 3 / 5;
-    }
-
-    beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
-
-    beamInterface->m_drawingPlace = (place == BEAMPLACE_below) ? BEAMPLACE_below : BEAMPLACE_above;
-
-    for (auto coord : m_beamElementCoordRefs) {
-        // All notes and chords get their stem value stored
-        LayerElement *el = coord->m_element;
-        if (el->Is(TABGRP)) {
-            coord->m_yBeam = y;
-        }
-    }
-}
-
 void BeamSegment::CalcBeam(
     Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool init)
 {
@@ -140,7 +91,6 @@ void BeamSegment::CalcBeam(
     assert(staff);
     assert(doc);
 
-    int y1, y2;
     assert(m_beamElementCoordRefs.size() > 0);
 
     // For recursive calls, avoid to re-init values
@@ -148,13 +98,24 @@ void BeamSegment::CalcBeam(
         this->CalcBeamInit(layer, staff, doc, beamInterface, place);
     }
 
-    beamInterface->m_fractionSize = staff->m_drawingStaffSize;
+    bool horizontal = true;
+    if (staff->IsTablature()) {
+        int glyphSize = staff->GetDrawingStaffNotationSize();
+        beamInterface->m_fractionSize = glyphSize * 2 / 3;
 
-    bool horizontal = beamInterface->IsHorizontal();
+        // Alwyas horizontal when outside the staff and not when inside the staff
+        // Eventually we will need to look at the content to pre-determine if horizontal for inside beams
+        horizontal = staff->IsTabWithStemsOutside();
+        this->CalcBeamPlaceTab(layer, staff, doc, beamInterface, place);
+    }
+    else {
+        beamInterface->m_fractionSize = staff->m_drawingStaffSize;
 
-    // Beam@place has precedence - however, in some cases, CalcBeam is called recursively because we need to change the
-    // place This occurs when mixed makes no sense and the beam is placed above or below instead.
-    this->CalcBeamPlace(layer, beamInterface, place);
+        horizontal = beamInterface->IsHorizontal();
+        // Beam@place has precedence - however, in some cases, CalcBeam is called recursively because we need to change
+        // the place This occurs when mixed makes no sense and the beam is placed above or below instead.
+        this->CalcBeamPlace(layer, beamInterface, place);
+    }
 
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         CalcMixedBeamPlace(staff);
@@ -172,18 +133,34 @@ void BeamSegment::CalcBeam(
         }
     }
 
-    // ArrayOfBeamElementCoords stemUps;
-    // ArrayOfBeamElementCoords stemDowns;
-
     /******************************************************************/
     // Set the stem lengths to stem objects
+
+    if (staff->IsTablature()) {
+        this->CalcSetStemValuesTab(layer, staff, doc, beamInterface);
+    }
+    else {
+        this->CalcSetStemValues(layer, staff, doc, beamInterface);
+    }
+}
+
+void BeamSegment::CalcSetStemValues(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+{
+    assert(layer);
+    assert(staff);
+    assert(doc);
+    assert(beamInterface);
+
+    int y1, y2;
 
     for (auto coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
-        if ((el->Is(NOTE)) || (el->Is(CHORD))) {
-            StemmedDrawingInterface *stemmedInterface = el->GetStemmedDrawingInterface();
-            assert(beamInterface);
+        if (el->Is({ CHORD, NOTE })) {
+
+            // Get the interface for the chord or note
+            StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
+            if (!stemmedInterface) continue;
 
             assert(coord->m_closestNote);
 
@@ -265,6 +242,54 @@ void BeamSegment::CalcBeam(
             // Since the value were calculated relatively to the element position, adjust them
             stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
             stem->SetDrawingYRel(y2 - el->GetDrawingY());
+            stem->SetDrawingStemLen(y2 - y1);
+        }
+    }
+}
+
+void BeamSegment::CalcSetStemValuesTab(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+{
+    assert(layer);
+    assert(staff);
+    assert(doc);
+    assert(beamInterface);
+
+    int y1, y2;
+
+    for (auto coord : m_beamElementCoordRefs) {
+        // All notes and chords get their stem value stored
+        LayerElement *el = coord->m_element;
+        if (el->Is(TABGRP)) {
+            // Just in case
+            if (!coord->m_closestNote && !coord->m_tabDurSym) continue;
+
+            // Get the interface from child tabDurSym
+            StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
+            if (!stemmedInterface) continue;
+
+            y1 = coord->m_yBeam;
+
+            y2 = (coord->m_closestNote) ? coord->m_closestNote->GetDrawingY() : coord->m_tabDurSym->GetDrawingY();
+
+            if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+                // Move down to ensure the stem is slightly shorter than the top-beam
+                y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                if (coord->m_closestNote) y2 += doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            }
+            else {
+                y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                if (coord->m_closestNote) y2 -= doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            }
+
+            Stem *stem = stemmedInterface->GetDrawingStem();
+            // This is the case with fTrem on whole notes
+            if (!stem) continue;
+
+            // stem->SetDrawingStemDir(stemDir);
+            stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
+            if (coord->m_closestNote) {
+                stem->SetDrawingYRel(y2 - el->GetDrawingY());
+            }
             stem->SetDrawingStemLen(y2 - y1);
         }
     }
@@ -467,15 +492,34 @@ void BeamSegment::CalcBeamInit(
         beamInterface->m_beamWidthWhite *= 4;
         beamInterface->m_beamWidthWhite /= 3;
     }
-    beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
-    // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-    beamInterface->m_stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, false)
-        - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    beamInterface->m_stemXAbove[1] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, true)
-        - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    beamInterface->m_stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    beamInterface->m_stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    if (staff->IsTablature()) {
+        // Adjust the height and spacing of the beams
+        beamInterface->m_beamWidthBlack /= 2;
+        beamInterface->m_beamWidthWhite /= 2;
+
+        // Adjust it further for tab.lute.french and tab.lute.italian
+        if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
+            beamInterface->m_beamWidthBlack = beamInterface->m_beamWidthBlack * 2 / 5;
+            beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 3 / 5;
+        }
+
+        beamInterface->m_stemXAbove[0] = 0;
+        beamInterface->m_stemXAbove[1] = 0;
+        beamInterface->m_stemXBelow[0] = 0;
+        beamInterface->m_stemXBelow[1] = 0;
+    }
+    else {
+        // x-offset values for stem bases, dx[y] where y = element->m_cueSize
+        beamInterface->m_stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, false)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        beamInterface->m_stemXAbove[1] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, true)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        beamInterface->m_stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        beamInterface->m_stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    }
+
+    beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
     /******************************************************************/
     // Calculate the extreme values
@@ -861,6 +905,9 @@ void BeamSegment::CalcBeamPosition(
         }
     }
 
+    // Nothing else to do with tab beams outside the staff
+    if (staff->IsTablature() && staff->IsTabWithStemsOutside()) return;
+
     /******************************************************************/
     // Calculate the slope is necessary
 
@@ -1082,17 +1129,6 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     assert(beamInterface);
 
     if (place != BEAMPLACE_NONE) {
-        /*
-        if (beamInterface->m_hasMultipleStemDir && (place != BEAMPLACE_mixed)) {
-            LogDebug("Stem directions (mixed) contradict beam placement (below or above)");
-        }
-        else if ((beamInterface->m_notesStemDir == STEMDIRECTION_up) && (place == BEAMPLACE_below)) {
-            LogDebug("Stem directions (up) contradict beam placement (below)");
-        }
-        else if ((beamInterface->m_notesStemDir == STEMDIRECTION_down) && (place == BEAMPLACE_above)) {
-            LogDebug("Stem directions (down) contradict beam placement (above)");
-        }
-        */
         beamInterface->m_drawingPlace = place;
     }
     // Default with cross-staff
@@ -1140,6 +1176,36 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     // if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
+void BeamSegment::CalcBeamPlaceTab(
+    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
+{
+    assert(layer);
+    assert(staff);
+    assert(doc);
+    assert(beamInterface);
+
+    if (place != BEAMPLACE_NONE) {
+        beamInterface->m_drawingPlace = (place == BEAMPLACE_below) ? BEAMPLACE_below : BEAMPLACE_above;
+    }
+    // Do we have more that one layer?
+    else {
+        data_STEMDIRECTION layerStemDir = layer->GetDrawingStemDir();
+        // The layerStemDir can be none (single layer), up (1st layer), or down (2n layer)
+        // Is is put above by default with tablature with a single layer
+        beamInterface->m_drawingPlace = (layerStemDir == STEMDIRECTION_down) ? BEAMPLACE_below : BEAMPLACE_above;
+    }
+
+    if (beamInterface->m_drawingPlace == BEAMPLACE_below && staff->IsTabWithStemsOutside()) {
+        for (auto coord : m_beamElementCoordRefs) {
+            if (!coord->m_element || !coord->m_element->Is(TABGRP)) continue;
+            TabGrp *tabGrp = vrv_cast<TabGrp *>(coord->m_element);
+            assert(tabGrp);
+            TabDurSym *tabDurSym = vrv_cast<TabDurSym *>(tabGrp->FindDescendantByType(TABDURSYM));
+            if (tabDurSym) tabDurSym->AdjustDrawingYRel(staff, doc);
+        }
+    }
+}
+
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
     int relevantNoteLoc = VRV_UNSET;
@@ -1148,7 +1214,8 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
             : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
                                                                       : STEMDIRECTION_up;
-        coord->SetClosestNote(stemDir);
+        coord->SetClosestNoteOrTabDurSym(stemDir, staff->IsTabWithStemsOutside());
+        // Nothing else to do if we have no closest note (that includes tab beams outside the staff)
         if (!coord->m_closestNote) continue;
         if (relevantNoteLoc == VRV_UNSET) {
             relevantNoteLoc = coord->m_closestNote->GetDrawingLoc();
@@ -1165,13 +1232,18 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
             : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
                                                                       : STEMDIRECTION_up;
-        const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
+        // Get the tabDurSym stem length (if any)
+        if (coord->m_tabDurSym) {
+            m_uniformStemLength = coord->CalculateStemLengthTab(staff, stemDir);
+            continue;
+        }
         if (!coord->m_closestNote) continue;
-        // if location matches, or if current elements duration is shorter than 8th. This ensures that beams with
-        // partial beams will not be shorted when lowest/highest note is 8th and can be shortened
-        if ((coord->m_dur > minDuration)
-            && ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
-                || (!isHorizontal && (std::abs(m_uniformStemLength) < 13)))) {
+        // skip current element if it's longer that minDuration and is not a part of fTrem
+        if ((coord->m_dur <= minDuration) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
+        // if location matches or if current stem length is too short - adjust stem length
+        const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
+        if ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
+            || (!isHorizontal && (std::abs(m_uniformStemLength) < 13))) {
             m_uniformStemLength = coordStemLength;
             minDuration = coord->m_dur;
         }
@@ -1603,10 +1675,11 @@ void BeamElementCoord::SetDrawingStemDir(
         return;
     }
 
-    if (!m_element->Is({ CHORD, NOTE })) return;
+    // Get the interface from the chord (if any)
+    StemmedDrawingInterface *stemInterface = this->GetStemHolderInterface();
+    // Not a Chord or a Note or no TabDurSym in TabGrp
+    if (!stemInterface) return;
 
-    StemmedDrawingInterface *stemInterface = m_element->GetStemmedDrawingInterface();
-    assert(stemInterface);
     m_stem = stemInterface->GetDrawingStem();
     assert(m_stem);
 
@@ -1614,6 +1687,13 @@ void BeamElementCoord::SetDrawingStemDir(
     m_yBeam = m_element->GetDrawingY();
     m_x += (STEMDIRECTION_up == stemDir) ? interface->m_stemXAbove[interface->m_cueSize]
                                          : interface->m_stemXBelow[interface->m_cueSize];
+
+    if (m_tabDurSym && !m_closestNote) {
+        m_yBeam = m_tabDurSym->GetDrawingY();
+        m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
+        return;
+    }
+
     if (!m_closestNote) return;
 
     if (!interface->m_cueSize && (m_element->IsGraceNote() || m_element->GetDrawingCueSize())
@@ -1689,6 +1769,14 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
     return stemLen + CalculateStemModAdjustment(stemLen, directionBias);
 }
 
+int BeamElementCoord::CalculateStemLengthTab(Staff *staff, data_STEMDIRECTION stemDir)
+{
+    if (!m_tabDurSym) return 0;
+
+    const int directionBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    return m_tabDurSym->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3 * directionBias;
+}
+
 int BeamElementCoord::CalculateStemModAdjustment(int stemLength, int directionBias)
 {
     // handle @stem.mod attribute to properly draw beams with tremolos
@@ -1710,7 +1798,21 @@ int BeamElementCoord::CalculateStemModAdjustment(int stemLength, int directionBi
     return 0;
 }
 
-void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
+StemmedDrawingInterface *BeamElementCoord::GetStemHolderInterface()
+{
+    if (!m_element || !m_element->Is({ CHORD, NOTE, TABGRP })) return NULL;
+
+    if (m_element->Is({ CHORD, NOTE })) return m_element->GetStemmedDrawingInterface();
+
+    TabGrp *tabGrp = vrv_cast<TabGrp *>(m_element);
+    assert(tabGrp);
+    TabDurSym *tabDurSym = vrv_cast<TabDurSym *>(tabGrp->FindDescendantByType(TABDURSYM));
+    if (tabDurSym) return tabDurSym->GetStemmedDrawingInterface();
+
+    return NULL;
+}
+
+void BeamElementCoord::SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, bool outsideStaff)
 {
     m_closestNote = NULL;
     if (m_element->Is(NOTE)) {
@@ -1720,6 +1822,14 @@ void BeamElementCoord::SetClosestNote(data_STEMDIRECTION stemDir)
         Chord *chord = vrv_cast<Chord *>(m_element);
         assert(chord);
         m_closestNote = (STEMDIRECTION_up == stemDir) ? chord->GetTopNote() : chord->GetBottomNote();
+    }
+    else if (m_element->Is(TABGRP)) {
+        TabGrp *tabGrp = vrv_cast<TabGrp *>(m_element);
+        assert(tabGrp);
+        m_tabDurSym = vrv_cast<TabDurSym *>(tabGrp->FindDescendantByType(TABDURSYM));
+        if (!outsideStaff) {
+            m_closestNote = (STEMDIRECTION_up == stemDir) ? tabGrp->GetTopNote() : tabGrp->GetBottomNote();
+        }
     }
 }
 
