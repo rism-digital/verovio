@@ -17,6 +17,9 @@
 #include "iohumdrum.h"
 #include "iomei.h"
 
+using namespace std;
+#include <iostream>
+
 //----------------------------------------------------------------------------
 
 #ifndef NO_HUMDRUM_SUPPORT
@@ -5882,6 +5885,8 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             // But always need to provide @meter.unit since timestamps
             // are in reference to it (can't add meter.count since
             // this will also print a time signature.
+            // Count now allowed (suppress time signature display with @form="invis").
+            count = stoi(matches[1]);
             unit = stoi(matches[2]);
             MeterSig *vrvmetersig = getMeterSig(element);
             vrvmetersig->SetForm(METERFORM_invis);
