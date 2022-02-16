@@ -100,22 +100,21 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     if (!start || !end) return;
 
-    const curvature_CURVEDIR drawingCurveDir = slur->GetDrawingCurvedir();
-    const RelPositions boundaryPos = slur->GetRelBoundaryPositions();
+    const curvature_CURVEDIR drawingCurveDir = slur->ReduceDrawingCurveDir();
 
     /************** adjusting y position **************/
 
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
-    std::pair<Point, Point> adjustedPoints = slur->AdjustCoordinates(
-        m_doc, staff, std::make_pair(Point(x1, y1), Point(x2, y2)), spanningType, boundaryPos);
+    std::pair<Point, Point> adjustedPoints
+        = slur->AdjustCoordinates(m_doc, staff, std::make_pair(Point(x1, y1), Point(x2, y2)), spanningType);
 
     /************** y position **************/
 
-    int sign = boundaryPos.isStartAbove ? 1 : -1;
+    int sign = slur->HasEndpointAboveStart() ? 1 : -1;
     adjustedPoints.first.y += 1.25 * sign * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-    sign = boundaryPos.isEndAbove ? 1 : -1;
+    sign = slur->HasEndpointAboveEnd() ? 1 : -1;
     adjustedPoints.second.y += 1.25 * sign * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     Point points[4];
@@ -174,6 +173,7 @@ float View::CalcInitialSlur(
 {
     // For now we pick C1 = P1 and C2 = P2
     BezierCurve bezier(points[0], points[0], points[3], points[3]);
+    bezier.SetControlSides(slur->HasEndpointAboveStart(), slur->HasEndpointAboveEnd());
 
     /************** content **************/
 
@@ -247,10 +247,8 @@ float View::CalcInitialSlur(
 
     /************** control points **************/
 
-    const RelPositions controlPointPos = slur->GetRelBoundaryPositions();
-    bezier.CalcInitialControlPointParams(
-        m_doc, (curveDir != curvature_CURVEDIR_mixed), slurAngle, staff->m_drawingStaffSize);
-    bezier.UpdateControlPoints(controlPointPos);
+    bezier.CalcInitialControlPointParams(m_doc, slurAngle, staff->m_drawingStaffSize);
+    bezier.UpdateControlPoints();
     if (curveDir != curvature_CURVEDIR_mixed) {
         bezier.Rotate(slurAngle, bezier.p1);
     }

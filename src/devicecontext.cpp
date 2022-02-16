@@ -22,6 +22,12 @@
 
 namespace vrv {
 
+void BezierCurve::SetControlSides(bool leftAbove, bool rightAbove)
+{
+    m_leftControlAbove = leftAbove;
+    m_rightControlAbove = rightAbove;
+}
+
 void BezierCurve::Rotate(float angle, const Point &rotationPoint)
 {
     p1 = BoundingBox::CalcPositionAfterRotation(p1, angle, rotationPoint);
@@ -30,16 +36,16 @@ void BezierCurve::Rotate(float angle, const Point &rotationPoint)
     c2 = BoundingBox::CalcPositionAfterRotation(c2, angle, rotationPoint);
 }
 
-void BezierCurve::CalcInitialControlPointParams(Doc *doc, bool isConvex, float angle, int staffSize)
+void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staffSize)
 {
-    // Note: For convex curves we assume that the curve is rotated such that p1.y == p2.y,
-    // but for curves with mixed curvature we assume that the curve is unrotated
+    // Note: For convex curves (both control points on the same side) we assume that the curve is rotated
+    // such that p1.y == p2.y, but for curves with mixed curvature we assume that the curve is unrotated
     const int dist = abs(p2.x - p1.x);
     const int unit = doc->GetDrawingUnit(staffSize);
 
     // Initialize offset
     int offset = 0;
-    if (isConvex) {
+    if (m_leftControlAbove == m_rightControlAbove) {
         const double ratio = double(dist) / double(unit);
         double baseVal = (ratio > 4.0) ? 3.0 : 6.0;
         if ((ratio > 4.0) && (ratio < 32.0)) {
@@ -53,12 +59,12 @@ void BezierCurve::CalcInitialControlPointParams(Doc *doc, bool isConvex, float a
         offset = std::min(offset, 4 * unit);
     }
 
-    m_leftControlPointOffset = offset;
-    m_rightControlPointOffset = offset;
+    m_leftControlOffset = offset;
+    m_rightControlOffset = offset;
 
     // Initialize height
     int height = 1.2 * unit;
-    if (isConvex) {
+    if (m_leftControlAbove == m_rightControlAbove) {
         height = std::max(dist / 5, height);
         height = std::min(3 * unit, height);
         height *= doc->GetOptions()->m_slurCurveFactor.GetValue();
@@ -72,23 +78,23 @@ void BezierCurve::CalcInitialControlPointParams(Doc *doc, bool isConvex, float a
     this->SetControlHeight(height);
 }
 
-void BezierCurve::UpdateControlPointParams(const RelPositions &controlPointPos)
+void BezierCurve::UpdateControlPointParams()
 {
-    m_leftControlPointOffset = c1.x - p1.x;
-    m_rightControlPointOffset = p2.x - c2.x;
-    int sign = controlPointPos.isStartAbove ? 1 : -1;
+    m_leftControlOffset = c1.x - p1.x;
+    m_rightControlOffset = p2.x - c2.x;
+    int sign = m_leftControlAbove ? 1 : -1;
     m_leftControlHeight = sign * (c1.y - p1.y);
-    sign = controlPointPos.isEndAbove ? 1 : -1;
+    sign = m_rightControlAbove ? 1 : -1;
     m_rightControlHeight = sign * (c2.y - p2.y);
 }
 
-void BezierCurve::UpdateControlPoints(const RelPositions &controlPointPos)
+void BezierCurve::UpdateControlPoints()
 {
-    c1.x = p1.x + m_leftControlPointOffset;
-    c2.x = p2.x - m_rightControlPointOffset;
-    int sign = controlPointPos.isStartAbove ? 1 : -1;
+    c1.x = p1.x + m_leftControlOffset;
+    c2.x = p2.x - m_rightControlOffset;
+    int sign = m_leftControlAbove ? 1 : -1;
     c1.y = p1.y + sign * m_leftControlHeight;
-    sign = controlPointPos.isEndAbove ? 1 : -1;
+    sign = m_rightControlAbove ? 1 : -1;
     c2.y = p2.y + sign * m_rightControlHeight;
 }
 

@@ -33,6 +33,7 @@ struct ControlPointConstraint {
 };
 
 // Helper enum classes
+enum class SlurCurveDirection { None, Above, Below, MixedDownwards, MixedUpwards };
 enum class PortatoSlurType { None, StemSide, Centered };
 
 //----------------------------------------------------------------------------
@@ -69,24 +70,50 @@ public:
     ///@}
 
     /**
-     * @name Getter, setter and checker for the drawing curve direction and cross-staff flag
+     * @name Getter, setter and checker for the drawing curve direction
      */
     ///@{
-    curvature_CURVEDIR GetDrawingCurvedir() const { return m_drawingCurvedir; }
-    void SetDrawingCurvedir(curvature_CURVEDIR curvedir) { m_drawingCurvedir = curvedir; }
-    bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
+    SlurCurveDirection GetDrawingCurveDir() const { return m_drawingCurveDir; }
+    void SetDrawingCurveDir(SlurCurveDirection curveDir) { m_drawingCurveDir = curveDir; }
+    bool HasDrawingCurveDir() const { return (m_drawingCurveDir != SlurCurveDirection::None); }
+    curvature_CURVEDIR ReduceDrawingCurveDir() const;
     ///@}
 
     /**
-     * Determines the relative boundary positions from the drawing curve direction
+     * @name Additional checks based on the drawing curve direction
      */
-    RelPositions GetRelBoundaryPositions();
+    ///@{
+    bool HasMixedCurveDir() const
+    {
+        return (m_drawingCurveDir == SlurCurveDirection::MixedDownwards)
+            || (m_drawingCurveDir == SlurCurveDirection::MixedUpwards);
+    }
+    bool HasEndpointAboveStart() const
+    {
+        return (m_drawingCurveDir == SlurCurveDirection::Above)
+            || (m_drawingCurveDir == SlurCurveDirection::MixedUpwards);
+    }
+    bool HasEndpointBelowStart() const
+    {
+        return (m_drawingCurveDir == SlurCurveDirection::Below)
+            || (m_drawingCurveDir == SlurCurveDirection::MixedDownwards);
+    }
+    bool HasEndpointAboveEnd() const
+    {
+        return (m_drawingCurveDir == SlurCurveDirection::Above)
+            || (m_drawingCurveDir == SlurCurveDirection::MixedDownwards);
+    }
+    bool HasEndpointBelowEnd() const
+    {
+        return (m_drawingCurveDir == SlurCurveDirection::Below)
+            || (m_drawingCurveDir == SlurCurveDirection::MixedUpwards);
+    }
+    ///@}
 
     /**
      * Adjust starting coordinates for the slurs depending on the curve direction and spanning type of the slur
      */
-    std::pair<Point, Point> AdjustCoordinates(
-        Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, const RelPositions &boundaryPos);
+    std::pair<Point, Point> AdjustCoordinates(Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType);
 
     /**
      * Determine layer elements spanned by the slur
@@ -139,12 +166,11 @@ private:
      */
     ///@{
     // Retrieve the start and end note locations of the slur
-    std::pair<int, int> GetStartEndLocs(
-        Note *startNote, Chord *startChord, Note *endNote, Chord *endChord, const RelPositions &boundaryPos) const;
+    std::pair<int, int> GetStartEndLocs(Note *startNote, Chord *startChord, Note *endNote, Chord *endChord) const;
     // Calculate the break location at system start/end and the pitch difference
-    std::pair<int, int> CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, const RelPositions &boundaryPos) const;
+    std::pair<int, int> CalcBrokenLoc(Staff *staff, int startLoc, int endLoc) const;
     // Check if the slur resembles portato
-    PortatoSlurType IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord, const RelPositions &boundaryPos) const;
+    PortatoSlurType IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord) const;
     ///@}
 
     /**
@@ -196,13 +222,11 @@ public:
     //
 private:
     /**
-     * The drawing curve direction.
-     * This is calculated only when start - end points are on the same system. Otherwise
-     * it is left unset. This also means that it is reset only in ResetDrawing and not when
-     * the alignment is reset. The reason is because we want to preserve the value when the
-     * document is cast-off.
+     * The drawing curve direction
+     * This is calculated in the PrepareSlurs functor and contains an additional distinction
+     * for s-shaped slurs / mixed direction: whether the slur goes upwards or downwards
      */
-    curvature_CURVEDIR m_drawingCurvedir;
+    SlurCurveDirection m_drawingCurveDir;
 };
 
 } // namespace vrv

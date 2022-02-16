@@ -99,25 +99,17 @@ void Slur::Reset()
     this->ResetCurveRend();
     this->ResetLayerIdent();
 
-    m_drawingCurvedir = curvature_CURVEDIR_NONE;
+    m_drawingCurveDir = SlurCurveDirection::None;
 }
 
-RelPositions Slur::GetRelBoundaryPositions()
+curvature_CURVEDIR Slur::ReduceDrawingCurveDir() const
 {
-    switch (m_drawingCurvedir) {
-        case curvature_CURVEDIR_above: return { true, true };
-        case curvature_CURVEDIR_below: return { false, false };
-        case curvature_CURVEDIR_mixed: {
-            const int startStaffN = this->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
-            const int endStaffN = this->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
-            if (startStaffN < endStaffN) {
-                return { false, true };
-            }
-            else {
-                return { true, false };
-            }
-        }
-        default: return { true, true };
+    switch (m_drawingCurveDir) {
+        case SlurCurveDirection::Above: return curvature_CURVEDIR_above;
+        case SlurCurveDirection::Below: return curvature_CURVEDIR_below;
+        case SlurCurveDirection::MixedDownwards:
+        case SlurCurveDirection::MixedUpwards: return curvature_CURVEDIR_mixed;
+        default: return curvature_CURVEDIR_NONE;
     }
 }
 
@@ -326,8 +318,8 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     Point points[4];
     curve->GetPoints(points);
     BezierCurve bezier(points[0], points[1], points[2], points[3]);
-    const RelPositions controlPointPos = this->GetRelBoundaryPositions();
-    bezier.UpdateControlPointParams(controlPointPos);
+    bezier.SetControlSides(this->HasEndpointAboveStart(), this->HasEndpointAboveEnd());
+    bezier.UpdateControlPointParams();
 
     const int unit = doc->GetDrawingUnit(100);
     const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
@@ -350,7 +342,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
             lambda = double(bezier.c2.x - bezier.p1.x) / double(bezier.p2.x - bezier.p1.x);
             bezier.c2.y += sign * ((1.0 - lambda) * endPointShiftLeft + lambda * endPointShiftRight);
         }
-        bezier.UpdateControlPointParams(controlPointPos);
+        bezier.UpdateControlPointParams();
         curve->UpdatePoints(bezier);
     }
 
@@ -363,9 +355,9 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     int controlPointOffsetRight = 0;
     std::tie(ok, controlPointOffsetLeft, controlPointOffsetRight) = this->CalcControlPointOffset(curve, bezier, margin);
     if (ok) {
-        bezier.SetLeftControlPointOffset(controlPointOffsetLeft);
-        bezier.SetRightControlPointOffset(controlPointOffsetRight);
-        bezier.UpdateControlPoints(controlPointPos);
+        bezier.SetLeftControlOffset(controlPointOffsetLeft);
+        bezier.SetRightControlOffset(controlPointOffsetRight);
+        bezier.UpdateControlPoints();
         curve->UpdatePoints(bezier);
     }
 
@@ -380,7 +372,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         = this->CalcControlPointVerticalShift(curve, bezier, margin);
     bezier.SetLeftControlHeight(bezier.GetLeftControlHeight() + controlPointShiftLeft);
     bezier.SetRightControlHeight(bezier.GetRightControlHeight() + controlPointShiftRight);
-    bezier.UpdateControlPoints(controlPointPos);
+    bezier.UpdateControlPoints();
     curve->UpdatePoints(bezier);
 
     // STEP 5: Adjust the slur shape
@@ -565,11 +557,11 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
     // Calculate offset from extremal slope, but use 1/20 of horizontal distance as minimum
     const int minOffset = (bezierCurve.p2.x - bezierCurve.p1.x) / 20;
     int leftOffset = minOffset;
-    if (bezierCurve.GetLeftControlPointOffset() > 0) {
+    if (bezierCurve.GetLeftControlOffset() > 0) {
         leftOffset = std::max<int>(leftOffset, std::abs(bezierCurve.GetLeftControlHeight()) / leftSlopeMax);
     }
     int rightOffset = minOffset;
-    if (bezierCurve.GetRightControlPointOffset() > 0) {
+    if (bezierCurve.GetRightControlOffset() > 0) {
         rightOffset = std::max<int>(rightOffset, std::abs(bezierCurve.GetRightControlHeight()) / rightSlopeMax);
     }
 
@@ -699,10 +691,9 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
     }
 
     // Update control points
-    const RelPositions controlPointPos = this->GetRelBoundaryPositions();
-    if (!ignoreLeft) bezierCurve.SetLeftControlHeight(slopeLeft * sign * bezierCurve.GetLeftControlPointOffset());
-    if (!ignoreRight) bezierCurve.SetRightControlHeight(slopeRight * -sign * bezierCurve.GetRightControlPointOffset());
-    bezierCurve.UpdateControlPoints(controlPointPos);
+    if (!ignoreLeft) bezierCurve.SetLeftControlHeight(slopeLeft * sign * bezierCurve.GetLeftControlOffset());
+    if (!ignoreRight) bezierCurve.SetRightControlHeight(slopeRight * -sign * bezierCurve.GetRightControlOffset());
+    bezierCurve.UpdateControlPoints();
 
     // *** STEP 2: Ensure CONVEXITY ***
     // <)C1P1C2 and <)C1P2C2 should be at least 3 degree
@@ -724,9 +715,9 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
     }
 
     // Update control points
-    if (!ignoreLeft) bezierCurve.SetLeftControlHeight(slopeLeft * sign * bezierCurve.GetLeftControlPointOffset());
-    if (!ignoreRight) bezierCurve.SetRightControlHeight(slopeRight * -sign * bezierCurve.GetRightControlPointOffset());
-    bezierCurve.UpdateControlPoints(controlPointPos);
+    if (!ignoreLeft) bezierCurve.SetLeftControlHeight(slopeLeft * sign * bezierCurve.GetLeftControlOffset());
+    if (!ignoreRight) bezierCurve.SetRightControlHeight(slopeRight * -sign * bezierCurve.GetRightControlOffset());
+    bezierCurve.UpdateControlPoints();
 }
 
 double Slur::RotateSlope(double slope, double degrees, double doublingBound, bool upwards) const
@@ -867,7 +858,7 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION
 }
 
 std::pair<Point, Point> Slur::AdjustCoordinates(
-    Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, const RelPositions &boundaryPos)
+    Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType)
 {
     StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetStart());
     StemmedDrawingInterface *endStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetEnd());
@@ -916,7 +907,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     const bool isGraceToNoteSlur
         = !start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && start->IsGraceNote() && !end->IsGraceNote();
 
-    const PortatoSlurType portatoSlurType = this->IsPortatoSlur(doc, startNote, startChord, boundaryPos);
+    const PortatoSlurType portatoSlurType = this->IsPortatoSlur(doc, startNote, startChord);
 
     int x1, x2, y1, y2;
     std::tie(x1, x2, y1, y2) = std::tie(points.first.x, points.second.x, points.first.y, points.second.y);
@@ -936,7 +927,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             startChord->GetYExtremes(yChordMax, yChordMin);
         }
         // slur is up
-        if (boundaryPos.isStartAbove) {
+        if (this->HasEndpointAboveStart()) {
             // P(^)
             if (startStemDir == STEMDIRECTION_down || startStemLen == 0) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
@@ -1027,7 +1018,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         }
         // get the stem direction of the end
         // slur is up
-        if (boundaryPos.isEndAbove) {
+        if (this->HasEndpointAboveEnd()) {
             // (^)P
             if (endStemDir == STEMDIRECTION_down || endStemLen == 0) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
@@ -1124,7 +1115,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     // Positions not attached to a note
     int startLoc = 0;
     int endLoc = 0;
-    std::tie(startLoc, endLoc) = this->GetStartEndLocs(startNote, startChord, endNote, endChord, boundaryPos);
+    std::tie(startLoc, endLoc) = this->GetStartEndLocs(startNote, startChord, endNote, endChord);
 
     const int staffSize = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     const int staffTop = staff->GetDrawingY();
@@ -1132,9 +1123,9 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
 
     int brokenLoc = 0;
     int pitchDiff = 0;
-    std::tie(brokenLoc, pitchDiff) = this->CalcBrokenLoc(staff, startLoc, endLoc, boundaryPos);
+    std::tie(brokenLoc, pitchDiff) = this->CalcBrokenLoc(staff, startLoc, endLoc);
     if (spanningType == SPANNING_START) {
-        if (boundaryPos.isStartAbove) {
+        if (this->HasEndpointAboveStart()) {
             y2 = std::max(staffTop, y1);
             y2 += pitchDiff * unit / 2;
             y2 = std::max(staffTop, y2);
@@ -1146,14 +1137,14 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         }
         // Make sure that broken slurs do not look like ties
         if ((std::abs(y1 - y2) < 2 * unit) && (std::abs(x1 - x2) < 2 * staffSize)) {
-            const int sign = boundaryPos.isStartAbove ? 1 : -1;
+            const int sign = this->HasEndpointAboveStart() ? 1 : -1;
             y2 = y1 + 2 * sign * unit;
         }
         // At the end of a system, the slur finishes just short of the last barline
         x2 -= (doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize) + unit) / 2;
     }
     if (end->Is(TIMESTAMP_ATTR)) {
-        if (boundaryPos.isStartAbove) {
+        if (this->HasEndpointAboveStart()) {
             y2 = std::max(staffTop, y1);
         }
         else {
@@ -1161,7 +1152,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         }
     }
     if (spanningType == SPANNING_END) {
-        if (boundaryPos.isEndAbove) {
+        if (this->HasEndpointAboveEnd()) {
             y1 = std::max(staffTop, y2);
             y1 -= pitchDiff * unit / 2;
             y1 = std::max(staffTop, y1);
@@ -1173,12 +1164,12 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         }
         // Make sure that broken slurs do not look like ties
         if ((std::abs(y1 - y2) < 2 * unit) && (std::abs(x1 - x2) < 2 * staffSize)) {
-            const int sign = boundaryPos.isEndAbove ? 1 : -1;
+            const int sign = this->HasEndpointAboveEnd() ? 1 : -1;
             y1 = y2 + 2 * sign * unit;
         }
     }
     if (start->Is(TIMESTAMP_ATTR)) {
-        if (boundaryPos.isEndAbove) {
+        if (this->HasEndpointAboveEnd()) {
             y1 = std::max(staffTop, y2);
         }
         else {
@@ -1194,12 +1185,11 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     return std::make_pair(Point(x1, y1), Point(x2, y2));
 }
 
-std::pair<int, int> Slur::GetStartEndLocs(
-    Note *startNote, Chord *startChord, Note *endNote, Chord *endChord, const RelPositions &boundaryPos) const
+std::pair<int, int> Slur::GetStartEndLocs(Note *startNote, Chord *startChord, Note *endNote, Chord *endChord) const
 {
     int startLoc = startNote ? startNote->GetDrawingLoc() : 0;
     if (startChord) {
-        if (boundaryPos.isStartAbove) {
+        if (this->HasEndpointAboveStart()) {
             startLoc = startChord->GetTopNote()->GetDrawingLoc();
         }
         else {
@@ -1209,7 +1199,7 @@ std::pair<int, int> Slur::GetStartEndLocs(
 
     int endLoc = endNote ? endNote->GetDrawingLoc() : 0;
     if (endChord) {
-        if (boundaryPos.isEndAbove) {
+        if (this->HasEndpointAboveEnd()) {
             endLoc = endChord->GetTopNote()->GetDrawingLoc();
         }
         else {
@@ -1220,18 +1210,18 @@ std::pair<int, int> Slur::GetStartEndLocs(
     return { startLoc, endLoc };
 }
 
-std::pair<int, int> Slur::CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, const RelPositions &boundaryPos) const
+std::pair<int, int> Slur::CalcBrokenLoc(Staff *staff, int startLoc, int endLoc) const
 {
     assert(staff);
 
     const int staffTopLoc = 2 * (staff->m_drawingLines - 1);
-    const int loc1 = boundaryPos.isStartAbove ? std::max(startLoc, staffTopLoc - 1) : std::min(startLoc, 1);
-    const int loc2 = boundaryPos.isEndAbove ? std::max(endLoc, staffTopLoc - 1) : std::min(endLoc, 1);
+    const int loc1 = this->HasEndpointAboveStart() ? std::max(startLoc, staffTopLoc - 1) : std::min(startLoc, 1);
+    const int loc2 = this->HasEndpointAboveEnd() ? std::max(endLoc, staffTopLoc - 1) : std::min(endLoc, 1);
 
     return { (loc1 + loc2) / 2, loc2 - loc1 };
 }
 
-PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord, const RelPositions &boundaryPos) const
+PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord) const
 {
     ListOfObjects artics;
     if (startChord) {
@@ -1246,8 +1236,8 @@ PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord
         type = PortatoSlurType::Centered;
         Artic *artic = vrv_cast<Artic *>(artics.front());
         // Various cases where portato slurs shouldn't be applied
-        if (!artic->IsInsideArtic() || ((artic->GetDrawingPlace() == STAFFREL_above) && !boundaryPos.isStartAbove)
-            || ((artic->GetDrawingPlace() == STAFFREL_below) && boundaryPos.isStartAbove)) {
+        if (!artic->IsInsideArtic() || ((artic->GetDrawingPlace() == STAFFREL_above) && this->HasEndpointBelowStart())
+            || ((artic->GetDrawingPlace() == STAFFREL_below) && this->HasEndpointAboveStart())) {
             return PortatoSlurType::None;
         }
         // Check for stem side staccato
@@ -1271,7 +1261,7 @@ int Slur::ResetDrawing(FunctorParams *functorParams)
     // Call parent one too
     ControlElement::ResetDrawing(functorParams);
 
-    m_drawingCurvedir = curvature_CURVEDIR_NONE;
+    m_drawingCurveDir = SlurCurveDirection::None;
     // m_isCrossStaff = false;
 
     return FUNCTOR_CONTINUE;
@@ -1284,16 +1274,16 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
 
     // If curve direction is prescribed as above or below, use it
     if (this->HasCurvedir() && (this->GetCurvedir() != curvature_CURVEDIR_mixed)) {
-        this->SetDrawingCurvedir(
-            (this->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below);
+        this->SetDrawingCurveDir(
+            (this->GetCurvedir() == curvature_CURVEDIR_above) ? SlurCurveDirection::Above : SlurCurveDirection::Below);
     }
-    if (this->HasDrawingCurvedir()) return FUNCTOR_CONTINUE;
+    if (this->HasDrawingCurveDir()) return FUNCTOR_CONTINUE;
 
     // Retrieve boundary
     LayerElement *start = this->GetStart();
     LayerElement *end = this->GetEnd();
     if (!start || !end) {
-        this->SetDrawingCurvedir(curvature_CURVEDIR_above);
+        this->SetDrawingCurveDir(SlurCurveDirection::Above);
         return FUNCTOR_CONTINUE;
     }
 
@@ -1301,8 +1291,12 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
     if (this->GetCurvedir() == curvature_CURVEDIR_mixed) {
         const int startStaffN = start->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
         const int endStaffN = end->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
-        if (startStaffN != endStaffN) {
-            this->SetDrawingCurvedir(curvature_CURVEDIR_mixed);
+        if (startStaffN < endStaffN) {
+            this->SetDrawingCurveDir(SlurCurveDirection::MixedDownwards);
+            return FUNCTOR_CONTINUE;
+        }
+        else if (startStaffN > endStaffN) {
+            this->SetDrawingCurveDir(SlurCurveDirection::MixedUpwards);
             return FUNCTOR_CONTINUE;
         }
         else {
@@ -1313,7 +1307,7 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
     // Retrieve staves and system
     std::vector<Staff *> staffList = this->GetTstampStaves(this->GetStartMeasure(), this);
     if (staffList.empty()) {
-        this->SetDrawingCurvedir(curvature_CURVEDIR_above);
+        this->SetDrawingCurveDir(SlurCurveDirection::Above);
         return FUNCTOR_CONTINUE;
     }
     Staff *staff = staffList.at(0);
@@ -1324,12 +1318,11 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
 
     if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && system->HasMixedDrawingStemDir(start, end)) {
         // Handle mixed stem direction
-        if (crossStaff) {
-            const curvature_CURVEDIR curveDir = system->GetPreferredCurveDirection(start, end, this);
-            this->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE ? curveDir : curvature_CURVEDIR_above);
+        if (crossStaff && (system->GetPreferredCurveDirection(start, end, this) == curvature_CURVEDIR_below)) {
+            this->SetDrawingCurveDir(SlurCurveDirection::Below);
         }
         else {
-            this->SetDrawingCurvedir(curvature_CURVEDIR_above);
+            this->SetDrawingCurveDir(SlurCurveDirection::Above);
         }
     }
     else {
@@ -1342,9 +1335,13 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
 
         const int center = staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) / 2;
         const bool isAboveStaffCenter = (start->GetDrawingY() > center);
-        const curvature_CURVEDIR curveDir
-            = this->GetPreferredCurveDirection(params->m_doc, startStemDir, isAboveStaffCenter);
-        this->SetDrawingCurvedir(curveDir != curvature_CURVEDIR_NONE ? curveDir : curvature_CURVEDIR_above);
+        if (this->GetPreferredCurveDirection(params->m_doc, startStemDir, isAboveStaffCenter)
+            == curvature_CURVEDIR_below) {
+            this->SetDrawingCurveDir(SlurCurveDirection::Below);
+        }
+        else {
+            this->SetDrawingCurveDir(SlurCurveDirection::Above);
+        }
     }
 
     return FUNCTOR_CONTINUE;
