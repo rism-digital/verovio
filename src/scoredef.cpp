@@ -353,6 +353,8 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
                     staffDef->SetDrawMensur(true);
                     Mensur *mensur = newStaffDef->GetMensurCopy();
                     staffDef->SetCurrentMensur(mensur);
+                    // Invisible meterSig is still needed for mRest:
+                    staffDef->SetCurrentMeterSig(meterSig);
                     delete mensur;
                 }
                 else {
