@@ -1014,7 +1014,34 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
         accid->SetZone(zone);
-        layer->AddChild(accid);
+        
+        // find the closest two neume
+        // if the two share the same parent, add accid inside syllable
+        // if not, add accid between syllables
+        ListOfObjects neumes;
+        ClassIdComparison ac(NEUME);
+        staff->FindAllDescendantByComparison(&neumes, &ac);
+        
+        if (neumes.size() < 2) {
+            layer->AddChild(accid);
+        } else {
+            std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
+
+            ClosestNeume compN;
+            compN.x = ulx;
+            compN.y = uly;
+
+            std::sort(neumesVector.begin(), neumesVector.end(), compN);
+            Object *fNeume = neumesVector.at(0);
+            Object *sNeume = neumesVector.at(1);
+
+            Object *fSyllable = fNeume->GetParent();
+            if (fSyllable->GetChildIndex(sNeume) == -1){
+                layer->AddChild(accid);
+            } else {
+                fSyllable->AddChild(accid);
+            }
+        }
 
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
@@ -1065,7 +1092,34 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
         divLine->SetZone(zone);
-        layer->AddChild(divLine);
+
+        // find the closest two neume
+        // if the two share the same parent, add divLine inside syllable
+        // if not, add divLine between syllables
+        ListOfObjects neumes;
+        ClassIdComparison ac(NEUME);
+        staff->FindAllDescendantByComparison(&neumes, &ac);
+        
+        if (neumes.size() < 2) {
+            layer->AddChild(divLine);
+        } else {
+            std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
+
+            ClosestNeume compN;
+            compN.x = ulx;
+            compN.y = uly;
+
+            std::sort(neumesVector.begin(), neumesVector.end(), compN);
+            Object *fNeume = neumesVector.at(0);
+            Object *sNeume = neumesVector.at(1);
+
+            Object *fSyllable = fNeume->GetParent();
+            if (fSyllable->GetChildIndex(sNeume) == -1){
+                layer->AddChild(divLine);
+            } else {
+                fSyllable->AddChild(divLine);
+            }
+        }
         
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);

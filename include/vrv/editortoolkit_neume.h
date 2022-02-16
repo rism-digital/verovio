@@ -128,6 +128,26 @@ struct ClosestBB {
     }
 };
 
+// To be used with std::stable_sort to find the position to insert a new accid / divLine
+struct ClosestNeume {
+    int x;
+    int y;
+
+    bool operator()(Object *a, Object *b)
+    {
+        if (!a->GetFirst(NC)->GetFacsimileInterface() || !b->GetFirst(NC)->GetFacsimileInterface()) return true;
+        Zone *zoneA = a->GetFirst(NC)->GetFacsimileInterface()->GetZone();
+        Zone *zoneB = b->GetFirst(NC)->GetFacsimileInterface()->GetZone();
+
+        int distA
+            = std::abs(x - zoneA->GetUlx());
+        int distB
+            = std::abs(x - zoneB->GetUlx());
+        
+        return (distA < distB);
+    }
+};
+
 // To be used with std::stable_sort to find the position to insert a new staff
 
 struct StaffSort {
