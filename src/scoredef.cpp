@@ -343,11 +343,29 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
             delete meterSig;
         }
         else if (newStaffDef->HasMeterSigInfo()) {
-            staffDef->SetDrawMeterSig(true);
-            // Never draw a meterSig AND a mensur
-            staffDef->SetDrawMensur(false);
             MeterSig *meterSig = newStaffDef->GetMeterSigCopy();
-            staffDef->SetCurrentMeterSig(meterSig);
+            if (newStaffDef->HasMensurInfo()) {
+                // If there is a mensur and the meterSig
+                // is invisible, then print mensur instead
+                data_METERFORM meterForm = meterSig->GetForm();
+                if (meterForm == METERFORM_invis) {
+                    staffDef->SetDrawMeterSig(false);
+                    staffDef->SetDrawMensur(true);
+                    Mensur *mensur = newStaffDef->GetMensurCopy();
+                    staffDef->SetCurrentMensur(mensur);
+                    delete mensur;
+                }
+                else {
+                    staffDef->SetDrawMeterSig(true);
+                    staffDef->SetDrawMensur(false);
+                    staffDef->SetCurrentMeterSig(meterSig);
+                }
+            }
+            else {
+                staffDef->SetDrawMeterSig(true);
+                staffDef->SetDrawMensur(false);
+                staffDef->SetCurrentMeterSig(meterSig);
+            }
             delete meterSig;
         }
         // copy other attributes if present
