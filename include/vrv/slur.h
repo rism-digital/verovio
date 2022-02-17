@@ -129,8 +129,8 @@ public:
      * Determine whether a layer element should lie above or below the slur
      */
     ///@{
-    bool IsElementAbove(LayerElement *element, Staff *startStaff, Staff *endStaff) const;
-    bool IsElementAbove(FloatingPositioner *positioner, Staff *startStaff, Staff *endStaff) const;
+    bool IsElementBelow(LayerElement *element, Staff *startStaff, Staff *endStaff) const;
+    bool IsElementBelow(FloatingPositioner *positioner, Staff *startStaff, Staff *endStaff) const;
     ///@}
 
     /**

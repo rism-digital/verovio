@@ -197,7 +197,7 @@ float View::CalcInitialSlur(
             || ((pRight.x > bezier.p1.x) && (pRight.x < bezier.p2.x))) {
             CurveSpannedElement *spannedElement = new CurveSpannedElement();
             spannedElement->m_boundingBox = element;
-            spannedElement->m_isAbove = slur->IsElementAbove(element, startStaff, endStaff);
+            spannedElement->m_isBelow = slur->IsElementBelow(element, startStaff, endStaff);
             curve->AddSpannedElement(spannedElement);
         }
 
@@ -225,7 +225,7 @@ float View::CalcInitialSlur(
                 && (positioner->GetContentLeft() < bezier.p2.x)) {
                 CurveSpannedElement *spannedElement = new CurveSpannedElement();
                 spannedElement->m_boundingBox = positioner;
-                spannedElement->m_isAbove = slur->IsElementAbove(positioner, startStaff, endStaff);
+                spannedElement->m_isBelow = slur->IsElementBelow(positioner, startStaff, endStaff);
                 curve->AddSpannedElement(spannedElement);
             }
         }
