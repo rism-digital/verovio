@@ -594,6 +594,7 @@ public:
     OptionBool m_mensuralToMeasure;
     OptionDbl m_midiTempoAdjustment;
     OptionDbl m_minLastJustification;
+    OptionDbl m_maxSingleSystemJustification;
     OptionBool m_mmOutput;
     OptionIntMap m_footer;
     OptionIntMap m_header;

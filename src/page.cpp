@@ -619,9 +619,9 @@ void Page::JustifyVertically()
     // Last page and justification of last page is not enabled
     Pages *pages = doc->GetPages();
     assert(pages);
+    const int childSystems = this->GetChildCount(SYSTEM);
     if (pages->GetLast() == this) {
         int idx = this->GetIdx();
-        const int childSystems = this->GetChildCount(SYSTEM);
         if (idx > 0) {
             Page *penultimatePage = dynamic_cast<Page *>(pages->GetPrevious(this));
             assert(penultimatePage);
@@ -638,6 +638,13 @@ void Page::JustifyVertically()
         else {
             const int stavesPerSystem = m_drawingScoreDef.GetDescendantCount(STAFFDEF);
             if (childSystems * stavesPerSystem < 8) return;
+        }
+    }
+    else if (childSystems == 1) {
+        const double ratio = (double)m_drawingJustifiableHeight / (double)doc->m_drawingPageHeight;
+        if (ratio > doc->GetOptions()->m_maxSingleSystemJustification.GetValue()) {
+            m_drawingJustifiableHeight = 0;
+            return;
         }
     }
 
