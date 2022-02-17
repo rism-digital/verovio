@@ -428,8 +428,9 @@ int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
     }
 
     // Limit shortening with duration shorter than quarter not when not in a beam
-    if ((this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
-        if (stemDir == STEMDIRECTION_up) {
+
+    if ((this->GetDrawingDur() > DUR_4) && !this->IsInBeam() && !this->IsInBeamSpan()) {
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             shortening = std::min(4, shortening);
         }
         else {
@@ -971,9 +972,9 @@ int Note::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // Stems have been calculated previously in Beam or fTrem
-    // Return to siblings because flags do not need to be processed either in that case
-    if ((this->IsInBeam() || this->IsInFTrem())) {
+    // Stems have been calculated previously in Beam or fTrem - siblings because flags do not need to
+    // be processed either
+    if (this->IsInBeam() || this->IsInFTrem() || this->IsInBeamSpan()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -1180,7 +1181,7 @@ int Note::CalcDots(FunctorParams *functorParams)
 
         // Stem up, shorter than 4th and not in beam
         if ((this->GetDots() != 0) && (params->m_chordStemDir == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4)
-            && !this->IsInBeam()) {
+            && !this->IsInBeam() && !this->IsInBeamSpan()) {
             // Shift according to the flag width if the top note is not flipped
             if ((this == chord->GetTopNote()) && !this->GetFlippedNotehead()) {
                 // HARDCODED
@@ -1203,8 +1204,8 @@ int Note::CalcDots(FunctorParams *functorParams)
         if (const int shift = dots->GetFlagShift(); shift) {
             flagShift += shift;
         }
-        else if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (!this->IsInBeam())
-            && (this->GetDrawingStemLen() < 3) && (IsDotOverlappingWithFlag(params->m_doc, staffSize, isDotShifted))) {
+        else if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && !this->IsInBeam() && (this->GetDrawingStemLen() < 3)
+            && !this->IsInBeamSpan() && (this->IsDotOverlappingWithFlag(params->m_doc, staffSize, isDotShifted))) {
             // HARDCODED
             const int shift = params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
             flagShift += shift;
@@ -1287,7 +1288,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     }
 
     if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem() && !this->IsChordTone()
-        && !this->IsMensuralDur() && !this->IsTabGrpNote()) {
+        && !this->IsMensuralDur() && !this->IsTabGrpNote() && !this->IsInBeamSpan()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {

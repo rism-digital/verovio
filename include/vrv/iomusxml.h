@@ -26,6 +26,7 @@
 namespace vrv {
 
 class Arpeg;
+class BeamSpan;
 class BracketSpan;
 class Clef;
 class ControlElement;
@@ -218,7 +219,7 @@ private:
     void ReadMusicXmlNote(
         pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
-    void ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
+    bool ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
     void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
     void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
     void ReadMusicXMLMeterSig(const pugi::xml_node &node, Object *parent);
@@ -292,6 +293,11 @@ private:
      */
     void RemoveLastFromStack(ClassId classId, Layer *layer);
 
+    /**
+     * Check if element of classId type is present on the specified layer
+     */
+    bool IsInStack(ClassId classId, Layer *layer);
+
     /*
      * @name Helper methods for checking presence of values of attributes or elements
      */
@@ -327,6 +333,7 @@ private:
     void CloseTie(Note *note);
     void OpenSlur(Measure *measure, short int number, Slur *slur);
     void CloseSlur(Measure *measure, short int number, LayerElement *element);
+    void CloseBeamSpan(Staff *staff, Layer *layer, LayerElement *element);
     ///@}
 
     /*
@@ -484,6 +491,8 @@ private:
     /* The stack for hairpin stops that might occur before a hairpin was started staffNumber, tStamp2, (hairpinNumber,
      * measureCount) */
     std::vector<std::tuple<int, double, musicxml::OpenSpanner>> m_hairpinStopStack;
+    /* The stack for the beamspans with numbers of staff/layer where starting element is located*/
+    std::vector<std::pair<BeamSpan *, std::pair<int, int>>> m_beamspanStack;
     std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner>> m_bracketStack;
     std::vector<std::pair<Trill *, musicxml::OpenSpanner>> m_trillStack;
     /* The stack of endings to be inserted at the end of XML import */

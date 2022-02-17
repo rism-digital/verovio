@@ -33,6 +33,7 @@ class Arpeg;
 class Artic;
 class BarLine;
 class Beam;
+class BeamSpan;
 class BeatRpt;
 class BracketSpan;
 class Breath;
@@ -390,6 +391,7 @@ private:
     ///@{
     void WriteAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
     void WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg);
+    void WriteBeamSpan(pugi::xml_node currentNode, BeamSpan *beamSpan);
     void WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan);
     void WriteBreath(pugi::xml_node currentNode, Breath *breath);
     void WriteCaesura(pugi::xml_node currentNode, Caesura *caesura);
@@ -686,6 +688,7 @@ private:
     ///@{
     bool ReadAnchoredText(Object *parent, pugi::xml_node anchoredText);
     bool ReadArpeg(Object *parent, pugi::xml_node arpeg);
+    bool ReadBeamSpan(Object *parent, pugi::xml_node beamSpan);
     bool ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan);
     bool ReadBreath(Object *parent, pugi::xml_node breath);
     bool ReadCaesura(Object *parent, pugi::xml_node caesura);
@@ -785,7 +788,6 @@ private:
     ///@{
     bool ReadFacsimile(Doc *doc, pugi::xml_node facsimile);
     bool ReadSurface(Facsimile *parent, pugi::xml_node surface);
-    bool ReadBeamSpanAsBeam(Measure *measure, pugi::xml_node beamSpan);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
     bool ReadZone(Surface *parent, pugi::xml_node zone);
     ///@}

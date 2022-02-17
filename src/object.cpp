@@ -583,14 +583,14 @@ void Object::FindAllDescendantsByComparison(
 }
 
 void Object::FindAllDescendantsBetween(
-    ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear)
+    ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear, int depth)
 {
     assert(objects);
     if (clear) objects->clear();
 
     Functor findAllBetween(&Object::FindAllBetween);
     FindAllBetweenParams findAllBetweenParams(comparison, objects, start, end);
-    this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD, true);
+    this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, depth, FORWARD, true);
 }
 
 Object *Object::GetChild(int idx) const
@@ -1574,12 +1574,21 @@ int Object::PreparePlist(FunctorParams *functorParams)
         return interface->InterfacePreparePlist(functorParams, this);
     }
 
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::ProcessPlist(FunctorParams *functorParams)
+{
+    PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
+    assert(params);
+
+    if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
+
     std::string uuid = this->GetUuid();
-    auto i = std::find_if(params->m_interfaceUuidPairs.begin(), params->m_interfaceUuidPairs.end(),
-        [uuid](std::pair<PlistInterface *, std::string> pair) { return (pair.second == uuid); });
-    if (i != params->m_interfaceUuidPairs.end()) {
-        i->first->SetRef(this);
-        params->m_interfaceUuidPairs.erase(i);
+    auto i = std::find_if(params->m_interfaceUuidTuples.begin(), params->m_interfaceUuidTuples.end(),
+        [&uuid](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == uuid); });
+    if (i != params->m_interfaceUuidTuples.end()) {
+        std::get<2>(*i) = this;
     }
 
     return FUNCTOR_CONTINUE;
@@ -1917,6 +1926,30 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     if (!this->IsLayerElement()) {
         return FUNCTOR_CONTINUE;
+    }
+
+    // Take into account beam in cross-staff situation
+    if (this->Is(BEAM)) {
+        Beam *beam = vrv_cast<Beam *>(this);
+        assert(beam);
+        // Ignore it if it has cross-staff content but is not entirely cross-staff itself
+        if (beam->m_crossStaffContent && !beam->m_crossStaff) return FUNCTOR_CONTINUE;
+    }
+
+    // Take into account stem for notes in cross-staff situation and in beams
+    if (this->Is(STEM)) {
+        LayerElement *noteOrChord = dynamic_cast<LayerElement *>(this->GetParent());
+        if (noteOrChord && noteOrChord->m_crossStaff) {
+            if (noteOrChord->IsInBeam()) {
+                Beam *beam = vrv_cast<Beam *>(noteOrChord->GetFirstAncestor(BEAM));
+                assert(beam);
+                // Ignore it but only if the beam is not entirely cross-staff itself
+                if (!beam->m_crossStaff) return FUNCTOR_CONTINUE;
+            }
+            else if (noteOrChord->IsInBeamSpan()) {
+                return FUNCTOR_CONTINUE;
+            }
+        }
     }
 
     if (this->Is(FB) || this->Is(FIGURE)) {

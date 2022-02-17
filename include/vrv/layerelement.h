@@ -124,6 +124,7 @@ public:
      * Looking in the content list is necessary for grace notes or imbricated beams.
      */
     Beam *IsInBeam();
+    bool IsInBeamSpan() const;
     ///@}
 
     /**
@@ -481,6 +482,9 @@ public:
      */
     Staff *m_crossStaff;
     Layer *m_crossLayer;
+
+    // flag to indicate that layerElement belongs to the beamSpan
+    bool m_isInBeamspan;
 
 protected:
     Alignment *m_alignment;

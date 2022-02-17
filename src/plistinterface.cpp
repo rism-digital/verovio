@@ -102,7 +102,7 @@ int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *
 
     std::vector<std::string>::iterator iter;
     for (iter = m_uuids.begin(); iter != m_uuids.end(); ++iter) {
-        params->m_interfaceUuidPairs.push_back({ this, *iter });
+        params->m_interfaceUuidTuples.push_back(std::make_tuple(this, *iter, (Object *)NULL));
     }
 
     return FUNCTOR_CONTINUE;

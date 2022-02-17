@@ -411,8 +411,8 @@ public:
      * Return all the objects matching the Comparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
-    void FindAllDescendantsBetween(
-        ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
+    void FindAllDescendantsBetween(ListOfObjects *objects, Comparison *comparison, Object *start, Object *end,
+        bool clear = true, int depth = UNLIMITED_DEPTH);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -1066,11 +1066,16 @@ public:
     virtual int PrepareProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Match elements of @plist.
+     * Prepare list of elements in the @plist.
      */
     ///@{
     virtual int PreparePlist(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * Match elements of @plist
+     */
+    virtual int ProcessPlist(FunctorParams *functorParams);
 
     /**
      * Extract default duration from scoredef/staffdef
@@ -1279,6 +1284,24 @@ public:
      */
     ///@{
     virtual int PrepareMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Get the list of referenced elements for the beamSpan as well as set referenced
+     * object for those elements to beamSpan containing them.
+     */
+    ///@{
+    virtual int ResolveBeamSpanElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Resolve spanning beamspans by breaking it into separate parts, each belonging to the corresponding
+     * system/measure. BeamSpans get elements reassigned, so that each beamSpan can be drawn as control
+     * element. This allows free placement of beamSpan in the MEI tree and ensures that beamSpan will be
+     * drawn properly
+     */
+    ///@{
+    virtual int ResolveSpanningBeamSpans(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

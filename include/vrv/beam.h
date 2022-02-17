@@ -189,6 +189,57 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// BeamSpanSegment
+//----------------------------------------------------------------------------
+
+// Class for storing additional information regarding beamSegment placement (in case of beamSpan spanning over
+// the systems)
+class BeamSpanSegment : public BeamSegment {
+public:
+    BeamSpanSegment();
+    virtual ~BeamSpanSegment(){};
+
+    /**
+     * Set/get methods for member variables
+     */
+    ///@{
+    Measure *GetMeasure() const { return m_measure; }
+    void SetMeasure(Measure *measure) { m_measure = measure; }
+    Staff *GetStaff() const { return m_staff; }
+    void SetStaff(Staff *staff) { m_staff = staff; }
+    Layer *GetLayer() const { return m_layer; }
+    void SetLayer(Layer *layer) { m_layer = layer; }
+    BeamElementCoord *GetBeginCoord() const { return m_begin; }
+    void SetBeginCoord(BeamElementCoord *begin) { m_begin = begin; }
+    BeamElementCoord *GetEndCoord() const { return m_end; }
+    void SetEndCoord(BeamElementCoord *end) { m_end = end; }
+    ///@}
+
+    /**
+     * Set/get methods for spanning type of segment.
+     * Set spanning type based on the positioning of the beam segment
+     */
+    ///@{
+    void SetSpanningType(int systemIndex, int systemCount);
+    int GetSpanningType() const { return m_spanningType; }
+    ///@}
+
+    // Helper to append coordinates for the beamSpans that are drawn over systems
+    void AppendSpanningCoordinates(Measure *measure);
+
+private:
+    // main values to track positioning of the segment
+    Measure *m_measure;
+    Staff *m_staff;
+    Layer *m_layer;
+    BeamElementCoord *m_begin;
+    BeamElementCoord *m_end;
+
+    // spanning type for purposes of adding additional coordinates to segment
+    int m_spanningType = SPANNING_START_END;
+};
+
+//----------------------------------------------------------------------------
 // Beam
 //----------------------------------------------------------------------------
 
