@@ -358,7 +358,7 @@ private:
      * Return whether dots are overlapping with flag. Take into account flag height, its position as well
      * as position of the note and position of the dots
      */
-    bool IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted);
+    bool IsDotOverlappingWithFlag(Doc *doc, const int staffSize, int dotLocShift);
 
     /**
      * Register deferred notes for MIDI

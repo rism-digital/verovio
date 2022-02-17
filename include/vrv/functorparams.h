@@ -283,7 +283,7 @@ public:
     }
     std::vector<int> m_staffNs;
     std::vector<LayerElement *> m_elements;
-    std::vector<LayerElement *> m_dots;
+    std::vector<Dots *> m_dots;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;

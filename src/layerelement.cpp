@@ -1495,7 +1495,7 @@ int LayerElement::AdjustDots(FunctorParams *functorParams)
 
     if (this->Is(NOTE) && this->GetParent()->Is(CHORD)) return FUNCTOR_SIBLINGS;
     if (this->Is(DOTS)) {
-        params->m_dots.push_back(this);
+        params->m_dots.push_back(vrv_cast<Dots *>(this));
     }
     else {
         params->m_elements.push_back(this);
@@ -1711,7 +1711,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
         else if (this->Is(NOTE)) {
             Note *currentNote = vrv_cast<Note *>(this);
             assert(currentNote);
-            if (otherElements.at(i)->Is(STEM) && (shift == 0)) {
+            if (otherElements.at(i)->Is(STEM) && (shift == 0) && areDotsAdjusted) {
                 const int horizontalMargin = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
                 const data_STEMDIRECTION stemDir = stem->GetDrawingStemDir();
