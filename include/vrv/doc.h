@@ -213,7 +213,7 @@ public:
      * true before ExportMIDI() or ExportTimemap() can export anything (These two functions
      * will automatically run CalculateMidiTimemap() if HasMidiTimemap() return false.
      */
-    bool HasMidiTimemap();
+    bool HasMidiTimemap() const;
 
     /**
      * Export the document to a MIDI file.

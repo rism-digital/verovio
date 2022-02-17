@@ -244,7 +244,7 @@ bool Doc::GenerateMeasureNumbers()
     return true;
 }
 
-bool Doc::HasMidiTimemap()
+bool Doc::HasMidiTimemap() const
 {
     return (m_MIDITimemapTempo == m_options->m_midiTempoAdjustment.GetValue());
 }

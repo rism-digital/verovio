@@ -114,6 +114,7 @@ public:
      */
     ///@{
     Accid *GetDrawingAccid();
+    const Accid *GetDrawingAccid() const;
     ///@}
 
     /**
@@ -131,7 +132,7 @@ public:
      * Otherwise, it will look for the Staff ancestor.
      * Set the value of ledger lines above or below.
      */
-    bool HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff = NULL);
+    bool HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff = NULL) const;
 
     /**
      * Overriding functions to return information from chord parent if any

@@ -77,9 +77,9 @@ bool Harm::IsSupportedChild(Object *child)
     return true;
 }
 
-bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos)
+bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos) const
 {
-    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    const Text *textObject = dynamic_cast<const Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return false;
     std::wstring text = textObject->GetText();
 
@@ -119,9 +119,9 @@ void Harm::SetRootPitch(const TransPitch &pitch, unsigned int endPos)
     }
 }
 
-bool Harm::GetBassPitch(TransPitch &pitch)
+bool Harm::GetBassPitch(TransPitch &pitch) const
 {
-    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    const Text *textObject = dynamic_cast<const Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return false;
     std::wstring text = textObject->GetText();
     if (!text.length()) return false;

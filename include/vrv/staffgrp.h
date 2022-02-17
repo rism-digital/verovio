@@ -86,8 +86,8 @@ public:
      * @name Methods for checking the presence of label and labelAbbr information and getting them.
      */
     ///@{
-    bool HasLabelInfo();
-    bool HasLabelAbbrInfo();
+    bool HasLabelInfo() const;
+    bool HasLabelAbbrInfo() const;
 
     ///@}
 
@@ -97,9 +97,11 @@ public:
      */
     ///@{
     Label *GetLabel();
-    Label *GetLabelCopy();
+    const Label *GetLabel() const;
+    Label *GetLabelCopy() const;
     LabelAbbr *GetLabelAbbr();
-    LabelAbbr *GetLabelAbbrCopy();
+    const LabelAbbr *GetLabelAbbr() const;
+    LabelAbbr *GetLabelAbbrCopy() const;
     ///@}
 
     //----------//

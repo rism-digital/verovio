@@ -172,25 +172,30 @@ void StaffGrp::SetGroupSymbol(GrpSym *grpSym)
     }
 }
 
-bool StaffGrp::HasLabelInfo()
+bool StaffGrp::HasLabelInfo() const
 {
     return (this->FindDescendantByType(LABEL, 1));
 }
 
-bool StaffGrp::HasLabelAbbrInfo()
+bool StaffGrp::HasLabelAbbrInfo() const
 {
     return (this->FindDescendantByType(LABELABBR, 1));
 }
 
 Label *StaffGrp::GetLabel()
 {
+    return const_cast<Label *>(std::as_const(*this).GetLabel());
+}
+
+const Label *StaffGrp::GetLabel() const
+{
     // Always check if HasLabelInfo() is true before asking for it
-    Label *label = vrv_cast<Label *>(this->FindDescendantByType(LABEL, 1));
+    const Label *label = vrv_cast<const Label *>(this->FindDescendantByType(LABEL, 1));
     assert(label);
     return label;
 }
 
-Label *StaffGrp::GetLabelCopy()
+Label *StaffGrp::GetLabelCopy() const
 {
     // Always check if HasClefInfo() is true before asking for a clone
     Label *clone = dynamic_cast<Label *>(this->GetLabel()->Clone());
@@ -201,13 +206,18 @@ Label *StaffGrp::GetLabelCopy()
 
 LabelAbbr *StaffGrp::GetLabelAbbr()
 {
+    return const_cast<LabelAbbr *>(std::as_const(*this).GetLabelAbbr());
+}
+
+const LabelAbbr *StaffGrp::GetLabelAbbr() const
+{
     // Always check if HasLabelAbbrInfo() is true before asking for it
-    LabelAbbr *labelAbbr = vrv_cast<LabelAbbr *>(this->FindDescendantByType(LABELABBR, 1));
+    const LabelAbbr *labelAbbr = vrv_cast<const LabelAbbr *>(this->FindDescendantByType(LABELABBR, 1));
     assert(labelAbbr);
     return labelAbbr;
 }
 
-LabelAbbr *StaffGrp::GetLabelAbbrCopy()
+LabelAbbr *StaffGrp::GetLabelAbbrCopy() const
 {
     // Always check if HasClefInfo() is true before asking for a clone
     LabelAbbr *clone = dynamic_cast<LabelAbbr *>(this->GetLabelAbbr()->Clone());

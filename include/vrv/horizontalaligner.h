@@ -192,12 +192,12 @@ public:
     /**
      * Return true if the alignment contains at least one reference with staffN
      */
-    bool HasAlignmentReference(int staffN);
+    bool HasAlignmentReference(int staffN) const;
 
     /**
      * Return true if the alignment contains only references to timestamp attributes.
      */
-    bool HasTimestampOnly();
+    bool HasTimestampOnly() const;
 
     //----------//
     // Functors //

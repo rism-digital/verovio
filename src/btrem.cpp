@@ -108,7 +108,7 @@ int BTrem::GenerateMIDI(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-data_DURATION BTrem::CalcIndividualNoteDuration()
+data_DURATION BTrem::CalcIndividualNoteDuration() const
 {
     // Check if duration is given by attribute
     if (this->HasUnitdur()) {
@@ -118,13 +118,13 @@ data_DURATION BTrem::CalcIndividualNoteDuration()
     // Otherwise consider duration and stem modifier of first child chord/note
     data_DURATION childDur = DURATION_NONE;
     data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
-    Chord *chord = vrv_cast<Chord *>(this->FindDescendantByType(CHORD));
+    const Chord *chord = vrv_cast<const Chord *>(this->FindDescendantByType(CHORD));
     if (chord) {
         childDur = chord->GetDur();
         stemMod = chord->GetStemMod();
     }
     else {
-        Note *note = vrv_cast<Note *>(this->FindDescendantByType(NOTE));
+        const Note *note = vrv_cast<const Note *>(this->FindDescendantByType(NOTE));
         if (note) {
             childDur = note->GetDur();
             stemMod = note->GetStemMod();

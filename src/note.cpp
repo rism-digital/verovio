@@ -201,11 +201,15 @@ void Note::AlignDotsShift(Note *otherNote)
 
 Accid *Note::GetDrawingAccid()
 {
-    Accid *accid = dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
-    return accid;
+    return dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
 }
 
-bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
+const Accid *Note::GetDrawingAccid() const
+{
+    return dynamic_cast<const Accid *>(this->FindDescendantByType(ACCID));
+}
+
+bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
 {
     if (!staff) {
         staff = this->GetAncestorStaff();

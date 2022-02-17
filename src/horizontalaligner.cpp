@@ -491,13 +491,13 @@ bool Alignment::HasAccidVerticalOverlap(Alignment *otherAlignment, int staffN)
     return otherRef->HasAccidVerticalOverlap(currentRef->GetChildren());
 }
 
-bool Alignment::HasAlignmentReference(int staffN)
+bool Alignment::HasAlignmentReference(int staffN) const
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
     return (this->FindDescendantByComparison(&matchStaff, 1) != NULL);
 }
 
-bool Alignment::HasTimestampOnly()
+bool Alignment::HasTimestampOnly() const
 {
     // If no child, then not timestamp
     if (!this->GetChildCount()) return false;
