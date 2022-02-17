@@ -278,17 +278,17 @@ Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spann
 {
     Staff *extremalStaff = staff;
 
-    const curvature_CURVEDIR curveDir = this->GetCurvedir();
+    const SlurCurveDirection curveDir = this->GetDrawingCurveDir();
     const std::vector<LayerElement *> spannedElements = this->CollectSpannedElements(staff, xMin, xMax, spanningType);
 
-    // The floating curve positioner of cross staff slurs should live in the upper/lower staff alignment
-    // corresponding to whether the slur is curved above/below
+    // The floating curve positioner of cross staff slurs should live in the lower/upper staff alignment
+    // corresponding to whether the slur is curved below or not
     auto adaptStaff = [&extremalStaff, curveDir](LayerElement *element) {
         Staff *elementStaff = element->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-        if ((curveDir == curvature_CURVEDIR_above) && (elementStaff->GetN() < extremalStaff->GetN())) {
-            extremalStaff = elementStaff;
-        }
-        if ((curveDir == curvature_CURVEDIR_below) && (elementStaff->GetN() > extremalStaff->GetN())) {
+        const bool updateExtremal = (curveDir == SlurCurveDirection::Below)
+            ? (elementStaff->GetN() > extremalStaff->GetN())
+            : (elementStaff->GetN() < extremalStaff->GetN());
+        if (updateExtremal) {
             extremalStaff = elementStaff;
         }
     };
@@ -304,6 +304,32 @@ Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spann
     });
 
     return extremalStaff;
+}
+
+bool Slur::IsElementAbove(LayerElement *element, Staff *startStaff, Staff *endStaff) const
+{
+    switch (this->GetDrawingCurveDir()) {
+        case SlurCurveDirection::Above: return false;
+        case SlurCurveDirection::Below: return true;
+        case SlurCurveDirection::MixedDownwards:
+            return (element->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN() == startStaff->GetN());
+        case SlurCurveDirection::MixedUpwards:
+            return (element->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN() == endStaff->GetN());
+        default: return false;
+    }
+}
+
+bool Slur::IsElementAbove(FloatingPositioner *positioner, Staff *startStaff, Staff *endStaff) const
+{
+    switch (this->GetDrawingCurveDir()) {
+        case SlurCurveDirection::Above: return false;
+        case SlurCurveDirection::Below: return true;
+        case SlurCurveDirection::MixedDownwards:
+            return (positioner->GetAlignment()->GetStaff()->GetN() == startStaff->GetN());
+        case SlurCurveDirection::MixedUpwards:
+            return (positioner->GetAlignment()->GetStaff()->GetN() == endStaff->GetN());
+        default: return false;
+    }
 }
 
 void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)

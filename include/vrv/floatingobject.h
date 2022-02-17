@@ -387,12 +387,14 @@ public:
     {
         m_boundingBox = NULL;
         m_discarded = false;
+        m_isAbove = false;
     }
     virtual ~CurveSpannedElement(){};
 
     Point m_rotatedPoints[4];
     BoundingBox *m_boundingBox;
     bool m_discarded;
+    bool m_isAbove;
 };
 
 } // namespace vrv
