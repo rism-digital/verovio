@@ -515,8 +515,10 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
         overflowSum += this->GetOverlap();
     }
 
+    const int unit = doc->GetDrawingUnit(this->GetStaffSize());
+
     // Add a margin but not for the bottom aligner
-    if (m_staff) overflowSum += doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(this->GetStaffSize());
+    if (m_staff) overflowSum += doc->GetBottomMargin(STAFF) * unit;
 
     if (const int adjust = prevAlignment->GetBeamAdjust()) {
         overflowSum += adjust;
@@ -527,11 +529,42 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
     if (previous && current) {
         if ((current->Is(ARTIC) && previous->Is(ARTIC)) || (previous->Is(ARTIC) && current->Is(NOTE))
             || (current->Is(ARTIC) && previous->Is(NOTE))) {
-            if (current->HorizontalContentOverlap(previous)) overflowSum += doc->GetDrawingUnit(this->GetStaffSize());
+            if (current->HorizontalContentOverlap(previous)) overflowSum += unit;
+        }
+    }
+    if (this->IsInBracketGroup(true) && prevAlignment->IsInBracketGroup(false)) overflowSum += 2.5 * unit;
+
+    return overflowSum;
+}
+
+bool StaffAlignment::IsInBracketGroup(bool isFirst) const
+{
+    if (!this->m_staff) return false;
+
+    ScoreDef *scoreDef = this->m_system->GetDrawingScoreDef();
+    ListOfObjects groups = scoreDef->FindAllDescendantsByType(STAFFGRP);
+    for (auto staffGrp : groups) {
+        // Make sure that there is GrpSym present
+        GrpSym *grpSym = vrv_cast<GrpSym *>(staffGrp->GetFirst(GRPSYM));
+        if (!grpSym) continue;
+
+        if (grpSym->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
+            std::set<int> staffNs;
+            ListOfObjects staffDefs = staffGrp->FindAllDescendantsByType(STAFFDEF);
+            std::for_each(staffDefs.begin(), staffDefs.end(), [&staffNs](Object *object) {
+                StaffDef *staffDef = vrv_cast<StaffDef *>(object);
+                staffNs.emplace(staffDef->GetN());
+            });
+
+            const int currentN = this->m_staff->GetN();
+            if (staffNs.count(currentN)) {
+                if ((isFirst && (*staffNs.begin() == currentN)) || (!isFirst && (*staffNs.rbegin() == currentN)))
+                    return true;
+            }
         }
     }
 
-    return overflowSum;
+    return false;
 }
 
 void StaffAlignment::SetCurrentFloatingPositioner(
