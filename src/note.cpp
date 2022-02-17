@@ -1207,7 +1207,7 @@ int Note::CalcDots(FunctorParams *functorParams)
             flagShift += shift;
         }
         else if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && !this->IsInBeam() && (this->GetDrawingStemLen() < 3)
-            && !this->IsInBeamSpan() && (this->IsDotOverlappingWithFlag(params->m_doc, staffSize, isDotShifted))) {
+            && !this->IsInBeamSpan() && (this->IsDotOverlappingWithFlag(params->m_doc, staffSize, dotLocShift))) {
             // HARDCODED
             const int shift = params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
             flagShift += shift;
