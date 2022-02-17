@@ -594,12 +594,28 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
 {
     int leftAdjustment, rightAdjustment;
     std::tie(leftAdjustment, rightAdjustment)
-        = CalcLeftRightAdjustment(boundingBox, discard, margin, horizontalOverlap);
+        = this->CalcLeftRightAdjustment(boundingBox, discard, margin, horizontalOverlap);
+    return std::max(leftAdjustment, rightAdjustment);
+}
+
+int FloatingCurvePositioner::CalcDirectionalAdjustment(
+    BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap)
+{
+    int leftAdjustment, rightAdjustment;
+    std::tie(leftAdjustment, rightAdjustment)
+        = this->CalcDirectionalLeftRightAdjustment(boundingBox, isCurveAbove, discard, margin, horizontalOverlap);
     return std::max(leftAdjustment, rightAdjustment);
 }
 
 std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
     BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap)
+{
+    return this->CalcDirectionalLeftRightAdjustment(
+        boundingBox, (this->GetDir() == curvature_CURVEDIR_above), discard, margin, horizontalOverlap);
+}
+
+std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
+    BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap)
 {
     assert(boundingBox);
     assert(boundingBox->HasSelfBB());
@@ -613,11 +629,6 @@ std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
     Point p2 = points[3];
 
     Accessor type = SELF;
-    // bool keepInside = element->Is({ARTIC, ARTIC_PART, NOTE, STEM}));
-    // The idea is to force only some of the elements to be inside a slur.
-    // However, this currently does work because skipping an adjustment can cause collision later depending on how
-    // the slur is eventually adjusted. Keeping everything inside now.
-    bool keepInside = true;
     discard = false;
 
     // first check if they overlap at all
@@ -633,11 +644,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
     int leftAdjustment = 0;
     int rightAdjustment = 0;
 
-    if (this->GetDir() == curvature_CURVEDIR_above) {
-        // The curve is below the content - if the element needs to be kept inside (e.g. a note), then do not return.
-        if (((this->GetTopBy(type) + margin) < boundingBox->GetBottomBy(type)) && !keepInside) {
-            return { 0, 0 };
-        }
+    if (isCurveAbove) {
         int leftY = 0;
         int rightY = 0;
         // The curve overflows on both sides
@@ -666,10 +673,6 @@ std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
         rightAdjustment = std::max(boundingBox->GetTopBy(type) - rightY, 0);
     }
     else {
-        // The curve is below the content - if the element needs to be kept inside (e.g. a note), then do not return.
-        if (((this->GetTopBy(type) + margin) < boundingBox->GetBottomBy(type)) && !keepInside) {
-            return { 0, 0 };
-        }
         int leftY = 0;
         int rightY = 0;
         // The curve overflows on both sides

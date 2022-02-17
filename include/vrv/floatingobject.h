@@ -310,9 +310,13 @@ public:
      */
     ///@{
     int CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin = 0, bool horizontalOverlap = true);
+    int CalcDirectionalAdjustment(
+        BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin = 0, bool horizontalOverlap = true);
     // Refined version that returns the adjustments on the left and right hand side of the bounding box
     std::pair<int, int> CalcLeftRightAdjustment(
         BoundingBox *boundingBox, bool &discard, int margin = 0, bool horizontalOverlap = true);
+    std::pair<int, int> CalcDirectionalLeftRightAdjustment(
+        BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin = 0, bool horizontalOverlap = true);
     ///@}
 
     /**

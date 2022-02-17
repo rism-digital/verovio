@@ -182,7 +182,7 @@ float View::CalcInitialSlur(
 
     Staff *startStaff = slur->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
     Staff *endStaff = slur->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
-    if (startStaff && endStaff && (startStaff != endStaff)) {
+    if (startStaff && endStaff && (startStaff->GetN() != endStaff->GetN())) {
         curve->SetCrossStaff(endStaff);
     }
 
