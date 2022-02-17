@@ -1197,7 +1197,7 @@ int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
                     if (diff > max) max = diff;
                 }
                 if (max) dot->SetDrawingXRel(dot->GetDrawingXRel() + max);
-                vrv_cast<Dots *>(dot)->IsAdjusted(true);
+                dot->IsAdjusted(true);
             }
         }
     }

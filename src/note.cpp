@@ -724,7 +724,7 @@ void Note::UpdateFromTransPitch(const TransPitch &tp)
     }
 }
 
-bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted)
+bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, int dotLocShift)
 {
     Object *stem = this->GetFirst(STEM);
     if (!stem) return false;
@@ -739,7 +739,7 @@ bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShi
     const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, this->GetDrawingCueSize());
 
     const int dotMargin = flag->GetDrawingY() - this->GetDrawingY() - flagHeight - this->GetDrawingRadius(doc) / 2
-        - (isDotShifted ? doc->GetDrawingUnit(staffSize) : 0);
+        - dotLocShift * doc->GetDrawingUnit(staffSize);
 
     return dotMargin < 0;
 }
@@ -1197,15 +1197,17 @@ int Note::CalcDots(FunctorParams *functorParams)
         dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
         assert(dots);
 
-        dots->SetMapOfDotLocs(this->CalcOptimalDotLocations());
-        const bool isDotShifted = (this->GetDrawingLoc() % 2 == 0);
+        MapOfDotLocs dotLocs = this->CalcOptimalDotLocations();
+        dots->SetMapOfDotLocs(dotLocs);
+
+        const int dotLocShift = *(dotLocs.cbegin()->second.rbegin()) - this->GetDrawingLoc();
 
         // Stem up, shorter than 4th and not in beam
         if (const int shift = dots->GetFlagShift(); shift) {
             flagShift += shift;
         }
         else if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && !this->IsInBeam() && (this->GetDrawingStemLen() < 3)
-            && !this->IsInBeamSpan() && (this->IsDotOverlappingWithFlag(params->m_doc, staffSize, isDotShifted))) {
+            && !this->IsInBeamSpan() && (this->IsDotOverlappingWithFlag(params->m_doc, staffSize, dotLocShift))) {
             // HARDCODED
             const int shift = params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
             flagShift += shift;
