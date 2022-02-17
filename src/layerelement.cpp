@@ -1713,19 +1713,10 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             assert(currentNote);
             if (otherElements.at(i)->Is(STEM) && (shift == 0) && areDotsAdjusted) {
                 Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
-                const data_STEMDIRECTION stemDir = stem->GetDrawingStemDir();
                 // Nothing to do if note has same stem
                 if (currentNote->HasStemSameasNote()) continue;
 
-                const int horizontalMargin = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                const int leftOverlap = this->HorizontalLeftOverlap(otherElements.at(i), doc, 0, 0);
-                const int rightOverlap = this->HorizontalRightOverlap(otherElements.at(i), doc, 0, 0);
-                if ((leftOverlap != 0) && (rightOverlap != 0)) {
-                    shift = 3 * horizontalMargin;
-                    if (stemDir == STEMDIRECTION_up) {
-                        shift *= -1;
-                    }
-                }
+                shift -= stem->CompareToElementPosition(doc, currentNote, 0);
             }
         }
     }
