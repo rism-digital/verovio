@@ -1628,7 +1628,7 @@ bool Beam::IsTabBeam()
 // BeamSpanSegment
 //----------------------------------------------------------------------------
 
-BeamSpanSegment::BeamSpanSegment() 
+BeamSpanSegment::BeamSpanSegment()
 {
     m_measure = NULL;
     m_staff = NULL;
