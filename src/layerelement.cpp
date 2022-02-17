@@ -130,6 +130,8 @@ void LayerElement::Reset()
 
     m_crossStaff = NULL;
     m_crossLayer = NULL;
+
+    m_isInBeamspan = false;
 }
 
 LayerElement::~LayerElement() {}
@@ -2537,6 +2539,7 @@ int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
 
 int LayerElement::ResetDrawing(FunctorParams *functorParams)
 {
+    m_isInBeamspan = false;
     m_drawingCueSize = false;
     m_crossStaff = NULL;
     m_crossLayer = NULL;

@@ -1628,6 +1628,16 @@ bool Beam::IsTabBeam()
 // BeamSpanSegment
 //----------------------------------------------------------------------------
 
+BeamSpanSegment::BeamSpanSegment() 
+{
+    m_measure = NULL;
+    m_staff = NULL;
+    m_layer = NULL;
+    m_begin = NULL;
+    m_end = NULL;
+    m_spanningType = SPANNING_START_END;
+}
+
 void BeamSpanSegment::SetSpanningType(int systemIndex, int systemCount)
 {
     if (0 == systemIndex) {

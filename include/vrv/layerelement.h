@@ -483,7 +483,8 @@ public:
     Staff *m_crossStaff;
     Layer *m_crossLayer;
 
-    bool m_isInBeamspan = false;
+    // flag to indicate that layerElement belongs to the beamSpan
+    bool m_isInBeamspan;
 
 protected:
     Alignment *m_alignment;

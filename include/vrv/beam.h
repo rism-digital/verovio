@@ -196,7 +196,7 @@ public:
 // the systems)
 class BeamSpanSegment : public BeamSegment {
 public:
-    BeamSpanSegment() = default;
+    BeamSpanSegment();
     virtual ~BeamSpanSegment(){};
 
     /**
