@@ -616,37 +616,8 @@ void Page::JustifyVertically()
         return;
     }
 
-    // Last page and justification of last page is not enabled
-    Pages *pages = doc->GetPages();
-    assert(pages);
-    const int childSystems = this->GetChildCount(SYSTEM);
-    if (pages->GetLast() == this) {
-        int idx = this->GetIdx();
-        if (idx > 0) {
-            Page *penultimatePage = dynamic_cast<Page *>(pages->GetPrevious(this));
-            assert(penultimatePage);
-
-            if (penultimatePage->m_drawingJustifiableHeight < m_drawingJustifiableHeight) {
-                m_drawingJustifiableHeight = penultimatePage->m_drawingJustifiableHeight;
-            }
-
-            const int maxSystemsPerPage = doc->GetOptions()->m_systemMaxPerPage.GetValue();
-            if ((childSystems <= 2) || (childSystems < maxSystemsPerPage)) {
-                m_justificationSum = penultimatePage->m_justificationSum;
-            }
-        }
-        else {
-            const int stavesPerSystem = m_drawingScoreDef.GetDescendantCount(STAFFDEF);
-            if (childSystems * stavesPerSystem < 8) return;
-        }
-    }
-    else if (childSystems == 1) {
-        const double ratio = (double)m_drawingJustifiableHeight / (double)doc->m_drawingPageHeight;
-        if (ratio > doc->GetOptions()->m_maxSingleSystemJustification.GetValue()) {
-            m_drawingJustifiableHeight = 0;
-            return;
-        }
-    }
+    // Ignore vertical justification if it's not required
+    if (!IsJustificationRequired(doc)) return;
 
     // Justify Y position
     Functor justifyY(&Object::JustifyY);
@@ -662,6 +633,48 @@ void Page::JustifyVertically()
         adjustCrossStaffContentParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
         this->Process(&adjustCrossStaffContent, &adjustCrossStaffContentParams);
     }
+}
+
+bool Page::IsJustificationRequired(Doc *doc)
+{
+    Pages *pages = doc->GetPages();
+    assert(pages);
+
+    const int idx = this->GetIdx();
+    int previousJustifiableHeight = 0;
+    int previousJustificationSum = 0;
+    // get values from the previous page
+    if (idx > 0) {
+        Page *previousPage = dynamic_cast<Page *>(pages->GetPrevious(this));
+        assert(previousPage);
+        previousJustifiableHeight = previousPage->m_drawingJustifiableHeight;
+        previousJustificationSum = previousPage->m_justificationSum;
+    }
+
+    const int childSystems = this->GetChildCount(SYSTEM);
+    // Last page and justification of last page is not enabled
+    if (pages->GetLast() == this) {
+        if (idx > 0) {
+            if (previousJustifiableHeight < m_drawingJustifiableHeight) {
+                m_drawingJustifiableHeight = previousJustifiableHeight;
+            }
+
+            const int maxSystemsPerPage = doc->GetOptions()->m_systemMaxPerPage.GetValue();
+            if ((childSystems <= 2) || (childSystems < maxSystemsPerPage)) {
+                m_justificationSum = previousJustificationSum;
+            }
+        }
+        else {
+            const int stavesPerSystem = m_drawingScoreDef.GetDescendantCount(STAFFDEF);
+            if (childSystems * stavesPerSystem < 8) return;
+        }
+    }
+    const double ratio = (double)m_drawingJustifiableHeight / (double)doc->m_drawingPageHeight;
+    if (ratio > doc->GetOptions()->m_maxVerticalJustification.GetValue()) {
+        m_drawingJustifiableHeight = previousJustifiableHeight;
+    }
+
+    return true;
 }
 
 void Page::LayOutPitchPos()

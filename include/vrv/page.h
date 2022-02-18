@@ -193,6 +193,11 @@ private:
      */
     void AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc);
 
+    /**
+     * Check whether vertical justification is required for the current page
+     */
+    bool IsJustificationRequired(Doc *doc);
+
     //
 public:
     /** Page width (MEI scoredef@page.width). Saved if != -1 */

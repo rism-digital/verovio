@@ -975,11 +975,10 @@ Options::Options()
     m_minLastJustification.Init(0.8, 0.0, 1.0);
     this->Register(&m_minLastJustification, "minLastJustification", &m_general);
 
-    m_maxSingleSystemJustification.SetInfo("Maximum ratio of justifiable height for single system pages",
-        "Pages with single system are jutified vertically only if ratio of justifiable height to page height is lower "
-        "than this percent");
-    m_maxSingleSystemJustification.Init(0.3, 0.0, 1.0);
-    this->Register(&m_maxSingleSystemJustification, "maxSingleSystemJustification", &m_general);
+    m_maxVerticalJustification.SetInfo("Maximum ratio of justifiable height for page",
+        "Pages are justified vertically only if ratio of justifiable height to page height is lower than this percent");
+    m_maxVerticalJustification.Init(0.3, 0.0, 1.0);
+    this->Register(&m_maxVerticalJustification, "maxVerticalJustification", &m_general);
 
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);
