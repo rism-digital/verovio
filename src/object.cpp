@@ -617,6 +617,18 @@ ListOfObjects Object::FindAllDescendantsByType(ClassId classId, bool continueDep
     return objects;
 }
 
+ListOfConstObjects Object::FindAllDescendantsByType(
+    ClassId classId, bool continueDepthSearchForMatches, int deepness) const
+{
+    ListOfConstObjects objects;
+    ClassIdComparison comparison(classId);
+    Functor findAllConstByComparison(&Object::FindAllConstByComparison);
+    FindAllConstByComparisonParams findAllConstByComparisonParams(&comparison, &objects);
+    findAllConstByComparisonParams.m_continueDepthSearchForMatches = continueDepthSearchForMatches;
+    this->Process(&findAllConstByComparison, &findAllConstByComparisonParams, NULL, NULL, deepness);
+    return objects;
+}
+
 void Object::FindAllDescendantsByComparison(
     ListOfObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear)
 {
@@ -628,8 +640,19 @@ void Object::FindAllDescendantsByComparison(
     this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction, true);
 }
 
+void Object::FindAllDescendantsByComparison(
+    ListOfConstObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear) const
+{
+    assert(objects);
+    if (clear) objects->clear();
+
+    Functor findAllConstByComparison(&Object::FindAllConstByComparison);
+    FindAllConstByComparisonParams findAllConstByComparisonParams(comparison, objects);
+    this->Process(&findAllConstByComparison, &findAllConstByComparisonParams, NULL, NULL, deepness, direction, true);
+}
+
 void Object::FindAllDescendantsBetween(
-    ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear, int depth)
+    ListOfObjects *objects, Comparison *comparison, const Object *start, const Object *end, bool clear)
 {
     assert(objects);
     if (clear) objects->clear();
@@ -637,6 +660,17 @@ void Object::FindAllDescendantsBetween(
     Functor findAllBetween(&Object::FindAllBetween);
     FindAllBetweenParams findAllBetweenParams(comparison, objects, start, end);
     this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, depth, FORWARD, true);
+}
+
+void Object::FindAllDescendantsBetween(
+    ListOfConstObjects *objects, Comparison *comparison, const Object *start, const Object *end, bool clear) const
+{
+    assert(objects);
+    if (clear) objects->clear();
+
+    Functor findAllConstBetween(&Object::FindAllConstBetween);
+    FindAllConstBetweenParams findAllConstBetweenParams(comparison, objects, start, end);
+    this->Process(&findAllConstBetween, &findAllConstBetweenParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD, true);
 }
 
 Object *Object::GetChild(int idx) const
@@ -1550,9 +1584,54 @@ int Object::FindAllByComparison(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Object::FindAllConstByComparison(FunctorParams *functorParams) const
+{
+    FindAllConstByComparisonParams *params = vrv_params_cast<FindAllConstByComparisonParams *>(functorParams);
+    assert(params);
+
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
+        params->m_elements->push_back(this);
+        if (!params->m_continueDepthSearchForMatches) {
+            return FUNCTOR_SIBLINGS;
+        }
+    }
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
 int Object::FindAllBetween(FunctorParams *functorParams)
 {
     FindAllBetweenParams *params = vrv_params_cast<FindAllBetweenParams *>(functorParams);
+    assert(params);
+
+    // We are reaching the start of the range
+    if (params->m_start == this) {
+        // Setting the start to NULL indicates that we are in the range
+        params->m_start = NULL;
+    }
+    // We have not reached the start yet
+    else if (params->m_start) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
+        params->m_elements->push_back(this);
+    }
+
+    // We have reached the end of the range
+    if (params->m_end == this) {
+        return FUNCTOR_STOP;
+    }
+
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::FindAllConstBetween(FunctorParams *functorParams) const
+{
+    FindAllConstBetweenParams *params = vrv_params_cast<FindAllConstBetweenParams *>(functorParams);
     assert(params);
 
     // We are reaching the start of the range

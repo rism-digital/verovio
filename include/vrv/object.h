@@ -422,22 +422,34 @@ public:
     /**
      * Return all the objects with specified type
      */
+    ///@{
     ListOfObjects FindAllDescendantsByType(
         ClassId classId, bool continueDepthSearchForMatches = true, int deepness = UNLIMITED_DEPTH);
+    ListOfConstObjects FindAllDescendantsByType(
+        ClassId classId, bool continueDepthSearchForMatches = true, int deepness = UNLIMITED_DEPTH) const;
+    ///@}
 
     /**
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
+    ///@{
     void FindAllDescendantsByComparison(ListOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
         bool direction = FORWARD, bool clear = true);
+    void FindAllDescendantsByComparison(ListOfConstObjects *objects, Comparison *comparison,
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true) const;
+    ///@}
 
     /**
      * Return all the objects matching the Comparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
-    void FindAllDescendantsBetween(ListOfObjects *objects, Comparison *comparison, Object *start, Object *end,
-        bool clear = true, int depth = UNLIMITED_DEPTH);
+    ///@{
+    void FindAllDescendantsBetween(
+        ListOfObjects *objects, Comparison *comparison, const Object *start, const Object *end, bool clear = true);
+    void FindAllDescendantsBetween(ListOfConstObjects *objects, Comparison *comparison, const Object *start,
+        const Object *end, bool clear = true) const;
+    ///@}
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -627,12 +639,18 @@ public:
     /**
      * Find a all Object with an Comparison functor.
      */
+    ///@{
     virtual int FindAllByComparison(FunctorParams *functorParams);
+    virtual int FindAllConstByComparison(FunctorParams *functorParams) const;
+    ///@}
 
     /**
      * Find a all Object between a start and end Object and with an Comparison functor.
      */
+    ///@{
     virtual int FindAllBetween(FunctorParams *functorParams);
+    virtual int FindAllConstBetween(FunctorParams *functorParams) const;
+    ///@}
 
     /**
      * Find a all Object to which another object points to in the data.
