@@ -338,9 +338,6 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     assert(curve);
     assert(staff);
 
-    // For now we disable collision avoidance for s-slurs
-    if (curve->GetDir() == curvature_CURVEDIR_mixed) return;
-
     Point points[4];
     curve->GetPoints(points);
     BezierCurve bezier(points[0], points[1], points[2], points[3]);
@@ -359,18 +356,22 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     int endPointShiftRight = 0;
     std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, margin, unit);
     if ((endPointShiftLeft != 0) || (endPointShiftRight != 0)) {
-        const int sign = (curve->GetDir() == curvature_CURVEDIR_above) ? 1 : -1;
-        bezier.p1.y += sign * endPointShiftLeft;
-        bezier.p2.y += sign * endPointShiftRight;
+        const int signLeft = this->HasEndpointAboveStart() ? 1 : -1;
+        const int signRight = this->HasEndpointAboveEnd() ? 1 : -1;
+        bezier.p1.y += signLeft * endPointShiftLeft;
+        bezier.p2.y += signRight * endPointShiftRight;
         if (bezier.p1.x != bezier.p2.x) {
             double lambda = double(bezier.c1.x - bezier.p1.x) / double(bezier.p2.x - bezier.p1.x);
-            bezier.c1.y += sign * ((1.0 - lambda) * endPointShiftLeft + lambda * endPointShiftRight);
+            bezier.c1.y += signLeft * (1.0 - lambda) * endPointShiftLeft + signRight * lambda * endPointShiftRight;
             lambda = double(bezier.c2.x - bezier.p1.x) / double(bezier.p2.x - bezier.p1.x);
-            bezier.c2.y += sign * ((1.0 - lambda) * endPointShiftLeft + lambda * endPointShiftRight);
+            bezier.c2.y += signLeft * (1.0 - lambda) * endPointShiftLeft + signRight * lambda * endPointShiftRight;
         }
         bezier.UpdateControlPointParams();
         curve->UpdatePoints(bezier);
     }
+
+    // For now we disable collision avoidance for s-slurs
+    if (curve->GetDir() == curvature_CURVEDIR_mixed) return;
 
     // STEP 3: Calculate the horizontal offset of the control points.
     // The idea is to shift control points to the outside if there is an obstacle in the vicinity of the corresponding
@@ -426,7 +427,8 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
         }
 
         bool discard = false;
-        const int intersection = curve->CalcAdjustment(spannedElement->m_boundingBox, discard, margin);
+        const int intersection = curve->CalcDirectionalAdjustment(
+            spannedElement->m_boundingBox, spannedElement->m_isBelow, discard, margin);
         const int xMiddle
             = (spannedElement->m_boundingBox->GetSelfLeft() + spannedElement->m_boundingBox->GetSelfRight()) / 2.0;
         const float distanceRatio = float(xMiddle - bezierCurve.p1.x) / float(dist);
@@ -461,8 +463,8 @@ std::pair<int, int> Slur::CalcEndPointShift(
 
         bool discard = false;
         int intersectionLeft, intersectionRight;
-        std::tie(intersectionLeft, intersectionRight)
-            = curve->CalcLeftRightAdjustment(spannedElement->m_boundingBox, discard, margin);
+        std::tie(intersectionLeft, intersectionRight) = curve->CalcDirectionalLeftRightAdjustment(
+            spannedElement->m_boundingBox, spannedElement->m_isBelow, discard, margin);
 
         if (discard) {
             spannedElement->m_discarded = true;
@@ -473,11 +475,12 @@ std::pair<int, int> Slur::CalcEndPointShift(
             // Now apply the intersections on the left and right hand side of the bounding box
             const int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
             const float distanceRatioLeft = float(xLeft - bezierCurve.p1.x) / float(dist);
-            this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioLeft, intersectionLeft);
+            this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioLeft, intersectionLeft, spannedElement->m_isBelow);
 
             const int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
             const float distanceRatioRight = float(xRight - bezierCurve.p1.x) / float(dist);
-            this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioRight, intersectionRight);
+            this->ShiftEndPoints(
+                shiftLeft, shiftRight, distanceRatioRight, intersectionRight, spannedElement->m_isBelow);
         }
     }
 
@@ -486,12 +489,12 @@ std::pair<int, int> Slur::CalcEndPointShift(
     return { shiftLeft, shiftRight };
 }
 
-void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection) const
+void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, bool isBelow) const
 {
     // Filter collisions near the endpoints
     // Collisions with 0.15 <= ratio <= 0.85 do not contribute to shifts
     // They are compensated later by shifting the control points
-    if (ratio < 0.15) {
+    if ((ratio < 0.15) && (this->HasEndpointAboveStart() == isBelow)) {
         if (ratio > 0.05) {
             // For 0.05 <= ratio <= 0.15 collisions only partially contribute to shifts
             // We multiply with a function that interpolates between 1 and 0
@@ -499,7 +502,7 @@ void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int int
         }
         shiftLeft = std::max(shiftLeft, intersection);
     }
-    else if (ratio > 0.85) {
+    else if ((ratio > 0.85) && (this->HasEndpointAboveEnd() == isBelow)) {
         if (ratio < 0.95) {
             // For 0.85 <= ratio <= 0.95 collisions only partially contribute to shifts
             // We multiply with a function that interpolates between 0 and 1

@@ -215,7 +215,7 @@ private:
      */
     ///@{
     // Shift end points for collisions nearby
-    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection) const;
+    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, bool isBelow) const;
 
     // Rebalance shifts to avoid awkward tilting of short slurs
     void RebalanceShifts(int &shiftLeft, int &shiftRight, double distance, int unit) const;
