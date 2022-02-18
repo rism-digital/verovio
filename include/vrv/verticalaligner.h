@@ -250,10 +250,10 @@ public:
     BoundingBox *GetOverflowBBoxAbove() const { return m_overflowBBoxAbove; }
     void SetOverflowBBoxBelow(BoundingBox *bboxBelow, int overflowBottom);
     BoundingBox *GetOverflowBBoxBelow() const { return m_overflowBBoxBelow; }
-    void SetScoreDefClefOverflowAbove(int overflowAbove) { m_scoreDefClefOverflowAbove = overflowAbove; }
-    int GetScoreDefClefOverflowAbove() const { return m_scoreDefClefOverflowAbove; }
-    void SetScoreDefClefOverflowBelow(int overflowBelow) { m_scoreDefClefOverflowBelow = overflowBelow; }
-    int GetScoreDefClefOverflowBelow() const { return m_scoreDefClefOverflowBelow; }
+    void SetScoreDefOverflowAbove(int overflowAbove) { m_scoreDefClefOverflowAbove = overflowAbove; }
+    int GetScoreDefOverflowAbove() const { return m_scoreDefClefOverflowAbove; }
+    void SetScoreDefOverflowBelow(int overflowBelow) { m_scoreDefClefOverflowBelow = overflowBelow; }
+    int GetScoreDefOverflowBelow() const { return m_scoreDefClefOverflowBelow; }
     ///@}
 
     /**
@@ -292,6 +292,11 @@ public:
     void SetBeamAdjust(int beamAdjust) { m_beamAdjust = beamAdjust; }
     int GetBeamAdjust() const { return m_beamAdjust; }
     ///@}
+    
+    /**
+     * Find overflow for the alignments taking bracket group elements into account
+     */
+    void AdjustBracketGroupSpacing(Doc *doc, StaffAlignment *previous);
 
     //----------//
     // Functors //

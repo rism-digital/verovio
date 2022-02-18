@@ -1882,6 +1882,8 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
 
+        currentStaff->GetAlignment()->AdjustBracketGroupSpacing(params->m_doc, params->m_staffAlignment);
+
         params->m_staffAlignment = currentStaff->GetAlignment();
         return FUNCTOR_CONTINUE;
     }
@@ -1955,7 +1957,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
             if (isScoreDefClef) {
-                above->SetScoreDefClefOverflowAbove(overflowAbove);
+                above->SetScoreDefOverflowAbove(overflowAbove);
             }
             else {
                 above->SetOverflowBBoxAbove(current, overflowAbove);
@@ -1971,7 +1973,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
             if (isScoreDefClef) {
-                below->SetScoreDefClefOverflowBelow(overflowBelow);
+                below->SetScoreDefOverflowBelow(overflowBelow);
             }
             else {
                 below->SetOverflowBBoxBelow(current, overflowBelow);
