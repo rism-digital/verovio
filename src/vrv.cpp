@@ -66,7 +66,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 thread_local std::string Resources::s_path = "/usr/local/share/verovio";
-thread_local std::string Resources::s_smuflFontName = "";
 thread_local Resources::GlyphTextMap Resources::s_textFont;
 thread_local Resources::GlyphTable Resources::s_fontGlyphTable;
 thread_local Resources::GlyphNameTable Resources::s_glyphNameTable;
@@ -167,9 +166,6 @@ Glyph *Resources::GetTextGlyph(wchar_t code)
 
 bool Resources::LoadFont(const std::string &fontName)
 {
-    // set font name
-    s_smuflFontName = fontName;
-
     pugi::xml_document doc;
     const std::string filename = Resources::GetPath() + "/" + fontName + ".xml";
     pugi::xml_parse_result parseResult = doc.load_file(filename.c_str());
@@ -200,6 +196,7 @@ bool Resources::LoadFont(const std::string &fontName)
         if (current.attribute("w")) width = current.attribute("w").as_float();
         if (current.attribute("h")) height = current.attribute("h").as_float();
         glyph.SetBoundingBox(x, y, width, height);
+        glyph.SetPath(Resources::GetPath() + "/" + fontName + "/" + c_attribute.value() + ".xml");
         if (current.attribute("h-a-x")) glyph.SetHorizAdvX(current.attribute("h-a-x").as_float());
 
         // load anchors
