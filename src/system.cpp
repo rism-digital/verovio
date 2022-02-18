@@ -1060,8 +1060,8 @@ int System::CastOffPages(FunctorParams *functorParams)
         Object *nextSystem = params->m_contentPage->GetNext(this, SYSTEM);
         Object *lastSystem = params->m_currentPage->GetLast(SYSTEM);
         if (!nextSystem && lastSystem && (this == params->m_leftoverSystem)) {
-            ArrayOfObjects *children = this->GetChildrenForModification();
-            for (Object *child : *children) {
+            ArrayOfObjects &children = this->GetChildrenForModification();
+            for (Object *child : children) {
                 child->MoveItselfTo(lastSystem);
             }
             return FUNCTOR_SIBLINGS;

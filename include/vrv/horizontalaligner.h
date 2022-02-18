@@ -408,7 +408,7 @@ public:
      */
     bool CopyChildren() const override { return false; }
 
-    int GetAlignmentCount() const { return (int)GetChildren()->size(); }
+    int GetAlignmentCount() const { return (int)GetChildren().size(); }
 
     //----------//
     // Functors //

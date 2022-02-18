@@ -61,11 +61,6 @@ public:
     FacsimileInterface *GetFacsimileInterface() override { return dynamic_cast<FacsimileInterface *>(this); }
 
     /**
-     * Return a const pointer to the children
-     */
-    const ArrayOfObjects *GetChildren(bool docChildren = true) const override;
-
-    /**
      * Delete all the legder line arrays.
      */
     void ClearLedgerLines();

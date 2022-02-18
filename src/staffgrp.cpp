@@ -234,7 +234,7 @@ int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *)
 {
     this->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
 
-    for (auto &child : *this->GetChildren()) {
+    for (auto child : this->GetChildren()) {
         if (child->Is(STAFFDEF)) {
             StaffDef *staffDef = vrv_cast<StaffDef *>(child);
             assert(staffDef);
@@ -254,7 +254,7 @@ int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *)
     }
 
     if ((this->GetSymbol() == staffGroupingSym_SYMBOL_brace) && (this->GetDrawingVisibility() != OPTIMIZATION_HIDDEN)) {
-        for (auto &child : *this->GetChildren()) {
+        for (auto child : this->GetChildren()) {
             if (child->Is(STAFFDEF)) {
                 StaffDef *staffDef = vrv_cast<StaffDef *>(child);
                 assert(staffDef);

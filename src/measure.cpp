@@ -188,17 +188,17 @@ void Measure::AddChildBack(Object *child)
     }
 
     child->SetParent(this);
-    ArrayOfObjects *children = this->GetChildrenForModification();
-    if (children->empty()) {
-        children->push_back(child);
+    ArrayOfObjects &children = this->GetChildrenForModification();
+    if (children.empty()) {
+        children.push_back(child);
     }
-    else if (children->back()->Is(STAFF)) {
-        children->push_back(child);
+    else if (children.back()->Is(STAFF)) {
+        children.push_back(child);
     }
     else {
-        for (auto it = children->begin(); it != children->end(); ++it) {
+        for (auto it = children.begin(); it != children.end(); ++it) {
             if (!(*it)->Is(STAFF)) {
-                children->insert(it, child);
+                children.insert(it, child);
                 break;
             }
         }

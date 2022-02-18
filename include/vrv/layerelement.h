@@ -233,10 +233,10 @@ public:
      * Used only on beam, tuplet or ftrem have.
      */
     double GetSameAsContentAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
-        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
 
     double GetContentAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
-        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
 
     /**
      * Get zone bounds using child elements with facsimile information.

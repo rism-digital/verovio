@@ -76,9 +76,9 @@ bool Dir::IsSupportedChild(Object *child)
 
 bool Dir::AreChildrenAlignedTo(data_HORIZONTALALIGNMENT alignment) const
 {
-    const ArrayOfObjects *children = this->GetChildren();
-    bool hasHalign = std::any_of(children->begin(), children->end(), [&alignment](Object *child) {
-        AttHorizontalAlign *hAlign = dynamic_cast<AttHorizontalAlign *>(child);
+    ArrayOfConstObjects children = this->GetChildren();
+    bool hasHalign = std::any_of(children.begin(), children.end(), [&alignment](const Object *child) {
+        const AttHorizontalAlign *hAlign = dynamic_cast<const AttHorizontalAlign *>(child);
         return (hAlign && (hAlign->GetHalign() == alignment));
     });
     return hasHalign;

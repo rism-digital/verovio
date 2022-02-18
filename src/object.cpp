@@ -361,9 +361,9 @@ int Object::GetChildCount(const ClassId classId) const
     return (int)count_if(m_children.begin(), m_children.end(), ObjectComparison(classId));
 }
 
-int Object::GetChildCount(const ClassId classId, int depth)
+int Object::GetChildCount(const ClassId classId, int depth) const
 {
-    ListOfObjects objects = this->FindAllDescendantsByType(classId, true, depth);
+    ListOfConstObjects objects = this->FindAllDescendantsByType(classId, true, depth);
     return (int)objects.size();
 }
 
@@ -673,7 +673,12 @@ void Object::FindAllDescendantsBetween(
     this->Process(&findAllConstBetween, &findAllConstBetweenParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD, true);
 }
 
-Object *Object::GetChild(int idx) const
+Object *Object::GetChild(int idx)
+{
+    return const_cast<Object *>(std::as_const(*this).GetChild(idx));
+}
+
+const Object *Object::GetChild(int idx) const
 {
     if ((idx < 0) || (idx >= (int)m_children.size())) {
         return NULL;
@@ -683,13 +688,23 @@ Object *Object::GetChild(int idx) const
 
 Object *Object::GetChild(int idx, const ClassId classId)
 {
-    ListOfObjects objects = this->FindAllDescendantsByType(classId, true, 1);
+    return const_cast<Object *>(std::as_const(*this).GetChild(idx, classId));
+}
+
+const Object *Object::GetChild(int idx, const ClassId classId) const
+{
+    ListOfConstObjects objects = this->FindAllDescendantsByType(classId, true, 1);
     if ((idx < 0) || (idx >= (int)objects.size())) {
         return NULL;
     }
-    ListOfObjects::iterator it = objects.begin();
+    ListOfConstObjects::iterator it = objects.begin();
     std::advance(it, idx);
     return *it;
+}
+
+ArrayOfConstObjects Object::GetChildren() const
+{
+    return ArrayOfConstObjects(m_children.begin(), m_children.end());
 }
 
 bool Object::DeleteChild(Object *child)

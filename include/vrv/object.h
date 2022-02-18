@@ -233,25 +233,32 @@ public:
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }
     int GetChildCount(const ClassId classId) const;
-    int GetChildCount(const ClassId classId, int depth);
+    int GetChildCount(const ClassId classId, int depth) const;
     ///@}
 
     /**
      * Child access (generic)
      */
-    Object *GetChild(int idx) const;
+    ///@{
+    Object *GetChild(int idx);
+    const Object *GetChild(int idx) const;
     Object *GetChild(int idx, const ClassId classId);
+    const Object *GetChild(int idx, const ClassId classId) const;
+    ///@}
 
     /**
-     * Return a const pointer to the children
+     * Return the children as const reference or copy
      */
-    virtual const ArrayOfObjects *GetChildren(bool docChildren = true) const { return &m_children; }
+    ///@{
+    ArrayOfConstObjects GetChildren() const;
+    const ArrayOfObjects &GetChildren() { return m_children; }
+    ///@}
 
     /**
-     * Return a pointer to the children that allows modification.
+     * Return a reference to the children that allows modification.
      * This method should be all only in AddChild overrides methods
      */
-    ArrayOfObjects *GetChildrenForModification() { return &m_children; }
+    ArrayOfObjects &GetChildrenForModification() { return m_children; }
 
     /**
      * Fill an array of pairs with all attributes and their values.
