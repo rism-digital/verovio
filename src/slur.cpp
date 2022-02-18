@@ -356,8 +356,8 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     int endPointShiftRight = 0;
     std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, margin, unit);
     if ((endPointShiftLeft != 0) || (endPointShiftRight != 0)) {
-        const int signLeft = this->HasEndpointAboveStart() ? 1 : -1;
-        const int signRight = this->HasEndpointAboveEnd() ? 1 : -1;
+        const int signLeft = bezier.IsLeftControlAbove() ? 1 : -1;
+        const int signRight = bezier.IsRightControlAbove() ? 1 : -1;
         bezier.p1.y += signLeft * endPointShiftLeft;
         bezier.p2.y += signRight * endPointShiftRight;
         if (bezier.p1.x != bezier.p2.x) {
@@ -369,9 +369,6 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         bezier.UpdateControlPointParams();
         curve->UpdatePoints(bezier);
     }
-
-    // For now we disable collision avoidance for s-slurs
-    if (curve->GetDir() == curvature_CURVEDIR_mixed) return;
 
     // STEP 3: Calculate the horizontal offset of the control points.
     // The idea is to shift control points to the outside if there is an obstacle in the vicinity of the corresponding
@@ -387,6 +384,9 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         bezier.UpdateControlPoints();
         curve->UpdatePoints(bezier);
     }
+
+    // For now we disable collision avoidance for s-slurs
+    if (curve->GetDir() == curvature_CURVEDIR_mixed) return;
 
     // STEP 4: Calculate the vertical shift of the control points.
     // For each colliding bounding box we formulate a constraint ax + by >= c
@@ -547,20 +547,20 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
             continue;
         }
 
-        const int bbY = (curve->GetDir() == curvature_CURVEDIR_above) ? spannedElement->m_boundingBox->GetSelfTop()
-                                                                      : spannedElement->m_boundingBox->GetSelfBottom();
+        const int bbY = spannedElement->m_isBelow ? spannedElement->m_boundingBox->GetSelfTop()
+                                                  : spannedElement->m_boundingBox->GetSelfBottom();
         const Point pLeft = { spannedElement->m_boundingBox->GetSelfLeft(), bbY };
         const Point pRight = { spannedElement->m_boundingBox->GetSelfRight(), bbY };
 
         // Prefer the (increased) slope of P1-B1, if larger
         // B1 is the upper left bounding box corner of a colliding obstacle
-        if (pLeft.x > bezierCurve.p1.x + margin) {
+        if ((pLeft.x > bezierCurve.p1.x + margin) && (bezierCurve.IsLeftControlAbove() == spannedElement->m_isBelow)) {
             const double slope = BoundingBox::CalcSlope(bezierCurve.p1, pLeft);
-            if ((slope > 0.0) && (curve->GetDir() == curvature_CURVEDIR_above)) {
+            if ((slope > 0.0) && bezierCurve.IsLeftControlAbove()) {
                 const double adjustedSlope = this->RotateSlope(slope, 10.0, 2.5, true);
                 leftSlopeMax = std::max(leftSlopeMax, adjustedSlope);
             }
-            if ((slope < 0.0) && (curve->GetDir() == curvature_CURVEDIR_below)) {
+            if ((slope < 0.0) && !bezierCurve.IsLeftControlAbove()) {
                 const double adjustedSlope = this->RotateSlope(-slope, 10.0, 2.5, true);
                 leftSlopeMax = std::max(leftSlopeMax, adjustedSlope);
             }
@@ -568,13 +568,14 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
 
         // Prefer the (increased) slope of P2-B2, if larger
         // B2 is the upper right bounding box corner of a colliding obstacle
-        if (pRight.x < bezierCurve.p2.x - margin) {
+        if ((pRight.x < bezierCurve.p2.x - margin)
+            && (bezierCurve.IsRightControlAbove() == spannedElement->m_isBelow)) {
             const double slope = BoundingBox::CalcSlope(bezierCurve.p2, pRight);
-            if ((slope < 0.0) && (curve->GetDir() == curvature_CURVEDIR_above)) {
+            if ((slope < 0.0) && bezierCurve.IsRightControlAbove()) {
                 const double adjustedSlope = this->RotateSlope(-slope, 10.0, 2.5, true);
                 rightSlopeMax = std::max(rightSlopeMax, adjustedSlope);
             }
-            if ((slope > 0.0) && (curve->GetDir() == curvature_CURVEDIR_below)) {
+            if ((slope > 0.0) && !bezierCurve.IsRightControlAbove()) {
                 const double adjustedSlope = this->RotateSlope(slope, 10.0, 2.5, true);
                 rightSlopeMax = std::max(rightSlopeMax, adjustedSlope);
             }
