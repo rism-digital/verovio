@@ -670,7 +670,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
     // Stems have been calculated previously in beam or fTrem - siblings because flags do not need to
     // be processed either
-    if (this->IsInBeam() || this->IsInFTrem()) {
+    if (this->IsInBeam() || this->IsInFTrem() || this->IsInBeamSpan()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -814,7 +814,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
         currentStem->IsVirtual(true);
     }
 
-    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem()) {
+    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInBeamSpan() && !this->IsInFTrem()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {

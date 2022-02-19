@@ -4,7 +4,7 @@ font="VerovioText-1.0.sfd"
 
 # Generate bounding boxes for the VerovioText and move to ../data/text
 echo "Generating bounding-box file ..."
-./generate_text_font $font
+./generate_text_font.sh $font
 
 # Generate woff.xml
 fontforge generate_ff.py $font

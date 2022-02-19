@@ -1266,6 +1266,12 @@
 		E79C87C62694407B0098FE85 /* lv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79C87C2269440570098FE85 /* lv.cpp */; };
 		E79C87C7269440800098FE85 /* lv.h in Headers */ = {isa = PBXBuildFile; fileRef = E79C87C1269440420098FE85 /* lv.h */; };
 		E79C87C8269440810098FE85 /* lv.h in Headers */ = {isa = PBXBuildFile; fileRef = E79C87C1269440420098FE85 /* lv.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BD05622F2518CD12004057EB /* beamspan.h in Headers */ = {isa = PBXBuildFile; fileRef = BD05622E2518CD12004057EB /* beamspan.h */; };
+		BD0562302518CD12004057EB /* beamspan.h in Headers */ = {isa = PBXBuildFile; fileRef = BD05622E2518CD12004057EB /* beamspan.h */; };
+		BD0562362518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
+		BD0562372518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
+		BD0562382518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
+		BD0562392518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1734,6 +1740,8 @@
 		E79ADDC626BD645B00527E4B /* runtimeclock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = runtimeclock.cpp; path = src/runtimeclock.cpp; sourceTree = "<group>"; };
 		E79C87C1269440420098FE85 /* lv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lv.h; path = include/vrv/lv.h; sourceTree = "<group>"; };
 		E79C87C2269440570098FE85 /* lv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lv.cpp; path = src/lv.cpp; sourceTree = "<group>"; };
+		BD05622E2518CD12004057EB /* beamspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = beamspan.h; path = include/vrv/beamspan.h; sourceTree = "<group>"; };
+		BD0562352518CD20004057EB /* beamspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = beamspan.cpp; path = src/beamspan.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2093,6 +2101,8 @@
 				4DB3510D1C80409E002DD057 /* anchoredtext.h */,
 				4D6331F41F46D2CB00A0D6BF /* arpeg.cpp */,
 				4D6331F21F46D2B400A0D6BF /* arpeg.h */,
+				BD0562352518CD20004057EB /* beamspan.cpp */,
+				BD05622E2518CD12004057EB /* beamspan.h */,
 				4DE96E3A21C4373200CB85BE /* bracketspan.cpp */,
 				4DE96E3821C4370E00CB85BE /* bracketspan.h */,
 				4DE644F41EDBEA01002FBE6C /* breath.cpp */,
@@ -2563,6 +2573,7 @@
 				4D1BE7781C6942930086DC0E /* pugiconfig.hpp in Headers */,
 				4DC12A891F74111E000440E9 /* pgfoot.h in Headers */,
 				4DB3D8C91F83D10300B5FC2B /* dir.h in Headers */,
+				BD05622F2518CD12004057EB /* beamspan.h in Headers */,
 				4DEC4DDA21C8295700D1D273 /* damage.h in Headers */,
 				8F59294E18854BF800FE51AD /* positioninterface.h in Headers */,
 				8F59294F18854BF800FE51AD /* rest.h in Headers */,
@@ -2786,6 +2797,7 @@
 				BB4C4B2622A932CF001F6AF0 /* fermata.h in Headers */,
 				BB4C4B0022A932BC001F6AF0 /* supplied.h in Headers */,
 				BB4C4B8622A932DF001F6AF0 /* lb.h in Headers */,
+				BD0562302518CD12004057EB /* beamspan.h in Headers */,
 				BB4C4AFE22A932BC001F6AF0 /* subst.h in Headers */,
 				BB4C4AFC22A932BC001F6AF0 /* sic.h in Headers */,
 				BB4C4AEE22A932BC001F6AF0 /* expan.h in Headers */,
@@ -3097,6 +3109,7 @@
 				4D308105203DB6B500BC44F6 /* ref.cpp in Sources */,
 				4D1694161E3A44F300569BF4 /* pedal.cpp in Sources */,
 				4D1694171E3A44F300569BF4 /* mensur.cpp in Sources */,
+				BD0562372518CD20004057EB /* beamspan.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
 				4DC12A7D1F740FB9000440E9 /* view_running.cpp in Sources */,
 				4D15DE3B2411782300457C05 /* expansionmap.cpp in Sources */,
@@ -3281,6 +3294,7 @@
 				8F086EEE188539540037FD8E /* iomei.cpp in Sources */,
 				8F086EEF188539540037FD8E /* iomusxml.cpp in Sources */,
 				8F086EF0188539540037FD8E /* iopae.cpp in Sources */,
+				BD0562362518CD20004057EB /* beamspan.cpp in Sources */,
 				4D8CD8A61B4E922A00F0756F /* atts_critapp.cpp in Sources */,
 				4DEC4D7A21C8048700D1D273 /* abbr.cpp in Sources */,
 				4067E4C81DDDAF0000C6E059 /* fermata.cpp in Sources */,
@@ -3526,6 +3540,7 @@
 				4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				8F3DD34618854B2E0051330C /* layerelement.cpp in Sources */,
 				4DB3D8CA1F83D10700B5FC2B /* fermata.cpp in Sources */,
+				BD0562382518CD20004057EB /* beamspan.cpp in Sources */,
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				4D20740522A46BAA00E0765F /* atts_frettab.cpp in Sources */,
 				8F3DD34818854B2E0051330C /* mensur.cpp in Sources */,
@@ -3742,6 +3757,7 @@
 				BB4C4B7322A932D7001F6AF0 /* space.cpp in Sources */,
 				402492BF232E70000017BB75 /* gracegrp.cpp in Sources */,
 				BB4C4A6622A9321F001F6AF0 /* atts_critapp.cpp in Sources */,
+				BD0562392518CD20004057EB /* beamspan.cpp in Sources */,
 				BB4C4B3D22A932D7001F6AF0 /* artic.cpp in Sources */,
 				BB4C4A5D22A9321F001F6AF0 /* attconverter.cpp in Sources */,
 				BB4C4AF722A932BC001F6AF0 /* reg.cpp in Sources */,

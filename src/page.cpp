@@ -424,6 +424,10 @@ void Page::LayOutHorizontally()
     PrepareSlursParams prepareSlursParams(doc);
     Functor prepareSlurs(&Object::PrepareSlurs);
     this->Process(&prepareSlurs, &prepareSlursParams);
+
+    FunctorDocParams resolveSpanningBeamSpansParams(doc);
+    Functor resolveSpanningBeamSpans(&Object::ResolveSpanningBeamSpans);
+    this->Process(&resolveSpanningBeamSpans, &resolveSpanningBeamSpansParams);
 }
 
 void Page::HorizontalLayoutCachePage(bool restore)

@@ -92,6 +92,7 @@ void BeamDrawingInterface::Reset()
     m_fractionSize = 100;
     m_crossStaffContent = NULL;
     m_crossStaffRel = STAFFREL_basic_NONE;
+    m_isSpanningElement = false;
     m_shortestDur = 0;
     m_notesStemDir = STEMDIRECTION_NONE;
     m_drawingPlace = BEAMPLACE_NONE;
