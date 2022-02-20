@@ -755,6 +755,8 @@ protected:
     void analyzeVerseColor(hum::HTp &token);
     void processHangingTieEnds();
     bool checkForInvisibleBeam(Beam *beam, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, int layerindex);
+    void insertBeamSpan(hum::HTp token);
+    std::string getDataTokenId(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

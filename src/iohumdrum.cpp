@@ -49,6 +49,7 @@ using namespace std;
 #include "att.h"
 #include "barline.h"
 #include "beam.h"
+#include "beamspan.h"
 #include "beatrpt.h"
 #include "bracketspan.h"
 #include "breath.h"
@@ -16303,12 +16304,69 @@ void HumdrumInput::analyzeLayerBeams(
             lastbeamstate = beamstate[i];
             lastgbeamstate = gbeamstate[i];
         }
+    }
+
+    int beamstartindex = -1;
+    int beamendindex = -1;
+    if (beamstate.size() > 0) {
+        if (beamstate.back() > 0) {
+            // Extra beam start(s) at the end of the measure.  Remove all positive numbers at the back of the
+            // beamstate list until a zero is found (for the end of an in-measure beam end).
+            for (int i = (int)beamstate.size() - 1; i >= 0; i--) {
+                if (beamstate[i] == 0) {
+                    beamstartindex = i + 1;
+                    break;
+                }
+                beamstate[i] = 0;
+            }
+        }
+        else if (beamstate.back() < 0) {
+            // Extra beam ends at the start of the measure.
+            // After the first non-zero (and hopefully negative value) in the beamstate,
+            // subtract the last value in beam state (which is hopefully the same as the
+            // first non-zero value.
+            bool nonzero = false;
+            for (int i = 0; i < (int)beamstate.size(); i++) {
+                if (!nonzero) {
+                    if (beamstate[i] == 0) {
+                        continue;
+                    }
+                    else {
+                        nonzero = true;
+                        if (beamstate[i] != beamstate.back()) {
+                            // complicated beamspan case that is not yet handled.
+                            break;
+                        }
+                        beamendindex = i;
+                    }
+                }
+                beamstate[i] -= beamstate.back();
+            }
+        }
+    }
+
+    negativeQ = 0;
+    for (int i = 0; i < (int)beamstate.size(); i++) {
         if (beamstate[i] < 0) {
             negativeQ = 1;
+            break;
         }
+    }
+
+    gnegativeQ = 0;
+    for (int i = 0; i < (int)gbeamstate.size(); i++) {
         if (gbeamstate[i] < 0) {
-            negativeQ = 1;
+            gnegativeQ = 1;
+            break;
         }
+    }
+
+    if (beamstartindex >= 0) {
+        layerdata.at(beamstartindex)->setValue("auto", "beamSpanStart", 1);
+    }
+    if (beamendindex >= 0) {
+        layerdata.at(beamendindex)->setValue("auto", "beamSpanEnd", 1);
+        insertBeamSpan(layerdata.at(beamendindex));
     }
 
     // Convert to beam enumerations.  Beamstates are nonzero for the
@@ -16367,6 +16425,98 @@ void HumdrumInput::analyzeLayerBeams(
 
     storeBreaksec(beamstate, beamnum, layerdata);
     storeBreaksec(gbeamstate, gbeamnum, layerdata, true);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertBeamSpan --
+//
+
+void HumdrumInput::insertBeamSpan(hum::HTp token)
+{
+    // Ignore grace note beamspans for now:
+    if (token->find("q") != std::string::npos) {
+        return;
+    }
+
+    vector<hum::HTp> plist;
+    plist.reserve(128);
+    plist.push_back(token);
+
+    // Identify the start of the beamSpan:
+    hum::HTp current = token->getPreviousToken();
+    int barcount = 0;
+    while (current) {
+        if (current->isBarline()) {
+            ++barcount;
+            if (barcount > 1) {
+                // Limit beamSpan to adjacent measures for now.
+                break;
+            }
+        }
+        if (!current->isData()) {
+            current = current->getPreviousToken();
+            continue;
+        }
+        if (current->getValueBool("auto", "beamSpanStart")) {
+            plist.push_back(current);
+            break;
+        }
+        if (current->isNull()) {
+            current = current->getPreviousToken();
+            continue;
+        }
+        // Don't allow gracenote beamspans for now:
+        if (current->find("q") != std::string::npos) {
+            current = current->getPreviousToken();
+            continue;
+        }
+        // Not checking if the note/rest is a quarter note or larger.
+        plist.push_back(current);
+        current = current->getPreviousToken();
+    }
+
+    if (plist.size() < 2) {
+        return;
+    }
+
+    if (!plist.back()->getValueBool("auto", "beamSpanStart")) {
+        // Did not find a matching beamspan start for th beamspan end.
+        return;
+    }
+
+    BeamSpan *beamspan = new BeamSpan();
+
+    std::string startid = getDataTokenId(plist.back());
+    std::string endid = getDataTokenId(plist[0]);
+
+    std::string plistids;
+    for (int i = 0; i < (int)plist.size(); ++i) {
+        std::string idvalue = getDataTokenId(plist[i]);
+        beamspan->AddRef("#" + idvalue);
+    }
+
+    beamspan->SetStartid("#" + startid);
+    beamspan->SetEndid("#" + endid);
+    addChildMeasureOrSection(beamspan);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getDataTokenId -- Decide if note, chord, or rest.
+//
+
+std::string HumdrumInput::getDataTokenId(hum::HTp token)
+{
+    if (token->isChord()) {
+        return getLocationId("chord", token);
+    }
+    else if (token->isRest()) {
+        return getLocationId("rest", token);
+    }
+    else {
+        return getLocationId("note", token);
+    }
 }
 
 //////////////////////////////
