@@ -775,8 +775,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             fi->SetZone(sylZone);
         }
 
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
         ulx -= noteWidth / 2;
         // uly -= noteHeight / 2;
         // Set up facsimile
@@ -923,8 +923,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Zone *zone = new Zone();
         zone->SetUlx(ulx);
         zone->SetUly(uly);
-        zone->SetLrx(ulx + staffSize / 1.4);
-        zone->SetLry(uly + staffSize / 2);
+        zone->SetLrx(ulx + staffSize / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+        zone->SetLry(uly + staffSize / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
         clef->SetZone(zone);
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
         assert(surface);
@@ -965,8 +965,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         custos->SetZone(zone);
         layer->AddChild(custos);
 
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         ulx -= noteWidth / 2;
         uly -= noteHeight / 2;
@@ -1043,8 +1043,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             }
         }
 
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         ulx -= noteWidth / 2;
         uly -= noteHeight / 2;
@@ -1121,8 +1121,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             }
         }
         
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         ulx -= noteWidth / 2;
         uly -= noteHeight / 2;
@@ -2249,8 +2249,8 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
                     assert(surface);
 
-                    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-                    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+                    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+                    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
                     if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
@@ -2600,8 +2600,8 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
     assert(staff);
     Facsimile *facsimile = m_doc->GetFacsimile();
 
-    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
     prevNc = firstChild;
 
     // Iterate throught the contour and build the new grouping.
@@ -2697,8 +2697,8 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         Staff *staff = dynamic_cast<Staff *>(firstNc->GetFirstAncestor(STAFF));
         assert(staff);
 
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         zone->SetUlx(ligUlx + noteWidth);
         zone->SetUly(ligUly + noteHeight);

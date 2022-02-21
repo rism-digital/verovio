@@ -192,8 +192,8 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         params.at(0).yOffsetLiq[4] = 0.75;
     }
 
-    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
     int noteY, noteX;
     int yValue;
     if (nc->HasFacs() && (m_doc->GetType() == Facs)) {

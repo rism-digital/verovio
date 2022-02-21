@@ -758,8 +758,8 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, cueSize);
 
     if ((m_doc->GetType() == Facs) && element->HasFacs()) {
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
         fi->GetZone()->SetUlx(x);
