@@ -271,7 +271,7 @@ int BeamSpan::ResolveSpanningBeamSpans(FunctorParams *functorParams)
     // found and process it separatelly in the end
     Object *currentSystem = this->GetFirstAncestor(SYSTEM);
     int currentSystemIndex = 0;
-    for (int i = 0; i < elements.size() - 1; ++i) {
+    for (int i = 0; i < (int)elements.size() - 1; ++i) {
         if (elements.at(i).second == currentSystem) {
             currentSystemIndex = i;
             continue;

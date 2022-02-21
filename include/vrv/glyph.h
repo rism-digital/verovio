@@ -67,6 +67,14 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter for the path
+     */
+    ///@{
+    std::string GetPath() { return m_path; }
+    void SetPath(const std::string &path) { m_path = path; }
+    ///@}
+
+    /**
      * @name Setter and getter for the horizAdvX
      */
     ///@{
@@ -106,6 +114,8 @@ private:
     int m_unitsPerEm;
     /** The Unicode code in hexa as string */
     std::string m_codeStr;
+    /** Path to the glyph XML file */
+    std::string m_path;
     /** A map of the available anchors */
     std::map<SMuFLGlyphAnchor, Point> m_anchors;
 };

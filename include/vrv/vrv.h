@@ -151,8 +151,6 @@ public:
     /** Resource path */
     static std::string GetPath() { return s_path; }
     static void SetPath(const std::string &path) { s_path = path; }
-    /** Font name */
-    static std::string GetSmuflFontName() { return s_smuflFontName; }
     /** Init the SMufL music and text fonts */
     static bool InitFonts();
     /** Init the text font (bounding boxes and ASCII only) */
@@ -181,8 +179,6 @@ private:
 
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
     static thread_local std::string s_path;
-    /** Name of the font used for SMUFL glyphs*/
-    static thread_local std::string s_smuflFontName;
     /** The loaded SMuFL font */
     static thread_local GlyphTable s_fontGlyphTable;
     /** A text font used for bounding box calculations */
