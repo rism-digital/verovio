@@ -16363,6 +16363,8 @@ void HumdrumInput::analyzeLayerBeams(
 
     if (beamstartindex >= 0) {
         layerdata.at(beamstartindex)->setValue("auto", "beamSpanStart", 1);
+        // Store measure that the beamSpan starts in:
+        m_beamSpanStartDatabase[layerdata.at(beamstartindex)] = m_measure;
     }
     if (beamendindex >= 0) {
         layerdata.at(beamendindex)->setValue("auto", "beamSpanEnd", 1);
@@ -16499,7 +16501,19 @@ void HumdrumInput::insertBeamSpan(hum::HTp token)
         beamspan->AddRef("#" + idvalue);
     }
 
-    addChildMeasureOrSection(beamspan);
+    auto it = m_beamSpanStartDatabase.find(plist.back());
+    if (it != m_beamSpanStartDatabase.end()) {
+        Measure *smeasure = it->second;
+        if (smeasure) {
+            smeasure->AddChild(beamspan);
+            m_beamSpanStartDatabase.erase(it);
+        }
+    }
+    else {
+        // cannot find the starting measure for the beamSpan for
+        // some strange reason, so add it to the ending measure.
+        addChildMeasureOrSection(beamspan);
+    }
 }
 
 //////////////////////////////

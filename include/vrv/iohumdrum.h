@@ -1099,6 +1099,9 @@ private:
     // be converted into @class in SVG conversion.
     int m_humtype = false;
 
+    // m_beamSpanStartDatabase == keep track of the starting measure for a beamSpan
+    std::map<hum::HTp, Measure *> m_beamSpanStartDatabase;
+
 #endif /* NO_HUMDRUM_SUPPORT */
 };
 
