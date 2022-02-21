@@ -16490,14 +16490,15 @@ void HumdrumInput::insertBeamSpan(hum::HTp token)
     std::string startid = getDataTokenId(plist.back());
     std::string endid = getDataTokenId(plist[0]);
 
+    beamspan->SetStartid("#" + startid);
+    beamspan->SetEndid("#" + endid);
+
     std::string plistids;
-    for (int i = 0; i < (int)plist.size(); ++i) {
+    for (int i = (int)plist.size() - 1; i >= 0; --i) {
         std::string idvalue = getDataTokenId(plist[i]);
         beamspan->AddRef("#" + idvalue);
     }
 
-    beamspan->SetStartid("#" + startid);
-    beamspan->SetEndid("#" + endid);
     addChildMeasureOrSection(beamspan);
 }
 
