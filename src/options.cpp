@@ -1263,7 +1263,7 @@ Options::Options()
 
     m_measureMinWidth.SetInfo("Measure min width", "The minimal measure width in MEI units");
     m_measureMinWidth.Init(15, 1, 30);
-    this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
+    this->Register(&m_measureMinWidth, "measureMinWidth", &m_generalLayout);
 
     m_mnumInterval.SetInfo("Measure Number Interval", "How frequently to place measure numbers");
     m_mnumInterval.Init(0, 0, 64, false);
