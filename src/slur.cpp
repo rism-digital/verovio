@@ -385,28 +385,26 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         curve->UpdatePoints(bezier);
     }
 
-    // For now we disable collision avoidance for s-slurs
-    if (curve->GetDir() == curvature_CURVEDIR_mixed) return;
-
     // STEP 4: Calculate the vertical shift of the control points.
     // For each colliding bounding box we formulate a constraint ax + by >= c
     // where x, y denote the vertical adjustments of the control points and c is the size of the collision.
     // The coefficients a, b are calculated from the Bezier curve equation.
     // After collecting all constraints we calculate a solution.
-    int controlPointShiftLeft = 0;
-    int controlPointShiftRight = 0;
-    std::tie(controlPointShiftLeft, controlPointShiftRight)
-        = this->CalcControlPointVerticalShift(curve, bezier, margin);
-    bezier.SetLeftControlHeight(bezier.GetLeftControlHeight() + controlPointShiftLeft);
-    bezier.SetRightControlHeight(bezier.GetRightControlHeight() + controlPointShiftRight);
+    const ControlPointAdjustment adjustment = this->CalcControlPointVerticalShift(curve, bezier, margin);
+    const int leftSign = (bezier.IsLeftControlAbove() == adjustment.moveUpwards) ? 1 : -1;
+    bezier.SetLeftControlHeight(bezier.GetLeftControlHeight() + leftSign * adjustment.leftShift);
+    const int rightSign = (bezier.IsRightControlAbove() == adjustment.moveUpwards) ? 1 : -1;
+    bezier.SetRightControlHeight(bezier.GetRightControlHeight() + rightSign * adjustment.rightShift);
     bezier.UpdateControlPoints();
     curve->UpdatePoints(bezier);
 
     // STEP 5: Adjust the slur shape
     // Through the control point adjustments in step 3 and 4 it can happen that the slur looses its desired shape.
     // We correct the shape if the slur is too flat or not convex.
-    this->AdjustSlurShape(bezier, curve->GetDir(), unit);
-    curve->UpdatePoints(bezier);
+    if (curve->GetDir() != curvature_CURVEDIR_mixed) {
+        this->AdjustSlurShape(bezier, curve->GetDir(), unit);
+        curve->UpdatePoints(bezier);
+    }
 
     // Since we are going to redraw it, reset its bounding box
     curve->BoundingBox::ResetBoundingBox();
@@ -598,12 +596,16 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
     return { true, leftOffset, rightOffset };
 }
 
-std::pair<int, int> Slur::CalcControlPointVerticalShift(
+ControlPointAdjustment Slur::CalcControlPointVerticalShift(
     FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
 {
-    if (bezierCurve.p1.x >= bezierCurve.p2.x) return { 0, 0 };
+    ControlPointAdjustment adjustment{ 0, 0, false, 0 };
+    if (bezierCurve.p1.x >= bezierCurve.p2.x) return adjustment;
 
-    std::list<ControlPointConstraint> constraints;
+    std::list<ControlPointConstraint> aboveConstraints;
+    std::list<ControlPointConstraint> belowConstraints;
+    int maxIntersectionAbove = 0;
+    int maxIntersectionBelow = 0;
 
     const int dist = bezierCurve.p2.x - bezierCurve.p1.x;
 
@@ -617,13 +619,17 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
 
         bool discard = false;
         int intersectionLeft, intersectionRight;
-        std::tie(intersectionLeft, intersectionRight)
-            = curve->CalcLeftRightAdjustment(spannedElement->m_boundingBox, discard, margin);
+        std::tie(intersectionLeft, intersectionRight) = curve->CalcDirectionalLeftRightAdjustment(
+            spannedElement->m_boundingBox, spannedElement->m_isBelow, discard, margin);
 
         if (discard) {
             spannedElement->m_discarded = true;
             continue;
         }
+
+        std::list<ControlPointConstraint> &constraints
+            = spannedElement->m_isBelow ? belowConstraints : aboveConstraints;
+        int &maxIntersection = spannedElement->m_isBelow ? maxIntersectionBelow : maxIntersectionAbove;
 
         if ((intersectionLeft > 0) || (intersectionRight > 0)) {
             Point points[4];
@@ -640,6 +646,7 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
                 const double t = BoundingBox::CalcBezierParamAtPosition(points, xLeft);
                 constraints.push_back(
                     { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), double(intersectionLeft) });
+                maxIntersection = std::max(maxIntersection, intersectionLeft);
             }
 
             // Add constraint for the right boundary of the colliding bounding box
@@ -650,10 +657,34 @@ std::pair<int, int> Slur::CalcControlPointVerticalShift(
                 const double t = BoundingBox::CalcBezierParamAtPosition(points, xRight);
                 constraints.push_back(
                     { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), double(intersectionRight) });
+                maxIntersection = std::max(maxIntersection, intersectionRight);
             }
         }
     }
-    return this->SolveControlPointConstraints(constraints);
+
+    // Solve the constraints and calculate the adjustment
+    if (maxIntersectionAbove > maxIntersectionBelow) {
+        std::tie(adjustment.leftShift, adjustment.rightShift) = this->SolveControlPointConstraints(aboveConstraints);
+        adjustment.moveUpwards = false;
+    }
+    else {
+        std::tie(adjustment.leftShift, adjustment.rightShift) = this->SolveControlPointConstraints(belowConstraints);
+        adjustment.moveUpwards = true;
+    }
+
+    // Determine the requested staff space
+    if (bezierCurve.IsLeftControlAbove() && !bezierCurve.IsRightControlAbove()) {
+        adjustment.requestedStaffSpace = std::max(bezierCurve.p1.y - bezierCurve.p2.y + 4 * margin, 0);
+    }
+    else if (!bezierCurve.IsLeftControlAbove() && bezierCurve.IsRightControlAbove()) {
+        adjustment.requestedStaffSpace = std::max(bezierCurve.p2.y - bezierCurve.p1.y + 4 * margin, 0);
+    }
+    if ((maxIntersectionAbove > 0) && (maxIntersectionBelow > 0)) {
+        adjustment.requestedStaffSpace
+            = std::max(adjustment.requestedStaffSpace, maxIntersectionAbove + maxIntersectionBelow);
+    }
+
+    return adjustment;
 }
 
 std::pair<int, int> Slur::SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints)

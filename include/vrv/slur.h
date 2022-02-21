@@ -32,6 +32,19 @@ struct ControlPointConstraint {
     double c;
 };
 
+//----------------------------------------------------------------------------
+// ControlPointAdjustment
+//----------------------------------------------------------------------------
+/**
+ * A vertical adjustment of bezier control points
+ */
+struct ControlPointAdjustment {
+    int leftShift;
+    int rightShift;
+    bool moveUpwards;
+    int requestedStaffSpace;
+};
+
 // Helper enum classes
 enum class SlurCurveDirection { None, Above, Below, MixedDownwards, MixedUpwards };
 enum class PortatoSlurType { None, StemSide, Centered };
@@ -197,7 +210,7 @@ private:
         FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
     // Calculate the vertical control point shift
-    std::pair<int, int> CalcControlPointVerticalShift(
+    ControlPointAdjustment CalcControlPointVerticalShift(
         FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
     // Helper function to determine curve direction for the slurs that start at grace note
