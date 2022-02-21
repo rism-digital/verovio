@@ -138,7 +138,7 @@ int SystemAligner::GetOverflowAbove(const Doc *, bool scoreDefClef) const
 
     StaffAlignment *alignment = vrv_cast<StaffAlignment *>(this->GetChild(0));
     assert(alignment);
-    int overflowAbove = scoreDefClef ? alignment->GetScoreDefOverflowAbove() : alignment->GetOverflowAbove();
+    int overflowAbove = scoreDefClef ? alignment->GetScoreDefClefOverflowAbove() : alignment->GetOverflowAbove();
     return overflowAbove;
 }
 
@@ -148,7 +148,7 @@ int SystemAligner::GetOverflowBelow(const Doc *doc, bool scoreDefClef) const
 
     StaffAlignment *alignment = vrv_cast<StaffAlignment *>(this->GetChild(this->GetChildCount() - 2));
     assert(alignment);
-    int overflowBelow = scoreDefClef ? alignment->GetScoreDefOverflowBelow() : alignment->GetOverflowBelow();
+    int overflowBelow = scoreDefClef ? alignment->GetScoreDefClefOverflowBelow() : alignment->GetOverflowBelow();
     return overflowBelow;
 }
 
@@ -499,7 +499,7 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
     StaffAlignment *prevAlignment = dynamic_cast<StaffAlignment *>(parent->GetPrevious(this));
 
     if (!prevAlignment) {
-        const int maxOverflow = std::max(this->GetOverflowAbove(), this->GetScoreDefOverflowAbove());
+        const int maxOverflow = std::max(this->GetOverflowAbove(), this->GetScoreDefClefOverflowAbove());
         return maxOverflow + this->GetOverlap();
     }
 
@@ -536,7 +536,7 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
     return overflowSum;
 }
 
-void StaffAlignment::AdjustBracketGroupSpacing(Doc *doc, StaffAlignment *previous)
+void StaffAlignment::AdjustBracketGroupSpacing(Doc *doc, StaffAlignment *previous, int spacing)
 {
     if (!previous) return;
 
@@ -544,8 +544,12 @@ void StaffAlignment::AdjustBracketGroupSpacing(Doc *doc, StaffAlignment *previou
     if (this->IsInBracketGroup(true) && previous->IsInBracketGroup(false)) {
         const int overflowAbove = doc->GetGlyphHeight(SMUFL_E003_bracketTop, this->GetStaffSize(), false);
         const int overflowBelow = doc->GetGlyphHeight(SMUFL_E004_bracketBottom, this->GetStaffSize(), false);
-        previous->SetScoreDefOverflowBelow(overflowBelow + unit/2);
-        this->SetScoreDefOverflowAbove(overflowAbove + unit/2);
+        if (spacing < (overflowAbove + overflowBelow)) {
+            const int bracketOverlap = (overflowAbove + overflowBelow) - spacing / 2;
+            if (this->GetOverlap() < bracketOverlap) {
+                this->SetOverlap(bracketOverlap);
+            }
+        }
     }
 }
 
@@ -1046,11 +1050,13 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
     const int spacing = std::max(params->m_previous->m_overflowBelow, m_overflowAbove);
 
     // Calculate the overlap for scoreDef clefs
-    int overflowBelow = params->m_previous->GetScoreDefOverflowBelow();
-    int overflowAbove = this->GetScoreDefOverflowAbove();
+    int overflowBelow = params->m_previous->GetScoreDefClefOverflowBelow();
+    int overflowAbove = this->GetScoreDefClefOverflowAbove();
     if (spacing < (overflowBelow + overflowAbove)) {
         this->SetOverlap((overflowBelow + overflowAbove) - spacing);
     }
+
+    this->AdjustBracketGroupSpacing(params->m_doc, params->m_previous, spacing);
 
     // This is the bottom alignment (or something is wrong) - this is all we need to do
     if (!m_staff) {
