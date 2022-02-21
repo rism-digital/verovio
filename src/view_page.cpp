@@ -954,22 +954,26 @@ void View::DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine)
     const int x1 = x - barLineWidth / 2 - (dotSeparation + dotWidth);
     const int x2 = x + xShift;
 
-    const int yBottom = staff->GetDrawingY() - staff->m_drawingLines * m_doc->GetDrawingUnit(staffSize);
-    const int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staffSize);
+    const int numDots = 3 - staff->m_drawingLines % 2; // odd => 2 dots, even => 3 dots
+    const int yInc = m_doc->GetDrawingDoubleUnit(staffSize); // vertical distance between dots
+    const int yBottom = staff->GetDrawingY() - (staff->m_drawingLines + numDots % 2) * m_doc->GetDrawingUnit(staffSize);
+    const int yTop = yBottom + (numDots - 1) * yInc;
 
     if (barLine->GetForm() == BARRENDITION_rptstart) {
-        this->DrawSmuflCode(dc, x2 - thickBarLineWidth / 2, yTop, SMUFL_E044_repeatDot, staffSize, false);
-        this->DrawSmuflCode(dc, x2 - thickBarLineWidth / 2, yBottom, SMUFL_E044_repeatDot, staffSize, false);
+        for (int y = yTop; y >= yBottom; y -= yInc) {
+            this->DrawSmuflCode(dc, x2 - thickBarLineWidth / 2, y, SMUFL_E044_repeatDot, staffSize, false);
+        }
     }
     if (barLine->GetForm() == BARRENDITION_rptboth) {
-        this->DrawSmuflCode(
-            dc, x2 + barLineSeparation + barLineWidth / 2, yTop, SMUFL_E044_repeatDot, staffSize, false);
-        this->DrawSmuflCode(
-            dc, x2 + barLineSeparation + barLineWidth / 2, yBottom, SMUFL_E044_repeatDot, staffSize, false);
+        for (int y = yTop; y >= yBottom; y -= yInc) {
+            this->DrawSmuflCode(
+                dc, x2 + barLineSeparation + barLineWidth / 2, y, SMUFL_E044_repeatDot, staffSize, false);
+        }
     }
     if ((barLine->GetForm() == BARRENDITION_rptend) || (barLine->GetForm() == BARRENDITION_rptboth)) {
-        this->DrawSmuflCode(dc, x1, yTop, SMUFL_E044_repeatDot, staffSize, false);
-        this->DrawSmuflCode(dc, x1, yBottom, SMUFL_E044_repeatDot, staffSize, false);
+        for (int y = yTop; y >= yBottom; y -= yInc) {
+            this->DrawSmuflCode(dc, x1, y, SMUFL_E044_repeatDot, staffSize, false);
+        }
     }
 
     return;
