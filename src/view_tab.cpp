@@ -173,20 +173,21 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     int y = element->GetDrawingY();
 
     const int glyphSize = staff->GetDrawingStaffNotationSize();
+    const int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
 
     // For beam and guitar notation, stem are drawn through the child Stem
     if (!tabGrp->IsInBeam() && !staff->IsTabGuitar()) {
-        const int drawingDur
-            = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
-
         int symc = 0;
         switch (drawingDur) {
-            case DUR_2: symc = SMUFL_EBA7_luteDurationWhole; break;
-            case DUR_4: symc = SMUFL_EBA8_luteDurationHalf; break;
-            case DUR_8: symc = SMUFL_EBA9_luteDurationQuarter; break;
-            case DUR_16: symc = SMUFL_EBAA_luteDuration8th; break;
-            case DUR_32: symc = SMUFL_EBAB_luteDuration16th; break;
-            default: symc = SMUFL_EBA9_luteDurationQuarter;
+                // TODO SMUFL_EBA6_luteDurationDoubleWhole is defined by SMUFL but not yet implemented in Verovio
+                /* case DUR_1: symc = SMUFL_EBA6_luteDurationDoubleWhole; break; // 1 back flag */
+            case DUR_2: symc = SMUFL_EBA7_luteDurationWhole; break; // 0 flags
+            case DUR_4: symc = SMUFL_EBA8_luteDurationHalf; break; // 1 flag
+            case DUR_8: symc = SMUFL_EBA9_luteDurationQuarter; break; // 2 flags
+            case DUR_16: symc = SMUFL_EBAA_luteDuration8th; break; // 3 flags
+            case DUR_32: symc = SMUFL_EBAB_luteDuration16th; break; // 4 flags
+            case DUR_64: symc = SMUFL_EBAC_luteDuration32nd; break; // 5 flags
+            default: symc = SMUFL_EBA9_luteDurationQuarter; // 2 flags
         }
 
         this->DrawSmuflCode(dc, x, y, symc, glyphSize, true);
@@ -197,10 +198,29 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
         if (tabDurSym->GetDrawingStem()) {
             y = tabDurSym->GetDrawingStem()->GetDrawingY();
         }
-        y += m_doc->GetDrawingUnit(glyphSize) * 0.5 * stemDirFactor;
-        x += m_doc->GetDrawingUnit(glyphSize);
+
+        int dotSize = 0;
+
+        if (tabGrp->IsInBeam() || staff->IsTabGuitar()) {
+            y += m_doc->GetDrawingUnit(glyphSize) * 0.5 * stemDirFactor;
+            x += m_doc->GetDrawingUnit(glyphSize);
+            dotSize = glyphSize * 2 / 3;
+        }
+        else {
+            // Vertical: the more flags the lower the dots
+            const int durfactor = DUR_64 - std::min(std::max(drawingDur, DUR_2), DUR_64) + 1;
+            static_assert(DUR_64 - DUR_2 + 1 == 6);
+            static_assert(DUR_64 - DUR_64 + 1 == 1);
+
+            y += m_doc->GetDrawingUnit(glyphSize) * stemDirFactor * durfactor * 2 / 5;
+
+            // Horizontal: allow for font width
+            x += m_doc->GetGlyphWidth(SMUFL_EBA9_luteDurationQuarter, glyphSize, false) / 2;
+            dotSize = glyphSize * 9 / 10;
+        }
+
         for (int i = 0; i < tabGrp->GetDots(); ++i) {
-            this->DrawDot(dc, x, y, glyphSize * 2 / 3);
+            this->DrawDot(dc, x, y, dotSize);
             // HARDCODED
             x += m_doc->GetDrawingUnit(glyphSize) * 0.75;
         }

@@ -283,7 +283,7 @@ public:
     }
     std::vector<int> m_staffNs;
     std::vector<LayerElement *> m_elements;
-    std::vector<LayerElement *> m_dots;
+    std::vector<Dots *> m_dots;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;
@@ -1078,7 +1078,7 @@ public:
         m_verticalCenter = 0;
         m_dur = DUR_1;
         m_isGraceNote = false;
-        m_stemSameas = false;
+        m_isStemSameasSecondary = false;
         m_tabGrpWithNoNote = false;
         m_staff = NULL;
         m_layer = NULL;
@@ -1089,7 +1089,7 @@ public:
     int m_verticalCenter;
     int m_dur;
     bool m_isGraceNote;
-    bool m_stemSameas;
+    bool m_isStemSameasSecondary;
     bool m_tabGrpWithNoNote;
     Staff *m_staff;
     Layer *m_layer;
@@ -2076,7 +2076,7 @@ public:
 class PreparePlistParams : public FunctorParams {
 public:
     PreparePlistParams() { m_fillList = true; }
-    ArrayOfPlistInterfaceUuidPairs m_interfaceUuidPairs;
+    ArrayOfPlistInterfaceUuidTuples m_interfaceUuidTuples;
     bool m_fillList;
 };
 

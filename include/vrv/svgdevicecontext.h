@@ -23,6 +23,8 @@
 
 //----------------------------------------------------------------------------
 
+class Glyph;
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -284,7 +286,7 @@ private:
 
     // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>
-    std::set<std::string> m_smuflGlyphs;
+    std::set<Glyph *> m_smuflGlyphs;
 
     // pugixml data
     pugi::xml_document m_svgDoc;

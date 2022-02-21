@@ -304,8 +304,15 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     // for two layers, top layer shouldn't go below center and lower layer shouldn't go above it. Enforce this by adding
     // margin that will adjust rest position
     int marginLocation = isTopLayer ? 6 : 2;
-    if ((this->GetDur() == DURATION_2) || (this->GetDur() == DURATION_breve)) {
-        marginLocation = 4;
+    if ((this->GetDur() == DURATION_long) || (this->GetDur() == DURATION_4)) {
+        marginLocation = isTopLayer ? 8 : 0;
+    }
+    else if (this->GetDur() >= DURATION_8) {
+        marginLocation
+            = isTopLayer ? (6 + (this->GetDur() - DURATION_4) / 2 * 2) : (2 - (this->GetDur() - DURATION_8) / 2 * 2);
+    }
+    if (this->GetDur() >= DURATION_1024) {
+        marginLocation -= 2;
     }
     const int optimalLocation = isTopLayer
         ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation })

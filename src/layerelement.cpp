@@ -18,6 +18,7 @@
 #include "accid.h"
 #include "barline.h"
 #include "beam.h"
+#include "beamspan.h"
 #include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
@@ -129,6 +130,8 @@ void LayerElement::Reset()
 
     m_crossStaff = NULL;
     m_crossLayer = NULL;
+
+    m_isInBeamspan = false;
 }
 
 LayerElement::~LayerElement() {}
@@ -243,6 +246,13 @@ int LayerElement::GetOriginalLayerN()
         layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
     }
     return layerN;
+}
+
+bool LayerElement::IsInBeamSpan() const
+{
+    if (!this->Is({ CHORD, NOTE, REST })) return false;
+
+    return m_isInBeamspan;
 }
 
 Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence) const
@@ -1485,7 +1495,7 @@ int LayerElement::AdjustDots(FunctorParams *functorParams)
 
     if (this->Is(NOTE) && this->GetParent()->Is(CHORD)) return FUNCTOR_SIBLINGS;
     if (this->Is(DOTS)) {
-        params->m_dots.push_back(this);
+        params->m_dots.push_back(vrv_cast<Dots *>(this));
     }
     else {
         params->m_elements.push_back(this);
@@ -1701,16 +1711,12 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
         else if (this->Is(NOTE)) {
             Note *currentNote = vrv_cast<Note *>(this);
             assert(currentNote);
-            if ((currentNote->GetDrawingDur() == DUR_1) && otherElements.at(i)->Is(STEM) && (shift == 0)) {
-                const int horizontalMargin = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            if (otherElements.at(i)->Is(STEM) && (shift == 0) && areDotsAdjusted) {
                 Stem *stem = vrv_cast<Stem *>(otherElements.at(i));
-                data_STEMDIRECTION stemDir = stem->GetDrawingStemDir();
-                if (this->HorizontalLeftOverlap(otherElements.at(i), doc, 0, 0) != 0) {
-                    shift = 3 * horizontalMargin;
-                    if (stemDir == STEMDIRECTION_up) {
-                        shift *= -1;
-                    }
-                }
+                // Nothing to do if note has same stem
+                if (currentNote->HasStemSameasNote()) continue;
+
+                shift -= stem->CompareToElementPosition(doc, currentNote, 0);
             }
         }
     }
@@ -2529,6 +2535,7 @@ int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
 
 int LayerElement::ResetDrawing(FunctorParams *functorParams)
 {
+    m_isInBeamspan = false;
     m_drawingCueSize = false;
     m_crossStaff = NULL;
     m_crossLayer = NULL;

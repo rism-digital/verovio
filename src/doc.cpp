@@ -548,16 +548,22 @@ void Doc::PrepareDrawing()
     Functor preparePlist(&Object::PreparePlist);
     this->Process(&preparePlist, &preparePlistParams);
 
-    // If we have some left process again backward.
-    if (!preparePlistParams.m_interfaceUuidPairs.empty()) {
+    // Process plist after all pairs has been collected
+    if (!preparePlistParams.m_interfaceUuidTuples.empty()) {
         preparePlistParams.m_fillList = false;
-        this->Process(&preparePlist, &preparePlistParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+        Functor processPlist(&Object::ProcessPlist);
+        this->Process(&processPlist, &preparePlistParams);
+
+        for (const auto &[plistInterface, uuid, objectReference] : preparePlistParams.m_interfaceUuidTuples) {
+            plistInterface->SetRef(objectReference);
+        }
+        preparePlistParams.m_interfaceUuidTuples.clear();
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!preparePlistParams.m_interfaceUuidPairs.empty()) {
+    if (!preparePlistParams.m_interfaceUuidTuples.empty()) {
         LogWarning(
-            "%d element(s) with a @plist could match the target", preparePlistParams.m_interfaceUuidPairs.size());
+            "%d element(s) with a @plist could not match the target", preparePlistParams.m_interfaceUuidTuples.size());
     }
 
     /************ Resolve cross staff ************/
@@ -567,6 +573,12 @@ void Doc::PrepareDrawing()
     Functor prepareCrossStaff(&Object::PrepareCrossStaff);
     Functor prepareCrossStaffEnd(&Object::PrepareCrossStaffEnd);
     this->Process(&prepareCrossStaff, &prepareCrossStaffParams, &prepareCrossStaffEnd);
+
+    /************ Resolve beamspan elements ***********/
+
+    FunctorDocParams functorDocParams(this);
+    Functor resolveBeamSpanElements(&Object::ResolveBeamSpanElements);
+    this->Process(&resolveBeamSpanElements, &functorDocParams);
 
     /************ Prepare processing by staff/layer/verse ************/
 

@@ -23,6 +23,7 @@ class Arpeg;
 class BarLine;
 class Beam;
 class BeamSegment;
+class BeamSpan;
 class BracketSpan;
 class Breath;
 class Chord;
@@ -388,6 +389,7 @@ protected:
     ///@{
     void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, System *system, Object *graphic = NULL);
     ///@}
 
     /**
@@ -600,8 +602,8 @@ private:
     /**
      * Internal method for drawing a BeamSegment
      */
-    void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,
-        Staff *staff, Measure *measure);
+    void DrawBeamSegment(
+        DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer, Staff *staff);
 
     /**
      * Internal methods for drawing time spanning elements

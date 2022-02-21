@@ -226,6 +226,11 @@ public:
     ///@}
 
     /**
+     * Getter for stem sameas role
+     */
+    StemSameasDrawingRole GetStemSameasRole() const { return m_stemSameasRole; }
+
+    /**
      * Resovle @stem.sameas links by instanciating Note::m_stemSameas (*Note).
      * Called twice from Object::PrepareLinks. Once to fill uuid / note pairs,
      * and once to resolve the link. The link is bi-directional, which means
@@ -353,7 +358,7 @@ private:
      * Return whether dots are overlapping with flag. Take into account flag height, its position as well
      * as position of the note and position of the dots
      */
-    bool IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted);
+    bool IsDotOverlappingWithFlag(Doc *doc, const int staffSize, int dotLocShift);
 
     /**
      * Register deferred notes for MIDI

@@ -23,6 +23,7 @@
 #include "arpeg.h"
 #include "artic.h"
 #include "beam.h"
+#include "beamspan.h"
 #include "beatrpt.h"
 #include "bracketspan.h"
 #include "breath.h"
@@ -430,6 +431,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(ARPEG)) {
         m_currentNode = m_currentNode.append_child("arpeg");
         this->WriteArpeg(m_currentNode, vrv_cast<Arpeg *>(object));
+    }
+    else if (object->Is(BEAMSPAN)) {
+        m_currentNode = m_currentNode.append_child("beamSpan");
+        WriteBeamSpan(m_currentNode, dynamic_cast<BeamSpan *>(object));
     }
     else if (object->Is(BRACKETSPAN)) {
         m_currentNode = m_currentNode.append_child("bracketSpan");
@@ -1707,6 +1712,18 @@ void MEIOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
     arpeg->WriteArpegVis(currentNode);
     arpeg->WriteColor(currentNode);
     arpeg->WriteEnclosingChars(currentNode);
+}
+
+void MEIOutput::WriteBeamSpan(pugi::xml_node currentNode, BeamSpan *beamSpan)
+{
+    assert(beamSpan);
+
+    WriteControlElement(currentNode, beamSpan);
+    WritePlistInterface(currentNode, beamSpan);
+    WriteTimeSpanningInterface(currentNode, beamSpan);
+    beamSpan->WriteBeamedWith(currentNode);
+    beamSpan->WriteBeamRend(currentNode);
+    beamSpan->WriteColor(currentNode);
 }
 
 void MEIOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan)
@@ -4752,102 +4769,101 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
     bool success = true;
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        const std::string currentName = current.name();
         if (!success) break;
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        else if (this->IsEditorialElementName(currentName)) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_MEASURE);
         }
         // content
-        else if (std::string(current.name()) == "anchoredText") {
+        else if (currentName == "anchoredText") {
             success = this->ReadAnchoredText(parent, current);
         }
-        else if (std::string(current.name()) == "arpeg") {
+        else if (currentName == "arpeg") {
             success = this->ReadArpeg(parent, current);
         }
-        else if (std::string(current.name()) == "beamSpan") {
-            if (!ReadBeamSpanAsBeam(dynamic_cast<Measure *>(parent), current)) {
-                LogWarning("<beamSpan> is not readable as <beam> and will be ignored");
-            }
+        else if (currentName == "beamSpan") {
+            success = this->ReadBeamSpan(parent, current);
         }
-        else if (std::string(current.name()) == "bracketSpan") {
+        else if (currentName == "bracketSpan") {
             success = this->ReadBracketSpan(parent, current);
         }
-        else if (std::string(current.name()) == "breath") {
+        else if (currentName == "breath") {
             success = this->ReadBreath(parent, current);
         }
-        else if (std::string(current.name()) == "caesura") {
+        else if (currentName == "caesura") {
             success = this->ReadCaesura(parent, current);
         }
-        else if (std::string(current.name()) == "dir") {
+        else if (currentName == "dir") {
             success = this->ReadDir(parent, current);
         }
-        else if (std::string(current.name()) == "dynam") {
+        else if (currentName == "dynam") {
             success = this->ReadDynam(parent, current);
         }
-        else if (std::string(current.name()) == "fermata") {
+        else if (currentName == "fermata") {
             success = this->ReadFermata(parent, current);
         }
-        else if (std::string(current.name()) == "fing") {
+        else if (currentName == "fing") {
             success = this->ReadFing(parent, current);
         }
-        else if (std::string(current.name()) == "gliss") {
+        else if (currentName == "gliss") {
             success = this->ReadGliss(parent, current);
         }
-        else if (std::string(current.name()) == "hairpin") {
+        else if (currentName == "hairpin") {
             success = this->ReadHairpin(parent, current);
         }
-        else if (std::string(current.name()) == "harm") {
+        else if (currentName == "harm") {
             success = this->ReadHarm(parent, current);
         }
-        else if (std::string(current.name()) == "lv") {
+        else if (currentName == "lv") {
             success = this->ReadLv(parent, current);
         }
-        else if (std::string(current.name()) == "mNum") {
+        else if (currentName == "mNum") {
             success = this->ReadMNum(parent, current);
         }
-        else if (std::string(current.name()) == "mordent") {
+        else if (currentName == "mordent") {
             success = this->ReadMordent(parent, current);
         }
-        else if (std::string(current.name()) == "octave") {
+        else if (currentName == "octave") {
             success = this->ReadOctave(parent, current);
         }
-        else if (std::string(current.name()) == "pedal") {
+        else if (currentName == "pedal") {
             success = this->ReadPedal(parent, current);
         }
-        else if (std::string(current.name()) == "phrase") {
+        else if (currentName == "phrase") {
             success = this->ReadPhrase(parent, current);
         }
-        else if (std::string(current.name()) == "pitchInflection") {
+        else if (currentName == "pitchInflection") {
             success = this->ReadPitchInflection(parent, current);
         }
-        else if (std::string(current.name()) == "reh") {
+        else if (currentName == "reh") {
             success = this->ReadReh(parent, current);
         }
-        else if (std::string(current.name()) == "slur") {
+        else if (currentName == "slur") {
             success = this->ReadSlur(parent, current);
         }
-        else if (std::string(current.name()) == "staff") {
+        else if (currentName == "staff") {
             success = this->ReadStaff(parent, current);
         }
-        else if (std::string(current.name()) == "tempo") {
+        else if (currentName == "tempo") {
             success = this->ReadTempo(parent, current);
         }
-        else if (std::string(current.name()) == "tie") {
+        else if (currentName == "tie") {
             success = this->ReadTie(parent, current);
         }
-        else if (std::string(current.name()) == "trill") {
+        else if (currentName == "trill") {
             success = this->ReadTrill(parent, current);
         }
-        else if (std::string(current.name()) == "turn") {
+        else if (currentName == "turn") {
             success = this->ReadTurn(parent, current);
         }
-        else if (std::string(current.name()) == "tupletSpan") {
+        else if (currentName == "tupletSpan") {
             if (!ReadTupletSpanAsTuplet(dynamic_cast<Measure *>(parent), current)) {
                 LogWarning("<tupletSpan> is not readable as <tuplet> and will be ignored");
             }
         }
         // xml comment
-        else if (std::string(current.name()) == "") {
+        else if (currentName == "") {
             success = this->ReadXMLComment(parent, current);
         }
         else {
@@ -4933,6 +4949,22 @@ bool MEIInput::ReadArpeg(Object *parent, pugi::xml_node arpeg)
 
     parent->AddChild(vrvArpeg);
     this->ReadUnsupportedAttr(arpeg, vrvArpeg);
+    return true;
+}
+
+bool MEIInput::ReadBeamSpan(Object *parent, pugi::xml_node beamSpan)
+{
+    BeamSpan *vrvBeamSpan = new BeamSpan();
+    ReadControlElement(beamSpan, vrvBeamSpan);
+
+    ReadPlistInterface(beamSpan, vrvBeamSpan);
+    ReadTimeSpanningInterface(beamSpan, vrvBeamSpan);
+    vrvBeamSpan->ReadBeamedWith(beamSpan);
+    vrvBeamSpan->ReadBeamRend(beamSpan);
+    vrvBeamSpan->ReadColor(beamSpan);
+
+    parent->AddChild(vrvBeamSpan);
+    ReadUnsupportedAttr(beamSpan, vrvBeamSpan);
     return true;
 }
 
@@ -7077,83 +7109,6 @@ bool MEIInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
     else {
         return false;
     }
-}
-
-bool MEIInput::ReadBeamSpanAsBeam(Measure *measure, pugi::xml_node beamSpan)
-{
-    if (!measure) {
-        LogWarning("Cannot read <beamSpan> within editorial markup");
-        return false;
-    }
-
-    Beam *beam = new Beam();
-    this->SetMeiUuid(beamSpan, beam);
-
-    LayerElement *start = NULL;
-    LayerElement *end = NULL;
-
-    // att.labelled
-    if (beamSpan.attribute("label")) {
-        beam->SetLabel(beamSpan.attribute("label").value());
-    }
-
-    // att.typed
-    if (beamSpan.attribute("type")) {
-        beam->SetType(beamSpan.attribute("type").value());
-    }
-    else {
-        beam->SetType("beamSpan");
-    }
-
-    // att.beam.vis
-    if (beamSpan.attribute("color")) {
-        beam->SetColor(beamSpan.attribute("color").value());
-    }
-
-    // position (pitch)
-    if (beamSpan.attribute("startid")) {
-        std::string refId = ExtractUuidFragment(beamSpan.attribute("startid").value());
-        start = dynamic_cast<LayerElement *>(measure->FindDescendantByUuid(refId));
-        if (!start) {
-            LogWarning("Element with @startid '%s' not found when trying to read the <beamSpan>", refId.c_str());
-        }
-    }
-    if (beamSpan.attribute("endid")) {
-        std::string refId = ExtractUuidFragment(beamSpan.attribute("endid").value());
-        end = dynamic_cast<LayerElement *>(measure->FindDescendantByUuid(refId));
-        if (!end) {
-            LogWarning("Element with @endid '%s' not found when trying to read the <beamSpan>", refId.c_str());
-        }
-    }
-    if (!start || !end) {
-        delete beam;
-        return false;
-    }
-
-    LayerElement *startChild = dynamic_cast<LayerElement *>(start->GetLastAncestorNot(LAYER));
-    LayerElement *endChild = dynamic_cast<LayerElement *>(end->GetLastAncestorNot(LAYER));
-
-    if (!startChild || !endChild || (startChild->GetParent() != endChild->GetParent())) {
-        LogWarning("Start and end elements for <beamSpan> '%s' not in the same layer", beam->GetUuid().c_str());
-        delete beam;
-        return false;
-    }
-
-    Layer *parentLayer = dynamic_cast<Layer *>(startChild->GetParent());
-    assert(parentLayer);
-
-    int startIdx = startChild->GetIdx();
-    int endIdx = endChild->GetIdx();
-    // LogDebug("%d %d %s!", startIdx, endIdx, start->GetUuid().c_str());
-    int i;
-    for (i = endIdx; i >= startIdx; i--) {
-        LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
-        if (element) beam->AddChild(element);
-    }
-    beam->SetParent(parentLayer);
-    parentLayer->InsertChild(beam, startIdx);
-
-    return true;
 }
 
 bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan)

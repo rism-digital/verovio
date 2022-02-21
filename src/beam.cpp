@@ -368,7 +368,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
                 [midpointOffset](BeamElementCoord *coord) { coord->m_yBeam += midpointOffset; });
             if (!this->DoesBeamOverlap(staffTop, topOffset, staffBottom, bottomOffset)) return false;
         }
-        // If midpoint if above the staff, try to place beam at the top edge of the staff
+        // If midpoint is above the staff, try to place beam at the top edge of the staff
         if (!isMidpointWithinBounds && (midpoint > staffBottom)) {
             const int offset = (m_beamElementCoordRefs.front()->m_yBeam + m_beamElementCoordRefs.back()->m_yBeam
                                    - 2 * (staffTop - topOffset))
@@ -1625,6 +1625,73 @@ bool Beam::IsTabBeam()
 }
 
 //----------------------------------------------------------------------------
+// BeamSpanSegment
+//----------------------------------------------------------------------------
+
+BeamSpanSegment::BeamSpanSegment()
+{
+    m_measure = NULL;
+    m_staff = NULL;
+    m_layer = NULL;
+    m_begin = NULL;
+    m_end = NULL;
+    m_spanningType = SPANNING_START_END;
+}
+
+void BeamSpanSegment::SetSpanningType(int systemIndex, int systemCount)
+{
+    if (0 == systemIndex) {
+        m_spanningType = SPANNING_START;
+    }
+    else if ((systemCount - 1) == systemIndex) {
+        m_spanningType = SPANNING_END;
+    }
+    else {
+        m_spanningType = SPANNING_MIDDLE;
+    }
+}
+
+void BeamSpanSegment::AppendSpanningCoordinates(Measure *measure)
+{
+    const int spanningType = m_spanningType;
+    if (SPANNING_START_END == spanningType) return;
+
+    BarLine *bar = measure->GetRightBarLine();
+    const int rightSide = bar->GetDrawingX();
+    BeamElementCoord *front = m_beamElementCoordRefs.front();
+    BeamElementCoord *back = m_beamElementCoordRefs.back();
+    double slope = 0.0;
+    if (m_beamElementCoordRefs.size() > 1) {
+        slope = (double)(back->m_yBeam - front->m_yBeam) / (double)(back->m_x - front->m_x);
+    }
+
+    // in case if beamSpan starts in current system - stretch beam to the right barline
+    if ((SPANNING_START == spanningType) || (SPANNING_MIDDLE == spanningType)) {
+        BeamElementCoord *right = new BeamElementCoord(*back);
+        const int distance = rightSide - back->m_x;
+        right->m_x = rightSide;
+        right->m_yBeam += distance * slope;
+        m_beamElementCoordRefs.push_back(right);
+    }
+    // otherwise start beam closer to the start of the Measure, to indicate spanning
+    if ((SPANNING_END == spanningType) || (SPANNING_MIDDLE == spanningType)) {
+        BeamElementCoord *left = new BeamElementCoord(*front);
+        int offset = 0;
+        if (m_beamElementCoordRefs.size() > 1) {
+            const int divideBy = 2 * ((int)m_beamElementCoordRefs.size() - 1);
+            offset = (back->m_x - front->m_x) / divideBy;
+        }
+        else {
+            // 1.5 * unit offset in this case (harcoded for the time being)
+            offset = 270;
+        }
+        left->m_x -= offset;
+        left->m_yBeam -= offset * slope;
+        m_beamElementCoordRefs.insert(m_beamElementCoordRefs.begin(), left);
+    }
+}
+
+//----------------------------------------------------------------------------
 // BeamElementCoord
 //----------------------------------------------------------------------------
 
@@ -1711,7 +1778,8 @@ void BeamElementCoord::SetDrawingStemDir(
 
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
-    if (!interface->m_crossStaffContent && (BEAMPLACE_mixed != interface->m_drawingPlace)) {
+    if (!interface->m_isSpanningElement && !interface->m_crossStaffContent
+        && (BEAMPLACE_mixed != interface->m_drawingPlace)) {
         if (((stemDir == STEMDIRECTION_up) && (m_yBeam <= segment->m_verticalCenter))
             || ((stemDir == STEMDIRECTION_down) && (segment->m_verticalCenter <= m_yBeam))) {
             m_yBeam = segment->m_verticalCenter;
