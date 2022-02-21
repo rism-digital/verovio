@@ -564,6 +564,13 @@ enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
 #define SUPER_SCRIPT_POSITION -0.20 // lowered down from the midline
 #define SUB_SCRIPT_POSITION -0.17 // lowered down from the baseline
 
+//----------------------------------------------------------------------------
+// Neume notation note size to staff size ratio defines
+//----------------------------------------------------------------------------
+
+#define NOTE_HEIGHT_TO_STAFF_SIZE_RATIO 2
+#define NOTE_WIDTH_TO_STAFF_SIZE_RATIO 1.4
+
 } // namespace vrv
 
 #endif // __VRV_DEF_H__
