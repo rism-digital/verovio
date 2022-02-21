@@ -1066,6 +1066,10 @@ Options::Options()
     m_svgBoundingBoxes.Init(false);
     this->Register(&m_svgBoundingBoxes, "svgBoundingBoxes", &m_general);
 
+    m_svgCss.SetInfo("SVG additional CSS", "CSS (as a string) to be added to the SVG output");
+    m_svgCss.Init("");
+    this->Register(&m_svgCss, "svgCss", &m_general);
+
     m_svgViewBox.SetInfo("Use viewbox on svg root", "Use viewBox on svg root element for easy scaling of document");
     m_svgViewBox.Init(false);
     this->Register(&m_svgViewBox, "svgViewBox", &m_general);
@@ -1258,7 +1262,7 @@ Options::Options()
     this->Register(&m_lyricVerseCollapse, "lyricVerseCollapse", &m_generalLayout);
 
     m_measureMinWidth.SetInfo("Measure min width", "The minimal measure width in MEI units");
-    m_measureMinWidth.Init(15, 1, 30);
+    m_measureMinWidth.Init(1, 1, 30);
     this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
 
     m_mnumInterval.SetInfo("Measure Number Interval", "How frequently to place measure numbers");

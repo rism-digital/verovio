@@ -1303,6 +1303,11 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
         svg.SetSvgBoundingBoxes(true);
     }
 
+    // set the additional CSS if any
+    if (!m_options->m_svgCss.GetValue().empty()) {
+        svg.SetCss(m_options->m_svgCss.GetValue());
+    }
+
     if (m_options->m_svgViewBox.GetValue()) {
         svg.SetSvgViewBox(true);
     }
