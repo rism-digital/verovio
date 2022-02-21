@@ -35,6 +35,7 @@ Glyph::Glyph()
     m_horizAdvX = 0;
     m_unitsPerEm = 20480;
     m_codeStr = "[unset]";
+    m_path = "[unset]";
 }
 
 Glyph::Glyph(std::string path, std::string codeStr)
@@ -81,6 +82,7 @@ Glyph::Glyph(int unitsPerEm)
     m_horizAdvX = 0;
     m_unitsPerEm = unitsPerEm * 10;
     m_codeStr = "[unset]";
+    m_path = "[unset]";
 }
 
 Glyph::~Glyph() {}
