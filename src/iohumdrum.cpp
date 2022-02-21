@@ -5734,6 +5734,7 @@ void HumdrumInput::setMensurationSymbol(
 void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const std::string &metersig,
     hum::HTp partstart, hum::HTp timetok, hum::HTp metertok)
 {
+
     if ((partstart != NULL) && partstart->isMens()) {
         // Don't display time signatures in mensural notation.
         return;
@@ -5748,9 +5749,11 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
         setLocationId(vrvmeter, timetok);
     }
 
-    if (*metertok == "*met()") {
-        // set time signature to be invisible
-        vrvmeter->SetForm(METERFORM_invis);
+    if (metertok) {
+        if (*metertok == "*met()") {
+            // set time signature to be invisible
+            vrvmeter->SetForm(METERFORM_invis);
+        }
     }
 
     // Don't store time signature if there is a mensuration to show
