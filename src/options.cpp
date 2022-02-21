@@ -1066,6 +1066,10 @@ Options::Options()
     m_svgBoundingBoxes.Init(false);
     this->Register(&m_svgBoundingBoxes, "svgBoundingBoxes", &m_general);
 
+    m_svgCss.SetInfo("SVG additional CSS", "CSS (as a string) to be added to the SVG output");
+    m_svgCss.Init("");
+    this->Register(&m_svgCss, "svgCss", &m_general);
+
     m_svgViewBox.SetInfo("Use viewbox on svg root", "Use viewBox on svg root element for easy scaling of document");
     m_svgViewBox.Init(false);
     this->Register(&m_svgViewBox, "svgViewBox", &m_general);
