@@ -1262,7 +1262,7 @@ Options::Options()
     this->Register(&m_lyricVerseCollapse, "lyricVerseCollapse", &m_generalLayout);
 
     m_measureMinWidth.SetInfo("Measure min width", "The minimal measure width in MEI units");
-    m_measureMinWidth.Init(1, 1, 30);
+    m_measureMinWidth.Init(15, 1, 30);
     this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
 
     m_mnumInterval.SetInfo("Measure Number Interval", "How frequently to place measure numbers");
