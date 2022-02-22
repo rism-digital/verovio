@@ -340,10 +340,9 @@ protected:
     void FilterList(ArrayOfObjects *childList) override;
 
     /**
-     * Helper function to calculate overlap with layer elements that
-     * are placed within the duration of the beam
+     * See LayerElement::SetElementShortening
      */
-    int CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, int y2);
+    void SetElementShortening(int shortening) override;
 
 private:
     /**

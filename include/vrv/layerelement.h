@@ -251,6 +251,11 @@ public:
      */
     std::pair<int, bool> CalcElementHorizontalOverlap(Doc *doc, const std::vector<LayerElement *> &otherElements,
         bool areDotsAdjusted, bool isChordElement, bool isLowerElement = false, bool unison = true);
+    
+    /**
+     * Helper function to set shortening for elements with beam interface
+     */
+    virtual void SetElementShortening(int shortening){};
 
     //----------//
     // Functors //
@@ -443,6 +448,12 @@ protected:
      * secondary
      */
     virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; }
+
+    /**
+     * Helper function to calculate overlap with layer elements that
+     * are placed within the duration of element
+     */
+    int CalcLayerOverlap(Doc *doc, int direction, int y1, int y2);
 
     /**
      * Calculate the optimal dot location for a note or chord

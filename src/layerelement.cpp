@@ -892,6 +892,57 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     return usePrimary ? dotLocs1 : dotLocs2;
 }
 
+int LayerElement::CalcLayerOverlap(Doc *doc, int direction, int y1, int y2)
+{
+    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    if (!parentLayer) return 0;
+    // Check whether there are elements on other layer in the duration of the current beam. If there are none - stop
+    // here, there's nothing to be done
+    auto collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
+    if (collidingElementsList.empty()) return 0;
+
+    Staff *staff = this->GetAncestorStaff();
+
+    int leftMargin = 0;
+    int rightMargin = 0;
+    std::vector<int> elementOverlaps;
+    for (auto object : collidingElementsList) {
+        LayerElement *layerElement = vrv_cast<LayerElement *>(object);
+        if (!this->HorizontalContentOverlap(object)) continue;
+        if (direction > 0) {
+            // make sure that there's actual overlap first
+            if ((layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y1)
+                && (layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y2))
+                continue;
+            leftMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y1;
+            rightMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y2;
+        }
+        else {
+            // make sure that there's actual overlap first
+            if ((layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y1)
+                && (layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y2))
+                continue;
+            leftMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y1;
+            rightMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y2;
+        }
+        elementOverlaps.emplace_back(std::max(leftMargin * direction, rightMargin * direction));
+    }
+    if (elementOverlaps.empty()) return 0;
+
+    const int staffOffset = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
+    int overlap = 0;
+    if (*maxOverlap >= 0) {
+        overlap = ((*maxOverlap == 0) ? staffOffset : *maxOverlap) * direction;
+    }
+    else {
+        int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / staffOffset) * 2;
+        if (maxShorteningInHalfUnits > 0) --maxShorteningInHalfUnits;
+        this->SetElementShortening(maxShorteningInHalfUnits);
+    }
+    return overlap;
+}
+
 //----------------------------------------------------------------------------
 // Static methods for LayerElement
 //----------------------------------------------------------------------------
@@ -1439,8 +1490,8 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
 
     // ignore elements that are not in the beam or are direct children of the beam
     if (!params->m_beam) return FUNCTOR_CONTINUE;
-    if (!params->m_isOtherLayer && !this->Is(ACCID) && (this->GetFirstAncestor(BEAM) == params->m_beam)
-        && !this->IsGraceNote())
+    if (!params->m_isOtherLayer && !this->Is(ACCID) && !this->IsGraceNote()
+        && ((this->GetFirstAncestor(BEAM) == params->m_beam) || (this->GetFirstAncestor(FTREM) == params->m_beam)))
         return FUNCTOR_CONTINUE;
     // ignore elements that are both on other layer and cross-staff
     if (params->m_isOtherLayer && m_crossStaff) return FUNCTOR_CONTINUE;
@@ -1462,8 +1513,10 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
 
     // check if top/bottom of the element overlaps with beam coordinates
     int leftMargin = 0, rightMargin = 0;
-    Beam *beam = vrv_cast<Beam *>(params->m_beam);
-    const int beamCount = beam->m_beamSegment.GetAdjacentElementsDuration(this->GetDrawingX()) - DUR_8;
+    BeamDrawingInterface *beam = params->m_beam->GetBeamDrawingInterface();
+    const auto [above, below] = beam->GetAdditionalBeamCount();
+    int beamCount = std::max(above, below);
+    if (params->m_beam->Is(FTREM)) --beamCount;
     const int currentBeamYLeft = params->m_y1 + params->m_beamSlope * (this->GetContentLeft() - params->m_x1);
     const int currentBeamYRight = params->m_y1 + params->m_beamSlope * (this->GetContentRight() - params->m_x1);
     if (params->m_directionBias > 0) {
