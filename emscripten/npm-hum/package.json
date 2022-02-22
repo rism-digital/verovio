@@ -1,7 +1,7 @@
 {
-  "name": "verovio-dev",
-  "version": "2.2.0-6",
-  "description": "This is the development version of the verovio package",
+  "name": "verovio-humdrum",
+  "version": "3.9.0",
+  "description": "This is the stable version of the verovio package with humdrum support",
   "main": "index.js",
   "keywords": [
     "music",
@@ -9,9 +9,10 @@
     "music engraving",
     "mei",
     "music encoding",
-    "svg"
+    "svg",
+    "humdrum"
   ],
-  "author": "Laurent Pugin",
+  "author": "Laurent Pugin and others",
   "license": "LGPL 3",
   "repository": {
     "type": "git",
@@ -20,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/rism-digital/verovio/issues"
   },
-  "homepage": "http://www.verovio.org",
+  "homepage": "https://www.verovio.org",
   "engines": {
     "node": ">= 7.0.0"
   }

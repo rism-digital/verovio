@@ -11,7 +11,7 @@
     "music encoding",
     "svg"
   ],
-  "author": "Laurent Pugin",
+  "author": "Laurent Pugin and others",
   "license": "LGPL 3",
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
   "bugs": {
     "url": "https://github.com/rism-digital/verovio/issues"
   },
-  "homepage": "http://www.verovio.org",
+  "homepage": "https://www.verovio.org",
   "engines": {
     "node": ">= 7.0.0"
   }
