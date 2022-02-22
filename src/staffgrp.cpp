@@ -39,14 +39,14 @@ StaffGrp::StaffGrp()
     , AttStaffGrpVis()
     , AttTyped()
 {
-    RegisterAttClass(ATT_BASIC);
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_NNUMBERLIKE);
-    RegisterAttClass(ATT_STAFFGROUPINGSYM);
-    RegisterAttClass(ATT_STAFFGRPVIS);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_BASIC);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_STAFFGROUPINGSYM);
+    this->RegisterAttClass(ATT_STAFFGRPVIS);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 StaffGrp::~StaffGrp() {}
@@ -54,12 +54,12 @@ StaffGrp::~StaffGrp() {}
 void StaffGrp::Reset()
 {
     Object::Reset();
-    ResetBasic();
-    ResetLabelled();
-    ResetNNumberLike();
-    ResetStaffGroupingSym();
-    ResetStaffGrpVis();
-    ResetTyped();
+    this->ResetBasic();
+    this->ResetLabelled();
+    this->ResetNNumberLike();
+    this->ResetStaffGroupingSym();
+    this->ResetStaffGrpVis();
+    this->ResetTyped();
 
     m_drawingVisibility = OPTIMIZATION_NONE;
     m_groupSymbol = NULL;
@@ -135,7 +135,7 @@ int StaffGrp::GetMaxStaffSize()
 
 std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
 {
-    const ArrayOfObjects *staffDefs = GetList(this);
+    const ArrayOfObjects *staffDefs = this->GetList(this);
     if (staffDefs->empty()) {
         return { NULL, NULL };
     }

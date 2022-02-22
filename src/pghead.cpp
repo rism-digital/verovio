@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "lb.h"
 #include "rend.h"
 #include "text.h"
@@ -28,7 +29,7 @@ static const ClassRegistrar<PgHead> s_factory("pgHead", PGHEAD);
 
 PgHead::PgHead() : RunningElement(PGHEAD, "pghead-")
 {
-    Reset();
+    this->Reset();
 }
 
 PgHead::~PgHead() {}
@@ -36,6 +37,18 @@ PgHead::~PgHead() {}
 void PgHead::Reset()
 {
     RunningElement::Reset();
+}
+
+int PgHead::GetTotalHeight(Doc *doc)
+{
+    assert(doc);
+
+    int height = this->GetContentHeight();
+    if (height > 0) {
+        const int unit = doc->GetDrawingUnit(100);
+        height += doc->GetOptions()->m_bottomMarginPgHead.GetValue() * unit;
+    }
+    return height;
 }
 
 bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)

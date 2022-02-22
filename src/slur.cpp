@@ -45,13 +45,13 @@ Slur::Slur()
     , AttCurveRend()
     , AttLayerIdent()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CURVATURE);
-    RegisterAttClass(ATT_CURVEREND);
-    RegisterAttClass(ATT_LAYERIDENT);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CURVATURE);
+    this->RegisterAttClass(ATT_CURVEREND);
+    this->RegisterAttClass(ATT_LAYERIDENT);
 
-    Reset();
+    this->Reset();
 }
 
 Slur::Slur(ClassId classId)
@@ -62,13 +62,13 @@ Slur::Slur(ClassId classId)
     , AttCurveRend()
     , AttLayerIdent()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CURVATURE);
-    RegisterAttClass(ATT_CURVEREND);
-    RegisterAttClass(ATT_LAYERIDENT);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CURVATURE);
+    this->RegisterAttClass(ATT_CURVEREND);
+    this->RegisterAttClass(ATT_LAYERIDENT);
 
-    Reset();
+    this->Reset();
 }
 
 Slur::Slur(ClassId classId, const std::string &classIdStr)
@@ -79,13 +79,13 @@ Slur::Slur(ClassId classId, const std::string &classIdStr)
     , AttCurveRend()
     , AttLayerIdent()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CURVATURE);
-    RegisterAttClass(ATT_CURVEREND);
-    RegisterAttClass(ATT_LAYERIDENT);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CURVATURE);
+    this->RegisterAttClass(ATT_CURVEREND);
+    this->RegisterAttClass(ATT_LAYERIDENT);
 
-    Reset();
+    this->Reset();
 }
 
 Slur::~Slur() {}
@@ -94,10 +94,10 @@ void Slur::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    ResetColor();
-    ResetCurvature();
-    ResetCurveRend();
-    ResetLayerIdent();
+    this->ResetColor();
+    this->ResetCurvature();
+    this->ResetCurveRend();
+    this->ResetLayerIdent();
 
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
 }
@@ -137,8 +137,8 @@ Staff *Slur::GetBoundaryCrossStaff()
     }
     else {
         // Check if the two elements are in different staves (but themselves not cross-staff)
-        Staff *startStaff = vrv_cast<Staff *>(start->GetFirstAncestor(STAFF));
-        Staff *endStaff = vrv_cast<Staff *>(end->GetFirstAncestor(STAFF));
+        Staff *startStaff = start->GetAncestorStaff(ANCESTOR_ONLY, false);
+        Staff *endStaff = end->GetAncestorStaff(ANCESTOR_ONLY, false);
         if (startStaff && endStaff && (startStaff->GetN() != endStaff->GetN())) {
             return endStaff;
         }
@@ -163,10 +163,8 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
 
     std::set<int> staffNumbers;
     staffNumbers.emplace(staff->GetN());
-    Staff *startStaff = this->GetStart()->m_crossStaff ? this->GetStart()->m_crossStaff
-                                                       : vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
-    Staff *endStaff = this->GetEnd()->m_crossStaff ? this->GetEnd()->m_crossStaff
-                                                   : vrv_cast<Staff *>(this->GetEnd()->GetFirstAncestor(STAFF));
+    Staff *startStaff = this->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+    Staff *endStaff = this->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
     if (startStaff && (startStaff != staff)) {
         staffNumbers.emplace(startStaff->GetN());
     }
@@ -275,11 +273,7 @@ Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spann
     // The floating curve positioner of cross staff slurs should live in the upper/lower staff alignment
     // corresponding to whether the slur is curved above/below
     auto adaptStaff = [&extremalStaff, curveDir](LayerElement *element) {
-        Layer *elementLayer = NULL;
-        Staff *elementStaff = element->GetCrossStaff(elementLayer);
-        if (!elementStaff) elementStaff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
-        assert(elementStaff);
-
+        Staff *elementStaff = element->GetAncestorStaff(RESOLVE_CROSS_STAFF);
         if ((curveDir == curvature_CURVEDIR_above) && (elementStaff->GetN() < extremalStaff->GetN())) {
             extremalStaff = elementStaff;
         }
@@ -312,7 +306,8 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     BezierCurve bezier(points[0], points[1], points[2], points[3]);
     bezier.UpdateControlPointParams(curve->GetDir());
 
-    const int margin = doc->GetOptions()->m_slurMargin.GetValue() * doc->GetDrawingUnit(100);
+    const int unit = doc->GetDrawingUnit(100);
+    const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
 
     // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
     this->FilterSpannedElements(curve, bezier, margin);
@@ -321,7 +316,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // Only collisions near the endpoints are taken into account.
     int endPointShiftLeft = 0;
     int endPointShiftRight = 0;
-    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, margin);
+    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, margin, unit);
     if ((endPointShiftLeft != 0) || (endPointShiftRight != 0)) {
         const int sign = (curve->GetDir() == curvature_CURVEDIR_above) ? 1 : -1;
         bezier.p1.y += sign * endPointShiftLeft;
@@ -368,7 +363,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // STEP 5: Adjust the slur shape
     // Through the control point adjustments in step 3 and 4 it can happen that the slur looses its desired shape.
     // We correct the shape if the slur is too flat or not convex.
-    this->AdjustSlurShape(bezier, curve->GetDir(), doc->GetDrawingUnit(100));
+    this->AdjustSlurShape(bezier, curve->GetDir(), unit);
     curve->UpdatePoints(bezier);
 
     // Since we are going to redraw it, reset its bounding box
@@ -406,7 +401,8 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
     }
 }
 
-std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
+std::pair<int, int> Slur::CalcEndPointShift(
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const int margin, const int unit)
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return { 0, 0 };
 
@@ -443,6 +439,9 @@ std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, cons
             this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioRight, intersectionRight);
         }
     }
+
+    this->RebalanceShifts(shiftLeft, shiftRight, dist, unit);
+
     return { shiftLeft, shiftRight };
 }
 
@@ -466,6 +465,26 @@ void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int int
             intersection *= pow(10.0 * ratio - 8.5, 2.0);
         }
         shiftRight = std::max(shiftRight, intersection);
+    }
+}
+
+void Slur::RebalanceShifts(int &shiftLeft, int &shiftRight, const double distance, const int unit) const
+{
+    // alpha is 1 for dist <= 4U, 0 for dist >= 8U, interpolated between 4U and 8U
+    double alpha = 0.0;
+    if (distance <= 4.0 * unit) {
+        alpha = 1.0;
+    }
+    else if (distance <= 8.0 * unit) {
+        alpha = 2.0 - distance / (4.0 * unit);
+    }
+
+    const int difference = std::abs(shiftLeft - shiftRight);
+    if (shiftLeft < shiftRight) {
+        shiftLeft += alpha * difference;
+    }
+    else {
+        shiftRight += alpha * difference;
     }
 }
 
@@ -994,24 +1013,11 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             else if (isGraceToNoteSlur) {
-                if (end->IsInBeam()) {
-                    x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                }
-                else if (parentBeam || parentFTrem) {
-                    if (end->GetDrawingY() > y1) {
-                        y2 = end->GetDrawingY() + unit * 3;
-                    }
-                    else {
-                        y2 = y1;
-                        x2 += 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                    }
-                }
-                else if ((end->GetContentTop() >= start->GetContentTop())
-                    && (end->GetContentBottom() <= start->GetContentTop())) {
-                    y2 = end->GetDrawingY() + unit * 3;
-                }
-                else {
-                    y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                const int yMin = y1 - unit * 4;
+                const int yTop = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                y2 = std::max(end->GetDrawingY() + unit * 2, yMin);
+                if (y2 > yTop - unit * 2) {
+                    y2 = yTop;
                     x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
             }
@@ -1051,18 +1057,11 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             else if (isGraceToNoteSlur) {
-                if (end->IsInBeam()) {
-                    x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                }
-                else if (parentBeam || parentFTrem) {
-                    if (end->GetDrawingY() < y1) {
-                        y2 = end->GetDrawingY();
-                        x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                    }
-                    else {
-                        y2 = y1;
-                        x2 -= endRadius + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                    }
+                const int yMax = y1 + unit;
+                const int yBottom = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                y2 = std::min(end->GetDrawingY(), yMax);
+                if (y2 < yBottom + unit) {
+                    y2 = yBottom + unit * 2;
                 }
                 else {
                     x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);

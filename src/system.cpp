@@ -42,7 +42,7 @@ namespace vrv {
 
 System::System() : Object(SYSTEM, "system-"), DrawingListInterface(), AttTyped()
 {
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_TYPED);
 
     // We set parent to it because we want to access the parent doc from the aligners
     m_systemAligner.SetParent(this);
@@ -50,20 +50,20 @@ System::System() : Object(SYSTEM, "system-"), DrawingListInterface(), AttTyped()
     // owned pointers need to be set to NULL;
     m_drawingScoreDef = NULL;
 
-    Reset();
+    this->Reset();
 }
 
 System::~System()
 {
     // We need to delete own objects
-    Reset();
+    this->Reset();
 }
 
 void System::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
-    ResetTyped();
+    this->ResetTyped();
 
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
@@ -78,6 +78,8 @@ void System::Reset()
     m_drawingYRel = 0;
     m_drawingTotalWidth = 0;
     m_drawingJustifiableWidth = 0;
+    m_castOffTotalWidth = 0;
+    m_castOffJustifiableWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
     m_drawingIsOptimized = false;
 }
@@ -120,13 +122,13 @@ int System::GetDrawingY() const
 
 void System::SetDrawingXRel(int drawingXRel)
 {
-    ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
 }
 
 void System::SetDrawingYRel(int drawingYRel)
 {
-    ResetCachedDrawingY();
+    this->ResetCachedDrawingY();
     m_drawingYRel = drawingYRel;
 }
 
@@ -310,7 +312,8 @@ void System::AddToDrawingListIfNeccessary(Object *object)
 
     if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return;
 
-    if (object->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION, SLUR, SYL, TIE })) {
+    if (object->Is(
+            { BEAMSPAN, BRACKETSPAN, FIGURE, GLISS, HAIRPIN, LV, OCTAVE, PHRASE, PITCHINFLECTION, SLUR, SYL, TIE })) {
         this->AddToDrawingList(object);
     }
     else if (object->Is(DIR)) {
@@ -367,6 +370,27 @@ bool System::IsLastOfMdiv()
     assert(this->GetParent());
     Object *nextSibling = this->GetParent()->GetNext(this);
     return (nextSibling && nextSibling->IsPageElement());
+}
+
+double System::EstimateJustificationRatio(Doc *doc)
+{
+    assert(doc);
+
+    // We can only estimate if cast off system widths are available
+    if ((m_castOffTotalWidth == 0) || (m_castOffJustifiableWidth == 0)) {
+        return 1.0;
+    }
+
+    const double nonJustifiableWidth
+        = m_systemLeftMar + m_systemRightMar + m_castOffTotalWidth - m_castOffJustifiableWidth;
+    double estimatedRatio
+        = (double)(doc->m_drawingPageContentWidth - nonJustifiableWidth) / ((double)m_castOffJustifiableWidth);
+
+    // Apply dampening and bound compression
+    estimatedRatio *= 0.95;
+    estimatedRatio = std::max(estimatedRatio, 0.8);
+
+    return estimatedRatio;
 }
 
 void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
@@ -489,7 +513,7 @@ int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
-    SetDrawingXRel(0);
+    this->SetDrawingXRel(0);
     m_drawingAbbrLabelsWidth = 0;
 
     return FUNCTOR_CONTINUE;
@@ -497,7 +521,7 @@ int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int System::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    SetDrawingYRel(0);
+    this->SetDrawingYRel(0);
 
     m_systemAligner.Reset();
 
@@ -549,6 +573,19 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functorEnd, params);
 
     return FUNCTOR_SIBLINGS;
+}
+
+int System::SetAlignmentXPos(FunctorParams *functorParams)
+{
+    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    assert(params);
+
+    const double ratio = this->EstimateJustificationRatio(params->m_doc);
+    if (!this->IsLastOfMdiv() || (ratio < params->m_estimatedJustificationRatio)) {
+        params->m_estimatedJustificationRatio = ratio;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 int System::AdjustXOverflow(FunctorParams *functorParams)
@@ -729,7 +766,7 @@ int System::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    SetDrawingXRel(m_systemLeftMar + this->GetDrawingLabelsWidth());
+    this->SetDrawingXRel(m_systemLeftMar + this->GetDrawingLabelsWidth());
     params->m_shift = 0;
     params->m_justifiableWidth = 0;
 
@@ -741,8 +778,14 @@ int System::AlignMeasuresEnd(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    m_drawingTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
-    m_drawingJustifiableWidth = params->m_justifiableWidth;
+    if (params->m_storeCastOffSystemWidths) {
+        m_castOffTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
+        m_castOffJustifiableWidth = params->m_justifiableWidth;
+    }
+    else {
+        m_drawingTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
+        m_drawingJustifiableWidth = params->m_justifiableWidth;
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -753,16 +796,20 @@ int System::AlignSystems(FunctorParams *functorParams)
     assert(params);
     assert(m_systemAligner.GetBottomAlignment());
 
-    int systemMargin = this->IsFirstInPage() ? 0 : params->m_systemMargin;
-    if (systemMargin) {
-        const int margin
-            = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc));
-        // Ensure minimal white space between consecutive systems by adding one staff space
-        const int unit = params->m_doc->GetDrawingUnit(100);
-        params->m_shift -= std::max(margin, 2 * unit);
+    // No spacing for the first system
+    int systemSpacing = this->IsFirstInPage() ? 0 : params->m_systemSpacing;
+    if (systemSpacing) {
+        const int contentOverflow = params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc);
+        const int clefOverflow
+            = params->m_prevBottomClefOverflow + m_systemAligner.GetOverflowAbove(params->m_doc, true);
+        // Alignment is already pre-determined with staff alignment overflow
+        // We need to subtract them from the desired spacing
+        const int actualSpacing = systemSpacing - std::max(contentOverflow, clefOverflow);
+        // Set the spacing if it exists (greater than 0)
+        if (actualSpacing > 0) params->m_shift -= actualSpacing;
     }
 
-    SetDrawingYRel(params->m_shift);
+    this->SetDrawingYRel(params->m_shift);
 
     params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel();
 
@@ -773,6 +820,7 @@ int System::AlignSystems(FunctorParams *functorParams)
     }
 
     params->m_prevBottomOverflow = m_systemAligner.GetOverflowBelow(params->m_doc);
+    params->m_prevBottomClefOverflow = m_systemAligner.GetOverflowBelow(params->m_doc, true);
 
     return FUNCTOR_SIBLINGS;
 }

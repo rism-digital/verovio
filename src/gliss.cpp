@@ -34,13 +34,13 @@ Gliss::Gliss()
     , AttLineRendBase()
     , AttNNumberLike()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_LINEREND);
-    RegisterAttClass(ATT_LINERENDBASE);
-    RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_LINEREND);
+    this->RegisterAttClass(ATT_LINERENDBASE);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
 
-    Reset();
+    this->Reset();
 }
 
 Gliss::~Gliss() {}
@@ -49,10 +49,10 @@ void Gliss::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    ResetColor();
-    ResetLineRend();
-    ResetLineRendBase();
-    ResetNNumberLike();
+    this->ResetColor();
+    this->ResetLineRend();
+    this->ResetLineRendBase();
+    this->ResetNNumberLike();
 }
 
 //----------------------------------------------------------------------------

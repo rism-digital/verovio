@@ -36,6 +36,17 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * @name See Object::GenerateMIDIEnd
+     */
+    ///@{
+    int GenerateMIDIEnd(FunctorParams *functorParams) override;
+    ///@}
+
 protected:
     //
 private:

@@ -19,7 +19,7 @@ option(NO_MXL_SUPPORT           "Disable compressed MusicXML support"          O
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
 option(NO_RUNTIME               "Disable runtime clock support"                ON)
-option(BUILD_AS_LIBRARY         "Build verovio as library"                     OFF)
+option(BUILD_AS_LIBRARY         "Build Verovio as library"                     OFF)
 
 if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
     message(SEND_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
@@ -203,7 +203,10 @@ elseif (BUILD_AS_PYTHON)
     include(${SWIG_USE_FILE})
     set(CMAKE_SWIG_FLAGS "")
 
-    if(Python_VERSION VERSION_GREATER_EQUAL 3)
+    set(PYTHON_VERSION "3" CACHE STRING "Python Version to use")
+    find_package(Python EXACT ${PYTHON_VERSION} MODULE REQUIRED)
+
+    if(PYTHON_VERSION VERSION_GREATER_EQUAL 3)
       list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
     endif()
 
@@ -212,20 +215,13 @@ elseif (BUILD_AS_PYTHON)
     # needed for static build on linux
     add_definitions(-fPIC)
 
-    ### For building for specific version of Python (example for 3.4 on OS X with MacPorts installation)
-    #set(PYTHON_INCLUDE_DIR /opt/local/Library/Frameworks/Python.framework/Versions/3.4/include/python3.4m)
-    #set(PYTHON_LIBRARY /opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/libpython3.4.dylib)
-    #include_directories(${PYTHON_INCLUDE_DIR})
-    #swig_add_library(verovio_module_custom LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
-    #swig_link_libraries(verovio_module_custom verovio ${PYTHON_LIBRARY})
-
     ### For building for found version of Python (comment when specific version is set)
-    find_package(PythonLibs)
-    include_directories(${PYTHON_INCLUDE_PATH})
-    message(STATUS "***** Building for Python ${PYTHONLIBS_VERSION_STRING} *****")
-    string(REPLACE "." "_" OUTPUT_VERSION_STRING ${PYTHONLIBS_VERSION_STRING})
+    find_package(Python COMPONENTS Interpreter Development)
+    include_directories(${Python_INCLUDE_DIRS})
+    message(STATUS "***** Building for Python ${Python_VERSION} *****")
+    string(REPLACE "." "_" OUTPUT_VERSION_STRING ${Python_VERSION})
     swig_add_library(verovio_module_${OUTPUT_VERSION_STRING} LANGUAGE python TYPE MODULE SOURCES ../bindings/python/verovio.i)
-    swig_link_libraries(verovio_module_${OUTPUT_VERSION_STRING} verovio ${PYTHON_LIBRARIES})
+    swig_link_libraries(verovio_module_${OUTPUT_VERSION_STRING} verovio ${Python_LIBRARIES})
 
     add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
 

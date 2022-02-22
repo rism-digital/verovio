@@ -132,12 +132,40 @@ public:
      */
     void ClearCoords();
 
+    /**
+     * Helper to find number of additional beams. Return { additional beams above main beam, additional beams below }
+     */
+    virtual std::pair<int, int> GetAdditionalBeamCount() const { return { 0, 0 }; }
+
+    /**
+     * Helper to get number of beams represented by attributes @beam and @beam.float
+     */
+    virtual std::pair<int, int> GetFloatingBeamCount() const { return { 0, 0 }; }
+
+    /**
+     * Get above/below overflow
+     */
+    void GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below);
+
+    /**
+     * Get above/below overflow for the children
+     */
+    void GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below);
+
 protected:
     /**
      * Return the position of the element in the beam.
      * For notes, lookup the position of the parent chord.
      */
     int GetPosition(Object *object, LayerElement *element);
+
+    //
+private:
+    /**
+     * Determines whether beam should be horizontal based on item positions and relative beam place. Should be used with
+     * mixed beams, where beam place can be different for separate elements
+     */
+    bool IsHorizontalMixedBeam(const std::vector<int> &items, const std::vector<data_BEAMPLACE> &directions) const;
 
 public:
     // values to be set before calling CalcBeam
@@ -147,6 +175,7 @@ public:
     bool m_cueSize;
     Staff *m_crossStaffContent;
     data_STAFFREL_basic m_crossStaffRel;
+    bool m_isSpanningElement;
     int m_shortestDur;
     data_STEMDIRECTION m_notesStemDir;
     data_BEAMPLACE m_drawingPlace;
@@ -156,6 +185,7 @@ public:
     int m_beamWidth;
     int m_beamWidthBlack;
     int m_beamWidthWhite;
+    int m_fractionSize;
 
     // position x for the stem (normal and cue-sized)
     int m_stemXAbove[2];
@@ -165,6 +195,9 @@ public:
      * An array of coordinates for each element
      **/
     ArrayOfBeamElementCoords m_beamElementCoords;
+
+private:
+    //
 };
 
 //----------------------------------------------------------------------------

@@ -35,12 +35,12 @@ static const ClassRegistrar<Verse> s_factory("verse", VERSE);
 
 Verse::Verse() : LayerElement(VERSE, "verse-"), AttColor(), AttLang(), AttNInteger(), AttTypography()
 {
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_LANG);
-    RegisterAttClass(ATT_NINTEGER);
-    RegisterAttClass(ATT_TYPOGRAPHY);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_LANG);
+    this->RegisterAttClass(ATT_NINTEGER);
+    this->RegisterAttClass(ATT_TYPOGRAPHY);
 
-    Reset();
+    this->Reset();
 }
 
 Verse::~Verse() {}
@@ -48,10 +48,10 @@ Verse::~Verse() {}
 void Verse::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
-    ResetLang();
-    ResetNInteger();
-    ResetTypography();
+    this->ResetColor();
+    this->ResetLang();
+    this->ResetNInteger();
+    this->ResetTypography();
 
     m_drawingLabelAbbr = NULL;
 }
@@ -238,9 +238,9 @@ int Verse::PrepareProcessingLists(FunctorParams *functorParams)
     assert(params);
     // StaffN_LayerN_VerseN_t *tree = vrv_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Staff *staff = this->GetAncestorStaff();
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(staff && layer);
+    assert(layer);
 
     params->m_verseTree.child[staff->GetN()].child[layer->GetN()].child[this->GetN()];
     // Alternate solution with StaffN_LayerN_VerseN_t

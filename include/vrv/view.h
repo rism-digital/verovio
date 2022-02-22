@@ -23,6 +23,7 @@ class Arpeg;
 class BarLine;
 class Beam;
 class BeamSegment;
+class BeamSpan;
 class BracketSpan;
 class Breath;
 class Chord;
@@ -388,6 +389,7 @@ protected:
     ///@{
     void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, System *system, Object *graphic = NULL);
     ///@}
 
     /**
@@ -407,7 +409,7 @@ protected:
      */
     ///@{
     void DrawControlElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
-    void DrawTimeSpanningElement(DeviceContext *dc, Object *object, System *system);
+    void DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *system);
     void DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *system);
     void DrawArpegEnclosing(DeviceContext *dc, Arpeg *arpeg, Staff *staff, wchar_t startGlyph, wchar_t fillGlyph,
         wchar_t endGlyph, int x, int y, int height, bool cueSize);
@@ -508,6 +510,7 @@ protected:
      * Defined in view_tab.cpp
      */
     ///@{
+    void DrawTabClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawTabGrp(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -599,8 +602,13 @@ private:
     /**
      * Internal method for drawing a BeamSegment
      */
-    void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,
-        Staff *staff, Measure *measure);
+    void DrawBeamSegment(
+        DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer, Staff *staff);
+
+    /**
+     * Internal methods for drawing time spanning elements
+     */
+    bool HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerElement *start, LayerElement *end) const;
 
 public:
     /** Document */

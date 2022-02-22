@@ -32,13 +32,13 @@ static const ClassRegistrar<MRest> s_factory("mRest", MREST);
 MRest::MRest()
     : LayerElement(MREST, "mrest-"), PositionInterface(), AttColor(), AttCue(), AttFermataPresent(), AttVisibility()
 {
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CUE);
-    RegisterAttClass(ATT_FERMATAPRESENT);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_FERMATAPRESENT);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
-    Reset();
+    this->Reset();
 }
 
 MRest::~MRest() {}
@@ -47,10 +47,10 @@ void MRest::Reset()
 {
     LayerElement::Reset();
     PositionInterface::Reset();
-    ResetColor();
-    ResetCue();
-    ResetFermataPresent();
-    ResetVisibility();
+    this->ResetColor();
+    this->ResetCue();
+    this->ResetFermataPresent();
+    this->ResetVisibility();
 }
 
 //----------------------------------------------------------------------------
@@ -90,8 +90,7 @@ int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
 int MRest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation)
 {
     if (!layer) return defaultLocation;
-    Staff *parentStaff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
-    assert(parentStaff);
+    Staff *parentStaff = this->GetAncestorStaff();
 
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
     if (parentStaff->GetChildCount(LAYER) != 2) return defaultLocation;

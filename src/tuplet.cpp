@@ -26,6 +26,7 @@
 #include "rest.h"
 #include "space.h"
 #include "staff.h"
+#include "tabgrp.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -44,12 +45,12 @@ Tuplet::Tuplet()
     , AttNumberPlacement()
     , AttTupletVis()
 {
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_DURATIONRATIO);
-    RegisterAttClass(ATT_NUMBERPLACEMENT);
-    RegisterAttClass(ATT_TUPLETVIS);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_DURATIONRATIO);
+    this->RegisterAttClass(ATT_NUMBERPLACEMENT);
+    this->RegisterAttClass(ATT_TUPLETVIS);
 
-    Reset();
+    this->Reset();
 }
 
 Tuplet::~Tuplet() {}
@@ -57,10 +58,10 @@ Tuplet::~Tuplet() {}
 void Tuplet::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
-    ResetDurationRatio();
-    ResetNumberPlacement();
-    ResetTupletVis();
+    this->ResetColor();
+    this->ResetDurationRatio();
+    this->ResetNumberPlacement();
+    this->ResetTupletVis();
 
     m_drawingLeft = NULL;
     m_drawingRight = NULL;
@@ -100,6 +101,9 @@ bool Tuplet::IsSupportedChild(Object *child)
     }
     else if (child->Is(SPACE)) {
         assert(dynamic_cast<Space *>(child));
+    }
+    else if (child->Is(TABGRP)) {
+        assert(dynamic_cast<TabGrp *>(child));
     }
     else if (child->Is(TUPLET)) {
         assert(dynamic_cast<Tuplet *>(child));
@@ -237,7 +241,7 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize)
 void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff, int staffSize)
 {
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
-    if (!tupletNum || (GetNumVisible() == BOOLEAN_false)) return;
+    if (!tupletNum || (this->GetNumVisible() == BOOLEAN_false)) return;
 
     this->CalculateTupletNumCrossStaff(tupletNum);
 
@@ -320,8 +324,7 @@ void Tuplet::CalculateTupletNumCrossStaff(LayerElement *layerElement)
         return;
     };
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
     // Find if there is a mix of cross-staff and non-cross-staff elements in the tuplet
     ListOfObjects descendants;
     ClassIdsComparison comparison({ CHORD, NOTE, REST });
@@ -644,9 +647,8 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-    int staffSize = staff->m_drawingStaffSize;
+    Staff *staff = this->GetAncestorStaff();
+    const int staffSize = staff->m_drawingStaffSize;
 
     assert(m_drawingBracketPos != STAFFREL_basic_NONE);
 

@@ -49,7 +49,7 @@ void View::DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, 
     /******************************************************************/
     // Draw the children
 
-    DrawLayerChildren(dc, syllable, layer, staff, measure);
+    this->DrawLayerChildren(dc, syllable, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
@@ -183,7 +183,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
 
     for (auto it = params.begin(); it != params.end(); it++) {
-        DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
+        this->DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
             staff->m_drawingStaffSize, false, true);
     }
 
@@ -197,7 +197,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     }
 
     // Draw the children
-    DrawLayerChildren(dc, nc, layer, staff, measure);
+    this->DrawLayerChildren(dc, nc, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
@@ -216,7 +216,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // Start the Neume graphic and draw the children
 
     dc->StartGraphic(element, "", element->GetUuid());
-    DrawLayerChildren(dc, neume, layer, staff, measure);
+    this->DrawLayerChildren(dc, neume, layer, staff, measure);
     dc->EndGraphic(element, this);
 }
 

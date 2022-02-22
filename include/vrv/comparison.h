@@ -31,7 +31,6 @@ class Comparison {
 
 public:
     virtual bool operator()(Object *object) = 0;
-    virtual bool MatchesType(Object *object) = 0;
     // For classes that do a reverse comparison, return reversed result
     bool Result(bool comparison) { return (m_reverse) ? !comparison : comparison; }
     // Set reverse comparison.
@@ -60,23 +59,11 @@ class ClassIdComparison : public Comparison {
 public:
     ClassIdComparison(ClassId classId) { m_classId = classId; }
 
-    bool operator()(Object *object) override
-    {
-        if (object->Is(m_classId)) {
-            return true;
-        }
-        return false;
-    }
+    bool operator()(Object *object) override { return this->MatchesType(object); }
 
     ClassId GetType() { return m_classId; }
 
-    bool MatchesType(Object *object) override
-    {
-        if (object->Is(m_classId)) {
-            return true;
-        }
-        return false;
-    }
+    bool MatchesType(Object *object) { return (object->Is(m_classId)); }
 
 protected:
     ClassId m_classId;
@@ -95,15 +82,9 @@ public:
         m_supportReverse = true;
     }
 
-    bool operator()(Object *object) override
-    {
-        if (object->Is(m_classIds)) {
-            return Result(true);
-        }
-        return Result(false);
-    }
+    bool operator()(Object *object) override { return Result(this->MatchesType(object)); }
 
-    bool MatchesType(Object *object) override { return true; }
+    bool MatchesType(Object *object) { return (object->Is(m_classIds)); }
 
 protected:
     std::vector<ClassId> m_classIds;
@@ -125,8 +106,6 @@ public:
         }
         return false;
     }
-
-    bool MatchesType(Object *object) override { return true; }
 
 protected:
     InterfaceId m_interfaceId;
@@ -197,8 +176,6 @@ public:
         if (object->IsEditorialElement()) return Result(true);
         return Result(false);
     }
-
-    bool MatchesType(Object *object) override { return true; }
 };
 
 //----------------------------------------------------------------------------
@@ -454,25 +431,26 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// NoteOnsetOffsetComparison
+// NoteOrRestOnsetOffsetComparison
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is a note being played at the given time.
  */
-class NoteOnsetOffsetComparison : public ClassIdComparison {
+class NoteOrRestOnsetOffsetComparison : public ClassIdsComparison {
 
 public:
-    NoteOnsetOffsetComparison(const int time) : ClassIdComparison(NOTE) { m_time = time; }
+    NoteOrRestOnsetOffsetComparison(const int time) : ClassIdsComparison({ NOTE, REST }) { m_time = time; }
 
     void SetTime(int time) { m_time = time; }
 
     bool operator()(Object *object) override
     {
         if (!MatchesType(object)) return false;
-        Note *note = vrv_cast<Note *>(object);
-        assert(note);
-        return ((m_time >= note->GetRealTimeOnsetMilliseconds()) && (m_time <= note->GetRealTimeOffsetMilliseconds()));
+        DurationInterface *interface = object->GetDurationInterface();
+        assert(interface);
+        return ((m_time >= interface->GetRealTimeOnsetMilliseconds())
+            && (m_time <= interface->GetRealTimeOffsetMilliseconds()));
     }
 
 private:

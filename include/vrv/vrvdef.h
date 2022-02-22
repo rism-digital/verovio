@@ -13,6 +13,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <tuple>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -36,7 +37,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 9
+#define VERSION_MINOR 10
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -64,6 +65,8 @@ enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1, 
 
 #define MIDI_VELOCITY 90
 #define MIDI_TEMPO 120
+
+#define UNACC_GRACENOTE_DUR 27 // in milliseconds
 
 //----------------------------------------------------------------------------
 // Object defines
@@ -164,6 +167,7 @@ enum ClassId : uint16_t {
     CONTROL_ELEMENT,
     ANCHOREDTEXT,
     ARPEG,
+    BEAMSPAN,
     BRACKETSPAN,
     BREATH,
     CAESURA,
@@ -323,7 +327,9 @@ typedef std::vector<std::pair<int, int>> ArrayOfIntPairs;
 
 typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceUuidPairs;
 
-typedef std::vector<std::pair<PlistInterface *, std::string>> ArrayOfPlistInterfaceUuidPairs;
+typedef std::map<std::string, Note *> MapOfNoteUuidPairs;
+
+typedef std::vector<std::tuple<PlistInterface *, std::string, Object *>> ArrayOfPlistInterfaceUuidTuples;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
@@ -600,6 +606,12 @@ enum Accessor { SELF = 0, CONTENT };
 enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
 
 //----------------------------------------------------------------------------
+// Stem sameas drawing role
+//----------------------------------------------------------------------------
+
+enum StemSameasDrawingRole { SAMEAS_NONE = 0, SAMEAS_UNSET, SAMEAS_PRIMARY, SAMEAS_SECONDARY };
+
+//----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
 
@@ -607,12 +619,13 @@ enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
 
 // in half staff spaces (but should be 6 in two-voice notation)
 #define STANDARD_STEMLENGTH 7
+#define STANDARD_STEMLENGTH_TAB 3
 
 //----------------------------------------------------------------------------
 // Temporary - to be made an option?
 //----------------------------------------------------------------------------
 
-#define TABLATURE_STAFF_RATIO 1.3
+#define TABLATURE_STAFF_RATIO 1.75
 
 #define SUPER_SCRIPT_FACTOR 0.58
 #define SUPER_SCRIPT_POSITION -0.20 // lowered down from the midline

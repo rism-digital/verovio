@@ -616,6 +616,7 @@ public:
     OptionBool m_shrinkToFit;
     OptionBool m_staccatoCenter;
     OptionBool m_svgBoundingBoxes;
+    OptionString m_svgCss;
     OptionBool m_svgViewBox;
     OptionBool m_svgHtml5;
     OptionBool m_svgFormatRaw;
@@ -764,6 +765,7 @@ public:
     //
     OptionDbl m_topMarginArtic;
     OptionDbl m_topMarginHarm;
+    OptionDbl m_topMarginPgFooter;
 
     /**
      * Deprecated options

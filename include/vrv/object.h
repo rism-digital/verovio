@@ -120,6 +120,7 @@ public:
     }
     ///@}
 
+    virtual BeamDrawingInterface *GetBeamDrawingInterface() { return NULL; }
     virtual DurationInterface *GetDurationInterface() { return NULL; }
     virtual LinkingInterface *GetLinkingInterface() { return NULL; }
     virtual FacsimileInterface *GetFacsimileInterface() { return NULL; }
@@ -410,8 +411,8 @@ public:
      * Return all the objects matching the Comparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
-    void FindAllDescendantsBetween(
-        ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
+    void FindAllDescendantsBetween(ListOfObjects *objects, Comparison *comparison, Object *start, Object *end,
+        bool clear = true, int depth = UNLIMITED_DEPTH);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -1065,11 +1066,21 @@ public:
     virtual int PrepareProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Match elements of @plist.
+     * Prepare list of elements in the @plist.
      */
     ///@{
     virtual int PreparePlist(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * Match elements of @plist
+     */
+    virtual int ProcessPlist(FunctorParams *functorParams);
+
+    /**
+     * Extract default duration from scoredef/staffdef
+     */
+    virtual int PrepareDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Match start for TimePointingInterface elements (such as fermata or harm).
@@ -1253,6 +1264,13 @@ public:
     ///@}
 
     /**
+     * Cache or restore cached horizontal layout for faster layout redoing
+     */
+    ///@{
+    virtual int HorizontalLayoutCache(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Adjust note timings based on ties
      */
     ///@{
@@ -1260,10 +1278,38 @@ public:
     ///@}
 
     /**
+     * Prepare the MIDI export
+     * Captures information (i.e. from control elements) for MIDI interpretation
+     * This information is usually required beforehand in GenerateMIDI
+     */
+    ///@{
+    virtual int PrepareMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Get the list of referenced elements for the beamSpan as well as set referenced
+     * object for those elements to beamSpan containing them.
+     */
+    ///@{
+    virtual int ResolveBeamSpanElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Resolve spanning beamspans by breaking it into separate parts, each belonging to the corresponding
+     * system/measure. BeamSpans get elements reassigned, so that each beamSpan can be drawn as control
+     * element. This allows free placement of beamSpan in the MEI tree and ensures that beamSpan will be
+     * drawn properly
+     */
+    ///@{
+    virtual int ResolveSpanningBeamSpans(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Export the object to a MidiFile
      */
     ///@{
     virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int GenerateMIDIEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -1283,8 +1329,9 @@ public:
     /**
      * Calculate the maximum duration of each measure.
      */
+    ///@{
     virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
+    virtual int CalcMaxMeasureDurationEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

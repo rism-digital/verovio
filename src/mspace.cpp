@@ -24,7 +24,7 @@ static const ClassRegistrar<MSpace> s_factory("mSpace", MSPACE);
 
 MSpace::MSpace() : LayerElement(MSPACE, "mSpace-")
 {
-    Reset();
+    this->Reset();
 }
 
 MSpace::~MSpace() {}

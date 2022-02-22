@@ -24,6 +24,7 @@
 #include "elementpart.h"
 #include "fermata.h"
 #include "functorparams.h"
+#include "gracegrp.h"
 #include "horizontalaligner.h"
 #include "layer.h"
 #include "note.h"
@@ -77,16 +78,16 @@ Chord::Chord()
     , AttTiePresent()
     , AttVisibility()
 {
-    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CUE);
-    RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_STEMS);
-    RegisterAttClass(ATT_STEMSCMN);
-    RegisterAttClass(ATT_TIEPRESENT);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_GRACED);
+    this->RegisterAttClass(ATT_STEMS);
+    this->RegisterAttClass(ATT_STEMSCMN);
+    this->RegisterAttClass(ATT_TIEPRESENT);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
-    Reset();
+    this->Reset();
 }
 
 Chord::~Chord()
@@ -100,13 +101,13 @@ void Chord::Reset()
     DrawingListInterface::Reset();
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
-    ResetColor();
-    ResetCue();
-    ResetGraced();
-    ResetStems();
-    ResetStemsCmn();
-    ResetTiePresent();
-    ResetVisibility();
+    this->ResetColor();
+    this->ResetCue();
+    this->ResetGraced();
+    this->ResetStems();
+    this->ResetStemsCmn();
+    this->ResetTiePresent();
+    this->ResetVisibility();
 
     ClearClusters();
 }
@@ -477,7 +478,7 @@ bool Chord::HasNoteWithDots()
 }
 
 int Chord::AdjustOverlappingLayers(
-    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison)
+    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison, bool &stemSameas)
 {
     int margin = 0;
     // get positions of other elements
@@ -489,7 +490,7 @@ int Chord::AdjustOverlappingLayers(
             otherElementLocations.insert(note->GetDrawingLoc());
         }
     }
-    const ArrayOfObjects *notes = GetList(this);
+    const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
     // get current chord positions
     std::set<int> chordElementLocations;
@@ -499,8 +500,8 @@ int Chord::AdjustOverlappingLayers(
         chordElementLocations.insert(note->GetDrawingLoc());
     }
     const int expectedElementsInUnison
-        = CountElementsInUnison(chordElementLocations, otherElementLocations, GetDrawingStemDir());
-    const bool isLowerPosition = (STEMDIRECTION_down == GetDrawingStemDir() && (otherElementLocations.size() > 0)
+        = CountElementsInUnison(chordElementLocations, otherElementLocations, this->GetDrawingStemDir());
+    const bool isLowerPosition = (STEMDIRECTION_down == this->GetDrawingStemDir() && (otherElementLocations.size() > 0)
         && (*chordElementLocations.begin() >= *otherElementLocations.begin()));
     int actualElementsInUnison = 0;
     // process each note of the chord separately, storing locations in the set
@@ -519,7 +520,7 @@ int Chord::AdjustOverlappingLayers(
         isUnison = true;
     }
     else if (margin) {
-        SetDrawingXRel(GetDrawingXRel() + margin);
+        this->SetDrawingXRel(this->GetDrawingXRel() + margin);
         return margin;
     }
     return 0;
@@ -535,10 +536,7 @@ std::list<Note *> Chord::GetAdjacentNotesList(Staff *staff, int loc)
         Note *note = vrv_cast<Note *>(obj);
         assert(note);
 
-        Layer *layer = NULL;
-        Staff *noteStaff = note->GetCrossStaff(layer);
-        if (!noteStaff) noteStaff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(noteStaff);
+        Staff *noteStaff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
         if (noteStaff != staff) continue;
 
         const int locDiff = note->GetDrawingLoc() - loc;
@@ -613,8 +611,7 @@ int Chord::CalcArtic(FunctorParams *functorParams)
     params->m_parent = this;
     params->m_stemDir = this->GetDrawingStemDir();
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
@@ -673,7 +670,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
     // Stems have been calculated previously in beam or fTrem - siblings because flags do not need to
     // be processed either
-    if (this->IsInBeam() || this->IsInFTrem()) {
+    if (this->IsInBeam() || this->IsInFTrem() || this->IsInBeamSpan()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -684,8 +681,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
@@ -700,6 +696,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     params->m_interface = this;
     params->m_dur = this->GetActualDur();
     params->m_isGraceNote = this->IsGraceNote();
+    params->m_isStemSameasSecondary = false;
 
     /************ Set the direction ************/
 
@@ -747,10 +744,7 @@ MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate)
 
         if (predicate && !predicate(note)) continue;
 
-        Layer *layer = NULL;
-        Staff *staff = note->GetCrossStaff(layer);
-        if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
         noteLocations[staff].insert(note->GetDrawingLoc());
     }
@@ -820,7 +814,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
         currentStem->IsVirtual(true);
     }
 
-    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem()) {
+    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInBeamSpan() && !this->IsInFTrem()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {
@@ -834,7 +828,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
         if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
     }
 
-    SetDrawingStem(currentStem);
+    this->SetDrawingStem(currentStem);
 
     // Also set the drawing stem object (or NULL) to all child notes
     const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
@@ -867,6 +861,17 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
     this->Process(&prepareDrawingCueSize, NULL);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::PrepareLyrics(FunctorParams *functorParams)
+{
+    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
+    assert(params);
+
+    params->m_penultimateNoteOrChord = params->m_lastNoteOrChord;
+    params->m_lastNoteOrChord = this;
 
     return FUNCTOR_CONTINUE;
 }
@@ -907,10 +912,7 @@ int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
     // Check if chord spreads across several staves
     std::list<Staff *> extremalStaves;
     for (Note *note : { this->GetTopNote(), this->GetBottomNote() }) {
-        Layer *layer = NULL;
-        Staff *staff = note->GetCrossStaff(layer);
-        if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
         extremalStaves.push_back(staff);
     }
     assert(extremalStaves.size() == 2);
@@ -942,8 +944,7 @@ int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
         }
 
         // Reposition the stem
-        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-        assert(staff);
+        Staff *staff = this->GetAncestorStaff();
         Staff *rootStaff
             = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? extremalStaves.back() : extremalStaves.front();
         stem->SetDrawingYRel(stem->GetDrawingYRel() + getShift(staff) - getShift(rootStaff));
@@ -954,6 +955,41 @@ int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
             const int sign = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? 1 : -1;
             flag->SetDrawingYRel(flag->GetDrawingYRel() + sign * shift);
         }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    // Handle grace chords
+    if (this->IsGraceNote()) {
+        std::set<int> pitches;
+        const ArrayOfObjects *notes = this->GetList(this);
+        assert(notes);
+        for (Object *obj : *notes) {
+            Note *note = vrv_cast<Note *>(obj);
+            assert(note);
+            pitches.insert(note->GetMIDIPitch(params->m_transSemi));
+        }
+
+        double quarterDuration = 0.0;
+        const data_DURATION dur = this->GetDur();
+        if ((dur >= DURATION_long) && (dur <= DURATION_1024)) {
+            quarterDuration = pow(2.0, (DURATION_4 - dur));
+        }
+
+        params->m_graceNotes.push_back({ pitches, quarterDuration });
+
+        bool accented = (this->GetGrace() == GRACE_acc);
+        GraceGrp *graceGrp = vrv_cast<GraceGrp *>(this->GetFirstAncestor(GRACEGRP));
+        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
+        params->m_accentedGraceNote = accented;
+
+        return FUNCTOR_SIBLINGS;
     }
 
     return FUNCTOR_CONTINUE;

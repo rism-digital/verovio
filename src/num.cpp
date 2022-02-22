@@ -27,7 +27,7 @@ static const ClassRegistrar<Num> s_factory("num", NUM);
 
 Num::Num() : TextElement(NUM, "num-")
 {
-    Reset();
+    this->Reset();
 }
 
 Num::~Num() {}

@@ -25,11 +25,11 @@ static const ClassRegistrar<Caesura> s_factory("caesura", CAESURA);
 
 Caesura::Caesura() : ControlElement(CAESURA, "caesura-"), TimePointInterface(), AttColor(), AttPlacementRelStaff()
 {
-    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_PLACEMENTRELSTAFF);
+    this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
 
-    Reset();
+    this->Reset();
 }
 
 Caesura::~Caesura() {}
@@ -38,8 +38,8 @@ void Caesura::Reset()
 {
     ControlElement::Reset();
     TimePointInterface::Reset();
-    ResetColor();
-    ResetPlacementRelStaff();
+    this->ResetColor();
+    this->ResetPlacementRelStaff();
 }
 
 } // namespace vrv

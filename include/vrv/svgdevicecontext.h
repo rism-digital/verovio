@@ -23,6 +23,8 @@
 
 //----------------------------------------------------------------------------
 
+class Glyph;
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -216,6 +218,11 @@ public:
     void SetRemoveXlink(bool removeXlink) { m_removeXlink = removeXlink; }
 
     /**
+     * Setter for an additional CSS
+     */
+    void SetCss(std::string css) { m_css = css; }
+
+    /**
      *  Copies additional attributes of defined elements to the SVG, each string in the form "elementName@attribute"
      * (e.g., "note@pname")
      */
@@ -284,7 +291,7 @@ private:
 
     // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>
-    std::set<std::string> m_smuflGlyphs;
+    std::set<Glyph *> m_smuflGlyphs;
 
     // pugixml data
     pugi::xml_document m_svgDoc;
@@ -302,6 +309,8 @@ private:
     bool m_svgViewBox;
     // output HTML5 data-* attributes
     bool m_html5;
+    // additional CSS
+    std::string m_css;
     // copy additional attributes of given elements to the SVG, in the form "note@pname; layer@n"
     std::multimap<ClassId, std::string> m_svgAdditionalAttributes;
     // format output as raw, stripping extraneous whitespace and non-content newlines

@@ -29,17 +29,17 @@ static const ClassRegistrar<Surface> s_factory("surface", SURFACE);
 
 Surface::Surface() : Object(SURFACE, "surface-"), AttTyped(), AttCoordinated()
 {
-    RegisterAttClass(ATT_TYPED);
-    RegisterAttClass(ATT_COORDINATED);
-    Reset();
+    this->RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_COORDINATED);
+    this->Reset();
 }
 
 Surface::~Surface() {}
 
 void Surface::Reset()
 {
-    ResetTyped();
-    ResetCoordinated();
+    this->ResetTyped();
+    this->ResetCoordinated();
 }
 
 bool Surface::IsSupportedChild(Object *object)
@@ -57,7 +57,7 @@ bool Surface::IsSupportedChild(Object *object)
 
 int Surface::GetMaxX()
 {
-    if (HasLrx()) return GetLrx();
+    if (this->HasLrx()) return this->GetLrx();
     int max = 0;
     ListOfObjects zones = this->FindAllDescendantsByType(ZONE);
     for (auto iter = zones.begin(); iter != zones.end(); ++iter) {
@@ -70,7 +70,7 @@ int Surface::GetMaxX()
 
 int Surface::GetMaxY()
 {
-    if (HasLry()) return GetLry();
+    if (this->HasLry()) return this->GetLry();
     int max = 0;
     ListOfObjects zones = this->FindAllDescendantsByType(ZONE);
     for (auto iter = zones.begin(); iter != zones.end(); ++iter) {

@@ -1,0 +1,28 @@
+{
+  "name": "verovio-humdrum",
+  "version": "3.9.0",
+  "description": "This is the stable version of the verovio package with humdrum support",
+  "main": "index.js",
+  "keywords": [
+    "music",
+    "music notation",
+    "music engraving",
+    "mei",
+    "music encoding",
+    "svg",
+    "humdrum"
+  ],
+  "author": "Laurent Pugin and others",
+  "license": "LGPL 3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rism-digital/verovio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rism-digital/verovio/issues"
+  },
+  "homepage": "https://www.verovio.org",
+  "engines": {
+    "node": ">= 7.0.0"
+  }
+}

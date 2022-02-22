@@ -29,20 +29,20 @@ namespace vrv {
 
 TimePointInterface::TimePointInterface() : Interface(), AttStaffIdent(), AttStartId(), AttTimestampLogical()
 {
-    RegisterInterfaceAttClass(ATT_STAFFIDENT);
-    RegisterInterfaceAttClass(ATT_STARTID);
-    RegisterInterfaceAttClass(ATT_TIMESTAMPLOGICAL);
+    this->RegisterInterfaceAttClass(ATT_STAFFIDENT);
+    this->RegisterInterfaceAttClass(ATT_STARTID);
+    this->RegisterInterfaceAttClass(ATT_TIMESTAMPLOGICAL);
 
-    Reset();
+    this->Reset();
 }
 
 TimePointInterface::~TimePointInterface() {}
 
 void TimePointInterface::Reset()
 {
-    ResetStaffIdent();
-    ResetStartId();
-    ResetTimestampLogical();
+    this->ResetStaffIdent();
+    this->ResetStartId();
+    this->ResetTimestampLogical();
 
     m_start = NULL;
     m_startUuid = "";
@@ -97,7 +97,7 @@ bool TimePointInterface::IsOnStaff(int n)
         return false;
     }
     else if (m_start) {
-        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstAncestor(STAFF));
+        Staff *staff = m_start->GetAncestorStaff(ANCESTOR_ONLY, false);
         if (staff && (staff->GetN() == n)) return true;
     }
     return false;
@@ -129,8 +129,8 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
         }
     }
     else if (m_start && !m_start->Is(TIMESTAMP_ATTR)) {
-        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstAncestor(STAFF));
-        if (staff) staffList.push_back(staff->GetN());
+        Staff *staff = m_start->GetAncestorStaff();
+        staffList.push_back(staff->GetN());
     }
     else if (measure->GetChildCount(STAFF) == 1) {
         // If we have no @staff or startid but only one staff child assume it is the first one (@n1 is assumed)
@@ -157,10 +157,10 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
 
 TimeSpanningInterface::TimeSpanningInterface() : TimePointInterface(), AttStartEndId(), AttTimestamp2Logical()
 {
-    RegisterInterfaceAttClass(ATT_STARTENDID);
-    RegisterInterfaceAttClass(ATT_TIMESTAMP2LOGICAL);
+    this->RegisterInterfaceAttClass(ATT_STARTENDID);
+    this->RegisterInterfaceAttClass(ATT_TIMESTAMP2LOGICAL);
 
-    Reset();
+    this->Reset();
 }
 
 TimeSpanningInterface::~TimeSpanningInterface() {}
@@ -168,8 +168,8 @@ TimeSpanningInterface::~TimeSpanningInterface() {}
 void TimeSpanningInterface::Reset()
 {
     TimePointInterface::Reset();
-    ResetStartEndId();
-    ResetTimestamp2Logical();
+    this->ResetStartEndId();
+    this->ResetTimestamp2Logical();
 
     m_end = NULL;
     m_endUuid = "";
@@ -285,10 +285,10 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
 
     // No cross-staff endpoints, check if the slur itself crosses staves
     if (!startStaff) {
-        startStaff = dynamic_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
+        startStaff = this->GetStart()->GetAncestorStaff(ANCESTOR_ONLY, false);
     }
     if (!endStaff) {
-        endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstAncestor(STAFF));
+        endStaff = this->GetEnd()->GetAncestorStaff(ANCESTOR_ONLY, false);
     }
 
     // This happens with slurs starting or ending with a timestamp
@@ -323,7 +323,7 @@ int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams,
                 object->GetClassName().c_str(), object->GetUuid().c_str());
         return FUNCTOR_CONTINUE;
     }
-    else if (!HasTstamp()) {
+    else if (!this->HasTstamp()) {
         return FUNCTOR_CONTINUE; // This file is quite likely invalid?
     }
 
@@ -388,7 +388,7 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
         }
         return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
     }
-    else if (!HasTstamp2()) {
+    else if (!this->HasTstamp2()) {
         // We won't be able to do anything, just try to prepare the tstamp (start)
         return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
     }

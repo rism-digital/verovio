@@ -21,27 +21,27 @@ namespace vrv {
 
 TextElement::TextElement() : Object(TEXT_ELEMENT, "te-"), AttLabelled(), AttTyped()
 {
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 TextElement::TextElement(ClassId classId) : Object(classId, "te-"), AttLabelled(), AttTyped()
 {
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 TextElement::TextElement(ClassId classId, const std::string &classIdStr)
     : Object(classId, classIdStr), AttLabelled(), AttTyped()
 {
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 TextElement::~TextElement() {}
@@ -49,8 +49,8 @@ TextElement::~TextElement() {}
 void TextElement::Reset()
 {
     Object::Reset();
-    ResetLabelled();
-    ResetTyped();
+    this->ResetLabelled();
+    this->ResetTyped();
 
     m_drawingYRel = 0;
     m_drawingXRel = 0;
@@ -97,13 +97,13 @@ int TextElement::GetDrawingY() const
 
 void TextElement::SetDrawingXRel(int drawingXRel)
 {
-    ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
 }
 
 void TextElement::SetDrawingYRel(int drawingYRel)
 {
-    ResetCachedDrawingY();
+    this->ResetCachedDrawingY();
     m_drawingYRel = drawingYRel;
 }
 
@@ -113,8 +113,8 @@ void TextElement::SetDrawingYRel(int drawingYRel)
 
 int TextElement::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    SetDrawingXRel(0);
-    SetDrawingYRel(0);
+    this->SetDrawingXRel(0);
+    this->SetDrawingYRel(0);
 
     return FUNCTOR_CONTINUE;
 }
