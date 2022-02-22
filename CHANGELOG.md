@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [3.9.0] - 2022-02-22
 * Support for `beatRpt@beatdef`
 * Support for `scoreDef` and `staffDef` `@dur.default` (@eNote-GmBH)
 * Support for MIDI output of grace notes and multi-measure rests (@eNote-GmBH)
@@ -21,6 +23,7 @@
 * Option --svg-css for passing an additional CSS to be included in the SVG output
 * Preliminary support for stems and beam for guitar tablature
 * Preliminary support for tablature MusicXML import (@paul-bayleaf)
+* Distribution of the build with humdrum as NPM package
 
 ## [3.8.1] - 2022-01-10
 * Fix bug in PAE importer for durations and for key signatures
