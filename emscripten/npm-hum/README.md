@@ -2,7 +2,9 @@ This is an NPM of the stable version of the Verovio JavaScript toolkit with Humd
 
 [Verovio](https://www.verovio.org/) is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) music scores into SVG.
 
-This version of the toolkit includes Humdrum support. See it running in the [Verovio Humdrum Viewer](http://verovio.humdrum.org/).
+You can see Verovio with Humdrum support running in the [Verovio Humdrum Viewer](http://verovio.humdrum.org/).
+
+This version of the toolkit is the same as the [Verovio NPM](https://www.npmjs.com/package/verovio) package except that it includes Humdrum support.
 
 ## Usage
 
