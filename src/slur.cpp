@@ -100,6 +100,7 @@ void Slur::Reset()
     this->ResetLayerIdent();
 
     m_drawingCurveDir = SlurCurveDirection::None;
+    m_requestedStaffSpace = 0;
 }
 
 curvature_CURVEDIR Slur::ReduceDrawingCurveDir() const
@@ -397,6 +398,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     bezier.SetRightControlHeight(bezier.GetRightControlHeight() + rightSign * adjustment.rightShift);
     bezier.UpdateControlPoints();
     curve->UpdatePoints(bezier);
+    m_requestedStaffSpace = adjustment.requestedStaffSpace;
 
     // STEP 5: Adjust the slur shape
     // Through the control point adjustments in step 3 and 4 it can happen that the slur looses its desired shape.
@@ -674,10 +676,10 @@ ControlPointAdjustment Slur::CalcControlPointVerticalShift(
 
     // Determine the requested staff space
     if (bezierCurve.IsLeftControlAbove() && !bezierCurve.IsRightControlAbove()) {
-        adjustment.requestedStaffSpace = std::max(bezierCurve.p1.y - bezierCurve.p2.y + 4 * margin, 0);
+        adjustment.requestedStaffSpace = std::max(bezierCurve.p1.y - bezierCurve.p2.y + 6 * margin, 0);
     }
     else if (!bezierCurve.IsLeftControlAbove() && bezierCurve.IsRightControlAbove()) {
-        adjustment.requestedStaffSpace = std::max(bezierCurve.p2.y - bezierCurve.p1.y + 4 * margin, 0);
+        adjustment.requestedStaffSpace = std::max(bezierCurve.p2.y - bezierCurve.p1.y + 6 * margin, 0);
     }
     if ((maxIntersectionAbove > 0) && (maxIntersectionBelow > 0)) {
         adjustment.requestedStaffSpace
@@ -790,6 +792,29 @@ double Slur::RotateSlope(double slope, double degrees, double doublingBound, boo
     if (!upwards && (slope <= -doublingBound)) return slope * 2.0;
     const int sign = upwards ? 1 : -1;
     return tan(atan(slope) + sign * M_PI * degrees / 180.0);
+}
+
+std::pair<int, int> Slur::CalcRequestedStaffSpace(StaffAlignment *alignment)
+{
+    assert(alignment);
+
+    Staff *startStaff = this->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+    Staff *endStaff = this->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+
+    if (startStaff && endStaff) {
+        const int startStaffN = startStaff->GetN();
+        const int endStaffN = endStaff->GetN();
+        if (startStaffN != endStaffN) {
+            if (alignment->GetStaff()->GetN() == std::min(startStaffN, endStaffN)) {
+                return { 0, m_requestedStaffSpace };
+            }
+            if (alignment->GetStaff()->GetN() == std::max(startStaffN, endStaffN)) {
+                return { m_requestedStaffSpace, 0 };
+            }
+        }
+    }
+
+    return { 0, 0 };
 }
 
 float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir)

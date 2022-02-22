@@ -258,6 +258,8 @@ StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
     m_overflowBelow = 0;
     m_staffHeight = 0;
     m_overlap = 0;
+    m_requestedSpaceAbove = 0;
+    m_requestedSpaceBelow = 0;
     m_overflowBBoxAbove = NULL;
     m_overflowBBoxBelow = NULL;
     m_scoreDefClefOverflowAbove = 0;
@@ -326,6 +328,13 @@ void StaffAlignment::SetOverflowBBoxAbove(BoundingBox *bboxAbove, int overflowAb
     }
 }
 
+void StaffAlignment::SetRequestedSpaceAbove(int space)
+{
+    if (space > m_requestedSpaceAbove) {
+        m_requestedSpaceAbove = space;
+    }
+}
+
 void StaffAlignment::SetOverlap(int overlap)
 {
     if (overlap > m_overlap) {
@@ -344,6 +353,13 @@ void StaffAlignment::SetOverflowBBoxBelow(BoundingBox *bboxBelow, int overflowBo
 {
     if (overflowBottom > m_overflowBelow) {
         m_overflowBBoxBelow = bboxBelow;
+    }
+}
+
+void StaffAlignment::SetRequestedSpaceBelow(int space)
+{
+    if (space > m_requestedSpaceBelow) {
+        m_requestedSpaceBelow = space;
     }
 }
 
@@ -752,31 +768,36 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             bool skipAbove = false;
             bool skipBelow = false;
 
-            if ((*iter)->GetObject()->Is({ PHRASE, SLUR })) {
-                Slur *slur = vrv_cast<Slur *>((*iter)->GetObject());
-                assert(slur);
-                slur->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
-            }
-            else if ((*iter)->GetObject()->Is({ LV, TIE })) {
-                Tie *tie = vrv_cast<Tie *>((*iter)->GetObject());
-                assert(tie);
-                tie->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
+            if ((*iter)->GetObject()->Is({ LV, PHRASE, SLUR, TIE })) {
+                TimeSpanningInterface *interface = (*iter)->GetObject()->GetTimeSpanningInterface();
+                assert(interface);
+                interface->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
             }
 
             int overflowAbove = 0;
-            if (!skipAbove) overflowAbove = this->CalcOverflowAbove((*iter));
+            if (!skipAbove) overflowAbove = this->CalcOverflowAbove(*iter);
             if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
                 // LogMessage("%sparams->m_doc top overflow: %d", this->GetUuid().c_str(), overflowAbove);
                 this->SetOverflowAbove(overflowAbove);
-                m_overflowAboveBBoxes.push_back((*iter));
+                m_overflowAboveBBoxes.push_back(*iter);
             }
 
             int overflowBelow = 0;
-            if (!skipBelow) overflowBelow = this->CalcOverflowBelow((*iter));
+            if (!skipBelow) overflowBelow = this->CalcOverflowBelow(*iter);
             if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
                 // LogMessage("%s bottom overflow: %d", this->GetUuid().c_str(), overflowBelow);
                 this->SetOverflowBelow(overflowBelow);
-                m_overflowBelowBBoxes.push_back((*iter));
+                m_overflowBelowBBoxes.push_back(*iter);
+            }
+
+            int spaceAbove = 0;
+            int spaceBelow = 0;
+            if ((*iter)->GetObject()->Is({ LV, SLUR })) {
+                Slur *slur = vrv_cast<Slur *>((*iter)->GetObject());
+                assert(slur);
+                std::tie(spaceAbove, spaceBelow) = slur->CalcRequestedStaffSpace(this);
+                this->SetRequestedSpaceAbove(spaceAbove);
+                this->SetRequestedSpaceBelow(spaceBelow);
             }
             continue;
         }
@@ -1058,6 +1079,14 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
     }
 
     this->AdjustBracketGroupSpacing(params->m_doc, params->m_previous, spacing);
+
+    // Calculate the overlap from requested staff space
+    const int currentStaffDistance
+        = params->m_previous->GetYRel() - params->m_previous->GetStaffHeight() - this->GetYRel();
+    const int requestedSpace = std::max(this->GetRequestedSpaceAbove(), params->m_previous->GetRequestedSpaceBelow());
+    if ((requestedSpace > 0) && (spacing < (currentStaffDistance + requestedSpace))) {
+        this->SetOverlap(currentStaffDistance + requestedSpace - spacing);
+    }
 
     // This is the bottom alignment (or something is wrong) - this is all we need to do
     if (!m_staff) {

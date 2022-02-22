@@ -155,6 +155,11 @@ public:
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
     ///@}
 
+    /**
+     * Calculate the staff space above and below requested by s-shaped slurs
+     */
+    std::pair<int, int> CalcRequestedStaffSpace(StaffAlignment *alignment);
+
     //----------//
     // Functors //
     //----------//
@@ -178,6 +183,8 @@ private:
     std::pair<Layer *, LayerElement *> GetBoundaryLayer();
     // Get cross staff by only considering the slur boundary
     Staff *GetBoundaryCrossStaff();
+    // Determine curve direction for the slurs that start at grace note
+    curvature_CURVEDIR GetGraceCurveDirection(Doc *doc);
     // Get preferred curve direction based on various conditions
     curvature_CURVEDIR GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
     ///@}
@@ -213,9 +220,6 @@ private:
     ControlPointAdjustment CalcControlPointVerticalShift(
         FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
-    // Helper function to determine curve direction for the slurs that start at grace note
-    curvature_CURVEDIR GetGraceCurveDirection(Doc *doc);
-
     // Solve the constraints for vertical control point adjustment
     std::pair<int, int> SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints);
 
@@ -248,6 +252,12 @@ private:
      * for s-shaped slurs / mixed direction: whether the slur goes upwards or downwards
      */
     SlurCurveDirection m_drawingCurveDir;
+
+    /**
+     * The requested staff space
+     * S-shaped slurs can request staff space to prevent collisions from two sides
+     */
+    int m_requestedStaffSpace;
 };
 
 } // namespace vrv
