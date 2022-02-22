@@ -600,10 +600,13 @@ private:
         bool isMensuralBlack, bool firstHalf);
 
     /**
-     * Internal method for drawing a BeamSegment
+     * Internal methods for drawing a BeamSegment
      */
+    ///@{
     void DrawBeamSegment(
         DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer, Staff *staff);
+    void DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem);
+    ///@}
 
     /**
      * Internal methods for drawing time spanning elements
