@@ -8,7 +8,6 @@
 * Support for MIDI output of grace notes and multi-measure rests (@eNote-GmBH)
 * Support for `@stem.sameas` on notes for orchestra scores
 * Support for MIDI output of arpeggios (@eNote-GmBH)
-* Support for tuplets in ABC importer (@eNote-GmBH)
 * Support for `beamSpan` (@eNote-GmBH)
 * Support for lyrics, tuplets and multiple tunes (`mdiv`) in ABC import (@eNote-GmBH)
 * Improved double stemmed beams (@eNote-GmBH)
