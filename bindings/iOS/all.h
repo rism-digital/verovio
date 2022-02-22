@@ -68,6 +68,7 @@
 #import <VerovioFramework/textelement.h>
 #import <VerovioFramework/doc.h>
 #import <VerovioFramework/layer.h>
+#import <VerovioFramework/timemap.h>
 #import <VerovioFramework/mordent.h>
 #import <VerovioFramework/proport.h>
 #import <VerovioFramework/choice.h>
@@ -81,6 +82,7 @@
 #import <VerovioFramework/num.h>
 #import <VerovioFramework/keysig.h>
 #import <VerovioFramework/syllable.h>
+#import <VerovioFramework/beamspan.h>
 #import <VerovioFramework/editortoolkit_mensural.h>
 #import <VerovioFramework/add.h>
 #import <VerovioFramework/att.h>
