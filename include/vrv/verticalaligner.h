@@ -90,8 +90,8 @@ public:
     /**
      * Get System Overflows
      */
-    int GetOverflowAbove(const Doc *doc) const;
-    int GetOverflowBelow(const Doc *doc) const;
+    int GetOverflowAbove(const Doc *doc, bool scoreDefClef = false) const;
+    int GetOverflowBelow(const Doc *doc, bool scoreDefClef = false) const;
 
     /**
      * Get justification sum
@@ -250,6 +250,10 @@ public:
     BoundingBox *GetOverflowBBoxAbove() const { return m_overflowBBoxAbove; }
     void SetOverflowBBoxBelow(BoundingBox *bboxBelow, int overflowBottom);
     BoundingBox *GetOverflowBBoxBelow() const { return m_overflowBBoxBelow; }
+    void SetScoreDefClefOverflowAbove(int overflowAbove) { m_scoreDefClefOverflowAbove = overflowAbove; }
+    int GetScoreDefClefOverflowAbove() const { return m_scoreDefClefOverflowAbove; }
+    void SetScoreDefClefOverflowBelow(int overflowBelow) { m_scoreDefClefOverflowBelow = overflowBelow; }
+    int GetScoreDefClefOverflowBelow() const { return m_scoreDefClefOverflowBelow; }
     ///@}
 
     /**
@@ -280,6 +284,14 @@ public:
 
     void ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrpsParams *params,
         const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel);
+
+    /**
+     * @name Set/get for the beam adjust
+     */
+    ///@{
+    void SetBeamAdjust(int beamAdjust) { m_beamAdjust = beamAdjust; }
+    int GetBeamAdjust() const { return m_beamAdjust; }
+    ///@}
 
     //----------//
     // Functors //
@@ -372,7 +384,12 @@ private:
     int m_staffHeight;
     BoundingBox *m_overflowBBoxAbove;
     BoundingBox *m_overflowBBoxBelow;
+    int m_scoreDefClefOverflowAbove;
+    int m_scoreDefClefOverflowBelow;
     ///@}
+
+    // Value to store required beam adjustment for cross-staff beams
+    int m_beamAdjust = 0;
 
     /**
      * The list of overflowing bounding boxes (e.g, LayerElement or FloatingPositioner)

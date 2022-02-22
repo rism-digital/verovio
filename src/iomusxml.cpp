@@ -18,6 +18,7 @@
 
 #include "arpeg.h"
 #include "beam.h"
+#include "beamspan.h"
 #include "beatrpt.h"
 #include "bracketspan.h"
 #include "breath.h"
@@ -26,6 +27,7 @@
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
+#include "course.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -73,10 +75,13 @@
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "syl.h"
+#include "tabdursym.h"
+#include "tabgrp.h"
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
 #include "trill.h"
+#include "tuning.h"
 #include "tuplet.h"
 #include "turn.h"
 #include "verse.h"
@@ -314,7 +319,7 @@ void MusicXmlInput::InsertClefIntoObject(
     }
     else {
         Object *parent = layerElement->GetParent();
-        if (parent->Is({ CHORD, FTREM })) {
+        if (parent->Is({ CHORD, FTREM, TABGRP })) {
             InsertClefIntoObject(parent->GetParent(), clef, parent, insertAfter);
         }
         else {
@@ -401,7 +406,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     if (m_isLayerInitialized) return m_currentLayer;
 
     // Find voice number of node
-    int layerNum = (node.child("voice")) ? node.child("voice").text().as_int() : 1;
+    short int layerNum = (node.child("voice")) ? node.child("voice").text().as_int() : 1;
     if (layerNum < 1) {
         LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
         layerNum = 1;
@@ -417,7 +422,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     }
 
     // if not, take staff info of node element
-    int staffNum = (node.child("staff")) ? node.child("staff").text().as_int() : 1;
+    short int staffNum = (node.child("staff")) ? node.child("staff").text().as_int() : 1;
     if ((staffNum < 1) || (staffNum > measure->GetChildCount(STAFF))) {
         LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
         staffNum = 1;
@@ -430,7 +435,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     return m_currentLayer;
 }
 
-Layer *MusicXmlInput::SelectLayer(int staffNum, Measure *measure)
+Layer *MusicXmlInput::SelectLayer(short int staffNum, Measure *measure)
 {
     staffNum--;
     Staff *staff = vrv_cast<Staff *>(measure->GetChild(staffNum, STAFF));
@@ -439,7 +444,7 @@ Layer *MusicXmlInput::SelectLayer(int staffNum, Measure *measure)
     return SelectLayer(-1, staff);
 }
 
-Layer *MusicXmlInput::SelectLayer(int layerNum, Staff *staff)
+Layer *MusicXmlInput::SelectLayer(short int layerNum, Staff *staff)
 {
     Layer *layer = NULL;
     // no layer specified, return the first one (if any)
@@ -474,6 +479,13 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId, Layer *layer)
             return;
         }
     }
+}
+
+bool MusicXmlInput::IsInStack(ClassId classId, Layer *layer)
+{
+    return (m_elementStackMap.at(layer).end()
+        != std::find_if(m_elementStackMap.at(layer).begin(), m_elementStackMap.at(layer).end(),
+            [classId](LayerElement *element) { return element->Is(classId); }));
 }
 
 void MusicXmlInput::FillSpace(Layer *layer, int dur)
@@ -526,7 +538,7 @@ void MusicXmlInput::CloseTie(Note *note)
     }
 }
 
-void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
+void MusicXmlInput::OpenSlur(Measure *measure, short int number, Slur *slur)
 {
     // try to match open slur with slur stops within that measure
     for (auto iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
@@ -541,7 +553,7 @@ void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
     m_slurStack.push_back({ slur, openSlur });
 }
 
-void MusicXmlInput::CloseSlur(Measure *measure, int number, LayerElement *element)
+void MusicXmlInput::CloseSlur(Measure *measure, short int number, LayerElement *element)
 {
     // try to match slur stop to open slurs by slur number
     std::vector<std::pair<Slur *, musicxml::OpenSlur>>::reverse_iterator riter;
@@ -555,6 +567,17 @@ void MusicXmlInput::CloseSlur(Measure *measure, int number, LayerElement *elemen
     // add to m_slurStopStack, if not able to be closed
     musicxml::CloseSlur closeSlur(measure->GetN(), number);
     m_slurStopStack.push_back({ element, closeSlur });
+}
+
+void MusicXmlInput::CloseBeamSpan(Staff *staff, Layer *layer, LayerElement *element)
+{
+    for (auto riter = m_beamspanStack.rbegin(); riter != m_beamspanStack.rend(); ++riter) {
+        if ((riter->second.first == staff->GetN()) || (riter->second.second == layer->GetN())) {
+            riter->first->SetEndid("#" + element->GetUuid());
+            m_beamspanStack.erase(std::next(riter).base());
+            return;
+        }
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -691,9 +714,9 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
                 // find separator or use end() if there is no separator
                 const auto separator = std::find_if(iter, metronomeElements.end(),
                     [](const auto pair) { return pair.first == MetronomeElements::SEPARATOR; });
-                const int dotCount = (int)std::count_if(
+                const short int dotCount = (short int)std::count_if(
                     iter, separator, [](const auto pair) { return pair.first == MetronomeElements::BEAT_UNIT_DOT; });
-                for (int i = 0; i < dotCount; i++) {
+                for (short int i = 0; i < dotCount; i++) {
                     verovioText += L"\xE1E7"; // SMUFL augmentation dot
                 }
                 // set @mmUnit and @mmDots attributes only based on the first beat-unit in the sequence
@@ -833,7 +856,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
     m_staffGrpStack.push_back(staffGrp);
 
-    int staffOffset = 0;
+    short int staffOffset = 0;
     m_octDis.push_back(0);
 
     pugi::xpath_node scoreMidiBpm = root.select_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
@@ -988,7 +1011,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             partStaffGrp->SetUuid(partId.c_str());
-            const int nbStaves
+            const short int nbStaves
                 = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
@@ -1081,6 +1104,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     m_doc->ConvertToPageBasedDoc();
 
     // clean up stacks
+    if (!m_beamspanStack.empty()) {
+        LogWarning("MusicXML import: There are %d beamspans left without ending", m_beamspanStack.size());
+        m_beamspanStack.clear();
+    }
+
     if (!m_tieStack.empty()) {
         LogWarning("MusicXML import: There are %d ties left open", m_tieStack.size());
         m_tieStack.clear();
@@ -1201,13 +1229,14 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     app.append_attribute("version").set_value(GetVersion().c_str());
 }
 
-int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, StaffGrp *staffGrp, int staffOffset)
+short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
+    pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset)
 {
     assert(node);
     assert(staffGrp);
 
     // First get the number of staves in the part
-    int nbStaves = 1;
+    short int nbStaves = 1;
     pugi::xpath_node staves = node.select_node("attributes[1]/staves");
     if (staves) {
         nbStaves = staves.node().text().as_int();
@@ -1270,7 +1299,11 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 if (nbStaves > 1) clef.node().remove_attribute("id");
             }
             Clef *meiClef = ConvertClef(clef.node());
-            if (meiClef) staffDef->AddChild(meiClef);
+            if (meiClef) {
+                staffDef->AddChild(meiClef);
+                // if TAB assume guitar tablature until we examine <staff-details>, if any
+                if (meiClef->GetShape() == CLEFSHAPE_TAB) staffDef->SetNotationtype(NOTATIONTYPE_tab_guitar);
+            }
 
             // key sig
             xpath = StringFormat("key[@number='%d']", i + 1);
@@ -1291,7 +1324,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (!staffDetails) {
                 staffDetails = it->select_node("staff-details");
             }
-            int staffLines = staffDetails.node().select_node("staff-lines").node().text().as_int();
+            short int staffLines = staffDetails.node().select_node("staff-lines").node().text().as_int();
             if (staffLines) {
                 staffDef->SetLines(staffLines);
             }
@@ -1302,9 +1335,69 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (!scaleStr.empty()) {
                 staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr + "%"));
             }
-            pugi::xpath_node staffTuning = staffDetails.node().select_node("staff-tuning");
-            if (staffTuning) {
-                staffDef->SetNotationtype(NOTATIONTYPE_tab);
+            // Tablature?
+            if (staffDetails.node().child("staff-tuning") || staffDef->GetNotationtype() == NOTATIONTYPE_tab_guitar) {
+                // tablature type.  MusicXML does not support German tablature.
+                if (HasAttributeWithValue(staffDetails.node(), "show-frets", "letters")) {
+                    staffDef->SetNotationtype(NOTATIONTYPE_tab_lute_french);
+                }
+                else {
+                    // Frets are notated with numbers.
+                    // Italian tablature if the top staff line has a lower pitch than the bottom line
+                    // else guitar tablature.
+                    pugi::xml_node topLine = staffDetails.node().find_child_by_attribute(
+                        "staff-tuning", "line", std::to_string(staffLines).c_str());
+                    pugi::xml_node botLine = staffDetails.node().find_child_by_attribute("staff-tuning", "line", "1");
+                    if (topLine && botLine
+                        && PitchToMidi(topLine.child("tuning-step").text().as_string(),
+                               topLine.child("tuning-alter").text().as_int(),
+                               topLine.child("tuning-octave").text().as_int())
+                            < PitchToMidi(botLine.child("tuning-step").text().as_string(),
+                                botLine.child("tuning-alter").text().as_int(),
+                                botLine.child("tuning-octave").text().as_int())) {
+                        staffDef->SetNotationtype(NOTATIONTYPE_tab_lute_italian);
+                    }
+                    else {
+                        staffDef->SetNotationtype(NOTATIONTYPE_tab_guitar);
+                    }
+                }
+
+                // MusicXML specifies the tuning of the staff rather than the instrument,
+                // but this will at least give the tuning of some of the courses.
+                // For French tablature MusicXML ought to allow zero and negative values
+                // of @line to give the tuning for diapasons: 0 => 7, -1 => 8 etc.  But it doesn't.
+                // However, we can add the tuning of diapasons as we encounter them in <note>s.
+                Tuning *tuning = new Tuning();
+                staffDef->AddChild(tuning);
+
+                for (pugi::xml_node staffTuning : staffDetails.node().children("staff-tuning")) {
+                    Course *courseTuning = new Course();
+                    tuning->AddChild(courseTuning);
+
+                    const int line = staffTuning.attribute("line").as_int();
+                    const std::string stepStr = staffTuning.child("tuning-step").text().as_string();
+                    const int alterNum = staffTuning.child("tuning-alter").text().as_int();
+                    const int octaveNum = staffTuning.child("tuning-octave").text().as_int();
+
+                    if (staffDef->GetNotationtype() == NOTATIONTYPE_tab_lute_italian) {
+                        // Italian tablature, line 1 is course 1
+                        courseTuning->SetN(std::to_string(line));
+                    }
+                    else {
+                        // guitar and French tablature, line 1 is course = staffLines (typically 6)
+                        courseTuning->SetN(std::to_string(staffLines - line + 1));
+                    }
+                    courseTuning->SetPname(ConvertStepToPitchName(stepStr));
+                    courseTuning->SetOct(octaveNum);
+
+                    if (alterNum != 0) {
+                        static_assert(
+                            static_cast<int>(ACCIDENTAL_WRITTEN_f) == static_cast<int>(ACCIDENTAL_GESTURAL_f));
+                        static_assert(
+                            static_cast<int>(ACCIDENTAL_WRITTEN_s) == static_cast<int>(ACCIDENTAL_GESTURAL_s));
+                        courseTuning->SetAccid(static_cast<data_ACCIDENTAL_WRITTEN>(ConvertAlterToAccid(alterNum)));
+                    }
+                }
             }
 
             // time
@@ -1404,7 +1497,7 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
     }
 }
 
-bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset)
+bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, short int nbStaves, short int staffOffset)
 {
     assert(node);
     assert(section);
@@ -1471,7 +1564,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
 }
 
 bool MusicXmlInput::ReadMusicXmlMeasure(
-    pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset, int index)
+    pugi::xml_node node, Section *section, Measure *measure, short int nbStaves, const short int staffOffset, int index)
 {
     assert(node);
     assert(measure);
@@ -1636,7 +1729,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     pugi::xml_node clef = node.child("clef");
     if (clef) {
         // check if we have a staff number
-        int staffNum = clef.attribute("number").as_int();
+        short int staffNum = clef.attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
         Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1, STAFF));
         assert(staff);
@@ -1772,7 +1865,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
     }
 
     // fermatas
-    int fermataCounter = 0;
+    short int fermataCounter = 0;
     for (pugi::xml_node xmlFermata : node.children("fermata")) {
         ++fermataCounter;
         Fermata *fermata = new Fermata();
@@ -1802,7 +1895,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
 }
 
 void MusicXmlInput::ReadMusicXmlDirection(
-    pugi::xml_node node, Measure *measure, const std::string &measureNum, const int staffOffset)
+    pugi::xml_node node, Measure *measure, const std::string &measureNum, const short int staffOffset)
 {
     assert(node);
     assert(measure);
@@ -1812,7 +1905,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     const pugi::xml_node typeNode = node.child("direction-type");
     const pugi::xpath_node voice = node.select_node("voice");
-    const int offset = node.child("offset").text().as_int();
+    const short int offset = node.child("offset").text().as_int();
     const pugi::xml_node staffNode = node.child("staff");
     const pugi::xml_node soundNode = node.child("sound");
 
@@ -1823,7 +1916,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Bracket
     pugi::xml_node bracket = typeNode.child("bracket");
     if (bracket) {
-        int voiceNumber = bracket.attribute("number").as_int();
+        short int voiceNumber = bracket.attribute("number").as_int();
         voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
         if (HasAttributeWithValue(bracket, "type", "stop")) {
             if (m_bracketStack.empty()) {
@@ -1879,9 +1972,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Dashes (to be connected with previous <dir> or <dynam> as @extender and @tstamp2 attribute
     pugi::xpath_node dashes = typeNode.select_node("bracket|dashes");
     if (dashes) {
-        int dashesNumber = dashes.node().attribute("number").as_int();
+        short int dashesNumber = dashes.node().attribute("number").as_int();
         dashesNumber = (dashesNumber < 1) ? 1 : dashesNumber;
-        int staffNum = 1;
+        short int staffNum = 1;
         if (staffNode) staffNum = staffNode.text().as_int() + staffOffset;
         if (HasAttributeWithValue(dashes.node(), "type", "stop")) {
             std::vector<std::pair<ControlElement *, musicxml::OpenDashes>>::iterator iter = m_openDashesStack.begin();
@@ -1986,9 +2079,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
             pugi::xpath_node extender = (words.end() - 1)->parent().next_sibling("direction-type").first_child();
             if (!strcmp(extender.node().name(), "bracket") || !strcmp(extender.node().name(), "dashes")) {
-                int extNumber = extender.node().attribute("number").as_int();
+                short int extNumber = extender.node().attribute("number").as_int();
                 extNumber = (extNumber < 1) ? 1 : extNumber;
-                int staffNum = staffNode.text().as_int() + staffOffset;
+                short int staffNum = staffNode.text().as_int() + staffOffset;
                 staffNum = (staffNum < 1) ? 1 : staffNum;
                 dir->SetExtender(BOOLEAN_true);
                 if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
@@ -2044,9 +2137,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
         if (!dynamics.empty()) {
             pugi::xpath_node extender = (dynamics.end() - 1)->parent().next_sibling("direction-type").first_child();
             if (!strcmp(extender.node().name(), "bracket") || !strcmp(extender.node().name(), "dashes")) {
-                int extNumber = extender.node().attribute("number").as_int();
+                short int extNumber = extender.node().attribute("number").as_int();
                 extNumber = (extNumber < 1) ? 1 : extNumber;
-                int staffNum = staffNode.text().as_int() + staffOffset;
+                short int staffNum = staffNode.text().as_int() + staffOffset;
                 staffNum = (staffNum < 1) ? 1 : staffNum;
                 dynam->SetExtender(BOOLEAN_true);
                 if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
@@ -2065,7 +2158,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Hairpins
     pugi::xpath_node_set wedges = node.select_nodes("direction-type/wedge");
     for (pugi::xpath_node_set::const_iterator wedge = wedges.begin(); wedge != wedges.end(); ++wedge) {
-        int hairpinNumber = wedge->node().attribute("number").as_int();
+        short int hairpinNumber = wedge->node().attribute("number").as_int();
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
         if (HasAttributeWithValue(wedge->node(), "type", "stop")) {
             // match wedge type=stop to open hairpin
@@ -2144,7 +2237,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Ottava
     pugi::xml_node xmlShift = typeNode.child("octave-shift");
     if (xmlShift) {
-        const int staffNum = (!staffNode) ? 1 : staffNode.text().as_int() + staffOffset;
+        const short int staffNum = (!staffNode) ? 1 : staffNode.text().as_int() + staffOffset;
         if (HasAttributeWithValue(xmlShift, "type", "stop")) {
             m_octDis[staffNum] = 0;
             for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
@@ -2169,7 +2262,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             octave->SetColor(xmlShift.attribute("color").as_string());
             octave->SetDisPlace(octave->AttOctaveDisplacement::StrToStaffrelBasic(placeStr.c_str()));
             octave->SetN(xmlShift.attribute("number").as_string());
-            const int octDisNum = xmlShift.attribute("size") ? xmlShift.attribute("size").as_int() : 8;
+            const short int octDisNum = xmlShift.attribute("size") ? xmlShift.attribute("size").as_int() : 8;
             octave->SetDis(octave->AttOctaveDisplacement::StrToOctaveDis(std::to_string(octDisNum)));
             m_octDis[staffNum] = (octDisNum + 2) / 8;
             if (HasAttributeWithValue(xmlShift, "type", "up")) {
@@ -2231,7 +2324,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Principal voice
     pugi::xml_node lead = typeNode.child("principal-voice");
     if (lead) {
-        int voiceNumber = lead.attribute("number").as_int();
+        short int voiceNumber = lead.attribute("number").as_int();
         voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
         if (HasAttributeWithValue(lead, "type", "stop")) {
             const int measureDifference
@@ -2265,7 +2358,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         const std::string lang = rehearsal.attribute("xml:lang") ? rehearsal.attribute("xml:lang").as_string() : "it";
         const std::string textStr = GetContent(rehearsal);
         reh->SetColor(rehearsal.attribute("color").as_string());
-        int staffNum = staffNode.text().as_int() + staffOffset;
+        short int staffNum = staffNode.text().as_int() + staffOffset;
         staffNum = (staffNum < 1) ? 1 : staffNum;
         reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         reh->SetLang(lang);
@@ -2303,7 +2396,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // Tempo
-    pugi::xpath_node metronome = node.select_node("direction-type/metronome");
     if (containsTempo) {
         Tempo *tempo = new Tempo();
         if (!words.empty()) {
@@ -2314,6 +2406,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
         tempo->SetPlace(tempo->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
         if (words.size() != 0) TextRendition(words, tempo);
+        pugi::xpath_node metronome = node.select_node("direction-type/metronome[not(@print-object='no')]");
         if (metronome) PrintMetronome(metronome.node(), tempo);
         if (soundNode.attribute("tempo")) {
             tempo->SetMidiBpm(soundNode.attribute("tempo").as_double());
@@ -2328,7 +2421,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (!containsWords && !containsDynamics && !xmlCoda && !bracket && !lead && !metronome && !xmlSegno && !xmlShift
+    if (!containsDynamics && !containsTempo && !containsWords && !xmlCoda && !bracket && !lead && !xmlSegno && !xmlShift
         && !xmlPedal && wedges.empty() && !dashes && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", typeNode.first_child().name());
     }
@@ -2427,7 +2520,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
 }
 
 void MusicXmlInput::ReadMusicXmlNote(
-    pugi::xml_node node, Measure *measure, const std::string &measureNum, const int staffOffset, Section *section)
+    pugi::xml_node node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section)
 {
     assert(node);
     assert(measure);
@@ -2438,6 +2531,20 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
+    // find staff's staffDef
+    // TODO Tablature: is this the correct way to find a staff's staffDef?
+    AttNIntegerComparison cnc(STAFFDEF, staff->GetN());
+    StaffDef *staffDef = vrv_cast<StaffDef *>(m_doc->GetCurrentScoreDef()->FindDescendantByComparison(&cnc));
+    bool isTablature = false;
+    Tuning *tuning = NULL;
+
+    if (staffDef) {
+        tuning = vrv_cast<Tuning *>(staffDef->FindDescendantByType(TUNING));
+        const data_NOTATIONTYPE notationType = staffDef->GetNotationtype();
+        isTablature = (notationType == NOTATIONTYPE_tab || notationType == NOTATIONTYPE_tab_guitar
+            || notationType == NOTATIONTYPE_tab_lute_italian || notationType == NOTATIONTYPE_tab_lute_french
+            || notationType == NOTATIONTYPE_tab_lute_german);
+    }
 
     bool isChord = node.child("chord");
 
@@ -2468,13 +2575,13 @@ void MusicXmlInput::ReadMusicXmlNote(
     const std::string typeStr = node.child("type").text().as_string();
     const int dots = (int)node.select_nodes("dot").size();
 
-    ReadMusicXmlBeamsAndTuplets(node, layer, isChord);
+    short int tremSlashNum = -1;
 
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
     // tremolos
     pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
-    int tremSlashNum = -1;
+
     if (tremolo) {
         if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
             if (!isChord) {
@@ -2556,7 +2663,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 element = mRest;
                 if (cue) mRest->SetCue(BOOLEAN_true);
                 if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
-                if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
+                if (!octaveStr.empty()) mRest->SetOloc(std::stoi(octaveStr));
                 if (!noteID.empty()) {
                     mRest->SetUuid(noteID);
                 }
@@ -2564,23 +2671,35 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         else {
-            Rest *rest = new Rest();
-            element = rest;
-            rest->SetColor(node.attribute("color").as_string());
-            rest->SetDur(ConvertTypeToDur(typeStr));
-            rest->SetDurPpq(duration);
-            if (dots > 0) rest->SetDots(dots);
-            if (cue) rest->SetCue(BOOLEAN_true);
-            if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
-            if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
-            if (!noteID.empty()) {
-                rest->SetUuid(noteID);
+            if (isTablature) {
+                // rest
+                TabGrp *tabGrp = new TabGrp();
+                element = tabGrp;
+                tabGrp->SetDur(ConvertTypeToDur(typeStr));
+                tabGrp->SetDurPpq(duration);
+                if (dots > 0) tabGrp->SetDots(dots);
+                tabGrp->AddChild(new TabDurSym());
+                AddLayerElement(layer, tabGrp, duration);
             }
-            // set @staff attribute, if existing and different from parent staff number
-            if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
-                rest->SetStaff(
-                    rest->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
-            AddLayerElement(layer, rest, duration);
+            else {
+                Rest *rest = new Rest();
+                element = rest;
+                rest->SetColor(node.attribute("color").as_string());
+                rest->SetDur(ConvertTypeToDur(typeStr));
+                rest->SetDurPpq(duration);
+                if (dots > 0) rest->SetDots(dots);
+                if (cue) rest->SetCue(BOOLEAN_true);
+                if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
+                if (!octaveStr.empty()) rest->SetOloc(std::stoi(octaveStr));
+                if (!noteID.empty()) {
+                    rest->SetUuid(noteID);
+                }
+                // set @staff attribute, if existing and different from parent staff number
+                if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
+                    rest->SetStaff(
+                        rest->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
+                AddLayerElement(layer, rest, duration);
+            }
         }
     }
     else {
@@ -2635,21 +2754,21 @@ void MusicXmlInput::ReadMusicXmlNote(
             stemDir = STEMDIRECTION_up;
         }
 
-        // pitch and octave
+        // pitch and octave, optional, not needed for tablature
         pugi::xml_node pitch = node.child("pitch");
-        if (pitch) {
+        if (pitch && !isTablature) {
             const std::string stepStr = pitch.child("step").text().as_string();
-            const std::string alterStr = pitch.child("alter").text().as_string();
+            const float alterVal = pitch.child("alter").text().as_float();
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
-            if (!alterStr.empty()) {
+            if (pitch.child("alter")) {
                 Accid *accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
                     note->AddChild(accid);
                     accid->IsAttribute(true);
                 }
-                const data_ACCIDENTAL_GESTURAL accidGes = ConvertAlterToAccid(std::atof(alterStr.c_str()));
+                const data_ACCIDENTAL_GESTURAL accidGes = ConvertAlterToAccid(alterVal);
                 if (!IsSameAccidWrittenGestural(accid->GetAccid(), accidGes)) {
                     accid->SetAccidGes(accidGes);
                 }
@@ -2685,7 +2804,21 @@ void MusicXmlInput::ReadMusicXmlNote(
         pugi::xpath_node nextNote = node.select_node("./following-sibling::note");
         if (nextNote.node().child("chord")) nextIsChord = true;
         Chord *chord = NULL;
-        if (nextIsChord) {
+        TabGrp *tabGrp = NULL;
+        if (isTablature) {
+            // create the tabGrp if we are starting a new tabGrp
+            if (m_elementStackMap.at(layer).empty() || !m_elementStackMap.at(layer).back()->Is(TABGRP)) {
+                tabGrp = new TabGrp();
+                tabGrp->SetDur(ConvertTypeToDur(typeStr));
+                tabGrp->SetDurPpq(duration);
+                if (dots > 0) tabGrp->SetDots(dots);
+                tabGrp->AddChild(new TabDurSym());
+                AddLayerElement(layer, tabGrp, duration);
+                m_elementStackMap.at(layer).push_back(tabGrp);
+                element = tabGrp;
+            }
+        }
+        else if (nextIsChord) {
             // create the chord if we are starting a new chord
             if (m_elementStackMap.at(layer).empty() || !m_elementStackMap.at(layer).back()->Is(CHORD)) {
                 chord = new Chord();
@@ -2716,7 +2849,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         // If the current note is part of a chord.
-        if (nextIsChord || node.child("chord")) {
+        if (!isTablature && (nextIsChord || node.child("chord"))) {
             if (chord == NULL && m_elementStackMap.at(layer).size() > 0
                 && m_elementStackMap.at(layer).back()->Is(CHORD)) {
                 chord = dynamic_cast<Chord *>(m_elementStackMap.at(layer).back());
@@ -2749,7 +2882,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (cue) note->SetCue(BOOLEAN_true);
 
         // set attributes to the note if we are not in a chord
-        if (m_elementStackMap.at(layer).empty() || !m_elementStackMap.at(layer).back()->Is(CHORD)) {
+        if (!isTablature && (m_elementStackMap.at(layer).empty() || !m_elementStackMap.at(layer).back()->Is(CHORD))) {
             if (!typeStr.empty()) note->SetDur(ConvertTypeToDur(typeStr));
             note->SetDurPpq(duration);
             if (dots > 0) note->SetDots(dots);
@@ -2768,23 +2901,33 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
 
+        // beam / beamspan
+        if (!ReadMusicXmlBeamsAndTuplets(node, layer, isChord)) {
+            BeamSpan *meiBeamSpan = new BeamSpan();
+            meiBeamSpan->SetStartid("#" + element->GetUuid());
+            m_controlElements.push_back({ measureNum, meiBeamSpan });
+            m_beamspanStack.push_back({ meiBeamSpan, { staff->GetN(), layer->GetN() } });
+        }
+
         // verse / syl
         for (pugi::xml_node lyric : node.children("lyric")) {
-            int lyricNumber = lyric.attribute("number").as_int();
+            short int lyricNumber = lyric.attribute("number").as_int();
             lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
             Verse *verse = new Verse();
             verse->SetColor(lyric.attribute("color").as_string());
             // verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
-            for (pugi::xml_node textNode : lyric.children("text")) {
-                if (!HasAttributeWithValue(lyric, "print-object", "no")) {
+            std::string syllabic = "single";
+            for (pugi::xml_node childNode : lyric.children()) {
+                if (!strcmp(childNode.name(), "syllabic")) syllabic = GetContent(childNode);
+                if (!strcmp(childNode.name(), "text") && !HasAttributeWithValue(lyric, "print-object", "no")) {
                     // const std::string textColor = textNode.attribute("color").as_string();
-                    const std::string textStyle = textNode.attribute("font-style").as_string();
-                    const std::string textWeight = textNode.attribute("font-weight").as_string();
-                    int lineThrough = textNode.attribute("line-through").as_int();
-                    const std::string lang = textNode.attribute("xml:lang").as_string();
-                    std::string textStr = textNode.text().as_string();
+                    const std::string textStyle = childNode.attribute("font-style").as_string();
+                    const std::string textWeight = childNode.attribute("font-weight").as_string();
+                    const short int lineThrough = childNode.attribute("line-through").as_int();
+                    const std::string lang = childNode.attribute("xml:lang").as_string();
+                    std::string textStr = childNode.text().as_string();
 
                     // convert verse numbers to labels
                     std::regex labelSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)$");
@@ -2792,7 +2935,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     std::regex labelPrefixSearch("^([^[:alpha:]]*\\d[^[:alpha:]]*)[\\s\\u00A0]+");
                     std::smatch labelPrefixSearchMatches;
                     if (!textStr.empty() && std::regex_search(textStr, labelSearchMatches, labelSearch)
-                        && labelSearchMatches.ready() && textNode.next_sibling("elision")) {
+                        && labelSearchMatches.ready() && childNode.next_sibling("elision")) {
                         // entire textStr is a label (MusicXML from Finale)
 
                         Label *label = new Label();
@@ -2821,25 +2964,25 @@ void MusicXmlInput::ReadMusicXmlNote(
 
                     Syl *syl = new Syl();
                     syl->SetLang(lang.c_str());
-                    if (GetContentOfChild(lyric, "syllabic") == "single") {
+                    if (syllabic == "single") {
                         syl->SetWordpos(sylLog_WORDPOS_s);
                         syl->SetCon(sylLog_CON_s);
                     }
-                    else if (GetContentOfChild(lyric, "syllabic") == "begin") {
+                    else if (syllabic == "begin") {
                         syl->SetWordpos(sylLog_WORDPOS_i);
                         syl->SetCon(sylLog_CON_d);
                     }
-                    else if (GetContentOfChild(lyric, "syllabic") == "middle") {
+                    else if (syllabic == "middle") {
                         syl->SetWordpos(sylLog_WORDPOS_m);
                         syl->SetCon(sylLog_CON_d);
                     }
-                    else if (GetContentOfChild(lyric, "syllabic") == "end") {
+                    else if (syllabic == "end") {
                         syl->SetWordpos(sylLog_WORDPOS_t);
                         syl->SetCon(sylLog_CON_s);
                     }
 
                     // override @con if we have elisions or extensions
-                    if (textNode.next_sibling("elision")) {
+                    if (childNode.next_sibling("elision")) {
                         syl->SetCon(sylLog_CON_b);
                     }
                     else if (lyric.child("extend")) {
@@ -2864,6 +3007,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                     verse->AddChild(syl);
                 }
             }
+            // TODO Tablature: <tabGrp> does not support child <verse>
             if (element->Is(CHORD) || element->Is(NOTE)) {
                 element->AddChild(verse);
             }
@@ -2877,7 +3021,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         pugi::xpath_node_set slurs = node.select_nodes("notations/slur");
         for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it) {
             pugi::xml_node slur = it->node();
-            int slurNumber = slur.attribute("number").as_int();
+            short int slurNumber = slur.attribute("number").as_int();
             slurNumber = (slurNumber < 1) ? 1 : slurNumber;
             if (HasAttributeWithValue(slur, "type", "stop")) {
                 CloseSlur(measure, slurNumber, note);
@@ -2933,13 +3077,61 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // technical
         for (pugi::xml_node technical : notations.node().children("technical")) {
-            // fingering is handled on the same level as breath marks, dynamics, etc. so we skip it here
-            if (technical.child("fingering")) continue;
-            if (technical.child("fret")) {
-                // set @tab.string and @tab.fret
-            }
-            else {
-                for (pugi::xml_node articulation : technical.children()) {
+            for (pugi::xml_node technicalChild : technical.children()) {
+                const std::string technicalChildName = technicalChild.name();
+
+                // fingering is handled on the same level as breath marks, dynamics, etc. so we skip it here
+                if (technicalChildName == "fingering") continue;
+                if (technicalChildName == "string") continue; // handled with fret
+
+                if (technicalChildName == "fret") {
+                    assert(isTablature);
+
+                    // set @tab.string and @tab.fret
+                    const int fret = technicalChild.text().as_int();
+                    const int course = technical.child("string").text().as_int();
+                    note->SetTabFret(fret);
+                    note->SetTabCourse(course);
+
+                    // Do we have the pitch for this note, if so do we have the tuning for this course?
+                    pugi::xml_node pitch = node.child("pitch");
+                    if (tuning && pitch) {
+                        AttNNumberLikeComparison cnc(COURSE, std::to_string(course));
+                        Course *courseTuning = vrv_cast<Course *>(tuning->FindDescendantByComparison(&cnc));
+
+                        if (!courseTuning) {
+                            // we have the note's pitch, but not the course's tuning, set it
+
+                            const int midi = PitchToMidi(pitch.child("step").text().as_string(),
+                                pitch.child("alter").text().as_int(),
+                                pitch.child("octave").text().as_int()); // note's midi note number
+
+                            // course's pitch
+                            std::string stepStr;
+                            int alterNum = 0;
+                            int octaveNum = 0;
+                            MidiToPitch(midi - fret, stepStr, alterNum, octaveNum);
+
+                            courseTuning = new Course();
+                            tuning->AddChild(courseTuning);
+
+                            courseTuning->SetN(std::to_string(course));
+                            courseTuning->SetPname(ConvertStepToPitchName(stepStr));
+                            courseTuning->SetOct(octaveNum);
+
+                            if (alterNum != 0) {
+                                static_assert(
+                                    static_cast<int>(ACCIDENTAL_WRITTEN_f) == static_cast<int>(ACCIDENTAL_GESTURAL_f));
+                                static_assert(
+                                    static_cast<int>(ACCIDENTAL_WRITTEN_s) == static_cast<int>(ACCIDENTAL_GESTURAL_s));
+                                courseTuning->SetAccid(
+                                    static_cast<data_ACCIDENTAL_WRITTEN>(ConvertAlterToAccid(alterNum)));
+                            }
+                        }
+                    }
+                }
+                else {
+                    pugi::xml_node articulation = technicalChild;
                     Artic *artic = new Artic();
                     artics.push_back(ConvertArticulations(articulation.name()));
                     if (artics.back() == ARTICULATION_NONE) {
@@ -2960,12 +3152,13 @@ void MusicXmlInput::ReadMusicXmlNote(
         // add the note to the layer or to the current container
         AddLayerElement(layer, note, duration);
 
-        // if we are ending a chord remove it from the stack
+        // if we are ending a chord or tabGrp remove it from the stack
         if (!nextIsChord) {
-            if (!m_elementStackMap.at(layer).empty() && m_elementStackMap.at(layer).back()->Is(CHORD)) {
+            const ClassId classId = isTablature ? TABGRP : CHORD;
+            if (!m_elementStackMap.at(layer).empty() && m_elementStackMap.at(layer).back()->Is(classId)) {
                 SetChordStaff(layer);
 
-                RemoveLastFromStack(CHORD, layer);
+                RemoveLastFromStack(classId, layer);
             }
         }
     }
@@ -3055,8 +3248,8 @@ void MusicXmlInput::ReadMusicXmlNote(
     pugi::xpath_node_set glissandi = notations.node().select_nodes("glissando|slide");
     for (pugi::xpath_node_set::const_iterator it = glissandi.begin(); it != glissandi.end(); ++it) {
         std::string noteID = m_ID;
-        // prevent from using chords
-        if (element->Is(CHORD)) noteID = "#" + element->GetChild(0)->GetUuid();
+        // prevent from using chords or tabGrps
+        if (element->Is(CHORD) || element->Is(TABGRP)) noteID = "#" + element->GetChild(0)->GetUuid();
         pugi::xml_node xmlGlissando = it->node();
         if (HasAttributeWithValue(xmlGlissando, "type", "start")) {
             Gliss *gliss = new Gliss();
@@ -3071,7 +3264,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             m_glissStack.push_back(gliss);
         }
         else if (!m_glissStack.empty()) {
-            int extNumber = xmlGlissando.attribute("number").as_int();
+            short int extNumber = xmlGlissando.attribute("number").as_int();
             std::vector<Gliss *>::iterator iter = m_glissStack.begin();
             while (iter != m_glissStack.end()) {
                 if ((atoi(((*iter)->GetN()).c_str()) == extNumber) && ((*iter)->GetType() == xmlGlissando.name())) {
@@ -3184,7 +3377,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
     }
     if (!m_trillStack.empty() && notations.node().select_node("ornaments/wavy-line[@type='stop']")) {
-        int extNumber
+        short int extNumber
             = notations.node().select_node("ornaments/wavy-line[@type='stop']").node().attribute("number").as_int();
         std::vector<std::pair<Trill *, musicxml::OpenSpanner>>::iterator iter = m_trillStack.begin();
         while (iter != m_trillStack.end()) {
@@ -3244,7 +3437,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     // arpeggio
     pugi::xpath_node xmlArpeggiate = notations.node().select_node("*[contains(name(), 'arpeggiate')]");
     if (xmlArpeggiate) {
-        int arpegN = xmlArpeggiate.node().attribute("number").as_int();
+        short int arpegN = xmlArpeggiate.node().attribute("number").as_int();
         arpegN = (arpegN < 1) ? 1 : arpegN;
         const std::string direction = xmlArpeggiate.node().attribute("direction").as_string();
         bool added = false;
@@ -3313,9 +3506,18 @@ void MusicXmlInput::ReadMusicXmlNote(
                 Chord *chord = dynamic_cast<Chord *>(element);
                 chord->SetBreaksec(breakSec);
             }
+            else if (element->Is(TABGRP)) {
+                TabGrp *tabGrp = vrv_cast<TabGrp *>(element);
+                tabGrp->SetBreaksec(breakSec);
+            }
         }
         else {
-            RemoveLastFromStack(BEAM, layer);
+            if (IsInStack(BEAM, layer)) {
+                RemoveLastFromStack(BEAM, layer);
+            }
+            else {
+                CloseBeamSpan(staff, layer, element);
+            }
         }
     }
 
@@ -3385,7 +3587,7 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     }
 }
 
-void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord)
+bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord)
 {
     pugi::xpath_node beamStart = node.select_node("beam[@number='1' and text()='begin']");
     pugi::xpath_node tupletStart = node.select_node("notations/tuplet[@type='start']");
@@ -3424,12 +3626,19 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
         const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
         const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
 
-        if (beamEndIterator == currentMeasureNodes.end()) {
+        // find staff number for the corresponding elements - we do not want to match beam start on one staff with beam
+        // end on another
+        pugi::xpath_node nodeStaff = node.select_node("staff");
+        pugi::xpath_node endBeamStaff = beamEnd.select_node("staff");
+
+        if (beamEndIterator == currentMeasureNodes.end()
+            || (nodeStaff && endBeamStaff
+                && (nodeStaff.node().text().as_int() != endBeamStaff.node().text().as_int()))) {
             std::string measureName = (currentMeasure.node().attribute("id"))
                 ? currentMeasure.node().attribute("id").as_string()
                 : currentMeasure.node().attribute("number").as_string();
-            LogError("MusicXML import: Beam without end in measure %s", measureName.c_str());
-            return;
+            LogWarning("MusicXML import: Beam without end in measure %s treated as <beamSpan>", measureName.c_str());
+            return false;
         }
         // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
         std::vector<pugi::xml_node> beamNodes(beamStartIterator, beamEndIterator + 1);
@@ -3451,17 +3660,21 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
     else if (tupletStart) {
         if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
     }
+
+    return true;
 }
 
 void MusicXmlInput::ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer)
 {
+    // TODO <tuplet> does not support child <tabGrp>
+
     if (!tupletStart) return;
 
     Tuplet *tuplet = new Tuplet();
     AddLayerElement(layer, tuplet);
     m_elementStackMap.at(layer).push_back(tuplet);
-    int num = node.select_node("time-modification/actual-notes").node().text().as_int();
-    int numbase = node.select_node("time-modification/normal-notes").node().text().as_int();
+    short int num = node.select_node("time-modification/actual-notes").node().text().as_int();
+    short int numbase = node.select_node("time-modification/normal-notes").node().text().as_int();
     if (tupletStart.first_child()) {
         num = tupletStart.select_node("tuplet-actual/tuplet-number").node().text().as_int();
         numbase = tupletStart.select_node("tuplet-normal/tuplet-number").node().text().as_int();
@@ -3573,7 +3786,7 @@ Clef *MusicXmlInput::ConvertClef(const pugi::xml_node &clef)
         // clef octave change
         pugi::xml_node clefOctaveChange = clef.child("clef-octave-change");
         if (clefOctaveChange) {
-            int change = clefOctaveChange.text().as_int();
+            short int change = clefOctaveChange.text().as_int();
             switch (abs(change)) {
                 case 1: meiClef->SetDis(OCTAVE_DIS_8); break;
                 case 2: meiClef->SetDis(OCTAVE_DIS_15); break;
@@ -3601,7 +3814,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
         keySig->SetUuid(key.attribute("id").as_string());
     }
     if (key.child("fifths")) {
-        int fifths = key.child("fifths").text().as_int();
+        short int fifths = key.child("fifths").text().as_int();
         std::string keySigStr;
         if (fifths < 0)
             keySigStr = StringFormat("%df", abs(fifths));
@@ -3626,8 +3839,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
             KeyAccid *keyAccid = new KeyAccid();
             keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
             if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
-                data_ACCIDENTAL_GESTURAL accidValue
-                    = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
+                data_ACCIDENTAL_GESTURAL accidValue = ConvertAlterToAccid(keyStep.next_sibling().text().as_float());
                 keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
                 if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
                     keyAccid->SetAccid(
@@ -3937,7 +4149,7 @@ data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(const std::string &value)
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported pitch name '%s'", value.c_str());
+    LogWarning("MusicXML import: Unsupported step value '%s'", value.c_str());
     return PITCHNAME_NONE;
 }
 
@@ -4384,6 +4596,31 @@ void MusicXmlInput::SetChordStaff(Layer *layer)
         Note *note = vrv_cast<Note *>(object);
         note->ResetStaffIdent();
     });
+}
+
+int MusicXmlInput::PitchToMidi(const std::string &step, int alter, int octave)
+{
+    if (step.empty() || step[0] < 'A' || step[0] > 'G') return 0;
+
+    // Distance in semitones from the octave's starting C to the given step
+    //                                 A   B  C  D  E  F  G
+    static const int octaveStart[] = { 9, 11, 0, 2, 4, 5, 7 };
+    const int semitones = octave * 12 + octaveStart[step[0] - 'A'] + alter; // semitones from C0
+    return semitones + 12; // MIDI note C4 = 60
+}
+
+void MusicXmlInput::MidiToPitch(int midi, std::string &step, int &alter, int &octave)
+{
+    const int semitones = midi - 12; // C0 = 0
+
+    // 12 notes in an octave.  Ignore enharmonics, prefer B flat over A sharp.
+    static const std::pair<const char *, int> octaveNotes[] = { { "C", 0 }, { "C", 1 }, { "D", 0 }, { "D", 1 },
+        { "E", 0 }, { "F", 0 }, { "F", 1 }, { "G", 0 }, { "G", 1 }, { "A", 0 }, { "B", -1 }, { "B", 0 } };
+    static_assert(sizeof(octaveNotes) / sizeof(octaveNotes[0]) == 12);
+
+    octave = semitones / 12;
+    step = octaveNotes[semitones % 12].first;
+    alter = octaveNotes[semitones % 12].second;
 }
 
 #endif // NO_MUSICXML_SUPPORT

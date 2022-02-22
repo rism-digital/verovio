@@ -25,9 +25,9 @@ static const ClassRegistrar<Sic> s_factory("sic", SIC);
 
 Sic::Sic() : EditorialElement(SIC, "sic-"), AttSource()
 {
-    RegisterAttClass(ATT_SOURCE);
+    this->RegisterAttClass(ATT_SOURCE);
 
-    Reset();
+    this->Reset();
 }
 
 Sic::~Sic() {}
@@ -35,7 +35,7 @@ Sic::~Sic() {}
 void Sic::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

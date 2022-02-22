@@ -34,13 +34,13 @@ static const ClassRegistrar<Tempo> s_factory("tempo", TEMPO);
 Tempo::Tempo()
     : ControlElement(TEMPO, "tempo-"), TextDirInterface(), TimePointInterface(), AttLang(), AttMidiTempo(), AttMmTempo()
 {
-    RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    RegisterAttClass(ATT_LANG);
-    RegisterAttClass(ATT_MIDITEMPO);
-    RegisterAttClass(ATT_MMTEMPO);
+    this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
+    this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterAttClass(ATT_LANG);
+    this->RegisterAttClass(ATT_MIDITEMPO);
+    this->RegisterAttClass(ATT_MMTEMPO);
 
-    Reset();
+    this->Reset();
 }
 
 Tempo::~Tempo() {}
@@ -50,9 +50,9 @@ void Tempo::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimePointInterface::Reset();
-    ResetLang();
-    ResetMidiTempo();
-    ResetMmTempo();
+    this->ResetLang();
+    this->ResetMidiTempo();
+    this->ResetMmTempo();
 }
 
 bool Tempo::IsSupportedChild(Object *child)
@@ -76,7 +76,7 @@ int Tempo::GetDrawingXRelativeToStaff(int staffN)
         m_relativeX = m_drawingXRels.at(staffN);
     }
 
-    return GetStart()->GetDrawingX() + m_relativeX;
+    return this->GetStart()->GetDrawingX() + m_relativeX;
 }
 
 int Tempo::AdjustTempo(FunctorParams *functorParams)
@@ -92,20 +92,20 @@ int Tempo::AdjustTempo(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Measure *measure = vrv_cast<Measure *>(GetFirstAncestor(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
     Alignment *pos
         = dynamic_cast<Alignment *>(measure->m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
 
     for (auto positioner : positioners) {
         int left, right;
-        int start = GetStart()->GetDrawingX();
+        int start = this->GetStart()->GetDrawingX();
         const int staffN = positioner->GetAlignment()->GetStaff()->GetN();
-        if (!HasStartid() && (GetTstamp() <= 1) && pos) {
+        if (!this->HasStartid() && (this->GetTstamp() <= 1) && pos) {
             left = measure->GetDrawingX() + pos->GetXRel();
         }
         else {
-            Alignment *align = GetStart()->GetAlignment();
+            Alignment *align = this->GetStart()->GetAlignment();
             align->GetLeftRight(staffN, left, right);
         }
 
@@ -123,6 +123,29 @@ int Tempo::ResetDrawing(FunctorParams *functorParams)
     ControlElement::ResetDrawing(functorParams);
 
     m_drawingXRels.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Tempo::CalcMaxMeasureDuration(FunctorParams *functorParams)
+{
+    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    if (this->HasMidiBpm()) {
+        params->m_currentTempo = this->GetMidiBpm();
+    }
+    else if (this->HasMm()) {
+        double mm = this->GetMm();
+        int mmUnit = 4;
+        if (this->HasMmUnit() && (this->GetMmUnit() > DURATION_breve)) {
+            mmUnit = pow(2, (int)this->GetMmUnit() - 2);
+        }
+        if (this->HasMmDots()) {
+            mmUnit = 2 * mmUnit - (mmUnit / pow(2, this->GetMmDots()));
+        }
+        params->m_currentTempo = mm * 4.0 / mmUnit + 0.5;
+    }
 
     return FUNCTOR_CONTINUE;
 }

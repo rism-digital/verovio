@@ -42,27 +42,27 @@ namespace vrv {
 
 ScoreDefElement::ScoreDefElement() : Object(SCOREDEF_ELEMENT, "scoredefelement-"), ScoreDefInterface(), AttTyped()
 {
-    RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 ScoreDefElement::ScoreDefElement(ClassId classId) : Object(classId, "scoredefelement-"), ScoreDefInterface(), AttTyped()
 {
-    RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 ScoreDefElement::ScoreDefElement(ClassId classId, const std::string &classIdStr)
     : Object(classId, classIdStr), ScoreDefInterface(), AttTyped()
 {
-    RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 ScoreDefElement::~ScoreDefElement() {}
@@ -71,7 +71,7 @@ void ScoreDefElement::Reset()
 {
     Object::Reset();
     ScoreDefInterface::Reset();
-    ResetTyped();
+    this->ResetTyped();
 }
 
 bool ScoreDefElement::HasClefInfo(int depth)
@@ -198,12 +198,12 @@ ScoreDef::ScoreDef()
     , AttOptimization()
     , AttTimeBase()
 {
-    RegisterAttClass(ATT_DISTANCES);
-    RegisterAttClass(ATT_ENDINGS);
-    RegisterAttClass(ATT_OPTIMIZATION);
-    RegisterAttClass(ATT_TIMEBASE);
+    this->RegisterAttClass(ATT_DISTANCES);
+    this->RegisterAttClass(ATT_ENDINGS);
+    this->RegisterAttClass(ATT_OPTIMIZATION);
+    this->RegisterAttClass(ATT_TIMEBASE);
 
-    Reset();
+    this->Reset();
 }
 
 ScoreDef::~ScoreDef() {}
@@ -211,9 +211,9 @@ ScoreDef::~ScoreDef() {}
 void ScoreDef::Reset()
 {
     ScoreDefElement::Reset();
-    ResetDistances();
-    ResetEndings();
-    ResetOptimization();
+    this->ResetDistances();
+    this->ResetEndings();
+    this->ResetOptimization();
 
     m_drawLabels = false;
     m_drawingWidth = 0;
@@ -343,11 +343,31 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
             delete meterSig;
         }
         else if (newStaffDef->HasMeterSigInfo()) {
-            staffDef->SetDrawMeterSig(true);
-            // Never draw a meterSig AND a mensur
-            staffDef->SetDrawMensur(false);
             MeterSig *meterSig = newStaffDef->GetMeterSigCopy();
-            staffDef->SetCurrentMeterSig(meterSig);
+            if (newStaffDef->HasMensurInfo()) {
+                // If there is a mensur and the meterSig
+                // is invisible, then print mensur instead
+                data_METERFORM meterForm = meterSig->GetForm();
+                if (meterForm == METERFORM_invis) {
+                    staffDef->SetDrawMeterSig(false);
+                    staffDef->SetDrawMensur(true);
+                    Mensur *mensur = newStaffDef->GetMensurCopy();
+                    staffDef->SetCurrentMensur(mensur);
+                    // Invisible meterSig is still needed for mRest:
+                    staffDef->SetCurrentMeterSig(meterSig);
+                    delete mensur;
+                }
+                else {
+                    staffDef->SetDrawMeterSig(true);
+                    staffDef->SetDrawMensur(false);
+                    staffDef->SetCurrentMeterSig(meterSig);
+                }
+            }
+            else {
+                staffDef->SetDrawMeterSig(true);
+                staffDef->SetDrawMensur(false);
+                staffDef->SetCurrentMeterSig(meterSig);
+            }
             delete meterSig;
         }
         // copy other attributes if present
@@ -591,13 +611,13 @@ int ScoreDef::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    // SetDrawingXRel(m_systemLeftMar + this->GetDrawingWidth());
     params->m_shift += m_drawingLabelsWidth;
-    if (this->IsSectionRestart()) {
-        const bool hasLabel
-            = (NULL != this->FindDescendantByType(LABEL)) || (NULL != this->FindDescendantByType(LABELABBR));
-        // Add space if we have no label/labelAbbr and no grpSym
-        if (!hasLabel) params->m_shift += 5 * params->m_doc->GetDrawingDoubleUnit(100);
+
+    if (params->m_applySectionRestartShift) {
+        ClassIdsComparison comparison({ LABEL, LABELABBR });
+        if (this->FindDescendantByComparison(&comparison)) {
+            params->m_applySectionRestartShift = false;
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -608,9 +628,23 @@ int ScoreDef::JustifyX(FunctorParams *functorParams)
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
     assert(params);
 
-    params->m_measureXRel += m_drawingLabelsWidth;
+    if (m_drawingLabelsWidth > 0) {
+        params->m_measureXRel += m_drawingLabelsWidth;
+        params->m_applySectionRestartShift = false;
+    }
 
     return FUNCTOR_SIBLINGS;
+}
+
+int ScoreDef::PrepareDuration(FunctorParams *functorParams)
+{
+    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
+    assert(params);
+
+    params->m_durDefaultForStaffN.clear();
+    params->m_durDefault = this->GetDurDefault();
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

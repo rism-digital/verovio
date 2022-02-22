@@ -94,7 +94,7 @@ Object *Object::Clone() const
 
 Object::Object(const Object &object) : BoundingBox(object)
 {
-    ResetBoundingBox(); // It does not make sense to keep the values of the BBox
+    this->ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
     m_classId = object.m_classId;
     m_classIdStr = object.m_classIdStr;
@@ -141,7 +141,7 @@ Object &Object::operator=(const Object &object)
     // not self assignement
     if (this != &object) {
         ClearChildren();
-        ResetBoundingBox(); // It does not make sense to keep the values of the BBox
+        this->ResetBoundingBox(); // It does not make sense to keep the values of the BBox
 
         m_classId = object.m_classId;
         m_classIdStr = object.m_classIdStr;
@@ -197,7 +197,7 @@ void Object::Init(ClassId classId, const std::string &classIdStr)
 
     this->GenerateUuid();
 
-    Reset();
+    this->Reset();
 }
 
 void Object::SetAsReferenceObject()
@@ -210,7 +210,7 @@ void Object::SetAsReferenceObject()
 void Object::Reset()
 {
     ClearChildren();
-    ResetBoundingBox();
+    this->ResetBoundingBox();
 }
 
 void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId interfaceId)
@@ -541,7 +541,7 @@ Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direct
 Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction)
 {
     ClassIdComparison comparison(classId);
-    return FindDescendantByComparison(&comparison, deepness, direction);
+    return this->FindDescendantByComparison(&comparison, deepness, direction);
 }
 
 Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction)
@@ -583,14 +583,14 @@ void Object::FindAllDescendantsByComparison(
 }
 
 void Object::FindAllDescendantsBetween(
-    ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear)
+    ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear, int depth)
 {
     assert(objects);
     if (clear) objects->clear();
 
     Functor findAllBetween(&Object::FindAllBetween);
     FindAllBetweenParams findAllBetweenParams(comparison, objects, start, end);
-    this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD, true);
+    this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, depth, FORWARD, true);
 }
 
 Object *Object::GetChild(int idx) const
@@ -719,7 +719,7 @@ int Object::GetDescendantIndex(const Object *child, const ClassId classId, int d
     int i = 0;
     for (auto &object : objects) {
         if (child == object) return i;
-        i++;
+        ++i;
     }
     return -1;
 }
@@ -1115,7 +1115,7 @@ void ObjectListInterface::ResetList(Object *node)
 
 const ArrayOfObjects *ObjectListInterface::GetList(Object *node)
 {
-    ResetList(node);
+    this->ResetList(node);
     return &m_list;
 }
 
@@ -1134,7 +1134,7 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
     ArrayOfObjects::iterator it = m_list.begin();
-    int idx = GetListIndex(startFrom);
+    int idx = this->GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
     it = std::find_if(it, m_list.end(), ObjectComparison(classId));
@@ -1144,7 +1144,7 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
 Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
 {
     ArrayOfObjects::iterator it = m_list.begin();
-    int idx = GetListIndex(startFrom);
+    int idx = this->GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
     ArrayOfObjects::reverse_iterator rit(it);
@@ -1464,6 +1464,14 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
         if (interface->GetEnd() && !interface->GetEnd()->Is(TIMESTAMP_ATTR))
             params->m_elements->push_back(interface->GetEnd());
     }
+    if (this->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(this);
+        assert(note);
+        // The note has a stem.sameas that was resolved the a note, then that one is referenced
+        if (note->HasStemSameas() && note->HasStemSameasNote()) {
+            params->m_elements->push_back(note->GetStemSameasNote());
+        }
+    }
     // These will also be referred to as milestones in page-based MEI
     if (params->m_milestoneReferences && this->IsMilestoneElement()) {
         params->m_elements->push_back(this);
@@ -1526,6 +1534,14 @@ int Object::PrepareLinking(FunctorParams *functorParams)
         interface->InterfacePrepareLinking(functorParams, this);
     }
 
+    if (this->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(this);
+        assert(note);
+        PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
+        assert(params);
+        note->ResolveStemSameas(params);
+    }
+
     // @next
     std::string uuid = this->GetUuid();
     auto r1 = params->m_nextUuidPairs.equal_range(uuid);
@@ -1558,12 +1574,21 @@ int Object::PreparePlist(FunctorParams *functorParams)
         return interface->InterfacePreparePlist(functorParams, this);
     }
 
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::ProcessPlist(FunctorParams *functorParams)
+{
+    PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
+    assert(params);
+
+    if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
+
     std::string uuid = this->GetUuid();
-    auto i = std::find_if(params->m_interfaceUuidPairs.begin(), params->m_interfaceUuidPairs.end(),
-        [uuid](std::pair<PlistInterface *, std::string> pair) { return (pair.second == uuid); });
-    if (i != params->m_interfaceUuidPairs.end()) {
-        i->first->SetRef(this);
-        params->m_interfaceUuidPairs.erase(i);
+    auto i = std::find_if(params->m_interfaceUuidTuples.begin(), params->m_interfaceUuidTuples.end(),
+        [&uuid](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == uuid); });
+    if (i != params->m_interfaceUuidTuples.end()) {
+        std::get<2>(*i) = this;
     }
 
     return FUNCTOR_CONTINUE;
@@ -1876,10 +1901,8 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         assert(currentLayer);
         // set scoreDef attr
         if (currentLayer->GetStaffDefClef()) {
-            // Ignore system scoreDef clefs - clefs changes withing a staff are still taken into account
-            if (currentLayer->GetStaffDefClef()->GetScoreDefRole() != SCOREDEF_SYSTEM) {
-                currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
-            }
+            // System scoreDef clefs are taken into account but treated separately (see below)
+            currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
         }
         if (currentLayer->GetStaffDefKeySig()) {
             currentLayer->GetStaffDefKeySig()->SetOverflowBBoxes(params);
@@ -1905,6 +1928,30 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    // Take into account beam in cross-staff situation
+    if (this->Is(BEAM)) {
+        Beam *beam = vrv_cast<Beam *>(this);
+        assert(beam);
+        // Ignore it if it has cross-staff content but is not entirely cross-staff itself
+        if (beam->m_crossStaffContent && !beam->m_crossStaff) return FUNCTOR_CONTINUE;
+    }
+
+    // Take into account stem for notes in cross-staff situation and in beams
+    if (this->Is(STEM)) {
+        LayerElement *noteOrChord = dynamic_cast<LayerElement *>(this->GetParent());
+        if (noteOrChord && noteOrChord->m_crossStaff) {
+            if (noteOrChord->IsInBeam()) {
+                Beam *beam = vrv_cast<Beam *>(noteOrChord->GetFirstAncestor(BEAM));
+                assert(beam);
+                // Ignore it but only if the beam is not entirely cross-staff itself
+                if (!beam->m_crossStaff) return FUNCTOR_CONTINUE;
+            }
+            else if (noteOrChord->IsInBeamSpan()) {
+                return FUNCTOR_CONTINUE;
+            }
+        }
+    }
+
     if (this->Is(FB) || this->Is(FIGURE)) {
         return FUNCTOR_CONTINUE;
     }
@@ -1928,14 +1975,26 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     StaffAlignment *below = NULL;
     current->GetOverflowStaffAlignments(above, below);
 
+    bool isScoreDefClef = false;
+    // Exception for the scoreDef clef where we do not want to take into account the general overflow
+    // We have instead distinct members in StaffAlignment to store them
+    if (current->Is(CLEF) && current->GetScoreDefRole() == SCOREDEF_SYSTEM) {
+        isScoreDefClef = true;
+    }
+
     if (above) {
         int overflowAbove = above->CalcOverflowAbove(current);
         int staffSize = above->GetStaffSize();
         if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
-            above->SetOverflowBBoxAbove(current, overflowAbove);
-            above->SetOverflowAbove(overflowAbove);
-            above->AddBBoxAbove(current);
+            if (isScoreDefClef) {
+                above->SetScoreDefClefOverflowAbove(overflowAbove);
+            }
+            else {
+                above->SetOverflowBBoxAbove(current, overflowAbove);
+                above->SetOverflowAbove(overflowAbove);
+                above->AddBBoxAbove(current);
+            }
         }
     }
 
@@ -1944,9 +2003,14 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         int staffSize = below->GetStaffSize();
         if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
             // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
-            below->SetOverflowBBoxBelow(current, overflowBelow);
-            below->SetOverflowBelow(overflowBelow);
-            below->AddBBoxBelow(current);
+            if (isScoreDefClef) {
+                below->SetScoreDefClefOverflowBelow(overflowBelow);
+            }
+            else {
+                below->SetOverflowBBoxBelow(current, overflowBelow);
+                below->SetOverflowBelow(overflowBelow);
+                below->AddBBoxBelow(current);
+            }
         }
     }
 

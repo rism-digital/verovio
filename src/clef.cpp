@@ -30,15 +30,15 @@ static const ClassRegistrar<Clef> s_factory("clef", CLEF);
 Clef::Clef()
     : LayerElement(CLEF, "clef-"), AttClefShape(), AttColor(), AttLineLoc(), AttOctaveDisplacement(), AttVisibility()
 {
-    RegisterAttClass(ATT_CLEFSHAPE);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_ENCLOSINGCHARS);
-    RegisterAttClass(ATT_EXTSYM);
-    RegisterAttClass(ATT_LINELOC);
-    RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterAttClass(ATT_CLEFSHAPE);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
+    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_LINELOC);
+    this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
-    Reset();
+    this->Reset();
 }
 
 Clef::~Clef() {}
@@ -46,46 +46,46 @@ Clef::~Clef() {}
 void Clef::Reset()
 {
     LayerElement::Reset();
-    ResetClefShape();
-    ResetColor();
-    ResetEnclosingChars();
-    ResetExtSym();
-    ResetLineLoc();
-    ResetOctaveDisplacement();
-    ResetVisibility();
+    this->ResetClefShape();
+    this->ResetColor();
+    this->ResetEnclosingChars();
+    this->ResetExtSym();
+    this->ResetLineLoc();
+    this->ResetOctaveDisplacement();
+    this->ResetVisibility();
 }
 
 int Clef::GetClefLocOffset() const
 {
-    if (this->HasSameasLink() && this->GetSameasLink()->Is(CLEF)) {
-        Clef *sameas = vrv_cast<Clef *>(this->GetSameasLink());
-        assert(sameas);
+    // Only resolve simple sameas links to avoid infinite recursion
+    Clef *sameas = dynamic_cast<Clef *>(this->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
         return sameas->GetClefLocOffset();
     }
 
     int offset = 0;
-    if (GetShape() == CLEFSHAPE_G) {
+    if (this->GetShape() == CLEFSHAPE_G) {
         offset = -4;
     }
-    else if (GetShape() == CLEFSHAPE_GG) {
+    else if (this->GetShape() == CLEFSHAPE_GG) {
         offset = 3;
     }
-    else if (GetShape() == CLEFSHAPE_F) {
+    else if (this->GetShape() == CLEFSHAPE_F) {
         offset = 4;
     }
 
-    offset += (GetLine() - 1) * 2;
+    offset += (this->GetLine() - 1) * 2;
 
     int disPlace = 0;
-    if (GetDisPlace() == STAFFREL_basic_above)
+    if (this->GetDisPlace() == STAFFREL_basic_above)
         disPlace = -1;
-    else if (GetDisPlace() == STAFFREL_basic_below)
+    else if (this->GetDisPlace() == STAFFREL_basic_below)
         disPlace = 1;
 
     // ignore disPlace for gClef8vbOld
-    if (GetShape() == CLEFSHAPE_GG) disPlace = 0;
+    if (this->GetShape() == CLEFSHAPE_GG) disPlace = 0;
 
-    if ((disPlace != 0) && (GetDis() != OCTAVE_DIS_NONE)) offset += (disPlace * (GetDis() - 1));
+    if ((disPlace != 0) && (this->GetDis() != OCTAVE_DIS_NONE)) offset += (disPlace * (this->GetDis() - 1));
 
     return offset;
 }
@@ -97,31 +97,42 @@ int Clef::GetClefLocOffset() const
 wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
 {
     // If there is glyph.num, prioritize it
-    if (HasGlyphNum()) {
-        wchar_t code = GetGlyphNum();
+    if (this->HasGlyphNum()) {
+        wchar_t code = this->GetGlyphNum();
         if (NULL != Resources::GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
-    else if (HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+    else if (this->HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 
     switch (notationtype) {
+        case NOTATIONTYPE_tab:
+        case NOTATIONTYPE_tab_guitar: return SMUFL_E06D_6stringTabClef; break;
         case NOTATIONTYPE_neume:
             // neume clefs
-            return (GetShape() == CLEFSHAPE_F) ? SMUFL_E902_chantFclef : SMUFL_E906_chantCclef;
+            return (this->GetShape() == CLEFSHAPE_F) ? SMUFL_E902_chantFclef : SMUFL_E906_chantCclef;
             break;
         case NOTATIONTYPE_mensural:
         case NOTATIONTYPE_mensural_white:
             // mensural clefs
-            switch (GetShape()) {
+            switch (this->GetShape()) {
                 case CLEFSHAPE_G: return SMUFL_E901_mensuralGclefPetrucci; break;
                 case CLEFSHAPE_F: return SMUFL_E904_mensuralFclefPetrucci; break;
+                case CLEFSHAPE_C:
+                    switch (this->GetLine()) {
+                        case 1: return SMUFL_E907_mensuralCclefPetrucciPosLowest; break;
+                        case 2: return SMUFL_E908_mensuralCclefPetrucciPosLow; break;
+                        case 3: return SMUFL_E909_mensuralCclefPetrucciPosMiddle; break;
+                        case 4: return SMUFL_E90A_mensuralCclefPetrucciPosHigh; break;
+                        case 5: return SMUFL_E90B_mensuralCclefPetrucciPosHighest; break;
+                    }
+                    [[fallthrough]];
                 default: return SMUFL_E909_mensuralCclefPetrucciPosMiddle; break;
             }
         case NOTATIONTYPE_mensural_black:
-            switch (GetShape()) {
+            switch (this->GetShape()) {
                 case CLEFSHAPE_C: return SMUFL_E906_chantCclef; break;
                 case CLEFSHAPE_F: return SMUFL_E902_chantFclef; break;
                 default:
@@ -131,9 +142,9 @@ wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
             [[fallthrough]];
         default:
             // cmn clefs
-            switch (GetShape()) {
+            switch (this->GetShape()) {
                 case CLEFSHAPE_G:
-                    switch (GetDis()) {
+                    switch (this->GetDis()) {
                         case OCTAVE_DIS_8:
                             return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E053_gClef8va
                                                                                  : SMUFL_E052_gClef8vb;
@@ -146,7 +157,7 @@ wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
                     }
                 case CLEFSHAPE_GG: return SMUFL_E055_gClef8vbOld;
                 case CLEFSHAPE_F:
-                    switch (GetDis()) {
+                    switch (this->GetDis()) {
                         case OCTAVE_DIS_8:
                             return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E065_fClef8va
                                                                                  : SMUFL_E064_fClef8vb;
@@ -158,7 +169,7 @@ wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
                         default: return SMUFL_E062_fClef; break;
                     }
                 case CLEFSHAPE_C:
-                    switch (GetDis()) {
+                    switch (this->GetDis()) {
                         case OCTAVE_DIS_8: return SMUFL_E05D_cClef8vb; break;
                         default: return SMUFL_E05C_cClef; break;
                     }
@@ -184,10 +195,9 @@ int Clef::AdjustBeams(FunctorParams *functorParams)
     assert(params);
     if (!params->m_beam) return FUNCTOR_SIBLINGS;
 
-    Staff *staff = vrv_cast<Staff *>(GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
 
-    auto currentShapeIter = topToMiddleProportions.find(GetShape());
+    auto currentShapeIter = topToMiddleProportions.find(this->GetShape());
     if (currentShapeIter == topToMiddleProportions.end()) return FUNCTOR_CONTINUE;
 
     // const int directionBias = (vrv_cast<Beam *>(params->m_beam)->m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
@@ -197,7 +207,7 @@ int Clef::AdjustBeams(FunctorParams *functorParams)
     // Proportion of the glyph about Y point is defined in the topToMiddleProportions map and used when
     // left and right margins are calculated
     const int clefPosition = staff->GetDrawingY()
-        - params->m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - GetLine());
+        - params->m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - this->GetLine());
     const int clefGlyphHeight
         = params->m_doc->GetGlyphHeight(currentShapeIter->second.first, staff->m_drawingStaffSize, true);
     const int beamWidth = params->m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false);
@@ -235,8 +245,7 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
 
     assert(params->m_aligner);
 
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
+    Staff *staff = this->GetAncestorStaff();
 
     // Create ad comparison object for each type / @n
     std::vector<int> ns;

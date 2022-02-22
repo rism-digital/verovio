@@ -39,15 +39,15 @@ Accid::Accid()
     , AttExtSym()
 {
 
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
-    RegisterAttClass(ATT_ACCIDENTAL);
-    RegisterAttClass(ATT_ACCIDENTALGESTURAL);
-    RegisterAttClass(ATT_ACCIDLOG);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_ENCLOSINGCHARS);
-    RegisterAttClass(ATT_EXTSYM);
+    this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    this->RegisterAttClass(ATT_ACCIDENTAL);
+    this->RegisterAttClass(ATT_ACCIDENTALGESTURAL);
+    this->RegisterAttClass(ATT_ACCIDLOG);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
+    this->RegisterAttClass(ATT_EXTSYM);
 
-    Reset();
+    this->Reset();
 }
 
 Accid::~Accid() {}
@@ -56,12 +56,12 @@ void Accid::Reset()
 {
     LayerElement::Reset();
     PositionInterface::Reset();
-    ResetAccidental();
-    ResetAccidentalGestural();
-    ResetAccidLog();
-    ResetColor();
-    ResetEnclosingChars();
-    ResetExtSym();
+    this->ResetAccidental();
+    this->ResetAccidentalGestural();
+    this->ResetAccidLog();
+    this->ResetColor();
+    this->ResetEnclosingChars();
+    this->ResetExtSym();
 
     m_drawingUnison = NULL;
 }
@@ -73,13 +73,13 @@ std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
     wchar_t code = 0;
 
     // If there is glyph.num, prioritize it
-    if (HasGlyphNum()) {
-        code = GetGlyphNum();
+    if (this->HasGlyphNum()) {
+        code = this->GetGlyphNum();
         if (NULL == Resources::GetGlyph(code)) code = 0;
     }
     // If there is glyph.name (second priority)
-    else if (HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+    else if (this->HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
         if (NULL == Resources::GetGlyph(code)) code = 0;
     }
 
@@ -88,15 +88,15 @@ std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
             case NOTATIONTYPE_mensural:
             case NOTATIONTYPE_mensural_black:
             case NOTATIONTYPE_mensural_white:
-                switch (GetAccid()) {
+                switch (this->GetAccid()) {
                     case ACCIDENTAL_WRITTEN_s: code = SMUFL_E9E3_medRenSharpCroix; break;
                     case ACCIDENTAL_WRITTEN_f: code = SMUFL_E9E0_medRenFlatSoftB; break;
                     case ACCIDENTAL_WRITTEN_n: code = SMUFL_E9E2_medRenNatural; break;
                     // we do not want to ignore non-mensural accidentals
-                    default: code = GetAccidGlyph(GetAccid()); break;
+                    default: code = this->GetAccidGlyph(this->GetAccid()); break;
                 }
                 break;
-            default: code = GetAccidGlyph(GetAccid()); break;
+            default: code = this->GetAccidGlyph(this->GetAccid()); break;
         }
     }
 
@@ -121,11 +121,9 @@ std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
 
 void Accid::AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize)
 {
-    Layer *layer = NULL;
-    Staff *staff = element->GetCrossStaff(layer);
-    if (!staff) staff = vrv_cast<Staff *>(element->GetFirstAncestor(STAFF));
-
+    Staff *staff = element->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
+
     if (element->Is(NOTE) && chord && chord->HasAdjacentNotesInStaff(staff)) {
         const int horizontalMargin = 4 * doc->GetDrawingStemWidth(staffSize);
         const int drawingUnit = doc->GetDrawingUnit(staffSize);

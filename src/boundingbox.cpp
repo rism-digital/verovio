@@ -39,7 +39,7 @@ BoundingBox::BoundingBox()
     rect2[0] = Point(25, 25);
     rect2[1] = Point(100, 100);
 
-    ResetBoundingBox();
+    this->ResetBoundingBox();
 }
 
 bool BoundingBox::Is(const std::vector<ClassId> &classIds) const
@@ -54,7 +54,7 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
     int minX = std::min(x1, x2);
     int maxX = std::max(x1, x2);
 
-    int drawingX = GetDrawingX();
+    int drawingX = this->GetDrawingX();
 
     minX -= drawingX;
     maxX -= drawingX;
@@ -63,7 +63,7 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
     if (m_contentBB_x2 < maxX) m_contentBB_x2 = maxX;
 
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // GetClassName().c_str());
+    // this->GetClassName().c_str());
 }
 
 void BoundingBox::UpdateContentBBoxY(int y1, int y2)
@@ -73,7 +73,7 @@ void BoundingBox::UpdateContentBBoxY(int y1, int y2)
     int min_y = std::min(y1, y2);
     int max_y = std::max(y1, y2);
 
-    int drawingY = GetDrawingY();
+    int drawingY = this->GetDrawingY();
 
     min_y -= drawingY;
     max_y -= drawingY;
@@ -82,7 +82,7 @@ void BoundingBox::UpdateContentBBoxY(int y1, int y2)
     if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
 
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // GetClassName().c_str());
+    // this->GetClassName().c_str());
 }
 
 void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
@@ -92,7 +92,7 @@ void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
     int minX = std::min(x1, x2);
     int maxX = std::max(x1, x2);
 
-    int drawingX = GetDrawingX();
+    int drawingX = this->GetDrawingX();
 
     minX -= drawingX;
     maxX -= drawingX;
@@ -110,7 +110,7 @@ void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
     int min_y = std::min(y1, y2);
     int max_y = std::max(y1, y2);
 
-    int drawingY = GetDrawingY();
+    int drawingY = this->GetDrawingY();
 
     min_y -= drawingY;
     max_y -= drawingY;
@@ -159,7 +159,7 @@ bool BoundingBox::HasEmptyBB() const
 
 bool BoundingBox::HasContentBB() const
 {
-    return (HasContentHorizontalBB() && HasContentVerticalBB());
+    return (this->HasContentHorizontalBB() && this->HasContentVerticalBB());
 }
 
 bool BoundingBox::HasContentHorizontalBB() const
@@ -174,7 +174,7 @@ bool BoundingBox::HasContentVerticalBB() const
 
 bool BoundingBox::HasSelfBB() const
 {
-    return (HasSelfHorizontalBB() && HasSelfVerticalBB());
+    return (this->HasSelfHorizontalBB() && this->HasSelfVerticalBB());
 }
 
 bool BoundingBox::HasSelfHorizontalBB() const
@@ -654,7 +654,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     return 0;
 }
 
-int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, int additionalOffset) const
+int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
 {
     assert(beamInterface);
     assert(!beamInterface->m_beamElementCoords.empty());
@@ -664,18 +664,21 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, 
     const Point beamRight(
         beamInterface->m_beamElementCoords.back()->m_x, beamInterface->m_beamElementCoords.back()->m_yBeam);
 
+    const int leftX = this->GetLeftBy(type) - margin;
+    const int rightX = this->GetRightBy(type) + margin;
+
     Point leftIntersection(0, 0);
     Point rightIntersection(0, 0);
     const double beamSlope = BoundingBox::CalcSlope(beamLeft, beamRight);
-    if (this->GetLeftBy(type) <= beamLeft.x) {
+    if (leftX <= beamLeft.x) {
         // BB does not overlap horizontally with beam (left side of the beam)
-        if (this->GetRightBy(type) < beamLeft.x) {
+        if (rightX < beamLeft.x) {
             return 0;
         }
         // BB overlaps with left side of the beam
-        else if (this->GetRightBy(type) < beamRight.x) {
+        else if (rightX < beamRight.x) {
             leftIntersection = beamLeft;
-            rightIntersection.x = this->GetRightBy(type);
+            rightIntersection.x = rightX;
             rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
         }
         // BB covers the whole beam
@@ -685,10 +688,10 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, 
         }
     }
     else {
-        if (this->GetRightBy(type) > beamRight.x) {
+        if (rightX > beamRight.x) {
             // BB overlaps with right side of the beam
-            if (this->GetLeftBy(type) <= beamRight.x) {
-                leftIntersection.x = this->GetLeftBy(type);
+            if (leftX <= beamRight.x) {
+                leftIntersection.x = leftX;
                 leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
                 rightIntersection = beamRight;
             }
@@ -699,9 +702,9 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, 
         }
         // BB is inside of the beam
         else {
-            leftIntersection.x = this->GetLeftBy(type);
+            leftIntersection.x = leftX;
             leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
-            rightIntersection.x = this->GetRightBy(type);
+            rightIntersection.x = rightX;
             rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
         }
     }
@@ -709,13 +712,13 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, 
     // calculate vertical overlap of the BB with beam section
     if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
         const int topY = std::max(leftIntersection.y, rightIntersection.y);
-        const int shift = topY - this->GetBottomBy(type);
-        if (shift > 0) return shift + additionalOffset;
+        const int shift = topY - this->GetBottomBy(type) + margin;
+        return std::max(shift, 0);
     }
     else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
         const int bottomY = std::min(leftIntersection.y, rightIntersection.y);
-        const int shift = bottomY - this->GetTopBy(type);
-        if (shift < 0) return shift - additionalOffset;
+        const int shift = bottomY - this->GetTopBy(type) - margin;
+        return std::min(shift, 0);
     }
 
     return 0;
@@ -1075,7 +1078,7 @@ SegmentedLine::SegmentedLine(int start, int end)
 void SegmentedLine::GetStartEnd(int &start, int &end, int idx)
 {
     assert(idx >= 0);
-    assert(idx < GetSegmentCount());
+    assert(idx < this->GetSegmentCount());
 
     start = m_segments.at(idx).first;
     end = m_segments.at(idx).second;

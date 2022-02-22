@@ -25,9 +25,9 @@ static const ClassRegistrar<Reg> s_factory("reg", REG);
 
 Reg::Reg() : EditorialElement(REG, "reg-"), AttSource()
 {
-    RegisterAttClass(ATT_SOURCE);
+    this->RegisterAttClass(ATT_SOURCE);
 
-    Reset();
+    this->Reset();
 }
 
 Reg::~Reg() {}
@@ -35,7 +35,7 @@ Reg::~Reg() {}
 void Reg::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

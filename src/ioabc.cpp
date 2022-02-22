@@ -13,6 +13,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 
 //----------------------------------------------------------------------------
 
@@ -46,12 +47,14 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "syl.h"
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
 #include "trill.h"
 #include "tuplet.h"
 #include "turn.h"
+#include "verse.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -90,7 +93,7 @@ ABCInput::~ABCInput() {}
 bool ABCInput::Import(const std::string &abc)
 {
     std::istringstream in_stream(abc);
-    parseABC(in_stream);
+    ParseABC(in_stream);
     return true;
 }
 
@@ -99,141 +102,68 @@ bool ABCInput::Import(const std::string &abc)
 // parseABC --
 //
 
-void ABCInput::parseABC(std::istream &infile)
+void ABCInput::ParseABC(std::istream &infile)
 {
     // initialize doc
     m_doc->Reset();
     m_doc->SetType(Raw);
 
-    // read file header
-    std::getline(infile, abcLine);
-    while (abcLine[0] != 'X') {
-        if (infile.eof()) {
-            LogError("ABC import: No tune found");
-            exit(0);
-        }
-        if ((abcLine[0] == '%') && (abcLine[1] == '%'))
-            LogWarning("ABC import: Stylesheet directives are ignored");
-        else if (abcLine[1] == ':')
-            readInformationField(abcLine[0], &abcLine[2]);
+    Score *score = NULL;
+    Section *section = NULL;
+    CreateHeader();
+    while (!infile.eof()) {
         std::getline(infile, abcLine);
         ++m_lineNum;
-    }
-    CreateHeader();
-
-    while (!infile.eof()) {
-        while (!(abcLine[0] == 'X' && abcLine[1] == ':') && !infile.eof()) {
-            std::getline(infile, abcLine);
-            ++m_lineNum;
-        }
-        if (infile.eof()) break;
-
-        // read tune header
-        readInformationField('X', &abcLine[2]);
-        while (abcLine[0] != 'K' && !infile.eof()) {
-            std::getline(infile, abcLine);
-            ++m_lineNum;
-            readInformationField(abcLine[0], &abcLine[2]);
-        }
-        if (infile.eof()) break;
-        if (m_title.empty()) {
-            LogWarning("ABC import: Title field missing, creating empty title");
-            m_title.push_back(std::make_pair("", 0));
-        }
-        // add work entry to meiHead
-        CreateWorkEntry();
-
-        // create score
-        assert(m_mdiv != NULL);
-        Score *score = new Score();
-        if (!m_doc->GetCurrentScoreDef()->GetFirst(STAFFGRP)) {
-            m_mdiv->AddChild(score);
-
-            // create page head
-            PrintInformationFields();
-            StaffGrp *staffGrp = new StaffGrp();
-            // create staff
-            StaffDef *staffDef = new StaffDef();
-            staffDef->SetN(1);
-            staffDef->SetLines(m_stafflines);
-            staffDef->SetTransSemi(m_transpose);
-            if (m_clef) {
-                staffDef->AddChild(m_clef);
-                m_clef = NULL;
-            }
-            staffGrp->AddChild(staffDef);
-            m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
-            if (m_key) {
-                m_doc->GetCurrentScoreDef()->AddChild(m_key);
-                m_key = NULL;
-            }
-            if (m_meter) {
-                m_doc->GetCurrentScoreDef()->AddChild(m_meter);
-                m_meter = NULL;
-            }
-        }
-
-        // create section
-        Section *section = new Section();
-        // start with a new page
-        if (m_linebreak != '\0') {
-            Pb *pb = new Pb();
-            pb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
-            section->AddChild(pb);
-        }
-        // calculate default unit note length
-        if (m_durDefault == DURATION_NONE) {
-            CalcUnitNoteLength();
-        }
-
-        // read music code
-        m_layer = new Layer();
-        m_layer->SetN(1);
-        while (!infile.eof()) {
-            std::getline(infile, abcLine);
-            ++m_lineNum;
-            if (std::string(abcLine).find_first_not_of(' ') == std::string::npos) {
-                // abc tunes are separated from each other by empty lines
-                break;
-            }
-            else if (abcLine[0] == '%')
-                // skipping comments and stylesheet directives
-                continue;
-            else if (abcLine[1] == ':' && abcLine[0] != '|') {
-                if (abcLine[0] != 'K') {
-                    readInformationField(abcLine[0], &abcLine[2]);
+        if (!abcLine.empty() && (abcLine.at(0) == 'X')) {
+            while (!infile.eof()) {
+                if (abcLine.length() >= 3) {
+                    this->readInformationField(abcLine.at(0), abcLine.substr(2));
+                    if (abcLine.at(0) == 'K') break;
                 }
-                else {
-                    LogWarning("ABC import: Key changes not supported", abcLine[0]);
-                }
+                std::getline(infile, abcLine);
+                ++m_lineNum;
+            }
+            if (infile.eof()) break;
+            if (m_title.empty()) {
+                LogWarning("ABC import: Title field missing, creating empty title");
+                m_title.push_back(std::make_pair("", 0));
+            }
+            // add work entry to meiHead
+            this->CreateWorkEntry();
+
+            this->InitScoreAndSection(score, section);
+
+            continue;
+        }
+        else if (!m_mdiv || !score || !section) {
+            // if m_div is not initialized - we didn't read X element, so continue until we do
+            continue;
+        }
+        if (abcLine.empty() || (abcLine.find_first_not_of(' ') == std::string::npos)) {
+            // abc tunes are separated from each other by empty lines
+            this->FlushControlElements(score, section);
+            continue;
+        }
+        else if (abcLine.at(0) == '%')
+            // skipping comments and stylesheet directives
+            continue;
+        else if ((abcLine.length() >= 3) && (abcLine.at(1) == ':') && (abcLine.at(0) != '|')) {
+            if (abcLine.at(0) != 'K') {
+                this->readInformationField(abcLine.at(0), abcLine.substr(2));
             }
             else {
-                readMusicCode(abcLine, section);
+                LogWarning("ABC import: Key changes not supported");
             }
         }
-
-        // add ornaments, ties, and slur
-        Layer *layer = NULL;
-        Measure *measure = NULL;
-        for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
-            if (!measure || (layer && layer->GetUuid() != iter->first)) {
-                layer = dynamic_cast<Layer *>(section->FindDescendantByUuid(iter->first));
-            }
-            if (!layer) {
-                LogWarning("ABC import: Element '%s' could not be assigned to layer '%s'",
-                    iter->second->GetClassName().c_str(), iter->first.c_str());
-                delete iter->second;
-                continue;
-            }
-            measure = vrv_cast<Measure *>(layer->GetFirstAncestor(MEASURE));
-            assert(measure);
-            measure->AddChild(iter->second);
+        else {
+            m_verseNumber = 1;
+            m_lineNoteArray.clear();
+            this->readMusicCode(abcLine, section);
         }
+    }
 
+    if (section && score && !section->GetParent()) {
         score->AddChild(section);
-
-        // only append first tune in file
-        if (!score->GetFirstAncestor(MDIV)) delete score;
     }
 
     m_controlElements.clear();
@@ -295,53 +225,113 @@ void ABCInput::CalcUnitNoteLength()
     if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetTotalCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
-        // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
     }
     else {
         m_unitDur = 16;
         m_durDefault = DURATION_16;
-        // m_doc->m_scoreDef.SetDurDefault(DURATION_16);
     }
 }
 
-void ABCInput::AddBeam()
+void ABCInput::AddLayerElement()
 {
-    if (!m_noteStack.size()) {
-        return;
-    }
-    else if (m_noteStack.size() == 1) {
-        m_layer->AddChild(m_noteStack.back());
-    }
-    else {
-        Beam *beam = new Beam();
-        for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
-            beam->AddChild(*iter);
-        }
-        if (beam->FindDescendantByType(NOTE)) {
-            m_layer->AddChild(beam);
-        }
-        else {
-            for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
-                m_layer->AddChild(*iter);
+    // exit if there is nothing to add
+    if (!m_noteStack.size()) return;
+    // if just one note in the stack - add it do the layer directly
+    if (m_noteStack.size() == 1) {
+        if (m_containerElement.m_element && (ElementType::Tuplet == m_containerElement.m_type)) {
+            m_containerElement.m_element->AddChild(m_noteStack.back());
+            if (!--m_containerElement.m_count) {
+                m_layer->AddChild(m_containerElement.m_element);
+                m_containerElement = {};
             }
         }
+        else {
+            m_layer->AddChild(m_noteStack.back());
+        }
+        m_noteStack.clear();
+        return;
     }
+    // otherwise we can have beam or tuplet (for now)
+    Beam *beam = new Beam();
+    // add stacked notes to the current element
+    for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
+        beam->AddChild(*iter);
+    }
+    if (beam->FindDescendantByType(NOTE)) {
+        LayerElement *element = NULL;
+        if (m_containerElement.m_element && (ElementType::Tuplet == m_containerElement.m_type)) {
+            element = m_containerElement.m_element;
+            element->AddChild(beam);
+            m_containerElement.m_element = NULL;
+        }
+        // otherwise default to it being beam
+        else {
+            element = beam;
+        }
+        m_layer->AddChild(element);
+        beam = NULL;
+    }
+    else {
+        for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
+            m_layer->AddChild(*iter);
+        }
+    }
+    // clean-up leftover data, if any
+    if (beam) delete beam;
+    if (m_containerElement.m_element) delete m_containerElement.m_element;
+
+    m_containerElement = {};
     m_noteStack.clear();
 }
 
-void ABCInput::AddTuplet()
+int ABCInput::ParseTuplet(const std::string &musicCode, int index)
 {
-    if (!m_noteStack.size()) {
-        return;
+    constexpr std::string_view tupletElements = "(:0123456789 ";
+    const size_t tupletEnd = musicCode.find_first_not_of(tupletElements, ++index);
+    const std::string tupletStr = musicCode.substr(index, tupletEnd - index);
+
+    Tuplet *tuplet = new Tuplet();
+    size_t separator = tupletStr.find_first_of(":");
+    // Get tuplet number first 9:_:_
+    int tupletNum = 0;
+    if (separator != std::string::npos) {
+        const std::string tupletNumStr = tupletStr.substr(0, separator);
+        tupletNum = atoi(tupletNumStr.data());
+        ++separator;
     }
     else {
-        Tuplet *tuplet = new Tuplet();
-        for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
-            tuplet->AddChild(*iter);
-        }
-        m_layer->AddChild(tuplet);
+        tupletNum = atoi(tupletStr.c_str());
     }
-    m_noteStack.clear();
+    // Get tuplet number base _:3:_
+    int tupletNumbase = 0;
+    if (separator != std::string::npos) {
+        size_t secondSeparator = tupletStr.find_first_of(":", separator);
+        if (secondSeparator != std::string::npos) {
+            if (secondSeparator != separator) {
+                std::string tupletNumbaseStr = tupletStr.substr(separator, secondSeparator - separator);
+                tupletNumbase = atoi(tupletNumbaseStr.data());
+                separator = secondSeparator + 1;
+            }
+        }
+        else {
+            std::string tupletNumbaseStr = tupletStr.substr(separator);
+            tupletNumbase = atoi(tupletNumbaseStr.data());
+            separator = secondSeparator + 1;
+        }
+    }
+    // List of tuplets with default base of 3
+    const std::unordered_set<int> threeBase = { 2, 4, 8, 9 };
+    if (!tupletNumbase) {
+        tupletNumbase = threeBase.count(tupletNum) ? 3 : 2;
+    }
+    // Get number of elements supposed to be in the tuplet _:_:9
+    // Ignore this for the time being
+    tuplet->SetNum(tupletNum);
+    tuplet->SetNumbase(tupletNumbase);
+    m_containerElement = { ElementType::Tuplet, tuplet, tupletNum };
+
+    // return index of the last element in tuplet, so that we point to the actual notes when incrementing 'i'
+    return static_cast<int>(tupletEnd) - 1;
 }
 
 void ABCInput::AddAnnot(const std::string &remark)
@@ -578,7 +568,6 @@ void ABCInput::parseKey(std::string &keyString)
     m_key = new KeySig();
     m_key->IsAttribute(true);
     m_clef = new Clef();
-    m_clef->IsAttribute(true);
     while (isspace(keyString[i])) ++i;
 
     // set key.pname
@@ -744,7 +733,6 @@ void ABCInput::parseUnitNoteLength(const std::string &unitNoteLength)
         case 256: m_durDefault = DURATION_256; break;
         default: break;
     }
-    // m_doc->m_scoreDef.SetDurDefault(m_durDefault);
 }
 
 void ABCInput::parseMeter(const std::string &meterString)
@@ -769,7 +757,6 @@ void ABCInput::parseMeter(const std::string &meterString)
         // this is a little "hack", until libMEI is fixed
         m_meter->SetCount({ atoi(meterCount.c_str()) });
         m_meter->SetUnit(atoi(&meterString[meterString.find('/') + 1]));
-        m_meter->IsAttribute(true);
     }
 }
 
@@ -820,7 +807,7 @@ void ABCInput::parseReferenceNumber(const std::string &referenceNumberString)
     m_title.clear();
 }
 
-void ABCInput::PrintInformationFields()
+void ABCInput::PrintInformationFields(Score *score)
 {
     PgHead *pgHead = new PgHead();
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
@@ -860,7 +847,7 @@ void ABCInput::PrintInformationFields()
         originRend->AddChild(origin);
         pgHead->AddChild(originRend);
     }
-    m_doc->GetCurrentScoreDef()->AddChild(pgHead);
+    score->GetScoreDef()->AddChild(pgHead);
 }
 
 void ABCInput::CreateHeader()
@@ -962,6 +949,175 @@ void ABCInput::CreateWorkEntry()
     }
 }
 
+void ABCInput::FlushControlElements(Score *score, Section *section)
+{
+    Layer *layer = NULL;
+    Measure *measure = NULL;
+    for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
+        if (!measure || (layer && layer->GetUuid() != iter->first)) {
+            layer = dynamic_cast<Layer *>(section->FindDescendantByUuid(iter->first));
+        }
+        if (!layer) {
+            LogWarning("ABC import: Element '%s' could not be assigned to layer '%s'",
+                iter->second->GetClassName().c_str(), iter->first.c_str());
+            delete iter->second;
+            iter->second = NULL;
+            continue;
+        }
+        measure = vrv_cast<Measure *>(layer->GetFirstAncestor(MEASURE));
+        assert(measure);
+        measure->AddChild(iter->second);
+    }
+    if (!section->GetParent()) {
+        score->AddChild(section);
+    }
+
+    m_controlElements.clear();
+}
+
+void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
+{
+    // create score
+    assert(m_mdiv != NULL);
+    score = new Score();
+    m_mdiv->AddChild(score);
+
+    StaffGrp *staffGrp = new StaffGrp();
+    // create staff
+    StaffDef *staffDef = new StaffDef();
+    staffDef->SetN(1);
+    staffDef->SetLines(m_stafflines);
+    staffDef->SetTransSemi(m_transpose);
+    if (m_clef) {
+        staffDef->AddChild(m_clef);
+        m_clef = NULL;
+    }
+    if (m_meter) {
+        staffDef->AddChild(m_meter);
+        m_meter = NULL;
+    }
+    staffGrp->AddChild(staffDef);
+    // create page head
+    this->PrintInformationFields(score);
+    score->GetScoreDef()->AddChild(staffGrp);
+    if (m_key) {
+        score->GetScoreDef()->AddChild(m_key);
+        m_key = NULL;
+    }
+
+    // create section
+    section = new Section();
+    // start with a new page
+    if (m_linebreak != '\0') {
+        Pb *pb = new Pb();
+        pb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
+        section->AddChild(pb);
+    }
+    // calculate default unit note length
+    if (m_durDefault == DURATION_NONE) {
+        CalcUnitNoteLength();
+    }
+    score->GetScoreDef()->SetDurDefault(m_durDefault);
+    m_durDefault = DURATION_NONE;
+
+    // read music code
+    m_layer = new Layer();
+    m_layer->SetN(1);
+}
+
+void ABCInput::parseLyrics()
+{
+    std::vector<std::pair<Syl *, int>> syllables;
+    constexpr std::string_view delimiters = "~\\-_ ";
+    // skipping w:, so start from third element
+    std::size_t start = 2;
+    std::size_t found = abcLine.find_first_of(delimiters, 2);
+    while (found != std::string::npos) {
+        // Counter indicates for how many notes verse should be held. This defaults to 1, unless '_' is found
+        int counter = 1;
+        std::string syllable = "";
+        sylLog_CON sylType = sylLog_CON_NONE;
+        if (abcLine.at(found) == '_') {
+            while ((found < abcLine.size()) && (abcLine.at(found) == '_')) {
+                ++counter;
+                ++found;
+            }
+            --found;
+            sylType = sylLog_CON_u;
+        }
+        else if (abcLine.at(found) == '~') {
+            counter = 0;
+            sylType = sylLog_CON_s;
+        }
+        else if (abcLine.at(found) == '-') {
+            sylType = sylLog_CON_d;
+        }
+        else if (abcLine.at(found) == '\\') {
+            if ((found + 1 < abcLine.size()) && (abcLine.at(found + 1) == '-')) {
+                counter = 0;
+                ++found;
+                sylType = sylLog_CON_d;
+            }
+        }
+        // separate syllable from delimiters to form syl that we want to add
+        syllable = abcLine.substr(start, found - start);
+        syllable.erase(
+            std::remove_if(syllable.begin(), syllable.end(), [](unsigned char x) { return (x == '_') || (x == '\\'); }),
+            syllable.end());
+        if (!syllable.empty()) {
+            Text *sylText = new Text();
+            sylText->SetText(UTF8to16(syllable));
+            Syl *syl = new Syl();
+            syl->AddChild(sylText);
+            syl->SetCon(sylType);
+            if (sylType == sylLog_CON_d) {
+                syl->SetWordpos(sylLog_WORDPOS_m);
+            }
+            syllables.push_back({ syl, counter });
+        }
+
+        // find next delimeter in the string
+        start = found + 1;
+        found = abcLine.find_first_of(delimiters, start);
+        // if none found, the rest of the string is going to serve as last syl
+        if ((found == std::string::npos) && (start < abcLine.size())) {
+            std::string syllable = abcLine.substr(start);
+            if (!syllable.empty() && syllable[syllable.size() - 1] == '\r') syllable.erase(syllable.size() - 1);
+            Text *sylText = new Text();
+            sylText->SetText(UTF8to16(syllable));
+            Syl *syl = new Syl();
+            syl->AddChild(sylText);
+            syl->SetCon(sylType);
+            syllables.push_back({ syl, counter });
+        }
+    }
+
+    // Iterate over notes and syllables simultaneously. Move through note array using counters for each syllable, moving
+    // for several notes if syllable needs to be held
+    for (size_t i = 0, j = 0; (i < m_lineNoteArray.size()) && (j < syllables.size()); ++j) {
+        while (m_lineNoteArray.at(i)->IsGraceNote() && (i < m_lineNoteArray.size())) {
+            ++i;
+        }
+        if (i >= m_lineNoteArray.size()) break;
+        Verse *verse = NULL;
+        verse = vrv_cast<Verse *>(m_lineNoteArray.at(i)->GetChild(0, VERSE));
+        if (!verse) {
+            verse = new Verse();
+            verse->SetN(m_verseNumber);
+            m_lineNoteArray.at(i)->AddChild(verse);
+        }
+        verse->AddChild(syllables.at(j).first);
+        i += syllables.at(j).second;
+    }
+    // clean up syllables that were not added to any of the layer elements
+    for (const auto &syl : syllables) {
+        if (!syl.first->GetParent()) delete syl.first;
+    }
+
+    // increment verse number, in case next line in file is also w:
+    ++m_verseNumber;
+}
+
 //////////////////////////////
 //
 // readInformationField --
@@ -991,7 +1147,7 @@ void ABCInput::readInformationField(const char &dataKey, std::string value)
         case 'B': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
         case 'C': m_composer.push_back(std::make_pair(value, m_lineNum)); break;
         case 'D': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
-        case 'F': m_filename = value; break;
+        case 'F': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
         case 'H': m_history.push_back(std::make_pair(value, m_lineNum)); break;
         case 'I': parseInstruction(value); break;
         case 'K': parseKey(value); break;
@@ -1004,6 +1160,7 @@ void ABCInput::readInformationField(const char &dataKey, std::string value)
         case 'T': m_title.push_back(std::make_pair(value, m_lineNum)); break;
         case 'U': LogWarning("ABC import: User defined sympols are not supported"); break;
         case 'V': LogWarning("ABC import: Multi-voice music is not supported"); break;
+        case 'w': parseLyrics(); break;
         case 'W': LogWarning("ABC import: Lyrics are not supported yet"); break;
         case 'X': parseReferenceNumber(value); break;
         case 'Z': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
@@ -1035,7 +1192,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
         }
         if (isspace(musicCode.at(i))) {
             // always ends a beam
-            AddBeam();
+            AddLayerElement();
         }
 
         // comments
@@ -1070,7 +1227,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
 
         // linebreaks
         else if (musicCode.at(i) == m_linebreak) {
-            AddBeam();
+            AddLayerElement();
             Sb *sb = new Sb();
             section->AddChild(sb);
         }
@@ -1095,8 +1252,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
 
         // tuplets
         else if ((i + 2 < (int)musicCode.length()) && musicCode.at(i) == '(' && isdigit(musicCode.at(i + 1))) {
-            LogWarning("ABC import: Tuplets not supported yet");
-            // AddTuplet();
+            i = ParseTuplet(musicCode, i);
         }
 
         // slurs and ties
@@ -1139,11 +1295,14 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             // end chord
             if (chord->GetDur() < DURATION_8) {
                 // if chord cannot be beamed, write it directly to the layer
-                if (m_noteStack.size() > 0) AddBeam();
+                if (m_noteStack.size() > 0) AddLayerElement();
                 m_layer->AddChild(chord);
+                m_lineNoteArray.push_back(chord);
             }
-            else
+            else {
                 m_noteStack.push_back(chord);
+                m_lineNoteArray.push_back(chord);
+            }
             chord = NULL;
         }
 
@@ -1160,7 +1319,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             }
             // end grace group
             else {
-                if ((m_gracecount > 1) || (grace == GRACE_unacc)) AddBeam();
+                if ((m_gracecount > 1) || (grace == GRACE_unacc)) AddLayerElement();
                 grace = GRACE_NONE;
                 m_gracecount = 0;
             }
@@ -1318,11 +1477,14 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 note->SetDur(meiDur);
                 if (note->GetDur() < DURATION_8) {
                     // if note cannot be beamed, write it directly to the layer
-                    if (m_noteStack.size() > 0) AddBeam();
+                    if (m_noteStack.size() > 0) AddLayerElement();
                     m_layer->AddChild(note);
+                    m_lineNoteArray.push_back(note);
                 }
-                else
+                else {
                     m_noteStack.push_back(note);
+                    m_lineNoteArray.push_back(note);
+                }
             }
 
             if (!m_tieStack.empty()) {
@@ -1398,7 +1560,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             space->SetDur(meiDur);
 
             // spaces cannot be beamed
-            AddBeam();
+            AddLayerElement();
             m_layer->AddChild(space);
         }
 
@@ -1475,7 +1637,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             rest->SetDur(meiDur);
 
             // rests cannot be beamed
-            AddBeam();
+            AddLayerElement();
             m_layer->AddChild(rest);
         }
 
@@ -1520,7 +1682,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
         // barLine
         else if (musicCode.at(i) == '|') {
             // add stacked elements to layer
-            AddBeam();
+            AddLayerElement();
             i = SetBarLine(musicCode, i);
 
             if (m_barLines.second != BARRENDITION_NONE) {
@@ -1559,13 +1721,20 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             section->AddChild(scoreDef);
             m_meter = NULL;
         }
+
+        if (m_durDefault != DURATION_NONE) {
+            ScoreDef *scoreDef = new ScoreDef();
+            scoreDef->SetDurDefault(m_durDefault);
+            section->AddChild(scoreDef);
+            m_durDefault = DURATION_NONE;
+        }
     }
 
     // by default, line-breaks in the code generate line-breaks in the score
     // Verovio does not support line-breaks within a layer
     // has to be refined later
     if (sysBreak && (m_linebreak != '\0') && !(section->GetLast())->Is(SB)) {
-        AddBeam();
+        AddLayerElement();
         Sb *sb = new Sb();
         sb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
         section->AddChild(sb);

@@ -31,6 +31,7 @@ class Mdiv;
 class Measure;
 class MeterSig;
 class Note;
+class Score;
 class Section;
 class Slur;
 class Staff;
@@ -53,17 +54,17 @@ public:
 private:
     // function declarations:
 
-    void parseABC(std::istream &infile);
+    void ParseABC(std::istream &infile);
 
     // parsing functions
     int SetBarLine(const std::string &musicCode, int index);
     void CalcUnitNoteLength();
     void AddAnnot(const std::string &remark);
-    void AddBeam();
-    void AddTuplet();
+    void AddLayerElement();
     void AddTie();
     void StartSlur();
     void EndSlur();
+    int ParseTuplet(const std::string &musicCode, int index);
 
     // parse information fields
     void parseInstruction(const std::string &keyString); // I:
@@ -72,6 +73,7 @@ private:
     void parseMeter(const std::string &meterString); // M:
     void parseTempo(const std::string &tempoString); // Q:
     void parseReferenceNumber(const std::string &referenceNumberString); // X:
+    void parseLyrics(); // w:
 
     // input functions
     void readInformationField(const char &dataKey, std::string dataValue);
@@ -86,15 +88,24 @@ private:
     void AddOrnaments(LayerElement *element);
 
     // additional functions
-    void PrintInformationFields();
+    void PrintInformationFields(Score *score);
     void CreateHeader();
     void CreateWorkEntry();
+    void FlushControlElements(Score *score, Section *section);
+    void InitScoreAndSection(Score *&score, Section *&section);
 
 #endif // NO_ABC_SUPPORT
 
 public:
     //
 private:
+    enum class ElementType { Default, Tuplet };
+    struct ContainerElement {
+        ElementType m_type = ElementType::Default;
+        LayerElement *m_element = NULL;
+        int m_count = 0;
+    };
+
     std::string m_filename;
     Mdiv *m_mdiv = NULL;
     Clef *m_clef = NULL;
@@ -102,7 +113,7 @@ private:
     MeterSig *m_meter = NULL;
     Layer *m_layer = NULL;
 
-    data_DURATION m_durDefault; // todo: switch to MEI
+    data_DURATION m_durDefault;
     std::string m_ID;
     int m_unitDur;
     std::pair<data_BARRENDITION, data_BARRENDITION> m_barLines
@@ -117,6 +128,7 @@ private:
     int m_gracecount = 0;
     int m_stafflines = 5;
     int m_transpose = 0;
+    ContainerElement m_containerElement;
     /*
      * ABC metadata stacks
      */
@@ -134,6 +146,9 @@ private:
 
     std::vector<LayerElement *> m_layerElements;
     std::vector<LayerElement *> m_noteStack;
+    // Array of added notes in one line of ABC file. Used to track elements that might require adding verse to
+    std::vector<LayerElement *> m_lineNoteArray;
+    int m_verseNumber = 1;
     /*
      * ABC decoration stacks
      */

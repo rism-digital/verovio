@@ -183,17 +183,17 @@ void OptionBool::Init(bool defaultValue)
 bool OptionBool::SetValue(const std::string &value)
 {
     bool b = (value == "true") ? true : false;
-    return SetValue(b);
+    return this->SetValue(b);
 }
 
 bool OptionBool::SetValueDbl(double value)
 {
-    return SetValue((bool)value);
+    return this->SetValue((bool)value);
 }
 
 bool OptionBool::SetValueBool(bool value)
 {
-    return SetValue(value);
+    return this->SetValue(value);
 }
 
 std::string OptionBool::GetStrValue() const
@@ -240,7 +240,7 @@ void OptionDbl::Init(double defaultValue, double minValue, double maxValue)
 
 bool OptionDbl::SetValue(const std::string &value)
 {
-    return SetValue(atof(value.c_str()));
+    return this->SetValue(std::stod(value));
 }
 
 std::string OptionDbl::GetStrValue() const
@@ -255,14 +255,14 @@ std::string OptionDbl::GetDefaultStrValue() const
 
 bool OptionDbl::SetValueDbl(double value)
 {
-    return SetValue(value);
+    return this->SetValue(value);
 }
 
 bool OptionDbl::SetValue(double value)
 {
     if ((value < m_minValue) || (value > m_maxValue)) {
         LogError("Parameter value %f for '%s' out of bounds; default is %f, minimum %f, and maximum %f", value,
-            GetKey().c_str(), m_defaultValue, m_minValue, m_maxValue);
+            this->GetKey().c_str(), m_defaultValue, m_minValue, m_maxValue);
         return false;
     }
     m_value = value;
@@ -298,12 +298,12 @@ void OptionInt::Init(int defaultValue, int minValue, int maxValue, bool definiti
 
 bool OptionInt::SetValueDbl(double value)
 {
-    return SetValue((int)value);
+    return this->SetValue((int)value);
 }
 
 bool OptionInt::SetValue(const std::string &value)
 {
-    return SetValue(atoi(value.c_str()));
+    return this->SetValue(std::stoi(value));
 }
 
 std::string OptionInt::GetStrValue() const
@@ -330,7 +330,7 @@ bool OptionInt::SetValue(int value)
 {
     if ((value < m_minValue) || (value > m_maxValue)) {
         LogError("Parameter value %d for '%s' out of bounds; default is %d, minimum %d, and maximum %d", value,
-            GetKey().c_str(), m_defaultValue, m_minValue, m_maxValue);
+            this->GetKey().c_str(), m_defaultValue, m_minValue, m_maxValue);
         return false;
     }
     m_value = value;
@@ -490,7 +490,7 @@ bool OptionIntMap::SetValue(const std::string &value)
             m_isSet = true;
             return true;
         }
-    LogError("Parameter '%s' not valid for '%s'", value.c_str(), GetKey().c_str());
+    LogError("Parameter '%s' not valid for '%s'", value.c_str(), this->GetKey().c_str());
     return false;
 }
 
@@ -540,7 +540,7 @@ std::vector<std::string> OptionIntMap::GetStrValues(bool withoutDefault) const
 
 std::string OptionIntMap::GetStrValuesAsStr(bool withoutDefault) const
 {
-    std::vector<std::string> strValues = GetStrValues(withoutDefault);
+    std::vector<std::string> strValues = this->GetStrValues(withoutDefault);
     std::stringstream ss;
     int i;
     for (i = 0; i < (int)strValues.size(); ++i) {
@@ -620,7 +620,7 @@ void OptionJson::CopyTo(Option *option)
 void OptionJson::Init(JsonSource source, const std::string &defaultValue)
 {
     m_source = source;
-    ReadJson(m_defaultValues, defaultValue);
+    this->ReadJson(m_defaultValues, defaultValue);
     m_isSet = false;
 }
 
@@ -636,7 +636,7 @@ jsonxx::Object OptionJson::GetValue(bool getDefault) const
 
 bool OptionJson::SetValue(const std::string &value)
 {
-    bool ok = ReadJson(m_values, value);
+    bool ok = this->ReadJson(m_values, value);
     if (ok) {
         m_isSet = true;
     }
@@ -706,7 +706,7 @@ bool OptionJson::HasValue(const std::vector<std::string> &jsonNodePath) const
 
 int OptionJson::GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    return static_cast<int>(GetDoubleValue(jsonNodePath, getDefault));
+    return static_cast<int>(this->GetDoubleValue(jsonNodePath, getDefault));
 }
 
 double OptionJson::GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
@@ -1066,6 +1066,10 @@ Options::Options()
     m_svgBoundingBoxes.Init(false);
     this->Register(&m_svgBoundingBoxes, "svgBoundingBoxes", &m_general);
 
+    m_svgCss.SetInfo("SVG additional CSS", "CSS (as a string) to be added to the SVG output");
+    m_svgCss.Init("");
+    this->Register(&m_svgCss, "svgCss", &m_general);
+
     m_svgViewBox.SetInfo("Use viewbox on svg root", "Use viewBox on svg root element for easy scaling of document");
     m_svgViewBox.Init(false);
     this->Register(&m_svgViewBox, "svgViewBox", &m_general);
@@ -1259,7 +1263,7 @@ Options::Options()
 
     m_measureMinWidth.SetInfo("Measure min width", "The minimal measure width in MEI units");
     m_measureMinWidth.Init(15, 1, 30);
-    this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
+    this->Register(&m_measureMinWidth, "measureMinWidth", &m_generalLayout);
 
     m_mnumInterval.SetInfo("Measure Number Interval", "How frequently to place measure numbers");
     m_mnumInterval.Init(0, 0, 64, false);
@@ -1466,7 +1470,7 @@ Options::Options()
     this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
 
     m_bottomMarginPgHead.SetInfo("Bottom margin header", "The margin for header in MEI units");
-    m_bottomMarginPgHead.Init(8.0, 0.0, 24.0);
+    m_bottomMarginPgHead.Init(2.0, 0.0, 24.0);
     this->Register(&m_bottomMarginPgHead, "bottomMarginHeader", &m_elementMargins);
 
     /// custom left
@@ -1618,6 +1622,10 @@ Options::Options()
     m_topMarginHarm.SetInfo("Top margin harm", "The margin for harm in MEI units");
     m_topMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_topMarginHarm, "topMarginHarm", &m_elementMargins);
+
+    m_topMarginPgFooter.SetInfo("Top margin footer", "The margin for footer in MEI units");
+    m_topMarginPgFooter.Init(2.0, 0.0, 24.0);
+    this->Register(&m_topMarginPgFooter, "topMarginPgFooter", &m_elementMargins);
 
     /********* Deprecated options *********/
 

@@ -50,14 +50,29 @@ public:
      */
     void SetBoundingBox(double x, double y, double w, double h);
 
-    /** Get the units per EM */
+    /**
+     * @name Setter and getter for the units per EM
+     */
+    ///@{
     int GetUnitsPerEm() const { return m_unitsPerEm; }
+    void SetUnitsPerEm(int units) { m_unitsPerEm = units; }
+    ///@}
 
-    /** Get the path */
-    std::string GetPath() { return m_path; }
-
-    /** Get the code string */
+    /**
+     * @name Setter and getter for the code string
+     */
+    ///@{
     std::string GetCodeStr() { return m_codeStr; }
+    void SetCodeStr(const std::string &codeStr) { m_codeStr = codeStr; }
+    ///@}
+
+    /**
+     * @name Setter and getter for the path
+     */
+    ///@{
+    std::string GetPath() { return m_path; }
+    void SetPath(const std::string &path) { m_path = path; }
+    ///@}
 
     /**
      * @name Setter and getter for the horizAdvX
@@ -97,10 +112,10 @@ private:
     int m_horizAdvX;
     /** Units per EM for the glyph */
     int m_unitsPerEm;
-    /** Path to the file */
-    std::string m_path;
     /** The Unicode code in hexa as string */
     std::string m_codeStr;
+    /** Path to the glyph XML file */
+    std::string m_path;
     /** A map of the available anchors */
     std::map<SMuFLGlyphAnchor, Point> m_anchors;
 };

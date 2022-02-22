@@ -34,12 +34,12 @@ KeyAccid::KeyAccid()
     : LayerElement(KEYACCID, "keyaccid-"), PitchInterface(), AttAccidental(), AttColor(), AttEnclosingChars()
 {
 
-    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
-    RegisterAttClass(ATT_ACCIDENTAL);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_ENCLOSINGCHARS);
+    this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    this->RegisterAttClass(ATT_ACCIDENTAL);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
 
-    Reset();
+    this->Reset();
 }
 
 KeyAccid::~KeyAccid() {}
@@ -48,9 +48,9 @@ void KeyAccid::Reset()
 {
     LayerElement::Reset();
     PitchInterface::Reset();
-    ResetAccidental();
-    ResetColor();
-    ResetEnclosingChars();
+    this->ResetAccidental();
+    this->ResetColor();
+    this->ResetEnclosingChars();
 }
 
 bool KeySig::IsSupportedChild(Object *child)

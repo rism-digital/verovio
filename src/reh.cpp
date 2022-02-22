@@ -30,13 +30,13 @@ static const ClassRegistrar<Reh> s_factory("reh", REH);
 Reh::Reh()
     : ControlElement(REH, "reh-"), TextDirInterface(), TimePointInterface(), AttColor(), AttLang(), AttVerticalGroup()
 {
-    RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_LANG);
-    RegisterAttClass(ATT_VERTICALGROUP);
+    this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
+    this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_LANG);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
-    Reset();
+    this->Reset();
 }
 
 Reh::~Reh() {}
@@ -46,9 +46,9 @@ void Reh::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimePointInterface::Reset();
-    ResetColor();
-    ResetLang();
-    ResetVerticalGroup();
+    this->ResetColor();
+    this->ResetLang();
+    this->ResetVerticalGroup();
 }
 
 bool Reh::IsSupportedChild(Object *child)

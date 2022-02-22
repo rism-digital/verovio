@@ -150,7 +150,8 @@ private:
     void FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
     // Calculate the vertical shift of the slur end points
-    std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+    std::pair<int, int> CalcEndPointShift(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin, int unit);
 
     // Calculate the horizontal control point offset
     std::tuple<bool, int, int> CalcControlPointOffset(
@@ -176,6 +177,9 @@ private:
     ///@{
     // Shift end points for collisions nearby
     void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection) const;
+
+    // Rebalance shifts to avoid awkward tilting of short slurs
+    void RebalanceShifts(int &shiftLeft, int &shiftRight, double distance, int unit) const;
 
     // Rotate the slope by a given number of degrees, but choose smaller angles if already close to the vertical axis
     // Choose doublingBound as the positive slope value where doubling has the same effect as rotating:

@@ -37,12 +37,12 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
     m_drawingText = false;
     m_textAlignment = HORIZONTALALIGNMENT_left;
 
-    SetBrush(AxNONE, AxSOLID);
-    SetPen(AxNONE, 1, AxSOLID);
+    this->SetBrush(AxNONE, AxSOLID);
+    this->SetPen(AxNONE, 1, AxSOLID);
 
     m_update = update;
 
-    ResetGraphicRotation();
+    this->ResetGraphicRotation();
 }
 
 BBoxDeviceContext::~BBoxDeviceContext() {}
@@ -53,7 +53,7 @@ void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::st
     object->BoundingBox::ResetBoundingBox();
     m_objects.push_back(object);
 
-    ResetGraphicRotation();
+    this->ResetGraphicRotation();
 }
 
 void BBoxDeviceContext::ResumeGraphic(Object *object, std::string gId)
@@ -67,7 +67,7 @@ void BBoxDeviceContext::EndGraphic(Object *object, View *view)
     assert(m_objects.back() == object);
     m_objects.pop_back();
 
-    ResetGraphicRotation();
+    this->ResetGraphicRotation();
 }
 
 void BBoxDeviceContext::EndResumedGraphic(Object *object, View *view)
@@ -76,7 +76,7 @@ void BBoxDeviceContext::EndResumedGraphic(Object *object, View *view)
     assert(m_objects.back() == object);
     m_objects.pop_back();
 
-    ResetGraphicRotation();
+    this->ResetGraphicRotation();
 }
 
 void BBoxDeviceContext::RotateGraphic(Point const &orig, double angle)
@@ -143,7 +143,7 @@ void BBoxDeviceContext::DrawQuadBezierPath(Point bezier[3])
         pMax = pMax.max(Point(qx, qy));
     }
 
-    UpdateBB(pMin.x, pMin.y, pMax.x, pMax.y);
+    this->UpdateBB(pMin.x, pMin.y, pMax.x, pMax.y);
 }
 
 void BBoxDeviceContext::DrawCubicBezierPath(Point bezier[4])
@@ -154,7 +154,7 @@ void BBoxDeviceContext::DrawCubicBezierPath(Point bezier[4])
 
     BoundingBox::ApproximateBezierBoundingBox(bezier, pos, width, height, minYPos, maxYPos);
     // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
-    UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
+    this->UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
 
 void BBoxDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4])
@@ -165,20 +165,20 @@ void BBoxDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier
 
     BoundingBox::ApproximateBezierBoundingBox(bezier1, pos, width, height, minYPos, maxYPos);
     // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
-    UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
+    this->UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
     BoundingBox::ApproximateBezierBoundingBox(bezier2, pos, width, height, minYPos, maxYPos);
     // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
-    UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
+    this->UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
 
 void BBoxDeviceContext::DrawCircle(int x, int y, int radius)
 {
-    DrawEllipse(x - radius, y - radius, 2 * radius, 2 * radius);
+    this->DrawEllipse(x - radius, y - radius, 2 * radius, 2 * radius);
 }
 
 void BBoxDeviceContext::DrawEllipse(int x, int y, int width, int height)
 {
-    UpdateBB(x, y, x + width, y + height);
+    this->UpdateBB(x, y, x + width, y + height);
 }
 
 void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, double start, double end)
@@ -188,7 +188,7 @@ void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, dou
         penWidth += 1;
     }
     // needs to be fixed - for now uses the entire rectangle
-    UpdateBB(x - penWidth / 2, y - penWidth / 2, x + width + penWidth / 2, y + height + penWidth / 2);
+    this->UpdateBB(x - penWidth / 2, y - penWidth / 2, x + width + penWidth / 2, y + height + penWidth / 2);
 }
 
 void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
@@ -214,7 +214,7 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
         p1++;
     }
 
-    UpdateBB(x1 - p1, y1 - p1, x2 + p2, y2 + p2);
+    this->UpdateBB(x1 - p1, y1 - p1, x2 + p2, y2 + p2);
 }
 
 void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffset, int fillStyle)
@@ -233,12 +233,12 @@ void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOff
         if (points[i].y + yOffset < y1) y1 = points[i].y + yOffset;
         if (points[i].y + yOffset > y2) y2 = points[i].y + yOffset;
     }
-    UpdateBB(x1, y1, x2, y2);
+    this->UpdateBB(x1, y1, x2, y2);
 }
 
 void BBoxDeviceContext::DrawRectangle(int x, int y, int width, int height)
 {
-    DrawRoundedRectangle(x, y, width, height, 0);
+    this->DrawRoundedRectangle(x, y, width, height, 0);
 }
 
 void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, int radius)
@@ -258,12 +258,12 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
         penWidth += 1;
     }
 
-    UpdateBB(x - penWidth / 2, y - penWidth / 2, x + width + penWidth / 2, y + height + penWidth / 2);
+    this->UpdateBB(x - penWidth / 2, y - penWidth / 2, x + width + penWidth / 2, y + height + penWidth / 2);
 }
 
 void BBoxDeviceContext::DrawPlaceholder(int x, int y)
 {
-    UpdateBB(x, y, x, y);
+    this->UpdateBB(x, y, x, y);
 }
 
 void BBoxDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignment)
@@ -320,7 +320,7 @@ void BBoxDeviceContext::DrawText(
         m_textHeight = height;
         m_textAscent = 0;
         m_textDescent = 0;
-        UpdateBB(m_textX, m_textY, m_textX + m_textWidth, m_textY + m_textHeight);
+        this->UpdateBB(m_textX, m_textY, m_textX + m_textWidth, m_textY + m_textHeight);
     }
 
     else {
@@ -334,7 +334,7 @@ void BBoxDeviceContext::DrawText(
         }
 
         TextExtend extend;
-        GetTextExtent(wtext, &extend, true);
+        this->GetTextExtent(wtext, &extend, true);
         m_textWidth += extend.m_width;
         // keep that maximum values for ascent and descent
         m_textAscent = std::max(m_textAscent, extend.m_ascent);
@@ -346,7 +346,7 @@ void BBoxDeviceContext::DrawText(
         else if (m_textAlignment == HORIZONTALALIGNMENT_center) {
             m_textX -= (extend.m_width / 2);
         }
-        UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);
+        this->UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);
     }
 }
 
@@ -378,7 +378,7 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bo
         // because we are in the drawing context, y position is already flipped
         int y_off = y - g_y * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
 
-        UpdateBB(x_off, y_off, x_off + g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(),
+        this->UpdateBB(x_off, y_off, x_off + g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(),
             // idem, y position is flipped
             y_off - g_h * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(), smuflGlyph);
 
@@ -391,7 +391,7 @@ void BBoxDeviceContext::DrawSpline(int n, Point points[]) {}
 
 void BBoxDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg)
 {
-    DrawRoundedRectangle(x, y, width, height, 0);
+    this->DrawRoundedRectangle(x, y, width, height, 0);
 }
 
 void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph)

@@ -32,9 +32,9 @@ static const ClassRegistrar<MRpt2> s_factory("mRpt2", MRPT2);
 
 MRpt2::MRpt2() : LayerElement(MRPT2, "mrpt2-"), AttColor()
 {
-    RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_COLOR);
 
-    Reset();
+    this->Reset();
 }
 
 MRpt2::~MRpt2() {}
@@ -42,7 +42,7 @@ MRpt2::~MRpt2() {}
 void MRpt2::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
+    this->ResetColor();
 }
 
 } // namespace vrv

@@ -24,11 +24,11 @@ static const ClassRegistrar<Fing> s_factory("fing", FING);
 
 Fing::Fing() : ControlElement(FING, "fing-"), TimePointInterface(), TextDirInterface(), AttNNumberLike()
 {
-    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
 
-    Reset();
+    this->Reset();
 }
 
 Fing::~Fing() {}
@@ -38,7 +38,7 @@ void Fing::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     TextDirInterface::Reset();
-    ResetNNumberLike();
+    this->ResetNNumberLike();
 }
 
 bool Fing::IsSupportedChild(Object *child)

@@ -154,8 +154,8 @@ public:
      * Helper to adjust overlapping layers for chords
      * Returns the shift of the adjustment
      */
-    int AdjustOverlappingLayers(
-        Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison) override;
+    int AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted,
+        bool &isUnison, bool &stemSameas) override;
 
     /**
      * Helper to get list of notes that are adjacent to the specified location.
@@ -207,6 +207,11 @@ public:
     int PrepareLayerElementParts(FunctorParams *functorParams) override;
 
     /**
+     * See Object::PrepareLyrics
+     */
+    int PrepareLyrics(FunctorParams *functorParams) override;
+
+    /**
      * See Object::CalcOnsetOffsetEnd
      */
     int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
@@ -220,6 +225,11 @@ public:
      * See Object::AdjustCrossStaffContent
      */
     int AdjustCrossStaffContent(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::GenerateMIDI
+     */
+    int GenerateMIDI(FunctorParams *functorParams) override;
 
 protected:
     /**

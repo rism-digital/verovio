@@ -68,7 +68,7 @@ void View::DrawVerticalSegmentedLine(DeviceContext *dc, int x1, SegmentedLine &l
     int i, start, end;
     for (i = 0; i < line.GetSegmentCount(); i++) {
         line.GetStartEnd(start, end, i);
-        DrawVerticalLine(dc, start, end, x1, width, dashLength);
+        this->DrawVerticalLine(dc, start, end, x1, width, dashLength);
     }
 }
 
@@ -77,7 +77,7 @@ void View::DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine 
     int i, start, end;
     for (i = 0; i < line.GetSegmentCount(); i++) {
         line.GetStartEnd(start, end, i);
-        DrawHorizontalLine(dc, start, end, y1, width, dashLength);
+        this->DrawHorizontalLine(dc, start, end, y1, width, dashLength);
     }
 }
 
@@ -243,11 +243,11 @@ void View::DrawSquareBracket(DeviceContext *dc, bool leftBracket, int x, int y, 
 
     const int sign = leftBracket ? 1 : -1;
 
-    DrawFilledRectangle(dc, x, y - horizontalThickness / 2, x + sign * verticalThickness,
+    this->DrawFilledRectangle(dc, x, y - horizontalThickness / 2, x + sign * verticalThickness,
         y + height + horizontalThickness / 2); // vertical
-    DrawFilledRectangle(
+    this->DrawFilledRectangle(
         dc, x, y - horizontalThickness / 2, x + sign * width, y + horizontalThickness / 2); // horizontal bottom
-    DrawFilledRectangle(dc, x, y + height - horizontalThickness / 2, x + sign * width,
+    this->DrawFilledRectangle(dc, x, y + height - horizontalThickness / 2, x + sign * width,
         y + height + horizontalThickness / 2); // horizontal top
 }
 

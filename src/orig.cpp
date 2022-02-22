@@ -25,9 +25,9 @@ static const ClassRegistrar<Orig> s_factory("orig", ORIG);
 
 Orig::Orig() : EditorialElement(ORIG, "orig-"), AttSource()
 {
-    RegisterAttClass(ATT_SOURCE);
+    this->RegisterAttClass(ATT_SOURCE);
 
-    Reset();
+    this->Reset();
 }
 
 Orig::~Orig() {}
@@ -35,7 +35,7 @@ Orig::~Orig() {}
 void Orig::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

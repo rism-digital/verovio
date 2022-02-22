@@ -25,9 +25,9 @@ static const ClassRegistrar<Corr> s_factory("corr", CORR);
 
 Corr::Corr() : EditorialElement(CORR, "corr-"), AttSource()
 {
-    RegisterAttClass(ATT_SOURCE);
+    this->RegisterAttClass(ATT_SOURCE);
 
-    Reset();
+    this->Reset();
 }
 
 Corr::~Corr() {}
@@ -35,7 +35,7 @@ Corr::~Corr() {}
 void Corr::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

@@ -27,9 +27,9 @@ static const ClassRegistrar<Plica> s_factory("plica", PLICA);
 
 Plica::Plica() : LayerElement(PLICA, "plica-"), AttPlicaVis()
 {
-    RegisterAttClass(ATT_PLICAVIS);
+    this->RegisterAttClass(ATT_PLICAVIS);
 
-    Reset();
+    this->Reset();
 }
 
 Plica::~Plica() {}
@@ -37,7 +37,7 @@ Plica::~Plica() {}
 void Plica::Reset()
 {
     LayerElement::Reset();
-    ResetPlicaVis();
+    this->ResetPlicaVis();
 }
 
 //----------------------------------------------------------------------------

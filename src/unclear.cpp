@@ -25,9 +25,9 @@ static const ClassRegistrar<Unclear> s_factory("unclear", UNCLEAR);
 
 Unclear::Unclear() : EditorialElement(UNCLEAR, "unclear-"), AttSource()
 {
-    RegisterAttClass(ATT_SOURCE);
+    this->RegisterAttClass(ATT_SOURCE);
 
-    Reset();
+    this->Reset();
 }
 
 Unclear::~Unclear() {}
@@ -35,7 +35,7 @@ Unclear::~Unclear() {}
 void Unclear::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

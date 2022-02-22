@@ -234,7 +234,6 @@ public:
     int CastOffSystems(FunctorParams *functorParams) override;
 
     /**
-
      * See Object::CastOffEncoding
      */
     int CastOffEncoding(FunctorParams *functorParams) override;
@@ -249,6 +248,11 @@ public:
      */
     int JustifyX(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::PrepareDuration
+     */
+    int PrepareDuration(FunctorParams *functorParams) override;
+
 protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
@@ -260,7 +264,7 @@ private:
 public:
     bool m_setAsDrawing;
     bool m_insertScoreDef;
-    //
+
 private:
     /** Flags for indicating whether labels need to be drawn or not */
     bool m_drawLabels;

@@ -42,17 +42,17 @@ StaffDef::StaffDef()
     , AttTimeBase()
     , AttTransposition()
 {
-    RegisterAttClass(ATT_DISTANCES);
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_NINTEGER);
-    RegisterAttClass(ATT_NOTATIONTYPE);
-    RegisterAttClass(ATT_SCALABLE);
-    RegisterAttClass(ATT_STAFFDEFLOG);
-    RegisterAttClass(ATT_STAFFDEFVIS);
-    RegisterAttClass(ATT_TIMEBASE);
-    RegisterAttClass(ATT_TRANSPOSITION);
+    this->RegisterAttClass(ATT_DISTANCES);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_NINTEGER);
+    this->RegisterAttClass(ATT_NOTATIONTYPE);
+    this->RegisterAttClass(ATT_SCALABLE);
+    this->RegisterAttClass(ATT_STAFFDEFLOG);
+    this->RegisterAttClass(ATT_STAFFDEFVIS);
+    this->RegisterAttClass(ATT_TIMEBASE);
+    this->RegisterAttClass(ATT_TRANSPOSITION);
 
-    Reset();
+    this->Reset();
 }
 
 StaffDef::~StaffDef() {}
@@ -61,15 +61,15 @@ void StaffDef::Reset()
 {
     ScoreDefElement::Reset();
     StaffDefDrawingInterface::Reset();
-    ResetDistances();
-    ResetLabelled();
-    ResetNInteger();
-    ResetNotationType();
-    ResetScalable();
-    ResetStaffDefLog();
-    ResetStaffDefVis();
-    ResetTimeBase();
-    ResetTransposition();
+    this->ResetDistances();
+    this->ResetLabelled();
+    this->ResetNInteger();
+    this->ResetNotationType();
+    this->ResetScalable();
+    this->ResetStaffDefLog();
+    this->ResetStaffDefVis();
+    this->ResetTimeBase();
+    this->ResetTransposition();
 
     m_drawingVisibility = OPTIMIZATION_NONE;
 }
@@ -163,6 +163,18 @@ int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
     const bool redrawMeterSigGrp = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_METERSIGGRP;
     if (redrawMeterSigGrp || forceRedraw) {
         this->SetDrawMeterSigGrp(redrawMeterSigGrp);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int StaffDef::PrepareDuration(FunctorParams *functorParams)
+{
+    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
+    assert(params);
+
+    if (this->HasDurDefault() && this->HasN()) {
+        params->m_durDefaultForStaffN[this->GetN()] = this->GetDurDefault();
     }
 
     return FUNCTOR_CONTINUE;

@@ -24,23 +24,23 @@ namespace vrv {
 
 PageElement::PageElement() : Object(PAGE_ELEMENT, "pe"), AttTyped()
 {
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 PageElement::PageElement(ClassId classId) : Object(classId, "pe"), AttTyped()
 {
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 PageElement::PageElement(ClassId classId, const std::string &classIdStr) : Object(classId, classIdStr), AttTyped()
 {
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 PageElement::~PageElement() {}
@@ -48,7 +48,7 @@ PageElement::~PageElement() {}
 void PageElement::Reset()
 {
     Object::Reset();
-    ResetTyped();
+    this->ResetTyped();
 }
 
 //----------------------------------------------------------------------------

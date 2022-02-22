@@ -76,14 +76,14 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         m_slurThicknessCoefficient
             = BoundingBox::GetBezierThicknessCoefficient(points, curve->GetThickness(), curve->GetAngle(), penWidth);
     }
-    DrawThickBezierCurve(dc, points, m_slurThicknessCoefficient * curve->GetThickness(), staff->m_drawingStaffSize,
-        penWidth, curve->GetAngle(), penStyle);
+    this->DrawThickBezierCurve(dc, points, m_slurThicknessCoefficient * curve->GetThickness(),
+        staff->m_drawingStaffSize, penWidth, curve->GetAngle(), penStyle);
 
     /*
     int i;
     for (i = 0; i <= 10; ++i) {
         Point p = BoundingBox::CalcDeCasteljau(points, (double)i / 10.0);
-        DrawDot(dc, p.x, p.y, staff->m_drawingStaffSize);
+        this->DrawDot(dc, p.x, p.y, staff->m_drawingStaffSize);
     }
     */
 
@@ -182,10 +182,9 @@ float View::CalcInitialSlur(
     const std::vector<LayerElement *> elements
         = slur->CollectSpannedElements(staff, bezier.p1.x, bezier.p2.x, curve->GetSpanningType());
 
-    Staff *startStaff = slur->GetStart()->m_crossStaff ? slur->GetStart()->m_crossStaff
-                                                       : vrv_cast<Staff *>(slur->GetStart()->GetFirstAncestor(STAFF));
-    Staff *endStaff = slur->GetEnd()->m_crossStaff ? slur->GetEnd()->m_crossStaff
-                                                   : vrv_cast<Staff *>(slur->GetEnd()->GetFirstAncestor(STAFF));
+    Staff *startStaff = slur->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+    Staff *endStaff = slur->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+
     curve->ClearSpannedElements();
     for (auto element : elements) {
 

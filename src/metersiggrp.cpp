@@ -33,13 +33,13 @@ MeterSigGrp::MeterSigGrp()
     , AttMeterSigGrpLog()
     , AttTyped()
 {
-    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
-    RegisterAttClass(ATT_BASIC);
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_METERSIGGRPLOG);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
+    this->RegisterAttClass(ATT_BASIC);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_METERSIGGRPLOG);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
 MeterSigGrp::~MeterSigGrp() {}
@@ -48,10 +48,10 @@ void MeterSigGrp::Reset()
 {
     Object::Reset();
     LinkingInterface::Reset();
-    ResetBasic();
-    ResetLabelled();
-    ResetTyped();
-    ResetMeterSigGrpLog();
+    this->ResetBasic();
+    this->ResetLabelled();
+    this->ResetTyped();
+    this->ResetMeterSigGrpLog();
 }
 
 bool MeterSigGrp::IsSupportedChild(Object *child)
@@ -82,7 +82,7 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
 {
     MeterSig *newMeterSig = NULL;
     const ArrayOfObjects *childList = this->GetList(this);
-    switch (GetFunc()) {
+    switch (this->GetFunc()) {
         // For alternating meterSig group alternate between children sequentially
         case meterSigGrpLog_FUNC_alternating: {
             const int index = m_count % childList->size();

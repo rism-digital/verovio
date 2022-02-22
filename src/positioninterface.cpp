@@ -24,18 +24,18 @@ namespace vrv {
 
 PositionInterface::PositionInterface() : Interface(), AttStaffLoc(), AttStaffLocPitched()
 {
-    RegisterInterfaceAttClass(ATT_STAFFLOC);
-    RegisterInterfaceAttClass(ATT_STAFFLOCPITCHED);
+    this->RegisterInterfaceAttClass(ATT_STAFFLOC);
+    this->RegisterInterfaceAttClass(ATT_STAFFLOCPITCHED);
 
-    Reset();
+    this->Reset();
 }
 
 PositionInterface::~PositionInterface() {}
 
 void PositionInterface::Reset()
 {
-    ResetStaffLoc();
-    ResetStaffLocPitched();
+    this->ResetStaffLoc();
+    this->ResetStaffLocPitched();
 
     m_drawingLoc = 0;
 }

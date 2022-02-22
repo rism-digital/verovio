@@ -39,11 +39,11 @@ void View::DrawRunningElements(DeviceContext *dc, Page *page)
 
     RunningElement *header = page->GetHeader();
     if (header) {
-        DrawPgHeader(dc, header);
+        this->DrawPgHeader(dc, header);
     }
     RunningElement *footer = page->GetFooter();
     if (footer) {
-        DrawPgHeader(dc, footer);
+        this->DrawPgHeader(dc, footer);
     }
 }
 
@@ -71,7 +71,7 @@ void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(&pgHeadTxt);
 
-    DrawRunningChildren(dc, pgHeader, params);
+    this->DrawRunningChildren(dc, pgHeader, params);
 
     dc->ResetFont();
     dc->ResetBrush();

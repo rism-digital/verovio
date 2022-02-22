@@ -28,13 +28,13 @@ MultiRest::MultiRest()
     , AttNumberPlacement()
     , AttWidth()
 {
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_MULTIRESTVIS);
-    RegisterAttClass(ATT_NUMBERED);
-    RegisterAttClass(ATT_NUMBERPLACEMENT);
-    RegisterAttClass(ATT_WIDTH);
-    Reset();
+    this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_MULTIRESTVIS);
+    this->RegisterAttClass(ATT_NUMBERED);
+    this->RegisterAttClass(ATT_NUMBERPLACEMENT);
+    this->RegisterAttClass(ATT_WIDTH);
+    this->Reset();
 }
 
 MultiRest::~MultiRest() {}
@@ -43,11 +43,11 @@ void MultiRest::Reset()
 {
     LayerElement::Reset();
     PositionInterface::Reset();
-    ResetColor();
-    ResetMultiRestVis();
-    ResetNumbered();
-    ResetNumberPlacement();
-    ResetWidth();
+    this->ResetColor();
+    this->ResetMultiRestVis();
+    this->ResetNumbered();
+    this->ResetNumberPlacement();
+    this->ResetWidth();
 }
 
 bool MultiRest::UseBlockStyle(Doc *doc) const
@@ -55,19 +55,19 @@ bool MultiRest::UseBlockStyle(Doc *doc) const
     bool useBlock = false;
     switch (doc->GetOptions()->m_multiRestStyle.GetValue()) {
         case MULTIRESTSTYLE_auto:
-            if (GetNum() > 15) {
+            if (this->GetNum() > 15) {
                 useBlock = true;
             }
-            else if (GetNum() > 4) {
-                useBlock = (GetBlock() != BOOLEAN_false);
+            else if (this->GetNum() > 4) {
+                useBlock = (this->GetBlock() != BOOLEAN_false);
             }
             else {
-                useBlock = (GetBlock() == BOOLEAN_true);
+                useBlock = (this->GetBlock() == BOOLEAN_true);
             }
             break;
-        case MULTIRESTSTYLE_default: useBlock = (GetNum() > 4); break;
-        case MULTIRESTSTYLE_block: useBlock = (GetNum() > 1); break;
-        case MULTIRESTSTYLE_symbols: useBlock = (GetNum() > 30); break;
+        case MULTIRESTSTYLE_default: useBlock = (this->GetNum() > 4); break;
+        case MULTIRESTSTYLE_block: useBlock = (this->GetNum() > 1); break;
+        case MULTIRESTSTYLE_symbols: useBlock = (this->GetNum() > 30); break;
         default: // should not arrive here
             break;
     }

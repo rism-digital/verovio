@@ -46,13 +46,13 @@ Artic::Artic()
     , AttExtSym()
     , AttPlacementRelEvent()
 {
-    RegisterAttClass(ATT_ARTICULATION);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_ENCLOSINGCHARS);
-    RegisterAttClass(ATT_EXTSYM);
-    RegisterAttClass(ATT_PLACEMENTRELEVENT);
+    this->RegisterAttClass(ATT_ARTICULATION);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
+    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
-    Reset();
+    this->Reset();
 }
 
 Artic::~Artic() {}
@@ -60,11 +60,11 @@ Artic::~Artic() {}
 void Artic::Reset()
 {
     LayerElement::Reset();
-    ResetArticulation();
-    ResetColor();
-    ResetEnclosingChars();
-    ResetExtSym();
-    ResetPlacementRelEvent();
+    this->ResetArticulation();
+    this->ResetColor();
+    this->ResetEnclosingChars();
+    this->ResetExtSym();
+    this->ResetPlacementRelEvent();
 
     m_drawingPlace = STAFFREL_NONE;
 }
@@ -187,13 +187,13 @@ void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
 wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
 {
     // If there is glyph.num, prioritize it
-    if (HasGlyphNum()) {
-        wchar_t code = GetGlyphNum();
+    if (this->HasGlyphNum()) {
+        wchar_t code = this->GetGlyphNum();
         if (NULL != Resources::GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
-    else if (HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(GetGlyphName());
+    else if (this->HasGlyphName()) {
+        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 
@@ -323,7 +323,8 @@ int Artic::ConvertMarkupArtic(FunctorParams *functorParams)
     ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
     assert(params);
 
-    if (this->GetArtic().size() > 1) params->m_articPairsToConvert.emplace_back(std::make_pair(GetParent(), this));
+    if (this->GetArtic().size() > 1)
+        params->m_articPairsToConvert.emplace_back(std::make_pair(this->GetParent(), this));
 
     return FUNCTOR_CONTINUE;
 }
@@ -399,17 +400,10 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
     int yIn, yOut, yRel;
 
-    // Get the parent or cross-staff / layer
-
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-
-    if (m_crossStaff) {
-        staff = m_crossStaff;
-    }
-
-    Beam *beam = dynamic_cast<Beam *>(GetFirstAncestor(BEAM));
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+    Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+
     // Avoid in artic to be in legder lines
     if (this->GetDrawingPlace() == STAFFREL_above) {
         yIn = std::max(
@@ -546,12 +540,11 @@ int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIR
     if ((parent->GetChildCount(ARTIC) > 1) || (doc->GetOptions()->m_staccatoCenter.GetValue())) {
         return shift;
     }
-    data_ARTICULATION artic = GetArticFirst();
+    data_ARTICULATION artic = this->GetArticFirst();
     switch (artic) {
         case ARTICULATION_stacc:
         case ARTICULATION_stacciss: {
-            Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-            assert(staff);
+            Staff *staff = this->GetAncestorStaff();
             const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             if ((stemDir == STEMDIRECTION_up) && (m_drawingPlace == STAFFREL_above)) {
                 shift += shift - stemWidth / 2;

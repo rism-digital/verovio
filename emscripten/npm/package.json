@@ -1,6 +1,6 @@
 {
   "name": "verovio",
-  "version": "3.8.1",
+  "version": "3.9.0",
   "description": "This is the stable version of the verovio package",
   "main": "index.js",
   "keywords": [
@@ -11,7 +11,7 @@
     "music encoding",
     "svg"
   ],
-  "author": "Laurent Pugin",
+  "author": "Laurent Pugin and others",
   "license": "LGPL 3",
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
   "bugs": {
     "url": "https://github.com/rism-digital/verovio/issues"
   },
-  "homepage": "http://www.verovio.org",
+  "homepage": "https://www.verovio.org",
   "engines": {
     "node": ">= 7.0.0"
   }
