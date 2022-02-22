@@ -62,7 +62,7 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, Doc *doc
 
     if (idx < this->GetChildCount()) {
         children.push_back(m_bottomAlignment);
-        return dynamic_cast<StaffAlignment *>(this->GetChildren().at(idx));
+        return dynamic_cast<StaffAlignment *>(this->GetChild(idx));
     }
     // check that we are searching for the next one (not a gap)
     assert(idx == this->GetChildCount());
@@ -87,7 +87,7 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN)
 {
     StaffAlignment *alignment = NULL;
     for (int i = 0; i < this->GetChildCount(); ++i) {
-        alignment = vrv_cast<StaffAlignment *>(this->GetChildren().at(i));
+        alignment = vrv_cast<StaffAlignment *>(this->GetChild(i));
         assert(alignment);
 
         if ((alignment->GetStaff()) && (alignment->GetStaff()->GetN() == staffN)) return alignment;

@@ -50,12 +50,17 @@ void HorizontalAligner::Reset()
 
 Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType type, int &idx)
 {
+    return const_cast<Alignment *>(std::as_const(*this).SearchAlignmentAtTime(time, type, idx));
+}
+
+const Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType type, int &idx) const
+{
     int i;
     idx = -1; // the index if we reach the end.
-    Alignment *alignment = NULL;
+    const Alignment *alignment = NULL;
     // First try to see if we already have something at the time position
     for (i = 0; i < this->GetAlignmentCount(); ++i) {
-        alignment = vrv_cast<Alignment *>(this->GetChildren().at(i));
+        alignment = vrv_cast<const Alignment *>(this->GetChild(i));
         assert(alignment);
 
         double alignment_time = alignment->GetTime();
@@ -159,7 +164,7 @@ void MeasureAligner::SetMaxTime(double time)
     Alignment *alignment = NULL;
     // Increase the time position for all alignment from the right barline
     for (i = idx; i < this->GetAlignmentCount(); ++i) {
-        alignment = vrv_cast<Alignment *>(this->GetChildren().at(i));
+        alignment = vrv_cast<Alignment *>(this->GetChild(i));
         assert(alignment);
         // Change it only if higher than before
         if (time > alignment->GetTime()) alignment->SetTime(time);
@@ -645,13 +650,13 @@ AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, in
     return reference;
 }
 
-std::pair<int, int> Alignment::GetAlignmentTopBottom()
+std::pair<int, int> Alignment::GetAlignmentTopBottom() const
 {
     int max = VRV_UNSET, min = VRV_UNSET;
     // Iterate over each element in each alignment reference and find max/min Y value - these will serve as top/bottom
     // values for the Alignment
     for (auto child : this->GetChildren()) {
-        AlignmentReference *reference = dynamic_cast<AlignmentReference *>(child);
+        const AlignmentReference *reference = dynamic_cast<const AlignmentReference *>(child);
         for (auto element : reference->GetChildren()) {
             const int top = element->GetSelfTop();
             if ((VRV_UNSET == max) || (top > max)) {

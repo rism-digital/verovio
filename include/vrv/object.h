@@ -234,6 +234,7 @@ public:
     int GetChildCount() const { return (int)m_children.size(); }
     int GetChildCount(const ClassId classId) const;
     int GetChildCount(const ClassId classId, int depth) const;
+    int GetDescendantCount(const ClassId classId) const;
     ///@}
 
     /**

@@ -158,7 +158,7 @@ public:
     /**
      * Return pair of max and min Y value within alignment. Elements will be counted by alignment references.
      */
-    std::pair<int, int> GetAlignmentTopBottom();
+    std::pair<int, int> GetAlignmentTopBottom() const;
 
     /**
      * Add an accidental to the accidSpace of the AlignmentReference holding it.
@@ -408,7 +408,7 @@ public:
      */
     bool CopyChildren() const override { return false; }
 
-    int GetAlignmentCount() const { return (int)GetChildren().size(); }
+    int GetAlignmentCount() const { return this->GetChildCount(); }
 
     //----------//
     // Functors //
@@ -419,7 +419,10 @@ protected:
      * Search if an alignment of the type is already there at the time.
      * If not, return in idx the position where it needs to be inserted (-1 if it is the end)
      */
+    ///@{
     Alignment *SearchAlignmentAtTime(double time, AlignmentType type, int &idx);
+    const Alignment *SearchAlignmentAtTime(double time, AlignmentType type, int &idx) const;
+    ///@}
 
     /**
      * Add an alignment at the appropriate position (at the end if -1)
@@ -447,7 +450,7 @@ public:
      * @name Constructors, destructors, reset and class name methods
      * Reset method resets all attribute classes
      */
-    ///@(
+    ///@{
     MeasureAligner();
     virtual ~MeasureAligner();
     void Reset() override;

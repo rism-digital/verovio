@@ -81,9 +81,9 @@ public:
 
     bool GenerateChildMelodic();
 
-    NeumeGroup GetNeumeGroup();
+    NeumeGroup GetNeumeGroup() const;
 
-    std::vector<int> GetPitchDifferences();
+    std::vector<int> GetPitchDifferences() const;
 
     PitchInterface *GetHighestPitch();
     PitchInterface *GetLowestPitch();

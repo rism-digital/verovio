@@ -636,7 +636,7 @@ void Page::JustifyVertically()
             }
         }
         else {
-            const int stavesPerSystem = m_drawingScoreDef.GetChildCount(STAFFDEF, UNLIMITED_DEPTH);
+            const int stavesPerSystem = m_drawingScoreDef.GetDescendantCount(STAFFDEF);
             if (childSystems * stavesPerSystem < 8) return;
         }
     }

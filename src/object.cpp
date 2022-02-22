@@ -367,6 +367,12 @@ int Object::GetChildCount(const ClassId classId, int depth) const
     return (int)objects.size();
 }
 
+int Object::GetDescendantCount(const ClassId classId) const
+{
+    ListOfConstObjects objects = this->FindAllDescendantsByType(classId);
+    return (int)objects.size();
+}
+
 int Object::GetAttributes(ArrayOfStrAttr *attributes) const
 {
     assert(attributes);
