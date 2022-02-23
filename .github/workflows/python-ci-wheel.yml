@@ -108,10 +108,16 @@ jobs:
         working-directory: wheelhouse
         run: twine check *.whl
 
-      - name: Install from wheel on Unix
-        if: always() && runner.os != 'Windows'
+      - name: Install from wheel on Linux
+        if: always() && runner.os == 'Linux'
         working-directory: wheelhouse
         run: python -m pip install ./*.whl
+
+      # Install only the x86_64 wheel on macOS
+      - name: Install from wheel on macOS
+        working-directory: wheelhouse
+        if: always() && runner.os == 'macOS'
+        run: python -m pip install ./*x86_64.whl
 
       # Wildcard use is different with PowerShell
       # cf. https://stackoverflow.com/a/43900040
