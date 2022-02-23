@@ -89,6 +89,7 @@ jobs:
           CIBW_SKIP: cp27-* # manylinux2014 not compatible with python 2.7
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
           CIBW_ARCHS_MACOS: arm64
+          CIBW_TEST_SKIP: cp*-macosx_arm64
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_MANYLINUX_I686_IMAGE: manylinux2014
           CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
