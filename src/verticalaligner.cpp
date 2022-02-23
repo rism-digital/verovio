@@ -541,9 +541,10 @@ void StaffAlignment::AdjustBracketGroupSpacing(Doc *doc, StaffAlignment *previou
     if (!previous) return;
 
     const int unit = doc->GetDrawingUnit(this->GetStaffSize());
+    const int offset = (doc->GetOptions()->m_bracketThickness.GetValue() - 1) * unit / 2;
     if (this->IsInBracketGroup(true) && previous->IsInBracketGroup(false)) {
-        const int overflowAbove = doc->GetGlyphHeight(SMUFL_E003_bracketTop, this->GetStaffSize(), false);
-        const int overflowBelow = doc->GetGlyphHeight(SMUFL_E004_bracketBottom, this->GetStaffSize(), false);
+        const int overflowAbove = doc->GetGlyphHeight(SMUFL_E003_bracketTop, this->GetStaffSize(), false) + offset;
+        const int overflowBelow = doc->GetGlyphHeight(SMUFL_E004_bracketBottom, this->GetStaffSize(), false) + offset;
         if (spacing < (overflowAbove + overflowBelow)) {
             const int bracketOverlap = (overflowAbove + overflowBelow) - spacing / 2;
             if (this->GetOverlap() < bracketOverlap) {
