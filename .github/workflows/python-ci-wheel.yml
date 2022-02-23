@@ -50,7 +50,7 @@ jobs:
       # Set up
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - uses: nuget/setup-nuget@v1
         with:
@@ -86,9 +86,9 @@ jobs:
         with:
           output-dir: wheelhouse
         env:
-          CIBW_SKIP: cp27-* # manylinux2014 not compatible with python 2.7
+          CIBW_SKIP: cp37-macosx_arm64
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
-          CIBW_ARCHS_MACOS: arm64
+          CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_TEST_SKIP: cp*-macosx_arm64
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_MANYLINUX_I686_IMAGE: manylinux2014
@@ -143,7 +143,7 @@ jobs:
       # Set up
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
