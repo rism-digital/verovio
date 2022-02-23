@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       # Build the wheels for Linux, Windows and macOS for Python 3.10
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-20.04]
+        os: [macos-latest, windows-latest, ubuntu-latest]
         python-version: ["3.7", "3.8", "3.9", "3.10"]
         architecture: [x86, x64]
         include:
@@ -36,13 +36,13 @@ jobs:
           - os: windows-latest
             architecture: x86
             platform_id: win32
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             architecture: x64
             platform_id: manylinux_x86_64
         exclude:
           - os: macos-latest
             architecture: x86
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             architecture: x86
 
     steps:
@@ -135,7 +135,7 @@ jobs:
   #===============================================#
   build_sdist:
     name: Build sdist
-    runs-on: [ubuntu-20.04]
+    runs-on: [ubuntu-latest]
 
     steps:
       #===============================================#
@@ -212,7 +212,7 @@ jobs:
   upload_testpypi:
     name: Upload to TestPyPi
     needs: [build_wheels, build_sdist]
-    runs-on: [ubuntu-20.04]
+    runs-on: [ubuntu-latest]
 
     steps:
       #===============================================#
