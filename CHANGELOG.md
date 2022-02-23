@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Python Package Index (PyPI) distribution for macos arm64
 
 ## [3.9.0] - 2022-02-22
 * Support for `beatRpt@beatdef`
