@@ -100,7 +100,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     if (!start || !end) return;
 
-    const curvature_CURVEDIR drawingCurveDir = slur->ReduceDrawingCurveDir();
+    const curvature_CURVEDIR drawingCurveDir = slur->CalcDrawingCurveDir(spanningType);
 
     /************** adjusting y position **************/
 
@@ -111,10 +111,15 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     /************** y position **************/
 
-    int sign = slur->HasEndpointAboveStart() ? 1 : -1;
+    int sign = (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
+    if (drawingCurveDir == curvature_CURVEDIR_mixed) {
+        sign = slur->HasEndpointAboveStart() ? 1 : -1;
+    }
     adjustedPoints.first.y += 1.25 * sign * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-    sign = slur->HasEndpointAboveEnd() ? 1 : -1;
+    if (drawingCurveDir == curvature_CURVEDIR_mixed) {
+        sign = slur->HasEndpointAboveEnd() ? 1 : -1;
+    }
     adjustedPoints.second.y += 1.25 * sign * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     Point points[4];
@@ -173,7 +178,7 @@ float View::CalcInitialSlur(
 {
     // For now we pick C1 = P1 and C2 = P2
     BezierCurve bezier(points[0], points[0], points[3], points[3]);
-    bezier.SetControlSides(slur->HasEndpointAboveStart(), slur->HasEndpointAboveEnd());
+    slur->InitBezierControlSides(bezier, curve->GetDir());
 
     /************** content **************/
 

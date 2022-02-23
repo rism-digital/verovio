@@ -89,7 +89,7 @@ public:
     SlurCurveDirection GetDrawingCurveDir() const { return m_drawingCurveDir; }
     void SetDrawingCurveDir(SlurCurveDirection curveDir) { m_drawingCurveDir = curveDir; }
     bool HasDrawingCurveDir() const { return (m_drawingCurveDir != SlurCurveDirection::None); }
-    curvature_CURVEDIR ReduceDrawingCurveDir() const;
+    curvature_CURVEDIR CalcDrawingCurveDir(char spanningType) const;
     ///@}
 
     /**
@@ -126,7 +126,8 @@ public:
     /**
      * Adjust starting coordinates for the slurs depending on the curve direction and spanning type of the slur
      */
-    std::pair<Point, Point> AdjustCoordinates(Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType);
+    std::pair<Point, Point> AdjustCoordinates(
+        Doc *doc, Staff *staff, std::pair<Point, Point> points, char spanningType);
 
     /**
      * Determine layer elements spanned by the slur
@@ -145,6 +146,11 @@ public:
     bool IsElementBelow(LayerElement *element, Staff *startStaff, Staff *endStaff) const;
     bool IsElementBelow(FloatingPositioner *positioner, Staff *startStaff, Staff *endStaff) const;
     ///@}
+
+    /**
+     * Set the bezier control sides depending on the curve direction
+     */
+    void InitBezierControlSides(BezierCurve &bezier, curvature_CURVEDIR curveDir) const;
 
     /**
      * Slur adjustment

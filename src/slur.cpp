@@ -103,13 +103,25 @@ void Slur::Reset()
     m_requestedStaffSpace = 0;
 }
 
-curvature_CURVEDIR Slur::ReduceDrawingCurveDir() const
+curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
 {
     switch (m_drawingCurveDir) {
         case SlurCurveDirection::Above: return curvature_CURVEDIR_above;
         case SlurCurveDirection::Below: return curvature_CURVEDIR_below;
-        case SlurCurveDirection::MixedDownwards:
-        case SlurCurveDirection::MixedUpwards: return curvature_CURVEDIR_mixed;
+        case SlurCurveDirection::MixedDownwards: {
+            switch (spanningType) {
+                case SPANNING_START_END: return curvature_CURVEDIR_mixed;
+                case SPANNING_START: return curvature_CURVEDIR_below;
+                default: return curvature_CURVEDIR_above;
+            }
+        }
+        case SlurCurveDirection::MixedUpwards: {
+            switch (spanningType) {
+                case SPANNING_START_END: return curvature_CURVEDIR_mixed;
+                case SPANNING_START: return curvature_CURVEDIR_above;
+                default: return curvature_CURVEDIR_below;
+            }
+        }
         default: return curvature_CURVEDIR_NONE;
     }
 }
@@ -333,6 +345,18 @@ bool Slur::IsElementBelow(FloatingPositioner *positioner, Staff *startStaff, Sta
     }
 }
 
+void Slur::InitBezierControlSides(BezierCurve &bezier, curvature_CURVEDIR curveDir) const
+{
+    switch (curveDir) {
+        case curvature_CURVEDIR_above: bezier.SetControlSides(true, true); break;
+        case curvature_CURVEDIR_below: bezier.SetControlSides(false, false); break;
+        case curvature_CURVEDIR_mixed:
+            bezier.SetControlSides(this->HasEndpointAboveStart(), this->HasEndpointAboveEnd());
+            break;
+        default: break;
+    }
+}
+
 void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
 {
     assert(doc);
@@ -342,7 +366,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     Point points[4];
     curve->GetPoints(points);
     BezierCurve bezier(points[0], points[1], points[2], points[3]);
-    bezier.SetControlSides(this->HasEndpointAboveStart(), this->HasEndpointAboveEnd());
+    this->InitBezierControlSides(bezier, curve->GetDir());
     bezier.UpdateControlPointParams();
 
     const int unit = doc->GetDrawingUnit(100);
@@ -944,7 +968,7 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION
 }
 
 std::pair<Point, Point> Slur::AdjustCoordinates(
-    Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType)
+    Doc *doc, Staff *staff, std::pair<Point, Point> points, char spanningType)
 {
     StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetStart());
     StemmedDrawingInterface *endStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetEnd());
@@ -1239,7 +1263,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         }
     }
     if (spanningType == SPANNING_END) {
-        if (this->HasEndpointAboveEnd()) {
+        if (isSshaped != this->HasEndpointAboveEnd()) {
             y1 = std::max(staffTop, y2);
             y1 -= pitchDiff * unit / 2;
             y1 = std::max(staffTop, y1);
