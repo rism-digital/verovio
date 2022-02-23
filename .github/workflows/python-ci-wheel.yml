@@ -25,14 +25,11 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-20.04]
         python-version: ["3.7", "3.8", "3.9", "3.10"]
-        architecture: [x86, x64, arm64]
+        architecture: [x86, x64]
         include:
           - os: macos-latest
             architecture: x64
             platform_id: macosx_x86_64
-          - os: macos-latest
-            architecture: arm64
-            platform_id: macosx_arm64
           - os: windows-latest
             architecture: x64
             platform_id: win_amd64
@@ -45,12 +42,8 @@ jobs:
         exclude:
           - os: macos-latest
             architecture: x86
-          - os: windows-latest
-            architecture: arm64
           - os: ubuntu-20.04
             architecture: x86
-          - os: ubuntu-20.04
-            architecture: arm64
 
     steps:
       #===============================================#
@@ -95,7 +88,7 @@ jobs:
         env:
           CIBW_SKIP: cp27-* # manylinux2014 not compatible with python 2.7
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
-          CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_ARCHS_MACOS: universal2
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_MANYLINUX_I686_IMAGE: manylinux2014
           CIBW_BEFORE_ALL_MACOS: brew update && brew install swig
