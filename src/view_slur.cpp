@@ -178,7 +178,7 @@ float View::CalcInitialSlur(
 {
     // For now we pick C1 = P1 and C2 = P2
     BezierCurve bezier(points[0], points[0], points[3], points[3]);
-    slur->InitBezierControlSides(bezier, curve->GetDir());
+    slur->InitBezierControlSides(bezier, curveDir);
 
     /************** content **************/
 
