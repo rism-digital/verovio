@@ -25,11 +25,14 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-20.04]
         python-version: ["3.7", "3.8", "3.9", "3.10"]
-        architecture: [x86, x64]
+        architecture: [x86, x64, arm64]
         include:
           - os: macos-latest
             architecture: x64
             platform_id: macosx_x86_64
+          - os: macos-latest
+            architecture: arm64
+            platform_id: macosx_arm64
           - os: windows-latest
             architecture: x64
             platform_id: win_amd64
@@ -42,8 +45,12 @@ jobs:
         exclude:
           - os: macos-latest
             architecture: x86
+          - os: windows-latest
+            architecture: arm64
           - os: ubuntu-20.04
             architecture: x86
+          - os: ubuntu-20.04
+            architecture: arm64
 
     steps:
       #===============================================#
