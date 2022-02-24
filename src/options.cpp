@@ -976,7 +976,7 @@ Options::Options()
     this->Register(&m_minLastJustification, "minLastJustification", &m_general);
 
     m_maxVerticalJustification.SetInfo("Maximum ratio of justifiable height for page",
-        "Pages are justified vertically only if ratio of justifiable height to page height is lower than this percent");
+        "Maximum ratio of justifiable height to page height that can be used for the vertical justification");
     m_maxVerticalJustification.Init(0.3, 0.0, 1.0);
     this->Register(&m_maxVerticalJustification, "maxVerticalJustification", &m_general);
 

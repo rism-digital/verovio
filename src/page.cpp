@@ -617,7 +617,7 @@ void Page::JustifyVertically()
     }
 
     // Ignore vertical justification if it's not required
-    if (!IsJustificationRequired(doc)) return;
+    if (!this->IsJustificationRequired(doc)) return;
 
     // Justify Y position
     Functor justifyY(&Object::JustifyY);
@@ -640,21 +640,16 @@ bool Page::IsJustificationRequired(Doc *doc)
     Pages *pages = doc->GetPages();
     assert(pages);
 
-    const int idx = this->GetIdx();
-    int previousJustifiableHeight = 0;
-    int previousJustificationSum = 0;
-    // get values from the previous page
-    if (idx > 0) {
-        Page *previousPage = dynamic_cast<Page *>(pages->GetPrevious(this));
-        assert(previousPage);
-        previousJustifiableHeight = previousPage->m_drawingJustifiableHeight;
-        previousJustificationSum = previousPage->m_justificationSum;
-    }
-
     const int childSystems = this->GetChildCount(SYSTEM);
     // Last page and justification of last page is not enabled
     if (pages->GetLast() == this) {
+        const int idx = this->GetIdx();
         if (idx > 0) {
+            Page *previousPage = dynamic_cast<Page *>(pages->GetPrevious(this));
+            assert(previousPage);
+            const int previousJustifiableHeight = previousPage->m_drawingJustifiableHeight;
+            const int previousJustificationSum = previousPage->m_justificationSum;
+
             if (previousJustifiableHeight < m_drawingJustifiableHeight) {
                 m_drawingJustifiableHeight = previousJustifiableHeight;
             }
@@ -671,7 +666,8 @@ bool Page::IsJustificationRequired(Doc *doc)
     }
     const double ratio = (double)m_drawingJustifiableHeight / (double)doc->m_drawingPageHeight;
     if (ratio > doc->GetOptions()->m_maxVerticalJustification.GetValue()) {
-        m_drawingJustifiableHeight = previousJustifiableHeight;
+        m_drawingJustifiableHeight
+            = doc->m_drawingPageHeight * doc->GetOptions()->m_maxVerticalJustification.GetValue();
     }
 
     return true;
