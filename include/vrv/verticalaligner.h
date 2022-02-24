@@ -349,7 +349,7 @@ private:
     int GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *attSpacing) const;
 
     /**
-     * Return whether current staff alignmnet at the start/end of bracket group
+     * Return whether current staff alignment is at the start/end of a bracket group
      */
     bool IsInBracketGroup(bool isFirst) const;
 
