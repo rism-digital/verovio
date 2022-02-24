@@ -252,6 +252,11 @@ public:
     std::pair<int, bool> CalcElementHorizontalOverlap(Doc *doc, const std::vector<LayerElement *> &otherElements,
         bool areDotsAdjusted, bool isChordElement, bool isLowerElement = false, bool unison = true);
 
+    /**
+     * Get code for the stem mod
+     */
+    virtual wchar_t GetDrawingStemMod() const;
+
     //----------//
     // Functors //
     //----------//

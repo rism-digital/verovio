@@ -482,14 +482,15 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     /************ Set the position, the length and adjust to the note head ************/
 
+    const int unit = params->m_doc->GetDrawingUnit(staffSize);
     int baseStem = 0;
     // Use the given one if any
     if (this->HasStemLen()) {
-        baseStem = this->GetStemLen() * -params->m_doc->GetDrawingUnit(staffSize);
+        baseStem = this->GetStemLen() * -unit;
     }
     // Do not adjust the baseStem for stem sameas notes (its length is in m_chordStemLength)
     else if (!params->m_isStemSameasSecondary) {
-        int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
+        int thirdUnit = unit / 3;
         const data_STEMDIRECTION stemDir = params->m_interface->GetDrawingStemDir();
         baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff, stemDir) * thirdUnit);
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
@@ -529,20 +530,19 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     /************ Set flag and slashes (if necessary) and adjust the length ************/
 
-    int slashFactor = 0;
-    // In case there is explicitly specified stem mod for slashes
-    if (!params->m_isStemSameasSecondary && this->HasStemMod() && (this->GetStemMod() < 8)) {
-        slashFactor = this->GetStemMod() - 1;
-    }
-    // otherwise check whether it's trem and its @unitdir attribute is shorter than duration
-    else if (!params->m_isStemSameasSecondary && this->GetFirstAncestor(BTREM)) {
+    //int slashFactor = 0;
+    wchar_t code = 0;
+    if (!params->m_isStemSameasSecondary) {
         BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
-        assert(bTrem);
-        if (bTrem->HasUnitdur() && (bTrem->GetUnitdur() > DURATION_4)) {
-            slashFactor = bTrem->GetUnitdur() - DURATION_4;
+        if (bTrem) {
+            code = bTrem->GetDrawingStemMod();
+        }
+        else if (this->HasStemMod() && (this->GetStemMod() < 8)) {
+            code = this->GetDrawingStemMod();
         }
     }
 
+    int flagOffset = 0;
     Flag *flag = NULL;
     // There is never a flag with a duration longer than 8th notes
     if (params->m_dur > DUR_4) {
@@ -554,24 +554,18 @@ int Stem::CalcStem(FunctorParams *functorParams)
         }
         else {
             flag->m_drawingNbFlags = params->m_dur - DUR_4;
-            if (!this->HasStemLen() && !this->IsGraceNote() && this->HasStemMod()) {
-                slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
-            }
+            flagOffset = unit * (flag->m_drawingNbFlags - 1);
         }
     }
 
     // Adjust basic stem length to number of slashes
-    if ((slashFactor > 0) && !this->HasStemLen()) {
-        const int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
-            + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
-        while (abs(baseStem) < slashFactor * tremStep + params->m_doc->GetDrawingUnit(staffSize) * 3) {
-            if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-                this->SetDrawingStemLen(this->GetDrawingStemLen() - tremStep);
-            }
-            else {
-                this->SetDrawingStemLen(this->GetDrawingStemLen() + tremStep);
-            }
-            --slashFactor;
+    if (code) {
+        const int height = params->m_doc->GetGlyphHeight(code, staffSize, false) / 2;
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() - height - flagOffset);
+        }
+        else {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() + height + flagOffset);
         }
     }
 

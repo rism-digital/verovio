@@ -144,4 +144,38 @@ data_DURATION BTrem::CalcIndividualNoteDuration()
     return DURATION_NONE;
 }
 
+wchar_t BTrem::GetDrawingStemMod() const
+{
+    Object *child = const_cast<BTrem *>(this)->FindDescendantByType(CHORD);
+    if (!child) {
+        child = const_cast<BTrem *>(this)->FindDescendantByType(NOTE);
+        if (!child) return 0;
+    }
+
+    wchar_t code = vrv_cast<LayerElement *>(child)->GetDrawingStemMod();
+    if (code) return code;
+
+    DurationInterface *duration = child->GetDurationInterface();
+    if (!duration) return 0;
+    const int drawingDur = duration->GetDur();
+
+    if (!this->HasUnitdur()) {
+        if (drawingDur < DUR_2) return SMUFL_E222_tremolo3;
+        return 0;
+    }
+    int slashDur = this->GetUnitdur() - drawingDur;
+    if (drawingDur < DUR_4) slashDur = this->GetUnitdur() - DUR_4;
+    switch (slashDur) {
+        case (0): return 0;
+        case (1): return SMUFL_E220_tremolo1;
+        case (2): return SMUFL_E221_tremolo2;
+        case (3): return SMUFL_E222_tremolo3;
+        case (4): return SMUFL_E223_tremolo4;
+        case (5): return SMUFL_E224_tremolo5;
+        default: break;
+    }
+
+    return 0;
+}
+
 } // namespace vrv
