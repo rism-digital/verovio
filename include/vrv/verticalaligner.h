@@ -292,7 +292,7 @@ public:
     void SetBeamAdjust(int beamAdjust) { m_beamAdjust = beamAdjust; }
     int GetBeamAdjust() const { return m_beamAdjust; }
     ///@}
-    
+
     /**
      * Find overflow for the alignments taking bracket group elements into account
      */
