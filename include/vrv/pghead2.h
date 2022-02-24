@@ -35,7 +35,7 @@ public:
     /**
      * Overriden to get the appropriate margin
      */
-    int GetTotalHeight(Doc *doc) override;
+    int GetTotalHeight(const Doc *doc) const override;
 
     //----------//
     // Functors //

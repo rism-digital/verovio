@@ -658,7 +658,7 @@ void Object::FindAllDescendantsByComparison(
 }
 
 void Object::FindAllDescendantsBetween(
-    ListOfObjects *objects, Comparison *comparison, const Object *start, const Object *end, bool clear)
+    ListOfObjects *objects, Comparison *comparison, const Object *start, const Object *end, bool clear, int depth)
 {
     assert(objects);
     if (clear) objects->clear();
@@ -668,15 +668,15 @@ void Object::FindAllDescendantsBetween(
     this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, depth, FORWARD, true);
 }
 
-void Object::FindAllDescendantsBetween(
-    ListOfConstObjects *objects, Comparison *comparison, const Object *start, const Object *end, bool clear) const
+void Object::FindAllDescendantsBetween(ListOfConstObjects *objects, Comparison *comparison, const Object *start,
+    const Object *end, bool clear, int depth) const
 {
     assert(objects);
     if (clear) objects->clear();
 
     Functor findAllConstBetween(&Object::FindAllConstBetween);
     FindAllConstBetweenParams findAllConstBetweenParams(comparison, objects, start, end);
-    this->Process(&findAllConstBetween, &findAllConstBetweenParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD, true);
+    this->Process(&findAllConstBetween, &findAllConstBetweenParams, NULL, NULL, depth, FORWARD, true);
 }
 
 Object *Object::GetChild(int idx)

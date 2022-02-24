@@ -453,10 +453,10 @@ public:
      * The start and end objects are included in the result set.
      */
     ///@{
-    void FindAllDescendantsBetween(
-        ListOfObjects *objects, Comparison *comparison, const Object *start, const Object *end, bool clear = true);
+    void FindAllDescendantsBetween(ListOfObjects *objects, Comparison *comparison, const Object *start,
+        const Object *end, bool clear = true, int depth = UNLIMITED_DEPTH);
     void FindAllDescendantsBetween(ListOfConstObjects *objects, Comparison *comparison, const Object *start,
-        const Object *end, bool clear = true) const;
+        const Object *end, bool clear = true, int depth = UNLIMITED_DEPTH) const;
     ///@}
 
     /**

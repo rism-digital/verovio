@@ -91,9 +91,9 @@ public:
      */
     ///@{
     /** Height including margins */
-    virtual int GetTotalHeight(Doc *doc) = 0;
+    virtual int GetTotalHeight(const Doc *doc) const = 0;
     /** Content height */
-    int GetContentHeight();
+    int GetContentHeight() const;
     /** Row from 0 to 2 */
     int GetRowHeight(int row) const;
     /** Col from 0 to 2 */

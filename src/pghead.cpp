@@ -39,7 +39,7 @@ void PgHead::Reset()
     RunningElement::Reset();
 }
 
-int PgHead::GetTotalHeight(Doc *doc)
+int PgHead::GetTotalHeight(const Doc *doc) const
 {
     assert(doc);
 

@@ -185,7 +185,7 @@ void RunningElement::SetDrawingPage(Page *page)
     }
 }
 
-int RunningElement::GetContentHeight()
+int RunningElement::GetContentHeight() const
 {
     int height = 0;
     int i;

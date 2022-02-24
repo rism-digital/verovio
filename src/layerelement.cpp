@@ -255,7 +255,7 @@ bool LayerElement::IsInBeamSpan() const
     return m_isInBeamspan;
 }
 
-Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence) const
+Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence)
 {
     return const_cast<Staff *>(std::as_const(*this).GetAncestorStaff(strategy, assertExistence));
 }
