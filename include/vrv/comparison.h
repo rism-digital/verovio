@@ -241,7 +241,7 @@ public:
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
         if (!object->HasAttClass(ATT_NINTEGER)) return false;
-        const AttNInteger *element = vrv_cast<const AttNInteger *>(object);
+        const AttNInteger *element = dynamic_cast<const AttNInteger *>(object);
         assert(element);
         return (element->GetN() == m_n);
     }
@@ -270,7 +270,7 @@ public:
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
         if (!object->HasAttClass(ATT_NINTEGER)) return false;
-        const AttNInteger *element = vrv_cast<const AttNInteger *>(object);
+        const AttNInteger *element = dynamic_cast<const AttNInteger *>(object);
         assert(element);
         return (std::find(m_ns.begin(), m_ns.end(), element->GetN()) != m_ns.end());
     }
@@ -298,7 +298,7 @@ public:
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
         if (!object->HasAttClass(ATT_NNUMBERLIKE)) return false;
-        const AttNNumberLike *element = vrv_cast<const AttNNumberLike *>(object);
+        const AttNNumberLike *element = dynamic_cast<const AttNNumberLike *>(object);
         assert(element);
         return (element->GetN() == m_n);
     }
@@ -369,7 +369,7 @@ public:
     {
         if (!MatchesType(object)) return false;
         if (!object->HasAttClass(ATT_VISIBILITY)) return false;
-        const AttVisibility *visibility = vrv_cast<const AttVisibility *>(object);
+        const AttVisibility *visibility = dynamic_cast<const AttVisibility *>(object);
         assert(visibility);
         return (visibility->GetVisible() == m_isVisible);
     }
