@@ -2257,7 +2257,8 @@ enum {
     ERR_056_TIMESIG_CHANGE,
     ERR_057_MENSUR_CHANGE,
     ERR_058_FERMATA_MREST,
-    ERR_059_DOUBLE_DOTS_MENS
+    ERR_059_DOUBLE_DOTS_MENS,
+    ERR_060_CLEF_MISSING
 };
 
 // clang-format off
@@ -2320,7 +2321,8 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_056_TIMESIG_CHANGE, "The time signature cannot be changed more than once in a measure." },
     { ERR_057_MENSUR_CHANGE, "The mensur sign cannot be changed more than once in a measure." },
     { ERR_058_FERMATA_MREST, "A fermata on measure rest with extra '%s' is invalid." },
-    { ERR_059_DOUBLE_DOTS_MENS, "Double-dotted notes are invalid with mensural notation." }
+    { ERR_059_DOUBLE_DOTS_MENS, "Double-dotted notes are invalid with mensural notation." },
+    { ERR_060_CLEF_MISSING, "A clef is required." }
 };
 // clang-format on
 
@@ -2699,6 +2701,19 @@ bool PAEInput::Import(const std::string &input)
         pae::Token staffDefToken(0, pae::CLEF_POS);
         m_hasClef = true;
         if (success) success = this->ParseClef(&m_clef, clefStr, staffDefToken, &m_isMensural);
+    }
+    else {
+        pae::Token staffDefToken(0, pae::CLEF_POS);
+        LogPAE(ERR_060_CLEF_MISSING, staffDefToken);
+        if (m_pedanticMode) {
+            success = false;
+        }
+        else {
+            m_hasClef = true;
+            m_clef.SetLine(2);
+            m_clef.SetShape(CLEFSHAPE_G);
+            m_clef.SetEnclose(ENCLOSURE_brack);
+        }
     }
 
     if (!meterSigOrMensurStr.empty()) {
