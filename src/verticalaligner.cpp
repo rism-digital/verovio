@@ -515,8 +515,10 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
         overflowSum += this->GetOverlap();
     }
 
+    const int unit = doc->GetDrawingUnit(this->GetStaffSize());
+
     // Add a margin but not for the bottom aligner
-    if (m_staff) overflowSum += doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(this->GetStaffSize());
+    if (m_staff) overflowSum += doc->GetBottomMargin(STAFF) * unit;
 
     if (const int adjust = prevAlignment->GetBeamAdjust()) {
         overflowSum += adjust;
@@ -527,11 +529,59 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
     if (previous && current) {
         if ((current->Is(ARTIC) && previous->Is(ARTIC)) || (previous->Is(ARTIC) && current->Is(NOTE))
             || (current->Is(ARTIC) && previous->Is(NOTE))) {
-            if (current->HorizontalContentOverlap(previous)) overflowSum += doc->GetDrawingUnit(this->GetStaffSize());
+            if (current->HorizontalContentOverlap(previous)) overflowSum += unit;
         }
     }
 
     return overflowSum;
+}
+
+void StaffAlignment::AdjustBracketGroupSpacing(Doc *doc, StaffAlignment *previous, int spacing)
+{
+    if (!previous) return;
+
+    if (this->IsInBracketGroup(true) && previous->IsInBracketGroup(false)) {
+        const int unit = doc->GetDrawingUnit(this->GetStaffSize());
+        const int offset = (doc->GetOptions()->m_bracketThickness.GetValue() - 1) * unit / 2;
+        const int overflowAbove = doc->GetGlyphHeight(SMUFL_E003_bracketTop, this->GetStaffSize(), false) + offset;
+        const int overflowBelow = doc->GetGlyphHeight(SMUFL_E004_bracketBottom, this->GetStaffSize(), false) + offset;
+        if (spacing < (overflowAbove + overflowBelow)) {
+            const int bracketOverlap = (overflowAbove + overflowBelow) - spacing / 2;
+            if (this->GetOverlap() < bracketOverlap) {
+                this->SetOverlap(bracketOverlap);
+            }
+        }
+    }
+}
+
+bool StaffAlignment::IsInBracketGroup(bool isFirst) const
+{
+    if (!this->m_staff) return false;
+
+    ScoreDef *scoreDef = this->m_system->GetDrawingScoreDef();
+    ListOfObjects groups = scoreDef->FindAllDescendantsByType(STAFFGRP);
+    for (auto staffGrp : groups) {
+        // Make sure that there is GrpSym present
+        GrpSym *grpSym = vrv_cast<GrpSym *>(staffGrp->GetFirst(GRPSYM));
+        if (!grpSym) continue;
+
+        if (grpSym->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
+            std::set<int> staffNs;
+            ListOfObjects staffDefs = staffGrp->FindAllDescendantsByType(STAFFDEF);
+            std::for_each(staffDefs.begin(), staffDefs.end(), [&staffNs](Object *object) {
+                StaffDef *staffDef = vrv_cast<StaffDef *>(object);
+                staffNs.emplace(staffDef->GetN());
+            });
+
+            const int currentN = this->m_staff->GetN();
+            if (staffNs.count(currentN)) {
+                if ((isFirst && (*staffNs.begin() == currentN)) || (!isFirst && (*staffNs.rbegin() == currentN)))
+                    return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void StaffAlignment::SetCurrentFloatingPositioner(
@@ -1006,6 +1056,8 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
     if (spacing < (overflowBelow + overflowAbove)) {
         this->SetOverlap((overflowBelow + overflowAbove) - spacing);
     }
+
+    this->AdjustBracketGroupSpacing(params->m_doc, params->m_previous, spacing);
 
     // This is the bottom alignment (or something is wrong) - this is all we need to do
     if (!m_staff) {
