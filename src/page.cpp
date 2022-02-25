@@ -430,11 +430,6 @@ void Page::LayOutHorizontally()
     Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
 
-    // Calculate the slur direction
-    PrepareSlursParams prepareSlursParams(doc);
-    Functor prepareSlurs(&Object::PrepareSlurs);
-    this->Process(&prepareSlurs, &prepareSlursParams);
-
     FunctorDocParams resolveSpanningBeamSpansParams(doc);
     Functor resolveSpanningBeamSpans(&Object::ResolveSpanningBeamSpans);
     this->Process(&resolveSpanningBeamSpans, &resolveSpanningBeamSpansParams);
