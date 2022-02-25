@@ -91,6 +91,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse the insert action");
     }
+    else if (action == "insertToSyllable") {
+        std::string elementId;
+        if (this->ParseInsertToSyllableAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->InsertToSyllable(elementId);
+        }
+        LogWarning("Could not parse the insert action");
+    }
     else if (action == "set") {
         std::string elementId, attrType, attrValue;
         if (this->ParseSetAction(json.get<jsonxx::Object>("param"), &elementId, &attrType, &attrValue)) {
@@ -1015,7 +1022,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         surface->AddChild(zone);
         accid->SetZone(zone);
         
-        // find the closest two neume
+        // find closest two neume
         // if the two share the same parent, add accid inside syllable
         // if not, add accid between syllables
         ListOfObjects neumes;
@@ -1093,7 +1100,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         surface->AddChild(zone);
         divLine->SetZone(zone);
 
-        // find the closest two neume
+        // find closest two neume
         // if the two share the same parent, add divLine inside syllable
         // if not, add divLine between syllables
         ListOfObjects neumes;
@@ -1146,6 +1153,92 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     m_infoObject.import("status", status);
     m_infoObject.import("message", message);
     return true;
+}
+
+bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get drawing page");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get drawing page.");
+        return false;
+    }
+    if (m_doc->GetType() != Facs) {
+        LogError("Drawing page without facsimile");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Drawing page without facsimile is unsupported.");
+        return false;
+    }
+
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    assert(element);
+    Object *parent = element->GetParent();
+    assert(parent);
+
+    if (element == NULL) {
+        LogError("No element exists with ID '%s'.", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "No element exists with ID" + elementId + ".");
+        return false;
+    }
+    if (!(element->Is(DIVLINE) || element->Is(ACCID))) {
+        LogError("Element is of type %s, but only Divlines and Accids can be inserted into syllables.",
+            element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message",
+            "Element is of type " + element->GetClassName()
+                + ", but only DivLines and Accids can be inserted into syllables.");
+        return false;
+    }
+
+    int ulx;
+    int uly;
+    if (dynamic_cast<FacsimileInterface *>(element)->HasFacs()) {
+        ulx = element->GetFacsimileInterface()->GetZone()->GetUlx();
+        uly = element->GetFacsimileInterface()->GetZone()->GetUly();
+    }
+    else {
+        LogError("Selected '%s' without facsimile", element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Selected '" + element->GetClassName() + "' without facsimile is unsupported.");
+        return false;        
+    }
+
+    Staff *staff = dynamic_cast<Staff *>(element->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    // find closest neume
+    ListOfObjects neumes;
+    Object *neume;
+    assert(neume);
+    ClassIdComparison ac(NEUME);
+    staff->FindAllDescendantByComparison(&neumes, &ac);
+    std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
+    if (neumes.size() > 0) {
+        ClosestNeume compN;
+        compN.x = ulx;
+        compN.y = uly;
+
+        std::sort(neumesVector.begin(), neumesVector.end(), compN);
+        neume = neumesVector.at(0);
+    } 
+    else {
+        LogError("A syllable must exist in the staff to insert a '%s' into.", element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "A syllable must exist in the staff to insert a '" + element->GetClassName() + "' into.");
+        return false;
+    }
+
+    Object *syllable = neume->GetParent();
+    assert(syllable);
+
+    element->MoveItselfTo(syllable);
+    syllable->ReorderByXPos();
+    parent->ClearRelinquishedChildren();
+    parent->ReorderByXPos();
+
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    return true;   
 }
 
 bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
@@ -2990,6 +3083,12 @@ bool EditorToolkitNeume::ParseInsertAction(jsonxx::Object param, std::string *el
         if (!param.has<jsonxx::Number>("lry")) return false;
         *lry = param.get<jsonxx::Number>("lry");
     }
+    return true;
+}
+
+bool EditorToolkitNeume::ParseInsertToSyllableAction(jsonxx::Object param, std::string *elementId) {
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
     return true;
 }
 
