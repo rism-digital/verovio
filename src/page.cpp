@@ -661,7 +661,7 @@ bool Page::IsJustificationRequired(Doc *doc)
         }
         else {
             const int stavesPerSystem = m_drawingScoreDef.GetDescendantCount(STAFFDEF);
-            if (childSystems * stavesPerSystem < 8) return;
+            if (childSystems * stavesPerSystem < 8) return false;
         }
     }
     const double ratio = (double)m_drawingJustifiableHeight / (double)doc->m_drawingPageHeight;
