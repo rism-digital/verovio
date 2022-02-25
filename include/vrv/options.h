@@ -594,7 +594,6 @@ public:
     OptionBool m_mensuralToMeasure;
     OptionDbl m_midiTempoAdjustment;
     OptionDbl m_minLastJustification;
-    OptionDbl m_maxVerticalJustification;
     OptionBool m_mmOutput;
     OptionIntMap m_footer;
     OptionIntMap m_header;
@@ -658,6 +657,7 @@ public:
     OptionDbl m_justificationBracketGroup;
     OptionDbl m_justificationStaff;
     OptionDbl m_justificationSystem;
+    OptionDbl m_justificationMaxVertical;
     OptionDbl m_ledgerLineThickness;
     OptionDbl m_ledgerLineExtension;
     OptionDbl m_lyricHyphenLength;

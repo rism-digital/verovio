@@ -665,9 +665,9 @@ bool Page::IsJustificationRequired(Doc *doc)
         }
     }
     const double ratio = (double)m_drawingJustifiableHeight / (double)doc->m_drawingPageHeight;
-    if (ratio > doc->GetOptions()->m_maxVerticalJustification.GetValue()) {
+    if (ratio > doc->GetOptions()->m_justificationMaxVertical.GetValue()) {
         m_drawingJustifiableHeight
-            = doc->m_drawingPageHeight * doc->GetOptions()->m_maxVerticalJustification.GetValue();
+            = doc->m_drawingPageHeight * doc->GetOptions()->m_justificationMaxVertical.GetValue();
     }
 
     return true;

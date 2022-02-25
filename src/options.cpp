@@ -975,11 +975,6 @@ Options::Options()
     m_minLastJustification.Init(0.8, 0.0, 1.0);
     this->Register(&m_minLastJustification, "minLastJustification", &m_general);
 
-    m_maxVerticalJustification.SetInfo("Maximum ratio of justifiable height for page",
-        "Maximum ratio of justifiable height to page height that can be used for the vertical justification");
-    m_maxVerticalJustification.Init(0.3, 0.0, 1.0);
-    this->Register(&m_maxVerticalJustification, "maxVerticalJustification", &m_general);
-
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_general);
@@ -1228,6 +1223,11 @@ Options::Options()
         "Spacing brace group justification", "Space between staves inside a braced group justification");
     m_justificationBraceGroup.Init(1., 0., 10.);
     this->Register(&m_justificationBraceGroup, "justificationBraceGroup", &m_generalLayout);
+
+    m_justificationMaxVertical.SetInfo("Maximum ratio of justifiable height for page",
+        "Maximum ratio of justifiable height to page height that can be used for the vertical justification");
+    m_justificationMaxVertical.Init(0.3, 0.0, 1.0);
+    this->Register(&m_justificationMaxVertical, "justificationMaxVertical", &m_general);
 
     m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");
     m_ledgerLineThickness.Init(0.25, 0.10, 0.50);
