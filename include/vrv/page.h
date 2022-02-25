@@ -52,7 +52,7 @@ public:
     /**
      * Return the number of system (children are System object only)
      */
-    int GetSystemCount() const { return (int)GetChildren()->size(); }
+    int GetSystemCount() const { return (int)GetChildren().size(); }
 
     /**
      * @name Get and set the pixel per unit factor.
@@ -67,8 +67,10 @@ public:
      * Looks if the page is the first one or not
      */
     ///@{
-    RunningElement *GetHeader() const;
-    RunningElement *GetFooter() const;
+    RunningElement *GetHeader();
+    const RunningElement *GetHeader() const;
+    RunningElement *GetFooter();
+    const RunningElement *GetFooter() const;
     ///@}
 
     /**

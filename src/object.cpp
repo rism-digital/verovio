@@ -361,9 +361,15 @@ int Object::GetChildCount(const ClassId classId) const
     return (int)count_if(m_children.begin(), m_children.end(), ObjectComparison(classId));
 }
 
-int Object::GetChildCount(const ClassId classId, int depth)
+int Object::GetChildCount(const ClassId classId, int depth) const
 {
-    ListOfObjects objects = this->FindAllDescendantsByType(classId, true, depth);
+    ListOfConstObjects objects = this->FindAllDescendantsByType(classId, true, depth);
+    return (int)objects.size();
+}
+
+int Object::GetDescendantCount(const ClassId classId) const
+{
+    ListOfConstObjects objects = this->FindAllDescendantsByType(classId);
     return (int)objects.size();
 }
 
@@ -415,6 +421,11 @@ bool Object::HasAttribute(std::string attribute, std::string value) const
 
 Object *Object::GetFirst(const ClassId classId)
 {
+    return const_cast<Object *>(std::as_const(*this).GetFirst(classId));
+}
+
+const Object *Object::GetFirst(const ClassId classId) const
+{
     m_iteratorElementType = classId;
     m_iteratorEnd = m_children.end();
     m_iteratorCurrent = std::find_if(m_children.begin(), m_iteratorEnd, ObjectComparison(m_iteratorElementType));
@@ -423,14 +434,24 @@ Object *Object::GetFirst(const ClassId classId)
 
 Object *Object::GetNext()
 {
-    m_iteratorCurrent++;
+    return const_cast<Object *>(std::as_const(*this).GetNext());
+}
+
+const Object *Object::GetNext() const
+{
+    ++m_iteratorCurrent;
     m_iteratorCurrent = std::find_if(m_iteratorCurrent, m_iteratorEnd, ObjectComparison(m_iteratorElementType));
     return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
 }
 
 Object *Object::GetNext(const Object *child, const ClassId classId)
 {
-    ArrayOfObjects::iterator iteratorEnd, iteratorCurrent;
+    return const_cast<Object *>(std::as_const(*this).GetNext(child, classId));
+}
+
+const Object *Object::GetNext(const Object *child, const ClassId classId) const
+{
+    ArrayOfObjects::const_iterator iteratorEnd, iteratorCurrent;
     iteratorEnd = m_children.end();
     iteratorCurrent = std::find(m_children.begin(), iteratorEnd, child);
     if (iteratorCurrent != iteratorEnd) {
@@ -442,7 +463,12 @@ Object *Object::GetNext(const Object *child, const ClassId classId)
 
 Object *Object::GetPrevious(const Object *child, const ClassId classId)
 {
-    ArrayOfObjects::reverse_iterator riteratorEnd, riteratorCurrent;
+    return const_cast<Object *>(std::as_const(*this).GetPrevious(child, classId));
+}
+
+const Object *Object::GetPrevious(const Object *child, const ClassId classId) const
+{
+    ArrayOfObjects::const_reverse_iterator riteratorEnd, riteratorCurrent;
     riteratorEnd = m_children.rend();
     riteratorCurrent = std::find(m_children.rbegin(), riteratorEnd, child);
     if (riteratorCurrent != riteratorEnd) {
@@ -452,7 +478,12 @@ Object *Object::GetPrevious(const Object *child, const ClassId classId)
     return (riteratorCurrent == riteratorEnd) ? NULL : *riteratorCurrent;
 }
 
-Object *Object::GetLast(const ClassId classId) const
+Object *Object::GetLast(const ClassId classId)
+{
+    return const_cast<Object *>(std::as_const(*this).GetLast(classId));
+}
+
+const Object *Object::GetLast(const ClassId classId) const
 {
     ArrayOfObjects::const_reverse_iterator riter
         = std::find_if(m_children.rbegin(), m_children.rend(), ObjectComparison(classId));
@@ -529,7 +560,12 @@ void Object::ClearRelinquishedChildren()
     }
 }
 
-Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direction)
+Object *Object::FindDescendantByUuid(const std::string &uuid, int deepness, bool direction)
+{
+    return const_cast<Object *>(std::as_const(*this).FindDescendantByUuid(uuid, deepness, direction));
+}
+
+const Object *Object::FindDescendantByUuid(const std::string &uuid, int deepness, bool direction) const
 {
     Functor findByUuid(&Object::FindByUuid);
     FindByUuidParams findbyUuidParams;
@@ -540,11 +576,21 @@ Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direct
 
 Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction)
 {
+    return const_cast<Object *>(std::as_const(*this).FindDescendantByType(classId, deepness, direction));
+}
+
+const Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction) const
+{
     ClassIdComparison comparison(classId);
     return this->FindDescendantByComparison(&comparison, deepness, direction);
 }
 
 Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction)
+{
+    return const_cast<Object *>(std::as_const(*this).FindDescendantByComparison(comparison, deepness, direction));
+}
+
+const Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction) const
 {
     Functor findByComparison(&Object::FindByComparison);
     FindByComparisonParams findByComparisonParams(comparison);
@@ -553,6 +599,12 @@ Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness,
 }
 
 Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int deepness, bool direction)
+{
+    return const_cast<Object *>(
+        std::as_const(*this).FindDescendantExtremeByComparison(comparison, deepness, direction));
+}
+
+const Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int deepness, bool direction) const
 {
     Functor findExtremeByComparison(&Object::FindExtremeByComparison);
     FindExtremeByComparisonParams findExtremeByComparisonParams(comparison);
@@ -571,6 +623,18 @@ ListOfObjects Object::FindAllDescendantsByType(ClassId classId, bool continueDep
     return objects;
 }
 
+ListOfConstObjects Object::FindAllDescendantsByType(
+    ClassId classId, bool continueDepthSearchForMatches, int deepness) const
+{
+    ListOfConstObjects objects;
+    ClassIdComparison comparison(classId);
+    Functor findAllConstByComparison(&Object::FindAllConstByComparison);
+    FindAllConstByComparisonParams findAllConstByComparisonParams(&comparison, &objects);
+    findAllConstByComparisonParams.m_continueDepthSearchForMatches = continueDepthSearchForMatches;
+    this->Process(&findAllConstByComparison, &findAllConstByComparisonParams, NULL, NULL, deepness);
+    return objects;
+}
+
 void Object::FindAllDescendantsByComparison(
     ListOfObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear)
 {
@@ -582,8 +646,19 @@ void Object::FindAllDescendantsByComparison(
     this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction, true);
 }
 
+void Object::FindAllDescendantsByComparison(
+    ListOfConstObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear) const
+{
+    assert(objects);
+    if (clear) objects->clear();
+
+    Functor findAllConstByComparison(&Object::FindAllConstByComparison);
+    FindAllConstByComparisonParams findAllConstByComparisonParams(comparison, objects);
+    this->Process(&findAllConstByComparison, &findAllConstByComparisonParams, NULL, NULL, deepness, direction, true);
+}
+
 void Object::FindAllDescendantsBetween(
-    ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear, int depth)
+    ListOfObjects *objects, Comparison *comparison, const Object *start, const Object *end, bool clear, int depth)
 {
     assert(objects);
     if (clear) objects->clear();
@@ -593,7 +668,23 @@ void Object::FindAllDescendantsBetween(
     this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, depth, FORWARD, true);
 }
 
-Object *Object::GetChild(int idx) const
+void Object::FindAllDescendantsBetween(ListOfConstObjects *objects, Comparison *comparison, const Object *start,
+    const Object *end, bool clear, int depth) const
+{
+    assert(objects);
+    if (clear) objects->clear();
+
+    Functor findAllConstBetween(&Object::FindAllConstBetween);
+    FindAllConstBetweenParams findAllConstBetweenParams(comparison, objects, start, end);
+    this->Process(&findAllConstBetween, &findAllConstBetweenParams, NULL, NULL, depth, FORWARD, true);
+}
+
+Object *Object::GetChild(int idx)
+{
+    return const_cast<Object *>(std::as_const(*this).GetChild(idx));
+}
+
+const Object *Object::GetChild(int idx) const
 {
     if ((idx < 0) || (idx >= (int)m_children.size())) {
         return NULL;
@@ -603,13 +694,23 @@ Object *Object::GetChild(int idx) const
 
 Object *Object::GetChild(int idx, const ClassId classId)
 {
-    ListOfObjects objects = this->FindAllDescendantsByType(classId, true, 1);
+    return const_cast<Object *>(std::as_const(*this).GetChild(idx, classId));
+}
+
+const Object *Object::GetChild(int idx, const ClassId classId) const
+{
+    ListOfConstObjects objects = this->FindAllDescendantsByType(classId, true, 1);
     if ((idx < 0) || (idx >= (int)objects.size())) {
         return NULL;
     }
-    ListOfObjects::iterator it = objects.begin();
+    ListOfConstObjects::iterator it = objects.begin();
     std::advance(it, idx);
     return *it;
+}
+
+ArrayOfConstObjects Object::GetChildren() const
+{
+    return ArrayOfConstObjects(m_children.begin(), m_children.end());
 }
 
 bool Object::DeleteChild(Object *child)
@@ -701,9 +802,9 @@ void Object::ResetCachedDrawingY() const
     }
 }
 
-int Object::GetChildIndex(const Object *child)
+int Object::GetChildIndex(const Object *child) const
 {
-    ArrayOfObjects::iterator iter;
+    ArrayOfObjects::const_iterator iter;
     int i;
     for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, ++i) {
         if (child == *iter) {
@@ -740,7 +841,7 @@ void Object::FillFlatList(ArrayOfObjects *flatList)
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
 
-ListOfObjects Object::GetAncestors() const
+ListOfObjects Object::GetAncestors()
 {
     ListOfObjects ancestors;
     Object *object = m_parent;
@@ -751,7 +852,23 @@ ListOfObjects Object::GetAncestors() const
     return ancestors;
 }
 
-Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
+ListOfConstObjects Object::GetAncestors() const
+{
+    ListOfConstObjects ancestors;
+    const Object *object = m_parent;
+    while (object) {
+        ancestors.push_back(object);
+        object = object->m_parent;
+    }
+    return ancestors;
+}
+
+Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth)
+{
+    return const_cast<Object *>(std::as_const(*this).GetFirstAncestor(classId, maxDepth));
+}
+
+const Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
@@ -765,7 +882,12 @@ Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
     }
 }
 
-Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
+Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth)
+{
+    return const_cast<Object *>(std::as_const(*this).GetFirstAncestorInRange(classIdMin, classIdMax, maxDepth));
+}
+
+const Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
@@ -828,47 +950,8 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         return;
     }
 
-    bool processChildren = true;
-    if (functor->m_visibleOnly) {
-        if (this->IsEditorialElement()) {
-            EditorialElement *editorialElement = vrv_cast<EditorialElement *>(this);
-            assert(editorialElement);
-            if (editorialElement->m_visibility == Hidden) {
-                processChildren = false;
-            }
-        }
-        else if (this->Is(MDIV)) {
-            Mdiv *mdiv = vrv_cast<Mdiv *>(this);
-            assert(mdiv);
-            if (mdiv->m_visibility == Hidden) {
-                processChildren = false;
-            }
-        }
-        else if (this->IsSystemElement()) {
-            SystemElement *systemElement = vrv_cast<SystemElement *>(this);
-            assert(systemElement);
-            if (systemElement->m_visibility == Hidden) {
-                processChildren = false;
-            }
-        }
-    }
-
-    // When we are starting a new Score, we need to update to Doc current ScoreDef
-    if (direction == FORWARD && this->Is(SCORE)) {
-        Score *score = vrv_cast<Score *>(this);
-        assert(score);
-        score->SetAsCurrent();
-    }
-    // We need to do the same in backward direction through the PageMilestoneEnd::m_start
-    else if (direction == BACKWARD && this->Is(PAGE_MILESTONE_END)) {
-        PageMilestoneEnd *elementEnd = vrv_cast<PageMilestoneEnd *>(this);
-        assert(elementEnd);
-        if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
-            Score *score = vrv_cast<Score *>(elementEnd->GetStart());
-            assert(score);
-            score->SetAsCurrent();
-        }
-    }
+    // Update the current score stored in the document
+    this->UpdateDocumentScore(direction);
 
     if (!skipFirst) {
         functor->Call(this, functorParams);
@@ -889,35 +972,13 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
     deepness--;
 
-    if (processChildren) {
-        auto filterPredicate = [filters](Object *iter) -> bool {
-            if (filters && !filters->empty()) {
-                // first we look if there is a comparison object for the object type (e.g., a Staff)
-                ClassId classId = iter->m_classId;
-                ArrayOfComparisons::iterator comparisonIter
-                    = std::find_if(filters->begin(), filters->end(), [classId](Comparison *iter) -> bool {
-                          ClassIdComparison *attComparison = vrv_cast<ClassIdComparison *>(iter);
-                          assert(attComparison);
-                          return classId == attComparison->GetType();
-                      });
-
-                if (comparisonIter != filters->end()) {
-                    // use the operator of the Comparison object to evaluate the attribute
-                    if (!(**comparisonIter)(iter)) {
-                        // the attribute value doesn't match
-                        return false;
-                    }
-                }
-            }
-            return true;
-        };
-
+    if (!this->SkipChildren(functor)) {
         // We need a pointer to the array for the option to work on a reversed copy
         ArrayOfObjects *children = &m_children;
         if (direction == BACKWARD) {
             for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
-                if (filterPredicate(*iter)) {
+                if (this->FiltersApply(filters, *iter)) {
                     (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
                 }
             }
@@ -925,7 +986,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         else {
             for (ArrayOfObjects::iterator iter = children->begin(); iter != children->end(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
-                if (filterPredicate(*iter)) {
+                if (this->FiltersApply(filters, *iter)) {
                     (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
                 }
             }
@@ -935,8 +996,124 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     if (endFunctor && !skipFirst) {
         endFunctor->Call(this, functorParams);
     }
+}
 
-    skipFirst = false;
+void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
+    int deepness, bool direction, bool skipFirst) const
+{
+    if (functor->m_returnCode == FUNCTOR_STOP) {
+        return;
+    }
+
+    // Update the current score stored in the document
+    const_cast<Object *>(this)->UpdateDocumentScore(direction);
+
+    if (!skipFirst) {
+        functor->Call(this, functorParams);
+    }
+
+    // do not go any deeper in this case
+    if (functor->m_returnCode == FUNCTOR_SIBLINGS) {
+        functor->m_returnCode = FUNCTOR_CONTINUE;
+        return;
+    }
+    else if (this->IsEditorialElement()) {
+        // since editorial object doesn't count, we increase the deepness limit
+        deepness++;
+    }
+    if (deepness == 0) {
+        // any need to change the functor m_returnCode?
+        return;
+    }
+    deepness--;
+
+    if (!this->SkipChildren(functor)) {
+        // We need a pointer to the array for the option to work on a reversed copy
+        const ArrayOfObjects *children = &m_children;
+        if (direction == BACKWARD) {
+            for (ArrayOfObjects::const_reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
+                // we will end here if there is no filter at all or for the current child type
+                if (this->FiltersApply(filters, *iter)) {
+                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+                }
+            }
+        }
+        else {
+            for (ArrayOfObjects::const_iterator iter = children->begin(); iter != children->end(); ++iter) {
+                // we will end here if there is no filter at all or for the current child type
+                if (this->FiltersApply(filters, *iter)) {
+                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+                }
+            }
+        }
+    }
+
+    if (endFunctor && !skipFirst) {
+        endFunctor->Call(this, functorParams);
+    }
+}
+
+void Object::UpdateDocumentScore(bool direction)
+{
+    // When we are starting a new score, we need to update the current score in the document
+    if (direction == FORWARD && this->Is(SCORE)) {
+        Score *score = vrv_cast<Score *>(this);
+        assert(score);
+        score->SetAsCurrent();
+    }
+    // We need to do the same in backward direction through the PageMilestoneEnd::m_start
+    else if (direction == BACKWARD && this->Is(PAGE_MILESTONE_END)) {
+        PageMilestoneEnd *elementEnd = vrv_cast<PageMilestoneEnd *>(this);
+        assert(elementEnd);
+        if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
+            Score *score = vrv_cast<Score *>(elementEnd->GetStart());
+            assert(score);
+            score->SetAsCurrent();
+        }
+    }
+}
+
+bool Object::SkipChildren(Functor *functor) const
+{
+    if (functor->m_visibleOnly) {
+        if (this->IsEditorialElement()) {
+            const EditorialElement *editorialElement = vrv_cast<const EditorialElement *>(this);
+            assert(editorialElement);
+            if (editorialElement->m_visibility == Hidden) {
+                return true;
+            }
+        }
+        else if (this->Is(MDIV)) {
+            const Mdiv *mdiv = vrv_cast<const Mdiv *>(this);
+            assert(mdiv);
+            if (mdiv->m_visibility == Hidden) {
+                return true;
+            }
+        }
+        else if (this->IsSystemElement()) {
+            const SystemElement *systemElement = vrv_cast<const SystemElement *>(this);
+            assert(systemElement);
+            if (systemElement->m_visibility == Hidden) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Object::FiltersApply(const ArrayOfComparisons *filters, Object *object) const
+{
+    if (filters) {
+        return std::all_of(filters->begin(), filters->end(), [object](Comparison *iter) {
+            // ignore any class comparison which does not match the object class
+            ClassIdComparison *cmp = dynamic_cast<ClassIdComparison *>(iter);
+            if (!cmp || (cmp->GetType() != object->m_classId)) {
+                return true;
+            }
+            return (*iter)(object);
+        });
+    }
+    return true;
 }
 
 int Object::Save(Output *output)
@@ -1061,20 +1238,20 @@ bool Object::sortByUlx(Object *a, Object *b)
     return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
 }
 
-bool Object::IsPreOrdered(Object *left, Object *right)
+bool Object::IsPreOrdered(const Object *left, const Object *right)
 {
-    ListOfObjects ancestorsLeft = left->GetAncestors();
+    ListOfConstObjects ancestorsLeft = left->GetAncestors();
     ancestorsLeft.push_front(left);
     // Check if right is an ancestor of left
     if (std::find(ancestorsLeft.begin(), ancestorsLeft.end(), right) != ancestorsLeft.end()) return false;
-    ListOfObjects ancestorsRight = right->GetAncestors();
+    ListOfConstObjects ancestorsRight = right->GetAncestors();
     ancestorsRight.push_front(right);
     // Check if left is an ancestor of right
     if (std::find(ancestorsRight.begin(), ancestorsRight.end(), left) != ancestorsRight.end()) return true;
 
     // Now there must be mismatches since we included left and right into the ancestor lists above
     auto iterPair = std::mismatch(ancestorsLeft.rbegin(), ancestorsLeft.rend(), ancestorsRight.rbegin());
-    Object *commonParent = (*iterPair.first)->m_parent;
+    const Object *commonParent = (*iterPair.first)->m_parent;
     if (commonParent) {
         return (commonParent->GetChildIndex(*iterPair.first) < commonParent->GetChildIndex(*iterPair.second));
     }
@@ -1248,6 +1425,7 @@ Functor::Functor()
     m_returnCode = FUNCTOR_CONTINUE;
     m_visibleOnly = true;
     obj_fpt = NULL;
+    const_obj_fpt = NULL;
 }
 
 Functor::Functor(int (Object::*_obj_fpt)(FunctorParams *))
@@ -1255,12 +1433,34 @@ Functor::Functor(int (Object::*_obj_fpt)(FunctorParams *))
     m_returnCode = FUNCTOR_CONTINUE;
     m_visibleOnly = true;
     obj_fpt = _obj_fpt;
+    const_obj_fpt = NULL;
+}
+
+Functor::Functor(int (Object::*_const_obj_fpt)(FunctorParams *) const)
+{
+    m_returnCode = FUNCTOR_CONTINUE;
+    m_visibleOnly = true;
+    obj_fpt = NULL;
+    const_obj_fpt = _const_obj_fpt;
 }
 
 void Functor::Call(Object *ptr, FunctorParams *functorParams)
 {
-    // we should have return codes (not just bool) for avoiding to go further down the tree in some cases
-    m_returnCode = (*ptr.*obj_fpt)(functorParams);
+    if (const_obj_fpt) {
+        m_returnCode = (ptr->*const_obj_fpt)(functorParams);
+    }
+    else {
+        m_returnCode = (ptr->*obj_fpt)(functorParams);
+    }
+}
+
+void Functor::Call(const Object *ptr, FunctorParams *functorParams)
+{
+    if (!const_obj_fpt && obj_fpt) {
+        LogError("Non-const functor cannot be called from a const method!");
+        assert(false);
+    }
+    m_returnCode = (ptr->*const_obj_fpt)(functorParams);
 }
 
 //----------------------------------------------------------------------------
@@ -1337,7 +1537,7 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByUuid(FunctorParams *functorParams)
+int Object::FindByUuid(FunctorParams *functorParams) const
 {
     FindByUuidParams *params = vrv_params_cast<FindByUuidParams *>(functorParams);
     assert(params);
@@ -1356,7 +1556,7 @@ int Object::FindByUuid(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByComparison(FunctorParams *functorParams)
+int Object::FindByComparison(FunctorParams *functorParams) const
 {
     FindByComparisonParams *params = vrv_params_cast<FindByComparisonParams *>(functorParams);
     assert(params);
@@ -1376,7 +1576,7 @@ int Object::FindByComparison(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindExtremeByComparison(FunctorParams *functorParams)
+int Object::FindExtremeByComparison(FunctorParams *functorParams) const
 {
     FindExtremeByComparisonParams *params = vrv_params_cast<FindExtremeByComparisonParams *>(functorParams);
     assert(params);
@@ -1405,9 +1605,54 @@ int Object::FindAllByComparison(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Object::FindAllConstByComparison(FunctorParams *functorParams) const
+{
+    FindAllConstByComparisonParams *params = vrv_params_cast<FindAllConstByComparisonParams *>(functorParams);
+    assert(params);
+
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
+        params->m_elements->push_back(this);
+        if (!params->m_continueDepthSearchForMatches) {
+            return FUNCTOR_SIBLINGS;
+        }
+    }
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
 int Object::FindAllBetween(FunctorParams *functorParams)
 {
     FindAllBetweenParams *params = vrv_params_cast<FindAllBetweenParams *>(functorParams);
+    assert(params);
+
+    // We are reaching the start of the range
+    if (params->m_start == this) {
+        // Setting the start to NULL indicates that we are in the range
+        params->m_start = NULL;
+    }
+    // We have not reached the start yet
+    else if (params->m_start) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
+        params->m_elements->push_back(this);
+    }
+
+    // We have reached the end of the range
+    if (params->m_end == this) {
+        return FUNCTOR_STOP;
+    }
+
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::FindAllConstBetween(FunctorParams *functorParams) const
+{
+    FindAllConstBetweenParams *params = vrv_params_cast<FindAllConstBetweenParams *>(functorParams);
     assert(params);
 
     // We are reaching the start of the range

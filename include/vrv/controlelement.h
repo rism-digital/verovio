@@ -47,7 +47,7 @@ public:
     /**
      * Check if the ControlElement has a Rend child and return its @halign equivalent (if any)
      */
-    data_HORIZONTALALIGNMENT GetChildRendAlignment();
+    data_HORIZONTALALIGNMENT GetChildRendAlignment() const;
 
     /**
      * Check if the ControlElement applies at a point where there is more than on layer.

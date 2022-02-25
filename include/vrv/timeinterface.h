@@ -47,6 +47,7 @@ public:
     ///@{
     void SetStart(LayerElement *start);
     LayerElement *GetStart() { return m_start; }
+    const LayerElement *GetStart() const { return m_start; }
     ///@}
 
     /**
@@ -62,7 +63,7 @@ public:
     /**
      * Return true if a start is given (@startid or @tstamp)
      */
-    bool HasStart() { return (m_start); }
+    bool HasStart() const { return (m_start); }
 
     /**
      * Return the start measure of the TimePointInterface
@@ -151,6 +152,7 @@ public:
     ///@{
     void SetEnd(LayerElement *end);
     LayerElement *GetEnd() { return m_end; }
+    const LayerElement *GetEnd() const { return m_end; }
     ///@}
 
     /**
@@ -161,7 +163,7 @@ public:
     /**
      *
      */
-    bool HasStartAndEnd() { return (m_start && m_end); }
+    bool HasStartAndEnd() const { return (m_start && m_end); }
 
     /**
      * Return the end measure of the TimePointInterface

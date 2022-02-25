@@ -1619,7 +1619,7 @@ const ArrayOfBeamElementCoords *Beam::GetElementCoords()
     return &m_beamElementCoords;
 }
 
-bool Beam::IsTabBeam()
+bool Beam::IsTabBeam() const
 {
     return (this->FindDescendantByType(TABGRP));
 }

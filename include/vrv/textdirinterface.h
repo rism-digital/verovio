@@ -38,7 +38,7 @@ public:
     /**
      * Return the number of lines in the text object by counting <lb> children
      */
-    int GetNumberOfLines(Object *object);
+    int GetNumberOfLines(const Object *object) const;
 
 private:
     //

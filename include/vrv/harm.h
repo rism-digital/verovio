@@ -61,9 +61,9 @@ public:
     /**
      * Transposition related. The int tracks where we have iterated through the string.
      */
-    bool GetRootPitch(TransPitch &pitch, unsigned int &pos);
+    bool GetRootPitch(TransPitch &pitch, unsigned int &pos) const;
     void SetRootPitch(const TransPitch &pitch, unsigned int endPos);
-    bool GetBassPitch(TransPitch &pitch);
+    bool GetBassPitch(TransPitch &pitch) const;
     void SetBassPitch(const TransPitch &pitch);
 
     //----------//

@@ -402,28 +402,28 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(
     return layerElementsInTimeSpanParams.m_elements;
 }
 
-Clef *Layer::GetCurrentClef() const
+Clef *Layer::GetCurrentClef()
 {
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff && staff->m_drawingStaffDef && staff->m_drawingStaffDef->GetCurrentClef());
     return staff->m_drawingStaffDef->GetCurrentClef();
 }
 
-KeySig *Layer::GetCurrentKeySig() const
+KeySig *Layer::GetCurrentKeySig()
 {
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff && staff->m_drawingStaffDef);
     return staff->m_drawingStaffDef->GetCurrentKeySig();
 }
 
-Mensur *Layer::GetCurrentMensur() const
+Mensur *Layer::GetCurrentMensur()
 {
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff && staff->m_drawingStaffDef);
     return staff->m_drawingStaffDef->GetCurrentMensur();
 }
 
-MeterSig *Layer::GetCurrentMeterSig() const
+MeterSig *Layer::GetCurrentMeterSig()
 {
     Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff && staff->m_drawingStaffDef);

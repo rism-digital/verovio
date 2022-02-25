@@ -52,7 +52,7 @@ public:
      * Get steps between calling object and parameter.
      * Returns calling pitch minus parameter pitch.
      */
-    int PitchDifferenceTo(PitchInterface *pi);
+    int PitchDifferenceTo(const PitchInterface *pi) const;
 
     /**
      * adjust the pitch value so that it stays in the same x,y position

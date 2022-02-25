@@ -176,15 +176,15 @@ void Note::AddChild(Object *child)
 
     child->SetParent(this);
 
-    ArrayOfObjects *children = this->GetChildrenForModification();
+    ArrayOfObjects &children = this->GetChildrenForModification();
 
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is({ DOTS, STEM })) {
-        children->insert(children->begin(), child);
+        children.insert(children.begin(), child);
     }
     else {
-        children->push_back(child);
+        children.push_back(child);
     }
     Modify();
 }
@@ -201,11 +201,15 @@ void Note::AlignDotsShift(Note *otherNote)
 
 Accid *Note::GetDrawingAccid()
 {
-    Accid *accid = dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
-    return accid;
+    return dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
 }
 
-bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
+const Accid *Note::GetDrawingAccid() const
+{
+    return dynamic_cast<const Accid *>(this->FindDescendantByType(ACCID));
+}
+
+bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
 {
     if (!staff) {
         staff = this->GetAncestorStaff();
@@ -220,14 +224,19 @@ bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
     return ((linesAbove > 0) || (linesBelow > 0));
 }
 
-Chord *Note::IsChordTone() const
+Chord *Note::IsChordTone()
 {
     return dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
+const Chord *Note::IsChordTone() const
+{
+    return dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+}
+
 int Note::GetDrawingDur() const
 {
-    Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    const Chord *chordParent = dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chordParent && !this->HasDur()) {
         return chordParent->GetActualDur();
     }
@@ -246,9 +255,14 @@ bool Note::IsClusterExtreme() const
         return false;
 }
 
-TabGrp *Note::IsTabGrpNote() const
+TabGrp *Note::IsTabGrpNote()
 {
     return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+}
+
+const TabGrp *Note::IsTabGrpNote() const
+{
+    return dynamic_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
 std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
@@ -454,7 +468,7 @@ wchar_t Note::GetMensuralNoteheadGlyph() const
         return 0;
     }
 
-    Staff *staff = this->GetAncestorStaff();
+    const Staff *staff = this->GetAncestorStaff();
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     wchar_t code = 0;
@@ -535,7 +549,7 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
     return SMUFL_E0A4_noteheadBlack;
 }
 
-bool Note::IsVisible() const
+bool Note::IsVisible()
 {
     if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;

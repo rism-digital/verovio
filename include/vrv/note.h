@@ -114,6 +114,7 @@ public:
      */
     ///@{
     Accid *GetDrawingAccid();
+    const Accid *GetDrawingAccid() const;
     ///@}
 
     /**
@@ -131,13 +132,14 @@ public:
      * Otherwise, it will look for the Staff ancestor.
      * Set the value of ledger lines above or below.
      */
-    bool HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff = NULL);
+    bool HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff = NULL) const;
 
     /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
-    Chord *IsChordTone() const;
+    Chord *IsChordTone();
+    const Chord *IsChordTone() const;
     int GetDrawingDur() const;
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
@@ -145,7 +147,10 @@ public:
     /**
      * Return the parent TabGrp is the note is part of one.
      */
-    TabGrp *IsTabGrpNote() const;
+    ///@{
+    TabGrp *IsTabGrpNote();
+    const TabGrp *IsTabGrpNote() const;
+    ///@}
 
     /**
      * @name Return the smufl string to use for a note give the notation type
@@ -209,7 +214,7 @@ public:
     /**
      * Check if a note or its parent chord are visible
      */
-    bool IsVisible() const;
+    bool IsVisible();
 
     /**
      * MIDI pitch

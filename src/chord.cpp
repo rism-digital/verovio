@@ -157,16 +157,16 @@ void Chord::AddChild(Object *child)
         return;
     }
 
-    ArrayOfObjects *children = this->GetChildrenForModification();
+    ArrayOfObjects &children = this->GetChildrenForModification();
 
     child->SetParent(this);
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is({ DOTS, STEM })) {
-        children->insert(children->begin(), child);
+        children.insert(children.begin(), child);
     }
     else {
-        children->push_back(child);
+        children.push_back(child);
     }
     Modify();
 }

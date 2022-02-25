@@ -35,7 +35,7 @@ void PgFoot2::Reset()
     RunningElement::Reset();
 }
 
-int PgFoot2::GetTotalHeight(Doc *doc)
+int PgFoot2::GetTotalHeight(const Doc *doc) const
 {
     assert(doc);
 

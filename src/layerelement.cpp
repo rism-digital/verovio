@@ -160,38 +160,38 @@ LayerElement *LayerElement::ThisOrSameasAsLink()
     return dynamic_cast<LayerElement *>(this->GetSameasLink());
 }
 
-bool LayerElement::IsGraceNote()
+bool LayerElement::IsGraceNote() const
 {
     // First, regardless of the type, check whether it's part of GRACEGRP
     if (this->GetFirstAncestor(GRACEGRP)) return true;
     // For note, we need to look at it or at the parent chord
     if (this->Is(NOTE)) {
-        Note const *note = vrv_cast<Note const *>(this);
+        const Note *note = vrv_cast<const Note *>(this);
         assert(note);
-        Chord *chord = note->IsChordTone();
+        const Chord *chord = note->IsChordTone();
         if (chord)
             return chord->HasGrace();
         else
             return (note->HasGrace());
     }
     else if (this->Is(CHORD)) {
-        Chord const *chord = vrv_cast<Chord const *>(this);
+        const Chord *chord = vrv_cast<const Chord *>(this);
         assert(chord);
         return (chord->HasGrace());
     }
     else if (this->Is(TUPLET)) {
         ClassIdsComparison matchType({ NOTE, CHORD });
         ArrayOfObjects children;
-        LayerElement *child = dynamic_cast<LayerElement *>(this->FindDescendantByComparison(&matchType));
+        const LayerElement *child = dynamic_cast<const LayerElement *>(this->FindDescendantByComparison(&matchType));
         if (child) return child->IsGraceNote();
     }
     // For accid, artic, etc.. look at the parent note / chord
     else {
         // For an accid we expect to be the child of a note - the note will lookup at the chord parent in necessary
-        Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
+        const Note *note = dynamic_cast<const Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) return note->IsGraceNote();
         // For an artic we can be direct child of a chord
-        Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_ACCID_DEPTH));
+        const Chord *chord = dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_ACCID_DEPTH));
         if (chord) return chord->IsGraceNote();
     }
     return false;
@@ -255,19 +255,29 @@ bool LayerElement::IsInBeamSpan() const
     return m_isInBeamspan;
 }
 
-Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence) const
+Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence)
 {
-    Staff *staff = NULL;
+    return const_cast<Staff *>(std::as_const(*this).GetAncestorStaff(strategy, assertExistence));
+}
+
+const Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence) const
+{
+    const Staff *staff = NULL;
     if (strategy == RESOLVE_CROSS_STAFF) {
         Layer *layer = NULL;
         staff = this->GetCrossStaff(layer);
     }
-    if (!staff) staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    if (!staff) staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
     if (assertExistence) assert(staff);
     return staff;
 }
 
-Staff *LayerElement::GetCrossStaff(Layer *&layer) const
+Staff *LayerElement::GetCrossStaff(Layer *&layer)
+{
+    return const_cast<Staff *>(std::as_const(*this).GetCrossStaff(layer));
+}
+
+const Staff *LayerElement::GetCrossStaff(Layer *&layer) const
 {
     if (m_crossStaff) {
         assert(m_crossLayer);
@@ -275,8 +285,8 @@ Staff *LayerElement::GetCrossStaff(Layer *&layer) const
         return m_crossStaff;
     }
 
-    LayerElement *parent
-        = dynamic_cast<LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
+    const LayerElement *parent
+        = dynamic_cast<const LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
 
     if (parent) return parent->GetCrossStaff(layer);
 
@@ -355,7 +365,7 @@ int LayerElement::GetDrawingX() const
 {
     // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingX
     if (this->HasFacs()) {
-        Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingX();
@@ -370,22 +380,22 @@ int LayerElement::GetDrawingX() const
     if (!m_alignment) {
         // assert(this->Is({ BEAM, FTREM, TUPLET }));
         // Here we just get the measure position - no cast to Measure is necessary
-        Object *measure = this->GetFirstAncestor(MEASURE);
+        const Object *measure = this->GetFirstAncestor(MEASURE);
         assert(measure);
         m_cachedDrawingX = measure->GetDrawingX();
         return m_cachedDrawingX;
     }
 
     // First get the first layerElement parent (if any) and use its position if they share the same alignment
-    LayerElement *parent
-        = dynamic_cast<LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
+    const LayerElement *parent
+        = dynamic_cast<const LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
     if (parent && (parent->GetAlignment() == this->GetAlignment())) {
         m_cachedDrawingX = (parent->GetDrawingX() + this->GetDrawingXRel());
         return m_cachedDrawingX;
     }
 
     // Otherwise get the measure - no cast to Measure is necessary
-    Object *measure = this->GetFirstAncestor(MEASURE);
+    const Object *measure = this->GetFirstAncestor(MEASURE);
     assert(measure);
 
     int graceNoteShift = 0;
@@ -403,7 +413,7 @@ int LayerElement::GetDrawingY() const
 {
     // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingY
     if (this->HasFacs()) {
-        Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingY();
@@ -413,7 +423,7 @@ int LayerElement::GetDrawingY() const
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
     // Look if we have a crossStaff situation
-    Object *object = m_crossStaff; // GetCrossStaff();
+    const Object *object = m_crossStaff; // GetCrossStaff();
     // First get the first layerElement parent (if any) but only if the element is not directly relative to staff
     // (e.g. artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
@@ -693,7 +703,7 @@ double LayerElement::GetAlignmentDuration(
 }
 
 double LayerElement::GetSameAsContentAlignmentDuration(
-    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
 {
     if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
@@ -706,7 +716,7 @@ double LayerElement::GetSameAsContentAlignmentDuration(
 }
 
 double LayerElement::GetContentAlignmentDuration(
-    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
 {
     if (!this->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
@@ -714,7 +724,7 @@ double LayerElement::GetContentAlignmentDuration(
 
     double duration = 0.0;
 
-    for (auto child : *this->GetChildren()) {
+    for (auto child : this->GetChildren()) {
         // Skip everything that does not have a duration interface and notes in chords
         if (!child->HasInterface(INTERFACE_DURATION) || (child->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH) != NULL)) {
             continue;
@@ -1996,7 +2006,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     }
     // For note, we also need to look at the parent chord
     else if (this->Is(NOTE)) {
-        Note const *note = vrv_cast<Note const *>(this);
+        Note *note = vrv_cast<Note *>(this);
         assert(note);
         Chord *chord = note->IsChordTone();
         if (chord) m_drawingCueSize = chord->GetDrawingCueSize();
@@ -2010,7 +2020,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     }
     // For accid, look at the parent if @func="edit" or otherwise to the parent note
     else if (this->Is(ACCID)) {
-        Accid const *accid = vrv_cast<Accid *>(this);
+        Accid *accid = vrv_cast<Accid *>(this);
         assert(accid);
         if (accid->GetFunc() == accidLog_FUNC_edit)
             m_drawingCueSize = true;

@@ -1359,7 +1359,7 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the attComparision text
+ * member 0: the comparison object
  * member 1: an array of all matching objects
  * member 2: the start object range
  * member 3: the end object range
@@ -1367,7 +1367,7 @@ public:
 
 class FindAllBetweenParams : public FunctorParams {
 public:
-    FindAllBetweenParams(Comparison *comparison, ListOfObjects *elements, Object *start, Object *end)
+    FindAllBetweenParams(Comparison *comparison, ListOfObjects *elements, const Object *start, const Object *end)
     {
         m_comparison = comparison;
         m_elements = elements;
@@ -1376,8 +1376,35 @@ public:
     }
     Comparison *m_comparison;
     ListOfObjects *m_elements;
-    Object *m_start;
-    Object *m_end;
+    const Object *m_start;
+    const Object *m_end;
+};
+
+//----------------------------------------------------------------------------
+// FindAllConstBetweenParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the comparison object
+ * member 1: an array of all matching objects
+ * member 2: the start object range
+ * member 3: the end object range
+ **/
+
+class FindAllConstBetweenParams : public FunctorParams {
+public:
+    FindAllConstBetweenParams(
+        Comparison *comparison, ListOfConstObjects *elements, const Object *start, const Object *end)
+    {
+        m_comparison = comparison;
+        m_elements = elements;
+        m_start = start;
+        m_end = end;
+    }
+    Comparison *m_comparison;
+    ListOfConstObjects *m_elements;
+    const Object *m_start;
+    const Object *m_end;
 };
 
 //----------------------------------------------------------------------------
@@ -1405,7 +1432,7 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the attComparision text
+ * member 0: the comparison object
  * member 1: an array of all matching objects
  * member 2: flag indicating whether descendants of matches should be searched as well
  **/
@@ -1420,6 +1447,29 @@ public:
     }
     Comparison *m_comparison;
     ListOfObjects *m_elements;
+    bool m_continueDepthSearchForMatches;
+};
+
+//----------------------------------------------------------------------------
+// FindAllConstByComparisonParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the comparison object
+ * member 1: an array of all matching objects
+ * member 2: flag indicating whether descendants of matches should be searched as well
+ **/
+
+class FindAllConstByComparisonParams : public FunctorParams {
+public:
+    FindAllConstByComparisonParams(Comparison *comparison, ListOfConstObjects *elements)
+    {
+        m_comparison = comparison;
+        m_elements = elements;
+        m_continueDepthSearchForMatches = true;
+    }
+    Comparison *m_comparison;
+    ListOfConstObjects *m_elements;
     bool m_continueDepthSearchForMatches;
 };
 
@@ -1440,7 +1490,7 @@ public:
         m_element = NULL;
     }
     Comparison *m_comparison;
-    Object *m_element;
+    const Object *m_element;
 };
 
 //----------------------------------------------------------------------------
@@ -1456,7 +1506,7 @@ class FindByUuidParams : public FunctorParams {
 public:
     FindByUuidParams() { m_element = NULL; }
     std::string m_uuid;
-    Object *m_element;
+    const Object *m_element;
 };
 
 //----------------------------------------------------------------------------
@@ -1498,7 +1548,7 @@ public:
         m_element = NULL;
     }
     Comparison *m_comparison;
-    Object *m_element;
+    const Object *m_element;
 };
 
 //----------------------------------------------------------------------------

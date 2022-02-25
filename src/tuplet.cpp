@@ -126,15 +126,15 @@ void Tuplet::AddChild(Object *child)
 
     child->SetParent(this);
 
-    ArrayOfObjects *children = this->GetChildrenForModification();
+    ArrayOfObjects &children = this->GetChildrenForModification();
 
     // Num and bracket are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is({ TUPLET_BRACKET, TUPLET_NUM })) {
-        children->insert(children->begin(), child);
+        children.insert(children.begin(), child);
     }
     else {
-        children->push_back(child);
+        children.push_back(child);
     }
 
     Modify();

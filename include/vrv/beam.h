@@ -287,7 +287,7 @@ public:
      * Return true if the beam has a tabGrp child.
      * In that case, the ObjectList will only have tabGrp elements. See Beam::FilterList
      */
-    bool IsTabBeam();
+    bool IsTabBeam() const;
 
     /**
      * @name Checker, getter and setter for a beam with which the stems are shared

@@ -79,16 +79,21 @@ bool Page::IsSupportedChild(Object *child)
     return true;
 }
 
-RunningElement *Page::GetHeader() const
+RunningElement *Page::GetHeader()
+{
+    return const_cast<RunningElement *>(std::as_const(*this).GetHeader());
+}
+
+const RunningElement *Page::GetHeader() const
 {
     assert(m_score);
 
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
         return NULL;
     }
 
-    Pages *pages = doc->GetPages();
+    const Pages *pages = doc->GetPages();
     assert(pages);
 
     // first page or use the pgHeader for all pages?
@@ -100,16 +105,21 @@ RunningElement *Page::GetHeader() const
     }
 }
 
-RunningElement *Page::GetFooter() const
+RunningElement *Page::GetFooter()
+{
+    return const_cast<RunningElement *>(std::as_const(*this).GetFooter());
+}
+
+const RunningElement *Page::GetFooter() const
 {
     assert(m_scoreEnd);
 
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
         return NULL;
     }
 
-    Pages *pages = doc->GetPages();
+    const Pages *pages = doc->GetPages();
     assert(pages);
 
     // first page or use the pgFooter for all pages?
@@ -626,7 +636,7 @@ void Page::JustifyVertically()
             }
         }
         else {
-            const int stavesPerSystem = m_drawingScoreDef.GetChildCount(STAFFDEF, UNLIMITED_DEPTH);
+            const int stavesPerSystem = m_drawingScoreDef.GetDescendantCount(STAFFDEF);
             if (childSystems * stavesPerSystem < 8) return;
         }
     }
@@ -668,7 +678,7 @@ void Page::LayOutPitchPos()
 
 int Page::GetContentHeight() const
 {
-    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -679,7 +689,7 @@ int Page::GetContentHeight() const
         return 0;
     }
 
-    System *last = dynamic_cast<System *>(this->GetLast(SYSTEM));
+    const System *last = dynamic_cast<const System *>(this->GetLast(SYSTEM));
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
@@ -692,7 +702,7 @@ int Page::GetContentHeight() const
 
 int Page::GetContentWidth() const
 {
-    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
     // in non debug
     if (!doc) return 0;
@@ -702,8 +712,8 @@ int Page::GetContentWidth() const
     assert(this == doc->GetDrawingPage());
 
     int maxWidth = 0;
-    for (auto &child : *this->GetChildren()) {
-        System *system = dynamic_cast<System *>(child);
+    for (auto child : this->GetChildren()) {
+        const System *system = dynamic_cast<const System *>(child);
         if (system) {
             // we include the left margin and the right margin
             int systemWidth = system->m_drawingTotalWidth + system->m_systemLeftMar + system->m_systemRightMar;

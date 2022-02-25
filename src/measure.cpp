@@ -188,17 +188,17 @@ void Measure::AddChildBack(Object *child)
     }
 
     child->SetParent(this);
-    ArrayOfObjects *children = this->GetChildrenForModification();
-    if (children->empty()) {
-        children->push_back(child);
+    ArrayOfObjects &children = this->GetChildrenForModification();
+    if (children.empty()) {
+        children.push_back(child);
     }
-    else if (children->back()->Is(STAFF)) {
-        children->push_back(child);
+    else if (children.back()->Is(STAFF)) {
+        children.push_back(child);
     }
     else {
-        for (auto it = children->begin(); it != children->end(); ++it) {
+        for (auto it = children.begin(); it != children.end(); ++it) {
             if (!(*it)->Is(STAFF)) {
-                children->insert(it, child);
+                children.insert(it, child);
                 break;
             }
         }
@@ -209,7 +209,7 @@ void Measure::AddChildBack(Object *child)
 int Measure::GetDrawingX() const
 {
     if (!this->IsMeasuredMusic()) {
-        System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+        const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
         if (system->m_yAbs != VRV_UNSET) {
             return (system->m_systemLeftMar);
@@ -220,7 +220,7 @@ int Measure::GetDrawingX() const
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
-    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     m_cachedDrawingX = system->GetDrawingX() + this->GetDrawingXRel();
     return m_cachedDrawingX;
@@ -325,10 +325,10 @@ int Measure::GetRightBarLineRight() const
 int Measure::GetWidth() const
 {
     if (!this->IsMeasuredMusic()) {
-        System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+        const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
         if (system->m_yAbs != VRV_UNSET) {
-            Page *page = vrv_cast<Page *>(system->GetFirstAncestor(PAGE));
+            const Page *page = vrv_cast<const Page *>(system->GetFirstAncestor(PAGE));
             assert(page);
             // xAbs2 =  page->m_pageWidth - system->m_systemRightMar;
             return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;

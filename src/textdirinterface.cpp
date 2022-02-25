@@ -36,12 +36,11 @@ void TextDirInterface::Reset()
     this->ResetPlacementRelStaff();
 }
 
-int TextDirInterface::GetNumberOfLines(Object *object)
+int TextDirInterface::GetNumberOfLines(const Object *object) const
 {
     assert(object);
 
-    ListOfObjects lbs = object->FindAllDescendantsByType(LB);
-    return ((int)lbs.size() + 1);
+    return object->GetDescendantCount(LB) + 1;
 }
 
 } // namespace vrv

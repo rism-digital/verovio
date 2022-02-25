@@ -69,7 +69,7 @@ public:
      * Get the StaffAlignment for the staffN.
      * Return NULL if not found.
      */
-    StaffAlignment *GetStaffAlignmentForStaffN(int staffN) const;
+    StaffAlignment *GetStaffAlignmentForStaffN(int staffN);
 
     /**
      * Get pointer to the parent system.
