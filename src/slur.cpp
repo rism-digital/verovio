@@ -1044,8 +1044,13 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             //  d(^)d
-            else if (isSshaped || isShortSlur) {
+            else if (isShortSlur) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
+            }
+            // s-shaped slurs
+            else if (isSshaped) {
+                y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                x1 += startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
             // portato slurs
             else if (portatoSlurType != PortatoSlurType::None) {
@@ -1090,8 +1095,13 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             // P(_)P
-            else if (isSshaped || isShortSlur) {
+            else if (isShortSlur) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+            }
+            // s-shaped slurs
+            else if (isSshaped) {
+                y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
             // portato slurs
             else if (portatoSlurType != PortatoSlurType::None) {
@@ -1135,9 +1145,15 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             // d(^)d
-            else if (isSshaped || isShortSlur) {
+            else if (isShortSlur) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
+            // s-shaped slurs
+            else if (isSshaped) {
+                y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            // grace note
             else if (isGraceToNoteSlur) {
                 const int yMin = y1 - unit * 4;
                 const int yTop = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
@@ -1190,8 +1206,13 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
                     x2 -= endRadius + 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 }
             }
-            else if (isSshaped || isShortSlur) {
+            else if (isShortSlur) {
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+            }
+            // s-shaped slurs
+            else if (isSshaped) {
+                y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
             // portato slurs
             else if (portatoSlurType != PortatoSlurType::None) {
