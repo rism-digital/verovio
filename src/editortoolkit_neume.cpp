@@ -2448,6 +2448,12 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 continue;
             }
 
+            if (el->Is(DIVLINE) || el->Is(ACCID)) {
+                el->MoveItselfTo(sparent);
+                fparent->ClearRelinquishedChildren();
+                continue;
+            }
+
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
