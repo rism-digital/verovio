@@ -892,12 +892,16 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     return usePrimary ? dotLocs1 : dotLocs2;
 }
 
-wchar_t LayerElement::GetDrawingStemMod() const
+data_STEMMODIFIER LayerElement::GetDrawingStemMod() const
 {
     const AttStems *stem = dynamic_cast<const AttStems *>(this);
-    if (!stem) return 0;
+    if (!stem) return STEMMODIFIER_NONE;
 
-    data_STEMMODIFIER stemMod = stem->GetStemMod();
+    return stem->GetStemMod();
+}
+
+wchar_t LayerElement::StemModeToGlyph(data_STEMMODIFIER stemMod) const
+{
     switch (stemMod) {
         case STEMMODIFIER_1slash: return SMUFL_E220_tremolo1;
         case STEMMODIFIER_2slash: return SMUFL_E221_tremolo2;
@@ -909,7 +913,6 @@ wchar_t LayerElement::GetDrawingStemMod() const
         case STEMMODIFIER_z: return SMUFL_E22A_buzzRoll;
         default: break;
     }
-
     return 0;
 }
 

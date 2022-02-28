@@ -253,9 +253,14 @@ public:
         bool areDotsAdjusted, bool isChordElement, bool isLowerElement = false, bool unison = true);
 
     /**
-     * Get code for the stem mod
+     * Get the stem mod for the element (if any)
      */
-    virtual wchar_t GetDrawingStemMod() const;
+    virtual data_STEMMODIFIER GetDrawingStemMod() const;
+
+    /**
+     * Convert stem mode to corresponding glyph code
+     */
+    wchar_t StemModeToGlyph(data_STEMMODIFIER stemMod) const;
 
     //----------//
     // Functors //

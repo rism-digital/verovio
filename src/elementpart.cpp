@@ -531,14 +531,14 @@ int Stem::CalcStem(FunctorParams *functorParams)
     /************ Set flag and slashes (if necessary) and adjust the length ************/
 
     //int slashFactor = 0;
-    wchar_t code = 0;
+    data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
     if (!params->m_isStemSameasSecondary) {
         BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
         if (bTrem) {
-            code = bTrem->GetDrawingStemMod();
+            stemMod = bTrem->GetDrawingStemMod();
         }
         else if (this->HasStemMod() && (this->GetStemMod() < 8)) {
-            code = this->GetDrawingStemMod();
+            stemMod = this->GetDrawingStemMod();
         }
     }
 
@@ -559,8 +559,12 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
 
     // Adjust basic stem length to number of slashes
-    if (code) {
-        const int height = params->m_doc->GetGlyphHeight(code, staffSize, false) / 2;
+    if (stemMod != STEMMODIFIER_NONE) {
+        const wchar_t code = this->StemModeToGlyph(stemMod);
+        int height = params->m_doc->GetGlyphHeight(code, staffSize, false) / 2;
+        if (stemMod == STEMMODIFIER_6slash) {
+            height += params->m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staffSize, false);
+        }
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             this->SetDrawingStemLen(this->GetDrawingStemLen() - height - flagOffset);
         }

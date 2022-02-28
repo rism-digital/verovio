@@ -1479,9 +1479,10 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
     if (duration) {
         drawingDur = duration->GetDur();
     }
-    wchar_t code = element->GetDrawingStemMod();
-    if (!code) return;
+    data_STEMMODIFIER stemMod = element->GetDrawingStemMod();
+    if (stemMod == STEMMODIFIER_NONE) return;
 
+    const wchar_t code = element->StemModeToGlyph(stemMod);
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int height = (m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) + unit) / 2;
     if (code == SMUFL_E645_vocalSprechgesang) height *= 2;
@@ -1533,7 +1534,19 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
         y += unit;
     }
     if ((code != SMUFL_E645_vocalSprechgesang) || !element->Is(BTREM)) {
-        this->DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
+        int adjust = 0;
+        if (stemMod == STEMMODIFIER_6slash) {
+            const int slash1height = m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false);
+            const int slash6height = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false);
+            // we need to take half (0.5) of the height difference between to glyphs for the the initial position and
+            // add a quarter (0.25) of the glyph to account for the height of slash side and white space between
+            // slashes. This results in 0.75 adjustment of the height
+            const int sign = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+            adjust = -sign * unit;
+            const int slash1adjust = sign * 0.75 * (slash6height - slash1height) + adjust;
+            this->DrawSmuflCode(dc, x, y + slash1adjust, SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false);
+        }
+        this->DrawSmuflCode(dc, x, y + adjust, code, staff->m_drawingStaffSize, false);
     }
 }
 
