@@ -65,6 +65,7 @@
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
+#include "layerdef.h"
 #include "lb.h"
 #include "lem.h"
 #include "ligature.h"
@@ -369,6 +370,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(LABELABBR)) {
         m_currentNode = m_currentNode.append_child("labelAbbr");
         this->WriteLabelAbbr(m_currentNode, vrv_cast<LabelAbbr *>(object));
+    }
+    else if (object->Is(LAYERDEF)) {
+        m_currentNode = m_currentNode.append_child("layerdef");
+        this->WriteLayerDef(m_currentNode, vrv_cast<LayerDef *>(object));
     }
     else if (object->Is(METERSIGGRP)) {
         m_currentNode = m_currentNode.append_child("meterSigGrp");
@@ -1623,6 +1628,17 @@ void MEIOutput::WriteLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr)
     assert(labelAbbr);
 
     this->WriteXmlId(currentNode, labelAbbr);
+}
+
+void MEIOutput::WriteLayerDef(pugi::xml_node currentNode, LayerDef* layerDef)
+{
+    assert(layerDef);
+
+    layerDef->WriteLabelled(currentNode);
+    layerDef->WriteNInteger(currentNode);
+    layerDef->WriteTyped(currentNode);
+
+    this->WriteXmlId(currentNode, layerDef);
 }
 
 void MEIOutput::WriteTuning(pugi::xml_node currentNode, Tuning *tuning)
@@ -4624,6 +4640,9 @@ bool MEIInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "labelAbbr") {
             success = this->ReadLabelAbbr(parent, current);
         }
+        else if (std::string(current.name()) == "layerDef") {
+            success = this->ReadLayerDef(parent, current);
+        }
         else if (std::string(current.name()) == "tuning") {
             success = this->ReadTuning(parent, current);
         }
@@ -4728,6 +4747,48 @@ bool MEIInput::ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr)
     parent->AddChild(vrvLabelAbbr);
     this->ReadUnsupportedAttr(labelAbbr, vrvLabelAbbr);
     return this->ReadTextChildren(vrvLabelAbbr, labelAbbr, vrvLabelAbbr);
+}
+
+bool MEIInput::ReadLayerDef(Object *parent, pugi::xml_node layerDef)
+{
+    LayerDef *vrvLayerDef = new LayerDef();
+
+    vrvLayerDef->ReadLabelled(layerDef);
+    vrvLayerDef->ReadNInteger(layerDef);
+    vrvLayerDef->ReadTyped(layerDef);
+
+    parent->AddChild(vrvLayerDef);
+    this->ReadUnsupportedAttr(layerDef, vrvLayerDef);
+    return this->ReadLayerDefChildren(vrvLayerDef, layerDef);
+}
+
+bool MEIInput::ReadLayerDefChildren(Object *parent, pugi::xml_node parentNode)
+{
+    assert(dynamic_cast<LayerDef *>(parent));
+
+    bool success = true;
+    pugi::xml_node current;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+
+        else if (std::string(current.name()) == "instrDef") {
+            success = this->ReadInstrDef(parent, current);
+        }
+        else if (std::string(current.name()) == "label") {
+            success = this->ReadLabel(parent, current);
+        }
+        else if (std::string(current.name()) == "labelAbbr") {
+            success = this->ReadLabelAbbr(parent, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = this->ReadXMLComment(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <layerDef>", current.name());
+        }
+    }
+    return success;
 }
 
 bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)

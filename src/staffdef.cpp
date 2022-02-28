@@ -17,6 +17,7 @@
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
+#include "layerdef.h"
 #include "metersiggrp.h"
 #include "staffgrp.h"
 #include "tuning.h"
@@ -90,6 +91,9 @@ bool StaffDef::IsSupportedChild(Object *child)
     }
     else if (child->Is(LABELABBR)) {
         assert(dynamic_cast<LabelAbbr *>(child));
+    }
+    else if (child->Is(LAYERDEF)) {
+        assert(dynamic_cast<LayerDef *>(child));
     }
     else if (child->Is(MENSUR)) {
         assert(dynamic_cast<Mensur *>(child));

@@ -240,6 +240,7 @@ enum ClassId : uint16_t {
     LAYER_ELEMENT_max,
     // Ids for ScoreDefElement child classes
     SCOREDEF_ELEMENT,
+    LAYERDEF,
     SCOREDEF,
     STAFFDEF,
     SCOREDEF_ELEMENT_max,
