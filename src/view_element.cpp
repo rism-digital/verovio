@@ -449,7 +449,6 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     BTrem *bTrem = vrv_cast<BTrem *>(element);
     assert(bTrem);
 
-    int drawingDur = 0;
     Object *bTremElement = bTrem->FindDescendantByType(CHORD);
     // Get from the chord or note child
     if (!bTremElement) bTremElement = bTrem->FindDescendantByType(NOTE);
