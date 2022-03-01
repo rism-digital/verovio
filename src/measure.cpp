@@ -1059,6 +1059,11 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         StaffAlignment *staffAlignment = system->m_systemAligner.GetStaffAlignmentForStaffN(staffN);
         params->m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
 
+        // Prevent collisions of scoredef clefs with thick barlines
+        if (this->IsFirstInSystem()) {
+            params->m_upcomingMinPos = params->m_doc->GetDrawingBarLineWidth(params->m_staffSize);
+        }
+
         filters.clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
