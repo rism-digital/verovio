@@ -34,6 +34,7 @@
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
+#include "layerdef.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -413,12 +414,17 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
         }
 
         // HARDCODED
-        int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
-        int y = staff->GetDrawingY()
-            - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int doubleUnit = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
+        const int space = doubleUnit;
+        const int y = staff->GetDrawingY() - (staffDef->GetLines() * doubleUnit / 2);
 
         const int staffSize = staff->GetDrawingStaffNotationSize();
-        this->DrawLabels(dc, scoreDef, staffDef, x - space, y, abbreviations, staffSize, 2 * space);
+        int adjust = 0;
+        if (staffDef->GetChildCount(LAYERDEF)) adjust = 3 * doubleUnit;
+        this->DrawLabels(
+            dc, scoreDef, staffDef, x - doubleUnit - adjust, y, abbreviations, staffSize, 2 * space + adjust);
+
+        this->DrawLayerDefLabels(dc, scoreDef, staff, staffDef, x, abbreviations);
     }
 }
 
@@ -479,12 +485,45 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
     dc->EndGraphic(groupSymbol, this);
 }
 
+void View::DrawLayerDefLabels(
+    DeviceContext *dc, ScoreDef *scoreDef, Staff *staff, StaffDef *staffDef, int x, bool abbreviations)
+{
+    assert(dc);
+    assert(staff);
+    assert(staffDef);
+
+    // constants
+    const int space = m_doc->GetDrawingDoubleUnit(scoreDef->GetMaxStaffSize());
+    const int yCenter
+        = staff->GetDrawingY() - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+    const int staffSize = staff->GetDrawingStaffNotationSize();
+    const int pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
+    const int layerDefCount = staffDef->GetChildCount(LAYERDEF);
+    const int requiredSpace = pointSize * layerDefCount;
+
+    int initialY = yCenter - (requiredSpace - pointSize) / 2;
+    for (int i = 0; i < layerDefCount; ++i) {
+        LayerDef *layerDef = vrv_cast<LayerDef *>(staffDef->GetChild(i, LAYERDEF));
+        if (!layerDef) continue;
+
+        AttNIntegerComparison comparison(LAYER, layerDef->GetN());
+        Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByComparison(&comparison, 1));
+        if (!layer) {
+            LogDebug("Layer or LayerDef missing in View::DrawLayerDefLabels");
+            continue;
+        }
+
+        this->DrawLabels(dc, scoreDef, layerDef, x - space, initialY, abbreviations, staffSize, space);
+        initialY += pointSize;
+    }
+}
+
 void View::DrawLabels(
     DeviceContext *dc, ScoreDef *scoreDef, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
 {
     assert(dc);
     assert(scoreDef);
-    assert(object->Is({ STAFFDEF, STAFFGRP }));
+    assert(object->Is({ LAYERDEF, STAFFDEF, STAFFGRP }));
 
     Label *label = dynamic_cast<Label *>(object->FindDescendantByType(LABEL, 1));
     LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
