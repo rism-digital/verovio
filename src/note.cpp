@@ -1472,8 +1472,9 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
                 params->m_heldNotes[course - 1].m_stopTime = startTime; // stop now
 
             // end all previously held notes that have reached their stoptime
+            // or if the new pitch is already sounding, on any course
             for (auto &held : params->m_heldNotes) {
-                if (held.m_pitch > 0 && held.m_stopTime <= startTime) {
+                if (held.m_pitch > 0 && (held.m_stopTime <= startTime || held.m_pitch == pitch)) {
                     params->m_midiFile->addNoteOff(params->m_midiTrack, held.m_stopTime * tpq, channel, held.m_pitch);
                     held.m_pitch = 0;
                     held.m_stopTime = 0;
