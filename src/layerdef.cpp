@@ -42,8 +42,6 @@ void LayerDef::Reset()
     this->ResetLabelled();
     this->ResetNInteger();
     this->ResetTyped();
-
-    //m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
 bool LayerDef::IsSupportedChild(Object *child)

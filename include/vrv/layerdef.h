@@ -28,7 +28,7 @@ public:
     void Reset() override;
     std::string GetClassName() const override { return "LayerDef"; }
     ///@}
-    
+
     /**
      * @name Methods for adding allowed content
      */
