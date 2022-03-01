@@ -1467,8 +1467,10 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
     // Get stem related values (direction and coordinates)
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     int stemX = 0;
+    int stemLen = 0;
     StemmedDrawingInterface *stem = childElement->GetStemmedDrawingInterface();
     if (stem) {
+        stemLen = stem->GetDrawingStemLen();
         stemDir = stem->GetDrawingStemDir();
         stemX = stem->GetDrawingStemStart(childElement).x;
     }
@@ -1484,8 +1486,15 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
     const wchar_t code = element->StemModeToGlyph(stemMod);
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int height = (m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) + unit) / 2;
-    if (code == SMUFL_E645_vocalSprechgesang) height *= 2;
-    int x, y;
+    if ((stemMod >= STEMMODIFIER_1slash) && (stemMod <= STEMMODIFIER_6slash)) {
+        height = std::abs(stemLen) / unit * unit - unit;
+        height -= m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) / 2;
+        if (stemMod == STEMMODIFIER_6slash)
+            height -= m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false) / 2;
+    }
+    else if (code == SMUFL_E645_vocalSprechgesang) height *= 2;
+    int x = 0;
+    int y = 0;
     if (stemDir == STEMDIRECTION_up) {
         if (drawingDur > DUR_1) {
             // Since we are adding the slashing on the stem, ignore artic

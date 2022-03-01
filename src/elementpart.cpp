@@ -558,18 +558,20 @@ int Stem::CalcStem(FunctorParams *functorParams)
         }
     }
 
+    const wchar_t code = this->StemModeToGlyph(stemMod);
+    const int actualLength = this->GetDrawingStemLen() / unit * unit;
+    const int diff = std::abs(actualLength) - params->m_doc->GetGlyphHeight(code, staffSize, false);
     // Adjust basic stem length to number of slashes
-    if (stemMod != STEMMODIFIER_NONE) {
-        const wchar_t code = this->StemModeToGlyph(stemMod);
-        int height = params->m_doc->GetGlyphHeight(code, staffSize, false) / 2;
+    if ((stemMod != STEMMODIFIER_NONE) && !this->HasStemLen() && (diff < unit * 2)) {
+        int adjust = (2 * unit - diff) / unit * unit;
         if (stemMod == STEMMODIFIER_6slash) {
-            height += params->m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staffSize, false);
+            adjust += params->m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staffSize, false);
         }
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() - height - flagOffset);
+            this->SetDrawingStemLen(this->GetDrawingStemLen() - adjust - flagOffset);
         }
         else {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() + height + flagOffset);
+            this->SetDrawingStemLen(this->GetDrawingStemLen() + adjust + flagOffset);
         }
     }
 
