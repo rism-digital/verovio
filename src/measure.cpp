@@ -238,6 +238,18 @@ void Measure::SetDrawingXRel(int drawingXRel)
     m_drawingXRel = drawingXRel;
 }
 
+bool Measure::IsFirstInSystem() const
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetFirst(MEASURE) == this);
+}
+
+bool Measure::IsLastInSystem() const
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetLast(MEASURE) == this);
+}
+
 int Measure::GetLeftBarLineXRel() const
 {
     if (m_measureAligner.GetLeftBarLineAlignment()) {
