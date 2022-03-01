@@ -1023,8 +1023,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         accid->SetZone(zone);
         
         // find closest two neume
-        // if the two share the same parent, add accid inside syllable
-        // if not, add accid between syllables
+        // if the two share the same parent
+        //      1) if the nearest neume is the last neume, add accid between syllables
+        //      2) if not, add accid inside the syllable
+        // if the two doesn't share the same parent, add accid between syllables
         ListOfObjects neumes;
         ClassIdComparison ac(NEUME);
         staff->FindAllDescendantByComparison(&neumes, &ac);
@@ -1038,7 +1040,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             compN.x = ulx;
             compN.y = uly;
 
-            std::sort(neumesVector.begin(), neumesVector.end(), compN);
+            std::stable_sort(neumesVector.begin(), neumesVector.end(), compN);
             Object *fNeume = neumesVector.at(0);
             Object *sNeume = neumesVector.at(1);
 
@@ -1046,7 +1048,13 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             if (fSyllable->GetChildIndex(sNeume) == -1){
                 layer->AddChild(accid);
             } else {
-                fSyllable->AddChild(accid);
+                // the two doesn't share the parent
+                if (fNeume->GetNext() == NULL) {
+                    layer->AddChild(accid);
+                }
+                else {
+                    fSyllable->AddChild(accid);
+                }
             }
         }
 
@@ -1101,8 +1109,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         divLine->SetZone(zone);
 
         // find closest two neume
-        // if the two share the same parent, add divLine inside syllable
-        // if not, add divLine between syllables
+        // if the two share the same parent
+        //      1) if the nearest neume is the last neume, add divLine between syllables
+        //      2) if not, add divLine inside the syllable
+        // if the two doesn't share the same parent, add divLine between syllables
         ListOfObjects neumes;
         ClassIdComparison ac(NEUME);
         staff->FindAllDescendantByComparison(&neumes, &ac);
@@ -1116,15 +1126,23 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             compN.x = ulx;
             compN.y = uly;
 
-            std::sort(neumesVector.begin(), neumesVector.end(), compN);
+            std::stable_sort(neumesVector.begin(), neumesVector.end(), compN);
             Object *fNeume = neumesVector.at(0);
             Object *sNeume = neumesVector.at(1);
 
             Object *fSyllable = fNeume->GetParent();
             if (fSyllable->GetChildIndex(sNeume) == -1){
+                // the two share the same parent
                 layer->AddChild(divLine);
-            } else {
-                fSyllable->AddChild(divLine);
+            } 
+            else {
+                // the two doesn't share the parent
+                if (fNeume->GetNext() == NULL) {
+                    layer->AddChild(divLine);
+                }
+                else {
+                    fSyllable->AddChild(divLine);
+                }
             }
         }
         
@@ -2445,6 +2463,12 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             
             // if the element is a syl then we want to keep it attached to the first node
             if (el->Is(SYL)) {
+                continue;
+            }
+
+            if (el->Is(DIVLINE) || el->Is(ACCID)) {
+                el->MoveItselfTo(sparent);
+                fparent->ClearRelinquishedChildren();
                 continue;
             }
 
