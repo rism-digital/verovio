@@ -346,29 +346,29 @@ void System::AddToDrawingListIfNeccessary(Object *object)
     }
 }
 
-bool System::IsFirstInPage()
+bool System::IsFirstInPage() const
 {
     assert(this->GetParent());
     return (this->GetParent()->GetFirst(SYSTEM) == this);
 }
 
-bool System::IsLastInPage()
+bool System::IsLastInPage() const
 {
     assert(this->GetParent());
     return (this->GetParent()->GetLast(SYSTEM) == this);
 }
 
-bool System::IsFirstOfMdiv()
+bool System::IsFirstOfMdiv() const
 {
     assert(this->GetParent());
-    Object *nextSibling = this->GetParent()->GetPrevious(this);
+    const Object *nextSibling = this->GetParent()->GetPrevious(this);
     return (nextSibling && nextSibling->IsPageElement());
 }
 
-bool System::IsLastOfMdiv()
+bool System::IsLastOfMdiv() const
 {
     assert(this->GetParent());
-    Object *nextSibling = this->GetParent()->GetNext(this);
+    const Object *nextSibling = this->GetParent()->GetNext(this);
     return (nextSibling && nextSibling->IsPageElement());
 }
 
