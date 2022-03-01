@@ -1857,8 +1857,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     // the current one allow it. For example, when one of them is a barline, we do not look how
     // bounding boxes can be nested but instead only look at the horizontal position
     bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment
-        && params->m_previousAlignment.m_alignment->PerfomBoundingBoxAlignment()
-        && this->GetAlignment()->PerfomBoundingBoxAlignment());
+        && params->m_previousAlignment.m_alignment->PerformBoundingBoxAlignment()
+        && this->GetAlignment()->PerformBoundingBoxAlignment());
 
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
