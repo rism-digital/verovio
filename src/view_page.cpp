@@ -344,7 +344,7 @@ void View::DrawStaffGrp(
         return;
     }
 
-    int staffSize = staffGrp->GetMaxStaffSize();
+    const int staffSize = staffGrp->GetMaxStaffSize();
     int yTop = first->GetDrawingY();
     // for the bottom position we need to take into account the number of lines and the staff size
     int yBottom
@@ -363,9 +363,9 @@ void View::DrawStaffGrp(
         this->DrawVerticalLine(dc, yTop, yBottom, x + barLineWidth / 2, barLineWidth);
     }
     // draw the group symbol
-    int staffGrpX = x;
+    const int staffGrpX = x;
     this->DrawGrpSym(dc, measure, staffGrp, x);
-    int grpSymSpace = staffGrpX - x;
+    const int grpSymSpace = staffGrpX - x;
 
     // recursively draw the children
     StaffGrp *childStaffGrp = NULL;
@@ -379,8 +379,8 @@ void View::DrawStaffGrp(
     // DrawStaffGrpLabel
     ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
     const int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
-    int xLabel = x - space;
-    int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
+    const int xLabel = x - space;
+    const int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
     this->DrawLabels(dc, scoreDef, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space + grpSymSpace);
 
     this->DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
