@@ -501,7 +501,7 @@ void View::DrawLayerDefLabels(
     const int layerDefCount = staffDef->GetChildCount(LAYERDEF);
     const int requiredSpace = pointSize * layerDefCount;
 
-    int initialY = yCenter - (requiredSpace - pointSize) / 2;
+    int initialY = yCenter + (requiredSpace - pointSize) / 2;
     for (int i = 0; i < layerDefCount; ++i) {
         LayerDef *layerDef = vrv_cast<LayerDef *>(staffDef->GetChild(i, LAYERDEF));
         if (!layerDef) continue;
@@ -514,7 +514,7 @@ void View::DrawLayerDefLabels(
         }
 
         this->DrawLabels(dc, scoreDef, layerDef, x - space, initialY, abbreviations, staffSize, space);
-        initialY += pointSize;
+        initialY -= pointSize;
     }
 }
 
