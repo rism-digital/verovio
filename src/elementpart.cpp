@@ -529,8 +529,6 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
 
     /************ Set flag and slashes (if necessary) and adjust the length ************/
-
-    //int slashFactor = 0;
     data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
     if (!params->m_isStemSameasSecondary) {
         BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));

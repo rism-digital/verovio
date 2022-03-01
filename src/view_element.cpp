@@ -1492,7 +1492,8 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
         if (stemMod == STEMMODIFIER_6slash)
             height -= m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false) / 2;
     }
-    else if (code == SMUFL_E645_vocalSprechgesang) height *= 2;
+    else if (code == SMUFL_E645_vocalSprechgesang)
+        height *= 2;
     int x = 0;
     int y = 0;
     if (stemDir == STEMDIRECTION_up) {
