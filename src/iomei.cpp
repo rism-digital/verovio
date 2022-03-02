@@ -1630,7 +1630,7 @@ void MEIOutput::WriteLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr)
     this->WriteXmlId(currentNode, labelAbbr);
 }
 
-void MEIOutput::WriteLayerDef(pugi::xml_node currentNode, LayerDef* layerDef)
+void MEIOutput::WriteLayerDef(pugi::xml_node currentNode, LayerDef *layerDef)
 {
     assert(layerDef);
 
@@ -4769,7 +4769,8 @@ bool MEIInput::ReadLayerDefChildren(Object *parent, pugi::xml_node parentNode)
     bool success = true;
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
-        if (!success) break;
+        if (!success)
+            break;
 
         else if (std::string(current.name()) == "instrDef") {
             success = this->ReadInstrDef(parent, current);
