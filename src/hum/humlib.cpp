@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Feb 28 23:55:00 PST 2022
+// Last Modified: Tue Mar  1 17:54:34 PST 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -36667,7 +36667,7 @@ string MuseData::convertAccents(const string& input) {
 			continue;
 		}
 
-		switch (input[i]) {
+		switch ((unsigned char)input[i]) {
 
 			case 0x00: output += "";  break;
 			case 0x01: output += "♯"; break;
@@ -58672,20 +58672,20 @@ void Tool_composite::analyzeGroupCompositeRhythms(HumdrumFile& infile) {
 					full += q;
 					full += pstring;
 					full += beam;
-					HTp targettok = NULL;
-					HTp targettok2 = NULL;
-					if (m_appendQ) {
-						targettok = infile.token(i, infile[i].getFieldCount()-2);
-						targettok2 = infile.token(i, infile[i].getFieldCount()-1);
-					} else {
-						if (m_coincidenceQ) {
-							targettok = infile.token(i, 1);
-							targettok2 = infile.token(i, 2);
-						} else {
-							targettok = infile.token(i, 0);
-							targettok2 = infile.token(i, 1);
-						}
-					}
+					// HTp targettok = NULL;
+					// HTp targettok2 = NULL;
+					//if (m_appendQ) {
+					//	targettok = infile.token(i, infile[i].getFieldCount()-2);
+					//	targettok2 = infile.token(i, infile[i].getFieldCount()-1);
+					//} else {
+					//	if (m_coincidenceQ) {
+					//		targettok = infile.token(i, 1);
+					//		targettok2 = infile.token(i, 2);
+					//	} else {
+					//		targettok = infile.token(i, 0);
+					//		targettok2 = infile.token(i, 1);
+					//	}
+					//}
 
 					string group = infile.token(i, j)->getValue("auto", "group");
 					if (group == "A") {
