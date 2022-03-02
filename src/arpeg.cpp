@@ -69,7 +69,7 @@ int Arpeg::GetDrawingX() const
 
     // Otherwise get the measure - no cast to Measure is necessary
     LogDebug("Accessing an arpeg x without positioner");
-    Object *measure = this->GetFirstAncestor(MEASURE);
+    const Object *measure = this->GetFirstAncestor(MEASURE);
     assert(measure);
 
     // This will be very arbitrary positionned...

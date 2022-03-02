@@ -244,7 +244,7 @@ bool Doc::GenerateMeasureNumbers()
     return true;
 }
 
-bool Doc::HasMidiTimemap()
+bool Doc::HasMidiTimemap() const
 {
     return (m_MIDITimemapTempo == m_options->m_midiTempoAdjustment.GetValue());
 }
@@ -1297,9 +1297,14 @@ Pages *Doc::GetPages()
     return dynamic_cast<Pages *>(this->FindDescendantByType(PAGES));
 }
 
-int Doc::GetPageCount()
+const Pages *Doc::GetPages() const
 {
-    Pages *pages = this->GetPages();
+    return dynamic_cast<const Pages *>(this->FindDescendantByType(PAGES));
+}
+
+int Doc::GetPageCount() const
+{
+    const Pages *pages = this->GetPages();
     return ((pages) ? pages->GetChildCount() : 0);
 }
 

@@ -40,10 +40,9 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
 {
     assert(prevSect);
     // find all siblings of expansion element to know what in MEI file
-    const vrv::ArrayOfObjects *expansionSiblings = prevSect->GetParent()->GetChildren();
-    assert(expansionSiblings);
+    const vrv::ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
     std::vector<std::string> reductionList;
-    for (auto o : *expansionSiblings) {
+    for (auto o : expansionSiblings) {
         if (o->Is(SECTION) || o->Is(ENDING) || o->Is(LEM) || o->Is(RDG)) reductionList.push_back(o->GetUuid());
     }
 
@@ -123,7 +122,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
 
 bool ExpansionMap::UpdateIds(Object *object)
 {
-    for (Object *o : *object->GetChildren()) {
+    for (Object *o : object->GetChildren()) {
         o->IsExpansion(true);
         if (o->HasInterface(INTERFACE_TIME_POINT)) {
             TimePointInterface *interface = o->GetTimePointInterface();
@@ -239,7 +238,7 @@ bool ExpansionMap::HasExpansionMap()
 
 void ExpansionMap::GetUuidList(Object *object, std::vector<std::string> &idList)
 {
-    for (Object *o : *object->GetChildren()) {
+    for (Object *o : object->GetChildren()) {
         idList.push_back(o->GetUuid());
         this->GetUuidList(o, idList);
     }
@@ -250,8 +249,8 @@ void ExpansionMap::GeneratePredictableIds(Object *source, Object *target)
     target->SetUuid(
         source->GetUuid() + "-rend" + std::to_string(this->GetExpansionIdsForElement(source->GetUuid()).size() + 1));
 
-    ArrayOfObjects sourceObjects = *source->GetChildren();
-    ArrayOfObjects targetObjects = *target->GetChildren();
+    ArrayOfObjects sourceObjects = source->GetChildren();
+    ArrayOfObjects targetObjects = target->GetChildren();
     if (sourceObjects.size() <= 0 || sourceObjects.size() != targetObjects.size()) return;
 
     unsigned i = 0;

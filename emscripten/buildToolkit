@@ -88,8 +88,10 @@ $LFLAGS .= " -s TOTAL_STACK=128MB";
 $LFLAGS .= " -s WASM=0";
 $LFLAGS .= " --memory-init-file 0";
 
-# Process command-line options:
+# Check that -w and -l and not enabled together
+die "ERROR: option -w cannot be enabled with -l.\n" if ($wasmQ && $lightQ);
 
+# Process command-line options:
 if ($wasmQ) {
 	print "Creating WASM toolkit version\n";
 
@@ -128,6 +130,7 @@ if ($chattyQ) {
 }
 
 if (!$nohumdrum) {
+	print "Creating toolkit version with humdrum\n";
 	$FLAGS_NAME .= "-hum";
 }
 
@@ -142,7 +145,7 @@ my $DATA_DIR  = "data";
 my $BUILD_DIR = "build";
 $BUILD_DIR .= "/$VERSION" if $VERSION;
 my $NPM = "npm";
-$NPM .= "-dev" if not($VERSION);
+$NPM .= "-hum" if !$nohumdrum;
 
 print "Compiled files will be written to $BUILD_DIR\n";
 
@@ -234,8 +237,8 @@ if ($? == 0) {
 	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
 	`cat $BUILD_DIR/verovio.js verovio-js-start.js verovio-proxy.js > $BUILD_DIR/$FILENAME`;
 
-	# wrap the npm package (but not with wasm build and without humdrum for now)
-	if ($wasmQ && !$lightQ && $nohumdrum) {
+	# wrap the npm package (only for wasm builds)
+	if ($wasmQ) {
 		print "Building $NPM package\n";
 		# the cat order is different for the npm package because we want to wrap the Module in the init function
 		`cat verovio-npm-start.js $BUILD_DIR/verovio.js verovio-proxy.js verovio-npm-end.js > $NPM/index.js`;

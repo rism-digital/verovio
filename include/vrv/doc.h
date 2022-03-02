@@ -112,12 +112,15 @@ public:
      * Will find it only when having read a pages-based MEI file,
      * or when a file was converted to page-based MEI.
      */
+    ///@{
     Pages *GetPages();
+    const Pages *GetPages() const;
+    ///@}
 
     /**
      * Get the total page count
      */
-    int GetPageCount();
+    int GetPageCount() const;
 
     /**
      * Return true if the MIDI generation is already done
@@ -210,7 +213,7 @@ public:
      * true before ExportMIDI() or ExportTimemap() can export anything (These two functions
      * will automatically run CalculateMidiTimemap() if HasMidiTimemap() return false.
      */
-    bool HasMidiTimemap();
+    bool HasMidiTimemap() const;
 
     /**
      * Export the document to a MIDI file.

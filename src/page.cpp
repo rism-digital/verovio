@@ -79,16 +79,21 @@ bool Page::IsSupportedChild(Object *child)
     return true;
 }
 
-RunningElement *Page::GetHeader() const
+RunningElement *Page::GetHeader()
+{
+    return const_cast<RunningElement *>(std::as_const(*this).GetHeader());
+}
+
+const RunningElement *Page::GetHeader() const
 {
     assert(m_score);
 
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
         return NULL;
     }
 
-    Pages *pages = doc->GetPages();
+    const Pages *pages = doc->GetPages();
     assert(pages);
 
     // first page or use the pgHeader for all pages?
@@ -100,16 +105,21 @@ RunningElement *Page::GetHeader() const
     }
 }
 
-RunningElement *Page::GetFooter() const
+RunningElement *Page::GetFooter()
+{
+    return const_cast<RunningElement *>(std::as_const(*this).GetFooter());
+}
+
+const RunningElement *Page::GetFooter() const
 {
     assert(m_scoreEnd);
 
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
         return NULL;
     }
 
-    Pages *pages = doc->GetPages();
+    const Pages *pages = doc->GetPages();
     assert(pages);
 
     // first page or use the pgFooter for all pages?
@@ -606,30 +616,8 @@ void Page::JustifyVertically()
         return;
     }
 
-    // Last page and justification of last page is not enabled
-    Pages *pages = doc->GetPages();
-    assert(pages);
-    if (pages->GetLast() == this) {
-        int idx = this->GetIdx();
-        const int childSystems = this->GetChildCount(SYSTEM);
-        if (idx > 0) {
-            Page *penultimatePage = dynamic_cast<Page *>(pages->GetPrevious(this));
-            assert(penultimatePage);
-
-            if (penultimatePage->m_drawingJustifiableHeight < m_drawingJustifiableHeight) {
-                m_drawingJustifiableHeight = penultimatePage->m_drawingJustifiableHeight;
-            }
-
-            const int maxSystemsPerPage = doc->GetOptions()->m_systemMaxPerPage.GetValue();
-            if ((childSystems <= 2) || (childSystems < maxSystemsPerPage)) {
-                m_justificationSum = penultimatePage->m_justificationSum;
-            }
-        }
-        else {
-            const int stavesPerSystem = m_drawingScoreDef.GetChildCount(STAFFDEF, UNLIMITED_DEPTH);
-            if (childSystems * stavesPerSystem < 8) return;
-        }
-    }
+    // Ignore vertical justification if it's not required
+    if (!this->IsJustificationRequired(doc)) return;
 
     // Justify Y position
     Functor justifyY(&Object::JustifyY);
@@ -645,6 +633,44 @@ void Page::JustifyVertically()
         adjustCrossStaffContentParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
         this->Process(&adjustCrossStaffContent, &adjustCrossStaffContentParams);
     }
+}
+
+bool Page::IsJustificationRequired(Doc *doc)
+{
+    Pages *pages = doc->GetPages();
+    assert(pages);
+
+    const int childSystems = this->GetChildCount(SYSTEM);
+    // Last page and justification of last page is not enabled
+    if (pages->GetLast() == this) {
+        const int idx = this->GetIdx();
+        if (idx > 0) {
+            Page *previousPage = dynamic_cast<Page *>(pages->GetPrevious(this));
+            assert(previousPage);
+            const int previousJustifiableHeight = previousPage->m_drawingJustifiableHeight;
+            const int previousJustificationSum = previousPage->m_justificationSum;
+
+            if (previousJustifiableHeight < m_drawingJustifiableHeight) {
+                m_drawingJustifiableHeight = previousJustifiableHeight;
+            }
+
+            const int maxSystemsPerPage = doc->GetOptions()->m_systemMaxPerPage.GetValue();
+            if ((childSystems <= 2) || (childSystems < maxSystemsPerPage)) {
+                m_justificationSum = previousJustificationSum;
+            }
+        }
+        else {
+            const int stavesPerSystem = m_drawingScoreDef.GetDescendantCount(STAFFDEF);
+            if (childSystems * stavesPerSystem < 8) return false;
+        }
+    }
+    const double ratio = (double)m_drawingJustifiableHeight / (double)doc->m_drawingPageHeight;
+    if (ratio > doc->GetOptions()->m_justificationMaxVertical.GetValue()) {
+        m_drawingJustifiableHeight
+            = doc->m_drawingPageHeight * doc->GetOptions()->m_justificationMaxVertical.GetValue();
+    }
+
+    return true;
 }
 
 void Page::LayOutPitchPos()
@@ -668,7 +694,7 @@ void Page::LayOutPitchPos()
 
 int Page::GetContentHeight() const
 {
-    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -679,7 +705,7 @@ int Page::GetContentHeight() const
         return 0;
     }
 
-    System *last = dynamic_cast<System *>(this->GetLast(SYSTEM));
+    const System *last = dynamic_cast<const System *>(this->GetLast(SYSTEM));
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
@@ -692,7 +718,7 @@ int Page::GetContentHeight() const
 
 int Page::GetContentWidth() const
 {
-    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
     // in non debug
     if (!doc) return 0;
@@ -702,8 +728,8 @@ int Page::GetContentWidth() const
     assert(this == doc->GetDrawingPage());
 
     int maxWidth = 0;
-    for (auto &child : *this->GetChildren()) {
-        System *system = dynamic_cast<System *>(child);
+    for (auto child : this->GetChildren()) {
+        const System *system = dynamic_cast<const System *>(child);
         if (system) {
             // we include the left margin and the right margin
             int systemWidth = system->m_drawingTotalWidth + system->m_systemLeftMar + system->m_systemRightMar;

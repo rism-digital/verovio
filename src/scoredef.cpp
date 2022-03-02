@@ -74,40 +74,45 @@ void ScoreDefElement::Reset()
     this->ResetTyped();
 }
 
-bool ScoreDefElement::HasClefInfo(int depth)
+bool ScoreDefElement::HasClefInfo(int depth) const
 {
     return (this->FindDescendantByType(CLEF, depth));
 }
 
-bool ScoreDefElement::HasKeySigInfo(int depth)
+bool ScoreDefElement::HasKeySigInfo(int depth) const
 {
     return (this->FindDescendantByType(KEYSIG, depth));
 }
 
-bool ScoreDefElement::HasMensurInfo(int depth)
+bool ScoreDefElement::HasMensurInfo(int depth) const
 {
     return (this->FindDescendantByType(MENSUR, depth));
 }
 
-bool ScoreDefElement::HasMeterSigInfo(int depth)
+bool ScoreDefElement::HasMeterSigInfo(int depth) const
 {
     return (this->FindDescendantByType(METERSIG, depth));
 }
 
-bool ScoreDefElement::HasMeterSigGrpInfo(int depth)
+bool ScoreDefElement::HasMeterSigGrpInfo(int depth) const
 {
     return (this->FindDescendantByType(METERSIGGRP, depth));
 }
 
 Clef *ScoreDefElement::GetClef()
 {
+    return const_cast<Clef *>(std::as_const(*this).GetClef());
+}
+
+const Clef *ScoreDefElement::GetClef() const
+{
     // Always check if HasClefInfo() is true before asking for it
-    Clef *clef = vrv_cast<Clef *>(this->FindDescendantByType(CLEF, 1));
+    const Clef *clef = vrv_cast<const Clef *>(this->FindDescendantByType(CLEF, 1));
     assert(clef);
     return clef;
 }
 
-Clef *ScoreDefElement::GetClefCopy()
+Clef *ScoreDefElement::GetClefCopy() const
 {
     // Always check if HasClefInfo() is true before asking for a clone
     Clef *clone = dynamic_cast<Clef *>(this->GetClef()->Clone());
@@ -118,13 +123,18 @@ Clef *ScoreDefElement::GetClefCopy()
 
 KeySig *ScoreDefElement::GetKeySig()
 {
+    return const_cast<KeySig *>(std::as_const(*this).GetKeySig());
+}
+
+const KeySig *ScoreDefElement::GetKeySig() const
+{
     // Always check if HasKeySigInfo() is true before asking for it
-    KeySig *keySig = vrv_cast<KeySig *>(this->FindDescendantByType(KEYSIG, 1));
+    const KeySig *keySig = vrv_cast<const KeySig *>(this->FindDescendantByType(KEYSIG, 1));
     assert(keySig);
     return keySig;
 }
 
-KeySig *ScoreDefElement::GetKeySigCopy()
+KeySig *ScoreDefElement::GetKeySigCopy() const
 {
     // Always check if HasKeySigInfo() is true before asking for a clone
     KeySig *clone = dynamic_cast<KeySig *>(this->GetKeySig()->Clone());
@@ -135,13 +145,18 @@ KeySig *ScoreDefElement::GetKeySigCopy()
 
 Mensur *ScoreDefElement::GetMensur()
 {
+    return const_cast<Mensur *>(std::as_const(*this).GetMensur());
+}
+
+const Mensur *ScoreDefElement::GetMensur() const
+{
     // Always check if HasMensurInfo() is true before asking for it
-    Mensur *mensur = vrv_cast<Mensur *>(this->FindDescendantByType(MENSUR, 1));
+    const Mensur *mensur = vrv_cast<const Mensur *>(this->FindDescendantByType(MENSUR, 1));
     assert(mensur);
     return mensur;
 }
 
-Mensur *ScoreDefElement::GetMensurCopy()
+Mensur *ScoreDefElement::GetMensurCopy() const
 {
     // Always check if HasMensurInfo() is true before asking for a clone
     Mensur *clone = dynamic_cast<Mensur *>(this->GetMensur()->Clone());
@@ -152,13 +167,18 @@ Mensur *ScoreDefElement::GetMensurCopy()
 
 MeterSig *ScoreDefElement::GetMeterSig()
 {
+    return const_cast<MeterSig *>(std::as_const(*this).GetMeterSig());
+}
+
+const MeterSig *ScoreDefElement::GetMeterSig() const
+{
     // Always check if HasMeterSigInfo() is true before asking for it
-    MeterSig *meterSig = vrv_cast<MeterSig *>(this->FindDescendantByType(METERSIG, 1));
+    const MeterSig *meterSig = vrv_cast<const MeterSig *>(this->FindDescendantByType(METERSIG, 1));
     assert(meterSig);
     return meterSig;
 }
 
-MeterSig *ScoreDefElement::GetMeterSigCopy()
+MeterSig *ScoreDefElement::GetMeterSigCopy() const
 {
     // Always check if HasMeterSigInfo() is true before asking for a clone
     MeterSig *clone = dynamic_cast<MeterSig *>(this->GetMeterSig()->Clone());
@@ -169,13 +189,18 @@ MeterSig *ScoreDefElement::GetMeterSigCopy()
 
 MeterSigGrp *ScoreDefElement::GetMeterSigGrp()
 {
+    return const_cast<MeterSigGrp *>(std::as_const(*this).GetMeterSigGrp());
+}
+
+const MeterSigGrp *ScoreDefElement::GetMeterSigGrp() const
+{
     // Always check if HasMeterSigGrpInfo() is true before asking for it
-    MeterSigGrp *meterSigGrp = vrv_cast<MeterSigGrp *>(this->FindDescendantByType(METERSIGGRP, 1));
+    const MeterSigGrp *meterSigGrp = vrv_cast<const MeterSigGrp *>(this->FindDescendantByType(METERSIGGRP, 1));
     assert(meterSigGrp);
     return meterSigGrp;
 }
 
-MeterSigGrp *ScoreDefElement::GetMeterSigGrpCopy()
+MeterSigGrp *ScoreDefElement::GetMeterSigGrpCopy() const
 {
     // Always check if HasMeterSigGrpInfo() is true before asking for a clone
     MeterSigGrp *clone = dynamic_cast<MeterSigGrp *>(this->GetMeterSigGrp()->Clone());
@@ -507,9 +532,19 @@ PgFoot *ScoreDef::GetPgFoot()
     return dynamic_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
 }
 
+const PgFoot *ScoreDef::GetPgFoot() const
+{
+    return dynamic_cast<const PgFoot *>(this->FindDescendantByType(PGFOOT));
+}
+
 PgFoot2 *ScoreDef::GetPgFoot2()
 {
     return dynamic_cast<PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
+}
+
+const PgFoot2 *ScoreDef::GetPgFoot2() const
+{
+    return dynamic_cast<const PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
 }
 
 PgHead *ScoreDef::GetPgHead()
@@ -517,9 +552,19 @@ PgHead *ScoreDef::GetPgHead()
     return dynamic_cast<PgHead *>(this->FindDescendantByType(PGHEAD));
 }
 
+const PgHead *ScoreDef::GetPgHead() const
+{
+    return dynamic_cast<const PgHead *>(this->FindDescendantByType(PGHEAD));
+}
+
 PgHead2 *ScoreDef::GetPgHead2()
 {
     return dynamic_cast<PgHead2 *>(this->FindDescendantByType(PGHEAD2));
+}
+
+const PgHead2 *ScoreDef::GetPgHead2() const
+{
+    return dynamic_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
 int ScoreDef::GetMaxStaffSize()
@@ -528,13 +573,13 @@ int ScoreDef::GetMaxStaffSize()
     return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
 }
 
-bool ScoreDef::IsSectionRestart()
+bool ScoreDef::IsSectionRestart() const
 {
     if (!this->GetParent()) return false;
     // In page-based structure, Section is a sibling to scoreDef
     // This has limitations: will not work with editorial markup, additional nested sections, and
     // if the section milestone is in the previous system.
-    Section *section = dynamic_cast<Section *>(this->GetParent()->GetPrevious(this, SECTION));
+    const Section *section = dynamic_cast<const Section *>(this->GetParent()->GetPrevious(this, SECTION));
     return (section && (section->GetRestart() == BOOLEAN_true));
 }
 

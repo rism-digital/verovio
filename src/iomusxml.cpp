@@ -353,7 +353,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
         Measure *existingMeasure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
         if (existingMeasure) {
-            for (auto current : *measure->GetChildren()) {
+            for (auto current : measure->GetChildren()) {
                 if (!current->Is(STAFF)) {
                     continue;
                 }
@@ -384,7 +384,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
 
     int currTime = 0;
     if (m_layerEndTimes.count(layer) > 0) currTime = m_layerEndTimes.at(layer);
-    if ((layer->GetChildren()->size() == 0 && m_durTotal > 0) || currTime < m_durTotal) {
+    if ((layer->GetChildren().size() == 0 && m_durTotal > 0) || currTime < m_durTotal) {
         FillSpace(layer, m_durTotal - currTime);
     }
 
@@ -1684,7 +1684,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         m_tieStopStack.clear();
     }
 
-    for (auto staff : *measure->GetChildren()) {
+    for (auto staff : measure->GetChildren()) {
         if (!staff->Is(STAFF)) {
             continue;
         }
@@ -4572,26 +4572,26 @@ void MusicXmlInput::SetChordStaff(Layer *layer)
     Chord *chord = vrv_cast<Chord *>(m_elementStackMap.at(layer).back());
     if (!chord) return;
 
-    const ArrayOfObjects *children = chord->GetChildren();
-    auto it = find_if(children->begin(), children->end(), [](Object *object) {
+    const ArrayOfObjects &children = chord->GetChildren();
+    auto it = find_if(children.begin(), children.end(), [](Object *object) {
         if (!object->Is(NOTE)) return false;
         Note *note = vrv_cast<Note *>(object);
         return !note->HasStaff();
     });
-    if (it != chord->GetChildren()->end()) return;
+    if (it != chord->GetChildren().end()) return;
 
     // if all notes have @staff attribute, but it's not the same staff at least of one note - leave it as is
     const auto chordStaff = vrv_cast<Note *>(chord->GetFirst(NOTE))->GetStaff();
-    it = find_if(children->begin(), children->end(), [&chordStaff](Object *object) {
+    it = find_if(children.begin(), children.end(), [&chordStaff](Object *object) {
         if (!object->Is(NOTE)) return false;
         Note *note = vrv_cast<Note *>(object);
         return (chordStaff != note->GetStaff());
     });
-    if (it != chord->GetChildren()->end()) return;
+    if (it != chord->GetChildren().end()) return;
 
     // Now that we're sure that cross-staff is the same for all notes, we can set it to chord and clear of notes
     chord->SetStaff(chordStaff);
-    for_each(children->begin(), children->end(), [](Object *object) {
+    for_each(children.begin(), children.end(), [](Object *object) {
         if (!object->Is(NOTE)) return;
         Note *note = vrv_cast<Note *>(object);
         note->ResetStaffIdent();

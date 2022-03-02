@@ -135,10 +135,10 @@ public:
     ListOfObjects GetLayerElementsInTimeSpan(
         double time, double duration, Measure *measure, int staff, bool excludeCurrent);
 
-    Clef *GetCurrentClef() const;
-    KeySig *GetCurrentKeySig() const;
-    Mensur *GetCurrentMensur() const;
-    MeterSig *GetCurrentMeterSig() const;
+    Clef *GetCurrentClef();
+    KeySig *GetCurrentKeySig();
+    Mensur *GetCurrentMensur();
+    MeterSig *GetCurrentMeterSig();
 
     void ResetStaffDefObjects();
 

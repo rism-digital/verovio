@@ -69,7 +69,7 @@ public:
      * Get the StaffAlignment for the staffN.
      * Return NULL if not found.
      */
-    StaffAlignment *GetStaffAlignmentForStaffN(int staffN) const;
+    StaffAlignment *GetStaffAlignmentForStaffN(int staffN);
 
     /**
      * Get pointer to the parent system.
@@ -293,6 +293,11 @@ public:
     int GetBeamAdjust() const { return m_beamAdjust; }
     ///@}
 
+    /**
+     * Find overflow for the alignments taking bracket group elements into account
+     */
+    void AdjustBracketGroupSpacing(Doc *doc, StaffAlignment *previous, int spacing);
+
     //----------//
     // Functors //
     //----------//
@@ -342,6 +347,11 @@ private:
      * Returns minimus preset spacing
      */
     int GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *attSpacing) const;
+
+    /**
+     * Return whether current staff alignment is at the start/end of a bracket group
+     */
+    bool IsInBracketGroup(bool isFirst) const;
 
 public:
     //

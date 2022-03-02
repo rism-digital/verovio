@@ -185,7 +185,7 @@ void RunningElement::SetDrawingPage(Page *page)
     }
 }
 
-int RunningElement::GetContentHeight()
+int RunningElement::GetContentHeight() const
 {
     int height = 0;
     int i;
@@ -195,7 +195,7 @@ int RunningElement::GetContentHeight()
     return height;
 }
 
-int RunningElement::GetRowHeight(int row)
+int RunningElement::GetRowHeight(int row) const
 {
     assert((row >= 0) && (row < 3));
 
@@ -207,7 +207,7 @@ int RunningElement::GetRowHeight(int row)
     return height;
 }
 
-int RunningElement::GetColHeight(int col)
+int RunningElement::GetColHeight(int col) const
 {
     assert((col >= 0) && (col < 3));
 
@@ -219,13 +219,13 @@ int RunningElement::GetColHeight(int col)
     return height;
 }
 
-int RunningElement::GetCellHeight(int cell)
+int RunningElement::GetCellHeight(int cell) const
 {
     assert((cell >= 0) && (cell < 9));
 
     int columnHeight = 0;
-    ArrayOfTextElements *textElements = &m_cells[cell];
-    ArrayOfTextElements::iterator iter;
+    const ArrayOfTextElements *textElements = &m_cells[cell];
+    ArrayOfTextElements::const_iterator iter;
     for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
         if ((*iter)->HasContentBB()) {
             columnHeight += (*iter)->GetContentY2() - (*iter)->GetContentY1();

@@ -67,7 +67,7 @@ public:
     /**
      * Check whether we need to optimize score based on the condense option
      */
-    bool ScoreDefNeedsOptimization(int optionCondense);
+    bool ScoreDefNeedsOptimization(int optionCondense) const;
 
     //----------//
     // Functors //

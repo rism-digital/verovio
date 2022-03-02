@@ -42,7 +42,7 @@ public:
     /**
      * Return the line for a the tuning and a given course and a notation type
      */
-    int CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines);
+    int CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines) const;
 
     /**
      * Calclate the MIDI pitch number for course/fret
@@ -53,7 +53,7 @@ public:
      *
      * @return MIDI pitch
      */
-    int CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType);
+    int CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType) const;
 
     //----------//
     // Functors //

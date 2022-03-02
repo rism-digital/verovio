@@ -110,7 +110,7 @@ public:
      */
     ///@{
     /** Return true if the element is a grace note */
-    bool IsGraceNote();
+    bool IsGraceNote() const;
     /** Return true if the element is has to be rederred as cue sized */
     bool GetDrawingCueSize() const;
     /** Return true if the element is a note within a ligature */
@@ -186,14 +186,20 @@ public:
     /**
      * Get the ancestor or cross staff
      */
-    Staff *GetAncestorStaff(StaffSearch strategy = ANCESTOR_ONLY, bool assertExistence = true) const;
+    ///@{
+    Staff *GetAncestorStaff(StaffSearch strategy = ANCESTOR_ONLY, bool assertExistence = true);
+    const Staff *GetAncestorStaff(StaffSearch strategy = ANCESTOR_ONLY, bool assertExistence = true) const;
+    ///@}
 
     /**
      * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff.
      * Also set the corresponding m_crossLayer to layer if a cross staff is found.
      * Return NULL if there is no cross-staff in the element or a parent.
      */
-    Staff *GetCrossStaff(Layer *&layer) const;
+    ///@{
+    Staff *GetCrossStaff(Layer *&layer);
+    const Staff *GetCrossStaff(Layer *&layer) const;
+    ///@}
 
     /**
      * Retrieve the direction of a cross-staff situation
@@ -227,10 +233,10 @@ public:
      * Used only on beam, tuplet or ftrem have.
      */
     double GetSameAsContentAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
-        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
 
     double GetContentAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
-        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
 
     /**
      * Get zone bounds using child elements with facsimile information.

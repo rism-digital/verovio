@@ -37,7 +37,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 9
+#define VERSION_MINOR 10
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -311,7 +311,11 @@ class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
 
+typedef std::vector<const Object *> ArrayOfConstObjects;
+
 typedef std::list<Object *> ListOfObjects;
+
+typedef std::list<const Object *> ListOfConstObjects;
 
 typedef std::vector<Comparison *> ArrayOfComparisons;
 

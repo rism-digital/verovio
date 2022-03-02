@@ -87,7 +87,7 @@ void PitchInterface::AdjustPitchByOffset(int pitchOffset)
     this->SetOct(oct);
 }
 
-int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
+int PitchInterface::PitchDifferenceTo(const PitchInterface *pi) const
 {
     assert(pi);
     int pitchDifference = 0;

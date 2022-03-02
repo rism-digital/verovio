@@ -53,7 +53,7 @@ private:
     /**
      * Calculate the duration of an individual note in a measured tremolo
      */
-    data_DURATION CalcIndividualNoteDuration();
+    data_DURATION CalcIndividualNoteDuration() const;
 
 public:
     //

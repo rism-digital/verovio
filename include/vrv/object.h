@@ -233,25 +233,33 @@ public:
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }
     int GetChildCount(const ClassId classId) const;
-    int GetChildCount(const ClassId classId, int depth);
+    int GetChildCount(const ClassId classId, int depth) const;
+    int GetDescendantCount(const ClassId classId) const;
     ///@}
 
     /**
      * Child access (generic)
      */
-    Object *GetChild(int idx) const;
+    ///@{
+    Object *GetChild(int idx);
+    const Object *GetChild(int idx) const;
     Object *GetChild(int idx, const ClassId classId);
+    const Object *GetChild(int idx, const ClassId classId) const;
+    ///@}
 
     /**
-     * Return a const pointer to the children
+     * Return the children as const reference or copy
      */
-    virtual const ArrayOfObjects *GetChildren(bool docChildren = true) const { return &m_children; }
+    ///@{
+    ArrayOfConstObjects GetChildren() const;
+    const ArrayOfObjects &GetChildren() { return m_children; }
+    ///@}
 
     /**
-     * Return a pointer to the children that allows modification.
+     * Return a reference to the children that allows modification.
      * This method should be all only in AddChild overrides methods
      */
-    ArrayOfObjects *GetChildrenForModification() { return &m_children; }
+    ArrayOfObjects &GetChildrenForModification() { return m_children; }
 
     /**
      * Fill an array of pairs with all attributes and their values.
@@ -273,7 +281,9 @@ public:
      */
     ///@{
     Object *GetFirst(const ClassId classId = UNSPECIFIED);
+    const Object *GetFirst(const ClassId classId = UNSPECIFIED) const;
     Object *GetNext();
+    const Object *GetNext() const;
     ///@}
 
     /**
@@ -282,18 +292,26 @@ public:
      */
     ///@{
     Object *GetNext(const Object *child, const ClassId classId = UNSPECIFIED);
+    const Object *GetNext(const Object *child, const ClassId classId = UNSPECIFIED) const;
     Object *GetPrevious(const Object *child, const ClassId classId = UNSPECIFIED);
+    const Object *GetPrevious(const Object *child, const ClassId classId = UNSPECIFIED) const;
     ///@}
 
     /**
      * Return the last child of the object (if any, NULL otherwise)
      */
-    Object *GetLast(const ClassId classId = UNSPECIFIED) const;
+    ///@{
+    Object *GetLast(const ClassId classId = UNSPECIFIED);
+    const Object *GetLast(const ClassId classId = UNSPECIFIED) const;
+    ///@}
 
     /**
      * Get the parent of the Object
      */
-    Object *GetParent() const { return m_parent; }
+    ///@{
+    Object *GetParent() { return m_parent; }
+    const Object *GetParent() const { return m_parent; }
+    ///@}
 
     /**
      * Set the parent of the Object.
@@ -344,7 +362,7 @@ public:
     /**
      * Look for the Object in the children and return its position (-1 if not found)
      */
-    int GetChildIndex(const Object *child);
+    int GetChildIndex(const Object *child) const;
 
     /**
      * Look for all Objects of a class and return its position (-1 if not found)
@@ -372,47 +390,74 @@ public:
      * Look for a descendant with the specified uuid (returns NULL if not found)
      * This method is a wrapper for the Object::FindByUuid functor.
      */
-    Object *FindDescendantByUuid(std::string uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    ///@{
+    Object *FindDescendantByUuid(const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    const Object *FindDescendantByUuid(
+        const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
+    ///@}
 
     /**
      * Look for a descendant with the specified type (returns NULL if not found)
      * This method is a wrapper for the Object::FindByType functor.
      */
+    ///@{
     Object *FindDescendantByType(ClassId classId, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    const Object *FindDescendantByType(ClassId classId, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
+    ///@}
 
     /**
      * Return the first element matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
+    ///@{
     Object *FindDescendantByComparison(
         Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    const Object *FindDescendantByComparison(
+        Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
+    ///@}
 
     /**
      * Return the element matching the extreme value with an Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
+    ///@{
     Object *FindDescendantExtremeByComparison(
         Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    const Object *FindDescendantExtremeByComparison(
+        Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
+    ///@}
 
     /**
      * Return all the objects with specified type
      */
+    ///@{
     ListOfObjects FindAllDescendantsByType(
         ClassId classId, bool continueDepthSearchForMatches = true, int deepness = UNLIMITED_DEPTH);
+    ListOfConstObjects FindAllDescendantsByType(
+        ClassId classId, bool continueDepthSearchForMatches = true, int deepness = UNLIMITED_DEPTH) const;
+    ///@}
 
     /**
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
+    ///@{
     void FindAllDescendantsByComparison(ListOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
         bool direction = FORWARD, bool clear = true);
+    void FindAllDescendantsByComparison(ListOfConstObjects *objects, Comparison *comparison,
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true) const;
+    ///@}
 
     /**
      * Return all the objects matching the Comparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
-    void FindAllDescendantsBetween(ListOfObjects *objects, Comparison *comparison, Object *start, Object *end,
-        bool clear = true, int depth = UNLIMITED_DEPTH);
+    ///@{
+    void FindAllDescendantsBetween(ListOfObjects *objects, Comparison *comparison, const Object *start,
+        const Object *end, bool clear = true, int depth = UNLIMITED_DEPTH);
+    void FindAllDescendantsBetween(ListOfConstObjects *objects, Comparison *comparison, const Object *start,
+        const Object *end, bool clear = true, int depth = UNLIMITED_DEPTH) const;
+    ///@}
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -445,15 +490,24 @@ public:
     /**
      * Returns all ancestors
      */
-    ListOfObjects GetAncestors() const;
+    ///@{
+    ListOfObjects GetAncestors();
+    ListOfConstObjects GetAncestors() const;
+    ///@}
 
     /**
      * Return the first ancestor of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
-    Object *GetFirstAncestor(const ClassId classId, int maxSteps = -1) const;
+    ///@{
+    Object *GetFirstAncestor(const ClassId classId, int maxSteps = -1);
+    const Object *GetFirstAncestor(const ClassId classId, int maxSteps = -1) const;
+    ///@}
 
-    Object *GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
+    ///@{
+    Object *GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1);
+    const Object *GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
+    ///@}
 
     /**
      * Return the last ancestor that is NOT of the specified type.
@@ -538,9 +592,14 @@ public:
      * limit (EditorialElement objects do not count).
      * skipFirst does not call the functor or endFunctor on the first (calling) level
      */
+    ///@{
     void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
         ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
         bool skipFirst = false);
+    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
+        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
+        bool skipFirst = false) const;
+    ///@}
 
     //----------------//
     // Static methods //
@@ -555,7 +614,7 @@ public:
     /**
      * @Return true if left appears before right in preorder traversal
      */
-    static bool IsPreOrdered(Object *left, Object *right);
+    static bool IsPreOrdered(const Object *left, const Object *right);
 
     //----------//
     // Functors //
@@ -574,26 +633,32 @@ public:
     /**
      * Find a Object with a specified uuid.
      */
-    virtual int FindByUuid(FunctorParams *functorParams);
+    virtual int FindByUuid(FunctorParams *functorParams) const;
 
     /**
      * Find a Object with a Comparison functor .     */
-    virtual int FindByComparison(FunctorParams *functorParams);
+    virtual int FindByComparison(FunctorParams *functorParams) const;
 
     /**
      * Find a Object with the extreme value with a Comparison functor .
      */
-    virtual int FindExtremeByComparison(FunctorParams *functorParams);
+    virtual int FindExtremeByComparison(FunctorParams *functorParams) const;
 
     /**
      * Find a all Object with an Comparison functor.
      */
+    ///@{
     virtual int FindAllByComparison(FunctorParams *functorParams);
+    virtual int FindAllConstByComparison(FunctorParams *functorParams) const;
+    ///@}
 
     /**
      * Find a all Object between a start and end Object and with an Comparison functor.
      */
+    ///@{
     virtual int FindAllBetween(FunctorParams *functorParams);
+    virtual int FindAllConstBetween(FunctorParams *functorParams) const;
+    ///@}
 
     /**
      * Find a all Object to which another object points to in the data.
@@ -1359,6 +1424,15 @@ private:
      */
     void Init(ClassId classId, const std::string &classIdStr);
 
+    /**
+     * Helper methods for functor processing
+     */
+    ///@{
+    void UpdateDocumentScore(bool direction);
+    bool SkipChildren(Functor *functor) const;
+    bool FiltersApply(const ArrayOfComparisons *filters, Object *object) const;
+    ///@}
+
 public:
     /**
      * Keep an array of unsupported attributes as pairs.
@@ -1413,8 +1487,8 @@ private:
      * Values are set when GetFirst is called (which is mandatory)
      */
     ///@{
-    ArrayOfObjects::iterator m_iteratorEnd, m_iteratorCurrent;
-    ClassId m_iteratorElementType;
+    mutable ArrayOfObjects::const_iterator m_iteratorEnd, m_iteratorCurrent;
+    mutable ClassId m_iteratorElementType;
     ///@}
 
     /**
@@ -1570,15 +1644,18 @@ private:
 class Functor {
 private:
     int (Object::*obj_fpt)(FunctorParams *functorParams); // pointer to member function
+    int (Object::*const_obj_fpt)(FunctorParams *functorParams) const;
 
 public:
     // constructor - takes pointer to a functor method and stores it
     Functor();
     Functor(int (Object::*_obj_fpt)(FunctorParams *));
+    Functor(int (Object::*_const_obj_fpt)(FunctorParams *) const);
     virtual ~Functor(){};
 
     // Call the internal functor method
     void Call(Object *ptr, FunctorParams *functorParams);
+    void Call(const Object *ptr, FunctorParams *functorParams);
 
 private:
     //

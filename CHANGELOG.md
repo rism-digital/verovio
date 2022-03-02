@@ -1,20 +1,29 @@
 # Changelog
 
 ## [unreleased]
+* Python Package Index (PyPI) distribution for macos arm64
+
+## [3.9.0] - 2022-02-22
 * Support for `beatRpt@beatdef`
 * Support for `scoreDef` and `staffDef` `@dur.default` (@eNote-GmBH)
 * Support for MIDI output of grace notes and multi-measure rests (@eNote-GmBH)
 * Support for `@stem.sameas` on notes for orchestra scores
 * Support for MIDI output of arpeggios (@eNote-GmBH)
-* Support for tuplets in ABC importer (@eNote-GmBH)
+* Support for `beamSpan` (@eNote-GmBH)
+* Support for lyrics, tuplets and multiple tunes (`mdiv`) in ABC import (@eNote-GmBH)
 * Improved double stemmed beams (@eNote-GmBH)
 * Improved tablature MIDI output (@paul-bayleaf)
 * Improved PAE importer (nested beams, mensural dots, stemless notes)
+* Improved vertical positioning with half staff spacing above and below the systems
+* Improved justification (@eNote-GmBH)
+* Improved handling of the SMUFL fonts (@eNote-GmBH)
 * Additional parameters to the redoLayout method for faster cached layout redoing
 * Additional parameters to the renderToTimemap method for including rests and measure
 * Additional ids for rests and measure added to the getElementsAtTime methods
+* Option --svg-css for passing an additional CSS to be included in the SVG output
 * Preliminary support for stems and beam for guitar tablature
 * Preliminary support for tablature MusicXML import (@paul-bayleaf)
+* Distribution of the build with humdrum as NPM package
 
 ## [3.8.1] - 2022-01-10
 * Fix bug in PAE importer for durations and for key signatures

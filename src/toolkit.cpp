@@ -1204,7 +1204,7 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
     if (m_options->m_breaks.GetValue() == BREAKS_line) {
         m_doc.CastOffLineDoc();
     }
-    else if (m_options->m_breaks.GetValue() == BREAKS_encoded) {
+    else if (m_options->m_breaks.GetValue() == BREAKS_encoded && m_doc.FindDescendantByType(PB)) {
         m_doc.CastOffEncodingDoc();
     }
     else if (m_options->m_breaks.GetValue() == BREAKS_smart) {
@@ -1304,6 +1304,11 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
     // set the option to use viewbox on svg root
     if (m_options->m_svgBoundingBoxes.GetValue()) {
         svg.SetSvgBoundingBoxes(true);
+    }
+
+    // set the additional CSS if any
+    if (!m_options->m_svgCss.GetValue().empty()) {
+        svg.SetCss(m_options->m_svgCss.GetValue());
     }
 
     if (m_options->m_svgViewBox.GetValue()) {
