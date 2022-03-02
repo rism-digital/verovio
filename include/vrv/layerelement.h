@@ -251,7 +251,7 @@ public:
      */
     std::pair<int, bool> CalcElementHorizontalOverlap(Doc *doc, const std::vector<LayerElement *> &otherElements,
         bool areDotsAdjusted, bool isChordElement, bool isLowerElement = false, bool unison = true);
-    
+
     /**
      * Helper function to set shortening for elements with beam interface
      */
