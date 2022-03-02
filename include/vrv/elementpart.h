@@ -391,6 +391,11 @@ private:
      */
     void AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration);
 
+    /**
+     * Helper to adjust length of stem based on presence of slashes
+     */
+    void AdjustSlashes(Doc *doc, int staffSize, int flagOffset, bool isSameAs);
+
 public:
     //
 private:

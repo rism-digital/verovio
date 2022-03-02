@@ -459,6 +459,48 @@ int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+void Stem::AdjustSlashes(Doc *doc, int staffSize, int flagOffset, bool isSameAs)
+{
+    const int unit = doc->GetDrawingUnit(staffSize);
+    data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
+    // do nothing if sameas
+    if (isSameAs) return;
+
+    BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
+    if (bTrem) {
+        stemMod = bTrem->GetDrawingStemMod();
+    }
+    else if (this->HasStemMod() && (this->GetStemMod() < 8)) {
+        stemMod = this->GetDrawingStemMod();
+    }
+
+    const wchar_t code = this->StemModeToGlyph(stemMod);
+    // if there is no glyph - do nothing
+    if (!code) return;
+
+    int lenAdjust = flagOffset;
+    if (this->GetParent()->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(this->GetParent());
+        lenAdjust += std::abs(chord->GetTopNote()->GetDrawingY() - chord->GetBottomNote()->GetDrawingY());
+    }
+
+    const int actualLength = std::abs(this->GetDrawingStemLen()) - lenAdjust / unit * unit;
+    const int diff = actualLength - doc->GetGlyphHeight(code, staffSize, false);
+    // Adjust basic stem length to number of slashes
+    if ((stemMod != STEMMODIFIER_NONE) && !this->HasStemLen() && (diff < unit * 2)) {
+        int adjust = ((2 * unit - diff) / unit + 1) * unit;
+        if (stemMod == STEMMODIFIER_6slash) {
+            adjust += doc->GetGlyphHeight(SMUFL_E220_tremolo1, staffSize, false);
+        }
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() - adjust);
+        }
+        else {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() + adjust);
+        }
+    }
+}
+
 int Stem::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
@@ -529,17 +571,6 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
 
     /************ Set flag and slashes (if necessary) and adjust the length ************/
-    data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
-    if (!params->m_isStemSameasSecondary) {
-        BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
-        if (bTrem) {
-            stemMod = bTrem->GetDrawingStemMod();
-        }
-        else if (this->HasStemMod() && (this->GetStemMod() < 8)) {
-            stemMod = this->GetDrawingStemMod();
-        }
-    }
-
     int flagOffset = 0;
     Flag *flag = NULL;
     // There is never a flag with a duration longer than 8th notes
@@ -552,26 +583,11 @@ int Stem::CalcStem(FunctorParams *functorParams)
         }
         else {
             flag->m_drawingNbFlags = params->m_dur - DUR_4;
-            flagOffset = unit * (flag->m_drawingNbFlags - 1);
+            flagOffset = 1.5 * unit * flag->m_drawingNbFlags;
         }
     }
 
-    const wchar_t code = this->StemModeToGlyph(stemMod);
-    const int actualLength = this->GetDrawingStemLen() / unit * unit;
-    const int diff = std::abs(actualLength) - params->m_doc->GetGlyphHeight(code, staffSize, false);
-    // Adjust basic stem length to number of slashes
-    if ((stemMod != STEMMODIFIER_NONE) && !this->HasStemLen() && (diff < unit * 2)) {
-        int adjust = (2 * unit - diff) / unit * unit;
-        if (stemMod == STEMMODIFIER_6slash) {
-            adjust += params->m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staffSize, false);
-        }
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() - adjust - flagOffset);
-        }
-        else {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() + adjust + flagOffset);
-        }
-    }
+    this->AdjustSlashes(params->m_doc, staffSize, flagOffset, params->m_isStemSameasSecondary);
 
     // SMUFL flags cover some additional stem length from the 32th only
     if (flag) {

@@ -1474,6 +1474,18 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
         stemDir = stem->GetDrawingStemDir();
         stemX = stem->GetDrawingStemStart(childElement).x;
     }
+
+    // Get note
+    Note *note = NULL;
+    if (childElement->Is(NOTE)) {
+        note = vrv_cast<Note *>(childElement);
+    }
+    else if (childElement->Is(CHORD)) {
+        note = (stemDir == STEMDIRECTION_up) ? vrv_cast<Chord *>(childElement)->GetTopNote()
+                                             : vrv_cast<Chord *>(childElement)->GetBottomNote();
+    }
+    if (!note) return;
+
     // Get duration for the element
     int drawingDur = 0;
     DurationInterface *duration = childElement->GetDurationInterface();
@@ -1483,64 +1495,53 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
     data_STEMMODIFIER stemMod = element->GetDrawingStemMod();
     if (stemMod == STEMMODIFIER_NONE) return;
 
+    // calculate height offset for positioning of stem mod elements on the stem
+    const int noteLoc = note->GetDrawingLoc();
     const wchar_t code = element->StemModeToGlyph(stemMod);
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int height = (m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) + unit) / 2;
-    if ((stemMod >= STEMMODIFIER_1slash) && (stemMod <= STEMMODIFIER_6slash)) {
-        height = std::abs(stemLen) / unit * unit - unit;
-        height -= m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) / 2;
-        if (stemMod == STEMMODIFIER_6slash)
-            height -= m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false) / 2;
-    }
-    else if (code == SMUFL_E645_vocalSprechgesang)
-        height *= 2;
-    int x = 0;
-    int y = 0;
-    if (stemDir == STEMDIRECTION_up) {
-        if (drawingDur > DUR_1) {
-            // Since we are adding the slashing on the stem, ignore artic
-            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - height;
-            x = stemX;
+    int height = 2 * unit;
+    switch (stemMod) {
+        case STEMMODIFIER_1slash:
+        case STEMMODIFIER_2slash:
+        case STEMMODIFIER_3slash:
+        case STEMMODIFIER_4slash:
+        case STEMMODIFIER_5slash:
+        case STEMMODIFIER_6slash: {
+            if (noteLoc % 2 == 0) height += unit;
+            height += m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) / 2;
+            if (stemMod == STEMMODIFIER_6slash)
+                height += m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false) / 2;
+            break;
         }
-        else {
-            // Take into account artic (not likely, though)
-            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize) + unit + height;
-            x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
+        case STEMMODIFIER_sprech: {
+            double mod = 0;
+            if (noteLoc % 2)
+                mod = (stemDir == STEMDIRECTION_up) ? 1.8 : 4.2;
+            else
+                mod = (stemDir == STEMDIRECTION_up) ? 2.8 : 5.2;
+            height += mod * unit;
+            break;
         }
-        if (drawingDur > DUR_4) {
-            Flag *flag = NULL;
-            flag = dynamic_cast<Flag *>(childElement->FindDescendantByType(FLAG));
-            if (flag) y -= unit * ((drawingDur > DUR_8) ? 3.5 : 2);
-        }
-    }
-    else {
-        if (drawingDur > DUR_1) {
-            // Same as above
-            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) + height;
-            x = stemX;
-        }
-        else {
-            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize) - unit * 2 - height;
-            x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
-        }
-        if (drawingDur > DUR_4) {
-            Flag *flag = NULL;
-            flag = dynamic_cast<Flag *>(childElement->FindDescendantByType(FLAG));
-            if (flag) y += unit * ((drawingDur > DUR_8) ? 3.5 : 2);
+        case STEMMODIFIER_z: {
+            height += (noteLoc % 2) ? 3 * unit : 4 * unit;
+            break;
         }
     }
 
-    bool drawingCueSize = childElement->GetDrawingCueSize();
-    const int beamWidthBlack = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize);
-    const int beamWidthWhite = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
+    // calculate position for the stem mod
+    const int sign = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    int y = note->GetDrawingY() + sign * height;
+    int x = stemX;
+    if (drawingDur <= DUR_1) x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
+
+    // calculate additional adjustments for beamed elements
     Beam *beam = childElement->IsInBeam();
     if (beam) {
-        int beamStep = (drawingDur - DUR_8) * (beamWidthBlack + beamWidthWhite) + beamWidthWhite;
-        y += (stemDir == STEMDIRECTION_down) ? beamStep : -beamStep;
-    }
-
-    if ((code == SMUFL_E22A_buzzRoll) && (stemDir == STEMDIRECTION_down)) {
-        y += unit;
+        bool drawingCueSize = childElement->GetDrawingCueSize();
+        const int beamWidthBlack = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize);
+        const int beamWidthWhite = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
+        const int beamStep = sign * ((drawingDur - DUR_8) * (beamWidthBlack + beamWidthWhite) + beamWidthWhite);
+        if ((y + beamStep) > (y + sign * unit)) y += beamStep;
     }
     if ((code != SMUFL_E645_vocalSprechgesang) || !element->Is(BTREM)) {
         int adjust = 0;
