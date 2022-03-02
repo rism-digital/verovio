@@ -4767,22 +4767,21 @@ bool MEIInput::ReadLayerDefChildren(Object *parent, pugi::xml_node parentNode)
     assert(dynamic_cast<LayerDef *>(parent));
 
     bool success = true;
-    pugi::xml_node current;
-    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+    for (const pugi::xml_node &current : parentNode.children()) {
+        const std::string currentName = current.name();
         if (!success)
             break;
-
-        else if (std::string(current.name()) == "instrDef") {
+        else if (currentName == "instrDef") {
             success = this->ReadInstrDef(parent, current);
         }
-        else if (std::string(current.name()) == "label") {
+        else if (currentName == "label") {
             success = this->ReadLabel(parent, current);
         }
-        else if (std::string(current.name()) == "labelAbbr") {
+        else if (currentName == "labelAbbr") {
             success = this->ReadLabelAbbr(parent, current);
         }
         // xml comment
-        else if (std::string(current.name()) == "") {
+        else if (currentName == "") {
             success = this->ReadXMLComment(parent, current);
         }
         else {
