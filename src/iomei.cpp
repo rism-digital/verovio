@@ -372,7 +372,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteLabelAbbr(m_currentNode, vrv_cast<LabelAbbr *>(object));
     }
     else if (object->Is(LAYERDEF)) {
-        m_currentNode = m_currentNode.append_child("layerdef");
+        m_currentNode = m_currentNode.append_child("layerDef");
         this->WriteLayerDef(m_currentNode, vrv_cast<LayerDef *>(object));
     }
     else if (object->Is(METERSIGGRP)) {
