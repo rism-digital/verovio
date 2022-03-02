@@ -1878,7 +1878,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
             // If we want the nesting to be reduced, we can set to:
             // selfLeft = this->GetSelfLeft();
             // This could be made an option (--spacing-limited-nesting)
-            int selfLeftMargin = params->m_doc->GetLeftMargin(this);
+            const double selfLeftMargin = params->m_doc->GetLeftMargin(this);
             int overlap = 0;
             for (auto &boundingBox : params->m_boundingBoxes) {
                 LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
