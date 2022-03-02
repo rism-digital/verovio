@@ -9299,6 +9299,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             // display a barline local to the staff
             addBarLineElement(layerdata[i], elements, pointers);
         }
+        if ((*layerdata[i] == "*bar") || (layerdata[i]->compare(0, 4, "*bar:") == 0)) {
+            BarLine *barline = new BarLine;
+            setLocationId(barline, layerdata[i]);
+            appendElement(elements, pointers, barline);
+        }
         if (!layerdata[i]->isData()) {
             continue;
         }
