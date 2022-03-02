@@ -1467,10 +1467,8 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
     // Get stem related values (direction and coordinates)
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     int stemX = 0;
-    int stemLen = 0;
     StemmedDrawingInterface *stem = childElement->GetStemmedDrawingInterface();
     if (stem) {
-        stemLen = stem->GetDrawingStemLen();
         stemDir = stem->GetDrawingStemDir();
         stemX = stem->GetDrawingStemStart(childElement).x;
     }
@@ -1497,9 +1495,10 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
 
     // calculate height offset for positioning of stem mod elements on the stem
     const int noteLoc = note->GetDrawingLoc();
-    const wchar_t code = element->StemModeToGlyph(stemMod);
+    const wchar_t code = element->StemModToGlyph(stemMod);
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int height = 2 * unit;
+    const int sign = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     switch (stemMod) {
         case STEMMODIFIER_1slash:
         case STEMMODIFIER_2slash:
@@ -1513,23 +1512,17 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
                 height += m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false) / 2;
             break;
         }
-        case STEMMODIFIER_sprech: {
-            double mod = 0;
-            if (noteLoc % 2)
-                mod = (stemDir == STEMDIRECTION_up) ? 1.8 : 4.2;
-            else
-                mod = (stemDir == STEMDIRECTION_up) ? 2.8 : 5.2;
-            height += mod * unit;
-            break;
-        }
+        case STEMMODIFIER_sprech:
         case STEMMODIFIER_z: {
-            height += (noteLoc % 2) ? 3 * unit : 4 * unit;
+            height += (noteLoc % 2) ? 3 * unit : 2 * unit;
+            if (stemMod == STEMMODIFIER_sprech)
+                height -= sign * m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) / 2;
             break;
         }
+        default: return;
     }
 
     // calculate position for the stem mod
-    const int sign = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     int y = note->GetDrawingY() + sign * height;
     int x = stemX;
     if (drawingDur <= DUR_1) x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);

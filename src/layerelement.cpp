@@ -900,7 +900,7 @@ data_STEMMODIFIER LayerElement::GetDrawingStemMod() const
     return stem->GetStemMod();
 }
 
-wchar_t LayerElement::StemModeToGlyph(data_STEMMODIFIER stemMod) const
+wchar_t LayerElement::StemModToGlyph(data_STEMMODIFIER stemMod) const
 {
     switch (stemMod) {
         case STEMMODIFIER_1slash: return SMUFL_E220_tremolo1;

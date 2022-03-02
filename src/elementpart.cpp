@@ -474,7 +474,7 @@ void Stem::AdjustSlashes(Doc *doc, int staffSize, int flagOffset, bool isSameAs)
         stemMod = this->GetDrawingStemMod();
     }
 
-    const wchar_t code = this->StemModeToGlyph(stemMod);
+    const wchar_t code = this->StemModToGlyph(stemMod);
     // if there is no glyph - do nothing
     if (!code) return;
 

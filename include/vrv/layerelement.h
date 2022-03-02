@@ -260,7 +260,7 @@ public:
     /**
      * Convert stem mode to corresponding glyph code
      */
-    wchar_t StemModeToGlyph(data_STEMMODIFIER stemMod) const;
+    wchar_t StemModToGlyph(data_STEMMODIFIER stemMod) const;
 
     //----------//
     // Functors //
