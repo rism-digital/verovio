@@ -537,7 +537,8 @@ protected:
     hum::HTp getCrescendoEnd(hum::HTp token);
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
     void storeOriginalClefMensurationKeyApp();
-    void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration);
+    void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration,
+        const std::string &typestring = "");
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
     std::string getLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Mar  2 20:52:48 PST 2022
+// Last Modified: Wed Mar  2 22:59:59 PST 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -22770,7 +22770,7 @@ void HumdrumFileContent::analyzeBarlines(void) {
 			}
 		}
 
-		if (hasStraddlingData(i)) {
+		if (hasDataStraddle(i)) {
 				infile[i].setValue("auto", "straddlingData", 1);
 		} else {
 				infile[i].setValue("auto", "straddlingData", 0);
@@ -22789,13 +22789,13 @@ void HumdrumFileContent::analyzeBarlines(void) {
 
 //////////////////////////////
 //
-// HumdrumFileContent::hasStraddlingData -- Returns true if the next
+// HumdrumFileContent::hasDataStraddle -- Returns true if the next
 //    data line after a barline has null tokens on isStaff() tokens.
 //    If there are no data lines after the barline, then it will
 //    return false;
 //
 
-bool HumdrumFileContent::hasStraddlingData(int line) {
+bool HumdrumFileContent::hasDataStraddle(int line) {
 	HumdrumFileContent& infile = *this;
 	if (!infile[line].isBarline()) {
 		return false;
@@ -22810,6 +22810,10 @@ bool HumdrumFileContent::hasStraddlingData(int line) {
 		if (!infile[i].isData()) {
 			continue;
 		}
+		if (infile[i].isGraceLine()) {
+			continue;
+		}
+
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			HTp token = infile.token(i, j);
 			if (!token->isStaff()) {
@@ -28574,6 +28578,24 @@ bool HumdrumLine::isKernBoundaryStart(void) const {
 
 //////////////////////////////
 //
+// HumdrumLine::isGraceLine --
+//
+
+bool HumdrumLine::isGraceLine(void) {
+	if (!this->isData()) {
+		return false;
+	}
+	if (this->getDuration() == 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumLine::isKernBoundaryEnd -- Return true if the next
 //    data line contains no null tokens in the **kern spines.
 //    Assuming that a **kern spine split always starts with
@@ -30503,12 +30525,12 @@ bool HumdrumLine::allSameBarlineStyle(void) {
 
 /////////////////////////////
 //
-// HumdrumLine::hasStraddlingData -- return true if barlines has any staff
+// HumdrumLine::hasDataStraddle -- return true if barlines has any staff
 //     that has data straddling it (the next measure starts with a null
 //     data token (excluding grace-note lines).
 //
 
-bool HumdrumLine::hasStraddlingData(void) {
+bool HumdrumLine::hasDataStraddle(void) {
 	return this->getValueInt("auto", "straddlingData");
 }
 

@@ -1473,7 +1473,7 @@ void HumdrumInput::adjustMeasureTimings(hum::HumdrumFile &infile)
                 // restart barline timestamps for regular barline
                 barstart = infile[i].getDurationFromStart();
             }
-            else if (infile[i].hasStraddlingData()) {
+            else if (infile[i].hasDataStraddle()) {
                 // the barlines are not all of the same style
                 // and there is at least one staff where there is a duration
                 // item (note or rest) that crosses over a barline.  The
@@ -6752,7 +6752,7 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
 
             if (token->isBarline() && !token->allSameBarlineStyle()) {
 
-                if (infile[i].hasStraddlingData()) {
+                if (infile[i].hasDataStraddle()) {
                     if (token->find('-') != std::string::npos) {
                         // do not store partial invisible barlines
                         continue;
@@ -9155,7 +9155,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             lastnote = layerdata[i];
         }
         if (prespace.at(i) > 0) {
-            addSpace(elements, pointers, prespace.at(i));
+            addSpace(elements, pointers, prespace.at(i), "straddle");
         }
         if (layerdata[i]->isData() && layerdata[i]->isNull()) {
             // print any global text directions attached to the null token
@@ -9684,7 +9684,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             // if there is empty space at the end of the layer.  The layer is
             // rhythmically too short, so add a space element to match the
             // amount of underfilling.
-            addSpace(elements, pointers, prespace.back());
+            addSpace(elements, pointers, prespace.back(), "filler");
         }
     }
 
@@ -11434,9 +11434,11 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
 //
 // HumdrumInput::addSpace -- Add one or more space elements
 //    to match the required duration.
+//    default value: typestring = ""
 //
 
-void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &pointers, hum::HumNum duration)
+void HumdrumInput::addSpace(
+    std::vector<string> &elements, std::vector<void *> &pointers, hum::HumNum duration, const std::string &typestring)
 {
     bool visible = false;
     if ((!m_signifiers.ispace_color.empty()) || (!m_signifiers.space_color.empty())) {
@@ -11458,6 +11460,9 @@ void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &
             colorRest(rest, "", -1, -1);
             appendElement(elements, pointers, rest);
             duration -= setDuration(rest, duration);
+            if (!typestring.empty()) {
+                rest->SetType(typestring);
+            }
         }
         else {
             Space *space = new Space();
@@ -11466,6 +11471,9 @@ void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &
             // }
             appendElement(elements, pointers, space);
             duration -= setDuration(space, duration);
+            if (!typestring.empty()) {
+                space->SetType(typestring);
+            }
         }
     }
 }
@@ -11630,6 +11638,7 @@ bool HumdrumInput::processOverfillingNotes(hum::HTp token)
     std::string visual_rhythm = hum::Convert::kernToRecip(token);
     token->setValue("auto", "N", "vis", visual_rhythm);
     token->setValue("auto", "MEI", "dur.logical", logical_rhythm);
+    token->setValue("auto", "MEI", "type", "straddle");
     return true;
 }
 
@@ -20985,7 +20994,13 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         int visualdurdots = (int)std::count(visualdur.begin(), visualdur.end(), '.');
         if (visualdurdots != logicaldurdots) {
             element->SetDotsGes(logicaldurdots);
+        }
+        std::string typestring = token->getValue("auto", "MEI", "type");
+        if (typestring.empty()) {
             element->SetType("overfill");
+        }
+        else {
+            element->SetType(typestring);
         }
     }
     else if (vstring.empty()) {
@@ -23456,7 +23471,7 @@ int HumdrumInput::getMeasureEndLine(int startline)
                 endline = i;
                 break;
             }
-            else if (!infile[i].hasStraddlingData()) {
+            else if (!infile[i].hasDataStraddle()) {
                 endline = i;
                 break;
             }
