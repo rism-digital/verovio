@@ -1470,6 +1470,21 @@ void HumdrumInput::adjustMeasureTimings(hum::HumdrumFile &infile)
     for (int i = 0; i < infile.getLineCount(); ++i) {
         if (infile[i].isBarline()) {
             if (infile[i].allSameBarlineStyle()) {
+                // restart barline timestamps for regular barline
+                barstart = infile[i].getDurationFromStart();
+            }
+            else if (infile[i].hasStraddlingData()) {
+                // the barlines are not all of the same style
+                // and there is at least one staff where there is a duration
+                // item (note or rest) that crosses over a barline.  The
+                // adjacent measures will be merged into a larger single measure
+                // in such cases. (i.e., not resetting barline durations).
+            }
+            else {
+                // The barlines are different, but there is no straddling
+                // note or rest.  This will be treated as a regular measure
+                // that is invisible at the system level, and with individual
+                // barlines of the given style for each staff.
                 barstart = infile[i].getDurationFromStart();
             }
         }
@@ -6311,9 +6326,11 @@ bool HumdrumInput::convertSystemMeasure(int &line)
     hum::HumdrumFile &infile = m_infiles[0];
     int startline = line;
     int endline = getMeasureEndLine(startline);
+
     if (endline > infile.getLineCount()) {
         return false;
     }
+
     if (endline < 0) {
         // empty measure, skip it.  This can happen at the start of
         // a score if there is an invisible measure before the start of the
@@ -6734,9 +6751,12 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
             }
 
             if (token->isBarline() && !token->allSameBarlineStyle()) {
-                if (token->find('-') != std::string::npos) {
-                    // do not store partial invisible barlines
-                    continue;
+
+                if (infile[i].hasStraddlingData()) {
+                    if (token->find('-') != std::string::npos) {
+                        // do not store partial invisible barlines
+                        continue;
+                    }
                 }
             }
             lt[staffindex][layerindex].push_back(token);
@@ -9297,7 +9317,12 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         if (layerdata[i]->isBarline() && (!layerdata[i]->allSameBarlineStyle())) {
             // display a barline local to the staff
-            addBarLineElement(layerdata[i], elements, pointers);
+            if (i == 0) {
+                // don't print a barline at the start of a measure (always?)
+            }
+            else {
+                addBarLineElement(layerdata[i], elements, pointers);
+            }
         }
         if ((*layerdata[i] == "*bar") || (layerdata[i]->compare(0, 4, "*bar:") == 0)) {
             BarLine *barline = new BarLine;
@@ -9734,6 +9759,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
 void HumdrumInput::addBarLineElement(hum::HTp bartok, std::vector<std::string> &elements, std::vector<void *> &pointers)
 {
+    if (bartok->find("-") != std::string::npos) {
+        // probably do not want to have an invisible barline
+        return;
+    }
+
     BarLine *barline = new BarLine();
     setLocationId(barline, bartok);
 
@@ -23329,6 +23359,12 @@ void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
         return;
     }
 
+    if (!infile[endline].allSameBarlineStyle()) {
+        // non-invisible staff barlines will be added later.
+        m_measure->SetRight(BARRENDITION_invis);
+        return;
+    }
+
     std::string endbar = infile[endline].getTokenString(0);
     std::string startbar = infile[startline].getTokenString(0);
 
@@ -23417,6 +23453,10 @@ int HumdrumInput::getMeasureEndLine(int startline)
             // If the barlines are not all of the same style, then
             // treat the barline as <barLine> rather than create new <measure>:
             if (infile[i].allSameBarlineStyle()) {
+                endline = i;
+                break;
+            }
+            else if (!infile[i].hasStraddlingData()) {
                 endline = i;
                 break;
             }

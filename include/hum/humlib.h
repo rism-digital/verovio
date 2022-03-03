@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Mar  1 17:54:34 PST 2022
+// Last Modified: Wed Mar  2 20:52:48 PST 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1334,6 +1334,7 @@ class HumdrumLine : public std::string, public HumHash {
 		void     copyStructure          (HLp line, const std::string& empty);
 
 		bool     allSameBarlineStyle    (void);
+		bool     hasStraddlingData      (void);
 
 	protected:
 		bool     analyzeTracks          (std::string& err);
@@ -2451,6 +2452,7 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		// in HumdrumFileContent-barline.cpp
 		void   analyzeBarlines            (void);
 		bool   hasDifferentBarlines       (void);
+		bool   hasStraddlingData          (int line);
 
 	protected:
 

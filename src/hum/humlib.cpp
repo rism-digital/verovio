@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Mar  1 17:54:34 PST 2022
+// Last Modified: Wed Mar  2 20:52:48 PST 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -22770,11 +22770,58 @@ void HumdrumFileContent::analyzeBarlines(void) {
 			}
 		}
 
+		if (hasStraddlingData(i)) {
+				infile[i].setValue("auto", "straddlingData", 1);
+		} else {
+				infile[i].setValue("auto", "straddlingData", 0);
+		}
+
 		if (!allSame) {
 			infile[i].setValue("auto", "barlinesDifferent", 1);
 			m_analyses.m_barlines_different = true;
+		} else {
+			infile[i].setValue("auto", "barlinesDifferent", 0);
 		}
 	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::hasStraddlingData -- Returns true if the next
+//    data line after a barline has null tokens on isStaff() tokens.
+//    If there are no data lines after the barline, then it will
+//    return false;
+//
+
+bool HumdrumFileContent::hasStraddlingData(int line) {
+	HumdrumFileContent& infile = *this;
+	if (!infile[line].isBarline()) {
+		return false;
+	}
+	for (int i=line+1; i<infile.getLineCount(); i++) {
+		if (infile[i].isInterpretation()) {
+			HTp token = infile.token(i, 0);
+			if (*token == "*-") {
+				return false;
+			}
+		}
+		if (!infile[i].isData()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isStaff()) {
+				continue;
+			}
+			if (token->isNull()) {
+				return true;
+			}
+		}
+		break;
+	}
+	return false;
 }
 
 
@@ -30450,6 +30497,19 @@ void HumdrumLine::copyStructure(HLp line, const string& empty) {
 
 bool HumdrumLine::allSameBarlineStyle(void) {
 	return !this->getValueInt("auto", "barlinesDifferent");
+}
+
+
+
+/////////////////////////////
+//
+// HumdrumLine::hasStraddlingData -- return true if barlines has any staff
+//     that has data straddling it (the next measure starts with a null
+//     data token (excluding grace-note lines).
+//
+
+bool HumdrumLine::hasStraddlingData(void) {
+	return this->getValueInt("auto", "straddlingData");
 }
 
 
