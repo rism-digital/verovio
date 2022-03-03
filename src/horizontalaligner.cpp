@@ -763,10 +763,10 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
     Accid *accid, Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids)
 {
     std::vector<Accid *> leftAccids;
-    const ArrayOfObjects *children = this->GetChildren();
+    const ArrayOfObjects &children = this->GetChildren();
 
     // bottom one
-    for (auto child : *children) {
+    for (auto child : children) {
         // if accidental has unison overlap, ignore elements on other layers for overlap
         if (accid->IsAlignedWithSameLayer() && (accid->GetFirstAncestor(LAYER) != child->GetFirstAncestor(LAYER)))
             continue;
@@ -795,12 +795,12 @@ bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfObjects *objects)
 
 void AlignmentReference::SetAccidLayerAlignment()
 {
-    const ArrayOfObjects *children = this->GetChildren();
+    const ArrayOfObjects &children = this->GetChildren();
     for (Accid *accid : m_accidSpace) {
         if (accid->IsAlignedWithSameLayer()) continue;
 
         Note *parentNote = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
-        const bool hasUnisonOverlap = std::any_of(children->begin(), children->end(), [parentNote](Object *object) {
+        const bool hasUnisonOverlap = std::any_of(children.begin(), children.end(), [parentNote](Object *object) {
             if (!object->Is(NOTE)) return false;
             Note *otherNote = vrv_cast<Note *>(object);
             // in case notes are in unison but have different accidentals
