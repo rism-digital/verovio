@@ -1021,42 +1021,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
         accid->SetZone(zone);
-        
-        // find closest two neume
-        // if the two share the same parent
-        //      1) if the nearest neume is the last neume, add accid between syllables
-        //      2) if not, add accid inside the syllable
-        // if the two doesn't share the same parent, add accid between syllables
-        ListOfObjects neumes;
-        ClassIdComparison ac(NEUME);
-        staff->FindAllDescendantByComparison(&neumes, &ac);
-        
-        if (neumes.size() < 2) {
-            layer->AddChild(accid);
-        } else {
-            std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
-
-            ClosestNeume compN;
-            compN.x = ulx;
-            compN.y = uly;
-
-            std::stable_sort(neumesVector.begin(), neumesVector.end(), compN);
-            Object *fNeume = neumesVector.at(0);
-            Object *sNeume = neumesVector.at(1);
-
-            Object *fSyllable = fNeume->GetParent();
-            if (fSyllable->GetChildIndex(sNeume) == -1){
-                layer->AddChild(accid);
-            } else {
-                // the two doesn't share the parent
-                if (fNeume->GetNext() == NULL) {
-                    layer->AddChild(accid);
-                }
-                else {
-                    fSyllable->AddChild(accid);
-                }
-            }
-        }
+        layer->AddChild(accid);
 
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
@@ -1107,45 +1072,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
         divLine->SetZone(zone);
-
-        // find closest two neume
-        // if the two share the same parent
-        //      1) if the nearest neume is the last neume, add divLine between syllables
-        //      2) if not, add divLine inside the syllable
-        // if the two doesn't share the same parent, add divLine between syllables
-        ListOfObjects neumes;
-        ClassIdComparison ac(NEUME);
-        staff->FindAllDescendantByComparison(&neumes, &ac);
-        
-        if (neumes.size() < 2) {
-            layer->AddChild(divLine);
-        } else {
-            std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
-
-            ClosestNeume compN;
-            compN.x = ulx;
-            compN.y = uly;
-
-            std::stable_sort(neumesVector.begin(), neumesVector.end(), compN);
-            Object *fNeume = neumesVector.at(0);
-            Object *sNeume = neumesVector.at(1);
-
-            Object *fSyllable = fNeume->GetParent();
-            if (fSyllable->GetChildIndex(sNeume) == -1){
-                // the two share the same parent
-                layer->AddChild(divLine);
-            } 
-            else {
-                // the two doesn't share the parent
-                if (fNeume->GetNext() == NULL) {
-                    layer->AddChild(divLine);
-                }
-                else {
-                    fSyllable->AddChild(divLine);
-                }
-            }
-        }
-        
+        layer->AddChild(divLine);
+                
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
