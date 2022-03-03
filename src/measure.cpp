@@ -1060,7 +1060,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         params->m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
 
         // Prevent collisions of scoredef clefs with thick barlines
-        if (this->IsFirstInSystem()) {
+        if (this->IsFirstInSystem() && (system->GetDrawingScoreDef()->GetSystemLeftline() != BOOLEAN_false)) {
             params->m_upcomingMinPos = params->m_doc->GetDrawingBarLineWidth(params->m_staffSize);
         }
 
