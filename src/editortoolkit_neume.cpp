@@ -1135,7 +1135,17 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
                 + ", but only DivLines and Accids can be inserted into syllables.");
         return false;
     }
+    if (!parent->Is(LAYER)) {
+        LogError("The selected %s is not a child of layer.",
+            element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message",
+            "The selected " + element->GetClassName()
+                + "is not a child of layer.");
+        return false;
+    }
 
+    // get the position of the selected element
     int ulx;
     int uly;
     if (dynamic_cast<FacsimileInterface *>(element)->HasFacs()) {
@@ -1174,6 +1184,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
         return false;
     }
 
+    // get nearest syllable using nearest neume
     Object *syllable = neume->GetParent();
     assert(syllable);
 
