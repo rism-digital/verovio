@@ -1210,6 +1210,7 @@ void BeamSegment::CalcBeamPlaceTab(
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
     int relevantNoteLoc = VRV_UNSET;
+    int minDuration = DUR_4;
     const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     for (auto coord : m_beamElementCoordRefs) {
         const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
@@ -1220,15 +1221,19 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         if (!coord->m_closestNote) continue;
         if (relevantNoteLoc == VRV_UNSET) {
             relevantNoteLoc = coord->m_closestNote->GetDrawingLoc();
+            minDuration = coord->m_dur;
         }
-        else {
+        else if (coord->m_dur > minDuration) {
+            relevantNoteLoc = coord->m_closestNote->GetDrawingLoc();
+            minDuration = coord->m_dur;
+        }
+        else if (coord->m_dur == minDuration) {
             relevantNoteLoc = (place == BEAMPLACE_below)
                 ? std::min(coord->m_closestNote->GetDrawingLoc(), relevantNoteLoc)
                 : std::max(coord->m_closestNote->GetDrawingLoc(), relevantNoteLoc);
         }
     }
 
-    int minDuration = DUR_4;
     for (auto coord : m_beamElementCoordRefs) {
         const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
             : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
@@ -1240,13 +1245,11 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         }
         if (!coord->m_closestNote) continue;
         // skip current element if it's longer that minDuration and is not a part of fTrem
-        if ((coord->m_dur <= minDuration) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
+        if ((coord->m_dur < minDuration) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
         // if location matches or if current stem length is too short - adjust stem length
         const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
-        if ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
-            || (!isHorizontal && (std::abs(m_uniformStemLength) < 13))) {
+        if (coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc) {
             m_uniformStemLength = coordStemLength;
-            minDuration = coord->m_dur;
         }
     }
     // make adjustments for the grace notes length
