@@ -2021,6 +2021,7 @@ void MEIOutput::WriteLayer(pugi::xml_node currentNode, Layer *layer)
     assert(layer);
 
     this->WriteXmlId(currentNode, layer);
+    layer->WriteCue(currentNode);
     layer->WriteNInteger(currentNode);
     layer->WriteTyped(currentNode);
     layer->WriteVisibility(currentNode);
@@ -5442,6 +5443,7 @@ bool MEIInput::ReadLayer(Object *parent, pugi::xml_node layer)
     Layer *vrvLayer = new Layer();
     this->SetMeiUuid(layer, vrvLayer);
 
+    vrvLayer->ReadCue(layer);
     vrvLayer->ReadNInteger(layer);
     vrvLayer->ReadTyped(layer);
     vrvLayer->ReadVisibility(layer);

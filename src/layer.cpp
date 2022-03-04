@@ -44,8 +44,15 @@ namespace vrv {
 static const ClassRegistrar<Layer> s_factory("layer", LAYER);
 
 Layer::Layer()
-    : Object(LAYER, "layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
+    : Object(LAYER, "layer-")
+    , DrawingListInterface()
+    , ObjectListInterface()
+    , AttCue()
+    , AttNInteger()
+    , AttTyped()
+    , AttVisibility()
 {
+    this->RegisterAttClass(ATT_CUE);
     this->RegisterAttClass(ATT_NINTEGER);
     this->RegisterAttClass(ATT_TYPED);
     this->RegisterAttClass(ATT_VISIBILITY);
@@ -74,6 +81,7 @@ void Layer::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
+    this->ResetCue();
     this->ResetNInteger();
     this->ResetTyped();
     this->ResetVisibility();
