@@ -14741,7 +14741,11 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
         else {
             mindex = slurstart->getValueInt("MEI", "measureIndex");
         }
-        bool isInvisible = checkIfSlurIsInvisible(slurstart, slurstartnumber);
+
+        // Check if there is a "y" marker immediately after the slur start, or
+        // the notes at both ends of the slur are invisible, unless there is an
+        // "X" immediately after the slur start.
+        bool isInvisible = checkIfSlurIsInvisible(slurstart, slurstartnumber, slurend, slurendnumber);
         if (isInvisible) {
             continue;
         }
@@ -14880,23 +14884,41 @@ void HumdrumInput::setLayoutSlurDirection(Slur *slur, hum::HTp token)
 // HumdrumInput::checkIfSlurIsInvisible --
 //
 
-bool HumdrumInput::checkIfSlurIsInvisible(hum::HTp token, int number)
+bool HumdrumInput::checkIfSlurIsInvisible(hum::HTp stoken, int snumber, hum::HTp etoken, int enumber)
 {
-    int tsize = (int)token->size();
+    int tsize = (int)stoken->size();
     int counter = 0;
+    bool hasy = false;
+    bool hasX = false;
+
     for (int i = 0; i < tsize - 1; ++i) {
-        if (token->at(i) == '(') {
+        if (stoken->at(i) == '(') {
             counter++;
         }
-        if (counter == number) {
-            if (token->at(i + 1) == 'y') {
-                return true;
+        else {
+            continue;
+        }
+        if (counter == snumber) {
+            if (stoken->at(i + 1) == 'y') {
+                hasy = true;
             }
-            else {
-                return false;
+            else if (stoken->at(i + 1) == 'X') {
+                hasX = true;
             }
         }
     }
+
+    if (hasy) {
+        return true;
+    }
+    if (hasX) {
+        return false;
+    }
+
+    if ((stoken->find("yy") != std::string::npos) && (etoken->find("yy") != std::string::npos)) {
+        return true;
+    }
+
     return false;
 }
 
