@@ -732,6 +732,13 @@ int Layer::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Layer::GenerateMIDI(FunctorParams *functorParams)
+{
+    if (this->GetCue() == BOOLEAN_true) return FUNCTOR_SIBLINGS;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Layer::GenerateMIDIEnd(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
