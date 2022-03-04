@@ -1482,13 +1482,13 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
         note = (stemDir == STEMDIRECTION_up) ? vrv_cast<Chord *>(childElement)->GetTopNote()
                                              : vrv_cast<Chord *>(childElement)->GetBottomNote();
     }
-    if (!note) return;
+    if (!note || note->IsGraceNote()) return;
 
     // Get duration for the element
     int drawingDur = 0;
     DurationInterface *duration = childElement->GetDurationInterface();
     if (duration) {
-        drawingDur = duration->GetDur();
+        drawingDur = duration->GetActualDur();
     }
     data_STEMMODIFIER stemMod = element->GetDrawingStemMod();
     if (stemMod == STEMMODIFIER_NONE) return;
@@ -1531,10 +1531,9 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
     Beam *beam = childElement->IsInBeam();
     if (beam) {
         bool drawingCueSize = childElement->GetDrawingCueSize();
-        const int beamWidthBlack = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize);
-        const int beamWidthWhite = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
-        const int beamStep = sign * ((drawingDur - DUR_8) * (beamWidthBlack + beamWidthWhite) + beamWidthWhite);
-        if ((y + beamStep) > (y + sign * unit)) y += beamStep;
+        const int beamStep = -sign
+            * ((drawingDur - DUR_8) * (beam->m_beamWidthBlack + beam->m_beamWidthWhite) + beam->m_beamWidthWhite);
+        if ((beamStep) > (sign * unit)) y += beamStep;
     }
     if ((code != SMUFL_E645_vocalSprechgesang) || !element->Is(BTREM)) {
         int adjust = 0;
@@ -1544,7 +1543,6 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
             // we need to take half (0.5) of the height difference between to glyphs for the the initial position and
             // add a quarter (0.25) of the glyph to account for the height of slash side and white space between
             // slashes. This results in 0.75 adjustment of the height
-            const int sign = (stemDir == STEMDIRECTION_up) ? 1 : -1;
             adjust = -sign * unit;
             const int slash1adjust = sign * 0.75 * (slash6height - slash1height) + adjust;
             this->DrawSmuflCode(dc, x, y + slash1adjust, SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false);

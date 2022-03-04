@@ -157,7 +157,7 @@ data_STEMMODIFIER BTrem::GetDrawingStemMod() const
 
     DurationInterface *duration = child->GetDurationInterface();
     if (!duration) return STEMMODIFIER_NONE;
-    const int drawingDur = duration->GetDur();
+    const int drawingDur = duration->GetActualDur();
 
     if (!this->HasUnitdur()) {
         if (drawingDur < DUR_2) return STEMMODIFIER_3slash;
@@ -166,13 +166,13 @@ data_STEMMODIFIER BTrem::GetDrawingStemMod() const
     int slashDur = this->GetUnitdur() - drawingDur;
     if (drawingDur < DUR_4) slashDur = this->GetUnitdur() - DUR_4;
     switch (slashDur) {
-        case (0): return STEMMODIFIER_NONE;
-        case (1): return STEMMODIFIER_1slash;
-        case (2): return STEMMODIFIER_2slash;
-        case (3): return STEMMODIFIER_3slash;
-        case (4): return STEMMODIFIER_4slash;
-        case (5): return STEMMODIFIER_5slash;
-        case (6): return STEMMODIFIER_6slash;
+        case 0: return STEMMODIFIER_NONE;
+        case 1: return STEMMODIFIER_1slash;
+        case 2: return STEMMODIFIER_2slash;
+        case 3: return STEMMODIFIER_3slash;
+        case 4: return STEMMODIFIER_4slash;
+        case 5: return STEMMODIFIER_5slash;
+        case 6: return STEMMODIFIER_6slash;
         default: break;
     }
 
