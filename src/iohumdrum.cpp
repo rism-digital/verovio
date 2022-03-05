@@ -8900,7 +8900,7 @@ void HumdrumInput::fillEmptyLayer(
         hum::HumNum starttime = layerdata[0]->getDurationFromStart();
         hum::HumNum endtime = layerdata.back()->getDurationFromStart();
         hum::HumNum duration = endtime - starttime;
-        addSpace(elements, pointers, duration);
+        addSpace(elements, pointers, duration, "straddle");
     }
 }
 
@@ -8986,7 +8986,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     /* Why not allowed?
     if (timesigdurs[startline] != duration) {
-            m_measure->SetMetcon(BOOLEAN_false);
+        m_measure->SetMetcon(BOOLEAN_false);
     }
     */
 
@@ -9065,8 +9065,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             setSystemMeasureStyle(startline, tempendline);
         }
         else {
-            MRest *mrest = new MRest();
-            appendElement(layer, mrest);
             hum::HTp trest = NULL;
             for (int i = 0; i < (int)layerdata.size(); ++i) {
                 if (!layerdata[i]->isData()) {
@@ -9078,7 +9076,28 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
             }
             if (trest) {
-                convertMRest(mrest, trest, -1, staffindex);
+                hum::HumNum duration = trest->getDuration();
+                hum::HumNum mstartdur = layerdata[0]->getDurationFromStart();
+                hum::HumNum menddur = layerdata.back()->getDurationFromStart();
+                hum::HumNum mdur = menddur - mstartdur;
+                hum::HumNum extradur = duration - mdur;
+                if (extradur == 0) {
+                    MRest *mrest = new MRest();
+                    appendElement(layer, mrest);
+                    convertMRest(mrest, trest, -1, staffindex);
+                }
+                else if (extradur > 0) {
+                    // add a rest that is left justified in the measure
+                    // (so not an mRest), and update the visual duration
+                    // of the rest because there will be invisible rests
+                    // added in later measure(s).
+                    Rest *rest = new Rest;
+                    appendElement(layer, rest);
+                    convertRest(rest, trest, -1, staffindex);
+                }
+                else {
+                    std::cerr << "Strange error for adding rest " << trest << std::endl;
+                }
             }
 
             for (int z = 0; z < (int)layerdata.size(); ++z) {
