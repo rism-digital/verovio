@@ -22820,21 +22820,10 @@ void HumdrumInput::printMeasureTokens()
 
 template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, hum::HumNum duration)
 {
+
     if (duration == 3) {
         element->SetDur(DURATION_2);
         element->SetDots(1);
-        return duration;
-    }
-    else if (duration == 2) {
-        element->SetDur(DURATION_2);
-        return duration;
-    }
-    else if (duration == 1) {
-        element->SetDur(DURATION_4);
-        return duration;
-    }
-    else if (duration == 4) {
-        element->SetDur(DURATION_1);
         return duration;
     }
     else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 2)) {
@@ -22875,15 +22864,23 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
         element->SetDur(DURATION_512);
         return duration;
     }
-    if (duration > 4) {
+    if (duration >= 16) {
+        element->SetDur(DURATION_long);
+        return 16;
+    }
+    if (duration >= 8) {
+        element->SetDur(DURATION_breve);
+        return 8;
+    }
+    if (duration >= 4) {
         element->SetDur(DURATION_1);
         return 4;
     }
-    if (duration > 2) {
+    if (duration >= 2) {
         element->SetDur(DURATION_2);
         return 2;
     }
-    if (duration > 1) {
+    if (duration >= 1) {
         element->SetDur(DURATION_4);
         return 1;
     }
