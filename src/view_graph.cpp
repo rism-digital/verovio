@@ -223,9 +223,10 @@ void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width,
     dc->ResetBrush();
 }
 
-void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
+void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize, bool dimin)
 {
-    const int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
+    int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
+    if (dimin) r *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);

@@ -843,8 +843,8 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
         int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         for (int loc : mapEntry.second) {
-            this->DrawDotsPart(
-                dc, x, y + loc * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), dotStaff);
+            this->DrawDotsPart(dc, x, y + loc * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(),
+                dotStaff, element->GetDrawingCueSize());
         }
     }
 
@@ -1755,17 +1755,18 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     dc->ResetBrush();
 }
 
-void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
+void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff, bool dimin)
 {
     int i;
 
     if (staff->IsOnStaffLine(y, m_doc)) {
         y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
+    const double distance = dimin ? m_doc->GetOptions()->m_graceFactor.GetValue() : 1.0;
     for (i = 0; i < dots; ++i) {
-        this->DrawDot(dc, x, y, staff->m_drawingStaffSize);
+        this->DrawDot(dc, x, y, staff->m_drawingStaffSize, dimin);
         // HARDCODED
-        x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
+        x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5 * distance;
     }
 }
 

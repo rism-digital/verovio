@@ -339,7 +339,7 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
     void DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y, double sizeFactor);
-    void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
+    void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff, bool dimin = false);
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */
     int DrawMeterSigFigures(
@@ -554,7 +554,7 @@ protected:
     void DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int radius);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
     void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth);
-    void DrawDot(DeviceContext *dc, int x, int y, int staffSize);
+    void DrawDot(DeviceContext *dc, int x, int y, int staffSize, bool dimin = false);
     void DrawSquareBracket(DeviceContext *dc, bool leftBracket, int x, int y, int height, int width,
         int horizontalThickness, int verticalThickness);
     void DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, int width, int offset, int bracketWidth,
