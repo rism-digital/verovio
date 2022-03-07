@@ -1996,6 +1996,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     Layer *currentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(currentLayer);
     if (currentLayer->GetCue() == BOOLEAN_true) {
         m_drawingCueSize = true;
         return FUNCTOR_CONTINUE;
