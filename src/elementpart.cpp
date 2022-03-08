@@ -333,6 +333,9 @@ int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int mar
 
 void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
 {
+    assert(this->GetParent());
+    assert(this->GetParent()->IsLayerElement());
+
     LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
     if (!parent) return;
 
