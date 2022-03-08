@@ -403,7 +403,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
     else {
         int adjust = 0;
         std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
-            if (!coord->m_element && !coord->m_element->Is({ NOTE, CHORD })) return;
+            if (coord->m_element && !coord->m_element->Is({ NOTE, CHORD })) return;
             int elemY = coord->m_element->GetDrawingY();
             const int diff = std::abs(elemY - coord->m_yBeam);
             if (coord->m_stem->GetDrawingStemDir() == STEMDIRECTION_down) {

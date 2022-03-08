@@ -570,7 +570,7 @@ int Staff::AlignVertically(FunctorParams *functorParams)
     std::vector<Object *>::const_iterator sylIterator
         = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(SYL));
     if (sylIterator != m_timeSpanningElements.end()) {
-        Verse *verse = vrv_cast<Verse *>((*sylIterator)->GetParent());
+        Verse *verse = vrv_cast<Verse *>((*sylIterator)->GetFirstAncestor(VERSE));
         if (verse) {
             const int verseNumber = verse->GetN();
             const bool verseCollapse = params->m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();

@@ -960,7 +960,7 @@ int LayerElement::CalcLayerOverlap(Doc *doc, int direction, int y1, int y2)
 int LayerElement::GetDotCount(const MapOfDotLocs &dotLocations)
 {
     return std::accumulate(dotLocations.cbegin(), dotLocations.cend(), 0,
-        [](int sum, const MapOfDotLocs::value_type &mapEntry) { return sum + mapEntry.second.size(); });
+        [](int sum, const MapOfDotLocs::value_type &mapEntry) { return sum + (int)mapEntry.second.size(); });
 }
 
 int LayerElement::GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDotLocs &dotLocs2)
@@ -1628,6 +1628,8 @@ int LayerElement::AdjustOverlappingLayers(
     }
 
     if (this->Is({ DOTS, STEM })) {
+        assert(this->GetParent());
+        assert(this->GetParent()->IsLayerElement());
         LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
         assert(parent);
         parent->SetDrawingXRel(parent->GetDrawingXRel() + margin);
@@ -1671,6 +1673,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             // Unisson, look at the duration for the note heads
             if (unison && currentNote->IsUnisonWith(previousNote, false)) {
                 int previousDuration = previousNote->GetDrawingDur();
+                assert(previousNote->GetParent());
                 const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;
                 data_STEMDIRECTION stemDir = currentNote->GetDrawingStemDir();
@@ -2367,9 +2370,9 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
     if (!currentLayer || this->IsScoreDefElement() || this->Is(MREST)) return FUNCTOR_SIBLINGS;
     if (!this->GetDurationInterface() || this->Is({ MSPACE, SPACE }) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
 
-    const double duration = !this->GetParent()->Is(CHORD)
+    const double duration = !this->GetFirstAncestor(CHORD)
         ? this->GetAlignmentDuration(params->m_mensur, params->m_meterSig)
-        : vrv_cast<Chord *>(this->GetParent())->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+        : vrv_cast<Chord *>(this->GetFirstAncestor(CHORD))->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
 
     const double time = m_alignment->GetTime();
 

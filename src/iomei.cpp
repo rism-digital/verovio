@@ -1255,6 +1255,7 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
 bool MEIOutput::AdjustLabel(Label *label)
 {
     assert(label);
+    assert(label->GetParent());
 
     // Check if there is a label abbreviation sibling
     LabelAbbr *abbr = vrv_cast<LabelAbbr *>(label->GetParent()->GetChild(0, LABELABBR));
