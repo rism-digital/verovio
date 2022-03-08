@@ -960,7 +960,7 @@ int LayerElement::CalcLayerOverlap(Doc *doc, int direction, int y1, int y2)
 int LayerElement::GetDotCount(const MapOfDotLocs &dotLocations)
 {
     return std::accumulate(dotLocations.cbegin(), dotLocations.cend(), 0,
-        [](int sum, const MapOfDotLocs::value_type &mapEntry) { return sum + mapEntry.second.size(); });
+        [](int sum, const MapOfDotLocs::value_type &mapEntry) { return sum + (int)mapEntry.second.size(); });
 }
 
 int LayerElement::GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDotLocs &dotLocs2)
