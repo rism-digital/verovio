@@ -511,6 +511,47 @@ int main(int argc, char **argv)
         }
     }
 
+    else if (outformat == "hummidi") {
+        std::string humdata;
+        if (infile == "-") {
+            std::ostringstream input_data;
+            for (std::string line; getline(std::cin, line);) {
+                input_data << line << std::endl;
+            }
+            if (input_data.str().empty()) {
+                std::cerr << "The input could not be loaded." << std::endl;
+                exit(1);
+            }
+            humdata = input_data.str();
+        }
+        else {
+            std::ifstream instream(infile.c_str());
+            if (!instream.is_open()) {
+                return 1;
+            }
+
+            instream.seekg(0, std::ios::end);
+            std::streamsize fileSize = (std::streamsize)instream.tellg();
+            instream.clear();
+            instream.seekg(0, std::ios::beg);
+
+            // read the file into the std::string:
+            humdata.resize(fileSize, 0);
+            instream.read(humdata.data(), fileSize);
+        }
+
+        std::string base64midi = toolkit.ConvertHumdrumToMIDI(humdata);
+        if (std_output) {
+            std::cout << base64midi << std::endl;
+        }
+        else {
+            std::cerr << "Humdrum-MIDI to file not yet implemented." << std::endl;
+            // outfile += ".mid";
+            // smf::MidiFile outputfile;
+            // outputfile.readBase64(base64midi);
+            // outputfile.write(outfile);
+        }
+    }
     else if (outformat == "midi") {
         outfile += ".mid";
         if (std_output) {
@@ -602,7 +643,6 @@ int main(int argc, char **argv)
                 humdata.resize(fileSize, 0);
                 instream.read(humdata.data(), fileSize);
             }
-
             // Output will be accessible from toolkit.GetHumdrum():
             toolkit.ConvertHumdrumToHumdrum(humdata);
         }

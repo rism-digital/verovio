@@ -1236,6 +1236,12 @@
 		BD0562372518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
 		BD0562382518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
 		BD0562392518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
+		BD87768327CE8A11005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
+		BD87768427CE8A19005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
+		BD87768527CE8A1A005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
+		BD87768627CE8A1A005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
+		BD87768727CE8A21005B97EA /* layerdef.h in Headers */ = {isa = PBXBuildFile; fileRef = BD87768127CE89FA005B97EA /* layerdef.h */; };
+		BD87768827CE8A21005B97EA /* layerdef.h in Headers */ = {isa = PBXBuildFile; fileRef = BD87768127CE89FA005B97EA /* layerdef.h */; };
 		BDA81C21268B38760065B802 /* metersiggrp.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA81C20268B386C0065B802 /* metersiggrp.h */; };
 		BDA81C22268B38770065B802 /* metersiggrp.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA81C20268B386C0065B802 /* metersiggrp.h */; };
 		BDA81C24268B38A10065B802 /* metersiggrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDA81C23268B38A10065B802 /* metersiggrp.cpp */; };
@@ -1723,6 +1729,8 @@
 		BBC19FC222B38C1400100F42 /* VerovioFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VerovioFramework.h; sourceTree = "<group>"; };
 		BD05622E2518CD12004057EB /* beamspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = beamspan.h; path = include/vrv/beamspan.h; sourceTree = "<group>"; };
 		BD0562352518CD20004057EB /* beamspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = beamspan.cpp; path = src/beamspan.cpp; sourceTree = "<group>"; };
+		BD87768127CE89FA005B97EA /* layerdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layerdef.h; path = include/vrv/layerdef.h; sourceTree = "<group>"; };
+		BD87768227CE8A11005B97EA /* layerdef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layerdef.cpp; path = src/layerdef.cpp; sourceTree = "<group>"; };
 		BDA81C20268B386C0065B802 /* metersiggrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersiggrp.h; path = include/vrv/metersiggrp.h; sourceTree = "<group>"; };
 		BDA81C23268B38A10065B802 /* metersiggrp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersiggrp.cpp; path = src/metersiggrp.cpp; sourceTree = "<group>"; };
 		BDC366C52576AF9300E4D826 /* grpsym.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grpsym.cpp; path = src/grpsym.cpp; sourceTree = "<group>"; };
@@ -2267,6 +2275,8 @@
 				40E1CEDC205060E20007C8AF /* labelabbr.h */,
 				8F086EC6188539540037FD8E /* layer.cpp */,
 				8F59291D18854BF800FE51AD /* layer.h */,
+				BD87768227CE8A11005B97EA /* layerdef.cpp */,
+				BD87768127CE89FA005B97EA /* layerdef.h */,
 				8F086EC9188539540037FD8E /* measure.cpp */,
 				8F59292018854BF800FE51AD /* measure.h */,
 				8F086ECE188539540037FD8E /* page.cpp */,
@@ -2523,6 +2533,7 @@
 				4D1BE7831C69434C0086DC0E /* MidiMessage.h in Headers */,
 				4DB3D8BF1F83D0DC00B5FC2B /* section.h in Headers */,
 				8F59294C18854BF800FE51AD /* page.h in Headers */,
+				BD87768727CE8A21005B97EA /* layerdef.h in Headers */,
 				4D1BE77F1C69434C0086DC0E /* Binasc.h in Headers */,
 				4DB3D8EA1F83D17700B5FC2B /* ligature.h in Headers */,
 				4DB3D8B11F83D05B00B5FC2B /* atts_shared.h in Headers */,
@@ -2698,6 +2709,7 @@
 				BB4C4AF022A932BC001F6AF0 /* lem.h in Headers */,
 				BB4C4AE022A932BC001F6AF0 /* annot.h in Headers */,
 				4D79642726C167200026288B /* pagemilestone.h in Headers */,
+				BD87768827CE8A21005B97EA /* layerdef.h in Headers */,
 				BB4C4B1C22A932CF001F6AF0 /* arpeg.h in Headers */,
 				BB4C4B2A22A932CF001F6AF0 /* harm.h in Headers */,
 				4DD7C10027A55CFD00B9C017 /* timemap.h in Headers */,
@@ -3086,6 +3098,7 @@
 				BD0562372518CD20004057EB /* beamspan.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
 				4DC12A7D1F740FB9000440E9 /* view_running.cpp in Sources */,
+				BD87768427CE8A19005B97EA /* layerdef.cpp in Sources */,
 				4D15DE3B2411782300457C05 /* expansionmap.cpp in Sources */,
 				4D1694191E3A44F300569BF4 /* drawinginterface.cpp in Sources */,
 				4D16947A1E41DCE000569BF4 /* atts_cmnornaments.cpp in Sources */,
@@ -3300,6 +3313,7 @@
 				8F086EF6188539540037FD8E /* mensur.cpp in Sources */,
 				4026FBE4203C827E0076535E /* mnum.cpp in Sources */,
 				4DB726C51B8BB0E80040231B /* text.cpp in Sources */,
+				BD87768327CE8A11005B97EA /* layerdef.cpp in Sources */,
 				4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				4D6122BE1F77E1E000FC90A0 /* rend.cpp in Sources */,
@@ -3517,6 +3531,7 @@
 				BD0562382518CD20004057EB /* beamspan.cpp in Sources */,
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				4D20740522A46BAA00E0765F /* atts_frettab.cpp in Sources */,
+				BD87768527CE8A1A005B97EA /* layerdef.cpp in Sources */,
 				8F3DD34818854B2E0051330C /* mensur.cpp in Sources */,
 				403BEFF8206C00FA00D022D5 /* multirpt.cpp in Sources */,
 				4DB3D8F91F83D1EC00B5FC2B /* boundingbox.cpp in Sources */,
@@ -3733,6 +3748,7 @@
 				BB4C4A6622A9321F001F6AF0 /* atts_critapp.cpp in Sources */,
 				BD0562392518CD20004057EB /* beamspan.cpp in Sources */,
 				BB4C4B3D22A932D7001F6AF0 /* artic.cpp in Sources */,
+				BD87768627CE8A1A005B97EA /* layerdef.cpp in Sources */,
 				BB4C4A5D22A9321F001F6AF0 /* attconverter.cpp in Sources */,
 				BB4C4AF722A932BC001F6AF0 /* reg.cpp in Sources */,
 				BB4C4B1322A932C8001F6AF0 /* section.cpp in Sources */,

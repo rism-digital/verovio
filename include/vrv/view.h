@@ -226,6 +226,8 @@ protected:
     void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
     void DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId);
+    void DrawLayerDefLabels(
+        DeviceContext *dc, ScoreDef *scoreDef, Staff *staff, StaffDef *staffDef, int x, bool abbreviations = false);
     void DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMeasure);
     ///@}
 
@@ -600,10 +602,13 @@ private:
         bool isMensuralBlack, bool firstHalf);
 
     /**
-     * Internal method for drawing a BeamSegment
+     * Internal methods for drawing a BeamSegment
      */
+    ///@{
     void DrawBeamSegment(
         DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer, Staff *staff);
+    void DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem);
+    ///@}
 
     /**
      * Internal methods for drawing time spanning elements

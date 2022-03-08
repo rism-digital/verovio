@@ -1224,6 +1224,11 @@ Options::Options()
     m_justificationBraceGroup.Init(1., 0., 10.);
     this->Register(&m_justificationBraceGroup, "justificationBraceGroup", &m_generalLayout);
 
+    m_justificationMaxVertical.SetInfo("Maximum ratio of justifiable height for page",
+        "Maximum ratio of justifiable height to page height that can be used for the vertical justification");
+    m_justificationMaxVertical.Init(0.3, 0.0, 1.0);
+    this->Register(&m_justificationMaxVertical, "justificationMaxVertical", &m_general);
+
     m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");
     m_ledgerLineThickness.Init(0.25, 0.10, 0.50);
     this->Register(&m_ledgerLineThickness, "ledgerLineThickness", &m_generalLayout);
@@ -1546,7 +1551,7 @@ Options::Options()
     /// custom right
 
     m_rightMarginAccid.SetInfo("Right margin accid", "The right margin for accid in MEI units");
-    m_rightMarginAccid.Init(0.0, 0.0, 2.0);
+    m_rightMarginAccid.Init(0.5, 0.0, 2.0);
     this->Register(&m_rightMarginAccid, "rightMarginAccid", &m_elementMargins);
 
     m_rightMarginBarLine.SetInfo("Right margin barLine", "The right margin for barLine in MEI units");

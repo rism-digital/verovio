@@ -136,6 +136,9 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
     else if (outputTo == "midi") {
         m_outputTo = MIDI;
     }
+    else if (outputTo == "hummidi") {
+        m_outputTo = HUMMIDI;
+    }
     else if (outputTo == "timemap") {
         m_outputTo = TIMEMAP;
     }
@@ -1383,10 +1386,10 @@ std::string Toolkit::RenderToMIDI()
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
 
-    std::stringstream strstrem;
-    outputfile.write(strstrem);
+    std::stringstream stream;
+    outputfile.write(stream);
     std::string outputstr = Base64Encode(
-        reinterpret_cast<const unsigned char *>(strstrem.str().c_str()), (unsigned int)strstrem.str().length());
+        reinterpret_cast<const unsigned char *>(stream.str().c_str()), (unsigned int)stream.str().length());
 
     return outputstr;
 }
@@ -1838,6 +1841,15 @@ std::string Toolkit::ConvertHumdrumToHumdrum(const std::string &humdrumData)
     return humout.str();
 #else
     return "";
+#endif
+}
+
+std::string Toolkit::ConvertHumdrumToMIDI(const std::string &humdrumData)
+{
+#ifndef NO_HUMDRUM_SUPPORT
+    return "TVRoZAAAAAYAAQAAAGRNVHJrAAAADQCQPHCBSJA8AAD/LwA=";
+#else
+    return "TVRoZAAAAAYAAQAAAGRNVHJrAAAADQCQPHCBSJA8AAD/LwA=";
 #endif
 }
 
