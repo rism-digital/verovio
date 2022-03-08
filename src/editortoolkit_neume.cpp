@@ -2779,6 +2779,24 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     assert(firstNc);
     Nc *secondNc = dynamic_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByUuid(secondNcId));
     assert(secondNc);
+
+    // check if contains non-puncta
+    ArrayOfStrAttr firstAttributes;
+    firstNc->GetAttributes(&firstAttributes);
+    ArrayOfStrAttr secondAttributes;
+    secondNc->GetAttributes(&secondAttributes);
+    bool containsTiltOrCurve = (std::find_if(firstAttributes.begin(), firstAttributes.end(), [](auto att) -> bool {
+        return (std::string{ "tilt" }.compare(att.first) == 0) || (std::string{ "curve" }.compare(att.first) == 0);
+    }) != firstAttributes.end()) || (std::find_if(secondAttributes.begin(), secondAttributes.end(), [](auto att) -> bool {
+        return (std::string{ "tilt" }.compare(att.first) == 0) || (std::string{ "curve" }.compare(att.first) == 0);
+    }) != secondAttributes.end());
+    if (containsTiltOrCurve) {
+        LogError("The selected neume components contain non-puncta.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "The selected neume components contain non-puncta.");
+        return false;
+    }
+
     Zone *zone = new Zone();
     // set ligature to false and update zone of second Nc
     if (isLigature == "true") {
