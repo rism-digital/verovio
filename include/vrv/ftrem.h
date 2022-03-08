@@ -69,6 +69,16 @@ public:
     //----------//
 
     /**
+     * See Object::AdjustBeams
+     */
+    int AdjustBeams(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::AdjustBeamsEnd
+     */
+    int AdjustBeamsEnd(FunctorParams *functorParams) override;
+
+    /**
      * See Object::CalcStem
      */
     int CalcStem(FunctorParams *functorParams) override;
@@ -90,6 +100,11 @@ protected:
      * Filter the flat list and keep only Note or Chords elements.
      */
     void FilterList(ArrayOfObjects *childList) override;
+
+    /**
+     * See LayerElement::SetElementShortening
+     */
+    void SetElementShortening(int shortening) override;
 
 public:
     /** */

@@ -117,9 +117,85 @@ std::pair<int, int> FTrem::GetFloatingBeamCount() const
     return { this->GetBeams(), this->GetBeamsFloat() };
 }
 
+void FTrem::SetElementShortening(int shortening)
+{
+    std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
+        [shortening](BeamElementCoord *coord) { coord->m_maxShortening = shortening; });
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int FTrem::AdjustBeams(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameas() || !this->GetChildCount() || m_beamSegment.m_beamElementCoordRefs.empty()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (!params->m_beam) {
+        if (m_drawingPlace != BEAMPLACE_mixed) {
+            params->m_beam = this;
+            params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
+            params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
+            params->m_x1 = m_beamSegment.m_beamElementCoordRefs.front()->m_x;
+            params->m_beamSlope = m_beamSegment.m_beamSlope;
+            params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
+            params->m_overlapMargin
+                = this->CalcLayerOverlap(params->m_doc, params->m_directionBias, params->m_y1, params->m_y2);
+        }
+        return FUNCTOR_CONTINUE;
+    }
+
+    const int leftMargin = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - params->m_y1;
+    const int rightMargin = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam - params->m_y2;
+
+    const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
+    if (overlapMargin >= params->m_overlapMargin) {
+        Staff *staff = this->GetAncestorStaff();
+        const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        params->m_overlapMargin = (overlapMargin + staffOffset) * params->m_directionBias;
+    }
+    return FUNCTOR_SIBLINGS;
+}
+
+int FTrem::AdjustBeamsEnd(FunctorParams *functorParams)
+{
+    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
+    assert(params);
+
+    if (params->m_beam != this) return FUNCTOR_CONTINUE;
+
+    if (m_drawingPlace == BEAMPLACE_mixed) return FUNCTOR_CONTINUE;
+
+    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    if (parentLayer) {
+        // find elements on the other layers for the duration of the current beam
+        auto otherLayersElements = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
+        if (!otherLayersElements.empty()) {
+            // call AdjustBeams separately for each element to find possible overlaps
+            params->m_isOtherLayer = true;
+            for (const auto element : otherLayersElements) {
+                if (!params->m_beam->HorizontalContentOverlap(element)) continue;
+                element->AdjustBeams(params);
+            }
+            params->m_isOtherLayer = false;
+        }
+    }
+
+    // set overlap margin for each coord in the beam
+    if (params->m_overlapMargin) {
+        std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
+            [overlap = params->m_overlapMargin](BeamElementCoord *coord) { coord->m_overlapMargin = overlap; });
+    }
+    params->m_beam = NULL;
+    params->m_overlapMargin = 0;
+
+    return FUNCTOR_CONTINUE;
+}
 
 int FTrem::CalcStem(FunctorParams *functorParams)
 {
