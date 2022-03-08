@@ -2577,6 +2577,8 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     short int tremSlashNum = -1;
 
+    const bool readBeamsAndTuplets = ReadMusicXmlBeamsAndTuplets(node, layer, isChord);
+
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
     // tremolos
@@ -2901,8 +2903,8 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
 
-        // beam / beamspan
-        if (!ReadMusicXmlBeamsAndTuplets(node, layer, isChord)) {
+        // beamspan
+        if (!readBeamsAndTuplets) {
             BeamSpan *meiBeamSpan = new BeamSpan();
             meiBeamSpan->SetStartid("#" + element->GetUuid());
             m_controlElements.push_back({ measureNum, meiBeamSpan });
