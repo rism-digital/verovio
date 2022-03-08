@@ -32,7 +32,6 @@ include_directories(
     ../include/hum
     ../include/json
     ../include/pugi
-    ../include/utf8
     ../include/zip
     ../include/vrv
     ../libmei
