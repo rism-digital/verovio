@@ -141,14 +141,14 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
         numAlteration = (keySig->GetAccidCount() > numAlteration) ? keySig->GetAccidCount() : numAlteration;
     }
 
+    const int unit = m_doc->GetDrawingUnit(100);
     int width = 0;
     // G-clef as default width
-    width += m_doc->GetLeftMargin(CLEF) + m_doc->GetGlyphWidth(SMUFL_E050_gClef, 100, false)
-        + m_doc->GetRightMargin(CLEF);
+    width += m_doc->GetGlyphWidth(SMUFL_E050_gClef, 100, false)
+        + (m_doc->GetLeftMargin(CLEF) + m_doc->GetRightMargin(CLEF)) * unit;
     if (numAlteration > 0) {
-        width += m_doc->GetLeftMargin(KEYSIG)
-            + m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_KEYSIG_STEP
-            + m_doc->GetRightMargin(KEYSIG);
+        width += m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_KEYSIG_STEP
+            + (m_doc->GetLeftMargin(KEYSIG) + m_doc->GetRightMargin(KEYSIG)) * unit;
     }
 
     scoreDef->SetDrawingWidth(width);

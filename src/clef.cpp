@@ -316,13 +316,14 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
     // This typically happens with invisible barlines or with --grace-rhythm-align but no grace on that staff
     if (nextLeft == -VRV_UNSET) nextLeft = nextAlignment->GetXRel();
 
-    int selfRight = this->GetContentRight() + params->m_doc->GetRightMargin(CLEF) * staff->m_drawingStaffSize;
+    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int selfRight = this->GetContentRight() + params->m_doc->GetRightMargin(this) * unit;
     // First move it to the left if necessary
     if (selfRight > nextLeft) {
         this->SetDrawingXRel(this->GetDrawingXRel() - selfRight + nextLeft);
     }
     // Then look if it overlaps on the right and make room if necessary
-    int selfLeft = this->GetContentLeft() - params->m_doc->GetLeftMargin(CLEF) * staff->m_drawingStaffSize;
+    const int selfLeft = this->GetContentLeft() - params->m_doc->GetLeftMargin(this) * unit;
     if (selfLeft < previousRight) {
         ArrayOfAdjustmentTuples boundaries{ std::make_tuple(
             previousAlignment, this->GetAlignment(), previousRight - selfLeft) };
