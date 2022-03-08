@@ -1380,16 +1380,27 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
 
     int length = top - bottom;
     // We add - substract a unit in order to have the line going to the edge
-    length += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int x = arpeg->GetDrawingX();
-    const int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int angle = -90;
+    const int y = bottom - unit;
 
+    const arpegLog_ORDER order = arpeg->GetOrder();
+    if (order == arpegLog_ORDER_nonarp) {
+        dc->StartGraphic(arpeg, "", arpeg->GetUuid());
+        const int offset = unit / 2;
+        const int thickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        this->DrawSquareBracket(dc, true, x - unit, bottom - offset, length + 2 * offset, unit, thickness, thickness);
+        dc->EndGraphic(arpeg, this);
+
+        return;
+    }
+
+    length += 2 * unit;
     wchar_t startGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
     wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
     wchar_t endGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
 
-    if (arpeg->GetOrder() == arpegLog_ORDER_down) {
+    if (order == arpegLog_ORDER_down) {
         startGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
         fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
         endGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
@@ -1402,6 +1413,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     dc->StartGraphic(arpeg, "", arpeg->GetUuid());
 
     // Smufl glyphs are horizontal - Rotate them counter clockwise
+    const int angle = -90;
     dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
 
     this->DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, startGlyph, endGlyph);
