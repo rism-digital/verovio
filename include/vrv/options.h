@@ -668,6 +668,7 @@ public:
     OptionBool m_lyricVerseCollapse;
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
+    OptionBool m_midiCue;
     OptionInt m_mnumInterval;
     OptionIntMap m_multiRestStyle;
     OptionDbl m_multiRestThickness;

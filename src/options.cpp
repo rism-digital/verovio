@@ -966,6 +966,10 @@ Options::Options()
     m_mensuralToMeasure.Init(false);
     this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_general);
 
+    m_midiCue.SetInfo("MIDI playback of cue notes", "Include cue notes in MIDI output");
+    m_midiCue.Init(false);
+    this->Register(&m_midiCue, "midiCue", &m_general);
+
     m_midiTempoAdjustment.SetInfo("MIDI tempo adjustment", "The MIDI tempo adjustment factor");
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_generalLayout);
