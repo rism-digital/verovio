@@ -197,8 +197,8 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
     else if (action == "toggleLigature") {
         std::vector<std::string> elementIds;
         std::string isLigature;
-        if (this->ParseToggleLigatureAction(json.get<jsonxx::Object>("param"), &elementIds, &isLigature)) {
-            return this->ToggleLigature(elementIds, isLigature);
+        if (this->ParseToggleLigatureAction(json.get<jsonxx::Object>("param"), &elementIds)) {
+            return this->ToggleLigature(elementIds);
         }
         LogWarning("Could not parse toggle ligature action");
     }
@@ -1396,12 +1396,14 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
                 Zone *zone = new Zone();
                 int ulx, uly, lrx, lry;
                 if (syllable->GenerateZoneBounds(&ulx, &uly, &lrx, &lry)) {
-                    int width = lrx - ulx;
-                    int height = lry - uly;
-                    zone->SetUlx(ulx - width);
-                    zone->SetUly(uly + 2 * height);
-                    zone->SetLrx(lrx + 2 * width);
-                    zone->SetLry(lry + 6 * height);
+                    // int offSetUlx = 150;
+                    int offSetUly = 50;
+                    int offSetLrx = 50;
+                    int offSetLry = 150;
+                    zone->SetUlx(ulx);
+                    zone->SetUly(uly + offSetUly);
+                    zone->SetLrx(lrx + offSetLrx);
+                    zone->SetLry(lry + offSetLry);
                     Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
                     surface->AddChild(zone);
                     syl->SetZone(zone);
@@ -2756,7 +2758,7 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
     return true;
 }
 
-bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std::string isLigature)
+bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
 {
     assert(elementIds.size() == 2);
     bool success1 = false;
@@ -2780,26 +2782,30 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     Nc *secondNc = dynamic_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByUuid(secondNcId));
     assert(secondNc);
 
-    // check if contains non-puncta
-    ArrayOfStrAttr firstAttributes;
-    firstNc->GetAttributes(&firstAttributes);
-    ArrayOfStrAttr secondAttributes;
-    secondNc->GetAttributes(&secondAttributes);
-    bool containsTiltOrCurve = (std::find_if(firstAttributes.begin(), firstAttributes.end(), [](auto att) -> bool {
-        return (std::string{ "tilt" }.compare(att.first) == 0) || (std::string{ "curve" }.compare(att.first) == 0);
-    }) != firstAttributes.end()) || (std::find_if(secondAttributes.begin(), secondAttributes.end(), [](auto att) -> bool {
-        return (std::string{ "tilt" }.compare(att.first) == 0) || (std::string{ "curve" }.compare(att.first) == 0);
-    }) != secondAttributes.end());
-    if (containsTiltOrCurve) {
-        LogError("The selected neume components contain non-puncta.");
+    // check if two ncs are adjacent
+    int firstIdx = firstNc->GetIdx();
+    int secondIdx = secondNc->GetIdx();
+    if (std::abs(firstIdx-secondIdx) != 1) {
+        LogError("The selected ncs are not adjacent.");
         m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "The selected neume components contain non-puncta.");
+        m_infoObject.import("message", "The selected ncs are not adjacent.");
         return false;
+    }
+
+    bool isLigature;
+    if (firstNc->HasAttribute("ligated", "true") && secondNc->HasAttribute("ligated", "true")) {
+        isLigature = true;
+    } else {
+        isLigature = false;
+        Set(firstNc->GetUuid(), "tilt", "");
+        Set(secondNc->GetUuid(), "tilt", "");
+        Set(firstNc->GetUuid(), "curve", "");
+        Set(secondNc->GetUuid(), "curve", "");
     }
 
     Zone *zone = new Zone();
     // set ligature to false and update zone of second Nc
-    if (isLigature == "true") {
+    if (isLigature) {
         if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
         int ligUlx = firstNc->GetZone()->GetUlx();
@@ -2823,7 +2829,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
     }
     // set ligature to true and update zones to be the same
-    else if (isLigature == "false") {
+    else if (!isLigature) {
         if (Att::SetNeumes(firstNc, "ligated", "true")) success1 = true;
 
         zone->SetUlx(firstNc->GetZone()->GetUlx());
@@ -2835,12 +2841,12 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
 
         if (Att::SetNeumes(secondNc, "ligated", "true")) success2 = true;
     }
-    else {
-        LogError("isLigature is invalid!");
-        m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "isLigature value '" + isLigature + "' is invalid.");
-        return false;
-    }
+    // else {
+    //     LogError("isLigature is invalid!");
+    //     m_infoObject.import("status", "FAILURE");
+    //     m_infoObject.import("message", "isLigature value '" + isLigature + "' is invalid.");
+    //     return false;
+    // }
     if (success1 && success2 && m_doc->GetType() != Facs) {
         m_doc->PrepareDrawing();
         m_doc->GetDrawingPage()->LayOut(true);
@@ -3286,16 +3292,13 @@ bool EditorToolkitNeume::ParseChangeGroupAction(jsonxx::Object param, std::strin
 }
 
 bool EditorToolkitNeume::ParseToggleLigatureAction(
-    jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature)
+    jsonxx::Object param, std::vector<std::string> *elementIds)
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
     for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
-    if (!param.has<jsonxx::String>("isLigature")) return false;
-    (*isLigature) = param.get<jsonxx::String>("isLigature");
-
     return true;
 }
 
