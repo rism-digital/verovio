@@ -108,18 +108,18 @@ curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
     switch (m_drawingCurveDir) {
         case SlurCurveDirection::Above: return curvature_CURVEDIR_above;
         case SlurCurveDirection::Below: return curvature_CURVEDIR_below;
-        case SlurCurveDirection::MixedDownwards: {
-            switch (spanningType) {
-                case SPANNING_START_END: return curvature_CURVEDIR_mixed;
-                case SPANNING_START: return curvature_CURVEDIR_below;
-                default: return curvature_CURVEDIR_above;
-            }
-        }
-        case SlurCurveDirection::MixedUpwards: {
+        case SlurCurveDirection::AboveBelow: {
             switch (spanningType) {
                 case SPANNING_START_END: return curvature_CURVEDIR_mixed;
                 case SPANNING_START: return curvature_CURVEDIR_above;
                 default: return curvature_CURVEDIR_below;
+            }
+        }
+        case SlurCurveDirection::BelowAbove: {
+            switch (spanningType) {
+                case SPANNING_START_END: return curvature_CURVEDIR_mixed;
+                case SPANNING_START: return curvature_CURVEDIR_below;
+                default: return curvature_CURVEDIR_above;
             }
         }
         default: return curvature_CURVEDIR_NONE;
@@ -324,10 +324,10 @@ bool Slur::IsElementBelow(LayerElement *element, Staff *startStaff, Staff *endSt
     switch (this->GetDrawingCurveDir()) {
         case SlurCurveDirection::Above: return true;
         case SlurCurveDirection::Below: return false;
-        case SlurCurveDirection::MixedDownwards:
-            return (element->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN() == endStaff->GetN());
-        case SlurCurveDirection::MixedUpwards:
+        case SlurCurveDirection::AboveBelow:
             return (element->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN() == startStaff->GetN());
+        case SlurCurveDirection::BelowAbove:
+            return (element->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN() == endStaff->GetN());
         default: return false;
     }
 }
@@ -337,10 +337,10 @@ bool Slur::IsElementBelow(FloatingPositioner *positioner, Staff *startStaff, Sta
     switch (this->GetDrawingCurveDir()) {
         case SlurCurveDirection::Above: return true;
         case SlurCurveDirection::Below: return false;
-        case SlurCurveDirection::MixedDownwards:
-            return (positioner->GetAlignment()->GetStaff()->GetN() == endStaff->GetN());
-        case SlurCurveDirection::MixedUpwards:
+        case SlurCurveDirection::AboveBelow:
             return (positioner->GetAlignment()->GetStaff()->GetN() == startStaff->GetN());
+        case SlurCurveDirection::BelowAbove:
+            return (positioner->GetAlignment()->GetStaff()->GetN() == endStaff->GetN());
         default: return false;
     }
 }
@@ -1424,11 +1424,11 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
         const int startStaffN = start->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
         const int endStaffN = end->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
         if (startStaffN < endStaffN) {
-            this->SetDrawingCurveDir(SlurCurveDirection::MixedDownwards);
+            this->SetDrawingCurveDir(SlurCurveDirection::BelowAbove);
             return FUNCTOR_CONTINUE;
         }
         else if (startStaffN > endStaffN) {
-            this->SetDrawingCurveDir(SlurCurveDirection::MixedUpwards);
+            this->SetDrawingCurveDir(SlurCurveDirection::AboveBelow);
             return FUNCTOR_CONTINUE;
         }
         else {

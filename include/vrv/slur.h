@@ -46,7 +46,7 @@ struct ControlPointAdjustment {
 };
 
 // Helper enum classes
-enum class SlurCurveDirection { None, Above, Below, MixedDownwards, MixedUpwards };
+enum class SlurCurveDirection { None, Above, Below, AboveBelow, BelowAbove };
 enum class PortatoSlurType { None, StemSide, Centered };
 
 //----------------------------------------------------------------------------
@@ -98,28 +98,28 @@ public:
     ///@{
     bool HasMixedCurveDir() const
     {
-        return (m_drawingCurveDir == SlurCurveDirection::MixedDownwards)
-            || (m_drawingCurveDir == SlurCurveDirection::MixedUpwards);
+        return (m_drawingCurveDir == SlurCurveDirection::AboveBelow)
+            || (m_drawingCurveDir == SlurCurveDirection::BelowAbove);
     }
     bool HasEndpointAboveStart() const
     {
         return (m_drawingCurveDir == SlurCurveDirection::Above)
-            || (m_drawingCurveDir == SlurCurveDirection::MixedUpwards);
+            || (m_drawingCurveDir == SlurCurveDirection::AboveBelow);
     }
     bool HasEndpointBelowStart() const
     {
         return (m_drawingCurveDir == SlurCurveDirection::Below)
-            || (m_drawingCurveDir == SlurCurveDirection::MixedDownwards);
+            || (m_drawingCurveDir == SlurCurveDirection::BelowAbove);
     }
     bool HasEndpointAboveEnd() const
     {
         return (m_drawingCurveDir == SlurCurveDirection::Above)
-            || (m_drawingCurveDir == SlurCurveDirection::MixedDownwards);
+            || (m_drawingCurveDir == SlurCurveDirection::BelowAbove);
     }
     bool HasEndpointBelowEnd() const
     {
         return (m_drawingCurveDir == SlurCurveDirection::Below)
-            || (m_drawingCurveDir == SlurCurveDirection::MixedUpwards);
+            || (m_drawingCurveDir == SlurCurveDirection::AboveBelow);
     }
     ///@}
 
@@ -255,7 +255,7 @@ private:
     /**
      * The drawing curve direction
      * This is calculated in the PrepareSlurs functor and contains an additional distinction
-     * for s-shaped slurs / mixed direction: whether the slur goes upwards or downwards
+     * for s-shaped slurs / mixed direction
      */
     SlurCurveDirection m_drawingCurveDir;
 
