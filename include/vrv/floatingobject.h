@@ -341,7 +341,7 @@ public:
     void AddSpannedElement(CurveSpannedElement *spannedElement) { m_spannedElements.push_back(spannedElement); }
 
     /**
-     * Return a cont pointer to the spanned elements
+     * Return a const pointer to the spanned elements
      */
     const ArrayOfCurveSpannedElements *GetSpannedElements() { return &m_spannedElements; }
 
@@ -353,6 +353,19 @@ public:
     Staff *GetCrossStaff() const { return m_crossStaff; }
     bool IsCrossStaff() const { return m_crossStaff != NULL; }
     ///@}
+
+    /**
+     * @name Getter, setter for the requested staff space
+     */
+    ///@{
+    void SetRequestedStaffSpace(int space) { m_requestedStaffSpace = space; }
+    int GetRequestedStaffSpace() const { return m_requestedStaffSpace; }
+    ///@}
+
+    /**
+     * Calculate the requested staff space above and below
+     */
+    std::pair<int, int> CalcRequestedStaffSpace(StaffAlignment *alignment);
 
 private:
     //
@@ -375,6 +388,11 @@ private:
 
     /** The cached min or max value (depending on the curvature) */
     int m_cachedMinMaxY;
+
+    /**
+     * Some curves (S-shaped slurs) can request staff space to prevent collisions from two sides
+     */
+    int m_requestedStaffSpace;
 };
 
 //----------------------------------------------------------------------------

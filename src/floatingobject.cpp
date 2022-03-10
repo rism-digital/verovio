@@ -518,7 +518,8 @@ void FloatingCurvePositioner::ResetCurveParams()
     m_dir = curvature_CURVEDIR_NONE;
     m_crossStaff = NULL;
     m_cachedMinMaxY = VRV_UNSET;
-    ClearSpannedElements();
+    m_requestedStaffSpace = 0;
+    this->ClearSpannedElements();
 }
 
 void FloatingCurvePositioner::UpdateCurveParams(
@@ -720,6 +721,32 @@ void FloatingCurvePositioner::GetPoints(Point points[4]) const
     points[1].y += currentY;
     points[2].y += currentY;
     points[3].y += currentY;
+}
+
+std::pair<int, int> FloatingCurvePositioner::CalcRequestedStaffSpace(StaffAlignment *alignment)
+{
+    assert(alignment);
+
+    TimeSpanningInterface *interface = this->GetObject()->GetTimeSpanningInterface();
+    if (interface) {
+        Staff *startStaff = interface->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+        Staff *endStaff = interface->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+
+        if (startStaff && endStaff) {
+            const int startStaffN = startStaff->GetN();
+            const int endStaffN = endStaff->GetN();
+            if (startStaffN != endStaffN) {
+                if (alignment->GetStaff()->GetN() == std::min(startStaffN, endStaffN)) {
+                    return { 0, m_requestedStaffSpace };
+                }
+                if (alignment->GetStaff()->GetN() == std::max(startStaffN, endStaffN)) {
+                    return { m_requestedStaffSpace, 0 };
+                }
+            }
+        }
+    }
+
+    return { 0, 0 };
 }
 
 //----------------------------------------------------------------------------

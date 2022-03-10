@@ -161,11 +161,6 @@ public:
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
     ///@}
 
-    /**
-     * Calculate the staff space above and below requested by s-shaped slurs
-     */
-    std::pair<int, int> CalcRequestedStaffSpace(StaffAlignment *alignment);
-
     //----------//
     // Functors //
     //----------//
@@ -258,12 +253,6 @@ private:
      * for s-shaped slurs / mixed direction
      */
     SlurCurveDirection m_drawingCurveDir;
-
-    /**
-     * The requested staff space
-     * S-shaped slurs can request staff space to prevent collisions from two sides
-     */
-    int m_requestedStaffSpace;
 };
 
 } // namespace vrv

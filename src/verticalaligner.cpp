@@ -792,13 +792,10 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 
             int spaceAbove = 0;
             int spaceBelow = 0;
-            if ((*iter)->GetObject()->Is({ LV, SLUR })) {
-                Slur *slur = vrv_cast<Slur *>((*iter)->GetObject());
-                assert(slur);
-                std::tie(spaceAbove, spaceBelow) = slur->CalcRequestedStaffSpace(this);
-                this->SetRequestedSpaceAbove(spaceAbove);
-                this->SetRequestedSpaceBelow(spaceBelow);
-            }
+            std::tie(spaceAbove, spaceBelow) = curve->CalcRequestedStaffSpace(this);
+            this->SetRequestedSpaceAbove(spaceAbove);
+            this->SetRequestedSpaceBelow(spaceBelow);
+
             continue;
         }
 
