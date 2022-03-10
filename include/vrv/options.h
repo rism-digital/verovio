@@ -592,6 +592,7 @@ public:
     OptionBool m_landscape;
     OptionBool m_ligatureAsBracket;
     OptionBool m_mensuralToMeasure;
+    OptionBool m_midiCue;
     OptionDbl m_midiTempoAdjustment;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
@@ -668,7 +669,6 @@ public:
     OptionBool m_lyricVerseCollapse;
     OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
-    OptionBool m_midiCue;
     OptionInt m_mnumInterval;
     OptionIntMap m_multiRestStyle;
     OptionDbl m_multiRestThickness;

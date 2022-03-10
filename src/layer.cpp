@@ -739,7 +739,7 @@ int Layer::GenerateMIDI(FunctorParams *functorParams)
 
     const bool midiCue = params->m_doc->GetOptions()->m_midiCue.GetValue();
 
-    if (this->GetCue() == BOOLEAN_true and !midiCue) return FUNCTOR_SIBLINGS;
+    if (this->GetCue() == BOOLEAN_true && !midiCue) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }
