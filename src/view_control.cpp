@@ -1391,37 +1391,37 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
         const int thickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         this->DrawSquareBracket(dc, true, x - unit, bottom - offset, length + 2 * offset, unit, thickness, thickness);
         dc->EndGraphic(arpeg, this);
-
-        return;
     }
+    else {
+        length += 2 * unit;
+        wchar_t startGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+        wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+        wchar_t endGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
 
-    length += 2 * unit;
-    wchar_t startGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
-    wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
-    wchar_t endGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
+        if (order == arpegLog_ORDER_down) {
+            startGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
+            fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+            endGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+        }
 
-    if (order == arpegLog_ORDER_down) {
-        startGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
-        fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
-        endGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+        if (arpeg->GetArrowShape() == LINESTARTENDSYMBOL_none) endGlyph = 0;
+
+        Point orig(x, y);
+
+        dc->StartGraphic(arpeg, "", arpeg->GetUuid());
+
+        // Smufl glyphs are horizontal - Rotate them counter clockwise
+        const int angle = -90;
+        dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
+
+        this->DrawSmuflLine(
+            dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, startGlyph, endGlyph);
+
+        dc->EndGraphic(arpeg, this);
+
+        // Possibly draw enclosing brackets
+        this->DrawArpegEnclosing(dc, arpeg, staff, startGlyph, fillGlyph, endGlyph, x, y, length, drawingCueSize);
     }
-
-    if (arpeg->GetArrowShape() == LINESTARTENDSYMBOL_none) endGlyph = 0;
-
-    Point orig(x, y);
-
-    dc->StartGraphic(arpeg, "", arpeg->GetUuid());
-
-    // Smufl glyphs are horizontal - Rotate them counter clockwise
-    const int angle = -90;
-    dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
-
-    this->DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, startGlyph, endGlyph);
-
-    dc->EndGraphic(arpeg, this);
-
-    // Possibly draw enclosing brackets
-    this->DrawArpegEnclosing(dc, arpeg, staff, startGlyph, fillGlyph, endGlyph, x, y, length, drawingCueSize);
 }
 
 void View::DrawArpegEnclosing(DeviceContext *dc, Arpeg *arpeg, Staff *staff, wchar_t startGlyph, wchar_t fillGlyph,
