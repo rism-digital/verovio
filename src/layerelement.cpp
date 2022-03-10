@@ -1330,7 +1330,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             loc = staffY->m_drawingTuning->CalcPitchPos(
                 note->GetTabCourse(), staffY->m_drawingNotationType, staffY->m_drawingLines);
         }
-        else if (note->HasPname() || note->HasLoc()) {
+        else if ((note->HasPname() && note->HasOct()) || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
