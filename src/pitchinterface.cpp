@@ -153,7 +153,13 @@ int PitchInterface::CalcLoc(
         if (note->HasLoc()) {
             return note->GetLoc();
         }
-        return PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layer->GetClefLocOffset(crossStaffElement));
+        else if (note->HasPname() && note->HasOct()) {
+            return PitchInterface::CalcLoc(
+                note->GetPname(), note->GetOct(), layer->GetClefLocOffset(crossStaffElement));
+        }
+        else {
+            return 0;
+        }
     }
     else if (layerElement->Is(CUSTOS)) {
         Custos *custos = vrv_cast<Custos *>(layerElement);
