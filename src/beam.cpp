@@ -1219,11 +1219,7 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         coord->SetClosestNoteOrTabDurSym(stemDir, staff->IsTabWithStemsOutside());
         // Nothing else to do if we have no closest note (that includes tab beams outside the staff)
         if (!coord->m_closestNote) continue;
-        if (relevantNoteLoc == VRV_UNSET) {
-            relevantNoteLoc = coord->m_closestNote->GetDrawingLoc();
-            minDuration = coord->m_dur;
-        }
-        else if (coord->m_dur > minDuration) {
+        if ((relevantNoteLoc == VRV_UNSET) || (coord->m_dur > minDuration)) {
             relevantNoteLoc = coord->m_closestNote->GetDrawingLoc();
             minDuration = coord->m_dur;
         }
@@ -1246,7 +1242,7 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         if (!coord->m_closestNote) continue;
         // skip current element if it's longer that minDuration and is not a part of fTrem
         if ((coord->m_dur < minDuration) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
-        // if location matches or if current stem length is too short - adjust stem length
+        // adjust stem length if location matches
         const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
         if (coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc) {
             m_uniformStemLength = coordStemLength;
