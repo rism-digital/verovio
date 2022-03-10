@@ -2,7 +2,6 @@ name: Check clang-format
 on: [push, pull_request]
 jobs:
   formatting-check:
-    name: Formatting Check
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -12,6 +11,9 @@ jobs:
           - check: "src"
             exclude: "(hum|crc|midi|json|pugi)"
           - check: "tools"
+    
+    name: Check for ${{ matrix.path['check'] }}
+          
     steps:
       - uses: actions/checkout@v2
       - name: Run clang-format style check for C/C++ programs.
