@@ -263,6 +263,16 @@ public:
      */
     virtual void SetElementShortening(int shortening){};
 
+    /**
+     * Get the stem mod for the element (if any)
+     */
+    virtual data_STEMMODIFIER GetDrawingStemMod() const;
+
+    /**
+     * Convert stem mode to corresponding glyph code
+     */
+    wchar_t StemModToGlyph(data_STEMMODIFIER stemMod) const;
+
     //----------//
     // Functors //
     //----------//

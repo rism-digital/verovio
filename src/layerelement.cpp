@@ -953,6 +953,30 @@ int LayerElement::CalcLayerOverlap(Doc *doc, int direction, int y1, int y2)
     return overlap;
 }
 
+data_STEMMODIFIER LayerElement::GetDrawingStemMod() const
+{
+    const AttStems *stem = dynamic_cast<const AttStems *>(this);
+    if (!stem) return STEMMODIFIER_NONE;
+
+    return stem->GetStemMod();
+}
+
+wchar_t LayerElement::StemModToGlyph(data_STEMMODIFIER stemMod) const
+{
+    switch (stemMod) {
+        case STEMMODIFIER_1slash: return SMUFL_E220_tremolo1;
+        case STEMMODIFIER_2slash: return SMUFL_E221_tremolo2;
+        case STEMMODIFIER_3slash: return SMUFL_E222_tremolo3;
+        case STEMMODIFIER_4slash: return SMUFL_E223_tremolo4;
+        case STEMMODIFIER_5slash: return SMUFL_E224_tremolo5;
+        case STEMMODIFIER_6slash: return SMUFL_E224_tremolo5;
+        case STEMMODIFIER_sprech: return SMUFL_E645_vocalSprechgesang;
+        case STEMMODIFIER_z: return SMUFL_E22A_buzzRoll;
+        default: break;
+    }
+    return 0;
+}
+
 //----------------------------------------------------------------------------
 // Static methods for LayerElement
 //----------------------------------------------------------------------------
