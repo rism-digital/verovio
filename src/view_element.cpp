@@ -1530,7 +1530,6 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
     // calculate additional adjustments for beamed elements
     Beam *beam = childElement->IsInBeam();
     if (beam) {
-        bool drawingCueSize = childElement->GetDrawingCueSize();
         const int beamStep = -sign
             * ((drawingDur - DUR_8) * (beam->m_beamWidthBlack + beam->m_beamWidthWhite) + beam->m_beamWidthWhite);
         if ((beamStep) > (sign * unit)) y += beamStep;
