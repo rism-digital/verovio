@@ -69,7 +69,15 @@ public:
      */
     ///@{
     FacsimileInterface *GetFacsimileInterface() override { return dynamic_cast<FacsimileInterface *>(this); }
+    const FacsimileInterface *GetFacsimileInterface() const override
+    {
+        return dynamic_cast<const FacsimileInterface *>(this);
+    }
     LinkingInterface *GetLinkingInterface() override { return dynamic_cast<LinkingInterface *>(this); }
+    const LinkingInterface *GetLinkingInterface() const override
+    {
+        return dynamic_cast<const LinkingInterface *>(this);
+    }
     ///@}
 
     /**

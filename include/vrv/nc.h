@@ -55,7 +55,12 @@ public:
      */
     ///@{
     DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
+    const DurationInterface *GetDurationInterface() const override
+    {
+        return dynamic_cast<const DurationInterface *>(this);
+    }
     PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
+    const PitchInterface *GetPitchInterface() const override { return dynamic_cast<const PitchInterface *>(this); }
     ///@}
 
 private:

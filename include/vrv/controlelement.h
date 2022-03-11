@@ -42,6 +42,10 @@ public:
      */
     ///@{
     LinkingInterface *GetLinkingInterface() override { return dynamic_cast<LinkingInterface *>(this); }
+    const LinkingInterface *GetLinkingInterface() const override
+    {
+        return dynamic_cast<const LinkingInterface *>(this);
+    }
     ///@}
 
     /**

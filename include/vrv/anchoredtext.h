@@ -41,6 +41,10 @@ public:
      */
     ///@{
     TextDirInterface *GetTextDirInterface() override { return dynamic_cast<TextDirInterface *>(this); }
+    const TextDirInterface *GetTextDirInterface() const override
+    {
+        return dynamic_cast<const TextDirInterface *>(this);
+    }
     ///@}
 
     /**

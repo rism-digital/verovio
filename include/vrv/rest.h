@@ -69,7 +69,15 @@ public:
      */
     ///@{
     PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override
+    {
+        return dynamic_cast<const PositionInterface *>(this);
+    }
     DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
+    const DurationInterface *GetDurationInterface() const override
+    {
+        return dynamic_cast<const DurationInterface *>(this);
+    }
     ///@}
 
     /** Override the method since alignment is required */

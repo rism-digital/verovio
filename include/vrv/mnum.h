@@ -48,7 +48,15 @@ public:
      */
     ///@{
     TextDirInterface *GetTextDirInterface() override { return dynamic_cast<TextDirInterface *>(this); }
+    const TextDirInterface *GetTextDirInterface() const override
+    {
+        return dynamic_cast<const TextDirInterface *>(this);
+    }
     TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return dynamic_cast<const TimePointInterface *>(this);
+    }
     ///@}
 
     /**

@@ -42,6 +42,7 @@ public:
      */
     ///@{
     PlistInterface *GetPlistInterface() override { return dynamic_cast<PlistInterface *>(this); }
+    const PlistInterface *GetPlistInterface() const override { return dynamic_cast<const PlistInterface *>(this); }
     ////@}
 
     //----------//

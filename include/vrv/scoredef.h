@@ -58,6 +58,10 @@ public:
      */
     ///@{
     ScoreDefInterface *GetScoreDefInterface() override { return dynamic_cast<ScoreDefInterface *>(this); }
+    const ScoreDefInterface *GetScoreDefInterface() const override
+    {
+        return dynamic_cast<const ScoreDefInterface *>(this);
+    }
     ///@}
 
     /**

@@ -49,7 +49,15 @@ public:
      */
     ///@{
     TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return dynamic_cast<const TimePointInterface *>(this);
+    }
     TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return dynamic_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
 
     virtual bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);

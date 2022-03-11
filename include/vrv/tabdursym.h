@@ -42,6 +42,10 @@ public:
     {
         return dynamic_cast<StemmedDrawingInterface *>(this);
     }
+    const StemmedDrawingInterface *GetStemmedDrawingInterface() const override
+    {
+        return dynamic_cast<const StemmedDrawingInterface *>(this);
+    }
     ///@}
 
     /** Override the method since alignment is required */

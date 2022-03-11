@@ -267,6 +267,10 @@ public:
      */
     ///@{
     BeamDrawingInterface *GetBeamDrawingInterface() override { return dynamic_cast<BeamDrawingInterface *>(this); }
+    const BeamDrawingInterface *GetBeamDrawingInterface() const override
+    {
+        return dynamic_cast<const BeamDrawingInterface *>(this);
+    }
     ///@}
 
     int GetNoteCount() const { return this->GetChildCount(NOTE); }

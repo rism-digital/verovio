@@ -58,7 +58,16 @@ public:
      */
     void CloneReset() override;
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     FacsimileInterface *GetFacsimileInterface() override { return dynamic_cast<FacsimileInterface *>(this); }
+    const FacsimileInterface *GetFacsimileInterface() const override
+    {
+        return dynamic_cast<const FacsimileInterface *>(this);
+    }
+    ///@}
 
     /**
      * Delete all the legder line arrays.

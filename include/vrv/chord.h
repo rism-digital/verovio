@@ -59,9 +59,17 @@ public:
      */
     ///@{
     DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
+    const DurationInterface *GetDurationInterface() const override
+    {
+        return dynamic_cast<const DurationInterface *>(this);
+    }
     StemmedDrawingInterface *GetStemmedDrawingInterface() override
     {
         return dynamic_cast<StemmedDrawingInterface *>(this);
+    }
+    const StemmedDrawingInterface *GetStemmedDrawingInterface() const override
+    {
+        return dynamic_cast<const StemmedDrawingInterface *>(this);
     }
     ///@}
 

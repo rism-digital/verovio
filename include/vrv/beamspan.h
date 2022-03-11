@@ -55,8 +55,17 @@ public:
      */
     ///@{
     PlistInterface *GetPlistInterface() override { return dynamic_cast<PlistInterface *>(this); }
+    const PlistInterface *GetPlistInterface() const override { return dynamic_cast<const PlistInterface *>(this); }
     TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return dynamic_cast<const TimePointInterface *>(this);
+    }
     TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return dynamic_cast<const TimeSpanningInterface *>(this);
+    }
     ////@}
 
     /**
