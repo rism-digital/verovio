@@ -100,25 +100,27 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     if (!start || !end) return;
 
-    const curvature_CURVEDIR drawingCurveDir = slur->GetDrawingCurvedir();
+    const curvature_CURVEDIR drawingCurveDir = slur->CalcDrawingCurveDir(spanningType);
 
     /************** adjusting y position **************/
 
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
-    std::pair<Point, Point> adjustedPoints = slur->AdjustCoordinates(
-        m_doc, staff, std::make_pair(Point(x1, y1), Point(x2, y2)), spanningType, drawingCurveDir);
+    std::pair<Point, Point> adjustedPoints
+        = slur->AdjustCoordinates(m_doc, staff, std::make_pair(Point(x1, y1), Point(x2, y2)), spanningType);
 
     /************** y position **************/
 
-    if (drawingCurveDir == curvature_CURVEDIR_above) {
-        adjustedPoints.first.y += 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        adjustedPoints.second.y += 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int sign = (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
+    if (drawingCurveDir == curvature_CURVEDIR_mixed) {
+        sign = slur->HasEndpointAboveStart() ? 1 : -1;
     }
-    else {
-        adjustedPoints.first.y -= 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        adjustedPoints.second.y -= 1.25 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    adjustedPoints.first.y += 1.25 * sign * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+    if (drawingCurveDir == curvature_CURVEDIR_mixed) {
+        sign = slur->HasEndpointAboveEnd() ? 1 : -1;
     }
+    adjustedPoints.second.y += 1.25 * sign * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     Point points[4];
     points[0] = adjustedPoints.first;
@@ -176,6 +178,7 @@ float View::CalcInitialSlur(
 {
     // For now we pick C1 = P1 and C2 = P2
     BezierCurve bezier(points[0], points[0], points[3], points[3]);
+    slur->InitBezierControlSides(bezier, curveDir);
 
     /************** content **************/
 
@@ -184,10 +187,12 @@ float View::CalcInitialSlur(
 
     Staff *startStaff = slur->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
     Staff *endStaff = slur->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+    if (startStaff && endStaff && (startStaff->GetN() != endStaff->GetN())) {
+        curve->SetCrossStaff(endStaff);
+    }
 
     curve->ClearSpannedElements();
     for (auto element : elements) {
-
         Point pRotated;
         Point pLeft;
         pLeft.x = element->GetSelfLeft();
@@ -197,6 +202,7 @@ float View::CalcInitialSlur(
             || ((pRight.x > bezier.p1.x) && (pRight.x < bezier.p2.x))) {
             CurveSpannedElement *spannedElement = new CurveSpannedElement();
             spannedElement->m_boundingBox = element;
+            spannedElement->m_isBelow = slur->IsElementBelow(element, startStaff, endStaff);
             curve->AddSpannedElement(spannedElement);
         }
 
@@ -224,6 +230,7 @@ float View::CalcInitialSlur(
                 && (positioner->GetContentLeft() < bezier.p2.x)) {
                 CurveSpannedElement *spannedElement = new CurveSpannedElement();
                 spannedElement->m_boundingBox = positioner;
+                spannedElement->m_isBelow = slur->IsElementBelow(positioner, startStaff, endStaff);
                 curve->AddSpannedElement(spannedElement);
             }
         }
@@ -241,13 +248,17 @@ float View::CalcInitialSlur(
         = (bezier.p2 == bezier.p1) ? 0 : atan2(bezier.p2.y - bezier.p1.y, bezier.p2.x - bezier.p1.x);
     const float slurAngle
         = dontAdjustAngle ? nonAdjustedAngle : slur->GetAdjustedSlurAngle(m_doc, bezier.p1, bezier.p2, curveDir);
-    bezier.p2 = BoundingBox::CalcPositionAfterRotation(bezier.p2, -slurAngle, bezier.p1);
+    if (curveDir != curvature_CURVEDIR_mixed) {
+        bezier.p2 = BoundingBox::CalcPositionAfterRotation(bezier.p2, -slurAngle, bezier.p1);
+    }
 
     /************** control points **************/
 
     bezier.CalcInitialControlPointParams(m_doc, slurAngle, staff->m_drawingStaffSize);
-    bezier.UpdateControlPoints(curveDir);
-    bezier.Rotate(slurAngle, bezier.p1);
+    bezier.UpdateControlPoints();
+    if (curveDir != curvature_CURVEDIR_mixed) {
+        bezier.Rotate(slurAngle, bezier.p1);
+    }
 
     points[0] = bezier.p1;
     points[1] = bezier.c1;

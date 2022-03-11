@@ -22,6 +22,12 @@
 
 namespace vrv {
 
+void BezierCurve::SetControlSides(bool leftAbove, bool rightAbove)
+{
+    m_leftControlAbove = leftAbove;
+    m_rightControlAbove = rightAbove;
+}
+
 void BezierCurve::Rotate(float angle, const Point &rotationPoint)
 {
     p1 = BoundingBox::CalcPositionAfterRotation(p1, angle, rotationPoint);
@@ -32,44 +38,63 @@ void BezierCurve::Rotate(float angle, const Point &rotationPoint)
 
 void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staffSize)
 {
+    // Note: For convex curves (both control points on the same side) we assume that the curve is rotated
+    // such that p1.y == p2.y, but for curves with mixed curvature we assume that the curve is unrotated
     const int dist = abs(p2.x - p1.x);
     const int unit = doc->GetDrawingUnit(staffSize);
 
     // Initialize offset
-    const double ratio = double(dist) / double(unit);
-    double baseVal = (ratio > 4.0) ? 3.0 : 6.0;
-    if ((ratio > 4.0) && (ratio < 32.0)) {
-        // interpolate baseVal between 6.0 and 3.0
-        baseVal = 8.0 - log2(ratio);
+    int offset = 0;
+    if (m_leftControlAbove == m_rightControlAbove) {
+        const double ratio = double(dist) / double(unit);
+        double baseVal = (ratio > 4.0) ? 3.0 : 6.0;
+        if ((ratio > 4.0) && (ratio < 32.0)) {
+            // interpolate baseVal between 6.0 and 3.0
+            baseVal = 8.0 - log2(ratio);
+        }
+        offset = dist / baseVal;
     }
-    const int offset = dist / baseVal;
-    m_leftControlPointOffset = offset;
-    m_rightControlPointOffset = offset;
+    else {
+        offset = dist / 12.0;
+        offset = std::min(offset, 4 * unit);
+    }
+
+    m_leftControlOffset = offset;
+    m_rightControlOffset = offset;
 
     // Initialize height
-    int height = std::max<int>(1.2 * unit, dist / 5);
-    height = std::min<int>(3.0 * unit, height);
-    height *= doc->GetOptions()->m_slurCurveFactor.GetValue();
-    height = std::min(height, 2 * doc->GetDrawingOctaveSize(staffSize));
-    height = std::min<int>(height, 2 * offset * cos(angle));
+    int height = 0;
+    if (m_leftControlAbove == m_rightControlAbove) {
+        height = std::max<int>(dist / 5, 1.2 * unit);
+        height = std::min(3 * unit, height);
+        height *= doc->GetOptions()->m_slurCurveFactor.GetValue();
+        height = std::min(height, 2 * doc->GetDrawingOctaveSize(staffSize));
+        height = std::min<int>(height, 2 * offset * cos(angle));
+    }
+    else {
+        height = std::max(std::abs(p2.y - p1.y), 4 * unit);
+        height *= doc->GetOptions()->m_slurCurveFactor.GetValue();
+    }
     this->SetControlHeight(height);
 }
 
-void BezierCurve::UpdateControlPointParams(curvature_CURVEDIR dir)
+void BezierCurve::UpdateControlPointParams()
 {
-    m_leftControlPointOffset = c1.x - p1.x;
-    m_rightControlPointOffset = p2.x - c2.x;
-    const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
+    m_leftControlOffset = c1.x - p1.x;
+    m_rightControlOffset = p2.x - c2.x;
+    int sign = m_leftControlAbove ? 1 : -1;
     m_leftControlHeight = sign * (c1.y - p1.y);
+    sign = m_rightControlAbove ? 1 : -1;
     m_rightControlHeight = sign * (c2.y - p2.y);
 }
 
-void BezierCurve::UpdateControlPoints(curvature_CURVEDIR dir)
+void BezierCurve::UpdateControlPoints()
 {
-    c1.x = p1.x + m_leftControlPointOffset;
-    c2.x = p2.x - m_rightControlPointOffset;
-    const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
+    c1.x = p1.x + m_leftControlOffset;
+    c2.x = p2.x - m_rightControlOffset;
+    int sign = m_leftControlAbove ? 1 : -1;
     c1.y = p1.y + sign * m_leftControlHeight;
+    sign = m_rightControlAbove ? 1 : -1;
     c2.y = p2.y + sign * m_rightControlHeight;
 }
 
