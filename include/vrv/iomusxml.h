@@ -65,26 +65,30 @@ namespace musicxml {
 
     class OpenSlur {
     public:
-        OpenSlur(const std::string &measureNum, short int number)
+        OpenSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
         {
             m_measureNum = measureNum;
             m_number = number;
+            m_curvedir = curvedir;
         }
 
         std::string m_measureNum;
         short int m_number;
+        curvature_CURVEDIR m_curvedir;
     };
 
     class CloseSlur {
     public:
-        CloseSlur(const std::string &measureNum, short int number)
+        CloseSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
         {
             m_measureNum = measureNum;
             m_number = number;
+            m_curvedir = curvedir;
         }
 
         std::string m_measureNum;
         short int m_number;
+        curvature_CURVEDIR m_curvedir;
     };
 
     class OpenSpanner {
@@ -331,8 +335,8 @@ private:
     ///@{
     void OpenTie(Note *note, Tie *tie);
     void CloseTie(Note *note);
-    void OpenSlur(Measure *measure, short int number, Slur *slur);
-    void CloseSlur(Measure *measure, short int number, LayerElement *element);
+    void OpenSlur(Measure *measure, short int number, Slur *slur, curvature_CURVEDIR dir);
+    void CloseSlur(Measure *measure, short int number, LayerElement *element, curvature_CURVEDIR dir);
     void CloseBeamSpan(Staff *staff, Layer *layer, LayerElement *element);
     ///@}
 
@@ -411,6 +415,11 @@ private:
     ///@{
     static bool IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, data_ACCIDENTAL_GESTURAL gestural);
     ///@}
+
+    /*
+     * @name Helper for detecting the slur curve direction
+     */
+    static curvature_CURVEDIR CombineCurvedir(curvature_CURVEDIR startDir, curvature_CURVEDIR stopDir);
 
     /*
      * @name Methods for converting MusicXML values to MEI attributes.
