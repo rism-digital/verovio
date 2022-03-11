@@ -108,8 +108,8 @@ struct ClosestBB {
     int distanceToBB(int ulx, int uly, int lrx, int lry, double rotate = 0)
     {
         int offset = (x - ulx) * tan(rotate * M_PI / 180.0);
-        uly = uly - offset;
-        lry = lry - offset;
+        uly = uly + offset;
+        lry = lry + offset;
         int xDiff = std::max((ulx > x ? ulx - x : 0), (x > lrx ? x - lrx : 0));
         int yDiff = std::max((uly > y ? uly - y : 0), (y > lry ? y - lry : 0));
 
