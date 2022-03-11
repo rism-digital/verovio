@@ -430,6 +430,11 @@ void Page::LayOutHorizontally()
     Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
 
+    // Calculate the slur direction
+    PrepareSlursParams prepareSlursParams(doc);
+    Functor prepareSlurs(&Object::PrepareSlurs);
+    this->Process(&prepareSlurs, &prepareSlursParams);
+
     FunctorDocParams resolveSpanningBeamSpansParams(doc);
     Functor resolveSpanningBeamSpans(&Object::ResolveSpanningBeamSpans);
     this->Process(&resolveSpanningBeamSpans, &resolveSpanningBeamSpansParams);
@@ -463,11 +468,6 @@ void Page::LayOutVertically()
     Functor calcLedgerLines(&Object::CalcLedgerLines);
     Functor calcLedgerLinesEnd(&Object::CalcLedgerLinesEnd);
     this->Process(&calcLedgerLines, &calcLedgerLinesParams, &calcLedgerLinesEnd);
-
-    // Calculate the slur direction
-    PrepareSlursParams prepareSlursParams(doc);
-    Functor prepareSlurs(&Object::PrepareSlurs);
-    this->Process(&prepareSlurs, &prepareSlursParams);
 
     // Align the content of the page using system aligners
     // After this:
