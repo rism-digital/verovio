@@ -448,9 +448,9 @@ protected:
      * Helper to figure whether two chords are in fully in unison based on the locations of the notes.
      * This function assumes that two chords are already in unison and checks whether chords can overlap with
      * their unison notes or if they should be placed separately.
-     * Returns true if all elements can safely overlap.
+     * Returns vector with all locations of elements in unison.
      */
-    virtual int CountElementsInUnison(
+    std::vector<int> GetElementsInUnison(
         const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection);
 
     /**

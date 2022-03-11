@@ -764,10 +764,10 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
     return result;
 }
 
-int LayerElement::CountElementsInUnison(
+std::vector<int> LayerElement::GetElementsInUnison(
     const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection)
 {
-    if (firstChord.empty() || secondChord.empty()) return 0;
+    if (firstChord.empty() || secondChord.empty()) return {};
     // Set always sorts elements, hence note locations stored will always be in ascending order, regardless
     // of how they are encoded in the MEI file
     std::set<int> difference;
@@ -789,7 +789,7 @@ int LayerElement::CountElementsInUnison(
                     && (element < *firstChord.rbegin()))
                 || ((firstChord.size() > secondChord.size()) && (element > *secondChord.begin())
                     && (element < *secondChord.rbegin()))) {
-                return 0;
+                return {};
             }
         }
     }
@@ -799,10 +799,10 @@ int LayerElement::CountElementsInUnison(
     // is higher than topmost location of the opposing chord it means that these elements cannot be in unison.
     // Same applies to the UP stem direction, just with reversed condition
     if (stemDirection == STEMDIRECTION_down) {
-        if ((*firstChord.rbegin() > *secondChord.rbegin()) || (*firstChord.begin() > *secondChord.begin())) return 0;
+        if ((*firstChord.rbegin() > *secondChord.rbegin()) || (*firstChord.begin() > *secondChord.begin())) return {};
     }
     else {
-        if ((*firstChord.rbegin() < *secondChord.rbegin()) || (*firstChord.begin() < *secondChord.begin())) return 0;
+        if ((*firstChord.rbegin() < *secondChord.rbegin()) || (*firstChord.begin() < *secondChord.begin())) return {};
     }
 
     // Finally, check if notes in unison are at the proper distance to be drawn as unison, as well as get number of
@@ -812,14 +812,14 @@ int LayerElement::CountElementsInUnison(
     auto it = std::set_intersection(
         firstChord.begin(), firstChord.end(), secondChord.begin(), secondChord.end(), intersection.begin());
     intersection.resize(it - intersection.begin());
-    if (intersection.empty()) return false;
+    if (intersection.empty()) return {};
     for (int i = 0; i < (int)intersection.size() - 1; ++i) {
         if (std::abs(intersection.at(i) - intersection.at(i + 1)) == 1) {
-            return 0;
+            return {};
         }
     }
 
-    return (int)intersection.size();
+    return intersection;
 }
 
 MapOfDotLocs LayerElement::CalcOptimalDotLocations()
@@ -1651,10 +1651,9 @@ int LayerElement::AdjustOverlappingLayers(
         stemSameas = note->HasStemSameasNote();
     }
 
-    if (this->Is({ DOTS, STEM })) {
-        assert(this->GetParent());
-        assert(this->GetParent()->IsLayerElement());
-        LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
+    if (this->Is({ ACCID, DOTS, STEM })) {
+        LayerElement *parent
+            = vrv_cast<LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
         assert(parent);
         parent->SetDrawingXRel(parent->GetDrawingXRel() + margin);
     }
@@ -1772,6 +1771,15 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             else {
                 shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
             }
+        }
+        else if (this->Is(ACCID) && otherElements.at(i)->Is(NOTE)) {
+            Note *parentNote = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
+            Note *otherNote = vrv_cast<Note *>(otherElements.at(i));
+            const bool isUnisonOverlap = parentNote && parentNote->IsUnisonWith(otherNote, true)
+                && !parentNote->IsUnisonWith(otherNote, false);
+            if (isUnisonOverlap && this->HorizontalContentOverlap(otherElements.at(i)))
+                shift += this->HorizontalRightOverlap(
+                    otherElements.at(i), doc, -doc->GetDrawingUnit(staff->m_drawingStaffSize));
         }
 
         if (this->Is(NOTE) && !otherElements.at(i)->Is(STEM)) {

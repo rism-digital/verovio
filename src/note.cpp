@@ -335,13 +335,7 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
 
 bool Note::IsUnisonWith(Note *note, bool ignoreAccid)
 {
-    if (!ignoreAccid) {
-        Accid *accid = this->GetDrawingAccid();
-        Accid *noteAccid = note->GetDrawingAccid();
-        data_ACCIDENTAL_WRITTEN accidVal = (accid) ? accid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
-        data_ACCIDENTAL_WRITTEN noteAccidVal = (noteAccid) ? noteAccid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
-        if (accidVal != noteAccidVal) return false;
-    }
+    if (!ignoreAccid && !this->IsEnharmonicWith(note)) return false;
 
     return ((this->GetPname() == note->GetPname()) && (this->GetOct() == note->GetOct()));
 }
