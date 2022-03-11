@@ -87,7 +87,7 @@ public:
      * Adjust accid position if it's placed above/below staff so that it does not overlap with ledger lines
      */
     void AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize);
-    
+
     /**
      * @name Set and get same layer alignment
      */
