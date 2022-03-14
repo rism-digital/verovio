@@ -349,13 +349,13 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data
 }
 
 void View::DrawThickBezierCurve(
-    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, float angle, int penStyle)
+    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, int penStyle)
 {
     assert(dc);
 
     Point bez1[4], bez2[4]; // filled array with control points and end point
 
-    BoundingBox::CalcThickBezier(bezier, thickness, angle, bez1, bez2);
+    BoundingBox::CalcThickBezier(bezier, thickness, bez1, bez2);
 
     bez1[0] = ToDeviceContext(bez1[0]);
     bez1[1] = ToDeviceContext(bez1[1]);

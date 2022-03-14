@@ -956,9 +956,9 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_tieMidpointThickness.GetValue();
     const int penWidth
         = m_doc->GetOptions()->m_tieEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const double thicknessCoefficient = BoundingBox::GetBezierThicknessCoefficient(bezier, thickness, 0, penWidth);
+    const double thicknessCoefficient = BoundingBox::GetBezierThicknessCoefficient(bezier, thickness, penWidth);
     this->DrawThickBezierCurve(
-        dc, bezier, thicknessCoefficient * thickness, staff->m_drawingStaffSize, penWidth, 0, penStyle);
+        dc, bezier, thicknessCoefficient * thickness, staff->m_drawingStaffSize, penWidth, penStyle);
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else

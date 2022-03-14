@@ -73,9 +73,9 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     const int penWidth
         = m_doc->GetOptions()->m_slurEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const double thicknessCoefficient
-        = BoundingBox::GetBezierThicknessCoefficient(points, curve->GetThickness(), curve->GetAngle(), penWidth);
-    this->DrawThickBezierCurve(dc, points, thicknessCoefficient * curve->GetThickness(), staff->m_drawingStaffSize,
-        penWidth, curve->GetAngle(), penStyle);
+        = BoundingBox::GetBezierThicknessCoefficient(points, curve->GetThickness(), penWidth);
+    this->DrawThickBezierCurve(
+        dc, points, thicknessCoefficient * curve->GetThickness(), staff->m_drawingStaffSize, penWidth, penStyle);
 
     /*
     int i;

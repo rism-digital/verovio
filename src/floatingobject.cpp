@@ -639,7 +639,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
     }
 
     Point topBezier[4], bottomBezier[4];
-    BoundingBox::CalcThickBezier(points, this->GetThickness(), this->GetAngle(), topBezier, bottomBezier);
+    BoundingBox::CalcThickBezier(points, this->GetThickness(), topBezier, bottomBezier);
 
     // Now calculate the left and right adjustments
     int leftAdjustment = 0;
