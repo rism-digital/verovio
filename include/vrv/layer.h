@@ -33,6 +33,7 @@ class StaffDef;
 class Layer : public Object,
               public DrawingListInterface,
               public ObjectListInterface,
+              public AttCue,
               public AttNInteger,
               public AttTyped,
               public AttVisibility {
@@ -246,6 +247,13 @@ public:
      * See Object::ResetDrawing
      */
     int ResetDrawing(FunctorParams *functorParams) override;
+
+    /**
+     * @name See Object::GenerateMIDI
+     */
+    ///@{
+    int GenerateMIDI(FunctorParams *functorParams) override;
+    ///@}
 
     /**
      * See Object::GenerateMIDIEnd

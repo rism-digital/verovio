@@ -391,7 +391,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
-            GenerateMIDIParams generateMIDIParams(midiFile, &generateMIDI);
+            GenerateMIDIParams generateMIDIParams(this, midiFile, &generateMIDI);
             generateMIDIParams.m_midiChannel = midiChannel;
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
