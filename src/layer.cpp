@@ -737,9 +737,9 @@ int Layer::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    const bool midiCue = params->m_doc->GetOptions()->m_midiCue.GetValue();
+    const bool midiNoCue = params->m_doc->GetOptions()->m_midiNoCue.GetValue();
 
-    if (this->GetCue() == BOOLEAN_true && !midiCue) return FUNCTOR_SIBLINGS;
+    if (this->GetCue() == BOOLEAN_true && midiNoCue) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }

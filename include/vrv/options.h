@@ -592,7 +592,7 @@ public:
     OptionBool m_landscape;
     OptionBool m_ligatureAsBracket;
     OptionBool m_mensuralToMeasure;
-    OptionBool m_midiCue;
+    OptionBool m_midiNoCue;
     OptionDbl m_midiTempoAdjustment;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;

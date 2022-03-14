@@ -1400,8 +1400,8 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // Skip cue notes
-    if (this->GetCue() == BOOLEAN_true && !params->m_doc->GetOptions()->m_midiCue.GetValue()) {
+    // Skip cue notes when midiNoCue is activated
+    if (this->GetCue() == BOOLEAN_true && params->m_doc->GetOptions()->m_midiNoCue.GetValue()) {
         return FUNCTOR_SIBLINGS;
     }
 
