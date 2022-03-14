@@ -1209,26 +1209,8 @@ void BeamSegment::CalcBeamPlaceTab(
 
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
-    int relevantNoteLoc = VRV_UNSET;
+    const auto [noteLoc, noteDur] = this->CalcStemDefiningNote(staff, place);
     const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
-    for (auto coord : m_beamElementCoordRefs) {
-        const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
-            : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
-                                                                      : STEMDIRECTION_up;
-        coord->SetClosestNoteOrTabDurSym(stemDir, staff->IsTabWithStemsOutside());
-        // Nothing else to do if we have no closest note (that includes tab beams outside the staff)
-        if (!coord->m_closestNote) continue;
-        if (relevantNoteLoc == VRV_UNSET) {
-            relevantNoteLoc = coord->m_closestNote->GetDrawingLoc();
-        }
-        else {
-            relevantNoteLoc = (place == BEAMPLACE_below)
-                ? std::min(coord->m_closestNote->GetDrawingLoc(), relevantNoteLoc)
-                : std::max(coord->m_closestNote->GetDrawingLoc(), relevantNoteLoc);
-        }
-    }
-
-    int minDuration = DUR_4;
     for (auto coord : m_beamElementCoordRefs) {
         const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
             : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
@@ -1240,13 +1222,11 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         }
         if (!coord->m_closestNote) continue;
         // skip current element if it's longer that minDuration and is not a part of fTrem
-        if ((coord->m_dur <= minDuration) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
-        // if location matches or if current stem length is too short - adjust stem length
+        if ((coord->m_dur < noteDur) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
+        // adjust stem length if location matches
         const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
-        if ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
-            || (!isHorizontal && (std::abs(m_uniformStemLength) < 13))) {
+        if (coord->m_closestNote->GetDrawingLoc() == noteLoc) {
             m_uniformStemLength = coordStemLength;
-            minDuration = coord->m_dur;
         }
     }
     // make adjustments for the grace notes length
@@ -1274,6 +1254,55 @@ std::pair<int, int> BeamSegment::CalcBeamRelativeMinMax(data_BEAMPLACE place) co
     });
 
     return { highestPoint, lowestPoint };
+}
+
+std::pair<int, int> BeamSegment::CalcStemDefiningNote(Staff *staff, data_BEAMPLACE place)
+{
+    int shortestDuration = DUR_4;
+    int shortestLoc = VRV_UNSET;
+    int relevantDuration = DUR_4;
+    int relevantLoc = VRV_UNSET;
+    const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
+    for (auto coord : m_beamElementCoordRefs) {
+        const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
+            : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
+                                                                      : STEMDIRECTION_up;
+        coord->SetClosestNoteOrTabDurSym(stemDir, staff->IsTabWithStemsOutside());
+        // Nothing else to do if we have no closest note (that includes tab beams outside the staff)
+        if (!coord->m_closestNote) continue;
+        // set initial values for both locations and durations to that of first note
+        if (relevantLoc == VRV_UNSET) {
+            relevantLoc = coord->m_closestNote->GetDrawingLoc();
+            shortestLoc = relevantLoc;
+            relevantDuration = coord->m_dur;
+            shortestDuration = relevantDuration;
+            continue;
+        }
+        // save location and duration of the note, if it is closer to the beam (i.e. placed higher on the staff for
+        // above beams and vice versa for below beams)
+        if ((place == BEAMPLACE_above) && (coord->m_closestNote->GetDrawingLoc() > relevantLoc)) {
+            relevantLoc = coord->m_closestNote->GetDrawingLoc();
+            relevantDuration = coord->m_dur;
+        }
+        else if ((place == BEAMPLACE_below) && (coord->m_closestNote->GetDrawingLoc() < relevantLoc)) {
+            relevantLoc = coord->m_closestNote->GetDrawingLoc();
+            relevantDuration = coord->m_dur;
+        }
+        // save location and duration of the note that have shortest duration
+        if (coord->m_dur >= shortestDuration) {
+            shortestDuration = coord->m_dur;
+            shortestLoc = coord->m_closestNote->GetDrawingLoc();
+        }
+    }
+
+    // if shortest note location does not offset its duration (shorter notes need more space for additional beams) then
+    // give preference to the its location
+    if ((shortestDuration - relevantDuration) > (std::abs(relevantLoc - shortestLoc) + 1)) {
+        relevantLoc = shortestLoc;
+        relevantDuration = shortestDuration;
+    }
+
+    return { relevantLoc, relevantDuration };
 }
 
 void BeamSegment::CalcHorizontalBeam(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface)
