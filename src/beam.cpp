@@ -1297,7 +1297,7 @@ std::pair<int, int> BeamSegment::CalcStemDefiningNote(Staff *staff, data_BEAMPLA
 
     // if shortest note location does not offset its duration (shorter notes need more space for additional beams) then
     // give preference to the its location
-    if ((shortestDuration - relevantDuration) > std::abs(relevantLoc - shortestLoc)) {
+    if ((shortestDuration - relevantDuration) > (std::abs(relevantLoc - shortestLoc) + 1)) {
         relevantLoc = shortestLoc;
         relevantDuration = shortestDuration;
     }
