@@ -513,7 +513,6 @@ void FloatingCurvePositioner::ResetCurveParams()
     m_points[1] = Point(0, 0);
     m_points[2] = Point(0, 0);
     m_points[3] = Point(0, 0);
-    m_angle = 0.0;
     m_thickness = 0;
     m_dir = curvature_CURVEDIR_NONE;
     m_crossStaff = NULL;
@@ -522,8 +521,7 @@ void FloatingCurvePositioner::ResetCurveParams()
     this->ClearSpannedElements();
 }
 
-void FloatingCurvePositioner::UpdateCurveParams(
-    const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir)
+void FloatingCurvePositioner::UpdateCurveParams(const Point points[4], int thickness, curvature_CURVEDIR curveDir)
 {
     m_points[0] = points[0];
     m_points[1] = points[1];
@@ -534,7 +532,6 @@ void FloatingCurvePositioner::UpdateCurveParams(
     m_points[1].y -= currentY;
     m_points[2].y -= currentY;
     m_points[3].y -= currentY;
-    m_angle = angle;
     m_thickness = thickness;
     m_dir = curveDir;
     m_cachedMinMaxY = VRV_UNSET;
@@ -547,7 +544,7 @@ void FloatingCurvePositioner::UpdatePoints(const BezierCurve &bezier)
     points[1] = bezier.c1;
     points[2] = bezier.c2;
     points[3] = bezier.p2;
-    this->UpdateCurveParams(points, m_angle, m_thickness, m_dir);
+    this->UpdateCurveParams(points, m_thickness, m_dir);
 }
 
 void FloatingCurvePositioner::MoveFrontHorizontal(int distance)

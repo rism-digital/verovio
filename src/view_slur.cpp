@@ -124,10 +124,10 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     points[0] = adjustedPoints.first;
     points[3] = adjustedPoints.second;
 
-    float angle = CalcInitialSlur(curve, slur, staff, drawingCurveDir, points);
+    this->CalcInitialSlur(curve, slur, staff, drawingCurveDir, points);
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurMidpointThickness.GetValue();
 
-    curve->UpdateCurveParams(points, angle, thickness, drawingCurveDir);
+    curve->UpdateCurveParams(points, thickness, drawingCurveDir);
 
     /************** articulation **************/
 
@@ -171,7 +171,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     }
 }
 
-float View::CalcInitialSlur(
+void View::CalcInitialSlur(
     FloatingCurvePositioner *curve, Slur *slur, Staff *staff, curvature_CURVEDIR curveDir, Point points[4])
 {
     // For now we pick C1 = P1 and C2 = P2
@@ -262,8 +262,6 @@ float View::CalcInitialSlur(
     points[1] = bezier.c1;
     points[2] = bezier.c2;
     points[3] = bezier.p2;
-
-    return slurAngle;
 }
 
 } // namespace vrv

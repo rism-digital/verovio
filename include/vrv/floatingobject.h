@@ -285,7 +285,7 @@ public:
      * Stored points are made relative to the curve drawingY.
      */
     ///@{
-    void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
+    void UpdateCurveParams(const Point points[4], int thickness, curvature_CURVEDIR curveDir);
     void UpdatePoints(const BezierCurve &bezier);
     ///@}
 
@@ -324,7 +324,6 @@ public:
      */
     ///@{
     void GetPoints(Point points[4]) const;
-    float GetAngle() { return m_angle; }
     int GetThickness() { return m_thickness; }
     curvature_CURVEDIR GetDir() { return m_dir; }
     ///@}
@@ -378,7 +377,6 @@ private:
      */
     ///@{
     Point m_points[4];
-    float m_angle;
     int m_thickness;
     curvature_CURVEDIR m_dir;
     Staff *m_crossStaff;

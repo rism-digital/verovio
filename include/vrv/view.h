@@ -590,7 +590,7 @@ private:
      */
     ///@{
     void DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType);
-    float CalcInitialSlur(
+    void CalcInitialSlur(
         FloatingCurvePositioner *curve, Slur *slur, Staff *staff, curvature_CURVEDIR curveDir, Point points[4]);
     ///@}
 
