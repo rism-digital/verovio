@@ -646,14 +646,6 @@ protected:
     int m_currentColour;
 
     /**
-     * Values to adjust tie/slur thickness to have proper MEI values for thickness
-     */
-    ///@{
-    double m_tieThicknessCoefficient;
-    double m_slurThicknessCoefficient;
-    ///@}
-
-    /**
      * Control the handling of slurs
      */
     SlurHandling m_slurHandling;
