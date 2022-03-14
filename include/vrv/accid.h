@@ -52,11 +52,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
-    const PositionInterface *GetPositionInterface() const override
-    {
-        return dynamic_cast<const PositionInterface *>(this);
-    }
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */

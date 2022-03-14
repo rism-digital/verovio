@@ -58,18 +58,12 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
-    const DurationInterface *GetDurationInterface() const override
-    {
-        return dynamic_cast<const DurationInterface *>(this);
-    }
-    StemmedDrawingInterface *GetStemmedDrawingInterface() override
-    {
-        return dynamic_cast<StemmedDrawingInterface *>(this);
-    }
+    DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
+    const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
+    StemmedDrawingInterface *GetStemmedDrawingInterface() override { return vrv_cast<StemmedDrawingInterface *>(this); }
     const StemmedDrawingInterface *GetStemmedDrawingInterface() const override
     {
-        return dynamic_cast<const StemmedDrawingInterface *>(this);
+        return vrv_cast<const StemmedDrawingInterface *>(this);
     }
     ///@}
 
