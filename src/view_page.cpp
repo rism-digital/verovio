@@ -203,7 +203,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     this->DrawSystemChildren(dc, system, system);
 
     this->DrawSystemList(dc, system, SYL);
-    this->DrawSystemList(dc, system, BEAMSPAN);
+    // BEAMSPAN is drawn earlier, inside call to DrawMeasureChildren()
     this->DrawSystemList(dc, system, BRACKETSPAN);
     this->DrawSystemList(dc, system, DYNAM);
     this->DrawSystemList(dc, system, DIR);
@@ -1623,12 +1623,21 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     assert(measure);
     assert(system);
 
+    // Beamspan has to be processes first to make sure that stems for all notes have correct length and extend all the
+    // way to the beam. For this, only beamspans are processed first and are ignored in the next loop
+    for (auto current : parent->GetChildren()) {
+        if (!current->Is(BEAMSPAN)) continue;
+        this->DrawControlElement(dc, dynamic_cast<ControlElement *>(current), measure, system);
+    }
+    this->DrawSystemList(dc, system, BEAMSPAN);
+
     for (auto current : parent->GetChildren()) {
         if (current->Is(STAFF)) {
             // cast to Staff check in DrawStaff
             this->DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
         }
         else if (current->IsControlElement()) {
+            if (current->Is(BEAMSPAN)) continue;
             // cast to ControlElement check in DrawControlElement
             this->DrawControlElement(dc, dynamic_cast<ControlElement *>(current), measure, system);
         }
