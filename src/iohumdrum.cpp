@@ -19921,6 +19921,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
         else {
             dur = convertRhythm(note, token, subtoken);
+            // duration not set here because probably already
+            // done at line eDcRfV
         }
         if (m_setrightstem) {
             m_setrightstem = false;
@@ -21134,7 +21136,10 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
                 case 2048: element->SetDurGes(DURATION_2048); break;
             }
         }
-        return durges;
+        hum::HumNum newdur = hum::Convert::recipToDuration(vstring);
+        // See note eDcRfV
+        setRhythmFromDuration(element, newdur);
+        return newdur;
     }
 
     return dur;
