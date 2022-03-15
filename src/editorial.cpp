@@ -182,7 +182,10 @@ int EditorialElement::CastOffEncoding(FunctorParams *functorParams)
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
     assert(params);
 
-    MoveItselfTo(params->m_currentSystem);
+    // Only move editorial elements that are a child of the system
+    if (this->GetParent() && this->GetParent()->Is(SYSTEM)) {
+        MoveItselfTo(params->m_currentSystem);
+    }
 
     return FUNCTOR_SIBLINGS;
 }
