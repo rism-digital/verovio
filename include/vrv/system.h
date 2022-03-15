@@ -136,10 +136,10 @@ public:
      * @name Check if the system is the first or last in page or of an mdiv by looking at the next sibling
      */
     ///@{
-    bool IsFirstInPage();
-    bool IsLastInPage();
-    bool IsFirstOfMdiv();
-    bool IsLastOfMdiv();
+    bool IsFirstInPage() const;
+    bool IsLastInPage() const;
+    bool IsFirstOfMdiv() const;
+    bool IsLastOfMdiv() const;
     ///@}
 
     /**
