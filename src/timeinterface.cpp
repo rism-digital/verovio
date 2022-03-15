@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "functorparams.h"
+#include "harm.h"
 #include "layerelement.h"
 #include "measure.h"
 #include "staff.h"
@@ -111,7 +112,15 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
     std::vector<Staff *> staves;
     std::vector<int>::iterator iter;
     std::vector<int> staffList;
-    if (this->HasStaff()) {
+
+    // For <f> within <harm> without @staff we try to get the @staff from the <harm> ancestor
+    if (object->Is(FIGURE) && !this->HasStaff()) {
+        Harm *harm = vrv_cast<Harm *>(object->GetFirstAncestor(HARM));
+        if (harm) {
+            staffList = harm->GetStaff();
+        }
+    }
+    else if (this->HasStaff()) {
         bool isInBetween = false;
         // limit between support to some elements?
         if (object->Is({ DYNAM, DIR, HAIRPIN, TEMPO })) {
@@ -136,6 +145,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
         // If we have no @staff or startid but only one staff child assume it is the first one (@n1 is assumed)
         staffList.push_back(1);
     }
+
     for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison comparison(STAFF, *iter);
         Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
