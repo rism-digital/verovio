@@ -381,7 +381,12 @@ int Measure::GetDrawingOverflow()
 
 int Measure::GetSectionRestartShift(Doc *doc) const
 {
-    return 5 * doc->GetDrawingDoubleUnit(100);
+    if (this->IsFirstInSystem()) {
+        return 0;
+    }
+    else {
+        return 5 * doc->GetDrawingDoubleUnit(100);
+    }
 }
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
