@@ -5749,7 +5749,6 @@ void HumdrumInput::setMensurationSymbol(
 void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const std::string &metersig,
     hum::HTp partstart, hum::HTp timetok, hum::HTp metertok)
 {
-
     if ((partstart != NULL) && partstart->isMens()) {
         // Don't display time signatures in mensural notation.
         return;
@@ -5845,13 +5844,13 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
 
     std::smatch matches;
     std::string metersig;
-    if (regex_search(*metersigtok, matches, regex("met\\((.*)\\)"))) {
+    if (metersigtok && regex_search(*metersigtok, matches, regex("met\\((.*)\\)"))) {
         metersig = matches[1];
     }
 
     int count = -1;
     int unit = -1;
-    if (regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)%(\\d+)"))) {
+    if (timesigtok && regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)%(\\d+)"))) {
         // int top = stoi(matches[1]);
         int bot = stoi(matches[2]);
         int bot2 = stoi(matches[3]);
@@ -5862,7 +5861,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             vrvmetersig->SetForm(METERFORM_num);
         }
     }
-    else if (regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
+    else if (timesigtok && regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
         if (!metersigtok) {
             count = stoi(matches[1]);
             unit = stoi(matches[2]);
