@@ -252,7 +252,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
             continue;
         }
 
-        StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface *>(child);
+        StemmedDrawingInterface *interface = child->GetStemmedDrawingInterface();
         assert(interface);
 
         // First pass

@@ -749,7 +749,7 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
     this->FindAllDescendantsByComparison(&childrenWithFacsimileInterface, &ic);
     bool result = false;
     for (auto it = childrenWithFacsimileInterface.begin(); it != childrenWithFacsimileInterface.end(); ++it) {
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(*it);
+        FacsimileInterface *fi = (*it)->GetFacsimileInterface();
         assert(fi);
         if (!(*it)->Is(SYL) && fi->HasFacs()) {
             Zone *zone = fi->GetZone();
@@ -1304,7 +1304,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
     else if (this->Is(DOT)) {
-        PositionInterface *interface = dynamic_cast<PositionInterface *>(this);
+        PositionInterface *interface = this->GetPositionInterface();
         assert(interface);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, interface->CalcDrawingLoc(layerY, layerElementY)));
     }

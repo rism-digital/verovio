@@ -762,7 +762,7 @@ curvature_CURVEDIR Slur::GetGraceCurveDirection(Doc *doc)
         }
     }
     else {
-        StemmedDrawingInterface *endStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(end);
+        StemmedDrawingInterface *endStemDrawInterface = end->GetStemmedDrawingInterface();
         data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
         if (endStemDrawInterface) {
             endStemDir = endStemDrawInterface->GetDrawingStemDir();
@@ -845,8 +845,8 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION
 std::pair<Point, Point> Slur::AdjustCoordinates(
     Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, curvature_CURVEDIR drawingCurveDir)
 {
-    StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetStart());
-    StemmedDrawingInterface *endStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(this->GetEnd());
+    StemmedDrawingInterface *startStemDrawInterface = this->GetStart()->GetStemmedDrawingInterface();
+    StemmedDrawingInterface *endStemDrawInterface = this->GetEnd()->GetStemmedDrawingInterface();
 
     data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
     int startStemLen = 0;
@@ -1303,7 +1303,7 @@ int Slur::PrepareSlurs(FunctorParams *functorParams)
     }
     else {
         // Handle uniform stem direction and time stamp boundaries
-        StemmedDrawingInterface *startStemDrawInterface = dynamic_cast<StemmedDrawingInterface *>(start);
+        StemmedDrawingInterface *startStemDrawInterface = start->GetStemmedDrawingInterface();
         data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
         if (startStemDrawInterface) {
             startStemDir = startStemDrawInterface->GetDrawingStemDir();

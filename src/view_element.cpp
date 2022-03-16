@@ -566,7 +566,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
+        FacsimileInterface *fi = element->GetFacsimileInterface();
         fi->GetZone()->SetUlx(x);
         fi->GetZone()->SetUly(ToDeviceContextY(y));
         fi->GetZone()->SetLrx(x + noteWidth);
@@ -661,7 +661,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
+        FacsimileInterface *fi = element->GetFacsimileInterface();
         fi->GetZone()->SetUlx(x);
         fi->GetZone()->SetUly(ToDeviceContextY(y));
         fi->GetZone()->SetLrx(x + noteWidth);
