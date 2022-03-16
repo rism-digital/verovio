@@ -1257,6 +1257,12 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int noteY = element->GetDrawingY();
     int noteX = element->GetDrawingX();
 
+    if (note->HasStemSameasNote() && note->GetFlippedNotehead()) {
+        int xShift = note->GetDrawingRadius(m_doc) * 2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        xShift *= (note->GetDrawingStemDir() == STEMDIRECTION_up) ? -1 : 1;
+        noteX -= xShift;
+    }
+
     if (!(note->GetHeadVisible() == BOOLEAN_false)) {
         /************** Noteheads: **************/
         int drawingDur = note->GetDrawingDur();
