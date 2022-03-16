@@ -249,7 +249,9 @@ public:
      * Encoded stem direction on the calling note is taken into account.
      * Called from Note::CalcStem
      */
-    data_STEMDIRECTION CalcStemDirForSameasNote(int verticalCenter);
+    data_STEMDIRECTION CalcStemDirForSameasNote(Doc *doc, int verticalCenter);
+
+    void CalcNoteHeadShiftForSameasNote(Doc *doc, Note *stemSameas, data_STEMDIRECTION stemDir);
 
 public:
     //----------------//

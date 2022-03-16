@@ -1481,6 +1481,35 @@ void BeamSegment::UpdateSameasRoles(data_BEAMPLACE place)
     }
 }
 
+void BeamSegment::CalcNoteHeadShiftForStemSameas(Doc *doc, Beam *sameasBeam, data_BEAMPLACE place)
+{
+    assert(doc);
+
+    if (!sameasBeam) return;
+
+    // We want to do this only from the second beams sharing the stems and if the role is set
+    if (m_stemSameasReverseRole || this->StemSameasIsUnset()) return;
+
+    const ArrayOfBeamElementCoords *sameasCoords = &sameasBeam->m_beamSegment.m_beamElementCoordRefs;
+    data_STEMDIRECTION stemDir = (place == BEAMPLACE_above) ? STEMDIRECTION_up : STEMDIRECTION_down;
+
+    // Loop throught both list of elements and calculate the note head shift
+    const int sameasSize = (int)sameasCoords->size();
+    for (int i = 0; i < int(m_beamElementCoordRefs.size()) && i < sameasSize; ++i) {
+        if (!m_beamElementCoordRefs.at(i)->m_element || !sameasCoords->at(i)->m_element) continue;
+
+        Note *note1 = (m_beamElementCoordRefs.at(i)->m_element->Is(NOTE))
+            ? vrv_cast<Note *>(m_beamElementCoordRefs.at(i)->m_element)
+            : NULL;
+        Note *note2
+            = (sameasCoords->at(i)->m_element->Is(NOTE)) ? vrv_cast<Note *>(sameasCoords->at(i)->m_element) : NULL;
+
+        if (!note1 || !note2) continue;
+
+        note1->CalcNoteHeadShiftForSameasNote(doc, note2, stemDir);
+    }
+}
+
 //----------------------------------------------------------------------------
 // Beam
 //----------------------------------------------------------------------------
@@ -2056,6 +2085,9 @@ int Beam::CalcStem(FunctorParams *functorParams)
     assert(staff);
 
     m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, initialPlace);
+
+    if (this->HasStemSameasBeam())
+        m_beamSegment.CalcNoteHeadShiftForStemSameas(params->m_doc, this->GetStemSameasBeam(), initialPlace);
 
     return FUNCTOR_CONTINUE;
 }

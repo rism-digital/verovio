@@ -1649,6 +1649,7 @@ int LayerElement::AdjustOverlappingLayers(
         Note *note = vrv_cast<Note *>(this);
         assert(note);
         stemSameas = note->HasStemSameasNote();
+        if (stemSameas) return 0;
     }
 
     if (this->Is({ ACCID, DOTS, STEM })) {
