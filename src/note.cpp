@@ -598,8 +598,9 @@ void Note::ResolveStemSameas(PrepareLinkingParams *params)
     }
 }
 
-data_STEMDIRECTION Note::CalcStemDirForSameasNote(int verticalCenter)
+data_STEMDIRECTION Note::CalcStemDirForSameasNote(Doc *doc, int verticalCenter)
 {
+    assert(doc);
     assert(m_stemSameas);
     assert(m_stemSameas->HasStemSameasNote());
     assert(m_stemSameas->GetStemSameasNote() == this);
@@ -623,12 +624,36 @@ data_STEMDIRECTION Note::CalcStemDirForSameasNote(int verticalCenter)
         // We also set the role to both notes accordingly
         topNote->m_stemSameasRole = (stemDir == STEMDIRECTION_up) ? SAMEAS_PRIMARY : SAMEAS_SECONDARY;
         bottomNote->m_stemSameasRole = (stemDir == STEMDIRECTION_up) ? SAMEAS_SECONDARY : SAMEAS_PRIMARY;
+
+        this->CalcNoteHeadShiftForSameasNote(doc, m_stemSameas, stemDir);
+
         return stemDir;
     }
     else {
         // Otherwise use the stem direction set for the other note previously when this method was called for it
         return m_stemSameas->GetDrawingStemDir();
     }
+}
+
+void Note::CalcNoteHeadShiftForSameasNote(Doc *doc, Note *stemSameas, data_STEMDIRECTION stemDir)
+{
+    assert(doc);
+    assert(stemSameas);
+
+    if (abs(this->GetDiatonicPitch() - stemSameas->GetDiatonicPitch()) > 1) return;
+
+    Note *noteToShift = this;
+    if (stemDir == STEMDIRECTION_up) {
+        if (this->GetDrawingY() < stemSameas->GetDrawingY()) noteToShift = stemSameas;
+    }
+    else {
+        if (this->GetDrawingY() > stemSameas->GetDrawingY()) noteToShift = stemSameas;
+    }
+    // With stem sameas we do not correct the position of the note itself because otherwise the children position,
+    // including the one of stem, will change as well. We only flag it. The correction is made in View::DrawNote
+    // This can potentially cause some problems with dots or accidentals but can be left like this because it is
+    // quite a corner case already.
+    noteToShift->SetFlippedNotehead(true);
 }
 
 bool Note::IsEnharmonicWith(Note *note)
@@ -1031,7 +1056,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     if (this->HasStemSameasNote()) {
-        stemDir = this->CalcStemDirForSameasNote(params->m_verticalCenter);
+        stemDir = this->CalcStemDirForSameasNote(params->m_doc, params->m_verticalCenter);
     }
     else if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();
