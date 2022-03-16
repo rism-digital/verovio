@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Mar  2 22:59:59 PST 2022
+// Last Modified: Wed Mar 16 15:37:13 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1484,6 +1484,7 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isNullData                (void) const;
 		bool     isChord                   (const std::string& separator = " ");
 		bool     isLabel                   (void) const;
+		bool     isExpansionList           (void) const;
 		bool     hasRhythm                 (void) const;
 		bool     hasBeam                   (void) const;
 		bool     hasFermata                (void) const;
@@ -5628,7 +5629,7 @@ class NoteNode {
 		int measure;     // measure number of note
 		int serial;      // serial number
 		int mark;        // for marking search matches
-		int notemarker;  // for pass-through of marks
+		std::string notemarker;  // for pass-through of marks
 		double beatsize; // time signature bottom value which or
 		                 // 3 times the bottom if compound meter
 		HumNum   duration;  // duration
@@ -5642,12 +5643,12 @@ class NoteNode {
 		int      isSustain            (void) { return b40 < 0 ? 1 : 0; }
 		int      isAttack             (void) { return b40 > 0 ? 1 : 0; }
 		int      getB40               (void) { return abs(b40); }
-		void     setId                (const string& anid);
-		string   getIdString          (void);
-		string   getId                (void);
+		void     setId                (const std::string& anid);
+		std::string   getIdString          (void);
+		std::string   getId                (void);
 
    protected:
-		string  protected_id; // id number provided by data
+		std::string  protected_id; // id number provided by data
 };
 
 
@@ -5659,97 +5660,97 @@ class Tool_cint : public HumTool {
 
 		bool     run                    (HumdrumFileSet& infiles);
 		bool     run                    (HumdrumFile& infile);
-		bool     run                    (const string& indata, ostream& out);
+		bool     run                    (const std::string& indata, ostream& out);
 		bool     run                    (HumdrumFile& infile, ostream& out);
 
 	protected:
 
 		void      initialize           (void);
 		void      example              (void);
-		void      usage                (const string& command);
+		void      usage                (const std::string& command);
 		int       processFile          (HumdrumFile& infile);
-		void      getKernTracks        (vector<int>& ktracks, HumdrumFile& infile);
-		int       validateInterval     (vector<vector<NoteNode> >& notes,
+		void      getKernTracks        (std::vector<int>& ktracks, HumdrumFile& infile);
+		int       validateInterval     (std::vector<std::vector<NoteNode> >& notes,
 		                                int i, int j, int k);
 		void      printIntervalInfo    (HumdrumFile& infile, int line,
-		                                int spine, vector<vector<NoteNode> >& notes,
+		                                int spine, std::vector<std::vector<NoteNode> >& notes,
 		                                int noteline, int noteindex,
-		                                vector<string >& abbr);
-		void      getAbbreviations     (vector<string >& abbreviations,
-		                                vector<string >& names);
-		void      getAbbreviation      (string& abbr, string& name);
-		void      extractNoteArray     (vector<vector<NoteNode> >& notes,
-		                                HumdrumFile& infile, vector<int>& ktracks,
-		                                vector<int>& reverselookup);
-		int       onlyRests            (vector<NoteNode>& data);
-		int       hasAttack            (vector<NoteNode>& data);
-		int       allSustained         (vector<NoteNode>& data);
-		void      printPitchGrid       (vector<vector<NoteNode> >& notes,
+		                                std::vector<std::string >& abbr);
+		void      getAbbreviations     (std::vector<std::string >& abbreviations,
+		                                std::vector<std::string >& names);
+		void      getAbbreviation      (std::string& abbr, std::string& name);
+		void      extractNoteArray     (std::vector<std::vector<NoteNode> >& notes,
+		                                HumdrumFile& infile, std::vector<int>& ktracks,
+		                                std::vector<int>& reverselookup);
+		int       onlyRests            (std::vector<NoteNode>& data);
+		int       hasAttack            (std::vector<NoteNode>& data);
+		int       allSustained         (std::vector<NoteNode>& data);
+		void      printPitchGrid       (std::vector<std::vector<NoteNode> >& notes,
 		                                HumdrumFile& infile);
-		void      getNames             (vector<string >& names,
-		                                vector<int>& reverselookup, HumdrumFile& infile);
-		void      printLattice         (vector<vector<NoteNode> >& notes,
-		                                HumdrumFile& infile, vector<int>& ktracks,
-		                                vector<int>& reverselookup, int n);
+		void      getNames             (std::vector<std::string >& names,
+		                                std::vector<int>& reverselookup, HumdrumFile& infile);
+		void      printLattice         (std::vector<std::vector<NoteNode> >& notes,
+		                                HumdrumFile& infile, std::vector<int>& ktracks,
+		                                std::vector<int>& reverselookup, int n);
 		void      printSpacer          (ostream& out);
 		int       printInterval        (ostream& out, NoteNode& note1, NoteNode& note2,
 		                                int type, int octaveadjust = 0);
-		int       printLatticeItem     (vector<vector<NoteNode> >& notes, int n,
+		int       printLatticeItem     (std::vector<std::vector<NoteNode> >& notes, int n,
 		                                int currentindex, int fileline);
-		int       printLatticeItemRows (vector<vector<NoteNode> >& notes, int n,
+		int       printLatticeItemRows (std::vector<std::vector<NoteNode> >& notes, int n,
 		                                int currentindex, int fileline);
-		int       printLatticeModule   (ostream& out, vector<vector<NoteNode> >& notes,
+		int       printLatticeModule   (ostream& out, std::vector<std::vector<NoteNode> >& notes,
 		                                int n, int startline, int part1, int part2);
 		void      printInterleaved     (HumdrumFile& infile, int line,
-		                                vector<int>& ktracks, vector<int>& reverselookup,
-		                                const string& interstring);
-		void      printLatticeInterleaved(vector<vector<NoteNode> >& notes,
-		                                HumdrumFile& infile, vector<int>& ktracks,
-		                                vector<int>& reverselookup, int n);
+		                                std::vector<int>& ktracks, std::vector<int>& reverselookup,
+		                                const std::string& interstring);
+		void      printLatticeInterleaved(std::vector<std::vector<NoteNode> >& notes,
+		                                HumdrumFile& infile, std::vector<int>& ktracks,
+		                                std::vector<int>& reverselookup, int n);
 		int       printInterleavedLattice(HumdrumFile& infile, int line,
-		                                vector<int>& ktracks, vector<int>& reverselookup,
+		                                std::vector<int>& ktracks, std::vector<int>& reverselookup,
 		                                int n, int currentindex,
-		                                vector<vector<NoteNode> >& notes);
-		int       printCombinations    (vector<vector<NoteNode> >& notes,
-		                                HumdrumFile& infile, vector<int>& ktracks,
-		                                vector<int>& reverselookup, int n,
-		                                vector<vector<string> >& retrospective,
-		                                const string& searchstring);
+		                                std::vector<std::vector<NoteNode> >& notes);
+		int       printCombinations    (std::vector<std::vector<NoteNode> >& notes,
+		                                HumdrumFile& infile, std::vector<int>& ktracks,
+		                                std::vector<int>& reverselookup, int n,
+		                                std::vector<std::vector<std::string> >& retrospective,
+		                                const std::string& searchstring);
 		void      printAsCombination   (HumdrumFile& infile, int line,
-		                                vector<int>& ktracks, vector<int>& reverselookup,
-		                                const string& interstring);
+		                                std::vector<int>& ktracks, std::vector<int>& reverselookup,
+		                                const std::string& interstring);
 		int       printModuleCombinations(HumdrumFile& infile, int line,
-		                                vector<int>& ktracks, vector<int>& reverselookup,
+		                                std::vector<int>& ktracks, std::vector<int>& reverselookup,
 		                                int n, int currentindex,
-		                                vector<vector<NoteNode> >& notes,
+		                                std::vector<std::vector<NoteNode> >& notes,
 		                                int& matchcount,
-		                                vector<vector<string> >& retrospective,
-		                                const string& searchstring);
-		int       printCombinationsSuspensions(vector<vector<NoteNode> >& notes,
-		                                HumdrumFile& infile, vector<int>& ktracks,
-		                                vector<int>& reverselookup, int n,
-		                                vector<vector<string> >& retrospective);
-		int       printCombinationModule(ostream& out, const string& filename,
-		                                vector<vector<NoteNode> >& notes,
+		                                std::vector<std::vector<std::string> >& retrospective,
+		                                const std::string& searchstring);
+		int       printCombinationsSuspensions(std::vector<std::vector<NoteNode> >& notes,
+		                                HumdrumFile& infile, std::vector<int>& ktracks,
+		                                std::vector<int>& reverselookup, int n,
+		                                std::vector<std::vector<std::string> >& retrospective);
+		int       printCombinationModule(ostream& out, const std::string& filename,
+		                                std::vector<std::vector<NoteNode> >& notes,
 		                                int n, int startline, int part1, int part2,
-		                                vector<vector<string> >& retrospective,
-		                                char& notemarker, int markstate = 0);
-		int       printCombinationModulePrepare(ostream& out, const string& filename,
-		                                vector<vector<NoteNode> >& notes, int n,
+		                                std::vector<std::vector<std::string> >& retrospective,
+		                                std::string& notemarker, int markstate = 0);
+		int       printCombinationModulePrepare(ostream& out, const std::string& filename,
+		                                std::vector<std::vector<NoteNode> >& notes, int n,
 		                                int startline, int part1, int part2,
-		                                vector<vector<string> >& retrospective,
-		                                HumdrumFile& infile, const string& searchstring);
-		int       getOctaveAdjustForCombinationModule(vector<vector<NoteNode> >& notes,
+		                                std::vector<std::vector<std::string> >& retrospective,
+		                                HumdrumFile& infile, const std::string& searchstring);
+		int       getOctaveAdjustForCombinationModule(std::vector<std::vector<NoteNode> >& notes,
 		                                int n, int startline, int part1, int part2);
 		void      addMarksToInputData  (HumdrumFile& infile,
-		                                vector<vector<NoteNode> >& notes,
-		                                vector<int>& ktracks,
-		                                vector<int>& reverselookup);
+		                                std::vector<std::vector<NoteNode> >& notes,
+		                                std::vector<int>& ktracks,
+		                                std::vector<int>& reverselookup);
 		void      markNote              (HumdrumFile& infile, int line, int col);
-		void      initializeRetrospective(vector<vector<string> >& retrospective,
-		                                HumdrumFile& infile, vector<int>& ktracks);
+		void      initializeRetrospective(std::vector<std::vector<std::string> >& retrospective,
+		                                HumdrumFile& infile, std::vector<int>& ktracks);
 		int       getTriangleIndex(int number, int num1, int num2);
-		void      adjustKTracks        (vector<int>& ktracks, const string& koption);
+		void      adjustKTracks        (std::vector<int>& ktracks, const std::string& koption);
 		int       getMeasure           (HumdrumFile& infile, int line);
 
 	private:
@@ -5795,10 +5796,11 @@ class Tool_cint : public HumTool {
 		int       uncrossQ     = 0;      // used with -c option
 		int       retroQ       = 0;      // used with --retro option
 		int       idQ          = 0;      // used with --id option
-		vector<string> Ids;              // used with --id option
-		char      NoteMarker   = '\0';   // used with -N option
-		string    SearchString;
-		string Spacer;
+		std::vector<std::string> Ids;    // used with --id option
+		std::string NoteMarker;          // used with -N option
+		std::string MarkColor;           // used with --color
+		std::string SearchString;
+		std::string Spacer;
 
 };
 
@@ -5872,7 +5874,7 @@ class Tool_composite : public HumTool {
 		void        analyzeLineGroup          (HumdrumFile& infile, int line,
 		                                       const string& target);
 		void        extractGroup              (HumdrumFile& infile, const std::string &target);
-		void        getNumericGroupStates     (vector<int>& states, HumdrumFile& infile, const string& tgroup);
+		void        getNumericGroupStates     (std::vector<int>& states, HumdrumFile& infile, const std::string& tgroup);
 		int         getGroupNoteType          (HumdrumFile& infile, int line, const std::string& group);
 		HumNum      getLineDuration           (HumdrumFile& infile, int index,
 		                                       std::vector<bool>& isNull);
@@ -5909,6 +5911,7 @@ class Tool_composite : public HumTool {
 		std::string getMeterSymbol            (HumdrumFile& infile, int line, const std::string& group);
 		std::string generateVerseLabelLine    (HumdrumFile& output, HumdrumFile& input, int line);
 		std::string generateStriaLine         (HumdrumFile& output, HumdrumFile& input, int line);
+		std::string getFullCompositeMarker    (int line);
 
 		// Numeric analysis functions:
 		void        doNumericAnalyses         (HumdrumFile& infile);
@@ -5928,7 +5931,7 @@ class Tool_composite : public HumTool {
 		// Numeric analysis support functions:
 		int         countNoteOnsets           (HTp token);
 
-		bool        needsCoincidenceMarker    (int line);
+		bool        needsCoincidenceMarker    (int line, bool forceQ = false);
 		void        addCoincidenceMarks       (HumdrumFile& infile);
 
 	private:
@@ -6019,9 +6022,15 @@ class Tool_composite : public HumTool {
 		int m_groupAssignmentIndex = 0;
 		int m_verseLabelIndex      = 0;
 
+		bool m_colorFullCompositeQ  = false;
+		bool m_extractInputQ        = false;
 		bool m_coinMarkQ            = false;
 		std::string m_coinMark      = "|";
 		std::string m_coinMarkColor = "limegreen";
+		std::string m_AMark         = "@";
+		std::string m_AMarkColor    = "crimson";
+		std::string m_BMark         = "Z";
+		std::string m_BMarkColor    = "dodgerblue";
 
 };
 
@@ -6549,6 +6558,41 @@ class Tool_extract : public HumTool {
 
 };
 
+
+
+class Tool_fb : public HumTool {
+	public:
+		         Tool_fb           (void);
+		        ~Tool_fb           () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+		void     processLine       (HumdrumFile& infile, int index);
+		void     setupScoreData    (HumdrumFile& infile);
+		void     getAnalyses       (HumdrumFile& infile);
+		void     getHarmonicIntervals(HumdrumFile& infile);
+		void     calculateIntervals(vector<int>& intervals, vector<HTp>& tokens, int bassIndex);
+		void     printOutput       (HumdrumFile& infile);
+		void     printLineStyle3   (HumdrumFile& infile, int line);
+		std::string getAnalysisTokenStyle3(HumdrumFile& infile, int line, int field);
+
+	private:
+		std::vector<HTp>              m_kernspines;
+		std::vector<int>              m_kerntracks;
+		std::vector<int>              m_track2index;
+		std::vector<std::vector<int>> m_keyaccid;
+		std::vector<std::vector<int>> m_intervals;
+		const int m_rest = -1000;
+		int       m_reference = 0; // currently fixed to bass
+		int       m_debugQ = false;
+
+};
 
 
 class Tool_filter : public HumTool {
@@ -8434,9 +8478,15 @@ class Tool_peak : public HumTool {
 		void                          processSpine       (HTp startok);
 		void                          identifyLocalPeaks (std::vector<bool>& peaknotes,
 		                                                  std::vector<int>& notelist);
+		void                          getDurations       (vector<double>& durations,
+		                                                  vector<vector<HTp>>& notelist);
+		void                          getBeat            (vector<bool>& metpos,
+		                                                  vector<vector<HTp>>& notelist);
+
 		void                          getLocalPeakNotes  (vector<vector<HTp>>& newnotelist,
 		                                                  vector<vector<HTp>>& oldnotelist,
 		                                                  vector<bool>& peaknotes);
+
 		void                          identifyPeakSequence(vector<bool>& globalpeaknotes,
 		                                                   vector<int>& peakmidinums,
 		                                                   vector<vector<HTp>>& notes);
@@ -8455,7 +8505,6 @@ class Tool_peak : public HumTool {
 		double      m_smallRest = 4.0;   // Ignore rests that are 1 whole note or less.
 		double      m_peakDur   = 24.0;  // 6 whole notes maximum between m_peakNum local maximums.
 		double      m_peakNum   = 3;    // Number of local maximums in a row needed to mark in score.
-
 
 };
 
