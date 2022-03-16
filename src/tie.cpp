@@ -240,7 +240,7 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     // control points
     Point c1, c2;
     // the height of the control points
-    height *= 4 / 3;
+    height *= 0.7;
 
     c1.x = startPoint.x + (endPoint.x - startPoint.x) / 4; // point at 1/4
     c2.x = startPoint.x + (endPoint.x - startPoint.x) / 4 * 3; // point at 3/4
