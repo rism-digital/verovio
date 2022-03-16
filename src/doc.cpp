@@ -391,7 +391,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
-            GenerateMIDIParams generateMIDIParams(midiFile, &generateMIDI);
+            GenerateMIDIParams generateMIDIParams(this, midiFile, &generateMIDI);
             generateMIDIParams.m_midiChannel = midiChannel;
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
@@ -1611,6 +1611,12 @@ double Doc::GetLeftMargin(Object *object) const
             default: break;
         }
     }
+    else if (id == CLEF) {
+        Clef *clef = vrv_cast<Clef *>(object);
+        if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
+            return m_options->m_clefChangeFactor.GetValue() * this->GetLeftMargin(id);
+        }
+    }
     return this->GetLeftMargin(id);
 }
 
@@ -1646,6 +1652,12 @@ double Doc::GetRightMargin(Object *object) const
             case BarLinePosition::Left: return m_options->m_rightMarginLeftBarLine.GetValue();
             case BarLinePosition::Right: return m_options->m_rightMarginRightBarLine.GetValue();
             default: break;
+        }
+    }
+    else if (id == CLEF) {
+        Clef *clef = vrv_cast<Clef *>(object);
+        if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
+            return m_options->m_clefChangeFactor.GetValue() * this->GetRightMargin(id);
         }
     }
     return this->GetRightMargin(id);

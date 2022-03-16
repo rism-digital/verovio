@@ -557,12 +557,27 @@ int Staff::AlignVertically(FunctorParams *functorParams)
     // Set the pointer of the m_alignment
     m_staffAlignment = alignment;
 
-    std::vector<Object *>::iterator it;
-    it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(VERSE));
-    if (it != m_timeSpanningElements.end()) {
-        Verse *v = vrv_cast<Verse *>(*it);
+    std::vector<Object *>::const_iterator verseIterator
+        = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(VERSE));
+    if (verseIterator != m_timeSpanningElements.end()) {
+        Verse *v = vrv_cast<Verse *>(*verseIterator);
         assert(v);
         alignment->AddVerseN(v->GetN());
+    }
+
+    // add verse number to alignment in case there are spanning SYL elements but there is no verse number already - this
+    // generally happens with verses spanning over several systems which results in invalid placement of connector lines
+    std::vector<Object *>::const_iterator sylIterator
+        = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(SYL));
+    if (sylIterator != m_timeSpanningElements.end()) {
+        Verse *verse = vrv_cast<Verse *>((*sylIterator)->GetFirstAncestor(VERSE));
+        if (verse) {
+            const int verseNumber = verse->GetN();
+            const bool verseCollapse = params->m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
+            if (!alignment->GetVersePosition(verseNumber, verseCollapse)) {
+                alignment->AddVerseN(verseNumber);
+            }
+        }
     }
 
     // for next staff

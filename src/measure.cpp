@@ -238,6 +238,18 @@ void Measure::SetDrawingXRel(int drawingXRel)
     m_drawingXRel = drawingXRel;
 }
 
+bool Measure::IsFirstInSystem() const
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetFirst(MEASURE) == this);
+}
+
+bool Measure::IsLastInSystem() const
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetLast(MEASURE) == this);
+}
+
 int Measure::GetLeftBarLineXRel() const
 {
     if (m_measureAligner.GetLeftBarLineAlignment()) {
@@ -369,7 +381,12 @@ int Measure::GetDrawingOverflow()
 
 int Measure::GetSectionRestartShift(Doc *doc) const
 {
-    return 5 * doc->GetDrawingDoubleUnit(100);
+    if (this->IsFirstInSystem()) {
+        return 0;
+    }
+    else {
+        return 5 * doc->GetDrawingDoubleUnit(100);
+    }
 }
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)

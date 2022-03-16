@@ -43,8 +43,7 @@ The following libraries are embedded in Verovio:
 | [JSON++](https://github.com/hjiang/jsonxx)          | JSON data parser           |
 | [MidiFile](https://github.com/craigsapp/midifile)   | Standard MIDI file export  |
 | [pugixml](https://pugixml.org/)                     | XML data parser            |
-| [UTF-CPP](http://utfcpp.sourceforge.net/)           | UTF character conversions  |
-| [MINIZ-CPP](https://github.com/tfussell/miniz-cpp/) | ZIP files reading/writing  |
+| [MINIZ-CPP](https://github.com/kkzi/miniz-cpp)      | ZIP files reading/writing  |
 
 Contributing
 ------------

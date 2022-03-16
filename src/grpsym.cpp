@@ -124,7 +124,9 @@ int GrpSym::ScoreDefSetGrpSym(FunctorParams *)
 
         this->SetStartDef(start);
         this->SetEndDef(end);
-        StaffGrp *staffGrp = vrv_cast<StaffGrp *>(start->GetParent());
+        // dynamic_cast because we never check parent type
+        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(start->GetParent());
+        assert(staffGrp);
         staffGrp->SetGroupSymbol(this);
     }
 

@@ -84,6 +84,10 @@ jobs:
             version: "10"
 
           - os: ubuntu-20.04
+            compiler: g++
+            version: "11"
+
+          - os: ubuntu-20.04
             compiler: clang
             version: "6.0"
 
@@ -93,7 +97,7 @@ jobs:
 
           - os: ubuntu-20.04
             compiler: clang
-            version: "10"
+            version: "12"
 
           - os: macos-10.15
             compiler: xcode

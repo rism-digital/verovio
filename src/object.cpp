@@ -2099,6 +2099,21 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    // starting a new mensur
+    if (this->Is(MENSUR)) {
+        Mensur *mensur = vrv_cast<Mensur *>(this);
+        assert(mensur);
+        if (mensur->IsScoreDefElement()) {
+            return FUNCTOR_CONTINUE;
+        }
+        assert(params->m_currentStaffDef);
+        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef.GetStaffDef(params->m_currentStaffDef->GetN());
+        assert(upcomingStaffDef);
+        upcomingStaffDef->SetCurrentMensur(mensur);
+        params->m_upcomingScoreDef.m_setAsDrawing = true;
+        return FUNCTOR_CONTINUE;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

@@ -96,14 +96,6 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     FTrem *fTrem = dynamic_cast<FTrem *>(element);
     assert(fTrem);
 
-    // temporary coordinates
-    int x1, x2, y1, y2;
-
-    // temporary variables
-    int shiftY;
-    int polygonHeight;
-    double dy1, dy2;
-
     /******************************************************************/
     // initialization
 
@@ -119,8 +111,6 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         LogError("View draw: <fTrem> element has invalid number of descendants.");
         return;
     }
-    BeamElementCoord *firstElement = beamElementCoords->at(0);
-    BeamElementCoord *secondElement = beamElementCoords->at(1);
 
     /******************************************************************/
     // Calculate the beam slope and position
@@ -140,9 +130,26 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Draw the stems and the bars
 
+    this->DrawFTremSegment(dc, staff, fTrem);
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem)
+{
+    assert(dc);
+    assert(staff);
+    assert(fTrem);
+
+    const ArrayOfBeamElementCoords *beamElementCoords = fTrem->GetElementCoords();
+
+    BeamElementCoord *firstElement = beamElementCoords->at(0);
+    BeamElementCoord *secondElement = beamElementCoords->at(1);
+
     // We look only at the first one for the duration since both are expected to be the same
-    assert(dynamic_cast<AttDurationLogical *>(firstElement->m_element));
-    int dur = (dynamic_cast<AttDurationLogical *>(firstElement->m_element))->GetDur();
+    AttDurationLogical *durationElement = dynamic_cast<AttDurationLogical *>(firstElement->m_element);
+    if (!durationElement) return;
+    const int dur = durationElement->GetDur();
 
     if (dur > DUR_1) {
         // Adjust the x position of the first and last element for taking into account the stem width
@@ -151,22 +158,21 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // Number of bars to draw
-    int allBars = fTrem->GetBeams();
+    const int allBars = fTrem->GetBeams();
     int floatingBars = fTrem->HasBeamsFloat() ? fTrem->GetBeamsFloat() : 0;
     int fullBars = allBars - floatingBars;
 
+    // Set initial coordinates for the beam
+    int y1 = firstElement->m_yBeam;
+    int y2 = secondElement->m_yBeam;
+
+    int x1 = firstElement->m_x;
+    int x2 = secondElement->m_x;
+
     // Shift direction
-    shiftY = (fTrem->m_drawingPlace == BEAMPLACE_below) ? 1.0 : -1.0;
-    polygonHeight = fTrem->m_beamWidthBlack * shiftY;
-
-    y1 = firstElement->m_yBeam;
-    y2 = secondElement->m_yBeam;
-
-    x1 = firstElement->m_x;
-    x2 = secondElement->m_x;
-
-    dy1 = shiftY;
-    dy2 = shiftY;
+    const double shiftY = (fTrem->m_drawingPlace == BEAMPLACE_below) ? 1.0 : -1.0;
+    const double dy1 = shiftY;
+    const double dy2 = shiftY;
 
     int space = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, fTrem->m_cueSize);
     // for non-stem notes the bar should be shortenend
@@ -184,6 +190,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         floatingBars = allBars - fullBars;
     }
 
+    const int polygonHeight = fTrem->m_beamWidthBlack * shiftY;
     for (int j = 0; j < fullBars; ++j) {
         this->DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
         y1 += polygonHeight;
@@ -194,8 +201,8 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // If we have no full bar but only floating bars, then move it inside
     if (fullBars == 0) {
-        y1 += dy1 * fTrem->m_beamWidthWhite;
-        y2 += dy2 * fTrem->m_beamWidthWhite;
+        y1 += dy1 * fTrem->m_beamWidthWhite / 2;
+        y2 += dy2 * fTrem->m_beamWidthWhite / 2;
     }
 
     // shorten the bar after having drawn the first one (but the first one)
@@ -211,8 +218,6 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y1 += dy1 * fTrem->m_beamWidthWhite;
         y2 += dy2 * fTrem->m_beamWidthWhite;
     }
-
-    dc->EndGraphic(element, this);
 }
 
 void View::DrawBeamSegment(

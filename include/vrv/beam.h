@@ -94,6 +94,7 @@ public:
     ///@{
     void InitSameasRoles(Beam *sameasBeam, data_BEAMPLACE &drawingPlace);
     void UpdateSameasRoles(data_BEAMPLACE place);
+    void CalcNoteHeadShiftForStemSameas(Doc *doc, Beam *sameasBeam, data_BEAMPLACE place);
     ///@}
 
 private:
@@ -136,6 +137,9 @@ private:
 
     // Helper to calculate max/min beam points for the relative beam place
     std::pair<int, int> CalcBeamRelativeMinMax(data_BEAMPLACE place) const;
+
+    // Helper to calculate location and duration of the note that would be setting highest/lowest point for the beam
+    std::pair<int, int> CalcStemDefiningNote(Staff *staff, data_BEAMPLACE place);
 
     // Calculate positioning for the horizontal beams
     void CalcHorizontalBeam(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
@@ -340,10 +344,9 @@ protected:
     void FilterList(ArrayOfObjects *childList) override;
 
     /**
-     * Helper function to calculate overlap with layer elements that
-     * are placed within the duration of the beam
+     * See LayerElement::SetElementShortening
      */
-    int CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, int y2);
+    void SetElementShortening(int shortening) override;
 
 private:
     /**

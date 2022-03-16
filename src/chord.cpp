@@ -494,16 +494,20 @@ int Chord::AdjustOverlappingLayers(
     assert(notes);
     // get current chord positions
     std::set<int> chordElementLocations;
-    for (auto iter : *notes) {
+    for (const auto iter : *notes) {
         Note *note = vrv_cast<Note *>(iter);
         assert(note);
         chordElementLocations.insert(note->GetDrawingLoc());
     }
-    const int expectedElementsInUnison
-        = CountElementsInUnison(chordElementLocations, otherElementLocations, this->GetDrawingStemDir());
+
+    std::vector<int> locationsInUnison
+        = this->GetElementsInUnison(chordElementLocations, otherElementLocations, this->GetDrawingStemDir());
+
+    const int expectedElementsInUnison = (int)locationsInUnison.size();
     const bool isLowerPosition = (STEMDIRECTION_down == this->GetDrawingStemDir() && (otherElementLocations.size() > 0)
         && (*chordElementLocations.begin() >= *otherElementLocations.begin()));
     int actualElementsInUnison = 0;
+
     // process each note of the chord separately, storing locations in the set
     for (auto iter : *notes) {
         Note *note = vrv_cast<Note *>(iter);
@@ -516,10 +520,27 @@ int Chord::AdjustOverlappingLayers(
         if (isInUnison) ++actualElementsInUnison;
     }
 
+    // if there are accidentals that are aligned for the layer separately, we need to have additional margin for them
+    int accidMargin = 0;
+    for (const auto iter : otherElements) {
+        if (!iter->Is(NOTE)) continue;
+        Note *note = vrv_cast<Note *>(iter);
+        Accid *accid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
+        if (accid && accid->IsAlignedWithSameLayer()) {
+            accidMargin += accid->GetContentRight() - accid->GetContentLeft();
+        }
+    }
+    if (accidMargin) {
+        // add padding for the accidentals (1.5 unit)
+        accidMargin += 1.5 * doc->GetDrawingUnit(100);
+    }
+
     if (expectedElementsInUnison && (expectedElementsInUnison == actualElementsInUnison)) {
         isUnison = true;
     }
     else if (margin) {
+        // adjust margin by accidental margin
+        margin -= accidMargin;
         this->SetDrawingXRel(this->GetDrawingXRel() + margin);
         return margin;
     }

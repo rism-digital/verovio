@@ -249,7 +249,14 @@ public:
      * Encoded stem direction on the calling note is taken into account.
      * Called from Note::CalcStem
      */
-    data_STEMDIRECTION CalcStemDirForSameasNote(int verticalCenter);
+    data_STEMDIRECTION CalcStemDirForSameasNote(Doc *doc, int verticalCenter);
+
+    /**
+     * Set the Note::m_flippedNotehead flag if one of the two notes needs to be placed on the side.
+     * The note X relative position remains untouched because we do not want the stem position to be changed.
+     * This is different than with chords. It means the the X position is actually corrected when drawing the note.
+     */
+    void CalcNoteHeadShiftForSameasNote(Doc *doc, Note *stemSameas, data_STEMDIRECTION stemDir);
 
 public:
     //----------------//

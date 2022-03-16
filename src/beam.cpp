@@ -403,9 +403,10 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
     else {
         int adjust = 0;
         std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
-            if (!coord->m_element && !coord->m_element->Is({ NOTE, CHORD })) return;
+            if (!coord->m_element || !coord->m_element->Is({ NOTE, CHORD })) return;
             int elemY = coord->m_element->GetDrawingY();
             const int diff = std::abs(elemY - coord->m_yBeam);
+            assert(coord->m_stem);
             if (coord->m_stem->GetDrawingStemDir() == STEMDIRECTION_down) {
                 if (elemY <= coord->m_yBeam + topOffset) {
                     if (diff > adjust) adjust = diff + topOffset;
@@ -1208,26 +1209,8 @@ void BeamSegment::CalcBeamPlaceTab(
 
 void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
-    int relevantNoteLoc = VRV_UNSET;
+    const auto [noteLoc, noteDur] = this->CalcStemDefiningNote(staff, place);
     const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
-    for (auto coord : m_beamElementCoordRefs) {
-        const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
-            : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
-                                                                      : STEMDIRECTION_up;
-        coord->SetClosestNoteOrTabDurSym(stemDir, staff->IsTabWithStemsOutside());
-        // Nothing else to do if we have no closest note (that includes tab beams outside the staff)
-        if (!coord->m_closestNote) continue;
-        if (relevantNoteLoc == VRV_UNSET) {
-            relevantNoteLoc = coord->m_closestNote->GetDrawingLoc();
-        }
-        else {
-            relevantNoteLoc = (place == BEAMPLACE_below)
-                ? std::min(coord->m_closestNote->GetDrawingLoc(), relevantNoteLoc)
-                : std::max(coord->m_closestNote->GetDrawingLoc(), relevantNoteLoc);
-        }
-    }
-
-    int minDuration = DUR_4;
     for (auto coord : m_beamElementCoordRefs) {
         const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
             : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
@@ -1239,13 +1222,11 @@ void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool is
         }
         if (!coord->m_closestNote) continue;
         // skip current element if it's longer that minDuration and is not a part of fTrem
-        if ((coord->m_dur <= minDuration) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
-        // if location matches or if current stem length is too short - adjust stem length
+        if ((coord->m_dur < noteDur) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
+        // adjust stem length if location matches
         const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
-        if ((coord->m_closestNote->GetDrawingLoc() == relevantNoteLoc)
-            || (!isHorizontal && (std::abs(m_uniformStemLength) < 13))) {
+        if (coord->m_closestNote->GetDrawingLoc() == noteLoc) {
             m_uniformStemLength = coordStemLength;
-            minDuration = coord->m_dur;
         }
     }
     // make adjustments for the grace notes length
@@ -1273,6 +1254,55 @@ std::pair<int, int> BeamSegment::CalcBeamRelativeMinMax(data_BEAMPLACE place) co
     });
 
     return { highestPoint, lowestPoint };
+}
+
+std::pair<int, int> BeamSegment::CalcStemDefiningNote(Staff *staff, data_BEAMPLACE place)
+{
+    int shortestDuration = DUR_4;
+    int shortestLoc = VRV_UNSET;
+    int relevantDuration = DUR_4;
+    int relevantLoc = VRV_UNSET;
+    const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
+    for (auto coord : m_beamElementCoordRefs) {
+        const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
+            : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
+                                                                      : STEMDIRECTION_up;
+        coord->SetClosestNoteOrTabDurSym(stemDir, staff->IsTabWithStemsOutside());
+        // Nothing else to do if we have no closest note (that includes tab beams outside the staff)
+        if (!coord->m_closestNote) continue;
+        // set initial values for both locations and durations to that of first note
+        if (relevantLoc == VRV_UNSET) {
+            relevantLoc = coord->m_closestNote->GetDrawingLoc();
+            shortestLoc = relevantLoc;
+            relevantDuration = coord->m_dur;
+            shortestDuration = relevantDuration;
+            continue;
+        }
+        // save location and duration of the note, if it is closer to the beam (i.e. placed higher on the staff for
+        // above beams and vice versa for below beams)
+        if ((place == BEAMPLACE_above) && (coord->m_closestNote->GetDrawingLoc() > relevantLoc)) {
+            relevantLoc = coord->m_closestNote->GetDrawingLoc();
+            relevantDuration = coord->m_dur;
+        }
+        else if ((place == BEAMPLACE_below) && (coord->m_closestNote->GetDrawingLoc() < relevantLoc)) {
+            relevantLoc = coord->m_closestNote->GetDrawingLoc();
+            relevantDuration = coord->m_dur;
+        }
+        // save location and duration of the note that have shortest duration
+        if (coord->m_dur >= shortestDuration) {
+            shortestDuration = coord->m_dur;
+            shortestLoc = coord->m_closestNote->GetDrawingLoc();
+        }
+    }
+
+    // if shortest note location does not offset its duration (shorter notes need more space for additional beams) then
+    // give preference to the its location
+    if ((shortestDuration - relevantDuration) > (std::abs(relevantLoc - shortestLoc) + 1)) {
+        relevantLoc = shortestLoc;
+        relevantDuration = shortestDuration;
+    }
+
+    return { relevantLoc, relevantDuration };
 }
 
 void BeamSegment::CalcHorizontalBeam(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface)
@@ -1448,6 +1478,35 @@ void BeamSegment::UpdateSameasRoles(data_BEAMPLACE place)
     else {
         m_stemSameasRole = SAMEAS_SECONDARY;
         (*m_stemSameasReverseRole) = SAMEAS_PRIMARY;
+    }
+}
+
+void BeamSegment::CalcNoteHeadShiftForStemSameas(Doc *doc, Beam *sameasBeam, data_BEAMPLACE place)
+{
+    assert(doc);
+
+    if (!sameasBeam) return;
+
+    // We want to do this only from the second beams sharing the stems and if the role is set
+    if (m_stemSameasReverseRole || this->StemSameasIsUnset()) return;
+
+    const ArrayOfBeamElementCoords *sameasCoords = &sameasBeam->m_beamSegment.m_beamElementCoordRefs;
+    data_STEMDIRECTION stemDir = (place == BEAMPLACE_above) ? STEMDIRECTION_up : STEMDIRECTION_down;
+
+    // Loop throught both list of elements and calculate the note head shift
+    const int sameasSize = (int)sameasCoords->size();
+    for (int i = 0; i < int(m_beamElementCoordRefs.size()) && i < sameasSize; ++i) {
+        if (!m_beamElementCoordRefs.at(i)->m_element || !sameasCoords->at(i)->m_element) continue;
+
+        Note *note1 = (m_beamElementCoordRefs.at(i)->m_element->Is(NOTE))
+            ? vrv_cast<Note *>(m_beamElementCoordRefs.at(i)->m_element)
+            : NULL;
+        Note *note2
+            = (sameasCoords->at(i)->m_element->Is(NOTE)) ? vrv_cast<Note *>(sameasCoords->at(i)->m_element) : NULL;
+
+        if (!note1 || !note2) continue;
+
+        note1->CalcNoteHeadShiftForSameasNote(doc, note2, stemDir);
     }
 }
 
@@ -1901,58 +1960,6 @@ void BeamElementCoord::SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, boo
     }
 }
 
-int Beam::CalcLayerOverlap(Doc *doc, Object *beam, int directionBias, int y1, int y2)
-{
-    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    if (!parentLayer) return 0;
-    // Check whether there are elements on other layer in the duration of the current beam. If there are none - stop
-    // here, there's nothing to be done
-    auto collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
-    if (collidingElementsList.empty()) return 0;
-
-    Staff *staff = this->GetAncestorStaff();
-
-    int leftMargin = 0;
-    int rightMargin = 0;
-    std::vector<int> elementOverlaps;
-    for (auto object : collidingElementsList) {
-        LayerElement *layerElement = vrv_cast<LayerElement *>(object);
-        if (!beam->HorizontalContentOverlap(object)) continue;
-        if (directionBias > 0) {
-            // make sure that there's actual overlap first
-            if ((layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y1)
-                && (layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y2))
-                continue;
-            leftMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y1;
-            rightMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y2;
-        }
-        else {
-            // make sure that there's actual overlap first
-            if ((layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y1)
-                && (layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y2))
-                continue;
-            leftMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y1;
-            rightMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y2;
-        }
-        elementOverlaps.emplace_back(std::max(leftMargin * directionBias, rightMargin * directionBias));
-    }
-    if (elementOverlaps.empty()) return 0;
-
-    const int staffOffset = doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
-    int overlap = 0;
-    if (*maxOverlap >= 0) {
-        overlap = ((*maxOverlap == 0) ? staffOffset : *maxOverlap) * directionBias;
-    }
-    else {
-        int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / staffOffset) * 2;
-        if (maxShorteningInHalfUnits > 0) --maxShorteningInHalfUnits;
-        std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
-            [maxShorteningInHalfUnits](BeamElementCoord *coord) { coord->m_maxShortening = maxShorteningInHalfUnits; });
-    }
-    return overlap;
-}
-
 std::pair<int, int> Beam::GetAdditionalBeamCount() const
 {
     int topShortestDur = DUR_8;
@@ -1967,6 +1974,12 @@ std::pair<int, int> Beam::GetAdditionalBeamCount() const
     });
 
     return { topShortestDur - DUR_8, bottomShortestDur - DUR_8 };
+}
+
+void Beam::SetElementShortening(int shortening)
+{
+    std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
+        [shortening](BeamElementCoord *coord) { coord->m_maxShortening = shortening; });
 }
 
 //----------------------------------------------------------------------------
@@ -1993,7 +2006,7 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
             params->m_beamSlope = m_beamSegment.m_beamSlope;
             params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
             params->m_overlapMargin
-                = CalcLayerOverlap(params->m_doc, params->m_beam, params->m_directionBias, params->m_y1, params->m_y2);
+                = this->CalcLayerOverlap(params->m_doc, params->m_directionBias, params->m_y1, params->m_y2);
         }
         return FUNCTOR_CONTINUE;
     }
@@ -2072,6 +2085,9 @@ int Beam::CalcStem(FunctorParams *functorParams)
     assert(staff);
 
     m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, initialPlace);
+
+    if (this->HasStemSameasBeam())
+        m_beamSegment.CalcNoteHeadShiftForStemSameas(params->m_doc, this->GetStemSameasBeam(), initialPlace);
 
     return FUNCTOR_CONTINUE;
 }

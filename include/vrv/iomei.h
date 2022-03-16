@@ -75,6 +75,7 @@ class InstrDef;
 class Label;
 class LabelAbbr;
 class Layer;
+class LayerDef;
 class LayerElement;
 class Lb;
 class Lem;
@@ -334,6 +335,7 @@ private:
     void WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef);
     void WriteLabel(pugi::xml_node currentNode, Label *label);
     void WriteLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr);
+    void WriteLayerDef(pugi::xml_node currentNode, LayerDef *layerDef);
     void WriteTuning(pugi::xml_node currentNode, Tuning *tuning);
     void WriteCourse(pugi::xml_node currentNode, Course *course);
     void WriteMeasure(pugi::xml_node currentNode, Measure *measure);
@@ -635,6 +637,8 @@ private:
     bool ReadStaff(Object *parent, pugi::xml_node staff);
     bool ReadStaffChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadLayer(Object *parent, pugi::xml_node layer);
+    bool ReadLayerDef(Object *parent, pugi::xml_node layerDef);
+    bool ReadLayerDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
     bool ReadTextChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
     ///@}

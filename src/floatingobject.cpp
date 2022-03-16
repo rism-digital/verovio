@@ -518,7 +518,8 @@ void FloatingCurvePositioner::ResetCurveParams()
     m_dir = curvature_CURVEDIR_NONE;
     m_crossStaff = NULL;
     m_cachedMinMaxY = VRV_UNSET;
-    ClearSpannedElements();
+    m_requestedStaffSpace = 0;
+    this->ClearSpannedElements();
 }
 
 void FloatingCurvePositioner::UpdateCurveParams(
@@ -594,12 +595,28 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
 {
     int leftAdjustment, rightAdjustment;
     std::tie(leftAdjustment, rightAdjustment)
-        = CalcLeftRightAdjustment(boundingBox, discard, margin, horizontalOverlap);
+        = this->CalcLeftRightAdjustment(boundingBox, discard, margin, horizontalOverlap);
+    return std::max(leftAdjustment, rightAdjustment);
+}
+
+int FloatingCurvePositioner::CalcDirectionalAdjustment(
+    BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap)
+{
+    int leftAdjustment, rightAdjustment;
+    std::tie(leftAdjustment, rightAdjustment)
+        = this->CalcDirectionalLeftRightAdjustment(boundingBox, isCurveAbove, discard, margin, horizontalOverlap);
     return std::max(leftAdjustment, rightAdjustment);
 }
 
 std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
     BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap)
+{
+    return this->CalcDirectionalLeftRightAdjustment(
+        boundingBox, (this->GetDir() == curvature_CURVEDIR_above), discard, margin, horizontalOverlap);
+}
+
+std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
+    BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap)
 {
     assert(boundingBox);
     assert(boundingBox->HasSelfBB());
@@ -613,11 +630,6 @@ std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
     Point p2 = points[3];
 
     Accessor type = SELF;
-    // bool keepInside = element->Is({ARTIC, ARTIC_PART, NOTE, STEM}));
-    // The idea is to force only some of the elements to be inside a slur.
-    // However, this currently does work because skipping an adjustment can cause collision later depending on how
-    // the slur is eventually adjusted. Keeping everything inside now.
-    bool keepInside = true;
     discard = false;
 
     // first check if they overlap at all
@@ -633,11 +645,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
     int leftAdjustment = 0;
     int rightAdjustment = 0;
 
-    if (this->GetDir() == curvature_CURVEDIR_above) {
-        // The curve is below the content - if the element needs to be kept inside (e.g. a note), then do not return.
-        if (((this->GetTopBy(type) + margin) < boundingBox->GetBottomBy(type)) && !keepInside) {
-            return { 0, 0 };
-        }
+    if (isCurveAbove) {
         int leftY = 0;
         int rightY = 0;
         // The curve overflows on both sides
@@ -666,10 +674,6 @@ std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
         rightAdjustment = std::max(boundingBox->GetTopBy(type) - rightY, 0);
     }
     else {
-        // The curve is below the content - if the element needs to be kept inside (e.g. a note), then do not return.
-        if (((this->GetTopBy(type) + margin) < boundingBox->GetBottomBy(type)) && !keepInside) {
-            return { 0, 0 };
-        }
         int leftY = 0;
         int rightY = 0;
         // The curve overflows on both sides
@@ -717,6 +721,32 @@ void FloatingCurvePositioner::GetPoints(Point points[4]) const
     points[1].y += currentY;
     points[2].y += currentY;
     points[3].y += currentY;
+}
+
+std::pair<int, int> FloatingCurvePositioner::CalcRequestedStaffSpace(StaffAlignment *alignment)
+{
+    assert(alignment);
+
+    TimeSpanningInterface *interface = this->GetObject()->GetTimeSpanningInterface();
+    if (interface) {
+        Staff *startStaff = interface->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+        Staff *endStaff = interface->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+
+        if (startStaff && endStaff) {
+            const int startStaffN = startStaff->GetN();
+            const int endStaffN = endStaff->GetN();
+            if (startStaffN != endStaffN) {
+                if (alignment->GetStaff()->GetN() == std::min(startStaffN, endStaffN)) {
+                    return { 0, m_requestedStaffSpace };
+                }
+                if (alignment->GetStaff()->GetN() == std::max(startStaffN, endStaffN)) {
+                    return { m_requestedStaffSpace, 0 };
+                }
+            }
+        }
+    }
+
+    return { 0, 0 };
 }
 
 //----------------------------------------------------------------------------

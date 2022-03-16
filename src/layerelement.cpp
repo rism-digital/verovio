@@ -764,10 +764,10 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
     return result;
 }
 
-int LayerElement::CountElementsInUnison(
+std::vector<int> LayerElement::GetElementsInUnison(
     const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection)
 {
-    if (firstChord.empty() || secondChord.empty()) return 0;
+    if (firstChord.empty() || secondChord.empty()) return {};
     // Set always sorts elements, hence note locations stored will always be in ascending order, regardless
     // of how they are encoded in the MEI file
     std::set<int> difference;
@@ -789,7 +789,7 @@ int LayerElement::CountElementsInUnison(
                     && (element < *firstChord.rbegin()))
                 || ((firstChord.size() > secondChord.size()) && (element > *secondChord.begin())
                     && (element < *secondChord.rbegin()))) {
-                return 0;
+                return {};
             }
         }
     }
@@ -799,10 +799,10 @@ int LayerElement::CountElementsInUnison(
     // is higher than topmost location of the opposing chord it means that these elements cannot be in unison.
     // Same applies to the UP stem direction, just with reversed condition
     if (stemDirection == STEMDIRECTION_down) {
-        if ((*firstChord.rbegin() > *secondChord.rbegin()) || (*firstChord.begin() > *secondChord.begin())) return 0;
+        if ((*firstChord.rbegin() > *secondChord.rbegin()) || (*firstChord.begin() > *secondChord.begin())) return {};
     }
     else {
-        if ((*firstChord.rbegin() < *secondChord.rbegin()) || (*firstChord.begin() < *secondChord.begin())) return 0;
+        if ((*firstChord.rbegin() < *secondChord.rbegin()) || (*firstChord.begin() < *secondChord.begin())) return {};
     }
 
     // Finally, check if notes in unison are at the proper distance to be drawn as unison, as well as get number of
@@ -812,14 +812,14 @@ int LayerElement::CountElementsInUnison(
     auto it = std::set_intersection(
         firstChord.begin(), firstChord.end(), secondChord.begin(), secondChord.end(), intersection.begin());
     intersection.resize(it - intersection.begin());
-    if (intersection.empty()) return false;
+    if (intersection.empty()) return {};
     for (int i = 0; i < (int)intersection.size() - 1; ++i) {
         if (std::abs(intersection.at(i) - intersection.at(i + 1)) == 1) {
-            return 0;
+            return {};
         }
     }
 
-    return (int)intersection.size();
+    return intersection;
 }
 
 MapOfDotLocs LayerElement::CalcOptimalDotLocations()
@@ -902,6 +902,81 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     return usePrimary ? dotLocs1 : dotLocs2;
 }
 
+int LayerElement::CalcLayerOverlap(Doc *doc, int direction, int y1, int y2)
+{
+    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    if (!parentLayer) return 0;
+    // Check whether there are elements on other layer in the duration of the current beam. If there are none - stop
+    // here, there's nothing to be done
+    auto collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
+    if (collidingElementsList.empty()) return 0;
+
+    Staff *staff = this->GetAncestorStaff();
+
+    int leftMargin = 0;
+    int rightMargin = 0;
+    std::vector<int> elementOverlaps;
+    for (auto object : collidingElementsList) {
+        LayerElement *layerElement = vrv_cast<LayerElement *>(object);
+        if (!this->HorizontalContentOverlap(object)) continue;
+        if (direction > 0) {
+            // make sure that there's actual overlap first
+            if ((layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y1)
+                && (layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y2))
+                continue;
+            leftMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y1;
+            rightMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y2;
+        }
+        else {
+            // make sure that there's actual overlap first
+            if ((layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y1)
+                && (layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y2))
+                continue;
+            leftMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y1;
+            rightMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y2;
+        }
+        elementOverlaps.emplace_back(std::max(leftMargin * direction, rightMargin * direction));
+    }
+    if (elementOverlaps.empty()) return 0;
+
+    const int staffOffset = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
+    int overlap = 0;
+    if (*maxOverlap >= 0) {
+        overlap = ((*maxOverlap == 0) ? staffOffset : *maxOverlap) * direction;
+    }
+    else {
+        int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / staffOffset) * 2;
+        if (maxShorteningInHalfUnits > 0) --maxShorteningInHalfUnits;
+        this->SetElementShortening(maxShorteningInHalfUnits);
+    }
+    return overlap;
+}
+
+data_STEMMODIFIER LayerElement::GetDrawingStemMod() const
+{
+    const AttStems *stem = dynamic_cast<const AttStems *>(this);
+    if (!stem) return STEMMODIFIER_NONE;
+
+    return stem->GetStemMod();
+}
+
+wchar_t LayerElement::StemModToGlyph(data_STEMMODIFIER stemMod) const
+{
+    switch (stemMod) {
+        case STEMMODIFIER_1slash: return SMUFL_E220_tremolo1;
+        case STEMMODIFIER_2slash: return SMUFL_E221_tremolo2;
+        case STEMMODIFIER_3slash: return SMUFL_E222_tremolo3;
+        case STEMMODIFIER_4slash: return SMUFL_E223_tremolo4;
+        case STEMMODIFIER_5slash: return SMUFL_E224_tremolo5;
+        case STEMMODIFIER_6slash: return SMUFL_E224_tremolo5;
+        case STEMMODIFIER_sprech: return SMUFL_E645_vocalSprechgesang;
+        case STEMMODIFIER_z: return SMUFL_E22A_buzzRoll;
+        default: break;
+    }
+    return 0;
+}
+
 //----------------------------------------------------------------------------
 // Static methods for LayerElement
 //----------------------------------------------------------------------------
@@ -909,7 +984,7 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
 int LayerElement::GetDotCount(const MapOfDotLocs &dotLocations)
 {
     return std::accumulate(dotLocations.cbegin(), dotLocations.cend(), 0,
-        [](int sum, const MapOfDotLocs::value_type &mapEntry) { return sum + mapEntry.second.size(); });
+        [](int sum, const MapOfDotLocs::value_type &mapEntry) { return sum + (int)mapEntry.second.size(); });
 }
 
 int LayerElement::GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDotLocs &dotLocs2)
@@ -1255,7 +1330,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             loc = staffY->m_drawingTuning->CalcPitchPos(
                 note->GetTabCourse(), staffY->m_drawingNotationType, staffY->m_drawingLines);
         }
-        else if (note->HasPname() || note->HasLoc()) {
+        else if ((note->HasPname() && note->HasOct()) || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
@@ -1449,8 +1524,8 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
 
     // ignore elements that are not in the beam or are direct children of the beam
     if (!params->m_beam) return FUNCTOR_CONTINUE;
-    if (!params->m_isOtherLayer && !this->Is(ACCID) && (this->GetFirstAncestor(BEAM) == params->m_beam)
-        && !this->IsGraceNote())
+    if (!params->m_isOtherLayer && !this->Is(ACCID) && !this->IsGraceNote()
+        && ((this->GetFirstAncestor(BEAM) == params->m_beam) || (this->GetFirstAncestor(FTREM) == params->m_beam)))
         return FUNCTOR_CONTINUE;
     // ignore elements that are both on other layer and cross-staff
     if (params->m_isOtherLayer && m_crossStaff) return FUNCTOR_CONTINUE;
@@ -1472,8 +1547,10 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
 
     // check if top/bottom of the element overlaps with beam coordinates
     int leftMargin = 0, rightMargin = 0;
-    Beam *beam = vrv_cast<Beam *>(params->m_beam);
-    const int beamCount = beam->m_beamSegment.GetAdjacentElementsDuration(this->GetDrawingX()) - DUR_8;
+    BeamDrawingInterface *beam = params->m_beam->GetBeamDrawingInterface();
+    const auto [above, below] = beam->GetAdditionalBeamCount();
+    int beamCount = std::max(above, below);
+    if (params->m_beam->Is(FTREM)) --beamCount;
     const int currentBeamYLeft = params->m_y1 + params->m_beamSlope * (this->GetContentLeft() - params->m_x1);
     const int currentBeamYRight = params->m_y1 + params->m_beamSlope * (this->GetContentRight() - params->m_x1);
     if (params->m_directionBias > 0) {
@@ -1572,10 +1649,12 @@ int LayerElement::AdjustOverlappingLayers(
         Note *note = vrv_cast<Note *>(this);
         assert(note);
         stemSameas = note->HasStemSameasNote();
+        if (stemSameas) return 0;
     }
 
-    if (this->Is({ DOTS, STEM })) {
-        LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
+    if (this->Is({ ACCID, DOTS, STEM })) {
+        LayerElement *parent
+            = vrv_cast<LayerElement *>(this->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
         assert(parent);
         parent->SetDrawingXRel(parent->GetDrawingXRel() + margin);
     }
@@ -1618,6 +1697,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             // Unisson, look at the duration for the note heads
             if (unison && currentNote->IsUnisonWith(previousNote, false)) {
                 int previousDuration = previousNote->GetDrawingDur();
+                assert(previousNote->GetParent());
                 const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;
                 data_STEMDIRECTION stemDir = currentNote->GetDrawingStemDir();
@@ -1692,6 +1772,15 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
             else {
                 shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
             }
+        }
+        else if (this->Is(ACCID) && otherElements.at(i)->Is(NOTE)) {
+            Note *parentNote = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
+            Note *otherNote = vrv_cast<Note *>(otherElements.at(i));
+            const bool isUnisonOverlap = parentNote && parentNote->IsUnisonWith(otherNote, true)
+                && !parentNote->IsUnisonWith(otherNote, false);
+            if (isUnisonOverlap && this->HorizontalContentOverlap(otherElements.at(i)))
+                shift += this->HorizontalRightOverlap(
+                    otherElements.at(i), doc, -doc->GetDrawingUnit(staff->m_drawingStaffSize));
         }
 
         if (this->Is(NOTE) && !otherElements.at(i)->Is(STEM)) {
@@ -1878,7 +1967,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
             // If we want the nesting to be reduced, we can set to:
             // selfLeft = this->GetSelfLeft();
             // This could be made an option (--spacing-limited-nesting)
-            int selfLeftMargin = params->m_doc->GetLeftMargin(this);
+            const double selfLeftMargin = params->m_doc->GetLeftMargin(this);
             int overlap = 0;
             for (auto &boundingBox : params->m_boundingBoxes) {
                 LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
@@ -1994,6 +2083,13 @@ int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
 {
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    Layer *currentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(currentLayer);
+    if (currentLayer->GetCue() == BOOLEAN_true) {
+        m_drawingCueSize = true;
+        return FUNCTOR_CONTINUE;
+    }
 
     if (this->IsGraceNote()) {
         m_drawingCueSize = true;
@@ -2314,9 +2410,9 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
     if (!currentLayer || this->IsScoreDefElement() || this->Is(MREST)) return FUNCTOR_SIBLINGS;
     if (!this->GetDurationInterface() || this->Is({ MSPACE, SPACE }) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
 
-    const double duration = !this->GetParent()->Is(CHORD)
+    const double duration = !this->GetFirstAncestor(CHORD)
         ? this->GetAlignmentDuration(params->m_mensur, params->m_meterSig)
-        : vrv_cast<Chord *>(this->GetParent())->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+        : vrv_cast<Chord *>(this->GetFirstAncestor(CHORD))->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
 
     const double time = m_alignment->GetTime();
 

@@ -1380,36 +1380,48 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
 
     int length = top - bottom;
     // We add - substract a unit in order to have the line going to the edge
-    length += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int x = arpeg->GetDrawingX();
-    const int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int angle = -90;
+    const int y = bottom - unit;
 
-    wchar_t startGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
-    wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
-    wchar_t endGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
-
-    if (arpeg->GetOrder() == arpegLog_ORDER_down) {
-        startGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
-        fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
-        endGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+    const arpegLog_ORDER order = arpeg->GetOrder();
+    if (order == arpegLog_ORDER_nonarp) {
+        dc->StartGraphic(arpeg, "", arpeg->GetUuid());
+        const int offset = unit / 2;
+        const int thickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        this->DrawSquareBracket(dc, true, x - unit, bottom - offset, length + 2 * offset, unit, thickness, thickness);
+        dc->EndGraphic(arpeg, this);
     }
+    else {
+        length += 2 * unit;
+        wchar_t startGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+        wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+        wchar_t endGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
 
-    if (arpeg->GetArrowShape() == LINESTARTENDSYMBOL_none) endGlyph = 0;
+        if (order == arpegLog_ORDER_down) {
+            startGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
+            fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+            endGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+        }
 
-    Point orig(x, y);
+        if (arpeg->GetArrowShape() == LINESTARTENDSYMBOL_none) endGlyph = 0;
 
-    dc->StartGraphic(arpeg, "", arpeg->GetUuid());
+        Point orig(x, y);
 
-    // Smufl glyphs are horizontal - Rotate them counter clockwise
-    dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
+        dc->StartGraphic(arpeg, "", arpeg->GetUuid());
 
-    this->DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, startGlyph, endGlyph);
+        // Smufl glyphs are horizontal - Rotate them counter clockwise
+        const int angle = -90;
+        dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
 
-    dc->EndGraphic(arpeg, this);
+        this->DrawSmuflLine(
+            dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, startGlyph, endGlyph);
 
-    // Possibly draw enclosing brackets
-    this->DrawArpegEnclosing(dc, arpeg, staff, startGlyph, fillGlyph, endGlyph, x, y, length, drawingCueSize);
+        dc->EndGraphic(arpeg, this);
+
+        // Possibly draw enclosing brackets
+        this->DrawArpegEnclosing(dc, arpeg, staff, startGlyph, fillGlyph, endGlyph, x, y, length, drawingCueSize);
+    }
 }
 
 void View::DrawArpegEnclosing(DeviceContext *dc, Arpeg *arpeg, Staff *staff, wchar_t startGlyph, wchar_t fillGlyph,

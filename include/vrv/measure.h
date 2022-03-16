@@ -108,6 +108,14 @@ public:
     ///@}
 
     /**
+     * @name Check if the measure is the first or last in the system
+     */
+    ///@{
+    bool IsFirstInSystem() const;
+    bool IsLastInSystem() const;
+    ///@}
+
+    /**
      * Return the index position of the measure in its system parent
      */
     int GetMeasureIdx() const { return Object::GetIdx(); }
