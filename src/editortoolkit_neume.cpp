@@ -1824,11 +1824,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
     std::string status = "OK", message = "";
 
-    bool containsPrecedes = false;
-    bool containsFollows = false;
-    Syllable *linkedSyllable;
-    std::string linkedID;
-
     // Get the current drawing page
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
@@ -1888,16 +1883,23 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
 
         if (par->GetClassId() == SYLLABLE) {
-            // Check if it is part of a linked/split syllable
+            // Check if it is part of a linked/split syllable and unlink
             Syllable *li = dynamic_cast<Syllable *>(par);
             assert(li);
+            std::string linkedID;
             if (li->HasPrecedes()) {
-                containsPrecedes = true;
                 linkedID = li->GetPrecedes();
-            }
-            if (li->HasFollows()) {
-                containsFollows = true;
+                if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
+                Set(li->GetUuid(),"precedes","");
+                Set(linkedID,"follows","");
+                SetText(linkedID,"");
+            } 
+            else if (li->HasFollows()) {
                 linkedID = li->GetFollows();
+                if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
+                Set(li->GetUuid(),"follows","");
+                Set(linkedID,"precedes","");
+                SetText(li->GetUuid(),"");
             }
         }
 
@@ -2135,77 +2137,47 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             Syllable *fullSyllable = new Syllable();
             Syl *fullSyl = NULL;
             
-            // syllables have @follows don't contain syl and bbox
-            // only process syl and bbox for syllables that don't have @follows
-            if (!containsFollows) {
-                // construct concatenated string of all the syls
-                std::wstring fullString = L"";
-                for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
-                    Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
-                    if (fullSyl == NULL && syl != NULL) {
-                        fullSyl = syl;
-                    }
-                    Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
-                    if (text != NULL) {
-                        std::wstring currentString = text->GetText();
-                        fullString = fullString + currentString;
-                    }
+            // construct concatenated string of all the syls
+            std::wstring fullString = L"";
+            for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
+                Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
+                if (fullSyl == NULL && syl != NULL) {
+                    fullSyl = syl;
                 }
-                // find the new boundingbox comprising all of the text
-                int ulx = -1, uly = -1, lrx = -1, lry = -1;
-                for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
-                    Object *par = dynamic_cast<Object *>(*it);
-                    assert(par);
-                    Syl *descSyl = dynamic_cast<Syl *>(par->FindDescendantByType(SYL));
-                    assert(descSyl);
-                    // FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>
-                    // ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
-                    FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
-                    if (facsInter != NULL) {
-                        if (ulx == -1) {
-                            ulx = facsInter->GetDrawingX();
-                            uly = facsInter->GetDrawingY();
-                            lrx = facsInter->GetWidth() + ulx;
-                            lry = facsInter->GetHeight() + uly;
-                        }
-                        else {
-                            if (facsInter->GetDrawingX() >= ulx) {
-                                lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
-                            } 
-                            else {
-                                ulx = facsInter->GetDrawingX();
-                            }
-
-                            if (facsInter->GetDrawingY() >= uly){
-                                lry = facsInter->GetHeight() + facsInter->GetDrawingY();
-                            }
-                            else {
-                                uly = facsInter->GetDrawingY();
-                            }                        
-                        }
-                    }
-                }
-                assert(fullSyl);
-                Text *text = dynamic_cast<Text *>(fullSyl->FindDescendantByType(TEXT));
-                assert(text);
-                text->SetText(fullString);
-                assert(fullSyllable);
-                fullSyllable->AddChild(fullSyl);
-                if (ulx >= 0 && uly >= 0 && lrx >= 0 && lry >= 0) {
-                    FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(fullSyl->GetFacsimileInterface());
-                    assert(facsInter);
-                    Zone *zone = dynamic_cast<Zone *>(facsInter->GetZone());
-                    assert(zone);
-                    assert(ulx >= 0);
-                    zone->SetUlx(ulx);
-                    assert(uly >= 0);
-                    zone->SetUly(uly);
-                    assert(lrx >= 0);
-                    zone->SetLrx(lrx);
-                    assert(lry >= 0);
-                    zone->SetLry(lry);
+                Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
+                if (text != NULL) {
+                    std::wstring currentString = text->GetText();
+                    fullString = fullString + currentString;
                 }
             }
+            // find the new boundingbox comprising all of the text
+            int ulx = -1, uly = -1, lrx = -1, lry = -1;
+            for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
+                Object *par = dynamic_cast<Object *>(*it);
+                assert(par);
+                Syl *descSyl = dynamic_cast<Syl *>(par->FindDescendantByType(SYL));
+                assert(descSyl);
+                // FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>
+                // ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
+                FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
+                if (facsInter != NULL) {
+                    if (ulx == -1) {
+                        ulx = facsInter->GetDrawingX();
+                    }
+                    if (facsInter->GetDrawingY() >= uly){
+                        lry = facsInter->GetHeight() + facsInter->GetDrawingY();
+                    }
+                    else {
+                        uly = facsInter->GetDrawingY();
+                    }  
+                }                
+            }
+            assert(fullSyl);
+            Text *text = dynamic_cast<Text *>(fullSyl->FindDescendantByType(TEXT));
+            assert(text);
+            text->SetText(fullString);
+            assert(fullSyllable);
+            fullSyllable->AddChild(fullSyl);
             
             for (auto it = elements.begin(); it != elements.end(); ++it) {
                 if ((*it)->GetParent() != fullSyllable && !(*it)->Is(SYL)) {
@@ -2219,6 +2191,20 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             doubleParent->AddChild(fullSyllable);
             Layer *layer = dynamic_cast<Layer *>(fullSyllable->GetFirstAncestor(LAYER));
             assert(layer);
+            if (ulx >= 0 && uly >= 0 && lrx >= 0 && lry >= 0) {
+                FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(fullSyl->GetFacsimileInterface());
+                assert(facsInter);
+                Zone *zone = dynamic_cast<Zone *>(facsInter->GetZone());
+                assert(zone);
+                assert(ulx >= 0);
+                zone->SetUlx(ulx);
+                assert(uly >= 0);
+                zone->SetUly(uly);
+                assert(lrx >= 0);
+                zone->SetLrx(lrx);
+                assert(lry >= 0);
+                zone->SetLry(lry);
+            }
             layer->ReorderByXPos();
             parent = fullSyllable;
         }
@@ -2261,23 +2247,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
             doubleParent->DeleteChild(obj);
         }
-    }
-
-    // update linked ID
-    if (parent->Is(SYLLABLE) && !linkedID.empty()) {
-        Syllable *currSyllable = dynamic_cast<Syllable *>(parent);
-        if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
-        linkedSyllable = dynamic_cast<Syllable *>(m_doc->GetDrawingPage()->FindDescendantByUuid(linkedID));
-
-        if (containsPrecedes) {
-            currSyllable->SetPrecedes("#" + linkedID);
-            linkedSyllable->SetFollows("#" + parent->GetUuid());
-        } else if (containsFollows) {
-            currSyllable->SetFollows("#" + linkedID);
-            linkedSyllable->SetPrecedes("#" + parent->GetUuid());
-        }
-    }
-    
+    }    
 
     m_infoObject.import("uuid", parent->GetUuid());
     m_infoObject.import("status", status);
