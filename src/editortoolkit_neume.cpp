@@ -1897,8 +1897,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             else if (li->HasFollows()) {
                 linkedID = li->GetFollows();
                 if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
-                LogMessage("%s", li->GetUuid().c_str());
-                LogMessage("%s", linkedID.c_str());
                 Set(li->GetUuid(),"follows","");
                 Set(linkedID,"precedes","");
                 SetText(li->GetUuid(),"");
