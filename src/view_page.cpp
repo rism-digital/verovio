@@ -1188,6 +1188,15 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
     }
 }
 
+void View::DrawBeamspanOnly(DeviceContext *dc, Object *parent, Measure *measure, System *system)
+{
+    for (auto current : parent->GetChildren()) {
+        if (!current->Is(BEAMSPAN)) continue;
+        this->DrawControlElement(dc, dynamic_cast<ControlElement *>(current), measure, system);
+    }
+    this->DrawSystemList(dc, system, BEAMSPAN);
+}
+
 //----------------------------------------------------------------------------
 // View - Staff
 //----------------------------------------------------------------------------
@@ -1625,11 +1634,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
 
     // Beamspan has to be processes first to make sure that stems for all notes have correct length and extend all the
     // way to the beam. For this, only beamspans are processed first and are ignored in the next loop
-    for (auto current : parent->GetChildren()) {
-        if (!current->Is(BEAMSPAN)) continue;
-        this->DrawControlElement(dc, dynamic_cast<ControlElement *>(current), measure, system);
-    }
-    this->DrawSystemList(dc, system, BEAMSPAN);
+    this->DrawBeamspanOnly(dc, parent, measure, system);
 
     for (auto current : parent->GetChildren()) {
         if (current->Is(STAFF)) {

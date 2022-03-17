@@ -198,6 +198,7 @@ protected:
      * Defined in view_page.cpp
      */
     ///@{
+    void DrawBeamspanOnly(DeviceContext *dc, Object *parent, Measure *measure, System *system);
     void DrawPageElement(DeviceContext *dc, PageElement *element);
     void DrawSystem(DeviceContext *dc, System *system);
     void DrawSystemList(DeviceContext *dc, System *system, const ClassId classId);
