@@ -1147,6 +1147,11 @@ Options::Options()
     m_beamMinSlope.Init(0, 0, 0);
     this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
 
+    m_beamNoStemExtension.SetInfo("No stem extionsion in beams",
+        "For notes in beams, stems will stop at first outermost sub-beam without crossing it");
+    m_beamNoStemExtension.Init(false);
+    this->Register(&m_beamNoStemExtension, "beamNoStemExtension", &m_generalLayout);
+
     m_bracketThickness.SetInfo("Bracket thickness", "The thickness of the system bracket");
     m_bracketThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);
