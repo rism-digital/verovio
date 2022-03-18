@@ -2544,22 +2544,24 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a pointer to the transposer
- * member 1: a pointer to document
- * member 2: the functor for redirection
+ * member 0: a pointer to the document
+ * member 1: the functor for redirection
+ * member 2: a pointer to the transposer
+ * member 3: the transposition to be applied
  **/
 
 class TransposeParams : public FunctorParams {
 public:
     TransposeParams(Doc *doc, Functor *functor, Transposer *transposer)
     {
-        m_transposer = transposer;
         m_doc = doc;
         m_functor = functor;
+        m_transposer = transposer;
     }
-    Transposer *m_transposer;
     Doc *m_doc;
     Functor *m_functor;
+    Transposer *m_transposer;
+    std::string m_transposition;
 };
 
 //----------------------------------------------------------------------------

@@ -1185,7 +1185,11 @@ void Doc::TransposeDoc()
         transpose.m_visibleOnly = false;
     }
 
-    this->Process(&transpose, &transposeParams);
+    if (m_options->m_transpose.IsSet()) {
+        // Transpose the entire document
+        transposeParams.m_transposition = m_options->m_transpose.GetValue();
+        this->Process(&transpose, &transposeParams);
+    }
 }
 
 void Doc::ExpandExpansions()

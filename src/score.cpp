@@ -283,12 +283,12 @@ int Score::Transpose(FunctorParams *functorParams)
 
     ScoreDef *scoreDef = this->GetScoreDef();
     Transposer *transposer = params->m_transposer;
+    const std::string &transposition = params->m_transposition;
 
-    const std::string transpositionOption = params->m_doc->GetOptions()->m_transpose.GetValue();
-    if (transposer->IsValidIntervalName(transpositionOption)) {
-        transposer->SetTransposition(transpositionOption);
+    if (transposer->IsValidIntervalName(transposition)) {
+        transposer->SetTransposition(transposition);
     }
-    else if (transposer->IsValidKeyTonic(transpositionOption)) {
+    else if (transposer->IsValidKeyTonic(transposition)) {
         // Find the starting key tonic of the data to use in calculating the tranposition interval:
         // Set transposition by key tonic.
         // Detect the current key from the keysignature.
@@ -305,9 +305,9 @@ int Score::Transpose(FunctorParams *functorParams)
             currentKey = transposer->CircleOfFifthsToMajorTonic(fifthsInt);
             // need to add a dummy "0" key signature in score (staffDefs of staffDef).
         }
-        transposer->SetTransposition(currentKey, transpositionOption);
+        transposer->SetTransposition(currentKey, transposition);
     }
-    else if (transposer->IsValidSemitones(transpositionOption)) {
+    else if (transposer->IsValidSemitones(transposition)) {
         KeySig *keysig = vrv_cast<KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
         int fifths = 0;
         if (keysig) {
@@ -317,10 +317,10 @@ int Score::Transpose(FunctorParams *functorParams)
             LogWarning("No key signature in data, assuming no key signature with no sharps/flats.");
             // need to add a dummy "0" key signature in score (staffDefs of staffDef).
         }
-        transposer->SetTransposition(fifths, transpositionOption);
+        transposer->SetTransposition(fifths, transposition);
     }
     else {
-        LogWarning("Transposition option argument is invalid: %s", transpositionOption.c_str());
+        LogWarning("Transposition is invalid: %s", transposition.c_str());
         // there is no transposition that can be done so do not try
         // to transpose any further (if continuing in this function,
         // there will not be an error, just that the transposition
