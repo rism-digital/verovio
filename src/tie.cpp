@@ -230,7 +230,7 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
 
     /************** bezier points **************/
 
-    // adjust the 'height' of the bezier based on the width of staff lines to make sure that there tie does not overlap
+    // adjust the 'height' of the bezier based on the width of staff lines to make sure that the tie does not overlap
     // with them
     const int height = (1.6 - doc->GetOptions()->m_staffLineWidth.GetValue()) * drawingUnit;
     const int distance = endPoint.x - startPoint.x; 
