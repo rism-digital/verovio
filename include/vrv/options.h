@@ -713,6 +713,7 @@ public:
     OptionString m_mdivXPathQuery;
     OptionArray m_substXPathQuery;
     OptionString m_transpose;
+    OptionJson m_transposeMdiv;
     OptionBool m_transposeSelectedOnly;
 
     /**

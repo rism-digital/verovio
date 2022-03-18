@@ -1438,9 +1438,14 @@ Options::Options()
     m_substXPathQuery.Init();
     this->Register(&m_substXPathQuery, "substXPathQuery", &m_selectors);
 
-    m_transpose.SetInfo("Transpose the content", "SUMMARY");
+    m_transpose.SetInfo("Transpose the content", "Transpose the entire content");
     m_transpose.Init("");
     this->Register(&m_transpose, "transpose", &m_selectors);
+
+    m_transposeMdiv.SetInfo(
+        "Transpose individual mdivs", "Json mapping the mdiv uuids to the corresponding transposition");
+    m_transposeMdiv.Init(JsonSource::String, "{}");
+    this->Register(&m_transposeMdiv, "transposeMdiv", &m_selectors);
 
     m_transposeSelectedOnly.SetInfo(
         "Transpose selected only", "Transpose only the selected content and ignore unselected editorial content");
