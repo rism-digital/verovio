@@ -243,6 +243,10 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
         stem->SetDrawingYRel(y2 - el->GetDrawingY());
         stem->SetDrawingStemLen(y2 - y1);
     }
+
+    if (doc->GetOptions()->m_beamNoStemExtension.GetValue() && (m_beamElementCoordRefs.size() > 2)) {
+        this->AdjustBeamStemExtension(beamInterface);
+    }
 }
 
 void BeamSegment::CalcSetStemValuesTab(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
@@ -426,6 +430,60 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
     }
 
     return true;
+}
+
+void BeamSegment::AdjustBeamStemExtension(BeamDrawingInterface *beamInterface)
+{
+    assert(beamInterface);
+
+    // set to store durations of relevant notes (it's ordered, so min duration is going to be first)
+    std::set<int> noteDurations;
+    // lambda check whether coord has element set and whether that element is CHORD or NOTE
+    const auto isNoteOrChord = [](BeamElementCoord *coord) {
+        return (coord->m_element && coord->m_element->Is({ CHORD, NOTE }));
+    };
+    // iterators
+    using VectorIt = ArrayOfBeamElementCoords::iterator;
+    using VectorReverseIt = ArrayOfBeamElementCoords::reverse_iterator;
+    for (VectorIt it = std::next(m_beamElementCoordRefs.begin()); it != std::prev(m_beamElementCoordRefs.end()); ++it) {
+        // clear values
+        noteDurations.clear();
+        if (!isNoteOrChord(*it)) continue;
+
+        // get current element duration
+        const int val = (*it)->m_breaksec ? std::min((*it)->m_breaksec + DURATION_4, (*it)->m_dur) : (*it)->m_dur;
+        noteDurations.insert(val);
+        // get next element duration
+        VectorIt nextElement = std::find_if(it + 1, m_beamElementCoordRefs.end(), isNoteOrChord);
+        if (nextElement != m_beamElementCoordRefs.end()) {
+            const int nextVal = (*nextElement)->m_breaksec
+                ? std::min((*nextElement)->m_breaksec + DURATION_4, (*nextElement)->m_dur)
+                : (*nextElement)->m_dur;
+            noteDurations.insert(nextVal);
+        }
+        // get previous element duration
+        VectorReverseIt reverse = std::make_reverse_iterator(it);
+        VectorReverseIt prevElement = std::find_if(reverse, m_beamElementCoordRefs.rend(), isNoteOrChord);
+        if (prevElement != m_beamElementCoordRefs.rend()) {
+            const int prevVal = (*prevElement)->m_breaksec
+                ? std::min((*prevElement)->m_breaksec + DURATION_4, (*prevElement)->m_dur)
+                : (*prevElement)->m_dur;
+            noteDurations.insert(prevVal);
+        }
+
+        // Get min duration of elements around
+        const int minDur = *noteDurations.begin();
+        if (minDur == DURATION_8) continue;
+
+        // Get stem and adjust it's lenth
+        StemmedDrawingInterface *stemmedInterface = (*it)->GetStemHolderInterface();
+        if (!stemmedInterface) continue;
+        Stem *stem = stemmedInterface->GetDrawingStem();
+
+        const int sign = beamInterface->m_drawingPlace == BEAMPLACE_below ? -1 : 1;
+        const int lengthAdjust = sign * (minDur - DURATION_8) * beamInterface->m_beamWidth;
+        stem->SetDrawingStemLen(stem->GetDrawingStemLen() + lengthAdjust);
+    }
 }
 
 void BeamSegment::AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface)
