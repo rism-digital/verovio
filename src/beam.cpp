@@ -137,16 +137,15 @@ void BeamSegment::CalcBeam(
     // Set the stem lengths to stem objects
 
     if (staff->IsTablature()) {
-        this->CalcSetStemValuesTab(layer, staff, doc, beamInterface);
+        this->CalcSetStemValuesTab(staff, doc, beamInterface);
     }
     else {
-        this->CalcSetStemValues(layer, staff, doc, beamInterface);
+        this->CalcSetStemValues(staff, doc, beamInterface);
     }
 }
 
-void BeamSegment::CalcSetStemValues(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
 {
-    assert(layer);
     assert(staff);
     assert(doc);
     assert(beamInterface);
@@ -156,100 +155,98 @@ void BeamSegment::CalcSetStemValues(Layer *layer, Staff *staff, Doc *doc, BeamDr
     for (auto coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
-        if (el->Is({ CHORD, NOTE })) {
+        if (!el->Is({ CHORD, NOTE })) continue;
 
-            // Get the interface for the chord or note
-            StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
-            if (!stemmedInterface) continue;
+        // Get the interface for the chord or note
+        StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
+        if (!stemmedInterface) continue;
 
-            assert(coord->m_closestNote);
+        assert(coord->m_closestNote);
 
-            y1 = coord->m_yBeam;
-            bool isStemSameas = false;
+        y1 = coord->m_yBeam;
+        bool isStemSameas = false;
 
-            // With stem.sameas the y is not the beam one but the one of the other note
-            // We also need to adjust the length differently (below)
-            if (this->StemSameasIsSecondary() && el->Is(NOTE)) {
-                Note *note = vrv_cast<Note *>(el);
-                assert(note);
-                if (note->HasStemSameasNote()) {
-                    y1 = note->GetStemSameasNote()->GetDrawingY();
-                    isStemSameas = true;
-                }
+        // With stem.sameas the y is not the beam one but the one of the other note
+        // We also need to adjust the length differently (below)
+        if (this->StemSameasIsSecondary() && el->Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(el);
+            assert(note);
+            if (note->HasStemSameasNote()) {
+                y1 = note->GetStemSameasNote()->GetDrawingY();
+                isStemSameas = true;
+            }
+        }
+
+        y2 = coord->m_closestNote->GetDrawingY();
+        if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+            if (isStemSameas) {
+                // Move up according to the cut-outs
+                y1 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
+            }
+            else {
+                // Move down to ensure the stem is slightly shorter than the top-beam
+                y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
+        }
+        else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+            if (isStemSameas) {
+                y1 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
+            }
+            else {
+                y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            }
+            y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
+        }
+        else if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
+            int stemOffset = 0;
+            if (coord->m_partialFlagPlace == coord->m_beamRelativePlace) {
+                stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth;
+            }
+            // handle cross-staff fTrem cases
+            const auto [beams, beamsFloat] = beamInterface->GetFloatingBeamCount();
+            if ((coord->GetStemDir() == STEMDIRECTION_down) && ((beams > 0) || (beamsFloat > 0))) {
+                int beamsCount = std::max(beams, beamsFloat);
+                if (beamsFloat <= 0) beamsCount--;
+                stemOffset = beamsCount * beamInterface->m_beamWidth;
             }
 
-            y2 = coord->m_closestNote->GetDrawingY();
-            if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
-                if (isStemSameas) {
-                    // Move up according to the cut-outs
-                    y1 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
-                }
-                else {
-                    // Move down to ensure the stem is slightly shorter than the top-beam
-                    y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                }
-                y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
-            }
-            else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
-                if (isStemSameas) {
-                    y1 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
-                }
-                else {
-                    y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                }
+            if (coord->m_beamRelativePlace == BEAMPLACE_below) {
+                y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize) + stemOffset;
                 y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
-            else if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
-                int stemOffset = 0;
-                if (coord->m_partialFlagPlace == coord->m_beamRelativePlace) {
-                    stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth;
-                }
-                // handle cross-staff fTrem cases
-                const auto [beams, beamsFloat] = beamInterface->GetFloatingBeamCount();
-                if ((coord->GetStemDir() == STEMDIRECTION_down) && ((beams > 0) || (beamsFloat > 0))) {
-                    int beamsCount = std::max(beams, beamsFloat);
-                    if (beamsFloat <= 0) beamsCount--;
-                    stemOffset = beamsCount * beamInterface->m_beamWidth;
-                }
-
-                if (coord->m_beamRelativePlace == BEAMPLACE_below) {
-                    y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize) + stemOffset;
-                    y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
-                }
-                else {
-                    y1 += stemOffset;
-                    y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
-                }
+            else {
+                y1 += stemOffset;
+                y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
-
-            if (coord->m_element->Is(CHORD)) {
-                Chord *chord = vrv_cast<Chord *>(coord->m_element);
-                assert(chord);
-                int yMax, yMin;
-                chord->GetYExtremes(yMax, yMin);
-                if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
-                    y2 += (coord->m_beamRelativePlace == BEAMPLACE_above) ? (yMin - yMax) : (yMax - yMin);
-                }
-                else {
-                    y2 += (beamInterface->m_drawingPlace == BEAMPLACE_above) ? (yMin - yMax) : (yMax - yMin);
-                }
-            }
-
-            Stem *stem = stemmedInterface->GetDrawingStem();
-            // This is the case with fTrem on whole notes
-            if (!stem) continue;
-
-            // Since the value were calculated relatively to the element position, adjust them
-            stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
-            stem->SetDrawingYRel(y2 - el->GetDrawingY());
-            stem->SetDrawingStemLen(y2 - y1);
         }
+
+        if (coord->m_element->Is(CHORD)) {
+            Chord *chord = vrv_cast<Chord *>(coord->m_element);
+            assert(chord);
+            int yMax, yMin;
+            chord->GetYExtremes(yMax, yMin);
+            if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
+                y2 += (coord->m_beamRelativePlace == BEAMPLACE_above) ? (yMin - yMax) : (yMax - yMin);
+            }
+            else {
+                y2 += (beamInterface->m_drawingPlace == BEAMPLACE_above) ? (yMin - yMax) : (yMax - yMin);
+            }
+        }
+
+        Stem *stem = stemmedInterface->GetDrawingStem();
+        // This is the case with fTrem on whole notes
+        if (!stem) continue;
+
+        // Since the value were calculated relatively to the element position, adjust them
+        stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
+        stem->SetDrawingYRel(y2 - el->GetDrawingY());
+        stem->SetDrawingStemLen(y2 - y1);
     }
 }
 
-void BeamSegment::CalcSetStemValuesTab(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+void BeamSegment::CalcSetStemValuesTab(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
 {
-    assert(layer);
     assert(staff);
     assert(doc);
     assert(beamInterface);

@@ -130,10 +130,10 @@ private:
     void CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal);
 
     // Helper to set the stem values
-    void CalcSetStemValues(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+    void CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
     // Helper to set the stem values for tablature
-    void CalcSetStemValuesTab(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+    void CalcSetStemValuesTab(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
     // Helper to calculate max/min beam points for the relative beam place
     std::pair<int, int> CalcBeamRelativeMinMax(data_BEAMPLACE place) const;
