@@ -1187,8 +1187,20 @@ void Doc::TransposeDoc()
 
     if (m_options->m_transpose.IsSet()) {
         // Transpose the entire document
+        if (m_options->m_transposeMdiv.IsSet()) {
+            LogWarning("\"%s\" is ignored when \"%s\" is set as well. Please use only one of the two options.",
+                m_options->m_transposeMdiv.GetKey().c_str(), m_options->m_transpose.GetKey().c_str());
+        }
         transposeParams.m_transposition = m_options->m_transpose.GetValue();
         this->Process(&transpose, &transposeParams);
+    }
+    else if (m_options->m_transposeMdiv.IsSet()) {
+        // Transpose mdivs individually
+        std::set<std::string> uuids = m_options->m_transposeMdiv.GetKeys();
+        for (const std::string &uuid : uuids) {
+            // TODO: Pass mdiv uuid as param into functor and filter by it
+            transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ uuid });
+        }
     }
 }
 

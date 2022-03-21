@@ -706,21 +706,33 @@ bool OptionJson::HasValue(const std::vector<std::string> &jsonNodePath) const
 
 int OptionJson::GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    return static_cast<int>(this->GetDoubleValue(jsonNodePath, getDefault));
+    return static_cast<int>(this->GetDblValue(jsonNodePath, getDefault));
 }
 
-double OptionJson::GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
+double OptionJson::GetDblValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    JsonPath path
-        = getDefault ? StringPath2NodePath(m_defaultValues, jsonNodePath) : StringPath2NodePath(m_values, jsonNodePath);
+    JsonPath path = StringPath2NodePath(getDefault ? m_defaultValues : m_values, jsonNodePath);
 
     if (path.size() != jsonNodePath.size() && !getDefault) {
         path = StringPath2NodePath(m_defaultValues, jsonNodePath);
     }
 
-    if (path.size() != jsonNodePath.size() || !path.back().get().is<jsonxx::Number>()) return 0;
+    if ((path.size() != jsonNodePath.size()) || !path.back().get().is<jsonxx::Number>()) return 0;
 
     return path.back().get().get<jsonxx::Number>();
+}
+
+std::string OptionJson::GetStrValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
+{
+    JsonPath path = StringPath2NodePath(getDefault ? m_defaultValues : m_values, jsonNodePath);
+
+    if ((path.size() != jsonNodePath.size()) && !getDefault) {
+        path = StringPath2NodePath(m_defaultValues, jsonNodePath);
+    }
+
+    if ((path.size() != jsonNodePath.size()) || !path.back().get().is<jsonxx::String>()) return "";
+
+    return path.back().get().get<jsonxx::String>();
 }
 
 bool OptionJson::UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value)
@@ -1734,10 +1746,10 @@ void Options::Sync()
 
         double jsonValue = 0.0;
         if (m_engravingDefaultsFile.HasValue(jsonNodePath)) {
-            jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
+            jsonValue = m_engravingDefaultsFile.GetDblValue(jsonNodePath);
         }
         else if (m_engravingDefaults.HasValue({ pair.first })) {
-            jsonValue = m_engravingDefaults.GetDoubleValue({ pair.first });
+            jsonValue = m_engravingDefaults.GetDblValue({ pair.first });
         }
         else
             continue;
