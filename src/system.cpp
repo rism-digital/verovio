@@ -805,8 +805,9 @@ int System::AlignSystems(FunctorParams *functorParams)
         // Alignment is already pre-determined with staff alignment overflow
         // We need to subtract them from the desired spacing
         const int actualSpacing = systemSpacing - std::max(contentOverflow, clefOverflow);
-        // Set the spacing if it exists (greater than 0)
-        if (actualSpacing > 0) params->m_shift -= actualSpacing;
+        // Ensure minimal white space between consecutive systems by adding one staff space
+        const int unit = params->m_doc->GetDrawingUnit(100);
+        params->m_shift -= std::max(actualSpacing, 2 * unit);
     }
 
     this->SetDrawingYRel(params->m_shift);
