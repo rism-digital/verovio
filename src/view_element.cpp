@@ -1488,7 +1488,7 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
         note = (stemDir == STEMDIRECTION_up) ? vrv_cast<Chord *>(childElement)->GetTopNote()
                                              : vrv_cast<Chord *>(childElement)->GetBottomNote();
     }
-    if (!note || note->IsGraceNote()) return;
+    if (!note || note->IsGraceNote() || note->GetDrawingCueSize()) return;
 
     // Get duration for the element
     int drawingDur = 0;
