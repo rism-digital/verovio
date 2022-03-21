@@ -281,6 +281,10 @@ int Score::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
+    // Check whether we are in the selected mdiv
+    if (!params->m_selectedMdivUuid.empty() && (params->m_selectedMdivUuid != params->m_currentMdivUuid))
+        return FUNCTOR_CONTINUE;
+
     ScoreDef *scoreDef = this->GetScoreDef();
     Transposer *transposer = params->m_transposer;
     const std::string &transposition = params->m_transposition;

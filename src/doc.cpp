@@ -1198,8 +1198,9 @@ void Doc::TransposeDoc()
         // Transpose mdivs individually
         std::set<std::string> uuids = m_options->m_transposeMdiv.GetKeys();
         for (const std::string &uuid : uuids) {
-            // TODO: Pass mdiv uuid as param into functor and filter by it
+            transposeParams.m_selectedMdivUuid = uuid;
             transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ uuid });
+            this->Process(&transpose, &transposeParams);
         }
     }
 }

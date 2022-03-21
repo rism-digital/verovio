@@ -1157,4 +1157,16 @@ int System::UnCastOff(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int System::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    // Check whether we are in the selected mdiv
+    if (!params->m_selectedMdivUuid.empty() && (params->m_selectedMdivUuid != params->m_currentMdivUuid))
+        return FUNCTOR_SIBLINGS;
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

@@ -2548,6 +2548,8 @@ public:
  * member 1: the functor for redirection
  * member 2: a pointer to the transposer
  * member 3: the transposition to be applied
+ * member 4: the mdiv selected for transposition
+ * member 5: the current mdiv
  **/
 
 class TransposeParams : public FunctorParams {
@@ -2562,6 +2564,8 @@ public:
     Functor *m_functor;
     Transposer *m_transposer;
     std::string m_transposition;
+    std::string m_selectedMdivUuid;
+    std::string m_currentMdivUuid;
 };
 
 //----------------------------------------------------------------------------

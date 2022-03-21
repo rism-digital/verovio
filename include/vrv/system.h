@@ -313,6 +313,11 @@ public:
      */
     int UnCastOff(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::Transpose
+     */
+    int Transpose(FunctorParams *functorParams) override;
+
 public:
     SystemAligner m_systemAligner;
 
