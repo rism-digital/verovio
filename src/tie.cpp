@@ -261,15 +261,15 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     assert(curve);
 
     const int thickness = drawingUnit * doc->GetOptions()->m_tieMidpointThickness.GetValue();
-    curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
+    curve->UpdateCurveParams(bezier, thickness, drawingCurveDir);
 
     if ((!startParentChord || isOuterChordNote) && durElement && (spanningType != SPANNING_END)) {
         UpdateTiePositioning(curve, bezier, durElement, note1, drawingUnit, drawingCurveDir);
-        curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
+        curve->UpdateCurveParams(bezier, thickness, drawingCurveDir);
     }
     if (!startParentChord && !endParentChord && note1 && note2 && (spanningType == SPANNING_START_END)) {
         if (this->AdjustEnharmonicTies(doc, curve, bezier, note1, note2, drawingCurveDir)) {
-            curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
+            curve->UpdateCurveParams(bezier, thickness, drawingCurveDir);
         }
     }
 
