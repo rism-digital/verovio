@@ -280,7 +280,9 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     // find best rest location relative to elements on other layers
     Staff *realStaff = m_crossStaff ? m_crossStaff : staff;
     ListOfObjects layers = realStaff->FindAllDescendantsByType(LAYER, false);
-    const auto otherLayerRelativeLocationInfo = this->GetLocationRelativeToOtherLayers(layers, layer, isTopLayer);
+    bool restOverlap = true;
+    const auto otherLayerRelativeLocationInfo
+        = this->GetLocationRelativeToOtherLayers(layers, layer, isTopLayer, restOverlap);
     int currentLayerRelativeLocation = this->GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
     int otherLayerRelativeLocation = otherLayerRelativeLocationInfo.first
         + this->GetRestOffsetFromOptions(RL_otherLayer, otherLayerRelativeLocationInfo, isTopLayer);
@@ -304,7 +306,7 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     // for two layers, top layer shouldn't go below center and lower layer shouldn't go above it. Enforce this by adding
     // margin that will adjust rest position
     int marginLocation = isTopLayer ? 6 : 2;
-    if ((this->GetDur() == DURATION_long) || (this->GetDur() == DURATION_4)) {
+    if ((this->GetDur() == DURATION_long) || ((this->GetDur() == DURATION_4) && restOverlap)) {
         marginLocation = isTopLayer ? 8 : 0;
     }
     else if (this->GetDur() >= DURATION_8) {
@@ -322,7 +324,7 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
 }
 
 std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
-    const ListOfObjects &layersList, Layer *currentLayer, bool isTopLayer)
+    const ListOfObjects &layersList, Layer *currentLayer, bool isTopLayer, bool &restOverlap)
 {
     if (!currentLayer) return { VRV_UNSET, RA_none };
 
@@ -339,6 +341,7 @@ std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
     std::pair<int, RestAccidental> finalElementInfo = { VRV_UNSET, RA_none };
     // Go through each colliding element and figure out optimal location for the rest
     for (Object *object : collidingElementsList) {
+        if (object->Is(NOTE)) restOverlap = false;
         auto currentElementInfo = this->GetElementLocation(object, vrv_cast<Layer *>(*layerIter), isTopLayer);
         if (currentElementInfo.first == VRV_UNSET) continue;
         //  If note on other layer is not on the same x position as rest - ignore its accidental
