@@ -48,7 +48,13 @@ public:
     /** Override the method since it is align to the staff */
     bool IsRelativeToStaff() const override { return (this->HasLoc() || (this->HasOloc() && this->HasPloc())); }
 
-    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
+    ///@}
 
     /** Override the method since alignment is required */
     bool HasToBeAligned() const override { return true; }

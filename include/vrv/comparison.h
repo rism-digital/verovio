@@ -126,7 +126,7 @@ public:
     bool operator()(const Object *object) override
     {
         if (!MatchesType(object)) return false;
-        const TimePointInterface *interface = const_cast<Object *>(object)->GetTimePointInterface();
+        const TimePointInterface *interface = object->GetTimePointInterface();
         if (!interface) return false;
         return (interface->GetStart() == m_pointingTo);
     }
@@ -150,7 +150,7 @@ public:
     bool operator()(const Object *object) override
     {
         if (!MatchesType(object)) return false;
-        const TimeSpanningInterface *interface = const_cast<Object *>(object)->GetTimeSpanningInterface();
+        const TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
         if (!interface) return false;
         return (interface->GetEnd() == m_pointingTo);
     }
@@ -447,7 +447,7 @@ public:
     bool operator()(const Object *object) override
     {
         if (!MatchesType(object)) return false;
-        const DurationInterface *interface = const_cast<Object *>(object)->GetDurationInterface();
+        const DurationInterface *interface = object->GetDurationInterface();
         assert(interface);
         return ((m_time >= interface->GetRealTimeOnsetMilliseconds())
             && (m_time <= interface->GetRealTimeOffsetMilliseconds()));

@@ -68,8 +68,13 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    FacsimileInterface *GetFacsimileInterface() override { return dynamic_cast<FacsimileInterface *>(this); }
-    LinkingInterface *GetLinkingInterface() override { return dynamic_cast<LinkingInterface *>(this); }
+    FacsimileInterface *GetFacsimileInterface() override { return vrv_cast<FacsimileInterface *>(this); }
+    const FacsimileInterface *GetFacsimileInterface() const override
+    {
+        return vrv_cast<const FacsimileInterface *>(this);
+    }
+    LinkingInterface *GetLinkingInterface() override { return vrv_cast<LinkingInterface *>(this); }
+    const LinkingInterface *GetLinkingInterface() const override { return vrv_cast<const LinkingInterface *>(this); }
     ///@}
 
     /**

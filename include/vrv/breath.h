@@ -39,7 +39,11 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
     ///@}
 
     //----------//

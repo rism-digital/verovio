@@ -120,18 +120,35 @@ public:
     }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual BeamDrawingInterface *GetBeamDrawingInterface() { return NULL; }
+    virtual const BeamDrawingInterface *GetBeamDrawingInterface() const { return NULL; }
     virtual DurationInterface *GetDurationInterface() { return NULL; }
+    virtual const DurationInterface *GetDurationInterface() const { return NULL; }
     virtual LinkingInterface *GetLinkingInterface() { return NULL; }
+    virtual const LinkingInterface *GetLinkingInterface() const { return NULL; }
     virtual FacsimileInterface *GetFacsimileInterface() { return NULL; }
+    virtual const FacsimileInterface *GetFacsimileInterface() const { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
+    virtual const PitchInterface *GetPitchInterface() const { return NULL; }
     virtual PlistInterface *GetPlistInterface() { return NULL; }
+    virtual const PlistInterface *GetPlistInterface() const { return NULL; }
     virtual PositionInterface *GetPositionInterface() { return NULL; }
+    virtual const PositionInterface *GetPositionInterface() const { return NULL; }
     virtual ScoreDefInterface *GetScoreDefInterface() { return NULL; }
+    virtual const ScoreDefInterface *GetScoreDefInterface() const { return NULL; }
     virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return NULL; }
+    virtual const StemmedDrawingInterface *GetStemmedDrawingInterface() const { return NULL; }
     virtual TextDirInterface *GetTextDirInterface() { return NULL; }
+    virtual const TextDirInterface *GetTextDirInterface() const { return NULL; }
     virtual TimePointInterface *GetTimePointInterface() { return NULL; }
+    virtual const TimePointInterface *GetTimePointInterface() const { return NULL; }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return NULL; }
+    virtual const TimeSpanningInterface *GetTimeSpanningInterface() const { return NULL; }
+    ///@}
 
     /**
      * Reset the object, that is 1) removing all childs and 2) resetting all attributes.

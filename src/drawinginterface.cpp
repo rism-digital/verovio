@@ -683,7 +683,7 @@ Point StemmedDrawingInterface::GetDrawingStemStart(Object *object)
 {
     assert(m_drawingStem || object);
     if (object && !m_drawingStem) {
-        assert(this == dynamic_cast<StemmedDrawingInterface *>(object));
+        assert(this == object->GetStemmedDrawingInterface());
         return Point(object->GetDrawingX(), object->GetDrawingY());
     }
     return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY());
@@ -693,7 +693,7 @@ Point StemmedDrawingInterface::GetDrawingStemEnd(Object *object)
 {
     assert(m_drawingStem || object);
     if (object && !m_drawingStem) {
-        assert(this == dynamic_cast<StemmedDrawingInterface *>(object));
+        assert(this == object->GetStemmedDrawingInterface());
         if (!m_drawingStem) {
             // Somehow arbitrary for chord - stem end it the bottom with no stem
             if (object->Is(CHORD)) {

@@ -4061,7 +4061,7 @@ bool PAEInput::ConvertDuration()
                 }
             }
             // Set the duration to the note, chord or rest
-            DurationInterface *interface = dynamic_cast<DurationInterface *>(token->m_object);
+            DurationInterface *interface = token->m_object->GetDurationInterface();
             assert(interface);
             interface->SetDur(currentDur->first);
             if (currentDur->second) {

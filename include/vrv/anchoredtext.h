@@ -40,7 +40,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    TextDirInterface *GetTextDirInterface() override { return dynamic_cast<TextDirInterface *>(this); }
+    TextDirInterface *GetTextDirInterface() override { return vrv_cast<TextDirInterface *>(this); }
+    const TextDirInterface *GetTextDirInterface() const override { return vrv_cast<const TextDirInterface *>(this); }
     ///@}
 
     /**
