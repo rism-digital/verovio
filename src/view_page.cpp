@@ -420,7 +420,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
 
         const int staffSize = staff->GetDrawingStaffNotationSize();
         int adjust = 0;
-        if (staffDef->GetChildCount(LAYERDEF)) adjust = 3 * doubleUnit;
+        if (staffDef->HasLayerDefWithLabel()) adjust = 3 * doubleUnit;
         this->DrawLabels(
             dc, scoreDef, staffDef, x - doubleUnit - adjust, y, abbreviations, staffSize, 2 * space + adjust);
 

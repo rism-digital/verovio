@@ -60,6 +60,11 @@ public:
     void SetDrawingVisibility(VisibilityOptimization drawingIsVisible) { m_drawingVisibility = drawingIsVisible; }
     ///@}
 
+    /**
+     * Return true if the label has layerDef with a label
+     */
+    bool HasLayerDefWithLabel() const;
+
     //----------//
     // Functors //
     //----------//
