@@ -154,7 +154,8 @@ void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
     const int unit = doc->GetDrawingUnit(staffSize);
     int horizontalMargin = doc->GetRightMargin(ACCID) * unit;
     // Reduce spacing for successive accidentals
-    if (element->Is(ACCID)) horizontalMargin *= 0.66;
+    if (element->Is(ACCID))
+        horizontalMargin *= 0.66;
     else if (element->Is(NOTE)) {
         Note *note = vrv_cast<Note *>(element);
         int ledgerAbove = 0;
