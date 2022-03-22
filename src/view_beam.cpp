@@ -438,7 +438,7 @@ void View::DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, System *system, O
     else {
         dc->StartGraphic(beamSpan, "", beamSpan->GetUuid(), false);
     }
-    
+
     BeamSpanSegment *segment = beamSpan->GetSegmentForSystem(system);
     if (segment) {
         // Reset current segment and set coordinates based on stored begin/end iterators for the ElementCoords
@@ -448,8 +448,9 @@ void View::DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, System *system, O
             beamSpan->m_beamElementCoords.begin(), beamSpan->m_beamElementCoords.end(), segment->GetBeginCoord());
         const auto coordsLast = std::find(
             beamSpan->m_beamElementCoords.begin(), beamSpan->m_beamElementCoords.end(), segment->GetEndCoord());
-        
-        if ((coordsFirst != beamSpan->m_beamElementCoords.end()) && (coordsLast != beamSpan->m_beamElementCoords.end())) {
+
+        if ((coordsFirst != beamSpan->m_beamElementCoords.end())
+            && (coordsLast != beamSpan->m_beamElementCoords.end())) {
             ArrayOfBeamElementCoords coord(coordsFirst, coordsLast + 1);
             segment->InitCoordRefs(&coord);
             segment->CalcBeam(segment->GetLayer(), segment->GetStaff(), m_doc, beamSpan, beamSpan->m_drawingPlace);
