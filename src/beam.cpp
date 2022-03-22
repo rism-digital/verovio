@@ -456,10 +456,7 @@ void BeamSegment::AdjustBeamStemExtension(BeamDrawingInterface *beamInterface)
         // get next element duration
         VectorIt nextElement = std::find_if(it + 1, m_beamElementCoordRefs.end(), isNoteOrChord);
         if (nextElement != m_beamElementCoordRefs.end()) {
-            const int nextVal = (*nextElement)->m_breaksec
-                ? std::min((*nextElement)->m_breaksec + DURATION_4, (*nextElement)->m_dur)
-                : (*nextElement)->m_dur;
-            noteDurations.insert(nextVal);
+            noteDurations.insert((*nextElement)->m_dur);
         }
         // get previous element duration
         VectorReverseIt reverse = std::make_reverse_iterator(it);
