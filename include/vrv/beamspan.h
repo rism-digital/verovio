@@ -19,6 +19,7 @@ namespace vrv {
 
 class Layer;
 class Staff;
+class System;
 
 //----------------------------------------------------------------------------
 // BeamSpan
@@ -75,6 +76,8 @@ public:
     void InitBeamSegments();
     void ClearBeamSegments();
     ////@}
+
+    BeamSpanSegment *GetSegmentForSystem(System *system);
 
     //----------//
     // Functors //

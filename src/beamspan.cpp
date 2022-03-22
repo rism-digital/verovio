@@ -19,6 +19,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "staff.h"
+#include "system.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -79,6 +80,18 @@ void BeamSpan::ClearBeamSegments()
         delete segment;
     }
     m_beamSegments.clear();
+}
+
+BeamSpanSegment *BeamSpan::GetSegmentForSystem(System *system)
+{
+    assert(system);
+
+    for (auto segment : m_beamSegments) {
+        // make sure to process only segments for current system
+        Measure *segmentSystem = segment->GetMeasure();
+        if (vrv_cast<System *>(segmentSystem->GetFirstAncestor(SYSTEM)) == system) return segment;
+    }
+    return NULL;
 }
 
 ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
