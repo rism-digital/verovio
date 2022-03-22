@@ -195,6 +195,14 @@ bool BeamSpan::AddSpanningSegment(Doc *doc, const SpanIndexVector &elements, int
 // Functors //
 //----------//
 
+int BeamSpan::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    this->ClearBeamSegments();
+    this->InitBeamSegments();
+
+    return ControlElement::ResetHorizontalAlignment(functorParams);
+}
+
 int BeamSpan::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
