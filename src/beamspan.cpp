@@ -89,7 +89,7 @@ BeamSpanSegment *BeamSpan::GetSegmentForSystem(System *system)
     for (auto segment : m_beamSegments) {
         // make sure to process only segments for current system
         Measure *segmentSystem = segment->GetMeasure();
-        if (vrv_cast<System *>(segmentSystem->GetFirstAncestor(SYSTEM)) == system) return segment;
+        if (segmentSystem && vrv_cast<System *>(segmentSystem->GetFirstAncestor(SYSTEM)) == system) return segment;
     }
     return NULL;
 }
