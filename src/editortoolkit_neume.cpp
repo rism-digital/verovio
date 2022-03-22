@@ -589,6 +589,37 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             assert(zone);
             zone->ShiftByXY(x, -y);
         }
+        
+        // if inside a syllable,
+        // check if it is still in the syllable zone (x range),
+        // if not, move it out
+        if (element->GetParent()->Is(SYLLABLE)) {
+            Object *parent = element->GetParent();
+            assert(parent);
+            Object *fNc = parent->GetFirst(NEUME)->GetFirst(NC);
+
+            Object *lNc;
+            if (parent->GetChildCount(NEUME) == 1) {
+                lNc = parent->GetFirst(NEUME)->GetLast();
+            } else {
+                lNc = parent->GetLast()->GetLast();
+            }
+
+            int xLeft = fNc->GetFacsimileInterface()->GetZone()->GetUlx();
+            int xRight = lNc->GetFacsimileInterface()->GetZone()->GetLrx();
+
+            if (fi->GetZone() != NULL) {
+                Zone *zone = fi->GetZone();
+                if (zone->GetUlx() < xLeft || zone->GetLrx() > xRight) {
+                    Object *sParent = parent->GetParent();
+                    assert(sParent);
+
+                    element->MoveItselfTo(sParent);
+                    parent->ClearRelinquishedChildren();
+                    sParent->ReorderByXPos();
+                }
+            }
+        }
         ChangeStaff(elementId);
     }
     else if (element->Is(DIVLINE)) {
@@ -605,6 +636,37 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             Zone *zone = fi->GetZone();
             assert(zone);
             zone->ShiftByXY(x, -y);
+        }
+
+        // if inside a syllable,
+        // check if it is still in the syllable zone (x range),
+        // if not, move it out
+        if (element->GetParent()->Is(SYLLABLE)) {
+            Object *parent = element->GetParent();
+            assert(parent);
+            Object *fNc = parent->GetFirst(NEUME)->GetFirst(NC);
+
+            Object *lNc;
+            if (parent->GetChildCount(NEUME) == 1) {
+                lNc = parent->GetFirst(NEUME)->GetLast();
+            } else {
+                lNc = parent->GetLast()->GetLast();
+            }
+
+            int xLeft = fNc->GetFacsimileInterface()->GetZone()->GetUlx();
+            int xRight = lNc->GetFacsimileInterface()->GetZone()->GetLrx();
+
+            if (fi->GetZone() != NULL) {
+                Zone *zone = fi->GetZone();
+                if (zone->GetUlx() < xLeft || zone->GetLrx() > xRight) {
+                    Object *sParent = parent->GetParent();
+                    assert(sParent);
+
+                    element->MoveItselfTo(sParent);
+                    parent->ClearRelinquishedChildren();
+                    sParent->ReorderByXPos();
+                }
+            }
         }
         ChangeStaff(elementId);
     }
