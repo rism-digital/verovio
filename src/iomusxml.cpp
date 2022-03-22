@@ -1425,6 +1425,12 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             if (transpose) {
                 staffDef->SetTransDiat(transpose.node().child("diatonic").text().as_int());
                 staffDef->SetTransSemi(transpose.node().child("chromatic").text().as_int());
+                if (transpose.node().child("octave-change")) {
+                    staffDef->SetTransDiat(transpose.node().child("chromatic").text().as_int()
+                        + 7 * transpose.node().child("octave-change").text().as_int());
+                    staffDef->SetTransSemi(transpose.node().child("chromatic").text().as_int()
+                        + 12 * transpose.node().child("octave-change").text().as_int());
+                }
             }
             // ppq
             pugi::xpath_node divisions = it->select_node("divisions");
