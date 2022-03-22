@@ -745,8 +745,13 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
 
+    // Normalize the slur via rotation (such that p1-p2 is horizontal)
+    const float angle = atan2(bezierCurve.p2.y - bezierCurve.p1.y, bezierCurve.p2.x - bezierCurve.p1.x);
+    bezierCurve.Rotate(-angle, bezierCurve.p1);
+    bezierCurve.UpdateControlPointParams();
+
     // *** STEP 1: Ensure MINIMAL HEIGHT ***
-    // <)C1P1P2 should be at least 20 degree, but allow smaller angles if the midpoint would be lifted more than 6 MEI
+    // <)C1P1P2 should be at least 30 degrees, but allow smaller angles if the midpoint would be lifted more than 6 MEI
     // units
     // Similar for <)P1P2C2
     const int sign = (dir == curvature_CURVEDIR_above) ? 1 : -1;
@@ -760,18 +765,18 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
     const double slopeBase = BoundingBox::CalcSlope(bezierCurve.p1, bezierCurve.p2);
 
     if (dir == curvature_CURVEDIR_above) {
-        double minSlopeLeft = this->RotateSlope(slopeBase, 20.0, 1.0, true);
+        double minSlopeLeft = this->RotateSlope(slopeBase, 30.0, 1.0, true);
         minSlopeLeft = std::min(minSlopeLeft, BoundingBox::CalcSlope(bezierCurve.p1, shiftedMidpoint));
         slopeLeft = std::max(slopeLeft, minSlopeLeft);
-        double minSlopeRight = this->RotateSlope(slopeBase, 20.0, 1.0, false);
+        double minSlopeRight = this->RotateSlope(slopeBase, 30.0, 1.0, false);
         minSlopeRight = std::max(minSlopeRight, BoundingBox::CalcSlope(bezierCurve.p2, shiftedMidpoint));
         slopeRight = std::min(slopeRight, minSlopeRight);
     }
     else if (dir == curvature_CURVEDIR_below) {
-        double minSlopeLeft = this->RotateSlope(slopeBase, 20.0, 1.0, false);
+        double minSlopeLeft = this->RotateSlope(slopeBase, 30.0, 1.0, false);
         minSlopeLeft = std::max(minSlopeLeft, BoundingBox::CalcSlope(bezierCurve.p1, shiftedMidpoint));
         if (!ignoreLeft) slopeLeft = std::min(slopeLeft, minSlopeLeft);
-        double minSlopeRight = this->RotateSlope(slopeBase, 20.0, 1.0, true);
+        double minSlopeRight = this->RotateSlope(slopeBase, 30.0, 1.0, true);
         minSlopeRight = std::min(minSlopeRight, BoundingBox::CalcSlope(bezierCurve.p2, shiftedMidpoint));
         if (!ignoreRight) slopeRight = std::max(slopeRight, minSlopeRight);
     }
@@ -804,6 +809,10 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
     if (!ignoreLeft) bezierCurve.SetLeftControlHeight(slopeLeft * sign * bezierCurve.GetLeftControlOffset());
     if (!ignoreRight) bezierCurve.SetRightControlHeight(slopeRight * -sign * bezierCurve.GetRightControlOffset());
     bezierCurve.UpdateControlPoints();
+
+    // Rotate back
+    bezierCurve.Rotate(angle, bezierCurve.p1);
+    bezierCurve.UpdateControlPointParams();
 }
 
 double Slur::RotateSlope(double slope, double degrees, double doublingBound, bool upwards) const
