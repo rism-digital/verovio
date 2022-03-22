@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "beamspan.h"
 #include "comparison.h"
 #include "dir.h"
 #include "doc.h"
@@ -876,6 +877,26 @@ int System::JustifyY(FunctorParams *functorParams)
 
     params->m_relativeShift = 0;
     m_systemAligner.Process(params->m_functor, params);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int System::AdjustCrossStaffYPos(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    for (auto &item : m_drawingList) {
+        if (item->Is(BEAMSPAN)) {
+            // Here we could check that the beamSpan is actually cross-staff. Otherwise doing this is pointless
+            BeamSpan *beamSpan = vrv_cast<BeamSpan *>(item);
+            assert(beamSpan);
+            BeamSpanSegment *segment = beamSpan->GetSegmentForSystem(this);
+            if (segment)
+                segment->CalcBeam(
+                    segment->GetLayer(), segment->GetStaff(), params->m_doc, beamSpan, beamSpan->m_drawingPlace);
+        }
+    }
 
     return FUNCTOR_SIBLINGS;
 }

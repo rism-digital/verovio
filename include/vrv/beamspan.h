@@ -19,6 +19,7 @@ namespace vrv {
 
 class Layer;
 class Staff;
+class System;
 
 //----------------------------------------------------------------------------
 // BeamSpan
@@ -76,9 +77,16 @@ public:
     void ClearBeamSegments();
     ////@}
 
+    BeamSpanSegment *GetSegmentForSystem(System *system);
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcStem

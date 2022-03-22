@@ -271,6 +271,11 @@ public:
     int JustifyY(FunctorParams *functorParams) override;
 
     /**
+     * See Object::AdjustCrossStaffYPos
+     */
+    int AdjustCrossStaffYPos(FunctorParams *functorParams) override;
+
+    /**
      * See Object::AdjustStaffOverlap
      */
     int AdjustStaffOverlap(FunctorParams *functorParams) override;
