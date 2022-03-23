@@ -126,9 +126,9 @@ void Accid::AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize)
     Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
 
     const int unit = doc->GetDrawingUnit(staffSize);
+    const int rightMargin = doc->GetRightMargin(ACCID) * unit;
     if (element->Is(NOTE) && chord && chord->HasAdjacentNotesInStaff(staff)) {
-        const int horizontalMargin
-            = doc->GetOptions()->m_ledgerLineExtension.GetValue() * unit + doc->GetDrawingStemWidth(staffSize);
+        const int horizontalMargin = doc->GetOptions()->m_ledgerLineExtension.GetValue() * unit + 0.5 * rightMargin;
         const int drawingUnit = doc->GetDrawingUnit(staffSize);
         const int staffTop = staff->GetDrawingY();
         const int staffBottom = staffTop - doc->GetDrawingStaffSize(staffSize);
@@ -161,8 +161,7 @@ void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
         int ledgerAbove = 0;
         int ledgerBelow = 0;
         if (note->HasLedgerLines(ledgerAbove, ledgerBelow)) {
-            const int value
-                = doc->GetOptions()->m_ledgerLineExtension.GetValue() * unit + doc->GetDrawingStemWidth(staffSize);
+            const int value = doc->GetOptions()->m_ledgerLineExtension.GetValue() * unit + 0.5 * horizontalMargin;
             horizontalMargin = std::max(horizontalMargin, value);
         }
     }
