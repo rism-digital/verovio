@@ -352,6 +352,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 {
     assert(doc);
     assert(staffAlignment);
+    assert(m_object);
 
     int staffSize = staffAlignment->GetStaffSize();
     int yRel;
@@ -363,13 +364,25 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         int minStaffDistance
             = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place) * doc->GetDrawingUnit(staffSize);
         if (this->GetObject()->Is(FERMATA) && (staffAlignment->GetStaff()->m_drawingLines == 1)) {
-            minStaffDistance = 2.5 * doc->GetDrawingUnit(staffAlignment->GetStaff()->m_drawingStaffSize);
+            minStaffDistance = 2.5 * doc->GetDrawingUnit(staffSize);
         }
         if (m_place == STAFFREL_above) {
             yRel = this->GetContentY1();
             yRel -= doc->GetBottomMargin(m_object->GetClassId()) * unit;
             this->SetDrawingYRel(yRel);
             this->SetDrawingYRel(-minStaffDistance);
+        }
+        else if (m_place == STAFFREL_within) {
+            yRel = staffAlignment->GetStaffHeight() / 2;
+            if (m_object->Is(TURN)) {
+                Turn *turn = vrv_cast<Turn *>(m_object);
+                assert(turn);
+                yRel += turn->GetTurnHeight(doc, staffSize) / 2;
+            }
+            else {
+                yRel += (this->GetContentY2() - this->GetContentY1()) / 2;
+            }
+            this->SetDrawingYRel(yRel);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + this->GetContentY2();
