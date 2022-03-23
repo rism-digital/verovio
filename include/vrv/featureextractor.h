@@ -49,7 +49,11 @@ public:
 private:
     //
 public:
-    Note *m_previousNote;
+    /**
+     * A list of previous notes for interval calculation.
+     * Usually one note, but sometimes more than one with tied notes.
+     */
+    std::list<Note *> m_previousNotes;
     jsonxx::Array m_pitches;
     jsonxx::Array m_pitchesIds;
     jsonxx::Array m_intervals;

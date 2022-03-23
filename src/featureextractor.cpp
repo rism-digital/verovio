@@ -44,7 +44,7 @@ FeatureExtractor::~FeatureExtractor() {}
 
 void FeatureExtractor::Reset()
 {
-    m_previousNote = NULL;
+    m_previousNotes.clear();
 }
 
 void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
@@ -58,7 +58,16 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         if (chord && note != chord->GetTopNote()) return;
 
         // Check if the note is tied to a previous one and skip it if yes
-        if (note->GetScoreTimeTiedDuration() == -1.0) return;
+        if (note->GetScoreTimeTiedDuration() == -1.0) {
+            // Check if we need to add it to the previous interval ids
+            const int intervalsIdsSize = (int)m_intervalsIds.size();
+            if (intervalsIdsSize > 0) m_intervalsIds.get<jsonxx::Array>(intervalsIdsSize - 1) << note->GetUuid();
+            // Same for pitch ids
+            const int pitchesIdsSize = (int)m_pitchesIds.size();
+            if (pitchesIdsSize > 0) m_pitchesIds.get<jsonxx::Array>(pitchesIdsSize - 1) << note->GetUuid();
+            m_previousNotes.push_back(note);
+            return;
+        }
 
         std::stringstream pitch;
         data_OCTAVE oct = note->GetOct();
@@ -100,16 +109,17 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         pitchesIds << note->GetUuid();
         m_pitchesIds << jsonxx::Value(pitchesIds);
 
-        // We have a previous note, so we can calculate an interval
-        if (m_previousNote) {
-            std::string interval = StringFormat("%d", note->GetMIDIPitch() - m_previousNote->GetMIDIPitch());
+        // We have a previous note (or more with tied notes), so we can calculate an interval
+        if (!m_previousNotes.empty()) {
+            std::string interval = StringFormat("%d", note->GetMIDIPitch() - m_previousNotes.front()->GetMIDIPitch());
             m_intervals << interval;
             jsonxx::Array intervalsIds;
-            intervalsIds << m_previousNote->GetUuid();
+            for (auto previousNote : m_previousNotes) intervalsIds << previousNote->GetUuid();
             intervalsIds << note->GetUuid();
             m_intervalsIds << jsonxx::Value(intervalsIds);
         }
-        m_previousNote = note;
+        m_previousNotes.clear();
+        m_previousNotes.push_back(note);
     }
 }
 
