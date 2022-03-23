@@ -2549,7 +2549,7 @@ public:
  * member 2: a pointer to the transposer
  * member 3: the transposition to be applied
  * member 4: the mdiv selected for transposition
- * member 5: the current mdiv
+ * member 5: the list of current (nested) mdivs
  **/
 
 class TransposeParams : public FunctorParams {
@@ -2565,7 +2565,7 @@ public:
     Transposer *m_transposer;
     std::string m_transposition;
     std::string m_selectedMdivUuid;
-    std::string m_currentMdivUuid;
+    std::list<std::string> m_currentMdivUuids;
 };
 
 //----------------------------------------------------------------------------

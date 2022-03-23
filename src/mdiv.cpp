@@ -126,7 +126,7 @@ int Mdiv::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
-    params->m_currentMdivUuid = this->GetUuid();
+    params->m_currentMdivUuids.push_back(this->GetUuid());
 
     return FUNCTOR_CONTINUE;
 }

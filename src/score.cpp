@@ -282,8 +282,11 @@ int Score::Transpose(FunctorParams *functorParams)
     assert(params);
 
     // Check whether we are in the selected mdiv
-    if (!params->m_selectedMdivUuid.empty() && (params->m_selectedMdivUuid != params->m_currentMdivUuid))
+    if (!params->m_selectedMdivUuid.empty()
+        && (std::find(params->m_currentMdivUuids.begin(), params->m_currentMdivUuids.end(), params->m_selectedMdivUuid)
+            == params->m_currentMdivUuids.end())) {
         return FUNCTOR_CONTINUE;
+    }
 
     ScoreDef *scoreDef = this->GetScoreDef();
     Transposer *transposer = params->m_transposer;
