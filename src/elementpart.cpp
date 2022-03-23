@@ -589,8 +589,9 @@ int Stem::CalcStem(FunctorParams *functorParams)
             flagOffset = 1.5 * unit * flag->m_drawingNbFlags;
         }
     }
-
-    this->AdjustSlashes(params->m_doc, staffSize, flagOffset, params->m_isStemSameasSecondary);
+    if (!params->m_isGraceNote && !drawingCueSize) {
+        this->AdjustSlashes(params->m_doc, staffSize, flagOffset, params->m_isStemSameasSecondary);
+    }
 
     // SMUFL flags cover some additional stem length from the 32th only
     if (flag) {

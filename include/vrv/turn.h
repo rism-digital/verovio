@@ -59,6 +59,11 @@ public:
      */
     wchar_t GetTurnGlyph() const;
 
+    /**
+     * Get the turn height ignoring slash
+     */
+    int GetTurnHeight(Doc *doc, int staffSize) const;
+
     //----------//
     // Functors //
     //----------//
