@@ -890,8 +890,7 @@ void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, do
     // TODO
 }
 
-void SvgDeviceContext::DrawEnclosedMusicText(
-    const std::wstring &text, int x, int y, int encloseY, bool setSmuflGlyph)
+void SvgDeviceContext::DrawEnclosedMusicText(const std::wstring &text, int x, int y, int encloseY, bool setSmuflGlyph)
 {
     assert(m_fontStack.top());
 

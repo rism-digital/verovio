@@ -109,7 +109,7 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
     else {
         this->DrawTextString(dc, str, params);
     }
-    
+
     if (params.m_textEnclose != ENCLOSURE_NONE) {
         std::wstring close;
         switch (params.m_textEnclose) {
