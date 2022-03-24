@@ -388,7 +388,7 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorPa
     }
 
     this->SetUuidStr();
-    params->m_timeSpanningInterfaces.push_back({ this, object->GetClassId() });
+    params->m_timeSpanningInterfaces.push_back({ this, object });
 
     return FUNCTOR_CONTINUE;
 }

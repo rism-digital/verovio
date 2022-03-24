@@ -2344,9 +2344,11 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     // Do not look for tstamp pointing to these
     if (this->Is({ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
 
-    ListOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ListOfSpanningInterOwnerPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         if (iter->first->SetStartAndEnd(this)) {
+            // Verify that the interface owner is encoded in the measure of its start
+            iter->first->VerifyMeasure(iter->second);
             // We have both the start and the end that are matched
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
