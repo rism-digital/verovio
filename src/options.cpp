@@ -1147,7 +1147,7 @@ Options::Options()
     m_beamMinSlope.Init(0, 0, 0);
     this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
 
-    m_beamNoStemExtension.SetInfo("No stem extionsion in beams",
+    m_beamNoStemExtension.SetInfo("No stem extension in beams",
         "For notes in beams, stems will stop at first outermost sub-beam without crossing it");
     m_beamNoStemExtension.Init(false);
     this->Register(&m_beamNoStemExtension, "beamNoStemExtension", &m_generalLayout);

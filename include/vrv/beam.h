@@ -98,7 +98,7 @@ public:
     ///@}
 
 private:
-    // Helper to adjust stem length to extend only towards outmost subbeam (if option "--beam-extend-stems" is set)
+    // Helper to adjust stem length to extend only towards outmost subbeam (if option "--beam-no-stem-extension" is set)
     void AdjustBeamStemExtension(BeamDrawingInterface *beamInterface);
 
     // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)

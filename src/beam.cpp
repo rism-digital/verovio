@@ -472,7 +472,7 @@ void BeamSegment::AdjustBeamStemExtension(BeamDrawingInterface *beamInterface)
         const int minDur = *noteDurations.begin();
         if (minDur == DURATION_8) continue;
 
-        // Get stem and adjust it's lenth
+        // Get stem and adjust it's length
         StemmedDrawingInterface *stemmedInterface = (*it)->GetStemHolderInterface();
         if (!stemmedInterface) continue;
         Stem *stem = stemmedInterface->GetDrawingStem();
