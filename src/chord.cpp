@@ -124,6 +124,47 @@ void Chord::ClearClusters() const
     m_clusters.clear();
 }
 
+void Chord::CalculateClusters()
+{
+    this->ClearClusters();
+
+    const ArrayOfObjects *childList = this->GetList(this);
+    ArrayOfObjects::const_iterator iter = childList->begin();
+
+    Note *curNote, *lastNote = vrv_cast<Note *>(*iter);
+    assert(lastNote);
+    int lastPitch = lastNote->GetDiatonicPitch();
+    ChordCluster *curCluster = NULL;
+
+    ++iter;
+
+    Layer *layer1 = NULL;
+    Layer *layer2 = NULL;
+
+    while (iter != childList->end()) {
+        curNote = vrv_cast<Note *>(*iter);
+        assert(curNote);
+        const int curPitch = curNote->GetDiatonicPitch();
+
+        if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff(layer1) == lastNote->GetCrossStaff(layer2))) {
+            if (!lastNote->GetCluster()) {
+                curCluster = new ChordCluster();
+                m_clusters.push_back(curCluster);
+                curCluster->push_back(lastNote);
+                lastNote->SetCluster(curCluster, (int)curCluster->size());
+            }
+            assert(curCluster);
+            curCluster->push_back(curNote);
+            curNote->SetCluster(curCluster, (int)curCluster->size());
+        }
+
+        lastNote = curNote;
+        lastPitch = curPitch;
+
+        ++iter;
+    }
+}
+
 bool Chord::IsSupportedChild(Object *child)
 {
     if (child->Is(ARTIC)) {
@@ -184,50 +225,6 @@ void Chord::FilterList(ArrayOfObjects *childList)
     }
 
     std::sort(childList->begin(), childList->end(), DiatonicSort());
-
-    if (childList->empty()) {
-        LogWarning("Chord '%s' has no child note - a default note is added", this->GetUuid().c_str());
-        Note *rescueNote = new Note();
-        this->AddChild(rescueNote);
-        childList->push_back(rescueNote);
-    }
-
-    iter = childList->begin();
-
-    this->ClearClusters();
-
-    Note *curNote, *lastNote = vrv_cast<Note *>(*iter);
-    assert(lastNote);
-    int lastPitch = lastNote->GetDiatonicPitch();
-    ChordCluster *curCluster = NULL;
-
-    ++iter;
-
-    Layer *layer1 = NULL;
-    Layer *layer2 = NULL;
-
-    while (iter != childList->end()) {
-        curNote = vrv_cast<Note *>(*iter);
-        assert(curNote);
-        const int curPitch = curNote->GetDiatonicPitch();
-
-        if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff(layer1) == lastNote->GetCrossStaff(layer2))) {
-            if (!lastNote->GetCluster()) {
-                curCluster = new ChordCluster();
-                m_clusters.push_back(curCluster);
-                curCluster->push_back(lastNote);
-                lastNote->SetCluster(curCluster, (int)curCluster->size());
-            }
-            assert(curCluster);
-            curCluster->push_back(curNote);
-            curNote->SetCluster(curCluster, (int)curCluster->size());
-        }
-
-        lastNote = curNote;
-        lastPitch = curPitch;
-
-        ++iter;
-    }
 }
 
 int Chord::PositionInChord(Note *note)
@@ -851,8 +848,11 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     this->SetDrawingStem(currentStem);
 
+    // Calculate chord clusters
+    this->CalculateClusters();
+
     // Also set the drawing stem object (or NULL) to all child notes
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this);
     for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         assert((*it)->Is(NOTE));
         Note *note = vrv_cast<Note *>(*it);
@@ -922,6 +922,22 @@ int Chord::ResetData(FunctorParams *functorParams)
 
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::InitializeDrawing(FunctorParams *functorParams)
+{
+    InitializeDrawingParams *params = vrv_params_cast<InitializeDrawingParams *>(functorParams);
+    assert(params);
+
+    const ArrayOfObjects *childList = this->GetList(this);
+    if (childList->empty()) {
+        LogWarning("Chord '%s' has no child note - a default note is added", this->GetUuid().c_str());
+        Note *rescueNote = new Note();
+        this->AddChild(rescueNote);
+    }
+    this->Modify();
+
     return FUNCTOR_CONTINUE;
 }
 
