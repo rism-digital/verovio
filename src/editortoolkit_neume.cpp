@@ -3002,6 +3002,22 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return true;
     }
 
+    if (element->Is(ACCID) || element->Is(DIVLINE)) {
+        // if accid or divLine is inside the syllable
+        // move it out
+        if (element->GetParent()->Is(SYLLABLE)) {
+            Object *par = element->GetParent();
+            assert(par);
+            Object *sPar = par->GetParent();
+            assert(sPar);
+
+            element->MoveItselfTo(sPar);
+            sPar->ReorderByXPos();
+            par->ClearRelinquishedChildren();
+            par->ReorderByXPos();
+        }
+    }
+
     // Adjust pitch/staff line.
     if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
