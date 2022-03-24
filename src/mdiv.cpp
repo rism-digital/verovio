@@ -121,4 +121,14 @@ int Mdiv::ConvertToPageBasedEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Mdiv::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    params->m_currentMdivUuids.push_back(this->GetUuid());
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

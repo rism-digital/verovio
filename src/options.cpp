@@ -706,21 +706,33 @@ bool OptionJson::HasValue(const std::vector<std::string> &jsonNodePath) const
 
 int OptionJson::GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    return static_cast<int>(this->GetDoubleValue(jsonNodePath, getDefault));
+    return static_cast<int>(this->GetDblValue(jsonNodePath, getDefault));
 }
 
-double OptionJson::GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
+double OptionJson::GetDblValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    JsonPath path
-        = getDefault ? StringPath2NodePath(m_defaultValues, jsonNodePath) : StringPath2NodePath(m_values, jsonNodePath);
+    JsonPath path = StringPath2NodePath(getDefault ? m_defaultValues : m_values, jsonNodePath);
 
     if (path.size() != jsonNodePath.size() && !getDefault) {
         path = StringPath2NodePath(m_defaultValues, jsonNodePath);
     }
 
-    if (path.size() != jsonNodePath.size() || !path.back().get().is<jsonxx::Number>()) return 0;
+    if ((path.size() != jsonNodePath.size()) || !path.back().get().is<jsonxx::Number>()) return 0;
 
     return path.back().get().get<jsonxx::Number>();
+}
+
+std::string OptionJson::GetStrValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
+{
+    JsonPath path = StringPath2NodePath(getDefault ? m_defaultValues : m_values, jsonNodePath);
+
+    if ((path.size() != jsonNodePath.size()) && !getDefault) {
+        path = StringPath2NodePath(m_defaultValues, jsonNodePath);
+    }
+
+    if ((path.size() != jsonNodePath.size()) || !path.back().get().is<jsonxx::String>()) return "";
+
+    return path.back().get().get<jsonxx::String>();
 }
 
 bool OptionJson::UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value)
@@ -1438,9 +1450,14 @@ Options::Options()
     m_substXPathQuery.Init();
     this->Register(&m_substXPathQuery, "substXPathQuery", &m_selectors);
 
-    m_transpose.SetInfo("Transpose the content", "SUMMARY");
+    m_transpose.SetInfo("Transpose the content", "Transpose the entire content");
     m_transpose.Init("");
     this->Register(&m_transpose, "transpose", &m_selectors);
+
+    m_transposeMdiv.SetInfo(
+        "Transpose individual mdivs", "Json mapping the mdiv uuids to the corresponding transposition");
+    m_transposeMdiv.Init(JsonSource::String, "{}");
+    this->Register(&m_transposeMdiv, "transposeMdiv", &m_selectors);
 
     m_transposeSelectedOnly.SetInfo(
         "Transpose selected only", "Transpose only the selected content and ignore unselected editorial content");
@@ -1729,10 +1746,10 @@ void Options::Sync()
 
         double jsonValue = 0.0;
         if (m_engravingDefaultsFile.HasValue(jsonNodePath)) {
-            jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
+            jsonValue = m_engravingDefaultsFile.GetDblValue(jsonNodePath);
         }
         else if (m_engravingDefaults.HasValue({ pair.first })) {
-            jsonValue = m_engravingDefaults.GetDoubleValue({ pair.first });
+            jsonValue = m_engravingDefaults.GetDblValue({ pair.first });
         }
         else
             continue;
