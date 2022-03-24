@@ -104,7 +104,8 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         std::transform(pname.begin(), pname.end(), pname.begin(), ::toupper);
         pitch << pname;
 
-        m_pitches << pitch.str();
+        m_pitchesChomatic << pitch.str();
+        m_pitchesDiatonic << pname;
         jsonxx::Array pitchesIds;
         pitchesIds << note->GetUuid();
         m_pitchesIds << jsonxx::Value(pitchesIds);
@@ -112,7 +113,10 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         // We have a previous note (or more with tied notes), so we can calculate an interval
         if (!m_previousNotes.empty()) {
             std::string interval = StringFormat("%d", note->GetMIDIPitch() - m_previousNotes.front()->GetMIDIPitch());
-            m_intervals << interval;
+            m_intervalsChomatic << interval;
+            std::string intervalDiatonic
+                = StringFormat("%d", note->GetDiatonicPitch() - m_previousNotes.front()->GetDiatonicPitch());
+            m_intervalsDiatonic << intervalDiatonic;
             jsonxx::Array intervalsIds;
             for (auto previousNote : m_previousNotes) intervalsIds << previousNote->GetUuid();
             intervalsIds << note->GetUuid();
@@ -126,10 +130,15 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
 void FeatureExtractor::ToJson(std::string &output)
 {
     jsonxx::Object o;
-    o << "pitches" << m_pitches;
+
+    o << "pitchesChomatic" << m_pitchesChomatic;
+    o << "pitchesDiatonic" << m_pitchesDiatonic;
     o << "pitchesIds" << m_pitchesIds;
-    o << "intervals" << m_intervals;
+
+    o << "intervalsChomatic" << m_intervalsChomatic;
+    o << "intervalsDiatonic" << m_intervalsDiatonic;
     o << "intervalsIds" << m_intervalsIds;
+
     output = o.json();
     LogDebug("%s", output.c_str());
 }

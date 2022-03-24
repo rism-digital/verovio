@@ -54,9 +54,13 @@ public:
      * Usually one note, but sometimes more than one with tied notes.
      */
     std::list<Note *> m_previousNotes;
-    jsonxx::Array m_pitches;
+
+    jsonxx::Array m_pitchesChomatic;
+    jsonxx::Array m_pitchesDiatonic;
     jsonxx::Array m_pitchesIds;
-    jsonxx::Array m_intervals;
+
+    jsonxx::Array m_intervalsChomatic;
+    jsonxx::Array m_intervalsDiatonic;
     jsonxx::Array m_intervalsIds;
 
 private:
