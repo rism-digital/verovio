@@ -134,6 +134,11 @@ public:
     //----------//
 
     /**
+     * See Object::InitializeDrawing
+     */
+    int InitializeDrawing(FunctorParams *functorParams) override;
+
+    /**
      * See Object::Save
      */
     ///@{

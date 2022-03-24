@@ -1891,6 +1891,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// InitializeDrawingParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the functor for redirection
+ * member 1: the doc
+ **/
+
+class InitializeDrawingParams : public FunctorParams {
+public:
+    InitializeDrawingParams(Functor *functor, Doc *doc)
+    {
+        m_functor = functor;
+        m_doc = doc;
+    }
+    Functor *m_functor;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // JustifyXParams
 //----------------------------------------------------------------------------
 

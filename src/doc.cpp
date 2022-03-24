@@ -471,10 +471,14 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
 
 void Doc::PrepareData()
 {
+    /************ Reset and initialization ************/
     if (m_dataPreparationDone) {
         Functor resetData(&Object::ResetData);
         this->Process(&resetData, NULL);
     }
+    Functor initializeDrawing(&Object::InitializeDrawing);
+    InitializeDrawingParams initializeDrawingParams(&initializeDrawing, this);
+    this->Process(&initializeDrawing, &initializeDrawingParams);
 
     /************ Store default durations ************/
 

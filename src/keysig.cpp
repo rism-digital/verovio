@@ -118,22 +118,6 @@ void KeySig::FilterList(ArrayOfObjects *childList)
         else
             iter = childList->erase(iter);
     }
-
-    data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
-    m_mixedChildrenAccidType = false;
-
-    for (auto &child : *childList) {
-        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
-        assert(keyAccid);
-        if (type == ACCIDENTAL_WRITTEN_NONE) {
-            type = keyAccid->GetAccid();
-            continue;
-        }
-        if (type != keyAccid->GetAccid()) {
-            m_mixedChildrenAccidType = true;
-            break;
-        }
-    }
 }
 
 int KeySig::GetAccidCount()
@@ -304,6 +288,31 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int KeySig::InitializeDrawing(FunctorParams *functorParams)
+{
+    InitializeDrawingParams *params = vrv_params_cast<InitializeDrawingParams *>(functorParams);
+    assert(params);
+
+    data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
+    m_mixedChildrenAccidType = false;
+
+    const ArrayOfObjects *childList = this->GetList(this);
+    for (auto &child : *childList) {
+        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
+        assert(keyAccid);
+        if (type == ACCIDENTAL_WRITTEN_NONE) {
+            type = keyAccid->GetAccid();
+            continue;
+        }
+        if (type != keyAccid->GetAccid()) {
+            m_mixedChildrenAccidType = true;
+            break;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int KeySig::Transpose(FunctorParams *functorParams)
 {

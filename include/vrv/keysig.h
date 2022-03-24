@@ -92,6 +92,11 @@ public:
     //----------//
 
     /**
+     * See Object::InitializeDrawing
+     */
+    int InitializeDrawing(FunctorParams *functorParams) override;
+
+    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;

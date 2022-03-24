@@ -1198,6 +1198,11 @@ public:
     ///@{
 
     /**
+     * One time member initialization at the very begin
+     */
+    virtual int InitializeDrawing(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Set the drawing cue size of all LayerElement
      */
     virtual int PrepareCueSize(FunctorParams *) { return FUNCTOR_CONTINUE; }

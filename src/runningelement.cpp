@@ -110,24 +110,6 @@ void RunningElement::FilterList(ArrayOfObjects *childList)
         }
         ++iter;
     }
-
-    int i;
-    for (i = 0; i < 9; ++i) {
-        m_cells[i].clear();
-    }
-    for (i = 0; i < 3; ++i) {
-        m_drawingScalingPercent[i] = 100;
-    }
-
-    for (iter = childList->begin(); iter != childList->end(); ++iter) {
-        int pos = 0;
-        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
-        assert(interface);
-        pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
-        TextElement *text = vrv_cast<TextElement *>(*iter);
-        assert(text);
-        m_cells[pos].push_back(text);
-    }
 }
 
 int RunningElement::GetDrawingX() const
@@ -395,6 +377,33 @@ void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALAL
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int RunningElement::InitializeDrawing(FunctorParams *functorParams)
+{
+    InitializeDrawingParams *params = vrv_params_cast<InitializeDrawingParams *>(functorParams);
+    assert(params);
+
+    int i;
+    for (i = 0; i < 9; ++i) {
+        m_cells[i].clear();
+    }
+    for (i = 0; i < 3; ++i) {
+        m_drawingScalingPercent[i] = 100;
+    }
+
+    const ArrayOfObjects *childList = this->GetList(this);
+    for (ArrayOfObjects::const_iterator iter = childList->begin(); iter != childList->end(); ++iter) {
+        int pos = 0;
+        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
+        assert(interface);
+        pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
+        TextElement *text = vrv_cast<TextElement *>(*iter);
+        assert(text);
+        m_cells[pos].push_back(text);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int RunningElement::Save(FunctorParams *functorParams)
 {

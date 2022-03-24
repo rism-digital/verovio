@@ -37,20 +37,13 @@ Ligature::Ligature() : LayerElement(LIGATURE, "ligature-"), ObjectListInterface(
     this->Reset();
 }
 
-Ligature::~Ligature()
-{
-    ClearClusters();
-}
+Ligature::~Ligature() {}
 
 void Ligature::Reset()
 {
     LayerElement::Reset();
     this->ResetLigatureVis();
-
-    ClearClusters();
 }
-
-void Ligature::ClearClusters() {}
 
 bool Ligature::IsSupportedChild(Object *child)
 {
@@ -106,10 +99,6 @@ void Ligature::FilterList(ArrayOfObjects *childList)
             ++iter;
         }
     }
-
-    iter = childList->begin();
-
-    this->ClearClusters();
 }
 
 int Ligature::GetDrawingNoteShape(Note *note)

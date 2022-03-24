@@ -74,6 +74,11 @@ public:
     //----------//
 
     /**
+     * See Object::InitializeDrawing
+     */
+    int InitializeDrawing(FunctorParams *functorParams) override;
+
+    /**
      * See Object::AdjustDots
      */
     int AdjustDots(FunctorParams *functorParams) override;
