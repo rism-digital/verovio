@@ -548,7 +548,7 @@ protected:
     void DrawSmuflLine(DeviceContext *dc, Point orig, int length, int staffSize, bool dimin, wchar_t fill,
         wchar_t start = 0, wchar_t end = 0);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data_HORIZONTALALIGNMENT alignment,
-        int staffSize = 100, bool dimin = false, bool setBBGlyph = false);
+        int staffSize = 100, bool dimin = false, bool setBBGlyph = false, bool drawEnclosed = false);
     void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100,
         std::optional<TextDrawingParams> params = std::nullopt);
     void DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y2, int lineThinkness);

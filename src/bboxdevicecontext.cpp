@@ -355,6 +355,54 @@ void BBoxDeviceContext::DrawRotatedText(const std::string &text, int x, int y, d
     // TODO
 }
 
+void BBoxDeviceContext::DrawEnclosedMusicText(const std::wstring &text, int x, int y, int encloseY, bool setSmuflGlyph)
+{
+    assert(m_fontStack.top());
+
+    // make sure that we have at least 3 symbols - enclosure and glyph to be enclosed
+    if (text.length() < 3) return this->DrawMusicText(text, x, y, setSmuflGlyph);
+
+    int g_x, g_y, g_w, g_h;
+    int lastCharWidth = 0;
+
+    wchar_t smuflGlyph = 0;
+    if (setSmuflGlyph && (text.length() == 1)) smuflGlyph = text.at(0);
+
+    for (unsigned int i = 0; i < text.length(); i++) {
+        wchar_t c = text.at(i);
+        Glyph *glyph = Resources::GetGlyph(c);
+        if (!glyph) {
+            continue;
+        }
+        // make sure that encloseY is used for first and last glyphs (enclosure)
+        const int bbY = ((i == 0) || (i == text.length() - 1)) ? encloseY : y;
+
+        glyph->GetBoundingBox(g_x, g_y, g_w, g_h);
+        int advX = glyph->GetHorizAdvX();
+
+        int x_off = 0;
+        // make sure that that first element after the glyph is not shifted to the left/right if its left margin is not
+        // set to 0
+        if (i == 1) {
+            x_off += x + std::abs(g_x) * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        }
+        else {
+            x_off += x + g_x * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        }
+        int y_off = bbY - g_y * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+
+        this->UpdateBB(x_off, y_off, x_off + g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(),
+            y_off - g_h * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(), smuflGlyph);
+
+        // make sure that second to last element (glyph before closing glyph) has correct shift
+        if (i == text.length() - 2)
+            x += (g_w + g_x) * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        else
+            x += advX * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        if ((i == 0) || (i == text.length() - 2)) x += 10;
+    }
+}
+
 void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
 {
     assert(m_fontStack.top());

@@ -167,6 +167,8 @@ public:
         int y = VRV_UNSET, int width = VRV_UNSET, int height = VRV_UNSET)
         = 0;
     virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) = 0;
+    virtual void DrawEnclosedMusicText(const std::wstring &text, int x, int y, int encloseY, bool setSmuflGlyph = false)
+        = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
     virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) = 0;
     virtual void DrawBackgroundImage(int x = 0, int y = 0) = 0;

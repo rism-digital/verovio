@@ -323,7 +323,7 @@ void View::DrawSmuflLine(
 }
 
 void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data_HORIZONTALALIGNMENT alignment,
-    int staffSize, bool dimin, bool setBBGlyph)
+    int staffSize, bool dimin, bool setBBGlyph, bool drawEnclosed)
 {
     assert(dc);
 
@@ -342,9 +342,15 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data
         dc->GetSmuflTextExtent(s, &extend);
         xDC -= extend.m_width;
     }
-
-    dc->DrawMusicText(s, xDC, ToDeviceContextY(y), setBBGlyph);
-
+    
+    if (drawEnclosed) {
+        const int encloseY = y + m_doc->GetDrawingUnit(staffSize);
+        dc->DrawEnclosedMusicText(s, xDC, ToDeviceContextY(y), ToDeviceContextY(encloseY), setBBGlyph);
+    }
+    else {
+        dc->DrawMusicText(s, xDC, ToDeviceContextY(y), setBBGlyph);
+    }
+    
     dc->ResetFont();
     dc->ResetBrush();
 }

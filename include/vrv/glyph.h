@@ -62,7 +62,7 @@ public:
      * @name Setter and getter for the code string
      */
     ///@{
-    std::string GetCodeStr() { return m_codeStr; }
+    std::string GetCodeStr() const { return m_codeStr; }
     void SetCodeStr(const std::string &codeStr) { m_codeStr = codeStr; }
     ///@}
 
@@ -70,7 +70,7 @@ public:
      * @name Setter and getter for the path
      */
     ///@{
-    std::string GetPath() { return m_path; }
+    std::string GetPath() const { return m_path; }
     void SetPath(const std::string &path) { m_path = path; }
     ///@}
 
@@ -78,9 +78,19 @@ public:
      * @name Setter and getter for the horizAdvX
      */
     ///@{
-    int GetHorizAdvX() { return m_horizAdvX; }
+    int GetHorizAdvX() const { return m_horizAdvX; }
     void SetHorizAdvX(double horizAdvX) { m_horizAdvX = (int)(horizAdvX * 10.0); }
     ///@}
+
+    /**
+     * Getter for the X
+     */
+    int GetX() const { return m_x; }
+
+    /**
+     * Getter for the width
+     */
+    int GetWidth() const { return m_width; }
 
     /**
      * Add an anchor for the glyph.
