@@ -1309,11 +1309,6 @@ public:
     virtual int PrepareDelayedTurns(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Functor for setting enlosure for the dynamics by adding corresponding text children to it
-     */
-    virtual int PrepareDynamEnclosure(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Functor for setting Measure of Ending
      */
     virtual int PrepareMilestones(FunctorParams *) { return FUNCTOR_CONTINUE; }

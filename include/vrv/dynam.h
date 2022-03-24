@@ -103,11 +103,6 @@ public:
      */
     int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::PrepareEnclosedDynam
-     */
-    int PrepareDynamEnclosure(FunctorParams *functoParams) override;
-
 protected:
     //
 private:

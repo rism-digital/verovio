@@ -102,46 +102,6 @@ std::wstring Dynam::GetSymbolStr() const
     return Dynam::GetSymbolStr(m_symbolStr);
 }
 
-int Dynam::PrepareDynamEnclosure(FunctorParams *functoParams)
-{
-    if (this->HasEnclose()) {
-        std::wstring openElement, closeElement;
-        switch (this->GetEnclose()) {
-            case ENCLOSURE_brack: {
-                openElement.assign(L"[");
-                closeElement.assign(L"]");
-                break;
-            }
-            case ENCLOSURE_paren: {
-                openElement.assign(L"(");
-                closeElement.assign(L")");
-                break;
-            }
-            default: break;
-        }
-        // If both opening/closing element are set - add them to the start and end of the dynam. Apply normal fontstyle
-        // to both, so that brackets are not inclined
-        if (!openElement.empty() && !closeElement.empty()) {
-            Rend *open = new Rend();
-            Rend *close = new Rend();
-            // Add opening bracket to the start of the dynam
-            Text *leftBracket = new Text();
-            leftBracket->SetText(openElement);
-            open->AddChild(leftBracket);
-            open->SetParent(this);
-            open->SetFontstyle(FONTSTYLE_normal);
-            this->InsertChild(open, 0);
-            // Add closing bracket at the end
-            Text *rightBracket = new Text();
-            rightBracket->SetText(closeElement);
-            close->AddChild(rightBracket);
-            close->SetFontstyle(FONTSTYLE_normal);
-            this->AddChild(close);
-        }
-    }
-    return FUNCTOR_SIBLINGS;
-}
-
 //----------------------------------------------------------------------------
 // Static methods for Dynam
 //----------------------------------------------------------------------------
