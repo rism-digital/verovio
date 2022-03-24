@@ -477,7 +477,9 @@ void BeamSegment::AdjustBeamStemExtension(BeamDrawingInterface *beamInterface)
         if (!stemmedInterface) continue;
         Stem *stem = stemmedInterface->GetDrawingStem();
 
-        const int sign = beamInterface->m_drawingPlace == BEAMPLACE_below ? -1 : 1;
+        const int sign = beamInterface->m_drawingPlace == BEAMPLACE_mixed
+            ? ((*it)->m_beamRelativePlace == BEAMPLACE_below ? -1 : 1)
+            : (beamInterface->m_drawingPlace == BEAMPLACE_below ? -1 : 1);
         const int lengthAdjust = sign * (minDur - DURATION_8) * beamInterface->m_beamWidth;
         stem->SetDrawingStemLen(stem->GetDrawingStemLen() + lengthAdjust);
     }
