@@ -161,6 +161,17 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
     return staves;
 }
 
+bool TimePointInterface::VerifyMeasure(const Object *owner)
+{
+    assert(owner);
+    if (m_start && (owner->GetFirstAncestor(MEASURE) != this->GetStartMeasure())) {
+        LogWarning("%s '%s' is not encoded in the measure of its start '%s'. This may cause improper rendering.",
+            owner->GetClassName().c_str(), owner->GetUuid().c_str(), m_start->GetUuid().c_str());
+        return false;
+    }
+    return true;
+}
+
 //----------------------------------------------------------------------------
 // TimeSpanningInterface
 //----------------------------------------------------------------------------

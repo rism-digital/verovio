@@ -251,8 +251,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         spanningType = SPANNING_MIDDLE;
     }
     // Return otherwise: this should only happen if the time spanning element is encoded in the wrong measure
-    else
+    else {
         return;
+    }
 
     // Overwrite the spanningType for open ended control events
     // We can identify them because they end on a right barline
