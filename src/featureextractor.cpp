@@ -112,7 +112,8 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
 
         // We have a previous note (or more with tied notes), so we can calculate an interval
         if (!m_previousNotes.empty()) {
-            std::string intervalChromatic = StringFormat("%d", note->GetMIDIPitch() - m_previousNotes.front()->GetMIDIPitch());
+            std::string intervalChromatic
+                = StringFormat("%d", note->GetMIDIPitch() - m_previousNotes.front()->GetMIDIPitch());
             m_intervalsChomatic << intervalChromatic;
             std::string intervalDiatonic
                 = StringFormat("%d", note->GetDiatonicPitch() - m_previousNotes.front()->GetDiatonicPitch());
