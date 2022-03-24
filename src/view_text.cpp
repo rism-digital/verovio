@@ -74,6 +74,15 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
         return;
     }
 
+    if (params.m_textEnclose != ENCLOSURE_NONE) {
+        std::wstring open;
+        switch (params.m_textEnclose) {
+            case ENCLOSURE_paren: open.push_back(L'('); break;
+            case ENCLOSURE_brack: open.push_back(L'['); break;
+        };
+        this->DrawTextString(dc, open, params);
+    }
+
     ArrayOfStringDynamTypePairs tokens;
     if (Dynam::GetSymbolsInStr(str, tokens)) {
         int first = true;
@@ -99,6 +108,15 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
     }
     else {
         this->DrawTextString(dc, str, params);
+    }
+    
+    if (params.m_textEnclose != ENCLOSURE_NONE) {
+        std::wstring close;
+        switch (params.m_textEnclose) {
+            case ENCLOSURE_paren: close.push_back(L')'); break;
+            case ENCLOSURE_brack: close.push_back(L']'); break;
+        };
+        this->DrawTextString(dc, close, params);
     }
 }
 

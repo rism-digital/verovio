@@ -1635,6 +1635,9 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         params.m_enclosedRend.clear();
         params.m_y = dynam->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+        if (dynam->HasEnclose()) {
+            params.m_textEnclose = dynam->GetEnclose();
+        }
 
         dynamTxt.SetPointSize(params.m_pointSize);
 
