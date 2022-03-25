@@ -3529,8 +3529,10 @@ bool PAEInput::ConvertFermata()
                     fermataTarget = token.m_object;
                     continue;
                 }
-                // This was probably not a fermata sign but a tuplet one
-                else {
+                // We still allow duration, accidental or octave markers within a fermata ()
+                else if (!this->Is(token, pae::DURATION) && this->Is(token, pae::ACCIDENTAL_INTERNAL)
+                    && this->Was(token, pae::OCTAVE)) {
+                    // This was probably not a fermata sign but a tuplet one
                     fermataToken = NULL;
                     continue;
                 }
