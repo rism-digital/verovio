@@ -250,6 +250,9 @@ private:
     // Choose doublingBound as the positive slope value where doubling has the same effect as rotating:
     // tan(atan(doublingBound) + degrees * PI / 180.0) ≈ 2.0 * doublingBound
     double RotateSlope(double slope, double degrees, double doublingBound, bool upwards) const;
+
+    // Calculate the minimal angle <)C1P1P2 or <)P1P2C2
+    float GetMinControlPointAngle(const BezierCurve &bezierCurve, float angle, int unit) const;
     ///@}
 
 public:
