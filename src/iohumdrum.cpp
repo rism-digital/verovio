@@ -12682,9 +12682,7 @@ bool HumdrumInput::addTempoDirection(const std::string &text, const std::string 
 
 bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
 {
-
     std::string name2 = name;
-
     std::string prestring;
     std::wstring symbol;
     std::string poststring;
@@ -12712,17 +12710,11 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
     }
 
     if (symbol.empty()) {
-        Text *text = new Text();
-        std::wstring value = UTF8to16(name2);
-        text->SetText(value);
-        label->AddChild(text);
+        addTextElement(label, name2);
     }
     else {
         if (!prestring.empty()) {
-            Text *text = new Text();
-            std::wstring value = UTF8to16(prestring);
-            text->SetText(value);
-            label->AddChild(text);
+            addTextElement(label, prestring);
         }
         Rend *rend = new Rend();
         Text *text = new Text();
@@ -12731,10 +12723,7 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
         label->AddChild(rend);
         rend->SetFontname("VerovioText");
         if (!poststring.empty()) {
-            Text *text = new Text();
-            std::wstring value = UTF8to16(poststring);
-            text->SetText(value);
-            label->AddChild(text);
+            addTextElement(label, poststring);
         }
         // verovio probably eats the space surronding the
         // rend, so may need to force to be non-breaking space.
