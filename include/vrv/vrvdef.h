@@ -344,6 +344,8 @@ typedef std::list<std::pair<TimePointInterface *, ClassId>> ListOfPointingInterC
 
 typedef std::list<std::pair<TimeSpanningInterface *, ClassId>> ListOfSpanningInterClassIdPairs;
 
+typedef std::list<std::pair<TimeSpanningInterface *, Object *>> ListOfSpanningInterOwnerPairs;
+
 typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 
 typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
