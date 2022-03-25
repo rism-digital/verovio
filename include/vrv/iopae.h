@@ -571,6 +571,7 @@ private:
     bool ConvertTuplet();
     bool ConvertDuration();
     bool ConvertTie();
+    bool ConvertLigature();
     bool ConvertAccidGes();
     ///@}
 
