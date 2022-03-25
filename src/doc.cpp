@@ -480,7 +480,7 @@ void Doc::PrepareDrawing()
     // Display warning if some elements were not matched
     const size_t unmatchedElements = std::count_if(prepareTimeSpanningParams.m_timeSpanningInterfaces.cbegin(),
         prepareTimeSpanningParams.m_timeSpanningInterfaces.cend(),
-        [](const ListOfSpanningInterClassIdPairs::value_type &entry) {
+        [](const ListOfSpanningInterOwnerPairs::value_type &entry) {
             return (entry.first->HasStartid() && entry.first->HasEndid());
         });
     if (unmatchedElements > 0) {
