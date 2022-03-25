@@ -161,6 +161,11 @@ int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
     assert(params);
 
     std::string n = this->GetN();
+    // If there is no @n on harm we use the first @staff value as negative
+    // This will not work if @staff has more than one staff id, but this is probably not going to be used
+    if (n == "" && this->HasStaff()) {
+        n = StringFormat("%d", this->GetStaff().at(0) * -1);
+    }
 
     for (auto &kv : params->m_harms) {
         if (kv.first == n) {

@@ -4006,7 +4006,12 @@ bool PAEInput::ConvertDuration()
     // The stack of durations for handling patterns
     std::list<std::pair<data_DURATION, int>> durations;
     // Add a default quarter note duration
-    durations.push_back({ DURATION_4, 0 });
+    if (m_isMensural) {
+        durations.push_back({ DURATION_semibrevis, 0 });
+    }
+    else {
+        durations.push_back({ DURATION_4, 0 });
+    }
     // Point to it
     std::list<std::pair<data_DURATION, int>>::iterator currentDur = durations.begin();
 
@@ -4061,7 +4066,7 @@ bool PAEInput::ConvertDuration()
                 }
             }
             // Set the duration to the note, chord or rest
-            DurationInterface *interface = dynamic_cast<DurationInterface *>(token->m_object);
+            DurationInterface *interface = token->m_object->GetDurationInterface();
             assert(interface);
             interface->SetDur(currentDur->first);
             if (currentDur->second) {

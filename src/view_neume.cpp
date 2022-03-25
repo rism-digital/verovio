@@ -189,7 +189,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     // adjust facsimile values of element based on where it is rendered if necessary
     if ((m_doc->GetType() == Facs) && element->HasFacs()) {
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
+        FacsimileInterface *fi = element->GetFacsimileInterface();
         fi->GetZone()->SetUlx(noteX);
         fi->GetZone()->SetUly(ToDeviceContextY(yValue));
         fi->GetZone()->SetLrx(noteX + noteWidth);

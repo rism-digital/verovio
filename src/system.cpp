@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "beamspan.h"
 #include "comparison.h"
 #include "dir.h"
 #include "doc.h"
@@ -252,7 +253,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
             continue;
         }
 
-        StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface *>(child);
+        StemmedDrawingInterface *interface = child->GetStemmedDrawingInterface();
         assert(interface);
 
         // First pass
@@ -805,8 +806,9 @@ int System::AlignSystems(FunctorParams *functorParams)
         // Alignment is already pre-determined with staff alignment overflow
         // We need to subtract them from the desired spacing
         const int actualSpacing = systemSpacing - std::max(contentOverflow, clefOverflow);
-        // Set the spacing if it exists (greater than 0)
-        if (actualSpacing > 0) params->m_shift -= actualSpacing;
+        // Ensure minimal white space between consecutive systems by adding one staff space
+        const int unit = params->m_doc->GetDrawingUnit(100);
+        params->m_shift -= std::max(actualSpacing, 2 * unit);
     }
 
     this->SetDrawingYRel(params->m_shift);
@@ -875,6 +877,26 @@ int System::JustifyY(FunctorParams *functorParams)
 
     params->m_relativeShift = 0;
     m_systemAligner.Process(params->m_functor, params);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int System::AdjustCrossStaffYPos(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    for (auto &item : m_drawingList) {
+        if (item->Is(BEAMSPAN)) {
+            // Here we could check that the beamSpan is actually cross-staff. Otherwise doing this is pointless
+            BeamSpan *beamSpan = vrv_cast<BeamSpan *>(item);
+            assert(beamSpan);
+            BeamSpanSegment *segment = beamSpan->GetSegmentForSystem(this);
+            if (segment)
+                segment->CalcBeam(
+                    segment->GetLayer(), segment->GetStaff(), params->m_doc, beamSpan, beamSpan->m_drawingPlace);
+        }
+    }
 
     return FUNCTOR_SIBLINGS;
 }
@@ -1152,6 +1174,21 @@ int System::UnCastOff(FunctorParams *functorParams)
     // Use the MoveChildrenFrom method that moves and relinquishes them
     // See Object::Relinquish
     params->m_currentSystem->MoveChildrenFrom(this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    // Check whether we are in the selected mdiv
+    if (!params->m_selectedMdivUuid.empty()
+        && (std::find(params->m_currentMdivUuids.begin(), params->m_currentMdivUuids.end(), params->m_selectedMdivUuid)
+            == params->m_currentMdivUuids.end())) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     return FUNCTOR_CONTINUE;
 }

@@ -1177,61 +1177,32 @@ void Doc::TransposeDoc()
 {
     Transposer transposer;
     transposer.SetBase600(); // Set extended chromatic alteration mode (allowing more than double sharps/flats)
-    std::string transpositionOption = m_options->m_transpose.GetValue();
-    if (transposer.IsValidIntervalName(transpositionOption)) {
-        transposer.SetTransposition(transpositionOption);
-    }
-    else if (transposer.IsValidKeyTonic(transpositionOption)) {
-
-        // Find the starting key tonic of the data to use in calculating the tranposition interval:
-        // Set transposition by key tonic.
-        // Detect the current key from the keysignature.
-        KeySig *keysig = dynamic_cast<KeySig *>(this->GetCurrentScoreDef()->FindDescendantByType(KEYSIG));
-        // If there is no keysignature, assume it is C.
-        TransPitch currentKey = TransPitch(0, 0, 0);
-        if (keysig && keysig->HasPname()) {
-            currentKey = TransPitch(keysig->GetPname(), ACCIDENTAL_GESTURAL_NONE, keysig->GetAccid(), 0);
-        }
-        else if (keysig) {
-            // No tonic pitch in key signature, so infer from key signature.
-            int fifthsInt = keysig->GetFifthsInt();
-            // Check the keySig@mode is present (currently assuming major):
-            currentKey = transposer.CircleOfFifthsToMajorTonic(fifthsInt);
-            // need to add a dummy "0" key signature in score (staffDefs of staffDef).
-        }
-        transposer.SetTransposition(currentKey, transpositionOption);
-    }
-
-    else if (transposer.IsValidSemitones(transpositionOption)) {
-        KeySig *keysig = dynamic_cast<KeySig *>(this->GetCurrentScoreDef()->FindDescendantByType(KEYSIG, 3));
-        int fifths = 0;
-        if (keysig) {
-            fifths = keysig->GetFifthsInt();
-        }
-        else {
-            LogWarning("No key signature in data, assuming no key signature with no sharps/flats.");
-            // need to add a dummy "0" key signature in score (staffDefs of staffDef).
-        }
-        transposer.SetTransposition(fifths, transpositionOption);
-    }
-    else {
-        LogWarning("Transposition option argument is invalid: %s", transpositionOption.c_str());
-        // there is no transposition that can be done so do not try
-        // to transpose any further (if continuing in this function,
-        // there will not be an error, just that the transposition
-        // will be at the unison, so no notes should change.
-        return;
-    }
 
     Functor transpose(&Object::Transpose);
-    TransposeParams transposeParams(this, &transposer);
+    TransposeParams transposeParams(this, &transpose, &transposer);
 
     if (m_options->m_transposeSelectedOnly.GetValue() == false) {
         transpose.m_visibleOnly = false;
     }
 
-    this->GetCurrentScoreDef()->Process(&transpose, &transposeParams);
-    this->Process(&transpose, &transposeParams);
+    if (m_options->m_transpose.IsSet()) {
+        // Transpose the entire document
+        if (m_options->m_transposeMdiv.IsSet()) {
+            LogWarning("\"%s\" is ignored when \"%s\" is set as well. Please use only one of the two options.",
+                m_options->m_transposeMdiv.GetKey().c_str(), m_options->m_transpose.GetKey().c_str());
+        }
+        transposeParams.m_transposition = m_options->m_transpose.GetValue();
+        this->Process(&transpose, &transposeParams);
+    }
+    else if (m_options->m_transposeMdiv.IsSet()) {
+        // Transpose mdivs individually
+        std::set<std::string> uuids = m_options->m_transposeMdiv.GetKeys();
+        for (const std::string &uuid : uuids) {
+            transposeParams.m_selectedMdivUuid = uuid;
+            transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ uuid });
+            this->Process(&transpose, &transposeParams);
+        }
+    }
 }
 
 void Doc::ExpandExpansions()

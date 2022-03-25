@@ -113,6 +113,18 @@ bool StaffDef::IsSupportedChild(Object *child)
     return true;
 }
 
+bool StaffDef::HasLayerDefWithLabel() const
+{
+    // First get all the staffGrps
+    ListOfConstObjects layerDefs = this->FindAllDescendantsByType(LAYERDEF);
+
+    // Then the @n of each first staffDef
+    for (auto &item : layerDefs) {
+        if (item->FindDescendantByType(LABEL)) return true;
+    }
+    return false;
+}
+
 //----------------------------------------------------------------------------
 // StaffDef functor methods
 //----------------------------------------------------------------------------

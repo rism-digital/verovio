@@ -1123,7 +1123,7 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
 
     this->SetXRel(this->GetXRel() + params->m_cumulatedXShift);
 
-    if (m_type == ALIGNMENT_MEASURE_END) {
+    if (m_type == ALIGNMENT_MEASURE_END && this->GetXRel() < params->m_minPos) {
         this->SetXRel(params->m_minPos);
     }
 

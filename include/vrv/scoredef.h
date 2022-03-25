@@ -57,7 +57,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    ScoreDefInterface *GetScoreDefInterface() override { return dynamic_cast<ScoreDefInterface *>(this); }
+    ScoreDefInterface *GetScoreDefInterface() override { return vrv_cast<ScoreDefInterface *>(this); }
+    const ScoreDefInterface *GetScoreDefInterface() const override { return vrv_cast<const ScoreDefInterface *>(this); }
     ///@}
 
     /**

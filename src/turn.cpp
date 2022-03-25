@@ -76,6 +76,20 @@ wchar_t Turn::GetTurnGlyph() const
     return (this->GetForm() == turnLog_FORM_lower) ? SMUFL_E568_ornamentTurnInverted : SMUFL_E567_ornamentTurn;
 }
 
+int Turn::GetTurnHeight(Doc *doc, int staffSize) const
+{
+    assert(doc);
+
+    wchar_t originalGlyph = this->GetTurnGlyph();
+    wchar_t referenceGlyph;
+    switch (originalGlyph) {
+        case SMUFL_E569_ornamentTurnSlash: referenceGlyph = SMUFL_E567_ornamentTurn; break;
+        case SMUFL_E56D_ornamentMordent: referenceGlyph = SMUFL_E56C_ornamentShortTrill; break;
+        default: referenceGlyph = originalGlyph;
+    }
+    return doc->GetGlyphHeight(referenceGlyph, staffSize, false);
+}
+
 //----------------------------------------------------------------------------
 // Turn functor methods
 //----------------------------------------------------------------------------

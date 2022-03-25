@@ -352,6 +352,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 {
     assert(doc);
     assert(staffAlignment);
+    assert(m_object);
 
     int staffSize = staffAlignment->GetStaffSize();
     int yRel;
@@ -363,13 +364,25 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         int minStaffDistance
             = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place) * doc->GetDrawingUnit(staffSize);
         if (this->GetObject()->Is(FERMATA) && (staffAlignment->GetStaff()->m_drawingLines == 1)) {
-            minStaffDistance = 2.5 * doc->GetDrawingUnit(staffAlignment->GetStaff()->m_drawingStaffSize);
+            minStaffDistance = 2.5 * doc->GetDrawingUnit(staffSize);
         }
         if (m_place == STAFFREL_above) {
             yRel = this->GetContentY1();
             yRel -= doc->GetBottomMargin(m_object->GetClassId()) * unit;
             this->SetDrawingYRel(yRel);
             this->SetDrawingYRel(-minStaffDistance);
+        }
+        else if (m_place == STAFFREL_within) {
+            yRel = staffAlignment->GetStaffHeight() / 2;
+            if (m_object->Is(TURN)) {
+                Turn *turn = vrv_cast<Turn *>(m_object);
+                assert(turn);
+                yRel += turn->GetTurnHeight(doc, staffSize) / 2;
+            }
+            else {
+                yRel += (this->GetContentY2() - this->GetContentY1()) / 2;
+            }
+            this->SetDrawingYRel(yRel);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + this->GetContentY2();
@@ -513,7 +526,6 @@ void FloatingCurvePositioner::ResetCurveParams()
     m_points[1] = Point(0, 0);
     m_points[2] = Point(0, 0);
     m_points[3] = Point(0, 0);
-    m_angle = 0.0;
     m_thickness = 0;
     m_dir = curvature_CURVEDIR_NONE;
     m_crossStaff = NULL;
@@ -522,8 +534,7 @@ void FloatingCurvePositioner::ResetCurveParams()
     this->ClearSpannedElements();
 }
 
-void FloatingCurvePositioner::UpdateCurveParams(
-    const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir)
+void FloatingCurvePositioner::UpdateCurveParams(const Point points[4], int thickness, curvature_CURVEDIR curveDir)
 {
     m_points[0] = points[0];
     m_points[1] = points[1];
@@ -534,7 +545,6 @@ void FloatingCurvePositioner::UpdateCurveParams(
     m_points[1].y -= currentY;
     m_points[2].y -= currentY;
     m_points[3].y -= currentY;
-    m_angle = angle;
     m_thickness = thickness;
     m_dir = curveDir;
     m_cachedMinMaxY = VRV_UNSET;
@@ -547,7 +557,7 @@ void FloatingCurvePositioner::UpdatePoints(const BezierCurve &bezier)
     points[1] = bezier.c1;
     points[2] = bezier.c2;
     points[3] = bezier.p2;
-    this->UpdateCurveParams(points, m_angle, m_thickness, m_dir);
+    this->UpdateCurveParams(points, m_thickness, m_dir);
 }
 
 void FloatingCurvePositioner::MoveFrontHorizontal(int distance)
@@ -639,7 +649,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
     }
 
     Point topBezier[4], bottomBezier[4];
-    BoundingBox::CalcThickBezier(points, this->GetThickness(), this->GetAngle(), topBezier, bottomBezier);
+    BoundingBox::CalcThickBezier(points, this->GetThickness(), topBezier, bottomBezier);
 
     // Now calculate the left and right adjustments
     int leftAdjustment = 0;

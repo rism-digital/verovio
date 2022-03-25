@@ -38,9 +38,10 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    StemmedDrawingInterface *GetStemmedDrawingInterface() override
+    StemmedDrawingInterface *GetStemmedDrawingInterface() override { return vrv_cast<StemmedDrawingInterface *>(this); }
+    const StemmedDrawingInterface *GetStemmedDrawingInterface() const override
     {
-        return dynamic_cast<StemmedDrawingInterface *>(this);
+        return vrv_cast<const StemmedDrawingInterface *>(this);
     }
     ///@}
 

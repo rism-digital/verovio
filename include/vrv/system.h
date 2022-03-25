@@ -271,6 +271,11 @@ public:
     int JustifyY(FunctorParams *functorParams) override;
 
     /**
+     * See Object::AdjustCrossStaffYPos
+     */
+    int AdjustCrossStaffYPos(FunctorParams *functorParams) override;
+
+    /**
      * See Object::AdjustStaffOverlap
      */
     int AdjustStaffOverlap(FunctorParams *functorParams) override;
@@ -312,6 +317,11 @@ public:
      * See Object::UnCastOff
      */
     int UnCastOff(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::Transpose
+     */
+    int Transpose(FunctorParams *functorParams) override;
 
 public:
     SystemAligner m_systemAligner;

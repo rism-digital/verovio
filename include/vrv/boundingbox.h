@@ -226,8 +226,7 @@ public:
     /**
      * Calculate thickness coefficient to be applient for bezier curve to fit MEI units thickness
      */
-    static double GetBezierThicknessCoefficient(
-        const Point bezier[4], int currentThickness, double angle, int penWidth);
+    static double GetBezierThicknessCoefficient(const Point bezier[4], int currentThickness, int penWidth);
 
     /**
      * Calculate the point bezier point position for a t between 0.0 and 1.0
@@ -237,8 +236,7 @@ public:
     /**
      * Calculate the position of the bezier above and below for a thick bezier
      */
-    static void CalcThickBezier(
-        const Point bezier[4], int thickness, float angle, Point *topBezier, Point *bottomBezier);
+    static void CalcThickBezier(const Point bezier[4], int thickness, Point topBezier[4], Point bottomBezier[4]);
 
     /**
      * Approximate the bounding box of a bezier taking into accound the height and the width.
