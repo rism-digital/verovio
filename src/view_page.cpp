@@ -353,8 +353,8 @@ void View::DrawStaffGrp(
     if (lastDef->GetLines() <= 1) yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
 
     // draw the system start bar line
+    ScoreDef *scoreDef = vrv_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
     if (topStaffGrp) {
-        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
         if (scoreDef && scoreDef->HasSystemStartLine()) {
             const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
             this->DrawVerticalLine(dc, yTop, yBottom, x + barLineWidth / 2, barLineWidth);
@@ -376,7 +376,6 @@ void View::DrawStaffGrp(
     }
 
     // DrawStaffGrpLabel
-    ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
     const int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);

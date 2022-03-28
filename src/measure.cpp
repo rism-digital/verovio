@@ -1047,6 +1047,8 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
 
+    const bool hasSystemStartLine = this->IsFirstInSystem() && system->GetDrawingScoreDef()->HasSystemStartLine();
+
     ArrayOfComparisons filters;
     for (auto staffN : params->m_staffNs) {
         params->m_minPos = 0;
@@ -1060,7 +1062,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         params->m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
 
         // Prevent collisions of scoredef clefs with thick barlines
-        if (this->IsFirstInSystem() && system->GetDrawingScoreDef()->HasSystemStartLine()) {
+        if (hasSystemStartLine) {
             params->m_upcomingMinPos = params->m_doc->GetDrawingBarLineWidth(params->m_staffSize);
         }
 
