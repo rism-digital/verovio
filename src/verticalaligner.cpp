@@ -253,6 +253,7 @@ StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
     m_yRel = 0;
     m_verseNs.clear();
     m_staff = NULL;
+    m_floatingPositionersSorted = true;
 
     m_overflowAbove = 0;
     m_overflowBelow = 0;
@@ -278,6 +279,29 @@ void StaffAlignment::ClearPositioners()
         delete *iter;
     }
     m_floatingPositioners.clear();
+
+    m_floatingPositionersSorted = true;
+}
+
+void StaffAlignment::SortPositioners()
+{
+    if (!m_floatingPositionersSorted) {
+        std::stable_sort(m_floatingPositioners.begin(), m_floatingPositioners.end(),
+            [](FloatingPositioner *left, FloatingPositioner *right) {
+                // Move fingering elements that should appear closer to the staff to the front
+                if (left->GetObject()->Is(FING) && right->GetObject()->Is(FING)) {
+                    if ((left->GetDrawingPlace() == STAFFREL_above) && (right->GetDrawingPlace() == STAFFREL_above)) {
+                        return (left->GetObjectX()->GetDrawingY() < right->GetObjectX()->GetDrawingY());
+                    }
+                    if ((left->GetDrawingPlace() == STAFFREL_below) && (right->GetDrawingPlace() == STAFFREL_below)) {
+                        return (left->GetObjectX()->GetDrawingY() > right->GetObjectX()->GetDrawingY());
+                    }
+                }
+                return false;
+            });
+
+        m_floatingPositionersSorted = true;
+    }
 }
 
 void StaffAlignment::SetStaff(Staff *staff, Doc *doc, SystemAligner::SpacingType spacingType)
@@ -614,6 +638,7 @@ void StaffAlignment::SetCurrentFloatingPositioner(
             positioner = new FloatingPositioner(object, this, spanningType);
             m_floatingPositioners.push_back(positioner);
         }
+        m_floatingPositionersSorted = false;
     }
     positioner->SetObjectXY(objectX, objectY);
     // LogDebug("BB %d", item->second.m_contentBB_x1);
@@ -725,6 +750,8 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 
     const int staffSize = this->GetStaffSize();
     const int drawingUnit = params->m_doc->GetDrawingUnit(staffSize);
+
+    this->SortPositioners();
 
     const bool verseCollapse = params->m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
     if (params->m_classId == SYL) {

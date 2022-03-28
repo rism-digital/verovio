@@ -339,7 +339,7 @@ public:
         m_doc = doc;
         m_functor = functor;
     }
-    ArrayOfFloatingPositioners *m_previousStaffPositioners;
+    const ArrayOfFloatingPositioners *m_previousStaffPositioners;
     StaffAlignment *m_previousStaffAlignment;
     Doc *m_doc;
     Functor *m_functor;

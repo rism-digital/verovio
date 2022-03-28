@@ -281,6 +281,11 @@ public:
     void ClearPositioners();
 
     /**
+     * Sort the FloatingPositioner objects.
+     */
+    void SortPositioners();
+
+    /**
      * Find all the intersection points with a vertical line (top to bottom)
      */
     void FindAllIntersectionPoints(
@@ -369,6 +374,10 @@ private:
      * The list of FloatingPositioner for the staff.
      */
     ArrayOfFloatingPositioners m_floatingPositioners;
+    /**
+     * Flag indicating whether the list of FloatingPositioner is sorted
+     */
+    bool m_floatingPositionersSorted;
     /**
      * Stores a pointer to the staff from which the aligner was created.
      * This is necessary since we don't always have all the staves.
