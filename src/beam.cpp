@@ -1648,33 +1648,6 @@ void Beam::FilterList(ArrayOfObjects *childList)
             ++iter;
         }
     }
-
-    Staff *beamStaff = this->GetAncestorStaff();
-    /*
-    if (this->HasBeamWith()) {
-        Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-        assert(measure);
-        if (this->GetBeamWith() == OTHERSTAFF_below) {
-            beamStaff = dynamic_cast<Staff *>(measure->GetNext(staff, STAFF));
-            if (beamStaff == NULL) {
-                LogError("Cannot access staff below for beam '%s'", this->GetUuid().c_str());
-                beamStaff = staff;
-            }
-        }
-        else if (this->GetBeamWith() == OTHERSTAFF_above) {
-            beamStaff = dynamic_cast<Staff *>(measure->GetPrevious(staff, STAFF));
-            if (beamStaff == NULL) {
-                LogError("Cannot access staff above for beam '%s'", this->GetUuid().c_str());
-                beamStaff = staff;
-            }
-        }
-    }
-    */
-
-    this->InitCoords(childList, beamStaff, this->GetPlace());
-
-    const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
-    this->InitCue(isCue);
 }
 
 const ArrayOfBeamElementCoords *Beam::GetElementCoords()
@@ -2102,15 +2075,19 @@ int Beam::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    m_beamSegment.InitCoordRefs(this->GetElementCoords());
-
-    data_BEAMPLACE initialPlace = this->GetPlace();
-    if (this->HasStemSameasBeam()) m_beamSegment.InitSameasRoles(this->GetStemSameasBeam(), initialPlace);
-
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
+
+    this->InitCoords(beamChildren, staff, this->GetPlace());
+    const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
+    this->InitCue(isCue);
+
+    m_beamSegment.InitCoordRefs(this->GetElementCoords());
+
+    data_BEAMPLACE initialPlace = this->GetPlace();
+    if (this->HasStemSameasBeam()) m_beamSegment.InitSameasRoles(this->GetStemSameasBeam(), initialPlace);
 
     m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, initialPlace);
 

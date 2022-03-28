@@ -107,7 +107,7 @@ public:
      * Initializes the m_beamElementCoords vector objects.
      * This is called by Beam::FilterList
      */
-    void InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
+    void InitCoords(const ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
 
     /**
      * Initialize m_cueSize value based on the @cue attribute and presence of child elements with @cue/@grace

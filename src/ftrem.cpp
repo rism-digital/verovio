@@ -100,11 +100,6 @@ void FTrem::FilterList(ArrayOfObjects *childList)
         }
         ++iter;
     }
-
-    Staff *staff = this->GetAncestorStaff();
-
-    this->InitCoords(childList, staff, BEAMPLACE_NONE);
-    this->InitCue(false);
 }
 
 std::pair<int, int> FTrem::GetAdditionalBeamCount() const
@@ -214,12 +209,15 @@ int FTrem::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    m_beamSegment.InitCoordRefs(this->GetElementCoords());
-
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
+
+    this->InitCoords(fTremChildren, staff, BEAMPLACE_NONE);
+    this->InitCue(false);
+
+    m_beamSegment.InitCoordRefs(this->GetElementCoords());
 
     m_beamSegment.CalcBeam(layer, staff, params->m_doc, this);
 
