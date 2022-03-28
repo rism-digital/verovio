@@ -2263,7 +2263,8 @@ enum {
     ERR_061_LIGATURE_NOTE_BEFORE,
     ERR_062_LIGATURE_NOTE_AFTER,
     ERR_063_LIGATURE_PITCH,
-    ERR_064_LIGATURE_DURATION
+    ERR_064_LIGATURE_DURATION,
+    ERR_065_MREST_INVALID_MEASURE
 };
 
 // clang-format off
@@ -2331,7 +2332,8 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_061_LIGATURE_NOTE_BEFORE, "To indicate a ligature, a '+' must be preceded by a note." },
     { ERR_062_LIGATURE_NOTE_AFTER, "To indicate a ligature, a '+' must be followed by a note." },
     { ERR_063_LIGATURE_PITCH, "A ligature cannot have two consecutive notes with the same pitch." },
-    { ERR_064_LIGATURE_DURATION, "The duration in a ligature cannot be shorter than a semibreve." }
+    { ERR_064_LIGATURE_DURATION, "The duration in a ligature cannot be shorter than a semibreve." },
+    { ERR_065_MREST_INVALID_MEASURE, "A measure with a measure rest cannot include anything else." }
 };
 // clang-format on
 
@@ -4451,7 +4453,32 @@ bool PAEInput::CheckHierarchy()
 bool PAEInput::CheckContentPreBuild()
 {
     // Additional checks to do here
-    // * mRest or multiRest should be unique child of layer
+    // * a measure with mRest or multiRest should not include anything else
+
+    pae::Token *previousToken = NULL;
+
+    for (auto &token : m_pae) {
+        if (token.IsVoid() || !token.m_object) continue;
+
+        // Check that the measure rest is at the beginning of a measure
+        if (token.Is(MULTIREST) && previousToken && !previousToken->Is(MEASURE)) {
+            LogPAE(ERR_065_MREST_INVALID_MEASURE, token);
+            if (m_pedanticMode) return false;
+            delete token.m_object;
+            token.m_object = NULL;
+        }
+        // Check that the measure rest is at the end of a measure
+        else if (previousToken && previousToken->Is(MULTIREST) && !token.Is(MEASURE)) {
+            LogPAE(ERR_065_MREST_INVALID_MEASURE, *previousToken);
+            if (m_pedanticMode) return false;
+            delete previousToken->m_object;
+            previousToken->m_object = NULL;
+        }
+
+        if (token.m_object) {
+            previousToken = &token;
+        }
+    }
 
     return true;
 }
