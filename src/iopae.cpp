@@ -2836,6 +2836,8 @@ bool PAEInput::Parse()
 
     if (success) success = this->ConvertAccidGes();
 
+    if (success) success = this->CheckContentPreBuild();
+
     if (success) success = this->CheckHierarchy();
 
     LogDebugTokens();
@@ -3021,6 +3023,8 @@ bool PAEInput::Parse()
             token.m_object = NULL;
         }
     }
+
+    CheckContentPostBuild();
 
     // We should have no object left, just in case they need to be delete.
     this->ClearTokenObjects();
@@ -4444,10 +4448,17 @@ bool PAEInput::CheckHierarchy()
     return true;
 }
 
-bool PAEInput::CheckContent()
+bool PAEInput::CheckContentPreBuild()
 {
     // Additional checks to do here
     // * mRest or multiRest should be unique child of layer
+
+    return true;
+}
+
+bool PAEInput::CheckContentPostBuild()
+{
+    // Additional checks to do here
     // * beam should have more than two children
     // * graceGrp should not be empty
     // * keySig / meterSig change more than once in a measure
