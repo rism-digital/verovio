@@ -1308,7 +1308,14 @@ void ObjectListInterface::ResetList(Object *node)
     node->Modify(false);
     m_list.clear();
     node->FillFlatList(&m_list);
-    this->FilterList(&m_list);
+    // TODO: remove later (BEGIN)
+    ArrayOfConstObjects tempList(m_list.begin(), m_list.end());
+    this->FilterList(tempList);
+    m_list.clear();
+    for (auto ptr : tempList) {
+        m_list.push_back(const_cast<Object *>(ptr));
+    }
+    // TODO: remove later (END)
 }
 
 const ArrayOfObjects *ObjectListInterface::GetList(Object *node)
@@ -1424,13 +1431,13 @@ void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &li
     }
 }
 
-void TextListInterface::FilterList(ArrayOfObjects *childList)
+void TextListInterface::FilterList(ArrayOfConstObjects &childList)
 {
-    ArrayOfObjects::iterator iter = childList->begin();
-    while (iter != childList->end()) {
+    ArrayOfConstObjects::iterator iter = childList.begin();
+    while (iter != childList.end()) {
         if (!(*iter)->Is({ LB, TEXT })) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         ++iter;

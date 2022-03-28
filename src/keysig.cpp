@@ -107,16 +107,16 @@ void KeySig::Reset()
     m_drawingCancelAccidCount = 0;
 }
 
-void KeySig::FilterList(ArrayOfObjects *childList)
+void KeySig::FilterList(ArrayOfConstObjects &childList)
 {
     // nothing  to filter since we allow only KeyAccid for now.
-    ArrayOfObjects::iterator iter = childList->begin();
+    ArrayOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if ((*iter)->Is(KEYACCID))
             ++iter;
         else
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
     }
 }
 

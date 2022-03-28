@@ -1586,29 +1586,29 @@ bool Beam::IsSupportedChild(Object *child)
     return true;
 }
 
-void Beam::FilterList(ArrayOfObjects *childList)
+void Beam::FilterList(ArrayOfConstObjects &childList)
 {
     bool firstNoteGrace = false;
     // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ArrayOfObjects::iterator iter = childList->begin();
+    ArrayOfConstObjects::iterator iter = childList.begin();
 
     const bool isTabBeam = this->IsTabBeam();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->IsLayerElement()) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         if (!(*iter)->HasInterface(INTERFACE_DURATION)) {
             // remove anything that has not a DurationInterface
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         else if (isTabBeam) {
             if (!(*iter)->Is(TABGRP)) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
             }
             else {
                 ++iter;
@@ -1616,33 +1616,33 @@ void Beam::FilterList(ArrayOfObjects *childList)
             continue;
         }
         else {
-            LayerElement *element = vrv_cast<LayerElement *>(*iter);
+            const LayerElement *element = vrv_cast<const LayerElement *>(*iter);
             assert(element);
             // if we are at the beginning of the beam
             // and the note is cueSize
             // assume all the beam is of grace notes
-            if (childList->begin() == iter) {
+            if (childList.begin() == iter) {
                 if (element->IsGraceNote()) firstNoteGrace = true;
             }
             // if the first note in beam was NOT a grace
             // we have grace notes embedded in a beam
             // drop them
             if (!firstNoteGrace && (element->IsGraceNote())) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
                 continue;
             }
             // also remove notes within chords
             if (element->Is(NOTE)) {
-                Note *note = vrv_cast<Note *>(element);
+                const Note *note = vrv_cast<const Note *>(element);
                 assert(note);
                 if (note->IsChordTone()) {
-                    iter = childList->erase(iter);
+                    iter = childList.erase(iter);
                     continue;
                 }
             }
             // and spaces
             else if (element->Is(SPACE)) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
                 continue;
             }
             ++iter;

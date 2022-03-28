@@ -79,22 +79,22 @@ const ArrayOfBeamElementCoords *FTrem::GetElementCoords()
     return &m_beamElementCoords;
 }
 
-void FTrem::FilterList(ArrayOfObjects *childList)
+void FTrem::FilterList(ArrayOfConstObjects &childList)
 {
-    ArrayOfObjects::iterator iter = childList->begin();
+    ArrayOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->Is(NOTE) && !(*iter)->Is(CHORD)) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc.)
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         // also remove notes within chords
         if ((*iter)->Is(NOTE)) {
-            Note *note = vrv_cast<Note *>(*iter);
+            const Note *note = vrv_cast<const Note *>(*iter);
             assert(note);
             if (note->IsChordTone()) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
                 continue;
             }
         }

@@ -298,15 +298,15 @@ void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff, int staffSize)
     tupletNum->SetDrawingYRel(yRel);
 }
 
-void Tuplet::FilterList(ArrayOfObjects *childList)
+void Tuplet::FilterList(ArrayOfConstObjects &childList)
 {
     // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ArrayOfObjects::iterator iter = childList->begin();
+    ArrayOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->IsLayerElement() || !(*iter)->HasInterface(INTERFACE_DURATION)) {
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
         }
         else {
             ++iter;

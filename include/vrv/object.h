@@ -1676,7 +1676,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ArrayOfObjects *childList){};
+    virtual void FilterList(ArrayOfConstObjects &childList){};
 
 public:
     /**
@@ -1717,7 +1717,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ArrayOfConstObjects &childList) override;
 
 private:
     //

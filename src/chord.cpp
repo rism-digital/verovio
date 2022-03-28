@@ -212,19 +212,19 @@ void Chord::AddChild(Object *child)
     Modify();
 }
 
-void Chord::FilterList(ArrayOfObjects *childList)
+void Chord::FilterList(ArrayOfConstObjects &childList)
 {
     // Retain only note children of chords
-    ArrayOfObjects::iterator iter = childList->begin();
+    ArrayOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if ((*iter)->Is(NOTE))
             ++iter;
         else
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
     }
 
-    std::sort(childList->begin(), childList->end(), DiatonicSort());
+    std::sort(childList.begin(), childList.end(), DiatonicSort());
 }
 
 int Chord::PositionInChord(Note *note)

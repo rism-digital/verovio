@@ -103,7 +103,7 @@ protected:
     /**
      * Filter the flat list and keep only Note or Chords elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ArrayOfConstObjects &childList) override;
 
     /**
      * See LayerElement::SetElementShortening

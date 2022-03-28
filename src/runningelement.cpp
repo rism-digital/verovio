@@ -91,21 +91,21 @@ bool RunningElement::IsSupportedChild(Object *child)
     return true;
 }
 
-void RunningElement::FilterList(ArrayOfObjects *childList)
+void RunningElement::FilterList(ArrayOfConstObjects &childList)
 {
-    ArrayOfObjects::iterator iter = childList->begin();
+    ArrayOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         // remove nested rend elements
         if ((*iter)->Is(REND)) {
             if ((*iter)->GetFirstAncestor(REND)) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
                 continue;
             }
         }
         // Also remove anything that is not a fig
         else if (!(*iter)->Is(FIG)) {
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         ++iter;

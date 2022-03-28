@@ -283,7 +283,7 @@ protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ArrayOfConstObjects &childList) override;
 
 private:
     //

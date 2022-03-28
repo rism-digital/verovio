@@ -65,12 +65,12 @@ bool MeterSigGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-void MeterSigGrp::FilterList(ArrayOfObjects *childList)
+void MeterSigGrp::FilterList(ArrayOfConstObjects &childList)
 {
     // We want to keep only MeterSig
-    childList->erase(std::remove_if(childList->begin(), childList->end(),
-                         [](const Object *object) -> bool { return !object->Is(METERSIG); }),
-        childList->end());
+    childList.erase(std::remove_if(childList.begin(), childList.end(),
+                        [](const Object *object) -> bool { return !object->Is(METERSIG); }),
+        childList.end());
 }
 
 void MeterSigGrp::AddAlternatingMeasureToVector(Measure *measure)

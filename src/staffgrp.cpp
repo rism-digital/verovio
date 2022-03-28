@@ -94,14 +94,14 @@ bool StaffGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-void StaffGrp::FilterList(ArrayOfObjects *childList)
+void StaffGrp::FilterList(ArrayOfConstObjects &childList)
 {
     // We want to keep only staffDef
-    ArrayOfObjects::iterator iter = childList->begin();
+    ArrayOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->Is(STAFFDEF)) {
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
         }
         else {
             ++iter;

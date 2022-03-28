@@ -83,19 +83,19 @@ Note *Ligature::GetLastNote()
     return lastNote;
 }
 
-void Ligature::FilterList(ArrayOfObjects *childList)
+void Ligature::FilterList(ArrayOfConstObjects &childList)
 {
     // Retain only note children of ligatures
-    ArrayOfObjects::iterator iter = childList->begin();
+    ArrayOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->Is(NOTE)) {
             // remove anything that is not an LayerElement
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
         }
         else {
             // assert that we keep only notes
-            assert(dynamic_cast<Note *>(*iter));
+            assert(dynamic_cast<const Note *>(*iter));
             ++iter;
         }
     }
