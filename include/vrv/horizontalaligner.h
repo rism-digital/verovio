@@ -147,7 +147,7 @@ public:
     /**
      * Returns true for Alignment for which we want to do bounding box alignment
      */
-    bool PerfomBoundingBoxAlignment() const;
+    bool PerformBoundingBoxAlignment() const;
 
     /**
      * Return the AlignmentReference holding the element.

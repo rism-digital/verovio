@@ -219,6 +219,11 @@ public:
 
     bool IsSectionRestart() const;
 
+    /**
+     * @return True if a system start line will be drawn
+     */
+    bool HasSystemStartLine();
+
     //----------//
     // Functors //
     //----------//
