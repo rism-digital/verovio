@@ -2408,6 +2408,17 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 }
             }
         }
+        if (el->Is(ACCID) || el->Is(DIVLINE)) {
+            fparent = el->GetFirstAncestor(SYLLABLE);
+            sparent = el->GetFirstAncestor(LAYER);
+            if (fparent && sparent) {
+                el->MoveItselfTo(sparent);
+                sparent->ReorderByXPos();
+                fparent->ClearRelinquishedChildren();
+                fparent->ReorderByXPos();
+            }
+            continue;
+        }
         if (elementIds.begin() == it || firstIsSyl) {
             // if the element is a syl we want it to stay attached to the first element
             // we'll still need to initialize all the parents, thus the bool
@@ -2461,11 +2472,11 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 continue;
             }
 
-            if (el->Is(DIVLINE) || el->Is(ACCID)) {
-                el->MoveItselfTo(sparent);
-                fparent->ClearRelinquishedChildren();
-                continue;
-            }
+            // if (el->Is(DIVLINE) || el->Is(ACCID)) {
+            //     el->MoveItselfTo(sparent);
+            //     fparent->ClearRelinquishedChildren();
+            //     continue;
+            // }
 
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc *>(el);
