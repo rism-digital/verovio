@@ -2627,7 +2627,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
     }
 
-    const std::string noteID = node.attribute("id").as_string();
+    std::string noteID = node.attribute("id").as_string();
     const int duration = node.child("duration").text().as_int();
     const int noteStaffNum = node.child("staff").text().as_int();
     const pugi::xml_node rest = node.child("rest");
@@ -2717,7 +2717,10 @@ void MusicXmlInput::ReadMusicXmlNote(
         element = note;
         note->SetVisible(ConvertWordToBool(node.attribute("print-object").as_string()));
         note->SetColor(node.attribute("color").as_string());
-        if (!noteID.empty()) {
+        if (noteID.empty()) {
+            noteID = note->GetUuid();
+        }
+        else {
             note->SetUuid(noteID);
         }
         note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
@@ -3247,7 +3250,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         Text *text = new Text();
         text->SetText(UTF8to16(fingText));
         m_controlElements.push_back({ measureNum, fing });
-        fing->SetStartid(m_ID);
+        fing->SetStartid("#" + noteID);
         fing->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         fing->SetPlace(fing->AttPlacementRelStaff::StrToStaffrel(xmlFing.node().attribute("placement").as_string()));
         fing->AddChild(text);
