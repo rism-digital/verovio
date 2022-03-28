@@ -80,7 +80,7 @@ std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
+        code = Resources::GetGlyphCode(this->GetGlyphName());
         if (NULL == Resources::GetGlyph(code)) code = 0;
     }
 
