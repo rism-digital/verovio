@@ -125,6 +125,36 @@ curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
     }
 }
 
+std::list<std::pair<data_VU, data_PERCENT>> Slur::ParseBulge() const
+{
+    // Split content by spaces
+    std::string content = this->GetBulge();
+    std::list<std::string> entries;
+    size_t pos = 0;
+    while ((pos = content.find(' ')) != std::string::npos) {
+        if (pos > 0) entries.push_back(content.substr(0, pos));
+        content.erase(0, pos + 1);
+    }
+    if (!content.empty()) entries.push_back(content);
+
+    // Convert entries to numerical values
+    std::list<std::pair<data_VU, data_PERCENT>> result;
+    Att converter;
+    data_VU distance = 0.0;
+    bool parseDistanceNext = true;
+    for (const std::string &entry : entries) {
+        if (parseDistanceNext) {
+            distance = converter.StrToVU(entry);
+        }
+        else {
+            const data_PERCENT offset = converter.StrToPercent(entry);
+            result.push_back({ distance, offset });
+        }
+        parseDistanceNext = !parseDistanceNext;
+    }
+    return result;
+}
+
 std::pair<Layer *, LayerElement *> Slur::GetBoundaryLayer()
 {
     LayerElement *start = this->GetStart();
@@ -435,8 +465,11 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     const int unit = doc->GetDrawingUnit(100);
     const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
 
-    // Disable collision avoidance if bulge is prescribed
-    if (this->HasBulge()) return;
+    // Special handling if bulge is prescribed
+    if (this->HasBulge()) {
+        const std::list<std::pair<data_VU, data_PERCENT>> bulgeEntries = this->ParseBulge();
+        return;
+    }
 
     // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
     this->FilterSpannedElements(curve, bezier, margin);
