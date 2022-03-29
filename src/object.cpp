@@ -846,7 +846,7 @@ int Object::GetDescendantIndex(const Object *child, const ClassId classId, int d
     return -1;
 }
 
-void Object::Modify(bool modified)
+void Object::Modify(bool modified) const
 {
     // if we have a parent and a new modification, propagate it
     if (m_parent && modified) {
@@ -855,10 +855,10 @@ void Object::Modify(bool modified)
     m_isModified = modified;
 }
 
-void Object::FillFlatList(ArrayOfObjects *flatList)
+void Object::FillFlatList(ArrayOfConstObjects &flatList) const
 {
     Functor addToFlatList(&Object::AddLayerElementToFlatList);
-    AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
+    AddLayerElementToFlatListParams addLayerElementToFlatListParams(&flatList);
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
 
@@ -1298,7 +1298,7 @@ ObjectListInterface &ObjectListInterface::operator=(const ObjectListInterface &i
     return *this;
 }
 
-void ObjectListInterface::ResetList(Object *node)
+void ObjectListInterface::ResetList(const Object *node)
 {
     // nothing to do, the list if up to date
     if (!node->IsModified()) {
@@ -1307,9 +1307,9 @@ void ObjectListInterface::ResetList(Object *node)
 
     node->Modify(false);
     m_list.clear();
-    node->FillFlatList(&m_list);
     // TODO: remove later (BEGIN)
     ArrayOfConstObjects tempList(m_list.begin(), m_list.end());
+    node->FillFlatList(tempList);
     this->FilterList(tempList);
     m_list.clear();
     for (auto ptr : tempList) {
@@ -1554,7 +1554,7 @@ void ObjectFactory::Register(std::string name, ClassId classId, std::function<Ob
 // Object functor methods
 //----------------------------------------------------------------------------
 
-int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
+int Object::AddLayerElementToFlatList(FunctorParams *functorParams) const
 {
     AddLayerElementToFlatListParams *params = vrv_params_cast<AddLayerElementToFlatListParams *>(functorParams);
     assert(params);

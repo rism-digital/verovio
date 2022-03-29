@@ -547,7 +547,7 @@ public:
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */
-    void FillFlatList(ArrayOfObjects *list);
+    void FillFlatList(ArrayOfConstObjects &list) const;
 
     /**
      * Check if the content was modified or not
@@ -557,7 +557,7 @@ public:
     /**
      * Mark the object and its parent (if any) as modified
      */
-    void Modify(bool modified = true);
+    void Modify(bool modified = true) const;
 
     /**
      * @name Setter and getter of the attribute flag
@@ -646,7 +646,7 @@ public:
     /**
      * Add each LayerElements and its children to a flat list
      */
-    virtual int AddLayerElementToFlatList(FunctorParams *functorParams);
+    virtual int AddLayerElementToFlatList(FunctorParams *functorParams) const;
 
     /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
@@ -1683,7 +1683,7 @@ public:
      * Reset the list of children and call FilterList().
      * As for GetList, we need to pass the object.
      */
-    void ResetList(Object *node);
+    void ResetList(const Object *node);
 };
 
 //----------------------------------------------------------------------------
