@@ -196,7 +196,12 @@ void View::CalcInitialSlur(
 
     /************** control points **************/
 
-    bezier.CalcInitialControlPointParams(m_doc, slurAngle, staff->m_drawingStaffSize);
+    if (slur->HasBulge()) {
+        bezier.CalcInitialControlPointParams();
+    }
+    else {
+        bezier.CalcInitialControlPointParams(m_doc, slurAngle, staff->m_drawingStaffSize);
+    }
     bezier.UpdateControlPoints();
     if (curveDir != curvature_CURVEDIR_mixed) {
         bezier.Rotate(slurAngle, bezier.p1);

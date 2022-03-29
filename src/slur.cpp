@@ -435,6 +435,9 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     const int unit = doc->GetDrawingUnit(100);
     const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
 
+    // Disable collision avoidance if bulge is prescribed
+    if (this->HasBulge()) return;
+
     // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
     this->FilterSpannedElements(curve, bezier, margin);
 
@@ -1480,18 +1483,23 @@ int Slur::CalcSlurDirection(FunctorParams *functorParams)
 
     // If curve direction is prescribed as mixed, use it if boundary lies in different staves
     if (this->GetCurvedir() == curvature_CURVEDIR_mixed) {
-        const int startStaffN = start->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
-        const int endStaffN = end->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
-        if (startStaffN < endStaffN) {
-            this->SetDrawingCurveDir(SlurCurveDirection::BelowAbove);
-            return FUNCTOR_CONTINUE;
-        }
-        else if (startStaffN > endStaffN) {
-            this->SetDrawingCurveDir(SlurCurveDirection::AboveBelow);
-            return FUNCTOR_CONTINUE;
+        if (this->HasBulge()) {
+            LogWarning("Mixed curve direction is ignored for slurs with prescribed bulge.");
         }
         else {
-            LogWarning("Mixed curve direction is ignored for slurs starting and ending on the same staff.");
+            const int startStaffN = start->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
+            const int endStaffN = end->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
+            if (startStaffN < endStaffN) {
+                this->SetDrawingCurveDir(SlurCurveDirection::BelowAbove);
+                return FUNCTOR_CONTINUE;
+            }
+            else if (startStaffN > endStaffN) {
+                this->SetDrawingCurveDir(SlurCurveDirection::AboveBelow);
+                return FUNCTOR_CONTINUE;
+            }
+            else {
+                LogWarning("Mixed curve direction is ignored for slurs starting and ending on the same staff.");
+            }
         }
     }
 

@@ -36,6 +36,13 @@ void BezierCurve::Rotate(float angle, const Point &rotationPoint)
     c2 = BoundingBox::CalcPositionAfterRotation(c2, angle, rotationPoint);
 }
 
+void BezierCurve::CalcInitialControlPointParams()
+{
+    const int dist = abs(p2.x - p1.x);
+    this->SetControlOffset(dist / 3.0);
+    this->SetControlHeight(0);
+}
+
 void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staffSize)
 {
     // Note: For convex curves (both control points on the same side) we assume that the curve is rotated
