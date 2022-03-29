@@ -1101,6 +1101,8 @@ void BeamSegment::CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterfac
     const int staffHeight = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
+    if (!m_firstNoteOrChord || !m_lastNoteOrChord) return;
+
     int adjust = 0;
     const int start = m_firstNoteOrChord->m_yBeam;
     const int end = m_lastNoteOrChord->m_yBeam;
