@@ -215,7 +215,7 @@ void OptionBool::Reset()
 bool OptionBool::SetValue(bool value)
 {
     m_value = value;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -266,7 +266,7 @@ bool OptionDbl::SetValue(double value)
         return false;
     }
     m_value = value;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -334,7 +334,7 @@ bool OptionInt::SetValue(int value)
         return false;
     }
     m_value = value;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -364,7 +364,7 @@ void OptionString::Init(const std::string &defaultValue)
 bool OptionString::SetValue(const std::string &value)
 {
     m_value = value;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -394,10 +394,7 @@ void OptionArray::Init()
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
 {
     m_values = values;
-    m_isSet = true;
-    // m_values.erase(std::remove_if(m_values.begin(), m_values.end(),
-    //                                       [](const std::string &s) { return s.empty(); }),
-    //                        m_values.end());
+    m_isSet = !m_values.empty();
     return true;
 }
 
@@ -440,9 +437,9 @@ std::string OptionArray::GetDefaultStrValue() const
 bool OptionArray::SetValue(std::vector<std::string> const &values)
 {
     m_values = values;
-    m_isSet = true;
     m_values.erase(std::remove_if(m_values.begin(), m_values.end(), [](const std::string &s) { return s.empty(); }),
         m_values.end());
+    m_isSet = !m_values.empty();
     return true;
 }
 
@@ -487,7 +484,7 @@ bool OptionIntMap::SetValue(const std::string &value)
     for (it = m_values->cbegin(); it != m_values->cend(); ++it)
         if (it->second == value) {
             m_value = it->first;
-            m_isSet = true;
+            m_isSet = (m_value != m_defaultValue);
             return true;
         }
     LogError("Parameter '%s' not valid for '%s'", value.c_str(), this->GetKey().c_str());
@@ -516,7 +513,7 @@ bool OptionIntMap::SetValue(int value)
     assert(m_values->count(value));
 
     m_value = value;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
 
     return true;
 }
@@ -584,7 +581,7 @@ bool OptionStaffrel::SetValue(const std::string &value)
         return false;
     }
     m_value = staffrel;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -638,7 +635,7 @@ bool OptionJson::SetValue(const std::string &value)
 {
     bool ok = this->ReadJson(m_values, value);
     if (ok) {
-        m_isSet = true;
+        m_isSet = (this->GetStrValue() != this->GetDefaultStrValue());
     }
     else {
         if (m_source == JsonSource::String) {
