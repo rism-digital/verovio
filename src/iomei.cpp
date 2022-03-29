@@ -3934,8 +3934,9 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
     Measure *unmeasured = NULL;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // content
@@ -4099,8 +4100,9 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
     Measure *unmeasured = NULL;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // section
@@ -4543,6 +4545,7 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         if (!success) {
             break;
         }
+        this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
@@ -5429,8 +5432,9 @@ bool MEIInput::ReadFbChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_FB);
         }
         // content
@@ -6362,6 +6366,7 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         if (!success) {
             break;
         }
+        this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
