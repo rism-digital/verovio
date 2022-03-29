@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "layerelement.h"
 #include "text.h"
 
 namespace vrv {
@@ -50,6 +51,26 @@ bool Fing::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+bool Fing::IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const
+{
+    if (!other->Is(FING)) return false;
+    const Fing *otherFing = vrv_cast<const Fing *>(other);
+
+    const LayerElement *element = dynamic_cast<const LayerElement *>(this->GetStart());
+    const LayerElement *otherElement = dynamic_cast<const LayerElement *>(otherFing->GetStart());
+    if (!element || !otherElement) return false;
+
+    if (drawingPlace == STAFFREL_above) {
+        return (element->GetDrawingY() < otherElement->GetDrawingY());
+    }
+    else if (drawingPlace == STAFFREL_below) {
+        return (element->GetDrawingY() > otherElement->GetDrawingY());
+    }
+    else {
+        return false;
+    }
 }
 
 } // namespace vrv

@@ -288,14 +288,9 @@ void StaffAlignment::SortPositioners()
     if (!m_floatingPositionersSorted) {
         std::stable_sort(m_floatingPositioners.begin(), m_floatingPositioners.end(),
             [](FloatingPositioner *left, FloatingPositioner *right) {
-                // Move fingering elements that should appear closer to the staff to the front
-                if (left->GetObject()->Is(FING) && right->GetObject()->Is(FING)) {
-                    if ((left->GetDrawingPlace() == STAFFREL_above) && (right->GetDrawingPlace() == STAFFREL_above)) {
-                        return (left->GetObjectX()->GetDrawingY() < right->GetObjectX()->GetDrawingY());
-                    }
-                    if ((left->GetDrawingPlace() == STAFFREL_below) && (right->GetDrawingPlace() == STAFFREL_below)) {
-                        return (left->GetObjectX()->GetDrawingY() > right->GetObjectX()->GetDrawingY());
-                    }
+                if ((left->GetObject()->GetClassId() == right->GetObject()->GetClassId())
+                    && (left->GetDrawingPlace() == right->GetDrawingPlace())) {
+                    return left->GetObject()->IsCloserToStaffThan(right->GetObject(), right->GetDrawingPlace());
                 }
                 return false;
             });
