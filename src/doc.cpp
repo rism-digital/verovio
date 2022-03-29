@@ -1052,7 +1052,7 @@ void Doc::CastOffEncodingDoc()
             break;
         }
     }
-    
+
     m_isCastOff = true;
 }
 
