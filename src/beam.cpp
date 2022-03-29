@@ -244,8 +244,8 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
         stem->SetDrawingStemLen(y2 - y1);
     }
 
-    if (doc->GetOptions()->m_beamNoStemExtension.GetValue() && (m_beamElementCoordRefs.size() > 2)) {
-        this->AdjustBeamStemExtension(beamInterface);
+    if (doc->GetOptions()->m_beamFrenchStyle.GetValue() && (m_beamElementCoordRefs.size() > 2)) {
+        this->AdjustBeamToFrenchStyle(beamInterface);
     }
 }
 
@@ -432,7 +432,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
     return true;
 }
 
-void BeamSegment::AdjustBeamStemExtension(BeamDrawingInterface *beamInterface)
+void BeamSegment::AdjustBeamToFrenchStyle(BeamDrawingInterface *beamInterface)
 {
     assert(beamInterface);
 
@@ -443,9 +443,9 @@ void BeamSegment::AdjustBeamStemExtension(BeamDrawingInterface *beamInterface)
         return (coord->m_element && coord->m_element->Is({ CHORD, NOTE }));
     };
     // iterators
-    using VectorIt = ArrayOfBeamElementCoords::iterator;
-    using VectorReverseIt = ArrayOfBeamElementCoords::reverse_iterator;
-    for (VectorIt it = std::next(m_beamElementCoordRefs.begin()); it != std::prev(m_beamElementCoordRefs.end()); ++it) {
+    using CoordIt = ArrayOfBeamElementCoords::iterator;
+    using CoordReverseIt = ArrayOfBeamElementCoords::reverse_iterator;
+    for (CoordIt it = std::next(m_beamElementCoordRefs.begin()); it != std::prev(m_beamElementCoordRefs.end()); ++it) {
         // clear values
         noteDurations.clear();
         if (!isNoteOrChord(*it)) continue;
@@ -454,13 +454,13 @@ void BeamSegment::AdjustBeamStemExtension(BeamDrawingInterface *beamInterface)
         const int val = (*it)->m_breaksec ? std::min((*it)->m_breaksec + DURATION_4, (*it)->m_dur) : (*it)->m_dur;
         noteDurations.insert(val);
         // get next element duration
-        VectorIt nextElement = std::find_if(it + 1, m_beamElementCoordRefs.end(), isNoteOrChord);
+        CoordIt nextElement = std::find_if(it + 1, m_beamElementCoordRefs.end(), isNoteOrChord);
         if (nextElement != m_beamElementCoordRefs.end()) {
             noteDurations.insert((*nextElement)->m_dur);
         }
         // get previous element duration
-        VectorReverseIt reverse = std::make_reverse_iterator(it);
-        VectorReverseIt prevElement = std::find_if(reverse, m_beamElementCoordRefs.rend(), isNoteOrChord);
+        CoordReverseIt reverse = std::make_reverse_iterator(it);
+        CoordReverseIt prevElement = std::find_if(reverse, m_beamElementCoordRefs.rend(), isNoteOrChord);
         if (prevElement != m_beamElementCoordRefs.rend()) {
             const int prevVal = (*prevElement)->m_breaksec
                 ? std::min((*prevElement)->m_breaksec + DURATION_4, (*prevElement)->m_dur)

@@ -639,7 +639,7 @@ public:
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
-    OptionBool m_beamNoStemExtension;
+    OptionBool m_beamFrenchStyle;
     OptionDbl m_bracketThickness;
     OptionDbl m_dynamDist;
     OptionDbl m_clefChangeFactor;
