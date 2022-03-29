@@ -1147,8 +1147,8 @@ Options::Options()
     m_beamMinSlope.Init(0, 0, 0);
     this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
 
-    m_beamFrenchStyle.SetInfo("French style of beams",
-        "For notes in beams, stems will stop at first outermost sub-beam without crossing it");
+    m_beamFrenchStyle.SetInfo(
+        "French style of beams", "For notes in beams, stems will stop at first outermost sub-beam without crossing it");
     m_beamFrenchStyle.Init(false);
     this->Register(&m_beamFrenchStyle, "beamFrenchStyle", &m_generalLayout);
 
