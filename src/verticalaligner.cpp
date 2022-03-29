@@ -461,9 +461,10 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
 {
     assert(doc);
 
+    int spacing = 0;
     const AttSpacing *scoreDefSpacing = this->GetAttSpacing();
 
-    int spacing = 0;
+    if (!scoreDefSpacing) return spacing;
     if (m_staff && m_staff->m_drawingStaffDef) {
         // Default or staffDef spacing
         if (m_staff->m_drawingStaffDef->HasSpacing()) {
