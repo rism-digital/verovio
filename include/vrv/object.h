@@ -1430,6 +1430,9 @@ public:
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
+    virtual int CreateDocSelection(FunctorParams *) { return FUNCTOR_CONTINUE; };
+    virtual int ResetDocSelection(FunctorParams *) { return FUNCTOR_CONTINUE; };
+
 private:
     /**
      * Method for generating the uuid.
