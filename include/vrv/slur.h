@@ -236,6 +236,9 @@ private:
      * Adjust slur position based on overlapping objects within its spanning elements
      */
     ///@{
+    // Calculate slur from bulge values
+    void AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit);
+
     // Discard certain spanned elements
     void FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
