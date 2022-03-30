@@ -898,7 +898,7 @@ int System::AdjustCrossStaffYPos(FunctorParams *functorParams)
         }
     }
 
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 int System::AdjustStaffOverlap(FunctorParams *functorParams)
