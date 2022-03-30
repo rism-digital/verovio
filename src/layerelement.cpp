@@ -2681,7 +2681,7 @@ int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::PrepareSlurs(FunctorParams *)
+int LayerElement::CalcSlurs(FunctorParams *)
 {
     return FUNCTOR_SIBLINGS;
 }

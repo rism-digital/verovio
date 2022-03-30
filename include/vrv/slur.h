@@ -179,9 +179,9 @@ public:
     int ResetDrawing(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareSlurs
+     * See Object::CalcSlurs
      */
-    int PrepareSlurs(FunctorParams *functorParams) override;
+    int CalcSlurs(FunctorParams *functorParams) override;
 
 private:
     /**
@@ -260,7 +260,7 @@ public:
 private:
     /**
      * The drawing curve direction
-     * This is calculated in the PrepareSlurs functor and contains an additional distinction
+     * This is calculated in the CalcSlurs functor and contains an additional distinction
      * for s-shaped slurs / mixed direction
      */
     SlurCurveDirection m_drawingCurveDir;
