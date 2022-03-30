@@ -1052,7 +1052,7 @@ void Doc::CastOffEncodingDoc()
             break;
         }
     }
-    
+
     m_isCastOff = true;
 }
 
@@ -1839,6 +1839,100 @@ ScoreDef *Doc::GetCurrentScoreDef()
 void Doc::SetCurrentScore(Score *score)
 {
     m_currentScore = score;
+}
+
+void Doc::InitSelectionDoc(const std::string &start, const std::string &end)
+{
+    if (this->HasSelection()) {
+        this->ResetSelectionDoc();
+    }
+
+    m_selectionStart = start;
+    m_selectionEnd = end;
+
+    this->ReactivateSelection();
+};
+
+void Doc::ResetSelectionDoc()
+{
+    m_selectionStart = "";
+    m_selectionEnd = "";
+
+    this->UnCastOffDoc();
+}
+
+bool Doc::HasSelection()
+{
+    return (!m_selectionStart.empty());
+}
+
+void Doc::DeactiveateSelection() {}
+
+void Doc::ReactivateSelection()
+{
+    if (this->IsCastOff()) this->UnCastOffDoc();
+
+    Pages *pages = this->GetPages();
+    assert(pages);
+
+    this->ScoreDefSetCurrentDoc();
+
+    Page *unCastOffPage = this->SetDrawingPage(0);
+
+    // Make sure we have global slurs curve dir
+    unCastOffPage->ResetAligners();
+
+    // We can now detach and delete the old content page
+    pages->DetachChild(0);
+    assert(unCastOffPage);
+
+    Page *selectionFirstPage = new Page();
+    pages->AddChild(selectionFirstPage);
+
+    InitSelectionParams initSelectionParams(selectionFirstPage, this, m_selectionStart, m_selectionEnd);
+    Functor initSelection(&Object::InitSelection);
+
+    unCastOffPage->Process(&initSelection, &initSelectionParams);
+
+    delete unCastOffPage;
+
+    this->ResetDrawingPage();
+    this->ScoreDefSetCurrentDoc(true);
+
+    if (pages->GetChildCount() < 2) {
+        LogWarning("Selection could not be made");
+        return;
+    }
+    else if (pages->GetChildCount() == 2) {
+        LogWarning("Selection end '%s' could not be found", m_selectionEnd.c_str());
+        // Add an empty page to make it work
+        pages->AddChild(new Page());
+    }
+
+    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(1));
+    System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
+    Score *score = new Score();
+    *score->GetScoreDef() = *system->GetDrawingScoreDef();
+    score->SetParent(selectionPage);
+    selectionPage->InsertChild(score, 0);
+
+    m_selectionPreceeding = vrv_cast<Page *>(pages->GetChild(0));
+    if (m_selectionPreceeding->FindDescendantByType(MEASURE)) {
+        this->SetDrawingPage(0);
+        m_selectionPreceeding->ResetAligners();
+    }
+
+    m_selectionFollowing = vrv_cast<Page *>(pages->GetChild(2));
+    if (m_selectionFollowing->FindDescendantByType(MEASURE)) {
+        this->SetDrawingPage(2);
+        m_selectionFollowing->ResetAligners();
+    }
+
+    this->SetDrawingPage(1);
+    pages->DetachChild(2);
+    pages->DetachChild(0);
+
+    this->SetDrawingPage(0);
 }
 
 //----------------------------------------------------------------------------

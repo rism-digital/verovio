@@ -1801,6 +1801,38 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// InitSelectionParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the system we are taking the content from
+ * member 1: a pointer the page we are adding system to
+ * member 2: a pointer to the current system
+ * member 3: a pointer to the doc
+ **/
+
+class InitSelectionParams : public FunctorParams {
+public:
+    InitSelectionParams(Page *page, Doc *doc, const std::string &start, const std::string &end)
+    {
+        m_page = page;
+        m_contentSystem = NULL;
+        m_currentSystem = NULL;
+        m_start = start;
+        m_end = end;
+        m_isSelection = false;
+        m_doc = doc;
+    }
+    System *m_contentSystem;
+    Page *m_page;
+    System *m_currentSystem;
+    std::string m_start;
+    std::string m_end;
+    bool m_isSelection;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // JustifyXParams
 //----------------------------------------------------------------------------
 
@@ -2202,20 +2234,6 @@ public:
     }
     MRpt *m_currentMRpt;
     data_BOOLEAN m_multiNumber;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
-// PrepareSlursParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the doc
- **/
-
-class PrepareSlursParams : public FunctorParams {
-public:
-    PrepareSlursParams(Doc *doc) { m_doc = doc; }
     Doc *m_doc;
 };
 

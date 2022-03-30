@@ -106,4 +106,14 @@ int SystemElement::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int SystemElement::InitSelection(FunctorParams *functorParams)
+{
+    InitSelectionParams *params = vrv_params_cast<InitSelectionParams *>(functorParams);
+    assert(params);
+
+    MoveItselfTo(params->m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 } // namespace vrv
