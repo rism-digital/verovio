@@ -232,7 +232,7 @@ void Page::LayOutTranscription(bool force)
     m_layoutDone = true;
 }
 
-void Page::LayOutHorizontally()
+void Page::ResetAligners()
 {
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
@@ -264,7 +264,7 @@ void Page::LayOutHorizontally()
     Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
     AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
-
+    
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
@@ -317,6 +317,23 @@ void Page::LayOutHorizontally()
     Functor calcArtic(&Object::CalcArtic);
     this->Process(&calcArtic, &calcArticParams);
 
+    CalcSlursParams calcSlursParams(doc);
+    Functor calcSlurs(&Object::CalcSlurs);
+    this->Process(&calcSlurs, &calcSlursParams);
+}
+
+
+void Page::LayOutHorizontally()
+{
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
+    
+    this->ResetAligners();
+    
     // Render it for filling the bounding box
     View view;
     view.SetDoc(doc);
@@ -429,11 +446,6 @@ void Page::LayOutHorizontally()
     Functor alignMeasures(&Object::AlignMeasures);
     Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
-
-    // Calculate the slur direction
-    PrepareSlursParams prepareSlursParams(doc);
-    Functor prepareSlurs(&Object::PrepareSlurs);
-    this->Process(&prepareSlurs, &prepareSlursParams);
 
     FunctorDocParams resolveSpanningBeamSpansParams(doc);
     Functor resolveSpanningBeamSpans(&Object::ResolveSpanningBeamSpans);

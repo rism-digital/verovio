@@ -1025,7 +1025,7 @@ void Doc::CastOffEncodingDoc()
 
     Page *unCastOffPage = this->SetDrawingPage(0);
     assert(unCastOffPage);
-    unCastOffPage->LayOutHorizontally();
+    unCastOffPage->ResetAligners();
 
     // Detach the contentPage
     pages->DetachChild(0);

@@ -905,7 +905,7 @@ public:
     /**
      * Calculate the slur direction
      */
-    virtual int PrepareSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
