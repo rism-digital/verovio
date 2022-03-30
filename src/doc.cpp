@@ -124,6 +124,11 @@ void Doc::Reset()
     m_header.reset();
     m_front.reset();
     m_back.reset();
+
+    m_selectionStart = "";
+    m_selectionEnd = "";
+    m_selectionPreceeding = NULL;
+    m_selectionFollowing = NULL;
 }
 
 void Doc::SetType(DocType type)
@@ -1842,28 +1847,51 @@ void Doc::SetCurrentScore(Score *score)
     m_currentScore = score;
 }
 
-void Doc::InitSelectionDoc(DocSelection &selection)
+void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
 {
     // No new selection to apply;
     if (!selection.m_isPending) return;
 
     if (this->HasSelection()) {
-        this->ResetSelectionDoc();
+        this->ResetSelectionDoc(resetCache);
     }
 
     m_selectionStart = selection.m_selectionStart;
     m_selectionEnd = selection.m_selectionEnd;
     selection.m_isPending = false;
 
-    this->ReactivateSelection();
+    if (this->HasSelection()) {
+        this->ReactivateSelection();
+    }
 };
 
-void Doc::ResetSelectionDoc()
+void Doc::ResetSelectionDoc(bool resetCache)
 {
+    assert(m_selectionPreceeding && m_selectionFollowing);
+
     m_selectionStart = "";
     m_selectionEnd = "";
 
-    this->UnCastOffDoc();
+    if (this->IsCastOff()) this->UnCastOffDoc();
+
+    Pages *pages = this->GetPages();
+    assert(pages);
+
+    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(0));
+    assert(selectionPage);
+    Score *score = vrv_cast<Score *>(selectionPage->FindDescendantByType(SCORE));
+    assert(score);
+    selectionPage->DeleteChild(score);
+
+    m_selectionPreceeding->SetParent(pages);
+    pages->InsertChild(m_selectionPreceeding, 0);
+    pages->AddChild(m_selectionFollowing);
+
+    m_selectionPreceeding = NULL;
+    m_selectionFollowing = NULL;
+
+    this->m_isCastOff = true;
+    this->UnCastOffDoc(resetCache);
 }
 
 bool Doc::HasSelection()
@@ -1875,6 +1903,8 @@ void Doc::DeactiveateSelection() {}
 
 void Doc::ReactivateSelection()
 {
+    assert(!m_selectionPreceeding && !m_selectionFollowing);
+
     if (this->IsCastOff()) this->UnCastOffDoc();
 
     Pages *pages = this->GetPages();
@@ -1906,6 +1936,8 @@ void Doc::ReactivateSelection()
 
     if (pages->GetChildCount() < 2) {
         LogWarning("Selection could not be made");
+        m_selectionStart = "";
+        m_selectionEnd = "";
         return;
     }
     else if (pages->GetChildCount() == 2) {

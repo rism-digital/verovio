@@ -696,11 +696,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     m_doc.PrepareDrawing();
-    m_doc.InitSelectionDoc(m_docSelection);
-    // m_doc.InitSelectionDoc("measure-L1681", "measure-L16852");
-    //  m_doc.InitSelectionDoc("d414233e23349", "d414233e23810");
-    //  m_doc.InitSelectionDoc("d1e280556", "d1e313647");
-    //  m_doc.InitSelectionDoc("m99_k457_001", "m109_k457_001");
+    m_doc.InitSelectionDoc(m_docSelection, true);
 
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
@@ -1215,7 +1211,13 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
         return;
     }
 
-    m_doc.UnCastOffDoc(resetCache);
+    if (m_docSelection.m_isPending) {
+        m_doc.InitSelectionDoc(m_docSelection, resetCache);
+    }
+    else {
+        m_doc.UnCastOffDoc(resetCache);
+    }
+
     if (m_options->m_breaks.GetValue() == BREAKS_line) {
         m_doc.CastOffLineDoc();
     }
