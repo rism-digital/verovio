@@ -465,12 +465,6 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     const int unit = doc->GetDrawingUnit(100);
     const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
 
-    // Special handling if bulge is prescribed
-    if (this->HasBulge()) {
-        this->AdjustSlurFromBulge(curve, bezier, unit);
-        return;
-    }
-
     // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
     this->FilterSpannedElements(curve, bezier, margin);
 
@@ -492,6 +486,12 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         }
         bezier.UpdateControlPointParams();
         curve->UpdatePoints(bezier);
+    }
+
+    // Special handling if bulge is prescribed from here on
+    if (this->HasBulge()) {
+        this->AdjustSlurFromBulge(curve, bezier, unit);
+        return;
     }
 
     // STEP 3: Calculate the horizontal offset of the control points.
