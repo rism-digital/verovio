@@ -21,6 +21,7 @@ class MidiFile;
 namespace vrv {
 
 class CastOffPagesParams;
+class DocSelection;
 class FontInfo;
 class Glyph;
 class Pages;
@@ -416,7 +417,7 @@ public:
      */
     bool IsCastOff() const { return m_isCastOff; }
 
-    void InitSelectionDoc(const std::string &start, const std::string &end);
+    void InitSelectionDoc(DocSelection &selection);
     void ResetSelectionDoc();
     bool HasSelection();
     void DeactiveateSelection();
@@ -599,6 +600,34 @@ private:
 
     /** Facsimile information */
     Facsimile *m_facsimile;
+};
+
+//----------------------------------------------------------------------------
+// DocSelection
+//----------------------------------------------------------------------------
+
+/**
+ * This class stores a document selection
+ */
+class DocSelection {
+
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    DocSelection();
+    virtual ~DocSelection(){};
+    ///@}
+
+    bool Parse(const std::string selection);
+
+private:
+    //
+public:
+    std::string m_selectionStart;
+    std::string m_selectionEnd;
+    bool m_isPending;
 };
 
 } // namespace vrv

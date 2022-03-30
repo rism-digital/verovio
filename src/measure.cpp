@@ -1305,20 +1305,28 @@ int Measure::InitSelection(FunctorParams *functorParams)
     assert(params);
 
     const bool startSelection = (!params->m_isSelection && this->GetUuid() == params->m_start);
-    const bool endSelection = (params->m_isSelection && this->GetUuid() == params->m_end);
 
-    if (!startSelection) MoveItselfTo(params->m_currentSystem);
-
-    if (startSelection || endSelection) {
+    if (startSelection) {
         Page *page = new Page();
         params->m_doc->GetPages()->AddChild(page);
         System *system = new System();
         page->AddChild(system);
         params->m_currentSystem = system;
-        params->m_isSelection = !params->m_isSelection;
+        params->m_isSelection = true;
     }
 
-    if (startSelection) MoveItselfTo(params->m_currentSystem);
+    const bool endSelection = (params->m_isSelection && this->GetUuid() == params->m_end);
+
+    MoveItselfTo(params->m_currentSystem);
+
+    if (endSelection) {
+        Page *page = new Page();
+        params->m_doc->GetPages()->AddChild(page);
+        System *system = new System();
+        page->AddChild(system);
+        params->m_currentSystem = system;
+        params->m_isSelection = false;
+    }
 
     return FUNCTOR_SIBLINGS;
 }

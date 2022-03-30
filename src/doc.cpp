@@ -65,6 +65,7 @@
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
+#include "jsonxx.h"
 
 namespace vrv {
 
@@ -1841,14 +1842,18 @@ void Doc::SetCurrentScore(Score *score)
     m_currentScore = score;
 }
 
-void Doc::InitSelectionDoc(const std::string &start, const std::string &end)
+void Doc::InitSelectionDoc(DocSelection &selection)
 {
+    // No new selection to apply;
+    if (!selection.m_isPending) return;
+
     if (this->HasSelection()) {
         this->ResetSelectionDoc();
     }
 
-    m_selectionStart = start;
-    m_selectionEnd = end;
+    m_selectionStart = selection.m_selectionStart;
+    m_selectionEnd = selection.m_selectionEnd;
+    selection.m_isPending = false;
 
     this->ReactivateSelection();
 };
@@ -1933,6 +1938,46 @@ void Doc::ReactivateSelection()
     pages->DetachChild(0);
 
     this->SetDrawingPage(0);
+}
+
+//----------------------------------------------------------------------------
+// DocSelection
+//----------------------------------------------------------------------------
+
+DocSelection::DocSelection()
+{
+    m_isPending = false;
+}
+
+bool DocSelection::Parse(const std::string selection)
+{
+    m_isPending = true;
+    m_selectionStart = "";
+    m_selectionEnd = "";
+
+    jsonxx::Object json;
+
+    // Empty string - we reset the selection
+    if (selection.empty()) return true;
+
+    if (!json.parse(selection)) {
+        LogWarning("Cannot parse JSON std::string. No selection set.");
+        return false;
+    }
+    // No start and no end - we reset the selection
+    else if (!json.has<jsonxx::String>("start") && !json.has<jsonxx::String>("end")) {
+        return true;
+    }
+    else {
+        // Only a start or an end - this is not valid
+        if (!json.has<jsonxx::String>("start") || !json.has<jsonxx::String>("end")) {
+            LogWarning("Selection requires 'start' and 'end'. No selection set.");
+            return false;
+        }
+        m_selectionStart = json.get<jsonxx::String>("start");
+        m_selectionEnd = json.get<jsonxx::String>("end");
+        return true;
+    }
 }
 
 //----------------------------------------------------------------------------
