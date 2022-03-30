@@ -411,6 +411,11 @@ public:
     bool HasCurrentScore() const { return m_currentScore != NULL; }
     ///@}
 
+    /**
+     * Return true if the document has been cast off already.
+     */
+    bool IsCastOff() const { return m_isCastOff; }
+
     //----------//
     // Functors //
     //----------//
@@ -498,6 +503,11 @@ private:
     ///@{
     Score *m_currentScore;
     ///@}
+
+    /**
+     * A flag indicating if the document has been cast off or not.
+     */
+    bool m_isCastOff;
 
     /*
      * The following values are set in the Doc::SetDrawingPage.

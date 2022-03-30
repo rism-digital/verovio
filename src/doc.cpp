@@ -113,6 +113,7 @@ void Doc::Reset()
     m_MIDITimemapTempo = 0.0;
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = false;
+    m_isCastOff = false;
 
     m_facsimile = NULL;
 
@@ -871,7 +872,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     Pages *pages = this->GetPages();
     assert(pages);
 
-    if (pages->GetChildCount() != 1) {
+    if (this->IsCastOff()) {
         LogDebug("Document is already cast off");
         return;
     }
@@ -975,10 +976,17 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     if (optimize) {
         this->ScoreDefOptimizeDoc();
     }
+
+    m_isCastOff = true;
 }
 
 void Doc::UnCastOffDoc(bool resetCache)
 {
+    if (!this->IsCastOff()) {
+        LogDebug("Document is not cast off");
+        return;
+    }
+
     Pages *pages = this->GetPages();
     assert(pages);
 
@@ -999,10 +1007,17 @@ void Doc::UnCastOffDoc(bool resetCache)
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
     this->ScoreDefSetCurrentDoc(true);
+
+    m_isCastOff = false;
 }
 
 void Doc::CastOffEncodingDoc()
 {
+    if (this->IsCastOff()) {
+        LogDebug("Document is already cast off");
+        return;
+    }
+
     this->ScoreDefSetCurrentDoc();
 
     Pages *pages = this->GetPages();
@@ -1037,6 +1052,8 @@ void Doc::CastOffEncodingDoc()
             break;
         }
     }
+
+    m_isCastOff = true;
 }
 
 void Doc::ConvertToPageBasedDoc()
