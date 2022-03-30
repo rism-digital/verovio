@@ -417,8 +417,8 @@ public:
      */
     bool IsCastOff() const { return m_isCastOff; }
 
-    void InitSelectionDoc(DocSelection &selection);
-    void ResetSelectionDoc();
+    void InitSelectionDoc(DocSelection &selection, bool resetCache);
+    void ResetSelectionDoc(bool resetCache);
     bool HasSelection();
     void DeactiveateSelection();
     void ReactivateSelection();

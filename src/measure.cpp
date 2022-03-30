@@ -1308,6 +1308,7 @@ int Measure::InitSelection(FunctorParams *functorParams)
 
     if (startSelection) {
         Page *page = new Page();
+        params->m_page = page;
         params->m_doc->GetPages()->AddChild(page);
         System *system = new System();
         page->AddChild(system);
@@ -1321,6 +1322,7 @@ int Measure::InitSelection(FunctorParams *functorParams)
 
     if (endSelection) {
         Page *page = new Page();
+        params->m_page = page;
         params->m_doc->GetPages()->AddChild(page);
         System *system = new System();
         page->AddChild(system);
