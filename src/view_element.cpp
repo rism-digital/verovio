@@ -263,8 +263,18 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // Check if the note is on the top line or above (add a unit for the note head half size)
             if (note->GetDrawingY() >= y) y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             // Check if the top of the stem is above
-            if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y))
+            if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y)) {
                 y = note->GetDrawingStemEnd(note).y;
+            }
+            else if (note->IsMensuralDur()) {
+                const int verticalCenter = y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+                const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
+                const int drawingDur = note->GetDrawingDur();
+                if ((note->GetStemDir() == STEMDIRECTION_up)
+                    || ((drawingDur > DUR_1) && (stemDir == STEMDIRECTION_up))) {
+                    y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * STANDARD_STEMLENGTH;
+                }
+            }
             // Increase the x position of the accid
             x += note->GetDrawingRadius(m_doc);
         }

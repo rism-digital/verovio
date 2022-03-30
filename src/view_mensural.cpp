@@ -52,30 +52,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     const int yNote = element->GetDrawingY();
     const int xNote = element->GetDrawingX();
     const int drawingDur = note->GetDrawingDur();
-    const int radius = note->GetDrawingRadius(m_doc);
-    const int staffY = staff->GetDrawingY();
     const bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-
-    /************** Stem/notehead direction: **************/
-
-    data_STEMDIRECTION layerStemDir;
-    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-
-    int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-    if (note->HasStemDir()) {
-        stemDir = note->GetStemDir();
-    }
-    else if ((layerStemDir = layer->GetDrawingStemDir(note)) != STEMDIRECTION_NONE) {
-        stemDir = layerStemDir;
-    }
-    else {
-        if (drawingDur < DUR_1) {
-            stemDir = STEMDIRECTION_down;
-        }
-        else {
-            stemDir = (yNote > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
-        }
-    }
 
     /************** Noteheads: **************/
 
@@ -95,6 +72,12 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         // For semibrevis with stem in black notation, encoded with an explicit stem direction
         if (((drawingDur > DUR_1) || ((note->GetStemDir() != STEMDIRECTION_NONE) && mensural_black))
             && note->GetStemVisible() != BOOLEAN_false) {
+            /************** Stem/notehead direction: **************/
+            const int radius = note->GetDrawingRadius(m_doc);
+            const int staffY = staff->GetDrawingY();
+            const int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+            const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
+            /************** Draw stem: **************/
             this->DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
         }
     }
@@ -805,6 +788,32 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
         bottomLeft->y = bottomLeft->y + (int)(length * slope);
         topLeft->y = topLeft->y + (int)(length * slope);
     }
+}
+
+data_STEMDIRECTION View::GetMensuralStemDirection(Layer *layer, Note *note, int verticalCenter)
+{
+    // constants
+    const int drawingDur = note->GetDrawingDur();
+    const int yNote = note->GetDrawingY();
+
+    data_STEMDIRECTION layerStemDir;
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+    if (note->HasStemDir()) {
+        stemDir = note->GetStemDir();
+    }
+    else if ((layerStemDir = layer->GetDrawingStemDir(note)) != STEMDIRECTION_NONE) {
+        stemDir = layerStemDir;
+    }
+    else {
+        if (drawingDur < DUR_1) {
+            stemDir = STEMDIRECTION_down;
+        }
+        else {
+            stemDir = (yNote > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        }
+    }
+
+    return stemDir;
 }
 
 } // namespace vrv
