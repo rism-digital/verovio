@@ -122,6 +122,11 @@ bool Toolkit::SetScale(int scale)
     return m_options->m_scale.SetValue(scale);
 }
 
+bool Toolkit::Select(const std::string &selection)
+{
+    return m_docSelection.Parse(selection);
+}
+
 bool Toolkit::SetOutputTo(std::string const &outputTo)
 {
     if ((outputTo == "humdrum") || (outputTo == "hum")) {
@@ -691,10 +696,11 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     m_doc.PrepareDrawing();
-    m_doc.InitSelectionDoc("measure-L1681", "measure-L16852");
-    // m_doc.InitSelectionDoc("d414233e23349", "d414233e23810");
-    // m_doc.InitSelectionDoc("d1e280556", "d1e313647");
-    // m_doc.InitSelectionDoc("m99_k457_001", "m109_k457_001");
+    m_doc.InitSelectionDoc(m_docSelection);
+    // m_doc.InitSelectionDoc("measure-L1681", "measure-L16852");
+    //  m_doc.InitSelectionDoc("d414233e23349", "d414233e23810");
+    //  m_doc.InitSelectionDoc("d1e280556", "d1e313647");
+    //  m_doc.InitSelectionDoc("m99_k457_001", "m109_k457_001");
 
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
