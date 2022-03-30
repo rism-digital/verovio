@@ -2033,7 +2033,7 @@ bool DocSelection::Parse(const std::string selection)
             }
             else {
                 measureRange = std::regex_replace(measureRange, std::regex(R"([^0-9])"), "");
-                if (!measureRange.empty()) m_selectionRangeEnd = std::stoi(measureRange);
+                if (!measureRange.empty()) m_selectionRangeStart = std::stoi(measureRange);
                 m_selectionRangeEnd = m_selectionRangeStart;
             }
             // Check values
