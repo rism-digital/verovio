@@ -637,17 +637,22 @@ void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezi
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
 
-    const std::list<std::pair<data_VU, data_PERCENT>> bulgeEntries = this->ParseBulge();
+    std::list<std::pair<data_VU, data_PERCENT>> bulgeEntries = this->ParseBulge();
+
+    // Filter admissible values
+    bulgeEntries.erase(std::remove_if(bulgeEntries.begin(), bulgeEntries.end(),
+                           [](const std::pair<data_VU, data_PERCENT> &entry) {
+                               return ((entry.first <= 0.0) || (entry.second <= 0.0) || (entry.second >= 100.0));
+                           }),
+        bulgeEntries.end());
 
     // Get the minimal and maximal lambda
-    double lambdaMin = 0.5;
-    double lambdaMax = 0.5;
+    double lambdaMin = 0.66;
+    double lambdaMax = 0.33;
     for (const std::pair<data_VU, data_PERCENT> &bulgeEntry : bulgeEntries) {
         const double lambda = bulgeEntry.second / 100.0;
-        if ((lambda > 0.0) && (lambda < 1.0) && (bulgeEntry.first > 0.0)) {
-            lambdaMin = std::min(lambda, lambdaMin);
-            lambdaMax = std::max(lambda, lambdaMax);
-        }
+        lambdaMin = std::min(lambda, lambdaMin);
+        lambdaMax = std::max(lambda, lambdaMax);
     }
 
     // Horizontal control point adjustment
@@ -670,12 +675,9 @@ void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezi
 
     for (const std::pair<data_VU, data_PERCENT> &bulgeEntry : bulgeEntries) {
         const double lambda = bulgeEntry.second / 100.0;
-        if ((lambda > 0.0) && (lambda < 1.0) && (bulgeEntry.first > 0.0)) {
-            const double x = (1.0 - lambda) * bezierCurve.p1.x + lambda * bezierCurve.p2.x;
-            const double t = BoundingBox::CalcBezierParamAtPosition(points, x);
-            constraints.push_back(
-                { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), bulgeEntry.first * unit });
-        }
+        const double x = (1.0 - lambda) * bezierCurve.p1.x + lambda * bezierCurve.p2.x;
+        const double t = BoundingBox::CalcBezierParamAtPosition(points, x);
+        constraints.push_back({ 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), bulgeEntry.first * unit });
     }
 
     // Solve these constraints and calculate the vertical control point adjustment
