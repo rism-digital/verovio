@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -1986,6 +1987,8 @@ bool DocSelection::Parse(const std::string selection)
     m_isPending = true;
     m_selectionStart = "";
     m_selectionEnd = "";
+    m_selectionRangeStart = VRV_UNSET;
+    m_selectionRangeEnd = VRV_UNSET;
 
     jsonxx::Object json;
 
@@ -1997,17 +2000,59 @@ bool DocSelection::Parse(const std::string selection)
         return false;
     }
     // No start and no end - we reset the selection
-    else if (!json.has<jsonxx::String>("start") && !json.has<jsonxx::String>("end")) {
+    else if (!json.has<jsonxx::String>("start") && !json.has<jsonxx::String>("end")
+        && !json.has<jsonxx::String>("measureRange")) {
         return true;
     }
     else {
         // Only a start or an end - this is not valid
-        if (!json.has<jsonxx::String>("start") || !json.has<jsonxx::String>("end")) {
-            LogWarning("Selection requires 'start' and 'end'. No selection set.");
-            return false;
+        if (json.has<jsonxx::String>("measureRange")) {
+            std::string measureRange = json.get<jsonxx::String>("measureRange");
+            if (measureRange == "all") {
+                m_selectionRangeStart = -1;
+                m_selectionRangeEnd = -1;
+            }
+            else if (measureRange.find("-") != std::string::npos) {
+                std::size_t pos = measureRange.find("-");
+                std::string startRange = measureRange.substr(0, pos);
+                std::string endRange = measureRange.substr(pos + 1, std::string::npos);
+                if (startRange == "start") {
+                    m_selectionRangeStart = -1;
+                }
+                else {
+                    startRange = std::regex_replace(startRange, std::regex(R"([^0-9])"), "");
+                    if (!startRange.empty()) m_selectionRangeStart = std::stoi(startRange);
+                }
+                if (endRange == "end") {
+                    m_selectionRangeEnd = -1;
+                }
+                else {
+                    endRange = std::regex_replace(endRange, std::regex(R"([^0-9])"), "");
+                    if (!endRange.empty()) m_selectionRangeEnd = std::stoi(endRange);
+                }
+            }
+            else {
+                measureRange = std::regex_replace(measureRange, std::regex(R"([^0-9])"), "");
+                if (!measureRange.empty()) m_selectionRangeEnd = std::stoi(measureRange);
+                m_selectionRangeEnd = m_selectionRangeStart;
+            }
+            // Check values
+            if (m_selectionRangeStart == VRV_UNSET || m_selectionRangeEnd == VRV_UNSET
+                || (m_selectionRangeEnd != -1 && m_selectionRangeStart > m_selectionRangeEnd)) {
+                LogWarning("Selection 'measureRange' could not be parsed. No selection set.");
+                m_selectionRangeStart = VRV_UNSET;
+                m_selectionRangeEnd = VRV_UNSET;
+                return false;
+            }
         }
-        m_selectionStart = json.get<jsonxx::String>("start");
-        m_selectionEnd = json.get<jsonxx::String>("end");
+        else {
+            if (!json.has<jsonxx::String>("start") || !json.has<jsonxx::String>("end")) {
+                LogWarning("Selection requires 'start' and 'end'. No selection set.");
+                return false;
+            }
+            m_selectionStart = json.get<jsonxx::String>("start");
+            m_selectionEnd = json.get<jsonxx::String>("end");
+        }
         return true;
     }
 }

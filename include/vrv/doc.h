@@ -627,6 +627,8 @@ private:
 public:
     std::string m_selectionStart;
     std::string m_selectionEnd;
+    int m_selectionRangeStart;
+    int m_selectionRangeEnd;
     bool m_isPending;
 };
 
