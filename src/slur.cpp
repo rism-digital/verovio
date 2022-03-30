@@ -541,6 +541,27 @@ void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezi
 
     const std::list<std::pair<data_VU, data_PERCENT>> bulgeEntries = this->ParseBulge();
 
+    // Get the minimal and maximal lambda
+    double lambdaMin = 0.5;
+    double lambdaMax = 0.5;
+    for (const std::pair<data_VU, data_PERCENT> &bulgeEntry : bulgeEntries) {
+        const double lambda = bulgeEntry.second / 100.0;
+        if ((lambda > 0.0) && (lambda < 1.0) && (bulgeEntry.first > 0.0)) {
+            lambdaMin = std::min(lambda, lambdaMin);
+            lambdaMax = std::max(lambda, lambdaMax);
+        }
+    }
+
+    // Horizontal control point adjustment
+    lambdaMin /= 2.0;
+    lambdaMax = 1.0 - (1.0 - lambdaMax) / 2.0;
+    const double xMin = (1.0 - lambdaMin) * bezierCurve.p1.x + lambdaMin * bezierCurve.p2.x;
+    const double xMax = (1.0 - lambdaMax) * bezierCurve.p1.x + lambdaMax * bezierCurve.p2.x;
+    bezierCurve.SetLeftControlOffset(xMin - bezierCurve.p1.x);
+    bezierCurve.SetRightControlOffset(bezierCurve.p2.x - xMax);
+    bezierCurve.UpdateControlPoints();
+    curve->UpdatePoints(bezierCurve);
+
     // Generate a control point constraint for each bulge entry
     std::list<ControlPointConstraint> constraints;
     Point points[4];
@@ -559,13 +580,17 @@ void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezi
         }
     }
 
-    // Solve these constraints and calculate the adjustment
+    // Solve these constraints and calculate the vertical control point adjustment
     int leftShift = 0;
     int rightShift = 0;
     std::tie(leftShift, rightShift) = this->SolveControlPointConstraints(constraints);
     bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + leftShift);
     bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + rightShift);
     bezierCurve.UpdateControlPoints();
+    curve->UpdatePoints(bezierCurve);
+
+    // Prevent awkward slur shapes
+    this->AdjustSlurShape(bezierCurve, curve->GetDir(), unit);
     curve->UpdatePoints(bezierCurve);
 
     // Since we are going to redraw it, reset its bounding box
