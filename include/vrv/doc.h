@@ -416,8 +416,8 @@ public:
      */
     bool IsCastOff() const { return m_isCastOff; }
 
-    void PrepareSelection();
-    void ResetSelection();
+    void InitSelectionDoc(const std::string &start, const std::string &end);
+    void ResetSelectionDoc();
     bool HasSelection();
     void DeactiveateSelection();
     void ReactivateSelection();
@@ -443,10 +443,10 @@ private:
     int CalcMusicFontSize();
 
 public:
-    Page *selectionPreceeding;
-    Page *selectionFollowing;
-    std::string selectionStart;
-    std::string selectionEnd;
+    Page *m_selectionPreceeding;
+    Page *m_selectionFollowing;
+    std::string m_selectionStart;
+    std::string m_selectionEnd;
 
     /**
      * A copy of the header tree stored as pugi::xml_document

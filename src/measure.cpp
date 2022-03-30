@@ -26,6 +26,7 @@
 #include "harm.h"
 #include "multirest.h"
 #include "page.h"
+#include "pages.h"
 #include "pedal.h"
 #include "section.h"
 #include "staff.h"
@@ -1296,6 +1297,30 @@ int Measure::CastOffEncoding(FunctorParams *functorParams)
     MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
+}
+
+int Measure::InitSelection(FunctorParams *functorParams)
+{
+    InitSelectionParams *params = vrv_params_cast<InitSelectionParams *>(functorParams);
+    assert(params);
+
+    const bool startSelection = (!params->m_isSelection && this->GetUuid() == params->m_start);
+    const bool endSelection = (params->m_isSelection && this->GetUuid() == params->m_end);
+
+    if (!startSelection) MoveItselfTo(params->m_currentSystem);
+
+    if (startSelection || endSelection) {
+        Page *page = new Page();
+        params->m_doc->GetPages()->AddChild(page);
+        System *system = new System();
+        page->AddChild(system);
+        params->m_currentSystem = system;
+        params->m_isSelection = !params->m_isSelection;
+    }
+
+    if (startSelection) MoveItselfTo(params->m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)

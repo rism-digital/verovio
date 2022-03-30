@@ -254,6 +254,11 @@ public:
     int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
+     * See Object::InitSelection
+     */
+    int InitSelection(FunctorParams *) override;
+
+    /**
      * See Object::AlignMeasures
      */
     int AlignMeasures(FunctorParams *functorParams) override;

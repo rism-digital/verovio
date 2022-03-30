@@ -264,7 +264,7 @@ void Page::ResetAligners()
     Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
     AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
-    
+
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
@@ -322,7 +322,6 @@ void Page::ResetAligners()
     this->Process(&calcSlurs, &calcSlursParams);
 }
 
-
 void Page::LayOutHorizontally()
 {
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
@@ -331,9 +330,9 @@ void Page::LayOutHorizontally()
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
-    
+
     this->ResetAligners();
-    
+
     // Render it for filling the bounding box
     View view;
     view.SetDoc(doc);

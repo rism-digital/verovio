@@ -664,6 +664,16 @@ int ScoreDef::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int ScoreDef::InitSelection(FunctorParams *functorParams)
+{
+    InitSelectionParams *params = vrv_params_cast<InitSelectionParams *>(functorParams);
+    assert(params);
+
+    MoveItselfTo(params->m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int ScoreDef::AlignMeasures(FunctorParams *functorParams)
 {
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);

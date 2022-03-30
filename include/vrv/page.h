@@ -124,6 +124,11 @@ public:
     void JustifyVertically();
 
     /**
+     * Reset and set the horizontal and vertical alignment
+     */
+    void ResetAligners();
+
+    /**
      * Lay out the pitch positions and stems (without redoing the entire layout)
      */
     void LayOutPitchPos();
