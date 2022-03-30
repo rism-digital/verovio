@@ -535,68 +535,6 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     curve->BoundingBox::ResetBoundingBox();
 }
 
-void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, const int unit)
-{
-    if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
-
-    const std::list<std::pair<data_VU, data_PERCENT>> bulgeEntries = this->ParseBulge();
-
-    // Get the minimal and maximal lambda
-    double lambdaMin = 0.5;
-    double lambdaMax = 0.5;
-    for (const std::pair<data_VU, data_PERCENT> &bulgeEntry : bulgeEntries) {
-        const double lambda = bulgeEntry.second / 100.0;
-        if ((lambda > 0.0) && (lambda < 1.0) && (bulgeEntry.first > 0.0)) {
-            lambdaMin = std::min(lambda, lambdaMin);
-            lambdaMax = std::max(lambda, lambdaMax);
-        }
-    }
-
-    // Horizontal control point adjustment
-    lambdaMin /= 2.0;
-    lambdaMax = 1.0 - (1.0 - lambdaMax) / 2.0;
-    const double xMin = (1.0 - lambdaMin) * bezierCurve.p1.x + lambdaMin * bezierCurve.p2.x;
-    const double xMax = (1.0 - lambdaMax) * bezierCurve.p1.x + lambdaMax * bezierCurve.p2.x;
-    bezierCurve.SetLeftControlOffset(xMin - bezierCurve.p1.x);
-    bezierCurve.SetRightControlOffset(bezierCurve.p2.x - xMax);
-    bezierCurve.UpdateControlPoints();
-    curve->UpdatePoints(bezierCurve);
-
-    // Generate a control point constraint for each bulge entry
-    std::list<ControlPointConstraint> constraints;
-    Point points[4];
-    points[0] = bezierCurve.p1;
-    points[1] = bezierCurve.c1;
-    points[2] = bezierCurve.c2;
-    points[3] = bezierCurve.p2;
-
-    for (const std::pair<data_VU, data_PERCENT> &bulgeEntry : bulgeEntries) {
-        const double lambda = bulgeEntry.second / 100.0;
-        if ((lambda > 0.0) && (lambda < 1.0) && (bulgeEntry.first > 0.0)) {
-            const double x = (1.0 - lambda) * bezierCurve.p1.x + lambda * bezierCurve.p2.x;
-            const double t = BoundingBox::CalcBezierParamAtPosition(points, x);
-            constraints.push_back(
-                { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), bulgeEntry.first * unit });
-        }
-    }
-
-    // Solve these constraints and calculate the vertical control point adjustment
-    int leftShift = 0;
-    int rightShift = 0;
-    std::tie(leftShift, rightShift) = this->SolveControlPointConstraints(constraints);
-    bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + leftShift);
-    bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + rightShift);
-    bezierCurve.UpdateControlPoints();
-    curve->UpdatePoints(bezierCurve);
-
-    // Prevent awkward slur shapes
-    this->AdjustSlurShape(bezierCurve, curve->GetDir(), unit);
-    curve->UpdatePoints(bezierCurve);
-
-    // Since we are going to redraw it, reset its bounding box
-    curve->BoundingBox::ResetBoundingBox();
-}
-
 void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
@@ -693,6 +631,68 @@ void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int int
         }
         shiftRight = std::max(shiftRight, intersection);
     }
+}
+
+void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, const int unit)
+{
+    if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
+
+    const std::list<std::pair<data_VU, data_PERCENT>> bulgeEntries = this->ParseBulge();
+
+    // Get the minimal and maximal lambda
+    double lambdaMin = 0.5;
+    double lambdaMax = 0.5;
+    for (const std::pair<data_VU, data_PERCENT> &bulgeEntry : bulgeEntries) {
+        const double lambda = bulgeEntry.second / 100.0;
+        if ((lambda > 0.0) && (lambda < 1.0) && (bulgeEntry.first > 0.0)) {
+            lambdaMin = std::min(lambda, lambdaMin);
+            lambdaMax = std::max(lambda, lambdaMax);
+        }
+    }
+
+    // Horizontal control point adjustment
+    lambdaMin /= 2.0;
+    lambdaMax = 1.0 - (1.0 - lambdaMax) / 2.0;
+    const double xMin = (1.0 - lambdaMin) * bezierCurve.p1.x + lambdaMin * bezierCurve.p2.x;
+    const double xMax = (1.0 - lambdaMax) * bezierCurve.p1.x + lambdaMax * bezierCurve.p2.x;
+    bezierCurve.SetLeftControlOffset(xMin - bezierCurve.p1.x);
+    bezierCurve.SetRightControlOffset(bezierCurve.p2.x - xMax);
+    bezierCurve.UpdateControlPoints();
+    curve->UpdatePoints(bezierCurve);
+
+    // Generate a control point constraint for each bulge entry
+    std::list<ControlPointConstraint> constraints;
+    Point points[4];
+    points[0] = bezierCurve.p1;
+    points[1] = bezierCurve.c1;
+    points[2] = bezierCurve.c2;
+    points[3] = bezierCurve.p2;
+
+    for (const std::pair<data_VU, data_PERCENT> &bulgeEntry : bulgeEntries) {
+        const double lambda = bulgeEntry.second / 100.0;
+        if ((lambda > 0.0) && (lambda < 1.0) && (bulgeEntry.first > 0.0)) {
+            const double x = (1.0 - lambda) * bezierCurve.p1.x + lambda * bezierCurve.p2.x;
+            const double t = BoundingBox::CalcBezierParamAtPosition(points, x);
+            constraints.push_back(
+                { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), bulgeEntry.first * unit });
+        }
+    }
+
+    // Solve these constraints and calculate the vertical control point adjustment
+    int leftShift = 0;
+    int rightShift = 0;
+    std::tie(leftShift, rightShift) = this->SolveControlPointConstraints(constraints);
+    bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + leftShift);
+    bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + rightShift);
+    bezierCurve.UpdateControlPoints();
+    curve->UpdatePoints(bezierCurve);
+
+    // Prevent awkward slur shapes
+    this->AdjustSlurShape(bezierCurve, curve->GetDir(), unit);
+    curve->UpdatePoints(bezierCurve);
+
+    // Since we are going to redraw it, reset its bounding box
+    curve->BoundingBox::ResetBoundingBox();
 }
 
 std::tuple<bool, int, int> Slur::CalcControlPointOffset(
