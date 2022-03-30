@@ -1155,18 +1155,22 @@ void BeamSegment::CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterfac
     const int staffHeight = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
+    if (!m_firstNoteOrChord || !m_lastNoteOrChord) return;
+
     int adjust = 0;
-    const int start = m_beamElementCoordRefs.at(0)->m_yBeam;
+    const int start = m_firstNoteOrChord->m_yBeam;
+    const int end = m_lastNoteOrChord->m_yBeam;
+    const int height = std::abs(end - start);
     if ((start <= staffTop) && (start >= staffTop - staffHeight)) {
         const int positionWithinStaffLines = std::abs((staffTop - start) % (unit * 2));
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
-            if (((positionWithinStaffLines == unit) && (m_beamSlope > 0))
+            if (((positionWithinStaffLines == unit) && (m_beamSlope > 0) && (height != unit))
                 || ((positionWithinStaffLines == 0.5 * unit) && (m_beamSlope < 0))) {
                 adjust = -0.5 * unit;
             }
         }
         else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
-            if (((positionWithinStaffLines == unit) && (m_beamSlope < 0))
+            if (((positionWithinStaffLines == unit) && (m_beamSlope < 0) && (height != unit))
                 || ((positionWithinStaffLines == 1.5 * unit) && (m_beamSlope > 0))) {
                 adjust = 0.5 * unit;
             }
