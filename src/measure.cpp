@@ -1307,12 +1307,10 @@ int Measure::InitSelection(FunctorParams *functorParams)
     const bool startSelection = (!params->m_isSelection && this->GetUuid() == params->m_start);
 
     if (startSelection) {
-        Page *page = new Page();
-        params->m_page = page;
-        params->m_doc->GetPages()->AddChild(page);
-        System *system = new System();
-        page->AddChild(system);
-        params->m_currentSystem = system;
+        params->m_page = new Page();
+        params->m_doc->GetPages()->AddChild(params->m_page);
+        params->m_currentSystem = new System();
+        params->m_page->AddChild(params->m_currentSystem);
         params->m_isSelection = true;
     }
 
@@ -1321,12 +1319,10 @@ int Measure::InitSelection(FunctorParams *functorParams)
     MoveItselfTo(params->m_currentSystem);
 
     if (endSelection) {
-        Page *page = new Page();
-        params->m_page = page;
-        params->m_doc->GetPages()->AddChild(page);
-        System *system = new System();
-        page->AddChild(system);
-        params->m_currentSystem = system;
+        params->m_page = new Page();
+        params->m_doc->GetPages()->AddChild(params->m_page);
+        params->m_currentSystem = new System();
+        params->m_page->AddChild(params->m_currentSystem);
         params->m_isSelection = false;
     }
 
