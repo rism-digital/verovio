@@ -1324,6 +1324,32 @@ const ArrayOfObjects &ObjectListInterface::GetList(Object *node)
     return m_list;
 }
 
+bool ObjectListInterface::HasEmptyList(Object *node)
+{
+    this->ResetList(node);
+    return m_list.empty();
+}
+
+int ObjectListInterface::GetListSize(Object *node)
+{
+    this->ResetList(node);
+    return static_cast<int>(m_list.size());
+}
+
+Object *ObjectListInterface::GetListFront(Object *node)
+{
+    this->ResetList(node);
+    assert(!m_list.empty());
+    return m_list.front();
+}
+
+Object *ObjectListInterface::GetListBack(Object *node)
+{
+    this->ResetList(node);
+    assert(!m_list.empty());
+    return m_list.back();
+}
+
 int ObjectListInterface::GetListIndex(const Object *listElement)
 {
     ArrayOfObjects::iterator iter;

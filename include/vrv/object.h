@@ -1667,6 +1667,17 @@ public:
      */
     const ArrayOfObjects &GetList(Object *node);
 
+    /**
+     * Convenience functions that check if the list is up-to-date
+     * If not, the list is updated before returning the result
+     */
+    ///@{
+    bool HasEmptyList(Object *node);
+    int GetListSize(Object *node);
+    Object *GetListFront(Object *node);
+    Object *GetListBack(Object *node);
+    ///@}
+
 private:
     mutable ArrayOfObjects m_list;
     ArrayOfObjects::iterator m_iteratorCurrent;
