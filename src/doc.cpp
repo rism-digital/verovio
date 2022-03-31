@@ -1856,10 +1856,8 @@ void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
     if (this->HasSelection()) {
         this->ResetSelectionDoc(resetCache);
     }
-
-    m_selectionStart = selection.m_selectionStart;
-    m_selectionEnd = selection.m_selectionEnd;
-    selection.m_isPending = false;
+    
+    selection.Set(this);
 
     if (this->HasSelection()) {
         this->ReactivateSelection();
@@ -1897,7 +1895,7 @@ void Doc::ResetSelectionDoc(bool resetCache)
 
 bool Doc::HasSelection()
 {
-    return (!m_selectionStart.empty());
+    return (!m_selectionStart.empty() && !m_selectionEnd.empty());
 }
 
 void Doc::DeactiveateSelection() {}
@@ -2054,6 +2052,57 @@ bool DocSelection::Parse(const std::string selection)
             m_selectionEnd = json.get<jsonxx::String>("end");
         }
         return true;
+    }
+}
+
+void DocSelection::Set(Doc *doc)
+{
+    assert(doc);
+    
+    m_isPending = false;
+    
+    doc->m_selectionStart = "";
+    doc->m_selectionEnd = "";
+    
+    if (m_selectionRangeStart != VRV_UNSET) {
+        std::string selectionStartId = "";
+        std::string selectionEndId = "";
+        
+        ListOfConstObjects measures;
+        ClassIdComparison matchType(MEASURE);
+        // Depth is this->pages->page-system->measure
+        doc->FindAllDescendantsByComparison(&measures, &matchType, 4);
+        
+        if (measures.empty()) return;
+        
+        if (m_selectionRangeStart == -1) {
+            selectionStartId = measures.front()->GetUuid();
+        }
+        else if (m_selectionRangeStart > 0 && m_selectionRangeStart <= (int)measures.size()) {
+            ListOfConstObjects::const_iterator it = measures.begin();
+            std::advance(it, m_selectionRangeStart - 1);
+            selectionStartId = (*it)->GetUuid();
+        }
+        else {
+            return;
+        }
+        if (m_selectionRangeEnd == -1) {
+            selectionEndId = measures.back()->GetUuid();
+        }
+        else if (m_selectionRangeEnd > 0 && m_selectionRangeEnd <= (int)measures.size()) {
+            ListOfConstObjects::const_iterator it = measures.begin();
+            std::advance(it, m_selectionRangeEnd - 1);
+            selectionEndId = (*it)->GetUuid();
+        }
+        else {
+            return;
+        }
+        doc->m_selectionStart = selectionStartId;
+        doc->m_selectionEnd = selectionEndId;
+    }
+    else {
+        doc->m_selectionStart = m_selectionStart;
+        doc->m_selectionEnd = m_selectionEnd;
     }
 }
 
