@@ -7354,7 +7354,7 @@ void MEIInput::NormalizeAttributes(pugi::xml_node &xmlElement)
         std::string value = elem.value();
 
         if (!std::set<std::string>{ "plist", "staff", "xml:id" }.count(name)) {
-            value.erase(std::remove_if(value.begin(), value.end(), std::isspace), value.end());
+            value.erase(std::remove(value.begin(), value.end(), ' '), value.end());
             elem.set_value(value.c_str());
         }
     }
