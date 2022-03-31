@@ -58,15 +58,14 @@ bool Fing::IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawin
     if (!other->Is(FING)) return false;
     const Fing *otherFing = vrv_cast<const Fing *>(other);
 
-    const LayerElement *element = dynamic_cast<const LayerElement *>(this->GetStart());
-    const LayerElement *otherElement = dynamic_cast<const LayerElement *>(otherFing->GetStart());
-    if (!element || !otherElement) return false;
+    if (!this->GetStart() || this->GetStart()->Is(TIMESTAMP_ATTR)) return false;
+    if (!otherFing->GetStart() || otherFing->GetStart()->Is(TIMESTAMP_ATTR)) return false;
 
     if (drawingPlace == STAFFREL_above) {
-        return (element->GetDrawingY() < otherElement->GetDrawingY());
+        return (this->GetStart()->GetDrawingY() < otherFing->GetStart()->GetDrawingY());
     }
     else if (drawingPlace == STAFFREL_below) {
-        return (element->GetDrawingY() > otherElement->GetDrawingY());
+        return (this->GetStart()->GetDrawingY() > otherFing->GetStart()->GetDrawingY());
     }
     else {
         return false;
