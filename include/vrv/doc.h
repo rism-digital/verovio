@@ -429,8 +429,13 @@ public:
     void InitSelectionDoc(DocSelection &selection, bool resetCache);
     void ResetSelectionDoc(bool resetCache);
     bool HasSelection();
+    /**
+     * Temporarily deactivate and reactivate selection.
+     * Used for example to get the complete MEI data.
+     * No check and cast-off performed.
+     */
     void DeactiveateSelection();
-    void ReactivateSelection();
+    void ReactivateSelection(bool resetAligners);
     ///@}
 
     //----------//

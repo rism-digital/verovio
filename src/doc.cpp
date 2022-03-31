@@ -1920,35 +1920,7 @@ void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
         pages->AddChild(new Page());
     }
 
-    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(1));
-    System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
-    // Add a selection scoreDef based on the current drawing system scoreDef
-    Score *selectionScore = new Score();
-    selectionScore->SetLabel("[selectionScore]");
-    *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
-    selectionScore->SetParent(selectionPage);
-    selectionPage->InsertChild(selectionScore, 0);
-
-    m_selectionPreceeding = vrv_cast<Page *>(pages->GetChild(0));
-    // Reset the aligners because data will be accessed when rendering control events outside the selection
-    if (m_selectionPreceeding->FindDescendantByType(MEASURE)) {
-        this->SetDrawingPage(0);
-        m_selectionPreceeding->ResetAligners();
-    }
-
-    m_selectionFollowing = vrv_cast<Page *>(pages->GetChild(2));
-    // Same for the following content
-    if (m_selectionFollowing->FindDescendantByType(MEASURE)) {
-        this->SetDrawingPage(2);
-        m_selectionFollowing->ResetAligners();
-    }
-
-    // Detach the preceeding and following page
-    this->SetDrawingPage(1);
-    pages->DetachChild(2);
-    pages->DetachChild(0);
-
-    this->SetDrawingPage(0);
+    this->ReactivateSelection(true);
 }
 
 void Doc::ResetSelectionDoc(bool resetCache)
@@ -1960,6 +1932,19 @@ void Doc::ResetSelectionDoc(bool resetCache)
 
     if (this->IsCastOff()) this->UnCastOffDoc();
 
+    this->DeactiveateSelection();
+
+    this->m_isCastOff = true;
+    this->UnCastOffDoc(resetCache);
+}
+
+bool Doc::HasSelection()
+{
+    return (!m_selectionStart.empty() && !m_selectionEnd.empty());
+}
+
+void Doc::DeactiveateSelection()
+{
     Pages *pages = this->GetPages();
     assert(pages);
 
@@ -1977,19 +1962,46 @@ void Doc::ResetSelectionDoc(bool resetCache)
 
     m_selectionPreceeding = NULL;
     m_selectionFollowing = NULL;
-
-    this->m_isCastOff = true;
-    this->UnCastOffDoc(resetCache);
 }
 
-bool Doc::HasSelection()
+void Doc::ReactivateSelection(bool resetAligners)
 {
-    return (!m_selectionStart.empty() && !m_selectionEnd.empty());
+    Pages *pages = this->GetPages();
+    assert(pages);
+
+    const int lastPage = pages->GetChildCount() - 1;
+    assert(lastPage > 1);
+
+    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(1));
+    System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
+    // Add a selection scoreDef based on the current drawing system scoreDef
+    Score *selectionScore = new Score();
+    selectionScore->SetLabel("[selectionScore]");
+    *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
+    selectionScore->SetParent(selectionPage);
+    selectionPage->InsertChild(selectionScore, 0);
+
+    m_selectionPreceeding = vrv_cast<Page *>(pages->GetChild(0));
+    // Reset the aligners because data will be accessed when rendering control events outside the selection
+    if (resetAligners && m_selectionPreceeding->FindDescendantByType(MEASURE)) {
+        this->SetDrawingPage(0);
+        m_selectionPreceeding->ResetAligners();
+    }
+
+    m_selectionFollowing = vrv_cast<Page *>(pages->GetChild(lastPage));
+    // Same for the following content
+    if (resetAligners && m_selectionFollowing->FindDescendantByType(MEASURE)) {
+        this->SetDrawingPage(2);
+        m_selectionFollowing->ResetAligners();
+    }
+
+    // Detach the preceeding and following page
+    this->SetDrawingPage(1);
+    pages->DetachChild(lastPage);
+    pages->DetachChild(0);
+
+    this->SetDrawingPage(0);
 }
-
-void Doc::DeactiveateSelection() {}
-
-void Doc::ReactivateSelection() {}
 
 //----------------------------------------------------------------------------
 // Doc functors methods
