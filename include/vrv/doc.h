@@ -602,38 +602,6 @@ private:
     Facsimile *m_facsimile;
 };
 
-//----------------------------------------------------------------------------
-// DocSelection
-//----------------------------------------------------------------------------
-
-/**
- * This class stores a document selection
- */
-class DocSelection {
-
-public:
-    /**
-     * @name Constructors, destructors
-     */
-    ///@{
-    DocSelection();
-    virtual ~DocSelection(){};
-    ///@}
-
-    bool Parse(const std::string selection);
-    
-    void Set(Doc *doc);
-
-private:
-    //
-public:
-    std::string m_selectionStart;
-    std::string m_selectionEnd;
-    int m_selectionRangeStart;
-    int m_selectionRangeEnd;
-    bool m_isPending;
-};
-
 } // namespace vrv
 
 #endif
