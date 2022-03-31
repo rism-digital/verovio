@@ -53,7 +53,8 @@ bool DocSelection::Parse(const std::string selection)
     // No start and no end - we reset the selection
     else if (!json.has<jsonxx::String>("start") && !json.has<jsonxx::String>("end")
         && !json.has<jsonxx::String>("measureRange")) {
-        return true;
+        LogWarning("Cannot extract a selection.");
+        return false;
     }
     else {
         // Only a start or an end - this is not valid

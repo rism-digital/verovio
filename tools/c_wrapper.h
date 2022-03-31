@@ -47,6 +47,7 @@ void vrvToolkit_redoLayout(void *tkPtr, const char *c_options);
 void vrvToolkit_redoPagePitchPosLayout(void *tkPtr);
 const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *options);
 void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed);
+bool vrvToolkit_select(void *tkPtr, const char *selection);
 void vrvToolkit_setOptions(void *tkPtr, const char *options);
 const char *vrvToolkit_validatePAE(void *tkPtr, const char *data);
 
