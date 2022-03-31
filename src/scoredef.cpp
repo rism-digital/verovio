@@ -490,11 +490,11 @@ void ScoreDef::ResetFromDrawingValues()
 StaffDef *ScoreDef::GetStaffDef(int n)
 {
     this->ResetList(this);
-    const ArrayOfObjects *childList = this->GetList(this);
+    const ArrayOfObjects &childList = this->GetList(this);
     ArrayOfObjects::const_iterator iter;
 
     StaffDef *staffDef = NULL;
-    for (iter = childList->begin(); iter != childList->end(); ++iter) {
+    for (iter = childList.begin(); iter != childList.end(); ++iter) {
         if (!(*iter)->Is(STAFFDEF)) continue;
         staffDef = vrv_cast<StaffDef *>(*iter);
         assert(staffDef);
@@ -523,12 +523,12 @@ StaffGrp *ScoreDef::GetStaffGrp(const std::string &n)
 std::vector<int> ScoreDef::GetStaffNs()
 {
     this->ResetList(this);
-    const ArrayOfObjects *childList = this->GetList(this);
+    const ArrayOfObjects &childList = this->GetList(this);
     ArrayOfObjects::const_iterator iter;
 
     std::vector<int> ns;
     StaffDef *staffDef = NULL;
-    for (iter = childList->begin(); iter != childList->end(); ++iter) {
+    for (iter = childList.begin(); iter != childList.end(); ++iter) {
         // It should be staffDef only, but double check.
         if (!(*iter)->Is(STAFFDEF)) continue;
         staffDef = vrv_cast<StaffDef *>(*iter);

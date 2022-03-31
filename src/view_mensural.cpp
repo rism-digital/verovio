@@ -330,17 +330,16 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     // Render a bracket for the ligature
     if (m_options->m_ligatureAsBracket.GetValue()) {
-        const ArrayOfObjects *notes = ligature->GetList(ligature);
-        assert(notes);
+        const ArrayOfObjects &notes = ligature->GetList(ligature);
 
-        if (notes->size() > 0) {
+        if (notes.size() > 0) {
             int y = staff->GetDrawingY();
             Note *firstNote = ligature->GetFirstNote();
             int x1 = firstNote->GetContentLeft();
             Note *lastNote = ligature->GetLastNote();
             int x2 = lastNote->GetContentRight();
             // Look for the highest note position in the ligature
-            for (auto &iter : *notes) {
+            for (auto &iter : notes) {
                 Note *note = vrv_cast<Note *>(iter);
                 assert(note);
                 y = std::max(y, note->GetContentTop());

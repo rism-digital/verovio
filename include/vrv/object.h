@@ -1665,7 +1665,7 @@ public:
      * If not, it updates the list and also calls FilterList.
      * Because this is an interface, we need to pass the object - not the best design.
      */
-    const ArrayOfObjects *GetList(Object *node);
+    const ArrayOfObjects &GetList(Object *node);
 
 private:
     mutable ArrayOfObjects m_list;

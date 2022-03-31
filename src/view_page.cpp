@@ -137,8 +137,8 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
     }
 
     // longest key signature of the staffDefs
-    const ArrayOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
-    for (ArrayOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); ++it) {
+    const ArrayOfObjects &scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
+    for (ArrayOfObjects::const_iterator it = scoreDefList.begin(); it != scoreDefList.end(); ++it) {
         StaffDef *staffDef = vrv_cast<StaffDef *>(*it);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
@@ -794,14 +794,14 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     }
     else {
         if (barLine->GetForm() == BARRENDITION_NONE) return;
-        const ArrayOfObjects *staffDefs = staffGrp->GetList(staffGrp);
-        if (staffDefs->empty()) {
+        const ArrayOfObjects &staffDefs = staffGrp->GetList(staffGrp);
+        if (staffDefs.empty()) {
             return;
         }
 
         StaffDef *firstDef = NULL;
         ArrayOfObjects::const_iterator iter;
-        for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
+        for (iter = staffDefs.begin(); iter != staffDefs.end(); ++iter) {
             StaffDef *staffDef = vrv_cast<StaffDef *>(*iter);
             assert(staffDef);
             if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
@@ -812,7 +812,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         StaffDef *lastDef = NULL;
         ArrayOfObjects::const_reverse_iterator riter;
-        for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
+        for (riter = staffDefs.rbegin(); riter != staffDefs.rend(); ++riter) {
             StaffDef *staffDef = vrv_cast<StaffDef *>(*riter);
             assert(staffDef);
             if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
@@ -860,8 +860,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if (barLine->HasRepetitionDots()) {
             StaffDef *childStaffDef = NULL;
-            const ArrayOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
-            for (ArrayOfObjects::const_reverse_iterator it = childList->rbegin(); it != childList->rend(); ++it) {
+            const ArrayOfObjects &childList = staffGrp->GetList(staffGrp); // make sure it's initialized
+            for (ArrayOfObjects::const_reverse_iterator it = childList.rbegin(); it != childList.rend(); ++it) {
                 childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
                     AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
@@ -1103,7 +1103,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(staff);
 
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
-    const ArrayOfObjects *childList = meterSigGrp->GetList(meterSigGrp);
+    const ArrayOfObjects &childList = meterSigGrp->GetList(meterSigGrp);
 
     const int glyphSize = staff->GetDrawingStaffNotationSize();
 
@@ -1111,7 +1111,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     int offset = 0;
     dc->StartGraphic(meterSigGrp, "", meterSigGrp->GetUuid());
     // Draw meterSigGrp by alternating meterSig and plus sign (when required)
-    for (auto iter = childList->begin(); iter != childList->end(); ++iter) {
+    for (auto iter = childList.begin(); iter != childList.end(); ++iter) {
         MeterSig *meterSig = vrv_cast<MeterSig *>(*iter);
         assert(meterSig);
 
@@ -1122,7 +1122,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
         const int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
         const int x = meterSig->GetDrawingX() + offset;
         const int width = meterSig->GetContentRight() - meterSig->GetContentLeft();
-        if ((meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_mixed) && (iter != std::prev(childList->end()))) {
+        if ((meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_mixed) && (iter != std::prev(childList.end()))) {
             // draw plus sign here
             const int plusX = x + width + unit / 2;
             this->DrawSmuflCode(dc, plusX, y, SMUFL_E08C_timeSigPlus, glyphSize, false);

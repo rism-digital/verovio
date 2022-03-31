@@ -117,14 +117,14 @@ void BeamDrawingInterface::ClearCoords()
     m_beamElementCoords.clear();
 }
 
-void BeamDrawingInterface::InitCoords(const ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place)
+void BeamDrawingInterface::InitCoords(const ArrayOfObjects &childList, Staff *staff, data_BEAMPLACE place)
 {
     assert(staff);
 
     BeamDrawingInterface::Reset();
     ClearCoords();
 
-    if (childList->empty()) {
+    if (childList.empty()) {
         return;
     }
 
@@ -133,14 +133,14 @@ void BeamDrawingInterface::InitCoords(const ArrayOfObjects *childList, Staff *st
     // duration variables
     int lastDur, currentDur;
 
-    m_beamElementCoords.reserve(childList->size());
+    m_beamElementCoords.reserve(childList.size());
     int i;
-    for (i = 0; i < (int)childList->size(); ++i) {
+    for (i = 0; i < (int)childList.size(); ++i) {
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
 
     // current point to the first Note in the layed out layer
-    LayerElement *current = dynamic_cast<LayerElement *>(childList->front());
+    LayerElement *current = dynamic_cast<LayerElement *>(childList.front());
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());
 
@@ -156,7 +156,7 @@ void BeamDrawingInterface::InitCoords(const ArrayOfObjects *childList, Staff *st
 
     int elementCount = 0;
 
-    ArrayOfObjects::const_iterator iter = childList->begin();
+    ArrayOfObjects::const_iterator iter = childList.begin();
     do {
         // Beam list should contain only DurationInterface objects
         assert(current->GetDurationInterface());
@@ -225,7 +225,7 @@ void BeamDrawingInterface::InitCoords(const ArrayOfObjects *childList, Staff *st
         elementCount++;
 
         ++iter;
-        if (iter == childList->end()) {
+        if (iter == childList.end()) {
             break;
         }
         current = dynamic_cast<LayerElement *>(*iter);
@@ -479,7 +479,7 @@ bool BeamDrawingInterface::IsFirstIn(Object *object, LayerElement *element)
 
 bool BeamDrawingInterface::IsLastIn(Object *object, LayerElement *element)
 {
-    int size = (int)this->GetList(object)->size();
+    int size = (int)this->GetList(object).size();
     int position = this->GetPosition(object, element);
     // This method should be called only if the note is part of a beam
     assert(position != -1);
@@ -619,8 +619,8 @@ void StaffDefDrawingInterface::SetCurrentMeterSigGrp(MeterSigGrp const *meterSig
 bool StaffDefDrawingInterface::DrawMeterSigGrp()
 {
     if (m_drawMeterSigGrp) {
-        const ArrayOfObjects *childList = m_currentMeterSigGrp.GetList(&m_currentMeterSigGrp);
-        if (childList->size() > 1) return true;
+        const ArrayOfObjects &childList = m_currentMeterSigGrp.GetList(&m_currentMeterSigGrp);
+        if (childList.size() > 1) return true;
     }
     return false;
 }

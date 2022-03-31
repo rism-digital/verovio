@@ -391,8 +391,8 @@ int RunningElement::InitializeDrawing(FunctorParams *functorParams)
         m_drawingScalingPercent[i] = 100;
     }
 
-    const ArrayOfObjects *childList = this->GetList(this);
-    for (ArrayOfObjects::const_iterator iter = childList->begin(); iter != childList->end(); ++iter) {
+    const ArrayOfObjects &childList = this->GetList(this);
+    for (ArrayOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
         int pos = 0;
         AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
         assert(interface);

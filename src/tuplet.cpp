@@ -396,7 +396,7 @@ void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
         return;
     }
 
-    const ArrayOfObjects *tupletChildren = this->GetList(this);
+    const ArrayOfObjects &tupletChildren = this->GetList(this);
 
     // There are unbeamed notes of two different beams
     // treat all the notes as unbeamed
@@ -404,8 +404,8 @@ void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
 
     // The first step is to calculate all the stem directions
     // cycle into the elements and count the up and down dirs
-    ArrayOfObjects::const_iterator iter = tupletChildren->begin();
-    while (iter != tupletChildren->end()) {
+    ArrayOfObjects::const_iterator iter = tupletChildren.begin();
+    while (iter != tupletChildren.end()) {
         if ((*iter)->Is(CHORD)) {
             Chord *currentChord = vrv_cast<Chord *>(*iter);
             assert(currentChord);

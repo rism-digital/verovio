@@ -2068,10 +2068,10 @@ int Beam::CalcStem(FunctorParams *functorParams)
 
     if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
 
-    const ArrayOfObjects *beamChildren = this->GetList(this);
+    const ArrayOfObjects &beamChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
-    if (beamChildren->empty()) {
+    if (beamChildren.empty()) {
         return FUNCTOR_CONTINUE;
     }
 

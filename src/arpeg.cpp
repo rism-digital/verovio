@@ -112,8 +112,8 @@ std::set<Note *> Arpeg::GetNotes()
         }
         else if (object->Is(CHORD)) {
             Chord *chord = vrv_cast<Chord *>(object);
-            const ArrayOfObjects *childList = chord->GetList(chord);
-            for (Object *child : *childList) {
+            const ArrayOfObjects &childList = chord->GetList(chord);
+            for (Object *child : childList) {
                 Note *note = vrv_cast<Note *>(child);
                 assert(note);
                 notes.insert(note);

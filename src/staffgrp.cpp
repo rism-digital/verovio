@@ -112,14 +112,14 @@ void StaffGrp::FilterList(ArrayOfConstObjects &childList)
 int StaffGrp::GetMaxStaffSize()
 {
     this->ResetList(this);
-    const ArrayOfObjects *childList = this->GetList(this);
+    const ArrayOfObjects &childList = this->GetList(this);
 
-    if (childList->empty()) return 100;
+    if (childList.empty()) return 100;
 
     int max = 0;
 
     StaffDef *staffDef = NULL;
-    for (auto &child : *childList) {
+    for (auto &child : childList) {
         staffDef = vrv_cast<StaffDef *>(child);
         assert(staffDef);
         if (staffDef->HasScale() && staffDef->GetScale() >= max) {
@@ -135,14 +135,14 @@ int StaffGrp::GetMaxStaffSize()
 
 std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
 {
-    const ArrayOfObjects *staffDefs = this->GetList(this);
-    if (staffDefs->empty()) {
+    const ArrayOfObjects &staffDefs = this->GetList(this);
+    if (staffDefs.empty()) {
         return { NULL, NULL };
     }
 
     StaffDef *firstDef = NULL;
     ArrayOfObjects::const_iterator iter;
-    for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
+    for (iter = staffDefs.begin(); iter != staffDefs.end(); ++iter) {
         StaffDef *staffDef = vrv_cast<StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
@@ -153,7 +153,7 @@ std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
 
     StaffDef *lastDef = NULL;
     ArrayOfObjects::const_reverse_iterator riter;
-    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
+    for (riter = staffDefs.rbegin(); riter != staffDefs.rend(); ++riter) {
         StaffDef *staffDef = vrv_cast<StaffDef *>(*riter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {

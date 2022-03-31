@@ -64,21 +64,21 @@ bool Ligature::IsSupportedChild(Object *child)
 
 Note *Ligature::GetFirstNote()
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
+    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
+    assert(childList.size() > 0);
 
-    Note *firstNote = vrv_cast<Note *>(childList->front());
+    Note *firstNote = vrv_cast<Note *>(childList.front());
     assert(firstNote);
     return firstNote;
 }
 
 Note *Ligature::GetLastNote()
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
+    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
+    assert(childList.size() > 0);
 
     // The first note is the bottom
-    Note *lastNote = vrv_cast<Note *>(childList->back());
+    Note *lastNote = vrv_cast<Note *>(childList.back());
     assert(lastNote);
     return lastNote;
 }
@@ -124,12 +124,11 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
     m_drawingShapes.clear();
 
-    Note *lastNote = dynamic_cast<Note *>(this->GetList(this)->back());
+    Note *lastNote = dynamic_cast<Note *>(this->GetList(this).back());
     Staff *staff = this->GetAncestorStaff();
 
-    const ArrayOfObjects *notes = this->GetList(this);
-    assert(notes);
-    if (notes->size() < 2) return FUNCTOR_SIBLINGS;
+    const ArrayOfObjects &notes = this->GetList(this);
+    if (notes.size() < 2) return FUNCTOR_SIBLINGS;
 
     Note *previousNote = NULL;
     bool previousUp = false;
@@ -138,12 +137,12 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
     bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     bool oblique = false;
-    if ((notes->size() == 2) && this->GetForm() == LIGATUREFORM_obliqua) oblique = true;
+    if ((notes.size() == 2) && this->GetForm() == LIGATUREFORM_obliqua) oblique = true;
 
     // For better clarify, we loop withing the Ligature::CalcLigatureNotePos instead of
     // implementing Note::CalcLigatureNotePos.
 
-    for (auto &iter : *notes) {
+    for (auto &iter : notes) {
 
         Note *note = vrv_cast<Note *>(iter);
         assert(note);
@@ -287,7 +286,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     previousNote = NULL;
     n1 = 0;
 
-    for (auto &iter : *notes) {
+    for (auto &iter : notes) {
 
         Note *note = vrv_cast<Note *>(iter);
         assert(note);

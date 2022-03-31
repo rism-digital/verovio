@@ -197,10 +197,10 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    const ArrayOfObjects *fTremChildren = this->GetList(this);
+    const ArrayOfObjects &fTremChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
-    if (fTremChildren->empty()) {
+    if (fTremChildren.empty()) {
         return FUNCTOR_CONTINUE;
     }
 
