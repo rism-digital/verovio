@@ -816,6 +816,16 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
 
+    bool hadSelection = false;
+    if (m_doc.HasSelection()) {
+        if (!scoreBased) {
+            LogError("Page-based MEI output is not possible when a selection is set.");
+            return "";
+        }
+        hadSelection = true;
+        m_doc.DeactiveateSelection();
+    }
+
     MEIOutput meioutput(&m_doc);
     meioutput.SetScoreBasedMEI(scoreBased);
 
@@ -831,6 +841,9 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     if (!mdiv.empty()) meioutput.SetMdiv(mdiv);
 
     std::string output = meioutput.GetOutput();
+
+    if (hadSelection) m_doc.ReactivateSelection(false);
+
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return output;
 }
