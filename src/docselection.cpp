@@ -39,6 +39,7 @@ bool DocSelection::Parse(const std::string selection)
     m_selectionEnd = "";
     m_selectionRangeStart = VRV_UNSET;
     m_selectionRangeEnd = VRV_UNSET;
+    m_measureRange = "";
 
     jsonxx::Object json;
 
@@ -57,15 +58,15 @@ bool DocSelection::Parse(const std::string selection)
     else {
         // Only a start or an end - this is not valid
         if (json.has<jsonxx::String>("measureRange")) {
-            std::string measureRange = json.get<jsonxx::String>("measureRange");
-            if (measureRange == "all") {
+            m_measureRange = json.get<jsonxx::String>("measureRange");
+            if (m_measureRange == "all") {
                 m_selectionRangeStart = -1;
                 m_selectionRangeEnd = -1;
             }
-            else if (measureRange.find("-") != std::string::npos) {
-                std::size_t pos = measureRange.find("-");
-                std::string startRange = measureRange.substr(0, pos);
-                std::string endRange = measureRange.substr(pos + 1, std::string::npos);
+            else if (m_measureRange.find("-") != std::string::npos) {
+                std::size_t pos = m_measureRange.find("-");
+                std::string startRange = m_measureRange.substr(0, pos);
+                std::string endRange = m_measureRange.substr(pos + 1, std::string::npos);
                 if (startRange == "start") {
                     m_selectionRangeStart = -1;
                 }
@@ -82,8 +83,8 @@ bool DocSelection::Parse(const std::string selection)
                 }
             }
             else {
-                measureRange = std::regex_replace(measureRange, std::regex(R"([^0-9])"), "");
-                if (!measureRange.empty()) m_selectionRangeStart = std::stoi(measureRange);
+                std::string measureRangeInt = std::regex_replace(m_measureRange, std::regex(R"([^0-9])"), "");
+                if (!measureRangeInt.empty()) m_selectionRangeStart = std::stoi(measureRangeInt);
                 m_selectionRangeEnd = m_selectionRangeStart;
             }
             // Check values
@@ -125,7 +126,10 @@ void DocSelection::Set(Doc *doc)
         // Depth is this->pages->page-system->measure
         doc->FindAllDescendantsByComparison(&measures, &matchType, 4);
 
-        if (measures.empty()) return;
+        if (measures.empty()) {
+            LogWarning("No measure found for selection '%s'.", m_measureRange.c_str());
+            return;
+        }
 
         if (m_selectionRangeStart == -1) {
             selectionStartId = measures.front()->GetUuid();
@@ -136,8 +140,10 @@ void DocSelection::Set(Doc *doc)
             selectionStartId = (*it)->GetUuid();
         }
         else {
+            LogWarning("Measure range start for selection '%s' could not be found.", m_measureRange.c_str());
             return;
         }
+
         if (m_selectionRangeEnd == -1) {
             selectionEndId = measures.back()->GetUuid();
         }
@@ -147,6 +153,7 @@ void DocSelection::Set(Doc *doc)
             selectionEndId = (*it)->GetUuid();
         }
         else {
+            LogWarning("Measure range end for selection '%s' could not be found.", m_measureRange.c_str());
             return;
         }
         doc->m_selectionStart = selectionStartId;
