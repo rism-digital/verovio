@@ -60,6 +60,11 @@ public:
     void Reset() override;
 
     /**
+     * Clear the selection pages.
+     */
+    void ClearSelectionPages();
+
+    /**
      * Refreshes the views from Doc.
      */
     virtual void Refresh();
@@ -417,11 +422,16 @@ public:
      */
     bool IsCastOff() const { return m_isCastOff; }
 
+    /**
+     * @name Methods for managing a selection.
+     */
+    ///@{
     void InitSelectionDoc(DocSelection &selection, bool resetCache);
     void ResetSelectionDoc(bool resetCache);
     bool HasSelection();
     void DeactiveateSelection();
     void ReactivateSelection();
+    ///@}
 
     //----------//
     // Functors //
