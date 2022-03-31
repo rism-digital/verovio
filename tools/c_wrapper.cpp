@@ -263,6 +263,12 @@ void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed)
     tk->ResetXmlIdSeed(seed);
 }
 
+bool vrvToolkit_select(void *tkPtr, const char *selection)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->Select(selection);
+}
+
 void vrvToolkit_setOptions(void *tkPtr, const char *options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
