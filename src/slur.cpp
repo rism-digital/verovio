@@ -128,29 +128,23 @@ curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
 std::list<std::pair<data_VU, data_PERCENT>> Slur::ParseBulge() const
 {
     // Split content by spaces
-    std::string content = this->GetBulge();
-    std::list<std::string> entries;
-    size_t pos = 0;
-    while ((pos = content.find(' ')) != std::string::npos) {
-        if (pos > 0) entries.push_back(content.substr(0, pos));
-        content.erase(0, pos + 1);
+    std::istringstream content;
+    content.str(this->GetBulge());
+    std::vector<std::string> entries;
+    std::string token;
+    while (std::getline(content, token, ' ')) {
+        entries.push_back(token);
     }
-    if (!content.empty()) entries.push_back(content);
 
-    // Convert entries to numerical values
+    // Convert entries to numerical and filter admissible values
     std::list<std::pair<data_VU, data_PERCENT>> result;
     Att converter;
-    data_VU distance = 0.0;
-    bool parseDistanceNext = true;
-    for (const std::string &entry : entries) {
-        if (parseDistanceNext) {
-            distance = converter.StrToVU(entry);
-        }
-        else {
-            const data_PERCENT offset = converter.StrToPercent(entry);
-            result.push_back({ distance, offset });
-        }
-        parseDistanceNext = !parseDistanceNext;
+    for (int i = 0; i < entries.size() - 1; i += 2) {
+        const data_VU distance = converter.StrToVU(entries[i]);
+        if ((distance == VRV_UNSET) || (distance <= 0.0)) continue;
+        const data_PERCENT offset = converter.StrToPercent(entries[i + 1]);
+        if ((offset <= 0.0) || (offset >= 100.0)) continue;
+        result.push_back({ distance, offset });
     }
     return result;
 }
@@ -638,13 +632,6 @@ void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezi
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
 
     std::list<std::pair<data_VU, data_PERCENT>> bulgeEntries = this->ParseBulge();
-
-    // Filter admissible values
-    bulgeEntries.erase(std::remove_if(bulgeEntries.begin(), bulgeEntries.end(),
-                           [](const std::pair<data_VU, data_PERCENT> &entry) {
-                               return ((entry.first <= 0.0) || (entry.second <= 0.0) || (entry.second >= 100.0));
-                           }),
-        bulgeEntries.end());
 
     // Get the minimal and maximal lambda
     double lambdaMin = 0.66;
