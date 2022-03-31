@@ -85,6 +85,11 @@ public:
      */
     virtual bool IsExtenderElement() const { return false; }
 
+    /**
+     * Check whether the current object must be positioned closer to the staff than the other
+     */
+    virtual bool IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const { return false; }
+
     //----------//
     // Functors //
     //----------//

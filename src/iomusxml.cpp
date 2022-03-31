@@ -2560,6 +2560,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     m_durFb = 0;
 
     LayerElement *element = NULL;
+    Note *note = NULL;
 
     bool nextIsChord = false;
     double onset = m_durTotal; // keep note onsets for later
@@ -2713,7 +2714,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
     }
     else {
-        Note *note = new Note();
+        note = new Note();
         element = note;
         note->SetVisible(ConvertWordToBool(node.attribute("print-object").as_string()));
         note->SetColor(node.attribute("color").as_string());
@@ -3247,7 +3248,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         Text *text = new Text();
         text->SetText(UTF8to16(fingText));
         m_controlElements.push_back({ measureNum, fing });
-        fing->SetStartid(m_ID);
+        const std::string startID = note ? ("#" + note->GetUuid()) : m_ID;
+        fing->SetStartid(startID);
         fing->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         fing->SetPlace(fing->AttPlacementRelStaff::StrToStaffrel(xmlFing.node().attribute("placement").as_string()));
         fing->AddChild(text);
