@@ -77,17 +77,25 @@ Doc::Doc() : Object(DOC, "doc-")
 {
     m_options = new Options();
 
+    // owned pointers need to be set to NULL;
+    m_selectionPreceeding = NULL;
+    m_selectionFollowing = NULL;
+
     this->Reset();
 }
 
 Doc::~Doc()
 {
+    this->ClearSelectionPages();
+
     delete m_options;
 }
 
 void Doc::Reset()
 {
     Object::Reset();
+
+    this->ClearSelectionPages();
 
     m_type = Raw;
     m_notationType = NOTATIONTYPE_NONE;
@@ -124,11 +132,20 @@ void Doc::Reset()
     m_header.reset();
     m_front.reset();
     m_back.reset();
+}
 
+void Doc::ClearSelectionPages()
+{
+    if (m_selectionPreceeding) {
+        delete m_selectionPreceeding;
+        m_selectionPreceeding = NULL;
+    }
+    if (m_selectionFollowing) {
+        delete m_selectionFollowing;
+        m_selectionFollowing = NULL;
+    }
     m_selectionStart = "";
     m_selectionEnd = "";
-    m_selectionPreceeding = NULL;
-    m_selectionFollowing = NULL;
 }
 
 void Doc::SetType(DocType type)
@@ -1858,49 +1875,8 @@ void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
 
     selection.Set(this);
 
-    if (this->HasSelection()) {
-        this->ReactivateSelection();
-    }
-};
+    if (!this->HasSelection()) return;
 
-void Doc::ResetSelectionDoc(bool resetCache)
-{
-    assert(m_selectionPreceeding && m_selectionFollowing);
-
-    m_selectionStart = "";
-    m_selectionEnd = "";
-
-    if (this->IsCastOff()) this->UnCastOffDoc();
-
-    Pages *pages = this->GetPages();
-    assert(pages);
-
-    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(0));
-    assert(selectionPage);
-    Score *score = vrv_cast<Score *>(selectionPage->FindDescendantByType(SCORE));
-    assert(score);
-    selectionPage->DeleteChild(score);
-
-    m_selectionPreceeding->SetParent(pages);
-    pages->InsertChild(m_selectionPreceeding, 0);
-    pages->AddChild(m_selectionFollowing);
-
-    m_selectionPreceeding = NULL;
-    m_selectionFollowing = NULL;
-
-    this->m_isCastOff = true;
-    this->UnCastOffDoc(resetCache);
-}
-
-bool Doc::HasSelection()
-{
-    return (!m_selectionStart.empty() && !m_selectionEnd.empty());
-}
-
-void Doc::DeactiveateSelection() {}
-
-void Doc::ReactivateSelection()
-{
     assert(!m_selectionPreceeding && !m_selectionFollowing);
 
     if (this->IsCastOff()) this->UnCastOffDoc();
@@ -1946,29 +1922,74 @@ void Doc::ReactivateSelection()
 
     Page *selectionPage = vrv_cast<Page *>(pages->GetChild(1));
     System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
-    Score *score = new Score();
-    *score->GetScoreDef() = *system->GetDrawingScoreDef();
-    score->SetParent(selectionPage);
-    selectionPage->InsertChild(score, 0);
+    // Add a selection scoreDef based on the current drawing system scoreDef
+    Score *selectionScore = new Score();
+    selectionScore->SetLabel("[selectionScore]");
+    *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
+    selectionScore->SetParent(selectionPage);
+    selectionPage->InsertChild(selectionScore, 0);
 
     m_selectionPreceeding = vrv_cast<Page *>(pages->GetChild(0));
+    // Reset the aligners because data will be accessed when rendering control events outside the selection
     if (m_selectionPreceeding->FindDescendantByType(MEASURE)) {
         this->SetDrawingPage(0);
         m_selectionPreceeding->ResetAligners();
     }
 
     m_selectionFollowing = vrv_cast<Page *>(pages->GetChild(2));
+    // Same for the following content
     if (m_selectionFollowing->FindDescendantByType(MEASURE)) {
         this->SetDrawingPage(2);
         m_selectionFollowing->ResetAligners();
     }
 
+    // Detach the preceeding and following page
     this->SetDrawingPage(1);
     pages->DetachChild(2);
     pages->DetachChild(0);
 
     this->SetDrawingPage(0);
 }
+
+void Doc::ResetSelectionDoc(bool resetCache)
+{
+    assert(m_selectionPreceeding && m_selectionFollowing);
+
+    m_selectionStart = "";
+    m_selectionEnd = "";
+
+    if (this->IsCastOff()) this->UnCastOffDoc();
+
+    Pages *pages = this->GetPages();
+    assert(pages);
+
+    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(0));
+    assert(selectionPage);
+    // We need to delete the selection scoreDef
+    Score *selectionScore = vrv_cast<Score *>(selectionPage->FindDescendantByType(SCORE));
+    assert(selectionScore);
+    if (selectionScore->GetLabel() != "[selectionScore]") LogError("Deleting wrong score element. Something is wrong");
+    selectionPage->DeleteChild(selectionScore);
+
+    m_selectionPreceeding->SetParent(pages);
+    pages->InsertChild(m_selectionPreceeding, 0);
+    pages->AddChild(m_selectionFollowing);
+
+    m_selectionPreceeding = NULL;
+    m_selectionFollowing = NULL;
+
+    this->m_isCastOff = true;
+    this->UnCastOffDoc(resetCache);
+}
+
+bool Doc::HasSelection()
+{
+    return (!m_selectionStart.empty() && !m_selectionEnd.empty());
+}
+
+void Doc::DeactiveateSelection() {}
+
+void Doc::ReactivateSelection() {}
 
 //----------------------------------------------------------------------------
 // Doc functors methods
