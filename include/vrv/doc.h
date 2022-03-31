@@ -621,6 +621,8 @@ public:
     ///@}
 
     bool Parse(const std::string selection);
+    
+    void Set(Doc *doc);
 
 private:
     //
