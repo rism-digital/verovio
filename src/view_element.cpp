@@ -1503,6 +1503,7 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
     const int noteLoc = note->GetDrawingLoc();
     const wchar_t code = element->StemModToGlyph(stemMod);
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int glyphHalfHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) / 2;
     int height = 2 * unit;
     const int sign = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     switch (stemMod) {
@@ -1513,7 +1514,7 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
         case STEMMODIFIER_5slash:
         case STEMMODIFIER_6slash: {
             if (noteLoc % 2 == 0) height += unit;
-            height += m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) / 2;
+            height += glyphHalfHeight;
             if (stemMod == STEMMODIFIER_6slash)
                 height += m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false) / 2;
             break;
@@ -1521,25 +1522,31 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
         case STEMMODIFIER_sprech:
         case STEMMODIFIER_z: {
             height += (noteLoc % 2) ? 3 * unit : 2 * unit;
-            if (stemMod == STEMMODIFIER_sprech)
-                height -= sign * m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) / 2;
+            if (stemMod == STEMMODIFIER_sprech) height -= sign * glyphHalfHeight;
             break;
         }
         default: return;
     }
 
-    // calculate position for the stem mod
-    int y = note->GetDrawingY() + sign * height;
-    int x = stemX;
-    if (drawingDur <= DUR_1) x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
-
     // calculate additional adjustments for beamed elements
     Beam *beam = childElement->IsInBeam();
     if (beam) {
-        const int beamStep = -sign
+        int beamMargin = (sign > 0) ? childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize)
+                                    : childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+        beamMargin -= sign
             * ((drawingDur - DUR_8) * (beam->m_beamWidthBlack + beam->m_beamWidthWhite) + beam->m_beamWidthWhite);
-        if ((beamStep) > (sign * unit)) y += beamStep;
+        const int modMargin = note->GetDrawingY() + sign * (height + glyphHalfHeight);
+        const int diff = sign * (modMargin - beamMargin);
+        if (diff > 0) {
+            const int halfUnit = 0.5 * unit;
+            height -= (diff / halfUnit + 1) * halfUnit;
+        }
     }
+
+    // calculate position for the stem mod
+    const int y = note->GetDrawingY() + sign * height;
+    const int x = (drawingDur <= DUR_1) ? childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc) : stemX;
+
     if ((code != SMUFL_E645_vocalSprechgesang) || !element->Is(BTREM)) {
         int adjust = 0;
         if (stemMod == STEMMODIFIER_6slash) {
