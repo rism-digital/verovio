@@ -288,9 +288,16 @@ void StaffAlignment::SortPositioners()
     if (!m_floatingPositionersSorted) {
         std::stable_sort(m_floatingPositioners.begin(), m_floatingPositioners.end(),
             [](FloatingPositioner *left, FloatingPositioner *right) {
-                if ((left->GetObject()->GetClassId() == right->GetObject()->GetClassId())
-                    && (left->GetDrawingPlace() == right->GetDrawingPlace())) {
-                    return left->GetObject()->IsCloserToStaffThan(right->GetObject(), right->GetDrawingPlace());
+                if (left->GetObject()->GetClassId() == right->GetObject()->GetClassId()) {
+                    if (left->GetDrawingPlace() == right->GetDrawingPlace()) {
+                        return left->GetObject()->IsCloserToStaffThan(right->GetObject(), right->GetDrawingPlace());
+                    }
+                    else {
+                        return (left->GetDrawingPlace() < right->GetDrawingPlace());
+                    }
+                }
+                else {
+                    return (left->GetObject()->GetClassId() < right->GetObject()->GetClassId());
                 }
                 return false;
             });
