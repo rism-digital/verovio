@@ -1028,7 +1028,7 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
             }
             // Here we should look at duration too because longer values in the middle could actually be OK as they are
             else if (((coord != m_lastNoteOrChord) || (coord != m_firstNoteOrChord)) && (coord->m_dur > DUR_8)) {
-                const int durLen = len - unit;
+                const int durLen = len - 0.9 * unit;
                 if (durLen < refLen) {
                     lengthen = true;
                     break;
