@@ -89,8 +89,6 @@ public:
     void DrawText(const std::string &text, const std::wstring &wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET,
         int width = VRV_UNSET, int height = VRV_UNSET) override;
     void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) override;
-    void DrawEnclosedMusicText(
-        const std::wstring &text, int x, int y, int encloseY, bool setSmuflGlyph = false) override;
     void DrawSpline(int n, Point points[]) override;
     void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) override;
     void DrawBackgroundImage(int x = 0, int y = 0) override;
@@ -254,11 +252,6 @@ private:
      * Internal method for drawing debug SVG bounding box
      */
     void DrawSvgBoundingBoxRectangle(int x, int y, int width, int height);
-
-    /**
-     * Internal method for drawing SVG glyph
-     */
-    void DrawSvgGlyph(Glyph *glyph, const std::string &hrefAttrib, int x, int y);
 
     /**
      * Change the flag for indicating the use of the VerovioText font

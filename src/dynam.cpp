@@ -99,23 +99,7 @@ bool Dynam::IsSymbolOnly()
 
 std::wstring Dynam::GetSymbolStr() const
 {
-    std::wstring symbol = Dynam::GetSymbolStr(m_symbolStr);
-    if (this->HasEnclose()) {
-        switch (this->GetEnclose()) {
-            case ENCLOSURE_brack: {
-                symbol.insert(0, 1, SMUFL_E26C_accidentalBracketLeft);
-                symbol.push_back(SMUFL_E26D_accidentalBracketRight);
-                break;
-            }
-            case ENCLOSURE_paren: {
-                symbol.insert(0, 1, SMUFL_E26A_accidentalParensLeft);
-                symbol.push_back(SMUFL_E26B_accidentalParensRight);
-                break;
-            }
-            default: break;
-        }
-    }
-    return symbol;
+    return Dynam::GetSymbolStr(m_symbolStr);
 }
 
 //----------------------------------------------------------------------------

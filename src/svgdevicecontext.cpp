@@ -890,54 +890,6 @@ void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, do
     // TODO
 }
 
-void SvgDeviceContext::DrawEnclosedMusicText(const std::wstring &text, int x, int y, int encloseY, bool setSmuflGlyph)
-{
-    assert(m_fontStack.top());
-
-    // make sure that we have at least 3 symbols - enclosure and glyph to be enclosed
-    if (text.length() < 3) return this->DrawMusicText(text, x, y, setSmuflGlyph);
-
-    int w, h, gx, gy;
-
-    // remove the `xlink:` prefix for backwards compatibility with older SVG viewers.
-    std::string hrefAttrib = "href";
-    if (!m_removeXlink) {
-        hrefAttrib.insert(0, "xlink:");
-    }
-
-    // print chars one by one
-    for (unsigned int i = 0; i < text.length(); ++i) {
-        wchar_t c = text.at(i);
-        Glyph *glyph = Resources::GetGlyph(c);
-        if (!glyph) {
-            continue;
-        }
-
-        // make sure that encloseY is used for first and last glyphs (enclosure)
-        const int drawY = ((i == 0) || (i == text.length() - 1)) ? encloseY : y;
-        // make sure that that first element after the glyph is not shifted to the left/right if its left margin is not
-        // set to 0
-        if (i == 1) x += -glyph->GetX() * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
-
-        this->DrawSvgGlyph(glyph, hrefAttrib, x, drawY);
-
-        // Get the bounds of the char
-        if (glyph->GetHorizAdvX() > 0) {
-            // make sure that second to last element (glyph before closing glyph) has correct shift
-            if (i == text.length() - 2)
-                x += (glyph->GetWidth() + glyph->GetX()) * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
-            else
-                x += glyph->GetHorizAdvX() * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
-        }
-        else {
-            glyph->GetBoundingBox(gx, gy, w, h);
-            x += w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
-        }
-
-        if ((i == 0) || (i == text.length() - 2)) x += 10;
-    }
-}
-
 void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
 {
     assert(m_fontStack.top());
@@ -958,7 +910,22 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
             continue;
         }
 
-        this->DrawSvgGlyph(glyph, hrefAttrib, x, y);
+        // Add the glyph to the array for the <defs>
+        m_smuflGlyphs.insert(glyph);
+
+        // Write the char in the SVG
+        pugi::xml_node useChild = AppendChild("use");
+        useChild.append_attribute(hrefAttrib.c_str())
+            = StringFormat("#%s-%s", glyph->GetCodeStr().c_str(), m_glyphPostfixId.c_str()).c_str();
+        useChild.append_attribute("x") = x;
+        useChild.append_attribute("y") = y;
+        useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+        useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+        if (m_fontStack.top()->GetWidthToHeightRatio() != 1.0f) {
+            useChild.append_attribute("transform") = StringFormat("matrix(%f,0,0,1,%f,0)",
+                m_fontStack.top()->GetWidthToHeightRatio(), x * (1. - m_fontStack.top()->GetWidthToHeightRatio()))
+                                                         .c_str();
+        }
 
         // Get the bounds of the char
         if (glyph->GetHorizAdvX() > 0)
@@ -1085,26 +1052,6 @@ void SvgDeviceContext::DrawSvgBoundingBoxRectangle(int x, int y, int width, int 
     rectChild.append_attribute("width") = width;
 
     rectChild.append_attribute("fill") = "transparent";
-}
-
-void SvgDeviceContext::DrawSvgGlyph(Glyph *glyph, const std::string &hrefAttrib, int x, int y)
-{
-    // Add the glyph to the array for the <defs>
-    m_smuflGlyphs.insert(glyph);
-
-    // Write the char in the SVG
-    pugi::xml_node useChild = AppendChild("use");
-    useChild.append_attribute(hrefAttrib.c_str())
-        = StringFormat("#%s-%s", glyph->GetCodeStr().c_str(), m_glyphPostfixId.c_str()).c_str();
-    useChild.append_attribute("x") = x;
-    useChild.append_attribute("y") = y;
-    useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
-    useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
-    if (m_fontStack.top()->GetWidthToHeightRatio() != 1.0f) {
-        useChild.append_attribute("transform") = StringFormat("matrix(%f,0,0,1,%f,0)",
-            m_fontStack.top()->GetWidthToHeightRatio(), x * (1. - m_fontStack.top()->GetWidthToHeightRatio()))
-                                                     .c_str();
-    }
 }
 
 void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
