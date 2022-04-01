@@ -125,30 +125,6 @@ curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
     }
 }
 
-std::list<std::pair<data_VU, data_PERCENT>> Slur::ParseBulge() const
-{
-    // Split content by spaces
-    std::istringstream content;
-    content.str(this->GetBulge());
-    std::vector<std::string> entries;
-    std::string token;
-    while (std::getline(content, token, ' ')) {
-        entries.push_back(token);
-    }
-
-    // Convert entries to numerical and filter admissible values
-    std::list<std::pair<data_VU, data_PERCENT>> result;
-    Att converter;
-    for (int i = 0; i < entries.size() - 1; i += 2) {
-        const data_VU distance = converter.StrToVU(entries[i]);
-        if ((distance == VRV_UNSET) || (distance <= 0.0)) continue;
-        const data_PERCENT offset = converter.StrToPercent(entries[i + 1]);
-        if ((offset <= 0.0) || (offset >= 100.0)) continue;
-        result.push_back({ distance, offset });
-    }
-    return result;
-}
-
 std::pair<Layer *, LayerElement *> Slur::GetBoundaryLayer()
 {
     LayerElement *start = this->GetStart();
@@ -631,12 +607,21 @@ void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezi
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
 
-    std::list<std::pair<data_VU, data_PERCENT>> bulgeEntries = this->ParseBulge();
+    // Read the bulge attribute
+    Att converter;
+    data_BULGE bulge = converter.StrToBulge(this->GetBulge());
+
+    // Filter admissible values
+    bulge.erase(std::remove_if(bulge.begin(), bulge.end(),
+                    [](const data_BULGE::value_type &entry) {
+                        return ((entry.first <= 0.0) || (entry.second <= 0.0) || (entry.second >= 100.0));
+                    }),
+        bulge.end());
 
     // Get the minimal and maximal lambda
     double lambdaMin = 0.66;
     double lambdaMax = 0.33;
-    for (const std::pair<data_VU, data_PERCENT> &bulgeEntry : bulgeEntries) {
+    for (const data_BULGE::value_type &bulgeEntry : bulge) {
         const double lambda = bulgeEntry.second / 100.0;
         lambdaMin = std::min(lambda, lambdaMin);
         lambdaMax = std::max(lambda, lambdaMax);
@@ -660,7 +645,7 @@ void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezi
     points[2] = bezierCurve.c2;
     points[3] = bezierCurve.p2;
 
-    for (const std::pair<data_VU, data_PERCENT> &bulgeEntry : bulgeEntries) {
+    for (const data_BULGE::value_type &bulgeEntry : bulge) {
         const double lambda = bulgeEntry.second / 100.0;
         const double x = (1.0 - lambda) * bezierCurve.p1.x + lambda * bezierCurve.p2.x;
         const double t = BoundingBox::CalcBezierParamAtPosition(points, x);

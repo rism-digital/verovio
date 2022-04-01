@@ -143,11 +143,6 @@ public:
     ///@}
 
     /**
-     * @name Parse the bulge attribute
-     */
-    std::list<std::pair<data_VU, data_PERCENT>> ParseBulge() const;
-
-    /**
      * Adjust starting coordinates for the slurs depending on the curve direction and spanning type of the slur
      */
     std::pair<Point, Point> AdjustCoordinates(

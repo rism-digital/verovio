@@ -94,6 +94,11 @@ enum data_BEATRPT_REND {
 };
 
 /**
+ * For storing bulge values (see slur@bulge)
+ */
+typedef std::vector<std::pair<double, double>> data_BULGE;
+
+/**
  * MEI data.DURATION
  */
 enum data_DURATION {
