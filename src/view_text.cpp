@@ -79,7 +79,8 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
         switch (params.m_textEnclose) {
             case ENCLOSURE_paren: open.push_back(L'('); break;
             case ENCLOSURE_brack: open.push_back(L'['); break;
-        };
+            default: break;
+        }
         this->DrawTextString(dc, open, params);
     }
 
@@ -115,7 +116,8 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
         switch (params.m_textEnclose) {
             case ENCLOSURE_paren: close.push_back(L')'); break;
             case ENCLOSURE_brack: close.push_back(L']'); break;
-        };
+            default: break;
+        }
         this->DrawTextString(dc, close, params);
     }
 }
