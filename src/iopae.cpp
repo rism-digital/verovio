@@ -4457,27 +4457,34 @@ bool PAEInput::CheckContentPreBuild()
 
     pae::Token *previousToken = NULL;
 
-    for (auto &token : m_pae) {
-        if (token.IsVoid() || !token.m_object) continue;
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid() || !token->m_object) {
+            ++token;
+            continue;
+        }
 
         // Check that the measure rest is at the beginning of a measure
-        if (token.Is(MULTIREST) && previousToken && !previousToken->Is(MEASURE)) {
-            LogPAE(ERR_065_MREST_INVALID_MEASURE, token);
+        if (token->Is(MULTIREST) && previousToken && !previousToken->Is(MEASURE)) {
+            LogPAE(ERR_065_MREST_INVALID_MEASURE, *token);
             if (m_pedanticMode) return false;
-            delete token.m_object;
-            token.m_object = NULL;
+            Measure *measure = new Measure();
+            measure->SetRight(BARRENDITION_invis);
+            m_pae.insert(token, pae::Token(0, pae::UNKOWN_POS, measure));
         }
         // Check that the measure rest is at the end of a measure
-        else if (previousToken && previousToken->Is(MULTIREST) && !token.Is(MEASURE)) {
+        else if (previousToken && previousToken->Is(MULTIREST) && !token->Is(MEASURE)) {
             LogPAE(ERR_065_MREST_INVALID_MEASURE, *previousToken);
             if (m_pedanticMode) return false;
-            delete previousToken->m_object;
-            previousToken->m_object = NULL;
+            Measure *measure = new Measure();
+            measure->SetRight(BARRENDITION_invis);
+            m_pae.insert(token, pae::Token(0, pae::UNKOWN_POS, measure));
         }
 
-        if (token.m_object) {
-            previousToken = &token;
+        if (token->m_object) {
+            previousToken = &(*token);
         }
+        ++token;
     }
 
     return true;
