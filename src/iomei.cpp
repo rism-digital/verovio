@@ -3874,6 +3874,7 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
     pugi::xml_node current;
     for (current = scoreDef.next_sibling(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         std::string elementName = std::string(current.name());
         // editorial
         if (this->IsEditorialElementName(current.name())) {
@@ -7353,10 +7354,12 @@ void MEIInput::NormalizeAttributes(pugi::xml_node &xmlElement)
         std::string name = elem.name();
         std::string value = elem.value();
 
-        if (!std::set<std::string>{ "plist", "staff", "xml:id" }.count(name)) {
-            value.erase(std::remove(value.begin(), value.end(), ' '), value.end());
-            elem.set_value(value.c_str());
-        }
+        size_t pos = value.find_first_not_of(' ');
+        if (pos != std::string::npos) value = value.substr(pos);
+        pos = value.find_last_not_of(' ');
+        if (pos != std::string::npos) value = value.substr(0, pos + 1);
+
+        elem.set_value(value.c_str());
     }
 }
 
