@@ -72,39 +72,27 @@ void TabGrp::FilterList(ArrayOfConstObjects &childList)
 
 int TabGrp::GetYTop()
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    assert(childList.size() > 0);
-
     // The last note is the top
-    return childList.back()->GetDrawingY();
+    return this->GetListBack(this)->GetDrawingY();
 }
 
 int TabGrp::GetYBottom()
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    assert(childList.size() > 0);
-
     // The first note is the bottom
-    return childList.front()->GetDrawingY();
+    return this->GetListFront(this)->GetDrawingY();
 }
 
 Note *TabGrp::GetTopNote()
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    assert(childList.size() > 0);
-
-    Note *topNote = vrv_cast<Note *>(childList.back());
+    Note *topNote = vrv_cast<Note *>(this->GetListBack(this));
     assert(topNote);
     return topNote;
 }
 
 Note *TabGrp::GetBottomNote()
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    assert(childList.size() > 0);
-
     // The first note is the bottom
-    Note *bottomNote = vrv_cast<Note *>(childList.front());
+    Note *bottomNote = vrv_cast<Note *>(this->GetListFront(this));
     assert(bottomNote);
     return bottomNote;
 }

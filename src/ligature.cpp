@@ -64,21 +64,15 @@ bool Ligature::IsSupportedChild(Object *child)
 
 Note *Ligature::GetFirstNote()
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    assert(childList.size() > 0);
-
-    Note *firstNote = vrv_cast<Note *>(childList.front());
+    Note *firstNote = vrv_cast<Note *>(this->GetListFront(this));
     assert(firstNote);
     return firstNote;
 }
 
 Note *Ligature::GetLastNote()
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    assert(childList.size() > 0);
-
     // The first note is the bottom
-    Note *lastNote = vrv_cast<Note *>(childList.back());
+    Note *lastNote = vrv_cast<Note *>(this->GetListBack(this));
     assert(lastNote);
     return lastNote;
 }
@@ -124,10 +118,10 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
     m_drawingShapes.clear();
 
-    Note *lastNote = dynamic_cast<Note *>(this->GetList(this).back());
+    const ArrayOfObjects &notes = this->GetList(this);
+    Note *lastNote = dynamic_cast<Note *>(notes.back());
     Staff *staff = this->GetAncestorStaff();
 
-    const ArrayOfObjects &notes = this->GetList(this);
     if (notes.size() < 2) return FUNCTOR_SIBLINGS;
 
     Note *previousNote = NULL;

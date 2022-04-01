@@ -229,7 +229,7 @@ void Chord::FilterList(ArrayOfConstObjects &childList)
 
 int Chord::PositionInChord(Note *note)
 {
-    int size = (int)this->GetList(this).size();
+    const int size = this->GetListSize(this);
     int position = this->GetListIndex(note);
     assert(position != -1);
     // this is the middle (only if odd)
@@ -240,50 +240,35 @@ int Chord::PositionInChord(Note *note)
 
 void Chord::GetYExtremes(int &yMax, int &yMin)
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    assert(childList.size() > 0);
-
     // The first note is the bottom
-    yMin = childList.front()->GetDrawingY();
+    yMin = this->GetListFront(this)->GetDrawingY();
     // The last note is the top
-    yMax = childList.back()->GetDrawingY();
+    yMax = this->GetListBack(this)->GetDrawingY();
 }
 
 int Chord::GetYTop()
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    assert(childList.size() > 0);
-
     // The last note is the top
-    return childList.back()->GetDrawingY();
+    return this->GetListBack(this)->GetDrawingY();
 }
 
 int Chord::GetYBottom()
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    assert(childList.size() > 0);
-
     // The first note is the bottom
-    return childList.front()->GetDrawingY();
+    return this->GetListFront(this)->GetDrawingY();
 }
 
 Note *Chord::GetTopNote()
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    assert(childList.size() > 0);
-
-    Note *topNote = vrv_cast<Note *>(childList.back());
+    Note *topNote = vrv_cast<Note *>(this->GetListBack(this));
     assert(topNote);
     return topNote;
 }
 
 Note *Chord::GetBottomNote()
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    assert(childList.size() > 0);
-
     // The first note is the bottom
-    Note *bottomNote = vrv_cast<Note *>(childList.front());
+    Note *bottomNote = vrv_cast<Note *>(this->GetListFront(this));
     assert(bottomNote);
     return bottomNote;
 }
@@ -925,8 +910,7 @@ int Chord::InitializeDrawing(FunctorParams *functorParams)
     InitializeDrawingParams *params = vrv_params_cast<InitializeDrawingParams *>(functorParams);
     assert(params);
 
-    const ArrayOfObjects &childList = this->GetList(this);
-    if (childList.empty()) {
+    if (this->HasEmptyList(this)) {
         LogWarning("Chord '%s' has no child note - a default note is added", this->GetUuid().c_str());
         Note *rescueNote = new Note();
         this->AddChild(rescueNote);

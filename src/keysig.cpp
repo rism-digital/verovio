@@ -122,9 +122,9 @@ void KeySig::FilterList(ArrayOfConstObjects &childList)
 
 int KeySig::GetAccidCount()
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
-    if (childList.size() > 0) {
-        return (int)childList.size();
+    const int childListSize = this->GetListSize(this); // make sure it's initialized
+    if (childListSize > 0) {
+        return childListSize;
     }
 
     if (!this->HasSig()) return 0;

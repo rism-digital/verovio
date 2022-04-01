@@ -1079,7 +1079,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         // Ligature notes are all aligned with the first note
         Note *note = vrv_cast<Note *>(this);
         assert(note);
-        Note *firstNote = dynamic_cast<Note *>(ligatureParent->GetList(ligatureParent).front());
+        Note *firstNote = dynamic_cast<Note *>(ligatureParent->GetListFront(ligatureParent));
         if (firstNote && (firstNote != note)) {
             m_alignment = firstNote->GetAlignment();
             m_alignment->AddLayerElementRef(this);
