@@ -222,17 +222,17 @@ const char *vrvToolkit_renderToPAE(void *tkPtr)
     return tk->GetCString();
 }
 
-const char *vrvToolkit_renderToSVG(void *tkPtr, int page_no, const char *c_options)
+const char *vrvToolkit_renderToSVG(void *tkPtr, int page_no, bool xmlDeclaration)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->SetCString(tk->RenderToSVG(page_no, false));
+    tk->SetCString(tk->RenderToSVG(page_no, xmlDeclaration));
     return tk->GetCString();
 }
 
-const char *vrvToolkit_renderToTimemap(void *tkPtr)
+const char *vrvToolkit_renderToTimemap(void *tkPtr, const char *c_options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->SetCString(tk->RenderToTimemap());
+    tk->SetCString(tk->RenderToTimemap(c_options));
     return tk->GetCString();
 }
 
