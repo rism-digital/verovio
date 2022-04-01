@@ -1202,7 +1202,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
             ? std::min(staff->GetDrawingY() - staffHeight, y2) - offset
             : std::max(staff->GetDrawingY(), y1) + offset;
 
-        this->DrawSmuflString(dc, xCentered, y, IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center);
+        this->DrawSmuflString(
+            dc, xCentered, y, IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
         dc->ResetFont();
     }
 
