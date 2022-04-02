@@ -9785,6 +9785,7 @@ void HumdrumInput::checkForFingeredHarmonic(Chord *chord, hum::HTp token)
     int scount = token->getSubtokenCount();
     if (scount != 3) {
         // only dealing with 3-note cases for now
+        return;
     }
     std::vector<std::string> tstrings = token->getSubtokens();
     int zcount = 0;
@@ -9839,7 +9840,7 @@ void HumdrumInput::checkForFingeredHarmonic(Chord *chord, hum::HTp token)
     }
 
     ArrayOfObjects &notes = chord->GetChildrenForModification();
-    Note *middle = vrv_cast<Note *>(notes[index]);
+    Note *middle = vrv_cast<Note *>(notes.at(index));
     middle->SetHeadShape(HEADSHAPE_diamond);
 }
 
