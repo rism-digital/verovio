@@ -9471,8 +9471,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 elements.push_back("chord");
                 pointers.push_back((void *)chord);
                 processChordSignifiers(chord, layerdata[i], staffindex);
-
                 convertChord(chord, layerdata[i], staffindex);
+                checkForFingeredHarmonic(chord, layerdata[i]);
                 popElementStack(elements, pointers);
                 // maybe an extra pop here for tremolos?
                 processSlurs(layerdata[i]);
@@ -9768,6 +9768,79 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForFingeredHarmonic --
+//
+
+void HumdrumInput::checkForFingeredHarmonic(Chord *chord, hum::HTp token)
+{
+    if (token->find("r") == std::string::npos) {
+        // No fingered harmonic notes
+        return;
+    }
+    hum::HumRegex hre;
+    int scount = token->getSubtokenCount();
+    if (scount != 3) {
+        // only dealing with 3-note cases for now
+    }
+    std::vector<std::string> tstrings = token->getSubtokens();
+    int zcount = 0;
+    std::vector<pair<int, int>> pitches(scount);
+    for (int i = 0; i < scount; i++) {
+        string mstring = tstrings[i];
+        if (mstring.find("r") != std::string::npos) {
+            hre.replaceDestructive(mstring, "", "r", "g");
+            zcount++;
+        }
+        int base40 = hum::Convert::kernToBase40(mstring);
+        pitches[i].first = i;
+        pitches[i].second = base40;
+    }
+    if (zcount != 2) {
+        // only dealing with fingered harmonic
+        return;
+    }
+    sort(pitches.begin(), pitches.end(), [](pair<int, int> &a, pair<int, int> &b) { return a.second < b.second; });
+
+    // The bottom two notes in the 3-note chord need to be labeled with "r"
+    // and the top one should not have an "r".
+
+    if (tstrings[pitches[0].first].find("r") == std::string::npos) {
+        return;
+    }
+    if (tstrings[pitches[1].first].find("r") == std::string::npos) {
+        return;
+    }
+    if (tstrings[pitches[2].first].find("r") != std::string::npos) {
+        return;
+    }
+
+    // Now set the middle note to be a diamond
+    int index = pitches[1].first;
+    if (tstrings[index].find("yy") != std::string::npos) {
+        // the middle note of the chord is invisible, so do nothing.
+        return;
+    }
+
+    // Only visible notes are in the MEI chord, so readjust the index
+    // the middle note in the MEI chord.
+    int adjustment = 0;
+    for (int i = 0; i < index; i++) {
+        if (tstrings[i].find("yy") != std::string::npos) {
+            adjustment++;
+        }
+    }
+    index = index - adjustment;
+    if (index < 0) {
+        return;
+    }
+
+    ArrayOfObjects &notes = chord->GetChildrenForModification();
+    Note *middle = vrv_cast<Note *>(notes[index]);
+    middle->SetHeadShape(HEADSHAPE_diamond);
 }
 
 //////////////////////////////
@@ -10753,14 +10826,35 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     char posch;
     char pos2ch;
     char pos3ch;
-    int tsize = (int)((string *)token)->size();
+    string nohidden = *token;
+    if (nohidden.find("yy") != std::string::npos) {
+        std::vector<std::string> tstrings = token->getSubtokens();
+        nohidden = "";
+        int counter = 0;
+        for (int i = 0; i < (int)tstrings.size(); i++) {
+            if (tstrings[i].find("yy") != std::string::npos) {
+                continue;
+            }
+            if (counter) {
+                nohidden += " ";
+                counter++;
+            }
+            nohidden += tstrings[i];
+        }
+    }
+    int tsize = (int)nohidden.size();
     for (int i = 0; i < tsize; ++i) {
-        ch = token->at(i);
-        if (i < (int)token->size() - 1) {
-            nextch = token->at(i + 1);
+        ch = nohidden.at(i);
+        if (i < (int)nohidden.size() - 1) {
+            nextch = nohidden.at(i + 1);
         }
         else {
             nextch = '\0';
+        }
+        if ((ch == 'o') && (nextch == 'y')) {
+            // Don't show harmonics on chords where the
+            // harmonic is on an invisible note.
+            continue;
         }
         int intch = (unsigned char)ch;
         if (intch < 0) {
@@ -10774,27 +10868,27 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         if (isdigit(ch)) {
             continue;
         }
-        posch = i < tsize - 1 ? token->at(i + 1) : 0;
+        posch = i < tsize - 1 ? nohidden.at(i + 1) : 0;
         if ((ch == '^') && (posch == '^')) {
             // use 6 slot in array for "^^" (heavy accent)
             ch = 6;
             intch = 6;
             articloc.at(intch) = i + 1;
-            posch = i < tsize - 2 ? token->at(i + 2) : 'g';
+            posch = i < tsize - 2 ? nohidden.at(i + 2) : 'g';
             ++i;
             continue;
         }
         else if ((ch == '\'') && (posch == '\'')) {
             // staccatissimo alternate (eventually remove)
             ch = '`';
-            posch = i < tsize - 2 ? token->at(i + 2) : 'g';
+            posch = i < tsize - 2 ? nohidden.at(i + 2) : 'g';
             ++i;
         }
         else if ((ch == '~') && (posch == '~')) {
             // textual tenuto
             textTenuto = true;
             ++i;
-            posch = i < tsize - 1 ? token->at(i + 1) : 0;
+            posch = i < tsize - 1 ? nohidden.at(i + 1) : 0;
             if (m_signifiers.below && (posch == m_signifiers.below)) {
                 textTenutoBelow = true;
             }
@@ -10818,8 +10912,8 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
 
         if (posch) {
             // check for gestural articulations
-            pos2ch = i < tsize - 2 ? token->at(i + 2) : 0;
-            pos3ch = i < tsize - 3 ? token->at(i + 3) : 0;
+            pos2ch = i < tsize - 2 ? nohidden.at(i + 2) : 0;
+            pos3ch = i < tsize - 3 ? nohidden.at(i + 3) : 0;
             if ((posch == 'y') && (pos2ch != 'y')) {
                 articges[ch] = 1;
             }
@@ -10950,9 +11044,11 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         // on the note level (which is probably a better
         // location which doing duplicate articulations).
         for (int j = 0; (j == 0) || (j < counts[i]); j++) {
+
             Artic *artic = new Artic();
             articlist.push_back(artic);
             element->AddChild(artic);
+
             if (artics.size() > 1) {
                 // reorder ID numbers by sequence in token later
                 setLocationId(artic, token, i + 1);
@@ -18671,7 +18767,9 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         if (isrest) {
             // <rest> not allowed in <chord>
             // (but chords are allowed in <rest>s somehow...)
-            continue;
+            // continue;
+            // Now a rest in a chord is a non-sounding notated notes
+            // usually related to a fingered harmonic.
         }
 
         if (isrecip && !isnote) {
@@ -19346,8 +19444,20 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         scordaturaGes = checkNoteForScordatura(tstring);
     }
 
+    bool isSilentQ = false;
     bool chordQ = token->isChord();
     bool unpitchedQ = token->isUnpitched();
+    if (chordQ) {
+        // Allow rests in chords to be non-sounding fingered harmonic notes.
+        // Need to check when a percussion clef.
+        unpitchedQ = false;
+        if (tstring.find("r") != std::string::npos) {
+            isSilentQ = true;
+        }
+        if (isSilentQ) {
+            note->SetVel(0);
+        }
+    }
     bool badpitchedQ = false;
     if (!unpitchedQ && (ss[staffindex].last_clef.compare(0, 6, "*clefX") == 0)) {
         badpitchedQ = true;
@@ -19440,6 +19550,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     // Add the pitch information
+    hum::HumRegex hre;
+    if (tstring.find("r") != std::string::npos) {
+        hre.replaceDestructive(tstring, "", "r", "g");
+    }
     int base40 = hum::Convert::kernToBase40(tstring);
     base40 += m_transpose[staffindex];
     int diatonic = hum::Convert::base40ToDiatonic(base40);
