@@ -571,6 +571,7 @@ private:
     bool ConvertTuplet();
     bool ConvertDuration();
     bool ConvertTie();
+    bool ConvertLigature();
     bool ConvertAccidGes();
     ///@}
 
@@ -621,10 +622,16 @@ private:
     bool CheckHierarchy();
 
     /**
+     * Some additional checked to be performed before the MEI tree has been build.
+     * Unimplemented
+     */
+    bool CheckContentPreBuild();
+
+    /**
      * Some additional checked to be performed one the MEI tree has been build.
      * Unimplemented
      */
-    bool CheckContent();
+    bool CheckContentPostBuild();
 
     /**
      * A helper to remove a token when checking the hierarchy and it is not valid

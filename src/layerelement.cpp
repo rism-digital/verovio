@@ -1946,8 +1946,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     // the current one allow it. For example, when one of them is a barline, we do not look how
     // bounding boxes can be nested but instead only look at the horizontal position
     bool performBoundingBoxAlignment = (params->m_previousAlignment.m_alignment
-        && params->m_previousAlignment.m_alignment->PerfomBoundingBoxAlignment()
-        && this->GetAlignment()->PerfomBoundingBoxAlignment());
+        && params->m_previousAlignment.m_alignment->PerformBoundingBoxAlignment()
+        && this->GetAlignment()->PerformBoundingBoxAlignment());
 
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
@@ -2344,9 +2344,11 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     // Do not look for tstamp pointing to these
     if (this->Is({ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
 
-    ListOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ListOfSpanningInterOwnerPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         if (iter->first->SetStartAndEnd(this)) {
+            // Verify that the interface owner is encoded in the measure of its start
+            iter->first->VerifyMeasure(iter->second);
             // We have both the start and the end that are matched
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }

@@ -97,7 +97,7 @@ verovio.vrvToolkit.renderToMIDI = Module.cwrap( 'vrvToolkit_renderToMIDI', 'stri
 verovio.vrvToolkit.renderToPAE = Module.cwrap( 'vrvToolkit_renderToPAE', 'string' );
 
 // char *renderToSvg(Toolkit *ic, int pageNo, const char *rendering_options)
-verovio.vrvToolkit.renderToSVG = Module.cwrap( 'vrvToolkit_renderToSVG', 'string', ['number', 'number', 'string'] );
+verovio.vrvToolkit.renderToSVG = Module.cwrap( 'vrvToolkit_renderToSVG', 'string', ['number', 'number', 'number'] );
 
 // char *renderToTimemap(Toolkit *ic)
 verovio.vrvToolkit.renderToTimemap = Module.cwrap( 'vrvToolkit_renderToTimemap', 'string', ['number', 'string'] );
@@ -190,9 +190,9 @@ verovio.toolkit.prototype.getLog = function ()
     return verovio.vrvToolkit.getLog( this.ptr );
 };
 
-verovio.toolkit.prototype.getMEI = function ( param1 )
+verovio.toolkit.prototype.getMEI = function ( options = {} )
 {
-    return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringify( param1 ) );
+    return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringify( options ) );
 };
 
 verovio.toolkit.prototype.getMIDIValuesForElement = function ( xmlId )
@@ -298,12 +298,12 @@ verovio.toolkit.prototype.renderToPAE = function ()
     return verovio.vrvToolkit.renderToPAE( this.ptr );
 };
 
-verovio.toolkit.prototype.renderToSVG = function ( pageNo, options )
+verovio.toolkit.prototype.renderToSVG = function ( pageNo = 1, xmlDeclaration = false )
 {
-    return verovio.vrvToolkit.renderToSVG( this.ptr, pageNo, JSON.stringify( options ) );
+    return verovio.vrvToolkit.renderToSVG( this.ptr, pageNo, xmlDeclaration );
 };
 
-verovio.toolkit.prototype.renderToTimemap = function ( options = {})
+verovio.toolkit.prototype.renderToTimemap = function ( options = {} )
 {
     return JSON.parse( verovio.vrvToolkit.renderToTimemap( this.ptr, JSON.stringify( options ) ) );
 };

@@ -339,7 +339,7 @@ public:
         m_doc = doc;
         m_functor = functor;
     }
-    ArrayOfFloatingPositioners *m_previousStaffPositioners;
+    const ArrayOfFloatingPositioners *m_previousStaffPositioners;
     StaffAlignment *m_previousStaffAlignment;
     Doc *m_doc;
     Functor *m_functor;
@@ -2210,7 +2210,7 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: std::vector< Object*>* that holds the current elements to match
+ * member 0: interface list that holds the current elements to match
  **/
 
 class PrepareTimePointingParams : public FunctorParams {
@@ -2224,14 +2224,14 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: std::vector< Object*>* that holds the current elements to match
- * member 1: bool* fillList for indicating whether the elements have to be stacked or not
+ * member 0: interface list that holds the current elements to match
+ * member 1: bool fillList for indicating whether the elements have to be stacked or not
  **/
 
 class PrepareTimeSpanningParams : public FunctorParams {
 public:
     PrepareTimeSpanningParams() { m_fillList = true; }
-    ListOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
+    ListOfSpanningInterOwnerPairs m_timeSpanningInterfaces;
     bool m_fillList;
 };
 
@@ -2240,8 +2240,8 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: std::vector< Object*>* that holds the current elements to match
- * member 1:  ListOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
+ * member 0: interface list that holds the current elements to match
+ * member 1: ListOfObjectBeatPairs that holds the tstamp2 elements for attach to the end measure
  **/
 
 class PrepareTimestampsParams : public FunctorParams {

@@ -81,6 +81,12 @@ public:
      */
     std::vector<Staff *> GetTstampStaves(Measure *measure, Object *object);
 
+    /**
+     * Return true if the interface owner is encoded in the measure of its start element
+     * Display a warning if not
+     */
+    bool VerifyMeasure(const Object *owner);
+
     //-----------------//
     // Pseudo functors //
     //-----------------//

@@ -583,6 +583,19 @@ bool ScoreDef::IsSectionRestart() const
     return (section && (section->GetRestart() == BOOLEAN_true));
 }
 
+bool ScoreDef::HasSystemStartLine()
+{
+    StaffGrp *staffGrp = vrv_cast<StaffGrp *>(this->FindDescendantByType(STAFFGRP));
+    if (staffGrp) {
+        auto [firstDef, lastDef] = staffGrp->GetFirstLastStaffDef();
+        if ((firstDef && lastDef && (firstDef != lastDef)) || staffGrp->GetFirst(GRPSYM)) {
+            return (this->GetSystemLeftline() != BOOLEAN_false);
+        }
+        return (this->GetSystemLeftline() == BOOLEAN_true);
+    }
+    return false;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

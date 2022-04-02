@@ -236,8 +236,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
-    // throughout the system
-    else {
+    // throughout the system => recheck that the systems are in correct order
+    else if (Object::IsPreOrdered(parentSystem1, system) && Object::IsPreOrdered(system, parentSystem2)) {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
         measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
@@ -249,6 +249,10 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         if (!Check(last)) return;
         x2 = last->GetDrawingX() + last->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
+    }
+    // Return otherwise: this should only happen if the time spanning element is encoded in the wrong measure
+    else {
+        return;
     }
 
     // Overwrite the spanningType for open ended control events

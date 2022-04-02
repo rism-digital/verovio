@@ -1052,6 +1052,8 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
 
+    const bool hasSystemStartLine = this->IsFirstInSystem() && system->GetDrawingScoreDef()->HasSystemStartLine();
+
     ArrayOfComparisons filters;
     for (auto staffN : params->m_staffNs) {
         params->m_minPos = 0;
@@ -1063,6 +1065,11 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         params->m_currentAlignment.Reset();
         StaffAlignment *staffAlignment = system->m_systemAligner.GetStaffAlignmentForStaffN(staffN);
         params->m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
+
+        // Prevent collisions of scoredef clefs with thick barlines
+        if (hasSystemStartLine) {
+            params->m_upcomingMinPos = params->m_doc->GetDrawingBarLineWidth(params->m_staffSize);
+        }
 
         filters.clear();
         // Create ad comparison object for each type / @n
@@ -1445,12 +1452,12 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
     PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
-    ListOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ListOfSpanningInterOwnerPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
         // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
         // midi output
-        if (iter->second == HARM) {
+        if (iter->second->GetClassId() == HARM) {
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {
