@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Mar 30 07:53:21 PDT 2022
+// Last Modified: Sat Apr  2 16:46:26 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -58699,7 +58699,7 @@ void Tool_composite::analyzeFullCompositeRhythm(HumdrumFile& infile) {
 			if (tok->isNote()) {
 				allrest = false;
 				allnull = false;
-				if ((tok->find("_") == string::npos) && 
+				if ((tok->find("_") == string::npos) &&
 				    (tok->find("]") == string::npos)) {
 					allsustain = false;
 				} else {
@@ -59911,8 +59911,8 @@ void Tool_composite::doNumericAnalyses(HumdrumFile& infile) {
 //////////////////////////////
 //
 // Tool_composite::doOnsetAnalyses -- targetGroup == "" means full composite onsets.
-//
-// First index of m_analyses is rhythm type, and second index is analysis type, with "0" being onsets.
+//     First index of m_analyses is rhythm type, and second index is analysis type,
+//     with "0" being onsets.
 //
 
 void Tool_composite::doOnsetAnalyses(HumdrumFile& infile) {
@@ -59929,7 +59929,26 @@ void Tool_composite::doOnsetAnalyses(HumdrumFile& infile) {
 	// Coincidence onset analysis must come after other onset analyses since it
 	// relies on group A + group B.
 	if (m_analyses.at(m_COINCIDENCE).at(m_ONSET).size() > 0) {
-		// doOnsetAnalysisCoincidence(m_analyses.at(m_COINCIDENCE).at(m_ONSET), infile, m_analyses.at(0));
+		doOnsetAnalysisCoincidence(m_analyses.at(m_COINCIDENCE).at(m_ONSET),
+		                           m_analyses.at(m_COMPOSITE_A).at(m_ONSET),
+		                           m_analyses.at(m_COMPOSITE_B).at(m_ONSET));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::doOnsetAnalysisCoincidence -- Note onset analysis for coincidence analysis.
+//
+
+void Tool_composite::doOnsetAnalysisCoincidence(vector<double>& output,
+		vector<double>& inputA, vector<double>& inputB) {
+	fill(output.begin(), output.end(), 0);
+	for (int i=0; i<(int)inputA.size(); i++) {
+		if ((inputA[i] > 0) && (inputB[i] > 0)) {
+			output[i] = inputA[i] + inputB[i];
+		}
 	}
 }
 
@@ -96311,6 +96330,7 @@ Tool_peak::Tool_peak(void) {
 	define("r|ignore-rest=d:1.0",  "ignore rests smaller than given value (in whole notes)");
 	define("n|number=i:3",         "number of high notes in a row");
 	define("d|dur|duration=d:6.0", "maximum duration between peak note attacks in whole notes");
+	define("i|info=b",             "print peak info");
 }
 
 
@@ -96373,6 +96393,8 @@ void Tool_peak::initialize(void) {
 	m_smallRest = getDouble("ignore-rest") * 4.0;  // convert to quarter notes
 	m_peakNum   = getInteger("number");
 	m_peakDur   = getInteger("duration") * 4.0;    // convert to quarter notes
+	m_infoQ     = getBoolean("info");
+	m_count     = 0;
 }
 
 
@@ -96400,6 +96422,10 @@ void Tool_peak::processFile(HumdrumFile& infile) {
 		m_humdrum_text << " = marked note, color=";
 		m_humdrum_text << m_color;
 		m_humdrum_text << endl;
+	}
+
+	if (m_infoQ) {
+		m_humdrum_text << "!!!peaks: " << m_count << endl;
 	}
 
 }

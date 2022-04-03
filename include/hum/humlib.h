@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Mar 30 07:53:21 PDT 2022
+// Last Modified: Sat Apr  2 16:46:26 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5921,6 +5921,8 @@ class Tool_composite : public HumTool {
 		void        convertNotesToRhythms     (HumdrumFile& infile);
 		int         getEventCount             (std::vector<string>& data);
 		void        fixTiedNotes              (std::vector<string>& data, HumdrumFile& infile);
+		void        doOnsetAnalysisCoincidence(vector<double>& output,
+		                                       vector<double>& inputA, vector<double>& inputB);
 
 		// Numeric analysis functions:
 		void        doNumericAnalyses         (HumdrumFile& infile);
@@ -8533,7 +8535,17 @@ class Tool_peak : public HumTool {
 		std::string m_color     = "red";
 		double      m_smallRest = 4.0;   // Ignore rests that are 1 whole note or less.
 		double      m_peakDur   = 24.0;  // 6 whole notes maximum between m_peakNum local maximums.
-		double      m_peakNum   = 3;    // Number of local maximums in a row needed to mark in score.
+		double      m_peakNum   = 3;     // Number of local maximums in a row needed to mark in score.
+
+
+		bool        m_infoQ     = false; // Used with -i option.
+		int         m_count     = 0;     // Number of peaks in score.
+
+		std::vector<int>    m_peakMeasureBegin;
+		std::vector<int>    m_peakMeasureEnd;
+		std::vector<HumNum> m_peakDuration;
+		std::vector<string> m_peakPitch;
+		std::vector<int>    m_peakPitchCount;
 
 };
 

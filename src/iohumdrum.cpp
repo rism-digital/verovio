@@ -25498,7 +25498,7 @@ double HumdrumInput::getTempoScaling(hum::HumdrumFile &infile)
                 number = number / 100.0;
             }
             else if (number >= 10.0) {
-                number = number / 10.0;
+                number = number / 100.0;
             }
             if (number > 0.0) {
                 output *= number;
