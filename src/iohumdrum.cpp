@@ -632,6 +632,7 @@ bool HumdrumInput::convertHumdrum()
     // Check if a mensural music score should be produced (and ignore **kerns,
     // since only mens or kern can be rendered by verovio at a time).
     m_mens = checkForMens(infile);
+    m_tempoScaling = getTempoScaling(infile);
 
     bool hasScordatura = checkForScordatura(infile);
     if (hasScordatura) {
@@ -4490,7 +4491,7 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
                 if (::isdigit((*kernpart)[3])) {
                     int tempo = stoi(kernpart->substr(3));
                     // std::string tempostr = to_string(tempo);
-                    scoreDef->SetMidiBpm(tempo);
+                    scoreDef->SetMidiBpm(tempo * m_tempoScaling);
                     foundtempo = true;
                 }
             }
@@ -4515,7 +4516,7 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
         if (omd) {
             int guess = hum::Convert::tempoNameToMm(*omd, bot, top);
             if (guess > 0) {
-                scoreDef->SetMidiBpm(guess);
+                scoreDef->SetMidiBpm(guess * m_tempoScaling);
             }
             else {
                 addDefaultTempo(scoreDef);
@@ -4536,7 +4537,7 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
 void HumdrumInput::addDefaultTempo(ScoreDef *scoreDef)
 {
     if (m_mens) {
-        scoreDef->SetMidiBpm(400);
+        scoreDef->SetMidiBpm(400.0 * m_tempoScaling);
         return;
     }
     double sum = 0.0;
@@ -4551,7 +4552,10 @@ void HumdrumInput::addDefaultTempo(ScoreDef *scoreDef)
     }
     double avgdur = sum / count;
     if (avgdur > 2.0) {
-        scoreDef->SetMidiBpm(400);
+        scoreDef->SetMidiBpm(400.0 * m_tempoScaling);
+    }
+    else if (m_tempoScaling != 1.0) {
+        scoreDef->SetMidiBpm(120.0 * m_tempoScaling);
     }
 }
 
@@ -6551,15 +6555,15 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         hum::HTp token = infile.token(index, 0);
         hum::HumNum timepos = token->getDurationFromStart();
         if (timepos > 0) {
-            int midibpm = getMmTempo(token);
+            double midibpm = getMmTempo(token);
             if (midibpm > 0) {
-                tempo->SetMidiBpm(midibpm);
+                tempo->SetMidiBpm(midibpm * m_tempoScaling);
             }
             else {
                 // check for *MM marker before OMD
                 midibpm = getMmTempoForward(token);
                 if (midibpm > 0) {
-                    tempo->SetMidiBpm(midibpm);
+                    tempo->SetMidiBpm(midibpm * m_tempoScaling);
                 }
             }
         }
@@ -10146,7 +10150,7 @@ void HumdrumInput::handleTempoChange(hum::HTp token)
         return;
     }
 
-    int midibpm = int(hre.getMatchDouble(1) + 0.5);
+    double midibpm = int(hre.getMatchDouble(1) + 0.5);
     if (midibpm <= 0) {
         return;
     }
@@ -10169,7 +10173,7 @@ void HumdrumInput::handleTempoChange(hum::HTp token)
     }
 
     Tempo *tempo = new Tempo();
-    tempo->SetMidiBpm(midibpm);
+    tempo->SetMidiBpm(midibpm * m_tempoScaling);
     setLocationId(tempo, token);
     int staffindex = 0;
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
@@ -11962,9 +11966,9 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     if (tempo) {
 
         Tempo *tempo = new Tempo();
-        int midibpm = getMmTempo(token);
+        double midibpm = getMmTempo(token);
         if (midibpm > 0) {
-            tempo->SetMidiBpm(midibpm);
+            tempo->SetMidiBpm(midibpm * m_tempoScaling);
         }
         if (cparam) {
             setStaffBetween(tempo, m_currentstaff);
@@ -12442,9 +12446,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         return;
     }
 
-    int midibpm = 0.0;
+    double midibpm = 0.0;
     if (tempoQ) {
-        midibpm = int(getMmTempo(token, true) + 0.5);
+        midibpm = getMmTempo(token, true);
         if (midibpm == 0) {
             // this is a redundant tempo message, so ignore (event as text dir).
             return;
@@ -12455,7 +12459,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
         tempo = new Tempo();
         if (midibpm > 0) {
-            tempo->SetMidiBpm(midibpm);
+            tempo->SetMidiBpm(midibpm * m_tempoScaling);
         }
         if (placement == "between") {
             setStaffBetween(tempo, m_currentstaff);
@@ -12727,9 +12731,9 @@ bool HumdrumInput::addTempoDirection(const std::string &text, const std::string 
     hum::HTp token, int staffindex, int justification, const std::string &color)
 {
     Tempo *tempo = new Tempo();
-    int midibpm = getMmTempo(token);
+    double midibpm = getMmTempo(token);
     if (midibpm > 0) {
-        tempo->SetMidiBpm(midibpm);
+        tempo->SetMidiBpm(midibpm * m_tempoScaling);
     }
     if (placement == "center") {
         setStaffBetween(tempo, m_currentstaff);
@@ -25465,6 +25469,43 @@ void HumdrumInput::analyzeVerseColor(hum::HTp &token)
         current = current->getNextToken();
         continue;
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getTempoScaling --
+//
+
+double HumdrumInput::getTempoScaling(hum::HumdrumFile &infile)
+{
+    double output = 1.0;
+    hum::HumRegex hre;
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (!infile[i].isGlobalReference()) {
+            continue;
+        }
+        hum::HTp token = infile.token(i, 0);
+        if (token->compare(0, 17, "!!!tempo-scaling:") != 0) {
+            continue;
+        }
+        std::string value = infile[i].getReferenceValue();
+        if (value.size() == 0) {
+            continue;
+        }
+        if (hre.search(value, "[+-]?(0?\\.?\\d+)")) {
+            double number = hre.getMatchDouble(1);
+            if (hre.search(value, "%")) {
+                number = number / 100.0;
+            }
+            else if (number >= 10.0) {
+                number = number / 10.0;
+            }
+            if (number > 0.0) {
+                output *= number;
+            }
+        }
+    }
+    return output;
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */
