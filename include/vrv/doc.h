@@ -428,7 +428,7 @@ public:
     ///@{
     void InitSelectionDoc(DocSelection &selection, bool resetCache);
     void ResetSelectionDoc(bool resetCache);
-    bool HasSelection();
+    bool HasSelection() const;
     /**
      * Temporarily deactivate and reactivate selection.
      * Used for example to get the complete MEI data.

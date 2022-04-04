@@ -1938,7 +1938,7 @@ void Doc::ResetSelectionDoc(bool resetCache)
     this->UnCastOffDoc(resetCache);
 }
 
-bool Doc::HasSelection()
+bool Doc::HasSelection() const
 {
     return (!m_selectionStart.empty() && !m_selectionEnd.empty());
 }
