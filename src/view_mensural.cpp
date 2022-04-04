@@ -260,7 +260,8 @@ void View::DrawMensuralStem(
         y2 = verticalCenter;
     }
 
-    const int halfStemWidth = m_doc->GetGlyphWidth(SMUFL_E93E_mensuralCombStemUp, staff->m_drawingStaffSize, drawingCueSize) / 2;
+    const int halfStemWidth
+        = m_doc->GetGlyphWidth(SMUFL_E93E_mensuralCombStemUp, staff->m_drawingStaffSize, drawingCueSize) / 2;
 
     // shorten the stem at its connection with the note head
     // this will not work if the pseudo size is changed
@@ -288,7 +289,8 @@ void View::DrawMensuralStem(
             }
         }
         else {
-            this->DrawSmuflCode(dc, x2 - halfStemWidth, stemY1, SMUFL_E93E_mensuralCombStemUp, staff->m_drawingStaffSize, drawingCueSize);
+            this->DrawSmuflCode(dc, x2 - halfStemWidth, stemY1, SMUFL_E93E_mensuralCombStemUp,
+                staff->m_drawingStaffSize, drawingCueSize);
         }
     }
     else {
@@ -299,7 +301,8 @@ void View::DrawMensuralStem(
             }
         }
         else {
-            this->DrawSmuflCode(dc, x2 - halfStemWidth, stemY1, SMUFL_E93F_mensuralCombStemDown, staff->m_drawingStaffSize, drawingCueSize);
+            this->DrawSmuflCode(dc, x2 - halfStemWidth, stemY1, SMUFL_E93F_mensuralCombStemDown,
+                staff->m_drawingStaffSize, drawingCueSize);
         }
     }
     dc->EndCustomGraphic();
