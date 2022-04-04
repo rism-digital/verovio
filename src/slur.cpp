@@ -334,6 +334,21 @@ void Slur::AddSpannedElements(
         const ArrayOfFloatingPositioners endTiePositioners = endStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
         std::copy(endTiePositioners.begin(), endTiePositioners.end(), std::back_inserter(tiePositioners));
     }
+
+    // Only consider ties in collision layers
+    tiePositioners.erase(std::remove_if(tiePositioners.begin(), tiePositioners.end(),
+                             [this](FloatingPositioner *positioner) {
+                                 TimeSpanningInterface *interface = positioner->GetObject()->GetTimeSpanningInterface();
+                                 assert(interface);
+                                 const bool startsInCollisionLayer
+                                     = (m_collisionLayersN.count(interface->GetStart()->GetOriginalLayerN()) > 0);
+                                 const bool endsInCollisionLayer
+                                     = (m_collisionLayersN.count(interface->GetEnd()->GetOriginalLayerN()) > 0);
+                                 return (!startsInCollisionLayer && !endsInCollisionLayer);
+                             }),
+        tiePositioners.end());
+
+    // Add ties to spanning elements
     for (FloatingPositioner *positioner : tiePositioners) {
         if (positioner->GetAlignment()->GetParentSystem() == curve->GetAlignment()->GetParentSystem()) {
             if (positioner->HasContentBB() && (positioner->GetContentRight() > xMin)
