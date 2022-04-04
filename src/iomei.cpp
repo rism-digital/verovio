@@ -3874,6 +3874,7 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
     pugi::xml_node current;
     for (current = scoreDef.next_sibling(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         std::string elementName = std::string(current.name());
         // editorial
         if (this->IsEditorialElementName(current.name())) {
@@ -3934,8 +3935,9 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
     Measure *unmeasured = NULL;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // content
@@ -4099,8 +4101,9 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
     Measure *unmeasured = NULL;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // section
@@ -4325,8 +4328,9 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_SCOREDEF);
         }
         // clef, keySig, etc.
@@ -4415,8 +4419,9 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_STAFFGRP);
         }
         // content
@@ -4541,6 +4546,7 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         if (!success) {
             break;
         }
+        this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
@@ -4834,8 +4840,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         const std::string currentName = current.name();
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(currentName)) {
+        if (this->IsEditorialElementName(currentName)) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_MEASURE);
         }
         // content
@@ -5426,8 +5433,9 @@ bool MEIInput::ReadFbChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_FB);
         }
         // content
@@ -5481,8 +5489,9 @@ bool MEIInput::ReadStaffChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_STAFF);
         }
         // content
@@ -5528,9 +5537,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
     pugi::xml_node xmlElement;
     std::string elementName;
     for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
-        if (!success) {
-            break;
-        }
+        if (!success) break;
+        this->NormalizeAttributes(xmlElement);
+
         elementName = std::string(xmlElement.name());
         // LogDebug("ReadLayerChildren: element <%s>", xmlElement.name());
         if (!this->IsAllowed(elementName, filter)) {
@@ -6358,6 +6367,7 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         if (!success) {
             break;
         }
+        this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
@@ -7336,6 +7346,21 @@ bool MEIInput::IsEditorialElementName(std::string elementName)
     auto i = std::find(MEIInput::s_editorialElementNames.begin(), MEIInput::s_editorialElementNames.end(), elementName);
     if (i != MEIInput::s_editorialElementNames.end()) return true;
     return false;
+}
+
+void MEIInput::NormalizeAttributes(pugi::xml_node &xmlElement)
+{
+    for (auto elem : xmlElement.attributes()) {
+        std::string name = elem.name();
+        std::string value = elem.value();
+
+        size_t pos = value.find_first_not_of(' ');
+        if (pos != std::string::npos) value = value.substr(pos);
+        pos = value.find_last_not_of(' ');
+        if (pos != std::string::npos) value = value.substr(0, pos + 1);
+
+        elem.set_value(value.c_str());
+    }
 }
 
 void MEIInput::UpgradePageTo_5_0_0(Page *page)
