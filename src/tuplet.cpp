@@ -298,7 +298,7 @@ void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff, int staffSize)
     tupletNum->SetDrawingYRel(yRel);
 }
 
-void Tuplet::FilterList(ArrayOfConstObjects &childList)
+void Tuplet::FilterList(ArrayOfConstObjects &childList) const
 {
     // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)

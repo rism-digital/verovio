@@ -65,7 +65,7 @@ bool MeterSigGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-void MeterSigGrp::FilterList(ArrayOfConstObjects &childList)
+void MeterSigGrp::FilterList(ArrayOfConstObjects &childList) const
 {
     // We want to keep only MeterSig
     childList.erase(std::remove_if(childList.begin(), childList.end(),

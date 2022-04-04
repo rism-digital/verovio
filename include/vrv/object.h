@@ -1641,23 +1641,33 @@ public:
     /**
      * Look for the Object in the list and return its position (-1 if not found)
      */
-    int GetListIndex(const Object *listElement);
+    int GetListIndex(const Object *listElement) const;
 
     /**
      * Gets the first item of type elementType starting at startFrom
      */
+    ///@{
+    const Object *GetListFirst(const Object *startFrom, const ClassId classId = UNSPECIFIED) const;
     Object *GetListFirst(const Object *startFrom, const ClassId classId = UNSPECIFIED);
-    Object *GetListFirstBackward(Object *startFrom, const ClassId classId = UNSPECIFIED);
+    const Object *GetListFirstBackward(const Object *startFrom, const ClassId classId = UNSPECIFIED) const;
+    Object *GetListFirstBackward(const Object *startFrom, const ClassId classId = UNSPECIFIED);
+    ///@}
 
     /**
      * Returns the previous object in the list (NULL if not found)
      */
-    Object *GetListPrevious(Object *listElement);
+    ///@{
+    const Object *GetListPrevious(const Object *listElement) const;
+    Object *GetListPrevious(const Object *listElement);
+    ///@}
 
     /**
      * Returns the next object in the list (NULL if not found)
      */
-    Object *GetListNext(Object *listElement);
+    ///@{
+    const Object *GetListNext(const Object *listElement) const;
+    Object *GetListNext(const Object *listElement);
+    ///@}
 
     /**
      * Return the list.
@@ -1665,36 +1675,40 @@ public:
      * If not, it updates the list and also calls FilterList.
      * Because this is an interface, we need to pass the object - not the best design.
      */
-    const ArrayOfObjects &GetList(Object *node);
+    ///@{
+    const ArrayOfConstObjects &GetList(const Object *node) const;
+    ArrayOfObjects GetList(const Object *node);
+    ///@}
 
     /**
      * Convenience functions that check if the list is up-to-date
      * If not, the list is updated before returning the result
      */
     ///@{
-    bool HasEmptyList(Object *node);
-    int GetListSize(Object *node);
-    Object *GetListFront(Object *node);
-    Object *GetListBack(Object *node);
+    bool HasEmptyList(const Object *node) const;
+    int GetListSize(const Object *node) const;
+    const Object *GetListFront(const Object *node) const;
+    Object *GetListFront(const Object *node);
+    const Object *GetListBack(const Object *node) const;
+    Object *GetListBack(const Object *node);
     ///@}
 
 private:
-    mutable ArrayOfObjects m_list;
-    ArrayOfObjects::iterator m_iteratorCurrent;
+    mutable ArrayOfConstObjects m_list;
 
 protected:
     /**
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ArrayOfConstObjects &childList){};
+    virtual void FilterList(ArrayOfConstObjects &childList) const {};
 
 public:
     /**
      * Reset the list of children and call FilterList().
      * As for GetList, we need to pass the object.
      */
-    void ResetList(const Object *node);
+    void ResetList(const Object *node) const;
 };
 
 //----------------------------------------------------------------------------
@@ -1728,7 +1742,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    void FilterList(ArrayOfConstObjects &childList) override;
+    void FilterList(ArrayOfConstObjects &childList) const override;
 
 private:
     //
@@ -1790,7 +1804,7 @@ class ObjectComparison {
 public:
     ObjectComparison(const ClassId classId) { m_classId = classId; }
 
-    bool operator()(Object *object)
+    bool operator()(const Object *object)
     {
         if (m_classId == UNSPECIFIED) {
             return true;

@@ -77,7 +77,7 @@ Note *Ligature::GetLastNote()
     return lastNote;
 }
 
-void Ligature::FilterList(ArrayOfConstObjects &childList)
+void Ligature::FilterList(ArrayOfConstObjects &childList) const
 {
     // Retain only note children of ligatures
     ArrayOfConstObjects::iterator iter = childList.begin();

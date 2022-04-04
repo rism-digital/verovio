@@ -94,7 +94,7 @@ bool StaffGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-void StaffGrp::FilterList(ArrayOfConstObjects &childList)
+void StaffGrp::FilterList(ArrayOfConstObjects &childList) const
 {
     // We want to keep only staffDef
     ArrayOfConstObjects::iterator iter = childList.begin();

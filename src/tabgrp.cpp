@@ -58,7 +58,7 @@ bool TabGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-void TabGrp::FilterList(ArrayOfConstObjects &childList)
+void TabGrp::FilterList(ArrayOfConstObjects &childList) const
 {
     // Retain only note children of chords
     ArrayOfConstObjects::iterator iter = childList.begin();

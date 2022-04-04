@@ -1298,7 +1298,7 @@ ObjectListInterface &ObjectListInterface::operator=(const ObjectListInterface &i
     return *this;
 }
 
-void ObjectListInterface::ResetList(const Object *node)
+void ObjectListInterface::ResetList(const Object *node) const
 {
     // nothing to do, the list if up to date
     if (!node->IsModified()) {
@@ -1307,52 +1307,64 @@ void ObjectListInterface::ResetList(const Object *node)
 
     node->Modify(false);
     m_list.clear();
-    // TODO: remove later (BEGIN)
-    ArrayOfConstObjects tempList(m_list.begin(), m_list.end());
-    node->FillFlatList(tempList);
-    this->FilterList(tempList);
-    m_list.clear();
-    for (auto ptr : tempList) {
-        m_list.push_back(const_cast<Object *>(ptr));
-    }
-    // TODO: remove later (END)
+    node->FillFlatList(m_list);
+    this->FilterList(m_list);
 }
 
-const ArrayOfObjects &ObjectListInterface::GetList(Object *node)
+const ArrayOfConstObjects &ObjectListInterface::GetList(const Object *node) const
 {
     this->ResetList(node);
     return m_list;
 }
 
-bool ObjectListInterface::HasEmptyList(Object *node)
+ArrayOfObjects ObjectListInterface::GetList(const Object *node)
+{
+    this->ResetList(node);
+    ArrayOfObjects result;
+    std::transform(m_list.begin(), m_list.end(), std::back_inserter(result),
+        [](const Object *obj) { return const_cast<Object *>(obj); });
+    return result;
+}
+
+bool ObjectListInterface::HasEmptyList(const Object *node) const
 {
     this->ResetList(node);
     return m_list.empty();
 }
 
-int ObjectListInterface::GetListSize(Object *node)
+int ObjectListInterface::GetListSize(const Object *node) const
 {
     this->ResetList(node);
     return static_cast<int>(m_list.size());
 }
 
-Object *ObjectListInterface::GetListFront(Object *node)
+const Object *ObjectListInterface::GetListFront(const Object *node) const
 {
     this->ResetList(node);
     assert(!m_list.empty());
     return m_list.front();
 }
 
-Object *ObjectListInterface::GetListBack(Object *node)
+Object *ObjectListInterface::GetListFront(const Object *node)
+{
+    return const_cast<Object *>(std::as_const(*this).GetListFront(node));
+}
+
+const Object *ObjectListInterface::GetListBack(const Object *node) const
 {
     this->ResetList(node);
     assert(!m_list.empty());
     return m_list.back();
 }
 
-int ObjectListInterface::GetListIndex(const Object *listElement)
+Object *ObjectListInterface::GetListBack(const Object *node)
 {
-    ArrayOfObjects::iterator iter;
+    return const_cast<Object *>(std::as_const(*this).GetListBack(node));
+}
+
+int ObjectListInterface::GetListIndex(const Object *listElement) const
+{
+    ArrayOfConstObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -1362,9 +1374,9 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
     return -1;
 }
 
-Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
+const Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId) const
 {
-    ArrayOfObjects::iterator it = m_list.begin();
+    ArrayOfConstObjects::iterator it = m_list.begin();
     int idx = this->GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
@@ -1372,20 +1384,30 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
     return (it == m_list.end()) ? NULL : *it;
 }
 
-Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
+Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
-    ArrayOfObjects::iterator it = m_list.begin();
+    return const_cast<Object *>(std::as_const(*this).GetListFirst(startFrom, classId));
+}
+
+const Object *ObjectListInterface::GetListFirstBackward(const Object *startFrom, const ClassId classId) const
+{
+    ArrayOfConstObjects::iterator it = m_list.begin();
     int idx = this->GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
-    ArrayOfObjects::reverse_iterator rit(it);
+    ArrayOfConstObjects::reverse_iterator rit(it);
     rit = std::find_if(rit, m_list.rend(), ObjectComparison(classId));
     return (rit == m_list.rend()) ? NULL : *rit;
 }
 
-Object *ObjectListInterface::GetListPrevious(Object *listElement)
+Object *ObjectListInterface::GetListFirstBackward(const Object *startFrom, const ClassId classId)
 {
-    ArrayOfObjects::iterator iter;
+    return const_cast<Object *>(std::as_const(*this).GetListFirstBackward(startFrom, classId));
+}
+
+const Object *ObjectListInterface::GetListPrevious(const Object *listElement) const
+{
+    ArrayOfConstObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -1400,9 +1422,14 @@ Object *ObjectListInterface::GetListPrevious(Object *listElement)
     return NULL;
 }
 
-Object *ObjectListInterface::GetListNext(Object *listElement)
+Object *ObjectListInterface::GetListPrevious(const Object *listElement)
 {
-    ArrayOfObjects::reverse_iterator iter;
+    return const_cast<Object *>(std::as_const(*this).GetListPrevious(listElement));
+}
+
+const Object *ObjectListInterface::GetListNext(const Object *listElement) const
+{
+    ArrayOfConstObjects::reverse_iterator iter;
     int i;
     for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -1415,6 +1442,11 @@ Object *ObjectListInterface::GetListNext(Object *listElement)
         }
     }
     return NULL;
+}
+
+Object *ObjectListInterface::GetListNext(const Object *listElement)
+{
+    return const_cast<Object *>(std::as_const(*this).GetListNext(listElement));
 }
 
 //----------------------------------------------------------------------------
@@ -1457,7 +1489,7 @@ void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &li
     }
 }
 
-void TextListInterface::FilterList(ArrayOfConstObjects &childList)
+void TextListInterface::FilterList(ArrayOfConstObjects &childList) const
 {
     ArrayOfConstObjects::iterator iter = childList.begin();
     while (iter != childList.end()) {

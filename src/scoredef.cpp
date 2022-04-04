@@ -441,7 +441,7 @@ void ScoreDef::ReplaceDrawingLabels(StaffGrp *newStaffGrp)
     }
 }
 
-void ScoreDef::FilterList(ArrayOfConstObjects &childList)
+void ScoreDef::FilterList(ArrayOfConstObjects &childList) const
 {
     // We want to keep only staffDef
     ArrayOfConstObjects::iterator iter = childList.begin();

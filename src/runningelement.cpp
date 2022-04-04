@@ -91,7 +91,7 @@ bool RunningElement::IsSupportedChild(Object *child)
     return true;
 }
 
-void RunningElement::FilterList(ArrayOfConstObjects &childList)
+void RunningElement::FilterList(ArrayOfConstObjects &childList) const
 {
     ArrayOfConstObjects::iterator iter = childList.begin();
 

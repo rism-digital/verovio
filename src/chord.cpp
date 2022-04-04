@@ -212,7 +212,7 @@ void Chord::AddChild(Object *child)
     Modify();
 }
 
-void Chord::FilterList(ArrayOfConstObjects &childList)
+void Chord::FilterList(ArrayOfConstObjects &childList) const
 {
     // Retain only note children of chords
     ArrayOfConstObjects::iterator iter = childList.begin();

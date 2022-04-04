@@ -1586,7 +1586,7 @@ bool Beam::IsSupportedChild(Object *child)
     return true;
 }
 
-void Beam::FilterList(ArrayOfConstObjects &childList)
+void Beam::FilterList(ArrayOfConstObjects &childList) const
 {
     bool firstNoteGrace = false;
     // We want to keep only notes and rests

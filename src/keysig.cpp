@@ -107,7 +107,7 @@ void KeySig::Reset()
     m_drawingCancelAccidCount = 0;
 }
 
-void KeySig::FilterList(ArrayOfConstObjects &childList)
+void KeySig::FilterList(ArrayOfConstObjects &childList) const
 {
     // nothing  to filter since we allow only KeyAccid for now.
     ArrayOfConstObjects::iterator iter = childList.begin();

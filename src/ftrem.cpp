@@ -79,7 +79,7 @@ const ArrayOfBeamElementCoords *FTrem::GetElementCoords()
     return &m_beamElementCoords;
 }
 
-void FTrem::FilterList(ArrayOfConstObjects &childList)
+void FTrem::FilterList(ArrayOfConstObjects &childList) const
 {
     ArrayOfConstObjects::iterator iter = childList.begin();
 

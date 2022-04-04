@@ -116,7 +116,7 @@ protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    void FilterList(ArrayOfConstObjects &childList) override;
+    void FilterList(ArrayOfConstObjects &childList) const override;
 
 private:
     /**

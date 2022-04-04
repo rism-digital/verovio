@@ -158,7 +158,7 @@ protected:
      * Filter the list for a specific class.
      * Keep only the top <rend> and <fig>
      */
-    void FilterList(ArrayOfConstObjects &childList) override;
+    void FilterList(ArrayOfConstObjects &childList) const override;
 
 private:
     /**
