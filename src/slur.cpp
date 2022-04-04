@@ -172,7 +172,7 @@ Staff *Slur::GetBoundaryCrossStaff()
     }
 }
 
-std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax, char spanningType)
+std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax)
 {
     // Decide whether we search the whole parent system or just one measure which is much faster
     Object *container = this->IsSpanningMeasures() ? staff->GetFirstAncestor(SYSTEM) : this->GetStartMeasure();
@@ -180,8 +180,6 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(this);
     findSpannedLayerElementsParams.m_minPos = xMin;
     findSpannedLayerElementsParams.m_maxPos = xMax;
-    findSpannedLayerElementsParams.m_inMeasureRange
-        = ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END));
     findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC, CHORD, CLEF, FLAG, GLISS, NOTE, STEM, TUPLET_BRACKET,
         TUPLET_NUM }; // Ties should be handled separately
 
@@ -199,8 +197,7 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
 
     // Run the search without layer bounds
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-    Functor findSpannedLayerElementsEnd(&Object::FindSpannedLayerElementsEnd);
-    container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
+    container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams);
 
     // Now determine the minimal and maximal layer
     std::set<int> layersN;
@@ -275,12 +272,9 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
         // For separated voices or prescribed layers rerun the search with layer bounds
         if (layersAreSeparated || this->HasLayer()) {
             findSpannedLayerElementsParams.m_elements.clear();
-            findSpannedLayerElementsParams.m_inMeasureRange
-                = ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END));
             findSpannedLayerElementsParams.m_minLayerN = minLayerN;
             findSpannedLayerElementsParams.m_maxLayerN = maxLayerN;
-            container->Process(
-                &findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
+            container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams);
         }
     }
 
@@ -362,12 +356,12 @@ void Slur::AddSpannedElements(
     }
 }
 
-Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spanningType)
+Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax)
 {
     Staff *extremalStaff = staff;
 
     const SlurCurveDirection curveDir = this->GetDrawingCurveDir();
-    const std::vector<LayerElement *> spannedElements = this->CollectSpannedElements(staff, xMin, xMax, spanningType);
+    const std::vector<LayerElement *> spannedElements = this->CollectSpannedElements(staff, xMin, xMax);
 
     // The floating curve positioner of cross staff slurs should live in the lower/upper staff alignment
     // corresponding to whether the slur is curved below or not

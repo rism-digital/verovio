@@ -180,8 +180,7 @@ void View::CalcInitialSlur(
 
     /************** content **************/
 
-    const std::vector<LayerElement *> elements
-        = slur->CollectSpannedElements(staff, bezier.p1.x, bezier.p2.x, curve->GetSpanningType());
+    const std::vector<LayerElement *> elements = slur->CollectSpannedElements(staff, bezier.p1.x, bezier.p2.x);
     slur->AddSpannedElements(curve, elements, staff, bezier.p1.x, bezier.p2.x);
 
     /************** angle **************/
