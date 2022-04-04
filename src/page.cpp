@@ -79,6 +79,26 @@ bool Page::IsSupportedChild(Object *child)
     return true;
 }
 
+bool Page::IsFirstOfSelection() const
+{
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+    if (!doc->HasSelection()) return false;
+
+    assert(this->GetParent());
+    return (this->GetParent()->GetFirst() == this);
+}
+
+bool Page::IsLastOfSelection() const
+{
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+    if (!doc->HasSelection()) return false;
+
+    assert(this->GetParent());
+    return (this->GetParent()->GetLast() == this);
+}
+
 RunningElement *Page::GetHeader()
 {
     return const_cast<RunningElement *>(std::as_const(*this).GetHeader());

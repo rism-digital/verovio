@@ -373,6 +373,20 @@ bool System::IsLastOfMdiv() const
     return (nextSibling && nextSibling->IsPageElement());
 }
 
+bool System::IsFirstOfSelection() const
+{
+    const Page *page = vrv_cast<const Page *>(this->GetFirstAncestor(PAGE));
+    assert(page);
+    return (page->IsFirstOfSelection() && this->IsFirstInPage());
+}
+
+bool System::IsLastOfSelection() const
+{
+    const Page *page = vrv_cast<const Page *>(this->GetFirstAncestor(PAGE));
+    assert(page);
+    return (page->IsLastOfSelection() && this->IsLastInPage());
+}
+
 double System::EstimateJustificationRatio(Doc *doc)
 {
     assert(doc);

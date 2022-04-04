@@ -63,6 +63,14 @@ public:
     ///@}
 
     /**
+     * @name Check if the page is the first or last in page of a selection
+     */
+    ///@{
+    bool IsFirstOfSelection() const;
+    bool IsLastOfSelection() const;
+    ///@}
+
+    /**
      * @name Getter header and footer.
      * Looks if the page is the first one or not
      */
