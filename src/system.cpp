@@ -596,7 +596,7 @@ int System::SetAlignmentXPos(FunctorParams *functorParams)
     assert(params);
 
     const double ratio = this->EstimateJustificationRatio(params->m_doc);
-    if (!this->IsLastOfMdiv() || (ratio < params->m_estimatedJustificationRatio)) {
+    if ((!this->IsLastOfMdiv() && !this->IsLastOfSelection()) || (ratio < params->m_estimatedJustificationRatio)) {
         params->m_estimatedJustificationRatio = ratio;
     }
 
@@ -863,7 +863,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
     // Check if we are on the last system of an mdiv.
     // Do not justify it if the non-justified width is less than a specified percent.
-    if (this->IsLastOfMdiv()) {
+    if (this->IsLastOfMdiv() || this->IsLastOfSelection()) {
         double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
         if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
             return FUNCTOR_SIBLINGS;
