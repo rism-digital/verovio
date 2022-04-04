@@ -256,12 +256,14 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int y = accid->GetDrawingY();
 
     if (accid->GetFunc() == accidLog_FUNC_edit) {
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) {
+            const int drawingDur = note->GetDrawingDur();
             // Check if the note is on the top line or above (add a unit for the note head half size)
-            if (note->GetDrawingY() >= y) y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            if (note->GetDrawingY() >= y) y = note->GetDrawingY() + unit;
             // Check if the top of the stem is above
             if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y)) {
                 y = note->GetDrawingStemEnd(note).y;
@@ -269,11 +271,13 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             else if (note->IsMensuralDur()) {
                 const int verticalCenter = y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
                 const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
-                const int drawingDur = note->GetDrawingDur();
                 if ((note->GetStemDir() == STEMDIRECTION_up)
                     || ((drawingDur > DUR_1) && (stemDir == STEMDIRECTION_up))) {
-                    y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * STANDARD_STEMLENGTH;
+                    y = note->GetDrawingY() + unit * STANDARD_STEMLENGTH;
                 }
+            }
+            else if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (drawingDur == DUR_LG)) {
+                y = note->GetDrawingStem()->GetDrawingY() + unit * STANDARD_STEMLENGTH;
             }
             // Increase the x position of the accid
             x += note->GetDrawingRadius(m_doc);
@@ -282,7 +286,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->GetDrawingCueSize()));
         dc->GetSmuflTextExtent(accid->GetSymbolStr(notationType), &extend);
         dc->ResetFont();
-        y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y += extend.m_descent + unit;
     }
 
     this->DrawSmuflString(
