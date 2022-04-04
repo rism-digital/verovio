@@ -260,9 +260,11 @@ void View::DrawMensuralStem(
         y2 = verticalCenter;
     }
 
+    const int halfStemWidth = m_doc->GetGlyphWidth(SMUFL_E93E_mensuralCombStemUp, staff->m_drawingStaffSize, drawingCueSize) / 2;
+
     // shorten the stem at its connection with the note head
     // this will not work if the pseudo size is changed
-    int shortening = 0.9 * m_doc->GetDrawingUnit(staffSize);
+    const int shortening = m_doc->GetDrawingUnit(staffSize) - halfStemWidth;
 
     // LogDebug("DrawMensuralStem: drawingDur=%d mensural_black=%d nbFlags=%d", drawingDur, mensural_black, nbFlags);
     int stemY1 = (dir == STEMDIRECTION_up) ? y1 + shortening : y1 - shortening;
@@ -274,7 +276,6 @@ void View::DrawMensuralStem(
         stemY2 = (dir == STEMDIRECTION_up) ? y2 - shortener : y2 + shortener;
     }
 
-    int halfStemWidth = m_doc->GetDrawingStemWidth(staffSize) / 2;
     // draw the stems and the flags
 
     dc->StartCustomGraphic("stem");
@@ -287,7 +288,7 @@ void View::DrawMensuralStem(
             }
         }
         else {
-            this->DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+            this->DrawSmuflCode(dc, x2 - halfStemWidth, stemY1, SMUFL_E93E_mensuralCombStemUp, staff->m_drawingStaffSize, drawingCueSize);
         }
     }
     else {
@@ -298,7 +299,7 @@ void View::DrawMensuralStem(
             }
         }
         else {
-            this->DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+            this->DrawSmuflCode(dc, x2 - halfStemWidth, stemY1, SMUFL_E93F_mensuralCombStemDown, staff->m_drawingStaffSize, drawingCueSize);
         }
     }
     dc->EndCustomGraphic();
