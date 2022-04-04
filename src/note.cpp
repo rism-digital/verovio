@@ -467,7 +467,7 @@ wchar_t Note::GetMensuralNoteheadGlyph() const
 
     wchar_t code = 0;
     if (mensural_black) {
-        code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+        code = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
     }
     else {
         if (this->GetColored() == BOOLEAN_true) {
