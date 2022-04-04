@@ -1730,12 +1730,12 @@ public:
     /**
      * Returns a contatenated version of all the text children
      */
-    std::wstring GetText(Object *node);
+    std::wstring GetText(const Object *node) const;
 
     /**
      * Fill an array of lines with concatenated content of each line
      */
-    void GetTextLines(Object *node, std::vector<std::wstring> &lines);
+    void GetTextLines(const Object *node, std::vector<std::wstring> &lines) const;
 
 protected:
     /**

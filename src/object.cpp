@@ -1453,34 +1453,34 @@ Object *ObjectListInterface::GetListNext(const Object *listElement)
 // TextListInterface
 //----------------------------------------------------------------------------
 
-std::wstring TextListInterface::GetText(Object *node)
+std::wstring TextListInterface::GetText(const Object *node) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    const ArrayOfObjects &childList = this->GetList(node); // make sure it's initialized
-    for (ArrayOfObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
+    const ArrayOfConstObjects &childList = this->GetList(node); // make sure it's initialized
+    for (ArrayOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
         if ((*it)->Is(LB)) {
             continue;
         }
-        Text *text = vrv_cast<Text *>(*it);
+        const Text *text = vrv_cast<const Text *>(*it);
         assert(text);
         concatText += text->GetText();
     }
     return concatText;
 }
 
-void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &lines)
+void TextListInterface::GetTextLines(const Object *node, std::vector<std::wstring> &lines) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    const ArrayOfObjects &childList = this->GetList(node); // make sure it's initialized
-    for (ArrayOfObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
+    const ArrayOfConstObjects &childList = this->GetList(node); // make sure it's initialized
+    for (ArrayOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
         if ((*it)->Is(LB) && !concatText.empty()) {
             lines.push_back(concatText);
             concatText.clear();
             continue;
         }
-        Text *text = vrv_cast<Text *>(*it);
+        const Text *text = vrv_cast<const Text *>(*it);
         assert(text);
         concatText += text->GetText();
     }
