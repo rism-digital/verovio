@@ -100,6 +100,7 @@ void Slur::Reset()
     this->ResetLayerIdent();
 
     m_drawingCurveDir = SlurCurveDirection::None;
+    m_collisionLayersN.clear();
 }
 
 curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
@@ -282,6 +283,12 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
                 &findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
         }
     }
+
+    // Store the layers used for collision avoidance
+    m_collisionLayersN = layersN;
+    std::transform(findSpannedLayerElementsParams.m_elements.cbegin(), findSpannedLayerElementsParams.m_elements.cend(),
+        std::inserter(m_collisionLayersN, m_collisionLayersN.end()),
+        [](LayerElement *element) { return element->GetOriginalLayerN(); });
 
     return findSpannedLayerElementsParams.m_elements;
 }

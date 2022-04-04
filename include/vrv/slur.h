@@ -264,6 +264,12 @@ private:
      * for s-shaped slurs / mixed direction
      */
     SlurCurveDirection m_drawingCurveDir;
+
+    /**
+     * Layers used for collision detection
+     * These are updated in CollectSpannedElements
+     */
+    std::set<int> m_collisionLayersN;
 };
 
 } // namespace vrv
