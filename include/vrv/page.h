@@ -63,7 +63,7 @@ public:
     ///@}
 
     /**
-     * @name Check if the page is the first or last in page of a selection
+     * @name Check if the page is the first or last page of a selection
      */
     ///@{
     bool IsFirstOfSelection() const;
