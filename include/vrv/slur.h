@@ -143,6 +143,12 @@ public:
     std::vector<LayerElement *> CollectSpannedElements(Staff *staff, int xMin, int xMax, char spanningType);
 
     /**
+     * Filter and add layer elements spanned by the slur to the positioner
+     */
+    void AddSpannedElements(
+        FloatingCurvePositioner *curve, const std::vector<LayerElement *> &elements, Staff *staff, int xMin, int xMax);
+
+    /**
      * Calculate the staff where the slur's floating curve positioner lives
      */
     Staff *CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spanningType);
