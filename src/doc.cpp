@@ -1996,11 +1996,10 @@ void Doc::ReactivateSelection(bool resetAligners)
     }
 
     // Detach the preceeding and following page
-    this->SetDrawingPage(1);
     pages->DetachChild(lastPage);
     pages->DetachChild(0);
-
-    this->SetDrawingPage(0);
+    // Make sure we do not point to page moved out of the selection
+    this->m_drawingPage = NULL;
 }
 
 //----------------------------------------------------------------------------
