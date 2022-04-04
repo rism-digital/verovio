@@ -1651,9 +1651,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         // If the dynamic is a symbol (pp, mf, etc.) draw it as one SMuFL string. This will not take into account
         // editorial element within the dynam as it would with text. Also, it is center only if it is a symbol.
         if (isSymbolOnly) {
-            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            this->DrawSmuflString(dc, params.m_x, params.m_y, dynamSymbol, alignment, (*staffIter)->m_drawingStaffSize);
-            dc->ResetFont();
+            this->DrawDynamSymbolOnly(dc, *staffIter, dynam, dynamSymbol, alignment, params);
         }
         else {
             dc->SetBrush(m_currentColour, AxSOLID);
@@ -1670,6 +1668,62 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     }
 
     dc->EndGraphic(dynam, this);
+}
+
+void View::DrawDynamSymbolOnly(DeviceContext *dc, Staff *staff, Dynam *dynam, const std::wstring &dynamSymbol,
+    data_HORIZONTALALIGNMENT alignment, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(staff);
+    assert(dynam);
+
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+
+    // calculate width of the symbol-only dynamic; generally it consists of only one symbol, but in case when it's
+    // combination of different dynamics glyphs we need to get total width of all elements
+    const int left = m_doc->GetGlyphLeft(dynamSymbol.at(0), staff->m_drawingStaffSize, false);
+    int width = 0;
+    for (int i = 0; i < dynamSymbol.size(); ++i) {
+        if (i == dynamSymbol.size() - 1)
+            width += m_doc->GetGlyphRight(dynamSymbol.at(i), staff->m_drawingStaffSize, false);
+        else
+            width += m_doc->GetGlyphAdvX(dynamSymbol.at(i), staff->m_drawingStaffSize, false);
+    }
+
+    // draw opening symbol
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if (dynam->HasEnclose()) {
+        wchar_t code;
+        std::wstring open;
+        if (dynam->GetEnclose() == ENCLOSURE_paren)
+            code = SMUFL_E26A_accidentalParensLeft;
+        else
+            code = SMUFL_E26C_accidentalBracketLeft;
+        open.push_back(code);
+
+        this->DrawSmuflString(dc, params.m_x, params.m_y + unit, open, alignment, staff->m_drawingStaffSize);
+        params.m_x += m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, false) - left + unit / 6;
+    }
+
+    // draw dynamics itself
+    this->DrawSmuflString(dc, params.m_x, params.m_y, dynamSymbol, alignment, staff->m_drawingStaffSize);
+
+    // draw closing symbol
+    if (dynam->HasEnclose()) {
+        wchar_t code;
+        std::wstring close;
+        if (dynam->GetEnclose() == ENCLOSURE_paren)
+            code = SMUFL_E26B_accidentalParensRight;
+        else
+            code = SMUFL_E26D_accidentalBracketRight;
+        close.push_back(code);
+
+        params.m_x += width + unit / 6;
+
+        this->DrawSmuflString(dc, params.m_x, params.m_y + unit, close, alignment, staff->m_drawingStaffSize);
+    }
+
+    dc->ResetFont();
 }
 
 void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &params)
