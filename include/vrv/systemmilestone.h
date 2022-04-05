@@ -140,7 +140,7 @@ public:
     virtual int InterfacePrepareMilestones(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * Reset the drawing values before calling PrepareData after changes.
      * Called from Ending::ResetData and EditorialElement::ResetData
      */
     virtual int InterfaceResetData(FunctorParams *functorParams);

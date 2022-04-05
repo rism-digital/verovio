@@ -379,7 +379,7 @@ typedef bool (*NotePredicate)(Note *);
  * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)
  * The stucture must be filled first and can then be used by instanciating a vector
  * of corresponding Comparison (typically AttNIntegerComparison for @n attribute).
- * See Doc::PrepareDrawing for an example.
+ * See Doc::PrepareData for an example.
  */
 struct IntTree {
     std::map<int, IntTree> child;
@@ -391,7 +391,7 @@ typedef std::map<int, IntTree> IntTree_t;
  * This is the alternate way for representing map of maps. With this solution,
  * we can easily have different types of key (attribute) at each level. We could
  * mix int, string, or even MEI data_* types. The drawback is that a type has to
- * be defined at each level. Also see Doc::PrepareDrawing for an example.
+ * be defined at each level. Also see Doc::PrepareData for an example.
  */
 typedef std::map<int, bool> VerseN_t;
 typedef std::map<int, VerseN_t> LayerN_VerserN_t;

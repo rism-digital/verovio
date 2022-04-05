@@ -342,7 +342,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
     PrepareProcessingListsParams prepareProcessingListsParams;
-    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
+    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareData)
     // StaffN_LayerN_VerseN_t staffLayerVerseTree;
     // params.push_back(&staffLayerVerseTree);
 
@@ -609,7 +609,7 @@ void Doc::PrepareData()
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
     PrepareProcessingListsParams prepareProcessingListsParams;
-    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
+    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareData)
     // StaffN_LayerN_VerseN_t staffLayerVerseTree;
     // params.push_back(&staffLayerVerseTree);
 

@@ -716,7 +716,7 @@ public:
     ///@}
 
     /**
-     * @name Functors for loading and saving the docuement
+     * @name Functors for loading and saving the document
      */
     ///@{
 
@@ -1277,7 +1277,7 @@ public:
     ///@}
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * Reset the drawing values before calling PrepareData after changes.
      */
     virtual int ResetData(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
