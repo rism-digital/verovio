@@ -89,9 +89,9 @@ int PageElement::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int PageElement::InitSelection(FunctorParams *functorParams)
+int PageElement::CastOffToSelection(FunctorParams *functorParams)
 {
-    InitSelectionParams *params = vrv_params_cast<InitSelectionParams *>(functorParams);
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
     assert(params);
 
     MoveItselfTo(params->m_page);

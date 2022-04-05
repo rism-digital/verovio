@@ -130,9 +130,9 @@ int PageMilestoneEnd::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int PageMilestoneEnd::InitSelection(FunctorParams *functorParams)
+int PageMilestoneEnd::CastOffToSelection(FunctorParams *functorParams)
 {
-    InitSelectionParams *params = vrv_params_cast<InitSelectionParams *>(functorParams);
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
     assert(params);
 
     assert(params->m_page);

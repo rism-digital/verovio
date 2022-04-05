@@ -1299,9 +1299,9 @@ int Measure::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::InitSelection(FunctorParams *functorParams)
+int Measure::CastOffToSelection(FunctorParams *functorParams)
 {
-    InitSelectionParams *params = vrv_params_cast<InitSelectionParams *>(functorParams);
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
     assert(params);
 
     const bool startSelection = (!params->m_isSelection && this->GetUuid() == params->m_start);

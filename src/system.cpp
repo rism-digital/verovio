@@ -1179,9 +1179,9 @@ int System::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::InitSelection(FunctorParams *functorParams)
+int System::CastOffToSelection(FunctorParams *functorParams)
 {
-    InitSelectionParams *params = vrv_params_cast<InitSelectionParams *>(functorParams);
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
     assert(params);
 
     // We are starting a new system we need to cast off

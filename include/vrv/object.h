@@ -1381,7 +1381,7 @@ public:
     ///@}
 
     /**
-     * @name Functors for calculating the layout of a document.
+     * @name Functors for calculating the layout of a document or of a selection.
      */
     ///@{
 
@@ -1416,6 +1416,13 @@ public:
      * This is used by Doc::ContinuousLayout for putting all pages / systems continously.
      */
     virtual int UnCastOff(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * CasttOff a document to selection.
+     * Move everything before the selection to the first page, the selection to a second page,
+     * and everthing after the selection to a third page.
+     */
+    virtual int CastOffToSelection(FunctorParams *) { return FUNCTOR_CONTINUE; };
 
     ///@}
 
@@ -1492,8 +1499,6 @@ public:
      * Transpose the content.
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    virtual int InitSelection(FunctorParams *) { return FUNCTOR_CONTINUE; };
 
 private:
     /**

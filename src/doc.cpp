@@ -1079,6 +1079,146 @@ void Doc::CastOffEncodingDoc()
     m_isCastOff = true;
 }
 
+void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
+{
+    // No new selection to apply;
+    if (!selection.m_isPending) return;
+
+    if (this->HasSelection()) {
+        this->ResetSelectionDoc(resetCache);
+    }
+
+    selection.Set(this);
+
+    if (!this->HasSelection()) return;
+
+    assert(!m_selectionPreceeding && !m_selectionFollowing);
+
+    if (this->IsCastOff()) this->UnCastOffDoc();
+
+    Pages *pages = this->GetPages();
+    assert(pages);
+
+    this->ScoreDefSetCurrentDoc();
+
+    Page *unCastOffPage = this->SetDrawingPage(0);
+
+    // Make sure we have global slurs curve dir
+    unCastOffPage->ResetAligners();
+
+    // We can now detach and delete the old content page
+    pages->DetachChild(0);
+    assert(unCastOffPage);
+
+    Page *selectionFirstPage = new Page();
+    pages->AddChild(selectionFirstPage);
+
+    CastOffToSelectionParams castOffToSelectionParams(selectionFirstPage, this, m_selectionStart, m_selectionEnd);
+    Functor castOffToSelection(&Object::CastOffToSelection);
+
+    unCastOffPage->Process(&castOffToSelection, &castOffToSelectionParams);
+
+    delete unCastOffPage;
+
+    this->ResetDataPage();
+    this->ScoreDefSetCurrentDoc(true);
+
+    if (pages->GetChildCount() < 2) {
+        LogWarning("Selection could not be made");
+        m_selectionStart = "";
+        m_selectionEnd = "";
+        return;
+    }
+    else if (pages->GetChildCount() == 2) {
+        LogWarning("Selection end '%s' could not be found", m_selectionEnd.c_str());
+        // Add an empty page to make it work
+        pages->AddChild(new Page());
+    }
+
+    this->ReactivateSelection(true);
+}
+
+void Doc::ResetSelectionDoc(bool resetCache)
+{
+    assert(m_selectionPreceeding && m_selectionFollowing);
+
+    m_selectionStart = "";
+    m_selectionEnd = "";
+
+    if (this->IsCastOff()) this->UnCastOffDoc();
+
+    this->DeactiveateSelection();
+
+    this->m_isCastOff = true;
+    this->UnCastOffDoc(resetCache);
+}
+
+bool Doc::HasSelection() const
+{
+    return (!m_selectionStart.empty() && !m_selectionEnd.empty());
+}
+
+void Doc::DeactiveateSelection()
+{
+    Pages *pages = this->GetPages();
+    assert(pages);
+
+    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(0));
+    assert(selectionPage);
+    // We need to delete the selection scoreDef
+    Score *selectionScore = vrv_cast<Score *>(selectionPage->FindDescendantByType(SCORE));
+    assert(selectionScore);
+    if (selectionScore->GetLabel() != "[selectionScore]") LogError("Deleting wrong score element. Something is wrong");
+    selectionPage->DeleteChild(selectionScore);
+
+    m_selectionPreceeding->SetParent(pages);
+    pages->InsertChild(m_selectionPreceeding, 0);
+    pages->AddChild(m_selectionFollowing);
+
+    m_selectionPreceeding = NULL;
+    m_selectionFollowing = NULL;
+}
+
+void Doc::ReactivateSelection(bool resetAligners)
+{
+    Pages *pages = this->GetPages();
+    assert(pages);
+
+    const int lastPage = pages->GetChildCount() - 1;
+    assert(lastPage > 1);
+
+    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(1));
+    System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
+    // Add a selection scoreDef based on the current drawing system scoreDef
+    Score *selectionScore = new Score();
+    selectionScore->SetLabel("[selectionScore]");
+    *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
+    // Use the drawing values as actual scoreDef
+    selectionScore->GetScoreDef()->ResetFromDrawingValues();
+    selectionScore->SetParent(selectionPage);
+    selectionPage->InsertChild(selectionScore, 0);
+
+    m_selectionPreceeding = vrv_cast<Page *>(pages->GetChild(0));
+    // Reset the aligners because data will be accessed when rendering control events outside the selection
+    if (resetAligners && m_selectionPreceeding->FindDescendantByType(MEASURE)) {
+        this->SetDrawingPage(0);
+        m_selectionPreceeding->ResetAligners();
+    }
+
+    m_selectionFollowing = vrv_cast<Page *>(pages->GetChild(lastPage));
+    // Same for the following content
+    if (resetAligners && m_selectionFollowing->FindDescendantByType(MEASURE)) {
+        this->SetDrawingPage(2);
+        m_selectionFollowing->ResetAligners();
+    }
+
+    // Detach the preceeding and following page
+    pages->DetachChild(lastPage);
+    pages->DetachChild(0);
+    // Make sure we do not point to page moved out of the selection
+    this->m_drawingPage = NULL;
+}
+
 void Doc::ConvertToPageBasedDoc()
 {
     Pages *pages = new Pages();
@@ -1862,146 +2002,6 @@ ScoreDef *Doc::GetCurrentScoreDef()
 void Doc::SetCurrentScore(Score *score)
 {
     m_currentScore = score;
-}
-
-void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
-{
-    // No new selection to apply;
-    if (!selection.m_isPending) return;
-
-    if (this->HasSelection()) {
-        this->ResetSelectionDoc(resetCache);
-    }
-
-    selection.Set(this);
-
-    if (!this->HasSelection()) return;
-
-    assert(!m_selectionPreceeding && !m_selectionFollowing);
-
-    if (this->IsCastOff()) this->UnCastOffDoc();
-
-    Pages *pages = this->GetPages();
-    assert(pages);
-
-    this->ScoreDefSetCurrentDoc();
-
-    Page *unCastOffPage = this->SetDrawingPage(0);
-
-    // Make sure we have global slurs curve dir
-    unCastOffPage->ResetAligners();
-
-    // We can now detach and delete the old content page
-    pages->DetachChild(0);
-    assert(unCastOffPage);
-
-    Page *selectionFirstPage = new Page();
-    pages->AddChild(selectionFirstPage);
-
-    InitSelectionParams initSelectionParams(selectionFirstPage, this, m_selectionStart, m_selectionEnd);
-    Functor initSelection(&Object::InitSelection);
-
-    unCastOffPage->Process(&initSelection, &initSelectionParams);
-
-    delete unCastOffPage;
-
-    this->ResetDataPage();
-    this->ScoreDefSetCurrentDoc(true);
-
-    if (pages->GetChildCount() < 2) {
-        LogWarning("Selection could not be made");
-        m_selectionStart = "";
-        m_selectionEnd = "";
-        return;
-    }
-    else if (pages->GetChildCount() == 2) {
-        LogWarning("Selection end '%s' could not be found", m_selectionEnd.c_str());
-        // Add an empty page to make it work
-        pages->AddChild(new Page());
-    }
-
-    this->ReactivateSelection(true);
-}
-
-void Doc::ResetSelectionDoc(bool resetCache)
-{
-    assert(m_selectionPreceeding && m_selectionFollowing);
-
-    m_selectionStart = "";
-    m_selectionEnd = "";
-
-    if (this->IsCastOff()) this->UnCastOffDoc();
-
-    this->DeactiveateSelection();
-
-    this->m_isCastOff = true;
-    this->UnCastOffDoc(resetCache);
-}
-
-bool Doc::HasSelection() const
-{
-    return (!m_selectionStart.empty() && !m_selectionEnd.empty());
-}
-
-void Doc::DeactiveateSelection()
-{
-    Pages *pages = this->GetPages();
-    assert(pages);
-
-    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(0));
-    assert(selectionPage);
-    // We need to delete the selection scoreDef
-    Score *selectionScore = vrv_cast<Score *>(selectionPage->FindDescendantByType(SCORE));
-    assert(selectionScore);
-    if (selectionScore->GetLabel() != "[selectionScore]") LogError("Deleting wrong score element. Something is wrong");
-    selectionPage->DeleteChild(selectionScore);
-
-    m_selectionPreceeding->SetParent(pages);
-    pages->InsertChild(m_selectionPreceeding, 0);
-    pages->AddChild(m_selectionFollowing);
-
-    m_selectionPreceeding = NULL;
-    m_selectionFollowing = NULL;
-}
-
-void Doc::ReactivateSelection(bool resetAligners)
-{
-    Pages *pages = this->GetPages();
-    assert(pages);
-
-    const int lastPage = pages->GetChildCount() - 1;
-    assert(lastPage > 1);
-
-    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(1));
-    System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
-    // Add a selection scoreDef based on the current drawing system scoreDef
-    Score *selectionScore = new Score();
-    selectionScore->SetLabel("[selectionScore]");
-    *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
-    // Use the drawing values as actual scoreDef
-    selectionScore->GetScoreDef()->ResetFromDrawingValues();
-    selectionScore->SetParent(selectionPage);
-    selectionPage->InsertChild(selectionScore, 0);
-
-    m_selectionPreceeding = vrv_cast<Page *>(pages->GetChild(0));
-    // Reset the aligners because data will be accessed when rendering control events outside the selection
-    if (resetAligners && m_selectionPreceeding->FindDescendantByType(MEASURE)) {
-        this->SetDrawingPage(0);
-        m_selectionPreceeding->ResetAligners();
-    }
-
-    m_selectionFollowing = vrv_cast<Page *>(pages->GetChild(lastPage));
-    // Same for the following content
-    if (resetAligners && m_selectionFollowing->FindDescendantByType(MEASURE)) {
-        this->SetDrawingPage(2);
-        m_selectionFollowing->ResetAligners();
-    }
-
-    // Detach the preceeding and following page
-    pages->DetachChild(lastPage);
-    pages->DetachChild(0);
-    // Make sure we do not point to page moved out of the selection
-    this->m_drawingPage = NULL;
 }
 
 //----------------------------------------------------------------------------
