@@ -1416,7 +1416,7 @@ public:
      * This is used by Doc::ContinuousLayout for putting all pages / systems continously.
      */
     virtual int UnCastOff(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    
+
     /**
      * CasttOff a document to selection.
      * Move everything before the selection to the first page, the selection to a second page,
