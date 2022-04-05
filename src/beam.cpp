@@ -791,10 +791,7 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
         }
     }
     else if (place == BEAMPLACE_mixed) {
-        if (step <= unit) {
-            step = 0;
-        }
-        else if (step > unit * 2) {
+        if ((step <= unit) || (step > unit * 2)) {
             step = unit * 2;
         }
         this->CalcMixedBeamStem(beamInterface, step);
@@ -896,11 +893,11 @@ void BeamSegment::CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int ste
     // beams above and below main beam. Start position of the beam is then further adjusted based on the step size to
     // make sure that beam is truly centered
     const int midPoint = (highestPoint + lowestPoint + (up - down) * beamInterface->m_beamWidth) / 2;
-    m_firstNoteOrChord->m_yBeam
-        = (m_lastNoteOrChord->m_beamRelativePlace == BEAMPLACE_below) ? midPoint - step / 2 : midPoint + step / 2;
-    m_lastNoteOrChord->m_yBeam = (m_lastNoteOrChord->m_beamRelativePlace == BEAMPLACE_below)
-        ? m_firstNoteOrChord->m_yBeam + step
-        : m_firstNoteOrChord->m_yBeam - step;
+    const bool isSlopeUp = (m_firstNoteOrChord->m_beamRelativePlace == m_lastNoteOrChord->m_beamRelativePlace)
+        ? (m_beamSlope > 0)
+        : (m_lastNoteOrChord->m_beamRelativePlace == BEAMPLACE_below);
+    m_firstNoteOrChord->m_yBeam = isSlopeUp ? midPoint - step / 2 : midPoint + step / 2;
+    m_lastNoteOrChord->m_yBeam = isSlopeUp ? m_firstNoteOrChord->m_yBeam + step : m_firstNoteOrChord->m_yBeam - step;
     if ((abs(m_firstNoteOrChord->m_yBeam - m_firstNoteOrChord->m_element->GetDrawingY()) < beamInterface->m_beamWidth)
         || (abs(m_lastNoteOrChord->m_yBeam - m_lastNoteOrChord->m_element->GetDrawingY())
             < beamInterface->m_beamWidth)) {

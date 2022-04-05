@@ -346,9 +346,6 @@ bool BeamDrawingInterface::IsHorizontalMixedBeam(
 {
     // items and directions should be of the same size, otherwise something is wrong
     if (items.size() != directions.size()) return false;
-    if ((items.size() == 3) && m_crossStaffContent) {
-        if ((directions.at(0) == directions.at(2)) && (directions.at(0) != directions.at(1))) return true;
-    }
 
     // calculate how many times stem direction is changed withing the beam
     int directionChanges = 0;
