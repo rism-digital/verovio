@@ -663,6 +663,16 @@ public:
     virtual int FindByComparison(FunctorParams *functorParams) const;
 
     /**
+     * Find the next child matching the Comparison object passed in the parameters
+     */
+    virtual int FindNextChildByComparison(FunctorParams *);
+
+    /**
+     * Find the previous child matching the Comparison object passed in the parameters
+     */
+    virtual int FindPreviousChildByComparison(FunctorParams *);
+
+    /**
      * Find a Object with the extreme value with a Comparison functor .
      */
     virtual int FindExtremeByComparison(FunctorParams *functorParams) const;
@@ -1477,10 +1487,6 @@ public:
      * Reorder elements by x-position.
      */
     virtual int ReorderByXPos(FunctorParams *);
-
-    virtual int FindNextChildByComparison(FunctorParams *);
-
-    virtual int FindPreviousChildByComparison(FunctorParams *);
 
     /**
      * Transpose the content.
