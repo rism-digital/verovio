@@ -84,6 +84,11 @@ public:
      */
     bool IsExtenderElement() const override { return GetExtender() == BOOLEAN_true; }
 
+    /**
+     * Retrieve parentheses / brackets from the enclose attribute
+     */
+    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs() const;
+
     //----------------//
     // Static methods //
     //----------------//

@@ -1679,6 +1679,9 @@ void View::DrawDynamSymbolOnly(DeviceContext *dc, Staff *staff, Dynam *dynam, co
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
+    wchar_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = dynam->GetEnclosingGlyphs();
+
     // calculate width of the symbol-only dynamic; generally it consists of only one symbol, but in case when it's
     // combination of different dynamics glyphs we need to get total width of all elements
     const int left = m_doc->GetGlyphLeft(dynamSymbol.at(0), staff->m_drawingStaffSize, false);
@@ -1692,34 +1695,23 @@ void View::DrawDynamSymbolOnly(DeviceContext *dc, Staff *staff, Dynam *dynam, co
 
     // draw opening symbol
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (dynam->HasEnclose()) {
-        wchar_t code;
+    if (enclosingFront) {
         std::wstring open;
-        if (dynam->GetEnclose() == ENCLOSURE_paren)
-            code = SMUFL_E26A_accidentalParensLeft;
-        else
-            code = SMUFL_E26C_accidentalBracketLeft;
-        open.push_back(code);
+        open.push_back(enclosingFront);
 
         this->DrawSmuflString(dc, params.m_x, params.m_y + unit, open, alignment, staff->m_drawingStaffSize);
-        params.m_x += m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, false) - left + unit / 6;
+        params.m_x += m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, false) - left + unit / 6;
     }
 
     // draw dynamics itself
     this->DrawSmuflString(dc, params.m_x, params.m_y, dynamSymbol, alignment, staff->m_drawingStaffSize);
 
     // draw closing symbol
-    if (dynam->HasEnclose()) {
-        wchar_t code;
+    if (enclosingBack) {
         std::wstring close;
-        if (dynam->GetEnclose() == ENCLOSURE_paren)
-            code = SMUFL_E26B_accidentalParensRight;
-        else
-            code = SMUFL_E26D_accidentalBracketRight;
-        close.push_back(code);
+        close.push_back(enclosingBack);
 
         params.m_x += width + unit / 6;
-
         this->DrawSmuflString(dc, params.m_x, params.m_y + unit, close, alignment, staff->m_drawingStaffSize);
     }
 

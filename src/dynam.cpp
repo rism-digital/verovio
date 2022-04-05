@@ -102,6 +102,18 @@ std::wstring Dynam::GetSymbolStr() const
     return Dynam::GetSymbolStr(m_symbolStr);
 }
 
+std::pair<wchar_t, wchar_t> Dynam::GetEnclosingGlyphs() const
+{
+    if (this->HasEnclose()) {
+        switch (this->GetEnclose()) {
+            case ENCLOSURE_brack: return { SMUFL_E26C_accidentalBracketLeft, SMUFL_E26D_accidentalBracketRight };
+            case ENCLOSURE_paren: return { SMUFL_E26A_accidentalParensLeft, SMUFL_E26B_accidentalParensRight };
+            default: break;
+        }
+    }
+    return { 0, 0 };
+}
+
 //----------------------------------------------------------------------------
 // Static methods for Dynam
 //----------------------------------------------------------------------------
