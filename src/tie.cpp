@@ -230,20 +230,16 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
 
     /************** bezier points **************/
 
-    // the 'height' of the bezier
-    int height = drawingUnit;
-    // if the space between the to points is more than two staff height, increase the height
-    if (endPoint.x - startPoint.x > 2 * doc->GetDrawingStaffSize(staff->m_drawingStaffSize)) {
-        height += drawingUnit;
-    }
+    // adjust the 'height' of the bezier based on the width of staff lines to make sure that the tie does not overlap
+    // with them
+    const int height = (1.6 - doc->GetOptions()->m_staffLineWidth.GetValue()) * drawingUnit;
+    const int distance = endPoint.x - startPoint.x;
 
     // control points
     Point c1, c2;
-    // the height of the control points
-    height *= 4 / 3;
 
-    c1.x = startPoint.x + (endPoint.x - startPoint.x) / 4; // point at 1/4
-    c2.x = startPoint.x + (endPoint.x - startPoint.x) / 4 * 3; // point at 3/4
+    c1.x = startPoint.x + distance / 4; // point at 1/4
+    c2.x = startPoint.x + distance / 4 * 3; // point at 3/4
 
     c1.y = startPoint.y + ySign * height;
     c2.y = endPoint.y + ySign * height;
@@ -261,15 +257,15 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     assert(curve);
 
     const int thickness = drawingUnit * doc->GetOptions()->m_tieMidpointThickness.GetValue();
-    curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
+    curve->UpdateCurveParams(bezier, thickness, drawingCurveDir);
 
     if ((!startParentChord || isOuterChordNote) && durElement && (spanningType != SPANNING_END)) {
         UpdateTiePositioning(curve, bezier, durElement, note1, drawingUnit, drawingCurveDir);
-        curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
+        curve->UpdateCurveParams(bezier, thickness, drawingCurveDir);
     }
     if (!startParentChord && !endParentChord && note1 && note2 && (spanningType == SPANNING_START_END)) {
         if (this->AdjustEnharmonicTies(doc, curve, bezier, note1, note2, drawingCurveDir)) {
-            curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
+            curve->UpdateCurveParams(bezier, thickness, drawingCurveDir);
         }
     }
 
@@ -590,7 +586,7 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
 // Tie functor methods
 //----------------------------------------------------------------------------
 
-int Tie::ResolveMIDITies(FunctorParams *)
+int Tie::InitTimemapTies(FunctorParams *)
 {
     Note *note1 = dynamic_cast<Note *>(this->GetStart());
     Note *note2 = dynamic_cast<Note *>(this->GetEnd());

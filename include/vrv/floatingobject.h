@@ -85,6 +85,11 @@ public:
      */
     virtual bool IsExtenderElement() const { return false; }
 
+    /**
+     * Check whether the current object must be positioned closer to the staff than the other
+     */
+    virtual bool IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const { return false; }
+
     //----------//
     // Functors //
     //----------//
@@ -120,9 +125,9 @@ public:
     int PrepareTimestamps(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnCastOff
@@ -285,7 +290,7 @@ public:
      * Stored points are made relative to the curve drawingY.
      */
     ///@{
-    void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
+    void UpdateCurveParams(const Point points[4], int thickness, curvature_CURVEDIR curveDir);
     void UpdatePoints(const BezierCurve &bezier);
     ///@}
 
@@ -310,9 +315,13 @@ public:
      */
     ///@{
     int CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin = 0, bool horizontalOverlap = true);
+    int CalcDirectionalAdjustment(
+        BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin = 0, bool horizontalOverlap = true);
     // Refined version that returns the adjustments on the left and right hand side of the bounding box
     std::pair<int, int> CalcLeftRightAdjustment(
         BoundingBox *boundingBox, bool &discard, int margin = 0, bool horizontalOverlap = true);
+    std::pair<int, int> CalcDirectionalLeftRightAdjustment(
+        BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin = 0, bool horizontalOverlap = true);
     ///@}
 
     /**
@@ -320,7 +329,6 @@ public:
      */
     ///@{
     void GetPoints(Point points[4]) const;
-    float GetAngle() { return m_angle; }
     int GetThickness() { return m_thickness; }
     curvature_CURVEDIR GetDir() { return m_dir; }
     ///@}
@@ -337,7 +345,7 @@ public:
     void AddSpannedElement(CurveSpannedElement *spannedElement) { m_spannedElements.push_back(spannedElement); }
 
     /**
-     * Return a cont pointer to the spanned elements
+     * Return a const pointer to the spanned elements
      */
     const ArrayOfCurveSpannedElements *GetSpannedElements() { return &m_spannedElements; }
 
@@ -350,6 +358,19 @@ public:
     bool IsCrossStaff() const { return m_crossStaff != NULL; }
     ///@}
 
+    /**
+     * @name Getter, setter for the requested staff space
+     */
+    ///@{
+    void SetRequestedStaffSpace(int space) { m_requestedStaffSpace = space; }
+    int GetRequestedStaffSpace() const { return m_requestedStaffSpace; }
+    ///@}
+
+    /**
+     * Calculate the requested staff space above and below
+     */
+    std::pair<int, int> CalcRequestedStaffSpace(StaffAlignment *alignment);
+
 private:
     //
 public:
@@ -361,7 +382,6 @@ private:
      */
     ///@{
     Point m_points[4];
-    float m_angle;
     int m_thickness;
     curvature_CURVEDIR m_dir;
     Staff *m_crossStaff;
@@ -371,6 +391,11 @@ private:
 
     /** The cached min or max value (depending on the curvature) */
     int m_cachedMinMaxY;
+
+    /**
+     * Some curves (S-shaped slurs) can request staff space to prevent collisions from two sides
+     */
+    int m_requestedStaffSpace;
 };
 
 //----------------------------------------------------------------------------
@@ -387,12 +412,14 @@ public:
     {
         m_boundingBox = NULL;
         m_discarded = false;
+        m_isBelow = true;
     }
     virtual ~CurveSpannedElement(){};
 
     Point m_rotatedPoints[4];
     BoundingBox *m_boundingBox;
     bool m_discarded;
+    bool m_isBelow;
 };
 
 } // namespace vrv

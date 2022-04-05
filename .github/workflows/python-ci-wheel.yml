@@ -50,7 +50,7 @@ jobs:
       # Set up
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - uses: nuget/setup-nuget@v1
         with:
@@ -149,7 +149,7 @@ jobs:
       # Set up
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2

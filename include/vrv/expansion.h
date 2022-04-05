@@ -41,7 +41,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    PlistInterface *GetPlistInterface() override { return dynamic_cast<PlistInterface *>(this); }
+    PlistInterface *GetPlistInterface() override { return vrv_cast<PlistInterface *>(this); }
+    const PlistInterface *GetPlistInterface() const override { return vrv_cast<const PlistInterface *>(this); }
     ////@}
 
     //----------//

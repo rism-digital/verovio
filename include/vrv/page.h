@@ -14,7 +14,7 @@
 namespace vrv {
 
 class DeviceContext;
-class PrepareProcessingListsParams;
+class InitProcessingListsParams;
 class RunningElement;
 class Score;
 class Staff;
@@ -60,6 +60,14 @@ public:
     ///@{
     double GetPPUFactor() const { return m_PPUFactor; }
     void SetPPUFactor(double PPUFactor) { m_PPUFactor = PPUFactor; }
+    ///@}
+
+    /**
+     * @name Check if the page is the first or last page of a selection
+     */
+    ///@{
+    bool IsFirstOfSelection() const;
+    bool IsLastOfSelection() const;
     ///@}
 
     /**
@@ -122,6 +130,11 @@ public:
      * Justifiy the content of the page (system/staves) vertically
      */
     void JustifyVertically();
+
+    /**
+     * Reset and set the horizontal and vertical alignment
+     */
+    void ResetAligners();
 
     /**
      * Lay out the pitch positions and stems (without redoing the entire layout)
@@ -191,7 +204,12 @@ private:
     /**
      * Adjust the horizontal postition of the syl processing verse by verse
      */
-    void AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc);
+    void AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc);
+
+    /**
+     * Check whether vertical justification is required for the current page
+     */
+    bool IsJustificationRequired(Doc *doc);
 
     //
 public:

@@ -333,6 +333,9 @@ int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int mar
 
 void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
 {
+    assert(this->GetParent());
+    assert(this->GetParent()->IsLayerElement());
+
     LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
     if (!parent) return;
 
@@ -391,10 +394,10 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Dots::ResetDrawing(FunctorParams *functorParams)
+int Dots::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_dotLocsByStaff.clear();
     m_isAdjusted = false;
@@ -411,10 +414,10 @@ int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Flag::ResetDrawing(FunctorParams *functorParams)
+int Flag::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_drawingNbFlags = 0;
 
@@ -459,6 +462,48 @@ int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+void Stem::AdjustSlashes(Doc *doc, int staffSize, int flagOffset, bool isSameAs)
+{
+    const int unit = doc->GetDrawingUnit(staffSize);
+    data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
+    // do nothing if sameas
+    if (isSameAs) return;
+
+    BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
+    if (bTrem) {
+        stemMod = bTrem->GetDrawingStemMod();
+    }
+    else if (this->HasStemMod() && (this->GetStemMod() < 8)) {
+        stemMod = this->GetDrawingStemMod();
+    }
+
+    const wchar_t code = this->StemModToGlyph(stemMod);
+    // if there is no glyph - do nothing
+    if (!code) return;
+
+    int lenAdjust = flagOffset;
+    if (this->GetParent()->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(this->GetParent());
+        lenAdjust += std::abs(chord->GetTopNote()->GetDrawingY() - chord->GetBottomNote()->GetDrawingY());
+    }
+
+    const int actualLength = std::abs(this->GetDrawingStemLen()) - lenAdjust / unit * unit;
+    const int diff = actualLength - doc->GetGlyphHeight(code, staffSize, false);
+    // Adjust basic stem length to number of slashes
+    if ((stemMod != STEMMODIFIER_NONE) && !this->HasStemLen() && (diff < unit * 2)) {
+        int adjust = ((2 * unit - diff) / unit + 1) * unit;
+        if (stemMod == STEMMODIFIER_6slash) {
+            adjust += doc->GetGlyphHeight(SMUFL_E220_tremolo1, staffSize, false);
+        }
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() - adjust);
+        }
+        else {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() + adjust);
+        }
+    }
+}
+
 int Stem::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
@@ -482,14 +527,15 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     /************ Set the position, the length and adjust to the note head ************/
 
+    const int unit = params->m_doc->GetDrawingUnit(staffSize);
     int baseStem = 0;
     // Use the given one if any
     if (this->HasStemLen()) {
-        baseStem = this->GetStemLen() * -params->m_doc->GetDrawingUnit(staffSize);
+        baseStem = this->GetStemLen() * -unit;
     }
     // Do not adjust the baseStem for stem sameas notes (its length is in m_chordStemLength)
     else if (!params->m_isStemSameasSecondary) {
-        int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
+        int thirdUnit = unit / 3;
         const data_STEMDIRECTION stemDir = params->m_interface->GetDrawingStemDir();
         baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff, stemDir) * thirdUnit);
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
@@ -528,21 +574,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
 
     /************ Set flag and slashes (if necessary) and adjust the length ************/
-
-    int slashFactor = 0;
-    // In case there is explicitly specified stem mod for slashes
-    if (!params->m_isStemSameasSecondary && this->HasStemMod() && (this->GetStemMod() < 8)) {
-        slashFactor = this->GetStemMod() - 1;
-    }
-    // otherwise check whether it's trem and its @unitdir attribute is shorter than duration
-    else if (!params->m_isStemSameasSecondary && this->GetFirstAncestor(BTREM)) {
-        BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
-        assert(bTrem);
-        if (bTrem->HasUnitdur() && (bTrem->GetUnitdur() > DURATION_4)) {
-            slashFactor = bTrem->GetUnitdur() - DURATION_4;
-        }
-    }
-
+    int flagOffset = 0;
     Flag *flag = NULL;
     // There is never a flag with a duration longer than 8th notes
     if (params->m_dur > DUR_4) {
@@ -554,25 +586,11 @@ int Stem::CalcStem(FunctorParams *functorParams)
         }
         else {
             flag->m_drawingNbFlags = params->m_dur - DUR_4;
-            if (!this->HasStemLen() && !this->IsGraceNote() && this->HasStemMod()) {
-                slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
-            }
+            flagOffset = 1.5 * unit * flag->m_drawingNbFlags;
         }
     }
-
-    // Adjust basic stem length to number of slashes
-    if ((slashFactor > 0) && !this->HasStemLen()) {
-        const int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
-            + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
-        while (abs(baseStem) < slashFactor * tremStep + params->m_doc->GetDrawingUnit(staffSize) * 3) {
-            if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-                this->SetDrawingStemLen(this->GetDrawingStemLen() - tremStep);
-            }
-            else {
-                this->SetDrawingStemLen(this->GetDrawingStemLen() + tremStep);
-            }
-            --slashFactor;
-        }
+    if (!params->m_isGraceNote && !drawingCueSize) {
+        this->AdjustSlashes(params->m_doc, staffSize, flagOffset, params->m_isStemSameasSecondary);
     }
 
     // SMUFL flags cover some additional stem length from the 32th only
@@ -629,10 +647,10 @@ int Stem::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Stem::ResetDrawing(FunctorParams *functorParams)
+int Stem::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingStemLen = 0;

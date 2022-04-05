@@ -57,7 +57,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    ScoreDefInterface *GetScoreDefInterface() override { return dynamic_cast<ScoreDefInterface *>(this); }
+    ScoreDefInterface *GetScoreDefInterface() override { return vrv_cast<ScoreDefInterface *>(this); }
+    const ScoreDefInterface *GetScoreDefInterface() const override { return vrv_cast<const ScoreDefInterface *>(this); }
     ///@}
 
     /**
@@ -157,6 +158,12 @@ public:
     void ReplaceDrawingLabels(StaffGrp *newStaffGrp);
 
     /**
+     * Replace the staffDef score attributes with the ones currently set as drawing values.
+     * Used when initializing a selection and adding a temporary score for it.
+     */
+    void ResetFromDrawingValues();
+
+    /**
      * Get the staffDef with number n (NULL if not found).
      */
     StaffDef *GetStaffDef(int n);
@@ -218,6 +225,11 @@ public:
 
     bool IsSectionRestart() const;
 
+    /**
+     * @return True if a system start line will be drawn
+     */
+    bool HasSystemStartLine();
+
     //----------//
     // Functors //
     //----------//
@@ -246,6 +258,11 @@ public:
      * See Object::CastOffEncoding
      */
     int CastOffEncoding(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::CastOffToSelection
+     */
+    int CastOffToSelection(FunctorParams *) override;
 
     /**
      * See Object::AlignMeasures

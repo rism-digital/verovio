@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "functorparams.h"
+#include "harm.h"
 #include "layerelement.h"
 #include "measure.h"
 #include "staff.h"
@@ -111,7 +112,15 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
     std::vector<Staff *> staves;
     std::vector<int>::iterator iter;
     std::vector<int> staffList;
-    if (this->HasStaff()) {
+
+    // For <f> within <harm> without @staff we try to get the @staff from the <harm> ancestor
+    if (object->Is(FIGURE) && !this->HasStaff()) {
+        Harm *harm = vrv_cast<Harm *>(object->GetFirstAncestor(HARM));
+        if (harm) {
+            staffList = harm->GetStaff();
+        }
+    }
+    else if (this->HasStaff()) {
         bool isInBetween = false;
         // limit between support to some elements?
         if (object->Is({ DYNAM, DIR, HAIRPIN, TEMPO })) {
@@ -136,6 +145,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
         // If we have no @staff or startid but only one staff child assume it is the first one (@n1 is assumed)
         staffList.push_back(1);
     }
+
     for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison comparison(STAFF, *iter);
         Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
@@ -149,6 +159,17 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
         staves.push_back(staff);
     }
     return staves;
+}
+
+bool TimePointInterface::VerifyMeasure(const Object *owner)
+{
+    assert(owner);
+    if (m_start && (owner->GetFirstAncestor(MEASURE) != this->GetStartMeasure())) {
+        LogWarning("%s '%s' is not encoded in the measure of its start '%s'. This may cause improper rendering.",
+            owner->GetClassName().c_str(), owner->GetUuid().c_str(), m_start->GetUuid().c_str());
+        return false;
+    }
+    return true;
 }
 
 //----------------------------------------------------------------------------
@@ -333,7 +354,7 @@ int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams,
     return FUNCTOR_CONTINUE;
 }
 
-int TimePointInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+int TimePointInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_start = NULL;
     m_startUuid = "";
@@ -367,7 +388,7 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorPa
     }
 
     this->SetUuidStr();
-    params->m_timeSpanningInterfaces.push_back({ this, object->GetClassId() });
+    params->m_timeSpanningInterfaces.push_back({ this, object });
 
     return FUNCTOR_CONTINUE;
 }
@@ -411,12 +432,12 @@ int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+int TimeSpanningInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_end = NULL;
     m_endUuid = "";
     // Special case where we have interface inheritance
-    return TimePointInterface::InterfaceResetDrawing(functorParams, object);
+    return TimePointInterface::InterfaceResetData(functorParams, object);
 }
 
 } // namespace vrv

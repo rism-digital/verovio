@@ -108,6 +108,13 @@ const char *vrvToolkit_convertHumdrumToHumdrum(void *tkPtr, const char *humdrumD
     return buffer;
 }
 
+const char *vrvToolkit_convertHumdrumToMIDI(void *tkPtr, const char *humdrumData)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->ConvertHumdrumToMIDI(humdrumData));
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_convertMEIToHumdrum(void *tkPtr, const char *meiData)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
@@ -215,17 +222,17 @@ const char *vrvToolkit_renderToPAE(void *tkPtr)
     return tk->GetCString();
 }
 
-const char *vrvToolkit_renderToSVG(void *tkPtr, int page_no, const char *c_options)
+const char *vrvToolkit_renderToSVG(void *tkPtr, int page_no, bool xmlDeclaration)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->SetCString(tk->RenderToSVG(page_no, false));
+    tk->SetCString(tk->RenderToSVG(page_no, xmlDeclaration));
     return tk->GetCString();
 }
 
-const char *vrvToolkit_renderToTimemap(void *tkPtr)
+const char *vrvToolkit_renderToTimemap(void *tkPtr, const char *c_options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->SetCString(tk->RenderToTimemap());
+    tk->SetCString(tk->RenderToTimemap(c_options));
     return tk->GetCString();
 }
 
@@ -254,6 +261,12 @@ void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     tk->ResetXmlIdSeed(seed);
+}
+
+bool vrvToolkit_select(void *tkPtr, const char *selection)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->Select(selection);
 }
 
 void vrvToolkit_setOptions(void *tkPtr, const char *options)

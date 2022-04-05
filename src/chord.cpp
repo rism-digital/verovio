@@ -494,16 +494,20 @@ int Chord::AdjustOverlappingLayers(
     assert(notes);
     // get current chord positions
     std::set<int> chordElementLocations;
-    for (auto iter : *notes) {
+    for (const auto iter : *notes) {
         Note *note = vrv_cast<Note *>(iter);
         assert(note);
         chordElementLocations.insert(note->GetDrawingLoc());
     }
-    const int expectedElementsInUnison
-        = CountElementsInUnison(chordElementLocations, otherElementLocations, this->GetDrawingStemDir());
+
+    std::vector<int> locationsInUnison
+        = this->GetElementsInUnison(chordElementLocations, otherElementLocations, this->GetDrawingStemDir());
+
+    const int expectedElementsInUnison = (int)locationsInUnison.size();
     const bool isLowerPosition = (STEMDIRECTION_down == this->GetDrawingStemDir() && (otherElementLocations.size() > 0)
         && (*chordElementLocations.begin() >= *otherElementLocations.begin()));
     int actualElementsInUnison = 0;
+
     // process each note of the chord separately, storing locations in the set
     for (auto iter : *notes) {
         Note *note = vrv_cast<Note *>(iter);
@@ -516,10 +520,27 @@ int Chord::AdjustOverlappingLayers(
         if (isInUnison) ++actualElementsInUnison;
     }
 
+    // if there are accidentals that are aligned for the layer separately, we need to have additional margin for them
+    int accidMargin = 0;
+    for (const auto iter : otherElements) {
+        if (!iter->Is(NOTE)) continue;
+        Note *note = vrv_cast<Note *>(iter);
+        Accid *accid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
+        if (accid && accid->IsAlignedWithSameLayer()) {
+            accidMargin += accid->GetContentRight() - accid->GetContentLeft();
+        }
+    }
+    if (accidMargin) {
+        // add padding for the accidentals (1.5 unit)
+        accidMargin += 1.5 * doc->GetDrawingUnit(100);
+    }
+
     if (expectedElementsInUnison && (expectedElementsInUnison == actualElementsInUnison)) {
         isUnison = true;
     }
     else if (margin) {
+        // adjust margin by accidental margin
+        margin -= accidMargin;
         this->SetDrawingXRel(this->GetDrawingXRel() + margin);
         return margin;
     }
@@ -559,9 +580,9 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
     if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
 
     // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(params->m_doc);
-    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(params->m_doc);
+    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
+    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
 
     CalcStemParams calcStemParams(params->m_doc);
     Functor calcStem(&Object::CalcStem);
@@ -859,8 +880,8 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ Prepare the drawing cue size ************/
 
-    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
+    Functor prepareCueSize(&Object::PrepareCueSize);
+    this->Process(&prepareCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
 }
@@ -876,9 +897,9 @@ int Chord::PrepareLyrics(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
+int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     LayerElement *element = this->ThisOrSameasAsLink();
@@ -894,10 +915,10 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::ResetDrawing(FunctorParams *functorParams)
+int Chord::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();

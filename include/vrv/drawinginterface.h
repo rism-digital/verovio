@@ -65,9 +65,12 @@ private:
     //
 public:
     //
-private:
+protected:
     /** The list of object for which drawing is postponed */
     ArrayOfObjects m_drawingList;
+
+private:
+    //
 };
 
 //----------------------------------------------------------------------------

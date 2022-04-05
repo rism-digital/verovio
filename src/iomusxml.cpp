@@ -538,34 +538,36 @@ void MusicXmlInput::CloseTie(Note *note)
     }
 }
 
-void MusicXmlInput::OpenSlur(Measure *measure, short int number, Slur *slur)
+void MusicXmlInput::OpenSlur(Measure *measure, short int number, Slur *slur, curvature_CURVEDIR dir)
 {
     // try to match open slur with slur stops within that measure
     for (auto iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
         if ((iter->second.m_number == number) && ((iter->second.m_measureNum).compare(measure->GetN()) == 0)) {
             slur->SetEndid("#" + iter->first->GetUuid());
+            slur->SetCurvedir(CombineCurvedir(dir, iter->second.m_curvedir));
             m_slurStopStack.erase(iter);
             return;
         }
     }
     // create new slur otherwise
-    musicxml::OpenSlur openSlur(measure->GetN(), number);
+    musicxml::OpenSlur openSlur(measure->GetN(), number, dir);
     m_slurStack.push_back({ slur, openSlur });
 }
 
-void MusicXmlInput::CloseSlur(Measure *measure, short int number, LayerElement *element)
+void MusicXmlInput::CloseSlur(Measure *measure, short int number, LayerElement *element, curvature_CURVEDIR dir)
 {
     // try to match slur stop to open slurs by slur number
     std::vector<std::pair<Slur *, musicxml::OpenSlur>>::reverse_iterator riter;
     for (riter = m_slurStack.rbegin(); riter != m_slurStack.rend(); ++riter) {
         if (riter->second.m_number == number) {
             riter->first->SetEndid("#" + element->GetUuid());
+            riter->first->SetCurvedir(CombineCurvedir(riter->second.m_curvedir, dir));
             m_slurStack.erase(std::next(riter).base());
             return;
         }
     }
     // add to m_slurStopStack, if not able to be closed
-    musicxml::CloseSlur closeSlur(measure->GetN(), number);
+    musicxml::CloseSlur closeSlur(measure->GetN(), number, dir);
     m_slurStopStack.push_back({ element, closeSlur });
 }
 
@@ -1423,6 +1425,12 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             if (transpose) {
                 staffDef->SetTransDiat(transpose.node().child("diatonic").text().as_int());
                 staffDef->SetTransSemi(transpose.node().child("chromatic").text().as_int());
+                if (transpose.node().child("octave-change")) {
+                    staffDef->SetTransDiat(transpose.node().child("chromatic").text().as_int()
+                        + 7 * transpose.node().child("octave-change").text().as_int());
+                    staffDef->SetTransSemi(transpose.node().child("chromatic").text().as_int()
+                        + 12 * transpose.node().child("octave-change").text().as_int());
+                }
             }
             // ppq
             pugi::xpath_node divisions = it->select_node("divisions");
@@ -2552,6 +2560,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     m_durFb = 0;
 
     LayerElement *element = NULL;
+    Note *note = NULL;
 
     bool nextIsChord = false;
     double onset = m_durTotal; // keep note onsets for later
@@ -2576,6 +2585,8 @@ void MusicXmlInput::ReadMusicXmlNote(
     const int dots = (int)node.select_nodes("dot").size();
 
     short int tremSlashNum = -1;
+
+    const bool readBeamsAndTuplets = ReadMusicXmlBeamsAndTuplets(node, layer, isChord);
 
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
@@ -2703,7 +2714,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
     }
     else {
-        Note *note = new Note();
+        note = new Note();
         element = note;
         note->SetVisible(ConvertWordToBool(node.attribute("print-object").as_string()));
         note->SetColor(node.attribute("color").as_string());
@@ -2901,8 +2912,8 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
 
-        // beam / beamspan
-        if (!ReadMusicXmlBeamsAndTuplets(node, layer, isChord)) {
+        // beamspan
+        if (!readBeamsAndTuplets) {
             BeamSpan *meiBeamSpan = new BeamSpan();
             meiBeamSpan->SetStartid("#" + element->GetUuid());
             m_controlElements.push_back({ measureNum, meiBeamSpan });
@@ -3023,8 +3034,9 @@ void MusicXmlInput::ReadMusicXmlNote(
             pugi::xml_node slur = it->node();
             short int slurNumber = slur.attribute("number").as_int();
             slurNumber = (slurNumber < 1) ? 1 : slurNumber;
+            const curvature_CURVEDIR dir = InferCurvedir(slur);
             if (HasAttributeWithValue(slur, "type", "stop")) {
-                CloseSlur(measure, slurNumber, note);
+                CloseSlur(measure, slurNumber, note, dir);
             }
             else if (HasAttributeWithValue(slur, "type", "start")) {
                 Slur *meiSlur = new Slur();
@@ -3032,13 +3044,11 @@ void MusicXmlInput::ReadMusicXmlNote(
                 meiSlur->SetColor(slur.attribute("color").as_string());
                 // lineform
                 meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
-                // placement and orientation
-                meiSlur->SetCurvedir(InferCurvedir(slur));
                 if (slur.attribute("id")) meiSlur->SetUuid(slur.attribute("id").as_string());
                 meiSlur->SetStartid("#" + note->GetUuid());
                 // add it to the stack
                 m_controlElements.push_back({ measureNum, meiSlur });
-                OpenSlur(measure, slurNumber, meiSlur);
+                OpenSlur(measure, slurNumber, meiSlur, dir);
             }
         }
 
@@ -3238,7 +3248,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         Text *text = new Text();
         text->SetText(UTF8to16(fingText));
         m_controlElements.push_back({ measureNum, fing });
-        fing->SetStartid(m_ID);
+        const std::string startID = note ? ("#" + note->GetUuid()) : m_ID;
+        fing->SetStartid(startID);
         fing->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         fing->SetPlace(fing->AttPlacementRelStaff::StrToStaffrel(xmlFing.node().attribute("placement").as_string()));
         fing->AddChild(text);
@@ -3871,6 +3882,19 @@ bool MusicXmlInput::IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, 
 
     const auto result = writtenToGesturalMap.find(written);
     return ((result != writtenToGesturalMap.end()) && (result->second == gestural));
+}
+
+curvature_CURVEDIR MusicXmlInput::CombineCurvedir(curvature_CURVEDIR startDir, curvature_CURVEDIR stopDir)
+{
+    if (startDir == curvature_CURVEDIR_NONE) {
+        return stopDir;
+    }
+    else if ((startDir != stopDir) && (stopDir != curvature_CURVEDIR_NONE)) {
+        return curvature_CURVEDIR_mixed;
+    }
+    else {
+        return startDir;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

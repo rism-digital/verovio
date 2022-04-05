@@ -521,7 +521,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     if (p1.x > this->GetRightBy(type)) return 0;
 
     Point topBezier[4], bottomBezier[4];
-    BoundingBox::CalcThickBezier(points, curve->GetThickness(), curve->GetAngle(), topBezier, bottomBezier);
+    BoundingBox::CalcThickBezier(points, curve->GetThickness(), topBezier, bottomBezier);
 
     // The curve overflows on both sides
     if ((p1.x < this->GetLeftBy(type)) && p2.x > this->GetRightBy(type)) {
@@ -820,11 +820,10 @@ Point BoundingBox::CalcPointAtBezier(const Point bezier[4], double t)
     return midPoint;
 }
 
-double BoundingBox::GetBezierThicknessCoefficient(
-    const Point bezier[4], int currentThickness, double angle, int penWidth)
+double BoundingBox::GetBezierThicknessCoefficient(const Point bezier[4], int currentThickness, int penWidth)
 {
     Point top[4], bottom[4];
-    CalcThickBezier(bezier, currentThickness, angle, top, bottom);
+    CalcThickBezier(bezier, currentThickness, top, bottom);
 
     Point topMidpoint = CalcPointAtBezier(top, 0.5);
     Point bottomMidpoint = CalcPointAtBezier(bottom, 0.5);
@@ -909,38 +908,41 @@ std::set<double> BoundingBox::SolveCubicPolynomial(double a, double b, double c,
     return { u - v - b / 3.0 };
 }
 
-void BoundingBox::CalcThickBezier(
-    const Point bezier[4], int thickness, float angle, Point *topBezier, Point *bottomBezier)
+void BoundingBox::CalcThickBezier(const Point bezier[4], int thickness, Point topBezier[4], Point bottomBezier[4])
 {
-    assert(topBezier && bottomBezier); // size should be 4 each
+    // We shift the control point outwards/inwards in the direction of the angle bisector of the polygon P1-C1-C2-P2 at
+    // C1 or C2
+    float slope1 = BoundingBox::CalcSlope(bezier[0], bezier[1]);
+    if (bezier[0].x > bezier[1].x) slope1 *= -1.0;
+    float slope2 = BoundingBox::CalcSlope(bezier[1], bezier[2]);
+    if (bezier[1].x > bezier[2].x) slope2 *= -1.0;
+    float slope3 = BoundingBox::CalcSlope(bezier[2], bezier[3]);
+    if (bezier[2].x > bezier[3].x) slope3 *= -1.0;
+    const float angle1 = (atan(slope1) + atan(slope2)) / 2.0;
+    const float angle2 = (atan(slope2) + atan(slope3)) / 2.0;
 
+    // Calculate top bezier
     Point c1Rotated = bezier[1];
     Point c2Rotated = bezier[2];
     c1Rotated.y += thickness * 0.5;
     c2Rotated.y += thickness * 0.5;
-    if (angle != 0.0) {
-        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[1]);
-        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[2]);
-    }
+    c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle1, bezier[1]);
+    c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle2, bezier[2]);
 
     topBezier[0] = bezier[0];
-    bottomBezier[0] = topBezier[0];
-
-    // Points for first bez, they go from xy to x1y1
     topBezier[1] = c1Rotated;
     topBezier[2] = c2Rotated;
     topBezier[3] = bezier[3];
 
+    // Calculate bottom bezier
     c1Rotated = bezier[1];
     c2Rotated = bezier[2];
     c1Rotated.y -= thickness * 0.5;
     c2Rotated.y -= thickness * 0.5;
-    if (angle != 0.0) {
-        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[1]);
-        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[2]);
-    }
+    c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle1, bezier[1]);
+    c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle2, bezier[2]);
 
-    // second bez. goes back
+    bottomBezier[0] = bezier[0];
     bottomBezier[1] = c1Rotated;
     bottomBezier[2] = c2Rotated;
     bottomBezier[3] = bezier[3];

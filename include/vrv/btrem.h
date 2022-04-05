@@ -40,6 +40,11 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
+    /**
+     * Get stem mod if encoded explicitly, or determine based on duration of bTrem and underlying elements
+     */
+    data_STEMMODIFIER GetDrawingStemMod() const override;
+
     //----------//
     // Functors //
     //----------//

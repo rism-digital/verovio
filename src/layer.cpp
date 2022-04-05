@@ -44,8 +44,15 @@ namespace vrv {
 static const ClassRegistrar<Layer> s_factory("layer", LAYER);
 
 Layer::Layer()
-    : Object(LAYER, "layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
+    : Object(LAYER, "layer-")
+    , DrawingListInterface()
+    , ObjectListInterface()
+    , AttCue()
+    , AttNInteger()
+    , AttTyped()
+    , AttVisibility()
 {
+    this->RegisterAttClass(ATT_CUE);
     this->RegisterAttClass(ATT_NINTEGER);
     this->RegisterAttClass(ATT_TYPED);
     this->RegisterAttClass(ATT_VISIBILITY);
@@ -74,6 +81,7 @@ void Layer::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
+    this->ResetCue();
     this->ResetNInteger();
     this->ResetTyped();
     this->ResetVisibility();
@@ -676,9 +684,9 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::PrepareProcessingLists(FunctorParams *functorParams)
+int Layer::InitProcessingLists(FunctorParams *functorParams)
 {
-    PrepareProcessingListsParams *params = vrv_params_cast<PrepareProcessingListsParams *>(functorParams);
+    InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);
     assert(params);
 
     // Alternate solution with StaffN_LayerN_VerseN_t
@@ -703,9 +711,9 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::CalcOnsetOffset(FunctorParams *functorParams)
+int Layer::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     params->m_currentScoreTime = 0.0;
@@ -717,10 +725,22 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::ResetDrawing(FunctorParams *functorParams)
+int Layer::ResetData(FunctorParams *functorParams)
 {
     m_crossStaffFromBelow = false;
     m_crossStaffFromAbove = false;
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    const bool midiNoCue = params->m_doc->GetOptions()->m_midiNoCue.GetValue();
+
+    if (this->GetCue() == BOOLEAN_true && midiNoCue) return FUNCTOR_SIBLINGS;
+
     return FUNCTOR_CONTINUE;
 }
 

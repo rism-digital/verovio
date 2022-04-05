@@ -218,7 +218,7 @@ public:
     const AttSpacing *GetAttSpacing() const;
 
     /**
-     * @name Calculates the overlow (above or below for the bounding box.
+     * @name Calculates the overflow (above or below) for the bounding box.
      * Looks if the bounding box is a FloatingPositioner or not, in which case it we take into account its m_drawingYRel
      * value.
      */
@@ -245,6 +245,10 @@ public:
     int GetOverflowBelow() const { return m_overflowBelow; }
     void SetOverlap(int overlap);
     int GetOverlap() const { return m_overlap; }
+    void SetRequestedSpaceAbove(int space);
+    int GetRequestedSpaceAbove() const { return m_requestedSpaceAbove; }
+    void SetRequestedSpaceBelow(int space);
+    int GetRequestedSpaceBelow() const { return m_requestedSpaceBelow; }
     int GetStaffHeight() const { return m_staffHeight; }
     void SetOverflowBBoxAbove(BoundingBox *bboxAbove, int overflowAbove);
     BoundingBox *GetOverflowBBoxAbove() const { return m_overflowBBoxAbove; }
@@ -275,6 +279,11 @@ public:
      * Deletes all the FloatingPositioner objects.
      */
     void ClearPositioners();
+
+    /**
+     * Sort the FloatingPositioner objects.
+     */
+    void SortPositioners();
 
     /**
      * Find all the intersection points with a vertical line (top to bottom)
@@ -366,6 +375,10 @@ private:
      */
     ArrayOfFloatingPositioners m_floatingPositioners;
     /**
+     * Flag indicating whether the list of FloatingPositioner is sorted
+     */
+    bool m_floatingPositionersSorted;
+    /**
      * Stores a pointer to the staff from which the aligner was created.
      * This is necessary since we don't always have all the staves.
      */
@@ -385,12 +398,14 @@ private:
     std::set<int> m_verseNs;
 
     /**
-     * @name values for storing the overlow and overlap
+     * @name values for storing the overflow and overlap
      */
     ///@{
     int m_overflowAbove;
     int m_overflowBelow;
     int m_overlap;
+    int m_requestedSpaceAbove;
+    int m_requestedSpaceBelow;
     int m_staffHeight;
     BoundingBox *m_overflowBBoxAbove;
     BoundingBox *m_overflowBBoxBelow;

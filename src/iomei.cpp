@@ -65,6 +65,7 @@
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
+#include "layerdef.h"
 #include "lb.h"
 #include "lem.h"
 #include "ligature.h"
@@ -369,6 +370,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(LABELABBR)) {
         m_currentNode = m_currentNode.append_child("labelAbbr");
         this->WriteLabelAbbr(m_currentNode, vrv_cast<LabelAbbr *>(object));
+    }
+    else if (object->Is(LAYERDEF)) {
+        m_currentNode = m_currentNode.append_child("layerDef");
+        this->WriteLayerDef(m_currentNode, vrv_cast<LayerDef *>(object));
     }
     else if (object->Is(METERSIGGRP)) {
         m_currentNode = m_currentNode.append_child("meterSigGrp");
@@ -1250,6 +1255,7 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
 bool MEIOutput::AdjustLabel(Label *label)
 {
     assert(label);
+    assert(label->GetParent());
 
     // Check if there is a label abbreviation sibling
     LabelAbbr *abbr = vrv_cast<LabelAbbr *>(label->GetParent()->GetChild(0, LABELABBR));
@@ -1623,6 +1629,17 @@ void MEIOutput::WriteLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr)
     assert(labelAbbr);
 
     this->WriteXmlId(currentNode, labelAbbr);
+}
+
+void MEIOutput::WriteLayerDef(pugi::xml_node currentNode, LayerDef *layerDef)
+{
+    assert(layerDef);
+
+    layerDef->WriteLabelled(currentNode);
+    layerDef->WriteNInteger(currentNode);
+    layerDef->WriteTyped(currentNode);
+
+    this->WriteXmlId(currentNode, layerDef);
 }
 
 void MEIOutput::WriteTuning(pugi::xml_node currentNode, Tuning *tuning)
@@ -2021,6 +2038,7 @@ void MEIOutput::WriteLayer(pugi::xml_node currentNode, Layer *layer)
     assert(layer);
 
     this->WriteXmlId(currentNode, layer);
+    layer->WriteCue(currentNode);
     layer->WriteNInteger(currentNode);
     layer->WriteTyped(currentNode);
     layer->WriteVisibility(currentNode);
@@ -3856,6 +3874,7 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
     pugi::xml_node current;
     for (current = scoreDef.next_sibling(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         std::string elementName = std::string(current.name());
         // editorial
         if (this->IsEditorialElementName(current.name())) {
@@ -3916,8 +3935,9 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
     Measure *unmeasured = NULL;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // content
@@ -4081,8 +4101,9 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
     Measure *unmeasured = NULL;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // section
@@ -4307,8 +4328,9 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_SCOREDEF);
         }
         // clef, keySig, etc.
@@ -4397,8 +4419,9 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_STAFFGRP);
         }
         // content
@@ -4523,6 +4546,7 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         if (!success) {
             break;
         }
+        this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
@@ -4623,6 +4647,9 @@ bool MEIInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "labelAbbr") {
             success = this->ReadLabelAbbr(parent, current);
+        }
+        else if (std::string(current.name()) == "layerDef") {
+            success = this->ReadLayerDef(parent, current);
         }
         else if (std::string(current.name()) == "tuning") {
             success = this->ReadTuning(parent, current);
@@ -4730,6 +4757,48 @@ bool MEIInput::ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr)
     return this->ReadTextChildren(vrvLabelAbbr, labelAbbr, vrvLabelAbbr);
 }
 
+bool MEIInput::ReadLayerDef(Object *parent, pugi::xml_node layerDef)
+{
+    LayerDef *vrvLayerDef = new LayerDef();
+
+    vrvLayerDef->ReadLabelled(layerDef);
+    vrvLayerDef->ReadNInteger(layerDef);
+    vrvLayerDef->ReadTyped(layerDef);
+
+    parent->AddChild(vrvLayerDef);
+    this->ReadUnsupportedAttr(layerDef, vrvLayerDef);
+    return this->ReadLayerDefChildren(vrvLayerDef, layerDef);
+}
+
+bool MEIInput::ReadLayerDefChildren(Object *parent, pugi::xml_node parentNode)
+{
+    assert(dynamic_cast<LayerDef *>(parent));
+
+    bool success = true;
+    for (const pugi::xml_node &current : parentNode.children()) {
+        const std::string currentName = current.name();
+        if (!success)
+            break;
+        else if (currentName == "instrDef") {
+            success = this->ReadInstrDef(parent, current);
+        }
+        else if (currentName == "label") {
+            success = this->ReadLabel(parent, current);
+        }
+        else if (currentName == "labelAbbr") {
+            success = this->ReadLabelAbbr(parent, current);
+        }
+        // xml comment
+        else if (currentName == "") {
+            success = this->ReadXMLComment(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <layerDef>", current.name());
+        }
+    }
+    return success;
+}
+
 bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
 {
     Measure *vrvMeasure = new Measure();
@@ -4771,8 +4840,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         const std::string currentName = current.name();
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(currentName)) {
+        if (this->IsEditorialElementName(currentName)) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_MEASURE);
         }
         // content
@@ -5363,8 +5433,9 @@ bool MEIInput::ReadFbChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_FB);
         }
         // content
@@ -5418,8 +5489,9 @@ bool MEIInput::ReadStaffChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_STAFF);
         }
         // content
@@ -5442,6 +5514,7 @@ bool MEIInput::ReadLayer(Object *parent, pugi::xml_node layer)
     Layer *vrvLayer = new Layer();
     this->SetMeiUuid(layer, vrvLayer);
 
+    vrvLayer->ReadCue(layer);
     vrvLayer->ReadNInteger(layer);
     vrvLayer->ReadTyped(layer);
     vrvLayer->ReadVisibility(layer);
@@ -5464,9 +5537,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
     pugi::xml_node xmlElement;
     std::string elementName;
     for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
-        if (!success) {
-            break;
-        }
+        if (!success) break;
+        this->NormalizeAttributes(xmlElement);
+
         elementName = std::string(xmlElement.name());
         // LogDebug("ReadLayerChildren: element <%s>", xmlElement.name());
         if (!this->IsAllowed(elementName, filter)) {
@@ -6294,6 +6367,7 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         if (!success) {
             break;
         }
+        this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
@@ -7272,6 +7346,21 @@ bool MEIInput::IsEditorialElementName(std::string elementName)
     auto i = std::find(MEIInput::s_editorialElementNames.begin(), MEIInput::s_editorialElementNames.end(), elementName);
     if (i != MEIInput::s_editorialElementNames.end()) return true;
     return false;
+}
+
+void MEIInput::NormalizeAttributes(pugi::xml_node &xmlElement)
+{
+    for (auto elem : xmlElement.attributes()) {
+        std::string name = elem.name();
+        std::string value = elem.value();
+
+        size_t pos = value.find_first_not_of(' ');
+        if (pos != std::string::npos) value = value.substr(pos);
+        pos = value.find_last_not_of(' ');
+        if (pos != std::string::npos) value = value.substr(0, pos + 1);
+
+        elem.set_value(value.c_str());
+    }
 }
 
 void MEIInput::UpgradePageTo_5_0_0(Page *page)

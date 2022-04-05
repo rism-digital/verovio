@@ -39,7 +39,13 @@ public:
     std::string GetClassName() const override { return "KeyAccid"; }
     ///@}
 
-    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
+    const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
+    ///@}
 
     /**
      * Retrieve SMuFL string for the accidental.

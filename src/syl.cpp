@@ -185,15 +185,15 @@ int Syl::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     return TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
 }
 
-int Syl::ResetDrawing(FunctorParams *functorParams)
+int Syl::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_nextWordSyl = NULL;
 
     // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfaceResetDrawing(functorParams, this);
+    return TimeSpanningInterface::InterfaceResetData(functorParams, this);
 }
 
 bool Syl::CreateDefaultZone(Doc *doc)

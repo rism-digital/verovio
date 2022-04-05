@@ -26,6 +26,7 @@
 #include "harm.h"
 #include "multirest.h"
 #include "page.h"
+#include "pages.h"
 #include "pedal.h"
 #include "section.h"
 #include "staff.h"
@@ -238,6 +239,18 @@ void Measure::SetDrawingXRel(int drawingXRel)
     m_drawingXRel = drawingXRel;
 }
 
+bool Measure::IsFirstInSystem() const
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetFirst(MEASURE) == this);
+}
+
+bool Measure::IsLastInSystem() const
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetLast(MEASURE) == this);
+}
+
 int Measure::GetLeftBarLineXRel() const
 {
     if (m_measureAligner.GetLeftBarLineAlignment()) {
@@ -369,7 +382,12 @@ int Measure::GetDrawingOverflow()
 
 int Measure::GetSectionRestartShift(Doc *doc) const
 {
-    return 5 * doc->GetDrawingDoubleUnit(100);
+    if (this->IsFirstInSystem()) {
+        return 0;
+    }
+    else {
+        return 5 * doc->GetDrawingDoubleUnit(100);
+    }
 }
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
@@ -1035,6 +1053,8 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
 
+    const bool hasSystemStartLine = this->IsFirstInSystem() && system->GetDrawingScoreDef()->HasSystemStartLine();
+
     ArrayOfComparisons filters;
     for (auto staffN : params->m_staffNs) {
         params->m_minPos = 0;
@@ -1046,6 +1066,11 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         params->m_currentAlignment.Reset();
         StaffAlignment *staffAlignment = system->m_systemAligner.GetStaffAlignmentForStaffN(staffN);
         params->m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
+
+        // Prevent collisions of scoredef clefs with thick barlines
+        if (hasSystemStartLine) {
+            params->m_upcomingMinPos = params->m_doc->GetDrawingBarLineWidth(params->m_staffSize);
+        }
 
         filters.clear();
         // Create ad comparison object for each type / @n
@@ -1147,9 +1172,9 @@ int Measure::AdjustXOverflow(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::SetAlignmentXPos(FunctorParams *functorParams)
+int Measure::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     m_measureAligner.Process(params->m_functor, params);
@@ -1197,7 +1222,7 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::ResetDrawing(FunctorParams *functorParams)
+int Measure::ResetData(FunctorParams *functorParams)
 {
     m_timestampAligner.Reset();
     m_drawingEnding = NULL;
@@ -1272,6 +1297,36 @@ int Measure::CastOffEncoding(FunctorParams *functorParams)
     MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
+}
+
+int Measure::CastOffToSelection(FunctorParams *functorParams)
+{
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
+    assert(params);
+
+    const bool startSelection = (!params->m_isSelection && this->GetUuid() == params->m_start);
+
+    if (startSelection) {
+        params->m_page = new Page();
+        params->m_doc->GetPages()->AddChild(params->m_page);
+        params->m_currentSystem = new System();
+        params->m_page->AddChild(params->m_currentSystem);
+        params->m_isSelection = true;
+    }
+
+    const bool endSelection = (params->m_isSelection && this->GetUuid() == params->m_end);
+
+    MoveItselfTo(params->m_currentSystem);
+
+    if (endSelection) {
+        params->m_page = new Page();
+        params->m_doc->GetPages()->AddChild(params->m_page);
+        params->m_currentSystem = new System();
+        params->m_page->AddChild(params->m_currentSystem);
+        params->m_isSelection = false;
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
@@ -1428,12 +1483,12 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
     PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
-    ListOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ListOfSpanningInterOwnerPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
         // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
         // midi output
-        if (iter->second == HARM) {
+        if (iter->second->GetClassId() == HARM) {
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {
@@ -1533,9 +1588,9 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareMIDI(FunctorParams *functorParams)
+int Measure::InitMIDI(FunctorParams *functorParams)
 {
-    PrepareMIDIParams *params = vrv_params_cast<PrepareMIDIParams *>(functorParams);
+    InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);
     assert(params);
 
     params->m_currentTempo = m_currentTempo;
@@ -1573,9 +1628,9 @@ int Measure::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
+int Measure::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     m_scoreTimeOffset.clear();
@@ -1588,9 +1643,9 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
+int Measure::InitMaxMeasureDurationEnd(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     const double scoreTimeIncrement
@@ -1603,9 +1658,9 @@ int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcOnsetOffset(FunctorParams *functorParams)
+int Measure::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     params->m_currentTempo = m_currentTempo;

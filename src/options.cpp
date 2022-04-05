@@ -215,7 +215,7 @@ void OptionBool::Reset()
 bool OptionBool::SetValue(bool value)
 {
     m_value = value;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -266,7 +266,7 @@ bool OptionDbl::SetValue(double value)
         return false;
     }
     m_value = value;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -334,7 +334,7 @@ bool OptionInt::SetValue(int value)
         return false;
     }
     m_value = value;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -364,7 +364,7 @@ void OptionString::Init(const std::string &defaultValue)
 bool OptionString::SetValue(const std::string &value)
 {
     m_value = value;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -394,10 +394,7 @@ void OptionArray::Init()
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
 {
     m_values = values;
-    m_isSet = true;
-    // m_values.erase(std::remove_if(m_values.begin(), m_values.end(),
-    //                                       [](const std::string &s) { return s.empty(); }),
-    //                        m_values.end());
+    m_isSet = !m_values.empty();
     return true;
 }
 
@@ -440,9 +437,9 @@ std::string OptionArray::GetDefaultStrValue() const
 bool OptionArray::SetValue(std::vector<std::string> const &values)
 {
     m_values = values;
-    m_isSet = true;
     m_values.erase(std::remove_if(m_values.begin(), m_values.end(), [](const std::string &s) { return s.empty(); }),
         m_values.end());
+    m_isSet = !m_values.empty();
     return true;
 }
 
@@ -487,7 +484,7 @@ bool OptionIntMap::SetValue(const std::string &value)
     for (it = m_values->cbegin(); it != m_values->cend(); ++it)
         if (it->second == value) {
             m_value = it->first;
-            m_isSet = true;
+            m_isSet = (m_value != m_defaultValue);
             return true;
         }
     LogError("Parameter '%s' not valid for '%s'", value.c_str(), this->GetKey().c_str());
@@ -516,7 +513,7 @@ bool OptionIntMap::SetValue(int value)
     assert(m_values->count(value));
 
     m_value = value;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
 
     return true;
 }
@@ -584,7 +581,7 @@ bool OptionStaffrel::SetValue(const std::string &value)
         return false;
     }
     m_value = staffrel;
-    m_isSet = true;
+    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -638,7 +635,7 @@ bool OptionJson::SetValue(const std::string &value)
 {
     bool ok = this->ReadJson(m_values, value);
     if (ok) {
-        m_isSet = true;
+        m_isSet = (this->GetStrValue() != this->GetDefaultStrValue());
     }
     else {
         if (m_source == JsonSource::String) {
@@ -706,21 +703,33 @@ bool OptionJson::HasValue(const std::vector<std::string> &jsonNodePath) const
 
 int OptionJson::GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    return static_cast<int>(this->GetDoubleValue(jsonNodePath, getDefault));
+    return static_cast<int>(this->GetDblValue(jsonNodePath, getDefault));
 }
 
-double OptionJson::GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
+double OptionJson::GetDblValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    JsonPath path
-        = getDefault ? StringPath2NodePath(m_defaultValues, jsonNodePath) : StringPath2NodePath(m_values, jsonNodePath);
+    JsonPath path = StringPath2NodePath(getDefault ? m_defaultValues : m_values, jsonNodePath);
 
     if (path.size() != jsonNodePath.size() && !getDefault) {
         path = StringPath2NodePath(m_defaultValues, jsonNodePath);
     }
 
-    if (path.size() != jsonNodePath.size() || !path.back().get().is<jsonxx::Number>()) return 0;
+    if ((path.size() != jsonNodePath.size()) || !path.back().get().is<jsonxx::Number>()) return 0;
 
     return path.back().get().get<jsonxx::Number>();
+}
+
+std::string OptionJson::GetStrValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
+{
+    JsonPath path = StringPath2NodePath(getDefault ? m_defaultValues : m_values, jsonNodePath);
+
+    if ((path.size() != jsonNodePath.size()) && !getDefault) {
+        path = StringPath2NodePath(m_defaultValues, jsonNodePath);
+    }
+
+    if ((path.size() != jsonNodePath.size()) || !path.back().get().is<jsonxx::String>()) return "";
+
+    return path.back().get().get<jsonxx::String>();
 }
 
 bool OptionJson::UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value)
@@ -966,6 +975,10 @@ Options::Options()
     m_mensuralToMeasure.Init(false);
     this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_general);
 
+    m_midiNoCue.SetInfo("MIDI playback of cue notes", "Skip cue notes in MIDI output");
+    m_midiNoCue.Init(false);
+    this->Register(&m_midiNoCue, "midiNoCue", &m_general);
+
     m_midiTempoAdjustment.SetInfo("MIDI tempo adjustment", "The MIDI tempo adjustment factor");
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_generalLayout);
@@ -1143,6 +1156,11 @@ Options::Options()
     m_beamMinSlope.Init(0, 0, 0);
     this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
 
+    m_beamFrenchStyle.SetInfo(
+        "French style of beams", "For notes in beams, stems will stop at first outermost sub-beam without crossing it");
+    m_beamFrenchStyle.Init(false);
+    this->Register(&m_beamFrenchStyle, "beamFrenchStyle", &m_generalLayout);
+
     m_bracketThickness.SetInfo("Bracket thickness", "The thickness of the system bracket");
     m_bracketThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);
@@ -1223,6 +1241,11 @@ Options::Options()
         "Spacing brace group justification", "Space between staves inside a braced group justification");
     m_justificationBraceGroup.Init(1., 0., 10.);
     this->Register(&m_justificationBraceGroup, "justificationBraceGroup", &m_generalLayout);
+
+    m_justificationMaxVertical.SetInfo("Maximum ratio of justifiable height for page",
+        "Maximum ratio of justifiable height to page height that can be used for the vertical justification");
+    m_justificationMaxVertical.Init(0.3, 0.0, 1.0);
+    this->Register(&m_justificationMaxVertical, "justificationMaxVertical", &m_general);
 
     m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");
     m_ledgerLineThickness.Init(0.25, 0.10, 0.50);
@@ -1307,7 +1330,7 @@ Options::Options()
     this->Register(&m_slurMargin, "slurMargin", &m_generalLayout);
 
     m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
-    m_slurMaxSlope.Init(40, 0, 80);
+    m_slurMaxSlope.Init(60, 30, 85);
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
 
     m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");
@@ -1429,9 +1452,14 @@ Options::Options()
     m_substXPathQuery.Init();
     this->Register(&m_substXPathQuery, "substXPathQuery", &m_selectors);
 
-    m_transpose.SetInfo("Transpose the content", "SUMMARY");
+    m_transpose.SetInfo("Transpose the content", "Transpose the entire content");
     m_transpose.Init("");
     this->Register(&m_transpose, "transpose", &m_selectors);
+
+    m_transposeMdiv.SetInfo(
+        "Transpose individual mdivs", "Json mapping the mdiv uuids to the corresponding transposition");
+    m_transposeMdiv.Init(JsonSource::String, "{}");
+    this->Register(&m_transposeMdiv, "transposeMdiv", &m_selectors);
 
     m_transposeSelectedOnly.SetInfo(
         "Transpose selected only", "Transpose only the selected content and ignore unselected editorial content");
@@ -1546,7 +1574,7 @@ Options::Options()
     /// custom right
 
     m_rightMarginAccid.SetInfo("Right margin accid", "The right margin for accid in MEI units");
-    m_rightMarginAccid.Init(0.0, 0.0, 2.0);
+    m_rightMarginAccid.Init(0.5, 0.0, 2.0);
     this->Register(&m_rightMarginAccid, "rightMarginAccid", &m_elementMargins);
 
     m_rightMarginBarLine.SetInfo("Right margin barLine", "The right margin for barLine in MEI units");
@@ -1720,10 +1748,10 @@ void Options::Sync()
 
         double jsonValue = 0.0;
         if (m_engravingDefaultsFile.HasValue(jsonNodePath)) {
-            jsonValue = m_engravingDefaultsFile.GetDoubleValue(jsonNodePath);
+            jsonValue = m_engravingDefaultsFile.GetDblValue(jsonNodePath);
         }
         else if (m_engravingDefaults.HasValue({ pair.first })) {
-            jsonValue = m_engravingDefaults.GetDoubleValue({ pair.first });
+            jsonValue = m_engravingDefaults.GetDblValue({ pair.first });
         }
         else
             continue;

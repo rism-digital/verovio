@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "docselection.h"
 #include "view.h"
 
 //----------------------------------------------------------------------------
@@ -28,6 +29,7 @@ enum FileFormat {
     MEI,
     HUMDRUM,
     HUMMEI,
+    HUMMIDI,
     PAE,
     ABC,
     DARMS,
@@ -287,6 +289,17 @@ public:
      */
     bool SetOutputTo(std::string const &outputTo);
 
+    /**
+     * Set the value for a selection.
+     * The selection will be applied only when some data is loaded or the layout is redone.
+     * The selection can be reset (cancelled) by passing an empty string or an empty JSON object.
+     * A selection across multiple mdivs is not possible.
+     *
+     * @param selection The selection as a stringified JSON object
+     * @return True if the selection was successfully parsed or reset
+     */
+    bool Select(const std::string &selection);
+
     ///@}
 
     /**
@@ -425,6 +438,13 @@ public:
      * @return The Humdrum data as a string
      */
     std::string ConvertHumdrumToHumdrum(const std::string &humdrumData);
+
+    /**
+     * Convert Humdrum data to MIDI.
+     *
+     * @return The MIDI file as a base64-encoded string
+     */
+    std::string ConvertHumdrumToMIDI(const std::string &humdrumData);
 
     /**
      * Write the humdrum buffer to the file
@@ -721,6 +741,7 @@ public:
     //
 private:
     Doc m_doc;
+    DocSelection m_docSelection;
     View m_view;
     FileFormat m_inputFrom;
     FileFormat m_outputTo;

@@ -10,6 +10,8 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <codecvt>
+#include <locale>
 #include <regex>
 
 //----------------------------------------------------------------------------
@@ -42,10 +44,8 @@
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
-#include "checked.h"
 #include "crc.h"
 #include "jsonxx.h"
-#include "unchecked.h"
 
 #ifndef NO_MXL_SUPPORT
 #include "zip_file.hpp"
@@ -122,6 +122,11 @@ bool Toolkit::SetScale(int scale)
     return m_options->m_scale.SetValue(scale);
 }
 
+bool Toolkit::Select(const std::string &selection)
+{
+    return m_docSelection.Parse(selection);
+}
+
 bool Toolkit::SetOutputTo(std::string const &outputTo)
 {
     if ((outputTo == "humdrum") || (outputTo == "hum")) {
@@ -135,6 +140,9 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
     }
     else if (outputTo == "midi") {
         m_outputTo = MIDI;
+    }
+    else if (outputTo == "hummidi") {
+        m_outputTo = HUMMIDI;
     }
     else if (outputTo == "timemap") {
         m_outputTo = TIMEMAP;
@@ -325,17 +333,22 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     fin.clear();
     fin.seekg(0, std::wios::beg);
 
-    std::vector<unsigned short> utf16line;
-    utf16line.reserve(wfileSize / 2 + 1);
+    std::u16string u16data((wfileSize / 2) + 1, '\0');
+    fin.read((char *)&u16data[0], wfileSize);
 
-    unsigned short buffer;
-    while (fin.read((char *)&buffer, sizeof(unsigned short))) {
-        utf16line.push_back(buffer);
-    }
-    // LogDebug("%d %d", wfileSize, utf8line.size());
+    // std::vector<char16_t> ;
+    // utf16line.reserve(wfileSize / 2 + 1);
 
-    std::string utf8line;
-    utf8::utf16to8(utf16line.begin(), utf16line.end(), back_inserter(utf8line));
+    // unsigned short buffer;
+    // while (fin.read((char *)&buffer, sizeof(char16_t))) {
+    //     utf16line.push_back(buffer);
+    // }
+
+    // std::u16string u16_str; //( reinterpret_cast<const char16_t*>(data2) );
+    //  LogDebug("%d %d", wfileSize, utf8line.size());
+
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+    std::string utf8line = convert.to_bytes(u16data);
 
     return LoadData(utf8line);
 }
@@ -677,12 +690,13 @@ bool Toolkit::LoadData(const std::string &data)
     m_doc.GenerateMeasureNumbers();
 
     // transpose the content if necessary
-    if (m_options->m_transpose.GetValue() != "") {
-        m_doc.PrepareDrawing();
+    if (m_options->m_transpose.IsSet() || m_options->m_transposeMdiv.IsSet()) {
+        m_doc.PrepareData();
         m_doc.TransposeDoc();
     }
 
-    m_doc.PrepareDrawing();
+    m_doc.PrepareData();
+    m_doc.InitSelectionDoc(m_docSelection, true);
 
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
@@ -802,6 +816,16 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
 
+    bool hadSelection = false;
+    if (m_doc.HasSelection()) {
+        if (!scoreBased) {
+            LogError("Page-based MEI output is not possible when a selection is set.");
+            return "";
+        }
+        hadSelection = true;
+        m_doc.DeactiveateSelection();
+    }
+
     MEIOutput meioutput(&m_doc);
     meioutput.SetScoreBasedMEI(scoreBased);
 
@@ -817,6 +841,9 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     if (!mdiv.empty()) meioutput.SetMdiv(mdiv);
 
     std::string output = meioutput.GetOutput();
+
+    if (hadSelection) m_doc.ReactivateSelection(false);
+
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return output;
 }
@@ -1197,7 +1224,13 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
         return;
     }
 
-    m_doc.UnCastOffDoc(resetCache);
+    if (m_docSelection.m_isPending) {
+        m_doc.InitSelectionDoc(m_docSelection, resetCache);
+    }
+    else {
+        m_doc.UnCastOffDoc(resetCache);
+    }
+
     if (m_options->m_breaks.GetValue() == BREAKS_line) {
         m_doc.CastOffLineDoc();
     }
@@ -1378,10 +1411,10 @@ std::string Toolkit::RenderToMIDI()
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
 
-    std::stringstream strstrem;
-    outputfile.write(strstrem);
+    std::stringstream stream;
+    outputfile.write(stream);
     std::string outputstr = Base64Encode(
-        reinterpret_cast<const unsigned char *>(strstrem.str().c_str()), (unsigned int)strstrem.str().length());
+        reinterpret_cast<const unsigned char *>(stream.str().c_str()), (unsigned int)stream.str().length());
 
     return outputstr;
 }
@@ -1454,9 +1487,9 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     jsonxx::Array restArray;
 
     // Here we need to check that the midi timemap is done
-    if (!m_doc.HasMidiTimemap()) {
+    if (!m_doc.HasTimemap()) {
         // generate MIDI timemap before progressing
-        m_doc.CalculateMidiTimemap();
+        m_doc.CalculateTimemap();
     }
 
     MeasureOnsetOffsetComparison matchMeasureTime(millisec);
@@ -1571,11 +1604,11 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     }
 
     int timeofElement = 0;
-    if (!m_doc.HasMidiTimemap()) {
+    if (!m_doc.HasTimemap()) {
         // generate MIDI timemap before progressing
-        m_doc.CalculateMidiTimemap();
+        m_doc.CalculateTimemap();
     }
-    if (!m_doc.HasMidiTimemap()) {
+    if (!m_doc.HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
     }
     if (element->Is(NOTE)) {
@@ -1626,11 +1659,11 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
     jsonxx::Array realTimeOnsetMilliseconds;
     jsonxx::Array realTimeOffsetMilliseconds;
 
-    if (!m_doc.HasMidiTimemap()) {
+    if (!m_doc.HasTimemap()) {
         // generate MIDI timemap before progressing
-        m_doc.CalculateMidiTimemap();
+        m_doc.CalculateTimemap();
     }
-    if (!m_doc.HasMidiTimemap()) {
+    if (!m_doc.HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
         return o.json();
     }
@@ -1674,11 +1707,11 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 
     jsonxx::Object o;
     if (element->Is(NOTE)) {
-        if (!m_doc.HasMidiTimemap()) {
+        if (!m_doc.HasTimemap()) {
             // generate MIDI timemap before progressing
-            m_doc.CalculateMidiTimemap();
+            m_doc.CalculateTimemap();
         }
-        if (!m_doc.HasMidiTimemap()) {
+        if (!m_doc.HasTimemap()) {
             LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
             return o.json();
         }
@@ -1833,6 +1866,15 @@ std::string Toolkit::ConvertHumdrumToHumdrum(const std::string &humdrumData)
     return humout.str();
 #else
     return "";
+#endif
+}
+
+std::string Toolkit::ConvertHumdrumToMIDI(const std::string &humdrumData)
+{
+#ifndef NO_HUMDRUM_SUPPORT
+    return "TVRoZAAAAAYAAQAAAGRNVHJrAAAADQCQPHCBSJA8AAD/LwA=";
+#else
+    return "TVRoZAAAAAYAAQAAAGRNVHJrAAAADQCQPHCBSJA8AAD/LwA=";
 #endif
 }
 

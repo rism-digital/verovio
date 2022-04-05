@@ -70,9 +70,9 @@ public:
     ///@}
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -134,9 +134,9 @@ public:
     ///@}
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
 private:
     //
@@ -381,15 +381,20 @@ public:
     ///@}
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
 private:
     /**
      * Addjusts flag placement and stem length if they are crossing notehead or ledger lines
      */
     void AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration);
+
+    /**
+     * Helper to adjust length of stem based on presence of slashes
+     */
+    void AdjustSlashes(Doc *doc, int staffSize, int flagOffset, bool isSameAs);
 
 public:
     //

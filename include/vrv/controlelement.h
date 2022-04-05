@@ -41,7 +41,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    LinkingInterface *GetLinkingInterface() override { return dynamic_cast<LinkingInterface *>(this); }
+    LinkingInterface *GetLinkingInterface() override { return vrv_cast<LinkingInterface *>(this); }
+    const LinkingInterface *GetLinkingInterface() const override { return vrv_cast<const LinkingInterface *>(this); }
     ///@}
 
     /**
@@ -66,9 +67,9 @@ public:
     int AdjustXOverflow(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
 private:
     //

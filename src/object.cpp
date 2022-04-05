@@ -133,7 +133,7 @@ void Object::CloneReset()
 {
     this->Modify();
     FunctorParams voidParams;
-    this->ResetDrawing(&voidParams);
+    this->ResetData(&voidParams);
 }
 
 Object &Object::operator=(const Object &object)
@@ -1189,7 +1189,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         a->FindAllDescendantsByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
             if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            FacsimileInterface *temp = (*it)->GetFacsimileInterface();
             assert(temp);
             if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
                 fa = temp;
@@ -1203,7 +1203,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         b->FindAllDescendantsByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
             if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            FacsimileInterface *temp = (*it)->GetFacsimileInterface();
             assert(temp);
             if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
                 fb = temp;
@@ -1255,7 +1255,7 @@ bool Object::IsPreOrdered(const Object *left, const Object *right)
     if (commonParent) {
         return (commonParent->GetChildIndex(*iterPair.first) < commonParent->GetChildIndex(*iterPair.second));
     }
-    return false;
+    return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2099,6 +2099,21 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    // starting a new mensur
+    if (this->Is(MENSUR)) {
+        Mensur *mensur = vrv_cast<Mensur *>(this);
+        assert(mensur);
+        if (mensur->IsScoreDefElement()) {
+            return FUNCTOR_CONTINUE;
+        }
+        assert(params->m_currentStaffDef);
+        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef.GetStaffDef(params->m_currentStaffDef->GetN());
+        assert(upcomingStaffDef);
+        upcomingStaffDef->SetCurrentMensur(mensur);
+        params->m_upcomingScoreDef.m_setAsDrawing = true;
+        return FUNCTOR_CONTINUE;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -2122,9 +2137,9 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetOverflowBBoxes(FunctorParams *functorParams)
+int Object::CalcBBoxOverflows(FunctorParams *functorParams)
 {
-    SetOverflowBBoxesParams *params = vrv_params_cast<SetOverflowBBoxesParams *>(functorParams);
+    CalcBBoxOverflowsParams *params = vrv_params_cast<CalcBBoxOverflowsParams *>(functorParams);
     assert(params);
 
     // starting a new staff
@@ -2147,16 +2162,16 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         // set scoreDef attr
         if (currentLayer->GetStaffDefClef()) {
             // System scoreDef clefs are taken into account but treated separately (see below)
-            currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefClef()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetStaffDefKeySig()) {
-            currentLayer->GetStaffDefKeySig()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefKeySig()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetStaffDefMensur()) {
-            currentLayer->GetStaffDefMensur()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefMensur()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetStaffDefMeterSig()) {
-            currentLayer->GetStaffDefMeterSig()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefMeterSig()->CalcBBoxOverflows(params);
         }
         return FUNCTOR_CONTINUE;
     }
@@ -2262,9 +2277,9 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
+int Object::CalcBBoxOverflowsEnd(FunctorParams *functorParams)
 {
-    SetOverflowBBoxesParams *params = vrv_params_cast<SetOverflowBBoxesParams *>(functorParams);
+    CalcBBoxOverflowsParams *params = vrv_params_cast<CalcBBoxOverflowsParams *>(functorParams);
     assert(params);
 
     // starting new layer
@@ -2273,16 +2288,16 @@ int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
         assert(currentLayer);
         // set scoreDef attr
         if (currentLayer->GetCautionStaffDefClef()) {
-            currentLayer->GetCautionStaffDefClef()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefClef()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetCautionStaffDefKeySig()) {
-            currentLayer->GetCautionStaffDefKeySig()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefKeySig()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetCautionStaffDefMensur()) {
-            currentLayer->GetCautionStaffDefMensur()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefMensur()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetCautionStaffDefMeterSig()) {
-            currentLayer->GetCautionStaffDefMeterSig()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefMeterSig()->CalcBBoxOverflows(params);
         }
     }
     return FUNCTOR_CONTINUE;

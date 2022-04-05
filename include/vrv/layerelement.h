@@ -68,8 +68,13 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    FacsimileInterface *GetFacsimileInterface() override { return dynamic_cast<FacsimileInterface *>(this); }
-    LinkingInterface *GetLinkingInterface() override { return dynamic_cast<LinkingInterface *>(this); }
+    FacsimileInterface *GetFacsimileInterface() override { return vrv_cast<FacsimileInterface *>(this); }
+    const FacsimileInterface *GetFacsimileInterface() const override
+    {
+        return vrv_cast<const FacsimileInterface *>(this);
+    }
+    LinkingInterface *GetLinkingInterface() override { return vrv_cast<LinkingInterface *>(this); }
+    const LinkingInterface *GetLinkingInterface() const override { return vrv_cast<const LinkingInterface *>(this); }
     ///@}
 
     /**
@@ -258,6 +263,21 @@ public:
     std::pair<int, bool> CalcElementHorizontalOverlap(Doc *doc, const std::vector<LayerElement *> &otherElements,
         bool areDotsAdjusted, bool isChordElement, bool isLowerElement = false, bool unison = true);
 
+    /**
+     * Helper function to set shortening for elements with beam interface
+     */
+    virtual void SetElementShortening(int shortening){};
+
+    /**
+     * Get the stem mod for the element (if any)
+     */
+    virtual data_STEMMODIFIER GetDrawingStemMod() const;
+
+    /**
+     * Convert stem mode to corresponding glyph code
+     */
+    wchar_t StemModToGlyph(data_STEMMODIFIER stemMod) const;
+
     //----------//
     // Functors //
     //----------//
@@ -320,9 +340,9 @@ public:
     int AdjustXRelForTranscription(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareDrawingCueSize
+     * See Object::PrepareCueSize
      */
-    int PrepareDrawingCueSize(FunctorParams *functorParams) override;
+    int PrepareCueSize(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareCrossStaff
@@ -353,9 +373,9 @@ public:
     int PrepareTimeSpanning(FunctorParams *functorParams) override;
 
     /**
-     * See Object::SetAlignmentPitchPos
+     * See Object::CalcAlignmentPitchPos
      */
-    int SetAlignmentPitchPos(FunctorParams *functorParams) override;
+    int CalcAlignmentPitchPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::FindSpannedLayerElements
@@ -373,17 +393,17 @@ public:
     int LayerElementsInTimeSpan(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcOnsetOffset
+     * See Object::InitOnsetOffset
      */
     ///@{
-    int CalcOnsetOffset(FunctorParams *functorParams) override;
+    int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**
-     * See Object::ResolveMIDITies
+     * See Object::InitTimemapTies
      */
     ///@{
-    int ResolveMIDITies(FunctorParams *functorParams) override;
+    int InitTimemapTies(FunctorParams *functorParams) override;
     ///@}
 
     /**
@@ -401,12 +421,12 @@ public:
     /**
      * See Object::CalcMaxMeasureDuration
      */
-    int CalcMaxMeasureDuration(FunctorParams *functorParams) override;
+    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::GetRelativeLayerElement
@@ -414,9 +434,9 @@ public:
     int GetRelativeLayerElement(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareSlurs
+     * See Object::CalcSlurDirection
      */
-    int PrepareSlurs(FunctorParams *functorParams) override;
+    int CalcSlurDirection(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareDuration
@@ -433,9 +453,9 @@ protected:
      * Helper to figure whether two chords are in fully in unison based on the locations of the notes.
      * This function assumes that two chords are already in unison and checks whether chords can overlap with
      * their unison notes or if they should be placed separately.
-     * Returns true if all elements can safely overlap.
+     * Returns vector with all locations of elements in unison.
      */
-    virtual int CountElementsInUnison(
+    std::vector<int> GetElementsInUnison(
         const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection);
 
     /**
@@ -449,6 +469,12 @@ protected:
      * secondary
      */
     virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; }
+
+    /**
+     * Helper function to calculate overlap with layer elements that
+     * are placed within the duration of element
+     */
+    int CalcLayerOverlap(Doc *doc, int direction, int y1, int y2);
 
     /**
      * Calculate the optimal dot location for a note or chord
@@ -523,7 +549,7 @@ protected:
     int m_cachedXRel;
 
     /**
-     * The cached drawing cue size set by PrepareDrawingCueSize
+     * The cached drawing cue size set by PrepareCueSize
      */
     bool m_drawingCueSize;
 

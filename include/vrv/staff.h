@@ -58,7 +58,16 @@ public:
      */
     void CloneReset() override;
 
-    FacsimileInterface *GetFacsimileInterface() override { return dynamic_cast<FacsimileInterface *>(this); }
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    FacsimileInterface *GetFacsimileInterface() override { return vrv_cast<FacsimileInterface *>(this); }
+    const FacsimileInterface *GetFacsimileInterface() const override
+    {
+        return vrv_cast<const FacsimileInterface *>(this);
+    }
+    ///@}
 
     /**
      * Delete all the legder line arrays.
@@ -224,9 +233,9 @@ public:
     int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareRpt
@@ -234,10 +243,10 @@ public:
     int PrepareRpt(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcOnsetOffset
+     * See Object::InitOnsetOffset
      */
     ///@{
-    int CalcOnsetOffset(FunctorParams *functorParams) override;
+    int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**

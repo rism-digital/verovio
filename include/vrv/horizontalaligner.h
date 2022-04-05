@@ -147,7 +147,7 @@ public:
     /**
      * Returns true for Alignment for which we want to do bounding box alignment
      */
-    bool PerfomBoundingBoxAlignment() const;
+    bool PerformBoundingBoxAlignment() const;
 
     /**
      * Return the AlignmentReference holding the element.
@@ -204,10 +204,10 @@ public:
     //----------//
 
     /**
-     * Set the position of the Alignment.
+     * Calc the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      */
-    int SetAlignmentXPos(FunctorParams *functorParams) override;
+    int CalcAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * Justify the X positions
@@ -258,7 +258,7 @@ public:
 private:
     /**
      * Stores the position relative to the measure.
-     * This is instanciated by the Object::SetAlignmentXPos functor.
+     * This is instanciated by the Object::CalcAlignmentXPos functor.
      * It takes into account a non-linear according to the time interval with
      * the previous Alignement
      */
@@ -340,6 +340,12 @@ public:
      * Return true if the reference has elements from cross-staff.
      */
     bool HasCrossStaffElements();
+
+    /**
+     * Set whether accidentals should be aligned with all elements of alignmentReference or elements from same layer
+     * only. Set for each accidental in accidSpace separately
+     */
+    void SetAccidLayerAlignment();
 
     //----------//
     // Functors //
@@ -535,7 +541,7 @@ public:
      * Looks at the time different with the previous Alignment.
      * For each MeasureAlignment, we need to reset the previous time position.
      */
-    int SetAlignmentXPos(FunctorParams *functorParams) override;
+    int CalcAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * Justify the X positions
@@ -630,7 +636,7 @@ public:
 
     /**
      * Set an linear defaut position for each grace note
-     * This is called from the SetAlignmentXPos Functor.
+     * This is called from the CalcAlignmentXPos Functor.
      */
     void SetGraceAligmentXPos(Doc *doc);
 

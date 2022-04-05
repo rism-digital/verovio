@@ -70,8 +70,13 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    PlistInterface *GetPlistInterface() override { return dynamic_cast<PlistInterface *>(this); }
-    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    PlistInterface *GetPlistInterface() override { return vrv_cast<PlistInterface *>(this); }
+    const PlistInterface *GetPlistInterface() const override { return vrv_cast<const PlistInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
     ////@}
 
     /**
@@ -104,9 +109,9 @@ public:
     ///@}
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::HorizontalLayoutCache
@@ -114,9 +119,9 @@ public:
     int HorizontalLayoutCache(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareMIDI
+     * See Object::InitMIDI
      */
-    int PrepareMIDI(FunctorParams *functorParams) override;
+    int InitMIDI(FunctorParams *functorParams) override;
 
 protected:
     //

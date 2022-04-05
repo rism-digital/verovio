@@ -461,7 +461,8 @@ public:
     ///@{
     bool HasValue(const std::vector<std::string> &jsonNodePath) const;
     int GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
-    double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
+    double GetDblValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
+    std::string GetStrValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     bool UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value);
     ///@}
 
@@ -592,6 +593,7 @@ public:
     OptionBool m_landscape;
     OptionBool m_ligatureAsBracket;
     OptionBool m_mensuralToMeasure;
+    OptionBool m_midiNoCue;
     OptionDbl m_midiTempoAdjustment;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
@@ -638,6 +640,7 @@ public:
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
+    OptionBool m_beamFrenchStyle;
     OptionDbl m_bracketThickness;
     OptionDbl m_dynamDist;
     OptionDbl m_clefChangeFactor;
@@ -657,6 +660,7 @@ public:
     OptionDbl m_justificationBracketGroup;
     OptionDbl m_justificationStaff;
     OptionDbl m_justificationSystem;
+    OptionDbl m_justificationMaxVertical;
     OptionDbl m_ledgerLineThickness;
     OptionDbl m_ledgerLineExtension;
     OptionDbl m_lyricHyphenLength;
@@ -711,6 +715,7 @@ public:
     OptionString m_mdivXPathQuery;
     OptionArray m_substXPathQuery;
     OptionString m_transpose;
+    OptionJson m_transposeMdiv;
     OptionBool m_transposeSelectedOnly;
 
     /**

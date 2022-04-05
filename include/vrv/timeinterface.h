@@ -81,6 +81,12 @@ public:
      */
     std::vector<Staff *> GetTstampStaves(Measure *measure, Object *object);
 
+    /**
+     * Return true if the interface owner is encoded in the measure of its start element
+     * Display a warning if not
+     */
+    bool VerifyMeasure(const Object *owner);
+
     //-----------------//
     // Pseudo functors //
     //-----------------//
@@ -103,9 +109,9 @@ public:
     virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
+    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
 
 protected:
     /**
@@ -224,9 +230,9 @@ public:
     int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int InterfaceResetDrawing(FunctorParams *functorParams, Object *object) override;
+    int InterfaceResetData(FunctorParams *functorParams, Object *object) override;
 
 private:
     //

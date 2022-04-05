@@ -11,7 +11,9 @@
 
 #include <assert.h>
 #include <cmath>
+#include <codecvt>
 #include <iostream>
+#include <locale>
 #include <sstream>
 #include <stdarg.h>
 #include <stdio.h>
@@ -44,9 +46,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "checked.h"
 #include "pugixml.hpp"
-#include "unchecked.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -440,21 +440,14 @@ std::string ExtractUuidFragment(std::string refUuid)
 
 std::string UTF16to8(const std::wstring &in)
 {
-    std::string out;
-
-    utf8::utf16to8(in.begin(), in.end(), std::back_inserter(out));
-
-    return out;
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> strCnv;
+    return strCnv.to_bytes(in);
 }
 
 std::wstring UTF8to16(const std::string &in)
 {
-    std::wstring out;
-    std::stringstream sin(in.c_str());
-
-    utf8::utf8to16(std::istreambuf_iterator<char>(sin), std::istreambuf_iterator<char>(), std::back_inserter(out));
-
-    return out;
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> strCnv;
+    return strCnv.from_bytes(in);
 }
 
 std::string GetFileVersion(int vmaj, int vmin, int vrev)

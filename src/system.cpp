@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "beamspan.h"
 #include "comparison.h"
 #include "dir.h"
 #include "doc.h"
@@ -252,7 +253,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
             continue;
         }
 
-        StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface *>(child);
+        StemmedDrawingInterface *interface = child->GetStemmedDrawingInterface();
         assert(interface);
 
         // First pass
@@ -346,30 +347,44 @@ void System::AddToDrawingListIfNeccessary(Object *object)
     }
 }
 
-bool System::IsFirstInPage()
+bool System::IsFirstInPage() const
 {
     assert(this->GetParent());
     return (this->GetParent()->GetFirst(SYSTEM) == this);
 }
 
-bool System::IsLastInPage()
+bool System::IsLastInPage() const
 {
     assert(this->GetParent());
     return (this->GetParent()->GetLast(SYSTEM) == this);
 }
 
-bool System::IsFirstOfMdiv()
+bool System::IsFirstOfMdiv() const
 {
     assert(this->GetParent());
-    Object *nextSibling = this->GetParent()->GetPrevious(this);
+    const Object *nextSibling = this->GetParent()->GetPrevious(this);
     return (nextSibling && nextSibling->IsPageElement());
 }
 
-bool System::IsLastOfMdiv()
+bool System::IsLastOfMdiv() const
 {
     assert(this->GetParent());
-    Object *nextSibling = this->GetParent()->GetNext(this);
+    const Object *nextSibling = this->GetParent()->GetNext(this);
     return (nextSibling && nextSibling->IsPageElement());
+}
+
+bool System::IsFirstOfSelection() const
+{
+    const Page *page = vrv_cast<const Page *>(this->GetFirstAncestor(PAGE));
+    assert(page);
+    return (page->IsFirstOfSelection() && this->IsFirstInPage());
+}
+
+bool System::IsLastOfSelection() const
+{
+    const Page *page = vrv_cast<const Page *>(this->GetFirstAncestor(PAGE));
+    assert(page);
+    return (page->IsLastOfSelection() && this->IsLastInPage());
 }
 
 double System::EstimateJustificationRatio(Doc *doc)
@@ -399,17 +414,17 @@ void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
     assert(targetSystem);
 
     // We need to populate processing lists for processing the document by Layer
-    PrepareProcessingListsParams prepareProcessingListsParams;
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    InitProcessingListsParams initProcessingListsParams;
+    Functor initProcessingLists(&Object::InitProcessingLists);
+    this->Process(&initProcessingLists, &initProcessingListsParams);
 
     // The means no content? Checking just in case
-    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+    if (initProcessingListsParams.m_layerTree.child.empty()) return;
 
     ConvertToCastOffMensuralParams convertToCastOffMensuralParams(
-        doc, targetSystem, &prepareProcessingListsParams.m_layerTree);
+        doc, targetSystem, &initProcessingListsParams.m_layerTree);
     // Store the list of staff N for detecting barLines that are on all systems
-    for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
+    for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
         convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
     }
 
@@ -420,18 +435,18 @@ void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
 void System::ConvertToUnCastOffMensuralSystem()
 {
     // We need to populate processing lists for processing the document by Layer
-    PrepareProcessingListsParams prepareProcessingListsParams;
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    InitProcessingListsParams initProcessingListsParams;
+    Functor initProcessingLists(&Object::InitProcessingLists);
+    this->Process(&initProcessingLists, &initProcessingListsParams);
 
     // The means no content? Checking just in case
-    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+    if (initProcessingListsParams.m_layerTree.child.empty()) return;
 
     ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
 
     ArrayOfComparisons filters;
     // Now we can process by layer and move their content to (measure) segments
-    for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
+    for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
         for (auto const &layers : staves.second.child) {
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(STAFF, staves.first);
@@ -575,13 +590,13 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::SetAlignmentXPos(FunctorParams *functorParams)
+int System::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     const double ratio = this->EstimateJustificationRatio(params->m_doc);
-    if (!this->IsLastOfMdiv() || (ratio < params->m_estimatedJustificationRatio)) {
+    if ((!this->IsLastOfMdiv() && !this->IsLastOfSelection()) || (ratio < params->m_estimatedJustificationRatio)) {
         params->m_estimatedJustificationRatio = ratio;
     }
 
@@ -805,8 +820,9 @@ int System::AlignSystems(FunctorParams *functorParams)
         // Alignment is already pre-determined with staff alignment overflow
         // We need to subtract them from the desired spacing
         const int actualSpacing = systemSpacing - std::max(contentOverflow, clefOverflow);
-        // Set the spacing if it exists (greater than 0)
-        if (actualSpacing > 0) params->m_shift -= actualSpacing;
+        // Ensure minimal white space between consecutive systems by adding one staff space
+        const int unit = params->m_doc->GetDrawingUnit(100);
+        params->m_shift -= std::max(actualSpacing, 2 * unit);
     }
 
     this->SetDrawingYRel(params->m_shift);
@@ -847,7 +863,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
     // Check if we are on the last system of an mdiv.
     // Do not justify it if the non-justified width is less than a specified percent.
-    if (this->IsLastOfMdiv()) {
+    if (this->IsLastOfMdiv() || this->IsLastOfSelection()) {
         double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
         if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
             return FUNCTOR_SIBLINGS;
@@ -877,6 +893,26 @@ int System::JustifyY(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;
+}
+
+int System::AdjustCrossStaffYPos(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    for (auto &item : m_drawingList) {
+        if (item->Is(BEAMSPAN)) {
+            // Here we could check that the beamSpan is actually cross-staff. Otherwise doing this is pointless
+            BeamSpan *beamSpan = vrv_cast<BeamSpan *>(item);
+            assert(beamSpan);
+            BeamSpanSegment *segment = beamSpan->GetSegmentForSystem(this);
+            if (segment)
+                segment->CalcBeam(
+                    segment->GetLayer(), segment->GetStaff(), params->m_doc, beamSpan, beamSpan->m_drawingPlace);
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 int System::AdjustStaffOverlap(FunctorParams *functorParams)
@@ -1143,6 +1179,21 @@ int System::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int System::CastOffToSelection(FunctorParams *functorParams)
+{
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
+    assert(params);
+
+    // We are starting a new system we need to cast off
+    params->m_contentSystem = this;
+    // We also need to create a new target system and add it to the page
+    System *system = new System();
+    params->m_page->AddChild(system);
+    params->m_currentSystem = system;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int System::UnCastOff(FunctorParams *functorParams)
 {
     UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
@@ -1152,6 +1203,21 @@ int System::UnCastOff(FunctorParams *functorParams)
     // Use the MoveChildrenFrom method that moves and relinquishes them
     // See Object::Relinquish
     params->m_currentSystem->MoveChildrenFrom(this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    // Check whether we are in the selected mdiv
+    if (!params->m_selectedMdivUuid.empty()
+        && (std::find(params->m_currentMdivUuids.begin(), params->m_currentMdivUuids.end(), params->m_selectedMdivUuid)
+            == params->m_currentMdivUuids.end())) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     return FUNCTOR_CONTINUE;
 }

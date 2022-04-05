@@ -226,6 +226,8 @@ protected:
     void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
     void DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId);
+    void DrawLayerDefLabels(
+        DeviceContext *dc, ScoreDef *scoreDef, Staff *staff, StaffDef *staffDef, int x, bool abbreviations = false);
     void DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMeasure);
     ///@}
 
@@ -325,6 +327,7 @@ protected:
     void DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff);
     void DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -339,7 +342,7 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
     void DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y, double sizeFactor);
-    void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
+    void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff, bool dimin = false);
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */
     int DrawMeterSigFigures(
@@ -536,8 +539,8 @@ protected:
     void DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength = 0);
     void DrawSmuflCode(
         DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph = false);
-    void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth,
-        float angle = 0.0, int penStyle = AxSOLID);
+    void DrawThickBezierCurve(
+        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, int penStyle = AxSOLID);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
     void DrawTextString(DeviceContext *dc, std::wstring str, TextDrawingParams &params);
     void DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParams &params, Rend *rend);
@@ -554,7 +557,7 @@ protected:
     void DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int radius);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
     void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth);
-    void DrawDot(DeviceContext *dc, int x, int y, int staffSize);
+    void DrawDot(DeviceContext *dc, int x, int y, int staffSize, bool dimin = false);
     void DrawSquareBracket(DeviceContext *dc, bool leftBracket, int x, int y, int height, int width,
         int horizontalThickness, int verticalThickness);
     void DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, int width, int offset, int bracketWidth,
@@ -587,7 +590,7 @@ private:
      */
     ///@{
     void DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType);
-    float CalcInitialSlur(
+    void CalcInitialSlur(
         FloatingCurvePositioner *curve, Slur *slur, Staff *staff, curvature_CURVEDIR curveDir, Point points[4]);
     ///@}
 
@@ -600,15 +603,23 @@ private:
         bool isMensuralBlack, bool firstHalf);
 
     /**
-     * Internal method for drawing a BeamSegment
+     * Internal methods for drawing a BeamSegment
      */
+    ///@{
     void DrawBeamSegment(
         DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer, Staff *staff);
+    void DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem);
+    ///@}
 
     /**
      * Internal methods for drawing time spanning elements
      */
     bool HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerElement *start, LayerElement *end) const;
+
+    /**
+     * Internal method to find stem direction for notes of mensural notation
+     */
+    data_STEMDIRECTION GetMensuralStemDirection(Layer *layer, Note *note, int verticalCenter);
 
 public:
     /** Document */
@@ -638,14 +649,6 @@ protected:
      * It can change when drawing the m_currentElement, for example
      */
     int m_currentColour;
-
-    /**
-     * Values to adjust tie/slur thickness to have proper MEI values for thickness
-     */
-    ///@{
-    double m_tieThicknessCoefficient;
-    double m_slurThicknessCoefficient;
-    ///@}
 
     /**
      * Control the handling of slurs

@@ -223,9 +223,10 @@ void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width,
     dc->ResetBrush();
 }
 
-void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
+void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize, bool dimin)
 {
-    const int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
+    int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
+    if (dimin) r *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
@@ -349,13 +350,13 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data
 }
 
 void View::DrawThickBezierCurve(
-    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, float angle, int penStyle)
+    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, int penStyle)
 {
     assert(dc);
 
     Point bez1[4], bez2[4]; // filled array with control points and end point
 
-    BoundingBox::CalcThickBezier(bezier, thickness, angle, bez1, bez2);
+    BoundingBox::CalcThickBezier(bezier, thickness, bez1, bez2);
 
     bez1[0] = ToDeviceContext(bez1[0]);
     bez1[1] = ToDeviceContext(bez1[1]);

@@ -37,7 +37,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
+    DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
+    const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
     ///@}
 
     /**
@@ -60,9 +61,9 @@ public:
     //----------//
 
     /**
-     * See Object::CalcOnsetOffsetEnd
+     * See Object::InitOnsetOffsetEnd
      */
-    virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
+    virtual int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcStem

@@ -256,15 +256,29 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int y = accid->GetDrawingY();
 
     if (accid->GetFunc() == accidLog_FUNC_edit) {
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) {
+            const int drawingDur = note->GetDrawingDur();
             // Check if the note is on the top line or above (add a unit for the note head half size)
-            if (note->GetDrawingY() >= y) y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            if (note->GetDrawingY() >= y) y = note->GetDrawingY() + unit;
             // Check if the top of the stem is above
-            if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y))
+            if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y)) {
                 y = note->GetDrawingStemEnd(note).y;
+            }
+            else if (note->IsMensuralDur()) {
+                const int verticalCenter = y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+                const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
+                if ((note->GetStemDir() == STEMDIRECTION_up)
+                    || ((drawingDur > DUR_1) && (stemDir == STEMDIRECTION_up))) {
+                    y = note->GetDrawingY() + unit * STANDARD_STEMLENGTH;
+                }
+            }
+            else if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (drawingDur == DUR_LG)) {
+                y = note->GetDrawingStem()->GetDrawingY() + unit * STANDARD_STEMLENGTH;
+            }
             // Increase the x position of the accid
             x += note->GetDrawingRadius(m_doc);
         }
@@ -272,7 +286,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->GetDrawingCueSize()));
         dc->GetSmuflTextExtent(accid->GetSymbolStr(notationType), &extend);
         dc->ResetFont();
-        y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y += extend.m_descent + unit;
     }
 
     this->DrawSmuflString(
@@ -449,30 +463,10 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     BTrem *bTrem = vrv_cast<BTrem *>(element);
     assert(bTrem);
 
-    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-    data_STEMMODIFIER stemMod;
-    int drawingDur = 0;
-    LayerElement *childElement = NULL;
-    Note *childNote = NULL;
-    Point stemPoint;
-    bool drawingCueSize = false;
-    int x, y;
-
-    Chord *childChord = dynamic_cast<Chord *>(bTrem->FindDescendantByType(CHORD));
+    Object *bTremElement = bTrem->FindDescendantByType(CHORD);
     // Get from the chord or note child
-    if (childChord) {
-        drawingDur = childChord->GetDur();
-        childElement = childChord;
-    }
-    else {
-        childNote = dynamic_cast<Note *>(bTrem->FindDescendantByType(NOTE));
-        if (childNote) {
-            drawingDur = childNote->GetDur();
-            childElement = childNote;
-        }
-    }
-
-    if (!childElement) {
+    if (!bTremElement) bTremElement = bTrem->FindDescendantByType(NOTE);
+    if (!bTremElement) {
         bTrem->SetEmptyBB();
         return;
     }
@@ -481,106 +475,16 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     this->DrawLayerChildren(dc, bTrem, layer, staff, measure);
 
-    if (childNote && childNote->HasStemSameasNote() && childNote->GetStemSameasRole() == SAMEAS_SECONDARY) {
-        bTrem->SetEmptyBB();
-        dc->EndGraphic(element, this);
-        return;
-    }
-
-    // Get stem values from the chord or note child
-    if (childChord) {
-        Stem *stem = childChord->GetDrawingStem();
-        stemDir = childChord->GetDrawingStemDir();
-        stemMod = stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
-        stemPoint = childChord->GetDrawingStemStart(childChord);
-    }
-    else {
-        Stem *stem = childNote->GetDrawingStem();
-        drawingCueSize = childNote->GetDrawingCueSize();
-        stemDir = childNote->GetDrawingStemDir();
-        stemMod = stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
-        stemPoint = childNote->GetDrawingStemStart(childNote);
-    }
-
-    // conlude from logical attributes
-    if (bTrem->HasUnitdur() && (stemMod == STEMMODIFIER_NONE)) {
-        int slashDur = bTrem->GetUnitdur() - drawingDur;
-        if (drawingDur < DUR_4) slashDur = bTrem->GetUnitdur() - DUR_4;
-        switch (slashDur) {
-            case (0): stemMod = STEMMODIFIER_NONE; break;
-            case (1): stemMod = STEMMODIFIER_1slash; break;
-            case (2): stemMod = STEMMODIFIER_2slash; break;
-            case (3): stemMod = STEMMODIFIER_3slash; break;
-            case (4): stemMod = STEMMODIFIER_4slash; break;
-            case (5): stemMod = STEMMODIFIER_5slash; break;
-            case (6): stemMod = STEMMODIFIER_6slash; break;
-            default: break;
+    if (bTremElement && bTremElement->Is(NOTE)) {
+        Note *childNote = vrv_cast<Note *>(bTremElement);
+        if (childNote->HasStemSameasNote() && childNote->GetStemSameasRole() == SAMEAS_SECONDARY) {
+            bTrem->SetEmptyBB();
+            dc->EndGraphic(element, this);
+            return;
         }
     }
 
-    int beamWidthBlack = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize);
-    int beamWidthWhite = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
-    int width = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize);
-    int height = beamWidthBlack * 2 / 3;
-    int step = beamWidthBlack + beamWidthWhite;
-
-    if (stemDir == STEMDIRECTION_up) {
-        if (drawingDur > DUR_1) {
-            // Since we are adding the slashing on the stem, ignore artic
-            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false)
-                - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
-            x = stemPoint.x;
-        }
-        else {
-            // Take into account artic (not likely, though)
-            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize)
-                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + (stemMod - 2) * step;
-            x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
-        }
-        if (drawingDur > DUR_4) {
-            Flag *flag = NULL;
-            flag = dynamic_cast<Flag *>(childElement->FindDescendantByType(FLAG));
-            if (flag) y -= (drawingDur > DUR_8) ? 2 * step : step;
-        }
-        step = -step;
-    }
-    else {
-        if (drawingDur > DUR_1) {
-            // Idem as above
-            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false)
-                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            x = stemPoint.x;
-        }
-        else {
-            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
-                - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 - (stemMod - 2) * step;
-            x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
-        }
-        if (drawingDur > DUR_4) {
-            Flag *flag = NULL;
-            flag = dynamic_cast<Flag *>(childElement->FindDescendantByType(FLAG));
-            if (flag) y += (drawingDur > DUR_8) ? 2 * step : step;
-        }
-    }
-
-    Beam *beam = childElement->IsInBeam();
-    if (beam) {
-        int beamStep = (drawingDur - DUR_8) * (beamWidthBlack + beamWidthWhite) + beamWidthWhite;
-        y += (stemDir == STEMDIRECTION_down) ? beamStep : -beamStep;
-    }
-
-    // by default draw 3 slashes (e.g., for a tremolo on a whole note)
-    if ((stemMod == STEMMODIFIER_NONE) && (drawingDur < DUR_2)) stemMod = STEMMODIFIER_3slash;
-    if (stemMod == STEMMODIFIER_z) {
-        if (stemDir == STEMDIRECTION_down) y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        this->DrawSmuflCode(dc, x, y, SMUFL_E22A_buzzRoll, staff->m_drawingStaffSize, false);
-    }
-    else if (stemMod != STEMMODIFIER_sprech) {
-        for (int s = 1; s < stemMod; ++s) {
-            this->DrawObliquePolygon(dc, x - width / 2, y - height / 2, x + width / 2, y + height / 2, beamWidthBlack);
-            y += step;
-        }
-    }
+    this->DrawStemMod(dc, element, staff);
 
     dc->EndGraphic(element, this);
 }
@@ -676,7 +580,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
+        FacsimileInterface *fi = element->GetFacsimileInterface();
         fi->GetZone()->SetUlx(x);
         fi->GetZone()->SetUly(ToDeviceContextY(y));
         fi->GetZone()->SetLrx(x + noteWidth);
@@ -771,7 +675,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
+        FacsimileInterface *fi = element->GetFacsimileInterface();
         fi->GetZone()->SetUlx(x);
         fi->GetZone()->SetUly(ToDeviceContextY(y));
         fi->GetZone()->SetLrx(x + noteWidth);
@@ -843,8 +747,8 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
         int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         for (int loc : mapEntry.second) {
-            this->DrawDotsPart(
-                dc, x, y + loc * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), dotStaff);
+            this->DrawDotsPart(dc, x, y + loc * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(),
+                dotStaff, element->GetDrawingCueSize());
         }
     }
 
@@ -1312,7 +1216,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
             ? std::min(staff->GetDrawingY() - staffHeight, y2) - offset
             : std::max(staff->GetDrawingY(), y1) + offset;
 
-        this->DrawSmuflString(dc, xCentered, y, IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center);
+        this->DrawSmuflString(
+            dc, xCentered, y, IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
         dc->ResetFont();
     }
 
@@ -1366,6 +1271,12 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     bool drawingCueSize = note->GetDrawingCueSize();
     int noteY = element->GetDrawingY();
     int noteX = element->GetDrawingX();
+
+    if (note->HasStemSameasNote() && note->GetFlippedNotehead()) {
+        int xShift = note->GetDrawingRadius(m_doc) * 2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        xShift *= (note->GetDrawingStemDir() == STEMDIRECTION_up) ? -1 : 1;
+        noteX -= xShift;
+    }
 
     if (!(note->GetHeadVisible() == BOOLEAN_false)) {
         /************** Noteheads: **************/
@@ -1538,30 +1449,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
         stem->GetDrawingY() - stem->GetDrawingStemLen());
 
-    if (stem->HasStemMod() && (stem->GetDrawingStemLen())) {
-        if (stem->GetStemMod() == STEMMODIFIER_sprech) {
-            int yShift = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            Note *note = vrv_cast<Note *>(stem->GetParent());
-            if (!note) {
-                Chord *chord = vrv_cast<Chord *>(stem->GetParent());
-                assert(chord);
-                if (stem->GetDrawingStemLen() < 0) {
-                    note = chord->GetTopNote();
-                }
-                else {
-                    note = chord->GetBottomNote();
-                }
-            }
-            assert(note);
-            if ((note->GetDrawingLoc() % 2) != 0) {
-                yShift += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            }
-            yShift *= (stem->GetDrawingStemLen() > 0) ? -1 : 1;
-            yShift -= m_doc->GetGlyphHeight(SMUFL_E645_vocalSprechgesang, staff->m_drawingStaffSize, false) / 2;
-            this->DrawSmuflCode(dc, stem->GetDrawingX(), note->GetDrawingY() + yShift, SMUFL_E645_vocalSprechgesang,
-                staff->m_drawingStaffSize, false);
-        }
-    }
+    this->DrawStemMod(dc, element, staff);
 
     this->DrawLayerChildren(dc, stem, layer, staff, measure);
 
@@ -1572,6 +1460,122 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     dc->EndGraphic(element, this);
+}
+
+void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
+{
+    // bTrem should already draw stem mod, so avoid doing it for second time from stem
+    if (element->GetFirstAncestor(BTREM)) return;
+
+    LayerElement *childElement = NULL;
+    // For bTrem, get first CHORD or NOTE, if there's no CHORD
+    if (element->Is(BTREM)) {
+        childElement = vrv_cast<LayerElement *>(element->FindDescendantByType(CHORD));
+        if (!childElement) childElement = vrv_cast<LayerElement *>(element->FindDescendantByType(NOTE));
+    }
+    // For stem just get parent element
+    else if (element->Is(STEM)) {
+        childElement = vrv_cast<LayerElement *>(element->GetParent());
+    }
+    else {
+        // should not happen, draw nothing
+        LogWarning("Drawing stem mod supported only for elements of <stem> or <bTrem> type.");
+        return;
+    }
+    // If we have no element at this point - exit without drawing anything
+    if (!childElement) return;
+
+    // Get stem related values (direction and coordinates)
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+    int stemX = 0;
+    StemmedDrawingInterface *stem = childElement->GetStemmedDrawingInterface();
+    if (stem) {
+        stemDir = stem->GetDrawingStemDir();
+        stemX = stem->GetDrawingStemStart(childElement).x;
+    }
+
+    // Get note
+    Note *note = NULL;
+    if (childElement->Is(NOTE)) {
+        note = vrv_cast<Note *>(childElement);
+    }
+    else if (childElement->Is(CHORD)) {
+        note = (stemDir == STEMDIRECTION_up) ? vrv_cast<Chord *>(childElement)->GetTopNote()
+                                             : vrv_cast<Chord *>(childElement)->GetBottomNote();
+    }
+    if (!note || note->IsGraceNote() || note->GetDrawingCueSize()) return;
+
+    // Get duration for the element
+    int drawingDur = 0;
+    DurationInterface *duration = childElement->GetDurationInterface();
+    if (duration) {
+        drawingDur = duration->GetActualDur();
+    }
+    data_STEMMODIFIER stemMod = element->GetDrawingStemMod();
+    if (stemMod == STEMMODIFIER_NONE) return;
+
+    // calculate height offset for positioning of stem mod elements on the stem
+    const int noteLoc = note->GetDrawingLoc();
+    const wchar_t code = element->StemModToGlyph(stemMod);
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int glyphHalfHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) / 2;
+    int height = 2 * unit;
+    const int sign = (stemDir == STEMDIRECTION_up) ? 1 : -1;
+    switch (stemMod) {
+        case STEMMODIFIER_1slash:
+        case STEMMODIFIER_2slash:
+        case STEMMODIFIER_3slash:
+        case STEMMODIFIER_4slash:
+        case STEMMODIFIER_5slash:
+        case STEMMODIFIER_6slash: {
+            if (noteLoc % 2 == 0) height += unit;
+            height += glyphHalfHeight;
+            if (stemMod == STEMMODIFIER_6slash)
+                height += m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false) / 2;
+            break;
+        }
+        case STEMMODIFIER_sprech:
+        case STEMMODIFIER_z: {
+            height += (noteLoc % 2) ? 3 * unit : 2 * unit;
+            if (stemMod == STEMMODIFIER_sprech) height -= sign * glyphHalfHeight;
+            break;
+        }
+        default: return;
+    }
+
+    // calculate additional adjustments for beamed elements
+    Beam *beam = childElement->IsInBeam();
+    if (beam) {
+        int beamMargin = (sign > 0) ? childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize)
+                                    : childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+        beamMargin -= sign
+            * ((drawingDur - DUR_8) * (beam->m_beamWidthBlack + beam->m_beamWidthWhite) + beam->m_beamWidthWhite);
+        const int modMargin = note->GetDrawingY() + sign * (height + glyphHalfHeight);
+        const int diff = sign * (modMargin - beamMargin);
+        if (diff > 0) {
+            const int halfUnit = 0.5 * unit;
+            height -= (diff / halfUnit + 1) * halfUnit;
+        }
+    }
+
+    // calculate position for the stem mod
+    const int y = note->GetDrawingY() + sign * height;
+    const int x = (drawingDur <= DUR_1) ? childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc) : stemX;
+
+    if ((code != SMUFL_E645_vocalSprechgesang) || !element->Is(BTREM)) {
+        int adjust = 0;
+        if (stemMod == STEMMODIFIER_6slash) {
+            const int slash1height = m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false);
+            const int slash6height = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false);
+            // we need to take half (0.5) of the height difference between to glyphs for the the initial position and
+            // add a quarter (0.25) of the glyph to account for the height of slash side and white space between
+            // slashes. This results in 0.75 adjustment of the height
+            adjust = -sign * unit;
+            const int slash1adjust = sign * 0.75 * (slash6height - slash1height) + adjust;
+            this->DrawSmuflCode(dc, x, y + slash1adjust, SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false);
+        }
+        this->DrawSmuflCode(dc, x, y + adjust, code, staff->m_drawingStaffSize, false);
+    }
 }
 
 void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1599,6 +1603,9 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     }
     if (syl->HasFontstyle()) {
         currentFont.SetStyle(syl->GetFontstyle());
+    }
+    if (syl->GetStart()->GetDrawingCueSize()) {
+        currentFont.SetPointSize(m_doc->GetCueSize(currentFont.GetPointSize()));
     }
     dc->SetFont(&currentFont);
 
@@ -1671,11 +1678,18 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             graphic = labelAbbr;
         }
 
+        LayerElement *layerElement
+            = vrv_cast<LayerElement *>(element->GetFirstAncestorInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
+
         FontInfo labelTxt;
         if (!dc->UseGlobalStyling()) {
             labelTxt.SetFaceName("Times");
         }
-        labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
+        int pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
+        if (layerElement && layerElement->GetDrawingCueSize()) {
+            pointSize = m_doc->GetCueSize(pointSize);
+        }
+        labelTxt.SetPointSize(pointSize);
 
         TextDrawingParams params;
         params.m_x = verse->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -1755,17 +1769,18 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     dc->ResetBrush();
 }
 
-void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
+void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff, bool dimin)
 {
     int i;
 
     if (staff->IsOnStaffLine(y, m_doc)) {
         y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
+    const double distance = dimin ? m_doc->GetOptions()->m_graceFactor.GetValue() : 1.0;
     for (i = 0; i < dots; ++i) {
-        this->DrawDot(dc, x, y, staff->m_drawingStaffSize);
+        this->DrawDot(dc, x, y, staff->m_drawingStaffSize, dimin);
         // HARDCODED
-        x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
+        x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5 * distance;
     }
 }
 
