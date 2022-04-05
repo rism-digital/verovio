@@ -156,10 +156,10 @@
   <g c="E4AC" x="0.0" y="0.0" w="273.0" h="265.0" h-a-x="274" n="articMarcatoAbove"/>
   <g c="E4AD" x="1.0" y="-265.0" w="273.0" h="265.0" h-a-x="274" n="articMarcatoBelow"/>
   <g c="E56B" x="0.0" y="0.0" w="244.0" h="468.0" h-a-x="244" n="ornamentTurnUpS"/>
-  <g c="E938" x="0.0" y="-192.0" w="312.0" h="386.0" h-a-x="312" n="mensuralNoteheadSemibrevisBlack"/>
-  <g c="E939" x="0.0" y="-192.0" w="312.0" h="386.0" h-a-x="312" n="mensuralNoteheadSemibrevisVoid"/>
-  <g c="E93C" x="0.0" y="-192.0" w="312.0" h="386.0" h-a-x="312" n="mensuralNoteheadMinimaWhite"/>
-  <g c="E93D" x="0.0" y="-192.0" w="312.0" h="386.0" h-a-x="312" n="mensuralNoteheadSemiminimaWhite"/>
+  <g c="E938" x="0.0" y="-141.0" w="282.0" h="282.0" h-a-x="282" n="mensuralNoteheadSemibrevisBlack"/>
+  <g c="E939" x="0.0" y="-141.0" w="282.0" h="282.0" h-a-x="282" n="mensuralNoteheadSemibrevisVoid"/>
+  <g c="E93C" x="0.0" y="-195.0" w="312.0" h="390.0" h-a-x="312" n="mensuralNoteheadMinimaWhite"/>
+  <g c="E93D" x="0.0" y="-195.0" w="312.0" h="390.0" h-a-x="312" n="mensuralNoteheadSemiminimaWhite"/>
   <g c="E101" x="0.0" y="-250.0" w="460.0" h="500.0" h-a-x="460" n="noteheadSlashHorizontalEnds">
     <a n="stemDownNW" x="0.0" y="-1.0"/>
     <a n="stemUpSE" x="1.84" y="1.0"/>
@@ -242,10 +242,10 @@
   <g c="E4CE" x="0.0" y="0.0" w="180.0" h="300.0" h-a-x="180" n="breathMarkComma"/>
   <g c="E93E" x="0.0" y="0.0" w="30.0" h="760.0" h-a-x="30" n="mensuralCombStemUp"/>
   <g c="E93F" x="0.0" y="-760.0" w="30.0" h="760.0" h-a-x="30" n="mensuralCombStemDown"/>
-  <g c="E949" x="0.0" y="0.0" w="186.0" h="760.0" h-a-x="186" n="mensuralCombStemUpFlagSemiminima"/>
-  <g c="E94B" x="0.0" y="0.0" w="186.0" h="760.0" h-a-x="186" n="mensuralCombStemUpFlagFusa"/>
-  <g c="E94A" x="0.0" y="-760.0" w="186.0" h="760.0" h-a-x="186" n="mensuralCombStemDownFlagSemiminima"/>
-  <g c="E94C" x="0.0" y="-760.0" w="186.0" h="760.0" h-a-x="186" n="mensuralCombStemDownFlagFusa"/>
+  <g c="E949" x="0.0" y="0.0" w="180.0" h="760.0" h-a-x="180" n="mensuralCombStemUpFlagSemiminima"/>
+  <g c="E94B" x="0.0" y="0.0" w="180.0" h="760.0" h-a-x="180" n="mensuralCombStemUpFlagFusa"/>
+  <g c="E94A" x="0.0" y="-760.0" w="180.0" h="760.0" h-a-x="186" n="mensuralCombStemDownFlagSemiminima"/>
+  <g c="E94C" x="0.0" y="-760.0" w="180.0" h="760.0" h-a-x="180" n="mensuralCombStemDownFlagFusa"/>
   <g c="E9F3" x="0.0" y="0.0" w="40.0" h="250.0" n="mensuralRestBrevis"/>
   <g c="E9F2" x="0.0" y="-250.0" w="40.0" h="500.0" n="mensuralRestLongaImperfecta"/>
   <g c="E9F1" x="0.0" y="-500.0" w="40.0" h="1000.0" n="mensuralRestLongaPerfecta"/>
@@ -262,8 +262,8 @@
     <a n="cutOutSE" x="0.5" y="-0.36"/>
   </g>
   <g c="E271" x="-42.0" y="-375.0" w="262.0" h="844.0" h-a-x="218" n="accidentalThreeQuarterTonesFlatArrowDown">
-    <a n="cutOutNE" x="0.19" y="0.58"/>
-    <a n="cutOutSE" x="0.59" y="-0.27"/>
+    <a n="cutOutNE" x="0.18" y="0.56"/>
+    <a n="cutOutSE" x="0.52" y="-0.34"/>
   </g>
   <g c="E272" x="-45.0" y="-377.0" w="222.0" h="882.0" h-a-x="178" n="accidentalQuarterToneSharpNaturalArrowUp">
     <a n="cutOutNE" x="0.47" y="0.78"/>
@@ -274,14 +274,14 @@
     <a n="cutOutSW" x="0.27" y="-0.83"/>
   </g>
   <g c="E274" x="0.0" y="-339.0" w="218.0" h="854.0" h-a-x="197" n="accidentalThreeQuarterTonesSharpArrowUp">
-    <a n="cutOutNE" x="0.62" y="0.88"/>
-    <a n="cutOutSE" x="0.62" y="-0.69"/>
-    <a n="cutOutSW" x="0.16" y="-0.87"/>
+    <a n="cutOutNW" x="0.16" y="0.64"/>
+    <a n="cutOutSE" x="0.62" y="-0.64"/>
+    <a n="cutOutSW" x="0.16" y="-0.82"/>
   </g>
   <g c="E275" x="0.0" y="-515.0" w="218.0" h="870.0" h-a-x="197" n="accidentalQuarterToneSharpArrowDown">
-    <a n="cutOutNE" x="0.62" y="0.86"/>
-    <a n="cutOutNW" x="0.16" y="0.7"/>
-    <a n="cutOutSE" x="0.62" y="-0.68"/>
+    <a n="cutOutNE" x="0.62" y="0.84"/>
+    <a n="cutOutNW" x="0.16" y="0.64"/>
+    <a n="cutOutSW" x="0.16" y="-0.82"/>
   </g>
   <g c="E280" x="0.0" y="-175.0" w="198.0" h="644.0" h-a-x="198" n="accidentalQuarterToneFlatStein">
     <a n="cutOutNW" x="0.7" y="0.58"/>
@@ -572,4 +572,13 @@
   <g c="E503" x="0.0" y="73.0" w="95.0" h="94.0" h-a-x="95" n="repeatBarUpperDot"/>
   <g c="E505" x="0.0" y="-166.0" w="95.0" h="94.0" h-a-x="95" n="repeatBarLowerDot"/>
   <g c="E0A5" x="0.0" y="0.0" w="314" h="0.0" h-a-x="314" n="noteheadNull"/>
+  <g c="E940" x="-209.0" y="-209.0" w="418.0" h="418.0" h-a-x="0" n="mensuralCombStemDiagonal"/>
+  <g c="E941" x="0.0" y="0.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemUpFlagRight"/>
+  <g c="E942" x="0.0" y="-760.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemDownFlagRight"/>
+  <g c="E943" x="0.0" y="0.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemUpFlagLeft"/>
+  <g c="E944" x="0.0" y="-760.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemDownFlagLeft"/>
+  <g c="E945" x="0.0" y="0.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemUpFlagFlared"/>
+  <g c="E946" x="0.0" y="-760.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemDownFlagFlared"/>
+  <g c="E947" x="-120.0" y="0.0" w="320.0" h="760.0" h-a-x="211" n="mensuralCombStemUpFlagExtended"/>
+  <g c="E948" x="-120.0" y="-760.0" w="320.0" h="760.0" h-a-x="211" n="mensuralCombStemDownFlagExtended"/>
 </bounding-boxes>

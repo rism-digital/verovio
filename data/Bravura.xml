@@ -613,6 +613,15 @@
   <g c="E93D" x="0.0" y="-184.0" w="320.0" h="369.0" h-a-x="320" n="mensuralNoteheadSemiminimaWhite"/>
   <g c="E93E" x="0.0" y="0.0" w="32.0" h="782.0" h-a-x="32" n="mensuralCombStemUp"/>
   <g c="E93F" x="0.0" y="-782.0" w="32.0" h="782.0" h-a-x="32" n="mensuralCombStemDown"/>
+  <g c="E940" x="-194.0" y="-193.0" w="386.0" h="385.0" h-a-x="1" n="mensuralCombStemDiagonal"/>
+  <g c="E941" x="0.0" y="0.0" w="220.0" h="782.0" h-a-x="220" n="mensuralCombStemUpFlagRight"/>
+  <g c="E942" x="0.0" y="-782.0" w="220.0" h="782.0" h-a-x="220" n="mensuralCombStemDownFlagRight"/>
+  <g c="E943" x="-188.0" y="0.0" w="220.0" h="782.0" h-a-x="32" n="mensuralCombStemUpFlagLeft"/>
+  <g c="E944" x="-188.0" y="-782.0" w="220.0" h="782.0" h-a-x="32" n="mensuralCombStemDownFlagLeft"/>
+  <g c="E945" x="0.0" y="0.0" w="231.0" h="782.0" h-a-x="231" n="mensuralCombStemUpFlagFlared"/>
+  <g c="E946" x="0.0" y="-782.0" w="231.0" h="782.0" h-a-x="231" n="mensuralCombStemDownFlagFlared"/>
+  <g c="E947" x="-124.0" y="0.0" w="343.0" h="782.0" h-a-x="219" n="mensuralCombStemUpFlagExtended"/>
+  <g c="E948" x="-124.0" y="-782.0" w="343.0" h="782.0" h-a-x="219" n="mensuralCombStemDownFlagExtended"/>
   <g c="E949" x="0.0" y="0.0" w="219.0" h="782.0" h-a-x="219" n="mensuralCombStemUpFlagSemiminima"/>
   <g c="E94A" x="0.0" y="-782.0" w="219.0" h="782.0" h-a-x="219" n="mensuralCombStemDownFlagSemiminima"/>
   <g c="E94B" x="0.0" y="0.0" w="219.0" h="782.0" h-a-x="219" n="mensuralCombStemUpFlagFusa"/>
