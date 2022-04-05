@@ -123,7 +123,7 @@ int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *funct
     return FUNCTOR_CONTINUE;
 }
 
-int LinkingInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+int LinkingInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_next = NULL;
     m_nextUuid = "";

@@ -147,10 +147,10 @@ int EditorialElement::PrepareMilestones(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int EditorialElement::ResetDrawing(FunctorParams *functorParams)
+int EditorialElement::ResetData(FunctorParams *functorParams)
 {
     if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfaceResetDrawing(functorParams);
+        this->SystemMilestoneInterface::InterfaceResetData(functorParams);
     }
 
     return FUNCTOR_CONTINUE;

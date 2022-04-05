@@ -249,10 +249,10 @@ int Verse::PrepareProcessingLists(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Verse::ResetDrawing(FunctorParams *functorParams)
+int Verse::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_drawingLabelAbbr = NULL;
 

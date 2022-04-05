@@ -359,7 +359,7 @@ public:
      * We need to call this because otherwise looking at the page idx will fail.
      * See Doc::LayOut for an example.
      */
-    void ResetDrawingPage() { m_drawingPage = NULL; }
+    void ResetDataPage() { m_drawingPage = NULL; }
 
     /**
      * Getter to the drawPage. Normally, getting the page should
@@ -575,10 +575,10 @@ private:
     bool m_currentScoreDefDone;
 
     /**
-     * A flag to indicate if the drawing preparation has been done. If yes,
-     * drawing preparation will be reset before being done again.
+     * A flag to indicate if the data preparation has been done. If yes,
+     * data preparation will be reset before being done again.
      */
-    bool m_drawingPreparationDone;
+    bool m_dataPreparationDone;
 
     /**
      * A flag to indicate that the MIDI timemap has been calculated.  The

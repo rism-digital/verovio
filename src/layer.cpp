@@ -725,7 +725,7 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::ResetDrawing(FunctorParams *functorParams)
+int Layer::ResetData(FunctorParams *functorParams)
 {
     m_crossStaffFromBelow = false;
     m_crossStaffFromAbove = false;

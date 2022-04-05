@@ -2641,7 +2641,7 @@ int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::ResetDrawing(FunctorParams *functorParams)
+int LayerElement::ResetData(FunctorParams *functorParams)
 {
     m_isInBeamspan = false;
     m_drawingCueSize = false;
@@ -2651,7 +2651,7 @@ int LayerElement::ResetDrawing(FunctorParams *functorParams)
     // Pass it to the pseudo functor of the interface
     LinkingInterface *interface = this->GetLinkingInterface();
     assert(interface);
-    interface->InterfaceResetDrawing(functorParams, this);
+    interface->InterfaceResetData(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

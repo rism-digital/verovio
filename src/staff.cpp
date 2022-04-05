@@ -628,7 +628,7 @@ int Staff::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Staff::ResetDrawing(FunctorParams *functorParams)
+int Staff::ResetData(FunctorParams *functorParams)
 {
     m_timeSpanningElements.clear();
     ClearLedgerLines();

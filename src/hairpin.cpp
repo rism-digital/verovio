@@ -249,10 +249,10 @@ int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Hairpin::ResetDrawing(FunctorParams *functorParams)
+int Hairpin::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    ControlElement::ResetDrawing(functorParams);
+    ControlElement::ResetData(functorParams);
 
     m_leftLink = NULL;
     m_rightLink = NULL;

@@ -1222,7 +1222,7 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::ResetDrawing(FunctorParams *functorParams)
+int Measure::ResetData(FunctorParams *functorParams)
 {
     m_timestampAligner.Reset();
     m_drawingEnding = NULL;

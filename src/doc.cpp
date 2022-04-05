@@ -118,7 +118,7 @@ void Doc::Reset()
     m_drawingPage = NULL;
     m_currentScore = NULL;
     m_currentScoreDefDone = false;
-    m_drawingPreparationDone = false;
+    m_dataPreparationDone = false;
     m_MIDITimemapTempo = 0.0;
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = false;
@@ -471,9 +471,9 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
 
 void Doc::PrepareData()
 {
-    if (m_drawingPreparationDone) {
-        Functor resetDrawing(&Object::ResetDrawing);
-        this->Process(&resetDrawing, NULL);
+    if (m_dataPreparationDone) {
+        Functor resetData(&Object::ResetData);
+        this->Process(&resetData, NULL);
     }
 
     /************ Store default durations ************/
@@ -817,7 +817,7 @@ void Doc::PrepareData()
 
     // LogElapsedTimeEnd ("Preparing drawing");
 
-    m_drawingPreparationDone = true;
+    m_dataPreparationDone = true;
 }
 
 void Doc::ScoreDefSetCurrentDoc(bool force)
@@ -953,7 +953,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 
     // Replace it with the castOffSinglePage
     pages->AddChild(castOffSinglePage);
-    this->ResetDrawingPage();
+    this->ResetDataPage();
     this->SetDrawingPage(0);
 
     bool optimize = false;
@@ -978,7 +978,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     // Detach the contentPage in order to be able call CastOffRunningElements
     pages->DetachChild(0);
     assert(castOffSinglePage && !castOffSinglePage->GetParent());
-    this->ResetDrawingPage();
+    this->ResetDataPage();
 
     for (auto const score : scores) {
         score->CalcRunningElementHeight(this);
@@ -1028,7 +1028,7 @@ void Doc::UnCastOffDoc(bool resetCache)
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
-    this->ResetDrawingPage();
+    this->ResetDataPage();
     this->ScoreDefSetCurrentDoc(true);
 
     m_isCastOff = false;
@@ -1065,7 +1065,7 @@ void Doc::CastOffEncodingDoc()
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
-    this->ResetDrawingPage();
+    this->ResetDataPage();
     this->ScoreDefSetCurrentDoc(true);
 
     // Optimize the doc if one of the score requires optimization
@@ -1095,7 +1095,7 @@ void Doc::ConvertToPageBasedDoc()
 
     this->AddChild(pages);
 
-    this->ResetDrawingPage();
+    this->ResetDataPage();
 }
 
 void Doc::ConvertToCastOffMensuralDoc(bool castOff)
@@ -1142,7 +1142,7 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
-    this->ResetDrawingPage();
+    this->ResetDataPage();
     this->ScoreDefSetCurrentDoc(true);
 }
 
@@ -1905,7 +1905,7 @@ void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
 
     delete unCastOffPage;
 
-    this->ResetDrawingPage();
+    this->ResetDataPage();
     this->ScoreDefSetCurrentDoc(true);
 
     if (pages->GetChildCount() < 2) {

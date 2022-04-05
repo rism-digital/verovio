@@ -831,7 +831,7 @@ int FloatingObject::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingObject::ResetDrawing(FunctorParams *functorParams)
+int FloatingObject::ResetData(FunctorParams *functorParams)
 {
     // Clear all
     FloatingObject::s_drawingObjectIds.clear();
@@ -841,12 +841,12 @@ int FloatingObject::ResetDrawing(FunctorParams *functorParams)
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
-        return interface->InterfaceResetDrawing(functorParams, this);
+        return interface->InterfaceResetData(functorParams, this);
     }
     else if (this->HasInterface(INTERFACE_TIME_POINT)) {
         TimePointInterface *interface = this->GetTimePointInterface();
         assert(interface);
-        return interface->InterfaceResetDrawing(functorParams, this);
+        return interface->InterfaceResetData(functorParams, this);
     }
     m_drawingGrpId = 0;
     return FUNCTOR_CONTINUE;

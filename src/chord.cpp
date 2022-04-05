@@ -915,10 +915,10 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::ResetDrawing(FunctorParams *functorParams)
+int Chord::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();

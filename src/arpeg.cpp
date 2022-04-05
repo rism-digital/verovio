@@ -225,14 +225,14 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Arpeg::ResetDrawing(FunctorParams *functorParams)
+int Arpeg::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    ControlElement::ResetDrawing(functorParams);
+    ControlElement::ResetData(functorParams);
 
     PlistInterface *interface = this->GetPlistInterface();
     assert(interface);
-    return interface->InterfaceResetDrawing(functorParams, this);
+    return interface->InterfaceResetData(functorParams, this);
 }
 
 int Arpeg::HorizontalLayoutCache(FunctorParams *functorParams)

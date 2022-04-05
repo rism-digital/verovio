@@ -354,7 +354,7 @@ int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams,
     return FUNCTOR_CONTINUE;
 }
 
-int TimePointInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+int TimePointInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_start = NULL;
     m_startUuid = "";
@@ -432,12 +432,12 @@ int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+int TimeSpanningInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_end = NULL;
     m_endUuid = "";
     // Special case where we have interface inheritance
-    return TimePointInterface::InterfaceResetDrawing(functorParams, object);
+    return TimePointInterface::InterfaceResetData(functorParams, object);
 }
 
 } // namespace vrv

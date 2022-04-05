@@ -117,10 +117,10 @@ int Tempo::AdjustTempo(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Tempo::ResetDrawing(FunctorParams *functorParams)
+int Tempo::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    ControlElement::ResetDrawing(functorParams);
+    ControlElement::ResetData(functorParams);
 
     m_drawingXRels.clear();
 

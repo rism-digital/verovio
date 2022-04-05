@@ -133,7 +133,7 @@ void Object::CloneReset()
 {
     this->Modify();
     FunctorParams voidParams;
-    this->ResetDrawing(&voidParams);
+    this->ResetData(&voidParams);
 }
 
 Object &Object::operator=(const Object &object)

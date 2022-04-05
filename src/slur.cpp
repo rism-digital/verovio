@@ -1395,10 +1395,10 @@ PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Slur::ResetDrawing(FunctorParams *functorParams)
+int Slur::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    ControlElement::ResetDrawing(functorParams);
+    ControlElement::ResetData(functorParams);
 
     m_drawingCurveDir = SlurCurveDirection::None;
     // m_isCrossStaff = false;

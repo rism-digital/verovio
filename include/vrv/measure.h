@@ -422,9 +422,9 @@ public:
     int InitSelection(FunctorParams *) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::FillStaffCurrentTimeSpanningEnd

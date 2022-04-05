@@ -2160,10 +2160,10 @@ int Beam::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Beam::ResetDrawing(FunctorParams *functorParams)
+int Beam::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
     BeamDrawingInterface::Reset();
 
     m_beamSegment.Reset();

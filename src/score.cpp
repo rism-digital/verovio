@@ -133,7 +133,7 @@ void Score::CalcRunningElementHeight(Doc *doc)
     pages->DeleteChild(page1);
     pages->DeleteChild(page2);
 
-    doc->ResetDrawingPage();
+    doc->ResetDataPage();
 }
 
 bool Score::ScoreDefNeedsOptimization(int optionCondense) const

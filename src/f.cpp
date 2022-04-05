@@ -97,13 +97,13 @@ int F::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     return interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
 }
 
-int F::ResetDrawing(FunctorParams *functorParams)
+int F::ResetData(FunctorParams *functorParams)
 {
-    TextElement::ResetDrawing(functorParams);
+    TextElement::ResetData(functorParams);
 
     TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
     assert(interface);
-    return interface->InterfaceResetDrawing(functorParams, this);
+    return interface->InterfaceResetData(functorParams, this);
 }
 
 } // namespace vrv

@@ -133,9 +133,9 @@ public:
     int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
 private:
     bool IsInsideArtic(data_ARTICULATION artic) const;

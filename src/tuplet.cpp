@@ -661,10 +661,10 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Tuplet::ResetDrawing(FunctorParams *functorParams)
+int Tuplet::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();

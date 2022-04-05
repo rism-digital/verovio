@@ -657,11 +657,11 @@ int Rest::CalcDots(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Rest::ResetDrawing(FunctorParams *functorParams)
+int Rest::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

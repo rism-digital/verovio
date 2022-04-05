@@ -1259,7 +1259,7 @@ public:
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ResetData(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Resolve Reh time pointing position in case none is set

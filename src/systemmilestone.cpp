@@ -101,9 +101,9 @@ int SystemMilestoneEnd::PrepareMilestones(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemMilestoneEnd::ResetDrawing(FunctorParams *functorParams)
+int SystemMilestoneEnd::ResetData(FunctorParams *functorParams)
 {
-    FloatingObject::ResetDrawing(functorParams);
+    FloatingObject::ResetData(functorParams);
 
     this->SetMeasure(NULL);
 
@@ -184,7 +184,7 @@ int SystemMilestoneInterface::InterfacePrepareMilestones(FunctorParams *functorP
     return FUNCTOR_CONTINUE;
 }
 
-int SystemMilestoneInterface::InterfaceResetDrawing(FunctorParams *functorParams)
+int SystemMilestoneInterface::InterfaceResetData(FunctorParams *functorParams)
 {
     m_drawingMeasure = NULL;
 
