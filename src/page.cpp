@@ -543,7 +543,7 @@ void Page::LayOutVertically()
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
-    CalcBboxOverflowsParams calcBBoxOverflowsParams(doc);
+    CalcBBoxOverflowsParams calcBBoxOverflowsParams(doc);
     Functor calcBBoxOverflows(&Object::CalcBBoxOverflows);
     Functor calcBBoxOverflowsEnd(&Object::CalcBBoxOverflowsEnd);
     this->Process(&calcBBoxOverflows, &calcBBoxOverflowsParams, &calcBBoxOverflowsEnd);

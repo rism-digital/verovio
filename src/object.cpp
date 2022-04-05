@@ -2139,7 +2139,7 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 
 int Object::CalcBBoxOverflows(FunctorParams *functorParams)
 {
-    CalcBboxOverflowsParams *params = vrv_params_cast<CalcBboxOverflowsParams *>(functorParams);
+    CalcBBoxOverflowsParams *params = vrv_params_cast<CalcBBoxOverflowsParams *>(functorParams);
     assert(params);
 
     // starting a new staff
@@ -2279,7 +2279,7 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
 
 int Object::CalcBBoxOverflowsEnd(FunctorParams *functorParams)
 {
-    CalcBboxOverflowsParams *params = vrv_params_cast<CalcBboxOverflowsParams *>(functorParams);
+    CalcBBoxOverflowsParams *params = vrv_params_cast<CalcBBoxOverflowsParams *>(functorParams);
     assert(params);
 
     // starting new layer

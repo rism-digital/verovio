@@ -1013,9 +1013,9 @@ public:
  * member 1: the doc
  **/
 
-class CalcBboxOverflowsParams : public FunctorParams {
+class CalcBBoxOverflowsParams : public FunctorParams {
 public:
-    CalcBboxOverflowsParams(Doc *doc)
+    CalcBBoxOverflowsParams(Doc *doc)
     {
         m_staffAlignment = NULL;
         m_doc = doc;
