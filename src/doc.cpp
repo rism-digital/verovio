@@ -1978,6 +1978,8 @@ void Doc::ReactivateSelection(bool resetAligners)
     Score *selectionScore = new Score();
     selectionScore->SetLabel("[selectionScore]");
     *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
+    // Use the drawing values as actual scoreDef
+    selectionScore->GetScoreDef()->ResetFromDrawingValues();
     selectionScore->SetParent(selectionPage);
     selectionPage->InsertChild(selectionScore, 0);
 

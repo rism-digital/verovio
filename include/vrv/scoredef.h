@@ -158,6 +158,12 @@ public:
     void ReplaceDrawingLabels(StaffGrp *newStaffGrp);
 
     /**
+     * Replace the staffDef score attributes with the ones currently set as drawing values.
+     * Used when initializing a selection and adding a temporary score for it.
+     */
+    void ResetFromDrawingValues();
+
+    /**
      * Get the staffDef with number n (NULL if not found).
      */
     StaffDef *GetStaffDef(int n);
