@@ -691,11 +691,11 @@ bool Toolkit::LoadData(const std::string &data)
 
     // transpose the content if necessary
     if (m_options->m_transpose.IsSet() || m_options->m_transposeMdiv.IsSet()) {
-        m_doc.PrepareDrawing();
+        m_doc.PrepareData();
         m_doc.TransposeDoc();
     }
 
-    m_doc.PrepareDrawing();
+    m_doc.PrepareData();
     m_doc.InitSelectionDoc(m_docSelection, true);
 
     // Convert pseudo-measures into distinct segments based on barLine elements

@@ -469,7 +469,7 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
     return true;
 }
 
-void Doc::PrepareDrawing()
+void Doc::PrepareData()
 {
     if (m_drawingPreparationDone) {
         Functor resetDrawing(&Object::ResetDrawing);
@@ -1138,7 +1138,7 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
         }
     }
 
-    this->PrepareDrawing();
+    this->PrepareData();
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!

@@ -1059,7 +1059,7 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
     else if (Att::SetVisual(element, attrType, attrValue))
         success = true;
     if (success && m_doc->GetType() != Facs) {
-        m_doc->PrepareDrawing();
+        m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
     m_infoObject.import("status", success ? "OK" : "FAILURE");
@@ -1220,7 +1220,7 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
         }
     }
     if (success && m_doc->GetType() != Facs) {
-        m_doc->PrepareDrawing();
+        m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
     m_infoObject.import("status", "OK");
@@ -2326,7 +2326,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         return false;
     }
     if (success1 && success2 && m_doc->GetType() != Facs) {
-        m_doc->PrepareDrawing();
+        m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
     m_infoObject.import("status", "OK");

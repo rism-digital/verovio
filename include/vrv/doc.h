@@ -257,11 +257,11 @@ public:
     void ScoreDefSetGrpSymDoc();
 
     /**
-     * Prepare the document for drawing.
-     * This sets drawing pointers and value and needs to be done after loading and any editing.
+     * Prepare the document data.
+     * This sets pointers and value and needs to be done after loading and any editing.
      * For example, it sets the approriate values for the lyrics connectors
      */
-    void PrepareDrawing();
+    void PrepareData();
 
     /**
      * Casts off the entire document.
