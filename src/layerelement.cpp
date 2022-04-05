@@ -2590,7 +2590,7 @@ int LayerElement::InitOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::ResolveMIDITies(FunctorParams *)
+int LayerElement::InitTimemapTies(FunctorParams *)
 {
     return FUNCTOR_CONTINUE;
 }

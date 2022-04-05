@@ -400,10 +400,10 @@ public:
     ///@}
 
     /**
-     * See Object::ResolveMIDITies
+     * See Object::InitTimemapTies
      */
     ///@{
-    int ResolveMIDITies(FunctorParams *functorParams) override;
+    int InitTimemapTies(FunctorParams *functorParams) override;
     ///@}
 
     /**

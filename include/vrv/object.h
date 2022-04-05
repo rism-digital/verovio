@@ -1440,9 +1440,19 @@ public:
     virtual int HorizontalLayoutCache(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Calculate the maximum duration of each measure.
+     */
+    virtual int InitMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * End Functor for Object::CalcMaxMeasureDuration
+     */
+    virtual int InitMaxMeasureDurationEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust note timings based on ties
      */
-    virtual int ResolveMIDITies(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int InitTimemapTies(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Initialize the MIDI export
@@ -1470,16 +1480,6 @@ public:
      * Export the object to a JSON feature file.
      */
     virtual int GenerateFeatures(FunctorParams *functorParams);
-
-    /**
-     * Calculate the maximum duration of each measure.
-     */
-    virtual int InitMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::CalcMaxMeasureDuration
-     */
-    virtual int InitMaxMeasureDurationEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 

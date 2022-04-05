@@ -119,7 +119,7 @@ void Doc::Reset()
     m_currentScore = NULL;
     m_currentScoreDefDone = false;
     m_dataPreparationDone = false;
-    m_MIDITimemapTempo = 0.0;
+    m_timemapTempo = 0.0;
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = false;
     m_isCastOff = false;
@@ -268,14 +268,14 @@ bool Doc::GenerateMeasureNumbers()
     return true;
 }
 
-bool Doc::HasMidiTimemap() const
+bool Doc::HasTimemap() const
 {
-    return (m_MIDITimemapTempo == m_options->m_midiTempoAdjustment.GetValue());
+    return (m_timemapTempo == m_options->m_midiTempoAdjustment.GetValue());
 }
 
-void Doc::CalculateMidiTimemap()
+void Doc::CalculateTimemap()
 {
-    m_MIDITimemapTempo = 0.0;
+    m_timemapTempo = 0.0;
 
     // This happens if the document was never cast off (breaks none option in the toolkit)
     if (!m_drawingPage && this->GetPageCount() == 1) {
@@ -309,20 +309,20 @@ void Doc::CalculateMidiTimemap()
     this->Process(&initOnsetOffset, &initOnsetOffsetParams, &initOnsetOffsetEnd);
 
     // Adjust the duration of tied notes
-    Functor resolveMIDITies(&Object::ResolveMIDITies);
-    this->Process(&resolveMIDITies, NULL, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    Functor initTimemapTies(&Object::InitTimemapTies);
+    this->Process(&initTimemapTies, NULL, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
 
-    m_MIDITimemapTempo = m_options->m_midiTempoAdjustment.GetValue();
+    m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }
 
 void Doc::ExportMIDI(smf::MidiFile *midiFile)
 {
 
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateMidiTimemap();
+        CalculateTimemap();
     }
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
     }
 
@@ -430,11 +430,11 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
 bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures)
 {
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateMidiTimemap();
+        CalculateTimemap();
     }
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
         output = "";
         return false;
@@ -451,11 +451,11 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
 
 bool Doc::ExportFeatures(std::string &output, const std::string &options)
 {
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateMidiTimemap();
+        CalculateTimemap();
     }
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
         output = "";
         return false;
