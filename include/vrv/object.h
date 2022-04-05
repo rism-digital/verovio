@@ -844,6 +844,14 @@ public:
     virtual int CalcDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Resolve spanning beamspans by breaking it into separate parts, each belonging to the corresponding
+     * system/measure. BeamSpans get elements reassigned, so that each beamSpan can be drawn as control
+     * element. This allows free placement of beamSpan in the MEI tree and ensures that beamSpan will be
+     * drawn properly
+     */
+    virtual int CalcSpanningBeamSpans(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the Arpeg position
      */
     virtual int AdjustArpeg(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1432,14 +1440,6 @@ public:
      * This information is usually required beforehand in GenerateMIDI
      */
     virtual int PrepareMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Resolve spanning beamspans by breaking it into separate parts, each belonging to the corresponding
-     * system/measure. BeamSpans get elements reassigned, so that each beamSpan can be drawn as control
-     * element. This allows free placement of beamSpan in the MEI tree and ensures that beamSpan will be
-     * drawn properly
-     */
-    virtual int ResolveSpanningBeamSpans(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Export the object to a MidiFile

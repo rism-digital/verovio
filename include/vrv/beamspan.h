@@ -99,9 +99,9 @@ public:
     int ResolveBeamSpanElements(FunctorParams *) override;
 
     /**
-     * See Object::ResolveSpanningBeamSpans
+     * See Object::CalcSpanningBeamSpans
      */
-    int ResolveSpanningBeamSpans(FunctorParams *) override;
+    int CalcSpanningBeamSpans(FunctorParams *) override;
 
 private:
     // Helper for breaking one big spanning beamSpan into smaller beamSpans

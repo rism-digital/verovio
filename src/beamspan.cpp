@@ -260,7 +260,7 @@ int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int BeamSpan::ResolveSpanningBeamSpans(FunctorParams *functorParams)
+int BeamSpan::CalcSpanningBeamSpans(FunctorParams *functorParams)
 {
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
     assert(params);

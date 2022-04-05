@@ -340,6 +340,10 @@ void Page::ResetAligners()
     CalcSlurDirectionParams calcSlurDirectionParams(doc);
     Functor calcSlurDirection(&Object::CalcSlurDirection);
     this->Process(&calcSlurDirection, &calcSlurDirectionParams);
+
+    FunctorDocParams calcSpanningBeamSpansParams(doc);
+    Functor calcSpanningBeamSpans(&Object::CalcSpanningBeamSpans);
+    this->Process(&calcSpanningBeamSpans, &calcSpanningBeamSpansParams);
 }
 
 void Page::LayOutHorizontally()
@@ -465,10 +469,6 @@ void Page::LayOutHorizontally()
     Functor alignMeasures(&Object::AlignMeasures);
     Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
-
-    FunctorDocParams resolveSpanningBeamSpansParams(doc);
-    Functor resolveSpanningBeamSpans(&Object::ResolveSpanningBeamSpans);
-    this->Process(&resolveSpanningBeamSpans, &resolveSpanningBeamSpansParams);
 }
 
 void Page::HorizontalLayoutCachePage(bool restore)
