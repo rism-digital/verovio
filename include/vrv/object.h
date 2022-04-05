@@ -705,6 +705,13 @@ public:
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight
      */
     virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+    
+    /**
+     * Go through all layer elements of the layer and return next/previous element relative to the specified
+     * layer element. It will search recursively through children elements until note, chord or ftrem is found.
+     * It can be used to look in neighboring layers for the similar search, but only first element will be checked.
+     */
+    virtual int GetRelativeLayerElement(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -1257,21 +1264,22 @@ public:
     ///@}
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
-     */
-    virtual int ResetData(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Resolve Reh time pointing position in case none is set
      */
     virtual int ResolveRehPosition(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * Get the list of referenced elements for the beamSpan as well as set referenced
+     * object for those elements to beamSpan containing them.
+     */
+    ///@{
+    virtual int ResolveBeamSpanElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
-     * Go through all layer elements of the layer and return next/previous element relative to the specified
-     * layer element. It will search recursively through children elements until note, chord or ftrem is found.
-     * It can be used to look in neighboring layers for the similar search, but only first element will be checked.
+     * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int GetRelativeLayerElement(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ResetData(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -1366,14 +1374,6 @@ public:
      */
     ///@{
     virtual int PrepareMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    ///@}
-
-    /**
-     * Get the list of referenced elements for the beamSpan as well as set referenced
-     * object for those elements to beamSpan containing them.
-     */
-    ///@{
-    virtual int ResolveBeamSpanElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
