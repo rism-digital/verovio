@@ -32,7 +32,7 @@ DocSelection::DocSelection()
     m_isPending = false;
 }
 
-bool DocSelection::Parse(const std::string selection)
+bool DocSelection::Parse(const std::string &selection)
 {
     m_isPending = true;
     m_selectionStart = "";
@@ -122,10 +122,7 @@ void DocSelection::Set(Doc *doc)
         std::string selectionStartId = "";
         std::string selectionEndId = "";
 
-        ListOfConstObjects measures;
-        ClassIdComparison matchType(MEASURE);
-        // Depth is this->pages->page-system->measure
-        doc->FindAllDescendantsByComparison(&measures, &matchType, 4);
+        ListOfObjects measures = doc->FindAllDescendantsByType(MEASURE, false);
 
         if (measures.empty()) {
             LogWarning("No measure found for selection '%s'.", m_measureRange.c_str());
@@ -136,7 +133,7 @@ void DocSelection::Set(Doc *doc)
             selectionStartId = measures.front()->GetUuid();
         }
         else if (m_selectionRangeStart > 0 && m_selectionRangeStart <= (int)measures.size()) {
-            ListOfConstObjects::const_iterator it = measures.begin();
+            ListOfObjects::const_iterator it = measures.begin();
             std::advance(it, m_selectionRangeStart - 1);
             selectionStartId = (*it)->GetUuid();
         }
@@ -149,7 +146,7 @@ void DocSelection::Set(Doc *doc)
             selectionEndId = measures.back()->GetUuid();
         }
         else if (m_selectionRangeEnd > 0 && m_selectionRangeEnd <= (int)measures.size()) {
-            ListOfConstObjects::const_iterator it = measures.begin();
+            ListOfObjects::const_iterator it = measures.begin();
             std::advance(it, m_selectionRangeEnd - 1);
             selectionEndId = (*it)->GetUuid();
         }

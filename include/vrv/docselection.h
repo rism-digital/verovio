@@ -36,7 +36,7 @@ public:
      * Parse the stringified JSON string a stores the values.
      * Priority is given to measureRange selection over start / end ids
      */
-    bool Parse(const std::string selection);
+    bool Parse(const std::string &selection);
 
     /**
      * Set the selection to the Doc.
