@@ -1628,9 +1628,9 @@ int Measure::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
+int Measure::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     m_scoreTimeOffset.clear();
@@ -1643,9 +1643,9 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
+int Measure::InitMaxMeasureDurationEnd(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     const double scoreTimeIncrement

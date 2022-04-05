@@ -295,12 +295,12 @@ void Doc::CalculateMidiTimemap()
     }
 
     // We first calculate the maximum duration of each measure
-    CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
-    calcMaxMeasureDurationParams.m_currentTempo = tempo;
-    calcMaxMeasureDurationParams.m_tempoAdjustment = m_options->m_midiTempoAdjustment.GetValue();
-    Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
-    Functor calcMaxMeasureDurationEnd(&Object::CalcMaxMeasureDurationEnd);
-    this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams, &calcMaxMeasureDurationEnd);
+    InitMaxMeasureDurationParams initMaxMeasureDurationParams;
+    initMaxMeasureDurationParams.m_currentTempo = tempo;
+    initMaxMeasureDurationParams.m_tempoAdjustment = m_options->m_midiTempoAdjustment.GetValue();
+    Functor initMaxMeasureDuration(&Object::InitMaxMeasureDuration);
+    Functor initMaxMeasureDurationEnd(&Object::InitMaxMeasureDurationEnd);
+    this->Process(&initMaxMeasureDuration, &initMaxMeasureDurationParams, &initMaxMeasureDurationEnd);
 
     // Then calculate the onset and offset times (w.r.t. the measure) for every note
     InitOnsetOffsetParams initOnsetOffsetParams;
@@ -335,10 +335,10 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     midiFile->addTempo(0, 0, tempo);
 
     // Capture information for MIDI generation, i.e. from control elements
-    Functor prepareMIDI(&Object::PrepareMIDI);
-    PrepareMIDIParams prepareMIDIParams;
-    prepareMIDIParams.m_currentTempo = tempo;
-    this->Process(&prepareMIDI, &prepareMIDIParams);
+    Functor initMIDI(&Object::InitMIDI);
+    InitMIDIParams initMIDIParams;
+    initMIDIParams.m_currentTempo = tempo;
+    this->Process(&initMIDI, &initMIDIParams);
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
     InitProcessingListsParams initProcessingListsParams;
@@ -420,7 +420,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;
-            generateMIDIParams.m_deferredNotes = prepareMIDIParams.m_deferredNotes;
+            generateMIDIParams.m_deferredNotes = initMIDIParams.m_deferredNotes;
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);

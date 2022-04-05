@@ -1067,35 +1067,6 @@ public:
 // Use FunctorDocParams
 
 //----------------------------------------------------------------------------
-// CalcMaxMeasureDurationParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current score time
- * member 1: the current time in seconds
- * member 2: the current tempo
- * member 3: the tempo adjustment
- * member 4: factor for multibar rests
- **/
-
-class CalcMaxMeasureDurationParams : public FunctorParams {
-public:
-    CalcMaxMeasureDurationParams()
-    {
-        m_currentScoreTime = 0.0;
-        m_currentRealTimeSeconds = 0.0;
-        m_currentTempo = MIDI_TEMPO;
-        m_tempoAdjustment = 1.0;
-        m_multiRestFactor = 1;
-    }
-    double m_currentScoreTime;
-    double m_currentRealTimeSeconds;
-    double m_currentTempo;
-    double m_tempoAdjustment;
-    int m_multiRestFactor;
-};
-
-//----------------------------------------------------------------------------
 // CalcSlurDirectionParams
 //----------------------------------------------------------------------------
 
@@ -2253,9 +2224,9 @@ public:
  * member 1: deferred notes which start slightly later
  **/
 
-class PrepareMIDIParams : public FunctorParams {
+class InitMIDIParams : public FunctorParams {
 public:
-    PrepareMIDIParams() { m_currentTempo = MIDI_TEMPO; }
+    InitMIDIParams() { m_currentTempo = MIDI_TEMPO; }
     double m_currentTempo;
     std::map<Note *, double> m_deferredNotes;
 };

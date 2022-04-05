@@ -85,7 +85,7 @@ public:
     /**
      * See Object::CalcMaxMeasureDuration
      */
-    int CalcMaxMeasureDuration(FunctorParams *functorParams) override;
+    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
 
 private:
     //

@@ -2627,9 +2627,9 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
+int LayerElement::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     if (this->Is(MULTIREST)) {

@@ -1474,12 +1474,12 @@ public:
     /**
      * Calculate the maximum duration of each measure.
      */
-    virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int InitMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * End Functor for Object::CalcMaxMeasureDuration
      */
-    virtual int CalcMaxMeasureDurationEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int InitMaxMeasureDurationEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
