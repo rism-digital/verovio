@@ -108,13 +108,13 @@ private:
 
     void CalcBeamInitForNotePair(Note *note1, Note *note2, Staff *staff, int &yMax, int &yMin);
 
-    bool CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step);
+    bool CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, int &step);
 
     void CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int step);
 
     void CalcBeamPosition(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal);
 
-    void CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
+    void CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, int &step);
 
     // Helper to adjust position of starting point to make sure that beam start-/endpoints touch the staff lines
     void CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);

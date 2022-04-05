@@ -668,14 +668,13 @@ void BeamSegment::CalcBeamInitForNotePair(Note *note1, Note *note2, Staff *staff
     }
 }
 
-bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step)
+bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, int &step)
 {
     assert(staff);
     assert(doc);
     assert(beamInterface);
 
     m_beamSlope = 0.0;
-    shorten = false;
 
     if (m_nbNotesOrChords < 2) {
         return false;
@@ -694,8 +693,6 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
         noteStep
             = abs(m_firstNoteOrChord->m_closestNote->GetDrawingY() - m_lastNoteOrChord->m_closestNote->GetDrawingY());
     }
-
-    // LogDebug("Slope (original) %f %f", m_beamSlope, noteSlope);
 
     // This can happen with two notes with 32sd or 64th notes and a diatonic step
     // Force the noteSlope to be considered instead
@@ -763,7 +760,6 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
 
     // We can keep the current slope but only if curStep is not 0 and smaller than the step
     if ((curStep != 0) && (curStep < step) && (BEAMPLACE_mixed != place)) {
-        // LogDebug("Current %d step is lower than max step %d", curStep, step);
         return false;
     }
     // This occurs when the current stem would yield an horizontal beam
@@ -795,13 +791,6 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
     if (place == BEAMPLACE_above) {
         // upwards
         if (m_beamSlope > 0.0) {
-            // For 8th note groups, reduce the length of the last note if possible - disabled because not working well
-            /*
-            if ((beamInterface->m_shortestDur == DUR_8) && !m_lastNoteOrChord->m_shortened
-                && !m_extendedToCenter) {
-                shorten = true;
-            }
-            */
             m_firstNoteOrChord->m_centered = m_lastNoteOrChord->m_centered;
             if (shortStep) {
                 if (!m_lastNoteOrChord->m_centered) {
@@ -813,13 +802,6 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
         }
         // downwards
         else {
-            // For 8th note groups, reduce the length of the first note if possible - disabled because not working well
-            /*
-            if ((beamInterface->m_shortestDur == DUR_8) && !m_firstNoteOrChord->m_shortened
-                && !m_extendedToCenter) {
-                //shorten = true;
-            }
-            */
             m_lastNoteOrChord->m_centered = m_firstNoteOrChord->m_centered;
             if (shortStep) {
                 if (!m_firstNoteOrChord->m_centered) {
@@ -833,13 +815,6 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
     else if (place == BEAMPLACE_below) {
         // downwards
         if (m_beamSlope < 0.0) {
-            // For 8th note groups, reduce the length of the last note if possible - disabled because not working well
-            /*
-            if ((beamInterface->m_shortestDur == DUR_8) && !m_lastNoteOrChord->m_shortened
-                && !m_extendedToCenter) {
-                //shorten = true;
-            }
-            */
             m_firstNoteOrChord->m_centered = m_lastNoteOrChord->m_centered;
             if (shortStep) {
                 if (!m_lastNoteOrChord->m_centered) {
@@ -851,13 +826,6 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
         }
         // upwards
         else {
-            // For 8th note groups, reduce the length of the first note if possible - disabled because not working well
-            /*
-            if ((beamInterface->m_shortestDur == DUR_8) && !m_firstNoteOrChord->m_shortened
-                && !m_extendedToCenter) {
-                //shorten = true;
-            }
-            */
             m_lastNoteOrChord->m_centered = m_firstNoteOrChord->m_centered;
             if (shortStep) {
                 if (!m_firstNoteOrChord->m_centered) {
@@ -880,11 +848,8 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
 
     m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
         Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
-    // LogDebug("Slope (adjusted) %f", m_beamSlope);
 
     if (m_nbNotesOrChords == 2) {
-        // For now do not shorten beams with two note
-        shorten = false;
         // Also, we never have to adjust the slope with two notes
         return false;
     }
@@ -964,10 +929,9 @@ void BeamSegment::CalcBeamPosition(Doc *doc, Staff *staff, BeamDrawingInterface 
 
     m_beamSlope = 0.0;
     if (!isHorizontal) {
-        bool shorten;
         int step;
-        if (this->CalcBeamSlope(staff, doc, beamInterface, shorten, step)) {
-            this->CalcAdjustSlope(staff, doc, beamInterface, shorten, step);
+        if (this->CalcBeamSlope(staff, doc, beamInterface, step)) {
+            this->CalcAdjustSlope(staff, doc, beamInterface, step);
         }
         else {
             this->CalcAdjustPosition(staff, doc, beamInterface);
@@ -980,7 +944,7 @@ void BeamSegment::CalcBeamPosition(Doc *doc, Staff *staff, BeamDrawingInterface 
     if (!beamInterface->m_crossStaffContent) this->AdjustBeamToLedgerLines(doc, staff, beamInterface);
 }
 
-void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step)
+void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, int &step)
 {
     assert(staff);
     assert(doc);
@@ -1064,22 +1028,8 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
 
             this->CalcAdjustPosition(staff, doc, beamInterface);
             // Try again - shortening will obviously be false at this stage
-            return this->CalcAdjustSlope(staff, doc, beamInterface, false, step);
+            return this->CalcAdjustSlope(staff, doc, beamInterface, step);
         }
-        // Do lengthen the stems
-        /*
-        else {
-            // We blindly extend it by unit. This can break the rule of the beam touching staff lines. To be improved
-            int count = ceil( (double)lengthen/double(unit) );
-            int lengthening = (beamInterface->m_drawingPlace == BEAMPLACE_below) ? -count * unit : count * unit;
-            for (int i = 0; i < elementCount; i++) {
-                BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-                coord->m_yBeam += lengthening;
-            }
-            this->CalcAdjustPosition(staff, doc, beamInterface);
-            return;
-        }
-        */
         // Other handling possibility by simply making the beam horizontal - not sure which one is best
         else {
             if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
@@ -1112,37 +1062,6 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
             return;
         }
     }
-
-    /******************************************************************/
-    // Shorten the stem length when possible
-
-    // Diabled anyway - see CalcBeamSlope that never sets shorten to true
-    /*
-    if (shorten) {
-        // LogDebug("Shorten true if %d", unit * 7);
-        // First check that we actually can short, which means that all stem are at least 7 units
-        for (int i = 0; i < elementCount; i++) {
-            BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-            if (coord->m_stem && coord->m_closestNote) {
-                int len = abs(coord->m_yBeam - coord->m_closestNote->GetDrawingY());
-                if ((len / unit) < 7) {
-                    // LogDebug("Shorten false: %d", len);
-                    shorten = false;
-                    break;
-                }
-            }
-        }
-
-        // If we can, shorten by two units
-        if (shorten) {
-            int shortening = (beamInterface->m_drawingPlace == BEAMPLACE_below) ? 2 * unit : -2 * unit;
-            for (int i = 0; i < elementCount; i++) {
-                BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-                coord->m_yBeam += shortening;
-            }
-        }
-    }
-    */
 }
 
 void BeamSegment::CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
