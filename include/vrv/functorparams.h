@@ -1005,6 +1005,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CalcBBoxOverflowsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current staffAlignment
+ * member 1: the doc
+ **/
+
+class CalcBboxOverflowsParams : public FunctorParams {
+public:
+    CalcBboxOverflowsParams(Doc *doc)
+    {
+        m_staffAlignment = NULL;
+        m_doc = doc;
+    }
+    StaffAlignment *m_staffAlignment;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // CalcChordNoteHeads
 //----------------------------------------------------------------------------
 
@@ -2519,26 +2539,6 @@ class ScoreDefUnsetCurrentParams : public FunctorParams {
 public:
     ScoreDefUnsetCurrentParams(Functor *functor) { m_functor = functor; }
     Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// SetOverflowBBoxesParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current staffAlignment
- * member 1: the doc
- **/
-
-class SetOverflowBBoxesParams : public FunctorParams {
-public:
-    SetOverflowBBoxesParams(Doc *doc)
-    {
-        m_staffAlignment = NULL;
-        m_doc = doc;
-    }
-    StaffAlignment *m_staffAlignment;
-    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

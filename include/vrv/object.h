@@ -1088,12 +1088,12 @@ public:
     /**
      * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
      */
-    virtual int SetOverflowBBoxes(FunctorParams *functorParams);
+    virtual int CalcBBoxOverflows(FunctorParams *functorParams);
 
     /**
      * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
      */
-    virtual int SetOverflowBBoxesEnd(FunctorParams *functorParams);
+    virtual int CalcBBoxOverflowsEnd(FunctorParams *functorParams);
 
     /**
      * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.

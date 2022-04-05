@@ -543,10 +543,10 @@ void Page::LayOutVertically()
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
-    SetOverflowBBoxesParams setOverflowBBoxesParams(doc);
-    Functor setOverflowBBoxes(&Object::SetOverflowBBoxes);
-    Functor setOverflowBBoxesEnd(&Object::SetOverflowBBoxesEnd);
-    this->Process(&setOverflowBBoxes, &setOverflowBBoxesParams, &setOverflowBBoxesEnd);
+    CalcBboxOverflowsParams calcBBoxOverflowsParams(doc);
+    Functor calcBBoxOverflows(&Object::CalcBBoxOverflows);
+    Functor calcBBoxOverflowsEnd(&Object::CalcBBoxOverflowsEnd);
+    this->Process(&calcBBoxOverflows, &calcBBoxOverflowsParams, &calcBBoxOverflowsEnd);
 
     // Adjust the positioners of floating elements (slurs, hairpin, dynam, etc)
     Functor adjustFloatingPositioners(&Object::AdjustFloatingPositioners);
