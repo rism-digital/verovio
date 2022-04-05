@@ -1115,7 +1115,7 @@ public:
     /**
      * Set the drawing cue size of all LayerElement
      */
-    virtual int PrepareDrawingCueSize(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareCueSize(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * See cross-staff / layer pointers on LayerElement

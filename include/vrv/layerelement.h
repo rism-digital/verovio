@@ -340,9 +340,9 @@ public:
     int AdjustXRelForTranscription(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareDrawingCueSize
+     * See Object::PrepareCueSize
      */
-    int PrepareDrawingCueSize(FunctorParams *functorParams) override;
+    int PrepareCueSize(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareCrossStaff
@@ -549,7 +549,7 @@ protected:
     int m_cachedXRel;
 
     /**
-     * The cached drawing cue size set by PrepareDrawingCueSize
+     * The cached drawing cue size set by PrepareCueSize
      */
     bool m_drawingCueSize;
 

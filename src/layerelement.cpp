@@ -2080,7 +2080,7 @@ int LayerElement::AdjustXRelForTranscription(FunctorParams *)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
+int LayerElement::PrepareCueSize(FunctorParams *functorParams)
 {
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
