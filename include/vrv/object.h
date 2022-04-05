@@ -1445,11 +1445,11 @@ public:
     virtual int ResolveMIDITies(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Prepare the MIDI export
+     * Initialize the MIDI export
      * Captures information (i.e. from control elements) for MIDI interpretation
      * This information is usually required beforehand in GenerateMIDI
      */
-    virtual int PrepareMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int InitMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Export the object to a MidiFile

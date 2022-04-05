@@ -1588,9 +1588,9 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareMIDI(FunctorParams *functorParams)
+int Measure::InitMIDI(FunctorParams *functorParams)
 {
-    PrepareMIDIParams *params = vrv_params_cast<PrepareMIDIParams *>(functorParams);
+    InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);
     assert(params);
 
     params->m_currentTempo = m_currentTempo;

@@ -250,9 +250,9 @@ int Arpeg::HorizontalLayoutCache(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Arpeg::PrepareMIDI(FunctorParams *functorParams)
+int Arpeg::InitMIDI(FunctorParams *functorParams)
 {
-    PrepareMIDIParams *params = vrv_params_cast<PrepareMIDIParams *>(functorParams);
+    InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);
     assert(params);
 
     // Sort the involved notes by playing order

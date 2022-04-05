@@ -460,9 +460,9 @@ public:
     int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareMIDI
+     * See Object::InitMIDI
      */
-    int PrepareMIDI(FunctorParams *functorParams) override;
+    int InitMIDI(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI

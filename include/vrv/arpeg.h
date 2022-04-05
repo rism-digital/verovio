@@ -119,9 +119,9 @@ public:
     int HorizontalLayoutCache(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareMIDI
+     * See Object::InitMIDI
      */
-    int PrepareMIDI(FunctorParams *functorParams) override;
+    int InitMIDI(FunctorParams *functorParams) override;
 
 protected:
     //
