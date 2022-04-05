@@ -95,7 +95,7 @@ void BeamSegment::CalcBeam(
 
     // For recursive calls, avoid to re-init values
     if (init) {
-        this->CalcBeamInit(layer, staff, doc, beamInterface, place);
+        this->CalcBeamInit(staff, doc, beamInterface, place);
     }
 
     bool horizontal = true;
@@ -111,7 +111,8 @@ void BeamSegment::CalcBeam(
     else {
         beamInterface->m_fractionSize = staff->m_drawingStaffSize;
 
-        horizontal = beamInterface->IsHorizontal();
+        if (doc->GetOptions()->m_beamMaxSlope.GetValue())
+            horizontal = beamInterface->IsHorizontal();
         // Beam@place has precedence - however, in some cases, CalcBeam is called recursively because we need to change
         // the place This occurs when mixed makes no sense and the beam is placed above or below instead.
         this->CalcBeamPlace(layer, beamInterface, place);
@@ -124,12 +125,12 @@ void BeamSegment::CalcBeam(
     CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
 
     // Set drawing stem positions
-    CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
+    CalcBeamPosition(doc, staff, beamInterface, horizontal);
     if (BEAMPLACE_mixed == beamInterface->m_drawingPlace) {
         if (NeedToResetPosition(staff, doc, beamInterface)) {
-            CalcBeamInit(layer, staff, doc, beamInterface, place);
+            CalcBeamInit(staff, doc, beamInterface, place);
             CalcBeamStemLength(staff, beamInterface->m_drawingPlace, horizontal);
-            CalcBeamPosition(doc, staff, layer, beamInterface, horizontal);
+            CalcBeamPosition(doc, staff, beamInterface, horizontal);
         }
     }
 
@@ -516,10 +517,8 @@ void BeamSegment::AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInt
     }
 }
 
-void BeamSegment::CalcBeamInit(
-    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
+void BeamSegment::CalcBeamInit(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
 {
-    assert(layer);
     assert(staff);
     assert(doc);
     assert(beamInterface);
@@ -669,10 +668,8 @@ void BeamSegment::CalcBeamInitForNotePair(Note *note1, Note *note2, Staff *staff
     }
 }
 
-bool BeamSegment::CalcBeamSlope(
-    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step)
+bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step)
 {
-    assert(layer);
     assert(staff);
     assert(doc);
     assert(beamInterface);
@@ -934,8 +931,7 @@ void BeamSegment::CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int ste
     }
 }
 
-void BeamSegment::CalcBeamPosition(
-    Doc *doc, Staff *staff, Layer *layer, BeamDrawingInterface *beamInterface, bool isHorizontal)
+void BeamSegment::CalcBeamPosition(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal)
 {
     // Set drawing stem positions
     for (auto coord : m_beamElementCoordRefs) {
@@ -970,7 +966,7 @@ void BeamSegment::CalcBeamPosition(
     if (!isHorizontal) {
         bool shorten;
         int step;
-        if (this->CalcBeamSlope(layer, staff, doc, beamInterface, shorten, step)) {
+        if (this->CalcBeamSlope(staff, doc, beamInterface, shorten, step)) {
             this->CalcAdjustSlope(staff, doc, beamInterface, shorten, step);
         }
         else {
