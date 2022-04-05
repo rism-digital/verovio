@@ -144,7 +144,7 @@ int Tempo::CalcMaxMeasureDuration(FunctorParams *functorParams)
         if (this->HasMmDots()) {
             mmUnit = 2 * mmUnit - (mmUnit / pow(2, this->GetMmDots()));
         }
-        params->m_currentTempo = mm * 4.0 / mmUnit + 0.5;
+        if (mmUnit > 0) params->m_currentTempo = mm * 4.0 / mmUnit;
     }
 
     return FUNCTOR_CONTINUE;
