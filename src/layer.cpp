@@ -711,9 +711,9 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::CalcOnsetOffset(FunctorParams *functorParams)
+int Layer::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     params->m_currentScoreTime = 0.0;

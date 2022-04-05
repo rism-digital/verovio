@@ -897,9 +897,9 @@ int Chord::PrepareLyrics(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
+int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     LayerElement *element = this->ThisOrSameasAsLink();

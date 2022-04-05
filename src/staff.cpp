@@ -658,9 +658,9 @@ int Staff::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::CalcOnsetOffset(FunctorParams *functorParams)
+int Staff::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     assert(m_drawingStaffDef);

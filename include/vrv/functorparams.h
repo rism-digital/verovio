@@ -1096,38 +1096,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CalcOnsetOffset
-//----------------------------------------------------------------------------
-
-/**
- * member 0: double: the current score time in the measure (incremented by each element)
- * member 1: double: the current real time in seconds in the measure (incremented by each element)
- * member 2: the current Mensur
- * member 3: the current MeterSig
- * member 4: the current notation type
- * member 5: the current tempo
- **/
-
-class CalcOnsetOffsetParams : public FunctorParams {
-public:
-    CalcOnsetOffsetParams()
-    {
-        m_currentScoreTime = 0.0;
-        m_currentRealTimeSeconds = 0.0;
-        m_currentMensur = NULL;
-        m_currentMeterSig = NULL;
-        m_notationType = NOTATIONTYPE_cmn;
-        m_currentTempo = MIDI_TEMPO;
-    }
-    double m_currentScoreTime;
-    double m_currentRealTimeSeconds;
-    Mensur *m_currentMensur;
-    MeterSig *m_currentMeterSig;
-    data_NOTATIONTYPE m_notationType;
-    double m_currentTempo;
-};
-
-//----------------------------------------------------------------------------
 // CalcSlurDirectionParams
 //----------------------------------------------------------------------------
 
@@ -1872,6 +1840,38 @@ public:
     int m_initialElementId;
     bool m_searchDirection;
     bool m_isInNeighboringLayer;
+};
+
+//----------------------------------------------------------------------------
+// InitOnsetOffset
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: double: the current score time in the measure (incremented by each element)
+ * member 1: double: the current real time in seconds in the measure (incremented by each element)
+ * member 2: the current Mensur
+ * member 3: the current MeterSig
+ * member 4: the current notation type
+ * member 5: the current tempo
+ **/
+
+class InitOnsetOffsetParams : public FunctorParams {
+public:
+    InitOnsetOffsetParams()
+    {
+        m_currentScoreTime = 0.0;
+        m_currentRealTimeSeconds = 0.0;
+        m_currentMensur = NULL;
+        m_currentMeterSig = NULL;
+        m_notationType = NOTATIONTYPE_cmn;
+        m_currentTempo = MIDI_TEMPO;
+    }
+    double m_currentScoreTime;
+    double m_currentRealTimeSeconds;
+    Mensur *m_currentMensur;
+    MeterSig *m_currentMeterSig;
+    data_NOTATIONTYPE m_notationType;
+    double m_currentTempo;
 };
 
 //----------------------------------------------------------------------------

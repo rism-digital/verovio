@@ -1427,12 +1427,12 @@ public:
     /**
      * Prepare Note onsets
      */
-    virtual int CalcOnsetOffset(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int InitOnsetOffset(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * End Functor for Object::CalcOnsetOffset
+     * End Functor for Object::InitOnsetOffset
      */
-    virtual int CalcOnsetOffsetEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int InitOnsetOffsetEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Cache or restore cached horizontal layout for faster layout redoing

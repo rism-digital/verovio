@@ -303,10 +303,10 @@ void Doc::CalculateMidiTimemap()
     this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams, &calcMaxMeasureDurationEnd);
 
     // Then calculate the onset and offset times (w.r.t. the measure) for every note
-    CalcOnsetOffsetParams calcOnsetOffsetParams;
-    Functor calcOnsetOffset(&Object::CalcOnsetOffset);
-    Functor calcOnsetOffsetEnd(&Object::CalcOnsetOffsetEnd);
-    this->Process(&calcOnsetOffset, &calcOnsetOffsetParams, &calcOnsetOffsetEnd);
+    InitOnsetOffsetParams initOnsetOffsetParams;
+    Functor initOnsetOffset(&Object::InitOnsetOffset);
+    Functor initOnsetOffsetEnd(&Object::InitOnsetOffsetEnd);
+    this->Process(&initOnsetOffset, &initOnsetOffsetParams, &initOnsetOffsetEnd);
 
     // Adjust the duration of tied notes
     Functor resolveMIDITies(&Object::ResolveMIDITies);

@@ -214,9 +214,9 @@ public:
     int PrepareLyrics(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcOnsetOffsetEnd
+     * See Object::InitOnsetOffsetEnd
      */
-    int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
+    int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetData

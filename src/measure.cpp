@@ -1658,9 +1658,9 @@ int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcOnsetOffset(FunctorParams *functorParams)
+int Measure::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     params->m_currentTempo = m_currentTempo;

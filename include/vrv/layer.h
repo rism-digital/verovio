@@ -237,10 +237,10 @@ public:
     int PrepareRpt(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcOnsetOffset
+     * See Object::InitOnsetOffset
      */
     ///@{
-    int CalcOnsetOffset(FunctorParams *functorParams) override;
+    int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**

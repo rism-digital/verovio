@@ -2493,9 +2493,9 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
+int LayerElement::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
