@@ -752,8 +752,8 @@ void Doc::PrepareData()
     /************ Resolve cue size ************/
 
     // Prepare the drawing cue size
-    Functor prepareDrawingCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
+    Functor prepareCueSize(&Object::PrepareCueSize);
+    this->Process(&prepareCueSize, NULL);
 
     /************ Instanciate LayerElement parts (stemp, flag, dots, etc) ************/
 
