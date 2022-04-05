@@ -100,7 +100,6 @@ void Slur::Reset()
     this->ResetLayerIdent();
 
     m_drawingCurveDir = SlurCurveDirection::None;
-    m_collisionLayersN.clear();
 }
 
 curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
@@ -172,7 +171,7 @@ Staff *Slur::GetBoundaryCrossStaff()
     }
 }
 
-std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax)
+SpannedElements Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax)
 {
     // Decide whether we search the whole parent system or just one measure which is much faster
     Object *container = this->IsSpanningMeasures() ? staff->GetFirstAncestor(SYSTEM) : this->GetStartMeasure();
@@ -278,17 +277,15 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
         }
     }
 
-    // Store the layers used for collision avoidance
-    m_collisionLayersN = layersN;
+    // Collect the layers used for collision avoidance
     std::transform(findSpannedLayerElementsParams.m_elements.cbegin(), findSpannedLayerElementsParams.m_elements.cend(),
-        std::inserter(m_collisionLayersN, m_collisionLayersN.end()),
-        [](LayerElement *element) { return element->GetOriginalLayerN(); });
+        std::inserter(layersN, layersN.end()), [](LayerElement *element) { return element->GetOriginalLayerN(); });
 
-    return findSpannedLayerElementsParams.m_elements;
+    return { findSpannedLayerElementsParams.m_elements, layersN };
 }
 
 void Slur::AddSpannedElements(
-    FloatingCurvePositioner *curve, const std::vector<LayerElement *> &elements, Staff *staff, int xMin, int xMax)
+    FloatingCurvePositioner *curve, const SpannedElements &spanned, Staff *staff, int xMin, int xMax)
 {
     Staff *startStaff = this->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
     Staff *endStaff = this->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
@@ -297,7 +294,7 @@ void Slur::AddSpannedElements(
     }
 
     curve->ClearSpannedElements();
-    for (auto element : elements) {
+    for (auto element : spanned.elements) {
         Point pRotated;
         Point pLeft;
         pLeft.x = element->GetSelfLeft();
@@ -331,13 +328,13 @@ void Slur::AddSpannedElements(
 
     // Only consider ties in collision layers
     tiePositioners.erase(std::remove_if(tiePositioners.begin(), tiePositioners.end(),
-                             [this](FloatingPositioner *positioner) {
+                             [&spanned](FloatingPositioner *positioner) {
                                  TimeSpanningInterface *interface = positioner->GetObject()->GetTimeSpanningInterface();
                                  assert(interface);
                                  const bool startsInCollisionLayer
-                                     = (m_collisionLayersN.count(interface->GetStart()->GetOriginalLayerN()) > 0);
+                                     = (spanned.layersN.count(interface->GetStart()->GetOriginalLayerN()) > 0);
                                  const bool endsInCollisionLayer
-                                     = (m_collisionLayersN.count(interface->GetEnd()->GetOriginalLayerN()) > 0);
+                                     = (spanned.layersN.count(interface->GetEnd()->GetOriginalLayerN()) > 0);
                                  return (!startsInCollisionLayer && !endsInCollisionLayer);
                              }),
         tiePositioners.end());
@@ -361,7 +358,7 @@ Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax)
     Staff *extremalStaff = staff;
 
     const SlurCurveDirection curveDir = this->GetDrawingCurveDir();
-    const std::vector<LayerElement *> spannedElements = this->CollectSpannedElements(staff, xMin, xMax);
+    const SpannedElements spanned = this->CollectSpannedElements(staff, xMin, xMax);
 
     // The floating curve positioner of cross staff slurs should live in the lower/upper staff alignment
     // corresponding to whether the slur is curved below or not
@@ -376,10 +373,10 @@ Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax)
     };
 
     // Run once through all spanned elements
-    std::for_each(spannedElements.begin(), spannedElements.end(), adaptStaff);
+    std::for_each(spanned.elements.begin(), spanned.elements.end(), adaptStaff);
 
     // Also check the beams of spanned elements
-    std::for_each(spannedElements.begin(), spannedElements.end(), [&adaptStaff](LayerElement *element) {
+    std::for_each(spanned.elements.begin(), spanned.elements.end(), [&adaptStaff](LayerElement *element) {
         if (Beam *beam = element->IsInBeam(); beam) {
             adaptStaff(beam);
         }

@@ -20,6 +20,17 @@ class Note;
 class Staff;
 
 //----------------------------------------------------------------------------
+// SpannedElements
+//----------------------------------------------------------------------------
+/**
+ * Contains the layer elements used for collision detection
+ */
+struct SpannedElements {
+    std::vector<LayerElement *> elements;
+    std::set<int> layersN;
+};
+
+//----------------------------------------------------------------------------
 // ControlPointConstraint
 //----------------------------------------------------------------------------
 /**
@@ -140,13 +151,13 @@ public:
     /**
      * Determine layer elements spanned by the slur
      */
-    std::vector<LayerElement *> CollectSpannedElements(Staff *staff, int xMin, int xMax);
+    SpannedElements CollectSpannedElements(Staff *staff, int xMin, int xMax);
 
     /**
      * Filter and add layer elements spanned by the slur to the positioner
      */
     void AddSpannedElements(
-        FloatingCurvePositioner *curve, const std::vector<LayerElement *> &elements, Staff *staff, int xMin, int xMax);
+        FloatingCurvePositioner *curve, const SpannedElements &elements, Staff *staff, int xMin, int xMax);
 
     /**
      * Calculate the staff where the slur's floating curve positioner lives
@@ -270,12 +281,6 @@ private:
      * for s-shaped slurs / mixed direction
      */
     SlurCurveDirection m_drawingCurveDir;
-
-    /**
-     * Layers used for collision detection
-     * These are updated in CollectSpannedElements
-     */
-    std::set<int> m_collisionLayersN;
 };
 
 } // namespace vrv
