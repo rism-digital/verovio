@@ -1010,7 +1010,7 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     this->SetDrawingXRel(0);
     // Exception here: the LayerElement::m_drawingYRel position is already set for horizontal alignment
-    // See Object::SetAlignmentPitchPos - for this reason we need to reset it here and not in ResetVerticalAlignment
+    // See Object::CalcAlignmentPitchPos - for this reason we need to reset it here and not in ResetVerticalAlignment
     this->SetDrawingYRel(0);
 
     m_alignment = NULL;
@@ -1022,7 +1022,7 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    // Nothing to do since m_drawingYRel is reset in ResetHorizontalAlignment and set in SetAlignmentPitchPos
+    // Nothing to do since m_drawingYRel is reset in ResetHorizontalAlignment and set in CalcAlignmentPitchPos
 
     return FUNCTOR_CONTINUE;
 }
@@ -1248,9 +1248,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
+int LayerElement::CalcAlignmentPitchPos(FunctorParams *functorParams)
 {
-    SetAlignmentPitchPosParams *params = vrv_params_cast<SetAlignmentPitchPosParams *>(functorParams);
+    CalcAlignmentPitchPosParams *params = vrv_params_cast<CalcAlignmentPitchPosParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;

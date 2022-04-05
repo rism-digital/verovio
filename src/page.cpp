@@ -217,9 +217,9 @@ void Page::LayOutTranscription(bool force)
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Set the pitch / pos alignment
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
-    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
+    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
+    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
 
     CalcStemParams calcStemParams(doc);
     Functor calcStem(&Object::CalcStem);
@@ -303,16 +303,16 @@ void Page::ResetAligners()
             }
         }
 
-        Functor setAlignmentX(&Object::SetAlignmentXPos);
-        SetAlignmentXPosParams setAlignmentXPosParams(doc, &setAlignmentX);
-        setAlignmentXPosParams.m_longestActualDur = longestActualDur;
-        this->Process(&setAlignmentX, &setAlignmentXPosParams);
+        Functor setAlignmentX(&Object::CalcAlignmentXPos);
+        CalcAlignmentXPosParams calcAlignmentXPosParams(doc, &setAlignmentX);
+        calcAlignmentXPosParams.m_longestActualDur = longestActualDur;
+        this->Process(&setAlignmentX, &calcAlignmentXPosParams);
     }
 
     // Set the pitch / pos alignment
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
-    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
+    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
+    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
 
     if (Att::IsMensuralType(doc->m_notationType)) {
         FunctorDocParams calcLigatureNotePosParams(doc);
@@ -714,9 +714,9 @@ void Page::LayOutPitchPos()
     assert(this == doc->GetDrawingPage());
 
     // Set the pitch / pos alignment
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
-    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
+    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
+    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
 
     CalcStemParams calcStemParams(doc);
     Functor calcStem(&Object::CalcStem);

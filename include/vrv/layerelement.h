@@ -373,9 +373,9 @@ public:
     int PrepareTimeSpanning(FunctorParams *functorParams) override;
 
     /**
-     * See Object::SetAlignmentPitchPos
+     * See Object::CalcAlignmentPitchPos
      */
-    int SetAlignmentPitchPos(FunctorParams *functorParams) override;
+    int CalcAlignmentPitchPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::FindSpannedLayerElements

@@ -1172,9 +1172,9 @@ int Measure::AdjustXOverflow(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::SetAlignmentXPos(FunctorParams *functorParams)
+int Measure::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     m_measureAligner.Process(params->m_functor, params);

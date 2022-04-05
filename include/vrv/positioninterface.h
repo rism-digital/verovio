@@ -40,7 +40,7 @@ public:
 
     /**
      * @name Setter and getter for the drawing staff loc.
-     * This is set by the SetAlignmentPitchPos functor.
+     * This is set by the CalcAlignmentPitchPos functor.
      */
     ///@{
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }

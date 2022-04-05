@@ -342,9 +342,9 @@ public:
     int AlignVertically(FunctorParams *functorParams) override;
 
     /**
-     * See Object::SetAlignmentXPos
+     * See Object::CalcAlignmentXPos
      */
-    int SetAlignmentXPos(FunctorParams *functorParams) override;
+    int CalcAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustArpeg

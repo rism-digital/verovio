@@ -833,15 +833,15 @@ public:
     virtual int AlignMeasuresEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the position of the Alignment.
+     * Calc the position of the Alignment.
      * Looks at the time difference from the previous Alignment.
      */
-    virtual int SetAlignmentXPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcAlignmentXPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     * Calc the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set the drawing stem positions, including for beams.

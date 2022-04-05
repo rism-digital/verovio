@@ -580,9 +580,9 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
     if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
 
     // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(params->m_doc);
-    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(params->m_doc);
+    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
+    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
 
     CalcStemParams calcStemParams(params->m_doc);
     Functor calcStem(&Object::CalcStem);

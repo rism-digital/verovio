@@ -590,9 +590,9 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::SetAlignmentXPos(FunctorParams *functorParams)
+int System::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     const double ratio = this->EstimateJustificationRatio(params->m_doc);
