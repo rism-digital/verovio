@@ -1054,16 +1054,16 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CalcSlursParams
+// CalcSlurDirectionParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: the doc
  **/
 
-class CalcSlursParams : public FunctorParams {
+class CalcSlurDirectionParams : public FunctorParams {
 public:
-    CalcSlursParams(Doc *doc) { m_doc = doc; }
+    CalcSlurDirectionParams(Doc *doc) { m_doc = doc; }
     Doc *m_doc;
 };
 

@@ -337,9 +337,9 @@ void Page::ResetAligners()
     Functor calcArtic(&Object::CalcArtic);
     this->Process(&calcArtic, &calcArticParams);
 
-    CalcSlursParams calcSlursParams(doc);
-    Functor calcSlurs(&Object::CalcSlurs);
-    this->Process(&calcSlurs, &calcSlursParams);
+    CalcSlurDirectionParams calcSlurDirectionParams(doc);
+    Functor calcSlurDirection(&Object::CalcSlurDirection);
+    this->Process(&calcSlurDirection, &calcSlurDirectionParams);
 }
 
 void Page::LayOutHorizontally()
