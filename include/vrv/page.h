@@ -14,7 +14,7 @@
 namespace vrv {
 
 class DeviceContext;
-class PrepareProcessingListsParams;
+class InitProcessingListsParams;
 class RunningElement;
 class Score;
 class Staff;
@@ -204,7 +204,7 @@ private:
     /**
      * Adjust the horizontal postition of the syl processing verse by verse
      */
-    void AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc);
+    void AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc);
 
     /**
      * Check whether vertical justification is required for the current page

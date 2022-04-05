@@ -643,6 +643,11 @@ public:
     virtual int AddLayerElementToFlatList(FunctorParams *functorParams);
 
     /**
+     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
+     */
+    virtual int InitProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * @name Functors for finding objects
      */
     ///@{
@@ -850,7 +855,7 @@ public:
      * drawn properly
      */
     virtual int CalcSpanningBeamSpans(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    
+
     /**
      * Calculate the slur direction
      */
@@ -1205,11 +1210,6 @@ public:
      * Match linking element (e.g, @next).
      */
     virtual int PrepareLinking(FunctorParams *functorParams);
-
-    /**
-     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
-     */
-    virtual int PrepareProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Prepare list of elements in the @plist.

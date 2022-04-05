@@ -684,9 +684,9 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::PrepareProcessingLists(FunctorParams *functorParams)
+int Layer::InitProcessingLists(FunctorParams *functorParams)
 {
-    PrepareProcessingListsParams *params = vrv_params_cast<PrepareProcessingListsParams *>(functorParams);
+    InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);
     assert(params);
 
     // Alternate solution with StaffN_LayerN_VerseN_t

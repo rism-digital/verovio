@@ -341,14 +341,14 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     this->Process(&prepareMIDI, &prepareMIDIParams);
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
-    PrepareProcessingListsParams prepareProcessingListsParams;
+    InitProcessingListsParams initProcessingListsParams;
     // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareData)
     // StaffN_LayerN_VerseN_t staffLayerVerseTree;
     // params.push_back(&staffLayerVerseTree);
 
     // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    Functor initProcessingLists(&Object::InitProcessingLists);
+    this->Process(&initProcessingLists, &initProcessingListsParams);
 
     // The tree is used to process each staff/layer/verse separately
     // For this, we use a array of AttNIntegerComparison that looks for each object if it is of the type
@@ -362,8 +362,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     int midiChannel = 0;
     int midiTrack = 1;
     ArrayOfComparisons filters;
-    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+    for (staves = initProcessingListsParams.m_layerTree.child.begin();
+         staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
 
         int transSemi = 0;
         if (StaffDef *staffDef = this->GetCurrentScoreDef()->GetStaffDef(staves->first)) {
@@ -608,15 +608,15 @@ void Doc::PrepareData()
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
-    PrepareProcessingListsParams prepareProcessingListsParams;
+    InitProcessingListsParams initProcessingListsParams;
     // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareData)
     // StaffN_LayerN_VerseN_t staffLayerVerseTree;
     // params.push_back(&staffLayerVerseTree);
 
     // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
     // LogElapsedTimeStart();
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    Functor initProcessingLists(&Object::InitProcessingLists);
+    this->Process(&initProcessingLists, &initProcessingListsParams);
 
     // The tree is used to process each staff/layer/verse separately
     // For this, we use an array of AttNIntegerComparison that looks for each object if it is of the type
@@ -629,8 +629,8 @@ void Doc::PrepareData()
     /************ Resolve some pointers by layer ************/
 
     ArrayOfComparisons filters;
-    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+    for (staves = initProcessingListsParams.m_layerTree.child.begin();
+         staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
@@ -653,8 +653,8 @@ void Doc::PrepareData()
 
     if (!prepareDelayedTurnsParams.m_delayedTurns.empty()) {
         prepareDelayedTurnsParams.m_initMap = false;
-        for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-             staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+        for (staves = initProcessingListsParams.m_layerTree.child.begin();
+             staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
                 filters.clear();
                 // Create ad comparison object for each type / @n
@@ -674,8 +674,8 @@ void Doc::PrepareData()
     /************ Resolve lyric connectors ************/
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
-    for (staves = prepareProcessingListsParams.m_verseTree.child.begin();
-         staves != prepareProcessingListsParams.m_verseTree.child.end(); ++staves) {
+    for (staves = initProcessingListsParams.m_verseTree.child.begin();
+         staves != initProcessingListsParams.m_verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
@@ -717,8 +717,8 @@ void Doc::PrepareData()
     /************ Resolve mRpt ************/
 
     // Process by staff for matching mRpt elements and setting the drawing number
-    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+    for (staves = initProcessingListsParams.m_layerTree.child.begin();
+         staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
@@ -1169,11 +1169,11 @@ void Doc::ConvertMarkupDoc(bool permanent)
 
         // We need to populate processing lists for processing the document by Layer (for matching @tie) and
         // by Verse (for matching syllable connectors)
-        PrepareProcessingListsParams prepareProcessingListsParams;
+        InitProcessingListsParams initProcessingListsParams;
 
         // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
-        Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-        this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+        Functor initProcessingLists(&Object::InitProcessingLists);
+        this->Process(&initProcessingLists, &initProcessingListsParams);
 
         IntTree_t::iterator staves;
         IntTree_t::iterator layers;
@@ -1183,8 +1183,8 @@ void Doc::ConvertMarkupDoc(bool permanent)
         // Process by layer for matching @tie attribute - we process notes and chords, looking at
         // GetTie values and pitch and oct for matching notes
         ArrayOfComparisons filters;
-        for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-             staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+        for (staves = initProcessingListsParams.m_layerTree.child.begin();
+             staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
                 filters.clear();
                 // Create ad comparison object for each type / @n

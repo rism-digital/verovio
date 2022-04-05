@@ -431,11 +431,11 @@ void Page::LayOutHorizontally()
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
-    PrepareProcessingListsParams prepareProcessingListsParams;
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    InitProcessingListsParams initProcessingListsParams;
+    Functor initProcessingLists(&Object::InitProcessingLists);
+    this->Process(&initProcessingLists, &initProcessingListsParams);
 
-    this->AdjustSylSpacingByVerse(prepareProcessingListsParams, doc);
+    this->AdjustSylSpacingByVerse(initProcessingListsParams, doc);
 
     Functor adjustHarmGrpsSpacing(&Object::AdjustHarmGrpsSpacing);
     Functor adjustHarmGrpsSpacingEnd(&Object::AdjustHarmGrpsSpacingEnd);
@@ -773,7 +773,7 @@ int Page::GetContentWidth() const
     return maxWidth;
 }
 
-void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc)
+void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc)
 {
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
