@@ -1406,9 +1406,9 @@ int Slur::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Slur::PrepareSlurs(FunctorParams *functorParams)
+int Slur::CalcSlurDirection(FunctorParams *functorParams)
 {
-    PrepareSlursParams *params = vrv_params_cast<PrepareSlursParams *>(functorParams);
+    CalcSlurDirectionParams *params = vrv_params_cast<CalcSlurDirectionParams *>(functorParams);
     assert(params);
 
     // If curve direction is prescribed as above or below, use it

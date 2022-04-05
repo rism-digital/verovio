@@ -455,6 +455,37 @@ void ScoreDef::FilterList(ArrayOfObjects *childList)
     }
 }
 
+void ScoreDef::ResetFromDrawingValues()
+{
+    this->ResetList(this);
+    const ArrayOfObjects *childList = this->GetList(this);
+
+    StaffDef *staffDef = NULL;
+    for (auto item : *childList) {
+        if (!item->Is(STAFFDEF)) continue;
+        staffDef = vrv_cast<StaffDef *>(item);
+        assert(staffDef);
+
+        Clef *clef = vrv_cast<Clef *>(staffDef->FindDescendantByType(CLEF));
+        if (clef) *clef = *staffDef->GetCurrentClef();
+
+        KeySig *keySig = vrv_cast<KeySig *>(staffDef->FindDescendantByType(KEYSIG));
+        if (keySig) *keySig = *staffDef->GetCurrentKeySig();
+
+        Mensur *mensur = vrv_cast<Mensur *>(staffDef->FindDescendantByType(MENSUR));
+        if (mensur) *mensur = *staffDef->GetCurrentMensur();
+
+        MeterSigGrp *meterSigGrp = vrv_cast<MeterSigGrp *>(staffDef->FindDescendantByType(METERSIGGRP));
+        MeterSig *meterSig = vrv_cast<MeterSig *>(staffDef->FindDescendantByType(METERSIG));
+        if (meterSigGrp) {
+            *meterSigGrp = *staffDef->GetCurrentMeterSigGrp();
+        }
+        else if (meterSig) {
+            *meterSig = *staffDef->GetCurrentMeterSig();
+        }
+    }
+}
+
 StaffDef *ScoreDef::GetStaffDef(int n)
 {
     this->ResetList(this);
@@ -657,6 +688,16 @@ int ScoreDef::CastOffSystems(FunctorParams *functorParams)
 int ScoreDef::CastOffEncoding(FunctorParams *functorParams)
 {
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    MoveItselfTo(params->m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int ScoreDef::InitSelection(FunctorParams *functorParams)
+{
+    InitSelectionParams *params = vrv_params_cast<InitSelectionParams *>(functorParams);
     assert(params);
 
     MoveItselfTo(params->m_currentSystem);

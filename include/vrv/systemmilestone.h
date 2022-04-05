@@ -71,6 +71,11 @@ public:
      */
     int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::InitSelection
+     */
+    int InitSelection(FunctorParams *) override;
+
 protected:
     //
 private:

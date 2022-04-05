@@ -373,6 +373,20 @@ bool System::IsLastOfMdiv() const
     return (nextSibling && nextSibling->IsPageElement());
 }
 
+bool System::IsFirstOfSelection() const
+{
+    const Page *page = vrv_cast<const Page *>(this->GetFirstAncestor(PAGE));
+    assert(page);
+    return (page->IsFirstOfSelection() && this->IsFirstInPage());
+}
+
+bool System::IsLastOfSelection() const
+{
+    const Page *page = vrv_cast<const Page *>(this->GetFirstAncestor(PAGE));
+    assert(page);
+    return (page->IsLastOfSelection() && this->IsLastInPage());
+}
+
 double System::EstimateJustificationRatio(Doc *doc)
 {
     assert(doc);
@@ -582,7 +596,7 @@ int System::SetAlignmentXPos(FunctorParams *functorParams)
     assert(params);
 
     const double ratio = this->EstimateJustificationRatio(params->m_doc);
-    if (!this->IsLastOfMdiv() || (ratio < params->m_estimatedJustificationRatio)) {
+    if ((!this->IsLastOfMdiv() && !this->IsLastOfSelection()) || (ratio < params->m_estimatedJustificationRatio)) {
         params->m_estimatedJustificationRatio = ratio;
     }
 
@@ -849,7 +863,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
     // Check if we are on the last system of an mdiv.
     // Do not justify it if the non-justified width is less than a specified percent.
-    if (this->IsLastOfMdiv()) {
+    if (this->IsLastOfMdiv() || this->IsLastOfSelection()) {
         double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
         if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
             return FUNCTOR_SIBLINGS;
@@ -1161,6 +1175,21 @@ int System::CastOffEncoding(FunctorParams *functorParams)
     // It will be added when reaching a pb / sb or at the end of the score in PageMilestoneEnd::CastOffEncoding
     assert(!params->m_currentSystem);
     params->m_currentSystem = new System();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::InitSelection(FunctorParams *functorParams)
+{
+    InitSelectionParams *params = vrv_params_cast<InitSelectionParams *>(functorParams);
+    assert(params);
+
+    // We are starting a new system we need to cast off
+    params->m_contentSystem = this;
+    // We also need to create a new target system and add it to the page
+    System *system = new System();
+    params->m_page->AddChild(system);
+    params->m_currentSystem = system;
 
     return FUNCTOR_CONTINUE;
 }

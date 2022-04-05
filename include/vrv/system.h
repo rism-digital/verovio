@@ -133,13 +133,16 @@ public:
     void AddToDrawingListIfNeccessary(Object *object);
 
     /**
-     * @name Check if the system is the first or last in page or of an mdiv by looking at the next sibling
+     * @name Check if the system is the first or last in page or of a selection or of an mdiv by looking at the next
+     * sibling
      */
     ///@{
     bool IsFirstInPage() const;
     bool IsLastInPage() const;
     bool IsFirstOfMdiv() const;
     bool IsLastOfMdiv() const;
+    bool IsFirstOfSelection() const;
+    bool IsLastOfSelection() const;
     ///@}
 
     /**
@@ -312,6 +315,11 @@ public:
      * See Object::CastOffEncoding
      */
     int CastOffEncoding(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::InitSelection
+     */
+    int InitSelection(FunctorParams *) override;
 
     /**
      * See Object::UnCastOff

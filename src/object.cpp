@@ -1255,7 +1255,7 @@ bool Object::IsPreOrdered(const Object *left, const Object *right)
     if (commonParent) {
         return (commonParent->GetChildIndex(*iterPair.first) < commonParent->GetChildIndex(*iterPair.second));
     }
-    return false;
+    return true;
 }
 
 //----------------------------------------------------------------------------

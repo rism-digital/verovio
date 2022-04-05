@@ -79,6 +79,26 @@ bool Page::IsSupportedChild(Object *child)
     return true;
 }
 
+bool Page::IsFirstOfSelection() const
+{
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+    if (!doc->HasSelection()) return false;
+
+    assert(this->GetParent());
+    return (this->GetParent()->GetFirst() == this);
+}
+
+bool Page::IsLastOfSelection() const
+{
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+    if (!doc->HasSelection()) return false;
+
+    assert(this->GetParent());
+    return (this->GetParent()->GetLast() == this);
+}
+
 RunningElement *Page::GetHeader()
 {
     return const_cast<RunningElement *>(std::as_const(*this).GetHeader());
@@ -232,7 +252,7 @@ void Page::LayOutTranscription(bool force)
     m_layoutDone = true;
 }
 
-void Page::LayOutHorizontally()
+void Page::ResetAligners()
 {
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
@@ -316,6 +336,22 @@ void Page::LayOutHorizontally()
     CalcArticParams calcArticParams(doc);
     Functor calcArtic(&Object::CalcArtic);
     this->Process(&calcArtic, &calcArticParams);
+
+    CalcSlurDirectionParams calcSlurDirectionParams(doc);
+    Functor calcSlurDirection(&Object::CalcSlurDirection);
+    this->Process(&calcSlurDirection, &calcSlurDirectionParams);
+}
+
+void Page::LayOutHorizontally()
+{
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
+
+    this->ResetAligners();
 
     // Render it for filling the bounding box
     View view;
@@ -429,11 +465,6 @@ void Page::LayOutHorizontally()
     Functor alignMeasures(&Object::AlignMeasures);
     Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
-
-    // Calculate the slur direction
-    PrepareSlursParams prepareSlursParams(doc);
-    Functor prepareSlurs(&Object::PrepareSlurs);
-    this->Process(&prepareSlurs, &prepareSlursParams);
 
     FunctorDocParams resolveSpanningBeamSpansParams(doc);
     Functor resolveSpanningBeamSpans(&Object::ResolveSpanningBeamSpans);

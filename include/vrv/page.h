@@ -63,6 +63,14 @@ public:
     ///@}
 
     /**
+     * @name Check if the page is the first or last page of a selection
+     */
+    ///@{
+    bool IsFirstOfSelection() const;
+    bool IsLastOfSelection() const;
+    ///@}
+
+    /**
      * @name Getter header and footer.
      * Looks if the page is the first one or not
      */
@@ -122,6 +130,11 @@ public:
      * Justifiy the content of the page (system/staves) vertically
      */
     void JustifyVertically();
+
+    /**
+     * Reset and set the horizontal and vertical alignment
+     */
+    void ResetAligners();
 
     /**
      * Lay out the pitch positions and stems (without redoing the entire layout)

@@ -122,6 +122,11 @@ bool Toolkit::SetScale(int scale)
     return m_options->m_scale.SetValue(scale);
 }
 
+bool Toolkit::Select(const std::string &selection)
+{
+    return m_docSelection.Parse(selection);
+}
+
 bool Toolkit::SetOutputTo(std::string const &outputTo)
 {
     if ((outputTo == "humdrum") || (outputTo == "hum")) {
@@ -691,6 +696,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     m_doc.PrepareDrawing();
+    m_doc.InitSelectionDoc(m_docSelection, true);
 
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
@@ -810,6 +816,16 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
 
+    bool hadSelection = false;
+    if (m_doc.HasSelection()) {
+        if (!scoreBased) {
+            LogError("Page-based MEI output is not possible when a selection is set.");
+            return "";
+        }
+        hadSelection = true;
+        m_doc.DeactiveateSelection();
+    }
+
     MEIOutput meioutput(&m_doc);
     meioutput.SetScoreBasedMEI(scoreBased);
 
@@ -825,6 +841,9 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     if (!mdiv.empty()) meioutput.SetMdiv(mdiv);
 
     std::string output = meioutput.GetOutput();
+
+    if (hadSelection) m_doc.ReactivateSelection(false);
+
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return output;
 }
@@ -1205,7 +1224,13 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
         return;
     }
 
-    m_doc.UnCastOffDoc(resetCache);
+    if (m_docSelection.m_isPending) {
+        m_doc.InitSelectionDoc(m_docSelection, resetCache);
+    }
+    else {
+        m_doc.UnCastOffDoc(resetCache);
+    }
+
     if (m_options->m_breaks.GetValue() == BREAKS_line) {
         m_doc.CastOffLineDoc();
     }

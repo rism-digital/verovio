@@ -21,6 +21,7 @@ class MidiFile;
 namespace vrv {
 
 class CastOffPagesParams;
+class DocSelection;
 class FontInfo;
 class Glyph;
 class Pages;
@@ -57,6 +58,11 @@ public:
      * Clear the content of the document.
      */
     void Reset() override;
+
+    /**
+     * Clear the selection pages.
+     */
+    void ClearSelectionPages();
 
     /**
      * Refreshes the views from Doc.
@@ -416,6 +422,22 @@ public:
      */
     bool IsCastOff() const { return m_isCastOff; }
 
+    /**
+     * @name Methods for managing a selection.
+     */
+    ///@{
+    void InitSelectionDoc(DocSelection &selection, bool resetCache);
+    void ResetSelectionDoc(bool resetCache);
+    bool HasSelection() const;
+    /**
+     * Temporarily deactivate and reactivate selection.
+     * Used for example to get the complete MEI data.
+     * No check and cast-off performed.
+     */
+    void DeactiveateSelection();
+    void ReactivateSelection(bool resetAligners);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -437,6 +459,11 @@ private:
     int CalcMusicFontSize();
 
 public:
+    Page *m_selectionPreceeding;
+    Page *m_selectionFollowing;
+    std::string m_selectionStart;
+    std::string m_selectionEnd;
+
     /**
      * A copy of the header tree stored as pugi::xml_document
      */

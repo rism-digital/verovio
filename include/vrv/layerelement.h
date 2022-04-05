@@ -434,9 +434,9 @@ public:
     int GetRelativeLayerElement(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareSlurs
+     * See Object::CalcSlurDirection
      */
-    int PrepareSlurs(FunctorParams *functorParams) override;
+    int CalcSlurDirection(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareDuration
