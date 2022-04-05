@@ -850,6 +850,11 @@ public:
      * drawn properly
      */
     virtual int CalcSpanningBeamSpans(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * Calculate the slur direction
+     */
+    virtual int CalcSlurDirection(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the Arpeg position
@@ -955,11 +960,6 @@ public:
      * Calculate the x position of tuplet brackets and num
      */
     virtual int AdjustTupletsX(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Calculate the slur direction
-     */
-    virtual int CalcSlurDirection(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
