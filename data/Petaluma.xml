@@ -304,6 +304,15 @@
   <g c="E93D" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralNoteheadSemiminimaWhite"/>
   <g c="E93E" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemUp"/>
   <g c="E93F" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemDown"/>
+  <g c="E940" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemDiagonal"/>
+  <g c="E941" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemUpFlagRight"/>
+  <g c="E942" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemDownFlagRight"/>
+  <g c="E943" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemUpFlagLeft"/>
+  <g c="E944" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemDownFlagLeft"/>
+  <g c="E945" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemUpFlagFlared"/>
+  <g c="E946" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemDownFlagFlared"/>
+  <g c="E947" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemUpFlagExtended"/>
+  <g c="E948" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemDownFlagExtended"/>
   <g c="E949" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemUpFlagSemiminima"/>
   <g c="E94A" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemDownFlagSemiminima"/>
   <g c="E94B" x="0.0" y="0.0" w="0.0" h="0.0" n="mensuralCombStemUpFlagFusa"/>
