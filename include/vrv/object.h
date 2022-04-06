@@ -1424,7 +1424,7 @@ public:
     virtual int UnCastOff(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * CasttOff a document to selection.
+     * CastOff a document to selection.
      * Move everything before the selection to the first page, the selection to a second page,
      * and everthing after the selection to a third page.
      */
