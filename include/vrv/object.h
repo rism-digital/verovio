@@ -1343,7 +1343,7 @@ public:
     /**
      * Resolve Reh time pointing position in case none is set
      */
-    virtual int ResolveRehPosition(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareRehPosition(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Get the list of referenced elements for the beamSpan as well as set referenced
