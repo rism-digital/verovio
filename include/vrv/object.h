@@ -1234,7 +1234,7 @@ public:
     /**
      * Match elements of @plist
      */
-    virtual int ProcessPlist(FunctorParams *functorParams);
+    virtual int PrepareProcessPlist(FunctorParams *functorParams);
 
     /**
      * Extract default duration from scoredef/staffdef

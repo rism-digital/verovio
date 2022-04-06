@@ -575,7 +575,7 @@ void Doc::PrepareData()
     // Process plist after all pairs has been collected
     if (!preparePlistParams.m_interfaceUuidTuples.empty()) {
         preparePlistParams.m_fillList = false;
-        Functor processPlist(&Object::ProcessPlist);
+        Functor processPlist(&Object::PrepareProcessPlist);
         this->Process(&processPlist, &preparePlistParams);
 
         for (const auto &[plistInterface, uuid, objectReference] : preparePlistParams.m_interfaceUuidTuples) {
