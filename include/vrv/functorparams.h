@@ -242,24 +242,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustCrossStaffContentParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a map of calculated shifts per StaffAlignment
- *  => this is transferred from JustifyY
- * member 1: the doc
- **/
-
-class AdjustCrossStaffContentParams : public FunctorParams {
-public:
-    AdjustCrossStaffContentParams(Doc *doc) { m_doc = doc; }
-
-    std::map<StaffAlignment *, int> m_shiftForStaff;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // AdjustDotsParams
 //----------------------------------------------------------------------------
 
@@ -1956,7 +1938,7 @@ public:
  * member 2: the amount of space for distribution
  * member 3: the sum of justification factors per page
  * member 4: a map of calculated shifts per StaffAlignment
- *  => this is transferred to AdjustCrossStaffContent
+ *  => this is transferred to JustifyYAdjustCrossStaff
  * member 5: the functor to be redirected to the MeasureAligner
  * member 6: the doc
  **/
@@ -1979,6 +1961,24 @@ public:
     double m_justificationSum;
     std::map<StaffAlignment *, int> m_shiftForStaff;
     Functor *m_functor;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// JustifyYAdjustCrossStaffParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a map of calculated shifts per StaffAlignment
+ *  => this is transferred from JustifyY
+ * member 1: the doc
+ **/
+
+class JustifyYAdjustCrossStaffParams : public FunctorParams {
+public:
+    JustifyYAdjustCrossStaffParams(Doc *doc) { m_doc = doc; }
+
+    std::map<StaffAlignment *, int> m_shiftForStaff;
     Doc *m_doc;
 };
 

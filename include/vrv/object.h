@@ -1376,7 +1376,7 @@ public:
     /**
      * Adjust cross staff content after vertical justification
      */
-    virtual int AdjustCrossStaffContent(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int JustifyYAdjustCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
