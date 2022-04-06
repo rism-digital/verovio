@@ -270,6 +270,12 @@ public:
     void UpdateControlPoints();
     ///@}
 
+    /**
+     * Estimate the curve parameter corresponding to the control points
+     * Based on the polyline P1-C1-C2-P2
+     */
+    std::pair<double, double> EstimateCurveParamForControlPoints() const;
+
 private:
     // Control point X-axis offset for both start/end points
     int m_leftControlOffset = 0;

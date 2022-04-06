@@ -98,6 +98,20 @@ void BezierCurve::UpdateControlPoints()
     c2.y = p2.y + sign * m_rightControlHeight;
 }
 
+std::pair<double, double> BezierCurve::EstimateCurveParamForControlPoints() const
+{
+    const double dist1 = BoundingBox::CalcDistance(p1, c1);
+    const double dist2 = BoundingBox::CalcDistance(c1, c2);
+    const double dist3 = BoundingBox::CalcDistance(c2, p2);
+    const double distSum = dist1 + dist2 + dist3;
+    if (distSum > 0.0) {
+        return { dist1 / distSum, dist3 / distSum };
+    }
+    else {
+        return { 0.0, 1.0 };
+    }
+}
+
 //----------------------------------------------------------------------------
 // DeviceContext
 //----------------------------------------------------------------------------
