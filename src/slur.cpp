@@ -278,8 +278,8 @@ SpannedElements Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax)
     }
 
     // Collect the layers used for collision avoidance
-    std::transform(findSpannedLayerElementsParams.m_elements.cbegin(), findSpannedLayerElementsParams.m_elements.cend(),
-        std::inserter(layersN, layersN.end()), [](LayerElement *element) { return element->GetOriginalLayerN(); });
+    std::for_each(findSpannedLayerElementsParams.m_elements.cbegin(), findSpannedLayerElementsParams.m_elements.cend(),
+        [&layersN](LayerElement *element) { layersN.insert(element->GetOriginalLayerN()); });
 
     return { findSpannedLayerElementsParams.m_elements, layersN };
 }
@@ -295,12 +295,9 @@ void Slur::AddSpannedElements(
 
     curve->ClearSpannedElements();
     for (auto element : spanned.elements) {
-        Point pRotated;
-        Point pLeft;
-        pLeft.x = element->GetSelfLeft();
-        Point pRight;
-        pRight.x = element->GetSelfRight();
-        if (((pLeft.x > xMin) && (pLeft.x < xMax)) || ((pRight.x > xMin) && (pRight.x < xMax))) {
+        const int xLeft = element->GetSelfLeft();
+        const int xRight = element->GetSelfRight();
+        if (((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax))) {
             CurveSpannedElement *spannedElement = new CurveSpannedElement();
             spannedElement->m_boundingBox = element;
             spannedElement->m_isBelow = this->IsElementBelow(element, startStaff, endStaff);
