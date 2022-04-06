@@ -110,6 +110,8 @@ private:
 
     bool CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, int &step);
 
+    int CalcBeamSlopeStep(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, int noteStep, bool &shortStep);
+
     void CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int step);
 
     void CalcBeamPosition(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal);

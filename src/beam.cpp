@@ -701,63 +701,15 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
     if (m_beamSlope == 0.0) return false;
 
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    // Default (maximum) step is two stave-spaces (4 units)
-    step = unit * 4;
-    // The current step according to stems - this can be flat because of the stem extended
-    int curStep = abs(m_firstNoteOrChord->m_yBeam - m_lastNoteOrChord->m_yBeam);
-    // The distance between the two extremes
-    int dist = m_lastNoteOrChord->m_x - m_firstNoteOrChord->m_x;
-    // Short accessors
-    const data_BEAMPLACE place = beamInterface->m_drawingPlace;
-    const int dur = beamInterface->m_shortestDur;
-
     // Indicates if we have a short step of half a unit
     // This occurs with 8th and 16th only and with a reduced distance of 3 stave-spaces (6 units)
     bool shortStep = false;
-    if (m_nbNotesOrChords == 2) {
-        step = unit * 2;
-        // Short distance
-        if (dist <= unit * 6) {
-            step = unit / 2;
-            shortStep = true;
-        }
-    }
-    // With three notes and a short distance (12 units) also reduce the step to a stave-space (2 units)
-    else if (m_nbNotesOrChords == 3) {
-        // Short distance
-        if (dist <= unit * 12) {
-            step = unit * 2;
-        }
-        // A fifth or smaller - reduce the step
-        else if (noteStep <= unit * 4) {
-            step = unit * 2;
-        }
-    }
-    else {
-        // A fourth or smaller - reduce to a short step
-        if (noteStep < unit * 3) {
-            step = unit / 2;
-            shortStep = true;
-        }
-        // A fifth or smaller - reduce the step
-        else if (noteStep <= unit * 4) {
-            step = unit * 2;
-        }
-        else if (m_nbNotesOrChords == 4) {
-            if ((m_beamElementCoordRefs.at(1)->m_yBeam == m_beamElementCoordRefs.at(2)->m_yBeam)
-                && ((m_firstNoteOrChord->m_yBeam == m_beamElementCoordRefs.at(1)->m_yBeam)
-                    || (m_lastNoteOrChord->m_yBeam == m_beamElementCoordRefs.at(2)->m_yBeam))) {
-                step = unit * 2;
-            }
-        }
-    }
-
-    // Prevent short step with values not shorter than a 16th
-    if (shortStep && (dur >= DUR_32)) {
-        step = unit * 2;
-        shortStep = false;
-    }
-
+    step = this->CalcBeamSlopeStep(doc, staff, beamInterface, noteStep, shortStep);
+    
+    // Short accessors
+    const data_BEAMPLACE place = beamInterface->m_drawingPlace;
+    // The current step according to stems - this can be flat because of the stem extended
+    const int curStep = abs(m_firstNoteOrChord->m_yBeam - m_lastNoteOrChord->m_yBeam);
     // We can keep the current slope but only if curStep is not 0 and smaller than the step
     if ((curStep != 0) && (curStep < step) && (BEAMPLACE_mixed != place)) {
         return false;
@@ -855,6 +807,64 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
     }
 
     return true;
+}
+
+int BeamSegment::CalcBeamSlopeStep(
+    Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, int noteStep, bool &shortStep)
+{
+    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    // Default (maximum) step is two stave-spaces (4 units)
+    int step = 4 * unit;
+    // The distance between the two extremes
+    const int dist = m_lastNoteOrChord->m_x - m_firstNoteOrChord->m_x;
+
+    if (m_nbNotesOrChords == 2) {
+        step = unit * 2;
+        // Short distance
+        if (dist <= unit * 6) {
+            step = unit / 2;
+            shortStep = true;
+        }
+    }
+    // With three notes and a short distance (12 units) also reduce the step to a stave-space (2 units)
+    else if (m_nbNotesOrChords == 3) {
+        // Short distance
+        if (dist <= unit * 12) {
+            step = unit * 2;
+        }
+        // A fifth or smaller - reduce the step
+        else if (noteStep <= unit * 4) {
+            step = unit * 2;
+        }
+    }
+    else {
+        // A fourth or smaller - reduce to a short step
+        if (noteStep < unit * 3) {
+            step = unit / 2;
+            shortStep = true;
+        }
+        // A fifth or smaller - reduce the step
+        else if (noteStep <= unit * 4) {
+            step = unit * 2;
+        }
+        else if (m_nbNotesOrChords == 4) {
+            if ((m_beamElementCoordRefs.at(1)->m_yBeam == m_beamElementCoordRefs.at(2)->m_yBeam)
+                && ((m_firstNoteOrChord->m_yBeam == m_beamElementCoordRefs.at(1)->m_yBeam)
+                    || (m_lastNoteOrChord->m_yBeam == m_beamElementCoordRefs.at(2)->m_yBeam))) {
+                step = unit * 2;
+            }
+        }
+    }
+
+    // duration
+    const int dur = beamInterface->m_shortestDur;
+    // Prevent short step with values not shorter than a 16th
+    if (shortStep && (dur >= DUR_32)) {
+        step = unit * 2;
+        shortStep = false;
+    }
+
+    return step;
 }
 
 void BeamSegment::CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int step)

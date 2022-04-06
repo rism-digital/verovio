@@ -1149,7 +1149,7 @@ Options::Options()
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
 
     m_beamMaxSlope.SetInfo("Beam max slope", "The maximum beam slope");
-    m_beamMaxSlope.Init(10, 1, 20);
+    m_beamMaxSlope.Init(10, 0, 20);
     this->Register(&m_beamMaxSlope, "beamMaxSlope", &m_generalLayout);
 
     m_beamMinSlope.SetInfo("Beam min slope", "The minimum beam slope");
