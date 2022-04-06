@@ -1349,7 +1349,7 @@ public:
      * Get the list of referenced elements for the beamSpan as well as set referenced
      * object for those elements to beamSpan containing them.
      */
-    virtual int ResolveBeamSpanElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareBeamSpanElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Reset the drawing values before calling PrepareData after changes.

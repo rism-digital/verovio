@@ -94,9 +94,9 @@ public:
     int CalcStem(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResolveBeamSpanElements
+     * See Object::PrepareBeamSpanElements
      */
-    int ResolveBeamSpanElements(FunctorParams *) override;
+    int PrepareBeamSpanElements(FunctorParams *) override;
 
     /**
      * See Object::CalcSpanningBeamSpans

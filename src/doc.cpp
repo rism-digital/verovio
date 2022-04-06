@@ -601,8 +601,8 @@ void Doc::PrepareData()
     /************ Resolve beamspan elements ***********/
 
     FunctorDocParams functorDocParams(this);
-    Functor resolveBeamSpanElements(&Object::ResolveBeamSpanElements);
-    this->Process(&resolveBeamSpanElements, &functorDocParams);
+    Functor prepareBeamSpanElements(&Object::PrepareBeamSpanElements);
+    this->Process(&prepareBeamSpanElements, &functorDocParams);
 
     /************ Prepare processing by staff/layer/verse ************/
 
