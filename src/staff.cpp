@@ -492,7 +492,7 @@ int Staff::ScoreDefOptimize(FunctorParams *functorParams)
 
     ListOfObjects notes = this->FindAllDescendantsByType(NOTE);
 
-    // Show the staff only if no layer with content or only mRests
+    // Show the staff only if there are any notes
     if (!notes.empty()) {
         staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
     }
