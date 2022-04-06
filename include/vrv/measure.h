@@ -427,9 +427,9 @@ public:
     int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::FillStaffCurrentTimeSpanningEnd
+     * See Object::PrepareStaffCurrentTimeSpanningEnd
      */
-    int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
+    int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareCrossStaff

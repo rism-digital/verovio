@@ -421,9 +421,10 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
     return TimePointInterface::InterfacePrepareTimestamps(params, object);
 }
 
-int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
+int TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
 {
-    FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    PrepareStaffCurrentTimeSpanningParams *params
+        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     if (this->IsSpanningMeasures()) {

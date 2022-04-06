@@ -63,7 +63,7 @@ public:
      * We have functor in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor method. These not called by the Process/Call loop but by the implementaion
-     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
+     * classes explicitely. See FloatingObject::PrepareStaffCurrentTimeSpanning for an example.
      */
 
     /**

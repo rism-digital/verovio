@@ -1333,12 +1333,12 @@ public:
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
      * At the end, remove the TimeSpanningInterface element from the list when the last measure is reached.
      */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareStaffCurrentTimeSpanning(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * End Functor for Object::FillStaffCurrentTimeSpanning
+     * End Functor for Object::PrepareStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Resolve Reh time pointing position in case none is set

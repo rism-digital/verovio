@@ -65,9 +65,9 @@ public:
     // TextElement does not inherit from FloatingObject.
 
     /**
-     * See Object::FillStaffCurrentTimeSpanning
+     * See Object::PrepareStaffCurrentTimeSpanning
      */
-    int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
+    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimePointing

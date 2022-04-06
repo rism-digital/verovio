@@ -91,9 +91,9 @@ public:
     int PrepareLyrics(FunctorParams *functorParams) override;
 
     /**
-     * See Object::FillStaffCurrentTimeSpanning
+     * See Object::PrepareStaffCurrentTimeSpanning
      */
-    int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
+    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetData
