@@ -1089,7 +1089,7 @@ public:
      * Adjust the position of the StaffAlignment.
      */
     virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    
+
     /**
      * Adjust the X/YRel positions taking into account the bounding boxes
      */
