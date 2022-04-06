@@ -378,7 +378,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // Only collisions near the endpoints are taken into account.
     int endPointShiftLeft = 0;
     int endPointShiftRight = 0;
-    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, margin, unit);
+    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, margin);
     if ((endPointShiftLeft != 0) || (endPointShiftRight != 0)) {
         const int signLeft = bezier.IsLeftControlAbove() ? 1 : -1;
         const int signRight = bezier.IsRightControlAbove() ? 1 : -1;
@@ -468,7 +468,7 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
 }
 
 std::pair<int, int> Slur::CalcEndPointShift(
-    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const int margin, const int unit)
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const int margin)
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return { 0, 0 };
 
@@ -507,8 +507,6 @@ std::pair<int, int> Slur::CalcEndPointShift(
         }
     }
 
-    this->RebalanceShifts(shiftLeft, shiftRight, dist, unit);
-
     return { shiftLeft, shiftRight };
 }
 
@@ -532,26 +530,6 @@ void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int int
             intersection *= pow(10.0 * ratio - 8.5, 2.0);
         }
         shiftRight = std::max(shiftRight, intersection);
-    }
-}
-
-void Slur::RebalanceShifts(int &shiftLeft, int &shiftRight, const double distance, const int unit) const
-{
-    // alpha is 1 for dist <= 4U, 0 for dist >= 8U, interpolated between 4U and 8U
-    double alpha = 0.0;
-    if (distance <= 4.0 * unit) {
-        alpha = 1.0;
-    }
-    else if (distance <= 8.0 * unit) {
-        alpha = 2.0 - distance / (4.0 * unit);
-    }
-
-    const int difference = std::abs(shiftLeft - shiftRight);
-    if (shiftLeft < shiftRight) {
-        shiftLeft += alpha * difference;
-    }
-    else {
-        shiftRight += alpha * difference;
     }
 }
 
