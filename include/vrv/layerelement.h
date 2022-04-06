@@ -444,9 +444,9 @@ public:
     int PrepareDuration(FunctorParams *functorParams) override;
 
     /**
-     * See Object::HorizontalLayoutCache
+     * See Object::LayOutHorizontallyCache
      */
-    int HorizontalLayoutCache(FunctorParams *functorParams) override;
+    int LayOutHorizontallyCache(FunctorParams *functorParams) override;
 
 protected:
     /**

@@ -2706,9 +2706,9 @@ int LayerElement::PrepareDuration(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::HorizontalLayoutCache(FunctorParams *functorParams)
+int LayerElement::LayOutHorizontallyCache(FunctorParams *functorParams)
 {
-    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    LayOutHorizontallyCacheParams *params = vrv_params_cast<LayOutHorizontallyCacheParams *>(functorParams);
     assert(params);
 
     if (params->m_restore) {

@@ -114,7 +114,7 @@ public:
      * This should be done in preparation of cast-off which is based on measure positioning.
      * The content of the measures is not laid out and keeps previously cached positioning.
      */
-    void HorizontalLayoutCachePage(bool restore = false);
+    void LayOutHorizontallyCachePage(bool restore = false);
 
     /**
      * Justifiy the content of the page (measures and their content) horizontally

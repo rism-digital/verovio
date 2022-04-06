@@ -976,6 +976,11 @@ public:
      */
     virtual int AdjustTupletsX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
+    /**
+     * Cache or restore cached horizontal layout for faster layout redoing
+     */
+    virtual int LayOutHorizontallyCache(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
     ///@}
 
     /**
@@ -1440,11 +1445,6 @@ public:
      * End Functor for Object::InitOnsetOffset
      */
     virtual int InitOnsetOffsetEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Cache or restore cached horizontal layout for faster layout redoing
-     */
-    virtual int HorizontalLayoutCache(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Calculate the maximum duration of each measure.

@@ -498,9 +498,9 @@ public:
     int UnCastOff(FunctorParams *functorParams) override;
 
     /**
-     * See Object::HorizontalLayoutCache
+     * See Object::LayOutHorizontallyCache
      */
-    int HorizontalLayoutCache(FunctorParams *functorParams) override;
+    int LayOutHorizontallyCache(FunctorParams *functorParams) override;
 
 public:
     // flags for drawing measure barline based on visibility or other conditions

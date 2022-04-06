@@ -914,10 +914,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     if (!firstMeasure || !firstMeasure->HasCachedHorizontalLayout()) {
         // LogDebug("Performing the horizontal layout");
         unCastOffPage->LayOutHorizontally();
-        unCastOffPage->HorizontalLayoutCachePage();
+        unCastOffPage->LayOutHorizontallyCachePage();
     }
     else {
-        unCastOffPage->HorizontalLayoutCachePage(true);
+        unCastOffPage->LayOutHorizontallyCachePage(true);
     }
 
     Page *castOffSinglePage = new Page();
