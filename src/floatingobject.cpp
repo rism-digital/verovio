@@ -815,18 +815,18 @@ int FloatingObject::PrepareTimestamps(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingObject::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
+int FloatingObject::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
-        interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
+        interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
     }
     if (this->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = this->GetLinkingInterface();
         assert(interface);
-        interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
+        interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
     }
     return FUNCTOR_CONTINUE;
 }

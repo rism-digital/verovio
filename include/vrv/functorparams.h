@@ -1355,20 +1355,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FillStaffCurrentTimeSpanningParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: std::vector< Object * >* of the current running TimeSpanningInterface elements
- **/
-
-class FillStaffCurrentTimeSpanningParams : public FunctorParams {
-public:
-    FillStaffCurrentTimeSpanningParams() {}
-    std::vector<Object *> m_timeSpanningElements;
-};
-
-//----------------------------------------------------------------------------
 // FindAllBetweenParams
 //----------------------------------------------------------------------------
 
@@ -2235,6 +2221,20 @@ public:
     MRpt *m_currentMRpt;
     data_BOOLEAN m_multiNumber;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// PrepareStaffCurrentTimeSpanningParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: std::vector< Object * >* of the current running TimeSpanningInterface elements
+ **/
+
+class PrepareStaffCurrentTimeSpanningParams : public FunctorParams {
+public:
+    PrepareStaffCurrentTimeSpanningParams() {}
+    std::vector<Object *> m_timeSpanningElements;
 };
 
 //----------------------------------------------------------------------------

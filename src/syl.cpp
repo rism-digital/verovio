@@ -179,10 +179,10 @@ int Syl::PrepareLyrics(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Syl::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
+int Syl::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
+    return TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
 }
 
 int Syl::ResetDrawing(FunctorParams *functorParams)

@@ -1329,9 +1329,10 @@ int Measure::InitSelection(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
+int Measure::PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
 {
-    FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    PrepareStaffCurrentTimeSpanningParams *params
+        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();

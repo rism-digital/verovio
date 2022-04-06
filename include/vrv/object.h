@@ -1252,8 +1252,8 @@ public:
      * At the end, remove the TimeSpanningInterface element from the list when the last measure is reached.
      */
     ///@{
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareStaffCurrentTimeSpanning(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

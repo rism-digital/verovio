@@ -702,10 +702,10 @@ void Doc::PrepareDrawing()
 
     // Once <slur>, <ties> and @ties are matched but also syl connectors, we need to set them as running
     // TimeSpanningInterface to each staff they are extended. This does not need to be done staff by staff because we
-    // can just check the staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
-    FillStaffCurrentTimeSpanningParams fillStaffCurrentTimeSpanningParams;
-    Functor fillStaffCurrentTimeSpanning(&Object::FillStaffCurrentTimeSpanning);
-    Functor fillStaffCurrentTimeSpanningEnd(&Object::FillStaffCurrentTimeSpanningEnd);
+    // can just check the staff->GetN to see where we are (see Staff::PrepareStaffCurrentTimeSpanning)
+    PrepareStaffCurrentTimeSpanningParams fillStaffCurrentTimeSpanningParams;
+    Functor fillStaffCurrentTimeSpanning(&Object::PrepareStaffCurrentTimeSpanning);
+    Functor fillStaffCurrentTimeSpanningEnd(&Object::PrepareStaffCurrentTimeSpanningEnd);
     this->Process(&fillStaffCurrentTimeSpanning, &fillStaffCurrentTimeSpanningParams, &fillStaffCurrentTimeSpanningEnd);
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open

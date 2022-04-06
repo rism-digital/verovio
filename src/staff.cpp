@@ -600,9 +600,10 @@ int Staff::CalcLedgerLinesEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
+int Staff::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
-    FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    PrepareStaffCurrentTimeSpanningParams *params
+        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
