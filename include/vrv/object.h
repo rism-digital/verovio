@@ -1089,6 +1089,11 @@ public:
      * Adjust the position of the StaffAlignment.
      */
     virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * Adjust the X/YRel positions taking into account the bounding boxes
+     */
+    virtual int AdjustXRelForTranscription(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
@@ -1121,11 +1126,6 @@ public:
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
     virtual int ApplyPPUFactor(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Adjust the X/YRel positions taking into account the bounding boxes
-     */
-    virtual int AdjustXRelForTranscription(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
