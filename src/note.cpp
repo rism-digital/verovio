@@ -522,7 +522,11 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         // case HEADSHAPE_rectangle: return SMUFL_noteheadRectangle;
         // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
         // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
-        case HEADSHAPE_slash: return SMUFL_E101_noteheadSlashHorizontalEnds;
+        case HEADSHAPE_slash: {
+            if (DUR_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
+            if (DUR_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
+            return SMUFL_E101_noteheadSlashHorizontalEnds;
+        }
         // case HEADSHAPE_square: return SMUFL_noteheadSquare;
         case HEADSHAPE_x: {
             if (DUR_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
