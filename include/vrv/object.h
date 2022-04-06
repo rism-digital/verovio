@@ -1213,6 +1213,7 @@ public:
 
     /**
      * Prepare group symbol starting and ending staffDefs for drawing
+     * TODO called outside Doc::PrepareData - should maybe be moved to ScoreDef related functors
      */
     virtual int ScoreDefSetGrpSym(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
