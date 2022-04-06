@@ -907,7 +907,7 @@ public:
     virtual int AdjustLayersEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Lay out the X positions of the grace notes looking at the bounding boxes.
+     * Adjust the X positions of the grace notes looking at the bounding boxes.
      * The functor is redirected from the MeasureAligner and then from the appropriate
      * alignment to the GraceAligner
      */
@@ -929,17 +929,17 @@ public:
     virtual int AdjustHarmGrpsSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Adjust the x position of accidental.
+     * Adjust the X position of accidental.
      */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Adjust the x position of accidental.
+     * Adjust the X position of accidental.
      */
     virtual int AdjustTempo(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Adjust the x position of a right barline in order to make sure the is no text content
+     * Adjust the X position of a right barline in order to make sure the is no text content
      * overlflowing in the right margin
      */
     virtual int AdjustXOverflow(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -950,7 +950,7 @@ public:
     virtual int AdjustXOverflowEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Lay out the X positions of the staff content looking at the bounding boxes.
+     * Adjust the X positions of the staff content looking at the bounding boxes.
      * The functor process by aligned-staff content, that is from a rediction in the
      * MeasureAligner and then staff by staff but taking into account cross-staff elements
      */
@@ -972,7 +972,7 @@ public:
     virtual int AdjustSylSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Calculate the x position of tuplet brackets and num
+     * Calculate the X position of tuplet brackets and num
      */
     virtual int AdjustTupletsX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
@@ -1076,12 +1076,12 @@ public:
     virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Calculate the y position of tuplet brackets and num
+     * Calculate the Y position of tuplet brackets and num
      */
     virtual int AdjustTupletsY(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Calculate the y relative position of tupletNum based on overlaps with other elements
+     * Calculate the Y relative position of tupletNum based on overlaps with other elements
      */
     virtual int AdjustTupletNumOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
