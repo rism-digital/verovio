@@ -105,7 +105,7 @@ std::pair<double, double> BezierCurve::EstimateCurveParamForControlPoints() cons
     const double dist3 = BoundingBox::CalcDistance(c2, p2);
     const double distSum = dist1 + dist2 + dist3;
     if (distSum > 0.0) {
-        return { dist1 / distSum, dist3 / distSum };
+        return { dist1 / distSum, (dist1 + dist2) / distSum };
     }
     else {
         return { 0.0, 1.0 };

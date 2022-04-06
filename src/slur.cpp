@@ -385,10 +385,10 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         bezier.p1.y += signLeft * endPointShiftLeft;
         bezier.p2.y += signRight * endPointShiftRight;
         if (bezier.p1.x != bezier.p2.x) {
-            double lambda = double(bezier.c1.x - bezier.p1.x) / double(bezier.p2.x - bezier.p1.x);
-            bezier.c1.y += signLeft * (1.0 - lambda) * endPointShiftLeft + signRight * lambda * endPointShiftRight;
-            lambda = double(bezier.c2.x - bezier.p1.x) / double(bezier.p2.x - bezier.p1.x);
-            bezier.c2.y += signLeft * (1.0 - lambda) * endPointShiftLeft + signRight * lambda * endPointShiftRight;
+            double lambda1, lambda2;
+            std::tie(lambda1, lambda2) = bezier.EstimateCurveParamForControlPoints();
+            bezier.c1.y += signLeft * (1.0 - lambda1) * endPointShiftLeft + signRight * lambda1 * endPointShiftRight;
+            bezier.c2.y += signLeft * (1.0 - lambda2) * endPointShiftLeft + signRight * lambda2 * endPointShiftRight;
         }
         bezier.UpdateControlPointParams();
         curve->UpdatePoints(bezier);
