@@ -1,7 +1,13 @@
 # Changelog
 
 ## [unreleased]
-* Python Package Index (PyPI) distribution for macos arm64
+* Improved rendering with diamond and slash shaped noteheads (@eNote-GmBH)
+* Improved rendering of slurs (@eNote-GmBH)
+* Support for `mixed` croff-staff slurs (@eNote-GmBH)
+* Support for `non-arp` arpeggios (@eNote-GmBH)
+* Option --beam-french-style for french beam style (@eNote-GmBH)
+* Option --transpose-mdiv for individual transposition of mdivs (@eNote-GmBH)
+* Python Package Index (PyPI) distribution for macOS arm64
 
 ## [3.9.0] - 2022-02-22
 * Support for `beatRpt@beatdef`
