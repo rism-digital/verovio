@@ -695,10 +695,7 @@ public:
     /**
      * Retrieve the layer elements spanned by two points
      */
-    ///@{
     virtual int FindSpannedLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int FindSpannedLayerElementsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    ///@}
 
     /**
      * Retrieve the minimum left and maximum right for an alignment.

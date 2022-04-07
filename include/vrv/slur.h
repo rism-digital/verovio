@@ -20,6 +20,17 @@ class Note;
 class Staff;
 
 //----------------------------------------------------------------------------
+// SpannedElements
+//----------------------------------------------------------------------------
+/**
+ * Contains the layer elements used for collision detection
+ */
+struct SpannedElements {
+    std::vector<LayerElement *> elements;
+    std::set<int> layersN;
+};
+
+//----------------------------------------------------------------------------
 // ControlPointConstraint
 //----------------------------------------------------------------------------
 /**
@@ -140,12 +151,18 @@ public:
     /**
      * Determine layer elements spanned by the slur
      */
-    std::vector<LayerElement *> CollectSpannedElements(Staff *staff, int xMin, int xMax, char spanningType);
+    SpannedElements CollectSpannedElements(Staff *staff, int xMin, int xMax);
+
+    /**
+     * Filter and add layer elements spanned by the slur to the positioner
+     */
+    void AddSpannedElements(
+        FloatingCurvePositioner *curve, const SpannedElements &elements, Staff *staff, int xMin, int xMax);
 
     /**
      * Calculate the staff where the slur's floating curve positioner lives
      */
-    Staff *CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spanningType);
+    Staff *CalculateExtremalStaff(Staff *staff, int xMin, int xMax);
 
     /**
      * Determine whether a layer element should lie above or below the slur
