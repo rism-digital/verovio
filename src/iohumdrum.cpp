@@ -717,7 +717,7 @@ bool HumdrumInput::convertHumdrum()
         else if (it->isDataType("**string")) {
             m_string = true;
         }
-        else if (it->isDataType("**mens")) {
+        else if (it->isMensLike()) {
             staffindex++;
             m_mens = true;
         }
@@ -912,11 +912,13 @@ void HumdrumInput::prepareFingerings(hum::HTp fstart)
 bool HumdrumInput::checkForMens(hum::HumdrumFile &infile)
 {
     std::vector<hum::HTp> spines;
-    infile.getSpineStartList(spines, "**mens");
-    if (spines.empty()) {
-        return false;
+    infile.getSpineStartList(spines);
+    for (int i = 0; i < (int)spines.size(); i++) {
+        if (spines[i]->isMensLike()) {
+            return true;
+        }
     }
-    return true;
+    return false;
 }
 
 //////////////////////////////
@@ -2345,7 +2347,7 @@ void HumdrumInput::prepareVerses()
             if (line.token(j)->isKernLike()) {
                 break;
             }
-            if (line.token(j)->isMens()) {
+            if (line.token(j)->isMensLike()) {
                 break;
             }
             else if (line.token(j)->isDataTypeLike("**text")) {
@@ -4772,7 +4774,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
     }
 
     // short-circuit *clef with *oclef for **mens data
-    if (staffstart->isMens()) {
+    if (staffstart->isMensLike()) {
         if ((!m_oclef.empty()) && (staffnumber == m_oclef.back().first)) {
             clef = *m_oclef.back().second;
             cleftok = m_oclef.back().second;
@@ -4780,7 +4782,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
     }
 
     // short-circuit *met with *omet for **mens data
-    if (staffstart->isMens()) {
+    if (staffstart->isMensLike()) {
         if ((!m_omet.empty()) && (staffnumber == m_omet.back().first)) {
             metersig = *m_omet.back().second;
             metertok = m_omet.back().second;
@@ -4947,7 +4949,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
 
     addInstrumentDefinition(m_staffdef.back(), staffstart);
 
-    if (staffstart->isMens()) {
+    if (staffstart->isMensLike()) {
         if (isBlackNotation(staffstart)) {
             m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural_black);
             ss.at(staffindex).mensuration_type = 1;
@@ -5408,7 +5410,7 @@ template <class ELEMENT>
 void HumdrumInput::setMeterSymbol(
     ELEMENT *element, const std::string &metersig, int staffindex, hum::HTp partstart, hum::HTp metertok)
 {
-    if ((partstart != NULL) && partstart->isMens()) {
+    if ((partstart != NULL) && partstart->isMensLike()) {
         setMensurationSymbol(element, metersig, staffindex, metertok);
         return;
     }
@@ -5753,7 +5755,7 @@ void HumdrumInput::setMensurationSymbol(
 void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const std::string &metersig,
     hum::HTp partstart, hum::HTp timetok, hum::HTp metertok)
 {
-    if ((partstart != NULL) && partstart->isMens()) {
+    if ((partstart != NULL) && partstart->isMensLike()) {
         // Don't display time signatures in mensural notation.
         return;
     }
@@ -6990,7 +6992,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
                 if (token->isKernLike()) {
                     staffindex++;
                 }
-                else if (token->isDataType("**mens")) {
+                else if (token->isMensLike()) {
                     staffindex++;
                 }
                 if (!(token->isDataType("**fb") || token->isDataType("**fba") || token->isDataType("**Bnum"))) {
@@ -9234,7 +9236,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
             }
 
-            if (layerdata[i]->isMens()) {
+            if (layerdata[i]->isMensLike()) {
                 if (layerdata[i]->isClef()) {
                     if (ss.at(m_currentstaff - 1).last_clef != *layerdata[i]) {
                         Clef *clef = insertClefElement(elements, pointers, layerdata[i], lastnote);
@@ -9355,7 +9357,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             continue;
         }
 
-        if (layerdata[i]->isMens()) {
+        if (layerdata[i]->isMensLike()) {
             convertMensuralToken(elements, pointers, layerdata[i], staffindex);
             continue;
         }
@@ -10587,7 +10589,7 @@ void HumdrumInput::convertMensuralToken(
     if (token->isNull()) {
         return;
     }
-    if (!token->isMens()) {
+    if (!token->isMensLike()) {
         return;
     }
 
@@ -12475,7 +12477,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             cerr << "DIRTOK FOR " << token << " IS EMPTY " << endl;
         }
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-        if (token->isMens()) {
+        if (token->isMensLike()) {
             // Attach to note, not with measure timestamp.
             // Need to handle text on chords (will currently have a problem attaching to chords)
             std::string startid = getLocationId("note", token);
@@ -12521,7 +12523,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             cerr << "DIRTOK FOR " << token << " IS EMPTY " << endl;
         }
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-        if (token->isMens()) {
+        if (token->isMensLike()) {
             // Attach to note, not with measure timestamp.
             // Need to handle text on chords (will currently have a problem attaching to chords)
             std::string startid = getLocationId("note", token);
@@ -12743,7 +12745,7 @@ bool HumdrumInput::addTempoDirection(const std::string &text, const std::string 
     }
     setLocationId(tempo, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-    if (token->isMens()) {
+    if (token->isMensLike()) {
         // Attach to note, not with measure timestamp.
         // Need to handle text on chords (will currently have a problem attaching to chords)
         std::string startid = getLocationId("note", token);
@@ -13102,7 +13104,7 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
     }
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-    if (token->isMens()) {
+    if (token->isMensLike()) {
         // Attach to note, not with measure timestamp.
         // Need to handle text on chords (will currently have a problem attaching to chords)
         string startid = getLocationId("note", token);
@@ -19773,7 +19775,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     bool gesturalQ = false;
     bool hasAccidental = false;
     int accidlevel = 0;
-    if (m_mens && token->isMens()) {
+    if (m_mens && token->isMensLike()) {
         // mensural notes are indicated differently, so check here for their method.
         if ((tstring.find("n") != std::string::npos) || (tstring.find("-") != std::string::npos)
             || (tstring.find("#") != std::string::npos)) {
@@ -20087,7 +20089,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     // handle ties
-    if (!token->isDataType("**mens")) {
+    if (!token->isMensLike()) {
         if ((tstring.find("[") != std::string::npos) || (tstring.find("_") != std::string::npos)) {
             processTieStart(note, token, tstring, subtoken);
         }
@@ -20511,14 +20513,14 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
     for (int i = startfield; i < line.getFieldCount(); ++i) {
         std::string exinterp = line.token(i)->getDataType();
 
-        if (line.token(i)->isKernLike() || (exinterp.find("kern") != std::string::npos)) {
+        if (line.token(i)->isKernLike()) {
             ttrack = line.token(i)->getTrack();
             if (ttrack != track) {
                 break;
             }
         }
 
-        if (line.token(i)->isMens() || (exinterp.find("mens") != std::string::npos)) {
+        if (line.token(i)->isMensLike()) {
             ttrack = line.token(i)->getTrack();
             if (ttrack != track) {
                 break;
@@ -21069,7 +21071,7 @@ template <class ELEMENT> void HumdrumInput::setRhythmFromDuration(ELEMENT elemen
 
 template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element, hum::HTp token, int subtoken)
 {
-    if (token->isMens()) {
+    if (token->isMensLike()) {
         return convertMensuralRhythm(element, token, subtoken);
     }
 
@@ -22669,7 +22671,7 @@ void HumdrumInput::addTrill(hum::HTp token)
 
 void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
-    if (token->isDataType("**mens")) {
+    if (token->isMensLike()) {
         return;
     }
     std::string endtag = "tieEnd";
@@ -22764,7 +22766,7 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
 void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
-    if (token->isDataType("**mens")) {
+    if (token->isMensLike()) {
         return;
     }
     std::string starttag = "tieStart";
@@ -23290,7 +23292,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 bool HumdrumInput::hasMensuralStaff(hum::HLp line)
 {
     for (int i = 0; i < line->getFieldCount(); ++i) {
-        if (line->token(i)->isMens()) {
+        if (line->token(i)->isMensLike()) {
             return true;
         }
     }
@@ -23415,7 +23417,7 @@ void HumdrumInput::storeOriginalClefMensurationKeyApp()
         if (m_oclef[i].second->isKernLike()) {
             kerncount++;
         }
-        else if (m_oclef[i].second->isMens()) {
+        else if (m_oclef[i].second->isMensLike()) {
             menscount++;
         }
     }
