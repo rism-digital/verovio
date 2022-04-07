@@ -790,6 +790,13 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
 
     // Rotate back
     bezierCurve.Rotate(angle, bezierCurve.p1);
+
+    // Enforce p1.x <= c1.x <= c2.x <= p2.x
+    bezierCurve.c1.x = std::max(bezierCurve.p1.x, bezierCurve.c1.x);
+    bezierCurve.c2.x = std::max(bezierCurve.c1.x, bezierCurve.c2.x);
+    bezierCurve.c2.x = std::min(bezierCurve.p2.x, bezierCurve.c2.x);
+    bezierCurve.c1.x = std::min(bezierCurve.c2.x, bezierCurve.c1.x);
+
     bezierCurve.UpdateControlPointParams();
 }
 
