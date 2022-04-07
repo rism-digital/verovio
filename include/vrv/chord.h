@@ -112,7 +112,7 @@ public:
     /**
      * Return true if the chord has some cross staff notes.
      */
-    bool HasCrossStaff();
+    bool HasCrossStaff() override;
 
     /**
      * Returns list of notes that have accidentals
