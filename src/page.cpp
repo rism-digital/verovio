@@ -471,15 +471,15 @@ void Page::LayOutHorizontally()
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
 }
 
-void Page::LayOutHorizontallyCachePage(bool restore)
+void Page::LayOutHorizontallyWithCache(bool restore)
 {
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    LayOutHorizontallyCacheParams layOutHorizontallyCacheParams(doc);
-    layOutHorizontallyCacheParams.m_restore = restore;
-    Functor layOutHorizontallyCache(&Object::LayOutHorizontallyCache);
-    this->Process(&layOutHorizontallyCache, &layOutHorizontallyCacheParams);
+    CacheHorizontalLayoutParams cacheHorizontalLayoutParams(doc);
+    cacheHorizontalLayoutParams.m_restore = restore;
+    Functor cacheHorizontalLayout(&Object::CacheHorizontalLayout);
+    this->Process(&cacheHorizontalLayout, &cacheHorizontalLayoutParams);
 }
 
 void Page::LayOutVertically()

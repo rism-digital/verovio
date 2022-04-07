@@ -1683,9 +1683,9 @@ int Measure::UnCastOff(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::LayOutHorizontallyCache(FunctorParams *functorParams)
+int Measure::CacheHorizontalLayout(FunctorParams *functorParams)
 {
-    LayOutHorizontallyCacheParams *params = vrv_params_cast<LayOutHorizontallyCacheParams *>(functorParams);
+    CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);
     assert(params);
 
     if (params->m_restore) {
@@ -1696,8 +1696,8 @@ int Measure::LayOutHorizontallyCache(FunctorParams *functorParams)
         m_cachedOverflow = this->GetDrawingOverflow();
         m_cachedXRel = m_drawingXRel;
     }
-    if (this->GetLeftBarLine()) this->GetLeftBarLine()->LayOutHorizontallyCache(functorParams);
-    if (this->GetRightBarLine()) this->GetRightBarLine()->LayOutHorizontallyCache(functorParams);
+    if (this->GetLeftBarLine()) this->GetLeftBarLine()->CacheHorizontalLayout(functorParams);
+    if (this->GetRightBarLine()) this->GetRightBarLine()->CacheHorizontalLayout(functorParams);
 
     return FUNCTOR_CONTINUE;
 }

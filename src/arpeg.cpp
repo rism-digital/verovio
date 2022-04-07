@@ -235,9 +235,9 @@ int Arpeg::ResetData(FunctorParams *functorParams)
     return interface->InterfaceResetData(functorParams, this);
 }
 
-int Arpeg::LayOutHorizontallyCache(FunctorParams *functorParams)
+int Arpeg::CacheHorizontalLayout(FunctorParams *functorParams)
 {
-    LayOutHorizontallyCacheParams *params = vrv_params_cast<LayOutHorizontallyCacheParams *>(functorParams);
+    CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);
     assert(params);
 
     if (params->m_restore) {

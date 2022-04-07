@@ -900,6 +900,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CacheHorizontalLayoutParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a flag indicating if the cache should be stored (default) or restored
+ * member 1: a pointer to the Doc
+ **/
+
+class CacheHorizontalLayoutParams : public FunctorParams {
+public:
+    CacheHorizontalLayoutParams(Doc *doc)
+    {
+        m_restore = false;
+        m_doc = doc;
+    }
+    bool m_restore;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // CalcAlignmentPitchPosParams
 //----------------------------------------------------------------------------
 
@@ -2024,26 +2044,6 @@ public:
     MeterSig *m_meterSig;
     Mensur *m_mensur;
     Layer *m_layer;
-};
-
-//----------------------------------------------------------------------------
-// LayOutHorizontallyCacheParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a flag indicating if the cache should be stored (default) or restored
- * member 1: a pointer to the Doc
- **/
-
-class LayOutHorizontallyCacheParams : public FunctorParams {
-public:
-    LayOutHorizontallyCacheParams(Doc *doc)
-    {
-        m_restore = false;
-        m_doc = doc;
-    }
-    bool m_restore;
-    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

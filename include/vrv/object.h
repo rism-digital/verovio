@@ -979,7 +979,7 @@ public:
     /**
      * Cache or restore cached horizontal layout for faster layout redoing
      */
-    virtual int LayOutHorizontallyCache(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CacheHorizontalLayout(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
