@@ -1687,10 +1687,12 @@ void View::DrawDynamSymbolOnly(DeviceContext *dc, Staff *staff, Dynam *dynam, co
     const int left = m_doc->GetGlyphLeft(dynamSymbol.at(0), staff->m_drawingStaffSize, false);
     int width = 0;
     for (int i = 0; i < dynamSymbol.size(); ++i) {
-        if (i == dynamSymbol.size() - 1)
+        if (i == dynamSymbol.size() - 1) {
             width += m_doc->GetGlyphRight(dynamSymbol.at(i), staff->m_drawingStaffSize, false);
-        else
+        }
+        else {
             width += m_doc->GetGlyphAdvX(dynamSymbol.at(i), staff->m_drawingStaffSize, false);
+        }
     }
 
     // draw opening symbol
