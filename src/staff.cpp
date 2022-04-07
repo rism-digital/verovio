@@ -490,10 +490,10 @@ int Staff::ScoreDefOptimize(FunctorParams *functorParams)
     matchTypeLayer.ReverseComparison();
     this->FindAllDescendantsByComparison(&layers, &matchTypeLayer);
 
-    ListOfObjects notes = this->FindAllDescendantsByType(NOTE);
+    Object *note = this->FindDescendantByType(NOTE);
 
     // Show the staff only if there are any notes
-    if (!notes.empty()) {
+    if (note) {
         staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
     }
 
