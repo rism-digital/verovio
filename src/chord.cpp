@@ -925,9 +925,9 @@ int Chord::ResetData(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
+int Chord::JustifyYAdjustCrossStaff(FunctorParams *functorParams)
 {
-    AdjustCrossStaffContentParams *params = vrv_params_cast<AdjustCrossStaffContentParams *>(functorParams);
+    JustifyYAdjustCrossStaffParams *params = vrv_params_cast<JustifyYAdjustCrossStaffParams *>(functorParams);
     assert(params);
 
     // Check if chord spreads across several staves

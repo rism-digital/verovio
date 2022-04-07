@@ -90,11 +90,11 @@ int F::PrepareTimestamps(FunctorParams *functorParams)
     return interface->InterfacePrepareTimestamps(functorParams, this);
 }
 
-int F::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
+int F::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
     assert(interface);
-    return interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
+    return interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
 }
 
 int F::ResetData(FunctorParams *functorParams)

@@ -180,59 +180,8 @@ void View::CalcInitialSlur(
 
     /************** content **************/
 
-    const std::vector<LayerElement *> elements
-        = slur->CollectSpannedElements(staff, bezier.p1.x, bezier.p2.x, curve->GetSpanningType());
-
-    Staff *startStaff = slur->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
-    Staff *endStaff = slur->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
-    if (startStaff && endStaff && (startStaff->GetN() != endStaff->GetN())) {
-        curve->SetCrossStaff(endStaff);
-    }
-
-    curve->ClearSpannedElements();
-    for (auto element : elements) {
-        Point pRotated;
-        Point pLeft;
-        pLeft.x = element->GetSelfLeft();
-        Point pRight;
-        pRight.x = element->GetSelfRight();
-        if (((pLeft.x > bezier.p1.x) && (pLeft.x < bezier.p2.x))
-            || ((pRight.x > bezier.p1.x) && (pRight.x < bezier.p2.x))) {
-            CurveSpannedElement *spannedElement = new CurveSpannedElement();
-            spannedElement->m_boundingBox = element;
-            spannedElement->m_isBelow = slur->IsElementBelow(element, startStaff, endStaff);
-            curve->AddSpannedElement(spannedElement);
-        }
-
-        if (!curve->IsCrossStaff() && element->m_crossStaff) {
-            curve->SetCrossStaff(element->m_crossStaff);
-        }
-    }
-
-    // Ties can be broken across systems, so we have to look for all floating curve positioners that represent them.
-    // This might be refined later, since using the entire bounding box of a tie for collision avoidance with slurs is
-    // coarse.
-    ArrayOfFloatingPositioners tiePositioners = staff->GetAlignment()->FindAllFloatingPositioners(TIE);
-    if (startStaff && (startStaff != staff) && startStaff->GetAlignment()) {
-        const ArrayOfFloatingPositioners startTiePositioners
-            = startStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
-        std::copy(startTiePositioners.begin(), startTiePositioners.end(), std::back_inserter(tiePositioners));
-    }
-    else if (endStaff && (endStaff != staff) && endStaff->GetAlignment()) {
-        const ArrayOfFloatingPositioners endTiePositioners = endStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
-        std::copy(endTiePositioners.begin(), endTiePositioners.end(), std::back_inserter(tiePositioners));
-    }
-    for (FloatingPositioner *positioner : tiePositioners) {
-        if (positioner->GetAlignment()->GetParentSystem() == curve->GetAlignment()->GetParentSystem()) {
-            if (positioner->HasContentBB() && (positioner->GetContentRight() > bezier.p1.x)
-                && (positioner->GetContentLeft() < bezier.p2.x)) {
-                CurveSpannedElement *spannedElement = new CurveSpannedElement();
-                spannedElement->m_boundingBox = positioner;
-                spannedElement->m_isBelow = slur->IsElementBelow(positioner, startStaff, endStaff);
-                curve->AddSpannedElement(spannedElement);
-            }
-        }
-    }
+    const SpannedElements spannedElements = slur->CollectSpannedElements(staff, bezier.p1.x, bezier.p2.x);
+    slur->AddSpannedElements(curve, spannedElements, staff, bezier.p1.x, bezier.p2.x);
 
     /************** angle **************/
 

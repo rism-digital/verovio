@@ -471,15 +471,15 @@ void Page::LayOutHorizontally()
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
 }
 
-void Page::HorizontalLayoutCachePage(bool restore)
+void Page::LayOutHorizontallyWithCache(bool restore)
 {
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    HorizontalLayoutCacheParams horizontalLayoutCacheParams(doc);
-    horizontalLayoutCacheParams.m_restore = restore;
-    Functor horizontalLayoutCache(&Object::HorizontalLayoutCache);
-    this->Process(&horizontalLayoutCache, &horizontalLayoutCacheParams);
+    CacheHorizontalLayoutParams cacheHorizontalLayoutParams(doc);
+    cacheHorizontalLayoutParams.m_restore = restore;
+    Functor cacheHorizontalLayout(&Object::CacheHorizontalLayout);
+    this->Process(&cacheHorizontalLayout, &cacheHorizontalLayoutParams);
 }
 
 void Page::LayOutVertically()
@@ -659,10 +659,10 @@ void Page::JustifyVertically()
 
     if (!justifyYParams.m_shiftForStaff.empty()) {
         // Adjust cross staff content which is displaced through vertical justification
-        Functor adjustCrossStaffContent(&Object::AdjustCrossStaffContent);
-        AdjustCrossStaffContentParams adjustCrossStaffContentParams(doc);
-        adjustCrossStaffContentParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
-        this->Process(&adjustCrossStaffContent, &adjustCrossStaffContentParams);
+        Functor justifyYAdjustCrossStaff(&Object::JustifyYAdjustCrossStaff);
+        JustifyYAdjustCrossStaffParams justifyYAdjustCrossStaffParams(doc);
+        justifyYAdjustCrossStaffParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
+        this->Process(&justifyYAdjustCrossStaff, &justifyYAdjustCrossStaffParams);
     }
 }
 

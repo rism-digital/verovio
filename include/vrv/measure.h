@@ -277,10 +277,7 @@ public:
     /**
      * See Object::FindSpannedLayerElements
      */
-    ///@{
     int FindSpannedLayerElements(FunctorParams *functorParams) override;
-    int FindSpannedLayerElementsEnd(FunctorParams *functorParams) override;
-    ///@}
 
     /**
      * See Object::ConvertMarkupAnalytical
@@ -427,9 +424,9 @@ public:
     int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::FillStaffCurrentTimeSpanningEnd
+     * See Object::PrepareStaffCurrentTimeSpanningEnd
      */
-    int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
+    int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareCrossStaff
@@ -498,9 +495,9 @@ public:
     int UnCastOff(FunctorParams *functorParams) override;
 
     /**
-     * See Object::HorizontalLayoutCache
+     * See Object::CacheHorizontalLayout
      */
-    int HorizontalLayoutCache(FunctorParams *functorParams) override;
+    int CacheHorizontalLayout(FunctorParams *functorParams) override;
 
 public:
     // flags for drawing measure barline based on visibility or other conditions

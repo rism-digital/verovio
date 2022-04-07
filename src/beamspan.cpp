@@ -228,7 +228,7 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int BeamSpan::ResolveBeamSpanElements(FunctorParams *functorParams)
+int BeamSpan::PrepareBeamSpanElements(FunctorParams *functorParams)
 {
     if (!m_beamedElements.empty() || !this->GetStart() || !this->GetEnd()) return FUNCTOR_CONTINUE;
 

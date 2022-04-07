@@ -224,9 +224,9 @@ public:
     int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustCrossStaffContent
+     * See Object::JustifyYAdjustCrossStaff
      */
-    int AdjustCrossStaffContent(FunctorParams *functorParams) override;
+    int JustifyYAdjustCrossStaff(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI

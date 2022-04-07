@@ -242,24 +242,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustCrossStaffContentParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a map of calculated shifts per StaffAlignment
- *  => this is transferred from JustifyY
- * member 1: the doc
- **/
-
-class AdjustCrossStaffContentParams : public FunctorParams {
-public:
-    AdjustCrossStaffContentParams(Doc *doc) { m_doc = doc; }
-
-    std::map<StaffAlignment *, int> m_shiftForStaff;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // AdjustDotsParams
 //----------------------------------------------------------------------------
 
@@ -918,6 +900,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CacheHorizontalLayoutParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a flag indicating if the cache should be stored (default) or restored
+ * member 1: a pointer to the Doc
+ **/
+
+class CacheHorizontalLayoutParams : public FunctorParams {
+public:
+    CacheHorizontalLayoutParams(Doc *doc)
+    {
+        m_restore = false;
+        m_doc = doc;
+    }
+    bool m_restore;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // CalcAlignmentPitchPosParams
 //----------------------------------------------------------------------------
 
@@ -1400,20 +1402,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FillStaffCurrentTimeSpanningParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: std::vector< Object * >* of the current running TimeSpanningInterface elements
- **/
-
-class FillStaffCurrentTimeSpanningParams : public FunctorParams {
-public:
-    FillStaffCurrentTimeSpanningParams() {}
-    std::vector<Object *> m_timeSpanningElements;
-};
-
-//----------------------------------------------------------------------------
 // FindAllBetweenParams
 //----------------------------------------------------------------------------
 
@@ -1621,9 +1609,8 @@ public:
  * member 3: the staff numbers to consider, any staff if empty
  * member 4: the minimal layerN to consider, unbounded below if zero
  * member 5: the maximal layerN to consider, unbounded above if zero
- * member 6: true if within measure range of timespanning interface, only this is searched
- * member 7: the timespanning interface
- * member 8: the class ids to keep
+ * member 6: the timespanning interface
+ * member 7: the class ids to keep
  **/
 
 class FindSpannedLayerElementsParams : public FunctorParams {
@@ -1635,7 +1622,6 @@ public:
         m_maxPos = 0;
         m_minLayerN = 0;
         m_maxLayerN = 0;
-        m_inMeasureRange = false;
     }
     std::vector<LayerElement *> m_elements;
     int m_minPos;
@@ -1643,7 +1629,6 @@ public:
     std::set<int> m_staffNs;
     int m_minLayerN;
     int m_maxLayerN;
-    bool m_inMeasureRange;
     TimeSpanningInterface *m_interface;
     std::vector<ClassId> m_classIds;
 };
@@ -1666,26 +1651,6 @@ public:
     }
     Doc *m_doc;
     FeatureExtractor *m_extractor;
-};
-
-//----------------------------------------------------------------------------
-// HorizontalLayoutCacheParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a flag indicating if the cache should be stored (default) or restored
- * member 1: a pointer to the Doc
- **/
-
-class HorizontalLayoutCacheParams : public FunctorParams {
-public:
-    HorizontalLayoutCacheParams(Doc *doc)
-    {
-        m_restore = false;
-        m_doc = doc;
-    }
-    bool m_restore;
-    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1970,7 +1935,7 @@ public:
  * member 2: the amount of space for distribution
  * member 3: the sum of justification factors per page
  * member 4: a map of calculated shifts per StaffAlignment
- *  => this is transferred to AdjustCrossStaffContent
+ *  => this is transferred to JustifyYAdjustCrossStaff
  * member 5: the functor to be redirected to the MeasureAligner
  * member 6: the doc
  **/
@@ -1993,6 +1958,24 @@ public:
     double m_justificationSum;
     std::map<StaffAlignment *, int> m_shiftForStaff;
     Functor *m_functor;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// JustifyYAdjustCrossStaffParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a map of calculated shifts per StaffAlignment
+ *  => this is transferred from JustifyY
+ * member 1: the doc
+ **/
+
+class JustifyYAdjustCrossStaffParams : public FunctorParams {
+public:
+    JustifyYAdjustCrossStaffParams(Doc *doc) { m_doc = doc; }
+
+    std::map<StaffAlignment *, int> m_shiftForStaff;
     Doc *m_doc;
 };
 
@@ -2309,6 +2292,20 @@ public:
     MRpt *m_currentMRpt;
     data_BOOLEAN m_multiNumber;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// PrepareStaffCurrentTimeSpanningParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: std::vector< Object * >* of the current running TimeSpanningInterface elements
+ **/
+
+class PrepareStaffCurrentTimeSpanningParams : public FunctorParams {
+public:
+    PrepareStaffCurrentTimeSpanningParams() {}
+    std::vector<Object *> m_timeSpanningElements;
 };
 
 //----------------------------------------------------------------------------

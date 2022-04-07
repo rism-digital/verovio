@@ -718,11 +718,6 @@ public:
     virtual int FindSpannedLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * End Functor for Object::FindSpannedLayerElements
-     */
-    virtual int FindSpannedLayerElementsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Retrieve the minimum left and maximum right for an alignment.
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
      */
@@ -907,7 +902,7 @@ public:
     virtual int AdjustLayersEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Lay out the X positions of the grace notes looking at the bounding boxes.
+     * Adjust the X positions of the grace notes looking at the bounding boxes.
      * The functor is redirected from the MeasureAligner and then from the appropriate
      * alignment to the GraceAligner
      */
@@ -929,17 +924,17 @@ public:
     virtual int AdjustHarmGrpsSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Adjust the x position of accidental.
+     * Adjust the X position of accidental.
      */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Adjust the x position of accidental.
+     * Adjust the X position of accidental.
      */
     virtual int AdjustTempo(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Adjust the x position of a right barline in order to make sure the is no text content
+     * Adjust the X position of a right barline in order to make sure the is no text content
      * overlflowing in the right margin
      */
     virtual int AdjustXOverflow(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -950,7 +945,7 @@ public:
     virtual int AdjustXOverflowEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Lay out the X positions of the staff content looking at the bounding boxes.
+     * Adjust the X positions of the staff content looking at the bounding boxes.
      * The functor process by aligned-staff content, that is from a rediction in the
      * MeasureAligner and then staff by staff but taking into account cross-staff elements
      */
@@ -972,9 +967,14 @@ public:
     virtual int AdjustSylSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Calculate the x position of tuplet brackets and num
+     * Calculate the X position of tuplet brackets and num
      */
     virtual int AdjustTupletsX(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Cache or restore cached horizontal layout for faster layout redoing
+     */
+    virtual int CacheHorizontalLayout(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -1071,12 +1071,12 @@ public:
     virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Calculate the y position of tuplet brackets and num
+     * Calculate the Y position of tuplet brackets and num
      */
     virtual int AdjustTupletsY(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Calculate the y relative position of tupletNum based on overlaps with other elements
+     * Calculate the Y relative position of tupletNum based on overlaps with other elements
      */
     virtual int AdjustTupletNumOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
@@ -1084,6 +1084,11 @@ public:
      * Adjust the position of the StaffAlignment.
      */
     virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the X/YRel positions taking into account the bounding boxes
+     */
+    virtual int AdjustXRelForTranscription(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
@@ -1116,11 +1121,6 @@ public:
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
     virtual int ApplyPPUFactor(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Adjust the X/YRel positions taking into account the bounding boxes
-     */
-    virtual int AdjustXRelForTranscription(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -1208,6 +1208,7 @@ public:
 
     /**
      * Prepare group symbol starting and ending staffDefs for drawing
+     * TODO called outside Doc::PrepareData - should maybe be moved to ScoreDef related functors
      */
     virtual int ScoreDefSetGrpSym(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
@@ -1229,7 +1230,7 @@ public:
     /**
      * Match elements of @plist
      */
-    virtual int ProcessPlist(FunctorParams *functorParams);
+    virtual int PrepareProcessPlist(FunctorParams *functorParams);
 
     /**
      * Extract default duration from scoredef/staffdef
@@ -1333,23 +1334,23 @@ public:
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
      * At the end, remove the TimeSpanningInterface element from the list when the last measure is reached.
      */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareStaffCurrentTimeSpanning(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * End Functor for Object::FillStaffCurrentTimeSpanning
+     * End Functor for Object::PrepareStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Resolve Reh time pointing position in case none is set
      */
-    virtual int ResolveRehPosition(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareRehPosition(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Get the list of referenced elements for the beamSpan as well as set referenced
      * object for those elements to beamSpan containing them.
      */
-    virtual int ResolveBeamSpanElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareBeamSpanElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Reset the drawing values before calling PrepareData after changes.
@@ -1376,7 +1377,7 @@ public:
     /**
      * Adjust cross staff content after vertical justification
      */
-    virtual int AdjustCrossStaffContent(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int JustifyYAdjustCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -1418,7 +1419,7 @@ public:
     virtual int UnCastOff(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * CasttOff a document to selection.
+     * CastOff a document to selection.
      * Move everything before the selection to the first page, the selection to a second page,
      * and everthing after the selection to a third page.
      */
@@ -1440,11 +1441,6 @@ public:
      * End Functor for Object::InitOnsetOffset
      */
     virtual int InitOnsetOffsetEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Cache or restore cached horizontal layout for faster layout redoing
-     */
-    virtual int HorizontalLayoutCache(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Calculate the maximum duration of each measure.

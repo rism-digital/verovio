@@ -515,8 +515,8 @@ void Doc::PrepareData()
 
     // Resolve <reh> elements first, since they can be encoded without @startid or @tstamp, but we need one internally
     // for placement
-    Functor resolveRehPosition(&Object::ResolveRehPosition);
-    this->Process(&resolveRehPosition, NULL);
+    Functor prepareRehPosition(&Object::PrepareRehPosition);
+    this->Process(&prepareRehPosition, NULL);
 
     // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
     PrepareTimePointingParams prepareTimePointingParams;
@@ -575,7 +575,7 @@ void Doc::PrepareData()
     // Process plist after all pairs has been collected
     if (!preparePlistParams.m_interfaceUuidTuples.empty()) {
         preparePlistParams.m_fillList = false;
-        Functor processPlist(&Object::ProcessPlist);
+        Functor processPlist(&Object::PrepareProcessPlist);
         this->Process(&processPlist, &preparePlistParams);
 
         for (const auto &[plistInterface, uuid, objectReference] : preparePlistParams.m_interfaceUuidTuples) {
@@ -601,8 +601,8 @@ void Doc::PrepareData()
     /************ Resolve beamspan elements ***********/
 
     FunctorDocParams functorDocParams(this);
-    Functor resolveBeamSpanElements(&Object::ResolveBeamSpanElements);
-    this->Process(&resolveBeamSpanElements, &functorDocParams);
+    Functor prepareBeamSpanElements(&Object::PrepareBeamSpanElements);
+    this->Process(&prepareBeamSpanElements, &functorDocParams);
 
     /************ Prepare processing by staff/layer/verse ************/
 
@@ -702,10 +702,10 @@ void Doc::PrepareData()
 
     // Once <slur>, <ties> and @ties are matched but also syl connectors, we need to set them as running
     // TimeSpanningInterface to each staff they are extended. This does not need to be done staff by staff because we
-    // can just check the staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
-    FillStaffCurrentTimeSpanningParams fillStaffCurrentTimeSpanningParams;
-    Functor fillStaffCurrentTimeSpanning(&Object::FillStaffCurrentTimeSpanning);
-    Functor fillStaffCurrentTimeSpanningEnd(&Object::FillStaffCurrentTimeSpanningEnd);
+    // can just check the staff->GetN to see where we are (see Staff::PrepareStaffCurrentTimeSpanning)
+    PrepareStaffCurrentTimeSpanningParams fillStaffCurrentTimeSpanningParams;
+    Functor fillStaffCurrentTimeSpanning(&Object::PrepareStaffCurrentTimeSpanning);
+    Functor fillStaffCurrentTimeSpanningEnd(&Object::PrepareStaffCurrentTimeSpanningEnd);
     this->Process(&fillStaffCurrentTimeSpanning, &fillStaffCurrentTimeSpanningParams, &fillStaffCurrentTimeSpanningEnd);
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
@@ -914,10 +914,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     if (!firstMeasure || !firstMeasure->HasCachedHorizontalLayout()) {
         // LogDebug("Performing the horizontal layout");
         unCastOffPage->LayOutHorizontally();
-        unCastOffPage->HorizontalLayoutCachePage();
+        unCastOffPage->LayOutHorizontallyWithCache();
     }
     else {
-        unCastOffPage->HorizontalLayoutCachePage(true);
+        unCastOffPage->LayOutHorizontallyWithCache(true);
     }
 
     Page *castOffSinglePage = new Page();

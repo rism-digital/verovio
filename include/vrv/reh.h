@@ -66,9 +66,9 @@ public:
     //----------//
 
     /**
-     * See Object::ResolveRehPosition
+     * See Object::PrepareRehPosition
      */
-    int ResolveRehPosition(FunctorParams *functorParams) override;
+    int PrepareRehPosition(FunctorParams *functorParams) override;
 
 protected:
     //
