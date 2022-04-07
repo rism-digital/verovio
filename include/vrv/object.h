@@ -718,11 +718,6 @@ public:
     virtual int FindSpannedLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * End Functor for Object::FindSpannedLayerElements
-     */
-    virtual int FindSpannedLayerElementsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Retrieve the minimum left and maximum right for an alignment.
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
      */

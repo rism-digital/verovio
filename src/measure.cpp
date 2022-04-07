@@ -680,25 +680,9 @@ int Measure::FindSpannedLayerElements(FunctorParams *functorParams)
     FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
 
-    if (params->m_interface->GetStartMeasure() == this) {
-        params->m_inMeasureRange = true;
-    }
+    if (Object::IsPreOrdered(this, params->m_interface->GetStartMeasure())) return FUNCTOR_SIBLINGS;
 
-    if (!params->m_inMeasureRange) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::FindSpannedLayerElementsEnd(FunctorParams *functorParams)
-{
-    FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
-    assert(params);
-
-    if (params->m_interface->GetEndMeasure() == this) {
-        params->m_inMeasureRange = false;
-    }
+    if (Object::IsPreOrdered(params->m_interface->GetEndMeasure(), this)) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }

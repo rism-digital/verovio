@@ -1609,9 +1609,8 @@ public:
  * member 3: the staff numbers to consider, any staff if empty
  * member 4: the minimal layerN to consider, unbounded below if zero
  * member 5: the maximal layerN to consider, unbounded above if zero
- * member 6: true if within measure range of timespanning interface, only this is searched
- * member 7: the timespanning interface
- * member 8: the class ids to keep
+ * member 6: the timespanning interface
+ * member 7: the class ids to keep
  **/
 
 class FindSpannedLayerElementsParams : public FunctorParams {
@@ -1623,7 +1622,6 @@ public:
         m_maxPos = 0;
         m_minLayerN = 0;
         m_maxLayerN = 0;
-        m_inMeasureRange = false;
     }
     std::vector<LayerElement *> m_elements;
     int m_minPos;
@@ -1631,7 +1629,6 @@ public:
     std::set<int> m_staffNs;
     int m_minLayerN;
     int m_maxLayerN;
-    bool m_inMeasureRange;
     TimeSpanningInterface *m_interface;
     std::vector<ClassId> m_classIds;
 };

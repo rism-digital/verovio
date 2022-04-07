@@ -171,7 +171,7 @@ Staff *Slur::GetBoundaryCrossStaff()
     }
 }
 
-std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax, char spanningType)
+SpannedElements Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax)
 {
     // Decide whether we search the whole parent system or just one measure which is much faster
     Object *container = this->IsSpanningMeasures() ? staff->GetFirstAncestor(SYSTEM) : this->GetStartMeasure();
@@ -179,8 +179,6 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(this);
     findSpannedLayerElementsParams.m_minPos = xMin;
     findSpannedLayerElementsParams.m_maxPos = xMax;
-    findSpannedLayerElementsParams.m_inMeasureRange
-        = ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END));
     findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC, CHORD, CLEF, FLAG, GLISS, NOTE, STEM, TUPLET_BRACKET,
         TUPLET_NUM }; // Ties should be handled separately
 
@@ -198,8 +196,7 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
 
     // Run the search without layer bounds
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-    Functor findSpannedLayerElementsEnd(&Object::FindSpannedLayerElementsEnd);
-    container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
+    container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams);
 
     // Now determine the minimal and maximal layer
     std::set<int> layersN;
@@ -274,24 +271,91 @@ std::vector<LayerElement *> Slur::CollectSpannedElements(Staff *staff, int xMin,
         // For separated voices or prescribed layers rerun the search with layer bounds
         if (layersAreSeparated || this->HasLayer()) {
             findSpannedLayerElementsParams.m_elements.clear();
-            findSpannedLayerElementsParams.m_inMeasureRange
-                = ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END));
             findSpannedLayerElementsParams.m_minLayerN = minLayerN;
             findSpannedLayerElementsParams.m_maxLayerN = maxLayerN;
-            container->Process(
-                &findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
+            container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams);
         }
     }
 
-    return findSpannedLayerElementsParams.m_elements;
+    // Collect the layers used for collision avoidance
+    std::for_each(findSpannedLayerElementsParams.m_elements.cbegin(), findSpannedLayerElementsParams.m_elements.cend(),
+        [&layersN](LayerElement *element) { layersN.insert(element->GetOriginalLayerN()); });
+
+    return { findSpannedLayerElementsParams.m_elements, layersN };
 }
 
-Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spanningType)
+void Slur::AddSpannedElements(
+    FloatingCurvePositioner *curve, const SpannedElements &spanned, Staff *staff, int xMin, int xMax)
+{
+    Staff *startStaff = this->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+    Staff *endStaff = this->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+    if (startStaff && endStaff && (startStaff->GetN() != endStaff->GetN())) {
+        curve->SetCrossStaff(endStaff);
+    }
+
+    curve->ClearSpannedElements();
+    for (auto element : spanned.elements) {
+        const int xLeft = element->GetSelfLeft();
+        const int xRight = element->GetSelfRight();
+        if (((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax))) {
+            CurveSpannedElement *spannedElement = new CurveSpannedElement();
+            spannedElement->m_boundingBox = element;
+            spannedElement->m_isBelow = this->IsElementBelow(element, startStaff, endStaff);
+            curve->AddSpannedElement(spannedElement);
+        }
+
+        if (!curve->IsCrossStaff() && element->m_crossStaff) {
+            curve->SetCrossStaff(element->m_crossStaff);
+        }
+    }
+
+    // Ties can be broken across systems, so we have to look for all floating curve positioners that represent them.
+    // This might be refined later, since using the entire bounding box of a tie for collision avoidance with slurs is
+    // coarse.
+    ArrayOfFloatingPositioners tiePositioners = staff->GetAlignment()->FindAllFloatingPositioners(TIE);
+    if (startStaff && (startStaff != staff) && startStaff->GetAlignment()) {
+        const ArrayOfFloatingPositioners startTiePositioners
+            = startStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
+        std::copy(startTiePositioners.begin(), startTiePositioners.end(), std::back_inserter(tiePositioners));
+    }
+    else if (endStaff && (endStaff != staff) && endStaff->GetAlignment()) {
+        const ArrayOfFloatingPositioners endTiePositioners = endStaff->GetAlignment()->FindAllFloatingPositioners(TIE);
+        std::copy(endTiePositioners.begin(), endTiePositioners.end(), std::back_inserter(tiePositioners));
+    }
+
+    // Only consider ties in collision layers
+    tiePositioners.erase(std::remove_if(tiePositioners.begin(), tiePositioners.end(),
+                             [&spanned](FloatingPositioner *positioner) {
+                                 TimeSpanningInterface *interface = positioner->GetObject()->GetTimeSpanningInterface();
+                                 assert(interface);
+                                 const bool startsInCollisionLayer
+                                     = (spanned.layersN.count(interface->GetStart()->GetOriginalLayerN()) > 0);
+                                 const bool endsInCollisionLayer
+                                     = (spanned.layersN.count(interface->GetEnd()->GetOriginalLayerN()) > 0);
+                                 return (!startsInCollisionLayer && !endsInCollisionLayer);
+                             }),
+        tiePositioners.end());
+
+    // Add ties to spanning elements
+    for (FloatingPositioner *positioner : tiePositioners) {
+        if (positioner->GetAlignment()->GetParentSystem() == curve->GetAlignment()->GetParentSystem()) {
+            if (positioner->HasContentBB() && (positioner->GetContentRight() > xMin)
+                && (positioner->GetContentLeft() < xMax)) {
+                CurveSpannedElement *spannedElement = new CurveSpannedElement();
+                spannedElement->m_boundingBox = positioner;
+                spannedElement->m_isBelow = this->IsElementBelow(positioner, startStaff, endStaff);
+                curve->AddSpannedElement(spannedElement);
+            }
+        }
+    }
+}
+
+Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax)
 {
     Staff *extremalStaff = staff;
 
     const SlurCurveDirection curveDir = this->GetDrawingCurveDir();
-    const std::vector<LayerElement *> spannedElements = this->CollectSpannedElements(staff, xMin, xMax, spanningType);
+    const SpannedElements spanned = this->CollectSpannedElements(staff, xMin, xMax);
 
     // The floating curve positioner of cross staff slurs should live in the lower/upper staff alignment
     // corresponding to whether the slur is curved below or not
@@ -306,10 +370,10 @@ Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spann
     };
 
     // Run once through all spanned elements
-    std::for_each(spannedElements.begin(), spannedElements.end(), adaptStaff);
+    std::for_each(spanned.elements.begin(), spanned.elements.end(), adaptStaff);
 
     // Also check the beams of spanned elements
-    std::for_each(spannedElements.begin(), spannedElements.end(), [&adaptStaff](LayerElement *element) {
+    std::for_each(spanned.elements.begin(), spanned.elements.end(), [&adaptStaff](LayerElement *element) {
         if (Beam *beam = element->IsInBeam(); beam) {
             adaptStaff(beam);
         }
