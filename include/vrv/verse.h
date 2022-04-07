@@ -62,14 +62,14 @@ public:
     int AdjustSylSpacing(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareProcessingLists
+     * See Object::InitProcessingLists
      */
-    int PrepareProcessingLists(FunctorParams *functorParams) override;
+    int InitProcessingLists(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
 private:
     //

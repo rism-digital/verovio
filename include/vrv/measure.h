@@ -339,9 +339,9 @@ public:
     int AlignVertically(FunctorParams *functorParams) override;
 
     /**
-     * See Object::SetAlignmentXPos
+     * See Object::CalcAlignmentXPos
      */
-    int SetAlignmentXPos(FunctorParams *functorParams) override;
+    int CalcAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustArpeg
@@ -414,19 +414,19 @@ public:
     int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
-     * See Object::InitSelection
+     * See Object::CastOffToSelection
      */
-    int InitSelection(FunctorParams *) override;
+    int CastOffToSelection(FunctorParams *) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::FillStaffCurrentTimeSpanningEnd
+     * See Object::PrepareStaffCurrentTimeSpanningEnd
      */
-    int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
+    int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareCrossStaff
@@ -457,9 +457,9 @@ public:
     int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareMIDI
+     * See Object::InitMIDI
      */
-    int PrepareMIDI(FunctorParams *functorParams) override;
+    int InitMIDI(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI
@@ -475,14 +475,14 @@ public:
      * See Object::CalcMaxMeasureDuration
      */
     ///@{
-    int CalcMaxMeasureDuration(FunctorParams *functorParams) override;
-    int CalcMaxMeasureDurationEnd(FunctorParams *functorParams) override;
+    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
+    int InitMaxMeasureDurationEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
-     * See Object::CalcOnsetOffset
+     * See Object::InitOnsetOffset
      */
-    int CalcOnsetOffset(FunctorParams *functorParams) override;
+    int InitOnsetOffset(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimestamps
@@ -495,9 +495,9 @@ public:
     int UnCastOff(FunctorParams *functorParams) override;
 
     /**
-     * See Object::HorizontalLayoutCache
+     * See Object::CacheHorizontalLayout
      */
-    int HorizontalLayoutCache(FunctorParams *functorParams) override;
+    int CacheHorizontalLayout(FunctorParams *functorParams) override;
 
 public:
     // flags for drawing measure barline based on visibility or other conditions

@@ -1156,9 +1156,9 @@ int Measure::AdjustXOverflow(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::SetAlignmentXPos(FunctorParams *functorParams)
+int Measure::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     m_measureAligner.Process(params->m_functor, params);
@@ -1206,7 +1206,7 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::ResetDrawing(FunctorParams *functorParams)
+int Measure::ResetData(FunctorParams *functorParams)
 {
     m_timestampAligner.Reset();
     m_drawingEnding = NULL;
@@ -1283,9 +1283,9 @@ int Measure::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::InitSelection(FunctorParams *functorParams)
+int Measure::CastOffToSelection(FunctorParams *functorParams)
 {
-    InitSelectionParams *params = vrv_params_cast<InitSelectionParams *>(functorParams);
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
     assert(params);
 
     const bool startSelection = (!params->m_isSelection && this->GetUuid() == params->m_start);
@@ -1313,9 +1313,10 @@ int Measure::InitSelection(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
+int Measure::PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
 {
-    FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    PrepareStaffCurrentTimeSpanningParams *params
+        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
@@ -1572,9 +1573,9 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareMIDI(FunctorParams *functorParams)
+int Measure::InitMIDI(FunctorParams *functorParams)
 {
-    PrepareMIDIParams *params = vrv_params_cast<PrepareMIDIParams *>(functorParams);
+    InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);
     assert(params);
 
     params->m_currentTempo = m_currentTempo;
@@ -1612,9 +1613,9 @@ int Measure::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
+int Measure::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     m_scoreTimeOffset.clear();
@@ -1627,9 +1628,9 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
+int Measure::InitMaxMeasureDurationEnd(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     const double scoreTimeIncrement
@@ -1642,9 +1643,9 @@ int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcOnsetOffset(FunctorParams *functorParams)
+int Measure::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     params->m_currentTempo = m_currentTempo;
@@ -1666,9 +1667,9 @@ int Measure::UnCastOff(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::HorizontalLayoutCache(FunctorParams *functorParams)
+int Measure::CacheHorizontalLayout(FunctorParams *functorParams)
 {
-    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);
     assert(params);
 
     if (params->m_restore) {
@@ -1679,8 +1680,8 @@ int Measure::HorizontalLayoutCache(FunctorParams *functorParams)
         m_cachedOverflow = this->GetDrawingOverflow();
         m_cachedXRel = m_drawingXRel;
     }
-    if (this->GetLeftBarLine()) this->GetLeftBarLine()->HorizontalLayoutCache(functorParams);
-    if (this->GetRightBarLine()) this->GetRightBarLine()->HorizontalLayoutCache(functorParams);
+    if (this->GetLeftBarLine()) this->GetLeftBarLine()->CacheHorizontalLayout(functorParams);
+    if (this->GetRightBarLine()) this->GetRightBarLine()->CacheHorizontalLayout(functorParams);
 
     return FUNCTOR_CONTINUE;
 }

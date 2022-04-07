@@ -580,9 +580,9 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
     if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
 
     // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(params->m_doc);
-    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(params->m_doc);
+    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
+    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
 
     CalcStemParams calcStemParams(params->m_doc);
     Functor calcStem(&Object::CalcStem);
@@ -880,8 +880,8 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ Prepare the drawing cue size ************/
 
-    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
+    Functor prepareCueSize(&Object::PrepareCueSize);
+    this->Process(&prepareCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
 }
@@ -897,9 +897,9 @@ int Chord::PrepareLyrics(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
+int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     LayerElement *element = this->ThisOrSameasAsLink();
@@ -915,19 +915,19 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::ResetDrawing(FunctorParams *functorParams)
+int Chord::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::AdjustCrossStaffContent(FunctorParams *functorParams)
+int Chord::JustifyYAdjustCrossStaff(FunctorParams *functorParams)
 {
-    AdjustCrossStaffContentParams *params = vrv_params_cast<AdjustCrossStaffContentParams *>(functorParams);
+    JustifyYAdjustCrossStaffParams *params = vrv_params_cast<JustifyYAdjustCrossStaffParams *>(functorParams);
     assert(params);
 
     // Check if chord spreads across several staves

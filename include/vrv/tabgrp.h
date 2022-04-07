@@ -61,9 +61,9 @@ public:
     //----------//
 
     /**
-     * See Object::CalcOnsetOffsetEnd
+     * See Object::InitOnsetOffsetEnd
      */
-    virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
+    virtual int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcStem

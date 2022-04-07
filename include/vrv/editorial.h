@@ -72,9 +72,9 @@ public:
     int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffSystems
@@ -87,9 +87,9 @@ public:
     int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
-     * See Object::InitSelection
+     * See Object::CastOffToSelection
      */
-    int InitSelection(FunctorParams *) override;
+    int CastOffToSelection(FunctorParams *) override;
 
 private:
     //

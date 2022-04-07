@@ -118,8 +118,8 @@ void Doc::Reset()
     m_drawingPage = NULL;
     m_currentScore = NULL;
     m_currentScoreDefDone = false;
-    m_drawingPreparationDone = false;
-    m_MIDITimemapTempo = 0.0;
+    m_dataPreparationDone = false;
+    m_timemapTempo = 0.0;
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = false;
     m_isCastOff = false;
@@ -268,14 +268,14 @@ bool Doc::GenerateMeasureNumbers()
     return true;
 }
 
-bool Doc::HasMidiTimemap() const
+bool Doc::HasTimemap() const
 {
-    return (m_MIDITimemapTempo == m_options->m_midiTempoAdjustment.GetValue());
+    return (m_timemapTempo == m_options->m_midiTempoAdjustment.GetValue());
 }
 
-void Doc::CalculateMidiTimemap()
+void Doc::CalculateTimemap()
 {
-    m_MIDITimemapTempo = 0.0;
+    m_timemapTempo = 0.0;
 
     // This happens if the document was never cast off (breaks none option in the toolkit)
     if (!m_drawingPage && this->GetPageCount() == 1) {
@@ -295,34 +295,34 @@ void Doc::CalculateMidiTimemap()
     }
 
     // We first calculate the maximum duration of each measure
-    CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
-    calcMaxMeasureDurationParams.m_currentTempo = tempo;
-    calcMaxMeasureDurationParams.m_tempoAdjustment = m_options->m_midiTempoAdjustment.GetValue();
-    Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
-    Functor calcMaxMeasureDurationEnd(&Object::CalcMaxMeasureDurationEnd);
-    this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams, &calcMaxMeasureDurationEnd);
+    InitMaxMeasureDurationParams initMaxMeasureDurationParams;
+    initMaxMeasureDurationParams.m_currentTempo = tempo;
+    initMaxMeasureDurationParams.m_tempoAdjustment = m_options->m_midiTempoAdjustment.GetValue();
+    Functor initMaxMeasureDuration(&Object::InitMaxMeasureDuration);
+    Functor initMaxMeasureDurationEnd(&Object::InitMaxMeasureDurationEnd);
+    this->Process(&initMaxMeasureDuration, &initMaxMeasureDurationParams, &initMaxMeasureDurationEnd);
 
     // Then calculate the onset and offset times (w.r.t. the measure) for every note
-    CalcOnsetOffsetParams calcOnsetOffsetParams;
-    Functor calcOnsetOffset(&Object::CalcOnsetOffset);
-    Functor calcOnsetOffsetEnd(&Object::CalcOnsetOffsetEnd);
-    this->Process(&calcOnsetOffset, &calcOnsetOffsetParams, &calcOnsetOffsetEnd);
+    InitOnsetOffsetParams initOnsetOffsetParams;
+    Functor initOnsetOffset(&Object::InitOnsetOffset);
+    Functor initOnsetOffsetEnd(&Object::InitOnsetOffsetEnd);
+    this->Process(&initOnsetOffset, &initOnsetOffsetParams, &initOnsetOffsetEnd);
 
     // Adjust the duration of tied notes
-    Functor resolveMIDITies(&Object::ResolveMIDITies);
-    this->Process(&resolveMIDITies, NULL, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    Functor initTimemapTies(&Object::InitTimemapTies);
+    this->Process(&initTimemapTies, NULL, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
 
-    m_MIDITimemapTempo = m_options->m_midiTempoAdjustment.GetValue();
+    m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }
 
 void Doc::ExportMIDI(smf::MidiFile *midiFile)
 {
 
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateMidiTimemap();
+        CalculateTimemap();
     }
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
     }
 
@@ -335,20 +335,20 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     midiFile->addTempo(0, 0, tempo);
 
     // Capture information for MIDI generation, i.e. from control elements
-    Functor prepareMIDI(&Object::PrepareMIDI);
-    PrepareMIDIParams prepareMIDIParams;
-    prepareMIDIParams.m_currentTempo = tempo;
-    this->Process(&prepareMIDI, &prepareMIDIParams);
+    Functor initMIDI(&Object::InitMIDI);
+    InitMIDIParams initMIDIParams;
+    initMIDIParams.m_currentTempo = tempo;
+    this->Process(&initMIDI, &initMIDIParams);
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
-    PrepareProcessingListsParams prepareProcessingListsParams;
-    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
+    InitProcessingListsParams initProcessingListsParams;
+    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareData)
     // StaffN_LayerN_VerseN_t staffLayerVerseTree;
     // params.push_back(&staffLayerVerseTree);
 
     // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    Functor initProcessingLists(&Object::InitProcessingLists);
+    this->Process(&initProcessingLists, &initProcessingListsParams);
 
     // The tree is used to process each staff/layer/verse separately
     // For this, we use a array of AttNIntegerComparison that looks for each object if it is of the type
@@ -362,8 +362,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     int midiChannel = 0;
     int midiTrack = 1;
     ArrayOfComparisons filters;
-    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+    for (staves = initProcessingListsParams.m_layerTree.child.begin();
+         staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
 
         int transSemi = 0;
         if (StaffDef *staffDef = this->GetCurrentScoreDef()->GetStaffDef(staves->first)) {
@@ -420,7 +420,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;
-            generateMIDIParams.m_deferredNotes = prepareMIDIParams.m_deferredNotes;
+            generateMIDIParams.m_deferredNotes = initMIDIParams.m_deferredNotes;
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);
@@ -430,11 +430,11 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
 bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures)
 {
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateMidiTimemap();
+        CalculateTimemap();
     }
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
         output = "";
         return false;
@@ -451,11 +451,11 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
 
 bool Doc::ExportFeatures(std::string &output, const std::string &options)
 {
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         // generate MIDI timemap before progressing
-        CalculateMidiTimemap();
+        CalculateTimemap();
     }
-    if (!Doc::HasMidiTimemap()) {
+    if (!Doc::HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
         output = "";
         return false;
@@ -469,11 +469,11 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
     return true;
 }
 
-void Doc::PrepareDrawing()
+void Doc::PrepareData()
 {
-    if (m_drawingPreparationDone) {
-        Functor resetDrawing(&Object::ResetDrawing);
-        this->Process(&resetDrawing, NULL);
+    if (m_dataPreparationDone) {
+        Functor resetData(&Object::ResetData);
+        this->Process(&resetData, NULL);
     }
 
     /************ Store default durations ************/
@@ -515,8 +515,8 @@ void Doc::PrepareDrawing()
 
     // Resolve <reh> elements first, since they can be encoded without @startid or @tstamp, but we need one internally
     // for placement
-    Functor resolveRehPosition(&Object::ResolveRehPosition);
-    this->Process(&resolveRehPosition, NULL);
+    Functor prepareRehPosition(&Object::PrepareRehPosition);
+    this->Process(&prepareRehPosition, NULL);
 
     // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
     PrepareTimePointingParams prepareTimePointingParams;
@@ -575,7 +575,7 @@ void Doc::PrepareDrawing()
     // Process plist after all pairs has been collected
     if (!preparePlistParams.m_interfaceUuidTuples.empty()) {
         preparePlistParams.m_fillList = false;
-        Functor processPlist(&Object::ProcessPlist);
+        Functor processPlist(&Object::PrepareProcessPlist);
         this->Process(&processPlist, &preparePlistParams);
 
         for (const auto &[plistInterface, uuid, objectReference] : preparePlistParams.m_interfaceUuidTuples) {
@@ -601,22 +601,22 @@ void Doc::PrepareDrawing()
     /************ Resolve beamspan elements ***********/
 
     FunctorDocParams functorDocParams(this);
-    Functor resolveBeamSpanElements(&Object::ResolveBeamSpanElements);
-    this->Process(&resolveBeamSpanElements, &functorDocParams);
+    Functor prepareBeamSpanElements(&Object::PrepareBeamSpanElements);
+    this->Process(&prepareBeamSpanElements, &functorDocParams);
 
     /************ Prepare processing by staff/layer/verse ************/
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
-    PrepareProcessingListsParams prepareProcessingListsParams;
-    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
+    InitProcessingListsParams initProcessingListsParams;
+    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareData)
     // StaffN_LayerN_VerseN_t staffLayerVerseTree;
     // params.push_back(&staffLayerVerseTree);
 
     // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
     // LogElapsedTimeStart();
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    Functor initProcessingLists(&Object::InitProcessingLists);
+    this->Process(&initProcessingLists, &initProcessingListsParams);
 
     // The tree is used to process each staff/layer/verse separately
     // For this, we use an array of AttNIntegerComparison that looks for each object if it is of the type
@@ -629,8 +629,8 @@ void Doc::PrepareDrawing()
     /************ Resolve some pointers by layer ************/
 
     ArrayOfComparisons filters;
-    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+    for (staves = initProcessingListsParams.m_layerTree.child.begin();
+         staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
@@ -653,8 +653,8 @@ void Doc::PrepareDrawing()
 
     if (!prepareDelayedTurnsParams.m_delayedTurns.empty()) {
         prepareDelayedTurnsParams.m_initMap = false;
-        for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-             staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+        for (staves = initProcessingListsParams.m_layerTree.child.begin();
+             staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
                 filters.clear();
                 // Create ad comparison object for each type / @n
@@ -674,8 +674,8 @@ void Doc::PrepareDrawing()
     /************ Resolve lyric connectors ************/
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
-    for (staves = prepareProcessingListsParams.m_verseTree.child.begin();
-         staves != prepareProcessingListsParams.m_verseTree.child.end(); ++staves) {
+    for (staves = initProcessingListsParams.m_verseTree.child.begin();
+         staves != initProcessingListsParams.m_verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
@@ -702,10 +702,10 @@ void Doc::PrepareDrawing()
 
     // Once <slur>, <ties> and @ties are matched but also syl connectors, we need to set them as running
     // TimeSpanningInterface to each staff they are extended. This does not need to be done staff by staff because we
-    // can just check the staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
-    FillStaffCurrentTimeSpanningParams fillStaffCurrentTimeSpanningParams;
-    Functor fillStaffCurrentTimeSpanning(&Object::FillStaffCurrentTimeSpanning);
-    Functor fillStaffCurrentTimeSpanningEnd(&Object::FillStaffCurrentTimeSpanningEnd);
+    // can just check the staff->GetN to see where we are (see Staff::PrepareStaffCurrentTimeSpanning)
+    PrepareStaffCurrentTimeSpanningParams fillStaffCurrentTimeSpanningParams;
+    Functor fillStaffCurrentTimeSpanning(&Object::PrepareStaffCurrentTimeSpanning);
+    Functor fillStaffCurrentTimeSpanningEnd(&Object::PrepareStaffCurrentTimeSpanningEnd);
     this->Process(&fillStaffCurrentTimeSpanning, &fillStaffCurrentTimeSpanningParams, &fillStaffCurrentTimeSpanningEnd);
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
@@ -717,8 +717,8 @@ void Doc::PrepareDrawing()
     /************ Resolve mRpt ************/
 
     // Process by staff for matching mRpt elements and setting the drawing number
-    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+    for (staves = initProcessingListsParams.m_layerTree.child.begin();
+         staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
@@ -752,8 +752,8 @@ void Doc::PrepareDrawing()
     /************ Resolve cue size ************/
 
     // Prepare the drawing cue size
-    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
+    Functor prepareCueSize(&Object::PrepareCueSize);
+    this->Process(&prepareCueSize, NULL);
 
     /************ Instanciate LayerElement parts (stemp, flag, dots, etc) ************/
 
@@ -817,7 +817,7 @@ void Doc::PrepareDrawing()
 
     // LogElapsedTimeEnd ("Preparing drawing");
 
-    m_drawingPreparationDone = true;
+    m_dataPreparationDone = true;
 }
 
 void Doc::ScoreDefSetCurrentDoc(bool force)
@@ -914,10 +914,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     if (!firstMeasure || !firstMeasure->HasCachedHorizontalLayout()) {
         // LogDebug("Performing the horizontal layout");
         unCastOffPage->LayOutHorizontally();
-        unCastOffPage->HorizontalLayoutCachePage();
+        unCastOffPage->LayOutHorizontallyWithCache();
     }
     else {
-        unCastOffPage->HorizontalLayoutCachePage(true);
+        unCastOffPage->LayOutHorizontallyWithCache(true);
     }
 
     Page *castOffSinglePage = new Page();
@@ -953,7 +953,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 
     // Replace it with the castOffSinglePage
     pages->AddChild(castOffSinglePage);
-    this->ResetDrawingPage();
+    this->ResetDataPage();
     this->SetDrawingPage(0);
 
     bool optimize = false;
@@ -978,7 +978,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     // Detach the contentPage in order to be able call CastOffRunningElements
     pages->DetachChild(0);
     assert(castOffSinglePage && !castOffSinglePage->GetParent());
-    this->ResetDrawingPage();
+    this->ResetDataPage();
 
     for (auto const score : scores) {
         score->CalcRunningElementHeight(this);
@@ -1028,7 +1028,7 @@ void Doc::UnCastOffDoc(bool resetCache)
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
-    this->ResetDrawingPage();
+    this->ResetDataPage();
     this->ScoreDefSetCurrentDoc(true);
 
     m_isCastOff = false;
@@ -1065,7 +1065,7 @@ void Doc::CastOffEncodingDoc()
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
-    this->ResetDrawingPage();
+    this->ResetDataPage();
     this->ScoreDefSetCurrentDoc(true);
 
     // Optimize the doc if one of the score requires optimization
@@ -1077,6 +1077,146 @@ void Doc::CastOffEncodingDoc()
     }
 
     m_isCastOff = true;
+}
+
+void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
+{
+    // No new selection to apply;
+    if (!selection.m_isPending) return;
+
+    if (this->HasSelection()) {
+        this->ResetSelectionDoc(resetCache);
+    }
+
+    selection.Set(this);
+
+    if (!this->HasSelection()) return;
+
+    assert(!m_selectionPreceeding && !m_selectionFollowing);
+
+    if (this->IsCastOff()) this->UnCastOffDoc();
+
+    Pages *pages = this->GetPages();
+    assert(pages);
+
+    this->ScoreDefSetCurrentDoc();
+
+    Page *unCastOffPage = this->SetDrawingPage(0);
+
+    // Make sure we have global slurs curve dir
+    unCastOffPage->ResetAligners();
+
+    // We can now detach and delete the old content page
+    pages->DetachChild(0);
+    assert(unCastOffPage);
+
+    Page *selectionFirstPage = new Page();
+    pages->AddChild(selectionFirstPage);
+
+    CastOffToSelectionParams castOffToSelectionParams(selectionFirstPage, this, m_selectionStart, m_selectionEnd);
+    Functor castOffToSelection(&Object::CastOffToSelection);
+
+    unCastOffPage->Process(&castOffToSelection, &castOffToSelectionParams);
+
+    delete unCastOffPage;
+
+    this->ResetDataPage();
+    this->ScoreDefSetCurrentDoc(true);
+
+    if (pages->GetChildCount() < 2) {
+        LogWarning("Selection could not be made");
+        m_selectionStart = "";
+        m_selectionEnd = "";
+        return;
+    }
+    else if (pages->GetChildCount() == 2) {
+        LogWarning("Selection end '%s' could not be found", m_selectionEnd.c_str());
+        // Add an empty page to make it work
+        pages->AddChild(new Page());
+    }
+
+    this->ReactivateSelection(true);
+}
+
+void Doc::ResetSelectionDoc(bool resetCache)
+{
+    assert(m_selectionPreceeding && m_selectionFollowing);
+
+    m_selectionStart = "";
+    m_selectionEnd = "";
+
+    if (this->IsCastOff()) this->UnCastOffDoc();
+
+    this->DeactiveateSelection();
+
+    this->m_isCastOff = true;
+    this->UnCastOffDoc(resetCache);
+}
+
+bool Doc::HasSelection() const
+{
+    return (!m_selectionStart.empty() && !m_selectionEnd.empty());
+}
+
+void Doc::DeactiveateSelection()
+{
+    Pages *pages = this->GetPages();
+    assert(pages);
+
+    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(0));
+    assert(selectionPage);
+    // We need to delete the selection scoreDef
+    Score *selectionScore = vrv_cast<Score *>(selectionPage->FindDescendantByType(SCORE));
+    assert(selectionScore);
+    if (selectionScore->GetLabel() != "[selectionScore]") LogError("Deleting wrong score element. Something is wrong");
+    selectionPage->DeleteChild(selectionScore);
+
+    m_selectionPreceeding->SetParent(pages);
+    pages->InsertChild(m_selectionPreceeding, 0);
+    pages->AddChild(m_selectionFollowing);
+
+    m_selectionPreceeding = NULL;
+    m_selectionFollowing = NULL;
+}
+
+void Doc::ReactivateSelection(bool resetAligners)
+{
+    Pages *pages = this->GetPages();
+    assert(pages);
+
+    const int lastPage = pages->GetChildCount() - 1;
+    assert(lastPage > 1);
+
+    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(1));
+    System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
+    // Add a selection scoreDef based on the current drawing system scoreDef
+    Score *selectionScore = new Score();
+    selectionScore->SetLabel("[selectionScore]");
+    *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
+    // Use the drawing values as actual scoreDef
+    selectionScore->GetScoreDef()->ResetFromDrawingValues();
+    selectionScore->SetParent(selectionPage);
+    selectionPage->InsertChild(selectionScore, 0);
+
+    m_selectionPreceeding = vrv_cast<Page *>(pages->GetChild(0));
+    // Reset the aligners because data will be accessed when rendering control events outside the selection
+    if (resetAligners && m_selectionPreceeding->FindDescendantByType(MEASURE)) {
+        this->SetDrawingPage(0);
+        m_selectionPreceeding->ResetAligners();
+    }
+
+    m_selectionFollowing = vrv_cast<Page *>(pages->GetChild(lastPage));
+    // Same for the following content
+    if (resetAligners && m_selectionFollowing->FindDescendantByType(MEASURE)) {
+        this->SetDrawingPage(2);
+        m_selectionFollowing->ResetAligners();
+    }
+
+    // Detach the preceeding and following page
+    pages->DetachChild(lastPage);
+    pages->DetachChild(0);
+    // Make sure we do not point to page moved out of the selection
+    this->m_drawingPage = NULL;
 }
 
 void Doc::ConvertToPageBasedDoc()
@@ -1095,7 +1235,7 @@ void Doc::ConvertToPageBasedDoc()
 
     this->AddChild(pages);
 
-    this->ResetDrawingPage();
+    this->ResetDataPage();
 }
 
 void Doc::ConvertToCastOffMensuralDoc(bool castOff)
@@ -1138,11 +1278,11 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
         }
     }
 
-    this->PrepareDrawing();
+    this->PrepareData();
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
-    this->ResetDrawingPage();
+    this->ResetDataPage();
     this->ScoreDefSetCurrentDoc(true);
 }
 
@@ -1169,11 +1309,11 @@ void Doc::ConvertMarkupDoc(bool permanent)
 
         // We need to populate processing lists for processing the document by Layer (for matching @tie) and
         // by Verse (for matching syllable connectors)
-        PrepareProcessingListsParams prepareProcessingListsParams;
+        InitProcessingListsParams initProcessingListsParams;
 
         // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
-        Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-        this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+        Functor initProcessingLists(&Object::InitProcessingLists);
+        this->Process(&initProcessingLists, &initProcessingListsParams);
 
         IntTree_t::iterator staves;
         IntTree_t::iterator layers;
@@ -1183,8 +1323,8 @@ void Doc::ConvertMarkupDoc(bool permanent)
         // Process by layer for matching @tie attribute - we process notes and chords, looking at
         // GetTie values and pitch and oct for matching notes
         ArrayOfComparisons filters;
-        for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-             staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+        for (staves = initProcessingListsParams.m_layerTree.child.begin();
+             staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
                 filters.clear();
                 // Create ad comparison object for each type / @n
@@ -1862,146 +2002,6 @@ ScoreDef *Doc::GetCurrentScoreDef()
 void Doc::SetCurrentScore(Score *score)
 {
     m_currentScore = score;
-}
-
-void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
-{
-    // No new selection to apply;
-    if (!selection.m_isPending) return;
-
-    if (this->HasSelection()) {
-        this->ResetSelectionDoc(resetCache);
-    }
-
-    selection.Set(this);
-
-    if (!this->HasSelection()) return;
-
-    assert(!m_selectionPreceeding && !m_selectionFollowing);
-
-    if (this->IsCastOff()) this->UnCastOffDoc();
-
-    Pages *pages = this->GetPages();
-    assert(pages);
-
-    this->ScoreDefSetCurrentDoc();
-
-    Page *unCastOffPage = this->SetDrawingPage(0);
-
-    // Make sure we have global slurs curve dir
-    unCastOffPage->ResetAligners();
-
-    // We can now detach and delete the old content page
-    pages->DetachChild(0);
-    assert(unCastOffPage);
-
-    Page *selectionFirstPage = new Page();
-    pages->AddChild(selectionFirstPage);
-
-    InitSelectionParams initSelectionParams(selectionFirstPage, this, m_selectionStart, m_selectionEnd);
-    Functor initSelection(&Object::InitSelection);
-
-    unCastOffPage->Process(&initSelection, &initSelectionParams);
-
-    delete unCastOffPage;
-
-    this->ResetDrawingPage();
-    this->ScoreDefSetCurrentDoc(true);
-
-    if (pages->GetChildCount() < 2) {
-        LogWarning("Selection could not be made");
-        m_selectionStart = "";
-        m_selectionEnd = "";
-        return;
-    }
-    else if (pages->GetChildCount() == 2) {
-        LogWarning("Selection end '%s' could not be found", m_selectionEnd.c_str());
-        // Add an empty page to make it work
-        pages->AddChild(new Page());
-    }
-
-    this->ReactivateSelection(true);
-}
-
-void Doc::ResetSelectionDoc(bool resetCache)
-{
-    assert(m_selectionPreceeding && m_selectionFollowing);
-
-    m_selectionStart = "";
-    m_selectionEnd = "";
-
-    if (this->IsCastOff()) this->UnCastOffDoc();
-
-    this->DeactiveateSelection();
-
-    this->m_isCastOff = true;
-    this->UnCastOffDoc(resetCache);
-}
-
-bool Doc::HasSelection() const
-{
-    return (!m_selectionStart.empty() && !m_selectionEnd.empty());
-}
-
-void Doc::DeactiveateSelection()
-{
-    Pages *pages = this->GetPages();
-    assert(pages);
-
-    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(0));
-    assert(selectionPage);
-    // We need to delete the selection scoreDef
-    Score *selectionScore = vrv_cast<Score *>(selectionPage->FindDescendantByType(SCORE));
-    assert(selectionScore);
-    if (selectionScore->GetLabel() != "[selectionScore]") LogError("Deleting wrong score element. Something is wrong");
-    selectionPage->DeleteChild(selectionScore);
-
-    m_selectionPreceeding->SetParent(pages);
-    pages->InsertChild(m_selectionPreceeding, 0);
-    pages->AddChild(m_selectionFollowing);
-
-    m_selectionPreceeding = NULL;
-    m_selectionFollowing = NULL;
-}
-
-void Doc::ReactivateSelection(bool resetAligners)
-{
-    Pages *pages = this->GetPages();
-    assert(pages);
-
-    const int lastPage = pages->GetChildCount() - 1;
-    assert(lastPage > 1);
-
-    Page *selectionPage = vrv_cast<Page *>(pages->GetChild(1));
-    System *system = vrv_cast<System *>(selectionPage->FindDescendantByType(SYSTEM));
-    // Add a selection scoreDef based on the current drawing system scoreDef
-    Score *selectionScore = new Score();
-    selectionScore->SetLabel("[selectionScore]");
-    *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
-    // Use the drawing values as actual scoreDef
-    selectionScore->GetScoreDef()->ResetFromDrawingValues();
-    selectionScore->SetParent(selectionPage);
-    selectionPage->InsertChild(selectionScore, 0);
-
-    m_selectionPreceeding = vrv_cast<Page *>(pages->GetChild(0));
-    // Reset the aligners because data will be accessed when rendering control events outside the selection
-    if (resetAligners && m_selectionPreceeding->FindDescendantByType(MEASURE)) {
-        this->SetDrawingPage(0);
-        m_selectionPreceeding->ResetAligners();
-    }
-
-    m_selectionFollowing = vrv_cast<Page *>(pages->GetChild(lastPage));
-    // Same for the following content
-    if (resetAligners && m_selectionFollowing->FindDescendantByType(MEASURE)) {
-        this->SetDrawingPage(2);
-        m_selectionFollowing->ResetAligners();
-    }
-
-    // Detach the preceeding and following page
-    pages->DetachChild(lastPage);
-    pages->DetachChild(0);
-    // Make sure we do not point to page moved out of the selection
-    this->m_drawingPage = NULL;
 }
 
 //----------------------------------------------------------------------------

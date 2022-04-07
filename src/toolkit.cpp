@@ -691,11 +691,11 @@ bool Toolkit::LoadData(const std::string &data)
 
     // transpose the content if necessary
     if (m_options->m_transpose.IsSet() || m_options->m_transposeMdiv.IsSet()) {
-        m_doc.PrepareDrawing();
+        m_doc.PrepareData();
         m_doc.TransposeDoc();
     }
 
-    m_doc.PrepareDrawing();
+    m_doc.PrepareData();
     m_doc.InitSelectionDoc(m_docSelection, true);
 
     // Convert pseudo-measures into distinct segments based on barLine elements
@@ -1487,9 +1487,9 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     jsonxx::Array restArray;
 
     // Here we need to check that the midi timemap is done
-    if (!m_doc.HasMidiTimemap()) {
+    if (!m_doc.HasTimemap()) {
         // generate MIDI timemap before progressing
-        m_doc.CalculateMidiTimemap();
+        m_doc.CalculateTimemap();
     }
 
     MeasureOnsetOffsetComparison matchMeasureTime(millisec);
@@ -1604,11 +1604,11 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     }
 
     int timeofElement = 0;
-    if (!m_doc.HasMidiTimemap()) {
+    if (!m_doc.HasTimemap()) {
         // generate MIDI timemap before progressing
-        m_doc.CalculateMidiTimemap();
+        m_doc.CalculateTimemap();
     }
-    if (!m_doc.HasMidiTimemap()) {
+    if (!m_doc.HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
     }
     if (element->Is(NOTE)) {
@@ -1659,11 +1659,11 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
     jsonxx::Array realTimeOnsetMilliseconds;
     jsonxx::Array realTimeOffsetMilliseconds;
 
-    if (!m_doc.HasMidiTimemap()) {
+    if (!m_doc.HasTimemap()) {
         // generate MIDI timemap before progressing
-        m_doc.CalculateMidiTimemap();
+        m_doc.CalculateTimemap();
     }
-    if (!m_doc.HasMidiTimemap()) {
+    if (!m_doc.HasTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
         return o.json();
     }
@@ -1707,11 +1707,11 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 
     jsonxx::Object o;
     if (element->Is(NOTE)) {
-        if (!m_doc.HasMidiTimemap()) {
+        if (!m_doc.HasTimemap()) {
             // generate MIDI timemap before progressing
-            m_doc.CalculateMidiTimemap();
+            m_doc.CalculateTimemap();
         }
-        if (!m_doc.HasMidiTimemap()) {
+        if (!m_doc.HasTimemap()) {
             LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
             return o.json();
         }

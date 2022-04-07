@@ -113,10 +113,10 @@ int Turn::PrepareDelayedTurns(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Turn::ResetDrawing(FunctorParams *functorParams)
+int Turn::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    ControlElement::ResetDrawing(functorParams);
+    ControlElement::ResetData(functorParams);
 
     m_drawingEndElement = NULL;
 

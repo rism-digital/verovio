@@ -226,10 +226,10 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FTrem::ResetDrawing(FunctorParams *functorParams)
+int FTrem::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_beamSegment.Reset();
 

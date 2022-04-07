@@ -109,19 +109,19 @@ public:
     ///@}
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::HorizontalLayoutCache
+     * See Object::CacheHorizontalLayout
      */
-    int HorizontalLayoutCache(FunctorParams *functorParams) override;
+    int CacheHorizontalLayout(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareMIDI
+     * See Object::InitMIDI
      */
-    int PrepareMIDI(FunctorParams *functorParams) override;
+    int InitMIDI(FunctorParams *functorParams) override;
 
 protected:
     //

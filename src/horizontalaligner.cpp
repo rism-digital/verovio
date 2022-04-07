@@ -883,9 +883,9 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
+int MeasureAligner::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     // We start a new MeasureAligner
@@ -1260,9 +1260,9 @@ int Alignment::HorizontalSpaceForDuration(
     return intervalXRel;
 }
 
-int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
+int Alignment::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     // Do not set an x pos for anything before the barline (including it)
@@ -1285,7 +1285,7 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
             params->m_doc->GetOptions()->m_spacingLinear.GetValue(),
             params->m_doc->GetOptions()->m_spacingNonLinear.GetValue());
-        // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
+        // LogDebug("CalcAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
 
     MapOfIntGraceAligners::const_iterator iter;

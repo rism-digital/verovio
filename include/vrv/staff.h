@@ -223,9 +223,9 @@ public:
     int CalcLedgerLinesEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::FillStaffCurrentTimeSpanning
+     * See Object::PrepareStaffCurrentTimeSpanning
      */
-    int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
+    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffEncoding
@@ -233,9 +233,9 @@ public:
     int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareRpt
@@ -243,10 +243,10 @@ public:
     int PrepareRpt(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcOnsetOffset
+     * See Object::InitOnsetOffset
      */
     ///@{
-    int CalcOnsetOffset(FunctorParams *functorParams) override;
+    int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**

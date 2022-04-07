@@ -61,11 +61,11 @@ int Dot::PreparePointersByLayer(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Dot::ResetDrawing(FunctorParams *functorParams)
+int Dot::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     m_drawingPreviousElement = NULL;
     m_drawingNextElement = NULL;

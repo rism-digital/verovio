@@ -108,7 +108,7 @@ int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *
     return FUNCTOR_CONTINUE;
 }
 
-int PlistInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+int PlistInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_uuids.clear();
     m_references.clear();

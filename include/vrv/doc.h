@@ -209,17 +209,17 @@ public:
     double GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition);
 
     /**
-     * Prepare the MIDI timemap for MIDI and timemap file export.
+     * Prepare the timemap for MIDI and timemap file export.
      * Run trough all the layers and fill the score-time and performance timing variables.
      */
-    void CalculateMidiTimemap();
+    void CalculateTimemap();
 
     /**
-     * Check to see if the MIDI timemap has already been calculated.  This needs to return
+     * Check to see if the timemap has already been calculated.  This needs to return
      * true before ExportMIDI() or ExportTimemap() can export anything (These two functions
-     * will automatically run CalculateMidiTimemap() if HasMidiTimemap() return false.
+     * will automatically run CalculateTimemap() if HasTimemap() return false.
      */
-    bool HasMidiTimemap() const;
+    bool HasTimemap() const;
 
     /**
      * Export the document to a MIDI file.
@@ -257,11 +257,11 @@ public:
     void ScoreDefSetGrpSymDoc();
 
     /**
-     * Prepare the document for drawing.
-     * This sets drawing pointers and value and needs to be done after loading and any editing.
+     * Prepare the document data.
+     * This sets pointers and value and needs to be done after loading and any editing.
      * For example, it sets the approriate values for the lyrics connectors
      */
-    void PrepareDrawing();
+    void PrepareData();
 
     /**
      * Casts off the entire document.
@@ -359,7 +359,7 @@ public:
      * We need to call this because otherwise looking at the page idx will fail.
      * See Doc::LayOut for an example.
      */
-    void ResetDrawingPage() { m_drawingPage = NULL; }
+    void ResetDataPage() { m_drawingPage = NULL; }
 
     /**
      * Getter to the drawPage. Normally, getting the page should
@@ -575,17 +575,17 @@ private:
     bool m_currentScoreDefDone;
 
     /**
-     * A flag to indicate if the drawing preparation has been done. If yes,
-     * drawing preparation will be reset before being done again.
+     * A flag to indicate if the data preparation has been done. If yes,
+     * data preparation will be reset before being done again.
      */
-    bool m_drawingPreparationDone;
+    bool m_dataPreparationDone;
 
     /**
-     * A flag to indicate that the MIDI timemap has been calculated.  The
+     * A flag to indicate that the timemap has been calculated.  The
      * timemap needs to be prepared before MIDI files or timemap JSON files
      * are generated. Value is 0.0 when no timemap has been generated.
      */
-    double m_MIDITimemapTempo;
+    double m_timemapTempo;
 
     /**
      * A flag to indicate whereas the document contains analytical markup to be converted.

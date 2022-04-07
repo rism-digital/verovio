@@ -394,10 +394,10 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Dots::ResetDrawing(FunctorParams *functorParams)
+int Dots::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_dotLocsByStaff.clear();
     m_isAdjusted = false;
@@ -414,10 +414,10 @@ int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Flag::ResetDrawing(FunctorParams *functorParams)
+int Flag::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_drawingNbFlags = 0;
 
@@ -647,10 +647,10 @@ int Stem::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Stem::ResetDrawing(FunctorParams *functorParams)
+int Stem::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingStemLen = 0;

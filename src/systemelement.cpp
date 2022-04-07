@@ -106,9 +106,9 @@ int SystemElement::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int SystemElement::InitSelection(FunctorParams *functorParams)
+int SystemElement::CastOffToSelection(FunctorParams *functorParams)
 {
-    InitSelectionParams *params = vrv_params_cast<InitSelectionParams *>(functorParams);
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
     assert(params);
 
     MoveItselfTo(params->m_currentSystem);

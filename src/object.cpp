@@ -133,7 +133,7 @@ void Object::CloneReset()
 {
     this->Modify();
     FunctorParams voidParams;
-    this->ResetDrawing(&voidParams);
+    this->ResetData(&voidParams);
 }
 
 Object &Object::operator=(const Object &object)
@@ -1822,7 +1822,7 @@ int Object::PreparePlist(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::ProcessPlist(FunctorParams *functorParams)
+int Object::PrepareProcessPlist(FunctorParams *functorParams)
 {
     PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
     assert(params);
@@ -2137,9 +2137,9 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetOverflowBBoxes(FunctorParams *functorParams)
+int Object::CalcBBoxOverflows(FunctorParams *functorParams)
 {
-    SetOverflowBBoxesParams *params = vrv_params_cast<SetOverflowBBoxesParams *>(functorParams);
+    CalcBBoxOverflowsParams *params = vrv_params_cast<CalcBBoxOverflowsParams *>(functorParams);
     assert(params);
 
     // starting a new staff
@@ -2162,16 +2162,16 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         // set scoreDef attr
         if (currentLayer->GetStaffDefClef()) {
             // System scoreDef clefs are taken into account but treated separately (see below)
-            currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefClef()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetStaffDefKeySig()) {
-            currentLayer->GetStaffDefKeySig()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefKeySig()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetStaffDefMensur()) {
-            currentLayer->GetStaffDefMensur()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefMensur()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetStaffDefMeterSig()) {
-            currentLayer->GetStaffDefMeterSig()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefMeterSig()->CalcBBoxOverflows(params);
         }
         return FUNCTOR_CONTINUE;
     }
@@ -2277,9 +2277,9 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
+int Object::CalcBBoxOverflowsEnd(FunctorParams *functorParams)
 {
-    SetOverflowBBoxesParams *params = vrv_params_cast<SetOverflowBBoxesParams *>(functorParams);
+    CalcBBoxOverflowsParams *params = vrv_params_cast<CalcBBoxOverflowsParams *>(functorParams);
     assert(params);
 
     // starting new layer
@@ -2288,16 +2288,16 @@ int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
         assert(currentLayer);
         // set scoreDef attr
         if (currentLayer->GetCautionStaffDefClef()) {
-            currentLayer->GetCautionStaffDefClef()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefClef()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetCautionStaffDefKeySig()) {
-            currentLayer->GetCautionStaffDefKeySig()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefKeySig()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetCautionStaffDefMensur()) {
-            currentLayer->GetCautionStaffDefMensur()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefMensur()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetCautionStaffDefMeterSig()) {
-            currentLayer->GetCautionStaffDefMeterSig()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefMeterSig()->CalcBBoxOverflows(params);
         }
     }
     return FUNCTOR_CONTINUE;

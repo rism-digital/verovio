@@ -179,21 +179,21 @@ int Syl::PrepareLyrics(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Syl::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
+int Syl::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
+    return TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
 }
 
-int Syl::ResetDrawing(FunctorParams *functorParams)
+int Syl::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_nextWordSyl = NULL;
 
     // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfaceResetDrawing(functorParams, this);
+    return TimeSpanningInterface::InterfaceResetData(functorParams, this);
 }
 
 bool Syl::CreateDefaultZone(Doc *doc)

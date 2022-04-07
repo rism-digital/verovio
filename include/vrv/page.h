@@ -14,7 +14,7 @@
 namespace vrv {
 
 class DeviceContext;
-class PrepareProcessingListsParams;
+class InitProcessingListsParams;
 class RunningElement;
 class Score;
 class Staff;
@@ -114,7 +114,7 @@ public:
      * This should be done in preparation of cast-off which is based on measure positioning.
      * The content of the measures is not laid out and keeps previously cached positioning.
      */
-    void HorizontalLayoutCachePage(bool restore = false);
+    void LayOutHorizontallyWithCache(bool restore = false);
 
     /**
      * Justifiy the content of the page (measures and their content) horizontally
@@ -204,7 +204,7 @@ private:
     /**
      * Adjust the horizontal postition of the syl processing verse by verse
      */
-    void AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc);
+    void AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc);
 
     /**
      * Check whether vertical justification is required for the current page

@@ -815,23 +815,23 @@ int FloatingObject::PrepareTimestamps(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingObject::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
+int FloatingObject::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
-        interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
+        interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
     }
     if (this->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = this->GetLinkingInterface();
         assert(interface);
-        interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
+        interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
     }
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingObject::ResetDrawing(FunctorParams *functorParams)
+int FloatingObject::ResetData(FunctorParams *functorParams)
 {
     // Clear all
     FloatingObject::s_drawingObjectIds.clear();
@@ -841,12 +841,12 @@ int FloatingObject::ResetDrawing(FunctorParams *functorParams)
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
-        return interface->InterfaceResetDrawing(functorParams, this);
+        return interface->InterfaceResetData(functorParams, this);
     }
     else if (this->HasInterface(INTERFACE_TIME_POINT)) {
         TimePointInterface *interface = this->GetTimePointInterface();
         assert(interface);
-        return interface->InterfaceResetDrawing(functorParams, this);
+        return interface->InterfaceResetData(functorParams, this);
     }
     m_drawingGrpId = 0;
     return FUNCTOR_CONTINUE;

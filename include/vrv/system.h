@@ -204,9 +204,9 @@ public:
     int AlignHorizontally(FunctorParams *functorParams) override;
 
     /**
-     * See Object::SetAlignmentXPos
+     * See Object::CalcAlignmentXPos
      */
-    int SetAlignmentXPos(FunctorParams *functorParams) override;
+    int CalcAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::AdjustXOverflow
@@ -317,9 +317,9 @@ public:
     int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
-     * See Object::InitSelection
+     * See Object::CastOffToSelection
      */
-    int InitSelection(FunctorParams *) override;
+    int CastOffToSelection(FunctorParams *) override;
 
     /**
      * See Object::UnCastOff
