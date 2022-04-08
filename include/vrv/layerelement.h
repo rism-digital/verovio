@@ -274,6 +274,11 @@ public:
     virtual data_STEMMODIFIER GetDrawingStemMod() const;
 
     /**
+     * Return true if cross-staff is set
+     */
+    virtual bool HasCrossStaff() { return !!m_crossStaff; }
+
+    /**
      * Convert stem mode to corresponding glyph code
      */
     wchar_t StemModToGlyph(data_STEMMODIFIER stemMod) const;

@@ -1404,6 +1404,19 @@ void BeamSegment::CalcMixedBeamPlace(Staff *staff)
         const int crossStaffN = currentCrossStaff->GetN();
         beamPlaceBelow = currentStaffN <= crossStaffN;
     }
+    else {
+        const auto iter = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
+            [](auto coord) { return coord->m_element->HasCrossStaff(); });
+        if ((iter != m_beamElementCoordRefs.end()) && (*iter)->m_element->Is(CHORD)) {
+            Chord *chord = vrv_cast<Chord *>((*iter)->m_element);
+            Staff *staffAbove = NULL;
+            Staff *staffBelow = NULL;
+            chord->GetCrossStaffExtremes(staffAbove, staffBelow);
+            // change beam direction in case if cross-staff note is located in staff above
+            if (staffAbove) beamPlaceBelow = true;
+            // otherwise just leave default value
+        }
+    }
 
     for (auto coord : m_beamElementCoordRefs) {
         if (it != m_beamElementCoordRefs.end()) {
@@ -1411,11 +1424,14 @@ void BeamSegment::CalcMixedBeamPlace(Staff *staff)
                 coord->m_beamRelativePlace = beamPlaceBelow ? BEAMPLACE_below : BEAMPLACE_above;
             }
             else {
-                coord->m_beamRelativePlace = !beamPlaceBelow ? BEAMPLACE_below : BEAMPLACE_above;
+                coord->m_beamRelativePlace = beamPlaceBelow ? BEAMPLACE_above : BEAMPLACE_below;
             }
         }
-        else {
+        else if (coord->GetStemDir() != BEAMPLACE_NONE) {
             coord->m_beamRelativePlace = (STEMDIRECTION_up == coord->GetStemDir()) ? BEAMPLACE_above : BEAMPLACE_below;
+        }
+        else {
+            coord->m_beamRelativePlace = beamPlaceBelow ? BEAMPLACE_below : BEAMPLACE_above;
         }
     }
 }
