@@ -64,15 +64,25 @@ bool Ligature::IsSupportedChild(Object *child)
 
 Note *Ligature::GetFirstNote()
 {
-    Note *firstNote = vrv_cast<Note *>(this->GetListFront(this));
+    return const_cast<Note *>(std::as_const(*this).GetFirstNote());
+}
+
+const Note *Ligature::GetFirstNote() const
+{
+    const Note *firstNote = vrv_cast<const Note *>(this->GetListFront(this));
     assert(firstNote);
     return firstNote;
 }
 
 Note *Ligature::GetLastNote()
 {
+    return const_cast<Note *>(std::as_const(*this).GetLastNote());
+}
+
+const Note *Ligature::GetLastNote() const
+{
     // The first note is the bottom
-    Note *lastNote = vrv_cast<Note *>(this->GetListBack(this));
+    const Note *lastNote = vrv_cast<const Note *>(this->GetListBack(this));
     assert(lastNote);
     return lastNote;
 }

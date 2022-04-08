@@ -77,7 +77,7 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
-    bool IsLastInNeume(LayerElement *element);
+    bool IsLastInNeume(const LayerElement *element) const;
 
     bool GenerateChildMelodic();
 
@@ -89,7 +89,7 @@ public:
     PitchInterface *GetLowestPitch();
 
 private:
-    int GetPosition(LayerElement *element);
+    int GetPosition(const LayerElement *element) const;
 
 public:
     //----------------//

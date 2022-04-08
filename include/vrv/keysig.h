@@ -58,10 +58,10 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /** Accid number getter */
-    int GetAccidCount();
+    int GetAccidCount() const;
 
     /** Accid type getter */
-    data_ACCIDENTAL_WRITTEN GetAccidType();
+    data_ACCIDENTAL_WRITTEN GetAccidType() const;
 
     /**
      * Fill the map of modified pitches

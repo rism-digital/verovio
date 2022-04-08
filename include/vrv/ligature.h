@@ -52,7 +52,9 @@ public:
      */
     ///@{
     Note *GetFirstNote();
+    const Note *GetFirstNote() const;
     Note *GetLastNote();
+    const Note *GetLastNote() const;
     ///@}
 
     /**

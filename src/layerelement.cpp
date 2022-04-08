@@ -210,22 +210,32 @@ bool LayerElement::IsInLigature() const
 
 FTrem *LayerElement::IsInFTrem()
 {
+    return const_cast<FTrem *>(std::as_const(*this).IsInFTrem());
+}
+
+const FTrem *LayerElement::IsInFTrem() const
+{
     if (!this->Is({ CHORD, NOTE })) return NULL;
-    return dynamic_cast<FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
+    return dynamic_cast<const FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
 }
 
 Beam *LayerElement::IsInBeam()
 {
+    return const_cast<Beam *>(std::as_const(*this).IsInBeam());
+}
+
+const Beam *LayerElement::IsInBeam() const
+{
     if (!this->Is({ CHORD, NOTE, TABGRP, TABDURSYM, STEM })) return NULL;
-    Beam *beamParent = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
+    const Beam *beamParent = vrv_cast<const Beam *>(this->GetFirstAncestor(BEAM));
     if (beamParent != NULL) {
         if (!this->IsGraceNote()) return beamParent;
         // This note is beamed and cue-sized - we will be able to get rid of this once MEI has a better modeling for
         // beamed grace notes
-        LayerElement *graceElement = this;
+        const LayerElement *graceElement = this;
         if (this->Is(STEM)) {
-            graceElement = vrv_cast<LayerElement *>(this->GetFirstAncestor(NOTE));
-            if (!graceElement) graceElement = vrv_cast<LayerElement *>(this->GetFirstAncestor(CHORD));
+            graceElement = vrv_cast<const LayerElement *>(this->GetFirstAncestor(NOTE));
+            if (!graceElement) graceElement = vrv_cast<const LayerElement *>(this->GetFirstAncestor(CHORD));
             assert(graceElement);
         }
         // Make sure the object list is set

@@ -227,7 +227,7 @@ void Chord::FilterList(ArrayOfConstObjects &childList) const
     std::sort(childList.begin(), childList.end(), DiatonicSort());
 }
 
-int Chord::PositionInChord(Note *note)
+int Chord::PositionInChord(const Note *note) const
 {
     const int size = this->GetListSize(this);
     int position = this->GetListIndex(note);
@@ -238,7 +238,7 @@ int Chord::PositionInChord(Note *note)
     return 1;
 }
 
-void Chord::GetYExtremes(int &yMax, int &yMin)
+void Chord::GetYExtremes(int &yMax, int &yMin) const
 {
     // The first note is the bottom
     yMin = this->GetListFront(this)->GetDrawingY();
@@ -246,13 +246,13 @@ void Chord::GetYExtremes(int &yMax, int &yMin)
     yMax = this->GetListBack(this)->GetDrawingY();
 }
 
-int Chord::GetYTop()
+int Chord::GetYTop() const
 {
     // The last note is the top
     return this->GetListBack(this)->GetDrawingY();
 }
 
-int Chord::GetYBottom()
+int Chord::GetYBottom() const
 {
     // The first note is the bottom
     return this->GetListFront(this)->GetDrawingY();
@@ -260,26 +260,36 @@ int Chord::GetYBottom()
 
 Note *Chord::GetTopNote()
 {
-    Note *topNote = vrv_cast<Note *>(this->GetListBack(this));
+    return const_cast<Note *>(std::as_const(*this).GetTopNote());
+}
+
+const Note *Chord::GetTopNote() const
+{
+    const Note *topNote = vrv_cast<const Note *>(this->GetListBack(this));
     assert(topNote);
     return topNote;
 }
 
 Note *Chord::GetBottomNote()
 {
+    return const_cast<Note *>(std::as_const(*this).GetBottomNote());
+}
+
+const Note *Chord::GetBottomNote() const
+{
     // The first note is the bottom
-    Note *bottomNote = vrv_cast<Note *>(this->GetListFront(this));
+    const Note *bottomNote = vrv_cast<const Note *>(this->GetListFront(this));
     assert(bottomNote);
     return bottomNote;
 }
 
-int Chord::GetXMin()
+int Chord::GetXMin() const
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     assert(childList.size() > 0);
 
     int x = -VRV_UNSET;
-    ArrayOfObjects::const_iterator iter = childList.begin();
+    ArrayOfConstObjects::const_iterator iter = childList.begin();
     while (iter != childList.end()) {
         if ((*iter)->GetDrawingX() < x) x = (*iter)->GetDrawingX();
         ++iter;
@@ -287,13 +297,13 @@ int Chord::GetXMin()
     return x;
 }
 
-int Chord::GetXMax()
+int Chord::GetXMax() const
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     assert(childList.size() > 0);
 
     int x = VRV_UNSET;
-    ArrayOfObjects::const_iterator iter = childList.begin();
+    ArrayOfConstObjects::const_iterator iter = childList.begin();
     while (iter != childList.end()) {
         if ((*iter)->GetDrawingX() > x) x = (*iter)->GetDrawingX();
         ++iter;
@@ -338,16 +348,16 @@ bool Chord::HasCrossStaff()
     return ((staffAbove != NULL) || (staffBelow != NULL));
 }
 
-Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
+Point Chord::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
 {
-    Note *bottomNote = this->GetBottomNote();
+    const Note *bottomNote = this->GetBottomNote();
     assert(bottomNote);
     return bottomNote->GetStemUpSE(doc, staffSize, isCueSize);
 }
 
-Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
+Point Chord::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
 {
-    Note *topNote = this->GetTopNote();
+    const Note *topNote = this->GetTopNote();
     assert(topNote);
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
@@ -390,17 +400,17 @@ data_STEMDIRECTION Chord::CalcStemDirection(int verticalCenter)
     return STEMDIRECTION_down;
 }
 
-int Chord::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
+int Chord::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const
 {
     assert(staff);
 
     if (stemDir == STEMDIRECTION_up) {
-        Note *topNote = this->GetTopNote();
+        const Note *topNote = this->GetTopNote();
         assert(topNote);
         return topNote->CalcStemLenInThirdUnits(staff, stemDir);
     }
     else if (stemDir == STEMDIRECTION_down) {
-        Note *bottomNote = this->GetBottomNote();
+        const Note *bottomNote = this->GetBottomNote();
         assert(bottomNote);
         return bottomNote->CalcStemLenInThirdUnits(staff, stemDir);
     }

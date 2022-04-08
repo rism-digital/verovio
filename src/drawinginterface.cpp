@@ -466,7 +466,7 @@ bool BeamDrawingInterface::HasOneStepHeight()
     return (abs(top - bottom) <= 1);
 }
 
-bool BeamDrawingInterface::IsFirstIn(Object *object, LayerElement *element)
+bool BeamDrawingInterface::IsFirstIn(const Object *object, const LayerElement *element) const
 {
     this->GetList(object);
     int position = this->GetPosition(object, element);
@@ -477,7 +477,7 @@ bool BeamDrawingInterface::IsFirstIn(Object *object, LayerElement *element)
     return false;
 }
 
-bool BeamDrawingInterface::IsLastIn(Object *object, LayerElement *element)
+bool BeamDrawingInterface::IsLastIn(const Object *object, const LayerElement *element) const
 {
     const int size = this->GetListSize(object);
     int position = this->GetPosition(object, element);
@@ -488,15 +488,15 @@ bool BeamDrawingInterface::IsLastIn(Object *object, LayerElement *element)
     return false;
 }
 
-int BeamDrawingInterface::GetPosition(Object *object, LayerElement *element)
+int BeamDrawingInterface::GetPosition(const Object *object, const LayerElement *element) const
 {
     this->GetList(object);
     int position = this->GetListIndex(element);
     // Check if this is a note in the chord
     if ((position == -1) && (element->Is(NOTE))) {
-        Note *note = vrv_cast<Note *>(element);
+        const Note *note = vrv_cast<const Note *>(element);
         assert(note);
-        Chord *chord = note->IsChordTone();
+        const Chord *chord = note->IsChordTone();
         if (chord) position = this->GetListIndex(chord);
     }
     return position;
@@ -616,7 +616,7 @@ void StaffDefDrawingInterface::SetCurrentMeterSigGrp(MeterSigGrp const *meterSig
     }
 }
 
-bool StaffDefDrawingInterface::DrawMeterSigGrp()
+bool StaffDefDrawingInterface::DrawMeterSigGrp() const
 {
     if (m_drawMeterSigGrp) {
         const int childListSize = m_currentMeterSigGrp.GetListSize(&m_currentMeterSigGrp);
@@ -662,7 +662,7 @@ void StemmedDrawingInterface::SetDrawingStemDir(data_STEMDIRECTION stemDir)
     if (m_drawingStem) m_drawingStem->SetDrawingStemDir(stemDir);
 }
 
-data_STEMDIRECTION StemmedDrawingInterface::GetDrawingStemDir()
+data_STEMDIRECTION StemmedDrawingInterface::GetDrawingStemDir() const
 {
     if (m_drawingStem) return m_drawingStem->GetDrawingStemDir();
     return STEMDIRECTION_NONE;
@@ -673,7 +673,7 @@ void StemmedDrawingInterface::SetDrawingStemLen(int stemLen)
     if (m_drawingStem) m_drawingStem->SetDrawingStemLen(stemLen);
 }
 
-int StemmedDrawingInterface::GetDrawingStemLen()
+int StemmedDrawingInterface::GetDrawingStemLen() const
 {
     if (m_drawingStem) return m_drawingStem->GetDrawingStemLen();
     return 0;

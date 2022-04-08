@@ -346,7 +346,7 @@ void Note::SetCluster(ChordCluster *cluster, int position)
     m_clusterPosition = position;
 }
 
-Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
+Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
@@ -379,7 +379,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
+Point Note::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
@@ -411,7 +411,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
+int Note::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const
 {
     assert(staff);
 

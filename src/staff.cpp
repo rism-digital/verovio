@@ -198,7 +198,7 @@ bool Staff::DrawingIsVisible()
     return (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN);
 }
 
-bool Staff::IsMensural()
+bool Staff::IsMensural() const
 {
     bool isMensural
         = (m_drawingNotationType == NOTATIONTYPE_mensural || m_drawingNotationType == NOTATIONTYPE_mensural_white
@@ -206,13 +206,13 @@ bool Staff::IsMensural()
     return isMensural;
 }
 
-bool Staff::IsNeume()
+bool Staff::IsNeume() const
 {
     bool isNeume = (m_drawingNotationType == NOTATIONTYPE_neume);
     return isNeume;
 }
 
-bool Staff::IsTablature()
+bool Staff::IsTablature() const
 {
     bool isTablature = (m_drawingNotationType == NOTATIONTYPE_tab || m_drawingNotationType == NOTATIONTYPE_tab_guitar
         || m_drawingNotationType == NOTATIONTYPE_tab_lute_italian
@@ -221,7 +221,7 @@ bool Staff::IsTablature()
     return isTablature;
 }
 
-bool Staff::IsTabWithStemsOutside()
+bool Staff::IsTabWithStemsOutside() const
 {
     if (!m_drawingStaffDef) return false;
     // Temporary implementation looking at staffDef@type

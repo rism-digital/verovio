@@ -83,24 +83,26 @@ public:
     /**
      * Return the maximum and minimum Y positions of the notes in the chord
      */
-    void GetYExtremes(int &yMax, int &yMin);
+    void GetYExtremes(int &yMax, int &yMin) const;
 
     /**
      * Return the top or bottom note or their Y position
      */
     ///@{
     Note *GetTopNote();
+    const Note *GetTopNote() const;
     Note *GetBottomNote();
-    int GetYTop();
-    int GetYBottom();
+    const Note *GetBottomNote() const;
+    int GetYTop() const;
+    int GetYBottom() const;
     ///@}
 
     /**
      * Return min or max note X position
      */
     ///@{
-    int GetXMin();
-    int GetXMax();
+    int GetXMin() const;
+    int GetXMax() const;
     ///@}
 
     /**
@@ -124,7 +126,7 @@ public:
      */
     ///@{
     /** Return 0 if the note is the middle note, -1 if below it and 1 if above */
-    int PositionInChord(Note *note);
+    int PositionInChord(const Note *note) const;
     ///@}
 
     /**
@@ -132,9 +134,9 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize) override;
-    Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize) override;
-    int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) override;
+    Point GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const override;
+    Point GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const override;
+    int CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const override;
     ///@}
 
     /**

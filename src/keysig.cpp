@@ -120,7 +120,7 @@ void KeySig::FilterList(ArrayOfConstObjects &childList) const
     }
 }
 
-int KeySig::GetAccidCount()
+int KeySig::GetAccidCount() const
 {
     const int childListSize = this->GetListSize(this); // make sure it's initialized
     if (childListSize > 0) {
@@ -132,12 +132,12 @@ int KeySig::GetAccidCount()
     return (this->GetSig().first);
 }
 
-data_ACCIDENTAL_WRITTEN KeySig::GetAccidType()
+data_ACCIDENTAL_WRITTEN KeySig::GetAccidType() const
 {
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     if (childList.size() > 0) {
         if (m_mixedChildrenAccidType) return ACCIDENTAL_WRITTEN_NONE;
-        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(childList.at(0));
+        const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(childList.at(0));
         assert(keyAccid);
         return keyAccid->GetAccid();
     }

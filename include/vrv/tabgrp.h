@@ -51,9 +51,11 @@ public:
      */
     ///@{
     Note *GetTopNote();
+    const Note *GetTopNote() const;
     Note *GetBottomNote();
-    int GetYTop();
-    int GetYBottom();
+    const Note *GetBottomNote() const;
+    int GetYTop() const;
+    int GetYBottom() const;
     ///@}
 
     //----------//
