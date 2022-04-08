@@ -1408,9 +1408,9 @@ void BeamSegment::CalcMixedBeamPlace(Staff *staff)
         const auto iter = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
             [](auto coord) { return coord->m_element->HasCrossStaff(); });
         if ((iter != m_beamElementCoordRefs.end()) && (*iter)->m_element->Is(CHORD)) {
-            Chord* chord = vrv_cast<Chord*>((*iter)->m_element);
-            Staff* staffAbove = NULL;
-            Staff* staffBelow = NULL;
+            Chord *chord = vrv_cast<Chord *>((*iter)->m_element);
+            Staff *staffAbove = NULL;
+            Staff *staffBelow = NULL;
             chord->GetCrossStaffExtremes(staffAbove, staffBelow);
             // change beam direction in case if cross-staff note is located in staff above
             if (staffAbove) beamPlaceBelow = true;
