@@ -982,14 +982,17 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     Note *startNote = NULL;
     LayerElement *start = this->GetStart();
     Chord *startChord = NULL;
+    bool hasStartFlag = false;
     if (start->Is(NOTE)) {
         startNote = vrv_cast<Note *>(start);
         assert(startNote);
         startChord = startNote->IsChordTone();
+        hasStartFlag = (startNote->FindDescendantByType(FLAG) != NULL);
     }
     else if (start->Is(CHORD)) {
         startChord = vrv_cast<Chord *>(start);
         assert(startChord);
+        hasStartFlag = (startChord->FindDescendantByType(FLAG) != NULL);
     }
 
     // Pointers for the end point of the slur
@@ -1056,7 +1059,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             // same but in beam - adjust the x too
             else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
                 || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
-                || isGraceToNoteSlur) {
+                || isGraceToNoteSlur || hasStartFlag) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
                 x1 += startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -1106,7 +1109,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             }
             // same but in beam
             else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
-                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))) {
+                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start)) || hasStartFlag) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                 x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
