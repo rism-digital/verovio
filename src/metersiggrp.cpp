@@ -78,10 +78,10 @@ void MeterSigGrp::AddAlternatingMeasureToVector(Measure *measure)
     m_alternatingMeasures.emplace_back(measure);
 }
 
-MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
+MeterSig *MeterSigGrp::GetSimplifiedMeterSig() const
 {
     MeterSig *newMeterSig = NULL;
-    const ArrayOfObjects &childList = this->GetList(this);
+    const ArrayOfConstObjects &childList = this->GetList(this);
     switch (this->GetFunc()) {
         // For alternating meterSig group alternate between children sequentially
         case meterSigGrpLog_FUNC_alternating: {
@@ -92,16 +92,18 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
         // For interchanging meterSig group select the largest signature, but make sure to align unit with the shortest
         case meterSigGrpLog_FUNC_interchanging: {
             // Get element with highest count
-            auto it = std::max_element(childList.begin(), childList.end(), [](Object *firstObj, Object *secondObj) {
-                MeterSig *firstMeterSig = vrv_cast<MeterSig *>(firstObj);
-                MeterSig *secondMeterSig = vrv_cast<MeterSig *>(secondObj);
-                const double firstRatio = (double)firstMeterSig->GetTotalCount() / (double)firstMeterSig->GetUnit();
-                const double secondRatio = (double)secondMeterSig->GetTotalCount() / (double)secondMeterSig->GetUnit();
-                return firstRatio < secondRatio;
-            });
+            auto it = std::max_element(
+                childList.begin(), childList.end(), [](const Object *firstObj, const Object *secondObj) {
+                    const MeterSig *firstMeterSig = vrv_cast<const MeterSig *>(firstObj);
+                    const MeterSig *secondMeterSig = vrv_cast<const MeterSig *>(secondObj);
+                    const double firstRatio = (double)firstMeterSig->GetTotalCount() / (double)firstMeterSig->GetUnit();
+                    const double secondRatio
+                        = (double)secondMeterSig->GetTotalCount() / (double)secondMeterSig->GetUnit();
+                    return firstRatio < secondRatio;
+                });
             int maxUnit = 0;
-            std::for_each(childList.begin(), childList.end(), [&maxUnit](Object *obj) {
-                MeterSig *meterSig = vrv_cast<MeterSig *>(obj);
+            std::for_each(childList.begin(), childList.end(), [&maxUnit](const Object *obj) {
+                const MeterSig *meterSig = vrv_cast<const MeterSig *>(obj);
                 if (meterSig->GetUnit() > maxUnit) maxUnit = meterSig->GetUnit();
             });
 
@@ -126,7 +128,7 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
                     LogWarning("Skipping over non-meterSig child of <MeterSigGrp>");
                     continue;
                 }
-                MeterSig *meterSig = vrv_cast<MeterSig *>(object);
+                const MeterSig *meterSig = vrv_cast<const MeterSig *>(object);
                 if (!newMeterSig) {
                     newMeterSig = vrv_cast<MeterSig *>(meterSig->Clone());
                 }

@@ -109,18 +109,17 @@ void StaffGrp::FilterList(ArrayOfConstObjects &childList) const
     }
 }
 
-int StaffGrp::GetMaxStaffSize()
+int StaffGrp::GetMaxStaffSize() const
 {
-    this->ResetList(this);
-    const ArrayOfObjects &childList = this->GetList(this);
+    const ArrayOfConstObjects &childList = this->GetList(this);
 
     if (childList.empty()) return 100;
 
     int max = 0;
 
-    StaffDef *staffDef = NULL;
+    const StaffDef *staffDef = NULL;
     for (auto &child : childList) {
-        staffDef = vrv_cast<StaffDef *>(child);
+        staffDef = vrv_cast<const StaffDef *>(child);
         assert(staffDef);
         if (staffDef->HasScale() && staffDef->GetScale() >= max) {
             max = staffDef->GetScale();

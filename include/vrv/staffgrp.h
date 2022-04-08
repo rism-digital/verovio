@@ -72,7 +72,7 @@ public:
     /**
      * Return the maximum staff size in the staffGrp (100 if empty)
      */
-    int GetMaxStaffSize();
+    int GetMaxStaffSize() const;
 
     /**
      * @name Setter and getter of the group symbol

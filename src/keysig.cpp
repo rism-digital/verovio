@@ -147,14 +147,14 @@ data_ACCIDENTAL_WRITTEN KeySig::GetAccidType() const
     return (this->GetSig().second);
 }
 
-void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid)
+void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
 {
     mapOfPitchAccid.clear();
 
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     if (childList.size() > 0) {
         for (auto &child : childList) {
-            KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
+            const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
             assert(keyAccid);
             mapOfPitchAccid[keyAccid->GetPname()] = keyAccid->GetAccid();
         }
@@ -168,16 +168,16 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid)
     }
 }
 
-std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname)
+std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname) const
 {
     pname = PITCHNAME_c;
     accid = ACCIDENTAL_WRITTEN_s;
     std::wstring symbolStr = L"";
 
-    const ArrayOfObjects &childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     if (childList.size() > 0) {
         if ((int)childList.size() <= pos) return symbolStr;
-        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(childList.at(pos));
+        const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(childList.at(pos));
         assert(keyAccid);
         accid = keyAccid->GetAccid();
         pname = keyAccid->GetPname();

@@ -142,7 +142,7 @@ public:
     /**
      * Check if the chord or one of its children is visible
      */
-    bool IsVisible();
+    bool IsVisible() const;
 
     /**
      * Return true if the chord has two notes with 1 diatonic step difference in the specific staff
@@ -152,7 +152,7 @@ public:
     /**
      * Return true if the chord has at least one note with a @dots > 0
      */
-    bool HasNoteWithDots();
+    bool HasNoteWithDots() const;
 
     /**
      * Helper to adjust overlapping layers for chords
@@ -257,7 +257,7 @@ protected:
      * Calculate stem direction based on the position of the notes in chord. Notes are compared in pairs starting from
      * the top-/bottommost and moving inward towards the center of the chord
      */
-    data_STEMDIRECTION CalcStemDirection(int verticalCenter);
+    data_STEMDIRECTION CalcStemDirection(int verticalCenter) const;
 
     /**
      * Clear the m_clusters vector and delete all the objects.

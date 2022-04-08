@@ -74,12 +74,12 @@ public:
     /**
      * Return true if the note or rest is the first of a beam.
      */
-    bool IsFirstInBeam(LayerElement *noteOrRest);
+    bool IsFirstInBeam(const LayerElement *noteOrRest) const;
 
     /**
      * Return true if the note or rest is the last of a beam.
      */
-    bool IsLastInBeam(LayerElement *noteOrRest);
+    bool IsLastInBeam(const LayerElement *noteOrRest) const;
 
     /**
      * @name Return the actual (gestural) duration of the note, for both CMN and mensural durations

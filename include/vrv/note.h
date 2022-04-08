@@ -217,7 +217,7 @@ public:
     /**
      * Check if a note or its parent chord are visible
      */
-    bool IsVisible();
+    bool IsVisible() const;
 
     /**
      * MIDI pitch

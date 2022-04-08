@@ -66,14 +66,14 @@ public:
     /**
      * Fill the map of modified pitches
      */
-    void FillMap(MapOfPitchAccid &mapOfPitchAccid);
+    void FillMap(MapOfPitchAccid &mapOfPitchAccid) const;
 
     /**
      * Return the string of the alteration at the positon pos.
      * Looks at keyAccid children if any.
      * The accid at pos is return in accid and the pname in pname.
      */
-    std::wstring GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname);
+    std::wstring GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname) const;
 
     int GetFifthsInt() const;
 

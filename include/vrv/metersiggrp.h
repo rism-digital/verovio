@@ -70,7 +70,7 @@ public:
     /**
      * Get simplified (i.e. single metersig with count/unit) based on the MeterSigGrp function
      */
-    MeterSig *GetSimplifiedMeterSig();
+    MeterSig *GetSimplifiedMeterSig() const;
 
     /**
      * Set counter for the alternating meterSigGrp based on the provided measureId

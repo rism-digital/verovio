@@ -362,10 +362,10 @@ Point Chord::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
-data_STEMDIRECTION Chord::CalcStemDirection(int verticalCenter)
+data_STEMDIRECTION Chord::CalcStemDirection(int verticalCenter) const
 {
-    const ArrayOfObjects &childList = this->GetList(this);
-    ArrayOfObjects topNotes, bottomNotes;
+    const ArrayOfConstObjects &childList = this->GetList(this);
+    ArrayOfConstObjects topNotes, bottomNotes;
 
     // split notes into two vectors - notes above vertical center and below
     std::partition_copy(childList.begin(), childList.end(), std::back_inserter(topNotes),
@@ -419,17 +419,17 @@ int Chord::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDi
     }
 }
 
-bool Chord::IsVisible()
+bool Chord::IsVisible() const
 {
     if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;
     }
 
     // if the chord doesn't have it, see if all the children are invisible
-    const ArrayOfObjects &notes = this->GetList(this);
+    const ArrayOfConstObjects &notes = this->GetList(this);
 
     for (auto &iter : notes) {
-        Note *note = vrv_cast<Note *>(iter);
+        const Note *note = vrv_cast<const Note *>(iter);
         assert(note);
         if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
             return true;
@@ -456,12 +456,12 @@ bool Chord::HasAdjacentNotesInStaff(Staff *staff)
     return (diff.end() != std::find(std::next(diff.begin()), diff.end(), 1));
 }
 
-bool Chord::HasNoteWithDots()
+bool Chord::HasNoteWithDots() const
 {
-    const ArrayOfObjects &notes = this->GetList(this);
+    const ArrayOfConstObjects &notes = this->GetList(this);
 
-    return std::any_of(notes.cbegin(), notes.cend(), [](Object *object) {
-        Note *note = vrv_cast<Note *>(object);
+    return std::any_of(notes.cbegin(), notes.cend(), [](const Object *object) {
+        const Note *note = vrv_cast<const Note *>(object);
         assert(note);
         return (note->GetDots() > 0);
     });
