@@ -82,11 +82,11 @@ wchar_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Custos::ResetDrawing(FunctorParams *functorParams)
+int Custos::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

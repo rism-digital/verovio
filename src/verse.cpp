@@ -232,9 +232,9 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Verse::PrepareProcessingLists(FunctorParams *functorParams)
+int Verse::InitProcessingLists(FunctorParams *functorParams)
 {
-    PrepareProcessingListsParams *params = vrv_params_cast<PrepareProcessingListsParams *>(functorParams);
+    InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);
     assert(params);
     // StaffN_LayerN_VerseN_t *tree = vrv_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 
@@ -249,10 +249,10 @@ int Verse::PrepareProcessingLists(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Verse::ResetDrawing(FunctorParams *functorParams)
+int Verse::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_drawingLabelAbbr = NULL;
 

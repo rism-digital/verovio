@@ -111,11 +111,11 @@ int Ending::PrepareMilestones(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Ending::ResetDrawing(FunctorParams *functorParams)
+int Ending::ResetData(FunctorParams *functorParams)
 {
-    FloatingObject::ResetDrawing(functorParams);
+    FloatingObject::ResetData(functorParams);
 
-    this->SystemMilestoneInterface::InterfaceResetDrawing(functorParams);
+    this->SystemMilestoneInterface::InterfaceResetData(functorParams);
 
     return FUNCTOR_CONTINUE;
 }

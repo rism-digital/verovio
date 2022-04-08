@@ -597,8 +597,8 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ Prepare the drawing cue size ************/
 
-    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
+    Functor prepareCueSize(&Object::PrepareCueSize);
+    this->Process(&prepareCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
 }
@@ -657,11 +657,11 @@ int Rest::CalcDots(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Rest::ResetDrawing(FunctorParams *functorParams)
+int Rest::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

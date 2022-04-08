@@ -40,7 +40,7 @@ public:
 
     /**
      * @name Setter and getter for the drawing staff loc.
-     * This is set by the SetAlignmentPitchPos functor.
+     * This is set by the CalcAlignmentPitchPos functor.
      */
     ///@{
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
@@ -60,12 +60,12 @@ public:
     //-----------------//
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
+    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
     virtual int InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object);
 

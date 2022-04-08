@@ -267,11 +267,11 @@ wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Accid::ResetDrawing(FunctorParams *functorParams)
+int Accid::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

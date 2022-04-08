@@ -332,10 +332,10 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Ligature::ResetDrawing(FunctorParams *functorParams)
+int Ligature::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_drawingShapes.clear();
 

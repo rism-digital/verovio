@@ -98,6 +98,7 @@ public:
         m_pointSize = 0;
         m_actualWidth = 0;
         m_enclose = TEXTRENDITION_NONE;
+        m_textEnclose = ENCLOSURE_NONE;
     }
     virtual ~TextDrawingParams(){};
 
@@ -115,6 +116,7 @@ public:
     int m_pointSize;
     std::vector<TextElement *> m_enclosedRend;
     data_TEXTRENDITION m_enclose;
+    data_ENCLOSURE m_textEnclose;
 };
 
 } // namespace vrv

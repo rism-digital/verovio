@@ -52,30 +52,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     const int yNote = element->GetDrawingY();
     const int xNote = element->GetDrawingX();
     const int drawingDur = note->GetDrawingDur();
-    const int radius = note->GetDrawingRadius(m_doc);
-    const int staffY = staff->GetDrawingY();
     const bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-
-    /************** Stem/notehead direction: **************/
-
-    data_STEMDIRECTION layerStemDir;
-    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-
-    int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-    if (note->HasStemDir()) {
-        stemDir = note->GetStemDir();
-    }
-    else if ((layerStemDir = layer->GetDrawingStemDir(note)) != STEMDIRECTION_NONE) {
-        stemDir = layerStemDir;
-    }
-    else {
-        if (drawingDur < DUR_1) {
-            stemDir = STEMDIRECTION_down;
-        }
-        else {
-            stemDir = (yNote > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
-        }
-    }
 
     /************** Noteheads: **************/
 
@@ -95,6 +72,12 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         // For semibrevis with stem in black notation, encoded with an explicit stem direction
         if (((drawingDur > DUR_1) || ((note->GetStemDir() != STEMDIRECTION_NONE) && mensural_black))
             && note->GetStemVisible() != BOOLEAN_false) {
+            /************** Stem/notehead direction: **************/
+            const int radius = note->GetDrawingRadius(m_doc);
+            const int staffY = staff->GetDrawingY();
+            const int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+            const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
+            /************** Draw stem: **************/
             this->DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
         }
     }
@@ -214,93 +197,44 @@ void View::DrawMensuralStem(
 {
     assert(note);
 
-    int staffSize = staff->m_drawingStaffSize;
-    int staffY = staff->GetDrawingY();
-    int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
-    int drawingDur = note->GetDrawingDur();
+    const int staffSize = staff->m_drawingStaffSize;
+    const int drawingDur = note->GetDrawingDur();
     // Cue size is currently disabled
-    bool drawingCueSize = false;
-    int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
-    bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-
-    baseStem = m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
-    flagStemHeight = m_doc->GetDrawingDoubleUnit(staffSize);
-    if (drawingCueSize) {
-        baseStem = m_doc->GetCueSize(baseStem);
-        flagStemHeight = m_doc->GetCueSize(flagStemHeight);
-    }
-
-    nbFlags = (mensural_black ? drawingDur - DUR_2 : drawingDur - DUR_4);
-    totalFlagStemHeight = flagStemHeight * (nbFlags * 2 - 1) / 2;
-
-    /* SMuFL provides combining stem-and-flag characters with one and two flags, but
-        at the moment, I'm using only the one flag ones, partly out of concern for
-        possible three-flag notes. */
+    const bool drawingCueSize = false;
+    const bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     /* In black notation, the semiminima gets one flag; in white notation, it gets none.
         In both cases, as in CWMN, each shorter duration gets one additional flag. */
+    const int nbFlags = (mensural_black ? drawingDur - DUR_2 : drawingDur - DUR_4);
 
-    if (dir == STEMDIRECTION_down) {
-        // flip all lengths. Exception: in mensural notation, the stem will never be at
-        //   left, so leave radius as is.
-        baseStem = -baseStem;
-        totalFlagStemHeight = -totalFlagStemHeight;
-        heightY = -heightY;
-    }
+    const int halfStemWidth
+        = m_doc->GetGlyphWidth(SMUFL_E93E_mensuralCombStemUp, staff->m_drawingStaffSize, drawingCueSize) / 2;
+    const int yOffset = m_doc->GetDrawingUnit(staffSize) - halfStemWidth;
 
-    // If we have flags, add them to the height.
-    int y1 = originY;
-    int y2 = ((nbFlags > 0) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
-    int x2 = xn + radius;
-
-    if ((dir == STEMDIRECTION_up) && (y2 < verticalCenter)) {
-        y2 = verticalCenter;
-    }
-    else if ((dir == STEMDIRECTION_down) && (y2 > verticalCenter)) {
-        y2 = verticalCenter;
-    }
-
-    // shorten the stem at its connection with the note head
-    // this will not work if the pseudo size is changed
-    int shortening = 0.9 * m_doc->GetDrawingUnit(staffSize);
-
-    // LogDebug("DrawMensuralStem: drawingDur=%d mensural_black=%d nbFlags=%d", drawingDur, mensural_black, nbFlags);
-    int stemY1 = (dir == STEMDIRECTION_up) ? y1 + shortening : y1 - shortening;
-    int stemY2 = y2;
-    if (nbFlags > 0) {
-        // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
-        int shortener
-            = (drawingCueSize) ? m_doc->GetCueSize(m_doc->GetDrawingUnit(staffSize)) : m_doc->GetDrawingUnit(staffSize);
-        stemY2 = (dir == STEMDIRECTION_up) ? y2 - shortener : y2 + shortener;
-    }
-
-    int halfStemWidth = m_doc->GetDrawingStemWidth(staffSize) / 2;
     // draw the stems and the flags
 
     dc->StartCustomGraphic("stem");
-    if (dir == STEMDIRECTION_up) {
 
-        if (nbFlags > 0) {
-            for (int i = 0; i < nbFlags; ++i) {
-                this->DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 - i * flagStemHeight,
-                    SMUFL_E949_mensuralCombStemUpFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
-            }
-        }
-        else {
-            this->DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+    wchar_t code;
+    if (dir == STEMDIRECTION_up) {
+        originY += yOffset;
+
+        switch (nbFlags) {
+            case 1: code = SMUFL_E949_mensuralCombStemUpFlagSemiminima; break;
+            case 2: code = SMUFL_E94B_mensuralCombStemUpFlagFusa; break;
+            default: code = SMUFL_E93E_mensuralCombStemUp;
         }
     }
     else {
-        if (nbFlags > 0) {
-            for (int i = 0; i < nbFlags; ++i) {
-                this->DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 + i * flagStemHeight,
-                    SMUFL_E94A_mensuralCombStemDownFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
-            }
-        }
-        else {
-            this->DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+        originY -= yOffset;
+        switch (nbFlags) {
+            case 1: code = SMUFL_E94A_mensuralCombStemDownFlagSemiminima; break;
+            case 2: code = SMUFL_E94C_mensuralCombStemDownFlagFusa; break;
+            default: code = SMUFL_E93F_mensuralCombStemDown;
         }
     }
+
+    this->DrawSmuflCode(dc, xn + radius - halfStemWidth, originY, code, staff->m_drawingStaffSize, drawingCueSize);
     dc->EndCustomGraphic();
 
     // Store the stem direction ?
@@ -805,6 +739,32 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
         bottomLeft->y = bottomLeft->y + (int)(length * slope);
         topLeft->y = topLeft->y + (int)(length * slope);
     }
+}
+
+data_STEMDIRECTION View::GetMensuralStemDirection(Layer *layer, Note *note, int verticalCenter)
+{
+    // constants
+    const int drawingDur = note->GetDrawingDur();
+    const int yNote = note->GetDrawingY();
+
+    data_STEMDIRECTION layerStemDir;
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+    if (note->HasStemDir()) {
+        stemDir = note->GetStemDir();
+    }
+    else if ((layerStemDir = layer->GetDrawingStemDir(note)) != STEMDIRECTION_NONE) {
+        stemDir = layerStemDir;
+    }
+    else {
+        if (drawingDur < DUR_1) {
+            stemDir = STEMDIRECTION_down;
+        }
+        else {
+            stemDir = (yNote > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        }
+    }
+
+    return stemDir;
 }
 
 } // namespace vrv

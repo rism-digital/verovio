@@ -684,9 +684,9 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::PrepareProcessingLists(FunctorParams *functorParams)
+int Layer::InitProcessingLists(FunctorParams *functorParams)
 {
-    PrepareProcessingListsParams *params = vrv_params_cast<PrepareProcessingListsParams *>(functorParams);
+    InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);
     assert(params);
 
     // Alternate solution with StaffN_LayerN_VerseN_t
@@ -711,9 +711,9 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::CalcOnsetOffset(FunctorParams *functorParams)
+int Layer::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     params->m_currentScoreTime = 0.0;
@@ -725,7 +725,7 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::ResetDrawing(FunctorParams *functorParams)
+int Layer::ResetData(FunctorParams *functorParams)
 {
     m_crossStaffFromBelow = false;
     m_crossStaffFromAbove = false;

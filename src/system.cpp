@@ -279,8 +279,7 @@ curvature_CURVEDIR System::GetPreferredCurveDirection(LayerElement *start, Layer
     assert(layerStart);
 
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-    Functor findSpannedLayerElementsEnd(&Object::FindSpannedLayerElementsEnd);
-    this->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, &findSpannedLayerElementsEnd);
+    this->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams);
 
     curvature_CURVEDIR preferredDirection = curvature_CURVEDIR_NONE;
     for (auto element : findSpannedLayerElementsParams.m_elements) {
@@ -373,6 +372,20 @@ bool System::IsLastOfMdiv() const
     return (nextSibling && nextSibling->IsPageElement());
 }
 
+bool System::IsFirstOfSelection() const
+{
+    const Page *page = vrv_cast<const Page *>(this->GetFirstAncestor(PAGE));
+    assert(page);
+    return (page->IsFirstOfSelection() && this->IsFirstInPage());
+}
+
+bool System::IsLastOfSelection() const
+{
+    const Page *page = vrv_cast<const Page *>(this->GetFirstAncestor(PAGE));
+    assert(page);
+    return (page->IsLastOfSelection() && this->IsLastInPage());
+}
+
 double System::EstimateJustificationRatio(Doc *doc)
 {
     assert(doc);
@@ -400,17 +413,17 @@ void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
     assert(targetSystem);
 
     // We need to populate processing lists for processing the document by Layer
-    PrepareProcessingListsParams prepareProcessingListsParams;
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    InitProcessingListsParams initProcessingListsParams;
+    Functor initProcessingLists(&Object::InitProcessingLists);
+    this->Process(&initProcessingLists, &initProcessingListsParams);
 
     // The means no content? Checking just in case
-    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+    if (initProcessingListsParams.m_layerTree.child.empty()) return;
 
     ConvertToCastOffMensuralParams convertToCastOffMensuralParams(
-        doc, targetSystem, &prepareProcessingListsParams.m_layerTree);
+        doc, targetSystem, &initProcessingListsParams.m_layerTree);
     // Store the list of staff N for detecting barLines that are on all systems
-    for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
+    for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
         convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
     }
 
@@ -421,18 +434,18 @@ void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
 void System::ConvertToUnCastOffMensuralSystem()
 {
     // We need to populate processing lists for processing the document by Layer
-    PrepareProcessingListsParams prepareProcessingListsParams;
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    InitProcessingListsParams initProcessingListsParams;
+    Functor initProcessingLists(&Object::InitProcessingLists);
+    this->Process(&initProcessingLists, &initProcessingListsParams);
 
     // The means no content? Checking just in case
-    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+    if (initProcessingListsParams.m_layerTree.child.empty()) return;
 
     ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
 
     ArrayOfComparisons filters;
     // Now we can process by layer and move their content to (measure) segments
-    for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
+    for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
         for (auto const &layers : staves.second.child) {
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(STAFF, staves.first);
@@ -576,13 +589,13 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::SetAlignmentXPos(FunctorParams *functorParams)
+int System::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     const double ratio = this->EstimateJustificationRatio(params->m_doc);
-    if (!this->IsLastOfMdiv() || (ratio < params->m_estimatedJustificationRatio)) {
+    if ((!this->IsLastOfMdiv() && !this->IsLastOfSelection()) || (ratio < params->m_estimatedJustificationRatio)) {
         params->m_estimatedJustificationRatio = ratio;
     }
 
@@ -849,7 +862,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
     // Check if we are on the last system of an mdiv.
     // Do not justify it if the non-justified width is less than a specified percent.
-    if (this->IsLastOfMdiv()) {
+    if (this->IsLastOfMdiv() || this->IsLastOfSelection()) {
         double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
         if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
             return FUNCTOR_SIBLINGS;
@@ -1161,6 +1174,21 @@ int System::CastOffEncoding(FunctorParams *functorParams)
     // It will be added when reaching a pb / sb or at the end of the score in PageMilestoneEnd::CastOffEncoding
     assert(!params->m_currentSystem);
     params->m_currentSystem = new System();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::CastOffToSelection(FunctorParams *functorParams)
+{
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
+    assert(params);
+
+    // We are starting a new system we need to cast off
+    params->m_contentSystem = this;
+    // We also need to create a new target system and add it to the page
+    System *system = new System();
+    params->m_page->AddChild(system);
+    params->m_currentSystem = system;
 
     return FUNCTOR_CONTINUE;
 }

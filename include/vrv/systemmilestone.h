@@ -57,9 +57,9 @@ public:
     int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffSystems
@@ -70,6 +70,11 @@ public:
      * See Object::PrepareFloatingGrps
      */
     int PrepareFloatingGrps(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::CastOffToSelection
+     */
+    int CastOffToSelection(FunctorParams *) override;
 
 protected:
     //
@@ -135,10 +140,10 @@ public:
     virtual int InterfacePrepareMilestones(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
-     * Called from Ending::ResetDrawing and EditorialElement::ResetDrawing
+     * Reset the drawing values before calling PrepareData after changes.
+     * Called from Ending::ResetData and EditorialElement::ResetData
      */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams);
+    virtual int InterfaceResetData(FunctorParams *functorParams);
 
 protected:
     //

@@ -227,9 +227,9 @@ public:
     int AlignHorizontallyEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareProcessingLists
+     * See Object::InitProcessingLists
      */
-    int PrepareProcessingLists(FunctorParams *functorParams) override;
+    int InitProcessingLists(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareRpt
@@ -237,16 +237,16 @@ public:
     int PrepareRpt(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcOnsetOffset
+     * See Object::InitOnsetOffset
      */
     ///@{
-    int CalcOnsetOffset(FunctorParams *functorParams) override;
+    int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::GenerateMIDI

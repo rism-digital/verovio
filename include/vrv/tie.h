@@ -73,10 +73,10 @@ public:
     //----------//
 
     /**
-     * see Object::ResolveMIDITies
+     * see Object::InitTimemapTies
      */
     ///@{
-    int ResolveMIDITies(FunctorParams *functorParams) override;
+    int InitTimemapTies(FunctorParams *functorParams) override;
     ///@}
 
 private:

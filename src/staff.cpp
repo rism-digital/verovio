@@ -490,10 +490,10 @@ int Staff::ScoreDefOptimize(FunctorParams *functorParams)
     matchTypeLayer.ReverseComparison();
     this->FindAllDescendantsByComparison(&layers, &matchTypeLayer);
 
-    ListOfObjects mRests = this->FindAllDescendantsByType(MREST);
+    Object *note = this->FindDescendantByType(NOTE);
 
-    // Show the staff only if no layer with content or only mRests
-    if (layers.empty() || (mRests.size() != layers.size())) {
+    // Show the staff only if there are any notes
+    if (note) {
         staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
     }
 
@@ -600,9 +600,10 @@ int Staff::CalcLedgerLinesEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
+int Staff::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
-    FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    PrepareStaffCurrentTimeSpanningParams *params
+        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
@@ -628,7 +629,7 @@ int Staff::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Staff::ResetDrawing(FunctorParams *functorParams)
+int Staff::ResetData(FunctorParams *functorParams)
 {
     m_timeSpanningElements.clear();
     ClearLedgerLines();
@@ -658,9 +659,9 @@ int Staff::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::CalcOnsetOffset(FunctorParams *functorParams)
+int Staff::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     assert(m_drawingStaffDef);

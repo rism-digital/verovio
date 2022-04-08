@@ -467,7 +467,7 @@ wchar_t Note::GetMensuralNoteheadGlyph() const
 
     wchar_t code = 0;
     if (mensural_black) {
-        code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+        code = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
     }
     else {
         if (this->GetColored() == BOOLEAN_true) {
@@ -513,8 +513,8 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         // case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
         case HEADSHAPE_plus: return SMUFL_E0AF_noteheadPlusBlack;
         case HEADSHAPE_diamond: {
-            if (DUR_1 == duration) return SMUFL_E0D9_noteheadDiamondHalf;
-            return this->GetHeadFill() == FILL_void ? SMUFL_E0DD_noteheadDiamondWhite : SMUFL_E0DB_noteheadDiamondBlack;
+            if (DUR_4 > duration) return SMUFL_E0D9_noteheadDiamondHalf;
+            return SMUFL_E0DB_noteheadDiamondBlack;
         }
         // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
         // case HEADSHAPE_oval: return SMUFL_noteheadOval;
@@ -522,7 +522,11 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         // case HEADSHAPE_rectangle: return SMUFL_noteheadRectangle;
         // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
         // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
-        case HEADSHAPE_slash: return SMUFL_E101_noteheadSlashHorizontalEnds;
+        case HEADSHAPE_slash: {
+            if (DUR_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
+            if (DUR_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
+            return SMUFL_E101_noteheadSlashHorizontalEnds;
+        }
         // case HEADSHAPE_square: return SMUFL_noteheadSquare;
         case HEADSHAPE_x: {
             if (DUR_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
@@ -1363,8 +1367,8 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ Prepare the drawing cue size ************/
 
-    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
+    Functor prepareCueSize(&Object::PrepareCueSize);
+    this->Process(&prepareCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
 }
@@ -1382,11 +1386,11 @@ int Note::PrepareLyrics(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Note::ResetDrawing(FunctorParams *functorParams)
+int Note::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;

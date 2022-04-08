@@ -1010,7 +1010,7 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     this->SetDrawingXRel(0);
     // Exception here: the LayerElement::m_drawingYRel position is already set for horizontal alignment
-    // See Object::SetAlignmentPitchPos - for this reason we need to reset it here and not in ResetVerticalAlignment
+    // See Object::CalcAlignmentPitchPos - for this reason we need to reset it here and not in ResetVerticalAlignment
     this->SetDrawingYRel(0);
 
     m_alignment = NULL;
@@ -1022,7 +1022,7 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    // Nothing to do since m_drawingYRel is reset in ResetHorizontalAlignment and set in SetAlignmentPitchPos
+    // Nothing to do since m_drawingYRel is reset in ResetHorizontalAlignment and set in CalcAlignmentPitchPos
 
     return FUNCTOR_CONTINUE;
 }
@@ -1248,9 +1248,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
+int LayerElement::CalcAlignmentPitchPos(FunctorParams *functorParams)
 {
-    SetAlignmentPitchPosParams *params = vrv_params_cast<SetAlignmentPitchPosParams *>(functorParams);
+    CalcAlignmentPitchPosParams *params = vrv_params_cast<CalcAlignmentPitchPosParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -2080,7 +2080,7 @@ int LayerElement::AdjustXRelForTranscription(FunctorParams *)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
+int LayerElement::PrepareCueSize(FunctorParams *functorParams)
 {
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
@@ -2493,9 +2493,9 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
+int LayerElement::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -2590,7 +2590,7 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::ResolveMIDITies(FunctorParams *)
+int LayerElement::InitTimemapTies(FunctorParams *)
 {
     return FUNCTOR_CONTINUE;
 }
@@ -2627,9 +2627,9 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
+int LayerElement::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     if (this->Is(MULTIREST)) {
@@ -2641,7 +2641,7 @@ int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::ResetDrawing(FunctorParams *functorParams)
+int LayerElement::ResetData(FunctorParams *functorParams)
 {
     m_isInBeamspan = false;
     m_drawingCueSize = false;
@@ -2651,7 +2651,7 @@ int LayerElement::ResetDrawing(FunctorParams *functorParams)
     // Pass it to the pseudo functor of the interface
     LinkingInterface *interface = this->GetLinkingInterface();
     assert(interface);
-    interface->InterfaceResetDrawing(functorParams, this);
+    interface->InterfaceResetData(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }
@@ -2681,7 +2681,7 @@ int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::PrepareSlurs(FunctorParams *)
+int LayerElement::CalcSlurDirection(FunctorParams *)
 {
     return FUNCTOR_SIBLINGS;
 }
@@ -2706,9 +2706,9 @@ int LayerElement::PrepareDuration(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::HorizontalLayoutCache(FunctorParams *functorParams)
+int LayerElement::CacheHorizontalLayout(FunctorParams *functorParams)
 {
-    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);
     assert(params);
 
     if (params->m_restore) {

@@ -95,7 +95,7 @@ public:
      * We have functor in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor method. These not called by the Process/Call loop but by the implementaion
-     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
+     * classes explicitely. See FloatingObject::PrepareStaffCurrentTimeSpanning for an example.
      */
 
     /**
@@ -109,9 +109,9 @@ public:
     virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
+    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
 
 protected:
     /**
@@ -211,13 +211,13 @@ public:
      * We have functors in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor methods. These are not called by the Process/Call loop but by the implementation
-     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
+     * classes explicitely. See FloatingObject::PrepareStaffCurrentTimeSpanning for an example.
      */
 
     /**
-     * See Object::FillStaffCurrentTimeSpanning
+     * See Object::PrepareStaffCurrentTimeSpanning
      */
-    virtual int InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
+    virtual int InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::PrepareTimeSpanning
@@ -230,9 +230,9 @@ public:
     int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int InterfaceResetDrawing(FunctorParams *functorParams, Object *object) override;
+    int InterfaceResetData(FunctorParams *functorParams, Object *object) override;
 
 private:
     //

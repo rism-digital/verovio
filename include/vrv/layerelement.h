@@ -274,6 +274,11 @@ public:
     virtual data_STEMMODIFIER GetDrawingStemMod() const;
 
     /**
+     * Return true if cross-staff is set
+     */
+    virtual bool HasCrossStaff() { return !!m_crossStaff; }
+
+    /**
      * Convert stem mode to corresponding glyph code
      */
     wchar_t StemModToGlyph(data_STEMMODIFIER stemMod) const;
@@ -340,9 +345,9 @@ public:
     int AdjustXRelForTranscription(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareDrawingCueSize
+     * See Object::PrepareCueSize
      */
-    int PrepareDrawingCueSize(FunctorParams *functorParams) override;
+    int PrepareCueSize(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareCrossStaff
@@ -373,9 +378,9 @@ public:
     int PrepareTimeSpanning(FunctorParams *functorParams) override;
 
     /**
-     * See Object::SetAlignmentPitchPos
+     * See Object::CalcAlignmentPitchPos
      */
-    int SetAlignmentPitchPos(FunctorParams *functorParams) override;
+    int CalcAlignmentPitchPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::FindSpannedLayerElements
@@ -393,17 +398,17 @@ public:
     int LayerElementsInTimeSpan(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcOnsetOffset
+     * See Object::InitOnsetOffset
      */
     ///@{
-    int CalcOnsetOffset(FunctorParams *functorParams) override;
+    int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**
-     * See Object::ResolveMIDITies
+     * See Object::InitTimemapTies
      */
     ///@{
-    int ResolveMIDITies(FunctorParams *functorParams) override;
+    int InitTimemapTies(FunctorParams *functorParams) override;
     ///@}
 
     /**
@@ -421,12 +426,12 @@ public:
     /**
      * See Object::CalcMaxMeasureDuration
      */
-    int CalcMaxMeasureDuration(FunctorParams *functorParams) override;
+    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::GetRelativeLayerElement
@@ -434,9 +439,9 @@ public:
     int GetRelativeLayerElement(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareSlurs
+     * See Object::CalcSlurDirection
      */
-    int PrepareSlurs(FunctorParams *functorParams) override;
+    int CalcSlurDirection(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareDuration
@@ -444,9 +449,9 @@ public:
     int PrepareDuration(FunctorParams *functorParams) override;
 
     /**
-     * See Object::HorizontalLayoutCache
+     * See Object::CacheHorizontalLayout
      */
-    int HorizontalLayoutCache(FunctorParams *functorParams) override;
+    int CacheHorizontalLayout(FunctorParams *functorParams) override;
 
 protected:
     /**
@@ -549,7 +554,7 @@ protected:
     int m_cachedXRel;
 
     /**
-     * The cached drawing cue size set by PrepareDrawingCueSize
+     * The cached drawing cue size set by PrepareCueSize
      */
     bool m_drawingCueSize;
 

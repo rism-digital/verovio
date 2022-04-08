@@ -70,11 +70,11 @@ int MRest::ConvertMarkupAnalytical(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int MRest::ResetDrawing(FunctorParams *functorParams)
+int MRest::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

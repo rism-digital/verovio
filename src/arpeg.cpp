@@ -225,19 +225,19 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Arpeg::ResetDrawing(FunctorParams *functorParams)
+int Arpeg::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    ControlElement::ResetDrawing(functorParams);
+    ControlElement::ResetData(functorParams);
 
     PlistInterface *interface = this->GetPlistInterface();
     assert(interface);
-    return interface->InterfaceResetDrawing(functorParams, this);
+    return interface->InterfaceResetData(functorParams, this);
 }
 
-int Arpeg::HorizontalLayoutCache(FunctorParams *functorParams)
+int Arpeg::CacheHorizontalLayout(FunctorParams *functorParams)
 {
-    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);
     assert(params);
 
     if (params->m_restore) {
@@ -250,9 +250,9 @@ int Arpeg::HorizontalLayoutCache(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Arpeg::PrepareMIDI(FunctorParams *functorParams)
+int Arpeg::InitMIDI(FunctorParams *functorParams)
 {
-    PrepareMIDIParams *params = vrv_params_cast<PrepareMIDIParams *>(functorParams);
+    InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);
     assert(params);
 
     // Sort the involved notes by playing order

@@ -524,10 +524,10 @@ int Artic::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Artic::ResetDrawing(FunctorParams *functorParams)
+int Artic::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_drawingPlace = STAFFREL_NONE;
 

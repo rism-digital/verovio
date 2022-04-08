@@ -2220,21 +2220,20 @@
             <glyph glyph-code="E938" smufl-name="mensuralNoteheadSemibrevisBlack" />
             <glyph glyph-code="E939" smufl-name="mensuralNoteheadSemibrevisVoid" />
             <!--<glyph glyph-code="E93A" smufl-name="mensuralNoteheadSemibrevisBlackVoid" />-->
-            <!--<glyph glyph-code="E93B"
-                smufl-name="mensuralNoteheadSemibrevisBlackVoidTurned" />-->
+            <!--<glyph glyph-code="E93B" smufl-name="mensuralNoteheadSemibrevisBlackVoidTurned" />-->
             <glyph glyph-code="E93C" smufl-name="mensuralNoteheadMinimaWhite" />
             <glyph glyph-code="E93D" smufl-name="mensuralNoteheadSemiminimaWhite" />
             <glyph glyph-code="E93E" smufl-name="mensuralCombStemUp" />
             <glyph glyph-code="E93F" smufl-name="mensuralCombStemDown" />
-            <!--<glyph glyph-code="E940" smufl-name="mensuralCombStemDiagonal" />-->
-            <!--<glyph glyph-code="E941" smufl-name="mensuralCombStemUpFlagRight" />-->
-            <!--<glyph glyph-code="E942" smufl-name="mensuralCombStemDownFlagRight" />-->
-            <!--<glyph glyph-code="E943" smufl-name="mensuralCombStemUpFlagLeft" />-->
-            <!--<glyph glyph-code="E944" smufl-name="mensuralCombStemDownFlagLeft" />-->
-            <!--<glyph glyph-code="E945" smufl-name="mensuralCombStemUpFlagFlared" />-->
-            <!--<glyph glyph-code="E946" smufl-name="mensuralCombStemDownFlagFlared" />-->
-            <!--<glyph glyph-code="E947" smufl-name="mensuralCombStemUpFlagExtended" />-->
-            <!--<glyph glyph-code="E948" smufl-name="mensuralCombStemDownFlagExtended" />-->
+            <glyph glyph-code="E940" smufl-name="mensuralCombStemDiagonal" />
+            <glyph glyph-code="E941" smufl-name="mensuralCombStemUpFlagRight" />
+            <glyph glyph-code="E942" smufl-name="mensuralCombStemDownFlagRight" />
+            <glyph glyph-code="E943" smufl-name="mensuralCombStemUpFlagLeft" />
+            <glyph glyph-code="E944" smufl-name="mensuralCombStemDownFlagLeft" />
+            <glyph glyph-code="E945" smufl-name="mensuralCombStemUpFlagFlared" />
+            <glyph glyph-code="E946" smufl-name="mensuralCombStemDownFlagFlared" />
+            <glyph glyph-code="E947" smufl-name="mensuralCombStemUpFlagExtended" />
+            <glyph glyph-code="E948" smufl-name="mensuralCombStemDownFlagExtended" />
             <glyph glyph-code="E949" smufl-name="mensuralCombStemUpFlagSemiminima" />
             <glyph glyph-code="E94A" smufl-name="mensuralCombStemDownFlagSemiminima" />
             <glyph glyph-code="E94B" smufl-name="mensuralCombStemUpFlagFusa" />

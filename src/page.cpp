@@ -79,6 +79,26 @@ bool Page::IsSupportedChild(Object *child)
     return true;
 }
 
+bool Page::IsFirstOfSelection() const
+{
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+    if (!doc->HasSelection()) return false;
+
+    assert(this->GetParent());
+    return (this->GetParent()->GetFirst() == this);
+}
+
+bool Page::IsLastOfSelection() const
+{
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+    if (!doc->HasSelection()) return false;
+
+    assert(this->GetParent());
+    return (this->GetParent()->GetLast() == this);
+}
+
 RunningElement *Page::GetHeader()
 {
     return const_cast<RunningElement *>(std::as_const(*this).GetHeader());
@@ -197,9 +217,9 @@ void Page::LayOutTranscription(bool force)
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Set the pitch / pos alignment
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
-    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
+    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
+    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
 
     CalcStemParams calcStemParams(doc);
     Functor calcStem(&Object::CalcStem);
@@ -232,7 +252,7 @@ void Page::LayOutTranscription(bool force)
     m_layoutDone = true;
 }
 
-void Page::LayOutHorizontally()
+void Page::ResetAligners()
 {
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
@@ -283,16 +303,16 @@ void Page::LayOutHorizontally()
             }
         }
 
-        Functor setAlignmentX(&Object::SetAlignmentXPos);
-        SetAlignmentXPosParams setAlignmentXPosParams(doc, &setAlignmentX);
-        setAlignmentXPosParams.m_longestActualDur = longestActualDur;
-        this->Process(&setAlignmentX, &setAlignmentXPosParams);
+        Functor setAlignmentX(&Object::CalcAlignmentXPos);
+        CalcAlignmentXPosParams calcAlignmentXPosParams(doc, &setAlignmentX);
+        calcAlignmentXPosParams.m_longestActualDur = longestActualDur;
+        this->Process(&setAlignmentX, &calcAlignmentXPosParams);
     }
 
     // Set the pitch / pos alignment
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
-    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
+    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
+    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
 
     if (Att::IsMensuralType(doc->m_notationType)) {
         FunctorDocParams calcLigatureNotePosParams(doc);
@@ -316,6 +336,26 @@ void Page::LayOutHorizontally()
     CalcArticParams calcArticParams(doc);
     Functor calcArtic(&Object::CalcArtic);
     this->Process(&calcArtic, &calcArticParams);
+
+    CalcSlurDirectionParams calcSlurDirectionParams(doc);
+    Functor calcSlurDirection(&Object::CalcSlurDirection);
+    this->Process(&calcSlurDirection, &calcSlurDirectionParams);
+
+    FunctorDocParams calcSpanningBeamSpansParams(doc);
+    Functor calcSpanningBeamSpans(&Object::CalcSpanningBeamSpans);
+    this->Process(&calcSpanningBeamSpans, &calcSpanningBeamSpansParams);
+}
+
+void Page::LayOutHorizontally()
+{
+    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
+
+    this->ResetAligners();
 
     // Render it for filling the bounding box
     View view;
@@ -391,11 +431,11 @@ void Page::LayOutHorizontally()
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
-    PrepareProcessingListsParams prepareProcessingListsParams;
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    InitProcessingListsParams initProcessingListsParams;
+    Functor initProcessingLists(&Object::InitProcessingLists);
+    this->Process(&initProcessingLists, &initProcessingListsParams);
 
-    this->AdjustSylSpacingByVerse(prepareProcessingListsParams, doc);
+    this->AdjustSylSpacingByVerse(initProcessingListsParams, doc);
 
     Functor adjustHarmGrpsSpacing(&Object::AdjustHarmGrpsSpacing);
     Functor adjustHarmGrpsSpacingEnd(&Object::AdjustHarmGrpsSpacingEnd);
@@ -429,26 +469,17 @@ void Page::LayOutHorizontally()
     Functor alignMeasures(&Object::AlignMeasures);
     Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
-
-    // Calculate the slur direction
-    PrepareSlursParams prepareSlursParams(doc);
-    Functor prepareSlurs(&Object::PrepareSlurs);
-    this->Process(&prepareSlurs, &prepareSlursParams);
-
-    FunctorDocParams resolveSpanningBeamSpansParams(doc);
-    Functor resolveSpanningBeamSpans(&Object::ResolveSpanningBeamSpans);
-    this->Process(&resolveSpanningBeamSpans, &resolveSpanningBeamSpansParams);
 }
 
-void Page::HorizontalLayoutCachePage(bool restore)
+void Page::LayOutHorizontallyWithCache(bool restore)
 {
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    HorizontalLayoutCacheParams horizontalLayoutCacheParams(doc);
-    horizontalLayoutCacheParams.m_restore = restore;
-    Functor horizontalLayoutCache(&Object::HorizontalLayoutCache);
-    this->Process(&horizontalLayoutCache, &horizontalLayoutCacheParams);
+    CacheHorizontalLayoutParams cacheHorizontalLayoutParams(doc);
+    cacheHorizontalLayoutParams.m_restore = restore;
+    Functor cacheHorizontalLayout(&Object::CacheHorizontalLayout);
+    this->Process(&cacheHorizontalLayout, &cacheHorizontalLayoutParams);
 }
 
 void Page::LayOutVertically()
@@ -512,10 +543,10 @@ void Page::LayOutVertically()
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
-    SetOverflowBBoxesParams setOverflowBBoxesParams(doc);
-    Functor setOverflowBBoxes(&Object::SetOverflowBBoxes);
-    Functor setOverflowBBoxesEnd(&Object::SetOverflowBBoxesEnd);
-    this->Process(&setOverflowBBoxes, &setOverflowBBoxesParams, &setOverflowBBoxesEnd);
+    CalcBBoxOverflowsParams calcBBoxOverflowsParams(doc);
+    Functor calcBBoxOverflows(&Object::CalcBBoxOverflows);
+    Functor calcBBoxOverflowsEnd(&Object::CalcBBoxOverflowsEnd);
+    this->Process(&calcBBoxOverflows, &calcBBoxOverflowsParams, &calcBBoxOverflowsEnd);
 
     // Adjust the positioners of floating elements (slurs, hairpin, dynam, etc)
     Functor adjustFloatingPositioners(&Object::AdjustFloatingPositioners);
@@ -628,10 +659,10 @@ void Page::JustifyVertically()
 
     if (!justifyYParams.m_shiftForStaff.empty()) {
         // Adjust cross staff content which is displaced through vertical justification
-        Functor adjustCrossStaffContent(&Object::AdjustCrossStaffContent);
-        AdjustCrossStaffContentParams adjustCrossStaffContentParams(doc);
-        adjustCrossStaffContentParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
-        this->Process(&adjustCrossStaffContent, &adjustCrossStaffContentParams);
+        Functor justifyYAdjustCrossStaff(&Object::JustifyYAdjustCrossStaff);
+        JustifyYAdjustCrossStaffParams justifyYAdjustCrossStaffParams(doc);
+        justifyYAdjustCrossStaffParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
+        this->Process(&justifyYAdjustCrossStaff, &justifyYAdjustCrossStaffParams);
     }
 }
 
@@ -683,9 +714,9 @@ void Page::LayOutPitchPos()
     assert(this == doc->GetDrawingPage());
 
     // Set the pitch / pos alignment
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
-    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
+    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
+    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
 
     CalcStemParams calcStemParams(doc);
     Functor calcStem(&Object::CalcStem);
@@ -742,7 +773,7 @@ int Page::GetContentWidth() const
     return maxWidth;
 }
 
-void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc)
+void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc)
 {
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;

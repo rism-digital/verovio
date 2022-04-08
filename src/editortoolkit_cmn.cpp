@@ -65,7 +65,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
 
     // Action without parameter
     if (action == "commit") {
-        m_doc->PrepareDrawing();
+        m_doc->PrepareData();
         return true;
     }
 
