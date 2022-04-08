@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Apr  6 22:10:26 PDT 2022
+// Last Modified: Thu Apr  7 10:51:19 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1540,6 +1540,12 @@ class HumdrumToken : public std::string, public HumHash {
 		char     hasStemDirection          (void);
 		bool     allSameBarlineStyle       (void);
 
+
+		// pitch-related functions:
+		void             getMidiPitches    (std::vector<int>& output);
+		std::vector<int> getMidiPitches    (void);
+
+		// duration-related functions:
 		HumNum   getDuration               (void);
 		HumNum   getDuration               (HumNum scale);
 		HumNum   getTiedDuration           (void);

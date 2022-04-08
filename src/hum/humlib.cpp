@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Apr  6 22:10:26 PDT 2022
+// Last Modified: Thu Apr  7 10:51:19 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -31441,6 +31441,39 @@ bool HumdrumToken::isManipulator(void) const {
 	if (isTerminateInterpretation()) { return true; }
 	if (isExclusiveInterpretation()) { return true; }
 	return false;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getMidiPitches -- Returns 0 if a rest.
+//    Does not check for valid MIDI note number range of 0-127.
+//    Also not checking to see if input data type is not **kern.
+//
+
+void HumdrumToken::getMidiPitches(vector<int>& output) {
+	if (*this == ".") {
+		// Not resolving null tokens in this function.
+		output.clear();
+		return;
+	}
+	vector<string> pieces = this->getSubtokens();
+	output.resize(pieces.size());
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (pieces[i].find("r") != string::npos) {
+			output[i] = 0;
+		} else {
+			output[i] = Convert::kernToMidiNoteNumber(pieces[i]);
+		}
+	}
+}
+
+
+vector<int> HumdrumToken::getMidiPitches(void) {
+	vector<int> output;
+	this->getMidiPitches(output);
+	return output;
 }
 
 
