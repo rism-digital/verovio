@@ -2179,6 +2179,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 for (auto it = elements.begin(); it != elements.end(); ++it) {
                     if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
                         (*it)->MoveItselfTo(parent);
+                        parent->ReorderByXPos();
                     }
                 }
                 doubleParent->AddChild(parent);
