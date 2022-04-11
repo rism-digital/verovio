@@ -59,7 +59,7 @@ const char *ZIP_SIGNATURE = "\x50\x4B\x03\x04";
 
 void SetDefaultResourcePath(const std::string &path)
 {
-    Resources::SetPath(path);
+    Resources::SetDefaultPath(path);
 }
 
 //----------------------------------------------------------------------------
@@ -76,8 +76,10 @@ Toolkit::Toolkit(bool initFont)
     m_humdrumBuffer = NULL;
     m_cString = NULL;
 
+    const Resources &resources = m_doc.GetResources();
+    resources.SetPath(Resources::GetDefaultPath());
     if (initFont) {
-        Resources::InitFonts();
+        resources.InitFonts();
     }
 
     m_options = m_doc.GetOptions();
@@ -111,10 +113,24 @@ Toolkit::~Toolkit()
 #endif
 }
 
+std::string Toolkit::GetResourcePath() const
+{
+    return m_doc.GetResources().GetPath();
+}
+
 bool Toolkit::SetResourcePath(const std::string &path)
 {
-    Resources::SetPath(path);
-    return Resources::InitFonts();
+    const Resources &resources = m_doc.GetResources();
+    resources.SetPath(path);
+    return resources.InitFonts();
+}
+
+bool Toolkit::SetFont(const std::string &fontName)
+{
+    const Resources &resources = m_doc.GetResources();
+    const bool ok = resources.SetFont(fontName);
+    if (!ok) LogWarning("Font '%s' could not be loaded", fontName.c_str());
+    return ok;
 }
 
 bool Toolkit::SetScale(int scale)
@@ -1070,9 +1086,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
     // This needs to be fixed
-    if (!Resources::SetFont(m_options->m_font.GetValue())) {
-        LogWarning("Font '%s' could not be loaded", m_options->m_font.GetValue().c_str());
-    }
+    SetFont(m_options->m_font.GetValue());
 
     return true;
 }
@@ -1105,7 +1119,7 @@ void Toolkit::ResetOptions()
         [](const MapOfStrOptions::value_type &opt) { opt.second->Reset(); });
 
     // Set the (default) font
-    Resources::SetFont(m_options->m_font.GetValue());
+    SetFont(m_options->m_font.GetValue());
 }
 
 std::string Toolkit::GetElementAttr(const std::string &xmlId)

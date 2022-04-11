@@ -20,16 +20,14 @@ extern "C" {
 
 void *vrvToolkit_constructor()
 {
-    // set the default resource path
-    Resources::SetPath("/data");
+    SetDefaultResourcePath("/data");
 
     return new Toolkit();
 }
 
 void *vrvToolkit_constructorResourcePath(const char *resourcePath)
 {
-    // set the resource path
-    Resources::SetPath(resourcePath);
+    SetDefaultResourcePath(resourcePath);
 
     return new Toolkit();
 }

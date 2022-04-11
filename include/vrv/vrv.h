@@ -149,6 +149,9 @@ public:
      */
     ///@{
     /** Resource path */
+    static std::string GetDefaultPath() { return s_defaultPath; }
+    static void SetDefaultPath(const std::string &path) { s_defaultPath = path; }
+
     static std::string GetPath() { return s_path; }
     static void SetPath(const std::string &path) { s_path = path; }
     /** Init the SMufL music and text fonts */
@@ -176,6 +179,9 @@ private:
     //----------------//
     // Static members //
     //----------------//
+
+    /** The default path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
+    static thread_local std::string s_defaultPath;
 
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
     static thread_local std::string s_path;
