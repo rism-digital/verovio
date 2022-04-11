@@ -1301,8 +1301,8 @@ public:
 private:
     /**
      * Defines the height of a "virtual unit" (vu) in terms of real-world units.
-     * A single vu is half the distance between the vertical center point of a staff
-     * line and that of an adjacent staff line.
+     * A single vu is half the distance between adjacent staff lines where the
+     * interline space is measured from the middle of a staff line.
      **/
     std::string m_vuHeight;
 
