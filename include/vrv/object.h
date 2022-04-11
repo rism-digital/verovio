@@ -152,9 +152,9 @@ public:
     ///@}
 
     /**
-     * Resource access
+     * Resource access from the document
      */
-    const Resources *GetResources() const;
+    const Resources *GetDocResources() const;
 
     /**
      * Reset the object, that is 1) removing all childs and 2) resetting all attributes.

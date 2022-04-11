@@ -354,10 +354,13 @@ void RunningElement::SetCurrentPageNum(Page *currentPage)
 
 void RunningElement::LoadFooter()
 {
+    const Resources *resources = this->GetDocResources();
+    if (!resources) return;
+
     Fig *fig = new Fig();
     Svg *svg = new Svg();
 
-    std::string footer = Resources::GetPath() + "/footer.svg";
+    std::string footer = resources->GetPath() + "/footer.svg";
     pugi::xml_document footerDoc;
     footerDoc.load_file(footer.c_str());
     svg->Set(footerDoc.first_child());

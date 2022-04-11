@@ -71,12 +71,15 @@ std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
 {
     if (!this->HasAccid()) return L"";
 
+    const Resources *resources = this->GetDocResources();
+    if (!resources) return L"";
+
     wchar_t code = 0;
 
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
         code = this->GetGlyphNum();
-        if (NULL == Resources::GetGlyph(code)) code = 0;
+        if (NULL == resources->GetGlyph(code)) code = 0;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {

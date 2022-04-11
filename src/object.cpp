@@ -207,7 +207,7 @@ void Object::SetAsReferenceObject()
     m_isReferenceObject = true;
 }
 
-const Resources *Object::GetResources() const
+const Resources *Object::GetDocResources() const
 {
     const Doc *doc = NULL;
     if (this->Is(DOC)) {

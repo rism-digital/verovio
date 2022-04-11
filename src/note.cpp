@@ -366,7 +366,8 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
 
-    Glyph *glyph = Resources::GetGlyph(code);
+    const Resources &resources = doc->GetResources();
+    Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
 
     if (glyph->HasAnchor(SMUFL_stemUpSE)) {
@@ -397,7 +398,8 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
 
-    Glyph *glyph = Resources::GetGlyph(code);
+    const Resources &resources = doc->GetResources();
+    Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
 
     if (glyph->HasAnchor(SMUFL_stemDownNW)) {

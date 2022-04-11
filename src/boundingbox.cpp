@@ -315,7 +315,8 @@ int BoundingBox::GetRectangles(
     bool glyphRect = true;
 
     if (m_smuflGlyph != 0) {
-        glyph = Resources::GetGlyph(m_smuflGlyph);
+        const Resources &resources = doc->GetResources();
+        glyph = resources.GetGlyph(m_smuflGlyph);
         assert(glyph);
 
         if (glyph->HasAnchor(anchor1) && glyph->HasAnchor(anchor2)) {
