@@ -207,6 +207,18 @@ void Object::SetAsReferenceObject()
     m_isReferenceObject = true;
 }
 
+const Resources *Object::GetResources() const
+{
+    const Doc *doc = NULL;
+    if (this->Is(DOC)) {
+        doc = vrv_cast<const Doc *>(this);
+    }
+    else {
+        doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    }
+    return doc ? &doc->GetResources() : NULL;
+}
+
 void Object::Reset()
 {
     ClearChildren();

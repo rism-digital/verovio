@@ -33,6 +33,7 @@ class LinkingInterface;
 class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
+class Resources;
 class ScoreDefInterface;
 class StemmedDrawingInterface;
 class TextDirInterface;
@@ -149,6 +150,11 @@ public:
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return NULL; }
     virtual const TimeSpanningInterface *GetTimeSpanningInterface() const { return NULL; }
     ///@}
+
+    /**
+     * Resource access
+     */
+    const Resources *GetResources() const;
 
     /**
      * Reset the object, that is 1) removing all childs and 2) resetting all attributes.
