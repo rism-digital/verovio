@@ -1427,7 +1427,7 @@ void BeamSegment::CalcMixedBeamPlace(Staff *staff)
                 coord->m_beamRelativePlace = beamPlaceBelow ? BEAMPLACE_above : BEAMPLACE_below;
             }
         }
-        else if (coord->GetStemDir() != BEAMPLACE_NONE) {
+        else if (coord->GetStemDir() != STEMDIRECTION_NONE) {
             coord->m_beamRelativePlace = (STEMDIRECTION_up == coord->GetStemDir()) ? BEAMPLACE_above : BEAMPLACE_below;
         }
         else {
