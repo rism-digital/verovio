@@ -209,6 +209,7 @@ void Object::SetAsReferenceObject()
 
 const Resources *Object::GetDocResources() const
 {
+    // Search for the document
     const Doc *doc = NULL;
     if (this->Is(DOC)) {
         doc = vrv_cast<const Doc *>(this);
@@ -216,7 +217,15 @@ const Resources *Object::GetDocResources() const
     else {
         doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     }
-    return doc ? &doc->GetResources() : NULL;
+
+    // Return the resources or display warning
+    if (doc) {
+        return &doc->GetResources();
+    }
+    else {
+        LogWarning("Requested resources unavailable.");
+        return NULL;
+    }
 }
 
 void Object::Reset()
