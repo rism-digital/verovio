@@ -62,6 +62,7 @@ public:
     DeviceContext()
     {
         m_classId = DEVICE_CONTEXT;
+        m_resources = NULL;
         m_isDeactivatedX = false;
         m_isDeactivatedY = false;
         m_width = 0;
@@ -73,6 +74,7 @@ public:
     DeviceContext(ClassId classId)
     {
         m_classId = classId;
+        m_resources = NULL;
         m_isDeactivatedX = false;
         m_isDeactivatedY = false;
         m_width = 0;
@@ -84,6 +86,17 @@ public:
     virtual ~DeviceContext(){};
     ClassId GetClassId() const { return m_classId; }
     bool Is(ClassId classId) const { return (m_classId == classId); }
+    ///@}
+
+    /**
+     * @name Getter and setter for the resources
+     * Resources must be set before drawing
+     */
+    ///@{
+    const Resources *GetResources() const { return m_resources; }
+    bool HasResources() const { return (m_resources != NULL); }
+    void SetResources(const Resources *resources) { m_resources = resources; }
+    void ResetResources() { m_resources = NULL; }
     ///@}
 
     /**
@@ -308,6 +321,9 @@ protected:
 private:
     /** The class id representing the actual (derived) class */
     ClassId m_classId;
+
+    /** The resources (not owned by the device context) */
+    const Resources *m_resources;
 
     /** stores the width and height of the device context */
     int m_width;
