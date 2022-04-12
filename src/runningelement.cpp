@@ -378,9 +378,9 @@ void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALAL
 // Functor methods
 //----------------------------------------------------------------------------
 
-int RunningElement::InitializeDrawing(FunctorParams *functorParams)
+int RunningElement::InitData(FunctorParams *functorParams)
 {
-    InitializeDrawingParams *params = vrv_params_cast<InitializeDrawingParams *>(functorParams);
+    InitDataParams *params = vrv_params_cast<InitDataParams *>(functorParams);
     assert(params);
 
     int i;

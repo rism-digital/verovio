@@ -289,9 +289,9 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
 // Functors methods
 //----------------------------------------------------------------------------
 
-int KeySig::InitializeDrawing(FunctorParams *functorParams)
+int KeySig::InitData(FunctorParams *functorParams)
 {
-    InitializeDrawingParams *params = vrv_params_cast<InitializeDrawingParams *>(functorParams);
+    InitDataParams *params = vrv_params_cast<InitDataParams *>(functorParams);
     assert(params);
 
     data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;

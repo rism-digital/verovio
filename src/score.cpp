@@ -154,9 +154,9 @@ bool Score::ScoreDefNeedsOptimization(int optionCondense) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Score::InitializeDrawing(FunctorParams *functorParams)
+int Score::InitData(FunctorParams *functorParams)
 {
-    InitializeDrawingParams *params = vrv_params_cast<InitializeDrawingParams *>(functorParams);
+    InitDataParams *params = vrv_params_cast<InitDataParams *>(functorParams);
     assert(params);
 
     // Evaluate functor on scoreDef

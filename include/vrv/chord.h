@@ -226,9 +226,9 @@ public:
     int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::InitializeDrawing
+     * See Object::InitData
      */
-    int InitializeDrawing(FunctorParams *functorParams) override;
+    int InitData(FunctorParams *functorParams) override;
 
     /**
      * See Object::JustifyYAdjustCrossStaff

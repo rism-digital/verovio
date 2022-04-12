@@ -915,9 +915,9 @@ int Chord::ResetData(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::InitializeDrawing(FunctorParams *functorParams)
+int Chord::InitData(FunctorParams *functorParams)
 {
-    InitializeDrawingParams *params = vrv_params_cast<InitializeDrawingParams *>(functorParams);
+    InitDataParams *params = vrv_params_cast<InitDataParams *>(functorParams);
     assert(params);
 
     if (this->HasEmptyList(this)) {

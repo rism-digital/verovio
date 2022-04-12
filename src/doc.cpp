@@ -476,9 +476,9 @@ void Doc::PrepareData()
         Functor resetData(&Object::ResetData);
         this->Process(&resetData, NULL);
     }
-    Functor initializeDrawing(&Object::InitializeDrawing);
-    InitializeDrawingParams initializeDrawingParams(&initializeDrawing, this);
-    this->Process(&initializeDrawing, &initializeDrawingParams);
+    Functor initData(&Object::InitData);
+    InitDataParams initDataParams(&initData, this);
+    this->Process(&initData, &initDataParams);
 
     /************ Store default durations ************/
 
