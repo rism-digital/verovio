@@ -93,7 +93,7 @@ public:
      * Resources must be set before drawing
      */
     ///@{
-    const Resources *GetResources() const { return m_resources; }
+    const Resources *GetResources(bool showWarning = false) const;
     bool HasResources() const { return (m_resources != NULL); }
     void SetResources(const Resources *resources) { m_resources = resources; }
     void ResetResources() { m_resources = NULL; }

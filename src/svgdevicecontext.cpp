@@ -85,7 +85,6 @@ bool SvgDeviceContext::CopyFileToStream(const std::string &filename, std::ostrea
 
 void SvgDeviceContext::Commit(bool xml_declaration)
 {
-
     if (m_committed) {
         return;
     }
@@ -110,10 +109,11 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     }
 
     // add the woff VerovioText font if needed
-    if (m_vrvTextFont) {
-        std::string woff = Resources::GetPath() + "/woff.xml";
+    const Resources *resources = this->GetResources(true);
+    if (m_vrvTextFont && resources) {
+        const std::string woffPath = resources->GetPath() + "/woff.xml";
         pugi::xml_document woffDoc;
-        woffDoc.load_file(woff.c_str());
+        woffDoc.load_file(woffPath.c_str());
         m_svgNode.prepend_copy(woffDoc.first_child());
     }
 
@@ -894,6 +894,9 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
 {
     assert(m_fontStack.top());
 
+    const Resources *resources = this->GetResources();
+    assert(resources);
+
     int w, h, gx, gy;
 
     // remove the `xlink:` prefix for backwards compatibility with older SVG viewers.
@@ -905,7 +908,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
     // print chars one by one
     for (unsigned int i = 0; i < text.length(); ++i) {
         wchar_t c = text.at(i);
-        Glyph *glyph = Resources::GetGlyph(c);
+        Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;
         }
@@ -1056,6 +1059,9 @@ void SvgDeviceContext::DrawSvgBoundingBoxRectangle(int x, int y, int width, int 
 
 void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 {
+    const Resources *resources = this->GetResources();
+    assert(resources);
+
     bool groupInPage = false;
     bool drawAnchors = false;
     bool drawContentBB = false;
@@ -1094,7 +1100,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 
             for (iter = anchors.begin(); iter != anchors.end(); ++iter) {
                 if (object->GetBoundingBoxGlyph() != 0) {
-                    Glyph *glyph = Resources::GetGlyph(object->GetBoundingBoxGlyph());
+                    Glyph *glyph = resources->GetGlyph(object->GetBoundingBoxGlyph());
                     assert(glyph);
 
                     if (glyph->HasAnchor(*iter)) {
