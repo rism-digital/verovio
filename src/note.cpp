@@ -367,7 +367,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     }
 
     const Resources &resources = doc->GetResources();
-    Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
 
     if (glyph->HasAnchor(SMUFL_stemUpSE)) {
@@ -399,7 +399,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     }
 
     const Resources &resources = doc->GetResources();
-    Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
 
     if (glyph->HasAnchor(SMUFL_stemDownNW)) {

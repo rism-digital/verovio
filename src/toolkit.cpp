@@ -76,7 +76,7 @@ Toolkit::Toolkit(bool initFont)
     m_humdrumBuffer = NULL;
     m_cString = NULL;
 
-    const Resources &resources = m_doc.GetResources();
+    Resources &resources = m_doc.ModifyResources();
     resources.SetPath(Resources::GetDefaultPath());
     if (initFont) {
         resources.InitFonts();
@@ -120,14 +120,14 @@ std::string Toolkit::GetResourcePath() const
 
 bool Toolkit::SetResourcePath(const std::string &path)
 {
-    const Resources &resources = m_doc.GetResources();
+    Resources &resources = m_doc.ModifyResources();
     resources.SetPath(path);
     return resources.InitFonts();
 }
 
 bool Toolkit::SetFont(const std::string &fontName)
 {
-    const Resources &resources = m_doc.GetResources();
+    Resources &resources = m_doc.ModifyResources();
     const bool ok = resources.SetFont(fontName);
     if (!ok) LogWarning("Font '%s' could not be loaded", fontName.c_str());
     return ok;

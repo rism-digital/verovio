@@ -908,7 +908,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
     // print chars one by one
     for (unsigned int i = 0; i < text.length(); ++i) {
         wchar_t c = text.at(i);
-        Glyph *glyph = resources->GetGlyph(c);
+        const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;
         }
@@ -1100,7 +1100,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 
             for (iter = anchors.begin(); iter != anchors.end(); ++iter) {
                 if (object->GetBoundingBoxGlyph() != 0) {
-                    Glyph *glyph = resources->GetGlyph(object->GetBoundingBoxGlyph());
+                    const Glyph *glyph = resources->GetGlyph(object->GetBoundingBoxGlyph());
                     assert(glyph);
 
                     if (glyph->HasAnchor(*iter)) {

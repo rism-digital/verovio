@@ -370,7 +370,7 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bo
 
     for (unsigned int i = 0; i < text.length(); i++) {
         wchar_t c = text.at(i);
-        Glyph *glyph = resources->GetGlyph(c);
+        const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;
         }

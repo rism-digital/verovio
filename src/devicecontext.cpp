@@ -226,11 +226,11 @@ void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend
         extend->m_width = 0;
     }
 
-    Glyph *unkown = resources->GetTextGlyph(L'o');
+    const Glyph *unknown = resources->GetTextGlyph(L'o');
 
     for (unsigned int i = 0; i < string.length(); ++i) {
         wchar_t c = string[i];
-        Glyph *glyph = resources->GetTextGlyph(c);
+        const Glyph *glyph = resources->GetTextGlyph(c);
         if (!glyph) {
             glyph = resources->GetGlyph(c);
         }
@@ -242,7 +242,7 @@ void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend
                 glyph = resources->GetTextGlyph(L'.');
             }
             else {
-                glyph = unkown;
+                glyph = unknown;
             }
         }
         AddGlyphToTextExtend(glyph, extend);
@@ -262,7 +262,7 @@ void DeviceContext::GetSmuflTextExtent(const std::wstring &string, TextExtend *e
 
     for (unsigned int i = 0; i < string.length(); ++i) {
         wchar_t c = string[i];
-        Glyph *glyph = resources->GetGlyph(c);
+        const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;
         }
@@ -270,7 +270,7 @@ void DeviceContext::GetSmuflTextExtent(const std::wstring &string, TextExtend *e
     }
 }
 
-void DeviceContext::AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend)
+void DeviceContext::AddGlyphToTextExtend(const Glyph *glyph, TextExtend *extend)
 {
     assert(glyph);
     assert(extend);

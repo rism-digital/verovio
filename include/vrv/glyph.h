@@ -41,7 +41,7 @@ public:
     ///@}
 
     /** Get the bounds of the glyph */
-    void GetBoundingBox(int &x, int &y, int &w, int &h);
+    void GetBoundingBox(int &x, int &y, int &w, int &h) const;
 
     /**
      * Set the bounds of the glyph
@@ -62,7 +62,7 @@ public:
      * @name Setter and getter for the code string
      */
     ///@{
-    std::string GetCodeStr() { return m_codeStr; }
+    std::string GetCodeStr() const { return m_codeStr; }
     void SetCodeStr(const std::string &codeStr) { m_codeStr = codeStr; }
     ///@}
 
@@ -70,7 +70,7 @@ public:
      * @name Setter and getter for the path
      */
     ///@{
-    std::string GetPath() { return m_path; }
+    std::string GetPath() const { return m_path; }
     void SetPath(const std::string &path) { m_path = path; }
     ///@}
 
@@ -78,7 +78,7 @@ public:
      * @name Setter and getter for the horizAdvX
      */
     ///@{
-    int GetHorizAdvX() { return m_horizAdvX; }
+    int GetHorizAdvX() const { return m_horizAdvX; }
     void SetHorizAdvX(double horizAdvX) { m_horizAdvX = (int)(horizAdvX * 10.0); }
     ///@}
 
@@ -91,12 +91,12 @@ public:
     /**
      * Check if the glyph has anchor provided.
      */
-    bool HasAnchor(SMuFLGlyphAnchor anchor);
+    bool HasAnchor(SMuFLGlyphAnchor anchor) const;
 
     /**
      * Return the SMuFL anchor for the glyph.
      */
-    const Point *GetAnchor(SMuFLGlyphAnchor anchor);
+    const Point *GetAnchor(SMuFLGlyphAnchor anchor) const;
 
 private:
     //

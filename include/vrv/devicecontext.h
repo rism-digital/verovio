@@ -303,7 +303,7 @@ public:
     static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); }
 
 private:
-    void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);
+    void AddGlyphToTextExtend(const Glyph *glyph, TextExtend *extend);
 
 public:
     //

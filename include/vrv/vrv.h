@@ -129,8 +129,8 @@ bool Check(Object *object);
 //----------------------------------------------------------------------------
 
 /**
- * This class provides static resource values.
- * The default values can be changed by setters.
+ * This class provides resource values.
+ * It manages fonts and glyph tables.
  */
 
 class Resources {
@@ -140,42 +140,75 @@ public:
     using GlyphNameTable = std::unordered_map<std::string, wchar_t>;
     using GlyphTextMap = std::map<StyleAttributes, GlyphTable>;
 
-    //----------------//
-    // Static methods //
-    //----------------//
-
     /**
-     * @name Setters and getters for static environment variables
+     * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    /** Resource path */
+    Resources();
+    virtual ~Resources() = default;
+    ///@}
+
+    /**
+     * @name Setters and getters
+     */
+    ///@{
     static std::string GetDefaultPath() { return s_defaultPath; }
     static void SetDefaultPath(const std::string &path) { s_defaultPath = path; }
 
-    static std::string GetPath() { return s_path; }
-    static void SetPath(const std::string &path) { s_path = path; }
+    std::string GetPath() const { return m_path; }
+    void SetPath(const std::string &path) { m_path = path; }
+    ///@}
+
+    /**
+     * Font initialization
+     */
+    ///@{
     /** Init the SMufL music and text fonts */
-    static bool InitFonts();
+    bool InitFonts();
     /** Init the text font (bounding boxes and ASCII only) */
-    static bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
+    bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
     /** Select a particular font */
-    static bool SetFont(const std::string &fontName);
+    bool SetFont(const std::string &fontName);
+    ///@}
+
+    /**
+     * Retrieving glyphs
+     */
+    ///@{
     /** Returns the glyph (if exists) for a glyph code in the current SMuFL font */
-    static Glyph *GetGlyph(wchar_t smuflCode);
+    const Glyph *GetGlyph(wchar_t smuflCode) const;
     /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
-    static Glyph *GetGlyph(const std::string &smuflName);
+    const Glyph *GetGlyph(const std::string &smuflName) const;
     /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
-    static wchar_t GetGlyphCode(const std::string &smuflName);
+    wchar_t GetGlyphCode(const std::string &smuflName) const;
+    ///@}
+
+    /**
+     * Text fonts
+     */
+    ///@{
     /** Set current text style*/
-    static void SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle);
+    void SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle) const;
     /** Returns the glyph (if exists) for the text font (bounding box and ASCII only) */
-    static Glyph *GetTextGlyph(wchar_t code);
+    const Glyph *GetTextGlyph(wchar_t code) const;
     ///@}
 
 private:
-    static bool LoadFont(const std::string &fontName);
+    bool LoadFont(const std::string &fontName);
 
 private:
+    /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
+    std::string m_path;
+    /** The loaded SMuFL font */
+    GlyphTable m_fontGlyphTable;
+    /** A text font used for bounding box calculations */
+    GlyphTextMap m_textFont;
+    mutable StyleAttributes m_currentStyle;
+    /**
+     * A map of glyph name / code
+     */
+    GlyphNameTable m_glyphNameTable;
+
     //----------------//
     // Static members //
     //----------------//
@@ -183,18 +216,8 @@ private:
     /** The default path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
     static thread_local std::string s_defaultPath;
 
-    /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
-    static thread_local std::string s_path;
-    /** The loaded SMuFL font */
-    static thread_local GlyphTable s_fontGlyphTable;
-    /** A text font used for bounding box calculations */
-    static thread_local GlyphTextMap s_textFont;
-    static thread_local StyleAttributes s_currentStyle;
+    /** The default font style */
     static const StyleAttributes k_defaultStyle;
-    /**
-     * A map of glyph name / code
-     */
-    static thread_local GlyphNameTable s_glyphNameTable;
 };
 
 //----------------------------------------------------------------------------

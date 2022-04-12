@@ -291,7 +291,7 @@ private:
 
     // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>
-    std::set<Glyph *> m_smuflGlyphs;
+    std::set<const Glyph *> m_smuflGlyphs;
 
     // pugixml data
     pugi::xml_document m_svgDoc;

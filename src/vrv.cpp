@@ -66,17 +66,18 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 thread_local std::string Resources::s_defaultPath = "/usr/local/share/verovio";
-thread_local std::string Resources::s_path = "/usr/local/share/verovio";
-thread_local Resources::GlyphTextMap Resources::s_textFont;
-thread_local Resources::GlyphTable Resources::s_fontGlyphTable;
-thread_local Resources::GlyphNameTable Resources::s_glyphNameTable;
-thread_local Resources::StyleAttributes Resources::s_currentStyle;
 const Resources::StyleAttributes Resources::k_defaultStyle{ data_FONTWEIGHT::FONTWEIGHT_normal,
     data_FONTSTYLE::FONTSTYLE_normal };
 
 //----------------------------------------------------------------------------
 // Font related methods
 //----------------------------------------------------------------------------
+
+Resources::Resources()
+{
+    m_path = "/usr/local/share/verovio";
+    m_currentStyle = k_defaultStyle;
+}
 
 bool Resources::InitFonts()
 {
@@ -86,8 +87,8 @@ bool Resources::InitFonts()
     // The Leipzig as the default font
     if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded.");
 
-    if (s_fontGlyphTable.size() < SMUFL_COUNT) {
-        LogError("Expected %d default SMuFL glyphs but could load only %d.", SMUFL_COUNT, s_fontGlyphTable.size());
+    if (m_fontGlyphTable.size() < SMUFL_COUNT) {
+        LogError("Expected %d default SMuFL glyphs but could load only %d.", SMUFL_COUNT, m_fontGlyphTable.size());
         return false;
     }
 
@@ -112,7 +113,7 @@ bool Resources::InitFonts()
         }
     }
 
-    s_currentStyle = k_defaultStyle;
+    m_currentStyle = k_defaultStyle;
 
     return true;
 }
@@ -122,22 +123,22 @@ bool Resources::SetFont(const std::string &fontName)
     return LoadFont(fontName);
 }
 
-Glyph *Resources::GetGlyph(wchar_t smuflCode)
+const Glyph *Resources::GetGlyph(wchar_t smuflCode) const
 {
-    return s_fontGlyphTable.count(smuflCode) ? &s_fontGlyphTable.at(smuflCode) : NULL;
+    return m_fontGlyphTable.count(smuflCode) ? &m_fontGlyphTable.at(smuflCode) : NULL;
 }
 
-Glyph *Resources::GetGlyph(const std::string &smuflName)
+const Glyph *Resources::GetGlyph(const std::string &smuflName) const
 {
-    return s_glyphNameTable.count(smuflName) ? &s_fontGlyphTable.at(s_glyphNameTable.at(smuflName)) : NULL;
+    return m_glyphNameTable.count(smuflName) ? &m_fontGlyphTable.at(m_glyphNameTable.at(smuflName)) : NULL;
 }
 
-wchar_t Resources::GetGlyphCode(const std::string &smuflName)
+wchar_t Resources::GetGlyphCode(const std::string &smuflName) const
 {
-    return s_glyphNameTable.count(smuflName) ? s_glyphNameTable.at(smuflName) : 0;
+    return m_glyphNameTable.count(smuflName) ? m_glyphNameTable.at(smuflName) : 0;
 }
 
-void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle)
+void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle) const
 {
     if (fontWeight == FONTWEIGHT_NONE) {
         fontWeight = FONTWEIGHT_normal;
@@ -147,22 +148,24 @@ void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontSt
         fontStyle = FONTSTYLE_normal;
     }
 
-    s_currentStyle = { fontWeight, fontStyle };
-    if (s_textFont.count(s_currentStyle) == 0) {
+    m_currentStyle = { fontWeight, fontStyle };
+    if (m_textFont.count(m_currentStyle) == 0) {
         LogWarning("Text font for style (%d, %d) is not loaded. Use default", fontWeight, fontStyle);
-        s_currentStyle = k_defaultStyle;
+        m_currentStyle = k_defaultStyle;
     }
 }
 
-Glyph *Resources::GetTextGlyph(wchar_t code)
+const Glyph *Resources::GetTextGlyph(wchar_t code) const
 {
-    GlyphTable *currentTable = &s_textFont[s_textFont.count(s_currentStyle) != 0 ? s_currentStyle : k_defaultStyle];
+    const StyleAttributes style = (m_textFont.count(m_currentStyle) != 0) ? m_currentStyle : k_defaultStyle;
+    if (m_textFont.count(style) == 0) return NULL;
 
-    if (currentTable->count(code) == 0) {
+    const GlyphTable &currentTable = m_textFont.at(style);
+    if (currentTable.count(code) == 0) {
         return NULL;
     }
 
-    return &currentTable->at(code);
+    return &currentTable.at(code);
 }
 
 bool Resources::LoadFont(const std::string &fontName)
@@ -212,8 +215,8 @@ bool Resources::LoadFont(const std::string &fontName)
         }
 
         const wchar_t smuflCode = (wchar_t)strtol(c_attribute.value(), NULL, 16);
-        s_fontGlyphTable[smuflCode] = glyph;
-        s_glyphNameTable[n_attribute.value()] = smuflCode;
+        m_fontGlyphTable[smuflCode] = glyph;
+        m_glyphNameTable[n_attribute.value()] = smuflCode;
     }
 
     return true;
@@ -225,7 +228,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
     pugi::xml_document doc;
     // For now, we have only Times bounding boxes for ASCII chars
     // For any other char, we currently use 'o' bounding box
-    std::string filename = Resources::GetPath() + "/text/" + fontName + ".xml";
+    std::string filename = GetPath() + "/text/" + fontName + ".xml";
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
     if (!result) {
         // File not found, default bounding boxes will be used
@@ -239,10 +242,10 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
     }
     const int unitsPerEm = root.attribute("units-per-em").as_int();
     pugi::xml_node current;
-    if (s_textFont.count(style) == 0) {
-        s_textFont[style] = {};
+    if (m_textFont.count(style) == 0) {
+        m_textFont[style] = {};
     }
-    GlyphTable &currentTable = s_textFont.at(style);
+    GlyphTable &currentTable = m_textFont.at(style);
     for (current = root.child("g"); current; current = current.next_sibling("g")) {
         if (current.attribute("c")) {
             wchar_t code = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);

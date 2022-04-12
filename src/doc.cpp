@@ -1459,7 +1459,7 @@ int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -1472,7 +1472,7 @@ int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -1484,7 +1484,7 @@ int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
 int Doc::GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const
 {
     const Resources &resources = this->GetResources();
-    Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
     int advX = glyph->GetHorizAdvX();
     advX = advX * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -1515,7 +1515,7 @@ int Doc::GetGlyphLeft(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     x = x * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -1533,7 +1533,7 @@ int Doc::GetGlyphBottom(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -1553,7 +1553,7 @@ int Doc::GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const
 
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    Glyph *glyph = resources.GetTextGlyph(code);
+    const Glyph *glyph = resources.GetTextGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     h = h * font->GetPointSize() / glyph->GetUnitsPerEm();
@@ -1567,7 +1567,7 @@ int Doc::GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const
 
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    Glyph *glyph = resources.GetTextGlyph(code);
+    const Glyph *glyph = resources.GetTextGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     w = w * font->GetPointSize() / glyph->GetUnitsPerEm();
@@ -1580,7 +1580,7 @@ int Doc::GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const
     assert(font);
 
     const Resources &resources = this->GetResources();
-    Glyph *glyph = resources.GetTextGlyph(code);
+    const Glyph *glyph = resources.GetTextGlyph(code);
     assert(glyph);
     int advX = glyph->GetHorizAdvX();
     advX = advX * font->GetPointSize() / glyph->GetUnitsPerEm();
@@ -1594,7 +1594,7 @@ int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) con
 
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    Glyph *glyph = resources.GetTextGlyph(code);
+    const Glyph *glyph = resources.GetTextGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     y = y * font->GetPointSize() / glyph->GetUnitsPerEm();

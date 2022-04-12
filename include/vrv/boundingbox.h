@@ -274,14 +274,14 @@ private:
      * Calculate the rectangles with 2 anchor points.
      * Return false (and one single rectangle) when anchor points are out of the boundaries.
      */
-    bool GetGlyph2PointRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Glyph *glyph1,
+    bool GetGlyph2PointRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, const Glyph *glyph1,
         Point rect[3][2], Doc *doc) const;
 
     /**
      * Calculate the rectangles with 1 anchor point.
      * Return false (and one single rectangle) when anchor points are out of the boundaries.
      */
-    bool GetGlyph1PointRectangles(const SMuFLGlyphAnchor &anchor, Glyph *glyph, Point rect[2][2], Doc *doc) const;
+    bool GetGlyph1PointRectangles(const SMuFLGlyphAnchor &anchor, const Glyph *glyph, Point rect[2][2], Doc *doc) const;
 
 public:
     //

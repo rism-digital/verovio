@@ -95,7 +95,7 @@ void Glyph::SetBoundingBox(double x, double y, double w, double h)
     m_height = (int)(10.0 * h);
 }
 
-void Glyph::GetBoundingBox(int &x, int &y, int &w, int &h)
+void Glyph::GetBoundingBox(int &x, int &y, int &w, int &h) const
 {
     x = m_x;
     y = m_y;
@@ -125,14 +125,14 @@ void Glyph::SetAnchor(std::string anchorStr, double x, double y)
     m_anchors[anchorId] = Point(x * this->GetUnitsPerEm() / 4, y * this->GetUnitsPerEm() / 4);
 }
 
-bool Glyph::HasAnchor(SMuFLGlyphAnchor anchor)
+bool Glyph::HasAnchor(SMuFLGlyphAnchor anchor) const
 {
     return (m_anchors.count(anchor) == 1);
 }
 
-const Point *Glyph::GetAnchor(SMuFLGlyphAnchor anchor)
+const Point *Glyph::GetAnchor(SMuFLGlyphAnchor anchor) const
 {
-    return &m_anchors[anchor];
+    return &m_anchors.at(anchor);
 }
 
 } // namespace vrv
