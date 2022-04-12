@@ -458,11 +458,10 @@ void ScoreDef::FilterList(ArrayOfConstObjects &childList) const
 
 void ScoreDef::ResetFromDrawingValues()
 {
-    this->ResetList(this);
-    const ArrayOfObjects *childList = this->GetList(this);
+    const ArrayOfObjects &childList = this->GetList(this);
 
     StaffDef *staffDef = NULL;
-    for (auto item : *childList) {
+    for (auto item : childList) {
         if (!item->Is(STAFFDEF)) continue;
         staffDef = vrv_cast<StaffDef *>(item);
         assert(staffDef);
