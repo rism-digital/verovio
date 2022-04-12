@@ -755,7 +755,7 @@ void ABCInput::parseMeter(const std::string &meterString)
         if (meterCount.front() == '(' && meterCount.back() == ')')
             meterCount = meterCount.substr(1, meterCount.length() - 1);
         // this is a little "hack", until libMEI is fixed
-        m_meter->SetCount({ atoi(meterCount.c_str()) });
+        m_meter->SetCount(meterCount);
         m_meter->SetUnit(atoi(&meterString[meterString.find('/') + 1]));
     }
 }

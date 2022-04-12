@@ -17,6 +17,7 @@
 
 #include "attdef.h"
 #include "io.h"
+#include "metersig.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -471,6 +472,7 @@ private:
     /* meter signature */
     std::vector<int> m_meterCount = { 4 };
     int m_meterUnit = 4;
+    MeterSig::CountSign m_meterSign = MeterSig::CountSign::None;
     /* part information */
     Label *m_label = NULL;
     LabelAbbr *m_labelAbbr = NULL;

@@ -5783,7 +5783,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
                 // hide time signature
                 vrvmeter->SetForm(METERFORM_invis);
             }
-            vrvmeter->SetCount({ top * 2 });
+            vrvmeter->SetCount(std::to_string(top * 2));
             vrvmeter->SetUnit(1);
         }
         else {
@@ -5791,21 +5791,21 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
                 // Can't add if there is a mensuration; otherwise,
                 // a time signature will be shown.
                 vrvmeter->SetForm(METERFORM_invis);
-                vrvmeter->SetCount({ top });
+                vrvmeter->SetCount(std::to_string(top));
                 vrvmeter->SetUnit(bot);
             }
             else if (metersig == "3") {
-                vrvmeter->SetCount({ 3 });
+                vrvmeter->SetCount("3");
                 vrvmeter->SetUnit(bot);
                 vrvmeter->SetForm(METERFORM_num);
             }
             else if (metersig == "2") {
-                vrvmeter->SetCount({ 2 });
+                vrvmeter->SetCount("2");
                 vrvmeter->SetUnit(bot);
                 vrvmeter->SetForm(METERFORM_num);
             }
             else {
-                vrvmeter->SetCount({ top });
+                vrvmeter->SetCount(std::to_string(top));
                 vrvmeter->SetUnit(bot);
             }
         }
@@ -5849,29 +5849,27 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
     }
     else if (regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
         if (!metersigtok) {
-            count = stoi(matches[1]);
             unit = stoi(matches[2]);
             MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetCount({ count });
+            vrvmetersig->SetCount(matches[1]);
             vrvmetersig->SetUnit(unit);
         }
         else if (*metersigtok == "*met()") {
-            count = stoi(matches[1]);
             unit = stoi(matches[2]);
             MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetCount({ count });
+            vrvmetersig->SetCount(matches[1]);
             vrvmetersig->SetUnit(unit);
             vrvmetersig->SetForm(METERFORM_invis);
         }
         else if (metersig == "3") {
             MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetCount({ 3 });
+            vrvmetersig->SetCount("3");
             vrvmetersig->SetUnit(unit);
             vrvmetersig->SetForm(METERFORM_num);
         }
         else if (metersig == "2") {
             MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetCount({ 2 });
+            vrvmetersig->SetCount("2");
             vrvmetersig->SetUnit(unit);
             vrvmetersig->SetForm(METERFORM_num);
         }
@@ -5879,10 +5877,9 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             && (metersigtok->find('O') == std::string::npos)) {
             // Only storing the time signature if there is no mensuration
             // otherwise verovio will display both.
-            count = stoi(matches[1]);
             unit = stoi(matches[2]);
             MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetCount({ count });
+            vrvmetersig->SetCount(matches[1]);
             vrvmetersig->SetUnit(unit);
         }
         else {
@@ -5890,11 +5887,10 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             // are in reference to it (can't add meter.count since
             // this will also print a time signature.
             // Count now allowed (suppress time signature display with @form="invis").
-            count = stoi(matches[1]);
             unit = stoi(matches[2]);
             MeterSig *vrvmetersig = getMeterSig(element);
             vrvmetersig->SetForm(METERFORM_invis);
-            vrvmetersig->SetCount({ count });
+            vrvmetersig->SetCount(matches[1]);
             vrvmetersig->SetUnit(unit);
         }
         if (metersigtok) {
@@ -15527,7 +15523,7 @@ void HumdrumInput::insertMeterSigElement(
         setLocationId(msig, tsig);
     }
     appendElement(elements, pointers, msig);
-    msig->SetCount({ count });
+    msig->SetCount(std::to_string(count));
     if (unit > 0) {
         msig->SetUnit(unit);
     }

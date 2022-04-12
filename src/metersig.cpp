@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <math.h>
 #include <numeric>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -48,8 +49,70 @@ void MeterSig::Reset()
 
 int MeterSig::GetTotalCount() const
 {
-    const data_SUMMAND_List &summands = this->GetCount();
-    return std::accumulate(summands.cbegin(), summands.cend(), 0);
+    const auto [counts, sign] = this->GetMeterCounts();
+    switch (sign) {
+        case CountSign::Divide:
+            return std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::divides<int>());
+        case CountSign::Minus:
+            return std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::minus<int>());
+        case CountSign::Multiply:
+            return std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::multiplies<int>());
+        case CountSign::Plus:
+            return std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::plus<int>());
+        case CountSign::None:
+        default: break;
+    }
+
+    return counts.front();
+}
+
+std::pair<std::vector<int>, MeterSig::CountSign> MeterSig::GetMeterCounts() const 
+{
+    const std::string count = this->GetCount();
+    std::regex re("[\\*\\+/-]");
+    std::sregex_token_iterator first{ count.begin(), count.end(), re, -1 }, last;
+    std::vector<std::string> tokens{ first, last };
+
+    // Since there is currently no need for implementation of complex calculus within metersig, only one opperation will
+    // be supported in the meter count. Caclulation will be based on the first mathematical operator in the string
+    MeterSig::CountSign sign = CountSign::None;
+    const size_t pos = count.find_first_of("+-*/");
+    if (pos != std::string::npos) {
+        if (count[pos] == '/') {
+            sign = CountSign::Divide;
+        }
+        else if (count[pos] == '*') {
+            sign = CountSign::Multiply;
+        }
+        else if (count[pos] == '+') {
+            sign = CountSign::Plus;
+        }
+        else if (count[pos] == '-') {
+            sign = CountSign::Minus;
+        }
+    }
+    std::vector<int> result;
+    std::for_each(tokens.begin(), tokens.end(),
+        [&result](const std::string &elem) { result.emplace_back(std::atoi(elem.c_str())); });
+    return { result, sign };
+}
+
+void MeterSig::SetMeterCounts(const std::vector<int> &counts, MeterSig::CountSign sign) 
+{
+    std::stringstream output;
+    for (const int count : counts) {
+        output << count;
+        switch (sign) {
+            case CountSign::Divide: output << '\\'; break;
+            case CountSign::Minus: output << '-'; break;
+            case CountSign::Multiply: output << '*'; break;
+            case CountSign::Plus: output << '+'; break;
+            case CountSign::None:
+            default: break;
+        }
+    }
+
+    this->SetCount(output.str());
 }
 
 wchar_t MeterSig::GetSymbolGlyph() const
