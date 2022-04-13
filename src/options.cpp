@@ -212,6 +212,11 @@ void OptionBool::Reset()
     m_isSet = false;
 }
 
+bool OptionBool::IsSet() const
+{
+    return (m_value != m_defaultValue);
+}
+
 bool OptionBool::SetValue(bool value)
 {
     m_value = value;
@@ -274,6 +279,11 @@ void OptionDbl::Reset()
 {
     m_value = m_defaultValue;
     m_isSet = false;
+}
+
+bool OptionDbl::IsSet() const
+{
+    return (m_value != m_defaultValue);
 }
 
 //----------------------------------------------------------------------------
@@ -344,6 +354,11 @@ void OptionInt::Reset()
     m_isSet = false;
 }
 
+bool OptionInt::IsSet() const
+{
+    return (m_value != m_defaultValue);
+}
+
 //----------------------------------------------------------------------------
 // OptionString
 //----------------------------------------------------------------------------
@@ -372,6 +387,11 @@ void OptionString::Reset()
 {
     m_value = m_defaultValue;
     m_isSet = false;
+}
+
+bool OptionString::IsSet() const
+{
+    return (m_value != m_defaultValue);
 }
 
 //----------------------------------------------------------------------------
@@ -447,6 +467,11 @@ void OptionArray::Reset()
 {
     m_values.clear();
     m_isSet = false;
+}
+
+bool OptionArray::IsSet() const
+{
+    return !m_values.empty();
 }
 
 //----------------------------------------------------------------------------
@@ -555,6 +580,11 @@ void OptionIntMap::Reset()
     m_isSet = false;
 }
 
+bool OptionIntMap::IsSet() const
+{
+    return (m_value != m_defaultValue);
+}
+
 //----------------------------------------------------------------------------
 // OptionStaffrel
 //----------------------------------------------------------------------------
@@ -601,6 +631,11 @@ void OptionStaffrel::Reset()
 {
     m_value = m_defaultValue;
     m_isSet = false;
+}
+
+bool OptionStaffrel::IsSet() const
+{
+    return (m_value != m_defaultValue);
 }
 
 //----------------------------------------------------------------------------
@@ -668,6 +703,11 @@ void OptionJson::Reset()
 {
     m_values.reset();
     m_isSet = false;
+}
+
+bool OptionJson::IsSet() const
+{
+    return (this->GetStrValue() != this->GetDefaultStrValue());
 }
 
 bool OptionJson::ReadJson(jsonxx::Object &output, const std::string &input) const
