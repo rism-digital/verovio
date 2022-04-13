@@ -692,14 +692,19 @@ bool HumdrumInput::convertHumdrum()
     infile.getStaffLikeSpineStartList(staffstarts);
     vector<hum::HTp> tempstarts = staffstarts;
     staffstarts.clear();
+    vector<hum::HTp> tacets;
     for (int i = 0; i < (int)tempstarts.size(); i++) {
         if (*tempstarts[i] == "**kernyy") {
             continue;
         }
         if (isTacet(tempstarts[i])) {
+            tacets.push_back(tempstarts[i]);
             continue;
         }
         staffstarts.push_back(tempstarts[i]);
+    }
+    if (staffstarts.empty() && !tacets.empty()) {
+        staffstarts = tacets;
     }
 
     m_fbstates.resize(staffstarts.size());
