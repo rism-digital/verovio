@@ -690,6 +690,13 @@ bool HumdrumInput::convertHumdrum()
     // Create a list of the parts and which spine represents them.
     std::vector<hum::HTp> &staffstarts = m_staffstarts;
     infile.getStaffLikeSpineStartList(staffstarts);
+    vector<hum::HTp> tempstarts = staffstarts;
+    staffstarts.clear();
+    for (int i = 0; i < (int)tempstarts.size(); i++) {
+        if (*tempstarts[i] != "**kernyy") {
+            staffstarts.push_back(tempstarts[i]);
+        }
+    }
 
     m_fbstates.resize(staffstarts.size());
     std::fill(m_fbstates.begin(), m_fbstates.end(), 0);
@@ -16485,6 +16492,19 @@ void HumdrumInput::analyzeLayerBeams(
         }
     }
 
+    // Adjust the beam states if there are any negative values in it:
+    int min = 0;
+    for (int i = 0; i < (int)beamstate.size(); i++) {
+        if (beamstate[i] < min) {
+            min = beamstate[i];
+        }
+    }
+    if (min < 0) {
+        for (int i = 0; i < (int)beamstate.size(); i++) {
+            beamstate[i] -= min;
+        }
+    }
+
     int beamstartindex = -1;
     int beamendindex = -1;
     if (beamstate.size() > 0) {
@@ -20511,17 +20531,18 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
     bool lyricQ;
     int startfield = token->getFieldIndex() + 1;
     for (int i = startfield; i < line.getFieldCount(); ++i) {
-        std::string exinterp = line.token(i)->getDataType();
+        hum::HTp token = line.token(i);
+        std::string exinterp = token->getDataType();
 
-        if (line.token(i)->isKernLike()) {
-            ttrack = line.token(i)->getTrack();
+        if (token->isKernLike()) {
+            ttrack = token->getTrack();
             if (ttrack != track) {
                 break;
             }
         }
 
-        if (line.token(i)->isMensLike()) {
-            ttrack = line.token(i)->getTrack();
+        if (token->isMensLike()) {
+            ttrack = token->getTrack();
             if (ttrack != track) {
                 break;
             }
@@ -20530,17 +20551,17 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
         lyricQ = false;
         vdataQ = false;
         vvdataQ = false;
-        if (line.token(i)->isDataTypeLike("**text")) {
+        if (token->isDataTypeLike("**text")) {
             lyricQ = true;
         }
-        else if (line.token(i)->isDataTypeLike("**silbe")) {
+        else if (token->isDataTypeLike("**silbe")) {
             lyricQ = true;
         }
-        else if (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0) {
+        else if (token->getDataType().compare(0, 7, "**vdata") == 0) {
             vdataQ = true;
             lyricQ = true;
         }
-        else if (line.token(i)->getDataType().compare(0, 8, "**vvdata") == 0) {
+        else if (token->getDataType().compare(0, 8, "**vvdata") == 0) {
             vvdataQ = true;
             lyricQ = true;
         }
@@ -20549,12 +20570,12 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             continue;
         }
 
-        if (line.token(i)->isNull()) {
+        if (token->isNull()) {
             versenum++;
             continue;
         }
-        if (line.token(i)->isDataTypeLike("**silbe")) {
-            if (line.token(i)->getText() == "|") {
+        if (token->isDataTypeLike("**silbe")) {
+            if (token->getText() == "|") {
                 versenum++;
                 continue;
             }
@@ -20564,7 +20585,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
         std::string verselabel;
 
         if (!ss[staff].verse_labels.empty()) {
-            labels = getVerseLabels(line.token(i), staff);
+            labels = getVerseLabels(token, staff);
             if (!labels.empty()) {
                 verselabel = getVerseLabelText(labels[0]);
             }
@@ -20573,7 +20594,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
         std::vector<hum::HTp> abbrlabels;
         std::string verseabbrlabel;
         if (!ss[staff].verse_abbr_labels.empty()) {
-            abbrlabels = getVerseAbbrLabels(line.token(i), staff);
+            abbrlabels = getVerseAbbrLabels(token, staff);
             if (!abbrlabels.empty()) {
                 verseabbrlabel = getVerseLabelText(abbrlabels[0]);
             }
@@ -20581,11 +20602,11 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
 
         vtexts.clear();
         vtoks.clear();
-        // int track = line.token(i)->getTrack();
-        // int strack = line.token(i)->getSubtrack();
-        if (line.token(i)->isDataTypeLike("**silbe")) {
-            vtoks.push_back(line.token(i));
-            std::string value = line.token(i)->getText();
+        // int track = token->getTrack();
+        // int strack = token->getSubtrack();
+        if (token->isDataTypeLike("**silbe")) {
+            vtoks.push_back(token);
+            std::string value = token->getText();
             hre.replaceDestructive(value, "", "\\|", "g");
             hre.replaceDestructive(value, "&uuml;", "u2", "g");
             hre.replaceDestructive(value, "&auml;", "a2", "g");
@@ -20593,8 +20614,8 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             vtexts.push_back(value);
         }
         else {
-            vtoks.push_back(line.token(i));
-            vtexts.push_back(*line.token(i));
+            vtoks.push_back(token);
+            vtexts.push_back(*token);
         }
         if (vvdataQ) {
             splitSyllableBySpaces(vtexts);
@@ -20626,10 +20647,10 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             }
 
             if (vvdataQ) {
-                setLocationId(verse, line.token(i), j + 1);
+                setLocationId(verse, token, j + 1);
             }
             else {
-                setLocationId(verse, line.token(i), -1);
+                setLocationId(verse, token, -1);
             }
             appendElement(element, verse);
             verse->SetN(versenum);
@@ -20656,7 +20677,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             syls.push_back(syl);
             appendElement(verse, syls.back());
 
-            std::string datatype = line.token(i)->getDataType();
+            std::string datatype = token->getDataType();
 
             if (datatype.compare(0, 8, "**vdata-") == 0) {
                 std::string subdatatype = datatype.substr(8);
@@ -20673,10 +20694,10 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
 
             // add IDs for first syb-syllable:
             if (vvdataQ) {
-                setLocationId(syls.back(), line.token(i), j + 1);
+                setLocationId(syls.back(), token, j + 1);
             }
             else {
-                setLocationId(syls.back(), line.token(i), -1);
+                setLocationId(syls.back(), token, -1);
             }
 
             if (vdataQ || vvdataQ) {
