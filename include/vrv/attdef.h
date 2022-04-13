@@ -262,11 +262,6 @@ enum data_PITCHNAME_GES {
 enum data_PROLATIO { PROLATIO_NONE = -3, PROLATIO_2 = 2, PROLATIO_3 };
 
 /**
- * A typedef for a list of integer summands.
- */
-typedef std::vector<int> data_SUMMAND_List;
-
-/**
  * MEI data.TIE
  */
 enum data_TIE { TIE_NONE = 0, TIE_i, TIE_m, TIE_t };

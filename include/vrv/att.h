@@ -207,9 +207,6 @@ public:
     std::string ProlatioToStr(data_PROLATIO data) const;
     data_PROLATIO StrToProlatio(const std::string &value, bool logWarning = true) const;
 
-    std::string SummandListToStr(data_SUMMAND_List data) const;
-    data_SUMMAND_List StrToSummandList(std::string value) const;
-
     std::string TempusToStr(data_TEMPUS data) const;
     data_TEMPUS StrToTempus(const std::string &value, bool logWarning = true) const;
 
