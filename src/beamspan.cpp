@@ -101,6 +101,8 @@ ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
     ListOfObjects objects;
     layer->FindAllDescendantsBetween(&objects, &classIds, this->GetStart(), this->GetEnd(), true, 1);
 
+    if (objects.empty()) return {};
+
     ArrayOfObjects beamSpanElements(objects.begin(), objects.end());
     // If last element is not equal to the end, there is high chance that this beamSpan is cross-measure.
     // Look for the same N-staff N-layer in next measure and try finding end there
@@ -208,7 +210,7 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    if (!this->GetStart() || !this->GetEnd()) return FUNCTOR_CONTINUE;
+    if (!this->GetStart() || !this->GetEnd() || m_beamedElements.empty()) return FUNCTOR_CONTINUE;
 
     Layer *layer = vrv_cast<Layer *>(this->GetStart()->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
@@ -237,6 +239,8 @@ int BeamSpan::PrepareBeamSpanElements(FunctorParams *functorParams)
     if (!layer || !staff) return FUNCTOR_SIBLINGS;
 
     m_beamedElements = this->HasPlist() ? *this->GetRefs() : this->GetBeamSpanElementList(layer, staff);
+
+    if (m_beamedElements.empty()) return FUNCTOR_SIBLINGS;
 
     // set current beamSpan as referencedElement for all beamed elements (for thesake of figuring if corresponding
     // element is in beamSpan)

@@ -2072,7 +2072,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         LayerElement *element = vrv_cast<LayerElement *>(this);
         assert(element);
         Clef *clef = vrv_cast<Clef *>(element->ThisOrSameasAsLink());
-        assert(clef);
+        if (!clef->Is(CLEF)) return FUNCTOR_CONTINUE;
         if (clef->IsScoreDefElement()) {
             return FUNCTOR_CONTINUE;
         }

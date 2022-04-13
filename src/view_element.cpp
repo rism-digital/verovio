@@ -1512,11 +1512,12 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
         drawingDur = duration->GetActualDur();
     }
     data_STEMMODIFIER stemMod = element->GetDrawingStemMod();
-    if (stemMod == STEMMODIFIER_NONE) return;
+    if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return;
 
     // calculate height offset for positioning of stem mod elements on the stem
     const int noteLoc = note->GetDrawingLoc();
     const wchar_t code = element->StemModToGlyph(stemMod);
+    if (!code) return;
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int glyphHalfHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) / 2;
     int height = 2 * unit;
