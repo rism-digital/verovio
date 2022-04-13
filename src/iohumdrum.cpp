@@ -4748,6 +4748,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
             ss[staffindex].meter_bottom = bot;
             ss[staffindex].meter_top = top;
             if (bot == 0) {
+                // Can't to breve meters, so switch to semibreve meter (whole notes).
                 ss[staffindex].meter_bottom = 1;
                 ss[staffindex].meter_top *= 2;
             }
@@ -9072,6 +9073,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     // whole-measure rests later.  Also have to deal with
     // pedal mark in mrest meaures.
     if (hasFullMeasureRest(layerdata, timesigdurs[startline], duration)) {
+        hum::HumNum meterDur;
+        meterDur = 4;
+        meterDur = meterDur / ss[staffindex].meter_bottom;
+        meterDur = meterDur * ss[staffindex].meter_top;
         if (m_multirest[startline] > 1) {
             int tempendline = getMultiEndline(startline);
             MultiRest *multirest = new MultiRest();
@@ -9103,9 +9108,30 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 hum::HumNum mdur = menddur - mstartdur;
                 hum::HumNum extradur = duration - mdur;
                 if (extradur == 0) {
-                    MRest *mrest = new MRest();
-                    appendElement(layer, mrest);
-                    convertMRest(mrest, trest, -1, staffindex);
+                    if (meterDur == duration) {
+                        // duration of rest matches duration of meter so create mRest
+                        MRest *mrest = new MRest();
+                        appendElement(layer, mrest);
+                        convertMRest(mrest, trest, -1, staffindex);
+                    }
+                    else {
+                        // Duration of rest does not matches duration of meter so use a rest instead.
+                        // This code currently cannot handle non-power-of-two rests such as
+                        // a full measure rest of 5/8.
+                        if (trest->find("yy") != std::string::npos) {
+                            Space *irest = new Space();
+                            if (m_doc->GetOptions()->m_humType.GetValue()) {
+                                embedQstampInClass(irest, trest, *trest);
+                            }
+                            setLocationId(irest, trest);
+                            appendElement(elements, pointers, irest);
+                            convertRhythm(irest, trest);
+                        }
+                        else {
+                            Rest *rest = new Rest();
+                            convertRest(rest, trest, -1, staffindex);
+                        }
+                    }
                 }
                 else if (extradur > 0) {
                     // add a rest that is left justified in the measure
@@ -17364,7 +17390,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         tuptop[i] = value.getDenominator();
         tupbot[i] = value.getNumerator();
 
-        // Reference tuplet breve to breve rather than whole.
+        // Reference tuplet breve do breve rather than whole.
         if ((dotlessdur[i].getNumerator() == 4) && (dotlessdur[i].getDenominator() == 3)) {
             tupbot[i] = 2;
         }
