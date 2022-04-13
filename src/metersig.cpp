@@ -49,16 +49,30 @@ void MeterSig::Reset()
 
 int MeterSig::GetTotalCount() const
 {
-    const auto [counts, sign] = this->GetMeterCounts();
+    auto [counts, sign] = this->GetMeterCounts();
     switch (sign) {
-        case CountSign::Divide:
-            return std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::divides<int>());
-        case CountSign::Minus:
-            return std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::minus<int>());
-        case CountSign::Multiply:
-            return std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::multiplies<int>());
-        case CountSign::Plus:
-            return std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::plus<int>());
+        case CountSign::Divide: {
+            // make sure that there is no division by zero
+            std::for_each(counts.begin(), counts.end(), [](int &elem) {
+                if (!elem) elem = 1;
+            });
+            int result = std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::divides<int>());
+            if (!result) result = 1;
+            return result;
+        }
+        case CountSign::Minus: {
+            int result = std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::minus<int>());
+            if (result <= 0) result = 1;
+            return result;
+        }
+        case CountSign::Multiply: {
+            int result = std::accumulate(counts.begin(), counts.end(), 1, std::multiplies<int>());
+            if (!result) result = 1;
+            return result;
+        }
+        case CountSign::Plus: {
+            return std::accumulate(counts.begin(), counts.end(), 0, std::plus<int>());
+        }
         case CountSign::None:
         default: break;
     }
