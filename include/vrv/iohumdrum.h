@@ -760,6 +760,7 @@ protected:
     std::string getDataTokenId(hum::HTp token);
     void checkForFingeredHarmonic(Chord *chord, hum::HTp token);
     double getTempoScaling(hum::HumdrumFile &infile);
+    bool isTacet(hum::HTp spinestart);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

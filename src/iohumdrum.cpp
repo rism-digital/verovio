@@ -693,9 +693,13 @@ bool HumdrumInput::convertHumdrum()
     vector<hum::HTp> tempstarts = staffstarts;
     staffstarts.clear();
     for (int i = 0; i < (int)tempstarts.size(); i++) {
-        if (*tempstarts[i] != "**kernyy") {
-            staffstarts.push_back(tempstarts[i]);
+        if (*tempstarts[i] == "**kernyy") {
+            continue;
         }
+        if (isTacet(tempstarts[i])) {
+            continue;
+        }
+        staffstarts.push_back(tempstarts[i]);
     }
 
     m_fbstates.resize(staffstarts.size());
@@ -25529,6 +25533,28 @@ double HumdrumInput::getTempoScaling(hum::HumdrumFile &infile)
         }
     }
     return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::isTacet -- Returns true if *tacet interpretation
+//     is found before the first data line.  Such a spine is then
+//     ignored when printing the score (remove *tacet or change to
+//     *Xtacet to display the tacet part).
+
+bool HumdrumInput::isTacet(hum::HTp spinestart)
+{
+    hum::HTp current = spinestart->getNextToken();
+    while (current) {
+        if (current->isData()) {
+            break;
+        }
+        if (*current == "*tacet") {
+            return true;
+        }
+        current = current->getNextToken();
+    }
+    return false;
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */
