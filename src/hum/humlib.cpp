@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Apr  7 10:51:19 PDT 2022
+// Last Modified: Tue Apr 12 20:37:31 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -28311,6 +28311,149 @@ std::string HumdrumFileStructure::getKernBelowSignifier(void) {
 
 
 
+
+//////////////////////////////
+//
+// HumdrumLine::getMidiPitches: Get MIDI note numbers for **kern pitches on line.
+// 0 = rest, negative values are tied notes from previously in the score.
+//
+
+void HumdrumLine::getMidiPitches(std::vector<int>& output) {
+
+	HumdrumLine& line = *this;
+	output.clear();
+	if (!line.isData()) {
+		return;
+	}
+	vector<int> tnotes;
+	for (int i=0; i<line.getFieldCount(); i++) {
+		HTp token = line.token(i);
+		if (!token->isKern()) {
+			continue;
+		}
+		if (token->isNull()) {
+			return;
+		}
+		token->getMidiPitches(tnotes);
+		output.insert(output.end(), tnotes.begin(), tnotes.end());
+	}
+
+}
+
+
+std::vector<int> HumdrumLine::getMidiPitches(void) {
+	vector<int> output;
+	this->getMidiPitches(output);
+	return output;
+}
+
+
+void HumdrumLine::getMidiPitchesSortHL(std::vector<int>& output) {
+	output.clear();
+	this->getMidiPitches(output);
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) > abs(b);
+		}
+	);
+}
+	
+
+std::vector<int> HumdrumLine::getMidiPitchesSortHL(void) {
+	vector<int> output;
+	this->getMidiPitchesSortHL(output);
+	return output;
+}
+
+
+void HumdrumLine::getMidiPitchesSortLH(std::vector<int>& output) {
+	output.clear();
+	this->getMidiPitches(output);
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) < abs(b);
+		}
+	);
+}
+
+
+std::vector<int> HumdrumLine::getMidiPitchesSortLH(void) {
+	vector<int> output;
+	this->getMidiPitchesSortLH(output);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::getMidiPitches: Get MIDI note numbers for **kern pitches on line.
+// Null tokens are resulved to the token which is being sustained.
+// 0 = rest, negative values are tied notes from previously in the score.
+//
+
+void HumdrumLine::getMidiPitchesResolveNull(std::vector<int>& output) {
+	HumdrumLine& line = *this;
+	output.clear();
+	if (!line.isData()) {
+		return;
+	}
+	vector<int> tnotes;
+	for (int i=0; i<line.getFieldCount(); i++) {
+		HTp token = line.token(i);
+		if (!token->isKern()) {
+			continue;
+		}
+		token->getMidiPitchesResolveNull(tnotes);
+		output.insert(output.end(), tnotes.begin(), tnotes.end());
+	}
+}
+
+
+std::vector<int> HumdrumLine::getMidiPitchesResolveNull(void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNull(output);
+	return output;
+}
+
+
+void HumdrumLine::getMidiPitchesResolveNullSortHL(std::vector<int>& output) {
+	output.clear();
+	this->getMidiPitchesResolveNull(output);
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) > abs(b);
+		}
+	);
+}
+
+
+std::vector<int> HumdrumLine::getMidiPitchesResolveNullSortHL (void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNullSortHL(output);
+	return output;
+}
+
+
+void HumdrumLine::getMidiPitchesResolveNullSortLH(std::vector<int>& output) {
+	output.clear();
+	this->getMidiPitchesResolveNull(output);
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) < abs(b);
+		}
+	);
+}
+
+
+std::vector<int> HumdrumLine::getMidiPitchesResolveNullSortLH (void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNullSortLH(output);
+	return output;
+}
+
+
+
 //////////////////////////////
 //
 // HumdrumLine::HumdrumLine -- HumdrumLine constructor.
@@ -31015,6 +31158,8 @@ bool HumdrumToken::isKernLike(void) const {
 		return true;
 	} else if (dtype.compare(0, 7, "**kern-") == 0) {
 		return true;
+	} else if (dtype == "**kernyy") {
+		return true;
 	}
 	return false;
 }
@@ -31450,6 +31595,7 @@ bool HumdrumToken::isManipulator(void) const {
 // HumdrumToken::getMidiPitches -- Returns 0 if a rest.
 //    Does not check for valid MIDI note number range of 0-127.
 //    Also not checking to see if input data type is not **kern.
+//    Negative value means a sustained pitch.
 //
 
 void HumdrumToken::getMidiPitches(vector<int>& output) {
@@ -31465,6 +31611,12 @@ void HumdrumToken::getMidiPitches(vector<int>& output) {
 			output[i] = 0;
 		} else {
 			output[i] = Convert::kernToMidiNoteNumber(pieces[i]);
+			// sustained notes are negative values:
+			if (pieces[i].find("_") != string::npos) {
+				output[i] = -output[i];
+			} else if (pieces[i].find("]") != string::npos) {
+				output[i] = -output[i];
+			}
 		}
 	}
 }
@@ -31473,6 +31625,153 @@ void HumdrumToken::getMidiPitches(vector<int>& output) {
 vector<int> HumdrumToken::getMidiPitches(void) {
 	vector<int> output;
 	this->getMidiPitches(output);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getMidiPitchesSortHL -- Sort extracted MIDI pitches from
+//    high to low (when there is a chord).  Does not check for valid MIDI
+//    note number range of 0-127.  Also not checking to see if input data
+//    type is not **kern.  Sustained notes are negative values, but pitches
+//    are sorted by absolute value.
+//
+
+void HumdrumToken::getMidiPitchesSortHL(vector<int>& output) {
+	this->getMidiPitches(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) > abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getMidiPitchesSortHL(void) {
+	vector<int> output;
+	this->getMidiPitchesSortHL(output);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getMidiPitchesSortLH -- Sort extracted MIDI pitches from
+//    low to high (when there is a chord).  Does not check for valid MIDI
+//    note number range of 0-127.  Also not checking to see if input data
+//    type is not **kern.  Sustained notes are negative values, but pitches
+//    are sorted by absolute value.
+//
+
+void HumdrumToken::getMidiPitchesSortLH(vector<int>& output) {
+	this->getMidiPitches(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) < abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getMidiPitchesSortLH(void) {
+	vector<int> output;
+	this->getMidiPitchesSortLH(output);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// getMidiPitchesResolveNull -- same as getMidiPitches*() functions
+//     but resolves null tokens (get the last non-null token if null).
+//
+
+void HumdrumToken::getMidiPitchesResolveNull(vector<int>& output) {
+	bool nullQ = (*this == ".");
+	HTp token = this;
+	if (nullQ) {
+		token = this->resolveNull();
+	}
+	output.clear();
+	if (token == NULL) {
+		return;
+	}
+	if (*token == ".") {
+		return;
+	}
+	vector<string> pieces = token->getSubtokens();
+	output.resize(pieces.size());
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (pieces[i].find("r") != string::npos) {
+			output[i] = 0;
+		} else {
+			output[i] = Convert::kernToMidiNoteNumber(pieces[i]);
+			// sustained notes are negative values:
+			if (nullQ) {
+				output[i] = -output[i];
+			} else if (pieces[i].find("_") != string::npos) {
+				output[i] = -output[i];
+			} else if (pieces[i].find("]") != string::npos) {
+				output[i] = -output[i];
+			}
+		}
+	}
+}
+
+
+vector<int> HumdrumToken::getMidiPitchesResolveNull(void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNull(output);
+	return output;
+}
+
+
+void HumdrumToken::getMidiPitchesResolveNullSortHL(vector<int>& output) {
+	this->getMidiPitchesResolveNull(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) > abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getMidiPitchesResolveNullSortHL(void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNullSortHL(output);
+	return output;
+}
+
+
+void HumdrumToken::getMidiPitchesResolveNullSortLH(vector<int>& output) {
+	this->getMidiPitchesResolveNull(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) < abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getMidiPitchesResolveNullSortLH (void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNullSortLH(output);
 	return output;
 }
 
