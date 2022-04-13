@@ -111,8 +111,7 @@ void BeamSegment::CalcBeam(
     else {
         beamInterface->m_fractionSize = staff->m_drawingStaffSize;
 
-        if (doc->GetOptions()->m_beamMaxSlope.GetValue())
-            horizontal = beamInterface->IsHorizontal();
+        if (doc->GetOptions()->m_beamMaxSlope.GetValue()) horizontal = beamInterface->IsHorizontal();
         // Beam@place has precedence - however, in some cases, CalcBeam is called recursively because we need to change
         // the place This occurs when mixed makes no sense and the beam is placed above or below instead.
         this->CalcBeamPlace(layer, beamInterface, place);
@@ -705,7 +704,7 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
     // This occurs with 8th and 16th only and with a reduced distance of 3 stave-spaces (6 units)
     bool shortStep = false;
     step = this->CalcBeamSlopeStep(doc, staff, beamInterface, noteStep, shortStep);
-    
+
     // Short accessors
     const data_BEAMPLACE place = beamInterface->m_drawingPlace;
     // The current step according to stems - this can be flat because of the stem extended
