@@ -381,7 +381,7 @@ int Staff::GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place)
 
 void Staff::SetAlignmentBeamAdjustment(int adjust)
 {
-    m_staffAlignment->SetBeamAdjust(adjust);
+    if (m_staffAlignment) m_staffAlignment->SetBeamAdjust(adjust);
 }
 
 //----------------------------------------------------------------------------
