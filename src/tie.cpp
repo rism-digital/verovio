@@ -218,12 +218,13 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
 
     // shortTie correction cannot be applied for chords
     const bool isShortTie = !startParentChord && !endParentChord && (endPoint.x - startPoint.x < 4 * drawingUnit);
+    const bool isSameDirection = !(note1 && note2) || (note1->GetStemDir() == note2->GetStemDir());
 
     const int ySign = (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
 
     startPoint.y += ySign * drawingUnit / 2;
     endPoint.y += ySign * drawingUnit / 2;
-    if (isShortTie) {
+    if (isShortTie && isSameDirection) {
         startPoint.y += ySign * drawingUnit;
         endPoint.y += ySign * drawingUnit;
     }
