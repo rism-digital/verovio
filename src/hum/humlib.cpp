@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Apr 12 20:37:31 PDT 2022
+// Last Modified: Fri Apr 15 16:01:15 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -569,6 +569,84 @@ bool Convert::hasKernPhraseStart(const string& kerndata) {
 
 bool Convert::hasKernPhraseEnd(const string& kerndata) {
 	return kerndata.find('}') != string::npos;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::getKernBeamStartElisionLevel -- Returns the number of
+//   '&' characters before the given 'L' character in a kern token.
+//   Returns -1 if no 'L' character in string.
+//
+
+int Convert::getKernBeamStartElisionLevel(const string& kerndata, int index) {
+	bool foundBeamStart = false;
+	int output = 0;
+	int count = 0;
+	int target = index + 1;
+	for (int i=0; i<(int)kerndata.size(); i++) {
+		char ch = kerndata[i];
+		if (ch == 'L') {
+			count++;
+		}
+		if (count == target) {
+			foundBeamStart = true;
+			for (int j=i-1; j>=0; j--) {
+				ch = kerndata[j];
+				if (ch == '&') {
+					output++;
+				} else {
+					break;
+				}
+			}
+			break;
+		}
+	}
+	if (!foundBeamStart) {
+		return -1;
+	} else {
+		return output;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Convert::getKernBeamEndElisionLevel -- Returns the number of
+//   '&' characters before the last 'J' character in a kern token.
+//   Returns -1 if no 'J' character in string.
+//
+
+int Convert::getKernBeamEndElisionLevel(const string& kerndata, int index) {
+	bool foundBeamEnd = false;
+	int output = 0;
+	int count = 0;
+	int target = index + 1;
+	for (int i=0; i<(int)kerndata.size(); i++) {
+		char ch = kerndata[i];
+		if (ch == 'J') {
+			count++;
+		}
+		if (count == target) {
+			foundBeamEnd = true;
+			for (int j=i-1; j>=0; j--) {
+				ch = kerndata[j];
+				if (ch == '&') {
+					output++;
+				} else {
+					break;
+				}
+			}
+			break;
+		}
+	}
+	if (!foundBeamEnd) {
+		return -1;
+	} else {
+		return output;
+	}
 }
 
 
@@ -22703,7 +22781,7 @@ void HumdrumFileContent::analyzeBarlines(void) {
 		// Maybe allow forcing reanalysis.
 		return;
 	}
-	m_analyses.m_slurs_analyzed = true;
+	m_analyses.m_barlines_analyzed = true;
 	m_analyses.m_barlines_different = false;
 
 	string baseline;
@@ -22843,6 +22921,448 @@ bool HumdrumFileContent::hasDifferentBarlines(void) {
 }
 
 
+
+
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeBeams -- Link start and ends of
+//    beams to each other.
+//
+
+bool HumdrumFileContent::analyzeBeams(void) {
+	if (m_analyses.m_beams_analyzed) {
+		return false;
+	}
+	m_analyses.m_beams_analyzed = true;
+	bool output = true;
+	output &= analyzeKernBeams();
+	output &= analyzeMensBeams();
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeMensBeams -- Link start and ends of
+//    beams to each other.  They are the same as **kern, so borrowing
+//    analyzeKernBeams to do the analysis.
+//
+
+bool HumdrumFileContent::analyzeMensBeams(void) {
+	vector<HTp> beamstarts;
+	vector<HTp> beamends;
+
+	vector<HTp> l;
+	vector<pair<HTp, HTp>> labels; // first is previous label, second is next label
+	HumdrumFileBase& infile = *this;
+	labels.resize(infile.getLineCount());
+	l.resize(infile.getLineCount());
+	for (int i=0; i<infile.getLineCount(); i++) {
+		labels[i].first = NULL;
+		labels[i].second = NULL;
+		l[i] = NULL;
+	}
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		if ((token->compare(0, 2, "*>") == 0) && (token->find("[") == std::string::npos)) {
+			l[i] = token;
+		}
+	}
+	HTp current = NULL;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (l[i] != NULL) {
+			current = l[i];
+		}
+		labels[i].first = current;
+	}
+	current = NULL;
+	for (int i=infile.getLineCount() - 1; i>=0; i--) {
+		if (l[i] != NULL) {
+			current = l[i];
+		}
+		labels[i].second = current;
+	}
+
+	vector<int> endings(infile.getLineCount(), 0);
+	int ending = 0;
+	for (int i=0; i<(int)endings.size(); i++) {
+		if (l[i]) {
+			char lastchar = l[i]->back();
+			if (isdigit(lastchar)) {
+				ending = lastchar - '0';
+			} else {
+				ending = 0;
+			}
+		}
+		endings[i] = ending;
+	}
+
+	vector<HTp> mensspines;
+	getSpineStartList(mensspines, "**mens");
+	bool output = true;
+	string linkSignifier = m_signifiers.getKernLinkSignifier();
+	for (int i=0; i<(int)mensspines.size(); i++) {
+		output = output && analyzeKernBeams(mensspines[i], beamstarts, beamends, labels, endings, linkSignifier);
+	}
+	createLinkedBeams(beamstarts, beamends);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeKernBeams -- Link start and ends of
+//    beams to each other.
+//
+
+bool HumdrumFileContent::analyzeKernBeams(void) {
+	vector<HTp> beamstarts;
+	vector<HTp> beamends;
+
+	vector<HTp> l;
+	vector<pair<HTp, HTp>> labels; // first is previous label, second is next label
+	HumdrumFileBase& infile = *this;
+	labels.resize(infile.getLineCount());
+	l.resize(infile.getLineCount());
+	for (int i=0; i<infile.getLineCount(); i++) {
+		labels[i].first = NULL;
+		labels[i].second = NULL;
+		l[i] = NULL;
+	}
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		if ((token->compare(0, 2, "*>") == 0) && (token->find("[") == std::string::npos)) {
+			l[i] = token;
+		}
+	}
+	HTp current = NULL;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (l[i] != NULL) {
+			current = l[i];
+		}
+		labels[i].first = current;
+	}
+	current = NULL;
+	for (int i=infile.getLineCount() - 1; i>=0; i--) {
+		if (l[i] != NULL) {
+			current = l[i];
+		}
+		labels[i].second = current;
+	}
+
+	vector<int> endings(infile.getLineCount(), 0);
+	int ending = 0;
+	for (int i=0; i<(int)endings.size(); i++) {
+		if (l[i]) {
+			char lastchar = l[i]->back();
+			if (isdigit(lastchar)) {
+				ending = lastchar - '0';
+			} else {
+				ending = 0;
+			}
+		}
+		endings[i] = ending;
+	}
+
+	vector<HTp> kernspines;
+	getSpineStartList(kernspines, "**kern");
+	bool output = true;
+	string linkSignifier = m_signifiers.getKernLinkSignifier();
+	for (int i=0; i<(int)kernspines.size(); i++) {
+		output = output && analyzeKernBeams(kernspines[i], beamstarts, beamends, labels, endings, linkSignifier);
+	}
+
+	createLinkedBeams(beamstarts, beamends);
+	return output;
+}
+
+
+bool HumdrumFileContent::analyzeKernBeams(HTp spinestart,
+		vector<HTp>& linkstarts, vector<HTp>& linkends, vector<pair<HTp, HTp>>& labels,
+		vector<int>& endings, const string& linksig) {
+
+	// linked beams handled separately, so generate an ignore sequence:
+	string ignorebegin = linksig + "L";
+	string ignoreend = linksig + "J";
+
+	// tracktokens == the 2-D data list for the track,
+	// arranged in layers with the second dimension.
+	vector<vector<HTp> > tracktokens;
+	this->getTrackSeq(tracktokens, spinestart, OPT_DATA | OPT_NOEMPTY);
+	// printSequence(tracktokens);
+
+	// beamopens == list of beam openings for each track and elision level
+	// first dimension: elision level
+	// second dimension: track number
+	vector<vector<vector<HTp>>> beamopens;
+
+	beamopens.resize(4); // maximum of 4 elision levels
+	for (int i=0; i<(int)beamopens.size(); i++) {
+		beamopens[i].resize(8);  // maximum of 8 layers
+	}
+
+	int opencount = 0;
+	int closecount = 0;
+	int elision = 0;
+	HTp token;
+	for (int row=0; row<(int)tracktokens.size(); row++) {
+		for (int track=0; track<(int)tracktokens[row].size(); track++) {
+			token = tracktokens[row][track];
+			if (!token->isData()) {
+				continue;
+			}
+			if (token->isNull()) {
+				continue;
+			}
+			opencount = (int)count(token->begin(), token->end(), 'L');
+			closecount = (int)count(token->begin(), token->end(), 'J');
+
+			for (int i=0; i<closecount; i++) {
+				bool isLinked = isLinkedBeamEnd(token, i, ignoreend);
+				if (isLinked) {
+					linkends.push_back(token);
+					continue;
+				}
+				elision = token->getBeamEndElisionLevel(i);
+				if (elision < 0) {
+					continue;
+				}
+				if (beamopens[elision][track].size() > 0) {
+					linkBeamEndpoints(beamopens[elision][track].back(), token);
+					// remove beam opening from buffer
+					beamopens[elision][track].pop_back();
+				} else {
+					// No starting beam marker to match to this beam end in the
+					// given track.
+					// search for an open beam in another track:
+					bool found = false;
+					for (int itrack=0; itrack<(int)beamopens[elision].size(); itrack++) {
+						if (beamopens[elision][itrack].size() > 0) {
+							linkBeamEndpoints(beamopens[elision][itrack].back(), token);
+							// remove beam opening from buffer
+							beamopens[elision][itrack].pop_back();
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						int lineindex = token->getLineIndex();
+						int endnum = endings[lineindex];
+						int pindex = -1;
+						if (labels[lineindex].first) {
+							pindex = labels[lineindex].first->getLineIndex();
+							pindex--;
+						}
+						int endnumpre = -1;
+						if (pindex >= 0) {
+							endnumpre = endings[pindex];
+						}
+
+						if ((endnumpre > 0) && (endnum > 0) && (endnumpre != endnum)) {
+							// This is a beam in an ending that start at the start of an ending.
+							HumNum duration = token->getDurationFromStart();
+							if (labels[token->getLineIndex()].first) {
+								duration -= labels[token->getLineIndex()].first->getDurationFromStart();
+							}
+							token->setValue("auto", "endingBeamBack", "true");
+							token->setValue("auto", "beamSide", "stop");
+							token->setValue("auto", "beamDuration",
+								token->getDurationToEnd());
+						} else {
+							// This is a beam closing that does not have a matching opening.
+							token->setValue("auto", "hangingBeam", "true");
+							token->setValue("auto", "beamSide", "stop");
+							token->setValue("auto", "beamOpenIndex", to_string(i));
+							token->setValue("auto", "beamDuration",
+								token->getDurationToEnd());
+						}
+					}
+				}
+			}
+
+			for (int i=0; i<opencount; i++) {
+				bool isLinked = isLinkedBeamBegin(token, i, ignorebegin);
+				if (isLinked) {
+					linkstarts.push_back(token);
+					continue;
+				}
+				elision = token->getBeamStartElisionLevel(i);
+				if (elision < 0) {
+					continue;
+				}
+				beamopens[elision][track].push_back(token);
+			}
+		}
+	}
+
+	// Mark un-closed beam starts:
+	for (int i=0; i<(int)beamopens.size(); i++) {
+		for (int j=0; j<(int)beamopens[i].size(); j++) {
+			for (int k=0; k<(int)beamopens[i][j].size(); k++) {
+				beamopens[i][j][k]->setValue("", "auto", "hangingBeam", "true");
+				beamopens[i][j][k]->setValue("", "auto", "beamSide", "start");
+				beamopens[i][j][k]->setValue("", "auto", "beamDuration",
+						beamopens[i][j][k]->getDurationFromStart());
+			}
+		}
+	}
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::createLinkedBeams --  Currently assume that
+//    start and ends are matched.
+//
+
+void HumdrumFileContent::createLinkedBeams(vector<HTp>& linkstarts, vector<HTp>& linkends) {
+	int max = (int)linkstarts.size();
+	if ((int)linkends.size() < max) {
+		max = (int)linkends.size();
+	}
+	if (max == 0) {
+		// nothing to do
+		return;
+	}
+
+	for (int i=0; i<max; i++) {
+		linkBeamEndpoints(linkstarts[i], linkends[i]);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::isLinkedBeamEnd --
+//
+
+bool HumdrumFileContent::isLinkedBeamEnd(HTp token, int index, const string& pattern) {
+	if (pattern.size() <= 1) {
+		return false;
+	}
+	int counter = -1;
+	for (int i=0; i<(int)token->size(); i++) {
+		if (token->at(i) == 'J') {
+			counter++;
+		}
+		if (i == 0) {
+			// Can't have linked beam at starting index in string.
+			continue;
+		}
+		if (counter != index) {
+			continue;
+		}
+
+		int startindex = i - (int)pattern.size() + 1;
+		auto loc = token->find(pattern, startindex);
+		if ((loc != std::string::npos) && ((int)loc == startindex)) {
+			return true;
+		}
+		return false;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::isLinkedBeamBegin --
+//
+
+bool HumdrumFileContent::isLinkedBeamBegin(HTp token, int index, const string& pattern) {
+	if (pattern.size() <= 1) {
+		return false;
+	}
+	int counter = -1;
+	for (int i=0; i<(int)token->size(); i++) {
+		if (token->at(i) == 'L') {
+			counter++;
+		}
+		if (i == 0) {
+			continue;
+		}
+		if (counter != index) {
+			continue;
+		}
+		if (token->find(pattern, i - (int)pattern.size() + 1) != std::string::npos) {
+			return true;
+		}
+		return false;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::linkBeamEndpoints --  Allow up to two beam starts/ends
+//      on a note.
+//
+
+void HumdrumFileContent::linkBeamEndpoints(HTp beamstart, HTp beamend) {
+	string durtag = "beamDuration";
+	string endtag = "beamEndId";
+	string starttag = "beamStartId";
+	string beamstartnumbertag = "beamStartNumber";
+	string beamendnumbertag = "beamEndNumber";
+
+	int beamStartCount = beamstart->getValueInt("auto", "beamStartCount");
+	int opencount = (int)count(beamstart->begin(), beamstart->end(), 'L');
+	beamStartCount++;
+	int openEnumeration = opencount - beamStartCount + 1;
+
+	if (openEnumeration > 1) {
+		endtag += to_string(openEnumeration);
+		durtag += to_string(openEnumeration);
+		beamendnumbertag += to_string(openEnumeration);
+	}
+
+	int beamEndNumber = beamend->getValueInt("auto", "beamEndCount");
+	beamEndNumber++;
+	int closeEnumeration = beamEndNumber;
+	if (closeEnumeration > 1) {
+		starttag += to_string(closeEnumeration);
+		beamstartnumbertag += to_string(closeEnumeration);
+	}
+
+	HumNum duration = beamend->getDurationFromStart()
+			- beamstart->getDurationFromStart();
+
+	HumNum durToBar = beamstart->getDurationToBarline();
+
+	if (duration >= durToBar) {
+		beamstart->setValue("auto", "beamSpanStart", 1);
+		beamend->setValue("auto", "beamSpanEnd", 1);
+	}
+
+	beamstart->setValue("auto", endtag,            beamend);
+	beamstart->setValue("auto", "id",              beamstart);
+	beamstart->setValue("auto", beamendnumbertag,  closeEnumeration);
+	beamstart->setValue("auto", durtag,            duration);
+	beamstart->setValue("auto", "beamStartCount",  beamStartCount);
+
+	beamend->setValue("auto", starttag, beamstart);
+	beamend->setValue("auto", "id", beamend);
+	beamend->setValue("auto", beamstartnumbertag, openEnumeration);
+	beamend->setValue("auto", "beamEndCount",  beamEndNumber);
+}
 
 
 
@@ -23511,14 +24031,14 @@ bool HumdrumFileContent::analyzeKernPhrasings(HTp spinestart,
 							}
 							token->setValue("auto", "endingPhraseBack", "true");
 							token->setValue("auto", "phraseSide", "stop");
-							token->setValue("auto", "phraseDration",
+							token->setValue("auto", "phraseDuration",
 								token->getDurationToEnd());
 						} else {
 							// This is a phrase closing that does not have a matching opening.
 							token->setValue("auto", "hangingPhrase", "true");
 							token->setValue("auto", "phraseSide", "stop");
 							token->setValue("auto", "phraseOpenIndex", to_string(i));
-							token->setValue("auto", "phraseDration",
+							token->setValue("auto", "phraseDuration",
 								token->getDurationToEnd());
 						}
 					}
@@ -24643,14 +25163,14 @@ bool HumdrumFileContent::analyzeKernSlurs(HTp spinestart,
 							}
 							token->setValue("auto", "endingSlurBack", "true");
 							token->setValue("auto", "slurSide", "stop");
-							token->setValue("auto", "slurDration",
+							token->setValue("auto", "slurDuration",
 								token->getDurationToEnd());
 						} else {
 							// This is a slur closing that does not have a matching opening.
 							token->setValue("auto", "hangingSlur", "true");
 							token->setValue("auto", "slurSide", "stop");
 							token->setValue("auto", "slurOpenIndex", to_string(i));
-							token->setValue("auto", "slurDration",
+							token->setValue("auto", "slurDuration",
 								token->getDurationToEnd());
 						}
 					}
@@ -32148,7 +32668,12 @@ bool HumdrumToken::isStaff(void) const {
 
 bool HumdrumToken::isRest(void) {
 	if (isKernLike()) {
-		if (isNull() && Convert::isKernRest((string)(*resolveNull()))) {
+		if (isChord()) {
+			// rests are not allowed in chords, so return false if
+			// token is a chord (rests in chords are used for non-sounding
+			// notes in artificial harmonics).
+			return false;
+		} else if (isNull() && Convert::isKernRest((string)(*resolveNull()))) {
 			return true;
 		} else if (Convert::isKernRest((string)(*this))) {
 			return true;
@@ -34040,6 +34565,24 @@ int  HumdrumToken::getStrandIndex(void) const {
 
 //////////////////////////////
 //
+// HumdrumToken::getBeamStartElisionLevel -- Returns the count of
+//   elision marks ('&') preceding a slur start character '('.
+//   Returns -1 if there is no slur start character.
+//   Default value: index = 0
+//
+
+int HumdrumToken::getBeamStartElisionLevel(int index) const {
+	if (isDataType("**kern") || isDataType("**mens")) {
+		return Convert::getKernBeamStartElisionLevel((string)(*this), index);
+	} else {
+		return -1;
+	}
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumToken::getSlurStartElisionLevel -- Returns the count of
 //   elision marks ('&') preceding a slur start character '('.
 //   Returns -1 if there is no slur start character.
@@ -34067,6 +34610,24 @@ int HumdrumToken::getSlurStartElisionLevel(int index) const {
 int HumdrumToken::getPhraseStartElisionLevel(int index) const {
 	if (isDataType("**kern") || isDataType("**mens")) {
 		return Convert::getKernPhraseStartElisionLevel((string)(*this), index);
+	} else {
+		return -1;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getBeamEndElisionLevel -- Returns the count of
+//   elision marks ('&') preceding a slur end character ')'.
+//   Returns -1 if there is no slur end character.
+//   Default value: index = 0
+//
+
+int HumdrumToken::getBeamEndElisionLevel(int index) const {
+	if (isDataType("**kern") || isDataType("**mens")) {
+		return Convert::getKernBeamEndElisionLevel((string)(*this), index);
 	} else {
 		return -1;
 	}
@@ -96937,6 +97498,8 @@ void Tool_peak::processFile(HumdrumFile& infile) {
 	// get list of music spines (columns):
 	vector<HTp> starts = infile.getKernSpineStartList();
 
+	m_barNum = infile.getMeasureNumbers();
+
 	// The first "spine" is the lowest part on the system.
 	// The last "spine" is the highest part on the system.
 	for (int i=0; i<(int)starts.size(); i++) {
@@ -96955,6 +97518,15 @@ void Tool_peak::processFile(HumdrumFile& infile) {
 
 	if (m_infoQ) {
 		m_humdrum_text << "!!!peaks: " << m_count << endl;
+		for (int i=0; i<(int)m_peakMeasureBegin.size(); i++) {
+			m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+			m_humdrum_text << "!!!peak_group: " << i+1 << endl;
+			m_humdrum_text << "!!!start_measure: " << m_peakMeasureBegin[i] << endl;
+			m_humdrum_text << "!!!end_measure: " << m_peakMeasureEnd[i] << endl;
+			m_humdrum_text << "!!!group_duration: " << m_peakDuration[i] << endl;
+			m_humdrum_text << "!!!group_pitch: " << m_peakPitch[i] << endl;
+			m_humdrum_text << "!!!group_peakcount: " << m_peakPeakCount[i] << endl;
+		}
 	}
 
 }
@@ -97000,6 +97572,7 @@ void Tool_peak::processSpine(HTp startok) {
 		printData(notelist, midinums, peaknotes);
 	} else {
 		//markNotesInScore(notelist, peaknotes);
+
 		// Uncomment out the following line, and comment the above line,
 		// when identifyPeakSequence() is implemented:
 		markNotesInScore(peaknotelist, globalpeaknotes);
@@ -97146,32 +97719,6 @@ void Tool_peak::identifyPeakSequence(vector<bool>& globalpeaknotes, vector<int>&
 	//
 	//////////////////////////////////////////
 
-// 	int previousNote = -1;
-// 	int sequenceNum = 0;
-// 	int sequenceStart = 0;
-//
-// 	for (int i=0; i<(int)peakmidinums.size() - m_peakNum; i++) {
-// 		if (peakmidinums[i] == previousNote) { //check if same as previous peak
-// 			sequenceNum += 1;
-// 		} else {
-// 			sequenceNum = 0;
-// 		}
-// 		if (sequenceNum == 1) { //identify beginning of peak sequence
-// 			sequenceStart = i - 1;
-// 		}
-// 		if (sequenceNum >= m_peakNum - 1) {
-// 			int duration = timestamps[i] - timestamps[sequenceStart];
-// 			if (duration <= m_peakDur) {
-// 				for (int j=0; j<m_peakNum; j++) {
-// 					globalpeaknotes[sequenceStart + j] = true;
-// 				}
-// 		  } else {
-// 				sequenceStart += 1;
-// 		  }
-// 	  }
-// 		previousNote = peakmidinums[i];
-//   }
-// }
 	   for (int i=0; i<(int)peakmidinums.size() - m_peakNum; i++) {
 			 bool match = true;
 			 for (int j=1; j<m_peakNum; j++) {
@@ -97184,14 +97731,24 @@ void Tool_peak::identifyPeakSequence(vector<bool>& globalpeaknotes, vector<int>&
 			 	continue;
 			 }
 			 HumNum duration = timestamps[i + m_peakNum - 1] - timestamps[i];
-			 cerr << duration.getFloat() << "   " << m_peakDur << endl;
 			 if (duration.getFloat() > m_peakDur) {
 				 continue;
 			 }
+			 //data for every sub-sequeunce
+			 m_count += 1;
+			 int line = notes[i][0]->getLineIndex();
+			 int line2 = notes[i + m_peakNum - 1].back()->getLineIndex();
+
+			 m_peakDuration.push_back(duration.getFloat()/4.0);
+			 m_peakMeasureBegin.push_back(m_barNum[line]);
+			 m_peakMeasureEnd.push_back(m_barNum[line2]);
+			 m_peakPeakCount.push_back(3);
+			 m_peakPitch.push_back(notes[i][0]->getText());
+
 			 for (int j=0; j<m_peakNum; j++) {
-				 globalpeaknotes[i+j] = true;
-				 }
+				globalpeaknotes[i+j] = true;
 			 }
+		}
 }
 
 
@@ -97283,6 +97840,9 @@ vector<vector<HTp>> Tool_peak::getNoteList(HTp starting) {
 		}
 		tempout.resize(tempout.size() + 1);
 		tempout.back().push_back(current);
+		if (!current->isRest()) {
+			m_noteCount++;
+		}
 		previous = current;
 		current = current->getNextToken();
 	}
@@ -97341,7 +97901,7 @@ void  Tool_peak::getBeat(vector<bool>& metpos, vector<vector<HTp>>& notelist) {
 		} else {
 			metpos[i] = false;
 		}
-		cerr << "Position FOR " << notelist[i][0] << " IS " << metpos[i] << " ON LINE " << notelist[i][0]->getLineNumber() << endl;
+		//cerr << "Position FOR " << notelist[i][0] << " IS " << metpos[i] << " ON LINE " << notelist[i][0]->getLineNumber() << endl;
 	}
 }
 

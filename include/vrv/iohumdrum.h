@@ -761,6 +761,7 @@ protected:
     void checkForFingeredHarmonic(Chord *chord, hum::HTp token);
     double getTempoScaling(hum::HumdrumFile &infile);
     bool isTacet(hum::HTp spinestart);
+    void storeBeamSpansInStartingMeasure();
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -1103,8 +1104,9 @@ private:
     // be converted into @class in SVG conversion.
     int m_humtype = false;
 
-    // m_beamSpanStartDatabase == keep track of the starting measure for a beamSpan
-    std::map<hum::HTp, Measure *> m_beamSpanStartDatabase;
+    // m_beamSpanStartDatabase == keep track of the starting measure for
+    // a beamSpan starting in current measure.
+    std::vector<hum::HTp> m_beamSpanStartDatabase;
 
     // m_tempoScaling == global adjustment of tempo markings
     double m_tempoScaling = 1.0;

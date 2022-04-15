@@ -649,6 +649,7 @@ bool HumdrumInput::convertHumdrum()
     analyzeVerseColor(infile);
 
     infile.analyzeSlurs();
+    infile.analyzeBeams();
     infile.analyzePhrasings();
     infile.analyzeKernTies();
     // infile.analyzeKernStemLengths();
@@ -6408,6 +6409,8 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 
     addFTremSlurs();
 
+    storeBeamSpansInStartingMeasure();
+
     if (m_breaks) {
         checkForLayoutBreak(endline);
     }
@@ -6709,6 +6712,9 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
             if (!token->isStaff()) {
                 continue;
             }
+            if (token->isDataType("**kernyy")) {
+                continue;
+            }
             track = token->getTrack();
             if (track != lasttrack) {
                 layerindex = 0;
@@ -6721,6 +6727,9 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
                 continue;
             }
             staffindex = rkern[track];
+            if (staffindex < 0) {
+                cerr << "STAFF INDEX PROBLEM FOR TRACK " << track << endl;
+            }
             if ((int)lt[staffindex].size() < layerindex + 1) {
                 lt[staffindex].resize(lt[staffindex].size() + 1);
             }
@@ -16515,9 +16524,26 @@ void HumdrumInput::analyzeLayerBeams(
             lastgbeamstate = gbeamstate[i];
         }
         else {
-            beamstate[i] = characterCount(*layerdata[i], 'L');
-            beamstate[i] -= characterCount(*layerdata[i], 'J');
-            lastbeamstate = beamstate[i];
+            int Lcount = characterCount(*layerdata[i], 'L');
+            int Jcount = characterCount(*layerdata[i], 'J');
+            bool beamSpanStart = layerdata[i]->getValueBool("auto", "beamSpanStart");
+            bool beamSpanEnd = layerdata[i]->getValueBool("auto", "beamSpanEnd");
+            if ((beamSpanStart == false) && (beamSpanEnd == false)) {
+                beamstate[i] = Lcount;
+                beamstate[i] -= Jcount;
+                lastbeamstate = beamstate[i];
+            }
+            else if (beamSpanStart) {
+                m_beamSpanStartDatabase.push_back(layerdata[i]);
+                beamstate[i] = lastbeamstate;
+                gbeamstate[i] = lastgbeamstate;
+                continue;
+            }
+            else if (beamSpanStart) {
+                beamstate[i] = lastbeamstate;
+                gbeamstate[i] = lastgbeamstate;
+                continue;
+            }
         }
         if (i > 0) {
             beamstate[i] += beamstate[i - 1];
@@ -16538,6 +16564,13 @@ void HumdrumInput::analyzeLayerBeams(
         for (int i = 0; i < (int)beamstate.size(); i++) {
             beamstate[i] -= min;
         }
+    }
+
+    if (m_debug) {
+        for (int i = 0; i < (int)beamstate.size(); i++) {
+            cerr << layerdata[i] << "(" << beamstate[i] << ")  ";
+        }
+        cerr << endl;
     }
 
     int beamstartindex = -1;
@@ -16595,15 +16628,15 @@ void HumdrumInput::analyzeLayerBeams(
         }
     }
 
-    if (beamstartindex >= 0) {
-        layerdata.at(beamstartindex)->setValue("auto", "beamSpanStart", 1);
-        // Store measure that the beamSpan starts in:
-        m_beamSpanStartDatabase[layerdata.at(beamstartindex)] = m_measure;
-    }
-    if (beamendindex >= 0) {
-        layerdata.at(beamendindex)->setValue("auto", "beamSpanEnd", 1);
-        insertBeamSpan(layerdata.at(beamendindex));
-    }
+    // if (beamstartindex >= 0) {
+    //     layerdata.at(beamstartindex)->setValue("auto", "beamSpanStart", 1);
+    //     // Store measure that the beamSpan starts in:
+    //     m_beamSpanStartDatabase[layerdata.at(beamstartindex)] = m_measure;
+    // }
+    // if (beamendindex >= 0) {
+    //     layerdata.at(beamendindex)->setValue("auto", "beamSpanEnd", 1);
+    //     insertBeamSpan(layerdata.at(beamendindex));
+    // }
 
     // Convert to beam enumerations.  Beamstates are nonzero for the
     // notes in a beam, but the last one is zero.
@@ -16665,89 +16698,61 @@ void HumdrumInput::analyzeLayerBeams(
 
 //////////////////////////////
 //
-// HumdrumInput::insertBeamSpan --
+// HumdrumInput::storeBeamSpansInStartingMeasure --
+//
+
+void HumdrumInput::storeBeamSpansInStartingMeasure()
+{
+    for (int i = 0; i < (int)m_beamSpanStartDatabase.size(); i++) {
+        this->insertBeamSpan(m_beamSpanStartDatabase[i]);
+    }
+    m_beamSpanStartDatabase.clear();
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertBeamSpan -- Also deal with hanging beams.
 //
 
 void HumdrumInput::insertBeamSpan(hum::HTp token)
 {
+    if (!token) {
+        return;
+    }
+    bool hangingQ = token->getValueBool("auto", "hangingBeam");
+    if (hangingQ) {
+        // Not dealing with haning beams for now.
+        // See https://github.com/rism-digital/verovio/issues/2786
+        return;
+    }
     // Ignore grace note beamspans for now:
     if (token->find("q") != std::string::npos) {
         return;
     }
-
-    vector<hum::HTp> plist;
-    plist.reserve(128);
-    plist.push_back(token);
-
-    // Identify the start of the beamSpan:
-    hum::HTp current = token->getPreviousToken();
-    int barcount = 0;
-    while (current) {
-        if (current->isBarline()) {
-            ++barcount;
-            if (barcount > 1) {
-                // Limit beamSpan to adjacent measures for now.
-                break;
-            }
-        }
-        if (!current->isData()) {
-            current = current->getPreviousToken();
-            continue;
-        }
-        if (current->getValueBool("auto", "beamSpanStart")) {
-            plist.push_back(current);
-            break;
-        }
-        if (current->isNull()) {
-            current = current->getPreviousToken();
-            continue;
-        }
-        // Don't allow gracenote beamspans for now:
-        if (current->find("q") != std::string::npos) {
-            current = current->getPreviousToken();
-            continue;
-        }
-        // Not checking if the note/rest is a quarter note or larger.
-        plist.push_back(current);
-        current = current->getPreviousToken();
-    }
-
-    if (plist.size() < 2) {
+    bool spanStart = token->getValueBool("auto", "beamSpanStart");
+    if (!spanStart) {
         return;
     }
-
-    if (!plist.back()->getValueBool("auto", "beamSpanStart")) {
-        // Did not find a matching beamspan start for th beamspan end.
+    hum::HTp etok = token->getValueHTp("auto", "beamEndId");
+    if (!etok) {
         return;
     }
 
     BeamSpan *beamspan = new BeamSpan();
 
-    std::string startid = getDataTokenId(plist.back());
-    std::string endid = getDataTokenId(plist[0]);
+    std::string startid = getDataTokenId(token);
+    std::string endid = getDataTokenId(etok);
 
     beamspan->SetStartid("#" + startid);
     beamspan->SetEndid("#" + endid);
+    addChildMeasureOrSection(beamspan);
 
-    std::string plistids;
-    for (int i = (int)plist.size() - 1; i >= 0; --i) {
-        std::string idvalue = getDataTokenId(plist[i]);
-        beamspan->AddRef("#" + idvalue);
-    }
-
-    auto it = m_beamSpanStartDatabase.find(plist.back());
-    if (it != m_beamSpanStartDatabase.end()) {
-        Measure *smeasure = it->second;
-        if (smeasure) {
-            smeasure->AddChild(beamspan);
-            m_beamSpanStartDatabase.erase(it);
-        }
-    }
-    else {
-        // cannot find the starting measure for the beamSpan for
-        // some strange reason, so add it to the ending measure.
-        addChildMeasureOrSection(beamspan);
-    }
+    // Could add a list of all intervening notes in the beamSpan:
+    // std::string plistids;
+    // for (int i = (int)plist.size() - 1; i >= 0; --i) {
+    //     std::string idvalue = getDataTokenId(plist[i]);
+    //     beamspan->AddRef("#" + idvalue);
+    // }
 }
 
 //////////////////////////////
