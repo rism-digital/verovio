@@ -9312,46 +9312,50 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         subtrack--;
                     }
 
-                    // this code is no longer needed, since it can ignore
-                    // clef changes in partial layers.
-                    // if (subtrack) {
-                    //		cerr << "IGNORING CLEF IN SUBTRACK " << subtrack << endl;
-                    //     // ignore clef changes in subtracks and only
-                    //    // use the one in the primary track
-                    //   continue;
-                    // }
+                    hum::HumNum durFromStart = layerdata[i]->getDurationFromStart();
+                    hum::HumNum durFromBarline = layerdata[i]->getDurationFromBarline();
 
-                    Clef *clef = insertClefElement(elements, pointers, layerdata[i], lastnote);
-
-                    setLocationId(clef, layerdata[i]);
-                    int diff = layerindex - subtrack;
-                    if (diff > 0) {
-                        std::string letter;
-                        letter.push_back('a' + diff);
-                        std::string uid = clef->GetUuid();
-                        uid += letter;
-                        clef->SetUuid(uid);
+                    Clef *clef = NULL;
+                    if ((durFromStart > 0) && (durFromBarline == 0)) {
+                        // This clef will be inserted into a staffDef for the current
+                        // staff, which is handled elsewhere.
                     }
-                    if (spaceSplitToken != NULL) {
-                        // Add the second part of a split invisible rest:
-                        Space *irest = new Space();
-                        if (m_doc->GetOptions()->m_humType.GetValue()) {
-                            embedQstampInClass(irest, spaceSplitToken, *spaceSplitToken);
+                    else {
+                        // Store in the layer as a cautionary staff.
+                        clef = insertClefElement(elements, pointers, layerdata[i], lastnote);
+                    }
+
+                    if (clef) {
+                        setLocationId(clef, layerdata[i]);
+                        int diff = layerindex - subtrack;
+                        if (diff > 0) {
+                            std::string letter;
+                            letter.push_back('a' + diff);
+                            std::string uid = clef->GetUuid();
+                            uid += letter;
+                            clef->SetUuid(uid);
                         }
-                        setLocationId(irest, spaceSplitToken);
-                        std::string uid = irest->GetUuid();
-                        uid += "b";
-                        irest->SetUuid(uid);
-                        appendElement(elements, pointers, irest);
-                        // convertRhythm(irest, spaceSplitToken);
-                        setRhythmFromDuration(irest, remainingSplitDur);
-                        // processSlurs(spaceSplitToken);
-                        // processPhrases(spaceSplitToken);
-                        // processDynamics(spaceSplitToken, staffindex);
-                        // processDirections(spaceSplitToken, staffindex);
-                        // Store rest here to complete the split after the clef change.
-                        spaceSplitToken = NULL;
-                        remainingSplitDur = 0;
+                        if (spaceSplitToken != NULL) {
+                            // Add the second part of a split invisible rest:
+                            Space *irest = new Space();
+                            if (m_doc->GetOptions()->m_humType.GetValue()) {
+                                embedQstampInClass(irest, spaceSplitToken, *spaceSplitToken);
+                            }
+                            setLocationId(irest, spaceSplitToken);
+                            std::string uid = irest->GetUuid();
+                            uid += "b";
+                            irest->SetUuid(uid);
+                            appendElement(elements, pointers, irest);
+                            // convertRhythm(irest, spaceSplitToken);
+                            setRhythmFromDuration(irest, remainingSplitDur);
+                            // processSlurs(spaceSplitToken);
+                            // processPhrases(spaceSplitToken);
+                            // processDynamics(spaceSplitToken, staffindex);
+                            // processDirections(spaceSplitToken, staffindex);
+                            // Store rest here to complete the split after the clef change.
+                            spaceSplitToken = NULL;
+                            remainingSplitDur = 0;
+                        }
                     }
                 }
                 else if (layerdata[i]->isNull()) {
@@ -15837,18 +15841,19 @@ template <class ELEMENT> Mensur *HumdrumInput::getMensur(ELEMENT element, hum::H
 
 /////////////////////////////
 //
-// HumdrumInput::addSystemKeyTimeChange -- Add key or time signature changes
+// HumdrumInput::addSystemClefKeyTimeChange -- Add key or time signature changes
 //    for a measure.  The scoreDef element is inserted before the measure in
 //    which the change occurs. Presuming all staves have same changes for now.
 //
 
-void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
+void HumdrumInput::addSystemClefKeyTimeChange(int startline, int endline)
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumdrumFile &infile = m_infiles[0];
     hum::HumRegex hre;
 
     // Keep track of any key and time signature changes for each staff:
+    std::vector<hum::HTp> cleftok(ss.size(), NULL);
     std::vector<hum::HTp> keytok(ss.size(), NULL);
     std::vector<hum::HTp> keysigtok(ss.size(), NULL);
     std::vector<hum::HTp> timesigtok(ss.size(), NULL);
@@ -15856,6 +15861,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
     std::vector<hum::HTp> transposetok(ss.size(), NULL);
 
     bool empty = true;
+    bool hasClef = false;
     bool hasTimeSig = false;
     bool hasMeterSig = false;
     bool hasKeySig = false;
@@ -15887,8 +15893,10 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
                 empty = false;
                 hasKeySig = true;
             }
-            else if (hre.search(token, "^\\*[a-gA-G][#-]*:([a-z]{3})?$")) {
-                keytok.at(staffindex) = token;
+            else if (token->isClef()) {
+                cleftok.at(staffindex) = token;
+                empty = false;
+                hasClef = true;
             }
             else if (hre.search(token, "^\\*ITrd([-+\\d]+)c([-+\\d]+)")) {
                 // update the transposition for notes folling this
@@ -15913,7 +15921,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         return;
     }
 
-    // A score def needs to be added for the key/time sig changes:
+    // A score def needs to be added for the clef/key/time sig changes:
     ScoreDef *scoreDef = new ScoreDef();
     m_sections.back()->AddChild(scoreDef);
 
@@ -15924,8 +15932,31 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
     // individual changes in separate staffDefs.
     bool allSameTranspose = true;
     bool allSameKeySig = true;
+    bool allSameClef = true;
     bool allSameTimeSig = true;
     bool allSameMeterSig = true;
+
+    if (hasClef) {
+        if (cleftok[0] == NULL) {
+            allSameClef = false;
+        }
+        else {
+            for (int i = 1; i < (int)cleftok.size(); ++i) {
+                if (cleftok[i] == NULL) {
+                    allSameClef = false;
+                    break;
+                }
+                else if (*cleftok[0] != *cleftok[i]) {
+                    allSameClef = false;
+                    break;
+                }
+            }
+        }
+    }
+    else {
+        allSameClef = false;
+    }
+    allSameClef = false; // For always to false for now
 
     if (hasKeySig) {
         if (keysigtok[0] == NULL) {
@@ -16036,6 +16067,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         allSameKeySig = false;
     }
 
+    bool setAllClef = false;
     bool setAllKeySig = false;
     bool setAllTimeSig = false;
 
@@ -16045,6 +16077,11 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         setKeySig(-1, scoreDef, *((string *)keysigtok[0]), keysigtok[0], keytok[0], true);
         setAllKeySig = true;
     }
+
+    if (hasClef && allSameClef) {
+        // not implemented yet
+    }
+
     if (hasTimeSig && allSameTimeSig) {
         // Disable system-level time signatures for now.
         // setTimeSig(scoreDef, timesigtok[0], metersigtok[0], -1);
@@ -16061,6 +16098,14 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
     if (!setAllKeySig) {
         for (int i = 0; i < (int)keysigtok.size(); ++i) {
             if (keysigtok[i] != NULL) {
+                need = true;
+                needStaffDef.at(i) = true;
+            }
+        }
+    }
+    if (!setAllClef) {
+        for (int i = 0; i < (int)cleftok.size(); ++i) {
+            if (cleftok[i] != NULL) {
                 need = true;
                 needStaffDef.at(i) = true;
             }
@@ -16097,17 +16142,17 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         staves[i] = staffDef;
     }
 
-    if (!setAllTimeSig) {
-        // add individual time signatures to each staff as needed
-        for (int i = 0; i < (int)timesigtok.size(); ++i) {
-            if (timesigtok[i] == NULL) {
+    if (!setAllClef) {
+        // add individual clefs to each staff as needed
+        for (int i = 0; i < (int)cleftok.size(); ++i) {
+            if (cleftok[i] == NULL) {
                 continue;
             }
             if (staves[i] == NULL) {
                 // should not happen
                 continue;
             }
-            setTimeSig(staves[i], timesigtok[i], metersigtok[i], i);
+            setClef(staves[i], *cleftok[i], cleftok[i], NULL);
         }
     }
 
@@ -16122,6 +16167,20 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
                 continue;
             }
             setKeySig(i, staves[i], *((string *)keysigtok[i]), keysigtok[i], keytok[i], true);
+        }
+    }
+
+    if (!setAllTimeSig) {
+        // add individual time signatures to each staff as needed
+        for (int i = 0; i < (int)timesigtok.size(); ++i) {
+            if (timesigtok[i] == NULL) {
+                continue;
+            }
+            if (staves[i] == NULL) {
+                // should not happen
+                continue;
+            }
+            setTimeSig(staves[i], timesigtok[i], metersigtok[i], i);
         }
     }
 
@@ -23194,7 +23253,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     // fix for **mens ggg
 
     if (!m_mens && (infile[startline].getDurationFromStart() > 0)) {
-        addSystemKeyTimeChange(startline, endline);
+        addSystemClefKeyTimeChange(startline, endline);
     }
 
     std::string previoussection = m_lastsection;

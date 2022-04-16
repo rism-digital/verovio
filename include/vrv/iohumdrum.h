@@ -566,7 +566,7 @@ protected:
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
     bool analyzeBreaks(hum::HumdrumFile &infile);
-    void addSystemKeyTimeChange(int startline, int endline);
+    void addSystemClefKeyTimeChange(int startline, int endline);
     void prepareSections();
     int getDirection(const std::string &token, const std::string &target);
     void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
