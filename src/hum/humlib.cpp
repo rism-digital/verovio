@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Apr 15 16:01:15 PDT 2022
+// Last Modified: Sat Apr 16 14:08:47 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -23350,6 +23350,7 @@ void HumdrumFileContent::linkBeamEndpoints(HTp beamstart, HTp beamend) {
 	if (duration >= durToBar) {
 		beamstart->setValue("auto", "beamSpanStart", 1);
 		beamend->setValue("auto", "beamSpanEnd", 1);
+		markBeamSpanMembers(beamstart, beamend);
 	}
 
 	beamstart->setValue("auto", endtag,            beamend);
@@ -23363,6 +23364,46 @@ void HumdrumFileContent::linkBeamEndpoints(HTp beamstart, HTp beamend) {
 	beamend->setValue("auto", beamstartnumbertag, openEnumeration);
 	beamend->setValue("auto", "beamEndCount",  beamEndNumber);
 }
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::markBeamSpanMembers --
+//
+
+void HumdrumFileContent::markBeamSpanMembers(HTp beamstart, HTp beamend) {
+	int endindex = beamend->getLineIndex();
+	beamstart->setValue("auto", "inBeamSpan", beamstart);
+	beamend->setValue("auto", "inBeamSpan", beamstart);
+	HTp current = beamstart->getNextToken();;
+	while (current) {
+      int line = current->getLineIndex();
+		if (line > endindex) {
+			// terminate search for end if getting lost
+			break;
+		}
+		if (current == beamend) {
+			break;
+		}
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->getDuration() == 0) {
+			// ignore grace notes
+			current = current->getNextToken();
+			continue;
+		}
+		current->setValue("auto", "inBeamSpan", beamstart);
+		current = current->getNextToken();
+	}
+}
+
 
 
 

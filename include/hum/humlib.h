@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Apr 15 16:01:15 PDT 2022
+// Last Modified: Sat Apr 16 14:08:47 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2536,6 +2536,7 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		bool   isLinkedBeamEnd            (HTp token, int index, const std::string& pattern);
 		bool   isLinkedBeamBegin          (HTp token, int index, const std::string& pattern);
 		void   linkBeamEndpoints          (HTp beamstart, HTp beamend);
+		void   markBeamSpanMembers        (HTp beamstart, HTp beamend);
 		bool   analyzeKernBeams           (HTp spinestart, std::vector<HTp>& beamstarts,
 		                                   std::vector<HTp>& beamends,
 		                                   std::vector<std::pair<HTp, HTp>>& labels,

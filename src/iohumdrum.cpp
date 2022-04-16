@@ -8403,7 +8403,7 @@ void HumdrumInput::fixLargeTuplets(std::vector<humaux::HumdrumBeamAndTuplet> &tg
 // HumdrumInput::printGroupInfo --
 //
 
-void HumdrumInput::printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
+void HumdrumInput::printGroupInfo(const std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
     cerr << "TOK\t\tGRP\tBRAK\tNUM\tNBASE\tNSCAL\tBSTART\tBEND";
     cerr << "\tGBST\tGBEND\tTSTART\tTEND\tFORCE\tPRIORITY\n";
@@ -16586,8 +16586,9 @@ void HumdrumInput::analyzeLayerBeams(
             int Lcount = characterCount(*layerdata[i], 'L');
             int Jcount = characterCount(*layerdata[i], 'J');
             bool beamSpanStart = layerdata[i]->getValueBool("auto", "beamSpanStart");
-            bool beamSpanEnd = layerdata[i]->getValueBool("auto", "beamSpanEnd");
-            if ((beamSpanStart == false) && (beamSpanEnd == false)) {
+            // bool beamSpanEnd = layerdata[i]->getValueBool("auto", "beamSpanEnd");
+            bool inBeamSpan = layerdata[i]->getValueBool("auto", "inBeamSpan");
+            if (!inBeamSpan) {
                 beamstate[i] = Lcount;
                 beamstate[i] -= Jcount;
                 lastbeamstate = beamstate[i];
@@ -16598,10 +16599,9 @@ void HumdrumInput::analyzeLayerBeams(
                 gbeamstate[i] = lastgbeamstate;
                 continue;
             }
-            else if (beamSpanStart) {
+            else {
                 beamstate[i] = lastbeamstate;
                 gbeamstate[i] = lastgbeamstate;
-                continue;
             }
         }
         if (i > 0) {
