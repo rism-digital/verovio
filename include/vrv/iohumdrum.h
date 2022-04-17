@@ -832,6 +832,8 @@ protected:
     template <class ELEMENT> void storeExpansionList(ELEMENT *parent, hum::HTp etok);
     template <class ELEMENT> void setWrittenAccidentalUpper(ELEMENT element, const string &value);
     template <class ELEMENT> void setWrittenAccidentalLower(ELEMENT element, const string &value);
+    template <class ELEMENT> void attachToToken(ELEMENT *element, hum::HTp token);
+    template <class ELEMENT> void setAttachmentType(ELEMENT *element, hum::HTp token);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);

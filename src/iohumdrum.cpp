@@ -12076,8 +12076,10 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
             setStaff(dir, m_currentstaff);
         }
         setLocationId(dir, token);
+        // setAttachmentType(dir, token);
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
         dir->SetTstamp(tstamp.getFloat());
+
         if (vgroup > 0) {
             dir->SetVgrp(vgroup);
         }
@@ -12577,16 +12579,15 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         else {
             cerr << "DIRTOK FOR " << token << " IS EMPTY " << endl;
         }
-        hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+
         if (token->isMensLike()) {
-            // Attach to note, not with measure timestamp.
-            // Need to handle text on chords (will currently have a problem attaching to chords)
-            std::string startid = getLocationId("note", token);
-            dir->SetStartid("#" + startid);
+            attachToToken(dir, token);
         }
         else {
-            dir->SetTstamp(tstamp.getFloat());
+            setAttachmentType(dir, token);
         }
+
+        // ggg
         // bool problemQ = false;
         // bool sicQ = false;
         if (vgroup > 0) {
@@ -13815,8 +13816,8 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     }
                 }
                 setLocationId(dir, dyntok);
-                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
-                dir->SetTstamp(tstamp.getFloat());
+                setAttachmentType(dir, token);
+
                 std::string fontstyle;
                 std::string content = "cresc.";
 
@@ -13986,8 +13987,8 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
 
                 setLocationId(dir, dyntok);
-                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
-                dir->SetTstamp(tstamp.getFloat());
+                setAttachmentType(dir, token);
+
                 std::string fontstyle = "";
                 std::string content = "decresc.";
                 if (!m_signifiers.decresctext.empty()) {
@@ -14025,6 +14026,46 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     // legitimate reasons).  Maybe make this more efficient later, such as
     // do a separate parse of dynamics data in a different loop.
     processDynamics(token, staffindex);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setAttachmentType -- attach at a timestamp if a regular note/rest;
+//    otherwise attach with startid if a grace note.
+//
+
+template <class ELEMENT> void HumdrumInput::setAttachmentType(ELEMENT *element, hum::HTp token)
+{
+    hum::HumNum linedur = token->getLine()->getDuration();
+    if (linedur == 0) {
+        attachToToken(element, token);
+    }
+    else {
+        int staffindex = m_rkern[token->getTrack()];
+        hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
+        element->SetTstamp(barstamp.getFloat());
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::attachToToken -- Used to attach items to grace notes
+//    rather than using timestamps.
+//
+
+template <class ELEMENT> void HumdrumInput::attachToToken(ELEMENT *element, hum::HTp token)
+{
+    if (token->isChord()) {
+        element->SetStartid("#" + getLocationId("chord", token));
+    }
+    else if (token->isRest()) {
+        // Grace note rest?
+        element->SetStartid("#" + getLocationId("rest", token));
+    }
+    else {
+        element->SetStartid("#" + getLocationId("note", token));
+    }
+    // Deal with null tokens, which should not really happen.
 }
 
 //////////////////////////////
