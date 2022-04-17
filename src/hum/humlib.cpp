@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Apr 16 14:08:47 PDT 2022
+// Last Modified: Sun Apr 17 10:08:03 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -22272,7 +22272,9 @@ HLp HumdrumFileBase::getLineForInterpretationInsertionAbove(int index) {
 void HumdrumFileBase::clearTokenLinkInfo(void) {
 	HumdrumFileBase& infile = *this;
 	for (int i=0; i<infile.getLineCount(); i++) {
-		infile[i].clearTokenLinkInfo();
+		if (!infile[i].isEmpty()) {
+			infile[i].clearTokenLinkInfo();
+		}
 	}
 }
 
@@ -31246,6 +31248,9 @@ bool HumdrumLine::hasDataStraddle(void) {
 //
 
 void HumdrumLine::clearTokenLinkInfo(void) {
+	if (this->isEmpty()) {
+		return;
+	}
 	for (int i=0; i<getFieldCount(); i++) {
 		if (token(i)) {
 			token(i)->clearLinkInfo();

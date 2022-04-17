@@ -19470,7 +19470,6 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken, int sta
         }
     }
     else {
-
         if ((!oloc.empty()) && (!ploc.empty())) {
             int olocint = stoi(oloc);
             olocint -= ottava;
@@ -19687,6 +19686,27 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
     else if (timestamp > ss[staffindex].ottavaendtimestamp) {
         ss[staffindex].ottavanoteend = note;
+    }
+
+    if (ss[staffindex].ottavadownnoteend == NULL) {
+        ss[staffindex].ottavadownnoteend = note;
+    }
+    else if (timestamp > ss[staffindex].ottavadownendtimestamp) {
+        ss[staffindex].ottavadownnoteend = note;
+    }
+
+    if (ss[staffindex].ottava2noteend == NULL) {
+        ss[staffindex].ottava2noteend = note;
+    }
+    else if (timestamp > ss[staffindex].ottavaendtimestamp) {
+        ss[staffindex].ottava2noteend = note;
+    }
+
+    if (ss[staffindex].ottava2downnoteend == NULL) {
+        ss[staffindex].ottava2downnoteend = note;
+    }
+    else if (timestamp > ss[staffindex].ottavaendtimestamp) {
+        ss[staffindex].ottava2downnoteend = note;
     }
 
     if (timestamp > ss[staffindex].ottavadownendtimestamp) {
