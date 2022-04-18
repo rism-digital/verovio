@@ -1054,17 +1054,6 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight, exclude);
                 if (minLeft != -VRV_UNSET)
                     graceMaxPos = minLeft - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
-
-                auto it = std::find_if(params->m_measureTieEndpoints.cbegin(), params->m_measureTieEndpoints.cend(),
-                    [this](const std::pair<LayerElement *, LayerElement *> &pair) {
-                        return pair.first->GetAlignment() == this;
-                    });
-                if (it != params->m_measureTieEndpoints.end()) {
-                    const int unit = params->m_doc->GetDrawingUnit(100);
-                    const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * unit;
-                    const int diff = params->m_rightDefaultAlignment->GetXRel() - graceMaxPos;
-                    if (diff < minTieLength) graceMaxPos -= (unit + minTieLength - diff);
-                }
             }
             // This happens when grace notes are at the end of a measure before a barline
             else {

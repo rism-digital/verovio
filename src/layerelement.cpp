@@ -1865,6 +1865,16 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
+    auto it = std::find_if(params->m_measureTieEndpoints.cbegin(), params->m_measureTieEndpoints.cend(),
+        [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.first == this; });
+    if (it != params->m_measureTieEndpoints.end()) {
+        const int unit = params->m_doc->GetDrawingUnit(100);
+        const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * unit;
+        const int diff = params->m_rightDefaultAlignment->GetXRel() - this->GetSelfRight();
+
+        if (diff < (minTieLength + unit)) params->m_graceMaxPos -= (unit + minTieLength - diff);
+    }
+
     return FUNCTOR_SIBLINGS;
 }
 
