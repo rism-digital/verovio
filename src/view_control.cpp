@@ -406,7 +406,7 @@ bool View::HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerEl
                 }
             }
         }
-        else if (element->Is(SYL)) {
+        else if (element->Is({ OCTAVE, SYL })) {
             return true;
         }
         // To avoid showing the same warning multiple times, display a warning only during actual drawing
