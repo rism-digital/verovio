@@ -13749,24 +13749,11 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     tstamp2 += endtok->getLine()->getDuration() * mfactor;
                 }
                 int measures = getMeasureDifference(dyntok, endtok);
-                hairpin->SetTstamp(tstamp.getFloat());
-                // See issue https://github.com/rism-digital/verovio/issues/959
-                // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
-                // and https://github.com/rism-digital/verovio/pull/1876
-                // double endingCorrection = 0.03;
-                double endingCorrection = 0.00;
-                pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
+
+                setAttachmentType(hairpin, token);
+                pair<int, double> ts2(measures, tstamp2.getFloat());
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
-                if (endingCorrection > 0.00) {
-                    std::string tag = "endbar";
-                    int value = (int)((endingCorrection * 100.0) + 0.5);
-                    if (value < 10) {
-                        tag += "0";
-                        tag += to_string(value);
-                    }
-                    appendTypeTag(hairpin, tag);
-                }
                 addChildMeasureOrSection(hairpin);
 
                 std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
@@ -13909,25 +13896,13 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     tstamp2 += endtok->getLine()->getDuration();
                 }
                 int measures = getMeasureDifference(dyntok, endtok);
-                hairpin->SetTstamp(tstamp.getFloat());
-                // See issue https://github.com/rism-digital/verovio/issues/959
-                // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
-                // and https://github.com/rism-digital/verovio/pull/1876
-                // double endingCorrection = 0.03;
-                double endingCorrection = 0.00;
-                pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
+
+                setAttachmentType(hairpin, token);
+
+                pair<int, double> ts2(measures, tstamp2.getFloat());
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_dim);
 
-                if (endingCorrection > 0.00) {
-                    std::string tag = "endbar";
-                    int value = (int)((endingCorrection * 100.0) + 0.5);
-                    if (value < 10) {
-                        tag += "0";
-                        tag += to_string(value);
-                    }
-                    appendTypeTag(hairpin, tag);
-                }
                 addChildMeasureOrSection(hairpin);
 
                 std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
@@ -14037,7 +14012,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 template <class ELEMENT> void HumdrumInput::setAttachmentType(ELEMENT *element, hum::HTp token)
 {
     hum::HumNum linedur = token->getLine()->getDuration();
-    if (linedur == 0) {
+    if (token->isNull()) {
+        // Element cannot be attached to anything, so use timestamp;
+        int staffindex = m_rkern[token->getTrack()];
+        hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
+        element->SetTstamp(barstamp.getFloat());
+    }
+    else if (linedur == 0) {
+        // Element is attached to non-durational item (grace note, clef, time signature, etc).
         attachToToken(element, token);
     }
     else {
@@ -14050,22 +14032,27 @@ template <class ELEMENT> void HumdrumInput::setAttachmentType(ELEMENT *element, 
 //////////////////////////////
 //
 // HumdrumInput::attachToToken -- Used to attach items to grace notes
-//    rather than using timestamps.
+//    rather than using timestamps.  Null tokens are not allowed as input.
 //
 
 template <class ELEMENT> void HumdrumInput::attachToToken(ELEMENT *element, hum::HTp token)
 {
+    if (token->isNull()) {
+        cerr << "ERROR: Cannot input null tokens into HumdrumInput::attachToToken() function." << endl;
+        return;
+    }
     if (token->isChord()) {
         element->SetStartid("#" + getLocationId("chord", token));
     }
     else if (token->isRest()) {
-        // Grace note rest?
         element->SetStartid("#" + getLocationId("rest", token));
     }
-    else {
+    else if (token->isData()) {
         element->SetStartid("#" + getLocationId("note", token));
     }
-    // Deal with null tokens, which should not really happen.
+    else if (token->isClef()) {
+        element->SetStartid("#" + getLocationId("clef", token));
+    }
 }
 
 //////////////////////////////
