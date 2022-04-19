@@ -853,7 +853,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     KeySig *keySig = vrv_cast<KeySig *>(element);
     assert(keySig);
 
-    int x, y, i;
+    int x, y;
 
     Clef *c = layer->GetClef(element);
     if (!c) {
@@ -894,13 +894,18 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetAccidCount() == 0)) {
         dc->StartGraphic(element, "", element->GetUuid());
 
-        for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
+        for (int i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
             data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
             loc = PitchInterface::CalcLoc(
                 pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
             y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
+            dc->StartCustomGraphic("keyAccid");
+
             this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+
+            dc->EndCustomGraphic();
+
             x += naturalGlyphWidth + naturalStep;
         }
 
@@ -915,13 +920,17 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
         const int beginCancel
             = (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) ? keySig->GetAccidCount() : 0;
-        for (i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
+        for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
             data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
             loc = PitchInterface::CalcLoc(
                 pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
             y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
+            dc->StartCustomGraphic("keyAccid");
+
             this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+
+            dc->EndCustomGraphic();
 
             x += naturalGlyphWidth + naturalStep;
             if ((keySig->GetAccidCount() > 0) && (i + 1 == keySig->m_drawingCancelAccidCount)) {
@@ -933,7 +942,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    for (i = 0; i < keySig->GetAccidCount(); ++i) {
+    for (int i = 0; i < keySig->GetAccidCount(); ++i) {
         // We get the pitch from the keySig (looks for keyAccid children if any)
         data_ACCIDENTAL_WRITTEN accid;
         data_PITCHNAME pname;
@@ -942,7 +951,12 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         loc = PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, c), clefLocOffset);
         y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
+        dc->StartCustomGraphic("keyAccid");
+
         this->DrawSmuflString(dc, x, y, accidStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
+
+        dc->EndCustomGraphic();
+
         TextExtend extend;
         dc->GetSmuflTextExtent(accidStr, &extend);
         x += extend.m_width + step;
