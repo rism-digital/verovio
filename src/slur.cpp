@@ -607,9 +607,7 @@ void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezi
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
 
-    // Read the bulge attribute
-    Att converter;
-    data_BULGE bulge = converter.StrToBulge(this->GetBulge());
+    data_BULGE bulge = this->GetBulge();
 
     // Filter admissible values
     bulge.erase(std::remove_if(bulge.begin(), bulge.end(),
