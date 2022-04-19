@@ -1104,7 +1104,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
             Object *object = layer->GetNext(multiRest);
             if (object && object->Is(CLEF)) {
                 const int clefWidth = object->GetContentRight() - object->GetContentLeft();
-                minMeasureWidth += clefWidth + 0.65 * unit;
+                minMeasureWidth += clefWidth + params->m_doc->GetOptions()->m_clefChangeFactor.GetValue() * unit;
             }
         }
     }
