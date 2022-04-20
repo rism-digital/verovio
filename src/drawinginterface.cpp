@@ -119,6 +119,12 @@ void BeamDrawingInterface::ClearCoords()
 
 void BeamDrawingInterface::InitCoords(const ArrayOfObjects &childList, Staff *staff, data_BEAMPLACE place)
 {
+    ListOfObjects children(childList.begin(), childList.end());
+    this->InitCoords(children, staff, place);
+}
+
+void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *staff, data_BEAMPLACE place)
+{
     assert(staff);
 
     BeamDrawingInterface::Reset();
@@ -156,7 +162,7 @@ void BeamDrawingInterface::InitCoords(const ArrayOfObjects &childList, Staff *st
 
     int elementCount = 0;
 
-    ArrayOfObjects::const_iterator iter = childList.begin();
+    ListOfObjects::const_iterator iter = childList.begin();
     do {
         // Beam list should contain only DurationInterface objects
         assert(current->GetDurationInterface());

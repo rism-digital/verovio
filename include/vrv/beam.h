@@ -349,7 +349,7 @@ protected:
      * Filter the flat list and keep only Note and Chords elements.
      * This also initializes the m_beamElementCoords vector
      */
-    void FilterList(ArrayOfConstObjects &childList) const override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
     /**
      * See LayerElement::SetElementShortening

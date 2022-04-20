@@ -441,10 +441,10 @@ void ScoreDef::ReplaceDrawingLabels(StaffGrp *newStaffGrp)
     }
 }
 
-void ScoreDef::FilterList(ArrayOfConstObjects &childList) const
+void ScoreDef::FilterList(ListOfConstObjects &childList) const
 {
     // We want to keep only staffDef
-    ArrayOfConstObjects::iterator iter = childList.begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
     while (iter != childList.end()) {
         if (!(*iter)->Is(STAFFDEF)) {
@@ -458,7 +458,7 @@ void ScoreDef::FilterList(ArrayOfConstObjects &childList) const
 
 void ScoreDef::ResetFromDrawingValues()
 {
-    const ArrayOfObjects &childList = this->GetList(this);
+    const ListOfObjects &childList = this->GetList(this);
 
     StaffDef *staffDef = NULL;
     for (auto item : childList) {
@@ -493,8 +493,8 @@ StaffDef *ScoreDef::GetStaffDef(int n)
 
 const StaffDef *ScoreDef::GetStaffDef(int n) const
 {
-    const ArrayOfConstObjects &childList = this->GetList(this);
-    ArrayOfConstObjects::const_iterator iter;
+    const ListOfConstObjects &childList = this->GetList(this);
+    ListOfConstObjects::const_iterator iter;
 
     const StaffDef *staffDef = NULL;
     for (iter = childList.begin(); iter != childList.end(); ++iter) {
@@ -530,8 +530,8 @@ const StaffGrp *ScoreDef::GetStaffGrp(const std::string &n) const
 
 std::vector<int> ScoreDef::GetStaffNs() const
 {
-    const ArrayOfConstObjects &childList = this->GetList(this);
-    ArrayOfConstObjects::const_iterator iter;
+    const ListOfConstObjects &childList = this->GetList(this);
+    ListOfConstObjects::const_iterator iter;
 
     std::vector<int> ns;
     const StaffDef *staffDef = NULL;

@@ -87,10 +87,10 @@ const Note *Ligature::GetLastNote() const
     return lastNote;
 }
 
-void Ligature::FilterList(ArrayOfConstObjects &childList) const
+void Ligature::FilterList(ListOfConstObjects &childList) const
 {
     // Retain only note children of ligatures
-    ArrayOfConstObjects::iterator iter = childList.begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
     while (iter != childList.end()) {
         if (!(*iter)->Is(NOTE)) {
@@ -128,7 +128,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
     m_drawingShapes.clear();
 
-    const ArrayOfObjects &notes = this->GetList(this);
+    const ListOfObjects &notes = this->GetList(this);
     Note *lastNote = dynamic_cast<Note *>(notes.back());
     Staff *staff = this->GetAncestorStaff();
 

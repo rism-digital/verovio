@@ -855,7 +855,7 @@ void Object::Modify(bool modified) const
     m_isModified = modified;
 }
 
-void Object::FillFlatList(ArrayOfConstObjects &flatList) const
+void Object::FillFlatList(ListOfConstObjects &flatList) const
 {
     Functor addToFlatList(&Object::AddLayerElementToFlatList);
     AddLayerElementToFlatListParams addLayerElementToFlatListParams(&flatList);
@@ -1311,16 +1311,16 @@ void ObjectListInterface::ResetList(const Object *node) const
     this->FilterList(m_list);
 }
 
-const ArrayOfConstObjects &ObjectListInterface::GetList(const Object *node) const
+const ListOfConstObjects &ObjectListInterface::GetList(const Object *node) const
 {
     this->ResetList(node);
     return m_list;
 }
 
-ArrayOfObjects ObjectListInterface::GetList(const Object *node)
+ListOfObjects ObjectListInterface::GetList(const Object *node)
 {
     this->ResetList(node);
-    ArrayOfObjects result;
+    ListOfObjects result;
     std::transform(m_list.begin(), m_list.end(), std::back_inserter(result),
         [](const Object *obj) { return const_cast<Object *>(obj); });
     return result;
@@ -1364,7 +1364,7 @@ Object *ObjectListInterface::GetListBack(const Object *node)
 
 int ObjectListInterface::GetListIndex(const Object *listElement) const
 {
-    ArrayOfConstObjects::iterator iter;
+    ListOfConstObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -1376,7 +1376,7 @@ int ObjectListInterface::GetListIndex(const Object *listElement) const
 
 const Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId) const
 {
-    ArrayOfConstObjects::iterator it = m_list.begin();
+    ListOfConstObjects::iterator it = m_list.begin();
     int idx = this->GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
@@ -1391,11 +1391,11 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
 
 const Object *ObjectListInterface::GetListFirstBackward(const Object *startFrom, const ClassId classId) const
 {
-    ArrayOfConstObjects::iterator it = m_list.begin();
+    ListOfConstObjects::iterator it = m_list.begin();
     int idx = this->GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
-    ArrayOfConstObjects::reverse_iterator rit(it);
+    ListOfConstObjects::reverse_iterator rit(it);
     rit = std::find_if(rit, m_list.rend(), ObjectComparison(classId));
     return (rit == m_list.rend()) ? NULL : *rit;
 }
@@ -1407,7 +1407,7 @@ Object *ObjectListInterface::GetListFirstBackward(const Object *startFrom, const
 
 const Object *ObjectListInterface::GetListPrevious(const Object *listElement) const
 {
-    ArrayOfConstObjects::iterator iter;
+    ListOfConstObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -1429,7 +1429,7 @@ Object *ObjectListInterface::GetListPrevious(const Object *listElement)
 
 const Object *ObjectListInterface::GetListNext(const Object *listElement) const
 {
-    ArrayOfConstObjects::reverse_iterator iter;
+    ListOfConstObjects::reverse_iterator iter;
     int i;
     for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -1457,8 +1457,8 @@ std::wstring TextListInterface::GetText(const Object *node) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    const ArrayOfConstObjects &childList = this->GetList(node); // make sure it's initialized
-    for (ArrayOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
+    const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
+    for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
         if ((*it)->Is(LB)) {
             continue;
         }
@@ -1473,8 +1473,8 @@ void TextListInterface::GetTextLines(const Object *node, std::vector<std::wstrin
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    const ArrayOfConstObjects &childList = this->GetList(node); // make sure it's initialized
-    for (ArrayOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
+    const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
+    for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
         if ((*it)->Is(LB) && !concatText.empty()) {
             lines.push_back(concatText);
             concatText.clear();
@@ -1489,9 +1489,9 @@ void TextListInterface::GetTextLines(const Object *node, std::vector<std::wstrin
     }
 }
 
-void TextListInterface::FilterList(ArrayOfConstObjects &childList) const
+void TextListInterface::FilterList(ListOfConstObjects &childList) const
 {
-    ArrayOfConstObjects::iterator iter = childList.begin();
+    ListOfConstObjects::iterator iter = childList.begin();
     while (iter != childList.end()) {
         if (!(*iter)->Is({ LB, TEXT })) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)

@@ -79,9 +79,9 @@ const ArrayOfBeamElementCoords *FTrem::GetElementCoords()
     return &m_beamElementCoords;
 }
 
-void FTrem::FilterList(ArrayOfConstObjects &childList) const
+void FTrem::FilterList(ListOfConstObjects &childList) const
 {
-    ArrayOfConstObjects::iterator iter = childList.begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
     while (iter != childList.end()) {
         if (!(*iter)->Is(NOTE) && !(*iter)->Is(CHORD)) {
@@ -197,7 +197,7 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    const ArrayOfObjects &fTremChildren = this->GetList(this);
+    const ListOfObjects &fTremChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
     if (fTremChildren.empty()) {

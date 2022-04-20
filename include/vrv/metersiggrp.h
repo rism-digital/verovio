@@ -89,7 +89,7 @@ protected:
     /**
      * Filter the flat list and keep only meterSigGrp elements.
      */
-    void FilterList(ArrayOfConstObjects &childList) const override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     // vector with alternating measures to be used only with meterSigGrpLog_FUNC_alternating

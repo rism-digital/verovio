@@ -170,7 +170,7 @@ void SystemAligner::SetSpacing(const ScoreDef *scoreDef)
 
     m_spacingTypes.clear();
 
-    const ArrayOfConstObjects &childList = scoreDef->GetList(scoreDef);
+    const ListOfConstObjects &childList = scoreDef->GetList(scoreDef);
     for (auto iter = childList.begin(); iter != childList.end(); ++iter) {
         // It should be staffDef only, but double check.
         if (!(*iter)->Is(STAFFDEF)) continue;

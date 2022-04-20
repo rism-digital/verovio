@@ -791,7 +791,7 @@ void Note::DeferMIDINote(FunctorParams *functorParams, double shift, bool includ
     // Recursive call for chords
     Chord *chord = this->IsChordTone();
     if (chord && includeChordSiblings) {
-        const ArrayOfObjects &notes = chord->GetList(chord);
+        const ListOfObjects &notes = chord->GetList(chord);
 
         for (Object *obj : notes) {
             Note *note = vrv_cast<Note *>(obj);

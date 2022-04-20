@@ -1586,12 +1586,12 @@ bool Beam::IsSupportedChild(Object *child)
     return true;
 }
 
-void Beam::FilterList(ArrayOfConstObjects &childList) const
+void Beam::FilterList(ListOfConstObjects &childList) const
 {
     bool firstNoteGrace = false;
     // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ArrayOfConstObjects::iterator iter = childList.begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
     const bool isTabBeam = this->IsTabBeam();
 
@@ -2068,7 +2068,7 @@ int Beam::CalcStem(FunctorParams *functorParams)
 
     if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
 
-    const ArrayOfObjects &beamChildren = this->GetList(this);
+    const ListOfObjects &beamChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
     if (beamChildren.empty()) {

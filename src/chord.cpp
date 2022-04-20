@@ -128,8 +128,8 @@ void Chord::CalculateClusters()
 {
     this->ClearClusters();
 
-    const ArrayOfObjects &childList = this->GetList(this);
-    ArrayOfObjects::const_iterator iter = childList.begin();
+    const ListOfObjects &childList = this->GetList(this);
+    ListOfObjects::const_iterator iter = childList.begin();
 
     Note *curNote, *lastNote = vrv_cast<Note *>(*iter);
     assert(lastNote);
@@ -212,10 +212,10 @@ void Chord::AddChild(Object *child)
     Modify();
 }
 
-void Chord::FilterList(ArrayOfConstObjects &childList) const
+void Chord::FilterList(ListOfConstObjects &childList) const
 {
     // Retain only note children of chords
-    ArrayOfConstObjects::iterator iter = childList.begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
     while (iter != childList.end()) {
         if ((*iter)->Is(NOTE))
@@ -224,7 +224,7 @@ void Chord::FilterList(ArrayOfConstObjects &childList) const
             iter = childList.erase(iter);
     }
 
-    std::sort(childList.begin(), childList.end(), DiatonicSort());
+    childList.sort(DiatonicSort());
 }
 
 int Chord::PositionInChord(const Note *note) const
@@ -285,11 +285,11 @@ const Note *Chord::GetBottomNote() const
 
 int Chord::GetXMin() const
 {
-    const ArrayOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     assert(childList.size() > 0);
 
     int x = -VRV_UNSET;
-    ArrayOfConstObjects::const_iterator iter = childList.begin();
+    ListOfConstObjects::const_iterator iter = childList.begin();
     while (iter != childList.end()) {
         if ((*iter)->GetDrawingX() < x) x = (*iter)->GetDrawingX();
         ++iter;
@@ -299,11 +299,11 @@ int Chord::GetXMin() const
 
 int Chord::GetXMax() const
 {
-    const ArrayOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     assert(childList.size() > 0);
 
     int x = VRV_UNSET;
-    ArrayOfConstObjects::const_iterator iter = childList.begin();
+    ListOfConstObjects::const_iterator iter = childList.begin();
     while (iter != childList.end()) {
         if ((*iter)->GetDrawingX() > x) x = (*iter)->GetDrawingX();
         ++iter;
@@ -364,8 +364,8 @@ Point Chord::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
 
 data_STEMDIRECTION Chord::CalcStemDirection(int verticalCenter) const
 {
-    const ArrayOfConstObjects &childList = this->GetList(this);
-    ArrayOfConstObjects topNotes, bottomNotes;
+    const ListOfConstObjects &childList = this->GetList(this);
+    ListOfConstObjects topNotes, bottomNotes;
 
     // split notes into two vectors - notes above vertical center and below
     std::partition_copy(childList.begin(), childList.end(), std::back_inserter(topNotes),
@@ -426,7 +426,7 @@ bool Chord::IsVisible() const
     }
 
     // if the chord doesn't have it, see if all the children are invisible
-    const ArrayOfConstObjects &notes = this->GetList(this);
+    const ListOfConstObjects &notes = this->GetList(this);
 
     for (auto &iter : notes) {
         const Note *note = vrv_cast<const Note *>(iter);
@@ -458,7 +458,7 @@ bool Chord::HasAdjacentNotesInStaff(Staff *staff)
 
 bool Chord::HasNoteWithDots() const
 {
-    const ArrayOfConstObjects &notes = this->GetList(this);
+    const ListOfConstObjects &notes = this->GetList(this);
 
     return std::any_of(notes.cbegin(), notes.cend(), [](const Object *object) {
         const Note *note = vrv_cast<const Note *>(object);
@@ -480,7 +480,7 @@ int Chord::AdjustOverlappingLayers(
             otherElementLocations.insert(note->GetDrawingLoc());
         }
     }
-    const ArrayOfObjects &notes = this->GetList(this);
+    const ListOfObjects &notes = this->GetList(this);
     // get current chord positions
     std::set<int> chordElementLocations;
     for (const auto iter : notes) {
@@ -538,7 +538,7 @@ int Chord::AdjustOverlappingLayers(
 
 std::list<Note *> Chord::GetAdjacentNotesList(Staff *staff, int loc)
 {
-    const ArrayOfObjects &notes = this->GetList(this);
+    const ListOfObjects &notes = this->GetList(this);
 
     std::list<Note *> adjacentNotes;
     for (Object *obj : notes) {
@@ -743,7 +743,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
 MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate)
 {
-    const ArrayOfObjects &notes = this->GetList(this);
+    const ListOfObjects &notes = this->GetList(this);
 
     MapOfNoteLocs noteLocations;
     for (Object *obj : notes) {
@@ -842,8 +842,8 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     this->CalculateClusters();
 
     // Also set the drawing stem object (or NULL) to all child notes
-    const ArrayOfObjects &childList = this->GetList(this);
-    for (ArrayOfObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
+    const ListOfObjects &childList = this->GetList(this);
+    for (ListOfObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
         assert((*it)->Is(NOTE));
         Note *note = vrv_cast<Note *>(*it);
         assert(note);
@@ -994,7 +994,7 @@ int Chord::GenerateMIDI(FunctorParams *functorParams)
     // Handle grace chords
     if (this->IsGraceNote()) {
         std::set<int> pitches;
-        const ArrayOfObjects &notes = this->GetList(this);
+        const ListOfObjects &notes = this->GetList(this);
         for (Object *obj : notes) {
             Note *note = vrv_cast<Note *>(obj);
             assert(note);

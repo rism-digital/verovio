@@ -1404,14 +1404,14 @@ int LayerElement::CalcAlignmentPitchPos(FunctorParams *functorParams)
             if (beam) {
                 beam->ResetList(beam);
 
-                const ArrayOfObjects &beamList = beam->GetList(beam);
+                const ListOfObjects &beamList = beam->GetList(beam);
                 const int restIndex = beam->GetListIndex(rest);
                 assert(restIndex >= 0);
 
                 int leftLoc = loc;
-                ArrayOfObjects::const_iterator it = beamList.begin();
+                ListOfObjects::const_iterator it = beamList.begin();
                 std::advance(it, restIndex);
-                ArrayOfObjects::const_reverse_iterator rit(it);
+                ListOfObjects::const_reverse_iterator rit(it);
                 // iterate through the elements from the rest to the beginning of the beam
                 // until we hit a note or chord, which we will use to determine where the rest should be placed
                 for (; rit != beamList.rend(); ++rit) {

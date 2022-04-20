@@ -107,11 +107,9 @@ void KeySig::Reset()
     m_drawingCancelAccidCount = 0;
 }
 
-void KeySig::FilterList(ArrayOfConstObjects &childList) const
+void KeySig::FilterList(ListOfConstObjects &childList) const
 {
-    // nothing  to filter since we allow only KeyAccid for now.
-    ArrayOfConstObjects::iterator iter = childList.begin();
-
+    ListOfConstObjects::iterator iter = childList.begin();
     while (iter != childList.end()) {
         if ((*iter)->Is(KEYACCID))
             ++iter;
@@ -134,10 +132,10 @@ int KeySig::GetAccidCount() const
 
 data_ACCIDENTAL_WRITTEN KeySig::GetAccidType() const
 {
-    const ArrayOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     if (childList.size() > 0) {
         if (m_mixedChildrenAccidType) return ACCIDENTAL_WRITTEN_NONE;
-        const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(childList.at(0));
+        const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(childList.front());
         assert(keyAccid);
         return keyAccid->GetAccid();
     }
@@ -151,7 +149,7 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
 {
     mapOfPitchAccid.clear();
 
-    const ArrayOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     if (childList.size() > 0) {
         for (auto &child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
@@ -174,10 +172,11 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
     accid = ACCIDENTAL_WRITTEN_s;
     std::wstring symbolStr = L"";
 
-    const ArrayOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     if (childList.size() > 0) {
         if ((int)childList.size() <= pos) return symbolStr;
-        const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(childList.at(pos));
+        auto iter = std::next(childList.begin(), pos);
+        const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(*iter);
         assert(keyAccid);
         accid = keyAccid->GetAccid();
         pname = keyAccid->GetPname();
@@ -297,7 +296,7 @@ int KeySig::InitData(FunctorParams *functorParams)
     data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
     m_mixedChildrenAccidType = false;
 
-    const ArrayOfObjects &childList = this->GetList(this);
+    const ListOfObjects &childList = this->GetList(this);
     for (auto &child : childList) {
         KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
         assert(keyAccid);

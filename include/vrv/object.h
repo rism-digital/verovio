@@ -547,7 +547,7 @@ public:
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */
-    void FillFlatList(ArrayOfConstObjects &list) const;
+    void FillFlatList(ListOfConstObjects &list) const;
 
     /**
      * Check if the content was modified or not
@@ -1676,8 +1676,8 @@ public:
      * Because this is an interface, we need to pass the object - not the best design.
      */
     ///@{
-    const ArrayOfConstObjects &GetList(const Object *node) const;
-    ArrayOfObjects GetList(const Object *node);
+    const ListOfConstObjects &GetList(const Object *node) const;
+    ListOfObjects GetList(const Object *node);
     ///@}
 
     /**
@@ -1694,14 +1694,14 @@ public:
     ///@}
 
 private:
-    mutable ArrayOfConstObjects m_list;
+    mutable ListOfConstObjects m_list;
 
 protected:
     /**
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ArrayOfConstObjects &childList) const {};
+    virtual void FilterList(ListOfConstObjects &childList) const {};
 
 public:
     /**
@@ -1742,7 +1742,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    void FilterList(ArrayOfConstObjects &childList) const override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     //

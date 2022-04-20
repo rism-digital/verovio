@@ -272,7 +272,7 @@ protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    void FilterList(ArrayOfConstObjects &childList) const override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 public:
     mutable std::list<ChordCluster *> m_clusters;

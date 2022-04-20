@@ -91,9 +91,9 @@ bool RunningElement::IsSupportedChild(Object *child)
     return true;
 }
 
-void RunningElement::FilterList(ArrayOfConstObjects &childList) const
+void RunningElement::FilterList(ListOfConstObjects &childList) const
 {
-    ArrayOfConstObjects::iterator iter = childList.begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
     while (iter != childList.end()) {
         // remove nested rend elements
@@ -391,8 +391,8 @@ int RunningElement::InitData(FunctorParams *functorParams)
         m_drawingScalingPercent[i] = 100;
     }
 
-    const ArrayOfObjects &childList = this->GetList(this);
-    for (ArrayOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
+    const ListOfObjects &childList = this->GetList(this);
+    for (ListOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
         int pos = 0;
         AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
         assert(interface);

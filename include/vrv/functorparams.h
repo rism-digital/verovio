@@ -105,8 +105,8 @@ public:
 
 class AddLayerElementToFlatListParams : public FunctorParams {
 public:
-    AddLayerElementToFlatListParams(ArrayOfConstObjects *flatList) { m_flatList = flatList; }
-    ArrayOfConstObjects *m_flatList;
+    AddLayerElementToFlatListParams(ListOfConstObjects *flatList) { m_flatList = flatList; }
+    ListOfConstObjects *m_flatList;
 };
 
 //----------------------------------------------------------------------------

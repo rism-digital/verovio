@@ -58,16 +58,21 @@ bool TabGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-void TabGrp::FilterList(ArrayOfConstObjects &childList) const
+void TabGrp::FilterList(ListOfConstObjects &childList) const
 {
     // Retain only note children of chords
-    ArrayOfConstObjects::iterator iter = childList.begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
     while (iter != childList.end()) {
-        iter = ((*iter)->Is(NOTE)) ? iter + 1 : childList.erase(iter);
+        if ((*iter)->Is(NOTE)) {
+            ++iter;
+        }
+        else {
+            iter = childList.erase(iter);
+        }
     }
 
-    std::sort(childList.begin(), childList.end(), TabCourseSort());
+    childList.sort(TabCourseSort());
 }
 
 int TabGrp::GetYTop() const

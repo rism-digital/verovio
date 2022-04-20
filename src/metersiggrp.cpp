@@ -65,7 +65,7 @@ bool MeterSigGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-void MeterSigGrp::FilterList(ArrayOfConstObjects &childList) const
+void MeterSigGrp::FilterList(ListOfConstObjects &childList) const
 {
     // We want to keep only MeterSig
     childList.erase(std::remove_if(childList.begin(), childList.end(),
@@ -81,12 +81,13 @@ void MeterSigGrp::AddAlternatingMeasureToVector(Measure *measure)
 MeterSig *MeterSigGrp::GetSimplifiedMeterSig() const
 {
     MeterSig *newMeterSig = NULL;
-    const ArrayOfConstObjects &childList = this->GetList(this);
+    const ListOfConstObjects &childList = this->GetList(this);
     switch (this->GetFunc()) {
         // For alternating meterSig group alternate between children sequentially
         case meterSigGrpLog_FUNC_alternating: {
             const int index = m_count % childList.size();
-            newMeterSig = vrv_cast<MeterSig *>((childList.at(index))->Clone());
+            auto iter = std::next(childList.begin(), index);
+            newMeterSig = vrv_cast<MeterSig *>((*iter)->Clone());
             break;
         }
         // For interchanging meterSig group select the largest signature, but make sure to align unit with the shortest
