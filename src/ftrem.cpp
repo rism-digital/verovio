@@ -204,11 +204,6 @@ int FTrem::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (this->GetElementCoords()->size() != 2) {
-        LogError("Stem calculation: <fTrem> element has invalid number of descendants.");
-        return FUNCTOR_CONTINUE;
-    }
-
     Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
@@ -216,6 +211,11 @@ int FTrem::CalcStem(FunctorParams *functorParams)
 
     this->InitCoords(fTremChildren, staff, BEAMPLACE_NONE);
     this->InitCue(false);
+
+    if (this->GetElementCoords()->size() != 2) {
+        LogError("Stem calculation: <fTrem> element has invalid number of descendants.");
+        return FUNCTOR_CONTINUE;
+    }
 
     m_beamSegment.InitCoordRefs(this->GetElementCoords());
 
