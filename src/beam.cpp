@@ -1980,6 +1980,21 @@ void Beam::SetElementShortening(int shortening)
         [shortening](BeamElementCoord *coord) { coord->m_maxShortening = shortening; });
 }
 
+int Beam::GetBeamPartDuration(int x) const
+{
+    const auto it = std::find_if(m_beamSegment.m_beamElementCoordRefs.begin(),
+        m_beamSegment.m_beamElementCoordRefs.end(), [x](BeamElementCoord *coord) { return x < coord->m_x; });
+    if (it == m_beamSegment.m_beamElementCoordRefs.end()) {
+        return DUR_8;
+    }
+    else if (it == m_beamSegment.m_beamElementCoordRefs.begin()) {
+        return (*it)->m_dur;
+    }
+
+    if ((*it)->m_dur == (*std::prev(it))->m_dur) return (*it)->m_dur;
+    return std::min((*it)->m_dur, (*std::prev(it))->m_dur);
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -2009,8 +2024,17 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    const int leftMargin = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - params->m_y1;
-    const int rightMargin = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam - params->m_y2;
+    int leftMargin = 0, rightMargin = 0;
+    Beam *beam = vrv_cast<Beam *>(params->m_beam);
+    const int beamCount = beam->GetBeamPartDuration((*m_beamSegment.m_beamElementCoordRefs.begin())->m_x) - DUR_8;
+    const int currentBeamYLeft
+        = params->m_y1 + params->m_beamSlope * ((*m_beamSegment.m_beamElementCoordRefs.begin())->m_x - params->m_x1);
+    const int currentBeamYRight
+        = params->m_y1 + params->m_beamSlope * (m_beamSegment.m_beamElementCoordRefs.back()->m_x - params->m_x1);
+    leftMargin = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - currentBeamYLeft
+        + params->m_directionBias * (beamCount * beam->m_beamWidth + beam->m_beamWidthBlack);
+    rightMargin = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam - currentBeamYRight
+        + params->m_directionBias * (beamCount * beam->m_beamWidth + beam->m_beamWidthBlack);
 
     const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
     if (overlapMargin >= params->m_overlapMargin) {
