@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Apr 17 10:08:03 PDT 2022
+// Last Modified: Wed Apr 20 13:19:13 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -32195,6 +32195,16 @@ vector<int> HumdrumToken::getMidiPitches(void) {
 }
 
 
+int HumdrumToken::getMidiPitch(void) {
+	vector<int> pitches = getMidiPitches();
+	if (pitches.size() > 0) {
+		return pitches[0];
+	} else {
+		return 0;
+	}
+}
+
+
 
 //////////////////////////////
 //
@@ -32299,6 +32309,16 @@ vector<int> HumdrumToken::getMidiPitchesResolveNull(void) {
 	vector<int> output;
 	this->getMidiPitchesResolveNull(output);
 	return output;
+}
+
+
+int HumdrumToken::getMidiPitchResolveNull(void) {
+	vector<int> pitches = getMidiPitchesResolveNull();
+	if (pitches.size() > 0) {
+		return pitches[0];
+	} else {
+		return 0;
+	}
 }
 
 
@@ -72379,6 +72399,7 @@ string Tool_fb::getAnalysisTokenStyle3(HumdrumFile& infile, int line, int field)
 
 Tool_filter::Tool_filter(void) {
 	define("debug=b", "print debug statement");
+	define("v|variant=s:", "Run filters labeled with the given variant");
 }
 
 
@@ -72480,6 +72501,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(extract, infile, commands[i].second, status);
 		} else if (commands[i].first == "flipper") {
 			RUNTOOL(flipper, infile, commands[i].second, status);
+		} else if (commands[i].first == "filter") {
+			RUNTOOL(filter, infile, commands[i].second, status);
 		} else if (commands[i].first == "gasparize") {
 			RUNTOOL(gasparize, infile, commands[i].second, status);
 		} else if (commands[i].first == "melisma") {
@@ -72584,14 +72607,38 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 void Tool_filter::removeGlobalFilterLines(HumdrumFile& infile) {
 	HumRegex hre;
 	string text;
+
+	string maintag = "!!!filter:";
+	string mainXtag = "!!!Xfilter:";
+	string maintagQuery = "^!!!filter:";
+
+	string maintagV;
+	string mainXtagV;
+	string maintagQueryV;
+
+	if (m_variant.size() > 0) {
+		maintagV = "!!!filter-" + m_variant + ":";
+		mainXtagV = "!!!Xfilter-" + m_variant + ":";
+		maintagQueryV = "^!!!filter-" + m_variant + ":";
+	}
+
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].isReference()) {
 			continue;
 		}
-		if (infile.token(i, 0)->compare(0, 10, "!!!filter:") == 0) {
-			text = infile.token(i, 0)->getText();
-			hre.replaceDestructive(text, "!!!Xfilter:", "^!!!filter:");
-			infile.token(i, 0)->setText(text);
+
+		if (m_variant.size() > 0) {
+			if (infile.token(i, 0)->compare(0, maintagV.size(), maintagV) == 0) {
+				text = infile.token(i, 0)->getText();
+				hre.replaceDestructive(text, mainXtagV, maintagQueryV);
+				infile.token(i, 0)->setText(text);
+			}
+		} else {
+			if (infile.token(i, 0)->compare(0, maintag.size(), maintag) == 0) {
+				text = infile.token(i, 0)->getText();
+				hre.replaceDestructive(text, mainXtag, maintagQuery);
+				infile.token(i, 0)->setText(text);
+			}
 		}
 	}
 }
@@ -72606,6 +72653,21 @@ void Tool_filter::removeGlobalFilterLines(HumdrumFile& infile) {
 void Tool_filter::removeUniversalFilterLines(HumdrumFileSet& infiles) {
 	HumRegex hre;
 	string text;
+
+	string maintag = "!!!!filter:";
+	string mainXtag = "!!!!Xfilter:";
+	string maintagQuery = "^!!!!filter:";
+
+	string maintagV;
+	string mainXtagV;
+	string maintagQueryV;
+
+	if (m_variant.size() > 0) {
+		maintagV = "!!!!filter-" + m_variant + ":";
+		mainXtagV = "!!!!Xfilter-" + m_variant + ":";
+		maintagQueryV = "^!!!!filter-" + m_variant + ":";
+	}
+
 	for (int i=0; i<infiles.getCount(); i++) {
 		HumdrumFile& infile = infiles[i];
 		for (int j=0; j<infile.getLineCount(); j++) {
@@ -72613,11 +72675,20 @@ void Tool_filter::removeUniversalFilterLines(HumdrumFileSet& infiles) {
 				continue;
 			}
 			HTp token = infile.token(j, 0);
-			if (token->compare(0, 11, "!!!!filter:") == 0) {
-				text = token->getText();
-				hre.replaceDestructive(text, "!!!!Xfilter:", "^!!!!filter:");
-				token->setText(text);
-				infile[j].createLineFromTokens();
+			if (m_variant.size() > 0) {
+				if (token->compare(0, maintagV.size(), maintagV) == 0) {
+					text = token->getText();
+					hre.replaceDestructive(text, mainXtagV, maintagQueryV);
+					token->setText(text);
+					infile[j].createLineFromTokens();
+				}
+			} else {
+				if (token->compare(0, maintag.size(), maintag) == 0) {
+					text = token->getText();
+					hre.replaceDestructive(text, mainXtag, maintagQuery);
+					token->setText(text);
+					infile[j].createLineFromTokens();
+				}
 			}
 		}
 	}
@@ -72636,12 +72707,12 @@ void Tool_filter::getCommandList(vector<pair<string, string> >& commands,
 	vector<HLp> refs = infile.getReferenceRecords();
 	pair<string, string> entry;
 	string tag = "filter";
-	vector<string> clist;
-	HumRegex hre;
-   if (m_variant.size() > 0) {
+	if (m_variant.size() > 0) {
 		tag += "-";
 		tag += m_variant;
 	}
+	vector<string> clist;
+	HumRegex hre;
 	for (int i=0; i<(int)refs.size(); i++) {
 		string refkey = refs[i]->getGlobalReferenceKey();
 		if (refkey != tag) {
@@ -72767,12 +72838,12 @@ void Tool_filter::getUniversalCommandList(vector<pair<string, string> >& command
 	vector<HLp> refs = infiles.getUniversalReferenceRecords();
 	pair<string, string> entry;
 	string tag = "filter";
-	vector<string> clist;
-	HumRegex hre;
-   if (m_variant.size() > 0) {
+	if (m_variant.size() > 0) {
 		tag += "-";
 		tag += m_variant;
 	}
+	vector<string> clist;
+	HumRegex hre;
 	for (int i=0; i<(int)refs.size(); i++) {
 		if (refs[i]->getUniversalReferenceKey() != tag) {
 			continue;
@@ -72798,6 +72869,10 @@ void Tool_filter::getUniversalCommandList(vector<pair<string, string> >& command
 
 void Tool_filter::initialize(HumdrumFile& infile) {
 	m_debugQ = getBoolean("debug");
+	m_variant.clear();
+	if (getBoolean("variant")) {
+		m_variant = getString("variant");
+	}
 }
 
 
@@ -85322,6 +85397,9 @@ void Tool_modori::processFile(HumdrumFile& infile) {
 				} else if (hre.search(token, "^!!?LO:(TX|DY).*:ori=")) {
 					m_lotext.push_back(token);
 				}
+				if (hre.search(token, "^!LO:MO:.*")) {
+					m_lomo.push_back(token);
+				}
 			}
 		}
 		if (!infile[i].isInterpretation()) {
@@ -85378,7 +85456,6 @@ void Tool_modori::processFile(HumdrumFile& infile) {
 		// nothing to do
 		return;
 	}
-
 
 	switchModernOriginal(infile);
 	m_humdrum_text << infile;
@@ -85810,6 +85887,107 @@ void Tool_modori::switchModernOriginal(HumdrumFile& infile) {
 		infile[line].createLineFromTokens();
 	}
 
+	updateLoMo(infile);
+}
+
+
+//////////////////////////////
+//
+// Tool_modori::updateLoMo --
+//
+
+void Tool_modori::updateLoMo(HumdrumFile& infile) {
+	for (int i=0; i<(int)m_lomo.size(); i++) {
+		processLoMo(m_lomo[i]);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::processLoMo --
+//
+
+void Tool_modori::processLoMo(HTp lomo) {
+	HumRegex hre;
+
+	if (m_modernQ) {
+		string text = lomo->getText();
+		string modtext;
+		string oritext;
+		string base;
+		string rest;
+		if (hre.search(text, "(.*):mod=([^:]*)(.*)")) {
+			base = hre.getMatch(1);
+			modtext = hre.getMatch(2);
+			rest = hre.getMatch(3);
+			hre.replaceDestructive(modtext, ":", "&colon;", "g");
+			HTp current = lomo->getNextToken();
+			// null parameter allows next following null token
+			// to be swapped out
+			bool nullQ = hre.search(text, ":null:");
+			if (!nullQ) {
+				while (current) {
+					if (current->isNull()) {
+						current = current->getNextToken();
+						continue;
+					}
+					break;
+				}
+			}
+			if (current) {
+				string oritext = current->getText();
+				hre.replaceDestructive(oritext, "&colon;", ":", "g");
+				current->setText(modtext);
+				string newtext = base;
+				newtext += ":ori=";
+				newtext += oritext;
+				newtext += rest;
+				lomo->setText(newtext);
+				lomo->getLine()->createLineFromTokens();
+				current->getLine()->createLineFromTokens();
+			}
+		}
+
+	} else if (m_originalQ) {
+		string text = lomo->getText();
+		string modtext;
+		string oritext;
+		string base;
+		string rest;
+		if (hre.search(text, "(.*):ori=([^:]*)(.*)")) {
+			base = hre.getMatch(1);
+			oritext = hre.getMatch(2);
+			rest = hre.getMatch(3);
+			hre.replaceDestructive(oritext, ":", "&colon;", "g");
+			HTp current = lomo->getNextToken();
+			// null parameter allows next following null token
+			// to be swapped out
+			bool nullQ = hre.search(text, ":null:");
+			if (nullQ) {
+				while (current) {
+					if (current->isNull()) {
+						current = current->getNextToken();
+						continue;
+					}
+					break;
+				}
+			}
+			if (current) {
+				string modtext = current->getText();
+				hre.replaceDestructive(modtext, "&colon;", ":", "g");
+				current->setText(oritext);
+				string newtext = base;
+				newtext += ":mod=";
+				newtext += modtext;
+				newtext += rest;
+				lomo->setText(newtext);
+				lomo->getLine()->createLineFromTokens();
+				current->getLine()->createLineFromTokens();
+			}
+		}
+	}
 }
 
 
@@ -97562,19 +97740,193 @@ void Tool_peak::processFile(HumdrumFile& infile) {
 		m_humdrum_text << endl;
 	}
 
+	mergeOverlappingPeaks();
+
+	int all_note_count = countNotesInScore(infile);
+
+	int peak_note_count = 0;
+	for (int i=0; i<(int)m_peakIndex.size(); i++) {
+		if (m_peakIndex[i] < 0) {
+			continue;
+		}
+		peak_note_count += m_peakPeakCount[i];
+	}
+
 	if (m_infoQ) {
-		m_humdrum_text << "!!!peaks: " << m_count << endl;
-		for (int i=0; i<(int)m_peakMeasureBegin.size(); i++) {
-			m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-			m_humdrum_text << "!!!peak_group: " << i+1 << endl;
-			m_humdrum_text << "!!!start_measure: " << m_peakMeasureBegin[i] << endl;
-			m_humdrum_text << "!!!end_measure: " << m_peakMeasureEnd[i] << endl;
-			m_humdrum_text << "!!!group_duration: " << m_peakDuration[i] << endl;
-			m_humdrum_text << "!!!group_pitch: " << m_peakPitch[i] << endl;
-			m_humdrum_text << "!!!group_peakcount: " << m_peakPeakCount[i] << endl;
+		m_humdrum_text << "!!!peak_groups: " << m_count << endl;
+		m_humdrum_text << "!!!peak_notes: "  << peak_note_count << endl;
+		m_humdrum_text << "!!!score_notes: " << all_note_count << endl;
+		int pcounter = 1;
+		for (int i=0; i<(int)m_peakIndex.size(); i++) {
+			if (m_peakIndex[i] < 0) {
+				// This group has been merged into a larger one.
+				continue;
+			}
+			m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"  << endl;
+			m_humdrum_text << "!!!peak_group: "     << pcounter++            << endl;
+			m_humdrum_text << "!!!start_measure: "  << m_peakMeasureBegin[i] << endl;
+			m_humdrum_text << "!!!end_measure: "    << m_peakMeasureEnd[i]   << endl;
+			m_humdrum_text << "!!!group_duration: " << m_peakDuration[i].getFloat()/4.0 << endl;
+			m_humdrum_text << "!!!group_pitches:";
+			for (int j=0; j<(int)m_peakPitch[i].size(); j++) {
+				m_humdrum_text << " " << m_peakPitch[i][j];
+				m_humdrum_text << "(" << m_peakPitch[i][j]->getLineIndex() << ")";
+			}
+			m_humdrum_text << endl;
+			m_humdrum_text << "!!!group_peakcount: " << m_peakPeakCount[i]    << endl;
 		}
 	}
 
+}
+
+
+
+//////////////////////////////
+//
+// mergeOverlappingPeaks -- Merge overlapping peak groups.
+//    Groups that need to be merged:
+//    * Have the same track number (same staff)
+//    * Have the same MIDI pitch
+//    * Have and starttime for one group that starts before or on the
+//      endtime of another group.
+//    Merged groups are indicated as inactive if their index is set to
+//    a negative value.
+//
+
+void Tool_peak::mergeOverlappingPeaks(void) {
+	// This algorithm does not handle multiple groups that
+	// need merging, so redo the overlap identification
+	// several more times to enture multiple groups are
+	// merged.
+	for (int k=0; k<100; k++) {
+		bool mergers = false;
+		for (int i=0; i<(int)m_peakIndex.size(); i++) {
+			for (int j=i+1; j<(int)m_peakIndex.size(); j++) {
+				mergers |= checkGroupPairForMerger(i, j);
+			}
+		}
+		if (!mergers) {
+			break;
+		}
+	}
+
+	// re-calculate m_count (number of peak groups):
+	m_count = 0;
+	for (int i=0; i<(int)m_peakIndex.size(); i++) {
+		if (m_peakIndex[i] >= 0) {
+			m_count++;
+		}
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_peak::checkGroupPairForMerger --
+//    * Have and starttime for one group that starts before or on the
+//      endtime of another group.
+//    Merged groups are indicated as inactive if their index is set to
+//    a negative value.
+// Return value is true if there was a merger; otherwise, returns false.
+//
+
+bool Tool_peak::checkGroupPairForMerger(int index1, int index2) {
+
+	// Groups must not have been merged already:
+	if (m_peakIndex[index1] < 0) {
+		return false;
+	}
+	if (m_peakIndex[index2] < 0) {
+		return false;
+	}
+
+	// Groups must have the same track number (i.e., the same staff/part):
+	if (m_peakTrack[index1] != m_peakTrack[index2]) {
+		return false;
+	}
+
+	// Groups must have the same MIDI pitch:
+	if (m_peakPitch[index1].empty()) {
+		return false;
+	}
+	if (m_peakPitch[index2].empty()) {
+		return false;
+	}
+	int midi1 = m_peakPitch[index1][0]->getMidiPitch();
+	int midi2 = m_peakPitch[index2][0]->getMidiPitch();
+	if (midi1 != midi2) {
+		return false;
+	}
+
+	// Check if they overlap:
+	HumNum start1 = m_startTime[index1];
+	HumNum start2 = m_startTime[index2];
+	HumNum end1   = m_endTime[index1];
+	HumNum end2   = m_endTime[index2];
+	
+	bool mergeQ = false;
+	bool flipQ  = false;
+	if (start1 < start2) {
+		if (start2 <= end1) {
+			mergeQ = true;
+		}
+	} else {
+		if (start1 <= end2) {
+			flipQ = true;
+			mergeQ = true;
+		}
+	}
+
+	if (mergeQ == false) {
+		return false;
+	}
+
+	// merge the two groups:
+	if (flipQ) {
+		int tempi = index1;
+		index1 = index2;
+		index2 = tempi;
+	}
+
+	// Deactivate the second group by setting a negative index:
+	m_peakIndex[index2] *= -1;
+	
+	// Set the endtime of the first group to the end of the second group:
+	m_endTime[index1] = m_endTime[index2];
+
+	// Likewise, merge the ending measure numbers:
+	m_peakMeasureEnd[index1] = m_peakMeasureEnd[index2];
+
+	// Update the duration of the merged peak group:
+	m_peakDuration[index1] = m_endTime[index2] - m_startTime[index1];
+
+	// merge the notes/counts:
+	for (int i=0; i<(int)m_peakPitch[index2].size(); i++) {
+		vector<HTp> newtoks;
+		newtoks.clear();
+		for (int j=0; j<(int)m_peakPitch[index1].size(); j++) {
+			HTp token1 = m_peakPitch[index1][j];
+			HTp token2 = m_peakPitch[index2][i];
+			if (token2 == NULL) {
+				continue;
+			}
+			if (token1 == token2) {
+				m_peakPitch[index2][i] = NULL;
+			}
+		}
+	}
+
+	for (int k=0; k<(int)m_peakPitch[index2].size(); k++) {
+		HTp token = m_peakPitch[index2][k];
+		if (!token) {
+			continue;
+		}
+		m_peakPitch[index1].push_back(token);
+	}
+
+	m_peakPeakCount[index1] = m_peakPitch[index1].size();
+
+	return true;
 }
 
 
@@ -97667,7 +98019,7 @@ void Tool_peak::getLocalPeakNotes(vector<vector<HTp>>& newnotelist,
 	////////////////////////////
 	//
 	// Refinement to add to following loop: If the note has
-   // a duration less than or equal two 2 (half note), and
+	// a duration less than or equal two 2 (half note), and
 	// the note is not on a beat then do not add it to the
 	// newnotelist vector.
 	//
@@ -97765,36 +98117,49 @@ void Tool_peak::identifyPeakSequence(vector<bool>& globalpeaknotes, vector<int>&
 	//
 	//////////////////////////////////////////
 
-	   for (int i=0; i<(int)peakmidinums.size() - m_peakNum; i++) {
-			 bool match = true;
-			 for (int j=1; j<m_peakNum; j++) {
-				 if (peakmidinums[i+j] != peakmidinums[i+j-1]) {
-					 match = false;
-					 break;
-				 }
-			 }
-			 if (match != true) {
-			 	continue;
-			 }
-			 HumNum duration = timestamps[i + m_peakNum - 1] - timestamps[i];
-			 if (duration.getFloat() > m_peakDur) {
-				 continue;
-			 }
-			 //data for every sub-sequeunce
-			 m_count += 1;
-			 int line = notes[i][0]->getLineIndex();
-			 int line2 = notes[i + m_peakNum - 1].back()->getLineIndex();
-
-			 m_peakDuration.push_back(duration.getFloat()/4.0);
-			 m_peakMeasureBegin.push_back(m_barNum[line]);
-			 m_peakMeasureEnd.push_back(m_barNum[line2]);
-			 m_peakPeakCount.push_back(3);
-			 m_peakPitch.push_back(notes[i][0]->getText());
-
-			 for (int j=0; j<m_peakNum; j++) {
-				globalpeaknotes[i+j] = true;
-			 }
+	for (int i=0; i<(int)peakmidinums.size() - m_peakNum; i++) {
+		bool match = true;
+		for (int j=1; j<m_peakNum; j++) {
+			if (peakmidinums[i+j] != peakmidinums[i+j-1]) {
+				match = false;
+				break;
+			}
 		}
+		if (match != true) {
+			continue;
+		}
+		HumNum duration = timestamps[i + m_peakNum - 1] - timestamps[i];
+		if (duration.getFloat() > m_peakDur) {
+			continue;
+		}
+		//data for every sub-sequeunce
+		m_count += 1;
+		int line = notes[i][0]->getLineIndex();
+		int line2 = notes[i + m_peakNum - 1].back()->getLineIndex();
+
+		m_peakDuration.push_back(duration.getFloat()/4.0);
+		m_peakMeasureBegin.push_back(m_barNum[line]);
+		m_peakMeasureEnd.push_back(m_barNum[line2]);
+		vector<HTp> pnotes;
+		for (int j=0; j<m_peakNum; j++) {
+			pnotes.push_back(notes.at(i+j).at(0));
+		}
+		m_peakPitch.push_back(pnotes);
+		m_peakPeakCount.push_back((int)pnotes.size());
+
+		// variables to do peak group mergers later:
+		int track = notes[i][0]->getTrack();
+		m_peakTrack.push_back(track);
+		m_peakIndex.push_back(m_peakIndex.size());
+		HumNum starttime = notes[i][0]->getDurationFromStart();
+		HumNum endtime   = notes[i+m_peakNum-1].back()->getDurationFromStart();
+		m_startTime.push_back(starttime);
+		m_endTime.push_back(endtime);
+
+		for (int j=0; j<m_peakNum; j++) {
+			globalpeaknotes[i+j] = true;
+		}
+	}
 }
 
 
@@ -97933,7 +98298,7 @@ void  Tool_peak::getDurations(vector<double>& durations, vector<vector<HTp>>& no
 
 //////////////////////////////
 //
-// getBeat --
+// Tool_peak::getBeat --
 //
 
 void  Tool_peak::getBeat(vector<bool>& metpos, vector<vector<HTp>>& notelist) {
@@ -97952,7 +98317,37 @@ void  Tool_peak::getBeat(vector<bool>& metpos, vector<vector<HTp>>& notelist) {
 }
 
 
+//////////////////////////////
+//
+// Tool_peak::countNotesInScore --
+//
 
+int Tool_peak::countNotesInScore(HumdrumFile& infile) {
+	int counter = 0;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->isNull()) {
+				continue;
+			}
+			if (token->isRest()) {
+				continue;
+			}
+			if (token->isSecondaryTiedNote()) {
+				continue;
+			}
+			counter++;
+
+		}
+	}
+	return counter;
+}
 
 
 
