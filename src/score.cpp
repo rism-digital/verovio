@@ -154,9 +154,9 @@ bool Score::ScoreDefNeedsOptimization(int optionCondense) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Score::InitData(FunctorParams *functorParams)
+int Score::PrepareDataInitialization(FunctorParams *functorParams)
 {
-    InitDataParams *params = vrv_params_cast<InitDataParams *>(functorParams);
+    PrepareDataInitializationParams *params = vrv_params_cast<PrepareDataInitializationParams *>(functorParams);
     assert(params);
 
     // Evaluate functor on scoreDef

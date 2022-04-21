@@ -476,9 +476,9 @@ void Doc::PrepareData()
         Functor resetData(&Object::ResetData);
         this->Process(&resetData, NULL);
     }
-    Functor initData(&Object::InitData);
-    InitDataParams initDataParams(&initData, this);
-    this->Process(&initData, &initDataParams);
+    Functor prepareDataInitialization(&Object::PrepareDataInitialization);
+    PrepareDataInitializationParams prepareDataInitializationParams(&prepareDataInitialization, this);
+    this->Process(&prepareDataInitialization, &prepareDataInitializationParams);
 
     /************ Store default durations ************/
 

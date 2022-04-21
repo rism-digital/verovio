@@ -74,9 +74,9 @@ public:
     //----------//
 
     /**
-     * See Object::InitData
+     * See Object::PrepareDataInitialization
      */
-    int InitData(FunctorParams *functorParams) override;
+    int PrepareDataInitialization(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustDots

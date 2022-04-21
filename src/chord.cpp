@@ -915,9 +915,9 @@ int Chord::ResetData(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::InitData(FunctorParams *functorParams)
+int Chord::PrepareDataInitialization(FunctorParams *functorParams)
 {
-    InitDataParams *params = vrv_params_cast<InitDataParams *>(functorParams);
+    PrepareDataInitializationParams *params = vrv_params_cast<PrepareDataInitializationParams *>(functorParams);
     assert(params);
 
     if (this->HasEmptyList(this)) {

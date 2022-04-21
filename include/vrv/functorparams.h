@@ -1814,26 +1814,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// InitDataParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the functor for redirection
- * member 1: the doc
- **/
-
-class InitDataParams : public FunctorParams {
-public:
-    InitDataParams(Functor *functor, Doc *doc)
-    {
-        m_functor = functor;
-        m_doc = doc;
-    }
-    Functor *m_functor;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // InitMaxMeasureDurationParams
 //----------------------------------------------------------------------------
 
@@ -2085,6 +2065,26 @@ public:
     Measure *m_currentMeasure;
     Staff *m_currentCrossStaff;
     Layer *m_currentCrossLayer;
+};
+
+//----------------------------------------------------------------------------
+// PrepareDataInitializationParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the functor for redirection
+ * member 1: the doc
+ **/
+
+class PrepareDataInitializationParams : public FunctorParams {
+public:
+    PrepareDataInitializationParams(Functor *functor, Doc *doc)
+    {
+        m_functor = functor;
+        m_doc = doc;
+    }
+    Functor *m_functor;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
