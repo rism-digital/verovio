@@ -1992,6 +1992,19 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         elements.insert(el);
     }
 
+    if (parents.size() == 0) {
+        LogError("Could not get the parent.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the parent.");
+        return false;
+    }
+    else if (parents.size() == 1) {
+        LogError("The selected elements are already grouped.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "The selected elements are already grouped.");
+        return false;
+    }
+
     // auto it = elementIds.begin();
     // Object *el = m_doc->GetDrawingPage()->FindDescendantByUuid(*it);
     // Layer *layer = dynamic_cast<Layer *>(el->GetFirstAncestor(LAYER));
