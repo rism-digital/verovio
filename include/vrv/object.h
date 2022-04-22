@@ -27,6 +27,7 @@ class Doc;
 class DurationInterface;
 class EditorialElement;
 class Output;
+class Filters;
 class Functor;
 class FunctorParams;
 class LinkingInterface;
@@ -616,12 +617,10 @@ public:
      * skipFirst does not call the functor or endFunctor on the first (calling) level
      */
     ///@{
-    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
-        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
-        bool skipFirst = false);
-    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
-        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
-        bool skipFirst = false) const;
+    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false);
+    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false) const;
     ///@}
 
     //----------------//
@@ -1514,7 +1513,7 @@ private:
     ///@{
     void UpdateDocumentScore(bool direction);
     bool SkipChildren(Functor *functor) const;
-    bool FiltersApply(const ArrayOfComparisons *filters, Object *object) const;
+    bool FiltersApply(const Filters *filters, Object *object) const;
     ///@}
 
 public:

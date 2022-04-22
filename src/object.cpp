@@ -964,7 +964,7 @@ bool Object::HasNonEditorialContent()
     return (!nonEditorial.empty());
 }
 
-void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
+void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, Filters *filters,
     int deepness, bool direction, bool skipFirst)
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
@@ -1019,7 +1019,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
 }
 
-void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
+void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, Filters *filters,
     int deepness, bool direction, bool skipFirst) const
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
@@ -1122,19 +1122,9 @@ bool Object::SkipChildren(Functor *functor) const
     return false;
 }
 
-bool Object::FiltersApply(const ArrayOfComparisons *filters, Object *object) const
+bool Object::FiltersApply(const Filters *filters, Object *object) const
 {
-    if (filters) {
-        return std::all_of(filters->begin(), filters->end(), [object](Comparison *iter) {
-            // ignore any class comparison which does not match the object class
-            ClassIdComparison *cmp = dynamic_cast<ClassIdComparison *>(iter);
-            if (!cmp || (cmp->GetType() != object->m_classId)) {
-                return true;
-            }
-            return (*iter)(object);
-        });
-    }
-    return true;
+    return filters ? filters->Apply(object) : true;
 }
 
 int Object::Save(Output *output)

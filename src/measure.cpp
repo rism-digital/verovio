@@ -741,7 +741,7 @@ int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
     }
     params->m_targetSubSystem->AddChild(measure);
 
-    ArrayOfComparisons filters;
+    Filters filters;
     // Now we can process by layer and move their content to (measure) segments
     for (auto const &staves : params->m_layerTree->child) {
         for (auto const &layers : staves.second.child) {
@@ -942,16 +942,16 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
     if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
 
     std::vector<int>::iterator iter;
-    ArrayOfComparisons filters;
+    Filters filters;
     for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-        filters.clear();
+        filters.Clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(BARLINE_REFERENCES);
         ns.push_back(*iter);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.push_back(&matchStaff);
+        filters.Add(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
@@ -967,16 +967,16 @@ int Measure::AdjustDots(FunctorParams *functorParams)
     if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
 
     std::vector<int>::iterator iter;
-    ArrayOfComparisons filters;
+    Filters filters;
     for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-        filters.clear();
+        filters.Clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(BARLINE_REFERENCES);
         ns.push_back(*iter);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.push_back(&matchStaff);
+        filters.Add(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
@@ -1040,7 +1040,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 
     const bool hasSystemStartLine = this->IsFirstInSystem() && system->GetDrawingScoreDef()->HasSystemStartLine();
 
-    ArrayOfComparisons filters;
+    Filters filters;
     for (auto staffN : params->m_staffNs) {
         params->m_minPos = 0;
         params->m_upcomingMinPos = VRV_UNSET;
@@ -1057,14 +1057,15 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
             params->m_upcomingMinPos = params->m_doc->GetDrawingBarLineWidth(params->m_staffSize);
         }
 
-        filters.clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(staffN);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.push_back(&matchStaff);
+        CrossAlignmentReferenceComparison matchCrossStaff;
+        filters.SetType(Filters::Type::AnyOf);
+        filters = { &matchStaff, &matchCrossStaff };
 
         params->m_measureTieEndpoints = this->GetInternalTieEndpoints();
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);

@@ -443,7 +443,7 @@ void System::ConvertToUnCastOffMensuralSystem()
 
     ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
 
-    ArrayOfComparisons filters;
+    Filters filters;
     // Now we can process by layer and move their content to (measure) segments
     for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
         for (auto const &layers : staves.second.child) {
