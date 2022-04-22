@@ -1991,7 +1991,6 @@ int Beam::GetBeamPartDuration(int x) const
         return (*it)->m_dur;
     }
 
-    if ((*it)->m_dur == (*std::prev(it))->m_dur) return (*it)->m_dur;
     return std::min((*it)->m_dur, (*std::prev(it))->m_dur);
 }
 
