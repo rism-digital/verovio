@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "horizontalaligner.h"
+#include "resources.h"
 #include "smufl.h"
 
 namespace vrv {

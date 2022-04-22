@@ -12,6 +12,7 @@
 #include "expansionmap.h"
 #include "facsimile.h"
 #include "options.h"
+#include "resources.h"
 #include "scoredef.h"
 
 namespace smf {

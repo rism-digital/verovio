@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "resources.h"
 #include "smufl.h"
 #include "verticalaligner.h"
 
