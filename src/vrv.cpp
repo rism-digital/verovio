@@ -75,7 +75,7 @@ const Resources::StyleAttributes Resources::k_defaultStyle{ data_FONTWEIGHT::FON
 
 Resources::Resources()
 {
-    m_path = "/usr/local/share/verovio";
+    m_path = s_defaultPath;
     m_currentStyle = k_defaultStyle;
 }
 

@@ -76,9 +76,8 @@ Toolkit::Toolkit(bool initFont)
     m_humdrumBuffer = NULL;
     m_cString = NULL;
 
-    Resources &resources = m_doc.ModifyResources();
-    resources.SetPath(Resources::GetDefaultPath());
     if (initFont) {
+        Resources &resources = m_doc.ModifyResources();
         resources.InitFonts();
     }
 
