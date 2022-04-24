@@ -14017,9 +14017,13 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 template <class ELEMENT> void HumdrumInput::setAttachmentType(ELEMENT *element, hum::HTp token)
 {
     hum::HumNum linedur = token->getLine()->getDuration();
+    int staffindex = m_rkern[token->getTrack()];
     if (token->isNull()) {
         // Element cannot be attached to anything, so use timestamp;
-        int staffindex = m_rkern[token->getTrack()];
+        hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
+        element->SetTstamp(barstamp.getFloat());
+    }
+    else if (token->isBarline()) {
         hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
         element->SetTstamp(barstamp.getFloat());
     }
