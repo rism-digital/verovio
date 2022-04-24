@@ -18743,7 +18743,8 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
             tstamp -= barbuffer;
             appendTypeTag(pedal, "endbar-25");
         }
-        pedal->SetTstamp(tstamp.getFloat());
+        hum::HTp attachment = getNextNonNullDataOrMeasureToken(token);
+        setAttachmentType(pedal, attachment);
         pedal->SetDir(pedalLog_DIR_down);
         assignVerticalGroup(pedal, token);
         setStaff(pedal, m_currentstaff);
@@ -18763,12 +18764,37 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
             tstamp -= barbuffer;
             appendTypeTag(pedal, "endbar-25");
         }
-        pedal->SetTstamp(tstamp.getFloat());
+        hum::HTp attachment = getNextNonNullDataOrMeasureToken(token);
+        setAttachmentType(pedal, attachment);
         pedal->SetDir(pedalLog_DIR_up);
         assignVerticalGroup(pedal, token);
         setStaff(pedal, m_currentstaff);
         ss[staffindex].pedal = false;
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getNextNonNullDataOrMeasureToken --
+//
+
+hum::HTp HumdrumInput::getNextNonNullDataOrMeasureToken(hum::HTp tok) {
+	hum::HTp current = tok->getNextToken();
+	while (current) {
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isBarline()) {
+			return current;
+		}
+		if (current->isData()) {
+			return current;
+		}
+		current = current->getNextToken();
+	}
+	// Some sort of error and current is NULL pointer.
+	return tok;
 }
 
 //////////////////////////////

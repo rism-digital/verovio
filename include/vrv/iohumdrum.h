@@ -763,6 +763,7 @@ protected:
     double getTempoScaling(hum::HumdrumFile &infile);
     bool isTacet(hum::HTp spinestart);
     void storeBeamSpansInStartingMeasure();
+    hum::HTp getNextNonNullDataOrMeasureToken(hum::HTp tok);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
