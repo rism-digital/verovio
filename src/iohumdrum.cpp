@@ -18999,6 +18999,14 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         chord->SetStemPos(STEMPOSITION_right);
     }
 
+    int stemslashes = 0;
+    if (m_signifiers.tremolo) {
+        stemslashes = (int)std::count(token->begin(), token->end(), m_signifiers.tremolo);
+    }
+    if (stemslashes) {
+        chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(stemslashes) + "slash"));
+    }
+
     // Stem direction of the chord.  If both up and down, then show up.
     int crossdir = token->getValueInt("auto", "stem.dir");
     if (crossdir == 1) {
@@ -19887,6 +19895,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
+    int stemslashes = 0;
+    if ((!token->isChord()) && m_signifiers.tremolo) {
+        stemslashes = (int)std::count(tstring.begin(), tstring.end(), m_signifiers.tremolo);
+    }
+
     bool removeStemQ = getBooleanParameter(token, "N", "xstem");
     bool addCueSizeQ = getBooleanParameter(token, "N", "cue");
 
@@ -19895,6 +19908,9 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
     if (addCueSizeQ) {
         note->SetCue(BOOLEAN_true);
+    }
+    if (stemslashes) {
+        note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(stemslashes) + "slash"));
     }
 
     std::string head = token->getLayoutParameter("N", "head", subtoken);
@@ -24746,6 +24762,11 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         }
         else if (value.find("lefthand pizz", equals) != std::string::npos) {
             m_signifiers.lhpizz = signifier;
+        }
+
+        // tremolo slashes on stem
+        if (value.find("tremolo", equals) != std::string::npos) {
+            m_signifiers.tremolo = signifier;
         }
 
         // terminal longs

@@ -400,6 +400,7 @@ public:
     char hairpinAccent = '\0'; // For <> accent on a note.
     char verticalStroke = '\0'; // For horizontal stroke ornament
     char lhpizz = '\0'; // For left-hand pizzicato
+    char tremolo = '\0'; // For unmeasured tremolo slashes
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
