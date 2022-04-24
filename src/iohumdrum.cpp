@@ -12614,6 +12614,11 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
     }
 
+    if (problemQ) {
+        italic = false;
+        bold = false;
+    }
+
     bool plain = !(italic || bold);
     bool needrend = plain || bold || justification || color.size();
     bool oldneedrend = false;
