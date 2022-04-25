@@ -1841,27 +1841,30 @@ int View::DrawMeterSigFigures(
 
 void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smuflCode, int num, bool line, Staff *staff)
 {
-    int xSymbol = xCentered - m_doc->GetGlyphWidth(smuflCode, staff->m_drawingStaffSize, false) / 2;
-    int y = staff->GetDrawingY();
-    int ySymbol = y - staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const int staffSize = staff->m_drawingStaffSize;
+    const int y = staff->GetDrawingY();
+    const int xSymbol = xCentered - m_doc->GetGlyphWidth(smuflCode, staffSize, false) / 2;
+    const int ySymbol = y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize) / 2;
 
-    this->DrawSmuflCode(dc, xSymbol, ySymbol, smuflCode, staff->m_drawingStaffSize, false);
+    this->DrawSmuflCode(dc, xSymbol, ySymbol, smuflCode, staffSize, false);
 
     if (line) {
-        this->DrawVerticalLine(dc, y, y - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), xCentered,
-            m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+        const int yBottom = y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
+        const int offset = (y == ySymbol) ? m_doc->GetDrawingDoubleUnit(staffSize) : 0;
+        this->DrawVerticalLine(dc, y + offset, yBottom - offset, xCentered, m_doc->GetDrawingBarLineWidth(staffSize));
     }
 
     if (num > 0) {
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
         // calculate the width of the figures
         TextExtend extend;
-        std::wstring figures = IntToTupletFigures(num);
+        std::wstring figures = IntToTimeSigFigures(num);
         dc->GetSmuflTextExtent(figures, &extend);
-        int y = (staff->GetDrawingY() > ySymbol)
-            ? staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-            : ySymbol + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        dc->DrawMusicText(figures, ToDeviceContextX(xCentered - extend.m_width / 2), ToDeviceContextY(y));
+        const int numHeight = m_doc->GetGlyphHeight(smuflCode, staffSize, false);
+        const int yNum = (y > ySymbol + numHeight / 2)
+            ? staff->GetDrawingY() + m_doc->GetDrawingUnit(staffSize) + extend.m_height / 2
+            : ySymbol + 3 * m_doc->GetDrawingUnit(staffSize) + extend.m_height / 2;
+        dc->DrawMusicText(figures, ToDeviceContextX(xCentered - extend.m_width / 2), ToDeviceContextY(yNum));
         dc->ResetFont();
     }
 }
