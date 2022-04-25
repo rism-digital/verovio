@@ -1264,7 +1264,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
         y2 = y1;
     }
 
-    int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
+    const int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 

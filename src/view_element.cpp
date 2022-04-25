@@ -404,10 +404,10 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int yTop = staff->GetDrawingY();
-    int yBottom = yTop - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const int yTop = staff->GetDrawingY();
+    const int yBottom = yTop - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-    int offset = (yTop == yBottom) ? m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : 0;
+    const int offset = (yTop == yBottom) ? m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : 0;
 
     this->DrawBarLine(dc, yTop + offset, yBottom - offset, barLine, barLine->GetForm());
     if (barLine->HasRepetitionDots()) {
