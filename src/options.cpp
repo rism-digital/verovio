@@ -209,7 +209,6 @@ std::string OptionBool::GetDefaultStrValue() const
 void OptionBool::Reset()
 {
     m_value = m_defaultValue;
-    m_isSet = false;
 }
 
 bool OptionBool::IsSet() const
@@ -220,7 +219,6 @@ bool OptionBool::IsSet() const
 bool OptionBool::SetValue(bool value)
 {
     m_value = value;
-    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -271,14 +269,12 @@ bool OptionDbl::SetValue(double value)
         return false;
     }
     m_value = value;
-    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
 void OptionDbl::Reset()
 {
     m_value = m_defaultValue;
-    m_isSet = false;
 }
 
 bool OptionDbl::IsSet() const
@@ -344,14 +340,12 @@ bool OptionInt::SetValue(int value)
         return false;
     }
     m_value = value;
-    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
 void OptionInt::Reset()
 {
     m_value = m_defaultValue;
-    m_isSet = false;
 }
 
 bool OptionInt::IsSet() const
@@ -379,14 +373,12 @@ void OptionString::Init(const std::string &defaultValue)
 bool OptionString::SetValue(const std::string &value)
 {
     m_value = value;
-    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
 void OptionString::Reset()
 {
     m_value = m_defaultValue;
-    m_isSet = false;
 }
 
 bool OptionString::IsSet() const
@@ -414,7 +406,6 @@ void OptionArray::Init()
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
 {
     m_values = values;
-    m_isSet = !m_values.empty();
     return true;
 }
 
@@ -423,7 +414,6 @@ bool OptionArray::SetValue(const std::string &value)
     // Passing a single value to an array option adds it to the values and to not replace them
     if (!value.empty()) {
         m_values.push_back(value);
-        m_isSet = true;
     }
     return true;
 }
@@ -459,14 +449,12 @@ bool OptionArray::SetValue(std::vector<std::string> const &values)
     m_values = values;
     m_values.erase(std::remove_if(m_values.begin(), m_values.end(), [](const std::string &s) { return s.empty(); }),
         m_values.end());
-    m_isSet = !m_values.empty();
     return true;
 }
 
 void OptionArray::Reset()
 {
     m_values.clear();
-    m_isSet = false;
 }
 
 bool OptionArray::IsSet() const
@@ -509,7 +497,6 @@ bool OptionIntMap::SetValue(const std::string &value)
     for (it = m_values->cbegin(); it != m_values->cend(); ++it)
         if (it->second == value) {
             m_value = it->first;
-            m_isSet = (m_value != m_defaultValue);
             return true;
         }
     LogError("Parameter '%s' not valid for '%s'", value.c_str(), this->GetKey().c_str());
@@ -538,7 +525,6 @@ bool OptionIntMap::SetValue(int value)
     assert(m_values->count(value));
 
     m_value = value;
-    m_isSet = (m_value != m_defaultValue);
 
     return true;
 }
@@ -577,7 +563,6 @@ std::string OptionIntMap::GetStrValuesAsStr(bool withoutDefault) const
 void OptionIntMap::Reset()
 {
     m_value = m_defaultValue;
-    m_isSet = false;
 }
 
 bool OptionIntMap::IsSet() const
@@ -611,7 +596,6 @@ bool OptionStaffrel::SetValue(const std::string &value)
         return false;
     }
     m_value = staffrel;
-    m_isSet = (m_value != m_defaultValue);
     return true;
 }
 
@@ -630,7 +614,6 @@ std::string OptionStaffrel::GetDefaultStrValue() const
 void OptionStaffrel::Reset()
 {
     m_value = m_defaultValue;
-    m_isSet = false;
 }
 
 bool OptionStaffrel::IsSet() const
@@ -653,7 +636,6 @@ void OptionJson::Init(JsonSource source, const std::string &defaultValue)
 {
     m_source = source;
     this->ReadJson(m_defaultValues, defaultValue);
-    m_isSet = false;
 }
 
 JsonSource OptionJson::GetSource() const
@@ -669,10 +651,7 @@ jsonxx::Object OptionJson::GetValue(bool getDefault) const
 bool OptionJson::SetValue(const std::string &value)
 {
     bool ok = this->ReadJson(m_values, value);
-    if (ok) {
-        m_isSet = (this->GetStrValue() != this->GetDefaultStrValue());
-    }
-    else {
+    if (!ok) {
         if (m_source == JsonSource::String) {
             LogError("Input json is not valid or contains errors");
         }
@@ -702,7 +681,6 @@ std::string OptionJson::GetDefaultStrValue() const
 void OptionJson::Reset()
 {
     m_values.reset();
-    m_isSet = false;
 }
 
 bool OptionJson::IsSet() const

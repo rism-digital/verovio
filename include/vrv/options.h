@@ -82,7 +82,6 @@ public:
     // constructors and destructors
     Option()
     {
-        m_isSet = false;
         m_shortOption = 0;
         m_isCmdOnly = false;
     }
@@ -134,7 +133,6 @@ public:
 protected:
     std::string m_title;
     std::string m_description;
-    bool m_isSet;
 
 private:
     std::string m_key;
