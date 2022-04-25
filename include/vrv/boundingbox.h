@@ -189,6 +189,11 @@ public:
         const Point bezier[4], bool isMaxExtrema, int approximationSteps = BEZIER_APPROXIMATION);
 
     /**
+     * Calculate the euclidean distance between two points
+     */
+    static double CalcDistance(const Point &p1, const Point &p2);
+
+    /**
      * @return true if the distance between the points does not exceed margin
      */
     static bool ArePointsClose(const Point &p1, const Point &p2, int margin);
