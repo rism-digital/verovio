@@ -25,7 +25,7 @@ class ScoreDefInterface;
  */
 class MeterSig : public LayerElement, public AttEnclosingChars, public AttMeterSigLog, public AttMeterSigVis {
 public:
-    enum class CountSign { None, Divide, Minus, Multiply, Plus };
+    enum class MeterCountSign { None, Slash, Minus, Asterisk, Plus };
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method resets all attribute classes.
@@ -51,8 +51,8 @@ public:
      * Set/get methods to get operation signa and meter counts as separate values
      */
     ///@{
-    std::pair<std::vector<int>, CountSign> GetMeterCounts() const;
-    void SetMeterCounts(const std::vector<int> &counts, MeterSig::CountSign sign);
+    std::pair<std::vector<int>, MeterCountSign> GetMeterCounts() const;
+    void SetMeterCounts(const std::vector<int> &counts, MeterSig::MeterCountSign sign);
     ///@}
 
     /** Retrieves the symbol glyph */

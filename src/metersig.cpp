@@ -51,7 +51,7 @@ int MeterSig::GetTotalCount() const
 {
     auto [counts, sign] = this->GetMeterCounts();
     switch (sign) {
-        case CountSign::Divide: {
+        case MeterCountSign::Divide: {
             // make sure that there is no division by zero
             std::for_each(counts.begin(), counts.end(), [](int &elem) {
                 if (!elem) elem = 1;
@@ -60,27 +60,27 @@ int MeterSig::GetTotalCount() const
             if (!result) result = 1;
             return result;
         }
-        case CountSign::Minus: {
+        case MeterCountSign::Minus: {
             int result = std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::minus<int>());
             if (result <= 0) result = 1;
             return result;
         }
-        case CountSign::Multiply: {
+        case MeterCountSign::Multiply: {
             int result = std::accumulate(counts.begin(), counts.end(), 1, std::multiplies<int>());
             if (!result) result = 1;
             return result;
         }
-        case CountSign::Plus: {
+        case MeterCountSign::Plus: {
             return std::accumulate(counts.begin(), counts.end(), 0, std::plus<int>());
         }
-        case CountSign::None:
+        case MeterCountSign::None:
         default: break;
     }
 
     return counts.front();
 }
 
-std::pair<std::vector<int>, MeterSig::CountSign> MeterSig::GetMeterCounts() const 
+std::pair<std::vector<int>, MeterSig::MeterCountSign> MeterSig::GetMeterCounts() const
 {
     const std::string count = this->GetCount();
     std::regex re("[\\*\\+/-]");
@@ -89,20 +89,20 @@ std::pair<std::vector<int>, MeterSig::CountSign> MeterSig::GetMeterCounts() cons
 
     // Since there is currently no need for implementation of complex calculus within metersig, only one opperation will
     // be supported in the meter count. Caclulation will be based on the first mathematical operator in the string
-    MeterSig::CountSign sign = CountSign::None;
+    MeterSig::MeterCountSign sign = MeterCountSign::None;
     const size_t pos = count.find_first_of("+-*/");
     if (pos != std::string::npos) {
         if (count[pos] == '/') {
-            sign = CountSign::Divide;
+            sign = MeterCountSign::Divide;
         }
         else if (count[pos] == '*') {
-            sign = CountSign::Multiply;
+            sign = MeterCountSign::Multiply;
         }
         else if (count[pos] == '+') {
-            sign = CountSign::Plus;
+            sign = MeterCountSign::Plus;
         }
         else if (count[pos] == '-') {
-            sign = CountSign::Minus;
+            sign = MeterCountSign::Minus;
         }
     }
     std::vector<int> result;
@@ -111,17 +111,17 @@ std::pair<std::vector<int>, MeterSig::CountSign> MeterSig::GetMeterCounts() cons
     return { result, sign };
 }
 
-void MeterSig::SetMeterCounts(const std::vector<int> &counts, MeterSig::CountSign sign) 
+void MeterSig::SetMeterCounts(const std::vector<int> &counts, MeterSig::MeterCountSign sign)
 {
     std::stringstream output;
     for (const int count : counts) {
         output << count;
         switch (sign) {
-            case CountSign::Divide: output << '\\'; break;
-            case CountSign::Minus: output << '-'; break;
-            case CountSign::Multiply: output << '*'; break;
-            case CountSign::Plus: output << '+'; break;
-            case CountSign::None:
+            case MeterCountSign::Divide: output << '\\'; break;
+            case MeterCountSign::Minus: output << '-'; break;
+            case MeterCountSign::Multiply: output << '*'; break;
+            case MeterCountSign::Plus: output << '+'; break;
+            case MeterCountSign::None:
             default: break;
         }
     }
