@@ -17483,9 +17483,13 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         else {
             nextpowoftwo = nextLowerPowerOfTwo((double)tuptop[i] / tupbot[i]);
         }
+
         if (dotlessdur[i].getNumerator() == 3) {
-            // correction for duplets
-            nextpowoftwo /= 2;
+            hum::HumNum testval = dotlessdur[i].getDenominator();
+            if (testval.isPowerOfTwo()) {
+                // correction for duplets
+                nextpowoftwo /= 2;
+            }
         }
         hum::HumNum value = dotlessdur[i] / nextpowoftwo;
         tuptop[i] = value.getDenominator();
@@ -18778,23 +18782,24 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
 // HumdrumInput::getNextNonNullDataOrMeasureToken --
 //
 
-hum::HTp HumdrumInput::getNextNonNullDataOrMeasureToken(hum::HTp tok) {
-	hum::HTp current = tok->getNextToken();
-	while (current) {
-		if (current->isNull()) {
-			current = current->getNextToken();
-			continue;
-		}
-		if (current->isBarline()) {
-			return current;
-		}
-		if (current->isData()) {
-			return current;
-		}
-		current = current->getNextToken();
-	}
-	// Some sort of error and current is NULL pointer.
-	return tok;
+hum::HTp HumdrumInput::getNextNonNullDataOrMeasureToken(hum::HTp tok)
+{
+    hum::HTp current = tok->getNextToken();
+    while (current) {
+        if (current->isNull()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->isBarline()) {
+            return current;
+        }
+        if (current->isData()) {
+            return current;
+        }
+        current = current->getNextToken();
+    }
+    // Some sort of error and current is NULL pointer.
+    return tok;
 }
 
 //////////////////////////////
