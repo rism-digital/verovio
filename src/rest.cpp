@@ -303,19 +303,7 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
         }
     }
 
-    // for two layers, top layer shouldn't go below center and lower layer shouldn't go above it. Enforce this by adding
-    // margin that will adjust rest position
-    int marginLocation = isTopLayer ? 6 : 2;
-    if ((this->GetDur() == DURATION_long) || ((this->GetDur() == DURATION_4) && restOverlap)) {
-        marginLocation = isTopLayer ? 8 : 0;
-    }
-    else if (this->GetDur() >= DURATION_8) {
-        marginLocation
-            = isTopLayer ? (6 + (this->GetDur() - DURATION_4) / 2 * 2) : (2 - (this->GetDur() - DURATION_8) / 2 * 2);
-    }
-    if (this->GetDur() >= DURATION_1024) {
-        marginLocation -= 2;
-    }
+    const int marginLocation = this->GetMarginLayerLocation(isTopLayer, restOverlap);
     const int optimalLocation = isTopLayer
         ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation })
         : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation });
@@ -492,6 +480,23 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
     return { VRV_UNSET, RA_none };
 }
 
+int Rest::GetMarginLayerLocation(bool isTopLayer, bool restOverlap) const
+{
+    int marginLocation = isTopLayer ? 6 : 2;
+    if ((this->GetDur() == DURATION_long) || ((this->GetDur() == DURATION_4) && restOverlap)) {
+        marginLocation = isTopLayer ? 8 : 0;
+    }
+    else if (this->GetDur() >= DURATION_8) {
+        marginLocation
+            = isTopLayer ? (6 + (this->GetDur() - DURATION_4) / 2 * 2) : (2 - (this->GetDur() - DURATION_8) / 2 * 2);
+    }
+    if (this->GetDur() >= DURATION_1024) {
+        marginLocation -= 2;
+    }
+
+    return marginLocation;
+}
+
 int Rest::GetRestOffsetFromOptions(
     RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const
 {
@@ -531,13 +536,21 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
     // Adjust drawing location for the rest based on the overlap with beams.
     // Adjustment should be an even number, so that the rest is positioned properly
     const int overlapMargin = std::min(leftMargin, rightMargin);
-    if (overlapMargin < 0) {
-        Staff *staff = this->GetAncestorStaff();
-        if ((!this->HasOloc() || !HasPloc()) && !this->HasLoc()) {
-            const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
-            const int oldLoc = this->GetDrawingLoc();
-            const int newLoc = oldLoc + locAdjust - locAdjust % 2;
+    if (overlapMargin >= 0) return FUNCTOR_CONTINUE;
+
+    Staff *staff = this->GetAncestorStaff();
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+
+    if ((!this->HasOloc() || !this->HasPloc()) && !this->HasLoc()) {
+        // constants
+        const bool isTopLayer
+            = m_crossStaff ? (staff->GetN() < m_crossStaff->GetN()) : (staff->GetFirst(LAYER) == layer);
+        const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        // calculate new and old locations for the rest
+        const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
+        const int oldLoc = this->GetDrawingLoc();
+        const int newLoc = oldLoc + locAdjust - locAdjust % 2;
+        if (staff->GetChildCount(LAYER) == 1) {
             this->SetDrawingLoc(newLoc);
             this->SetDrawingYRel(staff->CalcPitchPosYRel(params->m_doc, newLoc));
             // If there are dots, adjust their location as well
@@ -552,14 +565,12 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
                     }
                 }
             }
-        }
-        else {
-            const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            params->m_overlapMargin
-                = (((overlapMargin * params->m_directionBias + staffOffset - 1) / staffOffset + 1.5) * staffOffset)
-                * params->m_directionBias;
+            return FUNCTOR_CONTINUE;
         }
     }
+
+    const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    params->m_overlapMargin = (((std::abs(overlapMargin)) / staffOffset - 1) * staffOffset) * params->m_directionBias;
 
     return FUNCTOR_CONTINUE;
 }
