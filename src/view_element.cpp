@@ -1075,7 +1075,23 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    this->DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E500_repeat1Bar, mRpt->m_drawingMeasureCount, false, staff);
+    this->DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E500_repeat1Bar, 0, false, staff);
+
+    // draw the measure count
+    const int mRptNum = mRpt->HasNum() ? mRpt->GetNum() : mRpt->m_drawingMeasureCount;
+    if ((mRptNum > 0) && (mRpt->GetNumVisible() != BOOLEAN_false)) {
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+        // calculate the extend of the number
+        TextExtend extend;
+        std::wstring figures = IntToTupletFigures(mRptNum);
+        dc->GetSmuflTextExtent(figures, &extend);
+        int yNum = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        if (mRpt->GetNumPlace() == STAFFREL_basic_below)
+            yNum -= staff->m_drawingLines * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) + extend.m_height;
+        dc->DrawMusicText(
+            figures, ToDeviceContextX(element->GetDrawingX() - extend.m_width / 2), ToDeviceContextY(yNum));
+        dc->ResetFont();
+    }
 
     dc->EndGraphic(element, this);
 }
