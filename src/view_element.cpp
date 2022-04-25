@@ -1833,13 +1833,13 @@ int View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSi
     for (int summand : numSummands) {
         if (!timeSigCombNumerator.empty()) {
             switch (numSign) {
-                case MeterSig::CountSign::Divide: timeSigCombNumerator += SMUFL_E08E_timeSigFractionalSlash; break;
-                case MeterSig::CountSign::Minus: timeSigCombNumerator += SMUFL_E090_timeSigMinus; break;
-                case MeterSig::CountSign::Multiply: timeSigCombNumerator += SMUFL_E091_timeSigMultiply; break;
-                case MeterSig::CountSign::Plus: timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall; break;
-                case MeterSig::CountSign::None:
+                case MeterSig::MeterCountSign::Slash: timeSigCombNumerator += SMUFL_E08E_timeSigFractionalSlash; break;
+                case MeterSig::MeterCountSign::Minus: timeSigCombNumerator += SMUFL_E090_timeSigMinus; break;
+                case MeterSig::MeterCountSign::Asterisk: timeSigCombNumerator += SMUFL_E091_timeSigMultiply; break;
+                case MeterSig::MeterCountSign::Plus: timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall; break;
+                case MeterSig::MeterCountSign::None:
                 default: break;
-            }            
+            }
         }
         timeSigCombNumerator += IntToTimeSigFigures(summand);
     }

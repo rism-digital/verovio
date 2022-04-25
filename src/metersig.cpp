@@ -51,7 +51,7 @@ int MeterSig::GetTotalCount() const
 {
     auto [counts, sign] = this->GetMeterCounts();
     switch (sign) {
-        case MeterCountSign::Divide: {
+        case MeterCountSign::Slash: {
             // make sure that there is no division by zero
             std::for_each(counts.begin(), counts.end(), [](int &elem) {
                 if (!elem) elem = 1;
@@ -65,7 +65,7 @@ int MeterSig::GetTotalCount() const
             if (result <= 0) result = 1;
             return result;
         }
-        case MeterCountSign::Multiply: {
+        case MeterCountSign::Asterisk: {
             int result = std::accumulate(counts.begin(), counts.end(), 1, std::multiplies<int>());
             if (!result) result = 1;
             return result;
@@ -93,10 +93,10 @@ std::pair<std::vector<int>, MeterSig::MeterCountSign> MeterSig::GetMeterCounts()
     const size_t pos = count.find_first_of("+-*/");
     if (pos != std::string::npos) {
         if (count[pos] == '/') {
-            sign = MeterCountSign::Divide;
+            sign = MeterCountSign::Slash;
         }
         else if (count[pos] == '*') {
-            sign = MeterCountSign::Multiply;
+            sign = MeterCountSign::Asterisk;
         }
         else if (count[pos] == '+') {
             sign = MeterCountSign::Plus;
@@ -117,9 +117,9 @@ void MeterSig::SetMeterCounts(const std::vector<int> &counts, MeterSig::MeterCou
     for (const int count : counts) {
         output << count;
         switch (sign) {
-            case MeterCountSign::Divide: output << '\\'; break;
+            case MeterCountSign::Slash: output << '\\'; break;
             case MeterCountSign::Minus: output << '-'; break;
-            case MeterCountSign::Multiply: output << '*'; break;
+            case MeterCountSign::Asterisk: output << '*'; break;
             case MeterCountSign::Plus: output << '+'; break;
             case MeterCountSign::None:
             default: break;
