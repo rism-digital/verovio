@@ -467,6 +467,12 @@
   <g c="F4F4" x="-10.0" y="-322.0" w="54.0" h="644.0" h-a-x="44" n="timeSigParensRightSmallLarge"/>
   <g c="F4F5" x="0.0" y="-482.05" w="54.83" h="964.05" h-a-x="55" n="timeSigParensLeftLarge"/>
   <g c="F4F6" x="0.0" y="-483.0" w="53.0" h="966.0" h-a-x="53" n="timeSigParensRightLarge"/>
+  <g c="F4FF" x="0.0" y="-489.0" w="73.0" h="978.0" h-a-x="73" n="timeSigBracketLeftLarge"/>
+  <g c="F500" x="0.0" y="-487.09" w="63.0" h="972.41" h-a-x="63" n="timeSigBracketRightLarge"/>
+  <g c="F501" x="0.0" y="-324.0" w="58.3" h="648.0" h-a-x="59" n="timeSigBracketLeftSmallLarge"/>
+  <g c="F502" x="0.0" y="-322.0" w="55.02" h="644.0" h-a-x="55" n="timeSigBracketRightSmallLarge"/>
+  <g c="F503" x="-0.11" y="-492.0" w="99.11" h="985.0" h-a-x="99" n="timeSigSlashLarge"/>
+  <g c="F504" x="0.0" y="-333.0" w="123.0" h="666.0" h-a-x="122" n="timeSigCut2Large"/>
   <g c="F506" x="0.0" y="-271.0" w="210.0" h="542.0" h-a-x="210" n="timeSig0Narrow"/>
   <g c="F507" x="0.0" y="-254.0" w="150.54" h="508.0" h-a-x="150" n="timeSig1Narrow"/>
   <g c="F508" x="0.0" y="-249.0" w="204.0" h="498.0" h-a-x="204" n="timeSig2Narrow"/>
@@ -488,6 +494,13 @@
   <g c="F519" x="1.0" y="-276.0" w="95.0" h="552.0" h-a-x="95" n="timeSigParensRightSmallNarrow"/>
   <g c="F51A" x="0.0" y="-493.0" w="171.0" h="983.54" h-a-x="171" n="timeSigParensLeftNarrow"/>
   <g c="F51B" x="0.0" y="-508.0" w="165.0" h="1017.0" h-a-x="165" n="timeSigParensRightNarrow"/>
+  <g c="F524" x="0.0" y="-631.0" w="123.44" h="1258.0" h-a-x="124" n="timeSigBracketLeftNarrow"/>
+  <g c="F525" x="0.0" y="-626.0" w="135.05" h="1251.29" h-a-x="135" n="timeSigBracketRightNarrow"/>
+  <g c="F526" x="0.0" y="-386.34" w="124.0" h="774.34" h-a-x="124" n="timeSigBracketLeftSmallNarrow"/>
+  <g c="F527" x="0.0" y="-389.15" w="131.0" h="776.76" h-a-x="131" n="timeSigBracketRightSmallNarrow"/>
+  <g c="F528" x="0.0" y="-523.0" w="309.0" h="1047.0" h-a-x="309" n="timeSigSlashNarrow"/>
+  <g c="F529" x="0.0" y="-407.0" w="326.0" h="811.07" h-a-x="326" n="timeSigCut2Narrow"/>
+  <g c="F52A" x="0.0" y="-407.0" w="230.0" h="811.07" h-a-x="230" n="timeSigCut3Narrow"/>
   <g c="E0A0" x="-0.44" y="-223.03" w="614.63" h="446.03" h-a-x="614" n="noteheadDoubleWhole">
     <a n="noteheadOrigin" x="0.52" y="0.0"/>
   </g>
@@ -742,6 +755,13 @@
   <g c="E093" x="0.0" y="-422.0" w="154.4" h="844.0" h-a-x="154" n="timeSigParensRightSmall"/>
   <g c="E094" x="0.56" y="-728.0" w="399.07" h="1456.0" h-a-x="399" n="timeSigParensLeft"/>
   <g c="E095" x="0.0" y="-722.63" w="274.26" h="1447.63" h-a-x="274" n="timeSigParensRight"/>
+  <g c="EC80" x="20.0" y="-631.0" w="123.44" h="1258.0" h-a-x="193" n="timeSigBracketLeft"/>
+  <g c="EC81" x="50.0" y="-626.0" w="135.05" h="1251.29" h-a-x="205" n="timeSigBracketRight"/>
+  <g c="EC82" x="20.0" y="-386.34" w="124.0" h="774.34" h-a-x="194" n="timeSigBracketLeftSmall"/>
+  <g c="EC83" x="50.0" y="-389.15" w="131.0" h="776.76" h-a-x="201" n="timeSigBracketRightSmall"/>
+  <g c="EC84" x="50.0" y="-523.0" w="309.0" h="1047.0" h-a-x="409" n="timeSigSlash"/>
+  <g c="EC85" x="0.34" y="-435.0" w="383.66" h="867.59" h-a-x="384" n="timeSigCut2"/>
+  <g c="EC86" x="0.0" y="-435.0" w="454.0" h="867.59" h-a-x="454" n="timeSigCut3"/>
   <g c="E220" x="-158.0" y="-88.0" w="314.19" h="176.0" h-a-x="156" n="tremolo1"/>
   <g c="E221" x="-148.0" y="-177.0" w="297.0" h="354.0" h-a-x="149" n="tremolo2"/>
   <g c="E222" x="-146.6" y="-253.0" w="293.82" h="506.0" h-a-x="147" n="tremolo3"/>
