@@ -481,7 +481,7 @@ void BeamSegment::AdjustBeamToFrenchStyle(BeamDrawingInterface *beamInterface)
             ? ((*it)->m_beamRelativePlace == BEAMPLACE_below ? -1 : 1)
             : (beamInterface->m_drawingPlace == BEAMPLACE_below ? -1 : 1);
         const int lengthAdjust = sign * (minDur - DURATION_8) * beamInterface->m_beamWidth;
-        stem->SetDrawingStemLen(stem->GetDrawingStemLen() + lengthAdjust);
+        stem->SetDrawingStemAdjust(lengthAdjust);
     }
 }
 

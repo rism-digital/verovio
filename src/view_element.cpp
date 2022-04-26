@@ -1472,7 +1472,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     this->DrawFilledRectangle(dc, stem->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
         stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
-        stem->GetDrawingY() - stem->GetDrawingStemLen());
+        stem->GetDrawingY() - (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()));
 
     this->DrawStemMod(dc, element, staff);
 

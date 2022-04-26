@@ -291,6 +291,7 @@ void Stem::Reset()
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingStemLen = 0;
+    m_drawingStemAdjust = 0;
     m_isVirtual = false;
 }
 
