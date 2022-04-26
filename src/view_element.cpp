@@ -431,21 +431,19 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
     dc->StartGraphic(element, "", element->GetUuid());
 
     const int x = element->GetDrawingX();
-    int xSymbol = x;
-    int y = element->GetDrawingY();
-    y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const int staffSize = staff->m_drawingStaffSize;
+    const int xSymbol = x;
+    const int ySymbol = element->GetDrawingY() - (staff->m_drawingLines - 1) * m_doc->GetDrawingUnit(staffSize);
 
     if (beatRpt->GetSlash() == BEATRPT_REND_mixed) {
-        this->DrawSmuflCode(dc, xSymbol, y, SMUFL_E501_repeat2Bars, staff->m_drawingStaffSize, false);
+        this->DrawSmuflCode(dc, xSymbol, ySymbol, SMUFL_E501_repeat2Bars, staffSize, false);
     }
     else {
         wchar_t slash = SMUFL_E504_repeatBarSlash;
-        this->DrawSmuflCode(dc, xSymbol, y, slash, staff->m_drawingStaffSize, false);
         const int slashNum = beatRpt->GetSlash();
-        const int halfWidth = m_doc->GetGlyphWidth(slash, staff->m_drawingStaffSize, false) / 2;
-        for (int i = 0; i < (slashNum - 1); ++i) {
-            xSymbol += halfWidth;
-            this->DrawSmuflCode(dc, xSymbol, y, slash, staff->m_drawingStaffSize, false);
+        const int halfWidth = m_doc->GetGlyphWidth(slash, staffSize, false) / 2;
+        for (int i = 0; i < slashNum; ++i) {
+            this->DrawSmuflCode(dc, xSymbol + i * halfWidth, ySymbol, slash, staffSize, false);
         }
     }
 
