@@ -65,7 +65,15 @@ wchar_t MeterSig::GetSymbolGlyph() const
 
 std::pair<wchar_t, wchar_t> MeterSig::GetEnclosingGlyphs(bool smallGlyph) const
 {
-    if (this->GetEnclose() == ENCLOSURE_paren) {
+    if (this->GetEnclose() == ENCLOSURE_brack) {
+        if (smallGlyph) {
+            return { SMUFL_EC82_timeSigBracketLeftSmall, SMUFL_EC83_timeSigBracketRightSmall };
+        }
+        else {
+            return { SMUFL_EC80_timeSigBracketLeft, SMUFL_EC81_timeSigBracketRight };
+        }
+    }
+    else if (this->GetEnclose() == ENCLOSURE_paren) {
         if (smallGlyph) {
             return { SMUFL_E092_timeSigParensLeftSmall, SMUFL_E093_timeSigParensRightSmall };
         }
