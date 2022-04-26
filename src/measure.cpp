@@ -1017,6 +1017,7 @@ int Measure::AdjustGraceXPos(FunctorParams *functorParams)
     params->m_rightDefaultAlignment = NULL;
 
     params->m_staffNs = staffNsReversed;
+    params->m_measureTieEndpoints = this->GetInternalTieEndpoints();
     m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
 
     // Put params back
