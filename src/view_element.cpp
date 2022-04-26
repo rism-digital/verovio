@@ -1855,14 +1855,14 @@ int View::DrawMeterSigFigures(
     return width;
 }
 
-void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smuflCode, int num, bool line, Staff *staff)
+void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t rptGlyph, int num, bool line, Staff *staff)
 {
     const int staffSize = staff->m_drawingStaffSize;
     const int y = staff->GetDrawingY();
-    const int xSymbol = xCentered - m_doc->GetGlyphWidth(smuflCode, staffSize, false) / 2;
+    const int xSymbol = xCentered - m_doc->GetGlyphWidth(rptGlyph, staffSize, false) / 2;
     const int ySymbol = y - (staff->m_drawingLines - 1) * m_doc->GetDrawingUnit(staffSize);
 
-    this->DrawSmuflCode(dc, xSymbol, ySymbol, smuflCode, staffSize, false);
+    this->DrawSmuflCode(dc, xSymbol, ySymbol, rptGlyph, staffSize, false);
 
     if (line) {
         const int yBottom = y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
@@ -1876,8 +1876,8 @@ void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smuflCode, int
         TextExtend extend;
         std::wstring figures = IntToTimeSigFigures(num);
         dc->GetSmuflTextExtent(figures, &extend);
-        const int numHeight = m_doc->GetGlyphHeight(smuflCode, staffSize, false);
-        const int yNum = (y > ySymbol + numHeight / 2)
+        const int symHeight = m_doc->GetGlyphHeight(rptGlyph, staffSize, false);
+        const int yNum = (y > ySymbol + symHeight / 2)
             ? staff->GetDrawingY() + m_doc->GetDrawingUnit(staffSize) + extend.m_height / 2
             : ySymbol + 3 * m_doc->GetDrawingUnit(staffSize) + extend.m_height / 2;
         dc->DrawMusicText(figures, ToDeviceContextX(xCentered - extend.m_width / 2), ToDeviceContextY(yNum));
