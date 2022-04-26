@@ -1131,8 +1131,19 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    const int measureWidth = measure->GetInnerWidth();
-    const int xCentered = multiRest->GetDrawingX();
+    int measureWidth = measure->GetInnerWidth();
+    int xCentered = multiRest->GetDrawingX();
+    // in case there is CLEF element in the same measure to the right of the mRest, we need to adjust width and starting
+    // postion of it to make sure that there is no overlap
+    if (layer->GetLast() != element) {
+        Object *object = layer->GetNext(element);
+        if (object && object->Is(CLEF)) {
+            const int rightMargin = xCentered + measureWidth / 2;
+            const int widthAdjust = rightMargin - object->GetDrawingX();
+            measureWidth -= widthAdjust;
+            xCentered -= widthAdjust / 2;
+        }
+    }
 
     // We do not support more than three chars
     const int num = std::min(multiRest->GetNum(), 999);
