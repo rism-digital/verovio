@@ -6911,16 +6911,9 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
     vrvAnnot->ReadPlist(annot);
     vrvAnnot->ReadSource(annot);
 
-    vrvAnnot->m_content.reset();
-    // copy all the nodes inside into the document
-    for (pugi::xml_node child = annot.first_child(); child; child = child.next_sibling()) {
-        vrvAnnot->m_content.append_copy(child);
-    }
-
     parent->AddChild(vrvAnnot);
     this->ReadUnsupportedAttr(annot, vrvAnnot);
-    // for Annot we do not load children because they preserved in Annot::m_content
-    return true;
+    return this->ReadTextChildren(vrvAnnot, annot, vrvAnnot);
 }
 
 bool MEIInput::ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
