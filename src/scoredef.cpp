@@ -363,6 +363,7 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
             staffDef->SetDrawMensur(false);
             MeterSigGrp *meterSigGrp = newStaffDef->GetMeterSigGrpCopy();
             MeterSig *meterSig = meterSigGrp->GetSimplifiedMeterSig();
+            staffDef->SetCurrentMeterSigGrp(meterSigGrp);
             delete meterSigGrp;
             staffDef->SetCurrentMeterSig(meterSig);
             delete meterSig;
