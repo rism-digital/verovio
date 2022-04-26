@@ -356,6 +356,12 @@ protected:
      */
     void SetElementShortening(int shortening) override;
 
+    /**
+     * Return duration of beam part for specified X coordinate. Duration of two closest elements is taken for this
+     * purpose.
+     */
+    int GetBeamPartDuration(int x) const;
+
 private:
     /**
      * A pointer to the beam with which stems are shared.
