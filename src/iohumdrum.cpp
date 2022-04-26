@@ -5772,7 +5772,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
     if (sscanf(timesig.c_str(), "*M%d/%d%%%d", &top, &bot, &bot2) == 3) {
         // Such as three-triplet whole notes in a 2/1 measure
         if ((metersig == "3") && (bot == 3) && (bot2 == 2)) {
-            vrvmeter->SetCount({ 3 });
+            vrvmeter->SetCount("3");
             vrvmeter->SetUnit(1);
             vrvmeter->SetForm(METERFORM_num);
         }
@@ -5842,7 +5842,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
         int bot2 = stoi(matches[3]);
         if ((metersig == "3") && (bot == 3) && (bot2 == 2)) {
             MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetCount({ 3 });
+            vrvmetersig->SetCount("3");
             vrvmetersig->SetUnit(1);
             vrvmetersig->SetForm(METERFORM_num);
         }

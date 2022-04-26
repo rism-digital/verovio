@@ -741,12 +741,12 @@ void ABCInput::parseMeter(const std::string &meterString)
     if (meterString.find('C') != std::string::npos) {
         if (meterString[meterString.find('C') + 1] == '|') {
             m_meter->SetSym(METERSIGN_cut);
-            m_meter->SetCount({ 2 });
+            m_meter->SetCount("2");
             m_meter->SetUnit(2);
         }
         else {
             m_meter->SetSym(METERSIGN_common);
-            m_meter->SetCount({ 4 });
+            m_meter->SetCount("4");
             m_meter->SetUnit(4);
         }
     }
