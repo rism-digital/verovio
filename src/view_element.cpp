@@ -1082,9 +1082,12 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         TextExtend extend;
         std::wstring figures = IntToTupletFigures(mRptNum);
         dc->GetSmuflTextExtent(figures, &extend);
-        int yNum = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int staffSize = staff->m_drawingStaffSize;
+        const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
+        const int offset = std::max(m_doc->GetGlyphHeight(SMUFL_E500_repeat1Bar, staffSize, false) - staffHeight, 0);
+        int yNum = staff->GetDrawingY() + m_doc->GetDrawingUnit(staffSize) + offset / 2;
         if (mRpt->GetNumPlace() == STAFFREL_basic_below)
-            yNum -= staff->m_drawingLines * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) + extend.m_height;
+            yNum -= staff->m_drawingLines * m_doc->GetDrawingDoubleUnit(staffSize) + extend.m_height + offset;
         dc->DrawMusicText(
             figures, ToDeviceContextX(element->GetDrawingX() - extend.m_width / 2), ToDeviceContextY(yNum));
         dc->ResetFont();
