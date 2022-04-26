@@ -430,9 +430,8 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    const int x = element->GetDrawingX();
     const int staffSize = staff->m_drawingStaffSize;
-    const int xSymbol = x;
+    const int xSymbol = element->GetDrawingX();
     const int ySymbol = element->GetDrawingY() - (staff->m_drawingLines - 1) * m_doc->GetDrawingUnit(staffSize);
 
     if (beatRpt->GetSlash() == BEATRPT_REND_mixed) {
@@ -1858,7 +1857,7 @@ void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smuflCode, int
     const int staffSize = staff->m_drawingStaffSize;
     const int y = staff->GetDrawingY();
     const int xSymbol = xCentered - m_doc->GetGlyphWidth(smuflCode, staffSize, false) / 2;
-    const int ySymbol = y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize) / 2;
+    const int ySymbol = y - (staff->m_drawingLines - 1) * m_doc->GetDrawingUnit(staffSize);
 
     this->DrawSmuflCode(dc, xSymbol, ySymbol, smuflCode, staffSize, false);
 
