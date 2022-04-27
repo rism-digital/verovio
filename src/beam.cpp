@@ -1283,6 +1283,13 @@ std::pair<int, int> BeamSegment::CalcStemDefiningNote(Staff *staff, data_BEAMPLA
         relevantLoc = shortestLoc;
         relevantDuration = shortestDuration;
     }
+    else if ((shortestDuration - relevantDuration) == (std::abs(relevantLoc - shortestLoc) + 1)) {
+        if (((globalStemDir == STEMDIRECTION_up) && (relevantLoc > 4))
+            || ((globalStemDir == STEMDIRECTION_down) && (relevantLoc < 4))) {
+            relevantLoc = shortestLoc;
+            relevantDuration = shortestDuration;
+        }
+    }
 
     return { relevantLoc, relevantDuration };
 }
