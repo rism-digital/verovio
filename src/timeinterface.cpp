@@ -403,7 +403,7 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
         if (this->HasTstamp2())
             LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
                 object->GetClassName().c_str(), object->GetUuid().c_str());
-        if (this->GetStartid() == this->GetEndid()) {
+        if ((this->GetStartid() == this->GetEndid()) && !object->Is(OCTAVE)) {
             LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid",
                 object->GetClassName().c_str(), object->GetUuid().c_str());
         }

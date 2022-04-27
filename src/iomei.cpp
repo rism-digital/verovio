@@ -2356,6 +2356,8 @@ void MEIOutput::WriteMRpt(pugi::xml_node currentNode, MRpt *mRpt)
 
     this->WriteLayerElement(currentNode, mRpt);
     mRpt->WriteColor(currentNode);
+    mRpt->WriteNumbered(currentNode);
+    mRpt->WriteNumberPlacement(currentNode);
 }
 
 void MEIOutput::WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2)
@@ -6077,6 +6079,8 @@ bool MEIInput::ReadMRpt(Object *parent, pugi::xml_node mRpt)
     this->ReadLayerElement(mRpt, vrvMRpt);
 
     vrvMRpt->ReadColor(mRpt);
+    vrvMRpt->ReadNumbered(mRpt);
+    vrvMRpt->ReadNumberPlacement(mRpt);
 
     parent->AddChild(vrvMRpt);
     this->ReadUnsupportedAttr(mRpt, vrvMRpt);

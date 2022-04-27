@@ -207,6 +207,27 @@ void Object::SetAsReferenceObject()
     m_isReferenceObject = true;
 }
 
+const Resources *Object::GetDocResources() const
+{
+    // Search for the document
+    const Doc *doc = NULL;
+    if (this->Is(DOC)) {
+        doc = vrv_cast<const Doc *>(this);
+    }
+    else {
+        doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    }
+
+    // Return the resources or display warning
+    if (doc) {
+        return &doc->GetResources();
+    }
+    else {
+        LogWarning("Requested resources unavailable.");
+        return NULL;
+    }
+}
+
 void Object::Reset()
 {
     ClearChildren();
@@ -2071,8 +2092,9 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(CLEF)) {
         LayerElement *element = vrv_cast<LayerElement *>(this);
         assert(element);
-        Clef *clef = vrv_cast<Clef *>(element->ThisOrSameasAsLink());
-        assert(clef);
+        LayerElement *elementOrLink = element->ThisOrSameasAsLink();
+        if (!elementOrLink || !elementOrLink->Is(CLEF)) return FUNCTOR_CONTINUE;
+        Clef *clef = vrv_cast<Clef *>(elementOrLink);
         if (clef->IsScoreDefElement()) {
             return FUNCTOR_CONTINUE;
         }

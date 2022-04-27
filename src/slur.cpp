@@ -442,20 +442,26 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // Only collisions near the endpoints are taken into account.
     int endPointShiftLeft = 0;
     int endPointShiftRight = 0;
-    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, margin, unit);
+    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, margin);
     if ((endPointShiftLeft != 0) || (endPointShiftRight != 0)) {
         const int signLeft = bezier.IsLeftControlAbove() ? 1 : -1;
         const int signRight = bezier.IsRightControlAbove() ? 1 : -1;
         bezier.p1.y += signLeft * endPointShiftLeft;
         bezier.p2.y += signRight * endPointShiftRight;
         if (bezier.p1.x != bezier.p2.x) {
-            double lambda = double(bezier.c1.x - bezier.p1.x) / double(bezier.p2.x - bezier.p1.x);
-            bezier.c1.y += signLeft * (1.0 - lambda) * endPointShiftLeft + signRight * lambda * endPointShiftRight;
-            lambda = double(bezier.c2.x - bezier.p1.x) / double(bezier.p2.x - bezier.p1.x);
-            bezier.c2.y += signLeft * (1.0 - lambda) * endPointShiftLeft + signRight * lambda * endPointShiftRight;
+            double lambda1, lambda2;
+            std::tie(lambda1, lambda2) = bezier.EstimateCurveParamForControlPoints();
+            bezier.c1.y += signLeft * (1.0 - lambda1) * endPointShiftLeft + signRight * lambda1 * endPointShiftRight;
+            bezier.c2.y += signLeft * (1.0 - lambda2) * endPointShiftLeft + signRight * lambda2 * endPointShiftRight;
         }
         bezier.UpdateControlPointParams();
         curve->UpdatePoints(bezier);
+    }
+
+    // Special handling if bulge is prescribed from here on
+    if (this->HasBulge()) {
+        this->AdjustSlurFromBulge(curve, bezier, unit);
+        return;
     }
 
     // STEP 3: Calculate the horizontal offset of the control points.
@@ -532,7 +538,7 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
 }
 
 std::pair<int, int> Slur::CalcEndPointShift(
-    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const int margin, const int unit)
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const int margin)
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return { 0, 0 };
 
@@ -571,8 +577,6 @@ std::pair<int, int> Slur::CalcEndPointShift(
         }
     }
 
-    this->RebalanceShifts(shiftLeft, shiftRight, dist, unit);
-
     return { shiftLeft, shiftRight };
 }
 
@@ -599,24 +603,68 @@ void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int int
     }
 }
 
-void Slur::RebalanceShifts(int &shiftLeft, int &shiftRight, const double distance, const int unit) const
+void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, const int unit)
 {
-    // alpha is 1 for dist <= 4U, 0 for dist >= 8U, interpolated between 4U and 8U
-    double alpha = 0.0;
-    if (distance <= 4.0 * unit) {
-        alpha = 1.0;
-    }
-    else if (distance <= 8.0 * unit) {
-        alpha = 2.0 - distance / (4.0 * unit);
+    if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
+
+    data_BULGE bulge = this->GetBulge();
+
+    // Filter admissible values
+    bulge.erase(std::remove_if(bulge.begin(), bulge.end(),
+                    [](const data_BULGE::value_type &entry) {
+                        return ((entry.first <= 0.0) || (entry.second <= 0.0) || (entry.second >= 100.0));
+                    }),
+        bulge.end());
+
+    // Get the minimal and maximal lambda
+    double lambdaMin = 0.66;
+    double lambdaMax = 0.33;
+    for (const data_BULGE::value_type &bulgeEntry : bulge) {
+        const double lambda = bulgeEntry.second / 100.0;
+        lambdaMin = std::min(lambda, lambdaMin);
+        lambdaMax = std::max(lambda, lambdaMax);
     }
 
-    const int difference = std::abs(shiftLeft - shiftRight);
-    if (shiftLeft < shiftRight) {
-        shiftLeft += alpha * difference;
+    // Horizontal control point adjustment
+    lambdaMin /= 2.0;
+    lambdaMax = 1.0 - (1.0 - lambdaMax) / 2.0;
+    const double xMin = (1.0 - lambdaMin) * bezierCurve.p1.x + lambdaMin * bezierCurve.p2.x;
+    const double xMax = (1.0 - lambdaMax) * bezierCurve.p1.x + lambdaMax * bezierCurve.p2.x;
+    bezierCurve.SetLeftControlOffset(xMin - bezierCurve.p1.x);
+    bezierCurve.SetRightControlOffset(bezierCurve.p2.x - xMax);
+    bezierCurve.UpdateControlPoints();
+    curve->UpdatePoints(bezierCurve);
+
+    // Generate a control point constraint for each bulge entry
+    std::list<ControlPointConstraint> constraints;
+    Point points[4];
+    points[0] = bezierCurve.p1;
+    points[1] = bezierCurve.c1;
+    points[2] = bezierCurve.c2;
+    points[3] = bezierCurve.p2;
+
+    for (const data_BULGE::value_type &bulgeEntry : bulge) {
+        const double lambda = bulgeEntry.second / 100.0;
+        const double x = (1.0 - lambda) * bezierCurve.p1.x + lambda * bezierCurve.p2.x;
+        const double t = BoundingBox::CalcBezierParamAtPosition(points, x);
+        constraints.push_back({ 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), bulgeEntry.first * unit });
     }
-    else {
-        shiftRight += alpha * difference;
-    }
+
+    // Solve these constraints and calculate the vertical control point adjustment
+    int leftShift = 0;
+    int rightShift = 0;
+    std::tie(leftShift, rightShift) = this->SolveControlPointConstraints(constraints);
+    bezierCurve.SetLeftControlHeight(bezierCurve.GetLeftControlHeight() + leftShift);
+    bezierCurve.SetRightControlHeight(bezierCurve.GetRightControlHeight() + rightShift);
+    bezierCurve.UpdateControlPoints();
+    curve->UpdatePoints(bezierCurve);
+
+    // Prevent awkward slur shapes
+    this->AdjustSlurShape(bezierCurve, curve->GetDir(), unit);
+    curve->UpdatePoints(bezierCurve);
+
+    // Since we are going to redraw it, reset its bounding box
+    curve->BoundingBox::ResetBoundingBox();
 }
 
 std::tuple<bool, int, int> Slur::CalcControlPointOffset(
@@ -876,6 +924,13 @@ void Slur::AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int
 
     // Rotate back
     bezierCurve.Rotate(angle, bezierCurve.p1);
+
+    // Enforce p1.x <= c1.x <= c2.x <= p2.x
+    bezierCurve.c1.x = std::max(bezierCurve.p1.x, bezierCurve.c1.x);
+    bezierCurve.c2.x = std::max(bezierCurve.c1.x, bezierCurve.c2.x);
+    bezierCurve.c2.x = std::min(bezierCurve.p2.x, bezierCurve.c2.x);
+    bezierCurve.c1.x = std::min(bezierCurve.c2.x, bezierCurve.c1.x);
+
     bezierCurve.UpdateControlPointParams();
 }
 
@@ -1061,14 +1116,17 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
     Note *startNote = NULL;
     LayerElement *start = this->GetStart();
     Chord *startChord = NULL;
+    bool hasStartFlag = false;
     if (start->Is(NOTE)) {
         startNote = vrv_cast<Note *>(start);
         assert(startNote);
         startChord = startNote->IsChordTone();
+        hasStartFlag = (startNote->FindDescendantByType(FLAG) != NULL);
     }
     else if (start->Is(CHORD)) {
         startChord = vrv_cast<Chord *>(start);
         assert(startChord);
+        hasStartFlag = (startChord->FindDescendantByType(FLAG) != NULL);
     }
 
     // Pointers for the end point of the slur
@@ -1135,7 +1193,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             // same but in beam - adjust the x too
             else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
                 || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
-                || isGraceToNoteSlur) {
+                || isGraceToNoteSlur || hasStartFlag) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
                 x1 += startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -1185,7 +1243,7 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
             }
             // same but in beam
             else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
-                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))) {
+                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start)) || hasStartFlag) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                 x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -1492,18 +1550,23 @@ int Slur::CalcSlurDirection(FunctorParams *functorParams)
 
     // If curve direction is prescribed as mixed, use it if boundary lies in different staves
     if (this->GetCurvedir() == curvature_CURVEDIR_mixed) {
-        const int startStaffN = start->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
-        const int endStaffN = end->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
-        if (startStaffN < endStaffN) {
-            this->SetDrawingCurveDir(SlurCurveDirection::BelowAbove);
-            return FUNCTOR_CONTINUE;
-        }
-        else if (startStaffN > endStaffN) {
-            this->SetDrawingCurveDir(SlurCurveDirection::AboveBelow);
-            return FUNCTOR_CONTINUE;
+        if (this->HasBulge()) {
+            LogWarning("Mixed curve direction is ignored for slurs with prescribed bulge.");
         }
         else {
-            LogWarning("Mixed curve direction is ignored for slurs starting and ending on the same staff.");
+            const int startStaffN = start->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
+            const int endStaffN = end->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
+            if (startStaffN < endStaffN) {
+                this->SetDrawingCurveDir(SlurCurveDirection::BelowAbove);
+                return FUNCTOR_CONTINUE;
+            }
+            else if (startStaffN > endStaffN) {
+                this->SetDrawingCurveDir(SlurCurveDirection::AboveBelow);
+                return FUNCTOR_CONTINUE;
+            }
+            else {
+                LogWarning("Mixed curve direction is ignored for slurs starting and ending on the same staff.");
+            }
         }
     }
 

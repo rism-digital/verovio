@@ -132,6 +132,9 @@ public:
     std::string BeatrptRendToStr(data_BEATRPT_REND data) const;
     data_BEATRPT_REND StrToBeatrptRend(const std::string &value, bool logWarning = true) const;
 
+    std::string BulgeToStr(const data_BULGE &data) const;
+    data_BULGE StrToBulge(const std::string &value, bool logWarning = true) const;
+
     std::string DurationToStr(data_DURATION data) const;
     data_DURATION StrToDuration(const std::string &value, bool logWarning = true) const;
 

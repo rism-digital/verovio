@@ -370,6 +370,8 @@ typedef std::map<std::string, std::function<Object *(void)>> MapOfStrConstructor
 
 typedef std::map<std::string, ClassId> MapOfStrClassIds;
 
+typedef std::vector<std::pair<LayerElement *, LayerElement *>> MeasureTieEndpoints;
+
 typedef bool (*NotePredicate)(Note *);
 
 /**

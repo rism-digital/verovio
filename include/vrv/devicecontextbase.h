@@ -260,7 +260,10 @@ public:
     /**
      * @name Initialize control point height and offset from end point positions
      */
+    ///@{
+    void CalcInitialControlPointParams();
     void CalcInitialControlPointParams(Doc *doc, float angle, int staffSize);
+    ///@}
 
     /**
      * Calculate control point offset and height from points or vice versa
@@ -269,6 +272,12 @@ public:
     void UpdateControlPointParams();
     void UpdateControlPoints();
     ///@}
+
+    /**
+     * Estimate the curve parameter corresponding to the control points
+     * Based on the polyline P1-C1-C2-P2
+     */
+    std::pair<double, double> EstimateCurveParamForControlPoints() const;
 
 private:
     // Control point X-axis offset for both start/end points

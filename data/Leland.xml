@@ -473,8 +473,60 @@
   </g>
   <g c="EAAD" x="-24.0" y="-83.0" w="283.0" h="343.0" h-a-x="259" n="wiggleArpeggiatoUpArrow"/>
   <g c="EAAE" x="-24.0" y="-84.0" w="283.0" h="343.0" h-a-x="259" n="wiggleArpeggiatoDownArrow"/>
+  <g c="F400" x="0.0" y="5.0" w="90.0" h="990.0" h-a-x="90" n="braceSmall"/>
+  <g c="F401" x="-1.0" y="4.59" w="52.0" h="990.41" h-a-x="51" n="braceLarge"/>
+  <g c="F402" x="0.0" y="4.59" w="44.0" h="990.41" h-a-x="44" n="braceLarger"/>
+  <g c="F403" x="0.0" y="5.0" w="38.0" h="990.0" h-a-x="38" n="braceFlat"/>
+  <g c="F40F" x="0.0" y="-200.0" w="289.0" h="200.0" h-a-x="289" n="flag8thUpStraight">
+    <a n="stemUpNW" x="0.0" y="-0.04"/>
+  </g>
+  <g c="F412" x="0.0" y="-388.0" w="289.0" h="388.0" h-a-x="289" n="flag16thUpStraight">
+    <a n="stemUpNW" x="0.0" y="-0.02"/>
+  </g>
+  <g c="F415" x="0.0" y="-388.0" w="289.0" h="576.0" h-a-x="289" n="flag32ndUpStraight">
+    <a n="stemUpNW" x="0.0" y="0.71"/>
+  </g>
+  <g c="F411" x="0.0" y="0.0" w="306.0" h="204.0" h-a-x="306" n="flag8thDownStraight">
+    <a n="stemDownSW" x="0.0" y="0.04"/>
+  </g>
+  <g c="F414" x="0.0" y="0.0" w="306.0" h="392.0" h-a-x="306" n="flag16thDownStraight">
+    <a n="stemDownSW" x="0.0" y="0.04"/>
+  </g>
+  <g c="F417" x="0.0" y="-188.0" w="306.0" h="580.0" h-a-x="306" n="flag32ndDownStraight">
+    <a n="stemDownSW" x="0.0" y="-0.71"/>
+  </g>
   <g c="E0F5" x="0.0" y="-212.0" w="75.0" h="421.41" h-a-x="75" n="noteheadParenthesisLeft"/>
   <g c="E0F6" x="0.0" y="-209.41" w="75.0" h="421.41" h-a-x="75" n="noteheadParenthesisRight"/>
+  <g c="F418" x="0.0" y="-388.0" w="289.0" h="762.0" h-a-x="289" n="flag64thUpStraight">
+    <a n="stemUpNW" x="0.0" y="1.46"/>
+  </g>
+  <g c="F41A" x="0.0" y="-376.0" w="306.0" h="767.0" h-a-x="306" n="flag64thDownStraight">
+    <a n="stemDownSW" x="0.0" y="-1.46"/>
+  </g>
+  <g c="F41B" x="0.0" y="-388.0" w="289.0" h="949.0" h-a-x="289" n="flag128thUpStraight">
+    <a n="stemUpNW" x="0.0" y="2.2"/>
+  </g>
+  <g c="F41D" x="0.0" y="-563.0" w="306.0" h="955.0" h-a-x="306" n="flag128thDownStraight">
+    <a n="stemDownSW" x="0.0" y="-2.21"/>
+  </g>
+  <g c="F41E" x="0.0" y="-388.0" w="289.0" h="1136.0" h-a-x="289" n="flag256thUpStraight">
+    <a n="stemUpNW" x="0.0" y="2.95"/>
+  </g>
+  <g c="F420" x="0.0" y="-750.0" w="306.0" h="1142.0" h-a-x="306" n="flag256thDownStraight">
+    <a n="stemDownSW" x="0.0" y="-2.96"/>
+  </g>
+  <g c="F421" x="0.0" y="-388.0" w="289.0" h="1324.0" h-a-x="289" n="flag512thUpStraight">
+    <a n="stemUpNW" x="0.0" y="3.7"/>
+  </g>
+  <g c="F423" x="0.0" y="-938.0" w="306.0" h="1330.0" h-a-x="306" n="flag512thDownStraight">
+    <a n="stemDownSW" x="0.0" y="-3.71"/>
+  </g>
+  <g c="F424" x="0.0" y="-388.0" w="289.0" h="1511.0" h-a-x="289" n="flag1024thUpStraight">
+    <a n="stemUpNW" x="0.0" y="4.45"/>
+  </g>
+  <g c="F426" x="0.0" y="-1125.0" w="306.0" h="1517.0" h-a-x="306" n="flag1024thDownStraight">
+    <a n="stemDownSW" x="0.0" y="-4.46"/>
+  </g>
   <g c="E4F6" x="0.0" y="-202.0" w="317.0" h="409.0" h-a-x="317" n="restQuarterZ"/>
   <g c="E06A" x="0.0" y="-438.0" w="304.0" h="877.0" h-a-x="304" n="unpitchedPercussionClef2"/>
   <g c="E4CE" x="0.0" y="0.0" w="191.0" h="321.0" h-a-x="191" n="breathMarkComma"/>
@@ -487,6 +539,7 @@
   <g c="E587" x="0.0" y="0.0" w="751.0" h="473.0" h-a-x="591" n="ornamentSchleifer"/>
   <g c="E5E6" x="0.0" y="0.0" w="280.0" h="280.0" h-a-x="280" n="brassMuteHalfClosed"/>
   <g c="E5E7" x="0.0" y="0.0" w="280.0" h="280.0" h-a-x="280" n="brassMuteOpen"/>
+  <g c="F4BA" x="0.0" y="-178.0" w="391.0" h="357.0" h-a-x="391" n="noteheadDoubleWholeAlt"/>
   <g c="E59D" x="-43.0" y="0.0" w="231.0" h="247.0" h-a-x="172" n="ornamentZigZagLineNoRightEnd">
     <a n="repeatOffset" x="0.69" y="0.0"/>
   </g>

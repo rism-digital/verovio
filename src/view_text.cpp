@@ -394,9 +394,12 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     assert(dc);
     assert(text);
 
+    const Resources *resources = dc->GetResources();
+    assert(resources);
+
     dc->StartTextGraphic(text, "", text->GetUuid());
 
-    Resources::SelectTextFont(dc->GetFont()->GetWeight(), dc->GetFont()->GetStyle());
+    resources->SelectTextFont(dc->GetFont()->GetWeight(), dc->GetFont()->GetStyle());
 
     if (params.m_explicitPosition) {
         dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);

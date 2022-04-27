@@ -86,6 +86,11 @@ public:
     std::string GetUuid() { return m_doc.GetUuid(); }
 
     /**
+     * Get the resource path for the Toolkit instance.
+     */
+    std::string GetResourcePath() const;
+
+    /**
      * Set the resource path for the Toolkit instance.
      *
      * This method needs to be called if the constructor had initFont=false or if the resource path
@@ -95,6 +100,11 @@ public:
      * @return True if the resources was successfully loaded
      */
     bool SetResourcePath(const std::string &path);
+
+    /**
+     * Set the font in the resources
+     */
+    bool SetFont(const std::string &fontName);
 
     /**
      * Get the log content for the latest operation

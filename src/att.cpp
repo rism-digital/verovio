@@ -125,6 +125,42 @@ data_BEATRPT_REND Att::StrToBeatrptRend(const std::string &value, bool logWarnin
     return BEATRPT_REND_NONE;
 }
 
+std::string Att::BulgeToStr(const data_BULGE &data) const
+{
+    std::ostringstream ss;
+    for (int i = 0; i < data.size(); ++i) {
+        if (i != 0) ss << " ";
+        ss << data[i].first << " " << data[i].second;
+    }
+    return ss.str();
+}
+
+data_BULGE Att::StrToBulge(const std::string &value, bool logWarning) const
+{
+    // Split content by spaces
+    std::istringstream content;
+    content.str(value);
+    std::vector<std::string> entries;
+    std::string token;
+    while (std::getline(content, token, ' ')) {
+        if (!token.empty()) entries.push_back(token);
+    }
+
+    // Convert entries to numerical values
+    data_BULGE bulge;
+    Att converter;
+    for (int i = 0; i < entries.size() - 1; i += 2) {
+        const double distance = converter.StrToDbl(entries[i]);
+        const double offset = converter.StrToDbl(entries[i + 1]);
+        if ((offset < 0.0) || (offset > 100.0)) {
+            if (logWarning) LogWarning("Unsupported percentage value '%f' in bulge", offset);
+            continue;
+        }
+        bulge.push_back({ distance, offset });
+    }
+    return bulge;
+}
+
 std::string Att::DurationToStr(data_DURATION data) const
 {
     std::string value;
