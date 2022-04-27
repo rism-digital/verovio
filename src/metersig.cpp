@@ -45,70 +45,51 @@ void MeterSig::Reset()
     this->ResetEnclosingChars();
     this->ResetMeterSigLog();
     this->ResetMeterSigVis();
+
+    m_meterCount.clear();
+    m_meterCountSign = MeterCountSign::None;
 }
 
-int MeterSig::GetTotalCount() const
+int MeterSig::GetTotalCount()
 {
-    auto [counts, sign] = this->GetMeterCounts();
-    switch (sign) {
+    if (m_meterCount.empty()) this->SplitMeterCounts();
+    switch (m_meterCountSign) {
         case MeterCountSign::Slash: {
             // make sure that there is no division by zero
-            std::for_each(counts.begin(), counts.end(), [](int &elem) {
+            std::for_each(m_meterCount.begin(), m_meterCount.end(), [](int &elem) {
                 if (!elem) elem = 1;
             });
-            int result = std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::divides<int>());
+            int result = std::accumulate(
+                std::next(m_meterCount.begin()), m_meterCount.end(), *m_meterCount.begin(), std::divides<int>());
             if (!result) result = 1;
             return result;
         }
         case MeterCountSign::Minus: {
-            int result = std::accumulate(std::next(counts.begin()), counts.end(), *counts.begin(), std::minus<int>());
+            int result = std::accumulate(
+                std::next(m_meterCount.begin()), m_meterCount.end(), *m_meterCount.begin(), std::minus<int>());
             if (result <= 0) result = 1;
             return result;
         }
         case MeterCountSign::Asterisk: {
-            int result = std::accumulate(counts.begin(), counts.end(), 1, std::multiplies<int>());
+            int result = std::accumulate(m_meterCount.begin(), m_meterCount.end(), 1, std::multiplies<int>());
             if (!result) result = 1;
             return result;
         }
         case MeterCountSign::Plus: {
-            return std::accumulate(counts.begin(), counts.end(), 0, std::plus<int>());
+            return std::accumulate(m_meterCount.begin(), m_meterCount.end(), 0, std::plus<int>());
         }
         case MeterCountSign::None:
         default: break;
     }
 
-    return counts.front();
+    return m_meterCount.front();
 }
 
-std::pair<std::vector<int>, MeterSig::MeterCountSign> MeterSig::GetMeterCounts() const
+std::pair<std::vector<int>, MeterSig::MeterCountSign> MeterSig::GetMeterCounts()
 {
-    const std::string count = this->GetCount();
-    std::regex re("[\\*\\+/-]");
-    std::sregex_token_iterator first{ count.begin(), count.end(), re, -1 }, last;
-    std::vector<std::string> tokens{ first, last };
+    if (m_meterCount.empty()) this->SplitMeterCounts();
 
-    // Since there is currently no need for implementation of complex calculus within metersig, only one opperation will
-    // be supported in the meter count. Caclulation will be based on the first mathematical operator in the string
-    MeterSig::MeterCountSign sign = MeterCountSign::None;
-    const size_t pos = count.find_first_of("+-*/");
-    if (pos != std::string::npos) {
-        if (count[pos] == '/') {
-            sign = MeterCountSign::Slash;
-        }
-        else if (count[pos] == '*') {
-            sign = MeterCountSign::Asterisk;
-        }
-        else if (count[pos] == '+') {
-            sign = MeterCountSign::Plus;
-        }
-        else if (count[pos] == '-') {
-            sign = MeterCountSign::Minus;
-        }
-    }
-    std::vector<int> result;
-    std::for_each(tokens.begin(), tokens.end(),
-        [&result](const std::string &elem) { result.emplace_back(std::atoi(elem.c_str())); });
-    return { result, sign };
+    return { m_meterCount, m_meterCountSign };
 }
 
 void MeterSig::SetMeterCounts(const std::vector<int> &counts, MeterSig::MeterCountSign sign)
@@ -127,6 +108,34 @@ void MeterSig::SetMeterCounts(const std::vector<int> &counts, MeterSig::MeterCou
     }
 
     this->SetCount(output.str());
+}
+
+void MeterSig::SplitMeterCounts()
+{
+    const std::string count = this->GetCount();
+    std::regex re("[\\*\\+/-]");
+    std::sregex_token_iterator first{ count.begin(), count.end(), re, -1 }, last;
+    std::vector<std::string> tokens{ first, last };
+
+    // Since there is currently no need for implementation of complex calculus within metersig, only one opperation will
+    // be supported in the meter count. Caclulation will be based on the first mathematical operator in the string
+    const size_t pos = count.find_first_of("+-*/");
+    if (pos != std::string::npos) {
+        if (count[pos] == '/') {
+            m_meterCountSign = MeterCountSign::Slash;
+        }
+        else if (count[pos] == '*') {
+            m_meterCountSign = MeterCountSign::Asterisk;
+        }
+        else if (count[pos] == '+') {
+            m_meterCountSign = MeterCountSign::Plus;
+        }
+        else if (count[pos] == '-') {
+            m_meterCountSign = MeterCountSign::Minus;
+        }
+    }
+    std::for_each(tokens.begin(), tokens.end(),
+        [this](const std::string &elem) { m_meterCount.emplace_back(std::atoi(elem.c_str())); });
 }
 
 wchar_t MeterSig::GetSymbolGlyph() const

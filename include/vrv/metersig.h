@@ -45,13 +45,13 @@ public:
     bool IsScoreDefElement() const override { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
 
     /** Evaluate additive meter counts */
-    int GetTotalCount() const;
+    int GetTotalCount();
 
     /**
      * Set/get methods to get operation signa and meter counts as separate values
      */
     ///@{
-    std::pair<std::vector<int>, MeterCountSign> GetMeterCounts() const;
+    std::pair<std::vector<int>, MeterCountSign> GetMeterCounts();
     void SetMeterCounts(const std::vector<int> &counts, MeterSig::MeterCountSign sign);
     ///@}
 
@@ -71,10 +71,14 @@ public:
     int LayerCountInTimeSpan(FunctorParams *functorParams) override;
 
 private:
-    //
+    // Helper function to split meter counts and signs within MeterSig
+    void SplitMeterCounts();
+
 public:
     //
 private:
+    std::vector<int> m_meterCount;
+    MeterCountSign m_meterCountSign;
 };
 
 } // namespace vrv
