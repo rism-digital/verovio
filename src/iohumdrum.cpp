@@ -16277,6 +16277,7 @@ int HumdrumInput::insertRepetitionElement(
         MRpt *mrpt = new MRpt();
         setLocationId(mrpt, token);
         appendElement(elements, pointers, mrpt);
+        mrpt->SetNumVisible(BOOLEAN_false);
         return outindex;
     }
 
