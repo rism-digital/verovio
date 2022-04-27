@@ -1080,14 +1080,15 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
         // calculate the extend of the number
         TextExtend extend;
-        std::wstring figures = IntToTupletFigures(mRptNum);
+        const std::wstring figures = this->IntToTupletFigures(mRptNum);
         dc->GetSmuflTextExtent(figures, &extend);
         const int staffSize = staff->m_drawingStaffSize;
         const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
         const int offset = std::max(m_doc->GetGlyphHeight(SMUFL_E500_repeat1Bar, staffSize, false) - staffHeight, 0);
         int yNum = staff->GetDrawingY() + m_doc->GetDrawingUnit(staffSize) + offset / 2;
-        if (mRpt->GetNumPlace() == STAFFREL_basic_below)
+        if (mRpt->GetNumPlace() == STAFFREL_basic_below) {
             yNum -= staff->m_drawingLines * m_doc->GetDrawingDoubleUnit(staffSize) + extend.m_height + offset;
+        }
         dc->DrawMusicText(
             figures, ToDeviceContextX(element->GetDrawingX() - extend.m_width / 2), ToDeviceContextY(yNum));
         dc->ResetFont();
@@ -1233,7 +1234,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
             : std::max(staff->GetDrawingY(), y1) + offset;
 
         this->DrawSmuflString(
-            dc, xCentered, y, IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
+            dc, xCentered, y, this->IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
         dc->ResetFont();
     }
 
@@ -1810,9 +1811,9 @@ int View::DrawMeterSigFigures(
     std::wstring timeSigCombNumerator, timeSigCombDenominator;
     for (int summand : numSummands) {
         if (!timeSigCombNumerator.empty()) timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall;
-        timeSigCombNumerator += IntToTimeSigFigures(summand);
+        timeSigCombNumerator += this->IntToTimeSigFigures(summand);
     }
-    if (den) timeSigCombDenominator = IntToTimeSigFigures(den);
+    if (den) timeSigCombDenominator = this->IntToTimeSigFigures(den);
 
     const int glyphSize = staff->GetDrawingStaffNotationSize();
 
@@ -1874,7 +1875,7 @@ void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t rptGlyph, int 
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
         // calculate the width of the figures
         TextExtend extend;
-        std::wstring figures = IntToTimeSigFigures(num);
+        const std::wstring figures = this->IntToTimeSigFigures(num);
         dc->GetSmuflTextExtent(figures, &extend);
         const int symHeight = m_doc->GetGlyphHeight(rptGlyph, staffSize, false);
         const int yNum = (y > ySymbol + symHeight / 2)
