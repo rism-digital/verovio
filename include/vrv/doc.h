@@ -83,7 +83,7 @@ public:
      */
     ///@{
     const Resources &GetResources() const { return m_resources; }
-    Resources &ModifyResources() { return m_resources; }
+    Resources &GetResourcesForModification() { return m_resources; }
     ///@}
 
     /**

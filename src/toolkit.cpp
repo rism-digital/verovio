@@ -77,7 +77,7 @@ Toolkit::Toolkit(bool initFont)
     m_cString = NULL;
 
     if (initFont) {
-        Resources &resources = m_doc.ModifyResources();
+        Resources &resources = m_doc.GetResourcesForModification();
         resources.InitFonts();
     }
 
@@ -119,14 +119,14 @@ std::string Toolkit::GetResourcePath() const
 
 bool Toolkit::SetResourcePath(const std::string &path)
 {
-    Resources &resources = m_doc.ModifyResources();
+    Resources &resources = m_doc.GetResourcesForModification();
     resources.SetPath(path);
     return resources.InitFonts();
 }
 
 bool Toolkit::SetFont(const std::string &fontName)
 {
-    Resources &resources = m_doc.ModifyResources();
+    Resources &resources = m_doc.GetResourcesForModification();
     const bool ok = resources.SetFont(fontName);
     if (!ok) LogWarning("Font '%s' could not be loaded", fontName.c_str());
     return ok;
