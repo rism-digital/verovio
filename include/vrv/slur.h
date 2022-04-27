@@ -237,6 +237,9 @@ private:
     // Calculate the vertical shift of the slur end points
     std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
+    // Calculate slur from bulge values
+    void AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit);
+
     // Calculate the horizontal control point offset
     std::tuple<bool, int, int> CalcControlPointOffset(
         FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
