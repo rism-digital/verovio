@@ -82,7 +82,6 @@ public:
     // constructors and destructors
     Option()
     {
-        m_isSet = false;
         m_shortOption = 0;
         m_isCmdOnly = false;
     }
@@ -100,12 +99,11 @@ public:
     virtual std::string GetDefaultStrValue() const = 0;
 
     virtual void Reset() = 0;
+    virtual bool IsSet() const = 0;
 
     void SetInfo(const std::string &title, const std::string &description);
     std::string GetTitle() const { return m_title; }
     std::string GetDescription() const { return m_description; }
-
-    bool IsSet() const { return m_isSet; }
 
     void SetShortOption(char shortOption, bool isCmdOnly);
     char GetShortOption() const { return m_shortOption; }
@@ -135,7 +133,6 @@ public:
 protected:
     std::string m_title;
     std::string m_description;
-    bool m_isSet;
 
 private:
     std::string m_key;
@@ -167,6 +164,7 @@ public:
     std::string GetDefaultStrValue() const override;
 
     void Reset() override;
+    bool IsSet() const override;
 
     bool GetValue() const { return m_value; }
     bool GetDefault() const { return m_defaultValue; }
@@ -207,6 +205,7 @@ public:
     std::string GetDefaultStrValue() const override;
 
     void Reset() override;
+    bool IsSet() const override;
 
     double GetValue() const { return m_value; }
     double GetDefault() const { return m_defaultValue; }
@@ -251,6 +250,7 @@ public:
     std::string GetDefaultStrValue() const override;
 
     void Reset() override;
+    bool IsSet() const override;
 
     int GetValue() const;
     int GetUnfactoredValue() const;
@@ -294,6 +294,7 @@ public:
     std::string GetDefault() const { return m_defaultValue; }
 
     void Reset() override;
+    bool IsSet() const override;
 
 private:
     //
@@ -329,6 +330,7 @@ public:
     bool SetValue(std::vector<std::string> const &values);
 
     void Reset() override;
+    bool IsSet() const override;
 
 private:
     //
@@ -366,6 +368,7 @@ public:
     std::string GetStrValuesAsStr(bool withoutDefault) const;
 
     void Reset() override;
+    bool IsSet() const override;
 
 private:
     //
@@ -398,6 +401,7 @@ public:
     std::string GetDefaultStrValue() const override;
 
     void Reset() override;
+    bool IsSet() const override;
 
     // For alternate types return a reference to the value
     // Alternatively we can have a values vector for each sub-type
@@ -453,6 +457,7 @@ public:
     std::string GetDefaultStrValue() const override;
 
     void Reset() override;
+    bool IsSet() const override;
     ///@}
 
     /**
