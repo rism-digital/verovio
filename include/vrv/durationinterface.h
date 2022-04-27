@@ -62,14 +62,14 @@ public:
      * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
      * LayerElement and DurationInterface have no inheritance link.
      */
-    double GetInterfaceAlignmentDuration(int num, int numBase);
+    double GetInterfaceAlignmentDuration(int num, int numBase) const;
 
     /**
      * Returns the duration (in double) for the element for mensural notation
      * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
      * need to be modified for shorter equality in later repertoire.
      */
-    double GetInterfaceAlignmentMensuralDuration(int num, int numBase, Mensur *currentMensur);
+    double GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const;
 
     /**
      * Return true if the note or rest is the first of a beam.
@@ -96,7 +96,7 @@ public:
      * If the element is part of a chord, return the chord actual duration, otherwise the note actual duration.
      * Since we need to check what the element is, we need to pass it as parameter.
      */
-    int GetNoteOrChordDur(LayerElement *element);
+    int GetNoteOrChordDur(const LayerElement *element) const;
 
     /**
      * Return true if the value is a mensural (DURATION_longa, brevis, etc.)
@@ -107,7 +107,7 @@ public:
      * Interface comparison operator.
      * Check if the LayerElement has a DurationInterface and compare attributes
      */
-    bool HasIdenticalDurationInterface(DurationInterface *otherDurationInterface);
+    bool HasIdenticalDurationInterface(DurationInterface *otherDurationInterface) const;
 
     /**
      * MIDI timing information
