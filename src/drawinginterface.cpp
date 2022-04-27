@@ -268,7 +268,7 @@ void BeamDrawingInterface::InitCue(bool beamCue)
     }
 }
 
-bool BeamDrawingInterface::IsHorizontal()
+bool BeamDrawingInterface::IsHorizontal() const
 {
     if (this->IsRepeatedPattern()) {
         return true;
@@ -392,7 +392,7 @@ bool BeamDrawingInterface::IsHorizontalMixedBeam(
     return result;
 }
 
-bool BeamDrawingInterface::IsRepeatedPattern()
+bool BeamDrawingInterface::IsRepeatedPattern() const
 {
     if (m_drawingPlace == BEAMPLACE_mixed) return false;
 
@@ -450,7 +450,7 @@ bool BeamDrawingInterface::IsRepeatedPattern()
     return false;
 }
 
-bool BeamDrawingInterface::HasOneStepHeight()
+bool BeamDrawingInterface::HasOneStepHeight() const
 {
     if (m_shortestDur < DUR_32) return false;
 
@@ -505,7 +505,7 @@ int BeamDrawingInterface::GetPosition(const Object *object, const LayerElement *
     return position;
 }
 
-void BeamDrawingInterface::GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below)
+void BeamDrawingInterface::GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below) const
 {
     if (!m_beamStaff || !m_crossStaffContent) return;
 
@@ -535,7 +535,7 @@ void BeamDrawingInterface::GetBeamOverflow(StaffAlignment *&above, StaffAlignmen
     }
 }
 
-void BeamDrawingInterface::GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below)
+void BeamDrawingInterface::GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below) const
 {
     if (m_beamStaff && m_crossStaffContent) {
         if (m_crossStaffRel == STAFFREL_basic_above) {

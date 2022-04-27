@@ -118,14 +118,14 @@ public:
      */
     void InitCue(bool beamCue);
 
-    bool IsHorizontal();
+    bool IsHorizontal() const;
 
-    bool IsRepeatedPattern();
+    bool IsRepeatedPattern() const;
 
     /**
      * Checks whether difference between highest and lowest notes of the beam is just one step
      */
-    bool HasOneStepHeight();
+    bool HasOneStepHeight() const;
 
     /**
      * Get total beam width with regards to the shortest duration of the beam (counting both beams and whitespace
@@ -151,12 +151,12 @@ public:
     /**
      * Get above/below overflow
      */
-    void GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below);
+    void GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below) const;
 
     /**
      * Get above/below overflow for the children
      */
-    void GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below);
+    void GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below) const;
 
 protected:
     /**
