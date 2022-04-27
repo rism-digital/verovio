@@ -394,7 +394,7 @@ public:
         if (!this->MatchesType(object)) return false;
         const AlignmentReference *ref = vrv_cast<const AlignmentReference *>(object);
         assert(ref);
-        return const_cast<AlignmentReference *>(ref)->HasCrossStaffElements();
+        return ref->HasCrossStaffElements();
     }
 };
 

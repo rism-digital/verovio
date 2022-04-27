@@ -793,15 +793,15 @@ bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfObjects *objects)
     return false;
 }
 
-bool AlignmentReference::HasCrossStaffElements()
+bool AlignmentReference::HasCrossStaffElements() const
 {
-    ListOfObjects children;
+    ListOfConstObjects children;
     ClassIdsComparison classId({ NOTE, CHORD });
     this->FindAllDescendantsByComparison(&children, &classId);
 
-    for (auto child : children) {
-        LayerElement *layerElement = vrv_cast<LayerElement *>(child);
-        if (layerElement && layerElement->m_crossStaff) return true;
+    for (const auto child : children) {
+        const LayerElement *layerElement = vrv_cast<const LayerElement *>(child);
+        if (layerElement->m_crossStaff) return true;
     }
 
     return false;
