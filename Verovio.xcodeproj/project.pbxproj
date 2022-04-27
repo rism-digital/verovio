@@ -1278,6 +1278,12 @@
 		E79C87C62694407B0098FE85 /* lv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79C87C2269440570098FE85 /* lv.cpp */; };
 		E79C87C7269440800098FE85 /* lv.h in Headers */ = {isa = PBXBuildFile; fileRef = E79C87C1269440420098FE85 /* lv.h */; };
 		E79C87C8269440810098FE85 /* lv.h in Headers */ = {isa = PBXBuildFile; fileRef = E79C87C1269440420098FE85 /* lv.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7BCFFB5281297980012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
+		E7BCFFB6281297980012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
+		E7BCFFB8281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; };
+		E7BCFFB9281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; };
+		E7BCFFBA281298620012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
+		E7BCFFBB281298630012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1749,6 +1755,8 @@
 		E79ADDC626BD645B00527E4B /* runtimeclock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = runtimeclock.cpp; path = src/runtimeclock.cpp; sourceTree = "<group>"; };
 		E79C87C1269440420098FE85 /* lv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lv.h; path = include/vrv/lv.h; sourceTree = "<group>"; };
 		E79C87C2269440570098FE85 /* lv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lv.cpp; path = src/lv.cpp; sourceTree = "<group>"; };
+		E7BCFFB4281297980012513D /* resources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resources.cpp; path = src/resources.cpp; sourceTree = "<group>"; };
+		E7BCFFB7281297C60012513D /* resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resources.h; path = include/vrv/resources.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2217,6 +2225,8 @@
 				8F59292418854BF800FE51AD /* object.h */,
 				4DA80D951A6ACF5D0089802D /* options.cpp */,
 				4DA80D941A6940120089802D /* options.h */,
+				E7BCFFB4281297980012513D /* resources.cpp */,
+				E7BCFFB7281297C60012513D /* resources.h */,
 				E79ADDC626BD645B00527E4B /* runtimeclock.cpp */,
 				E79ADDC326BD1AE900527E4B /* runtimeclock.h */,
 				4D1D733B1A1D0390001E08F6 /* smufl.h */,
@@ -2535,6 +2545,7 @@
 				4DEC4DD721C8295700D1D273 /* reg.h in Headers */,
 				4DB3D8AF1F83D05100B5FC2B /* atts_midi.h in Headers */,
 				4DA1448D1C2AB29400CB7CEE /* textelement.h in Headers */,
+				E7BCFFB8281297C60012513D /* resources.h in Headers */,
 				4DB787662022F0BF00394520 /* jsonxx.h in Headers */,
 				E79C87C7269440800098FE85 /* lv.h in Headers */,
 				E79ADDC426BD1AE900527E4B /* runtimeclock.h in Headers */,
@@ -2835,6 +2846,7 @@
 				BB4C4B9A22A932E5001F6AF0 /* linkinginterface.h in Headers */,
 				BB4C4A8322A9321F001F6AF0 /* atts_shared.h in Headers */,
 				BB4C4B5E22A932D7001F6AF0 /* metersig.h in Headers */,
+				E7BCFFB9281297C60012513D /* resources.h in Headers */,
 				4D2E758E22BC2B5B004C51F0 /* tabdursym.h in Headers */,
 				BB4C4B3022A932CF001F6AF0 /* pedal.h in Headers */,
 				BB4C4B6E22A932D7001F6AF0 /* note.h in Headers */,
@@ -3188,6 +3200,7 @@
 				4DA0EAEB22BB77C300A7EBEB /* editortoolkit_neume.cpp in Sources */,
 				4D16943B1E3A44F300569BF4 /* Binasc.cpp in Sources */,
 				4D16943C1E3A44F300569BF4 /* view_beam.cpp in Sources */,
+				E7BCFFBA281298620012513D /* resources.cpp in Sources */,
 				40D45EC3204EEAFE009C1EC9 /* instrdef.cpp in Sources */,
 				4D16943D1E3A44F300569BF4 /* view_element.cpp in Sources */,
 				4D16943E1E3A44F300569BF4 /* view_graph.cpp in Sources */,
@@ -3370,6 +3383,7 @@
 				4DA80D961A6ACF5D0089802D /* options.cpp in Sources */,
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
 				4D20B5EC1B873A1300EA9EC3 /* scoredefinterface.cpp in Sources */,
+				E7BCFFBB281298630012513D /* resources.cpp in Sources */,
 				4D95D4F21D6E042400B2B856 /* section.cpp in Sources */,
 				4D20741222A708C600E0765F /* view_tab.cpp in Sources */,
 				4D1BE7731C688F5A0086DC0E /* MidiMessage.cpp in Sources */,
@@ -3623,6 +3637,7 @@
 				8F3DD31E18854AFB0051330C /* bboxdevicecontext.cpp in Sources */,
 				4DB3D8F31F83D1C600B5FC2B /* scoredefinterface.cpp in Sources */,
 				4D2461DD246BE2E8002BBCCD /* expansionmap.cpp in Sources */,
+				E7BCFFB5281297980012513D /* resources.cpp in Sources */,
 				8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */,
 				4DC12A7E1F740FB9000440E9 /* view_running.cpp in Sources */,
 				8F3DD32218854AFB0051330C /* svgdevicecontext.cpp in Sources */,
@@ -3841,6 +3856,7 @@
 				BB4C4B1F22A932CF001F6AF0 /* breath.cpp in Sources */,
 				BB4C4AC522A932B6001F6AF0 /* measure.cpp in Sources */,
 				4D2461DE246BE2E9002BBCCD /* expansionmap.cpp in Sources */,
+				E7BCFFB6281297980012513D /* resources.cpp in Sources */,
 				BB4C4BA722A932EB001F6AF0 /* glyph.cpp in Sources */,
 				BB4C4AB922A932A6001F6AF0 /* iopae.cpp in Sources */,
 				BB4C4ABB22A932B6001F6AF0 /* instrdef.cpp in Sources */,

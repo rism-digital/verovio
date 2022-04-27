@@ -66,6 +66,10 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     assert(dc);
     assert(m_doc);
 
+    // Ensure that resources are set
+    const bool dcHasResources = dc->HasResources();
+    if (!dcHasResources) dc->SetResources(&m_doc->GetResources());
+
     m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
 
     // Keep the width of the initial scoreDef
@@ -107,6 +111,8 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     this->DrawRunningElements(dc, m_currentPage);
 
     dc->EndPage();
+
+    if (!dcHasResources) dc->ResetResources();
 }
 
 double View::GetPPUFactor() const

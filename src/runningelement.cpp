@@ -352,14 +352,15 @@ void RunningElement::SetCurrentPageNum(Page *currentPage)
     currentText->SetText(UTF8to16(StringFormat("%d", currentNum)));
 }
 
-void RunningElement::LoadFooter()
+void RunningElement::LoadFooter(const Doc *doc)
 {
     Fig *fig = new Fig();
     Svg *svg = new Svg();
 
-    std::string footer = Resources::GetPath() + "/footer.svg";
+    const Resources &resources = doc->GetResources();
+    const std::string footerPath = resources.GetPath() + "/footer.svg";
     pugi::xml_document footerDoc;
-    footerDoc.load_file(footer.c_str());
+    footerDoc.load_file(footerPath.c_str());
     svg->Set(footerDoc.first_child());
     fig->AddChild(svg);
     fig->SetHalign(HORIZONTALALIGNMENT_center);

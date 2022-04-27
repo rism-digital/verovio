@@ -122,7 +122,7 @@ public:
     /**
      * Load the footer from the resources (footer.svg)
      */
-    void LoadFooter();
+    void LoadFooter(const Doc *doc);
 
     /**
      * Add page numbering to the running element.

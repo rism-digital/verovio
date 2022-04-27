@@ -310,12 +310,13 @@ int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, Doc *doc, int m
 int BoundingBox::GetRectangles(
     const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2], Doc *doc) const
 {
-    Glyph *glyph = NULL;
+    const Glyph *glyph = NULL;
 
     bool glyphRect = true;
 
     if (m_smuflGlyph != 0) {
-        glyph = Resources::GetGlyph(m_smuflGlyph);
+        const Resources &resources = doc->GetResources();
+        glyph = resources.GetGlyph(m_smuflGlyph);
         assert(glyph);
 
         if (glyph->HasAnchor(anchor1) && glyph->HasAnchor(anchor2)) {
@@ -341,8 +342,8 @@ int BoundingBox::GetRectangles(
     return 1;
 }
 
-bool BoundingBox::GetGlyph2PointRectangles(
-    const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Glyph *glyph, Point rect[3][2], Doc *doc) const
+bool BoundingBox::GetGlyph2PointRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2,
+    const Glyph *glyph, Point rect[3][2], Doc *doc) const
 {
     assert(glyph);
 
@@ -430,7 +431,7 @@ bool BoundingBox::GetGlyph2PointRectangles(
 }
 
 bool BoundingBox::GetGlyph1PointRectangles(
-    const SMuFLGlyphAnchor &anchor, Glyph *glyph, Point rect[2][2], Doc *doc) const
+    const SMuFLGlyphAnchor &anchor, const Glyph *glyph, Point rect[2][2], Doc *doc) const
 {
     assert(glyph);
 
