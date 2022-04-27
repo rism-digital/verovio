@@ -46,6 +46,7 @@ void MRpt::Reset()
     LayerElement::Reset();
     this->ResetColor();
     this->ResetNumbered();
+    this->ResetNumberPlacement();
 
     m_drawingMeasureCount = 0;
 }
