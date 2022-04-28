@@ -336,9 +336,9 @@ std::set<int> Layer::GetLayersNInTimeSpan(double time, double duration, Measure 
     layerCountInTimeSpanParams.m_time = time;
     layerCountInTimeSpanParams.m_duration = duration;
 
-    ArrayOfComparisons filters;
+    Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
-    filters.push_back(&matchStaff);
+    filters.Add(&matchStaff);
 
     measure->m_measureAligner.Process(&layerCountInTimeSpan, &layerCountInTimeSpanParams, NULL, &filters);
 
@@ -400,9 +400,9 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(
     layerElementsInTimeSpanParams.m_duration = duration;
     layerElementsInTimeSpanParams.m_allLayersButCurrent = excludeCurrent;
 
-    ArrayOfComparisons filters;
+    Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
-    filters.push_back(&matchStaff);
+    filters.Add(&matchStaff);
 
     measure->m_measureAligner.Process(&layerElementsInTimeSpan, &layerElementsInTimeSpanParams, NULL, &filters);
 

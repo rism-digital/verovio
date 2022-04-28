@@ -781,7 +781,7 @@ void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *
 
     if (listsParams.m_verseTree.child.empty()) return;
 
-    ArrayOfComparisons filters;
+    Filters filters;
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     for (staves = listsParams.m_verseTree.child.begin(); staves != listsParams.m_verseTree.child.end(); ++staves) {
