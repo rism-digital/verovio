@@ -70,7 +70,7 @@ public:
     /**
      * Get simplified (i.e. single metersig with count/unit) based on the MeterSigGrp function
      */
-    MeterSig *GetSimplifiedMeterSig();
+    MeterSig *GetSimplifiedMeterSig() const;
 
     /**
      * Set counter for the alternating meterSigGrp based on the provided measureId
@@ -89,7 +89,7 @@ protected:
     /**
      * Filter the flat list and keep only meterSigGrp elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     // vector with alternating measures to be used only with meterSigGrpLog_FUNC_alternating

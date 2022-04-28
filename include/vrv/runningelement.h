@@ -134,6 +134,11 @@ public:
     //----------//
 
     /**
+     * See Object::PrepareDataInitialization
+     */
+    int PrepareDataInitialization(FunctorParams *functorParams) override;
+
+    /**
      * See Object::Save
      */
     ///@{
@@ -153,7 +158,7 @@ protected:
      * Filter the list for a specific class.
      * Keep only the top <rend> and <fig>
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     /**

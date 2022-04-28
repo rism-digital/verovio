@@ -177,7 +177,7 @@ bool Layer::IsSupportedChild(Object *child)
 LayerElement *Layer::GetPrevious(LayerElement *element)
 {
     this->ResetList(this);
-    if (!element || this->GetList(this)->empty()) return NULL;
+    if (!element || this->HasEmptyList(this)) return NULL;
 
     return dynamic_cast<LayerElement *>(this->GetListPrevious(element));
 }
@@ -369,10 +369,9 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool e
     // the duration of the beam based on those
     else if (element->Is(BEAM)) {
         Beam *beam = vrv_cast<Beam *>(element);
-        const ArrayOfObjects *beamChildren = beam->GetList(beam);
 
-        LayerElement *first = vrv_cast<LayerElement *>(beamChildren->front());
-        LayerElement *last = vrv_cast<LayerElement *>(beamChildren->back());
+        LayerElement *first = vrv_cast<LayerElement *>(beam->GetListFront(beam));
+        LayerElement *last = vrv_cast<LayerElement *>(beam->GetListBack(beam));
 
         if (!first || !last) return {};
 

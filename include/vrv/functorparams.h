@@ -105,8 +105,8 @@ public:
 
 class AddLayerElementToFlatListParams : public FunctorParams {
 public:
-    AddLayerElementToFlatListParams(ArrayOfObjects *flatList) { m_flatList = flatList; }
-    ArrayOfObjects *m_flatList;
+    AddLayerElementToFlatListParams(ListOfConstObjects *flatList) { m_flatList = flatList; }
+    ListOfConstObjects *m_flatList;
 };
 
 //----------------------------------------------------------------------------
@@ -2065,6 +2065,26 @@ public:
     Measure *m_currentMeasure;
     Staff *m_currentCrossStaff;
     Layer *m_currentCrossLayer;
+};
+
+//----------------------------------------------------------------------------
+// PrepareDataInitializationParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the functor for redirection
+ * member 1: the doc
+ **/
+
+class PrepareDataInitializationParams : public FunctorParams {
+public:
+    PrepareDataInitializationParams(Functor *functor, Doc *doc)
+    {
+        m_functor = functor;
+        m_doc = doc;
+    }
+    Functor *m_functor;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

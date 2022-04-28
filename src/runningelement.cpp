@@ -91,42 +91,24 @@ bool RunningElement::IsSupportedChild(Object *child)
     return true;
 }
 
-void RunningElement::FilterList(ArrayOfObjects *childList)
+void RunningElement::FilterList(ListOfConstObjects &childList) const
 {
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         // remove nested rend elements
         if ((*iter)->Is(REND)) {
             if ((*iter)->GetFirstAncestor(REND)) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
                 continue;
             }
         }
         // Also remove anything that is not a fig
         else if (!(*iter)->Is(FIG)) {
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         ++iter;
-    }
-
-    int i;
-    for (i = 0; i < 9; ++i) {
-        m_cells[i].clear();
-    }
-    for (i = 0; i < 3; ++i) {
-        m_drawingScalingPercent[i] = 100;
-    }
-
-    for (iter = childList->begin(); iter != childList->end(); ++iter) {
-        int pos = 0;
-        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
-        assert(interface);
-        pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
-        TextElement *text = vrv_cast<TextElement *>(*iter);
-        assert(text);
-        m_cells[pos].push_back(text);
     }
 }
 
@@ -395,6 +377,33 @@ void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALAL
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int RunningElement::PrepareDataInitialization(FunctorParams *functorParams)
+{
+    PrepareDataInitializationParams *params = vrv_params_cast<PrepareDataInitializationParams *>(functorParams);
+    assert(params);
+
+    int i;
+    for (i = 0; i < 9; ++i) {
+        m_cells[i].clear();
+    }
+    for (i = 0; i < 3; ++i) {
+        m_drawingScalingPercent[i] = 100;
+    }
+
+    const ListOfObjects &childList = this->GetList(this);
+    for (ListOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
+        int pos = 0;
+        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
+        assert(interface);
+        pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
+        TextElement *text = vrv_cast<TextElement *>(*iter);
+        assert(text);
+        m_cells[pos].push_back(text);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int RunningElement::Save(FunctorParams *functorParams)
 {

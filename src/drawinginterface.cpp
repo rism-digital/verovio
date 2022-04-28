@@ -117,14 +117,20 @@ void BeamDrawingInterface::ClearCoords()
     m_beamElementCoords.clear();
 }
 
-void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place)
+void BeamDrawingInterface::InitCoords(const ArrayOfObjects &childList, Staff *staff, data_BEAMPLACE place)
+{
+    ListOfObjects children(childList.begin(), childList.end());
+    this->InitCoords(children, staff, place);
+}
+
+void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *staff, data_BEAMPLACE place)
 {
     assert(staff);
 
     BeamDrawingInterface::Reset();
     ClearCoords();
 
-    if (childList->empty()) {
+    if (childList.empty()) {
         return;
     }
 
@@ -133,14 +139,14 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
     // duration variables
     int lastDur, currentDur;
 
-    m_beamElementCoords.reserve(childList->size());
+    m_beamElementCoords.reserve(childList.size());
     int i;
-    for (i = 0; i < (int)childList->size(); ++i) {
+    for (i = 0; i < (int)childList.size(); ++i) {
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
 
     // current point to the first Note in the layed out layer
-    LayerElement *current = dynamic_cast<LayerElement *>(childList->front());
+    LayerElement *current = dynamic_cast<LayerElement *>(childList.front());
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());
 
@@ -156,7 +162,7 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
 
     int elementCount = 0;
 
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfObjects::const_iterator iter = childList.begin();
     do {
         // Beam list should contain only DurationInterface objects
         assert(current->GetDurationInterface());
@@ -225,7 +231,7 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
         elementCount++;
 
         ++iter;
-        if (iter == childList->end()) {
+        if (iter == childList.end()) {
             break;
         }
         current = dynamic_cast<LayerElement *>(*iter);
@@ -466,7 +472,7 @@ bool BeamDrawingInterface::HasOneStepHeight()
     return (abs(top - bottom) <= 1);
 }
 
-bool BeamDrawingInterface::IsFirstIn(Object *object, LayerElement *element)
+bool BeamDrawingInterface::IsFirstIn(const Object *object, const LayerElement *element) const
 {
     this->GetList(object);
     int position = this->GetPosition(object, element);
@@ -477,9 +483,9 @@ bool BeamDrawingInterface::IsFirstIn(Object *object, LayerElement *element)
     return false;
 }
 
-bool BeamDrawingInterface::IsLastIn(Object *object, LayerElement *element)
+bool BeamDrawingInterface::IsLastIn(const Object *object, const LayerElement *element) const
 {
-    int size = (int)this->GetList(object)->size();
+    const int size = this->GetListSize(object);
     int position = this->GetPosition(object, element);
     // This method should be called only if the note is part of a beam
     assert(position != -1);
@@ -488,15 +494,15 @@ bool BeamDrawingInterface::IsLastIn(Object *object, LayerElement *element)
     return false;
 }
 
-int BeamDrawingInterface::GetPosition(Object *object, LayerElement *element)
+int BeamDrawingInterface::GetPosition(const Object *object, const LayerElement *element) const
 {
     this->GetList(object);
     int position = this->GetListIndex(element);
     // Check if this is a note in the chord
     if ((position == -1) && (element->Is(NOTE))) {
-        Note *note = vrv_cast<Note *>(element);
+        const Note *note = vrv_cast<const Note *>(element);
         assert(note);
-        Chord *chord = note->IsChordTone();
+        const Chord *chord = note->IsChordTone();
         if (chord) position = this->GetListIndex(chord);
     }
     return position;
@@ -616,11 +622,11 @@ void StaffDefDrawingInterface::SetCurrentMeterSigGrp(MeterSigGrp const *meterSig
     }
 }
 
-bool StaffDefDrawingInterface::DrawMeterSigGrp()
+bool StaffDefDrawingInterface::DrawMeterSigGrp() const
 {
     if (m_drawMeterSigGrp) {
-        const ArrayOfObjects *childList = m_currentMeterSigGrp.GetList(&m_currentMeterSigGrp);
-        if (childList->size() > 1) return true;
+        const int childListSize = m_currentMeterSigGrp.GetListSize(&m_currentMeterSigGrp);
+        if (childListSize > 1) return true;
     }
     return false;
 }
@@ -662,7 +668,7 @@ void StemmedDrawingInterface::SetDrawingStemDir(data_STEMDIRECTION stemDir)
     if (m_drawingStem) m_drawingStem->SetDrawingStemDir(stemDir);
 }
 
-data_STEMDIRECTION StemmedDrawingInterface::GetDrawingStemDir()
+data_STEMDIRECTION StemmedDrawingInterface::GetDrawingStemDir() const
 {
     if (m_drawingStem) return m_drawingStem->GetDrawingStemDir();
     return STEMDIRECTION_NONE;
@@ -673,7 +679,7 @@ void StemmedDrawingInterface::SetDrawingStemLen(int stemLen)
     if (m_drawingStem) m_drawingStem->SetDrawingStemLen(stemLen);
 }
 
-int StemmedDrawingInterface::GetDrawingStemLen()
+int StemmedDrawingInterface::GetDrawingStemLen() const
 {
     if (m_drawingStem) return m_drawingStem->GetDrawingStemLen();
     return 0;

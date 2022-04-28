@@ -346,7 +346,7 @@ void Note::SetCluster(ChordCluster *cluster, int position)
     m_clusterPosition = position;
 }
 
-Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
+Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
@@ -379,7 +379,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
+Point Note::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
@@ -411,7 +411,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
+int Note::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const
 {
     assert(staff);
 
@@ -549,14 +549,14 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
     return SMUFL_E0A4_noteheadBlack;
 }
 
-bool Note::IsVisible()
+bool Note::IsVisible() const
 {
     if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;
     }
     // if the chord doens't have it, see if all the children are invisible
     else if (this->GetParent() && this->GetParent()->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(this->GetParent());
+        const Chord *chord = vrv_cast<const Chord *>(this->GetParent());
         assert(chord);
         return chord->IsVisible();
     }
@@ -791,10 +791,9 @@ void Note::DeferMIDINote(FunctorParams *functorParams, double shift, bool includ
     // Recursive call for chords
     Chord *chord = this->IsChordTone();
     if (chord && includeChordSiblings) {
-        const ArrayOfObjects *notes = chord->GetList(chord);
-        assert(notes);
+        const ListOfObjects &notes = chord->GetList(chord);
 
-        for (Object *obj : *notes) {
+        for (Object *obj : notes) {
             Note *note = vrv_cast<Note *>(obj);
             assert(note);
             note->DeferMIDINote(functorParams, shift, false);

@@ -118,8 +118,8 @@ public:
 
     wchar_t GetFlagGlyph(data_STEMDIRECTION stemDir) const;
 
-    Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const;
-    Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const;
+    Point GetStemUpSE(const Doc *doc, int staffSize, bool graceSize) const;
+    Point GetStemDownNW(const Doc *doc, int staffSize, bool graceSize) const;
 
     //----------//
     // Functors //
@@ -344,9 +344,9 @@ public:
      * @name Setter and getter for darwing stem direction and length
      */
     ///@{
-    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; }
+    data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; }
     void SetDrawingStemDir(data_STEMDIRECTION drawingStemDir) { m_drawingStemDir = drawingStemDir; }
-    int GetDrawingStemLen() { return m_drawingStemLen; }
+    int GetDrawingStemLen() const { return m_drawingStemLen; }
     void SetDrawingStemLen(int drawingStemLen) { m_drawingStemLen = drawingStemLen; }
     ///@}
 

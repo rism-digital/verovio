@@ -298,15 +298,15 @@ void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff, int staffSize)
     tupletNum->SetDrawingYRel(yRel);
 }
 
-void Tuplet::FilterList(ArrayOfObjects *childList)
+void Tuplet::FilterList(ListOfConstObjects &childList) const
 {
     // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->IsLayerElement() || !(*iter)->HasInterface(INTERFACE_DURATION)) {
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
         }
         else {
             ++iter;
@@ -396,7 +396,7 @@ void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
         return;
     }
 
-    const ArrayOfObjects *tupletChildren = this->GetList(this);
+    const ListOfObjects &tupletChildren = this->GetList(this);
 
     // There are unbeamed notes of two different beams
     // treat all the notes as unbeamed
@@ -404,8 +404,8 @@ void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
 
     // The first step is to calculate all the stem directions
     // cycle into the elements and count the up and down dirs
-    ArrayOfObjects::const_iterator iter = tupletChildren->begin();
-    while (iter != tupletChildren->end()) {
+    ListOfObjects::const_iterator iter = tupletChildren.begin();
+    while (iter != tupletChildren.end()) {
         if ((*iter)->Is(CHORD)) {
             Chord *currentChord = vrv_cast<Chord *>(*iter);
             assert(currentChord);

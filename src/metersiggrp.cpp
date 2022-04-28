@@ -65,12 +65,12 @@ bool MeterSigGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-void MeterSigGrp::FilterList(ArrayOfObjects *childList)
+void MeterSigGrp::FilterList(ListOfConstObjects &childList) const
 {
     // We want to keep only MeterSig
-    childList->erase(std::remove_if(childList->begin(), childList->end(),
-                         [](const Object *object) -> bool { return !object->Is(METERSIG); }),
-        childList->end());
+    childList.erase(std::remove_if(childList.begin(), childList.end(),
+                        [](const Object *object) -> bool { return !object->Is(METERSIG); }),
+        childList.end());
 }
 
 void MeterSigGrp::AddAlternatingMeasureToVector(Measure *measure)
@@ -78,30 +78,33 @@ void MeterSigGrp::AddAlternatingMeasureToVector(Measure *measure)
     m_alternatingMeasures.emplace_back(measure);
 }
 
-MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
+MeterSig *MeterSigGrp::GetSimplifiedMeterSig() const
 {
     MeterSig *newMeterSig = NULL;
-    const ArrayOfObjects *childList = this->GetList(this);
+    const ListOfConstObjects &childList = this->GetList(this);
     switch (this->GetFunc()) {
         // For alternating meterSig group alternate between children sequentially
         case meterSigGrpLog_FUNC_alternating: {
-            const int index = m_count % childList->size();
-            newMeterSig = vrv_cast<MeterSig *>((childList->at(index))->Clone());
+            const int index = m_count % childList.size();
+            auto iter = std::next(childList.begin(), index);
+            newMeterSig = vrv_cast<MeterSig *>((*iter)->Clone());
             break;
         }
         // For interchanging meterSig group select the largest signature, but make sure to align unit with the shortest
         case meterSigGrpLog_FUNC_interchanging: {
             // Get element with highest count
-            auto it = std::max_element(childList->begin(), childList->end(), [](Object *firstObj, Object *secondObj) {
-                MeterSig *firstMeterSig = vrv_cast<MeterSig *>(firstObj);
-                MeterSig *secondMeterSig = vrv_cast<MeterSig *>(secondObj);
-                const double firstRatio = (double)firstMeterSig->GetTotalCount() / (double)firstMeterSig->GetUnit();
-                const double secondRatio = (double)secondMeterSig->GetTotalCount() / (double)secondMeterSig->GetUnit();
-                return firstRatio < secondRatio;
-            });
+            auto it = std::max_element(
+                childList.begin(), childList.end(), [](const Object *firstObj, const Object *secondObj) {
+                    const MeterSig *firstMeterSig = vrv_cast<const MeterSig *>(firstObj);
+                    const MeterSig *secondMeterSig = vrv_cast<const MeterSig *>(secondObj);
+                    const double firstRatio = (double)firstMeterSig->GetTotalCount() / (double)firstMeterSig->GetUnit();
+                    const double secondRatio
+                        = (double)secondMeterSig->GetTotalCount() / (double)secondMeterSig->GetUnit();
+                    return firstRatio < secondRatio;
+                });
             int maxUnit = 0;
-            std::for_each(childList->begin(), childList->end(), [&maxUnit](Object *obj) {
-                MeterSig *meterSig = vrv_cast<MeterSig *>(obj);
+            std::for_each(childList.begin(), childList.end(), [&maxUnit](const Object *obj) {
+                const MeterSig *meterSig = vrv_cast<const MeterSig *>(obj);
                 if (meterSig->GetUnit() > maxUnit) maxUnit = meterSig->GetUnit();
             });
 
@@ -121,12 +124,12 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig()
         case meterSigGrpLog_FUNC_mixed: {
             int maxUnit = 0;
             int currentCount = 0;
-            for (const auto object : *childList) {
+            for (const auto object : childList) {
                 if (!object->Is(METERSIG)) {
                     LogWarning("Skipping over non-meterSig child of <MeterSigGrp>");
                     continue;
                 }
-                MeterSig *meterSig = vrv_cast<MeterSig *>(object);
+                const MeterSig *meterSig = vrv_cast<const MeterSig *>(object);
                 if (!newMeterSig) {
                     newMeterSig = vrv_cast<MeterSig *>(meterSig->Clone());
                 }

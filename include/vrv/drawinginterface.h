@@ -99,15 +99,18 @@ public:
      * Object * is a pointer to the object implementing the interface (e.g, Beam, fTrem)
      */
     ///@{
-    bool IsFirstIn(Object *object, LayerElement *element);
-    bool IsLastIn(Object *object, LayerElement *element);
+    bool IsFirstIn(const Object *object, const LayerElement *element) const;
+    bool IsLastIn(const Object *object, const LayerElement *element) const;
     ///@}
 
     /**
      * Initializes the m_beamElementCoords vector objects.
-     * This is called by Beam::FilterList
      */
-    void InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
+    ///@{
+    bool HasCoords() const { return !m_beamElementCoords.empty(); }
+    void InitCoords(const ArrayOfObjects &childList, Staff *staff, data_BEAMPLACE place);
+    void InitCoords(const ListOfObjects &childList, Staff *staff, data_BEAMPLACE place);
+    ///@}
 
     /**
      * Initialize m_cueSize value based on the @cue attribute and presence of child elements with @cue/@grace
@@ -160,7 +163,7 @@ protected:
      * Return the position of the element in the beam.
      * For notes, lookup the position of the parent chord.
      */
-    int GetPosition(Object *object, LayerElement *element);
+    int GetPosition(const Object *object, const LayerElement *element) const;
 
     //
 private:
@@ -240,7 +243,7 @@ public:
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
     bool DrawMeterSig() { return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym())); }
     void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; }
-    bool DrawMeterSigGrp();
+    bool DrawMeterSigGrp() const;
     void SetDrawMeterSigGrp(bool drawMeterSigGrp) { m_drawMeterSigGrp = drawMeterSigGrp; }
     ///@}
 
@@ -320,9 +323,9 @@ public:
      */
     ///@{
     void SetDrawingStemDir(data_STEMDIRECTION stemDir);
-    data_STEMDIRECTION GetDrawingStemDir();
+    data_STEMDIRECTION GetDrawingStemDir() const;
     void SetDrawingStemLen(int drawingStemLen);
-    int GetDrawingStemLen();
+    int GetDrawingStemLen() const;
     ///@}
 
     Point GetDrawingStemStart(Object *object = NULL);
@@ -332,9 +335,9 @@ public:
      * @name Virtual methods overriden in child classes (Chord and Note)
      */
     ///@{
-    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize) = 0;
-    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize) = 0;
-    virtual int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) = 0;
+    virtual Point GetStemUpSE(const Doc *doc, int staffSize, bool graceSize) const = 0;
+    virtual Point GetStemDownNW(const Doc *doc, int staffSize, bool graceSize) const = 0;
+    virtual int CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const = 0;
     ///@}
 
 protected:

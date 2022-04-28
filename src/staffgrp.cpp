@@ -94,14 +94,14 @@ bool StaffGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-void StaffGrp::FilterList(ArrayOfObjects *childList)
+void StaffGrp::FilterList(ListOfConstObjects &childList) const
 {
     // We want to keep only staffDef
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->Is(STAFFDEF)) {
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
         }
         else {
             ++iter;
@@ -109,18 +109,17 @@ void StaffGrp::FilterList(ArrayOfObjects *childList)
     }
 }
 
-int StaffGrp::GetMaxStaffSize()
+int StaffGrp::GetMaxStaffSize() const
 {
-    this->ResetList(this);
-    const ArrayOfObjects *childList = this->GetList(this);
+    const ListOfConstObjects &childList = this->GetList(this);
 
-    if (childList->empty()) return 100;
+    if (childList.empty()) return 100;
 
     int max = 0;
 
-    StaffDef *staffDef = NULL;
-    for (auto &child : *childList) {
-        staffDef = vrv_cast<StaffDef *>(child);
+    const StaffDef *staffDef = NULL;
+    for (auto &child : childList) {
+        staffDef = vrv_cast<const StaffDef *>(child);
         assert(staffDef);
         if (staffDef->HasScale() && staffDef->GetScale() >= max) {
             max = staffDef->GetScale();
@@ -135,14 +134,14 @@ int StaffGrp::GetMaxStaffSize()
 
 std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
 {
-    const ArrayOfObjects *staffDefs = this->GetList(this);
-    if (staffDefs->empty()) {
+    const ListOfObjects &staffDefs = this->GetList(this);
+    if (staffDefs.empty()) {
         return { NULL, NULL };
     }
 
     StaffDef *firstDef = NULL;
-    ArrayOfObjects::const_iterator iter;
-    for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
+    ListOfObjects::const_iterator iter;
+    for (iter = staffDefs.begin(); iter != staffDefs.end(); ++iter) {
         StaffDef *staffDef = vrv_cast<StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
@@ -152,8 +151,8 @@ std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
     }
 
     StaffDef *lastDef = NULL;
-    ArrayOfObjects::const_reverse_iterator riter;
-    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
+    ListOfObjects::const_reverse_iterator riter;
+    for (riter = staffDefs.rbegin(); riter != staffDefs.rend(); ++riter) {
         StaffDef *staffDef = vrv_cast<StaffDef *>(*riter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {

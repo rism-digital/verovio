@@ -547,7 +547,7 @@ public:
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */
-    void FillFlatList(ArrayOfObjects *list);
+    void FillFlatList(ListOfConstObjects &list) const;
 
     /**
      * Check if the content was modified or not
@@ -557,7 +557,7 @@ public:
     /**
      * Mark the object and its parent (if any) as modified
      */
-    void Modify(bool modified = true);
+    void Modify(bool modified = true) const;
 
     /**
      * @name Setter and getter of the attribute flag
@@ -646,7 +646,7 @@ public:
     /**
      * Add each LayerElements and its children to a flat list
      */
-    virtual int AddLayerElementToFlatList(FunctorParams *functorParams);
+    virtual int AddLayerElementToFlatList(FunctorParams *functorParams) const;
 
     /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
@@ -1198,6 +1198,11 @@ public:
     ///@{
 
     /**
+     * One time member initialization at the very begin
+     */
+    virtual int PrepareDataInitialization(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Set the drawing cue size of all LayerElement
      */
     virtual int PrepareCueSize(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1636,23 +1641,33 @@ public:
     /**
      * Look for the Object in the list and return its position (-1 if not found)
      */
-    int GetListIndex(const Object *listElement);
+    int GetListIndex(const Object *listElement) const;
 
     /**
      * Gets the first item of type elementType starting at startFrom
      */
+    ///@{
+    const Object *GetListFirst(const Object *startFrom, const ClassId classId = UNSPECIFIED) const;
     Object *GetListFirst(const Object *startFrom, const ClassId classId = UNSPECIFIED);
-    Object *GetListFirstBackward(Object *startFrom, const ClassId classId = UNSPECIFIED);
+    const Object *GetListFirstBackward(const Object *startFrom, const ClassId classId = UNSPECIFIED) const;
+    Object *GetListFirstBackward(const Object *startFrom, const ClassId classId = UNSPECIFIED);
+    ///@}
 
     /**
      * Returns the previous object in the list (NULL if not found)
      */
-    Object *GetListPrevious(Object *listElement);
+    ///@{
+    const Object *GetListPrevious(const Object *listElement) const;
+    Object *GetListPrevious(const Object *listElement);
+    ///@}
 
     /**
      * Returns the next object in the list (NULL if not found)
      */
-    Object *GetListNext(Object *listElement);
+    ///@{
+    const Object *GetListNext(const Object *listElement) const;
+    Object *GetListNext(const Object *listElement);
+    ///@}
 
     /**
      * Return the list.
@@ -1660,25 +1675,40 @@ public:
      * If not, it updates the list and also calls FilterList.
      * Because this is an interface, we need to pass the object - not the best design.
      */
-    const ArrayOfObjects *GetList(Object *node);
+    ///@{
+    const ListOfConstObjects &GetList(const Object *node) const;
+    ListOfObjects GetList(const Object *node);
+    ///@}
+
+    /**
+     * Convenience functions that check if the list is up-to-date
+     * If not, the list is updated before returning the result
+     */
+    ///@{
+    bool HasEmptyList(const Object *node) const;
+    int GetListSize(const Object *node) const;
+    const Object *GetListFront(const Object *node) const;
+    Object *GetListFront(const Object *node);
+    const Object *GetListBack(const Object *node) const;
+    Object *GetListBack(const Object *node);
+    ///@}
 
 private:
-    mutable ArrayOfObjects m_list;
-    ArrayOfObjects::iterator m_iteratorCurrent;
+    mutable ListOfConstObjects m_list;
 
 protected:
     /**
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ArrayOfObjects *childList){};
+    virtual void FilterList(ListOfConstObjects &childList) const {};
 
 public:
     /**
      * Reset the list of children and call FilterList().
      * As for GetList, we need to pass the object.
      */
-    void ResetList(Object *node);
+    void ResetList(const Object *node) const;
 };
 
 //----------------------------------------------------------------------------
@@ -1700,19 +1730,19 @@ public:
     /**
      * Returns a contatenated version of all the text children
      */
-    std::wstring GetText(Object *node);
+    std::wstring GetText(const Object *node) const;
 
     /**
      * Fill an array of lines with concatenated content of each line
      */
-    void GetTextLines(Object *node, std::vector<std::wstring> &lines);
+    void GetTextLines(const Object *node, std::vector<std::wstring> &lines) const;
 
 protected:
     /**
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     //
@@ -1774,7 +1804,7 @@ class ObjectComparison {
 public:
     ObjectComparison(const ClassId classId) { m_classId = classId; }
 
-    bool operator()(Object *object)
+    bool operator()(const Object *object)
     {
         if (m_classId == UNSPECIFIED) {
             return true;

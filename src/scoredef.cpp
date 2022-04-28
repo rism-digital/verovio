@@ -441,14 +441,14 @@ void ScoreDef::ReplaceDrawingLabels(StaffGrp *newStaffGrp)
     }
 }
 
-void ScoreDef::FilterList(ArrayOfObjects *childList)
+void ScoreDef::FilterList(ListOfConstObjects &childList) const
 {
     // We want to keep only staffDef
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->Is(STAFFDEF)) {
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
         }
         else {
             ++iter;
@@ -458,11 +458,10 @@ void ScoreDef::FilterList(ArrayOfObjects *childList)
 
 void ScoreDef::ResetFromDrawingValues()
 {
-    this->ResetList(this);
-    const ArrayOfObjects *childList = this->GetList(this);
+    const ListOfObjects &childList = this->GetList(this);
 
     StaffDef *staffDef = NULL;
-    for (auto item : *childList) {
+    for (auto item : childList) {
         if (!item->Is(STAFFDEF)) continue;
         staffDef = vrv_cast<StaffDef *>(item);
         assert(staffDef);
@@ -489,14 +488,18 @@ void ScoreDef::ResetFromDrawingValues()
 
 StaffDef *ScoreDef::GetStaffDef(int n)
 {
-    this->ResetList(this);
-    const ArrayOfObjects *childList = this->GetList(this);
-    ArrayOfObjects::const_iterator iter;
+    return const_cast<StaffDef *>(std::as_const(*this).GetStaffDef(n));
+}
 
-    StaffDef *staffDef = NULL;
-    for (iter = childList->begin(); iter != childList->end(); ++iter) {
+const StaffDef *ScoreDef::GetStaffDef(int n) const
+{
+    const ListOfConstObjects &childList = this->GetList(this);
+    ListOfConstObjects::const_iterator iter;
+
+    const StaffDef *staffDef = NULL;
+    for (iter = childList.begin(); iter != childList.end(); ++iter) {
         if (!(*iter)->Is(STAFFDEF)) continue;
-        staffDef = vrv_cast<StaffDef *>(*iter);
+        staffDef = vrv_cast<const StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetN() == n) {
             return staffDef;
@@ -508,30 +511,34 @@ StaffDef *ScoreDef::GetStaffDef(int n)
 
 StaffGrp *ScoreDef::GetStaffGrp(const std::string &n)
 {
+    return const_cast<StaffGrp *>(std::as_const(*this).GetStaffGrp(n));
+}
+
+const StaffGrp *ScoreDef::GetStaffGrp(const std::string &n) const
+{
     // First get all the staffGrps
-    ListOfObjects staffGrps = this->FindAllDescendantsByType(STAFFGRP);
+    ListOfConstObjects staffGrps = this->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
     for (auto &item : staffGrps) {
-        StaffGrp *staffGrp = vrv_cast<StaffGrp *>(item);
+        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(item);
         assert(staffGrp);
         if (staffGrp->GetN() == n) return staffGrp;
     }
     return NULL;
 }
 
-std::vector<int> ScoreDef::GetStaffNs()
+std::vector<int> ScoreDef::GetStaffNs() const
 {
-    this->ResetList(this);
-    const ArrayOfObjects *childList = this->GetList(this);
-    ArrayOfObjects::const_iterator iter;
+    const ListOfConstObjects &childList = this->GetList(this);
+    ListOfConstObjects::const_iterator iter;
 
     std::vector<int> ns;
-    StaffDef *staffDef = NULL;
-    for (iter = childList->begin(); iter != childList->end(); ++iter) {
+    const StaffDef *staffDef = NULL;
+    for (iter = childList.begin(); iter != childList.end(); ++iter) {
         // It should be staffDef only, but double check.
         if (!(*iter)->Is(STAFFDEF)) continue;
-        staffDef = vrv_cast<StaffDef *>(*iter);
+        staffDef = vrv_cast<const StaffDef *>(*iter);
         assert(staffDef);
         ns.push_back(staffDef->GetN());
     }

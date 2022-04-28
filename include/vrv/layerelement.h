@@ -122,6 +122,7 @@ public:
     bool IsInLigature() const;
     /** Return the FTrem parten if the element is a note or a chord within a fTrem */
     FTrem *IsInFTrem();
+    const FTrem *IsInFTrem() const;
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
@@ -129,6 +130,7 @@ public:
      * Looking in the content list is necessary for grace notes or imbricated beams.
      */
     Beam *IsInBeam();
+    const Beam *IsInBeam() const;
     bool IsInBeamSpan() const;
     ///@}
 
