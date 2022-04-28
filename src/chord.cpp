@@ -940,7 +940,22 @@ int Chord::JustifyYAdjustCrossStaff(FunctorParams *functorParams)
 
     const int topStaffN = extremalStaves.front()->GetN();
     const int bottomStaffN = extremalStaves.back()->GetN();
-    if (topStaffN < bottomStaffN) {
+
+    bool hasCrossStaffNotes = false;
+    if ((topStaffN == bottomStaffN) && this->HasCrossStaff() && !m_crossStaff) {
+        Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        if (staff != extremalStaves.front()) {
+            extremalStaves.pop_back();
+            if (staff->GetN() > topStaffN) {
+                extremalStaves.push_back(staff);
+            }
+            else {
+                extremalStaves.push_front(staff);
+            }
+            hasCrossStaffNotes = true;
+        }
+    }
+    if (topStaffN < bottomStaffN || hasCrossStaffNotes) {
         // Now calculate the shift due to vertical justification
         auto getShift = [params](Staff *staff) {
             StaffAlignment *alignment = staff->GetAlignment();
