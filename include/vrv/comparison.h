@@ -525,6 +525,10 @@ public:
 
 public:
     Filters() = default;
+    explicit Filters(const std::initializer_list<Comparison *> &comp)
+    {
+        std::copy(comp.begin(), comp.end(), std::back_inserter(m_filters));
+    }
 
     void Add(Comparison *comp) { m_filters.push_back(comp); }
     void Clear() { m_filters.clear(); }
@@ -533,7 +537,7 @@ public:
     /**
      * Apply comparison filter based on the specified type
      */
-    bool Apply(Object *object) const
+    bool Apply(const Object *object) const
     {
         auto condition = [object](Comparison *iter) {
             // ignore any class comparison which does not match the object class
