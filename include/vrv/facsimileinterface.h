@@ -42,7 +42,7 @@ public:
     double GetDrawingRotate() const;
 
     /** Check if the object has a facsimile */
-    bool HasFacsimile() { return this->HasFacs(); }
+    bool HasFacsimile() const { return this->HasFacs(); }
 
     /** Set the zone */
     void SetZone(Zone *zone);
@@ -50,7 +50,10 @@ public:
     int GetSurfaceY() const;
 
     /** Get the zone */
+    ///@{
     Zone *GetZone() { return m_zone; }
+    const Zone *GetZone() const { return m_zone; }
+    ///@}
 
 private:
     Zone *m_zone = NULL;
