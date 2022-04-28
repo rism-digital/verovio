@@ -128,7 +128,7 @@ data_BEATRPT_REND Att::StrToBeatrptRend(const std::string &value, bool logWarnin
 std::string Att::BulgeToStr(const data_BULGE &data) const
 {
     std::ostringstream ss;
-    for (int i = 0; i < data.size(); ++i) {
+    for (size_t i = 0; i < data.size(); ++i) {
         if (i != 0) ss << " ";
         ss << data[i].first << " " << data[i].second;
     }
@@ -149,7 +149,7 @@ data_BULGE Att::StrToBulge(const std::string &value, bool logWarning) const
     // Convert entries to numerical values
     data_BULGE bulge;
     Att converter;
-    for (int i = 0; i < entries.size() - 1; i += 2) {
+    for (size_t i = 0; i < entries.size() - 1; i += 2) {
         const double distance = converter.StrToDbl(entries[i]);
         const double offset = converter.StrToDbl(entries[i + 1]);
         if ((offset < 0.0) || (offset > 100.0)) {
