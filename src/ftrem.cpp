@@ -209,8 +209,10 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
-    this->InitCoords(fTremChildren, staff, BEAMPLACE_NONE);
-    this->InitCue(false);
+    if (!this->HasCoords()) {
+        this->InitCoords(fTremChildren, staff, BEAMPLACE_NONE);
+        this->InitCue(false);
+    }
 
     if (this->GetElementCoords()->size() != 2) {
         LogError("Stem calculation: <fTrem> element has invalid number of descendants.");

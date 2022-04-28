@@ -2080,9 +2080,11 @@ int Beam::CalcStem(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
-    this->InitCoords(beamChildren, staff, this->GetPlace());
-    const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
-    this->InitCue(isCue);
+    if (!this->HasCoords()) {
+        this->InitCoords(beamChildren, staff, this->GetPlace());
+        const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
+        this->InitCue(isCue);
+    }
 
     m_beamSegment.InitCoordRefs(this->GetElementCoords());
 

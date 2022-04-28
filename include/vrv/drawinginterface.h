@@ -107,6 +107,7 @@ public:
      * Initializes the m_beamElementCoords vector objects.
      */
     ///@{
+    bool HasCoords() const { return !m_beamElementCoords.empty(); }
     void InitCoords(const ArrayOfObjects &childList, Staff *staff, data_BEAMPLACE place);
     void InitCoords(const ListOfObjects &childList, Staff *staff, data_BEAMPLACE place);
     ///@}
