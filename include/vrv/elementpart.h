@@ -348,6 +348,8 @@ public:
     void SetDrawingStemDir(data_STEMDIRECTION drawingStemDir) { m_drawingStemDir = drawingStemDir; }
     int GetDrawingStemLen() const { return m_drawingStemLen; }
     void SetDrawingStemLen(int drawingStemLen) { m_drawingStemLen = drawingStemLen; }
+    int GetDrawingStemAdjust() { return m_drawingStemAdjust; }
+    void SetDrawingStemAdjust(int drawingStemAdjust) { m_drawingStemAdjust = drawingStemAdjust; }
     ///@}
 
     /**
@@ -407,6 +409,10 @@ private:
      * The drawing length of stem
      */
     int m_drawingStemLen;
+    /**
+     * The adjustment of the drawing stem length (used with french style of beams)
+     */
+    int m_drawingStemAdjust;
     /**
      * A flag indicating if a stem if virtual and should never be rendered.
      * Virtual stems are added to whole notes (and longer) for position calculation and
