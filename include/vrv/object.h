@@ -609,7 +609,7 @@ public:
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
-     * The ArrayOfComparisons filter parameter makes is possible to process only objects of a
+     * The Filters class parameter makes is possible to process only objects of a
      * type that matches the attribute value given in the Comparison object.
      * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
@@ -1284,7 +1284,7 @@ public:
 
     /**
      * Set wordpos and connector ends
-     * The functor is processed by staff/layer/verse using an ArrayOfComparisons filter.
+     * The functor is processed by staff/layer/verse using an Filters class.
      * At the end, the functor is processed by doc at the end of a document of closing opened syl.
      */
     virtual int PrepareLyrics(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1302,7 +1302,7 @@ public:
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
-     * The functor is processed by staff/layer using an ArrayOfComparisons filter.
+     * The functor is processed by staff/layer using Filters class.
      */
     virtual int PrepareRpt(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
