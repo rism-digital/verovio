@@ -29,7 +29,7 @@ namespace vrv {
 static const ClassRegistrar<Clef> s_factory("clef", CLEF);
 
 Clef::Clef()
-    : LayerElement(CLEF, "clef-"),
+    : LayerElement(CLEF, "clef-")
     , AttClefShape()
     , AttColor()
     , AttLineLoc()
