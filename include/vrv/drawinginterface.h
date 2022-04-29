@@ -265,6 +265,7 @@ public:
      */
     ///@{
     Clef *GetCurrentClef() { return &m_currentClef; }
+    const Clef *GetCurrentClef() const { return &m_currentClef; }
     KeySig *GetCurrentKeySig() { return &m_currentKeySig; }
     Mensur *GetCurrentMensur() { return &m_currentMensur; }
     MeterSig *GetCurrentMeterSig() { return &m_currentMeterSig; }

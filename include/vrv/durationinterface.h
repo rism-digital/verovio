@@ -107,7 +107,7 @@ public:
      * Interface comparison operator.
      * Check if the LayerElement has a DurationInterface and compare attributes
      */
-    bool HasIdenticalDurationInterface(DurationInterface *otherDurationInterface) const;
+    bool HasIdenticalDurationInterface(const DurationInterface *otherDurationInterface) const;
 
     /**
      * MIDI timing information

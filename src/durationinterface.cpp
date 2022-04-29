@@ -219,7 +219,7 @@ bool DurationInterface::IsMensuralDur() const
     return (this->GetDur() > DUR_MENSURAL_MASK);
 }
 
-bool DurationInterface::HasIdenticalDurationInterface(DurationInterface *otherDurationInterface) const
+bool DurationInterface::HasIdenticalDurationInterface(const DurationInterface *otherDurationInterface) const
 {
     // This should never happen because it is fully implemented
     LogError("DurationInterface::HasIdenticalDurationInterface missing");
