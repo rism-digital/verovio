@@ -2907,8 +2907,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCount(std::string count_) { m_count = count_; }
-    std::string GetCount() const { return m_count; }
+    void SetCount(const data_METERCOUNT_pair &count_) { m_count = count_; }
+    data_METERCOUNT_pair GetCount() const { return m_count; }
     bool HasCount() const;
     //
     void SetSym(data_METERSIGN sym_) { m_sym = sym_; }
@@ -2922,7 +2922,7 @@ public:
 
 private:
     /** Indicates the number of performers. **/
-    std::string m_count;
+    data_METERCOUNT_pair m_count;
     /**
      * Indicates the use of a meter symbol instead of a numeric meter signature, that
      * is, 'C' for common time or 'C' with a slash for cut time.
@@ -2958,8 +2958,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeterCount(std::string meterCount_) { m_meterCount = meterCount_; }
-    std::string GetMeterCount() const { return m_meterCount; }
+    void SetMeterCount(const data_METERCOUNT_pair &meterCount_) { m_meterCount = meterCount_; }
+    data_METERCOUNT_pair GetMeterCount() const { return m_meterCount; }
     bool HasMeterCount() const;
     //
     void SetMeterUnit(int meterUnit_) { m_meterUnit = meterUnit_; }
@@ -2978,7 +2978,7 @@ private:
      * It must contain a decimal number or an expression that evaluates to a decimal
      * number, such as 2+3 or 3*2.
      **/
-    std::string m_meterCount;
+    data_METERCOUNT_pair m_meterCount;
     /**
      * Contains the number indicating the beat unit, that is, the bottom number of the
      * meter signature.

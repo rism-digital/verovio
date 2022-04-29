@@ -45,97 +45,39 @@ void MeterSig::Reset()
     this->ResetEnclosingChars();
     this->ResetMeterSigLog();
     this->ResetMeterSigVis();
-
-    m_meterCount.clear();
-    m_meterCountSign = MeterCountSign::None;
 }
 
 int MeterSig::GetTotalCount()
 {
-    if (m_meterCount.empty()) this->SplitMeterCounts();
-    switch (m_meterCountSign) {
+    auto [counts, sign] = this->GetCount();
+    switch (sign) {
         case MeterCountSign::Slash: {
             // make sure that there is no division by zero
-            std::for_each(m_meterCount.begin(), m_meterCount.end(), [](int &elem) {
+            std::for_each(counts.begin(), counts.end(), [](int &elem) {
                 if (!elem) elem = 1;
             });
-            int result = std::accumulate(
-                std::next(m_meterCount.begin()), m_meterCount.end(), *m_meterCount.begin(), std::divides<int>());
+            int result = std::accumulate(std::next(counts.cbegin()), counts.cend(), *counts.cbegin(), std::divides<int>());
             if (!result) result = 1;
             return result;
         }
         case MeterCountSign::Minus: {
-            int result = std::accumulate(
-                std::next(m_meterCount.begin()), m_meterCount.end(), *m_meterCount.begin(), std::minus<int>());
+            int result = std::accumulate(std::next(counts.cbegin()), counts.cend(), *counts.cbegin(), std::minus<int>());
             if (result <= 0) result = 1;
             return result;
         }
         case MeterCountSign::Asterisk: {
-            int result = std::accumulate(m_meterCount.begin(), m_meterCount.end(), 1, std::multiplies<int>());
+            int result = std::accumulate(counts.cbegin(), counts.cend(), 1, std::multiplies<int>());
             if (!result) result = 1;
             return result;
         }
         case MeterCountSign::Plus: {
-            return std::accumulate(m_meterCount.begin(), m_meterCount.end(), 0, std::plus<int>());
+            return std::accumulate(counts.cbegin(), counts.cend(), 0, std::plus<int>());
         }
         case MeterCountSign::None:
         default: break;
     }
 
-    return m_meterCount.front();
-}
-
-std::pair<std::vector<int>, MeterSig::MeterCountSign> MeterSig::GetMeterCounts()
-{
-    if (m_meterCount.empty()) this->SplitMeterCounts();
-
-    return { m_meterCount, m_meterCountSign };
-}
-
-void MeterSig::SetMeterCounts(const std::vector<int> &counts, MeterSig::MeterCountSign sign)
-{
-    std::stringstream output;
-    for (const int count : counts) {
-        output << count;
-        switch (sign) {
-            case MeterCountSign::Slash: output << '\\'; break;
-            case MeterCountSign::Minus: output << '-'; break;
-            case MeterCountSign::Asterisk: output << '*'; break;
-            case MeterCountSign::Plus: output << '+'; break;
-            case MeterCountSign::None:
-            default: break;
-        }
-    }
-
-    this->SetCount(output.str());
-}
-
-void MeterSig::SplitMeterCounts()
-{
-    const std::string count = this->GetCount();
-    std::regex re("[\\*\\+/-]");
-    std::sregex_token_iterator first{ count.begin(), count.end(), re, -1 }, last;
-    std::vector<std::string> tokens{ first, last };
-
-    // Since there is currently no need for implementation of complex calculus within metersig, only one opperation will
-    // be supported in the meter count. Caclulation will be based on the first mathematical operator in the string
-    const size_t pos = count.find_first_of("+-*/");
-    if (pos != std::string::npos) {
-        if (count[pos] == '/') {
-            m_meterCountSign = MeterCountSign::Slash;
-        }
-        else if (count[pos] == '*') {
-            m_meterCountSign = MeterCountSign::Asterisk;
-        }
-        else if (count[pos] == '+') {
-            m_meterCountSign = MeterCountSign::Plus;
-        }
-        else if (count[pos] == '-') {
-            m_meterCountSign = MeterCountSign::Minus;
-        }
-    }
-    std::for_each(tokens.begin(), tokens.end(),
-        [this](const std::string &elem) { m_meterCount.emplace_back(std::atoi(elem.c_str())); });
+    return counts.front();
 }
 
 wchar_t MeterSig::GetSymbolGlyph() const

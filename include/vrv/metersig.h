@@ -25,7 +25,6 @@ class ScoreDefInterface;
  */
 class MeterSig : public LayerElement, public AttEnclosingChars, public AttMeterSigLog, public AttMeterSigVis {
 public:
-    enum class MeterCountSign { None, Slash, Minus, Asterisk, Plus };
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method resets all attribute classes.
@@ -47,14 +46,6 @@ public:
     /** Evaluate additive meter counts */
     int GetTotalCount();
 
-    /**
-     * Set/get methods to get operation signa and meter counts as separate values
-     */
-    ///@{
-    std::pair<std::vector<int>, MeterCountSign> GetMeterCounts();
-    void SetMeterCounts(const std::vector<int> &counts, MeterSig::MeterCountSign sign);
-    ///@}
-
     /** Retrieves the symbol glyph */
     wchar_t GetSymbolGlyph() const;
 
@@ -71,14 +62,11 @@ public:
     int LayerCountInTimeSpan(FunctorParams *functorParams) override;
 
 private:
-    // Helper function to split meter counts and signs within MeterSig
-    void SplitMeterCounts();
-
+    //
 public:
     //
 private:
-    std::vector<int> m_meterCount;
-    MeterCountSign m_meterCountSign;
+    //
 };
 
 } // namespace vrv

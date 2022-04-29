@@ -1488,8 +1488,8 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
         pugi::xml_node beats = time.child("beats");
         pugi::xml_node beatType = time.child("beat-type");
         if (beats) {
-            meterSig->SetCount(beats.text().as_string());
-            std::tie(m_meterCount, m_meterSign) = meterSig->GetMeterCounts();
+            std::tie(m_meterCount, m_meterSign) = meterSig->Att::StrToMetercountPair(beats.text().as_string());
+            meterSig->SetCount({ m_meterCount, m_meterSign });
             m_meterUnit = beatType.text().as_int();
             meterSig->SetUnit(m_meterUnit);
         }
@@ -2663,7 +2663,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         else if (typeStr.empty() || rest.attribute("measure").as_bool()) {
             if (m_slash) {
                 MeterSig tmpMeterSig;
-                tmpMeterSig.SetMeterCounts(m_meterCount, m_meterSign);
+                tmpMeterSig.SetCount({ m_meterCount, m_meterSign });
                 const int totalCount = tmpMeterSig.GetTotalCount();
                 for (int i = totalCount; i > 0; --i) {
                     BeatRpt *slash = new BeatRpt;
@@ -4536,12 +4536,13 @@ std::pair<std::vector<int>, int> MusicXmlInput::GetMeterSigGrpValues(const pugi:
          ++iter1, ++iter2) {
         // Process current beat/beat-type combination and add it to the meterSigGrp
         MeterSig *meterSig = new MeterSig();
-        meterSig->SetCount(iter1->node().text().as_string());
+        data_METERCOUNT_pair count = meterSig->Att::StrToMetercountPair(iter1->node().text().as_string());
+        meterSig->SetCount(count);
         int currentUnit = iter2->node().text().as_int();
         meterSig->SetUnit(currentUnit);
         parent->AddChild(meterSig);
         std::vector<int> currentCount;
-        std::tie(currentCount, std::ignore) = meterSig->GetMeterCounts();
+        std::tie(currentCount, std::ignore) = meterSig->GetCount();
         // Process meterCount and meterUnit based on current/previous beats
         if (maxUnit == 0) maxUnit = currentUnit;
         if (maxUnit == currentUnit) {

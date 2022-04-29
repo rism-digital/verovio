@@ -472,7 +472,7 @@ private:
     /* meter signature */
     std::vector<int> m_meterCount = { 4 };
     int m_meterUnit = 4;
-    MeterSig::MeterCountSign m_meterSign = MeterSig::MeterCountSign::None;
+    MeterCountSign m_meterSign = MeterCountSign::None;
     /* part information */
     Label *m_label = NULL;
     LabelAbbr *m_labelAbbr = NULL;

@@ -1828,16 +1828,16 @@ int View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSi
     assert(dc);
     assert(staff);
 
-    const auto [numSummands, numSign] = meterSig->GetMeterCounts();
+    const auto [numSummands, numSign] = meterSig->GetCount();
     std::wstring timeSigCombNumerator, timeSigCombDenominator;
     for (int summand : numSummands) {
         if (!timeSigCombNumerator.empty()) {
             switch (numSign) {
-                case MeterSig::MeterCountSign::Slash: timeSigCombNumerator += SMUFL_E08E_timeSigFractionalSlash; break;
-                case MeterSig::MeterCountSign::Minus: timeSigCombNumerator += SMUFL_E090_timeSigMinus; break;
-                case MeterSig::MeterCountSign::Asterisk: timeSigCombNumerator += SMUFL_E091_timeSigMultiply; break;
-                case MeterSig::MeterCountSign::Plus: timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall; break;
-                case MeterSig::MeterCountSign::None:
+                case MeterCountSign::Slash: timeSigCombNumerator += SMUFL_E08E_timeSigFractionalSlash; break;
+                case MeterCountSign::Minus: timeSigCombNumerator += SMUFL_E090_timeSigMinus; break;
+                case MeterCountSign::Asterisk: timeSigCombNumerator += SMUFL_E091_timeSigMultiply; break;
+                case MeterCountSign::Plus: timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall; break;
+                case MeterCountSign::None:
                 default: break;
             }
         }

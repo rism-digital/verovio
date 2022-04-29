@@ -160,6 +160,16 @@ typedef data_VU data_MEASUREMENTABS;
 typedef data_VU data_MEASUREMENTREL;
 
 /**
+ * enum class for the signs used in meter counts
+ */
+enum class MeterCountSign { None, Slash, Minus, Asterisk, Plus };
+
+/**
+ * A typedef for a pair of metersign counts and sign combining them
+ */
+typedef std::pair<std::vector<int>, MeterCountSign> data_METERCOUNT_pair;
+
+/**
  * MEI data.MIDIBPM
  */
 typedef int data_MIDIBPM;

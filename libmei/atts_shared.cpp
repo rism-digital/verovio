@@ -3783,7 +3783,7 @@ AttMeterSigLog::~AttMeterSigLog()
 
 void AttMeterSigLog::ResetMeterSigLog()
 {
-    m_count = "";
+    m_count = {};
     m_sym = METERSIGN_NONE;
     m_unit = 0;
 }
@@ -3792,7 +3792,7 @@ bool AttMeterSigLog::ReadMeterSigLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("count")) {
-        this->SetCount(StrToStr(element.attribute("count").value()));
+        this->SetCount(StrToMetercountPair(element.attribute("count").value()));
         element.remove_attribute("count");
         hasAttribute = true;
     }
@@ -3813,7 +3813,7 @@ bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasCount()) {
-        element.append_attribute("count") = StrToStr(this->GetCount()).c_str();
+        element.append_attribute("count") = MetercountPairToStr(this->GetCount()).c_str();
         wroteAttribute = true;
     }
     if (this->HasSym()) {
@@ -3829,7 +3829,7 @@ bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element)
 
 bool AttMeterSigLog::HasCount() const
 {
-    return (m_count != "");
+    return m_count.first.empty();
 }
 
 bool AttMeterSigLog::HasSym() const
@@ -3859,7 +3859,7 @@ AttMeterSigDefaultLog::~AttMeterSigDefaultLog()
 
 void AttMeterSigDefaultLog::ResetMeterSigDefaultLog()
 {
-    m_meterCount = "";
+    m_meterCount = {};
     m_meterUnit = 0;
     m_meterSym = METERSIGN_NONE;
 }
@@ -3868,7 +3868,7 @@ bool AttMeterSigDefaultLog::ReadMeterSigDefaultLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("meter.count")) {
-        this->SetMeterCount(StrToStr(element.attribute("meter.count").value()));
+        this->SetMeterCount(StrToMetercountPair(element.attribute("meter.count").value()));
         element.remove_attribute("meter.count");
         hasAttribute = true;
     }
@@ -3889,7 +3889,7 @@ bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasMeterCount()) {
-        element.append_attribute("meter.count") = StrToStr(this->GetMeterCount()).c_str();
+        element.append_attribute("meter.count") = MetercountPairToStr(this->GetMeterCount()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMeterUnit()) {
@@ -3905,7 +3905,7 @@ bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element)
 
 bool AttMeterSigDefaultLog::HasMeterCount() const
 {
-    return (m_meterCount != "");
+    return m_meterCount.first.empty();
 }
 
 bool AttMeterSigDefaultLog::HasMeterUnit() const
@@ -8895,7 +8895,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttMeterSigLog *att = dynamic_cast<AttMeterSigLog *>(element);
         assert(att);
         if (attrType == "count") {
-            att->SetCount(att->StrToStr(attrValue));
+            att->SetCount(att->StrToMetercountPair(attrValue));
             return true;
         }
         if (attrType == "sym") {
@@ -8911,7 +8911,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttMeterSigDefaultLog *att = dynamic_cast<AttMeterSigDefaultLog *>(element);
         assert(att);
         if (attrType == "meter.count") {
-            att->SetMeterCount(att->StrToStr(attrValue));
+            att->SetMeterCount(att->StrToMetercountPair(attrValue));
             return true;
         }
         if (attrType == "meter.unit") {
@@ -10362,7 +10362,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttMeterSigLog *att = dynamic_cast<const AttMeterSigLog *>(element);
         assert(att);
         if (att->HasCount()) {
-            attributes->push_back({ "count", att->StrToStr(att->GetCount()) });
+            attributes->push_back({ "count", att->MetercountPairToStr(att->GetCount()) });
         }
         if (att->HasSym()) {
             attributes->push_back({ "sym", att->MetersignToStr(att->GetSym()) });
@@ -10375,7 +10375,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttMeterSigDefaultLog *att = dynamic_cast<const AttMeterSigDefaultLog *>(element);
         assert(att);
         if (att->HasMeterCount()) {
-            attributes->push_back({ "meter.count", att->StrToStr(att->GetMeterCount()) });
+            attributes->push_back({ "meter.count", att->MetercountPairToStr(att->GetMeterCount()) });
         }
         if (att->HasMeterUnit()) {
             attributes->push_back({ "meter.unit", att->IntToStr(att->GetMeterUnit()) });
