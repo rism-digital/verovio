@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Apr 23 13:40:10 PDT 2022
+// Last Modified: Thu Apr 28 21:23:22 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -8589,13 +8589,15 @@ class Tool_peak : public HumTool {
 		void                          initialize         (void);
 		void                          processFile        (HumdrumFile& infile, Options& options);
 		void                          processSpine       (HTp startok);
+		void 													processSpineFlipped(HTp startok);
 		void                          identifyLocalPeaks (std::vector<bool>& peaknotes,
 		                                                  std::vector<int>& notelist);
 		void                          getDurations       (vector<double>& durations,
 		                                                  vector<vector<HTp>>& notelist);
 		void                          getBeat            (vector<bool>& metpos,
 		                                                  vector<vector<HTp>>& notelist);
-
+		int                           getMetricLevel     (HTp token);
+		bool                          isSyncopated       (HTp token);
 		void                          getLocalPeakNotes  (vector<vector<HTp>>& newnotelist,
 		                                                  vector<vector<HTp>>& oldnotelist,
 		                                                  vector<bool>& peaknotes);
@@ -8612,10 +8614,13 @@ class Tool_peak : public HumTool {
 		                                                  vector<bool>& ispeak);
 		void                          mergeOverlappingPeaks(void);
 		bool                          checkGroupPairForMerger(int index1, int index2);
-      int                           countNotesInScore   (HumdrumFile& infile);
+    int                           countNotesInScore   (HumdrumFile& infile);
+		std::vector<int> 							flipMidiNumbers     (vector<int>& midinums);
 
 	private:
 		bool m_rawQ             = false;         // don't print score (only analysis)
+		bool m_peakQ            = false;         // analyze only peaks
+		bool m_npeakQ           = false;         // analyze only negative peaks (troughs)
 		std::string m_marker    = "@";           // marker to label peak notes in score
 		std::string m_color     = "red";         // color to mark peak notes
 		double      m_smallRest = 4.0;           // Ignore rests that are 1 whole note or less
@@ -9323,6 +9328,43 @@ class Tool_tassoize : public HumTool {
 		vector<vector<int>> m_pstates;
 		vector<vector<int>> m_kstates;
 		vector<vector<bool>> m_estates;
+
+};
+
+
+class Tool_thru : public HumTool {
+	public:
+		         Tool_thru         (void);
+		        ~Tool_thru         () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void      processFile         (HumdrumFile& infile);
+		void      initialize          (void);
+
+		void      checkOptions        (Options& opts, int argc, char* argv[]);
+		void      example             (void);
+		void      processData         (HumdrumFile& infile);
+		void      usage               (const char* command);
+		void      getLabelSequence    (vector<string>& labelsequence,
+		                               const string& astring);
+		int       getLabelIndex       (vector<string>& labels, string& key);
+		void      printLabelList      (HumdrumFile& infile);
+		void      printLabelInfo      (HumdrumFile& infile);
+		int       getBarline          (HumdrumFile& infile, int line);
+		int       adjustFirstBarline  (HumdrumFile& infile);
+
+	private:
+		bool      m_listQ = false;    // used with -l option
+		bool      m_infoQ = false;    // used with -i option
+		bool      m_keepQ = false;    // used with -k option
+		bool      m_quietQ = false;   // used with -q option
+		string    m_variation = "";   // used with -v option
+		string    m_realization = ""; // used with -r option
 
 };
 
