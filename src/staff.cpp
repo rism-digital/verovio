@@ -649,7 +649,10 @@ int Staff::PrepareRpt(FunctorParams *functorParams)
 
     // This is happening only for the first staff element of the staff @n
     if (StaffDef *staffDef = params->m_doc->GetCurrentScoreDef()->GetStaffDef(this->GetN())) {
-        if ((staffDef->HasMultiNumber()) && (staffDef->GetMultiNumber() == BOOLEAN_false)) {
+        const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)
+            || ((staffDef->GetMultiNumber() != BOOLEAN_true)
+                && (params->m_doc->GetCurrentScoreDef()->GetMultiNumber() == BOOLEAN_false));
+        if (hideNumber) {
             // Set it just in case, but stopping the functor should do it for this staff @n
             params->m_multiNumber = BOOLEAN_false;
             return FUNCTOR_STOP;
