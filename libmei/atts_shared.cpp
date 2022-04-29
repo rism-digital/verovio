@@ -3829,7 +3829,7 @@ bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element)
 
 bool AttMeterSigLog::HasCount() const
 {
-    return m_count.first.empty();
+    return !m_count.first.empty();
 }
 
 bool AttMeterSigLog::HasSym() const
@@ -3905,7 +3905,7 @@ bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element)
 
 bool AttMeterSigDefaultLog::HasMeterCount() const
 {
-    return m_meterCount.first.empty();
+    return !m_meterCount.first.empty();
 }
 
 bool AttMeterSigDefaultLog::HasMeterUnit() const
