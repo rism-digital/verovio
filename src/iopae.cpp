@@ -4727,16 +4727,15 @@ bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae:
     else if (paeStr == "c3/2") {
         // C3/2
         meterSig->SetSym(METERSIGN_common); // ??
-        meterSig->SetCount({ 3 }, MeterCountSign::None
-    });
-    meterSig->SetUnit(2);
-}
-else
-{
-    LogPAE(ERR_048_TIMESIG_INVALID, token, paeStr);
-    if (m_pedanticMode) return false;
-}
-return true;
+        meterSig->SetCount({ { 3 }, MeterCountSign::None });
+        meterSig->SetUnit(2);
+    }
+    else
+    {
+        LogPAE(ERR_048_TIMESIG_INVALID, token, paeStr);
+        if (m_pedanticMode) return false;
+    }
+    return true;
 }
 
 bool PAEInput::ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token &token)

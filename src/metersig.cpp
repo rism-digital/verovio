@@ -47,7 +47,7 @@ void MeterSig::Reset()
     this->ResetMeterSigVis();
 }
 
-int MeterSig::GetTotalCount()
+int MeterSig::GetTotalCount() const
 {
     auto [counts, sign] = this->GetCount();
     switch (sign) {

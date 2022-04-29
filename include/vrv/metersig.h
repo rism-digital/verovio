@@ -44,7 +44,7 @@ public:
     bool IsScoreDefElement() const override { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
 
     /** Evaluate additive meter counts */
-    int GetTotalCount();
+    int GetTotalCount() const;
 
     /** Retrieves the symbol glyph */
     wchar_t GetSymbolGlyph() const;
