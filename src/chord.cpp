@@ -933,51 +933,50 @@ int Chord::JustifyYAdjustCrossStaff(FunctorParams *functorParams)
     assert(params);
 
     // Check if chord spreads across several staves
-    std::list<Staff *> extremalStaves;
+    std::map<int, Staff *> extremalStaves;
     for (Note *note : { this->GetTopNote(), this->GetBottomNote() }) {
         Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-        extremalStaves.push_back(staff);
+        extremalStaves.insert({ staff->GetN(), staff });
     }
-    assert(extremalStaves.size() == 2);
+    // get chord parent staff
+    Staff *staff = this->GetAncestorStaff();
+    extremalStaves.insert({ staff->GetN(), staff });
 
-    const int topStaffN = extremalStaves.front()->GetN();
-    const int bottomStaffN = extremalStaves.back()->GetN();
-    if (topStaffN < bottomStaffN) {
-        // Now calculate the shift due to vertical justification
-        auto getShift = [params](Staff *staff) {
-            StaffAlignment *alignment = staff->GetAlignment();
-            if (params->m_shiftForStaff.find(alignment) != params->m_shiftForStaff.end()) {
-                return params->m_shiftForStaff.at(alignment);
-            }
-            return 0;
-        };
+    if (extremalStaves.size() < 2) return FUNCTOR_CONTINUE;
 
-        const int shift = getShift(extremalStaves.back()) - getShift(extremalStaves.front());
-
-        // Add the shift to the stem length of the chord
-        Stem *stem = vrv_cast<Stem *>(this->FindDescendantByType(STEM));
-        if (!stem) return FUNCTOR_CONTINUE;
-
-        const int stemLen = stem->GetDrawingStemLen();
-        if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
-            stem->SetDrawingStemLen(stemLen - shift);
+    // Now calculate the shift due to vertical justification
+    auto getShift = [params](Staff *staff) {
+        StaffAlignment *alignment = staff->GetAlignment();
+        if (params->m_shiftForStaff.find(alignment) != params->m_shiftForStaff.end()) {
+            return params->m_shiftForStaff.at(alignment);
         }
-        else {
-            stem->SetDrawingStemLen(stemLen + shift);
-        }
+        return 0;
+    };
 
-        // Reposition the stem
-        Staff *staff = this->GetAncestorStaff();
-        Staff *rootStaff
-            = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? extremalStaves.back() : extremalStaves.front();
-        stem->SetDrawingYRel(stem->GetDrawingYRel() + getShift(staff) - getShift(rootStaff));
+    const int shift = getShift(extremalStaves.rbegin()->second) - getShift(extremalStaves.begin()->second);
 
-        // Add the shift to the flag position
-        Flag *flag = vrv_cast<Flag *>(stem->FindDescendantByType(FLAG));
-        if (flag) {
-            const int sign = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? 1 : -1;
-            flag->SetDrawingYRel(flag->GetDrawingYRel() + sign * shift);
-        }
+    // Add the shift to the stem length of the chord
+    Stem *stem = vrv_cast<Stem *>(this->FindDescendantByType(STEM));
+    if (!stem) return FUNCTOR_CONTINUE;
+
+    const int stemLen = stem->GetDrawingStemLen();
+    if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
+        stem->SetDrawingStemLen(stemLen - shift);
+    }
+    else {
+        stem->SetDrawingStemLen(stemLen + shift);
+    }
+
+    // Reposition the stem
+    Staff *rootStaff = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? extremalStaves.rbegin()->second
+                                                                       : extremalStaves.begin()->second;
+    stem->SetDrawingYRel(stem->GetDrawingYRel() + getShift(staff) - getShift(rootStaff));
+
+    // Add the shift to the flag position
+    Flag *flag = vrv_cast<Flag *>(stem->FindDescendantByType(FLAG));
+    if (flag) {
+        const int sign = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? 1 : -1;
+        flag->SetDrawingYRel(flag->GetDrawingYRel() + sign * shift);
     }
 
     return FUNCTOR_CONTINUE;
