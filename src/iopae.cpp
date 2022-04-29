@@ -4730,8 +4730,7 @@ bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae:
         meterSig->SetCount({ { 3 }, MeterCountSign::None });
         meterSig->SetUnit(2);
     }
-    else
-    {
+    else {
         LogPAE(ERR_048_TIMESIG_INVALID, token, paeStr);
         if (m_pedanticMode) return false;
     }
