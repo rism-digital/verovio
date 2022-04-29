@@ -379,6 +379,26 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// CrossAlignmentReferenceComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if alignment reference contains cross-staff elements
+ */
+class CrossAlignmentReferenceComparison : public ClassIdComparison {
+public:
+    CrossAlignmentReferenceComparison() : ClassIdComparison(ALIGNMENT_REFERENCE) {}
+
+    bool operator()(const Object *object) override
+    {
+        if (!this->MatchesType(object)) return false;
+        const AlignmentReference *ref = vrv_cast<const AlignmentReference *>(object);
+        assert(ref);
+        return ref->HasCrossStaffElements();
+    }
+};
+
+//----------------------------------------------------------------------------
 // MeasureAlignerTypeComparison
 //----------------------------------------------------------------------------
 

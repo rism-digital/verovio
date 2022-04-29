@@ -1063,7 +1063,9 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         ns.push_back(-1);
         ns.push_back(staffN);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.Add(&matchStaff);
+        CrossAlignmentReferenceComparison matchCrossStaff;
+        filters.SetType(Filters::Type::AnyOf);
+        filters = { &matchStaff, &matchCrossStaff };
 
         params->m_measureTieEndpoints = this->GetInternalTieEndpoints();
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
