@@ -542,12 +542,9 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
     if (overlapMargin >= 0) return FUNCTOR_CONTINUE;
 
     Staff *staff = this->GetAncestorStaff();
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
 
     if ((!this->HasOloc() || !this->HasPloc()) && !this->HasLoc()) {
         // constants
-        const bool isTopLayer
-            = m_crossStaff ? (staff->GetN() < m_crossStaff->GetN()) : (staff->GetFirst(LAYER) == layer);
         const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         // calculate new and old locations for the rest
         const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
