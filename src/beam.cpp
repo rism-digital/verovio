@@ -152,6 +152,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
 
     int y1, y2;
 
+    const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     for (auto coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
@@ -177,6 +178,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
             }
         }
 
+        int stemAdjust = 0;
         y2 = coord->m_closestNote->GetDrawingY();
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             if (isStemSameas) {
@@ -184,8 +186,8 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
                 y1 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
             else {
-                // Move down to ensure the stem is slightly shorter than the top-beam
-                y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                // Set adjust to ensure that drawn stem is slightly shorter than the top-beam
+                stemAdjust = -stemWidth;
             }
             y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
         }
@@ -194,7 +196,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
                 y1 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
             else {
-                y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                stemAdjust = stemWidth;
             }
             y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
         }
@@ -212,7 +214,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
             }
 
             if (coord->m_beamRelativePlace == BEAMPLACE_below) {
-                y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize) + stemOffset;
+                y1 -= stemWidth + stemOffset;
                 y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
             else {
@@ -242,6 +244,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
         stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
         stem->SetDrawingYRel(y2 - el->GetDrawingY());
         stem->SetDrawingStemLen(y2 - y1);
+        stem->SetDrawingStemAdjust(-stemAdjust);
     }
 
     if (doc->GetOptions()->m_beamFrenchStyle.GetValue() && (m_beamElementCoordRefs.size() > 2)) {
@@ -481,7 +484,7 @@ void BeamSegment::AdjustBeamToFrenchStyle(BeamDrawingInterface *beamInterface)
             ? ((*it)->m_beamRelativePlace == BEAMPLACE_below ? -1 : 1)
             : (beamInterface->m_drawingPlace == BEAMPLACE_below ? -1 : 1);
         const int lengthAdjust = sign * (minDur - DURATION_8) * beamInterface->m_beamWidth;
-        stem->SetDrawingStemLen(stem->GetDrawingStemLen() + lengthAdjust);
+        stem->SetDrawingStemAdjust(stem->GetDrawingStemAdjust() + lengthAdjust);
     }
 }
 
