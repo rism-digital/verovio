@@ -162,7 +162,7 @@ public:
         return StrToVU(value, logWarning);
     }
 
-    std::string Att::MetercountPairToStr(const data_METERCOUNT_pair &data) const;
+    std::string MetercountPairToStr(const data_METERCOUNT_pair &data) const;
     data_METERCOUNT_pair StrToMetercountPair(const std::string &value) const;
 
     std::string ModusmaiorToStr(data_MODUSMAIOR data) const;
