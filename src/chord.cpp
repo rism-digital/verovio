@@ -966,7 +966,6 @@ int Chord::JustifyYAdjustCrossStaff(FunctorParams *functorParams)
     }
 
     // Reposition the stem
-    Staff *staff = this->GetAncestorStaff();
     Staff *rootStaff = (stem->GetDrawingStemDir() == STEMDIRECTION_up) ? extremalStaves.rbegin()->second
                                                                        : extremalStaves.begin()->second;
     stem->SetDrawingYRel(stem->GetDrawingYRel() + getShift(staff) - getShift(rootStaff));
