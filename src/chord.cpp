@@ -915,11 +915,8 @@ int Chord::ResetData(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::PrepareDataInitialization(FunctorParams *functorParams)
+int Chord::PrepareDataInitialization(FunctorParams *)
 {
-    PrepareDataInitializationParams *params = vrv_params_cast<PrepareDataInitializationParams *>(functorParams);
-    assert(params);
-
     if (this->HasEmptyList(this)) {
         LogWarning("Chord '%s' has no child note - a default note is added", this->GetUuid().c_str());
         Note *rescueNote = new Note();

@@ -378,11 +378,8 @@ void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALAL
 // Functor methods
 //----------------------------------------------------------------------------
 
-int RunningElement::PrepareDataInitialization(FunctorParams *functorParams)
+int RunningElement::PrepareDataInitialization(FunctorParams *)
 {
-    PrepareDataInitializationParams *params = vrv_params_cast<PrepareDataInitializationParams *>(functorParams);
-    assert(params);
-
     int i;
     for (i = 0; i < 9; ++i) {
         m_cells[i].clear();

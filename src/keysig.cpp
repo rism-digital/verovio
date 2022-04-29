@@ -288,11 +288,8 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
 // Functors methods
 //----------------------------------------------------------------------------
 
-int KeySig::PrepareDataInitialization(FunctorParams *functorParams)
+int KeySig::PrepareDataInitialization(FunctorParams *)
 {
-    PrepareDataInitializationParams *params = vrv_params_cast<PrepareDataInitializationParams *>(functorParams);
-    assert(params);
-
     data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
     m_mixedChildrenAccidType = false;
 
