@@ -56,12 +56,14 @@ int MeterSig::GetTotalCount()
             std::for_each(counts.begin(), counts.end(), [](int &elem) {
                 if (!elem) elem = 1;
             });
-            int result = std::accumulate(std::next(counts.cbegin()), counts.cend(), *counts.cbegin(), std::divides<int>());
+            int result
+                = std::accumulate(std::next(counts.cbegin()), counts.cend(), *counts.cbegin(), std::divides<int>());
             if (!result) result = 1;
             return result;
         }
         case MeterCountSign::Minus: {
-            int result = std::accumulate(std::next(counts.cbegin()), counts.cend(), *counts.cbegin(), std::minus<int>());
+            int result
+                = std::accumulate(std::next(counts.cbegin()), counts.cend(), *counts.cbegin(), std::minus<int>());
             if (result <= 0) result = 1;
             return result;
         }
