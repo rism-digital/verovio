@@ -58,22 +58,22 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /** Accid number getter */
-    int GetAccidCount();
+    int GetAccidCount() const;
 
     /** Accid type getter */
-    data_ACCIDENTAL_WRITTEN GetAccidType();
+    data_ACCIDENTAL_WRITTEN GetAccidType() const;
 
     /**
      * Fill the map of modified pitches
      */
-    void FillMap(MapOfPitchAccid &mapOfPitchAccid);
+    void FillMap(MapOfPitchAccid &mapOfPitchAccid) const;
 
     /**
      * Return the string of the alteration at the positon pos.
      * Looks at keyAccid children if any.
      * The accid at pos is return in accid and the pname in pname.
      */
-    std::wstring GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname);
+    std::wstring GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname) const;
 
     int GetFifthsInt() const;
 
@@ -92,6 +92,11 @@ public:
     //----------//
 
     /**
+     * See Object::PrepareDataInitialization
+     */
+    int PrepareDataInitialization(FunctorParams *) override;
+
+    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;
@@ -100,7 +105,7 @@ protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     //

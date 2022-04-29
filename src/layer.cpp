@@ -177,7 +177,7 @@ bool Layer::IsSupportedChild(Object *child)
 LayerElement *Layer::GetPrevious(LayerElement *element)
 {
     this->ResetList(this);
-    if (!element || this->GetList(this)->empty()) return NULL;
+    if (!element || this->HasEmptyList(this)) return NULL;
 
     return dynamic_cast<LayerElement *>(this->GetListPrevious(element));
 }
@@ -336,9 +336,9 @@ std::set<int> Layer::GetLayersNInTimeSpan(double time, double duration, Measure 
     layerCountInTimeSpanParams.m_time = time;
     layerCountInTimeSpanParams.m_duration = duration;
 
-    ArrayOfComparisons filters;
+    Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
-    filters.push_back(&matchStaff);
+    filters.Add(&matchStaff);
 
     measure->m_measureAligner.Process(&layerCountInTimeSpan, &layerCountInTimeSpanParams, NULL, &filters);
 
@@ -369,10 +369,9 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool e
     // the duration of the beam based on those
     else if (element->Is(BEAM)) {
         Beam *beam = vrv_cast<Beam *>(element);
-        const ArrayOfObjects *beamChildren = beam->GetList(beam);
 
-        LayerElement *first = vrv_cast<LayerElement *>(beamChildren->front());
-        LayerElement *last = vrv_cast<LayerElement *>(beamChildren->back());
+        LayerElement *first = vrv_cast<LayerElement *>(beam->GetListFront(beam));
+        LayerElement *last = vrv_cast<LayerElement *>(beam->GetListBack(beam));
 
         if (!first || !last) return {};
 
@@ -401,9 +400,9 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(
     layerElementsInTimeSpanParams.m_duration = duration;
     layerElementsInTimeSpanParams.m_allLayersButCurrent = excludeCurrent;
 
-    ArrayOfComparisons filters;
+    Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
-    filters.push_back(&matchStaff);
+    filters.Add(&matchStaff);
 
     measure->m_measureAligner.Process(&layerElementsInTimeSpan, &layerElementsInTimeSpanParams, NULL, &filters);
 

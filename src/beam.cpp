@@ -152,6 +152,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
 
     int y1, y2;
 
+    const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     for (auto coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
@@ -177,6 +178,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
             }
         }
 
+        int stemAdjust = 0;
         y2 = coord->m_closestNote->GetDrawingY();
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             if (isStemSameas) {
@@ -184,8 +186,8 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
                 y1 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
             else {
-                // Move down to ensure the stem is slightly shorter than the top-beam
-                y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                // Set adjust to ensure that drawn stem is slightly shorter than the top-beam
+                stemAdjust = -stemWidth;
             }
             y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
         }
@@ -194,7 +196,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
                 y1 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
             else {
-                y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                stemAdjust = stemWidth;
             }
             y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
         }
@@ -212,7 +214,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
             }
 
             if (coord->m_beamRelativePlace == BEAMPLACE_below) {
-                y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize) + stemOffset;
+                y1 -= stemWidth + stemOffset;
                 y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
             else {
@@ -242,6 +244,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
         stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
         stem->SetDrawingYRel(y2 - el->GetDrawingY());
         stem->SetDrawingStemLen(y2 - y1);
+        stem->SetDrawingStemAdjust(-stemAdjust);
     }
 
     if (doc->GetOptions()->m_beamFrenchStyle.GetValue() && (m_beamElementCoordRefs.size() > 2)) {
@@ -481,7 +484,7 @@ void BeamSegment::AdjustBeamToFrenchStyle(BeamDrawingInterface *beamInterface)
             ? ((*it)->m_beamRelativePlace == BEAMPLACE_below ? -1 : 1)
             : (beamInterface->m_drawingPlace == BEAMPLACE_below ? -1 : 1);
         const int lengthAdjust = sign * (minDur - DURATION_8) * beamInterface->m_beamWidth;
-        stem->SetDrawingStemLen(stem->GetDrawingStemLen() + lengthAdjust);
+        stem->SetDrawingStemAdjust(stem->GetDrawingStemAdjust() + lengthAdjust);
     }
 }
 
@@ -1586,29 +1589,29 @@ bool Beam::IsSupportedChild(Object *child)
     return true;
 }
 
-void Beam::FilterList(ArrayOfObjects *childList)
+void Beam::FilterList(ListOfConstObjects &childList) const
 {
     bool firstNoteGrace = false;
     // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
     const bool isTabBeam = this->IsTabBeam();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->IsLayerElement()) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         if (!(*iter)->HasInterface(INTERFACE_DURATION)) {
             // remove anything that has not a DurationInterface
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         else if (isTabBeam) {
             if (!(*iter)->Is(TABGRP)) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
             }
             else {
                 ++iter;
@@ -1616,65 +1619,38 @@ void Beam::FilterList(ArrayOfObjects *childList)
             continue;
         }
         else {
-            LayerElement *element = vrv_cast<LayerElement *>(*iter);
+            const LayerElement *element = vrv_cast<const LayerElement *>(*iter);
             assert(element);
             // if we are at the beginning of the beam
             // and the note is cueSize
             // assume all the beam is of grace notes
-            if (childList->begin() == iter) {
+            if (childList.begin() == iter) {
                 if (element->IsGraceNote()) firstNoteGrace = true;
             }
             // if the first note in beam was NOT a grace
             // we have grace notes embedded in a beam
             // drop them
             if (!firstNoteGrace && (element->IsGraceNote())) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
                 continue;
             }
             // also remove notes within chords
             if (element->Is(NOTE)) {
-                Note *note = vrv_cast<Note *>(element);
+                const Note *note = vrv_cast<const Note *>(element);
                 assert(note);
                 if (note->IsChordTone()) {
-                    iter = childList->erase(iter);
+                    iter = childList.erase(iter);
                     continue;
                 }
             }
             // and spaces
             else if (element->Is(SPACE)) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
                 continue;
             }
             ++iter;
         }
     }
-
-    Staff *beamStaff = this->GetAncestorStaff();
-    /*
-    if (this->HasBeamWith()) {
-        Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-        assert(measure);
-        if (this->GetBeamWith() == OTHERSTAFF_below) {
-            beamStaff = dynamic_cast<Staff *>(measure->GetNext(staff, STAFF));
-            if (beamStaff == NULL) {
-                LogError("Cannot access staff below for beam '%s'", this->GetUuid().c_str());
-                beamStaff = staff;
-            }
-        }
-        else if (this->GetBeamWith() == OTHERSTAFF_above) {
-            beamStaff = dynamic_cast<Staff *>(measure->GetPrevious(staff, STAFF));
-            if (beamStaff == NULL) {
-                LogError("Cannot access staff above for beam '%s'", this->GetUuid().c_str());
-                beamStaff = staff;
-            }
-        }
-    }
-    */
-
-    this->InitCoords(childList, beamStaff, this->GetPlace());
-
-    const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
-    this->InitCue(isCue);
 }
 
 const ArrayOfBeamElementCoords *Beam::GetElementCoords()
@@ -2095,22 +2071,28 @@ int Beam::CalcStem(FunctorParams *functorParams)
 
     if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
 
-    const ArrayOfObjects *beamChildren = this->GetList(this);
+    const ListOfObjects &beamChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
-    if (beamChildren->empty()) {
+    if (beamChildren.empty()) {
         return FUNCTOR_CONTINUE;
+    }
+
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(layer);
+    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    if (!this->HasCoords()) {
+        this->InitCoords(beamChildren, staff, this->GetPlace());
+        const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
+        this->InitCue(isCue);
     }
 
     m_beamSegment.InitCoordRefs(this->GetElementCoords());
 
     data_BEAMPLACE initialPlace = this->GetPlace();
     if (this->HasStemSameasBeam()) m_beamSegment.InitSameasRoles(this->GetStemSameasBeam(), initialPlace);
-
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
-    assert(staff);
 
     m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, initialPlace);
 

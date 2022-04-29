@@ -101,7 +101,7 @@ public:
     /**
      * Calculates and sets spacing for specified ScoreDef
      */
-    void SetSpacing(ScoreDef *scoreDef);
+    void SetSpacing(const ScoreDef *scoreDef);
 
 private:
     /**
@@ -112,7 +112,7 @@ private:
     /**
      * Calculates above spacing type for staffDef
      */
-    SpacingType CalculateSpacingAbove(StaffDef *staffDef) const;
+    SpacingType CalculateSpacingAbove(const StaffDef *staffDef) const;
 
 public:
     //

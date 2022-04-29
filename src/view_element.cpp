@@ -985,10 +985,6 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
     const bool hasSmallEnclosing = (meterSig->HasSym() || (meterSig->GetForm() == METERFORM_num));
     wchar_t enclosingFront, enclosingBack;
     std::tie(enclosingFront, enclosingBack) = meterSig->GetEnclosingGlyphs(hasSmallEnclosing);
-    if (meterSig->HasEnclose() && (meterSig->GetEnclose() != ENCLOSURE_none)
-        && (meterSig->GetEnclose() != ENCLOSURE_paren)) {
-        LogWarning("Only drawing of enclosing parentheses is supported for metersig.");
-    }
 
     dc->StartGraphic(meterSig, "", meterSig->GetUuid());
 
@@ -1489,7 +1485,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     this->DrawFilledRectangle(dc, stem->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
         stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
-        stem->GetDrawingY() - stem->GetDrawingStemLen());
+        stem->GetDrawingY() - (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()));
 
     this->DrawStemMod(dc, element, staff);
 

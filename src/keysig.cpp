@@ -107,40 +107,22 @@ void KeySig::Reset()
     m_drawingCancelAccidCount = 0;
 }
 
-void KeySig::FilterList(ArrayOfObjects *childList)
+void KeySig::FilterList(ListOfConstObjects &childList) const
 {
-    // nothing  to filter since we allow only KeyAccid for now.
-    ArrayOfObjects::iterator iter = childList->begin();
-
-    while (iter != childList->end()) {
+    ListOfConstObjects::iterator iter = childList.begin();
+    while (iter != childList.end()) {
         if ((*iter)->Is(KEYACCID))
             ++iter;
         else
-            iter = childList->erase(iter);
-    }
-
-    data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
-    m_mixedChildrenAccidType = false;
-
-    for (auto &child : *childList) {
-        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
-        assert(keyAccid);
-        if (type == ACCIDENTAL_WRITTEN_NONE) {
-            type = keyAccid->GetAccid();
-            continue;
-        }
-        if (type != keyAccid->GetAccid()) {
-            m_mixedChildrenAccidType = true;
-            break;
-        }
+            iter = childList.erase(iter);
     }
 }
 
-int KeySig::GetAccidCount()
+int KeySig::GetAccidCount() const
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    if (childList->size() > 0) {
-        return (int)childList->size();
+    const int childListSize = this->GetListSize(this); // make sure it's initialized
+    if (childListSize > 0) {
+        return childListSize;
     }
 
     if (!this->HasSig()) return 0;
@@ -148,12 +130,12 @@ int KeySig::GetAccidCount()
     return (this->GetSig().first);
 }
 
-data_ACCIDENTAL_WRITTEN KeySig::GetAccidType()
+data_ACCIDENTAL_WRITTEN KeySig::GetAccidType() const
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    if (childList->size() > 0) {
+    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    if (childList.size() > 0) {
         if (m_mixedChildrenAccidType) return ACCIDENTAL_WRITTEN_NONE;
-        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(childList->at(0));
+        const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(childList.front());
         assert(keyAccid);
         return keyAccid->GetAccid();
     }
@@ -163,14 +145,14 @@ data_ACCIDENTAL_WRITTEN KeySig::GetAccidType()
     return (this->GetSig().second);
 }
 
-void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid)
+void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
 {
     mapOfPitchAccid.clear();
 
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    if (childList->size() > 0) {
-        for (auto &child : *childList) {
-            KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
+    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    if (childList.size() > 0) {
+        for (auto &child : childList) {
+            const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
             assert(keyAccid);
             mapOfPitchAccid[keyAccid->GetPname()] = keyAccid->GetAccid();
         }
@@ -184,16 +166,17 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid)
     }
 }
 
-std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname)
+std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname) const
 {
     pname = PITCHNAME_c;
     accid = ACCIDENTAL_WRITTEN_s;
     std::wstring symbolStr = L"";
 
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    if (childList->size() > 0) {
-        if ((int)childList->size() <= pos) return symbolStr;
-        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(childList->at(pos));
+    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    if (childList.size() > 0) {
+        if ((int)childList.size() <= pos) return symbolStr;
+        auto iter = std::next(childList.begin(), pos);
+        const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(*iter);
         assert(keyAccid);
         accid = keyAccid->GetAccid();
         pname = keyAccid->GetPname();
@@ -304,6 +287,28 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int KeySig::PrepareDataInitialization(FunctorParams *)
+{
+    data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
+    m_mixedChildrenAccidType = false;
+
+    const ListOfObjects &childList = this->GetList(this);
+    for (auto &child : childList) {
+        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
+        assert(keyAccid);
+        if (type == ACCIDENTAL_WRITTEN_NONE) {
+            type = keyAccid->GetAccid();
+            continue;
+        }
+        if (type != keyAccid->GetAccid()) {
+            m_mixedChildrenAccidType = true;
+            break;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int KeySig::Transpose(FunctorParams *functorParams)
 {

@@ -52,7 +52,9 @@ public:
      */
     ///@{
     Note *GetFirstNote();
+    const Note *GetFirstNote() const;
     Note *GetLastNote();
+    const Note *GetLastNote() const;
     ///@}
 
     /**
@@ -79,14 +81,9 @@ public:
 
 protected:
     /**
-     * Clear the m_clusters vector and delete all the objects.
-     */
-    void ClearClusters();
-
-    /**
      * Filter the flat list and keep only Note elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 public:
     /**

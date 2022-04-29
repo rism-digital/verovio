@@ -72,7 +72,7 @@ public:
     /**
      * Return the maximum staff size in the staffGrp (100 if empty)
      */
-    int GetMaxStaffSize();
+    int GetMaxStaffSize() const;
 
     /**
      * @name Setter and getter of the group symbol
@@ -117,7 +117,7 @@ protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     //

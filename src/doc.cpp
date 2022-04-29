@@ -361,7 +361,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     // track 0 (included by default) is reserved for meta messages common to all tracks
     int midiChannel = 0;
     int midiTrack = 1;
-    ArrayOfComparisons filters;
+    Filters filters;
     for (staves = initProcessingListsParams.m_layerTree.child.begin();
          staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
 
@@ -406,12 +406,12 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         }
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            filters.clear();
+            filters.Clear();
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(STAFF, staves->first);
             AttNIntegerComparison matchLayer(LAYER, layers->first);
-            filters.push_back(&matchStaff);
-            filters.push_back(&matchLayer);
+            filters.Add(&matchStaff);
+            filters.Add(&matchLayer);
 
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
@@ -471,10 +471,14 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
 
 void Doc::PrepareData()
 {
+    /************ Reset and initialization ************/
     if (m_dataPreparationDone) {
         Functor resetData(&Object::ResetData);
         this->Process(&resetData, NULL);
     }
+    Functor prepareDataInitialization(&Object::PrepareDataInitialization);
+    PrepareDataInitializationParams prepareDataInitializationParams(&prepareDataInitialization, this);
+    this->Process(&prepareDataInitialization, &prepareDataInitializationParams);
 
     /************ Store default durations ************/
 
@@ -628,16 +632,16 @@ void Doc::PrepareData()
 
     /************ Resolve some pointers by layer ************/
 
-    ArrayOfComparisons filters;
+    Filters filters;
     for (staves = initProcessingListsParams.m_layerTree.child.begin();
          staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            filters.clear();
+            filters.Clear();
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(STAFF, staves->first);
             AttNIntegerComparison matchLayer(LAYER, layers->first);
-            filters.push_back(&matchStaff);
-            filters.push_back(&matchLayer);
+            filters.Add(&matchStaff);
+            filters.Add(&matchLayer);
 
             PreparePointersByLayerParams preparePointersByLayerParams;
             Functor preparePointersByLayer(&Object::PreparePointersByLayer);
@@ -656,12 +660,12 @@ void Doc::PrepareData()
         for (staves = initProcessingListsParams.m_layerTree.child.begin();
              staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-                filters.clear();
+                filters.Clear();
                 // Create ad comparison object for each type / @n
                 AttNIntegerComparison matchStaff(STAFF, staves->first);
                 AttNIntegerComparison matchLayer(LAYER, layers->first);
-                filters.push_back(&matchStaff);
-                filters.push_back(&matchLayer);
+                filters.Add(&matchStaff);
+                filters.Add(&matchLayer);
 
                 prepareDelayedTurnsParams.m_currentTurn = NULL;
                 prepareDelayedTurnsParams.m_previousElement = NULL;
@@ -679,14 +683,14 @@ void Doc::PrepareData()
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
-                filters.clear();
+                filters.Clear();
                 // Create ad comparison object for each type / @n
                 AttNIntegerComparison matchStaff(STAFF, staves->first);
                 AttNIntegerComparison matchLayer(LAYER, layers->first);
                 AttNIntegerComparison matchVerse(VERSE, verses->first);
-                filters.push_back(&matchStaff);
-                filters.push_back(&matchLayer);
-                filters.push_back(&matchVerse);
+                filters.Add(&matchStaff);
+                filters.Add(&matchLayer);
+                filters.Add(&matchVerse);
 
                 // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
                 // m_drawingLastNote is set only if the syl has a forward connector
@@ -720,12 +724,12 @@ void Doc::PrepareData()
     for (staves = initProcessingListsParams.m_layerTree.child.begin();
          staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            filters.clear();
+            filters.Clear();
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(STAFF, staves->first);
             AttNIntegerComparison matchLayer(LAYER, layers->first);
-            filters.push_back(&matchStaff);
-            filters.push_back(&matchLayer);
+            filters.Add(&matchStaff);
+            filters.Add(&matchLayer);
 
             // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
             PrepareRptParams prepareRptParams(this);
@@ -1318,16 +1322,16 @@ void Doc::ConvertMarkupDoc(bool permanent)
 
         // Process by layer for matching @tie attribute - we process notes and chords, looking at
         // GetTie values and pitch and oct for matching notes
-        ArrayOfComparisons filters;
+        Filters filters;
         for (staves = initProcessingListsParams.m_layerTree.child.begin();
              staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-                filters.clear();
+                filters.Clear();
                 // Create ad comparison object for each type / @n
                 AttNIntegerComparison matchStaff(STAFF, staves->first);
                 AttNIntegerComparison matchLayer(LAYER, layers->first);
-                filters.push_back(&matchStaff);
-                filters.push_back(&matchLayer);
+                filters.Add(&matchStaff);
+                filters.Add(&matchLayer);
 
                 ConvertMarkupAnalyticalParams convertMarkupAnalyticalParams(permanent);
                 Functor convertMarkupAnalytical(&Object::ConvertMarkupAnalytical);

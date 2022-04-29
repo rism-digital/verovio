@@ -658,7 +658,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
 int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
 {
     assert(beamInterface);
-    assert(!beamInterface->m_beamElementCoords.empty());
+    assert(beamInterface->HasCoords());
 
     const Point beamLeft(
         beamInterface->m_beamElementCoords.front()->m_x, beamInterface->m_beamElementCoords.front()->m_yBeam);

@@ -79,32 +79,27 @@ const ArrayOfBeamElementCoords *FTrem::GetElementCoords()
     return &m_beamElementCoords;
 }
 
-void FTrem::FilterList(ArrayOfObjects *childList)
+void FTrem::FilterList(ListOfConstObjects &childList) const
 {
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->Is(NOTE) && !(*iter)->Is(CHORD)) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc.)
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         // also remove notes within chords
         if ((*iter)->Is(NOTE)) {
-            Note *note = vrv_cast<Note *>(*iter);
+            const Note *note = vrv_cast<const Note *>(*iter);
             assert(note);
             if (note->IsChordTone()) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
                 continue;
             }
         }
         ++iter;
     }
-
-    Staff *staff = this->GetAncestorStaff();
-
-    this->InitCoords(childList, staff, BEAMPLACE_NONE);
-    this->InitCue(false);
 }
 
 std::pair<int, int> FTrem::GetAdditionalBeamCount() const
@@ -202,11 +197,21 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    const ArrayOfObjects *fTremChildren = this->GetList(this);
+    const ListOfObjects &fTremChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
-    if (fTremChildren->empty()) {
+    if (fTremChildren.empty()) {
         return FUNCTOR_CONTINUE;
+    }
+
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(layer);
+    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    if (!this->HasCoords()) {
+        this->InitCoords(fTremChildren, staff, BEAMPLACE_NONE);
+        this->InitCue(false);
     }
 
     if (this->GetElementCoords()->size() != 2) {
@@ -215,11 +220,6 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     }
 
     m_beamSegment.InitCoordRefs(this->GetElementCoords());
-
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
-    assert(staff);
 
     m_beamSegment.CalcBeam(layer, staff, params->m_doc, this);
 

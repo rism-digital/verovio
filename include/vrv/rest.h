@@ -158,6 +158,12 @@ private:
     int GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer);
 
     /**
+     * For two layers, top layer shouldn't go below center and lower layer shouldn't go above it. Enforce this by
+     * adding margin that will adjust rest position
+     */
+    int GetMarginLayerLocation(bool isTopLayer, bool restOverlap) const;
+
+    /**
      * Get location of the object on the layer if it's note, chord or ftrem
      */
     std::pair<int, RestAccidental> GetElementLocation(Object *object, Layer *layer, bool isTopLayer) const;

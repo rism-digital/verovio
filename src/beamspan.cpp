@@ -216,7 +216,7 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
     Measure *measure = vrv_cast<Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
 
-    this->InitCoords(&m_beamedElements, staff, this->GetPlace());
+    this->InitCoords(m_beamedElements, staff, this->GetPlace());
 
     m_beamSegments.at(0)->SetMeasure(measure);
     m_beamSegments.at(0)->SetStaff(staff);

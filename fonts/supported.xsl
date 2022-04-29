@@ -2158,9 +2158,9 @@
             <!--<glyph glyph-code="E900" smufl-name="mensuralGclef" />-->
             <glyph glyph-code="E901" smufl-name="mensuralGclefPetrucci" />
             <glyph glyph-code="E902" smufl-name="chantFclef" />
-            <!--<glyph glyph-code="E903" smufl-name="mensuralFclef" />-->
+            <glyph glyph-code="E903" smufl-name="mensuralFclef" />
             <glyph glyph-code="E904" smufl-name="mensuralFclefPetrucci" />
-            <!--<glyph glyph-code="E905" smufl-name="mensuralCclef" />-->
+            <glyph glyph-code="E905" smufl-name="mensuralCclef" />
             <glyph glyph-code="E906" smufl-name="chantCclef" />
             <glyph glyph-code="E907" smufl-name="mensuralCclefPetrucciPosLowest" />
             <glyph glyph-code="E908" smufl-name="mensuralCclefPetrucciPosLow" />
@@ -2960,13 +2960,13 @@
         </miscellaneousSymbols>
         <timeSignaturesSupplement>
             <description>Time signatures supplement</description>
-            <!--<glyph glyph-code="EC80" smufl-name="timeSigBracketLeft" />-->
-            <!--<glyph glyph-code="EC81" smufl-name="timeSigBracketRight" />-->
-            <!--<glyph glyph-code="EC82" smufl-name="timeSigBracketLeftSmall" />-->
-            <!--<glyph glyph-code="EC83" smufl-name="timeSigBracketRightSmall" />-->
-            <!--<glyph glyph-code="EC84" smufl-name="timeSigSlash" />-->
-            <!--<glyph glyph-code="EC85" smufl-name="timeSigCut2" />-->
-            <!--<glyph glyph-code="EC86" smufl-name="timeSigCut3" />-->
+            <glyph glyph-code="EC80" smufl-name="timeSigBracketLeft" />
+            <glyph glyph-code="EC81" smufl-name="timeSigBracketRight" />
+            <glyph glyph-code="EC82" smufl-name="timeSigBracketLeftSmall" />
+            <glyph glyph-code="EC83" smufl-name="timeSigBracketRightSmall" />
+            <glyph glyph-code="EC84" smufl-name="timeSigSlash" />
+            <glyph glyph-code="EC85" smufl-name="timeSigCut2" />
+            <glyph glyph-code="EC86" smufl-name="timeSigCut3" />
             <range_end>U+EC8F</range_end>
             <range_start>U+EC80</range_start>
         </timeSignaturesSupplement>

@@ -194,9 +194,9 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize) override;
-    Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize) override;
-    int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) override;
+    Point GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const override;
+    Point GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const override;
+    int CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const override;
     ///@}
 
     /**
@@ -217,7 +217,7 @@ public:
     /**
      * Check if a note or its parent chord are visible
      */
-    bool IsVisible();
+    bool IsVisible() const;
 
     /**
      * MIDI pitch
