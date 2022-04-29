@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "doc.h"
+#include "elementpart.h"
 #include "floatingobject.h"
 #include "functorparams.h"
 #include "layer.h"
@@ -407,17 +408,20 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
 
+    Flag *flag = vrv_cast<Flag *>(params->m_parent->FindDescendantByType(FLAG));
     // Avoid in artic to be in legder lines
     if (this->GetDrawingPlace() == STAFFREL_above) {
-        yIn = std::max(
-            params->m_parent->GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(),
-            staffYBottom);
+        int yAboveStem
+            = params->m_parent->GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY();
+        if (flag) yAboveStem += flag->GetStemUpSE(params->m_doc, staff->m_drawingStaffSize, false).y;
+        yIn = std::max(yAboveStem, staffYBottom);
         yOut = std::max(yIn, 0);
     }
     else {
-        yIn = std::min(
-            params->m_parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(),
-            0);
+        int yBelowStem = params->m_parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false)
+            - staff->GetDrawingY();
+        if (flag) yBelowStem += flag->GetStemDownNW(params->m_doc, staff->m_drawingStaffSize, false).y;
+        yIn = std::min(yBelowStem, 0);
         if (beam && beam->m_crossStaffContent && beam->m_drawingPlace == BEAMPLACE_mixed) yIn -= beam->m_beamWidth;
         yOut = std::min(yIn, staffYBottom);
     }
