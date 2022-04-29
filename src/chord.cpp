@@ -942,9 +942,6 @@ int Chord::JustifyYAdjustCrossStaff(FunctorParams *functorParams)
 
     if (extremalStaves.size() < 2) return FUNCTOR_CONTINUE;
 
-    const int topStaffN = extremalStaves.begin()->first;
-    const int bottomStaffN = extremalStaves.rbegin()->first;
-
     // Now calculate the shift due to vertical justification
     auto getShift = [params](Staff *staff) {
         StaffAlignment *alignment = staff->GetAlignment();
