@@ -15153,7 +15153,51 @@ bool HumdrumInput::checkIfSlurIsInvisible(hum::HTp stoken, int snumber, hum::HTp
     }
 
     if ((stoken->find("yy") != std::string::npos) && (etoken->find("yy") != std::string::npos)) {
-        return true;
+        bool schord = stoken->isChord();
+        bool echord = etoken->isChord();
+        if (!(schord || echord)) {
+            return true;
+        }
+
+        int scount = stoken->getSubtokenCount();
+        int ecount = stoken->getSubtokenCount();
+
+        int syycount = 0;
+        int eyycount = 0;
+
+        if (scount == 1) {
+            if (stoken->find("yy") != std::string::npos) {
+                syycount = 1;
+            }
+            else {
+                for (int i = 1; i < (int)stoken->size(); i++) {
+                    if ((stoken->at(i) == 'y') && (stoken->at(i - 1) == 'y')) {
+                        syycount++;
+                        i++;
+                    }
+                }
+            }
+        }
+
+        if (ecount == 1) {
+            if (etoken->find("yy") != std::string::npos) {
+                eyycount = 1;
+            }
+            else {
+                for (int i = 1; i < (int)etoken->size(); i++) {
+                    if ((etoken->at(i) == 'y') && (etoken->at(i - 1) == 'y')) {
+                        eyycount++;
+                        i++;
+                    }
+                }
+            }
+        }
+
+        if ((scount == syycount) && (ecount == eyycount)) {
+            // all notes in both chords are invisible so do not
+            // show the slur connecting them.
+            return true;
+        }
     }
 
     return false;

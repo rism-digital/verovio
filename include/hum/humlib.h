@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Apr 28 21:23:22 PDT 2022
+// Last Modified: Fri Apr 29 10:14:27 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -8621,6 +8621,7 @@ class Tool_peak : public HumTool {
 		bool m_rawQ             = false;         // don't print score (only analysis)
 		bool m_peakQ            = false;         // analyze only peaks
 		bool m_npeakQ           = false;         // analyze only negative peaks (troughs)
+		bool m_nsyncoQ          = false;         // analyze peaks without syncopation
 		std::string m_marker    = "@";           // marker to label peak notes in score
 		std::string m_color     = "red";         // color to mark peak notes
 		double      m_smallRest = 4.0;           // Ignore rests that are 1 whole note or less
