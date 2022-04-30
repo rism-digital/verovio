@@ -16853,7 +16853,7 @@ void HumdrumInput::insertBeamSpan(hum::HTp token)
     }
     bool hangingQ = token->getValueBool("auto", "hangingBeam");
     if (hangingQ) {
-        // Not dealing with haning beams for now.
+        // Not dealing with hanging beams for now.
         // See https://github.com/rism-digital/verovio/issues/2786
         return;
     }
@@ -16877,14 +16877,55 @@ void HumdrumInput::insertBeamSpan(hum::HTp token)
 
     beamspan->SetStartid("#" + startid);
     beamspan->SetEndid("#" + endid);
-    addChildMeasureOrSection(beamspan);
 
-    // Could add a list of all intervening notes in the beamSpan:
-    // std::string plistids;
-    // for (int i = (int)plist.size() - 1; i >= 0; --i) {
-    //     std::string idvalue = getDataTokenId(plist[i]);
-    //     beamspan->AddRef("#" + idvalue);
-    // }
+    setBeamSpanPlist(beamspan, token, etok);
+
+    addChildMeasureOrSection(beamspan);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setBeamSpanPlist -- Not fully generalized (higher layer number
+//    to lower one is allowed but not the other way around).  Cross-staff needs
+//    to be handled separatly, probably by marking individual notes in beamSpan.
+//
+
+void HumdrumInput::setBeamSpanPlist(BeamSpan *beamspan, hum::HTp starttok, hum::HTp endtok)
+{
+    std::vector<hum::HTp> tokens;
+    hum::HTp current = starttok;
+    if (current) {
+        tokens.push_back(current);
+    }
+    int endline = endtok->getLineIndex();
+
+    current = current->getNextToken();
+    while (current) {
+        if (current == endtok) {
+            tokens.push_back(current);
+            break;
+        }
+        int cline = current->getLineIndex();
+        if (cline > endline) {
+            // Something bad happened
+            break;
+        }
+        if (!current->isData()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->isNull()) {
+            current = current->getNextToken();
+            continue;
+        }
+        tokens.push_back(current);
+        current = current->getNextToken();
+    }
+
+    for (int i = 0; i < (int)tokens.size(); i++) {
+        std::string idvalue = getDataTokenId(tokens[i]);
+        beamspan->AddRef("#" + idvalue);
+    }
 }
 
 //////////////////////////////

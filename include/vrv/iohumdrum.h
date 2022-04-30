@@ -17,6 +17,7 @@
 
 #include "accid.h"
 #include "attdef.h"
+#include "beamspan.h"
 #include "beatrpt.h"
 #include "clef.h"
 #include "dir.h"
@@ -764,6 +765,7 @@ protected:
     bool isTacet(hum::HTp spinestart);
     void storeBeamSpansInStartingMeasure();
     hum::HTp getNextNonNullDataOrMeasureToken(hum::HTp tok);
+    void setBeamSpanPlist(BeamSpan *beamspan, hum::HTp starttok, hum::HTp etok);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
