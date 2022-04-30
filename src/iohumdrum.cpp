@@ -13537,31 +13537,59 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 justification = 1;
             }
 
-            bool editorial = false;
+            bool editQ = false;
+            bool brackQ = false;
+            bool parenQ = false;
+            bool curlyQ = false;
+            bool angleQ = false;
+
             std::string editstr = getLayoutParameter(dyntok, "DY", "ed", "true");
-            if (!editstr.empty()) {
-                editorial = true;
-                std::string newdynamic;
-                if (editstr.find("brack") != std::string::npos) {
-                    newdynamic = "[ ";
-                    newdynamic += dynamic;
-                    newdynamic += " ]";
-                    dynamic = newdynamic;
+            if (editstr == "true") {
+                editQ = true;
+            }
+            if (editstr.find("brack") != std::string::npos) {
+                brackQ = true;
+                editQ = true;
+            }
+            else if (editstr.find("paren") != std::string::npos) {
+                parenQ = true;
+                editQ = true;
+            }
+            else if (editstr.find("curly") != std::string::npos) {
+                curlyQ = true;
+                std::string newdynamic = "{ ";
+                newdynamic += dynamic;
+                newdynamic += " }";
+                dynamic = newdynamic;
+            }
+            else if (editstr.find("angle") != std::string::npos) {
+                angleQ = true;
+                std::string newdynamic = "< ";
+                newdynamic += dynamic;
+                newdynamic += " >";
+                dynamic = newdynamic;
+            }
+            if (!(parenQ || brackQ || curlyQ || angleQ)) {
+                std::string parenP = getLayoutParameter(dyntok, "DY", "paren", "true");
+                std::string brackP = getLayoutParameter(dyntok, "DY", "brack", "true");
+                std::string curlyP = getLayoutParameter(dyntok, "DY", "curly", "true");
+                std::string angleP = getLayoutParameter(dyntok, "DY", "angle", "true");
+                if (parenP == "true") {
+                    parenQ = true;
                 }
-                else if (editstr.find("paren") != std::string::npos) {
-                    newdynamic = "( ";
-                    newdynamic += dynamic;
-                    newdynamic += " )";
-                    dynamic = newdynamic;
+                else if (brackP == "true") {
+                    brackQ = true;
                 }
-                else if (editstr.find("curly") != std::string::npos) {
-                    newdynamic = "{ ";
+                else if (curlyP == "true") {
+                    curlyQ = true;
+                    std::string newdynamic = "{ ";
                     newdynamic += dynamic;
                     newdynamic += " }";
                     dynamic = newdynamic;
                 }
-                else if (editstr.find("angle") != std::string::npos) {
-                    newdynamic = "< ";
+                else if (angleP == "true") {
+                    angleQ = true;
+                    std::string newdynamic = "< ";
                     newdynamic += dynamic;
                     newdynamic += " >";
                     dynamic = newdynamic;
@@ -13572,7 +13600,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             int needsrend = justification || dcolor.size();
 
             Dynam *dynam = new Dynam();
-            if (editorial) {
+            if (editQ) {
                 Supplied *supplied = new Supplied();
                 appendElement(supplied, dynam);
                 addChildMeasureOrSection(supplied);
@@ -13581,7 +13609,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             else {
                 addChildMeasureOrSection(dynam);
             }
-            //              staffadj = ss[staffindex].m_dynamstaffadj;
+
+            if (parenQ) {
+                dynam->SetEnclose(ENCLOSURE_paren);
+            }
+            if (brackQ) {
+                dynam->SetEnclose(ENCLOSURE_brack);
+            }
+
             int newstaff = m_currentstaff - staffadj;
             if (newstaff < 1) {
                 newstaff = 1;
