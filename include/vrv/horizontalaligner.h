@@ -339,7 +339,7 @@ public:
     /**
      * Return true if the reference has elements from cross-staff.
      */
-    bool HasCrossStaffElements();
+    bool HasCrossStaffElements() const;
 
     /**
      * Set whether accidentals should be aligned with all elements of alignmentReference or elements from same layer
