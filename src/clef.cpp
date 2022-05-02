@@ -263,7 +263,7 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
     std::vector<int> ns;
     // -1 for barline attributes that need to be taken into account each time
     ns.push_back(BARLINE_REFERENCES);
-    ns.push_back(m_crossStaff? m_crossStaff->GetN() : staff->GetN());
+    ns.push_back(m_crossStaff ? m_crossStaff->GetN() : staff->GetN());
     AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
 
     // Look if we have a grace aligner just after the clef.
