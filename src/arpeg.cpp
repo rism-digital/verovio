@@ -76,7 +76,7 @@ int Arpeg::GetDrawingX() const
     return measure->GetDrawingX() + this->GetDrawingXRel();
 }
 
-bool Arpeg::IsValidRef(Object *ref) const
+bool Arpeg::IsValidRef(const Object *ref) const
 {
     if (!ref->Is({ CHORD, NOTE })) {
         LogWarning(
@@ -102,26 +102,34 @@ void Arpeg::SetDrawingXRel(int drawingXRel)
 
 std::set<Note *> Arpeg::GetNotes()
 {
-    std::set<Note *> notes;
-    auto extractNotes = [&notes](Object *object) {
+    std::set<Note *> result;
+    std::set<const Note *> notes = std::as_const(*this).GetNotes();
+    std::for_each(notes.begin(), notes.end(), [&result](const Note *note) { result.insert(const_cast<Note *>(note)); });
+    return result;
+}
+
+std::set<const Note *> Arpeg::GetNotes() const
+{
+    std::set<const Note *> notes;
+    auto extractNotes = [&notes](const Object *object) {
         if (!object) return;
         if (object->Is(NOTE)) {
-            Note *note = vrv_cast<Note *>(object);
+            const Note *note = vrv_cast<const Note *>(object);
             assert(note);
             notes.insert(note);
         }
         else if (object->Is(CHORD)) {
-            Chord *chord = vrv_cast<Chord *>(object);
-            const ListOfObjects &childList = chord->GetList(chord);
-            for (Object *child : childList) {
-                Note *note = vrv_cast<Note *>(child);
+            const Chord *chord = vrv_cast<const Chord *>(object);
+            const ListOfConstObjects &childList = chord->GetList(chord);
+            for (const Object *child : childList) {
+                const Note *note = vrv_cast<const Note *>(child);
                 assert(note);
                 notes.insert(note);
             }
         }
     };
     extractNotes(this->GetStart());
-    std::for_each(this->GetRefs()->begin(), this->GetRefs()->end(), extractNotes);
+    std::for_each(this->GetRefs().begin(), this->GetRefs().end(), extractNotes);
     return notes;
 }
 
@@ -146,21 +154,26 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
 
 Staff *Arpeg::GetCrossStaff()
 {
-    const ArrayOfObjects *refs = this->GetRefs();
-    if (refs->empty()) return NULL;
+    return const_cast<Staff *>(std::as_const(*this).GetCrossStaff());
+}
+
+const Staff *Arpeg::GetCrossStaff() const
+{
+    const ArrayOfConstObjects &refs = this->GetRefs();
+    if (refs.empty()) return NULL;
 
     // Find if there is at least one element that is not cross staff
-    auto iter = std::find_if(refs->begin(), refs->end(), [](Object *obj) {
-        LayerElement *element = vrv_cast<LayerElement *>(obj);
+    auto iter = std::find_if(refs.begin(), refs.end(), [](const Object *obj) {
+        const LayerElement *element = vrv_cast<const LayerElement *>(obj);
         assert(element);
         return !element->m_crossStaff;
     });
 
     // If that's the case - return NULL, we can base arpeggio location on the original staff
-    if (iter != refs->end()) return NULL;
+    if (iter != refs.end()) return NULL;
 
     // Otherwise return cross staff of the front element from the references
-    LayerElement *front = vrv_cast<LayerElement *>(refs->front());
+    const LayerElement *front = vrv_cast<const LayerElement *>(refs.front());
     assert(front);
     return front->m_crossStaff;
 }

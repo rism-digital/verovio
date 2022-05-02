@@ -1769,7 +1769,7 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
     if (this->HasInterface(INTERFACE_PLIST)) {
         PlistInterface *interface = this->GetPlistInterface();
         assert(interface);
-        for (auto &object : *interface->GetRefs()) {
+        for (auto &object : interface->GetRefs()) {
             params->m_elements->push_back(object);
         }
     }
