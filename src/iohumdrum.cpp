@@ -23929,6 +23929,18 @@ void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
     else if (endbar.find("-") != std::string::npos) {
         m_measure->SetRight(BARRENDITION_invis);
     }
+    else if (endbar.find("::") != std::string::npos) {
+        m_measure->SetRight(BARRENDITION_dbldashed);
+    }
+    else if (endbar.find(":") != std::string::npos) {
+        m_measure->SetRight(BARRENDITION_dashed);
+    }
+    else if (endbar.find("..") != std::string::npos) {
+        m_measure->SetRight(BARRENDITION_dbldotted);
+    }
+    else if (endbar.find(".") != std::string::npos) {
+        m_measure->SetRight(BARRENDITION_dotted);
+    }
 }
 
 //////////////////////////////
