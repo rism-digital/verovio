@@ -1,7 +1,5 @@
 import argparse
-import json
 import os
-import sys
 
 import diffimg
 import lxml.etree as etree
