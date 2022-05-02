@@ -255,6 +255,12 @@ const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *opt
     return vrvToolkit_renderToSVG(tk, 1, options);
 }
 
+void vrvToolkit_resetOptions(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->ResetOptions();
+}
+
 void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
