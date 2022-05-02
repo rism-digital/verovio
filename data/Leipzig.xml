@@ -204,20 +204,20 @@
   <g c="E06A" x="0.0" y="-396.0" w="257.0" h="791.0" h-a-x="257" n="unpitchedPercussionClef2"/>
   <g c="E902" x="-189.0" y="-268.0" w="370.0" h="470.0" h-a-x="181" n="chantFclef"/>
   <g c="E906" x="-1.0" y="-202.0" w="182.0" h="404.0" h-a-x="181" n="chantCclef"/>
-  <g c="E4A2" x="0.0" y="0.0" w="95.0" h="94.0" h-a-x="96" n="articStaccatoAbove"/>
-  <g c="E4A3" x="0.0" y="-94.0" w="95.0" h="94.0" h-a-x="96" n="articStaccatoBelow"/>
+  <g c="E4A2" x="0.0" y="0.0" w="96.0" h="96.0" h-a-x="96" n="articStaccatoAbove"/>
+  <g c="E4A3" x="0.0" y="-96.0" w="96.0" h="96.0" h-a-x="96" n="articStaccatoBelow"/>
   <g c="E4A4" x="0.0" y="0.0" w="346.0" h="36.0" h-a-x="346" n="articTenutoAbove"/>
   <g c="E4A5" x="0.0" y="-36.0" w="346.0" h="36.0" h-a-x="346" n="articTenutoBelow"/>
   <g c="E4A6" x="0.0" y="0.0" w="110.54" h="244.0" h-a-x="110" n="articStaccatissimoAbove"/>
   <g c="E4A7" x="0.0" y="-244.0" w="110.54" h="244.0" h-a-x="110" n="articStaccatissimoBelow"/>
   <g c="E4AE" x="0.0" y="0.0" w="273.0" h="375.0" h-a-x="274" n="articMarcatoStaccatoAbove"/>
   <g c="E4AF" x="1.0" y="-375.0" w="273.0" h="375.0" h-a-x="274" n="articMarcatoStaccatoBelow"/>
-  <g c="E4B0" x="0.0" y="0.0" w="347.0" h="346.0" h-a-x="347" n="articAccentStaccatoAbove"/>
-  <g c="E4B1" x="0.0" y="-346.0" w="347.0" h="346.0" h-a-x="347" n="articAccentStaccatoBelow"/>
-  <g c="E4B2" x="0.0" y="0.0" w="347.0" h="173.0" h-a-x="347" n="articTenutoStaccatoAbove"/>
-  <g c="E4B3" x="0.0" y="-173.0" w="347.0" h="173.0" h-a-x="347" n="articTenutoStaccatoBelow"/>
-  <g c="E4B4" x="0.0" y="0.0" w="347.0" h="308.0" h-a-x="347" n="articTenutoAccentAbove"/>
-  <g c="E4B5" x="0.0" y="-308.0" w="347.0" h="308.0" h-a-x="347" n="articTenutoAccentBelow"/>
+  <g c="E4B0" x="0.0" y="0.0" w="346.0" h="346.0" h-a-x="346" n="articAccentStaccatoAbove"/>
+  <g c="E4B1" x="0.0" y="-346.0" w="346.0" h="346.0" h-a-x="346" n="articAccentStaccatoBelow"/>
+  <g c="E4B2" x="0.0" y="0.0" w="346.0" h="173.0" h-a-x="346" n="articTenutoStaccatoAbove"/>
+  <g c="E4B3" x="0.0" y="-173.0" w="346.0" h="173.0" h-a-x="346" n="articTenutoStaccatoBelow"/>
+  <g c="E4B4" x="0.0" y="0.0" w="346.0" h="308.0" h-a-x="346" n="articTenutoAccentAbove"/>
+  <g c="E4B5" x="0.0" y="-308.0" w="346.0" h="308.0" h-a-x="346" n="articTenutoAccentBelow"/>
   <g c="E4B6" x="0.0" y="0.0" w="195.86" h="194.52" h-a-x="196" n="articStressAbove"/>
   <g c="E4B7" x="0.0" y="-194.52" w="195.86" h="194.52" h-a-x="196" n="articStressBelow"/>
   <g c="E4B8" x="0.0" y="0.0" w="270.0" h="167.0" h-a-x="270" n="articUnstressAbove"/>
@@ -590,4 +590,8 @@
   <g c="EC82" x="0.0" y="-340.0" w="120.0" h="680.0" h-a-x="120" n="timeSigBracketLeftSmall"/>
   <g c="EC83" x="-1.0" y="-340.0" w="121.0" h="680.0" h-a-x="120" n="timeSigBracketRightSmall"/>
   <g c="EC84" x="0.0" y="-518.0" w="354.0" h="1036.0" h-a-x="354" n="timeSigSlash"/>
+  <g c="E22E" x="0.0" y="0.0" w="246.0" h="96.0" h-a-x="246" n="tremoloDivisiDots2"/>
+  <g c="E22F" x="0.0" y="0.0" w="396.0" h="96.0" h-a-x="396" n="tremoloDivisiDots3"/>
+  <g c="E230" x="0.0" y="0.0" w="546.0" h="96.0" h-a-x="546" n="tremoloDivisiDots4"/>
+  <g c="E231" x="0.0" y="0.0" w="396.0" h="246.0" h-a-x="396" n="tremoloDivisiDots6"/>
 </bounding-boxes>
