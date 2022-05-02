@@ -251,7 +251,7 @@ int Layer::GetClefLocOffset(LayerElement *test)
     return clef->GetClefLocOffset();
 }
 
-int Layer::GetCrossStaffClefLocOffset(LayerElement* element, int currentOffset) 
+int Layer::GetCrossStaffClefLocOffset(LayerElement *element, int currentOffset)
 {
     if (element->m_crossStaff) {
         ResetList(this);
