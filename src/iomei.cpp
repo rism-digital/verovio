@@ -2135,6 +2135,8 @@ void MEIOutput::WriteBTrem(pugi::xml_node currentNode, BTrem *bTrem)
 
     this->WriteLayerElement(currentNode, bTrem);
     bTrem->WriteBTremLog(currentNode);
+    bTrem->WriteNumbered(currentNode);
+    bTrem->WriteNumberPlacement(currentNode);
     bTrem->WriteTremMeasured(currentNode);
 }
 
@@ -5799,6 +5801,8 @@ bool MEIInput::ReadBTrem(Object *parent, pugi::xml_node bTrem)
     this->ReadLayerElement(bTrem, vrvBTrem);
 
     vrvBTrem->ReadBTremLog(bTrem);
+    vrvBTrem->ReadNumbered(bTrem);
+    vrvBTrem->ReadNumberPlacement(bTrem);
     vrvBTrem->ReadTremMeasured(bTrem);
 
     parent->AddChild(vrvBTrem);
