@@ -88,6 +88,7 @@ if __name__ == '__main__':
             name, ext = os.path.splitext(item2)
             svgFile = os.path.join(path2, item1, name + '.svg')
             pngFile = os.path.join(path2, item1, name + '.png')
+            timeMapFile = os.path.join(path2, item1, name + '.json')
 
             # parse the MEI file
             if ext == '.mei':
@@ -102,6 +103,7 @@ if __name__ == '__main__':
 
             tk.setOptions(json.dumps(options))
             tk.loadFile(inputFile)
+            tk.renderToTimemapFile(timeMapFile)
             svgString = tk.renderToSVG(1)
             svgString = svgString.replace(
                 "overflow=\"inherit\"", "overflow=\"visible\"")
