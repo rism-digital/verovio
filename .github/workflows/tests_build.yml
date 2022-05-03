@@ -64,7 +64,7 @@ jobs:
           ls -alh ${{ env.OUTPUT_DIR }}
           sudo apt-get install openresolv wireguard
           sudo echo "${{ secrets.VPN_CONFIGURATION }}" > wg0.conf
-          python3 -m pip install diffimg lxml xmldiff cairosvg
+          python3 -m pip install diffimg jsondiff lxml xmldiff cairosvg
 
       - name: Checkout the dev branch
         uses: actions/checkout@v2
