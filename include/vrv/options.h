@@ -553,11 +553,11 @@ public:
 
     const MapOfStrOptions *GetItems() const { return &m_items; }
 
-    std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
+    const std::vector<OptionGrp *> *GetGrps() const { return &m_grps; }
 
     jsonxx::Object GetBaseOptGrp();
 
-    const std::vector<Option *> *GetBaseOptions();
+    const std::vector<Option *> *GetBaseOptions() const;
 
     // post processing of parameters
     void Sync();

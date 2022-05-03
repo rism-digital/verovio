@@ -960,7 +960,7 @@ std::string Toolkit::GetAvailableOptions() const
 
     grps << "0-base" << m_options->GetBaseOptGrp();
 
-    std::vector<OptionGrp *> *optionGrps = m_options->GetGrps();
+    const std::vector<OptionGrp *> *optionGrps = m_options->GetGrps();
     for (auto const &optionGrp : *optionGrps) {
 
         jsonxx::Object grp;

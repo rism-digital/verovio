@@ -1826,7 +1826,7 @@ jsonxx::Object Options::GetBaseOptGrp()
     return grpBase;
 }
 
-const std::vector<Option *> *Options::GetBaseOptions()
+const std::vector<Option *> *Options::GetBaseOptions() const
 {
     return m_baseOptions.GetOptions();
 }
