@@ -1700,28 +1700,29 @@ using MIDIChordSequence = std::list<MIDIChord>;
  * member 8: deferred notes which start slightly later
  * member 9: grace note sequence
  * member 10: flag indicating whether the last grace note/chord was accented
- * member 11: the functor
- * member 12: Tablature held notes indexed by (course - 1)
+ * member 11: flag indicating whether cue notes should be included
+ * member 12: the functor
+ * member 13: Tablature held notes indexed by (course - 1)
  **/
 
 class GenerateMIDIParams : public FunctorParams {
 public:
-    GenerateMIDIParams(Doc *doc, smf::MidiFile *midiFile, Functor *functor)
+    GenerateMIDIParams(smf::MidiFile *midiFile, Functor *functor)
     {
         m_midiFile = midiFile;
-        m_midiChannel = 0;
         m_midiTrack = 1;
+        m_midiChannel = 0;
         m_totalTime = 0.0;
         m_transSemi = 0;
         m_currentTempo = MIDI_TEMPO;
         m_lastNote = NULL;
         m_accentedGraceNote = false;
+        m_cueExclusion = false;
         m_functor = functor;
-        m_doc = doc;
     }
     smf::MidiFile *m_midiFile;
-    int m_midiChannel;
     int m_midiTrack;
+    int m_midiChannel;
     double m_totalTime;
     int m_transSemi;
     double m_currentTempo;
@@ -1730,9 +1731,9 @@ public:
     std::map<Note *, double> m_deferredNotes;
     MIDIChordSequence m_graceNotes;
     bool m_accentedGraceNote;
+    bool m_cueExclusion;
     Functor *m_functor;
     std::vector<MIDIHeldNote> m_heldNotes;
-    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1743,8 +1744,9 @@ public:
  * member 0: Score time from the start of the piece to previous barline in quarter notes
  * member 1: Real time from the start of the piece to previous barline in ms
  * member 2: Currently active tempo
- * member 3: A pointer to the Timemap
- * member 4: The functor for redirection
+ * member 3: flag indicating whether cue notes should be included
+ * member 4: a pointer to the Timemap
+ * member 5: the functor for redirection
  **/
 
 class GenerateTimemapParams : public FunctorParams {
@@ -1754,12 +1756,14 @@ public:
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;
         m_currentTempo = MIDI_TEMPO;
+        m_cueExclusion = false;
         m_timemap = timemap;
         m_functor = functor;
     }
     double m_scoreTimeOffset;
     double m_realTimeOffsetMilliseconds;
     double m_currentTempo;
+    bool m_cueExclusion;
     Timemap *m_timemap;
     Functor *m_functor;
 };
