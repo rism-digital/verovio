@@ -273,7 +273,7 @@ int main(int argc, char **argv)
     vrv::Options *options = toolkit.GetOptions();
     const vrv::MapOfStrOptions *params = options->GetItems();
     int mapSize = (int)params->size();
-    
+
     if (argc < 2) {
         std::cerr << "Expected one input file but found none." << std::endl << std::endl;
         display_usage(options, "");

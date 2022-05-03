@@ -974,7 +974,7 @@ Options::Options()
     m_expand.SetInfo("Expand expansion", "Expand all referenced elements in the expansion <xml:id>");
     m_expand.Init("");
     this->Register(&m_expand, "expand", &m_general);
-    
+
     m_footer.SetInfo("Footer", "Control footer layout");
     m_footer.Init(FOOTER_auto, &Option::s_footer);
     this->Register(&m_footer, "footer", &m_general);
@@ -1669,7 +1669,7 @@ Options::Options()
     m_topMarginPgFooter.SetInfo("Top margin footer", "The margin for footer in MEI units");
     m_topMarginPgFooter.Init(2.0, 0.0, 24.0);
     this->Register(&m_topMarginPgFooter, "topMarginPgFooter", &m_elementMargins);
-    
+
     /********* midi *********/
 
     m_midi.SetLabel("Midi options", "5-midi");
