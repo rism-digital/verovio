@@ -250,10 +250,6 @@ public:
     void SetRequestedSpaceBelow(int space);
     int GetRequestedSpaceBelow() const { return m_requestedSpaceBelow; }
     int GetStaffHeight() const { return m_staffHeight; }
-    void SetOverflowBBoxAbove(BoundingBox *bboxAbove, int overflowAbove);
-    BoundingBox *GetOverflowBBoxAbove() const { return m_overflowBBoxAbove; }
-    void SetOverflowBBoxBelow(BoundingBox *bboxBelow, int overflowBottom);
-    BoundingBox *GetOverflowBBoxBelow() const { return m_overflowBBoxBelow; }
     void SetScoreDefClefOverflowAbove(int overflowAbove) { m_scoreDefClefOverflowAbove = overflowAbove; }
     int GetScoreDefClefOverflowAbove() const { return m_scoreDefClefOverflowAbove; }
     void SetScoreDefClefOverflowBelow(int overflowBelow) { m_scoreDefClefOverflowBelow = overflowBelow; }
@@ -407,8 +403,6 @@ private:
     int m_requestedSpaceAbove;
     int m_requestedSpaceBelow;
     int m_staffHeight;
-    BoundingBox *m_overflowBBoxAbove;
-    BoundingBox *m_overflowBBoxBelow;
     int m_scoreDefClefOverflowAbove;
     int m_scoreDefClefOverflowBelow;
     ///@}

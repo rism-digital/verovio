@@ -261,8 +261,6 @@ StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
     m_overlap = 0;
     m_requestedSpaceAbove = 0;
     m_requestedSpaceBelow = 0;
-    m_overflowBBoxAbove = NULL;
-    m_overflowBBoxBelow = NULL;
     m_scoreDefClefOverflowAbove = 0;
     m_scoreDefClefOverflowBelow = 0;
 }
@@ -347,13 +345,6 @@ void StaffAlignment::SetOverflowAbove(int overflowAbove)
     }
 }
 
-void StaffAlignment::SetOverflowBBoxAbove(BoundingBox *bboxAbove, int overflowAbove)
-{
-    if (overflowAbove > m_overflowAbove) {
-        m_overflowBBoxAbove = bboxAbove;
-    }
-}
-
 void StaffAlignment::SetRequestedSpaceAbove(int space)
 {
     if (space > m_requestedSpaceAbove) {
@@ -372,13 +363,6 @@ void StaffAlignment::SetOverflowBelow(int overflowBottom)
 {
     if (overflowBottom > m_overflowBelow) {
         m_overflowBelow = overflowBottom;
-    }
-}
-
-void StaffAlignment::SetOverflowBBoxBelow(BoundingBox *bboxBelow, int overflowBottom)
-{
-    if (overflowBottom > m_overflowBelow) {
-        m_overflowBBoxBelow = bboxBelow;
     }
 }
 
@@ -565,15 +549,6 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
 
     if (const int adjust = prevAlignment->GetBeamAdjust()) {
         overflowSum += adjust;
-    }
-
-    BoundingBox *previous = prevAlignment->GetOverflowBBoxBelow();
-    BoundingBox *current = this->GetOverflowBBoxAbove();
-    if (previous && current) {
-        if ((current->Is(ARTIC) && previous->Is(ARTIC)) || (previous->Is(ARTIC) && current->Is(NOTE))
-            || (current->Is(ARTIC) && previous->Is(NOTE))) {
-            if (current->HorizontalContentOverlap(previous)) overflowSum += unit;
-        }
     }
 
     return overflowSum;
@@ -1145,11 +1120,15 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
                 // calculate the vertical overlap and see if this is more than the expected space
                 int overflowBelow = params->m_previous->CalcOverflowBelow(*iter);
                 int overflowAbove = this->CalcOverflowAbove(*i);
-                if (spacing < (overflowBelow + overflowAbove)) {
-                    // LogDebug("Overlap %d", (overflowBelow + overflowAbove) - spacing);
-                    this->SetOverlap((overflowBelow + overflowAbove) - spacing);
+                int minSpaceBetween = 0;
+                if (((*iter)->Is(ARTIC) && ((*i)->Is({ ARTIC, NOTE }))) || ((*iter)->Is(NOTE) && ((*i)->Is(ARTIC)))) {
+                    minSpaceBetween = drawingUnit;
                 }
-                i++;
+                if (spacing < (overflowBelow + overflowAbove + minSpaceBetween)) {
+                    // LogDebug("Overlap %d", (overflowBelow + overflowAbove + minSpaceBetween) - spacing);
+                    this->SetOverlap((overflowBelow + overflowAbove + minSpaceBetween) - spacing);
+                }
+                ++i;
             }
         }
     }
