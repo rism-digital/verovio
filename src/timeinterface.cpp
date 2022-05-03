@@ -83,11 +83,16 @@ void TimePointInterface::SetUuidStr()
 
 Measure *TimePointInterface::GetStartMeasure()
 {
-    if (!m_start) return NULL;
-    return dynamic_cast<Measure *>(m_start->GetFirstAncestor(MEASURE));
+    return const_cast<Measure *>(std::as_const(*this).GetStartMeasure());
 }
 
-bool TimePointInterface::IsOnStaff(int n)
+const Measure *TimePointInterface::GetStartMeasure() const
+{
+    if (!m_start) return NULL;
+    return vrv_cast<const Measure *>(m_start->GetFirstAncestor(MEASURE));
+}
+
+bool TimePointInterface::IsOnStaff(int n) const
 {
     if (this->HasStaff()) {
         std::vector<int> staffList = this->GetStaff();
@@ -98,7 +103,7 @@ bool TimePointInterface::IsOnStaff(int n)
         return false;
     }
     else if (m_start) {
-        Staff *staff = m_start->GetAncestorStaff(ANCESTOR_ONLY, false);
+        const Staff *staff = m_start->GetAncestorStaff(ANCESTOR_ONLY, false);
         if (staff && (staff->GetN() == n)) return true;
     }
     return false;
@@ -161,7 +166,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
     return staves;
 }
 
-bool TimePointInterface::VerifyMeasure(const Object *owner)
+bool TimePointInterface::VerifyMeasure(const Object *owner) const
 {
     assert(owner);
     if (m_start && (owner->GetFirstAncestor(MEASURE) != this->GetStartMeasure())) {

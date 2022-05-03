@@ -68,13 +68,16 @@ public:
     /**
      * Return the start measure of the TimePointInterface
      */
+    ///@{
     Measure *GetStartMeasure();
+    const Measure *GetStartMeasure() const;
+    ///@}
 
     /**
      * Return true if the TimePointInterface occurs on the staff @n
      * Looks that the parent staff if the using @stardid or at the @staff values.
      */
-    bool IsOnStaff(int n);
+    bool IsOnStaff(int n) const;
 
     /**
      * Return a vector of staves looking at the @staff attribute or at the parent staff or the @startid
@@ -85,7 +88,7 @@ public:
      * Return true if the interface owner is encoded in the measure of its start element
      * Display a warning if not
      */
-    bool VerifyMeasure(const Object *owner);
+    bool VerifyMeasure(const Object *owner) const;
 
     //-----------------//
     // Pseudo functors //
