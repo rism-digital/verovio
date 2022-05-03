@@ -74,6 +74,8 @@ enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDI
 // Option
 //----------------------------------------------------------------------------
 
+enum class OptionsCategory { None, Base, General, Layout, Margins, Midi, Selectors, Full };
+
 /**
  * This class is a base class of each styling parameter
  */
@@ -517,6 +519,9 @@ public:
     std::string GetLabel() const { return m_label; }
     std::string GetId() const { return m_id; }
 
+    void SetCategory(OptionsCategory category) { m_category = category; }
+    OptionsCategory GetCategory() const { return m_category; }
+
     void AddOption(Option *option) { m_options.push_back(option); }
 
     const std::vector<Option *> *GetOptions() const { return &m_options; }
@@ -527,6 +532,7 @@ protected:
     std::string m_id;
     std::string m_label;
     std::vector<Option *> m_options;
+    OptionsCategory m_category = OptionsCategory::None;
 };
 
 //----------------------------------------------------------------------------
@@ -593,17 +599,15 @@ public:
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionString m_expand;
+    OptionIntMap m_footer;
+    OptionIntMap m_header;
     OptionBool m_humType;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
     OptionBool m_ligatureAsBracket;
     OptionBool m_mensuralToMeasure;
-    OptionBool m_midiNoCue;
-    OptionDbl m_midiTempoAdjustment;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
-    OptionIntMap m_footer;
-    OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
     OptionBool m_outputFormatRaw;
@@ -647,11 +651,11 @@ public:
     OptionInt m_beamMinSlope;
     OptionBool m_beamFrenchStyle;
     OptionDbl m_bracketThickness;
-    OptionDbl m_dynamDist;
+    OptionBool m_breaksNoWidow;
     OptionDbl m_clefChangeFactor;
+    OptionDbl m_dynamDist;
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;
-    OptionBool m_breaksNoWidow;
     OptionDbl m_fingeringScale;
     OptionString m_font;
     OptionDbl m_graceFactor;
@@ -685,9 +689,9 @@ public:
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionDbl m_slurCurveFactor;
+    OptionDbl m_slurEndpointThickness;
     OptionDbl m_slurMargin;
     OptionInt m_slurMaxSlope;
-    OptionDbl m_slurEndpointThickness;
     OptionDbl m_slurMidpointThickness;
     OptionInt m_spacingBraceGroup;
     OptionInt m_spacingBracketGroup;
@@ -776,6 +780,14 @@ public:
     OptionDbl m_topMarginArtic;
     OptionDbl m_topMarginHarm;
     OptionDbl m_topMarginPgFooter;
+    
+    /**
+     * Midi
+     */
+    OptionGrp m_midi;
+
+    OptionBool m_midiNoCue;
+    OptionDbl m_midiTempoAdjustment;
 
     /**
      * Deprecated options
