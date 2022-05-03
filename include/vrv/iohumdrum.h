@@ -766,6 +766,7 @@ protected:
     void storeBeamSpansInStartingMeasure();
     hum::HTp getNextNonNullDataOrMeasureToken(hum::HTp tok);
     void setBeamSpanPlist(BeamSpan *beamspan, hum::HTp starttok, hum::HTp etok);
+    void checkMeterSigParameters(MeterSig *msig, hum::HTp timesigtok);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

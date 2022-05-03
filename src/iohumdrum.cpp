@@ -5780,6 +5780,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
 
     // Search for a MeterSig child in StaffDef and add one if it does not exist.
     MeterSig *vrvmeter = getMeterSig(part);
+    checkMeterSigParameters(vrvmeter, timetok);
     if (!vrvmeter) {
         return;
     }
@@ -5883,6 +5884,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             vrvmetersig->SetCount({ 3 });
             vrvmetersig->SetUnit(1);
             vrvmetersig->SetForm(METERFORM_num);
+            checkMeterSigParameters(vrvmetersig, timesigtok);
         }
     }
     else if (timesigtok && regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
@@ -5892,6 +5894,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             MeterSig *vrvmetersig = getMeterSig(element);
             vrvmetersig->SetCount({ count });
             vrvmetersig->SetUnit(unit);
+            checkMeterSigParameters(vrvmetersig, timesigtok);
         }
         else if (*metersigtok == "*met()") {
             count = stoi(matches[1]);
@@ -5957,6 +5960,28 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
     else {
         ss.at(staffindex).meter_top = count;
         ss.at(staffindex).meter_bottom = unit;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkMeterSigParameters -- search for enclosure
+//     or any other stylings for time signature from attached
+//     layout parameters.
+//
+
+void HumdrumInput::checkMeterSigParameters(MeterSig *msig, hum::HTp token)
+{
+    if (!token) {
+        return;
+    }
+    bool parenQ = hasLayoutParameter(token, "TS", "paren");
+    bool brackQ = hasLayoutParameter(token, "TS", "brack");
+    if (parenQ) {
+        msig->SetEnclose(ENCLOSURE_paren);
+    }
+    else if (brackQ) {
+        msig->SetEnclose(ENCLOSURE_brack);
     }
 }
 
@@ -12587,7 +12612,6 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             setAttachmentType(dir, token);
         }
 
-        // ggg
         // bool problemQ = false;
         // bool sicQ = false;
         if (vgroup > 0) {
