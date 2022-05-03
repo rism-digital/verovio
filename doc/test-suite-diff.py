@@ -1,7 +1,8 @@
 import argparse
 import os
 
-import diffimg
+from diffimg import diff as pngdiff
+from jsondiff import diff as jsondiff
 import lxml.etree as etree
 import PIL.Image as Image
 import PIL.ImageChops as ImageChops
@@ -126,12 +127,15 @@ if __name__ == "__main__":
             name, ext = os.path.splitext(item2)
             pngFile1 = os.path.join(path_in1, item1, name + '.png')
             pngFile2 = os.path.join(path_in2, item1, name + '.png')
+            jsonFile1 = os.path.join(path_in1, item1, name + '.json')
+            jsonFile2 = os.path.join(path_in2, item1, name + '.json')
             pngFileOut = os.path.join(path_out, item1, name + '.png')
             pngFile1Out = os.path.join(path_out, item1, name + '.after.png')
             pngFile2Out = os.path.join(path_out, item1, name + '.before.png')
             print(f'Comparing {name}')
 
-            diffValue = diffimg.diff(pngFile1, pngFile2, delete_diff_file=True)
+            diffValue = pngdiff(pngFile1, pngFile2, delete_diff_file=True)
+            print(jsondiff(jsonFile1, jsonFile2))
             if (diffValue > (args.threshold / 100.0)):
                 print(f'Img diff: {diffValue}')
                 row = etree.SubElement(table, 'tr')
