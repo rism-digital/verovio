@@ -315,8 +315,14 @@ public:
     virtual void Reset();
     ///@}
 
+    /**
+     * @name Set and get the stem object managed by the interface
+     */
+    ///@{
     void SetDrawingStem(Stem *stem);
-    Stem *GetDrawingStem() const { return m_drawingStem; }
+    Stem *GetDrawingStem() { return m_drawingStem; }
+    const Stem *GetDrawingStem() const { return m_drawingStem; }
+    ///@}
 
     /**
      * @name Set and get the stem direction and stem positions
@@ -329,8 +335,8 @@ public:
     int GetDrawingStemLen() const;
     ///@}
 
-    Point GetDrawingStemStart(Object *object = NULL);
-    Point GetDrawingStemEnd(Object *object = NULL);
+    Point GetDrawingStemStart(const Object *object = NULL) const;
+    Point GetDrawingStemEnd(const Object *object = NULL) const;
 
     /**
      * @name Virtual methods overriden in child classes (Chord and Note)

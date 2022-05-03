@@ -682,7 +682,7 @@ int StemmedDrawingInterface::GetDrawingStemLen() const
     return 0;
 }
 
-Point StemmedDrawingInterface::GetDrawingStemStart(Object *object)
+Point StemmedDrawingInterface::GetDrawingStemStart(const Object *object) const
 {
     assert(m_drawingStem || object);
     if (object && !m_drawingStem) {
@@ -692,15 +692,15 @@ Point StemmedDrawingInterface::GetDrawingStemStart(Object *object)
     return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY());
 }
 
-Point StemmedDrawingInterface::GetDrawingStemEnd(Object *object)
+Point StemmedDrawingInterface::GetDrawingStemEnd(const Object *object) const
 {
     assert(m_drawingStem || object);
     if (object && !m_drawingStem) {
         assert(this == object->GetStemmedDrawingInterface());
         if (!m_drawingStem) {
-            // Somehow arbitrary for chord - stem end it the bottom with no stem
+            // Somehow arbitrary for chord with no stem - stem end is the bottom
             if (object->Is(CHORD)) {
-                Chord *chord = vrv_cast<Chord *>(object);
+                const Chord *chord = vrv_cast<const Chord *>(object);
                 assert(chord);
                 return Point(object->GetDrawingX(), chord->GetYBottom());
             }
