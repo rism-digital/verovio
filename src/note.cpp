@@ -1425,7 +1425,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     }
 
     // Skip cue notes when midiNoCue is activated
-    if (this->GetCue() == BOOLEAN_true && params->m_doc->GetOptions()->m_midiNoCue.GetValue()) {
+    if (this->GetCue() == BOOLEAN_true && params->m_cueExclusion) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -1537,6 +1537,13 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
 {
     GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
+
+    if (this->HasGrace()) return FUNCTOR_SIBLINGS;
+
+    // Skip cue notes when midiNoCue is activated
+    if (this->GetCue() == BOOLEAN_true && params->m_cueExclusion) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     Note *note = vrv_cast<Note *>(this->ThisOrSameasAsLink());
     assert(note);

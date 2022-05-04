@@ -2328,7 +2328,6 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
                 above->SetScoreDefClefOverflowAbove(overflowAbove);
             }
             else {
-                above->SetOverflowBBoxAbove(current, overflowAbove);
                 above->SetOverflowAbove(overflowAbove);
                 above->AddBBoxAbove(current);
             }
@@ -2344,7 +2343,6 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
                 below->SetScoreDefClefOverflowBelow(overflowBelow);
             }
             else {
-                below->SetOverflowBBoxBelow(current, overflowBelow);
                 below->SetOverflowBelow(overflowBelow);
                 below->AddBBoxBelow(current);
             }

@@ -408,19 +408,22 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
 
+    Stem *stem = vrv_cast<Stem *>(params->m_parent->FindDescendantByType(STEM));
     Flag *flag = vrv_cast<Flag *>(params->m_parent->FindDescendantByType(FLAG));
     // Avoid in artic to be in legder lines
     if (this->GetDrawingPlace() == STAFFREL_above) {
         int yAboveStem
             = params->m_parent->GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY();
-        if (flag) yAboveStem += flag->GetStemUpSE(params->m_doc, staff->m_drawingStaffSize, false).y;
+        if (flag && stem && (stem->GetDrawingStemDir() == STEMDIRECTION_up))
+            yAboveStem += flag->GetStemUpSE(params->m_doc, staff->m_drawingStaffSize, false).y;
         yIn = std::max(yAboveStem, staffYBottom);
         yOut = std::max(yIn, 0);
     }
     else {
         int yBelowStem = params->m_parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false)
             - staff->GetDrawingY();
-        if (flag) yBelowStem += flag->GetStemDownNW(params->m_doc, staff->m_drawingStaffSize, false).y;
+        if (flag && stem && (stem->GetDrawingStemDir() == STEMDIRECTION_down))
+            yBelowStem += flag->GetStemDownNW(params->m_doc, staff->m_drawingStaffSize, false).y;
         yIn = std::min(yBelowStem, 0);
         if (beam && beam->m_crossStaffContent && beam->m_drawingPlace == BEAMPLACE_mixed) yIn -= beam->m_beamWidth;
         yOut = std::min(yIn, staffYBottom);
@@ -449,33 +452,37 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     }
 
     // Add spacing
-    int spacingTop = params->m_doc->GetTopMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int spacingBottom
-        = params->m_doc->GetBottomMargin(ARTIC) * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int spacingTop = params->m_doc->GetTopMargin(ARTIC) * unit;
+    const int spacingBottom = params->m_doc->GetBottomMargin(ARTIC) * unit;
+    const int direction = (this->GetDrawingPlace() == STAFFREL_above) ? 1 : -1;
     int y = this->GetDrawingY();
     int yShift = 0;
-    int direction = (this->GetDrawingPlace() == STAFFREL_above) ? 1 : -1;
 
+    const int bottomMargin = staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     if (this->IsInsideArtic()) {
         // If we are above the top of the  staff, just pile them up
         if ((this->GetDrawingPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) {
             yShift += spacingBottom;
         }
         // If we are below the bottom, just pile the down
-        else if ((this->GetDrawingPlace() == STAFFREL_below)
-            && (y < staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize))) {
-            yShift -= spacingTop;
+        else if ((this->GetDrawingPlace() == STAFFREL_below) && (y < bottomMargin)) {
+            if (y > bottomMargin - unit) {
+                yShift = (bottomMargin - unit) - y;
+            }
+            else {
+                yShift -= spacingTop;
+            }
         }
         // Otherwise make it fit the staff space
         else {
             yShift = staff->GetNearestInterStaffPosition(y, params->m_doc, this->GetDrawingPlace()) - y;
-            if (staff->IsOnStaffLine(y + yShift, params->m_doc))
-                yShift += params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * direction;
+            if (staff->IsOnStaffLine(y + yShift, params->m_doc)) yShift += unit * direction;
         }
     }
     // Artic part outside just need to be piled up or down
     else {
-        int spacing = (direction > 0) ? spacingBottom : spacingTop;
+        const int spacing = (direction > 0) ? spacingBottom : spacingTop;
         yShift += spacing * direction;
     }
     this->SetDrawingYRel(this->GetDrawingYRel() + yShift);
