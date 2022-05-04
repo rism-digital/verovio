@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue May  3 18:25:18 PDT 2022
+// Last Modified: Wed May  4 03:07:54 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5174,6 +5174,8 @@ class HumTool : public Options {
 		ostream&      getError        (ostream& out);
 		void          setError        (const string& message);
 
+		void          finally         (void) { };
+
 	protected:
 		std::stringstream m_humdrum_text;  // output text in Humdrum syntax.
 		std::stringstream m_json_text;     // output text in JSON syntax.
@@ -9307,8 +9309,17 @@ class Tool_synco : public HumTool {
 		void      markNote         (HTp token);
 
 	private:
-		bool      m_hasSyncoQ = false;
-		int       m_scount    = 0;
+		bool        m_hasSyncoQ = false;
+		bool        m_infoQ     = false;
+		bool        m_fileQ     = false;
+		bool        m_allQ      = false;
+		int         m_scount    = 0;
+		std::string m_color     = "skyblue";
+
+		// for -a option
+		int         m_scountTotal    = 0;
+		int         m_notecountTotal = 0;
+		int         m_fileCount      = 0;
 
 };
 
