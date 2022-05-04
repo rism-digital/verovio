@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon May  2 20:51:49 PDT 2022
+// Last Modified: Tue May  3 18:25:18 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -50421,17 +50421,16 @@ PixelColor::PixelColor(void) {
 	// do nothing
 }
 
+
 PixelColor::PixelColor(const PixelColor& color) {
 	Red   = color.Red;
 	Green = color.Green;
 	Blue  = color.Blue;
 }
 
-
 PixelColor::PixelColor(const string& color) {
 	setColor(color);
 }
-
 
 PixelColor::PixelColor(int red, int green, int blue) {
 	Red   = (unsigned int)limit(red, 0, 255);
@@ -50473,23 +50472,6 @@ void PixelColor::invert(void) {
 	Red   = ~Red;
 	Green = ~Green;
 	Blue  = ~Blue;
-}
-
-
-
-//////////////////////////////
-//
-// PixelColor::setColor -- set the contents to the specified value.
-//
-
-PixelColor& PixelColor::setColor(const string& colorstring) {
-	PixelColor color;
-	color = getColor(colorstring);
-	Red   = color.Red;
-	Green = color.Green;
-	Blue  = color.Blue;
-
-	return *this;
 }
 
 
@@ -50625,7 +50607,7 @@ void PixelColor::setBlueF(float value) {
 // PixelColor::setColor --
 //
 
-void PixelColor::setColor(PixelColor color) {
+void PixelColor::setColor(PixelColor& color) {
 	Red   = color.Red;
 	Green = color.Green;
 	Blue  = color.Blue;
@@ -50645,6 +50627,22 @@ PixelColor& PixelColor::setColor(int red, int green, int blue) {
 	return *this;
 }
 
+
+
+//////////////////////////////
+//
+// PixelColor::setColor -- set the contents to the specified value.
+//
+
+PixelColor& PixelColor::setColor(const string& colorstring) {
+	PixelColor color;
+	color = getColor(colorstring);
+	Red   = color.Red;
+	Green = color.Green;
+	Blue  = color.Blue;
+
+	return *this;
+}
 
 
 //////////////////////////////
@@ -50724,7 +50722,7 @@ int PixelColor::operator<(int number) {
 // PixelColor::operator== --
 //
 
-int PixelColor::operator==(PixelColor color) {
+int PixelColor::operator==(PixelColor& color) {
 	if (Red != color.Red) {
 		return 0;
 	}
@@ -50744,7 +50742,7 @@ int PixelColor::operator==(PixelColor color) {
 // PixelColor::operator!= --
 //
 
-int PixelColor::operator!=(PixelColor color) {
+int PixelColor::operator!=(PixelColor& color) {
 	if ((Red == color.Red) && (Green == color.Green) && (Blue == color.Blue)) {
 		return 0;
 	} else {
@@ -50798,7 +50796,7 @@ PixelColor& PixelColor::operator=(int value) {
 // PixelColor::operator+ --
 //
 
-PixelColor PixelColor::operator+(PixelColor color) {
+PixelColor PixelColor::operator+(PixelColor& color) {
 	PixelColor output;
 	output.Red   = (unsigned char)limit((int)Red   + color.Red,   0, 255);
 	output.Green = (unsigned char)limit((int)Green + color.Green, 0, 255);
@@ -50825,7 +50823,7 @@ PixelColor& PixelColor::operator+=(int number) {
 // PixelColor::operator- --
 //
 
-PixelColor PixelColor::operator-(PixelColor color) {
+PixelColor PixelColor::operator-(PixelColor& color) {
 	PixelColor output;
 	output.Red   = (unsigned char)limit((int)Red   - color.Red,   0, 255);
 	output.Green = (unsigned char)limit((int)Green - color.Green, 0, 255);
@@ -50840,7 +50838,7 @@ PixelColor PixelColor::operator-(PixelColor color) {
 // PixelColor::operator* --
 //
 
-PixelColor PixelColor::operator*(PixelColor color) {
+PixelColor PixelColor::operator*(PixelColor& color) {
 	PixelColor output;
 	output.Red   = (unsigned char)limit(floatToChar(charToFloat(Red)*charToFloat(color.Red)), 0, 255);
 	output.Green = (unsigned char)limit(floatToChar(charToFloat(Green)*charToFloat(color.Green)), 0, 255);
@@ -50951,182 +50949,172 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 	}
 
 	if (hasdigit) {
-		char rv[3] = {0};
-		char gv[3] = {0};
-		char bv[3] = {0};
-		string piece1 = colorstring.substr(start, 2);
+		string piece1 = colorstring.substr(start,   2);
 		string piece2 = colorstring.substr(start+2, 2);
 		string piece3 = colorstring.substr(start+4, 2);
 
-		strcpy(rv, piece1.c_str());
-		strcpy(gv, piece1.c_str());
-		strcpy(bv, piece1.c_str());
-		int rval = (int)strtol(rv, NULL, 16);
-		int gval = (int)strtol(gv, NULL, 16);
-		int bval = (int)strtol(bv, NULL, 16);
+		int rval = (int)strtol(piece1.c_str(), NULL, 16);
+		int gval = (int)strtol(piece2.c_str(), NULL, 16);
+		int bval = (int)strtol(piece3.c_str(), NULL, 16);
+
 		output.setColor(rval, gval, bval);
 		return output;
 	}
 
 	// color string
-	char buffer[128] = {0};
-	strncpy(buffer, colorstring.c_str(), 100);
-	length = (int)strlen(buffer);
-	for (int i=0; i<length; i++) {
-		buffer[i] = std::tolower(buffer[i]);
-	}
 	output.setColor(0,0,0);
+	const string& cs = colorstring;
 
-	if (strcmp("aliceblue",          buffer) == 0)  return getColor("#f0f8ff");
-	if (strcmp("antiquewhite",       buffer) == 0)  return getColor("#faebd7");
-	if (strcmp("aqua",               buffer) == 0)  return getColor("#00ffff");
-	if (strcmp("aquamarine",         buffer) == 0)  return getColor("#7fffd4");
-	if (strcmp("azure",              buffer) == 0)  return getColor("#f0ffff");
-	if (strcmp("beige",              buffer) == 0)  return getColor("#f5f5dc");
-	if (strcmp("bisque",             buffer) == 0)  return getColor("#ffe4c4");
-	if (strcmp("black",              buffer) == 0)  return getColor("#000000");
-	if (strcmp("blanchediamond",     buffer) == 0)  return getColor("#ffebcd");
-	if (strcmp("blue",               buffer) == 0)  return getColor("#0000ff");
-	if (strcmp("blueviolet",         buffer) == 0)  return getColor("#8a2be2");
-	if (strcmp("brown",              buffer) == 0)  return getColor("#a52a2a");
-	if (strcmp("burlywood",          buffer) == 0)  return getColor("#ffe4c4");
-	if (strcmp("cadetblue",          buffer) == 0)  return getColor("#5f9ea0");
-	if (strcmp("chartreuse",         buffer) == 0)  return getColor("#7fff00");
-	if (strcmp("coral",              buffer) == 0)  return getColor("#ff7f50");
-	if (strcmp("cornflowerblue",     buffer) == 0)  return getColor("#6495ed");
-	if (strcmp("cornsilk",           buffer) == 0)  return getColor("#fff8dc");
-	if (strcmp("crimson",            buffer) == 0)  return getColor("#dc143c");
-	if (strcmp("cyan",               buffer) == 0)  return getColor("#00ffff");
-	if (strcmp("darkblue",           buffer) == 0)  return getColor("#00008b");
-	if (strcmp("darkcyan",           buffer) == 0)  return getColor("#008b8b");
-	if (strcmp("darkgoldenrod",      buffer) == 0)  return getColor("#b8860b");
-	if (strcmp("darkgray",           buffer) == 0)  return getColor("#a9a9a9");
-	if (strcmp("darkgreen",          buffer) == 0)  return getColor("#006400");
-	if (strcmp("darkkhaki",          buffer) == 0)  return getColor("#bdb76b");
-	if (strcmp("darkmagenta",        buffer) == 0)  return getColor("#8b008b");
-	if (strcmp("darkolivegreen",     buffer) == 0)  return getColor("#556b2f");
-	if (strcmp("darkorange",         buffer) == 0)  return getColor("#ff8c00");
-	if (strcmp("darkorchid",         buffer) == 0)  return getColor("#9932cc");
-	if (strcmp("darkred",            buffer) == 0)  return getColor("#8b0000");
-	if (strcmp("darksalmon",         buffer) == 0)  return getColor("#e9967a");
-	if (strcmp("darkseagreen",       buffer) == 0)  return getColor("#8dbc8f");
-	if (strcmp("darkslateblue",      buffer) == 0)  return getColor("#483d8b");
-	if (strcmp("darkslategray",      buffer) == 0)  return getColor("#2e4e4e");
-	if (strcmp("darkturquoise",      buffer) == 0)  return getColor("#00ded1");
-	if (strcmp("darkviolet",         buffer) == 0)  return getColor("#9400d3");
-	if (strcmp("deeppink",           buffer) == 0)  return getColor("#ff1493");
-	if (strcmp("deepskyblue",        buffer) == 0)  return getColor("#00bfff");
-	if (strcmp("dimgray",            buffer) == 0)  return getColor("#696969");
-	if (strcmp("dodgerblue",         buffer) == 0)  return getColor("#1e90ff");
-	if (strcmp("firebrick",          buffer) == 0)  return getColor("#b22222");
-	if (strcmp("floralwhite",        buffer) == 0)  return getColor("#fffaf0");
-	if (strcmp("forestgreen",        buffer) == 0)  return getColor("#228b22");
-	if (strcmp("fuchsia",            buffer) == 0)  return getColor("#ff00ff");
-	if (strcmp("gainsboro",          buffer) == 0)  return getColor("#dcdcdc");
-	if (strcmp("ghostwhite",         buffer) == 0)  return getColor("#f8f8ff");
-	if (strcmp("gold",               buffer) == 0)  return getColor("#ffd700");
-	if (strcmp("goldenrod",          buffer) == 0)  return getColor("#daa520");
-	if (strcmp("gray",               buffer) == 0)  return getColor("#808080");
-	if (strcmp("gray",               buffer) == 0)  return getColor("#808080");
-	if (strcmp("green",              buffer) == 0)  return getColor("#008000");
-	if (strcmp("greenyellow",        buffer) == 0)  return getColor("#adff2f");
-	if (strcmp("honeydew",           buffer) == 0)  return getColor("#f0fff0");
-	if (strcmp("hotpink",            buffer) == 0)  return getColor("#ff69b4");
-	if (strcmp("indianred",          buffer) == 0)  return getColor("#cd5c5c");
-	if (strcmp("indigo",             buffer) == 0)  return getColor("#4b0082");
-	if (strcmp("ivory",              buffer) == 0)  return getColor("#fffff0");
-	if (strcmp("khaki",              buffer) == 0)  return getColor("#f0e68c");
-	if (strcmp("lavenderblush",      buffer) == 0)  return getColor("#fff0f5");
-	if (strcmp("lavender",           buffer) == 0)  return getColor("#e6e6fa");
-	if (strcmp("lawngreen",          buffer) == 0)  return getColor("#7cfc00");
-	if (strcmp("lemonchiffon",       buffer) == 0)  return getColor("#fffacd");
-	if (strcmp("lightblue",          buffer) == 0)  return getColor("#add8e6");
-	if (strcmp("lightorange",        buffer) == 0)  return getColor("#ff9c00");
-	if (strcmp("lightcoral",         buffer) == 0)  return getColor("#f08080");
-	if (strcmp("lightcyan",          buffer) == 0)  return getColor("#e0ffff");
-	if (strcmp("lightgoldenrodyellow",buffer)== 0)  return getColor("#fafad2");
-	if (strcmp("lightgreen",         buffer) == 0)  return getColor("#90ee90");
-	if (strcmp("lightgrey",          buffer) == 0)  return getColor("#d3d3d3");
-	if (strcmp("lightpink",          buffer) == 0)  return getColor("#ffb6c1");
-	if (strcmp("lightsalmon",        buffer) == 0)  return getColor("#ffa07a");
-	if (strcmp("lightseagreen",      buffer) == 0)  return getColor("#20b2aa");
-	if (strcmp("lightskyblue",       buffer) == 0)  return getColor("#87cefa");
-	if (strcmp("lightslategray",     buffer) == 0)  return getColor("#778899");
-	if (strcmp("lightsteelblue",     buffer) == 0)  return getColor("#b0c4de");
-	if (strcmp("lightyellow",        buffer) == 0)  return getColor("#ffffe0");
-	if (strcmp("lime",               buffer) == 0)  return getColor("#00ff00");
-	if (strcmp("limegreen",          buffer) == 0)  return getColor("#32cd32");
-	if (strcmp("linen",              buffer) == 0)  return getColor("#faf0e6");
-	if (strcmp("magenta",            buffer) == 0)  return getColor("#ff00ff");
-	if (strcmp("maroon",             buffer) == 0)  return getColor("#800000");
-	if (strcmp("maroon",             buffer) == 0)  return getColor("#800000");
-	if (strcmp("mediumaquamarine",   buffer) == 0)  return getColor("#66cdaa");
-	if (strcmp("mediumblue",         buffer) == 0)  return getColor("#0000cd");
-	if (strcmp("mediumorchid",       buffer) == 0)  return getColor("#ba55d3");
-	if (strcmp("mediumpurple",       buffer) == 0)  return getColor("#9370db");
-	if (strcmp("mediumseagreen",     buffer) == 0)  return getColor("#3cb371");
-	if (strcmp("mediumslateblue",    buffer) == 0)  return getColor("#7b68ee");
-	if (strcmp("mediumspringgreen",  buffer) == 0)  return getColor("#00fa9a");
-	if (strcmp("mediumturquoise",    buffer) == 0)  return getColor("#48d1cc");
-	if (strcmp("mediumvioletred",    buffer) == 0)  return getColor("#c71585");
-	if (strcmp("midnightblue",       buffer) == 0)  return getColor("#191970");
-	if (strcmp("mintcream",          buffer) == 0)  return getColor("#f5fffa");
-	if (strcmp("mistyrose",          buffer) == 0)  return getColor("#ffe4e1");
-	if (strcmp("moccasin",           buffer) == 0)  return getColor("#ffe4b5");
-	if (strcmp("navajowhite",        buffer) == 0)  return getColor("#ffdead");
-	if (strcmp("navy",               buffer) == 0)  return getColor("#000080");
-	if (strcmp("navy",               buffer) == 0)  return getColor("#000080");
-	if (strcmp("oldlace",            buffer) == 0)  return getColor("#fdf5e6");
-	if (strcmp("olive",              buffer) == 0)  return getColor("#6b8e23");
-	if (strcmp("olivedrab",          buffer) == 0)  return getColor("#6b8e23");
-	if (strcmp("orange",             buffer) == 0)  return getColor("#ff4500");
-	if (strcmp("orangered",          buffer) == 0)  return getColor("#ff4500");
-	if (strcmp("orchid",             buffer) == 0)  return getColor("#da70d6");
-	if (strcmp("palegoldenrod",      buffer) == 0)  return getColor("#eee8aa");
-	if (strcmp("palegreen",          buffer) == 0)  return getColor("#98fb98");
-	if (strcmp("paleturquoise",      buffer) == 0)  return getColor("#afeeee");
-	if (strcmp("palevioletred",      buffer) == 0)  return getColor("#db7093");
-	if (strcmp("papayawhip",         buffer) == 0)  return getColor("#ffefd5");
-	if (strcmp("peachpuff",          buffer) == 0)  return getColor("#ffdab9");
-	if (strcmp("peru",               buffer) == 0)  return getColor("#cd853f");
-	if (strcmp("pink",               buffer) == 0)  return getColor("#ffc8cb");
-	if (strcmp("plum",               buffer) == 0)  return getColor("#dda0dd");
-	if (strcmp("powderblue",         buffer) == 0)  return getColor("#b0e0e6");
-	if (strcmp("purple",             buffer) == 0)  return getColor("#800080");
-	if (strcmp("purple",             buffer) == 0)  return getColor("#800080");
-	if (strcmp("quartz",             buffer) == 0)  return getColor("#c9c9f3");
-	if (strcmp("red",                buffer) == 0)  return getColor("#ff0000");
-	if (strcmp("rosybrown",          buffer) == 0)  return getColor("#bc8f8f");
-	if (strcmp("royalblue",          buffer) == 0)  return getColor("#4169e1");
-	if (strcmp("saddlebrown",        buffer) == 0)  return getColor("#8b4513");
-	if (strcmp("salmon",             buffer) == 0)  return getColor("#fa8072");
-	if (strcmp("sandybrown",         buffer) == 0)  return getColor("#f4a460");
-	if (strcmp("seagreen",           buffer) == 0)  return getColor("#2e8b57");
-	if (strcmp("seashell",           buffer) == 0)  return getColor("#fff5ee");
-	if (strcmp("sienna",             buffer) == 0)  return getColor("#a0522d");
-	if (strcmp("silver",             buffer) == 0)  return getColor("#c0c0c0");
-	if (strcmp("silver",             buffer) == 0)  return getColor("#c0c0c0");
-	if (strcmp("skyblue",            buffer) == 0)  return getColor("#87ceeb");
-	if (strcmp("slateblue",          buffer) == 0)  return getColor("#6a5acd");
-	if (strcmp("snow",               buffer) == 0)  return getColor("#fffafa");
-	if (strcmp("steelblue",          buffer) == 0)  return getColor("#4682b4");
-	if (strcmp("tan",                buffer) == 0)  return getColor("#d2b48c");
-	if (strcmp("teal",               buffer) == 0)  return getColor("#008080");
-	if (strcmp("thistle",            buffer) == 0)  return getColor("#d8bfd8");
-	if (strcmp("tomato",             buffer) == 0)  return getColor("#ff6347");
-	if (strcmp("turquoise",          buffer) == 0)  return getColor("#40e0d0");
-	if (strcmp("violet",             buffer) == 0)  return getColor("#ee82ee");
-	if (strcmp("wheat",              buffer) == 0)  return getColor("#f5deb3");
-	if (strcmp("white",              buffer) == 0)  return getColor("#ffffff");
-	if (strcmp("white",              buffer) == 0)  return getColor("#ffffff");
-	if (strcmp("whitesmoke",         buffer) == 0)  return getColor("#f5f5f5");
-	if (strcmp("yellow",             buffer) == 0)  return getColor("#ffff00");
-	if (strcmp("yellowgreen",        buffer) == 0)  return getColor("#9acd32");
+	if      (cs == "aliceblue"           ) { output.setColor("#f0f8ff"); }
+	else if (cs == "antiquewhite"        ) { output.setColor("#faebd7"); }
+	else if (cs == "aqua"                ) { output.setColor("#00ffff"); }
+	else if (cs == "aquamarine"          ) { output.setColor("#7fffd4"); }
+	else if (cs == "azure"               ) { output.setColor("#f0ffff"); }
+	else if (cs == "beige"               ) { output.setColor("#f5f5dc"); }
+	else if (cs == "bisque"              ) { output.setColor("#ffe4c4"); }
+	else if (cs == "black"               ) { output.setColor("#000000"); }
+	else if (cs == "blanchediamond"      ) { output.setColor("#ffebcd"); }
+	else if (cs == "blue"                ) { output.setColor("#0000ff"); }
+	else if (cs == "blueviolet"          ) { output.setColor("#8a2be2"); }
+	else if (cs == "brown"               ) { output.setColor("#a52a2a"); }
+	else if (cs == "burlywood"           ) { output.setColor("#ffe4c4"); }
+	else if (cs == "cadetblue"           ) { output.setColor("#5f9ea0"); }
+	else if (cs == "chartreuse"          ) { output.setColor("#7fff00"); }
+	else if (cs == "coral"               ) { output.setColor("#ff7f50"); }
+	else if (cs == "cornflowerblue"      ) { output.setColor("#6495ed"); }
+	else if (cs == "cornsilk"            ) { output.setColor("#fff8dc"); }
+	else if (cs == "crimson"             ) { output.setColor("#dc143c"); }
+	else if (cs == "cyan"                ) { output.setColor("#00ffff"); }
+	else if (cs == "darkblue"            ) { output.setColor("#00008b"); }
+	else if (cs == "darkcyan"            ) { output.setColor("#008b8b"); }
+	else if (cs == "darkgoldenrod"       ) { output.setColor("#b8860b"); }
+	else if (cs == "darkgray"            ) { output.setColor("#a9a9a9"); }
+	else if (cs == "darkgreen"           ) { output.setColor("#006400"); }
+	else if (cs == "darkkhaki"           ) { output.setColor("#bdb76b"); }
+	else if (cs == "darkmagenta"         ) { output.setColor("#8b008b"); }
+	else if (cs == "darkolivegreen"      ) { output.setColor("#556b2f"); }
+	else if (cs == "darkorange"          ) { output.setColor("#ff8c00"); }
+	else if (cs == "darkorchid"          ) { output.setColor("#9932cc"); }
+	else if (cs == "darkred"             ) { output.setColor("#8b0000"); }
+	else if (cs == "darksalmon"          ) { output.setColor("#e9967a"); }
+	else if (cs == "darkseagreen"        ) { output.setColor("#8dbc8f"); }
+	else if (cs == "darkslateblue"       ) { output.setColor("#483d8b"); }
+	else if (cs == "darkslategray"       ) { output.setColor("#2e4e4e"); }
+	else if (cs == "darkturquoise"       ) { output.setColor("#00ded1"); }
+	else if (cs == "darkviolet"          ) { output.setColor("#9400d3"); }
+	else if (cs == "deeppink"            ) { output.setColor("#ff1493"); }
+	else if (cs == "deepskyblue"         ) { output.setColor("#00bfff"); }
+	else if (cs == "dimgray"             ) { output.setColor("#696969"); }
+	else if (cs == "dodgerblue"          ) { output.setColor("#1e90ff"); }
+	else if (cs == "firebrick"           ) { output.setColor("#b22222"); }
+	else if (cs == "floralwhite"         ) { output.setColor("#fffaf0"); }
+	else if (cs == "forestgreen"         ) { output.setColor("#228b22"); }
+	else if (cs == "fuchsia"             ) { output.setColor("#ff00ff"); }
+	else if (cs == "gainsboro"           ) { output.setColor("#dcdcdc"); }
+	else if (cs == "ghostwhite"          ) { output.setColor("#f8f8ff"); }
+	else if (cs == "gold"                ) { output.setColor("#ffd700"); }
+	else if (cs == "goldenrod"           ) { output.setColor("#daa520"); }
+	else if (cs == "gray"                ) { output.setColor("#808080"); }
+	else if (cs == "gray"                ) { output.setColor("#808080"); }
+	else if (cs == "green"               ) { output.setColor("#008000"); }
+	else if (cs == "greenyellow"         ) { output.setColor("#adff2f"); }
+	else if (cs == "honeydew"            ) { output.setColor("#f0fff0"); }
+	else if (cs == "hotpink"             ) { output.setColor("#ff69b4"); }
+	else if (cs == "indianred"           ) { output.setColor("#cd5c5c"); }
+	else if (cs == "indigo"              ) { output.setColor("#4b0082"); }
+	else if (cs == "ivory"               ) { output.setColor("#fffff0"); }
+	else if (cs == "khaki"               ) { output.setColor("#f0e68c"); }
+	else if (cs == "lavenderblush"       ) { output.setColor("#fff0f5"); }
+	else if (cs == "lavender"            ) { output.setColor("#e6e6fa"); }
+	else if (cs == "lawngreen"           ) { output.setColor("#7cfc00"); }
+	else if (cs == "lemonchiffon"        ) { output.setColor("#fffacd"); }
+	else if (cs == "lightblue"           ) { output.setColor("#add8e6"); }
+	else if (cs == "lightorange"         ) { output.setColor("#ff9c00"); }
+	else if (cs == "lightcoral"          ) { output.setColor("#f08080"); }
+	else if (cs == "lightcyan"           ) { output.setColor("#e0ffff"); }
+	else if (cs == "lightgoldenrodyellow") { output.setColor("#fafad2"); }
+	else if (cs == "lightgreen"          ) { output.setColor("#90ee90"); }
+	else if (cs == "lightgrey"           ) { output.setColor("#d3d3d3"); }
+	else if (cs == "lightpink"           ) { output.setColor("#ffb6c1"); }
+	else if (cs == "lightsalmon"         ) { output.setColor("#ffa07a"); }
+	else if (cs == "lightseagreen"       ) { output.setColor("#20b2aa"); }
+	else if (cs == "lightskyblue"        ) { output.setColor("#87cefa"); }
+	else if (cs == "lightslategray"      ) { output.setColor("#778899"); }
+	else if (cs == "lightsteelblue"      ) { output.setColor("#b0c4de"); }
+	else if (cs == "lightyellow"         ) { output.setColor("#ffffe0"); }
+	else if (cs == "lime"                ) { output.setColor("#00ff00"); }
+	else if (cs == "limegreen"           ) { output.setColor("#32cd32"); }
+	else if (cs == "linen"               ) { output.setColor("#faf0e6"); }
+	else if (cs == "magenta"             ) { output.setColor("#ff00ff"); }
+	else if (cs == "maroon"              ) { output.setColor("#800000"); }
+	else if (cs == "maroon"              ) { output.setColor("#800000"); }
+	else if (cs == "mediumaquamarine"    ) { output.setColor("#66cdaa"); }
+	else if (cs == "mediumblue"          ) { output.setColor("#0000cd"); }
+	else if (cs == "mediumorchid"        ) { output.setColor("#ba55d3"); }
+	else if (cs == "mediumpurple"        ) { output.setColor("#9370db"); }
+	else if (cs == "mediumseagreen"      ) { output.setColor("#3cb371"); }
+	else if (cs == "mediumslateblue"     ) { output.setColor("#7b68ee"); }
+	else if (cs == "mediumspringgreen"   ) { output.setColor("#00fa9a"); }
+	else if (cs == "mediumturquoise"     ) { output.setColor("#48d1cc"); }
+	else if (cs == "mediumvioletred"     ) { output.setColor("#c71585"); }
+	else if (cs == "midnightblue"        ) { output.setColor("#191970"); }
+	else if (cs == "mintcream"           ) { output.setColor("#f5fffa"); }
+	else if (cs == "mistyrose"           ) { output.setColor("#ffe4e1"); }
+	else if (cs == "moccasin"            ) { output.setColor("#ffe4b5"); }
+	else if (cs == "navajowhite"         ) { output.setColor("#ffdead"); }
+	else if (cs == "navy"                ) { output.setColor("#000080"); }
+	else if (cs == "navy"                ) { output.setColor("#000080"); }
+	else if (cs == "oldlace"             ) { output.setColor("#fdf5e6"); }
+	else if (cs == "olive"               ) { output.setColor("#6b8e23"); }
+	else if (cs == "olivedrab"           ) { output.setColor("#6b8e23"); }
+	else if (cs == "orange"              ) { output.setColor("#ff4500"); }
+	else if (cs == "orangered"           ) { output.setColor("#ff4500"); }
+	else if (cs == "orchid"              ) { output.setColor("#da70d6"); }
+	else if (cs == "palegoldenrod"       ) { output.setColor("#eee8aa"); }
+	else if (cs == "palegreen"           ) { output.setColor("#98fb98"); }
+	else if (cs == "paleturquoise"       ) { output.setColor("#afeeee"); }
+	else if (cs == "palevioletred"       ) { output.setColor("#db7093"); }
+	else if (cs == "papayawhip"          ) { output.setColor("#ffefd5"); }
+	else if (cs == "peachpuff"           ) { output.setColor("#ffdab9"); }
+	else if (cs == "peru"                ) { output.setColor("#cd853f"); }
+	else if (cs == "pink"                ) { output.setColor("#ffc8cb"); }
+	else if (cs == "plum"                ) { output.setColor("#dda0dd"); }
+	else if (cs == "powderblue"          ) { output.setColor("#b0e0e6"); }
+	else if (cs == "purple"              ) { output.setColor("#800080"); }
+	else if (cs == "purple"              ) { output.setColor("#800080"); }
+	else if (cs == "quartz"              ) { output.setColor("#c9c9f3"); }
+	else if (cs == "red"                 ) { output.setColor("#ff0000"); }
+	else if (cs == "rosybrown"           ) { output.setColor("#bc8f8f"); }
+	else if (cs == "royalblue"           ) { output.setColor("#4169e1"); }
+	else if (cs == "saddlebrown"         ) { output.setColor("#8b4513"); }
+	else if (cs == "salmon"              ) { output.setColor("#fa8072"); }
+	else if (cs == "sandybrown"          ) { output.setColor("#f4a460"); }
+	else if (cs == "seagreen"            ) { output.setColor("#2e8b57"); }
+	else if (cs == "seashell"            ) { output.setColor("#fff5ee"); }
+	else if (cs == "sienna"              ) { output.setColor("#a0522d"); }
+	else if (cs == "silver"              ) { output.setColor("#c0c0c0"); }
+	else if (cs == "silver"              ) { output.setColor("#c0c0c0"); }
+	else if (cs == "skyblue"             ) { output.setColor("#87ceeb"); }
+	else if (cs == "slateblue"           ) { output.setColor("#6a5acd"); }
+	else if (cs == "snow"                ) { output.setColor("#fffafa"); }
+	else if (cs == "steelblue"           ) { output.setColor("#4682b4"); }
+	else if (cs == "tan"                 ) { output.setColor("#d2b48c"); }
+	else if (cs == "teal"                ) { output.setColor("#008080"); }
+	else if (cs == "thistle"             ) { output.setColor("#d8bfd8"); }
+	else if (cs == "tomato"              ) { output.setColor("#ff6347"); }
+	else if (cs == "turquoise"           ) { output.setColor("#40e0d0"); }
+	else if (cs == "violet"              ) { output.setColor("#ee82ee"); }
+	else if (cs == "wheat"               ) { output.setColor("#f5deb3"); }
+	else if (cs == "white"               ) { output.setColor("#ffffff"); }
+	else if (cs == "white"               ) { output.setColor("#ffffff"); }
+	else if (cs == "whitesmoke"          ) { output.setColor("#f5f5f5"); }
+	else if (cs == "yellow"              ) { output.setColor("#ffff00"); }
+	else if (cs == "yellowgreen"         ) { output.setColor("#9acd32"); }
 
-// References:
-//            http://netdancer.com/rgbblk.htm
-//            http://www.htmlhelp.com/cgi-bin/color.cgi?rgb=FFFFFF
-//            http://www.brobstsystems.com/colors1.htm
+	// References:
+	//            http://netdancer.com/rgbblk.htm
+	//            http://www.htmlhelp.com/cgi-bin/color.cgi?rgb=FFFFFF
+	//            http://www.brobstsystems.com/colors1.htm
 
 	return output;
 }
@@ -51264,6 +51252,224 @@ int PixelColor::limit(int value, int min, int max) {
 		value = max;
 	}
 	return value;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor:mix -- mix two colors together.
+//
+
+PixelColor PixelColor::mix(PixelColor& color1, PixelColor& color2) {
+
+	PixelColor p1 = color1.getHsi();
+	PixelColor p2 = color2.getHsi();
+
+	PixelColor output;
+	unsigned int r = ((unsigned int)color1.Red + (unsigned int)color2.Red)/2;
+	unsigned int g = ((unsigned int)color1.Green + (unsigned int)color2.Green)/2;
+	unsigned int b = ((unsigned int)color1.Blue + (unsigned int)color2.Blue)/2;
+
+	output.setRed(r);
+	output.setGreen(g);
+	output.setBlue(b);
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::rgb2hsi -- convert from RGB color space to HSI color space.
+//     You have to keep track of color space used by pixel since RGB/HSI
+//     state is not stored in pixel.
+//
+
+PixelColor& PixelColor::rgb2hsi(void) {
+
+	// Convert RGB into range from 0 to 255.0:
+	double R = Red   / 255.0;
+	double G = Green / 255.0;
+	double B = Blue  / 255.0;
+
+	// HSI will be in the range from 0.0 to 1.0;
+	double H = 0.0; // will be stored in Red parameter
+	double S = 0.0; // will be stored in Green parameter
+	double I = 0.0; // will be stored in Blue parameter
+
+	double min = R;
+	if (G < min) min = G;
+	if (B < min) min = B;
+
+	I = (R+G+B)/3.0;
+	S = 1 - min/I;
+	if (S == 0.0) {
+		H = 0.0;
+	} else {
+		H = ((R-G)+(R-B))/2.0;
+		H = H/sqrt((R-G)*(R-G) + (R-B)*(G-B));
+		H = acos(H);
+		if (B > G) {
+			H = 2*M_PI - H;
+		}
+		H = H/(2*M_PI);
+	}
+
+	// Adjust output range from 0 to 255:
+	int h = (int)(H  * 255.0 + 0.5);
+	if (h < 0)   { h = 0; }
+	if (h > 255) { h = 255; }
+
+	int s = (int)(S  * 255.0 + 0.5);
+	if (s < 0)   { s = 0; }
+	if (s > 255) { s = 255; }
+
+	int i = (int)(I  * 255.0 + 0.5);
+	if (i < 0)   { i = 0; }
+	if (i > 255) { i = 255; }
+
+	Red   = h;
+	Green = s;
+	Blue  = i;
+
+	return *this;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::hsi2rgb -- convert from HSI color space to RGB color space.
+//
+
+PixelColor& PixelColor::hsi2rgb(void) {
+
+	// Scale input HSI into the range from 0.0 to 1.0:
+	double H = Red   / 255.0;
+	double S = Green / 255.0;
+	double I = Blue  / 255.0;
+
+	double R = 0.0;
+	double G = 0.0;
+	double B = 0.0;
+
+	if (H < 1.0/3.0) {
+		B = (1-S)/3;
+		R = (1+S*cos(2*M_PI*H)/cos(M_PI/3-2*M_PI*H))/3.0;
+		G = 1 - (B + R);
+	} else if (H < 2.0/3.0) {
+		H = H - 1.0/3.0;
+		R = (1-S)/3;
+		G = (1+S*cos(2*M_PI*H)/cos(M_PI/3-2*M_PI*H))/3.0;
+		B = 1 - (R+G);
+	} else {
+		H = H - 2.0/3.0;
+		G = (1-S)/3;
+		B = (1+S*cos(2*M_PI*H)/cos(M_PI/3-2*M_PI*H))/3.0;
+		R = 1 - (G+B);
+	}
+
+	// Adjust output range from 0 to 255:
+	int r = (int)(I * R * 3.0 * 255.0 + 0.5);
+	if (r < 0)   { r = 0; }
+	if (r > 255) { r = 255; }
+
+	int g = (int)(I * G * 3.0 * 255.0 + 0.5);
+	if (g < 0)   { g = 0; }
+	if (g > 255) { g = 255; }
+
+	int b = (int)(I * B * 3.0 * 255.0 + 0.5);
+	if (b < 0)   { b = 0; }
+	if (b > 255) { b = 255; }
+
+	Red   = r;
+	Green = g;
+	Blue  = b;
+
+	return *this;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::getHsi -- convert from RGB color space to HSI color space.
+//     You have to keep track of color space used by pixel since RGB/HSI
+//     state is not stored in pixel.
+//
+
+PixelColor PixelColor::getHsi(void) {
+	PixelColor tempColor = *this;
+	tempColor.rgb2hsi();
+	return tempColor;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::getRgb -- convert from HSI color space to RGB color space.
+//     You have to keep track of color space used by pixel since RGB/HSI
+//     state is not stored in pixel.
+//
+
+PixelColor PixelColor::getRgb(void) {
+	PixelColor tempColor = *this;
+	tempColor.hsi2rgb();
+	return tempColor;
+}
+
+
+//////////////////////////////
+//
+// PixelColor::getHexColor --
+//
+
+string PixelColor::getHexColor(void) {
+	string output = "#";
+	unsigned char redA   = (Red   & 0xF0) >> 4;
+	unsigned char redB   = (Red   & 0x0F);
+	unsigned char greenA = (Green & 0xF0) >> 4;
+	unsigned char greenB = (Green & 0x0F);
+	unsigned char blueA  = (Blue  & 0xF0) >> 4;
+	unsigned char blueB  = (Blue  & 0x0F);
+
+	if (redA < 10) {
+		output += '0' + redA;
+	} else {
+		output += 'A' + redA - 10;
+	}
+	if (redB < 10) {
+		output += '0' + redB;
+	} else {
+		output += 'A' + redB - 10;
+	}
+
+	if (greenA < 10) {
+		output += '0' + greenA;
+	} else {
+		output += 'A' + greenA - 10;
+	}
+	if (greenB < 10) {
+		output += '0' + greenB;
+	} else {
+		output += 'A' + greenB - 10;
+	}
+
+	if (blueA < 10) {
+		output += '0' + blueA;
+	} else {
+		output += 'A' + blueA - 10;
+	}
+	if (blueB < 10) {
+		output += '0' + blueB;
+	} else {
+		output += 'A' + blueB - 10;
+	}
+
+	return output;
 }
 
 
@@ -85504,7 +85710,7 @@ void Tool_modori::processFile(HumdrumFile& infile) {
 	}
 
 	switchModernOriginal(infile);
-	m_humdrum_text << infile;
+	printModoriOutput(infile);
 }
 
 
@@ -85935,6 +86141,88 @@ void Tool_modori::switchModernOriginal(HumdrumFile& infile) {
 
 	updateLoMo(infile);
 }
+
+
+//////////////////////////////
+//
+// Tool_modori::printModoriOutput --
+//
+
+void Tool_modori::printModoriOutput(HumdrumFile& infile) {
+	string state;
+	if (m_modernQ) {
+
+		// convert to modern
+		for (int i=0; i<infile.getLineCount(); i++) {
+			if (infile[i].isCommentGlobal()) {
+				HTp token = infile.token(i, 0);
+				if (*token == "!!LO:MO:mod") {
+				   state = "mod";
+					m_humdrum_text << token << endl;
+					continue;
+				} else if (*token == "!!LO:MO:ori") {
+				   state = "ori";
+					m_humdrum_text << token << endl;
+					continue;
+				} else if (*token == "!!LO:MO:end") {
+					state = "";
+					m_humdrum_text << token << endl;
+					continue;
+				}
+			}
+			if (state == "mod") {
+				// Remove global comment prefix "!! ".  Complain if not there.
+				if (infile[i].compare(0, 3, "!! ") != 0) {
+					cerr << "Error: line does not start with \"!! \":\t" << infile[i] << endl;
+				} else {
+					m_humdrum_text << infile[i].substr(3) << endl;
+				}
+			} else if (state == "ori") {
+				// Add global comment prefix "!! ".
+				m_humdrum_text << "!! " << infile[i] << endl;
+			} else {
+				m_humdrum_text << infile[i] << endl;
+			}
+		}
+
+	} else if (m_originalQ) {
+
+		// convert to original
+		for (int i=0; i<infile.getLineCount(); i++) {
+			if (infile[i].isCommentGlobal()) {
+				HTp token = infile.token(i, 0);
+				if (*token == "!!LO:MO:mod") {
+				   state = "mod";
+					m_humdrum_text << token << endl;
+					continue;
+				} else if (*token == "!!LO:MO:ori") {
+				   state = "ori";
+					m_humdrum_text << token << endl;
+					continue;
+				} else if (*token == "!!LO:MO:end") {
+					state = "";
+					m_humdrum_text << token << endl;
+					continue;
+				}
+			}
+			if (state == "ori") {
+				// Remove global comment prefix "!! ".  Complain if not there.
+				if (infile[i].compare(0, 3, "!! ") != 0) {
+					cerr << "Error: line does not start with \"!! \":\t" << infile[i] << endl;
+				} else {
+					m_humdrum_text << infile[i].substr(3) << endl;
+				}
+			} else if (state == "mod") {
+				// Add global comment prefix "!! ".
+				m_humdrum_text << "!! " << infile[i] << endl;
+			} else {
+				m_humdrum_text << infile[i] << endl;
+			}
+		}
+
+	}
+}
+
 
 
 //////////////////////////////
@@ -97816,15 +98104,10 @@ void Tool_peak::processFile(HumdrumFile& infile) {
   m_humdrum_text << "!!!peak_groups: " << m_count << endl;
   m_humdrum_text << "!!!peak_notes: "  << peak_note_count << endl;
   m_humdrum_text << "!!!score_notes: " << all_note_count << endl;
-	//print density information for peaks in myriads
+	//print density information for peaks per mille
 	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"  << endl;
-	m_humdrum_text << "!!!peak_note_density (myriad): " << ((double)peak_note_count / all_note_count) * 1000 << endl;
-	m_humdrum_text << "!!!peak_group_density (myriad): " << ((double)m_count / all_note_count) * 1000 << endl;
-
-	//print density information for peaks in percents
-	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"  << endl;
-	m_humdrum_text << "!!!peak_note_density (percentage): " << ((double)peak_note_count / all_note_count) * 100 << endl;
-	m_humdrum_text << "!!!peak_group_density (percentage): " << ((double)m_count / all_note_count) * 100 << endl;
+	m_humdrum_text << "!!!peak_note_density: " << ((double)peak_note_count / all_note_count) * 1000 << " permil " << endl;
+	m_humdrum_text << "!!!peak_group_density: " << ((double)m_count / all_note_count) * 1000 << " permil " << endl;
 
   int pcounter = 1;
   for (int i=0; i<(int)m_peakIndex.size(); i++) {

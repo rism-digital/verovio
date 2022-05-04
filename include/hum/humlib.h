@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon May  2 20:51:49 PDT 2022
+// Last Modified: Tue May  3 18:25:18 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4086,7 +4086,7 @@ class PixelColor {
 		void         setRedF        (float value);
 		void         setGreenF      (float value);
 		void         setBlueF       (float value);
-		void         setColor       (PixelColor color);
+		void         setColor       (PixelColor& color);
 		PixelColor&  setHue         (float value);
 		PixelColor&  setTriHue      (float value);
 		PixelColor&  makeGrey       (void);
@@ -4095,21 +4095,28 @@ class PixelColor {
 		PixelColor&  setGreyNormalized(double value);
 		int          operator>      (int number);
 		int          operator<      (int number);
-		int          operator==     (PixelColor color);
-		int          operator!=     (PixelColor color);
+		int          operator==     (PixelColor& color);
+		int          operator!=     (PixelColor& color);
 		PixelColor&  operator=      (PixelColor color);
 		PixelColor&  operator=      (int value);
-		PixelColor   operator+      (PixelColor color);
+		PixelColor   operator+      (PixelColor& color);
 		PixelColor&  operator+=     (int number);
-		PixelColor   operator-      (PixelColor color);
+		PixelColor   operator-      (PixelColor& color);
 		PixelColor&  operator*=     (double number);
-		PixelColor   operator*      (PixelColor color);
+		PixelColor   operator*      (PixelColor& color);
 		PixelColor   operator*      (double color);
 		PixelColor   operator*      (int color);
 		PixelColor   operator/      (double number);
 		PixelColor   operator/      (int number);
 
-		static PixelColor getColor  (const std::string& colorstring);
+		PixelColor&  rgb2hsi        (void);
+		PixelColor&  hsi2rgb        (void);
+		PixelColor   getHsi         (void);
+		PixelColor   getRgb         (void);
+		std::string  getHexColor    (void);
+
+		PixelColor   getColor       (const std::string& colorstring);
+		static PixelColor   mix     (PixelColor& color1, PixelColor& color2);
 
 		void         writePpm6      (std::ostream& out);
 		void         writePpm3      (std::ostream& out);
@@ -4118,6 +4125,7 @@ class PixelColor {
 		unsigned char   Red;
 		unsigned char   Green;
 		unsigned char   Blue;
+		// maybe add opacity byte or option byte to fill out 4 byte space.
 
 	private:
 		float   charToFloat         (int value);
@@ -7625,35 +7633,36 @@ class Tool_metlev : public HumTool {
 
 class Tool_modori : public HumTool {
 	public:
-		         Tool_modori         (void);
-		        ~Tool_modori         () {};
+		         Tool_modori                  (void);
+		        ~Tool_modori                  () {};
 
-		bool     run                 (HumdrumFileSet& infiles);
-		bool     run                 (HumdrumFile& infile);
-		bool     run                 (const string& indata, ostream& out);
-		bool     run                 (HumdrumFile& infile, ostream& out);
+		bool     run                          (HumdrumFileSet& infiles);
+		bool     run                          (HumdrumFile& infile);
+		bool     run                          (const string& indata, ostream& out);
+		bool     run                          (HumdrumFile& infile, ostream& out);
 
 	protected:
-		void     processFile         (HumdrumFile& infile);
-		void     initialize          (void);
-		void     printInfo           (void);
-		void     switchModernOriginal(HumdrumFile& infile);
-		bool     swapKeyStyle        (HTp one, HTp two);
-		bool     swapClefStyle       (HTp one, HTp two);
-		bool     flipMensurationStyle(HTp token);
+		void     processFile                  (HumdrumFile& infile);
+		void     initialize                   (void);
+		void     printInfo                    (void);
+		void     switchModernOriginal         (HumdrumFile& infile);
+		bool     swapKeyStyle                 (HTp one, HTp two);
+		bool     swapClefStyle                (HTp one, HTp two);
+		bool     flipMensurationStyle         (HTp token);
 		void     convertKeySignatureToModern  (HTp token);
 		void     convertKeySignatureToOriginal(HTp token);
 		void     convertKeySignatureToRegular (HTp token);
 		void     convertClefToModern          (HTp token);
 		void     convertClefToOriginal        (HTp token);
 		void     convertClefToRegular         (HTp token);
-		int      getPairedReference  (int index, vector<string>& keys);
-		void     storeModOriReferenceRecords(HumdrumFile& infile);
+		int      getPairedReference           (int index, vector<string>& keys);
+		void     storeModOriReferenceRecords  (HumdrumFile& infile);
 		void     processExclusiveInterpretationLine(HumdrumFile& infile, int line);
-		bool     processStaffCompanionSpines(std::vector<HTp> tokens);
-		bool     processStaffSpines(vector<HTp>& tokens);
-		void     updateLoMo          (HumdrumFile& infile);
-		void     processLoMo         (HTp lomo);
+		bool     processStaffCompanionSpines  (std::vector<HTp> tokens);
+		bool     processStaffSpines           (vector<HTp>& tokens);
+		void     updateLoMo                   (HumdrumFile& infile);
+		void     processLoMo                  (HTp lomo);
+		void     printModoriOutput            (HumdrumFile& infile);
 
 	private:
 		bool m_modernQ        = false; // -m option: show modern key/clef/time signatures
