@@ -11390,7 +11390,6 @@ void HumdrumInput::colorNote(Note *note, hum::HTp token, const std::string &subt
     }
 
     if (m_mens) {
-
         int justification = 0;
         for (int i = 0; i < (int)m_signifiers.mens_mark.size(); ++i) {
             if (subtoken.find(m_signifiers.mens_mark[i]) != std::string::npos) {
@@ -11409,9 +11408,11 @@ void HumdrumInput::colorNote(Note *note, hum::HTp token, const std::string &subt
     }
     else {
         int justification = 0;
+        std::vector<std::string> markcolors;
+        markcolors.clear();
         for (int i = 0; i < (int)m_signifiers.mark.size(); ++i) {
             if (subtoken.find(m_signifiers.mark[i]) != std::string::npos) {
-                note->SetColor(m_signifiers.mcolor[i]);
+                markcolors.push_back(m_signifiers.mcolor[i]);
                 appendTypeTag(note, "marked");
                 if (!m_signifiers.markdir[i].empty()) {
                     bool bold = true;
@@ -11420,7 +11421,22 @@ void HumdrumInput::colorNote(Note *note, hum::HTp token, const std::string &subt
                     addDirection(m_signifiers.markdir[i], "above", bold, italic, token, staffindex, justification,
                         m_signifiers.mcolor[i]);
                 }
-                break;
+            }
+            if (markcolors.size() == 1) {
+                note->SetColor(markcolors[0]);
+            }
+            else if (markcolors.size() > 1) {
+                hum::PixelColor a;
+                hum::PixelColor b;
+                a.setColor(markcolors[0]);
+                b.setColor(markcolors[1]);
+                hum::PixelColor mixed = hum::PixelColor::mix(a, b);
+                for (int i = 2; i < (int)markcolors.size(); i++) {
+                    a.setColor(markcolors[i]);
+                    mixed = hum::PixelColor::mix(mixed, a);
+                }
+                std::string mixedcolor = mixed.getHexColor();
+                note->SetColor(mixedcolor);
             }
         }
     }
