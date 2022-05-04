@@ -994,53 +994,21 @@ float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVE
     return slurAngle;
 }
 
-curvature_CURVEDIR Slur::GetGraceCurveDirection(Doc *doc)
+curvature_CURVEDIR Slur::GetGraceCurveDirection() const
 {
-    LayerElement *start = this->GetStart();
-    LayerElement *end = this->GetEnd();
-    const bool overlap = start->VerticalContentOverlap(end);
-    const int topDiff = std::abs(start->GetContentTop() - end->GetContentTop());
-    const int bottomDiff = std::abs(start->GetContentBottom() - end->GetContentBottom());
-    if (overlap) {
-        if (bottomDiff < 1.5 * topDiff) {
-            return curvature_CURVEDIR_below;
-        }
-        else if ((bottomDiff < 3 * topDiff) && (NULL != end->IsInBeam())) {
-            return curvature_CURVEDIR_below;
-        }
-        else {
-            return curvature_CURVEDIR_above;
-        }
+    // Always start on the notehead side
+    const LayerElement *start = this->GetStart();
+    const StemmedDrawingInterface *startStemDrawInterface = start->GetStemmedDrawingInterface();
+    data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
+    if (startStemDrawInterface) {
+        startStemDir = startStemDrawInterface->GetDrawingStemDir();
     }
-    else {
-        StemmedDrawingInterface *endStemDrawInterface = end->GetStemmedDrawingInterface();
-        data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
-        if (endStemDrawInterface) {
-            endStemDir = endStemDrawInterface->GetDrawingStemDir();
-        }
-
-        if (end->GetContentBottom() > start->GetContentTop()) {
-            if (endStemDir == STEMDIRECTION_up)
-                return curvature_CURVEDIR_above;
-            else {
-                return (bottomDiff < topDiff) ? curvature_CURVEDIR_below : curvature_CURVEDIR_above;
-            }
-        }
-        else if (end->GetContentTop() < start->GetContentBottom()) {
-            if (endStemDir == STEMDIRECTION_down)
-                return curvature_CURVEDIR_below;
-            else {
-                return (bottomDiff < topDiff) ? curvature_CURVEDIR_below : curvature_CURVEDIR_above;
-            }
-        }
-    }
-    return curvature_CURVEDIR_below;
+    return (startStemDir == STEMDIRECTION_down) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
 }
 
-curvature_CURVEDIR Slur::GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter)
+curvature_CURVEDIR Slur::GetPreferredCurveDirection(
+    Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur)
 {
-    const bool isGraceToNoteSlur = !this->GetStart()->Is(TIMESTAMP_ATTR) && !this->GetEnd()->Is(TIMESTAMP_ATTR)
-        && this->GetStart()->IsGraceNote() && !this->GetEnd()->IsGraceNote();
     Note *startNote = NULL;
     Chord *startParentChord = NULL;
     if (this->GetStart()->Is(NOTE)) {
@@ -1060,12 +1028,12 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION
         drawingCurveDir
             = (this->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
-    // grace notes - always below unless we have a drawing stem direction on the layer
+    // grace note slurs in case we have no drawing stem direction on the layer
     else if (isGraceToNoteSlur && layer && layerElement
         && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
-        drawingCurveDir = this->GetGraceCurveDirection(doc);
+        drawingCurveDir = this->GetGraceCurveDirection();
     }
-    // then layer direction trumps note direction
+    // otherwise layer direction trumps note direction
     else if (layer && layerElement && ((layerStemDir = layer->GetDrawingStemDir(layerElement)) != STEMDIRECTION_NONE)) {
         drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
@@ -1577,14 +1545,17 @@ int Slur::CalcSlurDirection(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
     Staff *staff = staffList.at(0);
-    Staff *crossStaff = this->GetBoundaryCrossStaff();
-
     System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
     assert(system);
 
-    if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && system->HasMixedDrawingStemDir(start, end)) {
+    const bool isCrossStaff = (this->GetBoundaryCrossStaff() != NULL);
+    const bool isGraceToNoteSlur = !this->GetStart()->Is(TIMESTAMP_ATTR) && !this->GetEnd()->Is(TIMESTAMP_ATTR)
+        && this->GetStart()->IsGraceNote() && !this->GetEnd()->IsGraceNote();
+
+    if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && !isGraceToNoteSlur
+        && system->HasMixedDrawingStemDir(start, end)) {
         // Handle mixed stem direction
-        if (crossStaff && (system->GetPreferredCurveDirection(start, end, this) == curvature_CURVEDIR_below)) {
+        if (isCrossStaff && (system->GetPreferredCurveDirection(start, end, this) == curvature_CURVEDIR_below)) {
             this->SetDrawingCurveDir(SlurCurveDirection::Below);
         }
         else {
@@ -1592,7 +1563,7 @@ int Slur::CalcSlurDirection(FunctorParams *functorParams)
         }
     }
     else {
-        // Handle uniform stem direction and time stamp boundaries
+        // Handle uniform stem direction, time stamp boundaries and grace note slurs
         StemmedDrawingInterface *startStemDrawInterface = start->GetStemmedDrawingInterface();
         data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
         if (startStemDrawInterface) {
@@ -1601,7 +1572,7 @@ int Slur::CalcSlurDirection(FunctorParams *functorParams)
 
         const int center = staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) / 2;
         const bool isAboveStaffCenter = (start->GetDrawingY() > center);
-        if (this->GetPreferredCurveDirection(params->m_doc, startStemDir, isAboveStaffCenter)
+        if (this->GetPreferredCurveDirection(params->m_doc, startStemDir, isAboveStaffCenter, isGraceToNoteSlur)
             == curvature_CURVEDIR_below) {
             this->SetDrawingCurveDir(SlurCurveDirection::Below);
         }

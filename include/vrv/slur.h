@@ -210,9 +210,10 @@ private:
     // Get cross staff by only considering the slur boundary
     Staff *GetBoundaryCrossStaff();
     // Determine curve direction for the slurs that start at grace note
-    curvature_CURVEDIR GetGraceCurveDirection(Doc *doc);
+    curvature_CURVEDIR GetGraceCurveDirection() const;
     // Get preferred curve direction based on various conditions
-    curvature_CURVEDIR GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
+    curvature_CURVEDIR GetPreferredCurveDirection(
+        Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur);
     ///@}
 
     /**
