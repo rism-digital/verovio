@@ -1165,7 +1165,8 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
         }
 
         // This is a hanging tie for no apparent reason.  Display it, but make
-        // it red. L.v. will be handled differently as an ornament.
+        // it red unless it is an l.v. tie.
+
         if (m_signifiers.terminallong && (token->find(m_signifiers.terminallong) != std::string::npos)) {
             // suppress hanging tie (because it was removed)
         }
@@ -1179,6 +1180,10 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
             if (!allowedToHang) {
                 tie->SetColor("red");
             }
+            bool lv = (token->getLayoutParameter("T", "lv") == "true");
+            if (lv) {
+                tie->SetType("lv");
+            }
         }
     }
 }
@@ -1191,6 +1196,12 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
 
 bool HumdrumInput::isTieAllowedToHang(hum::HTp token)
 {
+    // Allowed to hang if an l.v. tie
+    std::string lv = token->getLayoutParameter("T", "lv");
+    if (lv == "true") {
+        return true;
+    }
+
     hum::HTp current = token->getNextToken();
     while (current) {
         if (current->isInterpretation()) {
