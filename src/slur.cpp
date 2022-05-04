@@ -1008,7 +1008,7 @@ curvature_CURVEDIR Slur::GetGraceCurveDirection() const
 }
 
 curvature_CURVEDIR Slur::GetPreferredCurveDirection(
-    Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur)
+    data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur)
 {
     Note *startNote = NULL;
     Chord *startParentChord = NULL;
@@ -1573,7 +1573,7 @@ int Slur::CalcSlurDirection(FunctorParams *functorParams)
 
         const int center = staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) / 2;
         const bool isAboveStaffCenter = (start->GetDrawingY() > center);
-        if (this->GetPreferredCurveDirection(params->m_doc, startStemDir, isAboveStaffCenter, isGraceToNoteSlur)
+        if (this->GetPreferredCurveDirection(startStemDir, isAboveStaffCenter, isGraceToNoteSlur)
             == curvature_CURVEDIR_below) {
             this->SetDrawingCurveDir(SlurCurveDirection::Below);
         }

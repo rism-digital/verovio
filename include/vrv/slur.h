@@ -213,7 +213,7 @@ private:
     curvature_CURVEDIR GetGraceCurveDirection() const;
     // Get preferred curve direction based on various conditions
     curvature_CURVEDIR GetPreferredCurveDirection(
-        Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur);
+        data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur);
     ///@}
 
     /**
