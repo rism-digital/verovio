@@ -145,6 +145,8 @@ void TupletBracket::Reset()
 
     m_drawingXRelLeft = 0;
     m_drawingXRelRight = 0;
+    m_drawingYRelLeft = 0;
+    m_drawingYRelRight = 0;
     m_alignedNum = NULL;
 }
 
@@ -174,7 +176,8 @@ int TupletBracket::GetDrawingYLeft()
         // Calculate the y point aligning with the beam
         int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
         return beam->m_beamSegment.GetStartingY()
-            + beam->m_beamSegment.m_beamSlope * (xLeft - beam->m_beamSegment.GetStartingX()) + this->GetDrawingYRel();
+            + beam->m_beamSegment.m_beamSlope * (xLeft - beam->m_beamSegment.GetStartingX()) + this->GetDrawingYRel()
+            + m_drawingYRelLeft;
     }
     else {
         return this->GetDrawingY();
@@ -191,7 +194,8 @@ int TupletBracket::GetDrawingYRight()
         // Calculate the y point aligning with the beam
         int xRight = tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
         return beam->m_beamSegment.GetStartingY()
-            + beam->m_beamSegment.m_beamSlope * (xRight - beam->m_beamSegment.GetStartingX()) + this->GetDrawingYRel();
+            + beam->m_beamSegment.m_beamSlope * (xRight - beam->m_beamSegment.GetStartingX()) + this->GetDrawingYRel()
+            + m_drawingYRelRight;
     }
     else {
         return this->GetDrawingY();
@@ -441,6 +445,9 @@ int TupletBracket::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetVerticalAlignment(functorParams);
+
+    m_drawingYRelLeft = 0;
+    m_drawingYRelRight = 0;
 
     return FUNCTOR_CONTINUE;
 }
