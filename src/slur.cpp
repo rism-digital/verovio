@@ -134,14 +134,16 @@ std::pair<Layer *, LayerElement *> Slur::GetBoundaryLayer()
 
     Layer *layer = NULL;
     LayerElement *layerElement = NULL;
-    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
     if (!start->Is(TIMESTAMP_ATTR)) {
-        layer = dynamic_cast<Layer *>(start->GetFirstAncestor(LAYER));
+        layer = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));
         layerElement = start;
     }
-    else if (!end->Is(TIMESTAMP_ATTR)) {
-        layer = dynamic_cast<Layer *>(end->GetFirstAncestor(LAYER));
-        layerElement = end;
+    if (!end->Is(TIMESTAMP_ATTR)) {
+        // Prefer non grace notes if possible
+        if (!layerElement || layerElement->IsGraceNote()) {
+            layer = vrv_cast<Layer *>(end->GetFirstAncestor(LAYER));
+            layerElement = end;
+        }
     }
     if (layerElement && layerElement->m_crossStaff) layer = layerElement->m_crossLayer;
 
