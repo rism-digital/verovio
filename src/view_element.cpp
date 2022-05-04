@@ -472,7 +472,12 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         bTrem->SetEmptyBB();
         return;
     }
-    else if (bTremElement->Is(CHORD)) {
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    this->DrawLayerChildren(dc, bTrem, layer, staff, measure);
+
+    if (bTremElement->Is(CHORD)) {
         Chord *childChord = vrv_cast<Chord *>(bTremElement);
         xOffset = childChord->GetDrawingRadius(m_doc);
         yTop
@@ -494,10 +499,6 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             ? childNote->GetDrawingBottom(m_doc, staffSize)
             : yBottom;
     }
-
-    dc->StartGraphic(element, "", element->GetUuid());
-
-    this->DrawLayerChildren(dc, bTrem, layer, staff, measure);
 
     this->DrawStemMod(dc, element, staff);
 
