@@ -58,6 +58,7 @@ public:
     Object *Clone() const override { return new KeySig(*this); }
     void Reset() override;
     std::string GetClassName() const override { return "KeySig"; }
+    ///@}
 
     /** Override the method since alignment is required */
     bool HasToBeAligned() const override { return true; }
@@ -75,6 +76,14 @@ public:
 
     /** Accid type getter */
     data_ACCIDENTAL_WRITTEN GetAccidType() const;
+
+    /**
+     * Generate KeyAccid attribute children
+     */
+    ///@{
+    void ClearKeyAccidAttribChildren();
+    void GenerateKeyAccidAttribChildren();
+    ///@}
 
     /**
      * Fill the map of modified pitches

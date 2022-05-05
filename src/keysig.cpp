@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
+#include "editorial.h"
 #include "functorparams.h"
 #include "keyaccid.h"
 #include "scoredefinterface.h"
@@ -118,6 +119,24 @@ void KeySig::FilterList(ListOfConstObjects &childList) const
     }
 }
 
+bool KeySig::IsSupportedChild(Object *child)
+{
+    if (this->IsAttribute() && !child->IsAttribute()) {
+        LogError("Adding a non-attribute child to an attribute is not allowed");
+        assert(false);
+    }
+    else if (child->Is(KEYACCID)) {
+        assert(dynamic_cast<KeyAccid *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
+}
+
 int KeySig::GetAccidCount() const
 {
     const int childListSize = this->GetListSize(this); // make sure it's initialized
@@ -143,6 +162,29 @@ data_ACCIDENTAL_WRITTEN KeySig::GetAccidType() const
     if (!this->HasSig()) return ACCIDENTAL_WRITTEN_NONE;
 
     return (this->GetSig().second);
+}
+
+void KeySig::ClearKeyAccidAttribChildren()
+{
+    ListOfObjects childList = this->GetList(this);
+    std::for_each(childList.begin(), childList.end(), [this](Object *child) {
+        if (child->IsAttribute()) this->DeleteChild(child);
+    });
+}
+
+void KeySig::GenerateKeyAccidAttribChildren()
+{
+    if (this->HasEmptyList(this)) {
+        for (int i = 0; i < this->GetAccidCount(); ++i) {
+            KeyAccidInfo info = this->GetKeyAccidInfoAt(i);
+            KeyAccid *keyAccid = new KeyAccid();
+            keyAccid->SetUuid(this->GetUuid() + "-accid" + std::to_string(i));
+            keyAccid->SetAccid(info.accid);
+            keyAccid->SetPname(info.pname);
+            keyAccid->IsAttribute(true);
+            this->AddChild(keyAccid);
+        }
+    }
 }
 
 void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
@@ -290,6 +332,8 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
 
 int KeySig::PrepareDataInitialization(FunctorParams *)
 {
+    this->GenerateKeyAccidAttribChildren();
+
     data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
     m_mixedChildrenAccidType = false;
 

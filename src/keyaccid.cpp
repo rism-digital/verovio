@@ -15,7 +15,6 @@
 
 #include "accid.h"
 #include "doc.h"
-#include "editorial.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "note.h"
@@ -51,24 +50,6 @@ void KeyAccid::Reset()
     this->ResetAccidental();
     this->ResetColor();
     this->ResetEnclosingChars();
-}
-
-bool KeySig::IsSupportedChild(Object *child)
-{
-    if (this->IsAttribute()) {
-        LogError("Adding a child to an attribute is not allowed");
-        assert(false);
-    }
-    else if (child->Is(KEYACCID)) {
-        assert(dynamic_cast<KeyAccid *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else {
-        return false;
-    }
-    return true;
 }
 
 std::wstring KeyAccid::GetSymbolStr() const
