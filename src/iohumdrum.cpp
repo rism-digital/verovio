@@ -19454,10 +19454,20 @@ void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std:
         }
     }
 
+    bool clearDur = false;
+    for (int i = 0; i < (int)dataindex.size(); i++) {
+        int ii = dataindex[i];
+        if (layerdata[ii]->isData() && layerdata[ii]->isNull()) {
+            clearDur = true;
+        }
+    }
+
     if (dataindex.size() > 0) {
         prespace.resize(prespace.size() + 1);
-
         prespace.back() = layerendtime - startdur.back() - duration.back();
+        if (clearDur) {
+            prespace.back() = 0;
+        }
     }
 
     // See https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/124
