@@ -15,6 +15,7 @@
 #include "measure.h"
 #include "note.h"
 #include "object.h"
+#include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "timeinterface.h"
@@ -396,6 +397,33 @@ public:
         assert(ref);
         return ref->HasCrossStaffElements();
     }
+};
+
+//----------------------------------------------------------------------------
+// CrossStaffComparison
+//----------------------------------------------------------------------------
+/**
+ * This class evaluates whether there are cross-staff elements in general (or for specific N if it was specified)
+ */
+class CrossStaffComparison : public ClassIdComparison {
+
+public:
+    CrossStaffComparison(ClassId classId) : ClassIdComparison(classId) { m_staffN = -1; };
+    void SetStaffN(int staffN) { m_staffN = m_staffN; }
+
+    bool operator()(const Object *object) override
+    {
+        // Allow only layer elements of the matching type
+        if (!this->MatchesType(object) || !object->IsLayerElement()) return false;
+        const LayerElement *element = vrv_cast<const LayerElement *>(object);
+        if (!element->m_crossStaff) return false;
+        if (m_staffN == -1) return true;
+
+        return (element->m_crossStaff->GetN() == m_staffN);
+    }
+
+private:
+    int m_staffN;
 };
 
 //----------------------------------------------------------------------------
