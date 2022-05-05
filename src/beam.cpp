@@ -1974,6 +1974,11 @@ int Beam::GetBeamPartDuration(int x) const
     return std::min((*it)->m_dur, (*std::prev(it))->m_dur);
 }
 
+int Beam::GetBeamPartDuration(Object *object) const
+{
+    return this->GetBeamPartDuration(object->GetDrawingX());
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
