@@ -20,6 +20,19 @@ class Clef;
 class ScoreDefInterface;
 
 //----------------------------------------------------------------------------
+// KeyAccidInfo
+//----------------------------------------------------------------------------
+/**
+ * Useful information collected from a KeyAccid child
+ */
+struct KeyAccidInfo {
+    std::wstring symbolStr;
+    std::string uuid;
+    data_ACCIDENTAL_WRITTEN accid;
+    data_PITCHNAME pname;
+};
+
+//----------------------------------------------------------------------------
 // KeySig
 //----------------------------------------------------------------------------
 
@@ -69,11 +82,10 @@ public:
     void FillMap(MapOfPitchAccid &mapOfPitchAccid) const;
 
     /**
-     * Return the string of the alteration at the positon pos.
+     * Return key accid information at the positon pos.
      * Looks at keyAccid children if any.
-     * The accid at pos is return in accid and the pname in pname.
      */
-    std::wstring GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname) const;
+    KeyAccidInfo GetKeyAccidInfoAt(int pos) const;
 
     int GetFifthsInt() const;
 

@@ -166,38 +166,38 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
     }
 }
 
-std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname) const
+KeyAccidInfo KeySig::GetKeyAccidInfoAt(int pos) const
 {
-    pname = PITCHNAME_c;
-    accid = ACCIDENTAL_WRITTEN_s;
-    std::wstring symbolStr = L"";
+    KeyAccidInfo info({ L"", "", ACCIDENTAL_WRITTEN_s, PITCHNAME_c });
 
     const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     if (childList.size() > 0) {
-        if ((int)childList.size() <= pos) return symbolStr;
+        if ((int)childList.size() <= pos) return info;
         auto iter = std::next(childList.begin(), pos);
         const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(*iter);
         assert(keyAccid);
-        accid = keyAccid->GetAccid();
-        pname = keyAccid->GetPname();
-        return keyAccid->GetSymbolStr();
+        info.symbolStr = keyAccid->GetSymbolStr();
+        info.uuid = keyAccid->GetUuid();
+        info.accid = keyAccid->GetAccid();
+        info.pname = keyAccid->GetPname();
+        return info;
     }
 
-    if (pos > 12) return symbolStr;
+    if (pos > 12) return info;
 
-    int symb;
-    accid = this->GetAccidType();
-    if (accid == ACCIDENTAL_WRITTEN_f) {
+    wchar_t symb = 0;
+    info.accid = this->GetAccidType();
+    if (info.accid == ACCIDENTAL_WRITTEN_f) {
         symb = (pos < 7) ? SMUFL_E260_accidentalFlat : SMUFL_E264_accidentalDoubleFlat;
-        pname = s_pnameForFlats[pos % 7];
+        info.pname = s_pnameForFlats[pos % 7];
     }
     else {
         symb = (pos < 7) ? SMUFL_E262_accidentalSharp : SMUFL_E263_accidentalDoubleSharp;
-        pname = s_pnameForSharps[pos % 7];
+        info.pname = s_pnameForSharps[pos % 7];
     }
 
-    symbolStr.push_back(symb);
-    return symbolStr;
+    info.symbolStr.push_back(symb);
+    return info;
 }
 
 int KeySig::GetFifthsInt() const

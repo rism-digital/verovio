@@ -976,21 +976,19 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     for (int i = 0; i < keySig->GetAccidCount(); ++i) {
         // We get the pitch from the keySig (looks for keyAccid children if any)
-        data_ACCIDENTAL_WRITTEN accid;
-        data_PITCHNAME pname;
-        std::wstring accidStr = keySig->GetKeyAccidStrAt(i, accid, pname);
+        KeyAccidInfo info = keySig->GetKeyAccidInfoAt(i);
 
-        loc = PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, c), clefLocOffset);
+        loc = PitchInterface::CalcLoc(info.pname, KeySig::GetOctave(info.accid, info.pname, c), clefLocOffset);
         y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
         dc->StartCustomGraphic("keyAccid");
 
-        this->DrawSmuflString(dc, x, y, accidStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
+        this->DrawSmuflString(dc, x, y, info.symbolStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
 
         dc->EndCustomGraphic();
 
         TextExtend extend;
-        dc->GetSmuflTextExtent(accidStr, &extend);
+        dc->GetSmuflTextExtent(info.symbolStr, &extend);
         x += extend.m_width + step;
     }
 
