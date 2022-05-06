@@ -570,7 +570,8 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
     }
 
     const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    params->m_overlapMargin = ((std::abs(overlapMargin)) / staffOffset - 1) * staffOffset * params->m_directionBias;
+    const int unitChangeNumber = ((std::abs(overlapMargin)) / staffOffset - 1);
+    if (unitChangeNumber > 0) params->m_overlapMargin = unitChangeNumber * staffOffset * params->m_directionBias;
 
     return FUNCTOR_CONTINUE;
 }
