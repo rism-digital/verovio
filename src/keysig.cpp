@@ -344,7 +344,6 @@ int KeySig::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
-    LogDebug("Transposing keySig");
     int sig = this->GetFifthsInt();
 
     int intervalClass = params->m_transposer->CircleOfFifthsToIntervalClass(sig);

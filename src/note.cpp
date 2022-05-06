@@ -1560,8 +1560,6 @@ int Note::Transpose(FunctorParams *functorParams)
 
     if (!this->HasPname()) return FUNCTOR_SIBLINGS;
 
-    LogDebug("Transposing note");
-
     TransPitch pitch = this->GetTransPitch();
     params->m_transposer->Transpose(pitch);
     this->UpdateFromTransPitch(pitch);
