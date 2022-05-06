@@ -179,9 +179,9 @@ jobs:
           cmake ../cmake
           make -j8
 
-  ###########################
-  # Build the CLI artifacts #
-  ###########################
+  #################
+  # Build the CLI #
+  #################
   build_cli:
     # skip job if commit message contains "[skip-ci]"
     if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
@@ -202,16 +202,6 @@ jobs:
         run: |
           cmake ../cmake
           make -j8
-
-      - name: Update cli.txt
-        working-directory: ${{ github.workspace }}/tools
-        run: ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
-
-      - name: Upload cli artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.CLI_BUILD }}
-          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/cli.txt
 
   #####################################
   # Set up and cache emscripten build #
