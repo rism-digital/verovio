@@ -243,13 +243,11 @@ int KeySig::GetFifthsInt() const
 
 data_PITCHNAME KeySig::GetAccidPnameAt(data_ACCIDENTAL_WRITTEN accidType, int pos)
 {
-    if (pos > 6) return PITCHNAME_c;
-
     if (accidType == ACCIDENTAL_WRITTEN_f) {
-        return s_pnameForFlats[pos];
+        return s_pnameForFlats[pos % 7];
     }
     else {
-        return s_pnameForSharps[pos];
+        return s_pnameForSharps[pos % 7];
     }
 }
 
@@ -316,9 +314,10 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
 
 int KeySig::PrepareDataInitialization(FunctorParams *)
 {
+    // Clear attribute children
     this->ClearKeyAccidAttribChildren();
-    this->GenerateKeyAccidAttribChildren();
 
+    // Determine whether children have mixed accid type
     data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
     m_mixedChildrenAccidType = false;
 
@@ -335,6 +334,9 @@ int KeySig::PrepareDataInitialization(FunctorParams *)
             break;
         }
     }
+
+    // Regenerate attribute children
+    this->GenerateKeyAccidAttribChildren();
 
     return FUNCTOR_CONTINUE;
 }

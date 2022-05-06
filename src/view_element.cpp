@@ -922,35 +922,12 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int clefLocOffset = layer->GetClefLocOffset(element);
     int loc;
 
-    // Show cancellation if C major (0)
-    // This is not meant to make sense with mixed key signature
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetAccidCount() == 0)) {
-        dc->StartGraphic(element, "", element->GetUuid());
-
-        for (int i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
-            data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
-            loc = PitchInterface::CalcLoc(
-                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, clef), clefLocOffset);
-            y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
-
-            dc->StartCustomGraphic("keyAccid");
-
-            this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-
-            dc->EndCustomGraphic();
-
-            x += naturalGlyphWidth + naturalStep;
-        }
-
-        dc->EndGraphic(element, this);
-        return;
-    }
-
     dc->StartGraphic(element, "", element->GetUuid());
 
-    // Show cancellation if show cancellation (showchange) is true (false by default)
+    // Show cancellation if showchange is true (false by default) or if C major
     // This is not meant to make sense with mixed key signature
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM)
+        && ((keySig->GetSigShowchange() == BOOLEAN_true) || (keySig->GetAccidCount() == 0))) {
         const int beginCancel
             = (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) ? keySig->GetAccidCount() : 0;
         for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
