@@ -484,20 +484,17 @@ int Staff::ScoreDefOptimize(FunctorParams *functorParams)
 
     staffDef->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
 
-    // Check for the notes in current staff
+    // Ignore layers that are empty (or with @sameas)
+    ListOfObjects layers;
+    IsEmptyComparison matchTypeLayer(LAYER);
+    matchTypeLayer.ReverseComparison();
+    this->FindAllDescendantsByComparison(&layers, &matchTypeLayer);
+
     Object *note = this->FindDescendantByType(NOTE);
+
     // Show the staff only if there are any notes
     if (note) {
         staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
-    }
-    // otherwise, check if other staves have cross-staff notes to this staff
-    else {
-        const Measure *parentMeasure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-        ListOfConstObjects crossStaffNotes;
-        CrossStaffComparison matchCrossStaff(NOTE);
-        matchCrossStaff.SetStaffN(this->GetN());
-        parentMeasure->FindAllDescendantsByComparison(&crossStaffNotes, &matchCrossStaff);
-        if (!crossStaffNotes.empty()) staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
     }
 
     return FUNCTOR_SIBLINGS;
