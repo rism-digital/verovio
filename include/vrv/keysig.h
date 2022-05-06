@@ -27,7 +27,6 @@ class ScoreDefInterface;
  */
 struct KeyAccidInfo {
     std::wstring symbolStr;
-    std::string uuid;
     data_ACCIDENTAL_WRITTEN accid;
     data_PITCHNAME pname;
 };
@@ -72,7 +71,7 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /** Accid number getter */
-    int GetAccidCount() const;
+    int GetAccidCount(bool fromAttribute = false) const;
 
     /** Accid type getter */
     data_ACCIDENTAL_WRITTEN GetAccidType() const;

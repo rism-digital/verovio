@@ -137,16 +137,14 @@ bool KeySig::IsSupportedChild(Object *child)
     return true;
 }
 
-int KeySig::GetAccidCount() const
+int KeySig::GetAccidCount(bool fromAttribute) const
 {
-    const int childListSize = this->GetListSize(this); // make sure it's initialized
-    if (childListSize > 0) {
-        return childListSize;
+    if (fromAttribute) {
+        return this->HasSig() ? (this->GetSig().first) : 0;
     }
-
-    if (!this->HasSig()) return 0;
-
-    return (this->GetSig().first);
+    else {
+        return this->GetListSize(this);
+    }
 }
 
 data_ACCIDENTAL_WRITTEN KeySig::GetAccidType() const
@@ -175,10 +173,9 @@ void KeySig::ClearKeyAccidAttribChildren()
 void KeySig::GenerateKeyAccidAttribChildren()
 {
     if (this->HasEmptyList(this)) {
-        for (int i = 0; i < this->GetAccidCount(); ++i) {
+        for (int i = 0; i < this->GetAccidCount(true); ++i) {
             KeyAccidInfo info = this->GetKeyAccidInfoAt(i);
             KeyAccid *keyAccid = new KeyAccid();
-            keyAccid->SetUuid(this->GetUuid() + "-accid" + std::to_string(i));
             keyAccid->SetAccid(info.accid);
             keyAccid->SetPname(info.pname);
             keyAccid->IsAttribute(true);
@@ -210,7 +207,7 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
 
 KeyAccidInfo KeySig::GetKeyAccidInfoAt(int pos) const
 {
-    KeyAccidInfo info({ L"", "", ACCIDENTAL_WRITTEN_s, PITCHNAME_c });
+    KeyAccidInfo info({ L"", ACCIDENTAL_WRITTEN_s, PITCHNAME_c });
 
     const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     if (childList.size() > 0) {
@@ -219,7 +216,6 @@ KeyAccidInfo KeySig::GetKeyAccidInfoAt(int pos) const
         const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(*iter);
         assert(keyAccid);
         info.symbolStr = keyAccid->GetSymbolStr();
-        info.uuid = keyAccid->GetUuid();
         info.accid = keyAccid->GetAccid();
         info.pname = keyAccid->GetPname();
         return info;
@@ -332,6 +328,7 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
 
 int KeySig::PrepareDataInitialization(FunctorParams *)
 {
+    this->ClearKeyAccidAttribChildren();
     this->GenerateKeyAccidAttribChildren();
 
     data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
