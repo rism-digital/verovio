@@ -1003,8 +1003,7 @@ curvature_CURVEDIR Slur::GetGraceCurveDirection() const
     const StemmedDrawingInterface *startStemDrawInterface = start->GetStemmedDrawingInterface();
     const bool isStemDown
         = startStemDrawInterface && (startStemDrawInterface->GetDrawingStemDir() == STEMDIRECTION_down);
-    const bool isBeam = start->IsInBeam() || start->IsInBeamSpan() || start->IsInFTrem();
-    return (isStemDown == isBeam) ? curvature_CURVEDIR_below : curvature_CURVEDIR_above;
+    return isStemDown ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
 }
 
 curvature_CURVEDIR Slur::GetPreferredCurveDirection(
