@@ -1258,7 +1258,7 @@ Options::Options()
     m_justificationMaxVertical.SetInfo("Maximum ratio of justifiable height for page",
         "Maximum ratio of justifiable height to page height that can be used for the vertical justification");
     m_justificationMaxVertical.Init(0.3, 0.0, 1.0);
-    this->Register(&m_justificationMaxVertical, "justificationMaxVertical", &m_general);
+    this->Register(&m_justificationMaxVertical, "justificationMaxVertical", &m_generalLayout);
 
     m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");
     m_ledgerLineThickness.Init(0.25, 0.10, 0.50);
