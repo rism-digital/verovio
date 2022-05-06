@@ -315,6 +315,11 @@ public:
      */
     std::pair<int, int> GetAdditionalBeamCount() const override;
 
+    /**
+     * Return duration of beam part that are closest to the specified object X position
+     */
+    int GetBeamPartDuration(Object *object) const;
+
     //----------//
     // Functors //
     //----------//
