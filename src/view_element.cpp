@@ -32,6 +32,7 @@
 #include "ftrem.h"
 #include "functorparams.h"
 #include "halfmrpt.h"
+#include "keyaccid.h"
 #include "keysig.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -976,19 +977,22 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     for (int i = 0; i < keySig->GetAccidCount(); ++i) {
         // We get the pitch from the keySig (looks for keyAccid children if any)
-        KeyAccidInfo info = keySig->GetKeyAccidInfoAt(i);
+        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(keySig->GetChild(i, KEYACCID));
+        const data_ACCIDENTAL_WRITTEN accid = keyAccid->GetAccid();
+        const data_PITCHNAME pname = keyAccid->GetPname();
+        const std::wstring symbolStr = keyAccid->GetSymbolStr();
 
-        loc = PitchInterface::CalcLoc(info.pname, KeySig::GetOctave(info.accid, info.pname, c), clefLocOffset);
+        loc = PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, c), clefLocOffset);
         y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
         dc->StartCustomGraphic("keyAccid");
 
-        this->DrawSmuflString(dc, x, y, info.symbolStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
+        this->DrawSmuflString(dc, x, y, symbolStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
 
         dc->EndCustomGraphic();
 
         TextExtend extend;
-        dc->GetSmuflTextExtent(info.symbolStr, &extend);
+        dc->GetSmuflTextExtent(symbolStr, &extend);
         x += extend.m_width + step;
     }
 

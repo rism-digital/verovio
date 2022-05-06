@@ -26,7 +26,6 @@ class ScoreDefInterface;
  * Useful information collected from a KeyAccid child
  */
 struct KeyAccidInfo {
-    std::wstring symbolStr;
     data_ACCIDENTAL_WRITTEN accid;
     data_PITCHNAME pname;
 };
@@ -89,12 +88,6 @@ public:
      */
     void FillMap(MapOfPitchAccid &mapOfPitchAccid) const;
 
-    /**
-     * Return key accid information at the positon pos.
-     * Looks at keyAccid children if any.
-     */
-    KeyAccidInfo GetKeyAccidInfoAt(int pos) const;
-
     int GetFifthsInt() const;
 
     //----------------//
@@ -128,7 +121,11 @@ protected:
     void FilterList(ListOfConstObjects &childList) const override;
 
 private:
-    //
+    /**
+     * Generate key accid information for a given position
+     */
+    std::optional<KeyAccidInfo> GetKeyAccidInfoAt(int pos) const;
+
 public:
     bool m_mixedChildrenAccidType;
     /**

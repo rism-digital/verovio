@@ -174,12 +174,14 @@ void KeySig::GenerateKeyAccidAttribChildren()
 {
     if (this->HasEmptyList(this)) {
         for (int i = 0; i < this->GetAccidCount(true); ++i) {
-            KeyAccidInfo info = this->GetKeyAccidInfoAt(i);
-            KeyAccid *keyAccid = new KeyAccid();
-            keyAccid->SetAccid(info.accid);
-            keyAccid->SetPname(info.pname);
-            keyAccid->IsAttribute(true);
-            this->AddChild(keyAccid);
+            std::optional<KeyAccidInfo> info = this->GetKeyAccidInfoAt(i);
+            if (info) {
+                KeyAccid *keyAccid = new KeyAccid();
+                keyAccid->SetAccid(info->accid);
+                keyAccid->SetPname(info->pname);
+                keyAccid->IsAttribute(true);
+                this->AddChild(keyAccid);
+            }
         }
     }
 }
@@ -205,36 +207,22 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
     }
 }
 
-KeyAccidInfo KeySig::GetKeyAccidInfoAt(int pos) const
+std::optional<KeyAccidInfo> KeySig::GetKeyAccidInfoAt(int pos) const
 {
-    KeyAccidInfo info({ L"", ACCIDENTAL_WRITTEN_s, PITCHNAME_c });
+    if (pos > 12) return std::nullopt;
 
-    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
-    if (childList.size() > 0) {
-        if ((int)childList.size() <= pos) return info;
-        auto iter = std::next(childList.begin(), pos);
-        const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(*iter);
-        assert(keyAccid);
-        info.symbolStr = keyAccid->GetSymbolStr();
-        info.accid = keyAccid->GetAccid();
-        info.pname = keyAccid->GetPname();
-        return info;
-    }
-
-    if (pos > 12) return info;
-
-    wchar_t symb = 0;
-    info.accid = this->GetAccidType();
-    if (info.accid == ACCIDENTAL_WRITTEN_f) {
-        symb = (pos < 7) ? SMUFL_E260_accidentalFlat : SMUFL_E264_accidentalDoubleFlat;
+    KeyAccidInfo info;
+    if (this->GetAccidType() == ACCIDENTAL_WRITTEN_f) {
+        info.accid = (pos < 7) ? ACCIDENTAL_WRITTEN_f : ACCIDENTAL_WRITTEN_ff;
         info.pname = s_pnameForFlats[pos % 7];
     }
-    else {
-        symb = (pos < 7) ? SMUFL_E262_accidentalSharp : SMUFL_E263_accidentalDoubleSharp;
+    else if (this->GetAccidType() == ACCIDENTAL_WRITTEN_s) {
+        info.accid = (pos < 7) ? ACCIDENTAL_WRITTEN_s : ACCIDENTAL_WRITTEN_ss;
         info.pname = s_pnameForSharps[pos % 7];
     }
-
-    info.symbolStr.push_back(symb);
+    else {
+        return std::nullopt;
+    }
     return info;
 }
 
