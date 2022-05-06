@@ -575,10 +575,10 @@
             <!--<glyph glyph-code="E22B" smufl-name="pendereckiTremolo" />-->
             <!--<glyph glyph-code="E22C" smufl-name="unmeasuredTremolo" />-->
             <!--<glyph glyph-code="E22D" smufl-name="unmeasuredTremoloSimple" />-->
-            <!--<glyph glyph-code="E22E" smufl-name="tremoloDivisiDots2" />-->
-            <!--<glyph glyph-code="E22F" smufl-name="tremoloDivisiDots3" />-->
-            <!--<glyph glyph-code="E230" smufl-name="tremoloDivisiDots4" />-->
-            <!--<glyph glyph-code="E231" smufl-name="tremoloDivisiDots6" />-->
+            <glyph glyph-code="E22E" smufl-name="tremoloDivisiDots2" />
+            <glyph glyph-code="E22F" smufl-name="tremoloDivisiDots3" />
+            <glyph glyph-code="E230" smufl-name="tremoloDivisiDots4" />
+            <glyph glyph-code="E231" smufl-name="tremoloDivisiDots6" />
             <!--<glyph glyph-code="E232" smufl-name="stockhausenTremolo" />-->
             <!--<glyph glyph-code="E233" smufl-name="oneHandedRollStevens" />-->
             <!--<glyph glyph-code="E234" smufl-name="doubleLateralRollStevens" />-->

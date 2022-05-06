@@ -460,8 +460,13 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     BTrem *bTrem = vrv_cast<BTrem *>(element);
     assert(bTrem);
 
+    const int staffSize = staff->m_drawingStaffSize;
+    int xOffset = 0;
+    int yTop = staff->GetDrawingY();
+    int yBottom = yTop - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
+
+    // Get the chord or note child
     Object *bTremElement = bTrem->FindDescendantByType(CHORD);
-    // Get from the chord or note child
     if (!bTremElement) bTremElement = bTrem->FindDescendantByType(NOTE);
     if (!bTremElement) {
         bTrem->SetEmptyBB();
@@ -472,16 +477,46 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     this->DrawLayerChildren(dc, bTrem, layer, staff, measure);
 
-    if (bTremElement && bTremElement->Is(NOTE)) {
+    if (bTremElement->Is(CHORD)) {
+        Chord *childChord = vrv_cast<Chord *>(bTremElement);
+        xOffset = childChord->GetDrawingRadius(m_doc);
+        yTop
+            = (childChord->GetDrawingTop(m_doc, staffSize) > yTop) ? childChord->GetDrawingTop(m_doc, staffSize) : yTop;
+        yBottom = (childChord->GetDrawingBottom(m_doc, staffSize) < yBottom)
+            ? childChord->GetDrawingBottom(m_doc, staffSize)
+            : yBottom;
+    }
+    else if (bTremElement->Is(NOTE)) {
         Note *childNote = vrv_cast<Note *>(bTremElement);
         if (childNote->HasStemSameasNote() && childNote->GetStemSameasRole() == SAMEAS_SECONDARY) {
             bTrem->SetEmptyBB();
             dc->EndGraphic(element, this);
             return;
         }
+        xOffset = childNote->GetDrawingRadius(m_doc);
+        yTop = (childNote->GetDrawingTop(m_doc, staffSize) > yTop) ? childNote->GetDrawingTop(m_doc, staffSize) : yTop;
+        yBottom = (childNote->GetDrawingBottom(m_doc, staffSize) < yBottom)
+            ? childNote->GetDrawingBottom(m_doc, staffSize)
+            : yBottom;
     }
 
     this->DrawStemMod(dc, element, staff);
+
+    // draw the (tuplet) number
+    if (bTrem->HasNum() && (bTrem->GetNumVisible() != BOOLEAN_false)) {
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+        // calculate the extend of the number
+        TextExtend extend;
+        const std::wstring figures = this->IntToTupletFigures(bTrem->GetNum());
+        dc->GetSmuflTextExtent(figures, &extend);
+        int yNum = yTop + m_doc->GetDrawingUnit(staffSize);
+        if (bTrem->GetNumPlace() == STAFFREL_basic_below) {
+            yNum = yBottom - m_doc->GetDrawingUnit(staffSize) - extend.m_height;
+        }
+        dc->DrawMusicText(
+            figures, ToDeviceContextX(element->GetDrawingX() + xOffset - extend.m_width / 2), ToDeviceContextY(yNum));
+        dc->ResetFont();
+    }
 
     dc->EndGraphic(element, this);
 }

@@ -154,6 +154,10 @@
   <g c="E223" x="0.0" y="-377.0" w="290.0" h="755.0" h-a-x="290" n="tremolo4"/>
   <g c="E224" x="0.0" y="-471.0" w="290.0" h="944.0" h-a-x="290" n="tremolo5"/>
   <g c="E22A" x="-150.0" y="-140.0" w="300.0" h="280.0" h-a-x="150" n="buzzRoll"/>
+  <g c="E22E" x="-0.25" y="-0.25" w="246.5" h="78.25" h-a-x="246" n="tremoloDivisiDots2"/>
+  <g c="E22F" x="-0.25" y="-0.25" w="417.5" h="78.25" h-a-x="417" n="tremoloDivisiDots3"/>
+  <g c="E230" x="-0.25" y="-0.25" w="585.5" h="78.25" h-a-x="585" n="tremoloDivisiDots4"/>
+  <g c="E231" x="-0.25" y="-0.25" w="417.5" h="246.25" h-a-x="417" n="tremoloDivisiDots6"/>
   <g c="E240" x="0.0" y="-817.0" w="289.04" h="829.0" h-a-x="289" n="flag8thUp">
     <a n="stemUpNW" x="0.0" y="-0.01"/>
   </g>
