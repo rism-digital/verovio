@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "grpsym.h"
@@ -225,6 +226,21 @@ LabelAbbr *StaffGrp::GetLabelAbbrCopy() const
     return clone;
 }
 
+void StaffGrp::SetEverythingVisible()
+{
+    this->SetDrawingVisibility(OPTIMIZATION_SHOW);
+    std::for_each(this->GetChildren().begin(), this->GetChildren().end(), [](Object *child) {
+        if (child->Is(STAFFDEF)) {
+            StaffDef *staffDef = vrv_cast<StaffDef *>(child);
+            assert(staffDef);
+            staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
+        }
+        else if (child->Is(STAFFGRP)) {
+            vrv_cast<StaffGrp *>(child)->SetEverythingVisible();
+        }
+    });
+}
+
 //----------------------------------------------------------------------------
 // StaffGrp functor methods
 //----------------------------------------------------------------------------
@@ -232,6 +248,17 @@ LabelAbbr *StaffGrp::GetLabelAbbrCopy() const
 int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *)
 {
     this->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
+
+    const Object *instrDef = this->FindDescendantByType(INSTRDEF, 1);
+    if (instrDef) {
+        VisibleStaffDefOrGrpObject visibleStaves;
+        const Object *firstVisible = this->FindDescendantByComparison(&visibleStaves, 1);
+        if (firstVisible) {
+            this->SetEverythingVisible();
+        }
+
+        return FUNCTOR_CONTINUE;
+    }
 
     for (auto child : this->GetChildren()) {
         if (child->Is(STAFFDEF)) {
@@ -248,16 +275,6 @@ int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *)
             if (staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
                 this->SetDrawingVisibility(OPTIMIZATION_SHOW);
                 break;
-            }
-        }
-    }
-
-    if ((this->GetSymbol() == staffGroupingSym_SYMBOL_brace) && (this->GetDrawingVisibility() != OPTIMIZATION_HIDDEN)) {
-        for (auto child : this->GetChildren()) {
-            if (child->Is(STAFFDEF)) {
-                StaffDef *staffDef = vrv_cast<StaffDef *>(child);
-                assert(staffDef);
-                staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
             }
         }
     }

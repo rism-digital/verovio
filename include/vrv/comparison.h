@@ -520,11 +520,11 @@ public:
         if (object == m_objectToExclude || !ClassIdsComparison::operator()(object)) return false;
 
         if (object->Is(STAFFDEF)) {
-            const StaffDef *staffDef = dynamic_cast<const StaffDef *>(object);
+            const StaffDef *staffDef = vrv_cast<const StaffDef *>(object);
             return staffDef && staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
         }
 
-        const StaffGrp *staffGrp = dynamic_cast<const StaffGrp *>(object);
+        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(object);
         return staffGrp && staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
     }
 

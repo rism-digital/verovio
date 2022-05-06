@@ -104,6 +104,8 @@ public:
     LabelAbbr *GetLabelAbbrCopy() const;
     ///@}
 
+    void SetEverythingVisible();
+
     //----------//
     // Functors //
     //----------//
