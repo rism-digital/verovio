@@ -595,8 +595,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteHalfmRpt(m_currentNode, vrv_cast<HalfmRpt *>(object));
     }
     else if (object->Is(KEYACCID)) {
-        m_currentNode = m_currentNode.append_child("keyAccid");
-        this->WriteKeyAccid(m_currentNode, vrv_cast<KeyAccid *>(object));
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("keyAccid");
+            this->WriteKeyAccid(m_currentNode, vrv_cast<KeyAccid *>(object));
+        }
     }
     else if (object->Is(KEYSIG)) {
         if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("keySig");
