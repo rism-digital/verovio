@@ -23,7 +23,7 @@ class ScoreDefInterface;
 // KeyAccidInfo
 //----------------------------------------------------------------------------
 /**
- * Useful information collected from a KeyAccid child
+ * Useful information regarding a KeyAccid child
  */
 struct KeyAccidInfo {
     data_ACCIDENTAL_WRITTEN accid;
