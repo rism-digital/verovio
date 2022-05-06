@@ -888,8 +888,8 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     int x, y;
 
-    Clef *c = layer->GetClef(element);
-    if (!c) {
+    Clef *clef = layer->GetClef(element);
+    if (!clef) {
         keySig->SetEmptyBB();
         return;
     }
@@ -930,7 +930,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         for (int i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
             data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
             loc = PitchInterface::CalcLoc(
-                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
+                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, clef), clefLocOffset);
             y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
             dc->StartCustomGraphic("keyAccid");
@@ -956,7 +956,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
             data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
             loc = PitchInterface::CalcLoc(
-                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
+                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, clef), clefLocOffset);
             y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
             dc->StartCustomGraphic("keyAccid");
@@ -975,25 +975,12 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    for (int i = 0; i < keySig->GetAccidCount(); ++i) {
-        // We get the pitch from the keySig (looks for keyAccid children if any)
-        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(keySig->GetChild(i, KEYACCID));
-        const data_ACCIDENTAL_WRITTEN accid = keyAccid->GetAccid();
-        const data_PITCHNAME pname = keyAccid->GetPname();
-        const std::wstring symbolStr = keyAccid->GetSymbolStr();
-
-        loc = PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, c), clefLocOffset);
-        y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
-
-        dc->StartCustomGraphic("keyAccid");
-
-        this->DrawSmuflString(dc, x, y, symbolStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
-
-        dc->EndCustomGraphic();
-
-        TextExtend extend;
-        dc->GetSmuflTextExtent(symbolStr, &extend);
-        x += extend.m_width + step;
+    for (Object *child : keySig->GetChildren()) {
+        if (child->Is(KEYACCID)) {
+            KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
+            this->DrawKeyAccid(dc, keyAccid, staff, clef, clefLocOffset, x);
+            x += step;
+        }
     }
 
     dc->ResetFont();
@@ -1013,6 +1000,26 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(meterSig);
 
     this->DrawMeterSig(dc, meterSig, staff, 0);
+}
+
+void View::DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x)
+{
+    const data_ACCIDENTAL_WRITTEN accid = keyAccid->GetAccid();
+    const data_PITCHNAME pname = keyAccid->GetPname();
+    const std::wstring symbolStr = keyAccid->GetSymbolStr();
+
+    const int loc = PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, clef), clefLocOffset);
+    const int y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+
+    dc->StartCustomGraphic("keyAccid", "", keyAccid->GetUuid());
+
+    this->DrawSmuflString(dc, x, y, symbolStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
+
+    dc->EndCustomGraphic();
+
+    TextExtend extend;
+    dc->GetSmuflTextExtent(symbolStr, &extend);
+    x += extend.m_width;
 }
 
 void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset)
