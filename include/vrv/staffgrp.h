@@ -104,6 +104,9 @@ public:
     LabelAbbr *GetLabelAbbrCopy() const;
     ///@}
 
+    /**
+     * Set visibility of the group and all of its nested children to SHOW
+     */
     void SetEverythingVisible();
 
     //----------//
