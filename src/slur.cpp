@@ -998,7 +998,7 @@ float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVE
 
 curvature_CURVEDIR Slur::GetGraceCurveDirection() const
 {
-    // Start on the notehead side except for beams
+    // Start on the notehead side
     const LayerElement *start = this->GetStart();
     const StemmedDrawingInterface *startStemDrawInterface = start->GetStemmedDrawingInterface();
     const bool isStemDown
