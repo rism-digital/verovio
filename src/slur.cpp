@@ -100,6 +100,8 @@ void Slur::Reset()
     this->ResetLayerIdent();
 
     m_drawingCurveDir = SlurCurveDirection::None;
+    m_cachedDrawingX1 = VRV_UNSET;
+    m_cachedDrawingX2 = VRV_UNSET;
 }
 
 curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
@@ -123,6 +125,17 @@ curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
         }
         default: return curvature_CURVEDIR_NONE;
     }
+}
+
+bool Slur::HasCachedDrawingX12() const
+{
+    return ((m_cachedDrawingX1 != VRV_UNSET) && (m_cachedDrawingX2 != VRV_UNSET));
+}
+
+void Slur::SetCachedDrawingX12(int x1, int x2)
+{
+    m_cachedDrawingX1 = x1;
+    m_cachedDrawingX2 = x2;
 }
 
 std::pair<Layer *, LayerElement *> Slur::GetBoundaryLayer()
@@ -1061,8 +1074,8 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(
     return drawingCurveDir;
 }
 
-std::pair<Point, Point> Slur::AdjustCoordinates(
-    Doc *doc, Staff *staff, std::pair<Point, Point> points, char spanningType)
+std::pair<Point, Point> Slur::CalcEndPoints(
+    Doc *doc, Staff *staff, curvature_CURVEDIR drawingCurveDir, char spanningType)
 {
     StemmedDrawingInterface *startStemDrawInterface = this->GetStart()->GetStemmedDrawingInterface();
     StemmedDrawingInterface *endStemDrawInterface = this->GetEnd()->GetStemmedDrawingInterface();
@@ -1117,8 +1130,12 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
 
     const PortatoSlurType portatoSlurType = this->IsPortatoSlur(doc, startNote, startChord);
 
-    int x1, x2, y1, y2;
-    std::tie(x1, x2, y1, y2) = std::tie(points.first.x, points.second.x, points.first.y, points.second.y);
+    assert(this->HasCachedDrawingX12());
+
+    int x1 = m_cachedDrawingX1;
+    int x2 = m_cachedDrawingX2;
+    int y1 = staff->GetDrawingY();
+    int y2 = y1;
 
     bool isShortSlur = false;
     if (x2 - x1 < doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
@@ -1410,6 +1427,17 @@ std::pair<Point, Point> Slur::AdjustCoordinates(
         y1 = staffBottom + brokenLoc * unit;
         y2 = y1;
     }
+
+    // Final vertical adjustment based on drawing curve direction
+    int sign = (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
+    if (drawingCurveDir == curvature_CURVEDIR_mixed) {
+        sign = this->HasEndpointAboveStart() ? 1 : -1;
+    }
+    y1 += 1.25 * sign * unit;
+    if (drawingCurveDir == curvature_CURVEDIR_mixed) {
+        sign = this->HasEndpointAboveEnd() ? 1 : -1;
+    }
+    y2 += 1.25 * sign * unit;
 
     return std::make_pair(Point(x1, y1), Point(x2, y2));
 }

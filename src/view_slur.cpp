@@ -51,6 +51,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     if ((this->GetSlurHandling() == SlurHandling::Initialize) && dc->Is(BBOX_DEVICE_CONTEXT)
         && (curve->GetDir() == curvature_CURVEDIR_NONE || curve->IsCrossStaff())) {
+        slur->SetCachedDrawingX12(x1, x2);
         this->DrawSlurInitial(curve, slur, x1, x2, staff, spanningType);
     }
 
@@ -100,29 +101,11 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     const curvature_CURVEDIR drawingCurveDir = slur->CalcDrawingCurveDir(spanningType);
 
-    /************** adjusting y position **************/
-
-    int y1 = staff->GetDrawingY();
-    int y2 = staff->GetDrawingY();
-    std::pair<Point, Point> adjustedPoints
-        = slur->AdjustCoordinates(m_doc, staff, std::make_pair(Point(x1, y1), Point(x2, y2)), spanningType);
-
-    /************** y position **************/
-
-    int sign = (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
-    if (drawingCurveDir == curvature_CURVEDIR_mixed) {
-        sign = slur->HasEndpointAboveStart() ? 1 : -1;
-    }
-    adjustedPoints.first.y += 1.25 * sign * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-
-    if (drawingCurveDir == curvature_CURVEDIR_mixed) {
-        sign = slur->HasEndpointAboveEnd() ? 1 : -1;
-    }
-    adjustedPoints.second.y += 1.25 * sign * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const std::pair<Point, Point> endPoints = slur->CalcEndPoints(m_doc, staff, drawingCurveDir, spanningType);
 
     Point points[4];
-    points[0] = adjustedPoints.first;
-    points[3] = adjustedPoints.second;
+    points[0] = endPoints.first;
+    points[3] = endPoints.second;
 
     this->CalcInitialSlur(curve, slur, staff, drawingCurveDir, points);
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurMidpointThickness.GetValue();
