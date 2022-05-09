@@ -177,12 +177,15 @@ public:
     /**
      * Return the end measure of the TimePointInterface
      */
+    ///@{
     Measure *GetEndMeasure();
+    const Measure *GetEndMeasure() const;
+    ///@}
 
     /**
      * Return true if the element is spanning over two or more measures
      */
-    bool IsSpanningMeasures();
+    bool IsSpanningMeasures() const;
 
     /**
      *
@@ -194,8 +197,8 @@ public:
      * @Return true if end temporally occurs after start
      */
     ///@{
-    bool IsOrdered();
-    bool IsOrdered(LayerElement *start, LayerElement *end);
+    bool IsOrdered() const;
+    bool IsOrdered(const LayerElement *start, const LayerElement *end) const;
     ///@}
 
     /**

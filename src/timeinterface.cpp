@@ -229,26 +229,31 @@ bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
 
 Measure *TimeSpanningInterface::GetEndMeasure()
 {
-    if (!m_end) return NULL;
-    return dynamic_cast<Measure *>(m_end->GetFirstAncestor(MEASURE));
+    return const_cast<Measure *>(std::as_const(*this).GetEndMeasure());
 }
 
-bool TimeSpanningInterface::IsSpanningMeasures()
+const Measure *TimeSpanningInterface::GetEndMeasure() const
+{
+    if (!m_end) return NULL;
+    return vrv_cast<const Measure *>(m_end->GetFirstAncestor(MEASURE));
+}
+
+bool TimeSpanningInterface::IsSpanningMeasures() const
 {
     if (!this->HasStartAndEnd()) return false;
     return (this->GetStartMeasure() != this->GetEndMeasure());
 }
 
-bool TimeSpanningInterface::IsOrdered()
+bool TimeSpanningInterface::IsOrdered() const
 {
     return this->IsOrdered(m_start, m_end);
 }
 
-bool TimeSpanningInterface::IsOrdered(LayerElement *start, LayerElement *end)
+bool TimeSpanningInterface::IsOrdered(const LayerElement *start, const LayerElement *end) const
 {
     if (!start || !end) return true;
-    Measure *startMeasure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
-    Measure *endMeasure = vrv_cast<Measure *>(end->GetFirstAncestor(MEASURE));
+    const Measure *startMeasure = vrv_cast<const Measure *>(start->GetFirstAncestor(MEASURE));
+    const Measure *endMeasure = vrv_cast<const Measure *>(end->GetFirstAncestor(MEASURE));
 
     if (startMeasure == endMeasure) {
         if (!start->GetAlignment() || !end->GetAlignment()) return true;
