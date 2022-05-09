@@ -575,7 +575,7 @@ void StaffDefDrawingInterface::Reset()
     m_drawMeterSigGrp = false;
 }
 
-void StaffDefDrawingInterface::SetCurrentClef(Clef const *clef)
+void StaffDefDrawingInterface::SetCurrentClef(const Clef *clef)
 {
     if (clef) {
         m_currentClef = *clef;
@@ -583,7 +583,7 @@ void StaffDefDrawingInterface::SetCurrentClef(Clef const *clef)
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentKeySig(KeySig const *keySig)
+void StaffDefDrawingInterface::SetCurrentKeySig(const KeySig *keySig)
 {
     if (keySig) {
         char drawingCancelAccidCount = m_currentKeySig.GetAccidCount();
@@ -595,7 +595,7 @@ void StaffDefDrawingInterface::SetCurrentKeySig(KeySig const *keySig)
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentMensur(Mensur const *mensur)
+void StaffDefDrawingInterface::SetCurrentMensur(const Mensur *mensur)
 {
     if (mensur) {
         m_currentMensur = *mensur;
@@ -603,7 +603,7 @@ void StaffDefDrawingInterface::SetCurrentMensur(Mensur const *mensur)
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig const *meterSig)
+void StaffDefDrawingInterface::SetCurrentMeterSig(const MeterSig *meterSig)
 {
     if (meterSig) {
         m_currentMeterSig = *meterSig;
@@ -611,7 +611,7 @@ void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig const *meterSig)
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentMeterSigGrp(MeterSigGrp const *meterSigGrp)
+void StaffDefDrawingInterface::SetCurrentMeterSigGrp(const MeterSigGrp *meterSigGrp)
 {
     if (meterSigGrp) {
         m_currentMeterSigGrp = *meterSigGrp;
@@ -628,7 +628,7 @@ bool StaffDefDrawingInterface::DrawMeterSigGrp() const
     return false;
 }
 
-void StaffDefDrawingInterface::AlternateCurrentMeterSig(Measure *measure)
+void StaffDefDrawingInterface::AlternateCurrentMeterSig(const Measure *measure)
 {
     if (MeterSigGrp *meterSigGrp = this->GetCurrentMeterSigGrp();
         meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
