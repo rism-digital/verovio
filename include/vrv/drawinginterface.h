@@ -340,6 +340,7 @@ public:
     data_STEMDIRECTION GetDrawingStemDir() const;
     void SetDrawingStemLen(int drawingStemLen);
     int GetDrawingStemLen() const;
+    int GetDrawingStemModRelY() const;
     ///@}
 
     Point GetDrawingStemStart(const Object *object = NULL) const;

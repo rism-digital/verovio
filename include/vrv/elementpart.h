@@ -366,6 +366,7 @@ public:
     void SetDrawingStemLen(int drawingStemLen) { m_drawingStemLen = drawingStemLen; }
     int GetDrawingStemAdjust() { return m_drawingStemAdjust; }
     void SetDrawingStemAdjust(int drawingStemAdjust) { m_drawingStemAdjust = drawingStemAdjust; }
+    int GetStemModRelY() const { return m_stemModRelY; }
     ///@}
 
     /**
@@ -412,7 +413,12 @@ private:
     /**
      * Helper to adjust length of stem based on presence of slashes
      */
-    void AdjustSlashes(Doc *doc, int staffSize, int flagOffset, bool isSameAs);
+    void AdjustSlashes(Doc *doc, Staff *staff, int flagOffset);
+
+    /**
+     * Helper to calculate relative position for the stem modifier
+     */
+    void CalculateStemModRelY(Doc *doc, Staff *staff);
 
 public:
     //
@@ -425,6 +431,10 @@ private:
      * The drawing length of stem
      */
     int m_drawingStemLen;
+    /**
+     * Relative Y position for the stem modifier
+     */
+    int m_stemModRelY;
     /**
      * The adjustment of the drawing stem length (used with french style of beams)
      */
