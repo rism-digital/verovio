@@ -3054,7 +3054,7 @@ bool PAEInput::ConvertKeySig()
                 token.m_char = 0;
                 continue;
             }
-            if (!token.IsSpace()) {
+            if (!token.IsEnd() && !token.IsSpace()) {
                 LogPAE(ERR_004_KEY_SPACE, token);
                 if (m_pedanticMode) return false;
             }
@@ -3092,7 +3092,7 @@ bool PAEInput::ConvertClef()
                 token.m_char = 0;
                 continue;
             }
-            if (!token.IsSpace()) {
+            if (!token.IsEnd() && !token.IsSpace()) {
                 LogPAE(ERR_005_CLEF_SPACE, token);
                 if (m_pedanticMode) return false;
             }
@@ -3130,7 +3130,7 @@ bool PAEInput::ConvertMeterSigOrMensur()
                 token.m_char = 0;
                 continue;
             }
-            if (!token.IsSpace()) {
+            if (!token.IsEnd() && !token.IsSpace()) {
                 LogPAE(ERR_006_TIMESIG_SPACE, token);
                 if (m_pedanticMode) return false;
             }

@@ -861,6 +861,7 @@ Options::Options()
     // There are listed in Toolkit::GetAvailableOptions through Options::GetBaseOptGrp
 
     m_baseOptions.SetLabel("Base short options", "0-base");
+    m_baseOptions.SetCategory(OptionsCategory::Base);
 
     m_standardOutput.SetInfo(
         "Standard output", "Use \"-\" as input file or set the \"--stdin\" option for reading from the standard input");
@@ -932,7 +933,8 @@ Options::Options()
 
     /********* General *********/
 
-    m_general.SetLabel("Input and page layout options", "1-general");
+    m_general.SetLabel("Input and page configuration options", "1-general");
+    m_general.SetCategory(OptionsCategory::General);
     m_grps.push_back(&m_general);
 
     m_adjustPageHeight.SetInfo("Adjust page height", "Adjust the page height to the height of the content");
@@ -973,6 +975,14 @@ Options::Options()
     m_expand.Init("");
     this->Register(&m_expand, "expand", &m_general);
 
+    m_footer.SetInfo("Footer", "Control footer layout");
+    m_footer.Init(FOOTER_auto, &Option::s_footer);
+    this->Register(&m_footer, "footer", &m_general);
+
+    m_header.SetInfo("Header", "Control header layout");
+    m_header.Init(HEADER_auto, &Option::s_header);
+    this->Register(&m_header, "header", &m_general);
+
     m_humType.SetInfo("Humdrum type", "Include type attributes when importing from Humdrum");
     m_humType.Init(false);
     this->Register(&m_humType, "humType", &m_general);
@@ -993,14 +1003,6 @@ Options::Options()
     m_mensuralToMeasure.Init(false);
     this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_general);
 
-    m_midiNoCue.SetInfo("MIDI playback of cue notes", "Skip cue notes in MIDI output");
-    m_midiNoCue.Init(false);
-    this->Register(&m_midiNoCue, "midiNoCue", &m_general);
-
-    m_midiTempoAdjustment.SetInfo("MIDI tempo adjustment", "The MIDI tempo adjustment factor");
-    m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
-    this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_generalLayout);
-
     m_minLastJustification.SetInfo("Minimum last-system-justification width",
         "The last system is only justified if the unjustified width is greater than this percent");
     m_minLastJustification.Init(0.8, 0.0, 1.0);
@@ -1009,14 +1011,6 @@ Options::Options()
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_general);
-
-    m_footer.SetInfo("Footer", "Control footer layout");
-    m_footer.Init(FOOTER_auto, &Option::s_footer);
-    this->Register(&m_footer, "footer", &m_general);
-
-    m_header.SetInfo("Header", "Control header layout");
-    m_header.Init(HEADER_auto, &Option::s_header);
-    this->Register(&m_header, "header", &m_general);
 
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
@@ -1155,6 +1149,7 @@ Options::Options()
     /********* General layout *********/
 
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");
+    m_generalLayout.SetCategory(OptionsCategory::Layout);
     m_grps.push_back(&m_generalLayout);
 
     m_barLineSeparation.SetInfo(
@@ -1183,6 +1178,15 @@ Options::Options()
     m_bracketThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);
 
+    m_breaksNoWidow.SetInfo(
+        "Breaks no widow", "Prevent single measures on the last page by fitting it into previous system");
+    m_breaksNoWidow.Init(false);
+    this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
+
+    m_clefChangeFactor.SetInfo("Clef change size", "Set the ratio of normal clefs to changing clefs");
+    m_clefChangeFactor.Init(0.66, 0.25, 1.0);
+    this->Register(&m_clefChangeFactor, "clefChangeFactor", &m_generalLayout);
+
     m_dynamDist.SetInfo("Dynam dist", "The default distance from the staff for dynamic marks");
     m_dynamDist.Init(1.0, 0.5, 16.0);
     this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
@@ -1196,11 +1200,6 @@ Options::Options()
     m_engravingDefaultsFile.Init(JsonSource::FilePath, "");
     this->Register(&m_engravingDefaultsFile, "engravingDefaultsFile", &m_generalLayout);
 
-    m_breaksNoWidow.SetInfo(
-        "Breaks no widow", "Prevent single measures on the last page by fitting it into previous system");
-    m_breaksNoWidow.Init(false);
-    this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
-
     m_fingeringScale.SetInfo("Fingering scale", "The scale of fingering font compared to default font size");
     m_fingeringScale.Init(0.75, 0.25, 1);
     this->Register(&m_fingeringScale, "fingeringScale", &m_generalLayout);
@@ -1208,10 +1207,6 @@ Options::Options()
     m_font.SetInfo("Font", "Set the music font");
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
-
-    m_clefChangeFactor.SetInfo("Clef change size", "Set the ratio of normal clefs to changing clefs");
-    m_clefChangeFactor.Init(0.66, 0.25, 1.0);
-    this->Register(&m_clefChangeFactor, "clefChangeFactor", &m_generalLayout);
 
     m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
     m_graceFactor.Init(0.75, 0.5, 1.0);
@@ -1263,7 +1258,7 @@ Options::Options()
     m_justificationMaxVertical.SetInfo("Maximum ratio of justifiable height for page",
         "Maximum ratio of justifiable height to page height that can be used for the vertical justification");
     m_justificationMaxVertical.Init(0.3, 0.0, 1.0);
-    this->Register(&m_justificationMaxVertical, "justificationMaxVertical", &m_general);
+    this->Register(&m_justificationMaxVertical, "justificationMaxVertical", &m_generalLayout);
 
     m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");
     m_ledgerLineThickness.Init(0.25, 0.10, 0.50);
@@ -1343,6 +1338,10 @@ Options::Options()
     m_slurCurveFactor.Init(1.0, 0.2, 5.0);
     this->Register(&m_slurCurveFactor, "slurCurveFactor", &m_generalLayout);
 
+    m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");
+    m_slurEndpointThickness.Init(0.1, 0.05, 0.25);
+    this->Register(&m_slurEndpointThickness, "slurEndpointThickness", &m_generalLayout);
+
     m_slurMargin.SetInfo("Slur margin", "Slur safety distance in MEI units to obstacles");
     m_slurMargin.Init(1.0, 0.1, 4.0);
     this->Register(&m_slurMargin, "slurMargin", &m_generalLayout);
@@ -1350,10 +1349,6 @@ Options::Options()
     m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
     m_slurMaxSlope.Init(60, 30, 85);
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
-
-    m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");
-    m_slurEndpointThickness.Init(0.1, 0.05, 0.25);
-    this->Register(&m_slurEndpointThickness, "slurEndpointThickness", &m_generalLayout);
 
     m_slurMidpointThickness.SetInfo("Slur midpoint thickness", "The midpoint slur thickness in MEI units");
     m_slurMidpointThickness.Init(0.6, 0.2, 1.2);
@@ -1440,6 +1435,7 @@ Options::Options()
     /********* selectors *********/
 
     m_selectors.SetLabel("Element selectors and processing", "3-selectors");
+    m_selectors.SetCategory(OptionsCategory::Selectors);
     m_grps.push_back(&m_selectors);
 
     m_appXPathQuery.SetInfo("App xPath query",
@@ -1487,6 +1483,7 @@ Options::Options()
     /********* The layout margins by element *********/
 
     m_elementMargins.SetLabel("Element margins", "4-elementMargins");
+    m_elementMargins.SetCategory(OptionsCategory::Margins);
     m_grps.push_back(&m_elementMargins);
 
     m_defaultBottomMargin.SetInfo("Default bottom margin", "The default bottom margin");
@@ -1673,6 +1670,20 @@ Options::Options()
     m_topMarginPgFooter.Init(2.0, 0.0, 24.0);
     this->Register(&m_topMarginPgFooter, "topMarginPgFooter", &m_elementMargins);
 
+    /********* midi *********/
+
+    m_midi.SetLabel("Midi options", "5-midi");
+    m_midi.SetCategory(OptionsCategory::Midi);
+    m_grps.push_back(&m_midi);
+
+    m_midiNoCue.SetInfo("MIDI playback of cue notes", "Skip cue notes in MIDI output");
+    m_midiNoCue.Init(false);
+    this->Register(&m_midiNoCue, "midiNoCue", &m_midi);
+
+    m_midiTempoAdjustment.SetInfo("MIDI tempo adjustment", "The MIDI tempo adjustment factor");
+    m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
+    this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_midi);
+
     /********* Deprecated options *********/
 
     /*
@@ -1815,7 +1826,7 @@ jsonxx::Object Options::GetBaseOptGrp()
     return grpBase;
 }
 
-const std::vector<Option *> *Options::GetBaseOptions()
+const std::vector<Option *> *Options::GetBaseOptions() const
 {
     return m_baseOptions.GetOptions();
 }
