@@ -168,6 +168,12 @@ public:
         FloatingCurvePositioner *curve, const SpannedElements &elements, Staff *staff, int xMin, int xMax);
 
     /**
+     * Add curve positioner to articulations
+     */
+    void AddPositionerToArticulations(
+        FloatingCurvePositioner *curve, curvature_CURVEDIR drawingCurveDir, char spanningType);
+
+    /**
      * Calculate the staff where the slur's floating curve positioner lives
      */
     Staff *CalculateExtremalStaff(Staff *staff, int xMin, int xMax);

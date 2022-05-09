@@ -365,6 +365,49 @@ void Slur::AddSpannedElements(
     }
 }
 
+void Slur::AddPositionerToArticulations(
+    FloatingCurvePositioner *curve, curvature_CURVEDIR drawingCurveDir, char spanningType)
+{
+    LayerElement *start = this->GetStart();
+    LayerElement *end = this->GetEnd();
+    if (!start || !end) return;
+
+    // the normal case or start
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        ListOfObjects artics = start->FindAllDescendantsByType(ARTIC);
+        // Then the @n of each first staffDef
+        for (auto &object : artics) {
+            Artic *artic = vrv_cast<Artic *>(object);
+            assert(artic);
+            if (artic->IsOutsideArtic()) {
+                if ((artic->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                    artic->AddSlurPositioner(curve, true);
+                }
+                else if ((artic->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                    artic->AddSlurPositioner(curve, true);
+                }
+            }
+        }
+    }
+    // normal case or end
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        ListOfObjects artics = end->FindAllDescendantsByType(ARTIC);
+        // Then the @n of each first staffDef
+        for (auto &object : artics) {
+            Artic *artic = vrv_cast<Artic *>(object);
+            assert(artic);
+            if (artic->IsOutsideArtic()) {
+                if ((artic->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                    artic->AddSlurPositioner(curve, false);
+                }
+                else if ((artic->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                    artic->AddSlurPositioner(curve, false);
+                }
+            }
+        }
+    }
+}
+
 Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax)
 {
     Staff *extremalStaff = staff;

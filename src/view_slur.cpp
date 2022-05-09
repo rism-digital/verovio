@@ -112,46 +112,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     curve->UpdateCurveParams(points, thickness, drawingCurveDir);
 
-    /************** articulation **************/
-
-    // First get all artic children
-    ClassIdComparison matchType(ARTIC);
-    ListOfObjects artics;
-
-    // the normal case or start
-    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        start->FindAllDescendantsByComparison(&artics, &matchType);
-        // Then the @n of each first staffDef
-        for (auto &object : artics) {
-            Artic *artic = vrv_cast<Artic *>(object);
-            assert(artic);
-            if (artic->IsOutsideArtic()) {
-                if ((artic->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
-                    artic->AddSlurPositioner(curve, true);
-                }
-                else if ((artic->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
-                    artic->AddSlurPositioner(curve, true);
-                }
-            }
-        }
-    }
-    // normal case or end
-    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        end->FindAllDescendantsByComparison(&artics, &matchType);
-        // Then the @n of each first staffDef
-        for (auto &object : artics) {
-            Artic *artic = vrv_cast<Artic *>(object);
-            assert(artic);
-            if (artic->IsOutsideArtic()) {
-                if ((artic->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
-                    artic->AddSlurPositioner(curve, false);
-                }
-                else if ((artic->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
-                    artic->AddSlurPositioner(curve, false);
-                }
-            }
-        }
-    }
+    slur->AddPositionerToArticulations(curve, drawingCurveDir, spanningType);
 }
 
 void View::CalcInitialSlur(
