@@ -497,16 +497,15 @@ void BeamSegment::AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInt
     for (auto coord : m_beamElementCoordRefs) {
         if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
             const int topPosition = coord->m_yBeam + beamInterface->GetTotalBeamWidth();
-            const int topMargin = staffTop - doubleUnit / 2;
-            if (topPosition >= topMargin) {
-                adjust = ((topPosition - topMargin) / doubleUnit + 1) * doubleUnit;
+            if (topPosition > staffTop) {
+                adjust = ((topPosition - staffTop) / doubleUnit + 1) * doubleUnit;
                 break;
             }
         }
         else if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             const int bottomPosition = coord->m_yBeam - beamInterface->GetTotalBeamWidth();
-            const int bottomMargin = staffTop - staffHeight + doubleUnit / 2;
-            if (bottomPosition <= bottomMargin) {
+            const int bottomMargin = staffTop - staffHeight;
+            if (bottomPosition < bottomMargin) {
                 adjust = ((bottomPosition - bottomMargin) / doubleUnit - 1) * doubleUnit;
                 break;
             }
