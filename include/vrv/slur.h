@@ -31,6 +31,18 @@ struct SpannedElements {
 };
 
 //----------------------------------------------------------------------------
+// NearEndCollision
+//----------------------------------------------------------------------------
+/**
+ * Measure collisions near the end points
+ */
+struct NearEndCollision {
+    double metricAtStart;
+    double metricAtEnd;
+    bool endPointsAdjusted;
+};
+
+//----------------------------------------------------------------------------
 // ControlPointConstraint
 //----------------------------------------------------------------------------
 /**
@@ -252,6 +264,10 @@ private:
     ///@{
     // Discard certain spanned elements
     void FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
+    // Detect collisions near the endpoints
+    NearEndCollision DetectCollisionsNearEnd(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
     // Calculate the vertical shift of the slur end points
     std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);

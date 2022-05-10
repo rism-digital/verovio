@@ -498,7 +498,10 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
     this->FilterSpannedElements(curve, bezier, margin);
 
-    // STEP 2: Calculate the vertical adjustment of end points. This shifts the slur vertically.
+    // STEP 2: Detect collisions near the endpoints and switch to secondary endpoints if necessary
+    NearEndCollision nearEndCollision = this->DetectCollisionsNearEnd(curve, bezier, margin);
+
+    // STEP 3: Calculate the vertical adjustment of endpoints. This shifts the slur vertically.
     // Only collisions near the endpoints are taken into account.
     int endPointShiftLeft = 0;
     int endPointShiftRight = 0;
@@ -524,7 +527,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         return;
     }
 
-    // STEP 3: Calculate the horizontal offset of the control points.
+    // STEP 4: Calculate the horizontal offset of the control points.
     // The idea is to shift control points to the outside if there is an obstacle in the vicinity of the corresponding
     // endpoint. For C1 we consider the largest angle <)BP1P2 where B is a colliding left bounding box corner and choose
     // C1 in this direction. Similar for C2.
@@ -539,7 +542,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         curve->UpdatePoints(bezier);
     }
 
-    // STEP 4: Calculate the vertical shift of the control points.
+    // STEP 5: Calculate the vertical shift of the control points.
     // For each colliding bounding box we formulate a constraint ax + by >= c
     // where x, y denote the vertical adjustments of the control points and c is the size of the collision.
     // The coefficients a, b are calculated from the Bezier curve equation.
@@ -553,7 +556,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     curve->UpdatePoints(bezier);
     curve->SetRequestedStaffSpace(adjustment.requestedStaffSpace);
 
-    // STEP 5: Adjust the slur shape
+    // STEP 6: Adjust the slur shape
     // Through the control point adjustments in step 3 and 4 it can happen that the slur looses its desired shape.
     // We correct the shape if the slur is too flat or not convex.
     if (curve->GetDir() != curvature_CURVEDIR_mixed) {
@@ -595,6 +598,50 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
             spannedElement->m_discarded = true;
         }
     }
+}
+
+NearEndCollision Slur::DetectCollisionsNearEnd(
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
+{
+    NearEndCollision nearEndCollision({ 0.0, 0.0, false });
+    if (bezierCurve.p1.x >= bezierCurve.p2.x) return nearEndCollision;
+
+    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
+    for (auto spannedElement : *spannedElements) {
+        if (spannedElement->m_discarded) {
+            continue;
+        }
+
+        bool discard = false;
+        int intersectionLeft, intersectionRight;
+        std::tie(intersectionLeft, intersectionRight) = curve->CalcDirectionalLeftRightAdjustment(
+            spannedElement->m_boundingBox, spannedElement->m_isBelow, discard, margin);
+
+        if ((intersectionLeft > 0) || (intersectionRight > 0)) {
+            Point points[4];
+            points[0] = bezierCurve.p1;
+            points[1] = bezierCurve.c1;
+            points[2] = bezierCurve.c2;
+            points[3] = bezierCurve.p2;
+
+            // Adjust the collision metrics
+            const int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
+            Point pLeft(xLeft, BoundingBox::CalcBezierAtPosition(points, xLeft));
+            double distStart = std::max(BoundingBox::CalcDistance(bezierCurve.p1, pLeft), 1.0);
+            double distEnd = std::max(BoundingBox::CalcDistance(bezierCurve.p2, pLeft), 1.0);
+            nearEndCollision.metricAtStart = std::max(intersectionLeft / distStart, nearEndCollision.metricAtStart);
+            nearEndCollision.metricAtEnd = std::max(intersectionLeft / distEnd, nearEndCollision.metricAtEnd);
+
+            const int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
+            Point pRight(xRight, BoundingBox::CalcBezierAtPosition(points, xRight));
+            distStart = std::max(BoundingBox::CalcDistance(bezierCurve.p1, pRight), 1.0);
+            distEnd = std::max(BoundingBox::CalcDistance(bezierCurve.p2, pRight), 1.0);
+            nearEndCollision.metricAtStart = std::max(intersectionRight / distStart, nearEndCollision.metricAtStart);
+            nearEndCollision.metricAtEnd = std::max(intersectionRight / distEnd, nearEndCollision.metricAtEnd);
+        }
+    }
+
+    return nearEndCollision;
 }
 
 std::pair<int, int> Slur::CalcEndPointShift(
