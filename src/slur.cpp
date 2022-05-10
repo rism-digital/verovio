@@ -365,12 +365,14 @@ void Slur::AddSpannedElements(
     }
 }
 
-void Slur::AddPositionerToArticulations(
-    FloatingCurvePositioner *curve, curvature_CURVEDIR drawingCurveDir, char spanningType)
+void Slur::AddPositionerToArticulations(FloatingCurvePositioner *curve)
 {
     LayerElement *start = this->GetStart();
     LayerElement *end = this->GetEnd();
     if (!start || !end) return;
+
+    const char spanningType = curve->GetSpanningType();
+    const curvature_CURVEDIR curveDir = this->CalcDrawingCurveDir(spanningType);
 
     // the normal case or start
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
@@ -380,10 +382,10 @@ void Slur::AddPositionerToArticulations(
             Artic *artic = vrv_cast<Artic *>(object);
             assert(artic);
             if (artic->IsOutsideArtic()) {
-                if ((artic->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                if ((artic->GetPlace() == STAFFREL_above) && (curveDir == curvature_CURVEDIR_above)) {
                     artic->AddSlurPositioner(curve, true);
                 }
-                else if ((artic->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                else if ((artic->GetPlace() == STAFFREL_below) && (curveDir == curvature_CURVEDIR_below)) {
                     artic->AddSlurPositioner(curve, true);
                 }
             }
@@ -397,10 +399,10 @@ void Slur::AddPositionerToArticulations(
             Artic *artic = vrv_cast<Artic *>(object);
             assert(artic);
             if (artic->IsOutsideArtic()) {
-                if ((artic->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                if ((artic->GetPlace() == STAFFREL_above) && (curveDir == curvature_CURVEDIR_above)) {
                     artic->AddSlurPositioner(curve, false);
                 }
-                else if ((artic->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                else if ((artic->GetPlace() == STAFFREL_below) && (curveDir == curvature_CURVEDIR_below)) {
                     artic->AddSlurPositioner(curve, false);
                 }
             }
@@ -1550,6 +1552,61 @@ PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord
         }
     }
     return type;
+}
+
+void Slur::CalcInitialCurve(Doc *doc, FloatingCurvePositioner *curve)
+{
+    LayerElement *start = this->GetStart();
+    LayerElement *end = this->GetEnd();
+    if (!start || !end) return;
+
+    Staff *staff = dynamic_cast<Staff *>(curve->GetObjectY());
+    if (!staff) return;
+
+    const char spanningType = curve->GetSpanningType();
+    const curvature_CURVEDIR curveDir = this->CalcDrawingCurveDir(spanningType);
+
+    // Calculate endpoints
+    const std::pair<Point, Point> endPoints = this->CalcEndPoints(doc, staff, curveDir, spanningType);
+
+    // For now we pick C1 = P1 and C2 = P2
+    BezierCurve bezier(endPoints.first, endPoints.first, endPoints.second, endPoints.second);
+    this->InitBezierControlSides(bezier, curveDir);
+
+    // Angle adjustment
+    const bool dontAdjustAngle = curve->IsCrossStaff() || start->IsGraceNote();
+    const float nonAdjustedAngle
+        = (bezier.p2 == bezier.p1) ? 0 : atan2(bezier.p2.y - bezier.p1.y, bezier.p2.x - bezier.p1.x);
+    const float slurAngle
+        = dontAdjustAngle ? nonAdjustedAngle : this->GetAdjustedSlurAngle(doc, bezier.p1, bezier.p2, curveDir);
+    if (curveDir != curvature_CURVEDIR_mixed) {
+        bezier.p2 = BoundingBox::CalcPositionAfterRotation(bezier.p2, -slurAngle, bezier.p1);
+    }
+
+    // Calculate control points
+    if (this->HasBulge()) {
+        bezier.CalcInitialControlPointParams();
+    }
+    else {
+        bezier.CalcInitialControlPointParams(doc, slurAngle, staff->m_drawingStaffSize);
+    }
+    bezier.UpdateControlPoints();
+    if (curveDir != curvature_CURVEDIR_mixed) {
+        bezier.Rotate(slurAngle, bezier.p1);
+    }
+
+    Point points[4];
+    points[0] = bezier.p1;
+    points[1] = bezier.c1;
+    points[2] = bezier.c2;
+    points[3] = bezier.p2;
+
+    // Calculate thickness
+    const int thickness
+        = doc->GetDrawingUnit(staff->m_drawingStaffSize) * doc->GetOptions()->m_slurMidpointThickness.GetValue();
+
+    // Store everything in floating curve positioner
+    curve->UpdateCurveParams(points, thickness, curveDir);
 }
 
 //----------------------------------------------------------------------------

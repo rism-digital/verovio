@@ -157,6 +157,11 @@ public:
         Doc *doc, Staff *staff, curvature_CURVEDIR drawingCurveDir, char spanningType);
 
     /**
+     * Calculate the initial slur bezier curve and store it in the curve positioner
+     */
+    void CalcInitialCurve(Doc *doc, FloatingCurvePositioner *curve);
+
+    /**
      * Determine layer elements spanned by the slur
      */
     SpannedElements CollectSpannedElements(Staff *staff, int xMin, int xMax);
@@ -170,8 +175,7 @@ public:
     /**
      * Add curve positioner to articulations
      */
-    void AddPositionerToArticulations(
-        FloatingCurvePositioner *curve, curvature_CURVEDIR drawingCurveDir, char spanningType);
+    void AddPositionerToArticulations(FloatingCurvePositioner *curve);
 
     /**
      * Calculate the staff where the slur's floating curve positioner lives
