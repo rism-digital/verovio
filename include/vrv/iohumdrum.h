@@ -538,6 +538,7 @@ protected:
     hum::HTp getDecrescendoEnd(hum::HTp token);
     hum::HTp getCrescendoEnd(hum::HTp token);
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
+    int getMeasureDifference(hum::HTp starttok, hum::HumNum meterunit, hum::HumNum tieduration, hum::HumNum &tstamp);
     void storeOriginalClefMensurationKeyApp();
     void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration,
         const std::string &typestring = "");

@@ -1177,12 +1177,13 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
             Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
             appendTypeTag(tie, "hanging");
             bool allowedToHang = isTieAllowedToHang(token);
-            if (!allowedToHang) {
-                tie->SetColor("red");
-            }
-            bool lv = (token->getLayoutParameter("T", "lv") == "true");
+            string lvstring = token->getLayoutParameter("T", "lv");
+            bool lv = ((lvstring != "") && (lvstring != "false"));
             if (lv) {
                 tie->SetType("lv");
+            }
+            else if (!allowedToHang) {
+                tie->SetColor("red");
             }
         }
     }
@@ -1227,12 +1228,18 @@ bool HumdrumInput::isTieAllowedToHang(hum::HTp token)
 
 Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::HumNum meterunit, Measure *measure)
 {
-
     Tie *tie = new Tie();
     addTieLineStyle(tie, token, subindex);
     measure->AddChild(tie);
 
     addTieLineStyle(tie, token, subindex);
+
+    string lvstring = token->getLayoutParameter("T", "lv");
+    hum::HumNum tdur = 0;
+    hum::HumRegex hre;
+    if (hre.search(lvstring, "\\d")) {
+        tdur = hum::Convert::recipToDuration(lvstring);
+    }
 
     hum::HTp trackend = token->getOwner()->getTrackEnd(token->getTrack());
     hum::HTp current = token->getNextToken();
@@ -1266,6 +1273,7 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
         tstamp += 1;
     }
     else {
+        // attach to barline
         hum::HumNum tobar = token->getDurationToBarline();
         hum::HumNum frombar = token->getDurationFromBarline();
         tstamp = tobar + frombar;
@@ -1274,9 +1282,18 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
         tstamp += 1;
     }
 
-    pair<int, double> ts2(0, tstamp.getFloat());
-    tie->SetTstamp2(ts2); // attach start to beginning of measure
     tie->SetStartid("#" + startid);
+
+    if (tdur == 0) {
+        pair<int, double> ts2(0, tstamp.getFloat());
+        tie->SetTstamp2(ts2); // attach start to beginning of measure
+    }
+    else {
+        // attach to end time of lv parameters
+        int measures = getMeasureDifference(token, meterunit, tdur, tstamp);
+        pair<int, double> ts2(measures, tstamp.getFloat());
+        tie->SetTstamp2(ts2);
+    }
 
     int track = token->getTrack();
     std::vector<int> &rkern = m_rkern;
@@ -14541,6 +14558,51 @@ int HumdrumInput::getMeasureDifference(hum::HTp starttok, hum::HTp endtok)
             counter++;
         }
     }
+    return counter;
+}
+
+int HumdrumInput::getMeasureDifference(
+    hum::HTp starttok, hum::HumNum meterunit, hum::HumNum tieduration, hum::HumNum &tstamp)
+{
+    hum::HumdrumLine *line = starttok->getOwner();
+    if (line == NULL) {
+        return 0;
+    }
+    hum::HumdrumFile *file = line->getOwner();
+    if (line == NULL) {
+        return 0;
+    }
+    hum::HumdrumFile &infile = *file;
+    hum::HumNum endtime = starttok->getDurationFromStart() + tieduration;
+    int startline = starttok->getLineIndex();
+    int counter = 0;
+    int i = startline;
+    int lastBarline = -1;
+    while ((i < infile.getLineCount()) && (infile[i].getDurationFromStart() < endtime)) {
+        if (infile[i].isBarline()) {
+            // probably deal with invisible barlines
+            counter++;
+            lastBarline = i;
+        }
+        i++;
+    }
+
+    if (lastBarline == -1) {
+        hum::HumNum frombar = starttok->getDurationFromBarline();
+        tstamp = endtime;
+        tstamp *= meterunit;
+        tstamp /= 4;
+        tstamp += 1;
+        return 0;
+    }
+
+    // If the time signature bottom has changed, meterunit will need to be updated...
+    hum::HumNum lastbartime = infile[lastBarline].getDurationFromStart();
+    tstamp = endtime - lastbartime;
+    tstamp *= meterunit;
+    tstamp /= 4;
+    tstamp += 1;
+
     return counter;
 }
 
