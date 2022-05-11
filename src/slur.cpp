@@ -1289,12 +1289,20 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
             }
             // d(^)
             else {
-                // put it on the side, move it right
-                if (startStemLen != 0) x1 += unit * 2;
-                if (startChord)
-                    y1 = yChordMax + unit * 3;
-                else
-                    y1 = start->GetDrawingY() + unit * 3;
+                if (nearEndCollision && nearEndCollision->metricAtStart > 0.3) {
+                    // Secondary endpoint on top
+                    y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                    x1 += startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    nearEndCollision->endPointsAdjusted = true;
+                }
+                else {
+                    // Primary endpoint on the side, move it right
+                    if (startStemLen != 0) x1 += unit * 2;
+                    if (startChord)
+                        y1 = yChordMax + unit * 3;
+                    else
+                        y1 = start->GetDrawingY() + unit * 3;
+                }
             }
         }
         // slur is down
@@ -1339,12 +1347,20 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
             }
             // P(_)
             else {
-                // put it on the side, but no need to move it right
-                if (startChord) {
-                    y1 = yChordMin - unit * 3;
+                if (nearEndCollision && nearEndCollision->metricAtStart > 0.3) {
+                    // Secondary endpoint on bottom
+                    y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                    x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    nearEndCollision->endPointsAdjusted = true;
                 }
                 else {
-                    y1 = start->GetDrawingY() - unit * 3;
+                    // Primary endpoint on the side, but no need to move it right
+                    if (startChord) {
+                        y1 = yChordMin - unit * 3;
+                    }
+                    else {
+                        y1 = start->GetDrawingY() - unit * 3;
+                    }
                 }
             }
         }
@@ -1399,12 +1415,20 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
             }
             // (^)d
             else {
-                // put it on the side, no need to move it left
-                if (endChord) {
-                    y2 = yChordMax + unit * 3;
+                if (nearEndCollision && nearEndCollision->metricAtEnd > 0.3) {
+                    // Secondary endpoint on top
+                    y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
+                    x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    nearEndCollision->endPointsAdjusted = true;
                 }
                 else {
-                    y2 = end->GetDrawingY() + unit * 3;
+                    // Primary endpoint on the side, no need to move it left
+                    if (endChord) {
+                        y2 = yChordMax + unit * 3;
+                    }
+                    else {
+                        y2 = end->GetDrawingY() + unit * 3;
+                    }
                 }
             }
         }
@@ -1451,13 +1475,21 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
             }
             // (_)P
             else {
-                // put it on the side, move it left
-                if (endStemLen != 0) x2 -= unit * 2;
-                if (endChord) {
-                    y2 = yChordMin - unit * 3;
+                if (nearEndCollision && nearEndCollision->metricAtEnd > 0.3) {
+                    // Secondary endpoint on bottom
+                    y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+                    x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                    nearEndCollision->endPointsAdjusted = true;
                 }
                 else {
-                    y2 = end->GetDrawingY() - unit * 3;
+                    // Primary endpoint on the side, move it left
+                    if (endStemLen != 0) x2 -= unit * 2;
+                    if (endChord) {
+                        y2 = yChordMin - unit * 3;
+                    }
+                    else {
+                        y2 = end->GetDrawingY() - unit * 3;
+                    }
                 }
             }
         }
