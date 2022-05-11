@@ -9,6 +9,10 @@
 #ifndef __VRV_KEYSIG_H__
 #define __VRV_KEYSIG_H__
 
+#include <optional>
+
+//----------------------------------------------------------------------------
+
 #include "atts_analytical.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
