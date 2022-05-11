@@ -100,8 +100,6 @@ void Slur::Reset()
     this->ResetLayerIdent();
 
     m_drawingCurveDir = SlurCurveDirection::None;
-    m_cachedDrawingX1 = VRV_UNSET;
-    m_cachedDrawingX2 = VRV_UNSET;
 }
 
 curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
@@ -125,17 +123,6 @@ curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
         }
         default: return curvature_CURVEDIR_NONE;
     }
-}
-
-bool Slur::HasCachedDrawingX12() const
-{
-    return ((m_cachedDrawingX1 != VRV_UNSET) && (m_cachedDrawingX2 != VRV_UNSET));
-}
-
-void Slur::SetCachedDrawingX12(int x1, int x2)
-{
-    m_cachedDrawingX1 = x1;
-    m_cachedDrawingX2 = x2;
 }
 
 std::pair<Layer *, LayerElement *> Slur::GetBoundaryLayer()
@@ -1167,7 +1154,7 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(
 }
 
 std::pair<Point, Point> Slur::CalcEndPoints(
-    Doc *doc, Staff *staff, curvature_CURVEDIR drawingCurveDir, char spanningType)
+    Doc *doc, Staff *staff, int x1, int x2, curvature_CURVEDIR drawingCurveDir, char spanningType)
 {
     StemmedDrawingInterface *startStemDrawInterface = this->GetStart()->GetStemmedDrawingInterface();
     StemmedDrawingInterface *endStemDrawInterface = this->GetEnd()->GetStemmedDrawingInterface();
@@ -1222,10 +1209,6 @@ std::pair<Point, Point> Slur::CalcEndPoints(
 
     const PortatoSlurType portatoSlurType = this->IsPortatoSlur(doc, startNote, startChord);
 
-    assert(this->HasCachedDrawingX12());
-
-    int x1 = m_cachedDrawingX1;
-    int x2 = m_cachedDrawingX2;
     int y1 = staff->GetDrawingY();
     int y2 = y1;
 
@@ -1614,7 +1597,10 @@ void Slur::CalcInitialCurve(Doc *doc, FloatingCurvePositioner *curve)
     const curvature_CURVEDIR curveDir = this->CalcDrawingCurveDir(spanningType);
 
     // Calculate endpoints
-    const std::pair<Point, Point> endPoints = this->CalcEndPoints(doc, staff, curveDir, spanningType);
+    assert(curve->HasCachedX12());
+    const std::pair<int, int> cachedX12 = curve->GetCachedX12();
+    const std::pair<Point, Point> endPoints
+        = this->CalcEndPoints(doc, staff, cachedX12.first, cachedX12.second, curveDir, spanningType);
 
     // For now we pick C1 = P1 and C2 = P2
     BezierCurve bezier(endPoints.first, endPoints.first, endPoints.second, endPoints.second);

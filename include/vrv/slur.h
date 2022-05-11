@@ -155,18 +155,10 @@ public:
     ///@}
 
     /**
-     * Cache the drawing x1 and x2 values
-     */
-    ///@{
-    bool HasCachedDrawingX12() const;
-    void SetCachedDrawingX12(int x1, int x2);
-    ///@}
-
-    /**
      * Calculate the endpoint coordinates depending on the curve direction and spanning type of the slur
      */
     std::pair<Point, Point> CalcEndPoints(
-        Doc *doc, Staff *staff, curvature_CURVEDIR drawingCurveDir, char spanningType);
+        Doc *doc, Staff *staff, int x1, int x2, curvature_CURVEDIR drawingCurveDir, char spanningType);
 
     /**
      * Calculate the initial slur bezier curve and store it in the curve positioner
@@ -315,14 +307,6 @@ private:
      * for s-shaped slurs / mixed direction
      */
     SlurCurveDirection m_drawingCurveDir;
-
-    /**
-     * Cached values for x1 and x2 from the last call of View::DrawSlur
-     */
-    ///@{
-    int m_cachedDrawingX1;
-    int m_cachedDrawingX2;
-    ///@}
 };
 
 } // namespace vrv

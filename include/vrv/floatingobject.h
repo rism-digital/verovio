@@ -334,6 +334,15 @@ public:
     ///@}
 
     /**
+     * @name Getter and setter for cached x1 and x2
+     */
+    ///@{
+    bool HasCachedX12() const;
+    std::pair<int, int> GetCachedX12() const { return m_cachedX12; }
+    void SetCachedX12(const std::pair<int, int> &cachedX12) { m_cachedX12 = cachedX12; }
+    ///@}
+
+    /**
      * Deletes all the CurveSpannedElement objects.
      */
     void ClearSpannedElements();
@@ -391,6 +400,9 @@ private:
 
     /** The cached min or max value (depending on the curvature) */
     int m_cachedMinMaxY;
+
+    /** The cached values for x1 and x2 */
+    std::pair<int, int> m_cachedX12;
 
     /**
      * Some curves (S-shaped slurs) can request staff space to prevent collisions from two sides

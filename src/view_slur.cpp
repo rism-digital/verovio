@@ -85,7 +85,7 @@ FloatingCurvePositioner *View::CalcInitialSlur(
     if ((this->GetSlurHandling() == SlurHandling::Initialize) && dc->Is(BBOX_DEVICE_CONTEXT)
         && (curve->GetDir() == curvature_CURVEDIR_NONE || curve->IsCrossStaff())) {
         // Initial curve calculation
-        slur->SetCachedDrawingX12(x1, x2);
+        curve->SetCachedX12({ x1, x2 });
         slur->CalcInitialCurve(m_doc, curve);
 
         // Update x1 and x2
