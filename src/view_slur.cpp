@@ -88,15 +88,8 @@ FloatingCurvePositioner *View::CalcInitialSlur(
         curve->SetCachedX12({ x1, x2 });
         slur->CalcInitialCurve(m_doc, curve);
 
-        // Update x1 and x2
-        Point points[4];
-        curve->GetPoints(points);
-        x1 = points[0].x;
-        x2 = points[3].x;
-
         // Register content
-        const SpannedElements spannedElements = slur->CollectSpannedElements(staff, x1, x2);
-        slur->AddSpannedElements(curve, spannedElements, staff, x1, x2);
+        slur->CalcSpannedElements(curve);
         slur->AddPositionerToArticulations(curve);
     }
     return curve;

@@ -173,6 +173,22 @@ Staff *Slur::GetBoundaryCrossStaff()
     }
 }
 
+void Slur::CalcSpannedElements(FloatingCurvePositioner *curve)
+{
+    Staff *staff = dynamic_cast<Staff *>(curve->GetObjectY());
+    if (!staff) return;
+
+    // Determine x1 and x2
+    Point points[4];
+    curve->GetPoints(points);
+    const int x1 = points[0].x;
+    const int x2 = points[3].x;
+
+    // Collect, filter and store the spanned elements
+    const SpannedElements spannedElements = this->CollectSpannedElements(staff, x1, x2);
+    this->AddSpannedElements(curve, spannedElements, staff, x1, x2);
+}
+
 SpannedElements Slur::CollectSpannedElements(Staff *staff, int xMin, int xMax)
 {
     // Decide whether we search the whole parent system or just one measure which is much faster
@@ -487,6 +503,20 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
 
     // STEP 2: Detect collisions near the endpoints and switch to secondary endpoints if necessary
     NearEndCollision nearEndCollision = this->DetectCollisionsNearEnd(curve, bezier, margin);
+    this->CalcInitialCurve(doc, curve, &nearEndCollision);
+    if (nearEndCollision.endPointsAdjusted) {
+        curve->GetPoints(points);
+        bezier.p1 = points[0];
+        bezier.c1 = points[1];
+        bezier.c2 = points[2];
+        bezier.p2 = points[3];
+        bezier.UpdateControlPointParams();
+        this->CalcSpannedElements(curve);
+        this->FilterSpannedElements(curve, bezier, margin);
+    }
+    else {
+        curve->UpdatePoints(bezier);
+    }
 
     // STEP 3: Calculate the vertical adjustment of endpoints. This shifts the slur vertically.
     // Only collisions near the endpoints are taken into account.
@@ -1153,8 +1183,8 @@ curvature_CURVEDIR Slur::GetPreferredCurveDirection(
     return drawingCurveDir;
 }
 
-std::pair<Point, Point> Slur::CalcEndPoints(
-    Doc *doc, Staff *staff, int x1, int x2, curvature_CURVEDIR drawingCurveDir, char spanningType)
+std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndCollision *nearEndCollision, int x1, int x2,
+    curvature_CURVEDIR drawingCurveDir, char spanningType)
 {
     StemmedDrawingInterface *startStemDrawInterface = this->GetStart()->GetStemmedDrawingInterface();
     StemmedDrawingInterface *endStemDrawInterface = this->GetEnd()->GetStemmedDrawingInterface();
@@ -1584,7 +1614,7 @@ PortatoSlurType Slur::IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord
     return type;
 }
 
-void Slur::CalcInitialCurve(Doc *doc, FloatingCurvePositioner *curve)
+void Slur::CalcInitialCurve(Doc *doc, FloatingCurvePositioner *curve, NearEndCollision *nearEndCollision)
 {
     LayerElement *start = this->GetStart();
     LayerElement *end = this->GetEnd();
@@ -1600,7 +1630,7 @@ void Slur::CalcInitialCurve(Doc *doc, FloatingCurvePositioner *curve)
     assert(curve->HasCachedX12());
     const std::pair<int, int> cachedX12 = curve->GetCachedX12();
     const std::pair<Point, Point> endPoints
-        = this->CalcEndPoints(doc, staff, cachedX12.first, cachedX12.second, curveDir, spanningType);
+        = this->CalcEndPoints(doc, staff, nearEndCollision, cachedX12.first, cachedX12.second, curveDir, spanningType);
 
     // For now we pick C1 = P1 and C2 = P2
     BezierCurve bezier(endPoints.first, endPoints.first, endPoints.second, endPoints.second);
