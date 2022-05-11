@@ -67,7 +67,7 @@ void View::DrawVerticalSegmentedLine(DeviceContext *dc, int x1, SegmentedLine &l
 {
     int i, start, end;
     for (i = 0; i < line.GetSegmentCount(); i++) {
-        line.GetStartEnd(start, end, i);
+        std::tie(start, end) = line.GetStartEnd(i);
         this->DrawVerticalLine(dc, start, end, x1, width, dashLength);
     }
 }
@@ -76,7 +76,7 @@ void View::DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine 
 {
     int i, start, end;
     for (i = 0; i < line.GetSegmentCount(); i++) {
-        line.GetStartEnd(start, end, i);
+        std::tie(start, end) = line.GetStartEnd(i);
         this->DrawHorizontalLine(dc, start, end, y1, width, dashLength);
     }
 }
@@ -235,6 +235,19 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize, bool dimin)
 
     dc->ResetPen();
     dc->ResetBrush();
+}
+
+void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int staffSize, int interval)
+{
+    if (line.GetSegmentCount() > 1) return;
+
+    auto [start, end] = line.GetStartEnd(0);
+
+    int drawingPosition = start + interval / 2;
+    while (drawingPosition < end) {
+        this->DrawDot(dc, x, drawingPosition, 100, false);
+        drawingPosition += interval;
+    }
 }
 
 void View::DrawSquareBracket(DeviceContext *dc, bool leftBracket, int x, int y, int height, int width,
