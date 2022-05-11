@@ -3709,6 +3709,7 @@ void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi
 
     Beam *beam = new Beam();
     if (beamStart.attribute("id")) beam->SetUuid(beamStart.attribute("id").as_string());
+    if (beamStart.attribute("fan")) beam->SetForm(ConvertBeamFanToForm(beamStart.attribute("fan").as_string()));
     AddLayerElement(layer, beam);
     m_elementStackMap.at(layer).push_back(beam);
 }
@@ -3882,6 +3883,15 @@ bool MusicXmlInput::IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, 
 
     const auto result = writtenToGesturalMap.find(written);
     return ((result != writtenToGesturalMap.end()) && (result->second == gestural));
+}
+
+beamRend_FORM MusicXmlInput::ConvertBeamFanToForm(const std::string &value)
+{
+    if (value == "accel") return beamRend_FORM_acc;
+    if (value == "none") return beamRend_FORM_norm;
+    if (value == "rit") return beamRend_FORM_rit;
+
+    return beamRend_FORM_NONE;
 }
 
 curvature_CURVEDIR MusicXmlInput::CombineCurvedir(curvature_CURVEDIR startDir, curvature_CURVEDIR stopDir)
