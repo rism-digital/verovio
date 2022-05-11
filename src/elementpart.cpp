@@ -471,8 +471,11 @@ int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-void Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
+int Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
 {
+    // if stem length is explicitly set - exit
+    if (this->HasStemLen()) return 0;
+
     const int staffSize = staff->m_drawingStaffSize;
     const int unit = doc->GetDrawingUnit(staffSize);
     data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
@@ -483,11 +486,11 @@ void Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
     else if (this->HasStemMod() && (this->GetStemMod() < 8)) {
         stemMod = this->GetDrawingStemMod();
     }
-    if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return;
+    if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return 0;
 
     const wchar_t code = this->StemModToGlyph(stemMod);
     // if there is no glyph - do nothing
-    if (!code) return;
+    if (!code) return 0;
 
     int lenAdjust = flagOffset;
     if (this->GetParent()->Is(CHORD)) {
@@ -497,21 +500,19 @@ void Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
 
     const int glyphHeight = doc->GetGlyphHeight(code, staffSize, false);
     const int actualLength = std::abs(this->GetDrawingStemLen()) - lenAdjust / unit * unit;
-    const int val = std::abs(m_stemModRelY) - 0.5 * glyphHeight;
-    const int diff = actualLength - val - glyphHeight;
+    const int diff = actualLength - std::abs(m_stemModRelY) - 0.5 * glyphHeight;
 
-    if (!this->HasStemLen() && (diff < -0.5 * unit)) {
-        int adjust = (std::abs(diff) / unit + 1) * unit;
+    int adjust = 0;
+    if ((diff < 0.5 * unit) && (diff >= -0.5 * unit)) {
+        adjust = 0.5 * unit;
+    }
+    else if (diff < -0.5 * unit) {
+        adjust = (std::abs(diff) / unit + 1) * unit;
         if (stemMod == STEMMODIFIER_6slash) {
             adjust += doc->GetGlyphHeight(SMUFL_E220_tremolo1, staffSize, false) / 2;
         }
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() - adjust);
-        }
-        else {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() + adjust);
-        }
     }
+    return ((this->GetDrawingStemDir() == STEMDIRECTION_up) ? -adjust : adjust);
 }
 
 int Stem::CalcStem(FunctorParams *functorParams)
@@ -532,8 +533,8 @@ int Stem::CalcStem(FunctorParams *functorParams)
         this->SetDrawingXRel(0);
         this->SetDrawingYRel(0);
         this->SetDrawingStemLen(0);
-        this->CalculateStemModRelY(params->m_doc, params->m_staff);
-        this->AdjustSlashes(params->m_doc, params->m_staff, 0);
+        const int adjust = this->CalculateStemModAdjustment(params->m_doc, params->m_staff, 0);
+        if (adjust) this->SetDrawingStemLen(this->GetDrawingStemLen() + adjust);
         return FUNCTOR_CONTINUE;
     }
 
@@ -598,7 +599,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
         }
         else {
             flag->m_drawingNbFlags = params->m_dur - DUR_4;
-            flagOffset = 1.5 * unit * flag->m_drawingNbFlags;
+            flagOffset = unit * (flag->m_drawingNbFlags + 1);
         }
     }
 
@@ -651,8 +652,9 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
 
     if (!params->m_isGraceNote && !drawingCueSize && !params->m_isStemSameasSecondary) {
-        this->CalculateStemModRelY(params->m_doc, params->m_staff);
-        this->AdjustSlashes(params->m_doc, params->m_staff, flagOffset);
+        const int adjust = this->CalculateStemModAdjustment(params->m_doc, params->m_staff, flagOffset);
+        if (adjust) this->SetDrawingStemLen(this->GetDrawingStemLen() + adjust);
+        if (flag) flag->SetDrawingYRel(-this->GetDrawingStemLen());
     }
 
     if (flag) AdjustFlagPlacement(params->m_doc, flag, staffSize, params->m_verticalCenter, params->m_dur);
@@ -675,7 +677,14 @@ void Stem::CalculateStemModRelY(Doc *doc, Staff *staff)
     if (!note || note->IsGraceNote() || note->GetDrawingCueSize()) return;
 
     // Get stem mod for the element
-    data_STEMMODIFIER stemMod = this->GetDrawingStemMod();
+    data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
+    BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
+    if (bTrem) {
+        stemMod = bTrem->GetDrawingStemMod();
+    }
+    else if (this->HasStemMod() && (this->GetStemMod() < 8)) {
+        stemMod = this->GetDrawingStemMod();
+    }
     if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return;
 
     // calculate height offset for positioning of stem mod elements on the stem
@@ -708,25 +717,6 @@ void Stem::CalculateStemModRelY(Doc *doc, Staff *staff)
         default: return;
     }
 
-    // calculate additional adjustments for beamed elements
-    Beam *beam = parent->IsInBeam();
-    if (beam) {
-        // Get duration for the element
-        DurationInterface *duration = parent->GetDurationInterface();
-        const int drawingDur = duration ? duration->GetActualDur() : 0;
-        // calculate beam margin
-        int beamMargin = (sign > 0) ? parent->GetDrawingTop(doc, staff->m_drawingStaffSize)
-                                    : parent->GetDrawingBottom(doc, staff->m_drawingStaffSize);
-        beamMargin -= sign
-            * ((drawingDur - DUR_8) * (beam->m_beamWidthBlack + beam->m_beamWidthWhite) + beam->m_beamWidthWhite);
-        const int modMargin = note->GetDrawingY() + sign * (height + glyphHalfHeight);
-        const int diff = sign * (modMargin - beamMargin);
-        if (diff > 0) {
-            const int halfUnit = 0.5 * unit;
-            height -= (diff / halfUnit + 1) * halfUnit;
-        }
-    }
-
     // calculate adjust for the stem modifiers that overlap with ledger lines
     const int position = note->GetDrawingY() + sign * height;
     const int staffSize = staff->m_drawingStaffSize;
@@ -736,6 +726,12 @@ void Stem::CalculateStemModRelY(Doc *doc, Staff *staff)
     const int adjust = (sign * ledgerLineDifference > 0) ? (ledgerLineDifference / doubleUnit) * doubleUnit : 0;
 
     m_stemModRelY = sign * height + adjust;
+}
+
+int Stem::CalculateStemModAdjustment(Doc* doc, Staff* staff, int flagOffset)
+{
+    this->CalculateStemModRelY(doc, staff);
+    return this->AdjustSlashes(doc, staff, flagOffset);
 }
 
 int Stem::ResetData(FunctorParams *functorParams)

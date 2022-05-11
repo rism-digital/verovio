@@ -382,6 +382,11 @@ public:
      */
     int CompareToElementPosition(Doc *doc, LayerElement *otherElement, int margin);
 
+    /**
+     * Helper to calculate stem modifier relative Y rel and required adjustment for stem length
+     */
+    int CalculateStemModAdjustment(Doc *doc, Staff *staff, int flagOffset = 0);
+
     //----------//
     // Functors //
     //----------//
@@ -413,7 +418,7 @@ private:
     /**
      * Helper to adjust length of stem based on presence of slashes
      */
-    void AdjustSlashes(Doc *doc, Staff *staff, int flagOffset);
+    int AdjustSlashes(Doc *doc, Staff *staff, int flagOffset);
 
     /**
      * Helper to calculate relative position for the stem modifier

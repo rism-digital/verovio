@@ -251,6 +251,8 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
     if (doc->GetOptions()->m_beamFrenchStyle.GetValue() && (m_beamElementCoordRefs.size() > 2)) {
         this->AdjustBeamToFrenchStyle(beamInterface);
     }
+
+    this->AdjustBeamToTremolos(doc, staff, beamInterface);
 }
 
 void BeamSegment::CalcSetStemValuesTab(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
@@ -519,6 +521,37 @@ void BeamSegment::AdjustBeamToLedgerLines(
         std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
             [adjust](BeamElementCoord *coord) { coord->m_yBeam -= adjust; });
     }
+}
+
+void BeamSegment::AdjustBeamToTremolos(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface)
+{
+    // iterate over all coords and find maximum required adjustment for stems and beam; additional beams should be taken
+    // into account to make sure that correct value is calculated
+    int maxAdjustment = 0;
+    for (auto coord : m_beamElementCoordRefs) {
+        // Get the interface for the chord or note
+        StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
+        if (!stemmedInterface) continue;
+
+        Stem *stem = stemmedInterface->GetDrawingStem();
+        const int offset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth + beamInterface->m_beamWidthBlack;
+        const int currentAdjustment = stem->CalculateStemModAdjustment(doc, staff, offset);
+        if (std::abs(currentAdjustment) > std::abs(maxAdjustment)) maxAdjustment = currentAdjustment;
+    }
+    // exit in case no adjustment is required
+    if (maxAdjustment == 0) return;
+    // otherwise apply adjustment to all stems within beam and all beam positions
+    for (auto coord : m_beamElementCoordRefs) {
+        coord->m_yBeam -= maxAdjustment;
+
+        // Get the interface for the chord or note
+        StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
+        if (!stemmedInterface) continue;
+
+        Stem *stem = stemmedInterface->GetDrawingStem();
+        stem->SetDrawingStemLen(stem->GetDrawingStemLen() + maxAdjustment);
+    }
+
 }
 
 void BeamSegment::CalcBeamInit(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
