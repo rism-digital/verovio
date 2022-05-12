@@ -14640,7 +14640,7 @@ int HumdrumInput::getMeasureDifference(
 
     if (lastBarline == -1) {
         hum::HumNum frombar = starttok->getDurationFromBarline();
-        tstamp = endtime;
+        tstamp = frombar + tieduration;
         tstamp *= meterunit;
         tstamp /= 4;
         tstamp += 1;
