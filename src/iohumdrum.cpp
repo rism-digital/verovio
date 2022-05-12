@@ -8795,7 +8795,7 @@ bool HumdrumInput::checkForTremolo(
 //////////////////////////////
 //
 // HumdrumInput::checkForInvisibleBeam --  Not checking for interleaved grace notes
-//    within regular note beams yet.
+//    within regular note beams yet.  Does not deal with cross-bar beams.
 //
 
 bool HumdrumInput::checkForInvisibleBeam(
@@ -8803,19 +8803,19 @@ bool HumdrumInput::checkForInvisibleBeam(
 {
     int beamnum = tgs.at(layerindex).beamstart;
     for (int i = layerindex; i < (int)tgs.size(); i++) {
-        if (!tgs.at(layerindex).token) {
-            cerr << "WARNING in checkForInvisibleBeam: null token\n";
+        if (!tgs.at(i).token) {
+            cerr << "WARNING in checkForInvisibleBeam: NULL token\n";
             return false;
         }
-        int len = (int)tgs.at(layerindex).token->size();
+        int len = (int)tgs.at(i).token->size();
         if (len > 0) {
-            if (tgs.at(layerindex).token->at(0) == '*') {
+            if (tgs.at(i).token->at(0) == '*') {
                 continue;
             }
-            if (tgs.at(layerindex).token->at(0) == '!') {
+            if (tgs.at(i).token->at(0) == '!') {
                 continue;
             }
-            if (tgs.at(layerindex).token->at(0) == '=') {
+            if (tgs.at(i).token->at(0) == '=') {
                 continue;
             }
         }
@@ -8823,10 +8823,15 @@ bool HumdrumInput::checkForInvisibleBeam(
             // strange problem
             return false;
         }
-        if (tgs.at(layerindex).token->find("yy") == std::string::npos) {
-            return false;
+
+        hum::HTp token = tgs.at(i).token;
+        std::vector<std::string> subtoks = token->getSubtokens();
+        for (int j = 0; j < (int)subtoks.size(); j++) {
+            if (subtoks[j].find("yy") == std::string::npos) {
+                return false;
+            }
         }
-        int beamend = tgs.at(layerindex).beamend;
+        int beamend = tgs.at(i).beamend;
         if (beamend == beamnum) {
             break;
         }
@@ -9933,29 +9938,75 @@ void HumdrumInput::checkForFingeredHarmonic(Chord *chord, hum::HTp token)
         return;
     }
 
-    // Now set the middle note to be a diamond
-    int index = pitches[1].first;
-    if (tstrings[index].find("yy") != std::string::npos) {
-        // the middle note of the chord is invisible, so do nothing.
-        return;
+    // Indexes to notes in input token:
+    int bottomi = pitches[0].first; // index of bottom note in input token
+    int middlei = pitches[1].first; // index of middle note in input token
+    int topi = pitches[2].first; // index of top note in input token
+
+    vector<int> outputindex(3, -1);
+    int counter = 0;
+    if (tstrings[0].find("yy") == std::string::npos) {
+        outputindex[0] = counter++;
+    }
+    if (tstrings[1].find("yy") == std::string::npos) {
+        outputindex[1] = counter++;
+    }
+    if (tstrings[2].find("yy") == std::string::npos) {
+        outputindex[2] = counter++;
     }
 
-    // Only visible notes are in the MEI chord, so readjust the index
-    // the middle note in the MEI chord.
-    int adjustment = 0;
-    for (int i = 0; i < index; i++) {
-        if (tstrings[i].find("yy") != std::string::npos) {
-            adjustment++;
-        }
+    // Indexes to notes in verovio chord (-1 means not present):
+    int bottomo = outputindex[bottomi];
+    int middleo = outputindex[middlei];
+    int topo = outputindex[topi];
+
+    // Find highest note present in output:
+    int highesto = topo;
+    if (highesto < 0) {
+        highesto = middleo;
     }
-    index = index - adjustment;
-    if (index < 0) {
-        return;
+    if (highesto < 0) {
+        highesto = bottomo;
     }
 
     ArrayOfObjects &notes = chord->GetChildrenForModification();
-    Note *middle = vrv_cast<Note *>(notes.at(index));
-    middle->SetHeadShape(HEADSHAPE_diamond);
+
+    if (middleo >= 0) {
+        Note *middle = vrv_cast<Note *>(notes.at(middleo));
+        middle->SetHeadShape(HEADSHAPE_diamond);
+    }
+
+    // Mute all notes that are not the highest one in the chord:
+    if (notes.size() > 1) {
+        // mute all notes but the highest one in chord.
+        if ((bottomo >= 0) && (bottomo != highesto)) {
+            vrv_cast<Note *>(notes.at(bottomo))->SetVel(0);
+        }
+        if ((middleo >= 0) && (middleo != highesto)) {
+            vrv_cast<Note *>(notes.at(middleo))->SetVel(0);
+        }
+        if ((topo >= 0) && (topo != highesto)) {
+            vrv_cast<Note *>(notes.at(topo))->SetVel(0);
+        }
+    }
+
+    // If the highest note is not the top note, then add .ges pitch
+    // to the highest note.
+    if ((highesto >= 0) && (highesto != topo)) {
+        hum::HumPitch hpitch;
+        hpitch.setKernPitch(tstrings.at(topi));
+        int oct = hpitch.getOctave();
+        vrv_cast<Note *>(notes.at(highesto))->SetOctGes(oct);
+        switch (hpitch.getDiatonicPC()) {
+            case 0: vrv_cast<Note *>(notes.at(highesto))->SetPnameGes(PITCHNAME_c); break;
+            case 1: vrv_cast<Note *>(notes.at(highesto))->SetPnameGes(PITCHNAME_d); break;
+            case 2: vrv_cast<Note *>(notes.at(highesto))->SetPnameGes(PITCHNAME_e); break;
+            case 3: vrv_cast<Note *>(notes.at(highesto))->SetPnameGes(PITCHNAME_f); break;
+            case 4: vrv_cast<Note *>(notes.at(highesto))->SetPnameGes(PITCHNAME_g); break;
+            case 5: vrv_cast<Note *>(notes.at(highesto))->SetPnameGes(PITCHNAME_a); break;
+            case 6: vrv_cast<Note *>(notes.at(highesto))->SetPnameGes(PITCHNAME_b); break;
+        }
+    }
 }
 
 //////////////////////////////
@@ -19889,19 +19940,20 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         scordaturaGes = checkNoteForScordatura(tstring);
     }
 
-    bool isSilentQ = false;
     bool chordQ = token->isChord();
     bool unpitchedQ = token->isUnpitched();
     if (chordQ) {
         // Allow rests in chords to be non-sounding fingered harmonic notes.
         // Need to check when a percussion clef.
         unpitchedQ = false;
-        if (tstring.find("r") != std::string::npos) {
-            isSilentQ = true;
-        }
-        if (isSilentQ) {
-            note->SetVel(0);
-        }
+        // SetVel for harmonics handled in checkForFingeredHarmonic()
+        // bool isSilentQ = false;
+        // if (tstring.find("r") != std::string::npos) {
+        //     isSilentQ = true;
+        // }
+        // if (isSilentQ) {
+        //     note->SetVel(0);
+        // }
     }
     bool badpitchedQ = false;
     if (!unpitchedQ && (ss[staffindex].last_clef.compare(0, 6, "*clefX") == 0)) {
