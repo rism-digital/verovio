@@ -952,12 +952,12 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    for (Object *child : keySig->GetChildren()) {
-        if (child->Is(KEYACCID)) {
-            KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
-            this->DrawKeyAccid(dc, keyAccid, staff, clef, clefLocOffset, x);
-            x += step;
-        }
+    ListOfObjects childList = keySig->GetList(keySig);
+    for (Object *child : childList) {
+        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
+        assert(keyAccid);
+        this->DrawKeyAccid(dc, keyAccid, staff, clef, clefLocOffset, x);
+        x += step;
     }
 
     dc->ResetFont();
