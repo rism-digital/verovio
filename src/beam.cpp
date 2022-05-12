@@ -1252,9 +1252,10 @@ std::pair<int, int> BeamSegment::CalcStemDefiningNote(Staff *staff, data_BEAMPLA
         coord->SetClosestNoteOrTabDurSym(stemDir, staff->IsTabWithStemsOutside());
         // Nothing else to do if we have no closest note (that includes tab beams outside the staff)
         if (!coord->m_closestNote) continue;
+        const int currentLoc = coord->m_closestNote->GetDrawingLoc();
         // set initial values for both locations and durations to that of first note
         if (relevantLoc == VRV_UNSET) {
-            relevantLoc = coord->m_closestNote->GetDrawingLoc();
+            relevantLoc = currentLoc;
             shortestLoc = relevantLoc;
             relevantDuration = coord->m_dur;
             shortestDuration = relevantDuration;
@@ -1262,18 +1263,25 @@ std::pair<int, int> BeamSegment::CalcStemDefiningNote(Staff *staff, data_BEAMPLA
         }
         // save location and duration of the note, if it is closer to the beam (i.e. placed higher on the staff for
         // above beams and vice versa for below beams)
-        if ((place == BEAMPLACE_above) && (coord->m_closestNote->GetDrawingLoc() > relevantLoc)) {
-            relevantLoc = coord->m_closestNote->GetDrawingLoc();
+        if ((place == BEAMPLACE_above) && (currentLoc > relevantLoc)) {
+            relevantLoc = currentLoc;
             relevantDuration = coord->m_dur;
         }
-        else if ((place == BEAMPLACE_below) && (coord->m_closestNote->GetDrawingLoc() < relevantLoc)) {
-            relevantLoc = coord->m_closestNote->GetDrawingLoc();
+        else if ((place == BEAMPLACE_below) && (currentLoc < relevantLoc)) {
+            relevantLoc = currentLoc;
             relevantDuration = coord->m_dur;
         }
         // save location and duration of the note that have shortest duration
-        if (coord->m_dur >= shortestDuration) {
+        if (coord->m_dur > shortestDuration) {
             shortestDuration = coord->m_dur;
-            shortestLoc = coord->m_closestNote->GetDrawingLoc();
+            shortestLoc = currentLoc;
+        }
+        else if (coord->m_dur == shortestDuration) {
+            if (((stemDir == STEMDIRECTION_up) && (currentLoc > shortestLoc))
+                || ((stemDir == STEMDIRECTION_down) && (currentLoc < shortestLoc))) {
+                shortestDuration = coord->m_dur;
+                shortestLoc = currentLoc;
+            }
         }
     }
 
