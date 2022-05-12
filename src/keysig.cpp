@@ -101,9 +101,8 @@ void KeySig::Reset()
     this->ResetKeySigVis();
     this->ResetVisibility();
 
-    m_mixedChildrenAccidType = false;
-
     // key change drawing values
+    m_skipCancellation = false;
     m_drawingCancelAccidType = ACCIDENTAL_WRITTEN_n;
     m_drawingCancelAccidCount = 0;
 }
@@ -149,17 +148,18 @@ int KeySig::GetAccidCount(bool fromAttribute) const
 
 data_ACCIDENTAL_WRITTEN KeySig::GetAccidType() const
 {
-    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
-    if (childList.size() > 0) {
-        if (m_mixedChildrenAccidType) return ACCIDENTAL_WRITTEN_NONE;
-        const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(childList.front());
-        assert(keyAccid);
-        return keyAccid->GetAccid();
+    if (this->HasNonAttribKeyAccidChildren() || !this->HasSig()) {
+        return ACCIDENTAL_WRITTEN_NONE;
     }
+    else {
+        return (this->GetSig().second);
+    }
+}
 
-    if (!this->HasSig()) return ACCIDENTAL_WRITTEN_NONE;
-
-    return (this->GetSig().second);
+bool KeySig::HasNonAttribKeyAccidChildren() const
+{
+    const ListOfConstObjects &childList = this->GetList(this);
+    return std::any_of(childList.begin(), childList.end(), [](const Object *child) { return !child->IsAttribute(); });
 }
 
 void KeySig::ClearKeyAccidAttribChildren()
@@ -184,6 +184,10 @@ void KeySig::GenerateKeyAccidAttribChildren()
             }
         }
     }
+    else {
+        LogWarning("Attribute key signature is ignored, since KeySig '%s' contains KeyAccid children.",
+            this->GetUuid().c_str());
+    }
 }
 
 void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
@@ -200,9 +204,8 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
         return;
     }
 
-    int i;
     data_ACCIDENTAL_WRITTEN accidType = this->GetAccidType();
-    for (i = 0; i < this->GetAccidCount(); ++i) {
+    for (int i = 0; i < this->GetAccidCount(); ++i) {
         mapOfPitchAccid[KeySig::GetAccidPnameAt(accidType, i)] = accidType;
     }
 }
@@ -314,28 +317,8 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
 
 int KeySig::PrepareDataInitialization(FunctorParams *)
 {
-    // Clear attribute children
+    // Clear and regenerate attribute children
     this->ClearKeyAccidAttribChildren();
-
-    // Determine whether children have mixed accid type
-    data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
-    m_mixedChildrenAccidType = false;
-
-    const ListOfObjects &childList = this->GetList(this);
-    for (auto &child : childList) {
-        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
-        assert(keyAccid);
-        if (type == ACCIDENTAL_WRITTEN_NONE) {
-            type = keyAccid->GetAccid();
-            continue;
-        }
-        if (type != keyAccid->GetAccid()) {
-            m_mixedChildrenAccidType = true;
-            break;
-        }
-    }
-
-    // Regenerate attribute children
     this->GenerateKeyAccidAttribChildren();
 
     return FUNCTOR_CONTINUE;

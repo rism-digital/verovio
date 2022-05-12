@@ -925,27 +925,31 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->StartGraphic(element, "", element->GetUuid());
 
     // Show cancellation if showchange is true (false by default) or if C major
-    // This is not meant to make sense with mixed key signature
     if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM)
         && ((keySig->GetSigShowchange() == BOOLEAN_true) || (keySig->GetAccidCount() == 0))) {
-        const int beginCancel
-            = (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) ? keySig->GetAccidCount() : 0;
-        for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
-            data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
-            loc = PitchInterface::CalcLoc(
-                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, clef), clefLocOffset);
-            y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+        if (keySig->m_skipCancellation) {
+            LogWarning("Cautionary accidentals are skipped if the new or previous KeySig contains KeyAccid children.");
+        }
+        else {
+            const int beginCancel
+                = (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) ? keySig->GetAccidCount() : 0;
+            for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
+                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
+                loc = PitchInterface::CalcLoc(
+                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, clef), clefLocOffset);
+                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
-            dc->StartCustomGraphic("keyAccid");
+                dc->StartCustomGraphic("keyAccid");
 
-            this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+                this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
 
-            dc->EndCustomGraphic();
+                dc->EndCustomGraphic();
 
-            x += naturalGlyphWidth + naturalStep;
-            if ((keySig->GetAccidCount() > 0) && (i + 1 == keySig->m_drawingCancelAccidCount)) {
-                // Add some extra space after last natural
-                x += step;
+                x += naturalGlyphWidth + naturalStep;
+                if ((keySig->GetAccidCount() > 0) && (i + 1 == keySig->m_drawingCancelAccidCount)) {
+                    // Add some extra space after last natural
+                    x += step;
+                }
             }
         }
     }

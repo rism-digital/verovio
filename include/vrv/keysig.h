@@ -83,6 +83,7 @@ public:
      * Generate KeyAccid attribute children
      */
     ///@{
+    bool HasNonAttribKeyAccidChildren() const;
     void ClearKeyAccidAttribChildren();
     void GenerateKeyAccidAttribChildren();
     ///@}
@@ -131,13 +132,15 @@ private:
     std::optional<KeyAccidInfo> GetKeyAccidInfoAt(int pos) const;
 
 public:
-    bool m_mixedChildrenAccidType;
     /**
      * Variables for storing cancellation introduced by the key sig.
-     * The values are StaffDefDrawingInterface::ReplaceKeySig
+     * Values are set in StaffDefDrawingInterface::ReplaceKeySig
      */
+    ///@{
+    bool m_skipCancellation;
     data_ACCIDENTAL_WRITTEN m_drawingCancelAccidType;
     char m_drawingCancelAccidCount;
+    ///@}
 
     //----------------//
     // Static members //
