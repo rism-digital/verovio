@@ -981,11 +981,8 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
 void View::DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x)
 {
-    const data_ACCIDENTAL_WRITTEN accid = keyAccid->GetAccid();
-    const data_PITCHNAME pname = keyAccid->GetPname();
     const std::wstring symbolStr = keyAccid->GetSymbolStr();
-
-    const int loc = PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, clef), clefLocOffset);
+    const int loc = keyAccid->CalcStaffLoc(clef, clefLocOffset);
     const int y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
     dc->StartCustomGraphic("keyAccid", "", keyAccid->GetUuid());
