@@ -76,9 +76,6 @@ public:
     /** Accid number getter */
     int GetAccidCount(bool fromAttribute = false) const;
 
-    /** Check for duplicates */
-    bool HasAccidDuplicate() const;
-
     /** Accid type getter */
     data_ACCIDENTAL_WRITTEN GetAccidType() const;
 

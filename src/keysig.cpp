@@ -147,18 +147,6 @@ int KeySig::GetAccidCount(bool fromAttribute) const
     }
 }
 
-bool KeySig::HasAccidDuplicate() const
-{
-    std::set<data_PITCHNAME> accidPitches;
-    const ListOfConstObjects &childList = this->GetList(this);
-    for (const Object *child : childList) {
-        const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
-        assert(keyAccid);
-        accidPitches.insert(keyAccid->GetPname());
-    }
-    return (accidPitches.size() < childList.size());
-}
-
 data_ACCIDENTAL_WRITTEN KeySig::GetAccidType() const
 {
     const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
@@ -328,11 +316,6 @@ int KeySig::PrepareDataInitialization(FunctorParams *)
 {
     // Clear attribute children
     this->ClearKeyAccidAttribChildren();
-
-    // Check whether children have unique pitch
-    if (this->HasAccidDuplicate()) {
-        LogWarning("KeySig '%s' contains duplicate KeyAccid children.", this->GetUuid().c_str());
-    }
 
     // Determine whether children have mixed accid type
     data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
