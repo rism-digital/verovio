@@ -20276,6 +20276,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         else if (head.compare(0, 3, "dia") == 0) {
             note->SetHeadShape(HEADSHAPE_diamond);
         }
+        else if (head.compare(0, 4, "odia") == 0) {
+            note->SetHeadShape(HEADSHAPE_diamond);
+            note->SetHeadFill(FILL_void);
+        }
         else if (head == "slash") {
             note->SetHeadShape(HEADSHAPE_slash);
         }
