@@ -424,7 +424,7 @@ bool Transposer::SetTransposition(int keyFifths, const std::string &semitones)
 }
 
 // Note the order of the variables (key signature information is first in all
-// cases where there are two input parametrs to SetTransposition().
+// cases where there are two input parameters to SetTransposition().
 
 bool Transposer::SetTransposition(int keyFifths, int semitones)
 {
