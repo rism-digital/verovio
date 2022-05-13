@@ -129,7 +129,8 @@ std::set<const Note *> Arpeg::GetNotes() const
         }
     };
     extractNotes(this->GetStart());
-    std::for_each(this->GetRefs().begin(), this->GetRefs().end(), extractNotes);
+    const ArrayOfConstObjects &refs = this->GetRefs();
+    std::for_each(refs.begin(), refs.end(), extractNotes);
     return notes;
 }
 
