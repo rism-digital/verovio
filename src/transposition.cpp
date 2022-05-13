@@ -136,11 +136,13 @@ int TransPitch::GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACC
 data_ACCIDENTAL_GESTURAL TransPitch::GetAccidG() const
 {
     switch (m_accid) {
+        case -3: return ACCIDENTAL_GESTURAL_tf;
         case -2: return ACCIDENTAL_GESTURAL_ff;
         case -1: return ACCIDENTAL_GESTURAL_f;
         case 0: return ACCIDENTAL_GESTURAL_n;
         case 1: return ACCIDENTAL_GESTURAL_s;
         case 2: return ACCIDENTAL_GESTURAL_ss;
+        case 3: return ACCIDENTAL_GESTURAL_ts;
         default: break;
     }
     LogWarning("Transposition: Could not get Gestural Accidental for %i", m_accid);
