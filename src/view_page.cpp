@@ -851,7 +851,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         const bool singleStaff = (first == last);
         // erase intersections only if we have more than one staff
-        bool eraseIntersections = !singleStaff ? true : false;
+        bool eraseIntersections = !singleStaff;
         // do not erase intersections with right barline of the last measure of the system
         if (isLastMeasure && (barLine->GetPosition() == BarLinePosition::Right)) {
             eraseIntersections = false;
@@ -939,7 +939,7 @@ void View::DrawBarLine(
             break;
         case BARRENDITION_dotted: //
             if (singleStaff) {
-                this->DrawVerticalDots(dc, x, line, staffSize, m_doc->GetDrawingDoubleUnit(staffSize));
+                this->DrawVerticalDots(dc, x, line, barLineWidth, m_doc->GetDrawingDoubleUnit(staffSize));
             }
             else {
                 this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);

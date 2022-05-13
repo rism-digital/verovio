@@ -564,7 +564,7 @@ protected:
         int horizontalThickness, int verticalThickness);
     void DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, int width, int offset, int bracketWidth,
         int horizontalThickness, int verticalThickness);
-    void DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int staffSize, int interval);
+    void DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int barlineWidth, int interval);
     ///@}
 
     /**

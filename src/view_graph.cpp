@@ -237,17 +237,24 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize, bool dimin)
     dc->ResetBrush();
 }
 
-void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int staffSize, int interval)
+void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int barlineWidth, int interval)
 {
     if (line.GetSegmentCount() > 1) return;
 
-    auto [start, end] = line.GetStartEnd(0);
-
+    const auto [start, end] = line.GetStartEnd(0);
+    const int radius = std::max(barlineWidth, 2);
     int drawingPosition = start + interval / 2;
+
+    dc->SetPen(m_currentColour, 0, AxSOLID);
+    dc->SetBrush(m_currentColour, AxSOLID);
+
     while (drawingPosition < end) {
-        this->DrawDot(dc, x, drawingPosition, 100, false);
+        dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(drawingPosition), radius);
         drawingPosition += interval;
     }
+
+    dc->ResetPen();
+    dc->ResetBrush();
 }
 
 void View::DrawSquareBracket(DeviceContext *dc, bool leftBracket, int x, int y, int height, int width,
