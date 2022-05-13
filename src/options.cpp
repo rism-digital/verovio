@@ -1338,6 +1338,11 @@ Options::Options()
     m_slurCurveFactor.Init(1.0, 0.2, 5.0);
     this->Register(&m_slurCurveFactor, "slurCurveFactor", &m_generalLayout);
 
+    m_slurEndpointFlexibility.SetInfo("Slur endpoint flexibility",
+        "Slur end point flexibility - avoid asymmetric slurs by allowing more endpoint movement during adjustment");
+    m_slurEndpointFlexibility.Init(0.0, 0.0, 1.0);
+    this->Register(&m_slurEndpointFlexibility, "slurEndpointFlexibility", &m_generalLayout);
+
     m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");
     m_slurEndpointThickness.Init(0.1, 0.05, 0.25);
     this->Register(&m_slurEndpointThickness, "slurEndpointThickness", &m_generalLayout);
