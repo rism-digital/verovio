@@ -469,6 +469,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         else if ((this->GetDrawingPlace() == STAFFREL_below) && (y < bottomMargin)) {
             if (y > bottomMargin - unit) {
                 yShift = (bottomMargin - unit) - y;
+                if (std::abs(yShift) < spacingTop) yShift = -spacingTop;
             }
             else {
                 yShift -= spacingTop;
