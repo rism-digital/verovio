@@ -58,7 +58,7 @@ void Clef::Reset()
 int Clef::GetClefLocOffset() const
 {
     // Only resolve simple sameas links to avoid infinite recursion
-    Clef *sameas = dynamic_cast<Clef *>(this->GetSameasLink());
+    const Clef *sameas = dynamic_cast<const Clef *>(this->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
         return sameas->GetClefLocOffset();
     }

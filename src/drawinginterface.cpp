@@ -268,7 +268,7 @@ void BeamDrawingInterface::InitCue(bool beamCue)
     }
 }
 
-bool BeamDrawingInterface::IsHorizontal()
+bool BeamDrawingInterface::IsHorizontal() const
 {
     if (this->IsRepeatedPattern()) {
         return true;
@@ -392,7 +392,7 @@ bool BeamDrawingInterface::IsHorizontalMixedBeam(
     return result;
 }
 
-bool BeamDrawingInterface::IsRepeatedPattern()
+bool BeamDrawingInterface::IsRepeatedPattern() const
 {
     if (m_drawingPlace == BEAMPLACE_mixed) return false;
 
@@ -450,7 +450,7 @@ bool BeamDrawingInterface::IsRepeatedPattern()
     return false;
 }
 
-bool BeamDrawingInterface::HasOneStepHeight()
+bool BeamDrawingInterface::HasOneStepHeight() const
 {
     if (m_shortestDur < DUR_32) return false;
 
@@ -505,7 +505,7 @@ int BeamDrawingInterface::GetPosition(const Object *object, const LayerElement *
     return position;
 }
 
-void BeamDrawingInterface::GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below)
+void BeamDrawingInterface::GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below) const
 {
     if (!m_beamStaff || !m_crossStaffContent) return;
 
@@ -535,7 +535,7 @@ void BeamDrawingInterface::GetBeamOverflow(StaffAlignment *&above, StaffAlignmen
     }
 }
 
-void BeamDrawingInterface::GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below)
+void BeamDrawingInterface::GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below) const
 {
     if (m_beamStaff && m_crossStaffContent) {
         if (m_crossStaffRel == STAFFREL_basic_above) {
@@ -575,7 +575,7 @@ void StaffDefDrawingInterface::Reset()
     m_drawMeterSigGrp = false;
 }
 
-void StaffDefDrawingInterface::SetCurrentClef(Clef const *clef)
+void StaffDefDrawingInterface::SetCurrentClef(const Clef *clef)
 {
     if (clef) {
         m_currentClef = *clef;
@@ -583,7 +583,7 @@ void StaffDefDrawingInterface::SetCurrentClef(Clef const *clef)
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentKeySig(KeySig const *keySig)
+void StaffDefDrawingInterface::SetCurrentKeySig(const KeySig *keySig)
 {
     if (keySig) {
         char drawingCancelAccidCount = m_currentKeySig.GetAccidCount();
@@ -595,7 +595,7 @@ void StaffDefDrawingInterface::SetCurrentKeySig(KeySig const *keySig)
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentMensur(Mensur const *mensur)
+void StaffDefDrawingInterface::SetCurrentMensur(const Mensur *mensur)
 {
     if (mensur) {
         m_currentMensur = *mensur;
@@ -603,7 +603,7 @@ void StaffDefDrawingInterface::SetCurrentMensur(Mensur const *mensur)
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig const *meterSig)
+void StaffDefDrawingInterface::SetCurrentMeterSig(const MeterSig *meterSig)
 {
     if (meterSig) {
         m_currentMeterSig = *meterSig;
@@ -611,7 +611,7 @@ void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig const *meterSig)
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentMeterSigGrp(MeterSigGrp const *meterSigGrp)
+void StaffDefDrawingInterface::SetCurrentMeterSigGrp(const MeterSigGrp *meterSigGrp)
 {
     if (meterSigGrp) {
         m_currentMeterSigGrp = *meterSigGrp;
@@ -628,7 +628,7 @@ bool StaffDefDrawingInterface::DrawMeterSigGrp() const
     return false;
 }
 
-void StaffDefDrawingInterface::AlternateCurrentMeterSig(Measure *measure)
+void StaffDefDrawingInterface::AlternateCurrentMeterSig(const Measure *measure)
 {
     if (MeterSigGrp *meterSigGrp = this->GetCurrentMeterSigGrp();
         meterSigGrp->GetFunc() == meterSigGrpLog_FUNC_alternating) {
@@ -682,7 +682,7 @@ int StemmedDrawingInterface::GetDrawingStemLen() const
     return 0;
 }
 
-Point StemmedDrawingInterface::GetDrawingStemStart(Object *object)
+Point StemmedDrawingInterface::GetDrawingStemStart(const Object *object) const
 {
     assert(m_drawingStem || object);
     if (object && !m_drawingStem) {
@@ -692,15 +692,15 @@ Point StemmedDrawingInterface::GetDrawingStemStart(Object *object)
     return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY());
 }
 
-Point StemmedDrawingInterface::GetDrawingStemEnd(Object *object)
+Point StemmedDrawingInterface::GetDrawingStemEnd(const Object *object) const
 {
     assert(m_drawingStem || object);
     if (object && !m_drawingStem) {
         assert(this == object->GetStemmedDrawingInterface());
         if (!m_drawingStem) {
-            // Somehow arbitrary for chord - stem end it the bottom with no stem
+            // Somehow arbitrary for chord with no stem - stem end is the bottom
             if (object->Is(CHORD)) {
-                Chord *chord = vrv_cast<Chord *>(object);
+                const Chord *chord = vrv_cast<const Chord *>(object);
                 assert(chord);
                 return Point(object->GetDrawingX(), chord->GetYBottom());
             }
