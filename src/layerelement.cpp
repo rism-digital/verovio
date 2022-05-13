@@ -1073,12 +1073,21 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
                 verticalMargin = element->GetDrawingY() - this->GetDrawingY();
             }
             else if ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
-                && (element->GetDrawingY() < staffBottom)
-                && (element->GetDrawingY() < this->GetDrawingY())) {
+                && (element->GetDrawingY() < staffBottom) && (element->GetDrawingY() < this->GetDrawingY())) {
                 verticalMargin = this->GetDrawingY() - element->GetDrawingY();
             }
-            overlap = std::max(
-                overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin, verticalMargin));
+            overlap
+                = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin, verticalMargin));
+        }
+        else if (this->Is(ACCID) && element->Is(REST)) {
+            Rest *rest = vrv_cast<Rest *>(element);
+            const bool hasExplicitLoc = ((rest->HasOloc() && rest->HasPloc()) || rest->HasLoc());
+            if (element->GetFirstAncestor(BEAM) && !hasExplicitLoc) {
+                overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
+            }
+            else {
+                overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
+            }
         }
         else {
             overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
