@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun May  8 21:15:49 PDT 2022
+// Last Modified: Sat May 14 04:14:34 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -22418,6 +22418,18 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 			for (k=0; k<subcount; k++) {
 				bool tienote = false;
 				string subtok = token->getSubtoken(k);
+				if (subcount > 1) {
+					// Rests in chords represent unsounding notes.
+					// Rests can have pitch, but this is treated as
+					// Diatonic pitch which does not involve accidentals,
+					// so convert to pitch-like so that accidentals are
+					// processed on these notes.
+					for (int m=0; m<(int)subtok.size(); m++) {
+						if (subtok[m] == 'r') {
+							subtok[m] = 'R';
+						}
+					}
+				}
 				int b40 = Convert::kernToBase40(subtok);
 				int diatonic = Convert::kernToBase7(subtok);
 				int octaveadjust = token->getValueInt("auto", "ottava");
