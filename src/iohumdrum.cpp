@@ -9700,6 +9700,23 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 // insertMeterSigElement(elements, pointers, layerdata, i);
                 processDirections(layerdata[i], staffindex);
             }
+            if ((*layerdata[i] == "*bar") || (layerdata[i]->compare(0, 5, "*bar:") == 0)) {
+                BarLine *barline = new BarLine;
+                setLocationId(barline, layerdata[i]);
+                appendElement(elements, pointers, barline);
+            }
+            if (m_join && ((*layerdata[i] == "*a2") || (layerdata[i]->compare(0, 4, "*a2:") == 0))
+                && (layerdata[i]->getSubtrack() == 1)) {
+                // Add "a 2" text
+                Dir *dir = new Dir;
+                addTextElement(dir, "a 2");
+                setStaff(dir, m_currentstaff);
+                setLocationId(dir, layerdata[i]); // adjust with new element class
+                hum::HumNum tstamp = getMeasureTstamp(layerdata[i], staffindex);
+                dir->SetTstamp(tstamp.getFloat());
+                addChildBackMeasureOrSection(dir);
+                setPlaceRelStaff(dir, "above");
+            }
         }
         if (layerdata[i]->isBarline() && (!layerdata[i]->allSameBarlineStyle())) {
             // display a barline local to the staff
@@ -9709,11 +9726,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             else {
                 addBarLineElement(layerdata[i], elements, pointers);
             }
-        }
-        if ((*layerdata[i] == "*bar") || (layerdata[i]->compare(0, 4, "*bar:") == 0)) {
-            BarLine *barline = new BarLine;
-            setLocationId(barline, layerdata[i]);
-            appendElement(elements, pointers, barline);
         }
         if (!layerdata[i]->isData()) {
             continue;
