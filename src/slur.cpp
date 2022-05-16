@@ -436,6 +436,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
 
     const int unit = doc->GetDrawingUnit(100);
     const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
+    const double flexibility = doc->GetOptions()->m_slurEndpointFlexibility.GetValue();
 
     // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
     this->FilterSpannedElements(curve, bezier, margin);
@@ -444,7 +445,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // Only collisions near the endpoints are taken into account.
     int endPointShiftLeft = 0;
     int endPointShiftRight = 0;
-    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, margin);
+    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, flexibility, margin);
     if ((endPointShiftLeft != 0) || (endPointShiftRight != 0)) {
         const int signLeft = bezier.IsLeftControlAbove() ? 1 : -1;
         const int signRight = bezier.IsRightControlAbove() ? 1 : -1;
@@ -540,7 +541,7 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
 }
 
 std::pair<int, int> Slur::CalcEndPointShift(
-    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const int margin)
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const double flexibility, const int margin)
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return { 0, 0 };
 
@@ -570,39 +571,56 @@ std::pair<int, int> Slur::CalcEndPointShift(
             // Now apply the intersections on the left and right hand side of the bounding box
             const int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
             const float distanceRatioLeft = float(xLeft - bezierCurve.p1.x) / float(dist);
-            this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioLeft, intersectionLeft, spannedElement->m_isBelow);
+            this->ShiftEndPoints(
+                shiftLeft, shiftRight, distanceRatioLeft, intersectionLeft, flexibility, spannedElement->m_isBelow);
 
             const int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
             const float distanceRatioRight = float(xRight - bezierCurve.p1.x) / float(dist);
             this->ShiftEndPoints(
-                shiftLeft, shiftRight, distanceRatioRight, intersectionRight, spannedElement->m_isBelow);
+                shiftLeft, shiftRight, distanceRatioRight, intersectionRight, flexibility, spannedElement->m_isBelow);
         }
     }
 
     return { shiftLeft, shiftRight };
 }
 
-void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, bool isBelow) const
+void Slur::ShiftEndPoints(
+    int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const
 {
     // Filter collisions near the endpoints
-    // Collisions with 0.15 <= ratio <= 0.85 do not contribute to shifts
+    // Collisions with ratio beyond the partialShiftRadius do not contribute to shifts
     // They are compensated later by shifting the control points
-    if ((ratio < 0.15) && (this->HasEndpointAboveStart() == isBelow)) {
-        if (ratio > 0.05) {
-            // For 0.05 <= ratio <= 0.15 collisions only partially contribute to shifts
+    const double fullShiftRadius = 0.05 + flexibility * 0.15;
+    const double partialShiftRadius = fullShiftRadius * 3.0;
+
+    if ((ratio < partialShiftRadius) && (this->HasEndpointAboveStart() == isBelow)) {
+        if (ratio > fullShiftRadius) {
+            // Collisions here only partially contribute to shifts
             // We multiply with a function that interpolates between 1 and 0
-            intersection *= pow(1.5 - 10.0 * ratio, 2.0);
+            std::function<double(double)> func = this->CalcQuadraticInterpolation(partialShiftRadius, fullShiftRadius);
+            intersection *= func(ratio);
         }
         shiftLeft = std::max(shiftLeft, intersection);
     }
-    else if ((ratio > 0.85) && (this->HasEndpointAboveEnd() == isBelow)) {
-        if (ratio < 0.95) {
-            // For 0.85 <= ratio <= 0.95 collisions only partially contribute to shifts
+
+    if ((ratio > 1.0 - partialShiftRadius) && (this->HasEndpointAboveEnd() == isBelow)) {
+        if (ratio < 1.0 - fullShiftRadius) {
+            // Collisions here only partially contribute to shifts
             // We multiply with a function that interpolates between 0 and 1
-            intersection *= pow(10.0 * ratio - 8.5, 2.0);
+            std::function<double(double)> func
+                = this->CalcQuadraticInterpolation(1.0 - partialShiftRadius, 1.0 - fullShiftRadius);
+            intersection *= func(ratio);
         }
         shiftRight = std::max(shiftRight, intersection);
     }
+}
+
+std::function<double(double)> Slur::CalcQuadraticInterpolation(double zeroAt, double oneAt) const
+{
+    assert(zeroAt != oneAt);
+    const double a = 1.0 / (oneAt - zeroAt);
+    const double b = zeroAt / (zeroAt - oneAt);
+    return [a, b](double x) { return pow(a * x + b, 2.0); };
 }
 
 void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, const int unit)

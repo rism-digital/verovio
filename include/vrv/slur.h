@@ -10,6 +10,7 @@
 
 #include "controlelement.h"
 #include "timeinterface.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -236,7 +237,8 @@ private:
     void FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
     // Calculate the vertical shift of the slur end points
-    std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+    std::pair<int, int> CalcEndPointShift(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double flexibility, int margin);
 
     // Calculate slur from bulge values
     void AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit);
@@ -261,7 +263,10 @@ private:
      */
     ///@{
     // Shift end points for collisions nearby
-    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, bool isBelow) const;
+    void ShiftEndPoints(
+        int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const;
+    // Calculate the coefficients of a quadratic interpolation function
+    std::function<double(double)> CalcQuadraticInterpolation(double zeroAt, double oneAt) const;
 
     // Rotate the slope by a given number of degrees, but choose smaller angles if already close to the vertical axis
     // Choose doublingBound as the positive slope value where doubling has the same effect as rotating:
