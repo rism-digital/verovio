@@ -207,7 +207,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
             }
             // handle cross-staff fTrem cases
             const auto [beams, beamsFloat] = beamInterface->GetFloatingBeamCount();
-            if ((coord->GetStemDir() == STEMDIRECTION_down) && ((beams > 0) || (beamsFloat > 0))) {
+            if ((coord->m_stem->GetDrawingStemDir() == STEMDIRECTION_down) && ((beams > 0) || (beamsFloat > 0))) {
                 int beamsCount = std::max(beams, beamsFloat);
                 if (beamsFloat <= 0) beamsCount--;
                 stemOffset = beamsCount * beamInterface->m_beamWidth;
