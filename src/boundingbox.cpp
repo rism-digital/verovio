@@ -1083,13 +1083,12 @@ SegmentedLine::SegmentedLine(int start, int end)
     m_segments.push_back({ start, end });
 }
 
-void SegmentedLine::GetStartEnd(int &start, int &end, int idx)
+std::pair<int, int> SegmentedLine::GetStartEnd(int idx) const
 {
     assert(idx >= 0);
     assert(idx < this->GetSegmentCount());
 
-    start = m_segments.at(idx).first;
-    end = m_segments.at(idx).second;
+    return { m_segments.at(idx).first, m_segments.at(idx).second };
 }
 
 void SegmentedLine::AddGap(int start, int end)

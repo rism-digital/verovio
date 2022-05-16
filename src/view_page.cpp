@@ -785,7 +785,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                     yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                     yBottom -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                 }
-                this->DrawBarLine(dc, yTop, yBottom, barLine, form);
+                this->DrawBarLine(dc, yTop, yBottom, barLine);
                 if (barLine->HasRepetitionDots()) {
                     this->DrawBarLineDots(dc, staff, barLine);
                 }
@@ -849,13 +849,14 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
         }
 
+        const bool singleStaff = (first == last);
         // erase intersections only if we have more than one staff
-        bool eraseIntersections = (first != last) ? true : false;
+        bool eraseIntersections = !singleStaff;
         // do not erase intersections with right barline of the last measure of the system
         if (isLastMeasure && (barLine->GetPosition() == BarLinePosition::Right)) {
             eraseIntersections = false;
         }
-        this->DrawBarLine(dc, yTop, yBottom, barLine, barLine->GetForm(), eraseIntersections);
+        this->DrawBarLine(dc, yTop, yBottom, barLine, eraseIntersections, singleStaff);
 
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if (barLine->HasRepetitionDots()) {
@@ -879,11 +880,12 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 }
 
 void View::DrawBarLine(
-    DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, const data_BARRENDITION form, bool eraseIntersections)
+    DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, bool eraseIntersections, bool singleStaff)
 {
     assert(dc);
     assert(barLine);
 
+    const data_BARRENDITION form = barLine->GetForm();
     Staff *staff = barLine->GetAncestorStaff(ANCESTOR_ONLY, false);
     const int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
 
@@ -936,7 +938,12 @@ void View::DrawBarLine(
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
             break;
         case BARRENDITION_dotted: //
-            this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
+            if (singleStaff) {
+                this->DrawVerticalDots(dc, x, line, barLineWidth, m_doc->GetDrawingDoubleUnit(staffSize));
+            }
+            else {
+                this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
+            }
             break;
         case BARRENDITION_rptend:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
