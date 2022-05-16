@@ -8932,12 +8932,18 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
             }
             checkBeamWith(beam, tgs, layerdata, layerindex);
             setBeamLocationId(beam, tgs, layerdata, layerindex);
+            std::string id = beam->GetUuid();
+            layerdata[layerindex]->setValue("auto", "beamid", id);
         }
         else {
             beam = insertBeam(elements, pointers, tg);
             setBeamLocationId(beam, tgs, layerdata, layerindex);
+            std::string id = beam->GetUuid();
+            layerdata[layerindex]->setValue("auto", "beamid", id);
             bool status = checkForBeamJoin(beam, layerdata, layerindex);
             if (status) {
+                // remove beam from stack
+                removeBeam(elements, pointers);
                 return;
             }
 
@@ -8953,12 +8959,21 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
     }
     else if (tg.beamstart) {
         beam = insertBeam(elements, pointers, tg);
+        setBeamLocationId(beam, tgs, layerdata, layerindex);
+        std::string id = beam->GetUuid();
+        layerdata[layerindex]->setValue("auto", "beamid", id);
+        bool status = checkForBeamJoin(beam, layerdata, layerindex);
+        if (status) {
+            // remove beam from stack
+            removeBeam(elements, pointers);
+            return;
+        }
+
         checkForInvisibleBeam(beam, tgs, layerindex);
         if (direction) {
             appendTypeTag(beam, "placed");
         }
         checkBeamWith(beam, tgs, layerdata, layerindex);
-        setBeamLocationId(beam, tgs, layerdata, layerindex);
     }
     else if (tg.tupletstart) {
         insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_tuplet_number,
@@ -8974,6 +8989,8 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
         }
         checkBeamWith(beam, tgs, layerdata, layerindex);
         setBeamLocationId(beam, tgs, layerdata, layerindex);
+        std::string id = beam->GetUuid();
+        layerdata[layerindex]->setValue("auto", "beamid", id);
     }
 }
 
@@ -9019,6 +9036,9 @@ bool HumdrumInput::checkForBeamJoin(Beam *beam, std::vector<hum::HTp> &layerdata
     if (data1.size() != data2.size()) {
         return false;
     }
+    if (data1.empty()) {
+        return false;
+    }
 
     for (int i = 0; i < (int)data1.size(); i++) {
         hum::HumNum dur1 = data1[i]->getDuration();
@@ -9044,7 +9064,11 @@ bool HumdrumInput::checkForBeamJoin(Beam *beam, std::vector<hum::HTp> &layerdata
     for (int i = 0; i < (int)data1.size(); i++) {
         data1[i]->setValue("auto", "suppress", 1);
     }
-    beam->SetSameas("#XXX");
+    std::string id = data2[0]->getValue("auto", "beamid");
+    if ((id != "") && (id != "false")) {
+        beam->SetSameas("#" + id);
+    }
+
     return true;
 }
 
@@ -9066,7 +9090,7 @@ std::vector<hum::HTp> HumdrumInput::getBeamNotes(hum::HTp token, int beamstart)
             current = current->getNextToken();
             continue;
         }
-        if (!current->isNull()) {
+        if (current->isNull()) {
             current = current->getNextToken();
             continue;
         }
