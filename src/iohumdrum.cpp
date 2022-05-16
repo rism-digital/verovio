@@ -8403,6 +8403,13 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
     if (layerdata.size() > 0) {
         if (layerdata[0]->size() > 0) {
             setLocationIdNSuffix(m_layer, layerdata[0], layerindex + 1);
+            // Start the Layer at startline rather than line of first token in layer.
+            std::string id = m_layer->GetUuid();
+            hum::HumRegex hre;
+            std::string replacement = "L";
+            replacement += to_string(startline + 1);
+            hre.replaceDestructive(id, replacement, "L\\d+");
+            m_layer->SetUuid(id);
         }
     }
 
@@ -8918,6 +8925,7 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
             insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_tuplet_number,
                 ss[staffindex].suppress_tuplet_bracket);
             beam = insertBeam(elements, pointers, tg);
+
             checkForInvisibleBeam(beam, tgs, layerindex);
             if (direction) {
                 appendTypeTag(beam, "placed");
@@ -8927,11 +8935,17 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
         }
         else {
             beam = insertBeam(elements, pointers, tg);
+            setBeamLocationId(beam, tgs, layerdata, layerindex);
+            bool status = checkForBeamJoin(beam, layerdata, layerindex);
+            if (status) {
+                return;
+            }
+
             checkForInvisibleBeam(beam, tgs, layerindex);
             if (direction) {
                 appendTypeTag(beam, "placed");
             }
-            setBeamLocationId(beam, tgs, layerdata, layerindex);
+
             checkBeamWith(beam, tgs, layerdata, layerindex);
             insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_tuplet_number,
                 ss[staffindex].suppress_tuplet_bracket);
@@ -8961,6 +8975,110 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
         checkBeamWith(beam, tgs, layerdata, layerindex);
         setBeamLocationId(beam, tgs, layerdata, layerindex);
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForBeamJoin --
+//
+
+bool HumdrumInput::checkForBeamJoin(Beam *beam, std::vector<hum::HTp> &layerdata, int layerindex)
+{
+    if (!m_join) {
+        return false;
+    }
+    hum::HTp token = layerdata.at(layerindex);
+    int subtrack = token->getSubtrack();
+    if (subtrack != 2) {
+        return false;
+    }
+    hum::HTp ptoken = token->getPreviousFieldToken();
+    if (!ptoken) {
+        return false;
+    }
+    if (ptoken->isNull()) {
+        return false;
+    }
+    int ptrack = ptoken->getTrack();
+    int track = token->getTrack();
+    if (ptrack != track) {
+        return false;
+    }
+    int beamstart1 = token->getValueInt("auto", "beamstart");
+    int beamstart2 = ptoken->getValueInt("auto", "beamstart");
+    if (beamstart1 == 0) {
+        return false;
+    }
+    if (beamstart2 == 0) {
+        return false;
+    }
+
+    std::vector<hum::HTp> data1 = getBeamNotes(token, beamstart1);
+    std::vector<hum::HTp> data2 = getBeamNotes(ptoken, beamstart2);
+
+    if (data1.size() != data2.size()) {
+        return false;
+    }
+
+    for (int i = 0; i < (int)data1.size(); i++) {
+        hum::HumNum dur1 = data1[i]->getDuration();
+        hum::HumNum dur2 = data2[i]->getDuration();
+        if (dur1 != dur2) {
+            return false;
+        }
+        if (data1[i]->isChord()) {
+            return false;
+        }
+        if (data2[i]->isChord()) {
+            return false;
+        }
+        int pitch1 = data1[i]->getBase40Pitch();
+        int pitch2 = data2[i]->getBase40Pitch();
+        if (pitch1 != pitch2) {
+            return false;
+        }
+    }
+
+    // The beam is a duplicate of the first layer beam, so
+    // make sameas.
+    for (int i = 0; i < (int)data1.size(); i++) {
+        data1[i]->setValue("auto", "suppress", 1);
+    }
+    beam->SetSameas("#XXX");
+    return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getBeamNotes --
+//
+
+std::vector<hum::HTp> HumdrumInput::getBeamNotes(hum::HTp token, int beamstart)
+{
+    std::vector<hum::HTp> output;
+    output.push_back(token);
+    hum::HTp current = token->getNextToken();
+    while (current) {
+        if (current->isBarline()) {
+            break;
+        }
+        if (!current->isData()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (!current->isNull()) {
+            current = current->getNextToken();
+            continue;
+        }
+        int beamend = current->getValueInt("auto", "beamend");
+        output.push_back(current);
+        if (beamend == beamstart) {
+            break;
+        }
+        current = current->getNextToken();
+    }
+
+    return output;
 }
 
 //////////////////////////////
@@ -9055,16 +9173,96 @@ void HumdrumInput::checkForVerseLabels(hum::HTp token)
 
 //////////////////////////////
 //
+// HumdrumInput::checkForLayerJoin --
+//
+
+bool HumdrumInput::checkForLayerJoin(int staffindex, int layerindex)
+{
+    return false; // layer@sameas is not yet allowed.
+    /*
+            if (!m_join) {
+                    return false;
+            }
+            if (layerindex != 1) {
+                    return false;
+            }
+
+       std::vector<std::vector<hum::HTp>>& layerdatas = m_layertokens[staffindex];
+            std::vector<hum::HTp> data1;
+            std::vector<hum::HTp> data2;
+            for (int i=0; i<(int)layerdatas.at(0).size(); i++) {
+                    hum::HTp token = layerdatas.at(0).at(i);
+                    if (token->isData()) {
+                            data1.push_back(token);
+                    } else if (*token == "*Xjoin") {
+                            return false;
+                    }
+            }
+            for (int i=0; i<(int)layerdatas.at(1).size(); i++) {
+                    hum::HTp token = layerdatas.at(1).at(i);
+                    if (token->isData()) {
+                            data2.push_back(token);
+                    } else if (*token == "*Xjoin") {
+                            return false;
+                    }
+            }
+            if (data1.size() != data2.size()) {
+                    return false;
+            }
+            for (int i=0; i<(int)data1.size(); i++) {
+                    if (data1[i]->isChord()) {
+                            return false;
+                    }
+                    if (data2[1]->isChord()) {
+                            return false;
+                    }
+                    hum::HumNum dur1 = data1[i]->getDuration();
+                    hum::HumNum dur2 = data2[i]->getDuration();
+                    if (dur1 != dur2) {
+                            return false;
+                    }
+                    if (data1[i]->isRest() && data2[i]->isRest()) {
+                            continue;
+                    }
+                    int pitch1 = data1[i]->getBase40Pitch();
+                    int pitch2 = data2[i]->getBase40Pitch();
+                    if (pitch1 != pitch2) {
+                            continue;
+                    }
+            }
+
+            // Two layers have same note/rest content so make the second layer
+            // a sameas of the first layer:
+       Layer *&layer = m_layer;
+            std::string id = layer->GetUuid();
+            hum::HumRegex hre;
+            hre.replaceDestructive(id, "N1", "N\\d+");
+            // m_layer->SetSameas("#" + id);
+
+            return true;
+    */
+}
+
+//////////////////////////////
+//
 // HumdrumInput::fillContentsOfLayer -- Fill the layer with musical data.
 //
 
 bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, int layerindex)
 {
     hum::HumdrumFile &infile = m_infiles[0];
+
     std::vector<hum::HumNum> &timesigdurs = m_timesigdurs;
     std::vector<int> &rkern = m_rkern;
     int staffindex = rkern[track];
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+
+    if (m_join) {
+        bool status = checkForLayerJoin(staffindex, layerindex);
+        if (status) {
+            return true;
+        }
+    }
 
     if (staffindex < 0) {
         // not a kern spine.
@@ -17550,6 +17748,12 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             }
             tgs.at(i).beamstart = beamstartboolean.at(indexmapping2.at(i));
             tgs.at(i).beamend = beamendboolean.at(indexmapping2.at(i));
+            if (tgs.at(i).beamstart) {
+                tgs.at(i).token->setValue("auto", "beamstart", tgs.at(i).beamstart);
+            }
+            if (tgs.at(i).beamend) {
+                tgs.at(i).token->setValue("auto", "beamend", tgs.at(i).beamend);
+            }
         }
         return;
     }
@@ -17914,6 +18118,25 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     mergeTupletsCuttingBeam(tgs);
     resolveTupletBeamTie(tgs);
     assignTupletScalings(tgs);
+
+    storeTupletAndBeamInfoInTokens(tgs);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::storeTupletAndBeamInfoInTokens --
+//
+
+void HumdrumInput::storeTupletAndBeamInfoInTokens(std::vector<humaux::HumdrumBeamAndTuplet> &tgs)
+{
+    for (int i = 0; i < (int)tgs.size(); i++) {
+        if (tgs[i].beamstart) {
+            tgs[i].token->setValue("auto", "beamstart", tgs[i].beamstart);
+        }
+        if (tgs[i].beamend) {
+            tgs[i].token->setValue("auto", "beamend", tgs[i].beamend);
+        }
+    }
 }
 
 //////////////////////////////
