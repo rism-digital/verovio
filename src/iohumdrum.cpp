@@ -403,6 +403,8 @@ namespace humaux {
         std::fill(stem_type.begin(), stem_type.end(), 'X');
 
         mensuration_type = 0;
+
+        join = false;
     }
 
     ostream &StaffStateVariables::print(ostream &out, const std::string &prefix)
@@ -444,6 +446,7 @@ namespace humaux {
         out << prefix << "auto_custos              =  " << auto_custos << endl;
         out << prefix << "suppress_manual_custos   =  " << suppress_manual_custos << endl;
         out << prefix << "mensuration_type         =  " << mensuration_type << endl;
+        out << prefix << "join                     =  " << join << endl;
 
         return out;
     }
@@ -6835,7 +6838,6 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
             }
 
             if (token->isBarline() && !token->allSameBarlineStyle()) {
-
                 if (infile[i].hasDataStraddle()) {
                     if (token->find('-') != std::string::npos) {
                         // do not store partial invisible barlines
@@ -6853,6 +6855,20 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
                 // a secondary layer ends before the end of a measure.
 
                 for (int k = layercount; k < (int)lt[staffindex].size(); k++) {
+                    lt[staffindex][k].push_back(token);
+                }
+            }
+
+            // duplicate *join to all secondary layers
+            if ((layerindex == 0) && (*token == "*join")) {
+                for (int k = 1; k < (int)lt[staffindex].size(); k++) {
+                    lt[staffindex][k].push_back(token);
+                }
+            }
+
+            // duplicate *Xjoin to all secondary layers
+            if ((layerindex == 0) && (*token == "*Xjoin")) {
+                for (int k = 1; k < (int)lt[staffindex].size(); k++) {
                     lt[staffindex][k].push_back(token);
                 }
             }
@@ -6899,8 +6915,6 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
 
     std::vector<int> layers = getStaffLayerCounts();
 
-    int i;
-
     if (m_fb) {
         // This function needs to come before notes so that
         // the *above/*below markers can be used to set
@@ -6913,7 +6927,7 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
 
     // pre-allocate
     std::vector<Staff *> stafflist(staffstarts.size());
-    for (i = 0; i < (int)staffstarts.size(); ++i) {
+    for (int i = 0; i < (int)staffstarts.size(); ++i) {
         stafflist[i] = new Staff();
         addChildMeasureOrSection(stafflist[i]);
     }
@@ -6921,11 +6935,10 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
     checkForOmd(startline, endline);
 
     bool status = true;
-    for (i = 0; i < (int)staffstarts.size(); ++i) {
+    for (int i = 0; i < (int)staffstarts.size(); ++i) {
         m_currentstaff = i + 1;
         m_staff = stafflist[i];
         m_staff->SetN(m_currentstaff);
-
         status &= convertMeasureStaff(staffstarts[i]->getTrack(), startline, endline, i + 1, layers[i]);
         if (!status) {
             break;
@@ -8298,12 +8311,18 @@ bool HumdrumInput::convertMeasureStaff(int track, int startline, int endline, in
 {
     bool status = true;
     m_clef_buffer.clear();
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    int staffindex = m_currentstaff - 1;
+
     for (int i = 0; i < layercount; ++i) {
+        m_join = ss.at(staffindex).join;
         status &= convertStaffLayer(track, startline, endline, i);
         if (!status) {
             break;
         }
     }
+    ss.at(staffindex).join = m_join;
     checkClefBufferForSameAs();
     return status;
 }
@@ -9297,6 +9316,14 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             continue;
         }
         if (layerdata[i]->isInterpretation()) {
+            if (*layerdata[i] == "*join") {
+                m_join = true;
+                continue;
+            }
+            if (*layerdata[i] == "*Xjoin") {
+                m_join = false;
+                continue;
+            }
 
             if (ss[staffindex].verse) {
                 checkForVerseLabels(layerdata[i]);
@@ -20566,6 +20593,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             // if you want a stemless grace note, then set the
             // stemlength to zero explicitly.
         }
+
+        checkForJoin(note, token);
     }
     else {
         // deal with visual rhythms on a note that are different from the chord
@@ -20699,6 +20728,63 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             }
         }
         appendTypeTag(note, "scoredatura");
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForJoin -- Assuming only two layers for joining for now.
+//
+
+void HumdrumInput::checkForJoin(Note *note, hum::HTp token)
+{
+    if (!m_join) {
+        return;
+    }
+    if (token->isChord()) {
+        // Don't join chords.
+        return;
+    }
+    if (token->isRest()) {
+        // Deal with rests later (and can't be input to this function anyway).
+        return;
+    }
+    int subtrack = token->getSubtrack();
+    if (subtrack != 2) {
+        // Only applies to second layer.  Add higher layers later.
+        return;
+    }
+    int track = token->getTrack();
+    hum::HTp ptok = token->getPreviousFieldToken();
+    if (!ptok) {
+        return;
+    }
+    if (ptok->isChord() || ptok->isRest() || ptok->isNull()) {
+        return;
+    }
+    int ptrack = ptok->getTrack();
+    if (ptrack != track) {
+        return;
+    }
+
+    hum::HumNum dur = token->getDuration();
+    hum::HumNum pdur = ptok->getDuration();
+
+    int b40 = token->getBase40Pitch();
+    int pb40 = ptok->getBase40Pitch();
+
+    if (dur == pdur) {
+        if (b40 == pb40) {
+            // same pitch so make the entire notes the same:
+            std::string pid = getLocationId(note, ptok);
+            note->SetSameas("#" + pid);
+        }
+        else {
+            // same duration but different pitch:
+            // will be put into a chord by verovio
+            std::string pid = getLocationId(note, ptok);
+            note->SetStemSameas("#" + pid);
+        }
     }
 }
 

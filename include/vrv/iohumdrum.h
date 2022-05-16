@@ -342,6 +342,9 @@ namespace humaux {
 
         // toggle for black/white mensural notation.  0=white, 1=black
         int mensuration_type = 0;
+
+        // join layers into chords or shared notes.
+        bool join = false;
     };
 } // namespace humaux
 
@@ -768,6 +771,7 @@ protected:
     hum::HTp getNextNonNullDataOrMeasureToken(hum::HTp tok);
     void setBeamSpanPlist(BeamSpan *beamspan, hum::HTp starttok, hum::HTp etok);
     void checkMeterSigParameters(MeterSig *msig, hum::HTp timesigtok);
+    void checkForJoin(Note *note, hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -1118,6 +1122,9 @@ private:
 
     // m_tempoScaling == global adjustment of tempo markings
     double m_tempoScaling = 1.0;
+
+    // m_join == boolean for merging layers together.
+    bool m_join = false;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
