@@ -437,6 +437,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     const int unit = doc->GetDrawingUnit(100);
     const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
     const double flexibility = doc->GetOptions()->m_slurEndpointFlexibility.GetValue();
+    const double symmetry = doc->GetOptions()->m_slurSymmetry.GetValue();
 
     // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
     this->FilterSpannedElements(curve, bezier, margin);

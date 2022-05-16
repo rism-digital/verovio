@@ -1339,11 +1339,11 @@ Options::Options()
     this->Register(&m_slurCurveFactor, "slurCurveFactor", &m_generalLayout);
 
     m_slurEndpointFlexibility.SetInfo(
-        "Slur endpoint flexibility", "Slur end point flexibility - allow more endpoint movement during adjustment");
+        "Slur endpoint flexibility", "Slur endpoint flexibility - allow more endpoint movement during adjustment");
     m_slurEndpointFlexibility.Init(0.0, 0.0, 1.0);
     this->Register(&m_slurEndpointFlexibility, "slurEndpointFlexibility", &m_generalLayout);
 
-    m_slurEndpointThickness.SetInfo("Slur Endpoint thickness", "The Endpoint slur thickness in MEI units");
+    m_slurEndpointThickness.SetInfo("Slur endpoint thickness", "The endpoint slur thickness in MEI units");
     m_slurEndpointThickness.Init(0.1, 0.05, 0.25);
     this->Register(&m_slurEndpointThickness, "slurEndpointThickness", &m_generalLayout);
 
@@ -1358,6 +1358,10 @@ Options::Options()
     m_slurMidpointThickness.SetInfo("Slur midpoint thickness", "The midpoint slur thickness in MEI units");
     m_slurMidpointThickness.Init(0.6, 0.2, 1.2);
     this->Register(&m_slurMidpointThickness, "slurMidpointThickness", &m_generalLayout);
+
+    m_slurSymmetry.SetInfo("Slur symmetry", "Slur symmetry - high value means more symmetric slurs");
+    m_slurSymmetry.Init(0.0, 0.0, 1.0);
+    this->Register(&m_slurSymmetry, "slurSymmetry", &m_generalLayout);
 
     m_spacingBraceGroup.SetInfo(
         "Spacing brace group", "Minimum space between staves inside a braced group in MEI units");
