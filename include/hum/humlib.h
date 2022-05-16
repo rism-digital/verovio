@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat May 14 04:14:34 PDT 2022
+// Last Modified: Mon May 16 01:34:10 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1558,8 +1558,7 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     allSameBarlineStyle       (void);
 
 
-		// pitch-related functions:
-
+		// pitch-related functions (in HumdrumToken-midi.cpp):
 		int              getMidiPitch         (void);
 		void             getMidiPitches       (std::vector<int>& output);
 		std::vector<int> getMidiPitches       (void);
@@ -1575,6 +1574,23 @@ class HumdrumToken : public std::string, public HumHash {
 		std::vector<int> getMidiPitchesResolveNullSortHL (void);
 		void             getMidiPitchesResolveNullSortLH (std::vector<int>& output);
 		std::vector<int> getMidiPitchesResolveNullSortLH (void);
+
+		// pitch-related functions (in HumdrumToken-base40.cpp):
+		int              getBase40Pitch         (void);
+		void             getBase40Pitches       (std::vector<int>& output);
+		std::vector<int> getBase40Pitches       (void);
+		void             getBase40PitchesSortHL (std::vector<int>& output);
+		std::vector<int> getBase40PitchesSortHL (void);
+		void             getBase40PitchesSortLH (std::vector<int>& output);
+		std::vector<int> getBase40PitchesSortLH (void);
+
+		int              getBase40PitchResolveNull         (void);
+		void             getBase40PitchesResolveNull       (std::vector<int>& output);
+		std::vector<int> getBase40PitchesResolveNull       (void);
+		void             getBase40PitchesResolveNullSortHL (std::vector<int>& output);
+		std::vector<int> getBase40PitchesResolveNullSortHL (void);
+		void             getBase40PitchesResolveNullSortLH (std::vector<int>& output);
+		std::vector<int> getBase40PitchesResolveNullSortLH (void);
 
 		// duration-related functions:
 		HumNum   getDuration               (void);
@@ -5889,6 +5905,102 @@ class Tool_cint : public HumTool {
 };
 
 
+class Tool_cmr : public HumTool {
+	public:
+		                 Tool_cmr                (void);
+		                ~Tool_cmr                () {};
+
+		bool             run                     (HumdrumFileSet& infiles);
+		bool             run                     (HumdrumFile& infile);
+		bool             run                     (const string& indata, ostream& out);
+		bool             run                     (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void             processFile             (HumdrumFile& infile);
+		void             initialize              (void);
+		void             processFile             (HumdrumFile& infile, Options& options);
+		void             processSpine            (HTp startok);
+		void             processSpineFlipped     (HTp startok);
+		void             identifyLocalPeaks      (std::vector<bool>& cmrnotes,
+		                                          std::vector<int>& notelist);
+		void             getDurations            (vector<double>& durations,
+		                                          vector<vector<HTp>>& notelist);
+		void             getBeat                 (vector<bool>& metpos,
+		                                          vector<vector<HTp>>& notelist);
+		int              getMetricLevel          (HTp token);
+		bool             isMelodicallyAccented   (HTp token);
+		bool             hasLeapBefore           (HTp token);
+		bool             isSyncopated            (HTp token);
+		void             getLocalPeakNotes       (vector<vector<HTp>>& newnotelist,
+		                                          vector<vector<HTp>>& oldnotelist,
+		                                          vector<bool>& cmrnotes);
+
+		void             identifyPeakSequence    (vector<bool>& globalcmrnotes,
+		                                          vector<int>& cmrmidinums,
+		                                          vector<vector<HTp>>& notes);
+		std::vector<int> getMidiNumbers          (std::vector<std::vector<HTp>>& notelist);
+		std::vector<std::vector<HTp>> getNoteList(HTp starting);
+		void             printData               (std::vector<std::vector<HTp>>& notelist,
+		                                          std::vector<int>& midinums,
+		                                          std::vector<bool>& cmrnotes);
+		void             markNotesInScore        (vector<vector<HTp>>& cmrnotelist,
+		                                          vector<bool>& iscmr);
+		void             mergeOverlappingPeaks   (void);
+		bool             checkGroupPairForMerger (int index1, int index2);
+		int              countNotesInScore       (HumdrumFile& infile);
+		std::vector<int> flipMidiNumbers         (vector<int>& midinums);
+		void             markNotes               (vector<vector<HTp>>& notelist, vector<bool>& cmrnotesQ,
+		                                          const string& marker);
+		void             postProcessAnalysis     (HumdrumFile& infile);
+
+	private:
+		bool    m_rawQ        = false;           // don't print score (only analysis)
+		bool    m_cmrQ        = false;           // analyze only cmrs
+		bool    m_ncmrQ       = false;           // analyze only negative cmrs (troughs)
+		bool    m_naccentedQ  = false;           // analyze cmrs without melodic accentation
+		bool    m_infoQ       = false;           // used with -i option: display info only
+		bool    m_localQ      = false;           // used with -l option: mark all local peaks
+		bool    m_localOnlyQ  = false;           // used with -L option: only mark local peaks, then exit before CMR analysis.
+
+		double  m_smallRest   = 4.0;             // Ignore rests that are 1 whole note or less
+		double  m_cmrDur      = 24.0;            // 6 whole notes maximum between m_cmrNum local maximums
+		double  m_cmrNum      = 3;               // number of local maximums in a row needed to mark in score
+
+		int     m_count       = 0;               // number of cmr sequences in score
+		int     m_noteCount   = 0;               // total number of notes in the score
+
+		std::string m_color     = "red";         // color to mark cmr notes
+		std::string m_marker    = "@";           // marker to label cmr notes in score
+
+		std::string m_local_color = "limegreen"; // color to mark local peaks
+		std::string m_local_marker = "N";        // marker for local peak notes
+		int         m_local_count = 0;           // used for coloring local peaks
+
+		// negative peak markers:
+		std::string m_local_color_n = "green";   // color to mark local peaks
+		std::string m_local_marker_n = "K";      // marker for local peak notes
+		int         m_local_count_n = 0;         // used for coloring local peaks
+
+		std::string m_leap_color  = "purple";    // color to mark leap notes before peaks
+		std::string m_leap_marker = "k";         // marker for leap notes
+
+		std::vector<int>    m_barNum;            // storage for identify start/end measures of cmr groups
+
+		std::vector<int>    m_cmrMeasureBegin;   // starting measure of cmr group
+		std::vector<int>    m_cmrMeasureEnd;     // starting measure of cmr group
+		std::vector<HumNum> m_cmrDuration;       // between first cmr note and last cmr note.
+		std::vector<std::vector<HTp>> m_cmrPitch;// pitches of the cmr sequence (excluding tied notes)
+		std::vector<int>    m_cmrPeakCount;      // how many notes in a cmr sequence
+
+		// Merging variables for cmr groups:
+		std::vector<int>    m_cmrIndex;          // used to keep track of mergers
+		std::vector<int>    m_cmrTrack;          // used to keep track of mergers
+		std::vector<HumNum> m_startTime;         // starting time of first note in group
+		std::vector<HumNum> m_endTime;           // ending time of last note in group
+
+};
+
+
 class Tool_colorgroups : public HumTool {
 	public:
 		         Tool_colorgroups  (void);
@@ -8628,81 +8740,6 @@ class Tool_pccount : public HumTool {
 
 };
 
-
-
-class Tool_peak : public HumTool {
-	public:
-		                              Tool_peak          (void);
-		                             ~Tool_peak          () {};
-
-		bool                          run                (HumdrumFileSet& infiles);
-		bool                          run                (HumdrumFile& infile);
-		bool                          run                (const string& indata, ostream& out);
-		bool                          run                (HumdrumFile& infile, ostream& out);
-
-	protected:
-		void                          processFile        (HumdrumFile& infile);
-		void                          initialize         (void);
-		void                          processFile        (HumdrumFile& infile, Options& options);
-		void                          processSpine       (HTp startok);
-		void 													processSpineFlipped(HTp startok);
-		void                          identifyLocalPeaks (std::vector<bool>& peaknotes,
-		                                                  std::vector<int>& notelist);
-		void                          getDurations       (vector<double>& durations,
-		                                                  vector<vector<HTp>>& notelist);
-		void                          getBeat            (vector<bool>& metpos,
-		                                                  vector<vector<HTp>>& notelist);
-		int                           getMetricLevel     (HTp token);
-		bool                          isSyncopated       (HTp token);
-		void                          getLocalPeakNotes  (vector<vector<HTp>>& newnotelist,
-		                                                  vector<vector<HTp>>& oldnotelist,
-		                                                  vector<bool>& peaknotes);
-
-		void                          identifyPeakSequence(vector<bool>& globalpeaknotes,
-		                                                   vector<int>& peakmidinums,
-		                                                   vector<vector<HTp>>& notes);
-		std::vector<int>              getMidiNumbers     (std::vector<std::vector<HTp>>& notelist);
-		std::vector<std::vector<HTp>> getNoteList        (HTp starting);
-		void                          printData          (std::vector<std::vector<HTp>>& notelist,
-		                                                  std::vector<int>& midinums,
-		                                                  std::vector<bool>& peaknotes);
-		void                          markNotesInScore   (vector<vector<HTp>>& peaknotelist,
-		                                                  vector<bool>& ispeak);
-		void                          mergeOverlappingPeaks(void);
-		bool                          checkGroupPairForMerger(int index1, int index2);
-    int                           countNotesInScore   (HumdrumFile& infile);
-		std::vector<int> 							flipMidiNumbers     (vector<int>& midinums);
-
-	private:
-		bool m_rawQ             = false;         // don't print score (only analysis)
-		bool m_peakQ            = false;         // analyze only peaks
-		bool m_npeakQ           = false;         // analyze only negative peaks (troughs)
-		bool m_nsyncoQ          = false;         // analyze peaks without syncopation
-		std::string m_marker    = "@";           // marker to label peak notes in score
-		std::string m_color     = "red";         // color to mark peak notes
-		double      m_smallRest = 4.0;           // Ignore rests that are 1 whole note or less
-		double      m_peakDur   = 24.0;          // 6 whole notes maximum between m_peakNum local maximums
-		double      m_peakNum   = 3;             // number of local maximums in a row needed to mark in score
-
-		bool        m_infoQ     = false;         // used with -i option
-		int         m_count     = 0;             // number of peak sequences in score
-		int         m_noteCount = 0;             // total number of notes in the score
-
-		std::vector<int>    m_barNum;            // storage for identify start/end measures of peak groups
-
-		std::vector<int>    m_peakMeasureBegin;  // starting measure of peak group
-		std::vector<int>    m_peakMeasureEnd;    // starting measure of peak group
-		std::vector<HumNum> m_peakDuration;      // between first peak note and last peak note.
-		std::vector<std::vector<HTp>> m_peakPitch; // pitches of the peak sequence (excluding tied notes)
-		std::vector<int>    m_peakPeakCount;     // how many notes in a peak sequence
-
-		// Merging variables for peak groups:
-		std::vector<int>    m_peakIndex;         // used to keep track of mergers
-		std::vector<int>    m_peakTrack;         // used to keep track of mergers
-		std::vector<HumNum> m_startTime;         // starting time of first note in group
-		std::vector<HumNum> m_endTime;           // ending time of last note in group
-
-};
 
 
 
