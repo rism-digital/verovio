@@ -75,7 +75,7 @@ public:
     /**
      * Set counter for the alternating meterSigGrp based on the provided measureId
      */
-    void SetMeasureBasedCount(Measure *measure);
+    void SetMeasureBasedCount(const Measure *measure);
 
     //----------//
     // Functors //

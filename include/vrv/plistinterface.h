@@ -40,10 +40,10 @@ public:
     /**
      * Add a reference ref to the AttPlist vector (if not already there)
      */
-    void AddRef(std::string ref);
+    void AddRef(const std::string &ref);
 
     /**
-     * Add a references, not checking if it is already in the list (for expansion@plist).
+     * Add a reference, not checking if it is already in the list (for expansion@plist).
      */
     void AddRefAllowDuplicate(const std::string &ref);
 
@@ -51,9 +51,15 @@ public:
      * Set a reference object when the uuid is found in the m_uuids.
      * Calls IsValidRef to check that the type of object is valid.
      */
-    void SetRef(Object *object);
+    void SetRef(const Object *object);
 
-    const ArrayOfObjects *GetRefs() { return &m_references; }
+    /**
+     * Retrieve all reference objects
+     */
+    ///@{
+    ArrayOfObjects GetRefs();
+    const ArrayOfConstObjects &GetRefs() const { return m_references; }
+    ///@}
 
     //-----------------//
     // Pseudo functors //
@@ -86,7 +92,7 @@ protected:
      * Method to be redefined in the child class if specific validation is required.
      * The method is called from PlistInterface::SetRef
      */
-    virtual bool IsValidRef(Object *ref) const { return true; }
+    virtual bool IsValidRef(const Object *ref) const { return true; }
 
 private:
     //
@@ -98,7 +104,7 @@ private:
      * An array of resolved references.
      * Filled in InterfacePreparePlist (backward).
      */
-    ArrayOfObjects m_references;
+    ArrayOfConstObjects m_references;
 
     /**
      * An array of parsed any uris stored as uuids.

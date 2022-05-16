@@ -238,7 +238,7 @@ int BeamSpan::PrepareBeamSpanElements(FunctorParams *functorParams)
     Staff *staff = vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
     if (!layer || !staff) return FUNCTOR_SIBLINGS;
 
-    m_beamedElements = this->HasPlist() ? *this->GetRefs() : this->GetBeamSpanElementList(layer, staff);
+    m_beamedElements = this->HasPlist() ? this->GetRefs() : this->GetBeamSpanElementList(layer, staff);
 
     if (m_beamedElements.empty()) return FUNCTOR_SIBLINGS;
 

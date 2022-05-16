@@ -341,22 +341,22 @@ public:
     /**
      * Check if the segmented line is empty
      */
-    bool IsEmpty() { return (m_segments.empty()); }
+    bool IsEmpty() const { return (m_segments.empty()); }
 
     /**
      * Check if the line is one single segment
      */
-    bool IsUnsegmented() { return (m_segments.size() == 1); }
+    bool IsUnsegmented() const { return (m_segments.size() == 1); }
 
     /**
      * The number of segments
      */
-    int GetSegmentCount() { return (int)m_segments.size(); }
+    int GetSegmentCount() const { return (int)m_segments.size(); }
 
     /**
      * Get the start and end of a segment
      */
-    void GetStartEnd(int &start, int &end, int idx);
+    std::pair<int, int> GetStartEnd(int idx) const;
 
     /**
      * Add a gap in the line

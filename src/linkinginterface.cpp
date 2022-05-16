@@ -66,8 +66,13 @@ void LinkingInterface::SetUuidStr()
 
 Measure *LinkingInterface::GetNextMeasure()
 {
+    return const_cast<Measure *>(std::as_const(*this).GetNextMeasure());
+}
+
+const Measure *LinkingInterface::GetNextMeasure() const
+{
     if (!m_next) return NULL;
-    return dynamic_cast<Measure *>(m_next->GetFirstAncestor(MEASURE));
+    return vrv_cast<const Measure *>(m_next->GetFirstAncestor(MEASURE));
 }
 
 //----------------------------------------------------------------------------
