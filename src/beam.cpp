@@ -488,25 +488,26 @@ void BeamSegment::AdjustBeamToFrenchStyle(BeamDrawingInterface *beamInterface)
     }
 }
 
-void BeamSegment::AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface)
+void BeamSegment::AdjustBeamToLedgerLines(
+    Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal)
 {
     int adjust = 0;
     const int staffTop = staff->GetDrawingY();
     const int staffHeight = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     const int doubleUnit = doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const int staffMargin = isHorizontal ? doubleUnit / 2 : 0;
     for (auto coord : m_beamElementCoordRefs) {
         if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
             const int topPosition = coord->m_yBeam + beamInterface->GetTotalBeamWidth();
-            const int topMargin = staffTop - doubleUnit / 2;
-            if (topPosition >= topMargin) {
-                adjust = ((topPosition - topMargin) / doubleUnit + 1) * doubleUnit;
+            if (topPosition > staffTop - staffMargin) {
+                adjust = ((topPosition - staffTop) / doubleUnit + 1) * doubleUnit;
                 break;
             }
         }
         else if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             const int bottomPosition = coord->m_yBeam - beamInterface->GetTotalBeamWidth();
-            const int bottomMargin = staffTop - staffHeight + doubleUnit / 2;
-            if (bottomPosition <= bottomMargin) {
+            const int bottomMargin = staffTop - staffHeight;
+            if (bottomPosition < bottomMargin + staffMargin) {
                 adjust = ((bottomPosition - bottomMargin) / doubleUnit - 1) * doubleUnit;
                 break;
             }
@@ -950,7 +951,7 @@ void BeamSegment::CalcBeamPosition(Doc *doc, Staff *staff, BeamDrawingInterface 
         this->CalcHorizontalBeam(doc, staff, beamInterface);
     }
 
-    if (!beamInterface->m_crossStaffContent) this->AdjustBeamToLedgerLines(doc, staff, beamInterface);
+    if (!beamInterface->m_crossStaffContent) this->AdjustBeamToLedgerLines(doc, staff, beamInterface, isHorizontal);
 }
 
 void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, int &step)
