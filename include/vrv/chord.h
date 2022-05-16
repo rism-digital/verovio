@@ -158,7 +158,7 @@ public:
      * Helper to adjust overlapping layers for chords
      * Returns the shift of the adjustment
      */
-    int AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted,
+    int AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted,
         bool &isUnison, bool &stemSameas) override;
 
     /**

@@ -1545,7 +1545,7 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Note *note = vrv_cast<Note *>(this->ThisOrSameasAsLink());
+    Note *note = vrv_cast<Note *>(this->ThisOrSameasLink());
     assert(note);
 
     params->m_timemap->AddEntry(note, params);

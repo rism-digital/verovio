@@ -311,7 +311,7 @@ bool Stem::IsSupportedChild(Object *child)
     return true;
 }
 
-int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int margin)
+int Stem::CompareToElementPosition(const Doc *doc, LayerElement *otherElement, int margin)
 {
     Staff *staff = this->GetAncestorStaff();
 

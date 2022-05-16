@@ -145,10 +145,10 @@ public:
      * @name Return the overlap on the left / right / top / bottom looking at bounding box anchor points
      */
     ///@{
-    int HorizontalLeftOverlap(const BoundingBox *other, Doc *doc, int margin = 0, int vMargin = 0) const;
-    int HorizontalRightOverlap(const BoundingBox *other, Doc *doc, int margin = 0, int vMaring = 0) const;
-    int VerticalTopOverlap(const BoundingBox *other, Doc *doc, int margin = 0, int hMargin = 0) const;
-    int VerticalBottomOverlap(const BoundingBox *other, Doc *doc, int margin = 0, int hMargin = 0) const;
+    int HorizontalLeftOverlap(const BoundingBox *other, const Doc *doc, int margin = 0, int vMargin = 0) const;
+    int HorizontalRightOverlap(const BoundingBox *other, const Doc *doc, int margin = 0, int vMargin = 0) const;
+    int VerticalTopOverlap(const BoundingBox *other, const Doc *doc, int margin = 0, int hMargin = 0) const;
+    int VerticalBottomOverlap(const BoundingBox *other, const Doc *doc, int margin = 0, int hMargin = 0) const;
     ////}
 
     /**
@@ -273,20 +273,20 @@ private:
      * Return 1 with no smufl glyph or no anchor, 2 with on anchor point, and 3 with 2 anchor points.
      */
     int GetRectangles(
-        const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2], Doc *doc) const;
+        const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2], const Doc *doc) const;
 
     /**
      * Calculate the rectangles with 2 anchor points.
      * Return false (and one single rectangle) when anchor points are out of the boundaries.
      */
-    bool GetGlyph2PointRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, const Glyph *glyph1,
-        Point rect[3][2], Doc *doc) const;
+    bool GetGlyph2PointRectangles(
+        const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, const Glyph *glyph1, Point rect[3][2]) const;
 
     /**
      * Calculate the rectangles with 1 anchor point.
      * Return false (and one single rectangle) when anchor points are out of the boundaries.
      */
-    bool GetGlyph1PointRectangles(const SMuFLGlyphAnchor &anchor, const Glyph *glyph, Point rect[2][2], Doc *doc) const;
+    bool GetGlyph1PointRectangles(const SMuFLGlyphAnchor &anchor, const Glyph *glyph, Point rect[2][2]) const;
 
 public:
     //

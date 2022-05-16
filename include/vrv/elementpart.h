@@ -380,7 +380,7 @@ public:
     /**
      * Helper to adjust overlaping layers for stems
      */
-    int CompareToElementPosition(Doc *doc, LayerElement *otherElement, int margin);
+    int CompareToElementPosition(const Doc *doc, LayerElement *otherElement, int margin);
 
     /**
      * Helper to calculate stem modifier relative Y rel and required adjustment for stem length

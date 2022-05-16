@@ -373,7 +373,7 @@ typedef std::map<std::string, ClassId> MapOfStrClassIds;
 
 typedef std::vector<std::pair<LayerElement *, LayerElement *>> MeasureTieEndpoints;
 
-typedef bool (*NotePredicate)(Note *);
+typedef bool (*NotePredicate)(const Note *);
 
 /**
  * Generic int map recursive structure for storing hierachy of values

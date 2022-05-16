@@ -467,8 +467,8 @@ bool Chord::HasNoteWithDots() const
     });
 }
 
-int Chord::AdjustOverlappingLayers(
-    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison, bool &stemSameas)
+int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElement *> &otherElements,
+    bool areDotsAdjusted, bool &isUnison, bool &stemSameas)
 {
     int margin = 0;
     // get positions of other elements
@@ -763,7 +763,7 @@ MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary)
 {
     const bool isUpwardDirection = (this->GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
     const bool useReverseOrder = (isUpwardDirection != primary);
-    MapOfNoteLocs noteLocs = this->CalcNoteLocations([](Note *note) { return !note->HasDots(); });
+    MapOfNoteLocs noteLocs = this->CalcNoteLocations([](const Note *note) { return !note->HasDots(); });
     MapOfDotLocs dotLocs;
     for (const auto &mapEntry : noteLocs) {
         if (useReverseOrder)
@@ -892,7 +892,7 @@ int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
     InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    LayerElement *element = this->ThisOrSameasAsLink();
+    LayerElement *element = this->ThisOrSameasLink();
 
     double incrementScoreTime = element->GetAlignmentDuration(
         params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
