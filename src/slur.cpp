@@ -472,15 +472,18 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // The idea is to shift control points to the outside if there is an obstacle in the vicinity of the corresponding
     // endpoint. For C1 we consider the largest angle <)BP1P2 where B is a colliding left bounding box corner and choose
     // C1 in this direction. Similar for C2.
-    bool ok = false;
-    int controlPointOffsetLeft = 0;
-    int controlPointOffsetRight = 0;
-    std::tie(ok, controlPointOffsetLeft, controlPointOffsetRight) = this->CalcControlPointOffset(curve, bezier, margin);
-    if (ok) {
-        bezier.SetLeftControlOffset(controlPointOffsetLeft);
-        bezier.SetRightControlOffset(controlPointOffsetRight);
-        bezier.UpdateControlPoints();
-        curve->UpdatePoints(bezier);
+    if (this->AdjustControlPointOffset(bezier, symmetry, unit)) {
+        bool ok = false;
+        int controlPointOffsetLeft = 0;
+        int controlPointOffsetRight = 0;
+        std::tie(ok, controlPointOffsetLeft, controlPointOffsetRight)
+            = this->CalcControlPointOffset(curve, bezier, margin);
+        if (ok) {
+            bezier.SetLeftControlOffset(controlPointOffsetLeft);
+            bezier.SetRightControlOffset(controlPointOffsetRight);
+            bezier.UpdateControlPoints();
+            curve->UpdatePoints(bezier);
+        }
     }
 
     // STEP 4: Calculate the vertical shift of the control points.
@@ -686,6 +689,13 @@ void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezi
 
     // Since we are going to redraw it, reset its bounding box
     curve->BoundingBox::ResetBoundingBox();
+}
+
+bool Slur::AdjustControlPointOffset(const BezierCurve &bezierCurve, double symmetry, int unit) const
+{
+    const double distance = BoundingBox::CalcDistance(bezierCurve.p1, bezierCurve.p2);
+
+    return (distance > symmetry * 40 * unit);
 }
 
 std::tuple<bool, int, int> Slur::CalcControlPointOffset(

@@ -243,6 +243,9 @@ private:
     // Calculate slur from bulge values
     void AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit);
 
+    // Check whether control points should be adjusted horizontally
+    bool AdjustControlPointOffset(const BezierCurve &bezierCurve, double symmetry, int unit) const;
+
     // Calculate the horizontal control point offset
     std::tuple<bool, int, int> CalcControlPointOffset(
         FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
@@ -265,6 +268,7 @@ private:
     // Shift end points for collisions nearby
     void ShiftEndPoints(
         int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const;
+
     // Calculate the coefficients of a quadratic interpolation function
     std::function<double(double)> CalcQuadraticInterpolation(double zeroAt, double oneAt) const;
 
