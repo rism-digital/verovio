@@ -4656,10 +4656,14 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
     hum::HTp metertok = NULL;
     int top = 0;
     int bot = 0;
+    bool manip = false;
 
     hum::HumRegex hre;
     hum::HTp part = staffstart;
     while (part && !part->getLine()->isData()) {
+        if (*part == "*^") {
+            manip = true;
+        }
         if (part->compare(0, 5, "*clef") == 0) {
             if (cleftok) {
                 if (clef == *part) {
@@ -4725,7 +4729,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
         else if (part->compare(0, 5, "*ITrd") == 0) {
             itranspose = *part;
         }
-        else if (part->compare(0, 4, "*I''") == 0) {
+        else if ((part->compare(0, 4, "*I''") == 0) && !manip) {
             if (staffcount > 1) {
                 // Avoid encoding the part group abbreviation when there is only one
                 // part in order to suppress the display of the abbreviation.
@@ -4737,7 +4741,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
                 }
             }
         }
-        else if (part->compare(0, 3, "*I'") == 0) {
+        else if ((part->compare(0, 3, "*I'") == 0) && !manip) {
             if (staffcount > 1) {
                 // Avoid encoding the part abbreviation when there is only one
                 // part in order to suppress the display of the abbreviation.
@@ -4745,7 +4749,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
                 abbrtok = part;
             }
         }
-        else if (part->compare(0, 4, "*I\"\"") == 0) {
+        else if ((part->compare(0, 4, "*I\"\"") == 0) && !manip) {
             glabel = part->substr(4);
             glabeltok = part;
             // hasglabel = true;
@@ -4754,12 +4758,12 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
                 m_group_name_tok[group] = glabeltok;
             }
         }
-        else if (part->compare(0, 3, "*I\"") == 0) {
+        else if ((part->compare(0, 3, "*I\"") == 0) && !manip) {
             label = part->substr(3);
             labeltok = part;
             haslabel = true;
         }
-        else if (part->compare(0, 2, "*I") == 0) {
+        else if ((part->compare(0, 2, "*I") == 0) && !manip) {
             // check to see if an instrument code
             int len = (int)part->size();
             if ((len > 2) && ::islower(part->at(2))) {
