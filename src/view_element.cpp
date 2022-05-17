@@ -256,19 +256,24 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    if (accid->GetFunc() == accidLog_FUNC_edit) {
+    if (accid->HasPlace() || accid->GetFunc() == accidLog_FUNC_edit) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         y = staff->GetDrawingY();
+        if (accid->GetPlace() == STAFFREL_below) {
+            y -= (staff->m_drawingLines - 1) * 2 * unit;
+        }
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) {
             const int drawingDur = note->GetDrawingDur();
             // Check if the note is on the top line or above (add a unit for the note head half size)
-            if (note->GetDrawingY() >= y) y = note->GetDrawingY() + unit;
-            // Check if the top of the stem is above
-            if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y)) {
-                y = note->GetDrawingStemEnd(note).y;
+            if (accid->GetPlace() == STAFFREL_below) {
+                if (note->GetDrawingBottom(m_doc, staff->m_drawingStaffSize) <= y) {
+                    y = note->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+                }
             }
+            else if (note->GetDrawingTop(m_doc, staff->m_drawingStaffSize) >= y)
+                y = note->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             else if (note->IsMensuralDur()) {
                 const int verticalCenter = y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
                 const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
@@ -287,7 +292,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->GetDrawingCueSize()));
         dc->GetSmuflTextExtent(accid->GetSymbolStr(notationType), &extend);
         dc->ResetFont();
-        y += extend.m_descent + unit;
+        y = (accid->GetPlace() == STAFFREL_below) ? y - extend.m_ascent - unit : y + extend.m_descent + unit;
     }
 
     this->DrawSmuflString(
