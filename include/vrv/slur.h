@@ -270,7 +270,7 @@ private:
     void ShiftEndPoints(
         int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const;
 
-    // Calculate the coefficients of a quadratic interpolation function
+    // Calculate a quadratic interpolation function between zero and one
     std::function<double(double)> CalcQuadraticInterpolation(double zeroAt, double oneAt) const;
 
     // Rotate the slope by a given number of degrees, but choose smaller angles if already close to the vertical axis
