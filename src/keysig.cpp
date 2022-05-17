@@ -212,7 +212,7 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
 
 std::optional<KeyAccidInfo> KeySig::GetKeyAccidInfoAt(int pos) const
 {
-    if (pos > 12) return std::nullopt;
+    if ((pos < 0) || (pos > 12)) return std::nullopt;
 
     KeyAccidInfo info;
     if (this->GetAccidType() == ACCIDENTAL_WRITTEN_f) {
