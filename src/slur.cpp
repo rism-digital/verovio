@@ -491,7 +491,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // where x, y denote the vertical adjustments of the control points and c is the size of the collision.
     // The coefficients a, b are calculated from the Bezier curve equation.
     // After collecting all constraints we calculate a solution.
-    const ControlPointAdjustment adjustment = this->CalcControlPointVerticalShift(curve, bezier, margin);
+    const ControlPointAdjustment adjustment = this->CalcControlPointVerticalShift(curve, bezier, symmetry, margin);
     const int leftSign = (bezier.IsLeftControlAbove() == adjustment.moveUpwards) ? 1 : -1;
     bezier.SetLeftControlHeight(bezier.GetLeftControlHeight() + leftSign * adjustment.leftShift);
     const int rightSign = (bezier.IsRightControlAbove() == adjustment.moveUpwards) ? 1 : -1;
@@ -765,7 +765,7 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
 }
 
 ControlPointAdjustment Slur::CalcControlPointVerticalShift(
-    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double symmetry, int margin)
 {
     ControlPointAdjustment adjustment{ 0, 0, false, 0 };
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return adjustment;
@@ -832,11 +832,13 @@ ControlPointAdjustment Slur::CalcControlPointVerticalShift(
 
     // Solve the constraints and calculate the adjustment
     if (maxIntersectionAbove > maxIntersectionBelow) {
-        std::tie(adjustment.leftShift, adjustment.rightShift) = this->SolveControlPointConstraints(aboveConstraints);
+        std::tie(adjustment.leftShift, adjustment.rightShift)
+            = this->SolveControlPointConstraints(aboveConstraints, symmetry);
         adjustment.moveUpwards = false;
     }
     else {
-        std::tie(adjustment.leftShift, adjustment.rightShift) = this->SolveControlPointConstraints(belowConstraints);
+        std::tie(adjustment.leftShift, adjustment.rightShift)
+            = this->SolveControlPointConstraints(belowConstraints, symmetry);
         adjustment.moveUpwards = true;
     }
 
@@ -855,7 +857,8 @@ ControlPointAdjustment Slur::CalcControlPointVerticalShift(
     return adjustment;
 }
 
-std::pair<int, int> Slur::SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints)
+std::pair<int, int> Slur::SolveControlPointConstraints(
+    const std::list<ControlPointConstraint> &constraints, double symmetry)
 {
     if (constraints.empty()) return { 0, 0 };
 
@@ -870,7 +873,11 @@ std::pair<int, int> Slur::SolveControlPointConstraints(const std::list<ControlPo
         weightedAngleSum += weight * atan(constraint.b / constraint.a);
         weightSum += weight;
     }
-    const double slope = tan(weightedAngleSum / weightSum);
+    // Depending on symmetry we want the angle to be near PI/4
+    double angle = weightedAngleSum / weightSum;
+    angle = std::max(symmetry * M_PI / 4.0, angle);
+    angle = std::min((2.0 - symmetry) * M_PI / 4.0, angle);
+    const double slope = tan(angle);
 
     // Now follow the line with the averaged slope until we have hit all halfplanes.
     // For each constraint we must solve: slope * x = c/b - a/b * x
