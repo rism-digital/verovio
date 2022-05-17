@@ -512,6 +512,11 @@ void FloatingCurvePositioner::ResetPositioner()
     this->ResetCurveParams();
 }
 
+bool FloatingCurvePositioner::HasCachedX12() const
+{
+    return ((m_cachedX12.first != VRV_UNSET) && (m_cachedX12.second != VRV_UNSET));
+}
+
 void FloatingCurvePositioner::ClearSpannedElements()
 {
     for (auto &spannedElement : m_spannedElements) {
@@ -530,6 +535,7 @@ void FloatingCurvePositioner::ResetCurveParams()
     m_dir = curvature_CURVEDIR_NONE;
     m_crossStaff = NULL;
     m_cachedMinMaxY = VRV_UNSET;
+    m_cachedX12 = { VRV_UNSET, VRV_UNSET };
     m_requestedStaffSpace = 0;
     this->ClearSpannedElements();
 }
