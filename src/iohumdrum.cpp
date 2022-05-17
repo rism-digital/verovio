@@ -8944,12 +8944,13 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
             setBeamLocationId(beam, tgs, layerdata, layerindex);
             std::string id = beam->GetUuid();
             layerdata[layerindex]->setValue("auto", "beamid", id);
-            bool status = checkForBeamJoin(beam, layerdata, layerindex);
+            bool status = checkForBeamSameas(beam, layerdata, layerindex);
             if (status) {
                 // remove beam from stack
                 removeBeam(elements, pointers);
                 return;
             }
+            checkForBeamStemSameas(layerdata, layerindex);
 
             checkForInvisibleBeam(beam, tgs, layerindex);
             if (direction) {
@@ -8966,12 +8967,13 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
         setBeamLocationId(beam, tgs, layerdata, layerindex);
         std::string id = beam->GetUuid();
         layerdata[layerindex]->setValue("auto", "beamid", id);
-        bool status = checkForBeamJoin(beam, layerdata, layerindex);
+        bool status = checkForBeamSameas(beam, layerdata, layerindex);
         if (status) {
             // remove beam from stack
             removeBeam(elements, pointers);
             return;
         }
+        checkForBeamStemSameas(layerdata, layerindex);
 
         checkForInvisibleBeam(beam, tgs, layerindex);
         if (direction) {
@@ -9000,10 +9002,102 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
 
 //////////////////////////////
 //
-// HumdrumInput::checkForBeamJoin --
+// HumdrumInput::checkForBeamStemSameas -- Check to see if two beams
+//     have the same rhythm sequence (but can have differen pitches).
+//     If there are rests, they must align in both beams.
 //
 
-bool HumdrumInput::checkForBeamJoin(Beam *beam, std::vector<hum::HTp> &layerdata, int layerindex)
+bool HumdrumInput::checkForBeamStemSameas(std::vector<hum::HTp> &layerdata, int layerindex)
+{
+    if (!m_join) {
+        return false;
+    }
+    hum::HTp token = layerdata.at(layerindex);
+    int subtrack = token->getSubtrack();
+    if (subtrack != 2) {
+        return false;
+    }
+    hum::HTp ptoken = token->getPreviousFieldToken();
+    if (!ptoken) {
+        return false;
+    }
+    if (ptoken->isNull()) {
+        return false;
+    }
+    int ptrack = ptoken->getTrack();
+    int track = token->getTrack();
+    if (ptrack != track) {
+        return false;
+    }
+    int beamstart1 = token->getValueInt("auto", "beamstart");
+    int beamstart2 = ptoken->getValueInt("auto", "beamstart");
+    if (beamstart1 == 0) {
+        return false;
+    }
+    if (beamstart2 == 0) {
+        return false;
+    }
+
+    // Finished with possible error cases, so now do real checking.
+
+    std::vector<hum::HTp> data1 = getBeamNotes(token, beamstart1);
+    std::vector<hum::HTp> data2 = getBeamNotes(ptoken, beamstart2);
+
+    bool status = true;
+
+    if (data1.size() != data2.size()) {
+        status = false;
+    }
+    if (data1.empty()) {
+        status = false;
+    }
+
+    if (status) {
+        for (int i = 0; i < (int)data1.size(); i++) {
+            hum::HumNum dur1 = data1[i]->getDuration();
+            hum::HumNum dur2 = data2[i]->getDuration();
+            if (dur1 != dur2) {
+                status = false;
+                break;
+            }
+            if (data1[i]->isChord()) {
+                status = false;
+                break;
+            }
+            if (data2[i]->isChord()) {
+                status = false;
+                break;
+            }
+            if (data1[i]->isRest() && !data2[i]->isRest()) {
+                status = false;
+                break;
+            }
+            if (data2[i]->isRest() && !data1[i]->isRest()) {
+                status = false;
+                break;
+            }
+        }
+    }
+
+    if (status) {
+        return true;
+    }
+
+    // Prevent notes from merging between the two parts.
+    for (int i = 0; i < (int)data1.size(); i++) {
+        data1[i]->setValue("auto", "Xjoin", 1);
+    }
+
+    return false;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForBeamSameas -- Check to see if both beams are
+//    equivalent in pitch and rhythm content.
+//
+
+bool HumdrumInput::checkForBeamSameas(Beam *beam, std::vector<hum::HTp> &layerdata, int layerindex)
 {
     if (!m_join) {
         return false;
@@ -20999,35 +21093,38 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
 // HumdrumInput::checkForJoin -- Assuming only two layers for joining for now.
 //
 
-void HumdrumInput::checkForJoin(Note *note, hum::HTp token)
+bool HumdrumInput::checkForJoin(Note *note, hum::HTp token)
 {
     if (!m_join) {
-        return;
+        return false;
     }
     if (token->isChord()) {
         // Don't join chords.
-        return;
+        return false;
     }
     if (token->isRest()) {
         // Deal with rests later (and can't be input to this function anyway).
-        return;
+        return false;
     }
     int subtrack = token->getSubtrack();
     if (subtrack != 2) {
         // Only applies to second layer.  Add higher layers later.
-        return;
+        return false;
+    }
+    if (token->getValueBool("auto", "Xjoin")) {
+        return false;
     }
     int track = token->getTrack();
     hum::HTp ptok = token->getPreviousFieldToken();
     if (!ptok) {
-        return;
+        return false;
     }
     if (ptok->isChord() || ptok->isRest() || ptok->isNull()) {
-        return;
+        return false;
     }
     int ptrack = ptok->getTrack();
     if (ptrack != track) {
-        return;
+        return false;
     }
 
     hum::HumNum dur = token->getDuration();
@@ -21041,14 +21138,17 @@ void HumdrumInput::checkForJoin(Note *note, hum::HTp token)
             // same pitch so make the entire notes the same:
             std::string pid = getLocationId(note, ptok);
             note->SetSameas("#" + pid);
+            return true;
         }
         else {
             // same duration but different pitch:
             // will be put into a chord by verovio
             std::string pid = getLocationId(note, ptok);
             note->SetStemSameas("#" + pid);
+            return true;
         }
     }
+    return false;
 }
 
 //////////////////////////////

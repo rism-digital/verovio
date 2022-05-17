@@ -771,11 +771,12 @@ protected:
     hum::HTp getNextNonNullDataOrMeasureToken(hum::HTp tok);
     void setBeamSpanPlist(BeamSpan *beamspan, hum::HTp starttok, hum::HTp etok);
     void checkMeterSigParameters(MeterSig *msig, hum::HTp timesigtok);
-    void checkForJoin(Note *note, hum::HTp token);
+    bool checkForJoin(Note *note, hum::HTp token);
     bool checkForLayerJoin(int staffindex, int layerindex);
     void storeTupletAndBeamInfoInTokens(std::vector<humaux::HumdrumBeamAndTuplet> &tgs);
     std::vector<hum::HTp> getBeamNotes(hum::HTp token, int beamstart);
-    bool checkForBeamJoin(Beam *beam, std::vector<hum::HTp> &layerdata, int layerindex);
+    bool checkForBeamSameas(Beam *beam, std::vector<hum::HTp> &layerdata, int layerindex);
+    bool checkForBeamStemSameas(std::vector<hum::HTp> &layerdata, int layerindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
