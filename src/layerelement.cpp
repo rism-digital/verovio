@@ -1546,11 +1546,12 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     // ignore elements that have @visible attribute set to false
     AttVisibilityComparison isInvisible(this->GetClassId(), BOOLEAN_false);
     if (isInvisible(this)) return FUNCTOR_SIBLINGS;
-    // ignore editorial accidental
+    // ignore accidentals outside the staff
     if (this->Is(ACCID)) {
         Accid *accid = vrv_cast<Accid *>(this);
         assert(accid);
         if (accid->GetFunc() == accidLog_FUNC_edit) return FUNCTOR_CONTINUE;
+        if (accid->HasPlace()) return FUNCTOR_CONTINUE;
     }
 
     Staff *staff = this->GetAncestorStaff();
