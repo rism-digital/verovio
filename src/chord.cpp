@@ -313,6 +313,20 @@ int Chord::GetXMax() const
 
 void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow, Layer **layerAbove, Layer **layerBelow)
 {
+    const Staff *staffAboveRef = NULL;
+    const Staff *staffBelowRef = NULL;
+    const Layer *layerAboveRef = NULL;
+    const Layer *layerBelowRef = NULL;
+    std::as_const(*this).GetCrossStaffExtremes(staffAboveRef, staffBelowRef, &layerAboveRef, &layerBelowRef);
+    staffAbove = const_cast<Staff *>(staffAboveRef);
+    staffBelow = const_cast<Staff *>(staffBelowRef);
+    if (layerAbove) *layerAbove = const_cast<Layer *>(layerAboveRef);
+    if (layerBelow) *layerBelow = const_cast<Layer *>(layerBelowRef);
+}
+
+void Chord::GetCrossStaffExtremes(
+    const Staff *&staffAbove, const Staff *&staffBelow, const Layer **layerAbove, const Layer **layerBelow) const
+{
     staffAbove = NULL;
     staffBelow = NULL;
 
@@ -320,7 +334,7 @@ void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow, Layer 
     if (m_crossStaff) return;
 
     // The first note is the bottom
-    Note *bottomNote = this->GetBottomNote();
+    const Note *bottomNote = this->GetBottomNote();
     assert(bottomNote);
     if (bottomNote->m_crossStaff && bottomNote->m_crossLayer) {
         staffBelow = bottomNote->m_crossStaff;
@@ -328,7 +342,7 @@ void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow, Layer 
     }
 
     // The last note is the top
-    Note *topNote = this->GetTopNote();
+    const Note *topNote = this->GetTopNote();
     assert(topNote);
     if (topNote->m_crossStaff && topNote->m_crossLayer) {
         staffAbove = topNote->m_crossStaff;
@@ -336,12 +350,12 @@ void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow, Layer 
     }
 }
 
-bool Chord::HasCrossStaff()
+bool Chord::HasCrossStaff() const
 {
     if (m_crossStaff) return true;
 
-    Staff *staffAbove = NULL;
-    Staff *staffBelow = NULL;
+    const Staff *staffAbove = NULL;
+    const Staff *staffBelow = NULL;
 
     this->GetCrossStaffExtremes(staffAbove, staffBelow);
 

@@ -106,15 +106,19 @@ public:
     ///@}
 
     /**
-     * Return the cross staff above or below (if  any).
+     * Return the cross staff above or below (if any).
      */
+    ///@{
     void GetCrossStaffExtremes(
         Staff *&staffAbove, Staff *&staffBelow, Layer **layerAbove = NULL, Layer **layerBelow = NULL);
+    void GetCrossStaffExtremes(const Staff *&staffAbove, const Staff *&staffBelow, const Layer **layerAbove = NULL,
+        const Layer **layerBelow = NULL) const;
+    ///@}
 
     /**
      * Return true if the chord has some cross staff notes.
      */
-    bool HasCrossStaff() override;
+    bool HasCrossStaff() const override;
 
     /**
      * Returns list of notes that have accidentals

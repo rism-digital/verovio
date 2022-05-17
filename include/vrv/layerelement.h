@@ -285,7 +285,7 @@ public:
     /**
      * Return true if cross-staff is set
      */
-    virtual bool HasCrossStaff() { return (m_crossStaff != NULL); }
+    virtual bool HasCrossStaff() const { return (m_crossStaff != NULL); }
 
     /**
      * Convert stem mode to corresponding glyph code
