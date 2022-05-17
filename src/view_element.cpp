@@ -32,6 +32,7 @@
 #include "ftrem.h"
 #include "functorparams.h"
 #include "halfmrpt.h"
+#include "keyaccid.h"
 #include "keysig.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -887,8 +888,8 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     int x, y;
 
-    Clef *c = layer->GetClef(element);
-    if (!c) {
+    Clef *clef = layer->GetClef(element);
+    if (!clef) {
         keySig->SetEmptyBB();
         return;
     }
@@ -921,77 +922,46 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int clefLocOffset = layer->GetClefLocOffset(element);
     int loc;
 
-    // Show cancellation if C major (0)
-    // This is not meant to make sense with mixed key signature
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetAccidCount() == 0)) {
-        dc->StartGraphic(element, "", element->GetUuid());
-
-        for (int i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
-            data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
-            loc = PitchInterface::CalcLoc(
-                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
-            y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
-
-            dc->StartCustomGraphic("keyAccid");
-
-            this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-
-            dc->EndCustomGraphic();
-
-            x += naturalGlyphWidth + naturalStep;
-        }
-
-        dc->EndGraphic(element, this);
-        return;
-    }
-
     dc->StartGraphic(element, "", element->GetUuid());
 
-    // Show cancellation if show cancellation (showchange) is true (false by default)
-    // This is not meant to make sense with mixed key signature
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
-        const int beginCancel
-            = (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) ? keySig->GetAccidCount() : 0;
-        for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
-            data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
-            loc = PitchInterface::CalcLoc(
-                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
-            y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+    // Show cancellation if showchange is true (false by default) or if C major
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM)
+        && ((keySig->GetSigShowchange() == BOOLEAN_true) || (keySig->GetAccidCount() == 0))) {
+        if (keySig->m_skipCancellation) {
+            LogWarning("Cautionary accidentals are skipped if the new or previous KeySig contains KeyAccid children.");
+        }
+        else {
+            const int beginCancel
+                = (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) ? keySig->GetAccidCount() : 0;
+            for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
+                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
+                loc = PitchInterface::CalcLoc(
+                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, clef), clefLocOffset);
+                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
-            dc->StartCustomGraphic("keyAccid");
+                dc->StartCustomGraphic("keyAccid");
 
-            this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+                this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
 
-            dc->EndCustomGraphic();
+                dc->EndCustomGraphic();
 
-            x += naturalGlyphWidth + naturalStep;
-            if ((keySig->GetAccidCount() > 0) && (i + 1 == keySig->m_drawingCancelAccidCount)) {
-                // Add some extra space after last natural
-                x += step;
+                x += naturalGlyphWidth + naturalStep;
+                if ((keySig->GetAccidCount() > 0) && (i + 1 == keySig->m_drawingCancelAccidCount)) {
+                    // Add some extra space after last natural
+                    x += step;
+                }
             }
         }
     }
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    for (int i = 0; i < keySig->GetAccidCount(); ++i) {
-        // We get the pitch from the keySig (looks for keyAccid children if any)
-        data_ACCIDENTAL_WRITTEN accid;
-        data_PITCHNAME pname;
-        std::wstring accidStr = keySig->GetKeyAccidStrAt(i, accid, pname);
-
-        loc = PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, c), clefLocOffset);
-        y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
-
-        dc->StartCustomGraphic("keyAccid");
-
-        this->DrawSmuflString(dc, x, y, accidStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
-
-        dc->EndCustomGraphic();
-
-        TextExtend extend;
-        dc->GetSmuflTextExtent(accidStr, &extend);
-        x += extend.m_width + step;
+    ListOfObjects childList = keySig->GetList(keySig);
+    for (Object *child : childList) {
+        KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
+        assert(keyAccid);
+        this->DrawKeyAccid(dc, keyAccid, staff, clef, clefLocOffset, x);
+        x += step;
     }
 
     dc->ResetFont();
@@ -1011,6 +981,23 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(meterSig);
 
     this->DrawMeterSig(dc, meterSig, staff, 0);
+}
+
+void View::DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x)
+{
+    const std::wstring symbolStr = keyAccid->GetSymbolStr();
+    const int loc = keyAccid->CalcStaffLoc(clef, clefLocOffset);
+    const int y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+
+    dc->StartCustomGraphic("keyAccid", "", keyAccid->GetUuid());
+
+    this->DrawSmuflString(dc, x, y, symbolStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
+
+    dc->EndCustomGraphic();
+
+    TextExtend extend;
+    dc->GetSmuflTextExtent(symbolStr, &extend);
+    x += extend.m_width;
 }
 
 void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset)

@@ -83,6 +83,8 @@ public:
     const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
     PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
     const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     StemmedDrawingInterface *GetStemmedDrawingInterface() override { return vrv_cast<StemmedDrawingInterface *>(this); }
     const StemmedDrawingInterface *GetStemmedDrawingInterface() const override
     {

@@ -11,6 +11,7 @@
 #include "atts_gestural.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
+#include "positioninterface.h"
 
 namespace vrv {
 
@@ -23,6 +24,7 @@ namespace vrv {
  */
 class KeyAccid : public LayerElement,
                  public PitchInterface,
+                 public PositionInterface,
                  public AttAccidental,
                  public AttColor,
                  public AttEnclosingChars {
@@ -45,6 +47,8 @@ public:
     ///@{
     PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
     const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}
 
     /**
@@ -52,6 +56,11 @@ public:
      * This will include brackets
      */
     std::wstring GetSymbolStr() const;
+
+    /**
+     * Determine the staff location
+     */
+    int CalcStaffLoc(Clef *clef, int clefLocOffset) const;
 
     //----------//
     // Functors //
