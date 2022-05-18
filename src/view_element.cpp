@@ -282,11 +282,11 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                     }
                 }
             }
-            if ((noteTop >= staffTop) || (noteBottom <= staffBottom)) {
-                y = (accid->GetPlace() == STAFFREL_below) ? noteBottom : noteTop;
+            if (accid->GetPlace() == STAFFREL_below) {
+                y = (noteBottom <= staffBottom) ? noteBottom : staffBottom;
             }
             else {
-                y = (accid->GetPlace() == STAFFREL_below) ? staffBottom : staffTop;
+                y = (noteTop >= staffTop) ? noteTop : staffTop;
             }
             // Increase the x position of the accid
             x += note->GetDrawingRadius(m_doc);
