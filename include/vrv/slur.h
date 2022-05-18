@@ -10,7 +10,6 @@
 
 #include "controlelement.h"
 #include "timeinterface.h"
-#include "vrvdef.h"
 
 namespace vrv {
 
@@ -244,7 +243,7 @@ private:
     void AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit);
 
     // Check whether control points should be adjusted horizontally
-    bool AdjustControlPointOffset(const BezierCurve &bezierCurve, double symmetry, int unit) const;
+    bool AllowControlOffsetAdjustment(const BezierCurve &bezierCurve, double symmetry, int unit) const;
 
     // Calculate the horizontal control point offset
     std::tuple<bool, int, int> CalcControlPointOffset(
@@ -270,8 +269,8 @@ private:
     void ShiftEndPoints(
         int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const;
 
-    // Calculate a quadratic interpolation function between zero and one
-    std::function<double(double)> CalcQuadraticInterpolation(double zeroAt, double oneAt) const;
+    // Determine a quadratic interpolation function between zero and one and evaluate it
+    double CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const;
 
     // Rotate the slope by a given number of degrees, but choose smaller angles if already close to the vertical axis
     // Choose doublingBound as the positive slope value where doubling has the same effect as rotating:

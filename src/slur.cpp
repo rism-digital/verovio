@@ -472,7 +472,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // The idea is to shift control points to the outside if there is an obstacle in the vicinity of the corresponding
     // endpoint. For C1 we consider the largest angle <)BP1P2 where B is a colliding left bounding box corner and choose
     // C1 in this direction. Similar for C2.
-    if (this->AdjustControlPointOffset(bezier, symmetry, unit)) {
+    if (this->AllowControlOffsetAdjustment(bezier, symmetry, unit)) {
         bool ok = false;
         int controlPointOffsetLeft = 0;
         int controlPointOffsetRight = 0;
@@ -601,8 +601,7 @@ void Slur::ShiftEndPoints(
         if (ratio > fullShiftRadius) {
             // Collisions here only partially contribute to shifts
             // We multiply with a function that interpolates between 1 and 0
-            std::function<double(double)> func = this->CalcQuadraticInterpolation(partialShiftRadius, fullShiftRadius);
-            intersection *= func(ratio);
+            intersection *= this->CalcQuadraticInterpolation(partialShiftRadius, fullShiftRadius, ratio);
         }
         shiftLeft = std::max(shiftLeft, intersection);
     }
@@ -611,20 +610,18 @@ void Slur::ShiftEndPoints(
         if (ratio < 1.0 - fullShiftRadius) {
             // Collisions here only partially contribute to shifts
             // We multiply with a function that interpolates between 0 and 1
-            std::function<double(double)> func
-                = this->CalcQuadraticInterpolation(1.0 - partialShiftRadius, 1.0 - fullShiftRadius);
-            intersection *= func(ratio);
+            intersection *= this->CalcQuadraticInterpolation(1.0 - partialShiftRadius, 1.0 - fullShiftRadius, ratio);
         }
         shiftRight = std::max(shiftRight, intersection);
     }
 }
 
-std::function<double(double)> Slur::CalcQuadraticInterpolation(double zeroAt, double oneAt) const
+double Slur::CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const
 {
     assert(zeroAt != oneAt);
     const double a = 1.0 / (oneAt - zeroAt);
     const double b = zeroAt / (zeroAt - oneAt);
-    return [a, b](double x) { return pow(a * x + b, 2.0); };
+    return pow(a * arg + b, 2.0);
 }
 
 void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, const int unit)
@@ -691,7 +688,7 @@ void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezi
     curve->BoundingBox::ResetBoundingBox();
 }
 
-bool Slur::AdjustControlPointOffset(const BezierCurve &bezierCurve, double symmetry, int unit) const
+bool Slur::AllowControlOffsetAdjustment(const BezierCurve &bezierCurve, double symmetry, int unit) const
 {
     const double distance = BoundingBox::CalcDistance(bezierCurve.p1, bezierCurve.p2);
 
