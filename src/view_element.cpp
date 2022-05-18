@@ -267,9 +267,11 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             const int drawingDur = note->GetDrawingDur();
             int noteTop = note->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             int noteBottom = note->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+            bool onstaff = (accid->GetOnstaff() == BOOLEAN_true);
 
             // Adjust position to mensural stems
             if (note->IsMensuralDur()) {
+                if (accid->GetFunc() != accidLog_FUNC_edit) onstaff = (accid->GetOnstaff() != BOOLEAN_false);
                 const int verticalCenter = staffTop - (staff->m_drawingLines - 1) * unit;
                 const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
                 if ((drawingDur > DUR_1) || (drawingDur < DUR_BR)) {
@@ -283,10 +285,10 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                 }
             }
             if (accid->GetPlace() == STAFFREL_below) {
-                y = (noteBottom <= staffBottom) ? noteBottom : staffBottom;
+                y = ((noteBottom <= staffBottom) || onstaff) ? noteBottom : staffBottom;
             }
             else {
-                y = (noteTop >= staffTop) ? noteTop : staffTop;
+                y = ((noteTop >= staffTop) || onstaff) ? noteTop : staffTop;
             }
             // Increase the x position of the accid
             x += note->GetDrawingRadius(m_doc);
