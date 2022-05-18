@@ -1058,7 +1058,7 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
         bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
         if (!hasOverlap) continue;
 
-        // For note to note alignment, make sure there is a standard spacing even if they to not overlap
+        // For note to note alignment, make sure there is a standard spacing even if they do not overlap
         // vertically
         if (this->Is(NOTE) && element->Is(NOTE)) {
             overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
@@ -1082,7 +1082,7 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
         else if (this->Is(ACCID) && element->Is(REST)) {
             Rest *rest = vrv_cast<Rest *>(element);
             const bool hasExplicitLoc = ((rest->HasOloc() && rest->HasPloc()) || rest->HasLoc());
-            if (element->GetFirstAncestor(BEAM) && !hasExplicitLoc) {
+            if ((rest->GetFirstAncestor(BEAM) || rest->IsInBeamSpan()) && !hasExplicitLoc) {
                 overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
             }
             else {
