@@ -258,32 +258,35 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     if (accid->HasPlace() || accid->GetFunc() == accidLog_FUNC_edit) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y = staff->GetDrawingY();
-        if (accid->GetPlace() == STAFFREL_below) {
-            y -= (staff->m_drawingLines - 1) * 2 * unit;
-        }
+        const int staffTop = staff->GetDrawingY();
+        const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
+
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) {
             const int drawingDur = note->GetDrawingDur();
-            // Check if the note is on the top line or above (add a unit for the note head half size)
-            if (accid->GetPlace() == STAFFREL_below) {
-                if (note->GetDrawingBottom(m_doc, staff->m_drawingStaffSize) <= y) {
-                    y = note->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
-                }
-            }
-            else if (note->GetDrawingTop(m_doc, staff->m_drawingStaffSize) >= y)
-                y = note->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
-            else if (note->IsMensuralDur()) {
-                const int verticalCenter = y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+            int noteTop = note->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+            int noteBottom = note->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+
+            // Adjust position to mensural stems
+            if (note->IsMensuralDur()) {
+                const int verticalCenter = staffTop - (staff->m_drawingLines - 1) * unit;
                 const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
-                if ((note->GetStemDir() == STEMDIRECTION_up)
-                    || ((drawingDur > DUR_1) && (stemDir == STEMDIRECTION_up))) {
-                    y = note->GetDrawingY() + unit * STANDARD_STEMLENGTH;
+                if ((drawingDur > DUR_1) || (drawingDur < DUR_BR)) {
+                    if (stemDir == STEMDIRECTION_up) {
+                        noteTop = note->GetDrawingY() + unit * STANDARD_STEMLENGTH;
+                        noteBottom -= unit;
+                    }
+                    else {
+                        noteBottom = note->GetDrawingY() - unit * STANDARD_STEMLENGTH;
+                    }
                 }
             }
-            else if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (drawingDur == DUR_LG)) {
-                y = note->GetDrawingStem()->GetDrawingY() + unit * STANDARD_STEMLENGTH;
+            if ((noteTop >= staffTop) || (noteBottom <= staffBottom)) {
+                y = (accid->GetPlace() == STAFFREL_below) ? noteBottom : noteTop;
+            }
+            else {
+                y = (accid->GetPlace() == STAFFREL_below) ? staffBottom : staffTop;
             }
             // Increase the x position of the accid
             x += note->GetDrawingRadius(m_doc);
