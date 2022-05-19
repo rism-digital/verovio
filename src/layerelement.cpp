@@ -1032,11 +1032,11 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
         selfLeft = this->GetAlignment()->GetXRel();
         return { 0, selfLeft };
     }
-    
+
     // We add it to the upcoming bounding boxes
     params->m_upcomingBoundingBoxes.push_back(this);
     params->m_currentAlignment.m_alignment = this->GetAlignment();
-    
+
     // only look at the horizontal position
     if (!performBoundingBoxAlignment) {
         selfLeft = this->GetSelfLeft();

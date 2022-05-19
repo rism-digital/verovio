@@ -511,7 +511,7 @@ private:
      * Get above/below overflow for the chord elements
      */
     void GetChordOverflow(StaffAlignment *&above, StaffAlignment *&below, int staffN);
-    
+
     /**
      * Calculate offset and left overlap of the element
      */
