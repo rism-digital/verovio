@@ -292,16 +292,23 @@ int Score::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
+    ScoreDef *scoreDef = this->GetScoreDef();
+    Transposer *transposer = params->m_transposer;
+    const std::string &transposition = params->m_transposition;
+
+    // Check whether we transpose to sounding pitch
+    if (params->m_transposeToSoundingPitch) {
+        // Evaluate functor on scoreDef
+        scoreDef->Process(params->m_functor, params);
+        return FUNCTOR_CONTINUE;
+    }
+
     // Check whether we are in the selected mdiv
     if (!params->m_selectedMdivUuid.empty()
         && (std::find(params->m_currentMdivUuids.begin(), params->m_currentMdivUuids.end(), params->m_selectedMdivUuid)
             == params->m_currentMdivUuids.end())) {
         return FUNCTOR_CONTINUE;
     }
-
-    ScoreDef *scoreDef = this->GetScoreDef();
-    Transposer *transposer = params->m_transposer;
-    const std::string &transposition = params->m_transposition;
 
     if (transposer->IsValidIntervalName(transposition)) {
         transposer->SetTransposition(transposition);

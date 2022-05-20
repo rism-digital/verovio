@@ -1385,6 +1385,15 @@ void Doc::TransposeDoc()
             this->Process(&transpose, &transposeParams);
         }
     }
+
+    if (m_options->m_transposeToSoundingPitch.GetValue()) {
+        // Transpose to sounding pitch
+        transposeParams.m_selectedMdivUuid = "";
+        transposeParams.m_transposition = "";
+        transposeParams.m_transposer->SetTransposition(0);
+        transposeParams.m_transposeToSoundingPitch = true;
+        this->Process(&transpose, &transposeParams);
+    }
 }
 
 void Doc::ExpandExpansions()
