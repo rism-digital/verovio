@@ -177,9 +177,9 @@ public:
     int GetDrawingXRelRight() { return m_drawingXRelRight; }
     void SetDrawingXRelRight(int drawingXRelRight) { m_drawingXRelRight = drawingXRelRight; }
     // Vertical positions
-    int GetDrawingYRelLeft() { return m_drawingYRelLeft; }
+    int GetDrawingYRelLeft() const { return m_drawingYRelLeft; }
     void SetDrawingYRelLeft(int drawingYRelLeft) { m_drawingYRelLeft = drawingYRelLeft; }
-    int GetDrawingYRelRight() { return m_drawingYRelRight; }
+    int GetDrawingYRelRight() const { return m_drawingYRelRight; }
     void SetDrawingYRelRight(int drawingYRelRight) { m_drawingYRelRight = drawingYRelRight; }
     ///@}
 

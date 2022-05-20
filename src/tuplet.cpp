@@ -145,7 +145,7 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff)
     TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
     if (!tupletBracket || (this->GetBracketVisible() == BOOLEAN_false)) return;
 
-    // if bracket is used for beam elements - process that part separatelly
+    // if bracket is used for beam elements - process that part separately
     Beam *beam = this->GetBracketAlignedBeam();
     if (beam) return this->AdjustTupletBracketBeamY(doc, staff, tupletBracket, beam);
 
@@ -233,16 +233,6 @@ void Tuplet::AdjustTupletBracketBeamY(Doc *doc, Staff *staff, TupletBracket *bra
     if (restAdjust) bracketVerticalMargin += restAdjust;
 
     const int yReference = staff->GetDrawingY();
-    // Adjust bracket in case beam is horizontal and bracket overlaps with staff line
-    if (beam->m_beamSegment.m_beamSlope == 0.0) {
-        const int staffHeight = doc->GetDrawingStaffSize(staffSize);
-        if ((beam->m_beamSegment.GetStartingY() < yReference)
-            && (beam->m_beamSegment.GetStartingY() > yReference - staffHeight)
-            && !(beam->m_beamSegment.GetStartingY() % doubleUnit)) {
-            bracketVerticalMargin += doubleUnit / 4;
-        }
-    }
-
     bracket->SetDrawingYRel(bracket->GetDrawingYRel() - articPadding + bracketVerticalMargin);
 
     // Make sure that there are no overlaps with staff lines
