@@ -586,12 +586,19 @@ void StaffDefDrawingInterface::SetCurrentClef(const Clef *clef)
 void StaffDefDrawingInterface::SetCurrentKeySig(const KeySig *keySig)
 {
     if (keySig) {
-        char drawingCancelAccidCount = m_currentKeySig.GetAccidCount();
-        data_ACCIDENTAL_WRITTEN drawingCancelAccidType = m_currentKeySig.GetAccidType();
+        const bool ignoreCancel
+            = (m_currentKeySig.HasNonAttribKeyAccidChildren() || keySig->HasNonAttribKeyAccidChildren());
+        const int drawingCancelAccidCount = m_currentKeySig.GetAccidCount();
+        const data_ACCIDENTAL_WRITTEN drawingCancelAccidType = m_currentKeySig.GetAccidType();
         m_currentKeySig = *keySig;
         m_currentKeySig.CloneReset();
-        m_currentKeySig.m_drawingCancelAccidCount = drawingCancelAccidCount;
-        m_currentKeySig.m_drawingCancelAccidType = drawingCancelAccidType;
+        if (ignoreCancel) {
+            m_currentKeySig.m_skipCancellation = true;
+        }
+        else {
+            m_currentKeySig.m_drawingCancelAccidCount = drawingCancelAccidCount;
+            m_currentKeySig.m_drawingCancelAccidType = drawingCancelAccidType;
+        }
     }
 }
 

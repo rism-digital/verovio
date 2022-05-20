@@ -595,8 +595,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteHalfmRpt(m_currentNode, vrv_cast<HalfmRpt *>(object));
     }
     else if (object->Is(KEYACCID)) {
-        m_currentNode = m_currentNode.append_child("keyAccid");
-        this->WriteKeyAccid(m_currentNode, vrv_cast<KeyAccid *>(object));
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("keyAccid");
+            this->WriteKeyAccid(m_currentNode, vrv_cast<KeyAccid *>(object));
+        }
     }
     else if (object->Is(KEYSIG)) {
         if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("keySig");
@@ -2239,6 +2241,7 @@ void MEIOutput::WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid)
 
     this->WriteLayerElement(currentNode, keyAccid);
     this->WritePitchInterface(currentNode, keyAccid);
+    this->WritePositionInterface(currentNode, keyAccid);
     keyAccid->WriteAccidental(currentNode);
     keyAccid->WriteColor(currentNode);
     keyAccid->WriteEnclosingChars(currentNode);
@@ -5964,6 +5967,7 @@ bool MEIInput::ReadKeyAccid(Object *parent, pugi::xml_node keyAccid)
     this->ReadLayerElement(keyAccid, vrvKeyAccid);
 
     this->ReadPitchInterface(keyAccid, vrvKeyAccid);
+    this->ReadPositionInterface(keyAccid, vrvKeyAccid);
     vrvKeyAccid->ReadAccidental(keyAccid);
     vrvKeyAccid->ReadColor(keyAccid);
     vrvKeyAccid->ReadEnclosingChars(keyAccid);

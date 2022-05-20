@@ -9,6 +9,10 @@
 #ifndef __VRV_KEYSIG_H__
 #define __VRV_KEYSIG_H__
 
+#include <optional>
+
+//----------------------------------------------------------------------------
+
 #include "atts_analytical.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
@@ -18,6 +22,17 @@ namespace vrv {
 
 class Clef;
 class ScoreDefInterface;
+
+//----------------------------------------------------------------------------
+// KeyAccidInfo
+//----------------------------------------------------------------------------
+/**
+ * Useful information regarding a KeyAccid child
+ */
+struct KeyAccidInfo {
+    data_ACCIDENTAL_WRITTEN accid;
+    data_PITCHNAME pname;
+};
 
 //----------------------------------------------------------------------------
 // KeySig
@@ -45,6 +60,7 @@ public:
     Object *Clone() const override { return new KeySig(*this); }
     void Reset() override;
     std::string GetClassName() const override { return "KeySig"; }
+    ///@}
 
     /** Override the method since alignment is required */
     bool HasToBeAligned() const override { return true; }
@@ -58,22 +74,24 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /** Accid number getter */
-    int GetAccidCount() const;
+    int GetAccidCount(bool fromAttribute = false) const;
 
     /** Accid type getter */
     data_ACCIDENTAL_WRITTEN GetAccidType() const;
 
     /**
+     * Generate KeyAccid attribute children
+     */
+    ///@{
+    bool HasNonAttribKeyAccidChildren() const;
+    void ClearKeyAccidAttribChildren();
+    void GenerateKeyAccidAttribChildren();
+    ///@}
+
+    /**
      * Fill the map of modified pitches
      */
     void FillMap(MapOfPitchAccid &mapOfPitchAccid) const;
-
-    /**
-     * Return the string of the alteration at the positon pos.
-     * Looks at keyAccid children if any.
-     * The accid at pos is return in accid and the pname in pname.
-     */
-    std::wstring GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname) const;
 
     int GetFifthsInt() const;
 
@@ -108,15 +126,21 @@ protected:
     void FilterList(ListOfConstObjects &childList) const override;
 
 private:
-    //
+    /**
+     * Generate key accid information for a given position
+     */
+    std::optional<KeyAccidInfo> GetKeyAccidInfoAt(int pos) const;
+
 public:
-    bool m_mixedChildrenAccidType;
     /**
      * Variables for storing cancellation introduced by the key sig.
-     * The values are StaffDefDrawingInterface::ReplaceKeySig
+     * Values are set in StaffDefDrawingInterface::ReplaceKeySig
      */
+    ///@{
+    bool m_skipCancellation;
     data_ACCIDENTAL_WRITTEN m_drawingCancelAccidType;
     char m_drawingCancelAccidCount;
+    ///@}
 
     //----------------//
     // Static members //

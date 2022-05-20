@@ -43,6 +43,7 @@ class Fermata;
 class Gliss;
 class Hairpin;
 class Harm;
+class KeyAccid;
 class Layer;
 class LayerElement;
 class Lb;
@@ -343,6 +344,7 @@ protected:
     void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
     void DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y, double sizeFactor);
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff, bool dimin = false);
+    void DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x);
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */
     int DrawMeterSigFigures(
@@ -592,9 +594,8 @@ private:
      * @name Internal methods used for calculating slurs
      */
     ///@{
-    void DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType);
-    void CalcInitialSlur(
-        FloatingCurvePositioner *curve, Slur *slur, Staff *staff, curvature_CURVEDIR curveDir, Point points[4]);
+    FloatingCurvePositioner *CalcInitialSlur(
+        DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType);
     ///@}
 
     /**

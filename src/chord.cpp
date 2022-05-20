@@ -939,7 +939,7 @@ int Chord::JustifyYAdjustCrossStaff(FunctorParams *functorParams)
         extremalStaves.insert({ staff->GetN(), staff });
     }
     // get chord parent staff
-    Staff *staff = this->GetAncestorStaff();
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     extremalStaves.insert({ staff->GetN(), staff });
 
     if (extremalStaves.size() < 2) return FUNCTOR_CONTINUE;
