@@ -261,12 +261,12 @@ int Layer::GetClefLocOffset(const LayerElement *test) const
     return clef->GetClefLocOffset();
 }
 
-int Layer::GetCrossStaffClefLocOffset(LayerElement *element, int currentOffset)
+int Layer::GetCrossStaffClefLocOffset(const LayerElement *element, int currentOffset) const
 {
     if (element->m_crossStaff) {
         ResetList(this);
         if (!element->Is(CLEF)) {
-            Clef *clef = vrv_cast<Clef *>(GetListFirstBackward(element, CLEF));
+            const Clef *clef = vrv_cast<const Clef *>(GetListFirstBackward(element, CLEF));
             if (clef && clef->m_crossStaff) {
                 return clef->GetClefLocOffset();
             }

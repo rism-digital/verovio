@@ -155,7 +155,7 @@ int PitchInterface::CalcLoc(
         }
         else if (note->HasPname() && note->HasOct()) {
             int offset = layer->GetClefLocOffset(crossStaffElement);
-            Layer *parentLayer = vrv_cast<Layer *>(layerElement->GetFirstAncestor(LAYER));
+            const Layer *parentLayer = vrv_cast<const Layer *>(layerElement->GetFirstAncestor(LAYER));
             if (parentLayer != layer) {
                 offset = parentLayer->GetCrossStaffClefLocOffset(layerElement, offset);
             }
