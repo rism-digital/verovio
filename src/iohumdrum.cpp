@@ -2521,6 +2521,7 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
     hum::HumRegex hre;
     for (int i = 0; i < (int)staffstarts.size(); ++i) {
         m_staffdef.push_back(new StaffDef());
+        setLocationId(m_staffdef.back(), staffstarts[i]);
         if (hre.search(staffstarts[i], "^\\*\\*kern-(.*)")) {
             m_staffdef.back()->SetType(hre.getMatch(1));
         }
