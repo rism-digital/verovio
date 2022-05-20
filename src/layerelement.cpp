@@ -2170,11 +2170,11 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
 
     // Look for cross-staff situations
     // If we have one, make is available in m_crossStaff
-    DurationInterface *durElement = this->GetDurationInterface();
-    if (!durElement) return FUNCTOR_CONTINUE;
+    AttStaffIdent *crossElement = dynamic_cast<AttStaffIdent *>(this);
+    if (!crossElement) return FUNCTOR_CONTINUE;
 
     // If we have not @staff, set to what we had before (quite likely NULL for all non cross staff cases)
-    if (!durElement->HasStaff()) {
+    if (!crossElement->HasStaff()) {
         m_crossStaff = params->m_currentCrossStaff;
         m_crossLayer = params->m_currentCrossLayer;
         return FUNCTOR_CONTINUE;
@@ -2184,10 +2184,10 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     params->m_currentCrossStaff = NULL;
     params->m_currentCrossLayer = NULL;
 
-    AttNIntegerComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
+    AttNIntegerComparison comparisonFirst(STAFF, crossElement->GetStaff().at(0));
     m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindDescendantByComparison(&comparisonFirst, 1));
     if (!m_crossStaff) {
-        LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0),
+        LogWarning("Could not get the cross staff reference '%d' for element '%s'", crossElement->GetStaff().at(0),
             this->GetUuid().c_str());
         return FUNCTOR_CONTINUE;
     }
@@ -2196,7 +2196,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     // Check if we have a cross-staff to itself...
     if (m_crossStaff == parentStaff) {
         LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff",
-            durElement->GetStaff().at(0), this->GetUuid().c_str());
+            crossElement->GetStaff().at(0), this->GetUuid().c_str());
         m_crossStaff = NULL;
         return FUNCTOR_CONTINUE;
     }
@@ -2217,7 +2217,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     if (!m_crossLayer) {
         // Nothing we can do
         LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
-            durElement->GetStaff().at(0), this->GetUuid().c_str());
+            crossElement->GetStaff().at(0), this->GetUuid().c_str());
         m_crossStaff = NULL;
     }
 
