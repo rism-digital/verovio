@@ -453,7 +453,7 @@ bool Chord::IsVisible() const
     return false;
 }
 
-bool Chord::HasAdjacentNotesInStaff(Staff *staff)
+bool Chord::HasAdjacentNotesInStaff(const Staff *staff) const
 {
     assert(staff);
     MapOfNoteLocs locations = this->CalcNoteLocations();
@@ -550,7 +550,7 @@ int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElemen
     return 0;
 }
 
-std::list<Note *> Chord::GetAdjacentNotesList(Staff *staff, int loc)
+std::list<Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc)
 {
     const ListOfObjects &notes = this->GetList(this);
 
@@ -755,25 +755,25 @@ int Chord::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate)
+MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate) const
 {
-    const ListOfObjects &notes = this->GetList(this);
+    const ListOfConstObjects &notes = this->GetList(this);
 
     MapOfNoteLocs noteLocations;
-    for (Object *obj : notes) {
-        Note *note = vrv_cast<Note *>(obj);
+    for (const Object *obj : notes) {
+        const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
 
         if (predicate && !predicate(note)) continue;
 
-        Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+        const Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
         noteLocations[staff].insert(note->GetDrawingLoc());
     }
     return noteLocations;
 }
 
-MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary)
+MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary) const
 {
     const bool isUpwardDirection = (this->GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
     const bool useReverseOrder = (isUpwardDirection != primary);

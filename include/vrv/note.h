@@ -352,14 +352,14 @@ protected:
     /**
      * The note locations w.r.t. each staff
      */
-    MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) override;
+    MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) const override;
 
     /**
      * The dot locations w.r.t. each staff
      * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
      * secondary
      */
-    MapOfDotLocs CalcDotLocations(int layerCount, bool primary) override;
+    MapOfDotLocs CalcDotLocations(int layerCount, bool primary) const override;
 
 private:
     /**

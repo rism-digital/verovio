@@ -1161,18 +1161,18 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate)
+MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate) const
 {
     if (predicate && !predicate(this)) return {};
 
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+    const Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
     MapOfNoteLocs noteLocations;
     noteLocations[staff] = { this->GetDrawingLoc() };
     return noteLocations;
 }
 
-MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary)
+MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary) const
 {
     const bool isUpwardDirection = (this->GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
     const bool shiftUpwards = (isUpwardDirection == primary);
@@ -1180,7 +1180,7 @@ MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary)
     assert(noteLocs.size() == 1);
 
     MapOfDotLocs dotLocs;
-    Staff *staff = noteLocs.cbegin()->first;
+    const Staff *staff = noteLocs.cbegin()->first;
     int loc = *noteLocs.cbegin()->second.cbegin();
     if (loc % 2 == 0) loc += (shiftUpwards ? 1 : -1);
     dotLocs[staff] = { loc };

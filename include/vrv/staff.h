@@ -158,7 +158,7 @@ public:
      * Used for calculating clustered information/dot position.
      * The *Doc is the parent doc but passed as param in order to avoid look-up
      */
-    bool IsOnStaffLine(int y, Doc *doc);
+    bool IsOnStaffLine(int y, const Doc *doc) const;
 
     /**
      * Find the nearest unit position in the direction indicated by place.

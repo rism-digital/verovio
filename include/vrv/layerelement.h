@@ -475,14 +475,14 @@ protected:
     /**
      * The note locations w.r.t. each staff, implemented for note and chord
      */
-    virtual MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) { return {}; }
+    virtual MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) const { return {}; }
 
     /**
      * The dot locations w.r.t. each staff, implemented for note and chord
      * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
      * secondary
      */
-    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) { return {}; }
+    virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) const { return {}; }
 
     /**
      * Helper function to calculate overlap with layer elements that
