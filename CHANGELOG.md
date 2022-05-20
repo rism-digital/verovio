@@ -3,6 +3,7 @@
 ## [unreleased]
 * Improved rendering with diamond and slash shaped noteheads (@eNote-GmBH)
 * Improved rendering of slurs (@eNote-GmBH)
+* Support for `accid@place` (@eNote-GmBH)
 * Support for `mRpt@num` and `mRpt@num.place` (@eNote-GmBH)
 * Support for `mixed` croff-staff slurs (@eNote-GmBH)
 * Support for `non-arp` arpeggios (@eNote-GmBH)
