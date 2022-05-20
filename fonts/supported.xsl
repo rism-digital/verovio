@@ -124,9 +124,9 @@
             <glyph glyph-code="E077" smufl-name="fClefTurned" />
             <!--<glyph glyph-code="E078" smufl-name="bridgeClef" />-->
             <!--<glyph glyph-code="E079" smufl-name="accdnDiatonicClef" />-->
-            <!--<glyph glyph-code="E07A" smufl-name="gClefChange" />-->
-            <!--<glyph glyph-code="E07B" smufl-name="cClefChange" />-->
-            <!--<glyph glyph-code="E07C" smufl-name="fClefChange" />-->
+            <glyph glyph-code="E07A" smufl-name="gClefChange" />
+            <glyph glyph-code="E07B" smufl-name="cClefChange" />
+            <glyph glyph-code="E07C" smufl-name="fClefChange" />
             <!--<glyph glyph-code="E07D" smufl-name="clef8" />-->
             <!--<glyph glyph-code="E07E" smufl-name="clef15" />-->
             <!--<glyph glyph-code="E07F" smufl-name="clefChangeCombining" />-->

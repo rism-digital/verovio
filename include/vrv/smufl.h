@@ -56,6 +56,9 @@ enum {
     SMUFL_E075_cClefReversed = 0xE075,
     SMUFL_E076_fClefReversed = 0xE076,
     SMUFL_E077_fClefTurned = 0xE077,
+    SMUFL_E07A_gClefChange = 0xE07A,
+    SMUFL_E07B_cClefChange = 0xE07B,
+    SMUFL_E07C_fClefChange = 0xE07C,
     SMUFL_E080_timeSig0 = 0xE080,
     SMUFL_E081_timeSig1 = 0xE081,
     SMUFL_E082_timeSig2 = 0xE082,
@@ -464,7 +467,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 439
+#define SMUFL_COUNT 442
 
 } // namespace vrv
 
