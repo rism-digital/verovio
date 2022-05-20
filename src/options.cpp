@@ -1183,10 +1183,6 @@ Options::Options()
     m_breaksNoWidow.Init(false);
     this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
 
-    m_clefChangeFactor.SetInfo("Clef change size", "Set the ratio of normal clefs to changing clefs");
-    m_clefChangeFactor.Init(0.75, 0.25, 1.0);
-    this->Register(&m_clefChangeFactor, "clefChangeFactor", &m_generalLayout);
-
     m_dynamDist.SetInfo("Dynam dist", "The default distance from the staff for dynamic marks");
     m_dynamDist.Init(1.0, 0.5, 16.0);
     this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
