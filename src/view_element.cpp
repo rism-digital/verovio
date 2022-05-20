@@ -599,17 +599,9 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
 
-    double clefSizeFactor = 1.0;
-    if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
-        if (m_doc->GetType() != Transcription && m_doc->GetType() != Facs) {
-            clefSizeFactor = m_options->m_clefChangeFactor.GetValue();
-            // x -= m_doc->GetGlyphWidth(sym, clefSizeFactor * staff->m_drawingStaffSize, false) * 1.35;
-        }
-    }
-
     dc->StartGraphic(element, "", element->GetUuid());
 
-    this->DrawSmuflCode(dc, x, y, sym, clefSizeFactor * staff->m_drawingStaffSize, false);
+    this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
 
     if ((m_doc->GetType() == Facs) && element->HasFacs()) {
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
@@ -623,22 +615,22 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     // Possibly draw enclosing brackets
-    this->DrawClefEnclosing(dc, clef, staff, sym, x, y, clefSizeFactor);
+    this->DrawClefEnclosing(dc, clef, staff, sym, x, y);
 
     dc->EndGraphic(element, this);
 }
 
 void View::DrawClefEnclosing(
-    DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y, double sizeFactor)
+    DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y)
 {
     if ((clef->GetEnclose() == ENCLOSURE_brack) || (clef->GetEnclose() == ENCLOSURE_box)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int glyphSize = staff->GetDrawingStaffNotationSize();
-        x += sizeFactor * m_doc->GetGlyphLeft(glyph, glyphSize, false);
-        y += sizeFactor * m_doc->GetGlyphBottom(glyph, glyphSize, false);
-        const int height = sizeFactor * m_doc->GetGlyphHeight(glyph, glyphSize, false);
-        const int width = sizeFactor * m_doc->GetGlyphWidth(glyph, glyphSize, false);
-        const int offset = 3 * unit / 4;
+        x += m_doc->GetGlyphLeft(glyph, glyphSize, false);
+        y += m_doc->GetGlyphBottom(glyph, glyphSize, false);
+        const int height = m_doc->GetGlyphHeight(glyph, glyphSize, false);
+        const int width = m_doc->GetGlyphWidth(glyph, glyphSize, false);
+        const int offset = unit * 3 / 4;
         // We use overlapping brackets to draw boxes :)
         const int bracketWidth = (clef->GetEnclose() == ENCLOSURE_brack) ? unit : (width + offset);
         const int verticalThickness = m_doc->GetDrawingStemWidth(glyphSize);
@@ -943,11 +935,11 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
                 dc->StartCustomGraphic("keyAccid");
 
-                this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+            this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
 
-                dc->EndCustomGraphic();
+            dc->EndCustomGraphic();
 
-                x += naturalGlyphWidth + naturalStep;
+            x += naturalGlyphWidth + naturalStep;
                 if ((keySig->GetAccidCount() > 0) && (i + 1 == keySig->m_drawingCancelAccidCount)) {
                     // Add some extra space after last natural
                     x += step;
