@@ -6933,6 +6933,7 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
     std::vector<Staff *> stafflist(staffstarts.size());
     for (int i = 0; i < (int)staffstarts.size(); ++i) {
         stafflist[i] = new Staff();
+        setLocationId(stafflist[i], staffstarts[i]);
         addChildMeasureOrSection(stafflist[i]);
     }
 
