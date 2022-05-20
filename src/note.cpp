@@ -604,9 +604,8 @@ void Note::ResolveStemSameas(PrepareLinkingParams *params)
     }
 }
 
-data_STEMDIRECTION Note::CalcStemDirForSameasNote(Doc *doc, int verticalCenter)
+data_STEMDIRECTION Note::CalcStemDirForSameasNote(int verticalCenter)
 {
-    assert(doc);
     assert(m_stemSameas);
     assert(m_stemSameas->HasStemSameasNote());
     assert(m_stemSameas->GetStemSameasNote() == this);
@@ -631,7 +630,7 @@ data_STEMDIRECTION Note::CalcStemDirForSameasNote(Doc *doc, int verticalCenter)
         topNote->m_stemSameasRole = (stemDir == STEMDIRECTION_up) ? SAMEAS_PRIMARY : SAMEAS_SECONDARY;
         bottomNote->m_stemSameasRole = (stemDir == STEMDIRECTION_up) ? SAMEAS_SECONDARY : SAMEAS_PRIMARY;
 
-        this->CalcNoteHeadShiftForSameasNote(doc, m_stemSameas, stemDir);
+        this->CalcNoteHeadShiftForSameasNote(m_stemSameas, stemDir);
 
         return stemDir;
     }
@@ -641,9 +640,8 @@ data_STEMDIRECTION Note::CalcStemDirForSameasNote(Doc *doc, int verticalCenter)
     }
 }
 
-void Note::CalcNoteHeadShiftForSameasNote(Doc *doc, Note *stemSameas, data_STEMDIRECTION stemDir)
+void Note::CalcNoteHeadShiftForSameasNote(Note *stemSameas, data_STEMDIRECTION stemDir)
 {
-    assert(doc);
     assert(stemSameas);
 
     if (abs(this->GetDiatonicPitch() - stemSameas->GetDiatonicPitch()) > 1) return;
@@ -1061,7 +1059,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     if (this->HasStemSameasNote()) {
-        stemDir = this->CalcStemDirForSameasNote(params->m_doc, params->m_verticalCenter);
+        stemDir = this->CalcStemDirForSameasNote(params->m_verticalCenter);
     }
     else if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();

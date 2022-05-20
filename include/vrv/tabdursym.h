@@ -75,7 +75,7 @@ public:
      * direction has been determined. This is why we have this method called from
      * Beam::CalcTabBeamPlace
      */
-    void AdjustDrawingYRel(Staff *staff, Doc *doc);
+    void AdjustDrawingYRel(const Staff *staff, const Doc *doc);
 
     //----------//
     // Functors //

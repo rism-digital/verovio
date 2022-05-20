@@ -68,7 +68,7 @@ void BeamSegment::Reset()
     m_stemSameasReverseRole = NULL;
 }
 
-const ArrayOfBeamElementCoords *BeamSegment::GetElementCoordRefs() const
+const ArrayOfBeamElementCoords *BeamSegment::GetElementCoordRefs()
 {
     // this->GetList(this);
     return &m_beamElementCoordRefs;
@@ -85,7 +85,7 @@ void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoord
 }
 
 void BeamSegment::CalcBeam(
-    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool init)
+    Layer *layer, Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool init)
 {
     assert(layer);
     assert(staff);
@@ -144,7 +144,7 @@ void BeamSegment::CalcBeam(
     }
 }
 
-void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const BeamDrawingInterface *beamInterface)
 {
     assert(staff);
     assert(doc);
@@ -255,7 +255,7 @@ void BeamSegment::CalcSetStemValues(Staff *staff, Doc *doc, BeamDrawingInterface
     this->AdjustBeamToTremolos(doc, staff, beamInterface);
 }
 
-void BeamSegment::CalcSetStemValuesTab(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+void BeamSegment::CalcSetStemValuesTab(const Staff *staff, const Doc *doc, const BeamDrawingInterface *beamInterface)
 {
     assert(staff);
     assert(doc);
@@ -302,7 +302,8 @@ void BeamSegment::CalcSetStemValuesTab(Staff *staff, Doc *doc, BeamDrawingInterf
     }
 }
 
-bool BeamSegment::DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, int bottomOffset, bool isCrossStaff)
+bool BeamSegment::DoesBeamOverlap(
+    int staffTop, int topOffset, int staffBottom, int bottomOffset, bool isCrossStaff) const
 {
     // find if current beam fits within the staff
     auto outsideBounds
@@ -329,7 +330,7 @@ bool BeamSegment::DoesBeamOverlap(int staffTop, int topOffset, int staffBottom, 
     return (overlapping != m_beamElementCoordRefs.end());
 }
 
-bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface)
 {
     const int unit = doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     const auto [topBeams, bottomBeams] = beamInterface->GetAdditionalBeamCount();
@@ -438,7 +439,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, Doc *doc, BeamDrawingInterfa
     return true;
 }
 
-void BeamSegment::AdjustBeamToFrenchStyle(BeamDrawingInterface *beamInterface)
+void BeamSegment::AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterface)
 {
     assert(beamInterface);
 
@@ -683,13 +684,14 @@ void BeamSegment::CalcBeamInit(Staff *staff, Doc *doc, BeamDrawingInterface *bea
     m_weightedPlace = ((m_verticalCenter - yMin) > (yMax - m_verticalCenter)) ? BEAMPLACE_above : BEAMPLACE_below;
 }
 
-void BeamSegment::CalcBeamInitForNotePair(Note *note1, Note *note2, Staff *staff, int &yMax, int &yMin)
+void BeamSegment::CalcBeamInitForNotePair(
+    const Note *note1, const Note *note2, const Staff *staff, int &yMax, int &yMin)
 {
     assert(note1);
     assert(note2);
 
-    Note *bottomNote = (note1->GetDrawingY() > note2->GetDrawingY()) ? note2 : note1;
-    Note *topNote = (note1->GetDrawingY() > note2->GetDrawingY()) ? note1 : note2;
+    const Note *bottomNote = (note1->GetDrawingY() > note2->GetDrawingY()) ? note2 : note1;
+    const Note *topNote = (note1->GetDrawingY() > note2->GetDrawingY()) ? note1 : note2;
 
     yMax = bottomNote->GetDrawingY();
     yMin = topNote->GetDrawingY();
@@ -704,7 +706,7 @@ void BeamSegment::CalcBeamInitForNotePair(Note *note1, Note *note2, Staff *staff
     }
 }
 
-bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, int &step)
+bool BeamSegment::CalcBeamSlope(const Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface, int &step)
 {
     assert(staff);
     assert(doc);
@@ -843,7 +845,7 @@ bool BeamSegment::CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *be
 }
 
 int BeamSegment::CalcBeamSlopeStep(
-    Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, int noteStep, bool &shortStep)
+    const Doc *doc, const Staff *staff, BeamDrawingInterface *beamInterface, int noteStep, bool &shortStep)
 {
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // Default (maximum) step is two stave-spaces (4 units)
@@ -900,7 +902,7 @@ int BeamSegment::CalcBeamSlopeStep(
     return step;
 }
 
-void BeamSegment::CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int step)
+void BeamSegment::CalcMixedBeamStem(const BeamDrawingInterface *beamInterface, int step)
 {
     // In cases, when both first and last notes/chords of the beam have same relative places (i.e. they have same stem
     // direction and/or same staff), - we don't need additional calculations
@@ -939,7 +941,8 @@ void BeamSegment::CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int ste
     }
 }
 
-void BeamSegment::CalcBeamPosition(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal)
+void BeamSegment::CalcBeamPosition(
+    const Doc *doc, const Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal)
 {
     // Set drawing stem positions
     for (auto coord : m_beamElementCoordRefs) {
@@ -987,7 +990,7 @@ void BeamSegment::CalcBeamPosition(Doc *doc, Staff *staff, BeamDrawingInterface 
     if (!beamInterface->m_crossStaffContent) this->AdjustBeamToLedgerLines(doc, staff, beamInterface, isHorizontal);
 }
 
-void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, int &step)
+void BeamSegment::CalcAdjustSlope(const Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface, int &step)
 {
     assert(staff);
     assert(doc);
@@ -1107,7 +1110,7 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
     }
 }
 
-void BeamSegment::CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+void BeamSegment::CalcAdjustPosition(const Staff *staff, const Doc *doc, const BeamDrawingInterface *beamInterface)
 {
     const int staffTop = staff->GetDrawingY();
     const int staffHeight = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
@@ -1194,7 +1197,7 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
 }
 
 void BeamSegment::CalcBeamPlaceTab(
-    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
+    const Layer *layer, const Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
 {
     assert(layer);
     assert(staff);
@@ -1223,7 +1226,7 @@ void BeamSegment::CalcBeamPlaceTab(
     }
 }
 
-void BeamSegment::CalcBeamStemLength(Staff *staff, data_BEAMPLACE place, bool isHorizontal)
+void BeamSegment::CalcBeamStemLength(const Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
     const auto [noteLoc, noteDur] = this->CalcStemDefiningNote(staff, place);
     const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
@@ -1272,7 +1275,7 @@ std::pair<int, int> BeamSegment::CalcBeamRelativeMinMax(data_BEAMPLACE place) co
     return { highestPoint, lowestPoint };
 }
 
-std::pair<int, int> BeamSegment::CalcStemDefiningNote(Staff *staff, data_BEAMPLACE place)
+std::pair<int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const
 {
     int shortestDuration = DUR_4;
     int shortestLoc = VRV_UNSET;
@@ -1336,7 +1339,7 @@ std::pair<int, int> BeamSegment::CalcStemDefiningNote(Staff *staff, data_BEAMPLA
     return { relevantLoc, relevantDuration };
 }
 
-void BeamSegment::CalcHorizontalBeam(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface)
+void BeamSegment::CalcHorizontalBeam(const Doc *doc, const Staff *staff, const BeamDrawingInterface *beamInterface)
 {
 
     if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
@@ -1365,7 +1368,7 @@ void BeamSegment::CalcHorizontalBeam(Doc *doc, Staff *staff, BeamDrawingInterfac
     this->CalcAdjustPosition(staff, doc, beamInterface);
 }
 
-void BeamSegment::CalcMixedBeamPlace(Staff *staff)
+void BeamSegment::CalcMixedBeamPlace(const Staff *staff)
 {
     const int currentStaffN = staff->GetN();
     const auto it = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
@@ -1528,10 +1531,8 @@ void BeamSegment::UpdateSameasRoles(data_BEAMPLACE place)
     }
 }
 
-void BeamSegment::CalcNoteHeadShiftForStemSameas(Doc *doc, Beam *sameasBeam, data_BEAMPLACE place)
+void BeamSegment::CalcNoteHeadShiftForStemSameas(Beam *sameasBeam, data_BEAMPLACE place)
 {
-    assert(doc);
-
     if (!sameasBeam) return;
 
     // We want to do this only from the second beams sharing the stems and if the role is set
@@ -1553,7 +1554,7 @@ void BeamSegment::CalcNoteHeadShiftForStemSameas(Doc *doc, Beam *sameasBeam, dat
 
         if (!note1 || !note2) continue;
 
-        note1->CalcNoteHeadShiftForSameasNote(doc, note2, stemDir);
+        note1->CalcNoteHeadShiftForSameasNote(note2, stemDir);
     }
 }
 
@@ -1730,12 +1731,12 @@ void BeamSpanSegment::SetSpanningType(int systemIndex, int systemCount)
     }
 }
 
-void BeamSpanSegment::AppendSpanningCoordinates(Measure *measure)
+void BeamSpanSegment::AppendSpanningCoordinates(const Measure *measure)
 {
     const int spanningType = m_spanningType;
     if (SPANNING_START_END == spanningType) return;
 
-    BarLine *bar = measure->GetRightBarLine();
+    const BarLine *bar = measure->GetRightBarLine();
     const int rightSide = bar->GetDrawingX();
     BeamElementCoord *front = m_beamElementCoordRefs.front();
     BeamElementCoord *back = m_beamElementCoordRefs.back();
@@ -1799,8 +1800,8 @@ data_STEMDIRECTION BeamElementCoord::GetStemDir() const
     return stemInterface->GetStemDir();
 }
 
-void BeamElementCoord::SetDrawingStemDir(
-    data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface)
+void BeamElementCoord::SetDrawingStemDir(data_STEMDIRECTION stemDir, const Staff *staff, const Doc *doc,
+    const BeamSegment *segment, const BeamDrawingInterface *interface)
 {
     assert(staff);
     assert(doc);
@@ -1869,7 +1870,7 @@ void BeamElementCoord::SetDrawingStemDir(
     m_yBeam += m_overlapMargin;
 }
 
-int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal)
+int BeamElementCoord::CalculateStemLength(const Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal) const
 {
     if (!m_closestNote) return 0;
 
@@ -1916,7 +1917,7 @@ int BeamElementCoord::CalculateStemLength(Staff *staff, data_STEMDIRECTION stemD
     return stemLen + CalculateStemModAdjustment(stemLen, directionBias);
 }
 
-int BeamElementCoord::CalculateStemLengthTab(Staff *staff, data_STEMDIRECTION stemDir)
+int BeamElementCoord::CalculateStemLengthTab(const Staff *staff, data_STEMDIRECTION stemDir) const
 {
     if (!m_tabDurSym) return 0;
 
@@ -1924,7 +1925,7 @@ int BeamElementCoord::CalculateStemLengthTab(Staff *staff, data_STEMDIRECTION st
     return m_tabDurSym->CalcStemLenInThirdUnits(staff, stemDir) * 2 / 3 * directionBias;
 }
 
-int BeamElementCoord::CalculateStemModAdjustment(int stemLength, int directionBias)
+int BeamElementCoord::CalculateStemModAdjustment(int stemLength, int directionBias) const
 {
     // handle @stem.mod attribute to properly draw beams with tremolos
     int slashFactor = 0;
@@ -1932,7 +1933,7 @@ int BeamElementCoord::CalculateStemModAdjustment(int stemLength, int directionBi
         if (m_closestNote->GetStemMod() < STEMMODIFIER_sprech) slashFactor = m_closestNote->GetStemMod() - 1;
     }
     else if (m_element->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(m_element);
+        const Chord *chord = vrv_cast<const Chord *>(m_element);
         assert(chord);
         if (chord->GetStemMod() < STEMMODIFIER_sprech) slashFactor = chord->GetStemMod() - 1;
     }
@@ -2016,7 +2017,7 @@ int Beam::GetBeamPartDuration(int x) const
     return std::min((*it)->m_dur, (*std::prev(it))->m_dur);
 }
 
-int Beam::GetBeamPartDuration(Object *object) const
+int Beam::GetBeamPartDuration(const Object *object) const
 {
     return this->GetBeamPartDuration(object->GetDrawingX());
 }
@@ -2141,7 +2142,7 @@ int Beam::CalcStem(FunctorParams *functorParams)
     m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, initialPlace);
 
     if (this->HasStemSameasBeam())
-        m_beamSegment.CalcNoteHeadShiftForStemSameas(params->m_doc, this->GetStemSameasBeam(), initialPlace);
+        m_beamSegment.CalcNoteHeadShiftForStemSameas(this->GetStemSameasBeam(), initialPlace);
 
     return FUNCTOR_CONTINUE;
 }
