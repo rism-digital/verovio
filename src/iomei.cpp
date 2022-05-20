@@ -5123,6 +5123,22 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
     pugi::xml_node xmlElement;
     std::string elementName;
     int i = 0;
+
+    // FOR NEON EDITOR
+    // We want bounding boxes to appear even if there is no text associated with
+    // the <syl>. In order to draw the bounding box, we add an empty Text node.
+    if (!parentNode.first_child() && parent->GetClassName() == "Syl") {
+      elementName = std::string(xmlElement.name());
+
+      Text *vrvText = new Text();
+      std::wstring str = UTF8to16("");
+
+      vrvText->SetText(str);
+      parent->AddChild(vrvText);
+
+      return success;
+    }
+
     for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
         if (!success) {
             break;
