@@ -497,6 +497,8 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
 
     const int unit = doc->GetDrawingUnit(100);
     const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
+    const double flexibility = doc->GetOptions()->m_slurEndpointFlexibility.GetValue();
+    const double symmetry = doc->GetOptions()->m_slurSymmetry.GetValue();
 
     // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
     this->FilterSpannedElements(curve, bezier, margin);
@@ -522,7 +524,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // Only collisions near the endpoints are taken into account.
     int endPointShiftLeft = 0;
     int endPointShiftRight = 0;
-    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, margin);
+    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, flexibility, margin);
     if ((endPointShiftLeft != 0) || (endPointShiftRight != 0)) {
         const int signLeft = bezier.IsLeftControlAbove() ? 1 : -1;
         const int signRight = bezier.IsRightControlAbove() ? 1 : -1;
@@ -548,15 +550,18 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // The idea is to shift control points to the outside if there is an obstacle in the vicinity of the corresponding
     // endpoint. For C1 we consider the largest angle <)BP1P2 where B is a colliding left bounding box corner and choose
     // C1 in this direction. Similar for C2.
-    bool ok = false;
-    int controlPointOffsetLeft = 0;
-    int controlPointOffsetRight = 0;
-    std::tie(ok, controlPointOffsetLeft, controlPointOffsetRight) = this->CalcControlPointOffset(curve, bezier, margin);
-    if (ok) {
-        bezier.SetLeftControlOffset(controlPointOffsetLeft);
-        bezier.SetRightControlOffset(controlPointOffsetRight);
-        bezier.UpdateControlPoints();
-        curve->UpdatePoints(bezier);
+    if (this->AllowControlOffsetAdjustment(bezier, symmetry, unit)) {
+        bool ok = false;
+        int controlPointOffsetLeft = 0;
+        int controlPointOffsetRight = 0;
+        std::tie(ok, controlPointOffsetLeft, controlPointOffsetRight)
+            = this->CalcControlPointOffset(curve, bezier, margin);
+        if (ok) {
+            bezier.SetLeftControlOffset(controlPointOffsetLeft);
+            bezier.SetRightControlOffset(controlPointOffsetRight);
+            bezier.UpdateControlPoints();
+            curve->UpdatePoints(bezier);
+        }
     }
 
     // STEP 5: Calculate the vertical shift of the control points.
@@ -564,7 +569,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // where x, y denote the vertical adjustments of the control points and c is the size of the collision.
     // The coefficients a, b are calculated from the Bezier curve equation.
     // After collecting all constraints we calculate a solution.
-    const ControlPointAdjustment adjustment = this->CalcControlPointVerticalShift(curve, bezier, margin);
+    const ControlPointAdjustment adjustment = this->CalcControlPointVerticalShift(curve, bezier, symmetry, margin);
     const int leftSign = (bezier.IsLeftControlAbove() == adjustment.moveUpwards) ? 1 : -1;
     bezier.SetLeftControlHeight(bezier.GetLeftControlHeight() + leftSign * adjustment.leftShift);
     const int rightSign = (bezier.IsRightControlAbove() == adjustment.moveUpwards) ? 1 : -1;
@@ -662,7 +667,7 @@ NearEndCollision Slur::DetectCollisionsNearEnd(
 }
 
 std::pair<int, int> Slur::CalcEndPointShift(
-    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const int margin)
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const double flexibility, const int margin)
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return { 0, 0 };
 
@@ -692,39 +697,53 @@ std::pair<int, int> Slur::CalcEndPointShift(
             // Now apply the intersections on the left and right hand side of the bounding box
             const int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
             const float distanceRatioLeft = float(xLeft - bezierCurve.p1.x) / float(dist);
-            this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioLeft, intersectionLeft, spannedElement->m_isBelow);
+            this->ShiftEndPoints(
+                shiftLeft, shiftRight, distanceRatioLeft, intersectionLeft, flexibility, spannedElement->m_isBelow);
 
             const int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
             const float distanceRatioRight = float(xRight - bezierCurve.p1.x) / float(dist);
             this->ShiftEndPoints(
-                shiftLeft, shiftRight, distanceRatioRight, intersectionRight, spannedElement->m_isBelow);
+                shiftLeft, shiftRight, distanceRatioRight, intersectionRight, flexibility, spannedElement->m_isBelow);
         }
     }
 
     return { shiftLeft, shiftRight };
 }
 
-void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, bool isBelow) const
+void Slur::ShiftEndPoints(
+    int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const
 {
     // Filter collisions near the endpoints
-    // Collisions with 0.15 <= ratio <= 0.85 do not contribute to shifts
+    // Collisions with ratio beyond the partialShiftRadius do not contribute to shifts
     // They are compensated later by shifting the control points
-    if ((ratio < 0.15) && (this->HasEndpointAboveStart() == isBelow)) {
-        if (ratio > 0.05) {
-            // For 0.05 <= ratio <= 0.15 collisions only partially contribute to shifts
+    const double fullShiftRadius = 0.05 + flexibility * 0.15;
+    const double partialShiftRadius = fullShiftRadius * 3.0;
+
+    if ((ratio < partialShiftRadius) && (this->HasEndpointAboveStart() == isBelow)) {
+        if (ratio > fullShiftRadius) {
+            // Collisions here only partially contribute to shifts
             // We multiply with a function that interpolates between 1 and 0
-            intersection *= pow(1.5 - 10.0 * ratio, 2.0);
+            intersection *= this->CalcQuadraticInterpolation(partialShiftRadius, fullShiftRadius, ratio);
         }
         shiftLeft = std::max(shiftLeft, intersection);
     }
-    else if ((ratio > 0.85) && (this->HasEndpointAboveEnd() == isBelow)) {
-        if (ratio < 0.95) {
-            // For 0.85 <= ratio <= 0.95 collisions only partially contribute to shifts
+
+    if ((ratio > 1.0 - partialShiftRadius) && (this->HasEndpointAboveEnd() == isBelow)) {
+        if (ratio < 1.0 - fullShiftRadius) {
+            // Collisions here only partially contribute to shifts
             // We multiply with a function that interpolates between 0 and 1
-            intersection *= pow(10.0 * ratio - 8.5, 2.0);
+            intersection *= this->CalcQuadraticInterpolation(1.0 - partialShiftRadius, 1.0 - fullShiftRadius, ratio);
         }
         shiftRight = std::max(shiftRight, intersection);
     }
+}
+
+double Slur::CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const
+{
+    assert(zeroAt != oneAt);
+    const double a = 1.0 / (oneAt - zeroAt);
+    const double b = zeroAt / (zeroAt - oneAt);
+    return pow(a * arg + b, 2.0);
 }
 
 void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, const int unit)
@@ -789,6 +808,13 @@ void Slur::AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezi
 
     // Since we are going to redraw it, reset its bounding box
     curve->BoundingBox::ResetBoundingBox();
+}
+
+bool Slur::AllowControlOffsetAdjustment(const BezierCurve &bezierCurve, double symmetry, int unit) const
+{
+    const double distance = BoundingBox::CalcDistance(bezierCurve.p1, bezierCurve.p2);
+
+    return (distance > symmetry * 40 * unit);
 }
 
 std::tuple<bool, int, int> Slur::CalcControlPointOffset(
@@ -858,7 +884,7 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
 }
 
 ControlPointAdjustment Slur::CalcControlPointVerticalShift(
-    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double symmetry, int margin)
 {
     ControlPointAdjustment adjustment{ 0, 0, false, 0 };
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return adjustment;
@@ -925,11 +951,13 @@ ControlPointAdjustment Slur::CalcControlPointVerticalShift(
 
     // Solve the constraints and calculate the adjustment
     if (maxIntersectionAbove > maxIntersectionBelow) {
-        std::tie(adjustment.leftShift, adjustment.rightShift) = this->SolveControlPointConstraints(aboveConstraints);
+        std::tie(adjustment.leftShift, adjustment.rightShift)
+            = this->SolveControlPointConstraints(aboveConstraints, symmetry);
         adjustment.moveUpwards = false;
     }
     else {
-        std::tie(adjustment.leftShift, adjustment.rightShift) = this->SolveControlPointConstraints(belowConstraints);
+        std::tie(adjustment.leftShift, adjustment.rightShift)
+            = this->SolveControlPointConstraints(belowConstraints, symmetry);
         adjustment.moveUpwards = true;
     }
 
@@ -948,7 +976,8 @@ ControlPointAdjustment Slur::CalcControlPointVerticalShift(
     return adjustment;
 }
 
-std::pair<int, int> Slur::SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints)
+std::pair<int, int> Slur::SolveControlPointConstraints(
+    const std::list<ControlPointConstraint> &constraints, double symmetry)
 {
     if (constraints.empty()) return { 0, 0 };
 
@@ -963,7 +992,11 @@ std::pair<int, int> Slur::SolveControlPointConstraints(const std::list<ControlPo
         weightedAngleSum += weight * atan(constraint.b / constraint.a);
         weightSum += weight;
     }
-    const double slope = tan(weightedAngleSum / weightSum);
+    // Depending on symmetry we want the angle to be near PI/4
+    double angle = weightedAngleSum / weightSum;
+    angle = std::max(symmetry * M_PI / 4.0, angle);
+    angle = std::min((2.0 - symmetry) * M_PI / 4.0, angle);
+    const double slope = tan(angle);
 
     // Now follow the line with the averaged slope until we have hit all halfplanes.
     // For each constraint we must solve: slope * x = c/b - a/b * x

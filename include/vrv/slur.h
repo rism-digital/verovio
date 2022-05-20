@@ -259,10 +259,14 @@ private:
         FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
     // Calculate the vertical shift of the slur end points
-    std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+    std::pair<int, int> CalcEndPointShift(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double flexibility, int margin);
 
     // Calculate slur from bulge values
     void AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit);
+
+    // Check whether control points should be adjusted horizontally
+    bool AllowControlOffsetAdjustment(const BezierCurve &bezierCurve, double symmetry, int unit) const;
 
     // Calculate the horizontal control point offset
     std::tuple<bool, int, int> CalcControlPointOffset(
@@ -270,10 +274,11 @@ private:
 
     // Calculate the vertical control point shift
     ControlPointAdjustment CalcControlPointVerticalShift(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double symmetry, int margin);
 
     // Solve the constraints for vertical control point adjustment
-    std::pair<int, int> SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints);
+    std::pair<int, int> SolveControlPointConstraints(
+        const std::list<ControlPointConstraint> &constraints, double symmetry = 0.0);
 
     // Improve the slur shape by adjusting the control point heights
     void AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int unit);
@@ -284,7 +289,11 @@ private:
      */
     ///@{
     // Shift end points for collisions nearby
-    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, bool isBelow) const;
+    void ShiftEndPoints(
+        int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const;
+
+    // Determine a quadratic interpolation function between zero and one and evaluate it
+    double CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const;
 
     // Rotate the slope by a given number of degrees, but choose smaller angles if already close to the vertical axis
     // Choose doublingBound as the positive slope value where doubling has the same effect as rotating:
