@@ -512,6 +512,11 @@ private:
      */
     void GetChordOverflow(StaffAlignment *&above, StaffAlignment *&below, int staffN);
 
+    /**
+     * Calculate offset and left overlap of the element
+     */
+    std::pair<int, int> CalculateXPosOffset(FunctorParams *functorParams);
+
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
