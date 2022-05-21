@@ -31,7 +31,9 @@ class Accid : public LayerElement,
               public AttAccidLog,
               public AttColor,
               public AttEnclosingChars,
-              public AttExtSym {
+              public AttExtSym,
+              public AttPlacementOnStaff,
+              public AttPlacementRelEvent {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

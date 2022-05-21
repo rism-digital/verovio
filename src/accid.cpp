@@ -37,6 +37,8 @@ Accid::Accid()
     , AttColor()
     , AttEnclosingChars()
     , AttExtSym()
+    , AttPlacementOnStaff()
+    , AttPlacementRelEvent()
 {
 
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -46,6 +48,8 @@ Accid::Accid()
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_PLACEMENTONSTAFF);
+    this->RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
     this->Reset();
 }
@@ -62,6 +66,8 @@ void Accid::Reset()
     this->ResetColor();
     this->ResetEnclosingChars();
     this->ResetExtSym();
+    this->ResetPlacementOnStaff();
+    this->ResetPlacementRelEvent();
 
     m_drawingUnison = NULL;
     m_alignedWithSameLayer = false;

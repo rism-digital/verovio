@@ -2079,6 +2079,8 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     accid->WriteColor(currentNode);
     accid->WriteEnclosingChars(currentNode);
     accid->WriteExtSym(currentNode);
+    accid->WritePlacementOnStaff(currentNode);
+    accid->WritePlacementRelEvent(currentNode);
 }
 
 void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
@@ -5725,6 +5727,8 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     vrvAccid->ReadColor(accid);
     vrvAccid->ReadEnclosingChars(accid);
     vrvAccid->ReadExtSym(accid);
+    vrvAccid->ReadPlacementOnStaff(accid);
+    vrvAccid->ReadPlacementRelEvent(accid);
 
     parent->AddChild(vrvAccid);
     this->ReadUnsupportedAttr(accid, vrvAccid);
