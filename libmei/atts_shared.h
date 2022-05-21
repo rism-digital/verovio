@@ -2907,7 +2907,7 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCount(const data_METERCOUNT_pair &count_) { m_count = count_; }
+    void SetCount(data_METERCOUNT_pair count_) { m_count = count_; }
     data_METERCOUNT_pair GetCount() const { return m_count; }
     bool HasCount() const;
     //
@@ -2958,7 +2958,7 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeterCount(const data_METERCOUNT_pair &meterCount_) { m_meterCount = meterCount_; }
+    void SetMeterCount(data_METERCOUNT_pair meterCount_) { m_meterCount = meterCount_; }
     data_METERCOUNT_pair GetMeterCount() const { return m_meterCount; }
     bool HasMeterCount() const;
     //

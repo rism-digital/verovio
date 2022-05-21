@@ -3783,7 +3783,7 @@ AttMeterSigLog::~AttMeterSigLog()
 
 void AttMeterSigLog::ResetMeterSigLog()
 {
-    m_count = {};
+    m_count = std::pair<std::vector<int>, MeterCountSign>();
     m_sym = METERSIGN_NONE;
     m_unit = 0;
 }
@@ -3829,7 +3829,7 @@ bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element)
 
 bool AttMeterSigLog::HasCount() const
 {
-    return !m_count.first.empty();
+    return (m_count != std::pair<std::vector<int>, MeterCountSign>());
 }
 
 bool AttMeterSigLog::HasSym() const
@@ -3859,7 +3859,7 @@ AttMeterSigDefaultLog::~AttMeterSigDefaultLog()
 
 void AttMeterSigDefaultLog::ResetMeterSigDefaultLog()
 {
-    m_meterCount = {};
+    m_meterCount = std::pair<std::vector<int>, MeterCountSign>();
     m_meterUnit = 0;
     m_meterSym = METERSIGN_NONE;
 }
@@ -3905,7 +3905,7 @@ bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element)
 
 bool AttMeterSigDefaultLog::HasMeterCount() const
 {
-    return !m_meterCount.first.empty();
+    return (m_meterCount != std::pair<std::vector<int>, MeterCountSign>());
 }
 
 bool AttMeterSigDefaultLog::HasMeterUnit() const
