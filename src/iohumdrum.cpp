@@ -11405,6 +11405,21 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             ++i;
             continue;
         }
+        if ((ch == '"') && (posch == '"')) {
+            // use 9 slot in array for ""^" (snap pizzicato)
+            ch = 9;
+            intch = 9;
+            articloc.at(intch) = i + 1;
+            posch = i < tsize - 2 ? nohidden.at(i + 2) : 'g';
+            if (posch == m_signifiers.below) {
+                articpos.at(intch) = -1;
+            }
+            else if (posch == m_signifiers.above) {
+                articpos.at(intch) = +1;
+            }
+            ++i;
+            continue;
+        }
         else if ((ch == '\'') && (posch == '\'')) {
             // staccatissimo alternate (eventually remove)
             ch = '`';
@@ -11459,9 +11474,6 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         else if ((posch != 0) && (posch == m_signifiers.below)) {
             articpos.at(intch) = -1;
             showpos.at(intch) = true;
-        }
-        else {
-            articpos.at(intch) = 0;
         }
     }
 
@@ -11529,6 +11541,13 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         gestural.push_back(articges[8]);
         counts.push_back(articcount[8]);
         showingpositions.push_back(showpos[8]);
+    }
+    if (articloc[9]) {
+        artics.push_back(ARTICULATION_snap);
+        positions.push_back(articpos[9]);
+        gestural.push_back(articges[9]);
+        counts.push_back(articcount[9]);
+        showingpositions.push_back(showpos[9]);
     }
     if (articloc['^']) {
         artics.push_back(ARTICULATION_acc);
