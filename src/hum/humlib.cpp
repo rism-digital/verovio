@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon May 16 01:34:10 PDT 2022
+// Last Modified: Sat May 21 11:50:51 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -22416,7 +22416,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 			lasttrack = track;
 			int rindex = rtracks[track];
 			for (k=0; k<subcount; k++) {
-				bool tienote = false;
+				// bool tienote = false;
 				string subtok = token->getSubtoken(k);
 				if (subcount > 1) {
 					// Rests in chords represent unsounding notes.
@@ -22450,7 +22450,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 				}
 
 				if (((subtok.find("_") != string::npos) || (subtok.find("]") != string::npos))) {
-					tienote = true;
+					// tienote = true;
 					// tied notes do not have accidentals, so skip them
 					if ((accid != keysigs[rindex][diatonic % 7]) && firstinbar[rindex]) {
 						// But first, prepare to force an accidental to be shown on
