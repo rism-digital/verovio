@@ -1028,10 +1028,10 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
         x += m_doc->GetGlyphWidth(code, glyphSize, false);
     }
     else if (meterSig->GetForm() == METERFORM_num) {
-        x += this->DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
+        x += this->DrawMeterSigFigures(dc, x, y, meterSig, 0, staff);
     }
     else if (meterSig->HasCount()) {
-        x += this->DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
+        x += this->DrawMeterSigFigures(dc, x, y, meterSig, meterSig->GetUnit(), staff);
     }
 
     if (enclosingBack) {
@@ -1847,16 +1847,25 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Sta
     }
 }
 
-int View::DrawMeterSigFigures(
-    DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff)
+int View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSig, int den, Staff *staff)
 {
     assert(dc);
     assert(staff);
 
+    const auto [numSummands, numSign] = meterSig->GetCount();
     std::wstring timeSigCombNumerator, timeSigCombDenominator;
     for (int summand : numSummands) {
-        if (!timeSigCombNumerator.empty()) timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall;
-        timeSigCombNumerator += this->IntToTimeSigFigures(summand);
+        if (!timeSigCombNumerator.empty()) {
+            switch (numSign) {
+                case MeterCountSign::Slash: timeSigCombNumerator += SMUFL_E08E_timeSigFractionalSlash; break;
+                case MeterCountSign::Minus: timeSigCombNumerator += SMUFL_E090_timeSigMinus; break;
+                case MeterCountSign::Asterisk: timeSigCombNumerator += SMUFL_E091_timeSigMultiply; break;
+                case MeterCountSign::Plus: timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall; break;
+                case MeterCountSign::None:
+                default: break;
+            }
+        }
+        timeSigCombNumerator += IntToTimeSigFigures(summand);
     }
     if (den) timeSigCombDenominator = this->IntToTimeSigFigures(den);
 

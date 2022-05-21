@@ -1390,11 +1390,11 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
     std::cmatch matches;
     if (meter) {
         if (regex_match(timesig_str, matches, std::regex("(\\d+)/(\\d+)"))) {
-            meter->SetCount({ std::stoi(matches[1]) });
+            meter->SetCount({ { std::stoi(matches[1]) }, MeterCountSign::None });
             meter->SetUnit(std::stoi(matches[2]));
         }
         else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
-            meter->SetCount({ std::stoi(timesig_str) });
+            meter->SetCount({ { std::stoi(timesig_str) }, MeterCountSign::None });
             meter->SetUnit(1);
             meter->SetForm(METERFORM_num);
         }
@@ -1409,12 +1409,12 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
         else if (strcmp(timesig_str, "c3") == 0) {
             // C3
             meter->SetSym(METERSIGN_common);
-            meter->SetCount({ 3 });
+            meter->SetCount({ { 3 }, MeterCountSign::None });
         }
         else if (strcmp(timesig_str, "c3/2") == 0) {
             // C3/2
             meter->SetSym(METERSIGN_common); // ??
-            meter->SetCount({ 3 });
+            meter->SetCount({ { 2 }, MeterCountSign::None });
             meter->SetUnit(2);
         }
         else {
@@ -4696,18 +4696,18 @@ bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae:
     if (paeStr.size() < 1) {
         LogPAE(ERR_047_TIMESIG_INCOMPLETE, token);
         if (m_pedanticMode) return false;
-        meterSig->SetCount({ 4 });
+        meterSig->SetCount({ { 4 }, MeterCountSign::None });
         meterSig->SetUnit(4);
         return true;
     }
 
     std::cmatch matches;
     if (regex_match(paeStr.c_str(), matches, std::regex("(\\d+)/(\\d+)"))) {
-        meterSig->SetCount({ std::stoi(matches[1]) });
+        meterSig->SetCount({ { std::stoi(matches[1]) }, MeterCountSign::None });
         meterSig->SetUnit(std::stoi(matches[2]));
     }
     else if (regex_match(paeStr.c_str(), matches, std::regex("\\d+"))) {
-        meterSig->SetCount({ std::stoi(paeStr.c_str()) });
+        meterSig->SetCount({ { std::stoi(paeStr) }, MeterCountSign::None });
         meterSig->SetUnit(1);
         meterSig->SetForm(METERFORM_num);
     }
@@ -4722,12 +4722,12 @@ bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae:
     else if (paeStr == "c3") {
         // C3
         meterSig->SetSym(METERSIGN_common);
-        meterSig->SetCount({ 3 });
+        meterSig->SetCount({ { 3 }, MeterCountSign::None });
     }
     else if (paeStr == "c3/2") {
         // C3/2
         meterSig->SetSym(METERSIGN_common); // ??
-        meterSig->SetCount({ 3 });
+        meterSig->SetCount({ { 3 }, MeterCountSign::None });
         meterSig->SetUnit(2);
     }
     else {
