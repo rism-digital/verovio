@@ -35,6 +35,7 @@ public:
     virtual ~Dots();
     void Reset() override;
     std::string GetClassName() const override { return "Dots"; }
+    Object *Clone() const override { return new Dots(*this); }
     ///@}
 
     /** Override the method since alignment is required */
@@ -111,6 +112,7 @@ public:
     virtual ~Flag();
     void Reset() override;
     std::string GetClassName() const override { return "Flag"; }
+    Object *Clone() const override { return new Flag(*this); }
     ///@}
 
     /** Override the method since alignment is required */
@@ -330,6 +332,7 @@ public:
     virtual ~Stem();
     void Reset() override;
     std::string GetClassName() const override { return "Stem"; }
+    Object *Clone() const override { return new Stem(*this); }
     ///@}
 
     /** Override the method since alignment is required */

@@ -111,10 +111,10 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig() const
             newMeterSig = vrv_cast<MeterSig *>((*it)->Clone());
             if (newMeterSig->GetUnit() < maxUnit) {
                 const int ratio = maxUnit / newMeterSig->GetUnit();
-                data_SUMMAND_List currentCount = newMeterSig->GetCount();
+                auto [currentCount, sign] = newMeterSig->GetCount();
                 std::transform(currentCount.begin(), currentCount.end(), currentCount.begin(),
                     [&ratio](int elem) -> int { return elem * ratio; });
-                newMeterSig->SetCount(currentCount);
+                newMeterSig->SetCount({ currentCount, sign });
                 newMeterSig->SetUnit(maxUnit);
             }
             break;
@@ -150,7 +150,7 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig() const
                 }
             }
             newMeterSig->SetUnit(maxUnit);
-            newMeterSig->SetCount({ currentCount });
+            newMeterSig->SetCount({ { currentCount }, MeterCountSign::None });
             break;
         }
         default: {

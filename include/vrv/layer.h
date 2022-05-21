@@ -100,6 +100,11 @@ public:
     int GetClefLocOffset(const LayerElement *test) const;
 
     /**
+     * Return the clef offset for the position if there are cross-staff clefs on the same layer
+     */
+    int GetCrossStaffClefLocOffset(const LayerElement *element, int locOffset) const;
+
+    /**
      * @name Set and get the stem direction of the layer.
      * This stays STEMDIRECTION_NONE with on single layer in the staff.
      */

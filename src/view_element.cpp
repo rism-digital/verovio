@@ -256,29 +256,39 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    if (accid->GetFunc() == accidLog_FUNC_edit) {
+    if (accid->HasPlace() || (accid->GetFunc() == accidLog_FUNC_edit)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y = staff->GetDrawingY();
+        const int staffTop = staff->GetDrawingY();
+        const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
+
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) {
             const int drawingDur = note->GetDrawingDur();
-            // Check if the note is on the top line or above (add a unit for the note head half size)
-            if (note->GetDrawingY() >= y) y = note->GetDrawingY() + unit;
-            // Check if the top of the stem is above
-            if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y)) {
-                y = note->GetDrawingStemEnd(note).y;
-            }
-            else if (note->IsMensuralDur()) {
-                const int verticalCenter = y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+            int noteTop = note->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+            int noteBottom = note->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+            bool onStaff = (accid->GetOnstaff() == BOOLEAN_true);
+
+            // Adjust position to mensural stems
+            if (note->IsMensuralDur()) {
+                if (accid->GetFunc() != accidLog_FUNC_edit) onStaff = (accid->GetOnstaff() != BOOLEAN_false);
+                const int verticalCenter = staffTop - (staff->m_drawingLines - 1) * unit;
                 const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
-                if ((note->GetStemDir() == STEMDIRECTION_up)
-                    || ((drawingDur > DUR_1) && (stemDir == STEMDIRECTION_up))) {
-                    y = note->GetDrawingY() + unit * STANDARD_STEMLENGTH;
+                if ((drawingDur > DUR_1) || (drawingDur < DUR_BR)) {
+                    if (stemDir == STEMDIRECTION_up) {
+                        noteTop = note->GetDrawingY() + unit * STANDARD_STEMLENGTH;
+                        noteBottom -= unit;
+                    }
+                    else {
+                        noteBottom = note->GetDrawingY() - unit * STANDARD_STEMLENGTH;
+                    }
                 }
             }
-            else if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (drawingDur == DUR_LG)) {
-                y = note->GetDrawingStem()->GetDrawingY() + unit * STANDARD_STEMLENGTH;
+            if (accid->GetPlace() == STAFFREL_below) {
+                y = ((noteBottom <= staffBottom) || onStaff) ? noteBottom : staffBottom;
+            }
+            else {
+                y = ((noteTop >= staffTop) || onStaff) ? noteTop : staffTop;
             }
             // Increase the x position of the accid
             x += note->GetDrawingRadius(m_doc);
@@ -287,7 +297,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->GetDrawingCueSize()));
         dc->GetSmuflTextExtent(accid->GetSymbolStr(notationType), &extend);
         dc->ResetFont();
-        y += extend.m_descent + unit;
+        y = (accid->GetPlace() == STAFFREL_below) ? y - extend.m_ascent - unit : y + extend.m_descent + unit;
     }
 
     this->DrawSmuflString(
@@ -552,6 +562,8 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Clef *clef = vrv_cast<Clef *>(element);
     assert(clef);
+
+    if (clef->m_crossStaff) staff = clef->m_crossStaff;
 
     // hidden clef
     if (clef->GetVisible() == BOOLEAN_false) {
@@ -1026,10 +1038,10 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
         x += m_doc->GetGlyphWidth(code, glyphSize, false);
     }
     else if (meterSig->GetForm() == METERFORM_num) {
-        x += this->DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
+        x += this->DrawMeterSigFigures(dc, x, y, meterSig, 0, staff);
     }
     else if (meterSig->HasCount()) {
-        x += this->DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
+        x += this->DrawMeterSigFigures(dc, x, y, meterSig, meterSig->GetUnit(), staff);
     }
 
     if (enclosingBack) {
@@ -1845,16 +1857,25 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Sta
     }
 }
 
-int View::DrawMeterSigFigures(
-    DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff)
+int View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSig, int den, Staff *staff)
 {
     assert(dc);
     assert(staff);
 
+    const auto [numSummands, numSign] = meterSig->GetCount();
     std::wstring timeSigCombNumerator, timeSigCombDenominator;
     for (int summand : numSummands) {
-        if (!timeSigCombNumerator.empty()) timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall;
-        timeSigCombNumerator += this->IntToTimeSigFigures(summand);
+        if (!timeSigCombNumerator.empty()) {
+            switch (numSign) {
+                case MeterCountSign::Slash: timeSigCombNumerator += SMUFL_E08E_timeSigFractionalSlash; break;
+                case MeterCountSign::Minus: timeSigCombNumerator += SMUFL_E090_timeSigMinus; break;
+                case MeterCountSign::Asterisk: timeSigCombNumerator += SMUFL_E091_timeSigMultiply; break;
+                case MeterCountSign::Plus: timeSigCombNumerator += SMUFL_E08D_timeSigPlusSmall; break;
+                case MeterCountSign::None:
+                default: break;
+            }
+        }
+        timeSigCombNumerator += IntToTimeSigFigures(summand);
     }
     if (den) timeSigCombDenominator = this->IntToTimeSigFigures(den);
 

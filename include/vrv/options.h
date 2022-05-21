@@ -689,10 +689,12 @@ public:
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionDbl m_slurCurveFactor;
+    OptionDbl m_slurEndpointFlexibility;
     OptionDbl m_slurEndpointThickness;
     OptionDbl m_slurMargin;
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurMidpointThickness;
+    OptionDbl m_slurSymmetry;
     OptionInt m_spacingBraceGroup;
     OptionInt m_spacingBracketGroup;
     OptionBool m_spacingDurDetection;

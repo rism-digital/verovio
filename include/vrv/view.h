@@ -347,8 +347,7 @@ protected:
     void DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x);
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */
-    int DrawMeterSigFigures(
-        DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff);
+    int DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSig, int den, Staff *staff);
     void DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smulfCode, int num, bool line, Staff *staff);
     ///@}
 

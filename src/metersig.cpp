@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <math.h>
 #include <numeric>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -48,8 +49,37 @@ void MeterSig::Reset()
 
 int MeterSig::GetTotalCount() const
 {
-    const data_SUMMAND_List &summands = this->GetCount();
-    return std::accumulate(summands.cbegin(), summands.cend(), 0);
+    auto [counts, sign] = this->GetCount();
+    switch (sign) {
+        case MeterCountSign::Slash: {
+            // make sure that there is no division by zero
+            std::for_each(counts.begin(), counts.end(), [](int &elem) {
+                if (!elem) elem = 1;
+            });
+            int result
+                = std::accumulate(std::next(counts.cbegin()), counts.cend(), *counts.cbegin(), std::divides<int>());
+            if (!result) result = 1;
+            return result;
+        }
+        case MeterCountSign::Minus: {
+            int result
+                = std::accumulate(std::next(counts.cbegin()), counts.cend(), *counts.cbegin(), std::minus<int>());
+            if (result <= 0) result = 1;
+            return result;
+        }
+        case MeterCountSign::Asterisk: {
+            int result = std::accumulate(counts.cbegin(), counts.cend(), 1, std::multiplies<int>());
+            if (!result) result = 1;
+            return result;
+        }
+        case MeterCountSign::Plus: {
+            return std::accumulate(counts.cbegin(), counts.cend(), 0, std::plus<int>());
+        }
+        case MeterCountSign::None:
+        default: break;
+    }
+
+    return counts.front();
 }
 
 wchar_t MeterSig::GetSymbolGlyph() const

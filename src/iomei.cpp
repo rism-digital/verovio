@@ -2079,6 +2079,8 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     accid->WriteColor(currentNode);
     accid->WriteEnclosingChars(currentNode);
     accid->WriteExtSym(currentNode);
+    accid->WritePlacementOnStaff(currentNode);
+    accid->WritePlacementRelEvent(currentNode);
 }
 
 void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
@@ -2183,6 +2185,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     clef->WriteExtSym(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
+    clef->WriteStaffIdent(currentNode);
     clef->WriteVisibility(currentNode);
 }
 
@@ -5724,6 +5727,8 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     vrvAccid->ReadColor(accid);
     vrvAccid->ReadEnclosingChars(accid);
     vrvAccid->ReadExtSym(accid);
+    vrvAccid->ReadPlacementOnStaff(accid);
+    vrvAccid->ReadPlacementRelEvent(accid);
 
     parent->AddChild(vrvAccid);
     this->ReadUnsupportedAttr(accid, vrvAccid);
@@ -5864,6 +5869,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
     vrvClef->ReadExtSym(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
+    vrvClef->ReadStaffIdent(clef);
     vrvClef->ReadVisibility(clef);
 
     parent->AddChild(vrvClef);
