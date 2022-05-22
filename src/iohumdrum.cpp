@@ -19529,14 +19529,46 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
 
 //////////////////////////////
 //
-// HumdrumInput::getNextNonNullDataOrMeasureToken --
+// HumdrumInput::getNextNonNullDataOrMeasureToken -- Designed for
+//    finding an attachment for Pedal marks.
 //
 
 hum::HTp HumdrumInput::getNextNonNullDataOrMeasureToken(hum::HTp tok)
 {
+    int track = tok->getTrack();
+
     hum::HTp current = tok->getNextToken();
     while (current) {
+        if (current->isInterpretation()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->isCommentLocal()) {
+            current = current->getNextToken();
+            continue;
+        }
         if (current->isNull()) {
+            // Search for note in staff above.
+            hum::HTp rcurrent = current->getNextFieldToken();
+            while (rcurrent) {
+                int rtrack = rcurrent->getTrack();
+                if (abs(rtrack - track) > 1) {
+                    break;
+                }
+                if (!rcurrent->isKern()) {
+                    rcurrent = rcurrent->getNextFieldToken();
+                    continue;
+                }
+                if (rcurrent->isNull()) {
+                    rcurrent = rcurrent->getNextFieldToken();
+                    continue;
+                }
+                if (rcurrent->isData()) {
+                    return rcurrent;
+                }
+                rcurrent = rcurrent->getNextFieldToken();
+            }
+
             current = current->getNextToken();
             continue;
         }
