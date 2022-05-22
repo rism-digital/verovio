@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat May 21 11:50:51 PDT 2022
+// Last Modified: Sun May 22 07:01:04 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -51188,151 +51188,179 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 	output.setColor(0,0,0);
 	const string& cs = colorstring;
 
-	if      (cs == "aliceblue"           ) { output.setColor("#f0f8ff"); }
-	else if (cs == "antiquewhite"        ) { output.setColor("#faebd7"); }
-	else if (cs == "aqua"                ) { output.setColor("#00ffff"); }
-	else if (cs == "aquamarine"          ) { output.setColor("#7fffd4"); }
-	else if (cs == "azure"               ) { output.setColor("#f0ffff"); }
-	else if (cs == "beige"               ) { output.setColor("#f5f5dc"); }
-	else if (cs == "bisque"              ) { output.setColor("#ffe4c4"); }
-	else if (cs == "black"               ) { output.setColor("#000000"); }
-	else if (cs == "blanchediamond"      ) { output.setColor("#ffebcd"); }
-	else if (cs == "blue"                ) { output.setColor("#0000ff"); }
-	else if (cs == "blueviolet"          ) { output.setColor("#8a2be2"); }
-	else if (cs == "brown"               ) { output.setColor("#a52a2a"); }
-	else if (cs == "burlywood"           ) { output.setColor("#ffe4c4"); }
-	else if (cs == "cadetblue"           ) { output.setColor("#5f9ea0"); }
-	else if (cs == "chartreuse"          ) { output.setColor("#7fff00"); }
-	else if (cs == "coral"               ) { output.setColor("#ff7f50"); }
-	else if (cs == "cornflowerblue"      ) { output.setColor("#6495ed"); }
-	else if (cs == "cornsilk"            ) { output.setColor("#fff8dc"); }
-	else if (cs == "crimson"             ) { output.setColor("#dc143c"); }
-	else if (cs == "cyan"                ) { output.setColor("#00ffff"); }
-	else if (cs == "darkblue"            ) { output.setColor("#00008b"); }
-	else if (cs == "darkcyan"            ) { output.setColor("#008b8b"); }
-	else if (cs == "darkgoldenrod"       ) { output.setColor("#b8860b"); }
-	else if (cs == "darkgray"            ) { output.setColor("#a9a9a9"); }
-	else if (cs == "darkgreen"           ) { output.setColor("#006400"); }
-	else if (cs == "darkkhaki"           ) { output.setColor("#bdb76b"); }
-	else if (cs == "darkmagenta"         ) { output.setColor("#8b008b"); }
-	else if (cs == "darkolivegreen"      ) { output.setColor("#556b2f"); }
-	else if (cs == "darkorange"          ) { output.setColor("#ff8c00"); }
-	else if (cs == "darkorchid"          ) { output.setColor("#9932cc"); }
-	else if (cs == "darkred"             ) { output.setColor("#8b0000"); }
-	else if (cs == "darksalmon"          ) { output.setColor("#e9967a"); }
-	else if (cs == "darkseagreen"        ) { output.setColor("#8dbc8f"); }
-	else if (cs == "darkslateblue"       ) { output.setColor("#483d8b"); }
-	else if (cs == "darkslategray"       ) { output.setColor("#2e4e4e"); }
-	else if (cs == "darkturquoise"       ) { output.setColor("#00ded1"); }
-	else if (cs == "darkviolet"          ) { output.setColor("#9400d3"); }
-	else if (cs == "deeppink"            ) { output.setColor("#ff1493"); }
-	else if (cs == "deepskyblue"         ) { output.setColor("#00bfff"); }
-	else if (cs == "dimgray"             ) { output.setColor("#696969"); }
-	else if (cs == "dodgerblue"          ) { output.setColor("#1e90ff"); }
-	else if (cs == "firebrick"           ) { output.setColor("#b22222"); }
-	else if (cs == "floralwhite"         ) { output.setColor("#fffaf0"); }
-	else if (cs == "forestgreen"         ) { output.setColor("#228b22"); }
-	else if (cs == "fuchsia"             ) { output.setColor("#ff00ff"); }
-	else if (cs == "gainsboro"           ) { output.setColor("#dcdcdc"); }
-	else if (cs == "ghostwhite"          ) { output.setColor("#f8f8ff"); }
-	else if (cs == "gold"                ) { output.setColor("#ffd700"); }
-	else if (cs == "goldenrod"           ) { output.setColor("#daa520"); }
-	else if (cs == "gray"                ) { output.setColor("#808080"); }
-	else if (cs == "gray"                ) { output.setColor("#808080"); }
-	else if (cs == "green"               ) { output.setColor("#008000"); }
-	else if (cs == "greenyellow"         ) { output.setColor("#adff2f"); }
-	else if (cs == "honeydew"            ) { output.setColor("#f0fff0"); }
-	else if (cs == "hotpink"             ) { output.setColor("#ff69b4"); }
-	else if (cs == "indianred"           ) { output.setColor("#cd5c5c"); }
-	else if (cs == "indigo"              ) { output.setColor("#4b0082"); }
-	else if (cs == "ivory"               ) { output.setColor("#fffff0"); }
-	else if (cs == "khaki"               ) { output.setColor("#f0e68c"); }
-	else if (cs == "lavenderblush"       ) { output.setColor("#fff0f5"); }
-	else if (cs == "lavender"            ) { output.setColor("#e6e6fa"); }
-	else if (cs == "lawngreen"           ) { output.setColor("#7cfc00"); }
-	else if (cs == "lemonchiffon"        ) { output.setColor("#fffacd"); }
-	else if (cs == "lightblue"           ) { output.setColor("#add8e6"); }
-	else if (cs == "lightorange"         ) { output.setColor("#ff9c00"); }
-	else if (cs == "lightcoral"          ) { output.setColor("#f08080"); }
-	else if (cs == "lightcyan"           ) { output.setColor("#e0ffff"); }
-	else if (cs == "lightgoldenrodyellow") { output.setColor("#fafad2"); }
-	else if (cs == "lightgreen"          ) { output.setColor("#90ee90"); }
-	else if (cs == "lightgrey"           ) { output.setColor("#d3d3d3"); }
-	else if (cs == "lightpink"           ) { output.setColor("#ffb6c1"); }
-	else if (cs == "lightsalmon"         ) { output.setColor("#ffa07a"); }
-	else if (cs == "lightseagreen"       ) { output.setColor("#20b2aa"); }
-	else if (cs == "lightskyblue"        ) { output.setColor("#87cefa"); }
-	else if (cs == "lightslategray"      ) { output.setColor("#778899"); }
-	else if (cs == "lightsteelblue"      ) { output.setColor("#b0c4de"); }
-	else if (cs == "lightyellow"         ) { output.setColor("#ffffe0"); }
-	else if (cs == "lime"                ) { output.setColor("#00ff00"); }
-	else if (cs == "limegreen"           ) { output.setColor("#32cd32"); }
-	else if (cs == "linen"               ) { output.setColor("#faf0e6"); }
-	else if (cs == "magenta"             ) { output.setColor("#ff00ff"); }
-	else if (cs == "maroon"              ) { output.setColor("#800000"); }
-	else if (cs == "maroon"              ) { output.setColor("#800000"); }
-	else if (cs == "mediumaquamarine"    ) { output.setColor("#66cdaa"); }
-	else if (cs == "mediumblue"          ) { output.setColor("#0000cd"); }
-	else if (cs == "mediumorchid"        ) { output.setColor("#ba55d3"); }
-	else if (cs == "mediumpurple"        ) { output.setColor("#9370db"); }
-	else if (cs == "mediumseagreen"      ) { output.setColor("#3cb371"); }
-	else if (cs == "mediumslateblue"     ) { output.setColor("#7b68ee"); }
-	else if (cs == "mediumspringgreen"   ) { output.setColor("#00fa9a"); }
-	else if (cs == "mediumturquoise"     ) { output.setColor("#48d1cc"); }
-	else if (cs == "mediumvioletred"     ) { output.setColor("#c71585"); }
-	else if (cs == "midnightblue"        ) { output.setColor("#191970"); }
-	else if (cs == "mintcream"           ) { output.setColor("#f5fffa"); }
-	else if (cs == "mistyrose"           ) { output.setColor("#ffe4e1"); }
-	else if (cs == "moccasin"            ) { output.setColor("#ffe4b5"); }
-	else if (cs == "navajowhite"         ) { output.setColor("#ffdead"); }
-	else if (cs == "navy"                ) { output.setColor("#000080"); }
-	else if (cs == "navy"                ) { output.setColor("#000080"); }
-	else if (cs == "oldlace"             ) { output.setColor("#fdf5e6"); }
-	else if (cs == "olive"               ) { output.setColor("#6b8e23"); }
-	else if (cs == "olivedrab"           ) { output.setColor("#6b8e23"); }
-	else if (cs == "orange"              ) { output.setColor("#ff4500"); }
-	else if (cs == "orangered"           ) { output.setColor("#ff4500"); }
-	else if (cs == "orchid"              ) { output.setColor("#da70d6"); }
-	else if (cs == "palegoldenrod"       ) { output.setColor("#eee8aa"); }
-	else if (cs == "palegreen"           ) { output.setColor("#98fb98"); }
-	else if (cs == "paleturquoise"       ) { output.setColor("#afeeee"); }
-	else if (cs == "palevioletred"       ) { output.setColor("#db7093"); }
-	else if (cs == "papayawhip"          ) { output.setColor("#ffefd5"); }
-	else if (cs == "peachpuff"           ) { output.setColor("#ffdab9"); }
-	else if (cs == "peru"                ) { output.setColor("#cd853f"); }
-	else if (cs == "pink"                ) { output.setColor("#ffc8cb"); }
-	else if (cs == "plum"                ) { output.setColor("#dda0dd"); }
-	else if (cs == "powderblue"          ) { output.setColor("#b0e0e6"); }
-	else if (cs == "purple"              ) { output.setColor("#800080"); }
-	else if (cs == "purple"              ) { output.setColor("#800080"); }
-	else if (cs == "quartz"              ) { output.setColor("#c9c9f3"); }
-	else if (cs == "red"                 ) { output.setColor("#ff0000"); }
-	else if (cs == "rosybrown"           ) { output.setColor("#bc8f8f"); }
-	else if (cs == "royalblue"           ) { output.setColor("#4169e1"); }
-	else if (cs == "saddlebrown"         ) { output.setColor("#8b4513"); }
-	else if (cs == "salmon"              ) { output.setColor("#fa8072"); }
-	else if (cs == "sandybrown"          ) { output.setColor("#f4a460"); }
-	else if (cs == "seagreen"            ) { output.setColor("#2e8b57"); }
-	else if (cs == "seashell"            ) { output.setColor("#fff5ee"); }
-	else if (cs == "sienna"              ) { output.setColor("#a0522d"); }
-	else if (cs == "silver"              ) { output.setColor("#c0c0c0"); }
-	else if (cs == "silver"              ) { output.setColor("#c0c0c0"); }
-	else if (cs == "skyblue"             ) { output.setColor("#87ceeb"); }
-	else if (cs == "slateblue"           ) { output.setColor("#6a5acd"); }
-	else if (cs == "snow"                ) { output.setColor("#fffafa"); }
-	else if (cs == "steelblue"           ) { output.setColor("#4682b4"); }
-	else if (cs == "tan"                 ) { output.setColor("#d2b48c"); }
-	else if (cs == "teal"                ) { output.setColor("#008080"); }
-	else if (cs == "thistle"             ) { output.setColor("#d8bfd8"); }
-	else if (cs == "tomato"              ) { output.setColor("#ff6347"); }
-	else if (cs == "turquoise"           ) { output.setColor("#40e0d0"); }
-	else if (cs == "violet"              ) { output.setColor("#ee82ee"); }
-	else if (cs == "wheat"               ) { output.setColor("#f5deb3"); }
-	else if (cs == "white"               ) { output.setColor("#ffffff"); }
-	else if (cs == "white"               ) { output.setColor("#ffffff"); }
-	else if (cs == "whitesmoke"          ) { output.setColor("#f5f5f5"); }
-	else if (cs == "yellow"              ) { output.setColor("#ffff00"); }
-	else if (cs == "yellowgreen"         ) { output.setColor("#9acd32"); }
+	char fc = '\0';
+	if (cs.empty()) {
+		fc = cs[0];
+	}
+
+	switch (fc) {
+	case 'a':
+	if (cs == "aliceblue"           ) { output.setColor("#f0f8ff");  return output; }
+	if (cs == "antiquewhite"        ) { output.setColor("#faebd7");  return output; }
+	if (cs == "aqua"                ) { output.setColor("#00ffff");  return output; }
+	if (cs == "aquamarine"          ) { output.setColor("#7fffd4");  return output; }
+	if (cs == "azure"               ) { output.setColor("#f0ffff");  return output; }
+	break; case 'b':
+	if (cs == "beige"               ) { output.setColor("#f5f5dc");  return output; }
+	if (cs == "bisque"              ) { output.setColor("#ffe4c4");  return output; }
+	if (cs == "black"               ) { output.setColor("#000000");  return output; }
+	if (cs == "blanchediamond"      ) { output.setColor("#ffebcd");  return output; }
+	if (cs == "blue"                ) { output.setColor("#0000ff");  return output; }
+	if (cs == "blueviolet"          ) { output.setColor("#8a2be2");  return output; }
+	if (cs == "brown"               ) { output.setColor("#a52a2a");  return output; }
+	if (cs == "burlywood"           ) { output.setColor("#ffe4c4");  return output; }
+	break; case 'c':
+	if (cs == "cadetblue"           ) { output.setColor("#5f9ea0");  return output; }
+	if (cs == "chartreuse"          ) { output.setColor("#7fff00");  return output; }
+	if (cs == "coral"               ) { output.setColor("#ff7f50");  return output; }
+	if (cs == "cornflowerblue"      ) { output.setColor("#6495ed");  return output; }
+	if (cs == "cornsilk"            ) { output.setColor("#fff8dc");  return output; }
+	if (cs == "crimson"             ) { output.setColor("#dc143c");  return output; }
+	if (cs == "cyan"                ) { output.setColor("#00ffff");  return output; }
+	break; case 'd':
+	if (cs == "darkblue"            ) { output.setColor("#00008b");  return output; }
+	if (cs == "darkcyan"            ) { output.setColor("#008b8b");  return output; }
+	if (cs == "darkgoldenrod"       ) { output.setColor("#b8860b");  return output; }
+	if (cs == "darkgray"            ) { output.setColor("#a9a9a9");  return output; }
+	if (cs == "darkgreen"           ) { output.setColor("#006400");  return output; }
+	if (cs == "darkkhaki"           ) { output.setColor("#bdb76b");  return output; }
+	if (cs == "darkmagenta"         ) { output.setColor("#8b008b");  return output; }
+	if (cs == "darkolivegreen"      ) { output.setColor("#556b2f");  return output; }
+	if (cs == "darkorange"          ) { output.setColor("#ff8c00");  return output; }
+	if (cs == "darkorchid"          ) { output.setColor("#9932cc");  return output; }
+	if (cs == "darkred"             ) { output.setColor("#8b0000");  return output; }
+	if (cs == "darksalmon"          ) { output.setColor("#e9967a");  return output; }
+	if (cs == "darkseagreen"        ) { output.setColor("#8dbc8f");  return output; }
+	if (cs == "darkslateblue"       ) { output.setColor("#483d8b");  return output; }
+	if (cs == "darkslategray"       ) { output.setColor("#2e4e4e");  return output; }
+	if (cs == "darkturquoise"       ) { output.setColor("#00ded1");  return output; }
+	if (cs == "darkviolet"          ) { output.setColor("#9400d3");  return output; }
+	if (cs == "deeppink"            ) { output.setColor("#ff1493");  return output; }
+	if (cs == "deepskyblue"         ) { output.setColor("#00bfff");  return output; }
+	if (cs == "dimgray"             ) { output.setColor("#696969");  return output; }
+	if (cs == "dodgerblue"          ) { output.setColor("#1e90ff");  return output; }
+	break; case 'f':
+	if (cs == "firebrick"           ) { output.setColor("#b22222");  return output; }
+	if (cs == "floralwhite"         ) { output.setColor("#fffaf0");  return output; }
+	if (cs == "forestgreen"         ) { output.setColor("#228b22");  return output; }
+	if (cs == "fuchsia"             ) { output.setColor("#ff00ff");  return output; }
+	break; case 'g':
+	if (cs == "gainsboro"           ) { output.setColor("#dcdcdc");  return output; }
+	if (cs == "ghostwhite"          ) { output.setColor("#f8f8ff");  return output; }
+	if (cs == "gold"                ) { output.setColor("#ffd700");  return output; }
+	if (cs == "goldenrod"           ) { output.setColor("#daa520");  return output; }
+	if (cs == "gray"                ) { output.setColor("#808080");  return output; }
+	if (cs == "gray"                ) { output.setColor("#808080");  return output; }
+	if (cs == "green"               ) { output.setColor("#008000");  return output; }
+	if (cs == "greenyellow"         ) { output.setColor("#adff2f");  return output; }
+	break; case 'h':
+	if (cs == "honeydew"            ) { output.setColor("#f0fff0");  return output; }
+	if (cs == "hotpink"             ) { output.setColor("#ff69b4");  return output; }
+	if (cs == "indianred"           ) { output.setColor("#cd5c5c");  return output; }
+	break; case 'i':
+	if (cs == "indigo"              ) { output.setColor("#4b0082");  return output; }
+	if (cs == "ivory"               ) { output.setColor("#fffff0");  return output; }
+	break; case 'k':
+	if (cs == "khaki"               ) { output.setColor("#f0e68c");  return output; }
+	break; case 'l':
+	if (cs == "lavenderblush"       ) { output.setColor("#fff0f5");  return output; }
+	if (cs == "lavender"            ) { output.setColor("#e6e6fa");  return output; }
+	if (cs == "lawngreen"           ) { output.setColor("#7cfc00");  return output; }
+	if (cs == "lemonchiffon"        ) { output.setColor("#fffacd");  return output; }
+	if (cs == "lightblue"           ) { output.setColor("#add8e6");  return output; }
+	if (cs == "lightorange"         ) { output.setColor("#ff9c00");  return output; }
+	if (cs == "lightcoral"          ) { output.setColor("#f08080");  return output; }
+	if (cs == "lightcyan"           ) { output.setColor("#e0ffff");  return output; }
+	if (cs == "lightgoldenrodyellow") { output.setColor("#fafad2");  return output; }
+	if (cs == "lightgreen"          ) { output.setColor("#90ee90");  return output; }
+	if (cs == "lightgrey"           ) { output.setColor("#d3d3d3");  return output; }
+	if (cs == "lightpink"           ) { output.setColor("#ffb6c1");  return output; }
+	if (cs == "lightsalmon"         ) { output.setColor("#ffa07a");  return output; }
+	if (cs == "lightseagreen"       ) { output.setColor("#20b2aa");  return output; }
+	if (cs == "lightskyblue"        ) { output.setColor("#87cefa");  return output; }
+	if (cs == "lightslategray"      ) { output.setColor("#778899");  return output; }
+	if (cs == "lightsteelblue"      ) { output.setColor("#b0c4de");  return output; }
+	if (cs == "lightyellow"         ) { output.setColor("#ffffe0");  return output; }
+	if (cs == "lime"                ) { output.setColor("#00ff00");  return output; }
+	if (cs == "limegreen"           ) { output.setColor("#32cd32");  return output; }
+	if (cs == "linen"               ) { output.setColor("#faf0e6");  return output; }
+	break; case 'm':
+	if (cs == "magenta"             ) { output.setColor("#ff00ff");  return output; }
+	if (cs == "maroon"              ) { output.setColor("#800000");  return output; }
+	if (cs == "maroon"              ) { output.setColor("#800000");  return output; }
+	if (cs == "mediumaquamarine"    ) { output.setColor("#66cdaa");  return output; }
+	if (cs == "mediumblue"          ) { output.setColor("#0000cd");  return output; }
+	if (cs == "mediumorchid"        ) { output.setColor("#ba55d3");  return output; }
+	if (cs == "mediumpurple"        ) { output.setColor("#9370db");  return output; }
+	if (cs == "mediumseagreen"      ) { output.setColor("#3cb371");  return output; }
+	if (cs == "mediumslateblue"     ) { output.setColor("#7b68ee");  return output; }
+	if (cs == "mediumspringgreen"   ) { output.setColor("#00fa9a");  return output; }
+	if (cs == "mediumturquoise"     ) { output.setColor("#48d1cc");  return output; }
+	if (cs == "mediumvioletred"     ) { output.setColor("#c71585");  return output; }
+	if (cs == "midnightblue"        ) { output.setColor("#191970");  return output; }
+	if (cs == "mintcream"           ) { output.setColor("#f5fffa");  return output; }
+	if (cs == "mistyrose"           ) { output.setColor("#ffe4e1");  return output; }
+	if (cs == "moccasin"            ) { output.setColor("#ffe4b5");  return output; }
+	break; case 'n':
+	if (cs == "navajowhite"         ) { output.setColor("#ffdead");  return output; }
+	if (cs == "navy"                ) { output.setColor("#000080");  return output; }
+	if (cs == "navy"                ) { output.setColor("#000080");  return output; }
+	break; case 'o':
+	if (cs == "oldlace"             ) { output.setColor("#fdf5e6");  return output; }
+	if (cs == "olive"               ) { output.setColor("#6b8e23");  return output; }
+	if (cs == "olivedrab"           ) { output.setColor("#6b8e23");  return output; }
+	if (cs == "orange"              ) { output.setColor("#ff4500");  return output; }
+	if (cs == "orangered"           ) { output.setColor("#ff4500");  return output; }
+	if (cs == "orchid"              ) { output.setColor("#da70d6");  return output; }
+	break; case 'p':
+	if (cs == "palegoldenrod"       ) { output.setColor("#eee8aa");  return output; }
+	if (cs == "palegreen"           ) { output.setColor("#98fb98");  return output; }
+	if (cs == "paleturquoise"       ) { output.setColor("#afeeee");  return output; }
+	if (cs == "palevioletred"       ) { output.setColor("#db7093");  return output; }
+	if (cs == "papayawhip"          ) { output.setColor("#ffefd5");  return output; }
+	if (cs == "peachpuff"           ) { output.setColor("#ffdab9");  return output; }
+	if (cs == "peru"                ) { output.setColor("#cd853f");  return output; }
+	if (cs == "pink"                ) { output.setColor("#ffc8cb");  return output; }
+	if (cs == "plum"                ) { output.setColor("#dda0dd");  return output; }
+	if (cs == "powderblue"          ) { output.setColor("#b0e0e6");  return output; }
+	if (cs == "purple"              ) { output.setColor("#800080");  return output; }
+	if (cs == "purple"              ) { output.setColor("#800080");  return output; }
+	break; case 'q':
+	if (cs == "quartz"              ) { output.setColor("#c9c9f3");  return output; }
+	break; case 'r':
+	if (cs == "red"                 ) { output.setColor("#ff0000");  return output; }
+	if (cs == "rosybrown"           ) { output.setColor("#bc8f8f");  return output; }
+	if (cs == "royalblue"           ) { output.setColor("#4169e1");  return output; }
+	break; case 's':
+	if (cs == "saddlebrown"         ) { output.setColor("#8b4513");  return output; }
+	if (cs == "salmon"              ) { output.setColor("#fa8072");  return output; }
+	if (cs == "sandybrown"          ) { output.setColor("#f4a460");  return output; }
+	if (cs == "seagreen"            ) { output.setColor("#2e8b57");  return output; }
+	if (cs == "seashell"            ) { output.setColor("#fff5ee");  return output; }
+	if (cs == "sienna"              ) { output.setColor("#a0522d");  return output; }
+	if (cs == "silver"              ) { output.setColor("#c0c0c0");  return output; }
+	if (cs == "silver"              ) { output.setColor("#c0c0c0");  return output; }
+	if (cs == "skyblue"             ) { output.setColor("#87ceeb");  return output; }
+	if (cs == "slateblue"           ) { output.setColor("#6a5acd");  return output; }
+	if (cs == "snow"                ) { output.setColor("#fffafa");  return output; }
+	if (cs == "steelblue"           ) { output.setColor("#4682b4");  return output; }
+	break; case 't':
+	if (cs == "tan"                 ) { output.setColor("#d2b48c");  return output; }
+	if (cs == "teal"                ) { output.setColor("#008080");  return output; }
+	if (cs == "thistle"             ) { output.setColor("#d8bfd8");  return output; }
+	if (cs == "tomato"              ) { output.setColor("#ff6347");  return output; }
+	if (cs == "turquoise"           ) { output.setColor("#40e0d0");  return output; }
+	break; case 'v':
+	if (cs == "violet"              ) { output.setColor("#ee82ee");  return output; }
+	break; case 'w':
+	if (cs == "wheat"               ) { output.setColor("#f5deb3");  return output; }
+	if (cs == "white"               ) { output.setColor("#ffffff");  return output; }
+	if (cs == "white"               ) { output.setColor("#ffffff");  return output; }
+	if (cs == "whitesmoke"          ) { output.setColor("#f5f5f5");  return output; }
+	break; case 'y':
+	if (cs == "yellow"              ) { output.setColor("#ffff00");  return output; }
+	if (cs == "yellowgreen"         ) { output.setColor("#9acd32");  return output; }
+	}
 
 	// References:
 	//            http://netdancer.com/rgbblk.htm
