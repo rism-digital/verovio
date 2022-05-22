@@ -207,6 +207,8 @@ namespace humaux {
         // Used for tremolo compression
         bool tremolo;
 
+        bool suppress_articulations;
+
         // Used for sustain pedal
         bool pedal;
 
@@ -777,6 +779,7 @@ protected:
     std::vector<hum::HTp> getBeamNotes(hum::HTp token, int beamstart);
     bool checkForBeamSameas(Beam *beam, std::vector<hum::HTp> &layerdata, int layerindex);
     bool checkForBeamStemSameas(std::vector<hum::HTp> &layerdata, int layerindex);
+    void processInterpretationStuff(hum::HTp token, int staffindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

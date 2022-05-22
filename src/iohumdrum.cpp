@@ -360,6 +360,7 @@ namespace humaux {
         verse = false;
         suppress_tuplet_number = false;
         suppress_tuplet_bracket = false;
+        suppress_articulations = false;
         tremolo = false;
         pedal = false;
         righthalfstem = false;
@@ -413,6 +414,7 @@ namespace humaux {
         out << prefix << "verse                    =  " << verse << endl;
         out << prefix << "suppress_tuplet_number   =  " << suppress_tuplet_number << endl;
         out << prefix << "suppress_tuplet_bracket  =  " << suppress_tuplet_bracket << endl;
+        out << prefix << "suppress_articulations   =  " << suppress_articulations << endl;
         out << prefix << "tremolo                  =  " << tremolo << endl;
         // vector<bool> cue_size;
         // vector<char> stem_type;
@@ -9634,6 +9636,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             continue;
         }
         if (layerdata[i]->isInterpretation()) {
+            processInterpretationStuff(layerdata[i], staffindex);
             if (*layerdata[i] == "*join") {
                 m_join = true;
                 continue;
@@ -10244,6 +10247,37 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processInterpretationStuff --
+//
+
+void HumdrumInput::processInterpretationStuff(hum::HTp token, int staffindex)
+{
+    if (!token->isInterpretation()) {
+        return;
+    }
+
+    if (token->compare(0, 8, "*Xartic:") == 0) {
+        if (token->find("simile") != std::string::npos) {
+            std::string placement = "below";
+            if (token->find(":a") != std::string::npos) {
+                placement = "above";
+            }
+            bool bold = false;
+            if (token->find(":B") != std::string::npos) {
+                bold = true;
+            }
+            bool italic = true;
+            int justification = 0;
+            std::string color;
+            int vgroup = -1;
+            addDirection("simile", placement, bold, italic, token, staffindex, justification, color, vgroup);
+            return;
+        }
+    }
 }
 
 //////////////////////////////
@@ -11336,6 +11370,10 @@ void HumdrumInput::addPlicaUp(Note *note)
 
 template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hum::HTp token)
 {
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    int staffindex = m_rkern[token->getTrack()];
+
     // store artics in random access grid, along with their staff positions:
     vector<int> articcount(128, 0); // number of explicit articulations (when duplicating with "X" postfix).
     vector<int> articloc(128, 0);
@@ -11611,7 +11649,14 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             oneartic.clear();
             oneartic.push_back(artics.at(i));
             if (gestural.at(i)) {
-                // artic->SetArticGes(oneartic);
+                // can only add one gestural articulation?
+                // artic->SetArticGes(artics.at(i));
+                // artic->SetArticGes(onartic);
+                continue;
+            }
+            if (ss[staffindex].suppress_articulations) {
+                // artic->SetArticGes(artics.at(i));
+                // artic->SetArticGes(onartic);
                 continue;
             }
             else {
@@ -12619,6 +12664,7 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
 
 void HumdrumInput::processDirections(hum::HTp token, int staffindex)
 {
+
     int lcount = token->getLinkedParameterSetCount();
     for (int i = 0; i < lcount; ++i) {
         processLinkedDirection(i, token, staffindex);
@@ -18853,25 +18899,36 @@ hum::HumNum HumdrumInput::removeFactorsOfTwo(hum::HumNum value, int &tcount, int
 //     that are turned on/off by interpretation tokens.
 //
 // Controls that this function deals with:
+//    *artic       = show articulations on notes
+//    *Xartic      = hide articulations on notes
+//
 //    *Xtuplet     = suppress beam and bracket tuplet numbers
 //    *tuplet      = display beam and bracket tuplet numbers
+//
 //    *Xtremolo    = terminal *tremelo contraction
 //    *tremolo     = merge possible beam groups into tremolos
+//
 //    *Xbeamtup    = suppress beam tuplet numbers
 //    *beamtup     = display beam tuplet numbers
+//
 //    *Xbrackettup = suppress tuplet brackets
 //    *brackettup  = display tuplet brackets
+//
 //    *Xcue        = notes back to regular size (operates at layer level rather than staff level).
 //    *cue         = display notes in cue size (operates at layer level rather than staff level).
+//
 //    *kcancel     = display cancellation key signatures
 //    *Xkcancel    = do not display cancellation key signatures (default)
+//
 //    *2\right     = place stems on right side of half notes when stem is down.
 //    *2\left      = place stems on left side of half notes when stem is down.
+//
 //    *stem:       = automatic assignment of stems if there are no stems on the note already.
 //       *stem:X   = no automatic assignment
 //       *stem:x   = no stem
-//       *stem:/   = no stem up
-//       *stem:\   = no stem down
+//       *stem:/   = stem up
+//       *stem:\   = stem down
+//
 //    *head:       = notehead shape
 //
 
@@ -18892,6 +18949,13 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     }
     else if (value == "*brackettup") {
         ss[staffindex].suppress_tuplet_bracket = false;
+    }
+
+    if ((value == "*Xartic") || (value.compare(0, 8, "*Xartic:") == 0)) {
+        ss[staffindex].suppress_articulations = true;
+    }
+    else if ((value == "*artic") || (value.compare(0, 7, "*artic:") == 0)) {
+        ss[staffindex].suppress_articulations = false;
     }
 
     if (value == "*Xtuplet") {
