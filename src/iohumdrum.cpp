@@ -15467,7 +15467,7 @@ std::string HumdrumInput::escapeFreeAmpersand(const std::string &value)
             output += value[i];
             continue;
         }
-        int solo = false;
+        bool solo = false;
         int lastj = i;
         for (int j = i + 1; j < (int)value.size(); j++) {
             if (value[j] == ' ') {
