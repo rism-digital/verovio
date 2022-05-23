@@ -20,6 +20,7 @@
 #include "layerdef.h"
 #include "metersiggrp.h"
 #include "staffgrp.h"
+#include "transposition.h"
 #include "tuning.h"
 #include "vrv.h"
 
@@ -191,6 +192,27 @@ int StaffDef::PrepareDuration(FunctorParams *functorParams)
 
     if (this->HasDurDefault() && this->HasN()) {
         params->m_durDefaultForStaffN[this->GetN()] = this->GetDurDefault();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int StaffDef::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    if (params->m_transposeToSoundingPitch) {
+        if (this->HasTransSemi() && this->HasN()) {
+            const int roundedValue = static_cast<int>(std::round(this->GetTransSemi()));
+            params->m_transSemiForStaffN[this->GetN()] = roundedValue;
+            // Set transposition to trigger changes in KeySig
+            params->m_transposer->SetTransposition(roundedValue);
+            this->ResetTransposition();
+        }
+        else {
+            params->m_transposer->SetTransposition(0);
+        }
     }
 
     return FUNCTOR_CONTINUE;

@@ -127,6 +127,7 @@ int Mdiv::Transpose(FunctorParams *functorParams)
     assert(params);
 
     params->m_currentMdivUuids.push_back(this->GetUuid());
+    params->m_transSemiForStaffN.clear();
 
     return FUNCTOR_CONTINUE;
 }

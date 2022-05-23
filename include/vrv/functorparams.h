@@ -2607,6 +2607,7 @@ public:
  * member 4: the mdiv selected for transposition
  * member 5: the list of current (nested) mdivs
  * member 6: transpose to sounding pitch by evaluating @trans.semi
+ * member 7: pitch shift in semitones for staff
  **/
 
 class TransposeParams : public FunctorParams {
@@ -2625,6 +2626,7 @@ public:
     std::string m_selectedMdivUuid;
     std::list<std::string> m_currentMdivUuids;
     bool m_transposeToSoundingPitch;
+    std::map<int, int> m_transSemiForStaffN;
 };
 
 //----------------------------------------------------------------------------
