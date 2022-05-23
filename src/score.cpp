@@ -317,15 +317,15 @@ int Score::Transpose(FunctorParams *functorParams)
         // Find the starting key tonic of the data to use in calculating the tranposition interval:
         // Set transposition by key tonic.
         // Detect the current key from the keysignature.
-        KeySig *keysig = vrv_cast<KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
+        KeySig *keySig = vrv_cast<KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
         // If there is no keysignature, assume it is C.
         TransPitch currentKey = TransPitch(0, 0, 0);
-        if (keysig && keysig->HasPname()) {
-            currentKey = TransPitch(keysig->GetPname(), ACCIDENTAL_GESTURAL_NONE, keysig->GetAccid(), 0);
+        if (keySig && keySig->HasPname()) {
+            currentKey = TransPitch(keySig->GetPname(), ACCIDENTAL_GESTURAL_NONE, keySig->GetAccid(), 0);
         }
-        else if (keysig) {
+        else if (keySig) {
             // No tonic pitch in key signature, so infer from key signature.
-            int fifthsInt = keysig->GetFifthsInt();
+            int fifthsInt = keySig->GetFifthsInt();
             // Check the keySig@mode is present (currently assuming major):
             currentKey = transposer->CircleOfFifthsToMajorTonic(fifthsInt);
             // need to add a dummy "0" key signature in score (staffDefs of staffDef).
@@ -333,10 +333,10 @@ int Score::Transpose(FunctorParams *functorParams)
         transposer->SetTransposition(currentKey, transposition);
     }
     else if (transposer->IsValidSemitones(transposition)) {
-        KeySig *keysig = vrv_cast<KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
+        KeySig *keySig = vrv_cast<KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
         int fifths = 0;
-        if (keysig) {
-            fifths = keysig->GetFifthsInt();
+        if (keySig) {
+            fifths = keySig->GetFifthsInt();
         }
         else {
             LogWarning("No key signature in data, assuming no key signature with no sharps/flats.");

@@ -203,11 +203,15 @@ int StaffDef::Transpose(FunctorParams *functorParams)
     assert(params);
 
     if (params->m_transposeToSoundingPitch) {
-        if (this->HasTransSemi() && this->HasN()) {
-            const int roundedValue = static_cast<int>(std::round(this->GetTransSemi()));
-            params->m_transSemiForStaffN[this->GetN()] = roundedValue;
-            // Set transposition to trigger changes in KeySig
-            params->m_transposer->SetTransposition(roundedValue);
+        const KeySig *keySig = vrv_cast<const KeySig *>(this->FindDescendantByType(KEYSIG));
+        if (keySig && this->HasTransSemi() && this->HasN()) {
+            const int fifths = keySig->GetFifthsInt();
+            int semitones = static_cast<int>(std::round(this->GetTransSemi()));
+            // Factor out octave transpositions
+            const int sign = (semitones >= 0) ? +1 : -1;
+            semitones = sign * (std::abs(semitones) % 24);
+            params->m_transposer->SetTransposition(fifths, std::to_string(semitones));
+            params->m_transposeIntervalForStaffN[this->GetN()] = params->m_transposer->GetTranspositionIntervalClass();
             this->ResetTransposition();
         }
         else {
