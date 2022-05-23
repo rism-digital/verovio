@@ -53,15 +53,17 @@ public:
     void AddChild(Object *object) override;
 
     /**
-     * @name Setter and getter for darwing elements and position
+     * @name Setter and getter for drawing elements and position
      */
     ///@{
     LayerElement *GetDrawingLeft() { return m_drawingLeft; }
+    const LayerElement *GetDrawingLeft() const { return m_drawingLeft; }
     void SetDrawingLeft(LayerElement *drawingLeft) { m_drawingLeft = drawingLeft; }
     LayerElement *GetDrawingRight() { return m_drawingRight; }
+    const LayerElement *GetDrawingRight() const { return m_drawingRight; }
     void SetDrawingRight(LayerElement *drawingRight) { m_drawingRight = drawingRight; }
-    data_STAFFREL_basic GetDrawingBracketPos() { return m_drawingBracketPos; }
-    data_STAFFREL_basic GetDrawingNumPos() { return m_drawingNumPos; }
+    data_STAFFREL_basic GetDrawingBracketPos() const { return m_drawingBracketPos; }
+    data_STAFFREL_basic GetDrawingNumPos() const { return m_drawingNumPos; }
     ///@}
 
     /**
@@ -69,7 +71,9 @@ public:
      */
     ///@{
     Beam *GetBracketAlignedBeam() { return m_bracketAlignedBeam; }
+    const Beam *GetBracketAlignedBeam() const { return m_bracketAlignedBeam; }
     Beam *GetNumAlignedBeam() { return m_numAlignedBeam; }
+    const Beam *GetNumAlignedBeam() const { return m_numAlignedBeam; }
     ///@}
 
     /**
