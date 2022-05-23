@@ -934,11 +934,11 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
                 dc->StartCustomGraphic("keyAccid");
 
-            this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+                this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
 
-            dc->EndCustomGraphic();
+                dc->EndCustomGraphic();
 
-            x += naturalGlyphWidth + naturalStep;
+                x += naturalGlyphWidth + naturalStep;
                 if ((keySig->GetAccidCount() > 0) && (i + 1 == keySig->m_drawingCancelAccidCount)) {
                     // Add some extra space after last natural
                     x += step;
