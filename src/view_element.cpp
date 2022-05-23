@@ -620,8 +620,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     dc->EndGraphic(element, this);
 }
 
-void View::DrawClefEnclosing(
-    DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y)
+void View::DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y)
 {
     if ((clef->GetEnclose() == ENCLOSURE_brack) || (clef->GetEnclose() == ENCLOSURE_box)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
