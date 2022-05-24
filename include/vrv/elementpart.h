@@ -171,13 +171,18 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for darwing rel positions
+     * @name Setter and getter for drawing rel positions
      */
     ///@{
     int GetDrawingXRelLeft() { return m_drawingXRelLeft; }
     void SetDrawingXRelLeft(int drawingXRelLeft) { m_drawingXRelLeft = drawingXRelLeft; }
     int GetDrawingXRelRight() { return m_drawingXRelRight; }
     void SetDrawingXRelRight(int drawingXRelRight) { m_drawingXRelRight = drawingXRelRight; }
+    // Vertical positions
+    int GetDrawingYRelLeft() const { return m_drawingYRelLeft; }
+    void SetDrawingYRelLeft(int drawingYRelLeft) { m_drawingYRelLeft = drawingYRelLeft; }
+    int GetDrawingYRelRight() const { return m_drawingYRelRight; }
+    void SetDrawingYRelRight(int drawingYRelRight) { m_drawingYRelRight = drawingYRelRight; }
     ///@}
 
     /**
@@ -238,6 +243,14 @@ private:
      * The right X position is the one of the last Chord / Note / Rest in the tuplet
      */
     int m_drawingXRelRight;
+    /**
+     * The YRel shift for the left X position.
+     */
+    int m_drawingYRelLeft = 0;
+    /**
+     * The YRel shift for the right X position.
+     */
+    int m_drawingYRelRight = 0;
     /** A pointer to the num with which the TupletBracket is aligned (if any) */
     TupletNum *m_alignedNum;
 };
