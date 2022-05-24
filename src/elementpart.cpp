@@ -501,15 +501,16 @@ int Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
     const int glyphHeight = doc->GetGlyphHeight(code, staffSize, false);
     const int actualLength = std::abs(this->GetDrawingStemLen()) - lenAdjust / unit * unit;
     const int diff = actualLength - std::abs(m_stemModRelY) - 0.5 * glyphHeight;
+    const int halfUnit = 0.5 * unit;
 
     int adjust = 0;
-    if ((diff < 0.5 * unit) && (diff >= -0.5 * unit)) {
-        adjust = 0.5 * unit;
+    if ((diff < halfUnit) && (diff >= -halfUnit)) {
+        adjust = halfUnit;
     }
-    else if (diff < -0.5 * unit) {
-        adjust = (std::abs(diff) / unit + 1) * unit;
+    else if (diff < -halfUnit) {
+        adjust = (std::abs(diff) / halfUnit + 1) * halfUnit;
         if (stemMod == STEMMODIFIER_6slash) {
-            adjust += doc->GetGlyphHeight(SMUFL_E220_tremolo1, staffSize, false) / 2;
+            adjust += doc->GetGlyphHeight(SMUFL_E220_tremolo1, staffSize, false) / 4;
         }
     }
     return ((this->GetDrawingStemDir() == STEMDIRECTION_up) ? -adjust : adjust);
