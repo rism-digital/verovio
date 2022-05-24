@@ -367,7 +367,12 @@ void LayerElement::GetChordOverflow(StaffAlignment *&above, StaffAlignment *&bel
     }
 }
 
-Alignment *LayerElement::GetGraceAlignment() const
+Alignment *LayerElement::GetGraceAlignment()
+{
+    return const_cast<Alignment *>(std::as_const(*this).GetGraceAlignment());
+}
+
+const Alignment *LayerElement::GetGraceAlignment() const
 {
     assert(m_graceAlignment);
     return m_graceAlignment;

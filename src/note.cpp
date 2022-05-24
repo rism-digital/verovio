@@ -333,7 +333,7 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
     }
 }
 
-bool Note::IsUnisonWith(Note *note, bool ignoreAccid)
+bool Note::IsUnisonWith(const Note *note, bool ignoreAccid) const
 {
     if (!ignoreAccid && !this->IsEnharmonicWith(note)) return false;
 
@@ -660,12 +660,12 @@ void Note::CalcNoteHeadShiftForSameasNote(Note *stemSameas, data_STEMDIRECTION s
     noteToShift->SetFlippedNotehead(true);
 }
 
-bool Note::IsEnharmonicWith(Note *note)
+bool Note::IsEnharmonicWith(const Note *note) const
 {
     return (this->GetMIDIPitch() == note->GetMIDIPitch());
 }
 
-int Note::GetMIDIPitch(const int shift)
+int Note::GetMIDIPitch(const int shift) const
 {
     int pitch = 0;
 
@@ -697,7 +697,7 @@ int Note::GetMIDIPitch(const int shift)
     }
     else if (this->HasTabCourse()) {
         // tablature
-        Staff *staff = this->GetAncestorStaff();
+        const Staff *staff = this->GetAncestorStaff();
         if (staff->m_drawingTuning) {
             pitch = staff->m_drawingTuning->CalcPitchNumber(
                 this->GetTabCourse(), this->GetTabFret(), staff->m_drawingNotationType);
@@ -708,9 +708,9 @@ int Note::GetMIDIPitch(const int shift)
     return pitch + shift;
 }
 
-int Note::GetChromaticAlteration()
+int Note::GetChromaticAlteration() const
 {
-    Accid *accid = this->GetDrawingAccid();
+    const Accid *accid = this->GetDrawingAccid();
 
     if (accid) {
         return TransPitch::GetChromaticAlteration(accid->GetAccidGes(), accid->GetAccid());

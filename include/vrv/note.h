@@ -168,7 +168,7 @@ public:
      * Return true if the note is a unison.
      * If ignoreAccid is set to true then only @pname and @oct are compared.
      */
-    bool IsUnisonWith(Note *note, bool ignoreAccid = false);
+    bool IsUnisonWith(const Note *note, bool ignoreAccid = false) const;
 
     /**
      * @name Setter and getter for the chord cluster and the position of the note
@@ -214,7 +214,7 @@ public:
     /**
      * Check whether current note is enharmonic with another
      */
-    bool IsEnharmonicWith(Note *note);
+    bool IsEnharmonicWith(const Note *note) const;
 
     /**
      * Check if a note or its parent chord are visible
@@ -224,7 +224,7 @@ public:
     /**
      * MIDI pitch
      */
-    int GetMIDIPitch(int shift = 0);
+    int GetMIDIPitch(int shift = 0) const;
 
     /**
      * @name Checker, getter and setter for a note with which the stem is shared
@@ -365,7 +365,7 @@ private:
     /**
      * Get the pitch difference in semitones of the accidental (implicit or explicit) for this note.
      */
-    int GetChromaticAlteration();
+    int GetChromaticAlteration() const;
 
     TransPitch GetTransPitch();
 
