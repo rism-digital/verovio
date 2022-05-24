@@ -754,4 +754,28 @@ int ScoreDef::PrepareDuration(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int ScoreDef::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    if (params->m_transposeToSoundingPitch) {
+        // Set the transposition in order to transpose common key signatures
+        // (i.e. encoded as ScoreDef attributes or direct KeySig children)
+        const std::vector<int> staffNs = this->GetStaffNs();
+        if (staffNs.empty()) {
+            int transposeInterval = 0;
+            if (!params->m_transposeIntervalForStaffN.empty()) {
+                transposeInterval = params->m_transposeIntervalForStaffN.begin()->second;
+            }
+            params->m_transposer->SetTransposition(transposeInterval);
+        }
+        else {
+            this->GetStaffDef(staffNs.front())->Transpose(functorParams);
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

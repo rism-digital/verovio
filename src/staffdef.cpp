@@ -203,7 +203,13 @@ int StaffDef::Transpose(FunctorParams *functorParams)
     assert(params);
 
     if (params->m_transposeToSoundingPitch) {
+        // Retrieve the key signature
         const KeySig *keySig = vrv_cast<const KeySig *>(this->FindDescendantByType(KEYSIG));
+        if (!keySig) {
+            const ScoreDef *scoreDef = vrv_cast<const ScoreDef *>(this->GetFirstAncestor(SCOREDEF));
+            keySig = vrv_cast<const KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
+        }
+        // Determine and store the transposition interval (based on keySig)
         if (keySig && this->HasTransSemi() && this->HasN()) {
             const int fifths = keySig->GetFifthsInt();
             int semitones = static_cast<int>(std::round(this->GetTransSemi()));
@@ -215,7 +221,11 @@ int StaffDef::Transpose(FunctorParams *functorParams)
             this->ResetTransposition();
         }
         else {
-            params->m_transposer->SetTransposition(0);
+            int transposeInterval = 0;
+            if (this->HasN() && (params->m_transposeIntervalForStaffN.count(this->GetN()) > 0)) {
+                transposeInterval = params->m_transposeIntervalForStaffN.at(this->GetN());
+            }
+            params->m_transposer->SetTransposition(transposeInterval);
         }
     }
 
