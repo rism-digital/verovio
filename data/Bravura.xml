@@ -34,6 +34,9 @@
   <g c="E075" x="0.0" y="-506.0" w="699.0" h="1012.0" h-a-x="699" n="cClefReversed"/>
   <g c="E076" x="0.0" y="-635.0" w="689.0" h="897.0" h-a-x="689" n="fClefReversed"/>
   <g c="E077" x="0.0" y="-264.0" w="689.0" h="897.0" h-a-x="684" n="fClefTurned"/>
+  <g c="E07A" x="0.0" y="-455.0" w="440.0" h="1162.0" h-a-x="440" n="gClefChange"/>
+  <g c="E07B" x="0.0" y="-332.0" w="506.0" h="664.0" h-a-x="506" n="cClefChange"/>
+  <g c="E07C" x="-15.0" y="-414.0" w="478.0" h="584.0" h-a-x="462" n="fClefChange"/>
   <g c="E080" x="20.0" y="-250.0" w="430.0" h="501.0" h-a-x="470" n="timeSig0"/>
   <g c="E081" x="20.0" y="-250.0" w="294.0" h="501.0" h-a-x="334" n="timeSig1"/>
   <g c="E082" x="20.0" y="-257.0" w="406.0" h="511.0" h-a-x="446" n="timeSig2"/>
@@ -961,6 +964,7 @@
     <a n="stemUpSE" x="1.32" y="0.19"/>
   </g>
   <g c="F4BF" x="0.0" y="-539.0" w="643.0" h="1077.0" h-a-x="643" n="cClefFrench20C"/>
+  <g c="F4C0" x="0.0" y="-359.0" w="472.0" h="724.0" h-a-x="472" n="cClefFrench20CChange"/>
   <g c="F4C2" x="0.0" y="-8.0" w="646.0" h="469.0" h-a-x="646" n="sedicesima"/>
   <g c="F4C3" x="0.0" y="-8.0" w="1315.0" h="469.0" h-a-x="1316" n="sedicesimaAlta"/>
   <g c="F4C4" x="0.0" y="-8.0" w="1285.0" h="469.0" h-a-x="1286" n="sedicesimaBassa"/>
