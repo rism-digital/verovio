@@ -759,6 +759,8 @@ int ScoreDef::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
+    params->m_hasScoreDefKeySig = false;
+
     if (params->m_transposeToSoundingPitch) {
         // Set the transposition in order to transpose common key signatures
         // (i.e. encoded as ScoreDef attributes or direct KeySig children)
@@ -772,6 +774,35 @@ int ScoreDef::Transpose(FunctorParams *functorParams)
         }
         else {
             this->GetStaffDef(staffNs.front())->Transpose(functorParams);
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int ScoreDef::TransposeEnd(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    if (params->m_transposeToSoundingPitch && params->m_hasScoreDefKeySig) {
+        bool showWarning = false;
+        // Check if some staves are untransposed
+        const int mapEntryCount = static_cast<int>(params->m_transposeIntervalForStaffN.size());
+        if ((mapEntryCount > 0) && (mapEntryCount < this->GetStaffNs().size())) {
+            showWarning = true;
+        }
+        // Check if there are different transpositions
+        auto iter = std::adjacent_find(params->m_transposeIntervalForStaffN.begin(),
+            params->m_transposeIntervalForStaffN.end(),
+            [](const auto &mapEntry1, const auto &mapEntry2) { return (mapEntry1.second != mapEntry2.second); });
+        if (iter != params->m_transposeIntervalForStaffN.end()) {
+            showWarning = true;
+        }
+        // Display warning
+        if (showWarning) {
+            LogWarning("Transpose to sounding pitch cannot handle different transpositions for ScoreDef key "
+                       "signatures. Please encode KeySig as StaffDef attribute or child.");
         }
     }
 

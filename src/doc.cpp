@@ -1362,7 +1362,7 @@ void Doc::TransposeDoc()
 
     Functor transpose(&Object::Transpose);
     Functor transposeEnd(&Object::TransposeEnd);
-    TransposeParams transposeParams(this, &transpose, &transposer);
+    TransposeParams transposeParams(this, &transpose, &transposeEnd, &transposer);
 
     if (m_options->m_transposeSelectedOnly.GetValue() == false) {
         transpose.m_visibleOnly = false;

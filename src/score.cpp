@@ -299,7 +299,7 @@ int Score::Transpose(FunctorParams *functorParams)
     // Check whether we transpose to sounding pitch
     if (params->m_transposeToSoundingPitch) {
         // Evaluate functor on scoreDef
-        scoreDef->Process(params->m_functor, params);
+        scoreDef->Process(params->m_functor, params, params->m_functorEnd);
         return FUNCTOR_CONTINUE;
     }
 
@@ -354,7 +354,7 @@ int Score::Transpose(FunctorParams *functorParams)
     }
 
     // Evaluate functor on scoreDef
-    scoreDef->Process(params->m_functor, params);
+    scoreDef->Process(params->m_functor, params, params->m_functorEnd);
 
     return FUNCTOR_CONTINUE;
 }

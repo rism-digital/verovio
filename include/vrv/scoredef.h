@@ -288,7 +288,10 @@ public:
     /**
      * See Object::Transpose
      */
+    ///@{
     int Transpose(FunctorParams *functorParams) override;
+    int TransposeEnd(FunctorParams *functorParams) override;
+    ///@}
 
 protected:
     /**

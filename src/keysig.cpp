@@ -329,6 +329,10 @@ int KeySig::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
+    if (!this->GetFirstAncestor(STAFFDEF)) {
+        params->m_hasScoreDefKeySig = true;
+    }
+
     int sig = this->GetFifthsInt();
 
     int intervalClass = params->m_transposer->CircleOfFifthsToIntervalClass(sig);
