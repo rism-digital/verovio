@@ -136,11 +136,13 @@ int TransPitch::GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACC
 data_ACCIDENTAL_GESTURAL TransPitch::GetAccidG() const
 {
     switch (m_accid) {
+        case -3: return ACCIDENTAL_GESTURAL_tf;
         case -2: return ACCIDENTAL_GESTURAL_ff;
         case -1: return ACCIDENTAL_GESTURAL_f;
         case 0: return ACCIDENTAL_GESTURAL_n;
         case 1: return ACCIDENTAL_GESTURAL_s;
         case 2: return ACCIDENTAL_GESTURAL_ss;
+        case 3: return ACCIDENTAL_GESTURAL_ts;
         default: break;
     }
     LogWarning("Transposition: Could not get Gestural Accidental for %i", m_accid);
@@ -387,7 +389,7 @@ bool Transposer::SetTransposition(const TransPitch &fromPitch, const std::string
     TransPitch toPitch;
     if (this->GetKeyTonic(toString, toPitch)) {
         // Determine proper octave offset.
-        int numSigns = toPitch.m_oct;
+        const int numSigns = toPitch.m_oct;
         m_transpose = this->GetInterval(fromPitch, toPitch);
         // A transposition with n plus or minus signs should never be more than n octaves away.
         if (numSigns > 0 && m_transpose > this->PerfectOctaveClass() * numSigns) {
@@ -417,16 +419,16 @@ bool Transposer::SetTransposition(int keyFifths, const std::string &semitones)
     if (!this->IsValidSemitones(semitones)) {
         return false;
     }
-    int semis = stoi(semitones);
+    const int semis = stoi(semitones);
     return this->SetTransposition(keyFifths, semis);
 }
 
 // Note the order of the variables (key signature information is first in all
-// cases where there are two input parametrs to SetTransposition().
+// cases where there are two input parameters to SetTransposition().
 
 bool Transposer::SetTransposition(int keyFifths, int semitones)
 {
-    int intervalClass = this->SemitonesToIntervalClass(keyFifths, semitones);
+    const int intervalClass = this->SemitonesToIntervalClass(keyFifths, semitones);
     return this->SetTransposition(intervalClass);
 }
 
@@ -438,9 +440,9 @@ bool Transposer::SetTransposition(int keyFifths, int semitones)
 
 int Transposer::SemitonesToIntervalClass(int keyFifths, int semitones)
 {
-    int sign = semitones < 0 ? -1 : +1;
+    const int sign = semitones < 0 ? -1 : +1;
     semitones = semitones < 0 ? -semitones : semitones;
-    int octave = semitones / 12;
+    const int octave = semitones / 12;
     semitones = semitones - octave * 12;
     int sum1, sum2;
     std::string interval = "P1";
@@ -528,7 +530,7 @@ int Transposer::SemitonesToIntervalClass(int keyFifths, int semitones)
 
 std::string Transposer::SemitonesToIntervalName(int keyFifths, int semitones)
 {
-    int intervalClass = this->SemitonesToIntervalClass(keyFifths, semitones);
+    const int intervalClass = this->SemitonesToIntervalClass(keyFifths, semitones);
     return this->GetIntervalName(intervalClass);
 }
 
@@ -543,10 +545,10 @@ std::string Transposer::SemitonesToIntervalName(int keyFifths, int semitones)
 
 int Transposer::IntervalToSemitones(int interval)
 {
-    int sign = interval < 0 ? -1 : +1;
+    const int sign = interval < 0 ? -1 : +1;
     interval = interval < 0 ? -interval : interval;
-    int octave = interval / m_base;
-    int intervalClass = interval - octave * m_base;
+    const int octave = interval / m_base;
+    const int intervalClass = interval - octave * m_base;
     int diatonic = 0;
     int chromatic = 0;
     this->IntervalToDiatonicChromatic(diatonic, chromatic, intervalClass);
@@ -562,7 +564,7 @@ int Transposer::IntervalToSemitones(int interval)
 
 int Transposer::IntervalToSemitones(const std::string &intervalName)
 {
-    int interval = this->GetInterval(intervalName);
+    const int interval = this->GetInterval(intervalName);
     return this->IntervalToSemitones(interval);
 }
 
@@ -1128,7 +1130,7 @@ TransPitch Transposer::IntegerPitchToTransPitch(int ipitch)
         mindiff = chroma - m_diatonicMapping.back();
         mini = (int)m_diatonicMapping.size() - 1;
         for (int i = (int)m_diatonicMapping.size() - 2; i >= 0; i--) {
-            int diff = chroma - m_diatonicMapping[i];
+            const int diff = chroma - m_diatonicMapping[i];
             if (abs(diff) < abs(mindiff)) {
                 mindiff = diff;
                 mini = i;
@@ -1143,7 +1145,7 @@ TransPitch Transposer::IntegerPitchToTransPitch(int ipitch)
         mindiff = chroma - m_diatonicMapping[0];
         mini = 0;
         for (int i = 1; i < (int)m_diatonicMapping.size(); ++i) {
-            int diff = chroma - m_diatonicMapping[i];
+            const int diff = chroma - m_diatonicMapping[i];
             if (abs(diff) < abs(mindiff)) {
                 mindiff = diff;
                 mini = i;
@@ -1195,7 +1197,7 @@ int Transposer::GetInterval(const TransPitch &p1, const TransPitch &p2)
 
 std::string Transposer::GetIntervalName(const TransPitch &p1, const TransPitch &p2)
 {
-    int iclass = this->GetInterval(p1, p2);
+    const int iclass = this->GetInterval(p1, p2);
     return this->GetIntervalName(iclass);
 }
 
@@ -1207,13 +1209,13 @@ std::string Transposer::GetIntervalName(int intervalClass)
         intervalClass = -intervalClass;
     }
 
-    int octave = intervalClass / m_base;
-    int chroma = intervalClass - octave * m_base;
+    const int octave = intervalClass / m_base;
+    const int chroma = intervalClass - octave * m_base;
 
     int mindiff = chroma;
     int mini = 0;
     for (int i = 1; i < (int)m_diatonicMapping.size(); ++i) {
-        int diff = chroma - (m_diatonicMapping[i] - m_diatonicMapping[0]);
+        const int diff = chroma - (m_diatonicMapping[i] - m_diatonicMapping[0]);
         if (abs(diff) < abs(mindiff)) {
             mindiff = diff;
             mini = i;
@@ -1373,7 +1375,7 @@ std::string Transposer::GetIntervalName(int intervalClass)
 
 int Transposer::IntervalToCircleOfFifths(const std::string &transstring)
 {
-    int intervalClass = this->GetInterval(transstring);
+    const int intervalClass = this->GetInterval(transstring);
     return this->IntervalToCircleOfFifths(intervalClass);
 }
 
@@ -1389,8 +1391,8 @@ int Transposer::IntervalToCircleOfFifths(int transval)
         transval %= m_base;
     }
 
-    int p5 = this->PerfectFifthClass();
-    int p4 = this->PerfectFourthClass();
+    const int p5 = this->PerfectFifthClass();
+    const int p4 = this->PerfectFourthClass();
     for (int i = 1; i < m_base; ++i) {
         if ((p5 * i) % m_base == transval) {
             return i;
@@ -1429,7 +1431,7 @@ int Transposer::CircleOfFifthsToIntervalClass(int fifths)
 
 std::string Transposer::CircleOfFifthsToIntervalName(int fifths)
 {
-    int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
+    const int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
     return this->GetIntervalName(intervalClass);
 }
 
@@ -1442,7 +1444,7 @@ std::string Transposer::CircleOfFifthsToIntervalName(int fifths)
 
 TransPitch Transposer::CircleOfFifthsToMajorTonic(int fifths)
 {
-    int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
+    const int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
     return this->IntegerPitchToTransPitch((this->GetCPitchClass() + intervalClass) % this->GetBase());
 }
 
@@ -1455,7 +1457,7 @@ TransPitch Transposer::CircleOfFifthsToMajorTonic(int fifths)
 
 TransPitch Transposer::CircleOfFifthsToMinorTonic(int fifths)
 {
-    int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
+    const int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
     return this->IntegerPitchToTransPitch((this->GetAPitchClass() + intervalClass) % this->GetBase());
 }
 
@@ -1468,7 +1470,7 @@ TransPitch Transposer::CircleOfFifthsToMinorTonic(int fifths)
 
 TransPitch Transposer::CircleOfFifthsToDorianTonic(int fifths)
 {
-    int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
+    const int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
     return this->IntegerPitchToTransPitch((this->GetDPitchClass() + intervalClass) % this->GetBase());
 }
 
@@ -1481,7 +1483,7 @@ TransPitch Transposer::CircleOfFifthsToDorianTonic(int fifths)
 
 TransPitch Transposer::CircleOfFifthsToPhrygianTonic(int fifths)
 {
-    int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
+    const int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
     return this->IntegerPitchToTransPitch((this->GetEPitchClass() + intervalClass) % this->GetBase());
 }
 
@@ -1494,7 +1496,7 @@ TransPitch Transposer::CircleOfFifthsToPhrygianTonic(int fifths)
 
 TransPitch Transposer::CircleOfFifthsToLydianTonic(int fifths)
 {
-    int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
+    const int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
     return this->IntegerPitchToTransPitch((this->GetFPitchClass() + intervalClass) % this->GetBase());
 }
 
@@ -1507,7 +1509,7 @@ TransPitch Transposer::CircleOfFifthsToLydianTonic(int fifths)
 
 TransPitch Transposer::CircleOfFifthsToMixolydianTonic(int fifths)
 {
-    int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
+    const int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
     return this->IntegerPitchToTransPitch((this->GetGPitchClass() + intervalClass) % this->GetBase());
 }
 
@@ -1520,7 +1522,7 @@ TransPitch Transposer::CircleOfFifthsToMixolydianTonic(int fifths)
 
 TransPitch Transposer::CircleOfFifthsToLocrianTonic(int fifths)
 {
-    int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
+    const int intervalClass = this->CircleOfFifthsToIntervalClass(fifths);
     return this->IntegerPitchToTransPitch((this->GetBPitchClass() + intervalClass) % this->GetBase());
 }
 
@@ -1697,7 +1699,7 @@ std::string Transposer::DiatonicChromaticToIntervalName(int diatonic, int chroma
 
 int Transposer::DiatonicChromaticToIntervalClass(int diatonic, int chromatic)
 {
-    std::string intervalName = this->DiatonicChromaticToIntervalName(diatonic, chromatic);
+    const std::string intervalName = this->DiatonicChromaticToIntervalName(diatonic, chromatic);
     return this->GetInterval(intervalName);
 }
 
@@ -1708,7 +1710,7 @@ int Transposer::DiatonicChromaticToIntervalClass(int diatonic, int chromatic)
 
 void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, int intervalClass)
 {
-    std::string intervalName = this->GetIntervalName(intervalClass);
+    const std::string intervalName = this->GetIntervalName(intervalClass);
     this->IntervalToDiatonicChromatic(diatonic, chromatic, intervalName);
 }
 
@@ -1792,7 +1794,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
         return;
     }
     dnum--;
-    int octave = dnum / 7;
+    const int octave = dnum / 7;
     dnum = dnum - octave * 7;
 
     diatonic = direction * (octave * 7 + dnum);
@@ -1973,7 +1975,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
 
 bool Transposer::IsValidIntervalName(const std::string &name)
 {
-    std::string pattern = "(-|\\+?)([Pp]|M|m|[aA]+|[dD]+)([1-9][0-9]*)";
+    const std::string pattern = "(-|\\+?)([Pp]|M|m|[aA]+|[dD]+)([1-9][0-9]*)";
     if (std::regex_search(name, std::regex(pattern))) {
         return true;
     }
@@ -2002,7 +2004,7 @@ bool Transposer::IsValidIntervalName(const std::string &name)
 
 bool Transposer::IsValidSemitones(const std::string &name)
 {
-    std::string pattern = "^(-|\\+?)(\\d+)$";
+    const std::string pattern = "^(-|\\+?)(\\d+)$";
     if (std::regex_search(name, std::regex(pattern))) {
         return true;
     }
@@ -2038,7 +2040,7 @@ bool Transposer::IsValidSemitones(const std::string &name)
 
 bool Transposer::IsValidKeyTonic(const std::string &name)
 {
-    std::string pattern = "([+]*|[-]*)([A-Ga-g])([Ss#]*|[Ffb]*)";
+    const std::string pattern = "([+]*|[-]*)([A-Ga-g])([Ss#]*|[Ffb]*)";
     if (std::regex_search(name, std::regex(pattern))) {
         return true;
     }

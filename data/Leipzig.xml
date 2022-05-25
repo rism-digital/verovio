@@ -28,8 +28,8 @@
     <a n="stemDownNW" x="-0.0" y="-0.16"/>
     <a n="stemUpSE" x="1.26" y="0.16"/>
   </g>
-  <g c="E05C" x="0.0" y="-502.0" w="606.0" h="1004.0" h-a-x="656" n="cClef"/>
-  <g c="E05D" x="0.0" y="-735.0" w="606.0" h="1237.0" h-a-x="616" n="cClef8vb"/>
+  <g c="E05C" x="0.0" y="-502.0" w="606.0" h="1004.0" h-a-x="606" n="cClef"/>
+  <g c="E05D" x="0.0" y="-735.0" w="606.0" h="1237.0" h-a-x="606" n="cClef8vb"/>
   <g c="E051" x="-1.0" y="-893.0" w="647.0" h="1976.0" h-a-x="650" n="gClef15mb"/>
   <g c="E050" x="-1.0" y="-655.0" w="647.0" h="1738.0" h-a-x="646" n="gClef"/>
   <g c="E052" x="-1.0" y="-890.0" w="647.0" h="1973.0" h-a-x="646" n="gClef8vb"/>
@@ -505,10 +505,13 @@
     <a n="cutOutSW" x="0.25" y="-0.82"/>
   </g>
   <g c="E073" x="-1.0" y="-655.0" w="647.0" h="1738.0" h-a-x="646" n="gClefReversed"/>
-  <g c="E074" x="-1.0" y="-655.0" w="647.0" h="1738.0" h-a-x="646" n="gClefTurned"/>
+  <g c="E074" x="-1.0" y="-1083.0" w="647.0" h="1738.0" h-a-x="646" n="gClefTurned"/>
   <g c="E076" x="4.0" y="-581.0" w="694.0" h="832.0" h-a-x="698" n="fClefReversed"/>
   <g c="E077" x="4.0" y="-581.0" w="694.0" h="832.0" h-a-x="698" n="fClefTurned"/>
-  <g c="E075" x="0.0" y="-502.0" w="606.0" h="1004.0" h-a-x="656" n="cClefReversed"/>
+  <g c="E075" x="0.0" y="-502.0" w="606.0" h="1004.0" h-a-x="606" n="cClefReversed"/>
+  <g c="E07A" x="-1.0" y="-509.0" w="503.0" h="1350.0" h-a-x="502" n="gClefChange"/>
+  <g c="E07B" x="0.0" y="-406.0" w="490.0" h="812.0" h-a-x="490" n="cClefChange"/>
+  <g c="E07C" x="3.0" y="-508.0" w="607.0" h="727.0" h-a-x="610" n="fClefChange"/>
   <g c="E06D" x="-3.0" y="-750.0" w="411.0" h="1500.0" h-a-x="409" n="6stringTabClef"/>
   <g c="E06E" x="-3.0" y="-500.0" w="275.0" h="1000.0" h-a-x="271" n="4stringTabClef"/>
   <g c="E055" x="-1.0" y="-655.0" w="1039.0" h="1738.0" h-a-x="646" n="gClef8vbOld"/>
@@ -573,7 +576,7 @@
   <g c="E505" x="0.0" y="-166.0" w="95.0" h="94.0" h-a-x="95" n="repeatBarLowerDot"/>
   <g c="E0A5" x="0.0" y="0.0" w="314" h="0.0" h-a-x="314" n="noteheadNull"/>
   <g c="E940" x="-209.0" y="-209.0" w="418.0" h="418.0" h-a-x="0" n="mensuralCombStemDiagonal"/>
-  <g c="E905" x="0.0" y="-500.0" w="744.0" h="1000.0" h-a-x="744" n="mensuralCclef"/>
+  <g c="E905" x="0.0" y="-500.0" w="526.0" h="1000.0" h-a-x="526" n="mensuralCclef"/>
   <g c="E941" x="0.0" y="0.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemUpFlagRight"/>
   <g c="E942" x="0.0" y="-760.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemDownFlagRight"/>
   <g c="E943" x="0.0" y="0.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemUpFlagLeft"/>

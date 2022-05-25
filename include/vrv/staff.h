@@ -264,6 +264,11 @@ public:
      */
     int GenerateMIDI(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::Transpose
+     */
+    int Transpose(FunctorParams *functorParams) override;
+
 private:
     /**
      * Add the ledger line dashes to the legderline array.

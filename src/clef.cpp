@@ -106,6 +106,7 @@ int Clef::GetClefLocOffset() const
 wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
 {
     const Resources *resources = this->GetDocResources();
+    const bool clefChange = (this->GetAlignment() && (this->GetAlignment()->GetType() == ALIGNMENT_CLEF));
     if (!resources) return 0;
 
     // If there is glyph.num, prioritize it
@@ -165,7 +166,7 @@ wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
                             return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E053_gClef8va
                                                                                  : SMUFL_E051_gClef15mb;
                             break;
-                        default: return SMUFL_E050_gClef; break;
+                        default: return (clefChange) ? SMUFL_E07A_gClefChange : SMUFL_E050_gClef; break;
                     }
                 case CLEFSHAPE_GG: return SMUFL_E055_gClef8vbOld;
                 case CLEFSHAPE_F:
@@ -178,12 +179,12 @@ wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
                             return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E066_fClef15ma
                                                                                  : SMUFL_E063_fClef15mb;
                             break;
-                        default: return SMUFL_E062_fClef; break;
+                        default: return (clefChange) ? SMUFL_E07C_fClefChange : SMUFL_E062_fClef; break;
                     }
                 case CLEFSHAPE_C:
                     switch (this->GetDis()) {
                         case OCTAVE_DIS_8: return SMUFL_E05D_cClef8vb; break;
-                        default: return SMUFL_E05C_cClef; break;
+                        default: return (clefChange) ? SMUFL_E07B_cClefChange : SMUFL_E05C_cClef; break;
                     }
                 case CLEFSHAPE_perc: return SMUFL_E069_unpitchedPercussionClef1;
                 default: break;

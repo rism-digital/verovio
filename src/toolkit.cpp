@@ -705,7 +705,8 @@ bool Toolkit::LoadData(const std::string &data)
     m_doc.GenerateMeasureNumbers();
 
     // transpose the content if necessary
-    if (m_options->m_transpose.IsSet() || m_options->m_transposeMdiv.IsSet()) {
+    if (m_options->m_transpose.IsSet() || m_options->m_transposeMdiv.IsSet()
+        || m_options->m_transposeToSoundingPitch.IsSet()) {
         m_doc.PrepareData();
         m_doc.TransposeDoc();
     }

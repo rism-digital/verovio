@@ -16,6 +16,7 @@
 namespace vrv {
 
 class Note;
+class TupletBracket;
 
 //----------------------------------------------------------------------------
 // Tuplet
@@ -122,12 +123,17 @@ private:
     /**
      * Adjust tuplet relative positioning based on possible overlaps
      */
-    void AdjustTupletBracketY(Doc *doc, Staff *staff, int staffSize);
+    void AdjustTupletBracketY(Doc *doc, Staff *staff);
+
+    /**
+     * Adjust tuplet relative positioning for tuplets based on beams
+     */
+    void AdjustTupletBracketBeamY(Doc *doc, Staff *staff, TupletBracket *bracket, Beam *beam);
 
     /**
      * Adjust tuplet relative positioning based on possible overlaps
      */
-    void AdjustTupletNumY(Doc *doc, Staff *staff, int staffSize);
+    void AdjustTupletNumY(Doc *doc, Staff *staff);
 
     /**
      * Calculate corresponding cross-staff for the tuplet number if necessary. In case when tuplet is completely

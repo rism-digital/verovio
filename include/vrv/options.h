@@ -652,7 +652,6 @@ public:
     OptionBool m_beamFrenchStyle;
     OptionDbl m_bracketThickness;
     OptionBool m_breaksNoWidow;
-    OptionDbl m_clefChangeFactor;
     OptionDbl m_dynamDist;
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;
@@ -728,6 +727,7 @@ public:
     OptionString m_transpose;
     OptionJson m_transposeMdiv;
     OptionBool m_transposeSelectedOnly;
+    OptionBool m_transposeToSoundingPitch;
 
     /**
      * Element margins

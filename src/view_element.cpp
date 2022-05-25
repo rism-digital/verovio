@@ -609,17 +609,9 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
 
-    double clefSizeFactor = 1.0;
-    if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
-        if (m_doc->GetType() != Transcription && m_doc->GetType() != Facs) {
-            clefSizeFactor = m_options->m_clefChangeFactor.GetValue();
-            // x -= m_doc->GetGlyphWidth(sym, clefSizeFactor * staff->m_drawingStaffSize, false) * 1.35;
-        }
-    }
-
     dc->StartGraphic(element, "", element->GetUuid());
 
-    this->DrawSmuflCode(dc, x, y, sym, clefSizeFactor * staff->m_drawingStaffSize, false);
+    this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
 
     if ((m_doc->GetType() == Facs) && element->HasFacs()) {
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
@@ -633,22 +625,21 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     // Possibly draw enclosing brackets
-    this->DrawClefEnclosing(dc, clef, staff, sym, x, y, clefSizeFactor);
+    this->DrawClefEnclosing(dc, clef, staff, sym, x, y);
 
     dc->EndGraphic(element, this);
 }
 
-void View::DrawClefEnclosing(
-    DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y, double sizeFactor)
+void View::DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y)
 {
     if ((clef->GetEnclose() == ENCLOSURE_brack) || (clef->GetEnclose() == ENCLOSURE_box)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int glyphSize = staff->GetDrawingStaffNotationSize();
-        x += sizeFactor * m_doc->GetGlyphLeft(glyph, glyphSize, false);
-        y += sizeFactor * m_doc->GetGlyphBottom(glyph, glyphSize, false);
-        const int height = sizeFactor * m_doc->GetGlyphHeight(glyph, glyphSize, false);
-        const int width = sizeFactor * m_doc->GetGlyphWidth(glyph, glyphSize, false);
-        const int offset = 3 * unit / 4;
+        x += m_doc->GetGlyphLeft(glyph, glyphSize, false);
+        y += m_doc->GetGlyphBottom(glyph, glyphSize, false);
+        const int height = m_doc->GetGlyphHeight(glyph, glyphSize, false);
+        const int width = m_doc->GetGlyphWidth(glyph, glyphSize, false);
+        const int offset = unit * 3 / 4;
         // We use overlapping brackets to draw boxes :)
         const int bracketWidth = (clef->GetEnclose() == ENCLOSURE_brack) ? unit : (width + offset);
         const int verticalThickness = m_doc->GetDrawingStemWidth(glyphSize);
@@ -1559,10 +1550,12 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
 
     // Get stem related values (direction and coordinates)
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+    int stemRelY = 0;
     int stemX = 0;
     StemmedDrawingInterface *stem = childElement->GetStemmedDrawingInterface();
     if (stem) {
         stemDir = stem->GetDrawingStemDir();
+        stemRelY = stem->GetDrawingStemModRelY();
         stemX = stem->GetDrawingStemStart(childElement).x;
     }
 
@@ -1578,66 +1571,23 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
     if (!note || note->IsGraceNote() || note->GetDrawingCueSize()) return;
 
     // Get duration for the element
-    int drawingDur = 0;
     DurationInterface *duration = childElement->GetDurationInterface();
-    if (duration) {
-        drawingDur = duration->GetActualDur();
-    }
+    const int drawingDur = duration ? duration->GetActualDur() : 0;
+
     data_STEMMODIFIER stemMod = element->GetDrawingStemMod();
     if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return;
-
-    // calculate height offset for positioning of stem mod elements on the stem
-    const int noteLoc = note->GetDrawingLoc();
     const wchar_t code = element->StemModToGlyph(stemMod);
     if (!code) return;
-    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int glyphHalfHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) / 2;
-    int height = 2 * unit;
-    const int sign = (stemDir == STEMDIRECTION_up) ? 1 : -1;
-    switch (stemMod) {
-        case STEMMODIFIER_1slash:
-        case STEMMODIFIER_2slash:
-        case STEMMODIFIER_3slash:
-        case STEMMODIFIER_4slash:
-        case STEMMODIFIER_5slash:
-        case STEMMODIFIER_6slash: {
-            if (noteLoc % 2 == 0) height += unit;
-            height += glyphHalfHeight;
-            if (stemMod == STEMMODIFIER_6slash)
-                height += m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false) / 2;
-            break;
-        }
-        case STEMMODIFIER_sprech:
-        case STEMMODIFIER_z: {
-            height += (noteLoc % 2) ? 3 * unit : 2 * unit;
-            if (stemMod == STEMMODIFIER_sprech) height -= sign * glyphHalfHeight;
-            break;
-        }
-        default: return;
-    }
-
-    // calculate additional adjustments for beamed elements
-    Beam *beam = childElement->IsInBeam();
-    if (beam) {
-        int beamMargin = (sign > 0) ? childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize)
-                                    : childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
-        beamMargin -= sign
-            * ((drawingDur - DUR_8) * (beam->m_beamWidthBlack + beam->m_beamWidthWhite) + beam->m_beamWidthWhite);
-        const int modMargin = note->GetDrawingY() + sign * (height + glyphHalfHeight);
-        const int diff = sign * (modMargin - beamMargin);
-        if (diff > 0) {
-            const int halfUnit = 0.5 * unit;
-            height -= (diff / halfUnit + 1) * halfUnit;
-        }
-    }
 
     // calculate position for the stem mod
-    const int y = note->GetDrawingY() + sign * height;
+    const int y = note->GetDrawingY() + stemRelY;
     const int x = (drawingDur <= DUR_1) ? childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc) : stemX;
 
     if ((code != SMUFL_E645_vocalSprechgesang) || !element->Is(BTREM)) {
         int adjust = 0;
         if (stemMod == STEMMODIFIER_6slash) {
+            const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            const int sign = (stemDir == STEMDIRECTION_up) ? 1 : -1;
             const int slash1height = m_doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false);
             const int slash6height = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false);
             // we need to take half (0.5) of the height difference between to glyphs for the the initial position and

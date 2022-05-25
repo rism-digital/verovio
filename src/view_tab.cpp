@@ -62,7 +62,7 @@ void View::DrawTabClef(DeviceContext *dc, LayerElement *element, Layer *layer, S
     this->DrawSmuflCode(dc, x, y, sym, glyphSize, false);
 
     // Possibly draw enclosing brackets
-    this->DrawClefEnclosing(dc, clef, staff, sym, x, y, 1.0);
+    this->DrawClefEnclosing(dc, clef, staff, sym, x, y);
 
     dc->EndGraphic(element, this);
 }
