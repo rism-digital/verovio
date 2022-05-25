@@ -1,14 +1,18 @@
 # Changelog
 
-## [unreleased]
-* Improved rendering with diamond and slash shaped noteheads (@eNote-GmBH)
-* Improved rendering of slurs (@eNote-GmBH)
+## [3.10.0] - 2022-05-25
 * Support for `accid@place` (@eNote-GmBH)
 * Support for `mRpt@num` and `mRpt@num.place` (@eNote-GmBH)
 * Support for `mixed` croff-staff slurs (@eNote-GmBH)
 * Support for `non-arp` arpeggios (@eNote-GmBH)
+* Support for ligatures in Plaine and Easie
+* Function select for specifying a portion of a score for rendering
+* Improved rendering with diamond and slash shaped noteheads (@eNote-GmBH)
+* Improved rendering of slurs (@eNote-GmBH)
+* Improved Plaine and Easie validation
 * Option --beam-french-style for french beam style (@eNote-GmBH)
 * Option --transpose-mdiv for individual transposition of mdivs (@eNote-GmBH)
+* Option --transpose-to-sounding-pitch for transposing to sounding pitches using `@trans.semi`
 * Python Package Index (PyPI) distribution for macOS arm64
 
 ## [3.9.0] - 2022-02-22
