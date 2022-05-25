@@ -73,7 +73,7 @@ void MeterSigGrp::FilterList(ListOfConstObjects &childList) const
         childList.end());
 }
 
-void MeterSigGrp::AddAlternatingMeasureToVector(Measure *measure)
+void MeterSigGrp::AddAlternatingMeasureToVector(const Measure *measure)
 {
     m_alternatingMeasures.emplace_back(measure);
 }
