@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun May 22 07:44:40 PDT 2022
+// Last Modified: Wed May 25 08:26:17 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -256,7 +256,7 @@ vector<int> Convert::harmToBase40(const string& harm, int keyroot, int keymode) 
 	}
 
 	int rootdeg = -1; // chord root scale degree in key
-	int degalt = 0;   // degree alteration
+	// int degalt = 0;   // degree alteration
 
 	vector<char> chars(256, 0);
 	for (auto ch : cbase) {
@@ -264,7 +264,7 @@ vector<int> Convert::harmToBase40(const string& harm, int keyroot, int keymode) 
 	}
 
 	rootdeg = -1; // invalid scale degree
-	degalt = chars['#'] - chars['-'];
+	// degalt = chars['#'] - chars['-'];
 
 	int vcount = chars['V'] + chars['v'];
 	int icount = chars['I'] + chars['i'];
@@ -289,16 +289,16 @@ vector<int> Convert::harmToBase40(const string& harm, int keyroot, int keymode) 
 				if (chars['N']) {
 					// Neapolitan (flat-second scale degree)
 					rootdeg = 1; // -II
-					degalt += -1; // -II
+					// degalt += -1; // -II
 				} else if (chars['L'] || chars['F'] || chars['G']) {
 					// augmented 6th chord on -VII
 					rootdeg = 5;
 					// fixed to -VI of major scale:
 					if (newkeymode == 0) { // major
-						degalt += -1;
+						// degalt += -1;
 					} else { // minor
 						// already at -VI in minor
-						degalt += 0;
+						// degalt += 0;
 					}
 				}
 				break;
@@ -31285,7 +31285,7 @@ bool HumdrumLine::allSameBarlineStyle(void) {
 //
 
 bool HumdrumLine::hasDataStraddle(void) {
-	return this->getValueInt("auto", "straddlingData");
+	return (this->getValueInt("auto", "straddlingData") ? true : false);
 }
 
 
