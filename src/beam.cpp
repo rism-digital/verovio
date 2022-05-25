@@ -551,7 +551,6 @@ void BeamSegment::AdjustBeamToTremolos(Doc *doc, Staff *staff, BeamDrawingInterf
         Stem *stem = stemmedInterface->GetDrawingStem();
         stem->SetDrawingStemLen(stem->GetDrawingStemLen() + maxAdjustment);
     }
-
 }
 
 void BeamSegment::CalcBeamInit(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)

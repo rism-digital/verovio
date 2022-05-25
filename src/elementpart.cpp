@@ -729,7 +729,7 @@ void Stem::CalculateStemModRelY(Doc *doc, Staff *staff)
     m_stemModRelY = sign * height + adjust;
 }
 
-int Stem::CalculateStemModAdjustment(Doc* doc, Staff* staff, int flagOffset)
+int Stem::CalculateStemModAdjustment(Doc *doc, Staff *staff, int flagOffset)
 {
     this->CalculateStemModRelY(doc, staff);
     return this->AdjustSlashes(doc, staff, flagOffset);
