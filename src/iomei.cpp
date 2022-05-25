@@ -3513,7 +3513,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
             m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
             m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
         }
-    }    
+    }
 
     front = music.child("front");
     if (!front.empty()) {
