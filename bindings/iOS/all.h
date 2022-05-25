@@ -41,11 +41,13 @@
 #import <VerovioFramework/hairpin.h>
 #import <VerovioFramework/staffgrp.h>
 #import <VerovioFramework/pitchinflection.h>
+#import <VerovioFramework/resources.h>
 #import <VerovioFramework/text.h>
 #import <VerovioFramework/space.h>
 #import <VerovioFramework/vrv.h>
 #import <VerovioFramework/sb.h>
 #import <VerovioFramework/clef.h>
+#import <VerovioFramework/layerdef.h>
 #import <VerovioFramework/supplied.h>
 #import <VerovioFramework/score.h>
 #import <VerovioFramework/tie.h>
@@ -96,6 +98,7 @@
 #import <VerovioFramework/svg.h>
 #import <VerovioFramework/section.h>
 #import <VerovioFramework/trill.h>
+#import <VerovioFramework/docselection.h>
 #import <VerovioFramework/tabgrp.h>
 #import <VerovioFramework/scoredef.h>
 #import <VerovioFramework/view.h>
@@ -186,9 +189,6 @@
 #import <VerovioFramework/MidiEventList.h>
 #import <VerovioFramework/Binasc.h>
 #import <VerovioFramework/MidiMessage.h>
-#import <VerovioFramework/core.h>
-#import <VerovioFramework/unchecked.h>
-#import <VerovioFramework/checked.h>
 #import <VerovioFramework/crc.h>
 #import <VerovioFramework/jsonxx.h>
 #import <VerovioFramework/humlib.h>
