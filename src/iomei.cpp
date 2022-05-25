@@ -3506,11 +3506,13 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     }
 
     facsimile = music.child("facsimile");
-    if ((!facsimile.empty()) && (m_doc->GetOptions()->m_useFacsimile.GetValue())) {
+    if (!facsimile.empty()) {
         this->ReadFacsimile(m_doc, facsimile);
-        m_doc->SetType(Facs);
-        m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
-        m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
+        if (m_doc->GetOptions()->m_useFacsimile.GetValue()) {
+            m_doc->SetType(Facs);
+            m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
+            m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
+        }
     }
 
     front = music.child("front");
