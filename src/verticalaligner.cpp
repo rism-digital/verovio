@@ -1004,7 +1004,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
     if (!staff) return FUNCTOR_CONTINUE;
 
     // Adjust each slur such that spanned elements are avoided
-    std::vector<FloatingCurvePositioner *> positioners;
+    ArrayOfFloatingCurvePositioners positioners;
     for (FloatingPositioner *positioner : m_floatingPositioners) {
         assert(positioner->GetObject());
         if (!positioner->GetObject()->Is({ PHRASE, SLUR })) continue;
@@ -1026,25 +1026,35 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
         }
     }
 
-    // Adjust positioning of slurs with common start/end
+    // Detection of inner slurs
+    std::map<FloatingCurvePositioner *, ArrayOfFloatingCurvePositioners> innerCurveMap;
     const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    for (size_t i = 0; i + 1 < positioners.size(); ++i) {
+    for (size_t i = 0; i < positioners.size(); ++i) {
         Slur *firstSlur = vrv_cast<Slur *>(positioners[i]->GetObject());
-        for (size_t j = i + 1; j < positioners.size(); ++j) {
+        ArrayOfFloatingCurvePositioners innerCurves;
+        for (size_t j = 0; j < positioners.size(); ++j) {
+            if (i == j) continue;
             Slur *secondSlur = vrv_cast<Slur *>(positioners[j]->GetObject());
+            // Check if second slur is inner slur of first
+            if (!positioners[i]->IsCrossStaff() && !positioners[j]->IsCrossStaff()) {
+                if (positioners[j]->GetSpanningType() == SPANNING_START_END) {
+                    if (firstSlur->HasInnerSlur(secondSlur)) {
+                        innerCurves.push_back(positioners[j]);
+                    }
+                }
+            }
+            // Adjust positioning of slurs with common start/end
             Point points1[4], points2[4];
             positioners[i]->GetPoints(points1);
             positioners[j]->GetPoints(points2);
-            if ((firstSlur->GetStart() == secondSlur->GetEnd())
-                && BoundingBox::ArePointsClose(points1[0], points2[3], unit)) {
-                positioners[i]->MoveFrontHorizontal(unit / 2);
-                positioners[j]->MoveBackHorizontal(-unit / 2);
-            }
-            else if ((firstSlur->GetEnd() == secondSlur->GetStart())
+            if ((firstSlur->GetEnd() == secondSlur->GetStart())
                 && BoundingBox::ArePointsClose(points1[3], points2[0], unit)) {
                 positioners[i]->MoveBackHorizontal(-unit / 2);
                 positioners[j]->MoveFrontHorizontal(unit / 2);
             }
+        }
+        if (!innerCurves.empty()) {
+            innerCurveMap[positioners[i]] = innerCurves;
         }
     }
 

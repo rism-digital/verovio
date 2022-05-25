@@ -125,7 +125,7 @@ curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
     }
 }
 
-bool Slur::IsInnerSlur(const Slur *innerSlur) const
+bool Slur::HasInnerSlur(const Slur *innerSlur) const
 {
     // Check drawing curve direction
     if (this->GetDrawingCurveDir() != innerSlur->GetDrawingCurveDir()) return false;

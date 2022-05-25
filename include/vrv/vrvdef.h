@@ -293,6 +293,7 @@ class BoundingBox;
 class Comparison;
 class CurveSpannedElement;
 class FloatingPositioner;
+class FloatingCurvePositioner;
 class GraceAligner;
 class InterfaceComparison;
 class LayerElement;
@@ -345,6 +346,8 @@ typedef std::list<std::pair<TimeSpanningInterface *, ClassId>> ListOfSpanningInt
 typedef std::list<std::pair<TimeSpanningInterface *, Object *>> ListOfSpanningInterOwnerPairs;
 
 typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
+
+typedef std::vector<FloatingCurvePositioner *> ArrayOfFloatingCurvePositioners;
 
 typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 

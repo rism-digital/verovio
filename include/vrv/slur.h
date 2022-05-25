@@ -158,7 +158,7 @@ public:
      * @name Detection and storage of inner slurs
      */
     ///@{
-    bool IsInnerSlur(const Slur *innerSlur) const;
+    bool HasInnerSlur(const Slur *innerSlur) const;
     ///@}
 
     /**
