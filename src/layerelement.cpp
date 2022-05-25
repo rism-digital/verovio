@@ -1092,6 +1092,18 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
         else {
             overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
         }
+        // if there is no overlap between elements, make additinal checks for some of the edge cases
+        if (!overlap) {
+            // if last element of the tuplet is rest, make sure there is sufficient distance between it and next
+            // note/chord (for ledger lines)
+            if (this->Is({ NOTE, CHORD }) && !this->GetFirstAncestor(TUPLET) && element->Is(REST)
+                && element->GetFirstAncestor(TUPLET)) {
+                Rest *rest = vrv_cast<Rest *>(element);
+                if (rest->GetDur() > DUR_8) {
+                    overlap = 1.5 * (rest->GetDur() - DUR_8) * drawingUnit;
+                }
+            }
+        }
     }
 
     return { -overlap, selfLeft };
