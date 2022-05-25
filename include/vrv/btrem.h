@@ -20,7 +20,11 @@ namespace vrv {
 /**
  * This class models the MEI <bTrem> element.
  */
-class BTrem : public LayerElement, public AttBTremLog, public AttTremMeasured {
+class BTrem : public LayerElement,
+              public AttBTremLog,
+              public AttNumbered,
+              public AttNumberPlacement,
+              public AttTremMeasured {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -40,6 +44,11 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
+    /**
+     * Get stem mod if encoded explicitly, or determine based on duration of bTrem and underlying elements
+     */
+    data_STEMMODIFIER GetDrawingStemMod() const override;
+
     //----------//
     // Functors //
     //----------//
@@ -53,7 +62,7 @@ private:
     /**
      * Calculate the duration of an individual note in a measured tremolo
      */
-    data_DURATION CalcIndividualNoteDuration();
+    data_DURATION CalcIndividualNoteDuration() const;
 
 public:
     //

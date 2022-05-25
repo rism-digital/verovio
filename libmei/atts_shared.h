@@ -1033,8 +1033,8 @@ public:
     std::string GetBezier() const { return m_bezier; }
     bool HasBezier() const;
     //
-    void SetBulge(std::string bulge_) { m_bulge = bulge_; }
-    std::string GetBulge() const { return m_bulge; }
+    void SetBulge(data_BULGE bulge_) { m_bulge = bulge_; }
+    data_BULGE GetBulge() const { return m_bulge; }
     bool HasBulge() const;
     //
     void SetCurvedir(curvature_CURVEDIR curvedir_) { m_curvedir = curvedir_; }
@@ -1054,10 +1054,11 @@ private:
      * The first value captures a distance to the left (positive value) or right
      * (negative value) of the line, expressed in virtual units. The second value of
      * each pair represents a point along the line, expressed as a percentage of the
-     * line's length. N.B. An MEI virtual unit (VU) is half the distance between
-     * adjacent staff lines.
+     * line's length. N.B. An MEI virtual unit (vu) is half the distance between
+     * adjacent staff lines where the interline space is measured from the middle of a
+     * staff line.
      **/
-    std::string m_bulge;
+    data_BULGE m_bulge;
     /** Describes a curve with a generic term indicating the direction of curvature. **/
     curvature_CURVEDIR m_curvedir;
 
@@ -2906,8 +2907,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCount(data_SUMMAND_List count_) { m_count = count_; }
-    data_SUMMAND_List GetCount() const { return m_count; }
+    void SetCount(data_METERCOUNT_pair count_) { m_count = count_; }
+    data_METERCOUNT_pair GetCount() const { return m_count; }
     bool HasCount() const;
     //
     void SetSym(data_METERSIGN sym_) { m_sym = sym_; }
@@ -2921,7 +2922,7 @@ public:
 
 private:
     /** Indicates the number of performers. **/
-    data_SUMMAND_List m_count;
+    data_METERCOUNT_pair m_count;
     /**
      * Indicates the use of a meter symbol instead of a numeric meter signature, that
      * is, 'C' for common time or 'C' with a slash for cut time.
@@ -2957,8 +2958,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeterCount(data_SUMMAND_List meterCount_) { m_meterCount = meterCount_; }
-    data_SUMMAND_List GetMeterCount() const { return m_meterCount; }
+    void SetMeterCount(data_METERCOUNT_pair meterCount_) { m_meterCount = meterCount_; }
+    data_METERCOUNT_pair GetMeterCount() const { return m_meterCount; }
     bool HasMeterCount() const;
     //
     void SetMeterUnit(int meterUnit_) { m_meterUnit = meterUnit_; }
@@ -2974,10 +2975,10 @@ private:
     /**
      * Captures the number of beats in a measure, that is, the top number of the meter
      * signature.
-     * It must contain a decimal number or an additive expression that evaluates to a
-     * decimal number, such as 2+3.
+     * It must contain a decimal number or an expression that evaluates to a decimal
+     * number, such as 2+3 or 3*2.
      **/
-    data_SUMMAND_List m_meterCount;
+    data_METERCOUNT_pair m_meterCount;
     /**
      * Contains the number indicating the beat unit, that is, the bottom number of the
      * meter signature.

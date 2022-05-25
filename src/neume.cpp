@@ -69,16 +69,16 @@ bool Neume::IsSupportedChild(Object *child)
     return true;
 }
 
-int Neume::GetPosition(LayerElement *element)
+int Neume::GetPosition(const LayerElement *element) const
 {
     this->GetList(this);
     int position = this->GetListIndex(element);
     return position;
 }
 
-bool Neume::IsLastInNeume(LayerElement *element)
+bool Neume::IsLastInNeume(const LayerElement *element) const
 {
-    int size = (int)this->GetList(this)->size();
+    const int size = this->GetListSize(this);
     int position = this->GetPosition(element);
 
     // This method should be called only if the note is part of a neume
@@ -88,19 +88,19 @@ bool Neume::IsLastInNeume(LayerElement *element)
     return false;
 }
 
-NeumeGroup Neume::GetNeumeGroup()
+NeumeGroup Neume::GetNeumeGroup() const
 {
-    ListOfObjects children = this->FindAllDescendantsByType(NC);
+    ListOfConstObjects children = this->FindAllDescendantsByType(NC);
 
     auto iter = children.begin();
-    Nc *previous = dynamic_cast<Nc *>(*iter);
+    const Nc *previous = dynamic_cast<const Nc *>(*iter);
     if (previous == NULL) return NEUME_ERROR;
     ++iter;
 
     std::string key = "";
 
     for (; iter != children.end(); ++iter) {
-        Nc *current = vrv_cast<Nc *>(*iter);
+        const Nc *current = vrv_cast<const Nc *>(*iter);
         assert(current);
 
         int pitchDifference = current->PitchDifferenceTo(previous);
@@ -124,21 +124,21 @@ NeumeGroup Neume::GetNeumeGroup()
     }
 }
 
-std::vector<int> Neume::GetPitchDifferences()
+std::vector<int> Neume::GetPitchDifferences() const
 {
     std::vector<int> pitchDifferences;
-    ListOfObjects ncChildren = this->FindAllDescendantsByType(NC);
+    ListOfConstObjects ncChildren = this->FindAllDescendantsByType(NC);
 
     pitchDifferences.reserve(ncChildren.size() - 1);
 
     // Iterate through children and calculate pitch differences
     auto iter = ncChildren.begin();
-    Nc *previous = dynamic_cast<Nc *>(*iter);
+    const Nc *previous = dynamic_cast<const Nc *>(*iter);
     if (previous == NULL) return pitchDifferences;
     ++iter;
 
     for (; iter != ncChildren.end(); ++iter) {
-        Nc *current = vrv_cast<Nc *>(*iter);
+        const Nc *current = vrv_cast<const Nc *>(*iter);
         assert(current);
         pitchDifferences.push_back(current->PitchDifferenceTo(previous));
         previous = current;

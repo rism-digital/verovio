@@ -57,18 +57,19 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    ScoreDefInterface *GetScoreDefInterface() override { return dynamic_cast<ScoreDefInterface *>(this); }
+    ScoreDefInterface *GetScoreDefInterface() override { return vrv_cast<ScoreDefInterface *>(this); }
+    const ScoreDefInterface *GetScoreDefInterface() const override { return vrv_cast<const ScoreDefInterface *>(this); }
     ///@}
 
     /**
      * @name Methods for checking the presence of clef, key signature, etc. information and getting them.
      */
     ///@{
-    bool HasClefInfo(int depth = 1);
-    bool HasKeySigInfo(int depth = 1);
-    bool HasMensurInfo(int depth = 1);
-    bool HasMeterSigInfo(int depth = 1);
-    bool HasMeterSigGrpInfo(int depth = 1);
+    bool HasClefInfo(int depth = 1) const;
+    bool HasKeySigInfo(int depth = 1) const;
+    bool HasMensurInfo(int depth = 1) const;
+    bool HasMeterSigInfo(int depth = 1) const;
+    bool HasMeterSigGrpInfo(int depth = 1) const;
     ///@}
 
     /**
@@ -81,15 +82,20 @@ public:
      */
     ///@{
     Clef *GetClef();
-    Clef *GetClefCopy();
+    const Clef *GetClef() const;
+    Clef *GetClefCopy() const;
     KeySig *GetKeySig();
-    KeySig *GetKeySigCopy();
+    const KeySig *GetKeySig() const;
+    KeySig *GetKeySigCopy() const;
     Mensur *GetMensur();
-    Mensur *GetMensurCopy();
+    const Mensur *GetMensur() const;
+    Mensur *GetMensurCopy() const;
     MeterSig *GetMeterSig();
-    MeterSig *GetMeterSigCopy();
+    const MeterSig *GetMeterSig() const;
+    MeterSig *GetMeterSigCopy() const;
     MeterSigGrp *GetMeterSigGrp();
-    MeterSigGrp *GetMeterSigGrpCopy();
+    const MeterSigGrp *GetMeterSigGrp() const;
+    MeterSigGrp *GetMeterSigGrpCopy() const;
     ///@}
 
     //----------//
@@ -152,19 +158,31 @@ public:
     void ReplaceDrawingLabels(StaffGrp *newStaffGrp);
 
     /**
+     * Replace the staffDef score attributes with the ones currently set as drawing values.
+     * Used when initializing a selection and adding a temporary score for it.
+     */
+    void ResetFromDrawingValues();
+
+    /**
      * Get the staffDef with number n (NULL if not found).
      */
+    ///@{
     StaffDef *GetStaffDef(int n);
+    const StaffDef *GetStaffDef(int n) const;
+    ///@}
 
     /**
      * Get the staffGrp with number n (NULL if not found).
      */
+    ///@{
     StaffGrp *GetStaffGrp(const std::string &n);
+    const StaffGrp *GetStaffGrp(const std::string &n) const;
+    ///@}
 
     /**
      * Return all the @n values of the staffDef in a scoreDef
      */
-    std::vector<int> GetStaffNs();
+    std::vector<int> GetStaffNs() const;
 
     /**
      * Set the redraw flag to all staffDefs.
@@ -197,9 +215,13 @@ public:
      */
     ///@{
     PgFoot *GetPgFoot();
+    const PgFoot *GetPgFoot() const;
     PgFoot2 *GetPgFoot2();
+    const PgFoot2 *GetPgFoot2() const;
     PgHead *GetPgHead();
+    const PgHead *GetPgHead() const;
     PgHead2 *GetPgHead2();
+    const PgHead2 *GetPgHead2() const;
     ///@}
 
     /**
@@ -207,7 +229,12 @@ public:
      */
     int GetMaxStaffSize();
 
-    bool IsSectionRestart();
+    bool IsSectionRestart() const;
+
+    /**
+     * @return True if a system start line will be drawn
+     */
+    bool HasSystemStartLine();
 
     //----------//
     // Functors //
@@ -239,6 +266,11 @@ public:
     int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
+     * See Object::CastOffToSelection
+     */
+    int CastOffToSelection(FunctorParams *) override;
+
+    /**
      * See Object::AlignMeasures
      */
     int AlignMeasures(FunctorParams *functorParams) override;
@@ -253,11 +285,19 @@ public:
      */
     int PrepareDuration(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::Transpose
+     */
+    ///@{
+    int Transpose(FunctorParams *functorParams) override;
+    int TransposeEnd(FunctorParams *functorParams) override;
+    ///@}
+
 protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     //

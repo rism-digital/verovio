@@ -12,6 +12,7 @@
 #include "expansionmap.h"
 #include "facsimile.h"
 #include "options.h"
+#include "resources.h"
 #include "scoredef.h"
 
 namespace smf {
@@ -21,6 +22,7 @@ class MidiFile;
 namespace vrv {
 
 class CastOffPagesParams;
+class DocSelection;
 class FontInfo;
 class Glyph;
 class Pages;
@@ -59,6 +61,11 @@ public:
     void Reset() override;
 
     /**
+     * Clear the selection pages.
+     */
+    void ClearSelectionPages();
+
+    /**
      * Refreshes the views from Doc.
      */
     virtual void Refresh();
@@ -66,8 +73,18 @@ public:
     /**
      * Getter for the options
      */
+    ///@{
     Options *GetOptions() const { return m_options; }
-    void SetOptions(Options *options) { (*m_options) = *options; };
+    void SetOptions(Options *options) { (*m_options) = *options; }
+    ///@}
+
+    /**
+     * Getter for the resources
+     */
+    ///@{
+    const Resources &GetResources() const { return m_resources; }
+    Resources &GetResourcesForModification() { return m_resources; }
+    ///@}
 
     /**
      * Generate a document scoreDef when none is provided.
@@ -94,8 +111,10 @@ public:
      * Getter and setter for the DocType.
      * The setter resets the document.
      */
+    ///@{
     DocType GetType() const { return m_type; }
     void SetType(DocType type);
+    ///@}
 
     /**
      * Check if the document has a page with the specified value
@@ -112,12 +131,15 @@ public:
      * Will find it only when having read a pages-based MEI file,
      * or when a file was converted to page-based MEI.
      */
+    ///@{
     Pages *GetPages();
+    const Pages *GetPages() const;
+    ///@}
 
     /**
      * Get the total page count
      */
-    int GetPageCount();
+    int GetPageCount() const;
 
     /**
      * Return true if the MIDI generation is already done
@@ -200,17 +222,17 @@ public:
     double GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition);
 
     /**
-     * Prepare the MIDI timemap for MIDI and timemap file export.
+     * Prepare the timemap for MIDI and timemap file export.
      * Run trough all the layers and fill the score-time and performance timing variables.
      */
-    void CalculateMidiTimemap();
+    void CalculateTimemap();
 
     /**
-     * Check to see if the MIDI timemap has already been calculated.  This needs to return
+     * Check to see if the timemap has already been calculated.  This needs to return
      * true before ExportMIDI() or ExportTimemap() can export anything (These two functions
-     * will automatically run CalculateMidiTimemap() if HasMidiTimemap() return false.
+     * will automatically run CalculateTimemap() if HasTimemap() return false.
      */
-    bool HasMidiTimemap();
+    bool HasTimemap() const;
 
     /**
      * Export the document to a MIDI file.
@@ -248,11 +270,11 @@ public:
     void ScoreDefSetGrpSymDoc();
 
     /**
-     * Prepare the document for drawing.
-     * This sets drawing pointers and value and needs to be done after loading and any editing.
+     * Prepare the document data.
+     * This sets pointers and value and needs to be done after loading and any editing.
      * For example, it sets the approriate values for the lyrics connectors
      */
-    void PrepareDrawing();
+    void PrepareData();
 
     /**
      * Casts off the entire document.
@@ -350,7 +372,7 @@ public:
      * We need to call this because otherwise looking at the page idx will fail.
      * See Doc::LayOut for an example.
      */
-    void ResetDrawingPage() { m_drawingPage = NULL; }
+    void ResetDataPage() { m_drawingPage = NULL; }
 
     /**
      * Getter to the drawPage. Normally, getting the page should
@@ -408,6 +430,27 @@ public:
     bool HasCurrentScore() const { return m_currentScore != NULL; }
     ///@}
 
+    /**
+     * Return true if the document has been cast off already.
+     */
+    bool IsCastOff() const { return m_isCastOff; }
+
+    /**
+     * @name Methods for managing a selection.
+     */
+    ///@{
+    void InitSelectionDoc(DocSelection &selection, bool resetCache);
+    void ResetSelectionDoc(bool resetCache);
+    bool HasSelection() const;
+    /**
+     * Temporarily deactivate and reactivate selection.
+     * Used for example to get the complete MEI data.
+     * No check and cast-off performed.
+     */
+    void DeactiveateSelection();
+    void ReactivateSelection(bool resetAligners);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -429,6 +472,11 @@ private:
     int CalcMusicFontSize();
 
 public:
+    Page *m_selectionPreceeding;
+    Page *m_selectionFollowing;
+    std::string m_selectionStart;
+    std::string m_selectionEnd;
+
     /**
      * A copy of the header tree stored as pugi::xml_document
      */
@@ -489,12 +537,22 @@ private:
     Options *m_options;
 
     /**
+     * The resources (glyph table).
+     */
+    Resources m_resources;
+
+    /**
      * @name Holds a pointer to the current score/scoreDef.
      * Set by Doc::GetCurrentScoreDef or explicitly through Doc::SetCurrentScoreDef
      */
     ///@{
     Score *m_currentScore;
     ///@}
+
+    /**
+     * A flag indicating if the document has been cast off or not.
+     */
+    bool m_isCastOff;
 
     /*
      * The following values are set in the Doc::SetDrawingPage.
@@ -535,17 +593,17 @@ private:
     bool m_currentScoreDefDone;
 
     /**
-     * A flag to indicate if the drawing preparation has been done. If yes,
-     * drawing preparation will be reset before being done again.
+     * A flag to indicate if the data preparation has been done. If yes,
+     * data preparation will be reset before being done again.
      */
-    bool m_drawingPreparationDone;
+    bool m_dataPreparationDone;
 
     /**
-     * A flag to indicate that the MIDI timemap has been calculated.  The
+     * A flag to indicate that the timemap has been calculated.  The
      * timemap needs to be prepared before MIDI files or timemap JSON files
      * are generated. Value is 0.0 when no timemap has been generated.
      */
-    double m_MIDITimemapTempo;
+    double m_timemapTempo;
 
     /**
      * A flag to indicate whereas the document contains analytical markup to be converted.

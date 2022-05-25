@@ -39,7 +39,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
+    const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */
@@ -60,9 +61,9 @@ public:
     //----------//
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment

@@ -65,9 +65,12 @@ private:
     //
 public:
     //
-private:
+protected:
     /** The list of object for which drawing is postponed */
     ArrayOfObjects m_drawingList;
+
+private:
+    //
 };
 
 //----------------------------------------------------------------------------
@@ -96,15 +99,18 @@ public:
      * Object * is a pointer to the object implementing the interface (e.g, Beam, fTrem)
      */
     ///@{
-    bool IsFirstIn(Object *object, LayerElement *element);
-    bool IsLastIn(Object *object, LayerElement *element);
+    bool IsFirstIn(const Object *object, const LayerElement *element) const;
+    bool IsLastIn(const Object *object, const LayerElement *element) const;
     ///@}
 
     /**
      * Initializes the m_beamElementCoords vector objects.
-     * This is called by Beam::FilterList
      */
-    void InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
+    ///@{
+    bool HasCoords() const { return !m_beamElementCoords.empty(); }
+    void InitCoords(const ArrayOfObjects &childList, Staff *staff, data_BEAMPLACE place);
+    void InitCoords(const ListOfObjects &childList, Staff *staff, data_BEAMPLACE place);
+    ///@}
 
     /**
      * Initialize m_cueSize value based on the @cue attribute and presence of child elements with @cue/@grace
@@ -112,14 +118,14 @@ public:
      */
     void InitCue(bool beamCue);
 
-    bool IsHorizontal();
+    bool IsHorizontal() const;
 
-    bool IsRepeatedPattern();
+    bool IsRepeatedPattern() const;
 
     /**
      * Checks whether difference between highest and lowest notes of the beam is just one step
      */
-    bool HasOneStepHeight();
+    bool HasOneStepHeight() const;
 
     /**
      * Get total beam width with regards to the shortest duration of the beam (counting both beams and whitespace
@@ -145,19 +151,19 @@ public:
     /**
      * Get above/below overflow
      */
-    void GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below);
+    void GetBeamOverflow(StaffAlignment *&above, StaffAlignment *&below) const;
 
     /**
      * Get above/below overflow for the children
      */
-    void GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below);
+    void GetBeamChildOverflow(StaffAlignment *&above, StaffAlignment *&below) const;
 
 protected:
     /**
      * Return the position of the element in the beam.
      * For notes, lookup the position of the parent chord.
      */
-    int GetPosition(Object *object, LayerElement *element);
+    int GetPosition(const Object *object, const LayerElement *element) const;
 
     //
 private:
@@ -229,15 +235,18 @@ public:
      * This will be true only for the first layer in the staff.
      */
     ///@{
-    bool DrawClef() { return (m_drawClef && m_currentClef.HasShape()); }
+    bool DrawClef() const { return (m_drawClef && m_currentClef.HasShape()); }
     void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
-    bool DrawKeySig() { return (m_drawKeySig); }
+    bool DrawKeySig() const { return (m_drawKeySig); }
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
-    bool DrawMensur() { return (m_drawMensur && m_currentMensur.HasSign()); }
+    bool DrawMensur() const { return (m_drawMensur && m_currentMensur.HasSign()); }
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
-    bool DrawMeterSig() { return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym())); }
+    bool DrawMeterSig() const
+    {
+        return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym()));
+    }
     void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; }
-    bool DrawMeterSigGrp();
+    bool DrawMeterSigGrp() const;
     void SetDrawMeterSigGrp(bool drawMeterSigGrp) { m_drawMeterSigGrp = drawMeterSigGrp; }
     ///@}
 
@@ -245,12 +254,12 @@ public:
      * @name Set the current clef, keySig, mensur and meterSig.
      */
     ///@{
-    void SetCurrentClef(Clef const *clef);
-    void SetCurrentKeySig(KeySig const *keySig);
-    void SetCurrentMensur(Mensur const *mensur);
-    void SetCurrentMeterSig(MeterSig const *meterSig);
-    void SetCurrentMeterSigGrp(MeterSigGrp const *meterSig);
-    void AlternateCurrentMeterSig(Measure *measure);
+    void SetCurrentClef(const Clef *clef);
+    void SetCurrentKeySig(const KeySig *keySig);
+    void SetCurrentMensur(const Mensur *mensur);
+    void SetCurrentMeterSig(const MeterSig *meterSig);
+    void SetCurrentMeterSigGrp(const MeterSigGrp *meterSigGrp);
+    void AlternateCurrentMeterSig(const Measure *measure);
     ///@}
 
     /**
@@ -259,10 +268,15 @@ public:
      */
     ///@{
     Clef *GetCurrentClef() { return &m_currentClef; }
+    const Clef *GetCurrentClef() const { return &m_currentClef; }
     KeySig *GetCurrentKeySig() { return &m_currentKeySig; }
+    const KeySig *GetCurrentKeySig() const { return &m_currentKeySig; }
     Mensur *GetCurrentMensur() { return &m_currentMensur; }
+    const Mensur *GetCurrentMensur() const { return &m_currentMensur; }
     MeterSig *GetCurrentMeterSig() { return &m_currentMeterSig; }
+    const MeterSig *GetCurrentMeterSig() const { return &m_currentMeterSig; }
     MeterSigGrp *GetCurrentMeterSigGrp() { return &m_currentMeterSigGrp; }
+    const MeterSigGrp *GetCurrentMeterSigGrp() const { return &m_currentMeterSigGrp; }
     ///@}
 
 private:
@@ -308,8 +322,14 @@ public:
     virtual void Reset();
     ///@}
 
+    /**
+     * @name Set and get the stem object managed by the interface
+     */
+    ///@{
     void SetDrawingStem(Stem *stem);
-    Stem *GetDrawingStem() const { return m_drawingStem; }
+    Stem *GetDrawingStem() { return m_drawingStem; }
+    const Stem *GetDrawingStem() const { return m_drawingStem; }
+    ///@}
 
     /**
      * @name Set and get the stem direction and stem positions
@@ -317,21 +337,22 @@ public:
      */
     ///@{
     void SetDrawingStemDir(data_STEMDIRECTION stemDir);
-    data_STEMDIRECTION GetDrawingStemDir();
+    data_STEMDIRECTION GetDrawingStemDir() const;
     void SetDrawingStemLen(int drawingStemLen);
-    int GetDrawingStemLen();
+    int GetDrawingStemLen() const;
+    int GetDrawingStemModRelY() const;
     ///@}
 
-    Point GetDrawingStemStart(Object *object = NULL);
-    Point GetDrawingStemEnd(Object *object = NULL);
+    Point GetDrawingStemStart(const Object *object = NULL) const;
+    Point GetDrawingStemEnd(const Object *object = NULL) const;
 
     /**
      * @name Virtual methods overriden in child classes (Chord and Note)
      */
     ///@{
-    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize) = 0;
-    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize) = 0;
-    virtual int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) = 0;
+    virtual Point GetStemUpSE(const Doc *doc, int staffSize, bool graceSize) const = 0;
+    virtual Point GetStemDownNW(const Doc *doc, int staffSize, bool graceSize) const = 0;
+    virtual int CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const = 0;
     ///@}
 
 protected:

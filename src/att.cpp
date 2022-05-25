@@ -77,9 +77,9 @@ data_VU Att::StrToVU(const std::string &value, bool logWarning) const
 std::string Att::ArticulationListToStr(data_ARTICULATION_List data) const
 {
     std::ostringstream ss;
-    for (size_t i = 0; i < data.size(); ++i) {
+    for (int i = 0; i < (int)data.size(); ++i) {
         if (i != 0) ss << " ";
-        ss << ArticulationToStr(data[i]);
+        ss << ArticulationToStr(data.at(i));
     }
     return ss.str();
 }
@@ -123,6 +123,42 @@ data_BEATRPT_REND Att::StrToBeatrptRend(const std::string &value, bool logWarnin
     if (value == "mixed") return BEATRPT_REND_mixed;
     if (logWarning && !value.empty()) LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
     return BEATRPT_REND_NONE;
+}
+
+std::string Att::BulgeToStr(const data_BULGE &data) const
+{
+    std::ostringstream ss;
+    for (int i = 0; i < (int)data.size(); ++i) {
+        if (i != 0) ss << " ";
+        ss << data.at(i).first << " " << data.at(i).second;
+    }
+    return ss.str();
+}
+
+data_BULGE Att::StrToBulge(const std::string &value, bool logWarning) const
+{
+    // Split content by spaces
+    std::istringstream content;
+    content.str(value);
+    std::vector<std::string> entries;
+    std::string token;
+    while (std::getline(content, token, ' ')) {
+        if (!token.empty()) entries.push_back(token);
+    }
+
+    // Convert entries to numerical values
+    data_BULGE bulge;
+    Att converter;
+    for (int i = 0; i < (int)entries.size() - 1; i += 2) {
+        const double distance = converter.StrToDbl(entries.at(i));
+        const double offset = converter.StrToDbl(entries.at(i + 1));
+        if ((offset < 0.0) || (offset > 100.0)) {
+            if (logWarning) LogWarning("Unsupported percentage value '%f' in bulge", offset);
+            continue;
+        }
+        bulge.push_back({ distance, offset });
+    }
+    return bulge;
 }
 
 std::string Att::DurationToStr(data_DURATION data) const
@@ -339,8 +375,8 @@ std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const
 
 data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
 {
-    for (size_t i = 0; i < value.length(); ++i) {
-        if (iswspace(value[i])) {
+    for (int i = 0; i < (int)value.length(); ++i) {
+        if (iswspace(value.at(i))) {
             value.erase(i, 1);
             i--;
         }
@@ -357,6 +393,54 @@ data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
         timePoint = atof(value.c_str());
     }
     return { measure, timePoint };
+}
+
+std::string Att::MetercountPairToStr(const data_METERCOUNT_pair &data) const
+{
+    std::stringstream output;
+    for (const int count : data.first) {
+        output << count;
+        switch (data.second) {
+            case MeterCountSign::Slash: output << '\\'; break;
+            case MeterCountSign::Minus: output << '-'; break;
+            case MeterCountSign::Asterisk: output << '*'; break;
+            case MeterCountSign::Plus: output << '+'; break;
+            case MeterCountSign::None:
+            default: break;
+        }
+    }
+
+    return output.str();
+}
+
+data_METERCOUNT_pair Att::StrToMetercountPair(const std::string &value) const
+{
+    std::regex re("[\\*\\+/-]");
+    std::sregex_token_iterator first{ value.begin(), value.end(), re, -1 }, last;
+    std::vector<std::string> tokens{ first, last };
+
+    // Since there is currently no need for implementation of complex calculus within metersig, only one opperation will
+    // be supported in the meter count. Caclulation will be based on the first mathematical operator in the string
+    MeterCountSign sign = MeterCountSign::None;
+    const size_t pos = value.find_first_of("+-*/");
+    if (pos != std::string::npos) {
+        if (value[pos] == '/') {
+            sign = MeterCountSign::Slash;
+        }
+        else if (value[pos] == '*') {
+            sign = MeterCountSign::Asterisk;
+        }
+        else if (value[pos] == '+') {
+            sign = MeterCountSign::Plus;
+        }
+        else if (value[pos] == '-') {
+            sign = MeterCountSign::Minus;
+        }
+    }
+    std::vector<int> result;
+    std::for_each(tokens.begin(), tokens.end(),
+        [&result](const std::string &elem) { result.emplace_back(std::atoi(elem.c_str())); });
+    return { result, sign };
 }
 
 std::string Att::MidivalueNameToStr(data_MIDIVALUE_NAME data) const
@@ -627,27 +711,6 @@ data_PROLATIO Att::StrToProlatio(const std::string &value, bool logWarning) cons
     return PROLATIO_NONE;
 }
 
-std::string Att::SummandListToStr(data_SUMMAND_List data) const
-{
-    std::ostringstream ss;
-    for (size_t i = 0; i < data.size(); ++i) {
-        if (i != 0) ss << "+";
-        ss << data[i];
-    }
-    return ss.str();
-}
-
-data_SUMMAND_List Att::StrToSummandList(std::string value) const
-{
-    data_SUMMAND_List list;
-    std::istringstream iss(value);
-    std::string token;
-    while (std::getline(iss, token, '+')) {
-        list.push_back(atoi(token.c_str()));
-    }
-    return list;
-}
-
 std::string Att::TempusToStr(data_TEMPUS data) const
 {
     std::string value;
@@ -697,9 +760,9 @@ data_TIE Att::StrToTie(const std::string &value, bool logWarning) const
 std::string Att::XsdAnyURIListToStr(xsdAnyURI_List data) const
 {
     std::ostringstream ss;
-    for (size_t i = 0; i < data.size(); ++i) {
+    for (int i = 0; i < (int)data.size(); ++i) {
         if (i != 0) ss << " ";
-        ss << data[i];
+        ss << data.at(i);
     }
     return ss.str();
 }
@@ -718,9 +781,9 @@ xsdAnyURI_List Att::StrToXsdAnyURIList(const std::string &value) const
 std::string Att::XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const
 {
     std::ostringstream ss;
-    for (size_t i = 0; i < data.size(); ++i) {
+    for (int i = 0; i < (int)data.size(); ++i) {
         if (i != 0) ss << " ";
-        ss << data[i];
+        ss << data.at(i);
     }
     return ss.str();
 }

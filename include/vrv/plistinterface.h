@@ -40,10 +40,10 @@ public:
     /**
      * Add a reference ref to the AttPlist vector (if not already there)
      */
-    void AddRef(std::string ref);
+    void AddRef(const std::string &ref);
 
     /**
-     * Add a references, not checking if it is already in the list (for expansion@plist).
+     * Add a reference, not checking if it is already in the list (for expansion@plist).
      */
     void AddRefAllowDuplicate(const std::string &ref);
 
@@ -51,9 +51,15 @@ public:
      * Set a reference object when the uuid is found in the m_uuids.
      * Calls IsValidRef to check that the type of object is valid.
      */
-    void SetRef(Object *object);
+    void SetRef(const Object *object);
 
-    const ArrayOfObjects *GetRefs() { return &m_references; }
+    /**
+     * Retrieve all reference objects
+     */
+    ///@{
+    ArrayOfObjects GetRefs();
+    const ArrayOfConstObjects &GetRefs() const { return m_references; }
+    ///@}
 
     //-----------------//
     // Pseudo functors //
@@ -63,7 +69,7 @@ public:
      * We have functor in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor method. These not called by the Process/Call loop but by the implementaion
-     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
+     * classes explicitely. See FloatingObject::PrepareStaffCurrentTimeSpanning for an example.
      */
 
     /**
@@ -72,9 +78,9 @@ public:
     virtual int InterfacePreparePlist(FunctorParams *functorParams, Object *object);
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
+    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
 
 protected:
     /**
@@ -86,7 +92,7 @@ protected:
      * Method to be redefined in the child class if specific validation is required.
      * The method is called from PlistInterface::SetRef
      */
-    virtual bool IsValidRef(Object *ref) const { return true; }
+    virtual bool IsValidRef(const Object *ref) const { return true; }
 
 private:
     //
@@ -98,7 +104,7 @@ private:
      * An array of resolved references.
      * Filled in InterfacePreparePlist (backward).
      */
-    ArrayOfObjects m_references;
+    ArrayOfConstObjects m_references;
 
     /**
      * An array of parsed any uris stored as uuids.

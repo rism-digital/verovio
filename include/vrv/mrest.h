@@ -47,7 +47,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}
 
     /**
@@ -65,9 +66,9 @@ public:
     int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment

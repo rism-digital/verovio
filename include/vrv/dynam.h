@@ -48,9 +48,18 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    TextDirInterface *GetTextDirInterface() override { return dynamic_cast<TextDirInterface *>(this); }
-    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
-    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TextDirInterface *GetTextDirInterface() override { return vrv_cast<TextDirInterface *>(this); }
+    const TextDirInterface *GetTextDirInterface() const override { return vrv_cast<const TextDirInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
 
     /**
@@ -75,6 +84,11 @@ public:
      */
     bool IsExtenderElement() const override { return GetExtender() == BOOLEAN_true; }
 
+    /**
+     * Retrieve parentheses / brackets from the enclose attribute
+     */
+    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs() const;
+
     //----------------//
     // Static methods //
     //----------------//
@@ -93,11 +107,6 @@ public:
      * See Object::PrepareFloatingGrps
      */
     int PrepareFloatingGrps(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareEnclosedDynam
-     */
-    int PrepareDynamEnclosure(FunctorParams *functoParams) override;
 
 protected:
     //

@@ -1059,7 +1059,7 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
     else if (Att::SetVisual(element, attrType, attrValue))
         success = true;
     if (success && m_doc->GetType() != Facs) {
-        m_doc->PrepareDrawing();
+        m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
     m_infoObject.import("status", success ? "OK" : "FAILURE");
@@ -1220,7 +1220,7 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
         }
     }
     if (success && m_doc->GetType() != Facs) {
-        m_doc->PrepareDrawing();
+        m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
     m_infoObject.import("status", "OK");
@@ -1292,7 +1292,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     // Move any elements that should be on the second staff there.
     for (Object *child = layer->GetFirst(); child != NULL; child = layer->GetNext()) {
         assert(child);
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(child);
+        FacsimileInterface *fi = child->GetFacsimileInterface();
         if (fi == NULL || !fi->HasFacs()) {
             fi = NULL;
             ListOfObjects facsimileInterfaces;
@@ -1300,7 +1300,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
             child->FindAllDescendantsByComparison(&facsimileInterfaces, &ic);
 
             for (auto it = facsimileInterfaces.begin(); it != facsimileInterfaces.end(); ++it) {
-                FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+                FacsimileInterface *temp = (*it)->GetFacsimileInterface();
                 assert(temp);
                 if (temp->HasFacs() && (fi == NULL || temp->GetZone()->GetUlx() < fi->GetZone()->GetUlx())) {
                     fi = temp;
@@ -1344,12 +1344,12 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     InterfaceComparison ic(INTERFACE_FACSIMILE);
     ListOfObjects fiChildren;
     obj->FindAllDescendantsByComparison(&fiChildren, &ic);
-    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(obj);
+    FacsimileInterface *fi = obj->GetFacsimileInterface();
     if (fi != NULL && fi->HasFacs()) {
         fi->SetZone(NULL);
     }
     for (auto it = fiChildren.begin(); it != fiChildren.end(); ++it) {
-        fi = dynamic_cast<FacsimileInterface *>(*it);
+        fi = (*it)->GetFacsimileInterface();
         if (fi != NULL && fi->HasFacs()) {
             fi->SetZone(NULL);
         }
@@ -1721,7 +1721,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     InterfaceComparison comp(INTERFACE_FACSIMILE);
                     syl->GetFirstAncestor(SYLLABLE)->FindAllDescendantsByComparison(&children, &comp);
                     for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
-                        FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
+                        FacsimileInterface *temp = (*iter2)->GetFacsimileInterface();
                         assert(temp);
                         Zone *tempZone = vrv_cast<Zone *>(temp->GetZone());
                         assert(tempZone);
@@ -1835,9 +1835,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 assert(par);
                 Syl *descSyl = vrv_cast<Syl *>(par->FindDescendantByType(SYL));
                 assert(descSyl);
-                // FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>
-                // ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
-                FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
+                FacsimileInterface *facsInter = descSyl->GetFacsimileInterface();
 
                 if (facsInter != NULL) {
                     // Update bb to valid extremes
@@ -2024,7 +2022,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                         InterfaceComparison comp(INTERFACE_FACSIMILE);
                         syl->GetFirstAncestor(SYLLABLE)->FindAllDescendantsByComparison(&children, &comp);
                         for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
-                            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
+                            FacsimileInterface *temp = (*iter2)->GetFacsimileInterface();
                             assert(temp);
                             Zone *tempZone = vrv_cast<Zone *>(temp->GetZone());
                             assert(tempZone);
@@ -2059,7 +2057,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     zone->SetLry(zone->GetLry() + 200);
 
                     assert(m_doc->GetFacsimile());
-                    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
+                    FacsimileInterface *fi = syl->GetFacsimileInterface();
                     assert(fi);
                     Object *surface = m_doc->GetFacsimile()->FindDescendantByType(SURFACE);
                     if (surface != NULL) {
@@ -2328,7 +2326,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         return false;
     }
     if (success1 && success2 && m_doc->GetType() != Facs) {
-        m_doc->PrepareDrawing();
+        m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
     m_infoObject.import("status", "OK");
@@ -2384,7 +2382,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
     ClosestBB comp;
 
-    if (dynamic_cast<FacsimileInterface *>(element)->HasFacs()) {
+    if (element->GetFacsimileInterface()->HasFacs()) {
         comp.x = element->GetFacsimileInterface()->GetZone()->GetUlx();
         comp.y = element->GetFacsimileInterface()->GetZone()->GetUly();
     }

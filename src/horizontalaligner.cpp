@@ -50,12 +50,17 @@ void HorizontalAligner::Reset()
 
 Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType type, int &idx)
 {
+    return const_cast<Alignment *>(std::as_const(*this).SearchAlignmentAtTime(time, type, idx));
+}
+
+const Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType type, int &idx) const
+{
     int i;
     idx = -1; // the index if we reach the end.
-    Alignment *alignment = NULL;
+    const Alignment *alignment = NULL;
     // First try to see if we already have something at the time position
     for (i = 0; i < this->GetAlignmentCount(); ++i) {
-        alignment = vrv_cast<Alignment *>(this->GetChildren()->at(i));
+        alignment = vrv_cast<const Alignment *>(this->GetChild(i));
         assert(alignment);
 
         double alignment_time = alignment->GetTime();
@@ -80,9 +85,9 @@ Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType t
 void HorizontalAligner::AddAlignment(Alignment *alignment, int idx)
 {
     alignment->SetParent(this);
-    ArrayOfObjects *children = this->GetChildrenForModification();
+    ArrayOfObjects &children = this->GetChildrenForModification();
     if (idx == -1) {
-        children->push_back(alignment);
+        children.push_back(alignment);
     }
     else {
         InsertChild(alignment, idx);
@@ -159,7 +164,7 @@ void MeasureAligner::SetMaxTime(double time)
     Alignment *alignment = NULL;
     // Increase the time position for all alignment from the right barline
     for (i = idx; i < this->GetAlignmentCount(); ++i) {
-        alignment = vrv_cast<Alignment *>(this->GetChildren()->at(i));
+        alignment = vrv_cast<Alignment *>(this->GetChild(i));
         assert(alignment);
         // Change it only if higher than before
         if (time > alignment->GetTime()) alignment->SetTime(time);
@@ -198,7 +203,7 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         int startX = start->GetXRel();
         int endX = end->GetXRel();
         // We use a reverse iterator
-        for (auto child : *this->GetChildren()) {
+        for (auto child : this->GetChildren()) {
             Alignment *current = vrv_cast<Alignment *>(child);
             assert(current);
             // Nothing to do once we passed the start alignment
@@ -221,7 +226,7 @@ void MeasureAligner::PushAlignmentsRight()
 {
     Alignment *previous = NULL;
     ArrayOfObjects::const_reverse_iterator riter;
-    for (riter = this->GetChildren()->rbegin(); riter != this->GetChildren()->rend(); ++riter) {
+    for (riter = this->GetChildren().rbegin(); riter != this->GetChildren().rend(); ++riter) {
         Alignment *current = vrv_cast<Alignment *>(*riter);
         assert(current);
         if (current->IsOfType({ ALIGNMENT_GRACENOTE })) {
@@ -255,7 +260,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
 
     bool found = false;
     ArrayOfObjects::const_reverse_iterator riter;
-    for (riter = this->GetChildren()->rbegin(); riter != this->GetChildren()->rend(); ++riter) {
+    for (riter = this->GetChildren().rbegin(); riter != this->GetChildren().rend(); ++riter) {
         if (!found) {
             if ((*riter) == alignment) found = true;
             continue;
@@ -420,7 +425,7 @@ void GraceAligner::SetGraceAligmentXPos(Doc *doc)
 
     int i = 0;
     // Then the @n of each first staffDef
-    for (childrenIter = this->GetChildren()->rbegin(); childrenIter != this->GetChildren()->rend(); ++childrenIter) {
+    for (childrenIter = this->GetChildren().rbegin(); childrenIter != this->GetChildren().rend(); ++childrenIter) {
         Alignment *alignment = vrv_cast<Alignment *>(*childrenIter);
         assert(alignment);
         // We space with a notehead (non grace size) which seems to be a reasonable default spacing with margin
@@ -488,16 +493,16 @@ bool Alignment::HasAccidVerticalOverlap(Alignment *otherAlignment, int staffN)
         = vrv_cast<AlignmentReference *>(otherAlignment->FindDescendantByComparison(&matchStaff, 1));
     if (!currentRef || !otherRef) return false;
 
-    return otherRef->HasAccidVerticalOverlap(currentRef->GetChildren());
+    return otherRef->HasAccidVerticalOverlap(&currentRef->GetChildren());
 }
 
-bool Alignment::HasAlignmentReference(int staffN)
+bool Alignment::HasAlignmentReference(int staffN) const
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
     return (this->FindDescendantByComparison(&matchStaff, 1) != NULL);
 }
 
-bool Alignment::HasTimestampOnly()
+bool Alignment::HasTimestampOnly() const
 {
     // If no child, then not timestamp
     if (!this->GetChildCount()) return false;
@@ -598,9 +603,9 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std:
     getAlignmentLeftRightParams.m_excludeClasses = m_excludes;
 
     if (staffN != VRV_UNSET) {
-        ArrayOfComparisons filters;
+        Filters filters;
         AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-        filters.push_back(&matchStaff);
+        filters.Add(&matchStaff);
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
     }
     else {
@@ -624,7 +629,7 @@ bool Alignment::HasGraceAligner(int id) const
     return (m_graceAligners.count(id) == 1);
 }
 
-bool Alignment::PerfomBoundingBoxAlignment() const
+bool Alignment::PerformBoundingBoxAlignment() const
 {
     return this->IsOfType({ ALIGNMENT_ACCID, ALIGNMENT_DOT, ALIGNMENT_DEFAULT });
 }
@@ -633,7 +638,7 @@ AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, in
 {
     AlignmentReference *reference = NULL;
 
-    for (auto child : *this->GetChildren()) {
+    for (auto child : this->GetChildren()) {
         reference = dynamic_cast<AlignmentReference *>(child);
         if (reference->GetN() == staffN) {
             return reference;
@@ -645,14 +650,14 @@ AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, in
     return reference;
 }
 
-std::pair<int, int> Alignment::GetAlignmentTopBottom()
+std::pair<int, int> Alignment::GetAlignmentTopBottom() const
 {
     int max = VRV_UNSET, min = VRV_UNSET;
     // Iterate over each element in each alignment reference and find max/min Y value - these will serve as top/bottom
     // values for the Alignment
-    for (auto child : *this->GetChildren()) {
-        AlignmentReference *reference = dynamic_cast<AlignmentReference *>(child);
-        for (auto element : *reference->GetChildren()) {
+    for (auto child : this->GetChildren()) {
+        const AlignmentReference *reference = dynamic_cast<const AlignmentReference *>(child);
+        for (auto element : reference->GetChildren()) {
             const int top = element->GetSelfTop();
             if ((VRV_UNSET == max) || (top > max)) {
                 max = top;
@@ -723,25 +728,25 @@ void AlignmentReference::AddChild(Object *child)
     LayerElement *childElement = vrv_cast<LayerElement *>(child);
     assert(childElement);
 
-    ArrayOfObjects *children = this->GetChildrenForModification();
+    ArrayOfObjects &children = this->GetChildrenForModification();
 
     if (!childElement->HasSameas()) {
         ArrayOfObjects::iterator childrenIter;
         // Check if the we will have a reference with multiple layers
-        for (childrenIter = children->begin(); childrenIter != children->end(); ++childrenIter) {
+        for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
             LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
             if (childElement->GetAlignmentLayerN() == element->GetAlignmentLayerN()) {
                 break;
             }
         }
-        if (childrenIter == children->end()) m_layerCount++;
+        if (childrenIter == children.end()) m_layerCount++;
     }
 
     // Special case where we do not set the parent because the reference will not have ownership
     // Children will be treated as relinquished objects in the desctructor
     // However, we need to make sure the child has a parent (somewhere else)
     assert(child->GetParent() && this->IsReferenceObject());
-    children->push_back(child);
+    children.push_back(child);
     Modify();
 }
 
@@ -758,9 +763,13 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
     Accid *accid, Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids)
 {
     std::vector<Accid *> leftAccids;
+    const ArrayOfObjects &children = this->GetChildren();
 
     // bottom one
-    for (auto child : *this->GetChildren()) {
+    for (auto child : children) {
+        // if accidental has unison overlap, ignore elements on other layers for overlap
+        if (accid->IsAlignedWithSameLayer() && (accid->GetFirstAncestor(LAYER) != child->GetFirstAncestor(LAYER)))
+            continue;
         accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids, adjustedAccids);
     }
 
@@ -773,7 +782,7 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
 
 bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfObjects *objects)
 {
-    for (const auto child : *this->GetChildren()) {
+    for (const auto child : this->GetChildren()) {
         if (!child->Is(ACCID)) continue;
         Accid *accid = vrv_cast<Accid *>(child);
         if (!accid->HasAccid()) continue;
@@ -782,6 +791,52 @@ bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfObjects *objects)
         }
     }
     return false;
+}
+
+bool AlignmentReference::HasCrossStaffElements() const
+{
+    ListOfConstObjects children;
+    ClassIdsComparison classId({ NOTE, CHORD });
+    this->FindAllDescendantsByComparison(&children, &classId);
+
+    for (const auto child : children) {
+        const LayerElement *layerElement = vrv_cast<const LayerElement *>(child);
+        if (layerElement->m_crossStaff) return true;
+    }
+
+    return false;
+}
+
+void AlignmentReference::SetAccidLayerAlignment()
+{
+    const ArrayOfObjects &children = this->GetChildren();
+    for (Accid *accid : m_accidSpace) {
+        if (accid->IsAlignedWithSameLayer()) continue;
+
+        Note *parentNote = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
+        const bool hasUnisonOverlap = std::any_of(children.begin(), children.end(), [parentNote](Object *object) {
+            if (!object->Is(NOTE)) return false;
+            Note *otherNote = vrv_cast<Note *>(object);
+            // in case notes are in unison but have different accidentals
+            return parentNote && parentNote->IsUnisonWith(otherNote, true)
+                && !parentNote->IsUnisonWith(otherNote, false);
+        });
+
+        if (!hasUnisonOverlap) continue;
+
+        Chord *chord = vrv_cast<Chord *>(accid->GetFirstAncestor(CHORD));
+        // no chord, so align only parent note
+        if (!chord) {
+            accid->IsAlignedWithSameLayer(true);
+            continue;
+        }
+        // we have chord ancestor, so need to align all of its accidentals
+        ListOfObjects accidentals = chord->FindAllDescendantsByType(ACCID);
+        std::for_each(accidentals.begin(), accidentals.end(), [](Object *object) {
+            Accid *accid = vrv_cast<Accid *>(object);
+            accid->IsAlignedWithSameLayer(true);
+        });
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -808,11 +863,11 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     time = time - 1.0;
     TimestampAttr *timestampAttr = NULL;
 
-    ArrayOfObjects *children = this->GetChildrenForModification();
+    ArrayOfObjects &children = this->GetChildrenForModification();
 
     // First try to see if we already have something at the time position
     for (i = 0; i < this->GetChildCount(); ++i) {
-        timestampAttr = vrv_cast<TimestampAttr *>(children->at(i));
+        timestampAttr = vrv_cast<TimestampAttr *>(children.at(i));
         assert(timestampAttr);
 
         double alignmentTime = timestampAttr->GetActualDurPos();
@@ -830,7 +885,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     timestampAttr->SetDrawingPos(time);
     timestampAttr->SetParent(this);
     if (idx == -1) {
-        children->push_back(timestampAttr);
+        children.push_back(timestampAttr);
     }
     else {
         InsertChild(timestampAttr, idx);
@@ -842,9 +897,9 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
+int MeasureAligner::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     // We start a new MeasureAligner
@@ -989,7 +1044,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         assert(measureAligner);
 
         std::vector<int>::iterator iter;
-        ArrayOfComparisons filters;
+        Filters filters;
         for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
             const int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
 
@@ -1028,10 +1083,10 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             params->m_graceMaxPos = graceMaxPos;
             params->m_graceUpcomingMaxPos = -VRV_UNSET;
             params->m_graceCumulatedXShift = VRV_UNSET;
-            filters.clear();
+            filters.Clear();
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
-            filters.push_back(&matchStaff);
+            filters.Add(&matchStaff);
 
             if (this->HasGraceAligner(graceAlignerId)) {
                 this->GetGraceAligner(graceAlignerId)
@@ -1082,7 +1137,7 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
 
     this->SetXRel(this->GetXRel() + params->m_cumulatedXShift);
 
-    if (m_type == ALIGNMENT_MEASURE_END) {
+    if (m_type == ALIGNMENT_MEASURE_END && this->GetXRel() < params->m_minPos) {
         this->SetXRel(params->m_minPos);
     }
 
@@ -1219,9 +1274,9 @@ int Alignment::HorizontalSpaceForDuration(
     return intervalXRel;
 }
 
-int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
+int Alignment::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     // Do not set an x pos for anything before the barline (including it)
@@ -1244,7 +1299,7 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
             params->m_doc->GetOptions()->m_spacingLinear.GetValue(),
             params->m_doc->GetOptions()->m_spacingNonLinear.GetValue());
-        // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
+        // LogDebug("CalcAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
 
     MapOfIntGraceAligners::const_iterator iter;
@@ -1385,7 +1440,7 @@ int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
     // Because we are processing grace notes alignment backward (see Alignment::AdjustGraceXPos) we need
     // to process the children (LayerElement) "by hand" in FORWARD manner
     // (filters can be NULL because filtering was already applied in the parent)
-    for (auto child : *this->GetChildren()) {
+    for (auto child : this->GetChildren()) {
         child->Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, FORWARD);
     }
 
@@ -1404,6 +1459,8 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
 
     std::sort(m_accidSpace.begin(), m_accidSpace.end(), AccidSpaceSort());
+    // process accid layer alignment
+    this->SetAccidLayerAlignment();
 
     // Detect the octave and mark them
     std::vector<Accid *>::iterator iter, octaveIter;

@@ -47,13 +47,22 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
     ///@}
 
     /**
      * Get the SMuFL glyph for the turn based on form or glyph.num
      */
     wchar_t GetTurnGlyph() const;
+
+    /**
+     * Get the turn height ignoring slash
+     */
+    int GetTurnHeight(Doc *doc, int staffSize) const;
 
     //----------//
     // Functors //
@@ -65,9 +74,9 @@ public:
     int PrepareDelayedTurns(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
 protected:
     //

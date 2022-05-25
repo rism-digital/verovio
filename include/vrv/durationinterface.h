@@ -62,24 +62,24 @@ public:
      * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
      * LayerElement and DurationInterface have no inheritance link.
      */
-    double GetInterfaceAlignmentDuration(int num, int numBase);
+    double GetInterfaceAlignmentDuration(int num, int numBase) const;
 
     /**
      * Returns the duration (in double) for the element for mensural notation
      * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
      * need to be modified for shorter equality in later repertoire.
      */
-    double GetInterfaceAlignmentMensuralDuration(int num, int numBase, Mensur *currentMensur);
+    double GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const;
 
     /**
      * Return true if the note or rest is the first of a beam.
      */
-    bool IsFirstInBeam(LayerElement *noteOrRest);
+    bool IsFirstInBeam(const LayerElement *noteOrRest) const;
 
     /**
      * Return true if the note or rest is the last of a beam.
      */
-    bool IsLastInBeam(LayerElement *noteOrRest);
+    bool IsLastInBeam(const LayerElement *noteOrRest) const;
 
     /**
      * @name Return the actual (gestural) duration of the note, for both CMN and mensural durations
@@ -96,7 +96,7 @@ public:
      * If the element is part of a chord, return the chord actual duration, otherwise the note actual duration.
      * Since we need to check what the element is, we need to pass it as parameter.
      */
-    int GetNoteOrChordDur(LayerElement *element);
+    int GetNoteOrChordDur(const LayerElement *element) const;
 
     /**
      * Return true if the value is a mensural (DURATION_longa, brevis, etc.)
@@ -107,7 +107,7 @@ public:
      * Interface comparison operator.
      * Check if the LayerElement has a DurationInterface and compare attributes
      */
-    bool HasIdenticalDurationInterface(DurationInterface *otherDurationInterface);
+    bool HasIdenticalDurationInterface(const DurationInterface *otherDurationInterface) const;
 
     /**
      * MIDI timing information
@@ -134,7 +134,7 @@ public:
      * We have functors in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor methods. These are not called by the Process/Call loop but by the implementation
-     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
+     * classes explicitely. See FloatingObject::PrepareStaffCurrentTimeSpanning for an example.
      */
 
 private:

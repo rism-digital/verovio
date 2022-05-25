@@ -48,8 +48,16 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
-    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
 
     virtual bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);
@@ -65,10 +73,10 @@ public:
     //----------//
 
     /**
-     * see Object::ResolveMIDITies
+     * see Object::InitTimemapTies
      */
     ///@{
-    int ResolveMIDITies(FunctorParams *functorParams) override;
+    int InitTimemapTies(FunctorParams *functorParams) override;
     ///@}
 
 private:

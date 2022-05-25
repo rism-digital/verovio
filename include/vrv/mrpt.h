@@ -23,7 +23,7 @@ namespace vrv {
 /**
  * This class models the MEI <mRpt> element.
  */
-class MRpt : public LayerElement, public AttColor {
+class MRpt : public LayerElement, public AttColor, public AttNumbered, public AttNumberPlacement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

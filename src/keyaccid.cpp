@@ -15,7 +15,6 @@
 
 #include "accid.h"
 #include "doc.h"
-#include "editorial.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "note.h"
@@ -31,10 +30,16 @@ namespace vrv {
 static const ClassRegistrar<KeyAccid> s_factory("keyAccid", KEYACCID);
 
 KeyAccid::KeyAccid()
-    : LayerElement(KEYACCID, "keyaccid-"), PitchInterface(), AttAccidental(), AttColor(), AttEnclosingChars()
+    : LayerElement(KEYACCID, "keyaccid-")
+    , PitchInterface()
+    , PositionInterface()
+    , AttAccidental()
+    , AttColor()
+    , AttEnclosingChars()
 {
 
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_ACCIDENTAL);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
@@ -48,27 +53,10 @@ void KeyAccid::Reset()
 {
     LayerElement::Reset();
     PitchInterface::Reset();
+    PositionInterface::Reset();
     this->ResetAccidental();
     this->ResetColor();
     this->ResetEnclosingChars();
-}
-
-bool KeySig::IsSupportedChild(Object *child)
-{
-    if (this->IsAttribute()) {
-        LogError("Adding a child to an attribute is not allowed");
-        assert(false);
-    }
-    else if (child->Is(KEYACCID)) {
-        assert(dynamic_cast<KeyAccid *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else {
-        return false;
-    }
-    return true;
 }
 
 std::wstring KeyAccid::GetSymbolStr() const
@@ -97,6 +85,18 @@ std::wstring KeyAccid::GetSymbolStr() const
         symbolStr.push_back(symc);
     }
     return symbolStr;
+}
+
+int KeyAccid::CalcStaffLoc(Clef *clef, int clefLocOffset) const
+{
+    if (this->HasLoc()) {
+        return this->GetLoc();
+    }
+    else {
+        const data_ACCIDENTAL_WRITTEN accid = this->GetAccid();
+        const data_PITCHNAME pname = this->GetPname();
+        return PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, clef), clefLocOffset);
+    }
 }
 
 //----------------------------------------------------------------------------

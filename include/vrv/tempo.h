@@ -47,8 +47,13 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    TextDirInterface *GetTextDirInterface() override { return dynamic_cast<TextDirInterface *>(this); }
-    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TextDirInterface *GetTextDirInterface() override { return vrv_cast<TextDirInterface *>(this); }
+    const TextDirInterface *GetTextDirInterface() const override { return vrv_cast<const TextDirInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
     ///@}
 
     /**
@@ -73,14 +78,14 @@ public:
     int AdjustTempo(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcMaxMeasureDuration
      */
-    int CalcMaxMeasureDuration(FunctorParams *functorParams) override;
+    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
 
 private:
     //

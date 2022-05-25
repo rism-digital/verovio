@@ -147,7 +147,7 @@ public:
     /**
      * Returns true for Alignment for which we want to do bounding box alignment
      */
-    bool PerfomBoundingBoxAlignment() const;
+    bool PerformBoundingBoxAlignment() const;
 
     /**
      * Return the AlignmentReference holding the element.
@@ -158,7 +158,7 @@ public:
     /**
      * Return pair of max and min Y value within alignment. Elements will be counted by alignment references.
      */
-    std::pair<int, int> GetAlignmentTopBottom();
+    std::pair<int, int> GetAlignmentTopBottom() const;
 
     /**
      * Add an accidental to the accidSpace of the AlignmentReference holding it.
@@ -192,22 +192,22 @@ public:
     /**
      * Return true if the alignment contains at least one reference with staffN
      */
-    bool HasAlignmentReference(int staffN);
+    bool HasAlignmentReference(int staffN) const;
 
     /**
      * Return true if the alignment contains only references to timestamp attributes.
      */
-    bool HasTimestampOnly();
+    bool HasTimestampOnly() const;
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * Set the position of the Alignment.
+     * Calc the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      */
-    int SetAlignmentXPos(FunctorParams *functorParams) override;
+    int CalcAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * Justify the X positions
@@ -258,7 +258,7 @@ public:
 private:
     /**
      * Stores the position relative to the measure.
-     * This is instanciated by the Object::SetAlignmentXPos functor.
+     * This is instanciated by the Object::CalcAlignmentXPos functor.
      * It takes into account a non-linear according to the time interval with
      * the previous Alignement
      */
@@ -339,7 +339,13 @@ public:
     /**
      * Return true if the reference has elements from cross-staff.
      */
-    bool HasCrossStaffElements();
+    bool HasCrossStaffElements() const;
+
+    /**
+     * Set whether accidentals should be aligned with all elements of alignmentReference or elements from same layer
+     * only. Set for each accidental in accidSpace separately
+     */
+    void SetAccidLayerAlignment();
 
     //----------//
     // Functors //
@@ -408,7 +414,7 @@ public:
      */
     bool CopyChildren() const override { return false; }
 
-    int GetAlignmentCount() const { return (int)GetChildren()->size(); }
+    int GetAlignmentCount() const { return this->GetChildCount(); }
 
     //----------//
     // Functors //
@@ -419,7 +425,10 @@ protected:
      * Search if an alignment of the type is already there at the time.
      * If not, return in idx the position where it needs to be inserted (-1 if it is the end)
      */
+    ///@{
     Alignment *SearchAlignmentAtTime(double time, AlignmentType type, int &idx);
+    const Alignment *SearchAlignmentAtTime(double time, AlignmentType type, int &idx) const;
+    ///@}
 
     /**
      * Add an alignment at the appropriate position (at the end if -1)
@@ -447,7 +456,7 @@ public:
      * @name Constructors, destructors, reset and class name methods
      * Reset method resets all attribute classes
      */
-    ///@(
+    ///@{
     MeasureAligner();
     virtual ~MeasureAligner();
     void Reset() override;
@@ -532,7 +541,7 @@ public:
      * Looks at the time different with the previous Alignment.
      * For each MeasureAlignment, we need to reset the previous time position.
      */
-    int SetAlignmentXPos(FunctorParams *functorParams) override;
+    int CalcAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * Justify the X positions
@@ -627,7 +636,7 @@ public:
 
     /**
      * Set an linear defaut position for each grace note
-     * This is called from the SetAlignmentXPos Functor.
+     * This is called from the CalcAlignmentXPos Functor.
      */
     void SetGraceAligmentXPos(Doc *doc);
 

@@ -39,8 +39,16 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
-    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
 
     /**
@@ -57,9 +65,9 @@ public:
     // TextElement does not inherit from FloatingObject.
 
     /**
-     * See Object::FillStaffCurrentTimeSpanning
+     * See Object::PrepareStaffCurrentTimeSpanning
      */
-    int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
+    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimePointing
@@ -77,9 +85,9 @@ public:
     int PrepareTimestamps(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
 private:
     //

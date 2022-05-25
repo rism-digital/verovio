@@ -51,7 +51,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    LinkingInterface *GetLinkingInterface() override { return this; }
+    LinkingInterface *GetLinkingInterface() override { return vrv_cast<LinkingInterface *>(this); }
+    const LinkingInterface *GetLinkingInterface() const override { return vrv_cast<const LinkingInterface *>(this); }
     ///@}
 
     /**
@@ -69,12 +70,12 @@ public:
     /**
      * Get simplified (i.e. single metersig with count/unit) based on the MeterSigGrp function
      */
-    MeterSig *GetSimplifiedMeterSig();
+    MeterSig *GetSimplifiedMeterSig() const;
 
     /**
      * Set counter for the alternating meterSigGrp based on the provided measureId
      */
-    void SetMeasureBasedCount(Measure *measure);
+    void SetMeasureBasedCount(const Measure *measure);
 
     //----------//
     // Functors //
@@ -88,7 +89,7 @@ protected:
     /**
      * Filter the flat list and keep only meterSigGrp elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     // vector with alternating measures to be used only with meterSigGrpLog_FUNC_alternating

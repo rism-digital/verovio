@@ -66,6 +66,7 @@ private:
 public:
     //
 private:
+    //
 };
 
 } // namespace vrv

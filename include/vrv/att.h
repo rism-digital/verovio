@@ -132,6 +132,9 @@ public:
     std::string BeatrptRendToStr(data_BEATRPT_REND data) const;
     data_BEATRPT_REND StrToBeatrptRend(const std::string &value, bool logWarning = true) const;
 
+    std::string BulgeToStr(const data_BULGE &data) const;
+    data_BULGE StrToBulge(const std::string &value, bool logWarning = true) const;
+
     std::string DurationToStr(data_DURATION data) const;
     data_DURATION StrToDuration(const std::string &value, bool logWarning = true) const;
 
@@ -158,6 +161,9 @@ public:
     {
         return StrToVU(value, logWarning);
     }
+
+    std::string MetercountPairToStr(const data_METERCOUNT_pair &data) const;
+    data_METERCOUNT_pair StrToMetercountPair(const std::string &value) const;
 
     std::string ModusmaiorToStr(data_MODUSMAIOR data) const;
     data_MODUSMAIOR StrToModusmaior(const std::string &value, bool logWarning = true) const;
@@ -203,9 +209,6 @@ public:
 
     std::string ProlatioToStr(data_PROLATIO data) const;
     data_PROLATIO StrToProlatio(const std::string &value, bool logWarning = true) const;
-
-    std::string SummandListToStr(data_SUMMAND_List data) const;
-    data_SUMMAND_List StrToSummandList(std::string value) const;
 
     std::string TempusToStr(data_TEMPUS data) const;
     data_TEMPUS StrToTempus(const std::string &value, bool logWarning = true) const;

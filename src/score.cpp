@@ -133,17 +133,17 @@ void Score::CalcRunningElementHeight(Doc *doc)
     pages->DeleteChild(page1);
     pages->DeleteChild(page2);
 
-    doc->ResetDrawingPage();
+    doc->ResetDataPage();
 }
 
-bool Score::ScoreDefNeedsOptimization(int optionCondense)
+bool Score::ScoreDefNeedsOptimization(int optionCondense) const
 {
     if (optionCondense == CONDENSE_none) return false;
     // optimize scores only if encoded
     bool optimize = (m_scoreDef.HasOptimize() && m_scoreDef.GetOptimize() == BOOLEAN_true);
     // if nothing specified, do not if there is only one grpSym
     if ((optionCondense == CONDENSE_auto) && !m_scoreDef.HasOptimize()) {
-        ListOfObjects symbols = m_scoreDef.FindAllDescendantsByType(GRPSYM);
+        ListOfConstObjects symbols = m_scoreDef.FindAllDescendantsByType(GRPSYM);
         optimize = (symbols.size() > 1);
     }
 
@@ -153,6 +153,17 @@ bool Score::ScoreDefNeedsOptimization(int optionCondense)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int Score::PrepareDataInitialization(FunctorParams *functorParams)
+{
+    PrepareDataInitializationParams *params = vrv_params_cast<PrepareDataInitializationParams *>(functorParams);
+    assert(params);
+
+    // Evaluate functor on scoreDef
+    this->GetScoreDef()->Process(params->m_functor, params);
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Score::AdjustDots(FunctorParams *functorParams)
 {
@@ -272,6 +283,78 @@ int Score::PrepareDuration(FunctorParams *functorParams)
     if (scoreDef) {
         scoreDef->Process(params->m_functor, params);
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Score::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    ScoreDef *scoreDef = this->GetScoreDef();
+    Transposer *transposer = params->m_transposer;
+    const std::string &transposition = params->m_transposition;
+
+    // Check whether we transpose to sounding pitch
+    if (params->m_transposeToSoundingPitch) {
+        // Evaluate functor on scoreDef
+        scoreDef->Process(params->m_functor, params, params->m_functorEnd);
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Check whether we are in the selected mdiv
+    if (!params->m_selectedMdivUuid.empty()
+        && (std::find(params->m_currentMdivUuids.begin(), params->m_currentMdivUuids.end(), params->m_selectedMdivUuid)
+            == params->m_currentMdivUuids.end())) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (transposer->IsValidIntervalName(transposition)) {
+        transposer->SetTransposition(transposition);
+    }
+    else if (transposer->IsValidKeyTonic(transposition)) {
+        // Find the starting key tonic of the data to use in calculating the tranposition interval:
+        // Set transposition by key tonic.
+        // Detect the current key from the keysignature.
+        KeySig *keySig = vrv_cast<KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
+        // If there is no keysignature, assume it is C.
+        TransPitch currentKey = TransPitch(0, 0, 0);
+        if (keySig && keySig->HasPname()) {
+            currentKey = TransPitch(keySig->GetPname(), ACCIDENTAL_GESTURAL_NONE, keySig->GetAccid(), 0);
+        }
+        else if (keySig) {
+            // No tonic pitch in key signature, so infer from key signature.
+            int fifthsInt = keySig->GetFifthsInt();
+            // Check the keySig@mode is present (currently assuming major):
+            currentKey = transposer->CircleOfFifthsToMajorTonic(fifthsInt);
+            // need to add a dummy "0" key signature in score (staffDefs of staffDef).
+        }
+        transposer->SetTransposition(currentKey, transposition);
+    }
+    else if (transposer->IsValidSemitones(transposition)) {
+        KeySig *keySig = vrv_cast<KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
+        int fifths = 0;
+        if (keySig) {
+            fifths = keySig->GetFifthsInt();
+        }
+        else {
+            LogWarning("No key signature in data, assuming no key signature with no sharps/flats.");
+            // need to add a dummy "0" key signature in score (staffDefs of staffDef).
+        }
+        transposer->SetTransposition(fifths, transposition);
+    }
+    else {
+        LogWarning("Transposition is invalid: %s", transposition.c_str());
+        // there is no transposition that can be done so do not try
+        // to transpose any further (if continuing in this function,
+        // there will not be an error, just that the transposition
+        // will be at the unison, so no notes should change.
+        return FUNCTOR_STOP;
+    }
+
+    // Evaluate functor on scoreDef
+    scoreDef->Process(params->m_functor, params, params->m_functorEnd);
 
     return FUNCTOR_CONTINUE;
 }

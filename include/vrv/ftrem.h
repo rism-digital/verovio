@@ -40,7 +40,11 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    BeamDrawingInterface *GetBeamDrawingInterface() override { return dynamic_cast<BeamDrawingInterface *>(this); }
+    BeamDrawingInterface *GetBeamDrawingInterface() override { return vrv_cast<BeamDrawingInterface *>(this); }
+    const BeamDrawingInterface *GetBeamDrawingInterface() const override
+    {
+        return vrv_cast<const BeamDrawingInterface *>(this);
+    }
     ///@}
 
     /**
@@ -69,14 +73,24 @@ public:
     //----------//
 
     /**
+     * See Object::AdjustBeams
+     */
+    int AdjustBeams(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::AdjustBeamsEnd
+     */
+    int AdjustBeamsEnd(FunctorParams *functorParams) override;
+
+    /**
      * See Object::CalcStem
      */
     int CalcStem(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI
@@ -89,7 +103,12 @@ protected:
     /**
      * Filter the flat list and keep only Note or Chords elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
+
+    /**
+     * See LayerElement::SetElementShortening
+     */
+    void SetElementShortening(int shortening) override;
 
 public:
     /** */

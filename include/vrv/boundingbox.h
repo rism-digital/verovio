@@ -189,6 +189,11 @@ public:
         const Point bezier[4], bool isMaxExtrema, int approximationSteps = BEZIER_APPROXIMATION);
 
     /**
+     * Calculate the euclidean distance between two points
+     */
+    static double CalcDistance(const Point &p1, const Point &p2);
+
+    /**
      * @return true if the distance between the points does not exceed margin
      */
     static bool ArePointsClose(const Point &p1, const Point &p2, int margin);
@@ -226,8 +231,7 @@ public:
     /**
      * Calculate thickness coefficient to be applient for bezier curve to fit MEI units thickness
      */
-    static double GetBezierThicknessCoefficient(
-        const Point bezier[4], int currentThickness, double angle, int penWidth);
+    static double GetBezierThicknessCoefficient(const Point bezier[4], int currentThickness, int penWidth);
 
     /**
      * Calculate the point bezier point position for a t between 0.0 and 1.0
@@ -237,8 +241,7 @@ public:
     /**
      * Calculate the position of the bezier above and below for a thick bezier
      */
-    static void CalcThickBezier(
-        const Point bezier[4], int thickness, float angle, Point *topBezier, Point *bottomBezier);
+    static void CalcThickBezier(const Point bezier[4], int thickness, Point topBezier[4], Point bottomBezier[4]);
 
     /**
      * Approximate the bounding box of a bezier taking into accound the height and the width.
@@ -276,14 +279,14 @@ private:
      * Calculate the rectangles with 2 anchor points.
      * Return false (and one single rectangle) when anchor points are out of the boundaries.
      */
-    bool GetGlyph2PointRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Glyph *glyph1,
+    bool GetGlyph2PointRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, const Glyph *glyph1,
         Point rect[3][2], Doc *doc) const;
 
     /**
      * Calculate the rectangles with 1 anchor point.
      * Return false (and one single rectangle) when anchor points are out of the boundaries.
      */
-    bool GetGlyph1PointRectangles(const SMuFLGlyphAnchor &anchor, Glyph *glyph, Point rect[2][2], Doc *doc) const;
+    bool GetGlyph1PointRectangles(const SMuFLGlyphAnchor &anchor, const Glyph *glyph, Point rect[2][2], Doc *doc) const;
 
 public:
     //
@@ -338,22 +341,22 @@ public:
     /**
      * Check if the segmented line is empty
      */
-    bool IsEmpty() { return (m_segments.empty()); }
+    bool IsEmpty() const { return (m_segments.empty()); }
 
     /**
      * Check if the line is one single segment
      */
-    bool IsUnsegmented() { return (m_segments.size() == 1); }
+    bool IsUnsegmented() const { return (m_segments.size() == 1); }
 
     /**
      * The number of segments
      */
-    int GetSegmentCount() { return (int)m_segments.size(); }
+    int GetSegmentCount() const { return (int)m_segments.size(); }
 
     /**
      * Get the start and end of a segment
      */
-    void GetStartEnd(int &start, int &end, int idx);
+    std::pair<int, int> GetStartEnd(int idx) const;
 
     /**
      * Add a gap in the line

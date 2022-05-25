@@ -79,11 +79,16 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
-    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
-    StemmedDrawingInterface *GetStemmedDrawingInterface() override
+    DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
+    const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
+    const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
+    StemmedDrawingInterface *GetStemmedDrawingInterface() override { return vrv_cast<StemmedDrawingInterface *>(this); }
+    const StemmedDrawingInterface *GetStemmedDrawingInterface() const override
     {
-        return dynamic_cast<StemmedDrawingInterface *>(this);
+        return vrv_cast<const StemmedDrawingInterface *>(this);
     }
     ///@}
 
@@ -114,11 +119,12 @@ public:
      */
     ///@{
     Accid *GetDrawingAccid();
+    const Accid *GetDrawingAccid() const;
     ///@}
 
     /**
      * @name Setter and getter for the drawing staff loc.
-     * This is set by the SetAlignmentPitchPos functor.
+     * This is set by the CalcAlignmentPitchPos functor.
      */
     ///@{
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
@@ -131,13 +137,14 @@ public:
      * Otherwise, it will look for the Staff ancestor.
      * Set the value of ledger lines above or below.
      */
-    bool HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff = NULL);
+    bool HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff = NULL) const;
 
     /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
-    Chord *IsChordTone() const;
+    Chord *IsChordTone();
+    const Chord *IsChordTone() const;
     int GetDrawingDur() const;
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
@@ -145,7 +152,10 @@ public:
     /**
      * Return the parent TabGrp is the note is part of one.
      */
-    TabGrp *IsTabGrpNote() const;
+    ///@{
+    TabGrp *IsTabGrpNote();
+    const TabGrp *IsTabGrpNote() const;
+    ///@}
 
     /**
      * @name Return the smufl string to use for a note give the notation type
@@ -186,9 +196,9 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize) override;
-    Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize) override;
-    int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) override;
+    Point GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const override;
+    Point GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const override;
+    int CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const override;
     ///@}
 
     /**
@@ -244,7 +254,14 @@ public:
      * Encoded stem direction on the calling note is taken into account.
      * Called from Note::CalcStem
      */
-    data_STEMDIRECTION CalcStemDirForSameasNote(int verticalCenter);
+    data_STEMDIRECTION CalcStemDirForSameasNote(Doc *doc, int verticalCenter);
+
+    /**
+     * Set the Note::m_flippedNotehead flag if one of the two notes needs to be placed on the side.
+     * The note X relative position remains untouched because we do not want the stem position to be changed.
+     * This is different than with chords. It means the the X position is actually corrected when drawing the note.
+     */
+    void CalcNoteHeadShiftForSameasNote(Doc *doc, Note *stemSameas, data_STEMDIRECTION stemDir);
 
 public:
     //----------------//
@@ -307,9 +324,9 @@ public:
     int PrepareLyrics(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment

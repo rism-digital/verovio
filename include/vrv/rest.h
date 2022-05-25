@@ -68,8 +68,10 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
-    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
+    DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
+    const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */
@@ -114,9 +116,9 @@ public:
     int PrepareLayerElementParts(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -143,7 +145,7 @@ private:
      * Get the rest vertical location relative to location of elements placed on other layers
      */
     std::pair<int, RestAccidental> GetLocationRelativeToOtherLayers(
-        const ListOfObjects &layersList, Layer *currentLayer, bool isTopLayer);
+        const ListOfObjects &layersList, Layer *currentLayer, bool isTopLayer, bool &restOverlap);
 
     /**
      * Get the rest vertical location relative to location of elements placed on current layers
@@ -154,6 +156,12 @@ private:
      * Get location of first/last element of the corresponding layer
      */
     int GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer);
+
+    /**
+     * For two layers, top layer shouldn't go below center and lower layer shouldn't go above it. Enforce this by
+     * adding margin that will adjust rest position
+     */
+    int GetMarginLayerLocation(bool isTopLayer, bool restOverlap) const;
 
     /**
      * Get location of the object on the layer if it's note, chord or ftrem

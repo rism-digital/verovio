@@ -94,6 +94,11 @@ enum data_BEATRPT_REND {
 };
 
 /**
+ * For storing bulge values (see slur@bulge)
+ */
+typedef std::vector<std::pair<double, double>> data_BULGE;
+
+/**
  * MEI data.DURATION
  */
 enum data_DURATION {
@@ -153,6 +158,16 @@ typedef data_VU data_MEASUREMENTABS;
  * MEI data.MEASUREMENTREL
  */
 typedef data_VU data_MEASUREMENTREL;
+
+/**
+ * enum class for the signs used in meter counts
+ */
+enum class MeterCountSign { None, Slash, Minus, Asterisk, Plus };
+
+/**
+ * A typedef for a pair of metersign counts and sign combining them
+ */
+typedef std::pair<std::vector<int>, MeterCountSign> data_METERCOUNT_pair;
 
 /**
  * MEI data.MIDIBPM
@@ -255,11 +270,6 @@ enum data_PITCHNAME_GES {
  * NONE is -3 for perfect value (abs) by default
  */
 enum data_PROLATIO { PROLATIO_NONE = -3, PROLATIO_2 = 2, PROLATIO_3 };
-
-/**
- * A typedef for a list of integer summands.
- */
-typedef std::vector<int> data_SUMMAND_List;
 
 /**
  * MEI data.TIE

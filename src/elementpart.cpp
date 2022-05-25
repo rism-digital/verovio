@@ -111,16 +111,16 @@ wchar_t Flag::GetFlagGlyph(data_STEMDIRECTION stemDir) const
     }
 }
 
-Point Flag::GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const
+Point Flag::GetStemUpSE(const Doc *doc, int staffSize, bool graceSize) const
 {
-    code = this->GetFlagGlyph(STEMDIRECTION_up);
+    const wchar_t code = this->GetFlagGlyph(STEMDIRECTION_up);
 
     return Point(0, doc->GetGlyphTop(code, staffSize, graceSize));
 }
 
-Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code) const
+Point Flag::GetStemDownNW(const Doc *doc, int staffSize, bool graceSize) const
 {
-    code = this->GetFlagGlyph(STEMDIRECTION_down);
+    const wchar_t code = this->GetFlagGlyph(STEMDIRECTION_down);
 
     return Point(0, doc->GetGlyphBottom(code, staffSize, graceSize));
 }
@@ -145,6 +145,8 @@ void TupletBracket::Reset()
 
     m_drawingXRelLeft = 0;
     m_drawingXRelRight = 0;
+    m_drawingYRelLeft = 0;
+    m_drawingYRelRight = 0;
     m_alignedNum = NULL;
 }
 
@@ -174,7 +176,8 @@ int TupletBracket::GetDrawingYLeft()
         // Calculate the y point aligning with the beam
         int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
         return beam->m_beamSegment.GetStartingY()
-            + beam->m_beamSegment.m_beamSlope * (xLeft - beam->m_beamSegment.GetStartingX()) + this->GetDrawingYRel();
+            + beam->m_beamSegment.m_beamSlope * (xLeft - beam->m_beamSegment.GetStartingX()) + this->GetDrawingYRel()
+            + m_drawingYRelLeft;
     }
     else {
         return this->GetDrawingY();
@@ -191,7 +194,8 @@ int TupletBracket::GetDrawingYRight()
         // Calculate the y point aligning with the beam
         int xRight = tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
         return beam->m_beamSegment.GetStartingY()
-            + beam->m_beamSegment.m_beamSlope * (xRight - beam->m_beamSegment.GetStartingX()) + this->GetDrawingYRel();
+            + beam->m_beamSegment.m_beamSlope * (xRight - beam->m_beamSegment.GetStartingX()) + this->GetDrawingYRel()
+            + m_drawingYRelRight;
     }
     else {
         return this->GetDrawingY();
@@ -291,7 +295,9 @@ void Stem::Reset()
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingStemLen = 0;
+    m_drawingStemAdjust = 0;
     m_isVirtual = false;
+    m_stemModRelY = 0;
 }
 
 bool Stem::IsSupportedChild(Object *child)
@@ -333,6 +339,9 @@ int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int mar
 
 void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
 {
+    assert(this->GetParent());
+    assert(this->GetParent()->IsLayerElement());
+
     LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
     if (!parent) return;
 
@@ -391,10 +400,10 @@ void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int vertical
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Dots::ResetDrawing(FunctorParams *functorParams)
+int Dots::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_dotLocsByStaff.clear();
     m_isAdjusted = false;
@@ -411,10 +420,10 @@ int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Flag::ResetDrawing(FunctorParams *functorParams)
+int Flag::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_drawingNbFlags = 0;
 
@@ -438,6 +447,9 @@ int TupletBracket::ResetVerticalAlignment(FunctorParams *functorParams)
     // Call parent one too
     LayerElement::ResetVerticalAlignment(functorParams);
 
+    m_drawingYRelLeft = 0;
+    m_drawingYRelRight = 0;
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -459,6 +471,51 @@ int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
+{
+    // if stem length is explicitly set - exit
+    if (this->HasStemLen()) return 0;
+
+    const int staffSize = staff->m_drawingStaffSize;
+    const int unit = doc->GetDrawingUnit(staffSize);
+    data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
+    BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
+    if (bTrem) {
+        stemMod = bTrem->GetDrawingStemMod();
+    }
+    else if (this->HasStemMod() && (this->GetStemMod() < 8)) {
+        stemMod = this->GetDrawingStemMod();
+    }
+    if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return 0;
+
+    const wchar_t code = this->StemModToGlyph(stemMod);
+    // if there is no glyph - do nothing
+    if (!code) return 0;
+
+    int lenAdjust = flagOffset;
+    if (this->GetParent()->Is(CHORD)) {
+        Chord *chord = vrv_cast<Chord *>(this->GetParent());
+        lenAdjust += std::abs(chord->GetTopNote()->GetDrawingY() - chord->GetBottomNote()->GetDrawingY());
+    }
+
+    const int glyphHeight = doc->GetGlyphHeight(code, staffSize, false);
+    const int actualLength = std::abs(this->GetDrawingStemLen()) - lenAdjust / unit * unit;
+    const int diff = actualLength - std::abs(m_stemModRelY) - 0.5 * glyphHeight;
+    const int halfUnit = 0.5 * unit;
+
+    int adjust = 0;
+    if ((diff < halfUnit) && (diff >= -halfUnit)) {
+        adjust = halfUnit;
+    }
+    else if (diff < -halfUnit) {
+        adjust = (std::abs(diff) / halfUnit + 1) * halfUnit;
+        if (stemMod == STEMMODIFIER_6slash) {
+            adjust += doc->GetGlyphHeight(SMUFL_E220_tremolo1, staffSize, false) / 4;
+        }
+    }
+    return ((this->GetDrawingStemDir() == STEMDIRECTION_up) ? -adjust : adjust);
+}
+
 int Stem::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
@@ -477,19 +534,22 @@ int Stem::CalcStem(FunctorParams *functorParams)
         this->SetDrawingXRel(0);
         this->SetDrawingYRel(0);
         this->SetDrawingStemLen(0);
+        const int adjust = this->CalculateStemModAdjustment(params->m_doc, params->m_staff, 0);
+        if (adjust) this->SetDrawingStemLen(this->GetDrawingStemLen() + adjust);
         return FUNCTOR_CONTINUE;
     }
 
     /************ Set the position, the length and adjust to the note head ************/
 
+    const int unit = params->m_doc->GetDrawingUnit(staffSize);
     int baseStem = 0;
     // Use the given one if any
     if (this->HasStemLen()) {
-        baseStem = this->GetStemLen() * -params->m_doc->GetDrawingUnit(staffSize);
+        baseStem = this->GetStemLen() * -unit;
     }
     // Do not adjust the baseStem for stem sameas notes (its length is in m_chordStemLength)
     else if (!params->m_isStemSameasSecondary) {
-        int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
+        int thirdUnit = unit / 3;
         const data_STEMDIRECTION stemDir = params->m_interface->GetDrawingStemDir();
         baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff, stemDir) * thirdUnit);
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
@@ -528,21 +588,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
 
     /************ Set flag and slashes (if necessary) and adjust the length ************/
-
-    int slashFactor = 0;
-    // In case there is explicitly specified stem mod for slashes
-    if (!params->m_isStemSameasSecondary && this->HasStemMod() && (this->GetStemMod() < 8)) {
-        slashFactor = this->GetStemMod() - 1;
-    }
-    // otherwise check whether it's trem and its @unitdir attribute is shorter than duration
-    else if (!params->m_isStemSameasSecondary && this->GetFirstAncestor(BTREM)) {
-        BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
-        assert(bTrem);
-        if (bTrem->HasUnitdur() && (bTrem->GetUnitdur() > DURATION_4)) {
-            slashFactor = bTrem->GetUnitdur() - DURATION_4;
-        }
-    }
-
+    int flagOffset = 0;
     Flag *flag = NULL;
     // There is never a flag with a duration longer than 8th notes
     if (params->m_dur > DUR_4) {
@@ -554,24 +600,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
         }
         else {
             flag->m_drawingNbFlags = params->m_dur - DUR_4;
-            if (!this->HasStemLen() && !this->IsGraceNote() && this->HasStemMod()) {
-                slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
-            }
-        }
-    }
-
-    // Adjust basic stem length to number of slashes
-    if ((slashFactor > 0) && !this->HasStemLen()) {
-        const int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
-            + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
-        while (abs(baseStem) < slashFactor * tremStep + params->m_doc->GetDrawingUnit(staffSize) * 3) {
-            if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-                this->SetDrawingStemLen(this->GetDrawingStemLen() - tremStep);
-            }
-            else {
-                this->SetDrawingStemLen(this->GetDrawingStemLen() + tremStep);
-            }
-            --slashFactor;
+            flagOffset = unit * (flag->m_drawingNbFlags + 1);
         }
     }
 
@@ -597,12 +626,11 @@ int Stem::CalcStem(FunctorParams *functorParams)
     if (params->m_dur > DUR_16) {
         assert(flag);
         Point stemEnd;
-        wchar_t flagCode = 0;
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            stemEnd = flag->GetStemUpSE(params->m_doc, staffSize, drawingCueSize, flagCode);
+            stemEnd = flag->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
         }
         else {
-            stemEnd = flag->GetStemDownNW(params->m_doc, staffSize, drawingCueSize, flagCode);
+            stemEnd = flag->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
         }
         // Trick for shortening the stem with DUR_8
         flagHeight = stemEnd.y;
@@ -624,15 +652,93 @@ int Stem::CalcStem(FunctorParams *functorParams)
         if (flag) flag->SetDrawingYRel(-this->GetDrawingStemLen());
     }
 
+    if (!params->m_isGraceNote && !drawingCueSize && !params->m_isStemSameasSecondary) {
+        const int adjust = this->CalculateStemModAdjustment(params->m_doc, params->m_staff, flagOffset);
+        if (adjust) this->SetDrawingStemLen(this->GetDrawingStemLen() + adjust);
+        if (flag) flag->SetDrawingYRel(-this->GetDrawingStemLen());
+    }
+
     if (flag) AdjustFlagPlacement(params->m_doc, flag, staffSize, params->m_verticalCenter, params->m_dur);
 
     return FUNCTOR_CONTINUE;
 }
 
-int Stem::ResetDrawing(FunctorParams *functorParams)
+void Stem::CalculateStemModRelY(Doc *doc, Staff *staff)
+{
+    const int sign = (this->GetDrawingStemDir() == STEMDIRECTION_up) ? 1 : -1;
+    LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
+    // Get note
+    Note *note = NULL;
+    if (parent->Is(NOTE)) {
+        note = vrv_cast<Note *>(parent);
+    }
+    else if (parent->Is(CHORD)) {
+        note = (sign > 0) ? vrv_cast<Chord *>(parent)->GetTopNote() : vrv_cast<Chord *>(parent)->GetBottomNote();
+    }
+    if (!note || note->IsGraceNote() || note->GetDrawingCueSize()) return;
+
+    // Get stem mod for the element
+    data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
+    BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
+    if (bTrem) {
+        stemMod = bTrem->GetDrawingStemMod();
+    }
+    else if (this->HasStemMod() && (this->GetStemMod() < 8)) {
+        stemMod = this->GetDrawingStemMod();
+    }
+    if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return;
+
+    // calculate height offset for positioning of stem mod elements on the stem
+    const wchar_t code = this->StemModToGlyph(stemMod);
+    if (!code) return;
+
+    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int glyphHalfHeight = doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false) / 2;
+    const int noteLoc = note->GetDrawingLoc();
+    int height = 2 * unit;
+    switch (stemMod) {
+        case STEMMODIFIER_1slash:
+        case STEMMODIFIER_2slash:
+        case STEMMODIFIER_3slash:
+        case STEMMODIFIER_4slash:
+        case STEMMODIFIER_5slash:
+        case STEMMODIFIER_6slash: {
+            if (noteLoc % 2 == 0) height += unit;
+            height += glyphHalfHeight;
+            if (stemMod == STEMMODIFIER_6slash)
+                height += doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false) / 2;
+            break;
+        }
+        case STEMMODIFIER_sprech:
+        case STEMMODIFIER_z: {
+            height += (noteLoc % 2) ? 3 * unit : 2 * unit;
+            if (stemMod == STEMMODIFIER_sprech) height -= sign * glyphHalfHeight;
+            break;
+        }
+        default: return;
+    }
+
+    // calculate adjust for the stem modifiers that overlap with ledger lines
+    const int position = note->GetDrawingY() + sign * height;
+    const int staffSize = staff->m_drawingStaffSize;
+    const int doubleUnit = 2 * unit;
+    const int margin = (sign > 0) ? staff->GetDrawingY() - doc->GetDrawingStaffSize(staffSize) : staff->GetDrawingY();
+    const int ledgerLineDifference = margin - (position - sign * glyphHalfHeight);
+    const int adjust = (sign * ledgerLineDifference > 0) ? (ledgerLineDifference / doubleUnit) * doubleUnit : 0;
+
+    m_stemModRelY = sign * height + adjust;
+}
+
+int Stem::CalculateStemModAdjustment(Doc *doc, Staff *staff, int flagOffset)
+{
+    this->CalculateStemModRelY(doc, staff);
+    return this->AdjustSlashes(doc, staff, flagOffset);
+}
+
+int Stem::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetData(functorParams);
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingStemLen = 0;

@@ -77,19 +77,19 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
-    bool IsLastInNeume(LayerElement *element);
+    bool IsLastInNeume(const LayerElement *element) const;
 
     bool GenerateChildMelodic();
 
-    NeumeGroup GetNeumeGroup();
+    NeumeGroup GetNeumeGroup() const;
 
-    std::vector<int> GetPitchDifferences();
+    std::vector<int> GetPitchDifferences() const;
 
     PitchInterface *GetHighestPitch();
     PitchInterface *GetLowestPitch();
 
 private:
-    int GetPosition(LayerElement *element);
+    int GetPosition(const LayerElement *element) const;
 
 public:
     //----------------//

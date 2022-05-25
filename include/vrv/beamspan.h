@@ -19,6 +19,7 @@ namespace vrv {
 
 class Layer;
 class Staff;
+class System;
 
 //----------------------------------------------------------------------------
 // BeamSpan
@@ -54,9 +55,18 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    PlistInterface *GetPlistInterface() override { return dynamic_cast<PlistInterface *>(this); }
-    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
-    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
+    PlistInterface *GetPlistInterface() override { return vrv_cast<PlistInterface *>(this); }
+    const PlistInterface *GetPlistInterface() const override { return vrv_cast<const PlistInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ////@}
 
     /**
@@ -67,9 +77,16 @@ public:
     void ClearBeamSegments();
     ////@}
 
+    BeamSpanSegment *GetSegmentForSystem(System *system);
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcStem
@@ -77,14 +94,14 @@ public:
     int CalcStem(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResolveBeamSpanElements
+     * See Object::PrepareBeamSpanElements
      */
-    int ResolveBeamSpanElements(FunctorParams *) override;
+    int PrepareBeamSpanElements(FunctorParams *) override;
 
     /**
-     * See Object::ResolveSpanningBeamSpans
+     * See Object::CalcSpanningBeamSpans
      */
-    int ResolveSpanningBeamSpans(FunctorParams *) override;
+    int CalcSpanningBeamSpans(FunctorParams *) override;
 
 private:
     // Helper for breaking one big spanning beamSpan into smaller beamSpans

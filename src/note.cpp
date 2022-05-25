@@ -176,15 +176,15 @@ void Note::AddChild(Object *child)
 
     child->SetParent(this);
 
-    ArrayOfObjects *children = this->GetChildrenForModification();
+    ArrayOfObjects &children = this->GetChildrenForModification();
 
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is({ DOTS, STEM })) {
-        children->insert(children->begin(), child);
+        children.insert(children.begin(), child);
     }
     else {
-        children->push_back(child);
+        children.push_back(child);
     }
     Modify();
 }
@@ -201,11 +201,15 @@ void Note::AlignDotsShift(Note *otherNote)
 
 Accid *Note::GetDrawingAccid()
 {
-    Accid *accid = dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
-    return accid;
+    return dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
 }
 
-bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
+const Accid *Note::GetDrawingAccid() const
+{
+    return dynamic_cast<const Accid *>(this->FindDescendantByType(ACCID));
+}
+
+bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
 {
     if (!staff) {
         staff = this->GetAncestorStaff();
@@ -220,14 +224,19 @@ bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
     return ((linesAbove > 0) || (linesBelow > 0));
 }
 
-Chord *Note::IsChordTone() const
+Chord *Note::IsChordTone()
 {
     return dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
+const Chord *Note::IsChordTone() const
+{
+    return dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+}
+
 int Note::GetDrawingDur() const
 {
-    Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    const Chord *chordParent = dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chordParent && !this->HasDur()) {
         return chordParent->GetActualDur();
     }
@@ -246,9 +255,14 @@ bool Note::IsClusterExtreme() const
         return false;
 }
 
-TabGrp *Note::IsTabGrpNote() const
+TabGrp *Note::IsTabGrpNote()
 {
     return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+}
+
+const TabGrp *Note::IsTabGrpNote() const
+{
+    return dynamic_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
 std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
@@ -321,13 +335,7 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
 
 bool Note::IsUnisonWith(Note *note, bool ignoreAccid)
 {
-    if (!ignoreAccid) {
-        Accid *accid = this->GetDrawingAccid();
-        Accid *noteAccid = note->GetDrawingAccid();
-        data_ACCIDENTAL_WRITTEN accidVal = (accid) ? accid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
-        data_ACCIDENTAL_WRITTEN noteAccidVal = (noteAccid) ? noteAccid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
-        if (accidVal != noteAccidVal) return false;
-    }
+    if (!ignoreAccid && !this->IsEnharmonicWith(note)) return false;
 
     return ((this->GetPname() == note->GetPname()) && (this->GetOct() == note->GetOct()));
 }
@@ -338,7 +346,7 @@ void Note::SetCluster(ChordCluster *cluster, int position)
     m_clusterPosition = position;
 }
 
-Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
+Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
@@ -358,7 +366,8 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
 
-    Glyph *glyph = Resources::GetGlyph(code);
+    const Resources &resources = doc->GetResources();
+    const Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
 
     if (glyph->HasAnchor(SMUFL_stemUpSE)) {
@@ -370,7 +379,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
+Point Note::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
@@ -389,7 +398,8 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
 
-    Glyph *glyph = Resources::GetGlyph(code);
+    const Resources &resources = doc->GetResources();
+    const Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
 
     if (glyph->HasAnchor(SMUFL_stemDownNW)) {
@@ -401,7 +411,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
+int Note::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const
 {
     assert(staff);
 
@@ -454,12 +464,12 @@ wchar_t Note::GetMensuralNoteheadGlyph() const
         return 0;
     }
 
-    Staff *staff = this->GetAncestorStaff();
+    const Staff *staff = this->GetAncestorStaff();
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     wchar_t code = 0;
     if (mensural_black) {
-        code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+        code = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
     }
     else {
         if (this->GetColored() == BOOLEAN_true) {
@@ -505,8 +515,8 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         // case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
         case HEADSHAPE_plus: return SMUFL_E0AF_noteheadPlusBlack;
         case HEADSHAPE_diamond: {
-            if (DUR_1 == duration) return SMUFL_E0D9_noteheadDiamondHalf;
-            return this->GetHeadFill() == FILL_void ? SMUFL_E0DD_noteheadDiamondWhite : SMUFL_E0DB_noteheadDiamondBlack;
+            if (DUR_4 > duration) return SMUFL_E0D9_noteheadDiamondHalf;
+            return SMUFL_E0DB_noteheadDiamondBlack;
         }
         // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
         // case HEADSHAPE_oval: return SMUFL_noteheadOval;
@@ -514,7 +524,11 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         // case HEADSHAPE_rectangle: return SMUFL_noteheadRectangle;
         // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
         // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
-        case HEADSHAPE_slash: return SMUFL_E101_noteheadSlashHorizontalEnds;
+        case HEADSHAPE_slash: {
+            if (DUR_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
+            if (DUR_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
+            return SMUFL_E101_noteheadSlashHorizontalEnds;
+        }
         // case HEADSHAPE_square: return SMUFL_noteheadSquare;
         case HEADSHAPE_x: {
             if (DUR_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
@@ -542,7 +556,7 @@ bool Note::IsVisible() const
     }
     // if the chord doens't have it, see if all the children are invisible
     else if (this->GetParent() && this->GetParent()->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(this->GetParent());
+        const Chord *chord = vrv_cast<const Chord *>(this->GetParent());
         assert(chord);
         return chord->IsVisible();
     }
@@ -590,8 +604,9 @@ void Note::ResolveStemSameas(PrepareLinkingParams *params)
     }
 }
 
-data_STEMDIRECTION Note::CalcStemDirForSameasNote(int verticalCenter)
+data_STEMDIRECTION Note::CalcStemDirForSameasNote(Doc *doc, int verticalCenter)
 {
+    assert(doc);
     assert(m_stemSameas);
     assert(m_stemSameas->HasStemSameasNote());
     assert(m_stemSameas->GetStemSameasNote() == this);
@@ -615,12 +630,36 @@ data_STEMDIRECTION Note::CalcStemDirForSameasNote(int verticalCenter)
         // We also set the role to both notes accordingly
         topNote->m_stemSameasRole = (stemDir == STEMDIRECTION_up) ? SAMEAS_PRIMARY : SAMEAS_SECONDARY;
         bottomNote->m_stemSameasRole = (stemDir == STEMDIRECTION_up) ? SAMEAS_SECONDARY : SAMEAS_PRIMARY;
+
+        this->CalcNoteHeadShiftForSameasNote(doc, m_stemSameas, stemDir);
+
         return stemDir;
     }
     else {
         // Otherwise use the stem direction set for the other note previously when this method was called for it
         return m_stemSameas->GetDrawingStemDir();
     }
+}
+
+void Note::CalcNoteHeadShiftForSameasNote(Doc *doc, Note *stemSameas, data_STEMDIRECTION stemDir)
+{
+    assert(doc);
+    assert(stemSameas);
+
+    if (abs(this->GetDiatonicPitch() - stemSameas->GetDiatonicPitch()) > 1) return;
+
+    Note *noteToShift = this;
+    if (stemDir == STEMDIRECTION_up) {
+        if (this->GetDrawingY() < stemSameas->GetDrawingY()) noteToShift = stemSameas;
+    }
+    else {
+        if (this->GetDrawingY() > stemSameas->GetDrawingY()) noteToShift = stemSameas;
+    }
+    // With stem sameas we do not correct the position of the note itself because otherwise the children position,
+    // including the one of stem, will change as well. We only flag it. The correction is made in View::DrawNote
+    // This can potentially cause some problems with dots or accidentals but can be left like this because it is
+    // quite a corner case already.
+    noteToShift->SetFlippedNotehead(true);
 }
 
 bool Note::IsEnharmonicWith(Note *note)
@@ -752,10 +791,9 @@ void Note::DeferMIDINote(FunctorParams *functorParams, double shift, bool includ
     // Recursive call for chords
     Chord *chord = this->IsChordTone();
     if (chord && includeChordSiblings) {
-        const ArrayOfObjects *notes = chord->GetList(chord);
-        assert(notes);
+        const ListOfObjects &notes = chord->GetList(chord);
 
-        for (Object *obj : *notes) {
+        for (Object *obj : notes) {
             Note *note = vrv_cast<Note *>(obj);
             assert(note);
             note->DeferMIDINote(functorParams, shift, false);
@@ -1023,7 +1061,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     if (this->HasStemSameasNote()) {
-        stemDir = this->CalcStemDirForSameasNote(params->m_verticalCenter);
+        stemDir = this->CalcStemDirForSameasNote(params->m_doc, params->m_verticalCenter);
     }
     else if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();
@@ -1330,8 +1368,8 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ Prepare the drawing cue size ************/
 
-    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
+    Functor prepareCueSize(&Object::PrepareCueSize);
+    this->Process(&prepareCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
 }
@@ -1349,11 +1387,11 @@ int Note::PrepareLyrics(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Note::ResetDrawing(FunctorParams *functorParams)
+int Note::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
@@ -1383,6 +1421,11 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
 
     // Skip linked notes
     if (this->HasSameasLink()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // Skip cue notes when midiNoCue is activated
+    if (this->GetCue() == BOOLEAN_true && params->m_cueExclusion) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -1495,6 +1538,13 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
     GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
+    if (this->HasGrace()) return FUNCTOR_SIBLINGS;
+
+    // Skip cue notes when midiNoCue is activated
+    if (this->GetCue() == BOOLEAN_true && params->m_cueExclusion) {
+        return FUNCTOR_SIBLINGS;
+    }
+
     Note *note = vrv_cast<Note *>(this->ThisOrSameasAsLink());
     assert(note);
 
@@ -1509,8 +1559,6 @@ int Note::Transpose(FunctorParams *functorParams)
     assert(params);
 
     if (!this->HasPname()) return FUNCTOR_SIBLINGS;
-
-    LogDebug("Transposing note");
 
     TransPitch pitch = this->GetTransPitch();
     params->m_transposer->Transpose(pitch);

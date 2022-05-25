@@ -130,6 +130,26 @@ def get_text_names_to_codes(filepath: str) -> dict:
             if len(items) == 6:
                 result[items[3]] = items[5]
     return result
+    
+###################################################
+#  Parse font_metadata.json for alternate glyphs  #
+###################################################
+
+
+def get_alternate_glyphs(glyphnames: dict, metadata: dict) -> dict:
+    """Retrieve alternate glyphs from font metadata"""
+    glyph_alternates = metadata["glyphsWithAlternates"] if "glyphsWithAlternates" in metadata else ""
+    if not bool(glyph_alternates):
+        return glyph_alternates
+    additional_glyphs = {}
+    for glyphname, alternates in glyph_alternates.items():
+        code = [k for k in glyphnames if glyphnames[k] == glyphname]
+        # if glyph is in the supported list - extract alternates for it
+        if code:
+            for element in alternates["alternates"]:
+                additional_glyphs[element["codepoint"][2:]] = element["name"]
+
+    return additional_glyphs
 
 #########################
 #  Extract SMUFL font   #
@@ -140,6 +160,10 @@ def extract_smufl_font(root, metadata_file):
     glyphnames = get_supported_glyph_codes()
     metadata = get_json_content(metadata_file)
     glyph_anchors = metadata["glyphsWithAnchors"] if "glyphsWithAnchors" in metadata else ""
+    # extract alternate glyphs and append them if any
+    alternate_glyphs = get_alternate_glyphs(glyphnames, metadata)
+    if bool(alternate_glyphs):
+        glyphnames.update(alternate_glyphs)
 
     # (1) Create xml file for each glyph
     write_xml_glyphs(glyphnames)

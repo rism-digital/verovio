@@ -17,6 +17,7 @@
 
 #include "attdef.h"
 #include "io.h"
+#include "metersig.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -65,26 +66,30 @@ namespace musicxml {
 
     class OpenSlur {
     public:
-        OpenSlur(const std::string &measureNum, short int number)
+        OpenSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
         {
             m_measureNum = measureNum;
             m_number = number;
+            m_curvedir = curvedir;
         }
 
         std::string m_measureNum;
         short int m_number;
+        curvature_CURVEDIR m_curvedir;
     };
 
     class CloseSlur {
     public:
-        CloseSlur(const std::string &measureNum, short int number)
+        CloseSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
         {
             m_measureNum = measureNum;
             m_number = number;
+            m_curvedir = curvedir;
         }
 
         std::string m_measureNum;
         short int m_number;
+        curvature_CURVEDIR m_curvedir;
     };
 
     class OpenSpanner {
@@ -331,8 +336,8 @@ private:
     ///@{
     void OpenTie(Note *note, Tie *tie);
     void CloseTie(Note *note);
-    void OpenSlur(Measure *measure, short int number, Slur *slur);
-    void CloseSlur(Measure *measure, short int number, LayerElement *element);
+    void OpenSlur(Measure *measure, short int number, Slur *slur, curvature_CURVEDIR dir);
+    void CloseSlur(Measure *measure, short int number, LayerElement *element, curvature_CURVEDIR dir);
     void CloseBeamSpan(Staff *staff, Layer *layer, LayerElement *element);
     ///@}
 
@@ -413,6 +418,11 @@ private:
     ///@}
 
     /*
+     * @name Helper for detecting the slur curve direction
+     */
+    static curvature_CURVEDIR CombineCurvedir(curvature_CURVEDIR startDir, curvature_CURVEDIR stopDir);
+
+    /*
      * @name Methods for converting MusicXML values to MEI attributes.
      */
     ///@{
@@ -427,6 +437,7 @@ private:
     static data_MIDIVALUE ConvertDynamicsToMidiVal(const float dynamics);
     static data_PITCHNAME ConvertStepToPitchName(const std::string &value);
     static data_TEXTRENDITION ConvertEnclosure(const std::string &value);
+    static beamRend_FORM ConvertBeamFanToForm(const std::string &value);
     static curvature_CURVEDIR InferCurvedir(const pugi::xml_node slurOrTie);
     static fermataVis_SHAPE ConvertFermataShape(const std::string &value);
     static pedalLog_DIR ConvertPedalTypeToDir(const std::string &value);
@@ -462,6 +473,7 @@ private:
     /* meter signature */
     std::vector<int> m_meterCount = { 4 };
     int m_meterUnit = 4;
+    MeterCountSign m_meterSign = MeterCountSign::None;
     /* part information */
     Label *m_label = NULL;
     LabelAbbr *m_labelAbbr = NULL;

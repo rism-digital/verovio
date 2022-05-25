@@ -133,13 +133,16 @@ public:
     void AddToDrawingListIfNeccessary(Object *object);
 
     /**
-     * @name Check if the system is the first or last in page or of an mdiv by looking at the next sibling
+     * @name Check if the system is the first or last in page or of a selection or of an mdiv by looking at the next
+     * sibling
      */
     ///@{
-    bool IsFirstInPage();
-    bool IsLastInPage();
-    bool IsFirstOfMdiv();
-    bool IsLastOfMdiv();
+    bool IsFirstInPage() const;
+    bool IsLastInPage() const;
+    bool IsFirstOfMdiv() const;
+    bool IsLastOfMdiv() const;
+    bool IsFirstOfSelection() const;
+    bool IsLastOfSelection() const;
     ///@}
 
     /**
@@ -201,9 +204,9 @@ public:
     int AlignHorizontally(FunctorParams *functorParams) override;
 
     /**
-     * See Object::SetAlignmentXPos
+     * See Object::CalcAlignmentXPos
      */
-    int SetAlignmentXPos(FunctorParams *functorParams) override;
+    int CalcAlignmentXPos(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::AdjustXOverflow
@@ -271,6 +274,11 @@ public:
     int JustifyY(FunctorParams *functorParams) override;
 
     /**
+     * See Object::AdjustCrossStaffYPos
+     */
+    int AdjustCrossStaffYPos(FunctorParams *functorParams) override;
+
+    /**
      * See Object::AdjustStaffOverlap
      */
     int AdjustStaffOverlap(FunctorParams *functorParams) override;
@@ -309,9 +317,19 @@ public:
     int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
+     * See Object::CastOffToSelection
+     */
+    int CastOffToSelection(FunctorParams *) override;
+
+    /**
      * See Object::UnCastOff
      */
     int UnCastOff(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::Transpose
+     */
+    int Transpose(FunctorParams *functorParams) override;
 
 public:
     SystemAligner m_systemAligner;

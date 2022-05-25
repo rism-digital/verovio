@@ -16,6 +16,7 @@
 #include "comparison.h"
 #include "doc.h"
 #include "functorparams.h"
+#include "layer.h"
 #include "scoredefinterface.h"
 #include "staff.h"
 
@@ -28,13 +29,20 @@ namespace vrv {
 static const ClassRegistrar<Clef> s_factory("clef", CLEF);
 
 Clef::Clef()
-    : LayerElement(CLEF, "clef-"), AttClefShape(), AttColor(), AttLineLoc(), AttOctaveDisplacement(), AttVisibility()
+    : LayerElement(CLEF, "clef-")
+    , AttClefShape()
+    , AttColor()
+    , AttLineLoc()
+    , AttOctaveDisplacement()
+    , AttStaffIdent()
+    , AttVisibility()
 {
     this->RegisterAttClass(ATT_CLEFSHAPE);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYM);
     this->RegisterAttClass(ATT_LINELOC);
+    this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
     this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
     this->RegisterAttClass(ATT_VISIBILITY);
 
@@ -52,13 +60,14 @@ void Clef::Reset()
     this->ResetExtSym();
     this->ResetLineLoc();
     this->ResetOctaveDisplacement();
+    this->ResetStaffIdent();
     this->ResetVisibility();
 }
 
 int Clef::GetClefLocOffset() const
 {
     // Only resolve simple sameas links to avoid infinite recursion
-    Clef *sameas = dynamic_cast<Clef *>(this->GetSameasLink());
+    const Clef *sameas = dynamic_cast<const Clef *>(this->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
         return sameas->GetClefLocOffset();
     }
@@ -96,15 +105,19 @@ int Clef::GetClefLocOffset() const
 
 wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
 {
+    const Resources *resources = this->GetDocResources();
+    const bool clefChange = (this->GetAlignment() && (this->GetAlignment()->GetType() == ALIGNMENT_CLEF));
+    if (!resources) return 0;
+
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
         wchar_t code = this->GetGlyphNum();
-        if (NULL != Resources::GetGlyph(code)) return code;
+        if (NULL != resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
-        if (NULL != Resources::GetGlyph(code)) return code;
+        wchar_t code = resources->GetGlyphCode(this->GetGlyphName());
+        if (NULL != resources->GetGlyph(code)) return code;
     }
 
     switch (notationtype) {
@@ -153,7 +166,7 @@ wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
                             return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E053_gClef8va
                                                                                  : SMUFL_E051_gClef15mb;
                             break;
-                        default: return SMUFL_E050_gClef; break;
+                        default: return (clefChange) ? SMUFL_E07A_gClefChange : SMUFL_E050_gClef; break;
                     }
                 case CLEFSHAPE_GG: return SMUFL_E055_gClef8vbOld;
                 case CLEFSHAPE_F:
@@ -166,12 +179,12 @@ wchar_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
                             return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E066_fClef15ma
                                                                                  : SMUFL_E063_fClef15mb;
                             break;
-                        default: return SMUFL_E062_fClef; break;
+                        default: return (clefChange) ? SMUFL_E07C_fClefChange : SMUFL_E062_fClef; break;
                     }
                 case CLEFSHAPE_C:
                     switch (this->GetDis()) {
                         case OCTAVE_DIS_8: return SMUFL_E05D_cClef8vb; break;
-                        default: return SMUFL_E05C_cClef; break;
+                        default: return (clefChange) ? SMUFL_E07B_cClefChange : SMUFL_E05C_cClef; break;
                     }
                 case CLEFSHAPE_perc: return SMUFL_E069_unpitchedPercussionClef1;
                 default: break;
@@ -251,7 +264,7 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
     std::vector<int> ns;
     // -1 for barline attributes that need to be taken into account each time
     ns.push_back(BARLINE_REFERENCES);
-    ns.push_back(staff->GetN());
+    ns.push_back(m_crossStaff ? m_crossStaff->GetN() : staff->GetN());
     AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
 
     // Look if we have a grace aligner just after the clef.
@@ -316,13 +329,14 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
     // This typically happens with invisible barlines or with --grace-rhythm-align but no grace on that staff
     if (nextLeft == -VRV_UNSET) nextLeft = nextAlignment->GetXRel();
 
-    int selfRight = this->GetContentRight() + params->m_doc->GetRightMargin(CLEF) * staff->m_drawingStaffSize;
+    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int selfRight = this->GetContentRight() + params->m_doc->GetRightMargin(this) * unit;
     // First move it to the left if necessary
     if (selfRight > nextLeft) {
         this->SetDrawingXRel(this->GetDrawingXRel() - selfRight + nextLeft);
     }
     // Then look if it overlaps on the right and make room if necessary
-    int selfLeft = this->GetContentLeft() - params->m_doc->GetLeftMargin(CLEF) * staff->m_drawingStaffSize;
+    const int selfLeft = this->GetContentLeft() - params->m_doc->GetLeftMargin(this) * unit;
     if (selfLeft < previousRight) {
         ArrayOfAdjustmentTuples boundaries{ std::make_tuple(
             previousAlignment, this->GetAlignment(), previousRight - selfLeft) };

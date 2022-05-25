@@ -30,9 +30,11 @@ namespace vrv {
 
 static const ClassRegistrar<BTrem> s_factory("btrem", BTREM);
 
-BTrem::BTrem() : LayerElement(BTREM, "btrem-"), AttBTremLog(), AttTremMeasured()
+BTrem::BTrem() : LayerElement(BTREM, "btrem-"), AttBTremLog(), AttNumbered(), AttNumberPlacement(), AttTremMeasured()
 {
     this->RegisterAttClass(ATT_BTREMLOG);
+    this->RegisterAttClass(ATT_NUMBERED);
+    this->RegisterAttClass(ATT_NUMBERPLACEMENT);
     this->RegisterAttClass(ATT_TREMMEASURED);
 
     this->Reset();
@@ -44,6 +46,8 @@ void BTrem::Reset()
 {
     LayerElement::Reset();
     this->ResetBTremLog();
+    this->ResetNumbered();
+    this->ResetNumberPlacement();
     this->ResetTremMeasured();
 }
 
@@ -108,7 +112,7 @@ int BTrem::GenerateMIDI(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-data_DURATION BTrem::CalcIndividualNoteDuration()
+data_DURATION BTrem::CalcIndividualNoteDuration() const
 {
     // Check if duration is given by attribute
     if (this->HasUnitdur()) {
@@ -118,13 +122,13 @@ data_DURATION BTrem::CalcIndividualNoteDuration()
     // Otherwise consider duration and stem modifier of first child chord/note
     data_DURATION childDur = DURATION_NONE;
     data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
-    Chord *chord = vrv_cast<Chord *>(this->FindDescendantByType(CHORD));
+    const Chord *chord = vrv_cast<const Chord *>(this->FindDescendantByType(CHORD));
     if (chord) {
         childDur = chord->GetDur();
         stemMod = chord->GetStemMod();
     }
     else {
-        Note *note = vrv_cast<Note *>(this->FindDescendantByType(NOTE));
+        const Note *note = vrv_cast<const Note *>(this->FindDescendantByType(NOTE));
         if (note) {
             childDur = note->GetDur();
             stemMod = note->GetStemMod();
@@ -142,6 +146,41 @@ data_DURATION BTrem::CalcIndividualNoteDuration()
         }
     }
     return DURATION_NONE;
+}
+
+data_STEMMODIFIER BTrem::GetDrawingStemMod() const
+{
+    Object *child = const_cast<BTrem *>(this)->FindDescendantByType(CHORD);
+    if (!child) {
+        child = const_cast<BTrem *>(this)->FindDescendantByType(NOTE);
+        if (!child) return STEMMODIFIER_NONE;
+    }
+
+    data_STEMMODIFIER stemMod = vrv_cast<LayerElement *>(child)->GetDrawingStemMod();
+    if (stemMod != STEMMODIFIER_NONE) return stemMod;
+
+    DurationInterface *duration = child->GetDurationInterface();
+    if (!duration) return STEMMODIFIER_NONE;
+    const int drawingDur = duration->GetActualDur();
+
+    if (!this->HasUnitdur()) {
+        if (drawingDur < DUR_2) return STEMMODIFIER_3slash;
+        return STEMMODIFIER_NONE;
+    }
+    int slashDur = this->GetUnitdur() - drawingDur;
+    if (drawingDur < DUR_4) slashDur = this->GetUnitdur() - DUR_4;
+    switch (slashDur) {
+        case 0: return STEMMODIFIER_NONE;
+        case 1: return STEMMODIFIER_1slash;
+        case 2: return STEMMODIFIER_2slash;
+        case 3: return STEMMODIFIER_3slash;
+        case 4: return STEMMODIFIER_4slash;
+        case 5: return STEMMODIFIER_5slash;
+        case 6: return STEMMODIFIER_6slash;
+        default: break;
+    }
+
+    return STEMMODIFIER_NONE;
 }
 
 } // namespace vrv

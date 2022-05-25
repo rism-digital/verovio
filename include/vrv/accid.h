@@ -31,7 +31,9 @@ class Accid : public LayerElement,
               public AttAccidLog,
               public AttColor,
               public AttEnclosingChars,
-              public AttExtSym {
+              public AttExtSym,
+              public AttPlacementOnStaff,
+              public AttPlacementRelEvent {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -48,7 +50,13 @@ public:
     /** Override the method since it is align to the staff */
     bool IsRelativeToStaff() const override { return (this->HasLoc() || (this->HasOloc() && this->HasPloc())); }
 
-    PositionInterface *GetPositionInterface() override { return dynamic_cast<PositionInterface *>(this); }
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
+    ///@}
 
     /** Override the method since alignment is required */
     bool HasToBeAligned() const override { return true; }
@@ -88,6 +96,14 @@ public:
      */
     void AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize);
 
+    /**
+     * @name Set and get same layer alignment
+     */
+    ///@{
+    void IsAlignedWithSameLayer(bool alignWithSameLayer) { m_alignedWithSameLayer = alignWithSameLayer; }
+    bool IsAlignedWithSameLayer() const { return m_alignedWithSameLayer; }
+    ///@}
+
     //----------------//
     // Static methods //
     //----------------//
@@ -102,9 +118,9 @@ public:
     //----------//
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -119,6 +135,7 @@ private:
     Accid *m_drawingOctave;
     Accid *m_drawingUnison;
     bool m_isDrawingOctave;
+    bool m_alignedWithSameLayer;
 };
 
 //----------------------------------------------------------------------------

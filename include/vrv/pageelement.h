@@ -56,6 +56,11 @@ public:
     int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
+     * See Object::CastOffToSelection
+     */
+    int CastOffToSelection(FunctorParams *) override;
+
+    /**
      * See Object::UnCastOff
      */
     int UnCastOff(FunctorParams *functorParams) override;

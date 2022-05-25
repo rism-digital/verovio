@@ -40,8 +40,13 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    TextDirInterface *GetTextDirInterface() override { return dynamic_cast<TextDirInterface *>(this); }
-    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
+    TextDirInterface *GetTextDirInterface() override { return vrv_cast<TextDirInterface *>(this); }
+    const TextDirInterface *GetTextDirInterface() const override { return vrv_cast<const TextDirInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
     ///@}
 
     /**
@@ -49,6 +54,11 @@ public:
      * Only supported elements will be actually added to the child list.
      */
     bool IsSupportedChild(Object *object) override;
+
+    /**
+     * Check whether the current object must be positioned closer to the staff than the other
+     */
+    bool IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const override;
 
     //----------//
     // Functors //

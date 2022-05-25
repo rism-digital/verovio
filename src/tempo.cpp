@@ -117,19 +117,19 @@ int Tempo::AdjustTempo(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Tempo::ResetDrawing(FunctorParams *functorParams)
+int Tempo::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    ControlElement::ResetDrawing(functorParams);
+    ControlElement::ResetData(functorParams);
 
     m_drawingXRels.clear();
 
     return FUNCTOR_CONTINUE;
 }
 
-int Tempo::CalcMaxMeasureDuration(FunctorParams *functorParams)
+int Tempo::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     if (this->HasMidiBpm()) {
@@ -144,7 +144,7 @@ int Tempo::CalcMaxMeasureDuration(FunctorParams *functorParams)
         if (this->HasMmDots()) {
             mmUnit = 2 * mmUnit - (mmUnit / pow(2, this->GetMmDots()));
         }
-        params->m_currentTempo = mm * 4.0 / mmUnit + 0.5;
+        if (mmUnit > 0) params->m_currentTempo = mm * 4.0 / mmUnit;
     }
 
     return FUNCTOR_CONTINUE;

@@ -37,6 +37,8 @@ Accid::Accid()
     , AttColor()
     , AttEnclosingChars()
     , AttExtSym()
+    , AttPlacementOnStaff()
+    , AttPlacementRelEvent()
 {
 
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -46,6 +48,8 @@ Accid::Accid()
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_PLACEMENTONSTAFF);
+    this->RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
     this->Reset();
 }
@@ -62,25 +66,31 @@ void Accid::Reset()
     this->ResetColor();
     this->ResetEnclosingChars();
     this->ResetExtSym();
+    this->ResetPlacementOnStaff();
+    this->ResetPlacementRelEvent();
 
     m_drawingUnison = NULL;
+    m_alignedWithSameLayer = false;
 }
 
 std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
 {
     if (!this->HasAccid()) return L"";
 
+    const Resources *resources = this->GetDocResources();
+    if (!resources) return L"";
+
     wchar_t code = 0;
 
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
         code = this->GetGlyphNum();
-        if (NULL == Resources::GetGlyph(code)) code = 0;
+        if (NULL == resources->GetGlyph(code)) code = 0;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
-        if (NULL == Resources::GetGlyph(code)) code = 0;
+        code = resources->GetGlyphCode(this->GetGlyphName());
+        if (NULL == resources->GetGlyph(code)) code = 0;
     }
 
     if (!code) {
@@ -124,8 +134,10 @@ void Accid::AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize)
     Staff *staff = element->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
 
+    const int unit = doc->GetDrawingUnit(staffSize);
+    const int rightMargin = doc->GetRightMargin(ACCID) * unit;
     if (element->Is(NOTE) && chord && chord->HasAdjacentNotesInStaff(staff)) {
-        const int horizontalMargin = 4 * doc->GetDrawingStemWidth(staffSize);
+        const int horizontalMargin = doc->GetOptions()->m_ledgerLineExtension.GetValue() * unit + 0.5 * rightMargin;
         const int drawingUnit = doc->GetDrawingUnit(staffSize);
         const int staffTop = staff->GetDrawingY();
         const int staffBottom = staffTop - doc->GetDrawingStaffSize(staffSize);
@@ -148,10 +160,22 @@ void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
 
     if (this == element) return;
 
-    const int verticalMargin = 1 * doc->GetDrawingStemWidth(staffSize);
-    int horizontalMargin = 2 * doc->GetDrawingStemWidth(staffSize);
-
-    if (element->Is(NOTE)) horizontalMargin = 3 * doc->GetDrawingStemWidth(staffSize);
+    const int unit = doc->GetDrawingUnit(staffSize);
+    int horizontalMargin = doc->GetRightMargin(ACCID) * unit;
+    // Reduce spacing for successive accidentals
+    if (element->Is(ACCID)) {
+        horizontalMargin *= 0.66;
+    }
+    else if (element->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(element);
+        int ledgerAbove = 0;
+        int ledgerBelow = 0;
+        if (note->HasLedgerLines(ledgerAbove, ledgerBelow)) {
+            const int value = doc->GetOptions()->m_ledgerLineExtension.GetValue() * unit + 0.5 * horizontalMargin;
+            horizontalMargin = std::max(horizontalMargin, value);
+        }
+    }
+    const int verticalMargin = unit / 4;
 
     if (!this->VerticalSelfOverlap(element, verticalMargin)) {
         this->AdjustToLedgerLines(doc, element, staffSize);
@@ -252,11 +276,11 @@ wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Accid::ResetDrawing(FunctorParams *functorParams)
+int Accid::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

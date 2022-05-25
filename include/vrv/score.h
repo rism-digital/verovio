@@ -67,11 +67,16 @@ public:
     /**
      * Check whether we need to optimize score based on the condense option
      */
-    bool ScoreDefNeedsOptimization(int optionCondense);
+    bool ScoreDefNeedsOptimization(int optionCondense) const;
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::PrepareDataInitialization
+     */
+    int PrepareDataInitialization(FunctorParams *functorParams) override;
 
     /**
      * See Object::AdjustDots
@@ -120,6 +125,11 @@ public:
      * See Object::PrepareDuration
      */
     int PrepareDuration(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::Transpose
+     */
+    int Transpose(FunctorParams *functorParams) override;
 
 private:
     /**

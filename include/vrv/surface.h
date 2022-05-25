@@ -40,8 +40,8 @@ public:
     ///@}
     bool IsSupportedChild(Object *object) override;
 
-    int GetMaxX();
-    int GetMaxY();
+    int GetMaxX() const;
+    int GetMaxY() const;
 
 protected:
     //

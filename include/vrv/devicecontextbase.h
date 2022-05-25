@@ -230,14 +230,11 @@ public:
      * @name Getter/setter for control point offset (as well as method to calculate it from options)
      */
     ///@{
-    void SetControlPointOffset(int controlPointOffset)
-    {
-        m_leftControlPointOffset = m_rightControlPointOffset = controlPointOffset;
-    };
-    void SetLeftControlPointOffset(int height) { m_leftControlPointOffset = height; }
-    void SetRightControlPointOffset(int height) { m_rightControlPointOffset = height; }
-    int GetLeftControlPointOffset() const { return m_leftControlPointOffset; }
-    int GetRightControlPointOffset() const { return m_rightControlPointOffset; }
+    void SetControlOffset(int offset) { m_leftControlOffset = m_rightControlOffset = offset; }
+    void SetLeftControlOffset(int offset) { m_leftControlOffset = offset; }
+    void SetRightControlOffset(int offset) { m_rightControlOffset = offset; }
+    int GetLeftControlOffset() const { return m_leftControlOffset; }
+    int GetRightControlOffset() const { return m_rightControlOffset; }
     ///@}
 
     /**
@@ -252,24 +249,44 @@ public:
     ///@}
 
     /**
+     * @name Getter/setter for the side of the control points (left and right)
+     */
+    ///@{
+    void SetControlSides(bool leftAbove, bool rightAbove);
+    bool IsLeftControlAbove() const { return m_leftControlAbove; }
+    bool IsRightControlAbove() const { return m_rightControlAbove; }
+    ///@}
+
+    /**
      * @name Initialize control point height and offset from end point positions
      */
+    ///@{
+    void CalcInitialControlPointParams();
     void CalcInitialControlPointParams(Doc *doc, float angle, int staffSize);
+    ///@}
 
     /**
      * Calculate control point offset and height from points or vice versa
      */
     ///@{
-    void UpdateControlPointParams(curvature_CURVEDIR dir);
-    void UpdateControlPoints(curvature_CURVEDIR dir);
+    void UpdateControlPointParams();
+    void UpdateControlPoints();
     ///@}
+
+    /**
+     * Estimate the curve parameter corresponding to the control points
+     * Based on the polyline P1-C1-C2-P2
+     */
+    std::pair<double, double> EstimateCurveParamForControlPoints() const;
 
 private:
     // Control point X-axis offset for both start/end points
-    int m_leftControlPointOffset = 0;
-    int m_rightControlPointOffset = 0;
+    int m_leftControlOffset = 0;
+    int m_rightControlOffset = 0;
     int m_leftControlHeight = 0;
     int m_rightControlHeight = 0;
+    bool m_leftControlAbove = true;
+    bool m_rightControlAbove = true;
 
     // no copy ctor or assignment operator - the defaults are ok
 };

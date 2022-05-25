@@ -29,6 +29,7 @@
 #include "keyaccid.h"
 #include "keysig.h"
 #include "layer.h"
+#include "ligature.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "metersig.h"
@@ -1389,11 +1390,11 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
     std::cmatch matches;
     if (meter) {
         if (regex_match(timesig_str, matches, std::regex("(\\d+)/(\\d+)"))) {
-            meter->SetCount({ std::stoi(matches[1]) });
+            meter->SetCount({ { std::stoi(matches[1]) }, MeterCountSign::None });
             meter->SetUnit(std::stoi(matches[2]));
         }
         else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
-            meter->SetCount({ std::stoi(timesig_str) });
+            meter->SetCount({ { std::stoi(timesig_str) }, MeterCountSign::None });
             meter->SetUnit(1);
             meter->SetForm(METERFORM_num);
         }
@@ -1408,12 +1409,12 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
         else if (strcmp(timesig_str, "c3") == 0) {
             // C3
             meter->SetSym(METERSIGN_common);
-            meter->SetCount({ 3 });
+            meter->SetCount({ { 3 }, MeterCountSign::None });
         }
         else if (strcmp(timesig_str, "c3/2") == 0) {
             // C3/2
             meter->SetSym(METERSIGN_common); // ??
-            meter->SetCount({ 3 });
+            meter->SetCount({ { 2 }, MeterCountSign::None });
             meter->SetUnit(2);
         }
         else {
@@ -2257,7 +2258,13 @@ enum {
     ERR_056_TIMESIG_CHANGE,
     ERR_057_MENSUR_CHANGE,
     ERR_058_FERMATA_MREST,
-    ERR_059_DOUBLE_DOTS_MENS
+    ERR_059_DOUBLE_DOTS_MENS,
+    ERR_060_CLEF_MISSING,
+    ERR_061_LIGATURE_NOTE_BEFORE,
+    ERR_062_LIGATURE_NOTE_AFTER,
+    ERR_063_LIGATURE_PITCH,
+    ERR_064_LIGATURE_DURATION,
+    ERR_065_MREST_INVALID_MEASURE
 };
 
 // clang-format off
@@ -2320,7 +2327,13 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_056_TIMESIG_CHANGE, "The time signature cannot be changed more than once in a measure." },
     { ERR_057_MENSUR_CHANGE, "The mensur sign cannot be changed more than once in a measure." },
     { ERR_058_FERMATA_MREST, "A fermata on measure rest with extra '%s' is invalid." },
-    { ERR_059_DOUBLE_DOTS_MENS, "Double-dotted notes are invalid with mensural notation." }
+    { ERR_059_DOUBLE_DOTS_MENS, "Double-dotted notes are invalid with mensural notation." },
+    { ERR_060_CLEF_MISSING, "A clef is required." },
+    { ERR_061_LIGATURE_NOTE_BEFORE, "To indicate a ligature, a '+' must be preceded by a note." },
+    { ERR_062_LIGATURE_NOTE_AFTER, "To indicate a ligature, a '+' must be followed by a note." },
+    { ERR_063_LIGATURE_PITCH, "A ligature cannot have two consecutive notes with the same pitch." },
+    { ERR_064_LIGATURE_DURATION, "The duration in a ligature cannot be shorter than a semibreve." },
+    { ERR_065_MREST_INVALID_MEASURE, "A measure with a measure rest cannot include anything else." }
 };
 // clang-format on
 
@@ -2363,6 +2376,7 @@ namespace pae {
 
     enum status_FIGURE { FIGURE_NONE = 0, FIGURE_START, FIGURE_END, FIGURE_REPEAT };
     enum status_CHORD { CHORD_NONE = 0, CHORD_MARKER, CHORD_NOTE };
+    enum status_LIGATURE { LIGATURE_NONE = 0, LIGATURE_MARKER, LIGATURE_NOTE };
 
     // specific positions with negative numbers
     enum { UNKOWN_POS = -1, KEYSIG_POS = -2, CLEF_POS = -3, TIMESIG_POS = -4, INPUT_POS = -5 };
@@ -2700,6 +2714,19 @@ bool PAEInput::Import(const std::string &input)
         m_hasClef = true;
         if (success) success = this->ParseClef(&m_clef, clefStr, staffDefToken, &m_isMensural);
     }
+    else {
+        pae::Token staffDefToken(0, pae::CLEF_POS);
+        LogPAE(ERR_060_CLEF_MISSING, staffDefToken);
+        if (m_pedanticMode) {
+            success = false;
+        }
+        else {
+            m_hasClef = true;
+            m_clef.SetLine(2);
+            m_clef.SetShape(CLEFSHAPE_G);
+            m_clef.SetEnclose(ENCLOSURE_brack);
+        }
+    }
 
     if (!meterSigOrMensurStr.empty()) {
         pae::Token staffDefToken(0, pae::TIMESIG_POS);
@@ -2807,7 +2834,11 @@ bool PAEInput::Parse()
 
     if (success) success = this->ConvertTie();
 
+    if (success) success = this->ConvertLigature();
+
     if (success) success = this->ConvertAccidGes();
+
+    if (success) success = this->CheckContentPreBuild();
 
     if (success) success = this->CheckHierarchy();
 
@@ -2820,6 +2851,8 @@ bool PAEInput::Parse()
 
     m_doc->Reset();
     m_doc->SetType(Raw);
+    // Set the notation type
+    if (m_isMensural) m_doc->m_notationType = NOTATIONTYPE_mensural;
     // The mdiv
     Mdiv *mdiv = new Mdiv();
     mdiv->m_visibility = Visible;
@@ -2972,7 +3005,7 @@ bool PAEInput::Parse()
             layerElementContainers.back()->AddChild(element);
 
             // Add to the stack the layer element that are containers
-            if (element->Is({ BEAM, CHORD, GRACEGRP, TUPLET })) {
+            if (element->Is({ BEAM, CHORD, GRACEGRP, LIGATURE, TUPLET })) {
                 layerElementContainers.push_back(element);
             }
         }
@@ -2992,6 +3025,8 @@ bool PAEInput::Parse()
             token.m_object = NULL;
         }
     }
+
+    CheckContentPostBuild();
 
     // We should have no object left, just in case they need to be delete.
     this->ClearTokenObjects();
@@ -3019,7 +3054,7 @@ bool PAEInput::ConvertKeySig()
                 token.m_char = 0;
                 continue;
             }
-            if (!token.IsSpace()) {
+            if (!token.IsEnd() && !token.IsSpace()) {
                 LogPAE(ERR_004_KEY_SPACE, token);
                 if (m_pedanticMode) return false;
             }
@@ -3057,7 +3092,7 @@ bool PAEInput::ConvertClef()
                 token.m_char = 0;
                 continue;
             }
-            if (!token.IsSpace()) {
+            if (!token.IsEnd() && !token.IsSpace()) {
                 LogPAE(ERR_005_CLEF_SPACE, token);
                 if (m_pedanticMode) return false;
             }
@@ -3095,7 +3130,7 @@ bool PAEInput::ConvertMeterSigOrMensur()
                 token.m_char = 0;
                 continue;
             }
-            if (!token.IsSpace()) {
+            if (!token.IsEnd() && !token.IsSpace()) {
                 LogPAE(ERR_006_TIMESIG_SPACE, token);
                 if (m_pedanticMode) return false;
             }
@@ -3500,8 +3535,10 @@ bool PAEInput::ConvertFermata()
                     fermataTarget = token.m_object;
                     continue;
                 }
-                // This was probably not a fermata sign but a tuplet one
-                else {
+                // We still allow duration, accidental or octave markers within a fermata ()
+                else if (!this->Is(token, pae::DURATION) && this->Is(token, pae::ACCIDENTAL_INTERNAL)
+                    && this->Was(token, pae::OCTAVE)) {
+                    // This was probably not a fermata sign but a tuplet one
                     fermataToken = NULL;
                     continue;
                 }
@@ -3991,7 +4028,12 @@ bool PAEInput::ConvertDuration()
     // The stack of durations for handling patterns
     std::list<std::pair<data_DURATION, int>> durations;
     // Add a default quarter note duration
-    durations.push_back({ DURATION_4, 0 });
+    if (m_isMensural) {
+        durations.push_back({ DURATION_semibrevis, 0 });
+    }
+    else {
+        durations.push_back({ DURATION_4, 0 });
+    }
     // Point to it
     std::list<std::pair<data_DURATION, int>>::iterator currentDur = durations.begin();
 
@@ -4046,7 +4088,7 @@ bool PAEInput::ConvertDuration()
                 }
             }
             // Set the duration to the note, chord or rest
-            DurationInterface *interface = dynamic_cast<DurationInterface *>(token->m_object);
+            DurationInterface *interface = token->m_object->GetDurationInterface();
             assert(interface);
             interface->SetDur(currentDur->first);
             if (currentDur->second) {
@@ -4084,8 +4126,14 @@ bool PAEInput::ConvertDuration()
 
 bool PAEInput::ConvertTie()
 {
+    // No ties in mensural
+    // Since now we use the same symbol just return - eventually we want to check them in pedantic mode
+    // if (m_isMensural) return true;
+
     Note *note = NULL;
     Tie *tie = NULL;
+    // A pointer to the token be able to reset it to '+' in mensural notation
+    pae::Token *tieToken = NULL;
 
     for (auto &token : m_pae) {
         if (token.IsVoid()) continue;
@@ -4095,11 +4143,24 @@ bool PAEInput::ConvertTie()
             assert(tokenNote);
             if (tie && note) {
                 if (note->GetOct() != tokenNote->GetOct() || note->GetPname() != tokenNote->GetPname()) {
-                    LogPAE(ERR_037_TIE_PITCH, token);
-                    if (m_pedanticMode) return false;
+                    if (m_isMensural && tieToken) {
+                        // This is probably a ligature - reset it back
+                        delete tie;
+                        tie = NULL;
+                        tieToken->m_object = NULL;
+                        tieToken->m_char = '+';
+                        tieToken = NULL;
+                        note = NULL;
+                    }
+                    else {
+                        LogPAE(ERR_037_TIE_PITCH, token);
+                        if (m_pedanticMode) return false;
+                    }
                 }
-                tie->SetEndid("#" + tokenNote->GetUuid());
-                tie = NULL;
+                else {
+                    tie->SetEndid("#" + tokenNote->GetUuid());
+                    tie = NULL;
+                }
             }
             note = tokenNote;
             continue;
@@ -4112,6 +4173,8 @@ bool PAEInput::ConvertTie()
                 continue;
             }
             if (note) {
+                // Keep a pointer to the token in case this is a ligature
+                tieToken = &token;
                 tie = new Tie();
                 tie->SetStartid("#" + note->GetUuid());
                 token.m_object = tie;
@@ -4129,6 +4192,112 @@ bool PAEInput::ConvertTie()
         else if (!tie) {
             note = NULL;
         }
+    }
+
+    return true;
+}
+
+bool PAEInput::ConvertLigature()
+{
+    // No ligatures in non mensural
+    // Since now we use the same symbol just return
+    // Eventually, once we have a distinct symbol we will want to check them in pedantic mode
+    if (!m_isMensural) return true;
+
+    if (!this->HasInput('+')) return true;
+
+    // A flag for the ligature status NONE|MARKER|NOTE
+    pae::status_LIGATURE status = pae::LIGATURE_NONE;
+    // The iterator of the last note that can become the first note of a ligature
+    std::list<pae::Token>::iterator note = m_pae.end();
+    // The previous ligature note for checking that is it not of the same pitch
+    Note *previousNote = NULL;
+
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid()) {
+            ++token;
+            continue;
+        }
+
+        // We encounter a ligature marker - change the status if we have a note previously
+        if (token->m_char == '+') {
+            token->m_char = 0;
+            if (note == m_pae.end()) {
+                LogPAE(ERR_061_LIGATURE_NOTE_BEFORE, *token);
+                if (m_pedanticMode) return false;
+            }
+            else {
+                assert(previousNote);
+                status = pae::LIGATURE_MARKER;
+            }
+            ++token;
+            continue;
+        }
+
+        // We expect a note
+        if (status == pae::LIGATURE_MARKER) {
+            // If we have a note, we change the status - we will be able to decide to close the ligature on the next
+            // token
+            if (token->Is(NOTE)) {
+                Note *tokenNote = vrv_cast<Note *>(token->m_object);
+                assert(tokenNote);
+                assert(previousNote);
+                // Check we don't have two consecutive notes with the same pitch
+                if (previousNote->GetOct() == tokenNote->GetOct()
+                    && previousNote->GetPname() == tokenNote->GetPname()) {
+                    LogPAE(ERR_063_LIGATURE_PITCH, *token);
+                    if (m_pedanticMode) return false;
+                    status = pae::LIGATURE_NONE;
+                    note = m_pae.end();
+                    previousNote = NULL;
+                }
+                // Check the duration is valid for a ligature
+                else if (tokenNote->GetDur() > DURATION_semibrevis) {
+                    LogPAE(ERR_064_LIGATURE_DURATION, *token);
+                    if (m_pedanticMode) return false;
+                    status = pae::LIGATURE_NONE;
+                    note = m_pae.end();
+                    previousNote = NULL;
+                }
+                else {
+                    status = pae::LIGATURE_NOTE;
+                    previousNote = tokenNote;
+                }
+            }
+            // After a marker, we should allow accidentals, octave, duration or fermata markers but nothing else
+            else if (!this->Was(*token, pae::ACCIDENTAL_INTERNAL) && !this->Was(*token, pae::OCTAVE)
+                && !this->Was(*token, pae::DURATION) && token->m_inputChar != '(') {
+                LogPAE(ERR_062_LIGATURE_NOTE_AFTER, *token);
+                if (m_pedanticMode) return false;
+                status = pae::LIGATURE_NONE;
+                note = m_pae.end();
+                previousNote = NULL;
+            }
+            ++token;
+            continue;
+        }
+
+        // We passed the last note of the ligature - create it
+        if (status == pae::LIGATURE_NOTE) {
+            Ligature *ligature = new Ligature();
+            m_pae.insert(note, pae::Token(0, pae::UNKOWN_POS, ligature));
+            m_pae.insert(token, pae::Token(pae::CONTAINER_END, pae::UNKOWN_POS, ligature));
+        }
+
+        status = pae::LIGATURE_NONE;
+        if (token->Is(NOTE)) {
+            note = token;
+            previousNote = vrv_cast<Note *>(token->m_object);
+            assert(previousNote);
+        }
+        // Previous token was a note but current is a ')' skip it because we allow fermata on a ligature note
+        else if (token->m_inputChar != ')') {
+            note = m_pae.end();
+            previousNote = NULL;
+        }
+
+        ++token;
     }
 
     return true;
@@ -4281,10 +4450,49 @@ bool PAEInput::CheckHierarchy()
     return true;
 }
 
-bool PAEInput::CheckContent()
+bool PAEInput::CheckContentPreBuild()
 {
     // Additional checks to do here
-    // * mRest or multiRest should be unique child of layer
+    // * a measure with mRest or multiRest should not include anything else
+
+    pae::Token *previousToken = NULL;
+
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid() || !token->m_object) {
+            ++token;
+            continue;
+        }
+
+        // Check that the measure rest is at the beginning of a measure
+        if (token->Is(MULTIREST) && previousToken && !previousToken->Is(MEASURE)) {
+            LogPAE(ERR_065_MREST_INVALID_MEASURE, *token);
+            if (m_pedanticMode) return false;
+            Measure *measure = new Measure();
+            measure->SetRight(BARRENDITION_invis);
+            m_pae.insert(token, pae::Token(0, pae::UNKOWN_POS, measure));
+        }
+        // Check that the measure rest is at the end of a measure
+        else if (previousToken && previousToken->Is(MULTIREST) && !token->Is(MEASURE)) {
+            LogPAE(ERR_065_MREST_INVALID_MEASURE, *previousToken);
+            if (m_pedanticMode) return false;
+            Measure *measure = new Measure();
+            measure->SetRight(BARRENDITION_invis);
+            m_pae.insert(token, pae::Token(0, pae::UNKOWN_POS, measure));
+        }
+
+        if (token->m_object) {
+            previousToken = &(*token);
+        }
+        ++token;
+    }
+
+    return true;
+}
+
+bool PAEInput::CheckContentPostBuild()
+{
+    // Additional checks to do here
     // * beam should have more than two children
     // * graceGrp should not be empty
     // * keySig / meterSig change more than once in a measure
@@ -4488,18 +4696,18 @@ bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae:
     if (paeStr.size() < 1) {
         LogPAE(ERR_047_TIMESIG_INCOMPLETE, token);
         if (m_pedanticMode) return false;
-        meterSig->SetCount({ 4 });
+        meterSig->SetCount({ { 4 }, MeterCountSign::None });
         meterSig->SetUnit(4);
         return true;
     }
 
     std::cmatch matches;
     if (regex_match(paeStr.c_str(), matches, std::regex("(\\d+)/(\\d+)"))) {
-        meterSig->SetCount({ std::stoi(matches[1]) });
+        meterSig->SetCount({ { std::stoi(matches[1]) }, MeterCountSign::None });
         meterSig->SetUnit(std::stoi(matches[2]));
     }
     else if (regex_match(paeStr.c_str(), matches, std::regex("\\d+"))) {
-        meterSig->SetCount({ std::stoi(paeStr.c_str()) });
+        meterSig->SetCount({ { std::stoi(paeStr) }, MeterCountSign::None });
         meterSig->SetUnit(1);
         meterSig->SetForm(METERFORM_num);
     }
@@ -4514,12 +4722,12 @@ bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae:
     else if (paeStr == "c3") {
         // C3
         meterSig->SetSym(METERSIGN_common);
-        meterSig->SetCount({ 3 });
+        meterSig->SetCount({ { 3 }, MeterCountSign::None });
     }
     else if (paeStr == "c3/2") {
         // C3/2
         meterSig->SetSym(METERSIGN_common); // ??
-        meterSig->SetCount({ 3 });
+        meterSig->SetCount({ { 3 }, MeterCountSign::None });
         meterSig->SetUnit(2);
     }
     else {

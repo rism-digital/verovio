@@ -20,6 +20,29 @@ class Note;
 class Staff;
 
 //----------------------------------------------------------------------------
+// SpannedElements
+//----------------------------------------------------------------------------
+/**
+ * Contains the layer elements used for collision detection
+ */
+struct SpannedElements {
+    std::vector<LayerElement *> elements;
+    std::set<int> layersN;
+};
+
+//----------------------------------------------------------------------------
+// NearEndCollision
+//----------------------------------------------------------------------------
+/**
+ * Measure collisions near the end points
+ */
+struct NearEndCollision {
+    double metricAtStart;
+    double metricAtEnd;
+    bool endPointsAdjusted;
+};
+
+//----------------------------------------------------------------------------
 // ControlPointConstraint
 //----------------------------------------------------------------------------
 /**
@@ -32,7 +55,21 @@ struct ControlPointConstraint {
     double c;
 };
 
+//----------------------------------------------------------------------------
+// ControlPointAdjustment
+//----------------------------------------------------------------------------
+/**
+ * A vertical adjustment of bezier control points
+ */
+struct ControlPointAdjustment {
+    int leftShift;
+    int rightShift;
+    bool moveUpwards;
+    int requestedStaffSpace;
+};
+
 // Helper enum classes
+enum class SlurCurveDirection { None, Above, Below, AboveBelow, BelowAbove };
 enum class PortatoSlurType { None, StemSide, Centered };
 
 //----------------------------------------------------------------------------
@@ -64,34 +101,83 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    TimePointInterface *GetTimePointInterface() override { return dynamic_cast<TimePointInterface *>(this); }
-    TimeSpanningInterface *GetTimeSpanningInterface() override { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
 
     /**
-     * @name Getter, setter and checker for the drawing curve direction and cross-staff flag
+     * @name Getter, setter and checker for the drawing curve direction
      */
     ///@{
-    curvature_CURVEDIR GetDrawingCurvedir() const { return m_drawingCurvedir; }
-    void SetDrawingCurvedir(curvature_CURVEDIR curvedir) { m_drawingCurvedir = curvedir; }
-    bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
+    SlurCurveDirection GetDrawingCurveDir() const { return m_drawingCurveDir; }
+    void SetDrawingCurveDir(SlurCurveDirection curveDir) { m_drawingCurveDir = curveDir; }
+    bool HasDrawingCurveDir() const { return (m_drawingCurveDir != SlurCurveDirection::None); }
+    curvature_CURVEDIR CalcDrawingCurveDir(char spanningType) const;
     ///@}
 
     /**
-     * Adjust starting coordinates for the slurs depending on the curve direction and spanning type of the slur
+     * @name Additional checks based on the drawing curve direction
      */
-    std::pair<Point, Point> AdjustCoordinates(
-        Doc *doc, Staff *staff, std::pair<Point, Point> points, int spanningType, curvature_CURVEDIR drawingCurveDir);
+    ///@{
+    bool HasMixedCurveDir() const
+    {
+        return (m_drawingCurveDir == SlurCurveDirection::AboveBelow)
+            || (m_drawingCurveDir == SlurCurveDirection::BelowAbove);
+    }
+    bool HasEndpointAboveStart() const
+    {
+        return (m_drawingCurveDir == SlurCurveDirection::Above)
+            || (m_drawingCurveDir == SlurCurveDirection::AboveBelow);
+    }
+    bool HasEndpointBelowStart() const
+    {
+        return (m_drawingCurveDir == SlurCurveDirection::Below)
+            || (m_drawingCurveDir == SlurCurveDirection::BelowAbove);
+    }
+    bool HasEndpointAboveEnd() const
+    {
+        return (m_drawingCurveDir == SlurCurveDirection::Above)
+            || (m_drawingCurveDir == SlurCurveDirection::BelowAbove);
+    }
+    bool HasEndpointBelowEnd() const
+    {
+        return (m_drawingCurveDir == SlurCurveDirection::Below)
+            || (m_drawingCurveDir == SlurCurveDirection::AboveBelow);
+    }
+    ///@}
 
     /**
-     * Determine layer elements spanned by the slur
+     * Calculate the initial slur bezier curve and store it in the curve positioner
      */
-    std::vector<LayerElement *> CollectSpannedElements(Staff *staff, int xMin, int xMax, char spanningType);
+    void CalcInitialCurve(Doc *doc, FloatingCurvePositioner *curve, NearEndCollision *nearEndCollision = NULL);
+
+    /**
+     * Recalculate the spanned elements of the curve positioner
+     */
+    void CalcSpannedElements(FloatingCurvePositioner *curve);
+
+    /**
+     * Add curve positioner to articulations
+     */
+    void AddPositionerToArticulations(FloatingCurvePositioner *curve);
 
     /**
      * Calculate the staff where the slur's floating curve positioner lives
      */
-    Staff *CalculateExtremalStaff(Staff *staff, int xMin, int xMax, char spanningType);
+    Staff *CalculateExtremalStaff(Staff *staff, int xMin, int xMax);
+
+    /**
+     * Set the bezier control sides depending on the curve direction
+     */
+    void InitBezierControlSides(BezierCurve &bezier, curvature_CURVEDIR curveDir) const;
 
     /**
      * Slur adjustment
@@ -107,14 +193,14 @@ public:
     //----------//
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareSlurs
+     * See Object::CalcSlurDirection
      */
-    int PrepareSlurs(FunctorParams *functorParams) override;
+    int CalcSlurDirection(FunctorParams *functorParams) override;
 
 private:
     /**
@@ -125,21 +211,40 @@ private:
     std::pair<Layer *, LayerElement *> GetBoundaryLayer();
     // Get cross staff by only considering the slur boundary
     Staff *GetBoundaryCrossStaff();
+    // Determine curve direction for the slurs that start at grace note
+    curvature_CURVEDIR GetGraceCurveDirection() const;
     // Get preferred curve direction based on various conditions
-    curvature_CURVEDIR GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
+    curvature_CURVEDIR GetPreferredCurveDirection(
+        data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur);
     ///@}
 
     /**
-     * Helper for calculating the initial slur start and end points
+     * Helper for calculating spanned elements
      */
     ///@{
+    // Determine layer elements spanned by the slur
+    SpannedElements CollectSpannedElements(Staff *staff, int xMin, int xMax);
+    // Filter and add layer elements spanned by the slur to the positioner
+    void AddSpannedElements(
+        FloatingCurvePositioner *curve, const SpannedElements &elements, Staff *staff, int xMin, int xMax);
+    // Determine whether a layer element should lie above or below the slur
+    bool IsElementBelow(LayerElement *element, Staff *startStaff, Staff *endStaff) const;
+    bool IsElementBelow(FloatingPositioner *positioner, Staff *startStaff, Staff *endStaff) const;
+    ///@}
+
+    /**
+     * Helper for calculating the initial slur
+     */
+    ///@{
+    // Calculate the endpoint coordinates depending on the curve direction and spanning type of the slur
+    std::pair<Point, Point> CalcEndPoints(Doc *doc, Staff *staff, NearEndCollision *nearEndCollision, int x1, int x2,
+        curvature_CURVEDIR drawingCurveDir, char spanningType);
     // Retrieve the start and end note locations of the slur
-    std::pair<int, int> GetStartEndLocs(
-        Note *startNote, Chord *startChord, Note *endNote, Chord *endChord, curvature_CURVEDIR dir) const;
+    std::pair<int, int> GetStartEndLocs(Note *startNote, Chord *startChord, Note *endNote, Chord *endChord) const;
     // Calculate the break location at system start/end and the pitch difference
-    std::pair<int, int> CalcBrokenLoc(Staff *staff, int startLoc, int endLoc, curvature_CURVEDIR dir) const;
+    std::pair<int, int> CalcBrokenLoc(Staff *staff, int startLoc, int endLoc) const;
     // Check if the slur resembles portato
-    PortatoSlurType IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord, curvature_CURVEDIR curveDir) const;
+    PortatoSlurType IsPortatoSlur(Doc *doc, Note *startNote, Chord *startChord) const;
     ///@}
 
     /**
@@ -149,23 +254,31 @@ private:
     // Discard certain spanned elements
     void FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
+    // Detect collisions near the endpoints
+    NearEndCollision DetectCollisionsNearEnd(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
     // Calculate the vertical shift of the slur end points
     std::pair<int, int> CalcEndPointShift(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin, int unit);
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double flexibility, int margin);
+
+    // Calculate slur from bulge values
+    void AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit);
+
+    // Check whether control points should be adjusted horizontally
+    bool AllowControlOffsetAdjustment(const BezierCurve &bezierCurve, double symmetry, int unit) const;
 
     // Calculate the horizontal control point offset
     std::tuple<bool, int, int> CalcControlPointOffset(
         FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
     // Calculate the vertical control point shift
-    std::pair<int, int> CalcControlPointVerticalShift(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
-
-    // Helper function to determine curve direction for the slurs that start at grace note
-    curvature_CURVEDIR GetGraceCurveDirection(Doc *doc);
+    ControlPointAdjustment CalcControlPointVerticalShift(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double symmetry, int margin);
 
     // Solve the constraints for vertical control point adjustment
-    std::pair<int, int> SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints);
+    std::pair<int, int> SolveControlPointConstraints(
+        const std::list<ControlPointConstraint> &constraints, double symmetry = 0.0);
 
     // Improve the slur shape by adjusting the control point heights
     void AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int unit);
@@ -176,28 +289,30 @@ private:
      */
     ///@{
     // Shift end points for collisions nearby
-    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection) const;
+    void ShiftEndPoints(
+        int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const;
 
-    // Rebalance shifts to avoid awkward tilting of short slurs
-    void RebalanceShifts(int &shiftLeft, int &shiftRight, double distance, int unit) const;
+    // Determine a quadratic interpolation function between zero and one and evaluate it
+    double CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const;
 
     // Rotate the slope by a given number of degrees, but choose smaller angles if already close to the vertical axis
     // Choose doublingBound as the positive slope value where doubling has the same effect as rotating:
     // tan(atan(doublingBound) + degrees * PI / 180.0) ≈ 2.0 * doublingBound
     double RotateSlope(double slope, double degrees, double doublingBound, bool upwards) const;
+
+    // Calculate the minimal angle <)C1P1P2 or <)P1P2C2
+    float GetMinControlPointAngle(const BezierCurve &bezierCurve, float angle, int unit) const;
     ///@}
 
 public:
     //
 private:
     /**
-     * The drawing curve direction.
-     * This is calculated only when start - end points are on the same system. Otherwise
-     * it is left unset. This also means that it is reset only in ResetDrawing and not when
-     * the alignment is reset. The reason is because we want to preserve the value when the
-     * document is cast-off.
+     * The drawing curve direction
+     * This is calculated in the CalcSlurDirection functor and contains an additional distinction
+     * for s-shaped slurs / mixed direction
      */
-    curvature_CURVEDIR m_drawingCurvedir;
+    SlurCurveDirection m_drawingCurveDir;
 };
 
 } // namespace vrv

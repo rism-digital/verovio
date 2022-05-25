@@ -77,9 +77,9 @@ bool Harm::IsSupportedChild(Object *child)
     return true;
 }
 
-bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos)
+bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos) const
 {
-    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    const Text *textObject = dynamic_cast<const Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return false;
     std::wstring text = textObject->GetText();
 
@@ -119,9 +119,9 @@ void Harm::SetRootPitch(const TransPitch &pitch, unsigned int endPos)
     }
 }
 
-bool Harm::GetBassPitch(TransPitch &pitch)
+bool Harm::GetBassPitch(TransPitch &pitch) const
 {
-    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    const Text *textObject = dynamic_cast<const Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return false;
     std::wstring text = textObject->GetText();
     if (!text.length()) return false;
@@ -161,6 +161,11 @@ int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
     assert(params);
 
     std::string n = this->GetN();
+    // If there is no @n on harm we use the first @staff value as negative
+    // This will not work if @staff has more than one staff id, but this is probably not going to be used
+    if (n == "" && this->HasStaff()) {
+        n = StringFormat("%d", this->GetStaff().at(0) * -1);
+    }
 
     for (auto &kv : params->m_harms) {
         if (kv.first == n) {
@@ -286,8 +291,6 @@ int Harm::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
-
-    LogDebug("Transposing harm");
 
     unsigned int position = 0;
     TransPitch pitch;

@@ -130,6 +130,17 @@ int PageMilestoneEnd::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int PageMilestoneEnd::CastOffToSelection(FunctorParams *functorParams)
+{
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
+    assert(params);
+
+    assert(params->m_page);
+    this->MoveItselfTo(params->m_page);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int PageMilestoneEnd::UnCastOff(FunctorParams *functorParams)
 {
     UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
@@ -143,6 +154,18 @@ int PageMilestoneEnd::UnCastOff(FunctorParams *functorParams)
     }
 
     MoveItselfTo(params->m_page);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int PageMilestoneEnd::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    if (this->m_start && this->m_start->Is(MDIV)) {
+        params->m_currentMdivUuids.pop_back();
+    }
 
     return FUNCTOR_CONTINUE;
 }

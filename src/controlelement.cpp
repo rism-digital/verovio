@@ -66,9 +66,9 @@ void ControlElement::Reset()
     this->ResetTyped();
 }
 
-data_HORIZONTALALIGNMENT ControlElement::GetChildRendAlignment()
+data_HORIZONTALALIGNMENT ControlElement::GetChildRendAlignment() const
 {
-    Rend *rend = dynamic_cast<Rend *>(this->FindDescendantByType(REND));
+    const Rend *rend = dynamic_cast<const Rend *>(this->FindDescendantByType(REND));
     if (!rend || !rend->HasHalign()) return HORIZONTALALIGNMENT_NONE;
 
     return rend->GetHalign();
@@ -143,16 +143,16 @@ int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int ControlElement::ResetDrawing(FunctorParams *functorParams)
+int ControlElement::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    FloatingObject::ResetDrawing(functorParams);
+    FloatingObject::ResetData(functorParams);
 
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = this->GetLinkingInterface();
         assert(interface);
-        return interface->InterfaceResetDrawing(functorParams, this);
+        return interface->InterfaceResetData(functorParams, this);
     }
 
     return FUNCTOR_CONTINUE;

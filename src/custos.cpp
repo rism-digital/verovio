@@ -57,15 +57,18 @@ bool Custos::IsSupportedChild(Object *child)
 
 wchar_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const
 {
+    const Resources *resources = this->GetDocResources();
+    if (!resources) return 0;
+
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
         wchar_t code = this->GetGlyphNum();
-        if (NULL != Resources::GetGlyph(code)) return code;
+        if (NULL != resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
-        if (NULL != Resources::GetGlyph(code)) return code;
+        wchar_t code = resources->GetGlyphCode(this->GetGlyphName());
+        if (NULL != resources->GetGlyph(code)) return code;
     }
 
     switch (notationtype) {
@@ -82,11 +85,11 @@ wchar_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Custos::ResetDrawing(FunctorParams *functorParams)
+int Custos::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

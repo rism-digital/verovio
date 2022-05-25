@@ -64,15 +64,15 @@ void TabDurSym::AddChild(Object *child)
 
     child->SetParent(this);
 
-    ArrayOfObjects *children = this->GetChildrenForModification();
+    ArrayOfObjects &children = this->GetChildrenForModification();
 
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is(STEM)) {
-        children->insert(children->begin(), child);
+        children.insert(children.begin(), child);
     }
     else {
-        children->push_back(child);
+        children.push_back(child);
     }
     Modify();
 }
@@ -93,19 +93,17 @@ void TabDurSym::AdjustDrawingYRel(Staff *staff, Doc *doc)
     this->SetDrawingYRel(-yRel);
 }
 
-Point TabDurSym::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
+Point TabDurSym::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
 {
-    Point p(0, 0);
-    return p;
+    return Point();
 }
 
-Point TabDurSym::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
+Point TabDurSym::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
 {
-    Point p(0, 0);
-    return p;
+    return Point();
 }
 
-int TabDurSym::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
+int TabDurSym::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const
 {
     assert(staff);
 

@@ -90,20 +90,20 @@ int F::PrepareTimestamps(FunctorParams *functorParams)
     return interface->InterfacePrepareTimestamps(functorParams, this);
 }
 
-int F::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
+int F::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
     assert(interface);
-    return interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
+    return interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
 }
 
-int F::ResetDrawing(FunctorParams *functorParams)
+int F::ResetData(FunctorParams *functorParams)
 {
-    TextElement::ResetDrawing(functorParams);
+    TextElement::ResetData(functorParams);
 
     TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
     assert(interface);
-    return interface->InterfaceResetDrawing(functorParams, this);
+    return interface->InterfaceResetData(functorParams, this);
 }
 
 } // namespace vrv

@@ -72,7 +72,7 @@ public:
     /**
      * Return the maximum staff size in the staffGrp (100 if empty)
      */
-    int GetMaxStaffSize();
+    int GetMaxStaffSize() const;
 
     /**
      * @name Setter and getter of the group symbol
@@ -86,8 +86,8 @@ public:
      * @name Methods for checking the presence of label and labelAbbr information and getting them.
      */
     ///@{
-    bool HasLabelInfo();
-    bool HasLabelAbbrInfo();
+    bool HasLabelInfo() const;
+    bool HasLabelAbbrInfo() const;
 
     ///@}
 
@@ -97,10 +97,17 @@ public:
      */
     ///@{
     Label *GetLabel();
-    Label *GetLabelCopy();
+    const Label *GetLabel() const;
+    Label *GetLabelCopy() const;
     LabelAbbr *GetLabelAbbr();
-    LabelAbbr *GetLabelAbbrCopy();
+    const LabelAbbr *GetLabelAbbr() const;
+    LabelAbbr *GetLabelAbbrCopy() const;
     ///@}
+
+    /**
+     * Set visibility of the group and all of its nested children to SHOW
+     */
+    void SetEverythingVisible();
 
     //----------//
     // Functors //
@@ -115,7 +122,7 @@ protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     //

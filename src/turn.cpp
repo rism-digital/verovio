@@ -62,18 +62,35 @@ void Turn::Reset()
 
 wchar_t Turn::GetTurnGlyph() const
 {
+    const Resources *resources = this->GetDocResources();
+    if (!resources) return 0;
+
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
         wchar_t code = this->GetGlyphNum();
-        if (NULL != Resources::GetGlyph(code)) return code;
+        if (NULL != resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
-        if (NULL != Resources::GetGlyph(code)) return code;
+        wchar_t code = resources->GetGlyphCode(this->GetGlyphName());
+        if (NULL != resources->GetGlyph(code)) return code;
     }
 
     return (this->GetForm() == turnLog_FORM_lower) ? SMUFL_E568_ornamentTurnInverted : SMUFL_E567_ornamentTurn;
+}
+
+int Turn::GetTurnHeight(Doc *doc, int staffSize) const
+{
+    assert(doc);
+
+    wchar_t originalGlyph = this->GetTurnGlyph();
+    wchar_t referenceGlyph;
+    switch (originalGlyph) {
+        case SMUFL_E569_ornamentTurnSlash: referenceGlyph = SMUFL_E567_ornamentTurn; break;
+        case SMUFL_E56D_ornamentMordent: referenceGlyph = SMUFL_E56C_ornamentShortTrill; break;
+        default: referenceGlyph = originalGlyph;
+    }
+    return doc->GetGlyphHeight(referenceGlyph, staffSize, false);
 }
 
 //----------------------------------------------------------------------------
@@ -99,10 +116,10 @@ int Turn::PrepareDelayedTurns(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Turn::ResetDrawing(FunctorParams *functorParams)
+int Turn::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    ControlElement::ResetDrawing(functorParams);
+    ControlElement::ResetData(functorParams);
 
     m_drawingEndElement = NULL;
 

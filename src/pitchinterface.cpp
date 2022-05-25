@@ -45,7 +45,7 @@ void PitchInterface::Reset()
     this->ResetPitch();
 }
 
-bool PitchInterface::HasIdenticalPitchInterface(PitchInterface *otherPitchInterface)
+bool PitchInterface::HasIdenticalPitchInterface(const PitchInterface *otherPitchInterface) const
 {
     // This should never happen because it is fully implemented
     LogError("PitchInterface::HasIdenticalPitchInterface missing");
@@ -87,7 +87,7 @@ void PitchInterface::AdjustPitchByOffset(int pitchOffset)
     this->SetOct(oct);
 }
 
-int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
+int PitchInterface::PitchDifferenceTo(const PitchInterface *pi) const
 {
     assert(pi);
     int pitchDifference = 0;
@@ -98,7 +98,7 @@ int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
     return pitchDifference;
 }
 
-void PitchInterface::AdjustPitchForNewClef(Clef *oldClef, Clef *newClef)
+void PitchInterface::AdjustPitchForNewClef(const Clef *oldClef, const Clef *newClef)
 {
     assert(oldClef);
     assert(newClef);
@@ -137,26 +137,36 @@ void PitchInterface::AdjustPname(int &pname, int &oct)
 }
 
 int PitchInterface::CalcLoc(
-    LayerElement *layerElement, Layer *layer, LayerElement *crossStaffElement, bool topChordNote)
+    const LayerElement *layerElement, const Layer *layer, const LayerElement *crossStaffElement, bool topChordNote)
 {
     assert(layerElement);
 
     if (layerElement->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(layerElement);
+        const Chord *chord = vrv_cast<const Chord *>(layerElement);
         assert(chord);
-        Note *note = (topChordNote) ? chord->GetTopNote() : chord->GetBottomNote();
+        const Note *note = (topChordNote) ? chord->GetTopNote() : chord->GetBottomNote();
         return CalcLoc(note, layer, crossStaffElement);
     }
     else if (layerElement->Is(NOTE)) {
-        Note *note = vrv_cast<Note *>(layerElement);
+        const Note *note = vrv_cast<const Note *>(layerElement);
         assert(note);
         if (note->HasLoc()) {
             return note->GetLoc();
         }
-        return PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layer->GetClefLocOffset(crossStaffElement));
+        else if (note->HasPname() && note->HasOct()) {
+            int offset = layer->GetClefLocOffset(crossStaffElement);
+            const Layer *parentLayer = vrv_cast<const Layer *>(layerElement->GetFirstAncestor(LAYER));
+            if (parentLayer != layer) {
+                offset = parentLayer->GetCrossStaffClefLocOffset(layerElement, offset);
+            }
+            return PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), offset);
+        }
+        else {
+            return 0;
+        }
     }
     else if (layerElement->Is(CUSTOS)) {
-        Custos *custos = vrv_cast<Custos *>(layerElement);
+        const Custos *custos = vrv_cast<const Custos *>(layerElement);
         assert(custos);
         if (custos->HasLoc()) {
             return custos->GetLoc();

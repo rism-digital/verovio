@@ -310,12 +310,13 @@ int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, Doc *doc, int m
 int BoundingBox::GetRectangles(
     const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2], Doc *doc) const
 {
-    Glyph *glyph = NULL;
+    const Glyph *glyph = NULL;
 
     bool glyphRect = true;
 
     if (m_smuflGlyph != 0) {
-        glyph = Resources::GetGlyph(m_smuflGlyph);
+        const Resources &resources = doc->GetResources();
+        glyph = resources.GetGlyph(m_smuflGlyph);
         assert(glyph);
 
         if (glyph->HasAnchor(anchor1) && glyph->HasAnchor(anchor2)) {
@@ -341,8 +342,8 @@ int BoundingBox::GetRectangles(
     return 1;
 }
 
-bool BoundingBox::GetGlyph2PointRectangles(
-    const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Glyph *glyph, Point rect[3][2], Doc *doc) const
+bool BoundingBox::GetGlyph2PointRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2,
+    const Glyph *glyph, Point rect[3][2], Doc *doc) const
 {
     assert(glyph);
 
@@ -430,7 +431,7 @@ bool BoundingBox::GetGlyph2PointRectangles(
 }
 
 bool BoundingBox::GetGlyph1PointRectangles(
-    const SMuFLGlyphAnchor &anchor, Glyph *glyph, Point rect[2][2], Doc *doc) const
+    const SMuFLGlyphAnchor &anchor, const Glyph *glyph, Point rect[2][2], Doc *doc) const
 {
     assert(glyph);
 
@@ -521,7 +522,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     if (p1.x > this->GetRightBy(type)) return 0;
 
     Point topBezier[4], bottomBezier[4];
-    BoundingBox::CalcThickBezier(points, curve->GetThickness(), curve->GetAngle(), topBezier, bottomBezier);
+    BoundingBox::CalcThickBezier(points, curve->GetThickness(), topBezier, bottomBezier);
 
     // The curve overflows on both sides
     if ((p1.x < this->GetLeftBy(type)) && p2.x > this->GetRightBy(type)) {
@@ -657,7 +658,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
 int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
 {
     assert(beamInterface);
-    assert(!beamInterface->m_beamElementCoords.empty());
+    assert(beamInterface->HasCoords());
 
     const Point beamLeft(
         beamInterface->m_beamElementCoords.front()->m_x, beamInterface->m_beamElementCoords.front()->m_yBeam);
@@ -763,9 +764,14 @@ Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point cen
     return point;
 }
 
+double BoundingBox::CalcDistance(const Point &p1, const Point &p2)
+{
+    return std::hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
 bool BoundingBox::ArePointsClose(const Point &p1, const Point &p2, int margin)
 {
-    return (hypot(p1.x - p2.x, p1.y - p2.y) <= margin);
+    return (BoundingBox::CalcDistance(p1, p2) <= margin);
 }
 
 double BoundingBox::CalcSlope(const Point &p1, const Point &p2)
@@ -820,11 +826,10 @@ Point BoundingBox::CalcPointAtBezier(const Point bezier[4], double t)
     return midPoint;
 }
 
-double BoundingBox::GetBezierThicknessCoefficient(
-    const Point bezier[4], int currentThickness, double angle, int penWidth)
+double BoundingBox::GetBezierThicknessCoefficient(const Point bezier[4], int currentThickness, int penWidth)
 {
     Point top[4], bottom[4];
-    CalcThickBezier(bezier, currentThickness, angle, top, bottom);
+    CalcThickBezier(bezier, currentThickness, top, bottom);
 
     Point topMidpoint = CalcPointAtBezier(top, 0.5);
     Point bottomMidpoint = CalcPointAtBezier(bottom, 0.5);
@@ -909,38 +914,41 @@ std::set<double> BoundingBox::SolveCubicPolynomial(double a, double b, double c,
     return { u - v - b / 3.0 };
 }
 
-void BoundingBox::CalcThickBezier(
-    const Point bezier[4], int thickness, float angle, Point *topBezier, Point *bottomBezier)
+void BoundingBox::CalcThickBezier(const Point bezier[4], int thickness, Point topBezier[4], Point bottomBezier[4])
 {
-    assert(topBezier && bottomBezier); // size should be 4 each
+    // We shift the control point outwards/inwards in the direction of the angle bisector of the polygon P1-C1-C2-P2 at
+    // C1 or C2
+    float slope1 = BoundingBox::CalcSlope(bezier[0], bezier[1]);
+    if (bezier[0].x > bezier[1].x) slope1 *= -1.0;
+    float slope2 = BoundingBox::CalcSlope(bezier[1], bezier[2]);
+    if (bezier[1].x > bezier[2].x) slope2 *= -1.0;
+    float slope3 = BoundingBox::CalcSlope(bezier[2], bezier[3]);
+    if (bezier[2].x > bezier[3].x) slope3 *= -1.0;
+    const float angle1 = (atan(slope1) + atan(slope2)) / 2.0;
+    const float angle2 = (atan(slope2) + atan(slope3)) / 2.0;
 
+    // Calculate top bezier
     Point c1Rotated = bezier[1];
     Point c2Rotated = bezier[2];
     c1Rotated.y += thickness * 0.5;
     c2Rotated.y += thickness * 0.5;
-    if (angle != 0.0) {
-        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[1]);
-        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[2]);
-    }
+    c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle1, bezier[1]);
+    c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle2, bezier[2]);
 
     topBezier[0] = bezier[0];
-    bottomBezier[0] = topBezier[0];
-
-    // Points for first bez, they go from xy to x1y1
     topBezier[1] = c1Rotated;
     topBezier[2] = c2Rotated;
     topBezier[3] = bezier[3];
 
+    // Calculate bottom bezier
     c1Rotated = bezier[1];
     c2Rotated = bezier[2];
     c1Rotated.y -= thickness * 0.5;
     c2Rotated.y -= thickness * 0.5;
-    if (angle != 0.0) {
-        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[1]);
-        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[2]);
-    }
+    c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle1, bezier[1]);
+    c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle2, bezier[2]);
 
-    // second bez. goes back
+    bottomBezier[0] = bezier[0];
     bottomBezier[1] = c1Rotated;
     bottomBezier[2] = c2Rotated;
     bottomBezier[3] = bezier[3];
@@ -1075,13 +1083,12 @@ SegmentedLine::SegmentedLine(int start, int end)
     m_segments.push_back({ start, end });
 }
 
-void SegmentedLine::GetStartEnd(int &start, int &end, int idx)
+std::pair<int, int> SegmentedLine::GetStartEnd(int idx) const
 {
     assert(idx >= 0);
     assert(idx < this->GetSegmentCount());
 
-    start = m_segments.at(idx).first;
-    end = m_segments.at(idx).second;
+    return { m_segments.at(idx).first, m_segments.at(idx).second };
 }
 
 void SegmentedLine::AddGap(int start, int end)

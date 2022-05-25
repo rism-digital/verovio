@@ -41,7 +41,7 @@ public:
      * Interface comparison operator.
      * Checks if the LayerElement has a PitchInterface and compares attributes
      */
-    bool HasIdenticalPitchInterface(PitchInterface *otherPitchInterface);
+    bool HasIdenticalPitchInterface(const PitchInterface *otherPitchInterface) const;
 
     /**
      * Shift pname and octave by a certain number of steps.
@@ -52,13 +52,13 @@ public:
      * Get steps between calling object and parameter.
      * Returns calling pitch minus parameter pitch.
      */
-    int PitchDifferenceTo(PitchInterface *pi);
+    int PitchDifferenceTo(const PitchInterface *pi) const;
 
     /**
      * adjust the pitch value so that it stays in the same x,y position
      * given it's new and old clefs
      */
-    void AdjustPitchForNewClef(Clef *oldClef, Clef *newClef);
+    void AdjustPitchForNewClef(const Clef *oldClef, const Clef *newClef);
 
     //----------------//
     // Static methods //
@@ -75,7 +75,8 @@ public:
      * By default for chord takes the top note, but the bottom note otherwise.
      * E.g., return 0 for and C4 with clef C1, -2 with clef G2.
      */
-    static int CalcLoc(LayerElement *element, Layer *layer, LayerElement *crossStaffElement, bool topChordNote = true);
+    static int CalcLoc(const LayerElement *element, const Layer *layer, const LayerElement *crossStaffElement,
+        bool topChordNote = true);
 
     /**
      * Calculate the loc for a pitch and octave and considerting the clef loc offset.

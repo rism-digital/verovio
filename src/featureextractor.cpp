@@ -44,7 +44,7 @@ FeatureExtractor::~FeatureExtractor() {}
 
 void FeatureExtractor::Reset()
 {
-    m_previousNote = NULL;
+    m_previousNotes.clear();
 }
 
 void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
@@ -58,7 +58,16 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         if (chord && note != chord->GetTopNote()) return;
 
         // Check if the note is tied to a previous one and skip it if yes
-        if (note->GetScoreTimeTiedDuration() == -1.0) return;
+        if (note->GetScoreTimeTiedDuration() == -1.0) {
+            // Check if we need to add it to the previous interval ids
+            const int intervalsIdsSize = (int)m_intervalsIds.size();
+            if (intervalsIdsSize > 0) m_intervalsIds.get<jsonxx::Array>(intervalsIdsSize - 1) << note->GetUuid();
+            // Same for pitch ids
+            const int pitchesIdsSize = (int)m_pitchesIds.size();
+            if (pitchesIdsSize > 0) m_pitchesIds.get<jsonxx::Array>(pitchesIdsSize - 1) << note->GetUuid();
+            m_previousNotes.push_back(note);
+            return;
+        }
 
         std::stringstream pitch;
         data_OCTAVE oct = note->GetOct();
@@ -95,31 +104,42 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         std::transform(pname.begin(), pname.end(), pname.begin(), ::toupper);
         pitch << pname;
 
-        m_pitches << pitch.str();
+        m_pitchesChromatic << pitch.str();
+        m_pitchesDiatonic << pname;
         jsonxx::Array pitchesIds;
         pitchesIds << note->GetUuid();
         m_pitchesIds << jsonxx::Value(pitchesIds);
 
-        // We have a previous note, so we can calculate an interval
-        if (m_previousNote) {
-            std::string interval = StringFormat("%d", note->GetMIDIPitch() - m_previousNote->GetMIDIPitch());
-            m_intervals << interval;
+        // We have a previous note (or more with tied notes), so we can calculate an interval
+        if (!m_previousNotes.empty()) {
+            std::string intervalChromatic
+                = StringFormat("%d", note->GetMIDIPitch() - m_previousNotes.front()->GetMIDIPitch());
+            m_intervalsChromatic << intervalChromatic;
+            std::string intervalDiatonic
+                = StringFormat("%d", note->GetDiatonicPitch() - m_previousNotes.front()->GetDiatonicPitch());
+            m_intervalsDiatonic << intervalDiatonic;
             jsonxx::Array intervalsIds;
-            intervalsIds << m_previousNote->GetUuid();
+            for (auto previousNote : m_previousNotes) intervalsIds << previousNote->GetUuid();
             intervalsIds << note->GetUuid();
             m_intervalsIds << jsonxx::Value(intervalsIds);
         }
-        m_previousNote = note;
+        m_previousNotes.clear();
+        m_previousNotes.push_back(note);
     }
 }
 
 void FeatureExtractor::ToJson(std::string &output)
 {
     jsonxx::Object o;
-    o << "pitches" << m_pitches;
+
+    o << "pitchesChromatic" << m_pitchesChromatic;
+    o << "pitchesDiatonic" << m_pitchesDiatonic;
     o << "pitchesIds" << m_pitchesIds;
-    o << "intervals" << m_intervals;
+
+    o << "intervalsChromatic" << m_intervalsChromatic;
+    o << "intervalsDiatonic" << m_intervalsDiatonic;
     o << "intervalsIds" << m_intervalsIds;
+
     output = o.json();
     LogDebug("%s", output.c_str());
 }

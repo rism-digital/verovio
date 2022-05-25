@@ -38,9 +38,10 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    StemmedDrawingInterface *GetStemmedDrawingInterface() override
+    StemmedDrawingInterface *GetStemmedDrawingInterface() override { return vrv_cast<StemmedDrawingInterface *>(this); }
+    const StemmedDrawingInterface *GetStemmedDrawingInterface() const override
     {
-        return dynamic_cast<StemmedDrawingInterface *>(this);
+        return vrv_cast<const StemmedDrawingInterface *>(this);
     }
     ///@}
 
@@ -62,9 +63,9 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize) override;
-    Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize) override;
-    int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) override;
+    Point GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const override;
+    Point GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const override;
+    int CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const override;
     ///@}
 
     /**

@@ -43,7 +43,7 @@ public:
      * @name Get the corresponding milestone start
      */
     ///@{
-    Object *GetStart() { return m_start; }
+    Object *GetStart() const { return m_start; }
     std::string GetStartClassName() const { return m_startClassName; }
     ///@}
 
@@ -67,9 +67,19 @@ public:
     int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
+     * See Object::CastOffToSelection
+     */
+    int CastOffToSelection(FunctorParams *) override;
+
+    /**
      * See Object::UnCastOff
      */
     int UnCastOff(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::Transpose
+     */
+    int Transpose(FunctorParams *functorParams) override;
 
 protected:
     //

@@ -236,8 +236,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
-    // throughout the system
-    else {
+    // throughout the system => recheck that the systems are in correct order
+    else if (Object::IsPreOrdered(parentSystem1, system) && Object::IsPreOrdered(system, parentSystem2)) {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
         measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
@@ -249,6 +249,10 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         if (!Check(last)) return;
         x2 = last->GetDrawingX() + last->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
+    }
+    // Return otherwise: this should only happen if the time spanning element is encoded in the wrong measure
+    else {
+        return;
     }
 
     // Overwrite the spanningType for open ended control events
@@ -293,7 +297,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
                 if (this->GetSlurHandling() == SlurHandling::Ignore) break;
                 Slur *slur = vrv_cast<Slur *>(element);
                 assert(slur);
-                staff = slur->CalculateExtremalStaff(staff, x1, x2, spanningType);
+                staff = slur->CalculateExtremalStaff(staff, x1, x2);
             }
 
             // Create the floating positioner
@@ -402,7 +406,7 @@ bool View::HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerEl
                 }
             }
         }
-        else if (element->Is(SYL)) {
+        else if (element->Is({ OCTAVE, SYL })) {
             return true;
         }
         // To avoid showing the same warning multiple times, display a warning only during actual drawing
@@ -956,11 +960,9 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_tieMidpointThickness.GetValue();
     const int penWidth
         = m_doc->GetOptions()->m_tieEndpointThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (m_tieThicknessCoefficient <= 0) {
-        m_tieThicknessCoefficient = BoundingBox::GetBezierThicknessCoefficient(bezier, thickness, 0, penWidth);
-    }
+    const double thicknessCoefficient = BoundingBox::GetBezierThicknessCoefficient(bezier, thickness, penWidth);
     this->DrawThickBezierCurve(
-        dc, bezier, m_tieThicknessCoefficient * thickness, staff->m_drawingStaffSize, penWidth, 0, penStyle);
+        dc, bezier, thicknessCoefficient * thickness, staff->m_drawingStaffSize, penWidth, penStyle);
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
@@ -1380,36 +1382,48 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
 
     int length = top - bottom;
     // We add - substract a unit in order to have the line going to the edge
-    length += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int x = arpeg->GetDrawingX();
-    const int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int angle = -90;
+    const int y = bottom - unit;
 
-    wchar_t startGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
-    wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
-    wchar_t endGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
-
-    if (arpeg->GetOrder() == arpegLog_ORDER_down) {
-        startGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
-        fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
-        endGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+    const arpegLog_ORDER order = arpeg->GetOrder();
+    if (order == arpegLog_ORDER_nonarp) {
+        dc->StartGraphic(arpeg, "", arpeg->GetUuid());
+        const int offset = unit / 2;
+        const int thickness = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        this->DrawSquareBracket(dc, true, x - unit, bottom - offset, length + 2 * offset, unit, thickness, thickness);
+        dc->EndGraphic(arpeg, this);
     }
+    else {
+        length += 2 * unit;
+        wchar_t startGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+        wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+        wchar_t endGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
 
-    if (arpeg->GetArrowShape() == LINESTARTENDSYMBOL_none) endGlyph = 0;
+        if (order == arpegLog_ORDER_down) {
+            startGlyph = (arpeg->GetArrow() == BOOLEAN_true) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
+            fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+            endGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+        }
 
-    Point orig(x, y);
+        if (arpeg->GetArrowShape() == LINESTARTENDSYMBOL_none) endGlyph = 0;
 
-    dc->StartGraphic(arpeg, "", arpeg->GetUuid());
+        Point orig(x, y);
 
-    // Smufl glyphs are horizontal - Rotate them counter clockwise
-    dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
+        dc->StartGraphic(arpeg, "", arpeg->GetUuid());
 
-    this->DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, startGlyph, endGlyph);
+        // Smufl glyphs are horizontal - Rotate them counter clockwise
+        const int angle = -90;
+        dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
 
-    dc->EndGraphic(arpeg, this);
+        this->DrawSmuflLine(
+            dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, startGlyph, endGlyph);
 
-    // Possibly draw enclosing brackets
-    this->DrawArpegEnclosing(dc, arpeg, staff, startGlyph, fillGlyph, endGlyph, x, y, length, drawingCueSize);
+        dc->EndGraphic(arpeg, this);
+
+        // Possibly draw enclosing brackets
+        this->DrawArpegEnclosing(dc, arpeg, staff, startGlyph, fillGlyph, endGlyph, x, y, length, drawingCueSize);
+    }
 }
 
 void View::DrawArpegEnclosing(DeviceContext *dc, Arpeg *arpeg, Staff *staff, wchar_t startGlyph, wchar_t fillGlyph,
@@ -1621,6 +1635,9 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         params.m_enclosedRend.clear();
         params.m_y = dynam->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+        if (dynam->HasEnclose()) {
+            params.m_textEnclose = dynam->GetEnclose();
+        }
 
         dynamTxt.SetPointSize(params.m_pointSize);
 
@@ -1634,9 +1651,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         // If the dynamic is a symbol (pp, mf, etc.) draw it as one SMuFL string. This will not take into account
         // editorial element within the dynam as it would with text. Also, it is center only if it is a symbol.
         if (isSymbolOnly) {
-            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            this->DrawSmuflString(dc, params.m_x, params.m_y, dynamSymbol, alignment, (*staffIter)->m_drawingStaffSize);
-            dc->ResetFont();
+            this->DrawDynamSymbolOnly(dc, *staffIter, dynam, dynamSymbol, alignment, params);
         }
         else {
             dc->SetBrush(m_currentColour, AxSOLID);
@@ -1655,6 +1670,56 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     dc->EndGraphic(dynam, this);
 }
 
+void View::DrawDynamSymbolOnly(DeviceContext *dc, Staff *staff, Dynam *dynam, const std::wstring &dynamSymbol,
+    data_HORIZONTALALIGNMENT alignment, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(staff);
+    assert(dynam);
+
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+
+    wchar_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = dynam->GetEnclosingGlyphs();
+
+    // calculate width of the symbol-only dynamic; generally it consists of only one symbol, but in case when it's
+    // combination of different dynamics glyphs we need to get total width of all elements
+    const int left = m_doc->GetGlyphLeft(dynamSymbol.at(0), staff->m_drawingStaffSize, false);
+    int width = 0;
+    for (int i = 0; i < (int)dynamSymbol.size(); ++i) {
+        if (i == (int)dynamSymbol.size() - 1) {
+            width += m_doc->GetGlyphRight(dynamSymbol.at(i), staff->m_drawingStaffSize, false);
+        }
+        else {
+            width += m_doc->GetGlyphAdvX(dynamSymbol.at(i), staff->m_drawingStaffSize, false);
+        }
+    }
+
+    // draw opening symbol
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if (enclosingFront) {
+        std::wstring open;
+        open.push_back(enclosingFront);
+
+        this->DrawSmuflString(dc, params.m_x, params.m_y + unit, open, alignment, staff->m_drawingStaffSize);
+        params.m_x += m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, false) - left + unit / 6;
+    }
+
+    // draw dynamics itself
+    this->DrawSmuflString(dc, params.m_x, params.m_y, dynamSymbol, alignment, staff->m_drawingStaffSize);
+
+    // draw closing symbol
+    if (enclosingBack) {
+        std::wstring close;
+        close.push_back(enclosingBack);
+
+        params.m_x += width + unit / 6;
+        this->DrawSmuflString(dc, params.m_x, params.m_y + unit, close, alignment, staff->m_drawingStaffSize);
+    }
+
+    dc->ResetFont();
+}
+
 void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &params)
 {
     assert(dc);
@@ -1671,7 +1736,7 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(fontDim);
 
-    for (auto current : *fb->GetChildren()) {
+    for (auto current : fb->GetChildren()) {
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
         if (current->Is(FIGURE)) {
             // dynamic_cast assert in DrawF

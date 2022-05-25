@@ -34,7 +34,6 @@ env:
     # Will be programmatically set to 'false' for rism-digital repo.
 
   # build artifacts
-  CLI_BUILD: cli-build
   DOC_BUILD: doc-build
   TOOLKIT_BUILD: toolkit-build
 
@@ -84,6 +83,10 @@ jobs:
             version: "10"
 
           - os: ubuntu-20.04
+            compiler: g++
+            version: "11"
+
+          - os: ubuntu-20.04
             compiler: clang
             version: "6.0"
 
@@ -93,7 +96,7 @@ jobs:
 
           - os: ubuntu-20.04
             compiler: clang
-            version: "10"
+            version: "12"
 
           - os: macos-10.15
             compiler: xcode
@@ -174,40 +177,6 @@ jobs:
         run: |
           cmake ../cmake
           make -j8
-
-  ###########################
-  # Build the CLI artifacts #
-  ###########################
-  build_cli:
-    # skip job if commit message contains "[skip-ci]"
-    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
-
-    name: Build cli
-    runs-on: ubuntu-20.04
-
-    steps:
-      - name: Checkout main repo
-        uses: actions/checkout@v2
-
-      - name: Create temp dir
-        working-directory: ${{ github.workspace }}
-        run: mkdir -p $TEMP_DIR/
-
-      - name: Run make
-        working-directory: ${{ github.workspace }}/tools
-        run: |
-          cmake ../cmake
-          make -j8
-
-      - name: Update cli.txt
-        working-directory: ${{ github.workspace }}/tools
-        run: ./verovio -h > $GITHUB_WORKSPACE/$TEMP_DIR/cli.txt
-
-      - name: Upload cli artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.CLI_BUILD }}
-          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/cli.txt
 
   #####################################
   # Set up and cache emscripten build #
@@ -316,7 +285,7 @@ jobs:
     name: Check settings for deployment
     runs-on: ubuntu-20.04
     # run deployment only after finishing the build jobs
-    needs: [build_cpp, build_cli, build_js]
+    needs: [build_cpp, build_js]
 
     # Github Environment Variables persist only on job level.
     # To transfer values to later jobs, outputs mechanism has to be used.
@@ -352,7 +321,7 @@ jobs:
     runs-on: ubuntu-20.04
     if: ${{ needs.check_deploy_settings.outputs._DISABLE_DEPLOY_STEPS == 'false' }}
     # run deployment only after finishing the build jobs
-    needs: [build_cpp, build_cli, build_js, check_deploy_settings]
+    needs: [build_cpp, build_js, check_deploy_settings]
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
@@ -368,12 +337,6 @@ jobs:
           # relative path under $GITHUB_WORKSPACE to place the repository
           path: ${{ env.GH_PAGES_DIR }}
 
-      - name: Download CLI_BUILD artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: ${{ env.CLI_BUILD }}
-          path: artifacts/${{ env.CLI_BUILD }}
-
       - name: Download TOOLKIT_BUILD artifacts
         uses: actions/download-artifact@v2
         with:
@@ -382,7 +345,6 @@ jobs:
 
       - name: Copy artifacts to gh-pages
         run: |
-          cp artifacts/$CLI_BUILD/cli.txt $GH_PAGES_DIR/_includes/
           cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Check git status before commit
@@ -441,7 +403,7 @@ jobs:
     name: Build documentation
     runs-on: ubuntu-20.04
     # run only after finishing other build jobs
-    needs: [build_cpp, build_cli, build_js]
+    needs: [build_cpp, build_js]
 
     steps:
       - name: Checkout main repo

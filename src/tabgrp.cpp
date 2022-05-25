@@ -58,53 +58,56 @@ bool TabGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-void TabGrp::FilterList(ArrayOfObjects *childList)
+void TabGrp::FilterList(ListOfConstObjects &childList) const
 {
     // Retain only note children of chords
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
-        iter = ((*iter)->Is(NOTE)) ? iter + 1 : childList->erase(iter);
+    while (iter != childList.end()) {
+        if ((*iter)->Is(NOTE)) {
+            ++iter;
+        }
+        else {
+            iter = childList.erase(iter);
+        }
     }
 
-    std::sort(childList->begin(), childList->end(), TabCourseSort());
+    childList.sort(TabCourseSort());
 }
 
-int TabGrp::GetYTop()
+int TabGrp::GetYTop() const
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
-
     // The last note is the top
-    return childList->back()->GetDrawingY();
+    return this->GetListBack(this)->GetDrawingY();
 }
 
-int TabGrp::GetYBottom()
+int TabGrp::GetYBottom() const
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
-
     // The first note is the bottom
-    return childList->front()->GetDrawingY();
+    return this->GetListFront(this)->GetDrawingY();
 }
 
 Note *TabGrp::GetTopNote()
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
+    return const_cast<Note *>(std::as_const(*this).GetTopNote());
+}
 
-    Note *topNote = vrv_cast<Note *>(childList->back());
+const Note *TabGrp::GetTopNote() const
+{
+    const Note *topNote = vrv_cast<const Note *>(this->GetListBack(this));
     assert(topNote);
     return topNote;
 }
 
 Note *TabGrp::GetBottomNote()
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
+    return const_cast<Note *>(std::as_const(*this).GetBottomNote());
+}
 
+const Note *TabGrp::GetBottomNote() const
+{
     // The first note is the bottom
-    Note *bottomNote = vrv_cast<Note *>(childList->front());
+    const Note *bottomNote = vrv_cast<const Note *>(this->GetListFront(this));
     assert(bottomNote);
     return bottomNote;
 }
@@ -113,9 +116,9 @@ Note *TabGrp::GetBottomNote()
 // Functor methods
 //----------------------------------------------------------------------------
 
-int TabGrp::CalcOnsetOffsetEnd(FunctorParams *functorParams)
+int TabGrp::InitOnsetOffsetEnd(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     LayerElement *element = this->ThisOrSameasAsLink();

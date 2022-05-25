@@ -58,10 +58,12 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    DurationInterface *GetDurationInterface() override { return dynamic_cast<DurationInterface *>(this); }
-    StemmedDrawingInterface *GetStemmedDrawingInterface() override
+    DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
+    const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
+    StemmedDrawingInterface *GetStemmedDrawingInterface() override { return vrv_cast<StemmedDrawingInterface *>(this); }
+    const StemmedDrawingInterface *GetStemmedDrawingInterface() const override
     {
-        return dynamic_cast<StemmedDrawingInterface *>(this);
+        return vrv_cast<const StemmedDrawingInterface *>(this);
     }
     ///@}
 
@@ -81,24 +83,26 @@ public:
     /**
      * Return the maximum and minimum Y positions of the notes in the chord
      */
-    void GetYExtremes(int &yMax, int &yMin);
+    void GetYExtremes(int &yMax, int &yMin) const;
 
     /**
      * Return the top or bottom note or their Y position
      */
     ///@{
     Note *GetTopNote();
+    const Note *GetTopNote() const;
     Note *GetBottomNote();
-    int GetYTop();
-    int GetYBottom();
+    const Note *GetBottomNote() const;
+    int GetYTop() const;
+    int GetYBottom() const;
     ///@}
 
     /**
      * Return min or max note X position
      */
     ///@{
-    int GetXMin();
-    int GetXMax();
+    int GetXMin() const;
+    int GetXMax() const;
     ///@}
 
     /**
@@ -110,7 +114,7 @@ public:
     /**
      * Return true if the chord has some cross staff notes.
      */
-    bool HasCrossStaff();
+    bool HasCrossStaff() override;
 
     /**
      * Returns list of notes that have accidentals
@@ -122,7 +126,7 @@ public:
      */
     ///@{
     /** Return 0 if the note is the middle note, -1 if below it and 1 if above */
-    int PositionInChord(Note *note);
+    int PositionInChord(const Note *note) const;
     ///@}
 
     /**
@@ -130,15 +134,15 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize) override;
-    Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize) override;
-    int CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir) override;
+    Point GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const override;
+    Point GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const override;
+    int CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const override;
     ///@}
 
     /**
      * Check if the chord or one of its children is visible
      */
-    bool IsVisible();
+    bool IsVisible() const;
 
     /**
      * Return true if the chord has two notes with 1 diatonic step difference in the specific staff
@@ -148,7 +152,7 @@ public:
     /**
      * Return true if the chord has at least one note with a @dots > 0
      */
-    bool HasNoteWithDots();
+    bool HasNoteWithDots() const;
 
     /**
      * Helper to adjust overlapping layers for chords
@@ -212,19 +216,24 @@ public:
     int PrepareLyrics(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcOnsetOffsetEnd
+     * See Object::InitOnsetOffsetEnd
      */
-    int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
+    int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustCrossStaffContent
+     * See Object::PrepareDataInitialization
      */
-    int AdjustCrossStaffContent(FunctorParams *functorParams) override;
+    int PrepareDataInitialization(FunctorParams *) override;
+
+    /**
+     * See Object::JustifyYAdjustCrossStaff
+     */
+    int JustifyYAdjustCrossStaff(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI
@@ -248,7 +257,7 @@ protected:
      * Calculate stem direction based on the position of the notes in chord. Notes are compared in pairs starting from
      * the top-/bottommost and moving inward towards the center of the chord
      */
-    data_STEMDIRECTION CalcStemDirection(int verticalCenter);
+    data_STEMDIRECTION CalcStemDirection(int verticalCenter) const;
 
     /**
      * Clear the m_clusters vector and delete all the objects.
@@ -256,9 +265,14 @@ protected:
     void ClearClusters() const;
 
     /**
+     * Recalculate the m_clusters vector
+     */
+    void CalculateClusters();
+
+    /**
      * Filter the flat list and keep only Note elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 public:
     mutable std::list<ChordCluster *> m_clusters;

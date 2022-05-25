@@ -14,7 +14,7 @@
 namespace vrv {
 
 class DeviceContext;
-class PrepareProcessingListsParams;
+class InitProcessingListsParams;
 class RunningElement;
 class Score;
 class Staff;
@@ -52,7 +52,7 @@ public:
     /**
      * Return the number of system (children are System object only)
      */
-    int GetSystemCount() const { return (int)GetChildren()->size(); }
+    int GetSystemCount() const { return (int)GetChildren().size(); }
 
     /**
      * @name Get and set the pixel per unit factor.
@@ -63,12 +63,22 @@ public:
     ///@}
 
     /**
+     * @name Check if the page is the first or last page of a selection
+     */
+    ///@{
+    bool IsFirstOfSelection() const;
+    bool IsLastOfSelection() const;
+    ///@}
+
+    /**
      * @name Getter header and footer.
      * Looks if the page is the first one or not
      */
     ///@{
-    RunningElement *GetHeader() const;
-    RunningElement *GetFooter() const;
+    RunningElement *GetHeader();
+    const RunningElement *GetHeader() const;
+    RunningElement *GetFooter();
+    const RunningElement *GetFooter() const;
     ///@}
 
     /**
@@ -104,7 +114,7 @@ public:
      * This should be done in preparation of cast-off which is based on measure positioning.
      * The content of the measures is not laid out and keeps previously cached positioning.
      */
-    void HorizontalLayoutCachePage(bool restore = false);
+    void LayOutHorizontallyWithCache(bool restore = false);
 
     /**
      * Justifiy the content of the page (measures and their content) horizontally
@@ -120,6 +130,11 @@ public:
      * Justifiy the content of the page (system/staves) vertically
      */
     void JustifyVertically();
+
+    /**
+     * Reset and set the horizontal and vertical alignment
+     */
+    void ResetAligners();
 
     /**
      * Lay out the pitch positions and stems (without redoing the entire layout)
@@ -189,7 +204,12 @@ private:
     /**
      * Adjust the horizontal postition of the syl processing verse by verse
      */
-    void AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc);
+    void AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc);
+
+    /**
+     * Check whether vertical justification is required for the current page
+     */
+    bool IsJustificationRequired(Doc *doc);
 
     //
 public:

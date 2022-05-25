@@ -55,7 +55,7 @@ bool Tuning::IsSupportedChild(Object *child)
     return true;
 }
 
-int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines)
+int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines) const
 {
     switch (notationType) {
         case NOTATIONTYPE_tab_lute_french:
@@ -67,7 +67,7 @@ int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines)
     }
 }
 
-int Tuning::CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType)
+int Tuning::CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType) const
 {
     // Use <tuning><course>s, if available
     // else use @tuning.standard, if available
@@ -75,7 +75,7 @@ int Tuning::CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType
 
     // Do we have the tuning for this course?
     AttNNumberLikeComparison cnc(COURSE, std::to_string(course));
-    Course *courseTuning = vrv_cast<Course *>(this->FindDescendantByComparison(&cnc));
+    const Course *courseTuning = vrv_cast<const Course *>(this->FindDescendantByComparison(&cnc));
 
     if (courseTuning && courseTuning->HasPname() && courseTuning->HasOct()) {
 
