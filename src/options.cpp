@@ -1485,6 +1485,11 @@ Options::Options()
     m_transposeSelectedOnly.Init(false);
     this->Register(&m_transposeSelectedOnly, "transposeSelectedOnly", &m_selectors);
 
+    m_transposeToSoundingPitch.SetInfo(
+        "Transpose to sounding pitch", "Transpose to sounding pitch by evaluating @trans.semi");
+    m_transposeToSoundingPitch.Init(false);
+    this->Register(&m_transposeToSoundingPitch, "transposeToSoundingPitch", &m_selectors);
+
     /********* The layout margins by element *********/
 
     m_elementMargins.SetLabel("Element margins", "4-elementMargins");

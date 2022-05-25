@@ -84,6 +84,11 @@ public:
      */
     int PrepareDuration(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::Transpose
+     */
+    int Transpose(FunctorParams *functorParams) override;
+
 private:
     //
 public:

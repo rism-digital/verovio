@@ -727,6 +727,7 @@ public:
     OptionString m_transpose;
     OptionJson m_transposeMdiv;
     OptionBool m_transposeSelectedOnly;
+    OptionBool m_transposeToSoundingPitch;
 
     /**
      * Element margins

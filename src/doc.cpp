@@ -1361,7 +1361,8 @@ void Doc::TransposeDoc()
     transposer.SetBase600(); // Set extended chromatic alteration mode (allowing more than double sharps/flats)
 
     Functor transpose(&Object::Transpose);
-    TransposeParams transposeParams(this, &transpose, &transposer);
+    Functor transposeEnd(&Object::TransposeEnd);
+    TransposeParams transposeParams(this, &transpose, &transposeEnd, &transposer);
 
     if (m_options->m_transposeSelectedOnly.GetValue() == false) {
         transpose.m_visibleOnly = false;
@@ -1374,7 +1375,7 @@ void Doc::TransposeDoc()
                 m_options->m_transposeMdiv.GetKey().c_str(), m_options->m_transpose.GetKey().c_str());
         }
         transposeParams.m_transposition = m_options->m_transpose.GetValue();
-        this->Process(&transpose, &transposeParams);
+        this->Process(&transpose, &transposeParams, &transposeEnd);
     }
     else if (m_options->m_transposeMdiv.IsSet()) {
         // Transpose mdivs individually
@@ -1382,8 +1383,17 @@ void Doc::TransposeDoc()
         for (const std::string &uuid : uuids) {
             transposeParams.m_selectedMdivUuid = uuid;
             transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ uuid });
-            this->Process(&transpose, &transposeParams);
+            this->Process(&transpose, &transposeParams, &transposeEnd);
         }
+    }
+
+    if (m_options->m_transposeToSoundingPitch.GetValue()) {
+        // Transpose to sounding pitch
+        transposeParams.m_selectedMdivUuid = "";
+        transposeParams.m_transposition = "";
+        transposeParams.m_transposer->SetTransposition(0);
+        transposeParams.m_transposeToSoundingPitch = true;
+        this->Process(&transpose, &transposeParams, &transposeEnd);
     }
 }
 

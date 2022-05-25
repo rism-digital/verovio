@@ -1501,6 +1501,11 @@ public:
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
+    /**
+     * End functor for Object::Transpose
+     */
+    virtual int TransposeEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
 private:
     /**
      * Method for generating the uuid.

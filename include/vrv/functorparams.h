@@ -2602,26 +2602,37 @@ public:
 /**
  * member 0: a pointer to the document
  * member 1: the functor for redirection
- * member 2: a pointer to the transposer
- * member 3: the transposition to be applied
- * member 4: the mdiv selected for transposition
- * member 5: the list of current (nested) mdivs
+ * member 2: the end functor for redirection
+ * member 3: a pointer to the transposer
+ * member 4: the transposition to be applied
+ * member 5: the mdiv selected for transposition
+ * member 6: the list of current (nested) mdivs
+ * member 7: transpose to sounding pitch by evaluating @trans.semi
+ * member 8: true if the current scoreDef contains a KeySig (direct child or attribute)
+ * member 9: transposition interval for staff
  **/
 
 class TransposeParams : public FunctorParams {
 public:
-    TransposeParams(Doc *doc, Functor *functor, Transposer *transposer)
+    TransposeParams(Doc *doc, Functor *functor, Functor *functorEnd, Transposer *transposer)
     {
         m_doc = doc;
         m_functor = functor;
+        m_functorEnd = functorEnd;
         m_transposer = transposer;
+        m_transposeToSoundingPitch = false;
+        m_hasScoreDefKeySig = false;
     }
     Doc *m_doc;
     Functor *m_functor;
+    Functor *m_functorEnd;
     Transposer *m_transposer;
     std::string m_transposition;
     std::string m_selectedMdivUuid;
     std::list<std::string> m_currentMdivUuids;
+    bool m_transposeToSoundingPitch;
+    bool m_hasScoreDefKeySig;
+    std::map<int, int> m_transposeIntervalForStaffN;
 };
 
 //----------------------------------------------------------------------------
