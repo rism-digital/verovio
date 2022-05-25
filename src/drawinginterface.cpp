@@ -695,7 +695,7 @@ int StemmedDrawingInterface::GetDrawingStemModRelY() const
     return 0;
 }
 
-Point StemmedDrawingInterface::GetDrawingStemStart(const Object *object)
+Point StemmedDrawingInterface::GetDrawingStemStart(const Object *object) const
 {
     assert(m_drawingStem || object);
     if (object && !m_drawingStem) {
