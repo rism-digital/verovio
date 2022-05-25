@@ -125,6 +125,28 @@ curvature_CURVEDIR Slur::CalcDrawingCurveDir(char spanningType) const
     }
 }
 
+bool Slur::IsInnerSlur(const Slur *innerSlur) const
+{
+    // Check drawing curve direction
+    if (this->GetDrawingCurveDir() != innerSlur->GetDrawingCurveDir()) return false;
+    if (this->HasMixedCurveDir()) return false;
+
+    // Check the layer
+    const LayerElement *start = this->GetStart();
+    const LayerElement *end = this->GetEnd();
+    if (!start || !end) return false;
+    const LayerElement *innerStart = innerSlur->GetStart();
+    const LayerElement *innerEnd = innerSlur->GetEnd();
+    if (!innerStart || !innerEnd) return false;
+
+    if (std::abs(start->GetAlignmentLayerN()) != std::abs(innerStart->GetAlignmentLayerN())) return false;
+    if (std::abs(end->GetAlignmentLayerN()) != std::abs(innerEnd->GetAlignmentLayerN())) return false;
+
+    // Check the alignment
+    if (this->IsOrdered(innerStart, start) || this->IsOrdered(end, innerEnd)) return false;
+    return ((this->IsOrdered(start, innerStart)) || (this->IsOrdered(innerEnd, end)));
+}
+
 std::pair<Layer *, LayerElement *> Slur::GetBoundaryLayer()
 {
     LayerElement *start = this->GetStart();

@@ -155,6 +155,13 @@ public:
     ///@}
 
     /**
+     * @name Detection and storage of inner slurs
+     */
+    ///@{
+    bool IsInnerSlur(const Slur *innerSlur) const;
+    ///@}
+
+    /**
      * Calculate the initial slur bezier curve and store it in the curve positioner
      */
     void CalcInitialCurve(Doc *doc, FloatingCurvePositioner *curve, NearEndCollision *nearEndCollision = NULL);
