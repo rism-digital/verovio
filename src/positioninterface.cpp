@@ -40,7 +40,7 @@ void PositionInterface::Reset()
     m_drawingLoc = 0;
 }
 
-bool PositionInterface::HasIdenticalPositionInterface(PositionInterface *otherPositionInterface)
+bool PositionInterface::HasIdenticalPositionInterface(const PositionInterface *otherPositionInterface) const
 {
     if (!otherPositionInterface) {
         return false;
@@ -57,7 +57,7 @@ bool PositionInterface::HasIdenticalPositionInterface(PositionInterface *otherPo
     return true;
 }
 
-int PositionInterface::CalcDrawingLoc(Layer *layer, LayerElement *element)
+int PositionInterface::CalcDrawingLoc(const Layer *layer, const LayerElement *element)
 {
     assert(layer);
 

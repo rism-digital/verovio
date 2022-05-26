@@ -203,6 +203,7 @@ $exports .= "'_vrvToolkit_renderToMIDI',";
 $exports .= "'_vrvToolkit_renderToPAE',";
 $exports .= "'_vrvToolkit_renderToSVG',";
 $exports .= "'_vrvToolkit_renderToTimemap',";
+$exports .= "'_vrvToolkit_resetOptions',";
 $exports .= "'_vrvToolkit_resetXmlIdSeed',";
 $exports .= "'_vrvToolkit_select',";
 $exports .= "'_vrvToolkit_setOptions',";

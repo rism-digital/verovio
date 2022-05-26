@@ -27,12 +27,14 @@ class Doc;
 class DurationInterface;
 class EditorialElement;
 class Output;
+class Filters;
 class Functor;
 class FunctorParams;
 class LinkingInterface;
 class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
+class Resources;
 class ScoreDefInterface;
 class StemmedDrawingInterface;
 class TextDirInterface;
@@ -149,6 +151,11 @@ public:
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return NULL; }
     virtual const TimeSpanningInterface *GetTimeSpanningInterface() const { return NULL; }
     ///@}
+
+    /**
+     * Resource access from the document
+     */
+    const Resources *GetDocResources() const;
 
     /**
      * Reset the object, that is 1) removing all childs and 2) resetting all attributes.
@@ -541,7 +548,7 @@ public:
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */
-    void FillFlatList(ArrayOfObjects *list);
+    void FillFlatList(ListOfConstObjects &list) const;
 
     /**
      * Check if the content was modified or not
@@ -551,7 +558,7 @@ public:
     /**
      * Mark the object and its parent (if any) as modified
      */
-    void Modify(bool modified = true);
+    void Modify(bool modified = true) const;
 
     /**
      * @name Setter and getter of the attribute flag
@@ -602,7 +609,7 @@ public:
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
-     * The ArrayOfComparisons filter parameter makes is possible to process only objects of a
+     * The Filters class parameter makes is possible to process only objects of a
      * type that matches the attribute value given in the Comparison object.
      * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
@@ -610,12 +617,10 @@ public:
      * skipFirst does not call the functor or endFunctor on the first (calling) level
      */
     ///@{
-    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
-        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
-        bool skipFirst = false);
-    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
-        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD,
-        bool skipFirst = false) const;
+    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false);
+    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false) const;
     ///@}
 
     //----------------//
@@ -640,7 +645,7 @@ public:
     /**
      * Add each LayerElements and its children to a flat list
      */
-    virtual int AddLayerElementToFlatList(FunctorParams *functorParams);
+    virtual int AddLayerElementToFlatList(FunctorParams *functorParams) const;
 
     /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
@@ -1192,6 +1197,11 @@ public:
     ///@{
 
     /**
+     * One time member initialization at the very begin
+     */
+    virtual int PrepareDataInitialization(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Set the drawing cue size of all LayerElement
      */
     virtual int PrepareCueSize(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1279,7 +1289,7 @@ public:
 
     /**
      * Set wordpos and connector ends
-     * The functor is processed by staff/layer/verse using an ArrayOfComparisons filter.
+     * The functor is processed by staff/layer/verse using an Filters class.
      * At the end, the functor is processed by doc at the end of a document of closing opened syl.
      */
     virtual int PrepareLyrics(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1297,7 +1307,7 @@ public:
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
-     * The functor is processed by staff/layer using an ArrayOfComparisons filter.
+     * The functor is processed by staff/layer using Filters class.
      */
     virtual int PrepareRpt(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
@@ -1307,11 +1317,6 @@ public:
      * Processed by staff/layer after that
      */
     virtual int PrepareDelayedTurns(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Functor for setting enlosure for the dynamics by adding corresponding text children to it
-     */
-    virtual int PrepareDynamEnclosure(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Functor for setting Measure of Ending
@@ -1496,6 +1501,11 @@ public:
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
+    /**
+     * End functor for Object::Transpose
+     */
+    virtual int TransposeEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
 private:
     /**
      * Method for generating the uuid.
@@ -1513,7 +1523,7 @@ private:
     ///@{
     void UpdateDocumentScore(bool direction);
     bool SkipChildren(Functor *functor) const;
-    bool FiltersApply(const ArrayOfComparisons *filters, Object *object) const;
+    bool FiltersApply(const Filters *filters, Object *object) const;
     ///@}
 
 public:
@@ -1635,23 +1645,33 @@ public:
     /**
      * Look for the Object in the list and return its position (-1 if not found)
      */
-    int GetListIndex(const Object *listElement);
+    int GetListIndex(const Object *listElement) const;
 
     /**
      * Gets the first item of type elementType starting at startFrom
      */
+    ///@{
+    const Object *GetListFirst(const Object *startFrom, const ClassId classId = UNSPECIFIED) const;
     Object *GetListFirst(const Object *startFrom, const ClassId classId = UNSPECIFIED);
-    Object *GetListFirstBackward(Object *startFrom, const ClassId classId = UNSPECIFIED);
+    const Object *GetListFirstBackward(const Object *startFrom, const ClassId classId = UNSPECIFIED) const;
+    Object *GetListFirstBackward(const Object *startFrom, const ClassId classId = UNSPECIFIED);
+    ///@}
 
     /**
      * Returns the previous object in the list (NULL if not found)
      */
-    Object *GetListPrevious(Object *listElement);
+    ///@{
+    const Object *GetListPrevious(const Object *listElement) const;
+    Object *GetListPrevious(const Object *listElement);
+    ///@}
 
     /**
      * Returns the next object in the list (NULL if not found)
      */
-    Object *GetListNext(Object *listElement);
+    ///@{
+    const Object *GetListNext(const Object *listElement) const;
+    Object *GetListNext(const Object *listElement);
+    ///@}
 
     /**
      * Return the list.
@@ -1659,25 +1679,40 @@ public:
      * If not, it updates the list and also calls FilterList.
      * Because this is an interface, we need to pass the object - not the best design.
      */
-    const ArrayOfObjects *GetList(Object *node);
+    ///@{
+    const ListOfConstObjects &GetList(const Object *node) const;
+    ListOfObjects GetList(const Object *node);
+    ///@}
+
+    /**
+     * Convenience functions that check if the list is up-to-date
+     * If not, the list is updated before returning the result
+     */
+    ///@{
+    bool HasEmptyList(const Object *node) const;
+    int GetListSize(const Object *node) const;
+    const Object *GetListFront(const Object *node) const;
+    Object *GetListFront(const Object *node);
+    const Object *GetListBack(const Object *node) const;
+    Object *GetListBack(const Object *node);
+    ///@}
 
 private:
-    mutable ArrayOfObjects m_list;
-    ArrayOfObjects::iterator m_iteratorCurrent;
+    mutable ListOfConstObjects m_list;
 
 protected:
     /**
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ArrayOfObjects *childList){};
+    virtual void FilterList(ListOfConstObjects &childList) const {};
 
 public:
     /**
      * Reset the list of children and call FilterList().
      * As for GetList, we need to pass the object.
      */
-    void ResetList(Object *node);
+    void ResetList(const Object *node) const;
 };
 
 //----------------------------------------------------------------------------
@@ -1699,19 +1734,19 @@ public:
     /**
      * Returns a contatenated version of all the text children
      */
-    std::wstring GetText(Object *node);
+    std::wstring GetText(const Object *node) const;
 
     /**
      * Fill an array of lines with concatenated content of each line
      */
-    void GetTextLines(Object *node, std::vector<std::wstring> &lines);
+    void GetTextLines(const Object *node, std::vector<std::wstring> &lines) const;
 
 protected:
     /**
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     //
@@ -1773,7 +1808,7 @@ class ObjectComparison {
 public:
     ObjectComparison(const ClassId classId) { m_classId = classId; }
 
-    bool operator()(Object *object)
+    bool operator()(const Object *object)
     {
         if (m_classId == UNSPECIFIED) {
             return true;

@@ -73,7 +73,7 @@ void DurationInterface::Reset()
     m_scoreTimeTiedDuration = 0.0;
 }
 
-double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase)
+double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) const
 {
     int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
     if (noteDur == DUR_NONE) noteDur = DUR_4;
@@ -91,7 +91,7 @@ double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase)
     return duration;
 }
 
-double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numBase, Mensur *currentMensur)
+double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const
 {
     int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
     if (noteDur == DUR_NONE) noteDur = DUR_4;
@@ -157,32 +157,22 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     return duration;
 }
 
-bool DurationInterface::IsFirstInBeam(LayerElement *noteOrRest)
+bool DurationInterface::IsFirstInBeam(const LayerElement *noteOrRest) const
 {
-    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
+    const Beam *beam = dynamic_cast<const Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
     if (!beam) {
         return false;
     }
-    const ArrayOfObjects *notesOrRests = beam->GetList(beam);
-    ArrayOfObjects::const_iterator iter = notesOrRests->begin();
-    if (*iter == noteOrRest) {
-        return true;
-    }
-    return false;
+    return (noteOrRest == beam->GetListFront(beam));
 }
 
-bool DurationInterface::IsLastInBeam(LayerElement *noteOrRest)
+bool DurationInterface::IsLastInBeam(const LayerElement *noteOrRest) const
 {
-    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
+    const Beam *beam = dynamic_cast<const Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
     if (!beam) {
         return false;
     }
-    const ArrayOfObjects *notesOrRests = beam->GetList(beam);
-    ArrayOfObjects::const_reverse_iterator iter = notesOrRests->rbegin();
-    if (*iter == noteOrRest) {
-        return true;
-    }
-    return false;
+    return (noteOrRest == beam->GetListBack(beam));
 }
 
 int DurationInterface::GetActualDur() const
@@ -205,15 +195,15 @@ int DurationInterface::CalcActualDur(data_DURATION dur) const
     return (dur & DUR_MENSURAL_MASK);
 }
 
-int DurationInterface::GetNoteOrChordDur(LayerElement *element)
+int DurationInterface::GetNoteOrChordDur(const LayerElement *element) const
 {
     if (element->Is(CHORD)) {
         return this->GetActualDur();
     }
     else if (element->Is(NOTE)) {
-        Note *note = vrv_cast<Note *>(element);
+        const Note *note = vrv_cast<const Note *>(element);
         assert(note);
-        Chord *chord = note->IsChordTone();
+        const Chord *chord = note->IsChordTone();
         if (chord && !this->HasDur())
             return chord->GetActualDur();
         else
@@ -229,7 +219,7 @@ bool DurationInterface::IsMensuralDur() const
     return (this->GetDur() > DUR_MENSURAL_MASK);
 }
 
-bool DurationInterface::HasIdenticalDurationInterface(DurationInterface *otherDurationInterface)
+bool DurationInterface::HasIdenticalDurationInterface(const DurationInterface *otherDurationInterface) const
 {
     // This should never happen because it is fully implemented
     LogError("DurationInterface::HasIdenticalDurationInterface missing");

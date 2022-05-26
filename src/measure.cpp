@@ -741,7 +741,7 @@ int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
     }
     params->m_targetSubSystem->AddChild(measure);
 
-    ArrayOfComparisons filters;
+    Filters filters;
     // Now we can process by layer and move their content to (measure) segments
     for (auto const &staves : params->m_layerTree->child) {
         for (auto const &layers : staves.second.child) {
@@ -942,16 +942,16 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
     if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
 
     std::vector<int>::iterator iter;
-    ArrayOfComparisons filters;
+    Filters filters;
     for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-        filters.clear();
+        filters.Clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(BARLINE_REFERENCES);
         ns.push_back(*iter);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.push_back(&matchStaff);
+        filters.Add(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
@@ -967,16 +967,16 @@ int Measure::AdjustDots(FunctorParams *functorParams)
     if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
 
     std::vector<int>::iterator iter;
-    ArrayOfComparisons filters;
+    Filters filters;
     for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-        filters.clear();
+        filters.Clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(BARLINE_REFERENCES);
         ns.push_back(*iter);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.push_back(&matchStaff);
+        filters.Add(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
@@ -1017,6 +1017,7 @@ int Measure::AdjustGraceXPos(FunctorParams *functorParams)
     params->m_rightDefaultAlignment = NULL;
 
     params->m_staffNs = staffNsReversed;
+    params->m_measureTieEndpoints = this->GetInternalTieEndpoints();
     m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
 
     // Put params back
@@ -1039,7 +1040,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 
     const bool hasSystemStartLine = this->IsFirstInSystem() && system->GetDrawingScoreDef()->HasSystemStartLine();
 
-    ArrayOfComparisons filters;
+    Filters filters;
     for (auto staffN : params->m_staffNs) {
         params->m_minPos = 0;
         params->m_upcomingMinPos = VRV_UNSET;
@@ -1056,14 +1057,15 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
             params->m_upcomingMinPos = params->m_doc->GetDrawingBarLineWidth(params->m_staffSize);
         }
 
-        filters.clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(staffN);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.push_back(&matchStaff);
+        CrossAlignmentReferenceComparison matchCrossStaff;
+        filters.SetType(Filters::Type::AnyOf);
+        filters = { &matchStaff, &matchCrossStaff };
 
         params->m_measureTieEndpoints = this->GetInternalTieEndpoints();
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
@@ -1089,15 +1091,23 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     // Adjust min width based on multirest attributes (@num and @width), but only if these values are larger than
     // current min width
     else if (this->FindDescendantByType(MULTIREST) != NULL) {
+        const int unit = params->m_doc->GetDrawingUnit(params->m_staffSize);
         MultiRest *multiRest = vrv_cast<MultiRest *>(this->FindDescendantByType(MULTIREST));
         const int num = multiRest->GetNum();
         if (multiRest->HasWidth()) {
-            const int fixedWidth
-                = multiRest->AttWidth::GetWidth() * (params->m_doc->GetDrawingUnit(params->m_staffSize) + 4);
+            const int fixedWidth = multiRest->AttWidth::GetWidth() * (unit + 4);
             if (minMeasureWidth < fixedWidth) minMeasureWidth = fixedWidth;
         }
         else if (num > 10) {
             minMeasureWidth *= log1p(num) / 2;
+        }
+        Object *layer = multiRest->GetFirstAncestor(LAYER);
+        if (layer->GetLast() != multiRest) {
+            Object *object = layer->GetNext(multiRest);
+            if (object && object->Is(CLEF)) {
+                const int clefWidth = object->GetContentRight() - object->GetContentLeft();
+                minMeasureWidth += clefWidth + unit;
+            }
         }
     }
 

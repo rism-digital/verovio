@@ -2273,7 +2273,7 @@ std::string AttConverter::MidinamesToStr(data_MIDINAMES data) const
         case MIDINAMES_Shamisen: value = "Shamisen"; break;
         case MIDINAMES_Koto: value = "Koto"; break;
         case MIDINAMES_Kalimba: value = "Kalimba"; break;
-        case MIDINAMES_Bagpipe: value = "Bagpipe"; break;
+        case MIDINAMES_Bag_pipe: value = "Bag_pipe"; break;
         case MIDINAMES_Fiddle: value = "Fiddle"; break;
         case MIDINAMES_Shanai: value = "Shanai"; break;
         case MIDINAMES_Tinkle_Bell: value = "Tinkle_Bell"; break;
@@ -2458,7 +2458,7 @@ data_MIDINAMES AttConverter::StrToMidinames(const std::string &value, bool logWa
     if (value == "Shamisen") return MIDINAMES_Shamisen;
     if (value == "Koto") return MIDINAMES_Koto;
     if (value == "Kalimba") return MIDINAMES_Kalimba;
-    if (value == "Bagpipe") return MIDINAMES_Bagpipe;
+    if (value == "Bag_pipe") return MIDINAMES_Bag_pipe;
     if (value == "Fiddle") return MIDINAMES_Fiddle;
     if (value == "Shanai") return MIDINAMES_Shanai;
     if (value == "Tinkle_Bell") return MIDINAMES_Tinkle_Bell;

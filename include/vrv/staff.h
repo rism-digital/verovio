@@ -110,14 +110,14 @@ public:
      * @name Get notation type
      */
     ///@{
-    bool IsMensural();
-    bool IsNeume();
-    bool IsTablature();
-    bool IsTabGuitar() { return m_drawingNotationType == NOTATIONTYPE_tab_guitar; }
-    bool IsTabLuteFrench() { return m_drawingNotationType == NOTATIONTYPE_tab_lute_french; }
-    bool IsTabLuteGerman() { return m_drawingNotationType == NOTATIONTYPE_tab_lute_german; }
-    bool IsTabLuteItalian() { return m_drawingNotationType == NOTATIONTYPE_tab_lute_italian; }
-    bool IsTabWithStemsOutside();
+    bool IsMensural() const;
+    bool IsNeume() const;
+    bool IsTablature() const;
+    bool IsTabGuitar() const { return m_drawingNotationType == NOTATIONTYPE_tab_guitar; }
+    bool IsTabLuteFrench() const { return m_drawingNotationType == NOTATIONTYPE_tab_lute_french; }
+    bool IsTabLuteGerman() const { return m_drawingNotationType == NOTATIONTYPE_tab_lute_german; }
+    bool IsTabLuteItalian() const { return m_drawingNotationType == NOTATIONTYPE_tab_lute_italian; }
+    bool IsTabWithStemsOutside() const;
     ///@}
 
     /**
@@ -263,6 +263,11 @@ public:
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::Transpose
+     */
+    int Transpose(FunctorParams *functorParams) override;
 
 private:
     /**

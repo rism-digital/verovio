@@ -67,7 +67,7 @@ void View::DrawVerticalSegmentedLine(DeviceContext *dc, int x1, SegmentedLine &l
 {
     int i, start, end;
     for (i = 0; i < line.GetSegmentCount(); i++) {
-        line.GetStartEnd(start, end, i);
+        std::tie(start, end) = line.GetStartEnd(i);
         this->DrawVerticalLine(dc, start, end, x1, width, dashLength);
     }
 }
@@ -76,7 +76,7 @@ void View::DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine 
 {
     int i, start, end;
     for (i = 0; i < line.GetSegmentCount(); i++) {
-        line.GetStartEnd(start, end, i);
+        std::tie(start, end) = line.GetStartEnd(i);
         this->DrawHorizontalLine(dc, start, end, y1, width, dashLength);
     }
 }
@@ -232,6 +232,26 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize, bool dimin)
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(y), r);
+
+    dc->ResetPen();
+    dc->ResetBrush();
+}
+
+void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int barlineWidth, int interval)
+{
+    if (line.GetSegmentCount() > 1) return;
+
+    const auto [start, end] = line.GetStartEnd(0);
+    const int radius = std::max(barlineWidth, 2);
+    int drawingPosition = start + interval / 2;
+
+    dc->SetPen(m_currentColour, 0, AxSOLID);
+    dc->SetBrush(m_currentColour, AxSOLID);
+
+    while (drawingPosition < end) {
+        dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(drawingPosition), radius);
+        drawingPosition += interval;
+    }
 
     dc->ResetPen();
     dc->ResetBrush();

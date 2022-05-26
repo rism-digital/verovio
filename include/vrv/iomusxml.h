@@ -17,6 +17,7 @@
 
 #include "attdef.h"
 #include "io.h"
+#include "metersig.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -436,6 +437,7 @@ private:
     static data_MIDIVALUE ConvertDynamicsToMidiVal(const float dynamics);
     static data_PITCHNAME ConvertStepToPitchName(const std::string &value);
     static data_TEXTRENDITION ConvertEnclosure(const std::string &value);
+    static beamRend_FORM ConvertBeamFanToForm(const std::string &value);
     static curvature_CURVEDIR InferCurvedir(const pugi::xml_node slurOrTie);
     static fermataVis_SHAPE ConvertFermataShape(const std::string &value);
     static pedalLog_DIR ConvertPedalTypeToDir(const std::string &value);
@@ -471,6 +473,7 @@ private:
     /* meter signature */
     std::vector<int> m_meterCount = { 4 };
     int m_meterUnit = 4;
+    MeterCountSign m_meterSign = MeterCountSign::None;
     /* part information */
     Label *m_label = NULL;
     LabelAbbr *m_labelAbbr = NULL;

@@ -105,8 +105,8 @@ public:
 
 class AddLayerElementToFlatListParams : public FunctorParams {
 public:
-    AddLayerElementToFlatListParams(ArrayOfObjects *flatList) { m_flatList = flatList; }
-    ArrayOfObjects *m_flatList;
+    AddLayerElementToFlatListParams(ListOfConstObjects *flatList) { m_flatList = flatList; }
+    ListOfConstObjects *m_flatList;
 };
 
 //----------------------------------------------------------------------------
@@ -358,10 +358,11 @@ public:
  * member 2: the cumulated shift on the previous aligners
  * member 3: the list of staffN in the top-level scoreDef
  * member 4: the flag indicating whereas the alignment is in a Measure or in a Grace
- * member 5: the pointer to the right ALIGNMENT_DEFAULT (if any)
- * member 6: the Doc
- * member 7: the Functor to be redirected to MeasureAligner and GraceAligner
- * member 8: the end Functor for redirection
+ * member 5: list of tie endpoints for the current measure
+ * member 6: the pointer to the right ALIGNMENT_DEFAULT (if any)
+ * member 7: the Doc
+ * member 8: the Functor to be redirected to MeasureAligner and GraceAligner
+ * member 9: the end Functor for redirection
  **/
 
 class AdjustGraceXPosParams : public FunctorParams {
@@ -373,6 +374,7 @@ public:
         m_graceCumulatedXShift = 0;
         m_staffNs = staffNs;
         m_isGraceAlignment = false;
+        m_measureTieEndpoints.clear();
         m_rightDefaultAlignment = NULL;
         m_doc = doc;
         m_functor = functor;
@@ -384,6 +386,7 @@ public:
     int m_graceCumulatedXShift;
     std::vector<int> m_staffNs;
     bool m_isGraceAlignment;
+    MeasureTieEndpoints m_measureTieEndpoints;
     Alignment *m_rightDefaultAlignment;
     Doc *m_doc;
     Functor *m_functor;
@@ -708,7 +711,7 @@ public:
     std::vector<ClassId> m_includes;
     std::vector<ClassId> m_excludes;
     bool m_rightBarLinesOnly;
-    std::vector<std::pair<LayerElement *, LayerElement *>> m_measureTieEndpoints;
+    MeasureTieEndpoints m_measureTieEndpoints;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;
@@ -1697,28 +1700,29 @@ using MIDIChordSequence = std::list<MIDIChord>;
  * member 8: deferred notes which start slightly later
  * member 9: grace note sequence
  * member 10: flag indicating whether the last grace note/chord was accented
- * member 11: the functor
- * member 12: Tablature held notes indexed by (course - 1)
+ * member 11: flag indicating whether cue notes should be included
+ * member 12: the functor
+ * member 13: Tablature held notes indexed by (course - 1)
  **/
 
 class GenerateMIDIParams : public FunctorParams {
 public:
-    GenerateMIDIParams(Doc *doc, smf::MidiFile *midiFile, Functor *functor)
+    GenerateMIDIParams(smf::MidiFile *midiFile, Functor *functor)
     {
         m_midiFile = midiFile;
-        m_midiChannel = 0;
         m_midiTrack = 1;
+        m_midiChannel = 0;
         m_totalTime = 0.0;
         m_transSemi = 0;
         m_currentTempo = MIDI_TEMPO;
         m_lastNote = NULL;
         m_accentedGraceNote = false;
+        m_cueExclusion = false;
         m_functor = functor;
-        m_doc = doc;
     }
     smf::MidiFile *m_midiFile;
-    int m_midiChannel;
     int m_midiTrack;
+    int m_midiChannel;
     double m_totalTime;
     int m_transSemi;
     double m_currentTempo;
@@ -1727,9 +1731,9 @@ public:
     std::map<Note *, double> m_deferredNotes;
     MIDIChordSequence m_graceNotes;
     bool m_accentedGraceNote;
+    bool m_cueExclusion;
     Functor *m_functor;
     std::vector<MIDIHeldNote> m_heldNotes;
-    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1740,8 +1744,9 @@ public:
  * member 0: Score time from the start of the piece to previous barline in quarter notes
  * member 1: Real time from the start of the piece to previous barline in ms
  * member 2: Currently active tempo
- * member 3: A pointer to the Timemap
- * member 4: The functor for redirection
+ * member 3: flag indicating whether cue notes should be included
+ * member 4: a pointer to the Timemap
+ * member 5: the functor for redirection
  **/
 
 class GenerateTimemapParams : public FunctorParams {
@@ -1751,12 +1756,14 @@ public:
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;
         m_currentTempo = MIDI_TEMPO;
+        m_cueExclusion = false;
         m_timemap = timemap;
         m_functor = functor;
     }
     double m_scoreTimeOffset;
     double m_realTimeOffsetMilliseconds;
     double m_currentTempo;
+    bool m_cueExclusion;
     Timemap *m_timemap;
     Functor *m_functor;
 };
@@ -2062,6 +2069,26 @@ public:
     Measure *m_currentMeasure;
     Staff *m_currentCrossStaff;
     Layer *m_currentCrossLayer;
+};
+
+//----------------------------------------------------------------------------
+// PrepareDataInitializationParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the functor for redirection
+ * member 1: the doc
+ **/
+
+class PrepareDataInitializationParams : public FunctorParams {
+public:
+    PrepareDataInitializationParams(Functor *functor, Doc *doc)
+    {
+        m_functor = functor;
+        m_doc = doc;
+    }
+    Functor *m_functor;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -2575,26 +2602,37 @@ public:
 /**
  * member 0: a pointer to the document
  * member 1: the functor for redirection
- * member 2: a pointer to the transposer
- * member 3: the transposition to be applied
- * member 4: the mdiv selected for transposition
- * member 5: the list of current (nested) mdivs
+ * member 2: the end functor for redirection
+ * member 3: a pointer to the transposer
+ * member 4: the transposition to be applied
+ * member 5: the mdiv selected for transposition
+ * member 6: the list of current (nested) mdivs
+ * member 7: transpose to sounding pitch by evaluating @trans.semi
+ * member 8: true if the current scoreDef contains a KeySig (direct child or attribute)
+ * member 9: transposition interval for staff
  **/
 
 class TransposeParams : public FunctorParams {
 public:
-    TransposeParams(Doc *doc, Functor *functor, Transposer *transposer)
+    TransposeParams(Doc *doc, Functor *functor, Functor *functorEnd, Transposer *transposer)
     {
         m_doc = doc;
         m_functor = functor;
+        m_functorEnd = functorEnd;
         m_transposer = transposer;
+        m_transposeToSoundingPitch = false;
+        m_hasScoreDefKeySig = false;
     }
     Doc *m_doc;
     Functor *m_functor;
+    Functor *m_functorEnd;
     Transposer *m_transposer;
     std::string m_transposition;
     std::string m_selectedMdivUuid;
     std::list<std::string> m_currentMdivUuids;
+    bool m_transposeToSoundingPitch;
+    bool m_hasScoreDefKeySig;
+    std::map<int, int> m_transposeIntervalForStaffN;
 };
 
 //----------------------------------------------------------------------------

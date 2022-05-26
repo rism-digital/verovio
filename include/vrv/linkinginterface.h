@@ -44,9 +44,11 @@ public:
      */
     ///@{
     void SetNextLink(Object *next);
-    Object *GetNextLink() const { return m_next; }
+    Object *GetNextLink() { return m_next; }
+    const Object *GetNextLink() const { return m_next; }
     void SetSameasLink(Object *sameas);
-    Object *GetSameasLink() const { return m_sameas; }
+    Object *GetSameasLink() { return m_sameas; }
+    const Object *GetSameasLink() const { return m_sameas; }
     ///@}
 
     /**
@@ -60,7 +62,10 @@ public:
     /**
      * Return the start measure of the next object (if any, NULL otherwise)
      */
+    ///@{
     Measure *GetNextMeasure();
+    const Measure *GetNextMeasure() const;
+    ///@}
 
     //-----------------//
     // Pseudo functors //

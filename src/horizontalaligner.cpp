@@ -603,9 +603,9 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std:
     getAlignmentLeftRightParams.m_excludeClasses = m_excludes;
 
     if (staffN != VRV_UNSET) {
-        ArrayOfComparisons filters;
+        Filters filters;
         AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-        filters.push_back(&matchStaff);
+        filters.Add(&matchStaff);
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
     }
     else {
@@ -790,6 +790,20 @@ bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfObjects *objects)
             if (accid->VerticalContentOverlap(object)) return true;
         }
     }
+    return false;
+}
+
+bool AlignmentReference::HasCrossStaffElements() const
+{
+    ListOfConstObjects children;
+    ClassIdsComparison classId({ NOTE, CHORD });
+    this->FindAllDescendantsByComparison(&children, &classId);
+
+    for (const auto child : children) {
+        const LayerElement *layerElement = vrv_cast<const LayerElement *>(child);
+        if (layerElement->m_crossStaff) return true;
+    }
+
     return false;
 }
 
@@ -1030,7 +1044,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         assert(measureAligner);
 
         std::vector<int>::iterator iter;
-        ArrayOfComparisons filters;
+        Filters filters;
         for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
             const int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
 
@@ -1069,10 +1083,10 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             params->m_graceMaxPos = graceMaxPos;
             params->m_graceUpcomingMaxPos = -VRV_UNSET;
             params->m_graceCumulatedXShift = VRV_UNSET;
-            filters.clear();
+            filters.Clear();
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
-            filters.push_back(&matchStaff);
+            filters.Add(&matchStaff);
 
             if (this->HasGraceAligner(graceAlignerId)) {
                 this->GetGraceAligner(graceAlignerId)

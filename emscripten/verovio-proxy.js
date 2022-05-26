@@ -102,6 +102,9 @@ verovio.vrvToolkit.renderToSVG = Module.cwrap( 'vrvToolkit_renderToSVG', 'string
 // char *renderToTimemap(Toolkit *ic)
 verovio.vrvToolkit.renderToTimemap = Module.cwrap( 'vrvToolkit_renderToTimemap', 'string', ['number', 'string'] );
 
+// void resetOptions(Toolkit *ic)
+verovio.vrvToolkit.resetOptions = Module.cwrap( 'vrvToolkit_resetOptions', null, ['number'] );
+
 // void resetXmlIdSeed(Toolkit *ic, int seed) 
 verovio.vrvToolkit.resetXmlIdSeed = Module.cwrap( 'vrvToolkit_resetXmlIdSeed', null, ['number', 'number'] );
 
@@ -310,6 +313,11 @@ verovio.toolkit.prototype.renderToTimemap = function ( options = {} )
 {
     return JSON.parse( verovio.vrvToolkit.renderToTimemap( this.ptr, JSON.stringify( options ) ) );
 };
+
+verovio.toolkit.prototype.resetOptions = function ()
+{
+    verovio.vrvToolkit.resetOptions( this.ptr );
+}
 
 verovio.toolkit.prototype.resetXmlIdSeed = function ( seed )
 {

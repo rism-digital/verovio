@@ -102,20 +102,27 @@ private:
     void AdjustBeamToFrenchStyle(BeamDrawingInterface *beamInterface);
 
     // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)
-    void AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
+    void AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal);
 
-    void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
+    /**
+     * Helper to calculate required adjustment to beam position and stem length for beams that have tremolos or notes
+     * with stem modifiers
+     */
+    void AdjustBeamToTremolos(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
+
+    void CalcBeamInit(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     void CalcBeamInitForNotePair(Note *note1, Note *note2, Staff *staff, int &yMax, int &yMin);
 
-    bool CalcBeamSlope(
-        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step);
+    bool CalcBeamSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, int &step);
+
+    int CalcBeamSlopeStep(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, int noteStep, bool &shortStep);
 
     void CalcMixedBeamStem(BeamDrawingInterface *beamInterface, int step);
 
-    void CalcBeamPosition(Doc *doc, Staff *staff, Layer *layer, BeamDrawingInterface *beamInterface, bool isHorizontal);
+    void CalcBeamPosition(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal);
 
-    void CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step);
+    void CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, int &step);
 
     // Helper to adjust position of starting point to make sure that beam start-/endpoints touch the staff lines
     void CalcAdjustPosition(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
@@ -314,6 +321,11 @@ public:
      */
     std::pair<int, int> GetAdditionalBeamCount() const override;
 
+    /**
+     * Return duration of beam part that are closest to the specified object X position
+     */
+    int GetBeamPartDuration(Object *object) const;
+
     //----------//
     // Functors //
     //----------//
@@ -348,12 +360,18 @@ protected:
      * Filter the flat list and keep only Note and Chords elements.
      * This also initializes the m_beamElementCoords vector
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
     /**
      * See LayerElement::SetElementShortening
      */
     void SetElementShortening(int shortening) override;
+
+    /**
+     * Return duration of beam part for specified X coordinate. Duration of two closest elements is taken for this
+     * purpose.
+     */
+    int GetBeamPartDuration(int x) const;
 
 private:
     /**

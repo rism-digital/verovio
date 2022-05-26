@@ -363,6 +363,7 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
             staffDef->SetDrawMensur(false);
             MeterSigGrp *meterSigGrp = newStaffDef->GetMeterSigGrpCopy();
             MeterSig *meterSig = meterSigGrp->GetSimplifiedMeterSig();
+            staffDef->SetCurrentMeterSigGrp(meterSigGrp);
             delete meterSigGrp;
             staffDef->SetCurrentMeterSig(meterSig);
             delete meterSig;
@@ -440,14 +441,14 @@ void ScoreDef::ReplaceDrawingLabels(StaffGrp *newStaffGrp)
     }
 }
 
-void ScoreDef::FilterList(ArrayOfObjects *childList)
+void ScoreDef::FilterList(ListOfConstObjects &childList) const
 {
     // We want to keep only staffDef
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->Is(STAFFDEF)) {
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
         }
         else {
             ++iter;
@@ -457,11 +458,10 @@ void ScoreDef::FilterList(ArrayOfObjects *childList)
 
 void ScoreDef::ResetFromDrawingValues()
 {
-    this->ResetList(this);
-    const ArrayOfObjects *childList = this->GetList(this);
+    const ListOfObjects &childList = this->GetList(this);
 
     StaffDef *staffDef = NULL;
-    for (auto item : *childList) {
+    for (auto item : childList) {
         if (!item->Is(STAFFDEF)) continue;
         staffDef = vrv_cast<StaffDef *>(item);
         assert(staffDef);
@@ -488,14 +488,18 @@ void ScoreDef::ResetFromDrawingValues()
 
 StaffDef *ScoreDef::GetStaffDef(int n)
 {
-    this->ResetList(this);
-    const ArrayOfObjects *childList = this->GetList(this);
-    ArrayOfObjects::const_iterator iter;
+    return const_cast<StaffDef *>(std::as_const(*this).GetStaffDef(n));
+}
 
-    StaffDef *staffDef = NULL;
-    for (iter = childList->begin(); iter != childList->end(); ++iter) {
+const StaffDef *ScoreDef::GetStaffDef(int n) const
+{
+    const ListOfConstObjects &childList = this->GetList(this);
+    ListOfConstObjects::const_iterator iter;
+
+    const StaffDef *staffDef = NULL;
+    for (iter = childList.begin(); iter != childList.end(); ++iter) {
         if (!(*iter)->Is(STAFFDEF)) continue;
-        staffDef = vrv_cast<StaffDef *>(*iter);
+        staffDef = vrv_cast<const StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetN() == n) {
             return staffDef;
@@ -507,30 +511,34 @@ StaffDef *ScoreDef::GetStaffDef(int n)
 
 StaffGrp *ScoreDef::GetStaffGrp(const std::string &n)
 {
+    return const_cast<StaffGrp *>(std::as_const(*this).GetStaffGrp(n));
+}
+
+const StaffGrp *ScoreDef::GetStaffGrp(const std::string &n) const
+{
     // First get all the staffGrps
-    ListOfObjects staffGrps = this->FindAllDescendantsByType(STAFFGRP);
+    ListOfConstObjects staffGrps = this->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
     for (auto &item : staffGrps) {
-        StaffGrp *staffGrp = vrv_cast<StaffGrp *>(item);
+        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(item);
         assert(staffGrp);
         if (staffGrp->GetN() == n) return staffGrp;
     }
     return NULL;
 }
 
-std::vector<int> ScoreDef::GetStaffNs()
+std::vector<int> ScoreDef::GetStaffNs() const
 {
-    this->ResetList(this);
-    const ArrayOfObjects *childList = this->GetList(this);
-    ArrayOfObjects::const_iterator iter;
+    const ListOfConstObjects &childList = this->GetList(this);
+    ListOfConstObjects::const_iterator iter;
 
     std::vector<int> ns;
-    StaffDef *staffDef = NULL;
-    for (iter = childList->begin(); iter != childList->end(); ++iter) {
+    const StaffDef *staffDef = NULL;
+    for (iter = childList.begin(); iter != childList.end(); ++iter) {
         // It should be staffDef only, but double check.
         if (!(*iter)->Is(STAFFDEF)) continue;
-        staffDef = vrv_cast<StaffDef *>(*iter);
+        staffDef = vrv_cast<const StaffDef *>(*iter);
         assert(staffDef);
         ns.push_back(staffDef->GetN());
     }
@@ -742,6 +750,61 @@ int ScoreDef::PrepareDuration(FunctorParams *functorParams)
 
     params->m_durDefaultForStaffN.clear();
     params->m_durDefault = this->GetDurDefault();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int ScoreDef::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    params->m_hasScoreDefKeySig = false;
+
+    if (params->m_transposeToSoundingPitch) {
+        // Set the transposition in order to transpose common key signatures
+        // (i.e. encoded as ScoreDef attributes or direct KeySig children)
+        const std::vector<int> staffNs = this->GetStaffNs();
+        if (staffNs.empty()) {
+            int transposeInterval = 0;
+            if (!params->m_transposeIntervalForStaffN.empty()) {
+                transposeInterval = params->m_transposeIntervalForStaffN.begin()->second;
+            }
+            params->m_transposer->SetTransposition(transposeInterval);
+        }
+        else {
+            this->GetStaffDef(staffNs.front())->Transpose(functorParams);
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int ScoreDef::TransposeEnd(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    if (params->m_transposeToSoundingPitch && params->m_hasScoreDefKeySig) {
+        bool showWarning = false;
+        // Check if some staves are untransposed
+        const int mapEntryCount = static_cast<int>(params->m_transposeIntervalForStaffN.size());
+        if ((mapEntryCount > 0) && (mapEntryCount < this->GetStaffNs().size())) {
+            showWarning = true;
+        }
+        // Check if there are different transpositions
+        auto iter = std::adjacent_find(params->m_transposeIntervalForStaffN.begin(),
+            params->m_transposeIntervalForStaffN.end(),
+            [](const auto &mapEntry1, const auto &mapEntry2) { return (mapEntry1.second != mapEntry2.second); });
+        if (iter != params->m_transposeIntervalForStaffN.end()) {
+            showWarning = true;
+        }
+        // Display warning
+        if (showWarning) {
+            LogWarning("Transpose to sounding pitch cannot handle different transpositions for ScoreDef key "
+                       "signatures. Please encode KeySig as StaffDef attribute or child.");
+        }
+    }
 
     return FUNCTOR_CONTINUE;
 }

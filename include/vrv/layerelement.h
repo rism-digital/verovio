@@ -122,6 +122,7 @@ public:
     bool IsInLigature() const;
     /** Return the FTrem parten if the element is a note or a chord within a fTrem */
     FTrem *IsInFTrem();
+    const FTrem *IsInFTrem() const;
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
@@ -129,6 +130,7 @@ public:
      * Looking in the content list is necessary for grace notes or imbricated beams.
      */
     Beam *IsInBeam();
+    const Beam *IsInBeam() const;
     bool IsInBeamSpan() const;
     ///@}
 
@@ -272,6 +274,11 @@ public:
      * Get the stem mod for the element (if any)
      */
     virtual data_STEMMODIFIER GetDrawingStemMod() const;
+
+    /**
+     * Return true if cross-staff is set
+     */
+    virtual bool HasCrossStaff() { return !!m_crossStaff; }
 
     /**
      * Convert stem mode to corresponding glyph code
@@ -504,6 +511,11 @@ private:
      * Get above/below overflow for the chord elements
      */
     void GetChordOverflow(StaffAlignment *&above, StaffAlignment *&below, int staffN);
+
+    /**
+     * Calculate offset and left overlap of the element
+     */
+    std::pair<int, int> CalculateXPosOffset(FunctorParams *functorParams);
 
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */

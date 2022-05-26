@@ -37,20 +37,13 @@ Ligature::Ligature() : LayerElement(LIGATURE, "ligature-"), ObjectListInterface(
     this->Reset();
 }
 
-Ligature::~Ligature()
-{
-    ClearClusters();
-}
+Ligature::~Ligature() {}
 
 void Ligature::Reset()
 {
     LayerElement::Reset();
     this->ResetLigatureVis();
-
-    ClearClusters();
 }
-
-void Ligature::ClearClusters() {}
 
 bool Ligature::IsSupportedChild(Object *child)
 {
@@ -71,45 +64,45 @@ bool Ligature::IsSupportedChild(Object *child)
 
 Note *Ligature::GetFirstNote()
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
+    return const_cast<Note *>(std::as_const(*this).GetFirstNote());
+}
 
-    Note *firstNote = vrv_cast<Note *>(childList->front());
+const Note *Ligature::GetFirstNote() const
+{
+    const Note *firstNote = vrv_cast<const Note *>(this->GetListFront(this));
     assert(firstNote);
     return firstNote;
 }
 
 Note *Ligature::GetLastNote()
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
+    return const_cast<Note *>(std::as_const(*this).GetLastNote());
+}
 
+const Note *Ligature::GetLastNote() const
+{
     // The first note is the bottom
-    Note *lastNote = vrv_cast<Note *>(childList->back());
+    const Note *lastNote = vrv_cast<const Note *>(this->GetListBack(this));
     assert(lastNote);
     return lastNote;
 }
 
-void Ligature::FilterList(ArrayOfObjects *childList)
+void Ligature::FilterList(ListOfConstObjects &childList) const
 {
     // Retain only note children of ligatures
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         if (!(*iter)->Is(NOTE)) {
             // remove anything that is not an LayerElement
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
         }
         else {
             // assert that we keep only notes
-            assert(dynamic_cast<Note *>(*iter));
+            assert(dynamic_cast<const Note *>(*iter));
             ++iter;
         }
     }
-
-    iter = childList->begin();
-
-    this->ClearClusters();
 }
 
 int Ligature::GetDrawingNoteShape(Note *note)
@@ -135,12 +128,11 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
     m_drawingShapes.clear();
 
-    Note *lastNote = dynamic_cast<Note *>(this->GetList(this)->back());
+    const ListOfObjects &notes = this->GetList(this);
+    Note *lastNote = dynamic_cast<Note *>(notes.back());
     Staff *staff = this->GetAncestorStaff();
 
-    const ArrayOfObjects *notes = this->GetList(this);
-    assert(notes);
-    if (notes->size() < 2) return FUNCTOR_SIBLINGS;
+    if (notes.size() < 2) return FUNCTOR_SIBLINGS;
 
     Note *previousNote = NULL;
     bool previousUp = false;
@@ -149,12 +141,12 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
     bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     bool oblique = false;
-    if ((notes->size() == 2) && this->GetForm() == LIGATUREFORM_obliqua) oblique = true;
+    if ((notes.size() == 2) && this->GetForm() == LIGATUREFORM_obliqua) oblique = true;
 
     // For better clarify, we loop withing the Ligature::CalcLigatureNotePos instead of
     // implementing Note::CalcLigatureNotePos.
 
-    for (auto &iter : *notes) {
+    for (auto &iter : notes) {
 
         Note *note = vrv_cast<Note *>(iter);
         assert(note);
@@ -298,7 +290,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     previousNote = NULL;
     n1 = 0;
 
-    for (auto &iter : *notes) {
+    for (auto &iter : notes) {
 
         Note *note = vrv_cast<Note *>(iter);
         assert(note);

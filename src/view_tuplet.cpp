@@ -133,8 +133,10 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
         bracketHeight *= -1;
     }
 
-    this->DrawFilledRectangle(dc, xLeft, yLeft, xLeft + lineWidth, yLeft + bracketHeight);
-    this->DrawFilledRectangle(dc, xRight, yRight, xRight - lineWidth, yRight + bracketHeight);
+    this->DrawFilledRectangle(
+        dc, xLeft, yLeft + lineWidth / 2, xLeft + lineWidth, yLeft + bracketHeight + lineWidth / 2);
+    this->DrawFilledRectangle(
+        dc, xRight, yRight + lineWidth / 2, xRight - lineWidth, yRight + bracketHeight + lineWidth / 2);
 
     dc->EndResumedGraphic(tupletBracket, this);
 

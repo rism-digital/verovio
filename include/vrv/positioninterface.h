@@ -47,13 +47,13 @@ public:
     int GetDrawingLoc() const { return m_drawingLoc; }
     ///@}
 
-    int CalcDrawingLoc(Layer *layer, LayerElement *element);
+    int CalcDrawingLoc(const Layer *layer, const LayerElement *element);
 
     /**
      * Inteface comparison operator.
      * Checks if the LayerElement has a PositionInterface and compares attributes
      */
-    bool HasIdenticalPositionInterface(PositionInterface *otherPitchInterface);
+    bool HasIdenticalPositionInterface(const PositionInterface *otherPositionInterface) const;
 
     //-----------------//
     // Pseudo functors //

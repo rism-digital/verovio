@@ -20,16 +20,14 @@ extern "C" {
 
 void *vrvToolkit_constructor()
 {
-    // set the default resource path
-    Resources::SetPath("/data");
+    SetDefaultResourcePath("/data");
 
     return new Toolkit();
 }
 
 void *vrvToolkit_constructorResourcePath(const char *resourcePath)
 {
-    // set the resource path
-    Resources::SetPath(resourcePath);
+    SetDefaultResourcePath(resourcePath);
 
     return new Toolkit();
 }
@@ -255,6 +253,12 @@ const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *opt
     vrvToolkit_loadData(tk, data);
 
     return vrvToolkit_renderToSVG(tk, 1, options);
+}
+
+void vrvToolkit_resetOptions(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->ResetOptions();
 }
 
 void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed)

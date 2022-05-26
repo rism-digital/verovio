@@ -1462,9 +1462,9 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
         pugi::xpath_node interchangeable = time.select_node("interchangeable");
         meterSigGrp->SetFunc(interchangeable ? meterSigGrpLog_FUNC_interchanging : meterSigGrpLog_FUNC_mixed);
 
-        std::tie(m_meterCount, m_meterUnit) = GetMeterSigGrpValues(time, meterSigGrp);
+        std::tie(m_meterCount, m_meterUnit) = this->GetMeterSigGrpValues(time, meterSigGrp);
         if (interchangeable) {
-            [[maybe_unused]] auto [interCount, interUnit] = GetMeterSigGrpValues(interchangeable.node(), meterSigGrp);
+            std::tie(std::ignore, std::ignore) = this->GetMeterSigGrpValues(interchangeable.node(), meterSigGrp);
         }
         parent->AddChild(meterSigGrp);
     }
@@ -1488,8 +1488,9 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
         pugi::xml_node beats = time.child("beats");
         pugi::xml_node beatType = time.child("beat-type");
         if (beats) {
-            m_meterCount = meterSig->AttMeterSigLog::StrToSummandList(beats.text().as_string());
-            meterSig->SetCount(m_meterCount);
+            std::tie(m_meterCount, m_meterSign)
+                = meterSig->AttMeterSigLog::StrToMetercountPair(beats.text().as_string());
+            meterSig->SetCount({ m_meterCount, m_meterSign });
             m_meterUnit = beatType.text().as_int();
             meterSig->SetUnit(m_meterUnit);
         }
@@ -2662,7 +2663,9 @@ void MusicXmlInput::ReadMusicXmlNote(
         // we assume /note without /type or with duration of an entire bar to be mRest
         else if (typeStr.empty() || rest.attribute("measure").as_bool()) {
             if (m_slash) {
-                const int totalCount = std::accumulate(m_meterCount.cbegin(), m_meterCount.cend(), 0);
+                MeterSig tmpMeterSig;
+                tmpMeterSig.SetCount({ m_meterCount, m_meterSign });
+                const int totalCount = tmpMeterSig.GetTotalCount();
                 for (int i = totalCount; i > 0; --i) {
                     BeatRpt *slash = new BeatRpt;
                     AddLayerElement(layer, slash, duration);
@@ -3648,7 +3651,7 @@ bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
             std::string measureName = (currentMeasure.node().attribute("id"))
                 ? currentMeasure.node().attribute("id").as_string()
                 : currentMeasure.node().attribute("number").as_string();
-            LogWarning("MusicXML import: Beam without end in measure %s treated as <beamSpan>", measureName.c_str());
+            LogDebug("MusicXML import: Beam without end in measure %s treated as <beamSpan>", measureName.c_str());
             return false;
         }
         // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
@@ -3709,6 +3712,7 @@ void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi
 
     Beam *beam = new Beam();
     if (beamStart.attribute("id")) beam->SetUuid(beamStart.attribute("id").as_string());
+    if (beamStart.attribute("fan")) beam->SetForm(ConvertBeamFanToForm(beamStart.attribute("fan").as_string()));
     AddLayerElement(layer, beam);
     m_elementStackMap.at(layer).push_back(beam);
 }
@@ -3882,6 +3886,15 @@ bool MusicXmlInput::IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, 
 
     const auto result = writtenToGesturalMap.find(written);
     return ((result != writtenToGesturalMap.end()) && (result->second == gestural));
+}
+
+beamRend_FORM MusicXmlInput::ConvertBeamFanToForm(const std::string &value)
+{
+    if (value == "accel") return beamRend_FORM_acc;
+    if (value == "none") return beamRend_FORM_norm;
+    if (value == "rit") return beamRend_FORM_rit;
+
+    return beamRend_FORM_NONE;
 }
 
 curvature_CURVEDIR MusicXmlInput::CombineCurvedir(curvature_CURVEDIR startDir, curvature_CURVEDIR stopDir)
@@ -4534,11 +4547,13 @@ std::pair<std::vector<int>, int> MusicXmlInput::GetMeterSigGrpValues(const pugi:
          ++iter1, ++iter2) {
         // Process current beat/beat-type combination and add it to the meterSigGrp
         MeterSig *meterSig = new MeterSig();
-        std::vector<int> currentCount = meterSig->AttMeterSigLog::StrToSummandList(iter1->node().text().as_string());
-        meterSig->SetCount(currentCount);
+        data_METERCOUNT_pair count = meterSig->AttMeterSigLog::StrToMetercountPair(iter1->node().text().as_string());
+        meterSig->SetCount(count);
         int currentUnit = iter2->node().text().as_int();
         meterSig->SetUnit(currentUnit);
         parent->AddChild(meterSig);
+        std::vector<int> currentCount;
+        std::tie(currentCount, std::ignore) = meterSig->GetCount();
         // Process meterCount and meterUnit based on current/previous beats
         if (maxUnit == 0) maxUnit = currentUnit;
         if (maxUnit == currentUnit) {

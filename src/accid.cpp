@@ -37,6 +37,8 @@ Accid::Accid()
     , AttColor()
     , AttEnclosingChars()
     , AttExtSym()
+    , AttPlacementOnStaff()
+    , AttPlacementRelEvent()
 {
 
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -46,6 +48,8 @@ Accid::Accid()
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_PLACEMENTONSTAFF);
+    this->RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
     this->Reset();
 }
@@ -62,6 +66,8 @@ void Accid::Reset()
     this->ResetColor();
     this->ResetEnclosingChars();
     this->ResetExtSym();
+    this->ResetPlacementOnStaff();
+    this->ResetPlacementRelEvent();
 
     m_drawingUnison = NULL;
     m_alignedWithSameLayer = false;
@@ -71,17 +77,20 @@ std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
 {
     if (!this->HasAccid()) return L"";
 
+    const Resources *resources = this->GetDocResources();
+    if (!resources) return L"";
+
     wchar_t code = 0;
 
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
         code = this->GetGlyphNum();
-        if (NULL == Resources::GetGlyph(code)) code = 0;
+        if (NULL == resources->GetGlyph(code)) code = 0;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
-        if (NULL == Resources::GetGlyph(code)) code = 0;
+        code = resources->GetGlyphCode(this->GetGlyphName());
+        if (NULL == resources->GetGlyph(code)) code = 0;
     }
 
     if (!code) {

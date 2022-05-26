@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <math.h>
 #include <numeric>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -48,8 +49,37 @@ void MeterSig::Reset()
 
 int MeterSig::GetTotalCount() const
 {
-    const data_SUMMAND_List &summands = this->GetCount();
-    return std::accumulate(summands.cbegin(), summands.cend(), 0);
+    auto [counts, sign] = this->GetCount();
+    switch (sign) {
+        case MeterCountSign::Slash: {
+            // make sure that there is no division by zero
+            std::for_each(counts.begin(), counts.end(), [](int &elem) {
+                if (!elem) elem = 1;
+            });
+            int result
+                = std::accumulate(std::next(counts.cbegin()), counts.cend(), *counts.cbegin(), std::divides<int>());
+            if (!result) result = 1;
+            return result;
+        }
+        case MeterCountSign::Minus: {
+            int result
+                = std::accumulate(std::next(counts.cbegin()), counts.cend(), *counts.cbegin(), std::minus<int>());
+            if (result <= 0) result = 1;
+            return result;
+        }
+        case MeterCountSign::Asterisk: {
+            int result = std::accumulate(counts.cbegin(), counts.cend(), 1, std::multiplies<int>());
+            if (!result) result = 1;
+            return result;
+        }
+        case MeterCountSign::Plus: {
+            return std::accumulate(counts.cbegin(), counts.cend(), 0, std::plus<int>());
+        }
+        case MeterCountSign::None:
+        default: break;
+    }
+
+    return counts.front();
 }
 
 wchar_t MeterSig::GetSymbolGlyph() const
@@ -65,7 +95,15 @@ wchar_t MeterSig::GetSymbolGlyph() const
 
 std::pair<wchar_t, wchar_t> MeterSig::GetEnclosingGlyphs(bool smallGlyph) const
 {
-    if (this->GetEnclose() == ENCLOSURE_paren) {
+    if (this->GetEnclose() == ENCLOSURE_brack) {
+        if (smallGlyph) {
+            return { SMUFL_EC82_timeSigBracketLeftSmall, SMUFL_EC83_timeSigBracketRightSmall };
+        }
+        else {
+            return { SMUFL_EC80_timeSigBracketLeft, SMUFL_EC81_timeSigBracketRight };
+        }
+    }
+    else if (this->GetEnclose() == ENCLOSURE_paren) {
         if (smallGlyph) {
             return { SMUFL_E092_timeSigParensLeftSmall, SMUFL_E093_timeSigParensRightSmall };
         }

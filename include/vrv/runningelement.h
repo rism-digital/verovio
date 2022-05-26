@@ -122,7 +122,7 @@ public:
     /**
      * Load the footer from the resources (footer.svg)
      */
-    void LoadFooter();
+    void LoadFooter(const Doc *doc);
 
     /**
      * Add page numbering to the running element.
@@ -132,6 +132,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::PrepareDataInitialization
+     */
+    int PrepareDataInitialization(FunctorParams *) override;
 
     /**
      * See Object::Save
@@ -153,7 +158,7 @@ protected:
      * Filter the list for a specific class.
      * Keep only the top <rend> and <fig>
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     /**

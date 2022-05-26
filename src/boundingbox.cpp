@@ -310,12 +310,13 @@ int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, Doc *doc, int m
 int BoundingBox::GetRectangles(
     const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2], Doc *doc) const
 {
-    Glyph *glyph = NULL;
+    const Glyph *glyph = NULL;
 
     bool glyphRect = true;
 
     if (m_smuflGlyph != 0) {
-        glyph = Resources::GetGlyph(m_smuflGlyph);
+        const Resources &resources = doc->GetResources();
+        glyph = resources.GetGlyph(m_smuflGlyph);
         assert(glyph);
 
         if (glyph->HasAnchor(anchor1) && glyph->HasAnchor(anchor2)) {
@@ -341,8 +342,8 @@ int BoundingBox::GetRectangles(
     return 1;
 }
 
-bool BoundingBox::GetGlyph2PointRectangles(
-    const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Glyph *glyph, Point rect[3][2], Doc *doc) const
+bool BoundingBox::GetGlyph2PointRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2,
+    const Glyph *glyph, Point rect[3][2], Doc *doc) const
 {
     assert(glyph);
 
@@ -430,7 +431,7 @@ bool BoundingBox::GetGlyph2PointRectangles(
 }
 
 bool BoundingBox::GetGlyph1PointRectangles(
-    const SMuFLGlyphAnchor &anchor, Glyph *glyph, Point rect[2][2], Doc *doc) const
+    const SMuFLGlyphAnchor &anchor, const Glyph *glyph, Point rect[2][2], Doc *doc) const
 {
     assert(glyph);
 
@@ -657,7 +658,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
 int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
 {
     assert(beamInterface);
-    assert(!beamInterface->m_beamElementCoords.empty());
+    assert(beamInterface->HasCoords());
 
     const Point beamLeft(
         beamInterface->m_beamElementCoords.front()->m_x, beamInterface->m_beamElementCoords.front()->m_yBeam);
@@ -763,9 +764,14 @@ Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point cen
     return point;
 }
 
+double BoundingBox::CalcDistance(const Point &p1, const Point &p2)
+{
+    return std::hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
 bool BoundingBox::ArePointsClose(const Point &p1, const Point &p2, int margin)
 {
-    return (hypot(p1.x - p2.x, p1.y - p2.y) <= margin);
+    return (BoundingBox::CalcDistance(p1, p2) <= margin);
 }
 
 double BoundingBox::CalcSlope(const Point &p1, const Point &p2)
@@ -1077,13 +1083,12 @@ SegmentedLine::SegmentedLine(int start, int end)
     m_segments.push_back({ start, end });
 }
 
-void SegmentedLine::GetStartEnd(int &start, int &end, int idx)
+std::pair<int, int> SegmentedLine::GetStartEnd(int idx) const
 {
     assert(idx >= 0);
     assert(idx < this->GetSegmentCount());
 
-    start = m_segments.at(idx).first;
-    end = m_segments.at(idx).second;
+    return { m_segments.at(idx).first, m_segments.at(idx).second };
 }
 
 void SegmentedLine::AddGap(int start, int end)

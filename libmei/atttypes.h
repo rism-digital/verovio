@@ -1124,7 +1124,7 @@ enum data_MIDINAMES {
     MIDINAMES_Shamisen,
     MIDINAMES_Koto,
     MIDINAMES_Kalimba,
-    MIDINAMES_Bagpipe,
+    MIDINAMES_Bag_pipe,
     MIDINAMES_Fiddle,
     MIDINAMES_Shanai,
     MIDINAMES_Tinkle_Bell,

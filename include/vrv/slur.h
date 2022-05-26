@@ -31,6 +31,18 @@ struct SpannedElements {
 };
 
 //----------------------------------------------------------------------------
+// NearEndCollision
+//----------------------------------------------------------------------------
+/**
+ * Measure collisions near the end points
+ */
+struct NearEndCollision {
+    double metricAtStart;
+    double metricAtEnd;
+    bool endPointsAdjusted;
+};
+
+//----------------------------------------------------------------------------
 // ControlPointConstraint
 //----------------------------------------------------------------------------
 /**
@@ -143,34 +155,24 @@ public:
     ///@}
 
     /**
-     * Adjust starting coordinates for the slurs depending on the curve direction and spanning type of the slur
+     * Calculate the initial slur bezier curve and store it in the curve positioner
      */
-    std::pair<Point, Point> AdjustCoordinates(
-        Doc *doc, Staff *staff, std::pair<Point, Point> points, char spanningType);
+    void CalcInitialCurve(Doc *doc, FloatingCurvePositioner *curve, NearEndCollision *nearEndCollision = NULL);
 
     /**
-     * Determine layer elements spanned by the slur
+     * Recalculate the spanned elements of the curve positioner
      */
-    SpannedElements CollectSpannedElements(Staff *staff, int xMin, int xMax);
+    void CalcSpannedElements(FloatingCurvePositioner *curve);
 
     /**
-     * Filter and add layer elements spanned by the slur to the positioner
+     * Add curve positioner to articulations
      */
-    void AddSpannedElements(
-        FloatingCurvePositioner *curve, const SpannedElements &elements, Staff *staff, int xMin, int xMax);
+    void AddPositionerToArticulations(FloatingCurvePositioner *curve);
 
     /**
      * Calculate the staff where the slur's floating curve positioner lives
      */
     Staff *CalculateExtremalStaff(Staff *staff, int xMin, int xMax);
-
-    /**
-     * Determine whether a layer element should lie above or below the slur
-     */
-    ///@{
-    bool IsElementBelow(LayerElement *element, Staff *startStaff, Staff *endStaff) const;
-    bool IsElementBelow(FloatingPositioner *positioner, Staff *startStaff, Staff *endStaff) const;
-    ///@}
 
     /**
      * Set the bezier control sides depending on the curve direction
@@ -210,15 +212,33 @@ private:
     // Get cross staff by only considering the slur boundary
     Staff *GetBoundaryCrossStaff();
     // Determine curve direction for the slurs that start at grace note
-    curvature_CURVEDIR GetGraceCurveDirection(Doc *doc);
+    curvature_CURVEDIR GetGraceCurveDirection() const;
     // Get preferred curve direction based on various conditions
-    curvature_CURVEDIR GetPreferredCurveDirection(Doc *doc, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter);
+    curvature_CURVEDIR GetPreferredCurveDirection(
+        data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur);
     ///@}
 
     /**
-     * Helper for calculating the initial slur start and end points
+     * Helper for calculating spanned elements
      */
     ///@{
+    // Determine layer elements spanned by the slur
+    SpannedElements CollectSpannedElements(Staff *staff, int xMin, int xMax);
+    // Filter and add layer elements spanned by the slur to the positioner
+    void AddSpannedElements(
+        FloatingCurvePositioner *curve, const SpannedElements &elements, Staff *staff, int xMin, int xMax);
+    // Determine whether a layer element should lie above or below the slur
+    bool IsElementBelow(LayerElement *element, Staff *startStaff, Staff *endStaff) const;
+    bool IsElementBelow(FloatingPositioner *positioner, Staff *startStaff, Staff *endStaff) const;
+    ///@}
+
+    /**
+     * Helper for calculating the initial slur
+     */
+    ///@{
+    // Calculate the endpoint coordinates depending on the curve direction and spanning type of the slur
+    std::pair<Point, Point> CalcEndPoints(Doc *doc, Staff *staff, NearEndCollision *nearEndCollision, int x1, int x2,
+        curvature_CURVEDIR drawingCurveDir, char spanningType);
     // Retrieve the start and end note locations of the slur
     std::pair<int, int> GetStartEndLocs(Note *startNote, Chord *startChord, Note *endNote, Chord *endChord) const;
     // Calculate the break location at system start/end and the pitch difference
@@ -234,9 +254,19 @@ private:
     // Discard certain spanned elements
     void FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
 
+    // Detect collisions near the endpoints
+    NearEndCollision DetectCollisionsNearEnd(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+
     // Calculate the vertical shift of the slur end points
     std::pair<int, int> CalcEndPointShift(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin, int unit);
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double flexibility, int margin);
+
+    // Calculate slur from bulge values
+    void AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit);
+
+    // Check whether control points should be adjusted horizontally
+    bool AllowControlOffsetAdjustment(const BezierCurve &bezierCurve, double symmetry, int unit) const;
 
     // Calculate the horizontal control point offset
     std::tuple<bool, int, int> CalcControlPointOffset(
@@ -244,10 +274,11 @@ private:
 
     // Calculate the vertical control point shift
     ControlPointAdjustment CalcControlPointVerticalShift(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double symmetry, int margin);
 
     // Solve the constraints for vertical control point adjustment
-    std::pair<int, int> SolveControlPointConstraints(const std::list<ControlPointConstraint> &constraints);
+    std::pair<int, int> SolveControlPointConstraints(
+        const std::list<ControlPointConstraint> &constraints, double symmetry = 0.0);
 
     // Improve the slur shape by adjusting the control point heights
     void AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int unit);
@@ -258,10 +289,11 @@ private:
      */
     ///@{
     // Shift end points for collisions nearby
-    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, bool isBelow) const;
+    void ShiftEndPoints(
+        int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const;
 
-    // Rebalance shifts to avoid awkward tilting of short slurs
-    void RebalanceShifts(int &shiftLeft, int &shiftRight, double distance, int unit) const;
+    // Determine a quadratic interpolation function between zero and one and evaluate it
+    double CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const;
 
     // Rotate the slope by a given number of degrees, but choose smaller angles if already close to the vertical axis
     // Choose doublingBound as the positive slope value where doubling has the same effect as rotating:

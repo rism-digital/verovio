@@ -292,8 +292,6 @@ int Harm::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
-    LogDebug("Transposing harm");
-
     unsigned int position = 0;
     TransPitch pitch;
     if (this->GetRootPitch(pitch, position)) {

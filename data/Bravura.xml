@@ -34,6 +34,9 @@
   <g c="E075" x="0.0" y="-506.0" w="699.0" h="1012.0" h-a-x="699" n="cClefReversed"/>
   <g c="E076" x="0.0" y="-635.0" w="689.0" h="897.0" h-a-x="689" n="fClefReversed"/>
   <g c="E077" x="0.0" y="-264.0" w="689.0" h="897.0" h-a-x="684" n="fClefTurned"/>
+  <g c="E07A" x="0.0" y="-455.0" w="440.0" h="1162.0" h-a-x="440" n="gClefChange"/>
+  <g c="E07B" x="0.0" y="-332.0" w="506.0" h="664.0" h-a-x="506" n="cClefChange"/>
+  <g c="E07C" x="-15.0" y="-414.0" w="478.0" h="584.0" h-a-x="462" n="fClefChange"/>
   <g c="E080" x="20.0" y="-250.0" w="430.0" h="501.0" h-a-x="470" n="timeSig0"/>
   <g c="E081" x="20.0" y="-250.0" w="294.0" h="501.0" h-a-x="334" n="timeSig1"/>
   <g c="E082" x="20.0" y="-257.0" w="406.0" h="511.0" h-a-x="446" n="timeSig2"/>
@@ -144,6 +147,10 @@
   <g c="E223" x="-150.0" y="-370.0" w="300.0" h="744.0" h-a-x="149" n="tremolo4"/>
   <g c="E224" x="-151.0" y="-460.0" w="301.0" h="930.0" h-a-x="149" n="tremolo5"/>
   <g c="E22A" x="-155.0" y="-116.0" w="311.0" h="232.0" h-a-x="156" n="buzzRoll"/>
+  <g c="E22E" x="0.0" y="0.0" w="250.0" h="100.0" h-a-x="250" n="tremoloDivisiDots2"/>
+  <g c="E22F" x="0.0" y="0.0" w="400.0" h="100.0" h-a-x="400" n="tremoloDivisiDots3"/>
+  <g c="E230" x="0.0" y="0.0" w="550.0" h="100.0" h-a-x="550" n="tremoloDivisiDots4"/>
+  <g c="E231" x="0.0" y="0.0" w="400.0" h="250.0" h-a-x="400" n="tremoloDivisiDots6"/>
   <g c="E240" x="0.0" y="-810.19" w="264.0" h="819.19" h-a-x="264" n="flag8thUp">
     <a n="graceNoteSlashNE" x="1.28" y="-0.8"/>
     <a n="graceNoteSlashSW" x="-0.64" y="-2.46"/>
@@ -575,7 +582,9 @@
   <g c="E88A" x="10.0" y="58.0" w="111.0" h="210.0" h-a-x="111" n="tupletColon"/>
   <g c="E901" x="0.0" y="-169.0" w="339.0" h="1091.0" h-a-x="339" n="mensuralGclefPetrucci"/>
   <g c="E902" x="0.0" y="-231.0" w="264.0" h="452.0" h-a-x="264" n="chantFclef"/>
+  <g c="E903" x="0.0" y="-172.0" w="297.0" h="344.0" h-a-x="298" n="mensuralFclef"/>
   <g c="E904" x="0.0" y="-1069.0" w="488.0" h="1660.0" h-a-x="488" n="mensuralFclefPetrucci"/>
+  <g c="E905" x="0.0" y="-500.0" w="650.0" h="1000.0" h-a-x="650" n="mensuralCclef"/>
   <g c="E906" x="0.0" y="-221.0" w="134.0" h="442.0" h-a-x="134" n="chantCclef"/>
   <g c="E907" x="0.0" y="-349.0" w="244.0" h="1149.0" h-a-x="244" n="mensuralCclefPetrucciPosLowest"/>
   <g c="E908" x="0.0" y="-600.0" w="244.0" h="1400.0" h-a-x="244" n="mensuralCclefPetrucciPosLow"/>
@@ -702,6 +711,331 @@
   <g c="EBE7" x="25.0" y="0.0" w="242.0" h="301.0" h-a-x="242" n="luteItalianFret7"/>
   <g c="EBE8" x="24.0" y="0.0" w="230.0" h="301.0" h-a-x="230" n="luteItalianFret8"/>
   <g c="EBE9" x="24.0" y="0.0" w="235.0" h="300.0" h-a-x="235" n="luteItalianFret9"/>
+  <g c="EC80" x="0.0" y="-622.0" w="118.0" h="1236.0" h-a-x="118" n="timeSigBracketLeft"/>
+  <g c="EC81" x="0.0" y="-622.0" w="118.0" h="1236.0" h-a-x="118" n="timeSigBracketRight"/>
+  <g c="EC82" x="0.0" y="-372.0" w="118.0" h="736.0" h-a-x="118" n="timeSigBracketLeftSmall"/>
+  <g c="EC83" x="0.0" y="-372.0" w="118.0" h="736.0" h-a-x="118" n="timeSigBracketRightSmall"/>
+  <g c="EC84" x="0.0" y="-517.0" w="327.0" h="1033.0" h-a-x="327" n="timeSigSlash"/>
+  <g c="EC85" x="20.0" y="-362.0" w="406.0" h="723.0" h-a-x="446" n="timeSigCut2"/>
+  <g c="EC86" x="17.0" y="-361.0" w="381.0" h="723.0" h-a-x="398" n="timeSigCut3"/>
   <g c="ED40" x="0.0" y="1.0" w="708.0" h="244.0" h-a-x="708" n="articSoftAccentAbove"/>
   <g c="ED41" x="0.0" y="-245.0" w="708.0" h="244.0" h-a-x="708" n="articSoftAccentBelow"/>
+  <g c="F400" x="0.0" y="0.0" w="103.0" h="997.0" h-a-x="103" n="braceSmall"/>
+  <g c="F401" x="0.0" y="1.0" w="67.0" h="997.0" h-a-x="67" n="braceLarge"/>
+  <g c="F402" x="0.0" y="0.0" w="60.0" h="997.0" h-a-x="61" n="braceLarger"/>
+  <g c="F403" x="0.0" y="1.0" w="56.0" h="999.0" h-a-x="57" n="braceFlat"/>
+  <g c="F404" x="0.0" y="0.0" w="772.0" h="787.0" h-a-x="777" n="segnoJapanese"/>
+  <g c="F405" x="0.0" y="-153.0" w="957.0" h="1053.0" h-a-x="954" n="codaJapanese"/>
+  <g c="F406" x="0.0" y="-585.0" w="851.0" h="846.0" h-a-x="851" n="fClefFrench"/>
+  <g c="F407" x="0.0" y="-582.0" w="1041.0" h="855.0" h-a-x="1041" n="fClef19thCentury"/>
+  <g c="F408" x="0.0" y="-779.0" w="863.0" h="1420.0" h-a-x="863" n="cClefFrench"/>
+  <g c="F409" x="0.0" y="250.0" w="292.0" h="500.0" h-a-x="297" n="unpitchedPercussionClef1Alt"/>
+  <g c="F40A" x="-6.0" y="-1005.0" w="547.0" h="2012.0" h-a-x="516" n="6stringTabClefTall"/>
+  <g c="F40B" x="0.0" y="-754.0" w="487.0" h="1509.0" h-a-x="487" n="6stringTabClefSerif"/>
+  <g c="F40C" x="0.0" y="-586.0" w="318.0" h="1172.0" h-a-x="318" n="4stringTabClefTall"/>
+  <g c="F40D" x="0.0" y="-502.0" w="324.0" h="1004.0" h-a-x="324" n="4stringTabClefSerif"/>
+  <g c="F40F" x="0.0" y="-355.0" w="240.0" h="355.0" h-a-x="250" n="flag8thUpStraight">
+    <a n="stemUpNW" x="0.0" y="-0.22"/>
+  </g>
+  <g c="F410" x="0.0" y="-548.0" w="267.0" h="556.0" h-a-x="267" n="flag8thUpShort">
+    <a n="stemUpNW" x="0.0" y="-0.2"/>
+  </g>
+  <g c="F411" x="0.0" y="0.0" w="240.0" h="355.0" h-a-x="262" n="flag8thDownStraight">
+    <a n="stemDownSW" x="0.0" y="0.12"/>
+  </g>
+  <g c="F412" x="0.0" y="-555.0" w="240.0" h="555.0" h-a-x="262" n="flag16thUpStraight">
+    <a n="stemUpNW" x="0.0" y="-0.18"/>
+  </g>
+  <g c="F413" x="0.0" y="-624.0" w="264.0" h="636.0" h-a-x="264" n="flag16thUpShort">
+    <a n="stemUpNW" x="0.0" y="-0.26"/>
+  </g>
+  <g c="F414" x="0.0" y="0.0" w="240.0" h="555.0" h-a-x="279" n="flag16thDownStraight">
+    <a n="stemDownSW" x="0.0" y="0.12"/>
+  </g>
+  <g c="F415" x="0.0" y="-552.0" w="240.0" h="755.0" h-a-x="262" n="flag32ndUpStraight">
+    <a n="stemUpNW" x="0.0" y="0.7"/>
+  </g>
+  <g c="F416" x="0.0" y="-613.0" w="264.0" h="834.0" h-a-x="265" n="flag32ndUpShort">
+    <a n="stemUpNW" x="0.0" y="0.7"/>
+  </g>
+  <g c="F417" x="0.0" y="-200.0" w="240.0" h="755.0" h-a-x="276" n="flag32ndDownStraight">
+    <a n="stemDownSW" x="0.0" y="-0.68"/>
+  </g>
+  <g c="F418" x="0.0" y="-552.0" w="240.0" h="955.0" h-a-x="262" n="flag64thUpStraight">
+    <a n="stemUpNW" x="0.0" y="1.49"/>
+  </g>
+  <g c="F419" x="0.0" y="-624.0" w="264.0" h="1027.0" h-a-x="262" n="flag64thUpShort">
+    <a n="stemUpNW" x="0.0" y="1.39"/>
+  </g>
+  <g c="F41A" x="0.0" y="-400.0" w="240.0" h="955.0" h-a-x="275" n="flag64thDownStraight">
+    <a n="stemDownSW" x="0.0" y="-1.18"/>
+  </g>
+  <g c="F41B" x="0.0" y="-555.0" w="240.0" h="1155.0" h-a-x="264" n="flag128thUpStraight">
+    <a n="stemUpNW" x="0.0" y="2.3"/>
+  </g>
+  <g c="F41C" x="0.0" y="-623.0" w="264.0" h="1214.0" h-a-x="259" n="flag128thUpShort">
+    <a n="stemUpNW" x="0.0" y="2.08"/>
+  </g>
+  <g c="F41D" x="0.0" y="-600.0" w="240.0" h="1155.0" h-a-x="275" n="flag128thDownStraight">
+    <a n="stemDownSW" x="0.0" y="-2.28"/>
+  </g>
+  <g c="F41E" x="0.0" y="-555.0" w="240.0" h="1355.0" h-a-x="268" n="flag256thUpStraight">
+    <a n="stemUpNW" x="0.0" y="3.07"/>
+  </g>
+  <g c="F41F" x="0.0" y="-614.0" w="264.0" h="1402.0" h-a-x="265" n="flag256thUpShort">
+    <a n="stemUpNW" x="0.0" y="2.84"/>
+  </g>
+  <g c="F420" x="0.0" y="-800.0" w="240.0" h="1355.0" h-a-x="301" n="flag256thDownStraight">
+    <a n="stemDownSW" x="0.0" y="-3.07"/>
+  </g>
+  <g c="F421" x="0.0" y="-555.0" w="240.0" h="1555.0" h-a-x="268" n="flag512thUpStraight">
+    <a n="stemUpNW" x="0.0" y="3.86"/>
+  </g>
+  <g c="F422" x="0.0" y="-616.0" w="264.0" h="1565.0" h-a-x="268" n="flag512thUpShort">
+    <a n="stemUpNW" x="0.0" y="3.54"/>
+  </g>
+  <g c="F423" x="0.0" y="-1000.0" w="240.0" h="1555.0" h-a-x="301" n="flag512thDownStraight">
+    <a n="stemDownSW" x="0.0" y="-3.88"/>
+  </g>
+  <g c="F424" x="0.0" y="-555.0" w="240.0" h="1755.0" h-a-x="301" n="flag1024thUpStraight">
+    <a n="stemUpNW" x="0.0" y="4.64"/>
+  </g>
+  <g c="F425" x="0.0" y="-614.0" w="264.0" h="1730.0" h-a-x="272" n="flag1024thUpShort">
+    <a n="stemUpNW" x="0.0" y="4.26"/>
+  </g>
+  <g c="F426" x="0.0" y="-1200.0" w="240.0" h="1755.0" h-a-x="301" n="flag1024thDownStraight">
+    <a n="stemDownSW" x="0.0" y="-4.66"/>
+  </g>
+  <g c="F427" x="1.0" y="-177.0" w="262.0" h="620.0" h-a-x="263" n="accidentalFlatSmall"/>
+  <g c="F428" x="0.0" y="-334.0" w="190.0" h="675.0" h-a-x="190" n="accidentalNaturalSmall"/>
+  <g c="F429" x="0.0" y="-349.0" w="261.0" h="700.0" h-a-x="261" n="accidentalSharpSmall"/>
+  <g c="F42A" x="0.0" y="1.0" w="429.0" h="304.0" h-a-x="431" n="articAccentAboveLarge"/>
+  <g c="F42B" x="0.0" y="-304.0" w="429.0" h="304.0" h-a-x="431" n="articAccentBelowLarge"/>
+  <g c="F432" x="0.0" y="0.0" w="200.0" h="300.0" h-a-x="200" n="pluckedSnapPizzicatoBelowGerman"/>
+  <g c="F433" x="0.0" y="0.0" w="200.0" h="300.0" h-a-x="200" n="pluckedSnapPizzicatoAboveGerman"/>
+  <g c="F434" x="0.0" y="-8.0" w="923.0" h="563.0" h-a-x="922" n="keyboardPedalPedNoDot"/>
+  <g c="F435" x="0.0" y="-15.0" w="1014.0" h="606.0" h-a-x="1014" n="keyboardPedalSostNoDot"/>
+  <g c="F43F" x="0.0" y="-169.0" w="529.0" h="338.0" h-a-x="529" n="noteheadDoubleWholeAlt">
+    <a n="noteheadOrigin" x="0.14" y="0.0"/>
+  </g>
+  <g c="F440" x="5.0" y="-258.0" w="116.0" h="516.0" h-a-x="126" n="timeSig0Large"/>
+  <g c="F441" x="4.0" y="-250.0" w="62.0" h="500.0" h-a-x="71" n="timeSig1Large"/>
+  <g c="F442" x="8.0" y="-250.0" w="120.0" h="500.0" h-a-x="132" n="timeSig2Large"/>
+  <g c="F443" x="4.0" y="-254.0" w="119.0" h="508.0" h-a-x="130" n="timeSig3Large"/>
+  <g c="F444" x="5.0" y="-250.0" w="123.0" h="500.0" h-a-x="132" n="timeSig4Large"/>
+  <g c="F445" x="5.0" y="-254.0" w="119.0" h="508.0" h-a-x="128" n="timeSig5Large"/>
+  <g c="F446" x="4.0" y="-254.0" w="118.0" h="508.0" h-a-x="128" n="timeSig6Large"/>
+  <g c="F447" x="4.0" y="-250.0" w="119.0" h="500.0" h-a-x="128" n="timeSig7Large"/>
+  <g c="F448" x="4.0" y="-254.0" w="120.0" h="508.0" h-a-x="130" n="timeSig8Large"/>
+  <g c="F449" x="5.0" y="-258.0" w="117.0" h="516.0" h-a-x="128" n="timeSig9Large"/>
+  <g c="F44A" x="5.0" y="-259.0" w="127.0" h="517.0" h-a-x="139" n="timeSigCommonLarge"/>
+  <g c="F44B" x="4.0" y="-314.0" w="128.0" h="627.0" h-a-x="139" n="timeSigCutCommonLarge"/>
+  <g c="F44C" x="0.0" y="-149.0" w="80.0" h="298.0" h-a-x="80" n="timeSigPlusLarge"/>
+  <g c="F45A" x="0.0" y="0.0" w="291.0" h="269.0" h-a-x="291" n="luteFrenchFretCAlt"/>
+  <g c="F45D" x="20.0" y="-250.0" w="430.0" h="501.0" h-a-x="470" n="timeSig0Small"/>
+  <g c="F45E" x="20.0" y="-251.0" w="321.0" h="501.0" h-a-x="361" n="timeSig1Small"/>
+  <g c="F45F" x="20.0" y="-255.0" w="406.0" h="511.0" h-a-x="446" n="timeSig2Small"/>
+  <g c="F460" x="20.0" y="-250.0" w="381.0" h="500.0" h-a-x="421" n="timeSig3Small"/>
+  <g c="F461" x="20.0" y="-251.0" w="443.0" h="501.0" h-a-x="483" n="timeSig4Small"/>
+  <g c="F462" x="20.0" y="-248.0" w="363.0" h="497.0" h-a-x="403" n="timeSig5Small"/>
+  <g c="F463" x="20.0" y="-250.0" w="394.0" h="500.0" h-a-x="434" n="timeSig6Small"/>
+  <g c="F464" x="20.0" y="-250.0" w="401.0" h="499.0" h-a-x="441" n="timeSig7Small"/>
+  <g c="F465" x="20.0" y="-259.0" w="396.0" h="518.0" h-a-x="436" n="timeSig8Small"/>
+  <g c="F466" x="20.0" y="-250.0" w="394.0" h="500.0" h-a-x="434" n="timeSig9Small"/>
+  <g c="F467" x="0.0" y="-169.0" w="683.0" h="338.0" h-a-x="683" n="noteheadDoubleWholeSmall">
+    <a n="noteheadOrigin" x="0.44" y="0.0"/>
+  </g>
+  <g c="F468" x="0.0" y="-137.0" w="459.0" h="273.0" h-a-x="459" n="noteheadWholeSmall"/>
+  <g c="F469" x="0.0" y="-145.0" w="341.0" h="290.0" h-a-x="341" n="noteheadHalfSmall">
+    <a n="stemDownNW" x="0.0" y="-0.2"/>
+    <a n="stemUpSE" x="1.36" y="0.19"/>
+  </g>
+  <g c="F46A" x="0.0" y="-144.0" w="352.0" h="282.0" h-a-x="352" n="noteheadBlackSmall">
+    <a n="stemDownNW" x="0.0" y="-0.17"/>
+    <a n="stemUpSE" x="1.41" y="0.16"/>
+  </g>
+  <g c="F46B" x="-86.0" y="-134.0" w="521.0" h="414.0" h-a-x="435" n="dynamicPianoSmall"/>
+  <g c="F46C" x="0.0" y="-11.0" w="542.0" h="284.0" h-a-x="542" n="dynamicMezzoSmall"/>
+  <g c="F46D" x="-140.0" y="-166.0" w="585.0" h="623.0" h-a-x="445" n="dynamicForteSmall"/>
+  <g c="F46E" x="0.0" y="0.0" w="359.0" h="287.0" h-a-x="359" n="dynamicRinforzandoSmall"/>
+  <g c="F46F" x="1.0" y="1.0" w="224.0" h="285.0" h-a-x="225" n="dynamicSforzandoSmall"/>
+  <g c="F470" x="0.0" y="-4.0" w="292.0" h="285.0" h-a-x="292" n="dynamicZSmall"/>
+  <g c="F471" x="-37.0" y="-6.0" w="371.0" h="285.0" h-a-x="334" n="dynamicNienteSmall"/>
+  <g c="F472" x="0.0" y="-689.0" w="666.0" h="1760.0" h-a-x="666" n="gClefSmall"/>
+  <g c="F473" x="0.0" y="-503.0" w="766.0" h="1006.0" h-a-x="766" n="cClefSmall"/>
+  <g c="F474" x="-23.0" y="-627.0" w="724.0" h="884.0" h-a-x="700" n="fClefSmall"/>
+  <g c="F475" x="0.0" y="0.0" w="333.0" h="244.0" h-a-x="333" n="articAccentAboveSmall"/>
+  <g c="F476" x="0.0" y="-244.0" w="333.0" h="244.0" h-a-x="333" n="articAccentBelowSmall"/>
+  <g c="F477" x="0.0" y="0.0" w="122.0" h="122.0" h-a-x="123" n="articStaccatoAboveSmall"/>
+  <g c="F478" x="0.0" y="-122.0" w="122.0" h="122.0" h-a-x="123" n="articStaccatoBelowSmall"/>
+  <g c="F479" x="0.0" y="0.0" w="339.0" h="64.0" h-a-x="339" n="articTenutoAboveSmall"/>
+  <g c="F47A" x="0.0" y="-64.0" w="339.0" h="64.0" h-a-x="339" n="articTenutoBelowSmall"/>
+  <g c="F47B" x="0.0" y="0.0" w="132.0" h="295.0" h-a-x="132" n="articStaccatissimoAboveSmall"/>
+  <g c="F47C" x="0.0" y="-295.0" w="132.0" h="295.0" h-a-x="132" n="articStaccatissimoBelowSmall"/>
+  <g c="F47D" x="0.0" y="0.0" w="117.0" h="290.0" h-a-x="117" n="articStaccatissimoWedgeAboveSmall"/>
+  <g c="F47E" x="0.0" y="-290.0" w="117.0" h="290.0" h-a-x="117" n="articStaccatissimoWedgeBelowSmall"/>
+  <g c="F47F" x="0.0" y="0.0" w="64.0" h="290.0" h-a-x="64" n="articStaccatissimoStrokeAboveSmall"/>
+  <g c="F480" x="0.0" y="-290.0" w="64.0" h="290.0" h-a-x="64" n="articStaccatissimoStrokeBelowSmall"/>
+  <g c="F481" x="0.0" y="-1.0" w="236.0" h="254.0" h-a-x="236" n="articMarcatoAboveSmall"/>
+  <g c="F482" x="0.0" y="-254.0" w="236.0" h="254.0" h-a-x="236" n="articMarcatoBelowSmall"/>
+  <g c="F483" x="0.0" y="0.0" w="236.0" h="474.0" h-a-x="236" n="articMarcatoStaccatoAboveSmall"/>
+  <g c="F484" x="0.0" y="-509.0" w="236.0" h="508.0" h-a-x="236" n="articMarcatoStaccatoBelowSmall"/>
+  <g c="F485" x="0.0" y="0.0" w="333.0" h="464.0" h-a-x="333" n="articAccentStaccatoAboveSmall"/>
+  <g c="F486" x="0.0" y="-448.0" w="333.0" h="448.0" h-a-x="333" n="articAccentStaccatoBelowSmall"/>
+  <g c="F487" x="0.0" y="0.0" w="339.0" h="282.0" h-a-x="339" n="articTenutoStaccatoAboveSmall"/>
+  <g c="F488" x="0.0" y="-286.0" w="339.0" h="286.0" h-a-x="339" n="articTenutoStaccatoBelowSmall"/>
+  <g c="F489" x="0.0" y="0.0" w="339.0" h="384.0" h-a-x="339" n="articTenutoAccentAboveSmall"/>
+  <g c="F48A" x="0.0" y="-394.0" w="339.0" h="394.0" h-a-x="339" n="articTenutoAccentBelowSmall"/>
+  <g c="F48B" x="1.0" y="-807.0" w="268.0" h="818.0" h-a-x="268" n="flag8thUpSmall">
+    <a n="stemUpNW" x="0.0" y="0.0"/>
+  </g>
+  <g c="F48C" x="1.0" y="-8.0" w="268.0" h="816.36" h-a-x="269" n="flag8thDownSmall">
+    <a n="stemDownSW" x="0.0" y="0.0"/>
+  </g>
+  <g c="F48D" x="0.0" y="-808.0" w="286.0" h="826.0" h-a-x="286" n="flag16thUpSmall">
+    <a n="stemUpNW" x="0.0" y="-0.08"/>
+  </g>
+  <g c="F48E" x="0.0" y="-19.0" w="317.0" h="841.0" h-a-x="317" n="flag16thDownSmall">
+    <a n="stemDownSW" x="0.0" y="0.07"/>
+  </g>
+  <g c="F48F" x="0.0" y="-809.0" w="286.0" h="1012.0" h-a-x="286" n="flag32ndUpSmall">
+    <a n="stemUpNW" x="0.0" y="0.66"/>
+  </g>
+  <g c="F490" x="0.0" y="-225.0" w="317.0" h="1035.0" h-a-x="317" n="flag32ndDownSmall">
+    <a n="stemDownSW" x="0.0" y="-0.72"/>
+  </g>
+  <g c="F491" x="0.0" y="-811.0" w="287.0" h="1207.0" h-a-x="287" n="flag64thUpSmall">
+    <a n="stemUpNW" x="0.0" y="1.39"/>
+  </g>
+  <g c="F492" x="0.0" y="-408.0" w="318.0" h="1218.0" h-a-x="318" n="flag64thDownSmall">
+    <a n="stemDownSW" x="0.0" y="-1.47"/>
+  </g>
+  <g c="F493" x="0.0" y="-810.0" w="287.0" h="1412.0" h-a-x="287" n="flag128thUpSmall">
+    <a n="stemUpNW" x="0.0" y="2.2"/>
+  </g>
+  <g c="F494" x="0.0" y="-618.0" w="317.0" h="1427.0" h-a-x="317" n="flag128thDownSmall">
+    <a n="stemDownSW" x="0.0" y="-2.28"/>
+  </g>
+  <g c="F495" x="0.0" y="-811.0" w="287.0" h="1579.0" h-a-x="287" n="flag256thUpSmall">
+    <a n="stemUpNW" x="0.0" y="2.94"/>
+  </g>
+  <g c="F496" x="0.0" y="-791.0" w="317.0" h="1595.0" h-a-x="317" n="flag256thDownSmall">
+    <a n="stemDownSW" x="0.0" y="-3.04"/>
+  </g>
+  <g c="F497" x="0.0" y="-811.0" w="287.0" h="1763.0" h-a-x="287" n="flag512thUpSmall">
+    <a n="stemUpNW" x="0.0" y="3.66"/>
+  </g>
+  <g c="F498" x="0.0" y="-980.0" w="317.0" h="1789.0" h-a-x="317" n="flag512thDownSmall">
+    <a n="stemDownSW" x="0.0" y="-3.74"/>
+  </g>
+  <g c="F499" x="0.0" y="-811.0" w="287.0" h="1941.0" h-a-x="287" n="flag1024thUpSmall">
+    <a n="stemUpNW" x="0.0" y="4.25"/>
+  </g>
+  <g c="F49A" x="0.0" y="-1181.0" w="318.0" h="1992.0" h-a-x="318" n="flag1024thDownSmall">
+    <a n="stemDownSW" x="0.0" y="-4.47"/>
+  </g>
+  <g c="F49B" x="0.0" y="-550.0" w="284.0" h="1100.0" h-a-x="284" n="mensuralCclefVoid"/>
+  <g c="F49C" x="0.0" y="-550.0" w="284.0" h="1100.0" h-a-x="284" n="mensuralCclefBlack"/>
+  <g c="F49D" x="1.0" y="-414.0" w="288.0" h="574.0" h-a-x="289" n="chantFclefHufnagel"/>
+  <g c="F49E" x="0.0" y="-188.0" w="286.0" h="378.0" h-a-x="286" n="chantCclefHufnagel"/>
+  <g c="F49F" x="0.0" y="-88.0" w="145.0" h="554.0" h-a-x="145" n="medRenFlatSoftBOld"/>
+  <g c="F4A0" x="0.0" y="-101.0" w="168.0" h="565.0" h-a-x="168" n="medRenFlatSoftBHufnagel"/>
+  <g c="F4A1" x="0.0" y="-175.0" w="411.0" h="612.0" h-a-x="411" n="accidentalDoubleFlatJoinedStems"/>
+  <g c="F4A2" x="0.0" y="-175.0" w="596.0" h="614.0" h-a-x="596" n="accidentalTripleFlatJoinedStems"/>
+  <g c="F4BA" x="0.0" y="-171.0" w="655.0" h="338.0" h-a-x="657" n="noteheadDoubleWholeOversized">
+    <a n="noteheadOrigin" x="0.39" y="0.0"/>
+  </g>
+  <g c="F4BB" x="0.0" y="-250.0" w="533.0" h="500.0" h-a-x="533" n="noteheadDoubleWholeSquareOversized"/>
+  <g c="F4BC" x="0.0" y="-136.0" w="459.0" h="273.0" h-a-x="459" n="noteheadWholeOversized"/>
+  <g c="F4BD" x="0.0" y="-140.0" w="329.0" h="280.0" h-a-x="329" n="noteheadHalfOversized">
+    <a n="splitStemDownNE" x="1.03" y="-0.37"/>
+    <a n="splitStemDownNW" x="0.11" y="-0.45"/>
+    <a n="splitStemUpSE" x="1.22" y="0.44"/>
+    <a n="splitStemUpSW" x="0.32" y="0.39"/>
+    <a n="stemDownNW" x="0.0" y="-0.2"/>
+    <a n="stemUpSE" x="1.32" y="0.19"/>
+  </g>
+  <g c="F4BE" x="0.0" y="-140.0" w="329.0" h="280.0" h-a-x="329" n="noteheadBlackOversized">
+    <a n="splitStemDownNE" x="1.05" y="-0.31"/>
+    <a n="splitStemDownNW" x="0.1" y="-0.44"/>
+    <a n="splitStemUpSE" x="1.24" y="0.41"/>
+    <a n="splitStemUpSW" x="0.31" y="0.37"/>
+    <a n="stemDownNW" x="0.0" y="-0.18"/>
+    <a n="stemUpSE" x="1.32" y="0.19"/>
+  </g>
+  <g c="F4BF" x="0.0" y="-539.0" w="643.0" h="1077.0" h-a-x="643" n="cClefFrench20C"/>
+  <g c="F4C0" x="0.0" y="-359.0" w="472.0" h="724.0" h-a-x="472" n="cClefFrench20CChange"/>
+  <g c="F4C2" x="0.0" y="-8.0" w="646.0" h="469.0" h-a-x="646" n="sedicesima"/>
+  <g c="F4C3" x="0.0" y="-8.0" w="1315.0" h="469.0" h-a-x="1316" n="sedicesimaAlta"/>
+  <g c="F4C4" x="0.0" y="-8.0" w="1285.0" h="469.0" h-a-x="1286" n="sedicesimaBassa"/>
+  <g c="F4C5" x="4.0" y="-7.0" w="753.0" h="470.0" h-a-x="757" n="ventiquattresima"/>
+  <g c="F4C6" x="4.0" y="-7.0" w="1441.0" h="470.0" h-a-x="1445" n="ventiquattresimaAlta"/>
+  <g c="F4C7" x="4.0" y="-7.0" w="1441.0" h="470.0" h-a-x="1445" n="ventiquattresimaBassa"/>
+  <g c="F4C8" x="0.0" y="-8.0" w="1232.0" h="469.0" h-a-x="1231" n="sedicesimaBassaMb"/>
+  <g c="F4C9" x="4.0" y="-7.0" w="1398.0" h="470.0" h-a-x="1402" n="ventiquattresimaBassaMb"/>
+  <g c="F4CC" x="10.0" y="-13.0" w="255.0" h="391.0" h-a-x="254" n="tuplet0Light"/>
+  <g c="F4CD" x="10.0" y="0.0" w="206.0" h="378.0" h-a-x="206" n="tuplet1Light"/>
+  <g c="F4CE" x="10.0" y="0.0" w="281.0" h="378.0" h-a-x="281" n="tuplet2Light"/>
+  <g c="F4CF" x="10.0" y="-13.0" w="265.0" h="391.0" h-a-x="265" n="tuplet3Light"/>
+  <g c="F4D0" x="10.0" y="0.0" w="264.0" h="378.0" h-a-x="263" n="tuplet4Light"/>
+  <g c="F4D1" x="10.0" y="-13.0" w="273.0" h="391.0" h-a-x="273" n="tuplet5Light"/>
+  <g c="F4D2" x="10.0" y="-13.0" w="261.0" h="391.0" h-a-x="261" n="tuplet6Light"/>
+  <g c="F4D3" x="20.0" y="-11.0" w="235.0" h="381.0" h-a-x="235" n="tuplet7Light"/>
+  <g c="F4D4" x="10.0" y="-8.0" w="270.0" h="390.0" h-a-x="269" n="tuplet8Light"/>
+  <g c="F4D5" x="10.0" y="-8.0" w="265.0" h="390.0" h-a-x="265" n="tuplet9Light"/>
+  <g c="F4D6" x="10.0" y="-4.0" w="134.0" h="298.0" h-a-x="134" n="tupletColonLight"/>
+  <g c="F4E4" x="0.0" y="-300.0" w="636.0" h="600.0" h-a-x="636" n="noteheadSlashHorizontalEndsOversized">
+    <a n="stemDownNW" x="0.0" y="-1.2"/>
+    <a n="stemUpSE" x="2.55" y="1.2"/>
+  </g>
+  <g c="F4E5" x="0.0" y="-300.0" w="1176.0" h="600.0" h-a-x="1176" n="noteheadSlashWhiteWholeOversized"/>
+  <g c="F4E6" x="0.0" y="-300.0" w="936.0" h="600.0" h-a-x="936" n="noteheadSlashWhiteHalfOversized">
+    <a n="stemDownNW" x="0.0" y="-1.2"/>
+    <a n="stemUpSE" x="3.74" y="1.2"/>
+  </g>
+  <g c="F4EE" x="0.0" y="-157.0" w="112.0" h="314.0" h-a-x="111" n="timeSigPlusSmallLarge"/>
+  <g c="F4EF" x="0.0" y="-262.0" w="73.0" h="524.0" h-a-x="74" n="timeSigFractionalSlashLarge"/>
+  <g c="F4F0" x="0.0" y="-86.0" w="112.0" h="175.0" h-a-x="111" n="timeSigEqualsLarge"/>
+  <g c="F4F1" x="0.0" y="-24.0" w="112.0" h="47.0" h-a-x="111" n="timeSigMinusLarge"/>
+  <g c="F4F2" x="0.0" y="-128.0" w="91.0" h="255.0" h-a-x="92" n="timeSigMultiplyLarge"/>
+  <g c="F4F3" x="0.0" y="-329.0" w="54.0" h="658.0" h-a-x="44" n="timeSigParensLeftSmallLarge"/>
+  <g c="F4F4" x="-10.0" y="-329.0" w="54.0" h="658.0" h-a-x="44" n="timeSigParensRightSmallLarge"/>
+  <g c="F4F5" x="0.0" y="-494.0" w="51.0" h="988.0" h-a-x="51" n="timeSigParensLeftLarge"/>
+  <g c="F4F6" x="0.0" y="-494.0" w="51.0" h="988.0" h-a-x="51" n="timeSigParensRightLarge"/>
+  <g c="F4FF" x="0.0" y="-500.0" w="46.0" h="1000.0" h-a-x="50" n="timeSigBracketLeftLarge"/>
+  <g c="F500" x="4.0" y="-500.0" w="46.0" h="1000.0" h-a-x="50" n="timeSigBracketRightLarge"/>
+  <g c="F501" x="0.0" y="-330.0" w="46.0" h="659.0" h-a-x="50" n="timeSigBracketLeftSmallLarge"/>
+  <g c="F502" x="3.0" y="-330.0" w="47.0" h="659.0" h-a-x="50" n="timeSigBracketRightSmallLarge"/>
+  <g c="F503" x="0.0" y="-499.0" w="111.0" h="999.0" h-a-x="111" n="timeSigSlashLarge"/>
+  <g c="F504" x="0.0" y="-330.0" w="119.0" h="659.0" h-a-x="119" n="timeSigCut2Large"/>
+  <g c="F505" x="0.0" y="-329.0" w="118.0" h="658.0" h-a-x="118" n="timeSigCut3Large"/>
+  <g c="F506" x="0.0" y="-250.0" w="258.0" h="501.0" h-a-x="258" n="timeSig0Narrow"/>
+  <g c="F507" x="0.0" y="-250.0" w="177.0" h="501.0" h-a-x="177" n="timeSig1Narrow"/>
+  <g c="F508" x="0.0" y="-254.0" w="243.0" h="510.0" h-a-x="244" n="timeSig2Narrow"/>
+  <g c="F509" x="0.0" y="-250.0" w="229.0" h="500.0" h-a-x="229" n="timeSig3Narrow"/>
+  <g c="F50A" x="0.0" y="-250.0" w="258.0" h="501.0" h-a-x="258" n="timeSig4Narrow"/>
+  <g c="F50B" x="0.0" y="-248.0" w="218.0" h="497.0" h-a-x="219" n="timeSig5Narrow"/>
+  <g c="F50C" x="0.0" y="-250.0" w="237.0" h="500.0" h-a-x="237" n="timeSig6Narrow"/>
+  <g c="F50D" x="0.0" y="-249.0" w="241.0" h="499.0" h-a-x="242" n="timeSig7Narrow"/>
+  <g c="F50E" x="0.0" y="-259.0" w="238.0" h="519.0" h-a-x="240" n="timeSig8Narrow"/>
+  <g c="F50F" x="0.0" y="-250.0" w="237.0" h="500.0" h-a-x="237" n="timeSig9Narrow"/>
+  <g c="F510" x="0.0" y="-250.0" w="251.0" h="500.0" h-a-x="252" n="timeSigCommonNarrow"/>
+  <g c="F511" x="0.0" y="-360.0" w="251.0" h="720.0" h-a-x="252" n="timeSigCutCommonNarrow"/>
+  <g c="F512" x="-1.0" y="-250.0" w="300.0" h="500.0" h-a-x="298" n="timeSigPlusNarrow"/>
+  <g c="F513" x="-1.0" y="-133.0" w="154.0" h="256.0" h-a-x="151" n="timeSigPlusSmallNarrow"/>
+  <g c="F514" x="0.0" y="-190.0" w="227.0" h="379.0" h-a-x="227" n="timeSigFractionalSlashNarrow"/>
+  <g c="F515" x="0.0" y="-125.0" w="269.0" h="249.0" h-a-x="269" n="timeSigEqualsNarrow"/>
+  <g c="F516" x="0.0" y="-35.0" w="269.0" h="75.0" h-a-x="269" n="timeSigMinusNarrow"/>
+  <g c="F517" x="0.0" y="-198.0" w="237.0" h="396.0" h-a-x="237" n="timeSigMultiplyNarrow"/>
+  <g c="F518" x="0.0" y="-251.0" w="110.0" h="500.0" h-a-x="110" n="timeSigParensLeftSmallNarrow"/>
+  <g c="F519" x="0.0" y="-251.0" w="110.0" h="500.0" h-a-x="110" n="timeSigParensRightSmallNarrow"/>
+  <g c="F51A" x="0.0" y="-489.0" w="184.0" h="980.0" h-a-x="184" n="timeSigParensLeftNarrow"/>
+  <g c="F51B" x="0.0" y="-489.0" w="184.0" h="980.0" h-a-x="184" n="timeSigParensRightNarrow"/>
+  <g c="F524" x="0.0" y="-622.0" w="118.0" h="1236.0" h-a-x="118" n="timeSigBracketLeftNarrow"/>
+  <g c="F525" x="0.0" y="-622.0" w="118.0" h="1236.0" h-a-x="118" n="timeSigBracketRightNarrow"/>
+  <g c="F526" x="0.0" y="-372.0" w="118.0" h="736.0" h-a-x="118" n="timeSigBracketLeftSmallNarrow"/>
+  <g c="F527" x="0.0" y="-372.0" w="118.0" h="736.0" h-a-x="118" n="timeSigBracketRightSmallNarrow"/>
+  <g c="F528" x="0.0" y="-517.0" w="327.0" h="1033.0" h-a-x="327" n="timeSigSlashNarrow"/>
+  <g c="F529" x="12.0" y="-362.0" w="244.0" h="723.0" h-a-x="256" n="timeSigCut2Narrow"/>
+  <g c="F52A" x="10.0" y="-361.0" w="229.0" h="723.0" h-a-x="250" n="timeSigCut3Narrow"/>
 </bounding-boxes>

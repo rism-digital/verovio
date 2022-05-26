@@ -28,8 +28,8 @@
     <a n="stemDownNW" x="-0.0" y="-0.16"/>
     <a n="stemUpSE" x="1.26" y="0.16"/>
   </g>
-  <g c="E05C" x="0.0" y="-502.0" w="606.0" h="1004.0" h-a-x="656" n="cClef"/>
-  <g c="E05D" x="0.0" y="-735.0" w="606.0" h="1237.0" h-a-x="616" n="cClef8vb"/>
+  <g c="E05C" x="0.0" y="-502.0" w="606.0" h="1004.0" h-a-x="606" n="cClef"/>
+  <g c="E05D" x="0.0" y="-735.0" w="606.0" h="1237.0" h-a-x="606" n="cClef8vb"/>
   <g c="E051" x="-1.0" y="-893.0" w="647.0" h="1976.0" h-a-x="650" n="gClef15mb"/>
   <g c="E050" x="-1.0" y="-655.0" w="647.0" h="1738.0" h-a-x="646" n="gClef"/>
   <g c="E052" x="-1.0" y="-890.0" w="647.0" h="1973.0" h-a-x="646" n="gClef8vb"/>
@@ -146,7 +146,7 @@
   <g c="E4A1" x="0.0" y="-236.0" w="347.0" h="236.0" h-a-x="347" n="articAccentBelow"/>
   <g c="E4A8" x="0.0" y="0.0" w="153.0" h="224.0" h-a-x="153" n="articStaccatissimoWedgeAbove"/>
   <g c="E4A9" x="0.0" y="-224.0" w="153.0" h="224.0" h-a-x="153" n="articStaccatissimoWedgeBelow"/>
-  <g c="E4AA" x="0.0" y="0.0" w="33.0" h="240.0" n="articStaccatissimoStrokeAbove"/>
+  <g c="E4AA" x="0.0" y="0.0" w="33.0" h="240.0" h-a-x="1000" n="articStaccatissimoStrokeAbove"/>
   <g c="E4AB" x="0.0" y="-240.0" w="33.0" h="240.0" h-a-x="34" n="articStaccatissimoStrokeBelow"/>
   <g c="E568" x="0.0" y="0.0" w="468.0" h="244.0" h-a-x="468" n="ornamentTurnInverted"/>
   <g c="E567" x="0.0" y="0.0" w="468.0" h="244.0" h-a-x="468" n="ornamentTurn"/>
@@ -198,26 +198,26 @@
   <g c="E519" x="0.0" y="-15.0" w="991.0" h="326.0" h-a-x="991" n="ventiduesimaBassa"/>
   <g c="E511" x="0.0" y="1.0" w="657.0" h="349.0" h-a-x="657" n="ottavaAlta"/>
   <g c="E512" x="0.0" y="0.0" w="650.0" h="332.0" h-a-x="650" n="ottavaBassa"/>
-  <g c="E513" x="0.0" y="0.0" w="624.0" h="332.0" h-a-x="624" n="ottavaBassaBa"/>
+  <g c="E513" x="0.0" y="0.0" w="624.0" h="332.0" n="ottavaBassaBa"/>
   <g c="E504" x="0.0" y="-242.0" w="508.0" h="484.0" h-a-x="508" n="repeatBarSlash"/>
   <g c="E069" x="0.0" y="-250.0" w="325.0" h="500.0" h-a-x="325" n="unpitchedPercussionClef1"/>
   <g c="E06A" x="0.0" y="-396.0" w="257.0" h="791.0" h-a-x="257" n="unpitchedPercussionClef2"/>
   <g c="E902" x="-189.0" y="-268.0" w="370.0" h="470.0" h-a-x="181" n="chantFclef"/>
   <g c="E906" x="-1.0" y="-202.0" w="182.0" h="404.0" h-a-x="181" n="chantCclef"/>
-  <g c="E4A2" x="0.0" y="0.0" w="95.0" h="94.0" h-a-x="96" n="articStaccatoAbove"/>
-  <g c="E4A3" x="0.0" y="-94.0" w="95.0" h="94.0" h-a-x="96" n="articStaccatoBelow"/>
+  <g c="E4A2" x="0.0" y="0.0" w="96.0" h="96.0" h-a-x="96" n="articStaccatoAbove"/>
+  <g c="E4A3" x="0.0" y="-96.0" w="96.0" h="96.0" h-a-x="96" n="articStaccatoBelow"/>
   <g c="E4A4" x="0.0" y="0.0" w="346.0" h="36.0" h-a-x="346" n="articTenutoAbove"/>
   <g c="E4A5" x="0.0" y="-36.0" w="346.0" h="36.0" h-a-x="346" n="articTenutoBelow"/>
   <g c="E4A6" x="0.0" y="0.0" w="110.54" h="244.0" h-a-x="110" n="articStaccatissimoAbove"/>
   <g c="E4A7" x="0.0" y="-244.0" w="110.54" h="244.0" h-a-x="110" n="articStaccatissimoBelow"/>
   <g c="E4AE" x="0.0" y="0.0" w="273.0" h="375.0" h-a-x="274" n="articMarcatoStaccatoAbove"/>
   <g c="E4AF" x="1.0" y="-375.0" w="273.0" h="375.0" h-a-x="274" n="articMarcatoStaccatoBelow"/>
-  <g c="E4B0" x="0.0" y="0.0" w="347.0" h="346.0" h-a-x="347" n="articAccentStaccatoAbove"/>
-  <g c="E4B1" x="0.0" y="-346.0" w="347.0" h="346.0" h-a-x="347" n="articAccentStaccatoBelow"/>
-  <g c="E4B2" x="0.0" y="0.0" w="347.0" h="173.0" h-a-x="347" n="articTenutoStaccatoAbove"/>
-  <g c="E4B3" x="0.0" y="-173.0" w="347.0" h="173.0" h-a-x="347" n="articTenutoStaccatoBelow"/>
-  <g c="E4B4" x="0.0" y="0.0" w="347.0" h="308.0" h-a-x="347" n="articTenutoAccentAbove"/>
-  <g c="E4B5" x="0.0" y="-308.0" w="347.0" h="308.0" h-a-x="347" n="articTenutoAccentBelow"/>
+  <g c="E4B0" x="0.0" y="0.0" w="346.0" h="346.0" h-a-x="346" n="articAccentStaccatoAbove"/>
+  <g c="E4B1" x="0.0" y="-346.0" w="346.0" h="346.0" h-a-x="346" n="articAccentStaccatoBelow"/>
+  <g c="E4B2" x="0.0" y="0.0" w="346.0" h="173.0" h-a-x="346" n="articTenutoStaccatoAbove"/>
+  <g c="E4B3" x="0.0" y="-173.0" w="346.0" h="173.0" h-a-x="346" n="articTenutoStaccatoBelow"/>
+  <g c="E4B4" x="0.0" y="0.0" w="346.0" h="308.0" h-a-x="346" n="articTenutoAccentAbove"/>
+  <g c="E4B5" x="0.0" y="-308.0" w="346.0" h="308.0" h-a-x="346" n="articTenutoAccentBelow"/>
   <g c="E4B6" x="0.0" y="0.0" w="195.86" h="194.52" h-a-x="196" n="articStressAbove"/>
   <g c="E4B7" x="0.0" y="-194.52" w="195.86" h="194.52" h-a-x="196" n="articStressBelow"/>
   <g c="E4B8" x="0.0" y="0.0" w="270.0" h="167.0" h-a-x="270" n="articUnstressAbove"/>
@@ -246,15 +246,15 @@
   <g c="E94B" x="0.0" y="0.0" w="180.0" h="760.0" h-a-x="180" n="mensuralCombStemUpFlagFusa"/>
   <g c="E94A" x="0.0" y="-760.0" w="180.0" h="760.0" h-a-x="186" n="mensuralCombStemDownFlagSemiminima"/>
   <g c="E94C" x="0.0" y="-760.0" w="180.0" h="760.0" h-a-x="180" n="mensuralCombStemDownFlagFusa"/>
-  <g c="E9F3" x="0.0" y="0.0" w="40.0" h="250.0" n="mensuralRestBrevis"/>
-  <g c="E9F2" x="0.0" y="-250.0" w="40.0" h="500.0" n="mensuralRestLongaImperfecta"/>
-  <g c="E9F1" x="0.0" y="-500.0" w="40.0" h="1000.0" n="mensuralRestLongaPerfecta"/>
-  <g c="E9F0" x="0.0" y="-500.0" w="130.0" h="1000.0" n="mensuralRestMaxima"/>
-  <g c="E9F4" x="0.0" y="110.0" w="40.0" h="140.0" n="mensuralRestSemibrevis"/>
-  <g c="E9F5" x="0.0" y="0.0" w="40.0" h="140.0" n="mensuralRestMinima"/>
-  <g c="E9F6" x="0.0" y="0.0" w="118.0" h="140.0" n="mensuralRestSemiminima"/>
-  <g c="E9F7" x="0.0" y="0.0" w="118.0" h="140.0" n="mensuralRestFusa"/>
-  <g c="E9F8" x="0.0" y="0.0" w="118.0" h="140.0" n="mensuralRestSemifusa"/>
+  <g c="E9F3" x="0.0" y="0.0" w="40.0" h="250.0" h-a-x="1000" n="mensuralRestBrevis"/>
+  <g c="E9F2" x="0.0" y="-250.0" w="40.0" h="500.0" h-a-x="1000" n="mensuralRestLongaImperfecta"/>
+  <g c="E9F1" x="0.0" y="-500.0" w="40.0" h="1000.0" h-a-x="1000" n="mensuralRestLongaPerfecta"/>
+  <g c="E9F0" x="0.0" y="-500.0" w="130.0" h="1000.0" h-a-x="1000" n="mensuralRestMaxima"/>
+  <g c="E9F4" x="0.0" y="110.0" w="40.0" h="140.0" h-a-x="1000" n="mensuralRestSemibrevis"/>
+  <g c="E9F5" x="0.0" y="0.0" w="40.0" h="140.0" h-a-x="1000" n="mensuralRestMinima"/>
+  <g c="E9F6" x="0.0" y="0.0" w="118.0" h="140.0" h-a-x="1000" n="mensuralRestSemiminima"/>
+  <g c="E9F7" x="0.0" y="0.0" w="118.0" h="140.0" h-a-x="1000" n="mensuralRestFusa"/>
+  <g c="E9F8" x="0.0" y="0.0" w="118.0" h="140.0" h-a-x="1000" n="mensuralRestSemifusa"/>
   <g c="E26C" x="0.0" y="-260.0" w="90.0" h="520.0" h-a-x="90" n="accidentalBracketLeft"/>
   <g c="E26D" x="0.0" y="-260.0" w="90.0" h="520.0" h-a-x="90" n="accidentalBracketRight"/>
   <g c="E270" x="-43.0" y="-184.0" w="263.0" h="786.0" h-a-x="221" n="accidentalQuarterToneFlatArrowUp">
@@ -327,38 +327,38 @@
   <g c="EAAD" x="0.0" y="-44.0" w="370.0" h="200.0" h-a-x="370" n="wiggleArpeggiatoUpArrow"/>
   <g c="EAAE" x="0.0" y="-44.0" w="370.0" h="200.0" h-a-x="370" n="wiggleArpeggiatoDownArrow"/>
   <g c="E659" x="0.0" y="-14.0" w="969.0" h="549.0" h-a-x="969" n="keyboardPedalSost"/>
-  <g c="E910" x="0.0" y="-240.0" w="480.0" h="480.0" n="mensuralProlation1"/>
-  <g c="E911" x="0.0" y="-240.0" w="480.0" h="480.0" n="mensuralProlation2"/>
-  <g c="E912" x="0.0" y="-408.0" w="480.0" h="816.0" n="mensuralProlation3"/>
-  <g c="E913" x="0.0" y="-408.0" w="480.0" h="816.0" n="mensuralProlation4"/>
-  <g c="E91B" x="-26.0" y="-266.0" w="532.0" h="532.0" n="mensuralProportionTempusPerfectum"/>
-  <g c="E91C" x="-75.0" y="-240.0" w="625.0" h="480.0" n="mensuralProportionProportioDupla1"/>
-  <g c="E914" x="0.0" y="-240.0" w="450.0" h="480.0" n="mensuralProlation5"/>
-  <g c="E917" x="0.0" y="-408.0" w="450.0" h="816.0" n="mensuralProlation8"/>
-  <g c="E91E" x="-26.0" y="-266.0" w="532.0" h="532.0" n="mensuralProportionProportioTripla"/>
-  <g c="E920" x="0.0" y="-63.0" w="126.0" h="126.0" n="mensuralProlationCombiningDot"/>
+  <g c="E910" x="0.0" y="-240.0" w="480.0" h="480.0" h-a-x="480" n="mensuralProlation1"/>
+  <g c="E911" x="0.0" y="-240.0" w="480.0" h="480.0" h-a-x="480" n="mensuralProlation2"/>
+  <g c="E912" x="0.0" y="-408.0" w="480.0" h="816.0" h-a-x="480" n="mensuralProlation3"/>
+  <g c="E913" x="0.0" y="-408.0" w="480.0" h="816.0" h-a-x="480" n="mensuralProlation4"/>
+  <g c="E91B" x="-26.0" y="-266.0" w="532.0" h="532.0" h-a-x="480" n="mensuralProportionTempusPerfectum"/>
+  <g c="E91C" x="-75.0" y="-240.0" w="625.0" h="480.0" h-a-x="480" n="mensuralProportionProportioDupla1"/>
+  <g c="E914" x="0.0" y="-240.0" w="450.0" h="480.0" h-a-x="450" n="mensuralProlation5"/>
+  <g c="E917" x="0.0" y="-408.0" w="450.0" h="816.0" h-a-x="450" n="mensuralProlation8"/>
+  <g c="E91E" x="-26.0" y="-266.0" w="532.0" h="532.0" h-a-x="450" n="mensuralProportionProportioTripla"/>
+  <g c="E920" x="0.0" y="-63.0" w="126.0" h="126.0" h-a-x="126" n="mensuralProlationCombiningDot"/>
   <g c="E921" x="0.0" y="-47.0" w="223.0" h="93.0" h-a-x="223" n="mensuralProlationCombiningTwoDots"/>
   <g c="E922" x="0.0" y="-40.0" w="292.0" h="80.0" h-a-x="292" n="mensuralProlationCombiningThreeDots"/>
   <g c="E923" x="0.0" y="-88.0" w="196.0" h="176.0" h-a-x="196" n="mensuralProlationCombiningThreeDotsTri"/>
   <g c="E924" x="0.0" y="-131.0" w="264.0" h="262.0" h-a-x="264" n="mensuralProlationCombiningDotVoid"/>
   <g c="E925" x="0.0" y="-408.0" w="36.0" h="816.0" h-a-x="36" n="mensuralProlationCombiningStroke"/>
-  <g c="E918" x="0.0" y="-408.0" w="450.0" h="816.0" n="mensuralProlation9"/>
-  <g c="E915" x="0.0" y="-240.0" w="450.0" h="480.0" n="mensuralProlation6"/>
-  <g c="E916" x="30.0" y="-240.0" w="450.0" h="480.0" n="mensuralProlation7"/>
-  <g c="E919" x="30.0" y="-408.0" w="450.0" h="816.0" n="mensuralProlation10"/>
-  <g c="E91A" x="30.0" y="-240.0" w="450.0" h="480.0" n="mensuralProlation11"/>
-  <g c="E91F" x="-26.0" y="-266.0" w="532.0" h="532.0" n="mensuralProportionProportioQuadrupla"/>
-  <g c="E91D" x="-26.0" y="-266.0" w="532.0" h="532.0" n="mensuralProportionProportioDupla2"/>
-  <g c="EBE0" x="-3.0" y="-3.0" w="226.0" h="252.0" h-a-x="220" n="luteItalianFret0"/>
-  <g c="EBE1" x="-2.09" y="-4.0" w="155.09" h="253.0" h-a-x="148" n="luteItalianFret1"/>
-  <g c="EBE2" x="-3.9" y="-3.0" w="172.9" h="252.0" h-a-x="166" n="luteItalianFret2"/>
-  <g c="EBE3" x="-3.0" y="-3.0" w="172.0" h="252.0" h-a-x="166" n="luteItalianFret3"/>
-  <g c="EBE4" x="-4.0" y="-3.03" w="205.0" h="252.03" h-a-x="198" n="luteItalianFret4"/>
-  <g c="EBE5" x="-3.0" y="-3.0" w="155.0" h="257.0" h-a-x="149" n="luteItalianFret5"/>
-  <g c="EBE6" x="-3.0" y="-3.0" w="182.0" h="252.0" h-a-x="176" n="luteItalianFret6"/>
-  <g c="EBE7" x="-3.02" y="-3.0" w="168.02" h="252.0" h-a-x="162" n="luteItalianFret7"/>
-  <g c="EBE8" x="-3.0" y="-3.0" w="194.0" h="252.0" h-a-x="188" n="luteItalianFret8"/>
-  <g c="EBE9" x="-3.0" y="-3.15" w="185.0" h="252.15" h-a-x="179" n="luteItalianFret9"/>
+  <g c="E918" x="0.0" y="-408.0" w="450.0" h="816.0" h-a-x="450" n="mensuralProlation9"/>
+  <g c="E915" x="0.0" y="-240.0" w="450.0" h="480.0" h-a-x="450" n="mensuralProlation6"/>
+  <g c="E916" x="30.0" y="-240.0" w="450.0" h="480.0" h-a-x="480" n="mensuralProlation7"/>
+  <g c="E919" x="30.0" y="-408.0" w="450.0" h="816.0" h-a-x="480" n="mensuralProlation10"/>
+  <g c="E91A" x="30.0" y="-240.0" w="450.0" h="480.0" h-a-x="480" n="mensuralProlation11"/>
+  <g c="E91F" x="-26.0" y="-266.0" w="532.0" h="532.0" h-a-x="480" n="mensuralProportionProportioQuadrupla"/>
+  <g c="E91D" x="-26.0" y="-266.0" w="532.0" h="532.0" h-a-x="450" n="mensuralProportionProportioDupla2"/>
+  <g c="EBE0" x="17.0" y="-3.0" w="226.0" h="252.0" h-a-x="220" n="luteItalianFret0"/>
+  <g c="EBE1" x="18.0" y="-4.0" w="155.0" h="253.0" h-a-x="148" n="luteItalianFret1"/>
+  <g c="EBE2" x="16.0" y="-3.0" w="173.0" h="252.0" h-a-x="166" n="luteItalianFret2"/>
+  <g c="EBE3" x="17.0" y="-3.0" w="172.0" h="252.0" h-a-x="166" n="luteItalianFret3"/>
+  <g c="EBE4" x="16.0" y="-3.0" w="205.0" h="252.0" h-a-x="198" n="luteItalianFret4"/>
+  <g c="EBE5" x="17.0" y="-3.0" w="155.0" h="257.0" h-a-x="149" n="luteItalianFret5"/>
+  <g c="EBE6" x="17.0" y="-3.0" w="182.0" h="252.0" h-a-x="176" n="luteItalianFret6"/>
+  <g c="EBE7" x="17.0" y="-3.0" w="168.0" h="252.0" h-a-x="162" n="luteItalianFret7"/>
+  <g c="EBE8" x="17.0" y="-3.0" w="194.0" h="252.0" h-a-x="188" n="luteItalianFret8"/>
+  <g c="EBE9" x="17.0" y="-3.0" w="185.0" h="252.0" h-a-x="179" n="luteItalianFret9"/>
   <g c="EBA7" x="0.0" y="0.0" w="88.0" h="791.0" h-a-x="88" n="luteDurationWhole"/>
   <g c="EBA8" x="-1.0" y="0.0" w="405.0" h="795.0" h-a-x="403" n="luteDurationHalf"/>
   <g c="EBAA" x="0.0" y="0.0" w="392.0" h="781.0" h-a-x="393" n="luteDuration8th"/>
@@ -382,7 +382,7 @@
   <g c="EBCA" x="1.0" y="0.0" w="232.0" h="348.0" h-a-x="233" n="luteFrenchFretL"/>
   <g c="EBCB" x="-1.0" y="-1.0" w="550.0" h="229.2" h-a-x="549" n="luteFrenchFretM"/>
   <g c="EBCC" x="0.2" y="-0.2" w="341.2" h="210.8" h-a-x="341" n="luteFrenchFretN"/>
-  <g c="E000" x="0.11" y="1.15" w="92.63" h="997.71" n="brace"/>
+  <g c="E000" x="0.11" y="1.15" w="92.63" h="997.71" h-a-x="1000" n="brace"/>
   <g c="E645" x="-150.0" y="0.0" w="300.0" h="300.0" h-a-x="150" n="vocalSprechgesang"/>
   <g c="E0A9" x="0.0" y="-125.0" w="290.0" h="250.0" h-a-x="290" n="noteheadXBlack">
     <a n="stemDownNW" x="0.0" y="-0.44"/>
@@ -455,7 +455,7 @@
   <g c="E5C7" x="1.0" y="-80.0" w="1104.0" h="448.0" h-a-x="1105" n="ornamentPrecompInvertedMordentUpperPrefix"/>
   <g c="E5C8" x="0.0" y="-243.0" w="756.0" h="483.0" h-a-x="756" n="ornamentPrecompTrillLowerSuffix"/>
   <g c="E56F" x="0.0" y="-107.0" w="500.0" h="397.0" h-a-x="500" n="ornamentHaydn"/>
-  <g c="E587" x="0.0" y="-2.0" w="999.0" h="374.0" n="ornamentSchleifer"/>
+  <g c="E587" x="0.0" y="-2.0" w="999.0" h="374.0" h-a-x="1000" n="ornamentSchleifer"/>
   <g c="E651" x="0.0" y="0.0" w="320.0" h="514.0" h-a-x="320" n="keyboardPedalP"/>
   <g c="E65A" x="0.0" y="-14.0" w="378.0" h="549.0" h-a-x="378" n="keyboardPedalS"/>
   <g c="E4E4" x="0.0" y="0.0" w="300.0" h="125.0" h-a-x="300" n="restHalf"/>
@@ -463,7 +463,7 @@
   <g c="E4E2" x="0.0" y="0.0" w="125.0" h="250.0" h-a-x="125" n="restDoubleWhole"/>
   <g c="E4E1" x="0.0" y="-250.0" w="125.0" h="500.0" h-a-x="125" n="restLonga"/>
   <g c="E4E0" x="0.0" y="-250.0" w="375.0" h="500.0" h-a-x="375" n="restMaxima"/>
-  <g c="E583" x="0.0" y="0.0" w="26.0" h="330.0" n="ornamentVerticalLine"/>
+  <g c="E583" x="0.0" y="0.0" w="26.0" h="330.0" h-a-x="1000" n="ornamentVerticalLine"/>
   <g c="E440" x="0.0" y="-175.0" w="247.0" h="644.0" h-a-x="247" n="accidentalBuyukMucennebFlat">
     <a n="cutOutNE" x="0.32" y="1.48"/>
     <a n="cutOutSE" x="0.63" y="-0.34"/>
@@ -505,10 +505,13 @@
     <a n="cutOutSW" x="0.25" y="-0.82"/>
   </g>
   <g c="E073" x="-1.0" y="-655.0" w="647.0" h="1738.0" h-a-x="646" n="gClefReversed"/>
-  <g c="E074" x="-1.0" y="-655.0" w="647.0" h="1738.0" h-a-x="646" n="gClefTurned"/>
+  <g c="E074" x="-1.0" y="-1083.0" w="647.0" h="1738.0" h-a-x="646" n="gClefTurned"/>
   <g c="E076" x="4.0" y="-581.0" w="694.0" h="832.0" h-a-x="698" n="fClefReversed"/>
   <g c="E077" x="4.0" y="-581.0" w="694.0" h="832.0" h-a-x="698" n="fClefTurned"/>
-  <g c="E075" x="0.0" y="-502.0" w="606.0" h="1004.0" h-a-x="656" n="cClefReversed"/>
+  <g c="E075" x="0.0" y="-502.0" w="606.0" h="1004.0" h-a-x="606" n="cClefReversed"/>
+  <g c="E07A" x="-1.0" y="-509.0" w="503.0" h="1350.0" h-a-x="502" n="gClefChange"/>
+  <g c="E07B" x="0.0" y="-406.0" w="490.0" h="812.0" h-a-x="490" n="cClefChange"/>
+  <g c="E07C" x="3.0" y="-508.0" w="607.0" h="727.0" h-a-x="610" n="fClefChange"/>
   <g c="E06D" x="-3.0" y="-750.0" w="411.0" h="1500.0" h-a-x="409" n="6stringTabClef"/>
   <g c="E06E" x="-3.0" y="-500.0" w="275.0" h="1000.0" h-a-x="271" n="4stringTabClef"/>
   <g c="E055" x="-1.0" y="-655.0" w="1039.0" h="1738.0" h-a-x="646" n="gClef8vbOld"/>
@@ -573,6 +576,7 @@
   <g c="E505" x="0.0" y="-166.0" w="95.0" h="94.0" h-a-x="95" n="repeatBarLowerDot"/>
   <g c="E0A5" x="0.0" y="0.0" w="314" h="0.0" h-a-x="314" n="noteheadNull"/>
   <g c="E940" x="-209.0" y="-209.0" w="418.0" h="418.0" h-a-x="0" n="mensuralCombStemDiagonal"/>
+  <g c="E905" x="0.0" y="-500.0" w="526.0" h="1000.0" h-a-x="526" n="mensuralCclef"/>
   <g c="E941" x="0.0" y="0.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemUpFlagRight"/>
   <g c="E942" x="0.0" y="-760.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemDownFlagRight"/>
   <g c="E943" x="0.0" y="0.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemUpFlagLeft"/>
@@ -581,4 +585,16 @@
   <g c="E946" x="0.0" y="-760.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemDownFlagFlared"/>
   <g c="E947" x="-120.0" y="0.0" w="320.0" h="760.0" h-a-x="211" n="mensuralCombStemUpFlagExtended"/>
   <g c="E948" x="-120.0" y="-760.0" w="320.0" h="760.0" h-a-x="211" n="mensuralCombStemDownFlagExtended"/>
+  <g c="EC85" x="20.0" y="-319.0" w="402.0" h="637.0" h-a-x="442" n="timeSigCut2"/>
+  <g c="EC86" x="20.0" y="-319.0" w="372.0" h="637.0" h-a-x="412" n="timeSigCut3"/>
+  <g c="E903" x="0.0" y="-220.0" w="515.0" h="440.0" h-a-x="515" n="mensuralFclef"/>
+  <g c="EC80" x="0.0" y="-590.0" w="120.0" h="1180.0" h-a-x="120" n="timeSigBracketLeft"/>
+  <g c="EC81" x="0.0" y="-590.0" w="120.0" h="1180.0" h-a-x="120" n="timeSigBracketRight"/>
+  <g c="EC82" x="0.0" y="-340.0" w="120.0" h="680.0" h-a-x="120" n="timeSigBracketLeftSmall"/>
+  <g c="EC83" x="-1.0" y="-340.0" w="121.0" h="680.0" h-a-x="120" n="timeSigBracketRightSmall"/>
+  <g c="EC84" x="0.0" y="-518.0" w="354.0" h="1036.0" h-a-x="354" n="timeSigSlash"/>
+  <g c="E22E" x="0.0" y="0.0" w="246.0" h="96.0" h-a-x="246" n="tremoloDivisiDots2"/>
+  <g c="E22F" x="0.0" y="0.0" w="396.0" h="96.0" h-a-x="396" n="tremoloDivisiDots3"/>
+  <g c="E230" x="0.0" y="0.0" w="546.0" h="96.0" h-a-x="546" n="tremoloDivisiDots4"/>
+  <g c="E231" x="0.0" y="0.0" w="396.0" h="246.0" h-a-x="396" n="tremoloDivisiDots6"/>
 </bounding-boxes>
