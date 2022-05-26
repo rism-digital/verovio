@@ -450,7 +450,7 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     else {
         wchar_t slash = SMUFL_E504_repeatBarSlash;
-        const int slashNum = beatRpt->GetSlash();
+        const int slashNum = beatRpt->HasSlash()? beatRpt->GetSlash() : 1;
         const int halfWidth = m_doc->GetGlyphWidth(slash, staffSize, false) / 2;
         for (int i = 0; i < slashNum; ++i) {
             this->DrawSmuflCode(dc, xSymbol + i * halfWidth, ySymbol, slash, staffSize, false);
