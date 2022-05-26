@@ -2054,6 +2054,76 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         newClef = clefsBefore[dynamic_cast<Syllable *>(sortedSyllables.front())];
     }
 
+    //////////////////////////////////////////////////////////////////////
+    //  HANDLE DIVLINES IN SYLLABLES BEING MERGED:
+    //
+    //  Step 1: Find all divlines in the syllables being merged
+    //  Step 2: Insert the divlines into the set `elements`
+    //  Step 3: Take out the divlines that are to the left/right of the
+    //            first/last neume component respectively.
+    //  Step 4: Relocate these divlines from step 3 into the layer object
+    //////////////////////////////////////////////////////////////////////
+
+    // Step 1:
+    // If there are divlines between the elements getting grouped,
+    // add these divlines to the set of elements to be replaced
+    ListOfObjects divLines;
+    ClassIdComparison divLineComp(DIVLINE);
+
+    for (Object* el : sortedElements) {
+        ListOfObjects tmpDivLines;
+        el->GetFirstAncestor(SYLLABLE)->FindAllDescendantByComparison(&tmpDivLines, &divLineComp);
+
+        divLines.merge(tmpDivLines);
+    }
+
+    // Step 2:
+    for (auto it = divLines.begin(); it != divLines.end(); ++it) {
+        elements.insert(*it);
+    }
+
+    // Step 3:
+    // Collect all div lines to the left and right of the first neume / neume component
+    // of the soon-to-be merged syllable
+    //
+    std::set<Object*> delDivLines;
+
+    std::copy(elements.begin(), elements.end(), std::back_inserter(sortedElements));
+    std::stable_sort(sortedElements.begin(), sortedElements.end(), Object::sortByUlx);
+
+    // scan leftmost divs
+    std::vector<Object *>::iterator left_it = sortedElements.begin();
+    while (left_it != sortedElements.end() && (*left_it)->GetClassId() != NEUME && (*left_it) -> GetClassId() != NC) {
+        if ((*left_it)->GetClassId() == DIVLINE) {
+            delDivLines.insert(*left_it);
+        }
+
+        ++left_it;
+    }
+
+    // scan rightmost divs
+    std::vector<Object *>::reverse_iterator right_it = sortedElements.rbegin();
+    while (right_it != sortedElements.rend() && (*right_it)->GetClassId() != NEUME && (*right_it) -> GetClassId() != NC) {
+        if ((*right_it)->GetClassId() == DIVLINE) {
+            delDivLines.insert(*right_it);
+        }
+
+        ++right_it;
+    }
+
+    // Step 4:
+    // Relocate these `delDivLines` into the layer object, and
+    // remove these divlines from the set `elements`
+    for (Object *div : delDivLines) {
+        div->MoveItselfTo(div->GetFirstAncestor(LAYER));
+        elements.erase(div);
+    }
+
+    ////////////////////////
+    // END DIVLINE CHECKS
+    ////////////////////////
+     
+
     // find parents where all of their children are being grouped
     for (auto it = parents.begin(); it != parents.end(); ++it) {
         auto parentPair = *it;
@@ -2255,11 +2325,13 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             assert(fullSyllable);
             fullSyllable->AddChild(fullSyl);
             
+            // Move elements to the new group syllable
             for (auto it = elements.begin(); it != elements.end(); ++it) {
                 if ((*it)->GetParent() != fullSyllable && !(*it)->Is(SYL)) {
                     (*it)->MoveItselfTo(fullSyllable);
                 }
             }
+
             if (doubleParent == NULL) {
                 LogError("No second level parent!");
                 return false;
