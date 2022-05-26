@@ -1390,11 +1390,11 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
     std::cmatch matches;
     if (meter) {
         if (regex_match(timesig_str, matches, std::regex("(\\d+)/(\\d+)"))) {
-            meter->SetCount({ std::stoi(matches[1]) });
+            meter->SetCount({ { std::stoi(matches[1]) }, MeterCountSign::None });
             meter->SetUnit(std::stoi(matches[2]));
         }
         else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
-            meter->SetCount({ std::stoi(timesig_str) });
+            meter->SetCount({ { std::stoi(timesig_str) }, MeterCountSign::None });
             meter->SetUnit(1);
             meter->SetForm(METERFORM_num);
         }
@@ -1409,12 +1409,12 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
         else if (strcmp(timesig_str, "c3") == 0) {
             // C3
             meter->SetSym(METERSIGN_common);
-            meter->SetCount({ 3 });
+            meter->SetCount({ { 3 }, MeterCountSign::None });
         }
         else if (strcmp(timesig_str, "c3/2") == 0) {
             // C3/2
             meter->SetSym(METERSIGN_common); // ??
-            meter->SetCount({ 3 });
+            meter->SetCount({ { 2 }, MeterCountSign::None });
             meter->SetUnit(2);
         }
         else {
@@ -2263,7 +2263,8 @@ enum {
     ERR_061_LIGATURE_NOTE_BEFORE,
     ERR_062_LIGATURE_NOTE_AFTER,
     ERR_063_LIGATURE_PITCH,
-    ERR_064_LIGATURE_DURATION
+    ERR_064_LIGATURE_DURATION,
+    ERR_065_MREST_INVALID_MEASURE
 };
 
 // clang-format off
@@ -2331,7 +2332,8 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_061_LIGATURE_NOTE_BEFORE, "To indicate a ligature, a '+' must be preceded by a note." },
     { ERR_062_LIGATURE_NOTE_AFTER, "To indicate a ligature, a '+' must be followed by a note." },
     { ERR_063_LIGATURE_PITCH, "A ligature cannot have two consecutive notes with the same pitch." },
-    { ERR_064_LIGATURE_DURATION, "The duration in a ligature cannot be shorter than a semibreve." }
+    { ERR_064_LIGATURE_DURATION, "The duration in a ligature cannot be shorter than a semibreve." },
+    { ERR_065_MREST_INVALID_MEASURE, "A measure with a measure rest cannot include anything else." }
 };
 // clang-format on
 
@@ -2836,6 +2838,8 @@ bool PAEInput::Parse()
 
     if (success) success = this->ConvertAccidGes();
 
+    if (success) success = this->CheckContentPreBuild();
+
     if (success) success = this->CheckHierarchy();
 
     LogDebugTokens();
@@ -3022,6 +3026,8 @@ bool PAEInput::Parse()
         }
     }
 
+    CheckContentPostBuild();
+
     // We should have no object left, just in case they need to be delete.
     this->ClearTokenObjects();
 
@@ -3048,7 +3054,7 @@ bool PAEInput::ConvertKeySig()
                 token.m_char = 0;
                 continue;
             }
-            if (!token.IsSpace()) {
+            if (!token.IsEnd() && !token.IsSpace()) {
                 LogPAE(ERR_004_KEY_SPACE, token);
                 if (m_pedanticMode) return false;
             }
@@ -3086,7 +3092,7 @@ bool PAEInput::ConvertClef()
                 token.m_char = 0;
                 continue;
             }
-            if (!token.IsSpace()) {
+            if (!token.IsEnd() && !token.IsSpace()) {
                 LogPAE(ERR_005_CLEF_SPACE, token);
                 if (m_pedanticMode) return false;
             }
@@ -3124,7 +3130,7 @@ bool PAEInput::ConvertMeterSigOrMensur()
                 token.m_char = 0;
                 continue;
             }
-            if (!token.IsSpace()) {
+            if (!token.IsEnd() && !token.IsSpace()) {
                 LogPAE(ERR_006_TIMESIG_SPACE, token);
                 if (m_pedanticMode) return false;
             }
@@ -4444,10 +4450,49 @@ bool PAEInput::CheckHierarchy()
     return true;
 }
 
-bool PAEInput::CheckContent()
+bool PAEInput::CheckContentPreBuild()
 {
     // Additional checks to do here
-    // * mRest or multiRest should be unique child of layer
+    // * a measure with mRest or multiRest should not include anything else
+
+    pae::Token *previousToken = NULL;
+
+    std::list<pae::Token>::iterator token = m_pae.begin();
+    while (token != m_pae.end()) {
+        if (token->IsVoid() || !token->m_object) {
+            ++token;
+            continue;
+        }
+
+        // Check that the measure rest is at the beginning of a measure
+        if (token->Is(MULTIREST) && previousToken && !previousToken->Is(MEASURE)) {
+            LogPAE(ERR_065_MREST_INVALID_MEASURE, *token);
+            if (m_pedanticMode) return false;
+            Measure *measure = new Measure();
+            measure->SetRight(BARRENDITION_invis);
+            m_pae.insert(token, pae::Token(0, pae::UNKOWN_POS, measure));
+        }
+        // Check that the measure rest is at the end of a measure
+        else if (previousToken && previousToken->Is(MULTIREST) && !token->Is(MEASURE)) {
+            LogPAE(ERR_065_MREST_INVALID_MEASURE, *previousToken);
+            if (m_pedanticMode) return false;
+            Measure *measure = new Measure();
+            measure->SetRight(BARRENDITION_invis);
+            m_pae.insert(token, pae::Token(0, pae::UNKOWN_POS, measure));
+        }
+
+        if (token->m_object) {
+            previousToken = &(*token);
+        }
+        ++token;
+    }
+
+    return true;
+}
+
+bool PAEInput::CheckContentPostBuild()
+{
+    // Additional checks to do here
     // * beam should have more than two children
     // * graceGrp should not be empty
     // * keySig / meterSig change more than once in a measure
@@ -4651,18 +4696,18 @@ bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae:
     if (paeStr.size() < 1) {
         LogPAE(ERR_047_TIMESIG_INCOMPLETE, token);
         if (m_pedanticMode) return false;
-        meterSig->SetCount({ 4 });
+        meterSig->SetCount({ { 4 }, MeterCountSign::None });
         meterSig->SetUnit(4);
         return true;
     }
 
     std::cmatch matches;
     if (regex_match(paeStr.c_str(), matches, std::regex("(\\d+)/(\\d+)"))) {
-        meterSig->SetCount({ std::stoi(matches[1]) });
+        meterSig->SetCount({ { std::stoi(matches[1]) }, MeterCountSign::None });
         meterSig->SetUnit(std::stoi(matches[2]));
     }
     else if (regex_match(paeStr.c_str(), matches, std::regex("\\d+"))) {
-        meterSig->SetCount({ std::stoi(paeStr.c_str()) });
+        meterSig->SetCount({ { std::stoi(paeStr) }, MeterCountSign::None });
         meterSig->SetUnit(1);
         meterSig->SetForm(METERFORM_num);
     }
@@ -4677,12 +4722,12 @@ bool PAEInput::ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae:
     else if (paeStr == "c3") {
         // C3
         meterSig->SetSym(METERSIGN_common);
-        meterSig->SetCount({ 3 });
+        meterSig->SetCount({ { 3 }, MeterCountSign::None });
     }
     else if (paeStr == "c3/2") {
         // C3/2
         meterSig->SetSym(METERSIGN_common); // ??
-        meterSig->SetCount({ 3 });
+        meterSig->SetCount({ { 3 }, MeterCountSign::None });
         meterSig->SetUnit(2);
     }
     else {

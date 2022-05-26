@@ -31,7 +31,9 @@ class Accid : public LayerElement,
               public AttAccidLog,
               public AttColor,
               public AttEnclosingChars,
-              public AttExtSym {
+              public AttExtSym,
+              public AttPlacementOnStaff,
+              public AttPlacementRelEvent {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -116,9 +118,9 @@ public:
     //----------//
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment

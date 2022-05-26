@@ -101,7 +101,7 @@ public:
     /**
      * Calculates and sets spacing for specified ScoreDef
      */
-    void SetSpacing(ScoreDef *scoreDef);
+    void SetSpacing(const ScoreDef *scoreDef);
 
 private:
     /**
@@ -112,7 +112,7 @@ private:
     /**
      * Calculates above spacing type for staffDef
      */
-    SpacingType CalculateSpacingAbove(StaffDef *staffDef) const;
+    SpacingType CalculateSpacingAbove(const StaffDef *staffDef) const;
 
 public:
     //
@@ -250,10 +250,6 @@ public:
     void SetRequestedSpaceBelow(int space);
     int GetRequestedSpaceBelow() const { return m_requestedSpaceBelow; }
     int GetStaffHeight() const { return m_staffHeight; }
-    void SetOverflowBBoxAbove(BoundingBox *bboxAbove, int overflowAbove);
-    BoundingBox *GetOverflowBBoxAbove() const { return m_overflowBBoxAbove; }
-    void SetOverflowBBoxBelow(BoundingBox *bboxBelow, int overflowBottom);
-    BoundingBox *GetOverflowBBoxBelow() const { return m_overflowBBoxBelow; }
     void SetScoreDefClefOverflowAbove(int overflowAbove) { m_scoreDefClefOverflowAbove = overflowAbove; }
     int GetScoreDefClefOverflowAbove() const { return m_scoreDefClefOverflowAbove; }
     void SetScoreDefClefOverflowBelow(int overflowBelow) { m_scoreDefClefOverflowBelow = overflowBelow; }
@@ -279,6 +275,11 @@ public:
      * Deletes all the FloatingPositioner objects.
      */
     void ClearPositioners();
+
+    /**
+     * Sort the FloatingPositioner objects.
+     */
+    void SortPositioners();
 
     /**
      * Find all the intersection points with a vertical line (top to bottom)
@@ -370,6 +371,10 @@ private:
      */
     ArrayOfFloatingPositioners m_floatingPositioners;
     /**
+     * Flag indicating whether the list of FloatingPositioner is sorted
+     */
+    bool m_floatingPositionersSorted;
+    /**
      * Stores a pointer to the staff from which the aligner was created.
      * This is necessary since we don't always have all the staves.
      */
@@ -398,8 +403,6 @@ private:
     int m_requestedSpaceAbove;
     int m_requestedSpaceBelow;
     int m_staffHeight;
-    BoundingBox *m_overflowBBoxAbove;
-    BoundingBox *m_overflowBBoxBelow;
     int m_scoreDefClefOverflowAbove;
     int m_scoreDefClefOverflowBelow;
     ///@}

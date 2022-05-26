@@ -66,8 +66,13 @@ void LinkingInterface::SetUuidStr()
 
 Measure *LinkingInterface::GetNextMeasure()
 {
+    return const_cast<Measure *>(std::as_const(*this).GetNextMeasure());
+}
+
+const Measure *LinkingInterface::GetNextMeasure() const
+{
     if (!m_next) return NULL;
-    return dynamic_cast<Measure *>(m_next->GetFirstAncestor(MEASURE));
+    return vrv_cast<const Measure *>(m_next->GetFirstAncestor(MEASURE));
 }
 
 //----------------------------------------------------------------------------
@@ -96,9 +101,10 @@ int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Obje
     return FUNCTOR_CONTINUE;
 }
 
-int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
+int LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
 {
-    FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    PrepareStaffCurrentTimeSpanningParams *params
+        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     // Only dir and dynam can be spanning with @next (extender)
@@ -123,7 +129,7 @@ int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *funct
     return FUNCTOR_CONTINUE;
 }
 
-int LinkingInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+int LinkingInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_next = NULL;
     m_nextUuid = "";

@@ -55,6 +55,11 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
+    /**
+     * Check whether the current object must be positioned closer to the staff than the other
+     */
+    bool IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const override;
+
     //----------//
     // Functors //
     //----------//

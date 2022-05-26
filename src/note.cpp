@@ -346,7 +346,7 @@ void Note::SetCluster(ChordCluster *cluster, int position)
     m_clusterPosition = position;
 }
 
-Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
+Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
@@ -366,7 +366,8 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
 
-    Glyph *glyph = Resources::GetGlyph(code);
+    const Resources &resources = doc->GetResources();
+    const Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
 
     if (glyph->HasAnchor(SMUFL_stemUpSE)) {
@@ -378,7 +379,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
+Point Note::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
@@ -397,7 +398,8 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
 
-    Glyph *glyph = Resources::GetGlyph(code);
+    const Resources &resources = doc->GetResources();
+    const Glyph *glyph = resources.GetGlyph(code);
     assert(glyph);
 
     if (glyph->HasAnchor(SMUFL_stemDownNW)) {
@@ -409,7 +411,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-int Note::CalcStemLenInThirdUnits(Staff *staff, data_STEMDIRECTION stemDir)
+int Note::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const
 {
     assert(staff);
 
@@ -467,7 +469,7 @@ wchar_t Note::GetMensuralNoteheadGlyph() const
 
     wchar_t code = 0;
     if (mensural_black) {
-        code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+        code = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
     }
     else {
         if (this->GetColored() == BOOLEAN_true) {
@@ -513,8 +515,8 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         // case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
         case HEADSHAPE_plus: return SMUFL_E0AF_noteheadPlusBlack;
         case HEADSHAPE_diamond: {
-            if (DUR_1 == duration) return SMUFL_E0D9_noteheadDiamondHalf;
-            return this->GetHeadFill() == FILL_void ? SMUFL_E0DD_noteheadDiamondWhite : SMUFL_E0DB_noteheadDiamondBlack;
+            if (DUR_4 > duration) return SMUFL_E0D9_noteheadDiamondHalf;
+            return SMUFL_E0DB_noteheadDiamondBlack;
         }
         // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
         // case HEADSHAPE_oval: return SMUFL_noteheadOval;
@@ -522,7 +524,11 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         // case HEADSHAPE_rectangle: return SMUFL_noteheadRectangle;
         // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
         // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
-        case HEADSHAPE_slash: return SMUFL_E101_noteheadSlashHorizontalEnds;
+        case HEADSHAPE_slash: {
+            if (DUR_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
+            if (DUR_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
+            return SMUFL_E101_noteheadSlashHorizontalEnds;
+        }
         // case HEADSHAPE_square: return SMUFL_noteheadSquare;
         case HEADSHAPE_x: {
             if (DUR_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
@@ -543,14 +549,14 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
     return SMUFL_E0A4_noteheadBlack;
 }
 
-bool Note::IsVisible()
+bool Note::IsVisible() const
 {
     if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;
     }
     // if the chord doens't have it, see if all the children are invisible
     else if (this->GetParent() && this->GetParent()->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(this->GetParent());
+        const Chord *chord = vrv_cast<const Chord *>(this->GetParent());
         assert(chord);
         return chord->IsVisible();
     }
@@ -785,10 +791,9 @@ void Note::DeferMIDINote(FunctorParams *functorParams, double shift, bool includ
     // Recursive call for chords
     Chord *chord = this->IsChordTone();
     if (chord && includeChordSiblings) {
-        const ArrayOfObjects *notes = chord->GetList(chord);
-        assert(notes);
+        const ListOfObjects &notes = chord->GetList(chord);
 
-        for (Object *obj : *notes) {
+        for (Object *obj : notes) {
             Note *note = vrv_cast<Note *>(obj);
             assert(note);
             note->DeferMIDINote(functorParams, shift, false);
@@ -1363,8 +1368,8 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ Prepare the drawing cue size ************/
 
-    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
+    Functor prepareCueSize(&Object::PrepareCueSize);
+    this->Process(&prepareCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
 }
@@ -1382,11 +1387,11 @@ int Note::PrepareLyrics(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Note::ResetDrawing(FunctorParams *functorParams)
+int Note::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
@@ -1420,7 +1425,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     }
 
     // Skip cue notes when midiNoCue is activated
-    if (this->GetCue() == BOOLEAN_true && params->m_doc->GetOptions()->m_midiNoCue.GetValue()) {
+    if (this->GetCue() == BOOLEAN_true && params->m_cueExclusion) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -1533,6 +1538,13 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
     GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
+    if (this->HasGrace()) return FUNCTOR_SIBLINGS;
+
+    // Skip cue notes when midiNoCue is activated
+    if (this->GetCue() == BOOLEAN_true && params->m_cueExclusion) {
+        return FUNCTOR_SIBLINGS;
+    }
+
     Note *note = vrv_cast<Note *>(this->ThisOrSameasAsLink());
     assert(note);
 
@@ -1547,8 +1559,6 @@ int Note::Transpose(FunctorParams *functorParams)
     assert(params);
 
     if (!this->HasPname()) return FUNCTOR_SIBLINGS;
-
-    LogDebug("Transposing note");
 
     TransPitch pitch = this->GetTransPitch();
     params->m_transposer->Transpose(pitch);

@@ -56,6 +56,9 @@ enum {
     SMUFL_E075_cClefReversed = 0xE075,
     SMUFL_E076_fClefReversed = 0xE076,
     SMUFL_E077_fClefTurned = 0xE077,
+    SMUFL_E07A_gClefChange = 0xE07A,
+    SMUFL_E07B_cClefChange = 0xE07B,
+    SMUFL_E07C_fClefChange = 0xE07C,
     SMUFL_E080_timeSig0 = 0xE080,
     SMUFL_E081_timeSig1 = 0xE081,
     SMUFL_E082_timeSig2 = 0xE082,
@@ -107,6 +110,10 @@ enum {
     SMUFL_E223_tremolo4 = 0xE223,
     SMUFL_E224_tremolo5 = 0xE224,
     SMUFL_E22A_buzzRoll = 0xE22A,
+    SMUFL_E22E_tremoloDivisiDots2 = 0xE22E,
+    SMUFL_E22F_tremoloDivisiDots3 = 0xE22F,
+    SMUFL_E230_tremoloDivisiDots4 = 0xE230,
+    SMUFL_E231_tremoloDivisiDots6 = 0xE231,
     SMUFL_E240_flag8thUp = 0xE240,
     SMUFL_E241_flag8thDown = 0xE241,
     SMUFL_E242_flag16thUp = 0xE242,
@@ -334,7 +341,9 @@ enum {
     SMUFL_E88A_tupletColon = 0xE88A,
     SMUFL_E901_mensuralGclefPetrucci = 0xE901,
     SMUFL_E902_chantFclef = 0xE902,
+    SMUFL_E903_mensuralFclef = 0xE903,
     SMUFL_E904_mensuralFclefPetrucci = 0xE904,
+    SMUFL_E905_mensuralCclef = 0xE905,
     SMUFL_E906_chantCclef = 0xE906,
     SMUFL_E907_mensuralCclefPetrucciPosLowest = 0xE907,
     SMUFL_E908_mensuralCclefPetrucciPosLow = 0xE908,
@@ -369,6 +378,15 @@ enum {
     SMUFL_E93D_mensuralNoteheadSemiminimaWhite = 0xE93D,
     SMUFL_E93E_mensuralCombStemUp = 0xE93E,
     SMUFL_E93F_mensuralCombStemDown = 0xE93F,
+    SMUFL_E940_mensuralCombStemDiagonal = 0xE940,
+    SMUFL_E941_mensuralCombStemUpFlagRight = 0xE941,
+    SMUFL_E942_mensuralCombStemDownFlagRight = 0xE942,
+    SMUFL_E943_mensuralCombStemUpFlagLeft = 0xE943,
+    SMUFL_E944_mensuralCombStemDownFlagLeft = 0xE944,
+    SMUFL_E945_mensuralCombStemUpFlagFlared = 0xE945,
+    SMUFL_E946_mensuralCombStemDownFlagFlared = 0xE946,
+    SMUFL_E947_mensuralCombStemUpFlagExtended = 0xE947,
+    SMUFL_E948_mensuralCombStemDownFlagExtended = 0xE948,
     SMUFL_E949_mensuralCombStemUpFlagSemiminima = 0xE949,
     SMUFL_E94A_mensuralCombStemDownFlagSemiminima = 0xE94A,
     SMUFL_E94B_mensuralCombStemUpFlagFusa = 0xE94B,
@@ -437,12 +455,19 @@ enum {
     SMUFL_EBE7_luteItalianFret7 = 0xEBE7,
     SMUFL_EBE8_luteItalianFret8 = 0xEBE8,
     SMUFL_EBE9_luteItalianFret9 = 0xEBE9,
+    SMUFL_EC80_timeSigBracketLeft = 0xEC80,
+    SMUFL_EC81_timeSigBracketRight = 0xEC81,
+    SMUFL_EC82_timeSigBracketLeftSmall = 0xEC82,
+    SMUFL_EC83_timeSigBracketRightSmall = 0xEC83,
+    SMUFL_EC84_timeSigSlash = 0xEC84,
+    SMUFL_EC85_timeSigCut2 = 0xEC85,
+    SMUFL_EC86_timeSigCut3 = 0xEC86,
     SMUFL_ED40_articSoftAccentAbove = 0xED40,
     SMUFL_ED41_articSoftAccentBelow = 0xED41,
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 417
+#define SMUFL_COUNT 442
 
 } // namespace vrv
 

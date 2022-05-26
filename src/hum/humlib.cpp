@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Mar  1 17:54:34 PST 2022
+// Last Modified: Sun May 22 07:44:40 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -569,6 +569,84 @@ bool Convert::hasKernPhraseStart(const string& kerndata) {
 
 bool Convert::hasKernPhraseEnd(const string& kerndata) {
 	return kerndata.find('}') != string::npos;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::getKernBeamStartElisionLevel -- Returns the number of
+//   '&' characters before the given 'L' character in a kern token.
+//   Returns -1 if no 'L' character in string.
+//
+
+int Convert::getKernBeamStartElisionLevel(const string& kerndata, int index) {
+	bool foundBeamStart = false;
+	int output = 0;
+	int count = 0;
+	int target = index + 1;
+	for (int i=0; i<(int)kerndata.size(); i++) {
+		char ch = kerndata[i];
+		if (ch == 'L') {
+			count++;
+		}
+		if (count == target) {
+			foundBeamStart = true;
+			for (int j=i-1; j>=0; j--) {
+				ch = kerndata[j];
+				if (ch == '&') {
+					output++;
+				} else {
+					break;
+				}
+			}
+			break;
+		}
+	}
+	if (!foundBeamStart) {
+		return -1;
+	} else {
+		return output;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Convert::getKernBeamEndElisionLevel -- Returns the number of
+//   '&' characters before the last 'J' character in a kern token.
+//   Returns -1 if no 'J' character in string.
+//
+
+int Convert::getKernBeamEndElisionLevel(const string& kerndata, int index) {
+	bool foundBeamEnd = false;
+	int output = 0;
+	int count = 0;
+	int target = index + 1;
+	for (int i=0; i<(int)kerndata.size(); i++) {
+		char ch = kerndata[i];
+		if (ch == 'J') {
+			count++;
+		}
+		if (count == target) {
+			foundBeamEnd = true;
+			for (int j=i-1; j>=0; j--) {
+				ch = kerndata[j];
+				if (ch == '&') {
+					output++;
+				} else {
+					break;
+				}
+			}
+			break;
+		}
+	}
+	if (!foundBeamEnd) {
+		return -1;
+	} else {
+		return output;
+	}
 }
 
 
@@ -22194,10 +22272,11 @@ HLp HumdrumFileBase::getLineForInterpretationInsertionAbove(int index) {
 void HumdrumFileBase::clearTokenLinkInfo(void) {
 	HumdrumFileBase& infile = *this;
 	for (int i=0; i<infile.getLineCount(); i++) {
-		infile[i].clearTokenLinkInfo();
+		if (!infile[i].isEmpty()) {
+			infile[i].clearTokenLinkInfo();
+		}
 	}
 }
-
 
 
 
@@ -22278,70 +22357,79 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 		}
 		if (infile[i].isInterpretation()) {
 			for (j=0; j<infile[i].getFieldCount(); j++) {
-				if (!infile[i].token(j)->isKern()) {
+				HTp token  = infile.token(i, j);
+				if (!token->isKern()) {
 					continue;
 				}
-				if (infile[i].token(j)->compare(0, 3, "*k[") == 0) {
-					track = infile[i].token(j)->getTrack();
+				if (token->compare(0, 3, "*k[") == 0) {
+					track = token->getTrack();
 					kindex = rtracks[track];
 					fillKeySignature(keysigs[kindex], *infile[i].token(j));
 					// resetting key states of current measure.  What to do if this
 					// key signature is in the middle of a measure?
-					resetDiatonicStatesWithKeySignature(dstates[kindex],
-							keysigs[kindex]);
-					resetDiatonicStatesWithKeySignature(gdstates[kindex],
-							keysigs[kindex]);
+					resetDiatonicStatesWithKeySignature(dstates[kindex], keysigs[kindex]);
+					resetDiatonicStatesWithKeySignature(gdstates[kindex], keysigs[kindex]);
 				}
 			}
 		} else if (infile[i].isBarline()) {
 			for (j=0; j<infile[i].getFieldCount(); j++) {
-				if (!infile[i].token(j)->isKern()) {
+				HTp token = infile.token(i, j);
+				if (!token->isKern()) {
 					continue;
 				}
-				if (infile[i].token(j)->isInvisible()) {
+				if (token->isInvisible()) {
 					continue;
 				}
 				std::fill(firstinbar.begin(), firstinbar.end(), 1);
-				track = infile[i].token(j)->getTrack();
+				track = token->getTrack();
 				kindex = rtracks[track];
 				// reset the accidental states in dstates to match keysigs.
-				resetDiatonicStatesWithKeySignature(dstates[kindex],
-						keysigs[kindex]);
-				resetDiatonicStatesWithKeySignature(gdstates[kindex],
-						keysigs[kindex]);
+				resetDiatonicStatesWithKeySignature(dstates[kindex], keysigs[kindex]);
+				resetDiatonicStatesWithKeySignature(gdstates[kindex], keysigs[kindex]);
 			}
 		}
 
 		if (!infile[i].isData()) {
 			continue;
 		}
-
 		fill(concurrentstate.begin(), concurrentstate.end(), 0);
 		lasttrack = -1;
 
 		for (j=0; j<infile[i].getFieldCount(); j++) {
-			if (!infile[i].token(j)->isKern()) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
 				continue;
 			}
-			if (infile[i].token(j)->isNull()) {
+			if (token->isNull()) {
 				continue;
 			}
-			if (infile[i].token(j)->isRest()) {
+			if (token->isRest()) {
 				continue;
 			}
 
-			int subcount = infile[i].token(j)->getSubtokenCount();
-			track = infile[i].token(j)->getTrack();
+			int subcount = token->getSubtokenCount();
+			track = token->getTrack();
 
 			if (lasttrack != track) {
 				fill(concurrentstate.begin(), concurrentstate.end(), 0);
 			}
 			lasttrack = track;
-
 			int rindex = rtracks[track];
 			for (k=0; k<subcount; k++) {
-				HTp token = infile[i].token(j);
+				// bool tienote = false;
 				string subtok = token->getSubtoken(k);
+				if (subcount > 1) {
+					// Rests in chords represent unsounding notes.
+					// Rests can have pitch, but this is treated as
+					// Diatonic pitch which does not involve accidentals,
+					// so convert to pitch-like so that accidentals are
+					// processed on these notes.
+					for (int m=0; m<(int)subtok.size(); m++) {
+						if (subtok[m] == 'r') {
+							subtok[m] = 'R';
+						}
+					}
+				}
 				int b40 = Convert::kernToBase40(subtok);
 				int diatonic = Convert::kernToBase7(subtok);
 				int octaveadjust = token->getValueInt("auto", "ottava");
@@ -22350,7 +22438,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					// Deal with extra-low notes later.
 					continue;
 				}
-				int graceQ = infile[i].token(j)->isGrace();
+				int graceQ = token->isGrace();
 				int accid = Convert::kernToAccidentalCount(subtok);
 				int hiddenQ = 0;
 				if (subtok.find("yy") == string::npos) {
@@ -22361,11 +22449,10 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					}
 				}
 
-				if (((subtok.find("_") != string::npos) ||
-						(subtok.find("]") != string::npos))) {
-					// tied notes do not have slurs, so skip them
-					if ((accid != keysigs[rindex][diatonic % 7]) &&
-							firstinbar[rindex]) {
+				if (((subtok.find("_") != string::npos) || (subtok.find("]") != string::npos))) {
+					// tienote = true;
+					// tied notes do not have accidentals, so skip them
+					if ((accid != keysigs[rindex][diatonic % 7]) && firstinbar[rindex]) {
 						// But first, prepare to force an accidental to be shown on
 						// the note immediately following the end of a tied group
 						// if the tied group crosses a barline.
@@ -22395,7 +22482,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					int trilldiatonic = Convert::base40ToDiatonic(trillnote);
 					int trillaccid    = Convert::base40ToAccidental(trillnote);
 					if (dstates[rindex][trilldiatonic] != trillaccid) {
-						infile[i].token(j)->setValue("auto", to_string(k),
+						token->setValue("auto", to_string(k),
 								"trillAccidental", to_string(trillaccid));
 						dstates[rindex][trilldiatonic] = -1000 + trillaccid;
 					}
@@ -22405,8 +22492,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					int trilldiatonic = Convert::base40ToDiatonic(trillnote);
 					int trillaccid    = Convert::base40ToAccidental(trillnote);
 					if (dstates[rindex][trilldiatonic] != trillaccid) {
-						infile[i].token(j)->setValue("auto", to_string(k),
-								"trillAccidental", to_string(trillaccid));
+						token->setValue("auto", to_string(k), "trillAccidental", to_string(trillaccid));
 						dstates[rindex][trilldiatonic] = -1000 + trillaccid;
 					}
 				} else if (subtok.find("M") != string::npos) {
@@ -22415,8 +22501,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
 					int auxaccid    = Convert::base40ToAccidental(auxnote);
 					if (dstates[rindex][auxdiatonic] != auxaccid) {
-						infile[i].token(j)->setValue("auto", to_string(k),
-								"mordentUpperAccidental", to_string(auxaccid));
+						token->setValue("auto", to_string(k), "mordentUpperAccidental", to_string(auxaccid));
 						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
 					}
 				} else if (subtok.find("m") != string::npos) {
@@ -22425,8 +22510,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
 					int auxaccid    = Convert::base40ToAccidental(auxnote);
 					if (dstates[rindex][auxdiatonic] != auxaccid) {
-						infile[i].token(j)->setValue("auto", to_string(k),
-								"mordentUpperAccidental", to_string(auxaccid));
+						token->setValue("auto", to_string(k), "mordentUpperAccidental", to_string(auxaccid));
 						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
 					}
 				} else if (subtok.find("W") != string::npos) {
@@ -22435,7 +22519,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
 					int auxaccid    = Convert::base40ToAccidental(auxnote);
 					if (dstates[rindex][auxdiatonic] != auxaccid) {
-						infile[i].token(j)->setValue("auto", to_string(k),
+						token->setValue("auto", to_string(k),
 								"mordentLowerAccidental", to_string(auxaccid));
 						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
 					}
@@ -22445,13 +22529,12 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
 					int auxaccid    = Convert::base40ToAccidental(auxnote);
 					if (dstates[rindex][auxdiatonic] != auxaccid) {
-						infile[i].token(j)->setValue("auto", to_string(k),
+						token->setValue("auto", to_string(k),
 								"mordentLowerAccidental", to_string(auxaccid));
 						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
 					}
 
 				} else if ((loc = subtok.find("$")) != string::npos) {
-
 					int turndiatonic = Convert::base40ToDiatonic(b40);
 					// int turnaccid = Convert::base40ToAccidental(b40);
 					// inverted turn
@@ -22496,18 +22579,16 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					int uacc = Convert::base40ToAccidental(b40 + upperint);
 					int bacc = Convert::base40ToAccidental(b40 + lowerint);
 					if (uacc != upperaccid) {
-						infile[i].token(j)->setValue("auto", to_string(k),
+						token->setValue("auto", to_string(k),
 								"turnUpperAccidental", to_string(uacc));
 						dstates[rindex][upperdiatonic] = -1000 + uacc;
 					}
 					if (bacc != loweraccid) {
-						infile[i].token(j)->setValue("auto", to_string(k),
+						token->setValue("auto", to_string(k),
 								"turnLowerAccidental", to_string(bacc));
 						dstates[rindex][lowerdiatonic] = -1000 + bacc;
 					}
-
 				} else if ((loc = subtok.find("S")) != string::npos) {
-
 					int turndiatonic = Convert::base40ToDiatonic(b40);
 					// int turnaccid = Convert::base40ToAccidental(b40);
 					// regular turn
@@ -22551,31 +22632,31 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					}
 					int uacc = Convert::base40ToAccidental(b40 + upperint);
 					int bacc = Convert::base40ToAccidental(b40 + lowerint);
+
 					if (uacc != upperaccid) {
-						infile[i].token(j)->setValue("auto", to_string(k),
-								"turnUpperAccidental", to_string(uacc));
+						token->setValue("auto", to_string(k), "turnUpperAccidental", to_string(uacc));
 						dstates[rindex][upperdiatonic] = -1000 + uacc;
 					}
 					if (bacc != loweraccid) {
-						infile[i].token(j)->setValue("auto", to_string(k),
-								"turnLowerAccidental", to_string(bacc));
+						token->setValue("auto", to_string(k), "turnLowerAccidental", to_string(bacc));
 						dstates[rindex][lowerdiatonic] = -1000 + bacc;
 					}
 				}
+
+				// if (tienote) {
+				// 	continue;
+				// }
 
 				if (graceQ && (accid != gdstates[rindex][diatonic])) {
 					// accidental is different from the previous state so should be
 					// printed
 					if (!hiddenQ) {
-						infile[i].token(j)->setValue("auto", to_string(k),
-								"visualAccidental", "true");
+						token->setValue("auto", to_string(k), "visualAccidental", "true");
 						if (gdstates[rindex][diatonic] < -900) {
 							// this is an obligatory cautionary accidental
 							// or at least half the time it is (figure that out later)
-							infile[i].token(j)->setValue("auto", to_string(k),
-									"obligatoryAccidental", "true");
-							infile[i].token(j)->setValue("auto", to_string(k),
-									"cautionaryAccidental", "true");
+							token->setValue("auto", to_string(k), "obligatoryAccidental", "true");
+							token->setValue("auto", to_string(k), "cautionaryAccidental", "true");
 						}
 					}
 					gdstates[rindex][diatonic] = accid;
@@ -22589,27 +22670,21 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					// accidental is different from the previous state so should be
 					// printed, but only print if not supposed to be hidden.
 					if (!hiddenQ) {
-						infile[i].token(j)->setValue("auto", to_string(k),
-								"visualAccidental", "true");
+						token->setValue("auto", to_string(k), "visualAccidental", "true");
 						concurrentstate[diatonic] = accid;
 						if (dstates[rindex][diatonic] < -900) {
 							// this is an obligatory cautionary accidental
 							// or at least half the time it is (figure that out later)
-							infile[i].token(j)->setValue("auto", to_string(k),
-									"obligatoryAccidental", "true");
-							infile[i].token(j)->setValue("auto", to_string(k),
-									"cautionaryAccidental", "true");
+							token->setValue("auto", to_string(k), "obligatoryAccidental", "true");
+							token->setValue("auto", to_string(k), "cautionaryAccidental", "true");
 						}
 					}
 					dstates[rindex][diatonic] = accid;
 					gdstates[rindex][diatonic] = accid;
 
-				} else if ((accid == 0) && (subtok.find("n") != string::npos) &&
-							!hiddenQ) {
-					infile[i].token(j)->setValue("auto", to_string(k),
-							"cautionaryAccidental", "true");
-					infile[i].token(j)->setValue("auto", to_string(k),
-							"visualAccidental", "true");
+				} else if ((accid == 0) && (subtok.find("n") != string::npos) && !hiddenQ) {
+					token->setValue("auto", to_string(k), "cautionaryAccidental", "true");
+					token->setValue("auto", to_string(k), "visualAccidental", "true");
 				} else if (subtok.find("XX") == string::npos) {
 					// The accidental is not necessary. See if there is a single "X"
 					// immediately after the accidental which means to force it to
@@ -22617,20 +22692,14 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					auto loc = subtok.find("X");
 					if ((loc != string::npos) && (loc > 0)) {
 						if (subtok[loc-1] == '#') {
-							infile[i].token(j)->setValue("auto", to_string(k),
-									"cautionaryAccidental", "true");
-									infile[i].token(j)->setValue("auto", to_string(k),
-											"visualAccidental", "true");
+							token->setValue("auto", to_string(k), "cautionaryAccidental", "true");
+									token->setValue("auto", to_string(k), "visualAccidental", "true");
 						} else if (subtok[loc-1] == '-') {
-							infile[i].token(j)->setValue("auto", to_string(k),
-									"cautionaryAccidental", "true");
-									infile[i].token(j)->setValue("auto", to_string(k),
-											"visualAccidental", "true");
+							token->setValue("auto", to_string(k), "cautionaryAccidental", "true");
+									token->setValue("auto", to_string(k), "visualAccidental", "true");
 						} else if (subtok[loc-1] == 'n') {
-							infile[i].token(j)->setValue("auto", to_string(k),
-									"cautionaryAccidental", "true");
-							infile[i].token(j)->setValue("auto", to_string(k),
-									"visualAccidental", "true");
+							token->setValue("auto", to_string(k), "cautionaryAccidental", "true");
+							token->setValue("auto", to_string(k), "visualAccidental", "true");
 						}
 					}
 				}
@@ -22703,7 +22772,7 @@ void HumdrumFileContent::analyzeBarlines(void) {
 		// Maybe allow forcing reanalysis.
 		return;
 	}
-	m_analyses.m_slurs_analyzed = true;
+	m_analyses.m_barlines_analyzed = true;
 	m_analyses.m_barlines_different = false;
 
 	string baseline;
@@ -22770,11 +22839,62 @@ void HumdrumFileContent::analyzeBarlines(void) {
 			}
 		}
 
+		if (hasDataStraddle(i)) {
+				infile[i].setValue("auto", "straddlingData", 1);
+		} else {
+				infile[i].setValue("auto", "straddlingData", 0);
+		}
+
 		if (!allSame) {
 			infile[i].setValue("auto", "barlinesDifferent", 1);
 			m_analyses.m_barlines_different = true;
+		} else {
+			infile[i].setValue("auto", "barlinesDifferent", 0);
 		}
 	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::hasDataStraddle -- Returns true if the next
+//    data line after a barline has null tokens on isStaff() tokens.
+//    If there are no data lines after the barline, then it will
+//    return false;
+//
+
+bool HumdrumFileContent::hasDataStraddle(int line) {
+	HumdrumFileContent& infile = *this;
+	if (!infile[line].isBarline()) {
+		return false;
+	}
+	for (int i=line+1; i<infile.getLineCount(); i++) {
+		if (infile[i].isInterpretation()) {
+			HTp token = infile.token(i, 0);
+			if (*token == "*-") {
+				return false;
+			}
+		}
+		if (!infile[i].isData()) {
+			continue;
+		}
+		if (infile[i].isGraceLine()) {
+			continue;
+		}
+
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isStaff()) {
+				continue;
+			}
+			if (token->isNull()) {
+				return true;
+			}
+		}
+		break;
+	}
+	return false;
 }
 
 
@@ -22791,6 +22911,489 @@ bool HumdrumFileContent::hasDifferentBarlines(void) {
 	return m_analyses.m_barlines_different;
 }
 
+
+
+
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeBeams -- Link start and ends of
+//    beams to each other.
+//
+
+bool HumdrumFileContent::analyzeBeams(void) {
+	if (m_analyses.m_beams_analyzed) {
+		return false;
+	}
+	m_analyses.m_beams_analyzed = true;
+	bool output = true;
+	output &= analyzeKernBeams();
+	output &= analyzeMensBeams();
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeMensBeams -- Link start and ends of
+//    beams to each other.  They are the same as **kern, so borrowing
+//    analyzeKernBeams to do the analysis.
+//
+
+bool HumdrumFileContent::analyzeMensBeams(void) {
+	vector<HTp> beamstarts;
+	vector<HTp> beamends;
+
+	vector<HTp> l;
+	vector<pair<HTp, HTp>> labels; // first is previous label, second is next label
+	HumdrumFileBase& infile = *this;
+	labels.resize(infile.getLineCount());
+	l.resize(infile.getLineCount());
+	for (int i=0; i<infile.getLineCount(); i++) {
+		labels[i].first = NULL;
+		labels[i].second = NULL;
+		l[i] = NULL;
+	}
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		if ((token->compare(0, 2, "*>") == 0) && (token->find("[") == std::string::npos)) {
+			l[i] = token;
+		}
+	}
+	HTp current = NULL;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (l[i] != NULL) {
+			current = l[i];
+		}
+		labels[i].first = current;
+	}
+	current = NULL;
+	for (int i=infile.getLineCount() - 1; i>=0; i--) {
+		if (l[i] != NULL) {
+			current = l[i];
+		}
+		labels[i].second = current;
+	}
+
+	vector<int> endings(infile.getLineCount(), 0);
+	int ending = 0;
+	for (int i=0; i<(int)endings.size(); i++) {
+		if (l[i]) {
+			char lastchar = l[i]->back();
+			if (isdigit(lastchar)) {
+				ending = lastchar - '0';
+			} else {
+				ending = 0;
+			}
+		}
+		endings[i] = ending;
+	}
+
+	vector<HTp> mensspines;
+	getSpineStartList(mensspines, "**mens");
+	bool output = true;
+	string linkSignifier = m_signifiers.getKernLinkSignifier();
+	for (int i=0; i<(int)mensspines.size(); i++) {
+		output = output && analyzeKernBeams(mensspines[i], beamstarts, beamends, labels, endings, linkSignifier);
+	}
+	createLinkedBeams(beamstarts, beamends);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeKernBeams -- Link start and ends of
+//    beams to each other.
+//
+
+bool HumdrumFileContent::analyzeKernBeams(void) {
+	vector<HTp> beamstarts;
+	vector<HTp> beamends;
+
+	vector<HTp> l;
+	vector<pair<HTp, HTp>> labels; // first is previous label, second is next label
+	HumdrumFileBase& infile = *this;
+	labels.resize(infile.getLineCount());
+	l.resize(infile.getLineCount());
+	for (int i=0; i<infile.getLineCount(); i++) {
+		labels[i].first = NULL;
+		labels[i].second = NULL;
+		l[i] = NULL;
+	}
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		if ((token->compare(0, 2, "*>") == 0) && (token->find("[") == std::string::npos)) {
+			l[i] = token;
+		}
+	}
+	HTp current = NULL;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (l[i] != NULL) {
+			current = l[i];
+		}
+		labels[i].first = current;
+	}
+	current = NULL;
+	for (int i=infile.getLineCount() - 1; i>=0; i--) {
+		if (l[i] != NULL) {
+			current = l[i];
+		}
+		labels[i].second = current;
+	}
+
+	vector<int> endings(infile.getLineCount(), 0);
+	int ending = 0;
+	for (int i=0; i<(int)endings.size(); i++) {
+		if (l[i]) {
+			char lastchar = l[i]->back();
+			if (isdigit(lastchar)) {
+				ending = lastchar - '0';
+			} else {
+				ending = 0;
+			}
+		}
+		endings[i] = ending;
+	}
+
+	vector<HTp> kernspines;
+	getSpineStartList(kernspines, "**kern");
+	bool output = true;
+	string linkSignifier = m_signifiers.getKernLinkSignifier();
+	for (int i=0; i<(int)kernspines.size(); i++) {
+		output = output && analyzeKernBeams(kernspines[i], beamstarts, beamends, labels, endings, linkSignifier);
+	}
+
+	createLinkedBeams(beamstarts, beamends);
+	return output;
+}
+
+
+bool HumdrumFileContent::analyzeKernBeams(HTp spinestart,
+		vector<HTp>& linkstarts, vector<HTp>& linkends, vector<pair<HTp, HTp>>& labels,
+		vector<int>& endings, const string& linksig) {
+
+	// linked beams handled separately, so generate an ignore sequence:
+	string ignorebegin = linksig + "L";
+	string ignoreend = linksig + "J";
+
+	// tracktokens == the 2-D data list for the track,
+	// arranged in layers with the second dimension.
+	vector<vector<HTp> > tracktokens;
+	this->getTrackSeq(tracktokens, spinestart, OPT_DATA | OPT_NOEMPTY);
+	// printSequence(tracktokens);
+
+	// beamopens == list of beam openings for each track and elision level
+	// first dimension: elision level
+	// second dimension: track number
+	vector<vector<vector<HTp>>> beamopens;
+
+	beamopens.resize(4); // maximum of 4 elision levels
+	for (int i=0; i<(int)beamopens.size(); i++) {
+		beamopens[i].resize(8);  // maximum of 8 layers
+	}
+
+	int opencount = 0;
+	int closecount = 0;
+	int elision = 0;
+	HTp token;
+	for (int row=0; row<(int)tracktokens.size(); row++) {
+		for (int track=0; track<(int)tracktokens[row].size(); track++) {
+			token = tracktokens[row][track];
+			if (!token->isData()) {
+				continue;
+			}
+			if (token->isNull()) {
+				continue;
+			}
+			opencount = (int)count(token->begin(), token->end(), 'L');
+			closecount = (int)count(token->begin(), token->end(), 'J');
+
+			for (int i=0; i<closecount; i++) {
+				bool isLinked = isLinkedBeamEnd(token, i, ignoreend);
+				if (isLinked) {
+					linkends.push_back(token);
+					continue;
+				}
+				elision = token->getBeamEndElisionLevel(i);
+				if (elision < 0) {
+					continue;
+				}
+				if (beamopens[elision][track].size() > 0) {
+					linkBeamEndpoints(beamopens[elision][track].back(), token);
+					// remove beam opening from buffer
+					beamopens[elision][track].pop_back();
+				} else {
+					// No starting beam marker to match to this beam end in the
+					// given track.
+					// search for an open beam in another track:
+					bool found = false;
+					for (int itrack=0; itrack<(int)beamopens[elision].size(); itrack++) {
+						if (beamopens[elision][itrack].size() > 0) {
+							linkBeamEndpoints(beamopens[elision][itrack].back(), token);
+							// remove beam opening from buffer
+							beamopens[elision][itrack].pop_back();
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						int lineindex = token->getLineIndex();
+						int endnum = endings[lineindex];
+						int pindex = -1;
+						if (labels[lineindex].first) {
+							pindex = labels[lineindex].first->getLineIndex();
+							pindex--;
+						}
+						int endnumpre = -1;
+						if (pindex >= 0) {
+							endnumpre = endings[pindex];
+						}
+
+						if ((endnumpre > 0) && (endnum > 0) && (endnumpre != endnum)) {
+							// This is a beam in an ending that start at the start of an ending.
+							HumNum duration = token->getDurationFromStart();
+							if (labels[token->getLineIndex()].first) {
+								duration -= labels[token->getLineIndex()].first->getDurationFromStart();
+							}
+							token->setValue("auto", "endingBeamBack", "true");
+							token->setValue("auto", "beamSide", "stop");
+							token->setValue("auto", "beamDuration",
+								token->getDurationToEnd());
+						} else {
+							// This is a beam closing that does not have a matching opening.
+							token->setValue("auto", "hangingBeam", "true");
+							token->setValue("auto", "beamSide", "stop");
+							token->setValue("auto", "beamOpenIndex", to_string(i));
+							token->setValue("auto", "beamDuration",
+								token->getDurationToEnd());
+						}
+					}
+				}
+			}
+
+			for (int i=0; i<opencount; i++) {
+				bool isLinked = isLinkedBeamBegin(token, i, ignorebegin);
+				if (isLinked) {
+					linkstarts.push_back(token);
+					continue;
+				}
+				elision = token->getBeamStartElisionLevel(i);
+				if (elision < 0) {
+					continue;
+				}
+				beamopens[elision][track].push_back(token);
+			}
+		}
+	}
+
+	// Mark un-closed beam starts:
+	for (int i=0; i<(int)beamopens.size(); i++) {
+		for (int j=0; j<(int)beamopens[i].size(); j++) {
+			for (int k=0; k<(int)beamopens[i][j].size(); k++) {
+				beamopens[i][j][k]->setValue("", "auto", "hangingBeam", "true");
+				beamopens[i][j][k]->setValue("", "auto", "beamSide", "start");
+				beamopens[i][j][k]->setValue("", "auto", "beamDuration",
+						beamopens[i][j][k]->getDurationFromStart());
+			}
+		}
+	}
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::createLinkedBeams --  Currently assume that
+//    start and ends are matched.
+//
+
+void HumdrumFileContent::createLinkedBeams(vector<HTp>& linkstarts, vector<HTp>& linkends) {
+	int max = (int)linkstarts.size();
+	if ((int)linkends.size() < max) {
+		max = (int)linkends.size();
+	}
+	if (max == 0) {
+		// nothing to do
+		return;
+	}
+
+	for (int i=0; i<max; i++) {
+		linkBeamEndpoints(linkstarts[i], linkends[i]);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::isLinkedBeamEnd --
+//
+
+bool HumdrumFileContent::isLinkedBeamEnd(HTp token, int index, const string& pattern) {
+	if (pattern.size() <= 1) {
+		return false;
+	}
+	int counter = -1;
+	for (int i=0; i<(int)token->size(); i++) {
+		if (token->at(i) == 'J') {
+			counter++;
+		}
+		if (i == 0) {
+			// Can't have linked beam at starting index in string.
+			continue;
+		}
+		if (counter != index) {
+			continue;
+		}
+
+		int startindex = i - (int)pattern.size() + 1;
+		auto loc = token->find(pattern, startindex);
+		if ((loc != std::string::npos) && ((int)loc == startindex)) {
+			return true;
+		}
+		return false;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::isLinkedBeamBegin --
+//
+
+bool HumdrumFileContent::isLinkedBeamBegin(HTp token, int index, const string& pattern) {
+	if (pattern.size() <= 1) {
+		return false;
+	}
+	int counter = -1;
+	for (int i=0; i<(int)token->size(); i++) {
+		if (token->at(i) == 'L') {
+			counter++;
+		}
+		if (i == 0) {
+			continue;
+		}
+		if (counter != index) {
+			continue;
+		}
+		if (token->find(pattern, i - (int)pattern.size() + 1) != std::string::npos) {
+			return true;
+		}
+		return false;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::linkBeamEndpoints --  Allow up to two beam starts/ends
+//      on a note.
+//
+
+void HumdrumFileContent::linkBeamEndpoints(HTp beamstart, HTp beamend) {
+	string durtag = "beamDuration";
+	string endtag = "beamEndId";
+	string starttag = "beamStartId";
+	string beamstartnumbertag = "beamStartNumber";
+	string beamendnumbertag = "beamEndNumber";
+
+	int beamStartCount = beamstart->getValueInt("auto", "beamStartCount");
+	int opencount = (int)count(beamstart->begin(), beamstart->end(), 'L');
+	beamStartCount++;
+	int openEnumeration = opencount - beamStartCount + 1;
+
+	if (openEnumeration > 1) {
+		endtag += to_string(openEnumeration);
+		durtag += to_string(openEnumeration);
+		beamendnumbertag += to_string(openEnumeration);
+	}
+
+	int beamEndNumber = beamend->getValueInt("auto", "beamEndCount");
+	beamEndNumber++;
+	int closeEnumeration = beamEndNumber;
+	if (closeEnumeration > 1) {
+		starttag += to_string(closeEnumeration);
+		beamstartnumbertag += to_string(closeEnumeration);
+	}
+
+	HumNum duration = beamend->getDurationFromStart()
+			- beamstart->getDurationFromStart();
+
+	HumNum durToBar = beamstart->getDurationToBarline();
+
+	if (duration >= durToBar) {
+		beamstart->setValue("auto", "beamSpanStart", 1);
+		beamend->setValue("auto", "beamSpanEnd", 1);
+		markBeamSpanMembers(beamstart, beamend);
+	}
+
+	beamstart->setValue("auto", endtag,            beamend);
+	beamstart->setValue("auto", "id",              beamstart);
+	beamstart->setValue("auto", beamendnumbertag,  closeEnumeration);
+	beamstart->setValue("auto", durtag,            duration);
+	beamstart->setValue("auto", "beamStartCount",  beamStartCount);
+
+	beamend->setValue("auto", starttag, beamstart);
+	beamend->setValue("auto", "id", beamend);
+	beamend->setValue("auto", beamstartnumbertag, openEnumeration);
+	beamend->setValue("auto", "beamEndCount",  beamEndNumber);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::markBeamSpanMembers --
+//
+
+void HumdrumFileContent::markBeamSpanMembers(HTp beamstart, HTp beamend) {
+	int endindex = beamend->getLineIndex();
+	beamstart->setValue("auto", "inBeamSpan", beamstart);
+	beamend->setValue("auto", "inBeamSpan", beamstart);
+	HTp current = beamstart->getNextToken();;
+	while (current) {
+      int line = current->getLineIndex();
+		if (line > endindex) {
+			// terminate search for end if getting lost
+			break;
+		}
+		if (current == beamend) {
+			break;
+		}
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->getDuration() == 0) {
+			// ignore grace notes
+			current = current->getNextToken();
+			continue;
+		}
+		current->setValue("auto", "inBeamSpan", beamstart);
+		current = current->getNextToken();
+	}
+}
 
 
 
@@ -23202,6 +23805,65 @@ void HumdrumFileContent::prepareStaffBelowNoteStems(HTp token) {
 }
 
 
+//////////////////////////////
+//
+// HumdrumFileContent::getNoteCount -- Returns the number of notes in **kern spines.
+//    could be expanded to **mens, and kern-like sorts of spines.  Also could be
+//    expanded to all staff-like spines, or specific spines.
+//
+
+int HumdrumFileContent::getNoteCount(void) {
+	HumdrumFileContent& infile = *this;
+	int counter = 0;
+	
+	int scount = infile.getStrandCount();
+	for (int i=0; i<scount; i++) {
+		HTp sstart = infile.getStrandStart(i);
+		if (!sstart->isKern()) {
+			continue;
+		}
+		HTp send = infile.getStrandEnd(i);
+		HTp current = sstart;
+		while (current && (current != send)) {
+			if (!current->isData()) {
+				current = current->getNextToken();
+				continue;
+			}
+			if (current->isNull()) {
+				current = current->getNextToken();
+				continue;
+			}
+			if (current->isRest()) {
+				current = current->getNextToken();
+				continue;
+			}
+			int subcount = current->getSubtokenCount();
+			if (subcount == 1) {
+				if (!current->isSecondaryTiedNote()) {
+					counter++;
+				}
+			} else {
+				vector<string> subtokens = current->getSubtokens();
+				for (int i=0; i<(int)subtokens.size(); i++) {
+					if (subtokens[i].find("_") != string::npos) {
+						continue;
+					}
+					if (subtokens[i].find("]") != string::npos) {
+						continue;
+					}
+					if (subtokens[i].find("r") != string::npos) {
+						continue;
+					}
+					counter++;
+				}
+			}
+			current = current->getNextToken();
+		}
+	}
+	return counter;
+}
+
+
 
 
 
@@ -23460,14 +24122,14 @@ bool HumdrumFileContent::analyzeKernPhrasings(HTp spinestart,
 							}
 							token->setValue("auto", "endingPhraseBack", "true");
 							token->setValue("auto", "phraseSide", "stop");
-							token->setValue("auto", "phraseDration",
+							token->setValue("auto", "phraseDuration",
 								token->getDurationToEnd());
 						} else {
 							// This is a phrase closing that does not have a matching opening.
 							token->setValue("auto", "hangingPhrase", "true");
 							token->setValue("auto", "phraseSide", "stop");
 							token->setValue("auto", "phraseOpenIndex", to_string(i));
-							token->setValue("auto", "phraseDration",
+							token->setValue("auto", "phraseDuration",
 								token->getDurationToEnd());
 						}
 					}
@@ -24592,14 +25254,14 @@ bool HumdrumFileContent::analyzeKernSlurs(HTp spinestart,
 							}
 							token->setValue("auto", "endingSlurBack", "true");
 							token->setValue("auto", "slurSide", "stop");
-							token->setValue("auto", "slurDration",
+							token->setValue("auto", "slurDuration",
 								token->getDurationToEnd());
 						} else {
 							// This is a slur closing that does not have a matching opening.
 							token->setValue("auto", "hangingSlur", "true");
 							token->setValue("auto", "slurSide", "stop");
 							token->setValue("auto", "slurOpenIndex", to_string(i));
-							token->setValue("auto", "slurDration",
+							token->setValue("auto", "slurDuration",
 								token->getDurationToEnd());
 						}
 					}
@@ -28260,6 +28922,149 @@ std::string HumdrumFileStructure::getKernBelowSignifier(void) {
 
 
 
+
+//////////////////////////////
+//
+// HumdrumLine::getMidiPitches: Get MIDI note numbers for **kern pitches on line.
+// 0 = rest, negative values are tied notes from previously in the score.
+//
+
+void HumdrumLine::getMidiPitches(std::vector<int>& output) {
+
+	HumdrumLine& line = *this;
+	output.clear();
+	if (!line.isData()) {
+		return;
+	}
+	vector<int> tnotes;
+	for (int i=0; i<line.getFieldCount(); i++) {
+		HTp token = line.token(i);
+		if (!token->isKern()) {
+			continue;
+		}
+		if (token->isNull()) {
+			return;
+		}
+		token->getMidiPitches(tnotes);
+		output.insert(output.end(), tnotes.begin(), tnotes.end());
+	}
+
+}
+
+
+std::vector<int> HumdrumLine::getMidiPitches(void) {
+	vector<int> output;
+	this->getMidiPitches(output);
+	return output;
+}
+
+
+void HumdrumLine::getMidiPitchesSortHL(std::vector<int>& output) {
+	output.clear();
+	this->getMidiPitches(output);
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) > abs(b);
+		}
+	);
+}
+	
+
+std::vector<int> HumdrumLine::getMidiPitchesSortHL(void) {
+	vector<int> output;
+	this->getMidiPitchesSortHL(output);
+	return output;
+}
+
+
+void HumdrumLine::getMidiPitchesSortLH(std::vector<int>& output) {
+	output.clear();
+	this->getMidiPitches(output);
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) < abs(b);
+		}
+	);
+}
+
+
+std::vector<int> HumdrumLine::getMidiPitchesSortLH(void) {
+	vector<int> output;
+	this->getMidiPitchesSortLH(output);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::getMidiPitches: Get MIDI note numbers for **kern pitches on line.
+// Null tokens are resulved to the token which is being sustained.
+// 0 = rest, negative values are tied notes from previously in the score.
+//
+
+void HumdrumLine::getMidiPitchesResolveNull(std::vector<int>& output) {
+	HumdrumLine& line = *this;
+	output.clear();
+	if (!line.isData()) {
+		return;
+	}
+	vector<int> tnotes;
+	for (int i=0; i<line.getFieldCount(); i++) {
+		HTp token = line.token(i);
+		if (!token->isKern()) {
+			continue;
+		}
+		token->getMidiPitchesResolveNull(tnotes);
+		output.insert(output.end(), tnotes.begin(), tnotes.end());
+	}
+}
+
+
+std::vector<int> HumdrumLine::getMidiPitchesResolveNull(void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNull(output);
+	return output;
+}
+
+
+void HumdrumLine::getMidiPitchesResolveNullSortHL(std::vector<int>& output) {
+	output.clear();
+	this->getMidiPitchesResolveNull(output);
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) > abs(b);
+		}
+	);
+}
+
+
+std::vector<int> HumdrumLine::getMidiPitchesResolveNullSortHL (void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNullSortHL(output);
+	return output;
+}
+
+
+void HumdrumLine::getMidiPitchesResolveNullSortLH(std::vector<int>& output) {
+	output.clear();
+	this->getMidiPitchesResolveNull(output);
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) < abs(b);
+		}
+	);
+}
+
+
+std::vector<int> HumdrumLine::getMidiPitchesResolveNullSortLH (void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNullSortLH(output);
+	return output;
+}
+
+
+
 //////////////////////////////
 //
 // HumdrumLine::HumdrumLine -- HumdrumLine constructor.
@@ -28521,6 +29326,24 @@ bool HumdrumLine::isKernBoundaryStart(void) const {
 		}
 	}
 	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::isGraceLine --
+//
+
+bool HumdrumLine::isGraceLine(void) {
+	if (!this->isData()) {
+		return false;
+	}
+	if (this->getDuration() == 0) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 
@@ -30454,12 +31277,28 @@ bool HumdrumLine::allSameBarlineStyle(void) {
 
 
 
+/////////////////////////////
+//
+// HumdrumLine::hasDataStraddle -- return true if barlines has any staff
+//     that has data straddling it (the next measure starts with a null
+//     data token (excluding grace-note lines).
+//
+
+bool HumdrumLine::hasDataStraddle(void) {
+	return this->getValueInt("auto", "straddlingData");
+}
+
+
+
 //////////////////////////////
 //
 // HumdrumLine::clearTokenLinkInfo --
 //
 
 void HumdrumLine::clearTokenLinkInfo(void) {
+	if (this->isEmpty()) {
+		return;
+	}
 	for (int i=0; i<getFieldCount(); i++) {
 		if (token(i)) {
 			token(i)->clearLinkInfo();
@@ -30486,6 +31325,424 @@ ostream& operator<< (ostream& out, HLp line) {
 	out << (string)(*line);
 	return out;
 }
+
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getBase40Pitches -- Returns 0 if a rest.
+//    (This will be a problem for very low notes).
+//    Not checking to see if input data type is not **kern.
+//    Negative value means a sustained pitch.
+//
+
+void HumdrumToken::getBase40Pitches(vector<int>& output) {
+	if (*this == ".") {
+		// Not resolving null tokens in this function.
+		output.clear();
+		return;
+	}
+	vector<string> pieces = this->getSubtokens();
+	output.resize(pieces.size());
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (pieces[i].find("r") != string::npos) {
+			output[i] = 0;
+		} else {
+			output[i] = Convert::kernToBase40(pieces[i]);
+			// sustained notes are negative values:
+			if (pieces[i].find("_") != string::npos) {
+				output[i] = -output[i];
+			} else if (pieces[i].find("]") != string::npos) {
+				output[i] = -output[i];
+			}
+		}
+	}
+}
+
+
+vector<int> HumdrumToken::getBase40Pitches(void) {
+	vector<int> output;
+	this->getBase40Pitches(output);
+	return output;
+}
+
+
+int HumdrumToken::getBase40Pitch(void) {
+	vector<int> pitches = getBase40Pitches();
+	if (pitches.size() > 0) {
+		return pitches[0];
+	} else {
+		return 0;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getBase40PitchesSortHL -- Sort extracted Base-40 pitches from
+//    high to low (when there is a chord).  Does not check for valid Base-40
+//    note number range of 0-127.  Also not checking to see if input data
+//    type is not **kern.  Sustained notes are negative values, but pitches
+//    are sorted by absolute value.
+//
+
+void HumdrumToken::getBase40PitchesSortHL(vector<int>& output) {
+	this->getBase40Pitches(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) > abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getBase40PitchesSortHL(void) {
+	vector<int> output;
+	this->getBase40PitchesSortHL(output);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getBase40PitchesSortLH -- Sort extracted Base-40 pitches from
+//    low to high (when there is a chord).  Does not check for valid Base-40
+//    note number range of 0-127.  Also not checking to see if input data
+//    type is not **kern.  Sustained notes are negative values, but pitches
+//    are sorted by absolute value.
+//
+
+void HumdrumToken::getBase40PitchesSortLH(vector<int>& output) {
+	this->getBase40Pitches(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) < abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getBase40PitchesSortLH(void) {
+	vector<int> output;
+	this->getBase40PitchesSortLH(output);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// getBase40PitchesResolveNull -- same as getBase40Pitches*() functions
+//     but resolves null tokens (get the last non-null token if null).
+//
+
+void HumdrumToken::getBase40PitchesResolveNull(vector<int>& output) {
+	bool nullQ = (*this == ".");
+	HTp token = this;
+	if (nullQ) {
+		token = this->resolveNull();
+	}
+	output.clear();
+	if (token == NULL) {
+		return;
+	}
+	if (*token == ".") {
+		return;
+	}
+	vector<string> pieces = token->getSubtokens();
+	output.resize(pieces.size());
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (pieces[i].find("r") != string::npos) {
+			output[i] = 0;
+		} else {
+			output[i] = Convert::kernToBase40(pieces[i]);
+			// sustained notes are negative values:
+			if (nullQ) {
+				output[i] = -output[i];
+			} else if (pieces[i].find("_") != string::npos) {
+				output[i] = -output[i];
+			} else if (pieces[i].find("]") != string::npos) {
+				output[i] = -output[i];
+			}
+		}
+	}
+}
+
+
+vector<int> HumdrumToken::getBase40PitchesResolveNull(void) {
+	vector<int> output;
+	this->getBase40PitchesResolveNull(output);
+	return output;
+}
+
+
+int HumdrumToken::getBase40PitchResolveNull(void) {
+	vector<int> pitches = getBase40PitchesResolveNull();
+	if (pitches.size() > 0) {
+		return pitches[0];
+	} else {
+		return 0;
+	}
+}
+
+
+void HumdrumToken::getBase40PitchesResolveNullSortHL(vector<int>& output) {
+	this->getBase40PitchesResolveNull(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) > abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getBase40PitchesResolveNullSortHL(void) {
+	vector<int> output;
+	this->getBase40PitchesResolveNullSortHL(output);
+	return output;
+}
+
+
+void HumdrumToken::getBase40PitchesResolveNullSortLH(vector<int>& output) {
+	this->getBase40PitchesResolveNull(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) < abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getBase40PitchesResolveNullSortLH (void) {
+	vector<int> output;
+	this->getBase40PitchesResolveNullSortLH(output);
+	return output;
+}
+
+
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getMidiPitches -- Returns 0 if a rest.
+//    Does not check for valid MIDI note number range of 0-127.
+//    Also not checking to see if input data type is not **kern.
+//    Negative value means a sustained pitch.
+//
+
+void HumdrumToken::getMidiPitches(vector<int>& output) {
+	if (*this == ".") {
+		// Not resolving null tokens in this function.
+		output.clear();
+		return;
+	}
+	vector<string> pieces = this->getSubtokens();
+	output.resize(pieces.size());
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (pieces[i].find("r") != string::npos) {
+			output[i] = 0;
+		} else {
+			output[i] = Convert::kernToMidiNoteNumber(pieces[i]);
+			// sustained notes are negative values:
+			if (pieces[i].find("_") != string::npos) {
+				output[i] = -output[i];
+			} else if (pieces[i].find("]") != string::npos) {
+				output[i] = -output[i];
+			}
+		}
+	}
+}
+
+
+vector<int> HumdrumToken::getMidiPitches(void) {
+	vector<int> output;
+	this->getMidiPitches(output);
+	return output;
+}
+
+
+int HumdrumToken::getMidiPitch(void) {
+	vector<int> pitches = getMidiPitches();
+	if (pitches.size() > 0) {
+		return pitches[0];
+	} else {
+		return 0;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getMidiPitchesSortHL -- Sort extracted MIDI pitches from
+//    high to low (when there is a chord).  Does not check for valid MIDI
+//    note number range of 0-127.  Also not checking to see if input data
+//    type is not **kern.  Sustained notes are negative values, but pitches
+//    are sorted by absolute value.
+//
+
+void HumdrumToken::getMidiPitchesSortHL(vector<int>& output) {
+	this->getMidiPitches(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) > abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getMidiPitchesSortHL(void) {
+	vector<int> output;
+	this->getMidiPitchesSortHL(output);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getMidiPitchesSortLH -- Sort extracted MIDI pitches from
+//    low to high (when there is a chord).  Does not check for valid MIDI
+//    note number range of 0-127.  Also not checking to see if input data
+//    type is not **kern.  Sustained notes are negative values, but pitches
+//    are sorted by absolute value.
+//
+
+void HumdrumToken::getMidiPitchesSortLH(vector<int>& output) {
+	this->getMidiPitches(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) < abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getMidiPitchesSortLH(void) {
+	vector<int> output;
+	this->getMidiPitchesSortLH(output);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// getMidiPitchesResolveNull -- same as getMidiPitches*() functions
+//     but resolves null tokens (get the last non-null token if null).
+//
+
+void HumdrumToken::getMidiPitchesResolveNull(vector<int>& output) {
+	bool nullQ = (*this == ".");
+	HTp token = this;
+	if (nullQ) {
+		token = this->resolveNull();
+	}
+	output.clear();
+	if (token == NULL) {
+		return;
+	}
+	if (*token == ".") {
+		return;
+	}
+	vector<string> pieces = token->getSubtokens();
+	output.resize(pieces.size());
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (pieces[i].find("r") != string::npos) {
+			output[i] = 0;
+		} else {
+			output[i] = Convert::kernToMidiNoteNumber(pieces[i]);
+			// sustained notes are negative values:
+			if (nullQ) {
+				output[i] = -output[i];
+			} else if (pieces[i].find("_") != string::npos) {
+				output[i] = -output[i];
+			} else if (pieces[i].find("]") != string::npos) {
+				output[i] = -output[i];
+			}
+		}
+	}
+}
+
+
+vector<int> HumdrumToken::getMidiPitchesResolveNull(void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNull(output);
+	return output;
+}
+
+
+int HumdrumToken::getMidiPitchResolveNull(void) {
+	vector<int> pitches = getMidiPitchesResolveNull();
+	if (pitches.size() > 0) {
+		return pitches[0];
+	} else {
+		return 0;
+	}
+}
+
+
+void HumdrumToken::getMidiPitchesResolveNullSortHL(vector<int>& output) {
+	this->getMidiPitchesResolveNull(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) > abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getMidiPitchesResolveNullSortHL(void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNullSortHL(output);
+	return output;
+}
+
+
+void HumdrumToken::getMidiPitchesResolveNullSortLH(vector<int>& output) {
+	this->getMidiPitchesResolveNull(output);
+	if (output.size() <= 1) {
+		return;
+	}
+	sort(output.begin(), output.end(),
+		[](const int& a, const int& b) {
+			return abs(a) < abs(b);
+		}
+	);
+}
+
+
+vector<int> HumdrumToken::getMidiPitchesResolveNullSortLH (void) {
+	vector<int> output;
+	this->getMidiPitchesResolveNullSortLH(output);
+	return output;
+}
+
 
 
 
@@ -30933,6 +32190,8 @@ bool HumdrumToken::isKernLike(void) const {
 		return true;
 	} else if (dtype.compare(0, 7, "**kern-") == 0) {
 		return true;
+	} else if (dtype == "**kernyy") {
+		return true;
 	}
 	return false;
 }
@@ -30948,6 +32207,28 @@ bool HumdrumToken::isKernLike(void) const {
 
 bool HumdrumToken::isMens(void) const {
 	return isDataType("**mens");
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isMensLike -- Returns true if the data type of the token
+//    is **mens, or **mens- plus a tag.  This Allows for **mens-tag to be
+//    treated as a staff for printing in verovio.  This can be used to separate
+//    analysis spines that are output as **mens data to be prevented for use
+//    as input to another analysis as real **mens data.
+// @SEEALSO: isDataType
+//
+
+bool HumdrumToken::isMensLike(void) const {
+	string dtype = getDataType();
+	if (dtype == "**mens") {
+		return true;
+	} else if (dtype.compare(0, 7, "**mens-") == 0) {
+		return true;
+	}
+	return false;
 }
 
 
@@ -31295,7 +32576,7 @@ bool HumdrumToken::analyzeDuration(void) {
 					} else {
 						m_duration = Convert::recipToDuration((string)(*this));
 					}
-				} else if (isMens()) {
+				} else if (isMensLike()) {
 					int rlev = this->getValueInt("auto", "mensuration", "levels");
 					if (rlev < 2222) {
 						cerr << "Warning: mensuration levels not analyzed yet" << endl;
@@ -31369,8 +32650,10 @@ HumNum HumdrumToken::getDuration(HumNum scale) {
 //////////////////////////////
 //
 // HumdrumToken::getTiedDuration -- Returns the duration of the token and any
-//    tied notes attached to it.  Does not work well which chords.  Does
-//    not work well with secondary spine splits.
+//    tied notes attached to it.  Does not work well which chords that have
+//    notes with different tie states.  Does not work well with secondary spine splits
+//    (only follows left side of spine split).  Does not deal with disjunct ties or
+//    linked ties (ties across staves).   Does handle enharmonic spelling of tied notes.
 //
 
 HumNum HumdrumToken::getTiedDuration(void) {
@@ -31378,25 +32661,37 @@ HumNum HumdrumToken::getTiedDuration(void) {
 		analyzeDuration();
 	}
 	HumNum output = m_duration;
+
+	if (this->find("[") == string::npos) {
+		return output;
+	}
+
 	// start of a tied group so add the durations of the other notes.
-	int b40 = Convert::kernToBase40(this);
-	HTp note = this;
-	HTp nnote = NULL;
+	int b12 = Convert::kernToBase12(this);
+	HTp note = this->getNextToken();
 	while (note) {
-		nnote = note->getNextNNDT();
-		if (!nnote) {
+		if (!note->isData()) {
+         // The algorithm should be improved here, since only a lefthand
+			// spine split will be followed (but the tie could be going to
+			// a note on the right side of the split).
+			note = note->getNextToken();
+			continue;
+		}
+		if (note->isNull()) {
+			note = note->getNextToken();
+			continue;
+		}
+		if (!note->isSecondaryTiedNote()) {
 			break;
 		}
-		if (!nnote->isSecondaryTiedNote()) {
+		int nb12 = Convert::kernToBase12(note);
+		if (nb12 != b12) {
+			// bad or incomplete tie (or cross-spine complexity, or disjunct tie):
 			break;
 		}
-		int nb40 = Convert::kernToBase40(this);
-		if (nb40 != b40) {
-			break;
-		}
-		// note is tied to previous one, so add its curation to output.
-		output += nnote->getDuration();
-		note = nnote;
+		// Note is tied to previous one, so add its curation to output.
+		output += note->getDuration();
+		note = note->getNextToken();
 	}
 
 	return output;
@@ -31682,7 +32977,7 @@ bool HumdrumToken::isStaff(void) const {
 	if (isKernLike()) {
 		return true;
 	}
-	if (isMens()) {
+	if (isMensLike()) {
 		return true;
 	}
 
@@ -31698,12 +32993,17 @@ bool HumdrumToken::isStaff(void) const {
 
 bool HumdrumToken::isRest(void) {
 	if (isKernLike()) {
-		if (isNull() && Convert::isKernRest((string)(*resolveNull()))) {
+		if (isChord()) {
+			// rests are not allowed in chords, so return false if
+			// token is a chord (rests in chords are used for non-sounding
+			// notes in artificial harmonics).
+			return false;
+		} else if (isNull() && Convert::isKernRest((string)(*resolveNull()))) {
 			return true;
 		} else if (Convert::isKernRest((string)(*this))) {
 			return true;
 		}
-	} else if (isMens()) {
+	} else if (isMensLike()) {
 		if (isNull() && Convert::isMensRest((string)(*resolveNull()))) {
 			return true;
 		} else if (Convert::isMensRest((string)(*this))) {
@@ -31732,7 +33032,7 @@ bool HumdrumToken::isNote(void) {
 		if (Convert::isKernNote((string)(*this))) {
 			return true;
 		}
-	} else if (isMens()) {
+	} else if (isMensLike()) {
 		if (Convert::isMensNote((string)(*this))) {
 			return true;
 		}
@@ -32303,7 +33603,7 @@ int HumdrumToken::hasCautionaryAccidental(int subtokenIndex) const {
 //
 
 bool HumdrumToken::hasLigatureBegin(void) {
-	if (isMens()) {
+	if (isMensLike()) {
 		return Convert::hasLigatureBegin(*this);
 	} else {
 		return false;
@@ -32318,7 +33618,7 @@ bool HumdrumToken::hasLigatureBegin(void) {
 //
 
 bool HumdrumToken::hasRectaLigatureBegin(void) {
-	if (isMens()) {
+	if (isMensLike()) {
 		return Convert::hasRectaLigatureBegin(*this);
 	} else {
 		return false;
@@ -32333,7 +33633,7 @@ bool HumdrumToken::hasRectaLigatureBegin(void) {
 //
 
 bool HumdrumToken::hasObliquaLigatureBegin(void) {
-	if (isMens()) {
+	if (isMensLike()) {
 		return Convert::hasObliquaLigatureBegin(*this);
 	} else {
 		return false;
@@ -32379,7 +33679,7 @@ bool HumdrumToken::allSameBarlineStyle(void) {
 //
 
 bool HumdrumToken::hasLigatureEnd(void) {
-	if (isMens()) {
+	if (isMensLike()) {
 		return Convert::hasLigatureEnd(*this);
 	} else {
 		return false;
@@ -32394,7 +33694,7 @@ bool HumdrumToken::hasLigatureEnd(void) {
 //
 
 bool HumdrumToken::hasRectaLigatureEnd(void) {
-	if (isMens()) {
+	if (isMensLike()) {
 		return Convert::hasRectaLigatureEnd(*this);
 	} else {
 		return false;
@@ -32409,7 +33709,7 @@ bool HumdrumToken::hasRectaLigatureEnd(void) {
 //
 
 bool HumdrumToken::hasObliquaLigatureEnd(void) {
-	if (isMens()) {
+	if (isMensLike()) {
 		return Convert::hasObliquaLigatureEnd(*this);
 	} else {
 		return false;
@@ -32589,13 +33889,30 @@ bool HumdrumToken::isNullData(void) const {
 //
 
 bool HumdrumToken::isLabel(void) const {
-	if (string::compare(0, 2, "*>") != 0) {
+	if (this->compare(0, 2, "*>") != 0) {
 		return false;
 	}
-	if (string::find("[") != string::npos) {
+	if (this->find("[") != string::npos) {
 		return false;
 	}
 	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isExpansionList -- Returns true if a thru expansion list (such as *>[A,A,B], or *>norep[A,B]).
+//
+
+bool HumdrumToken::isExpansionList(void) const {
+	if (this->compare(0, 2, "*>") != 0) {
+		return false;
+	}
+	if ((this->find("[") != string::npos) && (this->back() == ']')) {
+		return true;
+	}
+	return false;
 }
 
 
@@ -32821,7 +34138,7 @@ string HumdrumToken::getSubtoken(int index, const string& separator) const {
 
 	int count = 0;
 	for (int i=0; i<(int)size(); i++) {
-		if (string::compare(i, separator.size(), separator) == 0) {
+		if (this->compare(i, separator.size(), separator) == 0) {
 			count++;
 			if (count > index) {
 				break;
@@ -33573,6 +34890,24 @@ int  HumdrumToken::getStrandIndex(void) const {
 
 //////////////////////////////
 //
+// HumdrumToken::getBeamStartElisionLevel -- Returns the count of
+//   elision marks ('&') preceding a slur start character '('.
+//   Returns -1 if there is no slur start character.
+//   Default value: index = 0
+//
+
+int HumdrumToken::getBeamStartElisionLevel(int index) const {
+	if (isDataType("**kern") || isDataType("**mens")) {
+		return Convert::getKernBeamStartElisionLevel((string)(*this), index);
+	} else {
+		return -1;
+	}
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumToken::getSlurStartElisionLevel -- Returns the count of
 //   elision marks ('&') preceding a slur start character '('.
 //   Returns -1 if there is no slur start character.
@@ -33600,6 +34935,24 @@ int HumdrumToken::getSlurStartElisionLevel(int index) const {
 int HumdrumToken::getPhraseStartElisionLevel(int index) const {
 	if (isDataType("**kern") || isDataType("**mens")) {
 		return Convert::getKernPhraseStartElisionLevel((string)(*this), index);
+	} else {
+		return -1;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getBeamEndElisionLevel -- Returns the count of
+//   elision marks ('&') preceding a slur end character ')'.
+//   Returns -1 if there is no slur end character.
+//   Default value: index = 0
+//
+
+int HumdrumToken::getBeamEndElisionLevel(int index) const {
+	if (isDataType("**kern") || isDataType("**mens")) {
+		return Convert::getKernBeamEndElisionLevel((string)(*this), index);
 	} else {
 		return -1;
 	}
@@ -49291,17 +50644,16 @@ PixelColor::PixelColor(void) {
 	// do nothing
 }
 
+
 PixelColor::PixelColor(const PixelColor& color) {
 	Red   = color.Red;
 	Green = color.Green;
 	Blue  = color.Blue;
 }
 
-
 PixelColor::PixelColor(const string& color) {
 	setColor(color);
 }
-
 
 PixelColor::PixelColor(int red, int green, int blue) {
 	Red   = (unsigned int)limit(red, 0, 255);
@@ -49343,23 +50695,6 @@ void PixelColor::invert(void) {
 	Red   = ~Red;
 	Green = ~Green;
 	Blue  = ~Blue;
-}
-
-
-
-//////////////////////////////
-//
-// PixelColor::setColor -- set the contents to the specified value.
-//
-
-PixelColor& PixelColor::setColor(const string& colorstring) {
-	PixelColor color;
-	color = getColor(colorstring);
-	Red   = color.Red;
-	Green = color.Green;
-	Blue  = color.Blue;
-
-	return *this;
 }
 
 
@@ -49495,7 +50830,7 @@ void PixelColor::setBlueF(float value) {
 // PixelColor::setColor --
 //
 
-void PixelColor::setColor(PixelColor color) {
+void PixelColor::setColor(PixelColor& color) {
 	Red   = color.Red;
 	Green = color.Green;
 	Blue  = color.Blue;
@@ -49515,6 +50850,22 @@ PixelColor& PixelColor::setColor(int red, int green, int blue) {
 	return *this;
 }
 
+
+
+//////////////////////////////
+//
+// PixelColor::setColor -- set the contents to the specified value.
+//
+
+PixelColor& PixelColor::setColor(const string& colorstring) {
+	PixelColor color;
+	color = getColor(colorstring);
+	Red   = color.Red;
+	Green = color.Green;
+	Blue  = color.Blue;
+
+	return *this;
+}
 
 
 //////////////////////////////
@@ -49594,7 +50945,7 @@ int PixelColor::operator<(int number) {
 // PixelColor::operator== --
 //
 
-int PixelColor::operator==(PixelColor color) {
+int PixelColor::operator==(PixelColor& color) {
 	if (Red != color.Red) {
 		return 0;
 	}
@@ -49614,7 +50965,7 @@ int PixelColor::operator==(PixelColor color) {
 // PixelColor::operator!= --
 //
 
-int PixelColor::operator!=(PixelColor color) {
+int PixelColor::operator!=(PixelColor& color) {
 	if ((Red == color.Red) && (Green == color.Green) && (Blue == color.Blue)) {
 		return 0;
 	} else {
@@ -49668,7 +51019,7 @@ PixelColor& PixelColor::operator=(int value) {
 // PixelColor::operator+ --
 //
 
-PixelColor PixelColor::operator+(PixelColor color) {
+PixelColor PixelColor::operator+(PixelColor& color) {
 	PixelColor output;
 	output.Red   = (unsigned char)limit((int)Red   + color.Red,   0, 255);
 	output.Green = (unsigned char)limit((int)Green + color.Green, 0, 255);
@@ -49695,7 +51046,7 @@ PixelColor& PixelColor::operator+=(int number) {
 // PixelColor::operator- --
 //
 
-PixelColor PixelColor::operator-(PixelColor color) {
+PixelColor PixelColor::operator-(PixelColor& color) {
 	PixelColor output;
 	output.Red   = (unsigned char)limit((int)Red   - color.Red,   0, 255);
 	output.Green = (unsigned char)limit((int)Green - color.Green, 0, 255);
@@ -49710,7 +51061,7 @@ PixelColor PixelColor::operator-(PixelColor color) {
 // PixelColor::operator* --
 //
 
-PixelColor PixelColor::operator*(PixelColor color) {
+PixelColor PixelColor::operator*(PixelColor& color) {
 	PixelColor output;
 	output.Red   = (unsigned char)limit(floatToChar(charToFloat(Red)*charToFloat(color.Red)), 0, 255);
 	output.Green = (unsigned char)limit(floatToChar(charToFloat(Green)*charToFloat(color.Green)), 0, 255);
@@ -49821,182 +51172,200 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 	}
 
 	if (hasdigit) {
-		char rv[3] = {0};
-		char gv[3] = {0};
-		char bv[3] = {0};
-		string piece1 = colorstring.substr(start, 2);
+		string piece1 = colorstring.substr(start,   2);
 		string piece2 = colorstring.substr(start+2, 2);
 		string piece3 = colorstring.substr(start+4, 2);
 
-		strcpy(rv, piece1.c_str());
-		strcpy(gv, piece1.c_str());
-		strcpy(bv, piece1.c_str());
-		int rval = (int)strtol(rv, NULL, 16);
-		int gval = (int)strtol(gv, NULL, 16);
-		int bval = (int)strtol(bv, NULL, 16);
+		int rval = (int)strtol(piece1.c_str(), NULL, 16);
+		int gval = (int)strtol(piece2.c_str(), NULL, 16);
+		int bval = (int)strtol(piece3.c_str(), NULL, 16);
+
 		output.setColor(rval, gval, bval);
 		return output;
 	}
 
 	// color string
-	char buffer[128] = {0};
-	strncpy(buffer, colorstring.c_str(), 100);
-	length = (int)strlen(buffer);
-	for (int i=0; i<length; i++) {
-		buffer[i] = std::tolower(buffer[i]);
-	}
 	output.setColor(0,0,0);
+	const string& cs = colorstring;
 
-	if (strcmp("aliceblue",          buffer) == 0)  return getColor("#f0f8ff");
-	if (strcmp("antiquewhite",       buffer) == 0)  return getColor("#faebd7");
-	if (strcmp("aqua",               buffer) == 0)  return getColor("#00ffff");
-	if (strcmp("aquamarine",         buffer) == 0)  return getColor("#7fffd4");
-	if (strcmp("azure",              buffer) == 0)  return getColor("#f0ffff");
-	if (strcmp("beige",              buffer) == 0)  return getColor("#f5f5dc");
-	if (strcmp("bisque",             buffer) == 0)  return getColor("#ffe4c4");
-	if (strcmp("black",              buffer) == 0)  return getColor("#000000");
-	if (strcmp("blanchediamond",     buffer) == 0)  return getColor("#ffebcd");
-	if (strcmp("blue",               buffer) == 0)  return getColor("#0000ff");
-	if (strcmp("blueviolet",         buffer) == 0)  return getColor("#8a2be2");
-	if (strcmp("brown",              buffer) == 0)  return getColor("#a52a2a");
-	if (strcmp("burlywood",          buffer) == 0)  return getColor("#ffe4c4");
-	if (strcmp("cadetblue",          buffer) == 0)  return getColor("#5f9ea0");
-	if (strcmp("chartreuse",         buffer) == 0)  return getColor("#7fff00");
-	if (strcmp("coral",              buffer) == 0)  return getColor("#ff7f50");
-	if (strcmp("cornflowerblue",     buffer) == 0)  return getColor("#6495ed");
-	if (strcmp("cornsilk",           buffer) == 0)  return getColor("#fff8dc");
-	if (strcmp("crimson",            buffer) == 0)  return getColor("#dc143c");
-	if (strcmp("cyan",               buffer) == 0)  return getColor("#00ffff");
-	if (strcmp("darkblue",           buffer) == 0)  return getColor("#00008b");
-	if (strcmp("darkcyan",           buffer) == 0)  return getColor("#008b8b");
-	if (strcmp("darkgoldenrod",      buffer) == 0)  return getColor("#b8860b");
-	if (strcmp("darkgray",           buffer) == 0)  return getColor("#a9a9a9");
-	if (strcmp("darkgreen",          buffer) == 0)  return getColor("#006400");
-	if (strcmp("darkkhaki",          buffer) == 0)  return getColor("#bdb76b");
-	if (strcmp("darkmagenta",        buffer) == 0)  return getColor("#8b008b");
-	if (strcmp("darkolivegreen",     buffer) == 0)  return getColor("#556b2f");
-	if (strcmp("darkorange",         buffer) == 0)  return getColor("#ff8c00");
-	if (strcmp("darkorchid",         buffer) == 0)  return getColor("#9932cc");
-	if (strcmp("darkred",            buffer) == 0)  return getColor("#8b0000");
-	if (strcmp("darksalmon",         buffer) == 0)  return getColor("#e9967a");
-	if (strcmp("darkseagreen",       buffer) == 0)  return getColor("#8dbc8f");
-	if (strcmp("darkslateblue",      buffer) == 0)  return getColor("#483d8b");
-	if (strcmp("darkslategray",      buffer) == 0)  return getColor("#2e4e4e");
-	if (strcmp("darkturquoise",      buffer) == 0)  return getColor("#00ded1");
-	if (strcmp("darkviolet",         buffer) == 0)  return getColor("#9400d3");
-	if (strcmp("deeppink",           buffer) == 0)  return getColor("#ff1493");
-	if (strcmp("deepskyblue",        buffer) == 0)  return getColor("#00bfff");
-	if (strcmp("dimgray",            buffer) == 0)  return getColor("#696969");
-	if (strcmp("dodgerblue",         buffer) == 0)  return getColor("#1e90ff");
-	if (strcmp("firebrick",          buffer) == 0)  return getColor("#b22222");
-	if (strcmp("floralwhite",        buffer) == 0)  return getColor("#fffaf0");
-	if (strcmp("forestgreen",        buffer) == 0)  return getColor("#228b22");
-	if (strcmp("fuchsia",            buffer) == 0)  return getColor("#ff00ff");
-	if (strcmp("gainsboro",          buffer) == 0)  return getColor("#dcdcdc");
-	if (strcmp("ghostwhite",         buffer) == 0)  return getColor("#f8f8ff");
-	if (strcmp("gold",               buffer) == 0)  return getColor("#ffd700");
-	if (strcmp("goldenrod",          buffer) == 0)  return getColor("#daa520");
-	if (strcmp("gray",               buffer) == 0)  return getColor("#808080");
-	if (strcmp("gray",               buffer) == 0)  return getColor("#808080");
-	if (strcmp("green",              buffer) == 0)  return getColor("#008000");
-	if (strcmp("greenyellow",        buffer) == 0)  return getColor("#adff2f");
-	if (strcmp("honeydew",           buffer) == 0)  return getColor("#f0fff0");
-	if (strcmp("hotpink",            buffer) == 0)  return getColor("#ff69b4");
-	if (strcmp("indianred",          buffer) == 0)  return getColor("#cd5c5c");
-	if (strcmp("indigo",             buffer) == 0)  return getColor("#4b0082");
-	if (strcmp("ivory",              buffer) == 0)  return getColor("#fffff0");
-	if (strcmp("khaki",              buffer) == 0)  return getColor("#f0e68c");
-	if (strcmp("lavenderblush",      buffer) == 0)  return getColor("#fff0f5");
-	if (strcmp("lavender",           buffer) == 0)  return getColor("#e6e6fa");
-	if (strcmp("lawngreen",          buffer) == 0)  return getColor("#7cfc00");
-	if (strcmp("lemonchiffon",       buffer) == 0)  return getColor("#fffacd");
-	if (strcmp("lightblue",          buffer) == 0)  return getColor("#add8e6");
-	if (strcmp("lightorange",        buffer) == 0)  return getColor("#ff9c00");
-	if (strcmp("lightcoral",         buffer) == 0)  return getColor("#f08080");
-	if (strcmp("lightcyan",          buffer) == 0)  return getColor("#e0ffff");
-	if (strcmp("lightgoldenrodyellow",buffer)== 0)  return getColor("#fafad2");
-	if (strcmp("lightgreen",         buffer) == 0)  return getColor("#90ee90");
-	if (strcmp("lightgrey",          buffer) == 0)  return getColor("#d3d3d3");
-	if (strcmp("lightpink",          buffer) == 0)  return getColor("#ffb6c1");
-	if (strcmp("lightsalmon",        buffer) == 0)  return getColor("#ffa07a");
-	if (strcmp("lightseagreen",      buffer) == 0)  return getColor("#20b2aa");
-	if (strcmp("lightskyblue",       buffer) == 0)  return getColor("#87cefa");
-	if (strcmp("lightslategray",     buffer) == 0)  return getColor("#778899");
-	if (strcmp("lightsteelblue",     buffer) == 0)  return getColor("#b0c4de");
-	if (strcmp("lightyellow",        buffer) == 0)  return getColor("#ffffe0");
-	if (strcmp("lime",               buffer) == 0)  return getColor("#00ff00");
-	if (strcmp("limegreen",          buffer) == 0)  return getColor("#32cd32");
-	if (strcmp("linen",              buffer) == 0)  return getColor("#faf0e6");
-	if (strcmp("magenta",            buffer) == 0)  return getColor("#ff00ff");
-	if (strcmp("maroon",             buffer) == 0)  return getColor("#800000");
-	if (strcmp("maroon",             buffer) == 0)  return getColor("#800000");
-	if (strcmp("mediumaquamarine",   buffer) == 0)  return getColor("#66cdaa");
-	if (strcmp("mediumblue",         buffer) == 0)  return getColor("#0000cd");
-	if (strcmp("mediumorchid",       buffer) == 0)  return getColor("#ba55d3");
-	if (strcmp("mediumpurple",       buffer) == 0)  return getColor("#9370db");
-	if (strcmp("mediumseagreen",     buffer) == 0)  return getColor("#3cb371");
-	if (strcmp("mediumslateblue",    buffer) == 0)  return getColor("#7b68ee");
-	if (strcmp("mediumspringgreen",  buffer) == 0)  return getColor("#00fa9a");
-	if (strcmp("mediumturquoise",    buffer) == 0)  return getColor("#48d1cc");
-	if (strcmp("mediumvioletred",    buffer) == 0)  return getColor("#c71585");
-	if (strcmp("midnightblue",       buffer) == 0)  return getColor("#191970");
-	if (strcmp("mintcream",          buffer) == 0)  return getColor("#f5fffa");
-	if (strcmp("mistyrose",          buffer) == 0)  return getColor("#ffe4e1");
-	if (strcmp("moccasin",           buffer) == 0)  return getColor("#ffe4b5");
-	if (strcmp("navajowhite",        buffer) == 0)  return getColor("#ffdead");
-	if (strcmp("navy",               buffer) == 0)  return getColor("#000080");
-	if (strcmp("navy",               buffer) == 0)  return getColor("#000080");
-	if (strcmp("oldlace",            buffer) == 0)  return getColor("#fdf5e6");
-	if (strcmp("olive",              buffer) == 0)  return getColor("#6b8e23");
-	if (strcmp("olivedrab",          buffer) == 0)  return getColor("#6b8e23");
-	if (strcmp("orange",             buffer) == 0)  return getColor("#ff4500");
-	if (strcmp("orangered",          buffer) == 0)  return getColor("#ff4500");
-	if (strcmp("orchid",             buffer) == 0)  return getColor("#da70d6");
-	if (strcmp("palegoldenrod",      buffer) == 0)  return getColor("#eee8aa");
-	if (strcmp("palegreen",          buffer) == 0)  return getColor("#98fb98");
-	if (strcmp("paleturquoise",      buffer) == 0)  return getColor("#afeeee");
-	if (strcmp("palevioletred",      buffer) == 0)  return getColor("#db7093");
-	if (strcmp("papayawhip",         buffer) == 0)  return getColor("#ffefd5");
-	if (strcmp("peachpuff",          buffer) == 0)  return getColor("#ffdab9");
-	if (strcmp("peru",               buffer) == 0)  return getColor("#cd853f");
-	if (strcmp("pink",               buffer) == 0)  return getColor("#ffc8cb");
-	if (strcmp("plum",               buffer) == 0)  return getColor("#dda0dd");
-	if (strcmp("powderblue",         buffer) == 0)  return getColor("#b0e0e6");
-	if (strcmp("purple",             buffer) == 0)  return getColor("#800080");
-	if (strcmp("purple",             buffer) == 0)  return getColor("#800080");
-	if (strcmp("quartz",             buffer) == 0)  return getColor("#c9c9f3");
-	if (strcmp("red",                buffer) == 0)  return getColor("#ff0000");
-	if (strcmp("rosybrown",          buffer) == 0)  return getColor("#bc8f8f");
-	if (strcmp("royalblue",          buffer) == 0)  return getColor("#4169e1");
-	if (strcmp("saddlebrown",        buffer) == 0)  return getColor("#8b4513");
-	if (strcmp("salmon",             buffer) == 0)  return getColor("#fa8072");
-	if (strcmp("sandybrown",         buffer) == 0)  return getColor("#f4a460");
-	if (strcmp("seagreen",           buffer) == 0)  return getColor("#2e8b57");
-	if (strcmp("seashell",           buffer) == 0)  return getColor("#fff5ee");
-	if (strcmp("sienna",             buffer) == 0)  return getColor("#a0522d");
-	if (strcmp("silver",             buffer) == 0)  return getColor("#c0c0c0");
-	if (strcmp("silver",             buffer) == 0)  return getColor("#c0c0c0");
-	if (strcmp("skyblue",            buffer) == 0)  return getColor("#87ceeb");
-	if (strcmp("slateblue",          buffer) == 0)  return getColor("#6a5acd");
-	if (strcmp("snow",               buffer) == 0)  return getColor("#fffafa");
-	if (strcmp("steelblue",          buffer) == 0)  return getColor("#4682b4");
-	if (strcmp("tan",                buffer) == 0)  return getColor("#d2b48c");
-	if (strcmp("teal",               buffer) == 0)  return getColor("#008080");
-	if (strcmp("thistle",            buffer) == 0)  return getColor("#d8bfd8");
-	if (strcmp("tomato",             buffer) == 0)  return getColor("#ff6347");
-	if (strcmp("turquoise",          buffer) == 0)  return getColor("#40e0d0");
-	if (strcmp("violet",             buffer) == 0)  return getColor("#ee82ee");
-	if (strcmp("wheat",              buffer) == 0)  return getColor("#f5deb3");
-	if (strcmp("white",              buffer) == 0)  return getColor("#ffffff");
-	if (strcmp("white",              buffer) == 0)  return getColor("#ffffff");
-	if (strcmp("whitesmoke",         buffer) == 0)  return getColor("#f5f5f5");
-	if (strcmp("yellow",             buffer) == 0)  return getColor("#ffff00");
-	if (strcmp("yellowgreen",        buffer) == 0)  return getColor("#9acd32");
+	char fc = '\0';
+	if (cs.empty()) {
+		fc = cs[0];
+	}
 
-// References:
-//            http://netdancer.com/rgbblk.htm
-//            http://www.htmlhelp.com/cgi-bin/color.cgi?rgb=FFFFFF
-//            http://www.brobstsystems.com/colors1.htm
+	switch (fc) {
+	case 'a':
+	if (cs == "aliceblue"           ) { output.setColor("#f0f8ff");  return output; }
+	if (cs == "antiquewhite"        ) { output.setColor("#faebd7");  return output; }
+	if (cs == "aqua"                ) { output.setColor("#00ffff");  return output; }
+	if (cs == "aquamarine"          ) { output.setColor("#7fffd4");  return output; }
+	if (cs == "azure"               ) { output.setColor("#f0ffff");  return output; }
+	break; case 'b':
+	if (cs == "beige"               ) { output.setColor("#f5f5dc");  return output; }
+	if (cs == "bisque"              ) { output.setColor("#ffe4c4");  return output; }
+	if (cs == "black"               ) { output.setColor("#000000");  return output; }
+	if (cs == "blanchediamond"      ) { output.setColor("#ffebcd");  return output; }
+	if (cs == "blue"                ) { output.setColor("#0000ff");  return output; }
+	if (cs == "blueviolet"          ) { output.setColor("#8a2be2");  return output; }
+	if (cs == "brown"               ) { output.setColor("#a52a2a");  return output; }
+	if (cs == "burlywood"           ) { output.setColor("#ffe4c4");  return output; }
+	break; case 'c':
+	if (cs == "cadetblue"           ) { output.setColor("#5f9ea0");  return output; }
+	if (cs == "chartreuse"          ) { output.setColor("#7fff00");  return output; }
+	if (cs == "coral"               ) { output.setColor("#ff7f50");  return output; }
+	if (cs == "cornflowerblue"      ) { output.setColor("#6495ed");  return output; }
+	if (cs == "cornsilk"            ) { output.setColor("#fff8dc");  return output; }
+	if (cs == "crimson"             ) { output.setColor("#dc143c");  return output; }
+	if (cs == "cyan"                ) { output.setColor("#00ffff");  return output; }
+	break; case 'd':
+	if (cs == "darkblue"            ) { output.setColor("#00008b");  return output; }
+	if (cs == "darkcyan"            ) { output.setColor("#008b8b");  return output; }
+	if (cs == "darkgoldenrod"       ) { output.setColor("#b8860b");  return output; }
+	if (cs == "darkgray"            ) { output.setColor("#a9a9a9");  return output; }
+	if (cs == "darkgreen"           ) { output.setColor("#006400");  return output; }
+	if (cs == "darkkhaki"           ) { output.setColor("#bdb76b");  return output; }
+	if (cs == "darkmagenta"         ) { output.setColor("#8b008b");  return output; }
+	if (cs == "darkolivegreen"      ) { output.setColor("#556b2f");  return output; }
+	if (cs == "darkorange"          ) { output.setColor("#ff8c00");  return output; }
+	if (cs == "darkorchid"          ) { output.setColor("#9932cc");  return output; }
+	if (cs == "darkred"             ) { output.setColor("#8b0000");  return output; }
+	if (cs == "darksalmon"          ) { output.setColor("#e9967a");  return output; }
+	if (cs == "darkseagreen"        ) { output.setColor("#8dbc8f");  return output; }
+	if (cs == "darkslateblue"       ) { output.setColor("#483d8b");  return output; }
+	if (cs == "darkslategray"       ) { output.setColor("#2e4e4e");  return output; }
+	if (cs == "darkturquoise"       ) { output.setColor("#00ded1");  return output; }
+	if (cs == "darkviolet"          ) { output.setColor("#9400d3");  return output; }
+	if (cs == "deeppink"            ) { output.setColor("#ff1493");  return output; }
+	if (cs == "deepskyblue"         ) { output.setColor("#00bfff");  return output; }
+	if (cs == "dimgray"             ) { output.setColor("#696969");  return output; }
+	if (cs == "dodgerblue"          ) { output.setColor("#1e90ff");  return output; }
+	break; case 'f':
+	if (cs == "firebrick"           ) { output.setColor("#b22222");  return output; }
+	if (cs == "floralwhite"         ) { output.setColor("#fffaf0");  return output; }
+	if (cs == "forestgreen"         ) { output.setColor("#228b22");  return output; }
+	if (cs == "fuchsia"             ) { output.setColor("#ff00ff");  return output; }
+	break; case 'g':
+	if (cs == "gainsboro"           ) { output.setColor("#dcdcdc");  return output; }
+	if (cs == "ghostwhite"          ) { output.setColor("#f8f8ff");  return output; }
+	if (cs == "gold"                ) { output.setColor("#ffd700");  return output; }
+	if (cs == "goldenrod"           ) { output.setColor("#daa520");  return output; }
+	if (cs == "gray"                ) { output.setColor("#808080");  return output; }
+	if (cs == "gray"                ) { output.setColor("#808080");  return output; }
+	if (cs == "green"               ) { output.setColor("#008000");  return output; }
+	if (cs == "greenyellow"         ) { output.setColor("#adff2f");  return output; }
+	break; case 'h':
+	if (cs == "honeydew"            ) { output.setColor("#f0fff0");  return output; }
+	if (cs == "hotpink"             ) { output.setColor("#ff69b4");  return output; }
+	if (cs == "indianred"           ) { output.setColor("#cd5c5c");  return output; }
+	break; case 'i':
+	if (cs == "indigo"              ) { output.setColor("#4b0082");  return output; }
+	if (cs == "ivory"               ) { output.setColor("#fffff0");  return output; }
+	break; case 'k':
+	if (cs == "khaki"               ) { output.setColor("#f0e68c");  return output; }
+	break; case 'l':
+	if (cs == "lavenderblush"       ) { output.setColor("#fff0f5");  return output; }
+	if (cs == "lavender"            ) { output.setColor("#e6e6fa");  return output; }
+	if (cs == "lawngreen"           ) { output.setColor("#7cfc00");  return output; }
+	if (cs == "lemonchiffon"        ) { output.setColor("#fffacd");  return output; }
+	if (cs == "lightblue"           ) { output.setColor("#add8e6");  return output; }
+	if (cs == "lightorange"         ) { output.setColor("#ff9c00");  return output; }
+	if (cs == "lightcoral"          ) { output.setColor("#f08080");  return output; }
+	if (cs == "lightcyan"           ) { output.setColor("#e0ffff");  return output; }
+	if (cs == "lightgoldenrodyellow") { output.setColor("#fafad2");  return output; }
+	if (cs == "lightgreen"          ) { output.setColor("#90ee90");  return output; }
+	if (cs == "lightgrey"           ) { output.setColor("#d3d3d3");  return output; }
+	if (cs == "lightpink"           ) { output.setColor("#ffb6c1");  return output; }
+	if (cs == "lightsalmon"         ) { output.setColor("#ffa07a");  return output; }
+	if (cs == "lightseagreen"       ) { output.setColor("#20b2aa");  return output; }
+	if (cs == "lightskyblue"        ) { output.setColor("#87cefa");  return output; }
+	if (cs == "lightslategray"      ) { output.setColor("#778899");  return output; }
+	if (cs == "lightsteelblue"      ) { output.setColor("#b0c4de");  return output; }
+	if (cs == "lightyellow"         ) { output.setColor("#ffffe0");  return output; }
+	if (cs == "lime"                ) { output.setColor("#00ff00");  return output; }
+	if (cs == "limegreen"           ) { output.setColor("#32cd32");  return output; }
+	if (cs == "linen"               ) { output.setColor("#faf0e6");  return output; }
+	break; case 'm':
+	if (cs == "magenta"             ) { output.setColor("#ff00ff");  return output; }
+	if (cs == "maroon"              ) { output.setColor("#800000");  return output; }
+	if (cs == "maroon"              ) { output.setColor("#800000");  return output; }
+	if (cs == "mediumaquamarine"    ) { output.setColor("#66cdaa");  return output; }
+	if (cs == "mediumblue"          ) { output.setColor("#0000cd");  return output; }
+	if (cs == "mediumorchid"        ) { output.setColor("#ba55d3");  return output; }
+	if (cs == "mediumpurple"        ) { output.setColor("#9370db");  return output; }
+	if (cs == "mediumseagreen"      ) { output.setColor("#3cb371");  return output; }
+	if (cs == "mediumslateblue"     ) { output.setColor("#7b68ee");  return output; }
+	if (cs == "mediumspringgreen"   ) { output.setColor("#00fa9a");  return output; }
+	if (cs == "mediumturquoise"     ) { output.setColor("#48d1cc");  return output; }
+	if (cs == "mediumvioletred"     ) { output.setColor("#c71585");  return output; }
+	if (cs == "midnightblue"        ) { output.setColor("#191970");  return output; }
+	if (cs == "mintcream"           ) { output.setColor("#f5fffa");  return output; }
+	if (cs == "mistyrose"           ) { output.setColor("#ffe4e1");  return output; }
+	if (cs == "moccasin"            ) { output.setColor("#ffe4b5");  return output; }
+	break; case 'n':
+	if (cs == "navajowhite"         ) { output.setColor("#ffdead");  return output; }
+	if (cs == "navy"                ) { output.setColor("#000080");  return output; }
+	if (cs == "navy"                ) { output.setColor("#000080");  return output; }
+	break; case 'o':
+	if (cs == "oldlace"             ) { output.setColor("#fdf5e6");  return output; }
+	if (cs == "olive"               ) { output.setColor("#6b8e23");  return output; }
+	if (cs == "olivedrab"           ) { output.setColor("#6b8e23");  return output; }
+	if (cs == "orange"              ) { output.setColor("#ff4500");  return output; }
+	if (cs == "orangered"           ) { output.setColor("#ff4500");  return output; }
+	if (cs == "orchid"              ) { output.setColor("#da70d6");  return output; }
+	break; case 'p':
+	if (cs == "palegoldenrod"       ) { output.setColor("#eee8aa");  return output; }
+	if (cs == "palegreen"           ) { output.setColor("#98fb98");  return output; }
+	if (cs == "paleturquoise"       ) { output.setColor("#afeeee");  return output; }
+	if (cs == "palevioletred"       ) { output.setColor("#db7093");  return output; }
+	if (cs == "papayawhip"          ) { output.setColor("#ffefd5");  return output; }
+	if (cs == "peachpuff"           ) { output.setColor("#ffdab9");  return output; }
+	if (cs == "peru"                ) { output.setColor("#cd853f");  return output; }
+	if (cs == "pink"                ) { output.setColor("#ffc8cb");  return output; }
+	if (cs == "plum"                ) { output.setColor("#dda0dd");  return output; }
+	if (cs == "powderblue"          ) { output.setColor("#b0e0e6");  return output; }
+	if (cs == "purple"              ) { output.setColor("#800080");  return output; }
+	if (cs == "purple"              ) { output.setColor("#800080");  return output; }
+	break; case 'q':
+	if (cs == "quartz"              ) { output.setColor("#c9c9f3");  return output; }
+	break; case 'r':
+	if (cs == "red"                 ) { output.setColor("#ff0000");  return output; }
+	if (cs == "rosybrown"           ) { output.setColor("#bc8f8f");  return output; }
+	if (cs == "royalblue"           ) { output.setColor("#4169e1");  return output; }
+	break; case 's':
+	if (cs == "saddlebrown"         ) { output.setColor("#8b4513");  return output; }
+	if (cs == "salmon"              ) { output.setColor("#fa8072");  return output; }
+	if (cs == "sandybrown"          ) { output.setColor("#f4a460");  return output; }
+	if (cs == "seagreen"            ) { output.setColor("#2e8b57");  return output; }
+	if (cs == "seashell"            ) { output.setColor("#fff5ee");  return output; }
+	if (cs == "sienna"              ) { output.setColor("#a0522d");  return output; }
+	if (cs == "silver"              ) { output.setColor("#c0c0c0");  return output; }
+	if (cs == "silver"              ) { output.setColor("#c0c0c0");  return output; }
+	if (cs == "skyblue"             ) { output.setColor("#87ceeb");  return output; }
+	if (cs == "slateblue"           ) { output.setColor("#6a5acd");  return output; }
+	if (cs == "snow"                ) { output.setColor("#fffafa");  return output; }
+	if (cs == "steelblue"           ) { output.setColor("#4682b4");  return output; }
+	break; case 't':
+	if (cs == "tan"                 ) { output.setColor("#d2b48c");  return output; }
+	if (cs == "teal"                ) { output.setColor("#008080");  return output; }
+	if (cs == "thistle"             ) { output.setColor("#d8bfd8");  return output; }
+	if (cs == "tomato"              ) { output.setColor("#ff6347");  return output; }
+	if (cs == "turquoise"           ) { output.setColor("#40e0d0");  return output; }
+	break; case 'v':
+	if (cs == "violet"              ) { output.setColor("#ee82ee");  return output; }
+	break; case 'w':
+	if (cs == "wheat"               ) { output.setColor("#f5deb3");  return output; }
+	if (cs == "white"               ) { output.setColor("#ffffff");  return output; }
+	if (cs == "white"               ) { output.setColor("#ffffff");  return output; }
+	if (cs == "whitesmoke"          ) { output.setColor("#f5f5f5");  return output; }
+	break; case 'y':
+	if (cs == "yellow"              ) { output.setColor("#ffff00");  return output; }
+	if (cs == "yellowgreen"         ) { output.setColor("#9acd32");  return output; }
+	}
+
+	// References:
+	//            http://netdancer.com/rgbblk.htm
+	//            http://www.htmlhelp.com/cgi-bin/color.cgi?rgb=FFFFFF
+	//            http://www.brobstsystems.com/colors1.htm
 
 	return output;
 }
@@ -50134,6 +51503,224 @@ int PixelColor::limit(int value, int min, int max) {
 		value = max;
 	}
 	return value;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor:mix -- mix two colors together.
+//
+
+PixelColor PixelColor::mix(PixelColor& color1, PixelColor& color2) {
+
+	PixelColor p1 = color1.getHsi();
+	PixelColor p2 = color2.getHsi();
+
+	PixelColor output;
+	unsigned int r = ((unsigned int)color1.Red + (unsigned int)color2.Red)/2;
+	unsigned int g = ((unsigned int)color1.Green + (unsigned int)color2.Green)/2;
+	unsigned int b = ((unsigned int)color1.Blue + (unsigned int)color2.Blue)/2;
+
+	output.setRed(r);
+	output.setGreen(g);
+	output.setBlue(b);
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::rgb2hsi -- convert from RGB color space to HSI color space.
+//     You have to keep track of color space used by pixel since RGB/HSI
+//     state is not stored in pixel.
+//
+
+PixelColor& PixelColor::rgb2hsi(void) {
+
+	// Convert RGB into range from 0 to 255.0:
+	double R = Red   / 255.0;
+	double G = Green / 255.0;
+	double B = Blue  / 255.0;
+
+	// HSI will be in the range from 0.0 to 1.0;
+	double H = 0.0; // will be stored in Red parameter
+	double S = 0.0; // will be stored in Green parameter
+	double I = 0.0; // will be stored in Blue parameter
+
+	double min = R;
+	if (G < min) min = G;
+	if (B < min) min = B;
+
+	I = (R+G+B)/3.0;
+	S = 1 - min/I;
+	if (S == 0.0) {
+		H = 0.0;
+	} else {
+		H = ((R-G)+(R-B))/2.0;
+		H = H/sqrt((R-G)*(R-G) + (R-B)*(G-B));
+		H = acos(H);
+		if (B > G) {
+			H = 2*M_PI - H;
+		}
+		H = H/(2*M_PI);
+	}
+
+	// Adjust output range from 0 to 255:
+	int h = (int)(H  * 255.0 + 0.5);
+	if (h < 0)   { h = 0; }
+	if (h > 255) { h = 255; }
+
+	int s = (int)(S  * 255.0 + 0.5);
+	if (s < 0)   { s = 0; }
+	if (s > 255) { s = 255; }
+
+	int i = (int)(I  * 255.0 + 0.5);
+	if (i < 0)   { i = 0; }
+	if (i > 255) { i = 255; }
+
+	Red   = h;
+	Green = s;
+	Blue  = i;
+
+	return *this;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::hsi2rgb -- convert from HSI color space to RGB color space.
+//
+
+PixelColor& PixelColor::hsi2rgb(void) {
+
+	// Scale input HSI into the range from 0.0 to 1.0:
+	double H = Red   / 255.0;
+	double S = Green / 255.0;
+	double I = Blue  / 255.0;
+
+	double R = 0.0;
+	double G = 0.0;
+	double B = 0.0;
+
+	if (H < 1.0/3.0) {
+		B = (1-S)/3;
+		R = (1+S*cos(2*M_PI*H)/cos(M_PI/3-2*M_PI*H))/3.0;
+		G = 1 - (B + R);
+	} else if (H < 2.0/3.0) {
+		H = H - 1.0/3.0;
+		R = (1-S)/3;
+		G = (1+S*cos(2*M_PI*H)/cos(M_PI/3-2*M_PI*H))/3.0;
+		B = 1 - (R+G);
+	} else {
+		H = H - 2.0/3.0;
+		G = (1-S)/3;
+		B = (1+S*cos(2*M_PI*H)/cos(M_PI/3-2*M_PI*H))/3.0;
+		R = 1 - (G+B);
+	}
+
+	// Adjust output range from 0 to 255:
+	int r = (int)(I * R * 3.0 * 255.0 + 0.5);
+	if (r < 0)   { r = 0; }
+	if (r > 255) { r = 255; }
+
+	int g = (int)(I * G * 3.0 * 255.0 + 0.5);
+	if (g < 0)   { g = 0; }
+	if (g > 255) { g = 255; }
+
+	int b = (int)(I * B * 3.0 * 255.0 + 0.5);
+	if (b < 0)   { b = 0; }
+	if (b > 255) { b = 255; }
+
+	Red   = r;
+	Green = g;
+	Blue  = b;
+
+	return *this;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::getHsi -- convert from RGB color space to HSI color space.
+//     You have to keep track of color space used by pixel since RGB/HSI
+//     state is not stored in pixel.
+//
+
+PixelColor PixelColor::getHsi(void) {
+	PixelColor tempColor = *this;
+	tempColor.rgb2hsi();
+	return tempColor;
+}
+
+
+
+//////////////////////////////
+//
+// PixelColor::getRgb -- convert from HSI color space to RGB color space.
+//     You have to keep track of color space used by pixel since RGB/HSI
+//     state is not stored in pixel.
+//
+
+PixelColor PixelColor::getRgb(void) {
+	PixelColor tempColor = *this;
+	tempColor.hsi2rgb();
+	return tempColor;
+}
+
+
+//////////////////////////////
+//
+// PixelColor::getHexColor --
+//
+
+string PixelColor::getHexColor(void) {
+	string output = "#";
+	unsigned char redA   = (Red   & 0xF0) >> 4;
+	unsigned char redB   = (Red   & 0x0F);
+	unsigned char greenA = (Green & 0xF0) >> 4;
+	unsigned char greenB = (Green & 0x0F);
+	unsigned char blueA  = (Blue  & 0xF0) >> 4;
+	unsigned char blueB  = (Blue  & 0x0F);
+
+	if (redA < 10) {
+		output += '0' + redA;
+	} else {
+		output += 'A' + redA - 10;
+	}
+	if (redB < 10) {
+		output += '0' + redB;
+	} else {
+		output += 'A' + redB - 10;
+	}
+
+	if (greenA < 10) {
+		output += '0' + greenA;
+	} else {
+		output += 'A' + greenA - 10;
+	}
+	if (greenB < 10) {
+		output += '0' + greenB;
+	} else {
+		output += 'A' + greenB - 10;
+	}
+
+	if (blueA < 10) {
+		output += '0' + blueA;
+	} else {
+		output += 'A' + blueA - 10;
+	}
+	if (blueB < 10) {
+		output += '0' + blueB;
+	} else {
+		output += 'A' + blueB - 10;
+	}
+
+	return output;
 }
 
 
@@ -54340,6 +55927,7 @@ Tool_cint::Tool_cint(void) {
 	define("R|no-rest|no-rests|norest|norests=b", "number of sequential modules");
 	define("O|octave-all=b", "transpose all harmonic intervals to within an octave");
 	define("chromatic=b", "display intervals as diatonic intervals with chromatic alterations");
+	define("color=s:red", "color of marked notes");
 	define("search=s:", "search string");
 	define("mark=b", "mark matches notes from searches in data");
 	define("count=b", "count matched modules from search query");
@@ -54459,7 +56047,7 @@ NoteNode::~NoteNode(void) {
 void NoteNode::clear(void) {
 	mark = measure = serial = b40 = 0;
 	beatsize = 0.0;
-	notemarker = 0;
+	notemarker = "";
 	line = spine = -1;
 	protected_id = "";
 }
@@ -54551,7 +56139,7 @@ int Tool_cint::processFile(HumdrumFile& infile) {
 		}
 		infile.createLinesFromTokens();
 		m_humdrum_text << infile;
-		m_humdrum_text << "!!!RDF**kern: @ = matched note, color=\"#ff0000\"\n";
+		m_humdrum_text << "!!!RDF**kern: " << NoteMarker << " = matched note, color=\"" << MarkColor << "\"\n";
 	}
 
 	if (debugQ) {
@@ -54925,7 +56513,7 @@ int Tool_cint::printCombinationModulePrepare(ostream& out, const string& filenam
 	HumRegex hre;
 	stringstream tempstream;
 	int match;
-	char notemarker = '\0';
+	string notemarker;
 // ggg
 	int status = printCombinationModule(tempstream, filename, notes,
 			n, startline, part1, part2, retrospective, notemarker);
@@ -54933,8 +56521,8 @@ int Tool_cint::printCombinationModulePrepare(ostream& out, const string& filenam
 		if (raw2Q || rawQ) {
 			tempstream << "\n";
 		}
-		if (NoteMarker && (notemarker == NoteMarker)) {
-			out << (char)NoteMarker;
+		if ((!NoteMarker.empty()) && (notemarker == NoteMarker)) {
+			out << NoteMarker;
 		}
 		if (searchQ) {
 			// Check to see if the extracted module matches to the
@@ -55154,10 +56742,10 @@ void Tool_cint::addMarksToInputData(HumdrumFile& infile,
 //
 
 void Tool_cint::markNote(HumdrumFile& infile, int line, int col) {
-	// string text = *infile.token(line, col);
-	// text += "@";
-	// infile.token(line, col)->setText(text);
-	*infile.token(line, col) += "@";
+	HTp token = infile.token(line, col);
+	string text = *token;
+	text += NoteMarker;
+	token->setText(text);
 }
 
 
@@ -55290,10 +56878,10 @@ int Tool_cint::getOctaveAdjustForCombinationModule(vector<vector<NoteNode> >& no
 
 int Tool_cint::printCombinationModule(ostream& out, const string& filename,
 		vector<vector<NoteNode> >& notes, int n, int startline, int part1,
-		int part2, vector<vector<string> >& retrospective, char& notemarker,
+		int part2, vector<vector<string> >& retrospective, string& notemarker,
 		int markstate) {
 
-	notemarker = '\0';
+	notemarker = "";
 
 	if (norestsQ) {
 		if (notes[part1][startline].b40 == 0) {
@@ -56285,8 +57873,8 @@ void Tool_cint::printPitchGrid(vector<vector<NoteNode> >& notes, HumdrumFile& in
 				m_humdrum_text << beat << "\t";
 			}
 			for (j=0; j<(int)notes.size(); j++) {
-				if (notes[j][i].notemarker) {
-					m_humdrum_text << (char)notes[j][i].notemarker;
+				if (!notes[j][i].notemarker.empty()) {
+					m_humdrum_text << notes[j][i].notemarker;
 				}
 				m_humdrum_text << notes[j][i].b40;
 				if (j < (int)notes.size()-1) {
@@ -56332,8 +57920,8 @@ void Tool_cint::printPitchGrid(vector<vector<NoteNode> >& notes, HumdrumFile& in
 				m_humdrum_text << beat << "\t";
 			}
 			for (j=0; j<(int)notes.size(); j++) {
-				if (notes[j][i].notemarker) {
-					m_humdrum_text << (char)notes[j][i].notemarker;
+				if (!notes[j][i].notemarker.empty()) {
+					m_humdrum_text << notes[j][i].notemarker;
 				}
 				pitch = notes[j][i].b40;
 				abspitch = abs(pitch);
@@ -56385,16 +57973,16 @@ void Tool_cint::printPitchGrid(vector<vector<NoteNode> >& notes, HumdrumFile& in
 			if (rhythmQ) {
 				line = notes[0][i].line;
 				beat = infile[line].getDurationFromBarline().getFloat() * notes[0][i].beatsize + 1;
-				if (notes[j][i].notemarker) {
-					m_humdrum_text << (char)notes[j][i].notemarker;
+				if (!notes[j][i].notemarker.empty()) {
+					m_humdrum_text << notes[j][i].notemarker;
 				}
 				m_humdrum_text << infile[line].getDurationFromStart() << "\t";
 				m_humdrum_text << notes[0][i].measure << "\t";
 				m_humdrum_text << beat << "\t";
 			}
 			for (j=0; j<(int)notes.size(); j++) {
-				if (notes[j][i].notemarker) {
-					m_humdrum_text << (char)notes[j][i].notemarker;
+				if (!notes[j][i].notemarker.empty()) {
+					m_humdrum_text << notes[j][i].notemarker;
 				}
 				pitch = notes[j][i].b40;
 				if (pitch == 0) {
@@ -56447,16 +58035,16 @@ void Tool_cint::printPitchGrid(vector<vector<NoteNode> >& notes, HumdrumFile& in
 			if (rhythmQ) {
 				line = notes[0][i].line;
 				beat = infile[line].getDurationFromBarline().getFloat() * notes[0][i].beatsize + 1;
-				if (notes[j][i].notemarker) {
-					m_humdrum_text << (char)notes[j][i].notemarker;
+				if (!notes[j][i].notemarker.empty()) {
+					m_humdrum_text << notes[j][i].notemarker;
 				}
 				m_humdrum_text << infile[line].getDurationFromStart() << "\t";
 				m_humdrum_text << notes[0][i].measure << "\t";
 				m_humdrum_text << beat << "\t";
 			}
 			for (j=0; j<(int)notes.size(); j++) {
-				if (notes[j][i].notemarker) {
-					m_humdrum_text << (char)notes[j][i].notemarker;
+				if (!notes[j][i].notemarker.empty()) {
+					m_humdrum_text << notes[j][i].notemarker;
 				}
 				pitch = notes[j][i].b40;
 				abspitch = abs(pitch);
@@ -56868,7 +58456,7 @@ void Tool_cint::initialize(void) {
 			  << "craig@ccrma.stanford.edu, September 2013" << endl;
 		exit(0);
 	} else if (getBoolean("version")) {
-		m_humdrum_text << getCommand() << ", version: 31 May 2017" << endl;
+		m_humdrum_text << getCommand() << ", version: 16 March 2022" << endl;
 		m_humdrum_text << "compiled: " << __DATE__ << endl;
 		exit(0);
 	} else if (getBoolean("help")) {
@@ -56942,9 +58530,13 @@ void Tool_cint::initialize(void) {
 	uncrossQ     = getBoolean("uncross");
 	locationQ    = getBoolean("location");
 	retroQ       = getBoolean("retrospective");
-	NoteMarker   = 0;
+	MarkColor    = getString("color");
+	NoteMarker   = "";
 	if (getBoolean("note-marker")) {
-		NoteMarker = getString("note-marker").c_str()[0];
+		NoteMarker = getString("note-marker");
+	}
+	if (searchQ) {
+		NoteMarker = getString("note-marker");
 	}
 	if (Chaincount < 0) {
 		Chaincount = 0;
@@ -56995,6 +58587,986 @@ void Tool_cint::usage(const string& command) {
 	"                                                                         \n"
 	<< endl;
 }
+
+
+
+
+/////////////////////////////////
+//
+// Tool_cmr::Tool_cmr -- Set the recognized options for the tool.
+//
+
+Tool_cmr::Tool_cmr(void) {
+	define("data|raw|raw-data=b",  "print analysis data");
+	define("m|mark|marker=s:@",    "symbol to mark cmr notes");
+	define("c|color=s:red",        "color of marked notes");
+	define("r|ignore-rest=d:1.0",  "ignore rests smaller than given value (in whole notes)");
+	define("n|number=i:3",         "number of high notes in a row");
+	define("d|dur|duration=d:6.0", "maximum duration between cmr note attacks in whole notes");
+	define("i|info=b",             "print cmr info");
+	define("p|cmrs=b",             "detect only positive cmrs");
+	define("t|troughs=b",          "detect only negative cmrs");
+	define("A|not-accented=b",     "counts only cmrs that do not have melodic accentation");
+	define("l|local-peaks=b",      "mark local peaks");
+	define("L|only-local-peaks=b", "mark local peaks only");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_cmr::run -- Do the main work of the tool.
+//
+
+bool Tool_cmr::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_cmr::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_cmr::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_cmr::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_cmr::initialize(void) {
+	m_rawQ         = getBoolean("raw-data");
+	m_cmrQ         = getBoolean("cmrs");
+	m_ncmrQ        = getBoolean("troughs");
+	m_naccentedQ   = getBoolean("not-accented");
+	m_localQ       = getBoolean("local-peaks");
+	m_localOnlyQ   = getBoolean("only-local-peaks");
+	if (m_localOnlyQ) {
+		m_localQ = true;
+	}
+
+	m_marker       = getString("marker");
+	m_color        = getString("color");
+
+	m_smallRest    = getDouble("ignore-rest") * 4.0;  // convert from whole notes to quarter notes
+	m_cmrNum       = getInteger("number");
+	m_cmrDur       = getInteger("duration") * 4.0;    // convert from whole notes to quarter notes
+	m_infoQ        = getBoolean("info");
+	m_count        = 0;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::processFile --
+//
+
+void Tool_cmr::processFile(HumdrumFile& infile) {
+	// get list of music spines (columns):
+	vector<HTp> starts = infile.getKernSpineStartList();
+
+	m_local_count = 0;
+
+	m_barNum = infile.getMeasureNumbers();
+
+	// The first "spine" is the lowest part on the system.
+	// The last "spine" is the highest part on the system.
+	for (int i=0; i<(int)starts.size(); i++) {
+		if (m_cmrQ) {
+			processSpine(starts[i]);
+		} else if (m_ncmrQ) {
+			processSpineFlipped(starts[i]);
+		} else {
+			processSpine(starts[i]);
+			processSpineFlipped(starts[i]);
+		}
+	}
+
+	infile.createLinesFromTokens();
+
+	if (!m_rawQ) {
+		m_humdrum_text << infile;
+
+		if (!m_localOnlyQ) {
+			m_humdrum_text << "!!!RDF**kern: ";
+			m_humdrum_text << m_marker;
+			m_humdrum_text << " = marked note, color=";
+			m_humdrum_text << m_color;
+			m_humdrum_text << endl;
+		}
+
+		if (m_local_count > 0) {
+			m_humdrum_text << "!!!RDF**kern: ";
+			m_humdrum_text << m_local_marker;
+			m_humdrum_text << " = marked note, color=";
+			m_humdrum_text << m_local_color;
+			m_humdrum_text << endl;
+		}
+
+		if (m_local_count_n > 0) {
+			m_humdrum_text << "!!!RDF**kern: ";
+			m_humdrum_text << m_local_marker_n;
+			m_humdrum_text << " = marked note, color=";
+			m_humdrum_text << m_local_color_n;
+			m_humdrum_text << endl;
+		}
+
+	}
+
+	if (!m_localOnlyQ) {
+		postProcessAnalysis(infile);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::postProcessAnalysis --
+//
+
+void Tool_cmr::postProcessAnalysis(HumdrumFile& infile) {
+	mergeOverlappingPeaks();
+
+	int all_note_count = countNotesInScore(infile);
+
+	int cmr_note_count = 0;
+	for (int i=0; i<(int)m_cmrIndex.size(); i++) {
+		if (m_cmrIndex[i] < 0) {
+			continue;
+		}
+		cmr_note_count += m_cmrPeakCount[i];
+	}
+	//print all statistics for cmr groups
+
+	// if (m_infoQ) {
+	m_humdrum_text << "!!!cmr_groups: " << m_count << endl;
+	m_humdrum_text << "!!!cmr_notes: "  << cmr_note_count << endl;
+	m_humdrum_text << "!!!score_notes: " << all_note_count << endl;
+	// print density information for cmrs per mille
+	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"  << endl;
+	m_humdrum_text << "!!!cmr_note_density: " << ((double)cmr_note_count / all_note_count) * 1000 << " permil" << endl;
+	m_humdrum_text << "!!!cmr_group_density: " << ((double)m_count / all_note_count) * 1000 << " permil" << endl;
+
+	int pcounter = 1;
+	for (int i=0; i<(int)m_cmrIndex.size(); i++) {
+		if (m_cmrIndex[i] < 0) {
+			// This group has been merged into a larger one.
+			continue;
+		}
+		m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"  << endl;
+		m_humdrum_text << "!!!cmr_group: "     << pcounter++            << endl;
+		m_humdrum_text << "!!!start_measure: "  << m_cmrMeasureBegin[i] << endl;
+		m_humdrum_text << "!!!end_measure: "    << m_cmrMeasureEnd[i]   << endl;
+		m_humdrum_text << "!!!group_duration: " << m_cmrDuration[i].getFloat()/4.0 << endl;
+		m_humdrum_text << "!!!group_pitches:";
+		for (int j=0; j<(int)m_cmrPitch[i].size(); j++) {
+			m_humdrum_text << " " << m_cmrPitch[i][j];
+			m_humdrum_text << "(" << m_cmrPitch[i][j]->getLineIndex() << ")";
+		}
+		m_humdrum_text << endl;
+		m_humdrum_text << "!!!group_cmrcount: " << m_cmrPeakCount[i]    << endl;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// mergeOverlappingPeaks -- Merge overlapping cmr groups.
+//    Groups that need to be merged:
+//    * Have the same track number (same staff)
+//    * Have the same MIDI pitch
+//    * Have and starttime for one group that starts before or on the
+//      endtime of another group.
+//    Merged groups are indicated as inactive if their index is set to
+//    a negative value.
+//
+
+void Tool_cmr::mergeOverlappingPeaks(void) {
+	// This algorithm does not handle multiple groups that
+	// need merging, so redo the overlap identification
+	// several more times to enture multiple groups are
+	// merged.
+	for (int k=0; k<100; k++) {
+		bool mergers = false;
+		for (int i=0; i<(int)m_cmrIndex.size(); i++) {
+			for (int j=i+1; j<(int)m_cmrIndex.size(); j++) {
+				mergers |= checkGroupPairForMerger(i, j);
+			}
+		}
+		if (!mergers) {
+			break;
+		}
+	}
+
+	// re-calculate m_count (number of cmr groups):
+	m_count = 0;
+	for (int i=0; i<(int)m_cmrIndex.size(); i++) {
+		if (m_cmrIndex[i] >= 0) {
+			m_count++;
+		}
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_cmr::checkGroupPairForMerger --
+//    * Have and starttime for one group that starts before or on the
+//      endtime of another group.
+//    Merged groups are indicated as inactive if their index is set to
+//    a negative value.
+// Return value is true if there was a merger; otherwise, returns false.
+//
+
+bool Tool_cmr::checkGroupPairForMerger(int index1, int index2) {
+
+	// Groups must not have been merged already:
+	if (m_cmrIndex[index1] < 0) {
+		return false;
+	}
+	if (m_cmrIndex[index2] < 0) {
+		return false;
+	}
+
+	// Groups must have the same track number (i.e., the same staff/part):
+	if (m_cmrTrack[index1] != m_cmrTrack[index2]) {
+		return false;
+	}
+
+	// Groups must have the same MIDI pitch:
+	if (m_cmrPitch[index1].empty()) {
+		return false;
+	}
+	if (m_cmrPitch[index2].empty()) {
+		return false;
+	}
+	int midi1 = m_cmrPitch[index1][0]->getMidiPitch();
+	int midi2 = m_cmrPitch[index2][0]->getMidiPitch();
+	if (midi1 != midi2) {
+		return false;
+	}
+
+	// Check if they overlap:
+	HumNum start1 = m_startTime[index1];
+	HumNum start2 = m_startTime[index2];
+	HumNum end1   = m_endTime[index1];
+	HumNum end2   = m_endTime[index2];
+
+	bool mergeQ = false;
+	bool flipQ  = false;
+	if (start1 < start2) {
+		if (start2 <= end1) {
+			mergeQ = true;
+		}
+	} else {
+		if (start1 <= end2) {
+			flipQ = true;
+			mergeQ = true;
+		}
+	}
+
+	if (mergeQ == false) {
+		return false;
+	}
+
+	// merge the two groups:
+	if (flipQ) {
+		int tempi = index1;
+		index1 = index2;
+		index2 = tempi;
+	}
+
+	// Deactivate the second group by setting a negative index:
+	m_cmrIndex[index2] *= -1;
+
+	// Set the endtime of the first group to the end of the second group:
+	m_endTime[index1] = m_endTime[index2];
+
+	// Likewise, merge the ending measure numbers:
+	m_cmrMeasureEnd[index1] = m_cmrMeasureEnd[index2];
+
+	// Update the duration of the merged cmr group:
+	m_cmrDuration[index1] = m_endTime[index2] - m_startTime[index1];
+
+	// merge the notes/counts:
+	for (int i=0; i<(int)m_cmrPitch[index2].size(); i++) {
+		vector<HTp> newtoks;
+		newtoks.clear();
+		for (int j=0; j<(int)m_cmrPitch[index1].size(); j++) {
+			HTp token1 = m_cmrPitch[index1][j];
+			HTp token2 = m_cmrPitch[index2][i];
+			if (token2 == NULL) {
+				continue;
+			}
+			if (token1 == token2) {
+				m_cmrPitch[index2][i] = NULL;
+			}
+		}
+	}
+
+	for (int k=0; k<(int)m_cmrPitch[index2].size(); k++) {
+		HTp token = m_cmrPitch[index2][k];
+		if (!token) {
+			continue;
+		}
+		m_cmrPitch[index1].push_back(token);
+	}
+
+	m_cmrPeakCount[index1] = m_cmrPitch[index1].size();
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::processSpine -- Process one part.  Only the first voice/layer
+//    on the staff will be processed (so only the top part if there is a divisi).
+//
+
+void Tool_cmr::processSpine(HTp startok) {
+	// notelist is a two dimensional array of notes.   The
+	// first dimension is a list of the note attacks in time
+	// (plus rests), and the second dimension is for a list of the
+	// tied notes after the first one (this is so that we can
+	// highlight both the starting note and any tied notes to that
+	// starting note later).
+	vector<vector<HTp>> notelist = getNoteList(startok);
+
+	// midinums: MIDI note numbers for each note (with rests being 0).
+	vector<int> midinums = getMidiNumbers(notelist);
+
+	// cmrnotesQ: True = the note is a local high pitch.
+	vector<bool> cmrnotesQ(midinums.size(), false);
+	identifyLocalPeaks(cmrnotesQ, midinums);
+
+	if (m_localQ) {
+		markNotes(notelist, cmrnotesQ, m_local_marker);
+	}
+	if (m_localOnlyQ) {
+		return;
+	}
+
+	// cmrnotelist: Only the local cmr notes which will be extracted
+	// from all note list in the getLocalPeakNotes() function.
+	vector<vector<HTp>> cmrnotelist;
+	getLocalPeakNotes(cmrnotelist, notelist, cmrnotesQ);
+
+	// cmrmidinums: MIDI note numbers for cmrnotelist notes.
+	vector<int> cmrmidinums = getMidiNumbers(cmrnotelist);
+
+	// globalcmrnotes: boolean list that indicates if a local
+	// cmr note is part of a longer sequence of cmr notes.
+	// This variable will be filled in by identifyPeakSequence().
+	vector<bool> globalcmrnotes(cmrnotelist.size(), false);
+	identifyPeakSequence(globalcmrnotes, cmrmidinums, cmrnotelist);
+
+	if (m_rawQ) {
+		printData(notelist, midinums, cmrnotesQ);
+	} else {
+		markNotesInScore(cmrnotelist, globalcmrnotes);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::markNotes -- mark notes in list that are true
+//     with given marker.
+//
+
+void Tool_cmr::markNotes(vector<vector<HTp>>& notelist,
+		vector<bool>& cmrnotesQ, const string& marker) {
+	bool negative = false;
+	if (marker == m_local_marker_n) {
+		negative = true;
+	}
+	for (int i=0; i<(int)cmrnotesQ.size(); i++) {
+		if (!cmrnotesQ[i]) {
+			continue;
+		}
+		for (int j=0; j<(int)notelist.at(i).size(); j++) {
+			string text = *notelist[i][j];
+			if (text.find(marker) == string::npos) {
+				text += marker;
+				notelist[i][j]->setText(text);
+				if (negative) {
+            	m_local_count_n++;
+				} else {
+            	m_local_count++;
+				}
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::processSpineFlipped -- Similar to processSpine(), but
+//    searches for minima CMRs rather than maxima CMRs.
+//
+
+void Tool_cmr::processSpineFlipped(HTp startok) {
+	// notelist is a two dimensional array of notes.   The
+	// first dimension is a list of the note attacks in time
+	// (plus rests), and the second dimension is for a list of the
+	// tied notes after the first one (this is so that we can
+	// highlight both the starting note and any tied notes to that
+	// starting note later).
+	vector<vector<HTp>> notelist = getNoteList(startok);
+
+	// midinums: MIDI note numbers for each note (with rests being 0).
+	vector<int> midinums = getMidiNumbers(notelist);
+	midinums = flipMidiNumbers(midinums);
+
+	// cmrnotesQ: True = the note is a local high pitch.
+	vector<bool> cmrnotesQ(midinums.size(), false);
+	identifyLocalPeaks(cmrnotesQ, midinums);
+
+	if (m_localQ) {
+		markNotes(notelist, cmrnotesQ, m_local_marker_n);
+	}
+	if (m_localOnlyQ) {
+		return;
+	}
+
+	// cmrnotelist: Only the local cmr notes which will be extracted
+	// from all note list in the getLocalPeakNotes() function.
+	vector<vector<HTp>> cmrnotelist;
+	getLocalPeakNotes(cmrnotelist, notelist, cmrnotesQ);
+
+	// cmrmidinums: MIDI note numbers for cmrnotelist notes.
+	vector<int> cmrmidinums = getMidiNumbers(cmrnotelist);
+
+	// globalcmrnotes: boolean list that indicates if a local
+	// cmr note is part of a longer sequence of cmr notes.
+	// This variable will be filled in by identifyPeakSequence().
+	vector<bool> globalcmrnotes(cmrnotelist.size(), false);
+	identifyPeakSequence(globalcmrnotes, cmrmidinums, cmrnotelist);
+
+	if (m_rawQ) {
+		printData(notelist, midinums, cmrnotesQ);
+	} else {
+		markNotesInScore(cmrnotelist, globalcmrnotes);
+	}
+}
+
+
+vector<int> Tool_cmr::flipMidiNumbers(vector<int>& midinums) {
+	for (int i=0; i<(int)midinums.size(); i++) {
+		if (midinums[i] == 0) {
+			continue;
+		}
+		int flippedMidiNum = (midinums[i] * -1) + 128;
+		midinums[i] = flippedMidiNum;
+	}
+	return midinums;
+}
+
+//////////////////////////////
+//
+// Tool_cmr::markNotesInScore --
+//
+
+void Tool_cmr::markNotesInScore(vector<vector<HTp>>& cmrnotelist, vector<bool>& iscmr) {
+	for (int i=0; i<(int)cmrnotelist.size(); i++) {
+		if (!iscmr[i]) {
+			continue;
+		}
+		for (int j=0; j<(int)cmrnotelist[i].size(); j++) {
+			string text = *(cmrnotelist[i][j]);
+			text += m_marker;
+			cmrnotelist[i][j]->setText(text);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getLocalPeakNotes -- Throw away notes/rests that are not cmrs.
+//
+
+void Tool_cmr::getLocalPeakNotes(vector<vector<HTp>>& newnotelist,
+		vector<vector<HTp>>& oldnotelist, vector<bool>& cmrnotesQ) {
+
+	// durations == duration of notes in quarter-note units
+	vector<double> durations;
+	getDurations(durations, oldnotelist);
+
+	// strongbeat == true if on a beat (whole-note metric postion).
+	vector<bool> strongbeat;
+	getBeat(strongbeat, oldnotelist);
+
+
+	////////////////////////////
+	//
+	// Refinement to add to following loop: If the note has
+	// a duration less than or equal two 2 (half note), and
+	// the note is not on a beat then do not add it to the
+	// newnotelist vector.
+	//
+	////////////////////////////
+
+	newnotelist.clear();
+	for (int i=0; i<(int)cmrnotesQ.size(); i++) {
+		if ((durations[i] <= 2) && (strongbeat[i] == false)) {
+			continue;
+		}
+		if (cmrnotesQ[i]) {
+			newnotelist.push_back(oldnotelist[i]);
+		}
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::identifyLocalPeaks -- Identify notes that are higher than their
+//    adjacent neighbors.  The midinumbs are MIDI note numbers (integers)
+//    for the pitch, with higher number meaning higher pitches.  Rests are
+//    the value 0.  Do not assign a note as a cmr note if one of the
+//    adjacent notes is a rest. (This could be refined later, such as ignoring
+//    short rests).
+//
+
+void Tool_cmr::identifyLocalPeaks(vector<bool>& cmrnotesQ, vector<int>& midinums) { //changed to midinums from 'notelist'
+	for (int i=1; i<(int)midinums.size() - 1; i++) {
+		if ((midinums[i - 1] <= 0) && (midinums[i + 1] <= 0)) { //not sandwiched by rests
+			continue;
+		} else if (midinums[i] <= 0) {
+			continue;
+		}
+		if ((midinums[i] > midinums[i - 1]) && (midinums[i + 1] == 0)) { //allow rest after note
+			cmrnotesQ[i] = 1;
+		}
+		if ((midinums[i - 1] == 0) && (midinums[i] > midinums[i + 1])) { //allow rest before note
+			cmrnotesQ[i] = 1;
+		}
+		if ((midinums[i] > midinums[i - 1]) && (midinums[i] > midinums[i + 1])) { //check neighboring notes
+			cmrnotesQ[i] = 1;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::identifyPeakSequence -- Identify a sequence of local cmrs that can form
+//       a cmr sequence
+//
+// Input variables:
+//      globalcmrnotes -- output data that is set to true if the note is part of a
+//                         global cmr note sequence.  This vector has the same size
+//                         as the cmrmidinums vector and the values are initially set
+//                         to false.  This function will set notes that are part of a sequence
+//                         of local cmr notes (with length m_cmrNum) to true.
+//      cmrmidinums    -- MIDI number vector for all local cmr notes.
+//      notes           -- double vector of Humdrum notes (needed to get timestamps).
+//
+// Member variables that are needed in the Algorithm:
+//    int    m_cmrNum: Number of consecutive local cmrnotes needed to mark global cmr.
+//    double m_cmrDur: Maximum duration of the first/last cmr note in global cmr sequence.
+//
+//
+
+void Tool_cmr::identifyPeakSequence(vector<bool>& globalcmrnotes, vector<int>& cmrmidinums,
+		vector<vector<HTp>>& notes) {
+
+	// Set initial positions of globalcmrnotes to false:
+	globalcmrnotes.resize(cmrmidinums.size());
+	fill(globalcmrnotes.begin(), globalcmrnotes.end(), false);
+	// The code below (under Algorithms) will set notes identified as a "global cmr" to true
+	// in this vector.
+
+	// Get the timestamps of all local cmr notes:
+	vector<double> timestamps(notes.size(), 0.0);
+	for (int i=0; i<(int)notes.size(); i++) {
+		timestamps[i] = notes[i][0]->getDurationFromStart().getFloat();
+	}
+
+	///////////////////////////////////////////
+	//
+	// Algorithm:
+	//
+	//    * Loop through each element in the cmrmidinums vector checking if it is a part of
+	//      a longer cmr sequence of the same MIDI note number.  The loop will start at
+	//      index 0 and go until but not including cmrmidinums.size() - m_cmrNum.
+	//
+	//    * A "global cmr" means that there are m_cmrNum MIDI note numbers in a row in cmrmidinums.
+	//      (all of the cmr notes have to be the same MIDI note number).
+	//
+	//    *  In addition, the time difference between the starting and ending note of the cmr
+	//       sequence has to be equal to or less than m_cmrDur (6 whole notes by default).
+	//       Subtract the timestamp of the last and first notes and see if the duration between
+	//       these notes is equal or less than m_cmrDur.
+	//
+	//////////////////////////////////////////
+
+	for (int i=0; i<(int)cmrmidinums.size() - m_cmrNum; i++) {
+		bool match = true;
+		bool accented = isMelodicallyAccented(notes[i][0]);
+		for (int j=1; j<m_cmrNum; j++) {
+			accented |= isMelodicallyAccented(notes[i+j][0]);
+			if (cmrmidinums[i+j] != cmrmidinums[i+j-1]) {
+				match = false;
+				break;
+			}
+		}
+		if (!match) {
+			continue;
+		}
+		if ((!m_naccentedQ) && (!accented)){
+			continue;
+		}
+		if ((m_naccentedQ) && (accented)) {
+			continue;
+		}
+
+		HumNum duration = timestamps[i + m_cmrNum - 1] - timestamps[i];
+		if (duration.getFloat() > m_cmrDur) {
+			continue;
+		}
+		//data for every sub-sequeunce
+		m_count += 1;
+		int line = notes[i][0]->getLineIndex();
+		int line2 = notes[i + m_cmrNum - 1].back()->getLineIndex();
+
+		m_cmrDuration.push_back(duration.getFloat()/4.0);
+		m_cmrMeasureBegin.push_back(m_barNum[line]);
+		m_cmrMeasureEnd.push_back(m_barNum[line2]);
+		vector<HTp> pnotes;
+		for (int j=0; j<m_cmrNum; j++) {
+			pnotes.push_back(notes.at(i+j).at(0));
+		}
+		m_cmrPitch.push_back(pnotes);
+		m_cmrPeakCount.push_back((int)pnotes.size());
+
+		// variables to do cmr group mergers later:
+		int track = notes[i][0]->getTrack();
+		m_cmrTrack.push_back(track);
+		m_cmrIndex.push_back(m_cmrIndex.size());
+		HumNum starttime = notes[i][0]->getDurationFromStart();
+		HumNum endtime   = notes[i+m_cmrNum-1].back()->getDurationFromStart();
+		m_startTime.push_back(starttime);
+		m_endTime.push_back(endtime);
+
+		for (int j=0; j<m_cmrNum; j++) {
+			globalcmrnotes[i+j] = true;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::printData -- Print input and output data.  First column is the MIDI note
+//      number, second one is the cmr analysis (true=local maximum note)
+//
+
+void Tool_cmr::printData(vector<vector<HTp>>& notelist, vector<int>& midinums, vector<bool>& cmrnotes) {
+	m_free_text << "MIDI\tPEAK\tKERN" << endl;
+	for (int i=0; i<(int)notelist.size(); i++) {
+		m_free_text << midinums.at(i) << "\t";
+		m_free_text << cmrnotes.at(i);
+		for (int j=0; j<(int)notelist[i].size(); j++) {
+			m_free_text << "\t" << notelist[i][j];
+		}
+		m_free_text << endl;
+	}
+	m_free_text << "******************************************" << endl;
+	m_free_text << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getMidiNumbers -- convert note tokens into MIDI note numbers.
+//    60 = middle C (C4), 62 = D4, 72 = C5, 48 = C3.
+//
+
+vector<int> Tool_cmr::getMidiNumbers(vector<vector<HTp>>& notelist) {
+	vector<int> output(notelist.size(), 0);  // fill with rests by default
+	for (int i=0; i<(int)notelist.size(); i++) {
+		output[i] = Convert::kernToMidiNoteNumber(notelist.at(i).at(0));
+		if (output[i] < 0) {
+			// Set rests to be 0
+			output[i] = 0;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getNoteList -- Return a list of the notes and rests for
+//     a part, with the input being the starting token of the part from
+//     which the note list should be extracted.  The output is a two-
+//     dimensional vector.  The first dimension is for the list of notes,
+//     and the second dimension is used to store any subsequent tied notes
+//     so that they can be marked and highlighted in the score.
+//
+
+vector<vector<HTp>> Tool_cmr::getNoteList(HTp starting) {
+	vector<vector<HTp>> tempout;
+	tempout.reserve(2000);
+
+	HTp previous = starting;
+	HTp current = starting;
+	while (current) {
+		if (!current->isData()) {
+			previous = current;
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			previous = current;
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNoteSustain()) {
+			if (tempout.size() > 0) {
+				tempout.back().push_back(current);
+			}
+			previous = current;
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isRest()) {
+			if (previous->isRest()) {
+				// do not store previous rest
+				previous = current;
+				current = current->getNextToken();
+				continue;
+			}
+		}
+		tempout.resize(tempout.size() + 1);
+		tempout.back().push_back(current);
+		if (!current->isRest()) {
+			m_noteCount++;
+		}
+		previous = current;
+		current = current->getNextToken();
+	}
+
+	// Remove any rests that are shorter or equal to m_shortRest:
+	vector<vector<HTp>> output;
+	output.reserve(tempout.size());
+	for (int i=0; i<(int)tempout.size() - 1; i++) {
+		if (!tempout[i][0]->isRest()) {
+			output.push_back(tempout[i]);
+			continue;
+		}
+		// get the duration of the (multi-rest):
+		HumNum restStart = tempout[i][0]->getDurationFromStart();
+		HumNum noteStart = tempout[i+1][0]->getDurationFromStart();
+		HumNum duration = noteStart - restStart;
+		if (duration.getFloat() > m_smallRest) {
+			output.push_back(tempout[i]);
+		}
+	}
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// getNoteDurations --
+//
+
+void  Tool_cmr::getDurations(vector<double>& durations, vector<vector<HTp>>& notelist) {
+	durations.resize(notelist.size());
+	for (int i=0; i<(int)notelist.size(); i++) {
+		HumNum duration = notelist[i][0]->getTiedDuration();
+		durations[i] = duration.getFloat();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getBeat --
+//
+
+void  Tool_cmr::getBeat(vector<bool>& metpos, vector<vector<HTp>>& notelist) {
+	metpos.resize(notelist.size());
+	for (int i=0; i<(int)notelist.size(); i++) {
+		HumNum position = notelist[i][0]->getDurationFromBarline();
+		if (position.getDenominator() != 1) {
+			metpos[i] = false;
+		} if (position.getNumerator() % 4 == 0) {
+			metpos[i] = true;
+		} else {
+			metpos[i] = false;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getMetricLevel --
+//
+
+int  Tool_cmr::getMetricLevel(HTp token) {
+	HumNum beat = token->getDurationFromBarline();
+	if (!beat.isInteger()) { // anything less than quarter note level
+		return -1;
+	}
+	if (beat.getNumerator() % 4 == 0) { // whole note level
+		return 2;
+	}
+	if (beat.getNumerator() % 2 == 0) { // half note level
+		return 1;
+	} else { // quarter note level
+		return 0;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::isMelodicallyAccented --
+//
+
+bool  Tool_cmr::isMelodicallyAccented(HTp token) {
+	return hasLeapBefore(token) || isSyncopated(token);
+}
+
+
+//////////////////////////////
+//
+// Tool_cmr::hasLeapBefore --
+//
+
+bool  Tool_cmr::hasLeapBefore(HTp token) {
+	HTp current = token->getPreviousToken();
+	int startNote = token->getMidiPitch();
+	while (current) {
+		if (!current->isData()) {
+			current = current->getPreviousToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getPreviousToken();
+			continue;
+		}
+		if (current->isRest()) {
+			current = current->getPreviousToken();
+			continue;
+		}
+		int testNote = current->getMidiPitch();
+		int interval = startNote - testNote;
+		return interval > 2;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::isSyncopated --
+//
+
+bool  Tool_cmr::isSyncopated(HTp token) {
+	HumNum dur = token->getTiedDuration();
+	double logDur = log2(dur.getFloat());
+	int metLev = getMetricLevel(token);
+	if (metLev >= 2) { // no syncopations occuring on whole-note level or higher
+		return false;
+	}
+	if (logDur > metLev) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::countNotesInScore --
+//
+
+int Tool_cmr::countNotesInScore(HumdrumFile& infile) {
+	int counter = 0;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->isNull()) {
+				continue;
+			}
+			if (token->isRest()) {
+				continue;
+			}
+		  if (token->isSecondaryTiedNote()) {
+				continue;
+			}
+			counter++;
+
+		}
+	}
+	return counter;
+}
+
 
 
 
@@ -57376,26 +59948,25 @@ void Tool_colortriads::processFile(HumdrumFile& infile) {
 //
 
 Tool_composite::Tool_composite(void) {
-	define("debug=b",       "print debug statements");
-	define("a|append=b",    "append data to end of line (top of system)");
-	define("x|extract=b",   "only output composite rhythm spines");
-	define("grace=b",       "include grace notes in composite rhythms");
-	define("u|up-stem=b",   "force notes to be up-stem");
-
-	define("o|only=s",      "output notes of given group (A or B)");
-
+	define("debug=b",         "print debug statements");
+	define("a|append=b",      "append data to end of line (top of system)");
+	define("x|extract=b",     "only output composite rhythm spines");
+	define("grace=b",         "include grace notes in composite rhythms");
+	define("u|up-stem=b",     "force notes to be up-stem");
+	define("C|color-full-composite=b", "color full composite rhythm if score has groups");
+	define("l|score-size=d:100.0",     "set staff size of input score (percent)");
+	define("L|analysis-size=d:100.0",  "set staff size of analysis staves (percent)");
+	define("o|only=s",        "output notes of given group (A or B)");
+	define("r|rhythms=b",     "convert input score to rhythms only.");
+	define("e|events=b",      "show event counts on analysis staves.");
 	define("F|no-full-composite=b", "Do not do full composite rhythm analysis");
 	define("c|coincidence=b", "Do coincidence rhythm analysis");
 	define("g|group|groups|grouping|groupings=b", "Do group rhythm analysis");
 	define("m|mark=b",        "Mark coincidences in group analysis and input score");
+	define("M|mark-input=b",  "Mark coincidences in input score");
 
 	// Numeric analysis options:
-	define("P|onsets=b",             "count number of note (pitch) onsets in feature");
-	define("A|accents=b",            "count number of accents in feature");
-	define("O|ornaments=b",          "count number of ornaments in feature");
-	define("S|slurs=b",              "count number of slur beginnings/ending in feature");
-	define("T|total=b",              "count total number of analysis features for each note");
-	define("all|all-analyses=b",     "do all analyses");
+	define("A|analysis|analyses=s",  "List of numeric analysis features to extract");
 
 	// Styling for numeric analyses;
 	define("Z|no-zeros|no-zeroes=b", "do not show zeros in analyses.");
@@ -57420,10 +59991,13 @@ void Tool_composite::initialize(HumdrumFile& infile) {
 
 	m_hasGroupsQ = hasGroupInterpretations(infile);
 
-	m_fullCompositeQ = !getBoolean("no-full-composite");
-	m_coincidenceQ   =  getBoolean("coincidence");
-	m_groupsQ        =  getBoolean("groups");
-	m_upstemQ        =  getBoolean("up-stem");
+	m_colorFullCompositeQ =  getBoolean("color-full-composite");
+	m_fullCompositeQ      = !getBoolean("no-full-composite");
+	m_coincidenceQ        =  getBoolean("coincidence");
+	m_groupsQ             =  getBoolean("groups");
+	m_upstemQ             =  getBoolean("up-stem");
+	m_rhythmQ             =  getBoolean("rhythms");
+	m_eventQ              =  getBoolean("events");
 
 	// There must be at least one analysis being done (excluding -o options):
 	if (!m_groupsQ && !m_coincidenceQ) {
@@ -57434,6 +60008,9 @@ void Tool_composite::initialize(HumdrumFile& infile) {
 	m_onlyQ          = getBoolean("only");
 	m_only           = getString("only");
 
+	m_scoreSize      = getDouble("score-size");
+	m_analysisSize   = getDouble("analysis-size");
+
 	if (m_fullCompositeQ) {
 		m_fullComposite.resize(infile.getLineCount());
 	}
@@ -57442,17 +60019,37 @@ void Tool_composite::initialize(HumdrumFile& infile) {
 	m_groups[0].resize(infile.getLineCount());
 	m_groups[1].resize(infile.getLineCount());
 
-	m_analysisOnsetsQ    = getBoolean("onsets");
-	m_analysisAccentsQ   = getBoolean("accents");
-	m_analysisOrnamentsQ = getBoolean("ornaments");
-	m_analysisSlursQ     = getBoolean("slurs");
-	m_analysisTotalQ     = getBoolean("total");
-	if (getBoolean("all")) {
-		m_analysisOnsetsQ    = true;
-		m_analysisAccentsQ   = true;
-		m_analysisOrnamentsQ = true;
-		m_analysisSlursQ     = true;
-		m_analysisTotalQ     = true;
+	m_analysisOnsetsQ    = false;
+	m_analysisAccentsQ   = false;
+	m_analysisOrnamentsQ = false;
+	m_analysisSlursQ     = false;
+	m_analysisTotalQ     = false;
+
+	if (getBoolean("analyses")) {
+		string argument = getString("analyses");
+		if (argument == "all") {
+			m_analysisOnsetsQ    = true;
+			m_analysisAccentsQ   = true;
+			m_analysisOrnamentsQ = true;
+			m_analysisSlursQ     = true;
+			m_analysisTotalQ     = true;
+		} else {
+			if (argument.find("n") != string::npos) {
+				m_analysisOnsetsQ = true;
+			}
+			if (argument.find("a") != string::npos) {
+				m_analysisAccentsQ = true;
+			}
+			if (argument.find("o") != string::npos) {
+				m_analysisOrnamentsQ = true;
+			}
+			if (argument.find("s") != string::npos) {
+				m_analysisSlursQ = true;
+			}
+			if (argument.find("t") != string::npos) {
+				m_analysisTotalQ = true;
+			}
+		}
 	}
 
 	m_analysisIndex.resize(5);
@@ -57475,6 +60072,10 @@ void Tool_composite::initialize(HumdrumFile& infile) {
 	initializeNumericAnalyses(infile);
 	m_assignedQ = false;
 	m_coinMarkQ = getBoolean("mark");
+	if (getBoolean("mark-input")) {
+		m_coinMarkQ = true;
+		m_extractInputQ = true;
+	}
 }
 
 
@@ -57587,9 +60188,7 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 	if (m_fullCompositeQ) {
 		analyzeFullCompositeRhythm(infile);
 	}
-	if (m_groupsQ) {
-		analyzeGroupCompositeRhythms(infile);
-	}
+	analyzeGroupCompositeRhythms(infile);
 	if (m_analysesQ) {
 		doNumericAnalyses(infile);
 	}
@@ -57658,18 +60257,22 @@ void Tool_composite::addCoincidenceMarks(HumdrumFile& infile) {
 }
 
 
+
 //////////////////////////////
 //
 // Tool_composite::prepareOutput --
 //
 
 void Tool_composite::prepareOutput(HumdrumFile& infile) {
-
 	analyzeOutputVariables(infile);
 
 	if (m_coinMarkQ) {
 		addCoincidenceMarks(infile);
 		infile.generateLinesFromTokens();
+	}
+
+	if (m_rhythmQ) {
+		convertNotesToRhythms(infile);
 	}
 
 	stringstream analysis;
@@ -57684,56 +60287,139 @@ void Tool_composite::prepareOutput(HumdrumFile& infile) {
 		analysis << endl;
 	}
 
-	// Now either print the output data by itself, or
-	// merge with input score:
-	if (m_extractQ) {
-		// output only analysis data
-		m_humdrum_text << analysis.str();
-	} else {
-		// merge analysis data with input file
-		HumdrumFile output;
-		output.readString(analysis.str());
-		if (m_beamQ) {
-			Tool_autobeam autobeam;
-			autobeam.run(output);
-		}
+	HumdrumFile output;
+	output.readString(analysis.str());
 
-		for (int i=0; i<infile.getLineCount(); i++) {
+	stringstream tempout;
 
-			if (m_verseLabelIndex && (m_verseLabelIndex == -i)) {
-				m_humdrum_text << generateVerseLabelLine(output, infile, i);
-				m_humdrum_text << endl;
-			}
-
-			if (m_striaIndex && (m_striaIndex == -i)) {
-				m_humdrum_text << generateStriaLine(output, infile, i);
-				m_humdrum_text << endl;
-			}
-
-			if (!infile[i].hasSpines()) {
-				m_humdrum_text << infile[i];
-			} else if (m_appendQ) {
-				// analysis data at end of line
-				m_humdrum_text << infile[i];
-				m_humdrum_text << "\t";
-				m_humdrum_text << output[i];
-			} else if (m_prependQ) {
-				// analysis data at start of line (default)
-				m_humdrum_text << output[i];
-				m_humdrum_text << "\t";
-				m_humdrum_text << infile[i];
-			} else {
-				// output data only
-				m_humdrum_text << output[i];
-			}
-			m_humdrum_text << endl;
-		}
+	addStaffInfo(output, infile);
+	addTimeSignatureChanges(output, infile);
+	addMeterSignatureChanges(output, infile);
+	adjustBadCoincidenceRests(output, infile);
+	for (int i=0; i<output.getLineCount(); i++) {
+		output[i].createLineFromTokens();
 	}
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+
+		if (m_verseLabelIndex && (m_verseLabelIndex == -i)) {
+			string labelLine = generateVerseLabelLine(output, infile, i);
+			if (!labelLine.empty()) {
+				tempout << labelLine;
+				tempout << endl;
+			}
+		}
+
+		if (m_striaIndex && (m_striaIndex == -i)) {
+			string striaLine =  generateStriaLine(output, infile, i);
+			if (!striaLine.empty()) {
+				tempout << striaLine;
+				tempout << endl;
+			}
+		}
+
+		if (((m_scoreSize != 100.0) || (m_analysisSize != 100.0)) && m_sizeIndex && (m_sizeIndex == -i)) {
+			string sizeLine = generateSizeLine(output, infile, i);
+			if (!sizeLine.empty()) {
+				tempout << sizeLine;
+				tempout << endl;
+			}
+		}
+
+		if (!infile[i].hasSpines()) {
+			tempout << output[i];
+		} else if (m_appendQ) {
+			// analysis data at end of line
+			if (m_extractInputQ || !m_extractQ) {
+				tempout << infile[i];
+			}
+			if (!(m_extractQ || m_extractInputQ)) {
+				tempout << "\t";
+			}
+			if (m_extractQ || !m_extractInputQ) {
+				tempout << output[i];
+			}
+		} else if (m_prependQ) {
+			// analysis data at start of line (default)
+			if (!m_extractInputQ || m_extractQ) {
+				tempout << output[i];
+			}
+			if (!(m_extractQ || m_extractInputQ)) {
+				tempout << "\t";
+			}
+			if (!m_extractQ || m_extractInputQ) {
+				tempout << infile[i];
+			}
+		} else {
+			// output data only
+			tempout << output[i];
+		}
+		tempout << endl;
+	}
+
+	if (m_beamQ) {
+	/*
+		string spinelist = "1";
+		int otracks = output.getMaxTrack();
+		if (otracks > 1) {
+			spinelist += "-" + to_string(otracks);
+		}
+		string soption = "-s " + spinelist;
+		vector<string> argv;
+		argv.push_back(soption);    // only beam analysis spines.
+		argv.push_back("-g");       // beam adjacent grace notes
+
+		Tool_autobeam autobeam;
+		autobeam.process(argv);
+		HumdrumFile finaloutput;
+		finaloutput.readString(tempout.str());
+		autobeam.run(finaloutput);
+		for (int i=0; i<finaloutput.getLineCount(); i++) {
+			finaloutput[i].createLineFromTokens();
+		}
+		m_humdrum_text << finaloutput;
+	*/
+
+		HumdrumFile finaloutput;
+		finaloutput.readString(tempout.str());
+		Tool_autobeam autobeam;
+		autobeam.run(finaloutput);
+		m_humdrum_text << finaloutput;
+
+	} else {
+		m_humdrum_text << tempout.str();
+	}
+
 	if (m_coinMarkQ) {
 		m_humdrum_text << "!!!RDF**kern: " << m_coinMark;
-		m_humdrum_text << " = marked note, color=\"";
-		m_humdrum_text << "limegreen\"";
-		m_humdrum_text << endl;
+		m_humdrum_text << " = marked note, coincidence note, color=\"";
+		m_humdrum_text << m_coinMarkColor << "\"" << endl;
+	}
+	if (m_colorFullCompositeQ) {
+		m_humdrum_text << "!!!RDF**kern: " << m_AMark;
+      m_humdrum_text << " = marked note, polyrhythm group A, color=\"";
+		m_humdrum_text << m_AMarkColor << "\"" << endl;
+		m_humdrum_text << "!!!RDF**kern: " << m_BMark;
+      m_humdrum_text << " = marked note, polyrhythm group B, color=\"";
+		m_humdrum_text << m_BMarkColor << "\"" << endl;
+		if (!m_coinMarkQ) {
+			m_humdrum_text << "!!!RDF**kern: " << m_coinMark;
+			m_humdrum_text << " = marked note, coincidence note, color=\"";
+			m_humdrum_text << m_coinMarkColor << "\"" << endl;
+		}
+	}
+
+	if (m_groupBEventCount >= 0) {
+		m_humdrum_text << "!!!group-b-event-count: " << m_groupBEventCount << endl;
+	}
+	if (m_groupAEventCount >= 0) {
+		m_humdrum_text << "!!!group-a-event-count: " << m_groupAEventCount << endl;
+	}
+	if (m_fullCompositeEventCount >= 0) {
+		m_humdrum_text << "!!!composite-event-count: " << m_fullCompositeEventCount << endl;
+	}
+	if (m_coincidenceEventCount >= 0) {
+		m_humdrum_text << "!!!coincidence-event-count: " << m_coincidenceEventCount << endl;
 	}
 }
 
@@ -57745,41 +60431,56 @@ void Tool_composite::prepareOutput(HumdrumFile& infile) {
 //
 
 string Tool_composite::generateVerseLabelLine(HumdrumFile& output, HumdrumFile& input, int line) {
+
+	if (m_extractInputQ) {
+		return "";
+	}
+
 	string outstring;
 	string inputBlanks;
-	for (int i=0; i<input[line].getFieldCount(); i++) {
-		inputBlanks += "*";
-		if (i < input[line].getFieldCount() - 1) {
-			inputBlanks += "\t";
+	if (!m_extractQ) {
+		for (int i=0; i<input[line].getFieldCount(); i++) {
+			inputBlanks += "*";
+			if (i < input[line].getFieldCount() - 1) {
+				inputBlanks += "\t";
+			}
 		}
 	}
-	if (m_appendQ) {
-		outstring += inputBlanks;
-		outstring += "\t";
+	if (!(m_extractQ || m_extractInputQ)) {
+		if (m_appendQ) {
+			outstring += inputBlanks;
+			outstring += "\t";
+		}
 	}
 	string outputLabels;
-	for (int i=0; i<output[line].getFieldCount(); i++) {
-		HTp token = output.token(line, i);
-		string exinterp = token->getExInterp();
-		if (exinterp.compare(0, 8, "**vdata-") != 0) {
-			outputLabels += "*";
-			if (output[line].getFieldCount()) {
+	if (!m_extractInputQ) {
+		for (int i=0; i<output[line].getFieldCount(); i++) {
+			HTp token = output.token(line, i);
+			string exinterp = token->getExInterp();
+			if (exinterp.compare(0, 8, "**vdata-") != 0) {
+				outputLabels += "*";
+				if (i < output[line].getFieldCount() - 1) {
+					outputLabels += "\t";
+				}
+				continue;
+			}
+			string label = exinterp.substr(8);
+			outputLabels += "*v:";
+			outputLabels += label;
+			outputLabels += ":";
+			if (i < output[line].getFieldCount() - 1) {
 				outputLabels += "\t";
 			}
-			continue;
-		}
-		string label = exinterp.substr(8);
-		outputLabels += "*v:";
-		outputLabels += label;
-		if (i < output[line].getFieldCount() - 1) {
-			outputLabels += "\t";
 		}
 	}
 	outstring += outputLabels;
-	if (m_prependQ) {
-		outstring += "\t";
+	if (m_prependQ || m_extractQ) {
+		if (!(m_extractQ || m_extractInputQ)) {
+			outstring += "\t";
+		}
 		outstring += inputBlanks;
 	}
+
 	return outstring;
 }
 
@@ -57788,42 +60489,139 @@ string Tool_composite::generateVerseLabelLine(HumdrumFile& output, HumdrumFile& 
 //////////////////////////////
 //
 // Tool_composite::generateStriaLine --
+// m_extractQ      == output only
+// m_extractInputQ == input only
 //
 
 string Tool_composite::generateStriaLine(HumdrumFile& output, HumdrumFile& input, int line) {
+
+	if (m_extractInputQ) {
+		return "";
+	}
+
 	string outstring;
 	string inputBlanks;
-	for (int i=0; i<input[line].getFieldCount(); i++) {
-		inputBlanks += "*";
-		if (i < input[line].getFieldCount() - 1) {
-			inputBlanks += "\t";
+	if (!m_extractQ) {
+		for (int i=0; i<input[line].getFieldCount(); i++) {
+			inputBlanks += "*";
+			if (i < input[line].getFieldCount() - 1) {
+				inputBlanks += "\t";
+			}
+		}
+		if (m_appendQ) {
+			outstring += inputBlanks;
+			if (!m_extractInputQ) {
+				outstring += "\t";
+			}
 		}
 	}
-	if (m_appendQ) {
-		outstring += inputBlanks;
-		outstring += "\t";
-	}
+
 	string outputStria;
-	for (int i=0; i<output[line].getFieldCount(); i++) {
-		HTp token = output.token(line, i);
-		string exinterp = token->getExInterp();
-		if (exinterp.compare(0, 6, "**kern") != 0) {
-			outputStria += "*";
-			if (output[line].getFieldCount()) {
+	if (!m_extractInputQ) {
+		for (int i=0; i<output[line].getFieldCount(); i++) {
+			HTp token = output.token(line, i);
+			string exinterp = token->getExInterp();
+			if (exinterp.compare(0, 6, "**kern") != 0) {
+				outputStria += "*";
+				if (i < output[line].getFieldCount() - 1) {
+					outputStria += "\t";
+				}
+				continue;
+			}
+			outputStria += "*stria1";
+			if (i < output[line].getFieldCount() - 1) {
 				outputStria += "\t";
 			}
-			continue;
-		}
-		outputStria += "*stria1";
-		if (i < output[line].getFieldCount() - 1) {
-			outputStria += "\t";
 		}
 	}
+
 	outstring += outputStria;
-	if (m_prependQ) {
-		outstring += "\t";
+	if (m_prependQ || m_extractQ) {
+		if (!(m_extractQ || m_extractInputQ)) {
+			outstring += "\t";
+		}
 		outstring += inputBlanks;
 	}
+
+	return outstring;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::generateSizeLine --
+// m_extractQ      == output only
+// m_extractInputQ == input only
+//
+
+string Tool_composite::generateSizeLine(HumdrumFile& output, HumdrumFile& input, int line) {
+
+	if (m_extractInputQ) {
+		return "";
+	}
+
+	string outstring;
+	string inputBlanks;
+	if (!m_extractQ) {
+		for (int i=0; i<input[line].getFieldCount(); i++) {
+			HTp token = input.token(line, i);
+			inputBlanks += "*";
+			if (token->isKernLike() && (m_scoreSize != 100.0)) {
+				stringstream value;
+				value.str("");
+				value << m_scoreSize;
+				inputBlanks += "size:";
+				inputBlanks += value.str();
+				inputBlanks += "%";
+			}
+			if (i < input[line].getFieldCount() - 1) {
+				inputBlanks += "\t";
+			}
+		}
+		if (m_appendQ) {
+			outstring += inputBlanks;
+			if (!m_extractInputQ) {
+				outstring += "\t";
+			}
+		}
+	}
+
+	string outputSize;
+	if (!m_extractInputQ) {
+		for (int i=0; i<output[line].getFieldCount(); i++) {
+			HTp token = output.token(line, i);
+			string exinterp = token->getExInterp();
+			if (exinterp.compare(0, 6, "**kern") != 0) {
+				outputSize += "*";
+				if (output[line].getFieldCount()) {
+					outputSize += "\t";
+				}
+				continue;
+			}
+			outputSize += "*";
+			if (m_analysisSize != 100.0) {
+				outputSize += "size:";
+				stringstream value;
+				value.str("");
+				value << m_analysisSize;
+				outputSize += value.str();
+				outputSize += "%";
+			}
+			if (i < output[line].getFieldCount() - 1) {
+				outputSize += "\t";
+			}
+		}
+	}
+
+	outstring += outputSize;
+	if (m_prependQ || m_extractQ) {
+		if (!(m_extractQ || m_extractInputQ)) {
+			outstring += "\t";
+		}
+		outstring += inputBlanks;
+	}
+
 	return outstring;
 }
 
@@ -57843,7 +60641,13 @@ void Tool_composite::getAnalysisOutputLine(ostream& output, HumdrumFile& infile,
 	stringstream tempout;
 
 	if (m_coincidenceQ) {
-		tempout << getCoincidenceToken(infile, line);
+		string value = getCoincidenceToken(infile, line);
+		tempout << value;
+		if (m_upstemQ) {
+			if (value.find("R") != string::npos) {
+				tempout << "/";
+			}
+		}
 		if (processedQ) {
 			tempout << "\t";
 		}
@@ -57973,13 +60777,25 @@ string Tool_composite::getCoincidenceToken(HumdrumFile& infile, int line) {
 		} else if (line == m_clefIndex) {
 			return "*clefX";
 		} else if (line == m_instrumentNameIndex) {
-			return "*I\"Coincidence";
+			string output = "*I\"Coincidence";
+			if (m_eventQ) {
+				m_coincidenceEventCount = getEventCount(m_coincidence);
+				stringstream value;
+				value.str("");
+				value << "\\n(" << m_coincidenceEventCount << " event";
+				if (m_coincidenceEventCount != 1) {
+					value << "s";
+				}
+				value << ")";
+				output += value.str();
+			}
+			return output;
 		} else if (line == m_instrumentAbbrIndex) {
 			return "*I'Coin.";
 		} else if (line == m_timeSignatureIndex) {
 			return getTimeSignature(infile, m_timeSignatureIndex, "");
 		} else if (line == m_meterSymbolIndex) {
-			return getMeterSymbol(infile, m_meterSymbolIndex, "");
+			return getMetricSymbol(infile, m_meterSymbolIndex, "");
 		} else {
 			return "*";
 		}
@@ -58007,6 +60823,8 @@ string Tool_composite::getFullCompositeToken(HumdrumFile& infile, int line) {
 			string output = m_fullComposite[line];
 			if (domark) {
 				output += m_coinMark;
+			} else if (m_colorFullCompositeQ) {
+				output += getFullCompositeMarker(line);
 			}
 			return output;
 		} else {
@@ -58021,13 +60839,25 @@ string Tool_composite::getFullCompositeToken(HumdrumFile& infile, int line) {
 		} else if (line == m_clefIndex) {
 			return "*clefX";
 		} else if (line == m_instrumentNameIndex) {
-			return "*I\"Composite";
+			string output = "*I\"Composite";
+			if (m_eventQ) {
+				m_fullCompositeEventCount = getEventCount(m_fullComposite);
+				stringstream value;
+				value.str("");
+				value << "\\n(" << m_fullCompositeEventCount << " event";
+				if (m_fullCompositeEventCount != 1) {
+					value << "s";
+				}
+				value << ")";
+				output += value.str();
+			}
+			return output;
 		} else if (line == m_instrumentAbbrIndex) {
 			return "*I'Comp.";
 		} else if (line == m_timeSignatureIndex) {
 			return getTimeSignature(infile, m_timeSignatureIndex, "");
 		} else if (line == m_meterSymbolIndex) {
-			return getMeterSymbol(infile, m_meterSymbolIndex, "");
+			return getMetricSymbol(infile, m_meterSymbolIndex, "");
 		} else {
 			return "*";
 		}
@@ -58045,41 +60875,83 @@ string Tool_composite::getFullCompositeToken(HumdrumFile& infile, int line) {
 
 //////////////////////////////
 //
+// Tool_composite::getFullCompositeMarker --
+//
+
+string Tool_composite::getFullCompositeMarker(int line) {
+
+	bool domark = needsCoincidenceMarker(line, true);
+	if (domark) {
+		return m_coinMark;
+	}
+
+	string Avalue = m_groups.at(0).at(line);
+	string Bvalue = m_groups.at(1).at(line);
+
+	if ((Avalue == ".") && (Bvalue == ".")) {
+		return "";
+	}
+
+	// bool Arest = Avalue.find("r") != string::npos;
+	// bool Brest = Bvalue.find("r") != string::npos;
+	bool Anote = Avalue.find("R") != string::npos;
+	bool Bnote = Bvalue.find("R") != string::npos;
+	// bool Anull = Avalue == ".";
+	// bool Bnull = Bvalue == ".";
+
+	// deal with tied note sustains?
+	if (Anote) {
+		return m_AMark;
+	}
+	if (Bnote) {
+		return m_BMark;
+	}
+
+	return "";
+}
+
+
+
+//////////////////////////////
+//
 // Tool_composite::needsCoincidenceMarker -- return composite marker if there
 //     is a coincidence between two groups on the given line (from group analysis data).
 //
 
-bool Tool_composite::needsCoincidenceMarker(int line) {
+bool Tool_composite::needsCoincidenceMarker(int line, bool forceQ) {
 	string group1 = m_groups.at(0).at(line);
 	string group2 = m_groups.at(1).at(line);
 
-	bool domark = true;
 	if (!m_coinMarkQ) {
-		return false;
-	} else { 
-		// coincidence if there are no ties or rests, or null tokens involved.
-		if (group1 == "") {
-			domark = false;
-		} else if (group2 == "") {
-			domark = false;
-		} else if (group1.find("r") != string::npos) {
-			domark = false;
-		} else if (group2.find("r") != string::npos) {
-			domark = false;
-		} else if (group1.find("_") != string::npos) {
-			domark = false;
-		} else if (group2.find("_") != string::npos) {
-			domark = false;
-		} else if (group1.find("]") != string::npos) {
-			domark = false;
-		} else if (group2.find("]") != string::npos) {
-			domark = false;
-		} else if (group1 == ".") {
-			domark = false;
-		} else if (group2 == ".") {
-			domark = false;
+		if (!forceQ) {
+			return false;
 		}
 	}
+
+	// Coincidence if there are no ties or rests, or null tokens involved.
+	bool domark = true;
+	if (group1 == "") {
+		domark = false;
+	} else if (group2 == "") {
+		domark = false;
+	} else if (group1.find("r") != string::npos) {
+		domark = false;
+	} else if (group2.find("r") != string::npos) {
+		domark = false;
+	} else if (group1.find("_") != string::npos) {
+		domark = false;
+	} else if (group2.find("_") != string::npos) {
+		domark = false;
+	} else if (group1.find("]") != string::npos) {
+		domark = false;
+	} else if (group2.find("]") != string::npos) {
+		domark = false;
+	} else if (group1 == ".") {
+		domark = false;
+	} else if (group2 == ".") {
+		domark = false;
+	}
+
 	return domark;
 }
 
@@ -58120,9 +60992,33 @@ string Tool_composite::getGroupCompositeToken(HumdrumFile& infile, int line, int
 			return "*clefX";
 		} else if (line == m_instrumentNameIndex) {
 			if (group == 0) {
-				return "*I\"Group A";
+				string output = "*I\"Group A";
+				if (m_eventQ) {
+					m_groupAEventCount = getEventCount(m_groups.at(0));
+					stringstream value;
+					value.str("");
+					value << "\\n(" << m_groupAEventCount << " event";
+					if (m_groupAEventCount != 1) {
+						value << "s";
+					}
+					value << ")";
+					output += value.str();
+				}
+				return output;
 			} else {
-				return "*I\"Group B";
+				string output = "*I\"Group B";
+				if (m_eventQ) {
+					m_groupBEventCount = getEventCount(m_groups.at(1));
+					stringstream value;
+					value.str("");
+					value << "\\n(" << m_groupBEventCount << " event";
+					if (m_groupBEventCount != 1) {
+						value << "s";
+					}
+					value << ")";
+					output += value.str();
+				}
+				return output;
 			}
 		} else if (line == m_instrumentAbbrIndex) {
 			if (group == 0) {
@@ -58141,7 +61037,7 @@ string Tool_composite::getGroupCompositeToken(HumdrumFile& infile, int line, int
 		} else if (line == m_timeSignatureIndex) {
 			return getTimeSignature(infile, m_timeSignatureIndex, tgroup);
 		} else if (line == m_meterSymbolIndex) {
-			return getMeterSymbol(infile, m_meterSymbolIndex, tgroup);
+			return getMetricSymbol(infile, m_meterSymbolIndex, tgroup);
 		} else {
 			return "*";
 		}
@@ -58192,17 +61088,17 @@ string Tool_composite::getTimeSignature(HumdrumFile& infile, int line, const str
 
 //////////////////////////////
 //
-// Tool_composite::getMeterSymbol --
+// Tool_composite::getMetricSymbol --
 //
 
-string Tool_composite::getMeterSymbol(HumdrumFile& infile, int line, const string& group) {
+string Tool_composite::getMetricSymbol(HumdrumFile& infile, int line, const string& group) {
 	if (!infile[line].isInterpretation()) {
 		return "*";
 	}
 	HTp lastToken = NULL;
 	for (int j=0; j<infile[line].getFieldCount(); j++) {
 		HTp token = infile.token(line, j);
-		if (!token->isMeterSymbol()) {
+		if (!token->isMetricSymbol()) {
 			continue;
 		}
 		lastToken = token;
@@ -58236,6 +61132,7 @@ void Tool_composite::analyzeFullCompositeRhythm(HumdrumFile& infile) {
 
 	vector<bool> isRest(infile.getLineCount(), false);
 	vector<bool> isNull(infile.getLineCount(), false);
+	vector<bool> isSustain(infile.getLineCount(), false);
 
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (durations[i] == 0) {
@@ -58243,6 +61140,7 @@ void Tool_composite::analyzeFullCompositeRhythm(HumdrumFile& infile) {
 		}
 		bool allnull = true;
 		bool allrest = true;
+		bool allsustain = true;
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			HTp tok = infile.token(i, j);
 			if (tok->isNull()) {
@@ -58254,14 +61152,23 @@ void Tool_composite::analyzeFullCompositeRhythm(HumdrumFile& infile) {
 			}
 			if (tok->isNote()) {
 				allrest = false;
-				break;
+				allnull = false;
+				if ((tok->find("_") == string::npos) &&
+				    (tok->find("]") == string::npos)) {
+					allsustain = false;
+				} else {
+				// 	cerr << "NOTE THAT IS SUSTAIN: " << tok << endl;
+				}
+			} else {
+				// cerr << "TOKEN IS NOT NOTE " << tok << endl;
 			}
 			if (tok->isRest()) {
 				allnull = false;
 			}
 		}
-		isRest[i] = allrest ? true : false;
-		isNull[i] = allnull ? true : false;
+		isRest[i]    = allrest    ? true : false;
+		isNull[i]    = allnull    ? true : false;
+		isSustain[i] = allsustain ? true : false;
 	}
 
 	string pstring = m_pitch;
@@ -58334,12 +61241,64 @@ void Tool_composite::analyzeFullCompositeRhythm(HumdrumFile& infile) {
 			output += "r";
 		} else {
 			output += pstring;
+			if (isSustain.at(i)) {
+				output += "]";
+			}
 		}
 		m_fullComposite[i] = output;
+		// cerr << output << "\tS:" << isSustain[i] << "\tR:" << isRest[i] << "\tN:" << isNull[i] << endl;
 	}
+
+
+	fixTiedNotes(m_fullComposite, infile);
 
 //	removeAuxTremolosFromCompositeRhythm(infile);
 
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::fixTiedNotes --
+//
+
+void Tool_composite::fixTiedNotes(vector<string>& data, HumdrumFile& infile) {
+	bool intie = false;
+	HumRegex hre;
+	for (int i=(int)data.size() - 1; i>=0; i--) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		if (infile[i].isGraceLine()) {
+			// ignore grace-note lines
+			continue;
+		}
+		if (data.at(i) == ".") {
+			continue;
+		}
+		if (data.at(i) == "") {
+			continue;
+		}
+		if (intie) {
+			if (data.at(i).find("[") != string::npos) {
+				intie = false;
+			} else if (data.at(i).find("]") != string::npos) {
+				hre.replaceDestructive(data.at(i), "_", "[]]");
+			} else if (data.at(i).find("_") != string::npos) {
+				// do nothing
+			} else {
+				data.at(i) = "[" + data.at(i);
+				intie = false;
+			}
+		} else {
+			if (data.at(i).find("]") != string::npos) {
+				intie = true;
+			} else if (data.at(i).find("_") != string::npos) {
+				intie = true;
+			}
+		}
+	}
 }
 
 
@@ -58425,10 +61384,46 @@ void Tool_composite::analyzeCoincidenceRhythms(HumdrumFile& infile) {
 		}
 	}
 
+	string lastnote = "";
+	HumNum remainder;
+	bool barline = false;
 	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isBarline()) {
+			barline = true;
+		}
+		if (barline && infile[i].isData() && !infile[i].isGraceLine()) {
+			barline = false;
+			if (remainder > 0) {
+				// add remainder rest at start of new barline
+				HumNum durtobar = infile[i].getDurationToBarline();
+				if (remainder > durtobar) {
+					// Presuming a need for a rest at the start of the measure that
+					// is an overflow from the previous measure.
+					remainder = remainder - durtobar;
+					string recip = Convert::durationToRecip(durtobar);
+					string text = recip + "r";
+					lastnote = text;
+					m_coincidence[i] = text;
+				} else {
+					// Remainder rest stops by the next bar.
+					string recip = Convert::durationToRecip(remainder);
+					remainder = 0;
+					string text = recip + "r";
+					lastnote = text;
+					m_coincidence[i] = text;
+				}
+			}
+		}
 		if (noteAttack[i]) {
 			HumNum duration = infile[nextAttackIndex[i]].getDurationFromStart() -
 				infile[i].getDurationFromStart();
+			HumNum durtobar = infile[i].getDurationToBarline();
+			if (duration > durtobar) {
+				// clip the duration to the duration of the rest of the measure
+				remainder = duration - durtobar;
+				duration = durtobar;
+			}
+
 			string recip = Convert::durationToRecip(duration);
 			string text;
 			if (noteAttack[i] == -2) {
@@ -58437,26 +61432,45 @@ void Tool_composite::analyzeCoincidenceRhythms(HumdrumFile& infile) {
 				// or is a tie end if the next note is an attack (1) or rest (2)
 				if (noteAttack[nextAttackIndex[i]] > 0) {
 					// tie end
-					m_coincidence[i] = text + "]";
+					if ((lastnote.find("[") == string::npos) && (lastnote.find("_") == string::npos)) {
+						m_coincidence[i] = recip + "r";
+						// previous note is not a tie, so switch this note to a rest from
+						// a sustained tied note
+
+					} else {
+						m_coincidence[i] = text;
+						m_coincidence[i] += "]";
+					}
+					lastnote = m_coincidence[i];
 				} else {
 					// tie middle
-					m_coincidence[i] = text + "_";
+					if ((lastnote.find("[") == string::npos) && (lastnote.find("_") == string::npos)) {
+						m_coincidence[i] = text + "[";
+					} else {
+						m_coincidence[i] = text + "_";
+					}
+					lastnote = m_coincidence[i];
 				}
 			} else if (noteAttack[i] == 1) {
 				text = recip + "eR";
 				// Start a tie if the next note is a tied note
 				if (noteAttack[nextAttackIndex[i]] == -2) {
 					m_coincidence[i] = "[" + text;
+					lastnote = m_coincidence[i];
 				} else {
 					m_coincidence[i] = text;
+					lastnote = m_coincidence[i];
 				}
 			} else if (noteAttack[i] == 2) {
 				// rest
 				text = recip + "r";
 				m_coincidence[i] = text;
+				lastnote = m_coincidence[i];
 			}
 		}
 	}
+
+	// fixTiedNotes(m_coincidence, infile);
 
 	if (m_debugQ) {
 		cerr << "MERGED Coincidence states:" << endl;
@@ -59351,8 +62365,8 @@ void Tool_composite::doNumericAnalyses(HumdrumFile& infile) {
 //////////////////////////////
 //
 // Tool_composite::doOnsetAnalyses -- targetGroup == "" means full composite onsets.
-//
-// First index of m_analyses is rhythm type, and second index is analysis type, with "0" being onsets.
+//     First index of m_analyses is rhythm type, and second index is analysis type,
+//     with "0" being onsets.
 //
 
 void Tool_composite::doOnsetAnalyses(HumdrumFile& infile) {
@@ -59369,7 +62383,26 @@ void Tool_composite::doOnsetAnalyses(HumdrumFile& infile) {
 	// Coincidence onset analysis must come after other onset analyses since it
 	// relies on group A + group B.
 	if (m_analyses.at(m_COINCIDENCE).at(m_ONSET).size() > 0) {
-		// doOnsetAnalysisCoincidence(m_analyses.at(m_COINCIDENCE).at(m_ONSET), infile, m_analyses.at(0));
+		doOnsetAnalysisCoincidence(m_analyses.at(m_COINCIDENCE).at(m_ONSET),
+		                           m_analyses.at(m_COMPOSITE_A).at(m_ONSET),
+		                           m_analyses.at(m_COMPOSITE_B).at(m_ONSET));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::doOnsetAnalysisCoincidence -- Note onset analysis for coincidence analysis.
+//
+
+void Tool_composite::doOnsetAnalysisCoincidence(vector<double>& output,
+		vector<double>& inputA, vector<double>& inputB) {
+	fill(output.begin(), output.end(), 0);
+	for (int i=0; i<(int)inputA.size(); i++) {
+		if ((inputA[i] > 0) && (inputB[i] > 0)) {
+			output[i] = inputA[i] + inputB[i];
+		}
 	}
 }
 
@@ -59521,7 +62554,8 @@ void Tool_composite::analyzeOutputVariables(HumdrumFile& infile) {
 	m_groupAssignmentIndex = 0;
 	m_firstDataIndex       = 0;
 	m_verseLabelIndex      = 0;
-	m_striaIndex           = 0;
+	m_striaIndex           = 0;  // just before clef line in score
+	m_sizeIndex            = 0;
 	m_clefIndex            = 0;
 
 	int barlineIndex = 0;
@@ -59570,6 +62604,9 @@ void Tool_composite::analyzeOutputVariables(HumdrumFile& infile) {
 			if (token->isStria()) {
 				m_striaIndex = i;
 			}
+			if (token->compare(0, 6, "*size:") == 0) {
+				m_sizeIndex = i;
+			}
 			if (token->compare(0, 5, "*grp:") == 0) {
 				if (m_groupAssignmentIndex <= 0) {
 					m_groupAssignmentIndex = i;
@@ -59605,7 +62642,472 @@ void Tool_composite::analyzeOutputVariables(HumdrumFile& infile) {
 		}
 	}
 
+	if (!m_sizeIndex) {
+		// In rare cases there could be a LO parameter for the last interpretation
+		// line (such as a layout parameter for a clef).  Currently ignore this problem.
+		if (m_clefIndex > 0) {
+			m_sizeIndex = -m_clefIndex;
+		}
+	}
+
 }
+
+
+
+//////////////////////////////
+//
+// Tool_composite::addStaffInfo -- Find staff number line and add staff line to output
+//     if found.
+//
+
+void Tool_composite::addStaffInfo(HumdrumFile& output, HumdrumFile& infile) {
+	int staffindex = -1;
+	HumRegex hre;
+	int lastStaff = -1;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isData()) {
+			break;
+		}
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKernLike()) {
+				continue;
+			}
+			if (hre.search(token, "^\\*staff(\\d+)")) {
+				lastStaff = hre.getMatchInt(1);
+				staffindex = i;
+				break;
+			}
+		}
+
+		if (staffindex > 0) {
+			break;
+		}
+	}
+	if (staffindex < 0) {
+		return;
+	}
+	if (lastStaff < 0) {
+		return;
+	}
+
+	int currentStaff = lastStaff;
+	for (int j=output[staffindex].getFieldCount() - 1; j>=0; j--) {
+		HTp token = output.token(staffindex, j);
+		string staffnum = "*staff" + to_string(++currentStaff);
+		token->setText(staffnum);
+	}
+
+	output[staffindex].createLineFromTokens();
+
+	int beginStaff = lastStaff + 1;
+	int endStaff = lastStaff + output[staffindex].getFieldCount();
+	int staffcount = output[staffindex].getFieldCount();
+	string decoadd;
+	if (staffcount > 1) {
+		decoadd = "[(";
+		for (int i=beginStaff; i<=endStaff; i++) {
+			decoadd += "s" + to_string(i);
+		}
+		decoadd += ")]";
+	} else {
+		decoadd = "s" + to_string(beginStaff);
+	}
+
+	for (int i=output.getLineCount() - 1; i>=0; i--) {
+		if (!output[i].isGlobalReference()) {
+			continue;
+		}
+		HTp token = output.token(i, 0);
+		if (hre.search(token, "!!!system-decoration:(\\s*)(.*)(\\s*)$")) {
+			string prevalue = hre.getMatch(1);
+			string original = hre.getMatch(2);
+			string postvalue = hre.getMatch(3);
+			string text = "!!!system-decoration:"+ prevalue + original + decoadd + postvalue;
+			token->setText(text);
+			output[i].createLineFromTokens();
+			break;
+		}
+	}
+
+}
+
+
+
+///////////////////////////////
+//
+// Tool_composite::addTimeSignatureChanges --
+//
+
+void Tool_composite::addTimeSignatureChanges(HumdrumFile& output, HumdrumFile& infile) {
+	string timesig;
+	string groupAsig;
+	string groupBsig;
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		timesig    = "";
+		groupAsig  = "";
+		groupBsig  = "";
+
+		bool foundtime = false;
+
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isTimeSignature()) {
+				string group = token->getValue("auto", "group");
+				if (group == "") {
+					timesig = *token;
+					foundtime = true;
+				} else if (group == "A") {
+					groupAsig = *token;
+					foundtime = true;
+				} else if (group == "B") {
+					groupBsig = *token;
+					foundtime = true;
+				} else {
+					timesig = *token;
+					foundtime = true;
+				}
+			}
+		}
+
+		if (!foundtime) {
+			continue;
+		}
+
+		for (int j=0; j<output[i].getFieldCount(); j++) {
+			HTp token = output.token(i, j);
+			string spinetype = token->getDataType();
+			if ((spinetype == "**kern-coin") || (spinetype == "**kern-comp")) {
+				if (timesig != "") {
+					token->setText(timesig);
+				} else if (groupAsig != "") {
+					token->setText(groupAsig);
+				} else if (groupBsig != "") {
+					token->setText(groupAsig);
+				}
+			} else if (spinetype == "**kern-grpA") {
+				if (groupAsig != "") {
+					token->setText(groupAsig);
+				}
+			} else if (spinetype == "**kern-grpB") {
+				if (groupBsig != "") {
+					token->setText(groupBsig);
+				}
+			}
+		}
+		output[i].createLineFromTokens();
+
+	}
+}
+
+
+
+///////////////////////////////
+//
+// Tool_composite::addMeterSignatureChanges --
+//
+
+void Tool_composite::addMeterSignatureChanges(HumdrumFile& output, HumdrumFile& infile) {
+	string metersig;
+	string groupAsig;
+	string groupBsig;
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		metersig    = "";
+		groupAsig  = "";
+		groupBsig  = "";
+
+		bool foundtime = false;
+
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isMetricSymbol()) {
+				string group = token->getValue("auto", "group");
+				if (group == "") {
+					metersig = *token;
+					foundtime = true;
+				} else if (group == "A") {
+					groupAsig = *token;
+					foundtime = true;
+				} else if (group == "B") {
+					groupBsig = *token;
+					foundtime = true;
+				} else {
+					metersig = *token;
+					foundtime = true;
+				}
+			}
+		}
+
+		if (!foundtime) {
+			continue;
+		}
+
+		for (int j=0; j<output[i].getFieldCount(); j++) {
+			HTp token = output.token(i, j);
+			string spinetype = token->getDataType();
+			if ((spinetype == "**kern-coin") || (spinetype == "**kern-comp")) {
+				if (metersig != "") {
+					token->setText(metersig);
+				} else if (groupAsig != "") {
+					token->setText(groupAsig);
+				} else if (groupBsig != "") {
+					token->setText(groupAsig);
+				}
+			} else if (spinetype == "**kern-grpA") {
+				if (groupAsig != "") {
+					token->setText(groupAsig);
+				}
+			} else if (spinetype == "**kern-grpB") {
+				if (groupBsig != "") {
+					token->setText(groupBsig);
+				}
+			}
+		}
+		output[i].createLineFromTokens();
+
+	}
+}
+
+
+
+//////////////////////////////
+//
+// adjustBadCoincidenceRests --  Sometimes coincidence rests are not so great, particularly
+//    when they are long and there is a small note that will add to it to fill in a measure
+//    (such as a 5 eighth-note rest in 6/8).  Try to simplify such case in this function
+//    (more can be added on a case-by-case basis).
+//
+//    3... => 5 eighth notes (split according to meter).
+//
+
+void Tool_composite::adjustBadCoincidenceRests(HumdrumFile& output, HumdrumFile& infile) {
+	vector<HTp> sstarts;
+	output.getSpineStartList(sstarts, "**kern-coin");
+	if (sstarts.empty()) {
+		// no coincidence spine to process
+		return;
+	}
+
+	HumRegex hre;
+	vector<HumNum> timesigtop(output.getLineCount(), 4);
+	vector<HumNum> timesigbot(output.getLineCount(), 4);
+	HumNum tts = 4;
+	HumNum bts = 4;
+
+	for (int i=0; i<output.getLineCount(); i++) {
+		if (!output[i].isInterpretation()) {
+			timesigtop[i] = tts;
+			timesigbot[i] = bts;
+			continue;
+		}
+		for (int j=0; j<output[i].getFieldCount(); j++) {
+			HTp token = output.token(i, j);
+			if (token->getDataType() != "**kern-coin") {
+				continue;
+			}
+			if (token->isTimeSignature()) {
+				if (hre.search(token, "^\\*M(\\d+)/(\\d+)")) {
+					tts = hre.getMatch(1);
+					bts = hre.getMatch(2);
+				}
+			}
+			break;
+		}
+		timesigtop[i] = tts;
+		timesigbot[i] = bts;
+	}
+
+	HTp current = sstarts.at(0);
+	string rhythm;
+	while (current) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (!current->isRest()) {
+			// should check pitches as well
+			current = current->getNextToken();
+			continue;
+		}
+		if (hre.search(current, "(\\d+%?\\d*\\.*)")) {
+			rhythm = hre.getMatch(1);
+			if (rhythm == "3...") {
+				int lindex = current->getLineIndex();
+				current = fixBadRestRhythm(current, rhythm, timesigtop[lindex], timesigbot[lindex]);
+			}
+		}
+		current = current->getNextToken();
+	}
+
+}
+
+
+//////////////////////////////
+//
+// Tool_composite::fixBadRestRhythm --
+//
+
+HTp Tool_composite::fixBadRestRhythm(HTp token, string& rhythm, HumNum tstop, HumNum tsbot) {
+	HumNum duration = Convert::recipToDuration(rhythm);
+	if (rhythm == "3...") {
+		duration = 5;
+		duration /= 8;
+		duration *= 4;
+	}
+	HumRegex hre;
+	vector<HTp> tokens;
+	HTp current = token;
+	bool compound = false;
+	HumNum testval = tstop / 3;
+	if ((testval > 1) && testval.isInteger()) {
+		compound = true;
+	}
+	tokens.push_back(token);
+	current = current->getNextToken();
+	while (current) {
+		if (current->isBarline()) {
+			tokens.push_back(current);
+			break;
+		}
+		if (current->isData()) {
+			tokens.push_back(current);
+			if (!current->isNull()) {
+				break;
+			}
+		}
+		current = current->getNextToken();
+	}
+
+	vector<HumNum> beatfrac;
+	for (int i=0; i<(int)tokens.size(); i++) {
+		HumNum value = tokens[i]->getDurationFromBarline();
+		if (compound) {
+			value /= 3;
+		}
+		value *= tsbot;
+		value /= 4;
+		double dval = value.getFloat();
+		int intval = (int)dval;
+		value -= intval;
+		beatfrac.push_back(value);
+	}
+
+	for (int i=1; i<(int)tokens.size() - 1; i++) {
+		if (beatfrac[i] == 0) {
+			// split rest at a beat boundary
+			HumNum pos1 = token->getDurationFromStart();
+			HumNum pos2 = tokens[i]->getDurationFromStart();
+			HumNum predur = pos2 - pos1;
+			HumNum postdur = duration - predur;
+			string newrhy = Convert::durationToRecip(predur);
+			string toktext = *token;
+			string text2 = *token;
+			hre.replaceDestructive(toktext, newrhy, rhythm);
+			token->setText(toktext);
+			newrhy = Convert::durationToRecip(postdur);
+			hre.replaceDestructive(text2, newrhy, rhythm);
+			tokens[i]->setText(text2);
+			// doing only once for now
+			break;
+		}
+	}
+
+	if (tokens.back()->isBarline()) {
+		return tokens.back();
+	}
+	if (tokens.size() == 1) {
+		return tokens.back();
+	}
+	if (tokens.size() > 1) {
+		return tokens.at((int)tokens.size() - 2);
+	}
+	// shouldn't get here
+	return NULL;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_composite::convertNotesToRhythms --
+//
+
+void Tool_composite::convertNotesToRhythms(HumdrumFile& infile) {
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->isRest()) {
+				continue;
+			}
+			if (token->isNull()) {
+				continue;
+			}
+			string text = *token;
+			hre.replaceDestructive(text, "eR", "[A-Ga-g]+[#n-]*", "g");
+			token->setText(text);
+		}
+		infile[i].createLineFromTokens();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// getEventCount -- Return the number of note attacks.
+//
+
+int Tool_composite::getEventCount(vector<string>& data) {
+	int output = 0;
+	for (int i=0; i<(int)data.size(); i++) {
+		if (data[i] == "") {
+			continue;
+		}
+		if (data[i] == ".") {
+			continue;
+		}
+		if (data[i].find("*") != string::npos) {
+			continue;
+		}
+		if (data[i].find("!") != string::npos) {
+			continue;
+		}
+		if (data[i].find("r") != string::npos) {
+			continue;
+		}
+		if (data[i].find("_") != string::npos) {
+			continue;
+		}
+		if (data[i].find("]") != string::npos) {
+			continue;
+		}
+		output++;
+	}
+	return output;
+}
+
 
 
 
@@ -69941,6 +73443,370 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 
 
 
+/////////////////////////////////
+//
+// Tool_fb::Tool_fb -- Set the recognized options for the tool.
+//
+
+Tool_fb::Tool_fb(void) {
+	define("d|debug=b", "Print debug information");
+	define("r|reference=i:0", "Reference kern spine (1 indexed)");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_fb::run -- Do the main work of the tool.
+//
+
+bool Tool_fb::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_fb::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_fb::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_fb::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fb::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_fb::initialize(void) {
+	m_debugQ = getBoolean("debug");
+	m_reference = getInteger("reference") - 1;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fb::processFile --
+//
+
+void Tool_fb::processFile(HumdrumFile& infile) {
+	setupScoreData(infile);
+	getHarmonicIntervals(infile);
+	printOutput(infile);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fb::getHarmonicIntervals -- Fill in
+//
+
+void Tool_fb::getHarmonicIntervals(HumdrumFile& infile) {
+	m_intervals.resize(infile.getLineCount());
+
+	vector<HTp> tokens(m_kernspines.size(), NULL);
+	for (int i=0; i<infile.getLineCount(); i++) {
+		m_intervals[i].resize(0);
+		if (!infile[i].isData()) {
+			continue;
+		}
+		fill(tokens.begin(), tokens.end(), (HTp)NULL);
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			int track = token->getTrack();
+			int index = m_track2index.at(track);
+			tokens[index] = token;
+			// cerr << token << "\t";
+		}
+		m_intervals[i].resize(m_kernspines.size());
+		calculateIntervals(m_intervals[i], tokens, m_reference);
+		// cerr << endl;
+
+		if (m_debugQ) {
+			for (int j=0; j<(int)m_intervals[i].size(); j++) {
+				m_free_text << tokens[j] << "\t(";
+				if (m_intervals[i][j] == m_rest) {
+					m_free_text << "R";
+				} else {
+					m_free_text << m_intervals[i][j];
+				}
+				m_free_text << ")";
+				if (j < (int)m_intervals[i].size() - 1) {
+					m_free_text << "\t";
+				}
+			}
+			m_free_text << endl;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fb::calculateIntervals --
+//
+
+void Tool_fb::calculateIntervals(vector<int>& intervals,
+		vector<HTp>& tokens, int bassIndex) {
+	if (intervals.size() != tokens.size()) {
+		cerr << "ERROR: Size if vectors do not match" << endl;
+		return;
+	}
+
+	HTp reftok = tokens[m_reference];
+	if (reftok->isNull()) {
+		reftok = reftok->resolveNull();
+	}
+
+	if (!reftok || reftok->isRest()) {
+		for (int i=0; i<(int)tokens.size(); i++) {
+			intervals[i] = m_rest;
+		}
+		return;
+	}
+
+	int base40ref = Convert::kernToBase40(reftok);
+
+	for (int i=0; i<(int)tokens.size(); i++) {
+		if (i == m_reference) {
+			intervals[i] = m_rest;
+			continue;
+		}
+		if (tokens[i]->isRest()) {
+			intervals[i] = m_rest;
+			continue;
+		}
+		if (tokens[m_reference]->isRest()) {
+			intervals[i] = m_rest;
+			continue;
+		}
+		if (tokens[i]->isNull()) {
+			continue;
+		}
+		int base40 = Convert::kernToBase40(tokens[i]);
+		int interval = base40 - base40ref;
+		intervals[i] = interval;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fb::setupScoreData --
+//
+
+void Tool_fb::setupScoreData(HumdrumFile& infile) {
+	infile.getKernSpineStartList(m_kernspines);
+	m_kerntracks.resize(m_kernspines.size());
+	for (int i=0; i<(int)m_kernspines.size(); i++) {
+		m_kerntracks[i] = m_kernspines[i]->getTrack();
+	}
+
+	int maxtrack = infile.getMaxTrack();
+	m_track2index.resize(maxtrack + 1);
+	fill(m_track2index.begin(), m_track2index.end(), -1);
+	for (int i=0; i<(int)m_kerntracks.size(); i++) {
+		m_track2index.at(m_kerntracks[i]) = i;
+	}
+
+	if (m_reference >= (int)m_kernspines.size()) {
+		m_reference = (int)m_kernspines.size() - 1;
+	}
+	if (m_reference < 0) {
+		m_reference = 0;
+	}
+
+	vector<int> pcs(7, 0);
+
+	m_keyaccid.resize(infile.getLineCount());
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->isKeySignature()) {
+				fill(pcs.begin(), pcs.end(), 0);
+				HumRegex hre;
+				if (hre.search(token, "c#")) { pcs[0] = +1;}
+				if (hre.search(token, "d#")) { pcs[1] = +1;}
+				if (hre.search(token, "e#")) { pcs[2] = +1;}
+				if (hre.search(token, "f#")) { pcs[3] = +1;}
+				if (hre.search(token, "g#")) { pcs[4] = +1;}
+				if (hre.search(token, "a#")) { pcs[5] = +1;}
+				if (hre.search(token, "b#")) { pcs[6] = +1;}
+				if (hre.search(token, "c-")) { pcs[0] = -1;}
+				if (hre.search(token, "d-")) { pcs[1] = -1;}
+				if (hre.search(token, "e-")) { pcs[2] = -1;}
+				if (hre.search(token, "f-")) { pcs[3] = -1;}
+				if (hre.search(token, "g-")) { pcs[4] = -1;}
+				if (hre.search(token, "a-")) { pcs[5] = -1;}
+				if (hre.search(token, "b-")) { pcs[6] = -1;}
+				m_keyaccid[i] = pcs;
+			}
+		}
+	}
+
+	for (int i=1; i<infile.getLineCount(); i++) {
+		if (m_keyaccid[i].empty()) {
+			m_keyaccid[i] = m_keyaccid[i-1];
+		}
+	}
+	for (int i=infile.getLineCount() - 2; i>=0; i--) {
+		if (m_keyaccid[i].empty()) {
+			m_keyaccid[i] = m_keyaccid[i+1];
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fb:printOutput --
+//
+
+void Tool_fb::printOutput(HumdrumFile& infile) {
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			m_humdrum_text << infile[i] << endl;
+			continue;
+		}
+		printLineStyle3(infile, i);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fb::printLineStyle3 --
+//
+
+void Tool_fb::printLineStyle3(HumdrumFile& infile, int line) {
+	bool printed = false;
+	int reftrack = m_kerntracks[m_reference];
+	bool tab = false;
+
+	for (int i=0; i<infile[line].getFieldCount(); i++) {
+		HTp token = infile.token(line, i);
+		int track = token->getTrack();
+		if (printed || (track != reftrack + 1)) {
+			if (tab) {
+				m_humdrum_text << "\t" << token;
+			} else {
+				tab = true;
+				m_humdrum_text << token;
+			}
+			continue;
+		}
+		// print analysis spine and then next spine
+		if (tab) {
+			m_humdrum_text << "\t";
+		} else {
+			tab = true;
+		}
+		m_humdrum_text << getAnalysisTokenStyle3(infile, line, i);
+		printed = true;
+		m_humdrum_text << "\t" << token;
+	}
+	m_humdrum_text << "\n";
+}
+
+
+
+//////////////////////////////
+//
+// Tool_fb::getAnalysisTokenStyle3 --
+//
+
+string Tool_fb::getAnalysisTokenStyle3(HumdrumFile& infile, int line, int field) {
+	if (infile[line].isCommentLocal()) {
+		return "!";
+	}
+	if (infile[line].isInterpretation()) {
+		HTp token = infile.token(line, 0);
+		if (token->compare(0, 2, "**") == 0) {
+			return "**fb";
+		} else if (*token == "*-") {
+			return "*-";
+		} else if (token->isLabel()) {
+			return *token;
+		} else if (token->isExpansionList()) {
+			return *token;
+		} else if (token->isKeySignature()) {
+			return *token;
+		} else if (token->isKeyDesignation()) {
+			return *token;
+		} else {
+			return "*";
+		}
+	}
+	if (infile[line].isBarline()) {
+		HTp token = infile.token(line, 0);
+		return *token;
+	}
+
+	// create data token
+	string output;
+
+	for (int i=(int)m_intervals[line].size()-1; i>=0; i--) {
+		if (i == m_reference) {
+			continue;
+		}
+		int base40int = m_intervals[line][i];
+		string iname = Convert::base40ToIntervalAbbr(base40int);
+		output += iname;
+		output += " ";
+	}
+	if (!output.empty()) {
+		output.resize((int)output.size() - 1);
+	}
+
+	return output;
+}
+
+
+
+
 #define RUNTOOL(NAME, INFILE, COMMAND, STATUS)     \
 	Tool_##NAME *tool = new Tool_##NAME;            \
 	tool->process(COMMAND);                         \
@@ -70006,6 +73872,7 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 
 Tool_filter::Tool_filter(void) {
 	define("debug=b", "print debug statement");
+	define("v|variant=s:", "Run filters labeled with the given variant");
 }
 
 
@@ -70078,6 +73945,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(chord, infile, commands[i].second, status);
 		} else if (commands[i].first == "cint") {
 			RUNTOOL(cint, infile, commands[i].second, status);
+		} else if (commands[i].first == "cmr") {
+			RUNTOOL(cmr, infile, commands[i].second, status);
 		} else if (commands[i].first == "composite") {
 			RUNTOOL(composite, infile, commands[i].second, status);
 		} else if (commands[i].first == "dissonant") {
@@ -70094,6 +73963,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(hproof, infile, commands[i].second, status);
 		} else if (commands[i].first == "humsheet") {
 			RUNTOOL(humsheet, infile, commands[i].second, status);
+		} else if (commands[i].first == "humtr") {
+			RUNTOOL(humtr, infile, commands[i].second, status);
 		} else if (commands[i].first == "kernview") {
 			RUNTOOL(kernview, infile, commands[i].second, status);
 		} else if (commands[i].first == "shed") {
@@ -70107,6 +73978,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(extract, infile, commands[i].second, status);
 		} else if (commands[i].first == "flipper") {
 			RUNTOOL(flipper, infile, commands[i].second, status);
+		} else if (commands[i].first == "filter") {
+			RUNTOOL(filter, infile, commands[i].second, status);
 		} else if (commands[i].first == "gasparize") {
 			RUNTOOL(gasparize, infile, commands[i].second, status);
 		} else if (commands[i].first == "melisma") {
@@ -70119,8 +73992,6 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(modori, infile, commands[i].second, status);
 		} else if (commands[i].first == "msearch") {
 			RUNTOOL(msearch, infile, commands[i].second, status);
-		} else if (commands[i].first == "peak") {
-			RUNTOOL(peak, infile, commands[i].second, status);
 		} else if (commands[i].first == "phrase") {
 			RUNTOOL(phrase, infile, commands[i].second, status);
 		} else if (commands[i].first == "restfill") {
@@ -70156,6 +74027,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(spinetrace, infile, commands[i].second, status);
 		} else if (commands[i].first == "strophe") {
 			RUNTOOL(strophe, infile, commands[i].second, status);
+		} else if (commands[i].first == "synco") {
+			RUNTOOL(synco, infile, commands[i].second, status);
 		} else if (commands[i].first == "tabber") {
 			RUNTOOL(tabber, infile, commands[i].second, status);
 		} else if (commands[i].first == "tassoize") {
@@ -70170,6 +74043,14 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(chantize, infile, commands[i].second, status);
 		} else if (commands[i].first == "timebase") {
 			RUNTOOL(timebase, infile, commands[i].second, status);
+		} else if (commands[i].first == "thru") {
+			RUNTOOL(thru, infile, commands[i].second, status);
+		} else if (commands[i].first == "thrux") {
+			// Humdrum Extras emulation
+			RUNTOOL(thru, infile, commands[i].second, status);
+		} else if (commands[i].first == "thruxx") {
+			// humlib cli emulation
+			RUNTOOL(thru, infile, commands[i].second, status);
 		} else if (commands[i].first == "tie") {
 			RUNTOOL(tie, infile, commands[i].second, status);
 		} else if (commands[i].first == "transpose") {
@@ -70211,14 +74092,38 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 void Tool_filter::removeGlobalFilterLines(HumdrumFile& infile) {
 	HumRegex hre;
 	string text;
+
+	string maintag = "!!!filter:";
+	string mainXtag = "!!!Xfilter:";
+	string maintagQuery = "^!!!filter:";
+
+	string maintagV;
+	string mainXtagV;
+	string maintagQueryV;
+
+	if (m_variant.size() > 0) {
+		maintagV = "!!!filter-" + m_variant + ":";
+		mainXtagV = "!!!Xfilter-" + m_variant + ":";
+		maintagQueryV = "^!!!filter-" + m_variant + ":";
+	}
+
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].isReference()) {
 			continue;
 		}
-		if (infile.token(i, 0)->compare(0, 10, "!!!filter:") == 0) {
-			text = infile.token(i, 0)->getText();
-			hre.replaceDestructive(text, "!!!Xfilter:", "^!!!filter:");
-			infile.token(i, 0)->setText(text);
+
+		if (m_variant.size() > 0) {
+			if (infile.token(i, 0)->compare(0, maintagV.size(), maintagV) == 0) {
+				text = infile.token(i, 0)->getText();
+				hre.replaceDestructive(text, mainXtagV, maintagQueryV);
+				infile.token(i, 0)->setText(text);
+			}
+		} else {
+			if (infile.token(i, 0)->compare(0, maintag.size(), maintag) == 0) {
+				text = infile.token(i, 0)->getText();
+				hre.replaceDestructive(text, mainXtag, maintagQuery);
+				infile.token(i, 0)->setText(text);
+			}
 		}
 	}
 }
@@ -70233,6 +74138,21 @@ void Tool_filter::removeGlobalFilterLines(HumdrumFile& infile) {
 void Tool_filter::removeUniversalFilterLines(HumdrumFileSet& infiles) {
 	HumRegex hre;
 	string text;
+
+	string maintag = "!!!!filter:";
+	string mainXtag = "!!!!Xfilter:";
+	string maintagQuery = "^!!!!filter:";
+
+	string maintagV;
+	string mainXtagV;
+	string maintagQueryV;
+
+	if (m_variant.size() > 0) {
+		maintagV = "!!!!filter-" + m_variant + ":";
+		mainXtagV = "!!!!Xfilter-" + m_variant + ":";
+		maintagQueryV = "^!!!!filter-" + m_variant + ":";
+	}
+
 	for (int i=0; i<infiles.getCount(); i++) {
 		HumdrumFile& infile = infiles[i];
 		for (int j=0; j<infile.getLineCount(); j++) {
@@ -70240,11 +74160,20 @@ void Tool_filter::removeUniversalFilterLines(HumdrumFileSet& infiles) {
 				continue;
 			}
 			HTp token = infile.token(j, 0);
-			if (token->compare(0, 11, "!!!!filter:") == 0) {
-				text = token->getText();
-				hre.replaceDestructive(text, "!!!!Xfilter:", "^!!!!filter:");
-				token->setText(text);
-				infile[j].createLineFromTokens();
+			if (m_variant.size() > 0) {
+				if (token->compare(0, maintagV.size(), maintagV) == 0) {
+					text = token->getText();
+					hre.replaceDestructive(text, mainXtagV, maintagQueryV);
+					token->setText(text);
+					infile[j].createLineFromTokens();
+				}
+			} else {
+				if (token->compare(0, maintag.size(), maintag) == 0) {
+					text = token->getText();
+					hre.replaceDestructive(text, mainXtag, maintagQuery);
+					token->setText(text);
+					infile[j].createLineFromTokens();
+				}
 			}
 		}
 	}
@@ -70263,12 +74192,12 @@ void Tool_filter::getCommandList(vector<pair<string, string> >& commands,
 	vector<HLp> refs = infile.getReferenceRecords();
 	pair<string, string> entry;
 	string tag = "filter";
-	vector<string> clist;
-	HumRegex hre;
-   if (m_variant.size() > 0) {
+	if (m_variant.size() > 0) {
 		tag += "-";
 		tag += m_variant;
 	}
+	vector<string> clist;
+	HumRegex hre;
 	for (int i=0; i<(int)refs.size(); i++) {
 		string refkey = refs[i]->getGlobalReferenceKey();
 		if (refkey != tag) {
@@ -70394,12 +74323,12 @@ void Tool_filter::getUniversalCommandList(vector<pair<string, string> >& command
 	vector<HLp> refs = infiles.getUniversalReferenceRecords();
 	pair<string, string> entry;
 	string tag = "filter";
-	vector<string> clist;
-	HumRegex hre;
-   if (m_variant.size() > 0) {
+	if (m_variant.size() > 0) {
 		tag += "-";
 		tag += m_variant;
 	}
+	vector<string> clist;
+	HumRegex hre;
 	for (int i=0; i<(int)refs.size(); i++) {
 		if (refs[i]->getUniversalReferenceKey() != tag) {
 			continue;
@@ -70425,6 +74354,10 @@ void Tool_filter::getUniversalCommandList(vector<pair<string, string> >& command
 
 void Tool_filter::initialize(HumdrumFile& infile) {
 	m_debugQ = getBoolean("debug");
+	m_variant.clear();
+	if (getBoolean("variant")) {
+		m_variant = getString("variant");
+	}
 }
 
 
@@ -75361,6 +79294,516 @@ void Tool_humsort::processFile(HumdrumFile& infile) {
 }
 
 
+
+
+
+
+
+/////////////////////////////////
+//
+// Tool_humtr::Tool_humtr -- Set the recognized options for the tool.
+//
+
+Tool_humtr::Tool_humtr(void) {
+	define("T|no-text|no-lyrics=b", "Do not convert lyrics in **text spines.");
+	define("L|no-local=b", "Do not convert local LO t parameters.");
+	define("G|no-global=b", "Do not convert global LO t parameters.");
+	define("R|no-reference=b", "Do not convert reference record values.");
+
+	define("t|text-only|lyrics-only=b", "convert only lyrics in **text spines.");
+	define("l|local-only=b", "convert only local LO t parameters.");
+	define("g|global-only=b", "convert only global LO t parameters.");
+	define("r|reference-only=b", "convert only reference record values.");
+
+	define("d|data-type=s", "process only given exclusive interpretations");
+	define("s|spines=s", "spines to process");
+
+	define("i|input=s", "Input characters to change");
+	define("o|output=s", "Output characters to change to");
+
+	define("m|replace-map=s", "Characters to change from and to");
+	define("M|display-mapping=b", "Display character transliterations mappings");
+	define("p|popc|popc2=b", "Add POPC2 character substitutions");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_humtr::initialize(void) {
+	m_lyricsQ    = !getBoolean("T");
+	m_localQ     = !getBoolean("L");
+	m_globalQ    = !getBoolean("G");
+	m_referenceQ = !getBoolean("R");
+
+	m_lyricsOnlyQ    = getBoolean("t");
+	m_localOnlyQ     = getBoolean("l");
+	m_globalOnlyQ    = getBoolean("g");
+	m_referenceOnlyQ = getBoolean("r");
+
+	if (m_lyricsOnlyQ || m_localOnlyQ || m_globalOnlyQ || m_referenceOnlyQ) {
+		m_lyricsQ = false;
+		m_localQ = false;
+		m_globalQ = false;
+		m_referenceQ = false;
+	}
+	if (m_lyricsOnlyQ) {
+		m_lyricsQ = true;
+	}
+	if (m_localOnlyQ) {
+		m_localQ = true;
+	}
+	if (m_globalOnlyQ) {
+		m_globalQ = true;
+	}
+	if (m_referenceOnlyQ) {
+		m_referenceQ = true;
+	}
+
+	m_from.clear();
+	m_to.clear();
+
+	if (!getBoolean("replace-map")) {
+		string replace = getString("replace-map");
+		addFromToCombined(replace);
+	}
+
+	if (getBoolean("input") && getBoolean("output")) {
+		string fromString = getString("input");
+		string toString = getString("output");
+		fillFromToPair(fromString, toString);
+	}
+
+	if (getBoolean("popc")) {
+		addFromToCombined("ſ:s ʃ:s &#383;:s ν:u ί:í α:a ť:k ᴣ:z ʓ:z̨ ʒ̇:ż ʒ́:ź Ʒ̇:Ż Ʒ́:Ź æ:ae");
+	}
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_humtr::run -- Do the main work of the tool.
+//
+
+bool Tool_humtr::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+
+bool Tool_humtr::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_humtr::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_humtr::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	if (getBoolean("display-mapping")) {
+		int lengthF = (int)m_from.size();
+		int lengthT = (int)m_to.size();
+		int length = lengthF;
+		if (length > lengthT) {
+			length = lengthT;
+		}
+		for (int i=0; i<length; i++) {
+			m_free_text << "FROM\t" << m_from[i] << "\tTO\t" << m_to[i] << endl;
+		}
+		return true;
+	} else {
+		infile.createLinesFromTokens();
+		m_humdrum_text << infile;
+	}
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::processFile --
+//
+
+void Tool_humtr::processFile(HumdrumFile& infile) {
+	if (m_lyricsQ) {
+		convertTextSpines(infile);
+	}
+	if (m_localQ) {
+		convertLocalLayoutText(infile);
+	}
+	if (m_globalQ) {
+		convertGlobalLayoutText(infile);
+	}
+	if (m_referenceQ) {
+		convertReferenceText(infile);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::convertTextSpines --
+//
+
+void Tool_humtr::convertTextSpines(HumdrumFile& infile) {
+	int scount = infile.getStrandCount();
+	for (int i=0; i<scount; i++) {
+		HTp stok = infile.getStrandStart(i);
+		if (!stok->isDataType("**text")) {
+			continue;
+		}
+		HTp etok = infile.getStrandEnd(i);
+		processTextStrand(stok, etok);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::processTextStrand --
+//
+
+void Tool_humtr::processTextStrand(HTp stok, HTp etok) {
+	HTp current = stok;
+	while (current && (current != etok)) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+
+		string text = transliterateText(*current);
+		if (text != *current) {
+			current->setText(text);
+		}
+
+		current = current->getNextToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::convertReferenceText --
+//
+
+void Tool_humtr::convertReferenceText(HumdrumFile& infile) {
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isGlobalReference()) {
+			continue;
+		}
+
+		HTp token = infile.token(i, 0);
+		if (!hre.search(token, "^!!![^:]+:(.*)$")) {
+			continue;
+		}
+		string oldcontents = hre.getMatch(1);
+		if (oldcontents == "") {
+			return;
+		}
+		string newcontents = transliterateText(oldcontents);
+		if (oldcontents != newcontents) {
+			string text = *token;
+			hre.replaceDestructive(text, ":" + newcontents, ":" + oldcontents);
+			token->setText(text);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::convertGlobalLayoutText --
+//
+
+void Tool_humtr::convertGlobalLayoutText(HumdrumFile& infile) {
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isCommentGlobal()) {
+			continue;
+		}
+
+		HTp token = infile.token(i, 0);
+		if (!hre.search(token, "^!!LO:.*:t=([^:]+)")) {
+			continue;
+		}
+		string oldcontents = hre.getMatch(1);
+		string newcontents = transliterateText(oldcontents);
+		if (oldcontents != newcontents) {
+			string text = *token;
+			hre.replaceDestructive(text, ":t=" + newcontents, ":t=" + oldcontents);
+			token->setText(text);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::convertLocalLayoutText --
+//
+
+void Tool_humtr::convertLocalLayoutText(HumdrumFile& infile) {
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isCommentLocal()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (*token == "!") {
+				continue;
+			}
+			if (!hre.search(token, "^!LO:.*:t=([^:]+)")) {
+				continue;
+			}
+			string oldcontents = hre.getMatch(1);
+			string newcontents = transliterateText(oldcontents);
+			if (oldcontents != newcontents) {
+				string text = *token;
+				hre.replaceDestructive(text, ":t=" + newcontents, ":t=" + oldcontents);
+				token->setText(text);
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::addFromToCombined -- Add additional translations to
+//     the from / to substitutions array.
+//
+
+void Tool_humtr::addFromToCombined(const string& value) {
+	HumRegex hre;
+	vector<string> entries;
+	hre.split(entries, value, m_sep1);
+	for (int i=0; i<(int)entries.size(); i++) {
+		vector<string> mapping;
+		hre.split(mapping, entries[i], m_sep2);
+		if (mapping.size() != 2) {
+			cerr << "Warning: ignoring bad character mapping: " << entries[i] << endl;
+			continue;
+		}
+		m_from.push_back(mapping[0]);
+		m_to.push_back(mapping[1]);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::fillFromToPair
+//
+
+void Tool_humtr::fillFromToPair(const string& from, const string& to) {
+	vector<string> fromList = getUtf8CharacterArray(from);
+	vector<string> toList   = getUtf8CharacterArray(to);
+	if (fromList.size() != toList.size()) {
+		cerr << "Error: String lengths to not match for " << from << "\tAND\t" << to << endl;
+		cerr << "FROM LIST count: " << fromList.size() << endl;
+		for (int i=0; i<(int)fromList.size(); i++) {
+			cerr << "\t" << fromList[i] << endl;
+		}
+		cerr << endl;
+		cerr << "TO LIST count: " << toList.size() << endl;
+		for (int i=0; i<(int)toList.size(); i++) {
+			cerr << "\t" << toList[i] << endl;
+		}
+		return;
+	}
+	for (int i=0; i<(int)fromList.size(); i++) {
+		m_from.push_back(fromList[i]);
+	}
+	for (int i=0; i<(int)toList.size(); i++) {
+		m_to.push_back(toList[i]);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::getUtf8CharacterArray --
+//
+
+vector<string> Tool_humtr::getUtf8CharacterArray(const string& value) {
+	vector<string> output;
+	string current;
+	for (int i=0; i<(int)value.size(); i++) {
+		current = "";
+		char v = value[i];
+		current.push_back(v);
+		unsigned char u = (unsigned char)v;
+		if (u < 0x80) {
+			output.push_back(current);
+			continue;
+		}
+		int count = 0;
+		if (u >> 5 == 6) {
+			count = 1;
+		} else if (u >> 4 == 14) {
+			count = 2;
+		} else if (u >> 3 == 30) {
+			count = 3;
+		} else {
+			cerr << "Error reading UTF-8 character in string " << value << endl;
+			output.clear();
+			return output;
+		}
+		for (int j=0; j<count; j++) {
+			v = value[i+j];
+			u = (unsigned char)v;
+			if (v >> 6 != 2) {
+				cerr << "Error in reading UTF-8 character of string " << endl;
+				output.clear();
+				return output;
+			}
+			current.push_back(v);
+		}
+		output.push_back(current);
+	}
+
+	if (output.empty()) {
+		return output;
+	}
+
+	// Check for ASCII character ranges:
+	vector<string> out2;
+	out2.push_back(output[0]);
+	for (int i=1; i<(int)output.size() - 1; i++) {
+		if (output[i] != "-") {
+			out2.push_back(output[i]);
+			continue;
+		}
+		if ((output[i-1].size() > 1) || (output[i+1].size() > 1)) {
+			// One or both of the adjacent characters are UTF-8, so
+			// treat dash as regular character rather than range operator.
+			out2.push_back(output[i]);
+			continue;
+		}
+
+		// Insert a range of characters:
+		unsigned int starting = (unsigned char)output[i-1][0];
+		unsigned int ending   = (unsigned char)output[i+1][0];
+		if (starting > 0xff) {
+			cerr << "Strange error here " << starting << endl;
+		}
+		if (ending > 0xff) {
+			cerr << "Strange error here " << starting << endl;
+		}
+		if (starting == ending) {
+			continue;
+		}
+		int direction;
+		if (starting > ending) {
+			direction = -1;
+			starting--;
+			ending++;
+		} else {
+			direction = 1;
+			starting++;
+			ending--;
+		}
+		if (direction > 0) {
+			for (unsigned int j=starting; j<=ending; j++) {
+				string current = "";
+				current.push_back((unsigned char)j);
+				out2.push_back(current);
+			}
+		} else {
+			for (unsigned int j=starting; j>=ending; j--) {
+				string current = "";
+				current.push_back((unsigned char)j);
+				out2.push_back(current);
+			}
+		}
+	}
+	if (output.size() > 1) {
+		out2.push_back(output.back());
+	}
+
+	return out2;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::transliterateText --
+//
+
+string Tool_humtr::transliterateText(const string& input) {
+	return transliterateTextNonOverlapping(input);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::transliterateTextNonOverlapping --
+//
+
+string Tool_humtr::transliterateTextNonOverlapping(const string& input) {
+	string output = input;
+	HumRegex hre;
+	for (int i=0; i<(int)m_from.size(); i++) {
+		hre.replaceDestructive(output, m_to.at(i), m_from.at(i), "g");
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humtr::transliterateTextOverlapping -- Only single-character mappings
+//     are allowed (used particularly for character ranges).
+//
+
+string Tool_humtr::transliterateTextOverlapping(const string& input) {
+	// not implemented yet
+	return input;
+}
 
 
 
@@ -82833,9 +87276,13 @@ Tool_modori::Tool_modori(void) {
 	define("m|modern=b",    "prepare score for modern style");
 	define("o|original=b", "prepare score for original style");
 	define("d|info=b", "display key/clef/mensuration information");
-	define("K|no-key|no-keys=b", "Do not change key signatures");
+
 	define("C|no-clef|no-clefs=b", "Do not change clefs");
+	define("K|no-key|no-keys=b", "Do not change key signatures");
+	define("L|no-lyrics=b", "Do not change **text exclusive interpretations");
 	define("M|no-mensuration|no-mensurations=b", "Do not change mensurations");
+	define("R|no-references=b", "Do not change reference records keys");
+	define("T|no-text=b",    "Do not change !LO:(TX|DY) layout parameters");
 }
 
 
@@ -82901,6 +87348,9 @@ void Tool_modori::initialize(void) {
 	}
 	m_nokeyQ         = getBoolean("no-key");
 	m_noclefQ        = getBoolean("no-clef");
+	m_nolotextQ      = getBoolean("no-text");
+	m_nolyricsQ      = getBoolean("no-lyrics");
+	m_norefsQ        = getBoolean("no-references");
 	m_nomensurationQ = getBoolean("no-mensuration");
 }
 
@@ -82915,19 +87365,48 @@ void Tool_modori::processFile(HumdrumFile& infile) {
 	m_keys.clear();
 	m_clefs.clear();
 	m_mensurations.clear();
+	m_references.clear();
+	m_lyrics.clear();
+	m_lotext.clear();
 
 	int maxtrack = infile.getMaxTrack();
 	m_keys.resize(maxtrack+1);
 	m_clefs.resize(maxtrack+1);
 	m_mensurations.resize(maxtrack+1);
+	m_references.reserve(1000);
+	m_lyrics.reserve(1000);
+	m_lotext.reserve(1000);
+
+	HumRegex hre;
+	int exinterpLine = -1;
 
 	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isCommentLocal() || infile[i].isCommentGlobal()) {
+			for (int j=0; j<infile[i].getFieldCount(); j++) {
+				HTp token = infile.token(i, j);
+				if (*token == "!") {
+					continue;
+				}
+				if (hre.search(token, "^!!?LO:(TX|DY).*:mod=")) {
+					m_lotext.push_back(token);
+				} else if (hre.search(token, "^!!?LO:(TX|DY).*:ori=")) {
+					m_lotext.push_back(token);
+				}
+				if (hre.search(token, "^!LO:MO:.*")) {
+					m_lomo.push_back(token);
+				}
+			}
+		}
 		if (!infile[i].isInterpretation()) {
 			continue;
 		}
 		HumNum timeval = infile[i].getDurationFromStart();
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			HTp token = infile.token(i, j);
+			if (token->isExclusiveInterpretation()) {
+				exinterpLine = i;
+				continue;
+			}
 			if (!token->isKern()) {
 				continue;
 			}
@@ -82955,6 +87434,12 @@ void Tool_modori::processFile(HumdrumFile& infile) {
 		}
 	}
 
+	if (exinterpLine >= 0) {
+		processExclusiveInterpretationLine(infile, exinterpLine);
+	}
+
+	storeModOriReferenceRecords(infile);
+
 	if (m_infoQ) {
 		if (m_modernQ || m_originalQ) {
 			m_humdrum_text << infile;
@@ -82968,7 +87453,280 @@ void Tool_modori::processFile(HumdrumFile& infile) {
 	}
 
 	switchModernOriginal(infile);
+	printModoriOutput(infile);
 }
+
+
+//////////////////////////////
+//
+// Tool_modori::processExclusiveInterpretationLine --
+//
+
+void Tool_modori::processExclusiveInterpretationLine(HumdrumFile& infile, int line) {
+	vector<HTp> staffish;
+	vector<HTp> staff;
+	vector<vector<HTp>> nonstaff;
+	bool init = false;
+	bool changed = false;
+
+	if (!infile[line].isExclusive()) {
+		return;
+	}
+
+	for (int i=0; i<infile[line].getFieldCount(); i++) {
+		HTp token = infile.token(line, i);
+		if (!token->isExclusiveInterpretation()) {
+			continue;
+		}
+		if (token->isStaff()) {
+			staff.push_back(token);
+			nonstaff.resize(nonstaff.size() + 1);
+			init = 1;
+		} else {
+			if (init) {
+				nonstaff.back().push_back(token);
+			}
+		}
+		if (token->isStaff()) {
+			staffish.push_back(token);
+		} else if (*token == "**mod-kern") {
+			staffish.push_back(token);
+		} else if (*token == "**mod-mens") {
+			staffish.push_back(token);
+		} else if (*token == "**ori-kern") {
+			staffish.push_back(token);
+		} else if (*token == "**ori-mens") {
+			staffish.push_back(token);
+		}
+	}
+
+	for (int i=0; i<(int)staff.size(); i++) {
+		changed |= processStaffCompanionSpines(nonstaff[i]);
+	}
+
+	changed |= processStaffSpines(staffish);
+
+	if (changed) {
+		infile[line].createLineFromTokens();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::processStaffSpines --
+//
+
+bool Tool_modori::processStaffSpines(vector<HTp>& tokens) {
+
+	HumRegex hre;
+	bool changed = false;
+	for (int i=0; i<(int)tokens.size(); i++) {
+		if (hre.search(tokens[i], "^\\*\\*(ori|mod)-(.*)")) {
+			string newexinterp = "**" + hre.getMatch(2) + "-" + hre.getMatch(1);
+			tokens[i]->setText(newexinterp);
+			changed = true;
+		} else if (hre.search(tokens[i], "^\\*\\*(.*?)-(ori|mod)$")) {
+			string newexinterp = "**" + hre.getMatch(2) + "-" + hre.getMatch(1);
+			tokens[i]->setText(newexinterp);
+			changed = true;
+		}
+	}
+
+	return changed;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::processStaffCompanionSpines --
+//
+
+bool Tool_modori::processStaffCompanionSpines(vector<HTp> tokens) {
+
+	vector<HTp> mods;
+	vector<HTp> oris;
+	vector<HTp> other;
+
+	for (int i=0; i<(int)tokens.size(); i++) {
+		if (tokens[i]->find("**mod-") != string::npos) {
+			mods.push_back(tokens[i]);
+		} else if (tokens[i]->find("**ori-") != string::npos) {
+			oris.push_back(tokens[i]);
+		} else {
+			other.push_back(tokens[i]);
+		}
+	}
+
+	bool gchanged = false;
+
+	if (mods.empty() && oris.empty()) {
+		// Nothing to do.
+		return false;
+	}
+
+	// mods and oris should not be mixed, so if there are no
+	// other spines, then also give up:
+	if (other.empty()) {
+		return false;
+	}
+
+
+	if (m_modernQ) {
+		bool changed = false;
+		// Swap (**mod-XXX and **XXX) to (**XXX and **ori-XXX)
+
+		for (int i=0; i<(int)other.size(); i++) {
+			if (other[i] == NULL) {
+				continue;
+			}
+			string target = "**mod-" + other[i]->substr(2);
+			for (int j=0; j<(int)mods.size(); j++) {
+				if (mods[j] == NULL) {
+					continue;
+				}
+				if (*mods[j] != target) {
+					continue;
+				}
+				mods[j]->setText(*other[i]);
+				mods[j] = NULL;
+				changed = true;
+				gchanged = true;
+			}
+			if (changed) {
+				string replacement = "**ori-" + other[i]->substr(2);
+				other[i]->setText(replacement);
+				other[i] = NULL;
+			}
+		}
+
+	} else if (m_originalQ) {
+		bool changed = false;
+		// Swap (**ori-XXX and **XXX) to (**XXX and **mod-XXX)
+
+		for (int i=0; i<(int)other.size(); i++) {
+			if (other[i] == NULL) {
+				continue;
+			}
+			string target = "**ori-" + other[i]->substr(2);
+			for (int j=0; j<(int)oris.size(); j++) {
+				if (oris[j] == NULL) {
+					continue;
+				}
+				if (*oris[j] != target) {
+					continue;
+				}
+				oris[j]->setText(*other[i]);
+				oris[j] = NULL;
+				changed = true;
+				gchanged = true;
+			}
+			if (changed) {
+				string replacement = "**mod-" + other[i]->substr(2);
+				other[i]->setText(replacement);
+				other[i] = NULL;
+			}
+		}
+	}
+
+	return gchanged;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::storeModOriReferenceRecors --
+//
+
+void Tool_modori::storeModOriReferenceRecords(HumdrumFile& infile) {
+	m_references.clear();
+
+	vector<HLp> refs = infile.getGlobalReferenceRecords();
+	vector<string> keys(refs.size());
+	for (int i=0; i<(int)refs.size(); i++) {
+		string key = refs.at(i)->getReferenceKey();
+		keys.at(i) = key;
+	}
+
+	vector<int> modernIndex;
+	vector<int> originalIndex;
+
+	HumRegex hre;
+	for (int i=0; i<(int)keys.size(); i++) {
+		if (m_modernQ || m_infoQ) {
+			if (hre.search(keys[i], "-mod$")) {
+				modernIndex.push_back(i);
+			}
+		} else if (m_originalQ || m_infoQ) {
+			if (hre.search(keys[i], "-ori$")) {
+				originalIndex.push_back(i);
+			}
+		}
+	}
+
+	if (m_modernQ || m_infoQ) {
+		// Store *-mod reference records if there is a pairing:
+		int pairing = -1;
+		for (int i=0; i<(int)modernIndex.size(); i++) {
+			int index = modernIndex[i];
+			pairing = getPairedReference(index, keys);
+			if (pairing >= 0) {
+				m_references.push_back(make_pair(refs[index]->token(0), refs[pairing]->token(0)));
+			}
+		}
+	}
+
+	if (m_originalQ || m_infoQ) {
+		// Store *-ori reference records if there is a pairing:
+		int pairing = -1;
+		string target;
+		for (int i=0; i<(int)originalIndex.size(); i++) {
+			int index = originalIndex[i];
+			pairing = getPairedReference(index, keys);
+			if (pairing >= 0) {
+				target = keys[index];
+				m_references.push_back(make_pair(refs[index]->token(0), refs[pairing]->token(0)));
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::getPairedReference --
+//
+
+int Tool_modori::getPairedReference(int index, vector<string>& keys) {
+	string key = keys.at(index);
+	string tkey = key;
+	if (tkey.size() > 4) {
+		tkey.resize(tkey.size() - 4);
+	} else {
+		return -1;
+	}
+
+	for (int i=0; i<(int)keys.size(); i++) {
+		int ii = index + i;
+		if (ii < (int)keys.size()) {
+			if (tkey == keys.at(ii)) {
+				return ii;
+			}
+		}
+		ii = index - i;
+		if (ii >= 0) {
+			if (tkey == keys.at(ii)) {
+				return ii;
+			}
+		}
+	}
+	return -1;
+}
+
 
 
 //////////////////////////////
@@ -83014,7 +87772,92 @@ void Tool_modori::switchModernOriginal(HumdrumFile& infile) {
 		}
 	}
 
-	// mensurations are only used for "original" display.  It is possible
+	if (!m_nolyricsQ) {
+		bool adjust = false;
+		int line = -1;
+		for (int i=0; i<(int)m_lyrics.size(); i++) {
+			HTp token = m_lyrics[i];
+			line = token->getLineIndex();
+			if (m_modernQ) {
+				if (*token == "**text") {
+					adjust = true;
+					token->setText("**ori-text");
+				} else if (*token == "**mod-text") {
+					adjust = true;
+					token->setText("**text");
+				}
+			} else {
+				if (*token == "**text") {
+					adjust = true;
+					token->setText("**mod-text");
+				} else if (*token == "**ori-text") {
+					adjust = true;
+					token->setText("**text");
+				}
+			}
+		}
+		if (adjust && (line >= 0)) {
+			infile[line].createLineFromTokens();
+		}
+	}
+
+	if (!m_nolotextQ) {
+		HumRegex hre;
+		for (int i=0; i<(int)m_lotext.size(); i++) {
+			HTp token = m_lotext[i];
+			int line = token->getLineIndex();
+			if (hre.search(token, "^!!?LO:(TX|DY).*:mod=")) {
+				string text = *token;
+				hre.replaceDestructive(text, ":ori=", ":t=");
+				hre.replaceDestructive(text, ":t=", ":mod=");
+				token->setText(text);
+				changed.insert(line);
+			} else if (hre.search(token, "^!!?LO:(TX|DY).*:ori=")) {
+				string text = *token;
+				hre.replaceDestructive(text, ":mod=", ":t=");
+				hre.replaceDestructive(text, ":t=", ":ori=");
+				token->setText(text);
+				changed.insert(line);
+			}
+		}
+	}
+
+	if (!m_norefsQ) {
+		HumRegex hre;
+		for (int i=0; i<(int)m_references.size(); i++) {
+			HTp first = m_references[i].first;
+			HTp second = m_references[i].second;
+
+			if (m_modernQ) {
+				if (hre.search(first, "^!!![^:]*?-mod:")) {
+					string text = *first;
+					hre.replaceDestructive(text, ":", "-...:");
+					first->setText(text);
+					infile[first->getLineIndex()].createLineFromTokens();
+
+					text = *second;
+					hre.replaceDestructive(text, "-ori:", ":");
+					second->setText(text);
+					infile[second->getLineIndex()].createLineFromTokens();
+				}
+			} else if (m_originalQ) {
+				if (hre.search(first, "^!!![^:]*?-ori:")) {
+					string text = *first;
+					hre.replaceDestructive(text, ":", "-...:");
+					first->setText(text);
+					infile[first->getLineIndex()].createLineFromTokens();
+
+					text = *second;
+					hre.replaceDestructive(text, "-mod:", ":");
+					second->setText(text);
+					infile[second->getLineIndex()].createLineFromTokens();
+				}
+			}
+
+		}
+	}
+
+	// Mensurations are only used for "original" display.  It is possible
 	// to use a modern metric signature (common time or cut time) but these
 	// are not currently allowed.  Only one *met at a given time position
 	// is allowed.
@@ -83039,6 +87882,189 @@ void Tool_modori::switchModernOriginal(HumdrumFile& infile) {
 		infile[line].createLineFromTokens();
 	}
 
+	updateLoMo(infile);
+}
+
+
+//////////////////////////////
+//
+// Tool_modori::printModoriOutput --
+//
+
+void Tool_modori::printModoriOutput(HumdrumFile& infile) {
+	string state;
+	if (m_modernQ) {
+
+		// convert to modern
+		for (int i=0; i<infile.getLineCount(); i++) {
+			if (infile[i].isCommentGlobal()) {
+				HTp token = infile.token(i, 0);
+				if (*token == "!!LO:MO:mod") {
+				   state = "mod";
+					m_humdrum_text << token << endl;
+					continue;
+				} else if (*token == "!!LO:MO:ori") {
+				   state = "ori";
+					m_humdrum_text << token << endl;
+					continue;
+				} else if (*token == "!!LO:MO:end") {
+					state = "";
+					m_humdrum_text << token << endl;
+					continue;
+				}
+			}
+			if (state == "mod") {
+				// Remove global comment prefix "!! ".  Complain if not there.
+				if (infile[i].compare(0, 3, "!! ") != 0) {
+					cerr << "Error: line does not start with \"!! \":\t" << infile[i] << endl;
+				} else {
+					m_humdrum_text << infile[i].substr(3) << endl;
+				}
+			} else if (state == "ori") {
+				// Add global comment prefix "!! ".
+				m_humdrum_text << "!! " << infile[i] << endl;
+			} else {
+				m_humdrum_text << infile[i] << endl;
+			}
+		}
+
+	} else if (m_originalQ) {
+
+		// convert to original
+		for (int i=0; i<infile.getLineCount(); i++) {
+			if (infile[i].isCommentGlobal()) {
+				HTp token = infile.token(i, 0);
+				if (*token == "!!LO:MO:mod") {
+				   state = "mod";
+					m_humdrum_text << token << endl;
+					continue;
+				} else if (*token == "!!LO:MO:ori") {
+				   state = "ori";
+					m_humdrum_text << token << endl;
+					continue;
+				} else if (*token == "!!LO:MO:end") {
+					state = "";
+					m_humdrum_text << token << endl;
+					continue;
+				}
+			}
+			if (state == "ori") {
+				// Remove global comment prefix "!! ".  Complain if not there.
+				if (infile[i].compare(0, 3, "!! ") != 0) {
+					cerr << "Error: line does not start with \"!! \":\t" << infile[i] << endl;
+				} else {
+					m_humdrum_text << infile[i].substr(3) << endl;
+				}
+			} else if (state == "mod") {
+				// Add global comment prefix "!! ".
+				m_humdrum_text << "!! " << infile[i] << endl;
+			} else {
+				m_humdrum_text << infile[i] << endl;
+			}
+		}
+
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::updateLoMo --
+//
+
+void Tool_modori::updateLoMo(HumdrumFile& infile) {
+	for (int i=0; i<(int)m_lomo.size(); i++) {
+		processLoMo(m_lomo[i]);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::processLoMo --
+//
+
+void Tool_modori::processLoMo(HTp lomo) {
+	HumRegex hre;
+
+	if (m_modernQ) {
+		string text = lomo->getText();
+		string modtext;
+		string oritext;
+		string base;
+		string rest;
+		if (hre.search(text, "(.*):mod=([^:]*)(.*)")) {
+			base = hre.getMatch(1);
+			modtext = hre.getMatch(2);
+			rest = hre.getMatch(3);
+			hre.replaceDestructive(modtext, ":", "&colon;", "g");
+			HTp current = lomo->getNextToken();
+			// null parameter allows next following null token
+			// to be swapped out
+			bool nullQ = hre.search(text, ":null:");
+			if (!nullQ) {
+				while (current) {
+					if (current->isNull()) {
+						current = current->getNextToken();
+						continue;
+					}
+					break;
+				}
+			}
+			if (current) {
+				string oritext = current->getText();
+				hre.replaceDestructive(oritext, "&colon;", ":", "g");
+				current->setText(modtext);
+				string newtext = base;
+				newtext += ":ori=";
+				newtext += oritext;
+				newtext += rest;
+				lomo->setText(newtext);
+				lomo->getLine()->createLineFromTokens();
+				current->getLine()->createLineFromTokens();
+			}
+		}
+
+	} else if (m_originalQ) {
+		string text = lomo->getText();
+		string modtext;
+		string oritext;
+		string base;
+		string rest;
+		if (hre.search(text, "(.*):ori=([^:]*)(.*)")) {
+			base = hre.getMatch(1);
+			oritext = hre.getMatch(2);
+			rest = hre.getMatch(3);
+			hre.replaceDestructive(oritext, ":", "&colon;", "g");
+			HTp current = lomo->getNextToken();
+			// null parameter allows next following null token
+			// to be swapped out
+			bool nullQ = hre.search(text, ":null:");
+			if (nullQ) {
+				while (current) {
+					if (current->isNull()) {
+						current = current->getNextToken();
+						continue;
+					}
+					break;
+				}
+			}
+			if (current) {
+				string modtext = current->getText();
+				hre.replaceDestructive(modtext, "&colon;", ":", "g");
+				current->setText(oritext);
+				string newtext = base;
+				newtext += ":mod=";
+				newtext += modtext;
+				newtext += rest;
+				lomo->setText(newtext);
+				lomo->getLine()->createLineFromTokens();
+				current->getLine()->createLineFromTokens();
+			}
+		}
+	}
 }
 
 
@@ -83298,7 +88324,7 @@ void Tool_modori::printInfo(void) {
 
 	for (int t=1; t<(int)m_keys.size(); ++t) {
 		for (auto it = m_keys.at(t).begin(); it != m_keys.at(t).end(); ++it) {
-			m_humdrum_text << "!!    " << it->first;
+			m_humdrum_text << "!!\t" << it->first;
 			for (int j=0; j<(int)it->second.size(); ++j) {
 				m_humdrum_text << '\t' << it->second.at(j);
 		}
@@ -83311,7 +88337,7 @@ void Tool_modori::printInfo(void) {
 
 	for (int t=1; t<(int)m_keys.size(); ++t) {
 		for (auto it = m_clefs.at(t).begin(); it != m_clefs.at(t).end(); ++it) {
-			m_humdrum_text << "!!    " << it->first;
+			m_humdrum_text << "!!\t" << it->first;
 			for (int j=0; j<(int)it->second.size(); ++j) {
 				m_humdrum_text << '\t' << it->second.at(j);
 			}
@@ -83324,7 +88350,7 @@ void Tool_modori::printInfo(void) {
 
 	for (int t=1; t<(int)m_mensurations.size(); ++t) {
 		for (auto it = m_mensurations.at(t).begin(); it != m_mensurations.at(t).end(); ++it) {
-			m_humdrum_text << "!!    " << it->first;
+			m_humdrum_text << "!!\t" << it->first;
 			for (int j=0; j<(int)it->second.size(); j++) {
 				m_humdrum_text << '\t' << it->second.at(j);
 			}
@@ -83333,7 +88359,32 @@ void Tool_modori::printInfo(void) {
 	}
 
 	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+	m_humdrum_text << "!! LYRICS:" << endl;
 
+	for (int i=0; i<(int)m_lyrics.size(); i++) {
+		HTp token = m_lyrics[i];
+		m_humdrum_text << "!!\t";
+		m_humdrum_text << token;
+		m_humdrum_text << endl;
+	}
+
+	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+	m_humdrum_text << "!! TEXT:" << endl;
+
+	for (int i=0; i<(int)m_lotext.size(); i++) {
+		m_humdrum_text << "!!\t" << m_lotext[i] << endl;
+	}
+
+	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+	m_humdrum_text << "!! REFERENCES:" << endl;
+
+	for (int i=0; i<(int)m_references.size(); i++) {
+		m_humdrum_text << "!!\t" << m_references[i].first << endl;
+		m_humdrum_text << "!!\t" << m_references[i].second << endl;
+		m_humdrum_text << "!!\n";
+	}
+
+	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 }
 
 
@@ -94658,396 +99709,6 @@ string Tool_pccount::getPitchClassString(int b40) {
 
 
 
-/////////////////////////////////
-//
-// Tool_peak::Tool_peak -- Set the recognized options for the tool.
-//
-
-Tool_peak::Tool_peak(void) {
-	define("data|raw|raw-data=b",  "print analysis data");
-	define("m|mark|marker=s:@",    "symbol to mark peak notes");
-	define("c|color=s:red",        "color of marked notes");
-	define("r|ignore-rest=d:1.0",  "ignore rests smaller than given value (in whole notes)");
-	define("n|number=i:3",         "number of high notes in a row");
-	define("d|dur|duration=d:6.0", "maximum duration between peak note attacks in whole notes");
-}
-
-
-
-/////////////////////////////////
-//
-// Tool_peak::run -- Do the main work of the tool.
-//
-
-bool Tool_peak::run(HumdrumFileSet& infiles) {
-	bool status = true;
-	for (int i=0; i<infiles.getCount(); i++) {
-		status &= run(infiles[i]);
-	}
-	return status;
-}
-
-
-bool Tool_peak::run(const string& indata, ostream& out) {
-	HumdrumFile infile(indata);
-	bool status = run(infile);
-	if (hasAnyText()) {
-		getAllText(out);
-	} else {
-		out << infile;
-	}
-	return status;
-}
-
-
-bool Tool_peak::run(HumdrumFile& infile, ostream& out) {
-	bool status = run(infile);
-	if (hasAnyText()) {
-		getAllText(out);
-	} else {
-		out << infile;
-	}
-	return status;
-}
-
-
-bool Tool_peak::run(HumdrumFile& infile) {
-	initialize();
-	processFile(infile);
-	return true;
-}
-
-
-
-//////////////////////////////
-//
-// Tool_peak::initialize --  Initializations that only have to be done once
-//    for all HumdrumFile segments.
-//
-
-void Tool_peak::initialize(void) {
-	m_rawQ      = getBoolean("raw-data");
-	m_marker    = getString("marker");
-	m_color     = getString("color");
-	m_smallRest = getDouble("ignore-rest") * 4.0;  // convert to quarter notes
-	m_peakNum   = getInteger("number");
-	m_peakDur   = getInteger("duration") * 4.0;    // convert to quarter notes
-}
-
-
-
-//////////////////////////////
-//
-// Tool_peak::processFile --
-//
-
-void Tool_peak::processFile(HumdrumFile& infile) {
-	// get list of music spines (columns):
-	vector<HTp> starts = infile.getKernSpineStartList();
-
-	// The first "spine" is the lowest part on the system.
-	// The last "spine" is the highest part on the system.
-	for (int i=0; i<(int)starts.size(); i++) {
-		processSpine(starts[i]);
-	}
-
-	infile.createLinesFromTokens();
-	if (!m_rawQ) {
-		m_humdrum_text << infile;
-		m_humdrum_text << "!!!RDF**kern: ";
-		m_humdrum_text << m_marker;
-		m_humdrum_text << " = marked note, color=";
-		m_humdrum_text << m_color;
-		m_humdrum_text << endl;
-	}
-
-}
-
-
-
-//////////////////////////////
-//
-// Tool_peak::processSpine -- Process one line of music.
-//
-
-void Tool_peak::processSpine(HTp startok) {
-	// notelist is a two dimensional array of notes.   The
-	// first dimension is a list of the note attacks in time
-	// (plus rests), and the second dimension is for a list of the
-	// tied notes after the first one (this is so that we can
-	// highlight both the starting note and any tied notes to that
-	// starting note later).
-	vector<vector<HTp>> notelist = getNoteList(startok);
-
-	// MIDI note numbers for each note (with rests being 0).
-	vector<int> midinums = getMidiNumbers(notelist);
-
-	// True = the note is a local high pitch.
-	vector<bool> peaknotes(midinums.size(), false);
-	identifyLocalPeaks(peaknotes, midinums);
-
-	// peaknotelist: Only the local peak notes which will be extracted
-	// from all note list in the getLocalPeakNotes() function.
-	vector<vector<HTp>> peaknotelist;
-	getLocalPeakNotes(peaknotelist, notelist, peaknotes);
-
-	// peakmidinums: MIDI note numbers for peaknotelist notes.
-	vector<int> peakmidinums = getMidiNumbers(peaknotelist);
-
-	// globalpeaknotes: boolean list that indicates if a local
-	// peak note is part of a longer sequence of peak notes.
-	// This variable will be filled in by identifyPeakSequence().
-	vector<bool> globalpeaknotes(peaknotelist.size(), false);
-	identifyPeakSequence(globalpeaknotes, peakmidinums, peaknotelist);
-
-	if (m_rawQ) {
-		printData(notelist, midinums, peaknotes);
-	} else {
-		markNotesInScore(notelist, peaknotes);
-		// Uncomment out the following line, and comment the above line,
-		// when identifyPeakSequence() is implemented:
-		// markNotesInScore(peaknotelist, globalpeaknotes);
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_peak::markNotesInScore --
-//
-
-void Tool_peak::markNotesInScore(vector<vector<HTp>>& peaknotelist, vector<bool>& ispeak) {
-	for (int i=0; i<(int)peaknotelist.size(); i++) {
-		if (!ispeak[i]) {
-			continue;
-		}
-		for (int j=0; j<(int)peaknotelist[i].size(); j++) {
-			string text = *(peaknotelist[i][j]);
-			text += m_marker;
-			peaknotelist[i][j]->setText(text);
-		}
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_peak::getLocalPeakNotes -- Throw away notes/rests that are not peaks.
-//
-
-void Tool_peak::getLocalPeakNotes(vector<vector<HTp>>& newnotelist,
-		vector<vector<HTp>>& oldnotelist, vector<bool>& peaknotes) {
-	newnotelist.clear();
-	for (int i=0; i<(int)peaknotes.size(); i++) {
-		if (peaknotes[i]) {
-			newnotelist.push_back(oldnotelist[i]);
-		}
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_peak::identifyLocalPeaks -- Identify notes that are higher than their
-//    adjacent neighbors.  The midinumbs are MIDI note numbers (integers)
-//    for the pitch, with higher number meaning higher pitches.  Rests are
-//    the value 0.  Do not assign a note as a peak note if one of the
-//    adjacent notes is a rest. (This could be refined later, such as ignoring
-//    short rests).
-//
-
-void Tool_peak::identifyLocalPeaks(vector<bool>& peaknotes, vector<int>& midinums) { //changed to midinums from 'notelist'
-	for (int i=1; i<(int)midinums.size() - 1; i++) {
-		if ((midinums[i - 1] <= 0) || (midinums[i + 1] <= 0)) { //not next to a rest
-			continue;
-		} else if (midinums[i] <= 0) {
-			continue;
-		}
-		if ((midinums[i] > midinums[i - 1]) && (midinums[i] > midinums[i + 1])) { //check neighboring notes
-			peaknotes[i] = 1;
-		}
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_peak::identifyPeakSequence -- Identify a sequence of local peaks that can form
-//       a peak sequence
-//
-// Input variables:
-//      globalpeaknotes -- output data that is set to true if the note is part of a
-//                         global peak note sequence.  This vector has the same size
-//                         as the peakmidinums vector and the values are initially set
-//                         to false.  This function will set notes that are part of a sequence
-//                         of local peak notes (with length m_peakNum) to true.
-//      peakmidinums    -- MIDI number vector for all local peak notes.
-//      notes           -- double vector of Humdrum notes (needed to get timestamps).
-//
-// Member variables that are needed in the Algorithm:
-//    int    m_peakNum: Number of consecutive local peaknotes needed to mark global peak.
-//    double m_peakDur: Maximum duration of the first/last peak note in global peak sequence.
-//
-//
-
-void Tool_peak::identifyPeakSequence(vector<bool>& globalpeaknotes, vector<int>& peakmidinums,
-		vector<vector<HTp>>& notes) {
-
-	// Set initial positions of globalpeaknotes to false:
-	globalpeaknotes.resize(peakmidinums.size());
-	fill(globalpeaknotes.begin(), globalpeaknotes.end(), false);
-	// The code below (under Algorithms) will set notes identified as a "global peak" to true
-	// in this vector.
-
-	// Get the timestamps of all local peak notes:
-	vector<double> timestamps(notes.size(), 0.0);
-	for (int i=0; i<(int)notes.size(); i++) {
-		timestamps[i] = notes[i][0]->getDurationFromStart().getFloat();
-	}
-
-
-	///////////////////////////////////////////
-	//
-	// Algorithm:
-	//
-	//    * Loop through each element in the peakmidinums vector checking if it is a part of
-	//      a longer peak sequence of the same MIDI note number.  The loop will start at
-	//      index 0 and go until but not including peakmidinums.size() - m_peakNum.
-	//
-	//    * A "global peak" means that there are m_peakNum MIDI note numbers in a row in peakmidinums.
-	//      (all of the peak notes have to be the same MIDI note number).
-	//
-	//    *  In addition, the time difference between the starting and ending note of the peak
-	//       sequence has to be equal to or less than m_peakDur (6 whole notes by default).
-	//       Subtract the timestamp of the last and first notes and see if the duration between
-	//       these notes is equal or less than m_peakDur.
-	//
-	//////////////////////////////////////////
-
-
-}
-
-
-
-//////////////////////////////
-//
-// Tool_peak::printData -- Print input and output data.  First column is the MIDI note
-//      number, second one is the peak analysis (true=local maximum note)
-//
-
-void Tool_peak::printData(vector<vector<HTp>>& notelist, vector<int>& midinums, vector<bool>& peaknotes) {
-	m_free_text << "MIDI\tPEAK\tKERN" << endl;
-	for (int i=0; i<(int)notelist.size(); i++) {
-		m_free_text << midinums.at(i) << "\t";
-		m_free_text << peaknotes.at(i);
-		for (int j=0; j<(int)notelist[i].size(); j++) {
-			m_free_text << "\t" << notelist[i][j];
-		}
-		m_free_text << endl;
-	}
-	m_free_text << "******************************************" << endl;
-	m_free_text << endl;
-}
-
-
-
-//////////////////////////////
-//
-// Tool_peak::getMidiNumbers -- convert note tokens into MIDI note numbers.
-//    60 = middle C (C4), 62 = D4, 72 = C5, 48 = C3.
-//
-
-vector<int> Tool_peak::getMidiNumbers(vector<vector<HTp>>& notelist) {
-	vector<int> output(notelist.size(), 0);  // fill with rests by default
-	for (int i=0; i<(int)notelist.size(); i++) {
-		output[i] = Convert::kernToMidiNoteNumber(notelist.at(i).at(0));
-		if (output[i] < 0) {
-			// Set rests to be 0
-			output[i] = 0;
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// Tool_peak::getNoteList -- Return a list of the notes and rests for
-//     a part, with the input being the starting token of the part from
-//     which the note list should be extracted.  The output is a two-
-//     dimensional vector.  The first dimension is for the list of notes,
-//     and the second dimension is used to store any subsequent tied notes
-//     so that they can be marked and highlighted in the score.
-//
-
-vector<vector<HTp>> Tool_peak::getNoteList(HTp starting) {
-	vector<vector<HTp>> tempout;
-	tempout.reserve(2000);
-
-	HTp previous = starting;
-	HTp current = starting;
-	while (current) {
-		if (!current->isData()) {
-			previous = current;
-			current = current->getNextToken();
-			continue;
-		}
-		if (current->isNull()) {
-			previous = current;
-			current = current->getNextToken();
-			continue;
-		}
-		if (current->isNoteSustain()) {
-			if (tempout.size() > 0) {
-				tempout.back().push_back(current);
-			}
-			previous = current;
-			current = current->getNextToken();
-			continue;
-		}
-		if (current->isRest()) {
-			if (previous->isRest()) {
-				// do not store previous rest
-				previous = current;
-				current = current->getNextToken();
-				continue;
-			}
-		}
-		tempout.resize(tempout.size() + 1);
-		tempout.back().push_back(current);
-		previous = current;
-		current = current->getNextToken();
-	}
-
-	// Remove any rests that are shorter or equal to m_shortRest:
-	vector<vector<HTp>> output;
-	output.reserve(tempout.size());
-	for (int i=0; i<(int)tempout.size() - 1; i++) {
-		if (!tempout[i][0]->isRest()) {
-			output.push_back(tempout[i]);
-			continue;
-		}
-		// get the duration of the (multi-rest):
-		HumNum restStart = tempout[i][0]->getDurationFromStart();
-		HumNum noteStart = tempout[i+1][0]->getDurationFromStart();
-		HumNum duration = noteStart - restStart;
-		if (duration.getFloat() > m_smallRest) {
-			output.push_back(tempout[i]);
-		}
-	}
-
-	return output;
-}
-
-
-
-
-
 
 /////////////////////////////////
 //
@@ -101374,6 +106035,251 @@ void Tool_strophe::displayStropheVariants(HumdrumFile& infile) {
 
 /////////////////////////////////
 //
+// Tool_synco::Tool_synco -- Set the recognized options for the tool.
+//
+
+Tool_synco::Tool_synco(void) {
+	define("c|color=s:skyblue", "SVG color to highlight syncopation notes");
+	define("i|info=b", "Display only statistics info");
+	define("f|filename=b", "Add filename to statistics info");
+	define("a|all=b", "Average all statistics info");
+}
+
+
+/////////////////////////////////
+//
+// Tool_synco::run -- Do the main work of the tool.
+//
+
+bool Tool_synco::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	if (m_allQ) {
+		m_free_text << m_scountTotal << "\t";
+		m_free_text << m_notecountTotal << "\t";
+		double percent =  (double)m_scountTotal / m_notecountTotal;
+		percent = int(percent * 10000.0 + 0.5) / 100.0;
+		m_free_text << percent << "\t";
+		m_free_text << m_fileCount;
+		if (m_fileCount == 1) {
+			m_free_text << " file";
+		} else {
+			m_free_text << " files";
+		}
+		m_free_text << endl;
+	}
+	return status;
+}
+
+
+
+bool Tool_synco::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_synco::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_synco::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	if (m_hasSyncoQ && !m_infoQ) {
+		infile.createLinesFromTokens();
+		m_humdrum_text << infile;
+		m_humdrum_text << "!!!RDF**kern: | = marked note, color=" << m_color << endl;
+	}
+	double notecount = infile.getNoteCount();
+	double density = m_scount / (double)notecount;
+	double percent =  int(density * 10000.0 + 0.5) / 100.0;
+	if (m_infoQ) {
+		m_free_text << m_scount << "\t" << notecount << "\t" << percent << "%";
+		if (m_fileQ) {
+			m_free_text << "\t" << infile.getFilename();
+		}
+		m_free_text << endl;
+
+		m_scountTotal    += m_scount;
+		m_notecountTotal += notecount;
+		m_fileCount++;
+	} else {
+		m_humdrum_text << "!!!syncopated_notes: " << m_scount << endl;
+		m_humdrum_text << "!!!total_notes: " << notecount << endl;
+		m_humdrum_text << "!!!syncopated_density: " << percent << "%" << endl;
+	}
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_synco::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_synco::initialize(void) {
+	m_infoQ = getBoolean("info");
+	m_fileQ = getBoolean("filename");
+	m_allQ  = getBoolean("all");
+	m_color = getString("color");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_synco::processFile --
+//
+
+void Tool_synco::processFile(HumdrumFile& infile) {
+	int scount = infile.getStrandCount();
+	m_scount = 0;
+	for (int i=0; i<scount; i++) {
+		HTp stok = infile.getStrandStart(i);
+		if (!stok->isKern()) {
+			continue;
+		}
+		HTp etok = infile.getStrandEnd(i);
+		processStrand(stok, etok);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_synco::processStrand --
+//
+
+void Tool_synco::processStrand(HTp stok, HTp etok) {
+	HTp current = stok;
+	while (current && (current != etok)) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isRest()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isSecondaryTiedNote()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (isSyncopated(current)) {
+			m_hasSyncoQ = true;
+			m_scount++;
+			markNote(current);
+		}
+		current = current->getNextToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_synco::isSyncopated --
+//
+
+bool Tool_synco::isSyncopated(HTp token) {
+	double metlev   = getMetricLevel(token);
+	HumNum duration = token->getTiedDuration();
+	double logDur   = log2(duration.getFloat());
+	if (metlev == 2) {
+		return false;
+	}
+	if (logDur > metlev) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_synco::getMetricLevel -- Assuming whole-note beats for now.
+//
+
+double Tool_synco::getMetricLevel(HTp token) {
+	HumNum durbar = token->getDurationFromBarline();
+	if (!durbar.isInteger()) {
+		return -1.0;
+	}
+	if (durbar.getNumerator() % 4 == 0) {
+		return 2.0;
+	}
+	if (durbar.getNumerator() % 2 == 0) {
+		return 1.0;
+	}
+	return 0.0;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_synco::markNote -- Currently ignoring chords.
+//
+
+void Tool_synco::markNote(HTp token) {
+	token->setText(token->getText() + "|");
+	if ((token->find('[') != string::npos) || (token->find('_') != string::npos)) {
+		HTp current = token->getNextToken();
+		while (current) {
+			if (!current->isData()) {
+				current = current->getNextToken();
+				continue;
+			}
+			if (current->isNull()) {
+				current = current->getNextToken();
+				continue;
+			}
+			if (current->isRest()) {
+				break;
+			}
+			if (current->find("_") != string::npos) {
+				current->setText(current->getText() + "|");
+			} else if (current->find("]") != string::npos) {
+				current->setText(current->getText() + "|");
+				break;
+			}
+			current = current->getNextToken();
+		}
+	}
+}
+
+
+
+
+
+/////////////////////////////////
+//
 // Tool_gridtest::Tool_tabber -- Set the recognized options for the tool.
 //
 
@@ -102357,6 +107263,505 @@ string Tool_tassoize::getDate(void) {
 
 /////////////////////////////////
 //
+// Tool_thru::Tool_thru -- Set the recognized options for the tool.
+//
+
+Tool_thru::Tool_thru(void) {
+	define("v|variation=s:",   "Choose the expansion variation");
+	define("l|list=b:",        "Print list of labels in file");
+	define("k|keep=b:",        "Keep variation interpretations");
+	define("i|info=b:",        "Print info list of labels in file");
+	define("r|realization=s:", "Alternate relaization label sequence");
+}
+
+
+/////////////////////////////////
+//
+// Tool_thru::run -- Do the main work of the tool.
+//
+
+bool Tool_thru::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_thru::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_thru::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_thru::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_thru::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_thru::initialize(void) {
+	m_variation   = getString("variation");
+	m_realization = getString("realization");
+	m_listQ       = getBoolean("list");
+	m_infoQ       = getBoolean("info");
+	m_keepQ       = getBoolean("keep");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_thru::processFile --
+//
+
+void Tool_thru::processFile(HumdrumFile& infile) {
+	if (m_listQ) {
+		printLabelList(infile);
+		return;
+	} else if (m_infoQ) {
+		printLabelInfo(infile);
+		return;
+	}
+	processData(infile);
+
+	// analyze the input file according to command-line options
+	// infiles[i].printNonemptySegmentLabel(m_humdrum_text);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_thru::printLabelList -- print a list of the thru labels.
+//
+
+void Tool_thru::printLabelList(HumdrumFile& infile) {
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		if (token->compare(0, 2, "*>") != 0) {
+			continue;   // ignore non-labels
+		}
+		//if (token->find('[') != NULL) {
+		//   continue;   // ignore realizations
+		//}
+		m_humdrum_text << token->substr(2);
+		m_humdrum_text << '\n';
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_thru::printLabelInfo -- print a list of the thru labels.
+//
+
+void Tool_thru::printLabelInfo(HumdrumFile& infile) {
+	// infile.analyzeRhythm();
+	vector<int> labellines;
+	labellines.reserve(1000);
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+
+		if (token->compare(0, 2, "*>") != 0) {
+			continue;   // ignore non-labels
+		}
+		if (token->find('[') != string::npos) {
+			m_humdrum_text << "!!>";
+			m_humdrum_text << token->substr(2) << endl;
+			m_humdrum_text << '\n';
+			continue;   // ignore realizations
+		}
+		labellines.push_back(i);
+	}
+
+	vector<int> barlines(1000, -1);
+	for (int i=0; i<(int)labellines.size(); i++) {
+		barlines[i] = getBarline(infile, labellines[i]);
+	}
+
+	if (barlines.size() > 0) {
+		barlines[0] = adjustFirstBarline(infile);
+	}
+
+	int startline;
+	int endline;
+	HumNum startbeat;
+	HumNum endbeat;
+	HumNum duration;
+
+	m_humdrum_text << "**label\t**sline\t**eline\t**sbeat\t**ebeat\t**dur\t**bar\n";
+	for (int i=0; i<(int)labellines.size(); i++) {
+		startline = labellines[i];
+		if (i<(int)labellines.size()-1) {
+			endline = labellines[i+1]-1;
+		} else {
+			endline = infile.getLineCount() - 1;
+		}
+		startbeat = infile[startline].getDurationFromStart();
+		endbeat = infile[endline].getDurationFromStart();
+		duration = endbeat - startbeat;
+		duration = int(duration.getFloat() * 10000.0 + 0.5) / 10000.0;
+		HTp token = infile.token(startline, 0);
+		m_humdrum_text << token->substr(2);
+		m_humdrum_text << '\t';
+		m_humdrum_text << startline + 1;
+		m_humdrum_text << '\t';
+		m_humdrum_text << endline + 1;
+		m_humdrum_text << '\t';
+		m_humdrum_text << startbeat;
+		m_humdrum_text << '\t';
+		m_humdrum_text << endbeat;
+		m_humdrum_text << '\t';
+		m_humdrum_text << duration;
+		m_humdrum_text << '\t';
+		m_humdrum_text << barlines[i];
+		m_humdrum_text << '\n';
+
+	}
+	m_humdrum_text << "*-\t*-\t*-\t*-\t*-\t*-\t*-\n";
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_thru::adjustFirstBarline --
+//
+
+int Tool_thru::adjustFirstBarline(HumdrumFile& infile) {
+	int number = 0;
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isBarline()) {
+			continue;
+		}
+		if (infile[i].getDurationFromStart() > 0) {
+			break;
+		}
+		HTp token = infile.token(i, 0);
+		if (hre.search(token, "=.*(\\d+)")) {
+			number = hre.getMatchInt(1);
+		}
+		break;
+	}
+	return number;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_thru::getBarline --
+//
+
+int Tool_thru::getBarline(HumdrumFile& infile, int line) {
+
+	if (infile[line].getDurationFromStart() == 0) {
+		return 0;
+	}
+
+	int missingcount = 0;
+	int number = -1;
+	HumRegex hre;
+	for (int i=line; i>0; i--) {
+		if (!infile[i].isBarline()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+
+		if (hre.search(token, "=.*(\\d+)")) {
+			number = hre.getMatchInt(1);
+			break;
+		} else {
+			missingcount++;
+		}
+		if (missingcount > 1) {
+			break;
+		}
+	}
+
+	return number;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_thru::processData --
+//
+
+void Tool_thru::processData(HumdrumFile& infile) {
+	vector<string> labelsequence;
+	labelsequence.reserve(1000);
+
+	vector<string> labels;
+	labels.reserve(1000);
+
+	vector<int> startline;
+	startline.reserve(1000);
+
+	vector<int> stopline;
+	stopline.reserve(1000);
+
+	int header = -1;
+	int footer = -1;
+	string labelsearch;
+	labelsearch = "*>";
+	labelsearch += m_variation;
+	labelsearch += "[";
+
+	// check for label to expand
+	int foundlabel = 0;
+	string tempseq;
+	if (m_realization.size()  == 0) {
+		for (int i=0; i<infile.getLineCount(); i++) {
+			if (!infile[i].isInterpretation()) {
+				continue;
+			}
+			HTp token = infile.token(i, 0);
+			if (token->compare(0, labelsearch.size(), labelsearch) != 0) {
+				continue;
+			}
+
+			tempseq = token->substr(labelsearch.size());
+			getLabelSequence(labelsequence, tempseq);
+			foundlabel = 1;
+			break;
+		}
+	} else {
+		foundlabel = 1;
+		getLabelSequence(labelsequence, m_realization);
+	}
+
+	if (foundlabel == 0) {
+		// did not find the label to expand, so echo the data back
+		for (int i=0; i<infile.getLineCount(); i++) {
+			HTp token = infile.token(i, 0);
+			if (*token == "*thru") {
+				continue;
+			}
+			m_humdrum_text << infile[i] << "\n";
+			if (token->compare(0, 2, "**") == 0) {
+				for (int j=0; j<infile[i].getFieldCount(); j++) {
+					m_humdrum_text << "*thru";
+					if (j < infile[i].getFieldCount() - 1) {
+						m_humdrum_text << "\t";
+					}
+				}
+				m_humdrum_text << "\n";
+			}
+		}
+		return;
+	}
+
+	// for (i=0; i<(int)labelsequence.size(); i++) {
+	//    m_humdrum_text << i+1 << "\t=\t" << labelsequence[i] << endl;
+	// }
+
+	// search for the labeled sections in the music
+	string label;
+	int location;
+	int index;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		if (*token == "*-") {
+			location = i-1;
+			footer = i;
+			stopline.push_back(location);
+		}
+		if (token->compare(0, 2, "*>") != 0) {
+			continue;
+		}
+		if (token->find('[') != string::npos) {
+			continue;
+		}
+		if (token->find(']') != string::npos) {
+			continue;
+		}
+
+		if (labels.size() == 0) {
+			header = i-1;
+		}
+
+		label = token->substr(2);
+		index = (int)labels.size();
+		location = i-1;
+		if (startline.size() > 0) {
+			stopline.push_back(location);
+		}
+		labels.resize(index+1);
+		labels[index] = label;
+		startline.push_back(i);
+	}
+
+	// m_humdrum_text << "FOOTER = " << footer << endl;
+	// m_humdrum_text << "HEADER = " << header << endl;
+	// for (i=0; i<(int)labels.size(); i++) {
+	//    m_humdrum_text << "\t" << i << "\t=\t" << labels[i]
+	//         << "\t" << startline[i] << "\t" << stopline[i]
+	//         << endl;
+	// }
+
+	// now ready to copy the labeled segements into a final file.
+
+
+	// print header:
+	for (int i=0; i<=header; i++) {
+		HTp token = infile.token(i, 0);
+		if (*token == "*thru") {
+			continue;
+		}
+
+		if (!m_keepQ) {
+			if (infile[i].isInterpretation()) {
+				if (token->compare(0, 2, "*>") == 0) {
+					if (token->find('[') != string::npos) {
+						continue;
+					}
+				}
+			}
+		}
+
+		m_humdrum_text << infile[i] << "\n";
+		if (token->compare(0, 2, "**") == 0) {
+			for (int j=0; j<infile[i].getFieldCount(); j++) {
+				m_humdrum_text << "*thru";
+				if (j < infile[i].getFieldCount() - 1) {
+					m_humdrum_text << "\t";
+				}
+			}
+			m_humdrum_text << "\n";
+		}
+	}
+
+	int start;
+	int stop;
+	for (int i=0; i<(int)labelsequence.size(); i++) {
+		index = getLabelIndex(labels, labelsequence[i]);
+		if (index < 0) {
+			m_humdrum_text << "!! THRU ERROR: label " << labelsequence[i]
+				  << " does not exist, skipping.\n";
+		}
+		start = startline[index];
+		stop  = stopline[index];
+		for (int j=start; j<=stop; j++) {
+			if (!m_keepQ) {
+				if (infile[j].isInterpretation()) {
+					HTp token = infile.token(j, 0);
+					if (token->compare(0, 2, "*>") == 0) {
+						if (token->find('[') != string::npos) {
+							continue;
+						}
+					}
+				}
+			}
+			m_humdrum_text << infile[j] << "\n";
+		}
+	}
+
+	// print footer:
+	for (int i=footer; i<infile.getLineCount(); i++) {
+		if (!m_keepQ) {
+			if (infile[i].isInterpretation()) {
+				HTp token = infile.token(i, 0);
+				if (token->compare(0, 2, "*>") == 0) {
+					if (token->find('[') != string::npos) {
+						continue;
+					}
+				}
+			}
+		}
+		m_humdrum_text << infile[i] << "\n";
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_thru::getLabelIndex --
+//
+
+int Tool_thru::getLabelIndex(vector<string>& labels, string& key) {
+	for (int i=0; i<(int)labels.size(); i++) {
+		if (key == labels[i]) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_thru::getLabelSequence --
+//
+
+void Tool_thru::getLabelSequence(vector<string>& labelsequence,
+		const string& astring) {
+	int slength = (int)astring.size();
+	char* sdata = new char[slength+1];
+	strcpy(sdata, astring.c_str());
+	const char* ignorecharacters = ", [] ";
+	int index;
+
+	char* strptr = strtok(sdata, ignorecharacters);
+	while (strptr != NULL) {
+		labelsequence.resize((int)labelsequence.size() + 1);
+		index = (int)labelsequence.size() - 1;
+		labelsequence[index] = strptr;
+		strptr = strtok(NULL, ignorecharacters);
+	}
+
+	delete [] sdata;
+}
+
+
+
+
+/////////////////////////////////
+//
 // Tool_tie::Tool_tie -- Set the recognized options for the tool.
 //
 
@@ -102366,6 +107771,7 @@ Tool_tie::Tool_tie(void) {
 	define("p|printable=b", "merge tied notes only if single note is a printable note.");
 	define("M|mark=b", "Mark overfill notes.");
 	define("i|invisible=b", "Mark overfill barlines invisible.");
+	define("I|skip-invisible=b", "Skip invisible measures when splitting overfill durations.");
 }
 
 
@@ -102423,11 +107829,12 @@ bool Tool_tie::run(HumdrumFile& infile) {
 //
 
 void Tool_tie::initialize(void) {
-	m_printQ      = getBoolean("printable");
-	m_mergeQ      = getBoolean("merge");
-	m_splitQ      = getBoolean("split");
-	m_markQ       = getBoolean("mark");
-	m_invisibleQ  = getBoolean("invisible");
+	m_printQ         = getBoolean("printable");
+	m_mergeQ         = getBoolean("merge");
+	m_splitQ         = getBoolean("split");
+	m_markQ          = getBoolean("mark");
+	m_invisibleQ     = getBoolean("invisible");
+	m_skipInvisibleQ = getBoolean("skip-invisible");
 }
 
 
@@ -102503,7 +107910,7 @@ void Tool_tie::splitOverfills(HumdrumFile& infile) {
 
 void Tool_tie::splitToken(HTp tok) {
 	HumNum duration = tok->getDuration();
-	HumNum toBarline = tok->getDurationToBarline();
+	HumNum toBarline = getDurationToNextBarline(tok);
 	HumNum newdur = toBarline;
 	duration = duration - toBarline;
 	string text = "[";
@@ -102523,7 +107930,6 @@ void Tool_tie::splitToken(HTp tok) {
 //
 
 void Tool_tie::carryForwardLeftoverDuration(HumNum duration, HTp tok) {
-
 	if (duration <= 0) {
 		return;
 	}
@@ -102531,7 +107937,13 @@ void Tool_tie::carryForwardLeftoverDuration(HumNum duration, HTp tok) {
 	// find next barline:
 	while (current) {
 		if (current->isBarline()) {
-			break;
+			if (m_skipInvisibleQ) {
+				if (current->find("-") == string::npos) {
+					break;
+				}
+			} else {
+				break;
+			}
 		}
 		current = current->getNextToken();
 	}
@@ -102550,7 +107962,7 @@ void Tool_tie::carryForwardLeftoverDuration(HumNum duration, HTp tok) {
 		hre.replaceDestructive(text, "", "-", "g");
 		barline->setText(text);
 	}
-	HumNum bardur = current->getDurationToBarline();
+	HumNum bardur = getDurationToNextBarline(current);
 
 	// find first null token after barline (that is not on a grace-note line)
 	// if the original note is an overfill note, there must be
@@ -102586,15 +107998,25 @@ void Tool_tie::carryForwardLeftoverDuration(HumNum duration, HTp tok) {
 	foundQ = 0;
 	while (current) {
 		if (current->isBarline()) {
-			foundQ = true;
-			break;
+			if (m_skipInvisibleQ) {
+				if (current->find("-") == string::npos) {
+					foundQ = true;
+					break;
+				}
+			} else {
+				foundQ = true;
+				break;
+			}
 		}
 		if (current->isData()) {
-			foundQ = true;
-			break;
+			if (!current->isNull()) {
+				foundQ = true;
+				break;
+			}
 		}
 		current = current->getNextToken();
 	}
+
 	if (!foundQ) {
 		// strange error
 		return;
@@ -102751,6 +108173,7 @@ void Tool_tie::markNextBarlineInvisible(HTp tok) {
 			continue;
 		}
 		if (current->find('-') != string::npos) {
+			// Already invisible
 			break;
 		}
 		string text = *current;
@@ -102834,11 +108257,59 @@ bool Tool_tie::checkForInvisible(HTp tok) {
 
 bool Tool_tie::checkForOverfill(HTp tok) {
 	HumNum duration = tok->getDuration();
-	HumNum tobarline = tok->getDurationToBarline();
+	HumNum tobarline = getDurationToNextBarline(tok);
 	if (duration > tobarline) {
 		return true;
 	} else {
 		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tie::getDurationToNextVisibleBarline --
+//
+
+HumNum Tool_tie::getDurationToNextVisibleBarline(HTp tok) {
+	HTp current = tok;
+	HTp barline = NULL;
+	while (current) {
+		if (!current->isBarline()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->find("-") != string::npos) {
+			// invisible so skip this barline
+			current = current->getNextToken();
+			continue;
+		}
+		barline = current;
+		break;
+	}
+
+	if (!barline) {
+		return tok->getDurationToEnd();
+	}
+	HumNum startpos   = tok->getDurationFromStart();
+	HumNum endpos     = barline->getDurationFromStart();
+	HumNum difference = endpos - startpos;
+	return difference;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tie::getDurationToNextBarline --
+//
+
+HumNum Tool_tie::getDurationToNextBarline(HTp tok) {
+	if (m_skipInvisibleQ) {
+		return getDurationToNextVisibleBarline(tok);
+	} else {
+		return tok->getDurationToBarline();
 	}
 }
 

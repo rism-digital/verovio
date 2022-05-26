@@ -40,32 +40,32 @@ public:
 
     /**
      * @name Setter and getter for the drawing staff loc.
-     * This is set by the SetAlignmentPitchPos functor.
+     * This is set by the CalcAlignmentPitchPos functor.
      */
     ///@{
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
     int GetDrawingLoc() const { return m_drawingLoc; }
     ///@}
 
-    int CalcDrawingLoc(Layer *layer, LayerElement *element);
+    int CalcDrawingLoc(const Layer *layer, const LayerElement *element);
 
     /**
      * Inteface comparison operator.
      * Checks if the LayerElement has a PositionInterface and compares attributes
      */
-    bool HasIdenticalPositionInterface(PositionInterface *otherPitchInterface);
+    bool HasIdenticalPositionInterface(const PositionInterface *otherPositionInterface) const;
 
     //-----------------//
     // Pseudo functors //
     //-----------------//
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
+    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
     virtual int InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object);
 

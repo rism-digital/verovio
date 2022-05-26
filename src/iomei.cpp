@@ -595,8 +595,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteHalfmRpt(m_currentNode, vrv_cast<HalfmRpt *>(object));
     }
     else if (object->Is(KEYACCID)) {
-        m_currentNode = m_currentNode.append_child("keyAccid");
-        this->WriteKeyAccid(m_currentNode, vrv_cast<KeyAccid *>(object));
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("keyAccid");
+            this->WriteKeyAccid(m_currentNode, vrv_cast<KeyAccid *>(object));
+        }
     }
     else if (object->Is(KEYSIG)) {
         if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("keySig");
@@ -2077,6 +2079,8 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     accid->WriteColor(currentNode);
     accid->WriteEnclosingChars(currentNode);
     accid->WriteExtSym(currentNode);
+    accid->WritePlacementOnStaff(currentNode);
+    accid->WritePlacementRelEvent(currentNode);
 }
 
 void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
@@ -2135,6 +2139,8 @@ void MEIOutput::WriteBTrem(pugi::xml_node currentNode, BTrem *bTrem)
 
     this->WriteLayerElement(currentNode, bTrem);
     bTrem->WriteBTremLog(currentNode);
+    bTrem->WriteNumbered(currentNode);
+    bTrem->WriteNumberPlacement(currentNode);
     bTrem->WriteTremMeasured(currentNode);
 }
 
@@ -2179,6 +2185,7 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     clef->WriteExtSym(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
+    clef->WriteStaffIdent(currentNode);
     clef->WriteVisibility(currentNode);
 }
 
@@ -2237,6 +2244,7 @@ void MEIOutput::WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid)
 
     this->WriteLayerElement(currentNode, keyAccid);
     this->WritePitchInterface(currentNode, keyAccid);
+    this->WritePositionInterface(currentNode, keyAccid);
     keyAccid->WriteAccidental(currentNode);
     keyAccid->WriteColor(currentNode);
     keyAccid->WriteEnclosingChars(currentNode);
@@ -2356,6 +2364,8 @@ void MEIOutput::WriteMRpt(pugi::xml_node currentNode, MRpt *mRpt)
 
     this->WriteLayerElement(currentNode, mRpt);
     mRpt->WriteColor(currentNode);
+    mRpt->WriteNumbered(currentNode);
+    mRpt->WriteNumberPlacement(currentNode);
 }
 
 void MEIOutput::WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2)
@@ -3496,11 +3506,13 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     }
 
     facsimile = music.child("facsimile");
-    if ((!facsimile.empty()) && (m_doc->GetOptions()->m_useFacsimile.GetValue())) {
+    if (!facsimile.empty()) {
         this->ReadFacsimile(m_doc, facsimile);
-        m_doc->SetType(Facs);
-        m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
-        m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
+        if (m_doc->GetOptions()->m_useFacsimile.GetValue()) {
+            m_doc->SetType(Facs);
+            m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
+            m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
+        }
     }
 
     front = music.child("front");
@@ -3874,6 +3886,7 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
     pugi::xml_node current;
     for (current = scoreDef.next_sibling(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         std::string elementName = std::string(current.name());
         // editorial
         if (this->IsEditorialElementName(current.name())) {
@@ -3934,8 +3947,9 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
     Measure *unmeasured = NULL;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // content
@@ -4099,8 +4113,9 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
     Measure *unmeasured = NULL;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // section
@@ -4325,8 +4340,9 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_SCOREDEF);
         }
         // clef, keySig, etc.
@@ -4415,8 +4431,9 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_STAFFGRP);
         }
         // content
@@ -4541,6 +4558,7 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         if (!success) {
             break;
         }
+        this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
@@ -4834,8 +4852,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         const std::string currentName = current.name();
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(currentName)) {
+        if (this->IsEditorialElementName(currentName)) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_MEASURE);
         }
         // content
@@ -5426,8 +5445,9 @@ bool MEIInput::ReadFbChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_FB);
         }
         // content
@@ -5481,8 +5501,9 @@ bool MEIInput::ReadStaffChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        this->NormalizeAttributes(current);
         // editorial
-        else if (this->IsEditorialElementName(current.name())) {
+        if (this->IsEditorialElementName(current.name())) {
             success = this->ReadEditorialElement(parent, current, EDITORIAL_STAFF);
         }
         // content
@@ -5528,9 +5549,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
     pugi::xml_node xmlElement;
     std::string elementName;
     for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
-        if (!success) {
-            break;
-        }
+        if (!success) break;
+        this->NormalizeAttributes(xmlElement);
+
         elementName = std::string(xmlElement.name());
         // LogDebug("ReadLayerChildren: element <%s>", xmlElement.name());
         if (!this->IsAllowed(elementName, filter)) {
@@ -5708,6 +5729,8 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     vrvAccid->ReadColor(accid);
     vrvAccid->ReadEnclosingChars(accid);
     vrvAccid->ReadExtSym(accid);
+    vrvAccid->ReadPlacementOnStaff(accid);
+    vrvAccid->ReadPlacementRelEvent(accid);
 
     parent->AddChild(vrvAccid);
     this->ReadUnsupportedAttr(accid, vrvAccid);
@@ -5788,6 +5811,8 @@ bool MEIInput::ReadBTrem(Object *parent, pugi::xml_node bTrem)
     this->ReadLayerElement(bTrem, vrvBTrem);
 
     vrvBTrem->ReadBTremLog(bTrem);
+    vrvBTrem->ReadNumbered(bTrem);
+    vrvBTrem->ReadNumberPlacement(bTrem);
     vrvBTrem->ReadTremMeasured(bTrem);
 
     parent->AddChild(vrvBTrem);
@@ -5846,6 +5871,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
     vrvClef->ReadExtSym(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
+    vrvClef->ReadStaffIdent(clef);
     vrvClef->ReadVisibility(clef);
 
     parent->AddChild(vrvClef);
@@ -5949,6 +5975,7 @@ bool MEIInput::ReadKeyAccid(Object *parent, pugi::xml_node keyAccid)
     this->ReadLayerElement(keyAccid, vrvKeyAccid);
 
     this->ReadPitchInterface(keyAccid, vrvKeyAccid);
+    this->ReadPositionInterface(keyAccid, vrvKeyAccid);
     vrvKeyAccid->ReadAccidental(keyAccid);
     vrvKeyAccid->ReadColor(keyAccid);
     vrvKeyAccid->ReadEnclosingChars(keyAccid);
@@ -6068,6 +6095,8 @@ bool MEIInput::ReadMRpt(Object *parent, pugi::xml_node mRpt)
     this->ReadLayerElement(mRpt, vrvMRpt);
 
     vrvMRpt->ReadColor(mRpt);
+    vrvMRpt->ReadNumbered(mRpt);
+    vrvMRpt->ReadNumberPlacement(mRpt);
 
     parent->AddChild(vrvMRpt);
     this->ReadUnsupportedAttr(mRpt, vrvMRpt);
@@ -6358,6 +6387,7 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         if (!success) {
             break;
         }
+        this->NormalizeAttributes(xmlElement);
         elementName = std::string(xmlElement.name());
         if (filter && !this->IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
@@ -7336,6 +7366,21 @@ bool MEIInput::IsEditorialElementName(std::string elementName)
     auto i = std::find(MEIInput::s_editorialElementNames.begin(), MEIInput::s_editorialElementNames.end(), elementName);
     if (i != MEIInput::s_editorialElementNames.end()) return true;
     return false;
+}
+
+void MEIInput::NormalizeAttributes(pugi::xml_node &xmlElement)
+{
+    for (auto elem : xmlElement.attributes()) {
+        std::string name = elem.name();
+        std::string value = elem.value();
+
+        size_t pos = value.find_first_not_of(' ');
+        if (pos != std::string::npos) value = value.substr(pos);
+        pos = value.find_last_not_of(' ');
+        if (pos != std::string::npos) value = value.substr(0, pos + 1);
+
+        elem.set_value(value.c_str());
+    }
 }
 
 void MEIInput::UpgradePageTo_5_0_0(Page *page)

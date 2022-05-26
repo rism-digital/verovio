@@ -116,9 +116,9 @@ public:
     int PrepareLayerElementParts(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -156,6 +156,12 @@ private:
      * Get location of first/last element of the corresponding layer
      */
     int GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer);
+
+    /**
+     * For two layers, top layer shouldn't go below center and lower layer shouldn't go above it. Enforce this by
+     * adding margin that will adjust rest position
+     */
+    int GetMarginLayerLocation(bool isTopLayer, bool restOverlap) const;
 
     /**
      * Get location of the object on the layer if it's note, chord or ftrem

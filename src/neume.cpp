@@ -69,16 +69,16 @@ bool Neume::IsSupportedChild(Object *child)
     return true;
 }
 
-int Neume::GetPosition(LayerElement *element)
+int Neume::GetPosition(const LayerElement *element) const
 {
     this->GetList(this);
     int position = this->GetListIndex(element);
     return position;
 }
 
-bool Neume::IsLastInNeume(LayerElement *element)
+bool Neume::IsLastInNeume(const LayerElement *element) const
 {
-    int size = (int)this->GetList(this)->size();
+    const int size = this->GetListSize(this);
     int position = this->GetPosition(element);
 
     // This method should be called only if the note is part of a neume

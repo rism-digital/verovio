@@ -74,6 +74,8 @@ enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDI
 // Option
 //----------------------------------------------------------------------------
 
+enum class OptionsCategory { None, Base, General, Layout, Margins, Midi, Selectors, Full };
+
 /**
  * This class is a base class of each styling parameter
  */
@@ -82,7 +84,6 @@ public:
     // constructors and destructors
     Option()
     {
-        m_isSet = false;
         m_shortOption = 0;
         m_isCmdOnly = false;
     }
@@ -100,12 +101,11 @@ public:
     virtual std::string GetDefaultStrValue() const = 0;
 
     virtual void Reset() = 0;
+    virtual bool IsSet() const = 0;
 
     void SetInfo(const std::string &title, const std::string &description);
     std::string GetTitle() const { return m_title; }
     std::string GetDescription() const { return m_description; }
-
-    bool IsSet() const { return m_isSet; }
 
     void SetShortOption(char shortOption, bool isCmdOnly);
     char GetShortOption() const { return m_shortOption; }
@@ -135,7 +135,6 @@ public:
 protected:
     std::string m_title;
     std::string m_description;
-    bool m_isSet;
 
 private:
     std::string m_key;
@@ -167,6 +166,7 @@ public:
     std::string GetDefaultStrValue() const override;
 
     void Reset() override;
+    bool IsSet() const override;
 
     bool GetValue() const { return m_value; }
     bool GetDefault() const { return m_defaultValue; }
@@ -207,6 +207,7 @@ public:
     std::string GetDefaultStrValue() const override;
 
     void Reset() override;
+    bool IsSet() const override;
 
     double GetValue() const { return m_value; }
     double GetDefault() const { return m_defaultValue; }
@@ -251,6 +252,7 @@ public:
     std::string GetDefaultStrValue() const override;
 
     void Reset() override;
+    bool IsSet() const override;
 
     int GetValue() const;
     int GetUnfactoredValue() const;
@@ -294,6 +296,7 @@ public:
     std::string GetDefault() const { return m_defaultValue; }
 
     void Reset() override;
+    bool IsSet() const override;
 
 private:
     //
@@ -329,6 +332,7 @@ public:
     bool SetValue(std::vector<std::string> const &values);
 
     void Reset() override;
+    bool IsSet() const override;
 
 private:
     //
@@ -366,6 +370,7 @@ public:
     std::string GetStrValuesAsStr(bool withoutDefault) const;
 
     void Reset() override;
+    bool IsSet() const override;
 
 private:
     //
@@ -398,6 +403,7 @@ public:
     std::string GetDefaultStrValue() const override;
 
     void Reset() override;
+    bool IsSet() const override;
 
     // For alternate types return a reference to the value
     // Alternatively we can have a values vector for each sub-type
@@ -453,6 +459,7 @@ public:
     std::string GetDefaultStrValue() const override;
 
     void Reset() override;
+    bool IsSet() const override;
     ///@}
 
     /**
@@ -512,6 +519,9 @@ public:
     std::string GetLabel() const { return m_label; }
     std::string GetId() const { return m_id; }
 
+    void SetCategory(OptionsCategory category) { m_category = category; }
+    OptionsCategory GetCategory() const { return m_category; }
+
     void AddOption(Option *option) { m_options.push_back(option); }
 
     const std::vector<Option *> *GetOptions() const { return &m_options; }
@@ -522,6 +532,7 @@ protected:
     std::string m_id;
     std::string m_label;
     std::vector<Option *> m_options;
+    OptionsCategory m_category = OptionsCategory::None;
 };
 
 //----------------------------------------------------------------------------
@@ -542,11 +553,11 @@ public:
 
     const MapOfStrOptions *GetItems() const { return &m_items; }
 
-    std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
+    const std::vector<OptionGrp *> *GetGrps() const { return &m_grps; }
 
     jsonxx::Object GetBaseOptGrp();
 
-    const std::vector<Option *> *GetBaseOptions();
+    const std::vector<Option *> *GetBaseOptions() const;
 
     // post processing of parameters
     void Sync();
@@ -588,17 +599,15 @@ public:
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionString m_expand;
+    OptionIntMap m_footer;
+    OptionIntMap m_header;
     OptionBool m_humType;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
     OptionBool m_ligatureAsBracket;
     OptionBool m_mensuralToMeasure;
-    OptionBool m_midiNoCue;
-    OptionDbl m_midiTempoAdjustment;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
-    OptionIntMap m_footer;
-    OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
     OptionBool m_outputFormatRaw;
@@ -640,12 +649,12 @@ public:
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
+    OptionBool m_beamFrenchStyle;
     OptionDbl m_bracketThickness;
+    OptionBool m_breaksNoWidow;
     OptionDbl m_dynamDist;
-    OptionDbl m_clefChangeFactor;
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;
-    OptionBool m_breaksNoWidow;
     OptionDbl m_fingeringScale;
     OptionString m_font;
     OptionDbl m_graceFactor;
@@ -679,10 +688,12 @@ public:
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
     OptionDbl m_slurCurveFactor;
+    OptionDbl m_slurEndpointFlexibility;
+    OptionDbl m_slurEndpointThickness;
     OptionDbl m_slurMargin;
     OptionInt m_slurMaxSlope;
-    OptionDbl m_slurEndpointThickness;
     OptionDbl m_slurMidpointThickness;
+    OptionDbl m_slurSymmetry;
     OptionInt m_spacingBraceGroup;
     OptionInt m_spacingBracketGroup;
     OptionBool m_spacingDurDetection;
@@ -716,6 +727,7 @@ public:
     OptionString m_transpose;
     OptionJson m_transposeMdiv;
     OptionBool m_transposeSelectedOnly;
+    OptionBool m_transposeToSoundingPitch;
 
     /**
      * Element margins
@@ -770,6 +782,14 @@ public:
     OptionDbl m_topMarginArtic;
     OptionDbl m_topMarginHarm;
     OptionDbl m_topMarginPgFooter;
+
+    /**
+     * Midi
+     */
+    OptionGrp m_midi;
+
+    OptionBool m_midiNoCue;
+    OptionDbl m_midiTempoAdjustment;
 
     /**
      * Deprecated options

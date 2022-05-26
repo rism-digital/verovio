@@ -85,6 +85,11 @@ public:
      */
     virtual bool IsExtenderElement() const { return false; }
 
+    /**
+     * Check whether the current object must be positioned closer to the staff than the other
+     */
+    virtual bool IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const { return false; }
+
     //----------//
     // Functors //
     //----------//
@@ -100,9 +105,9 @@ public:
     int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
-     * See Object::FillStaffCurrentTimeSpanning
+     * See Object::PrepareStaffCurrentTimeSpanning
      */
-    int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
+    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareTimePointing
@@ -120,9 +125,9 @@ public:
     int PrepareTimestamps(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnCastOff
@@ -329,6 +334,15 @@ public:
     ///@}
 
     /**
+     * @name Getter and setter for cached x1 and x2
+     */
+    ///@{
+    bool HasCachedX12() const;
+    std::pair<int, int> GetCachedX12() const { return m_cachedX12; }
+    void SetCachedX12(const std::pair<int, int> &cachedX12) { m_cachedX12 = cachedX12; }
+    ///@}
+
+    /**
      * Deletes all the CurveSpannedElement objects.
      */
     void ClearSpannedElements();
@@ -386,6 +400,9 @@ private:
 
     /** The cached min or max value (depending on the curvature) */
     int m_cachedMinMaxY;
+
+    /** The cached values for x1 and x2 */
+    std::pair<int, int> m_cachedX12;
 
     /**
      * Some curves (S-shaped slurs) can request staff space to prevent collisions from two sides

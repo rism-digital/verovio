@@ -51,9 +51,11 @@ public:
      */
     ///@{
     Note *GetTopNote();
+    const Note *GetTopNote() const;
     Note *GetBottomNote();
-    int GetYTop();
-    int GetYBottom();
+    const Note *GetBottomNote() const;
+    int GetYTop() const;
+    int GetYBottom() const;
     ///@}
 
     //----------//
@@ -61,9 +63,9 @@ public:
     //----------//
 
     /**
-     * See Object::CalcOnsetOffsetEnd
+     * See Object::InitOnsetOffsetEnd
      */
-    virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams) override;
+    virtual int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcStem
@@ -74,7 +76,7 @@ protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     //

@@ -26,6 +26,7 @@
 #include "harm.h"
 #include "multirest.h"
 #include "page.h"
+#include "pages.h"
 #include "pedal.h"
 #include "section.h"
 #include "staff.h"
@@ -679,25 +680,9 @@ int Measure::FindSpannedLayerElements(FunctorParams *functorParams)
     FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
 
-    if (params->m_interface->GetStartMeasure() == this) {
-        params->m_inMeasureRange = true;
-    }
+    if (Object::IsPreOrdered(this, params->m_interface->GetStartMeasure())) return FUNCTOR_SIBLINGS;
 
-    if (!params->m_inMeasureRange) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::FindSpannedLayerElementsEnd(FunctorParams *functorParams)
-{
-    FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
-    assert(params);
-
-    if (params->m_interface->GetEndMeasure() == this) {
-        params->m_inMeasureRange = false;
-    }
+    if (Object::IsPreOrdered(params->m_interface->GetEndMeasure(), this)) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }
@@ -756,7 +741,7 @@ int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
     }
     params->m_targetSubSystem->AddChild(measure);
 
-    ArrayOfComparisons filters;
+    Filters filters;
     // Now we can process by layer and move their content to (measure) segments
     for (auto const &staves : params->m_layerTree->child) {
         for (auto const &layers : staves.second.child) {
@@ -957,16 +942,16 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
     if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
 
     std::vector<int>::iterator iter;
-    ArrayOfComparisons filters;
+    Filters filters;
     for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-        filters.clear();
+        filters.Clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(BARLINE_REFERENCES);
         ns.push_back(*iter);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.push_back(&matchStaff);
+        filters.Add(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
@@ -982,16 +967,16 @@ int Measure::AdjustDots(FunctorParams *functorParams)
     if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
 
     std::vector<int>::iterator iter;
-    ArrayOfComparisons filters;
+    Filters filters;
     for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-        filters.clear();
+        filters.Clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(BARLINE_REFERENCES);
         ns.push_back(*iter);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.push_back(&matchStaff);
+        filters.Add(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
@@ -1032,6 +1017,7 @@ int Measure::AdjustGraceXPos(FunctorParams *functorParams)
     params->m_rightDefaultAlignment = NULL;
 
     params->m_staffNs = staffNsReversed;
+    params->m_measureTieEndpoints = this->GetInternalTieEndpoints();
     m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
 
     // Put params back
@@ -1052,7 +1038,9 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
 
-    ArrayOfComparisons filters;
+    const bool hasSystemStartLine = this->IsFirstInSystem() && system->GetDrawingScoreDef()->HasSystemStartLine();
+
+    Filters filters;
     for (auto staffN : params->m_staffNs) {
         params->m_minPos = 0;
         params->m_upcomingMinPos = VRV_UNSET;
@@ -1064,14 +1052,20 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         StaffAlignment *staffAlignment = system->m_systemAligner.GetStaffAlignmentForStaffN(staffN);
         params->m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
 
-        filters.clear();
+        // Prevent collisions of scoredef clefs with thick barlines
+        if (hasSystemStartLine) {
+            params->m_upcomingMinPos = params->m_doc->GetDrawingBarLineWidth(params->m_staffSize);
+        }
+
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(staffN);
         AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.push_back(&matchStaff);
+        CrossAlignmentReferenceComparison matchCrossStaff;
+        filters.SetType(Filters::Type::AnyOf);
+        filters = { &matchStaff, &matchCrossStaff };
 
         params->m_measureTieEndpoints = this->GetInternalTieEndpoints();
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
@@ -1097,15 +1091,23 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     // Adjust min width based on multirest attributes (@num and @width), but only if these values are larger than
     // current min width
     else if (this->FindDescendantByType(MULTIREST) != NULL) {
+        const int unit = params->m_doc->GetDrawingUnit(params->m_staffSize);
         MultiRest *multiRest = vrv_cast<MultiRest *>(this->FindDescendantByType(MULTIREST));
         const int num = multiRest->GetNum();
         if (multiRest->HasWidth()) {
-            const int fixedWidth
-                = multiRest->AttWidth::GetWidth() * (params->m_doc->GetDrawingUnit(params->m_staffSize) + 4);
+            const int fixedWidth = multiRest->AttWidth::GetWidth() * (unit + 4);
             if (minMeasureWidth < fixedWidth) minMeasureWidth = fixedWidth;
         }
         else if (num > 10) {
             minMeasureWidth *= log1p(num) / 2;
+        }
+        Object *layer = multiRest->GetFirstAncestor(LAYER);
+        if (layer->GetLast() != multiRest) {
+            Object *object = layer->GetNext(multiRest);
+            if (object && object->Is(CLEF)) {
+                const int clefWidth = object->GetContentRight() - object->GetContentLeft();
+                minMeasureWidth += clefWidth + unit;
+            }
         }
     }
 
@@ -1164,9 +1166,9 @@ int Measure::AdjustXOverflow(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::SetAlignmentXPos(FunctorParams *functorParams)
+int Measure::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     m_measureAligner.Process(params->m_functor, params);
@@ -1214,7 +1216,7 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::ResetDrawing(FunctorParams *functorParams)
+int Measure::ResetData(FunctorParams *functorParams)
 {
     m_timestampAligner.Reset();
     m_drawingEnding = NULL;
@@ -1291,9 +1293,40 @@ int Measure::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
+int Measure::CastOffToSelection(FunctorParams *functorParams)
 {
-    FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
+    assert(params);
+
+    const bool startSelection = (!params->m_isSelection && this->GetUuid() == params->m_start);
+
+    if (startSelection) {
+        params->m_page = new Page();
+        params->m_doc->GetPages()->AddChild(params->m_page);
+        params->m_currentSystem = new System();
+        params->m_page->AddChild(params->m_currentSystem);
+        params->m_isSelection = true;
+    }
+
+    const bool endSelection = (params->m_isSelection && this->GetUuid() == params->m_end);
+
+    MoveItselfTo(params->m_currentSystem);
+
+    if (endSelection) {
+        params->m_page = new Page();
+        params->m_doc->GetPages()->AddChild(params->m_page);
+        params->m_currentSystem = new System();
+        params->m_page->AddChild(params->m_currentSystem);
+        params->m_isSelection = false;
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Measure::PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
+{
+    PrepareStaffCurrentTimeSpanningParams *params
+        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
@@ -1550,9 +1583,9 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareMIDI(FunctorParams *functorParams)
+int Measure::InitMIDI(FunctorParams *functorParams)
 {
-    PrepareMIDIParams *params = vrv_params_cast<PrepareMIDIParams *>(functorParams);
+    InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);
     assert(params);
 
     params->m_currentTempo = m_currentTempo;
@@ -1590,9 +1623,9 @@ int Measure::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
+int Measure::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     m_scoreTimeOffset.clear();
@@ -1605,9 +1638,9 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
+int Measure::InitMaxMeasureDurationEnd(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = vrv_params_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     const double scoreTimeIncrement
@@ -1620,9 +1653,9 @@ int Measure::CalcMaxMeasureDurationEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcOnsetOffset(FunctorParams *functorParams)
+int Measure::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     params->m_currentTempo = m_currentTempo;
@@ -1644,9 +1677,9 @@ int Measure::UnCastOff(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::HorizontalLayoutCache(FunctorParams *functorParams)
+int Measure::CacheHorizontalLayout(FunctorParams *functorParams)
 {
-    HorizontalLayoutCacheParams *params = vrv_params_cast<HorizontalLayoutCacheParams *>(functorParams);
+    CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);
     assert(params);
 
     if (params->m_restore) {
@@ -1657,8 +1690,8 @@ int Measure::HorizontalLayoutCache(FunctorParams *functorParams)
         m_cachedOverflow = this->GetDrawingOverflow();
         m_cachedXRel = m_drawingXRel;
     }
-    if (this->GetLeftBarLine()) this->GetLeftBarLine()->HorizontalLayoutCache(functorParams);
-    if (this->GetRightBarLine()) this->GetRightBarLine()->HorizontalLayoutCache(functorParams);
+    if (this->GetLeftBarLine()) this->GetLeftBarLine()->CacheHorizontalLayout(functorParams);
+    if (this->GetRightBarLine()) this->GetRightBarLine()->CacheHorizontalLayout(functorParams);
 
     return FUNCTOR_CONTINUE;
 }

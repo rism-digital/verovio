@@ -226,15 +226,18 @@ wchar_t Rest::GetRestGlyph() const
 
 wchar_t Rest::GetRestGlyph(const int duration) const
 {
+    const Resources *resources = this->GetDocResources();
+    if (!resources) return 0;
+
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
         wchar_t code = this->GetGlyphNum();
-        if (NULL != Resources::GetGlyph(code)) return code;
+        if (NULL != resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
-        wchar_t code = Resources::GetGlyphCode(this->GetGlyphName());
-        if (NULL != Resources::GetGlyph(code)) return code;
+        wchar_t code = resources->GetGlyphCode(this->GetGlyphName());
+        if (NULL != resources->GetGlyph(code)) return code;
     }
 
     switch (duration) {
@@ -303,19 +306,7 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
         }
     }
 
-    // for two layers, top layer shouldn't go below center and lower layer shouldn't go above it. Enforce this by adding
-    // margin that will adjust rest position
-    int marginLocation = isTopLayer ? 6 : 2;
-    if ((this->GetDur() == DURATION_long) || ((this->GetDur() == DURATION_4) && restOverlap)) {
-        marginLocation = isTopLayer ? 8 : 0;
-    }
-    else if (this->GetDur() >= DURATION_8) {
-        marginLocation
-            = isTopLayer ? (6 + (this->GetDur() - DURATION_4) / 2 * 2) : (2 - (this->GetDur() - DURATION_8) / 2 * 2);
-    }
-    if (this->GetDur() >= DURATION_1024) {
-        marginLocation -= 2;
-    }
+    const int marginLocation = this->GetMarginLayerLocation(isTopLayer, restOverlap);
     const int optimalLocation = isTopLayer
         ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation })
         : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation, marginLocation });
@@ -492,6 +483,23 @@ std::pair<int, RestAccidental> Rest::GetElementLocation(Object *object, Layer *l
     return { VRV_UNSET, RA_none };
 }
 
+int Rest::GetMarginLayerLocation(bool isTopLayer, bool restOverlap) const
+{
+    int marginLocation = isTopLayer ? 6 : 2;
+    if ((this->GetDur() == DURATION_long) || ((this->GetDur() == DURATION_4) && restOverlap)) {
+        marginLocation = isTopLayer ? 8 : 0;
+    }
+    else if (this->GetDur() >= DURATION_8) {
+        marginLocation
+            = isTopLayer ? (6 + (this->GetDur() - DURATION_4) / 2 * 2) : (2 - (this->GetDur() - DURATION_8) / 2 * 2);
+    }
+    if (this->GetDur() >= DURATION_1024) {
+        marginLocation -= 2;
+    }
+
+    return marginLocation;
+}
+
 int Rest::GetRestOffsetFromOptions(
     RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const
 {
@@ -517,7 +525,7 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
 
     // Calculate possible overlap for the rest with beams
     int leftMargin = 0, rightMargin = 0;
-    const int beams = vrv_cast<Beam *>(params->m_beam)->m_shortestDur - DUR_4;
+    const int beams = vrv_cast<Beam *>(params->m_beam)->GetBeamPartDuration(this) - DUR_4;
     const int beamWidth = vrv_cast<Beam *>(params->m_beam)->m_beamWidth;
     if (params->m_directionBias > 0) {
         leftMargin = params->m_y1 - beams * beamWidth - this->GetSelfTop();
@@ -531,13 +539,18 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
     // Adjust drawing location for the rest based on the overlap with beams.
     // Adjustment should be an even number, so that the rest is positioned properly
     const int overlapMargin = std::min(leftMargin, rightMargin);
-    if (overlapMargin < 0) {
-        Staff *staff = this->GetAncestorStaff();
-        if ((!this->HasOloc() || !HasPloc()) && !this->HasLoc()) {
-            const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
-            const int oldLoc = this->GetDrawingLoc();
-            const int newLoc = oldLoc + locAdjust - locAdjust % 2;
+    if (overlapMargin >= 0) return FUNCTOR_CONTINUE;
+
+    Staff *staff = this->GetAncestorStaff();
+
+    if ((!this->HasOloc() || !this->HasPloc()) && !this->HasLoc()) {
+        // constants
+        const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        // calculate new and old locations for the rest
+        const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
+        const int oldLoc = this->GetDrawingLoc();
+        const int newLoc = oldLoc + locAdjust - locAdjust % 2;
+        if (staff->GetChildCount(LAYER) == 1) {
             this->SetDrawingLoc(newLoc);
             this->SetDrawingYRel(staff->CalcPitchPosYRel(params->m_doc, newLoc));
             // If there are dots, adjust their location as well
@@ -552,14 +565,13 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
                     }
                 }
             }
-        }
-        else {
-            const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            params->m_overlapMargin
-                = (((overlapMargin * params->m_directionBias + staffOffset - 1) / staffOffset + 1.5) * staffOffset)
-                * params->m_directionBias;
+            return FUNCTOR_CONTINUE;
         }
     }
+
+    const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int unitChangeNumber = ((std::abs(overlapMargin)) / staffOffset - 1);
+    if (unitChangeNumber > 0) params->m_overlapMargin = unitChangeNumber * staffOffset * params->m_directionBias;
 
     return FUNCTOR_CONTINUE;
 }
@@ -597,8 +609,8 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ Prepare the drawing cue size ************/
 
-    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
+    Functor prepareCueSize(&Object::PrepareCueSize);
+    this->Process(&prepareCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
 }
@@ -657,11 +669,11 @@ int Rest::CalcDots(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Rest::ResetDrawing(FunctorParams *functorParams)
+int Rest::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-    PositionInterface::InterfaceResetDrawing(functorParams, this);
+    LayerElement::ResetData(functorParams);
+    PositionInterface::InterfaceResetData(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

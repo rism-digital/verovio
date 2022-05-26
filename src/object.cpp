@@ -133,7 +133,7 @@ void Object::CloneReset()
 {
     this->Modify();
     FunctorParams voidParams;
-    this->ResetDrawing(&voidParams);
+    this->ResetData(&voidParams);
 }
 
 Object &Object::operator=(const Object &object)
@@ -205,6 +205,27 @@ void Object::SetAsReferenceObject()
     assert(m_children.empty());
 
     m_isReferenceObject = true;
+}
+
+const Resources *Object::GetDocResources() const
+{
+    // Search for the document
+    const Doc *doc = NULL;
+    if (this->Is(DOC)) {
+        doc = vrv_cast<const Doc *>(this);
+    }
+    else {
+        doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    }
+
+    // Return the resources or display warning
+    if (doc) {
+        return &doc->GetResources();
+    }
+    else {
+        LogWarning("Requested resources unavailable.");
+        return NULL;
+    }
 }
 
 void Object::Reset()
@@ -825,7 +846,7 @@ int Object::GetDescendantIndex(const Object *child, const ClassId classId, int d
     return -1;
 }
 
-void Object::Modify(bool modified)
+void Object::Modify(bool modified) const
 {
     // if we have a parent and a new modification, propagate it
     if (m_parent && modified) {
@@ -834,10 +855,10 @@ void Object::Modify(bool modified)
     m_isModified = modified;
 }
 
-void Object::FillFlatList(ArrayOfObjects *flatList)
+void Object::FillFlatList(ListOfConstObjects &flatList) const
 {
     Functor addToFlatList(&Object::AddLayerElementToFlatList);
-    AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
+    AddLayerElementToFlatListParams addLayerElementToFlatListParams(&flatList);
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
 
@@ -943,7 +964,7 @@ bool Object::HasNonEditorialContent()
     return (!nonEditorial.empty());
 }
 
-void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
+void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, Filters *filters,
     int deepness, bool direction, bool skipFirst)
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
@@ -998,7 +1019,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
 }
 
-void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
+void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, Filters *filters,
     int deepness, bool direction, bool skipFirst) const
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
@@ -1101,19 +1122,9 @@ bool Object::SkipChildren(Functor *functor) const
     return false;
 }
 
-bool Object::FiltersApply(const ArrayOfComparisons *filters, Object *object) const
+bool Object::FiltersApply(const Filters *filters, Object *object) const
 {
-    if (filters) {
-        return std::all_of(filters->begin(), filters->end(), [object](Comparison *iter) {
-            // ignore any class comparison which does not match the object class
-            ClassIdComparison *cmp = dynamic_cast<ClassIdComparison *>(iter);
-            if (!cmp || (cmp->GetType() != object->m_classId)) {
-                return true;
-            }
-            return (*iter)(object);
-        });
-    }
-    return true;
+    return filters ? filters->Apply(object) : true;
 }
 
 int Object::Save(Output *output)
@@ -1255,7 +1266,7 @@ bool Object::IsPreOrdered(const Object *left, const Object *right)
     if (commonParent) {
         return (commonParent->GetChildIndex(*iterPair.first) < commonParent->GetChildIndex(*iterPair.second));
     }
-    return false;
+    return true;
 }
 
 //----------------------------------------------------------------------------
@@ -1277,7 +1288,7 @@ ObjectListInterface &ObjectListInterface::operator=(const ObjectListInterface &i
     return *this;
 }
 
-void ObjectListInterface::ResetList(Object *node)
+void ObjectListInterface::ResetList(const Object *node) const
 {
     // nothing to do, the list if up to date
     if (!node->IsModified()) {
@@ -1286,19 +1297,64 @@ void ObjectListInterface::ResetList(Object *node)
 
     node->Modify(false);
     m_list.clear();
-    node->FillFlatList(&m_list);
-    this->FilterList(&m_list);
+    node->FillFlatList(m_list);
+    this->FilterList(m_list);
 }
 
-const ArrayOfObjects *ObjectListInterface::GetList(Object *node)
+const ListOfConstObjects &ObjectListInterface::GetList(const Object *node) const
 {
     this->ResetList(node);
-    return &m_list;
+    return m_list;
 }
 
-int ObjectListInterface::GetListIndex(const Object *listElement)
+ListOfObjects ObjectListInterface::GetList(const Object *node)
 {
-    ArrayOfObjects::iterator iter;
+    this->ResetList(node);
+    ListOfObjects result;
+    std::transform(m_list.begin(), m_list.end(), std::back_inserter(result),
+        [](const Object *obj) { return const_cast<Object *>(obj); });
+    return result;
+}
+
+bool ObjectListInterface::HasEmptyList(const Object *node) const
+{
+    this->ResetList(node);
+    return m_list.empty();
+}
+
+int ObjectListInterface::GetListSize(const Object *node) const
+{
+    this->ResetList(node);
+    return static_cast<int>(m_list.size());
+}
+
+const Object *ObjectListInterface::GetListFront(const Object *node) const
+{
+    this->ResetList(node);
+    assert(!m_list.empty());
+    return m_list.front();
+}
+
+Object *ObjectListInterface::GetListFront(const Object *node)
+{
+    return const_cast<Object *>(std::as_const(*this).GetListFront(node));
+}
+
+const Object *ObjectListInterface::GetListBack(const Object *node) const
+{
+    this->ResetList(node);
+    assert(!m_list.empty());
+    return m_list.back();
+}
+
+Object *ObjectListInterface::GetListBack(const Object *node)
+{
+    return const_cast<Object *>(std::as_const(*this).GetListBack(node));
+}
+
+int ObjectListInterface::GetListIndex(const Object *listElement) const
+{
+    ListOfConstObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -1308,9 +1364,9 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
     return -1;
 }
 
-Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
+const Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId) const
 {
-    ArrayOfObjects::iterator it = m_list.begin();
+    ListOfConstObjects::iterator it = m_list.begin();
     int idx = this->GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
@@ -1318,20 +1374,30 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
     return (it == m_list.end()) ? NULL : *it;
 }
 
-Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
+Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
-    ArrayOfObjects::iterator it = m_list.begin();
+    return const_cast<Object *>(std::as_const(*this).GetListFirst(startFrom, classId));
+}
+
+const Object *ObjectListInterface::GetListFirstBackward(const Object *startFrom, const ClassId classId) const
+{
+    ListOfConstObjects::iterator it = m_list.begin();
     int idx = this->GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
-    ArrayOfObjects::reverse_iterator rit(it);
+    ListOfConstObjects::reverse_iterator rit(it);
     rit = std::find_if(rit, m_list.rend(), ObjectComparison(classId));
     return (rit == m_list.rend()) ? NULL : *rit;
 }
 
-Object *ObjectListInterface::GetListPrevious(Object *listElement)
+Object *ObjectListInterface::GetListFirstBackward(const Object *startFrom, const ClassId classId)
 {
-    ArrayOfObjects::iterator iter;
+    return const_cast<Object *>(std::as_const(*this).GetListFirstBackward(startFrom, classId));
+}
+
+const Object *ObjectListInterface::GetListPrevious(const Object *listElement) const
+{
+    ListOfConstObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -1346,9 +1412,14 @@ Object *ObjectListInterface::GetListPrevious(Object *listElement)
     return NULL;
 }
 
-Object *ObjectListInterface::GetListNext(Object *listElement)
+Object *ObjectListInterface::GetListPrevious(const Object *listElement)
 {
-    ArrayOfObjects::reverse_iterator iter;
+    return const_cast<Object *>(std::as_const(*this).GetListPrevious(listElement));
+}
+
+const Object *ObjectListInterface::GetListNext(const Object *listElement) const
+{
+    ListOfConstObjects::reverse_iterator iter;
     int i;
     for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -1363,38 +1434,43 @@ Object *ObjectListInterface::GetListNext(Object *listElement)
     return NULL;
 }
 
+Object *ObjectListInterface::GetListNext(const Object *listElement)
+{
+    return const_cast<Object *>(std::as_const(*this).GetListNext(listElement));
+}
+
 //----------------------------------------------------------------------------
 // TextListInterface
 //----------------------------------------------------------------------------
 
-std::wstring TextListInterface::GetText(Object *node)
+std::wstring TextListInterface::GetText(const Object *node) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    const ArrayOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+    const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
+    for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
         if ((*it)->Is(LB)) {
             continue;
         }
-        Text *text = vrv_cast<Text *>(*it);
+        const Text *text = vrv_cast<const Text *>(*it);
         assert(text);
         concatText += text->GetText();
     }
     return concatText;
 }
 
-void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &lines)
+void TextListInterface::GetTextLines(const Object *node, std::vector<std::wstring> &lines) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    const ArrayOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+    const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
+    for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
         if ((*it)->Is(LB) && !concatText.empty()) {
             lines.push_back(concatText);
             concatText.clear();
             continue;
         }
-        Text *text = vrv_cast<Text *>(*it);
+        const Text *text = vrv_cast<const Text *>(*it);
         assert(text);
         concatText += text->GetText();
     }
@@ -1403,13 +1479,13 @@ void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &li
     }
 }
 
-void TextListInterface::FilterList(ArrayOfObjects *childList)
+void TextListInterface::FilterList(ListOfConstObjects &childList) const
 {
-    ArrayOfObjects::iterator iter = childList->begin();
-    while (iter != childList->end()) {
+    ListOfConstObjects::iterator iter = childList.begin();
+    while (iter != childList.end()) {
         if (!(*iter)->Is({ LB, TEXT })) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         ++iter;
@@ -1526,7 +1602,7 @@ void ObjectFactory::Register(std::string name, ClassId classId, std::function<Ob
 // Object functor methods
 //----------------------------------------------------------------------------
 
-int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
+int Object::AddLayerElementToFlatList(FunctorParams *functorParams) const
 {
     AddLayerElementToFlatListParams *params = vrv_params_cast<AddLayerElementToFlatListParams *>(functorParams);
     assert(params);
@@ -1693,7 +1769,7 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
     if (this->HasInterface(INTERFACE_PLIST)) {
         PlistInterface *interface = this->GetPlistInterface();
         assert(interface);
-        for (auto &object : *interface->GetRefs()) {
+        for (auto &object : interface->GetRefs()) {
             params->m_elements->push_back(object);
         }
     }
@@ -1822,7 +1898,7 @@ int Object::PreparePlist(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::ProcessPlist(FunctorParams *functorParams)
+int Object::PrepareProcessPlist(FunctorParams *functorParams)
 {
     PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
     assert(params);
@@ -2071,13 +2147,15 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(CLEF)) {
         LayerElement *element = vrv_cast<LayerElement *>(this);
         assert(element);
-        Clef *clef = vrv_cast<Clef *>(element->ThisOrSameasAsLink());
-        assert(clef);
+        LayerElement *elementOrLink = element->ThisOrSameasAsLink();
+        if (!elementOrLink || !elementOrLink->Is(CLEF)) return FUNCTOR_CONTINUE;
+        Clef *clef = vrv_cast<Clef *>(elementOrLink);
         if (clef->IsScoreDefElement()) {
             return FUNCTOR_CONTINUE;
         }
         assert(params->m_currentStaffDef);
-        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef.GetStaffDef(params->m_currentStaffDef->GetN());
+        const int n = clef->m_crossStaff ? clef->m_crossStaff->GetN() : params->m_currentStaffDef->GetN();
+        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef.GetStaffDef(n);
         assert(upcomingStaffDef);
         upcomingStaffDef->SetCurrentClef(clef);
         params->m_upcomingScoreDef.m_setAsDrawing = true;
@@ -2137,9 +2215,9 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetOverflowBBoxes(FunctorParams *functorParams)
+int Object::CalcBBoxOverflows(FunctorParams *functorParams)
 {
-    SetOverflowBBoxesParams *params = vrv_params_cast<SetOverflowBBoxesParams *>(functorParams);
+    CalcBBoxOverflowsParams *params = vrv_params_cast<CalcBBoxOverflowsParams *>(functorParams);
     assert(params);
 
     // starting a new staff
@@ -2162,16 +2240,16 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         // set scoreDef attr
         if (currentLayer->GetStaffDefClef()) {
             // System scoreDef clefs are taken into account but treated separately (see below)
-            currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefClef()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetStaffDefKeySig()) {
-            currentLayer->GetStaffDefKeySig()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefKeySig()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetStaffDefMensur()) {
-            currentLayer->GetStaffDefMensur()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefMensur()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetStaffDefMeterSig()) {
-            currentLayer->GetStaffDefMeterSig()->SetOverflowBBoxes(params);
+            currentLayer->GetStaffDefMeterSig()->CalcBBoxOverflows(params);
         }
         return FUNCTOR_CONTINUE;
     }
@@ -2251,7 +2329,6 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
                 above->SetScoreDefClefOverflowAbove(overflowAbove);
             }
             else {
-                above->SetOverflowBBoxAbove(current, overflowAbove);
                 above->SetOverflowAbove(overflowAbove);
                 above->AddBBoxAbove(current);
             }
@@ -2267,7 +2344,6 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
                 below->SetScoreDefClefOverflowBelow(overflowBelow);
             }
             else {
-                below->SetOverflowBBoxBelow(current, overflowBelow);
                 below->SetOverflowBelow(overflowBelow);
                 below->AddBBoxBelow(current);
             }
@@ -2277,9 +2353,9 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
+int Object::CalcBBoxOverflowsEnd(FunctorParams *functorParams)
 {
-    SetOverflowBBoxesParams *params = vrv_params_cast<SetOverflowBBoxesParams *>(functorParams);
+    CalcBBoxOverflowsParams *params = vrv_params_cast<CalcBBoxOverflowsParams *>(functorParams);
     assert(params);
 
     // starting new layer
@@ -2288,16 +2364,16 @@ int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
         assert(currentLayer);
         // set scoreDef attr
         if (currentLayer->GetCautionStaffDefClef()) {
-            currentLayer->GetCautionStaffDefClef()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefClef()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetCautionStaffDefKeySig()) {
-            currentLayer->GetCautionStaffDefKeySig()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefKeySig()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetCautionStaffDefMensur()) {
-            currentLayer->GetCautionStaffDefMensur()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefMensur()->CalcBBoxOverflows(params);
         }
         if (currentLayer->GetCautionStaffDefMeterSig()) {
-            currentLayer->GetCautionStaffDefMeterSig()->SetOverflowBBoxes(params);
+            currentLayer->GetCautionStaffDefMeterSig()->CalcBBoxOverflows(params);
         }
     }
     return FUNCTOR_CONTINUE;

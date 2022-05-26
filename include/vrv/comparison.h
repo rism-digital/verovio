@@ -379,6 +379,26 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// CrossAlignmentReferenceComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if alignment reference contains cross-staff elements
+ */
+class CrossAlignmentReferenceComparison : public ClassIdComparison {
+public:
+    CrossAlignmentReferenceComparison() : ClassIdComparison(ALIGNMENT_REFERENCE) {}
+
+    bool operator()(const Object *object) override
+    {
+        if (!this->MatchesType(object)) return false;
+        const AlignmentReference *ref = vrv_cast<const AlignmentReference *>(object);
+        assert(ref);
+        return ref->HasCrossStaffElements();
+    }
+};
+
+//----------------------------------------------------------------------------
 // MeasureAlignerTypeComparison
 //----------------------------------------------------------------------------
 
@@ -500,16 +520,74 @@ public:
         if (object == m_objectToExclude || !ClassIdsComparison::operator()(object)) return false;
 
         if (object->Is(STAFFDEF)) {
-            const StaffDef *staffDef = dynamic_cast<const StaffDef *>(object);
+            const StaffDef *staffDef = vrv_cast<const StaffDef *>(object);
             return staffDef && staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
         }
 
-        const StaffGrp *staffGrp = dynamic_cast<const StaffGrp *>(object);
+        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(object);
         return staffGrp && staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
     }
 
 protected:
     const Object *m_objectToExclude;
+};
+
+//----------------------------------------------------------------------------
+// Filters class
+//----------------------------------------------------------------------------
+
+/**
+ * This class is used to store comparison filters and apply them when necessary
+ */
+class Filters {
+public:
+    enum class Type { AllOf, AnyOf };
+
+public:
+    Filters() = default;
+    explicit Filters(const std::initializer_list<Comparison *> &comp)
+    {
+        std::copy(comp.begin(), comp.end(), std::back_inserter(m_filters));
+    }
+
+    void Add(Comparison *comp) { m_filters.push_back(comp); }
+    void Clear() { m_filters.clear(); }
+    void SetType(Type type) { m_type = type; }
+
+    /**
+     * Apply comparison filter based on the specified type
+     */
+    bool Apply(const Object *object) const
+    {
+        auto condition = [object](Comparison *iter) {
+            // ignore any class comparison which does not match the object class
+            ClassIdComparison *cmp = dynamic_cast<ClassIdComparison *>(iter);
+            if (!cmp || (cmp->GetType() != object->GetClassId())) {
+                return true;
+            }
+            return (*iter)(object);
+        };
+        switch (m_type) {
+            case Type::AnyOf: {
+                return std::any_of(m_filters.cbegin(), m_filters.cend(), condition);
+            }
+            case Type::AllOf:
+            default: {
+                return std::all_of(m_filters.cbegin(), m_filters.cend(), condition);
+            }
+        }
+    }
+
+    Filters &operator=(const std::initializer_list<Comparison *> &other)
+    {
+        m_filters.clear();
+        std::copy(other.begin(), other.end(), std::back_inserter(m_filters));
+        return *this;
+    }
+
+private:
+    std::vector<Comparison *> m_filters;
+    Type m_type = Type::AllOf;
 };
 
 } // namespace vrv

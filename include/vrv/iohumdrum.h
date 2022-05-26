@@ -17,6 +17,7 @@
 
 #include "accid.h"
 #include "attdef.h"
+#include "beamspan.h"
 #include "beatrpt.h"
 #include "clef.h"
 #include "dir.h"
@@ -206,6 +207,8 @@ namespace humaux {
         // Used for tremolo compression
         bool tremolo;
 
+        bool suppress_articulations;
+
         // Used for sustain pedal
         bool pedal;
 
@@ -341,6 +344,9 @@ namespace humaux {
 
         // toggle for black/white mensural notation.  0=white, 1=black
         int mensuration_type = 0;
+
+        // join layers into chords or shared notes.
+        bool join = false;
     };
 } // namespace humaux
 
@@ -400,6 +406,7 @@ public:
     char hairpinAccent = '\0'; // For <> accent on a note.
     char verticalStroke = '\0'; // For horizontal stroke ornament
     char lhpizz = '\0'; // For left-hand pizzicato
+    char tremolo = '\0'; // For unmeasured tremolo slashes
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
@@ -482,7 +489,7 @@ protected:
         std::vector<humaux::HumdrumBeamAndTuplet> &tg, const std::vector<hum::HTp> &layerdata);
     void assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAndTuplet *> &tggroup);
 
-    void printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
+    void printGroupInfo(const std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void insertTuplet(std::vector<std::string> &elements, std::vector<void *> &pointers,
         const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> layerdata, int layerindex,
         bool suppressTupletNumber, bool suppressBracketTuplet);
@@ -536,8 +543,10 @@ protected:
     hum::HTp getDecrescendoEnd(hum::HTp token);
     hum::HTp getCrescendoEnd(hum::HTp token);
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
+    int getMeasureDifference(hum::HTp starttok, hum::HumNum meterunit, hum::HumNum tieduration, hum::HumNum &tstamp);
     void storeOriginalClefMensurationKeyApp();
-    void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration);
+    void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration,
+        const std::string &typestring = "");
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
     std::string getLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
@@ -565,7 +574,7 @@ protected:
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
     bool analyzeBreaks(hum::HumdrumFile &infile);
-    void addSystemKeyTimeChange(int startline, int endline);
+    void addSystemClefKeyTimeChange(int startline, int endline);
     void prepareSections();
     int getDirection(const std::string &token, const std::string &target);
     void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
@@ -699,7 +708,7 @@ protected:
     Tie *tieToPreviousItem(hum::HTp token, int subindex, hum::HumNum meterunit, Measure *measure = NULL);
     Tie *addHangingTieToNextItem(hum::HTp token, int subindex, hum::HumNum meterunit, Measure *measure);
     bool inDifferentEndings(hum::HTp token1, hum::HTp token2);
-    bool checkIfSlurIsInvisible(hum::HTp token, int number);
+    bool checkIfSlurIsInvisible(hum::HTp stoken, int snumber, hum::HTp etoken, int enumber);
     void checkForTupletMergesAndSplits(std::vector<int> &tupletgroups, std::vector<hum::HTp> &duritems,
         std::vector<hum::HumNum> &durations, std::vector<bool> &durforce);
     bool hasLayoutParameter(hum::HTp token, const std::string &category, const std::string &param);
@@ -757,6 +766,20 @@ protected:
     bool checkForInvisibleBeam(Beam *beam, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, int layerindex);
     void insertBeamSpan(hum::HTp token);
     std::string getDataTokenId(hum::HTp token);
+    void checkForFingeredHarmonic(Chord *chord, hum::HTp token);
+    double getTempoScaling(hum::HumdrumFile &infile);
+    bool isTacet(hum::HTp spinestart);
+    void storeBeamSpansInStartingMeasure();
+    hum::HTp getNextNonNullDataOrMeasureToken(hum::HTp tok);
+    void setBeamSpanPlist(BeamSpan *beamspan, hum::HTp starttok, hum::HTp etok);
+    void checkMeterSigParameters(MeterSig *msig, hum::HTp timesigtok);
+    bool checkForJoin(Note *note, hum::HTp token);
+    bool checkForLayerJoin(int staffindex, int layerindex);
+    void storeTupletAndBeamInfoInTokens(std::vector<humaux::HumdrumBeamAndTuplet> &tgs);
+    std::vector<hum::HTp> getBeamNotes(hum::HTp token, int beamstart);
+    bool checkForBeamSameas(Beam *beam, std::vector<hum::HTp> &layerdata, int layerindex);
+    bool checkForBeamStemSameas(std::vector<hum::HTp> &layerdata, int layerindex);
+    void processInterpretationStuff(hum::HTp token, int staffindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -808,8 +831,8 @@ protected:
     template <class ELEMENT> void addVerovioTextElement(ELEMENT *element, const std::string &musictext);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
-    template <class ELEMENT> void setPlaceRelStaff(ELEMENT *element, const std::string &place, bool showplace);
-    template <class ELEMENT> void setPlaceRelEvent(ELEMENT *element, const std::string &place, bool showplace);
+    template <class ELEMENT> void setPlaceRelStaff(ELEMENT *element, const std::string &place, bool showplace = false);
+    template <class ELEMENT> void setPlaceRelEvent(ELEMENT *element, const std::string &place, bool showplace = false);
     template <class ELEMENT>
     void setMeterSymbol(ELEMENT *element, const std::string &metersig, int staffindex, hum::HTp partstart = NULL,
         hum::HTp metertok = NULL);
@@ -827,6 +850,8 @@ protected:
     template <class ELEMENT> void storeExpansionList(ELEMENT *parent, hum::HTp etok);
     template <class ELEMENT> void setWrittenAccidentalUpper(ELEMENT element, const string &value);
     template <class ELEMENT> void setWrittenAccidentalLower(ELEMENT element, const string &value);
+    template <class ELEMENT> void attachToToken(ELEMENT *element, hum::HTp token);
+    template <class ELEMENT> void setAttachmentType(ELEMENT *element, hum::HTp token);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -1099,8 +1124,15 @@ private:
     // be converted into @class in SVG conversion.
     int m_humtype = false;
 
-    // m_beamSpanStartDatabase == keep track of the starting measure for a beamSpan
-    std::map<hum::HTp, Measure *> m_beamSpanStartDatabase;
+    // m_beamSpanStartDatabase == keep track of the starting measure for
+    // a beamSpan starting in current measure.
+    std::vector<hum::HTp> m_beamSpanStartDatabase;
+
+    // m_tempoScaling == global adjustment of tempo markings
+    double m_tempoScaling = 1.0;
+
+    // m_join == boolean for merging layers together.
+    bool m_join = false;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

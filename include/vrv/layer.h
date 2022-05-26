@@ -78,20 +78,31 @@ public:
      * This is used when inserting a note by passing a y position because we need
      * to know the clef in order to get the pitch.
      */
+    ///@{
     Clef *GetClef(LayerElement *test);
+    const Clef *GetClef(const LayerElement *test) const;
+    ///@}
 
     /**
      * Get the current clef based on facsimile for the test element.
      * This goes back by facsimile position until a clef is found.
      * Returns NULL if a clef cannot be found via this method.
      */
+    ///@{
     Clef *GetClefFacs(LayerElement *test);
+    const Clef *GetClefFacs(const LayerElement *test) const;
+    ///@}
 
     /**
      * Return the clef offset for the position x.
      * The method uses Layer::GetClef first to find the clef before test.
      */
-    int GetClefLocOffset(LayerElement *test);
+    int GetClefLocOffset(const LayerElement *test) const;
+
+    /**
+     * Return the clef offset for the position if there are cross-staff clefs on the same layer
+     */
+    int GetCrossStaffClefLocOffset(const LayerElement *element, int locOffset) const;
 
     /**
      * @name Set and get the stem direction of the layer.
@@ -137,6 +148,7 @@ public:
         double time, double duration, Measure *measure, int staff, bool excludeCurrent);
 
     Clef *GetCurrentClef();
+    const Clef *GetCurrentClef() const;
     KeySig *GetCurrentKeySig();
     Mensur *GetCurrentMensur();
     MeterSig *GetCurrentMeterSig();
@@ -227,9 +239,9 @@ public:
     int AlignHorizontallyEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareProcessingLists
+     * See Object::InitProcessingLists
      */
-    int PrepareProcessingLists(FunctorParams *functorParams) override;
+    int InitProcessingLists(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareRpt
@@ -237,16 +249,16 @@ public:
     int PrepareRpt(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcOnsetOffset
+     * See Object::InitOnsetOffset
      */
     ///@{
-    int CalcOnsetOffset(FunctorParams *functorParams) override;
+    int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int ResetDrawing(FunctorParams *functorParams) override;
+    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::GenerateMIDI

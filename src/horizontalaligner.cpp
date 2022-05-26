@@ -603,9 +603,9 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std:
     getAlignmentLeftRightParams.m_excludeClasses = m_excludes;
 
     if (staffN != VRV_UNSET) {
-        ArrayOfComparisons filters;
+        Filters filters;
         AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-        filters.push_back(&matchStaff);
+        filters.Add(&matchStaff);
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
     }
     else {
@@ -629,7 +629,7 @@ bool Alignment::HasGraceAligner(int id) const
     return (m_graceAligners.count(id) == 1);
 }
 
-bool Alignment::PerfomBoundingBoxAlignment() const
+bool Alignment::PerformBoundingBoxAlignment() const
 {
     return this->IsOfType({ ALIGNMENT_ACCID, ALIGNMENT_DOT, ALIGNMENT_DEFAULT });
 }
@@ -793,6 +793,20 @@ bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfObjects *objects)
     return false;
 }
 
+bool AlignmentReference::HasCrossStaffElements() const
+{
+    ListOfConstObjects children;
+    ClassIdsComparison classId({ NOTE, CHORD });
+    this->FindAllDescendantsByComparison(&children, &classId);
+
+    for (const auto child : children) {
+        const LayerElement *layerElement = vrv_cast<const LayerElement *>(child);
+        if (layerElement->m_crossStaff) return true;
+    }
+
+    return false;
+}
+
 void AlignmentReference::SetAccidLayerAlignment()
 {
     const ArrayOfObjects &children = this->GetChildren();
@@ -883,9 +897,9 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
+int MeasureAligner::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     // We start a new MeasureAligner
@@ -1030,7 +1044,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         assert(measureAligner);
 
         std::vector<int>::iterator iter;
-        ArrayOfComparisons filters;
+        Filters filters;
         for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
             const int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
 
@@ -1069,10 +1083,10 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             params->m_graceMaxPos = graceMaxPos;
             params->m_graceUpcomingMaxPos = -VRV_UNSET;
             params->m_graceCumulatedXShift = VRV_UNSET;
-            filters.clear();
+            filters.Clear();
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
-            filters.push_back(&matchStaff);
+            filters.Add(&matchStaff);
 
             if (this->HasGraceAligner(graceAlignerId)) {
                 this->GetGraceAligner(graceAlignerId)
@@ -1260,9 +1274,9 @@ int Alignment::HorizontalSpaceForDuration(
     return intervalXRel;
 }
 
-int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
+int Alignment::CalcAlignmentXPos(FunctorParams *functorParams)
 {
-    SetAlignmentXPosParams *params = vrv_params_cast<SetAlignmentXPosParams *>(functorParams);
+    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
     assert(params);
 
     // Do not set an x pos for anything before the barline (including it)
@@ -1285,7 +1299,7 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
             params->m_doc->GetOptions()->m_spacingLinear.GetValue(),
             params->m_doc->GetOptions()->m_spacingNonLinear.GetValue());
-        // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
+        // LogDebug("CalcAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
 
     MapOfIntGraceAligners::const_iterator iter;

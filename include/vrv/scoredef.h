@@ -158,19 +158,31 @@ public:
     void ReplaceDrawingLabels(StaffGrp *newStaffGrp);
 
     /**
+     * Replace the staffDef score attributes with the ones currently set as drawing values.
+     * Used when initializing a selection and adding a temporary score for it.
+     */
+    void ResetFromDrawingValues();
+
+    /**
      * Get the staffDef with number n (NULL if not found).
      */
+    ///@{
     StaffDef *GetStaffDef(int n);
+    const StaffDef *GetStaffDef(int n) const;
+    ///@}
 
     /**
      * Get the staffGrp with number n (NULL if not found).
      */
+    ///@{
     StaffGrp *GetStaffGrp(const std::string &n);
+    const StaffGrp *GetStaffGrp(const std::string &n) const;
+    ///@}
 
     /**
      * Return all the @n values of the staffDef in a scoreDef
      */
-    std::vector<int> GetStaffNs();
+    std::vector<int> GetStaffNs() const;
 
     /**
      * Set the redraw flag to all staffDefs.
@@ -219,6 +231,11 @@ public:
 
     bool IsSectionRestart() const;
 
+    /**
+     * @return True if a system start line will be drawn
+     */
+    bool HasSystemStartLine();
+
     //----------//
     // Functors //
     //----------//
@@ -249,6 +266,11 @@ public:
     int CastOffEncoding(FunctorParams *functorParams) override;
 
     /**
+     * See Object::CastOffToSelection
+     */
+    int CastOffToSelection(FunctorParams *) override;
+
+    /**
      * See Object::AlignMeasures
      */
     int AlignMeasures(FunctorParams *functorParams) override;
@@ -263,11 +285,19 @@ public:
      */
     int PrepareDuration(FunctorParams *functorParams) override;
 
+    /**
+     * See Object::Transpose
+     */
+    ///@{
+    int Transpose(FunctorParams *functorParams) override;
+    int TransposeEnd(FunctorParams *functorParams) override;
+    ///@}
+
 protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    void FilterList(ArrayOfObjects *childList) override;
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     //

@@ -101,9 +101,9 @@ int SystemMilestoneEnd::PrepareMilestones(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemMilestoneEnd::ResetDrawing(FunctorParams *functorParams)
+int SystemMilestoneEnd::ResetData(FunctorParams *functorParams)
 {
-    FloatingObject::ResetDrawing(functorParams);
+    FloatingObject::ResetData(functorParams);
 
     this->SetMeasure(NULL);
 
@@ -132,6 +132,16 @@ int SystemMilestoneEnd::CastOffSystems(FunctorParams *functorParams)
     else {
         params->m_pendingElements.push_back(endMilestone);
     }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int SystemMilestoneEnd::CastOffToSelection(FunctorParams *functorParams)
+{
+    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
+    assert(params);
+
+    MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -174,7 +184,7 @@ int SystemMilestoneInterface::InterfacePrepareMilestones(FunctorParams *functorP
     return FUNCTOR_CONTINUE;
 }
 
-int SystemMilestoneInterface::InterfaceResetDrawing(FunctorParams *functorParams)
+int SystemMilestoneInterface::InterfaceResetData(FunctorParams *functorParams)
 {
     m_drawingMeasure = NULL;
 

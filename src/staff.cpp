@@ -198,7 +198,7 @@ bool Staff::DrawingIsVisible()
     return (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN);
 }
 
-bool Staff::IsMensural()
+bool Staff::IsMensural() const
 {
     bool isMensural
         = (m_drawingNotationType == NOTATIONTYPE_mensural || m_drawingNotationType == NOTATIONTYPE_mensural_white
@@ -206,13 +206,13 @@ bool Staff::IsMensural()
     return isMensural;
 }
 
-bool Staff::IsNeume()
+bool Staff::IsNeume() const
 {
     bool isNeume = (m_drawingNotationType == NOTATIONTYPE_neume);
     return isNeume;
 }
 
-bool Staff::IsTablature()
+bool Staff::IsTablature() const
 {
     bool isTablature = (m_drawingNotationType == NOTATIONTYPE_tab || m_drawingNotationType == NOTATIONTYPE_tab_guitar
         || m_drawingNotationType == NOTATIONTYPE_tab_lute_italian
@@ -221,7 +221,7 @@ bool Staff::IsTablature()
     return isTablature;
 }
 
-bool Staff::IsTabWithStemsOutside()
+bool Staff::IsTabWithStemsOutside() const
 {
     if (!m_drawingStaffDef) return false;
     // Temporary implementation looking at staffDef@type
@@ -381,7 +381,7 @@ int Staff::GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place)
 
 void Staff::SetAlignmentBeamAdjustment(int adjust)
 {
-    m_staffAlignment->SetBeamAdjust(adjust);
+    if (m_staffAlignment) m_staffAlignment->SetBeamAdjust(adjust);
 }
 
 //----------------------------------------------------------------------------
@@ -490,10 +490,10 @@ int Staff::ScoreDefOptimize(FunctorParams *functorParams)
     matchTypeLayer.ReverseComparison();
     this->FindAllDescendantsByComparison(&layers, &matchTypeLayer);
 
-    ListOfObjects mRests = this->FindAllDescendantsByType(MREST);
+    Object *note = this->FindDescendantByType(NOTE);
 
-    // Show the staff only if no layer with content or only mRests
-    if (layers.empty() || (mRests.size() != layers.size())) {
+    // Show the staff only if there are any notes
+    if (note) {
         staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
     }
 
@@ -600,9 +600,10 @@ int Staff::CalcLedgerLinesEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
+int Staff::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
-    FillStaffCurrentTimeSpanningParams *params = vrv_params_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    PrepareStaffCurrentTimeSpanningParams *params
+        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
     std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
@@ -628,7 +629,7 @@ int Staff::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Staff::ResetDrawing(FunctorParams *functorParams)
+int Staff::ResetData(FunctorParams *functorParams)
 {
     m_timeSpanningElements.clear();
     ClearLedgerLines();
@@ -648,7 +649,10 @@ int Staff::PrepareRpt(FunctorParams *functorParams)
 
     // This is happening only for the first staff element of the staff @n
     if (StaffDef *staffDef = params->m_doc->GetCurrentScoreDef()->GetStaffDef(this->GetN())) {
-        if ((staffDef->HasMultiNumber()) && (staffDef->GetMultiNumber() == BOOLEAN_false)) {
+        const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)
+            || ((staffDef->GetMultiNumber() != BOOLEAN_true)
+                && (params->m_doc->GetCurrentScoreDef()->GetMultiNumber() == BOOLEAN_false));
+        if (hideNumber) {
             // Set it just in case, but stopping the functor should do it for this staff @n
             params->m_multiNumber = BOOLEAN_false;
             return FUNCTOR_STOP;
@@ -658,9 +662,9 @@ int Staff::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::CalcOnsetOffset(FunctorParams *functorParams)
+int Staff::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     assert(m_drawingStaffDef);
@@ -739,6 +743,22 @@ int Staff::GenerateMIDI(FunctorParams *functorParams)
     assert(params);
 
     params->m_expandedNotes.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Staff::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    if (params->m_transposeToSoundingPitch) {
+        int transposeInterval = 0;
+        if (this->HasN() && (params->m_transposeIntervalForStaffN.count(this->GetN()) > 0)) {
+            transposeInterval = params->m_transposeIntervalForStaffN.at(this->GetN());
+        }
+        params->m_transposer->SetTransposition(transposeInterval);
+    }
 
     return FUNCTOR_CONTINUE;
 }

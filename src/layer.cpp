@@ -177,7 +177,7 @@ bool Layer::IsSupportedChild(Object *child)
 LayerElement *Layer::GetPrevious(LayerElement *element)
 {
     this->ResetList(this);
-    if (!element || this->GetList(this)->empty()) return NULL;
+    if (!element || this->HasEmptyList(this)) return NULL;
 
     return dynamic_cast<LayerElement *>(this->GetListPrevious(element));
 }
@@ -205,7 +205,12 @@ LayerElement *Layer::GetAtPos(int x)
 
 Clef *Layer::GetClef(LayerElement *test)
 {
-    Object *testObject = test;
+    return const_cast<Clef *>(std::as_const(*this).GetClef(test));
+}
+
+const Clef *Layer::GetClef(const LayerElement *test) const
+{
+    const Object *testObject = test;
 
     if (!test) {
         return this->GetCurrentClef();
@@ -218,11 +223,11 @@ Clef *Layer::GetClef(LayerElement *test)
     }
 
     if (testObject && testObject->Is(CLEF)) {
-        Clef *clef = vrv_cast<Clef *>(testObject);
+        const Clef *clef = vrv_cast<const Clef *>(testObject);
         assert(clef);
         return clef;
     }
-    Clef *facsClef = this->GetClefFacs(test);
+    const Clef *facsClef = this->GetClefFacs(test);
     if (facsClef != NULL) {
         return facsClef;
     }
@@ -231,24 +236,44 @@ Clef *Layer::GetClef(LayerElement *test)
 
 Clef *Layer::GetClefFacs(LayerElement *test)
 {
-    Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
+    return const_cast<Clef *>(std::as_const(*this).GetClefFacs(test));
+}
+
+const Clef *Layer::GetClefFacs(const LayerElement *test) const
+{
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
     if (doc->GetType() == Facs) {
-        ListOfObjects clefs;
+        ListOfConstObjects clefs;
         ClassIdComparison ac(CLEF);
         doc->FindAllDescendantsBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
         if (clefs.size() > 0) {
-            return dynamic_cast<Clef *>(*clefs.rbegin());
+            return dynamic_cast<const Clef *>(*clefs.rbegin());
         }
     }
     return NULL;
 }
 
-int Layer::GetClefLocOffset(LayerElement *test)
+int Layer::GetClefLocOffset(const LayerElement *test) const
 {
-    Clef *clef = this->GetClef(test);
+    const Clef *clef = this->GetClef(test);
     if (!clef) return 0;
     return clef->GetClefLocOffset();
+}
+
+int Layer::GetCrossStaffClefLocOffset(const LayerElement *element, int currentOffset) const
+{
+    if (element->m_crossStaff) {
+        ResetList(this);
+        if (!element->Is(CLEF)) {
+            const Clef *clef = vrv_cast<const Clef *>(GetListFirstBackward(element, CLEF));
+            if (clef && clef->m_crossStaff) {
+                return clef->GetClefLocOffset();
+            }
+        }
+    }
+
+    return currentOffset;
 }
 
 data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
@@ -336,9 +361,9 @@ std::set<int> Layer::GetLayersNInTimeSpan(double time, double duration, Measure 
     layerCountInTimeSpanParams.m_time = time;
     layerCountInTimeSpanParams.m_duration = duration;
 
-    ArrayOfComparisons filters;
+    Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
-    filters.push_back(&matchStaff);
+    filters.Add(&matchStaff);
 
     measure->m_measureAligner.Process(&layerCountInTimeSpan, &layerCountInTimeSpanParams, NULL, &filters);
 
@@ -369,10 +394,9 @@ ListOfObjects Layer::GetLayerElementsForTimeSpanOf(LayerElement *element, bool e
     // the duration of the beam based on those
     else if (element->Is(BEAM)) {
         Beam *beam = vrv_cast<Beam *>(element);
-        const ArrayOfObjects *beamChildren = beam->GetList(beam);
 
-        LayerElement *first = vrv_cast<LayerElement *>(beamChildren->front());
-        LayerElement *last = vrv_cast<LayerElement *>(beamChildren->back());
+        LayerElement *first = vrv_cast<LayerElement *>(beam->GetListFront(beam));
+        LayerElement *last = vrv_cast<LayerElement *>(beam->GetListBack(beam));
 
         if (!first || !last) return {};
 
@@ -401,9 +425,9 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(
     layerElementsInTimeSpanParams.m_duration = duration;
     layerElementsInTimeSpanParams.m_allLayersButCurrent = excludeCurrent;
 
-    ArrayOfComparisons filters;
+    Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
-    filters.push_back(&matchStaff);
+    filters.Add(&matchStaff);
 
     measure->m_measureAligner.Process(&layerElementsInTimeSpan, &layerElementsInTimeSpanParams, NULL, &filters);
 
@@ -412,7 +436,12 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(
 
 Clef *Layer::GetCurrentClef()
 {
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    return const_cast<Clef *>(std::as_const(*this).GetCurrentClef());
+}
+
+const Clef *Layer::GetCurrentClef() const
+{
+    const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff && staff->m_drawingStaffDef && staff->m_drawingStaffDef->GetCurrentClef());
     return staff->m_drawingStaffDef->GetCurrentClef();
 }
@@ -684,9 +713,9 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::PrepareProcessingLists(FunctorParams *functorParams)
+int Layer::InitProcessingLists(FunctorParams *functorParams)
 {
-    PrepareProcessingListsParams *params = vrv_params_cast<PrepareProcessingListsParams *>(functorParams);
+    InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);
     assert(params);
 
     // Alternate solution with StaffN_LayerN_VerseN_t
@@ -711,9 +740,9 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::CalcOnsetOffset(FunctorParams *functorParams)
+int Layer::InitOnsetOffset(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = vrv_params_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     params->m_currentScoreTime = 0.0;
@@ -725,7 +754,7 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::ResetDrawing(FunctorParams *functorParams)
+int Layer::ResetData(FunctorParams *functorParams)
 {
     m_crossStaffFromBelow = false;
     m_crossStaffFromAbove = false;
@@ -737,9 +766,7 @@ int Layer::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    const bool midiNoCue = params->m_doc->GetOptions()->m_midiNoCue.GetValue();
-
-    if (this->GetCue() == BOOLEAN_true && midiNoCue) return FUNCTOR_SIBLINGS;
+    if (this->GetCue() == BOOLEAN_true && params->m_cueExclusion) return FUNCTOR_SIBLINGS;
 
     return FUNCTOR_CONTINUE;
 }

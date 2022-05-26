@@ -40,7 +40,7 @@ void PlistInterface::Reset()
     this->ResetPlist();
 }
 
-void PlistInterface::AddRef(std::string ref)
+void PlistInterface::AddRef(const std::string &ref)
 {
     xsdAnyURI_List references = this->GetPlist();
     if (std::find(references.begin(), references.end(), ref) == references.end()) {
@@ -56,7 +56,7 @@ void PlistInterface::AddRefAllowDuplicate(const std::string &ref)
     this->SetPlist(references);
 }
 
-void PlistInterface::SetRef(Object *ref)
+void PlistInterface::SetRef(const Object *ref)
 {
     if (!IsValidRef(ref)) {
         return;
@@ -65,6 +65,14 @@ void PlistInterface::SetRef(Object *ref)
     if (std::find(m_references.begin(), m_references.end(), ref) == m_references.end()) {
         m_references.push_back(ref);
     }
+}
+
+ArrayOfObjects PlistInterface::GetRefs()
+{
+    ArrayOfObjects result;
+    std::transform(m_references.begin(), m_references.end(), std::back_inserter(result),
+        [](const Object *obj) { return const_cast<Object *>(obj); });
+    return result;
 }
 
 void PlistInterface::SetUuidStrs()
@@ -108,7 +116,7 @@ int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *
     return FUNCTOR_CONTINUE;
 }
 
-int PlistInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+int PlistInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_uuids.clear();
     m_references.clear();

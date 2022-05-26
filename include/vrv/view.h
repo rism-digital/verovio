@@ -43,6 +43,7 @@ class Fermata;
 class Gliss;
 class Hairpin;
 class Harm;
+class KeyAccid;
 class Layer;
 class LayerElement;
 class Lb;
@@ -215,8 +216,8 @@ protected:
     void DrawBracketSq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure);
-    void DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, const data_BARRENDITION form,
-        bool eraseIntersections = false);
+    void DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, bool eraseIntersections = false,
+        bool singleStaff = true);
     void DrawBarLineDots(DeviceContext *dc, Staff *staff, BarLine *barLine);
     void DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerLines &lines, bool below, bool cueSize);
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
@@ -341,12 +342,12 @@ protected:
      */
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
-    void DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y, double sizeFactor);
+    void DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y);
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff, bool dimin = false);
+    void DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x);
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */
-    int DrawMeterSigFigures(
-        DeviceContext *dc, int x, int y, const std::vector<int> &numSummands, int den, Staff *staff);
+    int DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSig, int den, Staff *staff);
     void DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smulfCode, int num, bool line, Staff *staff);
     ///@}
 
@@ -419,6 +420,8 @@ protected:
     void DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system);
     void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
+    void DrawDynamSymbolOnly(DeviceContext *dc, Staff *staff, Dynam *dynam, const std::wstring &dynamSymbol,
+        data_HORIZONTALALIGNMENT alignment, TextDrawingParams &params);
     void DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, System *system);
     void DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *system);
     void DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system);
@@ -562,6 +565,7 @@ protected:
         int horizontalThickness, int verticalThickness);
     void DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, int width, int offset, int bracketWidth,
         int horizontalThickness, int verticalThickness);
+    void DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int barlineWidth, int interval);
     ///@}
 
     /**
@@ -589,9 +593,8 @@ private:
      * @name Internal methods used for calculating slurs
      */
     ///@{
-    void DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType);
-    void CalcInitialSlur(
-        FloatingCurvePositioner *curve, Slur *slur, Staff *staff, curvature_CURVEDIR curveDir, Point points[4]);
+    FloatingCurvePositioner *CalcInitialSlur(
+        DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType);
     ///@}
 
     /**
@@ -615,6 +618,11 @@ private:
      * Internal methods for drawing time spanning elements
      */
     bool HasValidTimeSpanningOrder(DeviceContext *dc, Object *element, LayerElement *start, LayerElement *end) const;
+
+    /**
+     * Internal method to find stem direction for notes of mensural notation
+     */
+    data_STEMDIRECTION GetMensuralStemDirection(Layer *layer, Note *note, int verticalCenter);
 
 public:
     /** Document */

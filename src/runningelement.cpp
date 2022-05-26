@@ -91,42 +91,24 @@ bool RunningElement::IsSupportedChild(Object *child)
     return true;
 }
 
-void RunningElement::FilterList(ArrayOfObjects *childList)
+void RunningElement::FilterList(ListOfConstObjects &childList) const
 {
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         // remove nested rend elements
         if ((*iter)->Is(REND)) {
             if ((*iter)->GetFirstAncestor(REND)) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
                 continue;
             }
         }
         // Also remove anything that is not a fig
         else if (!(*iter)->Is(FIG)) {
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         ++iter;
-    }
-
-    int i;
-    for (i = 0; i < 9; ++i) {
-        m_cells[i].clear();
-    }
-    for (i = 0; i < 3; ++i) {
-        m_drawingScalingPercent[i] = 100;
-    }
-
-    for (iter = childList->begin(); iter != childList->end(); ++iter) {
-        int pos = 0;
-        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
-        assert(interface);
-        pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
-        TextElement *text = vrv_cast<TextElement *>(*iter);
-        assert(text);
-        m_cells[pos].push_back(text);
     }
 }
 
@@ -352,14 +334,15 @@ void RunningElement::SetCurrentPageNum(Page *currentPage)
     currentText->SetText(UTF8to16(StringFormat("%d", currentNum)));
 }
 
-void RunningElement::LoadFooter()
+void RunningElement::LoadFooter(const Doc *doc)
 {
     Fig *fig = new Fig();
     Svg *svg = new Svg();
 
-    std::string footer = Resources::GetPath() + "/footer.svg";
+    const Resources &resources = doc->GetResources();
+    const std::string footerPath = resources.GetPath() + "/footer.svg";
     pugi::xml_document footerDoc;
-    footerDoc.load_file(footer.c_str());
+    footerDoc.load_file(footerPath.c_str());
     svg->Set(footerDoc.first_child());
     fig->AddChild(svg);
     fig->SetHalign(HORIZONTALALIGNMENT_center);
@@ -394,6 +377,30 @@ void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALAL
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int RunningElement::PrepareDataInitialization(FunctorParams *)
+{
+    int i;
+    for (i = 0; i < 9; ++i) {
+        m_cells[i].clear();
+    }
+    for (i = 0; i < 3; ++i) {
+        m_drawingScalingPercent[i] = 100;
+    }
+
+    const ListOfObjects &childList = this->GetList(this);
+    for (ListOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
+        int pos = 0;
+        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
+        assert(interface);
+        pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
+        TextElement *text = vrv_cast<TextElement *>(*iter);
+        assert(text);
+        m_cells[pos].push_back(text);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int RunningElement::Save(FunctorParams *functorParams)
 {

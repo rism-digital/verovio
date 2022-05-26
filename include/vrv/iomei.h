@@ -807,6 +807,11 @@ private:
     bool IsEditorialElementName(std::string elementName);
 
     /**
+     * Normalize attributes of xmlElement, removing white spaces if necessary
+     */
+    void NormalizeAttributes(pugi::xml_node &xmlElement);
+
+    /**
      * Read score-based MEI.
      * The data is read into an object, which is then converted to page-based MEI.
      * See MEIInput::ReadDoc, Doc::CreateScoreBuffer and Doc::ConvertToPageBasedDoc

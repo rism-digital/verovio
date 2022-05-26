@@ -68,13 +68,16 @@ public:
     /**
      * Return the start measure of the TimePointInterface
      */
+    ///@{
     Measure *GetStartMeasure();
+    const Measure *GetStartMeasure() const;
+    ///@}
 
     /**
      * Return true if the TimePointInterface occurs on the staff @n
      * Looks that the parent staff if the using @stardid or at the @staff values.
      */
-    bool IsOnStaff(int n);
+    bool IsOnStaff(int n) const;
 
     /**
      * Return a vector of staves looking at the @staff attribute or at the parent staff or the @startid
@@ -85,7 +88,7 @@ public:
      * Return true if the interface owner is encoded in the measure of its start element
      * Display a warning if not
      */
-    bool VerifyMeasure(const Object *owner);
+    bool VerifyMeasure(const Object *owner) const;
 
     //-----------------//
     // Pseudo functors //
@@ -95,7 +98,7 @@ public:
      * We have functor in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor method. These not called by the Process/Call loop but by the implementaion
-     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
+     * classes explicitely. See FloatingObject::PrepareStaffCurrentTimeSpanning for an example.
      */
 
     /**
@@ -109,9 +112,9 @@ public:
     virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
+    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
 
 protected:
     /**
@@ -174,12 +177,15 @@ public:
     /**
      * Return the end measure of the TimePointInterface
      */
+    ///@{
     Measure *GetEndMeasure();
+    const Measure *GetEndMeasure() const;
+    ///@}
 
     /**
      * Return true if the element is spanning over two or more measures
      */
-    bool IsSpanningMeasures();
+    bool IsSpanningMeasures() const;
 
     /**
      *
@@ -191,8 +197,8 @@ public:
      * @Return true if end temporally occurs after start
      */
     ///@{
-    bool IsOrdered();
-    bool IsOrdered(LayerElement *start, LayerElement *end);
+    bool IsOrdered() const;
+    bool IsOrdered(const LayerElement *start, const LayerElement *end) const;
     ///@}
 
     /**
@@ -211,13 +217,13 @@ public:
      * We have functors in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor methods. These are not called by the Process/Call loop but by the implementation
-     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
+     * classes explicitely. See FloatingObject::PrepareStaffCurrentTimeSpanning for an example.
      */
 
     /**
-     * See Object::FillStaffCurrentTimeSpanning
+     * See Object::PrepareStaffCurrentTimeSpanning
      */
-    virtual int InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
+    virtual int InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::PrepareTimeSpanning
@@ -230,9 +236,9 @@ public:
     int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object) override;
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetData
      */
-    int InterfaceResetDrawing(FunctorParams *functorParams, Object *object) override;
+    int InterfaceResetData(FunctorParams *functorParams, Object *object) override;
 
 private:
     //
