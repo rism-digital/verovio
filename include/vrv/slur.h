@@ -190,7 +190,10 @@ public:
      * Slur adjustment
      */
     ///@{
-    void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
+    void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, int unit);
+
+    void AdjustOuterSlur(
+        Doc *doc, FloatingCurvePositioner *curve, const ArrayOfFloatingCurvePositioners &innerCurves, int unit);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
     ///@}

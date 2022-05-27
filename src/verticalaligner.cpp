@@ -1002,6 +1002,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
 
     Staff *staff = this->GetStaff();
     if (!staff) return FUNCTOR_CONTINUE;
+    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     // Adjust each slur such that spanned elements are avoided
     ArrayOfFloatingCurvePositioners positioners;
@@ -1019,7 +1020,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
         if (!curve->HasContentBB()) continue;
         positioners.push_back(curve);
 
-        slur->AdjustSlur(params->m_doc, curve, staff);
+        slur->AdjustSlur(params->m_doc, curve, unit);
 
         if (curve->IsCrossStaff()) {
             params->m_crossStaffSlurs = true;
@@ -1028,7 +1029,6 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
 
     // Detection of inner slurs
     std::map<FloatingCurvePositioner *, ArrayOfFloatingCurvePositioners> innerCurveMap;
-    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     for (size_t i = 0; i < positioners.size(); ++i) {
         Slur *firstSlur = vrv_cast<Slur *>(positioners[i]->GetObject());
         ArrayOfFloatingCurvePositioners innerCurves;
@@ -1056,6 +1056,13 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
         if (!innerCurves.empty()) {
             innerCurveMap[positioners[i]] = innerCurves;
         }
+    }
+
+    // Adjust outer slurs w.r.t. inner slurs
+    for (const auto &mapEntry : innerCurveMap) {
+        Slur *slur = vrv_cast<Slur *>(mapEntry.first->GetObject());
+        assert(slur);
+        slur->AdjustOuterSlur(params->m_doc, mapEntry.first, mapEntry.second, unit);
     }
 
     return FUNCTOR_SIBLINGS;

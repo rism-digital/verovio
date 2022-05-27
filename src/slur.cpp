@@ -505,11 +505,10 @@ void Slur::InitBezierControlSides(BezierCurve &bezier, curvature_CURVEDIR curveD
     }
 }
 
-void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
+void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, int unit)
 {
     assert(doc);
     assert(curve);
-    assert(staff);
 
     Point points[4];
     curve->GetPoints(points);
@@ -517,7 +516,6 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     this->InitBezierControlSides(bezier, curve->GetDir());
     bezier.UpdateControlPointParams();
 
-    const int unit = doc->GetDrawingUnit(100);
     const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
     const double flexibility = doc->GetOptions()->m_slurEndpointFlexibility.GetValue();
     const double symmetry = doc->GetOptions()->m_slurSymmetry.GetValue();
@@ -1144,6 +1142,42 @@ float Slur::GetMinControlPointAngle(const BezierCurve &bezierCurve, float angle,
     }
 
     return 30.0 + angleIncrement * factor;
+}
+
+void Slur::AdjustOuterSlur(
+    Doc *doc, FloatingCurvePositioner *curve, const ArrayOfFloatingCurvePositioners &innerCurves, int unit)
+{
+    assert(doc);
+    assert(curve);
+
+    Point points[4];
+    curve->GetPoints(points);
+    BezierCurve bezier(points[0], points[1], points[2], points[3]);
+    this->InitBezierControlSides(bezier, curve->GetDir());
+    bezier.UpdateControlPointParams();
+
+    const int margin = doc->GetOptions()->m_slurMargin.GetValue() * unit;
+    const double flexibility = doc->GetOptions()->m_slurEndpointFlexibility.GetValue();
+    const double symmetry = doc->GetOptions()->m_slurSymmetry.GetValue();
+
+    // STEP 1: Calculate the vertical adjustment of endpoints. This shifts the slur vertically.
+    // Only collisions near the endpoints are taken into account.
+
+    // STEP 2: Calculate the vertical shift of the control points.
+    // For each inner slur we formulate some constraints ax + by >= c
+    // where x, y denote the vertical adjustments of the control points and c is the size of the collision.
+    // The coefficients a, b are calculated from the Bezier curve equation.
+    // After collecting all constraints we calculate a solution.
+
+    // STEP 3: Adjust the slur shape
+    // We correct the shape if the slur is too flat or not convex.
+    if (curve->GetDir() != curvature_CURVEDIR_mixed) {
+        this->AdjustSlurShape(bezier, curve->GetDir(), unit);
+        curve->UpdatePoints(bezier);
+    }
+
+    // Since we are going to redraw it, reset its bounding box
+    curve->BoundingBox::ResetBoundingBox();
 }
 
 float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir)
