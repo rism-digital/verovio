@@ -545,20 +545,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, int unit)
     int endPointShiftLeft = 0;
     int endPointShiftRight = 0;
     std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, flexibility, margin);
-    if ((endPointShiftLeft != 0) || (endPointShiftRight != 0)) {
-        const int signLeft = bezier.IsLeftControlAbove() ? 1 : -1;
-        const int signRight = bezier.IsRightControlAbove() ? 1 : -1;
-        bezier.p1.y += signLeft * endPointShiftLeft;
-        bezier.p2.y += signRight * endPointShiftRight;
-        if (bezier.p1.x != bezier.p2.x) {
-            double lambda1, lambda2;
-            std::tie(lambda1, lambda2) = bezier.EstimateCurveParamForControlPoints();
-            bezier.c1.y += signLeft * (1.0 - lambda1) * endPointShiftLeft + signRight * lambda1 * endPointShiftRight;
-            bezier.c2.y += signLeft * (1.0 - lambda2) * endPointShiftLeft + signRight * lambda2 * endPointShiftRight;
-        }
-        bezier.UpdateControlPointParams();
-        curve->UpdatePoints(bezier);
-    }
+    this->ApplyEndPointShift(curve, bezier, endPointShiftLeft, endPointShiftRight);
 
     // Special handling if bulge is prescribed from here on
     if (this->HasBulge()) {
@@ -728,6 +715,27 @@ std::pair<int, int> Slur::CalcEndPointShift(
     }
 
     return { shiftLeft, shiftRight };
+}
+
+void Slur::ApplyEndPointShift(
+    FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int endPointShiftLeft, int endPointShiftRight)
+{
+    if ((endPointShiftLeft != 0) || (endPointShiftRight != 0)) {
+        const int signLeft = bezierCurve.IsLeftControlAbove() ? 1 : -1;
+        const int signRight = bezierCurve.IsRightControlAbove() ? 1 : -1;
+        bezierCurve.p1.y += signLeft * endPointShiftLeft;
+        bezierCurve.p2.y += signRight * endPointShiftRight;
+        if (bezierCurve.p1.x != bezierCurve.p2.x) {
+            double lambda1, lambda2;
+            std::tie(lambda1, lambda2) = bezierCurve.EstimateCurveParamForControlPoints();
+            bezierCurve.c1.y
+                += signLeft * (1.0 - lambda1) * endPointShiftLeft + signRight * lambda1 * endPointShiftRight;
+            bezierCurve.c2.y
+                += signLeft * (1.0 - lambda2) * endPointShiftLeft + signRight * lambda2 * endPointShiftRight;
+        }
+        bezierCurve.UpdateControlPointParams();
+        curve->UpdatePoints(bezierCurve);
+    }
 }
 
 void Slur::ShiftEndPoints(
@@ -1162,6 +1170,11 @@ void Slur::AdjustOuterSlur(
 
     // STEP 1: Calculate the vertical adjustment of endpoints. This shifts the slur vertically.
     // Only collisions near the endpoints are taken into account.
+    int endPointShiftLeft = 0;
+    int endPointShiftRight = 0;
+    std::tie(endPointShiftLeft, endPointShiftRight)
+        = this->CalcEndPointShift(curve, bezier, innerCurves, flexibility, margin);
+    this->ApplyEndPointShift(curve, bezier, endPointShiftLeft, endPointShiftRight);
 
     // STEP 2: Calculate the vertical shift of the control points.
     // For each inner slur we formulate some constraints ax + by >= c
@@ -1178,6 +1191,19 @@ void Slur::AdjustOuterSlur(
 
     // Since we are going to redraw it, reset its bounding box
     curve->BoundingBox::ResetBoundingBox();
+}
+
+std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
+    const ArrayOfFloatingCurvePositioners &innerCurves, double flexibility, int margin)
+{
+    if (bezierCurve.p1.x >= bezierCurve.p2.x) return { 0, 0 };
+
+    int shiftLeft = 0;
+    int shiftRight = 0;
+
+    const int dist = bezierCurve.p2.x - bezierCurve.p1.x;
+
+    return { shiftLeft, shiftRight };
 }
 
 float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir)

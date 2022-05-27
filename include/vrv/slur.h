@@ -272,6 +272,10 @@ private:
     std::pair<int, int> CalcEndPointShift(
         FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double flexibility, int margin);
 
+    // Apply the vertical shift of the slur end points
+    void ApplyEndPointShift(
+        FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int endPointShiftLeft, int endPointShiftRight);
+
     // Calculate slur from bulge values
     void AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit);
 
@@ -292,6 +296,15 @@ private:
 
     // Improve the slur shape by adjusting the control point heights
     void AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int unit);
+    ///@}
+
+    /**
+     * Adjust slur position based on inner slurs
+     */
+    ///@{
+    // Calculate the vertical shift of the slur end points
+    std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
+        const ArrayOfFloatingCurvePositioners &innerCurves, double flexibility, int margin);
     ///@}
 
     /**
