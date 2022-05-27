@@ -1202,6 +1202,52 @@ std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, cons
     int shiftRight = 0;
 
     const int dist = bezierCurve.p2.x - bezierCurve.p1.x;
+    const bool isBelow = (curve->GetDir() == curvature_CURVEDIR_above);
+    const int sign = isBelow ? 1 : -1;
+    Point points[4];
+    points[0] = bezierCurve.p1;
+    points[1] = bezierCurve.c1;
+    points[2] = bezierCurve.c2;
+    points[3] = bezierCurve.p2;
+
+    for (FloatingCurvePositioner *innerCurve : innerCurves) {
+        Point innerPoints[4];
+        innerCurve->GetPoints(innerPoints);
+
+        // Adjustment for start point of inner slur
+        const int xInnerStart = innerPoints[0].x;
+        if ((bezierCurve.p1.x <= xInnerStart) && (xInnerStart <= bezierCurve.p2.x)) {
+            const int yStart = CalcBezierAtPosition(points, xInnerStart);
+            const int intersectionStart = (innerPoints[0].y - yStart) * sign + 1.5 * margin;
+            if (intersectionStart > 0) {
+                const float distanceRatioStart = float(xInnerStart - bezierCurve.p1.x) / float(dist);
+                this->ShiftEndPoints(
+                    shiftLeft, shiftRight, distanceRatioStart, intersectionStart, flexibility, isBelow);
+            }
+        }
+
+        // Adjustment for midpoint of inner slur
+        const Point innerMidPoint = BoundingBox::CalcPointAtBezier(innerPoints, 0.5);
+        if ((bezierCurve.p1.x <= innerMidPoint.x) && (innerMidPoint.x <= bezierCurve.p2.x)) {
+            const int yMid = CalcBezierAtPosition(points, innerMidPoint.x);
+            const int intersectionMid = (innerMidPoint.y - yMid) * sign + 1.5 * margin;
+            if (intersectionMid > 0) {
+                const float distanceRatioMid = float(innerMidPoint.x - bezierCurve.p1.x) / float(dist);
+                this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioMid, intersectionMid, flexibility, isBelow);
+            }
+        }
+
+        // Adjustment for end point of inner slur
+        const int xInnerEnd = innerPoints[3].x;
+        if ((bezierCurve.p1.x <= xInnerEnd) && (xInnerEnd <= bezierCurve.p2.x)) {
+            const int yEnd = CalcBezierAtPosition(points, xInnerEnd);
+            const int intersectionEnd = (innerPoints[3].y - yEnd) * sign + 1.5 * margin;
+            if (intersectionEnd > 0) {
+                const float distanceRatioEnd = float(xInnerEnd - bezierCurve.p1.x) / float(dist);
+                this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioEnd, intersectionEnd, flexibility, isBelow);
+            }
+        }
+    }
 
     return { shiftLeft, shiftRight };
 }
