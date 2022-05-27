@@ -831,9 +831,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             Zone *sylZone = new Zone();
 
             // these constants are just to improve visibility of the default boundingbox
-            int offSetUlx = 150;
-            int offSetUly = 50;
-            int offSetLrx = 350;
+            int offSetUlx = -50;
+            int offSetUly = 100;
+            int offSetLrx = 150;
             int offSetLry = 250;
 
             sylZone->SetUlx(ulx + offSetUlx);
