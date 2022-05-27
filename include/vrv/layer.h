@@ -110,8 +110,8 @@ public:
      */
     ///@{
     void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; }
-    data_STEMDIRECTION GetDrawingStemDir(LayerElement *element);
-    data_STEMDIRECTION GetDrawingStemDir(const ArrayOfBeamElementCoords *coords);
+    data_STEMDIRECTION GetDrawingStemDir(const LayerElement *element) const;
+    data_STEMDIRECTION GetDrawingStemDir(const ArrayOfBeamElementCoords *coords) const;
     data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; }
     ///@}
 
@@ -120,8 +120,8 @@ public:
      * Takes into account cross-staff situations: cross staff layers have negative N.
      */
     ///@{
-    std::set<int> GetLayersNForTimeSpanOf(LayerElement *element);
-    int GetLayerCountForTimeSpanOf(LayerElement *element);
+    std::set<int> GetLayersNForTimeSpanOf(const LayerElement *element) const;
+    int GetLayerCountForTimeSpanOf(const LayerElement *element) const;
     ///@}
 
     /**
@@ -129,8 +129,8 @@ public:
      * Takes into account cross-staff situations: cross staff layers have negative N.
      */
     ///@{
-    std::set<int> GetLayersNInTimeSpan(double time, double duration, Measure *measure, int staff);
-    int GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff);
+    std::set<int> GetLayersNInTimeSpan(double time, double duration, const Measure *measure, int staff) const;
+    int GetLayerCountInTimeSpan(double time, double duration, const Measure *measure, int staff) const;
     ///@}
 
     /**
@@ -138,20 +138,35 @@ public:
      * Takes into account cross-staff situations.
      * If excludeCurrent is specified, gets the list of layer elements for all layers except current
      */
-    ListOfObjects GetLayerElementsForTimeSpanOf(LayerElement *element, bool excludeCurrent = false);
+    ///@{
+    ListOfObjects GetLayerElementsForTimeSpanOf(const LayerElement *element, bool excludeCurrent = false);
+    ListOfConstObjects GetLayerElementsForTimeSpanOf(const LayerElement *element, bool excludeCurrent = false) const;
+    ///@}
 
     /**
      * Get the list of the layer elements used within a time span.
      * Takes into account cross-staff situations.
      */
+    ///@{
     ListOfObjects GetLayerElementsInTimeSpan(
-        double time, double duration, Measure *measure, int staff, bool excludeCurrent);
+        double time, double duration, const Measure *measure, int staff, bool excludeCurrent);
+    ListOfConstObjects GetLayerElementsInTimeSpan(
+        double time, double duration, const Measure *measure, int staff, bool excludeCurrent) const;
+    ///@}
 
+    /**
+     * Get the current clef, keysig, mensur and meterSig
+     */
+    ///@{
     Clef *GetCurrentClef();
     const Clef *GetCurrentClef() const;
     KeySig *GetCurrentKeySig();
+    const KeySig *GetCurrentKeySig() const;
     Mensur *GetCurrentMensur();
+    const Mensur *GetCurrentMensur() const;
     MeterSig *GetCurrentMeterSig();
+    const MeterSig *GetCurrentMeterSig() const;
+    ///@}
 
     void ResetStaffDefObjects();
 

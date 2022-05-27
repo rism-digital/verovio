@@ -54,7 +54,7 @@ public:
     /**
      * Get the vertical location for mRest considering other layer elements
      */
-    int GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation);
+    int GetOptimalLayerLocation(const Layer *layer, int defaultLocation) const;
 
     //----------//
     // Functors //

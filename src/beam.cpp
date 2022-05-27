@@ -84,8 +84,8 @@ void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoord
     m_beamElementCoordRefs = *beamElementCoords;
 }
 
-void BeamSegment::CalcBeam(
-    Layer *layer, Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place, bool init)
+void BeamSegment::CalcBeam(const Layer *layer, Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface,
+    data_BEAMPLACE place, bool init)
 {
     assert(layer);
     assert(staff);
@@ -1143,7 +1143,7 @@ void BeamSegment::CalcAdjustPosition(const Staff *staff, const Doc *doc, const B
     this->CalcSetValues();
 }
 
-void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
+void BeamSegment::CalcBeamPlace(const Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
 {
     assert(layer);
     assert(beamInterface);

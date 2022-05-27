@@ -1487,7 +1487,7 @@ int LayerElement::CalcAlignmentPitchPos(FunctorParams *functorParams)
             // should be refined later
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
-                loc = mRest->GetOptimalLayerLocation(staffY, layerY, loc);
+                loc = mRest->GetOptimalLayerLocation(layerY, loc);
             }
         }
 
@@ -2426,7 +2426,7 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
+int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams) const
 {
     LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
@@ -2464,12 +2464,12 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
     return (this->Is(CHORD)) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
-int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
+int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams) const
 {
     LayerElementsInTimeSpanParams *params = vrv_params_cast<LayerElementsInTimeSpanParams *>(functorParams);
     assert(params);
 
-    Layer *currentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    const Layer *currentLayer = vrv_cast<const Layer *>(this->GetFirstAncestor(LAYER));
     // Either get layer refernced by @m_layer or all layers but it, depending on the @m_allLayersButCurrent flag
     if ((!params->m_allLayersButCurrent && (currentLayer != params->m_layer))
         || (params->m_allLayersButCurrent && (currentLayer == params->m_layer))) {
@@ -2480,7 +2480,8 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
 
     const double duration = !this->GetFirstAncestor(CHORD)
         ? this->GetAlignmentDuration(params->m_mensur, params->m_meterSig)
-        : vrv_cast<Chord *>(this->GetFirstAncestor(CHORD))->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+        : vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD))
+              ->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
 
     const double time = m_alignment->GetTime();
 

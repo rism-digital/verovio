@@ -127,7 +127,7 @@ std::pair<wchar_t, wchar_t> MeterSig::GetEnclosingGlyphs(bool smallGlyph) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeterSig::LayerCountInTimeSpan(FunctorParams *functorParams)
+int MeterSig::LayerCountInTimeSpan(FunctorParams *functorParams) const
 {
     LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);

@@ -400,12 +400,12 @@ public:
     /**
      * See Object::LayerCountInTimeSpan
      */
-    int LayerCountInTimeSpan(FunctorParams *functorParams) override;
+    int LayerCountInTimeSpan(FunctorParams *functorParams) const override;
 
     /**
      * See Object::LayerElementsInTimeSpan
      */
-    int LayerElementsInTimeSpan(FunctorParams *functorParams) override;
+    int LayerElementsInTimeSpan(FunctorParams *functorParams) const override;
 
     /**
      * See Object::InitOnsetOffset

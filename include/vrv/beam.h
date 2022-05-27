@@ -44,7 +44,7 @@ public:
 
     void Reset();
 
-    void CalcBeam(Layer *layer, Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface,
+    void CalcBeam(const Layer *layer, Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface,
         data_BEAMPLACE place = BEAMPLACE_NONE, bool init = true);
 
     /**
@@ -128,7 +128,7 @@ private:
     // Helper to adjust position of starting point to make sure that beam start-/endpoints touch the staff lines
     void CalcAdjustPosition(const Staff *staff, const Doc *doc, const BeamDrawingInterface *beamInterface);
 
-    void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
+    void CalcBeamPlace(const Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     /**
      * Helper to calculate the beam position for a beam in tablature.
