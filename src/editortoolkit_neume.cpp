@@ -2255,11 +2255,13 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             assert(fullSyllable);
             fullSyllable->AddChild(fullSyl);
             
+            // Move elements to the new group syllable
             for (auto it = elements.begin(); it != elements.end(); ++it) {
                 if ((*it)->GetParent() != fullSyllable && !(*it)->Is(SYL)) {
                     (*it)->MoveItselfTo(fullSyllable);
                 }
             }
+
             if (doubleParent == NULL) {
                 LogError("No second level parent!");
                 return false;
@@ -2312,10 +2314,20 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
             doubleParent->DeleteChild(obj);
         }
-        else if (obj->GetChildCount() == obj->GetChildCount(SYL)) {
-            Object *syl;
-            while ((syl = obj->FindDescendantByType(SYL)) != NULL) {
-                obj->DeleteChild(syl);
+        else if (obj->GetChildCount() == (obj->GetChildCount(SYL) + obj->GetChildCount(DIVLINE) + obj->GetChildCount(ACCID))){
+            Object *leftover;
+            while ((leftover = obj->FindDescendantByType(SYL)) != NULL) {
+                obj->DeleteChild(leftover);
+            }
+            while ((leftover = obj->FindDescendantByType(DIVLINE)) != NULL) {
+                leftover->MoveItselfTo(parent);
+                parent->ReorderByXPos();
+                obj->ClearRelinquishedChildren();
+            }
+            while ((leftover = obj->FindDescendantByType(ACCID)) != NULL) {
+                leftover->MoveItselfTo(parent);
+                parent->ReorderByXPos();
+                obj->ClearRelinquishedChildren();
             }
             if (doubleParent == NULL) {
                 LogError("No second level parent!");
