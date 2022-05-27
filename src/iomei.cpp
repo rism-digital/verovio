@@ -1362,7 +1362,8 @@ void MEIOutput::WriteRevisionDesc(pugi::xml_node meiHead)
     std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     change.append_attribute("isodate").set_value(dateStr.c_str());
-    pugi::xml_node p1 = change.append_child("p");
+    pugi::xml_node changeDesc = change.append_child("changeDesc");
+    pugi::xml_node p1 = changeDesc.append_child("p");
     // Use transposer to convert interval from options to semitones
     Transposer transposer;
     const int value = transposer.IntervalToSemitones(m_doc->GetOptions()->m_transpose.GetValue());
