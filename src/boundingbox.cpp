@@ -793,9 +793,10 @@ double BoundingBox::CalcBezierParamAtPosition(const Point bezier[4], int x)
     const std::set<double> roots = BoundingBox::SolveCubicPolynomial(a, b, c, d);
 
     // Return the first root in [0,1]
-    constexpr double eps = 1e-6; // Numerical freedom
-    auto iter = std::find_if(
-        roots.begin(), roots.end(), [](double value) { return ((value >= -eps) && (value <= 1.0 + eps)); });
+    auto iter = std::find_if(roots.begin(), roots.end(), [](double value) {
+        constexpr double eps = 1e-6; // Numerical freedom
+        return ((value >= -eps) && (value <= 1.0 + eps));
+    });
     double root = 0.0;
     if (iter != roots.end()) {
         root = *iter;
