@@ -1181,6 +1181,12 @@ void Slur::AdjustOuterSlur(
     // where x, y denote the vertical adjustments of the control points and c is the size of the collision.
     // The coefficients a, b are calculated from the Bezier curve equation.
     // After collecting all constraints we calculate a solution.
+    const ControlPointAdjustment adjustment
+        = this->CalcControlPointVerticalShift(curve, bezier, innerCurves, symmetry, margin);
+    bezier.SetLeftControlHeight(bezier.GetLeftControlHeight() + adjustment.leftShift);
+    bezier.SetRightControlHeight(bezier.GetRightControlHeight() + adjustment.rightShift);
+    bezier.UpdateControlPoints();
+    curve->UpdatePoints(bezier);
 
     // STEP 3: Adjust the slur shape
     // We correct the shape if the slur is too flat or not convex.
@@ -1250,6 +1256,50 @@ std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, cons
     }
 
     return { shiftLeft, shiftRight };
+}
+
+ControlPointAdjustment Slur::CalcControlPointVerticalShift(FloatingCurvePositioner *curve,
+    const BezierCurve &bezierCurve, const ArrayOfFloatingCurvePositioners &innerCurves, double symmetry, int margin)
+{
+    ControlPointAdjustment adjustment{ 0, 0, false, 0 };
+    if (bezierCurve.p1.x >= bezierCurve.p2.x) return adjustment;
+
+    const int dist = bezierCurve.p2.x - bezierCurve.p1.x;
+    const bool isBelow = (curve->GetDir() == curvature_CURVEDIR_above);
+    const int sign = isBelow ? 1 : -1;
+    Point points[4];
+    points[0] = bezierCurve.p1;
+    points[1] = bezierCurve.c1;
+    points[2] = bezierCurve.c2;
+    points[3] = bezierCurve.p2;
+
+    std::list<ControlPointConstraint> constraints;
+    for (FloatingCurvePositioner *innerCurve : innerCurves) {
+        Point innerPoints[4];
+        innerCurve->GetPoints(innerPoints);
+
+        // Create five constraints for each inner slur
+        for (int step = 0; step <= 4; ++step) {
+            const Point innerPoint = BoundingBox::CalcPointAtBezier(innerPoints, 0.25 * step);
+            if ((bezierCurve.p1.x <= innerPoint.x) && (innerPoint.x <= bezierCurve.p2.x)) {
+                const int y = CalcBezierAtPosition(points, innerPoint.x);
+                const int intersection = (innerPoint.y - y) * sign + margin;
+                const float distanceRatio = float(innerPoint.x - bezierCurve.p1.x) / float(dist);
+
+                // Ignore obstacles close to the endpoints, because this would result in very large shifts
+                if ((std::abs(0.5 - distanceRatio) < 0.45) && (intersection > 0)) {
+                    const double t = BoundingBox::CalcBezierParamAtPosition(points, innerPoint.x);
+                    constraints.push_back(
+                        { 3.0 * pow(1.0 - t, 2.0) * t, 3.0 * (1.0 - t) * pow(t, 2.0), double(intersection) });
+                }
+            }
+        }
+    }
+
+    // Solve the constraints and calculate the adjustment
+    std::tie(adjustment.leftShift, adjustment.rightShift) = this->SolveControlPointConstraints(constraints, symmetry);
+
+    return adjustment;
 }
 
 float Slur::GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir)

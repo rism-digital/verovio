@@ -305,6 +305,10 @@ private:
     // Calculate the vertical shift of the slur end points
     std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
         const ArrayOfFloatingCurvePositioners &innerCurves, double flexibility, int margin);
+
+    // Calculate the vertical control point shift
+    ControlPointAdjustment CalcControlPointVerticalShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
+        const ArrayOfFloatingCurvePositioners &innerCurves, double symmetry, int margin);
     ///@}
 
     /**
