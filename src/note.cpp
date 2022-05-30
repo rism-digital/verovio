@@ -189,10 +189,10 @@ void Note::AddChild(Object *child)
     Modify();
 }
 
-void Note::AlignDotsShift(Note *otherNote)
+void Note::AlignDotsShift(const Note *otherNote)
 {
     Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-    Dots *otherDots = vrv_cast<Dots *>(otherNote->FindDescendantByType(DOTS, 1));
+    const Dots *otherDots = vrv_cast<const Dots *>(otherNote->FindDescendantByType(DOTS, 1));
     if (!dots || !otherDots) return;
     if (otherDots->GetFlagShift()) {
         dots->SetFlagShift(otherDots->GetFlagShift());
@@ -718,7 +718,7 @@ int Note::GetChromaticAlteration() const
     return 0;
 }
 
-TransPitch Note::GetTransPitch()
+TransPitch Note::GetTransPitch() const
 {
     int pname = this->GetPname() - PITCHNAME_c;
     return TransPitch(pname, this->GetChromaticAlteration(), this->GetOct());
@@ -761,12 +761,12 @@ void Note::UpdateFromTransPitch(const TransPitch &tp)
     }
 }
 
-bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, int dotLocShift)
+bool Note::IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const
 {
-    Object *stem = this->GetFirst(STEM);
+    const Object *stem = this->GetFirst(STEM);
     if (!stem) return false;
 
-    Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
+    const Flag *flag = dynamic_cast<const Flag *>(stem->GetFirst(FLAG));
     if (!flag) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
@@ -841,7 +841,7 @@ void Note::GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime,
 // Static methods //
 //----------------//
 
-bool Note::HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, Note *note2)
+bool Note::HandleLedgerLineStemCollision(const Doc *doc, const Staff *staff, const Note *note1, const Note *note2)
 {
     assert(doc);
     assert(staff);
@@ -849,8 +849,8 @@ bool Note::HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, No
     assert(note2);
 
     if (note1->GetDrawingLoc() == note2->GetDrawingLoc()) return false;
-    Note *upperNote = (note1->GetDrawingLoc() > note2->GetDrawingLoc()) ? note1 : note2;
-    Note *lowerNote = (note1->GetDrawingLoc() > note2->GetDrawingLoc()) ? note2 : note1;
+    const Note *upperNote = (note1->GetDrawingLoc() > note2->GetDrawingLoc()) ? note1 : note2;
+    const Note *lowerNote = (note1->GetDrawingLoc() > note2->GetDrawingLoc()) ? note2 : note1;
 
     if (upperNote->GetDrawingStemDir() != STEMDIRECTION_down) return false;
     if (lowerNote->GetDrawingStemDir() != STEMDIRECTION_up) return false;
@@ -866,8 +866,8 @@ bool Note::HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, No
     // If one note has more ledger lines, then check if the stems tip of the other note is outside of the staff on this
     // side
     if (linesBelowLower > linesBelowUpper) {
-        Chord *upperChord = upperNote->IsChordTone();
-        Stem *upperStem = upperChord ? upperChord->GetDrawingStem() : upperNote->GetDrawingStem();
+        const Chord *upperChord = upperNote->IsChordTone();
+        const Stem *upperStem = upperChord ? upperChord->GetDrawingStem() : upperNote->GetDrawingStem();
         if (upperStem) {
             const int staffBottom = staff->GetDrawingY() - 2 * unit * (staff->m_drawingLines - 1);
             const int stemBottom = upperStem->GetSelfBottom();
@@ -878,8 +878,8 @@ bool Note::HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, No
     }
 
     if (linesAboveUpper > linesAboveLower) {
-        Chord *lowerChord = lowerNote->IsChordTone();
-        Stem *lowerStem = lowerChord ? lowerChord->GetDrawingStem() : lowerNote->GetDrawingStem();
+        const Chord *lowerChord = lowerNote->IsChordTone();
+        const Stem *lowerStem = lowerChord ? lowerChord->GetDrawingStem() : lowerNote->GetDrawingStem();
         if (lowerStem) {
             const int staffTop = staff->GetDrawingY();
             const int stemTop = lowerStem->GetSelfTop();

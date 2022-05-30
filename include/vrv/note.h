@@ -112,7 +112,7 @@ public:
     /**
      * Align dots shift for two notes. Should be used for unison notes to align dots positioning
      */
-    void AlignDotsShift(Note *otherNote);
+    void AlignDotsShift(const Note *otherNote);
 
     /**
      * @name Setter and getter for accid attribute and other pointers
@@ -175,7 +175,7 @@ public:
      */
     ///@{
     void SetCluster(ChordCluster *cluster, int position);
-    ChordCluster *GetCluster() const { return m_cluster; }
+    ChordCluster *GetCluster() { return m_cluster; }
     ///@}
 
     /**
@@ -231,7 +231,8 @@ public:
      */
     ///@{
     bool HasStemSameasNote() const { return (m_stemSameas); }
-    Note *GetStemSameasNote() const { return m_stemSameas; }
+    Note *GetStemSameasNote() { return m_stemSameas; }
+    const Note *GetStemSameasNote() const { return m_stemSameas; }
     void SetStemSameasNote(Note *stemSameas) { m_stemSameas = stemSameas; }
     ///@}
 
@@ -272,7 +273,7 @@ public:
      * Assume that two notes from different layers are given occuring at the same time
      * Returns true if one note has a ledger line that collides (or is quite close) to the other note's stem
      */
-    static bool HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, Note *note2);
+    static bool HandleLedgerLineStemCollision(const Doc *doc, const Staff *staff, const Note *note1, const Note *note2);
 
     //----------//
     // Functors //
@@ -367,7 +368,7 @@ private:
      */
     int GetChromaticAlteration() const;
 
-    TransPitch GetTransPitch();
+    TransPitch GetTransPitch() const;
 
     void UpdateFromTransPitch(const TransPitch &tp);
 
@@ -375,7 +376,7 @@ private:
      * Return whether dots are overlapping with flag. Take into account flag height, its position as well
      * as position of the note and position of the dots
      */
-    bool IsDotOverlappingWithFlag(Doc *doc, const int staffSize, int dotLocShift);
+    bool IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const;
 
     /**
      * Register deferred notes for MIDI
