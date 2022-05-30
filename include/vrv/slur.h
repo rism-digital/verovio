@@ -155,11 +155,9 @@ public:
     ///@}
 
     /**
-     * @name Detection and storage of inner slurs
+     * @name Detection of inner slurs
      */
-    ///@{
     bool HasInnerSlur(const Slur *innerSlur) const;
-    ///@}
 
     /**
      * Calculate the initial slur bezier curve and store it in the curve positioner
