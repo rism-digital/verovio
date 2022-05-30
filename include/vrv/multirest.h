@@ -46,7 +46,7 @@ public:
     /**
      * True if block style rendering applies
      */
-    bool UseBlockStyle(Doc *doc) const;
+    bool UseBlockStyle(const Doc *doc) const;
 
 private:
     //
