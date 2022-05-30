@@ -68,7 +68,6 @@ std::set<int> &Dots::ModifyDotLocsForStaff(Staff *staff)
 
 Flag::Flag() : LayerElement(FLAG, "flag-")
 {
-
     this->Reset();
 }
 
