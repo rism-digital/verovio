@@ -1040,6 +1040,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
                 if (positioners[j]->GetSpanningType() == SPANNING_START_END) {
                     if (firstSlur->HasInnerSlur(secondSlur)) {
                         innerCurves.push_back(positioners[j]);
+                        continue;
                     }
                 }
             }
@@ -1051,6 +1052,18 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
                 && BoundingBox::ArePointsClose(points1[3], points2[0], unit)) {
                 positioners[i]->MoveBackHorizontal(-unit / 2);
                 positioners[j]->MoveFrontHorizontal(unit / 2);
+            }
+            if ((firstSlur->GetStart() == secondSlur->GetStart())
+                && BoundingBox::ArePointsClose(points1[0], points2[0], unit) && (points1[3].x > points2[3].x)) {
+                int diff = points2[0].y - points1[0].y;
+                diff += ((positioners[i]->GetDir() == curvature_CURVEDIR_below) ? -unit : unit);
+                positioners[i]->MoveFrontVertical(diff);
+            }
+            if ((firstSlur->GetEnd() == secondSlur->GetEnd())
+                && BoundingBox::ArePointsClose(points1[3], points2[3], unit) && (points1[0].x < points2[0].x)) {
+                int diff = points2[3].y - points1[3].y;
+                diff += ((positioners[i]->GetDir() == curvature_CURVEDIR_below) ? -unit : unit);
+                positioners[i]->MoveBackVertical(diff);
             }
         }
         if (!innerCurves.empty()) {
