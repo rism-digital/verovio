@@ -1353,6 +1353,44 @@ bool MEIOutput::WriteDoc(Doc *doc)
 
 void MEIOutput::WriteRevisionDesc(pugi::xml_node meiHead)
 {
+    // Use transposer to convert interval from options to semitones
+    const std::string transposition = m_doc->GetOptions()->m_transpose.GetValue();
+    Transposer transposer;
+    transposer.SetBase600();
+    int value = 0;
+    std::string keyTonic = "";
+    if (transposer.IsValidIntervalName(transposition)) {
+        const int interval = transposer.GetInterval(transposition);
+        int diatonic = 0;
+        int chromatic = 0;
+        transposer.IntervalToDiatonicChromatic(diatonic, chromatic, interval);
+        value = chromatic;
+    }
+    else if (transposer.IsValidSemitones(transposition)) {
+        value = stoi(transposition);
+    }
+    else if (transposer.IsValidKeyTonic(transposition)) {
+        // Prepare message for the KeyTonic transposition
+        TransPitch pitch;
+        transposer.GetKeyTonic(transposition, pitch);
+        std::string direction = "";
+        if (!pitch.m_oct) {
+            direction.assign("closest ");
+        }
+        else if (pitch.m_oct < 0) {
+            direction.append(std::to_string(std::abs(pitch.m_oct)) + " next lower ");
+        }
+        else if (pitch.m_oct > 0) {
+            direction.append(std::to_string(std::abs(pitch.m_oct)) + " next higher ");
+        }
+        keyTonic.append("Transposed to ");
+        keyTonic.append(direction);
+        keyTonic.append(pitch.GetSimplePitchString());
+    }
+
+    if (!value && keyTonic.empty()) return;
+
+    // Prepare revisionDest and change element to append
     pugi::xml_node revisionDesc = meiHead.child("revisionDesc");
     if (revisionDesc.empty()) revisionDesc = meiHead.append_child("revisionDesc");
     pugi::xml_node change = revisionDesc.append_child("change");
@@ -1364,27 +1402,22 @@ void MEIOutput::WriteRevisionDesc(pugi::xml_node meiHead)
     change.append_attribute("isodate").set_value(dateStr.c_str());
     pugi::xml_node changeDesc = change.append_child("changeDesc");
     pugi::xml_node p1 = changeDesc.append_child("p");
-    // Use transposer to convert interval from options to semitones
-    const std::string transposition = m_doc->GetOptions()->m_transpose.GetValue();
-    Transposer transposer;
-    int value = 0;
-    if (transposer.IsValidIntervalName(transposition)) {
-        value = transposer.IntervalToSemitones(transposition);
-    }
-    else if (transposer.IsValidSemitones(transposition)) {
-        value = stoi(transposition);
-    }
+
     // Prepare change string
-    std::stringstream ss;
-    ss << "Transposed";
-    if (value > 0) {
-        ss << " up " << value << " semitones by Verovio.";
+    if (!keyTonic.empty()) {
+        p1.text().set(keyTonic.c_str());
     }
     else {
-        ss << " down " << std::abs(value) << " semitones by Verovio.";
+        std::stringstream ss;
+        ss << "Transposed";
+        if (value > 0) {
+            ss << " up " << value << " semitones by Verovio.";
+        }
+        else {
+            ss << " down " << std::abs(value) << " semitones by Verovio.";
+        }
+        p1.text().set(ss.str().c_str());
     }
-    const std::string revisionText = ss.str();
-    p1.text().set(revisionText.c_str());
 }
 
 void MEIOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
