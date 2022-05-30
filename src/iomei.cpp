@@ -1386,6 +1386,7 @@ void MEIOutput::WriteRevisionDesc(pugi::xml_node meiHead)
         keyTonic.append("Transposed to ");
         keyTonic.append(direction);
         keyTonic.append(pitch.GetSimplePitchString());
+        keyTonic.append(" by Verovio");
     }
 
     if (!value && keyTonic.empty()) return;

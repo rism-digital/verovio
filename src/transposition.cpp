@@ -192,7 +192,7 @@ std::string TransPitch::GetSimplePitchString() const
     switch (m_accid) {
         case -2: return std::string(letter + "-double-flat");
         case -1: return std::string(letter + "-flat");
-        case 0: return std::string(letter + " tonic");
+        case 0: return std::string(letter);
         case 1: return std::string(letter + "-sharp");
         case 2: return std::string(letter + "-double-sharp");
         default: LogError("Transposition: Could not get Accidental for %i", m_accid);
