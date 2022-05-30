@@ -4772,6 +4772,7 @@ bool MEIInput::ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr)
 bool MEIInput::ReadLayerDef(Object *parent, pugi::xml_node layerDef)
 {
     LayerDef *vrvLayerDef = new LayerDef();
+    this->SetMeiUuid(layerDef, vrvLayerDef);
 
     vrvLayerDef->ReadLabelled(layerDef);
     vrvLayerDef->ReadNInteger(layerDef);
