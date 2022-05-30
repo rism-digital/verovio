@@ -262,18 +262,19 @@ void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff)
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
     if (!tupletNum || (this->GetNumVisible() == BOOLEAN_false)) return;
 
-    this->CalculateTupletNumCrossStaff(tupletNum);
-
-    Staff *tupletNumStaff = tupletNum->m_crossStaff ? tupletNum->m_crossStaff : staff;
-    const int staffSize = staff->m_drawingStaffSize;
-    const int yReference = tupletNumStaff->GetDrawingY();
-    const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);
     // The num is within a bracket
     if (tupletNum->GetAlignedBracket()) {
         // yRel is not used for drawing but we need to adjust it for the bounding box to follow the changes
         tupletNum->SetDrawingYRel(tupletNum->GetAlignedBracket()->GetDrawingYRel());
         return;
     }
+
+    this->CalculateTupletNumCrossStaff(tupletNum);
+
+    Staff *tupletNumStaff = tupletNum->m_crossStaff ? tupletNum->m_crossStaff : staff;
+    const int staffSize = staff->m_drawingStaffSize;
+    const int yReference = tupletNumStaff->GetDrawingY();
+    const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);
 
     // The num is on its own
     const int numVerticalMargin = (m_drawingNumPos == STAFFREL_basic_above) ? doubleUnit : -doubleUnit;
