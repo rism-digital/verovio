@@ -1365,8 +1365,15 @@ void MEIOutput::WriteRevisionDesc(pugi::xml_node meiHead)
     pugi::xml_node changeDesc = change.append_child("changeDesc");
     pugi::xml_node p1 = changeDesc.append_child("p");
     // Use transposer to convert interval from options to semitones
+    const std::string transposition = m_doc->GetOptions()->m_transpose.GetValue();
     Transposer transposer;
-    const int value = transposer.IntervalToSemitones(m_doc->GetOptions()->m_transpose.GetValue());
+    int value = 0;
+    if (transposer.IsValidIntervalName(transposition)) {
+        value = transposer.IntervalToSemitones(transposition);
+    }
+    else if (transposer.IsValidSemitones(transposition)) {
+        value = stoi(transposition);
+    }
     // Prepare change string
     std::stringstream ss;
     ss << "Transposed";
