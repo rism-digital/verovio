@@ -690,12 +690,17 @@ int System::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
 
     // Here we also need to handle the last harm of the measure - we check the alignment with the right barline
     if (params->m_previousHarmPositioner) {
-        int overlap = params->m_previousHarmPositioner->GetContentRight()
-            - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
+        const Object *positioner = params->m_previousHarmPositioner->GetObject();
+        assert(positioner);
+        // We do this only if it is the harm is in the last measure
+        if (params->m_previousMeasure == positioner->GetFirstAncestor(MEASURE)) {
+            int overlap = params->m_previousHarmPositioner->GetContentRight()
+                - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
 
-        if (overlap > 0) {
-            params->m_overlapingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
-                params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
+            if (overlap > 0) {
+                params->m_overlapingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
+                    params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
+            }
         }
     }
 
