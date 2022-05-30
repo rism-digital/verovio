@@ -27,6 +27,7 @@ static const ClassRegistrar<Fb> s_factory("fb", FB);
 
 Fb::Fb() : Object(FB, "fb-")
 {
+
     this->Reset();
 }
 

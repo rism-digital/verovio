@@ -2392,30 +2392,15 @@ namespace pae {
 
     Token::~Token() {}
 
-    bool Token::Is(ClassId classId)
-    {
-        return (m_object && m_object->Is(classId));
-    }
+    bool Token::Is(ClassId classId) { return (m_object && m_object->Is(classId)); }
 
-    bool Token::IsContainerEnd()
-    {
-        return (m_object && (m_char == pae::CONTAINER_END));
-    }
+    bool Token::IsContainerEnd() { return (m_object && (m_char == pae::CONTAINER_END)); }
 
-    bool Token::IsEnd()
-    {
-        return (!m_object && (m_char == pae::CONTAINER_END));
-    }
+    bool Token::IsEnd() { return (!m_object && (m_char == pae::CONTAINER_END)); }
 
-    bool Token::IsSpace()
-    {
-        return (m_char == ' ');
-    }
+    bool Token::IsSpace() { return (m_char == ' '); }
 
-    bool Token::IsVoid()
-    {
-        return (m_char == pae::VOID);
-    }
+    bool Token::IsVoid() { return (m_char == pae::VOID); }
 
     std::string Token::GetName()
     {
