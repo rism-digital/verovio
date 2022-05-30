@@ -162,6 +162,7 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff)
     const int yReference = staff->GetDrawingY();
     for (auto &descendant : descendants) {
         if (!descendant->HasSelfBB()) continue;
+        if (vrv_cast<LayerElement *>(descendant)->m_crossStaff) continue;
         if (m_drawingBracketPos == STAFFREL_basic_above) {
             int dist = descendant->GetSelfTop() - yReference;
             if (yRel < dist) yRel = dist;
