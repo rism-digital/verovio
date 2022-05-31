@@ -122,6 +122,8 @@ Object::Object(const Object &object) : BoundingBox(object)
         Object *current = object.m_children.at(i);
         Object *clone = current->Clone();
         if (clone) {
+            LinkingInterface *link = clone->GetLinkingInterface();
+            if (link) link->SetCorrespStr(object.m_children.at(i));
             clone->SetParent(this);
             clone->CloneReset();
             m_children.push_back(clone);
@@ -158,6 +160,8 @@ Object &Object::operator=(const Object &object)
         this->GenerateUuid();
         // For now do now copy them
         // m_unsupported = object.m_unsupported;
+        LinkingInterface *link = this->GetLinkingInterface();
+        if (link) link->SetCorrespStr(&object);
 
         if (object.CopyChildren()) {
             int i;
@@ -165,6 +169,8 @@ Object &Object::operator=(const Object &object)
                 Object *current = object.m_children.at(i);
                 Object *clone = current->Clone();
                 if (clone) {
+                    LinkingInterface *link = clone->GetLinkingInterface();
+                    if (link) link->SetCorrespStr(object.m_children.at(i));
                     clone->SetParent(this);
                     clone->CloneReset();
                     m_children.push_back(clone);
@@ -698,6 +704,28 @@ void Object::FindAllDescendantsBetween(ListOfConstObjects *objects, Comparison *
     Functor findAllConstBetween(&Object::FindAllConstBetween);
     FindAllConstBetweenParams findAllConstBetweenParams(comparison, objects, start, end);
     this->Process(&findAllConstBetween, &findAllConstBetweenParams, NULL, NULL, depth, FORWARD, true);
+}
+
+Object *Object::FindElementInLayerStaffDefsByUUID(const std::string &uuid)
+{
+    // Get all layers first
+    ListOfObjects layers = this->FindAllDescendantsByType(LAYER);
+    for (Object *layerObj : layers) {
+        Layer *layer = vrv_cast<Layer *>(layerObj);
+        if (!layer->HasStaffDef()) continue;
+        // Get corresponding elements from the layer
+        if (layer->GetStaffDefClef() && (layer->GetStaffDefClef()->GetUuid() == uuid)) return layer->GetStaffDefClef();
+        if (layer->GetStaffDefKeySig() && (layer->GetStaffDefKeySig()->GetUuid() == uuid))
+            return layer->GetStaffDefKeySig();
+        if (layer->GetStaffDefMensur() && (layer->GetStaffDefMensur()->GetUuid() == uuid))
+            return layer->GetStaffDefMensur();
+        if (layer->GetStaffDefMeterSig() && (layer->GetStaffDefMeterSig()->GetUuid() == uuid))
+            return layer->GetStaffDefMeterSig();
+        if (layer->GetStaffDefMeterSigGrp() && (layer->GetStaffDefMeterSigGrp()->GetUuid() == uuid))
+            return layer->GetStaffDefMeterSigGrp();
+    }
+
+    return NULL;
 }
 
 Object *Object::GetChild(int idx)
