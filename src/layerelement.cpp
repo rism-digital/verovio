@@ -2723,7 +2723,7 @@ int LayerElement::ResetData(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
+int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams) const
 {
     GetRelativeLayerElementParams *params = vrv_params_cast<GetRelativeLayerElementParams *>(functorParams);
     assert(params);

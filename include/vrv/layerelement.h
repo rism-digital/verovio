@@ -446,7 +446,7 @@ public:
     /**
      * See Object::GetRelativeLayerElement
      */
-    int GetRelativeLayerElement(FunctorParams *functorParams) override;
+    int GetRelativeLayerElement(FunctorParams *functorParams) const override;
 
     /**
      * See Object::CalcSlurDirection

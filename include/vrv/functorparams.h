@@ -1832,7 +1832,7 @@ public:
         m_searchDirection = searchDirection;
         m_isInNeighboringLayer = anotherLayer;
     }
-    Object *m_relativeElement;
+    const Object *m_relativeElement;
     int m_initialElementId;
     bool m_searchDirection;
     bool m_isInNeighboringLayer;
