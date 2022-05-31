@@ -75,7 +75,7 @@ const Measure *LinkingInterface::GetNextMeasure() const
     return vrv_cast<const Measure *>(m_next->GetFirstAncestor(MEASURE));
 }
 
-void LinkingInterface::SetCorrespStr(const Object *object)
+void LinkingInterface::AddBackLink(const Object *object)
 {
     const LinkingInterface *linking = object->GetLinkingInterface();
     std::string corresp = "#" + object->GetUuid();
