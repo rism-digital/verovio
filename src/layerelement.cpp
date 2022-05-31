@@ -208,26 +208,28 @@ bool LayerElement::IsInLigature() const
     return (this->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
 }
 
-FTrem *LayerElement::IsInFTrem()
+FTrem *LayerElement::GetAncestorFTrem()
 {
-    return const_cast<FTrem *>(std::as_const(*this).IsInFTrem());
+    return const_cast<FTrem *>(std::as_const(*this).GetAncestorFTrem());
 }
 
-const FTrem *LayerElement::IsInFTrem() const
+const FTrem *LayerElement::GetAncestorFTrem() const
 {
     if (!this->Is({ CHORD, NOTE })) return NULL;
-    return dynamic_cast<const FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
+    return vrv_cast<const FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
 }
 
-Beam *LayerElement::IsInBeam()
+Beam *LayerElement::GetAncestorBeam()
 {
-    return const_cast<Beam *>(std::as_const(*this).IsInBeam());
+    return const_cast<Beam *>(std::as_const(*this).GetAncestorBeam());
 }
 
-const Beam *LayerElement::IsInBeam() const
+const Beam *LayerElement::GetAncestorBeam() const
 {
-    if (!this->Is({ CHORD, NOTE, TABGRP, TABDURSYM, STEM })) return NULL;
+    if (!this->Is({ CHORD, NOTE, REST, TABGRP, TABDURSYM, STEM })) return NULL;
     const Beam *beamParent = vrv_cast<const Beam *>(this->GetFirstAncestor(BEAM));
+    if (this->Is(REST)) return beamParent;
+
     if (beamParent != NULL) {
         if (!this->IsGraceNote()) return beamParent;
         // This note is beamed and cue-sized - we will be able to get rid of this once MEI has a better modeling for
@@ -263,6 +265,11 @@ bool LayerElement::IsInBeamSpan() const
     if (!this->Is({ CHORD, NOTE, REST })) return false;
 
     return m_isInBeamspan;
+}
+
+bool LayerElement::IsInBeam() const
+{
+    return (this->GetAncestorBeam() || this->IsInBeamSpan());
 }
 
 Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence)
@@ -1082,7 +1089,7 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
         else if (this->Is(ACCID) && element->Is(REST)) {
             Rest *rest = vrv_cast<Rest *>(element);
             const bool hasExplicitLoc = ((rest->HasOloc() && rest->HasPloc()) || rest->HasLoc());
-            if ((rest->GetFirstAncestor(BEAM) || rest->IsInBeamSpan()) && !hasExplicitLoc) {
+            if (rest->IsInBeam() && !hasExplicitLoc) {
                 overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
             }
             else {

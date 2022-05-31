@@ -2278,7 +2278,7 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
     if (this->Is(STEM)) {
         LayerElement *noteOrChord = dynamic_cast<LayerElement *>(this->GetParent());
         if (noteOrChord && noteOrChord->m_crossStaff) {
-            if (noteOrChord->IsInBeam()) {
+            if (noteOrChord->GetAncestorBeam()) {
                 Beam *beam = vrv_cast<Beam *>(noteOrChord->GetFirstAncestor(BEAM));
                 assert(beam);
                 // Ignore it but only if the beam is not entirely cross-staff itself

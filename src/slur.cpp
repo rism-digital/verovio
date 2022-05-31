@@ -437,7 +437,7 @@ Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax)
 
     // Also check the beams of spanned elements
     std::for_each(spanned.elements.begin(), spanned.elements.end(), [&adaptStaff](LayerElement *element) {
-        if (Beam *beam = element->IsInBeam(); beam) {
+        if (Beam *beam = element->GetAncestorBeam(); beam) {
             adaptStaff(beam);
         }
     });
@@ -1314,8 +1314,8 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
             }
             // same but in beam - adjust the x too
-            else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
-                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
+            else if (((parentBeam = start->GetAncestorBeam()) && !parentBeam->IsLastIn(parentBeam, start))
+                || ((parentFTrem = start->GetAncestorFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
                 || isGraceToNoteSlur || hasStartFlag) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
                 x1 += startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
@@ -1373,8 +1373,9 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
             }
             // same but in beam
-            else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
-                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start)) || hasStartFlag) {
+            else if (((parentBeam = start->GetAncestorBeam()) && !parentBeam->IsLastIn(parentBeam, start))
+                || ((parentFTrem = start->GetAncestorFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
+                || hasStartFlag) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                 x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -1441,8 +1442,8 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
             }
             // same but in beam - adjust the x too
-            else if (((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
-                || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
+            else if (((parentBeam = end->GetAncestorBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
+                || ((parentFTrem = end->GetAncestorFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
                 x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -1500,9 +1501,8 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
             }
             // same but in beam
-            else if (((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
-                || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
-
+            else if (((parentBeam = end->GetAncestorBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
+                || ((parentFTrem = end->GetAncestorFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                 x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }

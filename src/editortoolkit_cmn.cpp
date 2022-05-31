@@ -515,7 +515,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
     assert(note);
 
     Chord *chord = note->IsChordTone();
-    Beam *beam = note->IsInBeam();
+    Beam *beam = note->GetAncestorBeam();
 
     if (chord) {
         if (chord->HasEditorialContent()) {

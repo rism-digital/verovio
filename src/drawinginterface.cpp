@@ -204,8 +204,8 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
             // Look at the stemDir to see if we have multiple stem Dir
             if (!m_hasMultipleStemDir) {
                 // At this stage, BeamCoord::m_stem is not necessary set, so we need to look at the Note / Chord
-                // original value Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first
-                // note of the beam
+                // original value Example: GetAncestorBeam called in Note::PrepareLayerElementParts when reaching the
+                // first note of the beam
                 currentStemDir = m_beamElementCoords.at(elementCount)->GetStemDir();
                 if (currentStemDir != STEMDIRECTION_NONE) {
                     if ((m_notesStemDir != STEMDIRECTION_NONE) && (m_notesStemDir != currentStemDir)) {
