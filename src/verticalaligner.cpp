@@ -1000,7 +1000,12 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
     AdjustSlursParams *params = vrv_params_cast<AdjustSlursParams *>(functorParams);
     assert(params);
 
-    std::vector<FloatingCurvePositioner *> positioners;
+    Staff *staff = this->GetStaff();
+    if (!staff) return FUNCTOR_CONTINUE;
+    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+    // Adjust each slur such that spanned elements are avoided
+    ArrayOfFloatingCurvePositioners positioners;
     for (FloatingPositioner *positioner : m_floatingPositioners) {
         assert(positioner->GetObject());
         if (!positioner->GetObject()->Is({ PHRASE, SLUR })) continue;
@@ -1015,46 +1020,62 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
         if (!curve->HasContentBB()) continue;
         positioners.push_back(curve);
 
-        slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
+        slur->AdjustSlur(params->m_doc, curve, unit);
 
         if (curve->IsCrossStaff()) {
             params->m_crossStaffSlurs = true;
         }
     }
 
-    // Adjust positioning of slurs with common start/end
-    Staff *staff = this->GetStaff();
-    if (staff) {
-        const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        for (size_t i = 0; i + 1 < positioners.size(); ++i) {
-            Slur *firstSlur = vrv_cast<Slur *>(positioners[i]->GetObject());
-            for (size_t j = i + 1; j < positioners.size(); ++j) {
-                Slur *secondSlur = vrv_cast<Slur *>(positioners[j]->GetObject());
-                Point points1[4], points2[4];
-                positioners[i]->GetPoints(points1);
-                positioners[j]->GetPoints(points2);
-                if ((firstSlur->GetStart() == secondSlur->GetStart())
-                    && BoundingBox::ArePointsClose(points1[0], points2[0], unit)) {
-                    FloatingCurvePositioner *positioner = positioners[points1[3].x > points2[3].x ? i : j];
-                    positioner->MoveFrontVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -unit : unit);
-                }
-                else if ((firstSlur->GetEnd() == secondSlur->GetEnd())
-                    && BoundingBox::ArePointsClose(points1[3], points2[3], unit)) {
-                    FloatingCurvePositioner *positioner = positioners[points1[0].x < points2[0].x ? i : j];
-                    positioner->MoveBackVertical(positioner->GetDir() == curvature_CURVEDIR_below ? -unit : unit);
-                }
-                else if ((firstSlur->GetStart() == secondSlur->GetEnd())
-                    && BoundingBox::ArePointsClose(points1[0], points2[3], unit)) {
-                    positioners[i]->MoveFrontHorizontal(unit / 2);
-                    positioners[j]->MoveBackHorizontal(-unit / 2);
-                }
-                else if ((firstSlur->GetEnd() == secondSlur->GetStart())
-                    && BoundingBox::ArePointsClose(points1[3], points2[0], unit)) {
-                    positioners[i]->MoveBackHorizontal(-unit / 2);
-                    positioners[j]->MoveFrontHorizontal(unit / 2);
+    // Detection of inner slurs
+    std::map<FloatingCurvePositioner *, ArrayOfFloatingCurvePositioners> innerCurveMap;
+    for (size_t i = 0; i < positioners.size(); ++i) {
+        Slur *firstSlur = vrv_cast<Slur *>(positioners[i]->GetObject());
+        ArrayOfFloatingCurvePositioners innerCurves;
+        for (size_t j = 0; j < positioners.size(); ++j) {
+            if (i == j) continue;
+            Slur *secondSlur = vrv_cast<Slur *>(positioners[j]->GetObject());
+            // Check if second slur is inner slur of first
+            if (!positioners[i]->IsCrossStaff() && !positioners[j]->IsCrossStaff()) {
+                if (positioners[j]->GetSpanningType() == SPANNING_START_END) {
+                    if (firstSlur->HasInnerSlur(secondSlur)) {
+                        innerCurves.push_back(positioners[j]);
+                        continue;
+                    }
                 }
             }
+            // Adjust positioning of slurs with common start/end
+            Point points1[4], points2[4];
+            positioners[i]->GetPoints(points1);
+            positioners[j]->GetPoints(points2);
+            if ((firstSlur->GetEnd() == secondSlur->GetStart())
+                && BoundingBox::ArePointsClose(points1[3], points2[0], unit)) {
+                positioners[i]->MoveBackHorizontal(-unit / 2);
+                positioners[j]->MoveFrontHorizontal(unit / 2);
+            }
+            if ((firstSlur->GetStart() == secondSlur->GetStart())
+                && BoundingBox::ArePointsClose(points1[0], points2[0], unit) && (points1[3].x > points2[3].x)) {
+                int diff = points2[0].y - points1[0].y;
+                diff += ((positioners[i]->GetDir() == curvature_CURVEDIR_below) ? -unit : unit);
+                positioners[i]->MoveFrontVertical(diff);
+            }
+            if ((firstSlur->GetEnd() == secondSlur->GetEnd())
+                && BoundingBox::ArePointsClose(points1[3], points2[3], unit) && (points1[0].x < points2[0].x)) {
+                int diff = points2[3].y - points1[3].y;
+                diff += ((positioners[i]->GetDir() == curvature_CURVEDIR_below) ? -unit : unit);
+                positioners[i]->MoveBackVertical(diff);
+            }
         }
+        if (!innerCurves.empty()) {
+            innerCurveMap[positioners[i]] = innerCurves;
+        }
+    }
+
+    // Adjust outer slurs w.r.t. inner slurs
+    for (const auto &mapEntry : innerCurveMap) {
+        Slur *slur = vrv_cast<Slur *>(mapEntry.first->GetObject());
+        assert(slur);
+        slur->AdjustOuterSlur(params->m_doc, mapEntry.first, mapEntry.second, unit);
     }
 
     return FUNCTOR_SIBLINGS;
