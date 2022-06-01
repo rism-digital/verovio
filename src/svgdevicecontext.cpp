@@ -673,7 +673,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
 }
 
-void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style)
+void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset)
 {
     assert(m_penStack.size());
     assert(m_brushStack.size());
@@ -682,9 +682,7 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffs
     Brush currentBrush = m_brushStack.top();
 
     pugi::xml_node polygonChild = AppendChild("polygon");
-    // if (fillStyle == wxODDEVEN_RULE)
-    //    polygonChild.append_attribute("fill-rule") = "evenodd;";
-    // else
+
     if (currentPen.GetWidth() > 0)
         polygonChild.append_attribute("stroke") = this->GetColour(currentPen.GetColour()).c_str();
     if (currentPen.GetWidth() > 1)

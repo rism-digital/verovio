@@ -217,7 +217,7 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     this->UpdateBB(x1 - p1, y1 - p1, x2 + p2, y2 + p2);
 }
 
-void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffset, int fillStyle)
+void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffset)
 {
     if (n == 0) {
         return;

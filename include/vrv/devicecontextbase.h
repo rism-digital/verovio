@@ -30,9 +30,6 @@ class Doc;
 #undef max
 #undef min
 
-/*  Polygon filling mode */
-enum { AxODDEVEN_RULE = 1, AxWINDING_RULE };
-
 enum {
     /*  Pen styles */
     AxSOLID = 100,
