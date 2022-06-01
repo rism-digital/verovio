@@ -199,6 +199,11 @@ public:
     bool HasCrossStaffFromBelow() const { return m_crossStaffFromBelow; }
     ///@}
 
+    /**
+     * Look for element by UUID in StaffDef elements (Clef, KeySig, etc.)
+     */
+    Object *FindElementInLayerStaffDefsByUUID(const std::string &uuid) override;
+
     //----------//
     // Functors //
     //----------//

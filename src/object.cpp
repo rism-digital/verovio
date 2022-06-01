@@ -123,7 +123,7 @@ Object::Object(const Object &object) : BoundingBox(object)
         Object *clone = current->Clone();
         if (clone) {
             LinkingInterface *link = clone->GetLinkingInterface();
-            if (link) link->AddBackLink(object.m_children.at(i));
+            if (link) link->AddBackLink(current);
             clone->SetParent(this);
             clone->CloneReset();
             m_children.push_back(clone);
@@ -170,7 +170,7 @@ Object &Object::operator=(const Object &object)
                 Object *clone = current->Clone();
                 if (clone) {
                     LinkingInterface *link = clone->GetLinkingInterface();
-                    if (link) link->AddBackLink(object.m_children.at(i));
+                    if (link) link->AddBackLink(current);
                     clone->SetParent(this);
                     clone->CloneReset();
                     m_children.push_back(clone);
@@ -710,21 +710,10 @@ Object *Object::FindElementInLayerStaffDefsByUUID(const std::string &uuid)
 {
     // Get all layers first
     ListOfObjects layers = this->FindAllDescendantsByType(LAYER);
-    for (Object *layerObj : layers) {
-        Layer *layer = vrv_cast<Layer *>(layerObj);
-        if (!layer->HasStaffDef()) continue;
-        // Get corresponding elements from the layer
-        if (layer->GetStaffDefClef() && (layer->GetStaffDefClef()->GetUuid() == uuid)) return layer->GetStaffDefClef();
-        if (layer->GetStaffDefKeySig() && (layer->GetStaffDefKeySig()->GetUuid() == uuid))
-            return layer->GetStaffDefKeySig();
-        if (layer->GetStaffDefMensur() && (layer->GetStaffDefMensur()->GetUuid() == uuid))
-            return layer->GetStaffDefMensur();
-        if (layer->GetStaffDefMeterSig() && (layer->GetStaffDefMeterSig()->GetUuid() == uuid))
-            return layer->GetStaffDefMeterSig();
-        if (layer->GetStaffDefMeterSigGrp() && (layer->GetStaffDefMeterSigGrp()->GetUuid() == uuid))
-            return layer->GetStaffDefMeterSigGrp();
+    for (Object *layer : layers) {
+        Object *element = layer->FindElementInLayerStaffDefsByUUID(uuid);
+        if (element) return element;
     }
-
     return NULL;
 }
 

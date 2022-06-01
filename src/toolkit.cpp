@@ -1139,26 +1139,36 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found again, try looking in the layer staffdefs
     if (!element) {
-        element = m_doc.FindElementInLayerStaffDefsByUUID(xmlId);
+        // Check drawing page elements first
+        if (m_doc.GetDrawingPage()) {
+            element = m_doc.GetDrawingPage()->FindElementInLayerStaffDefsByUUID(xmlId);
+        }
+        if (!element) {
+            element = m_doc.FindElementInLayerStaffDefsByUUID(xmlId);
+        }
+        // If element is found within layer staffdef - check for the linking interface @corresp attribute to find
+        // original ID of the element
+        if (element) {
+            // If element has @corresp set, try finding its origin
+            const LinkingInterface *link = element->GetLinkingInterface();
+            if (link && link->HasCorresp()) {
+                const std::string correspId = ExtractUuidFragment(link->GetCorresp());
+                Object *origin = m_doc.FindDescendantByUuid(correspId);
+                // if no original element was found, try searching through scoredef in score (only for certain elements)
+                if (!origin && element->Is({ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP })) {
+                    Page *page = vrv_cast<Page *>(m_doc.FindDescendantByType(PAGE));
+                    if (page && page->m_score) {
+                        origin = page->m_score->GetScoreDef()->FindDescendantByUuid(correspId);
+                    }
+                }
+                if (origin) element = origin;
+            }
+        }
     }
     // If not found at all
     if (!element) {
         LogMessage("Element with id '%s' could not be found", xmlId.c_str());
         return o.json();
-    }
-    // If element has @corresp set, try finding its origin
-    const LinkingInterface *link = element->GetLinkingInterface();
-    if (link && link->HasCorresp()) {
-        const std::string correspId = ExtractUuidFragment(link->GetCorresp());
-        Object *origin = m_doc.FindDescendantByUuid(correspId);
-        // if no original element was found, try searching through scoredef in score (only for certain elements)
-        if (!origin && element->Is({ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP })) {
-            Page *page = vrv_cast<Page *>(m_doc.FindDescendantByType(PAGE));
-            if (page && page->m_score) {
-                origin = page->m_score->GetScoreDef()->FindDescendantByUuid(correspId);
-            }
-        }
-        if (origin) element = origin;
     }
 
     // Fill the attribute array (pair of std::string) by looking at attributes for all available MEI modules

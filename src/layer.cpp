@@ -538,6 +538,20 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
     currentStaffDef->SetDrawMeterSig(false);
 }
 
+Object *Layer::FindElementInLayerStaffDefsByUUID(const std::string &uuid)
+{
+    if (!this->HasStaffDef()) return NULL;
+    // Get corresponding elements from the layer
+    if (this->GetStaffDefClef() && (this->GetStaffDefClef()->GetUuid() == uuid)) return this->GetStaffDefClef();
+    if (this->GetStaffDefKeySig() && (this->GetStaffDefKeySig()->GetUuid() == uuid)) return this->GetStaffDefKeySig();
+    if (this->GetStaffDefMensur() && (this->GetStaffDefMensur()->GetUuid() == uuid)) return this->GetStaffDefMensur();
+    if (this->GetStaffDefMeterSig() && (this->GetStaffDefMeterSig()->GetUuid() == uuid))
+        return this->GetStaffDefMeterSig();
+    if (this->GetStaffDefMeterSigGrp() && (this->GetStaffDefMeterSigGrp()->GetUuid() == uuid))
+        return this->GetStaffDefMeterSigGrp();
+    return NULL;
+}
+
 //----------------------------------------------------------------------------
 // Layer functor methods
 //----------------------------------------------------------------------------
