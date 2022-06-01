@@ -255,6 +255,13 @@ void Tuplet::AdjustTupletBracketBeamY(Doc *doc, Staff *staff, TupletBracket *bra
         if (leftMargin > 0) bracket->SetDrawingYRelLeft(sign * (leftMargin - bracketAdjust));
         if (rightMargin > 0) bracket->SetDrawingYRelRight(sign * (rightMargin - bracketAdjust));
     }
+
+    if (beam->m_crossStaffContent) {
+        if ((m_drawingBracketPos == STAFFREL_basic_below) && (beam->m_crossStaffContent->GetN() > staff->GetN())) {
+            bracket->SetDrawingYRelLeft(bracket->GetDrawingYRelLeft() - doubleUnit / 4);
+            bracket->SetDrawingYRelRight(bracket->GetDrawingYRelRight() - doubleUnit / 4);
+        }
+    }
 }
 
 void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff)
