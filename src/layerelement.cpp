@@ -260,16 +260,15 @@ int LayerElement::GetOriginalLayerN()
     return layerN;
 }
 
-bool LayerElement::IsInBeamSpan() const
+void LayerElement::SetIsInBeamSpan(bool isInBeamSpan)
 {
-    if (!this->Is({ CHORD, NOTE, REST })) return false;
-
-    return m_isInBeamspan;
+    if (!this->Is({ CHORD, NOTE, REST })) return;
+    m_isInBeamspan = isInBeamSpan;
 }
 
 bool LayerElement::IsInBeam() const
 {
-    return (this->GetAncestorBeam() || this->IsInBeamSpan());
+    return (this->GetAncestorBeam() || this->GetIsInBeamSpan());
 }
 
 Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bool assertExistence)
