@@ -245,6 +245,10 @@ if ($? == 0) {
 		# the cat order is different for the npm package because we want to wrap the Module in the init function
 		`cat verovio-npm-start.js $BUILD_DIR/verovio.js verovio-proxy.js verovio-npm-end.js > $NPM/index.js`;
 	}
+	elsif (!$VERSION) {
+		my $warning = "\nconsole.warn('The use of this build of the JS toolkit is deprecated. See https://github.com/rism-digital/verovio/discussions/2897');";
+		`echo "$warning" >> $BUILD_DIR/$FILENAME`;
+	}
 
 	# create a gzip version
 	`(cd $BUILD_DIR && gzip -c $FILENAME > $FILENAME.gz)`;

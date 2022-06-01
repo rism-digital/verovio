@@ -131,6 +131,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
+#include "transposition.h"
 #include "trill.h"
 #include "tuning.h"
 #include "tuplet.h"
@@ -1296,8 +1297,9 @@ bool MEIOutput::WriteDoc(Doc *doc)
     assert(!m_mei.empty());
 
     // ---- header ----
-
     if (!m_ignoreHeader && m_doc->m_header.first_child()) {
+        if (!m_doc->GetOptions()->m_transpose.GetValue().empty())
+            this->WriteRevisionDesc(m_doc->m_header.first_child());
         m_mei.append_copy(m_doc->m_header.first_child());
     }
     else {
@@ -1320,6 +1322,9 @@ bool MEIOutput::WriteDoc(Doc *doc)
         std::string dateStr = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
             now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
         date.append_child(pugi::node_pcdata).set_value(dateStr.c_str());
+
+        // revisionDesc
+        if (!m_doc->GetOptions()->m_transpose.GetValue().empty()) this->WriteRevisionDesc(meiHead);
     }
 
     // ---- music ----
@@ -1344,6 +1349,76 @@ bool MEIOutput::WriteDoc(Doc *doc)
     }
 
     return true;
+}
+
+void MEIOutput::WriteRevisionDesc(pugi::xml_node meiHead)
+{
+    // Use transposer to convert interval from options to semitones
+    const std::string transposition = m_doc->GetOptions()->m_transpose.GetValue();
+    Transposer transposer;
+    transposer.SetBase600();
+    int value = 0;
+    std::string keyTonic = "";
+    if (transposer.IsValidIntervalName(transposition)) {
+        const int interval = transposer.GetInterval(transposition);
+        int diatonic = 0;
+        int chromatic = 0;
+        transposer.IntervalToDiatonicChromatic(diatonic, chromatic, interval);
+        value = chromatic;
+    }
+    else if (transposer.IsValidSemitones(transposition)) {
+        value = stoi(transposition);
+    }
+    else if (transposer.IsValidKeyTonic(transposition)) {
+        // Prepare message for the KeyTonic transposition
+        TransPitch pitch;
+        transposer.GetKeyTonic(transposition, pitch);
+        std::string direction = "";
+        if (!pitch.m_oct) {
+            direction.assign("closest ");
+        }
+        else if (pitch.m_oct < 0) {
+            direction.append(std::to_string(std::abs(pitch.m_oct)) + " next lower ");
+        }
+        else if (pitch.m_oct > 0) {
+            direction.append(std::to_string(std::abs(pitch.m_oct)) + " next higher ");
+        }
+        keyTonic.append("Transposed to ");
+        keyTonic.append(direction);
+        keyTonic.append(pitch.GetSimplePitchString());
+        keyTonic.append(" by Verovio");
+    }
+
+    if (!value && keyTonic.empty()) return;
+
+    // Prepare revisionDest and change element to append
+    pugi::xml_node revisionDesc = meiHead.child("revisionDesc");
+    if (revisionDesc.empty()) revisionDesc = meiHead.append_child("revisionDesc");
+    pugi::xml_node change = revisionDesc.append_child("change");
+    // add isodate
+    const time_t t = time(0); // get time now
+    struct tm *now = localtime(&t);
+    std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+        now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+    change.append_attribute("isodate").set_value(dateStr.c_str());
+    pugi::xml_node changeDesc = change.append_child("changeDesc");
+    pugi::xml_node p1 = changeDesc.append_child("p");
+
+    // Prepare change string
+    if (!keyTonic.empty()) {
+        p1.text().set(keyTonic.c_str());
+    }
+    else {
+        std::stringstream ss;
+        ss << "Transposed";
+        if (value > 0) {
+            ss << " up " << value << " semitones by Verovio.";
+        }
+        else {
+            ss << " down " << std::abs(value) << " semitones by Verovio.";
+        }
+        p1.text().set(ss.str().c_str());
+    }
 }
 
 void MEIOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
@@ -4772,6 +4847,7 @@ bool MEIInput::ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr)
 bool MEIInput::ReadLayerDef(Object *parent, pugi::xml_node layerDef)
 {
     LayerDef *vrvLayerDef = new LayerDef();
+    this->SetMeiUuid(layerDef, vrvLayerDef);
 
     vrvLayerDef->ReadLabelled(layerDef);
     vrvLayerDef->ReadNInteger(layerDef);

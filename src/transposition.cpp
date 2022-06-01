@@ -183,6 +183,22 @@ std::wstring TransPitch::GetPitchString() const
     }
     return L"";
 }
+
+std::string TransPitch::GetSimplePitchString() const
+{
+    char pitchLetter = (m_pname + ('C' - 'A')) % 7 + 'A';
+    std::string letter;
+    letter += pitchLetter;
+    switch (m_accid) {
+        case -2: return letter + "-double-flat";
+        case -1: return letter + "-flat";
+        case 0: return letter;
+        case 1: return letter + "-sharp";
+        case 2: return letter + "-double-sharp";
+        default: LogError("Transposition: Could not get Accidental for %i", m_accid);
+    }
+    return "";
+}
 //////////////////////////////
 //
 // operator= TransPitch -- copy operator for pitches.
