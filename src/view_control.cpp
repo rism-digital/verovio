@@ -527,7 +527,7 @@ void View::DrawBracketSpan(
             dc->ResetBrush();
         }
         else if (bracketSpan->GetLform() == LINEFORM_dotted) {
-            dc->SetPen(m_currentColour, lineWidth, AxDOT, lineWidth, 1);
+            dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND);
             dc->SetBrush(m_currentColour, AxSOLID);
             // Adjust the start and end because the horizontal line of the was drawn in that case
             int x1Dotted
@@ -799,11 +799,11 @@ void View::DrawOctave(
         int dotShift = 0;
         if (octave->HasLform()) {
             if (octave->GetLform() == LINEFORM_solid) {
-                dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0);
+                dc->SetPen(m_currentColour, lineWidth, AxSOLID);
                 dc->SetBrush(m_currentColour, AxSOLID);
             }
             else if (octave->GetLform() == LINEFORM_dotted) {
-                dc->SetPen(m_currentColour, lineWidth, AxDOT, lineWidth, 1);
+                dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND);
                 dc->SetBrush(m_currentColour, AxSOLID);
                 dotShift = lineShift;
             }

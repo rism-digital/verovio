@@ -126,7 +126,8 @@ public:
      */
     ///@{
     void SetBrush(int colour, int opacity);
-    void SetPen(int colour, int width, int opacity, int dashLength = 0, int lineCap = 0);
+    void SetPen(
+        int colour, int width, int style, int dashLength = 0, int gapLength = 0, int lineCap = 0, int lineJoin = 0);
     void SetFont(FontInfo *font);
     void ResetBrush();
     void ResetPen();

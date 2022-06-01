@@ -511,10 +511,9 @@ void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
     pathChild.append_attribute("stroke-linejoin") = "round";
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
     if (m_penStack.top().GetDashLength() > 0) {
-        // Since we have stroke-linecap=round, change the dash length to be the percieved length.
-        int dashOn = std::max(m_penStack.top().GetDashLength() - m_penStack.top().GetWidth(), 0);
-        int dashOff = m_penStack.top().GetDashLength() + m_penStack.top().GetWidth();
-        pathChild.append_attribute("stroke-dasharray") = StringFormat("%d, %d", dashOn, dashOff).c_str();
+        const int dashLength = m_penStack.top().GetDashLength();
+        const int gapLength = (m_penStack.top().GetGapLength() > 0) ? m_penStack.top().GetGapLength() : dashLength;
+        pathChild.append_attribute("stroke-dasharray") = StringFormat("%d %d", dashLength, gapLength).c_str();
     }
 }
 
@@ -532,10 +531,9 @@ void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
     pathChild.append_attribute("stroke-linejoin") = "round";
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
     if (m_penStack.top().GetDashLength() > 0) {
-        // Since we have stroke-linecap=round, change the dash length to be the percieved length.
-        int dashOn = std::max(m_penStack.top().GetDashLength() - m_penStack.top().GetWidth(), 0);
-        int dashOff = m_penStack.top().GetDashLength() + m_penStack.top().GetWidth();
-        pathChild.append_attribute("stroke-dasharray") = StringFormat("%d, %d", dashOn, dashOff).c_str();
+        const int dashLength = m_penStack.top().GetDashLength();
+        const int gapLength = (m_penStack.top().GetGapLength() > 0) ? m_penStack.top().GetGapLength() : dashLength;
+        pathChild.append_attribute("stroke-dasharray") = StringFormat("%d %d", dashLength, gapLength).c_str();
     }
 }
 
@@ -662,14 +660,17 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
     pathChild.append_attribute("stroke") = this->GetColour(m_penStack.top().GetColour()).c_str();
-    if (m_penStack.top().GetLineCap() > 0) {
-        pathChild.append_attribute("stroke-linecap") = "round";
-        pathChild.append_attribute("stroke-dasharray")
-            = StringFormat("1, %d", int(2.5 * m_penStack.top().GetDashLength())).c_str();
+    switch (m_penStack.top().GetLineCap()) {
+        case AxCAP_BUTT: pathChild.append_attribute("stroke-linecap") = "butt"; break;
+        case AxCAP_ROUND: pathChild.append_attribute("stroke-linecap") = "round"; break;
+        case AxCAP_SQUARE: pathChild.append_attribute("stroke-linecap") = "square"; break;
+        default: break;
     }
-    else if (m_penStack.top().GetDashLength() > 0)
-        pathChild.append_attribute("stroke-dasharray")
-            = StringFormat("%d, %d", m_penStack.top().GetDashLength(), m_penStack.top().GetDashLength()).c_str();
+    if (m_penStack.top().GetDashLength() > 0) {
+        const int dashLength = m_penStack.top().GetDashLength();
+        const int gapLength = (m_penStack.top().GetGapLength() > 0) ? m_penStack.top().GetGapLength() : dashLength;
+        pathChild.append_attribute("stroke-dasharray") = StringFormat("%d %d", dashLength, gapLength).c_str();
+    }
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
 }
 
@@ -689,6 +690,14 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffs
         polygonChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
     if (currentPen.GetOpacity() != 1.0)
         polygonChild.append_attribute("stroke-opacity") = StringFormat("%f", currentPen.GetOpacity()).c_str();
+    switch (currentPen.GetLineJoin()) {
+        case AxJOIN_ARCS: polygonChild.append_attribute("stroke-linejoin") = "arcs"; break;
+        case AxJOIN_BEVEL: polygonChild.append_attribute("stroke-linejoin") = "bevel"; break;
+        case AxJOIN_MITER: polygonChild.append_attribute("stroke-linejoin") = "miter"; break;
+        case AxJOIN_MITER_CLIP: polygonChild.append_attribute("stroke-linejoin") = "miter-clip"; break;
+        case AxJOIN_ROUND: polygonChild.append_attribute("stroke-linejoin") = "round"; break;
+        default: break;
+    }
     if (currentBrush.GetColour() != AxNONE)
         polygonChild.append_attribute("fill") = this->GetColour(currentBrush.GetColour()).c_str();
     if (currentBrush.GetOpacity() != 1.0)

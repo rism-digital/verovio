@@ -41,6 +41,24 @@ enum {
     AxTRANSPARENT
 };
 
+enum {
+    /* Line cap styles */
+    AxCAP_UNKNOWN = 0,
+    AxCAP_BUTT,
+    AxCAP_ROUND,
+    AxCAP_SQUARE
+};
+
+enum {
+    /* Line join styles */
+    AxJOIN_UNKNOWN = 0,
+    AxJOIN_ARCS,
+    AxJOIN_BEVEL,
+    AxJOIN_MITER,
+    AxJOIN_MITER_CLIP,
+    AxJOIN_ROUND
+};
+
 // ---------------------------------------------------------------------------
 // Pen/Brush
 // ---------------------------------------------------------------------------
@@ -52,9 +70,18 @@ enum {
 
 class Pen {
 public:
-    Pen() : m_penColour(0), m_penWidth(0), m_dashLength(0), m_lineCap(0), m_penOpacity(0.0) {}
-    Pen(int colour, int width, float opacity, int dashLength, int lineCap)
-        : m_penColour(colour), m_penWidth(width), m_dashLength(dashLength), m_lineCap(lineCap), m_penOpacity(opacity)
+    Pen()
+        : m_penColour(0), m_penWidth(0), m_dashLength(0), m_gapLength(0), m_lineCap(0), m_lineJoin(0), m_penOpacity(0.0)
+    {
+    }
+    Pen(int colour, int width, float opacity, int dashLength, int gapLength, int lineCap, int lineJoin)
+        : m_penColour(colour)
+        , m_penWidth(width)
+        , m_dashLength(dashLength)
+        , m_gapLength(gapLength)
+        , m_lineCap(lineCap)
+        , m_lineJoin(lineJoin)
+        , m_penOpacity(opacity)
     {
     }
 
@@ -64,13 +91,17 @@ public:
     void SetWidth(int width) { m_penWidth = width; }
     int GetDashLength() const { return m_dashLength; }
     void SetDashLength(int dashLength) { m_dashLength = dashLength; }
+    int GetGapLength() const { return m_gapLength; }
+    void SetGapLength(int gapLength) { m_gapLength = gapLength; }
     int GetLineCap() const { return m_lineCap; }
     void SetLineCap(int lineCap) { m_lineCap = lineCap; }
+    int GetLineJoin() const { return m_lineJoin; }
+    void SetLineJoin(int lineJoin) { m_lineJoin = lineJoin; }
     float GetOpacity() const { return m_penOpacity; }
     void SetOpacity(float opacity) { m_penOpacity = opacity; }
 
 private:
-    int m_penColour, m_penWidth, m_dashLength, m_lineCap;
+    int m_penColour, m_penWidth, m_dashLength, m_gapLength, m_lineCap, m_lineJoin;
     float m_penOpacity;
 };
 
