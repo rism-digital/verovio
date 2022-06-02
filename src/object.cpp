@@ -2284,7 +2284,7 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
                 // Ignore it but only if the beam is not entirely cross-staff itself
                 if (!beam->m_crossStaff) return FUNCTOR_CONTINUE;
             }
-            else if (noteOrChord->IsInBeamSpan()) {
+            else if (noteOrChord->GetIsInBeamSpan()) {
                 return FUNCTOR_CONTINUE;
             }
         }
