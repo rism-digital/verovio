@@ -1689,7 +1689,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(verse);
 
     Label *label = dynamic_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
-    LabelAbbr *labelAbbr = verse->m_drawingLabelAbbr;
+    LabelAbbr *labelAbbr = verse->GetDrawingLabelAbbr();
 
     if (label || labelAbbr) {
 
