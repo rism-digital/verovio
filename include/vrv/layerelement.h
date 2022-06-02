@@ -133,7 +133,7 @@ public:
     const Beam *GetAncestorBeam() const;
     bool IsInBeam() const;
     ///@}
-    
+
     /**
      * @name Setter and getter for isInBeamspan flag
      */
