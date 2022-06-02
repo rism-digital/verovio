@@ -706,17 +706,6 @@ void Object::FindAllDescendantsBetween(ListOfConstObjects *objects, Comparison *
     this->Process(&findAllConstBetween, &findAllConstBetweenParams, NULL, NULL, depth, FORWARD, true);
 }
 
-Object *Object::FindElementInLayerStaffDefsByUUID(const std::string &uuid)
-{
-    // Get all layers first
-    ListOfObjects layers = this->FindAllDescendantsByType(LAYER);
-    for (Object *layer : layers) {
-        Object *element = layer->FindElementInLayerStaffDefsByUUID(uuid);
-        if (element) return element;
-    }
-    return NULL;
-}
-
 Object *Object::GetChild(int idx)
 {
     return const_cast<Object *>(std::as_const(*this).GetChild(idx));

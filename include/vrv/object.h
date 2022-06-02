@@ -484,11 +484,6 @@ public:
     ///@}
 
     /**
-     * Look for element by UUID in StaffDef elements (Clef, KeySig, etc.) of all layers within
-     */
-    virtual Object *FindElementInLayerStaffDefsByUUID(const std::string &uuid);
-
-    /**
      * Give up ownership of the child at the idx position (NULL if not found)
      * This is a method to be used only in the very particular case where the child
      * object cannot be detached straight away. It is typically the case
@@ -726,6 +721,11 @@ public:
      * Retrieve the layer elements spanned by two points
      */
     virtual int FindSpannedLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Look for element by UUID in StaffDef elements (Clef, KeySig, etc.) of all layers within
+     */
+    virtual int FindElementInLayerStaffDefsByUUID(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the minimum left and maximum right for an alignment.

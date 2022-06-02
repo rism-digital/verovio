@@ -538,20 +538,6 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
     currentStaffDef->SetDrawMeterSig(false);
 }
 
-Object *Layer::FindElementInLayerStaffDefsByUUID(const std::string &uuid)
-{
-    if (!this->HasStaffDef()) return NULL;
-    // Get corresponding elements from the layer
-    if (this->GetStaffDefClef() && (this->GetStaffDefClef()->GetUuid() == uuid)) return this->GetStaffDefClef();
-    if (this->GetStaffDefKeySig() && (this->GetStaffDefKeySig()->GetUuid() == uuid)) return this->GetStaffDefKeySig();
-    if (this->GetStaffDefMensur() && (this->GetStaffDefMensur()->GetUuid() == uuid)) return this->GetStaffDefMensur();
-    if (this->GetStaffDefMeterSig() && (this->GetStaffDefMeterSig()->GetUuid() == uuid))
-        return this->GetStaffDefMeterSig();
-    if (this->GetStaffDefMeterSigGrp() && (this->GetStaffDefMeterSigGrp()->GetUuid() == uuid))
-        return this->GetStaffDefMeterSigGrp();
-    return NULL;
-}
-
 //----------------------------------------------------------------------------
 // Layer functor methods
 //----------------------------------------------------------------------------
@@ -766,6 +752,32 @@ int Layer::InitOnsetOffset(FunctorParams *functorParams)
     params->m_currentMeterSig = this->GetCurrentMeterSig();
 
     return FUNCTOR_CONTINUE;
+}
+
+int Layer::FindElementInLayerStaffDefsByUUID(FunctorParams *functorParams) const
+{
+    FindLayerUuidWithinStaffDefParams *params = vrv_params_cast<FindLayerUuidWithinStaffDefParams *>(functorParams);
+    assert(params);
+
+    if (!this->HasStaffDef()) return FUNCTOR_SIBLINGS;
+    // Get corresponding elements from the layer
+    if (this->GetStaffDefClef() && (this->GetStaffDefClef()->GetUuid() == params->m_uuid)) {
+        params->m_object = this->GetStaffDefClef();
+    }
+    else if (this->GetStaffDefKeySig() && (this->GetStaffDefKeySig()->GetUuid() == params->m_uuid)) {
+        params->m_object = this->GetStaffDefKeySig();
+    }
+    else if (this->GetStaffDefMensur() && (this->GetStaffDefMensur()->GetUuid() == params->m_uuid)) {
+        params->m_object = this->GetStaffDefMensur();
+    }
+    else if (this->GetStaffDefMeterSig() && (this->GetStaffDefMeterSig()->GetUuid() == params->m_uuid)) {
+        params->m_object = this->GetStaffDefMeterSig();
+    }
+    else if (this->GetStaffDefMeterSigGrp() && (this->GetStaffDefMeterSigGrp()->GetUuid() == params->m_uuid)) {
+        params->m_object = this->GetStaffDefMeterSigGrp();
+    }
+
+    return params->m_object ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
 }
 
 int Layer::ResetData(FunctorParams *functorParams)

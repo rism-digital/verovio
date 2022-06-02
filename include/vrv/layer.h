@@ -162,12 +162,12 @@ public:
 
     bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; }
     void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; }
-    Clef *GetStaffDefClef() { return m_staffDefClef; }
-    KeySig *GetStaffDefKeySig() { return m_staffDefKeySig; }
-    Mensur *GetStaffDefMensur() { return m_staffDefMensur; }
-    MeterSig *GetStaffDefMeterSig() { return m_staffDefMeterSig; }
-    MeterSigGrp *GetStaffDefMeterSigGrp() { return m_staffDefMeterSigGrp; }
-    bool HasStaffDef()
+    Clef *GetStaffDefClef() const { return m_staffDefClef; }
+    KeySig *GetStaffDefKeySig() const { return m_staffDefKeySig; }
+    Mensur *GetStaffDefMensur() const { return m_staffDefMensur; }
+    MeterSig *GetStaffDefMeterSig() const { return m_staffDefMeterSig; }
+    MeterSigGrp *GetStaffDefMeterSigGrp() const { return m_staffDefMeterSigGrp; }
+    bool HasStaffDef() const
     {
         return (m_staffDefClef || m_staffDefKeySig || m_staffDefMensur || m_staffDefMeterSig || m_staffDefMeterSigGrp);
     }
@@ -198,11 +198,6 @@ public:
     void SetCrossStaffFromBelow(bool crossStaff) { m_crossStaffFromBelow = crossStaff; }
     bool HasCrossStaffFromBelow() const { return m_crossStaffFromBelow; }
     ///@}
-
-    /**
-     * Look for element by UUID in StaffDef elements (Clef, KeySig, etc.)
-     */
-    Object *FindElementInLayerStaffDefsByUUID(const std::string &uuid) override;
 
     //----------//
     // Functors //
@@ -264,6 +259,11 @@ public:
      * See Object::ResetData
      */
     int ResetData(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::FindElementInLayerStaffDefsByUUID
+     */
+    int FindElementInLayerStaffDefsByUUID(FunctorParams *) const override;
 
     /**
      * @name See Object::GenerateMIDI
