@@ -256,6 +256,8 @@ int Clef::AdjustClefChanges(FunctorParams *functorParams)
     assert(this->GetAlignment());
     if (this->GetAlignment()->GetType() != ALIGNMENT_CLEF) return FUNCTOR_CONTINUE;
 
+    if (!this->HasContentBB()) return FUNCTOR_CONTINUE;
+
     assert(params->m_aligner);
 
     Staff *staff = this->GetAncestorStaff();

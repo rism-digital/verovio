@@ -789,7 +789,7 @@ int ScoreDef::TransposeEnd(FunctorParams *functorParams)
         bool showWarning = false;
         // Check if some staves are untransposed
         const int mapEntryCount = static_cast<int>(params->m_transposeIntervalForStaffN.size());
-        if ((mapEntryCount > 0) && (mapEntryCount < this->GetStaffNs().size())) {
+        if ((mapEntryCount > 0) && (mapEntryCount < (int)this->GetStaffNs().size())) {
             showWarning = true;
         }
         // Check if there are different transpositions

@@ -140,7 +140,10 @@ namespace humaux {
 
     /////////////////////////////////////////////////////////////////////
 
-    HumdrumTie::HumdrumTie() { clear(); }
+    HumdrumTie::HumdrumTie()
+    {
+        clear();
+    }
 
     HumdrumTie::HumdrumTie(const HumdrumTie &anothertie)
     {
@@ -163,7 +166,10 @@ namespace humaux {
         m_meter_bottom = anothertie.m_meter_bottom;
     }
 
-    HumdrumTie::~HumdrumTie() { clear(); }
+    HumdrumTie::~HumdrumTie()
+    {
+        clear();
+    }
 
     HumdrumTie &HumdrumTie::operator=(const HumdrumTie &anothertie)
     {
@@ -207,17 +213,35 @@ namespace humaux {
         m_meter_bottom = 4;
     }
 
-    void HumdrumTie::setMeterTop(int metertop) { m_meter_top = metertop; }
+    void HumdrumTie::setMeterTop(int metertop)
+    {
+        m_meter_top = metertop;
+    }
 
-    void HumdrumTie::setMeterBottom(hum::HumNum meterbot) { m_meter_bottom = meterbot; }
+    void HumdrumTie::setMeterBottom(hum::HumNum meterbot)
+    {
+        m_meter_bottom = meterbot;
+    }
 
-    int HumdrumTie::getMeterTop() { return m_meter_top; }
+    int HumdrumTie::getMeterTop()
+    {
+        return m_meter_top;
+    }
 
-    hum::HumNum HumdrumTie::getMeterBottom() { return m_meter_bottom; }
+    hum::HumNum HumdrumTie::getMeterBottom()
+    {
+        return m_meter_bottom;
+    }
 
-    void HumdrumTie::setTieAbove() { m_above = true; }
+    void HumdrumTie::setTieAbove()
+    {
+        m_above = true;
+    }
 
-    void HumdrumTie::setTieBelow() { m_below = true; }
+    void HumdrumTie::setTieBelow()
+    {
+        m_below = true;
+    }
 
     Tie *HumdrumTie::insertTieIntoDom()
     {
@@ -302,11 +326,20 @@ namespace humaux {
         m_meter_bottom = meterbot;
     }
 
-    hum::HTp HumdrumTie::getEndToken() { return m_starttokenpointer; }
+    hum::HTp HumdrumTie::getEndToken()
+    {
+        return m_starttokenpointer;
+    }
 
-    void HumdrumTie::setEndId(const std::string &id) { m_endid = id; }
+    void HumdrumTie::setEndId(const std::string &id)
+    {
+        m_endid = id;
+    }
 
-    std::string HumdrumTie::getEndId() { return m_endid; }
+    std::string HumdrumTie::getEndId()
+    {
+        return m_endid;
+    }
 
     Tie *HumdrumTie::setEndAndInsert(const std::string &id, Measure *ending, int layer, const std::string &token,
         int pitch, hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok, int metertop,
@@ -316,33 +349,75 @@ namespace humaux {
         return insertTieIntoDom();
     }
 
-    bool HumdrumTie::isInserted() { return m_inserted; }
+    bool HumdrumTie::isInserted()
+    {
+        return m_inserted;
+    }
 
-    int HumdrumTie::getPitch() { return m_pitch; }
+    int HumdrumTie::getPitch()
+    {
+        return m_pitch;
+    }
 
-    int HumdrumTie::getLayer() { return m_layer; }
+    int HumdrumTie::getLayer()
+    {
+        return m_layer;
+    }
 
-    hum::HumNum HumdrumTie::getStartTime() { return m_starttime; }
+    hum::HumNum HumdrumTie::getStartTime()
+    {
+        return m_starttime;
+    }
 
-    hum::HumNum HumdrumTie::getMeterUnit() { return m_meter_bottom; }
+    hum::HumNum HumdrumTie::getMeterUnit()
+    {
+        return m_meter_bottom;
+    }
 
-    Measure *HumdrumTie::getStartMeasure() { return m_startmeasure; }
+    Measure *HumdrumTie::getStartMeasure()
+    {
+        return m_startmeasure;
+    }
 
-    Measure *HumdrumTie::getEndMeasure() { return m_endmeasure; }
+    Measure *HumdrumTie::getEndMeasure()
+    {
+        return m_endmeasure;
+    }
 
-    void HumdrumTie::setEndMeasure(Measure *measure) { m_endmeasure = measure; }
+    void HumdrumTie::setEndMeasure(Measure *measure)
+    {
+        m_endmeasure = measure;
+    }
 
-    hum::HumNum HumdrumTie::getEndTime() { return m_endtime; }
+    hum::HumNum HumdrumTie::getEndTime()
+    {
+        return m_endtime;
+    }
 
-    hum::HumNum HumdrumTie::getDuration() { return m_endtime - m_starttime; }
+    hum::HumNum HumdrumTie::getDuration()
+    {
+        return m_endtime - m_starttime;
+    }
 
-    std::string HumdrumTie::getStartToken() { return m_starttoken; }
+    std::string HumdrumTie::getStartToken()
+    {
+        return m_starttoken;
+    }
 
-    hum::HTp HumdrumTie::getStartTokenPointer() { return m_starttokenpointer; }
+    hum::HTp HumdrumTie::getStartTokenPointer()
+    {
+        return m_starttokenpointer;
+    }
 
-    int HumdrumTie::getStartSubindex() { return m_subindex; }
+    int HumdrumTie::getStartSubindex()
+    {
+        return m_subindex;
+    }
 
-    int HumdrumTie::getEndSubindex() { return m_subindex; }
+    int HumdrumTie::getEndSubindex()
+    {
+        return m_subindex;
+    }
 
     /////////////////////////////////////////////////////////////////////
 
@@ -353,7 +428,10 @@ namespace humaux {
         clear();
     }
 
-    StaffStateVariables::~StaffStateVariables() { clear(); }
+    StaffStateVariables::~StaffStateVariables()
+    {
+        clear();
+    }
 
     void StaffStateVariables::clear()
     {
@@ -2220,8 +2298,8 @@ void HumdrumInput::getRespPeople(
 // HumdrumInput::addPerson --
 //
 
-void HumdrumInput::addPerson(std::vector<std::vector<std::string>> &respPeople, std::vector<hum::HumdrumLine *> &references,
-    const std::string &key, const std::string &role)
+void HumdrumInput::addPerson(std::vector<std::vector<std::string>> &respPeople,
+    std::vector<hum::HumdrumLine *> &references, const std::string &key, const std::string &role)
 {
     for (int i = 0; i < (int)references.size(); ++i) {
         if (references[i]->getReferenceKey() == key) {
@@ -12154,8 +12232,8 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
 //    default value: typestring = ""
 //
 
-void HumdrumInput::addSpace(
-    std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration, const std::string &typestring)
+void HumdrumInput::addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration,
+    const std::string &typestring)
 {
     bool visible = false;
     if ((!m_signifiers.ispace_color.empty()) || (!m_signifiers.space_color.empty())) {
@@ -19865,7 +19943,8 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
 //    it will be assigned a duration of a quarter note.
 //
 
-void HumdrumInput::adjustChordNoteDurations(Chord *chord, std::vector<Note *> &notes, std::vector<std::string> &tstrings)
+void HumdrumInput::adjustChordNoteDurations(
+    Chord *chord, std::vector<Note *> &notes, std::vector<std::string> &tstrings)
 {
     if (notes.size() != tstrings.size()) {
         return;
@@ -19924,8 +20003,8 @@ void HumdrumInput::adjustChordNoteDurations(Chord *chord, std::vector<Note *> &n
 // dots == -1 means no @dots parameter.
 //
 
-void HumdrumInput::adjustChordNoteDuration(
-    Note *note, hum::HumNum hdur, int meidur, int dots, hum::HumNum chorddur, const std::string &tstring, hum::HumNum factor)
+void HumdrumInput::adjustChordNoteDuration(Note *note, hum::HumNum hdur, int meidur, int dots, hum::HumNum chorddur,
+    const std::string &tstring, hum::HumNum factor)
 {
     if (factor.isPowerOfTwo()) {
         // Handle simple case where dots are the same:

@@ -67,6 +67,11 @@ public:
     const Measure *GetNextMeasure() const;
     ///@}
 
+    /**
+     * Set @corresp attribute to the UUID (or @corresp) of the object
+     */
+    void AddBackLink(const Object *object);
+
     //-----------------//
     // Pseudo functors //
     //-----------------//

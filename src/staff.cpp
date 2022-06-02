@@ -472,6 +472,11 @@ int Staff::ScoreDefOptimize(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
+    // Always show staves with a clef change
+    if (this->FindDescendantByType(CLEF)) {
+        staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
+    }
+
     // Always show all staves when there is a fermata or a tempo
     // (without checking if the fermata is actually on that staff)
     if (params->m_hasFermata || params->m_hasTempo) {

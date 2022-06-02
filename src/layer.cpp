@@ -754,6 +754,32 @@ int Layer::InitOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Layer::FindElementInLayerStaffDefsByUUID(FunctorParams *functorParams) const
+{
+    FindLayerUuidWithinStaffDefParams *params = vrv_params_cast<FindLayerUuidWithinStaffDefParams *>(functorParams);
+    assert(params);
+
+    if (!this->HasStaffDef()) return FUNCTOR_SIBLINGS;
+    // Get corresponding elements from the layer
+    if (this->GetStaffDefClef() && (this->GetStaffDefClef()->GetUuid() == params->m_uuid)) {
+        params->m_object = this->GetStaffDefClef();
+    }
+    else if (this->GetStaffDefKeySig() && (this->GetStaffDefKeySig()->GetUuid() == params->m_uuid)) {
+        params->m_object = this->GetStaffDefKeySig();
+    }
+    else if (this->GetStaffDefMensur() && (this->GetStaffDefMensur()->GetUuid() == params->m_uuid)) {
+        params->m_object = this->GetStaffDefMensur();
+    }
+    else if (this->GetStaffDefMeterSig() && (this->GetStaffDefMeterSig()->GetUuid() == params->m_uuid)) {
+        params->m_object = this->GetStaffDefMeterSig();
+    }
+    else if (this->GetStaffDefMeterSigGrp() && (this->GetStaffDefMeterSigGrp()->GetUuid() == params->m_uuid)) {
+        params->m_object = this->GetStaffDefMeterSigGrp();
+    }
+
+    return params->m_object ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
+}
+
 int Layer::ResetData(FunctorParams *functorParams)
 {
     m_crossStaffFromBelow = false;

@@ -1637,6 +1637,27 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// FindLayerUuidWithinStaffDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the element inside Layer StaffDef
+ * member 1: UUID of element to be found
+ **/
+
+class FindLayerUuidWithinStaffDefParams : public FunctorParams {
+public:
+    explicit FindLayerUuidWithinStaffDefParams(const std::string &Uuid)
+    {
+        m_uuid = Uuid;
+        m_object = NULL;
+    }
+
+    Object *m_object;
+    std::string m_uuid;
+};
+
+//----------------------------------------------------------------------------
 // GenerateFeaturesParams
 //----------------------------------------------------------------------------
 

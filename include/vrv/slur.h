@@ -155,6 +155,11 @@ public:
     ///@}
 
     /**
+     * @name Detection of inner slurs
+     */
+    bool HasInnerSlur(const Slur *innerSlur) const;
+
+    /**
      * Calculate the initial slur bezier curve and store it in the curve positioner
      */
     void CalcInitialCurve(Doc *doc, FloatingCurvePositioner *curve, NearEndCollision *nearEndCollision = NULL);
@@ -183,7 +188,10 @@ public:
      * Slur adjustment
      */
     ///@{
-    void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
+    void AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, int unit);
+
+    void AdjustOuterSlur(
+        Doc *doc, FloatingCurvePositioner *curve, const ArrayOfFloatingCurvePositioners &innerCurves, int unit);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir);
     ///@}
@@ -262,6 +270,10 @@ private:
     std::pair<int, int> CalcEndPointShift(
         FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double flexibility, int margin);
 
+    // Apply the vertical shift of the slur end points
+    void ApplyEndPointShift(
+        FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int endPointShiftLeft, int endPointShiftRight);
+
     // Calculate slur from bulge values
     void AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit);
 
@@ -282,6 +294,19 @@ private:
 
     // Improve the slur shape by adjusting the control point heights
     void AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int unit);
+    ///@}
+
+    /**
+     * Adjust slur position based on inner slurs
+     */
+    ///@{
+    // Calculate the vertical control point shift
+    ControlPointAdjustment CalcControlPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
+        const ArrayOfFloatingCurvePositioners &innerCurves, double symmetry, int margin);
+
+    // Calculate the vertical shift of the slur end points
+    std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
+        const ArrayOfFloatingCurvePositioners &innerCurves, double flexibility, int margin);
     ///@}
 
     /**

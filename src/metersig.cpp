@@ -50,6 +50,15 @@ void MeterSig::Reset()
 int MeterSig::GetTotalCount() const
 {
     auto [counts, sign] = this->GetCount();
+    // If @count is empty, look at the sym to return a resonable value
+    if (counts.empty()) {
+        if (this->HasSym()) {
+            return (this->GetSym() == METERSIGN_common) ? 4 : 2;
+        }
+        else {
+            return 0;
+        }
+    }
     switch (sign) {
         case MeterCountSign::Slash: {
             // make sure that there is no division by zero
