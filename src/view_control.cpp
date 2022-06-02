@@ -599,12 +599,30 @@ void View::DrawHairpin(
 
     hairpinLog_FORM form = hairpin->GetForm();
 
+    // For now we calculate everything based on cresc.
     int startY = 0;
     int endY = hairpin->CalcHeight(m_doc, staff->m_drawingStaffSize, spanningType, leftLink, rightLink);
 
-    m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
+    // To get things right, we need to mirror the spanning type
+    char mirrorSpanningType = spanningType;
+    if (form == hairpinLog_FORM_dim) {
+        if (spanningType == SPANNING_START) mirrorSpanningType = SPANNING_END;
+        if (spanningType == SPANNING_END) mirrorSpanningType = SPANNING_START;
+    }
 
-    // We calculate points for cresc. by default. Start/End have to be swapped
+    // Adjust start/end for broken hairpins
+    if (mirrorSpanningType == SPANNING_START) {
+        endY = endY * 2 / 3;
+    }
+    else if (mirrorSpanningType == SPANNING_END) {
+        startY = endY / 3;
+    }
+    else if (mirrorSpanningType == SPANNING_MIDDLE) {
+        startY = endY / 3;
+        endY = endY * 2 / 3;
+    }
+
+    // Now swap start/end for dim.
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
 
     int y1 = hairpin->GetDrawingY();
@@ -612,47 +630,6 @@ void View::DrawHairpin(
         y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     int y2 = y1;
-
-    /************** start / end opening **************/
-
-    if (form == hairpinLog_FORM_cres) {
-        // the normal case
-        if (spanningType == SPANNING_START_END) {
-            // nothing to adjust
-        }
-        // In this case, we are drawing the first half of a cresc. and reduce the opening end
-        else if (spanningType == SPANNING_START) {
-            endY = endY / 2;
-        }
-        // Now this is the case we are drawing the end of a cresc. and increase the opening start
-        else if (spanningType == SPANNING_END) {
-            startY = endY / 2;
-        }
-        // Finally, cres. accross the system, increase the start and reduce the end
-        else {
-            startY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false) / 3;
-            endY = 2 * startY;
-        }
-    }
-    else {
-        // the normal case
-        if (spanningType == SPANNING_START_END) {
-            // nothing to adjust
-        }
-        // In this case, we are drawing the first half a a dim. Increase the opening end
-        else if (spanningType == SPANNING_START) {
-            endY = startY / 2;
-        }
-        // Now this is the case we are drawing the end of a dim. Reduce the opening start
-        else if (spanningType == SPANNING_END) {
-            startY = startY / 2;
-        }
-        // Finally, dim accross the system, reduce the start and increase the end
-        else {
-            endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false) / 3;
-            startY = 2 * endY;
-        }
-    }
 
     /************** draw it **************/
 
