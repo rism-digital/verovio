@@ -709,6 +709,8 @@ void SvgDeviceContext::DrawPolyline(int n, Point points[], int xOffset, int yOff
     this->AppendStrokeLineJoin(polylineChild, currentPen);
     this->AppendStrokeDashArray(polylineChild, currentPen);
 
+    polylineChild.append_attribute("fill") = "none";
+
     std::string pointsString;
     for (int i = 0; i < n; ++i) {
         pointsString += StringFormat("%d,%d ", points[i].x + xOffset, points[i].y + yOffset);

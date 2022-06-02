@@ -667,8 +667,30 @@ void View::DrawHairpin(
 
     const double hairpinThickness
         = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_hairpinThickness.GetValue();
-    this->DrawObliquePolygon(dc, x1, y1 - startY / 2, x2, y2 - endY / 2, hairpinThickness);
-    this->DrawObliquePolygon(dc, x1, y1 + startY / 2, x2, y2 + endY / 2, hairpinThickness);
+    dc->SetPen(m_currentColour, hairpinThickness, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_BEVEL);
+    if (startY == 0) {
+        Point p[3];
+        p[0] = { ToDeviceContextX(x2), ToDeviceContextY(y2 - endY / 2) };
+        p[1] = { ToDeviceContextX(x1), ToDeviceContextY(y1) };
+        p[2] = { p[0].x, ToDeviceContextY(y2 + endY / 2) };
+        dc->DrawPolyline(3, p);
+    }
+    else if (endY == 0) {
+        Point p[3];
+        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2) };
+        p[1] = { ToDeviceContextX(x2), ToDeviceContextY(y2) };
+        p[2] = { p[0].x, ToDeviceContextY(y1 + startY / 2) };
+        dc->DrawPolyline(3, p);
+    }
+    else {
+        Point startPoint(ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2));
+        Point endPoint(ToDeviceContextX(x2), ToDeviceContextY(y2 - endY / 2));
+        dc->DrawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+        startPoint.y = ToDeviceContextY(y1 + startY / 2);
+        endPoint.y = ToDeviceContextY(y2 + endY / 2);
+        dc->DrawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+    }
+    dc->ResetPen();
 
     // dc->ReactivateGraphic();
     if (graphic)
