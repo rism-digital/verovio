@@ -342,7 +342,7 @@ public:
     /**
      * See Object::AdjustTupletNumOverlap
      */
-    int AdjustTupletNumOverlap(FunctorParams *functorParams) override;
+    int AdjustTupletNumOverlap(FunctorParams *functorParams) const override;
 
     /**
      * See Object::AdjustXPos

@@ -2004,7 +2004,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams)
+int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams) const
 {
     AdjustTupletNumOverlapParams *params = vrv_params_cast<AdjustTupletNumOverlapParams *>(functorParams);
     assert(params);

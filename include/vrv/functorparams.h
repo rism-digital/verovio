@@ -591,7 +591,7 @@ public:
  **/
 class AdjustTupletNumOverlapParams : public FunctorParams {
 public:
-    AdjustTupletNumOverlapParams(TupletNum *tupletNum, Staff *staff)
+    AdjustTupletNumOverlapParams(const TupletNum *tupletNum, const Staff *staff)
     {
         m_tupletNum = tupletNum;
         m_drawingNumPos = STAFFREL_basic_NONE;
@@ -601,11 +601,11 @@ public:
         m_yRel = 0;
     }
 
-    TupletNum *m_tupletNum;
+    const TupletNum *m_tupletNum;
     data_STAFFREL_basic m_drawingNumPos;
     int m_horizontalMargin;
     int m_verticalMargin;
-    Staff *m_staff;
+    const Staff *m_staff;
     int m_yRel;
 };
 

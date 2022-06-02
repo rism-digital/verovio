@@ -86,7 +86,7 @@ public:
      * Return the maximum and minimum X positions of the notes in the tuplets.
      * Look at flipped noteheads in chords.
      */
-    void GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc) const;
+    void GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *doc) const;
 
     //----------//
     // Functors //
@@ -148,7 +148,7 @@ private:
     /**
      * Check whether tuplet number has valid postioning staffwise
      */
-    bool HasValidTupletNumPosition(Staff *preferredStaff, Staff *otherStaff);
+    bool HasValidTupletNumPosition(const Staff *preferredStaff, const Staff *otherStaff) const;
 
 public:
     //
