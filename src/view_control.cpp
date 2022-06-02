@@ -603,21 +603,21 @@ void View::DrawHairpin(
     int startY = 0;
     int endY = hairpin->CalcHeight(m_doc, staff->m_drawingStaffSize, spanningType, leftLink, rightLink);
 
-    // To get things right, we need to mirror the spanning type
-    char mirrorSpanningType = spanningType;
+    // To get things right, we need to consider the corresponding spanning type for dim.
+    char correspSpanningType = spanningType;
     if (form == hairpinLog_FORM_dim) {
-        if (spanningType == SPANNING_START) mirrorSpanningType = SPANNING_END;
-        if (spanningType == SPANNING_END) mirrorSpanningType = SPANNING_START;
+        if (spanningType == SPANNING_START) correspSpanningType = SPANNING_END;
+        if (spanningType == SPANNING_END) correspSpanningType = SPANNING_START;
     }
 
     // Adjust start/end for broken hairpins
-    if (mirrorSpanningType == SPANNING_START) {
+    if (correspSpanningType == SPANNING_START) {
         endY = endY * 2 / 3;
     }
-    else if (mirrorSpanningType == SPANNING_END) {
+    else if (correspSpanningType == SPANNING_END) {
         startY = endY / 3;
     }
-    else if (mirrorSpanningType == SPANNING_MIDDLE) {
+    else if (correspSpanningType == SPANNING_MIDDLE) {
         startY = endY / 3;
         endY = endY * 2 / 3;
     }
