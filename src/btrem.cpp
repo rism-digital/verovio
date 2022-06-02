@@ -81,7 +81,7 @@ int BTrem::GenerateMIDI(FunctorParams *functorParams)
     if (this->GetForm() == bTremLog_FORM_unmeas) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     // Adjust duration of the bTrem if it's nested within tuplet
     int num = 0;
     Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
@@ -96,7 +96,7 @@ int BTrem::GenerateMIDI(FunctorParams *functorParams)
     // Calculate duration of individual note in tremolo
     const data_DURATION individualNoteDur = CalcIndividualNoteDuration();
     if (individualNoteDur == DURATION_NONE) return FUNCTOR_CONTINUE;
-    const double noteInQuarterDur = pow(2.0, (DURATION_4 - individualNoteDur)); 
+    const double noteInQuarterDur = pow(2.0, (DURATION_4 - individualNoteDur));
 
     // Define lambda which expands one note into multiple individual notes of the same pitch
     auto expandNote = [params, noteInQuarterDur, num](Object *obj) {
