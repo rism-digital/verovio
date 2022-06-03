@@ -660,12 +660,13 @@ void View::DrawHairpin(
         dc->DrawPolyline(3, p);
     }
     else {
-        Point startPoint(ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2));
-        Point endPoint(ToDeviceContextX(x2), ToDeviceContextY(y2 - endY / 2));
-        dc->DrawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
-        startPoint.y = ToDeviceContextY(y1 + startY / 2);
-        endPoint.y = ToDeviceContextY(y2 + endY / 2);
-        dc->DrawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+        Point p[2];
+        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2) };
+        p[1] = { ToDeviceContextX(x2), ToDeviceContextY(y2 - endY / 2) };
+        dc->DrawPolyline(2, p);
+        p[0].y = ToDeviceContextY(y1 + startY / 2);
+        p[1].y = ToDeviceContextY(y2 + endY / 2);
+        dc->DrawPolyline(2, p);
     }
     dc->ResetPen();
 
