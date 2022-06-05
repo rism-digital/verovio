@@ -98,6 +98,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse the insert action");
     }
+    else if (action == "moveOuttaSyllable") {
+        std::string elementId;
+        if (this->ParseMoveOuttaSyllableAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->MoveOuttaSyllable(elementId);
+        }
+        LogWarning("Could not parse the insert action");
+    }
     else if (action == "set") {
         std::string elementId, attrType, attrValue;
         if (this->ParseSetAction(json.get<jsonxx::Object>("param"), &elementId, &attrType, &attrValue)) {
@@ -1259,6 +1266,64 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
     m_infoObject.import("message", "");
     return true;   
 }
+
+bool EditorToolkitNeume::MoveOuttaSyllable(std::string elementId) {
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get drawing page");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get drawing page.");
+        return false;
+    }
+    if (m_doc->GetType() != Facs) {
+        LogError("Drawing page without facsimile");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Drawing page without facsimile is unsupported.");
+        return false;
+    }
+
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    assert(element);
+    Object *parent = element->GetParent();
+    assert(parent);
+
+    if (element == NULL) {
+        LogError("No element exists with ID '%s'.", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "No element exists with ID" + elementId + ".");
+        return false;
+    }
+    if (!(element->Is(DIVLINE) || element->Is(ACCID))) {
+        LogError("Element is of type %s, but only Divlines and Accids can be moved out of syllables.",
+            element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message",
+            "Element is of type " + element->GetClassName()
+                + ", but only DivLines and Accids can be inserted into syllables.");
+        return false;
+    }
+    if (!parent->Is(SYLLABLE)) {
+        LogError("The selected %s is not a child of syllable.",
+            element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message",
+            "The selected " + element->GetClassName()
+                + "is not a child of syllable.");
+        return false;
+    }
+
+    Object *secondParent = parent->GetParent();
+    assert(secondParent);
+
+    element->MoveItselfTo(secondParent);
+    secondParent->ReorderByXPos();
+    parent->ClearRelinquishedChildren();
+    parent->ReorderByXPos();
+
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    return true;   
+}
+
 
 bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 {
@@ -3198,6 +3263,12 @@ bool EditorToolkitNeume::ParseInsertAction(jsonxx::Object param, std::string *el
 }
 
 bool EditorToolkitNeume::ParseInsertToSyllableAction(jsonxx::Object param, std::string *elementId) {
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
+    return true;
+}
+
+bool EditorToolkitNeume::ParseMoveOuttaSyllableAction(jsonxx::Object param, std::string *elementId) {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
     return true;
