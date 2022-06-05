@@ -347,6 +347,9 @@ namespace humaux {
 
         // join layers into chords or shared notes.
         bool join = false;
+
+        // glissando start tokens
+        std::vector<hum::HTp> glissStarts;
     };
 } // namespace humaux
 
@@ -780,6 +783,8 @@ protected:
     bool checkForBeamSameas(Beam *beam, std::vector<hum::HTp> &layerdata, int layerindex);
     bool checkForBeamStemSameas(std::vector<hum::HTp> &layerdata, int layerindex);
     void processInterpretationStuff(hum::HTp token, int staffindex);
+    void insertGlissandos(std::vector<hum::HTp> &tokens);
+    void createGlissando(hum::HTp glissStart, hum::HTp glissEnd);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

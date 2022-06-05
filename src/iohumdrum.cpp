@@ -68,6 +68,7 @@ using namespace std;
 #include "fermata.h"
 #include "fig.h"
 #include "ftrem.h"
+#include "gliss.h"
 #include "hairpin.h"
 #include "halfmrpt.h"
 #include "harm.h"
@@ -484,6 +485,7 @@ namespace humaux {
         mensuration_type = 0;
 
         join = false;
+        glissStarts.clear();
     }
 
     ostream &StaffStateVariables::print(ostream &out, const std::string &prefix)
@@ -8403,6 +8405,9 @@ bool HumdrumInput::convertMeasureStaff(int track, int startline, int endline, in
         if (!status) {
             break;
         }
+    }
+    if (ss.at(staffindex).glissStarts.size() > 0) {
+        insertGlissandos(ss.at(staffindex).glissStarts);
     }
     ss.at(staffindex).join = m_join;
     checkClefBufferForSameAs();
@@ -20500,6 +20505,12 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
+    if (subtoken <= 0) {
+        if (token->find('H') != std::string::npos) {
+            ss[staffindex].glissStarts.push_back(token);
+        }
+    }
+
     std::string tstring;
     int stindex = 0;
     if (subtoken < 0) {
@@ -26712,6 +26723,116 @@ bool HumdrumInput::isTacet(hum::HTp spinestart)
         current = current->getNextToken();
     }
     return false;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertGlissandos --
+//
+
+void HumdrumInput::insertGlissandos(std::vector<hum::HTp> &tokens)
+{
+    for (int i = 0; i < (int)tokens.size(); i++) {
+        hum::HTp nexttok = NULL;
+        hum::HTp current = tokens[i]->getNextToken();
+        while (current) {
+            if (!current->isData()) {
+                current = current->getNextToken();
+                continue;
+            }
+            if (current->isNull()) {
+                current = current->getNextToken();
+                continue;
+            }
+            nexttok = current;
+            break;
+        }
+        if (!nexttok) {
+            continue;
+        }
+        createGlissando(tokens[i], nexttok);
+    }
+    tokens.clear();
+}
+
+//////////////////////////////
+//
+// HumdrumInput::createGlissando --
+//
+
+void HumdrumInput::createGlissando(hum::HTp glissStart, hum::HTp glissEnd)
+{
+    if (glissEnd->find('h') == std::string::npos) {
+        return;
+    }
+    int staffnumber = m_currentstaff;
+
+    std::vector<int> gstarts;
+    std::vector<int> gends;
+    std::vector<std::string> stoks = glissStart->getSubtokens();
+    std::vector<std::string> etoks = glissEnd->getSubtokens();
+
+    if (!glissStart->isChord()) {
+        gstarts.push_back(0);
+    }
+    else {
+        for (int i = 0; i < (int)stoks.size(); i++) {
+            if (stoks[i].find("H") != std::string::npos) {
+                gstarts.push_back(i);
+            }
+        }
+    }
+
+    if (!glissEnd->isChord()) {
+        gends.push_back(0);
+    }
+    else {
+        for (int i = 0; i < (int)etoks.size(); i++) {
+            if (etoks[i].find("h") != std::string::npos) {
+                gends.push_back(i);
+            }
+        }
+    }
+
+    int minsize = (int)gstarts.size();
+    if (minsize > (int)gends.size()) {
+        minsize = (int)gends.size();
+    }
+
+    for (int i = 0; i < minsize; i++) {
+        std::string stok = stoks[gstarts[i]];
+        std::string etok = etoks[gends[i]];
+
+        Gliss *gliss = new Gliss();
+        setStaff(gliss, staffnumber);
+        if (stok.find("HH") != std::string::npos) {
+            gliss->SetLform(LINEFORM_wavy);
+        }
+        std::string startid = getLocationId("note", glissStart);
+        if (glissStart->isChord()) {
+            startid += "S";
+            startid += to_string(gstarts[i] + 1);
+        }
+
+        std::string endid = getLocationId("note", glissEnd);
+        if (glissEnd->isChord()) {
+            endid += "S";
+            endid += to_string(gends[i] + 1);
+        }
+
+        gliss->SetStartid("#" + startid);
+        gliss->SetEndid("#" + endid);
+        std::string glissId = "gliss-L";
+        glissId += to_string(glissStart->getLineNumber());
+        glissId += "F";
+        glissId += to_string(glissStart->getFieldNumber());
+        if (glissStart->isChord()) {
+            glissId += "S";
+            glissId += to_string(i + 1);
+        }
+        gliss->SetUuid(glissId);
+        m_measure->AddChild(gliss);
+    }
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */
