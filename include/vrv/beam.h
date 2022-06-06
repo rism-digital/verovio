@@ -448,6 +448,11 @@ public:
      * Return NULL otherwise.
      */
     StemmedDrawingInterface *GetStemHolderInterface();
+    
+    /**
+     * Update stem length based on the calculated coordinates and stemAdjust value
+     */
+    void UpdateStemLength(StemmedDrawingInterface *stemmedInterface, int y1, int y2, int stemAdjust);
 
     int m_x;
     int m_yBeam; // y value of stem top position

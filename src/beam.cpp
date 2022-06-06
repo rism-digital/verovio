@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "artic.h"
 #include "btrem.h"
 #include "doc.h"
 #include "editorial.h"
@@ -237,15 +238,7 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
             }
         }
 
-        Stem *stem = stemmedInterface->GetDrawingStem();
-        // This is the case with fTrem on whole notes
-        if (!stem) continue;
-
-        // Since the value were calculated relatively to the element position, adjust them
-        stem->SetDrawingXRel(coord->m_x - el->GetDrawingX());
-        stem->SetDrawingYRel(y2 - el->GetDrawingY());
-        stem->SetDrawingStemLen(y2 - y1);
-        stem->SetDrawingStemAdjust(-stemAdjust);
+        coord->UpdateStemLength(stemmedInterface, y1, y2, stemAdjust);
     }
 
     if (doc->GetOptions()->m_beamFrenchStyle.GetValue() && (m_beamElementCoordRefs.size() > 2)) {
@@ -253,6 +246,33 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
     }
 
     this->AdjustBeamToTremolos(doc, staff, beamInterface);
+}
+
+void BeamElementCoord::UpdateStemLength(StemmedDrawingInterface *stemmedInterface, int y1, int y2, int stemAdjust)
+{
+    Stem *stem = stemmedInterface->GetDrawingStem();
+    // This is the case with fTrem on whole notes
+    if (!stem) return;
+
+    // Since the value were calculated relatively to the element position, adjust them
+    stem->SetDrawingXRel(m_x - m_element->GetDrawingX());
+    stem->SetDrawingYRel(y2 - m_element->GetDrawingY());
+    const int prevStemLen = stem->GetDrawingStemLen();
+    const int newStemLen = y2 - y1;
+    stem->SetDrawingStemLen(newStemLen);
+    stem->SetDrawingStemAdjust(-stemAdjust);
+
+    // Adjust existing artic
+    ListOfObjects artics = m_element->FindAllDescendantsByType(ARTIC);
+
+    const int lenChange = newStemLen - prevStemLen;
+    for (auto object : artics) {
+        Artic *artic = vrv_cast<Artic *>(object);
+        if (((artic->GetDrawingPlace() == STAFFREL_above) && (stem->GetDrawingStemDir() == STEMDIRECTION_up))
+            || ((artic->GetDrawingPlace() == STAFFREL_below) && (stem->GetDrawingStemDir() == STEMDIRECTION_down))) {
+            artic->SetDrawingYRel(artic->GetDrawingYRel() - lenChange);
+        }
+    }
 }
 
 void BeamSegment::CalcSetStemValuesTab(const Staff *staff, const Doc *doc, const BeamDrawingInterface *beamInterface)
