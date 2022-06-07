@@ -493,7 +493,7 @@ void BeamSegment::AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterf
 }
 
 void BeamSegment::AdjustBeamToLedgerLines(
-    Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal)
+    const Doc *doc, const Staff *staff, const BeamDrawingInterface *beamInterface, bool isHorizontal)
 {
     int adjust = 0;
     const int staffTop = staff->GetDrawingY();
@@ -524,7 +524,7 @@ void BeamSegment::AdjustBeamToLedgerLines(
     }
 }
 
-void BeamSegment::AdjustBeamToTremolos(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface)
+void BeamSegment::AdjustBeamToTremolos(const Doc *doc, const Staff *staff, const BeamDrawingInterface *beamInterface)
 {
     // iterate over all coords and find maximum required adjustment for stems and beam; additional beams should be taken
     // into account to make sure that correct value is calculated
@@ -554,7 +554,8 @@ void BeamSegment::AdjustBeamToTremolos(Doc *doc, Staff *staff, BeamDrawingInterf
     }
 }
 
-void BeamSegment::CalcBeamInit(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
+void BeamSegment::CalcBeamInit(
+    const Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
 {
     assert(staff);
     assert(doc);

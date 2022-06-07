@@ -662,7 +662,7 @@ double LayerElement::GetAlignmentDuration(
     if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
-        Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
+        const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
         if (tuplet) {
             ListOfConstObjects objects;
             ClassIdsComparison ids({ CHORD, NOTE, REST });
@@ -681,7 +681,7 @@ double LayerElement::GetAlignmentDuration(
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
         if (this->Is(NC)) {
-            Neume *neume = vrv_cast<Neume *>(this->GetFirstAncestor(NEUME));
+            const Neume *neume = vrv_cast<const Neume *>(this->GetFirstAncestor(NEUME));
             if (neume->IsLastInNeume(this)) {
                 return 128;
             }
@@ -691,7 +691,7 @@ double LayerElement::GetAlignmentDuration(
         }
         double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
         // With fTrem we need to divide the duration by two
-        FTrem *fTrem = vrv_cast<FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
+        const FTrem *fTrem = vrv_cast<const FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
         if (fTrem) {
             durationValue /= 2.0;
         }

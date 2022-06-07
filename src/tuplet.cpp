@@ -140,7 +140,7 @@ void Tuplet::AddChild(Object *child)
     Modify();
 }
 
-void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff)
+void Tuplet::AdjustTupletBracketY(const Doc *doc, const Staff *staff)
 {
     TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
     if (!tupletBracket || (this->GetBracketVisible() == BOOLEAN_false)) return;
@@ -178,7 +178,7 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff)
     tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() + yRel + bracketVerticalMargin);
 }
 
-void Tuplet::AdjustTupletBracketBeamY(Doc *doc, Staff *staff, TupletBracket *bracket, Beam *beam)
+void Tuplet::AdjustTupletBracketBeamY(const Doc *doc, const Staff *staff, TupletBracket *bracket, const Beam *beam)
 {
     const int staffSize = staff->m_drawingStaffSize;
     const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);
@@ -257,7 +257,7 @@ void Tuplet::AdjustTupletBracketBeamY(Doc *doc, Staff *staff, TupletBracket *bra
     }
 }
 
-void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff)
+void Tuplet::AdjustTupletNumY(const Doc *doc, const Staff *staff)
 {
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
     if (!tupletNum || (this->GetNumVisible() == BOOLEAN_false)) return;
@@ -271,7 +271,7 @@ void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff)
 
     this->CalculateTupletNumCrossStaff(tupletNum);
 
-    Staff *tupletNumStaff = tupletNum->m_crossStaff ? tupletNum->m_crossStaff : staff;
+    const Staff *tupletNumStaff = tupletNum->m_crossStaff ? tupletNum->m_crossStaff : staff;
     const int staffSize = staff->m_drawingStaffSize;
     const int yReference = tupletNumStaff->GetDrawingY();
     const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);

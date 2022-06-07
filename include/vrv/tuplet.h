@@ -127,17 +127,17 @@ private:
     /**
      * Adjust tuplet relative positioning based on possible overlaps
      */
-    void AdjustTupletBracketY(Doc *doc, Staff *staff);
+    void AdjustTupletBracketY(const Doc *doc, const Staff *staff);
 
     /**
      * Adjust tuplet relative positioning for tuplets based on beams
      */
-    void AdjustTupletBracketBeamY(Doc *doc, Staff *staff, TupletBracket *bracket, Beam *beam);
+    void AdjustTupletBracketBeamY(const Doc *doc, const Staff *staff, TupletBracket *bracket, const Beam *beam);
 
     /**
      * Adjust tuplet relative positioning based on possible overlaps
      */
-    void AdjustTupletNumY(Doc *doc, Staff *staff);
+    void AdjustTupletNumY(const Doc *doc, const Staff *staff);
 
     /**
      * Calculate corresponding cross-staff for the tuplet number if necessary. In case when tuplet is completely

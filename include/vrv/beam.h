@@ -102,15 +102,16 @@ private:
     void AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterface);
 
     // Helper to adjust beam positioning with regards to ledger lines (top and bottom of the staff)
-    void AdjustBeamToLedgerLines(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal);
+    void AdjustBeamToLedgerLines(
+        const Doc *doc, const Staff *staff, const BeamDrawingInterface *beamInterface, bool isHorizontal);
 
     /**
      * Helper to calculate required adjustment to beam position and stem length for beams that have tremolos or notes
      * with stem modifiers
      */
-    void AdjustBeamToTremolos(Doc *doc, Staff *staff, BeamDrawingInterface *beamInterface);
+    void AdjustBeamToTremolos(const Doc *doc, const Staff *staff, const BeamDrawingInterface *beamInterface);
 
-    void CalcBeamInit(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
+    void CalcBeamInit(const Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
     void CalcBeamInitForNotePair(const Note *note1, const Note *note2, const Staff *staff, int &yMax, int &yMin);
 

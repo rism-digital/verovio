@@ -470,7 +470,7 @@ int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
+int Stem::AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) const
 {
     // if stem length is explicitly set - exit
     if (this->HasStemLen()) return 0;
@@ -478,7 +478,7 @@ int Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
     const int staffSize = staff->m_drawingStaffSize;
     const int unit = doc->GetDrawingUnit(staffSize);
     data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
-    BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
+    const BTrem *bTrem = vrv_cast<const BTrem *>(this->GetFirstAncestor(BTREM));
     if (bTrem) {
         stemMod = bTrem->GetDrawingStemMod();
     }
@@ -493,7 +493,7 @@ int Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
 
     int lenAdjust = flagOffset;
     if (this->GetParent()->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(this->GetParent());
+        const Chord *chord = vrv_cast<const Chord *>(this->GetParent());
         lenAdjust += std::abs(chord->GetTopNote()->GetDrawingY() - chord->GetBottomNote()->GetDrawingY());
     }
 
@@ -662,7 +662,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-void Stem::CalculateStemModRelY(Doc *doc, Staff *staff)
+void Stem::CalculateStemModRelY(const Doc *doc, const Staff *staff)
 {
     const int sign = (this->GetDrawingStemDir() == STEMDIRECTION_up) ? 1 : -1;
     LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
@@ -728,7 +728,7 @@ void Stem::CalculateStemModRelY(Doc *doc, Staff *staff)
     m_stemModRelY = sign * height + adjust;
 }
 
-int Stem::CalculateStemModAdjustment(Doc *doc, Staff *staff, int flagOffset)
+int Stem::CalculateStemModAdjustment(const Doc *doc, const Staff *staff, int flagOffset)
 {
     this->CalculateStemModRelY(doc, staff);
     return this->AdjustSlashes(doc, staff, flagOffset);

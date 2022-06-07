@@ -387,7 +387,7 @@ public:
     /**
      * Helper to calculate stem modifier relative Y rel and required adjustment for stem length
      */
-    int CalculateStemModAdjustment(Doc *doc, Staff *staff, int flagOffset = 0);
+    int CalculateStemModAdjustment(const Doc *doc, const Staff *staff, int flagOffset = 0);
 
     //----------//
     // Functors //
@@ -420,12 +420,12 @@ private:
     /**
      * Helper to adjust length of stem based on presence of slashes
      */
-    int AdjustSlashes(Doc *doc, Staff *staff, int flagOffset);
+    int AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) const;
 
     /**
      * Helper to calculate relative position for the stem modifier
      */
-    void CalculateStemModRelY(Doc *doc, Staff *staff);
+    void CalculateStemModRelY(const Doc *doc, const Staff *staff);
 
 public:
     //
