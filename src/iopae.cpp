@@ -4399,8 +4399,11 @@ bool PAEInput::CheckHierarchy()
     pae::Token layerToken('_', pae::UNKOWN_POS, &layer);
 
     bool isValid = false;
+    // Limit the number of checks
+    int checkCount = 0;
 
-    while (!isValid) {
+    while (!isValid && checkCount < 5) {
+        checkCount++;
         isValid = true;
         for (auto &token : m_pae) {
             if (token.IsVoid()) continue;
@@ -4445,6 +4448,8 @@ bool PAEInput::CheckHierarchy()
                         if (m_pedanticMode) return false;
                         // Indicate that the data was not valid in this pass so we will check it again
                         isValid = false;
+                        // Remove the problematic container
+                        this->RemoveContainerToken(token.m_object);
                         // If we want ot continue, we should remove the  last one added from the tokens
                         this->RemoveContainerToken(stack.back()->m_object);
                         stack.pop_back();
@@ -4462,7 +4467,7 @@ bool PAEInput::CheckHierarchy()
         }
     }
 
-    return true;
+    return isValid;
 }
 
 bool PAEInput::CheckContentPreBuild()
