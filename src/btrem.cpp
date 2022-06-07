@@ -20,6 +20,7 @@
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
+#include "tuplet.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -81,19 +82,36 @@ int BTrem::GenerateMIDI(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    // Adjust duration of the bTrem if it's nested within tuplet
+    int num = 0;
+    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
+    if (tuplet) {
+        num = (tuplet->GetNum() > 0) ? tuplet->GetNum() : 0;
+    }
+    // Get num value if it's set
+    if (this->HasNum()) {
+        num = this->GetNum();
+    }
+
     // Calculate duration of individual note in tremolo
     const data_DURATION individualNoteDur = CalcIndividualNoteDuration();
     if (individualNoteDur == DURATION_NONE) return FUNCTOR_CONTINUE;
     const double noteInQuarterDur = pow(2.0, (DURATION_4 - individualNoteDur));
 
     // Define lambda which expands one note into multiple individual notes of the same pitch
-    auto expandNote = [params, noteInQuarterDur](Object *obj) {
+    auto expandNote = [params, noteInQuarterDur, num](Object *obj) {
         Note *note = vrv_cast<Note *>(obj);
         assert(note);
         const int pitch = note->GetMIDIPitch(params->m_transSemi);
         const double totalInQuarterDur = note->GetScoreTimeDuration() + note->GetScoreTimeTiedDuration();
-        const int multiplicity = totalInQuarterDur / noteInQuarterDur;
-        (params->m_expandedNotes)[note] = MIDINoteSequence(multiplicity, { pitch, noteInQuarterDur });
+        int multiplicity = totalInQuarterDur / noteInQuarterDur;
+        double noteDuration = noteInQuarterDur;
+        // if NUM has been set for the bTrem, override calculated values
+        if (num) {
+            multiplicity = num;
+            noteDuration = totalInQuarterDur / double(num);
+        }
+        (params->m_expandedNotes)[note] = MIDINoteSequence(multiplicity, { pitch, noteDuration });
     };
 
     // Apply expansion either to all notes in chord or to first note
