@@ -275,12 +275,12 @@ protected:
     void FilterList(ListOfConstObjects &childList) const override;
 
 public:
-    mutable std::list<ChordCluster *> m_clusters;
-
+    //
+private:
     /**
-     * Positions of dots in the chord to avoid overlapping
+     * The list of chord clusters
      */
-    std::list<int> m_dots;
+    mutable std::list<ChordCluster *> m_clusters;
 };
 
 } // namespace vrv
