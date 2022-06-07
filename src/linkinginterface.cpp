@@ -75,6 +75,16 @@ const Measure *LinkingInterface::GetNextMeasure() const
     return vrv_cast<const Measure *>(m_next->GetFirstAncestor(MEASURE));
 }
 
+void LinkingInterface::AddBackLink(const Object *object)
+{
+    const LinkingInterface *linking = object->GetLinkingInterface();
+    std::string corresp = "#" + object->GetUuid();
+    if (linking && linking->HasCorresp()) {
+        corresp = linking->GetCorresp();
+    }
+    this->SetCorresp(corresp.c_str());
+}
+
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------

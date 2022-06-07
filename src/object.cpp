@@ -122,6 +122,8 @@ Object::Object(const Object &object) : BoundingBox(object)
         Object *current = object.m_children.at(i);
         Object *clone = current->Clone();
         if (clone) {
+            LinkingInterface *link = clone->GetLinkingInterface();
+            if (link) link->AddBackLink(current);
             clone->SetParent(this);
             clone->CloneReset();
             m_children.push_back(clone);
@@ -158,6 +160,8 @@ Object &Object::operator=(const Object &object)
         this->GenerateUuid();
         // For now do now copy them
         // m_unsupported = object.m_unsupported;
+        LinkingInterface *link = this->GetLinkingInterface();
+        if (link) link->AddBackLink(&object);
 
         if (object.CopyChildren()) {
             int i;
@@ -165,6 +169,8 @@ Object &Object::operator=(const Object &object)
                 Object *current = object.m_children.at(i);
                 Object *clone = current->Clone();
                 if (clone) {
+                    LinkingInterface *link = clone->GetLinkingInterface();
+                    if (link) link->AddBackLink(current);
                     clone->SetParent(this);
                     clone->CloneReset();
                     m_children.push_back(clone);
