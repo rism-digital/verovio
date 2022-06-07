@@ -649,13 +649,18 @@ double LayerElement::GetAlignmentDuration(
     if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
-        Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
+        Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
         if (tuplet) {
-            num = tuplet->GetNum();
-            numbase = tuplet->GetNumbase();
-            // 0 is not valid in MEI anyway - just correct it silently
-            if (num == 0) num = 1;
-            if (numbase == 0) numbase = 1;
+            ListOfConstObjects objects;
+            ClassIdsComparison ids({ CHORD, NOTE, REST });
+            tuplet->FindAllDescendantsByComparison(&objects, &ids);
+            if (objects.size() > 1) {
+                num = tuplet->GetNum();
+                numbase = tuplet->GetNumbase();
+                // 0 is not valid in MEI anyway - just correct it silently
+                if (num == 0) num = 1;
+                if (numbase == 0) numbase = 1;
+            }
         }
         DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
@@ -663,7 +668,7 @@ double LayerElement::GetAlignmentDuration(
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
         if (this->Is(NC)) {
-            Neume *neume = dynamic_cast<Neume *>(this->GetFirstAncestor(NEUME));
+            Neume *neume = vrv_cast<Neume *>(this->GetFirstAncestor(NEUME));
             if (neume->IsLastInNeume(this)) {
                 return 128;
             }
@@ -673,7 +678,7 @@ double LayerElement::GetAlignmentDuration(
         }
         double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
         // With fTrem we need to divide the duration by two
-        FTrem *fTrem = dynamic_cast<FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
+        FTrem *fTrem = vrv_cast<FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
         if (fTrem) {
             durationValue /= 2.0;
         }
@@ -1975,7 +1980,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     auto it = std::find_if(params->m_measureTieEndpoints.cbegin(), params->m_measureTieEndpoints.cend(),
         [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.first == this; });
-    if (it != params->m_measureTieEndpoints.end()) {
+    if (it != params->m_measureTieEndpoints.end() && params->m_rightDefaultAlignment) {
         const int unit = params->m_doc->GetDrawingUnit(100);
         const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * unit;
         const int diff = params->m_rightDefaultAlignment->GetXRel() - this->GetSelfRight();

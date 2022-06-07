@@ -1462,9 +1462,14 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
     if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) && !start->Is(TIMESTAMP_ATTR)) {
         // get the radius for adjusting the x position
         const int startRadius = start->GetDrawingRadius(doc);
-        // get the min max of the chord (if any)
+        // get the min max of the chord (if any) and horizontal correction for flipped notes
         if (startChord) {
             startChord->GetYExtremes(yChordMax, yChordMin);
+            if (startNote && startNote->GetFlippedNotehead()) {
+                Note *refNote
+                    = (startStemDir == STEMDIRECTION_down) ? startChord->GetTopNote() : startChord->GetBottomNote();
+                x1 += refNote->GetDrawingX() - startNote->GetDrawingX();
+            }
         }
         // slur is up
         if (this->HasEndpointAboveStart()) {
@@ -1578,9 +1583,13 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
     if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) && !end->Is(TIMESTAMP_ATTR)) {
         // get the radius for adjusting the x position
         const int endRadius = end->GetDrawingRadius(doc);
-        // get the min max of the chord if any
+        // get the min max of the chord (if any) and horizontal correction for flipped notes
         if (endChord) {
             endChord->GetYExtremes(yChordMax, yChordMin);
+            if (endNote && endNote->GetFlippedNotehead()) {
+                Note *refNote = (endStemDir == STEMDIRECTION_down) ? endChord->GetTopNote() : endChord->GetBottomNote();
+                x2 += refNote->GetDrawingX() - endNote->GetDrawingX();
+            }
         }
         // get the stem direction of the end
         // slur is up
