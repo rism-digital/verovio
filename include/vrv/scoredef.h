@@ -8,6 +8,7 @@
 #ifndef __VRV_SCOREDEF_H__
 #define __VRV_SCOREDEF_H__
 
+#include "atts_gestural.h"
 #include "atts_mei.h"
 #include "atts_shared.h"
 #include "drawinginterface.h"
@@ -123,6 +124,7 @@ class ScoreDef : public ScoreDefElement,
                  public AttDistances,
                  public AttEndings,
                  public AttOptimization,
+                 public AttScoreDefGes,
                  public AttTimeBase {
 public:
     /**
@@ -274,6 +276,11 @@ public:
      * See Object::AlignMeasures
      */
     int AlignMeasures(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::GenerateMIDI
+     */
+    int GenerateMIDI(FunctorParams *functorParams) override;
 
     /**
      * See Object::JustifyX

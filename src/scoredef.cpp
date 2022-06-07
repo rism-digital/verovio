@@ -34,6 +34,10 @@
 #include "system.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -221,11 +225,13 @@ ScoreDef::ScoreDef()
     , AttDistances()
     , AttEndings()
     , AttOptimization()
+    , AttScoreDefGes()
     , AttTimeBase()
 {
     this->RegisterAttClass(ATT_DISTANCES);
     this->RegisterAttClass(ATT_ENDINGS);
     this->RegisterAttClass(ATT_OPTIMIZATION);
+    this->RegisterAttClass(ATT_SCOREDEFGES);
     this->RegisterAttClass(ATT_TIMEBASE);
 
     this->Reset();
@@ -239,6 +245,7 @@ void ScoreDef::Reset()
     this->ResetDistances();
     this->ResetEndings();
     this->ResetOptimization();
+    this->ResetScoreDefGes();
 
     m_drawLabels = false;
     m_drawingWidth = 0;
@@ -725,6 +732,23 @@ int ScoreDef::AlignMeasures(FunctorParams *functorParams)
         if (this->FindDescendantByComparison(&comparison)) {
             params->m_applySectionRestartShift = false;
         }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    if (!this->HasTuneTemper()) return FUNCTOR_CONTINUE;
+
+    const data_TEMPERAMENT temper = this->GetTuneTemper();
+
+    if (temper != params->m_currentTemperament) {
+        params->m_midiFile->addTemperament(0, params->m_totalTime * params->m_midiFile->getTPQ(), temper);
+        params->m_currentTemperament = temper;
     }
 
     return FUNCTOR_CONTINUE;

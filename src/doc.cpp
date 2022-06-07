@@ -334,6 +334,12 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     }
     midiFile->addTempo(0, 0, tempo);
 
+    data_TEMPERAMENT temper = TEMPERAMENT_NONE;
+    if (this->GetCurrentScoreDef()->HasTuneTemper()) {
+        temper = this->GetCurrentScoreDef()->GetTuneTemper();
+    }
+    midiFile->addTemperament(0, 0, temper);
+
     // Capture information for MIDI generation, i.e. from control elements
     Functor initMIDI(&Object::InitMIDI);
     InitMIDIParams initMIDIParams;
@@ -421,6 +427,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDIParams.m_staffN = staves->first;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;
+            generateMIDIParams.m_currentTemperament = temper;
             generateMIDIParams.m_deferredNotes = initMIDIParams.m_deferredNotes;
             generateMIDIParams.m_cueExclusion = this->GetOptions()->m_midiNoCue.GetValue();
 
