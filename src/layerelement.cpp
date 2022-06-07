@@ -1975,7 +1975,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     auto it = std::find_if(params->m_measureTieEndpoints.cbegin(), params->m_measureTieEndpoints.cend(),
         [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.first == this; });
-    if (it != params->m_measureTieEndpoints.end()) {
+    if (it != params->m_measureTieEndpoints.end() && params->m_rightDefaultAlignment) {
         const int unit = params->m_doc->GetDrawingUnit(100);
         const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * unit;
         const int diff = params->m_rightDefaultAlignment->GetXRel() - this->GetSelfRight();
