@@ -1930,7 +1930,8 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         y1 = note2->GetDrawingY() - (x2 - x1) * sin(angle);
     }
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
-        if (Accid *accid = note2->GetDrawingAccid(); accid) {
+        Accid *accid = note2->GetDrawingAccid();
+        if (accid && (accid->GetAccid() != ACCIDENTAL_WRITTEN_NONE)) {
             const int dist = x2 - accid->GetContentLeft() + 0.5 * unit;
             x2 -= dist;
             y2 = note2->GetDrawingY() - dist * tan(angle);
