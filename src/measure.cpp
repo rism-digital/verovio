@@ -1606,6 +1606,12 @@ int Measure::GenerateMIDI(FunctorParams *functorParams)
         params->m_currentTempo = m_currentTempo;
     }
 
+    if (params->m_hasTemperChanged) {
+        params->m_doc->TuneMIDI(params->m_midiFile,
+            { params->m_midiTrack, params->m_totalTime * params->m_midiFile->getTPQ() }, params->m_currentTemperament);
+        params->m_hasTemperChanged = false;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

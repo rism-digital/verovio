@@ -65,6 +65,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "MidiEvent.h"
 #include "MidiFile.h"
 
 namespace vrv {
@@ -315,6 +316,22 @@ void Doc::CalculateTimemap()
     m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }
 
+void Doc::TuneMIDI(smf::MidiFile *midiFile, const std::pair<int, int> &trackPosition, data_TEMPERAMENT temper)
+{
+    smf::MidiEvent midiEvent;
+    midiEvent.tick = trackPosition.second;
+    if (temper != TEMPERAMENT_NONE) {
+        switch (temper) {
+            case TEMPERAMENT_equal: midiEvent.makeTemperamentEqual(); break;
+            case TEMPERAMENT_just: midiEvent.makeTemperamentBad(); break;
+            case TEMPERAMENT_mean: midiEvent.makeTemperamentMeantone(); break;
+            case TEMPERAMENT_pythagorean: midiEvent.makeTemperamentPythagorean(); break;
+            default: return;
+        }
+        midiFile->addEvent(trackPosition.first, midiEvent);
+    }
+}
+
 void Doc::ExportMIDI(smf::MidiFile *midiFile)
 {
 
@@ -338,7 +355,6 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     if (this->GetCurrentScoreDef()->HasTuneTemper()) {
         temper = this->GetCurrentScoreDef()->GetTuneTemper();
     }
-    midiFile->addTemperament(0, 0, temper);
 
     // Capture information for MIDI generation, i.e. from control elements
     Functor initMIDI(&Object::InitMIDI);
@@ -409,6 +425,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             if (meterSig && meterSig->HasCount()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
+            this->TuneMIDI(midiFile, {midiTrack, 0}, temper);
         }
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
@@ -421,7 +438,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
-            GenerateMIDIParams generateMIDIParams(midiFile, &generateMIDI);
+            GenerateMIDIParams generateMIDIParams(midiFile, this, &generateMIDI);
             generateMIDIParams.m_midiChannel = midiChannel;
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_staffN = staves->first;

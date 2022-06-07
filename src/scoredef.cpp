@@ -747,8 +747,8 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     const data_TEMPERAMENT temper = this->GetTuneTemper();
 
     if (temper != params->m_currentTemperament) {
-        params->m_midiFile->addTemperament(0, params->m_totalTime * params->m_midiFile->getTPQ(), temper);
         params->m_currentTemperament = temper;
+        params->m_hasTemperChanged = true;
     }
 
     return FUNCTOR_CONTINUE;

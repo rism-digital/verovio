@@ -1750,9 +1750,10 @@ using MIDIChordSequence = std::list<MIDIChord>;
 
 class GenerateMIDIParams : public FunctorParams {
 public:
-    GenerateMIDIParams(smf::MidiFile *midiFile, Functor *functor)
+    GenerateMIDIParams(smf::MidiFile *midiFile, Doc *doc, Functor *functor)
     {
         m_midiFile = midiFile;
+        m_doc = doc;
         m_midiTrack = 1;
         m_midiChannel = 0;
         m_totalTime = 0.0;
@@ -1760,12 +1761,14 @@ public:
         m_transSemi = 0;
         m_currentTempo = MIDI_TEMPO;
         m_currentTemperament = TEMPERAMENT_NONE;
+        m_hasTemperChanged = false;
         m_lastNote = NULL;
         m_accentedGraceNote = false;
         m_cueExclusion = false;
         m_functor = functor;
     }
     smf::MidiFile *m_midiFile;
+    Doc *m_doc;
     int m_midiTrack;
     int m_midiChannel;
     double m_totalTime;
@@ -1773,6 +1776,7 @@ public:
     int m_transSemi;
     double m_currentTempo;
     data_TEMPERAMENT m_currentTemperament;
+    bool m_hasTemperChanged;
     Note *m_lastNote;
     std::map<Note *, MIDINoteSequence> m_expandedNotes;
     std::map<Note *, double> m_deferredNotes;

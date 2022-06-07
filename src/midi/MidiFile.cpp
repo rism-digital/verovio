@@ -1816,29 +1816,6 @@ MidiEvent* MidiFile::addTempo(int aTrack, int aTick, double aTempo) {
 	return me;
 }
 
-//////////////////////////////
-//
-// MidiFile::addTemperament -- Add a temperament meta message.
-//
-
-MidiEvent *MidiFile::addTemperament(int aTrack, int aTick, int aTemperament)
-{
-    MidiEvent *me = new MidiEvent;
-    me->tick = aTick;
-    switch (aTemperament) {
-        case 0x1: me->makeTemperamentEqual(); break;
-        case 0x2: me->makeTemperamentBad(); break;
-        case 0x3: me->makeTemperamentMeantone(); break;
-        case 0x4: me->makeTemperamentPythagorean(); break;
-		default: {
-            delete me;
-			return NULL;
-		}
-	}
-    
-    m_events[aTrack]->push_back_no_copy(me);
-    return me;
-}
 
 
 //////////////////////////////

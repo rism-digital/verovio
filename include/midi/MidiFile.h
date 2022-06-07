@@ -216,8 +216,6 @@ class MidiFile {
 		                                           const std::string& text);
 		MidiEvent*         addTempo               (int aTrack, int aTick,
 		                                           double aTempo);
-		MidiEvent*         addTemperament         (int aTrack, int aTick,
-		                                           int aTemperament);
 		MidiEvent*         addTimeSignature       (int aTrack, int aTick,
 		                                           int top, int bottom,
 		                                           int clocksPerClick = 24,

@@ -451,6 +451,11 @@ public:
     void ReactivateSelection(bool resetAligners);
     ///@}
 
+    /**
+     * Add tuning events to the MIDI in case scoreDef has corresponding @tune attributes
+     */
+    void TuneMIDI(smf::MidiFile *midiFile, const std::pair<int, int> &trackPosition, data_TEMPERAMENT temper);
+
     //----------//
     // Functors //
     //----------//
