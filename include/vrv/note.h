@@ -402,7 +402,7 @@ private:
 
     /**
      * flags for determining clusters in chord (cluster this belongs to)
-     **/
+     */
     ChordCluster *m_cluster;
 
     /**
