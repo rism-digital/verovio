@@ -1955,7 +1955,7 @@ std::vector<uchar> MidiMessage::intToVlv(int value) {
 
 void MidiMessage::makeSysExMessage(const std::vector<uchar>& data) {
 	int startindex = 0;
-	int endindex = data.size() - 1;
+	int endindex = (int)data.size() - 1;
 	if (data.size() > 0) {
 		if (data[0] == 0xf0) {
 			startindex++;
@@ -2069,7 +2069,7 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 	data.push_back((uchar)0x08);  // sub-ID#1 (MIDI Tuning)
 	data.push_back((uchar)0x02);  // sub-ID#2 (note change)
 	data.push_back((uchar)program);  // tuning program number (0 - 127)
-	std::vector<uchar> vlv = intToVlv(mapping.size());
+	std::vector<uchar> vlv = intToVlv((int)mapping.size());
 	for (int i=0; i<(int)vlv.size(); i++) {
 		data.push_back(vlv[i]);
 	}
