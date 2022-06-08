@@ -4618,7 +4618,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
         if (cancel) {
             keySig->SetSigShowchange(BOOLEAN_true);
         }
-        // Make sure we generate the children keyAccid because Doc::PrepareData will not be called before generating the accid.ges
+        // Generate the children keyAccid because Doc::PrepareData will not be called before generating the accid.ges
         keySig->GenerateKeyAccidAttribChildren();
     }
     else {
