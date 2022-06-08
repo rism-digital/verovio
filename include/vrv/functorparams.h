@@ -1761,7 +1761,8 @@ public:
         m_transSemi = 0;
         m_currentTempo = MIDI_TEMPO;
         m_currentTemperament = TEMPERAMENT_NONE;
-        m_hasTemperChanged = false;
+        m_currentTune = 0.0;
+        m_hasTuningChanged = false;
         m_lastNote = NULL;
         m_accentedGraceNote = false;
         m_cueExclusion = false;
@@ -1776,7 +1777,8 @@ public:
     int m_transSemi;
     double m_currentTempo;
     data_TEMPERAMENT m_currentTemperament;
-    bool m_hasTemperChanged;
+    double m_currentTune;
+    bool m_hasTuningChanged;
     Note *m_lastNote;
     std::map<Note *, MIDINoteSequence> m_expandedNotes;
     std::map<Note *, double> m_deferredNotes;

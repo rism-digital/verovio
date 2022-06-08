@@ -316,7 +316,8 @@ void Doc::CalculateTimemap()
     m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }
 
-void Doc::TuneMIDI(smf::MidiFile *midiFile, const std::pair<int, int> &trackPosition, data_TEMPERAMENT temper)
+void Doc::TuneMIDI(
+    smf::MidiFile *midiFile, const std::pair<int, int> &trackPosition, data_TEMPERAMENT temper, double tuneHz)
 {
     smf::MidiEvent midiEvent;
     midiEvent.tick = trackPosition.second;
@@ -328,6 +329,16 @@ void Doc::TuneMIDI(smf::MidiFile *midiFile, const std::pair<int, int> &trackPosi
             case TEMPERAMENT_pythagorean: midiEvent.makeTemperamentPythagorean(); break;
             default: return;
         }
+        midiFile->addEvent(trackPosition.first, midiEvent);
+    }
+    else if (tuneHz > 0.0) {
+        // Add tuning for all keys from 0 to 127
+        std::vector<std::pair<int, double>> tuneFrequencies;
+        for (int i = 0; i < 127; i++) {
+            double freq = pow(2.0, (i - 69.0) / 12.0) * tuneHz;
+            tuneFrequencies.push_back(std::make_pair(i, freq));
+        }
+        midiEvent.makeMts2_KeyTuningsByFrequency(tuneFrequencies);
         midiFile->addEvent(trackPosition.first, midiEvent);
     }
 }
@@ -354,6 +365,10 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     data_TEMPERAMENT temper = TEMPERAMENT_NONE;
     if (this->GetCurrentScoreDef()->HasTuneTemper()) {
         temper = this->GetCurrentScoreDef()->GetTuneTemper();
+    }
+    double tuneHz = 0.0;
+    if (this->GetCurrentScoreDef()->HasTuneHz()) {
+        tuneHz = this->GetCurrentScoreDef()->GetTuneHz();
     }
 
     // Capture information for MIDI generation, i.e. from control elements
@@ -425,7 +440,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             if (meterSig && meterSig->HasCount()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
-            this->TuneMIDI(midiFile, {midiTrack, 0}, temper);
+            this->TuneMIDI(midiFile, { midiTrack, 0 }, temper, tuneHz);
         }
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {

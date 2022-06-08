@@ -742,13 +742,18 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    if (!this->HasTuneTemper()) return FUNCTOR_CONTINUE;
+    if (!this->HasTuneTemper() && !this->HasTuneHz()) return FUNCTOR_CONTINUE;
 
     const data_TEMPERAMENT temper = this->GetTuneTemper();
+    const double tuneHz = this->GetTuneHz();
 
     if (temper != params->m_currentTemperament) {
         params->m_currentTemperament = temper;
-        params->m_hasTemperChanged = true;
+        params->m_hasTuningChanged = true;
+    }
+    if (tuneHz > 0.0) {
+        params->m_currentTune = tuneHz;
+        params->m_hasTuningChanged = true;
     }
 
     return FUNCTOR_CONTINUE;
