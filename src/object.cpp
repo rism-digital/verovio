@@ -763,7 +763,7 @@ int Object::DeleteChildrenByComparison(Comparison *comparison)
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end();) {
         if ((*comparison)(*iter)) {
-            delete *iter;
+            if (!m_isReferenceObject) delete *iter;
             iter = m_children.erase(iter);
             ++count;
         }
