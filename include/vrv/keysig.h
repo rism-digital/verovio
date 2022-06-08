@@ -84,7 +84,6 @@ public:
      */
     ///@{
     bool HasNonAttribKeyAccidChildren() const;
-    void ClearKeyAccidAttribChildren();
     void GenerateKeyAccidAttribChildren();
     ///@}
 

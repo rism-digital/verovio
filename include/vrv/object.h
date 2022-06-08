@@ -512,6 +512,12 @@ public:
     bool DeleteChild(Object *child);
 
     /**
+     * Delete the children that match the comparison.
+     * Return the number of children deleted. Also mark the object as modified for invalidating the list.
+     */
+    int DeleteChildrenByComparison(Comparison *comparison);
+
+    /**
      * Returns all ancestors
      */
     ///@{

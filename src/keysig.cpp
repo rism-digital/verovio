@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
+#include "comparison.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "keyaccid.h"
@@ -162,16 +163,11 @@ bool KeySig::HasNonAttribKeyAccidChildren() const
     return std::any_of(childList.begin(), childList.end(), [](const Object *child) { return !child->IsAttribute(); });
 }
 
-void KeySig::ClearKeyAccidAttribChildren()
-{
-    ListOfObjects childList = this->GetList(this);
-    std::for_each(childList.begin(), childList.end(), [this](Object *child) {
-        if (child->IsAttribute()) this->DeleteChild(child);
-    });
-}
-
 void KeySig::GenerateKeyAccidAttribChildren()
 {
+    IsAttributeComparison isAttribute(KEYACCID);
+    this->DeleteChildrenByComparison(&isAttribute);
+
     if (this->HasEmptyList(this)) {
         for (int i = 0; i < this->GetAccidCount(true); ++i) {
             std::optional<KeyAccidInfo> info = this->GetKeyAccidInfoAt(i);
@@ -318,7 +314,6 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, c
 int KeySig::PrepareDataInitialization(FunctorParams *)
 {
     // Clear and regenerate attribute children
-    this->ClearKeyAccidAttribChildren();
     this->GenerateKeyAccidAttribChildren();
 
     return FUNCTOR_CONTINUE;
