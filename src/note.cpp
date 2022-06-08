@@ -726,26 +726,28 @@ TransPitch Note::GetTransPitch()
     return TransPitch(pname, this->GetChromaticAlteration(), this->GetOct());
 }
 
-void Note::UpdateFromTransPitch(const TransPitch &tp)
+void Note::UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig)
 {
     this->SetPname(tp.GetPitchName());
 
     Accid *accid = this->GetDrawingAccid();
-    bool transposeGesturalAccid = false;
-    bool transposeWrittenAccid = false;
     if (!accid) {
         accid = new Accid();
         this->AddChild(accid);
     }
-    if (accid->HasAccidGes()) {
-        transposeGesturalAccid = true;
-    }
-    if (accid->HasAccid()) {
-        transposeWrittenAccid = true;
-    }
+
+    bool transposeGesturalAccid = accid->HasAccidGes();
+    bool transposeWrittenAccid = accid->HasAccid();
     // TODO: Check the case of both existing but having unequal values.
     if (!accid->HasAccidGes() && !accid->HasAccid()) {
         transposeGesturalAccid = true;
+    }
+
+    // Without key signature prefer written accidentals
+    if (!hasKeySig && transposeGesturalAccid) {
+        accid->ResetAccidentalGestural();
+        transposeGesturalAccid = false;
+        if (tp.m_accid != 0) transposeWrittenAccid = true;
     }
 
     if (transposeGesturalAccid) {
@@ -1562,7 +1564,10 @@ int Note::Transpose(FunctorParams *functorParams)
 
     TransPitch pitch = this->GetTransPitch();
     params->m_transposer->Transpose(pitch);
-    this->UpdateFromTransPitch(pitch);
+
+    const int staffN = this->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
+    const bool hasKeySig = ((params->m_keySigForStaffN.count(staffN) > 0) || (params->m_keySigForStaffN.count(-1) > 0));
+    this->UpdateFromTransPitch(pitch, hasKeySig);
 
     return FUNCTOR_SIBLINGS;
 }
