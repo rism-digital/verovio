@@ -126,7 +126,8 @@ public:
      */
     ///@{
     void SetBrush(int colour, int opacity);
-    void SetPen(int colour, int width, int opacity, int dashLength = 0, int lineCap = 0);
+    void SetPen(
+        int colour, int width, int style, int dashLength = 0, int gapLength = 0, int lineCap = 0, int lineJoin = 0);
     void SetFont(FontInfo *font);
     void ResetBrush();
     void ResetPen();
@@ -172,8 +173,8 @@ public:
     virtual void DrawEllipse(int x, int y, int width, int height) = 0;
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end) = 0;
     virtual void DrawLine(int x1, int y1, int x2, int y2) = 0;
-    virtual void DrawPolygon(int n, Point points[], int xoffset = 0, int yoffset = 0, int fill_style = AxODDEVEN_RULE)
-        = 0;
+    virtual void DrawPolyline(int n, Point points[], int xOffset = 0, int yOffset = 0) = 0;
+    virtual void DrawPolygon(int n, Point points[], int xOffset = 0, int yOffset = 0) = 0;
     virtual void DrawRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius) = 0;

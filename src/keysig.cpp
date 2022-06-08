@@ -195,7 +195,7 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
     mapOfPitchAccid.clear();
 
     const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
-    if (childList.size() > 0) {
+    if (!childList.empty()) {
         for (auto &child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
             assert(keyAccid);
@@ -205,7 +205,7 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
     }
 
     data_ACCIDENTAL_WRITTEN accidType = this->GetAccidType();
-    for (int i = 0; i < this->GetAccidCount(); ++i) {
+    for (int i = 0; i < this->GetAccidCount(true); ++i) {
         mapOfPitchAccid[KeySig::GetAccidPnameAt(accidType, i)] = accidType;
     }
 }

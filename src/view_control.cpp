@@ -527,7 +527,7 @@ void View::DrawBracketSpan(
             dc->ResetBrush();
         }
         else if (bracketSpan->GetLform() == LINEFORM_dotted) {
-            dc->SetPen(m_currentColour, lineWidth, AxDOT, lineWidth, 1);
+            dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND);
             dc->SetBrush(m_currentColour, AxSOLID);
             // Adjust the start and end because the horizontal line of the was drawn in that case
             int x1Dotted
@@ -599,12 +599,30 @@ void View::DrawHairpin(
 
     hairpinLog_FORM form = hairpin->GetForm();
 
+    // For now we calculate everything based on cresc.
     int startY = 0;
     int endY = hairpin->CalcHeight(m_doc, staff->m_drawingStaffSize, spanningType, leftLink, rightLink);
 
-    m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
+    // To get things right, we need to consider the corresponding spanning type for dim.
+    char correspSpanningType = spanningType;
+    if (form == hairpinLog_FORM_dim) {
+        if (spanningType == SPANNING_START) correspSpanningType = SPANNING_END;
+        if (spanningType == SPANNING_END) correspSpanningType = SPANNING_START;
+    }
 
-    // We calculate points for cresc. by default. Start/End have to be swapped
+    // Adjust start/end for broken hairpins
+    if (correspSpanningType == SPANNING_START) {
+        endY = endY * 2 / 3;
+    }
+    else if (correspSpanningType == SPANNING_END) {
+        startY = endY / 3;
+    }
+    else if (correspSpanningType == SPANNING_MIDDLE) {
+        startY = endY / 3;
+        endY = endY * 2 / 3;
+    }
+
+    // Now swap start/end for dim.
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
 
     int y1 = hairpin->GetDrawingY();
@@ -612,47 +630,6 @@ void View::DrawHairpin(
         y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     int y2 = y1;
-
-    /************** start / end opening **************/
-
-    if (form == hairpinLog_FORM_cres) {
-        // the normal case
-        if (spanningType == SPANNING_START_END) {
-            // nothing to adjust
-        }
-        // In this case, we are drawing the first half of a cresc. and reduce the opening end
-        else if (spanningType == SPANNING_START) {
-            endY = endY / 2;
-        }
-        // Now this is the case we are drawing the end of a cresc. and increase the opening start
-        else if (spanningType == SPANNING_END) {
-            startY = endY / 2;
-        }
-        // Finally, cres. accross the system, increase the start and reduce the end
-        else {
-            startY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false) / 3;
-            endY = 2 * startY;
-        }
-    }
-    else {
-        // the normal case
-        if (spanningType == SPANNING_START_END) {
-            // nothing to adjust
-        }
-        // In this case, we are drawing the first half a a dim. Increase the opening end
-        else if (spanningType == SPANNING_START) {
-            endY = startY / 2;
-        }
-        // Now this is the case we are drawing the end of a dim. Reduce the opening start
-        else if (spanningType == SPANNING_END) {
-            startY = startY / 2;
-        }
-        // Finally, dim accross the system, reduce the start and increase the end
-        else {
-            endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false) / 3;
-            startY = 2 * endY;
-        }
-    }
 
     /************** draw it **************/
 
@@ -667,8 +644,31 @@ void View::DrawHairpin(
 
     const double hairpinThickness
         = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_hairpinThickness.GetValue();
-    this->DrawObliquePolygon(dc, x1, y1 - startY / 2, x2, y2 - endY / 2, hairpinThickness);
-    this->DrawObliquePolygon(dc, x1, y1 + startY / 2, x2, y2 + endY / 2, hairpinThickness);
+    dc->SetPen(m_currentColour, hairpinThickness, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_BEVEL);
+    if (startY == 0) {
+        Point p[3];
+        p[0] = { ToDeviceContextX(x2), ToDeviceContextY(y2 - endY / 2) };
+        p[1] = { ToDeviceContextX(x1), ToDeviceContextY(y1) };
+        p[2] = { p[0].x, ToDeviceContextY(y2 + endY / 2) };
+        dc->DrawPolyline(3, p);
+    }
+    else if (endY == 0) {
+        Point p[3];
+        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2) };
+        p[1] = { ToDeviceContextX(x2), ToDeviceContextY(y2) };
+        p[2] = { p[0].x, ToDeviceContextY(y1 + startY / 2) };
+        dc->DrawPolyline(3, p);
+    }
+    else {
+        Point p[2];
+        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2) };
+        p[1] = { ToDeviceContextX(x2), ToDeviceContextY(y2 - endY / 2) };
+        dc->DrawPolyline(2, p);
+        p[0].y = ToDeviceContextY(y1 + startY / 2);
+        p[1].y = ToDeviceContextY(y2 + endY / 2);
+        dc->DrawPolyline(2, p);
+    }
+    dc->ResetPen();
 
     // dc->ReactivateGraphic();
     if (graphic)
@@ -799,11 +799,11 @@ void View::DrawOctave(
         int dotShift = 0;
         if (octave->HasLform()) {
             if (octave->GetLform() == LINEFORM_solid) {
-                dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0);
+                dc->SetPen(m_currentColour, lineWidth, AxSOLID);
                 dc->SetBrush(m_currentColour, AxSOLID);
             }
             else if (octave->GetLform() == LINEFORM_dotted) {
-                dc->SetPen(m_currentColour, lineWidth, AxDOT, lineWidth, 1);
+                dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND);
                 dc->SetBrush(m_currentColour, AxSOLID);
                 dotShift = lineShift;
             }
@@ -1930,7 +1930,8 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         y1 = note2->GetDrawingY() - (x2 - x1) * sin(angle);
     }
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
-        if (Accid *accid = note2->GetDrawingAccid(); accid) {
+        Accid *accid = note2->GetDrawingAccid();
+        if (accid && (accid->GetAccid() != ACCIDENTAL_WRITTEN_NONE)) {
             const int dist = x2 - accid->GetContentLeft() + 0.5 * unit;
             x2 -= dist;
             y2 = note2->GetDrawingY() - dist * tan(angle);
