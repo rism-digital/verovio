@@ -4618,8 +4618,6 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
         if (cancel) {
             keySig->SetSigShowchange(BOOLEAN_true);
         }
-        // Generate the children keyAccid because Doc::PrepareData will not be called before generating the accid.ges
-        keySig->GenerateKeyAccidAttribChildren();
     }
     else {
         keySig->SetSig({ 0, ACCIDENTAL_WRITTEN_n });
