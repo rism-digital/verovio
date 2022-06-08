@@ -129,7 +129,7 @@ std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
     return symbolStr;
 }
 
-void Accid::AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize)
+void Accid::AdjustToLedgerLines(const Doc *doc, LayerElement *element, int staffSize)
 {
     Staff *staff = element->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
@@ -152,7 +152,7 @@ void Accid::AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize)
     }
 }
 
-void Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
+void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
     std::vector<Accid *> &adjustedAccids)
 {
     assert(element);

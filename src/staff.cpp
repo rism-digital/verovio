@@ -356,7 +356,7 @@ void Staff::SetFromFacsimile(Doc *doc)
     this->AdjustDrawingStaffSize();
 }
 
-bool Staff::IsOnStaffLine(int y, Doc *doc)
+bool Staff::IsOnStaffLine(int y, const Doc *doc) const
 {
     assert(doc);
 

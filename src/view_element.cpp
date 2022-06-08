@@ -778,7 +778,7 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     dc->StartGraphic(element, "", element->GetUuid());
 
     for (const auto &mapEntry : dots->GetMapOfDotLocs()) {
-        Staff *dotStaff = (mapEntry.first) ? mapEntry.first : staff;
+        const Staff *dotStaff = (mapEntry.first) ? mapEntry.first : staff;
         int y = dotStaff->GetDrawingY()
             - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
         int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -1689,7 +1689,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(verse);
 
     Label *label = dynamic_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
-    LabelAbbr *labelAbbr = verse->m_drawingLabelAbbr;
+    LabelAbbr *labelAbbr = verse->GetDrawingLabelAbbr();
 
     if (label || labelAbbr) {
 
@@ -1792,7 +1792,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     dc->ResetBrush();
 }
 
-void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff, bool dimin)
+void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, const Staff *staff, bool dimin)
 {
     int i;
 

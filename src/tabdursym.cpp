@@ -77,7 +77,7 @@ void TabDurSym::AddChild(Object *child)
     Modify();
 }
 
-void TabDurSym::AdjustDrawingYRel(Staff *staff, Doc *doc)
+void TabDurSym::AdjustDrawingYRel(const Staff *staff, const Doc *doc)
 {
     assert(staff);
     assert(doc);

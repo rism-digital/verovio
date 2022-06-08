@@ -49,7 +49,7 @@ void Dots::Reset()
     m_dotLocsByStaff.clear();
 }
 
-std::set<int> Dots::GetDotLocsForStaff(Staff *staff) const
+std::set<int> Dots::GetDotLocsForStaff(const Staff *staff) const
 {
     if (m_dotLocsByStaff.find(staff) != m_dotLocsByStaff.end()) {
         return m_dotLocsByStaff.at(staff);
@@ -57,7 +57,7 @@ std::set<int> Dots::GetDotLocsForStaff(Staff *staff) const
     return {};
 }
 
-std::set<int> &Dots::ModifyDotLocsForStaff(Staff *staff)
+std::set<int> &Dots::ModifyDotLocsForStaff(const Staff *staff)
 {
     return m_dotLocsByStaff[staff];
 }
@@ -150,28 +150,28 @@ void TupletBracket::Reset()
     m_alignedNum = NULL;
 }
 
-int TupletBracket::GetDrawingXLeft()
+int TupletBracket::GetDrawingXLeft() const
 {
-    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingLeft());
 
     return tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
 }
 
-int TupletBracket::GetDrawingXRight()
+int TupletBracket::GetDrawingXRight() const
 {
-    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingRight());
 
     return tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
 }
 
-int TupletBracket::GetDrawingYLeft()
+int TupletBracket::GetDrawingYLeft() const
 {
-    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingLeft());
 
-    Beam *beam = tuplet->GetBracketAlignedBeam();
+    const Beam *beam = tuplet->GetBracketAlignedBeam();
     if (beam) {
         // Calculate the y point aligning with the beam
         int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
@@ -184,12 +184,12 @@ int TupletBracket::GetDrawingYLeft()
     }
 }
 
-int TupletBracket::GetDrawingYRight()
+int TupletBracket::GetDrawingYRight() const
 {
-    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+    const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingRight());
 
-    Beam *beam = tuplet->GetBracketAlignedBeam();
+    const Beam *beam = tuplet->GetBracketAlignedBeam();
     if (beam) {
         // Calculate the y point aligning with the beam
         int xRight = tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
@@ -225,7 +225,7 @@ void TupletNum::Reset()
     m_alignedBracket = NULL;
 }
 
-int TupletNum::GetDrawingYMid()
+int TupletNum::GetDrawingYMid() const
 {
     if (m_alignedBracket) {
         int yLeft = m_alignedBracket->GetDrawingYLeft();
@@ -237,7 +237,7 @@ int TupletNum::GetDrawingYMid()
     }
 }
 
-int TupletNum::GetDrawingXMid(Doc *doc)
+int TupletNum::GetDrawingXMid(const Doc *doc) const
 {
     if (m_alignedBracket) {
         int xLeft = m_alignedBracket->GetDrawingXLeft();
@@ -245,7 +245,7 @@ int TupletNum::GetDrawingXMid(Doc *doc)
         return xLeft + ((xRight - xLeft) / 2);
     }
     else {
-        Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
+        const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET));
         assert(tuplet && tuplet->GetDrawingLeft() && tuplet->GetDrawingRight());
         int xLeft = tuplet->GetDrawingLeft()->GetDrawingX();
         int xRight = tuplet->GetDrawingRight()->GetDrawingX();
@@ -253,7 +253,7 @@ int TupletNum::GetDrawingXMid(Doc *doc)
             xRight += (tuplet->GetDrawingRight()->GetDrawingRadius(doc) * 2);
         }
         if (tuplet->GetNumAlignedBeam()) {
-            Beam *beam = tuplet->GetNumAlignedBeam();
+            const Beam *beam = tuplet->GetNumAlignedBeam();
             switch (beam->m_drawingPlace) {
                 case BEAMPLACE_above: xLeft += (tuplet->GetDrawingLeft()->GetDrawingRadius(doc)); break;
                 case BEAMPLACE_below: xRight -= (tuplet->GetDrawingRight()->GetDrawingRadius(doc)); break;
@@ -311,9 +311,9 @@ bool Stem::IsSupportedChild(Object *child)
     return true;
 }
 
-int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int margin)
+int Stem::CompareToElementPosition(const Doc *doc, const LayerElement *otherElement, int margin) const
 {
-    Staff *staff = this->GetAncestorStaff();
+    const Staff *staff = this->GetAncestorStaff();
 
     // check if there is an overlap on the left or on the right and displace stem's parent correspondingly
     const int right = HorizontalLeftOverlap(otherElement, doc, margin, 0);
@@ -321,8 +321,7 @@ int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int mar
     if (!right || !left) return 0;
 
     int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    Flag *currentFlag = NULL;
-    currentFlag = vrv_cast<Flag *>(FindDescendantByType(FLAG, 1));
+    const Flag *currentFlag = vrv_cast<const Flag *>(this->FindDescendantByType(FLAG, 1));
     if (currentFlag && currentFlag->m_drawingNbFlags) {
         wchar_t flagGlyph = currentFlag->GetFlagGlyph(STEMDIRECTION_down);
         const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, this->GetDrawingCueSize());
@@ -337,7 +336,7 @@ int Stem::CompareToElementPosition(Doc *doc, LayerElement *otherElement, int mar
     }
 }
 
-void Stem::AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
+void Stem::AdjustFlagPlacement(const Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
 {
     assert(this->GetParent());
     assert(this->GetParent()->IsLayerElement());
@@ -471,7 +470,7 @@ int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
+int Stem::AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) const
 {
     // if stem length is explicitly set - exit
     if (this->HasStemLen()) return 0;
@@ -479,7 +478,7 @@ int Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
     const int staffSize = staff->m_drawingStaffSize;
     const int unit = doc->GetDrawingUnit(staffSize);
     data_STEMMODIFIER stemMod = STEMMODIFIER_NONE;
-    BTrem *bTrem = vrv_cast<BTrem *>(this->GetFirstAncestor(BTREM));
+    const BTrem *bTrem = vrv_cast<const BTrem *>(this->GetFirstAncestor(BTREM));
     if (bTrem) {
         stemMod = bTrem->GetDrawingStemMod();
     }
@@ -494,7 +493,7 @@ int Stem::AdjustSlashes(Doc *doc, Staff *staff, int flagOffset)
 
     int lenAdjust = flagOffset;
     if (this->GetParent()->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(this->GetParent());
+        const Chord *chord = vrv_cast<const Chord *>(this->GetParent());
         lenAdjust += std::abs(chord->GetTopNote()->GetDrawingY() - chord->GetBottomNote()->GetDrawingY());
     }
 
@@ -663,7 +662,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-void Stem::CalculateStemModRelY(Doc *doc, Staff *staff)
+void Stem::CalculateStemModRelY(const Doc *doc, const Staff *staff)
 {
     const int sign = (this->GetDrawingStemDir() == STEMDIRECTION_up) ? 1 : -1;
     LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
@@ -729,7 +728,7 @@ void Stem::CalculateStemModRelY(Doc *doc, Staff *staff)
     m_stemModRelY = sign * height + adjust;
 }
 
-int Stem::CalculateStemModAdjustment(Doc *doc, Staff *staff, int flagOffset)
+int Stem::CalculateStemModAdjustment(const Doc *doc, const Staff *staff, int flagOffset)
 {
     this->CalculateStemModRelY(doc, staff);
     return this->AdjustSlashes(doc, staff, flagOffset);

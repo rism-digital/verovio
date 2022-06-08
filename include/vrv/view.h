@@ -343,7 +343,7 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
     void DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, wchar_t glyph, int x, int y);
-    void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff, bool dimin = false);
+    void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, const Staff *staff, bool dimin = false);
     void DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x);
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */

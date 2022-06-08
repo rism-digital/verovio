@@ -54,13 +54,6 @@ public:
     void GetAllArtics(bool direction, std::vector<Artic *> &artics);
 
     /**
-     * Split the articulation content into an array with the values to be displayed inside the staff / slur
-     * and the values to be displayed outside.
-     * Used by Artic::PrepareLayerElementParts that then creates the corresponding ArticPart objects.
-     */
-    void SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur);
-
-    /**
      * Return the inside and outside part of an artic if any (NULL otherwiser)
      */
     ///@{
@@ -71,7 +64,7 @@ public:
     /**
      * Check if the articList contains data_ARTICULATION has to be place above staff.
      */
-    bool AlwaysAbove();
+    bool AlwaysAbove() const;
 
     void AddSlurPositioner(FloatingCurvePositioner *positioner, bool start);
 
@@ -140,7 +133,7 @@ public:
 private:
     bool IsInsideArtic(data_ARTICULATION artic) const;
     // Calculate shift for the articulation based on its type and presence of other articulations
-    int CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIRECTION stemDir) const;
+    int CalculateHorizontalShift(const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir) const;
 
 public:
     std::vector<FloatingCurvePositioner *> m_startSlurPositioners;

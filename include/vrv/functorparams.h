@@ -591,7 +591,7 @@ public:
  **/
 class AdjustTupletNumOverlapParams : public FunctorParams {
 public:
-    AdjustTupletNumOverlapParams(TupletNum *tupletNum, Staff *staff)
+    AdjustTupletNumOverlapParams(const TupletNum *tupletNum, const Staff *staff)
     {
         m_tupletNum = tupletNum;
         m_drawingNumPos = STAFFREL_basic_NONE;
@@ -601,11 +601,11 @@ public:
         m_yRel = 0;
     }
 
-    TupletNum *m_tupletNum;
+    const TupletNum *m_tupletNum;
     data_STAFFREL_basic m_drawingNumPos;
     int m_horizontalMargin;
     int m_verticalMargin;
-    Staff *m_staff;
+    const Staff *m_staff;
     int m_yRel;
 };
 
@@ -1832,7 +1832,7 @@ public:
         m_searchDirection = searchDirection;
         m_isInNeighboringLayer = anotherLayer;
     }
-    Object *m_relativeElement;
+    const Object *m_relativeElement;
     int m_initialElementId;
     bool m_searchDirection;
     bool m_isInNeighboringLayer;
@@ -2022,7 +2022,7 @@ public:
 
 class LayerCountInTimeSpanParams : public FunctorParams {
 public:
-    LayerCountInTimeSpanParams(MeterSig *meterSig, Mensur *mensur, Functor *functor)
+    LayerCountInTimeSpanParams(const MeterSig *meterSig, const Mensur *mensur, Functor *functor)
     {
         m_time = 0.0;
         m_duration = 0.0;
@@ -2033,8 +2033,8 @@ public:
     double m_time;
     double m_duration;
     std::set<int> m_layers;
-    MeterSig *m_meterSig;
-    Mensur *m_mensur;
+    const MeterSig *m_meterSig;
+    const Mensur *m_mensur;
     Functor *m_functor;
 };
 
@@ -2053,7 +2053,7 @@ public:
 
 class LayerElementsInTimeSpanParams : public FunctorParams {
 public:
-    LayerElementsInTimeSpanParams(MeterSig *meterSig, Mensur *mensur, Layer *layer)
+    LayerElementsInTimeSpanParams(const MeterSig *meterSig, const Mensur *mensur, const Layer *layer)
     {
         m_time = 0.0;
         m_duration = 0.0;
@@ -2065,10 +2065,10 @@ public:
     double m_time;
     double m_duration;
     bool m_allLayersButCurrent;
-    ListOfObjects m_elements;
-    MeterSig *m_meterSig;
-    Mensur *m_mensur;
-    Layer *m_layer;
+    ListOfConstObjects m_elements;
+    const MeterSig *m_meterSig;
+    const Mensur *m_mensur;
+    const Layer *m_layer;
 };
 
 //----------------------------------------------------------------------------

@@ -149,7 +149,12 @@ void LayerElement::CloneReset()
     m_crossLayer = NULL;
 }
 
-LayerElement *LayerElement::ThisOrSameasAsLink()
+LayerElement *LayerElement::ThisOrSameasLink()
+{
+    return const_cast<LayerElement *>(std::as_const(*this).ThisOrSameasLink());
+}
+
+const LayerElement *LayerElement::ThisOrSameasLink() const
 {
     if (!this->HasSameasLink()) {
         return this;
@@ -157,7 +162,7 @@ LayerElement *LayerElement::ThisOrSameasAsLink()
 
     assert(this->GetSameasLink());
 
-    return dynamic_cast<LayerElement *>(this->GetSameasLink());
+    return dynamic_cast<const LayerElement *>(this->GetSameasLink());
 }
 
 bool LayerElement::IsGraceNote() const
@@ -249,11 +254,11 @@ const Beam *LayerElement::IsInBeam() const
     return NULL;
 }
 
-int LayerElement::GetOriginalLayerN()
+int LayerElement::GetOriginalLayerN() const
 {
     int layerN = this->GetAlignmentLayerN();
     if (layerN < 0) {
-        layerN = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER))->GetN();
+        layerN = vrv_cast<const Layer *>(this->GetFirstAncestor(LAYER))->GetN();
     }
     return layerN;
 }
@@ -274,7 +279,7 @@ const Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bo
 {
     const Staff *staff = NULL;
     if (strategy == RESOLVE_CROSS_STAFF) {
-        Layer *layer = NULL;
+        const Layer *layer = NULL;
         staff = this->GetCrossStaff(layer);
     }
     if (!staff) staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
@@ -284,10 +289,13 @@ const Staff *LayerElement::GetAncestorStaff(const StaffSearch strategy, const bo
 
 Staff *LayerElement::GetCrossStaff(Layer *&layer)
 {
-    return const_cast<Staff *>(std::as_const(*this).GetCrossStaff(layer));
+    const Layer *layerRef = NULL;
+    const Staff *staffRef = std::as_const(*this).GetCrossStaff(layerRef);
+    layer = const_cast<Layer *>(layerRef);
+    return const_cast<Staff *>(staffRef);
 }
 
-const Staff *LayerElement::GetCrossStaff(Layer *&layer) const
+const Staff *LayerElement::GetCrossStaff(const Layer *&layer) const
 {
     if (m_crossStaff) {
         assert(m_crossLayer);
@@ -303,11 +311,11 @@ const Staff *LayerElement::GetCrossStaff(Layer *&layer) const
     return NULL;
 }
 
-data_STAFFREL_basic LayerElement::GetCrossStaffRel()
+data_STAFFREL_basic LayerElement::GetCrossStaffRel() const
 {
     if (!m_crossStaff) return STAFFREL_basic_NONE;
 
-    Staff *staff = this->GetAncestorStaff();
+    const Staff *staff = this->GetAncestorStaff();
 
     return (m_crossStaff->GetN() < staff->GetN()) ? STAFFREL_basic_above : STAFFREL_basic_below;
 }
@@ -359,7 +367,12 @@ void LayerElement::GetChordOverflow(StaffAlignment *&above, StaffAlignment *&bel
     }
 }
 
-Alignment *LayerElement::GetGraceAlignment() const
+Alignment *LayerElement::GetGraceAlignment()
+{
+    return const_cast<Alignment *>(std::as_const(*this).GetGraceAlignment());
+}
+
+const Alignment *LayerElement::GetGraceAlignment() const
 {
     assert(m_graceAlignment);
     return m_graceAlignment;
@@ -448,19 +461,19 @@ int LayerElement::GetDrawingY() const
     return m_cachedDrawingY;
 }
 
-int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticType type)
+int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticType type) const
 {
     // It would not crash otherwise but there is not reason to call it
     assert(this->Is({ NOTE, CHORD }));
 
     ClassIdComparison isArtic(ARTIC);
-    ListOfObjects artics;
+    ListOfConstObjects artics;
     // Process backward because we want the farest away artic
     this->FindAllDescendantsByComparison(&artics, &isArtic, UNLIMITED_DEPTH, BACKWARD);
 
-    Artic *artic = NULL;
+    const Artic *artic = NULL;
     for (auto &child : artics) {
-        artic = vrv_cast<Artic *>(child);
+        artic = vrv_cast<const Artic *>(child);
         assert(artic);
         if (artic->GetDrawingPlace() == place) break;
         // otherwise reset it because we test on the pointer below
@@ -499,32 +512,32 @@ void LayerElement::CenterDrawingX()
     this->SetDrawingXRel(measure->GetInnerCenterX() - this->GetDrawingX());
 }
 
-int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticType type)
+int LayerElement::GetDrawingTop(const Doc *doc, int staffSize, bool withArtic, ArticType type) const
 {
     if (this->Is({ NOTE, CHORD }) && withArtic) {
         int articY = this->GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
         if (articY != VRV_UNSET) return articY;
     }
 
-    Note *note = NULL;
+    const Note *note = NULL;
     if (this->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(this);
+        const Chord *chord = vrv_cast<const Chord *>(this);
         assert(chord);
         note = chord->GetTopNote();
     }
     else if (this->Is(NOTE)) {
-        note = vrv_cast<Note *>(this);
+        note = vrv_cast<const Note *>(this);
         assert(note);
     }
 
     if (note) {
-        DurationInterface *durationInterface = this->GetDurationInterface();
+        const DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
             return note->GetDrawingY() + doc->GetDrawingUnit(staffSize);
         }
         // We should also take into account the stem shift to the right
-        StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
+        const StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
         if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
             return stemmedDrawingInterface->GetDrawingStemEnd(this).y;
@@ -537,32 +550,32 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticTy
     return this->GetDrawingY();
 }
 
-int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, ArticType type)
+int LayerElement::GetDrawingBottom(const Doc *doc, int staffSize, bool withArtic, ArticType type) const
 {
     if (this->Is({ NOTE, CHORD }) && withArtic) {
         int articY = this->GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
         if (articY != -VRV_UNSET) return articY;
     }
 
-    Note *note = NULL;
+    const Note *note = NULL;
     if (this->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(this);
+        const Chord *chord = vrv_cast<const Chord *>(this);
         assert(chord);
         note = chord->GetBottomNote();
     }
     else if (this->Is(NOTE)) {
-        note = vrv_cast<Note *>(this);
+        note = vrv_cast<const Note *>(this);
         assert(note);
     }
 
     if (note) {
-        DurationInterface *durationInterface = this->GetDurationInterface();
+        const DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
             return note->GetDrawingY() - doc->GetDrawingUnit(staffSize);
         }
         // We should also take into account the stem shift to the right
-        StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
+        const StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
         if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
             // this does not take into account the glyph's actual size
@@ -575,7 +588,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
     return this->GetDrawingY();
 }
 
-int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
+int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
 {
     assert(doc);
 
@@ -583,10 +596,10 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
 
     wchar_t code = 0;
     int dur = DUR_4;
-    Staff *staff = this->GetAncestorStaff();
+    const Staff *staff = this->GetAncestorStaff();
     bool isMensuralDur = false;
     if (this->Is(NOTE)) {
-        Note *note = vrv_cast<Note *>(this);
+        const Note *note = vrv_cast<const Note *>(this);
         assert(note);
         dur = note->GetDrawingDur();
         isMensuralDur = note->IsMensuralDur();
@@ -598,7 +611,7 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         }
     }
     else if (this->Is(CHORD)) {
-        Chord *chord = vrv_cast<Chord *>(this);
+        const Chord *chord = vrv_cast<const Chord *>(this);
         assert(chord);
         dur = chord->GetActualDur();
         isMensuralDur = chord->IsMensuralDur();
@@ -634,14 +647,14 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
 }
 
 double LayerElement::GetAlignmentDuration(
-    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+    const Mensur *mensur, const MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (this->IsGraceNote() && notGraceOnly) {
         return 0.0;
     }
 
     // Only resolve simple sameas links to avoid infinite recursion
-    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    const LayerElement *sameas = dynamic_cast<const LayerElement *>(this->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
         return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
@@ -649,7 +662,7 @@ double LayerElement::GetAlignmentDuration(
     if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
-        Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
+        const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
         if (tuplet) {
             ListOfConstObjects objects;
             ClassIdsComparison ids({ CHORD, NOTE, REST });
@@ -662,13 +675,13 @@ double LayerElement::GetAlignmentDuration(
                 if (numbase == 0) numbase = 1;
             }
         }
-        DurationInterface *duration = this->GetDurationInterface();
+        const DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
         if (duration->IsMensuralDur() && (notationType != NOTATIONTYPE_cmn)) {
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
         if (this->Is(NC)) {
-            Neume *neume = vrv_cast<Neume *>(this->GetFirstAncestor(NEUME));
+            const Neume *neume = vrv_cast<const Neume *>(this->GetFirstAncestor(NEUME));
             if (neume->IsLastInNeume(this)) {
                 return 128;
             }
@@ -678,21 +691,21 @@ double LayerElement::GetAlignmentDuration(
         }
         double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
         // With fTrem we need to divide the duration by two
-        FTrem *fTrem = vrv_cast<FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
+        const FTrem *fTrem = vrv_cast<const FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
         if (fTrem) {
             durationValue /= 2.0;
         }
         return durationValue;
     }
     else if (this->Is(BEATRPT)) {
-        BeatRpt *beatRpt = vrv_cast<BeatRpt *>(this);
+        const BeatRpt *beatRpt = vrv_cast<const BeatRpt *>(this);
         assert(beatRpt);
         int meterUnit = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else if (this->Is(TIMESTAMP_ATTR)) {
-        TimestampAttr *timestampAttr = vrv_cast<TimestampAttr *>(this);
+        const TimestampAttr *timestampAttr = vrv_cast<const TimestampAttr *>(this);
         assert(timestampAttr);
         int meterUnit = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
@@ -718,20 +731,20 @@ double LayerElement::GetAlignmentDuration(
 }
 
 double LayerElement::GetSameAsContentAlignmentDuration(
-    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+    const Mensur *mensur, const MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
     }
 
-    LayerElement *sameas = vrv_cast<LayerElement *>(this->GetSameasLink());
+    const LayerElement *sameas = vrv_cast<const LayerElement *>(this->GetSameasLink());
     assert(sameas);
 
     return sameas->GetContentAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
 }
 
 double LayerElement::GetContentAlignmentDuration(
-    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+    const Mensur *mensur, const MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
@@ -744,7 +757,7 @@ double LayerElement::GetContentAlignmentDuration(
         if (!child->HasInterface(INTERFACE_DURATION) || (child->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH) != NULL)) {
             continue;
         }
-        LayerElement *element = vrv_cast<LayerElement *>(child);
+        const LayerElement *element = vrv_cast<const LayerElement *>(child);
         assert(element);
         duration += element->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
@@ -752,22 +765,22 @@ double LayerElement::GetContentAlignmentDuration(
     return duration;
 }
 
-bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
+bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry) const
 {
     // Set integers to extremes
     *ulx = INT_MAX;
     *uly = INT_MAX;
     *lrx = INT_MIN;
     *lry = INT_MIN;
-    ListOfObjects childrenWithFacsimileInterface;
+    ListOfConstObjects childrenWithFacsimileInterface;
     InterfaceComparison ic(INTERFACE_FACSIMILE);
     this->FindAllDescendantsByComparison(&childrenWithFacsimileInterface, &ic);
     bool result = false;
     for (auto it = childrenWithFacsimileInterface.begin(); it != childrenWithFacsimileInterface.end(); ++it) {
-        FacsimileInterface *fi = (*it)->GetFacsimileInterface();
+        const FacsimileInterface *fi = (*it)->GetFacsimileInterface();
         assert(fi);
         if (!(*it)->Is(SYL) && fi->HasFacs()) {
-            Zone *zone = fi->GetZone();
+            const Zone *zone = fi->GetZone();
             assert(zone);
             *ulx = std::min(*ulx, zone->GetUlx());
             *uly = std::min(*uly, zone->GetUly());
@@ -780,7 +793,7 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
 }
 
 std::vector<int> LayerElement::GetElementsInUnison(
-    const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection)
+    const std::set<int> &firstChord, const std::set<int> &secondChord, data_STEMDIRECTION stemDirection) const
 {
     if (firstChord.empty() || secondChord.empty()) return {};
     // Set always sorts elements, hence note locations stored will always be in ascending order, regardless
@@ -917,7 +930,7 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
     return usePrimary ? dotLocs1 : dotLocs2;
 }
 
-int LayerElement::CalcLayerOverlap(Doc *doc, int direction, int y1, int y2)
+int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2)
 {
     Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
     if (!parentLayer) return 0;
@@ -1474,7 +1487,7 @@ int LayerElement::CalcAlignmentPitchPos(FunctorParams *functorParams)
             // should be refined later
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
-                loc = mRest->GetOptimalLayerLocation(staffY, layerY, loc);
+                loc = mRest->GetOptimalLayerLocation(layerY, loc);
             }
         }
 
@@ -1741,8 +1754,8 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::AdjustOverlappingLayers(
-    Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool &isUnison, bool &stemSameas)
+int LayerElement::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElement *> &otherElements,
+    bool areDotsAdjusted, bool &isUnison, bool &stemSameas)
 {
     if (this->Is(NOTE) && this->GetParent()->Is(CHORD))
         return 0;
@@ -1777,7 +1790,7 @@ int LayerElement::AdjustOverlappingLayers(
     return margin;
 }
 
-std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(Doc *doc,
+std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
     const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted, bool isChordElement, bool isLowerElement,
     bool unison)
 {
@@ -1991,7 +2004,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams)
+int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams) const
 {
     AdjustTupletNumOverlapParams *params = vrv_params_cast<AdjustTupletNumOverlapParams *>(functorParams);
     assert(params);
@@ -2413,7 +2426,7 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
+int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams) const
 {
     LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
@@ -2451,12 +2464,12 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
     return (this->Is(CHORD)) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
-int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
+int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams) const
 {
     LayerElementsInTimeSpanParams *params = vrv_params_cast<LayerElementsInTimeSpanParams *>(functorParams);
     assert(params);
 
-    Layer *currentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    const Layer *currentLayer = vrv_cast<const Layer *>(this->GetFirstAncestor(LAYER));
     // Either get layer refernced by @m_layer or all layers but it, depending on the @m_allLayersButCurrent flag
     if ((!params->m_allLayersButCurrent && (currentLayer != params->m_layer))
         || (params->m_allLayersButCurrent && (currentLayer == params->m_layer))) {
@@ -2467,7 +2480,8 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
 
     const double duration = !this->GetFirstAncestor(CHORD)
         ? this->GetAlignmentDuration(params->m_mensur, params->m_meterSig)
-        : vrv_cast<Chord *>(this->GetFirstAncestor(CHORD))->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+        : vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD))
+              ->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
 
     const double time = m_alignment->GetTime();
 
@@ -2553,7 +2567,7 @@ int LayerElement::InitOnsetOffset(FunctorParams *functorParams)
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    LayerElement *element = this->ThisOrSameasAsLink();
+    LayerElement *element = this->ThisOrSameasLink();
 
     double incrementScoreTime;
 
@@ -2709,7 +2723,7 @@ int LayerElement::ResetData(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
+int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams) const
 {
     GetRelativeLayerElementParams *params = vrv_params_cast<GetRelativeLayerElementParams *>(functorParams);
     assert(params);

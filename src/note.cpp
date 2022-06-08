@@ -189,10 +189,10 @@ void Note::AddChild(Object *child)
     Modify();
 }
 
-void Note::AlignDotsShift(Note *otherNote)
+void Note::AlignDotsShift(const Note *otherNote)
 {
     Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-    Dots *otherDots = vrv_cast<Dots *>(otherNote->FindDescendantByType(DOTS, 1));
+    const Dots *otherDots = vrv_cast<const Dots *>(otherNote->FindDescendantByType(DOTS, 1));
     if (!dots || !otherDots) return;
     if (otherDots->GetFlagShift()) {
         dots->SetFlagShift(otherDots->GetFlagShift());
@@ -333,7 +333,7 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
     }
 }
 
-bool Note::IsUnisonWith(Note *note, bool ignoreAccid)
+bool Note::IsUnisonWith(const Note *note, bool ignoreAccid) const
 {
     if (!ignoreAccid && !this->IsEnharmonicWith(note)) return false;
 
@@ -604,9 +604,8 @@ void Note::ResolveStemSameas(PrepareLinkingParams *params)
     }
 }
 
-data_STEMDIRECTION Note::CalcStemDirForSameasNote(Doc *doc, int verticalCenter)
+data_STEMDIRECTION Note::CalcStemDirForSameasNote(int verticalCenter)
 {
-    assert(doc);
     assert(m_stemSameas);
     assert(m_stemSameas->HasStemSameasNote());
     assert(m_stemSameas->GetStemSameasNote() == this);
@@ -631,7 +630,7 @@ data_STEMDIRECTION Note::CalcStemDirForSameasNote(Doc *doc, int verticalCenter)
         topNote->m_stemSameasRole = (stemDir == STEMDIRECTION_up) ? SAMEAS_PRIMARY : SAMEAS_SECONDARY;
         bottomNote->m_stemSameasRole = (stemDir == STEMDIRECTION_up) ? SAMEAS_SECONDARY : SAMEAS_PRIMARY;
 
-        this->CalcNoteHeadShiftForSameasNote(doc, m_stemSameas, stemDir);
+        this->CalcNoteHeadShiftForSameasNote(m_stemSameas, stemDir);
 
         return stemDir;
     }
@@ -641,9 +640,8 @@ data_STEMDIRECTION Note::CalcStemDirForSameasNote(Doc *doc, int verticalCenter)
     }
 }
 
-void Note::CalcNoteHeadShiftForSameasNote(Doc *doc, Note *stemSameas, data_STEMDIRECTION stemDir)
+void Note::CalcNoteHeadShiftForSameasNote(Note *stemSameas, data_STEMDIRECTION stemDir)
 {
-    assert(doc);
     assert(stemSameas);
 
     if (abs(this->GetDiatonicPitch() - stemSameas->GetDiatonicPitch()) > 1) return;
@@ -662,12 +660,12 @@ void Note::CalcNoteHeadShiftForSameasNote(Doc *doc, Note *stemSameas, data_STEMD
     noteToShift->SetFlippedNotehead(true);
 }
 
-bool Note::IsEnharmonicWith(Note *note)
+bool Note::IsEnharmonicWith(const Note *note) const
 {
     return (this->GetMIDIPitch() == note->GetMIDIPitch());
 }
 
-int Note::GetMIDIPitch(const int shift)
+int Note::GetMIDIPitch(const int shift) const
 {
     int pitch = 0;
 
@@ -699,7 +697,7 @@ int Note::GetMIDIPitch(const int shift)
     }
     else if (this->HasTabCourse()) {
         // tablature
-        Staff *staff = this->GetAncestorStaff();
+        const Staff *staff = this->GetAncestorStaff();
         if (staff->m_drawingTuning) {
             pitch = staff->m_drawingTuning->CalcPitchNumber(
                 this->GetTabCourse(), this->GetTabFret(), staff->m_drawingNotationType);
@@ -710,9 +708,9 @@ int Note::GetMIDIPitch(const int shift)
     return pitch + shift;
 }
 
-int Note::GetChromaticAlteration()
+int Note::GetChromaticAlteration() const
 {
-    Accid *accid = this->GetDrawingAccid();
+    const Accid *accid = this->GetDrawingAccid();
 
     if (accid) {
         return TransPitch::GetChromaticAlteration(accid->GetAccidGes(), accid->GetAccid());
@@ -720,7 +718,7 @@ int Note::GetChromaticAlteration()
     return 0;
 }
 
-TransPitch Note::GetTransPitch()
+TransPitch Note::GetTransPitch() const
 {
     int pname = this->GetPname() - PITCHNAME_c;
     return TransPitch(pname, this->GetChromaticAlteration(), this->GetOct());
@@ -763,12 +761,12 @@ void Note::UpdateFromTransPitch(const TransPitch &tp)
     }
 }
 
-bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, int dotLocShift)
+bool Note::IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const
 {
-    Object *stem = this->GetFirst(STEM);
+    const Object *stem = this->GetFirst(STEM);
     if (!stem) return false;
 
-    Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
+    const Flag *flag = dynamic_cast<const Flag *>(stem->GetFirst(FLAG));
     if (!flag) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
@@ -843,7 +841,7 @@ void Note::GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime,
 // Static methods //
 //----------------//
 
-bool Note::HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, Note *note2)
+bool Note::HandleLedgerLineStemCollision(const Doc *doc, const Staff *staff, const Note *note1, const Note *note2)
 {
     assert(doc);
     assert(staff);
@@ -851,8 +849,8 @@ bool Note::HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, No
     assert(note2);
 
     if (note1->GetDrawingLoc() == note2->GetDrawingLoc()) return false;
-    Note *upperNote = (note1->GetDrawingLoc() > note2->GetDrawingLoc()) ? note1 : note2;
-    Note *lowerNote = (note1->GetDrawingLoc() > note2->GetDrawingLoc()) ? note2 : note1;
+    const Note *upperNote = (note1->GetDrawingLoc() > note2->GetDrawingLoc()) ? note1 : note2;
+    const Note *lowerNote = (note1->GetDrawingLoc() > note2->GetDrawingLoc()) ? note2 : note1;
 
     if (upperNote->GetDrawingStemDir() != STEMDIRECTION_down) return false;
     if (lowerNote->GetDrawingStemDir() != STEMDIRECTION_up) return false;
@@ -868,8 +866,8 @@ bool Note::HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, No
     // If one note has more ledger lines, then check if the stems tip of the other note is outside of the staff on this
     // side
     if (linesBelowLower > linesBelowUpper) {
-        Chord *upperChord = upperNote->IsChordTone();
-        Stem *upperStem = upperChord ? upperChord->GetDrawingStem() : upperNote->GetDrawingStem();
+        const Chord *upperChord = upperNote->IsChordTone();
+        const Stem *upperStem = upperChord ? upperChord->GetDrawingStem() : upperNote->GetDrawingStem();
         if (upperStem) {
             const int staffBottom = staff->GetDrawingY() - 2 * unit * (staff->m_drawingLines - 1);
             const int stemBottom = upperStem->GetSelfBottom();
@@ -880,8 +878,8 @@ bool Note::HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, No
     }
 
     if (linesAboveUpper > linesAboveLower) {
-        Chord *lowerChord = lowerNote->IsChordTone();
-        Stem *lowerStem = lowerChord ? lowerChord->GetDrawingStem() : lowerNote->GetDrawingStem();
+        const Chord *lowerChord = lowerNote->IsChordTone();
+        const Stem *lowerStem = lowerChord ? lowerChord->GetDrawingStem() : lowerNote->GetDrawingStem();
         if (lowerStem) {
             const int staffTop = staff->GetDrawingY();
             const int stemTop = lowerStem->GetSelfTop();
@@ -1061,7 +1059,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     if (this->HasStemSameasNote()) {
-        stemDir = this->CalcStemDirForSameasNote(params->m_doc, params->m_verticalCenter);
+        stemDir = this->CalcStemDirForSameasNote(params->m_verticalCenter);
     }
     else if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();
@@ -1163,18 +1161,18 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate)
+MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate) const
 {
     if (predicate && !predicate(this)) return {};
 
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+    const Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
     MapOfNoteLocs noteLocations;
     noteLocations[staff] = { this->GetDrawingLoc() };
     return noteLocations;
 }
 
-MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary)
+MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary) const
 {
     const bool isUpwardDirection = (this->GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
     const bool shiftUpwards = (isUpwardDirection == primary);
@@ -1182,7 +1180,7 @@ MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary)
     assert(noteLocs.size() == 1);
 
     MapOfDotLocs dotLocs;
-    Staff *staff = noteLocs.cbegin()->first;
+    const Staff *staff = noteLocs.cbegin()->first;
     int loc = *noteLocs.cbegin()->second.cbegin();
     if (loc % 2 == 0) loc += (shiftUpwards ? 1 : -1);
     dotLocs[staff] = { loc };
@@ -1545,7 +1543,7 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Note *note = vrv_cast<Note *>(this->ThisOrSameasAsLink());
+    Note *note = vrv_cast<Note *>(this->ThisOrSameasLink());
     assert(note);
 
     params->m_timemap->AddEntry(note, params);

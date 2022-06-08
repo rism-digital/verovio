@@ -68,7 +68,8 @@ public:
     void SetDrawingOctave(bool isDrawingOctave) { m_isDrawingOctave = isDrawingOctave; }
     bool GetDrawingOctave() const { return m_isDrawingOctave; }
     void SetDrawingOctaveAccid(Accid *drawingOctave) { m_drawingOctave = drawingOctave; }
-    Accid *GetDrawingOctaveAccid() const { return m_drawingOctave; }
+    Accid *GetDrawingOctaveAccid() { return m_drawingOctave; }
+    const Accid *GetDrawingOctaveAccid() const { return m_drawingOctave; }
     ///@}
 
     /**
@@ -76,7 +77,8 @@ public:
      */
     ///@{
     void SetDrawingUnisonAccid(Accid *drawingUnison) { m_drawingUnison = drawingUnison; }
-    Accid *GetDrawingUnisonAccid() const { return m_drawingUnison; }
+    Accid *GetDrawingUnisonAccid() { return m_drawingUnison; }
+    const Accid *GetDrawingUnisonAccid() const { return m_drawingUnison; }
     ///@}
 
     /**
@@ -88,13 +90,13 @@ public:
     /**
      * Adjust X position of accid in relation to other element
      */
-    void AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
+    void AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
         std::vector<Accid *> &adjustedAccids);
 
     /**
      * Adjust accid position if it's placed above/below staff so that it does not overlap with ledger lines
      */
-    void AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize);
+    void AdjustToLedgerLines(const Doc *doc, LayerElement *element, int staffSize);
 
     /**
      * @name Set and get same layer alignment

@@ -170,7 +170,9 @@ public:
      */
     ///@{
     BarLine *GetLeftBarLine() { return &m_leftBarLine; }
+    const BarLine *GetLeftBarLine() const { return &m_leftBarLine; }
     BarLine *GetRightBarLine() { return &m_rightBarLine; }
+    const BarLine *GetRightBarLine() const { return &m_rightBarLine; }
     ///@}
 
     /**

@@ -930,6 +930,11 @@ const Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const Cl
 
 Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
 {
+    return const_cast<Object *>(std::as_const(*this).GetLastAncestorNot(classId, maxDepth));
+}
+
+const Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth) const
+{
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
     }
@@ -943,6 +948,11 @@ Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
 }
 
 Object *Object::GetFirstChildNot(const ClassId classId)
+{
+    return const_cast<Object *>(std::as_const(*this).GetFirstChildNot(classId));
+}
+
+const Object *Object::GetFirstChildNot(const ClassId classId) const
 {
     for (const auto child : m_children) {
         if (!child->Is(classId)) {
@@ -2153,7 +2163,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(CLEF)) {
         LayerElement *element = vrv_cast<LayerElement *>(this);
         assert(element);
-        LayerElement *elementOrLink = element->ThisOrSameasAsLink();
+        LayerElement *elementOrLink = element->ThisOrSameasLink();
         if (!elementOrLink || !elementOrLink->Is(CLEF)) return FUNCTOR_CONTINUE;
         Clef *clef = vrv_cast<Clef *>(elementOrLink);
         if (clef->IsScoreDefElement()) {
