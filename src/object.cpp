@@ -757,6 +757,24 @@ bool Object::DeleteChild(Object *child)
     }
 }
 
+int Object::DeleteChildrenByComparison(Comparison *comparison)
+{
+    int count = 0;
+    ArrayOfObjects::iterator iter;
+    for (iter = m_children.begin(); iter != m_children.end();) {
+        if ((*comparison)(*iter)) {
+            delete *iter;
+            iter = m_children.erase(iter);
+            ++count;
+        }
+        else {
+            ++iter;
+        }
+    }
+    if (count > 0) this->Modify();
+    return count;
+}
+
 void Object::GenerateUuid()
 {
     m_uuid = m_classIdStr.at(0) + Object::GenerateRandUuid();
