@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu May 26 14:02:01 PDT 2022
+// Last Modified: Wed Jun  8 12:03:09 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1539,7 +1539,9 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isMensurationSymbol       (void);
 		bool     isMensuration             (void) { return isMensurationSymbol(); }
 		bool     isOriginalMensurationSymbol(void);
+		bool     isModernMensurationSymbol (void);
 		bool     isOriginalMensuration     (void) { return isOriginalMensurationSymbol(); }
+		bool     isModernMensuration       (void) { return isModernMensurationSymbol(); }
 		bool     isInstrumentDesignation   (void);
 		bool     isInstrumentName          (void);
 		bool     isInstrumentAbbreviation  (void);
@@ -7829,6 +7831,10 @@ class Tool_modori : public HumTool {
 		void     convertClefToOriginal        (HTp token);
 		void     convertClefToRegular         (HTp token);
 
+		void     convertMensurationToModern   (HTp token);
+		void     convertMensurationToOriginal (HTp token);
+		void     convertMensurationToRegular  (HTp token);
+
 		void     convertInstrumentNameToModern   (HTp token);
 		void     convertInstrumentNameToOriginal (HTp token);
 		void     convertInstrumentNameToRegular  (HTp token);
@@ -7845,6 +7851,7 @@ class Tool_modori : public HumTool {
 		void     updateLoMo                   (HumdrumFile& infile);
 		void     processLoMo                  (HTp lomo);
 		void     printModoriOutput            (HumdrumFile& infile);
+		bool     swapMensurationStyle         (HTp one, HTp two);
 
 	private:
 		bool m_modernQ        = false; // -m option: show modern key/clef/time signatures

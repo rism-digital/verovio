@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu May 26 14:02:01 PDT 2022
+// Last Modified: Wed Jun  8 12:03:09 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -33386,11 +33386,28 @@ bool HumdrumToken::isMensurationSymbol(void) {
 
 //////////////////////////////
 //
-// HumdrumToken::isOriginalMensurationSymbol -- True if a **kern mensuration Symbol.
+// HumdrumToken::isOriginalMensurationSymbol -- True if a **kern mensuration symbol, original form.
 //
 
 bool HumdrumToken::isOriginalMensurationSymbol(void) {
 	if (this->compare(0, 6, "*omet(") != 0) {
+		return false;
+	}
+	if ((*this)[this->size()-1] != ')') {
+		return false;
+	}
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isModernMensurationSymbol -- True if a **kern mensuration symbol, modern form.
+//
+
+bool HumdrumToken::isModernMensurationSymbol(void) {
+	if (this->compare(0, 6, "*mmet(") != 0) {
 		return false;
 	}
 	if ((*this)[this->size()-1] != ')') {
@@ -87513,6 +87530,8 @@ void Tool_modori::processFile(HumdrumFile& infile) {
 				m_mensurations[track][timeval].push_back(token);
 			} else if (token->isOriginalMensuration()) {
 				m_mensurations[track][timeval].push_back(token);
+			} else if (token->isModernMensuration()) {
+				m_mensurations[track][timeval].push_back(token);
 			}
 		}
 	}
@@ -87872,23 +87891,6 @@ void Tool_modori::switchModernOriginal(HumdrumFile& infile) {
 		}
 	}
 
-	if (!m_noclefQ) {
-		for (int t=1; t<(int)m_clefs.size(); ++t) {
-			for (auto it = m_clefs.at(t).begin(); it != m_clefs.at(t).end(); ++it) {
-				if (it->second.size() != 2) {
-					continue;
-				}
-				bool status = swapClefStyle(it->second.at(0), it->second.at(1));
-				if (status) {
-					int line = it->second.at(0)->getLineIndex();
-					changed.insert(line);
-					line = it->second.at(1)->getLineIndex();
-					changed.insert(line);
-				}
-			}
-		}
-	}
-
 	if (!m_nolyricsQ) {
 		bool adjust = false;
 		int line = -1;
@@ -87982,12 +87984,38 @@ void Tool_modori::switchModernOriginal(HumdrumFile& infile) {
 	if (!m_nomensurationQ) {
 		for (int t=1; t<(int)m_mensurations.size(); ++t) {
 			for (auto it = m_mensurations.at(t).begin(); it != m_mensurations.at(t).end(); ++it) {
-				if (it->second.size() != 1) {
+				if (it->second.size() == 1) {
+					// swap omet to met, or met to omet:
+					bool status = flipMensurationStyle(it->second.at(0));
+					if (status) {
+						int line = it->second.at(0)->getLineIndex();
+						changed.insert(line);
+					}
+				} else if (it->second.size() == 2) {
+					// swap omet/met or mmet/met:
+					bool status = swapMensurationStyle(it->second.at(0), it->second.at(1));
+					if (status) {
+						int line = it->second.at(0)->getLineIndex();
+						changed.insert(line);
+						line = it->second.at(1)->getLineIndex();
+						changed.insert(line);
+					}
+				}
+			}
+		}
+	}
+
+	if (!m_noclefQ) {
+		for (int t=1; t<(int)m_clefs.size(); ++t) {
+			for (auto it = m_clefs.at(t).begin(); it != m_clefs.at(t).end(); ++it) {
+				if (it->second.size() != 2) {
 					continue;
 				}
-				bool status = flipMensurationStyle(it->second.at(0));
+				bool status = swapClefStyle(it->second.at(0), it->second.at(1));
 				if (status) {
 					int line = it->second.at(0)->getLineIndex();
+					changed.insert(line);
+					line = it->second.at(1)->getLineIndex();
 					changed.insert(line);
 				}
 			}
@@ -88396,6 +88424,62 @@ bool Tool_modori::swapInstrumentAbbreviationStyle(HTp one, HTp two) {
 
 //////////////////////////////
 //
+// Tool_modori::swapMensurationStyle -- Returns true if swapped.
+//
+
+bool Tool_modori::swapMensurationStyle(HTp one, HTp two) {
+	bool mtype1 = false;
+	bool mtype2 = false;
+	bool otype1 = false;
+	bool otype2 = false;
+	bool ktype1 = false;
+	bool ktype2 = false;
+	bool output = false;
+
+	if (one->isMensuration()) {
+		ktype1 = true;
+	} else if (one->isModernMensuration()) {
+		mtype1 = true;
+	} else if (one->isOriginalMensuration()) {
+		otype1 = true;
+	}
+
+	if (two->isMensuration()) {
+		ktype2 = true;
+	} else if (two->isModernMensuration()) {
+		mtype2 = true;
+	} else if (two->isOriginalMensuration()) {
+		otype2 = true;
+	}
+
+	if (m_modernQ) {
+		if (ktype1 && mtype2) {
+			convertMensurationToOriginal(one);
+			convertMensurationToRegular(two);
+			output = true;
+		} else if (mtype1 && ktype2) {
+			convertMensurationToRegular(one);
+			convertMensurationToOriginal(two);
+			output = true;
+		}
+	} else if (m_originalQ) {
+		if (ktype1 && otype2) {
+			convertMensurationToModern(one);
+			convertMensurationToRegular(two);
+			output = true;
+		} else if (otype1 && ktype2) {
+			convertMensurationToRegular(one);
+			convertMensurationToModern(two);
+			output = true;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
 // Tool_modori::swapClefStyle -- Returns true if swapped.
 //
 
@@ -88639,6 +88723,54 @@ void Tool_modori::convertClefToRegular(HTp token) {
 	HumRegex hre;
 	if (hre.search(token, "^\\*[mo]?clef(.*)")) {
 		string text = "*clef";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertMensurationToModern --
+//
+
+void Tool_modori::convertMensurationToModern(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?met\\((.*)")) {
+		string text = "*mmet(";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertMensurationToOriginal --
+//
+
+void Tool_modori::convertMensurationToOriginal(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?met\\((.*)")) {
+		string text = "*omet(";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertMensurationToRegular --
+//
+
+void Tool_modori::convertMensurationToRegular(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?met\\((.*)")) {
+		string text = "*met(";
 		text += hre.getMatch(1);
 		token->setText(text);
 	}
