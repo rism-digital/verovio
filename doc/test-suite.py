@@ -1,5 +1,6 @@
 # This script it expected to be run from ./bindings/python
 import argparse
+import hashlib
 import json
 import hashlib
 import os
@@ -14,7 +15,7 @@ import verovio
 
 ns = {'mei': 'http://www.music-encoding.org/ns/mei'}
 
-# Optional list for processing only listed test files 
+# Optional list for processing only listed test files
 # Files must be listed in a file passed with --shortlist, one by line
 # Ex. 'accid/accid-001.mei'
 shortlist = []
@@ -40,9 +41,6 @@ if __name__ == '__main__':
     # version of the toolkit
     tk = verovio.toolkit(False)
     print(f'Verovio {tk.getVersion()}')
-
-    # keep all the options to be able to reset them for each test
-    defaultOptions = json.loads(tk.getOptions(True))
 
     tk.setResourcePath('../../data')
     #tk.initClock()
@@ -79,12 +77,11 @@ if __name__ == '__main__':
                 continue
 
             # reset the options
-            options = {**defaultOptions, **testOptions}
+            options = testOptions
 
             # filenames (input MEI/XML and output SVG)
             inputFile = os.path.join(path1, item1, item2)
             options.update({"xmlIdSeed": int(hashlib.sha256(inputFile.encode("utf-8")).hexdigest(), 16) % 10**9})
-            print(inputFile)
             name, ext = os.path.splitext(item2)
             svgFile = os.path.join(path2, item1, name + '.svg')
             pngFile = os.path.join(path2, item1, name + '.png')
@@ -95,17 +92,24 @@ if __name__ == '__main__':
                 tree = ET.parse(inputFile)
                 root = tree.getroot()
                 # try to get the extMeta tag and load the options if existing
-                meta = root.findtext('.//mei:meiHead/mei:extMeta', namespaces=ns)
+                meta = root.findtext(
+                    './/mei:meiHead/mei:extMeta', namespaces=ns)
                 if meta is not None and meta != '':
                     print(meta)
                     metaOptions = json.loads(meta)
-                    options = {**options, **metaOptions}
+                    options |= metaOptions
 
+            print("setting options")
             tk.setOptions(json.dumps(options))
+            print(json.dumps(options))
             tk.loadFile(inputFile)
+            print("rendering to timemap")
             tk.renderToTimemapFile(timeMapFile)
+            print("rendering to SVG")
             svgString = tk.renderToSVG(1)
             svgString = svgString.replace(
                 "overflow=\"inherit\"", "overflow=\"visible\"")
             ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
+            print("saving to PNG")
             cairosvg.svg2png(bytestring=svgString, scale=2, write_to=pngFile)
+            tk.resetOptions()
