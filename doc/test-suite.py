@@ -77,12 +77,12 @@ if __name__ == '__main__':
                 continue
 
             # reset the options
-            options.clear()
             options = testOptions
 
             # filenames (input MEI/XML and output SVG)
             inputFile = os.path.join(path1, item1, item2)
-            options.update({"xmlIdSeed": int(hashlib.sha256(inputFile.encode("utf-8")).hexdigest(), 16) % 10**9})
+            options.update({"xmlIdSeed": int(hashlib.sha256(
+                inputFile.encode("utf-8")).hexdigest(), 16) % 10**9})
             name, ext = os.path.splitext(item2)
             svgFile = os.path.join(path2, item1, name + '.svg')
             pngFile = os.path.join(path2, item1, name + '.png')
@@ -114,3 +114,4 @@ if __name__ == '__main__':
             print("saving to PNG")
             cairosvg.svg2png(bytestring=svgString, scale=2, write_to=pngFile)
             tk.resetOptions()
+            options.clear()
