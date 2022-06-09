@@ -1714,16 +1714,17 @@ using MIDIChordSequence = std::list<MIDIChord>;
  * member 1: int: the midi track number
  * member 2: int: the midi channel number
  * member 3: double: the score time from the start of the music to the start of the current measure
- * member 4: int: the semi tone transposition for the current track
- * member 5: double with the current tempo
- * member 6: the last (non grace) note that was performed
- * member 7: expanded notes due to ornaments and tremolandi
- * member 8: deferred notes which start slightly later
- * member 9: grace note sequence
- * member 10: flag indicating whether the last grace note/chord was accented
- * member 11: flag indicating whether cue notes should be included
- * member 12: the functor
- * member 13: Tablature held notes indexed by (course - 1)
+ * member 4: the current staff number
+ * member 5: the semi tone transposition for the current track
+ * member 6: double with the current tempo
+ * member 7: the last (non grace) note that was performed
+ * member 8: expanded notes due to ornaments and tremolandi
+ * member 9: deferred notes which start slightly later
+ * member 10: grace note sequence
+ * member 11: flag indicating whether the last grace note/chord was accented
+ * member 12: flag indicating whether cue notes should be included
+ * member 13: the functor
+ * member 14: Tablature held notes indexed by (course - 1)
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1734,6 +1735,7 @@ public:
         m_midiTrack = 1;
         m_midiChannel = 0;
         m_totalTime = 0.0;
+        m_staffN = 0;
         m_transSemi = 0;
         m_currentTempo = MIDI_TEMPO;
         m_lastNote = NULL;
@@ -1745,6 +1747,7 @@ public:
     int m_midiTrack;
     int m_midiChannel;
     double m_totalTime;
+    int m_staffN;
     int m_transSemi;
     double m_currentTempo;
     Note *m_lastNote;
