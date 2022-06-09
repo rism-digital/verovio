@@ -254,18 +254,19 @@ void BeamElementCoord::UpdateStemLength(StemmedDrawingInterface *stemmedInterfac
     // This is the case with fTrem on whole notes
     if (!stem) return;
 
-    // Since the value were calculated relatively to the element position, adjust them
+    // Since the values were calculated relatively to the element position, adjust them
     stem->SetDrawingXRel(m_x - m_element->GetDrawingX());
     stem->SetDrawingYRel(y2 - m_element->GetDrawingY());
     const int prevStemLen = stem->GetDrawingStemLen();
     const int newStemLen = y2 - y1;
     stem->SetDrawingStemLen(newStemLen);
     stem->SetDrawingStemAdjust(-stemAdjust);
+    const int lenChange = newStemLen - prevStemLen;
+    // If length didn't change -just exit
+    if (!lenChange) return;
 
     // Adjust existing artic
-    ListOfObjects artics = m_element->FindAllDescendantsByType(ARTIC);
-
-    const int lenChange = newStemLen - prevStemLen;
+    ListOfObjects artics = m_element->FindAllDescendantsByType(ARTIC);    
     for (auto object : artics) {
         Artic *artic = vrv_cast<Artic *>(object);
         if (((artic->GetDrawingPlace() == STAFFREL_above) && (stem->GetDrawingStemDir() == STEMDIRECTION_up))
