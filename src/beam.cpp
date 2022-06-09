@@ -248,34 +248,6 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
     this->AdjustBeamToTremolos(doc, staff, beamInterface);
 }
 
-void BeamElementCoord::UpdateStemLength(StemmedDrawingInterface *stemmedInterface, int y1, int y2, int stemAdjust)
-{
-    Stem *stem = stemmedInterface->GetDrawingStem();
-    // This is the case with fTrem on whole notes
-    if (!stem) return;
-
-    // Since the values were calculated relatively to the element position, adjust them
-    stem->SetDrawingXRel(m_x - m_element->GetDrawingX());
-    stem->SetDrawingYRel(y2 - m_element->GetDrawingY());
-    const int prevStemLen = stem->GetDrawingStemLen();
-    const int newStemLen = y2 - y1;
-    stem->SetDrawingStemLen(newStemLen);
-    stem->SetDrawingStemAdjust(-stemAdjust);
-    const int lenChange = newStemLen - prevStemLen;
-    // If length didn't change -just exit
-    if (!lenChange) return;
-
-    // Adjust existing artic
-    ListOfObjects artics = m_element->FindAllDescendantsByType(ARTIC);    
-    for (auto object : artics) {
-        Artic *artic = vrv_cast<Artic *>(object);
-        if (((artic->GetDrawingPlace() == STAFFREL_above) && (stem->GetDrawingStemDir() == STEMDIRECTION_up))
-            || ((artic->GetDrawingPlace() == STAFFREL_below) && (stem->GetDrawingStemDir() == STEMDIRECTION_down))) {
-            artic->SetDrawingYRel(artic->GetDrawingYRel() - lenChange);
-        }
-    }
-}
-
 void BeamSegment::CalcSetStemValuesTab(const Staff *staff, const Doc *doc, const BeamDrawingInterface *beamInterface)
 {
     assert(staff);
@@ -1999,6 +1971,34 @@ void BeamElementCoord::SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, boo
         m_tabDurSym = vrv_cast<TabDurSym *>(tabGrp->FindDescendantByType(TABDURSYM));
         if (!outsideStaff) {
             m_closestNote = (STEMDIRECTION_up == stemDir) ? tabGrp->GetTopNote() : tabGrp->GetBottomNote();
+        }
+    }
+}
+
+void BeamElementCoord::UpdateStemLength(StemmedDrawingInterface *stemmedInterface, int y1, int y2, int stemAdjust)
+{
+    Stem *stem = stemmedInterface->GetDrawingStem();
+    // This is the case with fTrem on whole notes
+    if (!stem) return;
+
+    // Since the values were calculated relatively to the element position, adjust them
+    stem->SetDrawingXRel(m_x - m_element->GetDrawingX());
+    stem->SetDrawingYRel(y2 - m_element->GetDrawingY());
+    const int prevStemLen = stem->GetDrawingStemLen();
+    const int newStemLen = y2 - y1;
+    stem->SetDrawingStemLen(newStemLen);
+    stem->SetDrawingStemAdjust(-stemAdjust);
+    const int lenChange = newStemLen - prevStemLen;
+    // If length didn't change -just exit
+    if (!lenChange) return;
+
+    // Adjust existing artic
+    ListOfObjects artics = m_element->FindAllDescendantsByType(ARTIC);
+    for (auto object : artics) {
+        Artic *artic = vrv_cast<Artic *>(object);
+        if (((artic->GetDrawingPlace() == STAFFREL_above) && (stem->GetDrawingStemDir() == STEMDIRECTION_up))
+            || ((artic->GetDrawingPlace() == STAFFREL_below) && (stem->GetDrawingStemDir() == STEMDIRECTION_down))) {
+            artic->SetDrawingYRel(artic->GetDrawingYRel() - lenChange);
         }
     }
 }

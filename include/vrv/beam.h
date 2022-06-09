@@ -448,7 +448,7 @@ public:
      * Return NULL otherwise.
      */
     StemmedDrawingInterface *GetStemHolderInterface();
-    
+
     /**
      * Update stem length based on the calculated coordinates and stemAdjust value
      */
