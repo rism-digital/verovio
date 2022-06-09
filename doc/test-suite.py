@@ -77,6 +77,7 @@ if __name__ == '__main__':
                 continue
 
             # reset the options
+            options.clear()
             options = testOptions
 
             # filenames (input MEI/XML and output SVG)
