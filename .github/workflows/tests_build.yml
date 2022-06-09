@@ -32,10 +32,10 @@ jobs:
   ###################################################
   build_python:
     name: Build the test suite
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
-      - uses: FranzDiebold/github-env-vars-action@v1.2.1
+      - uses: FranzDiebold/github-env-vars-action@v2.3.1
       - name: Get Short SHA
         run: |
           echo "SHORT_SHA=`echo ${{ github.event.pull_request.head.sha }} | cut -c1-7`" >> $GITHUB_ENV
