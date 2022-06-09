@@ -5994,6 +5994,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
     int count = -1;
     int unit = -1;
     if (timesigtok && regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)%(\\d+)"))) {
+        count = stoi(matches[1]);
         // int top = stoi(matches[1]);
         int bot = stoi(matches[2]);
         int bot2 = stoi(matches[3]);
@@ -6006,6 +6007,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
         }
     }
     else if (timesigtok && regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
+        count = stoi(matches[1]);
         if (!metersigtok) {
             unit = stoi(matches[2]);
             MeterSig *vrvmetersig = getMeterSig(element);
