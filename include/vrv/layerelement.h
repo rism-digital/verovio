@@ -124,17 +124,25 @@ public:
     /** Return true if the element is a note within a ligature */
     bool IsInLigature() const;
     /** Return the FTrem parten if the element is a note or a chord within a fTrem */
-    FTrem *IsInFTrem();
-    const FTrem *IsInFTrem() const;
+    FTrem *GetAncestorFTrem();
+    const FTrem *GetAncestorFTrem() const;
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
      * Look for the first beam parent and check if the note is in its content list.
      * Looking in the content list is necessary for grace notes or imbricated beams.
      */
-    Beam *IsInBeam();
-    const Beam *IsInBeam() const;
-    bool IsInBeamSpan() const;
+    Beam *GetAncestorBeam();
+    const Beam *GetAncestorBeam() const;
+    bool IsInBeam() const;
+    ///@}
+
+    /**
+     * @name Setter and getter for isInBeamspan flag
+     */
+    ///@{
+    void SetIsInBeamSpan(bool isInBeamSpan);
+    bool GetIsInBeamSpan() const { return m_isInBeamspan; }
     ///@}
 
     /**
@@ -535,9 +543,6 @@ public:
     Staff *m_crossStaff;
     Layer *m_crossLayer;
 
-    // flag to indicate that layerElement belongs to the beamSpan
-    bool m_isInBeamspan;
-
 protected:
     Alignment *m_alignment;
 
@@ -584,6 +589,9 @@ private:
      * This also stores the negative values for identifying cross-staff
      */
     int m_alignmentLayerN;
+
+    // flag to indicate that layerElement belongs to the beamSpan
+    bool m_isInBeamspan;
 };
 
 } // namespace vrv

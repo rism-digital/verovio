@@ -250,7 +250,7 @@ int BeamSpan::PrepareBeamSpanElements(FunctorParams *functorParams)
 
         Measure *measure = vrv_cast<Measure *>(layerElem->GetFirstAncestor(MEASURE));
         if (!measure) continue;
-        layerElem->m_isInBeamspan = true;
+        layerElem->SetIsInBeamSpan(true);
 
         Staff *elementStaff = vrv_cast<Staff *>(layerElem->GetFirstAncestor(STAFF));
         if (elementStaff->GetN() != staff->GetN()) {
