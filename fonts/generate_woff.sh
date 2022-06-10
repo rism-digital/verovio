@@ -14,7 +14,7 @@ woffFont=${font%.sfd}.woff
 w=$(base64 $woffFont)
 
 cat woff-1.txt > woff.xml
-echo $w >> woff.xml
+echo "$w" >> woff.xml
 cat woff-2.txt >> woff.xml
 
 # move woff to data folder
