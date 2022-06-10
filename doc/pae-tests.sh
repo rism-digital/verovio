@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/bin/sh
 
 dir="./tests/pae/"
 d=`date`

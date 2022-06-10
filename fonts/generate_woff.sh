@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 font="VerovioText-1.0.sfd"
 

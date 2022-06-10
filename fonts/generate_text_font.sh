@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # This script generates XML file with bounding boxes for the plain font
 # One input argument (font name) is expected when running this script
 
