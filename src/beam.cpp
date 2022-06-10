@@ -616,8 +616,6 @@ void BeamSegment::CalcBeamInit(
     /******************************************************************/
     // Calculate the extreme values
 
-    int nbRests = 0;
-
     m_nbNotesOrChords = 0;
     m_ledgerLinesAbove = 0;
     m_ledgerLinesBelow = 0;
@@ -676,9 +674,6 @@ void BeamSegment::CalcBeamInit(
                     m_ledgerLinesAbove += linesAbove;
                 }
             }
-        }
-        else {
-            nbRests++;
         }
     }
 
