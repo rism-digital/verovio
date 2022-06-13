@@ -1474,7 +1474,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
         // slur is up
         if (this->HasEndpointAboveStart()) {
             // P(^)
-            if (startStemDir == STEMDIRECTION_down || startStemLen == 0) {
+            if ((startStemDir == STEMDIRECTION_down) || (startStemLen == 0)) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             //  d(^)d
@@ -1512,7 +1512,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
                 else {
                     // Primary endpoint on the side, move it right
-                    if (startStemLen != 0) x1 += unit * 2;
+                    x1 += unit * 2;
                     if (startChord)
                         y1 = yChordMax + unit * 3;
                     else
@@ -1533,7 +1533,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
             }
             // d(_)
-            else if (startStemDir == STEMDIRECTION_up || startStemLen == 0) {
+            else if ((startStemDir == STEMDIRECTION_up) || (startStemLen == 0)) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             // P(_)P
@@ -1596,7 +1596,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
         // slur is up
         if (this->HasEndpointAboveEnd()) {
             // (^)P
-            if (endStemDir == STEMDIRECTION_down || endStemLen == 0) {
+            if ((endStemDir == STEMDIRECTION_down) || (endStemLen == 0)) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             // d(^)d
@@ -1654,7 +1654,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
         }
         else {
             // (_)d
-            if (endStemDir == STEMDIRECTION_up || endStemLen == 0) {
+            if ((endStemDir == STEMDIRECTION_up) || (endStemLen == 0)) {
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             // P(_)P
@@ -1702,7 +1702,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
                 else {
                     // Primary endpoint on the side, move it left
-                    if (endStemLen != 0) x2 -= unit * 2;
+                    x2 -= unit * 2;
                     if (endChord) {
                         y2 = yChordMin - unit * 3;
                     }
