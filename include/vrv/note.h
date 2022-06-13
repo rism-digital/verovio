@@ -370,7 +370,7 @@ private:
 
     TransPitch GetTransPitch() const;
 
-    void UpdateFromTransPitch(const TransPitch &tp);
+    void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
 
     /**
      * Return whether dots are overlapping with flag. Take into account flag height, its position as well

@@ -21,6 +21,8 @@
 #include "keyaccid.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
+#include "staff.h"
+#include "staffdef.h"
 #include "transposition.h"
 #include "vrv.h"
 
@@ -324,11 +326,20 @@ int KeySig::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
-    if (!this->GetFirstAncestor(STAFFDEF)) {
-        params->m_hasScoreDefKeySig = true;
+    // Store current KeySig
+    int staffN = -1;
+    const StaffDef *staffDef = vrv_cast<StaffDef *>(this->GetFirstAncestor(STAFFDEF));
+    if (staffDef) {
+        staffN = staffDef->GetN();
     }
+    else {
+        const Staff *staff = this->GetAncestorStaff(ANCESTOR_ONLY, false);
+        if (staff) staffN = staff->GetN();
+    }
+    params->m_keySigForStaffN[staffN] = this;
 
-    int sig = this->GetFifthsInt();
+    // Transpose
+    const int sig = this->GetFifthsInt();
 
     int intervalClass = params->m_transposer->CircleOfFifthsToIntervalClass(sig);
     intervalClass = params->m_transposer->Transpose(intervalClass);

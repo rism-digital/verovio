@@ -2629,7 +2629,7 @@ public:
  * member 5: the mdiv selected for transposition
  * member 6: the list of current (nested) mdivs
  * member 7: transpose to sounding pitch by evaluating @trans.semi
- * member 8: true if the current scoreDef contains a KeySig (direct child or attribute)
+ * member 8: current KeySig for staff (ScoreDef key signatures are mapped to -1)
  * member 9: transposition interval for staff
  **/
 
@@ -2642,7 +2642,6 @@ public:
         m_functorEnd = functorEnd;
         m_transposer = transposer;
         m_transposeToSoundingPitch = false;
-        m_hasScoreDefKeySig = false;
     }
     Doc *m_doc;
     Functor *m_functor;
@@ -2652,7 +2651,7 @@ public:
     std::string m_selectedMdivUuid;
     std::list<std::string> m_currentMdivUuids;
     bool m_transposeToSoundingPitch;
-    bool m_hasScoreDefKeySig;
+    std::map<int, const KeySig *> m_keySigForStaffN;
     std::map<int, int> m_transposeIntervalForStaffN;
 };
 

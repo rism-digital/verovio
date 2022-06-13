@@ -759,8 +759,6 @@ int ScoreDef::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
-    params->m_hasScoreDefKeySig = false;
-
     if (params->m_transposeToSoundingPitch) {
         // Set the transposition in order to transpose common key signatures
         // (i.e. encoded as ScoreDef attributes or direct KeySig children)
@@ -785,7 +783,8 @@ int ScoreDef::TransposeEnd(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
-    if (params->m_transposeToSoundingPitch && params->m_hasScoreDefKeySig) {
+    const bool hasScoreDefKeySig = (params->m_keySigForStaffN.count(-1) > 0);
+    if (params->m_transposeToSoundingPitch && hasScoreDefKeySig) {
         bool showWarning = false;
         // Check if some staves are untransposed
         const int mapEntryCount = static_cast<int>(params->m_transposeIntervalForStaffN.size());
