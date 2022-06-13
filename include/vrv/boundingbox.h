@@ -152,6 +152,17 @@ public:
     ////}
 
     /**
+     * @name Return the left / right / top / bottom of the cut out rectangles (and use self bounding rect if there are
+     * none)
+     */
+    ///@{
+    int GetCutOutTop(const Doc *doc) const;
+    int GetCutOutBottom(const Doc *doc) const;
+    int GetCutOutLeft(const Doc *doc) const;
+    int GetCutOutRight(const Doc *doc) const;
+    ///@}
+
+    /**
      * Return true if the bounding box encloses the point.
      */
     bool Encloses(const Point point) const;

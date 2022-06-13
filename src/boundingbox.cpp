@@ -495,6 +495,74 @@ bool BoundingBox::GetGlyph1PointRectangles(const SMuFLGlyphAnchor &anchor, const
     return true;
 }
 
+int BoundingBox::GetCutOutTop(const Doc *doc) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BBrect, doc);
+    std::vector<int> topValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        topValues.push_back(BBrect[i][0].y);
+    }
+    assert(!topValues.empty());
+
+    // Return the second largest value (if there are at least two)
+    if (topValues.size() == 1) return topValues[0];
+    std::sort(topValues.begin(), topValues.end(), std::greater<int>());
+    return topValues[1];
+}
+
+int BoundingBox::GetCutOutBottom(const Doc *doc) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BBrect, doc);
+    std::vector<int> bottomValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        bottomValues.push_back(BBrect[i][1].y);
+    }
+    assert(!bottomValues.empty());
+
+    // Return the second smallest value (if there are at least two)
+    if (bottomValues.size() == 1) return bottomValues[0];
+    std::sort(bottomValues.begin(), bottomValues.end());
+    return bottomValues[1];
+}
+
+int BoundingBox::GetCutOutLeft(const Doc *doc) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BBrect, doc);
+    std::vector<int> leftValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        leftValues.push_back(BBrect[i][0].x);
+    }
+    assert(!leftValues.empty());
+
+    // Return the second smallest value (if there are at least two)
+    if (leftValues.size() == 1) return leftValues[0];
+    std::sort(leftValues.begin(), leftValues.end());
+    return leftValues[1];
+}
+
+int BoundingBox::GetCutOutRight(const Doc *doc) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BBrect, doc);
+    std::vector<int> rightValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        rightValues.push_back(BBrect[i][1].x);
+    }
+    assert(!rightValues.empty());
+
+    // Return the second largest value (if there are at least two)
+    if (rightValues.size() == 1) return rightValues[0];
+    std::sort(rightValues.begin(), rightValues.end(), std::greater<int>());
+    return rightValues[1];
+}
+
 bool BoundingBox::Encloses(const Point point) const
 {
     if (this->GetContentRight() < point.x) return false;
