@@ -55,7 +55,7 @@ public:
      * Returns that placement accordingly - otherwise return the default passed as parameter.
      * Applied only for trill, mordent, and turn elements.
      */
-    data_STAFFREL GetLayerPlace(data_STAFFREL defaultValue);
+    data_STAFFREL GetLayerPlace(data_STAFFREL defaultValue) const;
 
     //----------//
     // Functors //
