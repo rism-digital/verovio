@@ -314,14 +314,15 @@ public:
      * Discard will be true if the element already fits.
      */
     ///@{
-    int CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin = 0, bool horizontalOverlap = true);
-    int CalcDirectionalAdjustment(
-        BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin = 0, bool horizontalOverlap = true);
+    int CalcAdjustment(
+        BoundingBox *boundingBox, const Doc *doc, bool &discard, int margin = 0, bool horizontalOverlap = true);
+    int CalcDirectionalAdjustment(BoundingBox *boundingBox, const Doc *doc, bool isCurveAbove, bool &discard,
+        int margin = 0, bool horizontalOverlap = true);
     // Refined version that returns the adjustments on the left and right hand side of the bounding box
     std::pair<int, int> CalcLeftRightAdjustment(
-        BoundingBox *boundingBox, bool &discard, int margin = 0, bool horizontalOverlap = true);
-    std::pair<int, int> CalcDirectionalLeftRightAdjustment(
-        BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin = 0, bool horizontalOverlap = true);
+        BoundingBox *boundingBox, const Doc *doc, bool &discard, int margin = 0, bool horizontalOverlap = true);
+    std::pair<int, int> CalcDirectionalLeftRightAdjustment(BoundingBox *boundingBox, const Doc *doc, bool isCurveAbove,
+        bool &discard, int margin = 0, bool horizontalOverlap = true);
     ///@}
 
     /**

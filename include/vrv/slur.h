@@ -260,15 +260,16 @@ private:
      */
     ///@{
     // Discard certain spanned elements
-    void FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+    void FilterSpannedElements(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const Doc *doc, int margin);
 
     // Detect collisions near the endpoints
     NearEndCollision DetectCollisionsNearEnd(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const Doc *doc, int margin);
 
     // Calculate the vertical shift of the slur end points
     std::pair<int, int> CalcEndPointShift(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double flexibility, int margin);
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const Doc *doc, double flexibility, int margin);
 
     // Apply the vertical shift of the slur end points
     void ApplyEndPointShift(
@@ -286,7 +287,7 @@ private:
 
     // Calculate the vertical control point shift
     ControlPointAdjustment CalcControlPointVerticalShift(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double symmetry, int margin);
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const Doc *doc, double symmetry, int margin);
 
     // Solve the constraints for vertical control point adjustment
     std::pair<int, int> SolveControlPointConstraints(
