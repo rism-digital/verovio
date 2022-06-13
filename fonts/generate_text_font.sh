@@ -1,7 +1,8 @@
+#!/bin/sh
+
 # This script generates XML file with bounding boxes for the plain font
 # One input argument (font name) is expected when running this script
 
-scriptdir=$(dirname "$0")
 fontfile="${1%.*}"
 
 if [ -z "$1" ]

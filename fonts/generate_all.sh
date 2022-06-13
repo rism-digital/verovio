@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Requires python
 # Requires svgpathtools and lxml python libraries (install with 'pip3 install %name%')
 
