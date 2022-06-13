@@ -172,14 +172,14 @@ public:
      * Return intersection between the bounding box and the curve represented by the FloatingPositioner.
      * The Object pointed by the FloatingPositioner is expected to be a SLUR or a TIE
      */
-    int Intersects(FloatingCurvePositioner *curve, Accessor type, int margin = 0) const;
+    int Intersects(const FloatingCurvePositioner *curve, Accessor type, int margin = 0) const;
 
     /**
      * Return intersection between the bounding box and the beam represented by the BeamDrawingInterface.
      * A segment of the beam that matches horizontal position of the bounding box is taken to find whether there is
      * intersection.
      */
-    int Intersects(BeamDrawingInterface *beamInterface, Accessor type, int margin = 0) const;
+    int Intersects(const BeamDrawingInterface *beamInterface, Accessor type, int margin = 0) const;
 
     //----------------//
     // Static methods //
