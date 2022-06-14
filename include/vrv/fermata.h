@@ -57,7 +57,7 @@ public:
     ///@}
 
     /**
-     * Helpler for converting markup (from Note, Chord, Rest, MRest)
+     * Helper for converting markup (from Note, Chord, Rest, MRest)
      */
     void ConvertFromAnalyticalMarkup(
         AttFermataPresent *fermataPresent, const std::string &id, ConvertMarkupAnalyticalParams *params);
