@@ -84,6 +84,8 @@ Toolkit::Toolkit(bool initFont)
 
     m_options = m_doc.GetOptions();
 
+    m_skipLayoutOnLoad = false;
+
     m_editorToolkit = NULL;
 
 #ifndef NO_RUNTIME
@@ -790,6 +792,11 @@ bool Toolkit::LoadData(const std::string &data)
 #endif
 
     return true;
+}
+
+void Toolkit::SkipLayoutOnLoad(bool value)
+{
+    m_skipLayoutOnLoad = value;
 }
 
 std::string Toolkit::GetMEI(const std::string &jsonOptions)
