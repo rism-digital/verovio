@@ -75,10 +75,10 @@ void Tie::Reset()
     this->ResetCurveRend();
 }
 
-bool Tie::AdjustEnharmonicTies(Doc *doc, FloatingCurvePositioner *curve, Point bezier[4], Note *startNote,
-    Note *endNote, curvature_CURVEDIR drawingCurveDir)
+bool Tie::AdjustEnharmonicTies(const Doc *doc, FloatingCurvePositioner *curve, Point bezier[4], const Note *startNote,
+    const Note *endNote, curvature_CURVEDIR drawingCurveDir)
 {
-    ListOfObjects objects = endNote->FindAllDescendantsByType(ACCID);
+    ListOfConstObjects objects = endNote->FindAllDescendantsByType(ACCID);
     if (objects.empty()) return false;
 
     int overlap = 0;
@@ -138,7 +138,7 @@ bool Tie::AdjustEnharmonicTies(Doc *doc, FloatingCurvePositioner *curve, Point b
     return true;
 }
 
-bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4])
+bool Tie::CalculatePosition(const Doc *doc, const Staff *staff, int x1, int x2, int spanningType, Point bezier[4])
 {
     if (!doc || !staff) return false;
 
@@ -211,7 +211,7 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
 
     /************** x positions **************/
 
-    CalculateXPosition(doc, staff, startParentChord, endParentChord, spanningType, isOuterChordNote, startPoint,
+    this->CalculateXPosition(doc, staff, startParentChord, endParentChord, spanningType, isOuterChordNote, startPoint,
         endPoint, drawingCurveDir);
 
     /************** y position **************/
@@ -273,8 +273,8 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     return true;
 }
 
-int Tie::CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChord, Note *note,
-    curvature_CURVEDIR drawingCurveDir, int initialX, bool isStartPoint)
+int Tie::CalculateAdjacentChordXOffset(const Doc *doc, const Staff *staff, const Chord *parentChord, const Note *note,
+    curvature_CURVEDIR drawingCurveDir, int initialX, bool isStartPoint) const
 {
     assert(parentChord);
     const int drawingUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -289,7 +289,7 @@ int Tie::CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChor
             if ((curvature_CURVEDIR_below == drawingCurveDir) && (note == parentChord->GetBottomNote())) {
                 return defaultX;
             }
-            Stem *stem = parentChord->GetDrawingStem();
+            const Stem *stem = parentChord->GetDrawingStem();
             if (stem && !stem->IsVirtual()) {
                 return stem->GetContentRight() + 2 * radius + drawingUnit / 2;
             }
@@ -299,7 +299,8 @@ int Tie::CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChor
         }
         else {
             if (!note) return defaultX;
-            const std::list<Note *> adjacentNotes = parentChord->GetAdjacentNotesList(staff, note->GetDrawingLoc());
+            const std::list<const Note *> adjacentNotes
+                = parentChord->GetAdjacentNotesList(staff, note->GetDrawingLoc());
             for (const auto adjacentNote : adjacentNotes) {
                 if (adjacentNote->GetDrawingX() > note->GetDrawingX()) {
                     if ((drawingCurveDir == curvature_CURVEDIR_above)
@@ -324,7 +325,7 @@ int Tie::CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChor
             if ((curvature_CURVEDIR_above == drawingCurveDir) && (note == parentChord->GetTopNote())) {
                 return defaultX;
             }
-            Stem *stem = parentChord->GetDrawingStem();
+            const Stem *stem = parentChord->GetDrawingStem();
             if (stem && !stem->IsVirtual()) {
                 return stem->GetContentLeft() - 2 * radius - drawingUnit / 2;
             }
@@ -334,7 +335,8 @@ int Tie::CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChor
         }
         else {
             if (!note) return defaultX;
-            const std::list<Note *> adjacentNotes = parentChord->GetAdjacentNotesList(staff, note->GetDrawingLoc());
+            const std::list<const Note *> adjacentNotes
+                = parentChord->GetAdjacentNotesList(staff, note->GetDrawingLoc());
             for (const auto adjacentNote : adjacentNotes) {
                 if (adjacentNote->GetDrawingX() < note->GetDrawingX()) {
                     if ((drawingCurveDir == curvature_CURVEDIR_above)
@@ -352,11 +354,12 @@ int Tie::CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChor
     }
 }
 
-void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
-    bool isOuterChordNote, Point &startPoint, Point &endPoint, curvature_CURVEDIR drawingCurveDir)
+void Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *startParentChord,
+    const Chord *endParentChord, int spanningType, bool isOuterChordNote, Point &startPoint, Point &endPoint,
+    curvature_CURVEDIR drawingCurveDir) const
 {
-    Note *startNote = dynamic_cast<Note *>(this->GetStart());
-    Note *endNote = dynamic_cast<Note *>(this->GetEnd());
+    const Note *startNote = dynamic_cast<const Note *>(this->GetStart());
+    const Note *endNote = dynamic_cast<const Note *>(this->GetEnd());
 
     const int drawingUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     bool isShortTie = false;
@@ -390,7 +393,7 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
                 startPoint.x += r1 + drawingUnit / 2;
             }
             // endPoint
-            Staff *endStaff = staff;
+            const Staff *endStaff = staff;
             if (endParentChord) endStaff = endParentChord->GetAncestorStaff();
             if (endParentChord && endParentChord->HasAdjacentNotesInStaff(endStaff)) {
                 endPoint.x = this->CalculateAdjacentChordXOffset(
@@ -405,7 +408,7 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
                 startPoint.x += drawingUnit;
             }
             else {
-                Dots *dots = vrv_cast<Dots *>(startParentChord->FindDescendantByType(DOTS));
+                const Dots *dots = vrv_cast<const Dots *>(startParentChord->FindDescendantByType(DOTS));
                 assert(dots);
                 startPoint.x = dots->GetDrawingX() + (1 + startParentChord->GetDots()) * drawingUnit;
             }
@@ -435,7 +438,7 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
             }
         }
         if (startParentChord && !isOuterChordNote && (startParentChord->GetDots() > 0)) {
-            Dots *dots = vrv_cast<Dots *>(startParentChord->FindDescendantByType(DOTS));
+            const Dots *dots = vrv_cast<const Dots *>(startParentChord->FindDescendantByType(DOTS));
             assert(dots);
             startPoint.x = dots->GetDrawingX() + (1 + startParentChord->GetDots()) * drawingUnit;
         }
@@ -450,7 +453,7 @@ void Tie::CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Ch
         }
         if (!isShortTie) {
             // endPoint
-            Staff *endStaff = staff;
+            const Staff *endStaff = staff;
             if (endParentChord) endStaff = endParentChord->GetAncestorStaff();
             if (endParentChord && endParentChord->HasAdjacentNotesInStaff(endStaff)) {
                 endPoint.x = this->CalculateAdjacentChordXOffset(

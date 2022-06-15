@@ -60,13 +60,14 @@ public:
     }
     ///@}
 
-    virtual bool CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);
+    virtual bool CalculatePosition(
+        const Doc *doc, const Staff *staff, int x1, int x2, int spanningType, Point bezier[4]);
 
     /**
      * Calculate starting/ending point for the ties in the chords with adjacent notes
      */
-    int CalculateAdjacentChordXOffset(Doc *doc, Staff *staff, Chord *parentChord, Note *note,
-        curvature_CURVEDIR drawingCurveDir, int initialX, bool isStartPoint);
+    int CalculateAdjacentChordXOffset(const Doc *doc, const Staff *staff, const Chord *parentChord, const Note *note,
+        curvature_CURVEDIR drawingCurveDir, int initialX, bool isStartPoint) const;
 
     //----------//
     // Functors //
@@ -81,12 +82,13 @@ public:
 
 private:
     // Update tie positioning based overlaps with accidentals in cases with enharmonic ties
-    bool AdjustEnharmonicTies(Doc *doc, FloatingCurvePositioner *curve, Point bezier[4], Note *startNote, Note *endNote,
-        curvature_CURVEDIR drawingCurveDir);
+    bool AdjustEnharmonicTies(const Doc *doc, FloatingCurvePositioner *curve, Point bezier[4], const Note *startNote,
+        const Note *endNote, curvature_CURVEDIR drawingCurveDir);
 
     // Calculate initial position X position and return stem direction of the startNote
-    void CalculateXPosition(Doc *doc, Staff *staff, Chord *startParentChord, Chord *endParentChord, int spanningType,
-        bool isOuterChordNote, Point &startPoint, Point &endPoint, curvature_CURVEDIR drawingCurveDir);
+    void CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *startParentChord,
+        const Chord *endParentChord, int spanningType, bool isOuterChordNote, Point &startPoint, Point &endPoint,
+        curvature_CURVEDIR drawingCurveDir) const;
 
     // Helper function to get preferred curve direction based on the number of conditions (like note direction, position
     // on the staff, etc.)
