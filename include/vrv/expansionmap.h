@@ -48,7 +48,7 @@ public:
 private:
     bool UpdateIds(Object *object);
 
-    void GetUuidList(Object *object, std::vector<std::string> &idList);
+    void GetIDList(Object *object, std::vector<std::string> &idList);
 
     void GeneratePredictableIds(Object *source, Object *target);
 

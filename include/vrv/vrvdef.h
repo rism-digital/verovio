@@ -329,11 +329,11 @@ typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
 typedef std::vector<std::pair<int, int>> ArrayOfIntPairs;
 
-typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceUuidPairs;
+typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceIDPairs;
 
-typedef std::map<std::string, Note *> MapOfNoteUuidPairs;
+typedef std::map<std::string, Note *> MapOfNoteIDPairs;
 
-typedef std::vector<std::tuple<PlistInterface *, std::string, Object *>> ArrayOfPlistInterfaceUuidTuples;
+typedef std::vector<std::tuple<PlistInterface *, std::string, Object *>> ArrayOfPlistInterfaceIDTuples;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 

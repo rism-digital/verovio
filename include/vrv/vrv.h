@@ -54,7 +54,7 @@ bool AreEqual(double dFirstVal, double dSecondVal);
 /**
  * Extract the uuid from a any uri string
  */
-std::string ExtractUuidFragment(std::string refUuid);
+std::string ExtractIDFragment(std::string refID);
 
 /**
  * Utility for converting UTF16 (std::wstring) to UTF-8

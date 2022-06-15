@@ -164,7 +164,7 @@ int PageMilestoneEnd::Transpose(FunctorParams *functorParams)
     assert(params);
 
     if (this->m_start && this->m_start->Is(MDIV)) {
-        params->m_currentMdivUuids.pop_back();
+        params->m_currentMdivIDs.pop_back();
     }
 
     return FUNCTOR_CONTINUE;

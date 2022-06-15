@@ -56,7 +56,7 @@ bool Pages::IsSupportedChild(Object *child)
 
 void Pages::ConvertFrom(Score *score)
 {
-    score->SwapUuid(this);
+    score->SwapID(this);
     this->AttLabelled::operator=(*score);
     this->AttNNumberLike::operator=(*score);
 }

@@ -83,7 +83,7 @@ public:
      *
      * @return The ID as as string
      */
-    std::string GetUuid() { return m_doc.GetUuid(); }
+    std::string GetID() { return m_doc.GetID(); }
 
     /**
      * Get the resource path for the Toolkit instance.

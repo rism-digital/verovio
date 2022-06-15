@@ -75,14 +75,14 @@ ArrayOfObjects PlistInterface::GetRefs()
     return result;
 }
 
-void PlistInterface::SetUuidStrs()
+void PlistInterface::SetIDStrs()
 {
     assert(m_uuids.empty() && m_references.empty());
 
     xsdAnyURI_List list = this->GetPlist();
     xsdAnyURI_List::iterator iter;
     for (iter = list.begin(); iter != list.end(); ++iter) {
-        std::string uuid = ExtractUuidFragment(*iter);
+        std::string uuid = ExtractIDFragment(*iter);
         if (!uuid.empty()) {
             m_uuids.push_back(uuid);
         }
@@ -106,11 +106,11 @@ int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *
         return FUNCTOR_CONTINUE;
     }
 
-    this->SetUuidStrs();
+    this->SetIDStrs();
 
     std::vector<std::string>::iterator iter;
     for (iter = m_uuids.begin(); iter != m_uuids.end(); ++iter) {
-        params->m_interfaceUuidTuples.push_back(std::make_tuple(this, *iter, (Object *)NULL));
+        params->m_interfaceIDTuples.push_back(std::make_tuple(this, *iter, (Object *)NULL));
     }
 
     return FUNCTOR_CONTINUE;

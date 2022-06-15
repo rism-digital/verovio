@@ -567,18 +567,18 @@ void Note::ResolveStemSameas(PrepareLinkingParams *params)
 {
     assert(params);
 
-    // First pass we fill m_stemSameasUuidPairs
+    // First pass we fill m_stemSameasIDPairs
     if (params->m_fillList) {
         if (this->HasStemSameas()) {
-            std::string uuidTarget = ExtractUuidFragment(this->GetStemSameas());
-            params->m_stemSameasUuidPairs[uuidTarget] = this;
+            std::string uuidTarget = ExtractIDFragment(this->GetStemSameas());
+            params->m_stemSameasIDPairs[uuidTarget] = this;
         }
     }
     // Second pass we resolve links
     else {
-        const std::string uuid = this->GetUuid();
-        if (params->m_stemSameasUuidPairs.count(uuid)) {
-            Note *noteStemSameas = params->m_stemSameasUuidPairs.at(uuid);
+        const std::string uuid = this->GetID();
+        if (params->m_stemSameasIDPairs.count(uuid)) {
+            Note *noteStemSameas = params->m_stemSameasIDPairs.at(uuid);
             // Instanciate the bi-directional references and mark the roles as unset
             this->SetStemSameasNote(noteStemSameas);
             this->m_stemSameasRole = SAMEAS_UNSET;
@@ -599,7 +599,7 @@ void Note::ResolveStemSameas(PrepareLinkingParams *params)
                     beamStemSameas->SetStemSameasBeam(thisBeam);
                 }
             }
-            params->m_stemSameasUuidPairs.erase(uuid);
+            params->m_stemSameasIDPairs.erase(uuid);
         }
     }
 }
@@ -922,12 +922,12 @@ int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
                 if (!params->m_permanent) {
                     tie->IsAttribute(true);
                 }
-                tie->SetStartid("#" + (*iter)->GetUuid());
-                tie->SetEndid("#" + this->GetUuid());
+                tie->SetStartid("#" + (*iter)->GetID());
+                tie->SetEndid("#" + this->GetID());
                 params->m_controlEvents.push_back(tie);
             }
             else {
-                LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetUuid().c_str());
+                LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetID().c_str());
             }
             iter = params->m_currentNotes.erase(iter);
             // we are done for this note
@@ -948,7 +948,7 @@ int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
 
     if (this->HasFermata()) {
         Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
     }
 
     return FUNCTOR_CONTINUE;
@@ -1351,7 +1351,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     if (this->GetDots() > 0) {
         if (chord && (chord->GetDots() == this->GetDots())) {
             LogWarning(
-                "Note '%s' with a @dots attribute with the same value as its chord parent", this->GetUuid().c_str());
+                "Note '%s' with a @dots attribute with the same value as its chord parent", this->GetID().c_str());
         }
         if (!currentDots) {
             currentDots = new Dots();

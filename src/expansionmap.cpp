@@ -43,19 +43,19 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
     const vrv::ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
     std::vector<std::string> reductionList;
     for (auto o : expansionSiblings) {
-        if (o->Is(SECTION) || o->Is(ENDING) || o->Is(LEM) || o->Is(RDG)) reductionList.push_back(o->GetUuid());
+        if (o->Is(SECTION) || o->Is(ENDING) || o->Is(LEM) || o->Is(RDG)) reductionList.push_back(o->GetID());
     }
 
     for (std::string s : expansionList) {
         if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1); // remove trailing hash from reference
-        Object *currSect = prevSect->GetParent()->FindDescendantByUuid(s); // find section pointer of reference string
+        Object *currSect = prevSect->GetParent()->FindDescendantByID(s); // find section pointer of reference string
         if (!currSect) {
             return;
         }
         if (currSect->Is(EXPANSION)) { // if reference is itself an expansion, resolve it recursively
             // remove parent from reductionList, if expansion
             for (auto it = begin(reductionList); it != end(reductionList);) {
-                if ((*it).compare(currSect->GetParent()->GetUuid()) == 0)
+                if ((*it).compare(currSect->GetParent()->GetID()) == 0)
                     it = reductionList.erase(it);
                 else
                     ++it;
@@ -75,11 +75,11 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
 
                 // get IDs of old and new sections and add them to m_map
                 std::vector<std::string> oldIds;
-                oldIds.push_back(currSect->GetUuid());
-                this->GetUuidList(currSect, oldIds);
+                oldIds.push_back(currSect->GetID());
+                this->GetIDList(currSect, oldIds);
                 std::vector<std::string> clonedIds;
-                clonedIds.push_back(clonedObject->GetUuid());
-                this->GetUuidList(clonedObject, clonedIds);
+                clonedIds.push_back(clonedObject->GetID());
+                this->GetIDList(clonedObject, clonedIds);
                 for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); i++) {
                     this->AddExpandedIdToExpansionMap(oldIds.at(i), clonedIds.at(i));
                 }
@@ -107,7 +107,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
     }
     // make unused sections hidden
     for (std::string r : reductionList) {
-        Object *currSect = prevSect->GetParent()->FindDescendantByUuid(r);
+        Object *currSect = prevSect->GetParent()->FindDescendantByID(r);
         assert(currSect);
         if (currSect->Is(ENDING) || currSect->Is(SECTION)) {
             SystemElement *tmp = dynamic_cast<SystemElement *>(currSect);
@@ -236,18 +236,18 @@ bool ExpansionMap::HasExpansionMap()
     return (m_map.empty()) ? false : true;
 }
 
-void ExpansionMap::GetUuidList(Object *object, std::vector<std::string> &idList)
+void ExpansionMap::GetIDList(Object *object, std::vector<std::string> &idList)
 {
     for (Object *o : object->GetChildren()) {
-        idList.push_back(o->GetUuid());
-        this->GetUuidList(o, idList);
+        idList.push_back(o->GetID());
+        this->GetIDList(o, idList);
     }
 }
 
 void ExpansionMap::GeneratePredictableIds(Object *source, Object *target)
 {
-    target->SetUuid(
-        source->GetUuid() + "-rend" + std::to_string(this->GetExpansionIdsForElement(source->GetUuid()).size() + 1));
+    target->SetID(
+        source->GetID() + "-rend" + std::to_string(this->GetExpansionIdsForElement(source->GetID()).size() + 1));
 
     ArrayOfObjects sourceObjects = source->GetChildren();
     ArrayOfObjects targetObjects = target->GetChildren();

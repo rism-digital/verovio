@@ -605,7 +605,7 @@ int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 
     if (this->HasFermata()) {
         Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
     }
 
     return FUNCTOR_CONTINUE;
@@ -932,7 +932,7 @@ int Chord::ResetData(FunctorParams *functorParams)
 int Chord::PrepareDataInitialization(FunctorParams *)
 {
     if (this->HasEmptyList(this)) {
-        LogWarning("Chord '%s' has no child note - a default note is added", this->GetUuid().c_str());
+        LogWarning("Chord '%s' has no child note - a default note is added", this->GetID().c_str());
         Note *rescueNote = new Note();
         this->AddChild(rescueNote);
     }

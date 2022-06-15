@@ -46,7 +46,7 @@ void TimePointInterface::Reset()
     this->ResetTimestampLogical();
 
     m_start = NULL;
-    m_startUuid = "";
+    m_startID = "";
 }
 
 void TimePointInterface::SetStart(LayerElement *start)
@@ -57,8 +57,8 @@ void TimePointInterface::SetStart(LayerElement *start)
 
 bool TimePointInterface::SetStartOnly(LayerElement *element)
 {
-    // LogDebug("%s - %s - %s", element->GetUuid().c_str(), m_startUuid.c_str(), m_endUuid.c_str() );
-    if (!m_start && !m_startUuid.empty() && (element->GetUuid() == m_startUuid)) {
+    // LogDebug("%s - %s - %s", element->GetID().c_str(), m_startID.c_str(), m_endID.c_str() );
+    if (!m_start && !m_startID.empty() && (element->GetID() == m_startID)) {
         this->SetStart(element);
         return true;
     }
@@ -74,10 +74,10 @@ void TimePointInterface::AddStaff(int n)
     }
 }
 
-void TimePointInterface::SetUuidStr()
+void TimePointInterface::SetIDStr()
 {
     if (this->HasStartid()) {
-        m_startUuid = ExtractUuidFragment(this->GetStartid());
+        m_startID = ExtractIDFragment(this->GetStartid());
     }
 }
 
@@ -155,7 +155,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
         AttNIntegerComparison comparison(STAFF, *iter);
         Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
         if (!staff) {
-            // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
+            // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
             continue;
         }
         if (!staff->DrawingIsVisible()) {
@@ -171,7 +171,7 @@ bool TimePointInterface::VerifyMeasure(const Object *owner) const
     assert(owner);
     if (m_start && (owner->GetFirstAncestor(MEASURE) != this->GetStartMeasure())) {
         LogWarning("%s '%s' is not encoded in the measure of its start '%s'. This may cause improper rendering.",
-            owner->GetClassName().c_str(), owner->GetUuid().c_str(), m_start->GetUuid().c_str());
+            owner->GetClassName().c_str(), owner->GetID().c_str(), m_start->GetID().c_str());
         return false;
     }
     return true;
@@ -198,7 +198,7 @@ void TimeSpanningInterface::Reset()
     this->ResetTimestamp2Logical();
 
     m_end = NULL;
-    m_endUuid = "";
+    m_endID = "";
 }
 
 void TimeSpanningInterface::SetEnd(LayerElement *end)
@@ -207,21 +207,21 @@ void TimeSpanningInterface::SetEnd(LayerElement *end)
     m_end = end;
 }
 
-void TimeSpanningInterface::SetUuidStr()
+void TimeSpanningInterface::SetIDStr()
 {
-    TimePointInterface::SetUuidStr();
+    TimePointInterface::SetIDStr();
     if (this->HasEndid()) {
-        m_endUuid = ExtractUuidFragment(this->GetEndid());
+        m_endID = ExtractIDFragment(this->GetEndid());
     }
 }
 
 bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
 {
-    // LogDebug("%s - %s - %s", element->GetUuid().c_str(), m_startUuid.c_str(), m_endUuid.c_str() );
-    if (!m_start && !m_startUuid.empty() && (element->GetUuid() == m_startUuid)) {
+    // LogDebug("%s - %s - %s", element->GetID().c_str(), m_startID.c_str(), m_endID.c_str() );
+    if (!m_start && !m_startID.empty() && (element->GetID() == m_startID)) {
         this->SetStart(element);
     }
-    else if (!m_end && !m_endUuid.empty() && (element->GetUuid() == m_endUuid)) {
+    else if (!m_end && !m_endID.empty() && (element->GetID() == m_endID)) {
         this->SetEnd(element);
     }
     return (m_start && m_end);
@@ -351,7 +351,7 @@ int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams,
     if (this->HasStart()) {
         if (this->HasTstamp())
             LogWarning("%s with @xml:id %s has both a @startid and an @tstamp; @tstamp is ignored",
-                object->GetClassName().c_str(), object->GetUuid().c_str());
+                object->GetClassName().c_str(), object->GetID().c_str());
         return FUNCTOR_CONTINUE;
     }
     else if (!this->HasTstamp()) {
@@ -367,7 +367,7 @@ int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams,
 int TimePointInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_start = NULL;
-    m_startUuid = "";
+    m_startID = "";
     return FUNCTOR_CONTINUE;
 }
 
@@ -378,7 +378,7 @@ int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParam
 
     if (!this->HasStartid()) return FUNCTOR_CONTINUE;
 
-    this->SetUuidStr();
+    this->SetIDStr();
     params->m_timePointingInterfaces.push_back({ this, object->GetClassId() });
 
     return FUNCTOR_CONTINUE;
@@ -397,7 +397,7 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorPa
         return FUNCTOR_CONTINUE;
     }
 
-    this->SetUuidStr();
+    this->SetIDStr();
     params->m_timeSpanningInterfaces.push_back({ this, object });
 
     return FUNCTOR_CONTINUE;
@@ -412,10 +412,10 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
     if (this->HasEndid()) {
         if (this->HasTstamp2())
             LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
-                object->GetClassName().c_str(), object->GetUuid().c_str());
+                object->GetClassName().c_str(), object->GetID().c_str());
         if ((this->GetStartid() == this->GetEndid()) && !object->Is(OCTAVE)) {
             LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid",
-                object->GetClassName().c_str(), object->GetUuid().c_str());
+                object->GetClassName().c_str(), object->GetID().c_str());
         }
         return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
     }
@@ -446,7 +446,7 @@ int TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParam
 int TimeSpanningInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_end = NULL;
-    m_endUuid = "";
+    m_endID = "";
     // Special case where we have interface inheritance
     return TimePointInterface::InterfaceResetData(functorParams, object);
 }

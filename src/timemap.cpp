@@ -72,8 +72,8 @@ void Timemap::AddEntry(Object *object, GenerateTimemapParams *params)
         startEntry->qstamp = scoreTimeStart;
 
         // Store the element ID in list to turn on at given time - note or rest
-        if (!isRest) startEntry->notesOn.push_back(object->GetUuid());
-        if (isRest) startEntry->restsOn.push_back(object->GetUuid());
+        if (!isRest) startEntry->notesOn.push_back(object->GetID());
+        if (isRest) startEntry->restsOn.push_back(object->GetID());
 
         // Also add the tempo the
         startEntry->tempo = params->m_currentTempo;
@@ -90,8 +90,8 @@ void Timemap::AddEntry(Object *object, GenerateTimemapParams *params)
         endEntry->qstamp = scoreTimeEnd;
 
         // Store the element ID in list to turn off at given time - notes or rest
-        if (!isRest) endEntry->notesOff.push_back(object->GetUuid());
-        if (isRest) endEntry->restsOff.push_back(object->GetUuid());
+        if (!isRest) endEntry->notesOff.push_back(object->GetID());
+        if (isRest) endEntry->restsOff.push_back(object->GetID());
     }
     else if (object->Is(MEASURE)) {
 
@@ -112,7 +112,7 @@ void Timemap::AddEntry(Object *object, GenerateTimemapParams *params)
         startEntry->qstamp = scoreTimeStart;
 
         // Add the measureOn
-        startEntry->measureOn = measure->GetUuid();
+        startEntry->measureOn = measure->GetID();
     }
 }
 

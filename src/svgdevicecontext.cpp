@@ -70,7 +70,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
 
     m_outdata.clear();
 
-    m_glyphPostfixId = Object::GenerateRandUuid();
+    m_glyphPostfixId = Object::GenerateRandID();
 }
 
 SvgDeviceContext::~SvgDeviceContext() {}
@@ -1133,7 +1133,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             m_currentNode = m_pageNode;
         }
 
-        StartGraphic(object, "bounding-box", "bbox-" + object->GetUuid(), true, true);
+        StartGraphic(object, "bounding-box", "bbox-" + object->GetID(), true, true);
 
         if (box->HasSelfBB()) {
             this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
@@ -1184,7 +1184,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 
         if (drawContentBB) {
             if (object->HasContentBB()) {
-                StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetUuid(), true, true);
+                StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetID(), true, true);
                 if (object->HasContentBB()) {
                     this->DrawSvgBoundingBoxRectangle(
                         view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),

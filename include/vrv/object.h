@@ -234,10 +234,10 @@ public:
      */
     virtual void CloneReset();
 
-    const std::string &GetUuid() const { return m_uuid; }
-    void SetUuid(std::string uuid);
-    void SwapUuid(Object *other);
-    void ResetUuid();
+    const std::string &GetID() const { return m_uuid; }
+    void SetID(std::string uuid);
+    void SwapID(Object *other);
+    void ResetID();
 
     /**
      * Methods for setting / getting comments
@@ -412,11 +412,11 @@ public:
 
     /**
      * Look for a descendant with the specified uuid (returns NULL if not found)
-     * This method is a wrapper for the Object::FindByUuid functor.
+     * This method is a wrapper for the Object::FindByID functor.
      */
     ///@{
-    Object *FindDescendantByUuid(const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
-    const Object *FindDescendantByUuid(
+    Object *FindDescendantByID(const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    const Object *FindDescendantByID(
         const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
     ///@}
 
@@ -639,9 +639,9 @@ public:
     // Static methods //
     //----------------//
 
-    static void SeedUuid(unsigned int seed = 0);
+    static void SeedID(unsigned int seed = 0);
 
-    static std::string GenerateRandUuid();
+    static std::string GenerateRandID();
 
     static bool sortByUlx(Object *a, Object *b);
 
@@ -672,7 +672,7 @@ public:
     /**
      * Find a Object with a specified uuid.
      */
-    virtual int FindByUuid(FunctorParams *functorParams) const;
+    virtual int FindByID(FunctorParams *functorParams) const;
 
     /**
      * Find a Object with a Comparison functor.
@@ -1527,7 +1527,7 @@ private:
     /**
      * Method for generating the uuid.
      */
-    void GenerateUuid();
+    void GenerateID();
 
     /**
      * Initialisation method taking the class id and a uuid prefix argument.

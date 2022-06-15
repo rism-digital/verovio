@@ -182,7 +182,7 @@ bool System::SetCurrentFloatingPositioner(
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
     if (!alignment) {
         LogError("Staff @n='%d' for rendering control event %s %s not found", staffN, object->GetClassName().c_str(),
-            object->GetUuid().c_str());
+            object->GetID().c_str());
         return false;
     }
     alignment->SetCurrentFloatingPositioner(object, objectX, objectY, spanningType);
@@ -1217,9 +1217,9 @@ int System::Transpose(FunctorParams *functorParams)
     assert(params);
 
     // Check whether we are in the selected mdiv
-    if (!params->m_selectedMdivUuid.empty()
-        && (std::find(params->m_currentMdivUuids.begin(), params->m_currentMdivUuids.end(), params->m_selectedMdivUuid)
-            == params->m_currentMdivUuids.end())) {
+    if (!params->m_selectedMdivID.empty()
+        && (std::find(params->m_currentMdivIDs.begin(), params->m_currentMdivIDs.end(), params->m_selectedMdivID)
+            == params->m_currentMdivIDs.end())) {
         return FUNCTOR_SIBLINGS;
     }
 

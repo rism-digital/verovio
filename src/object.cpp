@@ -110,7 +110,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     m_attClasses = object.m_attClasses;
     m_interfaces = object.m_interfaces;
     // New uuid
-    this->GenerateUuid();
+    this->GenerateID();
     // For now do not copy them
     // m_unsupported = object.m_unsupported;
 
@@ -158,7 +158,7 @@ Object &Object::operator=(const Object &object)
         m_attClasses = object.m_attClasses;
         m_interfaces = object.m_interfaces;
         // New uuid
-        this->GenerateUuid();
+        this->GenerateID();
         // For now do now copy them
         // m_unsupported = object.m_unsupported;
         LinkingInterface *link = this->GetLinkingInterface();
@@ -202,7 +202,7 @@ void Object::Init(ClassId classId, const std::string &classIdStr)
     m_comment = "";
     m_closingComment = "";
 
-    this->GenerateUuid();
+    this->GenerateID();
 
     this->Reset();
 }
@@ -353,17 +353,17 @@ void Object::MoveItselfTo(Object *targetParent)
     targetParent->AddChild(relinquishedObject);
 }
 
-void Object::SetUuid(std::string uuid)
+void Object::SetID(std::string uuid)
 {
     m_uuid = uuid;
 }
 
-void Object::SwapUuid(Object *other)
+void Object::SwapID(Object *other)
 {
     assert(other);
-    std::string swapUuid = this->GetUuid();
-    this->SetUuid(other->GetUuid());
-    other->SetUuid(swapUuid);
+    std::string swapID = this->GetID();
+    this->SetID(other->GetID());
+    other->SetID(swapID);
 }
 
 void Object::ClearChildren()
@@ -588,18 +588,18 @@ void Object::ClearRelinquishedChildren()
     }
 }
 
-Object *Object::FindDescendantByUuid(const std::string &uuid, int deepness, bool direction)
+Object *Object::FindDescendantByID(const std::string &uuid, int deepness, bool direction)
 {
-    return const_cast<Object *>(std::as_const(*this).FindDescendantByUuid(uuid, deepness, direction));
+    return const_cast<Object *>(std::as_const(*this).FindDescendantByID(uuid, deepness, direction));
 }
 
-const Object *Object::FindDescendantByUuid(const std::string &uuid, int deepness, bool direction) const
+const Object *Object::FindDescendantByID(const std::string &uuid, int deepness, bool direction) const
 {
-    Functor findByUuid(&Object::FindByUuid);
-    FindByUuidParams findbyUuidParams;
-    findbyUuidParams.m_uuid = uuid;
-    this->Process(&findByUuid, &findbyUuidParams, NULL, NULL, deepness, direction, true);
-    return findbyUuidParams.m_element;
+    Functor findByID(&Object::FindByID);
+    FindByIDParams findbyIDParams;
+    findbyIDParams.m_uuid = uuid;
+    this->Process(&findByID, &findbyIDParams, NULL, NULL, deepness, direction, true);
+    return findbyIDParams.m_element;
 }
 
 Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction)
@@ -776,14 +776,14 @@ int Object::DeleteChildrenByComparison(Comparison *comparison)
     return count;
 }
 
-void Object::GenerateUuid()
+void Object::GenerateID()
 {
-    m_uuid = m_classIdStr.at(0) + Object::GenerateRandUuid();
+    m_uuid = m_classIdStr.at(0) + Object::GenerateRandID();
 }
 
-void Object::ResetUuid()
+void Object::ResetID()
 {
-    GenerateUuid();
+    GenerateID();
 }
 
 void Object::SetParent(Object *parent)
@@ -1202,7 +1202,7 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
 // Static methods for Object
 //----------------------------------------------------------------------------
 
-void Object::SeedUuid(unsigned int seed)
+void Object::SeedID(unsigned int seed)
 {
     // Init random number generator for uuids
     if (seed == 0) {
@@ -1214,7 +1214,7 @@ void Object::SeedUuid(unsigned int seed)
     }
 }
 
-std::string Object::GenerateRandUuid()
+std::string Object::GenerateRandID()
 {
     unsigned int nr = s_randomGenerator();
 
@@ -1274,10 +1274,10 @@ bool Object::sortByUlx(Object *a, Object *b)
 
     if (fa == NULL || fb == NULL) {
         if (fa == NULL) {
-            LogMessage("No available facsimile interface for %s", a->GetUuid().c_str());
+            LogMessage("No available facsimile interface for %s", a->GetID().c_str());
         }
         if (fb == NULL) {
-            LogMessage("No available facsimile interface for %s", b->GetUuid().c_str());
+            LogMessage("No available facsimile interface for %s", b->GetID().c_str());
         }
         return false;
     }
@@ -1649,9 +1649,9 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams) const
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByUuid(FunctorParams *functorParams) const
+int Object::FindByID(FunctorParams *functorParams) const
 {
-    FindByUuidParams *params = vrv_params_cast<FindByUuidParams *>(functorParams);
+    FindByIDParams *params = vrv_params_cast<FindByIDParams *>(functorParams);
     assert(params);
 
     if (params->m_element) {
@@ -1659,7 +1659,7 @@ int Object::FindByUuid(FunctorParams *functorParams) const
         return FUNCTOR_STOP;
     }
 
-    if (params->m_uuid == this->GetUuid()) {
+    if (params->m_uuid == this->GetID()) {
         params->m_element = this;
         // LogDebug("Found it!");
         return FUNCTOR_STOP;
@@ -1864,9 +1864,9 @@ int Object::PrepareFacsimile(FunctorParams *functorParams)
         FacsimileInterface *interface = this->GetFacsimileInterface();
         assert(interface);
         if (interface->HasFacs()) {
-            std::string facsUuid = (interface->GetFacs().compare(0, 1, "#") == 0 ? interface->GetFacs().substr(1)
-                                                                                 : interface->GetFacs());
-            Zone *zone = params->m_facsimile->FindZoneByUuid(facsUuid);
+            std::string facsID = (interface->GetFacs().compare(0, 1, "#") == 0 ? interface->GetFacs().substr(1)
+                                                                               : interface->GetFacs());
+            Zone *zone = params->m_facsimile->FindZoneByID(facsID);
             if (zone != NULL) {
                 interface->SetZone(zone);
             }
@@ -1900,22 +1900,22 @@ int Object::PrepareLinking(FunctorParams *functorParams)
     }
 
     // @next
-    std::string uuid = this->GetUuid();
-    auto r1 = params->m_nextUuidPairs.equal_range(uuid);
-    if (r1.first != params->m_nextUuidPairs.end()) {
+    std::string uuid = this->GetID();
+    auto r1 = params->m_nextIDPairs.equal_range(uuid);
+    if (r1.first != params->m_nextIDPairs.end()) {
         for (auto i = r1.first; i != r1.second; ++i) {
             i->second->SetNextLink(this);
         }
-        params->m_nextUuidPairs.erase(r1.first, r1.second);
+        params->m_nextIDPairs.erase(r1.first, r1.second);
     }
 
     // @sameas
-    auto r2 = params->m_sameasUuidPairs.equal_range(uuid);
-    if (r2.first != params->m_sameasUuidPairs.end()) {
+    auto r2 = params->m_sameasIDPairs.equal_range(uuid);
+    if (r2.first != params->m_sameasIDPairs.end()) {
         for (auto j = r2.first; j != r2.second; ++j) {
             j->second->SetSameasLink(this);
         }
-        params->m_sameasUuidPairs.erase(r2.first, r2.second);
+        params->m_sameasIDPairs.erase(r2.first, r2.second);
     }
     return FUNCTOR_CONTINUE;
 }
@@ -1941,10 +1941,10 @@ int Object::PrepareProcessPlist(FunctorParams *functorParams)
 
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
 
-    std::string uuid = this->GetUuid();
-    auto i = std::find_if(params->m_interfaceUuidTuples.begin(), params->m_interfaceUuidTuples.end(),
+    std::string uuid = this->GetID();
+    auto i = std::find_if(params->m_interfaceIDTuples.begin(), params->m_interfaceIDTuples.end(),
         [&uuid](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == uuid); });
-    if (i != params->m_interfaceUuidTuples.end()) {
+    if (i != params->m_interfaceIDTuples.end()) {
         std::get<2>(*i) = this;
     }
 
@@ -2360,7 +2360,7 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
         int overflowAbove = above->CalcOverflowAbove(current);
         int staffSize = above->GetStaffSize();
         if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-            // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+            // LogMessage("%s top overflow: %d", current->GetID().c_str(), overflowAbove);
             if (isScoreDefClef) {
                 above->SetScoreDefClefOverflowAbove(overflowAbove);
             }
@@ -2375,7 +2375,7 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
         int overflowBelow = below->CalcOverflowBelow(current);
         int staffSize = below->GetStaffSize();
         if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-            // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+            // LogMessage("%s bottom overflow: %d", current->GetID().c_str(), overflowBelow);
             if (isScoreDefClef) {
                 below->SetScoreDefClefOverflowBelow(overflowBelow);
             }

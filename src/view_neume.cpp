@@ -44,7 +44,7 @@ void View::DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, 
     /******************************************************************/
     // Start the Beam graphic and draw the children
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     /******************************************************************/
     // Draw the children
@@ -71,7 +71,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     };
     std::vector<drawingParams> params;
     params.push_back(drawingParams());
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     /******************************************************************/
 
@@ -215,7 +215,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Start the Neume graphic and draw the children
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
     this->DrawLayerChildren(dc, neume, layer, staff, measure);
     dc->EndGraphic(element, this);
 }

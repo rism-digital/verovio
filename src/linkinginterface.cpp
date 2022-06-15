@@ -37,9 +37,9 @@ void LinkingInterface::Reset()
     this->ResetLinking();
 
     m_next = NULL;
-    m_nextUuid = "";
+    m_nextID = "";
     m_sameas = NULL;
-    m_sameasUuid = "";
+    m_sameasID = "";
 }
 
 void LinkingInterface::SetNextLink(Object *next)
@@ -54,13 +54,13 @@ void LinkingInterface::SetSameasLink(Object *sameas)
     m_sameas = sameas;
 }
 
-void LinkingInterface::SetUuidStr()
+void LinkingInterface::SetIDStr()
 {
     if (this->HasNext()) {
-        m_nextUuid = ExtractUuidFragment(this->GetNext());
+        m_nextID = ExtractIDFragment(this->GetNext());
     }
     if (this->HasSameas()) {
-        m_sameasUuid = ExtractUuidFragment(this->GetSameas());
+        m_sameasID = ExtractIDFragment(this->GetSameas());
     }
 }
 
@@ -78,7 +78,7 @@ const Measure *LinkingInterface::GetNextMeasure() const
 void LinkingInterface::AddBackLink(const Object *object)
 {
     const LinkingInterface *linking = object->GetLinkingInterface();
-    std::string corresp = "#" + object->GetUuid();
+    std::string corresp = "#" + object->GetID();
     if (linking && linking->HasCorresp()) {
         corresp = linking->GetCorresp();
     }
@@ -99,13 +99,13 @@ int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Obje
         return FUNCTOR_CONTINUE;
     }
 
-    this->SetUuidStr();
+    this->SetIDStr();
 
-    if (!m_nextUuid.empty()) {
-        params->m_nextUuidPairs.insert({ m_nextUuid, this });
+    if (!m_nextID.empty()) {
+        params->m_nextIDPairs.insert({ m_nextID, this });
     }
-    if (!m_sameasUuid.empty()) {
-        params->m_sameasUuidPairs.insert({ m_sameasUuid, this });
+    if (!m_sameasID.empty()) {
+        params->m_sameasIDPairs.insert({ m_sameasID, this });
     }
 
     return FUNCTOR_CONTINUE;
@@ -142,9 +142,9 @@ int LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *fu
 int LinkingInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_next = NULL;
-    m_nextUuid = "";
+    m_nextID = "";
     m_sameas = NULL;
-    m_sameasUuid = "";
+    m_sameasID = "";
     return FUNCTOR_CONTINUE;
 }
 

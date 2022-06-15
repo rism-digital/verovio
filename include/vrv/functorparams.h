@@ -1544,7 +1544,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindByUuidParams
+// FindByIDParams
 //----------------------------------------------------------------------------
 
 /**
@@ -1552,9 +1552,9 @@ public:
  * member 1: the pointer to pointer to the Object
  **/
 
-class FindByUuidParams : public FunctorParams {
+class FindByIDParams : public FunctorParams {
 public:
-    FindByUuidParams() { m_element = NULL; }
+    FindByIDParams() { m_element = NULL; }
     std::string m_uuid;
     const Object *m_element;
 };
@@ -1637,7 +1637,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindLayerUuidWithinStaffDefParams
+// FindLayerIDWithinStaffDefParams
 //----------------------------------------------------------------------------
 
 /**
@@ -1645,11 +1645,11 @@ public:
  * member 1: UUID of element to be found
  **/
 
-class FindLayerUuidWithinStaffDefParams : public FunctorParams {
+class FindLayerIDWithinStaffDefParams : public FunctorParams {
 public:
-    explicit FindLayerUuidWithinStaffDefParams(const std::string &Uuid)
+    explicit FindLayerIDWithinStaffDefParams(const std::string &ID)
     {
-        m_uuid = Uuid;
+        m_uuid = ID;
         m_object = NULL;
     }
 
@@ -2233,9 +2233,9 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: MapOfLinkingInterfaceUuidPairs holds the interface / uuid pairs to match for links
- * member 1: MapOfLinkingInterfaceUuidPairs holds the interface / uuid pairs to match for sameas
- * member 2: MapOfNoteUuidPairs holds the note / uuid pairs to match for stem.sameas
+ * member 0: MapOfLinkingInterfaceIDPairs holds the interface / uuid pairs to match for links
+ * member 1: MapOfLinkingInterfaceIDPairs holds the interface / uuid pairs to match for sameas
+ * member 2: MapOfNoteIDPairs holds the note / uuid pairs to match for stem.sameas
  * member 3: bool* fillList for indicating whether the pairs have to be stacked or not
  *
  **/
@@ -2243,9 +2243,9 @@ public:
 class PrepareLinkingParams : public FunctorParams {
 public:
     PrepareLinkingParams() { m_fillList = true; }
-    MapOfLinkingInterfaceUuidPairs m_nextUuidPairs;
-    MapOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
-    MapOfNoteUuidPairs m_stemSameasUuidPairs;
+    MapOfLinkingInterfaceIDPairs m_nextIDPairs;
+    MapOfLinkingInterfaceIDPairs m_sameasIDPairs;
+    MapOfNoteIDPairs m_stemSameasIDPairs;
     bool m_fillList;
 };
 
@@ -2291,14 +2291,14 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: ArrayOfInterfaceUuidPairs holds the interface / uuid pairs to match
+ * member 0: ArrayOfInterfaceIDPairs holds the interface / uuid pairs to match
  * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
  **/
 
 class PreparePlistParams : public FunctorParams {
 public:
     PreparePlistParams() { m_fillList = true; }
-    ArrayOfPlistInterfaceUuidTuples m_interfaceUuidTuples;
+    ArrayOfPlistInterfaceIDTuples m_interfaceIDTuples;
     bool m_fillList;
 };
 
@@ -2651,8 +2651,8 @@ public:
     Functor *m_functorEnd;
     Transposer *m_transposer;
     std::string m_transposition;
-    std::string m_selectedMdivUuid;
-    std::list<std::string> m_currentMdivUuids;
+    std::string m_selectedMdivID;
+    std::list<std::string> m_currentMdivIDs;
     bool m_transposeToSoundingPitch;
     std::map<int, const KeySig *> m_keySigForStaffN;
     std::map<int, int> m_transposeIntervalForStaffN;

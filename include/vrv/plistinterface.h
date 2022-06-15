@@ -86,7 +86,7 @@ protected:
     /**
      * Extract the fragment of the any uris given in @plist
      */
-    void SetUuidStrs();
+    void SetIDStrs();
 
     /**
      * Method to be redefined in the child class if specific validation is required.

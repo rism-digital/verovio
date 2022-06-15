@@ -57,7 +57,7 @@ void View::DrawTabClef(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     this->DrawSmuflCode(dc, x, y, sym, glyphSize, false);
 
@@ -77,7 +77,7 @@ void View::DrawTabGrp(DeviceContext *dc, LayerElement *element, Layer *layer, St
     TabGrp *tabGrp = dynamic_cast<TabGrp *>(element);
     assert(tabGrp);
 
-    dc->StartGraphic(tabGrp, "", tabGrp->GetUuid());
+    dc->StartGraphic(tabGrp, "", tabGrp->GetID());
 
     // Draw children (rhyhtm, notes)
     this->DrawLayerChildren(dc, tabGrp, layer, staff, measure);
@@ -98,7 +98,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     // TabGrp *tabGrp = note->IsTabGrpNote();
     // assert(tabGrp);
 
-    dc->StartGraphic(note, "", note->GetUuid());
+    dc->StartGraphic(note, "", note->GetID());
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -167,7 +167,7 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     TabGrp *tabGrp = dynamic_cast<TabGrp *>(tabDurSym->GetFirstAncestor(TABGRP));
     assert(tabGrp);
 
-    dc->StartGraphic(tabDurSym, "", tabDurSym->GetUuid());
+    dc->StartGraphic(tabDurSym, "", tabDurSym->GetID());
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
