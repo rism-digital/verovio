@@ -67,8 +67,8 @@ void Hairpin::Reset()
     m_drawingLength = 0;
 }
 
-int Hairpin::CalcHeight(
-    Doc *doc, int staffSize, char spanningType, FloatingPositioner *leftPositioner, FloatingPositioner *rightPositioner)
+int Hairpin::CalcHeight(const Doc *doc, int staffSize, char spanningType, const FloatingPositioner *leftPositioner,
+    const FloatingPositioner *rightPositioner) const
 {
     assert(doc);
 
@@ -88,9 +88,9 @@ int Hairpin::CalcHeight(
 
     // Second of a <>
     if ((this->GetForm() == hairpinLog_FORM_dim) && m_leftLink && m_leftLink->Is(HAIRPIN)) {
-        // Do no adjust height when previous hairpin is not a full hairpin
+        // Don't adjust height when previous hairpin is not a full hairpin
         if (!leftPositioner || (leftPositioner->GetSpanningType() != SPANNING_START_END)) return endY;
-        Hairpin *left = vrv_cast<Hairpin *>(m_leftLink);
+        const Hairpin *left = vrv_cast<const Hairpin *>(m_leftLink);
         assert(left);
         // Take into account its length only if the left one is actually a <
         if (left->GetForm() == hairpinLog_FORM_cres) {
@@ -100,9 +100,9 @@ int Hairpin::CalcHeight(
 
     // First of a <>
     if ((this->GetForm() == hairpinLog_FORM_cres) && m_rightLink && m_rightLink->Is(HAIRPIN)) {
-        // Do no adjust height when next hairpin is not a full hairpin
+        // Don't adjust height when next hairpin is not a full hairpin
         if (!rightPositioner || (rightPositioner->GetSpanningType() != SPANNING_START_END)) return endY;
-        Hairpin *right = vrv_cast<Hairpin *>(m_rightLink);
+        const Hairpin *right = vrv_cast<const Hairpin *>(m_rightLink);
         assert(right);
         // Take into account its length only if the right one is actually a >
         if (right->GetForm() == hairpinLog_FORM_dim) {
@@ -158,17 +158,17 @@ void Hairpin::SetRightLink(ControlElement *rightLink)
     rightLink->SetDrawingGrpId(grpId);
 }
 
-std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int leftX, int rightX, int spanningType)
+std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int leftX, int rightX, int spanningType) const
 {
-    Measure *startMeasure = vrv_cast<Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
-    Measure *endMeasure = vrv_cast<Measure *>(this->GetEnd()->GetFirstAncestor(MEASURE));
+    const Measure *startMeasure = vrv_cast<const Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
+    const Measure *endMeasure = vrv_cast<const Measure *>(this->GetEnd()->GetFirstAncestor(MEASURE));
 
     if (!startMeasure || !endMeasure) return { 0, 0 };
 
     // Calculate adjustment that needs to be made for hairpin not to touch the left barline. We take doubleUnit for the
     // default margin to consider them overlapping, which is adjusted in case we have wider barline on the left
     int leftAdjustment = 0;
-    BarLine *leftBarline = startMeasure->GetLeftBarLine();
+    const BarLine *leftBarline = startMeasure->GetLeftBarLine();
     if (leftBarline && (spanningType == SPANNING_START_END || spanningType == SPANNING_START)) {
         int margin = doubleUnit;
         const int leftBarlineX = leftBarline->GetDrawingX();
@@ -182,16 +182,16 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
     // be selected - when processing start of the spanning hairpin, we should check for the last measure of the current
     // system, instead of the endMeasure
     int rightAdjustment = 0;
-    BarLine *rightBarline = NULL;
+    const BarLine *rightBarline = NULL;
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
         rightBarline = endMeasure->GetRightBarLine();
     }
     else if (spanningType == SPANNING_START) {
-        System *startSystem = vrv_cast<System *>(this->GetStart()->GetFirstAncestor(SYSTEM));
+        const System *startSystem = vrv_cast<const System *>(this->GetStart()->GetFirstAncestor(SYSTEM));
         if (startSystem) {
             ClassIdComparison cmp(MEASURE);
-            Measure *measure
-                = vrv_cast<Measure *>(startSystem->FindDescendantByComparison(&cmp, UNLIMITED_DEPTH, BACKWARD));
+            const Measure *measure
+                = vrv_cast<const Measure *>(startSystem->FindDescendantByComparison(&cmp, UNLIMITED_DEPTH, BACKWARD));
             if (measure) rightBarline = measure->GetRightBarLine();
         }
     }
