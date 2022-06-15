@@ -216,6 +216,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse change staff action");
     }
+    else if (action == "changeStaffTo") {
+        std::string elementId, staffId;
+        if (this->ParseChangeStaffToAction(json.get<jsonxx::Object>("param"), &elementId, &staffId)) {
+            return this->ChangeStaffTo(elementId, staffId);
+        }
+        LogWarning("Could not parse change staff action");
+    }
     else {
         LogWarning("Unknown action type '%s'.", action.c_str());
     }
@@ -627,7 +634,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 }
             }
         }
-        ChangeStaff(elementId);
     }
     else if (element->Is(DIVLINE)) {
         DivLine *divLine = dynamic_cast<DivLine *>(element);
@@ -675,7 +681,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 }
             }
         }
-        ChangeStaff(elementId);
     }
     else {
         LogWarning("Unsupported element for dragging.");
@@ -3203,6 +3208,166 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     return true;
 }
 
+bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffId)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
+        return false;
+    }
+
+    if (m_doc->GetType() != Facs) {
+        LogWarning("Staff re-association is only available in facsimile mode.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Staff re-association is only available in facsimile mode.");
+        return false;
+    }
+
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    assert(element);
+    if (element == NULL) {
+        LogError("No element exists with ID '%s'.", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "No element exists with ID" + elementId + ".");
+        return false;
+    }
+
+    if (!(element->Is(CLEF) || element->Is(DIVLINE) || element->Is(ACCID))) {
+        LogError("Element is of type %s, but only Clefs, Divlines, and Accids can change to a specified staff.",
+            element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message",
+            "Element is of type " + element->GetClassName()
+                + ", but only Clefs, Divlines, and Accids can change to a specified staff.");
+        return false;
+    }
+
+    Staff *staff = dynamic_cast<Staff *> (m_doc->GetDrawingPage()->FindDescendantByUuid(staffId));
+    
+    if (!staff) {
+        LogError("Could not find any staves. This should not happen");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not find any staves. This should not happen");
+        return false;
+    }
+
+    Layer *parent = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
+    Staff *sParent = dynamic_cast<Staff *>(parent->GetFirstAncestor(STAFF));
+    assert(parent);
+    if (parent == NULL || sParent == NULL) {
+        LogError("Couldn't find staff parent of element with id '%s'", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Couldn't find staff parent of element with id " + elementId);
+        return false;
+    }
+
+    Layer *layer = dynamic_cast<Layer *>(staff->FindDescendantByType(LAYER));
+    assert(LAYER);
+    if (layer == NULL) {
+        LogError("Couldn't find layer child of staff. This should not happen");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Couldn't find layer child of staff. This should not happen");
+        return false;
+    }
+
+    if (layer == parent) {
+        m_infoObject.import("status", "WARNING");
+        m_infoObject.import("message", "Moving to the same staff as before.");
+        m_infoObject.import("elementId", elementId);
+        m_infoObject.import("newStaffId", staff->GetUuid());
+        return true;
+    }
+
+    if (element->Is(ACCID) || element->Is(DIVLINE)) {
+        // if accid or divLine is inside the syllable
+        // move it out
+        if (element->GetParent()->Is(SYLLABLE)) {
+            Object *par = element->GetParent();
+            assert(par);
+            Object *sPar = par->GetParent();
+            assert(sPar);
+
+            element->MoveItselfTo(sPar);
+            sPar->ReorderByXPos();
+            par->ClearRelinquishedChildren();
+            par->ReorderByXPos();
+        }
+    }
+
+    // Adjust pitch/staff line.
+    if (element->Is(CLEF)) {
+        Clef *clef = dynamic_cast<Clef *>(element);
+        assert(clef);
+
+        Clef *previousClefBefore;
+        Clef *nextClefBefore;
+        ListOfObjects oldPitchChildren;
+        InterfaceComparison ic(INTERFACE_PITCH);
+        ClassIdComparison cic(CLEF);
+
+        previousClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cic, element));
+
+        if (previousClefBefore == NULL) {
+            previousClefBefore = layer->GetCurrentClef();
+        }
+
+        nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
+
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&oldPitchChildren, &ic, clef,
+            (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
+
+        PitchInterface *pi;
+
+        for (auto it = oldPitchChildren.begin(); it != oldPitchChildren.end(); ++it) {
+            pi = (*it)->GetPitchInterface();
+            assert(pi);
+            pi->AdjustPitchForNewClef(clef, previousClefBefore);
+        }
+
+        element->MoveItselfTo(layer);
+        layer->ReorderByXPos();
+        parent->ClearRelinquishedChildren();
+        parent->ReorderByXPos();
+
+        // Adjust clefline
+        if (!AdjustClefLineFromPosition(dynamic_cast<Clef *>(element), staff)) {
+            LogError("Could not adjust clef line of %s", element->GetUuid().c_str());
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Failed to set clef line from facsimile.");
+            return false;
+        }
+
+        // apply pitch interface changes to any elements whose clef may have changed
+        ListOfObjects newPitchChildren;
+        Clef *previousClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cic, element));
+        if (previousClefAfter == NULL) {
+            previousClefAfter = layer->GetCurrentClef();
+        }
+        Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(
+            &newPitchChildren, &ic, clef, (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
+
+        for (auto it = newPitchChildren.begin(); it != newPitchChildren.end(); ++it) {
+            pi = (*it)->GetPitchInterface();
+            assert(pi);
+            pi->AdjustPitchForNewClef(previousClefAfter, clef);
+        }
+    }
+    else {
+        element->MoveItselfTo(layer);
+        layer->ReorderByXPos();
+        parent->ClearRelinquishedChildren();
+        parent->ReorderByXPos();
+    }
+
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    m_infoObject.import("elementId", elementId);
+    m_infoObject.import("newStaffId", staff->GetUuid());
+    return true;
+}
+
 bool EditorToolkitNeume::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -3462,6 +3627,16 @@ bool EditorToolkitNeume::ParseChangeStaffAction(jsonxx::Object param, std::strin
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
+
+    return true;
+}
+
+bool EditorToolkitNeume::ParseChangeStaffToAction(jsonxx::Object param, std::string *elementId, std::string *staffId)
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("staffId")) return false;
+    (*staffId) = param.get<jsonxx::String>("staffId");
 
     return true;
 }
