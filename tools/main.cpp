@@ -472,6 +472,11 @@ int main(int argc, char **argv)
         outfile = removeExtension(outfile);
     }
 
+    // Skip the layout for MIDI and timemap output
+    if ((outformat == "midi") || (outformat == "timemap")) {
+        toolkit.SkipLayoutOnLoad(true);
+    }
+
     // Load the std input or load the file
     if (!((toolkit.GetOutputTo() == vrv::HUMDRUM) && (toolkit.GetInputFrom() == vrv::MEI))) {
         if (infile == "-") {

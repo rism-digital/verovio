@@ -742,7 +742,7 @@ bool Toolkit::LoadData(const std::string &data)
     // to be converted
     if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
 
-    if (breaks != BREAKS_none) {
+    if (!m_skipLayoutOnLoad && (breaks != BREAKS_none)) {
         if (input->GetLayoutInformation() == LAYOUT_ENCODED
             && (breaks == BREAKS_encoded || breaks == BREAKS_line || breaks == BREAKS_smart)) {
             if (breaks == BREAKS_encoded) {
