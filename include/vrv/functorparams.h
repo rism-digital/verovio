@@ -1647,9 +1647,9 @@ public:
 
 class FindLayerIDWithinStaffDefParams : public FunctorParams {
 public:
-    explicit FindLayerIDWithinStaffDefParams(const std::string &ID)
+    explicit FindLayerIDWithinStaffDefParams(const std::string &xmlId)
     {
-        m_uuid = ID;
+        m_uuid = xmlId;
         m_object = NULL;
     }
 

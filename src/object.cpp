@@ -596,10 +596,10 @@ Object *Object::FindDescendantByID(const std::string &uuid, int deepness, bool d
 const Object *Object::FindDescendantByID(const std::string &uuid, int deepness, bool direction) const
 {
     Functor findByID(&Object::FindByID);
-    FindByIDParams findbyIDParams;
-    findbyIDParams.m_uuid = uuid;
-    this->Process(&findByID, &findbyIDParams, NULL, NULL, deepness, direction, true);
-    return findbyIDParams.m_element;
+    FindByIDParams findByIDParams;
+    findByIDParams.m_uuid = uuid;
+    this->Process(&findByID, &findByIDParams, NULL, NULL, deepness, direction, true);
+    return findByIDParams.m_element;
 }
 
 Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction)

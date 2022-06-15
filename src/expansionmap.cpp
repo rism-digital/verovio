@@ -71,7 +71,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 // clone current section/ending/rdg/lem and rename it, adding -"rend2" for the first repetition etc.
                 Object *clonedObject = currSect->Clone();
                 clonedObject->CloneReset();
-                this->GeneratePredictableIds(currSect, clonedObject);
+                this->GeneratePredictableIDs(currSect, clonedObject);
 
                 // get IDs of old and new sections and add them to m_map
                 std::vector<std::string> oldIds;
@@ -81,11 +81,11 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 clonedIds.push_back(clonedObject->GetID());
                 this->GetIDList(clonedObject, clonedIds);
                 for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); i++) {
-                    this->AddExpandedIdToExpansionMap(oldIds.at(i), clonedIds.at(i));
+                    this->AddExpandedIDToExpansionMap(oldIds.at(i), clonedIds.at(i));
                 }
 
                 // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
-                this->UpdateIds(clonedObject);
+                this->UpdateIDs(clonedObject);
 
                 assert(prevSect->GetParent());
                 prevSect->GetParent()->InsertAfter(prevSect, clonedObject);
@@ -120,7 +120,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
     }
 }
 
-bool ExpansionMap::UpdateIds(Object *object)
+bool ExpansionMap::UpdateIDs(Object *object)
 {
     for (Object *o : object->GetChildren()) {
         o->IsExpansion(true);
@@ -130,7 +130,7 @@ bool ExpansionMap::UpdateIds(Object *object)
             // @startid
             std::string oldStartId = interface->GetStartid();
             if (oldStartId.rfind("#", 0) == 0) oldStartId = oldStartId.substr(1, oldStartId.size() - 1);
-            std::string newStartId = this->GetExpansionIdsForElement(oldStartId).back();
+            std::string newStartId = this->GetExpansionIDsForElement(oldStartId).back();
             if (!newStartId.empty()) interface->SetStartid("#" + newStartId);
         }
         if (o->HasInterface(INTERFACE_TIME_SPANNING)) {
@@ -139,12 +139,12 @@ bool ExpansionMap::UpdateIds(Object *object)
             // @startid
             std::string oldStartId = interface->GetStartid();
             if (oldStartId.rfind("#", 0) == 0) oldStartId = oldStartId.substr(1, oldStartId.size() - 1);
-            std::string newStartId = this->GetExpansionIdsForElement(oldStartId).back();
+            std::string newStartId = this->GetExpansionIDsForElement(oldStartId).back();
             if (!newStartId.empty()) interface->SetStartid("#" + newStartId);
             // @endid
             oldStartId = interface->GetEndid();
             if (oldStartId.rfind("#", 0) == 0) oldStartId = oldStartId.substr(1, oldStartId.size() - 1);
-            std::string newEndId = this->GetExpansionIdsForElement(oldStartId).back();
+            std::string newEndId = this->GetExpansionIDsForElement(oldStartId).back();
             if (!newEndId.empty()) interface->SetEndid("#" + newEndId);
         }
         if (o->HasInterface(INTERFACE_PLIST)) {
@@ -154,7 +154,7 @@ bool ExpansionMap::UpdateIds(Object *object)
             xsdAnyURI_List newList;
             for (std::string oldRefString : oldList) {
                 if (oldRefString.rfind("#", 0) == 0) oldRefString = oldRefString.substr(1, oldRefString.size() - 1);
-                newList.push_back("#" + this->GetExpansionIdsForElement(oldRefString).back());
+                newList.push_back("#" + this->GetExpansionIDsForElement(oldRefString).back());
             }
             interface->SetPlist(newList);
         }
@@ -164,40 +164,40 @@ bool ExpansionMap::UpdateIds(Object *object)
             // @sameas
             std::string oldIdString = interface->GetSameas();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            std::string newIdString = this->GetExpansionIdsForElement(oldIdString).back();
+            std::string newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetSameas("#" + newIdString);
             // @next
             oldIdString = interface->GetNext();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = this->GetExpansionIdsForElement(oldIdString).back();
+            newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetNext("#" + newIdString);
             // @prev
             oldIdString = interface->GetPrev();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = this->GetExpansionIdsForElement(oldIdString).back();
+            newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetPrev("#" + newIdString);
             // @copyof
             oldIdString = interface->GetCopyof();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = this->GetExpansionIdsForElement(oldIdString).back();
+            newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetCopyof("#" + newIdString);
             // @corresp
             oldIdString = interface->GetCorresp();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = this->GetExpansionIdsForElement(oldIdString).back();
+            newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetCorresp("#" + newIdString);
             // @synch
             oldIdString = interface->GetSynch();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);
-            newIdString = this->GetExpansionIdsForElement(oldIdString).back();
+            newIdString = this->GetExpansionIDsForElement(oldIdString).back();
             if (!newIdString.empty()) interface->SetSynch("#" + newIdString);
         }
-        UpdateIds(o);
+        UpdateIDs(o);
     }
     return true;
 }
 
-bool ExpansionMap::AddExpandedIdToExpansionMap(const std::string &origXmlId, std::string newXmlId)
+bool ExpansionMap::AddExpandedIDToExpansionMap(const std::string &origXmlId, std::string newXmlId)
 {
     auto list = m_map.find(origXmlId);
     if (list != m_map.end()) {
@@ -219,7 +219,7 @@ bool ExpansionMap::AddExpandedIdToExpansionMap(const std::string &origXmlId, std
     return true;
 }
 
-std::vector<std::string> ExpansionMap::GetExpansionIdsForElement(const std::string &xmlId)
+std::vector<std::string> ExpansionMap::GetExpansionIDsForElement(const std::string &xmlId)
 {
     try {
         return m_map.at(xmlId);
@@ -244,10 +244,10 @@ void ExpansionMap::GetIDList(Object *object, std::vector<std::string> &idList)
     }
 }
 
-void ExpansionMap::GeneratePredictableIds(Object *source, Object *target)
+void ExpansionMap::GeneratePredictableIDs(Object *source, Object *target)
 {
     target->SetID(
-        source->GetID() + "-rend" + std::to_string(this->GetExpansionIdsForElement(source->GetID()).size() + 1));
+        source->GetID() + "-rend" + std::to_string(this->GetExpansionIDsForElement(source->GetID()).size() + 1));
 
     ArrayOfObjects sourceObjects = source->GetChildren();
     ArrayOfObjects targetObjects = target->GetChildren();
@@ -255,7 +255,7 @@ void ExpansionMap::GeneratePredictableIds(Object *source, Object *target)
 
     unsigned i = 0;
     for (Object *s : sourceObjects) {
-        this->GeneratePredictableIds(s, targetObjects.at(i++));
+        this->GeneratePredictableIDs(s, targetObjects.at(i++));
     }
 }
 
