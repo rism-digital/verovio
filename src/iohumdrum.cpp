@@ -9815,9 +9815,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         if (diff > 0) {
                             std::string letter;
                             letter.push_back('a' + diff);
-                            std::string uid = clef->GetID();
-                            uid += letter;
-                            clef->SetID(uid);
+                            std::string id = clef->GetID();
+                            id += letter;
+                            clef->SetID(id);
                         }
                         if (spaceSplitToken != NULL) {
                             // Add the second part of a split invisible rest:
@@ -9826,9 +9826,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                                 embedQstampInClass(irest, spaceSplitToken, *spaceSplitToken);
                             }
                             setLocationId(irest, spaceSplitToken);
-                            std::string uid = irest->GetID();
-                            uid += "b";
-                            irest->SetID(uid);
+                            std::string id = irest->GetID();
+                            id += "b";
+                            irest->SetID(id);
                             appendElement(elements, pointers, irest);
                             // convertRhythm(irest, spaceSplitToken);
                             setRhythmFromDuration(irest, remainingSplitDur);
