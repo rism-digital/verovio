@@ -86,6 +86,11 @@ public:
     std::string GetID() { return m_doc.GetID(); }
 
     /**
+     * @name Deprecated version, same as GetID()
+     */
+    std::string GetUuid();
+
+    /**
      * Get the resource path for the Toolkit instance.
      */
     std::string GetResourcePath() const;
