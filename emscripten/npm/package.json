@@ -3,6 +3,7 @@
   "version": "3.9.0",
   "description": "This is the stable version of the verovio package",
   "main": "index.js",
+  "files": ["dist"],
   "scripts": {
     "build": "rollup --config",
     "prebundle": "rollup --config rollup.config.prebundle.js"
