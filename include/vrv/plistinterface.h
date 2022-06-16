@@ -84,7 +84,7 @@ public:
 
 protected:
     /**
-     * Extract the fragment of the any uris given in @plist
+     * Extract the fragment of the any URIs given in @plist
      */
     void SetIDStrs();
 
@@ -107,7 +107,7 @@ private:
     ArrayOfConstObjects m_references;
 
     /**
-     * An array of parsed any uris stored as ids.
+     * An array of parsed any URIs stored as ids.
      * Filled in InterfacePreparePlist (backward and forward).
      */
     std::vector<std::string> m_ids;
