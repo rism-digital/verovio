@@ -2,7 +2,16 @@
   "name": "verovio",
   "version": "3.9.0",
   "description": "This is the stable version of the verovio package",
-  "main": "index.js",
+  "main": "dist/verovio-toolkit-wasm.js",
+  "exports": {
+    ".": "./dist/verovio-toolkit-wasm.js",
+    "./next": {
+      "import": "./dist/verovio.mjs",
+      "require": "./dist/verovio.cjs"
+    },
+    "./wasm": "./dist/verovio-module.js",
+    "./wasm-hum": "./dist/verovio-module-hum.js"
+  },
   "files": ["dist"],
   "scripts": {
     "build": "rollup --config",
