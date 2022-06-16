@@ -217,9 +217,9 @@ public:
     bool HasFilter() const;
     void SetFirstPage(int page);
     void SetLastPage(int page);
-    void SetFirstMeasure(const std::string &uuid);
-    void SetLastMeasure(const std::string &uuid);
-    void SetMdiv(const std::string &uuid);
+    void SetFirstMeasure(const std::string &id);
+    void SetLastMeasure(const std::string &id);
+    void SetMdiv(const std::string &id);
     void ResetFilter();
     ///@}
 

@@ -514,9 +514,9 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
 
 void MusicXmlInput::GenerateID(pugi::xml_node node)
 {
-    std::string uuid = StringFormat("%s-%s", node.name(), Object::GenerateRandID().c_str()).c_str();
-    std::transform(uuid.begin(), uuid.end(), uuid.begin(), ::tolower);
-    node.append_attribute("xml:id").set_value(uuid.c_str());
+    std::string id = StringFormat("%s-%s", node.name(), Object::GenerateRandID().c_str()).c_str();
+    std::transform(id.begin(), id.end(), id.begin(), ::tolower);
+    node.append_attribute("xml:id").set_value(id.c_str());
 }
 
 //////////////////////////////////////////////////////////////////////////////

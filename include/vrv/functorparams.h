@@ -1548,14 +1548,14 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the uuid we are looking for
+ * member 0: the id we are looking for
  * member 1: the pointer to pointer to the Object
  **/
 
 class FindByIDParams : public FunctorParams {
 public:
     FindByIDParams() { m_element = NULL; }
-    std::string m_uuid;
+    std::string m_id;
     const Object *m_element;
 };
 
@@ -1649,12 +1649,12 @@ class FindLayerIDWithinStaffDefParams : public FunctorParams {
 public:
     explicit FindLayerIDWithinStaffDefParams(const std::string &xmlId)
     {
-        m_uuid = xmlId;
+        m_id = xmlId;
         m_object = NULL;
     }
 
     Object *m_object;
-    std::string m_uuid;
+    std::string m_id;
 };
 
 //----------------------------------------------------------------------------
@@ -2233,9 +2233,9 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: MapOfLinkingInterfaceIDPairs holds the interface / uuid pairs to match for links
- * member 1: MapOfLinkingInterfaceIDPairs holds the interface / uuid pairs to match for sameas
- * member 2: MapOfNoteIDPairs holds the note / uuid pairs to match for stem.sameas
+ * member 0: MapOfLinkingInterfaceIDPairs holds the interface / id pairs to match for links
+ * member 1: MapOfLinkingInterfaceIDPairs holds the interface / id pairs to match for sameas
+ * member 2: MapOfNoteIDPairs holds the note / id pairs to match for stem.sameas
  * member 3: bool* fillList for indicating whether the pairs have to be stacked or not
  *
  **/
@@ -2291,7 +2291,7 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: ArrayOfInterfaceIDPairs holds the interface / uuid pairs to match
+ * member 0: ArrayOfInterfaceIDPairs holds the interface / id pairs to match
  * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
  **/
 

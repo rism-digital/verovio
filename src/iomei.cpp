@@ -919,21 +919,21 @@ void MEIOutput::SetLastPage(int page)
     m_hasFilter = true;
 }
 
-void MEIOutput::SetFirstMeasure(const std::string &uuid)
+void MEIOutput::SetFirstMeasure(const std::string &id)
 {
-    m_firstMeasureID = uuid;
+    m_firstMeasureID = id;
     m_hasFilter = true;
 }
 
-void MEIOutput::SetLastMeasure(const std::string &uuid)
+void MEIOutput::SetLastMeasure(const std::string &id)
 {
-    m_lastMeasureID = uuid;
+    m_lastMeasureID = id;
     m_hasFilter = true;
 }
 
-void MEIOutput::SetMdiv(const std::string &uuid)
+void MEIOutput::SetMdiv(const std::string &id)
 {
-    m_mdivID = uuid;
+    m_mdivID = id;
     m_hasFilter = true;
 }
 
@@ -1277,7 +1277,7 @@ bool MEIOutput::AdjustLabel(Label *label)
 std::string MEIOutput::IDToMeiStr(Object *element)
 {
     std::string out = element->GetID();
-    // LogDebug("uuid: %s", out.c_str());
+    // LogDebug("id: %s", out.c_str());
     return out;
 }
 

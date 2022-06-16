@@ -23891,7 +23891,7 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
     hum::HumNum endtime = timestamp + token->getDuration();
     int track = token->getTrack();
     int rtrack = m_rkern[track];
-    std::string noteuuid = note->GetID();
+    std::string noteid = note->GetID();
     int cl = m_currentlayer;
     int pitch = hum::Convert::kernToMidiNoteNumber(tstring);
 
@@ -23900,7 +23900,7 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
     ss[rtrack].tiestarts.emplace_back();
     ss[rtrack].tiestarts.back().setStart(
-        noteuuid, m_measure, cl, tstring, pitch, timestamp, endtime, subindex, token, metertop, meterbot);
+        noteid, m_measure, cl, tstring, pitch, timestamp, endtime, subindex, token, metertop, meterbot);
 
     if (m_signifiers.above) {
         std::string marker = "[";
@@ -23948,7 +23948,7 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
     hum::HumNum timestamp = token->getDurationFromStart();
     int track = token->getTrack();
     int staffindex = m_rkern[track];
-    std::string noteuuid = note->GetID();
+    std::string noteid = note->GetID();
     bool disjunct = token->find("]]") != std::string::npos;
     if (token->find("__") != std::string::npos) {
         disjunct = true;
@@ -24028,7 +24028,7 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
         hum::HumNum endtime = starttime + duration;
 
         Tie *tie = found->setEndAndInsert(
-            noteuuid, m_measure, layer, tstring, pitch, starttime, endtime, subindex, token, metertop, meterbot);
+            noteid, m_measure, layer, tstring, pitch, starttime, endtime, subindex, token, metertop, meterbot);
 
         int startindex = found->getStartSubindex();
         if (starttoken) {

@@ -169,7 +169,7 @@ public:
      * needs to be overridden in the child class - otherwise, it will crash.
      * Because this will create a problem if we don't check this (the parents will
      * one the same child...)
-     * ID: the uuid is copied, it needs to be reset later if this is not wished
+     * ID: the id is copied, it needs to be reset later if this is not wished
      */
     Object(const Object &object);
 
@@ -234,8 +234,8 @@ public:
      */
     virtual void CloneReset();
 
-    const std::string &GetID() const { return m_uuid; }
-    void SetID(std::string uuid);
+    const std::string &GetID() const { return m_id; }
+    void SetID(std::string id);
     void SwapID(Object *other);
     void ResetID();
 
@@ -411,13 +411,13 @@ public:
     bool HasDescendant(Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
-     * Look for a descendant with the specified uuid (returns NULL if not found)
+     * Look for a descendant with the specified id (returns NULL if not found)
      * This method is a wrapper for the Object::FindByID functor.
      */
     ///@{
-    Object *FindDescendantByID(const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindDescendantByID(const std::string &id, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
     const Object *FindDescendantByID(
-        const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
+        const std::string &id, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
     ///@}
 
     /**
@@ -670,7 +670,7 @@ public:
     ///@{
 
     /**
-     * Find a Object with a specified uuid.
+     * Find a Object with a specified id.
      */
     virtual int FindByID(FunctorParams *functorParams) const;
 
@@ -1525,12 +1525,12 @@ public:
 
 private:
     /**
-     * Method for generating the uuid.
+     * Method for generating the id.
      */
     void GenerateID();
 
     /**
-     * Initialisation method taking the class id and a uuid prefix argument.
+     * Initialisation method taking the class id and a id prefix argument.
      */
     void Init(ClassId classId, const std::string &classIdStr);
 
@@ -1570,10 +1570,10 @@ private:
     ClassId m_classId;
 
     /**
-     * Members for storing / generating uuids
+     * Members for storing / generating ids
      */
     ///@{
-    std::string m_uuid;
+    std::string m_id;
     std::string m_classIdStr;
     ///@}
 
@@ -1636,7 +1636,7 @@ private:
     //----------------//
 
     /**
-     * A static counter for uuid generation.
+     * A static counter for id generation.
      */
     static thread_local unsigned long s_objectCounter;
 

@@ -570,15 +570,15 @@ void Note::ResolveStemSameas(PrepareLinkingParams *params)
     // First pass we fill m_stemSameasIDPairs
     if (params->m_fillList) {
         if (this->HasStemSameas()) {
-            std::string uuidTarget = ExtractIDFragment(this->GetStemSameas());
-            params->m_stemSameasIDPairs[uuidTarget] = this;
+            std::string idTarget = ExtractIDFragment(this->GetStemSameas());
+            params->m_stemSameasIDPairs[idTarget] = this;
         }
     }
     // Second pass we resolve links
     else {
-        const std::string uuid = this->GetID();
-        if (params->m_stemSameasIDPairs.count(uuid)) {
-            Note *noteStemSameas = params->m_stemSameasIDPairs.at(uuid);
+        const std::string id = this->GetID();
+        if (params->m_stemSameasIDPairs.count(id)) {
+            Note *noteStemSameas = params->m_stemSameasIDPairs.at(id);
             // Instanciate the bi-directional references and mark the roles as unset
             this->SetStemSameasNote(noteStemSameas);
             this->m_stemSameasRole = SAMEAS_UNSET;
@@ -599,7 +599,7 @@ void Note::ResolveStemSameas(PrepareLinkingParams *params)
                     beamStemSameas->SetStemSameasBeam(thisBeam);
                 }
             }
-            params->m_stemSameasIDPairs.erase(uuid);
+            params->m_stemSameasIDPairs.erase(id);
         }
     }
 }

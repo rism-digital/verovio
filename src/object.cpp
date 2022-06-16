@@ -109,7 +109,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     // Also copy attribute classes
     m_attClasses = object.m_attClasses;
     m_interfaces = object.m_interfaces;
-    // New uuid
+    // New id
     this->GenerateID();
     // For now do not copy them
     // m_unsupported = object.m_unsupported;
@@ -157,7 +157,7 @@ Object &Object::operator=(const Object &object)
         // Also copy attribute classes
         m_attClasses = object.m_attClasses;
         m_interfaces = object.m_interfaces;
-        // New uuid
+        // New id
         this->GenerateID();
         // For now do now copy them
         // m_unsupported = object.m_unsupported;
@@ -353,9 +353,9 @@ void Object::MoveItselfTo(Object *targetParent)
     targetParent->AddChild(relinquishedObject);
 }
 
-void Object::SetID(std::string uuid)
+void Object::SetID(std::string id)
 {
-    m_uuid = uuid;
+    m_id = id;
 }
 
 void Object::SwapID(Object *other)
@@ -588,16 +588,16 @@ void Object::ClearRelinquishedChildren()
     }
 }
 
-Object *Object::FindDescendantByID(const std::string &uuid, int deepness, bool direction)
+Object *Object::FindDescendantByID(const std::string &id, int deepness, bool direction)
 {
-    return const_cast<Object *>(std::as_const(*this).FindDescendantByID(uuid, deepness, direction));
+    return const_cast<Object *>(std::as_const(*this).FindDescendantByID(id, deepness, direction));
 }
 
-const Object *Object::FindDescendantByID(const std::string &uuid, int deepness, bool direction) const
+const Object *Object::FindDescendantByID(const std::string &id, int deepness, bool direction) const
 {
     Functor findByID(&Object::FindByID);
     FindByIDParams findByIDParams;
-    findByIDParams.m_uuid = uuid;
+    findByIDParams.m_id = id;
     this->Process(&findByID, &findByIDParams, NULL, NULL, deepness, direction, true);
     return findByIDParams.m_element;
 }
@@ -778,7 +778,7 @@ int Object::DeleteChildrenByComparison(Comparison *comparison)
 
 void Object::GenerateID()
 {
-    m_uuid = m_classIdStr.at(0) + Object::GenerateRandID();
+    m_id = m_classIdStr.at(0) + Object::GenerateRandID();
 }
 
 void Object::ResetID()
@@ -1204,7 +1204,7 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
 
 void Object::SeedID(unsigned int seed)
 {
-    // Init random number generator for uuids
+    // Init random number generator for ids
     if (seed == 0) {
         std::random_device rd;
         s_randomGenerator.seed(rd());
@@ -1659,12 +1659,12 @@ int Object::FindByID(FunctorParams *functorParams) const
         return FUNCTOR_STOP;
     }
 
-    if (params->m_uuid == this->GetID()) {
+    if (params->m_id == this->GetID()) {
         params->m_element = this;
         // LogDebug("Found it!");
         return FUNCTOR_STOP;
     }
-    // LogDebug("Still looking for uuid...");
+    // LogDebug("Still looking for id...");
     return FUNCTOR_CONTINUE;
 }
 
@@ -1900,8 +1900,8 @@ int Object::PrepareLinking(FunctorParams *functorParams)
     }
 
     // @next
-    std::string uuid = this->GetID();
-    auto r1 = params->m_nextIDPairs.equal_range(uuid);
+    std::string id = this->GetID();
+    auto r1 = params->m_nextIDPairs.equal_range(id);
     if (r1.first != params->m_nextIDPairs.end()) {
         for (auto i = r1.first; i != r1.second; ++i) {
             i->second->SetNextLink(this);
@@ -1910,7 +1910,7 @@ int Object::PrepareLinking(FunctorParams *functorParams)
     }
 
     // @sameas
-    auto r2 = params->m_sameasIDPairs.equal_range(uuid);
+    auto r2 = params->m_sameasIDPairs.equal_range(id);
     if (r2.first != params->m_sameasIDPairs.end()) {
         for (auto j = r2.first; j != r2.second; ++j) {
             j->second->SetSameasLink(this);
@@ -1941,9 +1941,9 @@ int Object::PrepareProcessPlist(FunctorParams *functorParams)
 
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
 
-    std::string uuid = this->GetID();
+    std::string id = this->GetID();
     auto i = std::find_if(params->m_interfaceIDTuples.begin(), params->m_interfaceIDTuples.end(),
-        [&uuid](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == uuid); });
+        [&id](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == id); });
     if (i != params->m_interfaceIDTuples.end()) {
         std::get<2>(*i) = this;
     }

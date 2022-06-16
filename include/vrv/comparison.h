@@ -487,18 +487,18 @@ private:
 class IDComparison : public ClassIdComparison {
 
 public:
-    IDComparison(ClassId classId, const std::string &uuid) : ClassIdComparison(classId) { m_uuid = uuid; }
+    IDComparison(ClassId classId, const std::string &id) : ClassIdComparison(classId) { m_id = id; }
 
-    void SetID(const std::string &uuid) { m_uuid = uuid; }
+    void SetID(const std::string &id) { m_id = id; }
 
     bool operator()(const Object *object) override
     {
         if (!MatchesType(object)) return false;
-        return object->GetID() == m_uuid;
+        return object->GetID() == m_id;
     }
 
 private:
-    std::string m_uuid;
+    std::string m_id;
 };
 
 //----------------------------------------------------------------------------

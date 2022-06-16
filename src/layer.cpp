@@ -796,19 +796,19 @@ int Layer::FindElementInLayerStaffDefsByID(FunctorParams *functorParams) const
 
     if (!this->HasStaffDef()) return FUNCTOR_SIBLINGS;
     // Get corresponding elements from the layer
-    if (this->GetStaffDefClef() && (this->GetStaffDefClef()->GetID() == params->m_uuid)) {
+    if (this->GetStaffDefClef() && (this->GetStaffDefClef()->GetID() == params->m_id)) {
         params->m_object = this->GetStaffDefClef();
     }
-    else if (this->GetStaffDefKeySig() && (this->GetStaffDefKeySig()->GetID() == params->m_uuid)) {
+    else if (this->GetStaffDefKeySig() && (this->GetStaffDefKeySig()->GetID() == params->m_id)) {
         params->m_object = this->GetStaffDefKeySig();
     }
-    else if (this->GetStaffDefMensur() && (this->GetStaffDefMensur()->GetID() == params->m_uuid)) {
+    else if (this->GetStaffDefMensur() && (this->GetStaffDefMensur()->GetID() == params->m_id)) {
         params->m_object = this->GetStaffDefMensur();
     }
-    else if (this->GetStaffDefMeterSig() && (this->GetStaffDefMeterSig()->GetID() == params->m_uuid)) {
+    else if (this->GetStaffDefMeterSig() && (this->GetStaffDefMeterSig()->GetID() == params->m_id)) {
         params->m_object = this->GetStaffDefMeterSig();
     }
-    else if (this->GetStaffDefMeterSigGrp() && (this->GetStaffDefMeterSigGrp()->GetID() == params->m_uuid)) {
+    else if (this->GetStaffDefMeterSigGrp() && (this->GetStaffDefMeterSigGrp()->GetID() == params->m_id)) {
         params->m_object = this->GetStaffDefMeterSigGrp();
     }
 

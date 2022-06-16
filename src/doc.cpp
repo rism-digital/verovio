@@ -584,7 +584,7 @@ void Doc::PrepareData()
         Functor processPlist(&Object::PrepareProcessPlist);
         this->Process(&processPlist, &preparePlistParams);
 
-        for (const auto &[plistInterface, uuid, objectReference] : preparePlistParams.m_interfaceIDTuples) {
+        for (const auto &[plistInterface, id, objectReference] : preparePlistParams.m_interfaceIDTuples) {
             plistInterface->SetRef(objectReference);
         }
         preparePlistParams.m_interfaceIDTuples.clear();
@@ -1379,10 +1379,10 @@ void Doc::TransposeDoc()
     }
     else if (m_options->m_transposeMdiv.IsSet()) {
         // Transpose mdivs individually
-        std::set<std::string> uuids = m_options->m_transposeMdiv.GetKeys();
-        for (const std::string &uuid : uuids) {
-            transposeParams.m_selectedMdivID = uuid;
-            transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ uuid });
+        std::set<std::string> ids = m_options->m_transposeMdiv.GetKeys();
+        for (const std::string &id : ids) {
+            transposeParams.m_selectedMdivID = id;
+            transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ id });
             this->Process(&transpose, &transposeParams, &transposeEnd);
         }
     }
