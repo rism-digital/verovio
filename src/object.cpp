@@ -353,11 +353,6 @@ void Object::MoveItselfTo(Object *targetParent)
     targetParent->AddChild(relinquishedObject);
 }
 
-void Object::SetID(std::string id)
-{
-    m_id = id;
-}
-
 void Object::SwapID(Object *other)
 {
     assert(other);

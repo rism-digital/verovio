@@ -494,7 +494,7 @@ public:
     bool operator()(const Object *object) override
     {
         if (!MatchesType(object)) return false;
-        return object->GetID() == m_id;
+        return (object->GetID() == m_id);
     }
 
 private:

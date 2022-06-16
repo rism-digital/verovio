@@ -235,7 +235,7 @@ public:
     virtual void CloneReset();
 
     const std::string &GetID() const { return m_id; }
-    void SetID(std::string id);
+    void SetID(const std::string &id) { m_id = id; }
     void SwapID(Object *other);
     void ResetID();
 

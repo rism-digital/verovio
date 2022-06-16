@@ -52,7 +52,7 @@ void LogString(std::string message, consoleLogLevel level);
 bool AreEqual(double dFirstVal, double dSecondVal);
 
 /**
- * Extract the id from a any uri string
+ * Extract the id from any uri string
  */
 std::string ExtractIDFragment(std::string refID);
 
