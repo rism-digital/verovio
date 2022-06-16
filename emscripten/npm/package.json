@@ -23,5 +23,8 @@
   "homepage": "https://www.verovio.org",
   "engines": {
     "node": ">= 7.0.0"
+  },
+  "devDependencies": {
+    "rollup": "^2.75.6"
   }
 }
