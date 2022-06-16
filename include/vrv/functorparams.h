@@ -1642,7 +1642,7 @@ public:
 
 /**
  * member 0: a pointer to the element inside Layer StaffDef
- * member 1: UUID of element to be found
+ * member 1: ID of element to be found
  **/
 
 class FindLayerIDWithinStaffDefParams : public FunctorParams {

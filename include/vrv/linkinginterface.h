@@ -68,7 +68,7 @@ public:
     ///@}
 
     /**
-     * Set @corresp attribute to the UUID (or @corresp) of the object
+     * Set @corresp attribute to the ID (or @corresp) of the object
      */
     void AddBackLink(const Object *object);
 

@@ -169,7 +169,7 @@ public:
      * needs to be overridden in the child class - otherwise, it will crash.
      * Because this will create a problem if we don't check this (the parents will
      * one the same child...)
-     * UUID: the uuid is copied, is needs to be reset later if this is not wished
+     * ID: the uuid is copied, it needs to be reset later if this is not wished
      */
     Object(const Object &object);
 
@@ -735,9 +735,9 @@ public:
     virtual int FindSpannedLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Look for element by UUID in StaffDef elements (Clef, KeySig, etc.) of all layers within
+     * Look for element by ID in StaffDef elements (Clef, KeySig, etc.) of all layers within
      */
-    virtual int FindElementInLayerStaffDefsByUUID(FunctorParams *) const { return FUNCTOR_CONTINUE; }
+    virtual int FindElementInLayerStaffDefsByID(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the minimum left and maximum right for an alignment.

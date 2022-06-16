@@ -789,7 +789,7 @@ int Layer::InitOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::FindElementInLayerStaffDefsByUUID(FunctorParams *functorParams) const
+int Layer::FindElementInLayerStaffDefsByID(FunctorParams *functorParams) const
 {
     FindLayerIDWithinStaffDefParams *params = vrv_params_cast<FindLayerIDWithinStaffDefParams *>(functorParams);
     assert(params);
