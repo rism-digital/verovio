@@ -607,37 +607,35 @@ int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
     return m_cachedMinMaxY;
 }
 
-int FloatingCurvePositioner::CalcAdjustment(
-    BoundingBox *boundingBox, const Doc *doc, bool &discard, int margin, bool horizontalOverlap)
+int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap)
 {
     int leftAdjustment, rightAdjustment;
     std::tie(leftAdjustment, rightAdjustment)
-        = this->CalcLeftRightAdjustment(boundingBox, doc, discard, margin, horizontalOverlap);
+        = this->CalcLeftRightAdjustment(boundingBox, discard, margin, horizontalOverlap);
     return std::max(leftAdjustment, rightAdjustment);
 }
 
 int FloatingCurvePositioner::CalcDirectionalAdjustment(
-    BoundingBox *boundingBox, const Doc *doc, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap)
+    BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap)
 {
     int leftAdjustment, rightAdjustment;
     std::tie(leftAdjustment, rightAdjustment)
-        = this->CalcDirectionalLeftRightAdjustment(boundingBox, doc, isCurveAbove, discard, margin, horizontalOverlap);
+        = this->CalcDirectionalLeftRightAdjustment(boundingBox, isCurveAbove, discard, margin, horizontalOverlap);
     return std::max(leftAdjustment, rightAdjustment);
 }
 
 std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
-    BoundingBox *boundingBox, const Doc *doc, bool &discard, int margin, bool horizontalOverlap)
+    BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap)
 {
     return this->CalcDirectionalLeftRightAdjustment(
-        boundingBox, doc, (this->GetDir() == curvature_CURVEDIR_above), discard, margin, horizontalOverlap);
+        boundingBox, (this->GetDir() == curvature_CURVEDIR_above), discard, margin, horizontalOverlap);
 }
 
 std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
-    BoundingBox *boundingBox, const Doc *doc, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap)
+    BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap)
 {
     assert(boundingBox);
     assert(boundingBox->HasSelfBB());
-    assert(doc);
 
     Point points[4];
     // We need to get the points because then stored points are relative
@@ -688,14 +686,8 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
             rightY = p2.y - margin;
         }
 
-        // For selected types use the cut out boundary
-        int boxTopY = boundingBox->GetTopBy(type);
-        if (boundingBox->Is(ACCID)) {
-            boxTopY = boundingBox->GetCutOutTop(doc);
-        }
-
-        leftAdjustment = std::max(boxTopY - leftY, 0);
-        rightAdjustment = std::max(boxTopY - rightY, 0);
+        leftAdjustment = std::max(boundingBox->GetTopBy(type) - leftY, 0);
+        rightAdjustment = std::max(boundingBox->GetTopBy(type) - rightY, 0);
     }
     else {
         int leftY = 0;
@@ -722,14 +714,8 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
             rightY = p2.y + margin;
         }
 
-        // For selected types use the cut out boundary
-        int boxBottomY = boundingBox->GetBottomBy(type);
-        if (boundingBox->Is(ACCID)) {
-            boxBottomY = boundingBox->GetCutOutBottom(doc);
-        }
-
-        leftAdjustment = std::max(leftY - boxBottomY, 0);
-        rightAdjustment = std::max(rightY - boxBottomY, 0);
+        leftAdjustment = std::max(leftY - boundingBox->GetBottomBy(type), 0);
+        rightAdjustment = std::max(rightY - boundingBox->GetBottomBy(type), 0);
     }
 
     if ((leftAdjustment == 0) && (rightAdjustment == 0)) {

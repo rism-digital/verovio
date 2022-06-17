@@ -521,10 +521,10 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, int unit)
     const double symmetry = doc->GetOptions()->m_slurSymmetry.GetValue();
 
     // STEP 1: Filter spanned elements and discard certain bounding boxes even though they collide
-    this->FilterSpannedElements(curve, bezier, doc, margin);
+    this->FilterSpannedElements(curve, bezier, margin);
 
     // STEP 2: Detect collisions near the endpoints and switch to secondary endpoints if necessary
-    NearEndCollision nearEndCollision = this->DetectCollisionsNearEnd(curve, bezier, doc, margin);
+    NearEndCollision nearEndCollision = this->DetectCollisionsNearEnd(curve, bezier, margin);
     this->CalcInitialCurve(doc, curve, &nearEndCollision);
     if (nearEndCollision.endPointsAdjusted) {
         curve->GetPoints(points);
@@ -534,7 +534,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, int unit)
         bezier.p2 = points[3];
         bezier.UpdateControlPointParams();
         this->CalcSpannedElements(curve);
-        this->FilterSpannedElements(curve, bezier, doc, margin);
+        this->FilterSpannedElements(curve, bezier, margin);
     }
     else {
         curve->UpdatePoints(bezier);
@@ -544,7 +544,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, int unit)
     // Only collisions near the endpoints are taken into account.
     int endPointShiftLeft = 0;
     int endPointShiftRight = 0;
-    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, doc, flexibility, margin);
+    std::tie(endPointShiftLeft, endPointShiftRight) = this->CalcEndPointShift(curve, bezier, flexibility, margin);
     this->ApplyEndPointShift(curve, bezier, endPointShiftLeft, endPointShiftRight);
 
     // Special handling if bulge is prescribed from here on
@@ -576,7 +576,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, int unit)
     // where x, y denote the vertical adjustments of the control points and c is the size of the collision.
     // The coefficients a, b are calculated from the Bezier curve equation.
     // After collecting all constraints we calculate a solution.
-    const ControlPointAdjustment adjustment = this->CalcControlPointVerticalShift(curve, bezier, doc, symmetry, margin);
+    const ControlPointAdjustment adjustment = this->CalcControlPointVerticalShift(curve, bezier, symmetry, margin);
     const int leftSign = (bezier.IsLeftControlAbove() == adjustment.moveUpwards) ? 1 : -1;
     bezier.SetLeftControlHeight(bezier.GetLeftControlHeight() + leftSign * adjustment.leftShift);
     const int rightSign = (bezier.IsRightControlAbove() == adjustment.moveUpwards) ? 1 : -1;
@@ -597,8 +597,7 @@ void Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, int unit)
     curve->BoundingBox::ResetBoundingBox();
 }
 
-void Slur::FilterSpannedElements(
-    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const Doc *doc, int margin)
+void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return;
 
@@ -614,7 +613,7 @@ void Slur::FilterSpannedElements(
 
         bool discard = false;
         const int intersection = curve->CalcDirectionalAdjustment(
-            spannedElement->m_boundingBox, doc, spannedElement->m_isBelow, discard, margin);
+            spannedElement->m_boundingBox, spannedElement->m_isBelow, discard, margin);
         const int xMiddle
             = (spannedElement->m_boundingBox->GetSelfLeft() + spannedElement->m_boundingBox->GetSelfRight()) / 2.0;
         const float distanceRatio = float(xMiddle - bezierCurve.p1.x) / float(dist);
@@ -631,7 +630,7 @@ void Slur::FilterSpannedElements(
 }
 
 NearEndCollision Slur::DetectCollisionsNearEnd(
-    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const Doc *doc, int margin)
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin)
 {
     NearEndCollision nearEndCollision({ 0.0, 0.0, false });
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return nearEndCollision;
@@ -645,7 +644,7 @@ NearEndCollision Slur::DetectCollisionsNearEnd(
         bool discard = false;
         int intersectionLeft, intersectionRight;
         std::tie(intersectionLeft, intersectionRight) = curve->CalcDirectionalLeftRightAdjustment(
-            spannedElement->m_boundingBox, doc, spannedElement->m_isBelow, discard, margin);
+            spannedElement->m_boundingBox, spannedElement->m_isBelow, discard, margin);
 
         if ((intersectionLeft > 0) || (intersectionRight > 0)) {
             Point points[4];
@@ -674,8 +673,8 @@ NearEndCollision Slur::DetectCollisionsNearEnd(
     return nearEndCollision;
 }
 
-std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
-    const Doc *doc, const double flexibility, const int margin)
+std::pair<int, int> Slur::CalcEndPointShift(
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const double flexibility, const int margin)
 {
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return { 0, 0 };
 
@@ -694,7 +693,7 @@ std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, cons
         bool discard = false;
         int intersectionLeft, intersectionRight;
         std::tie(intersectionLeft, intersectionRight) = curve->CalcDirectionalLeftRightAdjustment(
-            spannedElement->m_boundingBox, doc, spannedElement->m_isBelow, discard, margin);
+            spannedElement->m_boundingBox, spannedElement->m_isBelow, discard, margin);
 
         if (discard) {
             spannedElement->m_discarded = true;
@@ -913,7 +912,7 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
 }
 
 ControlPointAdjustment Slur::CalcControlPointVerticalShift(
-    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, const Doc *doc, double symmetry, int margin)
+    FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double symmetry, int margin)
 {
     ControlPointAdjustment adjustment{ 0, 0, false, 0 };
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return adjustment;
@@ -936,7 +935,7 @@ ControlPointAdjustment Slur::CalcControlPointVerticalShift(
         bool discard = false;
         int intersectionLeft, intersectionRight;
         std::tie(intersectionLeft, intersectionRight) = curve->CalcDirectionalLeftRightAdjustment(
-            spannedElement->m_boundingBox, doc, spannedElement->m_isBelow, discard, margin);
+            spannedElement->m_boundingBox, spannedElement->m_isBelow, discard, margin);
 
         if (discard) {
             spannedElement->m_discarded = true;

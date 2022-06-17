@@ -84,7 +84,7 @@ bool Tie::AdjustEnharmonicTies(Doc *doc, FloatingCurvePositioner *curve, Point b
     int overlap = 0;
     bool discard = false;
     for (auto object : objects) {
-        overlap = curve->CalcAdjustment(object, doc, discard);
+        overlap = curve->CalcAdjustment(object, discard);
     }
     if (!overlap) return false;
 
@@ -261,7 +261,7 @@ bool Tie::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanning
     curve->UpdateCurveParams(bezier, thickness, drawingCurveDir);
 
     if ((!startParentChord || isOuterChordNote) && durElement && (spanningType != SPANNING_END)) {
-        this->UpdateTiePositioning(curve, bezier, doc, durElement, note1, drawingUnit, drawingCurveDir);
+        UpdateTiePositioning(curve, bezier, durElement, note1, drawingUnit, drawingCurveDir);
         curve->UpdateCurveParams(bezier, thickness, drawingCurveDir);
     }
     if (!startParentChord && !endParentChord && note1 && note2 && (spanningType == SPANNING_START_END)) {
@@ -501,8 +501,8 @@ curvature_CURVEDIR Tie::GetPreferredCurveDirection(
     return drawingCurveDir;
 }
 
-void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], const Doc *doc,
-    LayerElement *durElement, Note *startNote, int drawingUnit, curvature_CURVEDIR drawingCurveDir)
+void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], LayerElement *durElement,
+    Note *startNote, int drawingUnit, curvature_CURVEDIR drawingCurveDir)
 {
     ListOfObjects objects;
     ClassIdsComparison cmp({ DOT, DOTS, FLAG });
@@ -538,14 +538,14 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
                 else if ((drawingCurveDir == curvature_CURVEDIR_below) && (startNote != parentChord->GetBottomNote())) {
                     margin = object->GetSelfBottom() - object->GetSelfTop() - offset;
                 }
-                const int overlap = curve->CalcAdjustment(object, doc, discard);
+                const int overlap = curve->CalcAdjustment(object, discard);
                 if ((overlap > 0) && (overlap < 1.5 * offset)) {
                     oppositeOverlap = overlap;
                 }
             }
             // calculate intersection with curve based on margin
             const int step = drawingUnit / 2;
-            int intersection = curve->CalcAdjustment(object, doc, discard, margin, false);
+            int intersection = curve->CalcAdjustment(object, discard, margin, false);
             if (intersection) {
                 intersection = (intersection / step + 1) * step + 0.5 * step;
                 intersection *= (drawingCurveDir == curvature_CURVEDIR_below) ? -1 : 1;
@@ -561,7 +561,7 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
         // In case there is overlap with flag, we need to move starting point to the side, to avoid it
         else if (object->Is(FLAG)) {
             bool discard = false;
-            int intersection = curve->CalcAdjustment(object, doc, discard);
+            int intersection = curve->CalcAdjustment(object, discard);
             if (intersection != 0) {
                 // in case there is an overlap with flag and dots are present - shift tie starting point to the right of
                 // the dot, otherwise shift it just enough to avoid overlapping with flag
