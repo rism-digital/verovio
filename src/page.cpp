@@ -225,7 +225,7 @@ void Page::LayOutTranscription(bool force)
     Functor calcStem(&Object::CalcStem);
     this->Process(&calcStem, &calcStemParams);
 
-    FunctorDocParams calcChordNoteHeadsParams(doc);
+    CalcChordNoteHeadsParams calcChordNoteHeadsParams(doc);
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
     this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
 
@@ -324,7 +324,7 @@ void Page::ResetAligners()
     Functor calcStem(&Object::CalcStem);
     this->Process(&calcStem, &calcStemParams);
 
-    FunctorDocParams calcChordNoteHeadsParams(doc);
+    CalcChordNoteHeadsParams calcChordNoteHeadsParams(doc);
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
     this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
 

@@ -588,20 +588,6 @@ void BeamSegment::CalcBeamInit(
             beamInterface->m_beamWidthBlack = beamInterface->m_beamWidthBlack * 2 / 5;
             beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 3 / 5;
         }
-
-        beamInterface->m_stemXAbove[0] = 0;
-        beamInterface->m_stemXAbove[1] = 0;
-        beamInterface->m_stemXBelow[0] = 0;
-        beamInterface->m_stemXBelow[1] = 0;
-    }
-    else {
-        // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-        beamInterface->m_stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, false)
-            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-        beamInterface->m_stemXAbove[1] = doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, true)
-            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-        beamInterface->m_stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-        beamInterface->m_stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     }
 
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
@@ -1821,8 +1807,9 @@ void BeamElementCoord::SetDrawingStemDir(data_STEMDIRECTION stemDir, const Staff
 
     m_stem->SetDrawingStemDir(stemDir);
     m_yBeam = m_element->GetDrawingY();
-    m_x += (STEMDIRECTION_up == stemDir) ? interface->m_stemXAbove[interface->m_cueSize]
-                                         : interface->m_stemXBelow[interface->m_cueSize];
+    m_x += (STEMDIRECTION_up == stemDir)
+        ? 2 * m_element->GetDrawingRadius(doc) - doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2
+        : doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
 
     if (m_tabDurSym && !m_closestNote) {
         m_yBeam = m_tabDurSym->GetDrawingY();

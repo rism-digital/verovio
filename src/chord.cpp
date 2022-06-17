@@ -755,6 +755,28 @@ int Chord::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Chord::CalcChordNoteHeads(FunctorParams *functorParams)
+{
+    CalcChordNoteHeadsParams *params = vrv_params_cast<CalcChordNoteHeadsParams *>(functorParams);
+    assert(params);
+
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+
+    if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+        if (this->IsInBeam()) {
+            params->m_diameter = 2 * this->GetDrawingRadius(params->m_doc);
+        }
+        else {
+            const Note *bottomNote = this->GetBottomNote();
+            const wchar_t code = bottomNote->GetNoteheadGlyph(this->GetActualDur());
+            params->m_diameter = params->m_doc->GetGlyphWidth(
+                code, staff->m_drawingStaffSize, this->GetDrawingCueSize() ? bottomNote->GetDrawingCueSize() : false);
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate) const
 {
     const ListOfConstObjects &notes = this->GetList(this);
