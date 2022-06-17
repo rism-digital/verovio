@@ -20,6 +20,7 @@ class BeamDrawingInterface;
 class Doc;
 class FloatingCurvePositioner;
 class Glyph;
+class Resources;
 
 //----------------------------------------------------------------------------
 // BoundingBox
@@ -156,10 +157,10 @@ public:
      * none)
      */
     ///@{
-    int GetCutOutTop(const Doc *doc) const;
-    int GetCutOutBottom(const Doc *doc) const;
-    int GetCutOutLeft(const Doc *doc) const;
-    int GetCutOutRight(const Doc *doc) const;
+    int GetCutOutTop(const Resources &resources) const;
+    int GetCutOutBottom(const Resources &resources) const;
+    int GetCutOutLeft(const Resources &resources) const;
+    int GetCutOutRight(const Resources &resources) const;
     ///@}
 
     /**
@@ -283,8 +284,8 @@ private:
      * bounding box.
      * Return 1 with no smufl glyph or no anchor, 2 with on anchor point, and 3 with 2 anchor points.
      */
-    int GetRectangles(
-        const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2], const Doc *doc) const;
+    int GetRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2],
+        const Resources &resources) const;
 
     /**
      * Calculate the rectangles with 2 anchor points.
