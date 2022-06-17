@@ -68,7 +68,7 @@ GetOptions (
 	'v|version=s'   => \$VERSION,
 	'x|exclusion=s' => \$exclusion,
 	'w|wasm'        => \$wasmQ,
-    'm|modularize' => \$modularizeQ,
+	'm|modularize' => \$modularizeQ,
 	'D|no-darms'    => \$nodarms,
 	'H|no-humdrum'  => \$nohumdrum,
 	'P|no-pae'      => \$nopae,
