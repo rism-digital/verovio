@@ -94,7 +94,7 @@ std::string GetVersion();
  * Encode the integer value using the specified base (max is 62)
  * Base 36 uses 0-9 and a-z, base 62 also A-Z.
  */
-std::string BaseEncodeInt(int value, int base);
+std::string BaseEncodeInt(unsigned int value, unsigned int base);
 
 /**
  *
