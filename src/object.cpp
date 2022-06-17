@@ -60,29 +60,30 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 thread_local unsigned long Object::s_objectCounter = 0;
+thread_local std::mt19937 Object::s_randomGenerator;
 
 Object::Object() : BoundingBox()
 {
-    Init(OBJECT, "m-");
     if (s_objectCounter++ == 0) {
-        SeedUuid();
+        this->SeedUuid();
     }
+    this->Init(OBJECT, "m-");
 }
 
 Object::Object(ClassId classId) : BoundingBox()
 {
-    Init(classId, "m-");
     if (s_objectCounter++ == 0) {
-        SeedUuid();
+        this->SeedUuid();
     }
+    this->Init(classId, "m-");
 }
 
 Object::Object(ClassId classId, const std::string &classIdStr) : BoundingBox()
 {
-    Init(classId, classIdStr);
     if (s_objectCounter++ == 0) {
-        SeedUuid();
+        this->SeedUuid();
     }
+    this->Init(classId, classIdStr);
 }
 
 Object *Object::Clone() const
@@ -1205,16 +1206,17 @@ void Object::SeedUuid(unsigned int seed)
 {
     // Init random number generator for uuids
     if (seed == 0) {
-        std::srand((unsigned int)std::time(0));
+        std::random_device rd;
+        s_randomGenerator.seed(rd());
     }
     else {
-        std::srand(seed);
+        s_randomGenerator.seed(seed);
     }
 }
 
 std::string Object::GenerateRandUuid()
 {
-    int nr = std::rand();
+    unsigned int nr = s_randomGenerator();
 
     // char str[17];
     // snprintf(str, 17, "%016d", nr);

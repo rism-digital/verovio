@@ -9,10 +9,10 @@
 #define __VRV_OBJECT_H__
 
 #include <cstdlib>
-#include <ctime>
 #include <functional>
 #include <iterator>
 #include <map>
+#include <random>
 #include <string>
 
 //----------------------------------------------------------------------------
@@ -1639,6 +1639,11 @@ private:
      * A static counter for uuid generation.
      */
     static thread_local unsigned long s_objectCounter;
+
+    /**
+     * Pseudo random number engine for ID generation
+     */
+    static thread_local std::mt19937 s_randomGenerator;
 };
 
 //----------------------------------------------------------------------------
