@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun  8 12:03:09 PDT 2022
+// Last Modified: Mon Jun 13 00:02:46 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -6129,6 +6129,7 @@ class Tool_composite : public HumTool {
 		void        fixTiedNotes              (std::vector<string>& data, HumdrumFile& infile);
 		void        doOnsetAnalysisCoincidence(vector<double>& output,
 		                                       vector<double>& inputA, vector<double>& inputB);
+		void        checkForAutomaticGrouping (HumdrumFile& infile);
 
 		// Numeric analysis functions:
 		void        doNumericAnalyses         (HumdrumFile& infile);
