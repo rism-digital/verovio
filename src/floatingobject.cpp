@@ -686,8 +686,17 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
             rightY = p2.y - margin;
         }
 
-        leftAdjustment = std::max(boundingBox->GetTopBy(type) - leftY, 0);
-        rightAdjustment = std::max(boundingBox->GetTopBy(type) - rightY, 0);
+        // For selected types use the cut out boundary
+        int boxTopY = boundingBox->GetTopBy(type);
+        if (boundingBox->Is(ACCID)) {
+            const Resources *resources = vrv_cast<Object *>(boundingBox)->GetDocResources();
+            if (resources) {
+                boxTopY = boundingBox->GetCutOutTop(*resources);
+            }
+        }
+
+        leftAdjustment = std::max(boxTopY - leftY, 0);
+        rightAdjustment = std::max(boxTopY - rightY, 0);
     }
     else {
         int leftY = 0;
@@ -714,8 +723,17 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
             rightY = p2.y + margin;
         }
 
-        leftAdjustment = std::max(leftY - boundingBox->GetBottomBy(type), 0);
-        rightAdjustment = std::max(rightY - boundingBox->GetBottomBy(type), 0);
+        // For selected types use the cut out boundary
+        int boxBottomY = boundingBox->GetBottomBy(type);
+        if (boundingBox->Is(ACCID)) {
+            const Resources *resources = vrv_cast<Object *>(boundingBox)->GetDocResources();
+            if (resources) {
+                boxBottomY = boundingBox->GetCutOutBottom(*resources);
+            }
+        }
+
+        leftAdjustment = std::max(leftY - boxBottomY, 0);
+        rightAdjustment = std::max(rightY - boxBottomY, 0);
     }
 
     if ((leftAdjustment == 0) && (rightAdjustment == 0)) {
