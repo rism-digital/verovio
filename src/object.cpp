@@ -65,7 +65,7 @@ thread_local std::mt19937 Object::s_randomGenerator;
 Object::Object() : BoundingBox()
 {
     if (s_objectCounter++ == 0) {
-        this->SeedUuid();
+        this->SeedID();
     }
     this->Init(OBJECT, "m-");
 }
@@ -73,7 +73,7 @@ Object::Object() : BoundingBox()
 Object::Object(ClassId classId) : BoundingBox()
 {
     if (s_objectCounter++ == 0) {
-        this->SeedUuid();
+        this->SeedID();
     }
     this->Init(classId, "m-");
 }
@@ -81,7 +81,7 @@ Object::Object(ClassId classId) : BoundingBox()
 Object::Object(ClassId classId, const std::string &classIdStr) : BoundingBox()
 {
     if (s_objectCounter++ == 0) {
-        this->SeedUuid();
+        this->SeedID();
     }
     this->Init(classId, classIdStr);
 }
