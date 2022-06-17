@@ -36,7 +36,7 @@
   },
   "homepage": "https://www.verovio.org",
   "engines": {
-    "node": ">= 7.0.0"
+    "node": ">= 14.17.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.0",
