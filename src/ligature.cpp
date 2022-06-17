@@ -105,7 +105,7 @@ void Ligature::FilterList(ListOfConstObjects &childList) const
     }
 }
 
-int Ligature::GetDrawingNoteShape(Note *note)
+int Ligature::GetDrawingNoteShape(const Note *note) const
 {
     assert(note);
     int position = this->GetListIndex(note);

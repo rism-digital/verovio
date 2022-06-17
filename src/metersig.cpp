@@ -50,6 +50,15 @@ void MeterSig::Reset()
 int MeterSig::GetTotalCount() const
 {
     auto [counts, sign] = this->GetCount();
+    // If @count is empty, look at the sym to return a resonable value
+    if (counts.empty()) {
+        if (this->HasSym()) {
+            return (this->GetSym() == METERSIGN_common) ? 4 : 2;
+        }
+        else {
+            return 0;
+        }
+    }
     switch (sign) {
         case MeterCountSign::Slash: {
             // make sure that there is no division by zero
@@ -118,7 +127,7 @@ std::pair<wchar_t, wchar_t> MeterSig::GetEnclosingGlyphs(bool smallGlyph) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeterSig::LayerCountInTimeSpan(FunctorParams *functorParams)
+int MeterSig::LayerCountInTimeSpan(FunctorParams *functorParams) const
 {
     LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);

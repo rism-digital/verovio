@@ -53,7 +53,7 @@ void View::DrawRoundedLine(DeviceContext *dc, int x1, int y1, int x2, int y2, in
 {
     assert(dc);
 
-    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, 0, 1);
+    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, 0, 0, AxCAP_ROUND);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));

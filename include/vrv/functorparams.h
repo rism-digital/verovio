@@ -591,7 +591,7 @@ public:
  **/
 class AdjustTupletNumOverlapParams : public FunctorParams {
 public:
-    AdjustTupletNumOverlapParams(TupletNum *tupletNum, Staff *staff)
+    AdjustTupletNumOverlapParams(const TupletNum *tupletNum, const Staff *staff)
     {
         m_tupletNum = tupletNum;
         m_drawingNumPos = STAFFREL_basic_NONE;
@@ -601,11 +601,11 @@ public:
         m_yRel = 0;
     }
 
-    TupletNum *m_tupletNum;
+    const TupletNum *m_tupletNum;
     data_STAFFREL_basic m_drawingNumPos;
     int m_horizontalMargin;
     int m_verticalMargin;
-    Staff *m_staff;
+    const Staff *m_staff;
     int m_yRel;
 };
 
@@ -1637,6 +1637,27 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// FindLayerUuidWithinStaffDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the element inside Layer StaffDef
+ * member 1: UUID of element to be found
+ **/
+
+class FindLayerUuidWithinStaffDefParams : public FunctorParams {
+public:
+    explicit FindLayerUuidWithinStaffDefParams(const std::string &Uuid)
+    {
+        m_uuid = Uuid;
+        m_object = NULL;
+    }
+
+    Object *m_object;
+    std::string m_uuid;
+};
+
+//----------------------------------------------------------------------------
 // GenerateFeaturesParams
 //----------------------------------------------------------------------------
 
@@ -1693,16 +1714,17 @@ using MIDIChordSequence = std::list<MIDIChord>;
  * member 1: int: the midi track number
  * member 2: int: the midi channel number
  * member 3: double: the score time from the start of the music to the start of the current measure
- * member 4: int: the semi tone transposition for the current track
- * member 5: double with the current tempo
- * member 6: the last (non grace) note that was performed
- * member 7: expanded notes due to ornaments and tremolandi
- * member 8: deferred notes which start slightly later
- * member 9: grace note sequence
- * member 10: flag indicating whether the last grace note/chord was accented
- * member 11: flag indicating whether cue notes should be included
- * member 12: the functor
- * member 13: Tablature held notes indexed by (course - 1)
+ * member 4: the current staff number
+ * member 5: the semi tone transposition for the current track
+ * member 6: double with the current tempo
+ * member 7: the last (non grace) note that was performed
+ * member 8: expanded notes due to ornaments and tremolandi
+ * member 9: deferred notes which start slightly later
+ * member 10: grace note sequence
+ * member 11: flag indicating whether the last grace note/chord was accented
+ * member 12: flag indicating whether cue notes should be included
+ * member 13: the functor
+ * member 14: Tablature held notes indexed by (course - 1)
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1713,6 +1735,7 @@ public:
         m_midiTrack = 1;
         m_midiChannel = 0;
         m_totalTime = 0.0;
+        m_staffN = 0;
         m_transSemi = 0;
         m_currentTempo = MIDI_TEMPO;
         m_lastNote = NULL;
@@ -1724,6 +1747,7 @@ public:
     int m_midiTrack;
     int m_midiChannel;
     double m_totalTime;
+    int m_staffN;
     int m_transSemi;
     double m_currentTempo;
     Note *m_lastNote;
@@ -1811,7 +1835,7 @@ public:
         m_searchDirection = searchDirection;
         m_isInNeighboringLayer = anotherLayer;
     }
-    Object *m_relativeElement;
+    const Object *m_relativeElement;
     int m_initialElementId;
     bool m_searchDirection;
     bool m_isInNeighboringLayer;
@@ -2001,7 +2025,7 @@ public:
 
 class LayerCountInTimeSpanParams : public FunctorParams {
 public:
-    LayerCountInTimeSpanParams(MeterSig *meterSig, Mensur *mensur, Functor *functor)
+    LayerCountInTimeSpanParams(const MeterSig *meterSig, const Mensur *mensur, Functor *functor)
     {
         m_time = 0.0;
         m_duration = 0.0;
@@ -2012,8 +2036,8 @@ public:
     double m_time;
     double m_duration;
     std::set<int> m_layers;
-    MeterSig *m_meterSig;
-    Mensur *m_mensur;
+    const MeterSig *m_meterSig;
+    const Mensur *m_mensur;
     Functor *m_functor;
 };
 
@@ -2032,7 +2056,7 @@ public:
 
 class LayerElementsInTimeSpanParams : public FunctorParams {
 public:
-    LayerElementsInTimeSpanParams(MeterSig *meterSig, Mensur *mensur, Layer *layer)
+    LayerElementsInTimeSpanParams(const MeterSig *meterSig, const Mensur *mensur, const Layer *layer)
     {
         m_time = 0.0;
         m_duration = 0.0;
@@ -2044,10 +2068,10 @@ public:
     double m_time;
     double m_duration;
     bool m_allLayersButCurrent;
-    ListOfObjects m_elements;
-    MeterSig *m_meterSig;
-    Mensur *m_mensur;
-    Layer *m_layer;
+    ListOfConstObjects m_elements;
+    const MeterSig *m_meterSig;
+    const Mensur *m_mensur;
+    const Layer *m_layer;
 };
 
 //----------------------------------------------------------------------------
@@ -2608,7 +2632,7 @@ public:
  * member 5: the mdiv selected for transposition
  * member 6: the list of current (nested) mdivs
  * member 7: transpose to sounding pitch by evaluating @trans.semi
- * member 8: true if the current scoreDef contains a KeySig (direct child or attribute)
+ * member 8: current KeySig for staff (ScoreDef key signatures are mapped to -1)
  * member 9: transposition interval for staff
  **/
 
@@ -2621,7 +2645,6 @@ public:
         m_functorEnd = functorEnd;
         m_transposer = transposer;
         m_transposeToSoundingPitch = false;
-        m_hasScoreDefKeySig = false;
     }
     Doc *m_doc;
     Functor *m_functor;
@@ -2631,7 +2654,7 @@ public:
     std::string m_selectedMdivUuid;
     std::list<std::string> m_currentMdivUuids;
     bool m_transposeToSoundingPitch;
-    bool m_hasScoreDefKeySig;
+    std::map<int, const KeySig *> m_keySigForStaffN;
     std::map<int, int> m_transposeIntervalForStaffN;
 };
 

@@ -60,29 +60,30 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 thread_local unsigned long Object::s_objectCounter = 0;
+thread_local std::mt19937 Object::s_randomGenerator;
 
 Object::Object() : BoundingBox()
 {
-    Init(OBJECT, "m-");
     if (s_objectCounter++ == 0) {
-        SeedUuid();
+        this->SeedUuid();
     }
+    this->Init(OBJECT, "m-");
 }
 
 Object::Object(ClassId classId) : BoundingBox()
 {
-    Init(classId, "m-");
     if (s_objectCounter++ == 0) {
-        SeedUuid();
+        this->SeedUuid();
     }
+    this->Init(classId, "m-");
 }
 
 Object::Object(ClassId classId, const std::string &classIdStr) : BoundingBox()
 {
-    Init(classId, classIdStr);
     if (s_objectCounter++ == 0) {
-        SeedUuid();
+        this->SeedUuid();
     }
+    this->Init(classId, classIdStr);
 }
 
 Object *Object::Clone() const
@@ -122,6 +123,8 @@ Object::Object(const Object &object) : BoundingBox(object)
         Object *current = object.m_children.at(i);
         Object *clone = current->Clone();
         if (clone) {
+            LinkingInterface *link = clone->GetLinkingInterface();
+            if (link) link->AddBackLink(current);
             clone->SetParent(this);
             clone->CloneReset();
             m_children.push_back(clone);
@@ -158,6 +161,8 @@ Object &Object::operator=(const Object &object)
         this->GenerateUuid();
         // For now do now copy them
         // m_unsupported = object.m_unsupported;
+        LinkingInterface *link = this->GetLinkingInterface();
+        if (link) link->AddBackLink(&object);
 
         if (object.CopyChildren()) {
             int i;
@@ -165,6 +170,8 @@ Object &Object::operator=(const Object &object)
                 Object *current = object.m_children.at(i);
                 Object *clone = current->Clone();
                 if (clone) {
+                    LinkingInterface *link = clone->GetLinkingInterface();
+                    if (link) link->AddBackLink(current);
                     clone->SetParent(this);
                     clone->CloneReset();
                     m_children.push_back(clone);
@@ -751,6 +758,24 @@ bool Object::DeleteChild(Object *child)
     }
 }
 
+int Object::DeleteChildrenByComparison(Comparison *comparison)
+{
+    int count = 0;
+    ArrayOfObjects::iterator iter;
+    for (iter = m_children.begin(); iter != m_children.end();) {
+        if ((*comparison)(*iter)) {
+            if (!m_isReferenceObject) delete *iter;
+            iter = m_children.erase(iter);
+            ++count;
+        }
+        else {
+            ++iter;
+        }
+    }
+    if (count > 0) this->Modify();
+    return count;
+}
+
 void Object::GenerateUuid()
 {
     m_uuid = m_classIdStr.at(0) + Object::GenerateRandUuid();
@@ -924,6 +949,11 @@ const Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const Cl
 
 Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
 {
+    return const_cast<Object *>(std::as_const(*this).GetLastAncestorNot(classId, maxDepth));
+}
+
+const Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth) const
+{
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
     }
@@ -937,6 +967,11 @@ Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
 }
 
 Object *Object::GetFirstChildNot(const ClassId classId)
+{
+    return const_cast<Object *>(std::as_const(*this).GetFirstChildNot(classId));
+}
+
+const Object *Object::GetFirstChildNot(const ClassId classId) const
 {
     for (const auto child : m_children) {
         if (!child->Is(classId)) {
@@ -1171,16 +1206,17 @@ void Object::SeedUuid(unsigned int seed)
 {
     // Init random number generator for uuids
     if (seed == 0) {
-        std::srand((unsigned int)std::time(0));
+        std::random_device rd;
+        s_randomGenerator.seed(rd());
     }
     else {
-        std::srand(seed);
+        s_randomGenerator.seed(seed);
     }
 }
 
 std::string Object::GenerateRandUuid()
 {
-    int nr = std::rand();
+    unsigned int nr = s_randomGenerator();
 
     // char str[17];
     // snprintf(str, 17, "%016d", nr);
@@ -2147,7 +2183,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(CLEF)) {
         LayerElement *element = vrv_cast<LayerElement *>(this);
         assert(element);
-        LayerElement *elementOrLink = element->ThisOrSameasAsLink();
+        LayerElement *elementOrLink = element->ThisOrSameasLink();
         if (!elementOrLink || !elementOrLink->Is(CLEF)) return FUNCTOR_CONTINUE;
         Clef *clef = vrv_cast<Clef *>(elementOrLink);
         if (clef->IsScoreDefElement()) {
@@ -2278,13 +2314,13 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
     if (this->Is(STEM)) {
         LayerElement *noteOrChord = dynamic_cast<LayerElement *>(this->GetParent());
         if (noteOrChord && noteOrChord->m_crossStaff) {
-            if (noteOrChord->IsInBeam()) {
+            if (noteOrChord->GetAncestorBeam()) {
                 Beam *beam = vrv_cast<Beam *>(noteOrChord->GetFirstAncestor(BEAM));
                 assert(beam);
                 // Ignore it but only if the beam is not entirely cross-staff itself
                 if (!beam->m_crossStaff) return FUNCTOR_CONTINUE;
             }
-            else if (noteOrChord->IsInBeamSpan()) {
+            else if (noteOrChord->GetIsInBeamSpan()) {
                 return FUNCTOR_CONTINUE;
             }
         }

@@ -15,11 +15,14 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
+#include "comparison.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "keyaccid.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
+#include "staff.h"
+#include "staffdef.h"
 #include "transposition.h"
 #include "vrv.h"
 
@@ -162,16 +165,11 @@ bool KeySig::HasNonAttribKeyAccidChildren() const
     return std::any_of(childList.begin(), childList.end(), [](const Object *child) { return !child->IsAttribute(); });
 }
 
-void KeySig::ClearKeyAccidAttribChildren()
-{
-    ListOfObjects childList = this->GetList(this);
-    std::for_each(childList.begin(), childList.end(), [this](Object *child) {
-        if (child->IsAttribute()) this->DeleteChild(child);
-    });
-}
-
 void KeySig::GenerateKeyAccidAttribChildren()
 {
+    IsAttributeComparison isAttribute(KEYACCID);
+    this->DeleteChildrenByComparison(&isAttribute);
+
     if (this->HasEmptyList(this)) {
         for (int i = 0; i < this->GetAccidCount(true); ++i) {
             std::optional<KeyAccidInfo> info = this->GetKeyAccidInfoAt(i);
@@ -195,7 +193,7 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
     mapOfPitchAccid.clear();
 
     const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
-    if (childList.size() > 0) {
+    if (!childList.empty()) {
         for (auto &child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
             assert(keyAccid);
@@ -205,7 +203,7 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
     }
 
     data_ACCIDENTAL_WRITTEN accidType = this->GetAccidType();
-    for (int i = 0; i < this->GetAccidCount(); ++i) {
+    for (int i = 0; i < this->GetAccidCount(true); ++i) {
         mapOfPitchAccid[KeySig::GetAccidPnameAt(accidType, i)] = accidType;
     }
 }
@@ -254,7 +252,7 @@ data_PITCHNAME KeySig::GetAccidPnameAt(data_ACCIDENTAL_WRITTEN accidType, int po
     }
 }
 
-int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, Clef *clef)
+int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, const Clef *clef)
 {
     int accidSet = 0; // flats
     int keySet = 0;
@@ -318,7 +316,6 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
 int KeySig::PrepareDataInitialization(FunctorParams *)
 {
     // Clear and regenerate attribute children
-    this->ClearKeyAccidAttribChildren();
     this->GenerateKeyAccidAttribChildren();
 
     return FUNCTOR_CONTINUE;
@@ -329,11 +326,20 @@ int KeySig::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
-    if (!this->GetFirstAncestor(STAFFDEF)) {
-        params->m_hasScoreDefKeySig = true;
+    // Store current KeySig
+    int staffN = -1;
+    const StaffDef *staffDef = vrv_cast<StaffDef *>(this->GetFirstAncestor(STAFFDEF));
+    if (staffDef) {
+        staffN = staffDef->GetN();
     }
+    else {
+        const Staff *staff = this->GetAncestorStaff(ANCESTOR_ONLY, false);
+        if (staff) staffN = staff->GetN();
+    }
+    params->m_keySigForStaffN[staffN] = this;
 
-    int sig = this->GetFifthsInt();
+    // Transpose
+    const int sig = this->GetFifthsInt();
 
     int intervalClass = params->m_transposer->CircleOfFifthsToIntervalClass(sig);
     intervalClass = params->m_transposer->Transpose(intervalClass);

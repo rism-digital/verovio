@@ -148,23 +148,7 @@ void Artic::GetAllArtics(bool direction, std::vector<Artic *> &artics)
     }
 }
 
-void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur)
-{
-    assert(insideSlur);
-    assert(outsideSlur);
-
-    std::vector<data_ARTICULATION> articList = this->GetArtic();
-    for (data_ARTICULATION artic : articList) {
-        if (IsInsideArtic(artic)) {
-            insideSlur->push_back(artic);
-        }
-        else {
-            outsideSlur->push_back(artic);
-        }
-    }
-}
-
-bool Artic::AlwaysAbove()
+bool Artic::AlwaysAbove() const
 {
     auto end = Artic::s_aboveStaffArtic.end();
     auto i = std::find(Artic::s_aboveStaffArtic.begin(), end, this->GetArticFirst());
@@ -549,7 +533,7 @@ int Artic::ResetData(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Artic::CalculateHorizontalShift(Doc *doc, LayerElement *parent, data_STEMDIRECTION stemDir) const
+int Artic::CalculateHorizontalShift(const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir) const
 {
     int shift = parent->GetDrawingRadius(doc);
     if ((parent->GetChildCount(ARTIC) > 1) || (doc->GetOptions()->m_staccatoCenter.GetValue())) {

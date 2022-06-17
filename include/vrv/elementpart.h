@@ -41,8 +41,8 @@ public:
     /** Override the method since alignment is required */
     bool HasToBeAligned() const override { return true; }
 
-    std::set<int> GetDotLocsForStaff(Staff *staff) const;
-    std::set<int> &ModifyDotLocsForStaff(Staff *staff);
+    std::set<int> GetDotLocsForStaff(const Staff *staff) const;
+    std::set<int> &ModifyDotLocsForStaff(const Staff *staff);
 
     const MapOfDotLocs &GetMapOfDotLocs() const { return m_dotLocsByStaff; }
     void SetMapOfDotLocs(const MapOfDotLocs &dotLocs) { m_dotLocsByStaff = dotLocs; };
@@ -174,9 +174,9 @@ public:
      * @name Setter and getter for drawing rel positions
      */
     ///@{
-    int GetDrawingXRelLeft() { return m_drawingXRelLeft; }
+    int GetDrawingXRelLeft() const { return m_drawingXRelLeft; }
     void SetDrawingXRelLeft(int drawingXRelLeft) { m_drawingXRelLeft = drawingXRelLeft; }
-    int GetDrawingXRelRight() { return m_drawingXRelRight; }
+    int GetDrawingXRelRight() const { return m_drawingXRelRight; }
     void SetDrawingXRelRight(int drawingXRelRight) { m_drawingXRelRight = drawingXRelRight; }
     // Vertical positions
     int GetDrawingYRelLeft() const { return m_drawingYRelLeft; }
@@ -186,16 +186,16 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for darwing positions.
+     * @name Setter and getter for drawing positions.
      * Takes into account:
      * - the position of the first and last element.
      * - the position of the beam if aligned with a beam.
      */
     ///@{
-    int GetDrawingXLeft();
-    int GetDrawingXRight();
-    int GetDrawingYLeft();
-    int GetDrawingYRight();
+    int GetDrawingXLeft() const;
+    int GetDrawingXRight() const;
+    int GetDrawingYLeft() const;
+    int GetDrawingYRight() const;
     ///@}
 
     /**
@@ -203,6 +203,7 @@ public:
      */
     ///@{
     TupletNum *GetAlignedNum() { return m_alignedNum; }
+    const TupletNum *GetAlignedNum() const { return m_alignedNum; }
     void SetAlignedNum(TupletNum *alignedNum) { m_alignedNum = alignedNum; }
     ///@}
 
@@ -284,8 +285,8 @@ public:
      * - the position of the beam if aligned with a beam.
      */
     ///@{
-    int GetDrawingYMid();
-    int GetDrawingXMid(Doc *doc = NULL);
+    int GetDrawingYMid() const;
+    int GetDrawingXMid(const Doc *doc = NULL) const;
     ///@}
 
     /**
@@ -293,6 +294,7 @@ public:
      */
     ///@{
     TupletBracket *GetAlignedBracket() { return m_alignedBracket; }
+    const TupletBracket *GetAlignedBracket() const { return m_alignedBracket; }
     void SetAlignedBracket(TupletBracket *alignedBracket);
     ///@}
 
@@ -364,7 +366,7 @@ public:
     void SetDrawingStemDir(data_STEMDIRECTION drawingStemDir) { m_drawingStemDir = drawingStemDir; }
     int GetDrawingStemLen() const { return m_drawingStemLen; }
     void SetDrawingStemLen(int drawingStemLen) { m_drawingStemLen = drawingStemLen; }
-    int GetDrawingStemAdjust() { return m_drawingStemAdjust; }
+    int GetDrawingStemAdjust() const { return m_drawingStemAdjust; }
     void SetDrawingStemAdjust(int drawingStemAdjust) { m_drawingStemAdjust = drawingStemAdjust; }
     int GetStemModRelY() const { return m_stemModRelY; }
     ///@}
@@ -380,12 +382,12 @@ public:
     /**
      * Helper to adjust overlaping layers for stems
      */
-    int CompareToElementPosition(Doc *doc, LayerElement *otherElement, int margin);
+    int CompareToElementPosition(const Doc *doc, const LayerElement *otherElement, int margin) const;
 
     /**
      * Helper to calculate stem modifier relative Y rel and required adjustment for stem length
      */
-    int CalculateStemModAdjustment(Doc *doc, Staff *staff, int flagOffset = 0);
+    int CalculateStemModAdjustment(const Doc *doc, const Staff *staff, int flagOffset = 0);
 
     //----------//
     // Functors //
@@ -413,17 +415,17 @@ private:
     /**
      * Addjusts flag placement and stem length if they are crossing notehead or ledger lines
      */
-    void AdjustFlagPlacement(Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration);
+    void AdjustFlagPlacement(const Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration);
 
     /**
      * Helper to adjust length of stem based on presence of slashes
      */
-    int AdjustSlashes(Doc *doc, Staff *staff, int flagOffset);
+    int AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) const;
 
     /**
      * Helper to calculate relative position for the stem modifier
      */
-    void CalculateStemModRelY(Doc *doc, Staff *staff);
+    void CalculateStemModRelY(const Doc *doc, const Staff *staff);
 
 public:
     //

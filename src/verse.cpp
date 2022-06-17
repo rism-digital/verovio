@@ -76,7 +76,7 @@ bool Verse::IsSupportedChild(Object *child)
     return true;
 }
 
-int Verse::AdjustPosition(int &overlap, int freeSpace, Doc *doc)
+int Verse::AdjustPosition(int &overlap, int freeSpace, const Doc *doc)
 {
     assert(doc);
 

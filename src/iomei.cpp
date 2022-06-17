@@ -4628,7 +4628,6 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
     bool success = true;
     pugi::xml_node xmlElement;
     std::string elementName;
-    int i = 0;
     for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
         if (!success) {
             break;
@@ -4661,7 +4660,6 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         else {
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
-        i++;
     }
     return success;
 }

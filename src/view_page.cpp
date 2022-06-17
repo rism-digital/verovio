@@ -785,7 +785,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                     yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                     yBottom -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                 }
-                this->DrawBarLine(dc, yTop, yBottom, barLine);
+                this->DrawBarLine(dc, yTop, yBottom, barLine, form);
                 if (barLine->HasRepetitionDots()) {
                     this->DrawBarLineDots(dc, staff, barLine);
                 }
@@ -856,7 +856,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         if (isLastMeasure && (barLine->GetPosition() == BarLinePosition::Right)) {
             eraseIntersections = false;
         }
-        this->DrawBarLine(dc, yTop, yBottom, barLine, eraseIntersections, singleStaff);
+        this->DrawBarLine(dc, yTop, yBottom, barLine, barLine->GetForm(), eraseIntersections, singleStaff);
 
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if (barLine->HasRepetitionDots()) {
@@ -879,13 +879,12 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     }
 }
 
-void View::DrawBarLine(
-    DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, bool eraseIntersections, bool singleStaff)
+void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, data_BARRENDITION form,
+    bool eraseIntersections, bool singleStaff)
 {
     assert(dc);
     assert(barLine);
 
-    const data_BARRENDITION form = barLine->GetForm();
     Staff *staff = barLine->GetAncestorStaff(ANCESTOR_ONLY, false);
     const int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
 

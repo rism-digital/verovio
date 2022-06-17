@@ -270,7 +270,7 @@ std::string GetVersion()
 
 static const std::string base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-std::string BaseEncodeInt(int value, int base)
+std::string BaseEncodeInt(unsigned int value, unsigned int base)
 {
     assert(base > 10);
     assert(base < 63);

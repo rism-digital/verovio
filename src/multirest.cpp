@@ -50,7 +50,7 @@ void MultiRest::Reset()
     this->ResetWidth();
 }
 
-bool MultiRest::UseBlockStyle(Doc *doc) const
+bool MultiRest::UseBlockStyle(const Doc *doc) const
 {
     bool useBlock = false;
     switch (doc->GetOptions()->m_multiRestStyle.GetValue()) {

@@ -87,30 +87,31 @@ int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int MRest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation)
+int MRest::GetOptimalLayerLocation(const Layer *layer, int defaultLocation) const
 {
     if (!layer) return defaultLocation;
-    Staff *parentStaff = this->GetAncestorStaff();
+    const Staff *parentStaff = this->GetAncestorStaff();
 
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
     if (parentStaff->GetChildCount(LAYER) != 2) return defaultLocation;
 
-    ListOfObjects layers = parentStaff->FindAllDescendantsByType(LAYER, false);
-    const bool isTopLayer = (vrv_cast<Layer *>(*layers.begin())->GetN() == layer->GetN());
+    ListOfConstObjects layers = parentStaff->FindAllDescendantsByType(LAYER, false);
+    const bool isTopLayer = (vrv_cast<const Layer *>(*layers.begin())->GetN() == layer->GetN());
 
-    ListOfObjects::iterator otherLayerIter = isTopLayer ? std::prev(layers.end()) : layers.begin();
-    ListOfObjects collidingElementsList = vrv_cast<Layer *>(*otherLayerIter)->GetLayerElementsForTimeSpanOf(this);
+    ListOfConstObjects::iterator otherLayerIter = isTopLayer ? std::prev(layers.end()) : layers.begin();
+    ListOfConstObjects collidingElementsList
+        = vrv_cast<const Layer *>(*otherLayerIter)->GetLayerElementsForTimeSpanOf(this);
 
     // find all locations for other layer
     std::vector<int> locations;
     for (auto element : collidingElementsList) {
         if (element->Is({ CHORD, NOTE })) {
-            LayerElement *layerElement = vrv_cast<LayerElement *>(element);
+            const LayerElement *layerElement = vrv_cast<const LayerElement *>(element);
             int loc = PitchInterface::CalcLoc(layerElement, layer, layerElement, isTopLayer);
             locations.push_back(loc);
         }
         else if (element->Is(REST)) {
-            Rest *rest = vrv_cast<Rest *>(element);
+            const Rest *rest = vrv_cast<const Rest *>(element);
             int loc = rest->GetDrawingLoc();
             locations.push_back(loc);
         }

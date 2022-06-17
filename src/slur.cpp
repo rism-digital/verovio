@@ -459,7 +459,7 @@ Staff *Slur::CalculateExtremalStaff(Staff *staff, int xMin, int xMax)
 
     // Also check the beams of spanned elements
     std::for_each(spanned.elements.begin(), spanned.elements.end(), [&adaptStaff](LayerElement *element) {
-        if (Beam *beam = element->IsInBeam(); beam) {
+        if (Beam *beam = element->GetAncestorBeam(); beam) {
             adaptStaff(beam);
         }
     });
@@ -1462,14 +1462,19 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
     if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) && !start->Is(TIMESTAMP_ATTR)) {
         // get the radius for adjusting the x position
         const int startRadius = start->GetDrawingRadius(doc);
-        // get the min max of the chord (if any)
+        // get the min max of the chord (if any) and horizontal correction for flipped notes
         if (startChord) {
             startChord->GetYExtremes(yChordMax, yChordMin);
+            if (startNote && startNote->GetFlippedNotehead()) {
+                Note *refNote
+                    = (startStemDir == STEMDIRECTION_down) ? startChord->GetTopNote() : startChord->GetBottomNote();
+                x1 += refNote->GetDrawingX() - startNote->GetDrawingX();
+            }
         }
         // slur is up
         if (this->HasEndpointAboveStart()) {
             // P(^)
-            if (startStemDir == STEMDIRECTION_down || startStemLen == 0) {
+            if ((startStemDir == STEMDIRECTION_down) || (startStemLen == 0)) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             //  d(^)d
@@ -1491,8 +1496,8 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
             }
             // same but in beam - adjust the x too
-            else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
-                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
+            else if (((parentBeam = start->GetAncestorBeam()) && !parentBeam->IsLastIn(parentBeam, start))
+                || ((parentFTrem = start->GetAncestorFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
                 || isGraceToNoteSlur || hasStartFlag) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
                 x1 += startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
@@ -1507,7 +1512,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
                 else {
                     // Primary endpoint on the side, move it right
-                    if (startStemLen != 0) x1 += unit * 2;
+                    x1 += unit * 2;
                     if (startChord)
                         y1 = yChordMax + unit * 3;
                     else
@@ -1528,7 +1533,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
             }
             // d(_)
-            else if (startStemDir == STEMDIRECTION_up || startStemLen == 0) {
+            else if ((startStemDir == STEMDIRECTION_up) || (startStemLen == 0)) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             // P(_)P
@@ -1550,8 +1555,9 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
             }
             // same but in beam
-            else if (((parentBeam = start->IsInBeam()) && !parentBeam->IsLastIn(parentBeam, start))
-                || ((parentFTrem = start->IsInFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start)) || hasStartFlag) {
+            else if (((parentBeam = start->GetAncestorBeam()) && !parentBeam->IsLastIn(parentBeam, start))
+                || ((parentFTrem = start->GetAncestorFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
+                || hasStartFlag) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                 x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -1578,15 +1584,19 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
     if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) && !end->Is(TIMESTAMP_ATTR)) {
         // get the radius for adjusting the x position
         const int endRadius = end->GetDrawingRadius(doc);
-        // get the min max of the chord if any
+        // get the min max of the chord (if any) and horizontal correction for flipped notes
         if (endChord) {
             endChord->GetYExtremes(yChordMax, yChordMin);
+            if (endNote && endNote->GetFlippedNotehead()) {
+                Note *refNote = (endStemDir == STEMDIRECTION_down) ? endChord->GetTopNote() : endChord->GetBottomNote();
+                x2 += refNote->GetDrawingX() - endNote->GetDrawingX();
+            }
         }
         // get the stem direction of the end
         // slur is up
         if (this->HasEndpointAboveEnd()) {
             // (^)P
-            if (endStemDir == STEMDIRECTION_down || endStemLen == 0) {
+            if ((endStemDir == STEMDIRECTION_down) || (endStemLen == 0)) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
             }
             // d(^)d
@@ -1618,8 +1628,8 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
             }
             // same but in beam - adjust the x too
-            else if (((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
-                || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
+            else if (((parentBeam = end->GetAncestorBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
+                || ((parentFTrem = end->GetAncestorFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
                 x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -1644,7 +1654,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
         }
         else {
             // (_)d
-            if (endStemDir == STEMDIRECTION_up || endStemLen == 0) {
+            if ((endStemDir == STEMDIRECTION_up) || (endStemLen == 0)) {
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             }
             // P(_)P
@@ -1677,9 +1687,8 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
             }
             // same but in beam
-            else if (((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
-                || ((parentFTrem = end->IsInFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
-
+            else if (((parentBeam = end->GetAncestorBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
+                || ((parentFTrem = end->GetAncestorFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                 x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -1693,7 +1702,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 }
                 else {
                     // Primary endpoint on the side, move it left
-                    if (endStemLen != 0) x2 -= unit * 2;
+                    x2 -= unit * 2;
                     if (endChord) {
                         y2 = yChordMin - unit * 3;
                     }

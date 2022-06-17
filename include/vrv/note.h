@@ -112,7 +112,7 @@ public:
     /**
      * Align dots shift for two notes. Should be used for unison notes to align dots positioning
      */
-    void AlignDotsShift(Note *otherNote);
+    void AlignDotsShift(const Note *otherNote);
 
     /**
      * @name Setter and getter for accid attribute and other pointers
@@ -168,14 +168,14 @@ public:
      * Return true if the note is a unison.
      * If ignoreAccid is set to true then only @pname and @oct are compared.
      */
-    bool IsUnisonWith(Note *note, bool ignoreAccid = false);
+    bool IsUnisonWith(const Note *note, bool ignoreAccid = false) const;
 
     /**
      * @name Setter and getter for the chord cluster and the position of the note
      */
     ///@{
     void SetCluster(ChordCluster *cluster, int position);
-    ChordCluster *GetCluster() const { return m_cluster; }
+    ChordCluster *GetCluster() { return m_cluster; }
     ///@}
 
     /**
@@ -214,7 +214,7 @@ public:
     /**
      * Check whether current note is enharmonic with another
      */
-    bool IsEnharmonicWith(Note *note);
+    bool IsEnharmonicWith(const Note *note) const;
 
     /**
      * Check if a note or its parent chord are visible
@@ -224,14 +224,15 @@ public:
     /**
      * MIDI pitch
      */
-    int GetMIDIPitch(int shift = 0);
+    int GetMIDIPitch(int shift = 0) const;
 
     /**
      * @name Checker, getter and setter for a note with which the stem is shared
      */
     ///@{
     bool HasStemSameasNote() const { return (m_stemSameas); }
-    Note *GetStemSameasNote() const { return m_stemSameas; }
+    Note *GetStemSameasNote() { return m_stemSameas; }
+    const Note *GetStemSameasNote() const { return m_stemSameas; }
     void SetStemSameasNote(Note *stemSameas) { m_stemSameas = stemSameas; }
     ///@}
 
@@ -254,14 +255,14 @@ public:
      * Encoded stem direction on the calling note is taken into account.
      * Called from Note::CalcStem
      */
-    data_STEMDIRECTION CalcStemDirForSameasNote(Doc *doc, int verticalCenter);
+    data_STEMDIRECTION CalcStemDirForSameasNote(int verticalCenter);
 
     /**
      * Set the Note::m_flippedNotehead flag if one of the two notes needs to be placed on the side.
      * The note X relative position remains untouched because we do not want the stem position to be changed.
      * This is different than with chords. It means the the X position is actually corrected when drawing the note.
      */
-    void CalcNoteHeadShiftForSameasNote(Doc *doc, Note *stemSameas, data_STEMDIRECTION stemDir);
+    void CalcNoteHeadShiftForSameasNote(Note *stemSameas, data_STEMDIRECTION stemDir);
 
 public:
     //----------------//
@@ -272,7 +273,7 @@ public:
      * Assume that two notes from different layers are given occuring at the same time
      * Returns true if one note has a ledger line that collides (or is quite close) to the other note's stem
      */
-    static bool HandleLedgerLineStemCollision(Doc *doc, Staff *staff, Note *note1, Note *note2);
+    static bool HandleLedgerLineStemCollision(const Doc *doc, const Staff *staff, const Note *note1, const Note *note2);
 
     //----------//
     // Functors //
@@ -352,30 +353,30 @@ protected:
     /**
      * The note locations w.r.t. each staff
      */
-    MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) override;
+    MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) const override;
 
     /**
      * The dot locations w.r.t. each staff
      * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
      * secondary
      */
-    MapOfDotLocs CalcDotLocations(int layerCount, bool primary) override;
+    MapOfDotLocs CalcDotLocations(int layerCount, bool primary) const override;
 
 private:
     /**
      * Get the pitch difference in semitones of the accidental (implicit or explicit) for this note.
      */
-    int GetChromaticAlteration();
+    int GetChromaticAlteration() const;
 
-    TransPitch GetTransPitch();
+    TransPitch GetTransPitch() const;
 
-    void UpdateFromTransPitch(const TransPitch &tp);
+    void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
 
     /**
      * Return whether dots are overlapping with flag. Take into account flag height, its position as well
      * as position of the note and position of the dots
      */
-    bool IsDotOverlappingWithFlag(Doc *doc, const int staffSize, int dotLocShift);
+    bool IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const;
 
     /**
      * Register deferred notes for MIDI
@@ -402,7 +403,7 @@ private:
 
     /**
      * flags for determining clusters in chord (cluster this belongs to)
-     **/
+     */
     ChordCluster *m_cluster;
 
     /**

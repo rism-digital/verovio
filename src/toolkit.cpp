@@ -36,6 +36,7 @@
 #include "options.h"
 #include "page.h"
 #include "runtimeclock.h"
+#include "score.h"
 #include "slur.h"
 #include "staff.h"
 #include "svgdevicecontext.h"
@@ -82,6 +83,8 @@ Toolkit::Toolkit(bool initFont)
     }
 
     m_options = m_doc.GetOptions();
+
+    m_skipLayoutOnLoad = false;
 
     m_editorToolkit = NULL;
 
@@ -739,7 +742,7 @@ bool Toolkit::LoadData(const std::string &data)
     // to be converted
     if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
 
-    if (breaks != BREAKS_none) {
+    if (!m_skipLayoutOnLoad && (breaks != BREAKS_none)) {
         if (input->GetLayoutInformation() == LAYOUT_ENCODED
             && (breaks == BREAKS_encoded || breaks == BREAKS_line || breaks == BREAKS_smart)) {
             if (breaks == BREAKS_encoded) {
@@ -789,6 +792,11 @@ bool Toolkit::LoadData(const std::string &data)
 #endif
 
     return true;
+}
+
+void Toolkit::SkipLayoutOnLoad(bool value)
+{
+    m_skipLayoutOnLoad = value;
 }
 
 std::string Toolkit::GetMEI(const std::string &jsonOptions)
@@ -1135,6 +1143,38 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     // If it wasn't there, try on the whole doc
     if (!element) {
         element = m_doc.FindDescendantByUuid(xmlId);
+    }
+    // If not found again, try looking in the layer staffdefs
+    if (!element) {
+        Functor findByUuid(&Object::FindElementInLayerStaffDefsByUUID);
+        FindLayerUuidWithinStaffDefParams params(xmlId);
+        // Check drawing page elements first
+        if (m_doc.GetDrawingPage()) {
+            m_doc.GetDrawingPage()->Process(&findByUuid, &params);
+            element = params.m_object;
+        }
+        if (!element) {
+            m_doc.Process(&findByUuid, &params);
+            element = params.m_object;
+        }
+        // If element is found within layer staffdef - check for the linking interface @corresp attribute to find
+        // original ID of the element
+        if (element) {
+            // If element has @corresp set, try finding its origin
+            const LinkingInterface *link = element->GetLinkingInterface();
+            if (link && link->HasCorresp()) {
+                const std::string correspId = ExtractUuidFragment(link->GetCorresp());
+                Object *origin = m_doc.FindDescendantByUuid(correspId);
+                // if no original element was found, try searching through scoredef in score (only for certain elements)
+                if (!origin && element->Is({ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP })) {
+                    Page *page = vrv_cast<Page *>(m_doc.FindDescendantByType(PAGE));
+                    if (page && page->m_score) {
+                        origin = page->m_score->GetScoreDef()->FindDescendantByUuid(correspId);
+                    }
+                }
+                if (origin) element = origin;
+            }
+        }
     }
     // If not found at all
     if (!element) {

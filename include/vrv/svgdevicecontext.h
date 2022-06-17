@@ -82,7 +82,8 @@ public:
     void DrawEllipse(int x, int y, int width, int height) override;
     void DrawEllipticArc(int x, int y, int width, int height, double start, double end) override;
     void DrawLine(int x1, int y1, int x2, int y2) override;
-    void DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE) override;
+    void DrawPolyline(int n, Point points[], int xOffset, int yOffset) override;
+    void DrawPolygon(int n, Point points[], int xOffset, int yOffset) override;
     void DrawRectangle(int x, int y, int width, int height) override;
     void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
     void DrawRoundedRectangle(int x, int y, int width, int height, int radius) override;
@@ -269,6 +270,15 @@ private:
     std::string GetColour(int colour);
 
     pugi::xml_node AppendChild(std::string name);
+
+    /**
+     * Transform pen properties into stroke attributes
+     */
+    ///@{
+    void AppendStrokeLineCap(pugi::xml_node node, const Pen &pen);
+    void AppendStrokeLineJoin(pugi::xml_node node, const Pen &pen);
+    void AppendStrokeDashArray(pugi::xml_node node, const Pen &pen);
+    ///@}
 
 public:
     //
