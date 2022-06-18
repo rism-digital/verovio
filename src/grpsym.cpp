@@ -102,22 +102,22 @@ int GrpSym::ScoreDefSetGrpSym(FunctorParams *)
         ScoreDef *scoreDef = vrv_cast<ScoreDef *>(this->GetParent());
         assert(scoreDef);
 
-        const std::string startId = ExtractUuidFragment(this->GetStartid());
-        const std::string endId = ExtractUuidFragment(this->GetEndid());
+        const std::string startId = ExtractIDFragment(this->GetStartid());
+        const std::string endId = ExtractIDFragment(this->GetEndid());
         const int level = this->GetLevel();
 
-        UuidComparison compare(STAFFDEF, startId);
+        IDComparison compare(STAFFDEF, startId);
         StaffDef *start = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&compare, level));
-        compare.SetUuid(endId);
+        compare.SetID(endId);
         StaffDef *end = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&compare, level));
 
         if (!start || !end) {
-            LogWarning("Could not find startid/endid on level %d for <'%s'>", level, this->GetUuid().c_str());
+            LogWarning("Could not find startid/endid on level %d for <'%s'>", level, this->GetID().c_str());
             return FUNCTOR_CONTINUE;
         }
 
         if (start->GetParent() != end->GetParent()) {
-            LogWarning("<'%s'> has mismatching parents for startid:<'%s'> and endid:<'%s'>", this->GetUuid().c_str(),
+            LogWarning("<'%s'> has mismatching parents for startid:<'%s'> and endid:<'%s'>", this->GetID().c_str(),
                 startId.c_str(), endId.c_str());
             return FUNCTOR_CONTINUE;
         }

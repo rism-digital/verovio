@@ -93,7 +93,7 @@ void FacsimileInterface::SetZone(Zone *zone)
     if (m_zone != NULL) {
         Object *parent = m_zone->GetParent();
         if (!parent->DeleteChild(m_zone)) {
-            printf("Failed to delete zone with ID %s\n", m_zone->GetUuid().c_str());
+            printf("Failed to delete zone with ID %s\n", m_zone->GetID().c_str());
         }
     }
     m_zone = zone;
@@ -101,7 +101,7 @@ void FacsimileInterface::SetZone(Zone *zone)
         this->SetFacs("");
     }
     else {
-        this->SetFacs("#" + m_zone->GetUuid());
+        this->SetFacs("#" + m_zone->GetID());
     }
 }
 

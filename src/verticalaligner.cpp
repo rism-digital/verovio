@@ -193,7 +193,7 @@ SystemAligner::SpacingType SystemAligner::GetAboveSpacingType(Staff *staff)
 
     auto iter = m_spacingTypes.find(staff->GetN());
     if (iter == m_spacingTypes.end()) {
-        LogWarning("No spacing type found matching @n=%d for '<%s>'", staff->GetN(), staff->GetUuid().c_str());
+        LogWarning("No spacing type found matching @n=%d for '<%s>'", staff->GetN(), staff->GetID().c_str());
         return SpacingType::None;
     }
 
@@ -782,7 +782,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             int overflowAbove = 0;
             if (!skipAbove) overflowAbove = this->CalcOverflowAbove(*iter);
             if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-                // LogMessage("%sparams->m_doc top overflow: %d", this->GetUuid().c_str(), overflowAbove);
+                // LogMessage("%sparams->m_doc top overflow: %d", this->GetID().c_str(), overflowAbove);
                 this->SetOverflowAbove(overflowAbove);
                 m_overflowAboveBBoxes.push_back(*iter);
             }
@@ -790,7 +790,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             int overflowBelow = 0;
             if (!skipBelow) overflowBelow = this->CalcOverflowBelow(*iter);
             if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-                // LogMessage("%s bottom overflow: %d", this->GetUuid().c_str(), overflowBelow);
+                // LogMessage("%s bottom overflow: %d", this->GetID().c_str(), overflowBelow);
                 this->SetOverflowBelow(overflowBelow);
                 m_overflowBelowBBoxes.push_back(*iter);
             }

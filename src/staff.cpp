@@ -349,7 +349,7 @@ void Staff::SetFromFacsimile(Doc *doc)
     if (!this->HasFacs()) return;
     if (this->GetZone() == NULL) {
         assert(doc);
-        Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
+        Zone *zone = doc->GetFacsimile()->FindZoneByID(this->GetFacs());
         assert(zone);
         this->SetZone(zone);
     }
@@ -443,7 +443,7 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
     params->m_targetStaff->ClearChildren();
     params->m_targetStaff->CloneReset();
     // Keep the xml:id of the staff in the first staff segment
-    params->m_targetStaff->SwapUuid(this);
+    params->m_targetStaff->SwapID(this);
     assert(params->m_targetMeasure);
     params->m_targetMeasure->AddChild(params->m_targetStaff);
 

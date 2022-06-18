@@ -43,7 +43,7 @@ public:
     ///@}
     bool IsSupportedChild(Object *object) override;
 
-    Zone *FindZoneByUuid(std::string zoneId);
+    Zone *FindZoneByID(std::string zoneId);
     int GetMaxY();
     int GetMaxX();
 };

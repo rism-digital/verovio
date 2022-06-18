@@ -243,7 +243,7 @@ public:
 
     /**
      * Resovle @stem.sameas links by instanciating Note::m_stemSameas (*Note).
-     * Called twice from Object::PrepareLinks. Once to fill uuid / note pairs,
+     * Called twice from Object::PrepareLinks. Once to fill id / note pairs,
      * and once to resolve the link. The link is bi-directional, which means
      * that both notes have their m_stemSameas pointer instanciated.
      */

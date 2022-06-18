@@ -383,7 +383,7 @@ int main(int argc, char **argv)
             case 'x':
                 seed = atoi(optarg);
                 options->m_xmlIdSeed.SetValue(seed);
-                vrv::Object::SeedUuid(seed);
+                vrv::Object::SeedID(seed);
                 break;
 
             case 'z':

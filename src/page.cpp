@@ -50,7 +50,7 @@ void Page::Reset()
     m_score = NULL;
     m_scoreEnd = NULL;
     m_layoutDone = false;
-    this->ResetUuid();
+    this->ResetID();
 
     // by default we have no values and use the document ones
     m_pageHeight = -1;

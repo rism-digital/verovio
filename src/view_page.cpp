@@ -169,17 +169,17 @@ void View::DrawPageElement(DeviceContext *dc, PageElement *element)
         PageMilestoneEnd *elementEnd = vrv_cast<PageMilestoneEnd *>(element);
         assert(elementEnd);
         assert(elementEnd->GetStart());
-        dc->StartGraphic(element, elementEnd->GetStart()->GetUuid(), element->GetUuid());
+        dc->StartGraphic(element, elementEnd->GetStart()->GetID(), element->GetID());
         dc->EndGraphic(element, this);
     }
     else if (element->Is(MDIV)) {
         // When the mdiv is not visible, then there is no start / end element
         std::string elementStart = (element->IsMilestoneElement()) ? "pageMilestone" : "";
-        dc->StartGraphic(element, elementStart, element->GetUuid());
+        dc->StartGraphic(element, elementStart, element->GetID());
         dc->EndGraphic(element, this);
     }
     else if (element->Is(SCORE)) {
-        dc->StartGraphic(element, "pageMilestone", element->GetUuid());
+        dc->StartGraphic(element, "pageMilestone", element->GetID());
         dc->EndGraphic(element, this);
     }
 }
@@ -193,7 +193,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     assert(dc);
     assert(system);
 
-    dc->StartGraphic(system, "", system->GetUuid());
+    dc->StartGraphic(system, "", system->GetID());
 
     Measure *firstMeasure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1));
 
@@ -311,7 +311,7 @@ void View::DrawScoreDef(
         this->DrawStaffGrp(dc, measure, staffGrp, x, true, !scoreDef->DrawLabels());
     }
     else {
-        dc->StartGraphic(barLine, "", barLine->GetUuid());
+        dc->StartGraphic(barLine, "", barLine->GetID());
         this->DrawBarLines(dc, measure, staffGrp, barLine, isLastMeasure);
         dc->EndGraphic(barLine, this);
     }
@@ -451,7 +451,7 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
         return;
     }
 
-    dc->StartGraphic(groupSymbol, "", groupSymbol->GetUuid());
+    dc->StartGraphic(groupSymbol, "", groupSymbol->GetID());
 
     const int staffSize = staffGrp->GetMaxStaffSize();
     int yTop = first->GetDrawingY();
@@ -565,7 +565,7 @@ void View::DrawLabels(
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(&labelTxt);
 
-    dc->StartGraphic(graphic, "", graphic->GetUuid());
+    dc->StartGraphic(graphic, "", graphic->GetID());
 
     dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
     this->DrawTextChildren(dc, graphic, params);
@@ -1041,7 +1041,7 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     // This is a special case where we do not draw (SVG, Bounding boxes, etc.) the measure for unmeasured music
     if (measure->IsMeasuredMusic()) {
-        dc->StartGraphic(measure, "", measure->GetUuid());
+        dc->StartGraphic(measure, "", measure->GetID());
     }
 
     if (m_drawingScoreDef.GetMnumVisible() != BOOLEAN_false) {
@@ -1115,7 +1115,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
 
     const int unit = m_doc->GetDrawingUnit(glyphSize);
     int offset = 0;
-    dc->StartGraphic(meterSigGrp, "", meterSigGrp->GetUuid());
+    dc->StartGraphic(meterSigGrp, "", meterSigGrp->GetID());
     // Draw meterSigGrp by alternating meterSig and plus sign (when required)
     for (auto iter = childList.begin(); iter != childList.end(); ++iter) {
         MeterSig *meterSig = vrv_cast<MeterSig *>(*iter);
@@ -1151,7 +1151,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
     Staff *staff = measure->GetTopVisibleStaff();
     if (staff) {
 
-        dc->StartGraphic(mnum, "", mnum->GetUuid());
+        dc->StartGraphic(mnum, "", mnum->GetID());
 
         FontInfo mnumTxt;
         if (!dc->UseGlobalStyling()) {
@@ -1216,7 +1216,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         return;
     }
 
-    dc->StartGraphic(staff, "", staff->GetUuid());
+    dc->StartGraphic(staff, "", staff->GetID());
 
     if (m_doc->GetType() == Facs) {
         staff->SetFromFacsimile(m_doc);
@@ -1373,7 +1373,7 @@ void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
     if (!layer || !layer->HasStaffDef()) return;
 
     // StaffDef staffDef;
-    // dc->StartGraphic(&staffDef, "", staffDef.GetUuid());
+    // dc->StartGraphic(&staffDef, "", staffDef.GetID());
 
     // draw the scoreDef if required
     if (layer->GetStaffDefClef()) {
@@ -1406,7 +1406,7 @@ void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *meas
     if (!layer || !layer->HasCautionStaffDef()) return;
 
     // StaffDef staffDef;
-    // dc->StartGraphic(&staffDef, "cautionary", staffDef.GetUuid());
+    // dc->StartGraphic(&staffDef, "cautionary", staffDef.GetID());
 
     // draw the scoreDef if required
     if (layer->GetCautionStaffDefClef()) {
@@ -1489,7 +1489,7 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
 
     // Now start to draw the layer content
 
-    dc->StartGraphic(layer, "", layer->GetUuid());
+    dc->StartGraphic(layer, "", layer->GetID());
 
     this->DrawLayerChildren(dc, layer, layer, staff, measure);
 
@@ -1793,7 +1793,7 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
     std::string elementStart;
     if (element->IsMilestoneElement()) elementStart = "systemElementStart";
 
-    dc->StartGraphic(element, elementStart, element->GetUuid());
+    dc->StartGraphic(element, elementStart, element->GetID());
     // EditorialElements at the system level that are visible have no children
     // if (element->m_visibility == Visible) {
     //    DrawSystemChildren(dc, element, system);
@@ -1815,7 +1815,7 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_MEASURE));
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
     if (element->m_visibility == Visible) {
         this->DrawMeasureChildren(dc, element, measure, system);
     }
@@ -1836,7 +1836,7 @@ void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *elemen
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_STAFF));
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
     if (element->m_visibility == Visible) {
         this->DrawStaffChildren(dc, element, staff, measure);
     }
@@ -1858,7 +1858,7 @@ void View::DrawLayerEditorialElement(
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_LAYER));
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
     if (element->m_visibility == Visible) {
         this->DrawLayerChildren(dc, element, layer, staff, measure);
     }
@@ -1879,7 +1879,7 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TEXT));
     }
 
-    dc->StartTextGraphic(element, "", element->GetUuid());
+    dc->StartTextGraphic(element, "", element->GetID());
     if (element->m_visibility == Visible) {
         this->DrawTextChildren(dc, element, params);
     }
@@ -1900,7 +1900,7 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_FB));
     }
 
-    dc->StartTextGraphic(element, "", element->GetUuid());
+    dc->StartTextGraphic(element, "", element->GetID());
     if (element->m_visibility == Visible) {
         this->DrawFbChildren(dc, element, params);
     }
@@ -1921,7 +1921,7 @@ void View::DrawRunningEditorialElement(DeviceContext *dc, EditorialElement *elem
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_RUNNING));
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
     if (element->m_visibility == Visible) {
         this->DrawRunningChildren(dc, element, params);
     }
@@ -1933,10 +1933,10 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextEl
     assert(element);
 
     if (isTextElement) {
-        dc->StartTextGraphic(element, "", element->GetUuid());
+        dc->StartTextGraphic(element, "", element->GetID());
     }
     else {
-        dc->StartGraphic(element, "", element->GetUuid());
+        dc->StartGraphic(element, "", element->GetID());
     }
 
     Annot *annot = vrv_cast<Annot *>(element);

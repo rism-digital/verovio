@@ -74,7 +74,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(measure);
 
     if (element->HasSameas()) {
-        dc->StartGraphic(element, "", element->GetUuid());
+        dc->StartGraphic(element, "", element->GetID());
         element->SetEmptyBB();
         dc->EndGraphic(element, this);
         return;
@@ -204,12 +204,12 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         this->DrawTuplet(dc, element, layer, staff, measure);
     }
     else if (element->Is(TUPLET_BRACKET)) {
-        dc->StartGraphic(element, "", element->GetUuid());
+        dc->StartGraphic(element, "", element->GetID());
         dc->EndGraphic(element, this);
         layer->AddToDrawingList(element);
     }
     else if (element->Is(TUPLET_NUM)) {
-        dc->StartGraphic(element, "", element->GetUuid());
+        dc->StartGraphic(element, "", element->GetID());
         dc->EndGraphic(element, this);
         layer->AddToDrawingList(element);
     }
@@ -242,13 +242,13 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // This can happen with accid within note with only accid.ges
     // We still create an graphic in the output
     if (!accid->HasAccid() || staff->IsTablature()) {
-        dc->StartGraphic(element, "", element->GetUuid());
+        dc->StartGraphic(element, "", element->GetID());
         accid->SetEmptyBB();
         dc->EndGraphic(element, this);
         return;
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     const data_NOTATIONTYPE notationType = staff->m_drawingNotationType;
     std::wstring accidStr = accid->GetSymbolStr(notationType);
@@ -376,7 +376,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // Draw glyph including possible enclosing brackets
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     if (enclosingFront) {
         int xCorrEncl = std::max(xCorr, m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
@@ -413,7 +413,7 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
         return;
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     const int yTop = staff->GetDrawingY();
     const int yBottom = yTop - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -439,7 +439,7 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
     BeatRpt *beatRpt = vrv_cast<BeatRpt *>(element);
     assert(beatRpt);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     const int staffSize = staff->m_drawingStaffSize;
     const int xSymbol = element->GetDrawingX();
@@ -484,7 +484,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         return;
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     this->DrawLayerChildren(dc, bTrem, layer, staff, measure);
 
@@ -609,7 +609,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
 
@@ -664,7 +664,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     Custos *custos = vrv_cast<Custos *>(element);
     assert(custos);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     // Select glyph to use for this custos
     const int sym = custos->GetCustosGlyph(staff->m_drawingNotationType);
@@ -736,7 +736,7 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     Dot *dot = vrv_cast<Dot *>(element);
     assert(dot);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     if (dot->m_drawingPreviousElement && dot->m_drawingPreviousElement->IsInLigature()) {
         this->DrawDotInLigature(dc, element, layer, staff, measure);
@@ -775,7 +775,7 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Dots *dots = vrv_cast<Dots *>(element);
     assert(dots);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     for (const auto &mapEntry : dots->GetMapOfDotLocs()) {
         const Staff *dotStaff = (mapEntry.first) ? mapEntry.first : staff;
@@ -800,17 +800,17 @@ void View::DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *
     assert(measure);
 
     if (dynamic_cast<Chord *>(element)) {
-        dc->StartGraphic(element, "", element->GetUuid());
+        dc->StartGraphic(element, "", element->GetID());
         this->DrawChord(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this);
     }
     else if (dynamic_cast<Note *>(element)) {
-        dc->StartGraphic(element, "", element->GetUuid());
+        dc->StartGraphic(element, "", element->GetID());
         this->DrawNote(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this);
     }
     else if (dynamic_cast<Rest *>(element)) {
-        dc->StartGraphic(element, "", element->GetUuid());
+        dc->StartGraphic(element, "", element->GetID());
         this->DrawRest(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this);
     }
@@ -833,7 +833,7 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int x = flag->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
     int y = flag->GetDrawingY();
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     wchar_t code = flag->GetFlagGlyph(stem->GetDrawingStemDir());
     this->DrawSmuflCode(dc, x, y, code, staff->GetDrawingStaffNotationSize(), flag->GetDrawingCueSize());
@@ -849,7 +849,7 @@ void View::DrawGraceGrp(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(staff);
     assert(measure);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     // basically nothing to do here
     this->DrawLayerChildren(dc, element, layer, staff, measure);
@@ -871,7 +871,7 @@ void View::DrawHalfmRpt(DeviceContext *dc, LayerElement *element, Layer *layer, 
     int x = halfmRpt->GetDrawingX();
     x += m_doc->GetGlyphWidth(SMUFL_E500_repeat1Bar, staff->m_drawingStaffSize, false) / 2;
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     this->DrawMRptPart(dc, x, SMUFL_E500_repeat1Bar, 0, false, staff);
 
@@ -925,7 +925,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int clefLocOffset = layer->GetClefLocOffset(element);
     int loc;
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     // Show cancellation if showchange is true (false by default) or if C major
     if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM)
@@ -992,7 +992,7 @@ void View::DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Cle
     const int loc = keyAccid->CalcStaffLoc(clef, clefLocOffset);
     const int y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
-    dc->StartCustomGraphic("keyAccid", "", keyAccid->GetUuid());
+    dc->StartCustomGraphic("keyAccid", "", keyAccid->GetID());
 
     this->DrawSmuflString(dc, x, y, symbolStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
 
@@ -1011,7 +1011,7 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
     wchar_t enclosingFront, enclosingBack;
     std::tie(enclosingFront, enclosingBack) = meterSig->GetEnclosingGlyphs(hasSmallEnclosing);
 
-    dc->StartGraphic(meterSig, "", meterSig->GetUuid());
+    dc->StartGraphic(meterSig, "", meterSig->GetID());
 
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = meterSig->GetDrawingX() + horizOffset;
@@ -1053,7 +1053,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     MRest *mRest = vrv_cast<MRest *>(element);
     assert(mRest);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     mRest->CenterDrawingX();
 
@@ -1105,7 +1105,7 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     mRpt->CenterDrawingX();
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     this->DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E500_repeat1Bar, 0, false, staff);
 
@@ -1145,7 +1145,7 @@ void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     mRpt2->CenterDrawingX();
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     this->DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, 2, true, staff);
 
@@ -1163,7 +1163,7 @@ void View::DrawMSpace(DeviceContext *dc, LayerElement *element, Layer *layer, St
     // MSpace *mSpace = vrv_cast<MSpace *>(element);
     // assert(mSpace);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
     // nothing to draw here
     dc->EndGraphic(element, this);
 }
@@ -1181,7 +1181,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     multiRest->CenterDrawingX();
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     int measureWidth = measure->GetInnerWidth();
     int xCentered = multiRest->GetDrawingX();
@@ -1300,7 +1300,7 @@ void View::DrawMultiRpt(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     multiRpt->CenterDrawingX();
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     this->DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, multiRpt->GetNum(), true, staff);
 
@@ -1346,7 +1346,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         int drawingDur = note->GetDrawingDur();
         if (drawingDur == DUR_NONE) {
             if (note->IsInBeam() && !dc->Is(BBOX_DEVICE_CONTEXT)) {
-                LogWarning("Missing duration for note '%s' in beam", note->GetUuid().c_str());
+                LogWarning("Missing duration for note '%s' in beam", note->GetID().c_str());
             }
             drawingDur = DUR_4;
         }
@@ -1425,7 +1425,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int drawingDur = rest->GetActualDur();
     if (drawingDur == DUR_NONE) {
         if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
-            LogWarning("Missing duration for rest '%s'", rest->GetUuid().c_str());
+            LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
         }
         drawingDur = DUR_4;
     }
@@ -1487,7 +1487,7 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
     dc->DrawPlaceholder(ToDeviceContextX(element->GetDrawingX()), ToDeviceContextY(element->GetDrawingY()));
     dc->EndGraphic(element, this);
 }
@@ -1506,7 +1506,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // Do not draw virtual (e.g., whole note) stems
     if (stem->IsVirtual()) return;
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     this->DrawFilledRectangle(dc, stem->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
         stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
@@ -1615,7 +1615,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerse, staff));
 
-    dc->StartGraphic(syl, "", syl->GetUuid());
+    dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
 
     dc->SetBrush(m_currentColour, AxSOLID);
@@ -1722,7 +1722,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&labelTxt);
 
-        dc->StartGraphic(graphic, "", graphic->GetUuid());
+        dc->StartGraphic(graphic, "", graphic->GetID());
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
         this->DrawTextChildren(dc, graphic, params);
@@ -1734,7 +1734,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->ResetBrush();
     }
 
-    dc->StartGraphic(verse, "", verse->GetUuid());
+    dc->StartGraphic(verse, "", verse->GetID());
 
     this->DrawLayerChildren(dc, verse, layer, staff, measure);
 

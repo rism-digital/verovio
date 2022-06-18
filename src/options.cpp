@@ -1476,7 +1476,7 @@ Options::Options()
     this->Register(&m_transpose, "transpose", &m_selectors);
 
     m_transposeMdiv.SetInfo(
-        "Transpose individual mdivs", "Json mapping the mdiv uuids to the corresponding transposition");
+        "Transpose individual mdivs", "Json mapping the mdiv ids to the corresponding transposition");
     m_transposeMdiv.Init(JsonSource::String, "{}");
     this->Register(&m_transposeMdiv, "transposeMdiv", &m_selectors);
 

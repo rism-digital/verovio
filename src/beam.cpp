@@ -398,7 +398,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingI
         if ((newDirection == STEMDIRECTION_down) && (m_uniformStemLength > 0)) m_uniformStemLength *= -1;
 
         LogWarning("Insufficient space to draw mixed beam, starting at '%s'. Drawing '%s' instead.",
-            m_beamElementCoordRefs.at(0)->m_element->GetUuid().c_str(),
+            m_beamElementCoordRefs.at(0)->m_element->GetID().c_str(),
             (beamInterface->m_drawingPlace == BEAMPLACE_above) ? "above" : "below");
     }
     else {
