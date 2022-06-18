@@ -126,7 +126,7 @@ int Mdiv::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
-    params->m_currentMdivUuids.push_back(this->GetUuid());
+    params->m_currentMdivIDs.push_back(this->GetID());
     params->m_keySigForStaffN.clear();
     params->m_transposeIntervalForStaffN.clear();
 

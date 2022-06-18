@@ -420,7 +420,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
         AttNIntegerComparison matchN(STAFF, *iter);
         Staff *staff = dynamic_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
         if (!staff) {
-            // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
+            // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
             continue;
         }
         staves.push_back(staff);
@@ -1298,7 +1298,7 @@ int Measure::CastOffToSelection(FunctorParams *functorParams)
     CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
     assert(params);
 
-    const bool startSelection = (!params->m_isSelection && this->GetUuid() == params->m_start);
+    const bool startSelection = (!params->m_isSelection && this->GetID() == params->m_start);
 
     if (startSelection) {
         params->m_page = new Page();
@@ -1308,7 +1308,7 @@ int Measure::CastOffToSelection(FunctorParams *functorParams)
         params->m_isSelection = true;
     }
 
-    const bool endSelection = (params->m_isSelection && this->GetUuid() == params->m_end);
+    const bool endSelection = (params->m_isSelection && this->GetID() == params->m_end);
 
     MoveItselfTo(params->m_currentSystem);
 
@@ -1462,7 +1462,7 @@ int Measure::PrepareTimePointingEnd(FunctorParams *functorParams)
 
     if (!params->m_timePointingInterfaces.empty()) {
         LogWarning("%d time pointing element(s) could not be matched in measure %s",
-            params->m_timePointingInterfaces.size(), this->GetUuid().c_str());
+            params->m_timePointingInterfaces.size(), this->GetID().c_str());
     }
 
     ListOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();

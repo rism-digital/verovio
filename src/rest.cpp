@@ -584,7 +584,7 @@ int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 
     if (this->HasFermata()) {
         Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
     }
 
     return FUNCTOR_CONTINUE;

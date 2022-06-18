@@ -123,7 +123,7 @@ void Artic::SplitMultival(Object *parent)
     if (this->IsAttribute()) {
         this->IsAttribute(false);
         LogMessage("Multiple valued attribute @artic on '%s' permanently converted to <artic> elements",
-            parent->GetUuid().c_str());
+            parent->GetID().c_str());
     }
 }
 

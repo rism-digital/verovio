@@ -362,7 +362,7 @@ void ABCInput::AddChordSymbol(LayerElement *element)
 
     // there should always only be one element in the harmony stack
     if (!m_harmStack.empty() && !m_harmStack.back()->HasStartid()) {
-        m_harmStack.back()->SetStartid("#" + element->GetUuid());
+        m_harmStack.back()->SetStartid("#" + element->GetID());
         m_harmStack.clear();
     }
 
@@ -375,11 +375,11 @@ void ABCInput::AddDynamic(LayerElement *element)
 
     for (auto it = m_dynam.begin(); it != m_dynam.end(); ++it) {
         Dynam *dynam = new Dynam();
-        dynam->SetStartid("#" + element->GetUuid());
+        dynam->SetStartid("#" + element->GetID());
         Text *text = new Text();
         text->SetText(UTF8to16(*it));
         dynam->AddChild(text);
-        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), dynam));
+        m_controlElements.push_back(std::make_pair(m_layer->GetID(), dynam));
     }
 
     m_dynam.clear();
@@ -390,9 +390,9 @@ void ABCInput::AddFermata(LayerElement *element)
     assert(element);
 
     Fermata *fermata = new Fermata();
-    fermata->SetStartid("#" + element->GetUuid());
+    fermata->SetStartid("#" + element->GetID());
     fermata->SetPlace(m_fermata);
-    m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), fermata));
+    m_controlElements.push_back(std::make_pair(m_layer->GetID(), fermata));
 
     m_fermata = STAFFREL_NONE;
 }
@@ -401,36 +401,36 @@ void ABCInput::AddOrnaments(LayerElement *element)
 {
     assert(element);
 
-    std::string refId = "#" + element->GetUuid();
+    std::string refId = "#" + element->GetID();
     // note->SetOrnam(m_ornam);
     if (m_ornam.find("m") != std::string::npos) {
         Mordent *mordent = new Mordent();
         mordent->SetStartid(refId);
         mordent->SetForm(mordentLog_FORM_lower);
-        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), mordent));
+        m_controlElements.push_back(std::make_pair(m_layer->GetID(), mordent));
     }
     if (m_ornam.find("M") != std::string::npos) {
         Mordent *mordent = new Mordent();
         mordent->SetStartid(refId);
         mordent->SetForm(mordentLog_FORM_upper);
-        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), mordent));
+        m_controlElements.push_back(std::make_pair(m_layer->GetID(), mordent));
     }
     if (m_ornam.find("s") != std::string::npos) {
         Turn *turn = new Turn();
         turn->SetStartid(refId);
         turn->SetForm(turnLog_FORM_lower);
-        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), turn));
+        m_controlElements.push_back(std::make_pair(m_layer->GetID(), turn));
     }
     if (m_ornam.find("S") != std::string::npos) {
         Turn *turn = new Turn();
         turn->SetStartid(refId);
         turn->SetForm(turnLog_FORM_upper);
-        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), turn));
+        m_controlElements.push_back(std::make_pair(m_layer->GetID(), turn));
     }
     if (m_ornam.find("T") != std::string::npos) {
         Trill *trill = new Trill();
         trill->SetStartid(refId);
-        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), trill));
+        m_controlElements.push_back(std::make_pair(m_layer->GetID(), trill));
     }
 
     m_ornam.clear();
@@ -446,7 +446,7 @@ void ABCInput::AddTie()
         Tie *tie = new Tie();
         tie->SetStartid(m_ID);
         m_tieStack.push_back(tie);
-        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), tie));
+        m_controlElements.push_back(std::make_pair(m_layer->GetID(), tie));
     }
 }
 
@@ -454,7 +454,7 @@ void ABCInput::StartSlur()
 {
     Slur *openSlur = new Slur();
     m_slurStack.push_back(openSlur);
-    m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), openSlur));
+    m_controlElements.push_back(std::make_pair(m_layer->GetID(), openSlur));
 }
 
 void ABCInput::EndSlur()
@@ -907,7 +907,7 @@ void ABCInput::CreateWorkEntry()
     // <work> //
     pugi::xml_node work = m_workList.append_child("work");
     work.append_attribute("n").set_value(m_mdiv->GetN().c_str());
-    work.append_attribute("data").set_value(StringFormat("#%s", m_mdiv->GetUuid().c_str()).c_str());
+    work.append_attribute("data").set_value(StringFormat("#%s", m_mdiv->GetID().c_str()).c_str());
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
         pugi::xml_node title = work.append_child("title");
         title.text().set((it->first).c_str());
@@ -954,8 +954,8 @@ void ABCInput::FlushControlElements(Score *score, Section *section)
     Layer *layer = NULL;
     Measure *measure = NULL;
     for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
-        if (!measure || (layer && layer->GetUuid() != iter->first)) {
-            layer = dynamic_cast<Layer *>(section->FindDescendantByUuid(iter->first));
+        if (!measure || (layer && layer->GetID() != iter->first)) {
+            layer = dynamic_cast<Layer *>(section->FindDescendantByID(iter->first));
         }
         if (!layer) {
             LogWarning("ABC import: Element '%s' could not be assigned to layer '%s'",
@@ -1010,7 +1010,7 @@ void ABCInput::InitScoreAndSection(Score *&score, Section *&section)
     // start with a new page
     if (m_linebreak != '\0') {
         Pb *pb = new Pb();
-        pb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
+        pb->SetID(StringFormat("abcLine%02d", m_lineNum + 1));
         section->AddChild(pb);
     }
     // calculate default unit note length
@@ -1329,7 +1329,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
         else if (pitch.find(toupper(musicCode.at(i))) != std::string::npos) {
             int oct = 0;
             Note *note = new Note;
-            m_ID = note->GetUuid();
+            m_ID = note->GetID();
 
             // accidentals
             if (i >= 1) {
@@ -1501,7 +1501,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
         // spaces
         else if (musicCode.at(i) == 'x') {
             Space *space = new Space();
-            m_ID = space->GetUuid();
+            m_ID = space->GetID();
 
             // add chord symbols
             if (!m_harmStack.empty()) {
@@ -1573,7 +1573,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
         // rests
         else if (musicCode.at(i) == 'z') {
             Rest *rest = new Rest();
-            m_ID = rest->GetUuid();
+            m_ID = rest->GetID();
 
             // add chord symbols
             if (!m_harmStack.empty()) {
@@ -1671,7 +1671,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             text->SetText(UTF8to16(chordSymbol));
             harm->AddChild(text);
             m_harmStack.push_back(harm);
-            m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), harm));
+            m_controlElements.push_back(std::make_pair(m_layer->GetID(), harm));
         }
 
         // suppressing score line-breaks
@@ -1736,7 +1736,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
     if (sysBreak && (m_linebreak != '\0') && !(section->GetLast())->Is(SB)) {
         AddLayerElement();
         Sb *sb = new Sb();
-        sb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
+        sb->SetID(StringFormat("abcLine%02d", m_lineNum + 1));
         section->AddChild(sb);
     }
 }

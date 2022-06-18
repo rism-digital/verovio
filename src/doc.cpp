@@ -554,22 +554,21 @@ void Doc::PrepareData()
     this->Process(&prepareLinking, &prepareLinkingParams);
 
     // If we have some left process again backward
-    if (!prepareLinkingParams.m_sameasUuidPairs.empty() || !prepareLinkingParams.m_stemSameasUuidPairs.empty()) {
+    if (!prepareLinkingParams.m_sameasIDPairs.empty() || !prepareLinkingParams.m_stemSameasIDPairs.empty()) {
         prepareLinkingParams.m_fillList = false;
         this->Process(&prepareLinking, &prepareLinkingParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!prepareLinkingParams.m_nextUuidPairs.empty()) {
-        LogWarning("%d element(s) with a @next could match the target", prepareLinkingParams.m_nextUuidPairs.size());
+    if (!prepareLinkingParams.m_nextIDPairs.empty()) {
+        LogWarning("%d element(s) with a @next could match the target", prepareLinkingParams.m_nextIDPairs.size());
     }
-    if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
-        LogWarning(
-            "%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasUuidPairs.size());
+    if (!prepareLinkingParams.m_sameasIDPairs.empty()) {
+        LogWarning("%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasIDPairs.size());
     }
-    if (!prepareLinkingParams.m_stemSameasUuidPairs.empty()) {
+    if (!prepareLinkingParams.m_stemSameasIDPairs.empty()) {
         LogWarning("%d element(s) with a @stem.sameas could match the target",
-            prepareLinkingParams.m_stemSameasUuidPairs.size());
+            prepareLinkingParams.m_stemSameasIDPairs.size());
     }
 
     /************ Resolve @plist ************/
@@ -580,21 +579,21 @@ void Doc::PrepareData()
     this->Process(&preparePlist, &preparePlistParams);
 
     // Process plist after all pairs has been collected
-    if (!preparePlistParams.m_interfaceUuidTuples.empty()) {
+    if (!preparePlistParams.m_interfaceIDTuples.empty()) {
         preparePlistParams.m_fillList = false;
         Functor processPlist(&Object::PrepareProcessPlist);
         this->Process(&processPlist, &preparePlistParams);
 
-        for (const auto &[plistInterface, uuid, objectReference] : preparePlistParams.m_interfaceUuidTuples) {
+        for (const auto &[plistInterface, id, objectReference] : preparePlistParams.m_interfaceIDTuples) {
             plistInterface->SetRef(objectReference);
         }
-        preparePlistParams.m_interfaceUuidTuples.clear();
+        preparePlistParams.m_interfaceIDTuples.clear();
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!preparePlistParams.m_interfaceUuidTuples.empty()) {
+    if (!preparePlistParams.m_interfaceIDTuples.empty()) {
         LogWarning(
-            "%d element(s) with a @plist could not match the target", preparePlistParams.m_interfaceUuidTuples.size());
+            "%d element(s) with a @plist could not match the target", preparePlistParams.m_interfaceIDTuples.size());
     }
 
     /************ Resolve cross staff ************/
@@ -1348,7 +1347,7 @@ void Doc::ConvertMarkupDoc(bool permanent)
                     std::vector<Note *>::iterator iter;
                     for (iter = convertMarkupAnalyticalParams.m_currentNotes.begin();
                          iter != convertMarkupAnalyticalParams.m_currentNotes.end(); ++iter) {
-                        LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
+                        LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetID().c_str());
                     }
                 }
             }
@@ -1380,17 +1379,17 @@ void Doc::TransposeDoc()
     }
     else if (m_options->m_transposeMdiv.IsSet()) {
         // Transpose mdivs individually
-        std::set<std::string> uuids = m_options->m_transposeMdiv.GetKeys();
-        for (const std::string &uuid : uuids) {
-            transposeParams.m_selectedMdivUuid = uuid;
-            transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ uuid });
+        std::set<std::string> ids = m_options->m_transposeMdiv.GetKeys();
+        for (const std::string &id : ids) {
+            transposeParams.m_selectedMdivID = id;
+            transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ id });
             this->Process(&transpose, &transposeParams, &transposeEnd);
         }
     }
 
     if (m_options->m_transposeToSoundingPitch.GetValue()) {
         // Transpose to sounding pitch
-        transposeParams.m_selectedMdivUuid = "";
+        transposeParams.m_selectedMdivID = "";
         transposeParams.m_transposition = "";
         transposeParams.m_transposer->SetTransposition(0);
         transposeParams.m_transposeToSoundingPitch = true;
@@ -1404,7 +1403,7 @@ void Doc::ExpandExpansions()
     std::string expansionId = this->GetOptions()->m_expand.GetValue();
     if (expansionId.empty()) return;
 
-    Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByUuid(expansionId));
+    Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
     if (start == NULL) {
         LogMessage("Import MEI: expansion ID \"%s\" not found.", expansionId.c_str());
         return;
@@ -1418,7 +1417,7 @@ void Doc::ExpandExpansions()
     // Expansion *originalExpansion = new Expansion();
     // char rnd[35];
     // snprintf(rnd, 35, "expansion-notated-%016d", std::rand());
-    // originalExpansion->SetUuid(rnd);
+    // originalExpansion->SetID(rnd);
 
     // for (std::string ref : existingList) {
     //    originalExpansion->GetPlistInterface()->AddRef("#" + ref);
@@ -1426,7 +1425,7 @@ void Doc::ExpandExpansions()
 
     // start->GetParent()->InsertAfter(start, originalExpansion);
 
-    // std::cout << "[expand] original expansion xml:id=\"" << originalExpansion->GetUuid().c_str()
+    // std::cout << "[expand] original expansion xml:id=\"" << originalExpansion->GetID().c_str()
     //          << "\" plist={";
     // for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
 

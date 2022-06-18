@@ -61,10 +61,10 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         if (note->GetScoreTimeTiedDuration() == -1.0) {
             // Check if we need to add it to the previous interval ids
             const int intervalsIdsSize = (int)m_intervalsIds.size();
-            if (intervalsIdsSize > 0) m_intervalsIds.get<jsonxx::Array>(intervalsIdsSize - 1) << note->GetUuid();
+            if (intervalsIdsSize > 0) m_intervalsIds.get<jsonxx::Array>(intervalsIdsSize - 1) << note->GetID();
             // Same for pitch ids
             const int pitchesIdsSize = (int)m_pitchesIds.size();
-            if (pitchesIdsSize > 0) m_pitchesIds.get<jsonxx::Array>(pitchesIdsSize - 1) << note->GetUuid();
+            if (pitchesIdsSize > 0) m_pitchesIds.get<jsonxx::Array>(pitchesIdsSize - 1) << note->GetID();
             m_previousNotes.push_back(note);
             return;
         }
@@ -107,7 +107,7 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         m_pitchesChromatic << pitch.str();
         m_pitchesDiatonic << pname;
         jsonxx::Array pitchesIds;
-        pitchesIds << note->GetUuid();
+        pitchesIds << note->GetID();
         m_pitchesIds << jsonxx::Value(pitchesIds);
 
         // We have a previous note (or more with tied notes), so we can calculate an interval
@@ -119,8 +119,8 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
                 = StringFormat("%d", note->GetDiatonicPitch() - m_previousNotes.front()->GetDiatonicPitch());
             m_intervalsDiatonic << intervalDiatonic;
             jsonxx::Array intervalsIds;
-            for (auto previousNote : m_previousNotes) intervalsIds << previousNote->GetUuid();
-            intervalsIds << note->GetUuid();
+            for (auto previousNote : m_previousNotes) intervalsIds << previousNote->GetID();
+            intervalsIds << note->GetID();
             m_intervalsIds << jsonxx::Value(intervalsIds);
         }
         m_previousNotes.clear();

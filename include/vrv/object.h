@@ -169,7 +169,7 @@ public:
      * needs to be overridden in the child class - otherwise, it will crash.
      * Because this will create a problem if we don't check this (the parents will
      * one the same child...)
-     * UUID: the uuid is copied, is needs to be reset later if this is not wished
+     * ID: the id is copied, it needs to be reset later if this is not wished
      */
     Object(const Object &object);
 
@@ -234,10 +234,10 @@ public:
      */
     virtual void CloneReset();
 
-    const std::string &GetUuid() const { return m_uuid; }
-    void SetUuid(std::string uuid);
-    void SwapUuid(Object *other);
-    void ResetUuid();
+    const std::string &GetID() const { return m_id; }
+    void SetID(const std::string &id) { m_id = id; }
+    void SwapID(Object *other);
+    void ResetID();
 
     /**
      * Methods for setting / getting comments
@@ -411,13 +411,13 @@ public:
     bool HasDescendant(Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
-     * Look for a descendant with the specified uuid (returns NULL if not found)
-     * This method is a wrapper for the Object::FindByUuid functor.
+     * Look for a descendant with the specified id (returns NULL if not found)
+     * This method is a wrapper for the Object::FindByID functor.
      */
     ///@{
-    Object *FindDescendantByUuid(const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
-    const Object *FindDescendantByUuid(
-        const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
+    Object *FindDescendantByID(const std::string &id, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    const Object *FindDescendantByID(
+        const std::string &id, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
     ///@}
 
     /**
@@ -639,9 +639,9 @@ public:
     // Static methods //
     //----------------//
 
-    static void SeedUuid(unsigned int seed = 0);
+    static void SeedID(unsigned int seed = 0);
 
-    static std::string GenerateRandUuid();
+    static std::string GenerateRandID();
 
     static bool sortByUlx(Object *a, Object *b);
 
@@ -670,9 +670,9 @@ public:
     ///@{
 
     /**
-     * Find a Object with a specified uuid.
+     * Find a Object with a specified id.
      */
-    virtual int FindByUuid(FunctorParams *functorParams) const;
+    virtual int FindByID(FunctorParams *functorParams) const;
 
     /**
      * Find a Object with a Comparison functor.
@@ -735,9 +735,9 @@ public:
     virtual int FindSpannedLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Look for element by UUID in StaffDef elements (Clef, KeySig, etc.) of all layers within
+     * Look for element by ID in StaffDef elements (Clef, KeySig, etc.) of all layers within
      */
-    virtual int FindElementInLayerStaffDefsByUUID(FunctorParams *) const { return FUNCTOR_CONTINUE; }
+    virtual int FindElementInLayerStaffDefsByID(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the minimum left and maximum right for an alignment.
@@ -1525,12 +1525,12 @@ public:
 
 private:
     /**
-     * Method for generating the uuid.
+     * Method for generating the id.
      */
-    void GenerateUuid();
+    void GenerateID();
 
     /**
-     * Initialisation method taking the class id and a uuid prefix argument.
+     * Initialisation method taking the class id and a id prefix argument.
      */
     void Init(ClassId classId, const std::string &classIdStr);
 
@@ -1570,10 +1570,10 @@ private:
     ClassId m_classId;
 
     /**
-     * Members for storing / generating uuids
+     * Members for storing / generating ids
      */
     ///@{
-    std::string m_uuid;
+    std::string m_id;
     std::string m_classIdStr;
     ///@}
 
@@ -1636,7 +1636,7 @@ private:
     //----------------//
 
     /**
-     * A static counter for uuid generation.
+     * A static counter for id generation.
      */
     static thread_local unsigned long s_objectCounter;
 

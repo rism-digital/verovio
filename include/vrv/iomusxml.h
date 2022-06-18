@@ -363,7 +363,7 @@ private:
      */
     ///@{
     ///@}
-    void GenerateUuid(pugi::xml_node node);
+    void GenerateID(pugi::xml_node node);
 
     /*
      * @name Helper method for meterSigGrp. Separates beat/beat-type into MeterSig and adds them to the MeterSigGrp.

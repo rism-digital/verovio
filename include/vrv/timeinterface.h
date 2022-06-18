@@ -120,7 +120,7 @@ protected:
     /**
      * Extract the fragment of the start or end @xml:id if given
      */
-    void SetUuidStr();
+    void SetIDStr();
 
 private:
     //
@@ -128,7 +128,7 @@ public:
     //
 protected:
     LayerElement *m_start;
-    std::string m_startUuid;
+    std::string m_startID;
 
 private:
 };
@@ -190,7 +190,7 @@ public:
     /**
      *
      */
-    void SetUuidStr();
+    void SetIDStr();
 
     /**
      * Check if the end points are temporally ordered
@@ -246,7 +246,7 @@ public:
     //
 private:
     LayerElement *m_end;
-    std::string m_endUuid;
+    std::string m_endID;
 };
 
 } // namespace vrv

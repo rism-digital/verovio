@@ -276,9 +276,9 @@ public:
     int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::FindElementInLayerStaffDefsByUUID
+     * See Object::FindElementInLayerStaffDefsByID
      */
-    int FindElementInLayerStaffDefsByUUID(FunctorParams *) const override;
+    int FindElementInLayerStaffDefsByID(FunctorParams *) const override;
 
     /**
      * @name See Object::GenerateMIDI

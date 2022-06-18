@@ -601,7 +601,7 @@ int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
     params->m_targetLayer->ClearChildren();
     params->m_targetLayer->CloneReset();
     // Keep the xml:id of the layer in the first segment
-    params->m_targetLayer->SwapUuid(this);
+    params->m_targetLayer->SwapID(this);
     assert(params->m_targetStaff);
     params->m_targetStaff->AddChild(params->m_targetLayer);
 
@@ -789,26 +789,26 @@ int Layer::InitOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::FindElementInLayerStaffDefsByUUID(FunctorParams *functorParams) const
+int Layer::FindElementInLayerStaffDefsByID(FunctorParams *functorParams) const
 {
-    FindLayerUuidWithinStaffDefParams *params = vrv_params_cast<FindLayerUuidWithinStaffDefParams *>(functorParams);
+    FindLayerIDWithinStaffDefParams *params = vrv_params_cast<FindLayerIDWithinStaffDefParams *>(functorParams);
     assert(params);
 
     if (!this->HasStaffDef()) return FUNCTOR_SIBLINGS;
     // Get corresponding elements from the layer
-    if (this->GetStaffDefClef() && (this->GetStaffDefClef()->GetUuid() == params->m_uuid)) {
+    if (this->GetStaffDefClef() && (this->GetStaffDefClef()->GetID() == params->m_id)) {
         params->m_object = this->GetStaffDefClef();
     }
-    else if (this->GetStaffDefKeySig() && (this->GetStaffDefKeySig()->GetUuid() == params->m_uuid)) {
+    else if (this->GetStaffDefKeySig() && (this->GetStaffDefKeySig()->GetID() == params->m_id)) {
         params->m_object = this->GetStaffDefKeySig();
     }
-    else if (this->GetStaffDefMensur() && (this->GetStaffDefMensur()->GetUuid() == params->m_uuid)) {
+    else if (this->GetStaffDefMensur() && (this->GetStaffDefMensur()->GetID() == params->m_id)) {
         params->m_object = this->GetStaffDefMensur();
     }
-    else if (this->GetStaffDefMeterSig() && (this->GetStaffDefMeterSig()->GetUuid() == params->m_uuid)) {
+    else if (this->GetStaffDefMeterSig() && (this->GetStaffDefMeterSig()->GetID() == params->m_id)) {
         params->m_object = this->GetStaffDefMeterSig();
     }
-    else if (this->GetStaffDefMeterSigGrp() && (this->GetStaffDefMeterSigGrp()->GetUuid() == params->m_uuid)) {
+    else if (this->GetStaffDefMeterSigGrp() && (this->GetStaffDefMeterSigGrp()->GetID() == params->m_id)) {
         params->m_object = this->GetStaffDefMeterSigGrp();
     }
 

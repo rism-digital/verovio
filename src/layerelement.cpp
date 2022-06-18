@@ -1175,7 +1175,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
-    // if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
+    // if (m_alignment) LogDebug("Element %s %s", this->GetID().c_str(), this->GetClassName().c_str());
     assert(!m_alignment);
 
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
@@ -2240,7 +2240,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindDescendantByComparison(&comparisonFirst, 1));
     if (!m_crossStaff) {
         LogWarning("Could not get the cross staff reference '%d' for element '%s'", crossElement->GetStaff().at(0),
-            this->GetUuid().c_str());
+            this->GetID().c_str());
         return FUNCTOR_CONTINUE;
     }
 
@@ -2248,7 +2248,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     // Check if we have a cross-staff to itself...
     if (m_crossStaff == parentStaff) {
         LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff",
-            crossElement->GetStaff().at(0), this->GetUuid().c_str());
+            crossElement->GetStaff().at(0), this->GetID().c_str());
         m_crossStaff = NULL;
         return FUNCTOR_CONTINUE;
     }
@@ -2269,7 +2269,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     if (!m_crossLayer) {
         // Nothing we can do
         LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
-            crossElement->GetStaff().at(0), this->GetUuid().c_str());
+            crossElement->GetStaff().at(0), this->GetID().c_str());
         m_crossStaff = NULL;
     }
 
