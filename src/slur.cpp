@@ -1500,11 +1500,17 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
                 || ((parentFTrem = start->GetAncestorFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
                 || isGraceToNoteSlur || hasStartFlag) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
-                x1 += startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                // Secondary endpoint for grace notes is further left
+                double weight = 1.0;
+                if (nearEndCollision && (nearEndCollision->metricAtStart > 1.0) && isGraceToNoteSlur) {
+                    weight = -0.5;
+                    nearEndCollision->endPointsAdjusted = true;
+                }
+                x1 += weight * (startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
             }
             // d(^)
             else {
-                if (nearEndCollision && nearEndCollision->metricAtStart > 0.3) {
+                if (nearEndCollision && (nearEndCollision->metricAtStart > 0.3)) {
                     // Secondary endpoint on top
                     y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
                     x1 += startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
@@ -1563,7 +1569,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(Doc *doc, Staff *staff, NearEndColli
             }
             // P(_)
             else {
-                if (nearEndCollision && nearEndCollision->metricAtStart > 0.3) {
+                if (nearEndCollision && (nearEndCollision->metricAtStart > 0.3)) {
                     // Secondary endpoint on bottom
                     y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                     x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
