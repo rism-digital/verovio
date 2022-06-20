@@ -403,7 +403,7 @@ public:
     /**
      * See Object::FindSpannedLayerElements
      */
-    int FindSpannedLayerElements(FunctorParams *functorParams) override;
+    int FindSpannedLayerElements(FunctorParams *functorParams) const override;
 
     /**
      * See Object::LayerCountInTimeSpan

@@ -43,7 +43,7 @@ void BezierCurve::CalcInitialControlPointParams()
     this->SetControlHeight(0);
 }
 
-void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staffSize)
+void BezierCurve::CalcInitialControlPointParams(const Doc *doc, float angle, int staffSize)
 {
     // Note: For convex curves (both control points on the same side) we assume that the curve is rotated
     // such that p1.y == p2.y, but for curves with mixed curvature we assume that the curve is unrotated
