@@ -351,7 +351,7 @@ Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
     // x default is always set to the right for now
-    int defaultXShift = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, isCueSize);
+    int defaultXShift = doc->GetGlyphWidth(this->GetNoteheadGlyph(this->GetActualDur()), staffSize, isCueSize);
     Point p(defaultXShift, defaultYShift);
 
     // Here we should get the notehead value
@@ -1093,36 +1093,16 @@ int Note::CalcStem(FunctorParams *functorParams)
 
 int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 {
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
+    CalcChordNoteHeadsParams *params = vrv_params_cast<CalcChordNoteHeadsParams *>(functorParams);
     assert(params);
 
     Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     const int staffSize = staff->m_drawingStaffSize;
 
-    bool mixedCue = false;
-    if (Chord *chord = this->IsChordTone(); chord != NULL) {
-        mixedCue = (chord->GetDrawingCueSize() != this->GetDrawingCueSize());
-    }
-
-    // Nothing to do for notes that are not in a cluster and without cue mixing
-    if (!m_cluster && !mixedCue) return FUNCTOR_SIBLINGS;
-
-    int diameter = 2 * this->GetDrawingRadius(params->m_doc);
-
-    // If chord consists partially of cue notes we may have to shift the noteheads
-    int cueShift = 0;
-    if (mixedCue && (this->GetDrawingStemDir() == STEMDIRECTION_up)) {
-        const double cueScaling = params->m_doc->GetCueScaling();
-        assert(cueScaling > 0.0);
-
-        if (this->GetDrawingCueSize()) {
-            // Note is cue and chord is not
-            cueShift = (1.0 / cueScaling - 1.0) * diameter; // shift to the right
-        }
-        else {
-            // Chord is cue and note is not
-            cueShift = (cueScaling - 1.0) * diameter; // shift to the left
-        }
+    const int diameter = 2 * this->GetDrawingRadius(params->m_doc);
+    int noteheadShift = 0;
+    if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (params->m_diameter)) {
+        noteheadShift = params->m_diameter - diameter;
     }
 
     /************** notehead direction **************/
@@ -1156,7 +1136,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
             this->SetDrawingXRel(-diameter + params->m_doc->GetDrawingStemWidth(staffSize));
         }
     }
-    this->SetDrawingXRel(this->GetDrawingXRel() + cueShift);
+    this->SetDrawingXRel(this->GetDrawingXRel() + noteheadShift);
 
     this->SetFlippedNotehead(flippedNotehead);
 

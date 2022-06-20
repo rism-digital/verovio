@@ -1130,6 +1130,27 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CalcChordNoteHeadsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the doc
+ * member 1: diameter of the anchoring note of the chord
+ **/
+
+class CalcChordNoteHeadsParams : public FunctorParams {
+public:
+    CalcChordNoteHeadsParams(Doc *doc)
+    {
+        m_doc = doc;
+        m_diameter = 0;
+    }
+
+    Doc *m_doc;
+    int m_diameter;
+};
+
+//----------------------------------------------------------------------------
 // CastOffEncodingParams
 //----------------------------------------------------------------------------
 
