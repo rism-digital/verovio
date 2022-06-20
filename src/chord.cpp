@@ -762,6 +762,7 @@ int Chord::CalcChordNoteHeads(FunctorParams *functorParams)
 
     Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
 
+    params->m_diameter = 0;
     if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
         if (this->IsInBeam()) {
             params->m_diameter = 2 * this->GetDrawingRadius(params->m_doc);

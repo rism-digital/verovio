@@ -1101,7 +1101,9 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 
     const int diameter = 2 * this->GetDrawingRadius(params->m_doc);
     int noteheadShift = 0;
-    if (this->GetDrawingStemDir() == STEMDIRECTION_up) noteheadShift = params->m_diameter - diameter;
+    if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (params->m_diameter)) {
+        noteheadShift = params->m_diameter - diameter;
+    }
 
     /************** notehead direction **************/
 
