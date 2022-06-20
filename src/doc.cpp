@@ -407,10 +407,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
-            int trackCount = midiFile->getTrackCount();
-            int addCount = midiTrack + 1 - trackCount;
-            if (addCount > 0) {
-                midiFile->addTracks(addCount);
+            if (midiFile->getTrackCount() < (midiTrack + 1)) {
+                midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
             }
             // set MIDI channel and instrument
             InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
@@ -421,8 +419,18 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             }
             if (instrdef) {
                 if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel();
-                if (instrdef->HasMidiInstrnum())
+                if (instrdef->HasMidiTrack()) {
+                    midiTrack = instrdef->GetMidiTrack();
+                    if (midiFile->getTrackCount() < (midiTrack + 1)) {
+                        midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
+                    }
+                    if (midiTrack > 255) {
+                        LogWarning("A high MIDI track number was assigned to staff %d", staffDef->GetN());
+                    }
+                }
+                if (instrdef->HasMidiInstrnum()) {
                     midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum());
+                }
             }
             // set MIDI track name
             Label *label = dynamic_cast<Label *>(staffDef->FindDescendantByType(LABEL, 1));
