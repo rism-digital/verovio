@@ -75,8 +75,8 @@ void Tie::Reset()
     this->ResetCurveRend();
 }
 
-bool Tie::AdjustEnharmonicTies(const Doc *doc, FloatingCurvePositioner *curve, Point bezier[4], const Note *startNote,
-    const Note *endNote, curvature_CURVEDIR drawingCurveDir)
+bool Tie::AdjustEnharmonicTies(const Doc *doc, const FloatingCurvePositioner *curve, Point bezier[4],
+    const Note *startNote, const Note *endNote, curvature_CURVEDIR drawingCurveDir) const
 {
     ListOfConstObjects objects = endNote->FindAllDescendantsByType(ACCID);
     if (objects.empty()) return false;
@@ -466,8 +466,8 @@ void Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *st
     }
 }
 
-curvature_CURVEDIR Tie::GetPreferredCurveDirection(
-    Layer *layer, Note *note, Chord *startParentChord, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter)
+curvature_CURVEDIR Tie::GetPreferredCurveDirection(const Layer *layer, const Note *note, const Chord *startParentChord,
+    data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter) const
 {
     data_STEMDIRECTION layerStemDir;
     curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
@@ -504,10 +504,10 @@ curvature_CURVEDIR Tie::GetPreferredCurveDirection(
     return drawingCurveDir;
 }
 
-void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], LayerElement *durElement,
-    Note *startNote, int drawingUnit, curvature_CURVEDIR drawingCurveDir)
+void Tie::UpdateTiePositioning(const FloatingCurvePositioner *curve, Point bezier[4], const LayerElement *durElement,
+    const Note *startNote, int drawingUnit, curvature_CURVEDIR drawingCurveDir) const
 {
-    ListOfObjects objects;
+    ListOfConstObjects objects;
     ClassIdsComparison cmp({ DOT, DOTS, FLAG });
     durElement->FindAllDescendantsByComparison(&objects, &cmp);
 
@@ -527,13 +527,13 @@ void Tie::UpdateTiePositioning(FloatingCurvePositioner *curve, Point bezier[4], 
             // chord gets separate BB
             int oppositeOverlap = 0;
             // calculate position for the tie in case there is overlap with FLAG in the future
-            dotsPosition
-                = object->GetDrawingX() + (1 + dynamic_cast<AttAugmentDots *>(durElement)->GetDots()) * drawingUnit;
+            dotsPosition = object->GetDrawingX()
+                + (1 + dynamic_cast<const AttAugmentDots *>(durElement)->GetDots()) * drawingUnit;
             if (durElement->Is(CHORD)) {
                 // If this is chord, we need to make sure that ties is compared agains relative dot. Since all dots have
                 // one BB and this action is done for outer ties only, we can safely take height of the BB to determine
                 // margin for adjustment calculation
-                Chord *parentChord = vrv_cast<Chord *>(durElement);
+                const Chord *parentChord = vrv_cast<const Chord *>(durElement);
                 int offset = (object->GetSelfRight() - object->GetSelfLeft()) / parentChord->GetDots();
                 if ((drawingCurveDir == curvature_CURVEDIR_above) && (startNote != parentChord->GetTopNote())) {
                     margin = object->GetSelfBottom() - object->GetSelfTop() + offset;
