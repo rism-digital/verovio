@@ -9635,6 +9635,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
                 else {
                     std::cerr << "Strange error for adding rest " << trest << std::endl;
+                    std::cerr << "LINE: " << trest->getLineNumber() << ", FIELD: " << trest->getFieldNumber() << std::endl;
                 }
             }
 
@@ -17894,7 +17895,6 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     std::vector<int> beamnum;
     std::vector<int> gbeamnum;
     analyzeLayerBeams(beamnum, gbeamnum, layerdata);
-
     tgs.clear();
 
     // duritems == a list of items in the layer which have duration.
@@ -18763,7 +18763,7 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
                 scaleadj.at(j) = 2;
                 break;
             }
-            cerr << "SOMETHING STANGE HAPPENED HERE2" << endl;
+            cerr << "SOMETHING STRANGE HAPPENED HERE2" << endl;
         }
 
         newtg.at(i)->tupletend = 0;
@@ -26832,7 +26832,7 @@ void HumdrumInput::createGlissando(hum::HTp glissStart, hum::HTp glissEnd)
             glissId += "S";
             glissId += to_string(i + 1);
         }
-        gliss->SetUuid(glissId);
+        gliss->SetID(glissId);
         m_measure->AddChild(gliss);
     }
 }
