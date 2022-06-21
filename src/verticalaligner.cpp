@@ -815,8 +815,10 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         }
         // Handle within placement (ignore collisions for certain classes)
         if (place == STAFFREL_within) {
+            if (params->m_classId == DIR) continue;
             if (params->m_classId == HAIRPIN) continue;
         }
+
         auto i = overflowBoxes->begin();
         auto end = overflowBoxes->end();
         while (i != end) {

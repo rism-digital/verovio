@@ -1558,7 +1558,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
         dirTxt.SetPointSize(params.m_pointSize);
 
-        if (dir->GetPlace() == STAFFREL_between) {
+        if ((dir->GetPlace() == STAFFREL_between) || (dir->GetPlace() == STAFFREL_within)) {
             if (lineCount > 1) {
                 params.m_y += (m_doc->GetTextLineHeight(&dirTxt, false) * (lineCount - 1) / 2);
             }
