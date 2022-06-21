@@ -379,7 +379,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 assert(turn);
                 yRel += turn->GetTurnHeight(doc, staffSize) / 2;
             }
-            else {
+            else if (!m_object->Is(HAIRPIN)) {
                 yRel += (this->GetContentY2() - this->GetContentY1()) / 2;
             }
             this->SetDrawingYRel(yRel);
