@@ -1820,6 +1820,30 @@ MidiEvent* MidiFile::addTempo(int aTrack, int aTick, double aTempo) {
 
 //////////////////////////////
 //
+// MidiFile::addKeySignature -- Add a key signature meta message
+//      (meta #0x59).
+//
+// Default values:
+//      fifths ==  0 (C)
+//      mode   ==  0 (major)
+//
+// Key signature of b minor would be:
+//      fifths = 2
+//      mode   = 1
+//
+
+MidiEvent* MidiFile::addKeySignature (int aTrack, int aTick, int fifths, bool mode) {
+    MidiEvent* me = new MidiEvent;
+    me->makeKeySignature(fifths, mode);
+    me->tick = aTick;
+    m_events[aTrack]->push_back_no_copy(me);
+    return me;
+}
+
+
+
+//////////////////////////////
+//
 // MidiFile::addTimeSignature -- Add a time signature meta message
 //      (meta #0x58).  The "bottom" parameter must be a power of two;
 //      otherwise, it will be set to the next highest power of two.

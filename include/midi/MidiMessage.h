@@ -140,6 +140,7 @@ class MidiMessage : public std::vector<uchar> {
 		void           makeLyric            (const std::string& text);
 		void           makeMarker           (const std::string& text);
 		void           makeCue              (const std::string& text);
+		void           makeKeySignature     (int fifths, bool mode = 0);
 		void           makeTimeSignature    (int top, int bottom,
 		                                     int clocksPerClick = 24,
 		                                     int num32dsPerQuarter = 8);

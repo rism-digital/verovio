@@ -1596,6 +1596,31 @@ void MidiMessage::setTempoMicroseconds(int microseconds) {
 
 //////////////////////////////
 //
+// MidiMessage::makeKeySignature -- create a key signature meta message
+//      (meta #0x59).
+//
+// Default values:
+//      fifths ==  0 (C)
+//      mode   ==  0 (major)
+//
+// Key signature of b minor would be:
+//      fifths = 2
+//      mode   = 1
+//
+
+void MidiMessage::makeKeySignature(int fifths, bool mode) {
+    resize(5);
+    (*this)[0] = 0xff;
+    (*this)[1] = 0x59;
+    (*this)[2] = 0x02;
+    (*this)[3] = 0xff & fifths;
+    (*this)[4] = 0xff & (int)mode;
+}
+
+
+
+//////////////////////////////
+//
 // MidiMessage::makeTimeSignature -- create a time signature meta message
 //      (meta #0x58).  The "bottom" parameter should be a power of two;
 //      otherwise, it will be forced to be the next highest power of two,
