@@ -402,8 +402,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     for (staves = initProcessingListsParams.m_layerTree.child.begin();
          staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
 
+        ScoreDef *currentScoreDef = this->GetCurrentScoreDef();
         int transSemi = 0;
-        if (StaffDef *staffDef = this->GetCurrentScoreDef()->GetStaffDef(staves->first)) {
+        if (StaffDef *staffDef = currentScoreDef->GetStaffDef(staves->first)) {
             // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
@@ -443,11 +444,23 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 std::string trackName = UTF16to8(label->GetText(label)).c_str();
                 if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
             }
+            // set MIDI key signature
+            KeySig *keySig = dynamic_cast<KeySig *>(staffDef->FindDescendantByType(KEYSIG));
+            if (!keySig && (currentScoreDef->HasKeySigInfo())) {
+                keySig = dynamic_cast<KeySig *>(currentScoreDef->GetKeySig());
+            }
+            if (keySig && keySig->HasSig()) {
+                midiFile->addKeySignature(midiTrack, 0, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
+            }
             // set MIDI time signature
-            MeterSig *meterSig = dynamic_cast<MeterSig *>(this->GetCurrentScoreDef()->FindDescendantByType(METERSIG));
+            MeterSig *meterSig = dynamic_cast<MeterSig *>(staffDef->FindDescendantByType(METERSIG));
+            if (!meterSig && (currentScoreDef->HasMeterSigInfo())) {
+                meterSig = dynamic_cast<MeterSig *>(currentScoreDef->GetMeterSig());
+            }
             if (meterSig && meterSig->HasCount()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
+            // set MIDI tuning
             this->TuneMIDI(midiFile, { midiTrack, 0 }, temper, tuneHz);
         }
 
