@@ -625,16 +625,10 @@ void View::DrawHairpin(
     // Now swap start/end for dim.
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
 
-    int y1 = hairpin->GetDrawingY();
-    if (hairpin->GetPlace() != STAFFREL_between) {
-        y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
-    int y2 = y1;
+    const int y1 = hairpin->GetDrawingY();
+    const int y2 = y1;
 
     /************** draw it **************/
-
-    y1 -= m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
-    y2 -= m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
 
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetID());
