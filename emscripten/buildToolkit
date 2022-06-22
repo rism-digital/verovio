@@ -219,7 +219,7 @@ $exports .= "]\"";
 
 my $extra_exports = "-s EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
 
-my $modularize = "-s MODULARIZE=".($modularizeQ ? "1" : "0")." -s EXPORT_NAME=\"'createVerovioModule'\"";
+my $modularize = $modularizeQ ? "-s MODULARIZE=1 -s EXPORT_NAME=\"'createVerovioModule'\"" : "";
 
 if ($makeQ) {
 	system("rm -rf CMakeFiles/");
