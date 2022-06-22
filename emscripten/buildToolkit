@@ -246,26 +246,30 @@ system($ccCmd);
 if ($? == 0) {
 	print " Done.\n";
 
-    `npm --prefix npm install`;
-    `npm --prefix npm run prebundle -- -o "\$(pwd)/$BUILD_DIR/$FILENAME"`;
+    # skip prebundled wasm module with verovio toolkit for modularized builds
+    if(!$modularizeQ) {
+        `npm --prefix npm install`;
+        `npm --prefix npm run prebundle -- -o "\$(pwd)/$BUILD_DIR/$FILENAME"`;
 
-	if (!$wasmQ && !$VERSION) {
-		my $warning = "\nconsole.warn('The use of this build of the JS toolkit is deprecated. See https://github.com/rism-digital/verovio/discussions/2897');";
-		`echo "$warning" >> $BUILD_DIR/$FILENAME`;
-	}
+        if (!$wasmQ && !$VERSION) {
+            my $warning = "\nconsole.warn('The use of this build of the JS toolkit is deprecated. See https://github.com/rism-digital/verovio/discussions/2897');";
+            `echo "$warning" >> $BUILD_DIR/$FILENAME`;
+        }
 
-	# create a gzip version
-	`(cd $BUILD_DIR && gzip -c $FILENAME > $FILENAME.gz)`;
-	print "$BUILD_DIR/$FILENAME.gz was created\n";
+        # create a gzip version
+        `(cd $BUILD_DIR && gzip -c $FILENAME > $FILENAME.gz)`;
+        print "$BUILD_DIR/$FILENAME.gz was created\n";
 
-	# all good
-	print "$BUILD_DIR/$FILENAME was created\n";
+        # all good
+        print "$BUILD_DIR/$FILENAME was created\n";
 
-	# create also a zip file if version name is given
-	if ($VERSION) {
-		`(cd $BUILD_DIR && zip $FILENAME.zip $FILENAME)`;
-		print "$BUILD_DIR/$FILENAME.zip was created\n";
-	}
+        # create also a zip file if version name is given
+        if ($VERSION) {
+            `(cd $BUILD_DIR && zip $FILENAME.zip $FILENAME)`;
+            print "$BUILD_DIR/$FILENAME.zip was created\n";
+        }
+    }
+
 } else {
 	print " Failed.\n";
 }
