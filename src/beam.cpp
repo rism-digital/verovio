@@ -346,8 +346,8 @@ std::pair<int, int> BeamSegment::GetMinimalStemLength(
         const Stem *stem = stemmedInterface->GetDrawingStem();
         const bool isStemUp = (stem->GetDrawingStemDir() == STEMDIRECTION_up);
         const int sign = isStemUp ? -1 : 1;
-        const int beamOverlap = hasFrenchStyle ? beamInterface->m_beamWidthBlack : beamInterface->GetTotalBeamWidth();
-        const int stemLength = sign * (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()) - beamOverlap;
+        int stemLength = sign * (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust());
+        if (!hasFrenchStyle) stemLength += beamInterface->m_beamWidthBlack - beamInterface->GetTotalBeamWidth();
 
         // Update the min length
         int &minLength = isStemUp ? minLengthBelow : minLengthAbove;
@@ -1571,6 +1571,41 @@ void BeamSegment::CalcNoteHeadShiftForStemSameas(Beam *sameasBeam, data_BEAMPLAC
     }
 }
 
+void BeamSegment::RequestStaffSpace(const Doc *doc, const BeamDrawingInterface *beamInterface)
+{
+    assert(doc);
+    assert(beamInterface);
+
+    if (beamInterface->m_drawingPlace != BEAMPLACE_mixed) return;
+    if (!beamInterface->m_beamStaff || !beamInterface->m_crossStaffContent) return;
+
+    // Min length is 4 units
+    const int minLength = 4 * doc->GetDrawingUnit(beamInterface->m_beamStaff->m_drawingStaffSize);
+
+    // Determine the alignments above and below
+    StaffAlignment *above = NULL;
+    StaffAlignment *below = NULL;
+    if (beamInterface->m_beamStaff->GetN() < beamInterface->m_crossStaffContent->GetN()) {
+        above = beamInterface->m_beamStaff->GetAlignment();
+        below = beamInterface->m_crossStaffContent->GetAlignment();
+    }
+    else {
+        above = beamInterface->m_crossStaffContent->GetAlignment();
+        below = beamInterface->m_beamStaff->GetAlignment();
+    }
+
+    // Update the requested staff space
+    const bool hasFrenchStyle = doc->GetOptions()->m_beamFrenchStyle.GetValue() && (m_beamElementCoordRefs.size() > 2);
+    int minLengthAbove, minLengthBelow;
+    std::tie(minLengthAbove, minLengthBelow) = this->GetMinimalStemLength(beamInterface, hasFrenchStyle);
+    if ((minLengthAbove < minLength) && above) {
+        above->SetRequestedSpaceBelow(minLength - minLengthAbove);
+    }
+    if ((minLengthBelow < minLength) && below) {
+        below->SetRequestedSpaceAbove(minLength - minLengthBelow);
+    }
+}
+
 //----------------------------------------------------------------------------
 // Beam
 //----------------------------------------------------------------------------
@@ -2080,7 +2115,10 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
 
     // process highest-level beam
     if (!params->m_beam) {
-        if (m_drawingPlace != BEAMPLACE_mixed) {
+        if (m_drawingPlace == BEAMPLACE_mixed) {
+            m_beamSegment.RequestStaffSpace(params->m_doc, this);
+        }
+        else {
             params->m_beam = this;
             params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
             params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;

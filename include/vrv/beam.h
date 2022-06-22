@@ -97,6 +97,11 @@ public:
     void CalcNoteHeadShiftForStemSameas(Beam *sameasBeam, data_BEAMPLACE place);
     ///@}
 
+    /**
+     * Request staff space for mixed beams if minimal stem length is too short
+     */
+    void RequestStaffSpace(const Doc *doc, const BeamDrawingInterface *beamInterface);
+
 private:
     // Helper to adjust stem length to extend only towards outmost subbeam (if option "--beam-french-style" is set)
     void AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterface);
