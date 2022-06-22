@@ -1106,9 +1106,10 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
     // Calculate the overlap from requested staff space
     const int currentStaffDistance
         = params->m_previous->GetYRel() - params->m_previous->GetStaffHeight() - this->GetYRel();
-    const int requestedSpace = std::max(this->GetRequestedSpaceAbove(), params->m_previous->GetRequestedSpaceBelow());
-    if ((requestedSpace > 0) && (spacing < (currentStaffDistance + requestedSpace))) {
-        this->SetOverlap(currentStaffDistance + requestedSpace - spacing);
+    int requestedSpace = std::max(this->GetRequestedSpaceAbove(), params->m_previous->GetRequestedSpaceBelow());
+    if (spacing > currentStaffDistance) requestedSpace += currentStaffDistance - spacing;
+    if (requestedSpace > 0) {
+        this->SetOverlap(requestedSpace);
     }
 
     // This is the bottom alignment (or something is wrong) - this is all we need to do
