@@ -38,6 +38,7 @@ Options:
 -P      Disable PAE importer
 -X      Disable MusicXML importer
 -M      Clean existing makefile
+-m      Modularize emscripten build
 
 EOT
 }
@@ -50,7 +51,7 @@ die "ERROR: emscripten cmake (emcmake) not found.\n" unless $EMCMAKE;
 die "ERROR: emscripten make (emmake) not found.\n" unless $EMMAKE;
 
 # Parse command-line options
-my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ);
+my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularizeQ);
 my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
@@ -67,6 +68,7 @@ GetOptions (
 	'v|version=s'   => \$VERSION,
 	'x|exclusion=s' => \$exclusion,
 	'w|wasm'        => \$wasmQ,
+	'm|modularize' => \$modularizeQ,
 	'D|no-darms'    => \$nodarms,
 	'H|no-humdrum'  => \$nohumdrum,
 	'P|no-pae'      => \$nopae,
@@ -134,6 +136,11 @@ if (!$nohumdrum) {
 	$FLAGS_NAME .= "-hum";
 }
 
+if($modularizeQ) {
+    print "Creating modularized emscripten build\n";
+    $FLAGS_NAME .= "-modularize";
+}
+
 if ($helpQ) {
 	print_help();
 	exit 2;
@@ -144,8 +151,6 @@ my $FILENAME = "verovio-toolkit$FLAGS_NAME.js";
 my $DATA_DIR  = "data";
 my $BUILD_DIR = "build";
 $BUILD_DIR .= "/$VERSION" if $VERSION;
-my $NPM = "npm";
-$NPM .= "-hum" if !$nohumdrum;
 
 print "Compiled files will be written to $BUILD_DIR\n";
 
@@ -214,6 +219,8 @@ $exports .= "]\"";
 
 my $extra_exports = "-s EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
 
+my $modularize = $modularizeQ ? "-s MODULARIZE=1 -s EXPORT_NAME=\"'createVerovioModule'\"" : "";
+
 if ($makeQ) {
 	system("rm -rf CMakeFiles/");
 	system("rm CMakeCache.txt");
@@ -228,7 +235,7 @@ my $makeCmd = "$EMMAKE make -j 8";
 system($makeCmd);
 
 print "*************\nLinking...\n";
-my $ccCmd = "$EMCC $CHATTY libverovio.a $LFLAGS $FLAGS $embed $exports $extra_exports $output";
+my $ccCmd = "$EMCC $CHATTY libverovio.a $LFLAGS $FLAGS $embed $exports $extra_exports $output $modularize";
 print "$ccCmd\n" if $CHATTY;
 
 system($ccCmd);
@@ -236,32 +243,30 @@ system($ccCmd);
 if ($? == 0) {
 	print " Done.\n";
 
-	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
-	`cat $BUILD_DIR/verovio.js verovio-js-start.js verovio-proxy.js > $BUILD_DIR/$FILENAME`;
+    # skip prebundled wasm module with verovio toolkit for modularized builds
+    if(!$modularizeQ) {
+        `npm --prefix npm install`;
+        `npm --prefix npm run prebundle -- -o "\$(pwd)/$BUILD_DIR/$FILENAME"`;
 
-	# wrap the npm package (only for wasm builds)
-	if ($wasmQ) {
-		print "Building $NPM package\n";
-		# the cat order is different for the npm package because we want to wrap the Module in the init function
-		`cat verovio-npm-start.js $BUILD_DIR/verovio.js verovio-proxy.js verovio-npm-end.js > $NPM/index.js`;
-	}
-	elsif (!$VERSION) {
-		my $warning = "\nconsole.warn('The use of this build of the JS toolkit is deprecated. See https://github.com/rism-digital/verovio/discussions/2897');";
-		`echo "$warning" >> $BUILD_DIR/$FILENAME`;
-	}
+        if (!$wasmQ && !$VERSION) {
+            my $warning = "\nconsole.warn('The use of this build of the JS toolkit is deprecated. See https://github.com/rism-digital/verovio/discussions/2897');";
+            `echo "$warning" >> $BUILD_DIR/$FILENAME`;
+        }
 
-	# create a gzip version
-	`(cd $BUILD_DIR && gzip -c $FILENAME > $FILENAME.gz)`;
-	print "$BUILD_DIR/$FILENAME.gz was created\n";
+        # create a gzip version
+        `(cd $BUILD_DIR && gzip -c $FILENAME > $FILENAME.gz)`;
+        print "$BUILD_DIR/$FILENAME.gz was created\n";
 
-	# all good
-	print "$BUILD_DIR/$FILENAME was created\n";
+        # all good
+        print "$BUILD_DIR/$FILENAME was created\n";
 
-	# create also a zip file if version name is given
-	if ($VERSION) {
-		`(cd $BUILD_DIR && zip $FILENAME.zip $FILENAME)`;
-		print "$BUILD_DIR/$FILENAME.zip was created\n";
-	}
+        # create also a zip file if version name is given
+        if ($VERSION) {
+            `(cd $BUILD_DIR && zip $FILENAME.zip $FILENAME)`;
+            print "$BUILD_DIR/$FILENAME.zip was created\n";
+        }
+    }
+
 } else {
 	print " Failed.\n";
 }
