@@ -246,6 +246,7 @@ system($ccCmd);
 if ($? == 0) {
 	print " Done.\n";
 
+    `npm --prefix npm install`;
     `npm --prefix npm run prebundle -- -o "\$(pwd)/$BUILD_DIR/$FILENAME"`;
 
 	if (!$wasmQ && !$VERSION) {
