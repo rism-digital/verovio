@@ -76,8 +76,6 @@ GetOptions (
 	'M|make' => \$makeQ
 );
 
-my $exportName = "VerovioModule";
-
 # Default compiling uses ASM and large file support.
 # Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
 # Empirically, the memory amount required is roughly 5 times the file size.
@@ -141,7 +139,6 @@ if (!$nohumdrum) {
 if($modularizeQ) {
     print "Creating modularized emscripten build\n";
     $FLAGS_NAME .= "-modularize";
-    $exportName = "createVerovioModule";
 }
 
 if ($helpQ) {
@@ -220,9 +217,9 @@ $exports .= "'_malloc',";
 $exports .= "'_free'";
 $exports .= "]\"";
 
-my $extra_exports = "-s EXPORTED_RUNTIME_METHODS='[\"cwrap\"]' -s EXPORT_NAME=\"'$exportName'\"";
+my $extra_exports = "-s EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
 
-my $modularize = "-s MODULARIZE=".($modularizeQ ? "1" : "0");
+my $modularize = "-s MODULARIZE=".($modularizeQ ? "1" : "0")." -s EXPORT_NAME=\"'createVerovioModule'\"";
 
 if ($makeQ) {
 	system("rm -rf CMakeFiles/");
