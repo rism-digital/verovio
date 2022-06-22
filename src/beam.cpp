@@ -323,6 +323,44 @@ bool BeamSegment::DoesBeamOverlap(
     return (overlapping != m_beamElementCoordRefs.end());
 }
 
+std::pair<int, int> BeamSegment::GetMinimalStemLength(
+    const BeamDrawingInterface *beamInterface, bool hasFrenchStyle) const
+{
+    assert(beamInterface);
+
+    int minLengthAbove = VRV_UNSET;
+    int minLengthBelow = VRV_UNSET;
+
+    // lambda check whether coord has element set and whether that element is CHORD or NOTE
+    const auto isNoteOrChord = [](BeamElementCoord *coord) {
+        return (coord->m_element && coord->m_element->Is({ CHORD, NOTE }));
+    };
+
+    using CoordIt = ArrayOfBeamElementCoords::const_iterator;
+    for (CoordIt it = m_beamElementCoordRefs.begin(); it != m_beamElementCoordRefs.end(); ++it) {
+        if (!isNoteOrChord(*it)) continue;
+
+        // Get the current stem length
+        const StemmedDrawingInterface *stemmedInterface = (*it)->GetStemHolderInterface();
+        if (!stemmedInterface) continue;
+        const Stem *stem = stemmedInterface->GetDrawingStem();
+        const bool isStemUp = (stem->GetDrawingStemDir() == STEMDIRECTION_up);
+        const int sign = isStemUp ? -1 : 1;
+        const int beamOverlap = hasFrenchStyle ? beamInterface->m_beamWidthBlack : beamInterface->GetTotalBeamWidth();
+        const int stemLength = sign * (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()) - beamOverlap;
+
+        // Update the min length
+        int &minLength = isStemUp ? minLengthBelow : minLengthAbove;
+        if (minLength == VRV_UNSET) {
+            minLength = stemLength;
+        }
+        else {
+            minLength = std::min(minLength, stemLength);
+        }
+    }
+    return { minLengthAbove, minLengthBelow };
+}
+
 bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface)
 {
     const int unit = doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
