@@ -37,6 +37,7 @@
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
+#include "MidiEvent.h"
 
 namespace vrv {
 
@@ -742,19 +743,51 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    if (this->HasTuneTemper()) {
-        const data_TEMPERAMENT temper = this->GetTuneTemper();
-        if (temper != params->m_currentTemperament) {
-            params->m_currentTemperament = temper;
-            params->m_hasTuningChanged = true;
+    double totalTime = params->m_totalTime;
+    // check next measure for the time offset
+    Object *parent = this->GetParent();
+    if (parent && (parent->GetLast() != this)) {
+        Object *next = parent->GetNext(this);
+        if (next && next->Is(MEASURE)) {
+            Measure *nextMeasure = vrv_cast<Measure *>(next);
+            const std::vector<double> &nextMeasureOffset = nextMeasure->GetTimeOffsetReference();
+            if (!nextMeasureOffset.empty()) {
+                totalTime = nextMeasureOffset.back();
+            }
         }
     }
+    smf::MidiEvent midiEvent;
+    midiEvent.tick = totalTime * params->m_midiFile->getTPQ();
+    // calculate reference pitch class based on @tune.pname
+    int referencePitchClass = 0;
+    if (this->HasTunePname()) {
+        Note tempNote;
+        tempNote.SetPname(this->GetTunePname());
+        const int midiPitch = tempNote.GetMIDIPitch();
+        referencePitchClass = (midiPitch - 61) % 12;
+    }
+    // set temperament event if corresponding attribute present
+    if (this->HasTuneTemper()) {
+        switch (this->GetTuneTemper()) {
+            case TEMPERAMENT_equal: midiEvent.makeTemperamentEqual(referencePitchClass); break;
+            case TEMPERAMENT_just: midiEvent.makeTemperamentBad(100.0, referencePitchClass); break;
+            case TEMPERAMENT_mean: midiEvent.makeTemperamentMeantone(referencePitchClass); break;
+            case TEMPERAMENT_pythagorean: midiEvent.makeTemperamentPythagorean(referencePitchClass); break;
+            default: break;
+        }
+        params->m_midiFile->addEvent(params->m_midiTrack, midiEvent);
+    }
+    // set tuning
     if (this->HasTuneHz()) {
         const double tuneHz = this->GetTuneHz();
-        if (tuneHz != params->m_currentTune) {
-            params->m_currentTune = tuneHz;
-            params->m_hasTuningChanged = true;
+        // Add tuning for all keys from 0 to 127
+        std::vector<std::pair<int, double>> tuneFrequencies;
+        for (int i = 0; i < 127; i++) {
+            double freq = pow(2.0, (i - 69.0) / 12.0) * tuneHz;
+            tuneFrequencies.push_back(std::make_pair(i, freq));
         }
+        midiEvent.makeMts2_KeyTuningsByFrequency(tuneFrequencies);
+        params->m_midiFile->addEvent(params->m_midiTrack, midiEvent);
     }
 
     return FUNCTOR_CONTINUE;

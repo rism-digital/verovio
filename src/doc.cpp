@@ -316,33 +316,6 @@ void Doc::CalculateTimemap()
     m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }
 
-void Doc::TuneMIDI(
-    smf::MidiFile *midiFile, const std::pair<int, int> &trackPosition, data_TEMPERAMENT temper, double tuneHz)
-{
-    smf::MidiEvent midiEvent;
-    midiEvent.tick = trackPosition.second;
-    if (temper != TEMPERAMENT_NONE) {
-        switch (temper) {
-            case TEMPERAMENT_equal: midiEvent.makeTemperamentEqual(); break;
-            case TEMPERAMENT_just: midiEvent.makeTemperamentBad(); break;
-            case TEMPERAMENT_mean: midiEvent.makeTemperamentMeantone(); break;
-            case TEMPERAMENT_pythagorean: midiEvent.makeTemperamentPythagorean(); break;
-            default: return;
-        }
-        midiFile->addEvent(trackPosition.first, midiEvent);
-    }
-    else if (tuneHz > 0.0) {
-        // Add tuning for all keys from 0 to 127
-        std::vector<std::pair<int, double>> tuneFrequencies;
-        for (int i = 0; i < 127; i++) {
-            double freq = pow(2.0, (i - 69.0) / 12.0) * tuneHz;
-            tuneFrequencies.push_back(std::make_pair(i, freq));
-        }
-        midiEvent.makeMts2_KeyTuningsByFrequency(tuneFrequencies);
-        midiFile->addEvent(trackPosition.first, midiEvent);
-    }
-}
-
 void Doc::ExportMIDI(smf::MidiFile *midiFile)
 {
 
@@ -361,15 +334,6 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         tempo = this->GetCurrentScoreDef()->GetMidiBpm();
     }
     midiFile->addTempo(0, 0, tempo);
-
-    data_TEMPERAMENT temper = TEMPERAMENT_NONE;
-    if (this->GetCurrentScoreDef()->HasTuneTemper()) {
-        temper = this->GetCurrentScoreDef()->GetTuneTemper();
-    }
-    double tuneHz = 0.0;
-    if (this->GetCurrentScoreDef()->HasTuneHz()) {
-        tuneHz = this->GetCurrentScoreDef()->GetTuneHz();
-    }
 
     // Capture information for MIDI generation, i.e. from control elements
     Functor initMIDI(&Object::InitMIDI);
@@ -460,9 +424,15 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             if (meterSig && meterSig->HasCount()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
-            // set MIDI tuning
-            this->TuneMIDI(midiFile, { midiTrack, 0 }, temper, tuneHz);
         }
+
+        // Set initial scoreDef values for tuning
+        Functor generateScoreDefMIDI(&Object::GenerateMIDI);
+        Functor generateScoreDefMIDIEnd(&Object::GenerateMIDIEnd);
+        GenerateMIDIParams generateScoreDefMIDIParams(midiFile, this, &generateScoreDefMIDI);
+        generateScoreDefMIDIParams.m_midiChannel = midiChannel;
+        generateScoreDefMIDIParams.m_midiTrack = midiTrack;
+        currentScoreDef->Process(&generateScoreDefMIDI, &generateScoreDefMIDIParams, &generateScoreDefMIDIEnd);
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.Clear();
@@ -480,7 +450,6 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDIParams.m_staffN = staves->first;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;
-            generateMIDIParams.m_currentTemperament = temper;
             generateMIDIParams.m_deferredNotes = initMIDIParams.m_deferredNotes;
             generateMIDIParams.m_cueExclusion = this->GetOptions()->m_midiNoCue.GetValue();
 

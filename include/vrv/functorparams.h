@@ -1753,16 +1753,12 @@ public:
     GenerateMIDIParams(smf::MidiFile *midiFile, Doc *doc, Functor *functor)
     {
         m_midiFile = midiFile;
-        m_doc = doc;
         m_midiTrack = 1;
         m_midiChannel = 0;
         m_totalTime = 0.0;
         m_staffN = 0;
         m_transSemi = 0;
         m_currentTempo = MIDI_TEMPO;
-        m_currentTemperament = TEMPERAMENT_NONE;
-        m_currentTune = 0.0;
-        m_hasTuningChanged = false;
         m_lastNote = NULL;
         m_accentedGraceNote = false;
         m_cueExclusion = false;
@@ -1776,9 +1772,6 @@ public:
     int m_staffN;
     int m_transSemi;
     double m_currentTempo;
-    data_TEMPERAMENT m_currentTemperament;
-    double m_currentTune;
-    bool m_hasTuningChanged;
     Note *m_lastNote;
     std::map<Note *, MIDINoteSequence> m_expandedNotes;
     std::map<Note *, double> m_deferredNotes;
