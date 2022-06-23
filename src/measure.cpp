@@ -675,7 +675,7 @@ std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEn
 // Measure functor methods
 //----------------------------------------------------------------------------
 
-int Measure::FindSpannedLayerElements(FunctorParams *functorParams)
+int Measure::FindSpannedLayerElements(FunctorParams *functorParams) const
 {
     FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);

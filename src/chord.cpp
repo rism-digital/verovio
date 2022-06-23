@@ -550,16 +550,16 @@ int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElemen
     return 0;
 }
 
-std::list<Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc)
+std::list<const Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc) const
 {
-    const ListOfObjects &notes = this->GetList(this);
+    const ListOfConstObjects &notes = this->GetList(this);
 
-    std::list<Note *> adjacentNotes;
-    for (Object *obj : notes) {
-        Note *note = vrv_cast<Note *>(obj);
+    std::list<const Note *> adjacentNotes;
+    for (const Object *obj : notes) {
+        const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
 
-        Staff *noteStaff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+        const Staff *noteStaff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
         if (noteStaff != staff) continue;
 
         const int locDiff = note->GetDrawingLoc() - loc;

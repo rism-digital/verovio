@@ -131,7 +131,12 @@ void FloatingObject::SetCurrentFloatingPositioner(FloatingPositioner *boundingBo
     m_currentPositioner = boundingBox;
 }
 
-FloatingPositioner *FloatingObject::GetCorrespFloatingPositioner(FloatingObject *object)
+FloatingPositioner *FloatingObject::GetCorrespFloatingPositioner(const FloatingObject *object)
+{
+    return const_cast<FloatingPositioner *>(std::as_const(*this).GetCorrespFloatingPositioner(object));
+}
+
+const FloatingPositioner *FloatingObject::GetCorrespFloatingPositioner(const FloatingObject *object) const
 {
     if (!object || !m_currentPositioner) return NULL;
 
@@ -348,7 +353,8 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel, bool force)
     }
 }
 
-bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
+bool FloatingPositioner::CalcDrawingYRel(
+    Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox)
 {
     assert(doc);
     assert(staffAlignment);
@@ -392,7 +398,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         }
     }
     else {
-        FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(horizOverlapingBBox);
+        const FloatingCurvePositioner *curve = dynamic_cast<const FloatingCurvePositioner *>(horizOverlapingBBox);
         if (curve) {
             assert(curve->m_object);
         }
@@ -408,7 +414,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 return true;
             }
             else if (horizOverlapingBBox->Is(BEAM) && !isExtender) {
-                const int shift = this->Intersects(vrv_cast<Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
+                const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }
@@ -416,7 +422,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             }
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + this->GetContentY1() - margin;
 
-            Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
+            const Object *object = dynamic_cast<const Object *>(horizOverlapingBBox);
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
             if (isExtender) {
@@ -441,7 +447,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 return true;
             }
             else if (horizOverlapingBBox->Is(BEAM) && !isExtender) {
-                const int shift = this->Intersects(vrv_cast<Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
+                const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }
@@ -450,7 +456,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
                 + this->GetContentY2() + margin;
 
-            Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
+            const Object *object = dynamic_cast<const Object *>(horizOverlapingBBox);
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
             if (isExtender) {
@@ -470,13 +476,14 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     return true;
 }
 
-int FloatingPositioner::GetSpaceBelow(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
+int FloatingPositioner::GetSpaceBelow(
+    const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox) const
 {
     if (m_place != STAFFREL_between) return VRV_UNSET;
 
     int staffSize = staffAlignment->GetStaffSize();
 
-    FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(horizOverlapingBBox);
+    const FloatingCurvePositioner *curve = dynamic_cast<const FloatingCurvePositioner *>(horizOverlapingBBox);
     if (curve) {
         assert(curve->m_object);
     }
@@ -590,7 +597,7 @@ void FloatingCurvePositioner::MoveBackVertical(int distance)
     m_points[3].y += distance;
 }
 
-int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
+int FloatingCurvePositioner::CalcMinMaxY(const Point points[4]) const
 {
     assert(this->GetObject());
     assert(this->GetObject()->Is({ LV, PHRASE, SLUR, TIE }));
@@ -607,7 +614,8 @@ int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
     return m_cachedMinMaxY;
 }
 
-int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap)
+int FloatingCurvePositioner::CalcAdjustment(
+    const BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap) const
 {
     int leftAdjustment, rightAdjustment;
     std::tie(leftAdjustment, rightAdjustment)
@@ -616,7 +624,7 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
 }
 
 int FloatingCurvePositioner::CalcDirectionalAdjustment(
-    BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap)
+    const BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap) const
 {
     int leftAdjustment, rightAdjustment;
     std::tie(leftAdjustment, rightAdjustment)
@@ -625,14 +633,14 @@ int FloatingCurvePositioner::CalcDirectionalAdjustment(
 }
 
 std::pair<int, int> FloatingCurvePositioner::CalcLeftRightAdjustment(
-    BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap)
+    const BoundingBox *boundingBox, bool &discard, int margin, bool horizontalOverlap) const
 {
     return this->CalcDirectionalLeftRightAdjustment(
         boundingBox, (this->GetDir() == curvature_CURVEDIR_above), discard, margin, horizontalOverlap);
 }
 
 std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
-    BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap)
+    const BoundingBox *boundingBox, bool isCurveAbove, bool &discard, int margin, bool horizontalOverlap) const
 {
     assert(boundingBox);
     assert(boundingBox->HasSelfBB());
@@ -689,7 +697,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
         // For selected types use the cut out boundary
         int boxTopY = boundingBox->GetTopBy(type);
         if (boundingBox->Is(ACCID)) {
-            const Resources *resources = vrv_cast<Object *>(boundingBox)->GetDocResources();
+            const Resources *resources = vrv_cast<const Object *>(boundingBox)->GetDocResources();
             if (resources) {
                 boxTopY = boundingBox->GetCutOutTop(*resources);
             }
@@ -726,7 +734,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
         // For selected types use the cut out boundary
         int boxBottomY = boundingBox->GetBottomBy(type);
         if (boundingBox->Is(ACCID)) {
-            const Resources *resources = vrv_cast<Object *>(boundingBox)->GetDocResources();
+            const Resources *resources = vrv_cast<const Object *>(boundingBox)->GetDocResources();
             if (resources) {
                 boxBottomY = boundingBox->GetCutOutBottom(*resources);
             }
@@ -757,14 +765,14 @@ void FloatingCurvePositioner::GetPoints(Point points[4]) const
     points[3].y += currentY;
 }
 
-std::pair<int, int> FloatingCurvePositioner::CalcRequestedStaffSpace(StaffAlignment *alignment)
+std::pair<int, int> FloatingCurvePositioner::CalcRequestedStaffSpace(const StaffAlignment *alignment) const
 {
     assert(alignment);
 
-    TimeSpanningInterface *interface = this->GetObject()->GetTimeSpanningInterface();
+    const TimeSpanningInterface *interface = this->GetObject()->GetTimeSpanningInterface();
     if (interface) {
-        Staff *startStaff = interface->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
-        Staff *endStaff = interface->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+        const Staff *startStaff = interface->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
+        const Staff *endStaff = interface->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
 
         if (startStaff && endStaff) {
             const int startStaffN = startStaff->GetN();

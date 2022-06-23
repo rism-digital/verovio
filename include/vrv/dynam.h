@@ -71,7 +71,7 @@ public:
     /**
      * Return true if the dynam text is only composed of f, p, r, z, etc. letters (e.g. sfz)
      */
-    bool IsSymbolOnly();
+    bool IsSymbolOnly() const;
 
     /**
      * Return the SMuFL str for the dynamic symbol.
@@ -93,7 +93,7 @@ public:
     // Static methods //
     //----------------//
 
-    static bool GetSymbolsInStr(std::wstring &str, ArrayOfStringDynamTypePairs &tokens);
+    static bool GetSymbolsInStr(const std::wstring &str, ArrayOfStringDynamTypePairs &tokens);
 
     static bool IsSymbolOnly(const std::wstring &str);
 
@@ -116,7 +116,7 @@ public:
     //
 private:
     /** A cached version of the symbol str instanciated by IsSymbolOnly() */
-    std::wstring m_symbolStr;
+    mutable std::wstring m_symbolStr;
 };
 
 } // namespace vrv

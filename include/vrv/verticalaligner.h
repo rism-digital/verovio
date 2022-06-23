@@ -189,7 +189,10 @@ public:
      * Look for the FloatingPositioner corresponding to the FloatingObject.
      * Return NULL if not found and does not create anything.
      */
-    FloatingPositioner *GetCorrespFloatingPositioner(FloatingObject *object);
+    ///@{
+    FloatingPositioner *GetCorrespFloatingPositioner(const FloatingObject *object);
+    const FloatingPositioner *GetCorrespFloatingPositioner(const FloatingObject *object) const;
+    ///@}
 
     /**
      * @name Setter and getter of the staff from which the alignment is created alignment.
@@ -223,8 +226,8 @@ public:
      * value.
      */
     ///@{
-    int CalcOverflowAbove(BoundingBox *box);
-    int CalcOverflowBelow(BoundingBox *box);
+    int CalcOverflowAbove(const BoundingBox *box) const;
+    int CalcOverflowBelow(const BoundingBox *box) const;
     ///@}
 
     /**

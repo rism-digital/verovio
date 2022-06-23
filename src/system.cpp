@@ -283,7 +283,7 @@ curvature_CURVEDIR System::GetPreferredCurveDirection(LayerElement *start, Layer
 
     curvature_CURVEDIR preferredDirection = curvature_CURVEDIR_NONE;
     for (auto element : findSpannedLayerElementsParams.m_elements) {
-        Layer *layer = vrv_cast<Layer *>((element)->GetFirstAncestor(LAYER));
+        const Layer *layer = vrv_cast<const Layer *>((element)->GetFirstAncestor(LAYER));
         assert(layer);
         if (layer == layerStart) continue;
 

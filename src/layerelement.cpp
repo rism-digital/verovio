@@ -2502,7 +2502,7 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams) const
     return this->Is(CHORD) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
-int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
+int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams) const
 {
     FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
@@ -2517,17 +2517,17 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         && (this->GetContentLeft() < params->m_maxPos)) {
 
         // We skip the start or end of the slur
-        LayerElement *start = params->m_interface->GetStart();
-        LayerElement *end = params->m_interface->GetEnd();
+        const LayerElement *start = params->m_interface->GetStart();
+        const LayerElement *end = params->m_interface->GetEnd();
         if ((this == start) || (this == end)) {
             return FUNCTOR_CONTINUE;
         }
 
         // Skip if neither parent staff nor cross staff matches the given staff number
         if (!params->m_staffNs.empty()) {
-            Staff *staff = this->GetAncestorStaff();
+            const Staff *staff = this->GetAncestorStaff();
             if (params->m_staffNs.find(staff->GetN()) == params->m_staffNs.end()) {
-                Layer *layer = NULL;
+                const Layer *layer = NULL;
                 staff = this->GetCrossStaff(layer);
                 if (!staff || (params->m_staffNs.find(staff->GetN()) == params->m_staffNs.end())) {
                     return FUNCTOR_CONTINUE;
@@ -2546,15 +2546,15 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 
         // Skip elements aligned at start/end, but on a different staff
         if ((this->GetAlignment() == start->GetAlignment()) && !start->Is(TIMESTAMP_ATTR)) {
-            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-            Staff *startStaff = start->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const Staff *startStaff = start->GetAncestorStaff(RESOLVE_CROSS_STAFF);
             if (staff->GetN() != startStaff->GetN()) {
                 return FUNCTOR_CONTINUE;
             }
         }
         if ((this->GetAlignment() == end->GetAlignment()) && !end->Is(TIMESTAMP_ATTR)) {
-            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-            Staff *endStaff = end->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const Staff *endStaff = end->GetAncestorStaff(RESOLVE_CROSS_STAFF);
             if (staff->GetN() != endStaff->GetN()) {
                 return FUNCTOR_CONTINUE;
             }

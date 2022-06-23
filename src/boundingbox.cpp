@@ -571,7 +571,7 @@ bool BoundingBox::Encloses(const Point point) const
     return true;
 }
 
-int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int margin) const
+int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type, int margin) const
 {
     assert(curve);
     assert(curve->GetObject());
@@ -721,7 +721,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     return 0;
 }
 
-int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
+int BoundingBox::Intersects(const BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
 {
     assert(beamInterface);
     assert(beamInterface->HasCoords());

@@ -732,7 +732,7 @@ public:
     /**
      * Retrieve the layer elements spanned by two points
      */
-    virtual int FindSpannedLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int FindSpannedLayerElements(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     /**
      * Look for element by ID in StaffDef elements (Clef, KeySig, etc.) of all layers within

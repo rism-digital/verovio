@@ -1639,7 +1639,7 @@ public:
 
 class FindSpannedLayerElementsParams : public FunctorParams {
 public:
-    FindSpannedLayerElementsParams(TimeSpanningInterface *interface)
+    FindSpannedLayerElementsParams(const TimeSpanningInterface *interface)
     {
         m_interface = interface;
         m_minPos = 0;
@@ -1647,13 +1647,13 @@ public:
         m_minLayerN = 0;
         m_maxLayerN = 0;
     }
-    std::vector<LayerElement *> m_elements;
+    std::vector<const LayerElement *> m_elements;
     int m_minPos;
     int m_maxPos;
     std::set<int> m_staffNs;
     int m_minLayerN;
     int m_maxLayerN;
-    TimeSpanningInterface *m_interface;
+    const TimeSpanningInterface *m_interface;
     std::vector<ClassId> m_classIds;
 };
 
