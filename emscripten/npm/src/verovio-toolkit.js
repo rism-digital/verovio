@@ -11,11 +11,11 @@ export class VerovioToolkit {
         this.proxy = createEmscriptenProxy(this.VerovioModule);
         this.ptr = this.proxy.constructor();
         console.debug('Creating toolkit instance');
-        VerovioToolkit.instances.push(this.ptr);
+        VerovioToolkit.instances.push(this);
     }
 
     destroy() {
-        VerovioToolkit.instances.splice(VerovioToolkit.instances.indexOf(this.ptr), 1);
+        VerovioToolkit.instances.splice(VerovioToolkit.instances.findIndex(i => i.ptr === this.ptr), 1);
         console.debug('Deleting toolkit instance');
         this.proxy.destructor(this.ptr);
     }
@@ -203,9 +203,8 @@ if ((typeof window !== 'undefined') && (window.addEventListener))
     // Add a listener that will delete the object (if necessary) when the page is closed
     window.addEventListener('unload', function()
     {
-        for (var i = 0; i < VerovioToolkit.instances.length; i++)
-        {
-            this.proxy.destructor(instances[i]);
-        }
+        VerovioToolkit.instances.forEach((instance) => {
+            instance.destroy();
+        });
     });
 }
