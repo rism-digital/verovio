@@ -791,6 +791,20 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
         midiEvent.makeMts2_KeyTuningsByFrequency(tuneFrequencies);
         params->m_midiFile->addEvent(params->m_midiTrack, midiEvent);
     }
+    // set MIDI key signature
+    if (this->HasKeySigInfo()) {
+        KeySig *keySig = dynamic_cast<KeySig *>(this->GetKeySig());
+        if (keySig && keySig->HasSig()) {
+            params->m_midiFile->addKeySignature(params->m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
+        }
+    }
+    // set MIDI time signature
+    if (this->HasMeterSigInfo()) {
+        MeterSig *meterSig = dynamic_cast<MeterSig *>(this->GetMeterSig());
+        if (meterSig && meterSig->HasCount()) {
+            params->m_midiFile->addTimeSignature(params->m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
+        }
+    }
 
     return FUNCTOR_CONTINUE;
 }
