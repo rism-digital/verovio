@@ -36,8 +36,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "MidiFile.h"
 #include "MidiEvent.h"
+#include "MidiFile.h"
 
 namespace vrv {
 
@@ -757,7 +757,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
         }
     }
     const double currentTick = totalTime * params->m_midiFile->getTPQ();
-    
+
     smf::MidiEvent midiEvent;
     midiEvent.tick = currentTick;
     // calculate reference pitch class based on @tune.pname
@@ -795,14 +795,16 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     if (this->HasKeySigInfo()) {
         KeySig *keySig = dynamic_cast<KeySig *>(this->GetKeySig());
         if (keySig && keySig->HasSig()) {
-            params->m_midiFile->addKeySignature(params->m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
+            params->m_midiFile->addKeySignature(
+                params->m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
         }
     }
     // set MIDI time signature
     if (this->HasMeterSigInfo()) {
         MeterSig *meterSig = dynamic_cast<MeterSig *>(this->GetMeterSig());
         if (meterSig && meterSig->HasCount()) {
-            params->m_midiFile->addTimeSignature(params->m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
+            params->m_midiFile->addTimeSignature(
+                params->m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
         }
     }
 
