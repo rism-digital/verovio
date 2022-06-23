@@ -6,7 +6,7 @@ export class VerovioToolkit {
     constructor(VerovioModule) {
         this.VerovioModule = VerovioModule;
         if (!this.VerovioModule) {
-            throw new Error('VerovioToolkit could not find emscripten module.');
+            throw new Error('VerovioToolkit needs VerovioModule passed as argument to the constructor.');
         }
         this.proxy = createEmscriptenProxy(this.VerovioModule);
         this.ptr = this.proxy.constructor();
