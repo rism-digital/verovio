@@ -750,14 +750,16 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
         Object *next = parent->GetNext(this);
         if (next && next->Is(MEASURE)) {
             Measure *nextMeasure = vrv_cast<Measure *>(next);
-            const std::vector<double> &nextMeasureOffset = nextMeasure->GetTimeOffsetReference();
-            if (!nextMeasureOffset.empty()) {
-                totalTime = nextMeasureOffset.back();
+            const double &nextMeasureOffset = nextMeasure->GetTimeOffsetReference();
+            if (!nextMeasureOffset) {
+                totalTime = nextMeasureOffset;
             }
         }
     }
+    const double currentTick = totalTime * params->m_midiFile->getTPQ();
+    
     smf::MidiEvent midiEvent;
-    midiEvent.tick = totalTime * params->m_midiFile->getTPQ();
+    midiEvent.tick = currentTick;
     // calculate reference pitch class based on @tune.pname
     int referencePitchClass = 0;
     if (this->HasTunePname()) {

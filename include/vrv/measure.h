@@ -275,7 +275,7 @@ public:
     /**
      * Read only access to m_scoreTimeOffset
      */
-    const std::vector<double> &GetTimeOffsetReference() const { return m_scoreTimeOffset; }
+    const double &GetTimeOffsetReference() const { return m_scoreTimeOffset.back(); }
 
     //----------//
     // Functors //
