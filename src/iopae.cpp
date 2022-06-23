@@ -4483,9 +4483,9 @@ bool PAEInput::CheckContentPreBuild()
             ++token;
             continue;
         }
-
         // Check that the measure rest is at the beginning of a measure
-        if (token->Is(MULTIREST) && previousToken && !previousToken->Is(MEASURE)) {
+        if (token->Is(MULTIREST) && previousToken && !previousToken->Is(MEASURE) && !previousToken->Is(KEYSIG)
+            && !previousToken->Is(METERSIG) && !previousToken->Is(METERSIGGRP)) {
             LogPAE(ERR_065_MREST_INVALID_MEASURE, *token);
             if (m_pedanticMode) return false;
             Measure *measure = new Measure();
