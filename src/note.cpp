@@ -708,7 +708,7 @@ int Note::GetMIDIPitch(const int shift) const
     return pitch + shift;
 }
 
-int Note::GetPitchClass() const 
+int Note::GetPitchClass() const
 {
     const int midiPitch = this->GetMIDIPitch();
     return (midiPitch - 61) % 12;
@@ -900,7 +900,7 @@ bool Note::HandleLedgerLineStemCollision(const Doc *doc, const Staff *staff, con
     return false;
 }
 
-int Note::PnameToPclass(data_PITCHNAME pitchName) 
+int Note::PnameToPclass(data_PITCHNAME pitchName)
 {
     int pitchClass = 0;
     switch (pitchClass) {
