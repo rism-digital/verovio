@@ -198,7 +198,16 @@ int DurationInterface::CalcActualDur(data_DURATION dur) const
 int DurationInterface::GetNoteOrChordDur(const LayerElement *element) const
 {
     if (element->Is(CHORD)) {
-        return this->GetActualDur();
+        int duration = this->GetActualDur();
+        const Chord *chord = vrv_cast<const Chord *>(element);
+        if (duration != DUR_NONE) return duration;
+
+        for (const Note *note : { chord->GetTopNote(), chord->GetBottomNote() }) {
+            const int noteDur = note->GetActualDur();
+            if (noteDur != DUR_NONE) {
+                return noteDur;
+            }
+        }        
     }
     else if (element->Is(NOTE)) {
         const Note *note = vrv_cast<const Note *>(element);
