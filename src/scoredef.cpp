@@ -750,10 +750,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
         Object *next = parent->GetNext(this);
         if (next && next->Is(MEASURE)) {
             Measure *nextMeasure = vrv_cast<Measure *>(next);
-            const double &nextMeasureOffset = nextMeasure->GetTimeOffsetReference();
-            if (nextMeasureOffset) {
-                totalTime = nextMeasureOffset;
-            }
+            totalTime = nextMeasure->GetTimeOffsetReference();
         }
     }
     const double currentTick = totalTime * params->m_midiFile->getTPQ();
