@@ -172,7 +172,7 @@ private:
 
     // Helper to check whether beam fits within certain bounds
     bool DoesBeamOverlap(
-        int staffTop, int topOffset, int staffBottom, int bottomOffset, bool isCrossStaff = false) const;
+        int staffTop, int topOffset, int staffBottom, int bottomOffset, int unit, bool isCrossStaff = false) const;
 
     // Helper to calculate the minimal stem length of above/below notes
     std::pair<int, int> GetMinimalStemLength(const BeamDrawingInterface *beamInterface, bool hasFrenchStyle) const;
