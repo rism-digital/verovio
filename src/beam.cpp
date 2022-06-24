@@ -323,6 +323,16 @@ bool BeamSegment::DoesBeamOverlap(
     return (overlapping != m_beamElementCoordRefs.end());
 }
 
+std::pair<int, int> BeamSegment::GetVerticalOffset(const BeamDrawingInterface *beamInterface) const
+{
+    const auto [topBeams, bottomBeams] = beamInterface->GetAdditionalBeamCount();
+    double multiplier = 1.0;
+    if (const Object *obj = dynamic_cast<const Object *>(beamInterface); obj && obj->Is(FTREM)) multiplier = 0.5;
+    const int topOffset = multiplier * topBeams * beamInterface->m_beamWidth;
+    const int bottomOffset = bottomBeams * beamInterface->m_beamWidth;
+    return { topOffset, bottomOffset };
+}
+
 std::pair<int, int> BeamSegment::GetMinimalStemLength(
     const BeamDrawingInterface *beamInterface, bool hasFrenchStyle) const
 {
@@ -364,11 +374,9 @@ std::pair<int, int> BeamSegment::GetMinimalStemLength(
 bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface)
 {
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const auto [topBeams, bottomBeams] = beamInterface->GetAdditionalBeamCount();
-    double multiplier = 1;
-    if (Object *obj = dynamic_cast<Object *>(beamInterface); obj && obj->Is(FTREM)) multiplier = 0.5;
-    const int topOffset = multiplier * topBeams * beamInterface->m_beamWidth + unit;
-    const int bottomOffset = bottomBeams * beamInterface->m_beamWidth + unit;
+    auto [topOffset, bottomOffset] = this->GetVerticalOffset(beamInterface);
+    topOffset += unit;
+    bottomOffset += unit;
 
     // find top and bottom of the staff
     const int staffTop = staff->GetDrawingY();
@@ -895,14 +903,13 @@ int BeamSegment::CalcBeamSlopeStep(
 
 void BeamSegment::CalcMixedBeamPosition(const BeamDrawingInterface *beamInterface, int step, int unit)
 {
-    // This helps with general beams but breaks trems
-    const auto [up, down] = beamInterface->GetAdditionalBeamCount();
+    const auto [topOffset, bottomOffset] = this->GetVerticalOffset(beamInterface);
 
     // Calculate midpoint for the beam, taking into account highest and lowest points, as well as number of additional
     // beams above and below main beam. Start position of the beam is then further adjusted based on the step size to
     // make sure that beam is truly centered
     int centerY = this->CalcMixedBeamCenterY(step, unit);
-    centerY += (beamInterface->m_beamWidthBlack + (down - up) * beamInterface->m_beamWidth) / 2;
+    centerY += (beamInterface->m_beamWidthBlack + bottomOffset - topOffset) / 2;
     const bool isSlopeUp = (m_firstNoteOrChord->m_beamRelativePlace == m_lastNoteOrChord->m_beamRelativePlace)
         ? (m_beamSlope > 0)
         : (m_lastNoteOrChord->m_beamRelativePlace == BEAMPLACE_below);

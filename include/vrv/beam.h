@@ -174,6 +174,9 @@ private:
     bool DoesBeamOverlap(
         int staffTop, int topOffset, int staffBottom, int bottomOffset, int unit, bool isCrossStaff = false) const;
 
+    // Helper to calculate the vertical offset of the beam top/bottom w.r.t. the beam center
+    std::pair<int, int> GetVerticalOffset(const BeamDrawingInterface *beamInterface) const;
+
     // Helper to calculate the minimal stem length of above/below notes
     std::pair<int, int> GetMinimalStemLength(const BeamDrawingInterface *beamInterface, bool hasFrenchStyle) const;
 
