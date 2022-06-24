@@ -171,14 +171,13 @@ private:
     void CalcSetValues();
 
     // Helper to check whether beam fits within certain bounds
-    bool DoesBeamOverlap(
-        int staffTop, int topOffset, int staffBottom, int bottomOffset, int unit, bool isCrossStaff = false) const;
+    bool DoesBeamOverlap(const BeamDrawingInterface *beamInterface, int topBorder, int bottomBorder, int unit) const;
 
     // Helper to calculate the vertical offset of the beam top/bottom w.r.t. the beam center
     std::pair<int, int> GetVerticalOffset(const BeamDrawingInterface *beamInterface) const;
 
     // Helper to calculate the minimal stem length of above/below notes
-    std::pair<int, int> GetMinimalStemLength(const BeamDrawingInterface *beamInterface, bool hasFrenchStyle) const;
+    std::pair<int, int> GetMinimalStemLength(const BeamDrawingInterface *beamInterface) const;
 
     // Helper to check mixed beam positioning compared to other elements (ledger lines, staff) and adjust it accordingly
     bool NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface);
