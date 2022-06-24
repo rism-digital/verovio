@@ -1535,7 +1535,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     // Store reference, i.e. for Nachschlag
     params->m_lastNote = this;
 
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 int Note::GenerateTimemap(FunctorParams *functorParams)
