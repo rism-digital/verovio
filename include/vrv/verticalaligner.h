@@ -249,6 +249,8 @@ public:
     int GetRequestedSpaceAbove() const { return m_requestedSpaceAbove; }
     void SetRequestedSpaceBelow(int space);
     int GetRequestedSpaceBelow() const { return m_requestedSpaceBelow; }
+    void SetRequestedSpacing(int spacing) { m_requestedSpacing = spacing; }
+    int GetRequestedSpacing() const { return m_requestedSpacing; }
     int GetStaffHeight() const { return m_staffHeight; }
     void SetScoreDefClefOverflowAbove(int overflowAbove) { m_scoreDefClefOverflowAbove = overflowAbove; }
     int GetScoreDefClefOverflowAbove() const { return m_scoreDefClefOverflowAbove; }
@@ -402,6 +404,7 @@ private:
     int m_overlap;
     int m_requestedSpaceAbove;
     int m_requestedSpaceBelow;
+    int m_requestedSpacing;
     int m_staffHeight;
     int m_scoreDefClefOverflowAbove;
     int m_scoreDefClefOverflowBelow;

@@ -261,6 +261,7 @@ StaffAlignment::StaffAlignment() : Object(STAFF_ALIGNMENT)
     m_overlap = 0;
     m_requestedSpaceAbove = 0;
     m_requestedSpaceBelow = 0;
+    m_requestedSpacing = 0;
     m_scoreDefClefOverflowAbove = 0;
     m_scoreDefClefOverflowBelow = 0;
 }
@@ -1103,13 +1104,12 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
 
     this->AdjustBracketGroupSpacing(params->m_doc, params->m_previous, spacing);
 
-    // Calculate the overlap from requested staff space
+    // Calculate the requested spacing
     const int currentStaffDistance
         = params->m_previous->GetYRel() - params->m_previous->GetStaffHeight() - this->GetYRel();
-    int requestedSpace = std::max(this->GetRequestedSpaceAbove(), params->m_previous->GetRequestedSpaceBelow());
-    if (spacing > currentStaffDistance) requestedSpace += currentStaffDistance - spacing;
+    const int requestedSpace = std::max(this->GetRequestedSpaceAbove(), params->m_previous->GetRequestedSpaceBelow());
     if (requestedSpace > 0) {
-        this->SetOverlap(requestedSpace);
+        this->SetRequestedSpacing(currentStaffDistance + requestedSpace);
     }
 
     // This is the bottom alignment (or something is wrong) - this is all we need to do
@@ -1181,7 +1181,8 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
     assert(params);
 
     const int defaultSpacing = this->GetMinimumSpacing(params->m_doc);
-    const int minSpacing = this->CalcMinimumRequiredSpacing(params->m_doc);
+    int minSpacing = this->CalcMinimumRequiredSpacing(params->m_doc);
+    minSpacing = std::max(this->GetRequestedSpacing(), minSpacing);
 
     if (minSpacing > defaultSpacing) {
         params->m_cumulatedShift += minSpacing - defaultSpacing;
