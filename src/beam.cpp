@@ -843,7 +843,7 @@ bool BeamSegment::CalcBeamSlope(const Staff *staff, const Doc *doc, BeamDrawingI
         if ((step <= unit) || (step > unit * 2)) {
             step = unit * 2;
         }
-        this->CalcMixedBeamStem(beamInterface, step);
+        this->CalcMixedBeamPosition(beamInterface, step);
     }
 
     m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
@@ -915,7 +915,7 @@ int BeamSegment::CalcBeamSlopeStep(
     return step;
 }
 
-void BeamSegment::CalcMixedBeamStem(const BeamDrawingInterface *beamInterface, int step)
+void BeamSegment::CalcMixedBeamPosition(const BeamDrawingInterface *beamInterface, int step)
 {
     // In cases, when both first and last notes/chords of the beam have same relative places (i.e. they have same stem
     // direction and/or same staff), - we don't need additional calculations
@@ -941,7 +941,7 @@ void BeamSegment::CalcMixedBeamStem(const BeamDrawingInterface *beamInterface, i
     // Calculate midpoint for the beam, taking into account highest and lowest points, as well as number of additional
     // beams above and below main beam. Start position of the beam is then further adjusted based on the step size to
     // make sure that beam is truly centered
-    const int midPoint = (highestPoint + lowestPoint + (up - down) * beamInterface->m_beamWidth) / 2;
+    const int midPoint = (highestPoint + lowestPoint + (down - up) * beamInterface->m_beamWidth) / 2;
     const bool isSlopeUp = (m_firstNoteOrChord->m_beamRelativePlace == m_lastNoteOrChord->m_beamRelativePlace)
         ? (m_beamSlope > 0)
         : (m_lastNoteOrChord->m_beamRelativePlace == BEAMPLACE_below);
@@ -1356,7 +1356,7 @@ void BeamSegment::CalcHorizontalBeam(const Doc *doc, const Staff *staff, const B
 {
 
     if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
-        this->CalcMixedBeamStem(beamInterface, 0);
+        this->CalcMixedBeamPosition(beamInterface, 0);
     }
     else {
         int maxLength = (beamInterface->m_drawingPlace == BEAMPLACE_above) ? VRV_UNSET : -VRV_UNSET;

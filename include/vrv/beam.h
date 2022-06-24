@@ -125,7 +125,7 @@ private:
     int CalcBeamSlopeStep(
         const Doc *doc, const Staff *staff, BeamDrawingInterface *beamInterface, int noteStep, bool &shortStep);
 
-    void CalcMixedBeamStem(const BeamDrawingInterface *beamInterface, int step);
+    void CalcMixedBeamPosition(const BeamDrawingInterface *beamInterface, int step);
 
     void CalcBeamPosition(const Doc *doc, const Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal);
 
