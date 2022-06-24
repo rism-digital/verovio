@@ -152,9 +152,6 @@ private:
     // Helper to set the stem values for tablature
     void CalcSetStemValuesTab(const Staff *staff, const Doc *doc, const BeamDrawingInterface *beamInterface);
 
-    // Helper to calculate max/min beam points for the relative beam place
-    std::pair<int, int> CalcBeamRelativeMinMax(data_BEAMPLACE place) const;
-
     // Helper to calculate the vertical center of mixed beams
     int CalcMixedBeamCenterY(int step, int unit) const;
 

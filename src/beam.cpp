@@ -943,11 +943,6 @@ void BeamSegment::CalcMixedBeamPosition(const BeamDrawingInterface *beamInterfac
         : (m_lastNoteOrChord->m_beamRelativePlace == BEAMPLACE_below);
     m_firstNoteOrChord->m_yBeam = isSlopeUp ? centerY - step / 2 : centerY + step / 2;
     m_lastNoteOrChord->m_yBeam = isSlopeUp ? m_firstNoteOrChord->m_yBeam + step : m_firstNoteOrChord->m_yBeam - step;
-    if ((abs(m_firstNoteOrChord->m_yBeam - m_firstNoteOrChord->m_element->GetDrawingY()) < beamInterface->m_beamWidth)
-        || (abs(m_lastNoteOrChord->m_yBeam - m_lastNoteOrChord->m_element->GetDrawingY())
-            < beamInterface->m_beamWidth)) {
-        std::swap(m_lastNoteOrChord->m_yBeam, m_firstNoteOrChord->m_yBeam);
-    }
 }
 
 void BeamSegment::CalcBeamPosition(
@@ -1266,22 +1261,6 @@ void BeamSegment::CalcBeamStemLength(const Staff *staff, data_BEAMPLACE place, b
             }
         }
     }
-}
-
-std::pair<int, int> BeamSegment::CalcBeamRelativeMinMax(data_BEAMPLACE place) const
-{
-    int highestPoint = VRV_UNSET;
-    int lowestPoint = VRV_UNSET;
-    std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
-        if (coord->m_beamRelativePlace == place) {
-            if ((highestPoint == VRV_UNSET) || (coord->m_yBeam > highestPoint)) highestPoint = coord->m_yBeam;
-            if ((lowestPoint == VRV_UNSET) || (coord->m_yBeam < lowestPoint)) {
-                lowestPoint = coord->m_yBeam;
-            }
-        }
-    });
-
-    return { highestPoint, lowestPoint };
 }
 
 int BeamSegment::CalcMixedBeamCenterY(int step, int unit) const
