@@ -843,7 +843,7 @@ bool BeamSegment::CalcBeamSlope(const Staff *staff, const Doc *doc, BeamDrawingI
         if ((step <= unit) || (step > unit * 2)) {
             step = unit * 2;
         }
-        this->CalcMixedBeamPosition(beamInterface, step);
+        this->CalcMixedBeamPosition(beamInterface, step, unit);
     }
 
     m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
@@ -915,7 +915,7 @@ int BeamSegment::CalcBeamSlopeStep(
     return step;
 }
 
-void BeamSegment::CalcMixedBeamPosition(const BeamDrawingInterface *beamInterface, int step)
+void BeamSegment::CalcMixedBeamPosition(const BeamDrawingInterface *beamInterface, int step, int unit)
 {
     // In cases, when both first and last notes/chords of the beam have same relative places (i.e. they have same stem
     // direction and/or same staff), - we don't need additional calculations
@@ -930,22 +930,18 @@ void BeamSegment::CalcMixedBeamPosition(const BeamDrawingInterface *beamInterfac
         return;
     }
 
-    const auto [aboveMax, aboveMin] = this->CalcBeamRelativeMinMax(BEAMPLACE_above);
-    const auto [belowMax, belowMin] = this->CalcBeamRelativeMinMax(BEAMPLACE_below);
-    const int highestPoint = (aboveMax != VRV_UNSET) ? aboveMax : belowMax;
-    const int lowestPoint = (belowMin != VRV_UNSET) ? belowMin : aboveMin;
-
     // This helps with general beams but breaks trems
     const auto [up, down] = beamInterface->GetAdditionalBeamCount();
 
     // Calculate midpoint for the beam, taking into account highest and lowest points, as well as number of additional
     // beams above and below main beam. Start position of the beam is then further adjusted based on the step size to
     // make sure that beam is truly centered
-    const int midPoint = (highestPoint + lowestPoint + (down - up) * beamInterface->m_beamWidth) / 2;
+    int centerY = this->CalcMixedBeamCenterY(step, unit);
+    centerY += (beamInterface->m_beamWidthBlack + (down - up) * beamInterface->m_beamWidth) / 2;
     const bool isSlopeUp = (m_firstNoteOrChord->m_beamRelativePlace == m_lastNoteOrChord->m_beamRelativePlace)
         ? (m_beamSlope > 0)
         : (m_lastNoteOrChord->m_beamRelativePlace == BEAMPLACE_below);
-    m_firstNoteOrChord->m_yBeam = isSlopeUp ? midPoint - step / 2 : midPoint + step / 2;
+    m_firstNoteOrChord->m_yBeam = isSlopeUp ? centerY - step / 2 : centerY + step / 2;
     m_lastNoteOrChord->m_yBeam = isSlopeUp ? m_firstNoteOrChord->m_yBeam + step : m_firstNoteOrChord->m_yBeam - step;
     if ((abs(m_firstNoteOrChord->m_yBeam - m_firstNoteOrChord->m_element->GetDrawingY()) < beamInterface->m_beamWidth)
         || (abs(m_lastNoteOrChord->m_yBeam - m_lastNoteOrChord->m_element->GetDrawingY())
@@ -1288,6 +1284,43 @@ std::pair<int, int> BeamSegment::CalcBeamRelativeMinMax(data_BEAMPLACE place) co
     return { highestPoint, lowestPoint };
 }
 
+int BeamSegment::CalcMixedBeamCenterY(int step, int unit) const
+{
+    const int dist = m_lastNoteOrChord->m_x - m_firstNoteOrChord->m_x;
+    const bool isSlopeUp = (m_firstNoteOrChord->m_beamRelativePlace == m_lastNoteOrChord->m_beamRelativePlace)
+        ? (m_beamSlope > 0)
+        : (m_lastNoteOrChord->m_beamRelativePlace == BEAMPLACE_below);
+    const int sign = isSlopeUp ? 1 : -1;
+    const double targetSlope = double(sign * step) / dist;
+
+    int highestBelowBeam = VRV_UNSET;
+    int lowestAboveBeam = VRV_UNSET;
+    for (auto coord : m_beamElementCoordRefs) {
+        const int normalizedY = coord->m_yBeam - targetSlope * (coord->m_x - m_firstNoteOrChord->m_x);
+        // Note that for elements below the beam the beamRelativePlace is above and vice versa
+        if (coord->m_beamRelativePlace == BEAMPLACE_above) {
+            if ((highestBelowBeam == VRV_UNSET) || (normalizedY > highestBelowBeam)) {
+                highestBelowBeam = normalizedY;
+            }
+        }
+        if (coord->m_beamRelativePlace == BEAMPLACE_below) {
+            if ((lowestAboveBeam == VRV_UNSET) || (normalizedY < lowestAboveBeam)) {
+                lowestAboveBeam = normalizedY;
+            }
+        }
+    }
+
+    int centerY = (m_firstNoteOrChord->m_yBeam + m_lastNoteOrChord->m_yBeam) / 2;
+    if ((highestBelowBeam != VRV_UNSET) && (lowestAboveBeam != VRV_UNSET)) {
+        centerY = (highestBelowBeam + lowestAboveBeam) / 2 + targetSlope * dist / 2;
+    }
+
+    // Adjust to an integral multiple of half a unit
+    centerY -= centerY % (unit / 2);
+
+    return centerY;
+}
+
 std::pair<int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const
 {
     int shortestDuration = DUR_4;
@@ -1356,7 +1389,8 @@ void BeamSegment::CalcHorizontalBeam(const Doc *doc, const Staff *staff, const B
 {
 
     if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) {
-        this->CalcMixedBeamPosition(beamInterface, 0);
+        const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        this->CalcMixedBeamPosition(beamInterface, 0, unit);
     }
     else {
         int maxLength = (beamInterface->m_drawingPlace == BEAMPLACE_above) ? VRV_UNSET : -VRV_UNSET;
@@ -1579,8 +1613,8 @@ void BeamSegment::RequestStaffSpace(const Doc *doc, const BeamDrawingInterface *
     if (beamInterface->m_drawingPlace != BEAMPLACE_mixed) return;
     if (!beamInterface->m_beamStaff || !beamInterface->m_crossStaffContent) return;
 
-    // Min length is 4 units
-    const int minLength = 4 * doc->GetDrawingUnit(beamInterface->m_beamStaff->m_drawingStaffSize);
+    // Min length is 6 units
+    const int minLength = 6 * doc->GetDrawingUnit(beamInterface->m_beamStaff->m_drawingStaffSize);
 
     // Determine the alignments above and below
     StaffAlignment *above = NULL;

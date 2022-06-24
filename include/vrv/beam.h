@@ -125,7 +125,7 @@ private:
     int CalcBeamSlopeStep(
         const Doc *doc, const Staff *staff, BeamDrawingInterface *beamInterface, int noteStep, bool &shortStep);
 
-    void CalcMixedBeamPosition(const BeamDrawingInterface *beamInterface, int step);
+    void CalcMixedBeamPosition(const BeamDrawingInterface *beamInterface, int step, int unit);
 
     void CalcBeamPosition(const Doc *doc, const Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal);
 
@@ -154,6 +154,9 @@ private:
 
     // Helper to calculate max/min beam points for the relative beam place
     std::pair<int, int> CalcBeamRelativeMinMax(data_BEAMPLACE place) const;
+
+    // Helper to calculate the vertical center of mixed beams
+    int CalcMixedBeamCenterY(int step, int unit) const;
 
     // Helper to calculate location and duration of the note that would be setting highest/lowest point for the beam
     std::pair<int, int> CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const;
