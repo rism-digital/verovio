@@ -548,10 +548,6 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
     // Add a margin but not for the bottom aligner
     if (m_staff) overflowSum += doc->GetBottomMargin(STAFF) * unit;
 
-    if (const int adjust = prevAlignment->GetBeamAdjust()) {
-        overflowSum += adjust;
-    }
-
     return overflowSum;
 }
 

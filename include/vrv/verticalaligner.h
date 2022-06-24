@@ -293,14 +293,6 @@ public:
         const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel);
 
     /**
-     * @name Set/get for the beam adjust
-     */
-    ///@{
-    void SetBeamAdjust(int beamAdjust) { m_beamAdjust = beamAdjust; }
-    int GetBeamAdjust() const { return m_beamAdjust; }
-    ///@}
-
-    /**
      * Find overflow for the alignments taking bracket group elements into account
      */
     void AdjustBracketGroupSpacing(Doc *doc, StaffAlignment *previous, int spacing);
@@ -409,9 +401,6 @@ private:
     int m_scoreDefClefOverflowAbove;
     int m_scoreDefClefOverflowBelow;
     ///@}
-
-    // Value to store required beam adjustment for cross-staff beams
-    int m_beamAdjust = 0;
 
     /**
      * The list of overflowing bounding boxes (e.g, LayerElement or FloatingPositioner)
