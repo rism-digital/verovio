@@ -751,7 +751,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
         if (next && next->Is(MEASURE)) {
             Measure *nextMeasure = vrv_cast<Measure *>(next);
             const double &nextMeasureOffset = nextMeasure->GetTimeOffsetReference();
-            if (!nextMeasureOffset) {
+            if (nextMeasureOffset) {
                 totalTime = nextMeasureOffset;
             }
         }
