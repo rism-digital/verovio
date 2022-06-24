@@ -708,6 +708,12 @@ int Note::GetMIDIPitch(const int shift) const
     return pitch + shift;
 }
 
+int Note::GetPitchClass() const 
+{
+    const int midiPitch = this->GetMIDIPitch();
+    return (midiPitch - 61) % 12;
+}
+
 int Note::GetChromaticAlteration() const
 {
     const Accid *accid = this->GetDrawingAccid();
@@ -892,6 +898,25 @@ bool Note::HandleLedgerLineStemCollision(const Doc *doc, const Staff *staff, con
     }
 
     return false;
+}
+
+int Note::PnameToPclass(data_PITCHNAME pitchName) 
+{
+    int pitchClass = 0;
+    switch (pitchClass) {
+        case PITCHNAME_c: pitchClass = 0; break;
+        case PITCHNAME_d: pitchClass = 2; break;
+        case PITCHNAME_e: pitchClass = 4; break;
+        case PITCHNAME_f: pitchClass = 5; break;
+        case PITCHNAME_g: pitchClass = 7; break;
+        case PITCHNAME_a: pitchClass = 9; break;
+        case PITCHNAME_b: pitchClass = 11; break;
+        default: break;
+    }
+
+    // Pitch class ranges from 0 to 11, if the values were accounting octaves we'd have to add (% 12), otherwise we can
+    // just return value directly
+    return pitchClass;
 }
 
 //----------------------------------------------------------------------------

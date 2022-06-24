@@ -763,10 +763,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     // calculate reference pitch class based on @tune.pname
     int referencePitchClass = 0;
     if (this->HasTunePname()) {
-        Note tempNote;
-        tempNote.SetPname(this->GetTunePname());
-        const int midiPitch = tempNote.GetMIDIPitch();
-        referencePitchClass = (midiPitch - 61) % 12;
+        referencePitchClass = Note::PnameToPclass(this->GetTunePname());
     }
     // set temperament event if corresponding attribute present
     if (this->HasTuneTemper()) {
