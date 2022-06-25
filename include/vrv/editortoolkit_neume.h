@@ -141,7 +141,23 @@ struct ClosestNeume {
 
     bool operator()(Object *a, Object *b)
     {
-        if (!a->GetFirst(NC)->GetFacsimileInterface() || !b->GetFirst(NC)->GetFacsimileInterface()) return true;
+        // check if neume has neume components
+        if (!a->GetFirst(NC)) {
+            LogError("Neume %s doesn't have neume components.", a->GetUuid().c_str());
+            return true;
+        }
+        if(!b->GetFirst(NC)) {
+            LogError("Neume %s doesn't have neume components.", b->GetUuid().c_str());
+            return true;
+        }
+        if (!a->GetFirst(NC)->GetFacsimileInterface()) {
+            LogError("Neume component %s doesn't have facsimile.", a->GetFirst(NC)->GetUuid().c_str());
+            return true;
+        }
+        if (!b->GetFirst(NC)->GetFacsimileInterface()) {
+            LogError("Neume component %s doesn't have facsimile.", b->GetFirst(NC)->GetUuid().c_str());
+            return true;
+        }
         Zone *zoneA = a->GetFirst(NC)->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFirst(NC)->GetFacsimileInterface()->GetZone();
 
