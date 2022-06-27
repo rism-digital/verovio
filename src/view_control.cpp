@@ -2728,15 +2728,23 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         const int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
         const int lineWidth = m_options->m_repeatEndingLineThickness.GetValue()
             * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
-
-        this->DrawFilledRectangle(dc, x1, y2, x2, y2 + lineWidth);
-        if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-            this->DrawFilledRectangle(dc, x1, y1, x1 + lineWidth, y2);
+        x1 -= m_options->m_staffLineWidth.GetValue() * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
+        //x2 -= m_options->m_thickBarlineThickness.GetValue() * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) / 2;
+        
+        dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_ARCS);
+        Point p[4];
+        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y1) };
+        p[1] = { ToDeviceContextX(x1), ToDeviceContextY(y2) };
+        p[2] = { ToDeviceContextX(x2), ToDeviceContextY(y2) };
+        p[3] = { ToDeviceContextX(x2), ToDeviceContextY(y1) };
+        if ((spanningType == SPANNING_END) || (ending->GetLstartsym() == LINESTARTENDSYMBOL_none)) {
+            p[0] = p[1];
         }
-        if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END))
-            && (ending->GetLendsym() != LINESTARTENDSYMBOL_none)) {
-            this->DrawFilledRectangle(dc, x2 - lineWidth, y1, x2, y2);
+        if ((spanningType == SPANNING_START) || (ending->GetLendsym() == LINESTARTENDSYMBOL_none)) {
+            p[3] = p[2];
         }
+        dc->DrawPolyline(4, p);
+        dc->ResetPen();
 
         dc->EndCustomGraphic();
     }
