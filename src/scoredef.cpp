@@ -750,7 +750,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
         Object *next = parent->GetNext(this);
         if (next && next->Is(MEASURE)) {
             Measure *nextMeasure = vrv_cast<Measure *>(next);
-            totalTime = nextMeasure->GetTimeOffsetReference();
+            totalTime = nextMeasure->GetLastTimeOffset();
         }
     }
     const double currentTick = totalTime * params->m_midiFile->getTPQ();
@@ -787,7 +787,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     }
     // set MIDI key signature
     if (this->HasKeySigInfo()) {
-        KeySig *keySig = dynamic_cast<KeySig *>(this->GetKeySig());
+        KeySig *keySig = vrv_cast<KeySig *>(this->GetKeySig());
         if (keySig && keySig->HasSig()) {
             params->m_midiFile->addKeySignature(
                 params->m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
@@ -795,7 +795,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     }
     // set MIDI time signature
     if (this->HasMeterSigInfo()) {
-        MeterSig *meterSig = dynamic_cast<MeterSig *>(this->GetMeterSig());
+        MeterSig *meterSig = vrv_cast<MeterSig *>(this->GetMeterSig());
         if (meterSig && meterSig->HasCount()) {
             params->m_midiFile->addTimeSignature(
                 params->m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());

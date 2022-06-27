@@ -398,28 +398,28 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 }
             }
             // set MIDI track name
-            Label *label = dynamic_cast<Label *>(staffDef->FindDescendantByType(LABEL, 1));
+            Label *label = vrv_cast<Label *>(staffDef->FindDescendantByType(LABEL, 1));
             if (!label) {
                 StaffGrp *staffGrp = vrv_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
                 assert(staffGrp);
-                label = dynamic_cast<Label *>(staffGrp->FindDescendantByType(LABEL, 1));
+                label = vrv_cast<Label *>(staffGrp->FindDescendantByType(LABEL, 1));
             }
             if (label) {
                 std::string trackName = UTF16to8(label->GetText(label)).c_str();
                 if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
             }
             // set MIDI key signature
-            KeySig *keySig = dynamic_cast<KeySig *>(staffDef->FindDescendantByType(KEYSIG));
+            KeySig *keySig = vrv_cast<KeySig *>(staffDef->FindDescendantByType(KEYSIG));
             if (!keySig && (currentScoreDef->HasKeySigInfo())) {
-                keySig = dynamic_cast<KeySig *>(currentScoreDef->GetKeySig());
+                keySig = vrv_cast<KeySig *>(currentScoreDef->GetKeySig());
             }
             if (keySig && keySig->HasSig()) {
                 midiFile->addKeySignature(midiTrack, 0, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
             }
             // set MIDI time signature
-            MeterSig *meterSig = dynamic_cast<MeterSig *>(staffDef->FindDescendantByType(METERSIG));
+            MeterSig *meterSig = vrv_cast<MeterSig *>(staffDef->FindDescendantByType(METERSIG));
             if (!meterSig && (currentScoreDef->HasMeterSigInfo())) {
-                meterSig = dynamic_cast<MeterSig *>(currentScoreDef->GetMeterSig());
+                meterSig = vrv_cast<MeterSig *>(currentScoreDef->GetMeterSig());
             }
             if (meterSig && meterSig->HasCount()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
