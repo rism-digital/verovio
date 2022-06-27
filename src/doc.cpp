@@ -429,7 +429,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         // Set initial scoreDef values for tuning
         Functor generateScoreDefMIDI(&Object::GenerateMIDI);
         Functor generateScoreDefMIDIEnd(&Object::GenerateMIDIEnd);
-        GenerateMIDIParams generateScoreDefMIDIParams(midiFile, this, &generateScoreDefMIDI);
+        GenerateMIDIParams generateScoreDefMIDIParams(midiFile, &generateScoreDefMIDI);
         generateScoreDefMIDIParams.m_midiChannel = midiChannel;
         generateScoreDefMIDIParams.m_midiTrack = midiTrack;
         currentScoreDef->Process(&generateScoreDefMIDI, &generateScoreDefMIDIParams, &generateScoreDefMIDIEnd);
@@ -444,7 +444,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
-            GenerateMIDIParams generateMIDIParams(midiFile, this, &generateMIDI);
+            GenerateMIDIParams generateMIDIParams(midiFile, &generateMIDI);
             generateMIDIParams.m_midiChannel = midiChannel;
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_staffN = staves->first;

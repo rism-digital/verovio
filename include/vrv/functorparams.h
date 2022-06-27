@@ -1750,7 +1750,7 @@ using MIDIChordSequence = std::list<MIDIChord>;
 
 class GenerateMIDIParams : public FunctorParams {
 public:
-    GenerateMIDIParams(smf::MidiFile *midiFile, Doc *doc, Functor *functor)
+    GenerateMIDIParams(smf::MidiFile *midiFile, Functor *functor)
     {
         m_midiFile = midiFile;
         m_midiTrack = 1;
@@ -1765,7 +1765,6 @@ public:
         m_functor = functor;
     }
     smf::MidiFile *m_midiFile;
-    Doc *m_doc;
     int m_midiTrack;
     int m_midiChannel;
     double m_totalTime;
