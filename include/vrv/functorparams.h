@@ -1674,7 +1674,7 @@ public:
         m_object = NULL;
     }
 
-    Object *m_object;
+    const Object *m_object;
     std::string m_id;
 };
 
