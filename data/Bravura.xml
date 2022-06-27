@@ -49,7 +49,7 @@
   <g c="E089" x="20.0" y="-249.0" w="394.0" h="500.0" h-a-x="434" n="timeSig9"/>
   <g c="E08A" x="5.0" y="-249.0" w="419.0" h="500.0" h-a-x="424" n="timeSigCommon"/>
   <g c="E08B" x="0.0" y="-359.0" w="418.0" h="720.0" h-a-x="417" n="timeSigCutCommon"/>
-  <g c="E08C" x="-1.0" y="-250.0" w="500.0" h="500.0" n="timeSigPlus"/>
+  <g c="E08C" x="-1.0" y="-250.0" w="500.0" h="500.0" h-a-x="500" n="timeSigPlus"/>
   <g c="E08D" x="-1.0" y="-133.0" w="256.0" h="256.0" h-a-x="254" n="timeSigPlusSmall"/>
   <g c="E08E" x="0.0" y="-190.0" w="378.0" h="379.0" h-a-x="378" n="timeSigFractionalSlash"/>
   <g c="E08F" x="0.0" y="-125.0" w="448.0" h="249.0" h-a-x="448" n="timeSigEquals"/>
@@ -516,7 +516,7 @@
   <g c="E56C" x="0.0" y="0.0" w="725.0" h="245.0" h-a-x="730" n="ornamentShortTrill"/>
   <g c="E56D" x="1.0" y="-73.0" w="728.0" h="392.0" h-a-x="729" n="ornamentMordent"/>
   <g c="E56E" x="1.0" y="0.0" w="984.0" h="244.0" h-a-x="985" n="ornamentTremblement"/>
-  <g c="E56F" x="0.0" y="-40.0" w="499.0" h="253.0" n="ornamentHaydn"/>
+  <g c="E56F" x="0.0" y="-40.0" w="499.0" h="253.0" h-a-x="500" n="ornamentHaydn"/>
   <g c="E583" x="1.0" y="109.0" w="24.0" h="280.0" h-a-x="27" n="ornamentVerticalLine"/>
   <g c="E587" x="0.0" y="0.0" w="1143.0" h="660.0" h-a-x="1143" n="ornamentSchleifer"/>
   <g c="E59D" x="-52.0" y="0.0" w="337.0" h="245.0" h-a-x="262" n="ornamentZigZagLineNoRightEnd">
@@ -600,7 +600,7 @@
   <g c="E916" x="-3.0" y="-250.0" w="495.0" h="531.0" h-a-x="492" n="mensuralProlation7"/>
   <g c="E917" x="1.0" y="-380.0" w="494.0" h="743.0" h-a-x="493" n="mensuralProlation8"/>
   <g c="E918" x="1.0" y="-380.0" w="494.0" h="743.0" h-a-x="495" n="mensuralProlation9"/>
-  <g c="E919" x="0.0" y="-380.0" w="495.0" h="743.0" n="mensuralProlation10"/>
+  <g c="E919" x="0.0" y="-380.0" w="495.0" h="743.0" h-a-x="500" n="mensuralProlation10"/>
   <g c="E91A" x="0.0" y="-267.0" w="495.0" h="531.0" h-a-x="494" n="mensuralProlation11"/>
   <g c="E91B" x="0.0" y="-276.0" w="547.0" h="551.0" h-a-x="547" n="mensuralProportionTempusPerfectum"/>
   <g c="E91C" x="0.0" y="-266.0" w="743.0" h="531.0" h-a-x="743" n="mensuralProportionProportioDupla1"/>
