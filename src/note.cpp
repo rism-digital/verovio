@@ -673,27 +673,12 @@ int Note::GetMIDIPitch(const int shift) const
         pitch = this->GetPnum();
     }
     else if (this->HasPname() || this->HasPnameGes()) {
-        int midiBase = 0;
-        data_PITCHNAME pname = this->GetPname();
-        if (this->HasPnameGes()) pname = this->GetPnameGes();
-        switch (pname) {
-            case PITCHNAME_c: midiBase = 0; break;
-            case PITCHNAME_d: midiBase = 2; break;
-            case PITCHNAME_e: midiBase = 4; break;
-            case PITCHNAME_f: midiBase = 5; break;
-            case PITCHNAME_g: midiBase = 7; break;
-            case PITCHNAME_a: midiBase = 9; break;
-            case PITCHNAME_b: midiBase = 11; break;
-            default: break;
-        }
-
-        // Check for accidentals
-        midiBase += this->GetChromaticAlteration();
+        const int pclass = this->GetPitchClass();
 
         int oct = this->GetOct();
         if (this->HasOctGes()) oct = this->GetOctGes();
 
-        pitch = midiBase + (oct + 1) * 12;
+        pitch = pclass + (oct + 1) * 12;
     }
     else if (this->HasTabCourse()) {
         // tablature
@@ -710,8 +695,16 @@ int Note::GetMIDIPitch(const int shift) const
 
 int Note::GetPitchClass() const
 {
-    const int midiPitch = this->GetMIDIPitch();
-    return (midiPitch - 61) % 12;
+    // if (this->HasPclass()) return this->GetPclass();
+
+    data_PITCHNAME pname = this->GetPname();
+    if (this->HasPnameGes()) pname = this->GetPnameGes();
+    int pitchClass = PnameToPclass(pname);
+
+    // Check for accidentals
+    pitchClass += this->GetChromaticAlteration();
+
+    return pitchClass;
 }
 
 int Note::GetChromaticAlteration() const
@@ -902,21 +895,16 @@ bool Note::HandleLedgerLineStemCollision(const Doc *doc, const Staff *staff, con
 
 int Note::PnameToPclass(data_PITCHNAME pitchName)
 {
-    int pitchClass = 0;
-    switch (pitchClass) {
-        case PITCHNAME_c: pitchClass = 0; break;
-        case PITCHNAME_d: pitchClass = 2; break;
-        case PITCHNAME_e: pitchClass = 4; break;
-        case PITCHNAME_f: pitchClass = 5; break;
-        case PITCHNAME_g: pitchClass = 7; break;
-        case PITCHNAME_a: pitchClass = 9; break;
-        case PITCHNAME_b: pitchClass = 11; break;
-        default: break;
+    switch (pitchName) {
+        case PITCHNAME_c: return 0; break;
+        case PITCHNAME_d: return 2; break;
+        case PITCHNAME_e: return 4; break;
+        case PITCHNAME_f: return 5; break;
+        case PITCHNAME_g: return 7; break;
+        case PITCHNAME_a: return 9; break;
+        case PITCHNAME_b: return 11; break;
+        default: return 0; break;
     }
-
-    // Pitch class ranges from 0 to 11, if the values were accounting octaves we'd have to add (% 12), otherwise we can
-    // just return value directly
-    return pitchClass;
 }
 
 //----------------------------------------------------------------------------
