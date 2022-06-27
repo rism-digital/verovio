@@ -12,7 +12,9 @@
     "./wasm": "./dist/verovio-module.js",
     "./wasm-hum": "./dist/verovio-module-hum.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "rollup --config",
     "prebundle": "rollup --config rollup.config.prebundle.js"
