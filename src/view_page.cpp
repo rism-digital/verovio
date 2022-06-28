@@ -786,23 +786,30 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             drawnPrevious = false;
             continue;
         }
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         // For the bottom position we need to take into account the number of lines and the staff size
-        int yBottom = staff->GetDrawingY()
-            - (staffDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        int yBottom = staff->GetDrawingY() - 2 * (staffDef->GetLines() - 1) * unit;
+        int yLength = staff->GetDrawingY() - yBottom;
+
+        // Adjust barline start and length
         if (measure->HasBarPlace()) {
             // bar.place counts upwards (note order).
-            yBottom += measure->GetBarPlace() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            yBottom += measure->GetBarPlace() * unit;
         }
-        int yTop = staff->GetDrawingY();
+        else if (staffDef->GetLines() <= 1) {
+            // Make sure barlines are visible with a single line
+            yBottom -= 2 * unit;
+        }
+
         if (measure->HasBarLen()) {
-            yTop = yBottom + (measure->GetBarLen() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+            yLength = measure->GetBarLen() * unit;
         }
-        // Make sure barlines are visible with a single line
-        if (staffDef->GetLines() <= 1) {
-            yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            yBottom -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        else if (staffDef->GetLines() <= 1) {
+            yLength = 4 * unit;
         }
+
+        const int yTop = yBottom + yLength;
 
         // Now draw the barline in the staff
         this->DrawBarLine(dc, yTop, yBottom, barLine, form, false, true);
