@@ -61,30 +61,7 @@ void KeyAccid::Reset()
 
 std::wstring KeyAccid::GetSymbolStr() const
 {
-    if (!this->HasAccid()) return L"";
-
-    wchar_t symc = Accid::GetAccidGlyph(this->GetAccid());
-    std::wstring symbolStr;
-
-    if (this->HasEnclose()) {
-        switch (this->GetEnclose()) {
-            case ENCLOSURE_brack:
-                symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
-                symbolStr.push_back(symc);
-                symbolStr.push_back(SMUFL_E26D_accidentalBracketRight);
-                break;
-            case ENCLOSURE_paren:
-                symbolStr.push_back(SMUFL_E26A_accidentalParensLeft);
-                symbolStr.push_back(symc);
-                symbolStr.push_back(SMUFL_E26B_accidentalParensRight);
-                break;
-            default: symbolStr.push_back(symc);
-        }
-    }
-    else {
-        symbolStr.push_back(symc);
-    }
-    return symbolStr;
+    return Accid::CreateSymbolStr(this->GetDocResources(), this->GetAccid(), this->GetEnclose());
 }
 
 int KeyAccid::CalcStaffLoc(Clef *clef, int clefLocOffset) const

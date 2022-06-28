@@ -73,60 +73,10 @@ void Accid::Reset()
     m_alignedWithSameLayer = false;
 }
 
-std::wstring Accid::GetSymbolStr(const data_NOTATIONTYPE notationType) const
+std::wstring Accid::GetSymbolStr(data_NOTATIONTYPE notationType) const
 {
-    if (!this->HasAccid()) return L"";
-
-    const Resources *resources = this->GetDocResources();
-    if (!resources) return L"";
-
-    wchar_t code = 0;
-
-    // If there is glyph.num, prioritize it
-    if (this->HasGlyphNum()) {
-        code = this->GetGlyphNum();
-        if (NULL == resources->GetGlyph(code)) code = 0;
-    }
-    // If there is glyph.name (second priority)
-    else if (this->HasGlyphName()) {
-        code = resources->GetGlyphCode(this->GetGlyphName());
-        if (NULL == resources->GetGlyph(code)) code = 0;
-    }
-
-    if (!code) {
-        switch (notationType) {
-            case NOTATIONTYPE_mensural:
-            case NOTATIONTYPE_mensural_black:
-            case NOTATIONTYPE_mensural_white:
-                switch (this->GetAccid()) {
-                    case ACCIDENTAL_WRITTEN_s: code = SMUFL_E9E3_medRenSharpCroix; break;
-                    case ACCIDENTAL_WRITTEN_f: code = SMUFL_E9E0_medRenFlatSoftB; break;
-                    case ACCIDENTAL_WRITTEN_n: code = SMUFL_E9E2_medRenNatural; break;
-                    // we do not want to ignore non-mensural accidentals
-                    default: code = this->GetAccidGlyph(this->GetAccid()); break;
-                }
-                break;
-            default: code = this->GetAccidGlyph(this->GetAccid()); break;
-        }
-    }
-
-    std::wstring symbolStr;
-    if (this->HasEnclose()) {
-        if (this->GetEnclose() == ENCLOSURE_brack) {
-            symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
-            symbolStr.push_back(code);
-            symbolStr.push_back(SMUFL_E26D_accidentalBracketRight);
-        }
-        else {
-            symbolStr.push_back(SMUFL_E26A_accidentalParensLeft);
-            symbolStr.push_back(code);
-            symbolStr.push_back(SMUFL_E26B_accidentalParensRight);
-        }
-    }
-    else {
-        symbolStr.push_back(code);
-    }
-    return symbolStr;
+    return Accid::CreateSymbolStr(this->GetDocResources(), this->GetAccid(), this->GetEnclose(), notationType,
+        this->GetGlyphNum(), this->GetGlyphName());
 }
 
 void Accid::AdjustToLedgerLines(const Doc *doc, LayerElement *element, int staffSize)
@@ -270,6 +220,61 @@ wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
         default: break;
     }
     return 0;
+}
+
+std::wstring Accid::CreateSymbolStr(const Resources *resources, data_ACCIDENTAL_WRITTEN accid, data_ENCLOSURE enclosure,
+    data_NOTATIONTYPE notationType, data_HEXNUM glyphNum, std::string glyphName)
+{
+    if (accid == ACCIDENTAL_WRITTEN_NONE) return L"";
+    if (!resources) return L"";
+
+    wchar_t code = 0;
+
+    // If there is glyph.num, prioritize it
+    if (glyphNum != 0) {
+        code = glyphNum;
+        if (NULL == resources->GetGlyph(code)) code = 0;
+    }
+    // If there is glyph.name (second priority)
+    else if (!glyphName.empty()) {
+        code = resources->GetGlyphCode(glyphName);
+        if (NULL == resources->GetGlyph(code)) code = 0;
+    }
+
+    if (!code) {
+        switch (notationType) {
+            case NOTATIONTYPE_mensural:
+            case NOTATIONTYPE_mensural_black:
+            case NOTATIONTYPE_mensural_white:
+                switch (accid) {
+                    case ACCIDENTAL_WRITTEN_s: code = SMUFL_E9E3_medRenSharpCroix; break;
+                    case ACCIDENTAL_WRITTEN_f: code = SMUFL_E9E0_medRenFlatSoftB; break;
+                    case ACCIDENTAL_WRITTEN_n: code = SMUFL_E9E2_medRenNatural; break;
+                    // we do not want to ignore non-mensural accidentals
+                    default: code = Accid::GetAccidGlyph(accid); break;
+                }
+                break;
+            default: code = Accid::GetAccidGlyph(accid); break;
+        }
+    }
+
+    std::wstring symbolStr;
+    if (enclosure != ENCLOSURE_NONE) {
+        if (enclosure == ENCLOSURE_brack) {
+            symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
+            symbolStr.push_back(code);
+            symbolStr.push_back(SMUFL_E26D_accidentalBracketRight);
+        }
+        else {
+            symbolStr.push_back(SMUFL_E26A_accidentalParensLeft);
+            symbolStr.push_back(code);
+            symbolStr.push_back(SMUFL_E26B_accidentalParensRight);
+        }
+    }
+    else {
+        symbolStr.push_back(code);
+    }
+    return symbolStr;
 }
 
 //----------------------------------------------------------------------------
