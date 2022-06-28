@@ -748,14 +748,13 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     // Run through each descendant staffDef
     const ListOfObjects &staffDefs = staffGrp->GetList(staffGrp);
     int yBottomPrevious = VRV_UNSET;
-    bool drawnPrevious = false;
     for (Object *object : staffDefs) {
         StaffDef *staffDef = vrv_cast<StaffDef *>(object);
         assert(staffDef);
 
         // In recursive call ignore any staffDef which is not a direct child
         if (recursive && (staffDef->GetParent() != staffGrp)) {
-            drawnPrevious = false;
+            yBottomPrevious = VRV_UNSET;
             continue;
         }
 
@@ -768,7 +767,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             if (barlineRend != BARRENDITION_NONE) form = barlineRend;
         }
         if (form == BARRENDITION_NONE) {
-            drawnPrevious = false;
+            yBottomPrevious = VRV_UNSET;
             continue;
         }
 
@@ -777,11 +776,11 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
         if (!staff) {
             LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", staffDef->GetN());
-            drawnPrevious = false;
+            yBottomPrevious = VRV_UNSET;
             continue;
         }
         if (!barlineThrough && (staff->GetVisible() == BOOLEAN_false)) {
-            drawnPrevious = false;
+            yBottomPrevious = VRV_UNSET;
             continue;
         }
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -810,26 +809,24 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         const int yTop = yBottom + yLength;
 
         // Now draw the barline in the staff
-        this->DrawBarLine(dc, yTop, yBottom, barLine, form, false, true);
+        this->DrawBarLine(dc, yTop, yBottom, barLine, form, false);
         if (barLine->HasRepetitionDots()) {
             this->DrawBarLineDots(dc, staff, barLine);
         }
 
         // ... and the barline in the staff space
-        if (barlineThrough && drawnPrevious) {
+        if (barlineThrough && (yBottomPrevious != VRV_UNSET)) {
             // Do not erase intersections with right barline of the last measure of the system
             const bool eraseIntersections = !isLastMeasure || (barLine->GetPosition() != BarLinePosition::Right);
 
-            this->DrawBarLine(dc, yBottomPrevious, yTop, barLine, form, eraseIntersections, true);
+            this->DrawBarLine(dc, yBottomPrevious, yTop, barLine, form, eraseIntersections);
         }
-
         yBottomPrevious = yBottom;
-        drawnPrevious = true;
     }
 }
 
-void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, data_BARRENDITION form,
-    bool eraseIntersections, bool singleStaff)
+void View::DrawBarLine(
+    DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, data_BARRENDITION form, bool eraseIntersections)
 {
     assert(dc);
     assert(barLine);
@@ -886,12 +883,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength, gapLength);
             break;
         case BARRENDITION_dotted: //
-            if (singleStaff) {
-                this->DrawVerticalDots(dc, x, line, barLineWidth, m_doc->GetDrawingDoubleUnit(staffSize));
-            }
-            else {
-                this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
-            }
+            this->DrawVerticalDots(dc, x, line, barLineWidth, m_doc->GetDrawingDoubleUnit(staffSize));
             break;
         case BARRENDITION_rptend:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
