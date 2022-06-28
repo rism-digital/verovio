@@ -118,9 +118,9 @@ public:
     /**
      * Create the SMuFL string based on various properties
      */
-    static std::wstring CreateSymbolStr(const Resources *resources, data_ACCIDENTAL_WRITTEN accid,
-        data_ENCLOSURE enclosure = ENCLOSURE_NONE, data_NOTATIONTYPE notationType = NOTATIONTYPE_NONE,
-        data_HEXNUM glyphNum = 0, std::string glyphName = "");
+    static std::wstring CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOSURE enclosure = ENCLOSURE_NONE,
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_NONE, const Resources *resources = NULL, data_HEXNUM glyphNum = 0,
+        std::string glyphName = "");
 
     //----------//
     // Functors //

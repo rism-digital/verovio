@@ -75,7 +75,7 @@ void Accid::Reset()
 
 std::wstring Accid::GetSymbolStr(data_NOTATIONTYPE notationType) const
 {
-    return Accid::CreateSymbolStr(this->GetDocResources(), this->GetAccid(), this->GetEnclose(), notationType,
+    return Accid::CreateSymbolStr(this->GetAccid(), this->GetEnclose(), notationType, this->GetDocResources(),
         this->GetGlyphNum(), this->GetGlyphName());
 }
 
@@ -222,23 +222,24 @@ wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
     return 0;
 }
 
-std::wstring Accid::CreateSymbolStr(const Resources *resources, data_ACCIDENTAL_WRITTEN accid, data_ENCLOSURE enclosure,
-    data_NOTATIONTYPE notationType, data_HEXNUM glyphNum, std::string glyphName)
+std::wstring Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOSURE enclosure,
+    data_NOTATIONTYPE notationType, const Resources *resources, data_HEXNUM glyphNum, std::string glyphName)
 {
     if (accid == ACCIDENTAL_WRITTEN_NONE) return L"";
-    if (!resources) return L"";
 
     wchar_t code = 0;
 
-    // If there is glyph.num, prioritize it
-    if (glyphNum != 0) {
-        code = glyphNum;
-        if (NULL == resources->GetGlyph(code)) code = 0;
-    }
-    // If there is glyph.name (second priority)
-    else if (!glyphName.empty()) {
-        code = resources->GetGlyphCode(glyphName);
-        if (NULL == resources->GetGlyph(code)) code = 0;
+    if (resources) {
+        // If there is glyph.num, prioritize it
+        if (glyphNum != 0) {
+            code = glyphNum;
+            if (NULL == resources->GetGlyph(code)) code = 0;
+        }
+        // If there is glyph.name (second priority)
+        else if (!glyphName.empty()) {
+            code = resources->GetGlyphCode(glyphName);
+            if (NULL == resources->GetGlyph(code)) code = 0;
+        }
     }
 
     if (!code) {
@@ -259,20 +260,18 @@ std::wstring Accid::CreateSymbolStr(const Resources *resources, data_ACCIDENTAL_
     }
 
     std::wstring symbolStr;
-    if (enclosure != ENCLOSURE_NONE) {
-        if (enclosure == ENCLOSURE_brack) {
+    switch (enclosure) {
+        case ENCLOSURE_brack:
             symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
             symbolStr.push_back(code);
             symbolStr.push_back(SMUFL_E26D_accidentalBracketRight);
-        }
-        else {
+            break;
+        case ENCLOSURE_paren:
             symbolStr.push_back(SMUFL_E26A_accidentalParensLeft);
             symbolStr.push_back(code);
             symbolStr.push_back(SMUFL_E26B_accidentalParensRight);
-        }
-    }
-    else {
-        symbolStr.push_back(code);
+            break;
+        default: symbolStr.push_back(code); break;
     }
     return symbolStr;
 }

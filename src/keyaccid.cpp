@@ -61,7 +61,7 @@ void KeyAccid::Reset()
 
 std::wstring KeyAccid::GetSymbolStr() const
 {
-    return Accid::CreateSymbolStr(this->GetDocResources(), this->GetAccid(), this->GetEnclose());
+    return Accid::CreateSymbolStr(this->GetAccid(), this->GetEnclose());
 }
 
 int KeyAccid::CalcStaffLoc(Clef *clef, int clefLocOffset) const
