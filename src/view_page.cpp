@@ -731,8 +731,11 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         return;
     }
 
+    const bool barlineThrough = (staffGrp->GetBarThru() == BOOLEAN_true);
+    const bool recursive = !barlineThrough;
+
     // Call the method recursively
-    if (staffGrp->GetBarThru() != BOOLEAN_true) {
+    if (recursive) {
         StaffGrp *childStaffGrp = NULL;
         for (int i = 0; i < staffGrp->GetChildCount(); ++i) {
             childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
@@ -746,31 +749,26 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     const ListOfObjects &staffDefs = staffGrp->GetList(staffGrp);
     int yBottomPrevious = VRV_UNSET;
     bool drawnPrevious = false;
-    data_BARRENDITION form = BARRENDITION_NONE;
     for (Object *object : staffDefs) {
         StaffDef *staffDef = vrv_cast<StaffDef *>(object);
         assert(staffDef);
 
-        // In case the barline is not drawn through ignore any staffDef which is not a direct child
-        // => It will be handled in the recursive call
-        if ((staffGrp->GetBarThru() != BOOLEAN_true) && (staffDef->GetParent() != staffGrp)) {
+        // In recursive call ignore any staffDef which is not a direct child
+        if (recursive && (staffDef->GetParent() != staffGrp)) {
             drawnPrevious = false;
             continue;
         }
 
-        // True if the current barline segment is an extension of another segment
-        const bool isExtension = (staffGrp->GetBarThru() == BOOLEAN_true) && drawnPrevious;
-        if (!isExtension) {
-            form = barLine->GetForm();
-            if (measure->HasInvisibleStaffBarlines()) {
-                data_BARRENDITION barlineRend = (barLine->GetPosition() == BarLinePosition::Right)
-                    ? measure->GetDrawingRightBarLineByStaffN(staffDef->GetN())
-                    : measure->GetDrawingLeftBarLineByStaffN(staffDef->GetN());
-                if (barlineRend != BARRENDITION_NONE) form = barlineRend;
-            }
+        // Determine the barline form
+        data_BARRENDITION form = barLine->GetForm();
+        if (!barlineThrough && (measure->HasInvisibleStaffBarlines())) {
+            data_BARRENDITION barlineRend = (barLine->GetPosition() == BarLinePosition::Right)
+                ? measure->GetDrawingRightBarLineByStaffN(staffDef->GetN())
+                : measure->GetDrawingLeftBarLineByStaffN(staffDef->GetN());
+            if (barlineRend != BARRENDITION_NONE) form = barlineRend;
         }
         if (form == BARRENDITION_NONE) {
-            drawnPrevious = true;
+            drawnPrevious = false;
             continue;
         }
 
@@ -782,7 +780,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             drawnPrevious = false;
             continue;
         }
-        if (!isExtension && (staff->GetVisible() == BOOLEAN_false)) {
+        if (!barlineThrough && (staff->GetVisible() == BOOLEAN_false)) {
             drawnPrevious = false;
             continue;
         }
@@ -818,7 +816,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
 
         // ... and the barline in the staff space
-        if (isExtension && (yBottomPrevious != VRV_UNSET)) {
+        if (barlineThrough && drawnPrevious) {
             // Do not erase intersections with right barline of the last measure of the system
             const bool eraseIntersections = !isLastMeasure || (barLine->GetPosition() != BarLinePosition::Right);
 
