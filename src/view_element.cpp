@@ -988,7 +988,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
 void View::DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x)
 {
-    const std::wstring symbolStr = keyAccid->GetSymbolStr();
+    const std::wstring symbolStr = keyAccid->GetSymbolStr(staff->m_drawingNotationType);
     const int loc = keyAccid->CalcStaffLoc(clef, clefLocOffset);
     const int y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 

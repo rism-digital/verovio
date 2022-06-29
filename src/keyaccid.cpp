@@ -59,9 +59,9 @@ void KeyAccid::Reset()
     this->ResetEnclosingChars();
 }
 
-std::wstring KeyAccid::GetSymbolStr() const
+std::wstring KeyAccid::GetSymbolStr(data_NOTATIONTYPE notationType) const
 {
-    return Accid::CreateSymbolStr(this->GetAccid(), this->GetEnclose());
+    return Accid::CreateSymbolStr(this->GetAccid(), this->GetEnclose(), notationType);
 }
 
 int KeyAccid::CalcStaffLoc(Clef *clef, int clefLocOffset) const
