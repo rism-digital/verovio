@@ -238,7 +238,9 @@ bool MEIOutput::Export()
 
         m_mei = meiDoc.append_child("mei");
         m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
-        m_mei.append_attribute("meiversion") = version.c_str();
+        AttMeiVersion att;
+        meiVersion_MEIVERSION meiVersion = meiVersion_MEIVERSION(meiVersion_MEIVERSION_MAX - 1);
+        m_mei.append_attribute("meiversion") = (att.AttConverter::MeiVersionMeiversionToStr(meiVersion)).c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
         m_doc->ConvertToCastOffMensuralDoc(false);
