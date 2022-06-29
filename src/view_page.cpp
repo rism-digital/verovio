@@ -809,7 +809,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         const int yTop = yBottom + yLength;
 
         // Now draw the barline in the staff
-        this->DrawBarLine(dc, yTop, yBottom, barLine, form, false);
+        this->DrawBarLine(dc, yTop, yBottom, barLine, form);
         if (barLine->HasRepetitionDots()) {
             this->DrawBarLineDots(dc, staff, barLine);
         }
@@ -819,31 +819,39 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             // Do not erase intersections with right barline of the last measure of the system
             const bool eraseIntersections = !isLastMeasure || (barLine->GetPosition() != BarLinePosition::Right);
 
-            this->DrawBarLine(dc, yBottomPrevious, yTop, barLine, form, eraseIntersections);
+            this->DrawBarLine(dc, yBottomPrevious, yTop, barLine, form, true, eraseIntersections);
         }
         yBottomPrevious = yBottom;
     }
 }
 
-void View::DrawBarLine(
-    DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, data_BARRENDITION form, bool eraseIntersections)
+void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, data_BARRENDITION form,
+    bool inStaffSpace, bool eraseIntersections)
 {
     assert(dc);
     assert(barLine);
 
     Staff *staff = barLine->GetAncestorStaff(ANCESTOR_ONLY, false);
     const int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
+    const int unit = m_doc->GetDrawingUnit(staffSize);
 
     const int x = barLine->GetDrawingX();
     const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
-    const int barLineThickWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_thickBarlineThickness.GetValue();
-    const int barLineSeparation = m_doc->GetDrawingUnit(staffSize) * m_options->m_barLineSeparation.GetValue();
+    const int barLineThickWidth = unit * m_options->m_thickBarlineThickness.GetValue();
+    const int barLineSeparation = unit * m_options->m_barLineSeparation.GetValue();
     const int barLinesSum = barLineThickWidth + barLineWidth;
     int x2 = x + barLineSeparation;
 
     const int dotLength = m_doc->GetDrawingUnit(staffSize) * 4 / 13;
     const int dashLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarLineDashLength.GetValue();
     const int gapLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarLineGapLength.GetValue();
+    // optimized for five line staves
+    const int dashLength = unit * 8 / 7;
+    if (inStaffSpace && ((form == BARRENDITION_dashed) || (form == BARRENDITION_dbldashed))) {
+        // Dashed lines in staff space should start with a gap
+        yTop -= dashLength;
+        yBottom += dashLength;
+    }
 
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
@@ -870,7 +878,7 @@ void View::DrawBarLine(
             lines.SetParent(system);
             lines.UpdateContentBBoxX(minX, maxX);
             lines.UpdateContentBBoxY(yTop, yBottom);
-            int margin = m_doc->GetDrawingUnit(staffSize) / 2;
+            int margin = unit / 2;
             system->m_systemAligner.FindAllIntersectionPoints(line, lines, { DIR, DYNAM, TEMPO }, margin);
         }
     }
@@ -883,7 +891,7 @@ void View::DrawBarLine(
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength, gapLength);
             break;
         case BARRENDITION_dotted: //
-            this->DrawVerticalDots(dc, x, line, barLineWidth, m_doc->GetDrawingDoubleUnit(staffSize));
+            this->DrawVerticalDots(dc, x, line, barLineWidth, 2 * unit);
             break;
         case BARRENDITION_rptend:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
@@ -915,8 +923,8 @@ void View::DrawBarLine(
             this->DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dashLength, gapLength);
             break;
         case BARRENDITION_dbldotted:
-            this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
-            this->DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dotLength);
+            this->DrawVerticalDots(dc, x, line, barLineWidth, 2 * unit);
+            this->DrawVerticalDots(dc, x2 + barLineWidth, line, barLineWidth, 2 * unit);
             break;
         default:
             // Use solid barline as fallback
