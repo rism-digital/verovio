@@ -386,8 +386,14 @@ protected:
 private:
     /**
      * An vector of line segments
+     * They always have increasing order and orientation
      */
     ArrayOfIntPairs m_segments;
+
+    /**
+     * Flag indicating the orientation of the original line
+     */
+    bool m_increasing;
 };
 
 } // namespace vrv

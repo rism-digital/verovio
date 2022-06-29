@@ -243,16 +243,16 @@ void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line,
 {
     if (line.GetSegmentCount() > 1) return;
 
-    const auto [start, end] = line.GetStartEnd(0);
+    const auto [top, bottom] = line.GetStartEnd(0);
     const int radius = std::max(barlineWidth, 2);
-    int drawingPosition = start + interval / 2;
+    int drawingPosition = top - interval / 2;
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    while (drawingPosition < end) {
+    while (drawingPosition > bottom) {
         dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(drawingPosition), radius);
-        drawingPosition += interval;
+        drawingPosition -= interval;
     }
 
     dc->ResetPen();

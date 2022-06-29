@@ -1151,7 +1151,8 @@ int BoundingBox::RectBottomOverlap(const Point rect1[2], const Point rect2[2], i
 
 SegmentedLine::SegmentedLine(int start, int end)
 {
-    if (start > end) {
+    m_increasing = (start <= end);
+    if (!m_increasing) {
         BoundingBox::Swap(start, end);
     }
     m_segments.push_back({ start, end });
@@ -1162,13 +1163,21 @@ std::pair<int, int> SegmentedLine::GetStartEnd(int idx) const
     assert(idx >= 0);
     assert(idx < this->GetSegmentCount());
 
-    return { m_segments.at(idx).first, m_segments.at(idx).second };
+    if (m_increasing) {
+        return { m_segments.at(idx).first, m_segments.at(idx).second };
+    }
+    else {
+        // Read the segment array "backwards"
+        idx = this->GetSegmentCount() - 1 - idx;
+        return { m_segments.at(idx).second, m_segments.at(idx).first };
+    }
 }
 
 void SegmentedLine::AddGap(int start, int end)
 {
     assert(start != end);
 
+    // Internally segments always have increasing order and orientation
     if (start > end) {
         BoundingBox::Swap(start, end);
     }
