@@ -207,7 +207,7 @@ int DurationInterface::GetNoteOrChordDur(const LayerElement *element) const
             if (duration != DUR_NONE) {
                 return duration;
             }
-        }        
+        }
     }
     else if (element->Is(NOTE)) {
         const Note *note = vrv_cast<const Note *>(element);
