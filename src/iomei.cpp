@@ -2170,6 +2170,7 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
 
     this->WriteLayerElement(currentNode, artic);
     artic->WriteArticulation(currentNode);
+    artic->WriteArticulationGestural(currentNode);
     artic->WriteColor(currentNode);
     artic->WriteEnclosingChars(currentNode);
     artic->WriteExtSym(currentNode);
@@ -5817,6 +5818,7 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
     this->ReadLayerElement(artic, vrvArtic);
 
     vrvArtic->ReadArticulation(artic);
+    vrvArtic->ReadArticulationGestural(artic);
     vrvArtic->ReadColor(artic);
     vrvArtic->ReadEnclosingChars(artic);
     vrvArtic->ReadExtSym(artic);
