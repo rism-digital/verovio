@@ -829,17 +829,17 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             Text *text = new Text();
             syl->AddChild(text);
             Zone *sylZone = new Zone();
-
-            // these constants are just to improve visibility of the default boundingbox
+            
+            int staffBottomY = staff->GetDrawingY() + staff->GetHeight();
             int offSetUlx = -50;
-            int offSetUly = 100;
+            int offSetUly = 0;
             int offSetLrx = 150;
-            int offSetLry = 250;
+            int offSetLry = 150;
 
             sylZone->SetUlx(ulx + offSetUlx);
-            sylZone->SetUly(uly + offSetUly);
+            sylZone->SetUly(staffBottomY + offSetUly);
             sylZone->SetLrx(ulx + offSetLrx);
-            sylZone->SetLry(uly + offSetLry);
+            sylZone->SetLry(staffBottomY + offSetLry);
             surface->AddChild(sylZone);
             fi->SetZone(sylZone);
         }
