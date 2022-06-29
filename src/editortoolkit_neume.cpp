@@ -829,17 +829,26 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             Text *text = new Text();
             syl->AddChild(text);
             Zone *sylZone = new Zone();
-            
-            int staffBottomY = staff->GetDrawingY() + staff->GetHeight();
-            int offSetUlx = -50;
-            int offSetUly = 0;
-            int offSetLrx = 150;
-            int offSetLry = 150;
 
-            sylZone->SetUlx(ulx + offSetUlx);
-            sylZone->SetUly(staffBottomY + offSetUly);
-            sylZone->SetLrx(ulx + offSetLrx);
-            sylZone->SetLry(staffBottomY + offSetLry);
+            // calculate bboxUlx and bboxUly wrt rotation using sine rule
+            double PI = 3.14;
+            int draw_w = staff->GetWidth();
+            int draw_h = staff->GetHeight();
+            double theta = staff->GetDrawingRotate();
+            int x = ulx - staff->GetDrawingX();
+            int y = (int)( (draw_w - x) * tan(theta * PI / 180.0) );
+
+            int staffUly = staff->GetDrawingY();
+            int bboxUlx = ulx;
+            int bboxUly = staffUly + draw_h - y;
+            int bboxWidth = 225; // width height and offset can be adjusted
+            int bboxHeight = 175;
+            int bboxOffsetX = 50;
+
+            sylZone->SetUlx(bboxUlx - bboxOffsetX);
+            sylZone->SetUly(bboxUly);
+            sylZone->SetLrx(bboxUlx + bboxWidth - bboxOffsetX);
+            sylZone->SetLry(bboxUly + bboxHeight);
             surface->AddChild(sylZone);
             fi->SetZone(sylZone);
         }
