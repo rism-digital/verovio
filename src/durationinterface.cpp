@@ -199,13 +199,13 @@ int DurationInterface::GetNoteOrChordDur(const LayerElement *element) const
 {
     if (element->Is(CHORD)) {
         int duration = this->GetActualDur();
-        const Chord *chord = vrv_cast<const Chord *>(element);
         if (duration != DUR_NONE) return duration;
 
+        const Chord *chord = vrv_cast<const Chord *>(element);
         for (const Note *note : { chord->GetTopNote(), chord->GetBottomNote() }) {
-            const int noteDur = note->GetActualDur();
-            if (noteDur != DUR_NONE) {
-                return noteDur;
+            duration = note->GetActualDur();
+            if (duration != DUR_NONE) {
+                return duration;
             }
         }        
     }
