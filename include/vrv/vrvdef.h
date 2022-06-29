@@ -42,8 +42,6 @@ namespace vrv {
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
 
-enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1, MEI_5_0_0_dev };
-
 //----------------------------------------------------------------------------
 // Cast redefinition
 //----------------------------------------------------------------------------
