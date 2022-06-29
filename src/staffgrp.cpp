@@ -33,6 +33,7 @@ static const ClassRegistrar<StaffGrp> s_factory("staffGrp", STAFFGRP);
 StaffGrp::StaffGrp()
     : Object(STAFFGRP, "staffgrp-")
     , ObjectListInterface()
+    , AttBarring()
     , AttBasic()
     , AttLabelled()
     , AttNNumberLike()
@@ -40,6 +41,7 @@ StaffGrp::StaffGrp()
     , AttStaffGrpVis()
     , AttTyped()
 {
+    this->RegisterAttClass(ATT_BARRING);
     this->RegisterAttClass(ATT_BASIC);
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
@@ -55,6 +57,7 @@ StaffGrp::~StaffGrp() {}
 void StaffGrp::Reset()
 {
     Object::Reset();
+    this->ResetBarring();
     this->ResetBasic();
     this->ResetLabelled();
     this->ResetNNumberLike();

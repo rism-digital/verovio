@@ -30,6 +30,7 @@ class LabelAbbr;
  */
 class StaffGrp : public Object,
                  public ObjectListInterface,
+                 public AttBarring,
                  public AttBasic,
                  public AttLabelled,
                  public AttNNumberLike,
