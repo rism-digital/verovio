@@ -3149,7 +3149,7 @@ MEIInput::MEIInput(Doc *doc) : Input(doc)
 {
     m_hasScoreDef = false;
     m_readingScoreBased = false;
-    m_version = meiVersion_MEIVERSION_NONE;
+    m_meiversion = meiVersion_MEIVERSION_NONE;
 }
 
 MEIInput::~MEIInput() {}
@@ -3602,12 +3602,12 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     if (root.attribute("meiversion")) {
         std::string version = std::string(root.attribute("meiversion").value());
         AttMeiVersion att;
-        m_version = att.AttConverter::StrToMeiVersionMeiversion(version);
+        m_meiversion = att.AttConverter::StrToMeiVersionMeiversion(version);
     }
     else {
         // default to MEI 5
         LogWarning("No meiversion found, falling back to MEI5 (dev)");
-        m_version = meiVersion_MEIVERSION_5_0_0_dev;
+        m_meiversion = meiVersion_MEIVERSION_5_0_0_dev;
     }
 
     // only try to handle meiHead if we have a full MEI document
@@ -3686,7 +3686,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     // Old page-based files. We skip the mdiv and load the pages element.
     // The mdiv and score boundaries are added by UpgradePageTo_5_0_0.
     // This work only for single page files
-    else if (m_selectedMdiv.child("pages") && (m_version == meiVersion_MEIVERSION_2013)) {
+    else if (m_selectedMdiv.child("pages") && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         pages = m_selectedMdiv.child("pages");
         m_readingScoreBased = false;
     }
@@ -3816,7 +3816,7 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     Page *vrvPage = new Page();
     this->SetMeiID(page, vrvPage);
 
-    if ((m_doc->GetType() == Transcription) && (m_version == meiVersion_MEIVERSION_2013)) {
+    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_3_0_0(vrvPage, m_doc);
     }
 
@@ -3861,7 +3861,7 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
         vrvPage->Process(&applyPPUFactor, &applyPPUFactorParams);
     }
 
-    if ((m_doc->GetType() == Transcription) && (m_version == meiVersion_MEIVERSION_2013)) {
+    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_5_0_0(vrvPage);
     }
 
@@ -4280,7 +4280,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                     assert(system);
                     unmeasured = new Measure(false);
                     m_doc->SetMensuralMusicOnly(true);
-                    if ((m_doc->GetType() == Transcription) && (m_version == meiVersion_MEIVERSION_2013)) {
+                    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
                     }
                     system->AddChild(unmeasured);
@@ -4410,7 +4410,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvMensur->SetColor(mensuralVis.GetMensurColor());
         vrvMensur->SetOrient(mensuralVis.GetMensurOrient());
 
-        if (m_version < meiVersion_MEIVERSION_5_0_0_dev) {
+        if (m_meiversion < meiVersion_MEIVERSION_5_0_0_dev) {
             UpgradeMensurTo_5_0_0(element, vrvMensur);
         }
 
@@ -4455,7 +4455,7 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     }
     this->ReadScoreDefElement(scoreDef, vrvScoreDef);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         UpgradeScoreDefElementTo_4_0_0(scoreDef, vrvScoreDef);
     }
 
@@ -4543,7 +4543,7 @@ bool MEIInput::ReadStaffGrp(Object *parent, pugi::xml_node staffGrp)
     StaffGrp *vrvStaffGrp = new StaffGrp();
     this->SetMeiID(staffGrp, vrvStaffGrp);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         UpgradeStaffGrpTo_4_0_0(staffGrp, vrvStaffGrp);
     }
 
@@ -4741,7 +4741,7 @@ bool MEIInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
     StaffDef *vrvStaffDef = new StaffDef();
     this->ReadScoreDefElement(staffDef, vrvStaffDef);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         UpgradeScoreDefElementTo_4_0_0(staffDef, vrvStaffDef);
         UpgradeStaffDefTo_4_0_0(staffDef, vrvStaffDef);
     }
@@ -4876,7 +4876,7 @@ bool MEIInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
     InstrDef *vrvInstrDef = new InstrDef();
     this->SetMeiID(instrDef, vrvInstrDef);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         if (instrDef.attribute("midi.volume")) {
             const float midiValue = instrDef.attribute("midi.volume").as_float();
             instrDef.attribute("midi.volume").set_value(StringFormat("%.2f%%", midiValue / 127 * 100).c_str());
@@ -4971,7 +4971,7 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
-    if ((m_doc->GetType() == Transcription) && (m_version == meiVersion_MEIVERSION_2013)) {
+    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeMeasureTo_5_0_0(measure);
     }
 
@@ -5388,7 +5388,7 @@ bool MEIInput::ReadMordent(Object *parent, pugi::xml_node mordent)
     Mordent *vrvMordent = new Mordent();
     this->ReadControlElement(mordent, vrvMordent);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         UpgradeMordentTo_4_0_0(mordent, vrvMordent);
     }
 
@@ -5555,7 +5555,7 @@ bool MEIInput::ReadTurn(Object *parent, pugi::xml_node turn)
     Turn *vrvTurn = new Turn();
     this->ReadControlElement(turn, vrvTurn);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         UpgradeTurnTo_4_0_0(turn, vrvTurn);
     }
 
@@ -5619,7 +5619,7 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
 
-    if ((m_doc->GetType() == Transcription) && (m_version == meiVersion_MEIVERSION_2013)) {
+    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeStaffTo_5_0_0(staff);
     }
 
@@ -5849,7 +5849,7 @@ bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     object->ReadLabelled(element);
     object->ReadTyped(element);
 
-    if ((m_doc->GetType() == Transcription) && (m_version == meiVersion_MEIVERSION_2013)) {
+    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeLayerElementTo_5_0_0(element);
     }
 
@@ -5941,7 +5941,7 @@ bool MEIInput::ReadBeatRpt(Object *parent, pugi::xml_node beatRpt)
     vrvBeatRpt->ReadBeatRptLog(beatRpt);
     vrvBeatRpt->ReadBeatRptVis(beatRpt);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         UpgradeBeatRptTo_4_0_0(beatRpt, vrvBeatRpt);
     }
 
@@ -5970,7 +5970,7 @@ bool MEIInput::ReadChord(Object *parent, pugi::xml_node chord)
     Chord *vrvChord = new Chord();
     this->ReadLayerElement(chord, vrvChord);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         if (chord.attribute("size")) {
             chord.remove_attribute("size");
             chord.append_attribute("cue").set_value("true");
@@ -6076,7 +6076,7 @@ bool MEIInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
     FTrem *vrvFTrem = new FTrem();
     this->ReadLayerElement(fTrem, vrvFTrem);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         UpgradeFTremTo_4_0_0(fTrem, vrvFTrem);
     }
 
@@ -6165,7 +6165,7 @@ bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     Mensur *vrvMensur = new Mensur();
     this->ReadLayerElement(mensur, vrvMensur);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         if (mensur.attribute("size")) {
             mensur.remove_attribute("size");
             mensur.append_attribute("cue").set_value("true");
@@ -6180,7 +6180,7 @@ bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadSlashCount(mensur);
     vrvMensur->ReadStaffLoc(mensur);
 
-    if (m_version < meiVersion_MEIVERSION_5_0_0_dev) {
+    if (m_meiversion < meiVersion_MEIVERSION_5_0_0_dev) {
         UpgradeMensurTo_5_0_0(mensur, vrvMensur);
     }
 
@@ -6209,7 +6209,7 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
     this->ReadLayerElement(mRest, vrvMRest);
     this->ReadPositionInterface(mRest, vrvMRest);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         if (mRest.attribute("size")) {
             mRest.remove_attribute("size");
             mRest.append_attribute("cue").set_value("true");
@@ -6225,7 +6225,7 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
         m_doc->SetMarkup(MARKUP_ANALYTICAL_FERMATA);
     }
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         // as mRest has no durationInterface we simply delete dur.ges on upgrade
         if (mRest.attribute("dur.ges")) mRest.remove_attribute("dur.ges");
     }
@@ -6334,7 +6334,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     Note *vrvNote = new Note();
     this->ReadLayerElement(note, vrvNote);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         if (note.attribute("size")) {
             note.remove_attribute("size");
             note.append_attribute("cue").set_value("true");
@@ -6386,7 +6386,7 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
     Rest *vrvRest = new Rest();
     this->ReadLayerElement(rest, vrvRest);
 
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         if (rest.attribute("size")) {
             rest.remove_attribute("size");
             rest.append_attribute("cue").set_value("true");
@@ -6704,7 +6704,7 @@ bool MEIInput::ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *in
 
 bool MEIInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
-    if (m_version < meiVersion_MEIVERSION_4_0_0) {
+    if (m_meiversion < meiVersion_MEIVERSION_4_0_0) {
         UpgradeDurGesTo_4_0_0(element, interface);
     }
 
