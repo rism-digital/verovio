@@ -623,7 +623,7 @@ void View::DrawHairpin(
     }
 
     // Now swap start/end for dim.
-    if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
+    if (form == hairpinLog_FORM_dim) std::swap(startY, endY);
 
     int y1 = hairpin->GetDrawingY();
     int y2 = y1;

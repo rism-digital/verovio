@@ -660,7 +660,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     y1 -= penWidth;
     y2 += penWidth;
     x += penWidth;
-    BoundingBox::Swap(y1, y2);
+    std::swap(y1, y2);
 
     const int fact = m_doc->GetDrawingBeamWhiteWidth(staffSize, false) + m_doc->GetDrawingStemWidth(staffSize);
     const int xdec = ToDeviceContextX(fact);

@@ -795,20 +795,6 @@ int BoundingBox::Intersects(const BeamDrawingInterface *beamInterface, Accessor 
 // Static methods for BoundingBox
 //----------------------------------------------------------------------------
 
-void BoundingBox::SwapPoints(Point &p1, Point &p2)
-{
-    Point tmp = p1;
-    p1 = p2;
-    p2 = tmp;
-}
-
-void BoundingBox::Swap(int &v1, int &v2)
-{
-    int tmp = v1;
-    v1 = v2;
-    v2 = tmp;
-}
-
 Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point center)
 {
     if (point == center) return point;
@@ -1153,7 +1139,7 @@ SegmentedLine::SegmentedLine(int start, int end)
 {
     m_increasing = (start <= end);
     if (!m_increasing) {
-        BoundingBox::Swap(start, end);
+        std::swap(start, end);
     }
     m_segments.push_back({ start, end });
 }
@@ -1179,7 +1165,7 @@ void SegmentedLine::AddGap(int start, int end)
 
     // Internally segments always have increasing order and orientation
     if (start > end) {
-        BoundingBox::Swap(start, end);
+        std::swap(start, end);
     }
 
     // nothing to do
