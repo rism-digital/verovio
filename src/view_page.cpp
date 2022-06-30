@@ -790,17 +790,19 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         int yLength = staff->GetDrawingY() - yBottom;
 
         // Adjust barline start and length
-        if (measure->HasBarPlace()) {
+        const auto [hasPlace, place] = barLine->GetPlace(staffDef);
+        if (hasPlace) {
             // bar.place counts upwards (note order).
-            yBottom += measure->GetBarPlace() * unit;
+            yBottom += place * unit;
         }
         else if (staffDef->GetLines() <= 1) {
             // Make sure barlines are visible with a single line
             yBottom -= 2 * unit;
         }
 
-        if (measure->HasBarLen()) {
-            yLength = measure->GetBarLen() * unit;
+        const auto [hasLength, length] = barLine->GetLength(staffDef);
+        if (hasLength) {
+            yLength = length * unit;
         }
         else if (staffDef->GetLines() <= 1) {
             yLength = 4 * unit;

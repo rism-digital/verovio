@@ -13,6 +13,8 @@
 
 namespace vrv {
 
+class StaffDef;
+
 enum class BarLinePosition { None, Left, Right };
 
 //----------------------------------------------------------------------------
@@ -58,8 +60,20 @@ public:
     /**
      * @name Get and set the position
      */
+    ///@{
     BarLinePosition GetPosition() const { return m_position; }
     void SetPosition(BarLinePosition position) { m_position = position; }
+    ///@}
+
+    /**
+     * @name Collect AttBarring attributes
+     * @return First entry is true if the attribute was found, second entry contains the value
+     */
+    ///@{
+    std::pair<bool, double> GetLength(const StaffDef *staffDef) const;
+    std::pair<bool, data_BARMETHOD> GetMethod(const StaffDef *staffDef) const;
+    std::pair<bool, int> GetPlace(const StaffDef *staffDef) const;
+    ///@}
 
     //----------//
     // Functors //
