@@ -225,8 +225,6 @@ wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
 std::wstring Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOSURE enclosure,
     data_NOTATIONTYPE notationType, const Resources *resources, data_HEXNUM glyphNum, std::string glyphName)
 {
-    if (accid == ACCIDENTAL_WRITTEN_NONE) return L"";
-
     wchar_t code = 0;
 
     if (resources) {
@@ -243,6 +241,8 @@ std::wstring Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOSUR
     }
 
     if (!code) {
+        if (accid == ACCIDENTAL_WRITTEN_NONE) return L"";
+
         switch (notationType) {
             case NOTATIONTYPE_mensural:
             case NOTATIONTYPE_mensural_black:
