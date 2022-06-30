@@ -717,7 +717,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     params->m_staff = staff;
     params->m_layer = layer;
     params->m_interface = this;
-    params->m_dur = this->GetActualDur();
+    params->m_dur = this->GetNoteOrChordDur(this);
     params->m_isGraceNote = this->IsGraceNote();
     params->m_isStemSameasSecondary = false;
 
@@ -855,11 +855,12 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     currentStem->AttGraced::operator=(*this);
     currentStem->AttStems::operator=(*this);
     currentStem->AttStemsCmn::operator=(*this);
-    if (this->GetActualDur() < DUR_2 || (this->GetStemVisible() == BOOLEAN_false)) {
+    int duration = this->GetNoteOrChordDur(this);
+    if ((duration < DUR_2) || (this->GetStemVisible() == BOOLEAN_false)) {
         currentStem->IsVirtual(true);
     }
 
-    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->GetAncestorFTrem()) {
+    if ((duration > DUR_4) && !this->IsInBeam() && !this->GetAncestorFTrem()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {
