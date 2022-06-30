@@ -771,6 +771,11 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             continue;
         }
 
+        // Determine the method
+        const auto [hasMethod, method] = barLine->GetMethod(staffDef);
+        const bool methodMensur = hasMethod && (method == BARMETHOD_mensur);
+        const bool methodTakt = hasMethod && (method == BARMETHOD_takt);
+
         // Get the corresponding staff
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
@@ -790,40 +795,52 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         int yLength = staff->GetDrawingY() - yBottom;
 
         // Adjust barline start and length
-        const auto [hasPlace, place] = barLine->GetPlace(staffDef);
-        if (hasPlace) {
-            // bar.place counts upwards (note order).
-            yBottom += place * unit;
+        if (methodTakt) {
+            yBottom = staff->GetDrawingY() - unit;
+            yLength = 2 * unit;
         }
-        else if (staffDef->GetLines() <= 1) {
-            // Make sure barlines are visible with a single line
-            yBottom -= 2 * unit;
-        }
+        else if (!methodMensur) {
+            const auto [hasPlace, place] = barLine->GetPlace(staffDef);
+            if (hasPlace) {
+                // bar.place counts upwards (note order).
+                yBottom += place * unit;
+            }
+            else if (staffDef->GetLines() <= 1) {
+                // Make sure barlines are visible with a single line
+                yBottom -= 2 * unit;
+            }
 
-        const auto [hasLength, length] = barLine->GetLength(staffDef);
-        if (hasLength) {
-            yLength = length * unit;
-        }
-        else if (staffDef->GetLines() <= 1) {
-            yLength = 4 * unit;
+            const auto [hasLength, length] = barLine->GetLength(staffDef);
+            if (hasLength) {
+                yLength = length * unit;
+            }
+            else if (staffDef->GetLines() <= 1) {
+                yLength = 4 * unit;
+            }
         }
 
         const int yTop = yBottom + yLength;
 
+        // Determine which parts to draw
+        const bool drawInStaff = !methodMensur;
+        const bool drawInStaffSpace = methodMensur || (!methodTakt && barlineThrough);
+
         // Now draw the barline in the staff
-        this->DrawBarLine(dc, yTop, yBottom, barLine, form);
-        if (barLine->HasRepetitionDots()) {
-            this->DrawBarLineDots(dc, staff, barLine);
+        if (drawInStaff) {
+            this->DrawBarLine(dc, yTop, yBottom, barLine, form);
+            if (!methodTakt && barLine->HasRepetitionDots()) {
+                this->DrawBarLineDots(dc, staff, barLine);
+            }
         }
 
         // ... and the barline in the staff space
-        if (barlineThrough && (yBottomPrevious != VRV_UNSET)) {
+        if (drawInStaffSpace && (yBottomPrevious != VRV_UNSET)) {
             // Do not erase intersections with right barline of the last measure of the system
             const bool eraseIntersections = !isLastMeasure || (barLine->GetPosition() != BarLinePosition::Right);
 
             this->DrawBarLine(dc, yBottomPrevious, yTop, barLine, form, true, eraseIntersections);
         }
-        yBottomPrevious = yBottom;
+        yBottomPrevious = methodTakt ? VRV_UNSET : yBottom;
     }
 }
 
