@@ -227,7 +227,8 @@ bool MEIOutput::Export()
         m_doc->ConvertToCastOffMensuralDoc(false);
 
         // this starts the call of all the functors
-        m_doc->Save(this);
+        SaveParams saveParams(this, this->GetBasic());
+        m_doc->SaveObject(saveParams);
 
         // Redo the mensural segment cast of if necessary
         m_doc->ConvertToCastOffMensuralDoc(true);
@@ -842,7 +843,8 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         }
         else {
             // Save the main scoreDef
-            m_doc->GetCurrentScoreDef()->Save(this);
+            SaveParams saveParams(this, this->GetBasic());
+            m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
         }
     }
 
@@ -1196,11 +1198,13 @@ void MEIOutput::WriteCustomScoreDef()
         }
 
         // Save the adjusted score def and delete it afterwards
-        scoreDef->Save(this);
+        SaveParams saveParams(this, this->GetBasic());
+        scoreDef->SaveObject(saveParams);
         delete scoreDef;
     }
     else {
-        m_doc->GetCurrentScoreDef()->Save(this);
+        SaveParams saveParams(this, this->GetBasic());
+        m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
     }
 }
 

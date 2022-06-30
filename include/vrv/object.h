@@ -35,6 +35,7 @@ class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
 class Resources;
+class SaveParams;
 class ScoreDefInterface;
 class StemmedDrawingInterface;
 class TextDirInterface;
@@ -602,7 +603,7 @@ public:
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
-    virtual int Save(Output *output);
+    int SaveObject(SaveParams &saveParams);
 
     /**
      * Sort the child elements using std::stable_sort

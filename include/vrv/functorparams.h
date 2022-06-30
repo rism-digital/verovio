@@ -2473,12 +2473,18 @@ public:
 
 /**
  * member 0: output stream
+ * member 1: flag for MEI basic output for filtering out editorial markup
  **/
 
 class SaveParams : public FunctorParams {
 public:
-    SaveParams(Output *output) { m_output = output; }
+    SaveParams(Output *output, bool basic)
+    {
+        m_output = output;
+        m_basic = basic;
+    }
     Output *m_output;
+    bool m_basic;
 };
 
 //----------------------------------------------------------------------------
