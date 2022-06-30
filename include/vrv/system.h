@@ -103,7 +103,8 @@ public:
      * @name Setter and getter of the drawing scoreDef
      */
     ///@{
-    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
+    ScoreDef *GetDrawingScoreDef() { return m_drawingScoreDef; }
+    const ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
     ///@}
 

@@ -104,7 +104,7 @@ public:
      * Check if the staff is currently visible.
      * Looks for the parent system and its current drawing scoreDef
      */
-    bool DrawingIsVisible();
+    bool DrawingIsVisible() const;
 
     /**
      * @name Get notation type

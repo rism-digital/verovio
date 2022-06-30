@@ -285,7 +285,7 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
-int Measure::GetRightBarLineWidth(Doc *doc)
+int Measure::GetRightBarLineWidth(const Doc *doc) const
 {
     const BarLine *barline = this->GetRightBarLine();
     if (!barline) return 0;
@@ -366,13 +366,13 @@ int Measure::GetInnerCenterX() const
 
 int Measure::GetDrawingOverflow()
 {
-    Functor adjustXOverlfow(&Object::AdjustXOverflow);
-    Functor adjustXOverlfowEnd(&Object::AdjustXOverflowEnd);
+    Functor adjustXOverflow(&Object::AdjustXOverflow);
+    Functor adjustXOverflowEnd(&Object::AdjustXOverflowEnd);
     AdjustXOverflowParams adjustXOverflowParams(0);
     adjustXOverflowParams.m_currentSystem = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(adjustXOverflowParams.m_currentSystem);
     adjustXOverflowParams.m_lastMeasure = this;
-    this->Process(&adjustXOverlfow, &adjustXOverflowParams, &adjustXOverlfowEnd);
+    this->Process(&adjustXOverflow, &adjustXOverflowParams, &adjustXOverflowEnd);
     if (!adjustXOverflowParams.m_currentWidest) return 0;
 
     int measureRightX = this->GetDrawingX() + this->GetWidth();
@@ -380,7 +380,7 @@ int Measure::GetDrawingOverflow()
     return std::max(0, overflow);
 }
 
-int Measure::GetSectionRestartShift(Doc *doc) const
+int Measure::GetSectionRestartShift(const Doc *doc) const
 {
     if (this->IsFirstInSystem()) {
         return 0;
@@ -431,10 +431,15 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 
 Staff *Measure::GetTopVisibleStaff()
 {
-    Staff *staff = NULL;
-    ListOfObjects staves = this->FindAllDescendantsByType(STAFF, false);
+    return const_cast<Staff *>(std::as_const(*this).GetTopVisibleStaff());
+}
+
+const Staff *Measure::GetTopVisibleStaff() const
+{
+    const Staff *staff = NULL;
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF, false);
     for (auto &child : staves) {
-        staff = vrv_cast<Staff *>(child);
+        staff = vrv_cast<const Staff *>(child);
         assert(staff);
         if (staff->DrawingIsVisible()) {
             break;
@@ -446,10 +451,15 @@ Staff *Measure::GetTopVisibleStaff()
 
 Staff *Measure::GetBottomVisibleStaff()
 {
-    Staff *bottomStaff = NULL;
-    ListOfObjects staves = this->FindAllDescendantsByType(STAFF, false);
+    return const_cast<Staff *>(std::as_const(*this).GetBottomVisibleStaff());
+}
+
+const Staff *Measure::GetBottomVisibleStaff() const
+{
+    const Staff *bottomStaff = NULL;
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF, false);
     for (const auto child : staves) {
-        Staff *staff = vrv_cast<Staff *>(child);
+        const Staff *staff = vrv_cast<const Staff *>(child);
         assert(staff);
         if (!staff->DrawingIsVisible()) {
             continue;
@@ -492,7 +502,7 @@ data_BARRENDITION Measure::GetDrawingRightBarLineByStaffN(int staffN) const
     return this->GetDrawingRightBarLine();
 }
 
-Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
+Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(const Measure *previous) const
 {
     // Barlines are stored in the map in the following format:
     // previous measure right -> current measure left -> expected barlines (previous, current)

@@ -187,13 +187,13 @@ int Staff::GetDrawingStaffNotationSize()
     return (this->IsTablature()) ? m_drawingStaffSize / TABLATURE_STAFF_RATIO : m_drawingStaffSize;
 }
 
-bool Staff::DrawingIsVisible()
+bool Staff::DrawingIsVisible() const
 {
-    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     assert(system->GetDrawingScoreDef());
 
-    StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(this->GetN());
+    const StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(this->GetN());
     assert(staffDef);
     return (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN);
 }
