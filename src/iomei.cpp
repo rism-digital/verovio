@@ -730,6 +730,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     }
 
     // Editorial markup
+    else if (object->IsEditorialElement() && this->GetBasic()) {
+        // Editorial markup in MEI basic output is skipped and no node should be created.
+        return true;
+    }
     else if (object->Is(ABBR)) {
         m_currentNode = m_currentNode.append_child("abbr");
         this->WriteAbbr(m_currentNode, vrv_cast<Abbr *>(object));
@@ -868,8 +872,18 @@ bool MEIOutput::WriteObjectEnd(Object *object)
         }
         if (object->Is({ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
             assert(!m_boundaries.empty() && (m_boundaries.top() == object));
-
             m_boundaries.pop();
+            // For system milestone ends that point to editorial markup, we need to make sure
+            // we stop here when outputting MEI basic because no node has been created for them
+            if (this->GetBasic() && object->Is(SYSTEM_MILESTONE_END)) {
+                SystemMilestoneEnd *milestoneEnd = vrv_cast<SystemMilestoneEnd *>(object);
+                assert(milestoneEnd && milestoneEnd->GetStart());
+                if (milestoneEnd->GetStart()->IsEditorialElement()) return true;
+            }
+        }
+        // For editorial markup in MEI basic, stop here because no node has been created
+        if (object->IsEditorialElement() && this->GetBasic()) {
+            return true;
         }
     }
     else {
