@@ -2672,8 +2672,14 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     assert(measure);
     // By default, endings are drawn on top of each group (@ending.rend="gouped") unless "top" is specified)
     if (system->GetDrawingScoreDef()->GetEndingRend() == endings_ENDINGREND_top) {
-        Staff *staff = dynamic_cast<Staff *>(system->FindDescendantByType(STAFF, 2, FORWARD));
-        if (!Check(staff)) return;
+        Staff *staff = NULL;
+        ListOfObjects systemStaves = system->FindAllDescendantsByType(STAFF, false);
+        for (const auto staffObject : systemStaves) {
+            staff = vrv_cast<Staff *>(staffObject);
+            StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(staff->GetN());
+            if (staffDef && (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN)) break;
+        }
+        if (!staff) return;
         staffList.push_back(staff);
     }
     else {

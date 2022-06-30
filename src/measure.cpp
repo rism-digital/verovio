@@ -403,22 +403,21 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     assert(scoreDef);
 
     std::vector<Staff *> staves;
-    std::vector<int>::iterator iter;
-    std::vector<int> staffList;
+    std::set<int> staffList;
 
     // First get all the staffGrps
     ListOfObjects staffGrps = scoreDef->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
     for (auto &staffGrp : staffGrps) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>((staffGrp)->GetFirst(STAFFDEF));
-        if (staffDef) staffList.push_back(staffDef->GetN());
+        StaffDef *staffDef = vrv_cast<StaffDef *>((staffGrp)->FindDescendantByType(STAFFDEF));
+        if (staffDef && (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN)) staffList.insert(staffDef->GetN());
     }
 
     // Get the corresponding staves in the measure
-    for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
+    for (auto iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison matchN(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
+        Staff *staff = vrv_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
             continue;
