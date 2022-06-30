@@ -261,6 +261,11 @@ private:
     void Reset();
 
     /**
+     *
+     */
+    bool IsTreeObject(Object *object) const;
+
+    /**
      * Score based filtering
      */
     ///@{

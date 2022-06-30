@@ -899,6 +899,9 @@ bool MEIOutput::WriteObjectInternalEnd(Object *object)
         m_currentNode.append_child(pugi::node_comment).set_value(object->GetClosingComment().c_str());
     }
 
+    if (object->Is(DOC)) return true;
+
+    assert(!m_nodeStack.empty());
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
 
@@ -960,6 +963,11 @@ void MEIOutput::Reset()
 
     m_streamStringOutput.str("");
     m_streamStringOutput.clear();
+}
+
+bool MEIOutput::IsTreeObject(Object *object) const
+{
+    return !object->Is({ PAGES, PAGE, SYSTEM, SYSTEM_MILESTONE_END, PAGE_MILESTONE_END });
 }
 
 bool MEIOutput::HasValidFilter() const
@@ -1117,7 +1125,7 @@ bool MEIOutput::ProcessScoreBasedFilter(Object *object)
         }
     }
 
-    if (!object->Is({ PAGES, PAGE, SYSTEM, SYSTEM_MILESTONE_END, PAGE_MILESTONE_END })) {
+    if (this->IsTreeObject(object)) {
         m_objectStack.push_back(object);
     }
 
@@ -1127,7 +1135,7 @@ bool MEIOutput::ProcessScoreBasedFilter(Object *object)
 bool MEIOutput::ProcessScoreBasedFilterEnd(Object *object)
 {
     // Pop current object or merged boundary from stack
-    if (!m_objectStack.empty()) {
+    if (this->IsTreeObject(object) && !m_objectStack.empty()) {
         m_objectStack.pop_back();
     }
 
