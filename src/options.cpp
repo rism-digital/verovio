@@ -1183,6 +1183,14 @@ Options::Options()
     m_breaksNoWidow.Init(false);
     this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
 
+    m_dashedBarlineDashLength.SetInfo("Dashed barline dash length", "The dash length of dashed barlines");
+    m_dashedBarlineDashLength.Init(1.0, 0.1, 5.0);
+    this->Register(&m_dashedBarlineDashLength, "dashedBarlineDashLength", &m_generalLayout);
+
+    m_dashedBarlineGapLength.SetInfo("Dashed barline gap length", "The gap length of dashed barlines");
+    m_dashedBarlineGapLength.Init(1.0, 0.1, 5.0);
+    this->Register(&m_dashedBarlineGapLength, "dashedBarlineGapLength", &m_generalLayout);
+
     m_dynamDist.SetInfo("Dynam dist", "The default distance from the staff for dynamic marks");
     m_dynamDist.Init(1.0, 0.5, 16.0);
     this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
@@ -1769,6 +1777,8 @@ void Options::Sync()
         { "thickBarlineThickness", &m_thickBarlineThickness }, //
         { "barlineSeparation", &m_barLineSeparation }, //
         { "repeatBarlineDotSeparation", &m_repeatBarLineDotSeparation }, //
+        { "dashedBarlineDashLength", &m_dashedBarlineDashLength }, //
+        { "dashedBarlineGapLength", &m_dashedBarlineGapLength }, //
         { "bracketThickness", &m_bracketThickness }, //
         { "subBracketThickness", &m_subBracketThickness }, //
         { "hairpinThickness", &m_hairpinThickness }, //

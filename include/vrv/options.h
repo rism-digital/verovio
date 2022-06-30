@@ -652,6 +652,8 @@ public:
     OptionBool m_beamFrenchStyle;
     OptionDbl m_bracketThickness;
     OptionBool m_breaksNoWidow;
+    OptionDbl m_dashedBarlineDashLength;
+    OptionDbl m_dashedBarlineGapLength;
     OptionDbl m_dynamDist;
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;
