@@ -404,18 +404,22 @@ int RunningElement::PrepareDataInitialization(FunctorParams *)
 
 int RunningElement::Save(FunctorParams *functorParams)
 {
-    if (this->IsGenerated())
+    if (this->IsGenerated()) {
         return FUNCTOR_SIBLINGS;
-    else
+    }
+    else {
         return Object::Save(functorParams);
+    }
 }
 
 int RunningElement::SaveEnd(FunctorParams *functorParams)
 {
-    if (this->IsGenerated())
+    if (this->IsGenerated()) {
         return FUNCTOR_SIBLINGS;
-    else
+    }
+    else {
         return Object::SaveEnd(functorParams);
+    }
 }
 
 int RunningElement::AlignVertically(FunctorParams *functorParams)
