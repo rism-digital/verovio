@@ -211,6 +211,14 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter for MEI basic output
+     */
+    ///@{
+    void SetBasic(bool basic) { m_basic = basic; }
+    bool GetBasic() const { return m_basic; }
+    ///@}
+
+    /**
      * Score based filtering by measure, page or mdiv
      */
     ///@{
@@ -523,6 +531,8 @@ private:
     std::ostringstream m_streamStringOutput;
     int m_indent;
     bool m_scoreBasedMEI;
+    /** A flag indicating the we want to produce MEI basic */
+    bool m_basic;
     pugi::xml_node m_mei;
 
     /** Current xml element */

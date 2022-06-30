@@ -154,6 +154,7 @@ MEIOutput::MEIOutput(Doc *doc) : Output(doc)
 {
     m_indent = 5;
     m_scoreBasedMEI = false;
+    m_basic = false;
     m_ignoreHeader = false;
     m_removeIds = false;
 
