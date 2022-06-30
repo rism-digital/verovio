@@ -21,6 +21,7 @@
 #include "measure.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "staffgrp.h"
 #include "system.h"
 #include "vrv.h"
 
@@ -75,6 +76,17 @@ bool BarLine::HasRepetitionDots() const
     if (this->GetForm() == BARRENDITION_rptstart || this->GetForm() == BARRENDITION_rptend
         || this->GetForm() == BARRENDITION_rptboth) {
         return true;
+    }
+    return false;
+}
+
+bool BarLine::IsDrawnThrough(const StaffGrp *staffGrp) const
+{
+    while (staffGrp) {
+        if (staffGrp->GetBarThru() == BOOLEAN_true) {
+            return true;
+        }
+        staffGrp = dynamic_cast<const StaffGrp *>(staffGrp->GetParent());
     }
     return false;
 }

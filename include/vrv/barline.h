@@ -14,6 +14,7 @@
 namespace vrv {
 
 class StaffDef;
+class StaffGrp;
 
 enum class BarLinePosition { None, Left, Right };
 
@@ -64,6 +65,11 @@ public:
     BarLinePosition GetPosition() const { return m_position; }
     void SetPosition(BarLinePosition position) { m_position = position; }
     ///@}
+
+    /**
+     * Check if the barline is drawn through
+     */
+    bool IsDrawnThrough(const StaffGrp *staffGrp) const;
 
     /**
      * @name Collect AttBarring attributes

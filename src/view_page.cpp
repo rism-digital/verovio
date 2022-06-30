@@ -312,7 +312,8 @@ void View::DrawScoreDef(
     }
     else {
         dc->StartGraphic(barLine, "", barLine->GetID());
-        this->DrawBarLines(dc, measure, staffGrp, barLine, isLastMeasure);
+        int yBottomPrevious = VRV_UNSET;
+        this->DrawBarLines(dc, measure, staffGrp, barLine, isLastMeasure, yBottomPrevious);
         dc->EndGraphic(barLine, this);
     }
 
@@ -720,7 +721,8 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     return;
 }
 
-void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure)
+void View::DrawBarLines(
+    DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure, int &yBottomPrevious)
 {
     assert(dc);
     assert(measure);
@@ -731,32 +733,21 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         return;
     }
 
-    const bool barlineThrough = (staffGrp->GetBarThru() == BOOLEAN_true);
-    const bool recursive = !barlineThrough;
+    const bool barlineThrough = barLine->IsDrawnThrough(staffGrp);
 
-    // Call the method recursively
-    if (recursive) {
-        StaffGrp *childStaffGrp = NULL;
-        for (int i = 0; i < staffGrp->GetChildCount(); ++i) {
-            childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
-            if (childStaffGrp) {
-                this->DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure);
-            }
-        }
-    }
+    for (int i = 0; i < staffGrp->GetChildCount(); ++i) {
+        Object *child = staffGrp->GetChild(i);
 
-    // Run through each descendant staffDef
-    const ListOfObjects &staffDefs = staffGrp->GetList(staffGrp);
-    int yBottomPrevious = VRV_UNSET;
-    for (Object *object : staffDefs) {
-        StaffDef *staffDef = vrv_cast<StaffDef *>(object);
-        assert(staffDef);
-
-        // In recursive call ignore any staffDef which is not a direct child
-        if (recursive && (staffDef->GetParent() != staffGrp)) {
-            yBottomPrevious = VRV_UNSET;
+        // Recursive call for staff group
+        if (child->Is(STAFFGRP)) {
+            StaffGrp *childStaffGrp = vrv_cast<StaffGrp *>(child);
+            this->DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure, yBottomPrevious);
             continue;
         }
+
+        if (!child->Is(STAFFDEF)) continue;
+        StaffDef *staffDef = vrv_cast<StaffDef *>(child);
+        assert(staffDef);
 
         // Determine the barline form
         data_BARRENDITION form = barLine->GetForm();
@@ -840,7 +831,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
             this->DrawBarLine(dc, yBottomPrevious, yTop, barLine, form, true, eraseIntersections);
         }
-        yBottomPrevious = methodTakt ? VRV_UNSET : yBottom;
+        yBottomPrevious = drawInStaffSpace ? yBottom : VRV_UNSET;
     }
 }
 
