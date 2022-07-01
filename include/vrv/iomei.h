@@ -261,7 +261,9 @@ private:
     void Reset();
 
     /**
-     *
+     * Helper checking if the object is tree object in score-based MEI
+     * For MEI basic output, also check object marked as attribute need to be kept as element
+     * of if some needs to be written as attributes
      */
     bool IsTreeObject(Object *object) const;
 
