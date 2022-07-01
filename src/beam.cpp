@@ -312,9 +312,7 @@ bool BeamSegment::DoesBeamOverlap(
 std::pair<int, int> BeamSegment::GetVerticalOffset(const BeamDrawingInterface *beamInterface) const
 {
     const auto [topBeams, bottomBeams] = beamInterface->GetAdditionalBeamCount();
-    double multiplier = 1.0;
-    if (const Object *obj = dynamic_cast<const Object *>(beamInterface); obj && obj->Is(FTREM)) multiplier = 0.5;
-    const int topOffset = multiplier * topBeams * beamInterface->m_beamWidth;
+    const int topOffset = topBeams * beamInterface->m_beamWidth;
     const int bottomOffset = bottomBeams * beamInterface->m_beamWidth;
     return { topOffset, bottomOffset };
 }

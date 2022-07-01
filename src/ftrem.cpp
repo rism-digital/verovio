@@ -104,7 +104,7 @@ void FTrem::FilterList(ListOfConstObjects &childList) const
 
 std::pair<int, int> FTrem::GetAdditionalBeamCount() const
 {
-    return { std::max(this->GetBeams(), this->GetBeamsFloat()), 0 };
+    return { 0, std::max(this->GetBeams(), this->GetBeamsFloat()) };
 }
 
 std::pair<int, int> FTrem::GetFloatingBeamCount() const
