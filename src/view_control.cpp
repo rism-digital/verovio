@@ -2612,16 +2612,17 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     Object *objectX;
     Measure *measure = NULL;
     char spanningType = SPANNING_START_END;
+    Measure *endingMeasure = NULL;
 
     // They both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
         measure = ending->GetMeasure();
         x1 = measure->GetDrawingX();
+        endingMeasure = endingEndMilestone->GetMeasure();
         objectX = measure;
         // if it is the first measure of the system use the left barline position
         if (system->GetFirst(MEASURE) == measure) x1 += measure->GetLeftBarLineXRel();
-        x2 = endingEndMilestone->GetMeasure()->GetDrawingX() + endingEndMilestone->GetMeasure()->GetRightBarLineXRel()
-            + endingEndMilestone->GetMeasure()->GetRightBarLineWidth(m_doc);
+        x2 = endingEndMilestone->GetMeasure()->GetDrawingX() + endingEndMilestone->GetMeasure()->GetRightBarLineXRel();
     }
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
     else if (system == parentSystem1) {
@@ -2630,9 +2631,10 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if (!Check(measure)) return;
         x1 = ending->GetMeasure()->GetDrawingX();
         objectX = measure;
+        endingMeasure = measure;
         // if it is the first measure of the system use the left barline position
         if (system->GetFirst(MEASURE) == ending->GetMeasure()) x1 += ending->GetMeasure()->GetLeftBarLineXRel();
-        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel() + measure->GetRightBarLineWidth(m_doc);
+        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         spanningType = SPANNING_START;
     }
     // We are in the system where the ending ends - draw it from the beginning of the system
@@ -2642,8 +2644,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
-        x2 = endingEndMilestone->GetMeasure()->GetDrawingX() + endingEndMilestone->GetMeasure()->GetRightBarLineXRel()
-            + endingEndMilestone->GetMeasure()->GetRightBarLineWidth(m_doc);
+        endingMeasure = endingEndMilestone->GetMeasure();
+        x2 = endingEndMilestone->GetMeasure()->GetDrawingX() + endingEndMilestone->GetMeasure()->GetRightBarLineXRel();
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
@@ -2654,10 +2656,11 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
+        endingMeasure = measure;
         // We need the last measure of the system for x2
         measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
-        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel() + measure->GetRightBarLineWidth(m_doc);
+        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
     }
 
@@ -2734,15 +2737,16 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         const int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
         const int lineWidth = m_options->m_repeatEndingLineThickness.GetValue()
             * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
-        x1 -= m_options->m_staffLineWidth.GetValue() * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
-        //x2 -= m_options->m_thickBarlineThickness.GetValue() * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) / 2;
         
+        const int startX
+            = x1 - m_options->m_staffLineWidth.GetValue() * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
+        const int endX = x2 + 0.5 * endingMeasure->CalculateRightBarLineWidth(m_doc, (*staffIter)->m_drawingStaffSize);
         dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_ARCS);
         Point p[4];
-        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y1) };
-        p[1] = { ToDeviceContextX(x1), ToDeviceContextY(y2) };
-        p[2] = { ToDeviceContextX(x2), ToDeviceContextY(y2) };
-        p[3] = { ToDeviceContextX(x2), ToDeviceContextY(y1) };
+        p[0] = { ToDeviceContextX(startX), ToDeviceContextY(y1) };
+        p[1] = { ToDeviceContextX(startX), ToDeviceContextY(y2) };
+        p[2] = { ToDeviceContextX(endX), ToDeviceContextY(y2) };
+        p[3] = { ToDeviceContextX(endX), ToDeviceContextY(y1) };
         if ((spanningType == SPANNING_END) || (ending->GetLstartsym() == LINESTARTENDSYMBOL_none)) {
             p[0] = p[1];
         }
