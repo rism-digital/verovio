@@ -285,12 +285,11 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
-int Measure::GetRightBarLineWidth(const Doc *doc) const
+int Measure::CalculateRightBarLineWidth(Doc *doc, int staffSize)
 {
     const BarLine *barline = this->GetRightBarLine();
     if (!barline) return 0;
 
-    const int staffSize = 100;
     const int barLineWidth = doc->GetDrawingBarLineWidth(staffSize);
     const int barLineThickWidth
         = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_thickBarlineThickness.GetValue();
