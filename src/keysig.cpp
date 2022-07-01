@@ -238,6 +238,43 @@ int KeySig::GetFifthsInt() const
     return 0;
 }
 
+data_KEYSIGNATURE KeySig::ConvertToSig() const
+{
+    data_KEYSIGNATURE sig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
+    const ListOfConstObjects &childList = this->GetList(this);
+    if (childList.size() > 1) {
+        const KeyAccid *firstKeyAccid = vrv_cast<const KeyAccid *>(childList.front());
+        assert(firstKeyAccid);
+        const data_ACCIDENTAL_WRITTEN accidType = firstKeyAccid->GetAccid();
+        if (accidType != ACCIDENTAL_WRITTEN_f && accidType != ACCIDENTAL_WRITTEN_s) {
+            LogWarning(
+                "KeySig content cannot be converted to @sig because this accidental type is not a flat or a sharp");
+            return sig;
+        }
+        bool isCommon = true;
+        int pos = 0;
+        for (auto &child : childList) {
+            const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
+            assert(keyAccid);
+            if (accidType == ACCIDENTAL_WRITTEN_f && s_pnameForFlats[pos] != keyAccid->GetPname()) {
+                isCommon = false;
+                break;
+            }
+            else if (accidType == ACCIDENTAL_WRITTEN_s && s_pnameForSharps[pos] != keyAccid->GetPname()) {
+                isCommon = false;
+                break;
+            }
+            pos++;
+        }
+        if (!isCommon) {
+            LogWarning("KeySig content cannot be converted to @sig because the accidental series is not standard");
+            return sig;
+        }
+        sig = std::make_pair((int)childList.size(), accidType);
+    }
+    return sig;
+}
+
 //----------------------------------------------------------------------------
 // Static methods for KeySig
 //----------------------------------------------------------------------------

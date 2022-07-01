@@ -2404,7 +2404,9 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
         attKeySigDefaultAnl.SetKeyPname(keySig->GetPname());
         attKeySigDefaultAnl.WriteKeySigDefaultAnl(currentNode);
         AttKeySigDefaultLog attKeySigDefaultLog;
-        attKeySigDefaultLog.SetKeySig(keySig->GetSig());
+        // If there is no @sig, try to build it from the keyAccid children.
+        const data_KEYSIGNATURE sig = (keySig->HasSig()) ? keySig->GetSig() : keySig->ConvertToSig();
+        attKeySigDefaultLog.SetKeySig(sig);
         attKeySigDefaultLog.WriteKeySigDefaultLog(currentNode);
         AttKeySigDefaultVis attKeySigDefaultVis;
         attKeySigDefaultVis.SetKeysigShow(keySig->GetVisible());
