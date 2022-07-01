@@ -1184,11 +1184,11 @@ Options::Options()
     this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
 
     m_dashedBarlineDashLength.SetInfo("Dashed barline dash length", "The dash length of dashed barlines");
-    m_dashedBarlineDashLength.Init(1.0, 0.1, 5.0);
+    m_dashedBarlineDashLength.Init(0.57, 0.1, 2.0);
     this->Register(&m_dashedBarlineDashLength, "dashedBarlineDashLength", &m_generalLayout);
 
     m_dashedBarlineGapLength.SetInfo("Dashed barline gap length", "The gap length of dashed barlines");
-    m_dashedBarlineGapLength.Init(1.0, 0.1, 5.0);
+    m_dashedBarlineGapLength.Init(0.57, 0.1, 2.0);
     this->Register(&m_dashedBarlineGapLength, "dashedBarlineGapLength", &m_generalLayout);
 
     m_dynamDist.SetInfo("Dynam dist", "The default distance from the staff for dynamic marks");
