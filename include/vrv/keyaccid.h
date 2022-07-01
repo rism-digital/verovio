@@ -8,6 +8,7 @@
 #ifndef __VRV_KEYACCID_H__
 #define __VRV_KEYACCID_H__
 
+#include "atts_externalsymbols.h"
 #include "atts_gestural.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
@@ -27,7 +28,8 @@ class KeyAccid : public LayerElement,
                  public PositionInterface,
                  public AttAccidental,
                  public AttColor,
-                 public AttEnclosingChars {
+                 public AttEnclosingChars,
+                 public AttExtSym {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -55,7 +57,7 @@ public:
      * Retrieve SMuFL string for the accidental.
      * This will include brackets
      */
-    std::wstring GetSymbolStr() const;
+    std::wstring GetSymbolStr(data_NOTATIONTYPE notationType) const;
 
     /**
      * Determine the staff location

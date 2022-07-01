@@ -2324,6 +2324,7 @@ void MEIOutput::WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid)
     keyAccid->WriteAccidental(currentNode);
     keyAccid->WriteColor(currentNode);
     keyAccid->WriteEnclosingChars(currentNode);
+    keyAccid->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
@@ -6055,6 +6056,7 @@ bool MEIInput::ReadKeyAccid(Object *parent, pugi::xml_node keyAccid)
     vrvKeyAccid->ReadAccidental(keyAccid);
     vrvKeyAccid->ReadColor(keyAccid);
     vrvKeyAccid->ReadEnclosingChars(keyAccid);
+    vrvKeyAccid->ReadExtSym(keyAccid);
 
     parent->AddChild(vrvKeyAccid);
     this->ReadUnsupportedAttr(keyAccid, vrvKeyAccid);

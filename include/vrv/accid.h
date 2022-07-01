@@ -85,7 +85,7 @@ public:
      * Retrieve SMuFL string for the accidental.
      * This will include brackets
      */
-    std::wstring GetSymbolStr(const data_NOTATIONTYPE notationType) const;
+    std::wstring GetSymbolStr(data_NOTATIONTYPE notationType) const;
 
     /**
      * Adjust X position of accid in relation to other element
@@ -113,7 +113,14 @@ public:
     /**
      * @name Method used for drawing accidentals on ornaments
      */
-    static wchar_t GetAccidGlyph(data_ACCIDENTAL_WRITTEN);
+    static wchar_t GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid);
+
+    /**
+     * Create the SMuFL string based on various properties
+     */
+    static std::wstring CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOSURE enclosure = ENCLOSURE_NONE,
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_NONE, const Resources *resources = NULL, data_HEXNUM glyphNum = 0,
+        std::string glyphName = "");
 
     //----------//
     // Functors //
