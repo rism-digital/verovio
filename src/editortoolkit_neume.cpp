@@ -831,7 +831,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             Zone *sylZone = new Zone();
 
             // calculate bboxUlx and bboxUly wrt rotation using sine rule
-            double PI = 3.14;
             int draw_w = staff->GetWidth();
             int draw_h = staff->GetHeight();
             double theta = staff->GetDrawingRotate();
@@ -842,13 +841,13 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             int bboxUly;
             // if staff rotates downward to the right
             if (theta > 0) {
-                int y = (int)( (draw_w - x) * tan(theta * PI / 180.0) );
+                int y = (int)( (draw_w - x) * tan(theta * M_PI / 180.0) );
                 bboxUly = staffUly + draw_h - y;
             } 
             // if staff rotates upwards to the right 
             else {
-                int y = (int)( x * tan(-theta * PI / 180.0) );
-                int h = (int)( draw_w * tan(-theta * PI / 180.0) );
+                int y = (int)( x * tan(-theta * M_PI / 180.0) );
+                int h = (int)( draw_w * tan(-theta * M_PI / 180.0) );
                 bboxUly = staffUly + (draw_h - h) - y;
             }
             // width height and offset can be adjusted
