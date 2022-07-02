@@ -842,16 +842,35 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             syl->AddChild(text);
             Zone *sylZone = new Zone();
 
-            // these constants are just to improve visibility of the default boundingbox
-            int offSetUlx = 150;
-            int offSetUly = 50;
-            int offSetLrx = 350;
-            int offSetLry = 250;
+            // calculate bboxUlx and bboxUly wrt rotation using sine rule
+            int draw_w = staff->GetWidth();
+            int draw_h = staff->GetHeight();
+            double theta = staff->GetDrawingRotate();
+            int staffUly = staff->GetDrawingY();
+            int x = ulx - staff->GetDrawingX();
 
-            sylZone->SetUlx(ulx + offSetUlx);
-            sylZone->SetUly(uly + offSetUly);
-            sylZone->SetLrx(ulx + offSetLrx);
-            sylZone->SetLry(uly + offSetLry);
+            int bboxUlx = ulx;
+            int bboxUly;
+            // if staff rotates downward to the right
+            if (theta > 0) {
+                int y = (int)( (draw_w - x) * tan(theta * M_PI / 180.0) );
+                bboxUly = staffUly + draw_h - y;
+            } 
+            // if staff rotates upwards to the right 
+            else {
+                int y = (int)( x * tan(-theta * M_PI / 180.0) );
+                int h = (int)( draw_w * tan(-theta * M_PI / 180.0) );
+                bboxUly = staffUly + (draw_h - h) - y;
+            }
+            // width height and offset can be adjusted
+            int bboxWidth = 225;
+            int bboxHeight = 175;
+            int bboxOffsetX = 50;
+            
+            sylZone->SetUlx(bboxUlx - bboxOffsetX);
+            sylZone->SetUly(bboxUly);
+            sylZone->SetLrx(bboxUlx + bboxWidth - bboxOffsetX);
+            sylZone->SetLry(bboxUly + bboxHeight);
             surface->AddChild(sylZone);
             fi->SetZone(sylZone);
         }
