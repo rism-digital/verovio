@@ -447,10 +447,11 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
-        && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae") && (outformat != "pb-mei")) {
+    if ((outformat != "svg") && (outformat != "mei") && (outformat != "mei-basic") && (outformat != "midi")
+        && (outformat != "timemap") && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae")
+        && (outformat != "pb-mei")) {
         std::cerr << "Output format (" << outformat
-                  << ") can only be 'mei', 'pb-mei', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
+                  << ") can only be 'mei', 'mei-basic', 'pb-mei', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
         exit(1);
     }
 
@@ -702,11 +703,13 @@ int main(int argc, char **argv)
         }
     }
     else {
-        const char *scoreBased = (outformat == "mei") ? "true" : "false";
+        const char *scoreBased = (outformat == "pb-mei") ? "false" : "true";
+        const char *basic = (outformat == "mei-basic") ? "true" : "false";
         const char *removeIds = (options->m_removeIds.GetValue()) ? "true" : "false";
         outfile += ".mei";
         if (all_pages) {
-            std::string params = vrv::StringFormat("{'scoreBased': %s, 'removeIds': %s}", scoreBased, removeIds);
+            std::string params
+                = vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'removeIds': %s}", scoreBased, basic, removeIds);
             if (std_output) {
                 std::string output;
                 std::cout << toolkit.GetMEI(params);
@@ -719,8 +722,8 @@ int main(int argc, char **argv)
             }
         }
         else {
-            std::string params
-                = vrv::StringFormat("{'scoreBased': %s, 'pageNo': %d, 'removeIds': %s}", scoreBased, page, removeIds);
+            std::string params = vrv::StringFormat(
+                "{'scoreBased': %s, 'basic': %s, 'pageNo': %d, 'removeIds': %s}", scoreBased, basic, page, removeIds);
             if (std_output) {
                 std::cout << toolkit.GetMEI(params);
             }
