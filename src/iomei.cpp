@@ -6912,8 +6912,23 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
     vrvAnnot->ReadSource(annot);
 
     parent->AddChild(vrvAnnot);
+    vrvAnnot->m_content.reset();
+
+    bool hasNonTextContent = false;
+    // copy all the nodes inside into the document
+    for (pugi::xml_node child = annot.first_child(); child; child = child.next_sibling()) {
+        const std::string nodeName = child.name();
+        if (!hasNonTextContent && (!nodeName.empty())) hasNonTextContent = true;
+        vrvAnnot->m_content.append_copy(child);
+    }
     this->ReadUnsupportedAttr(annot, vrvAnnot);
-    return this->ReadTextChildren(vrvAnnot, annot, vrvAnnot);
+    // Unless annot has only text we do not load children because they are preserved in Annot::m_content
+    if (hasNonTextContent) {
+        return true;
+    }
+    else {
+        return this->ReadTextChildren(vrvAnnot, annot, vrvAnnot);
+    }
 }
 
 bool MEIInput::ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
