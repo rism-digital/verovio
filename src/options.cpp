@@ -962,6 +962,11 @@ Options::Options()
     m_condenseFirstPage.Init(false);
     this->Register(&m_condenseFirstPage, "condenseFirstPage", &m_general);
 
+    m_condenseNotLastSystem.SetInfo(
+        "Condense not last system", "When condensing a score never condense the last system");
+    m_condenseNotLastSystem.Init(false);
+    this->Register(&m_condenseNotLastSystem, "condenseNotLastSystem", &m_general);
+
     m_condenseTempoPages.SetInfo(
         "Condense tempo pages", "When condensing a score also condense pages with a tempo change");
     m_condenseTempoPages.Init(false);
