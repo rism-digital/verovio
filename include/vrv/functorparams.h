@@ -1335,6 +1335,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// ConvertMarkupScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the scoreDef we are moving the content from
+ * member 1: the doc
+ **/
+
+class ConvertMarkupScoreDefParams : public FunctorParams {
+public:
+    ConvertMarkupScoreDefParams(Doc *doc)
+    {
+        m_currentScoreDef = NULL;
+        m_doc = doc;
+    }
+    ScoreDef *m_currentScoreDef;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // ConvertToCastOffMensuralParams
 //----------------------------------------------------------------------------
 

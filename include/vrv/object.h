@@ -805,6 +805,17 @@ public:
     virtual int ConvertMarkupArticEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Move scoreDef clef, keySig, meterSig and mensur to staffDef.
+     * When a staffDef already have one, it is not replaced.
+     */
+    virtual int ConvertMarkupScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * End Functor for Object::ConvertMarkupScoreDef
+     */
+    virtual int ConvertMarkupScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Save the content of any object by calling the appropriate FileOutputStream method.
      */
     virtual int Save(FunctorParams *functorParams);

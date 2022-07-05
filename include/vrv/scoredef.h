@@ -102,6 +102,16 @@ public:
     // Functors //
     //----------//
 
+    /**
+     * See Object::ConvertMarkupScoreDef
+     */
+    int ConvertMarkupScoreDef(FunctorParams *) override;
+
+    /**
+     * See Object::ConvertMarkupScoreDef
+     */
+    int ConvertMarkupScoreDefEnd(FunctorParams *) override;
+
 private:
     //
 public:

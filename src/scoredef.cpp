@@ -639,6 +639,22 @@ bool ScoreDef::HasSystemStartLine()
 // Functors methods
 //----------------------------------------------------------------------------
 
+int ScoreDefElement::ConvertMarkupScoreDef(FunctorParams *functorParams)
+{
+    ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
+    assert(params);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int ScoreDefElement::ConvertMarkupScoreDefEnd(FunctorParams *functorParams)
+{
+    ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
+    assert(params);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int ScoreDef::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_drawingLabelsWidth = 0;
