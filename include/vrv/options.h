@@ -608,6 +608,7 @@ public:
     OptionBool m_mensuralToMeasure;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
+    OptionBool m_moveScoreDefinitionToStaff;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
     OptionBool m_outputFormatRaw;

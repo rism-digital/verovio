@@ -1012,6 +1012,11 @@ Options::Options()
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_general);
 
+    m_moveScoreDefinitionToStaff.SetInfo("Move score definition to staff",
+        "Move score definition (clef, keySig, meterSig, etc.) from scoreDef to staffDef");
+    m_moveScoreDefinitionToStaff.Init(false);
+    this->Register(&m_moveScoreDefinitionToStaff, "moveScoreDefinitionToStaff", &m_general);
+
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
     this->Register(&m_noJustification, "noJustification", &m_general);
