@@ -196,8 +196,8 @@ private:
     float m_dpi{ 0 };
 
     // datastructures for mapping object ids to graphical items
-    QMap<QString, QList<QSGGeometryNode *> > m_id2NodeMapping;
-    QMap<QString, QList<TextQuickItem *> > m_id2QuickItemMapping;
+    QMap<QString, QList<QSGGeometryNode *>> m_id2NodeMapping;
+    QMap<QString, QList<TextQuickItem *>> m_id2QuickItemMapping;
 };
 } // namespace vrvQt
 
