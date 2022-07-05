@@ -3596,7 +3596,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
     if (root.attribute("meiversion")) {
         std::string version = std::string(root.attribute("meiversion").value());
-        if (version == "5.0.0-dev") {
+        if (version == "5.0.0-dev" || version == "4.0.1-rc1+basic") {
             m_version = MEI_5_0_0_dev;
         }
         else if (version == "4.0.1") {
