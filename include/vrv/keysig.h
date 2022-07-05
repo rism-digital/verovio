@@ -89,8 +89,8 @@ public:
 
     /**
      * Try to convert a keySig content (keyAccid) to a @sig value
-     * This can work only of the content represent as standard accidental series
-     * Return and empty @sig when the content cannot be converted
+     * This can work only if the content represents a standard accidental series
+     * Return an empty @sig when the content cannot be converted
      */
     data_KEYSIGNATURE ConvertToSig() const;
 

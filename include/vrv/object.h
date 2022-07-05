@@ -806,7 +806,7 @@ public:
 
     /**
      * Move scoreDef clef, keySig, meterSig and mensur to staffDef.
-     * When a staffDef already have one, it is not replaced.
+     * When a staffDef already has one, it is not replaced.
      */
     virtual int ConvertMarkupScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
 

@@ -262,8 +262,8 @@ private:
 
     /**
      * Helper checking if the object is tree object in score-based MEI
-     * For MEI basic output, also check object marked as attribute need to be kept as element
-     * of if some needs to be written as attributes
+     * For MEI basic output, also check if objects marked as attribute need to be kept as element (e.g., accid)
+     * or if some need to be written as attributes (e.g. scoreDef/clef)
      */
     bool IsTreeObject(Object *object) const;
 
@@ -538,7 +538,7 @@ private:
     std::ostringstream m_streamStringOutput;
     int m_indent;
     bool m_scoreBasedMEI;
-    /** A flag indicating the we want to produce MEI basic */
+    /** A flag indicating that we want to produce MEI basic */
     bool m_basic;
     pugi::xml_node m_mei;
 
