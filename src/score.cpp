@@ -205,6 +205,17 @@ int Score::AdjustGraceXPos(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Score::ConvertMarkupScoreDef(FunctorParams *functorParams)
+{
+    ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
+    assert(params);
+
+    // Evaluate functor on scoreDef
+    this->GetScoreDef()->Process(params->m_functor, params, params->m_functorEnd);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Score::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);

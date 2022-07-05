@@ -49,6 +49,7 @@ class Object;
 class Page;
 class Pedal;
 class ScoreDef;
+class ScoreDefElement;
 class Slur;
 class Staff;
 class StaffAlignment;
@@ -1341,17 +1342,23 @@ public:
 /**
  * member 0: a pointer to the scoreDef we are moving the content from
  * member 1: the doc
+ * member 2: the functor
+ * member 3: the end functor
  **/
 
 class ConvertMarkupScoreDefParams : public FunctorParams {
 public:
-    ConvertMarkupScoreDefParams(Doc *doc)
+    ConvertMarkupScoreDefParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_currentScoreDef = NULL;
         m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
     }
-    ScoreDef *m_currentScoreDef;
+    ScoreDefElement *m_currentScoreDef;
     Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------

@@ -644,7 +644,37 @@ int ScoreDefElement::ConvertMarkupScoreDef(FunctorParams *functorParams)
     ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
     assert(params);
 
-    return FUNCTOR_SIBLINGS;
+    if (this->Is(SCOREDEF)) {
+        params->m_currentScoreDef = this;
+        return FUNCTOR_CONTINUE;
+    }
+
+    // This should never be the case
+    if (!this->Is(STAFFDEF) || !params->m_currentScoreDef) return FUNCTOR_CONTINUE;
+
+    ScoreDefElement *scoreDef = params->m_currentScoreDef;
+
+    // Copy score definition elements to the staffDef but only if they are not given at the staffDef
+    // This might require more refined merging because we can lose data if some staffDef values are defined
+    // but do not contain all the ones given in the scoreDef (e.g. @key.mode in scoreDef but not in a staffDef with
+    // @key.sig)
+    if (scoreDef->HasClefInfo() && !this->HasClefInfo()) {
+        this->AddChild(scoreDef->GetClefCopy());
+    }
+    if (scoreDef->HasKeySigInfo() && !this->HasKeySigInfo()) {
+        this->AddChild(scoreDef->GetKeySigCopy());
+    }
+    if (scoreDef->HasMeterSigGrpInfo() && !this->HasMeterSigGrpInfo()) {
+        this->AddChild(scoreDef->GetMeterSigGrpCopy());
+    }
+    if (scoreDef->HasMeterSigInfo() && !this->HasMeterSigInfo()) {
+        this->AddChild(scoreDef->GetMeterSigCopy());
+    }
+    if (scoreDef->HasMensurInfo() && !this->HasMensurInfo()) {
+        this->AddChild(scoreDef->GetMensurCopy());
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 int ScoreDefElement::ConvertMarkupScoreDefEnd(FunctorParams *functorParams)
@@ -652,7 +682,33 @@ int ScoreDefElement::ConvertMarkupScoreDefEnd(FunctorParams *functorParams)
     ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
     assert(params);
 
-    return FUNCTOR_SIBLINGS;
+    if (!this->Is(SCOREDEF)) return FUNCTOR_CONTINUE;
+
+    // At the end of the scoreDef, remove all score definition elements
+    if (this->HasClefInfo()) {
+        Object *clef = this->FindDescendantByType(CLEF, 1);
+        if (clef) this->DeleteChild(clef);
+    }
+    if (this->HasKeySigInfo()) {
+        Object *keySig = this->FindDescendantByType(KEYSIG, 1);
+        if (keySig) this->DeleteChild(keySig);
+    }
+    if (this->HasMeterSigGrpInfo()) {
+        Object *meterSigGrp = this->FindDescendantByType(METERSIGGRP, 1);
+        if (meterSigGrp) this->DeleteChild(meterSigGrp);
+    }
+    if (this->HasMeterSigInfo()) {
+        Object *meterSig = this->FindDescendantByType(METERSIG, 1);
+        if (meterSig) this->DeleteChild(meterSig);
+    }
+    if (this->HasMensurInfo()) {
+        Object *mensur = this->FindDescendantByType(MENSUR, 1);
+        if (mensur) this->DeleteChild(mensur);
+    }
+
+    params->m_currentScoreDef = NULL;
+
+    return FUNCTOR_CONTINUE;
 }
 
 int ScoreDef::ResetHorizontalAlignment(FunctorParams *functorParams)
