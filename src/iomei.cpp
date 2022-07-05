@@ -4467,6 +4467,12 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
         UpgradeScoreDefElementTo_4_0_0(scoreDef, vrvScoreDef);
     }
 
+    if (m_doc->GetOptions()->m_moveScoreDefinitionToStaff.GetValue()) {
+        if (vrvScoreDef->HasClefInfo() || vrvScoreDef->HasKeySigInfo() || vrvScoreDef->HasMeterSigGrpInfo()
+            || vrvScoreDef->HasMeterSigInfo() || vrvScoreDef->HasMensurInfo())
+            m_doc->SetMarkup(MARKUP_SCOREDEF_DEFINITIONS);
+    }
+
     this->ReadScoreDefInterface(scoreDef, vrvScoreDef);
     vrvScoreDef->ReadDistances(scoreDef);
     vrvScoreDef->ReadEndings(scoreDef);
