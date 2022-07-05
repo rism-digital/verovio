@@ -497,6 +497,11 @@ int System::ScoreDefOptimize(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
     }
+    
+    if (this->IsLastOfMdiv()) {
+        this->IsDrawingOptimized(false);
+        return FUNCTOR_SIBLINGS;
+    }
 
     params->m_currentScoreDef = this->GetDrawingScoreDef();
     assert(params->m_currentScoreDef);
