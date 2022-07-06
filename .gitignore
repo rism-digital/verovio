@@ -72,7 +72,6 @@ bindings/qt/build-android
 # Output files
 output.svg
 output.mei
-index.js
 emscripten/npm-dev/node_modules
 
 # VS Code files
