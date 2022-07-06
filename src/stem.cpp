@@ -152,7 +152,6 @@ void Stem::AdjustFlagPlacement(const Doc *doc, Flag *flag, int staffSize, int ve
 // Functors methods
 //----------------------------------------------------------------------------
 
-
 int Stem::AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) const
 {
     // if stem length is explicitly set - exit
@@ -427,6 +426,5 @@ int Stem::ResetData(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-
 
 } // namespace vrv
