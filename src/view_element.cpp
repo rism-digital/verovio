@@ -923,7 +923,6 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     step *= TEMP_KEYSIG_STEP;
 
     int clefLocOffset = layer->GetClefLocOffset(element);
-    int loc;
 
     dc->StartGraphic(element, "", element->GetID());
 
@@ -938,7 +937,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
                 = (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) ? keySig->GetAccidCount() : 0;
             for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
                 data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
-                loc = PitchInterface::CalcLoc(
+                const int loc = PitchInterface::CalcLoc(
                     pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, clef), clefLocOffset);
                 y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 

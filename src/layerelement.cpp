@@ -1926,7 +1926,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                 shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
                 if (!isUnisonElement) shift -= horizontalMargin;
             }
-            else if ((horizontalMargin >= 0) || isChordElement) {
+            else if (isChordElement) {
                 shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
 
                 // Make additional adjustments for cross-staff and unison notes
