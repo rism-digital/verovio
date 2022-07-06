@@ -28,6 +28,8 @@ namespace vrv {
 // Stem
 //----------------------------------------------------------------------------
 
+static const ClassRegistrar<Note> s_factory("stem", STEM);
+
 Stem::Stem() : LayerElement(STEM, "stem-"), AttGraced(), AttStems(), AttStemsCmn()
 {
     this->RegisterAttClass(ATT_GRACED);

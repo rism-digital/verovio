@@ -33,9 +33,9 @@ public:
     ///@{
     Stem();
     virtual ~Stem();
+    Object *Clone() const override { return new Stem(*this); }
     void Reset() override;
     std::string GetClassName() const override { return "Stem"; }
-    Object *Clone() const override { return new Stem(*this); }
     ///@}
 
     /** Override the method since alignment is required */
