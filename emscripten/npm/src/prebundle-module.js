@@ -7,6 +7,12 @@ class VerovioToolkitDefaultModule extends VerovioToolkit {
     }
 };
 
+// Assign Module to window to prevent breaking changes.
+// Deprecated, use verovio.module instead.
+if (typeof window !== 'undefined') {
+    window.Module = DefaultVerovioModule;
+}
+
 export default {
     module: DefaultVerovioModule,
     toolkit: VerovioToolkitDefaultModule,
