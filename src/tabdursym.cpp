@@ -18,6 +18,7 @@
 #include "layer.h"
 #include "note.h"
 #include "staff.h"
+#include "stem.h"
 #include "tabgrp.h"
 
 namespace vrv {

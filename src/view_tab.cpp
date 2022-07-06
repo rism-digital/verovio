@@ -17,12 +17,12 @@
 
 #include "devicecontext.h"
 #include "doc.h"
-#include "elementpart.h"
 #include "note.h"
 #include "options.h"
 #include "rend.h"
 #include "smufl.h"
 #include "staff.h"
+#include "stem.h"
 #include "system.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
