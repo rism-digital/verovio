@@ -896,8 +896,8 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     int x2 = x + barLineSeparation;
 
     const int dotLength = m_doc->GetDrawingUnit(staffSize) * 4 / 13;
-    const int dashLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarlineDashLength.GetValue();
-    const int gapLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarlineGapLength.GetValue();
+    const int dashLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarLineDashLength.GetValue();
+    const int gapLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarLineGapLength.GetValue();
 
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
