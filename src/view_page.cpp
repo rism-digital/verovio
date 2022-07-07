@@ -305,6 +305,7 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
     if (!staffGrp) {
         return;
     }
+    const bool isSingleStaff = (staffGrp->GetListSize(staffGrp) == 1);
 
     if (barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
@@ -313,7 +314,7 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
     else {
         dc->StartGraphic(barLine, "", barLine->GetID());
         int yBottomPrevious = VRV_UNSET;
-        this->DrawBarLines(dc, measure, staffGrp, barLine, isLastMeasure, isLastSystem, yBottomPrevious);
+        this->DrawBarLines(dc, measure, staffGrp, barLine, isLastMeasure, isLastSystem, isSingleStaff, yBottomPrevious);
         dc->EndGraphic(barLine, this);
     }
 
@@ -722,7 +723,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 }
 
 void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure,
-    bool isLastSystem, int &yBottomPrevious)
+    bool isLastSystem, bool isSingleStaff, int &yBottomPrevious)
 {
     assert(dc);
     assert(measure);
@@ -741,7 +742,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Recursive call for staff group
         if (child->Is(STAFFGRP)) {
             StaffGrp *childStaffGrp = vrv_cast<StaffGrp *>(child);
-            this->DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure, isLastSystem, yBottomPrevious);
+            this->DrawBarLines(
+                dc, measure, childStaffGrp, barLine, isLastMeasure, isLastSystem, isSingleStaff, yBottomPrevious);
             continue;
         }
 
@@ -817,6 +819,10 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         bool drawOutsideStaff = methodMensur || (!methodTakt && barlineThrough);
         bool drawTaktstrichAbove = methodTakt;
         bool drawTaktstrichBelow = false;
+        if (methodMensur && isSingleStaff) {
+            drawTaktstrichAbove = true;
+            drawTaktstrichBelow = true;
+        }
         if ((isLastMeasure && isLastSystem) || barLine->HasRepetitionDots()) {
             drawInsideStaff = true;
             drawTaktstrichAbove = false;
