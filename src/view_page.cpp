@@ -817,7 +817,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         bool drawOutsideStaff = methodMensur || (!methodTakt && barlineThrough);
         bool drawTaktstrichAbove = methodTakt;
         bool drawTaktstrichBelow = false;
-        if (isLastMeasure && isLastSystem) {
+        if ((isLastMeasure && isLastSystem) || barLine->HasRepetitionDots()) {
             drawInsideStaff = true;
             drawTaktstrichAbove = false;
             drawTaktstrichBelow = false;
@@ -826,7 +826,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Now draw the barline part inside the staff
         if (drawInsideStaff) {
             this->DrawBarLine(dc, yTop, yBottom, barLine, form);
-            if (!methodTakt && barLine->HasRepetitionDots()) {
+            if (barLine->HasRepetitionDots()) {
                 this->DrawBarLineDots(dc, staff, barLine);
             }
         }
