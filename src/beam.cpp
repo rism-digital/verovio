@@ -2057,23 +2057,32 @@ void Beam::SetElementShortening(int shortening)
         [shortening](BeamElementCoord *coord) { coord->m_maxShortening = shortening; });
 }
 
-int Beam::GetBeamPartDuration(int x) const
+int Beam::GetBeamPartDuration(int x, bool ignoreRests) const
 {
+    // find element with position closest to the specified coordinate
     const auto it = std::find_if(m_beamSegment.m_beamElementCoordRefs.begin(),
-        m_beamSegment.m_beamElementCoordRefs.end(), [x](BeamElementCoord *coord) { return x < coord->m_x; });
+        m_beamSegment.m_beamElementCoordRefs.end(), [x, ignoreRests](BeamElementCoord *coord) {
+            return (x < coord->m_x) && (!coord->m_element->Is(REST) || !ignoreRests);
+        });
+    // handle cases when coordinate is outside of the beam
     if (it == m_beamSegment.m_beamElementCoordRefs.end()) {
         return DUR_8;
     }
     else if (it == m_beamSegment.m_beamElementCoordRefs.begin()) {
         return (*it)->m_dur;
     }
-
-    return std::min((*it)->m_dur, (*std::prev(it))->m_dur);
+    // Get previous relevant element (skipping over rests if needed)
+    auto prevIt = it;
+    do {
+        prevIt = std::prev(prevIt);
+        if (prevIt == m_beamSegment.m_beamElementCoordRefs.begin()) break;
+    } while ((*prevIt)->m_element->Is(REST) && ignoreRests);
+    return std::min((*it)->m_dur, (*prevIt)->m_dur);
 }
 
-int Beam::GetBeamPartDuration(const Object *object) const
+int Beam::GetBeamPartDuration(const Object *object, bool ignoreRests) const
 {
-    return this->GetBeamPartDuration(object->GetDrawingX());
+    return this->GetBeamPartDuration(object->GetDrawingX(), ignoreRests);
 }
 
 //----------------------------------------------------------------------------
