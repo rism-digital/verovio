@@ -344,7 +344,7 @@ public:
     /**
      * Return duration of beam part that are closest to the specified object X position
      */
-    int GetBeamPartDuration(const Object *object) const;
+    int GetBeamPartDuration(const Object *object, bool ignoreRests = false) const;
 
     //----------//
     // Functors //
@@ -391,7 +391,7 @@ protected:
      * Return duration of beam part for specified X coordinate. Duration of two closest elements is taken for this
      * purpose.
      */
-    int GetBeamPartDuration(int x) const;
+    int GetBeamPartDuration(int x, bool ignoreRests = false) const;
 
 private:
     /**
