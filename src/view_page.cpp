@@ -782,15 +782,13 @@ void View::DrawBarLines(
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         // For the bottom position we need to take into account the number of lines and the staff size
-        int yBottom = staff->GetDrawingY() - 2 * (staffDef->GetLines() - 1) * unit;
-        int yLength = staff->GetDrawingY() - yBottom;
+        const int yStaffTop = staff->GetDrawingY();
+        const int yStaffBottom = yStaffTop - 2 * (staffDef->GetLines() - 1) * unit;
+        int yBottom = yStaffBottom;
+        int yLength = yStaffTop - yStaffBottom;
 
-        // Adjust barline start and length
-        if (methodTakt) {
-            yBottom = staff->GetDrawingY() - unit;
-            yLength = 2 * unit;
-        }
-        else if (!methodMensur) {
+        // Adjust start and length
+        if (!methodMensur && !methodTakt) {
             const auto [hasPlace, place] = barLine->GetPlace(staffDef);
             if (hasPlace) {
                 // bar.place counts upwards (note order).
@@ -809,29 +807,45 @@ void View::DrawBarLines(
                 yLength = 4 * unit;
             }
         }
+        int yTop = yBottom + yLength;
 
-        const int yTop = yBottom + yLength;
+        // Shift the taktstrich outwards?
+        const int yTaktstrichShift = methodMensur ? unit : 0;
 
         // Determine which parts to draw
-        const bool drawInStaff = !methodMensur;
-        const bool drawInStaffSpace = methodMensur || (!methodTakt && barlineThrough);
+        const bool drawInsideStaff = !methodMensur && !methodTakt;
+        const bool drawOutsideStaff = methodMensur || (!methodTakt && barlineThrough);
+        const bool drawTaktstrichAbove = methodTakt;
+        const bool drawTaktstrichBelow = false;
 
-        // Now draw the barline in the staff
-        if (drawInStaff) {
+        // Now draw the barline part inside the staff
+        if (drawInsideStaff) {
             this->DrawBarLine(dc, yTop, yBottom, barLine, form);
             if (!methodTakt && barLine->HasRepetitionDots()) {
                 this->DrawBarLineDots(dc, staff, barLine);
             }
         }
 
-        // ... and the barline in the staff space
-        if (drawInStaffSpace && (yBottomPrevious != VRV_UNSET)) {
+        // ... and the barline part outside the staff
+        if (drawOutsideStaff && (yBottomPrevious != VRV_UNSET)) {
             // Do not erase intersections with right barline of the last measure of the system
             const bool eraseIntersections = !isLastMeasure || (barLine->GetPosition() != BarLinePosition::Right);
 
             this->DrawBarLine(dc, yBottomPrevious, yTop, barLine, form, true, eraseIntersections);
         }
-        yBottomPrevious = drawInStaffSpace ? yBottom : VRV_UNSET;
+        yBottomPrevious = drawOutsideStaff ? yBottom : VRV_UNSET;
+
+        // Draw the taktstrich above the staff
+        if (drawTaktstrichAbove) {
+            const int yTaktstrichCenter = yStaffTop + yTaktstrichShift;
+            this->DrawBarLine(dc, yTaktstrichCenter + unit, yTaktstrichCenter - unit, barLine, form);
+        }
+
+        // Draw the taktstrich below the staff
+        if (drawTaktstrichBelow) {
+            const int yTaktstrichCenter = yStaffBottom - yTaktstrichShift;
+            this->DrawBarLine(dc, yTaktstrichCenter + unit, yTaktstrichCenter - unit, barLine, form);
+        }
     }
 }
 
