@@ -293,8 +293,8 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     }
 }
 
-void View::DrawScoreDef(
-    DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine, bool isLastMeasure)
+void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine,
+    bool isLastMeasure, bool isLastSystem)
 {
     assert(dc);
     assert(scoreDef);
@@ -313,7 +313,7 @@ void View::DrawScoreDef(
     else {
         dc->StartGraphic(barLine, "", barLine->GetID());
         int yBottomPrevious = VRV_UNSET;
-        this->DrawBarLines(dc, measure, staffGrp, barLine, isLastMeasure, yBottomPrevious);
+        this->DrawBarLines(dc, measure, staffGrp, barLine, isLastMeasure, isLastSystem, yBottomPrevious);
         dc->EndGraphic(barLine, this);
     }
 
@@ -721,8 +721,8 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     return;
 }
 
-void View::DrawBarLines(
-    DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure, int &yBottomPrevious)
+void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure,
+    bool isLastSystem, int &yBottomPrevious)
 {
     assert(dc);
     assert(measure);
@@ -741,7 +741,7 @@ void View::DrawBarLines(
         // Recursive call for staff group
         if (child->Is(STAFFGRP)) {
             StaffGrp *childStaffGrp = vrv_cast<StaffGrp *>(child);
-            this->DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure, yBottomPrevious);
+            this->DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure, isLastSystem, yBottomPrevious);
             continue;
         }
 
@@ -813,10 +813,15 @@ void View::DrawBarLines(
         const int yTaktstrichShift = methodMensur ? unit : 0;
 
         // Determine which parts to draw
-        const bool drawInsideStaff = !methodMensur && !methodTakt;
-        const bool drawOutsideStaff = methodMensur || (!methodTakt && barlineThrough);
-        const bool drawTaktstrichAbove = methodTakt;
-        const bool drawTaktstrichBelow = false;
+        bool drawInsideStaff = !methodMensur && !methodTakt;
+        bool drawOutsideStaff = methodMensur || (!methodTakt && barlineThrough);
+        bool drawTaktstrichAbove = methodTakt;
+        bool drawTaktstrichBelow = false;
+        if (isLastMeasure && isLastSystem) {
+            drawInsideStaff = true;
+            drawTaktstrichAbove = false;
+            drawTaktstrichBelow = false;
+        }
 
         // Now draw the barline part inside the staff
         if (drawInsideStaff) {
@@ -1060,9 +1065,8 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
                 measure->GetLeftBarLine());
         }
         if ((measure->GetDrawingRightBarLine() != BARRENDITION_NONE) || measure->HasInvisibleStaffBarlines()) {
-            bool isLast = (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD)) ? true : false;
             this->DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetRightBarLine()->GetDrawingX(),
-                measure->GetRightBarLine(), isLast);
+                measure->GetRightBarLine(), measure->IsLastInSystem(), system->IsLastOfMdiv());
         }
     }
 
