@@ -30,6 +30,7 @@
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
+#include "stem.h"
 #include "verse.h"
 #include "verticalaligner.h"
 #include "vrv.h"

@@ -29,6 +29,7 @@
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
+#include "stem.h"
 #include "syl.h"
 #include "tabgrp.h"
 #include "tie.h"

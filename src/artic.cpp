@@ -21,6 +21,7 @@
 #include "layer.h"
 #include "smufl.h"
 #include "staff.h"
+#include "stem.h"
 #include "vrv.h"
 
 namespace vrv {

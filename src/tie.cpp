@@ -23,6 +23,7 @@
 #include "note.h"
 #include "slur.h"
 #include "staff.h"
+#include "stem.h"
 
 namespace vrv {
 
