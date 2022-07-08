@@ -1178,6 +1178,11 @@ Options::Options()
     m_beamMixedPreserve.Init(false);
     this->Register(&m_beamMixedPreserve, "beamMixedPreserve", &m_generalLayout);
 
+    m_beamMixedStemMin.SetInfo(
+        "Minimal stem length of mixed beams", "The minimal stem length in MEI units used to draw mixed beams");
+    m_beamMixedStemMin.Init(3.5, 1.0, 8.0);
+    this->Register(&m_beamMixedStemMin, "beamMixedStemMin", &m_generalLayout);
+
     m_bracketThickness.SetInfo("Bracket thickness", "The thickness of the system bracket");
     m_bracketThickness.Init(1.0, 0.5, 2.0);
     this->Register(&m_bracketThickness, "bracketThickness", &m_generalLayout);

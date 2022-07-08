@@ -651,6 +651,7 @@ public:
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
     OptionBool m_beamMixedPreserve;
+    OptionDbl m_beamMixedStemMin;
     OptionDbl m_bracketThickness;
     OptionBool m_breaksNoWidow;
     OptionDbl m_dynamDist;

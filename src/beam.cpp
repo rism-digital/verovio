@@ -296,7 +296,7 @@ void BeamSegment::CalcSetStemValuesTab(const Staff *staff, const Doc *doc, const
 }
 
 bool BeamSegment::DoesBeamOverlap(
-    const BeamDrawingInterface *beamInterface, int topBorder, int bottomBorder, int unit) const
+    const BeamDrawingInterface *beamInterface, int topBorder, int bottomBorder, int minStemLength) const
 {
     // Check if beam fits within the bounds
     const bool outsideBounds = std::any_of(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
@@ -306,7 +306,7 @@ bool BeamSegment::DoesBeamOverlap(
 
     // Check for minimal stem length
     const auto [minLengthAbove, minLengthBelow] = this->GetMinimalStemLength(beamInterface);
-    return (std::min(minLengthAbove, minLengthBelow) < 3 * unit);
+    return (std::min(minLengthAbove, minLengthBelow) < minStemLength);
 }
 
 std::pair<int, int> BeamSegment::GetVerticalOffset(const BeamDrawingInterface *beamInterface) const
@@ -382,6 +382,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingI
     }
 
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int minStemLength = doc->GetOptions()->m_beamMixedStemMin.GetValue() * unit;
     auto [topOffset, bottomOffset] = this->GetVerticalOffset(beamInterface);
 
     // find top and bottom of the staff
@@ -392,7 +393,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingI
     const int bottomBorder = staffBottom + bottomOffset + unit;
 
     // Check if the beam is admissible
-    if (!this->DoesBeamOverlap(beamInterface, topBorder, bottomBorder, unit)) {
+    if (!this->DoesBeamOverlap(beamInterface, topBorder, bottomBorder, minStemLength)) {
         return false;
     }
 
@@ -412,7 +413,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingI
             = (m_beamElementCoordRefs.front()->m_yBeam + m_beamElementCoordRefs.back()->m_yBeam - 2 * midpoint) / 2;
         std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
             [midpointOffset](BeamElementCoord *coord) { coord->m_yBeam -= midpointOffset; });
-        if (!this->DoesBeamOverlap(beamInterface, topBorder, bottomBorder, unit)) return false;
+        if (!this->DoesBeamOverlap(beamInterface, topBorder, bottomBorder, minStemLength)) return false;
     }
     // If midpoint is above the staff, try to place beam at the top edge of the staff
     if (!isMidpointWithinBounds && (midpoint > staffBottom)) {
@@ -428,7 +429,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingI
         std::for_each(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
             [offset](BeamElementCoord *coord) { coord->m_yBeam -= offset; });
     }
-    if (!this->DoesBeamOverlap(beamInterface, topBorder, bottomBorder, unit)) return false;
+    if (!this->DoesBeamOverlap(beamInterface, topBorder, bottomBorder, minStemLength)) return false;
 
     // If none of the positions work - there's no space for us to draw a mixed beam (or there is space but it would
     // overlap with ledger line). Adjust beam placement based on the most frequent stem direction
@@ -1555,8 +1556,10 @@ void BeamSegment::RequestStaffSpace(const Doc *doc, const BeamDrawingInterface *
     if (beamInterface->m_drawingPlace != BEAMPLACE_mixed) return;
     if (!beamInterface->m_beamStaff || !beamInterface->m_crossStaffContent) return;
 
-    // Min length is 5 units
-    const int minLength = 5 * doc->GetDrawingUnit(beamInterface->m_beamStaff->m_drawingStaffSize);
+    // Min length is taken from the option
+    // We add an extra unit for cross staff (more tolerance is possible here compared to single staff mixed beams)
+    const int unit = doc->GetDrawingUnit(beamInterface->m_beamStaff->m_drawingStaffSize);
+    const int minLength = (1 + doc->GetOptions()->m_beamMixedStemMin.GetValue()) * unit;
 
     // Determine the alignments above and below
     StaffAlignment *above = NULL;

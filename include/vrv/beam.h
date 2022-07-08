@@ -171,7 +171,8 @@ private:
     void CalcSetValues();
 
     // Helper to check whether beam fits within certain bounds
-    bool DoesBeamOverlap(const BeamDrawingInterface *beamInterface, int topBorder, int bottomBorder, int unit) const;
+    bool DoesBeamOverlap(
+        const BeamDrawingInterface *beamInterface, int topBorder, int bottomBorder, int minStemLength) const;
 
     // Helper to calculate the vertical offset of the beam top/bottom w.r.t. the beam center
     std::pair<int, int> GetVerticalOffset(const BeamDrawingInterface *beamInterface) const;
