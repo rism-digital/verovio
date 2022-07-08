@@ -674,27 +674,12 @@ int Note::GetMIDIPitch(const int shift) const
         pitch = this->GetPnum();
     }
     else if (this->HasPname() || this->HasPnameGes()) {
-        int midiBase = 0;
-        data_PITCHNAME pname = this->GetPname();
-        if (this->HasPnameGes()) pname = this->GetPnameGes();
-        switch (pname) {
-            case PITCHNAME_c: midiBase = 0; break;
-            case PITCHNAME_d: midiBase = 2; break;
-            case PITCHNAME_e: midiBase = 4; break;
-            case PITCHNAME_f: midiBase = 5; break;
-            case PITCHNAME_g: midiBase = 7; break;
-            case PITCHNAME_a: midiBase = 9; break;
-            case PITCHNAME_b: midiBase = 11; break;
-            default: break;
-        }
-
-        // Check for accidentals
-        midiBase += this->GetChromaticAlteration();
+        const int pclass = this->GetPitchClass();
 
         int oct = this->GetOct();
         if (this->HasOctGes()) oct = this->GetOctGes();
 
-        pitch = midiBase + (oct + 1) * 12;
+        pitch = pclass + (oct + 1) * 12;
     }
     else if (this->HasTabCourse()) {
         // tablature
@@ -707,6 +692,20 @@ int Note::GetMIDIPitch(const int shift) const
 
     // Apply shift, i.e. from transposition instruments
     return pitch + shift;
+}
+
+int Note::GetPitchClass() const
+{
+    // if (this->HasPclass()) return this->GetPclass();
+
+    data_PITCHNAME pname = this->GetPname();
+    if (this->HasPnameGes()) pname = this->GetPnameGes();
+    int pitchClass = PnameToPclass(pname);
+
+    // Check for accidentals
+    pitchClass += this->GetChromaticAlteration();
+
+    return pitchClass;
 }
 
 int Note::GetChromaticAlteration() const
@@ -893,6 +892,20 @@ bool Note::HandleLedgerLineStemCollision(const Doc *doc, const Staff *staff, con
     }
 
     return false;
+}
+
+int Note::PnameToPclass(data_PITCHNAME pitchName)
+{
+    switch (pitchName) {
+        case PITCHNAME_c: return 0; break;
+        case PITCHNAME_d: return 2; break;
+        case PITCHNAME_e: return 4; break;
+        case PITCHNAME_f: return 5; break;
+        case PITCHNAME_g: return 7; break;
+        case PITCHNAME_a: return 9; break;
+        case PITCHNAME_b: return 11; break;
+        default: return 0; break;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1511,7 +1524,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     // Store reference, i.e. for Nachschlag
     params->m_lastNote = this;
 
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 int Note::GenerateTimemap(FunctorParams *functorParams)

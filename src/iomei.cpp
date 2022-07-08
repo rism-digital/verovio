@@ -1595,6 +1595,7 @@ void MEIOutput::WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
     scoreDef->WriteDistances(currentNode);
     scoreDef->WriteEndings(currentNode);
     scoreDef->WriteOptimization(currentNode);
+    scoreDef->WriteScoreDefGes(currentNode);
     scoreDef->WriteTimeBase(currentNode);
 }
 
@@ -4403,6 +4404,7 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     vrvScoreDef->ReadDistances(scoreDef);
     vrvScoreDef->ReadEndings(scoreDef);
     vrvScoreDef->ReadOptimization(scoreDef);
+    vrvScoreDef->ReadScoreDefGes(scoreDef);
     vrvScoreDef->ReadTimeBase(scoreDef);
 
     this->ReadUnsupportedAttr(scoreDef, vrvScoreDef);

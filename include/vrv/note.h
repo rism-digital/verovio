@@ -227,6 +227,11 @@ public:
     int GetMIDIPitch(int shift = 0) const;
 
     /**
+     * Get pitch class of the current note
+     */
+    int GetPitchClass() const;
+
+    /**
      * @name Checker, getter and setter for a note with which the stem is shared
      */
     ///@{
@@ -274,6 +279,11 @@ public:
      * Returns true if one note has a ledger line that collides (or is quite close) to the other note's stem
      */
     static bool HandleLedgerLineStemCollision(const Doc *doc, const Staff *staff, const Note *note1, const Note *note2);
+
+    /**
+     * Get pitch class based on the pitch name
+     */
+    static int PnameToPclass(data_PITCHNAME pitchName);
 
     //----------//
     // Functors //

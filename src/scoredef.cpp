@@ -34,6 +34,11 @@
 #include "system.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "MidiEvent.h"
+#include "MidiFile.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -221,11 +226,13 @@ ScoreDef::ScoreDef()
     , AttDistances()
     , AttEndings()
     , AttOptimization()
+    , AttScoreDefGes()
     , AttTimeBase()
 {
     this->RegisterAttClass(ATT_DISTANCES);
     this->RegisterAttClass(ATT_ENDINGS);
     this->RegisterAttClass(ATT_OPTIMIZATION);
+    this->RegisterAttClass(ATT_SCOREDEFGES);
     this->RegisterAttClass(ATT_TIMEBASE);
 
     this->Reset();
@@ -239,6 +246,7 @@ void ScoreDef::Reset()
     this->ResetDistances();
     this->ResetEndings();
     this->ResetOptimization();
+    this->ResetScoreDefGes();
 
     m_drawLabels = false;
     m_drawingWidth = 0;
@@ -724,6 +732,73 @@ int ScoreDef::AlignMeasures(FunctorParams *functorParams)
         ClassIdsComparison comparison({ LABEL, LABELABBR });
         if (this->FindDescendantByComparison(&comparison)) {
             params->m_applySectionRestartShift = false;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    double totalTime = params->m_totalTime;
+    // check next measure for the time offset
+    Object *parent = this->GetParent();
+    if (parent && (parent->GetLast() != this)) {
+        Object *next = parent->GetNext(this);
+        if (next && next->Is(MEASURE)) {
+            Measure *nextMeasure = vrv_cast<Measure *>(next);
+            totalTime = nextMeasure->GetLastTimeOffset();
+        }
+    }
+    const double currentTick = totalTime * params->m_midiFile->getTPQ();
+
+    smf::MidiEvent midiEvent;
+    midiEvent.tick = currentTick;
+    // calculate reference pitch class based on @tune.pname
+    int referencePitchClass = 0;
+    if (this->HasTunePname()) {
+        referencePitchClass = Note::PnameToPclass(this->GetTunePname());
+    }
+    // set temperament event if corresponding attribute present
+    if (this->HasTuneTemper()) {
+        switch (this->GetTuneTemper()) {
+            case TEMPERAMENT_equal: midiEvent.makeTemperamentEqual(referencePitchClass); break;
+            case TEMPERAMENT_just: midiEvent.makeTemperamentBad(100.0, referencePitchClass); break;
+            case TEMPERAMENT_mean: midiEvent.makeTemperamentMeantone(referencePitchClass); break;
+            case TEMPERAMENT_pythagorean: midiEvent.makeTemperamentPythagorean(referencePitchClass); break;
+            default: break;
+        }
+        params->m_midiFile->addEvent(params->m_midiTrack, midiEvent);
+    }
+    // set tuning
+    if (this->HasTuneHz()) {
+        const double tuneHz = this->GetTuneHz();
+        // Add tuning for all keys from 0 to 127
+        std::vector<std::pair<int, double>> tuneFrequencies;
+        for (int i = 0; i < 127; i++) {
+            double freq = pow(2.0, (i - 69.0) / 12.0) * tuneHz;
+            tuneFrequencies.push_back(std::make_pair(i, freq));
+        }
+        midiEvent.makeMts2_KeyTuningsByFrequency(tuneFrequencies);
+        params->m_midiFile->addEvent(params->m_midiTrack, midiEvent);
+    }
+    // set MIDI key signature
+    if (this->HasKeySigInfo()) {
+        KeySig *keySig = vrv_cast<KeySig *>(this->GetKeySig());
+        if (keySig && keySig->HasSig()) {
+            params->m_midiFile->addKeySignature(
+                params->m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
+        }
+    }
+    // set MIDI time signature
+    if (this->HasMeterSigInfo()) {
+        MeterSig *meterSig = vrv_cast<MeterSig *>(this->GetMeterSig());
+        if (meterSig && meterSig->HasCount()) {
+            params->m_midiFile->addTimeSignature(
+                params->m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
         }
     }
 

@@ -272,6 +272,11 @@ public:
      */
     std::vector<std::pair<LayerElement *, LayerElement *>> GetInternalTieEndpoints();
 
+    /**
+     * Read only access to m_scoreTimeOffset
+     */
+    double GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
+
     //----------//
     // Functors //
     //----------//
