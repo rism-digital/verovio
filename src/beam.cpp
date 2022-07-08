@@ -306,7 +306,7 @@ bool BeamSegment::DoesBeamOverlap(
 
     // Check for minimal stem length
     const auto [minLengthAbove, minLengthBelow] = this->GetMinimalStemLength(beamInterface);
-    return (std::min(minLengthAbove, minLengthBelow) < 4 * unit);
+    return (std::min(minLengthAbove, minLengthBelow) < 3 * unit);
 }
 
 std::pair<int, int> BeamSegment::GetVerticalOffset(const BeamDrawingInterface *beamInterface) const
