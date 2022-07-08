@@ -83,7 +83,8 @@ public:
      */
     ///@{
     void SetGroupSymbol(GrpSym *grpSym);
-    GrpSym *GetGroupSymbol() const { return m_groupSymbol; }
+    GrpSym *GetGroupSymbol() { return m_groupSymbol; }
+    const GrpSym *GetGroupSymbol() const { return m_groupSymbol; }
     ///@}
 
     /**
