@@ -97,6 +97,11 @@ public:
     void CalcNoteHeadShiftForStemSameas(Beam *sameasBeam, data_BEAMPLACE place);
     ///@}
 
+    /**
+     * Request staff space for mixed beams if minimal stem length is too short
+     */
+    void RequestStaffSpace(const Doc *doc, const BeamDrawingInterface *beamInterface);
+
 private:
     // Helper to adjust stem length to extend only towards outmost subbeam (if option "--beam-french-style" is set)
     void AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterface);
@@ -120,7 +125,7 @@ private:
     int CalcBeamSlopeStep(
         const Doc *doc, const Staff *staff, BeamDrawingInterface *beamInterface, int noteStep, bool &shortStep);
 
-    void CalcMixedBeamStem(const BeamDrawingInterface *beamInterface, int step);
+    void CalcMixedBeamPosition(const BeamDrawingInterface *beamInterface, int step, int unit);
 
     void CalcBeamPosition(const Doc *doc, const Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal);
 
@@ -147,8 +152,8 @@ private:
     // Helper to set the stem values for tablature
     void CalcSetStemValuesTab(const Staff *staff, const Doc *doc, const BeamDrawingInterface *beamInterface);
 
-    // Helper to calculate max/min beam points for the relative beam place
-    std::pair<int, int> CalcBeamRelativeMinMax(data_BEAMPLACE place) const;
+    // Helper to calculate the vertical center of mixed beams
+    int CalcMixedBeamCenterY(int step, int unit) const;
 
     // Helper to calculate location and duration of the note that would be setting highest/lowest point for the beam
     std::pair<int, int> CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const;
@@ -165,9 +170,15 @@ private:
     // Helper to simply set the values of each BeamElementCoord according the the first position and the slope
     void CalcSetValues();
 
-    // Helper to check wheter beam fits within certain bounds
+    // Helper to check whether beam fits within certain bounds
     bool DoesBeamOverlap(
-        int staffTop, int topOffset, int staffBottom, int bottomOffset, bool isCrossStaff = false) const;
+        const BeamDrawingInterface *beamInterface, int topBorder, int bottomBorder, int minStemLength) const;
+
+    // Helper to calculate the vertical offset of the beam top/bottom w.r.t. the beam center
+    std::pair<int, int> GetVerticalOffset(const BeamDrawingInterface *beamInterface) const;
+
+    // Helper to calculate the minimal stem length of above/below notes
+    std::pair<int, int> GetMinimalStemLength(const BeamDrawingInterface *beamInterface) const;
 
     // Helper to check mixed beam positioning compared to other elements (ledger lines, staff) and adjust it accordingly
     bool NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingInterface *beamInterface);
