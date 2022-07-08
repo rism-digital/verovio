@@ -21,11 +21,11 @@
 
 namespace vrv {
 
-void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width, int dashLength)
+void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width, int dashLength, int gapLength)
 {
     assert(dc);
 
-    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength);
+    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength, gapLength);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x1), ToDeviceContextY(y2));
@@ -35,11 +35,11 @@ void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width
     return;
 }
 
-void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int width, int dashLength)
+void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int width, int dashLength, int gapLength)
 {
     assert(dc);
 
-    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength);
+    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength, gapLength);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
@@ -63,21 +63,23 @@ void View::DrawRoundedLine(DeviceContext *dc, int x1, int y1, int x2, int y2, in
     return;
 }
 
-void View::DrawVerticalSegmentedLine(DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength)
+void View::DrawVerticalSegmentedLine(
+    DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength, int gapLength)
 {
     int i, start, end;
     for (i = 0; i < line.GetSegmentCount(); i++) {
         std::tie(start, end) = line.GetStartEnd(i);
-        this->DrawVerticalLine(dc, start, end, x1, width, dashLength);
+        this->DrawVerticalLine(dc, start, end, x1, width, dashLength, gapLength);
     }
 }
 
-void View::DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength)
+void View::DrawHorizontalSegmentedLine(
+    DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength, int gapLength)
 {
     int i, start, end;
     for (i = 0; i < line.GetSegmentCount(); i++) {
         std::tie(start, end) = line.GetStartEnd(i);
-        this->DrawHorizontalLine(dc, start, end, y1, width, dashLength);
+        this->DrawHorizontalLine(dc, start, end, y1, width, dashLength, gapLength);
     }
 }
 

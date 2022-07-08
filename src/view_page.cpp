@@ -895,9 +895,9 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     const int barLinesSum = barLineThickWidth + barLineWidth;
     int x2 = x + barLineSeparation;
 
-    // optimized for five line staves
-    int dashLength = m_doc->GetDrawingUnit(staffSize) * 16 / 13;
-    int dotLength = m_doc->GetDrawingUnit(staffSize) * 4 / 13;
+    const int dotLength = m_doc->GetDrawingUnit(staffSize) * 4 / 13;
+    const int dashLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarLineDashLength.GetValue();
+    const int gapLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarLineGapLength.GetValue();
 
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
@@ -934,7 +934,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
             break;
         case BARRENDITION_dashed: //
-            this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
+            this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength, gapLength);
             break;
         case BARRENDITION_dotted: //
             if (singleStaff) {
@@ -970,8 +970,8 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             this->DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth);
             break;
         case BARRENDITION_dbldashed:
-            this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
-            this->DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dashLength);
+            this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength, gapLength);
+            this->DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dashLength, gapLength);
             break;
         case BARRENDITION_dbldotted:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);

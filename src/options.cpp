@@ -1162,7 +1162,7 @@ Options::Options()
     m_barLineSeparation.Init(0.8, 0.5, 2.0);
     this->Register(&m_barLineSeparation, "barLineSeparation", &m_generalLayout);
 
-    m_barLineWidth.SetInfo("Barline width", "The barLine width");
+    m_barLineWidth.SetInfo("Barline width", "The barline width");
     m_barLineWidth.Init(0.30, 0.10, 0.80);
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
 
@@ -1187,6 +1187,16 @@ Options::Options()
         "Breaks no widow", "Prevent single measures on the last page by fitting it into previous system");
     m_breaksNoWidow.Init(false);
     this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
+
+    // Optimized for five line staves
+    constexpr double dashedBarLineLengthDefault = 8.0 / 7.0;
+    m_dashedBarLineDashLength.SetInfo("Dashed barline dash length", "The dash length of dashed barlines");
+    m_dashedBarLineDashLength.Init(dashedBarLineLengthDefault, 0.1, 5.0);
+    this->Register(&m_dashedBarLineDashLength, "dashedBarLineDashLength", &m_generalLayout);
+
+    m_dashedBarLineGapLength.SetInfo("Dashed barline gap length", "The gap length of dashed barlines");
+    m_dashedBarLineGapLength.Init(dashedBarLineLengthDefault, 0.1, 5.0);
+    this->Register(&m_dashedBarLineGapLength, "dashedBarLineGapLength", &m_generalLayout);
 
     m_dynamDist.SetInfo("Dynam dist", "The default distance from the staff for dynamic marks");
     m_dynamDist.Init(1.0, 0.5, 16.0);
@@ -1774,6 +1784,8 @@ void Options::Sync()
         { "thickBarlineThickness", &m_thickBarlineThickness }, //
         { "barlineSeparation", &m_barLineSeparation }, //
         { "repeatBarlineDotSeparation", &m_repeatBarLineDotSeparation }, //
+        { "dashedBarlineDashLength", &m_dashedBarLineDashLength }, //
+        { "dashedBarlineGapLength", &m_dashedBarLineGapLength }, //
         { "bracketThickness", &m_bracketThickness }, //
         { "subBracketThickness", &m_subBracketThickness }, //
         { "hairpinThickness", &m_hairpinThickness }, //
