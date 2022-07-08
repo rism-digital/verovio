@@ -1161,6 +1161,11 @@ Options::Options()
     m_barLineWidth.Init(0.30, 0.10, 0.80);
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
 
+    m_beamFrenchStyle.SetInfo(
+        "French style of beams", "For notes in beams, stems will stop at first outermost sub-beam without crossing it");
+    m_beamFrenchStyle.Init(false);
+    this->Register(&m_beamFrenchStyle, "beamFrenchStyle", &m_generalLayout);
+
     m_beamMaxSlope.SetInfo("Beam max slope", "The maximum beam slope");
     m_beamMaxSlope.Init(10, 0, 20);
     this->Register(&m_beamMaxSlope, "beamMaxSlope", &m_generalLayout);
@@ -1169,10 +1174,9 @@ Options::Options()
     m_beamMinSlope.Init(0, 0, 0);
     this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
 
-    m_beamFrenchStyle.SetInfo(
-        "French style of beams", "For notes in beams, stems will stop at first outermost sub-beam without crossing it");
-    m_beamFrenchStyle.Init(false);
-    this->Register(&m_beamFrenchStyle, "beamFrenchStyle", &m_generalLayout);
+    m_beamMixedPreserve.SetInfo("Preserve mixed beams", "Mixed beams will be drawn even if there is not enough space");
+    m_beamMixedPreserve.Init(false);
+    this->Register(&m_beamMixedPreserve, "beamMixedPreserve", &m_generalLayout);
 
     m_bracketThickness.SetInfo("Bracket thickness", "The thickness of the system bracket");
     m_bracketThickness.Init(1.0, 0.5, 2.0);

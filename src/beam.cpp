@@ -377,6 +377,10 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingI
     }
 
     // CASE 2: SINGLE STAFF BEAMS
+    if (doc->GetOptions()->m_beamMixedPreserve.GetValue()) {
+        return false;
+    }
+
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     auto [topOffset, bottomOffset] = this->GetVerticalOffset(beamInterface);
 
