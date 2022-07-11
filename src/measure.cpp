@@ -299,16 +299,16 @@ int Measure::CalculateRightBarLineWidth(Doc *doc, int staffSize)
     switch (barline->GetForm()) {
         case BARRENDITION_dbl:
         case BARRENDITION_dbldashed: {
-            width = barLineSeparation + barLineWidth / 2;
+            width = barLineSeparation + barLineWidth;
             break;
         }
         case BARRENDITION_rptend:
         case BARRENDITION_end: {
-            width = barLineSeparation + barLineWidth + barLineThickWidth / 2;
+            width = barLineSeparation + barLineWidth + barLineThickWidth;
             break;
         }
         case BARRENDITION_rptboth: {
-            width = 2 * barLineSeparation + barLineWidth / 2 + barLineThickWidth;
+            width = 2 * barLineSeparation + barLineWidth + barLineThickWidth;
             break;
         }
         default: break;
