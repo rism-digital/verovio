@@ -83,8 +83,8 @@ bool BarLine::HasRepetitionDots() const
 bool BarLine::IsDrawnThrough(const StaffGrp *staffGrp) const
 {
     while (staffGrp) {
-        if (staffGrp->GetBarThru() == BOOLEAN_true) {
-            return true;
+        if (staffGrp->HasBarThru()) {
+            return (staffGrp->GetBarThru() == BOOLEAN_true);
         }
         staffGrp = dynamic_cast<const StaffGrp *>(staffGrp->GetParent());
     }
