@@ -747,9 +747,13 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             continue;
         }
 
+        // Determine the staff def
         if (!child->Is(STAFFDEF)) continue;
         StaffDef *staffDef = vrv_cast<StaffDef *>(child);
         assert(staffDef);
+        if (staffDef->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
+            continue;
+        }
 
         // Determine the barline form
         data_BARRENDITION form = barLine->GetForm();
