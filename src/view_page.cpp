@@ -875,11 +875,8 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     const int barLinesSum = barLineThickWidth + barLineWidth;
     int x2 = x + barLineSeparation;
 
-    const int dotLength = m_doc->GetDrawingUnit(staffSize) * 4 / 13;
-    const int dashLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarLineDashLength.GetValue();
-    const int gapLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarLineGapLength.GetValue();
-    // optimized for five line staves
-    const int dashLength = unit * 8 / 7;
+    const int dashLength = unit * m_options->m_dashedBarLineDashLength.GetValue();
+    const int gapLength = unit * m_options->m_dashedBarLineGapLength.GetValue();
     if (inStaffSpace && ((form == BARRENDITION_dashed) || (form == BARRENDITION_dbldashed))) {
         // Dashed lines in staff space should start with a gap
         yTop -= dashLength;
