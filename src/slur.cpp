@@ -325,7 +325,7 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
 }
 
 void Slur::AddSpannedElements(
-    FloatingCurvePositioner *curve, const SpannedElements &spanned, const Staff *staff, int xMin, int xMax)
+    FloatingCurvePositioner *curve, const SpannedElements &spanned, Staff *staff, int xMin, int xMax)
 {
     Staff *startStaff = this->GetStart()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
     Staff *endStaff = this->GetEnd()->GetAncestorStaff(RESOLVE_CROSS_STAFF, false);
