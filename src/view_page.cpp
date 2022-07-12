@@ -1224,7 +1224,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     this->DrawStaffDefCautionary(dc, staff, measure);
 
     for (auto &spanningElement : staff->m_timeSpanningElements) {
-        system->AddToDrawingListIfNeccessary(spanningElement);
+        system->AddToDrawingListIfNecessary(spanningElement);
     }
 
     dc->EndGraphic(staff, this);

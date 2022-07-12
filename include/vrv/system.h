@@ -112,12 +112,13 @@ public:
      * Check if the notes between the start and end have mixed drawing stem directions.
      * The start and end element are expected to be on the same staff and same layer.
      */
-    bool HasMixedDrawingStemDir(LayerElement *start, LayerElement *end);
+    bool HasMixedDrawingStemDir(const LayerElement *start, const LayerElement *end) const;
 
     /**
      * Get preferred curve direction based on the starting and ending point of the slur
      */
-    curvature_CURVEDIR GetPreferredCurveDirection(LayerElement *start, LayerElement *end, Slur *slur);
+    curvature_CURVEDIR GetPreferredCurveDirection(
+        const LayerElement *start, const LayerElement *end, const Slur *slur) const;
 
     /**
      * @name Setter and getter of the drawing visible flag
@@ -131,7 +132,7 @@ public:
      * Add an object to the drawing list but only if necessary.
      * Check types but also links (dynam, dir) and extensions (trill).
      */
-    void AddToDrawingListIfNeccessary(Object *object);
+    void AddToDrawingListIfNecessary(Object *object);
 
     /**
      * @name Check if the system is the first or last in page or of a selection or of an mdiv by looking at the next
@@ -149,7 +150,7 @@ public:
     /**
      * Estimate the justification ratio from the castoff system widths and the desired page width
      */
-    double EstimateJustificationRatio(Doc *doc);
+    double EstimateJustificationRatio(const Doc *doc) const;
 
     /**
      * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
