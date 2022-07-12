@@ -735,8 +735,8 @@ int Chord::CalcStem(FunctorParams *functorParams)
     data_STEMDIRECTION layerStemDir;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
-    if (stem->HasStemDir()) {
-        stemDir = stem->GetStemDir();
+    if (stem->HasDir()) {
+        stemDir = stem->GetDir();
     }
     else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
         stemDir = layerStemDir;
@@ -854,8 +854,9 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
         this->AddChild(currentStem);
     }
     currentStem->AttGraced::operator=(*this);
-    currentStem->AttStems::operator=(*this);
-    currentStem->AttStemsCmn::operator=(*this);
+    // TODO: CONVERT ATTRIBUTES
+    // currentStem->AttStems::operator=(*this);
+    // currentStem->AttStemsCmn::operator=(*this);
     int duration = this->GetNoteOrChordDur(this);
     if ((duration < DUR_2) || (this->GetStemVisible() == BOOLEAN_false)) {
         currentStem->IsVirtual(true);

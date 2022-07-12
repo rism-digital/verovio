@@ -1076,8 +1076,8 @@ int Note::CalcStem(FunctorParams *functorParams)
     if (this->HasStemSameasNote()) {
         stemDir = this->CalcStemDirForSameasNote(params->m_verticalCenter);
     }
-    else if (stem->HasStemDir()) {
-        stemDir = stem->GetStemDir();
+    else if (stem->HasDir()) {
+        stemDir = stem->GetDir();
     }
     else if (this->IsGraceNote()) {
         stemDir = STEMDIRECTION_up;
@@ -1305,8 +1305,9 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
             this->AddChild(currentStem);
         }
         currentStem->AttGraced::operator=(*this);
-        currentStem->AttStems::operator=(*this);
-        currentStem->AttStemsCmn::operator=(*this);
+        // TODO: CONVERT ATTRIBUTES
+        // currentStem->AttStems::operator=(*this);
+        // currentStem->AttStemsCmn::operator=(*this);
         if (this->GetActualDur() < DUR_2 || (this->GetStemVisible() == BOOLEAN_false)) {
             currentStem->IsVirtual(true);
         }

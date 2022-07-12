@@ -9,8 +9,7 @@
 #define __VRV_STEM_H__
 
 #include "atts_cmn.h"
-#include "atts_shared.h"
-#include "atts_visual.h"
+#include "atts_mensural.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -22,9 +21,9 @@ class Flag;
 //----------------------------------------------------------------------------
 
 /**
- * This class models a stem as a layer element part and has not direct MEI equivlatent.
+ * This class models a stem as a layer element part and as MEI <stem> element.
  */
-class Stem : public LayerElement, public AttGraced, public AttStems, public AttStemsCmn {
+class Stem : public LayerElement, public AttGraced, public AttStemVis, public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -47,13 +46,17 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
-     * @name Setter and getter for darwing stem direction and length
+     * @name Setter and getter for the drawing stem direction, length and modifier
      */
     ///@{
     data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; }
     void SetDrawingStemDir(data_STEMDIRECTION drawingStemDir) { m_drawingStemDir = drawingStemDir; }
     int GetDrawingStemLen() const { return m_drawingStemLen; }
     void SetDrawingStemLen(int drawingStemLen) { m_drawingStemLen = drawingStemLen; }
+    // Since Stem does not inherit from AttStems we override LayerElement::GetDrawingStemMod()
+    data_STEMMODIFIER GetDrawingStemMod() const override { return m_drawingStemMod; }
+    bool HasDrawingStemMod() const { return (m_drawingStemMod != STEMMODIFIER_NONE); }
+    void SetDrawingStemMod(data_STEMMODIFIER mod) { m_drawingStemMod = mod; }
     int GetDrawingStemAdjust() const { return m_drawingStemAdjust; }
     void SetDrawingStemAdjust(int drawingStemAdjust) { m_drawingStemAdjust = drawingStemAdjust; }
     int GetStemModRelY() const { return m_stemModRelY; }
@@ -126,6 +129,10 @@ private:
      * The drawing length of stem
      */
     int m_drawingStemLen;
+    /**
+     * The drawing modifier of the stem
+     */
+    data_STEMMODIFIER m_drawingStemMod;
     /**
      * Relative Y position for the stem modifier
      */
