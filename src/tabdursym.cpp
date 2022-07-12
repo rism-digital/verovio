@@ -203,8 +203,8 @@ int TabDurSym::CalcStem(FunctorParams *functorParams)
     // Up by default with tablature
     data_STEMDIRECTION stemDir = STEMDIRECTION_up;
 
-    if (stem->HasStemDir()) {
-        stemDir = stem->GetStemDir();
+    if (stem->HasDir()) {
+        stemDir = stem->GetDir();
     }
     else if ((layerStemDir = params->m_layer->GetDrawingStemDir()) != STEMDIRECTION_NONE) {
         stemDir = layerStemDir;
