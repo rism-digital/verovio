@@ -77,7 +77,7 @@ if __name__ == '__main__':
                 continue
 
             # reset the options
-            options = testOptions.copy()
+            #options = testOptions.copy()
 
             # filenames (input MEI/XML and output SVG)
             inputFile = os.path.join(path1, item1, item2)
@@ -113,5 +113,5 @@ if __name__ == '__main__':
             ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
             print("saving to PNG")
             cairosvg.svg2png(bytestring=svgString, scale=2, write_to=pngFile)
-            tk.resetOptions()
-            options.clear()
+            #tk.resetOptions()
+            #options.clear()
