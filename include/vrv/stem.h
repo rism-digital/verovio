@@ -95,14 +95,6 @@ public:
     int CalcStem(FunctorParams *functorParams) override;
 
     /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    ///@}
-
-    /**
      * See Object::ResetData
      */
     int ResetData(FunctorParams *functorParams) override;

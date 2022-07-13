@@ -401,6 +401,7 @@ private:
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
+    void WriteStem(pugi::xml_node currentNode, Stem *stem);
     void WriteSyllable(pugi::xml_node currentNode, Syllable *syllable);
     void WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym);
     void WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp);

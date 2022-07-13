@@ -681,6 +681,12 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child("space");
         this->WriteSpace(m_currentNode, vrv_cast<Space *>(object));
     }
+    else if (object->Is(STEM)) {
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("stem");
+            this->WriteStem(m_currentNode, vrv_cast<Stem *>(object));
+        }
+    }
     else if (object->Is(SYL)) {
         m_currentNode = m_currentNode.append_child("syl");
         this->WriteSyl(m_currentNode, vrv_cast<Syl *>(object));
@@ -2624,6 +2630,16 @@ void MEIOutput::WriteSpace(pugi::xml_node currentNode, Space *space)
 
     this->WriteLayerElement(currentNode, space);
     this->WriteDurationInterface(currentNode, space);
+}
+
+void MEIOutput::WriteStem(pugi::xml_node currentNode, Stem *stem)
+{
+    assert(stem);
+
+    this->WriteLayerElement(currentNode, stem);
+    stem->WriteGraced(currentNode);
+    stem->WriteStemVis(currentNode);
+    stem->WriteVisibility(currentNode);
 }
 
 void MEIOutput::WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym)
