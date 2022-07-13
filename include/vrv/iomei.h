@@ -700,6 +700,7 @@ private:
     bool ReadProport(Object *parent, pugi::xml_node proport);
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
+    bool ReadStem(Object *parent, pugi::xml_node stem);
     bool ReadSyl(Object *parent, pugi::xml_node syl);
     bool ReadSyllable(Object *parent, pugi::xml_node syllable);
     bool ReadTabDurSym(Object *parent, pugi::xml_node tabDurSym);
