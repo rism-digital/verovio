@@ -10,7 +10,7 @@ from lxml import etree as ET
 from svgpathtools import Path
 
 # Define svg namespace
-ns = {"svg": "http://www.w3.org/2000/svg"}
+SVG_NS = {"svg": "http://www.w3.org/2000/svg"}
 
 ######################
 #  Helper Functions  #
@@ -36,7 +36,7 @@ def write_file_content(filepath: str, content: str):
 
 def get_svg_elements(root: ET.Element, tag: str) -> list[ET.Element]:
     """Retrieve all elements with given tag name from svg."""
-    return root.findall(".//svg:" + tag, ns)  # XPath, recursive
+    return root.findall(".//svg:" + tag, SVG_NS)  # XPath, recursive
 
 ########################
 #  Parse Fontname.svg  #
@@ -51,13 +51,13 @@ def read_svg_font_file(font_file_name: str):
         print(f"Error opening font file {font_file_name}!")
         sys.exit(1)
     root = ET.fromstring(bytes(font_svg_content, encoding="utf-8"))
-    font = root.find("svg:defs/svg:font", ns)
+    font = root.find("svg:defs/svg:font", SVG_NS)
     default_hax = font.get("horiz-adv-x", "0")
     font_faces = get_svg_elements(font, "font-face")
     if len(font_faces) != 1:
         print(
             f"Error: the file {font_file_name} should have a unique font-face element!")
-        print(f"Please check that the svg has correct namespace: {ns}")
+        print(f"Please check that the svg has correct namespace: {SVG_NS['svg']}.")
         sys.exit(1)
     font_family = font_faces[0].get("font-family")
     units_per_em = font_faces[0].get("units-per-em")
