@@ -1,13 +1,14 @@
 import argparse
+import json
 import os
 
-from diffimg import diff as pngdiff
-from jsondiff import diff as jsondiff
 import lxml.etree as etree
 import PIL.Image as Image
 import PIL.ImageChops as ImageChops
 import PIL.ImageOps as ImageOps
 import xmldiff.main as main
+from diffimg import diff as pngdiff
+from jsondiff import diff as jsondiff
 
 ns = {'svg': 'http://www.w3.org/2000/svg'}
 
@@ -134,8 +135,13 @@ if __name__ == "__main__":
             pngFile2Out = os.path.join(path_out, item1, name + '.before.png')
             print(f'Comparing {name}')
 
+            json1 = json.load(jsonFile1)
+            json2 = json.load(jsonFile2)
+            if jsondiff(json1, json2):
+                print(json1)
+                print(json2)
+
             diffValue = pngdiff(pngFile1, pngFile2, delete_diff_file=True)
-            print(jsondiff(jsonFile1, jsonFile2))
             if (diffValue > (args.threshold / 100.0)):
                 print(f'Img diff: {diffValue}')
                 row = etree.SubElement(table, 'tr')
