@@ -135,8 +135,8 @@ if __name__ == "__main__":
             pngFile2Out = os.path.join(path_out, item1, name + '.before.png')
             print(f'Comparing {name}')
 
-            json1 = json.load(jsonFile1)
-            json2 = json.load(jsonFile2)
+            json1 = json.load(open(jsonFile1))
+            json2 = json.load(open(jsonFile2))
             if jsondiff(json1, json2):
                 print(json1)
                 print(json2)
