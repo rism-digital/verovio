@@ -118,6 +118,7 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "stem.h"
 #include "subst.h"
 #include "supplied.h"
 #include "surface.h"
@@ -3474,6 +3475,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "plica") {
             return true;
         }
+        else if (element == "stem") {
+            return true;
+        }
         else if (element == "syl") {
             return true;
         }
@@ -5802,6 +5806,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "space") {
             success = this->ReadSpace(parent, xmlElement);
         }
+        else if (elementName == "stem") {
+            success = this->ReadStem(parent, xmlElement);
+        }
         else if (elementName == "syl") {
             success = this->ReadSyl(parent, xmlElement);
         }
@@ -6428,6 +6435,20 @@ bool MEIInput::ReadSpace(Object *parent, pugi::xml_node space)
 
     parent->AddChild(vrvSpace);
     this->ReadUnsupportedAttr(space, vrvSpace);
+    return true;
+}
+
+bool MEIInput::ReadStem(Object *parent, pugi::xml_node stem)
+{
+    Stem *vrvStem = new Stem();
+    this->ReadLayerElement(stem, vrvStem);
+
+    vrvStem->ReadGraced(stem);
+    vrvStem->ReadStemVis(stem);
+    vrvStem->ReadVisibility(stem);
+
+    parent->AddChild(vrvStem);
+    this->ReadUnsupportedAttr(stem, vrvStem);
     return true;
 }
 
