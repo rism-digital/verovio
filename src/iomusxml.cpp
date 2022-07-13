@@ -889,7 +889,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     staffGrp->AddChild(grpSym);
                 }
                 const std::string groupBarline = xpathNode.node().child("group-barline").text().as_string();
-                staffGrp->SetBarThru(ConvertWordToBool(groupBarline));
+                if (!groupBarline.empty()) staffGrp->SetBarThru((groupBarline == "no") ? BOOLEAN_false : BOOLEAN_true);
+                if (groupBarline == "Mensurstrich") staffGrp->SetBarMethod(BARMETHOD_mensur);
                 // now stack it
                 const std::string groupName
                     = GetContentOfChild(xpathNode.node(), "group-name[not(@print-object='no')]");

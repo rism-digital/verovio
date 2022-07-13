@@ -185,18 +185,6 @@ public:
     // Static methods //
     //----------------//
 
-    /**
-     * Swap values.
-     * This is useful for example when switching to the device context world.
-     */
-    static void Swap(int &v1, int &v2);
-
-    /**
-     * Swap the points passed as reference.
-     * This is useful for example when calculating bezier positions.
-     */
-    static void SwapPoints(Point &p1, Point &p2);
-
     static std::pair<double, int> ApproximateBezierExtrema(
         const Point bezier[4], bool isMaxExtrema, int approximationSteps = BEZIER_APPROXIMATION);
 
@@ -386,8 +374,14 @@ protected:
 private:
     /**
      * An vector of line segments
+     * They always have increasing order and orientation
      */
     ArrayOfIntPairs m_segments;
+
+    /**
+     * Flag indicating the orientation of the original line
+     */
+    bool m_increasing;
 };
 
 } // namespace vrv

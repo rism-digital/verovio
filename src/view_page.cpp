@@ -293,8 +293,8 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     }
 }
 
-void View::DrawScoreDef(
-    DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine, bool isLastMeasure)
+void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine,
+    bool isLastMeasure, bool isLastSystem)
 {
     assert(dc);
     assert(scoreDef);
@@ -312,7 +312,8 @@ void View::DrawScoreDef(
     }
     else {
         dc->StartGraphic(barLine, "", barLine->GetID());
-        this->DrawBarLines(dc, measure, staffGrp, barLine, isLastMeasure);
+        int yBottomPrevious = VRV_UNSET;
+        this->DrawBarLines(dc, measure, staffGrp, barLine, isLastMeasure, isLastSystem, yBottomPrevious);
         dc->EndGraphic(barLine, this);
     }
 
@@ -660,7 +661,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     y1 -= penWidth;
     y2 += penWidth;
     x += penWidth;
-    BoundingBox::Swap(y1, y2);
+    std::swap(y1, y2);
 
     const int fact = m_doc->GetDrawingBeamWhiteWidth(staffSize, false) + m_doc->GetDrawingStemWidth(staffSize);
     const int xdec = ToDeviceContextX(fact);
@@ -720,7 +721,8 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     return;
 }
 
-void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure)
+void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure,
+    bool isLastSystem, int &yBottomPrevious)
 {
     assert(dc);
     assert(measure);
@@ -731,173 +733,155 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         return;
     }
 
-    if (staffGrp->GetBarThru() != BOOLEAN_true) {
-        // recursively draw the children (staffDef or staffGrp) - we assume @barthru is false by default
-        int i;
-        StaffGrp *childStaffGrp = NULL;
-        StaffDef *childStaffDef = NULL;
-        for (i = 0; i < staffGrp->GetChildCount(); ++i) {
-            childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
-            childStaffDef = dynamic_cast<StaffDef *>(staffGrp->GetChild(i));
-            if (childStaffGrp) {
-                if (childStaffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
-                    continue;
-                }
-                this->DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure);
-            }
-            else if (childStaffDef) {
-                if (childStaffDef->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
-                    continue;
-                }
-                AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
-                Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-                if (!staff) {
-                    LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", childStaffDef->GetN());
-                    continue;
-                }
-                if (staff->GetVisible() == BOOLEAN_false) {
-                    continue;
-                }
-                // Get current form. If neighboring invisible staff make sure that at least some kind of barline is
-                // drawn
-                data_BARRENDITION form = barLine->GetForm();
-                if (measure->HasInvisibleStaffBarlines()) {
-                    data_BARRENDITION barlineRend = (barLine->GetPosition() == BarLinePosition::Right)
-                        ? measure->GetDrawingRightBarLineByStaffN(childStaffDef->GetN())
-                        : measure->GetDrawingLeftBarLineByStaffN(childStaffDef->GetN());
-                    if (barlineRend != BARRENDITION_NONE) form = barlineRend;
-                }
-                if (form == BARRENDITION_NONE) continue;
+    const bool barlineThrough = barLine->IsDrawnThrough(staffGrp);
 
-                // for the bottom position we need to take into account the number of lines and the staff size
-                int yBottom = staff->GetDrawingY()
-                    - (childStaffDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-                if (measure->HasBarPlace()) {
-                    // bar.place counts upwards (note order).
-                    yBottom += measure->GetBarPlace() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-                }
-                int yTop = staff->GetDrawingY();
-                if (measure->HasBarLen()) {
-                    yTop = yBottom + (measure->GetBarLen() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-                }
+    for (int i = 0; i < staffGrp->GetChildCount(); ++i) {
+        Object *child = staffGrp->GetChild(i);
+
+        // Recursive call for staff group
+        if (child->Is(STAFFGRP)) {
+            StaffGrp *childStaffGrp = vrv_cast<StaffGrp *>(child);
+            this->DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure, isLastSystem, yBottomPrevious);
+            continue;
+        }
+
+        // Determine the staff def
+        if (!child->Is(STAFFDEF)) continue;
+        StaffDef *staffDef = vrv_cast<StaffDef *>(child);
+        assert(staffDef);
+        if (staffDef->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
+            continue;
+        }
+
+        // Determine the barline form
+        data_BARRENDITION form = barLine->GetForm();
+        if (!barlineThrough && (measure->HasInvisibleStaffBarlines())) {
+            data_BARRENDITION barlineRend = (barLine->GetPosition() == BarLinePosition::Right)
+                ? measure->GetDrawingRightBarLineByStaffN(staffDef->GetN())
+                : measure->GetDrawingLeftBarLineByStaffN(staffDef->GetN());
+            if (barlineRend != BARRENDITION_NONE) form = barlineRend;
+        }
+        if (form == BARRENDITION_NONE) {
+            yBottomPrevious = VRV_UNSET;
+            continue;
+        }
+
+        // Determine the method
+        const auto [hasMethod, method] = barLine->GetMethod(staffDef);
+        const bool methodMensur = hasMethod && (method == BARMETHOD_mensur);
+        const bool methodTakt = hasMethod && (method == BARMETHOD_takt);
+
+        // Get the corresponding staff
+        AttNIntegerComparison comparison(STAFF, staffDef->GetN());
+        Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
+        if (!staff) {
+            LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", staffDef->GetN());
+            yBottomPrevious = VRV_UNSET;
+            continue;
+        }
+        if (!barlineThrough && (staff->GetVisible() == BOOLEAN_false)) {
+            yBottomPrevious = VRV_UNSET;
+            continue;
+        }
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+        // For the bottom position we need to take into account the number of lines and the staff size
+        const int yStaffTop = staff->GetDrawingY();
+        const int yStaffBottom = yStaffTop - 2 * (staffDef->GetLines() - 1) * unit;
+        int yBottom = yStaffBottom;
+        int yLength = yStaffTop - yStaffBottom;
+
+        // Adjust start and length
+        if (!methodMensur && !methodTakt) {
+            const auto [hasPlace, place] = barLine->GetPlace(staffDef);
+            if (hasPlace) {
+                // bar.place counts upwards (note order).
+                yBottom += place * unit;
+            }
+            else if (staffDef->GetLines() <= 1) {
                 // Make sure barlines are visible with a single line
-                if (childStaffDef->GetLines() <= 1) {
-                    yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-                    yBottom -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-                }
-                this->DrawBarLine(dc, yTop, yBottom, barLine, form);
-                if (barLine->HasRepetitionDots()) {
-                    this->DrawBarLineDots(dc, staff, barLine);
-                }
+                yBottom -= 2 * unit;
+            }
+
+            const auto [hasLength, length] = barLine->GetLength(staffDef);
+            if (hasLength) {
+                yLength = length * unit;
+            }
+            else if (staffDef->GetLines() <= 1) {
+                yLength = 4 * unit;
             }
         }
-    }
-    else {
-        if (barLine->GetForm() == BARRENDITION_NONE) return;
-        const ListOfObjects &staffDefs = staffGrp->GetList(staffGrp);
-        if (staffDefs.empty()) {
-            return;
+        int yTop = yBottom + yLength;
+
+        // Shift the taktstrich outwards?
+        const int yTaktstrichShift = methodMensur ? unit : 0;
+
+        // Determine which parts to draw
+        bool drawInsideStaff = !methodMensur && !methodTakt;
+        bool drawOutsideStaff = !methodTakt && barlineThrough;
+        bool drawTaktstrichAbove = (methodMensur && !barlineThrough) || methodTakt;
+        bool drawTaktstrichBelow = methodMensur && !barlineThrough;
+        if ((isLastMeasure && isLastSystem) || barLine->HasRepetitionDots()) {
+            drawInsideStaff = true;
+            drawTaktstrichAbove = false;
+            drawTaktstrichBelow = false;
         }
 
-        StaffDef *firstDef = NULL;
-        ListOfObjects::const_iterator iter;
-        for (iter = staffDefs.begin(); iter != staffDefs.end(); ++iter) {
-            StaffDef *staffDef = vrv_cast<StaffDef *>(*iter);
-            assert(staffDef);
-            if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
-                firstDef = staffDef;
-                break;
-            }
-        }
-
-        StaffDef *lastDef = NULL;
-        ListOfObjects::const_reverse_iterator riter;
-        for (riter = staffDefs.rbegin(); riter != staffDefs.rend(); ++riter) {
-            StaffDef *staffDef = vrv_cast<StaffDef *>(*riter);
-            assert(staffDef);
-            if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
-                lastDef = staffDef;
-                break;
+        // Now draw the barline part inside the staff
+        if (drawInsideStaff) {
+            this->DrawBarLine(dc, yTop, yBottom, barLine, form);
+            if (barLine->HasRepetitionDots()) {
+                this->DrawBarLineDots(dc, staff, barLine);
             }
         }
 
-        if (!firstDef || !lastDef) {
-            LogDebug("Could not get staffDef while drawing staffGrp - DrawStaffGrp");
-            return;
+        // ... and the barline part outside the staff
+        if (drawOutsideStaff && (yBottomPrevious != VRV_UNSET)) {
+            // Do not erase intersections with right barline of the last measure of the system
+            const bool eraseIntersections = !isLastMeasure || (barLine->GetPosition() != BarLinePosition::Right);
+
+            this->DrawBarLine(dc, yBottomPrevious, yTop, barLine, form, true, eraseIntersections);
+        }
+        yBottomPrevious = drawOutsideStaff ? yBottom : VRV_UNSET;
+
+        // Draw the taktstrich above the staff
+        if (drawTaktstrichAbove) {
+            const int yTaktstrichCenter = yStaffTop + yTaktstrichShift;
+            this->DrawBarLine(dc, yTaktstrichCenter + unit, yTaktstrichCenter - unit, barLine, form);
         }
 
-        // Get the corresponding staff looking at the previous (or first) measure
-        AttNIntegerComparison comparisonFirst(STAFF, firstDef->GetN());
-        Staff *first = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparisonFirst, 1));
-        AttNIntegerComparison comparisonLast(STAFF, lastDef->GetN());
-        Staff *last = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparisonLast, 1));
-
-        if (!first || !last) {
-            LogDebug("Could not get staff (%d; %d) while drawing staffGrp - DrawStaffGrp", firstDef->GetN(),
-                lastDef->GetN());
-            return;
-        }
-
-        int yTop = first->GetDrawingY();
-        if (firstDef->GetLines() <= 1) {
-            yTop += m_doc->GetDrawingDoubleUnit(first->m_drawingStaffSize);
-        }
-        // for the bottom position we need to take into account the number of lines and the staff size
-        int yBottom
-            = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
-        if (lastDef->GetLines() <= 1) {
-            yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
-        }
-
-        const bool singleStaff = (first == last);
-        // erase intersections only if we have more than one staff
-        bool eraseIntersections = !singleStaff;
-        // do not erase intersections with right barline of the last measure of the system
-        if (isLastMeasure && (barLine->GetPosition() == BarLinePosition::Right)) {
-            eraseIntersections = false;
-        }
-        this->DrawBarLine(dc, yTop, yBottom, barLine, barLine->GetForm(), eraseIntersections, singleStaff);
-
-        // Now we have a barthru barLine, but we have dots so we still need to go through each staff
-        if (barLine->HasRepetitionDots()) {
-            StaffDef *childStaffDef = NULL;
-            const ListOfObjects &childList = staffGrp->GetList(staffGrp); // make sure it's initialized
-            for (ListOfObjects::const_reverse_iterator it = childList.rbegin(); it != childList.rend(); ++it) {
-                childStaffDef = dynamic_cast<StaffDef *>((*it));
-                if (childStaffDef) {
-                    AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
-                    Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-                    if (!staff) {
-                        LogDebug(
-                            "Could not get staff (%d) while drawing staffGrp - DrawBarLines", childStaffDef->GetN());
-                        continue;
-                    }
-                    this->DrawBarLineDots(dc, staff, barLine);
-                }
-            }
+        // Draw the taktstrich below the staff
+        if (drawTaktstrichBelow) {
+            const int yTaktstrichCenter = yStaffBottom - yTaktstrichShift;
+            this->DrawBarLine(dc, yTaktstrichCenter + unit, yTaktstrichCenter - unit, barLine, form);
         }
     }
 }
 
 void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLine, data_BARRENDITION form,
-    bool eraseIntersections, bool singleStaff)
+    bool inStaffSpace, bool eraseIntersections)
 {
     assert(dc);
     assert(barLine);
 
     Staff *staff = barLine->GetAncestorStaff(ANCESTOR_ONLY, false);
     const int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
+    const int unit = m_doc->GetDrawingUnit(staffSize);
 
     const int x = barLine->GetDrawingX();
     const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
-    const int barLineThickWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_thickBarlineThickness.GetValue();
-    const int barLineSeparation = m_doc->GetDrawingUnit(staffSize) * m_options->m_barLineSeparation.GetValue();
+    const int barLineThickWidth = unit * m_options->m_thickBarlineThickness.GetValue();
+    const int barLineSeparation = unit * m_options->m_barLineSeparation.GetValue();
     const int barLinesSum = barLineThickWidth + barLineWidth;
     int x2 = x + barLineSeparation;
 
-    const int dotLength = m_doc->GetDrawingUnit(staffSize) * 4 / 13;
-    const int dashLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarLineDashLength.GetValue();
-    const int gapLength = m_doc->GetDrawingUnit(staffSize) * m_options->m_dashedBarLineGapLength.GetValue();
+    const int dashLength = unit * m_options->m_dashedBarLineDashLength.GetValue();
+    const int gapLength = unit * m_options->m_dashedBarLineGapLength.GetValue();
+    if (inStaffSpace && ((form == BARRENDITION_dashed) || (form == BARRENDITION_dbldashed))) {
+        // Dashed lines in staff space should start with a gap
+        yTop -= dashLength;
+        yBottom += dashLength;
+    }
 
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
@@ -924,7 +908,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             lines.SetParent(system);
             lines.UpdateContentBBoxX(minX, maxX);
             lines.UpdateContentBBoxY(yTop, yBottom);
-            int margin = m_doc->GetDrawingUnit(staffSize) / 2;
+            int margin = unit / 2;
             system->m_systemAligner.FindAllIntersectionPoints(line, lines, { DIR, DYNAM, TEMPO }, margin);
         }
     }
@@ -937,12 +921,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength, gapLength);
             break;
         case BARRENDITION_dotted: //
-            if (singleStaff) {
-                this->DrawVerticalDots(dc, x, line, barLineWidth, m_doc->GetDrawingDoubleUnit(staffSize));
-            }
-            else {
-                this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
-            }
+            this->DrawVerticalDots(dc, x, line, barLineWidth, 2 * unit);
             break;
         case BARRENDITION_rptend:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
@@ -974,8 +953,8 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             this->DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dashLength, gapLength);
             break;
         case BARRENDITION_dbldotted:
-            this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
-            this->DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth, dotLength);
+            this->DrawVerticalDots(dc, x, line, barLineWidth, 2 * unit);
+            this->DrawVerticalDots(dc, x2 + barLineWidth, line, barLineWidth, 2 * unit);
             break;
         default:
             // Use solid barline as fallback
@@ -1087,9 +1066,8 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
                 measure->GetLeftBarLine());
         }
         if ((measure->GetDrawingRightBarLine() != BARRENDITION_NONE) || measure->HasInvisibleStaffBarlines()) {
-            bool isLast = (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD)) ? true : false;
             this->DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetRightBarLine()->GetDrawingX(),
-                measure->GetRightBarLine(), isLast);
+                measure->GetRightBarLine(), measure->IsLastInSystem(), system->IsLastOfMdiv());
         }
     }
 

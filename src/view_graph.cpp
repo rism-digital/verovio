@@ -87,7 +87,7 @@ void View::DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y
 {
     assert(dc); // DC cannot be NULL
 
-    BoundingBox::Swap(y1, y2);
+    std::swap(y1, y2);
 
     dc->SetPen(m_currentColour, lineThickness, AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
@@ -109,7 +109,7 @@ void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, in
 {
     assert(dc); // DC cannot be NULL
 
-    BoundingBox::Swap(y1, y2);
+    std::swap(y1, y2);
 
     // dc->SetPen(m_currentColour, 0, AxSOLID );
     // dc->SetBrush(AxWHITE, AxTRANSPARENT);
@@ -128,7 +128,7 @@ void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int
 {
     assert(dc); // DC cannot be NULL
 
-    BoundingBox::Swap(y1, y2);
+    std::swap(y1, y2);
 
     const int penWidth = lineThickness;
     dc->SetPen(m_currentColour, penWidth, AxSOLID);
@@ -157,7 +157,7 @@ void View::DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2,
 {
     assert(dc);
 
-    BoundingBox::Swap(y1, y2);
+    std::swap(y1, y2);
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
@@ -243,16 +243,16 @@ void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line,
 {
     if (line.GetSegmentCount() > 1) return;
 
-    const auto [start, end] = line.GetStartEnd(0);
+    const auto [top, bottom] = line.GetStartEnd(0);
     const int radius = std::max(barlineWidth, 2);
-    int drawingPosition = start + interval / 2;
+    int drawingPosition = top - interval / 2;
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    while (drawingPosition < end) {
+    while (drawingPosition > bottom) {
         dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(drawingPosition), radius);
-        drawingPosition += interval;
+        drawingPosition -= interval;
     }
 
     dc->ResetPen();

@@ -20,6 +20,8 @@
 #include "layer.h"
 #include "measure.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "system.h"
 #include "vrv.h"
 
@@ -76,6 +78,92 @@ bool BarLine::HasRepetitionDots() const
         return true;
     }
     return false;
+}
+
+bool BarLine::IsDrawnThrough(const StaffGrp *staffGrp) const
+{
+    while (staffGrp) {
+        if (staffGrp->HasBarThru()) {
+            return (staffGrp->GetBarThru() == BOOLEAN_true);
+        }
+        staffGrp = dynamic_cast<const StaffGrp *>(staffGrp->GetParent());
+    }
+    return false;
+}
+
+std::pair<bool, double> BarLine::GetLength(const StaffDef *staffDef) const
+{
+    // First check the parent measure
+    const Measure *measure = dynamic_cast<const Measure *>(this->GetParent());
+    if (measure && measure->HasBarLen()) {
+        return { true, measure->GetBarLen() };
+    }
+
+    // Then check the staffDef and its ancestors
+    const Object *object = staffDef;
+    while (object) {
+        if (object->HasAttClass(ATT_BARRING)) {
+            const AttBarring *att = dynamic_cast<const AttBarring *>(object);
+            assert(att);
+            if (att->HasBarLen()) {
+                return { true, att->GetBarLen() };
+            }
+        }
+        if (object->Is(SCOREDEF)) break;
+        object = object->GetParent();
+    }
+
+    return { false, 0.0 };
+}
+
+std::pair<bool, data_BARMETHOD> BarLine::GetMethod(const StaffDef *staffDef) const
+{
+    // First check the parent measure
+    const Measure *measure = dynamic_cast<const Measure *>(this->GetParent());
+    if (measure && measure->HasBarMethod()) {
+        return { true, measure->GetBarMethod() };
+    }
+
+    // Then check the staffDef and its ancestors
+    const Object *object = staffDef;
+    while (object) {
+        if (object->HasAttClass(ATT_BARRING)) {
+            const AttBarring *att = dynamic_cast<const AttBarring *>(object);
+            assert(att);
+            if (att->HasBarMethod()) {
+                return { true, att->GetBarMethod() };
+            }
+        }
+        if (object->Is(SCOREDEF)) break;
+        object = object->GetParent();
+    }
+
+    return { false, BARMETHOD_NONE };
+}
+
+std::pair<bool, int> BarLine::GetPlace(const StaffDef *staffDef) const
+{
+    // First check the parent measure
+    const Measure *measure = dynamic_cast<const Measure *>(this->GetParent());
+    if (measure && measure->HasBarPlace()) {
+        return { true, measure->GetBarPlace() };
+    }
+
+    // Then check the staffDef and its ancestors
+    const Object *object = staffDef;
+    while (object) {
+        if (object->HasAttClass(ATT_BARRING)) {
+            const AttBarring *att = dynamic_cast<const AttBarring *>(object);
+            assert(att);
+            if (att->HasBarPlace()) {
+                return { true, att->GetBarPlace() };
+            }
+        }
+        if (object->Is(SCOREDEF)) break;
+        object = object->GetParent();
+    }
+
+    return { false, 0 };
 }
 
 //----------------------------------------------------------------------------
