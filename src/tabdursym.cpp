@@ -135,6 +135,7 @@ int TabDurSym::PrepareLayerElementParts(FunctorParams *functorParams)
 
     if (!currentStem) {
         currentStem = new Stem();
+        currentStem->IsAttribute(true);
         this->AddChild(currentStem);
     }
     this->SetDrawingStem(currentStem);

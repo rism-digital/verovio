@@ -66,6 +66,25 @@ bool Stem::IsSupportedChild(Object *child)
     return true;
 }
 
+void Stem::FillAttributes(const AttStems &attSource)
+{
+    if (attSource.HasStemDir()) {
+        this->SetDir(attSource.GetStemDir());
+    }
+    if (attSource.HasStemLen()) {
+        this->SetLen(attSource.GetStemLen());
+    }
+    if (attSource.HasStemPos()) {
+        this->SetPos(attSource.GetStemPos());
+    }
+    if (attSource.HasStemMod()) {
+        this->SetDrawingStemMod(attSource.GetStemMod());
+    }
+    if (attSource.HasStemVisible()) {
+        this->SetVisible(attSource.GetStemVisible());
+    }
+}
+
 int Stem::CompareToElementPosition(const Doc *doc, const LayerElement *otherElement, int margin) const
 {
     const Staff *staff = this->GetAncestorStaff();

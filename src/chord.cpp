@@ -851,12 +851,12 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     if (!currentStem) {
         currentStem = new Stem();
+        currentStem->IsAttribute(true);
         this->AddChild(currentStem);
     }
     currentStem->AttGraced::operator=(*this);
-    // TODO: CONVERT ATTRIBUTES
-    // currentStem->AttStems::operator=(*this);
-    // currentStem->AttStemsCmn::operator=(*this);
+    currentStem->FillAttributes(*this);
+
     int duration = this->GetNoteOrChordDur(this);
     if ((duration < DUR_2) || (this->GetStemVisible() == BOOLEAN_false)) {
         currentStem->IsVirtual(true);

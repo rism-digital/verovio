@@ -46,6 +46,11 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
+     * Fill the attributes from the AttStems attribute of the parent note/chord
+     */
+    void FillAttributes(const AttStems &attSource);
+
+    /**
      * @name Setter and getter for the drawing stem direction, length and modifier
      */
     ///@{

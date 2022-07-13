@@ -1303,12 +1303,12 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     if (!this->IsChordTone() && !this->IsMensuralDur() && !this->IsTabGrpNote()) {
         if (!currentStem) {
             currentStem = new Stem();
+            currentStem->IsAttribute(true);
             this->AddChild(currentStem);
         }
         currentStem->AttGraced::operator=(*this);
-        // TODO: CONVERT ATTRIBUTES
-        // currentStem->AttStems::operator=(*this);
-        // currentStem->AttStemsCmn::operator=(*this);
+        currentStem->FillAttributes(*this);
+
         if (this->GetActualDur() < DUR_2 || (this->GetStemVisible() == BOOLEAN_false)) {
             currentStem->IsVirtual(true);
         }
