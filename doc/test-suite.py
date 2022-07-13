@@ -2,7 +2,6 @@
 import argparse
 import hashlib
 import json
-import hashlib
 import os
 import sys
 import xml.etree.ElementTree as ET
@@ -77,12 +76,12 @@ if __name__ == '__main__':
                 continue
 
             # reset the options
-            options = testOptions #.copy()
+            options = testOptions.copy()
 
             # filenames (input MEI/XML and output SVG)
             inputFile = os.path.join(path1, item1, item2)
-            options.update({"xmlIdSeed": int(hashlib.sha256(
-                inputFile.encode("utf-8")).hexdigest(), 16) % 10**9})
+            #options.update({"xmlIdSeed": int(hashlib.sha256(
+            #    inputFile.encode("utf-8")).hexdigest(), 16) % 10**9})
             print(inputFile)
             name, ext = os.path.splitext(item2)
             svgFile = os.path.join(path2, item1, name + '.svg')
@@ -101,18 +100,16 @@ if __name__ == '__main__':
                     metaOptions = json.loads(meta)
                     options |= metaOptions
 
-            print("setting options")
             tk.setOptions(json.dumps(options))
             print(json.dumps(options))
             tk.loadFile(inputFile)
-            print("rendering to timemap")
-            tk.renderToTimemapFile(timeMapFile)
-            print("rendering to SVG")
+            # render to SVG
             svgString = tk.renderToSVG(1)
             svgString = svgString.replace(
                 "overflow=\"inherit\"", "overflow=\"visible\"")
             ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
-            print("saving to PNG")
             cairosvg.svg2png(bytestring=svgString, scale=2, write_to=pngFile)
-            #tk.resetOptions()
-            #options.clear()
+            tk.resetOptions()
+            # create time map
+            tk.renderToTimemapFile(timeMapFile)
+            options.clear()
