@@ -83,6 +83,7 @@ if __name__ == '__main__':
             inputFile = os.path.join(path1, item1, item2)
             options.update({"xmlIdSeed": int(hashlib.sha256(
                 inputFile.encode("utf-8")).hexdigest(), 16) % 10**9})
+            print(inputFile)
             name, ext = os.path.splitext(item2)
             svgFile = os.path.join(path2, item1, name + '.svg')
             pngFile = os.path.join(path2, item1, name + '.png')
