@@ -6469,7 +6469,7 @@ AttStems::~AttStems()
 void AttStems::ResetStems()
 {
     m_stemDir = STEMDIRECTION_NONE;
-    m_stemLen = -1;
+    m_stemLen = -1.0;
     m_stemMod = STEMMODIFIER_NONE;
     m_stemPos = STEMPOSITION_NONE;
     m_stemSameas = "";
@@ -6569,7 +6569,7 @@ bool AttStems::HasStemDir() const
 
 bool AttStems::HasStemLen() const
 {
-    return (m_stemLen != -1);
+    return (m_stemLen != -1.0);
 }
 
 bool AttStems::HasStemMod() const

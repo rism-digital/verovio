@@ -408,7 +408,7 @@ AttStemVis::~AttStemVis()
 void AttStemVis::ResetStemVis()
 {
     m_pos = STEMPOSITION_NONE;
-    m_len = 0.0;
+    m_len = -1.0;
     m_form = STEMFORM_mensural_NONE;
     m_dir = STEMDIRECTION_NONE;
     m_flagPos = FLAGPOS_mensural_NONE;
@@ -488,7 +488,7 @@ bool AttStemVis::HasPos() const
 
 bool AttStemVis::HasLen() const
 {
-    return (m_len != 0.0);
+    return (m_len != -1.0);
 }
 
 bool AttStemVis::HasForm() const
