@@ -77,7 +77,7 @@ public:
     /**
      * See Object::GenerateMIDI
      */
-    int GenerateMIDI(FunctorParams *functorParams) override;
+    int GenerateMIDI(FunctorParams *) override;
 
     /**
      * See Object::ResetData

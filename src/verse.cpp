@@ -249,11 +249,8 @@ int Verse::InitProcessingLists(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Verse::GenerateMIDI(FunctorParams *functorParams)
+int Verse::GenerateMIDI(FunctorParams *)
 {
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
     Verse *previousVerse = vrv_cast<Verse *>(this->GetFirstAncestor(NOTE)->GetPrevious(this, VERSE));
 
     if (previousVerse) return FUNCTOR_SIBLINGS;
