@@ -77,7 +77,7 @@ if __name__ == '__main__':
                 continue
 
             # reset the options
-            #options = testOptions.copy()
+            options = testOptions #.copy()
 
             # filenames (input MEI/XML and output SVG)
             inputFile = os.path.join(path1, item1, item2)
