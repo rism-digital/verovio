@@ -5118,16 +5118,16 @@ bool MEIInput::ReadArpeg(Object *parent, pugi::xml_node arpeg)
 bool MEIInput::ReadBeamSpan(Object *parent, pugi::xml_node beamSpan)
 {
     BeamSpan *vrvBeamSpan = new BeamSpan();
-    ReadControlElement(beamSpan, vrvBeamSpan);
+    this->ReadControlElement(beamSpan, vrvBeamSpan);
 
-    ReadPlistInterface(beamSpan, vrvBeamSpan);
-    ReadTimeSpanningInterface(beamSpan, vrvBeamSpan);
+    this->ReadPlistInterface(beamSpan, vrvBeamSpan);
+    this->ReadTimeSpanningInterface(beamSpan, vrvBeamSpan);
     vrvBeamSpan->ReadBeamedWith(beamSpan);
     vrvBeamSpan->ReadBeamRend(beamSpan);
     vrvBeamSpan->ReadColor(beamSpan);
 
     parent->AddChild(vrvBeamSpan);
-    ReadUnsupportedAttr(beamSpan, vrvBeamSpan);
+    this->ReadUnsupportedAttr(beamSpan, vrvBeamSpan);
     return true;
 }
 
