@@ -167,7 +167,7 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
         m_outputTo = MEI;
     }
     else if (outputTo == "pb-mei") {
-        LogWarning("Output to 'pb-mei' is deprecaded, use 'mei-pb' instead.");
+        LogWarning("Output to 'pb-mei' is deprecated, use 'mei-pb' instead.");
         m_outputTo = MEI;
     }
     else if (outputTo == "midi") {

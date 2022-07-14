@@ -449,7 +449,7 @@ int main(int argc, char **argv)
 
     if (outformat == "pb-mei") {
         outformat = "mei-pb";
-        vrv::LogWarning("Output to 'pb-mei' is deprecaded, use 'mei-pb' instead.");
+        vrv::LogWarning("Output to 'pb-mei' is deprecated, use 'mei-pb' instead.");
     }
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "mei-basic") && (outformat != "mei-pb")
         && (outformat != "midi") && (outformat != "timemap") && (outformat != "humdrum") && (outformat != "hum")
