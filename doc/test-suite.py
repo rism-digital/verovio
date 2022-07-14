@@ -107,7 +107,7 @@ if __name__ == '__main__':
                 "overflow=\"inherit\"", "overflow=\"visible\"")
             ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
             cairosvg.svg2png(bytestring=svgString, scale=2, write_to=pngFile)
-            tk.resetOptions()
             # create time map
             tk.renderToTimemapFile(timeMapFile)
+            tk.resetOptions()
             options.clear()
