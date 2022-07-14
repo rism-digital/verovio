@@ -137,6 +137,8 @@ if __name__ == "__main__":
 
             json1 = json.load(open(jsonFile1))
             json2 = json.load(open(jsonFile2))
+            print(json1)
+            print(json2)
             if jsondiff(json1, json2):
                 print(json1)
                 print(json2)
