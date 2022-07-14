@@ -6,9 +6,9 @@ import lxml.etree as etree
 import PIL.Image as Image
 import PIL.ImageChops as ImageChops
 import PIL.ImageOps as ImageOps
-import xmldiff.main as main
 from diffimg import diff as pngdiff
 from jsondiff import diff as jsondiff
+from xmldiff.main import diff_trees as xmldiff
 
 ns = {'svg': 'http://www.w3.org/2000/svg'}
 
@@ -201,7 +201,7 @@ if __name__ == "__main__":
                 root2.remove(e)
 
             # unused for now
-            diff = main.diff_trees(root1, root2)
+            diff = xmldiff(root1, root2)
             if (len(diff) > 0):
                 print(f'Node diff: {len(diff)}')
 
