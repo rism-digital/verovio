@@ -243,7 +243,7 @@ data_KEYSIGNATURE KeySig::ConvertToSig() const
     data_KEYSIGNATURE sig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
     const ListOfConstObjects &childList = this->GetList(this);
     if (childList.size() > 1) {
-        data_ACCIDENTAL_WRITTEN accidType = ACCIDENTAL_WRITTEN_n;
+        data_ACCIDENTAL_WRITTEN accidType = ACCIDENTAL_WRITTEN_NONE;
         bool isCommon = true;
         int pos = 0;
         for (auto &child : childList) {
@@ -255,14 +255,14 @@ data_KEYSIGNATURE KeySig::ConvertToSig() const
                 continue;
             }
             // We have not a key sig type at this stage
-            if (accidType == ACCIDENTAL_WRITTEN_n) {
+            if (accidType == ACCIDENTAL_WRITTEN_NONE) {
                 if (curType == ACCIDENTAL_WRITTEN_s || curType == ACCIDENTAL_WRITTEN_f) {
                     accidType = curType;
                 }
             }
-            else if (accidType != curType) {
+            if (accidType != curType) {
                 LogWarning("All the keySig content cannot be converted to @sig because the accidental type is not a "
-                           "flat or a sharp or mixes them");
+                           "flat or a sharp, or mixes them");
                 break;
             }
             if (accidType == ACCIDENTAL_WRITTEN_f && s_pnameForFlats[pos] != keyAccid->GetPname()) {
