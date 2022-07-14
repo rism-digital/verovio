@@ -237,7 +237,7 @@ private:
     SpannedElements CollectSpannedElements(const Staff *staff, int xMin, int xMax) const;
     // Filter and add layer elements spanned by the slur to the positioner
     void AddSpannedElements(
-        FloatingCurvePositioner *curve, const SpannedElements &elements, const Staff *staff, int xMin, int xMax);
+        FloatingCurvePositioner *curve, const SpannedElements &elements, Staff *staff, int xMin, int xMax);
     // Determine whether a layer element should lie above or below the slur
     bool IsElementBelow(const LayerElement *element, const Staff *startStaff, const Staff *endStaff) const;
     bool IsElementBelow(const FloatingPositioner *positioner, const Staff *startStaff, const Staff *endStaff) const;

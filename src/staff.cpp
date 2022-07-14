@@ -182,18 +182,18 @@ void Staff::AdjustDrawingStaffSize()
     }
 }
 
-int Staff::GetDrawingStaffNotationSize()
+int Staff::GetDrawingStaffNotationSize() const
 {
     return (this->IsTablature()) ? m_drawingStaffSize / TABLATURE_STAFF_RATIO : m_drawingStaffSize;
 }
 
-bool Staff::DrawingIsVisible()
+bool Staff::DrawingIsVisible() const
 {
-    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     assert(system->GetDrawingScoreDef());
 
-    StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(this->GetN());
+    const StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(this->GetN());
     assert(staffDef);
     return (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN);
 }
@@ -228,7 +228,7 @@ bool Staff::IsTabWithStemsOutside() const
     return (!this->IsTabGuitar() || !m_drawingStaffDef->HasType() || m_drawingStaffDef->GetType() != "stems.within");
 }
 
-int Staff::CalcPitchPosYRel(Doc *doc, int loc)
+int Staff::CalcPitchPosYRel(const Doc *doc, int loc) const
 {
     assert(doc);
 
@@ -363,7 +363,7 @@ bool Staff::IsOnStaffLine(int y, const Doc *doc) const
     return ((y - this->GetDrawingY()) % (2 * doc->GetDrawingUnit(m_drawingStaffSize)) == 0);
 }
 
-int Staff::GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place)
+int Staff::GetNearestInterStaffPosition(int y, const Doc *doc, data_STAFFREL place) const
 {
     assert(doc);
 

@@ -79,12 +79,6 @@ public:
     void AddChildBack(Object *object);
 
     /**
-     * Add a TimestampAttr to the measure.
-     * The TimestampAttr it not added as child of the measure but to the Measure::m_timestamps array.
-     */
-    void AddTimestamp(TimestampAttr *timestampAttr);
-
-    /**
      * Return true if the Measure has cached values for the horizontal layout
      */
     bool HasCachedHorizontalLayout() const { return (m_cachedWidth != VRV_UNSET); }
@@ -147,7 +141,7 @@ public:
      * Select drawing barlines based on the previous right and current left barlines (to avoid duplicated doubles or
      * singles). In certain cases drawn barlines would be simplified if they can be overlapped, e.g. single with dbl
      */
-    BarlineRenditionPair SelectDrawingBarLines(Measure *previous);
+    BarlineRenditionPair SelectDrawingBarLines(const Measure *previous) const;
 
     /**
      * Set the drawing barlines for the measure.
@@ -195,7 +189,7 @@ public:
     /**
      * Return the width of the right barline based on the barline form
      */
-    int GetRightBarLineWidth(Doc *doc);
+    int GetRightBarLineWidth(const Doc *doc) const;
 
     /**
      * Return the width of the measure, including the barLine width
@@ -221,13 +215,14 @@ public:
     /**
      * Calculates the section restart shift
      */
-    int GetSectionRestartShift(Doc *doc) const;
+    int GetSectionRestartShift(const Doc *doc) const;
 
     /**
      * @name Setter and getter of the drawing scoreDef
      */
     ///@{
-    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
+    ScoreDef *GetDrawingScoreDef() { return m_drawingScoreDef; }
+    const ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
     ///@}
 
@@ -235,7 +230,8 @@ public:
      * @name Setter and getter of the drawing ending
      */
     ///@{
-    Ending *GetDrawingEnding() const { return m_drawingEnding; }
+    Ending *GetDrawingEnding() { return m_drawingEnding; }
+    const Ending *GetDrawingEnding() const { return m_drawingEnding; }
     void SetDrawingEnding(Ending *ending) { m_drawingEnding = ending; }
     ///@}
 
@@ -248,13 +244,19 @@ public:
      * Return the top (first) visible staff in the measure (if any).
      * Takes into account system optimization
      */
+    ///@{
     Staff *GetTopVisibleStaff();
+    const Staff *GetTopVisibleStaff() const;
+    ///@}
 
     /**
      * Return the botoom (last) visible staff in the measure (if any).
      * Takes into account system optimization
      */
+    ///@{
     Staff *GetBottomVisibleStaff();
+    const Staff *GetBottomVisibleStaff() const;
+    ///@}
 
     /**
      * Check if the measure encloses the given time (in millisecond)

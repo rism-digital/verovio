@@ -666,9 +666,9 @@ void Page::JustifyVertically()
     }
 }
 
-bool Page::IsJustificationRequired(Doc *doc)
+bool Page::IsJustificationRequired(const Doc *doc)
 {
-    Pages *pages = doc->GetPages();
+    const Pages *pages = doc->GetPages();
     assert(pages);
 
     const int childSystems = this->GetChildCount(SYSTEM);
@@ -676,7 +676,7 @@ bool Page::IsJustificationRequired(Doc *doc)
     if (pages->GetLast() == this) {
         const int idx = this->GetIdx();
         if (idx > 0) {
-            Page *previousPage = dynamic_cast<Page *>(pages->GetPrevious(this));
+            const Page *previousPage = dynamic_cast<const Page *>(pages->GetPrevious(this));
             assert(previousPage);
             const int previousJustifiableHeight = previousPage->m_drawingJustifiableHeight;
             const int previousJustificationSum = previousPage->m_justificationSum;

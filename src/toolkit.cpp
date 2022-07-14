@@ -1141,7 +1141,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
     jsonxx::Object o;
 
-    Object *element = NULL;
+    const Object *element = NULL;
 
     // Try to get the element on the current drawing page - it is usually the case and fast
     if (m_doc.GetDrawingPage()) {

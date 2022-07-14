@@ -97,13 +97,13 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Dir *dir = vrv_cast<Dir *>(element);
         assert(dir);
         this->DrawDir(dc, dir, measure, system);
-        system->AddToDrawingListIfNeccessary(dir);
+        system->AddToDrawingListIfNecessary(dir);
     }
     else if (element->Is(DYNAM)) {
         Dynam *dynam = vrv_cast<Dynam *>(element);
         assert(dynam);
         this->DrawDynam(dc, dynam, measure, system);
-        system->AddToDrawingListIfNeccessary(dynam);
+        system->AddToDrawingListIfNecessary(dynam);
     }
     else if (element->Is(FERMATA)) {
         Fermata *fermata = vrv_cast<Fermata *>(element);
@@ -129,7 +129,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Pedal *pedal = vrv_cast<Pedal *>(element);
         assert(pedal);
         this->DrawPedal(dc, pedal, measure, system);
-        system->AddToDrawingListIfNeccessary(pedal);
+        system->AddToDrawingListIfNecessary(pedal);
     }
     else if (element->Is(REH)) {
         Reh *reh = vrv_cast<Reh *>(element);
@@ -145,7 +145,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Trill *trill = vrv_cast<Trill *>(element);
         assert(trill);
         this->DrawTrill(dc, trill, measure, system);
-        system->AddToDrawingListIfNeccessary(trill);
+        system->AddToDrawingListIfNecessary(trill);
     }
     else if (element->Is(TURN)) {
         Turn *turn = vrv_cast<Turn *>(element);

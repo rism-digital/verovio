@@ -289,7 +289,7 @@ bool ScoreDef::IsSupportedChild(Object *child)
     return true;
 }
 
-void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
+void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
 {
     assert(newScoreDef);
 
@@ -297,11 +297,11 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     m_setAsDrawing = true;
 
     int redrawFlags = 0;
-    Clef const *clef = NULL;
-    KeySig const *keySig = NULL;
+    const Clef *clef = NULL;
+    const KeySig *keySig = NULL;
     Mensur *mensur = NULL;
     MeterSig *meterSig = NULL;
-    MeterSigGrp *meterSigGrp = NULL;
+    const MeterSigGrp *meterSigGrp = NULL;
 
     if (newScoreDef->HasClefInfo()) {
         redrawFlags |= StaffDefRedrawFlags::REDRAW_CLEF;
@@ -337,7 +337,7 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     this->SetRedrawFlags(redrawFlags);
 }
 
-void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
+void ScoreDef::ReplaceDrawingValues(const StaffDef *newStaffDef)
 {
     assert(newStaffDef);
 
@@ -348,12 +348,12 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
     if (staffDef) {
         if (newStaffDef->HasClefInfo()) {
             staffDef->SetDrawClef(true);
-            Clef const *clef = newStaffDef->GetClef();
+            const Clef *clef = newStaffDef->GetClef();
             staffDef->SetCurrentClef(clef);
         }
         if (newStaffDef->HasKeySigInfo()) {
             staffDef->SetDrawKeySig(true);
-            KeySig const *keySig = newStaffDef->GetKeySig();
+            const KeySig *keySig = newStaffDef->GetKeySig();
             staffDef->SetCurrentKeySig(keySig);
         }
         if (newStaffDef->HasMensurInfo()) {
@@ -412,7 +412,7 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
     }
 }
 
-void ScoreDef::ReplaceDrawingLabels(StaffGrp *newStaffGrp)
+void ScoreDef::ReplaceDrawingLabels(const StaffGrp *newStaffGrp)
 {
     assert(newStaffGrp);
 
@@ -614,9 +614,9 @@ const PgHead2 *ScoreDef::GetPgHead2() const
     return dynamic_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
-int ScoreDef::GetMaxStaffSize()
+int ScoreDef::GetMaxStaffSize() const
 {
-    StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(this->FindDescendantByType(STAFFGRP));
+    const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
 }
 
@@ -630,9 +630,9 @@ bool ScoreDef::IsSectionRestart() const
     return (section && (section->GetRestart() == BOOLEAN_true));
 }
 
-bool ScoreDef::HasSystemStartLine()
+bool ScoreDef::HasSystemStartLine() const
 {
-    StaffGrp *staffGrp = vrv_cast<StaffGrp *>(this->FindDescendantByType(STAFFGRP));
+    const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     if (staffGrp) {
         auto [firstDef, lastDef] = staffGrp->GetFirstLastStaffDef();
         if ((firstDef && lastDef && (firstDef != lastDef)) || staffGrp->GetFirst(GRPSYM)) {
