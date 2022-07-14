@@ -644,6 +644,10 @@ int Layer::ResetHorizontalAlignment(FunctorParams *functorParams)
     if (this->GetStaffDefMeterSig()) {
         this->GetStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
     }
+    if (this->GetStaffDefMeterSigGrp()) {
+        Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
+        this->GetStaffDefMeterSigGrp()->Process(&resetHorizontalAlignment, NULL);
+    }
 
     if (this->GetCautionStaffDefClef()) {
         this->GetCautionStaffDefClef()->ResetHorizontalAlignment(functorParams);
