@@ -2740,8 +2740,9 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         
         const int startX
             = x1 - m_options->m_staffLineWidth.GetValue() * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
-        const int endX = (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD))
-            ? x2 + endingMeasure->CalculateRightBarLineWidth(m_doc, (*staffIter)->m_drawingStaffSize)
+        const int endX = (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD)) ? x2
+            + endingMeasure->CalculateRightBarLineWidth(m_doc, (*staffIter)->m_drawingStaffSize) - lineWidth / 2
+            - m_options->m_staffLineWidth.GetValue() * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize)
             : x2;
         dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_ARCS);
         Point p[4];
