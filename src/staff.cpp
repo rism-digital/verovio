@@ -182,18 +182,18 @@ void Staff::AdjustDrawingStaffSize()
     }
 }
 
-int Staff::GetDrawingStaffNotationSize()
+int Staff::GetDrawingStaffNotationSize() const
 {
     return (this->IsTablature()) ? m_drawingStaffSize / TABLATURE_STAFF_RATIO : m_drawingStaffSize;
 }
 
-bool Staff::DrawingIsVisible()
+bool Staff::DrawingIsVisible() const
 {
-    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     assert(system->GetDrawingScoreDef());
 
-    StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(this->GetN());
+    const StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(this->GetN());
     assert(staffDef);
     return (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN);
 }
@@ -228,7 +228,7 @@ bool Staff::IsTabWithStemsOutside() const
     return (!this->IsTabGuitar() || !m_drawingStaffDef->HasType() || m_drawingStaffDef->GetType() != "stems.within");
 }
 
-int Staff::CalcPitchPosYRel(Doc *doc, int loc)
+int Staff::CalcPitchPosYRel(const Doc *doc, int loc) const
 {
     assert(doc);
 
@@ -349,21 +349,21 @@ void Staff::SetFromFacsimile(Doc *doc)
     if (!this->HasFacs()) return;
     if (this->GetZone() == NULL) {
         assert(doc);
-        Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
+        Zone *zone = doc->GetFacsimile()->FindZoneByID(this->GetFacs());
         assert(zone);
         this->SetZone(zone);
     }
     this->AdjustDrawingStaffSize();
 }
 
-bool Staff::IsOnStaffLine(int y, Doc *doc)
+bool Staff::IsOnStaffLine(int y, const Doc *doc) const
 {
     assert(doc);
 
     return ((y - this->GetDrawingY()) % (2 * doc->GetDrawingUnit(m_drawingStaffSize)) == 0);
 }
 
-int Staff::GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place)
+int Staff::GetNearestInterStaffPosition(int y, const Doc *doc, data_STAFFREL place) const
 {
     assert(doc);
 
@@ -377,11 +377,6 @@ int Staff::GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place)
         if (distance < 0) distance = doc->GetDrawingUnit(m_drawingStaffSize) + distance;
         return y - distance - doc->GetDrawingUnit(m_drawingStaffSize);
     }
-}
-
-void Staff::SetAlignmentBeamAdjustment(int adjust)
-{
-    if (m_staffAlignment) m_staffAlignment->SetBeamAdjust(adjust);
 }
 
 //----------------------------------------------------------------------------
@@ -443,7 +438,7 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
     params->m_targetStaff->ClearChildren();
     params->m_targetStaff->CloneReset();
     // Keep the xml:id of the staff in the first staff segment
-    params->m_targetStaff->SwapUuid(this);
+    params->m_targetStaff->SwapID(this);
     assert(params->m_targetMeasure);
     params->m_targetMeasure->AddChild(params->m_targetStaff);
 

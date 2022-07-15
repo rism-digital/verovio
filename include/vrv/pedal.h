@@ -77,7 +77,7 @@ public:
     /**
      * Get the pedal form based on the options and corresponding attributes from <pedal> and <scoreDef>
      */
-    pedalVis_FORM GetPedalForm(Doc *doc, System *system) const;
+    pedalVis_FORM GetPedalForm(const Doc *doc, const System *system) const;
 
     //----------//
     // Functors //

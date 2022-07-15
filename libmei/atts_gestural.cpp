@@ -87,14 +87,14 @@ AttArticulationGestural::~AttArticulationGestural()
 
 void AttArticulationGestural::ResetArticulationGestural()
 {
-    m_articGes = ARTICULATION_NONE;
+    m_articGes = std::vector<data_ARTICULATION>();
 }
 
 bool AttArticulationGestural::ReadArticulationGestural(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("artic.ges")) {
-        this->SetArticGes(StrToArticulation(element.attribute("artic.ges").value()));
+        this->SetArticGes(StrToArticulationList(element.attribute("artic.ges").value()));
         element.remove_attribute("artic.ges");
         hasAttribute = true;
     }
@@ -105,7 +105,7 @@ bool AttArticulationGestural::WriteArticulationGestural(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasArticGes()) {
-        element.append_attribute("artic.ges") = ArticulationToStr(this->GetArticGes()).c_str();
+        element.append_attribute("artic.ges") = ArticulationListToStr(this->GetArticGes()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -113,7 +113,7 @@ bool AttArticulationGestural::WriteArticulationGestural(pugi::xml_node element)
 
 bool AttArticulationGestural::HasArticGes() const
 {
-    return (m_articGes != ARTICULATION_NONE);
+    return (m_articGes != std::vector<data_ARTICULATION>());
 }
 
 /* include <attartic.ges> */
@@ -817,7 +817,7 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
         AttArticulationGestural *att = dynamic_cast<AttArticulationGestural *>(element);
         assert(att);
         if (attrType == "artic.ges") {
-            att->SetArticGes(att->StrToArticulation(attrValue));
+            att->SetArticGes(att->StrToArticulationList(attrValue));
             return true;
         }
     }
@@ -978,7 +978,7 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         const AttArticulationGestural *att = dynamic_cast<const AttArticulationGestural *>(element);
         assert(att);
         if (att->HasArticGes()) {
-            attributes->push_back({ "artic.ges", att->ArticulationToStr(att->GetArticGes()) });
+            attributes->push_back({ "artic.ges", att->ArticulationListToStr(att->GetArticGes()) });
         }
     }
     if (element->HasAttClass(ATT_BENDGES)) {

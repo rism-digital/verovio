@@ -75,16 +75,16 @@ ArrayOfObjects PlistInterface::GetRefs()
     return result;
 }
 
-void PlistInterface::SetUuidStrs()
+void PlistInterface::SetIDStrs()
 {
-    assert(m_uuids.empty() && m_references.empty());
+    assert(m_ids.empty() && m_references.empty());
 
     xsdAnyURI_List list = this->GetPlist();
     xsdAnyURI_List::iterator iter;
     for (iter = list.begin(); iter != list.end(); ++iter) {
-        std::string uuid = ExtractUuidFragment(*iter);
-        if (!uuid.empty()) {
-            m_uuids.push_back(uuid);
+        std::string id = ExtractIDFragment(*iter);
+        if (!id.empty()) {
+            m_ids.push_back(id);
         }
         else {
             LogError("Cannot parse the anyURI '%s'", (*iter).c_str());
@@ -106,11 +106,11 @@ int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *
         return FUNCTOR_CONTINUE;
     }
 
-    this->SetUuidStrs();
+    this->SetIDStrs();
 
     std::vector<std::string>::iterator iter;
-    for (iter = m_uuids.begin(); iter != m_uuids.end(); ++iter) {
-        params->m_interfaceUuidTuples.push_back(std::make_tuple(this, *iter, (Object *)NULL));
+    for (iter = m_ids.begin(); iter != m_ids.end(); ++iter) {
+        params->m_interfaceIDTuples.push_back(std::make_tuple(this, *iter, (Object *)NULL));
     }
 
     return FUNCTOR_CONTINUE;
@@ -118,7 +118,7 @@ int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *
 
 int PlistInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
-    m_uuids.clear();
+    m_ids.clear();
     m_references.clear();
 
     return FUNCTOR_CONTINUE;

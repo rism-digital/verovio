@@ -84,6 +84,8 @@ Toolkit::Toolkit(bool initFont)
 
     m_options = m_doc.GetOptions();
 
+    m_skipLayoutOnLoad = false;
+
     m_editorToolkit = NULL;
 
 #ifndef NO_RUNTIME
@@ -111,6 +113,13 @@ Toolkit::~Toolkit()
         m_runtimeClock = NULL;
     }
 #endif
+}
+
+std::string Toolkit::GetUuid()
+{
+    LogWarning("Toolkit function GetUuid() is deprecated; use GetID() instead.");
+
+    return this->GetID();
 }
 
 std::string Toolkit::GetResourcePath() const
@@ -151,7 +160,14 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
     else if (outputTo == "mei") {
         m_outputTo = MEI;
     }
+    else if (outputTo == "mei-basic") {
+        m_outputTo = MEI;
+    }
+    else if (outputTo == "mei-pb") {
+        m_outputTo = MEI;
+    }
     else if (outputTo == "pb-mei") {
+        LogWarning("Output to 'pb-mei' is deprecated, use 'mei-pb' instead.");
         m_outputTo = MEI;
     }
     else if (outputTo == "midi") {
@@ -463,7 +479,7 @@ bool Toolkit::LoadData(const std::string &data)
     if (m_options->m_xmlIdChecksum.GetValue()) {
         crcInit();
         unsigned int cr = crcFast((unsigned char *)data.c_str(), (int)data.size());
-        Object::SeedUuid(cr);
+        Object::SeedID(cr);
     }
 
 #ifndef NO_HUMDRUM_SUPPORT
@@ -740,7 +756,7 @@ bool Toolkit::LoadData(const std::string &data)
     // to be converted
     if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
 
-    if (breaks != BREAKS_none) {
+    if (!m_skipLayoutOnLoad && (breaks != BREAKS_none)) {
         if (input->GetLayoutInformation() == LAYOUT_ENCODED
             && (breaks == BREAKS_encoded || breaks == BREAKS_line || breaks == BREAKS_smart)) {
             if (breaks == BREAKS_encoded) {
@@ -792,9 +808,15 @@ bool Toolkit::LoadData(const std::string &data)
     return true;
 }
 
+void Toolkit::SkipLayoutOnLoad(bool value)
+{
+    m_skipLayoutOnLoad = value;
+}
+
 std::string Toolkit::GetMEI(const std::string &jsonOptions)
 {
     bool scoreBased = true;
+    bool basic = false;
     bool ignoreHeader = false;
     bool removeIds = m_options->m_removeIds.GetValue();
     int firstPage = 0;
@@ -812,6 +834,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
         }
         else {
             if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
+            if (json.has<jsonxx::Boolean>("basic")) basic = json.get<jsonxx::Boolean>("basic");
             if (json.has<jsonxx::Boolean>("ignoreHeader")) ignoreHeader = json.get<jsonxx::Boolean>("ignoreHeader");
             if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
             if (json.has<jsonxx::Number>("firstPage")) firstPage = json.get<jsonxx::Number>("firstPage");
@@ -845,6 +868,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     MEIOutput meioutput(&m_doc);
     meioutput.SetScoreBasedMEI(scoreBased);
+    meioutput.SetBasic(basic);
 
     int indent = (m_options->m_outputIndentTab.GetValue()) ? -1 : m_options->m_outputIndent.GetValue();
     meioutput.SetIndent(indent);
@@ -1022,7 +1046,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
             else if (iter->first == "xmlIdSeed") {
                 if (json.has<jsonxx::Number>("xmlIdSeed")) {
                     m_options->m_xmlIdSeed.SetValue(json.get<jsonxx::Number>("xmlIdSeed"));
-                    Object::SeedUuid(m_options->m_xmlIdSeed.GetValue());
+                    Object::SeedID(m_options->m_xmlIdSeed.GetValue());
                 }
             }
             // Deprecated option
@@ -1127,27 +1151,27 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
     jsonxx::Object o;
 
-    Object *element = NULL;
+    const Object *element = NULL;
 
     // Try to get the element on the current drawing page - it is usually the case and fast
     if (m_doc.GetDrawingPage()) {
-        element = m_doc.GetDrawingPage()->FindDescendantByUuid(xmlId);
+        element = m_doc.GetDrawingPage()->FindDescendantByID(xmlId);
     }
     // If it wasn't there, try on the whole doc
     if (!element) {
-        element = m_doc.FindDescendantByUuid(xmlId);
+        element = m_doc.FindDescendantByID(xmlId);
     }
     // If not found again, try looking in the layer staffdefs
     if (!element) {
-        Functor findByUuid(&Object::FindElementInLayerStaffDefsByUUID);
-        FindLayerUuidWithinStaffDefParams params(xmlId);
+        Functor findByID(&Object::FindElementInLayerStaffDefsByID);
+        FindLayerIDWithinStaffDefParams params(xmlId);
         // Check drawing page elements first
         if (m_doc.GetDrawingPage()) {
-            m_doc.GetDrawingPage()->Process(&findByUuid, &params);
+            m_doc.GetDrawingPage()->Process(&findByID, &params);
             element = params.m_object;
         }
         if (!element) {
-            m_doc.Process(&findByUuid, &params);
+            m_doc.Process(&findByID, &params);
             element = params.m_object;
         }
         // If element is found within layer staffdef - check for the linking interface @corresp attribute to find
@@ -1156,13 +1180,13 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
             // If element has @corresp set, try finding its origin
             const LinkingInterface *link = element->GetLinkingInterface();
             if (link && link->HasCorresp()) {
-                const std::string correspId = ExtractUuidFragment(link->GetCorresp());
-                Object *origin = m_doc.FindDescendantByUuid(correspId);
+                const std::string correspId = ExtractIDFragment(link->GetCorresp());
+                Object *origin = m_doc.FindDescendantByID(correspId);
                 // if no original element was found, try searching through scoredef in score (only for certain elements)
                 if (!origin && element->Is({ CLEF, GRPSYM, KEYSIG, MENSUR, METERSIG, METERSIGGRP })) {
                     Page *page = vrv_cast<Page *>(m_doc.FindDescendantByType(PAGE));
                     if (page && page->m_score) {
-                        origin = page->m_score->GetScoreDef()->FindDescendantByUuid(correspId);
+                        origin = page->m_score->GetScoreDef()->FindDescendantByID(correspId);
                     }
                 }
                 if (origin) element = origin;
@@ -1191,7 +1215,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 std::string Toolkit::GetNotatedIdForElement(const std::string &xmlId)
 {
     if (m_doc.m_expansionMap.HasExpansionMap())
-        return m_doc.m_expansionMap.GetExpansionIdsForElement(xmlId).front();
+        return m_doc.m_expansionMap.GetExpansionIDsForElement(xmlId).front();
     else
         return xmlId;
 }
@@ -1200,7 +1224,7 @@ std::string Toolkit::GetExpansionIdsForElement(const std::string &xmlId)
 {
     jsonxx::Array a;
     if (m_doc.m_expansionMap.HasExpansionMap()) {
-        for (std::string id : m_doc.m_expansionMap.GetExpansionIdsForElement(xmlId)) {
+        for (std::string id : m_doc.m_expansionMap.GetExpansionIDsForElement(xmlId)) {
             a << id;
         }
     }
@@ -1240,7 +1264,7 @@ std::string Toolkit::GetVersion()
 void Toolkit::ResetXmlIdSeed(int seed)
 {
     m_options->m_xmlIdSeed.SetValue(seed);
-    Object::SeedUuid(m_options->m_xmlIdSeed.GetValue());
+    Object::SeedID(m_options->m_xmlIdSeed.GetValue());
 }
 
 void Toolkit::ResetLogBuffer()
@@ -1564,26 +1588,26 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     // Fill the JSON object
     for (auto const item : notesOrRests) {
         if (item->Is(NOTE)) {
-            noteArray << item->GetUuid();
+            noteArray << item->GetID();
             Note *note = vrv_cast<Note *>(item);
             assert(note);
             Chord *chord = note->IsChordTone();
             if (chord) chords.push_back(chord);
         }
         else if (item->Is(REST)) {
-            restArray << item->GetUuid();
+            restArray << item->GetID();
         }
     }
     chords.unique();
     for (auto const item : chords) {
-        chordArray << item->GetUuid();
+        chordArray << item->GetID();
     }
 
     o << "notes" << noteArray;
     o << "chords" << chordArray;
     o << "rests" << restArray;
     o << "page" << pageNo;
-    o << "measure" << measure->GetUuid();
+    o << "measure" << measure->GetID();
 
     return o.json();
 }
@@ -1629,7 +1653,7 @@ std::string Toolkit::GetDescriptiveFeatures(const std::string &options)
 
 int Toolkit::GetPageWithElement(const std::string &xmlId)
 {
-    Object *element = m_doc.FindDescendantByUuid(xmlId);
+    Object *element = m_doc.FindDescendantByID(xmlId);
     if (!element) {
         return 0;
     }
@@ -1644,7 +1668,7 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
 {
     this->ResetLogBuffer();
 
-    Object *element = m_doc.FindDescendantByUuid(xmlId);
+    Object *element = m_doc.FindDescendantByID(xmlId);
 
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());
@@ -1692,7 +1716,7 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
 {
     this->ResetLogBuffer();
 
-    Object *element = m_doc.FindDescendantByUuid(xmlId);
+    Object *element = m_doc.FindDescendantByID(xmlId);
     jsonxx::Object o;
 
     if (!element) {
@@ -1746,7 +1770,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
     this->ResetLogBuffer();
 
-    Object *element = m_doc.FindDescendantByUuid(xmlId);
+    Object *element = m_doc.FindDescendantByID(xmlId);
 
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());

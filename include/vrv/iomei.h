@@ -211,15 +211,23 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter for MEI basic output
+     */
+    ///@{
+    void SetBasic(bool basic) { m_basic = basic; }
+    bool GetBasic() const { return m_basic; }
+    ///@}
+
+    /**
      * Score based filtering by measure, page or mdiv
      */
     ///@{
     bool HasFilter() const;
     void SetFirstPage(int page);
     void SetLastPage(int page);
-    void SetFirstMeasure(const std::string &uuid);
-    void SetLastMeasure(const std::string &uuid);
-    void SetMdiv(const std::string &uuid);
+    void SetFirstMeasure(const std::string &id);
+    void SetLastMeasure(const std::string &id);
+    void SetMdiv(const std::string &id);
     void ResetFilter();
     ///@}
 
@@ -251,6 +259,13 @@ private:
      * Reset
      */
     void Reset();
+
+    /**
+     * Helper checking if the object is tree object in score-based MEI
+     * For MEI basic output, also check if objects marked as attribute need to be kept as element (e.g., accid)
+     * or if some need to be written as attributes (e.g. scoreDef/clef)
+     */
+    bool IsTreeObject(Object *object) const;
 
     /**
      * Score based filtering
@@ -513,7 +528,7 @@ private:
 
     /** @name Methods for converting members into MEI attributes. */
     ///@{
-    std::string UuidToMeiStr(Object *element);
+    std::string IDToMeiStr(Object *element);
     std::string DocTypeToStr(DocType type);
     ///@}
 
@@ -523,6 +538,8 @@ private:
     std::ostringstream m_streamStringOutput;
     int m_indent;
     bool m_scoreBasedMEI;
+    /** A flag indicating that we want to produce MEI basic */
+    bool m_basic;
     pugi::xml_node m_mei;
 
     /** Current xml element */
@@ -542,10 +559,10 @@ private:
     int m_firstPage;
     int m_currentPage;
     int m_lastPage;
-    std::string m_firstMeasureUuid;
-    std::string m_lastMeasureUuid;
+    std::string m_firstMeasureID;
+    std::string m_lastMeasureID;
     RangeMatchLocation m_measureFilterMatchLocation;
-    std::string m_mdivUuid;
+    std::string m_mdivID;
     MatchLocation m_mdivFilterMatchLocation;
     ///@}
 
@@ -827,7 +844,7 @@ private:
      * @name Various methods for reading / converting values.
      */
     ///@{
-    void SetMeiUuid(pugi::xml_node element, Object *object);
+    void SetMeiID(pugi::xml_node element, Object *object);
     DocType StrToDocType(std::string type);
     std::wstring LeftTrim(std::wstring str);
     std::wstring RightTrim(std::wstring str);
@@ -876,7 +893,7 @@ private:
     /**
      * The version of the file being read
      */
-    MEIVersion m_version;
+    meiVersion_MEIVERSION m_meiversion;
 
     /**
      * A flag indicating wheather we are reading page-based or score-based MEI

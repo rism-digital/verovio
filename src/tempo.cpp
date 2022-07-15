@@ -69,7 +69,7 @@ bool Tempo::IsSupportedChild(Object *child)
     return true;
 }
 
-int Tempo::GetDrawingXRelativeToStaff(int staffN)
+int Tempo::GetDrawingXRelativeToStaff(int staffN) const
 {
     int m_relativeX = 0;
     if (m_drawingXRels.find(staffN) != m_drawingXRels.end()) {

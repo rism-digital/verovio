@@ -290,7 +290,7 @@ public:
      */
     ///@{
     void CalcInitialControlPointParams();
-    void CalcInitialControlPointParams(Doc *doc, float angle, int staffSize);
+    void CalcInitialControlPointParams(const Doc *doc, float angle, int staffSize);
     ///@}
 
     /**

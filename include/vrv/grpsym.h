@@ -46,9 +46,11 @@ public:
      */
     ///@{
     void SetStartDef(StaffDef *start);
-    StaffDef *GetStartDef() const { return m_startDef; };
+    StaffDef *GetStartDef() { return m_startDef; }
+    const StaffDef *GetStartDef() const { return m_startDef; }
     void SetEndDef(StaffDef *end);
-    StaffDef *GetEndDef() const { return m_endDef; };
+    StaffDef *GetEndDef() { return m_endDef; }
+    const StaffDef *GetEndDef() const { return m_endDef; }
     ///@}
 
     /**

@@ -84,9 +84,15 @@ public:
      */
     ///@{
     bool HasNonAttribKeyAccidChildren() const;
-    void ClearKeyAccidAttribChildren();
     void GenerateKeyAccidAttribChildren();
     ///@}
+
+    /**
+     * Try to convert a keySig content (keyAccid) to a @sig value
+     * This can work only if the content represents a standard accidental series
+     * Return an empty @sig when the content cannot be converted
+     */
+    data_KEYSIGNATURE ConvertToSig() const;
 
     /**
      * Fill the map of modified pitches
@@ -103,7 +109,7 @@ public:
      * Static methods for calculating position;
      */
     static data_PITCHNAME GetAccidPnameAt(data_ACCIDENTAL_WRITTEN alterationType, int pos);
-    static int GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pitch, Clef *clef);
+    static int GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pitch, const Clef *clef);
 
     //----------//
     // Functors //

@@ -52,9 +52,9 @@ void LogString(std::string message, consoleLogLevel level);
 bool AreEqual(double dFirstVal, double dSecondVal);
 
 /**
- * Extract the uuid from a any uri string
+ * Extract the ID from any URI
  */
-std::string ExtractUuidFragment(std::string refUuid);
+std::string ExtractIDFragment(std::string refID);
 
 /**
  * Utility for converting UTF16 (std::wstring) to UTF-8
@@ -94,7 +94,7 @@ std::string GetVersion();
  * Encode the integer value using the specified base (max is 62)
  * Base 36 uses 0-9 and a-z, base 62 also A-Z.
  */
-std::string BaseEncodeInt(int value, int base);
+std::string BaseEncodeInt(unsigned int value, unsigned int base);
 
 /**
  *

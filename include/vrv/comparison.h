@@ -478,27 +478,27 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// UuidComparison
+// IDComparison
 //----------------------------------------------------------------------------
 
 /**
- * This class evaluates if the object is of a certain ClassId has a certain Uuid
+ * This class evaluates if the object is of a certain ClassId has a certain ID
  */
-class UuidComparison : public ClassIdComparison {
+class IDComparison : public ClassIdComparison {
 
 public:
-    UuidComparison(ClassId classId, const std::string &uuid) : ClassIdComparison(classId) { m_uuid = uuid; }
+    IDComparison(ClassId classId, const std::string &id) : ClassIdComparison(classId) { m_id = id; }
 
-    void SetUuid(const std::string &uuid) { m_uuid = uuid; }
+    void SetID(const std::string &id) { m_id = id; }
 
     bool operator()(const Object *object) override
     {
         if (!MatchesType(object)) return false;
-        return object->GetUuid() == m_uuid;
+        return (object->GetID() == m_id);
     }
 
 private:
-    std::string m_uuid;
+    std::string m_id;
 };
 
 //----------------------------------------------------------------------------

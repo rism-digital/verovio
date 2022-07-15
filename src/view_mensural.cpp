@@ -160,7 +160,7 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     this->DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
 
@@ -323,7 +323,7 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
     Ligature *ligature = vrv_cast<Ligature *>(element);
     assert(ligature);
 
-    dc->StartGraphic(ligature, "", ligature->GetUuid());
+    dc->StartGraphic(ligature, "", ligature->GetID());
 
     // Draw children (notes)
     this->DrawLayerChildren(dc, ligature, layer, staff, measure);
@@ -531,7 +531,7 @@ void View::DrawPlica(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int shortStem = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     shortStem *= (!isMensuralBlack) ? 3.5 : 2.5;
 
-    dc->StartGraphic(plica, "", plica->GetUuid());
+    dc->StartGraphic(plica, "", plica->GetID());
 
     if (isLonga) {
         if (up) {
@@ -603,7 +603,7 @@ void View::DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     Proport *proport = dynamic_cast<Proport *>(element);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     int y = staff->GetDrawingY() - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
     int x = element->GetDrawingX();

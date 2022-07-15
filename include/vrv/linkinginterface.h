@@ -68,7 +68,7 @@ public:
     ///@}
 
     /**
-     * Set @corresp attribute to the UUID (or @corresp) of the object
+     * Set @corresp attribute to the ID (or @corresp) of the object
      */
     void AddBackLink(const Object *object);
 
@@ -102,7 +102,7 @@ protected:
     /**
      * Extract the fragment of the start or end @xml:id if given
      */
-    void SetUuidStr();
+    void SetIDStr();
 
 private:
     //
@@ -110,9 +110,9 @@ public:
     //
 private:
     Object *m_next;
-    std::string m_nextUuid;
+    std::string m_nextID;
     Object *m_sameas;
-    std::string m_sameasUuid;
+    std::string m_sameasID;
 };
 
 } // namespace vrv

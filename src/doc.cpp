@@ -65,6 +65,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "MidiEvent.h"
 #include "MidiFile.h"
 
 namespace vrv {
@@ -365,15 +366,14 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     for (staves = initProcessingListsParams.m_layerTree.child.begin();
          staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
 
+        ScoreDef *currentScoreDef = this->GetCurrentScoreDef();
         int transSemi = 0;
-        if (StaffDef *staffDef = this->GetCurrentScoreDef()->GetStaffDef(staves->first)) {
+        if (StaffDef *staffDef = currentScoreDef->GetStaffDef(staves->first)) {
             // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
-            int trackCount = midiFile->getTrackCount();
-            int addCount = midiTrack + 1 - trackCount;
-            if (addCount > 0) {
-                midiFile->addTracks(addCount);
+            if (midiFile->getTrackCount() < (midiTrack + 1)) {
+                midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
             }
             // set MIDI channel and instrument
             InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
@@ -384,26 +384,55 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             }
             if (instrdef) {
                 if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel();
-                if (instrdef->HasMidiInstrnum())
+                if (instrdef->HasMidiTrack()) {
+                    midiTrack = instrdef->GetMidiTrack();
+                    if (midiFile->getTrackCount() < (midiTrack + 1)) {
+                        midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
+                    }
+                    if (midiTrack > 255) {
+                        LogWarning("A high MIDI track number was assigned to staff %d", staffDef->GetN());
+                    }
+                }
+                if (instrdef->HasMidiInstrnum()) {
                     midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum());
+                }
             }
             // set MIDI track name
-            Label *label = dynamic_cast<Label *>(staffDef->FindDescendantByType(LABEL, 1));
+            Label *label = vrv_cast<Label *>(staffDef->FindDescendantByType(LABEL, 1));
             if (!label) {
                 StaffGrp *staffGrp = vrv_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
                 assert(staffGrp);
-                label = dynamic_cast<Label *>(staffGrp->FindDescendantByType(LABEL, 1));
+                label = vrv_cast<Label *>(staffGrp->FindDescendantByType(LABEL, 1));
             }
             if (label) {
                 std::string trackName = UTF16to8(label->GetText(label)).c_str();
                 if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
             }
+            // set MIDI key signature
+            KeySig *keySig = vrv_cast<KeySig *>(staffDef->FindDescendantByType(KEYSIG));
+            if (!keySig && (currentScoreDef->HasKeySigInfo())) {
+                keySig = vrv_cast<KeySig *>(currentScoreDef->GetKeySig());
+            }
+            if (keySig && keySig->HasSig()) {
+                midiFile->addKeySignature(midiTrack, 0, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
+            }
             // set MIDI time signature
-            MeterSig *meterSig = dynamic_cast<MeterSig *>(this->GetCurrentScoreDef()->FindDescendantByType(METERSIG));
+            MeterSig *meterSig = vrv_cast<MeterSig *>(staffDef->FindDescendantByType(METERSIG));
+            if (!meterSig && (currentScoreDef->HasMeterSigInfo())) {
+                meterSig = vrv_cast<MeterSig *>(currentScoreDef->GetMeterSig());
+            }
             if (meterSig && meterSig->HasCount()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
         }
+
+        // Set initial scoreDef values for tuning
+        Functor generateScoreDefMIDI(&Object::GenerateMIDI);
+        Functor generateScoreDefMIDIEnd(&Object::GenerateMIDIEnd);
+        GenerateMIDIParams generateScoreDefMIDIParams(midiFile, &generateScoreDefMIDI);
+        generateScoreDefMIDIParams.m_midiChannel = midiChannel;
+        generateScoreDefMIDIParams.m_midiTrack = midiTrack;
+        currentScoreDef->Process(&generateScoreDefMIDI, &generateScoreDefMIDIParams, &generateScoreDefMIDIEnd);
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.Clear();
@@ -418,6 +447,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             GenerateMIDIParams generateMIDIParams(midiFile, &generateMIDI);
             generateMIDIParams.m_midiChannel = midiChannel;
             generateMIDIParams.m_midiTrack = midiTrack;
+            generateMIDIParams.m_staffN = staves->first;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;
             generateMIDIParams.m_deferredNotes = initMIDIParams.m_deferredNotes;
@@ -553,22 +583,21 @@ void Doc::PrepareData()
     this->Process(&prepareLinking, &prepareLinkingParams);
 
     // If we have some left process again backward
-    if (!prepareLinkingParams.m_sameasUuidPairs.empty() || !prepareLinkingParams.m_stemSameasUuidPairs.empty()) {
+    if (!prepareLinkingParams.m_sameasIDPairs.empty() || !prepareLinkingParams.m_stemSameasIDPairs.empty()) {
         prepareLinkingParams.m_fillList = false;
         this->Process(&prepareLinking, &prepareLinkingParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!prepareLinkingParams.m_nextUuidPairs.empty()) {
-        LogWarning("%d element(s) with a @next could match the target", prepareLinkingParams.m_nextUuidPairs.size());
+    if (!prepareLinkingParams.m_nextIDPairs.empty()) {
+        LogWarning("%d element(s) with a @next could match the target", prepareLinkingParams.m_nextIDPairs.size());
     }
-    if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
-        LogWarning(
-            "%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasUuidPairs.size());
+    if (!prepareLinkingParams.m_sameasIDPairs.empty()) {
+        LogWarning("%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasIDPairs.size());
     }
-    if (!prepareLinkingParams.m_stemSameasUuidPairs.empty()) {
+    if (!prepareLinkingParams.m_stemSameasIDPairs.empty()) {
         LogWarning("%d element(s) with a @stem.sameas could match the target",
-            prepareLinkingParams.m_stemSameasUuidPairs.size());
+            prepareLinkingParams.m_stemSameasIDPairs.size());
     }
 
     /************ Resolve @plist ************/
@@ -579,21 +608,21 @@ void Doc::PrepareData()
     this->Process(&preparePlist, &preparePlistParams);
 
     // Process plist after all pairs has been collected
-    if (!preparePlistParams.m_interfaceUuidTuples.empty()) {
+    if (!preparePlistParams.m_interfaceIDTuples.empty()) {
         preparePlistParams.m_fillList = false;
         Functor processPlist(&Object::PrepareProcessPlist);
         this->Process(&processPlist, &preparePlistParams);
 
-        for (const auto &[plistInterface, uuid, objectReference] : preparePlistParams.m_interfaceUuidTuples) {
+        for (const auto &[plistInterface, id, objectReference] : preparePlistParams.m_interfaceIDTuples) {
             plistInterface->SetRef(objectReference);
         }
-        preparePlistParams.m_interfaceUuidTuples.clear();
+        preparePlistParams.m_interfaceIDTuples.clear();
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!preparePlistParams.m_interfaceUuidTuples.empty()) {
+    if (!preparePlistParams.m_interfaceIDTuples.empty()) {
         LogWarning(
-            "%d element(s) with a @plist could not match the target", preparePlistParams.m_interfaceUuidTuples.size());
+            "%d element(s) with a @plist could not match the target", preparePlistParams.m_interfaceIDTuples.size());
     }
 
     /************ Resolve cross staff ************/
@@ -1347,11 +1376,20 @@ void Doc::ConvertMarkupDoc(bool permanent)
                     std::vector<Note *>::iterator iter;
                     for (iter = convertMarkupAnalyticalParams.m_currentNotes.begin();
                          iter != convertMarkupAnalyticalParams.m_currentNotes.end(); ++iter) {
-                        LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
+                        LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetID().c_str());
                     }
                 }
             }
         }
+    }
+
+    if (m_markup & MARKUP_SCOREDEF_DEFINITIONS) {
+        LogMessage("Converting scoreDef markup...");
+        Functor convertMarkupScoreDef(&Object::ConvertMarkupScoreDef);
+        Functor convertMarkupScoreDefEnd(&Object::ConvertMarkupScoreDefEnd);
+        ConvertMarkupScoreDefParams convertMarkupScoreDefParams(
+            this, &convertMarkupScoreDef, &convertMarkupScoreDefEnd);
+        this->Process(&convertMarkupScoreDef, &convertMarkupScoreDefParams, &convertMarkupScoreDefEnd);
     }
 }
 
@@ -1379,17 +1417,17 @@ void Doc::TransposeDoc()
     }
     else if (m_options->m_transposeMdiv.IsSet()) {
         // Transpose mdivs individually
-        std::set<std::string> uuids = m_options->m_transposeMdiv.GetKeys();
-        for (const std::string &uuid : uuids) {
-            transposeParams.m_selectedMdivUuid = uuid;
-            transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ uuid });
+        std::set<std::string> ids = m_options->m_transposeMdiv.GetKeys();
+        for (const std::string &id : ids) {
+            transposeParams.m_selectedMdivID = id;
+            transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ id });
             this->Process(&transpose, &transposeParams, &transposeEnd);
         }
     }
 
     if (m_options->m_transposeToSoundingPitch.GetValue()) {
         // Transpose to sounding pitch
-        transposeParams.m_selectedMdivUuid = "";
+        transposeParams.m_selectedMdivID = "";
         transposeParams.m_transposition = "";
         transposeParams.m_transposer->SetTransposition(0);
         transposeParams.m_transposeToSoundingPitch = true;
@@ -1403,7 +1441,7 @@ void Doc::ExpandExpansions()
     std::string expansionId = this->GetOptions()->m_expand.GetValue();
     if (expansionId.empty()) return;
 
-    Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByUuid(expansionId));
+    Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
     if (start == NULL) {
         LogMessage("Import MEI: expansion ID \"%s\" not found.", expansionId.c_str());
         return;
@@ -1417,7 +1455,7 @@ void Doc::ExpandExpansions()
     // Expansion *originalExpansion = new Expansion();
     // char rnd[35];
     // snprintf(rnd, 35, "expansion-notated-%016d", std::rand());
-    // originalExpansion->SetUuid(rnd);
+    // originalExpansion->SetID(rnd);
 
     // for (std::string ref : existingList) {
     //    originalExpansion->GetPlistInterface()->AddRef("#" + ref);
@@ -1425,7 +1463,7 @@ void Doc::ExpandExpansions()
 
     // start->GetParent()->InsertAfter(start, originalExpansion);
 
-    // std::cout << "[expand] original expansion xml:id=\"" << originalExpansion->GetUuid().c_str()
+    // std::cout << "[expand] original expansion xml:id=\"" << originalExpansion->GetID().c_str()
     //          << "\" plist={";
     // for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
 

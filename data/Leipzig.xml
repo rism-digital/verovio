@@ -198,7 +198,7 @@
   <g c="E519" x="0.0" y="-15.0" w="991.0" h="326.0" h-a-x="991" n="ventiduesimaBassa"/>
   <g c="E511" x="0.0" y="1.0" w="657.0" h="349.0" h-a-x="657" n="ottavaAlta"/>
   <g c="E512" x="0.0" y="0.0" w="650.0" h="332.0" h-a-x="650" n="ottavaBassa"/>
-  <g c="E513" x="0.0" y="0.0" w="624.0" h="332.0" n="ottavaBassaBa"/>
+  <g c="E513" x="0.0" y="0.0" w="624.0" h="332.0" h-a-x="624" n="ottavaBassaBa"/>
   <g c="E504" x="0.0" y="-242.0" w="508.0" h="484.0" h-a-x="508" n="repeatBarSlash"/>
   <g c="E069" x="0.0" y="-250.0" w="325.0" h="500.0" h-a-x="325" n="unpitchedPercussionClef1"/>
   <g c="E06A" x="0.0" y="-396.0" w="257.0" h="791.0" h-a-x="257" n="unpitchedPercussionClef2"/>

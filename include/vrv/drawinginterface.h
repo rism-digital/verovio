@@ -193,10 +193,6 @@ public:
     int m_beamWidthWhite;
     int m_fractionSize;
 
-    // position x for the stem (normal and cue-sized)
-    int m_stemXAbove[2];
-    int m_stemXBelow[2];
-
     /**
      * An array of coordinates for each element
      **/

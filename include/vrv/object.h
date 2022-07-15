@@ -9,10 +9,10 @@
 #define __VRV_OBJECT_H__
 
 #include <cstdlib>
-#include <ctime>
 #include <functional>
 #include <iterator>
 #include <map>
+#include <random>
 #include <string>
 
 //----------------------------------------------------------------------------
@@ -35,6 +35,7 @@ class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
 class Resources;
+class SaveParams;
 class ScoreDefInterface;
 class StemmedDrawingInterface;
 class TextDirInterface;
@@ -169,7 +170,7 @@ public:
      * needs to be overridden in the child class - otherwise, it will crash.
      * Because this will create a problem if we don't check this (the parents will
      * one the same child...)
-     * UUID: the uuid is copied, is needs to be reset later if this is not wished
+     * ID: the id is copied, it needs to be reset later if this is not wished
      */
     Object(const Object &object);
 
@@ -234,10 +235,10 @@ public:
      */
     virtual void CloneReset();
 
-    const std::string &GetUuid() const { return m_uuid; }
-    void SetUuid(std::string uuid);
-    void SwapUuid(Object *other);
-    void ResetUuid();
+    const std::string &GetID() const { return m_id; }
+    void SetID(const std::string &id) { m_id = id; }
+    void SwapID(Object *other);
+    void ResetID();
 
     /**
      * Methods for setting / getting comments
@@ -411,13 +412,13 @@ public:
     bool HasDescendant(Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
-     * Look for a descendant with the specified uuid (returns NULL if not found)
-     * This method is a wrapper for the Object::FindByUuid functor.
+     * Look for a descendant with the specified id (returns NULL if not found)
+     * This method is a wrapper for the Object::FindByID functor.
      */
     ///@{
-    Object *FindDescendantByUuid(const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
-    const Object *FindDescendantByUuid(
-        const std::string &uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
+    Object *FindDescendantByID(const std::string &id, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    const Object *FindDescendantByID(
+        const std::string &id, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD) const;
     ///@}
 
     /**
@@ -512,6 +513,12 @@ public:
     bool DeleteChild(Object *child);
 
     /**
+     * Delete the children that match the comparison.
+     * Return the number of children deleted. Also mark the object as modified for invalidating the list.
+     */
+    int DeleteChildrenByComparison(Comparison *comparison);
+
+    /**
      * Returns all ancestors
      */
     ///@{
@@ -537,12 +544,18 @@ public:
      * Return the last ancestor that is NOT of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
+    ///@{
     Object *GetLastAncestorNot(const ClassId classId, int maxSteps = -1);
+    const Object *GetLastAncestorNot(const ClassId classId, int maxSteps = -1) const;
+    ///@}
 
     /**
      * Return the first child that is NOT of the specified type.
      */
+    ///@{
     Object *GetFirstChildNot(const ClassId classId);
+    const Object *GetFirstChildNot(const ClassId classId) const;
+    ///@}
 
     /**
      * Fill the list of all the children LayerElement.
@@ -590,7 +603,7 @@ public:
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
-    virtual int Save(Output *output);
+    int SaveObject(SaveParams &saveParams);
 
     /**
      * Sort the child elements using std::stable_sort
@@ -627,9 +640,9 @@ public:
     // Static methods //
     //----------------//
 
-    static void SeedUuid(unsigned int seed = 0);
+    static void SeedID(unsigned int seed = 0);
 
-    static std::string GenerateRandUuid();
+    static std::string GenerateRandID();
 
     static bool sortByUlx(Object *a, Object *b);
 
@@ -658,9 +671,9 @@ public:
     ///@{
 
     /**
-     * Find a Object with a specified uuid.
+     * Find a Object with a specified id.
      */
-    virtual int FindByUuid(FunctorParams *functorParams) const;
+    virtual int FindByID(FunctorParams *functorParams) const;
 
     /**
      * Find a Object with a Comparison functor.
@@ -710,22 +723,22 @@ public:
     /**
      * Look if the time / duration passed as parameter overlap with a space in the alignment references.
      */
-    virtual int LayerCountInTimeSpan(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int LayerCountInTimeSpan(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     /**
      * Look for all the layer elements that overlap with the time / duration within certain layer passed as parameter.
      */
-    virtual int LayerElementsInTimeSpan(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int LayerElementsInTimeSpan(FunctorParams *functorParams) const { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the layer elements spanned by two points
      */
-    virtual int FindSpannedLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int FindSpannedLayerElements(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     /**
-     * Look for element by UUID in StaffDef elements (Clef, KeySig, etc.) of all layers within
+     * Look for element by ID in StaffDef elements (Clef, KeySig, etc.) of all layers within
      */
-    virtual int FindElementInLayerStaffDefsByUUID(FunctorParams *) const { return FUNCTOR_CONTINUE; }
+    virtual int FindElementInLayerStaffDefsByID(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the minimum left and maximum right for an alignment.
@@ -739,7 +752,7 @@ public:
      * It will search recursively through children elements until note, chord or ftrem is found.
      * It can be used to look in neighboring layers for the similar search, but only first element will be checked.
      */
-    virtual int GetRelativeLayerElement(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int GetRelativeLayerElement(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -790,6 +803,17 @@ public:
      * End Functor for Object::ConvertMarkupArtic
      */
     virtual int ConvertMarkupArticEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Move scoreDef clef, keySig, meterSig and mensur to staffDef.
+     * When a staffDef already has one, it is not replaced.
+     */
+    virtual int ConvertMarkupScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * End Functor for Object::ConvertMarkupScoreDef
+     */
+    virtual int ConvertMarkupScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method.
@@ -1088,7 +1112,7 @@ public:
     /**
      * Calculate the Y relative position of tupletNum based on overlaps with other elements
      */
-    virtual int AdjustTupletNumOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustTupletNumOverlap(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of the StaffAlignment.
@@ -1513,12 +1537,12 @@ public:
 
 private:
     /**
-     * Method for generating the uuid.
+     * Method for generating the id.
      */
-    void GenerateUuid();
+    void GenerateID();
 
     /**
-     * Initialisation method taking the class id and a uuid prefix argument.
+     * Initialisation method taking the class id and a id prefix argument.
      */
     void Init(ClassId classId, const std::string &classIdStr);
 
@@ -1558,10 +1582,10 @@ private:
     ClassId m_classId;
 
     /**
-     * Members for storing / generating uuids
+     * Members for storing / generating ids
      */
     ///@{
-    std::string m_uuid;
+    std::string m_id;
     std::string m_classIdStr;
     ///@}
 
@@ -1624,9 +1648,14 @@ private:
     //----------------//
 
     /**
-     * A static counter for uuid generation.
+     * A static counter for id generation.
      */
     static thread_local unsigned long s_objectCounter;
+
+    /**
+     * Pseudo random number engine for ID generation
+     */
+    static thread_local std::mt19937 s_randomGenerator;
 };
 
 //----------------------------------------------------------------------------

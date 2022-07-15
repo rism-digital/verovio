@@ -10,33 +10,33 @@ from lxml import etree as ET
 from svgpathtools import Path
 
 # Define svg namespace
-SVG_NS = "http://www.w3.org/2000/svg"
+SVG_NS = {"svg": "http://www.w3.org/2000/svg"}
 
 ######################
 #  Helper Functions  #
 ######################
 
 
-def get_file_content(filepath) -> str:
+def get_file_content(filepath: str) -> str:
     """Open file in same directory as script and retrieve its content."""
-    location = os.path.realpath(os.path.dirname(__file__))
+    location = os.path.dirname(os.path.realpath(__file__))
     file = open(os.path.join(location, filepath), "r")
     content = file.read()
     file.close()
     return content
 
 
-def write_file_content(filepath, content):
+def write_file_content(filepath: str, content: str):
     """Write content to file with path relative to the script directory."""
-    location = os.path.realpath(os.path.dirname(__file__))
+    location = os.path.dirname(os.path.realpath(__file__))
     file = open(os.path.join(location, filepath), "w")
     file.write(content)
     file.close()
 
 
-def get_svg_elements(root, tag):
+def get_svg_elements(root: ET.Element, tag: str) -> list[ET.Element]:
     """Retrieve all elements with given tag name from svg."""
-    return root.findall(".//svg:" + tag, {"svg": SVG_NS})  # XPath, recursive
+    return root.findall(".//svg:" + tag, SVG_NS)  # XPath, recursive
 
 ########################
 #  Parse Fontname.svg  #
@@ -51,16 +51,18 @@ def read_svg_font_file(font_file_name: str):
         print(f"Error opening font file {font_file_name}!")
         sys.exit(1)
     root = ET.fromstring(bytes(font_svg_content, encoding="utf-8"))
-    font_faces = get_svg_elements(root, "font-face")
+    font = root.find("svg:defs/svg:font", SVG_NS)
+    default_hax = font.get("horiz-adv-x", "0")
+    font_faces = get_svg_elements(font, "font-face")
     if len(font_faces) != 1:
         print(
             f"Error: the file {font_file_name} should have a unique font-face element!")
-        print(f"Please check that the svg has correct namespace: {SVG_NS}")
+        print(f"Please check that the svg has correct namespace: {SVG_NS['svg']}.")
         sys.exit(1)
     font_family = font_faces[0].get("font-family")
     units_per_em = font_faces[0].get("units-per-em")
-    glyphs = get_svg_elements(root, "glyph")
-    return (font_family, units_per_em, glyphs)
+    glyphs = get_svg_elements(font, "glyph")
+    return (font_family, units_per_em, default_hax, glyphs)
 
 
 ########################
@@ -130,7 +132,7 @@ def get_text_names_to_codes(filepath: str) -> dict:
             if len(items) == 6:
                 result[items[3]] = items[5]
     return result
-    
+
 ###################################################
 #  Parse font_metadata.json for alternate glyphs  #
 ###################################################
@@ -192,10 +194,9 @@ def extract_smufl_font(root, metadata_file):
             g_element.set("h", str(0.0))
 
         # set set horiz-av-x
-        if "horiz-adv-x" in glyph.attrib:
-            g_element.set("h-a-x", glyph.get("horiz-adv-x"))
-            if not float(g_element.get("w")):
-                g_element.set("w", glyph.get("horiz-adv-x"))
+        g_element.set("h-a-x", glyph.get("horiz-adv-x", default_hax))
+        if not float(g_element.get("w")):
+            g_element.set("w", glyph.get("horiz-adv-x", default_hax))
 
         # add glyph anchors if present for current glyph
         current_glyphname = glyphnames[glyph_code] if glyph_code in glyphnames else ""
@@ -259,7 +260,8 @@ if __name__ == "__main__":
     # (1) Parse files
     font_file = os.sys.argv[1]
     metadata_file = os.sys.argv[2]
-    (font_family, units_per_em, glyphs) = read_svg_font_file(font_file)
+    (font_family, units_per_em, default_hax,
+     glyphs) = read_svg_font_file(font_file)
 
     root = ET.Element("bounding-boxes")
     root.set("font-family", font_family)

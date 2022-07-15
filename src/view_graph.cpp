@@ -21,11 +21,11 @@
 
 namespace vrv {
 
-void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width, int dashLength)
+void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width, int dashLength, int gapLength)
 {
     assert(dc);
 
-    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength);
+    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength, gapLength);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x1), ToDeviceContextY(y2));
@@ -35,11 +35,11 @@ void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width
     return;
 }
 
-void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int width, int dashLength)
+void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int width, int dashLength, int gapLength)
 {
     assert(dc);
 
-    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength);
+    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength, gapLength);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
@@ -63,21 +63,23 @@ void View::DrawRoundedLine(DeviceContext *dc, int x1, int y1, int x2, int y2, in
     return;
 }
 
-void View::DrawVerticalSegmentedLine(DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength)
+void View::DrawVerticalSegmentedLine(
+    DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength, int gapLength)
 {
     int i, start, end;
     for (i = 0; i < line.GetSegmentCount(); i++) {
         std::tie(start, end) = line.GetStartEnd(i);
-        this->DrawVerticalLine(dc, start, end, x1, width, dashLength);
+        this->DrawVerticalLine(dc, start, end, x1, width, dashLength, gapLength);
     }
 }
 
-void View::DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength)
+void View::DrawHorizontalSegmentedLine(
+    DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength, int gapLength)
 {
     int i, start, end;
     for (i = 0; i < line.GetSegmentCount(); i++) {
         std::tie(start, end) = line.GetStartEnd(i);
-        this->DrawHorizontalLine(dc, start, end, y1, width, dashLength);
+        this->DrawHorizontalLine(dc, start, end, y1, width, dashLength, gapLength);
     }
 }
 
@@ -85,7 +87,7 @@ void View::DrawNotFilledEllipse(DeviceContext *dc, int x1, int y1, int x2, int y
 {
     assert(dc); // DC cannot be NULL
 
-    BoundingBox::Swap(y1, y2);
+    std::swap(y1, y2);
 
     dc->SetPen(m_currentColour, lineThickness, AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
@@ -107,7 +109,7 @@ void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, in
 {
     assert(dc); // DC cannot be NULL
 
-    BoundingBox::Swap(y1, y2);
+    std::swap(y1, y2);
 
     // dc->SetPen(m_currentColour, 0, AxSOLID );
     // dc->SetBrush(AxWHITE, AxTRANSPARENT);
@@ -126,7 +128,7 @@ void View::DrawNotFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int
 {
     assert(dc); // DC cannot be NULL
 
-    BoundingBox::Swap(y1, y2);
+    std::swap(y1, y2);
 
     const int penWidth = lineThickness;
     dc->SetPen(m_currentColour, penWidth, AxSOLID);
@@ -155,7 +157,7 @@ void View::DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2,
 {
     assert(dc);
 
-    BoundingBox::Swap(y1, y2);
+    std::swap(y1, y2);
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
@@ -241,16 +243,16 @@ void View::DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line,
 {
     if (line.GetSegmentCount() > 1) return;
 
-    const auto [start, end] = line.GetStartEnd(0);
+    const auto [top, bottom] = line.GetStartEnd(0);
     const int radius = std::max(barlineWidth, 2);
-    int drawingPosition = start + interval / 2;
+    int drawingPosition = top - interval / 2;
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    while (drawingPosition < end) {
+    while (drawingPosition > bottom) {
         dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(drawingPosition), radius);
-        drawingPosition += interval;
+        drawingPosition -= interval;
     }
 
     dc->ResetPen();

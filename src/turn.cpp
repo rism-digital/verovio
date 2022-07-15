@@ -79,7 +79,7 @@ wchar_t Turn::GetTurnGlyph() const
     return (this->GetForm() == turnLog_FORM_lower) ? SMUFL_E568_ornamentTurnInverted : SMUFL_E567_ornamentTurn;
 }
 
-int Turn::GetTurnHeight(Doc *doc, int staffSize) const
+int Turn::GetTurnHeight(const Doc *doc, int staffSize) const
 {
     assert(doc);
 

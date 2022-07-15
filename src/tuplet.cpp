@@ -140,7 +140,7 @@ void Tuplet::AddChild(Object *child)
     Modify();
 }
 
-void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff)
+void Tuplet::AdjustTupletBracketY(const Doc *doc, const Staff *staff)
 {
     TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
     if (!tupletBracket || (this->GetBracketVisible() == BOOLEAN_false)) return;
@@ -178,7 +178,7 @@ void Tuplet::AdjustTupletBracketY(Doc *doc, Staff *staff)
     tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() + yRel + bracketVerticalMargin);
 }
 
-void Tuplet::AdjustTupletBracketBeamY(Doc *doc, Staff *staff, TupletBracket *bracket, Beam *beam)
+void Tuplet::AdjustTupletBracketBeamY(const Doc *doc, const Staff *staff, TupletBracket *bracket, const Beam *beam)
 {
     const int staffSize = staff->m_drawingStaffSize;
     const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);
@@ -264,7 +264,7 @@ void Tuplet::AdjustTupletBracketBeamY(Doc *doc, Staff *staff, TupletBracket *bra
     }
 }
 
-void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff)
+void Tuplet::AdjustTupletNumY(const Doc *doc, const Staff *staff)
 {
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
     if (!tupletNum || (this->GetNumVisible() == BOOLEAN_false)) return;
@@ -278,7 +278,7 @@ void Tuplet::AdjustTupletNumY(Doc *doc, Staff *staff)
 
     this->CalculateTupletNumCrossStaff(tupletNum);
 
-    Staff *tupletNumStaff = tupletNum->m_crossStaff ? tupletNum->m_crossStaff : staff;
+    const Staff *tupletNumStaff = tupletNum->m_crossStaff ? tupletNum->m_crossStaff : staff;
     const int staffSize = staff->m_drawingStaffSize;
     const int yReference = tupletNumStaff->GetDrawingY();
     const int doubleUnit = doc->GetDrawingDoubleUnit(staffSize);
@@ -388,9 +388,9 @@ void Tuplet::CalculateTupletNumCrossStaff(LayerElement *layerElement)
     }
 }
 
-bool Tuplet::HasValidTupletNumPosition(Staff *preferredStaff, Staff *otherStaff)
+bool Tuplet::HasValidTupletNumPosition(const Staff *preferredStaff, const Staff *otherStaff) const
 {
-    Beam *beam = this->GetNumAlignedBeam();
+    const Beam *beam = this->GetNumAlignedBeam();
     if (!beam) return true;
     if (beam->m_drawingPlace == BEAMPLACE_mixed) return false;
 
@@ -472,12 +472,12 @@ void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
     return;
 }
 
-void Tuplet::GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc) const
+void Tuplet::GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *doc) const
 {
     assert(m_drawingLeft);
     assert(m_drawingRight);
 
-    XRelLeft = 0;
+    xRelLeft = 0;
 
     if (m_drawingLeft->Is(NOTE)) {
         //
@@ -488,21 +488,21 @@ void Tuplet::GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc) co
     else if (m_drawingLeft->Is(CHORD)) {
         Chord *chord = vrv_cast<Chord *>(m_drawingLeft);
         assert(chord);
-        XRelLeft = chord->GetXMin() - m_drawingLeft->GetDrawingX();
+        xRelLeft = chord->GetXMin() - m_drawingLeft->GetDrawingX();
     }
 
-    XRelRight = 0;
+    xRelRight = 0;
 
     if (m_drawingRight->Is(NOTE)) {
-        XRelRight += (2 * m_drawingRight->GetDrawingRadius(doc));
+        xRelRight += (2 * m_drawingRight->GetDrawingRadius(doc));
     }
     else if (m_drawingRight->Is(REST)) {
-        XRelRight += m_drawingRight->GetSelfX2();
+        xRelRight += m_drawingRight->GetSelfX2();
     }
     else if (m_drawingRight->Is(CHORD)) {
         Chord *chord = vrv_cast<Chord *>(m_drawingRight);
         assert(chord);
-        XRelRight = chord->GetXMax() - chord->GetDrawingX() + (2 * chord->GetDrawingRadius(doc));
+        xRelRight = chord->GetXMax() - chord->GetDrawingX() + (2 * chord->GetDrawingRadius(doc));
     }
 }
 
@@ -632,14 +632,14 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
         m_numAlignedBeam = NULL;
     }
 
-    int XRelLeft;
-    int XRelRight;
-    this->GetDrawingLeftRightXRel(XRelLeft, XRelRight, params->m_doc);
+    int xRelLeft;
+    int xRelRight;
+    this->GetDrawingLeftRightXRel(xRelLeft, xRelRight, params->m_doc);
 
     TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
     if (tupletBracket && (this->GetBracketVisible() != BOOLEAN_false)) {
-        tupletBracket->SetDrawingXRelLeft(XRelLeft);
-        tupletBracket->SetDrawingXRelRight(XRelRight);
+        tupletBracket->SetDrawingXRelLeft(xRelLeft);
+        tupletBracket->SetDrawingXRelRight(xRelRight);
     }
 
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(this->FindDescendantByType(TUPLET_NUM));

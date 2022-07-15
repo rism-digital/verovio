@@ -205,6 +205,17 @@ int Score::AdjustGraceXPos(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Score::ConvertMarkupScoreDef(FunctorParams *functorParams)
+{
+    ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
+    assert(params);
+
+    // Evaluate functor on scoreDef
+    this->GetScoreDef()->Process(params->m_functor, params, params->m_functorEnd);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Score::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
@@ -304,9 +315,9 @@ int Score::Transpose(FunctorParams *functorParams)
     }
 
     // Check whether we are in the selected mdiv
-    if (!params->m_selectedMdivUuid.empty()
-        && (std::find(params->m_currentMdivUuids.begin(), params->m_currentMdivUuids.end(), params->m_selectedMdivUuid)
-            == params->m_currentMdivUuids.end())) {
+    if (!params->m_selectedMdivID.empty()
+        && (std::find(params->m_currentMdivIDs.begin(), params->m_currentMdivIDs.end(), params->m_selectedMdivID)
+            == params->m_currentMdivIDs.end())) {
         return FUNCTOR_CONTINUE;
     }
 

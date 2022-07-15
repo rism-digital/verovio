@@ -37,12 +37,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 11
+#define VERSION_MINOR 12
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
-
-enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1, MEI_5_0_0_dev };
 
 //----------------------------------------------------------------------------
 // Cast redefinition
@@ -329,11 +327,11 @@ typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
 typedef std::vector<std::pair<int, int>> ArrayOfIntPairs;
 
-typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceUuidPairs;
+typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceIDPairs;
 
-typedef std::map<std::string, Note *> MapOfNoteUuidPairs;
+typedef std::map<std::string, Note *> MapOfNoteIDPairs;
 
-typedef std::vector<std::tuple<PlistInterface *, std::string, Object *>> ArrayOfPlistInterfaceUuidTuples;
+typedef std::vector<std::tuple<PlistInterface *, std::string, Object *>> ArrayOfPlistInterfaceIDTuples;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
@@ -355,9 +353,9 @@ typedef std::vector<LedgerLine> ArrayOfLedgerLines;
 
 typedef std::vector<TextElement *> ArrayOfTextElements;
 
-typedef std::map<Staff *, std::multiset<int>> MapOfNoteLocs;
+typedef std::map<const Staff *, std::multiset<int>> MapOfNoteLocs;
 
-typedef std::map<Staff *, std::set<int>> MapOfDotLocs;
+typedef std::map<const Staff *, std::set<int>> MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;
 
@@ -373,7 +371,7 @@ typedef std::map<std::string, ClassId> MapOfStrClassIds;
 
 typedef std::vector<std::pair<LayerElement *, LayerElement *>> MeasureTieEndpoints;
 
-typedef bool (*NotePredicate)(Note *);
+typedef bool (*NotePredicate)(const Note *);
 
 /**
  * Generic int map recursive structure for storing hierachy of values
@@ -594,7 +592,8 @@ enum {
     MARKUP_ANALYTICAL_TIE = 1,
     MARKUP_ANALYTICAL_FERMATA = 2,
     MARKUP_GRACE_ATTRIBUTE = 4,
-    MARKUP_ARTIC_MULTIVAL = 8
+    MARKUP_ARTIC_MULTIVAL = 8,
+    MARKUP_SCOREDEF_DEFINITIONS = 16
 };
 
 //----------------------------------------------------------------------------

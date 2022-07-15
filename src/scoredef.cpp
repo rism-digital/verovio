@@ -34,6 +34,11 @@
 #include "system.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "MidiEvent.h"
+#include "MidiFile.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -221,11 +226,13 @@ ScoreDef::ScoreDef()
     , AttDistances()
     , AttEndings()
     , AttOptimization()
+    , AttScoreDefGes()
     , AttTimeBase()
 {
     this->RegisterAttClass(ATT_DISTANCES);
     this->RegisterAttClass(ATT_ENDINGS);
     this->RegisterAttClass(ATT_OPTIMIZATION);
+    this->RegisterAttClass(ATT_SCOREDEFGES);
     this->RegisterAttClass(ATT_TIMEBASE);
 
     this->Reset();
@@ -239,6 +246,7 @@ void ScoreDef::Reset()
     this->ResetDistances();
     this->ResetEndings();
     this->ResetOptimization();
+    this->ResetScoreDefGes();
 
     m_drawLabels = false;
     m_drawingWidth = 0;
@@ -281,7 +289,7 @@ bool ScoreDef::IsSupportedChild(Object *child)
     return true;
 }
 
-void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
+void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
 {
     assert(newScoreDef);
 
@@ -289,11 +297,11 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     m_setAsDrawing = true;
 
     int redrawFlags = 0;
-    Clef const *clef = NULL;
-    KeySig const *keySig = NULL;
+    const Clef *clef = NULL;
+    const KeySig *keySig = NULL;
     Mensur *mensur = NULL;
     MeterSig *meterSig = NULL;
-    MeterSigGrp *meterSigGrp = NULL;
+    const MeterSigGrp *meterSigGrp = NULL;
 
     if (newScoreDef->HasClefInfo()) {
         redrawFlags |= StaffDefRedrawFlags::REDRAW_CLEF;
@@ -329,7 +337,7 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     this->SetRedrawFlags(redrawFlags);
 }
 
-void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
+void ScoreDef::ReplaceDrawingValues(const StaffDef *newStaffDef)
 {
     assert(newStaffDef);
 
@@ -340,12 +348,12 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
     if (staffDef) {
         if (newStaffDef->HasClefInfo()) {
             staffDef->SetDrawClef(true);
-            Clef const *clef = newStaffDef->GetClef();
+            const Clef *clef = newStaffDef->GetClef();
             staffDef->SetCurrentClef(clef);
         }
         if (newStaffDef->HasKeySigInfo()) {
             staffDef->SetDrawKeySig(true);
-            KeySig const *keySig = newStaffDef->GetKeySig();
+            const KeySig *keySig = newStaffDef->GetKeySig();
             staffDef->SetCurrentKeySig(keySig);
         }
         if (newStaffDef->HasMensurInfo()) {
@@ -400,11 +408,11 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
         if (newStaffDef->HasLabel()) staffDef->SetLabel(newStaffDef->GetLabel());
     }
     else {
-        LogWarning("StaffDef with xml:id '%s' could not be found", newStaffDef->GetUuid().c_str());
+        LogWarning("StaffDef with xml:id '%s' could not be found", newStaffDef->GetID().c_str());
     }
 }
 
-void ScoreDef::ReplaceDrawingLabels(StaffGrp *newStaffGrp)
+void ScoreDef::ReplaceDrawingLabels(const StaffGrp *newStaffGrp)
 {
     assert(newStaffGrp);
 
@@ -606,9 +614,9 @@ const PgHead2 *ScoreDef::GetPgHead2() const
     return dynamic_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
-int ScoreDef::GetMaxStaffSize()
+int ScoreDef::GetMaxStaffSize() const
 {
-    StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(this->FindDescendantByType(STAFFGRP));
+    const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
 }
 
@@ -622,9 +630,9 @@ bool ScoreDef::IsSectionRestart() const
     return (section && (section->GetRestart() == BOOLEAN_true));
 }
 
-bool ScoreDef::HasSystemStartLine()
+bool ScoreDef::HasSystemStartLine() const
 {
-    StaffGrp *staffGrp = vrv_cast<StaffGrp *>(this->FindDescendantByType(STAFFGRP));
+    const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     if (staffGrp) {
         auto [firstDef, lastDef] = staffGrp->GetFirstLastStaffDef();
         if ((firstDef && lastDef && (firstDef != lastDef)) || staffGrp->GetFirst(GRPSYM)) {
@@ -638,6 +646,78 @@ bool ScoreDef::HasSystemStartLine()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int ScoreDefElement::ConvertMarkupScoreDef(FunctorParams *functorParams)
+{
+    ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
+    assert(params);
+
+    if (this->Is(SCOREDEF)) {
+        params->m_currentScoreDef = this;
+        return FUNCTOR_CONTINUE;
+    }
+
+    // This should never be the case
+    if (!this->Is(STAFFDEF) || !params->m_currentScoreDef) return FUNCTOR_CONTINUE;
+
+    ScoreDefElement *scoreDef = params->m_currentScoreDef;
+
+    // Copy score definition elements to the staffDef but only if they are not given at the staffDef
+    // This might require more refined merging because we can lose data if some staffDef values are defined
+    // but do not contain all the ones given in the scoreDef (e.g. @key.mode in scoreDef but not in a staffDef with
+    // @key.sig)
+    if (scoreDef->HasClefInfo() && !this->HasClefInfo()) {
+        this->AddChild(scoreDef->GetClefCopy());
+    }
+    if (scoreDef->HasKeySigInfo() && !this->HasKeySigInfo()) {
+        this->AddChild(scoreDef->GetKeySigCopy());
+    }
+    if (scoreDef->HasMeterSigGrpInfo() && !this->HasMeterSigGrpInfo()) {
+        this->AddChild(scoreDef->GetMeterSigGrpCopy());
+    }
+    if (scoreDef->HasMeterSigInfo() && !this->HasMeterSigInfo()) {
+        this->AddChild(scoreDef->GetMeterSigCopy());
+    }
+    if (scoreDef->HasMensurInfo() && !this->HasMensurInfo()) {
+        this->AddChild(scoreDef->GetMensurCopy());
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int ScoreDefElement::ConvertMarkupScoreDefEnd(FunctorParams *functorParams)
+{
+    ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
+    assert(params);
+
+    if (!this->Is(SCOREDEF)) return FUNCTOR_CONTINUE;
+
+    // At the end of the scoreDef, remove all score definition elements
+    if (this->HasClefInfo()) {
+        Object *clef = this->FindDescendantByType(CLEF, 1);
+        if (clef) this->DeleteChild(clef);
+    }
+    if (this->HasKeySigInfo()) {
+        Object *keySig = this->FindDescendantByType(KEYSIG, 1);
+        if (keySig) this->DeleteChild(keySig);
+    }
+    if (this->HasMeterSigGrpInfo()) {
+        Object *meterSigGrp = this->FindDescendantByType(METERSIGGRP, 1);
+        if (meterSigGrp) this->DeleteChild(meterSigGrp);
+    }
+    if (this->HasMeterSigInfo()) {
+        Object *meterSig = this->FindDescendantByType(METERSIG, 1);
+        if (meterSig) this->DeleteChild(meterSig);
+    }
+    if (this->HasMensurInfo()) {
+        Object *mensur = this->FindDescendantByType(MENSUR, 1);
+        if (mensur) this->DeleteChild(mensur);
+    }
+
+    params->m_currentScoreDef = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
 
 int ScoreDef::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
@@ -730,6 +810,73 @@ int ScoreDef::AlignMeasures(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    double totalTime = params->m_totalTime;
+    // check next measure for the time offset
+    Object *parent = this->GetParent();
+    if (parent && (parent->GetLast() != this)) {
+        Object *next = parent->GetNext(this);
+        if (next && next->Is(MEASURE)) {
+            Measure *nextMeasure = vrv_cast<Measure *>(next);
+            totalTime = nextMeasure->GetLastTimeOffset();
+        }
+    }
+    const double currentTick = totalTime * params->m_midiFile->getTPQ();
+
+    smf::MidiEvent midiEvent;
+    midiEvent.tick = currentTick;
+    // calculate reference pitch class based on @tune.pname
+    int referencePitchClass = 0;
+    if (this->HasTunePname()) {
+        referencePitchClass = Note::PnameToPclass(this->GetTunePname());
+    }
+    // set temperament event if corresponding attribute present
+    if (this->HasTuneTemper()) {
+        switch (this->GetTuneTemper()) {
+            case TEMPERAMENT_equal: midiEvent.makeTemperamentEqual(referencePitchClass); break;
+            case TEMPERAMENT_just: midiEvent.makeTemperamentBad(100.0, referencePitchClass); break;
+            case TEMPERAMENT_mean: midiEvent.makeTemperamentMeantone(referencePitchClass); break;
+            case TEMPERAMENT_pythagorean: midiEvent.makeTemperamentPythagorean(referencePitchClass); break;
+            default: break;
+        }
+        params->m_midiFile->addEvent(params->m_midiTrack, midiEvent);
+    }
+    // set tuning
+    if (this->HasTuneHz()) {
+        const double tuneHz = this->GetTuneHz();
+        // Add tuning for all keys from 0 to 127
+        std::vector<std::pair<int, double>> tuneFrequencies;
+        for (int i = 0; i < 127; i++) {
+            double freq = pow(2.0, (i - 69.0) / 12.0) * tuneHz;
+            tuneFrequencies.push_back(std::make_pair(i, freq));
+        }
+        midiEvent.makeMts2_KeyTuningsByFrequency(tuneFrequencies);
+        params->m_midiFile->addEvent(params->m_midiTrack, midiEvent);
+    }
+    // set MIDI key signature
+    if (this->HasKeySigInfo()) {
+        KeySig *keySig = vrv_cast<KeySig *>(this->GetKeySig());
+        if (keySig && keySig->HasSig()) {
+            params->m_midiFile->addKeySignature(
+                params->m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
+        }
+    }
+    // set MIDI time signature
+    if (this->HasMeterSigInfo()) {
+        MeterSig *meterSig = vrv_cast<MeterSig *>(this->GetMeterSig());
+        if (meterSig && meterSig->HasCount()) {
+            params->m_midiFile->addTimeSignature(
+                params->m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int ScoreDef::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
@@ -759,8 +906,6 @@ int ScoreDef::Transpose(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
-    params->m_hasScoreDefKeySig = false;
-
     if (params->m_transposeToSoundingPitch) {
         // Set the transposition in order to transpose common key signatures
         // (i.e. encoded as ScoreDef attributes or direct KeySig children)
@@ -785,7 +930,8 @@ int ScoreDef::TransposeEnd(FunctorParams *functorParams)
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
     assert(params);
 
-    if (params->m_transposeToSoundingPitch && params->m_hasScoreDefKeySig) {
+    const bool hasScoreDefKeySig = (params->m_keySigForStaffN.count(-1) > 0);
+    if (params->m_transposeToSoundingPitch && hasScoreDefKeySig) {
         bool showWarning = false;
         // Check if some staves are untransposed
         const int mapEntryCount = static_cast<int>(params->m_transposeIntervalForStaffN.size());

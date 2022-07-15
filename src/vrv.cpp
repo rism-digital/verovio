@@ -220,13 +220,13 @@ bool AreEqual(double dFirstVal, double dSecondVal)
     return std::fabs(dFirstVal - dSecondVal) < 1E-3;
 }
 
-std::string ExtractUuidFragment(std::string refUuid)
+std::string ExtractIDFragment(std::string refID)
 {
-    size_t pos = refUuid.find_last_of("#");
-    if ((pos != std::string::npos) && (pos < refUuid.length() - 1)) {
-        refUuid = refUuid.substr(pos + 1);
+    size_t pos = refID.find_last_of("#");
+    if ((pos != std::string::npos) && (pos < refID.length() - 1)) {
+        refID = refID.substr(pos + 1);
     }
-    return refUuid;
+    return refID;
 }
 
 std::string UTF16to8(const std::wstring &in)
@@ -270,7 +270,7 @@ std::string GetVersion()
 
 static const std::string base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-std::string BaseEncodeInt(int value, int base)
+std::string BaseEncodeInt(unsigned int value, unsigned int base)
 {
     assert(base > 10);
     assert(base < 63);

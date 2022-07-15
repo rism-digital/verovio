@@ -53,15 +53,17 @@ public:
     void AddChild(Object *object) override;
 
     /**
-     * @name Setter and getter for darwing elements and position
+     * @name Setter and getter for drawing elements and position
      */
     ///@{
     LayerElement *GetDrawingLeft() { return m_drawingLeft; }
+    const LayerElement *GetDrawingLeft() const { return m_drawingLeft; }
     void SetDrawingLeft(LayerElement *drawingLeft) { m_drawingLeft = drawingLeft; }
     LayerElement *GetDrawingRight() { return m_drawingRight; }
+    const LayerElement *GetDrawingRight() const { return m_drawingRight; }
     void SetDrawingRight(LayerElement *drawingRight) { m_drawingRight = drawingRight; }
-    data_STAFFREL_basic GetDrawingBracketPos() { return m_drawingBracketPos; }
-    data_STAFFREL_basic GetDrawingNumPos() { return m_drawingNumPos; }
+    data_STAFFREL_basic GetDrawingBracketPos() const { return m_drawingBracketPos; }
+    data_STAFFREL_basic GetDrawingNumPos() const { return m_drawingNumPos; }
     ///@}
 
     /**
@@ -69,7 +71,9 @@ public:
      */
     ///@{
     Beam *GetBracketAlignedBeam() { return m_bracketAlignedBeam; }
+    const Beam *GetBracketAlignedBeam() const { return m_bracketAlignedBeam; }
     Beam *GetNumAlignedBeam() { return m_numAlignedBeam; }
+    const Beam *GetNumAlignedBeam() const { return m_numAlignedBeam; }
     ///@}
 
     /**
@@ -82,7 +86,7 @@ public:
      * Return the maximum and minimum X positions of the notes in the tuplets.
      * Look at flipped noteheads in chords.
      */
-    void GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc) const;
+    void GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *doc) const;
 
     //----------//
     // Functors //
@@ -123,17 +127,17 @@ private:
     /**
      * Adjust tuplet relative positioning based on possible overlaps
      */
-    void AdjustTupletBracketY(Doc *doc, Staff *staff);
+    void AdjustTupletBracketY(const Doc *doc, const Staff *staff);
 
     /**
      * Adjust tuplet relative positioning for tuplets based on beams
      */
-    void AdjustTupletBracketBeamY(Doc *doc, Staff *staff, TupletBracket *bracket, Beam *beam);
+    void AdjustTupletBracketBeamY(const Doc *doc, const Staff *staff, TupletBracket *bracket, const Beam *beam);
 
     /**
      * Adjust tuplet relative positioning based on possible overlaps
      */
-    void AdjustTupletNumY(Doc *doc, Staff *staff);
+    void AdjustTupletNumY(const Doc *doc, const Staff *staff);
 
     /**
      * Calculate corresponding cross-staff for the tuplet number if necessary. In case when tuplet is completely
@@ -144,7 +148,7 @@ private:
     /**
      * Check whether tuplet number has valid postioning staffwise
      */
-    bool HasValidTupletNumPosition(Staff *preferredStaff, Staff *otherStaff);
+    bool HasValidTupletNumPosition(const Staff *preferredStaff, const Staff *otherStaff) const;
 
 public:
     //
