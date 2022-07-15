@@ -6927,6 +6927,7 @@ bool MEIInput::ReadAnnot(Object *parent, pugi::xml_node annot)
         return true;
     }
     else {
+        vrvAnnot->m_content.remove_children();
         return this->ReadTextChildren(vrvAnnot, annot, vrvAnnot);
     }
 }
