@@ -526,7 +526,7 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
 
     // Calculate possible overlap for the rest with beams
     int leftMargin = 0, rightMargin = 0;
-    const int beams = vrv_cast<Beam *>(params->m_beam)->GetBeamPartDuration(this, true) - DUR_4;
+    const int beams = vrv_cast<Beam *>(params->m_beam)->GetBeamPartDuration(this, false) - DUR_4;
     const int beamWidth = vrv_cast<Beam *>(params->m_beam)->m_beamWidth;
     if (params->m_directionBias > 0) {
         leftMargin = params->m_y1 - beams * beamWidth - this->GetSelfTop();
@@ -570,10 +570,10 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
         }
     }
 
-    const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int unitChangeNumber = ((std::abs(overlapMargin) + 15) / staffOffset);
+    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int unitChangeNumber = ((std::abs(overlapMargin) + unit / 6) / unit);
     if (unitChangeNumber > 0) {
-        const int adjust = unitChangeNumber * staffOffset * params->m_directionBias;
+        const int adjust = unitChangeNumber * unit * params->m_directionBias;
         if (std::abs(adjust) > std::abs(params->m_overlapMargin)) params->m_overlapMargin = adjust;
     }
 
