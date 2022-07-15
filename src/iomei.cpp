@@ -214,7 +214,7 @@ bool MEIOutput::Export()
         }
         else if (this->GetBasic()) {
             schema = "https://music-encoding.org/schema/dev/mei-basic.rng";
-            version = "4.0.1-rc1+basic";
+            version = "5.0.0-dev+basic";
         }
         else {
             schema = "https://music-encoding.org/schema/dev/mei-all.rng";
@@ -3601,7 +3601,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
     if (root.attribute("meiversion")) {
         std::string version = std::string(root.attribute("meiversion").value());
-        if (version == "5.0.0-dev" || version == "4.0.1-rc1+basic") {
+        if (version == "5.0.0-dev" || version == "5.0.0-dev+basic") {
             m_version = MEI_5_0_0_dev;
         }
         else if (version == "4.0.1") {
