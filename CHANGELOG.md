@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [3.11.00] - 2022-07-15
 * Support for MEI-basic output
 * Support for ES6 and improved npm package (@WolfgangDrescher)
 * Support for `@artic.ges` (@eNote-GmBH)
@@ -12,7 +12,6 @@
 * Option --score-definition-to-staff for moving `clef`, `keySig`, `meterSig` and `meterSigGrp` to `staffDef`
 * Option --beam-mixed-stem-min and --beam-mixed-preserve for controlling mixed beam flipping (@eNote-GmBH)
 * Option --condense-not-last-system for making sure the last system of a score is always shown
-
 
 ## [3.10.0] - 2022-05-25
 * Support for `accid@place` (@eNote-GmBH)

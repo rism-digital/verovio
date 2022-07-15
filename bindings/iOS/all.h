@@ -122,6 +122,7 @@
 #import <VerovioFramework/caesura.h>
 #import <VerovioFramework/editortoolkit_cmn.h>
 #import <VerovioFramework/mensur.h>
+#import <VerovioFramework/stem.h>
 #import <VerovioFramework/slur.h>
 #import <VerovioFramework/mrpt.h>
 #import <VerovioFramework/io.h>
