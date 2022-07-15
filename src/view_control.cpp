@@ -2706,6 +2706,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         TextExtend extend;
         dc->GetTextExtent("M", &extend, false);
 
+        const int unit = m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
         if (ending->HasN()) {
             std::stringstream strStream;
             // Maybe we want to add ( ) after system breaks? Or . as a styling options?
@@ -2719,7 +2720,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
             int textX = x1;
             if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-                textX += m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
+                textX += unit * 2 / 3;
             }
 
             TextDrawingParams params;
@@ -2734,15 +2735,14 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         dc->ResetFont();
 
-        const int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
-        const int lineWidth = m_options->m_repeatEndingLineThickness.GetValue()
-            * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
+        const int y2 = y1 + extend.m_height + unit * 2 / 3;
+        const int lineWidth = m_options->m_repeatEndingLineThickness.GetValue() * unit;
         
-        const int startX
-            = x1 - m_options->m_staffLineWidth.GetValue() * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
-        const int endX = (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD)) ? x2
-            + endingMeasure->CalculateRightBarLineWidth(m_doc, (*staffIter)->m_drawingStaffSize) - lineWidth / 2
-            - m_options->m_staffLineWidth.GetValue() * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize)
+        const int staffLineWidth = m_options->m_staffLineWidth.GetValue() * unit;
+        const int startX = x1 - staffLineWidth;
+        const int endX = (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD))
+            ? x2 + endingMeasure->CalculateRightBarLineWidth(m_doc, (*staffIter)->m_drawingStaffSize) - lineWidth / 2
+                - staffLineWidth
             : x2;
         dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_ARCS);
         Point p[4];
