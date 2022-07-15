@@ -893,7 +893,7 @@ private:
     /**
      * The version of the file being read
      */
-    MEIVersion m_version;
+    meiVersion_MEIVERSION m_meiversion;
 
     /**
      * A flag indicating wheather we are reading page-based or score-based MEI

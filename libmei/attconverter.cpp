@@ -4611,6 +4611,11 @@ std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) 
 {
     std::string value;
     switch (data) {
+        case meiVersion_MEIVERSION_2013: value = "2013"; break;
+        case meiVersion_MEIVERSION_3_0_0: value = "3.0.0"; break;
+        case meiVersion_MEIVERSION_4_0_0: value = "4.0.0"; break;
+        case meiVersion_MEIVERSION_4_0_1: value = "4.0.1"; break;
+        case meiVersion_MEIVERSION_5_0_0_devplusbasic: value = "5.0.0-dev+basic"; break;
         case meiVersion_MEIVERSION_5_0_0_dev: value = "5.0.0-dev"; break;
         default:
             LogWarning("Unknown value '%d' for att.meiVersion@meiversion", data);
@@ -4622,6 +4627,11 @@ std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) 
 
 meiVersion_MEIVERSION AttConverter::StrToMeiVersionMeiversion(const std::string &value, bool logWarning) const
 {
+    if (value == "2013") return meiVersion_MEIVERSION_2013;
+    if (value == "3.0.0") return meiVersion_MEIVERSION_3_0_0;
+    if (value == "4.0.0") return meiVersion_MEIVERSION_4_0_0;
+    if (value == "4.0.1") return meiVersion_MEIVERSION_4_0_1;
+    if (value == "5.0.0-dev+basic") return meiVersion_MEIVERSION_5_0_0_devplusbasic;
     if (value == "5.0.0-dev") return meiVersion_MEIVERSION_5_0_0_dev;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.meiVersion@meiversion", value.c_str());
