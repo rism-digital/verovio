@@ -130,12 +130,12 @@ void DocSelection::Set(Doc *doc)
         }
 
         if (m_selectionRangeStart == -1) {
-            selectionStartId = measures.front()->GetUuid();
+            selectionStartId = measures.front()->GetID();
         }
         else if (m_selectionRangeStart > 0 && m_selectionRangeStart <= (int)measures.size()) {
             ListOfObjects::const_iterator it = measures.begin();
             std::advance(it, m_selectionRangeStart - 1);
-            selectionStartId = (*it)->GetUuid();
+            selectionStartId = (*it)->GetID();
         }
         else {
             LogWarning("Measure range start for selection '%s' could not be found.", m_measureRange.c_str());
@@ -143,12 +143,12 @@ void DocSelection::Set(Doc *doc)
         }
 
         if (m_selectionRangeEnd == -1) {
-            selectionEndId = measures.back()->GetUuid();
+            selectionEndId = measures.back()->GetID();
         }
         else if (m_selectionRangeEnd > 0 && m_selectionRangeEnd <= (int)measures.size()) {
             ListOfObjects::const_iterator it = measures.begin();
             std::advance(it, m_selectionRangeEnd - 1);
-            selectionEndId = (*it)->GetUuid();
+            selectionEndId = (*it)->GetID();
         }
         else {
             LogWarning("Measure range end for selection '%s' could not be found.", m_measureRange.c_str());

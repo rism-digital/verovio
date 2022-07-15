@@ -62,7 +62,7 @@ public:
     /**
      * Get the turn height ignoring slash
      */
-    int GetTurnHeight(Doc *doc, int staffSize) const;
+    int GetTurnHeight(const Doc *doc, int staffSize) const;
 
     //----------//
     // Functors //

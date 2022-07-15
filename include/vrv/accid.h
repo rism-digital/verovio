@@ -68,7 +68,8 @@ public:
     void SetDrawingOctave(bool isDrawingOctave) { m_isDrawingOctave = isDrawingOctave; }
     bool GetDrawingOctave() const { return m_isDrawingOctave; }
     void SetDrawingOctaveAccid(Accid *drawingOctave) { m_drawingOctave = drawingOctave; }
-    Accid *GetDrawingOctaveAccid() const { return m_drawingOctave; }
+    Accid *GetDrawingOctaveAccid() { return m_drawingOctave; }
+    const Accid *GetDrawingOctaveAccid() const { return m_drawingOctave; }
     ///@}
 
     /**
@@ -76,25 +77,26 @@ public:
      */
     ///@{
     void SetDrawingUnisonAccid(Accid *drawingUnison) { m_drawingUnison = drawingUnison; }
-    Accid *GetDrawingUnisonAccid() const { return m_drawingUnison; }
+    Accid *GetDrawingUnisonAccid() { return m_drawingUnison; }
+    const Accid *GetDrawingUnisonAccid() const { return m_drawingUnison; }
     ///@}
 
     /**
      * Retrieve SMuFL string for the accidental.
      * This will include brackets
      */
-    std::wstring GetSymbolStr(const data_NOTATIONTYPE notationType) const;
+    std::wstring GetSymbolStr(data_NOTATIONTYPE notationType) const;
 
     /**
      * Adjust X position of accid in relation to other element
      */
-    void AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
+    void AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
         std::vector<Accid *> &adjustedAccids);
 
     /**
      * Adjust accid position if it's placed above/below staff so that it does not overlap with ledger lines
      */
-    void AdjustToLedgerLines(Doc *doc, LayerElement *element, int staffSize);
+    void AdjustToLedgerLines(const Doc *doc, LayerElement *element, int staffSize);
 
     /**
      * @name Set and get same layer alignment
@@ -111,7 +113,14 @@ public:
     /**
      * @name Method used for drawing accidentals on ornaments
      */
-    static wchar_t GetAccidGlyph(data_ACCIDENTAL_WRITTEN);
+    static wchar_t GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid);
+
+    /**
+     * Create the SMuFL string based on various properties
+     */
+    static std::wstring CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOSURE enclosure = ENCLOSURE_NONE,
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_NONE, const Resources *resources = NULL, data_HEXNUM glyphNum = 0,
+        std::string glyphName = "");
 
     //----------//
     // Functors //

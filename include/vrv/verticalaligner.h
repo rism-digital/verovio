@@ -189,7 +189,10 @@ public:
      * Look for the FloatingPositioner corresponding to the FloatingObject.
      * Return NULL if not found and does not create anything.
      */
-    FloatingPositioner *GetCorrespFloatingPositioner(FloatingObject *object);
+    ///@{
+    FloatingPositioner *GetCorrespFloatingPositioner(const FloatingObject *object);
+    const FloatingPositioner *GetCorrespFloatingPositioner(const FloatingObject *object) const;
+    ///@}
 
     /**
      * @name Setter and getter of the staff from which the alignment is created alignment.
@@ -223,8 +226,8 @@ public:
      * value.
      */
     ///@{
-    int CalcOverflowAbove(BoundingBox *box);
-    int CalcOverflowBelow(BoundingBox *box);
+    int CalcOverflowAbove(const BoundingBox *box) const;
+    int CalcOverflowBelow(const BoundingBox *box) const;
     ///@}
 
     /**
@@ -249,6 +252,8 @@ public:
     int GetRequestedSpaceAbove() const { return m_requestedSpaceAbove; }
     void SetRequestedSpaceBelow(int space);
     int GetRequestedSpaceBelow() const { return m_requestedSpaceBelow; }
+    void SetRequestedSpacing(int spacing) { m_requestedSpacing = spacing; }
+    int GetRequestedSpacing() const { return m_requestedSpacing; }
     int GetStaffHeight() const { return m_staffHeight; }
     void SetScoreDefClefOverflowAbove(int overflowAbove) { m_scoreDefClefOverflowAbove = overflowAbove; }
     int GetScoreDefClefOverflowAbove() const { return m_scoreDefClefOverflowAbove; }
@@ -289,14 +294,6 @@ public:
 
     void ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrpsParams *params,
         const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel);
-
-    /**
-     * @name Set/get for the beam adjust
-     */
-    ///@{
-    void SetBeamAdjust(int beamAdjust) { m_beamAdjust = beamAdjust; }
-    int GetBeamAdjust() const { return m_beamAdjust; }
-    ///@}
 
     /**
      * Find overflow for the alignments taking bracket group elements into account
@@ -402,13 +399,11 @@ private:
     int m_overlap;
     int m_requestedSpaceAbove;
     int m_requestedSpaceBelow;
+    int m_requestedSpacing;
     int m_staffHeight;
     int m_scoreDefClefOverflowAbove;
     int m_scoreDefClefOverflowBelow;
     ///@}
-
-    // Value to store required beam adjustment for cross-staff beams
-    int m_beamAdjust = 0;
 
     /**
      * The list of overflowing bounding boxes (e.g, LayerElement or FloatingPositioner)

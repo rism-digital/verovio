@@ -82,19 +82,25 @@ void BeamSpan::ClearBeamSegments()
     m_beamSegments.clear();
 }
 
-BeamSpanSegment *BeamSpan::GetSegmentForSystem(System *system)
+BeamSpanSegment *BeamSpan::GetSegmentForSystem(const System *system)
+{
+    return const_cast<BeamSpanSegment *>(std::as_const(*this).GetSegmentForSystem(system));
+}
+
+const BeamSpanSegment *BeamSpan::GetSegmentForSystem(const System *system) const
 {
     assert(system);
 
     for (auto segment : m_beamSegments) {
         // make sure to process only segments for current system
-        Measure *segmentSystem = segment->GetMeasure();
-        if (segmentSystem && vrv_cast<System *>(segmentSystem->GetFirstAncestor(SYSTEM)) == system) return segment;
+        const Measure *segmentSystem = segment->GetMeasure();
+        if (segmentSystem && vrv_cast<const System *>(segmentSystem->GetFirstAncestor(SYSTEM)) == system)
+            return segment;
     }
     return NULL;
 }
 
-ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
+ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, const Staff *staff)
 {
     // find all elements between startId and endId of the beamSpan
     ClassIdsComparison classIds({ NOTE, CHORD });
@@ -145,7 +151,7 @@ ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, Staff *staff)
     return beamSpanElements;
 }
 
-bool BeamSpan::AddSpanningSegment(Doc *doc, const SpanIndexVector &elements, int index, bool newSegment)
+bool BeamSpan::AddSpanningSegment(const Doc *doc, const SpanIndexVector &elements, int index, bool newSegment)
 {
     Layer *layer = vrv_cast<Layer *>((*elements.at(index).first)->GetFirstAncestor(LAYER));
     Staff *staff = vrv_cast<Staff *>((*elements.at(index).first)->GetFirstAncestor(STAFF));
@@ -250,9 +256,10 @@ int BeamSpan::PrepareBeamSpanElements(FunctorParams *functorParams)
 
         Measure *measure = vrv_cast<Measure *>(layerElem->GetFirstAncestor(MEASURE));
         if (!measure) continue;
-        layerElem->m_isInBeamspan = true;
+        layerElem->SetIsInBeamSpan(true);
 
         Staff *elementStaff = vrv_cast<Staff *>(layerElem->GetFirstAncestor(STAFF));
+        if (!elementStaff) continue;
         if (elementStaff->GetN() != staff->GetN()) {
             Layer *elementLayer = vrv_cast<Layer *>(layerElem->GetFirstAncestor(LAYER));
             if (!elementStaff || !elementLayer) continue;

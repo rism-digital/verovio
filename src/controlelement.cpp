@@ -74,18 +74,18 @@ data_HORIZONTALALIGNMENT ControlElement::GetChildRendAlignment() const
     return rend->GetHalign();
 }
 
-data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue)
+data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue) const
 {
     // Do this only for the following elements
     if (!this->Is({ TRILL, MORDENT, TURN })) return defaultValue;
 
-    TimePointInterface *interface = this->GetTimePointInterface();
+    const TimePointInterface *interface = this->GetTimePointInterface();
     assert(interface);
 
-    LayerElement *start = interface->GetStart();
+    const LayerElement *start = interface->GetStart();
     if (!start || start->Is(TIMESTAMP_ATTR)) return defaultValue;
 
-    Layer *layer = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));
+    const Layer *layer = vrv_cast<const Layer *>(start->GetFirstAncestor(LAYER));
     // We are only looking that the element cross-staff. We could use LayerElement::GetCrossStaff(Layer  *&)
     if (start->m_crossLayer) layer = start->m_crossLayer;
     assert(layer);
@@ -129,7 +129,7 @@ int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
     // Something is probably not right if nothing found - maybe no @staff
     if (positioners.empty()) {
         LogDebug("Something was wrong when searching positioners for %s '%s'", this->GetClassName().c_str(),
-            this->GetUuid().c_str());
+            this->GetID().c_str());
         return FUNCTOR_SIBLINGS;
     }
 

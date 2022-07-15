@@ -18,6 +18,7 @@
 #include "layer.h"
 #include "note.h"
 #include "staff.h"
+#include "stem.h"
 #include "tabgrp.h"
 
 namespace vrv {
@@ -77,7 +78,7 @@ void TabDurSym::AddChild(Object *child)
     Modify();
 }
 
-void TabDurSym::AdjustDrawingYRel(Staff *staff, Doc *doc)
+void TabDurSym::AdjustDrawingYRel(const Staff *staff, const Doc *doc)
 {
     assert(staff);
     assert(doc);

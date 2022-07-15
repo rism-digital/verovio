@@ -86,7 +86,7 @@ bool Dynam::IsSupportedChild(Object *child)
     return true;
 }
 
-bool Dynam::IsSymbolOnly()
+bool Dynam::IsSymbolOnly() const
 {
     m_symbolStr = L"";
     std::wstring str = this->GetText(this);
@@ -118,7 +118,7 @@ std::pair<wchar_t, wchar_t> Dynam::GetEnclosingGlyphs() const
 // Static methods for Dynam
 //----------------------------------------------------------------------------
 
-bool Dynam::GetSymbolsInStr(std::wstring &str, ArrayOfStringDynamTypePairs &tokens)
+bool Dynam::GetSymbolsInStr(const std::wstring &str, ArrayOfStringDynamTypePairs &tokens)
 {
     tokens.clear();
 

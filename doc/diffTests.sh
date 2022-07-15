@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This script need to be run from ./doc in the branch with the changes
 # add parameter true to rebuild the develop (reference) branch and tests

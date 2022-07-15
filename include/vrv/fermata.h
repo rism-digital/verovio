@@ -57,10 +57,10 @@ public:
     ///@}
 
     /**
-     * Helpler for converting markup (from Note, Chord, Rest, MRest)
+     * Helper for converting markup (from Note, Chord, Rest, MRest)
      */
     void ConvertFromAnalyticalMarkup(
-        AttFermataPresent *fermataPresent, const std::string &uuid, ConvertMarkupAnalyticalParams *params);
+        AttFermataPresent *fermataPresent, const std::string &id, ConvertMarkupAnalyticalParams *params);
 
     /**
      * Get the SMuFL glyph for the fermata based on type, shape or glyph.num

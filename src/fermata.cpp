@@ -57,7 +57,7 @@ void Fermata::Reset()
 }
 
 void Fermata::ConvertFromAnalyticalMarkup(
-    AttFermataPresent *fermataPresent, const std::string &uuid, ConvertMarkupAnalyticalParams *params)
+    AttFermataPresent *fermataPresent, const std::string &id, ConvertMarkupAnalyticalParams *params)
 {
     this->SetPlace(Att::StaffrelBasicToStaffrel(fermataPresent->GetFermata()));
     if (params->m_permanent) {
@@ -66,7 +66,7 @@ void Fermata::ConvertFromAnalyticalMarkup(
     else {
         this->IsAttribute(true);
     }
-    this->SetStartid("#" + uuid);
+    this->SetStartid("#" + id);
     params->m_controlEvents.push_back(this);
 }
 

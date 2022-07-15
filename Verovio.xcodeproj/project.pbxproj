@@ -1242,6 +1242,12 @@
 		BD0562372518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
 		BD0562382518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
 		BD0562392518CD20004057EB /* beamspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0562352518CD20004057EB /* beamspan.cpp */; };
+		BD2E4D95287587FD00B04350 /* stem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD2E4D94287587FD00B04350 /* stem.cpp */; };
+		BD2E4D962875880500B04350 /* stem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD2E4D94287587FD00B04350 /* stem.cpp */; };
+		BD2E4D972875880500B04350 /* stem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD2E4D94287587FD00B04350 /* stem.cpp */; };
+		BD2E4D982875880600B04350 /* stem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD2E4D94287587FD00B04350 /* stem.cpp */; };
+		BD2E4D9A2875882100B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; };
+		BD2E4D9B2875882200B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; };
 		BD87768327CE8A11005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
 		BD87768427CE8A19005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
 		BD87768527CE8A1A005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
@@ -1743,6 +1749,8 @@
 		BBC19FC222B38C1400100F42 /* VerovioFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VerovioFramework.h; sourceTree = "<group>"; };
 		BD05622E2518CD12004057EB /* beamspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = beamspan.h; path = include/vrv/beamspan.h; sourceTree = "<group>"; };
 		BD0562352518CD20004057EB /* beamspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = beamspan.cpp; path = src/beamspan.cpp; sourceTree = "<group>"; };
+		BD2E4D94287587FD00B04350 /* stem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stem.cpp; path = src/stem.cpp; sourceTree = "<group>"; };
+		BD2E4D992875881B00B04350 /* stem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stem.h; path = include/vrv/stem.h; sourceTree = "<group>"; };
 		BD87768127CE89FA005B97EA /* layerdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layerdef.h; path = include/vrv/layerdef.h; sourceTree = "<group>"; };
 		BD87768227CE8A11005B97EA /* layerdef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layerdef.cpp; path = src/layerdef.cpp; sourceTree = "<group>"; };
 		BDA81C20268B386C0065B802 /* metersiggrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersiggrp.h; path = include/vrv/metersiggrp.h; sourceTree = "<group>"; };
@@ -2417,6 +2425,8 @@
 				8F59292818854BF800FE51AD /* rest.h */,
 				4DB3072E1AC9ED2500EE0982 /* space.cpp */,
 				4DB3072D1AC9ED1800EE0982 /* space.h */,
+				BD2E4D94287587FD00B04350 /* stem.cpp */,
+				BD2E4D992875881B00B04350 /* stem.h */,
 				4D9A9C1D19A1DE2000028D93 /* syl.cpp */,
 				4D9A9C1B199F576100028D93 /* syl.h */,
 				4D766EF620ACAD61006875D8 /* syllable.cpp */,
@@ -2653,6 +2663,7 @@
 				40D45EC2204EEAFB009C1EC9 /* instrdef.h in Headers */,
 				4D422101199805E400963292 /* att.h in Headers */,
 				4D422102199805E400963292 /* attdef.h in Headers */,
+				BD2E4D9B2875882200B04350 /* stem.h in Headers */,
 				4D16947C1E41DE7200569BF4 /* atts_cmnornaments.h in Headers */,
 				4D6413762035F57800BB630E /* pages.h in Headers */,
 				4D9A9C17199F560200028D93 /* verse.h in Headers */,
@@ -2711,6 +2722,7 @@
 				BB4C4B9E22A932E5001F6AF0 /* plistinterface.h in Headers */,
 				4DA0EADE22BB77AF00A7EBEB /* zone.h in Headers */,
 				BB4C4A9122A9328F001F6AF0 /* boundingbox.h in Headers */,
+				BD2E4D9A2875882100B04350 /* stem.h in Headers */,
 				BB4C4B1422A932C8001F6AF0 /* section.h in Headers */,
 				BB4C4B8022A932DF001F6AF0 /* fb.h in Headers */,
 				BB4C4AF622A932BC001F6AF0 /* ref.h in Headers */,
@@ -3106,6 +3118,7 @@
 				4D16940C1E3A44F300569BF4 /* atts_midi.cpp in Sources */,
 				4D16940D1E3A44F300569BF4 /* hairpin.cpp in Sources */,
 				4DB3D8FC1F83D1FD00B5FC2B /* horizontalaligner.cpp in Sources */,
+				BD2E4D982875880600B04350 /* stem.cpp in Sources */,
 				4D16940E1E3A44F300569BF4 /* view_mensural.cpp in Sources */,
 				4D16940F1E3A44F300569BF4 /* layer.cpp in Sources */,
 				4D4335D01ED4502B003BE1A9 /* atts_visual.cpp in Sources */,
@@ -3472,6 +3485,7 @@
 				4DC34BAA19BC4A83006175CD /* custos.cpp in Sources */,
 				4D7927D020ECCC6D0002A45D /* view_slur.cpp in Sources */,
 				4D81351E2322C41800F59C01 /* keyaccid.cpp in Sources */,
+				BD2E4D95287587FD00B04350 /* stem.cpp in Sources */,
 				4DC34BAC19BC4A83006175CD /* dot.cpp in Sources */,
 				4DEC4DB221C826E000D1D273 /* supplied.cpp in Sources */,
 				4D20740A22A4FDFA00E0765F /* course.cpp in Sources */,
@@ -3543,6 +3557,7 @@
 				4DDBBB5C1C7AE45900054AFF /* dynam.cpp in Sources */,
 				4DB3D8D31F83D12300B5FC2B /* pedal.cpp in Sources */,
 				8F7DD0571EAF3682001B072A /* fb.cpp in Sources */,
+				BD2E4D972875880500B04350 /* stem.cpp in Sources */,
 				8F3DD34418854B2E0051330C /* keysig.cpp in Sources */,
 				4D1BE7741C688F5A0086DC0E /* MidiMessage.cpp in Sources */,
 				4DB3D8C01F83D0DF00B5FC2B /* systemelement.cpp in Sources */,
@@ -3762,6 +3777,7 @@
 				BB4C4B6922A932D7001F6AF0 /* nc.cpp in Sources */,
 				BB4C4B5F22A932D7001F6AF0 /* mrest.cpp in Sources */,
 				BB4C4B5722A932D7001F6AF0 /* layerelement.cpp in Sources */,
+				BD2E4D962875880500B04350 /* stem.cpp in Sources */,
 				BB4C4ACB22A932B6001F6AF0 /* pb.cpp in Sources */,
 				BB4C4BB422A932EB001F6AF0 /* view_text.cpp in Sources */,
 				BB4C4B4522A932D7001F6AF0 /* btrem.cpp in Sources */,

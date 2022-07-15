@@ -43,7 +43,7 @@ void BezierCurve::CalcInitialControlPointParams()
     this->SetControlHeight(0);
 }
 
-void BezierCurve::CalcInitialControlPointParams(Doc *doc, float angle, int staffSize)
+void BezierCurve::CalcInitialControlPointParams(const Doc *doc, float angle, int staffSize)
 {
     // Note: For convex curves (both control points on the same side) we assume that the curve is rotated
     // such that p1.y == p2.y, but for curves with mixed curvature we assume that the curve is unrotated
@@ -129,29 +129,32 @@ const Resources *DeviceContext::GetResources(bool showWarning) const
     return m_resources;
 }
 
-void DeviceContext::SetPen(int colour, int width, int opacity, int dashLength, int lineCap)
+void DeviceContext::SetPen(int colour, int width, int style, int dashLength, int gapLength, int lineCap, int lineJoin)
 {
     float opacityValue;
 
-    switch (opacity) {
+    switch (style) {
         case AxSOLID: opacityValue = 1.0; break;
         case AxDOT:
-            dashLength = dashLength ? dashLength : width * 1;
+            dashLength = dashLength ? dashLength : 1;
+            gapLength = gapLength ? gapLength : width * 3;
             opacityValue = 1.0;
             break;
         case AxLONG_DASH:
             dashLength = dashLength ? dashLength : width * 4;
+            gapLength = gapLength ? gapLength : width * 3;
             opacityValue = 1.0;
             break;
         case AxSHORT_DASH:
             dashLength = dashLength ? dashLength : width * 2;
+            gapLength = gapLength ? gapLength : width * 3;
             opacityValue = 1.0;
             break;
         case AxTRANSPARENT: opacityValue = 0.0; break;
         default: opacityValue = 1.0; // solid brush by default
     }
 
-    m_penStack.push(Pen(colour, width, opacityValue, dashLength, lineCap));
+    m_penStack.push(Pen(colour, width, opacityValue, dashLength, gapLength, lineCap, lineJoin));
 }
 
 void DeviceContext::SetBrush(int colour, int opacity)

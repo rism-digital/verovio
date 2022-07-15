@@ -1,5 +1,19 @@
 # Changelog
 
+## [unreleased]
+* Support for MEI-basic output
+* Support for ES6 and improved npm package (@WolfgangDrescher)
+* Support for `@artic.ges` (@eNote-GmBH)
+* Support for transposition of scores without key signature (@eNote-GmBH)
+* Support for `dashedBarlineDashLength` and `dashedBarlineGapLength` in engraving defaults (@eNoteGmBH)
+* Improved MIDI output with tuning, key signature and first verse (@eNote-GmBH)
+* Improved PAE output for measure rests
+* Improved mixed beam rendering (@eNote-GmBH)
+* Option --score-definition-to-staff for moving `clef`, `keySig`, `meterSig` and `meterSigGrp` to `staffDef`
+* Option --beam-mixed-stem-min and --beam-mixed-preserve for controlling mixed beam flipping (@eNote-GmBH)
+* Option --condense-not-last-system for making sure the last system of a score is always shown
+
+
 ## [3.10.0] - 2022-05-25
 * Support for `accid@place` (@eNote-GmBH)
 * Support for `mRpt@num` and `mRpt@num.place` (@eNote-GmBH)
@@ -21,7 +35,6 @@
 * Support for MIDI output of grace notes and multi-measure rests (@eNote-GmBH)
 * Support for `@stem.sameas` on notes for orchestra scores
 * Support for MIDI output of arpeggios (@eNote-GmBH)
-* Support for tuplets in ABC importer (@eNote-GmBH)
 * Support for `beamSpan` (@eNote-GmBH)
 * Support for lyrics, tuplets and multiple tunes (`mdiv`) in ABC import (@eNote-GmBH)
 * Improved double stemmed beams (@eNote-GmBH)

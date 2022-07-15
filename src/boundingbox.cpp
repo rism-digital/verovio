@@ -235,15 +235,15 @@ bool BoundingBox::VerticalSelfOverlap(const BoundingBox *other, int margin) cons
     return true;
 }
 
-int BoundingBox::HorizontalLeftOverlap(const BoundingBox *other, Doc *doc, int margin, int vMargin) const
+int BoundingBox::HorizontalLeftOverlap(const BoundingBox *other, const Doc *doc, int margin, int vMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
     int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
-    anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB1rect, doc);
-    anchor2 = other->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB2rect, doc);
+    anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB1rect, doc->GetResources());
+    anchor2 = other->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB2rect, doc->GetResources());
     for (i = 0; i < anchor1; ++i) {
         for (j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectLeftOverlap(BB1rect[i], BB2rect[j], margin, vMargin));
@@ -253,15 +253,15 @@ int BoundingBox::HorizontalLeftOverlap(const BoundingBox *other, Doc *doc, int m
     return overlap;
 }
 
-int BoundingBox::HorizontalRightOverlap(const BoundingBox *other, Doc *doc, int margin, int vMargin) const
+int BoundingBox::HorizontalRightOverlap(const BoundingBox *other, const Doc *doc, int margin, int vMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
     int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
-    anchor1 = this->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB1rect, doc);
-    anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB2rect, doc);
+    anchor1 = this->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB1rect, doc->GetResources());
+    anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB2rect, doc->GetResources());
     for (i = 0; i < anchor1; ++i) {
         for (j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectRightOverlap(BB1rect[i], BB2rect[j], margin, vMargin));
@@ -271,15 +271,15 @@ int BoundingBox::HorizontalRightOverlap(const BoundingBox *other, Doc *doc, int 
     return overlap;
 }
 
-int BoundingBox::VerticalTopOverlap(const BoundingBox *other, Doc *doc, int margin, int hMargin) const
+int BoundingBox::VerticalTopOverlap(const BoundingBox *other, const Doc *doc, int margin, int hMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
     int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
-    anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB1rect, doc);
-    anchor2 = other->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB2rect, doc);
+    anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB1rect, doc->GetResources());
+    anchor2 = other->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB2rect, doc->GetResources());
     for (i = 0; i < anchor1; ++i) {
         for (j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectTopOverlap(BB1rect[i], BB2rect[j], margin, hMargin));
@@ -289,15 +289,15 @@ int BoundingBox::VerticalTopOverlap(const BoundingBox *other, Doc *doc, int marg
     return overlap;
 }
 
-int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, Doc *doc, int margin, int hMargin) const
+int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, const Doc *doc, int margin, int hMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
     int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
-    anchor1 = this->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB1rect, doc);
-    anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB2rect, doc);
+    anchor1 = this->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB1rect, doc->GetResources());
+    anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB2rect, doc->GetResources());
     for (i = 0; i < anchor1; ++i) {
         for (j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectBottomOverlap(BB1rect[i], BB2rect[j], margin, hMargin));
@@ -307,28 +307,27 @@ int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, Doc *doc, int m
     return overlap;
 }
 
-int BoundingBox::GetRectangles(
-    const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2], Doc *doc) const
+int BoundingBox::GetRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2],
+    const Resources &resources) const
 {
     const Glyph *glyph = NULL;
 
     bool glyphRect = true;
 
     if (m_smuflGlyph != 0) {
-        const Resources &resources = doc->GetResources();
         glyph = resources.GetGlyph(m_smuflGlyph);
         assert(glyph);
 
         if (glyph->HasAnchor(anchor1) && glyph->HasAnchor(anchor2)) {
-            glyphRect = this->GetGlyph2PointRectangles(anchor1, anchor2, glyph, rect, doc);
+            glyphRect = this->GetGlyph2PointRectangles(anchor1, anchor2, glyph, rect);
             if (glyphRect) return 3;
         }
         else if (glyph->HasAnchor(anchor1)) {
-            glyphRect = this->GetGlyph1PointRectangles(anchor1, glyph, rect, doc);
+            glyphRect = this->GetGlyph1PointRectangles(anchor1, glyph, rect);
             if (glyphRect) return 2;
         }
         else if (glyph->HasAnchor(anchor2)) {
-            glyphRect = this->GetGlyph1PointRectangles(anchor2, glyph, rect, doc);
+            glyphRect = this->GetGlyph1PointRectangles(anchor2, glyph, rect);
             if (glyphRect) return 2;
         }
     }
@@ -342,8 +341,8 @@ int BoundingBox::GetRectangles(
     return 1;
 }
 
-bool BoundingBox::GetGlyph2PointRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2,
-    const Glyph *glyph, Point rect[3][2], Doc *doc) const
+bool BoundingBox::GetGlyph2PointRectangles(
+    const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, const Glyph *glyph, Point rect[3][2]) const
 {
     assert(glyph);
 
@@ -430,8 +429,7 @@ bool BoundingBox::GetGlyph2PointRectangles(const SMuFLGlyphAnchor &anchor1, cons
     return true;
 }
 
-bool BoundingBox::GetGlyph1PointRectangles(
-    const SMuFLGlyphAnchor &anchor, const Glyph *glyph, Point rect[2][2], Doc *doc) const
+bool BoundingBox::GetGlyph1PointRectangles(const SMuFLGlyphAnchor &anchor, const Glyph *glyph, Point rect[2][2]) const
 {
     assert(glyph);
 
@@ -496,6 +494,74 @@ bool BoundingBox::GetGlyph1PointRectangles(
     return true;
 }
 
+int BoundingBox::GetCutOutTop(const Resources &resources) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BBrect, resources);
+    std::vector<int> topValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        topValues.push_back(BBrect[i][0].y);
+    }
+    assert(!topValues.empty());
+
+    // Return the second largest value (if there are at least two)
+    if (topValues.size() == 1) return topValues[0];
+    std::sort(topValues.begin(), topValues.end(), std::greater<int>());
+    return topValues[1];
+}
+
+int BoundingBox::GetCutOutBottom(const Resources &resources) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BBrect, resources);
+    std::vector<int> bottomValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        bottomValues.push_back(BBrect[i][1].y);
+    }
+    assert(!bottomValues.empty());
+
+    // Return the second smallest value (if there are at least two)
+    if (bottomValues.size() == 1) return bottomValues[0];
+    std::sort(bottomValues.begin(), bottomValues.end());
+    return bottomValues[1];
+}
+
+int BoundingBox::GetCutOutLeft(const Resources &resources) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BBrect, resources);
+    std::vector<int> leftValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        leftValues.push_back(BBrect[i][0].x);
+    }
+    assert(!leftValues.empty());
+
+    // Return the second smallest value (if there are at least two)
+    if (leftValues.size() == 1) return leftValues[0];
+    std::sort(leftValues.begin(), leftValues.end());
+    return leftValues[1];
+}
+
+int BoundingBox::GetCutOutRight(const Resources &resources) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BBrect, resources);
+    std::vector<int> rightValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        rightValues.push_back(BBrect[i][1].x);
+    }
+    assert(!rightValues.empty());
+
+    // Return the second largest value (if there are at least two)
+    if (rightValues.size() == 1) return rightValues[0];
+    std::sort(rightValues.begin(), rightValues.end(), std::greater<int>());
+    return rightValues[1];
+}
+
 bool BoundingBox::Encloses(const Point point) const
 {
     if (this->GetContentRight() < point.x) return false;
@@ -505,7 +571,7 @@ bool BoundingBox::Encloses(const Point point) const
     return true;
 }
 
-int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int margin) const
+int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type, int margin) const
 {
     assert(curve);
     assert(curve->GetObject());
@@ -655,7 +721,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     return 0;
 }
 
-int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
+int BoundingBox::Intersects(const BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
 {
     assert(beamInterface);
     assert(beamInterface->HasCoords());
@@ -729,20 +795,6 @@ int BoundingBox::Intersects(BeamDrawingInterface *beamInterface, Accessor type, 
 // Static methods for BoundingBox
 //----------------------------------------------------------------------------
 
-void BoundingBox::SwapPoints(Point &p1, Point &p2)
-{
-    Point tmp = p1;
-    p1 = p2;
-    p2 = tmp;
-}
-
-void BoundingBox::Swap(int &v1, int &v2)
-{
-    int tmp = v1;
-    v1 = v2;
-    v2 = tmp;
-}
-
 Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point center)
 {
     if (point == center) return point;
@@ -793,9 +845,17 @@ double BoundingBox::CalcBezierParamAtPosition(const Point bezier[4], int x)
     const std::set<double> roots = BoundingBox::SolveCubicPolynomial(a, b, c, d);
 
     // Return the first root in [0,1]
-    auto iter
-        = std::find_if(roots.begin(), roots.end(), [](double value) { return ((value >= 0.0) && (value <= 1.0)); });
-    return (iter != roots.end()) ? *iter : 0.0;
+    auto iter = std::find_if(roots.begin(), roots.end(), [](double value) {
+        constexpr double eps = 1e-6; // Numerical freedom
+        return ((value >= -eps) && (value <= 1.0 + eps));
+    });
+    double root = 0.0;
+    if (iter != roots.end()) {
+        root = *iter;
+        root = std::max(root, 0.0);
+        root = std::min(root, 1.0);
+    }
+    return root;
 }
 
 int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x)
@@ -1077,8 +1137,9 @@ int BoundingBox::RectBottomOverlap(const Point rect1[2], const Point rect2[2], i
 
 SegmentedLine::SegmentedLine(int start, int end)
 {
-    if (start > end) {
-        BoundingBox::Swap(start, end);
+    m_increasing = (start <= end);
+    if (!m_increasing) {
+        std::swap(start, end);
     }
     m_segments.push_back({ start, end });
 }
@@ -1088,15 +1149,23 @@ std::pair<int, int> SegmentedLine::GetStartEnd(int idx) const
     assert(idx >= 0);
     assert(idx < this->GetSegmentCount());
 
-    return { m_segments.at(idx).first, m_segments.at(idx).second };
+    if (m_increasing) {
+        return { m_segments.at(idx).first, m_segments.at(idx).second };
+    }
+    else {
+        // Read the segment array "backwards"
+        idx = this->GetSegmentCount() - 1 - idx;
+        return { m_segments.at(idx).second, m_segments.at(idx).first };
+    }
 }
 
 void SegmentedLine::AddGap(int start, int end)
 {
     assert(start != end);
 
+    // Internally segments always have increasing order and orientation
     if (start > end) {
-        BoundingBox::Swap(start, end);
+        std::swap(start, end);
     }
 
     // nothing to do

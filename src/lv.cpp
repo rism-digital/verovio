@@ -35,7 +35,7 @@ void Lv::Reset()
     Tie::Reset();
 }
 
-bool Lv::CalculatePosition(Doc *doc, Staff *staff, int x1, int x2, int spanningType, Point bezier[4])
+bool Lv::CalculatePosition(const Doc *doc, const Staff *staff, int x1, int x2, int spanningType, Point bezier[4])
 {
     if (spanningType != SPANNING_START_END) {
         //  this makes no sense

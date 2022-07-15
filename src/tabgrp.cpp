@@ -121,7 +121,7 @@ int TabGrp::InitOnsetOffsetEnd(FunctorParams *functorParams)
     InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    LayerElement *element = this->ThisOrSameasAsLink();
+    LayerElement *element = this->ThisOrSameasLink();
 
     double incrementScoreTime = element->GetAlignmentDuration(
         params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);

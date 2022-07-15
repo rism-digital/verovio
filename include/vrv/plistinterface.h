@@ -48,7 +48,7 @@ public:
     void AddRefAllowDuplicate(const std::string &ref);
 
     /**
-     * Set a reference object when the uuid is found in the m_uuids.
+     * Set a reference object when the id is found in the m_ids.
      * Calls IsValidRef to check that the type of object is valid.
      */
     void SetRef(const Object *object);
@@ -84,9 +84,9 @@ public:
 
 protected:
     /**
-     * Extract the fragment of the any uris given in @plist
+     * Extract the fragment of the any URIs given in @plist
      */
-    void SetUuidStrs();
+    void SetIDStrs();
 
     /**
      * Method to be redefined in the child class if specific validation is required.
@@ -107,10 +107,10 @@ private:
     ArrayOfConstObjects m_references;
 
     /**
-     * An array of parsed any uris stored as uuids.
+     * An array of parsed any URIs stored as ids.
      * Filled in InterfacePreparePlist (backward and forward).
      */
-    std::vector<std::string> m_uuids;
+    std::vector<std::string> m_ids;
 };
 
 } // namespace vrv
