@@ -2142,7 +2142,7 @@ enum meiVersion_MEIVERSION {
     meiVersion_MEIVERSION_3_0_0,
     meiVersion_MEIVERSION_4_0_0,
     meiVersion_MEIVERSION_4_0_1,
-    meiVersion_MEIVERSION_4_0_1_rc1plusbasic,
+    meiVersion_MEIVERSION_5_0_0_devplusbasic,
     meiVersion_MEIVERSION_5_0_0_dev,
     meiVersion_MEIVERSION_MAX
 };
