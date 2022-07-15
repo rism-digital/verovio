@@ -49,6 +49,7 @@ class Object;
 class Page;
 class Pedal;
 class ScoreDef;
+class ScoreDefElement;
 class Slur;
 class Staff;
 class StaffAlignment;
@@ -591,7 +592,7 @@ public:
  **/
 class AdjustTupletNumOverlapParams : public FunctorParams {
 public:
-    AdjustTupletNumOverlapParams(TupletNum *tupletNum, Staff *staff)
+    AdjustTupletNumOverlapParams(const TupletNum *tupletNum, const Staff *staff)
     {
         m_tupletNum = tupletNum;
         m_drawingNumPos = STAFFREL_basic_NONE;
@@ -601,11 +602,11 @@ public:
         m_yRel = 0;
     }
 
-    TupletNum *m_tupletNum;
+    const TupletNum *m_tupletNum;
     data_STAFFREL_basic m_drawingNumPos;
     int m_horizontalMargin;
     int m_verticalMargin;
-    Staff *m_staff;
+    const Staff *m_staff;
     int m_yRel;
 };
 
@@ -1130,6 +1131,27 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CalcChordNoteHeadsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the doc
+ * member 1: diameter of the anchoring note of the chord
+ **/
+
+class CalcChordNoteHeadsParams : public FunctorParams {
+public:
+    CalcChordNoteHeadsParams(Doc *doc)
+    {
+        m_doc = doc;
+        m_diameter = 0;
+    }
+
+    Doc *m_doc;
+    int m_diameter;
+};
+
+//----------------------------------------------------------------------------
 // CastOffEncodingParams
 //----------------------------------------------------------------------------
 
@@ -1311,6 +1333,32 @@ class ConvertMarkupArticParams : public FunctorParams {
 public:
     ConvertMarkupArticParams() {}
     std::vector<std::pair<Object *, Artic *>> m_articPairsToConvert;
+};
+
+//----------------------------------------------------------------------------
+// ConvertMarkupScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the scoreDef we are moving the content from
+ * member 1: the doc
+ * member 2: the functor
+ * member 3: the end functor
+ **/
+
+class ConvertMarkupScoreDefParams : public FunctorParams {
+public:
+    ConvertMarkupScoreDefParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    {
+        m_currentScoreDef = NULL;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+    ScoreDefElement *m_currentScoreDef;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -1544,18 +1592,18 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindByUuidParams
+// FindByIDParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the uuid we are looking for
+ * member 0: the id we are looking for
  * member 1: the pointer to pointer to the Object
  **/
 
-class FindByUuidParams : public FunctorParams {
+class FindByIDParams : public FunctorParams {
 public:
-    FindByUuidParams() { m_element = NULL; }
-    std::string m_uuid;
+    FindByIDParams() { m_element = NULL; }
+    std::string m_id;
     const Object *m_element;
 };
 
@@ -1618,7 +1666,7 @@ public:
 
 class FindSpannedLayerElementsParams : public FunctorParams {
 public:
-    FindSpannedLayerElementsParams(TimeSpanningInterface *interface)
+    FindSpannedLayerElementsParams(const TimeSpanningInterface *interface)
     {
         m_interface = interface;
         m_minPos = 0;
@@ -1626,14 +1674,35 @@ public:
         m_minLayerN = 0;
         m_maxLayerN = 0;
     }
-    std::vector<LayerElement *> m_elements;
+    std::vector<const LayerElement *> m_elements;
     int m_minPos;
     int m_maxPos;
     std::set<int> m_staffNs;
     int m_minLayerN;
     int m_maxLayerN;
-    TimeSpanningInterface *m_interface;
+    const TimeSpanningInterface *m_interface;
     std::vector<ClassId> m_classIds;
+};
+
+//----------------------------------------------------------------------------
+// FindLayerIDWithinStaffDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the element inside Layer StaffDef
+ * member 1: ID of element to be found
+ **/
+
+class FindLayerIDWithinStaffDefParams : public FunctorParams {
+public:
+    explicit FindLayerIDWithinStaffDefParams(const std::string &xmlId)
+    {
+        m_id = xmlId;
+        m_object = NULL;
+    }
+
+    const Object *m_object;
+    std::string m_id;
 };
 
 //----------------------------------------------------------------------------
@@ -1693,16 +1762,17 @@ using MIDIChordSequence = std::list<MIDIChord>;
  * member 1: int: the midi track number
  * member 2: int: the midi channel number
  * member 3: double: the score time from the start of the music to the start of the current measure
- * member 4: int: the semi tone transposition for the current track
- * member 5: double with the current tempo
- * member 6: the last (non grace) note that was performed
- * member 7: expanded notes due to ornaments and tremolandi
- * member 8: deferred notes which start slightly later
- * member 9: grace note sequence
- * member 10: flag indicating whether the last grace note/chord was accented
- * member 11: flag indicating whether cue notes should be included
- * member 12: the functor
- * member 13: Tablature held notes indexed by (course - 1)
+ * member 4: the current staff number
+ * member 5: the semi tone transposition for the current track
+ * member 6: double with the current tempo
+ * member 7: the last (non grace) note that was performed
+ * member 8: expanded notes due to ornaments and tremolandi
+ * member 9: deferred notes which start slightly later
+ * member 10: grace note sequence
+ * member 11: flag indicating whether the last grace note/chord was accented
+ * member 12: flag indicating whether cue notes should be included
+ * member 13: the functor
+ * member 14: Tablature held notes indexed by (course - 1)
  **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -1713,6 +1783,7 @@ public:
         m_midiTrack = 1;
         m_midiChannel = 0;
         m_totalTime = 0.0;
+        m_staffN = 0;
         m_transSemi = 0;
         m_currentTempo = MIDI_TEMPO;
         m_lastNote = NULL;
@@ -1724,6 +1795,7 @@ public:
     int m_midiTrack;
     int m_midiChannel;
     double m_totalTime;
+    int m_staffN;
     int m_transSemi;
     double m_currentTempo;
     Note *m_lastNote;
@@ -1811,7 +1883,7 @@ public:
         m_searchDirection = searchDirection;
         m_isInNeighboringLayer = anotherLayer;
     }
-    Object *m_relativeElement;
+    const Object *m_relativeElement;
     int m_initialElementId;
     bool m_searchDirection;
     bool m_isInNeighboringLayer;
@@ -2001,7 +2073,7 @@ public:
 
 class LayerCountInTimeSpanParams : public FunctorParams {
 public:
-    LayerCountInTimeSpanParams(MeterSig *meterSig, Mensur *mensur, Functor *functor)
+    LayerCountInTimeSpanParams(const MeterSig *meterSig, const Mensur *mensur, Functor *functor)
     {
         m_time = 0.0;
         m_duration = 0.0;
@@ -2012,8 +2084,8 @@ public:
     double m_time;
     double m_duration;
     std::set<int> m_layers;
-    MeterSig *m_meterSig;
-    Mensur *m_mensur;
+    const MeterSig *m_meterSig;
+    const Mensur *m_mensur;
     Functor *m_functor;
 };
 
@@ -2032,7 +2104,7 @@ public:
 
 class LayerElementsInTimeSpanParams : public FunctorParams {
 public:
-    LayerElementsInTimeSpanParams(MeterSig *meterSig, Mensur *mensur, Layer *layer)
+    LayerElementsInTimeSpanParams(const MeterSig *meterSig, const Mensur *mensur, const Layer *layer)
     {
         m_time = 0.0;
         m_duration = 0.0;
@@ -2044,10 +2116,10 @@ public:
     double m_time;
     double m_duration;
     bool m_allLayersButCurrent;
-    ListOfObjects m_elements;
-    MeterSig *m_meterSig;
-    Mensur *m_mensur;
-    Layer *m_layer;
+    ListOfConstObjects m_elements;
+    const MeterSig *m_meterSig;
+    const Mensur *m_mensur;
+    const Layer *m_layer;
 };
 
 //----------------------------------------------------------------------------
@@ -2209,9 +2281,9 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: MapOfLinkingInterfaceUuidPairs holds the interface / uuid pairs to match for links
- * member 1: MapOfLinkingInterfaceUuidPairs holds the interface / uuid pairs to match for sameas
- * member 2: MapOfNoteUuidPairs holds the note / uuid pairs to match for stem.sameas
+ * member 0: MapOfLinkingInterfaceIDPairs holds the interface / id pairs to match for links
+ * member 1: MapOfLinkingInterfaceIDPairs holds the interface / id pairs to match for sameas
+ * member 2: MapOfNoteIDPairs holds the note / id pairs to match for stem.sameas
  * member 3: bool* fillList for indicating whether the pairs have to be stacked or not
  *
  **/
@@ -2219,9 +2291,9 @@ public:
 class PrepareLinkingParams : public FunctorParams {
 public:
     PrepareLinkingParams() { m_fillList = true; }
-    MapOfLinkingInterfaceUuidPairs m_nextUuidPairs;
-    MapOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
-    MapOfNoteUuidPairs m_stemSameasUuidPairs;
+    MapOfLinkingInterfaceIDPairs m_nextIDPairs;
+    MapOfLinkingInterfaceIDPairs m_sameasIDPairs;
+    MapOfNoteIDPairs m_stemSameasIDPairs;
     bool m_fillList;
 };
 
@@ -2267,14 +2339,14 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: ArrayOfInterfaceUuidPairs holds the interface / uuid pairs to match
+ * member 0: ArrayOfInterfaceIDPairs holds the interface / id pairs to match
  * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
  **/
 
 class PreparePlistParams : public FunctorParams {
 public:
     PreparePlistParams() { m_fillList = true; }
-    ArrayOfPlistInterfaceUuidTuples m_interfaceUuidTuples;
+    ArrayOfPlistInterfaceIDTuples m_interfaceIDTuples;
     bool m_fillList;
 };
 
@@ -2428,12 +2500,18 @@ public:
 
 /**
  * member 0: output stream
+ * member 1: flag for MEI basic output for filtering out editorial markup
  **/
 
 class SaveParams : public FunctorParams {
 public:
-    SaveParams(Output *output) { m_output = output; }
+    SaveParams(Output *output, bool basic)
+    {
+        m_output = output;
+        m_basic = basic;
+    }
     Output *m_output;
+    bool m_basic;
 };
 
 //----------------------------------------------------------------------------
@@ -2608,7 +2686,7 @@ public:
  * member 5: the mdiv selected for transposition
  * member 6: the list of current (nested) mdivs
  * member 7: transpose to sounding pitch by evaluating @trans.semi
- * member 8: true if the current scoreDef contains a KeySig (direct child or attribute)
+ * member 8: current KeySig for staff (ScoreDef key signatures are mapped to -1)
  * member 9: transposition interval for staff
  **/
 
@@ -2621,17 +2699,16 @@ public:
         m_functorEnd = functorEnd;
         m_transposer = transposer;
         m_transposeToSoundingPitch = false;
-        m_hasScoreDefKeySig = false;
     }
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;
     Transposer *m_transposer;
     std::string m_transposition;
-    std::string m_selectedMdivUuid;
-    std::list<std::string> m_currentMdivUuids;
+    std::string m_selectedMdivID;
+    std::list<std::string> m_currentMdivIDs;
     bool m_transposeToSoundingPitch;
-    bool m_hasScoreDefKeySig;
+    std::map<int, const KeySig *> m_keySigForStaffN;
     std::map<int, int> m_transposeIntervalForStaffN;
 };
 

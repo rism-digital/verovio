@@ -33,6 +33,7 @@ static const ClassRegistrar<StaffGrp> s_factory("staffGrp", STAFFGRP);
 StaffGrp::StaffGrp()
     : Object(STAFFGRP, "staffgrp-")
     , ObjectListInterface()
+    , AttBarring()
     , AttBasic()
     , AttLabelled()
     , AttNNumberLike()
@@ -40,6 +41,7 @@ StaffGrp::StaffGrp()
     , AttStaffGrpVis()
     , AttTyped()
 {
+    this->RegisterAttClass(ATT_BARRING);
     this->RegisterAttClass(ATT_BASIC);
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
@@ -55,6 +57,7 @@ StaffGrp::~StaffGrp() {}
 void StaffGrp::Reset()
 {
     Object::Reset();
+    this->ResetBarring();
     this->ResetBasic();
     this->ResetLabelled();
     this->ResetNNumberLike();
@@ -135,15 +138,21 @@ int StaffGrp::GetMaxStaffSize() const
 
 std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
 {
-    const ListOfObjects &staffDefs = this->GetList(this);
+    const auto [firstDef, lastDef] = std::as_const(*this).GetFirstLastStaffDef();
+    return { const_cast<StaffDef *>(firstDef), const_cast<StaffDef *>(lastDef) };
+}
+
+std::pair<const StaffDef *, const StaffDef *> StaffGrp::GetFirstLastStaffDef() const
+{
+    const ListOfConstObjects &staffDefs = this->GetList(this);
     if (staffDefs.empty()) {
         return { NULL, NULL };
     }
 
-    StaffDef *firstDef = NULL;
-    ListOfObjects::const_iterator iter;
+    const StaffDef *firstDef = NULL;
+    ListOfConstObjects::const_iterator iter;
     for (iter = staffDefs.begin(); iter != staffDefs.end(); ++iter) {
-        StaffDef *staffDef = vrv_cast<StaffDef *>(*iter);
+        const StaffDef *staffDef = vrv_cast<const StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
             firstDef = staffDef;
@@ -151,10 +160,10 @@ std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
         }
     }
 
-    StaffDef *lastDef = NULL;
-    ListOfObjects::const_reverse_iterator riter;
+    const StaffDef *lastDef = NULL;
+    ListOfConstObjects::const_reverse_iterator riter;
     for (riter = staffDefs.rbegin(); riter != staffDefs.rend(); ++riter) {
-        StaffDef *staffDef = vrv_cast<StaffDef *>(*riter);
+        const StaffDef *staffDef = vrv_cast<const StaffDef *>(*riter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
             lastDef = staffDef;

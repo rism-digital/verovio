@@ -197,6 +197,19 @@ int StaffDef::PrepareDuration(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int StaffDef::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    if (this->GetN() == params->m_staffN) {
+        // Update the semitone transposition
+        if (this->HasTransSemi()) params->m_transSemi = this->GetTransSemi();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int StaffDef::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

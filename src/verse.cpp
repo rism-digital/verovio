@@ -76,7 +76,7 @@ bool Verse::IsSupportedChild(Object *child)
     return true;
 }
 
-int Verse::AdjustPosition(int &overlap, int freeSpace, Doc *doc)
+int Verse::AdjustPosition(int &overlap, int freeSpace, const Doc *doc)
 {
     assert(doc);
 
@@ -247,6 +247,17 @@ int Verse::InitProcessingLists(FunctorParams *functorParams)
     //(*tree)[ staff->GetN() ][ layer->GetN() ][ this->GetN() ] = true;
 
     return FUNCTOR_SIBLINGS;
+}
+
+int Verse::GenerateMIDI(FunctorParams *)
+{
+    Note *note = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
+    assert(note);
+    Verse *previousVerse = vrv_cast<Verse *>(note->GetPrevious(this, VERSE));
+
+    if (previousVerse) return FUNCTOR_SIBLINGS;
+
+    return FUNCTOR_CONTINUE;
 }
 
 int Verse::ResetData(FunctorParams *functorParams)

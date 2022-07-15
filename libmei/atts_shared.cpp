@@ -7214,8 +7214,8 @@ AttTransposition::~AttTransposition()
 
 void AttTransposition::ResetTransposition()
 {
-    m_transDiat = 0.0;
-    m_transSemi = 0.0;
+    m_transDiat = VRV_UNSET;
+    m_transSemi = VRV_UNSET;
 }
 
 bool AttTransposition::ReadTransposition(pugi::xml_node element)
@@ -7250,12 +7250,12 @@ bool AttTransposition::WriteTransposition(pugi::xml_node element)
 
 bool AttTransposition::HasTransDiat() const
 {
-    return (m_transDiat != 0.0);
+    return (m_transDiat != VRV_UNSET);
 }
 
 bool AttTransposition::HasTransSemi() const
 {
-    return (m_transSemi != 0.0);
+    return (m_transSemi != VRV_UNSET);
 }
 
 /* include <atttrans.semi> */

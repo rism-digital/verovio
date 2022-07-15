@@ -104,7 +104,7 @@ void FTrem::FilterList(ListOfConstObjects &childList) const
 
 std::pair<int, int> FTrem::GetAdditionalBeamCount() const
 {
-    return { std::max(this->GetBeams(), this->GetBeamsFloat()), 0 };
+    return { 0, std::max(this->GetBeams(), this->GetBeamsFloat()) };
 }
 
 std::pair<int, int> FTrem::GetFloatingBeamCount() const
@@ -132,7 +132,10 @@ int FTrem::AdjustBeams(FunctorParams *functorParams)
     }
 
     if (!params->m_beam) {
-        if (m_drawingPlace != BEAMPLACE_mixed) {
+        if (m_drawingPlace == BEAMPLACE_mixed) {
+            m_beamSegment.RequestStaffSpace(params->m_doc, this);
+        }
+        else {
             params->m_beam = this;
             params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
             params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;

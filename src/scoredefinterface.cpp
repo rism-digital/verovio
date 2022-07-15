@@ -25,6 +25,7 @@ namespace vrv {
 
 ScoreDefInterface::ScoreDefInterface()
     : Interface()
+    , AttBarring()
     , AttDurationDefault()
     , AttLyricStyle()
     , AttMeasureNumbers()
@@ -34,6 +35,7 @@ ScoreDefInterface::ScoreDefInterface()
     , AttSpacing()
     , AttSystems()
 {
+    this->RegisterInterfaceAttClass(ATT_BARRING);
     this->RegisterInterfaceAttClass(ATT_DURATIONDEFAULT);
     this->RegisterInterfaceAttClass(ATT_LYRICSTYLE);
     this->RegisterInterfaceAttClass(ATT_MEASURENUMBERS);
@@ -52,6 +54,7 @@ ScoreDefInterface::~ScoreDefInterface() {}
 
 void ScoreDefInterface::Reset()
 {
+    this->ResetBarring();
     this->ResetDurationDefault();
     this->ResetLyricStyle();
     this->ResetMeasureNumbers();

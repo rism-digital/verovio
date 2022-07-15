@@ -106,15 +106,19 @@ public:
     ///@}
 
     /**
-     * Return the cross staff above or below (if  any).
+     * Return the cross staff above or below (if any).
      */
+    ///@{
     void GetCrossStaffExtremes(
         Staff *&staffAbove, Staff *&staffBelow, Layer **layerAbove = NULL, Layer **layerBelow = NULL);
+    void GetCrossStaffExtremes(const Staff *&staffAbove, const Staff *&staffBelow, const Layer **layerAbove = NULL,
+        const Layer **layerBelow = NULL) const;
+    ///@}
 
     /**
      * Return true if the chord has some cross staff notes.
      */
-    bool HasCrossStaff() override;
+    bool HasCrossStaff() const override;
 
     /**
      * Returns list of notes that have accidentals
@@ -147,7 +151,7 @@ public:
     /**
      * Return true if the chord has two notes with 1 diatonic step difference in the specific staff
      */
-    bool HasAdjacentNotesInStaff(Staff *staff);
+    bool HasAdjacentNotesInStaff(const Staff *staff) const;
 
     /**
      * Return true if the chord has at least one note with a @dots > 0
@@ -158,7 +162,7 @@ public:
      * Helper to adjust overlapping layers for chords
      * Returns the shift of the adjustment
      */
-    int AdjustOverlappingLayers(Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted,
+    int AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElement *> &otherElements, bool areDotsAdjusted,
         bool &isUnison, bool &stemSameas) override;
 
     /**
@@ -166,7 +170,7 @@ public:
      * Diatonic step difference is take up to 2 points, so HasAdjacentNotesInStaff() needs to be called first, to make
      * sure there actually are adjacent notes.
      */
-    std::list<Note *> GetAdjacentNotesList(Staff *staff, int loc);
+    std::list<const Note *> GetAdjacentNotesList(const Staff *staff, int loc) const;
 
     //----------//
     // Functors //
@@ -199,6 +203,11 @@ public:
      * See Object::CalcStem
      */
     int CalcStem(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::CalcChordNoteHeads
+     */
+    int CalcChordNoteHeads(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcDots
@@ -244,14 +253,14 @@ protected:
     /**
      * The note locations w.r.t. each staff
      */
-    MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) override;
+    MapOfNoteLocs CalcNoteLocations(NotePredicate predicate = NULL) const override;
 
     /**
      * The dot locations w.r.t. each staff
      * Since dots for notes on staff lines can be shifted upwards or downwards, there are two choices: primary and
      * secondary
      */
-    MapOfDotLocs CalcDotLocations(int layerCount, bool primary) override;
+    MapOfDotLocs CalcDotLocations(int layerCount, bool primary) const override;
 
     /**
      * Calculate stem direction based on the position of the notes in chord. Notes are compared in pairs starting from
@@ -275,12 +284,12 @@ protected:
     void FilterList(ListOfConstObjects &childList) const override;
 
 public:
-    mutable std::list<ChordCluster *> m_clusters;
-
+    //
+private:
     /**
-     * Positions of dots in the chord to avoid overlapping
+     * The list of chord clusters
      */
-    std::list<int> m_dots;
+    mutable std::list<ChordCluster *> m_clusters;
 };
 
 } // namespace vrv

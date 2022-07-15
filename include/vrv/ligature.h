@@ -60,10 +60,7 @@ public:
     /**
      * @name Return shape information about the note ligature
      */
-    ///@{
-    int GetDrawingNoteShape(Note *note);
-    int GetDrawingPreviousNoteShape(Note *note);
-    ///@}
+    int GetDrawingNoteShape(const Note *note) const;
 
     //----------//
     // Functors //

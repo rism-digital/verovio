@@ -45,9 +45,9 @@ bool Facsimile::IsSupportedChild(Object *object)
     return true;
 }
 
-Zone *Facsimile::FindZoneByUuid(std::string zoneId)
+Zone *Facsimile::FindZoneByID(std::string zoneId)
 {
-    return dynamic_cast<Zone *>(this->FindDescendantByUuid(zoneId));
+    return dynamic_cast<Zone *>(this->FindDescendantByID(zoneId));
 }
 
 int Facsimile::GetMaxX()

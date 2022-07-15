@@ -596,6 +596,7 @@ public:
     OptionDbl m_breaksSmartSb;
     OptionIntMap m_condense;
     OptionBool m_condenseFirstPage;
+    OptionBool m_condenseNotLastSystem;
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionString m_expand;
@@ -608,6 +609,7 @@ public:
     OptionBool m_mensuralToMeasure;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
+    OptionBool m_moveScoreDefinitionToStaff;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
     OptionBool m_outputFormatRaw;
@@ -647,11 +649,15 @@ public:
 
     OptionDbl m_barLineSeparation;
     OptionDbl m_barLineWidth;
+    OptionBool m_beamFrenchStyle;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
-    OptionBool m_beamFrenchStyle;
+    OptionBool m_beamMixedPreserve;
+    OptionDbl m_beamMixedStemMin;
     OptionDbl m_bracketThickness;
     OptionBool m_breaksNoWidow;
+    OptionDbl m_dashedBarLineDashLength;
+    OptionDbl m_dashedBarLineGapLength;
     OptionDbl m_dynamDist;
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;

@@ -230,11 +230,11 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     }
 
     // Try to get the element on the current drawing page
-    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
 
     // If it wasn't there, go back up to the whole doc
     if (!element) {
-        element = m_doc->FindDescendantByUuid(elementId);
+        element = m_doc->FindDescendantByID(elementId);
     }
     if (!element) {
         LogWarning("element is null");
@@ -608,7 +608,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         }
     }
     else {
-        staff = dynamic_cast<Staff *>(m_doc->FindDescendantByUuid(staffId));
+        staff = dynamic_cast<Staff *>(m_doc->FindDescendantByID(staffId));
     }
 
     Facsimile *facsimile = m_doc->GetFacsimile();
@@ -660,7 +660,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 parent->InsertChild(newStaff, i);
                 parent->Modify();
 
-                m_infoObject.import("uuid", newStaff->GetUuid());
+                m_infoObject.import("uuid", newStaff->GetID());
                 m_infoObject.import("status", status);
                 m_infoObject.import("message", message);
 
@@ -672,7 +672,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         parent->AddChild(newStaff);
         parent->Modify();
 
-        m_infoObject.import("uuid", newStaff->GetUuid());
+        m_infoObject.import("uuid", newStaff->GetID());
         m_infoObject.import("status", status);
         m_infoObject.import("message", message);
         return true;
@@ -818,10 +818,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             }
         }
         if (elementType == "nc") {
-            m_infoObject.import("uuid", nc->GetUuid());
+            m_infoObject.import("uuid", nc->GetID());
         }
         else {
-            m_infoObject.import("uuid", neume->GetUuid());
+            m_infoObject.import("uuid", neume->GetID());
         }
     }
     else if (elementType == "clef") {
@@ -868,7 +868,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         assert(surface);
         surface->AddChild(zone);
         layer->AddChild(clef);
-        m_infoObject.import("uuid", clef->GetUuid());
+        m_infoObject.import("uuid", clef->GetID());
         layer->ReorderByXPos();
 
         // ensure pitched elements associated with this clef keep their x,y positions
@@ -921,7 +921,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             m_infoObject.import("message", "Failed to set pitch.");
             return false;
         }
-        m_infoObject.import("uuid", custos->GetUuid());
+        m_infoObject.import("uuid", custos->GetID());
     }
     else {
         delete zone;
@@ -943,7 +943,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 
     // Get the staves by element ID and fail if a staff does not exist.
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
-        Staff *obj = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByUuid(*it));
+        Staff *obj = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByID(*it));
         if (obj != NULL && obj->Is(STAFF)) {
             staves.push_back(obj);
         }
@@ -1018,7 +1018,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 
     fillLayer->ReorderByXPos();
 
-    m_infoObject.import("uuid", fillStaff->GetUuid());
+    m_infoObject.import("uuid", fillStaff->GetID());
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
 
@@ -1030,7 +1030,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::string attrValue)
 {
     if (!m_doc->GetDrawingPage()) return false;
-    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     bool success = false;
     if (Att::SetAnalytical(element, attrType, attrValue))
         success = true;
@@ -1079,7 +1079,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
         m_infoObject.import("message", "Could not find drawing page.");
         return false;
     }
-    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     if (element == NULL) {
         LogWarning("No element with ID '%s' exists", elementId.c_str());
         m_infoObject.import("status", "FAILURE");
@@ -1153,7 +1153,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
             success = true;
         }
         else {
-            success = SetText(syl->GetUuid(), text);
+            success = SetText(syl->GetID(), text);
         }
     }
     else {
@@ -1179,7 +1179,7 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
     bool success = false;
     data_CLEFSHAPE clefShape = CLEFSHAPE_NONE;
     int shift = 0;
-    Clef *clef = vrv_cast<Clef *>(m_doc->GetDrawingPage()->FindDescendantByUuid(elementId));
+    Clef *clef = vrv_cast<Clef *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
     assert(clef);
 
     if (shape == "C") {
@@ -1236,7 +1236,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
         m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
-    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByUuid(elementId));
+    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
     // Validate parameters
     if (staff == NULL) {
         LogError("Either no element exists with ID '%s' or it is not a staff.", elementId.c_str());
@@ -1267,8 +1267,8 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
         m_infoObject.import("message", "Failed to create a second staff.");
         return false;
     }
-    Staff *splitStaff = dynamic_cast<Staff *>(
-        m_doc->GetDrawingPage()->FindDescendantByUuid(m_infoObject.get<jsonxx::String>("uuid")));
+    Staff *splitStaff
+        = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByID(m_infoObject.get<jsonxx::String>("uuid")));
     assert(splitStaff);
     if (splitStaff == NULL) {
         LogError("Split staff is null");
@@ -1318,7 +1318,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     layer->ClearRelinquishedChildren();
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
-    m_infoObject.import("uuid", splitStaff->GetUuid());
+    m_infoObject.import("uuid", splitStaff->GetID());
     return true;
 }
 
@@ -1330,7 +1330,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
-    Object *obj = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    Object *obj = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     assert(obj);
     bool result = false;
     bool isNeumeOrNc, isNc, isClef;
@@ -1358,7 +1358,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         // y position of pitched elements (like neumes) is determined by their pitches
         // so when deleting a clef, the position on a page that a pitch value is associated with could change
         // so we need to change the pitch value of any elements whose clef is going to change
-        Clef *clef = vrv_cast<Clef *>(m_doc->GetDrawingPage()->FindDescendantByUuid(elementId));
+        Clef *clef = vrv_cast<Clef *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
         assert(clef);
         ClassIdComparison ac(CLEF);
         Clef *previousClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
@@ -1412,7 +1412,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         parent = parent->GetParent();
         if (obj->FindDescendantByType(NC) == NULL) {
             // Delete the empty neume
-            std::string neumeId = obj->GetUuid();
+            std::string neumeId = obj->GetID();
             result &= parent->DeleteChild(obj);
             if (!result) {
                 LogError("Failed to delete empty neume (%s)", neumeId.c_str());
@@ -1434,15 +1434,14 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             if (li->HasPrecedes() || li->HasFollows()) {
                 std::string linkedID = (li->HasPrecedes() ? li->GetPrecedes() : li->GetFollows());
                 if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
-                Syllable *linkedSyllable
-                    = vrv_cast<Syllable *>(m_doc->GetDrawingPage()->FindDescendantByUuid(linkedID));
+                Syllable *linkedSyllable = vrv_cast<Syllable *>(m_doc->GetDrawingPage()->FindDescendantByID(linkedID));
                 if (linkedSyllable != NULL) {
                     if (linkedSyllable->HasPrecedes()) linkedSyllable->SetPrecedes("");
                     if (linkedSyllable->HasFollows()) linkedSyllable->SetFollows("");
                 }
             }
             // Delete the syllable empty of neumes
-            std::string syllableId = obj->GetUuid();
+            std::string syllableId = obj->GetID();
             result &= parent->DeleteChild(obj);
             if (!result) {
                 LogError("Failed to delete empty syllable (%s)", syllableId.c_str());
@@ -1474,7 +1473,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         return false;
     }
 
-    Object *obj = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    Object *obj = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     if (obj == NULL) {
         LogError("Object with ID '%s' not found.", elementId.c_str());
         m_infoObject.import("status", "FAILURE");
@@ -1576,7 +1575,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     // Determine what the parents are
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
         // Verify that the children are of the same type
-        Object *el = m_doc->GetDrawingPage()->FindDescendantByUuid(*it);
+        Object *el = m_doc->GetDrawingPage()->FindDescendantByID(*it);
         if (el == NULL) {
             LogError("Could not get element with ID %s", it->c_str());
             m_infoObject.import("status", "FAILURE");
@@ -1584,11 +1583,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             return false;
         }
         if (el->GetClassId() != elementClass) {
-            LogError("Element %s was of class %s. Expected class %s", el->GetUuid().c_str(), el->GetClassName().c_str(),
+            LogError("Element %s was of class %s. Expected class %s", el->GetID().c_str(), el->GetClassName().c_str(),
                 groupType.c_str());
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message",
-                "Element " + el->GetUuid() + " was of class " + el->GetClassName() + " but expected class " + groupType
+                "Element " + el->GetID() + " was of class " + el->GetClassName() + " but expected class " + groupType
                     + ".");
             return false;
         }
@@ -1596,9 +1595,9 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         // Get a set of parents and the number of children they have
         Object *par = el->GetParent();
         if (par == NULL) {
-            LogError("Parent of %s is null!", el->GetUuid().c_str());
+            LogError("Parent of %s is null!", el->GetID().c_str());
             m_infoObject.import("status", "FAILURE");
-            m_infoObject.import("message", "Parent of " + el->GetUuid() + " is null.");
+            m_infoObject.import("message", "Parent of " + el->GetID() + " is null.");
             return false;
         }
         if (doubleParent == NULL) {
@@ -1766,7 +1765,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 fi->SetZone(zone);
 
                 // syl->ResetFacsimile();
-                // syl->SetFacs(zone->GetUuid());
+                // syl->SetFacs(zone->GetID());
             }
         }
 
@@ -1929,7 +1928,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
     }
 
-    m_infoObject.import("uuid", parent->GetUuid());
+    m_infoObject.import("uuid", parent->GetID());
     m_infoObject.import("status", status);
     m_infoObject.import("message", message);
     return true;
@@ -1962,7 +1961,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         return false;
     }
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
-        Object *el = m_doc->GetDrawingPage()->FindDescendantByUuid(*it);
+        Object *el = m_doc->GetDrawingPage()->FindDescendantByID(*it);
 
         if (groupType == "neume") {
             // Keep the syl attached to the original syllable.
@@ -1972,7 +1971,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             if (currentParent == NULL) {
                 fparent = el->GetFirstAncestor(SYLLABLE);
                 assert(fparent);
-                uuidArray << fparent->GetUuid();
+                uuidArray << fparent->GetID();
                 sparent = fparent->GetFirstAncestor(LAYER);
                 assert(sparent);
                 currentParent = vrv_cast<Syllable *>(fparent);
@@ -2068,7 +2067,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                         delete zone;
                     }
                 }
-                uuidArray << newParent->GetUuid();
+                uuidArray << newParent->GetID();
                 sparent->AddChild(newParent);
                 sparent->ReorderByXPos();
             }
@@ -2088,7 +2087,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             if (elementIds.begin() == it) {
                 fparent = el->GetFirstAncestor(NEUME);
                 assert(fparent);
-                uuidArray << fparent->GetUuid();
+                uuidArray << fparent->GetID();
                 sparent = fparent->GetFirstAncestor(SYLLABLE);
                 assert(sparent);
                 currentParent = vrv_cast<Neume *>(fparent);
@@ -2111,7 +2110,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
 
                     el->MoveItselfTo(newParent);
                     fparent->ClearRelinquishedChildren();
-                    uuidArray << newParent->GetUuid();
+                    uuidArray << newParent->GetID();
                     sparent->AddChild(newParent);
                     sparent->ReorderByXPos();
 
@@ -2162,7 +2161,7 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
-    Neume *el = dynamic_cast<Neume *>(m_doc->GetDrawingPage()->FindDescendantByUuid(elementId));
+    Neume *el = dynamic_cast<Neume *>(m_doc->GetDrawingPage()->FindDescendantByID(elementId));
     if (el == NULL) {
         LogError("Unable to find neume with id %s", elementId.c_str());
         m_infoObject.import("status", "FAILURE");
@@ -2252,7 +2251,7 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         initialLry = newLry;
         prevNc = newNc;
     }
-    m_infoObject.import("uuid", el->GetUuid());
+    m_infoObject.import("uuid", el->GetID());
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
     return true;
@@ -2277,9 +2276,9 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         return false;
     }
 
-    Nc *firstNc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByUuid(firstNcId));
+    Nc *firstNc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByID(firstNcId));
     assert(firstNc);
-    Nc *secondNc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByUuid(secondNcId));
+    Nc *secondNc = vrv_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByID(secondNcId));
     assert(secondNc);
     Zone *zone = new Zone();
     // set ligature to false and update zone of second Nc
@@ -2357,7 +2356,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     assert(element);
     if (element == NULL) {
         LogError("No element exists with ID '%s'.", elementId.c_str());
@@ -2443,7 +2442,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         m_infoObject.import("status", "WARNING");
         m_infoObject.import("message", "Moving to the same staff as before.");
         m_infoObject.import("elementId", elementId);
-        m_infoObject.import("newStaffId", staff->GetUuid());
+        m_infoObject.import("newStaffId", staff->GetID());
         return true;
     }
 
@@ -2484,7 +2483,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
         // Adjust clefline
         if (!AdjustClefLineFromPosition(dynamic_cast<Clef *>(element), staff)) {
-            LogError("Could not adjust clef line of %s", element->GetUuid().c_str());
+            LogError("Could not adjust clef line of %s", element->GetID().c_str());
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Failed to set clef line from facsimile.");
             return false;
@@ -2513,11 +2512,11 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         parent->ClearRelinquishedChildren();
         parent->ReorderByXPos();
         if (!AdjustPitchFromPosition(element)) {
-            LogError("Could not adjust pitch of %s", element->GetUuid().c_str());
+            LogError("Could not adjust pitch of %s", element->GetID().c_str());
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Failed to properly set pitch.");
-            m_infoObject.import("elementId", element->GetUuid());
-            m_infoObject.import("newStaffId", staff->GetUuid());
+            m_infoObject.import("elementId", element->GetID());
+            m_infoObject.import("newStaffId", staff->GetID());
             return false;
         }
     }
@@ -2525,7 +2524,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
     m_infoObject.import("elementId", elementId);
-    m_infoObject.import("newStaffId", staff->GetUuid());
+    m_infoObject.import("newStaffId", staff->GetID());
     return true;
 }
 
@@ -2817,7 +2816,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             pi->SetPname(PITCHNAME_g);
         }
         else {
-            LogError("Clef %s does not have valid shape. Shape is %s", clef->GetUuid().c_str(), clef->GetShape());
+            LogError("Clef %s does not have valid shape. Shape is %s", clef->GetID().c_str(), clef->GetShape());
             return false;
         }
         pi->SetOct(3);
@@ -2845,7 +2844,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         syl->FindAllDescendantsByComparison(&pitchedChildren, &ic);
 
         if (pitchedChildren.empty()) {
-            LogWarning("Syllable had no pitched children to reorder for syllable %s", obj->GetUuid().c_str());
+            LogWarning("Syllable had no pitched children to reorder for syllable %s", obj->GetID().c_str());
             return true;
         }
 
@@ -2867,7 +2866,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             case CLEFSHAPE_F: pname = PITCHNAME_f; break;
             case CLEFSHAPE_G: pname = PITCHNAME_g; break;
             default:
-                LogError("Clef %s does not have valid shape. Shape is %s", clef->GetUuid().c_str(), clef->GetShape());
+                LogError("Clef %s does not have valid shape. Shape is %s", clef->GetID().c_str(), clef->GetShape());
                 return false;
         }
 
@@ -2876,7 +2875,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         for (auto it = pitchedChildren.begin(); it != pitchedChildren.end(); ++it) {
             FacsimileInterface *fi = (*it)->GetFacsimileInterface();
             if (fi == NULL || !fi->HasFacs()) {
-                LogError("Could not adjust pitch: child %s does not have facsimile data", (*it)->GetUuid().c_str());
+                LogError("Could not adjust pitch: child %s does not have facsimile data", (*it)->GetID().c_str());
                 return false;
             }
 
@@ -2905,7 +2904,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
     else {
         LogError("AdjustPitchFromPosition should only be called on custos or syllables."
                  "It has been called on %s, whose id is %s",
-            obj->GetClassName().c_str(), obj->GetUuid().c_str());
+            obj->GetClassName().c_str(), obj->GetID().c_str());
         return false;
     }
 }

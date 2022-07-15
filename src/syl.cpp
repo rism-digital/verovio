@@ -19,10 +19,15 @@
 #include "measure.h"
 #include "note.h"
 #include "staff.h"
+#include "text.h"
 #include "textelement.h"
 #include "verse.h"
 #include "vrv.h"
 #include "zone.h"
+
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
 
 namespace vrv {
 
@@ -157,7 +162,7 @@ int Syl::PrepareLyrics(FunctorParams *functorParams)
         else if (params->m_currentSyl->GetCon() == sylLog_CON_u) {
             if (params->m_currentSyl->GetStart() == params->m_penultimateNoteOrChord)
                 LogWarning("Syllable with underline extender under one single note '%s'",
-                    params->m_currentSyl->GetStart()->GetUuid().c_str());
+                    params->m_currentSyl->GetStart()->GetID().c_str());
             else
                 params->m_currentSyl->SetEnd(params->m_penultimateNoteOrChord);
         }
@@ -183,6 +188,20 @@ int Syl::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
     return TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
+}
+
+int Syl::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    const int startTime = params->m_totalTime + params->m_lastNote->GetScoreTimeOnset();
+    Text *text = vrv_cast<Text *>(this->GetChild(0, TEXT));
+    const std::string sylText = UTF16to8(text->GetText());
+
+    params->m_midiFile->addLyric(params->m_midiTrack, startTime * params->m_midiFile->getTPQ(), sylText);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int Syl::ResetData(FunctorParams *functorParams)
@@ -221,8 +240,8 @@ bool Syl::CreateDefaultZone(Doc *doc)
         int ulx, uly, lrx, lry;
         if (syllable->GenerateZoneBounds(&ulx, &uly, &lrx, &lry)) {
             if (ulx == 0 || uly == 0 || lrx == 0 || lry == 0) {
-                LogWarning("Zero value when generating bbox from %s: (%d, %d, %d, %d)", syllable->GetUuid().c_str(),
-                    ulx, uly, lrx, lry);
+                LogWarning("Zero value when generating bbox from %s: (%d, %d, %d, %d)", syllable->GetID().c_str(), ulx,
+                    uly, lrx, lry);
             }
             zone->SetUlx(ulx);
             zone->SetUly(uly + offsetUly);
@@ -230,8 +249,7 @@ bool Syl::CreateDefaultZone(Doc *doc)
             zone->SetLry(lry + offsetLry);
         }
         else {
-            LogWarning(
-                "Failed to create zone for %s of type %s", this->GetUuid().c_str(), this->GetClassName().c_str());
+            LogWarning("Failed to create zone for %s of type %s", this->GetID().c_str(), this->GetClassName().c_str());
             delete zone;
             return false;
         }

@@ -383,7 +383,7 @@ int main(int argc, char **argv)
             case 'x':
                 seed = atoi(optarg);
                 options->m_xmlIdSeed.SetValue(seed);
-                vrv::Object::SeedUuid(seed);
+                vrv::Object::SeedID(seed);
                 break;
 
             case 'z':
@@ -447,10 +447,15 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
-        && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae") && (outformat != "pb-mei")) {
+    if (outformat == "pb-mei") {
+        outformat = "mei-pb";
+        vrv::LogWarning("Output to 'pb-mei' is deprecated, use 'mei-pb' instead.");
+    }
+    if ((outformat != "svg") && (outformat != "mei") && (outformat != "mei-basic") && (outformat != "mei-pb")
+        && (outformat != "midi") && (outformat != "timemap") && (outformat != "humdrum") && (outformat != "hum")
+        && (outformat != "pae")) {
         std::cerr << "Output format (" << outformat
-                  << ") can only be 'mei', 'pb-mei', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
+                  << ") can only be 'mei', 'mei-basic', 'mei-pb', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
         exit(1);
     }
 
@@ -470,6 +475,11 @@ int main(int argc, char **argv)
     }
     else {
         outfile = removeExtension(outfile);
+    }
+
+    // Skip the layout for MIDI and timemap output
+    if ((outformat == "midi") || (outformat == "timemap")) {
+        toolkit.SkipLayoutOnLoad(true);
     }
 
     // Load the std input or load the file
@@ -697,11 +707,13 @@ int main(int argc, char **argv)
         }
     }
     else {
-        const char *scoreBased = (outformat == "mei") ? "true" : "false";
+        const char *scoreBased = (outformat == "mei-pb") ? "false" : "true";
+        const char *basic = (outformat == "mei-basic") ? "true" : "false";
         const char *removeIds = (options->m_removeIds.GetValue()) ? "true" : "false";
         outfile += ".mei";
         if (all_pages) {
-            std::string params = vrv::StringFormat("{'scoreBased': %s, 'removeIds': %s}", scoreBased, removeIds);
+            std::string params
+                = vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'removeIds': %s}", scoreBased, basic, removeIds);
             if (std_output) {
                 std::string output;
                 std::cout << toolkit.GetMEI(params);
@@ -714,8 +726,8 @@ int main(int argc, char **argv)
             }
         }
         else {
-            std::string params
-                = vrv::StringFormat("{'scoreBased': %s, 'pageNo': %d, 'removeIds': %s}", scoreBased, page, removeIds);
+            std::string params = vrv::StringFormat(
+                "{'scoreBased': %s, 'basic': %s, 'pageNo': %d, 'removeIds': %s}", scoreBased, basic, page, removeIds);
             if (std_output) {
                 std::cout << toolkit.GetMEI(params);
             }

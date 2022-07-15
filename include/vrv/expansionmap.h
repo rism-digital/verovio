@@ -43,17 +43,17 @@ public:
      */
     void Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &existingList, Object *prevSection);
 
-    std::vector<std::string> GetExpansionIdsForElement(const std::string &xmlId);
+    std::vector<std::string> GetExpansionIDsForElement(const std::string &xmlId);
 
 private:
-    bool UpdateIds(Object *object);
+    bool UpdateIDs(Object *object);
 
-    void GetUuidList(Object *object, std::vector<std::string> &idList);
+    void GetIDList(Object *object, std::vector<std::string> &idList);
 
-    void GeneratePredictableIds(Object *source, Object *target);
+    void GeneratePredictableIDs(Object *source, Object *target);
 
     /** Ads an id string to an original/notated id */
-    bool AddExpandedIdToExpansionMap(const std::string &origXmlId, std::string newXmlId);
+    bool AddExpandedIDToExpansionMap(const std::string &origXmlId, std::string newXmlId);
 
 public:
     /** The expansion map indicates which xmlId has been repeated (expanded) elsewhere */

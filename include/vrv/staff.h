@@ -98,13 +98,13 @@ public:
     /**
      * Return the drawing staff size for staff notation, including for tablature staves
      */
-    int GetDrawingStaffNotationSize();
+    int GetDrawingStaffNotationSize() const;
 
     /**
      * Check if the staff is currently visible.
      * Looks for the parent system and its current drawing scoreDef
      */
-    bool DrawingIsVisible();
+    bool DrawingIsVisible() const;
 
     /**
      * @name Get notation type
@@ -128,21 +128,24 @@ public:
     /**
      * Calculate the yRel for the staff given a @loc value
      */
-    int CalcPitchPosYRel(Doc *doc, int loc);
+    int CalcPitchPosYRel(const Doc *doc, int loc) const;
 
     /**
      * Getter for the StaffAlignment
      */
-    StaffAlignment *GetAlignment() const { return m_staffAlignment; }
+    ///@{
+    StaffAlignment *GetAlignment() { return m_staffAlignment; }
+    const StaffAlignment *GetAlignment() const { return m_staffAlignment; }
+    ///@}
 
     /**
      * Return the ledger line arrays
      */
     ///@{
-    const ArrayOfLedgerLines &GetLedgerLinesAbove() { return m_ledgerLinesAbove; }
-    const ArrayOfLedgerLines &GetLedgerLinesAboveCue() { return m_ledgerLinesAboveCue; }
-    const ArrayOfLedgerLines &GetLedgerLinesBelow() { return m_ledgerLinesBelow; }
-    const ArrayOfLedgerLines &GetLedgerLinesBelowCue() { return m_ledgerLinesBelowCue; }
+    const ArrayOfLedgerLines &GetLedgerLinesAbove() const { return m_ledgerLinesAbove; }
+    const ArrayOfLedgerLines &GetLedgerLinesAboveCue() const { return m_ledgerLinesAboveCue; }
+    const ArrayOfLedgerLines &GetLedgerLinesBelow() const { return m_ledgerLinesBelow; }
+    const ArrayOfLedgerLines &GetLedgerLinesBelowCue() const { return m_ledgerLinesBelowCue; }
     ///@}
 
     /**
@@ -158,25 +161,20 @@ public:
      * Used for calculating clustered information/dot position.
      * The *Doc is the parent doc but passed as param in order to avoid look-up
      */
-    bool IsOnStaffLine(int y, Doc *doc);
+    bool IsOnStaffLine(int y, const Doc *doc) const;
 
     /**
      * Find the nearest unit position in the direction indicated by place.
      * The *Doc is the parent doc but passed as param in order to avoid look-up
      */
-    int GetNearestInterStaffPosition(int y, Doc *doc, data_STAFFREL place);
+    int GetNearestInterStaffPosition(int y, const Doc *doc, data_STAFFREL place) const;
 
     /**
      * Set staff parameters based on
      * facsimile information (if it
      * exists).
      */
-    virtual void SetFromFacsimile(Doc *doc);
-
-    /**
-     * Set beam adjustment for the corresponding staff alignment
-     */
-    void SetAlignmentBeamAdjustment(int adjust);
+    void SetFromFacsimile(Doc *doc);
 
     //----------//
     // Functors //

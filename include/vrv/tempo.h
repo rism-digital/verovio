@@ -66,7 +66,7 @@ public:
      * @name Get the X drawing position
      */
     ///@{
-    int GetDrawingXRelativeToStaff(int staffN);
+    int GetDrawingXRelativeToStaff(int staffN) const;
 
     //----------//
     // Functors //
