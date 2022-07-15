@@ -35,7 +35,7 @@ public:
     ///@}
 
     /** Getter for level **/
-    EditorialLevel GetLevel() { return m_level; }
+    EditorialLevel GetLevel() const { return m_level; }
 
     /**
      * Add children to a apparatus.
