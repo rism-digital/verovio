@@ -207,19 +207,6 @@ bool MEIOutput::Export()
 
         // schema processing instruction
         std::string schema;
-        std::string version;
-        if (this->IsPageBasedMEI()) {
-            schema = "https://www.verovio.org/schema/dev/mei-verovio.rng";
-            version = "5.0.0-dev";
-        }
-        else if (this->GetBasic()) {
-            schema = "https://music-encoding.org/schema/dev/mei-basic.rng";
-            version = "4.0.1-rc1+basic";
-        }
-        else {
-            schema = "https://music-encoding.org/schema/dev/mei-all.rng";
-            version = "5.0.0-dev";
-        }
 
         decl = meiDoc.append_child(pugi::node_declaration);
         decl.set_name("xml-model");
@@ -240,6 +227,7 @@ bool MEIOutput::Export()
         m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
         AttConverter converter;
         meiVersion_MEIVERSION meiVersion = meiVersion_MEIVERSION(meiVersion_MEIVERSION_MAX - 1);
+        if (this->GetBasic()) meiVersion = meiVersion_MEIVERSION_4_0_1_rc1plusbasic;
         m_mei.append_attribute("meiversion") = (converter.MeiVersionMeiversionToStr(meiVersion)).c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
