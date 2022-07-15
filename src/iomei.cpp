@@ -238,9 +238,9 @@ bool MEIOutput::Export()
 
         m_mei = meiDoc.append_child("mei");
         m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
-        AttMeiVersion att;
+        AttConverter converter;
         meiVersion_MEIVERSION meiVersion = meiVersion_MEIVERSION(meiVersion_MEIVERSION_MAX - 1);
-        m_mei.append_attribute("meiversion") = (att.AttConverter::MeiVersionMeiversionToStr(meiVersion)).c_str();
+        m_mei.append_attribute("meiversion") = (converter.MeiVersionMeiversionToStr(meiVersion)).c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
         m_doc->ConvertToCastOffMensuralDoc(false);
@@ -3603,8 +3603,8 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
     if (root.attribute("meiversion")) {
         std::string version = std::string(root.attribute("meiversion").value());
-        AttMeiVersion att;
-        m_meiversion = att.AttConverter::StrToMeiVersionMeiversion(version);
+        AttConverter converter;
+        m_meiversion = converter.StrToMeiVersionMeiversion(version);
     }
     else {
         // default to MEI 5
