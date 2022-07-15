@@ -7,7 +7,7 @@ import PIL.Image as Image
 import PIL.ImageChops as ImageChops
 import PIL.ImageOps as ImageOps
 from diffimg import diff as pngdiff
-from jsondiff import diff as jsondiff
+from jsondiff import similarity as jsondiff
 from xmldiff.main import diff_trees as xmldiff
 
 ns = {'svg': 'http://www.w3.org/2000/svg'}
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
             timeMap1 = json.load(open(jsonFile1, 'r'))
             timeMap2 = json.load(open(jsonFile2, 'r'))
-            if jsondiff(timeMap1, timeMap2):
+            if jsondiff(timeMap1, timeMap2) != 1:
                 print(f'{name} produced a changed time map')
 
             diffValue = pngdiff(pngFile1, pngFile2, delete_diff_file=True)
