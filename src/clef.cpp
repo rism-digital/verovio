@@ -214,6 +214,8 @@ int Clef::AdjustBeams(FunctorParams *functorParams)
     const int currentBeamYRight = params->m_y1 + params->m_beamSlope * (this->GetContentRight() - params->m_x1);
     // get clef code and find its bounds on the staff (anchor point and top/bottom depending on the beam place)
     const wchar_t clefCode = this->GetClefGlyph(staff->m_drawingNotationType);
+    if (!clefCode) return FUNCTOR_SIBLINGS;
+
     const int clefPosition = staff->GetDrawingY()
         - params->m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - this->GetLine());
     const int clefBounds = clefPosition
@@ -225,10 +227,10 @@ int Clef::AdjustBeams(FunctorParams *functorParams)
     const int overlapMargin = std::min(leftMargin, rightMargin);
     if (overlapMargin >= 0) return FUNCTOR_CONTINUE;
     // calculate offset required for the beam
-    const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int unitChangeNumber = ((std::abs(overlapMargin) + 15) / staffOffset);
+    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int unitChangeNumber = ((std::abs(overlapMargin) + unit / 6) / unit);
     if (unitChangeNumber > 0) {
-        const int adjust = unitChangeNumber * staffOffset * params->m_directionBias;
+        const int adjust = unitChangeNumber * unit * params->m_directionBias;
         if (std::abs(adjust) > std::abs(params->m_overlapMargin)) params->m_overlapMargin = adjust;
     }
 

@@ -2057,12 +2057,12 @@ void Beam::SetElementShortening(int shortening)
         [shortening](BeamElementCoord *coord) { coord->m_maxShortening = shortening; });
 }
 
-int Beam::GetBeamPartDuration(int x, bool ignoreRests) const
+int Beam::GetBeamPartDuration(int x, bool includeRests) const
 {
     // find element with position closest to the specified coordinate
     const auto it = std::find_if(m_beamSegment.m_beamElementCoordRefs.begin(),
-        m_beamSegment.m_beamElementCoordRefs.end(), [x, ignoreRests](BeamElementCoord *coord) {
-            return (x < coord->m_x) && (!coord->m_element->Is(REST) || !ignoreRests);
+        m_beamSegment.m_beamElementCoordRefs.end(), [x, includeRests](BeamElementCoord *coord) {
+            return (x < coord->m_x) && (!coord->m_element->Is(REST) || includeRests);
         });
     // handle cases when coordinate is outside of the beam
     if (it == m_beamSegment.m_beamElementCoordRefs.end()) {
@@ -2072,17 +2072,16 @@ int Beam::GetBeamPartDuration(int x, bool ignoreRests) const
         return (*it)->m_dur;
     }
     // Get previous relevant element (skipping over rests if needed)
-    auto prevIt = it;
-    do {
-        prevIt = std::prev(prevIt);
-        if (prevIt == m_beamSegment.m_beamElementCoordRefs.begin()) break;
-    } while ((*prevIt)->m_element->Is(REST) && ignoreRests);
-    return std::min((*it)->m_dur, (*prevIt)->m_dur);
+    auto reverseIt = std::make_reverse_iterator(it);
+    reverseIt = std::find_if(reverseIt, m_beamSegment.m_beamElementCoordRefs.rend(),
+        [includeRests](BeamElementCoord *coord) { return (!coord->m_element->Is(REST) || includeRests); });
+    if (reverseIt != m_beamSegment.m_beamElementCoordRefs.rend()) return std::min((*it)->m_dur, (*reverseIt)->m_dur);
+    return (*it)->m_dur;    
 }
 
-int Beam::GetBeamPartDuration(const Object *object, bool ignoreRests) const
+int Beam::GetBeamPartDuration(const Object *object, bool includeRests) const
 {
-    return this->GetBeamPartDuration(object->GetDrawingX(), ignoreRests);
+    return this->GetBeamPartDuration(object->GetDrawingX(), includeRests);
 }
 
 //----------------------------------------------------------------------------
