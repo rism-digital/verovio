@@ -17,7 +17,6 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "elementpart.h"
-#include "note.h"
 #include "options.h"
 #include "smufl.h"
 #include "staff.h"
