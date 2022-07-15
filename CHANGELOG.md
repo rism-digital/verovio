@@ -5,7 +5,7 @@
 * Support for ES6 and improved npm package (@WolfgangDrescher)
 * Support for `@artic.ges` (@eNote-GmBH)
 * Support for transposition of scores without key signature (@eNote-GmBH)
-* Support for `dashedBarlineDashLength` and `dashedBarlineGapLength` in engraving defaults (@eNoteGmBH)
+* Support for `dashedBarlineDashLength` and `dashedBarlineGapLength` in engraving defaults (@eNote-GmBH)
 * Improved MIDI output with tuning, key signature and first verse (@eNote-GmBH)
 * Improved PAE output for measure rests
 * Improved mixed beam rendering (@eNote-GmBH)
