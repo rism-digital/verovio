@@ -211,6 +211,14 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter for MEI basic output
+     */
+    ///@{
+    void SetBasic(bool basic) { m_basic = basic; }
+    bool GetBasic() const { return m_basic; }
+    ///@}
+
+    /**
      * Score based filtering by measure, page or mdiv
      */
     ///@{
@@ -251,6 +259,13 @@ private:
      * Reset
      */
     void Reset();
+
+    /**
+     * Helper checking if the object is tree object in score-based MEI
+     * For MEI basic output, also check if objects marked as attribute need to be kept as element (e.g., accid)
+     * or if some need to be written as attributes (e.g. scoreDef/clef)
+     */
+    bool IsTreeObject(Object *object) const;
 
     /**
      * Score based filtering
@@ -523,6 +538,8 @@ private:
     std::ostringstream m_streamStringOutput;
     int m_indent;
     bool m_scoreBasedMEI;
+    /** A flag indicating that we want to produce MEI basic */
+    bool m_basic;
     pugi::xml_node m_mei;
 
     /** Current xml element */

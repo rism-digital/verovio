@@ -25,6 +25,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "fermata.h"
+#include "functorparams.h"
 #include "gracegrp.h"
 #include "keyaccid.h"
 #include "keysig.h"
@@ -73,11 +74,12 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    m_doc->GetCurrentScoreDef()->Save(this);
+    SaveParams saveParams(this, false);
+    m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
 
     m_docScoreDef = false;
 
-    m_doc->Save(this);
+    m_doc->SaveObject(saveParams);
 
     output = m_streamStringOutput.str();
 

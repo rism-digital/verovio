@@ -35,6 +35,7 @@ class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
 class Resources;
+class SaveParams;
 class ScoreDefInterface;
 class StemmedDrawingInterface;
 class TextDirInterface;
@@ -602,7 +603,7 @@ public:
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
-    virtual int Save(Output *output);
+    int SaveObject(SaveParams &saveParams);
 
     /**
      * Sort the child elements using std::stable_sort
@@ -802,6 +803,17 @@ public:
      * End Functor for Object::ConvertMarkupArtic
      */
     virtual int ConvertMarkupArticEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Move scoreDef clef, keySig, meterSig and mensur to staffDef.
+     * When a staffDef already has one, it is not replaced.
+     */
+    virtual int ConvertMarkupScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * End Functor for Object::ConvertMarkupScoreDef
+     */
+    virtual int ConvertMarkupScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method.

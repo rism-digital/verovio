@@ -107,6 +107,11 @@ public:
     ///@}
 
     /**
+     * See Object::ConvertMarkupScoreDef
+     */
+    int ConvertMarkupScoreDef(FunctorParams *) override;
+
+    /**
      * See Object::CastOffPages
      */
     int CastOffPages(FunctorParams *functorParams) override;

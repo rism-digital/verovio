@@ -154,6 +154,7 @@ MEIOutput::MEIOutput(Doc *doc) : Output(doc)
 {
     m_indent = 5;
     m_scoreBasedMEI = false;
+    m_basic = false;
     m_ignoreHeader = false;
     m_removeIds = false;
 
@@ -192,6 +193,10 @@ bool MEIOutput::Export()
                 return false;
             }
         }
+        if (this->IsPageBasedMEI() && this->GetBasic()) {
+            LogError("MEI output in page-based MEI is not possible with MEI basic");
+            return false;
+        }
 
         // Saving the entire document
         // * With score-based MEI, all mdivs are saved
@@ -201,8 +206,21 @@ bool MEIOutput::Export()
         decl.append_attribute("encoding") = "UTF-8";
 
         // schema processing instruction
-        const std::string schema = this->IsPageBasedMEI() ? "https://www.verovio.org/schema/dev/mei-verovio.rng"
-                                                          : "https://music-encoding.org/schema/dev/mei-all.rng";
+        std::string schema;
+        std::string version;
+        if (this->IsPageBasedMEI()) {
+            schema = "https://www.verovio.org/schema/dev/mei-verovio.rng";
+            version = "5.0.0-dev";
+        }
+        else if (this->GetBasic()) {
+            schema = "https://music-encoding.org/schema/dev/mei-basic.rng";
+            version = "4.0.1-rc1+basic";
+        }
+        else {
+            schema = "https://music-encoding.org/schema/dev/mei-all.rng";
+            version = "5.0.0-dev";
+        }
+
         decl = meiDoc.append_child(pugi::node_declaration);
         decl.set_name("xml-model");
         decl.append_attribute("href") = schema.c_str();
@@ -220,13 +238,14 @@ bool MEIOutput::Export()
 
         m_mei = meiDoc.append_child("mei");
         m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
-        m_mei.append_attribute("meiversion") = "5.0.0-dev";
+        m_mei.append_attribute("meiversion") = version.c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
         m_doc->ConvertToCastOffMensuralDoc(false);
 
         // this starts the call of all the functors
-        m_doc->Save(this);
+        SaveParams saveParams(this, this->GetBasic());
+        m_doc->SaveObject(saveParams);
 
         // Redo the mensural segment cast of if necessary
         m_doc->ConvertToCastOffMensuralDoc(true);
@@ -357,7 +376,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
 
     // ScoreDef related
     else if (object->Is(GRPSYM)) {
-        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("grpSym");
+        if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("grpSym");
         this->WriteGrpSym(m_currentNode, vrv_cast<GrpSym *>(object));
     }
     else if (object->Is(INSTRDEF)) {
@@ -463,7 +482,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteDynam(m_currentNode, vrv_cast<Dynam *>(object));
     }
     else if (object->Is(FERMATA)) {
-        if (!object->IsAttribute()) {
+        if (IsTreeObject(object)) {
             m_currentNode = m_currentNode.append_child("fermata");
             this->WriteFermata(m_currentNode, vrv_cast<Fermata *>(object));
         }
@@ -522,7 +541,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteTempo(m_currentNode, vrv_cast<Tempo *>(object));
     }
     else if (object->Is(TIE)) {
-        if (!object->IsAttribute()) {
+        if (this->IsTreeObject(object)) {
             m_currentNode = m_currentNode.append_child("tie");
             this->WriteTie(m_currentNode, vrv_cast<Tie *>(object));
         }
@@ -539,12 +558,14 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     // Layer elements
     else if (object->Is(ACCID)) {
         // Do not add a node for object representing an attribute
-        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("accid");
+        // Exception: always write them as element in MEI basic
+        if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("accid");
         this->WriteAccid(m_currentNode, vrv_cast<Accid *>(object));
     }
     else if (object->Is(ARTIC)) {
         // Do not add a node for object representing an attribute
-        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("artic");
+        // Exception: always write them as element in MEI basic
+        if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("artic");
         this->WriteArtic(m_currentNode, vrv_cast<Artic *>(object));
     }
     else if (object->Is(BARLINE)) {
@@ -568,7 +589,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteChord(m_currentNode, vrv_cast<Chord *>(object));
     }
     else if (object->Is(CLEF)) {
-        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("clef");
+        if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("clef");
         this->WriteClef(m_currentNode, vrv_cast<Clef *>(object));
     }
     else if (object->Is(CUSTOS)) {
@@ -596,13 +617,13 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteHalfmRpt(m_currentNode, vrv_cast<HalfmRpt *>(object));
     }
     else if (object->Is(KEYACCID)) {
-        if (!object->IsAttribute()) {
+        if (this->IsTreeObject(object)) {
             m_currentNode = m_currentNode.append_child("keyAccid");
             this->WriteKeyAccid(m_currentNode, vrv_cast<KeyAccid *>(object));
         }
     }
     else if (object->Is(KEYSIG)) {
-        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("keySig");
+        if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("keySig");
         this->WriteKeySig(m_currentNode, vrv_cast<KeySig *>(object));
     }
     else if (object->Is(LIGATURE)) {
@@ -610,11 +631,11 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteLigature(m_currentNode, vrv_cast<Ligature *>(object));
     }
     else if (object->Is(MENSUR)) {
-        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("mensur");
+        if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("mensur");
         this->WriteMensur(m_currentNode, vrv_cast<Mensur *>(object));
     }
     else if (object->Is(METERSIG)) {
-        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("meterSig");
+        if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("meterSig");
         this->WriteMeterSig(m_currentNode, vrv_cast<MeterSig *>(object));
     }
     else if (object->Is(MREST)) {
@@ -728,6 +749,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     }
 
     // Editorial markup
+    else if (object->IsEditorialElement() && this->GetBasic()) {
+        // Editorial markup in MEI basic output is skipped and no node should be created.
+        return true;
+    }
     else if (object->Is(ABBR)) {
         m_currentNode = m_currentNode.append_child("abbr");
         this->WriteAbbr(m_currentNode, vrv_cast<Abbr *>(object));
@@ -833,7 +858,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     }
 
     // Object representing an attribute have no node to push
-    if (!object->IsAttribute()) m_nodeStack.push_back(m_currentNode);
+    if (this->IsTreeObject(object)) m_nodeStack.push_back(m_currentNode);
 
     if (object->Is(SCORE)) {
         if (useCustomScoreDef) {
@@ -841,7 +866,8 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         }
         else {
             // Save the main scoreDef
-            m_doc->GetCurrentScoreDef()->Save(this);
+            SaveParams saveParams(this, this->GetBasic());
+            m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
         }
     }
 
@@ -865,8 +891,18 @@ bool MEIOutput::WriteObjectEnd(Object *object)
         }
         if (object->Is({ PAGE_MILESTONE_END, SYSTEM_MILESTONE_END })) {
             assert(!m_boundaries.empty() && (m_boundaries.top() == object));
-
             m_boundaries.pop();
+            // For system milestone ends that point to editorial markup, we need to make sure
+            // we stop here when outputting MEI basic because no node has been created for them
+            if (this->GetBasic() && object->Is(SYSTEM_MILESTONE_END)) {
+                SystemMilestoneEnd *milestoneEnd = vrv_cast<SystemMilestoneEnd *>(object);
+                assert(milestoneEnd && milestoneEnd->GetStart());
+                if (milestoneEnd->GetStart()->IsEditorialElement()) return true;
+            }
+        }
+        // For editorial markup in MEI basic, stop here because no node has been created
+        if (object->IsEditorialElement() && this->GetBasic()) {
+            return true;
         }
     }
     else {
@@ -888,7 +924,7 @@ bool MEIOutput::WriteObjectEnd(Object *object)
 bool MEIOutput::WriteObjectInternalEnd(Object *object)
 {
     // Object representing an attribute have no node to pop
-    if (object->IsAttribute()) {
+    if (!this->IsTreeObject(object)) {
         return true;
     }
 
@@ -896,6 +932,9 @@ bool MEIOutput::WriteObjectInternalEnd(Object *object)
         m_currentNode.append_child(pugi::node_comment).set_value(object->GetClosingComment().c_str());
     }
 
+    if (object->Is(DOC)) return true;
+
+    assert(!m_nodeStack.empty());
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
 
@@ -957,6 +996,28 @@ void MEIOutput::Reset()
 
     m_streamStringOutput.str("");
     m_streamStringOutput.clear();
+}
+
+bool MEIOutput::IsTreeObject(Object *object) const
+{
+    // In page-based MEI, only check if the object is an attribute or note
+    if (this->IsPageBasedMEI()) return !object->IsAttribute();
+
+    // These are not tree objects in score-based MEI
+    if (object->Is({ PAGES, PAGE, SYSTEM })) return false;
+
+    if (this->GetBasic()) {
+        // Always elements for accid, artic, fermata and tie in MEI basic
+        if (object->Is({ ACCID, ARTIC, FERMATA, TIE })) return true;
+
+        // Always attibutes for grpSym and keyAccid in MEI basic
+        if (object->Is({ GRPSYM, KEYACCID })) return false;
+
+        // Always attributes for clef, keySig and meterSig in MEI basic within a scoreDef
+        if (object->Is({ CLEF, KEYSIG, METERSIG }) && object->GetFirstAncestor(SCOREDEF)) return false;
+    }
+
+    return !object->IsAttribute();
 }
 
 bool MEIOutput::HasValidFilter() const
@@ -1114,7 +1175,7 @@ bool MEIOutput::ProcessScoreBasedFilter(Object *object)
         }
     }
 
-    if (!object->Is({ PAGES, PAGE, SYSTEM, SYSTEM_MILESTONE_END, PAGE_MILESTONE_END })) {
+    if (this->IsTreeObject(object)) {
         m_objectStack.push_back(object);
     }
 
@@ -1124,7 +1185,7 @@ bool MEIOutput::ProcessScoreBasedFilter(Object *object)
 bool MEIOutput::ProcessScoreBasedFilterEnd(Object *object)
 {
     // Pop current object or merged boundary from stack
-    if (!m_objectStack.empty()) {
+    if (this->IsTreeObject(object) && !m_objectStack.empty()) {
         m_objectStack.pop_back();
     }
 
@@ -1195,11 +1256,13 @@ void MEIOutput::WriteCustomScoreDef()
         }
 
         // Save the adjusted score def and delete it afterwards
-        scoreDef->Save(this);
+        SaveParams saveParams(this, this->GetBasic());
+        scoreDef->SaveObject(saveParams);
         delete scoreDef;
     }
     else {
-        m_doc->GetCurrentScoreDef()->Save(this);
+        SaveParams saveParams(this, this->GetBasic());
+        m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
     }
 }
 
@@ -1612,8 +1675,8 @@ void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
 {
     assert(grpSym);
 
-    // Only write att.symbol if representing an attribute
-    if (grpSym->IsAttribute()) {
+    // Only write att values if representing an attribute or in MEI basic
+    if (!this->IsTreeObject(grpSym)) {
         grpSym->WriteStaffGroupingSym(currentNode);
         return;
     }
@@ -2142,7 +2205,8 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     assert(accid);
 
     // Only write att.accidental and accidentalPerformed if representing an attribute
-    if (accid->IsAttribute()) {
+    // Execption for MEI basic
+    if (!this->IsTreeObject(accid)) {
         accid->WriteAccidental(currentNode);
         accid->WriteAccidentalGestural(currentNode);
         return;
@@ -2165,7 +2229,8 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
     assert(artic);
 
     // Only write att.articulation if representing an attribute
-    if (artic->IsAttribute()) {
+    // Execption for MEI basic
+    if (!this->IsTreeObject(artic)) {
         artic->WriteArticulation(currentNode);
         return;
     }
@@ -2241,7 +2306,8 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
 {
     assert(clef);
 
-    if (clef->IsAttribute()) {
+    // Only write att values if representing an attribute or in MEI basic
+    if (!this->IsTreeObject(clef)) {
         AttCleffingLog cleffingLog;
         cleffingLog.SetClefShape(clef->GetShape());
         cleffingLog.SetClefLine(clef->GetLine());
@@ -2333,7 +2399,8 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
 {
     assert(keySig);
 
-    if (keySig->IsAttribute()) {
+    // Only write att values if representing an attribute or in MEI basic
+    if (!this->IsTreeObject(keySig)) {
         AttKeySigDefaultAnl attKeySigDefaultAnl;
         // Broken in MEI 4.0.2 - waiting for a fix
         // attKeySigDefaultAnl.SetKeyAccid(keySig->GetAccid());
@@ -2341,7 +2408,9 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
         attKeySigDefaultAnl.SetKeyPname(keySig->GetPname());
         attKeySigDefaultAnl.WriteKeySigDefaultAnl(currentNode);
         AttKeySigDefaultLog attKeySigDefaultLog;
-        attKeySigDefaultLog.SetKeySig(keySig->GetSig());
+        // If there is no @sig, try to build it from the keyAccid children.
+        const data_KEYSIGNATURE sig = (keySig->HasSig()) ? keySig->GetSig() : keySig->ConvertToSig();
+        attKeySigDefaultLog.SetKeySig(sig);
         attKeySigDefaultLog.WriteKeySigDefaultLog(currentNode);
         AttKeySigDefaultVis attKeySigDefaultVis;
         attKeySigDefaultVis.SetKeysigShow(keySig->GetVisible());
@@ -2371,7 +2440,7 @@ void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
 {
     assert(mensur);
 
-    if (mensur->IsAttribute()) {
+    if (!this->IsTreeObject(mensur)) {
         AttMensuralLog mensuralLog;
 
         mensuralLog.SetProportNum(mensur->GetNum());
@@ -2407,7 +2476,8 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
 {
     assert(meterSig);
 
-    if (meterSig->IsAttribute()) {
+    // Only write att values if representing an attribute or in MEI basic
+    if (!this->IsTreeObject(meterSig)) {
         AttMeterSigDefaultLog meterSigDefaultLog;
         meterSigDefaultLog.SetMeterCount(meterSig->GetCount());
         meterSigDefaultLog.SetMeterSym(meterSig->GetSym());
@@ -3531,7 +3601,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
     if (root.attribute("meiversion")) {
         std::string version = std::string(root.attribute("meiversion").value());
-        if (version == "5.0.0-dev") {
+        if (version == "5.0.0-dev" || version == "4.0.1-rc1+basic") {
             m_version = MEI_5_0_0_dev;
         }
         else if (version == "4.0.1") {
@@ -4400,6 +4470,12 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 
     if (m_version < MEI_4_0_0) {
         UpgradeScoreDefElementTo_4_0_0(scoreDef, vrvScoreDef);
+    }
+
+    if (m_doc->GetOptions()->m_moveScoreDefinitionToStaff.GetValue()) {
+        if (vrvScoreDef->HasClefInfo() || vrvScoreDef->HasKeySigInfo() || vrvScoreDef->HasMeterSigGrpInfo()
+            || vrvScoreDef->HasMeterSigInfo() || vrvScoreDef->HasMensurInfo())
+            m_doc->SetMarkup(MARKUP_SCOREDEF_DEFINITIONS);
     }
 
     this->ReadScoreDefInterface(scoreDef, vrvScoreDef);

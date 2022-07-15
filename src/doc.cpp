@@ -1382,6 +1382,15 @@ void Doc::ConvertMarkupDoc(bool permanent)
             }
         }
     }
+
+    if (m_markup & MARKUP_SCOREDEF_DEFINITIONS) {
+        LogMessage("Converting scoreDef markup...");
+        Functor convertMarkupScoreDef(&Object::ConvertMarkupScoreDef);
+        Functor convertMarkupScoreDefEnd(&Object::ConvertMarkupScoreDefEnd);
+        ConvertMarkupScoreDefParams convertMarkupScoreDefParams(
+            this, &convertMarkupScoreDef, &convertMarkupScoreDefEnd);
+        this->Process(&convertMarkupScoreDef, &convertMarkupScoreDefParams, &convertMarkupScoreDefEnd);
+    }
 }
 
 void Doc::TransposeDoc()

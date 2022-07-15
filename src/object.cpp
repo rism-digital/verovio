@@ -1157,10 +1157,8 @@ bool Object::FiltersApply(const Filters *filters, Object *object) const
     return filters ? filters->Apply(object) : true;
 }
 
-int Object::Save(Output *output)
+int Object::SaveObject(SaveParams &saveParams)
 {
-    SaveParams saveParams(output);
-
     Functor save(&Object::Save);
     // Special case where we want to process all objects
     save.m_visibleOnly = false;

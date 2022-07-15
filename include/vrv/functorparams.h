@@ -49,6 +49,7 @@ class Object;
 class Page;
 class Pedal;
 class ScoreDef;
+class ScoreDefElement;
 class Slur;
 class Staff;
 class StaffAlignment;
@@ -1335,6 +1336,32 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// ConvertMarkupScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the scoreDef we are moving the content from
+ * member 1: the doc
+ * member 2: the functor
+ * member 3: the end functor
+ **/
+
+class ConvertMarkupScoreDefParams : public FunctorParams {
+public:
+    ConvertMarkupScoreDefParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    {
+        m_currentScoreDef = NULL;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+    ScoreDefElement *m_currentScoreDef;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
+};
+
+//----------------------------------------------------------------------------
 // ConvertToCastOffMensuralParams
 //----------------------------------------------------------------------------
 
@@ -2473,12 +2500,18 @@ public:
 
 /**
  * member 0: output stream
+ * member 1: flag for MEI basic output for filtering out editorial markup
  **/
 
 class SaveParams : public FunctorParams {
 public:
-    SaveParams(Output *output) { m_output = output; }
+    SaveParams(Output *output, bool basic)
+    {
+        m_output = output;
+        m_basic = basic;
+    }
     Output *m_output;
+    bool m_basic;
 };
 
 //----------------------------------------------------------------------------

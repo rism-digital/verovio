@@ -238,6 +238,52 @@ int KeySig::GetFifthsInt() const
     return 0;
 }
 
+data_KEYSIGNATURE KeySig::ConvertToSig() const
+{
+    data_KEYSIGNATURE sig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
+    const ListOfConstObjects &childList = this->GetList(this);
+    if (childList.size() > 1) {
+        data_ACCIDENTAL_WRITTEN accidType = ACCIDENTAL_WRITTEN_NONE;
+        bool isCommon = true;
+        int pos = 0;
+        for (auto &child : childList) {
+            const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
+            assert(keyAccid);
+            data_ACCIDENTAL_WRITTEN curType = keyAccid->GetAccid();
+            if (curType == ACCIDENTAL_WRITTEN_n) {
+                // Skip naturals encoded explicitly
+                continue;
+            }
+            // We have not a key sig type at this stage
+            if (accidType == ACCIDENTAL_WRITTEN_NONE) {
+                if (curType == ACCIDENTAL_WRITTEN_s || curType == ACCIDENTAL_WRITTEN_f) {
+                    accidType = curType;
+                }
+            }
+            if (accidType != curType) {
+                LogWarning("All the keySig content cannot be converted to @sig because the accidental type is not a "
+                           "flat or a sharp, or mixes them");
+                break;
+            }
+            if (accidType == ACCIDENTAL_WRITTEN_f && s_pnameForFlats[pos] != keyAccid->GetPname()) {
+                isCommon = false;
+                break;
+            }
+            else if (accidType == ACCIDENTAL_WRITTEN_s && s_pnameForSharps[pos] != keyAccid->GetPname()) {
+                isCommon = false;
+                break;
+            }
+            pos++;
+        }
+        if (!isCommon) {
+            LogWarning("KeySig content cannot be converted to @sig because the accidental series is not standard");
+            return sig;
+        }
+        sig = std::make_pair(pos, accidType);
+    }
+    return sig;
+}
+
 //----------------------------------------------------------------------------
 // Static methods for KeySig
 //----------------------------------------------------------------------------

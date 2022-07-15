@@ -913,7 +913,8 @@ Options::Options()
     m_scale.SetShortOption('s', false);
     m_baseOptions.AddOption(&m_scale);
 
-    m_outputTo.SetInfo("Output to", "Select output format to: \"mei\", \"pb-mei\", \"svg\", or \"midi\"");
+    m_outputTo.SetInfo(
+        "Output to", "Select output format to: \"mei\", \"mei-pb\", \"mei-basic\", \"svg\", or \"midi\"");
     m_outputTo.Init("svg");
     m_outputTo.SetKey("outputTo");
     m_outputTo.SetShortOption('t', true);
@@ -1016,6 +1017,11 @@ Options::Options()
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_general);
+
+    m_moveScoreDefinitionToStaff.SetInfo("Move score definition to staff",
+        "Move score definition (clef, keySig, meterSig, etc.) from scoreDef to staffDef");
+    m_moveScoreDefinitionToStaff.Init(false);
+    this->Register(&m_moveScoreDefinitionToStaff, "moveScoreDefinitionToStaff", &m_general);
 
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
