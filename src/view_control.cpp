@@ -2737,7 +2737,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         const int y2 = y1 + extend.m_height + unit * 2 / 3;
         const int lineWidth = m_options->m_repeatEndingLineThickness.GetValue() * unit;
-        
+
         const int staffLineWidth = m_options->m_staffLineWidth.GetValue() * unit;
         const int startX = x1 - staffLineWidth;
         const int endX = (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD))
