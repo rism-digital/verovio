@@ -231,6 +231,7 @@ jobs:
             message: "Building toolkit without humdrum as wasm"
             options: "-c -H -w -M"
             filepath: "verovio*wasm*"
+            upload: true
           - target: default
             message: "Building default toolkit with humdrum"
             options: "-c -M"
@@ -269,10 +270,12 @@ jobs:
         run: ./buildToolkit ${{ matrix.toolkit.options }}
 
       - name: Copy build into TEMP_DIR
+        if: ${{ matrix.toolkit.upload == true }}
         working-directory: ${{ github.workspace }}/emscripten
         run: cp build/${{ matrix.toolkit.filepath }} $GITHUB_WORKSPACE/$TEMP_DIR/
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
+        if: ${{ matrix.toolkit.upload == true }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.TOOLKIT_BUILD }}
