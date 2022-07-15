@@ -43,9 +43,10 @@ public:
     ///@}
     bool IsSupportedChild(Object *object) override;
 
-    Zone *FindZoneByID(std::string zoneId);
-    int GetMaxY();
-    int GetMaxX();
+    Zone *FindZoneByID(const std::string &zoneId);
+    const Zone *FindZoneByID(const std::string &zoneId) const;
+    int GetMaxX() const;
+    int GetMaxY() const;
 };
 
 } // namespace vrv
