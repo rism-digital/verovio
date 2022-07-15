@@ -1,6 +1,18 @@
 # Changelog
 
 ## [unreleased]
+* Support for MEI-basic output
+* Support for ES6 and improved npm package (@WolfgangDrescher)
+* Support for `@artic.ges` (@eNote-GmBH)
+* Support for transposition of scores without key signature (@eNote-GmBH)
+* Support for `dashedBarlineDashLength` and `dashedBarlineGapLength` in engraving defaults (@eNoteGmBH)
+* Improved MIDI output with tuning, key signature and first verse (@eNote-GmBH)
+* Improved PAE output for measure rests
+* Improved mixed beam rendering (@eNote-GmBH)
+* Option --score-definition-to-staff for moving `clef`, `keySig`, `meterSig` and `meterSigGrp` to `staffDef`
+* Option --beam-mixed-stem-min and --beam-mixed-preserve for controlling mixed beam flipping (@eNote-GmBH)
+* Option --condense-not-last-system for making sure the last system of a score is always shown
+
 
 ## [3.10.0] - 2022-05-25
 * Support for `accid@place` (@eNote-GmBH)
