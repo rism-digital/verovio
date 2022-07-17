@@ -150,11 +150,14 @@ my $FILENAME = "verovio-toolkit$FLAGS_NAME.js";
 
 my $DATA_DIR  = "data";
 my $BUILD_DIR = "build";
-$BUILD_DIR .= "/$VERSION" if $VERSION;
+my $OUTPUT_DIR = $BUILD_DIR;
+$OUTPUT_DIR .= "/$VERSION" if $VERSION;
 
 print "Compiled files will be written to $BUILD_DIR\n";
+print "Output files will be written to $OUTPUT_DIR\n";
 
 `mkdir -p $BUILD_DIR`;
+`mkdir -p $OUTPUT_DIR`;
 `mkdir -p $DATA_DIR`;
 
 syncSvgResources($exclusion);
@@ -246,24 +249,19 @@ if ($? == 0) {
     # skip prebundled wasm module with verovio toolkit for modularized builds
     if(!$modularizeQ) {
         `npm --prefix npm install`;
-        `npm --prefix npm run prebundle -- -o "\$(pwd)/$BUILD_DIR/$FILENAME"`;
-
-        if (!$wasmQ && !$VERSION) {
-            my $warning = "\nconsole.warn('The use of this build of the JS toolkit is deprecated. See https://github.com/rism-digital/verovio/discussions/2897');";
-            `echo "$warning" >> $BUILD_DIR/$FILENAME`;
-        }
+        `npm --prefix npm run prebundle -- -o "\$(pwd)/$OUTPUT_DIR/$FILENAME"`;
 
         # create a gzip version
-        `(cd $BUILD_DIR && gzip -c $FILENAME > $FILENAME.gz)`;
-        print "$BUILD_DIR/$FILENAME.gz was created\n";
+        `(cd $OUTPUT_DIR && gzip -c $FILENAME > $FILENAME.gz)`;
+        print "$OUTPUT_DIR/$FILENAME.gz was created\n";
 
         # all good
-        print "$BUILD_DIR/$FILENAME was created\n";
+        print "$OUTPUT_DIR/$FILENAME was created\n";
 
         # create also a zip file if version name is given
         if ($VERSION) {
-            `(cd $BUILD_DIR && zip $FILENAME.zip $FILENAME)`;
-            print "$BUILD_DIR/$FILENAME.zip was created\n";
+            `(cd $OUTPUT_DIR && zip $FILENAME.zip $FILENAME)`;
+            print "$OUTPUT_DIR/$FILENAME.zip was created\n";
         }
     }
 
