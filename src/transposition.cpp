@@ -45,14 +45,16 @@
 
 #include "transposition.h"
 
+//----------------------------------------------------------------------------
+
 #include <cctype>
 #include <iostream>
 #include <regex>
 #include <string>
 #include <vector>
 
-#include "attdef.h"
-#include "atttypes.h"
+//----------------------------------------------------------------------------
+
 #include "vrv.h"
 #include "vrvdef.h"
 

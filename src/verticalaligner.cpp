@@ -21,6 +21,7 @@
 #include "functorparams.h"
 #include "scoredef.h"
 #include "slur.h"
+#include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"

@@ -5,6 +5,8 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
+#include "layerelement.h"
+
 //----------------------------------------------------------------------------
 
 #include <algorithm>

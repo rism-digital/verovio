@@ -16,21 +16,13 @@
 //----------------------------------------------------------------------------
 
 #include "bboxdevicecontext.h"
-#include "comparison.h"
-#include "devicecontext.h"
-#include "doc.h"
-#include "ftrem.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "layerelement.h"
-#include "measure.h"
 #include "note.h"
 #include "options.h"
 #include "slur.h"
 #include "staff.h"
-#include "system.h"
-#include "timeinterface.h"
-#include "vrv.h"
 
 namespace vrv {
 

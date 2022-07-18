@@ -21,7 +21,6 @@
 #include "measure.h"
 #include "system.h"
 #include "text.h"
-#include "transposition.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 

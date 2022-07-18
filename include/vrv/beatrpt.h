@@ -10,7 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
-#include "beam.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {

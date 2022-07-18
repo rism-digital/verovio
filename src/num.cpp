@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "text.h"
 #include "vrv.h"
 
 namespace vrv {

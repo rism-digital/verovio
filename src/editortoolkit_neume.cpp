@@ -36,8 +36,6 @@
 
 //--------------------------------------------------------------------------------
 
-#include "jsonxx.h"
-
 namespace vrv {
 
 bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
