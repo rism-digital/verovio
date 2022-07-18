@@ -1085,7 +1085,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         }
         m_infoObject.import("uuid", custos->GetUuid());
     }
-    else if(elementType == "accid"){
+    else if (elementType == "accid"){
         Accid *accid = new Accid();
         data_ACCIDENTAL_WRITTEN accidTypeW = ACCIDENTAL_WRITTEN_NONE;
 
@@ -1100,7 +1100,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
             }
         }
-         if (accidTypeW == ACCIDENTAL_WRITTEN_NONE) {
+        if (accidTypeW == ACCIDENTAL_WRITTEN_NONE) {
             LogError("A accid type must be specified.");
             delete accid;
 

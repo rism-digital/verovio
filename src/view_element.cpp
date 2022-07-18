@@ -269,7 +269,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x,y;
     if ((m_doc->GetType() == Facs) && (accid->HasFacs())){
         x = accid->GetDrawingX();
-        y = ToLogicalY(staff->GetDrawingY());
+        y = ToLogicalY(accid->GetDrawingY());
+        // y = ToLogicalY(staff->GetDrawingY());
         // y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
     }
     else{
