@@ -285,12 +285,11 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
-int Measure::GetRightBarLineWidth(const Doc *doc) const
+int Measure::CalculateRightBarLineWidth(Doc *doc, int staffSize)
 {
     const BarLine *barline = this->GetRightBarLine();
     if (!barline) return 0;
 
-    const int staffSize = 100;
     const int barLineWidth = doc->GetDrawingBarLineWidth(staffSize);
     const int barLineThickWidth
         = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_thickBarlineThickness.GetValue();
@@ -300,16 +299,16 @@ int Measure::GetRightBarLineWidth(const Doc *doc) const
     switch (barline->GetForm()) {
         case BARRENDITION_dbl:
         case BARRENDITION_dbldashed: {
-            width = barLineSeparation + barLineWidth / 2;
+            width = barLineSeparation + barLineWidth;
             break;
         }
         case BARRENDITION_rptend:
         case BARRENDITION_end: {
-            width = barLineSeparation + barLineWidth + barLineThickWidth / 2;
+            width = barLineSeparation + barLineWidth + barLineThickWidth;
             break;
         }
         case BARRENDITION_rptboth: {
-            width = 2 * barLineSeparation + barLineWidth / 2 + barLineThickWidth;
+            width = 2 * barLineSeparation + barLineWidth + barLineThickWidth;
             break;
         }
         default: break;
@@ -403,22 +402,21 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     assert(scoreDef);
 
     std::vector<Staff *> staves;
-    std::vector<int>::iterator iter;
-    std::vector<int> staffList;
+    std::set<int> staffList;
 
     // First get all the staffGrps
     ListOfObjects staffGrps = scoreDef->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
     for (auto &staffGrp : staffGrps) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>((staffGrp)->GetFirst(STAFFDEF));
-        if (staffDef) staffList.push_back(staffDef->GetN());
+        StaffDef *staffDef = vrv_cast<StaffDef *>((staffGrp)->FindDescendantByType(STAFFDEF));
+        if (staffDef && (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN)) staffList.insert(staffDef->GetN());
     }
 
     // Get the corresponding staves in the measure
-    for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
+    for (auto iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison matchN(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
+        Staff *staff = vrv_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
             continue;

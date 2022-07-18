@@ -189,7 +189,7 @@ public:
     /**
      * Return the width of the right barline based on the barline form
      */
-    int GetRightBarLineWidth(const Doc *doc) const;
+    int CalculateRightBarLineWidth(Doc *doc, int staffSize);
 
     /**
      * Return the width of the measure, including the barLine width
