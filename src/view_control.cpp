@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <iostream>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -24,7 +23,6 @@
 #include "comparison.h"
 #include "devicecontext.h"
 #include "dir.h"
-#include "doc.h"
 #include "dynam.h"
 #include "ending.h"
 #include "f.h"
@@ -36,7 +34,6 @@
 #include "hairpin.h"
 #include "harm.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "measure.h"
 #include "mordent.h"
 #include "note.h"
@@ -54,10 +51,7 @@
 #include "system.h"
 #include "tempo.h"
 #include "text.h"
-#include "textelement.h"
 #include "tie.h"
-#include "timeinterface.h"
-#include "timestamp.h"
 #include "trill.h"
 #include "turn.h"
 #include "vrv.h"

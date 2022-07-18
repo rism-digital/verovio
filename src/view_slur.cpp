@@ -16,7 +16,6 @@
 //----------------------------------------------------------------------------
 
 #include "bboxdevicecontext.h"
-#include "ftrem.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "layerelement.h"

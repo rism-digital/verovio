@@ -12,7 +12,6 @@
 
 #include "devicecontextbase.h"
 #include "scoredef.h"
-#include "smufl.h"
 #include "textelement.h"
 #include "vrvdef.h"
 

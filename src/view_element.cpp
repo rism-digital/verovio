@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <iostream>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -24,7 +23,6 @@
 #include "clef.h"
 #include "custos.h"
 #include "devicecontext.h"
-#include "doc.h"
 #include "dot.h"
 #include "dynam.h"
 #include "elementpart.h"
@@ -33,31 +31,25 @@
 #include "functorparams.h"
 #include "halfmrpt.h"
 #include "keyaccid.h"
-#include "keysig.h"
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
-#include "metersig.h"
 #include "mrest.h"
 #include "mrpt.h"
 #include "mrpt2.h"
 #include "mspace.h"
 #include "multirest.h"
 #include "multirpt.h"
-#include "neume.h"
 #include "note.h"
 #include "options.h"
-#include "proport.h"
 #include "rest.h"
 #include "smufl.h"
-#include "space.h"
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
 #include "system.h"
-#include "textelement.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
