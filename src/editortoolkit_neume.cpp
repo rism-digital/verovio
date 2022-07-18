@@ -2034,23 +2034,24 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
 
         if (par->GetClassId() == SYLLABLE) {
-            // Check if it is part of a linked/split syllable and unlink
+            // Check if it is part of a linked/split syllable
+            // unlink, group into two new syllables, and link new syllables
             Syllable *li = dynamic_cast<Syllable *>(par);
             assert(li);
             std::string linkedID;
-            if (li->HasPrecedes()) {
-                linkedID = li->GetPrecedes();
-                if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
-                Set(li->GetUuid(),"precedes","");
-                Set(linkedID,"follows","");
-                SetText(linkedID,"");
-            } 
-            else if (li->HasFollows()) {
+            if (li->HasFollows()) {
                 linkedID = li->GetFollows();
                 if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
+
+                // unlink
                 Set(li->GetUuid(),"follows","");
                 Set(linkedID,"precedes","");
                 SetText(li->GetUuid(),"");
+
+                // group into two new syllables
+                int idx = std::distance(elementIds.begin(), it);
+                Group("neume", std::vector<std::string>(elementIds.begin(), elementIds.begin()+idx));
+                Group("neume", std::vector<std::string>(elementIds.begin()+idx, elementIds.end()));
             }
         }
 
