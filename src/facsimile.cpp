@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "object.h"
 #include "surface.h"
 #include "vrv.h"
 #include "zone.h"

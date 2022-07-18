@@ -18,7 +18,6 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
-#include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
 #include "layer.h"
