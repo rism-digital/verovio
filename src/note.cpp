@@ -34,7 +34,6 @@
 #include "tabgrp.h"
 #include "tie.h"
 #include "timemap.h"
-#include "transposition.h"
 #include "tuning.h"
 #include "verse.h"
 #include "vrv.h"

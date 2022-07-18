@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "controlelement.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "measure.h"

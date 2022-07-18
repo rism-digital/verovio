@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "object.h"
 #include "vrv.h"
 
 namespace vrv {
