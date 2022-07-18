@@ -18,6 +18,7 @@
 #include "functorparams.h"
 #include "layer.h"
 #include "scoredefinterface.h"
+#include "smufl.h"
 #include "staff.h"
 
 namespace vrv {
