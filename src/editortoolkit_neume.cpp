@@ -98,10 +98,10 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse the insert action");
     }
-    else if (action == "moveOuttaSyllable") {
+    else if (action == "moveOutsideSyllable") {
         std::string elementId;
-        if (this->ParseMoveOuttaSyllableAction(json.get<jsonxx::Object>("param"), &elementId)) {
-            return this->MoveOuttaSyllable(elementId);
+        if (this->ParseMoveOutsideSyllableAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->MoveOutsideSyllable(elementId);
         }
         LogWarning("Could not parse the insert action");
     }
@@ -1371,7 +1371,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
     return true;   
 }
 
-bool EditorToolkitNeume::MoveOuttaSyllable(std::string elementId) {
+bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
         m_infoObject.import("status", "FAILURE");
@@ -3533,7 +3533,7 @@ bool EditorToolkitNeume::ParseInsertToSyllableAction(jsonxx::Object param, std::
     return true;
 }
 
-bool EditorToolkitNeume::ParseMoveOuttaSyllableAction(jsonxx::Object param, std::string *elementId) {
+bool EditorToolkitNeume::ParseMoveOutsideSyllableAction(jsonxx::Object param, std::string *elementId) {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
     return true;
