@@ -5,7 +5,7 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include <assert.h>
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <regex>

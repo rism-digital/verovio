@@ -25,7 +25,7 @@ using namespace std;
 #ifndef NO_HUMDRUM_SUPPORT
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <cctype>
 #include <cmath>
 #include <locale>

@@ -8,7 +8,7 @@
 #include "metersig.h"
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 #include <numeric>
 #include <regex>

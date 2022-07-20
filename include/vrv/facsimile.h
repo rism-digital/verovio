@@ -8,7 +8,7 @@
 #ifndef __VRV_FACSIMILE_H__
 #define __VRV_FACSIMILE_H__
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
