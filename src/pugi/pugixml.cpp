@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <cassert>
+#include <assert.h>
 #include <limits.h>
 
 #ifdef PUGIXML_WCHAR_MODE
