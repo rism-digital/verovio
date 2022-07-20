@@ -1269,12 +1269,12 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
     std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
     if (neumes.size() > 0) {
         //removethisafter
-        std::cout << "neumes.size() > 0:\n" << "size: " << std::to_string(neumes.size()) << "\n\n";
-        std::cout << "neumeVector contents: " << "\n";
-        for (Object *nm : neumesVector) {
-            std::cout << nm->GetUuid() << "\n";
-        }
-        std::cout << "\n\n";
+        // std::cout << "neumes.size() > 0:\n" << "size: " << std::to_string(neumes.size()) << "\n\n";
+        // std::cout << "neumeVector contents: " << "\n";
+        // for (Object *nm : neumesVector) {
+        //     std::cout << nm->GetUuid() << "\n";
+        // }
+        // std::cout << "\n\n";
         // removethisafter
         ClosestNeume compN;
         compN.x = ulx;
@@ -1295,30 +1295,30 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
     Object *syllable = neume->GetParent();
     assert(syllable);
     
-    //removethisafter
-    auto sylChildren = syllable->GetChildren();
-    std::cout << "sylChildren: " << "\n";
-    for (Object *nm : *sylChildren) {
-        std::cout << nm->GetUuid() << "\n";
-    }
-    std::cout << "\n\n";
-    //removethisafter
+    // //removethisafter
+    // auto sylChildren = syllable->GetChildren();
+    // std::cout << "sylChildren: " << "\n";
+    // for (Object *nm : *sylChildren) {
+    //     std::cout << nm->GetUuid() << "\n";
+    // }
+    // std::cout << "\n\n";
+    // //removethisafter
 
     element->MoveItselfTo(syllable);
     syllable->ReorderByXPos();
     parent->ClearRelinquishedChildren();
     parent->ReorderByXPos();
 
-    std::cout << "element: " << element->GetUuid() << "\n"; //removethisafter
-    std::cout << "syllable: " << syllable->GetUuid() << "\n"; //removethisafter
-    std::cout << "parent: " << parent->GetUuid() << "\n\n"; //removethisafter
+    // std::cout << "element: " << element->GetUuid() << "\n"; //removethisafter
+    // std::cout << "syllable: " << syllable->GetUuid() << "\n"; //removethisafter
+    // std::cout << "parent: " << parent->GetUuid() << "\n\n"; //removethisafter
 
     //removethisafter
-    std::cout << "sylChildren REORDERED: " << "\n";
-    for (Object *nm : *sylChildren) {
-        std::cout << nm->GetUuid() << "\n";
-    }
-    std::cout << "\n\n";
+    // std::cout << "sylChildren REORDERED: " << "\n";
+    // for (Object *nm : *sylChildren) {
+    //     std::cout << nm->GetUuid() << "\n";
+    // }
+    // std::cout << "\n\n";
     //removethisafter
 
     // Adjust pitches of neumes proceding inserted clef
@@ -1346,10 +1346,6 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
         //removethisafter
 
         // Get clef line diff
-        int x = clef->GetSelfX1();
-        int y = clef->GetSelfY1();
-        std::cout << "x: " << std::to_string(x) << ", y: " << std::to_string(y) << "\n"; //removethisafter
-
         int precedingClefLine = precedingClef->GetLine();
         int clefLine = clef->GetLine();
         int lineDiff = clefLine - precedingClefLine;
@@ -1396,8 +1392,8 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
         m_infoObject.import("message", "No element exists with ID" + elementId + ".");
         return false;
     }
-    if (!(element->Is(DIVLINE) || element->Is(ACCID))) {
-        LogError("Element is of type %s, but only Divlines and Accids can be moved out of syllables.",
+    if (!(element->Is(DIVLINE) || element->Is(ACCID) || element->Is(CLEF))) {
+        LogError("Element is of type %s, but only Divlines, Accids, and Clefs can be moved out of syllables.",
             element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message",
@@ -1417,6 +1413,48 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
 
     Object *secondParent = parent->GetParent();
     assert(secondParent);
+
+    // restore pitches of neumes back to pitches in accordance with preceding clef
+    if (element->Is(CLEF)) {
+        Clef *clef = dynamic_cast<Clef *>(element);
+        Syllable *syllable = dynamic_cast<Syllable *>(parent);
+        ClassIdComparison ac(CLEF);
+        InterfaceComparison ic(INTERFACE_PITCH);
+
+        Clef *precedingClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
+        // Get neumes in syllable after inserted clef
+        ClassIdComparison cic(SYLLABLE);
+        Object *nextElement = dynamic_cast<Object *>(m_doc->GetDrawingPage()->FindNextChild(&cic, syllable));
+        ListOfObjects elementsAfterClef;
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&elementsAfterClef, &ic, clef, nextElement);
+
+        //removethisafter
+        std::cout << "precedingClef:\n" << precedingClef->GetUuid() << "\n\n";
+        std::cout << "nextElement:\n" << nextElement->GetUuid() << "\n\n";
+
+        std::cout << "elementsAfterClef: " << "\n";
+        for (Object *el : elementsAfterClef) {
+            std::cout << el->GetUuid() << "\n";
+        }
+        std::cout << "\n\n";
+        //removethisafter
+
+        // Get clef line diff
+        int precedingClefLine = precedingClef->GetLine();
+        int clefLine = clef->GetLine();
+        int lineDiff = precedingClefLine - clefLine;
+        std::cout << std::to_string(precedingClefLine) << "\n";
+        std::cout << std::to_string(clefLine) << "\n";
+        std::cout << std::to_string(lineDiff) << "\n";
+
+        std::cout << "Start Pitch Shift Process:\n";//removethisafter
+        if (lineDiff != 0) {
+            for (Object *iter : elementsAfterClef) {
+                std::cout << iter->GetUuid() << "\n"; //removethisafter
+                iter->GetPitchInterface()->AdjustPitchByOffset(lineDiff * -2);
+            }
+        }
+    }
 
     element->MoveItselfTo(secondParent);
     secondParent->ReorderByXPos();
