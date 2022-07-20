@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -26,8 +26,8 @@
 namespace vrv {
 
 #define DYNAM_CHARS 7
-std::wstring dynamChars[] = { L"p", L"m", L"f", L"r", L"s", L"z", L"n" };
-std::wstring dynamSmufl[] = { L"\uE520", L"\uE521", L"\uE522", L"\uE523", L"\uE524", L"\uE525", L"\uE526" };
+const std::wstring dynamChars[] = { L"p", L"m", L"f", L"r", L"s", L"z", L"n" };
+const std::wstring dynamSmufl[] = { L"\uE520", L"\uE521", L"\uE522", L"\uE523", L"\uE524", L"\uE525", L"\uE526" };
 
 //----------------------------------------------------------------------------
 // Dynam
