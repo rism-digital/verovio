@@ -12,12 +12,12 @@
 #include <cassert>
 #include <cmath>
 #include <codecvt>
+#include <cstdlib>
 #include <iostream>
 #include <locale>
 #include <sstream>
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <vector>
 
 #ifndef _WIN32
