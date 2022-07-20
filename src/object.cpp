@@ -287,11 +287,19 @@ void Object::SortChildren(Object::binaryComp comp)
 
 void Object::MoveItselfTo(Object *targetParent)
 {
+    std::cout << "Object::MoveItselfTo" << "\n"; //removethisafter
     assert(targetParent);
     assert(m_parent);
     assert(m_parent != targetParent);
 
+    std::cout << "targetParent: " << targetParent->GetUuid() << "\n"; //removethisafter
+    std::cout << "m_parent: " << m_parent->GetUuid() << "\n"; //removethisafter
+    std::cout << "this->GetParent(): " << this->GetParent()->GetUuid() << "\n"; //removethisafter
+
     Object *relinquishedObject = this->GetParent()->Relinquish(this->GetIdx());
+
+    std::cout << "relinquishedObject: " << relinquishedObject->GetUuid() << "\n"; //removethisafter
+    
     assert(relinquishedObject && (relinquishedObject == this));
     targetParent->AddChild(relinquishedObject);
 }
@@ -482,13 +490,19 @@ Object *Object::Relinquish(int idx)
 
 void Object::ClearRelinquishedChildren()
 {
+    std::cout << "Object::ClearRelinquishedChildren\n";//removethisafter
+
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end();) {
+        std::cout << (*iter)->GetUuid();//removethisafter
         if ((*iter)->GetParent() != this) {
+            std::cout << "erased\n"; //removethisafter
             iter = m_children.erase(iter);
         }
-        else
-            ++iter;
+        else {
+            ++iter; 
+            std::cout << "\n"; //removethisafter
+        }
     }
 }
 
@@ -625,6 +639,8 @@ bool Object::IsSupportedChild(Object *child)
 
 void Object::AddChild(Object *child)
 {
+    std::cout << "Object::AddChild\n"; //removethisafter
+
     if (!this->IsSupportedChild(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return;
@@ -632,6 +648,14 @@ void Object::AddChild(Object *child)
 
     child->SetParent(this);
     m_children.push_back(child);
+
+    // removethisafter
+    std::cout << "m_children.push_back(child):\n";
+    for (Object *child : m_children) {
+        std::cout << child->GetUuid() << "\n";
+    }
+    std::cout << "\n";
+
     Modify();
 }
 
@@ -870,8 +894,12 @@ int Object::Save(Output *output)
 
 void Object::ReorderByXPos()
 {
+    std::cout << "Object::ReorderByXPos()" << "\n"; //removethisafter
+
     ReorderByXPosParams params;
     Functor reorder(&Object::ReorderByXPos);
+
+    std::cout << "Object::ReorderByXPos()" << "\n"; //removethisafter
     this->Process(&reorder, &params);
 }
 
@@ -1739,14 +1767,22 @@ bool Object::sortByUlx(Object *a, Object *b)
 
 int Object::ReorderByXPos(FunctorParams *functorParams)
 {
+    std::cout << "Object::ReorderByXPos(FunctorParams *functorParams)\n"; //removethisafter
+
     if (this->GetFacsimileInterface() != NULL) {
         if (this->GetFacsimileInterface()->HasFacs()) {
+
+            std::cout << this->GetUuid() << ": return FUNCTOR_SIBLINGS" << "\n"; //removethisafter
+            
             return FUNCTOR_SIBLINGS; // This would have already been reordered.
         }
     }
 
     std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
     this->Modify();
+
+    std::cout << this->GetUuid() << ": return FUNCTOR_CONTINUE" << "\n"; //removethisafter
+
     return FUNCTOR_CONTINUE;
 }
 

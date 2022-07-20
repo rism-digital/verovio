@@ -42,6 +42,7 @@ void Syllable::Init()
 
 bool Syllable::IsSupportedChild(Object *child)
 {
+    std::cout << "Syllable::IsSupportedChild" << "\n"; //removethisafter
     if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));
     }
@@ -53,6 +54,9 @@ bool Syllable::IsSupportedChild(Object *child)
     }
     else if (child->Is(ACCID)) {
         assert(dynamic_cast<Accid *>(child));
+    }
+    else if (child->Is(CLEF)) {
+        assert(dynamic_cast<Clef *>(child));
     }
     else {
         return false;

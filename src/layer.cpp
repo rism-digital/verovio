@@ -138,13 +138,17 @@ void Layer::ResetStaffDefObjects()
 
 bool Layer::IsSupportedChild(Object *child)
 {
+    std::cout << "Layer::IsSupportedChild\n"; //removethisafter
     if (child->IsLayerElement()) {
+        std::cout << "Layer child->IsLayerElement()\n"; //removethisafter
         assert(dynamic_cast<LayerElement *>(child));
     }
     else if (child->IsEditorialElement()) {
+        std::cout << "Layer child->IsEditorialElement()\n"; //removethisafter
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
+        std::cout << "Layer else\n"; //removethisafter
         return false;
     }
     return true;
