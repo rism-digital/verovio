@@ -8,7 +8,7 @@
 #ifndef __VRV_TIMEMAP_H__
 #define __VRV_TIMEMAP_H__
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <string>
 #include <vector>

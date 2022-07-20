@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <climits>
 #include <math.h>
 #include <numeric>
