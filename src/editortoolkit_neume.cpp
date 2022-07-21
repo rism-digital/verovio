@@ -233,10 +233,11 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 
 bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 {
+    // LogMessage("%s", actions.get<jsonxx::Object>(0).json().c_str());
     bool status = true;
     jsonxx::Object results;
     for (int i = 0; i < (int)actions.size(); i++) {
-        if (!actions.has<jsonxx::Object>(i)) {
+        if (!actions.has<jsonxx::Object>(0)) {
             LogError("Action %d was not an object", i);
             m_infoObject.reset();
             m_infoObject.import("status", "FAILURE");
@@ -2049,9 +2050,31 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 SetText(li->GetUuid(),"");
 
                 // group into two new syllables
-                int idx = std::distance(elementIds.begin(), it);
+                // int idx = std::distance(elementIds.begin(), it);
+                // jsonxx::Array chainArray;
+                // jsonxx::Object group0;
+                // jsonxx::Object param0;
+                // jsonxx::Array ids0;
+                
+                // ids0.append(std::vector<std::string>(elementIds.begin(), elementIds.begin()+idx));
+                
+                // param0 << "groupType" << "neume";
+                // param0 << "elementIds" << ids0;
+                // group0 << "action" << "group";
+                // group0 << "param" << param0;
+                // chainArray << group0;
+
+                // LogMessage("%s", chainArray.get<jsonxx::Object>(0).json().c_str());
+
                 Group("neume", std::vector<std::string>(elementIds.begin(), elementIds.begin()+idx));
                 Group("neume", std::vector<std::string>(elementIds.begin()+idx, elementIds.end()));
+
+
+
+                // m_infoObject.import("uuid", parent->GetUuid());
+                // m_infoObject.import("status", status);
+                // m_infoObject.import("message", message);
+                // return true;
             }
         }
 
