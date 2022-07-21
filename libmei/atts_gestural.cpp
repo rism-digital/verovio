@@ -180,9 +180,9 @@ AttDurationGestural::~AttDurationGestural()
 void AttDurationGestural::ResetDurationGestural()
 {
     m_durGes = DURATION_NONE;
-    m_dotsGes = -1;
+    m_dotsGes = VRV_UNSET;
     m_durMetrical = 0.0;
-    m_durPpq = 0;
+    m_durPpq = VRV_UNSET;
     m_durReal = 0.0;
     m_durRecip = "";
 }
@@ -260,7 +260,7 @@ bool AttDurationGestural::HasDurGes() const
 
 bool AttDurationGestural::HasDotsGes() const
 {
-    return (m_dotsGes != -1);
+    return (m_dotsGes != VRV_UNSET);
 }
 
 bool AttDurationGestural::HasDurMetrical() const
@@ -270,7 +270,7 @@ bool AttDurationGestural::HasDurMetrical() const
 
 bool AttDurationGestural::HasDurPpq() const
 {
-    return (m_durPpq != 0);
+    return (m_durPpq != VRV_UNSET);
 }
 
 bool AttDurationGestural::HasDurReal() const
@@ -348,7 +348,7 @@ void AttNcGes::ResetNcGes()
 {
     m_octGes = -127;
     m_pnameGes = PITCHNAME_NONE;
-    m_pnum = 0;
+    m_pnum = VRV_UNSET;
 }
 
 bool AttNcGes::ReadNcGes(pugi::xml_node element)
@@ -402,7 +402,7 @@ bool AttNcGes::HasPnameGes() const
 
 bool AttNcGes::HasPnum() const
 {
-    return (m_pnum != 0);
+    return (m_pnum != VRV_UNSET);
 }
 
 /* include <attpnum> */
@@ -425,7 +425,7 @@ void AttNoteGes::ResetNoteGes()
     m_extremis = noteGes_EXTREMIS_NONE;
     m_octGes = -127;
     m_pnameGes = PITCHNAME_NONE;
-    m_pnum = 0;
+    m_pnum = VRV_UNSET;
 }
 
 bool AttNoteGes::ReadNoteGes(pugi::xml_node element)
@@ -493,7 +493,7 @@ bool AttNoteGes::HasPnameGes() const
 
 bool AttNoteGes::HasPnum() const
 {
-    return (m_pnum != 0);
+    return (m_pnum != VRV_UNSET);
 }
 
 /* include <attpnum> */
