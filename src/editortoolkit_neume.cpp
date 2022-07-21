@@ -698,7 +698,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
     std::vector<std::pair<std::string, std::string> > attributes)
 {
-    std::cout << "Insert\n";
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
         m_infoObject.import("status", "FAILURE");
@@ -1196,7 +1195,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 }
 
 bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
-    std::cout << "InsertToSyllable\n\n"; //removethisafter
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
         m_infoObject.import("status", "FAILURE");
@@ -1214,9 +1212,6 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
     assert(element);
     Object *parent = element->GetParent();
     assert(parent);
-
-    std::cout << "element uuid:\n" << element->GetUuid() << "\n\n"; //removethisafter
-    std::cout << "parent uuid:\n" << parent->GetUuid() << "\n\n"; //removethisafter
 
     if (element == NULL) {
         LogError("No element exists with ID '%s'.", elementId.c_str());
@@ -1268,21 +1263,12 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
     staff->FindAllDescendantByComparison(&neumes, &ac);
     std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
     if (neumes.size() > 0) {
-        //removethisafter
-        // std::cout << "neumes.size() > 0:\n" << "size: " << std::to_string(neumes.size()) << "\n\n";
-        // std::cout << "neumeVector contents: " << "\n";
-        // for (Object *nm : neumesVector) {
-        //     std::cout << nm->GetUuid() << "\n";
-        // }
-        // std::cout << "\n\n";
-        // removethisafter
         ClosestNeume compN;
         compN.x = ulx;
         compN.y = uly;
 
         std::sort(neumesVector.begin(), neumesVector.end(), compN);
         neume = neumesVector.at(0);
-        std::cout << "nearest neume: " << neume->GetUuid() << "\n\n"; //removethisafter
     } 
     else {
         LogError("A syllable must exist in the staff to insert a '%s' into.", element->GetClassName().c_str());
@@ -1294,32 +1280,11 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
     // get nearest syllable using nearest neume
     Object *syllable = neume->GetParent();
     assert(syllable);
-    
-    // //removethisafter
-    // auto sylChildren = syllable->GetChildren();
-    // std::cout << "sylChildren: " << "\n";
-    // for (Object *nm : *sylChildren) {
-    //     std::cout << nm->GetUuid() << "\n";
-    // }
-    // std::cout << "\n\n";
-    // //removethisafter
 
     element->MoveItselfTo(syllable);
     syllable->ReorderByXPos();
     parent->ClearRelinquishedChildren();
     parent->ReorderByXPos();
-
-    // std::cout << "element: " << element->GetUuid() << "\n"; //removethisafter
-    // std::cout << "syllable: " << syllable->GetUuid() << "\n"; //removethisafter
-    // std::cout << "parent: " << parent->GetUuid() << "\n\n"; //removethisafter
-
-    //removethisafter
-    // std::cout << "sylChildren REORDERED: " << "\n";
-    // for (Object *nm : *sylChildren) {
-    //     std::cout << nm->GetUuid() << "\n";
-    // }
-    // std::cout << "\n\n";
-    //removethisafter
 
     // Adjust pitches of neumes proceding inserted clef
     if (element->Is(CLEF)) {
@@ -1334,29 +1299,13 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
         ListOfObjects elementsAfterClef;
         m_doc->GetDrawingPage()->FindAllDescendantBetween(&elementsAfterClef, &ic, clef, nextElement);
 
-        //removethisafter
-        std::cout << "precedingClef:\n" << precedingClef->GetUuid() << "\n\n";
-        std::cout << "nextElement:\n" << nextElement->GetUuid() << "\n\n";
-
-        std::cout << "elementsAfterClef: " << "\n";
-        for (Object *el : elementsAfterClef) {
-            std::cout << el->GetUuid() << "\n";
-        }
-        std::cout << "\n\n";
-        //removethisafter
-
         // Get clef line diff
         int precedingClefLine = precedingClef->GetLine();
         int clefLine = clef->GetLine();
         int lineDiff = clefLine - precedingClefLine;
-        std::cout << std::to_string(precedingClefLine) << "\n";
-        std::cout << std::to_string(clefLine) << "\n";
-        std::cout << std::to_string(lineDiff) << "\n";
 
-        std::cout << "Start Pitch Shift Process:\n";//removethisafter
         if (lineDiff != 0) {
             for (Object *iter : elementsAfterClef) {
-                std::cout << iter->GetUuid() << "\n"; //removethisafter
                 iter->GetPitchInterface()->AdjustPitchByOffset(lineDiff * -2);
             }
         }
@@ -1428,29 +1377,13 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
         ListOfObjects elementsAfterClef;
         m_doc->GetDrawingPage()->FindAllDescendantBetween(&elementsAfterClef, &ic, clef, nextElement);
 
-        //removethisafter
-        std::cout << "precedingClef:\n" << precedingClef->GetUuid() << "\n\n";
-        std::cout << "nextElement:\n" << nextElement->GetUuid() << "\n\n";
-
-        std::cout << "elementsAfterClef: " << "\n";
-        for (Object *el : elementsAfterClef) {
-            std::cout << el->GetUuid() << "\n";
-        }
-        std::cout << "\n\n";
-        //removethisafter
-
         // Get clef line diff
         int precedingClefLine = precedingClef->GetLine();
         int clefLine = clef->GetLine();
         int lineDiff = precedingClefLine - clefLine;
-        std::cout << std::to_string(precedingClefLine) << "\n";
-        std::cout << std::to_string(clefLine) << "\n";
-        std::cout << std::to_string(lineDiff) << "\n";
 
-        std::cout << "Start Pitch Shift Process:\n";//removethisafter
         if (lineDiff != 0) {
             for (Object *iter : elementsAfterClef) {
-                std::cout << iter->GetUuid() << "\n"; //removethisafter
                 iter->GetPitchInterface()->AdjustPitchByOffset(lineDiff * -2);
             }
         }
@@ -1703,8 +1636,6 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
 
 bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
 {
-    std::cout << "SetClef\n";
-
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
         m_infoObject.import("status", "FAILURE");

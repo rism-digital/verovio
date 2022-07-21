@@ -42,7 +42,6 @@ void Syllable::Init()
 
 bool Syllable::IsSupportedChild(Object *child)
 {
-    std::cout << "Syllable::IsSupportedChild" << "\n"; //removethisafter
     if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));
     }
