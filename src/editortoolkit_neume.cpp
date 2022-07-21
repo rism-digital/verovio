@@ -1085,7 +1085,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         }
         m_infoObject.import("uuid", custos->GetUuid());
     }
-    else if(elementType == "accid"){
+    else if (elementType == "accid"){
         Accid *accid = new Accid();
         data_ACCIDENTAL_WRITTEN accidTypeW = ACCIDENTAL_WRITTEN_NONE;
 
@@ -1100,7 +1100,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
             }
         }
-         if (accidTypeW == ACCIDENTAL_WRITTEN_NONE) {
+        if (accidTypeW == ACCIDENTAL_WRITTEN_NONE) {
             LogError("A accid type must be specified.");
             delete accid;
 
@@ -3767,15 +3767,15 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         }
         pi->SetOct(3);
 
-        // glyphs in verovio are actually not centered, but are in the top left corner of a giant box
-        int centerY = fi->GetZone()->GetUly();
-        int centerX = fi->GetZone()->GetUlx();
-
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        const int pitchDifference = round(
-            (double)(staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - centerY
-                - ((centerX - staff->GetZone()->GetUlx()) * tan(-staff->GetDrawingRotate() * M_PI / 180.0)))
-            / (double)(staffSize));
+        
+        // Use the same pitchDifference equation for both syllables and custos
+        const int pitchDifference
+            = round((double)(staff->GetDrawingY() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine()))
+                        - fi->GetZone()->GetUly()
+                        - ((fi->GetZone()->GetUlx() - staff->GetZone()->GetUlx())
+                            * tan(-staff->GetDrawingRotate() * M_PI / 180.0)))
+                / (double)(staffSize));
 
         pi->AdjustPitchByOffset(pitchDifference);
         return true;
@@ -3838,7 +3838,9 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
                 (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
                 fi->GetZone()->GetUly() - ((fi->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) *
                 tan(-staff->GetDrawingRotate() * M_PI / 180.0))) / (double) (staffSize));*/
-            int pitchDifference
+
+            // Use the same pitchDifference equation for both syllables and custos
+            const int pitchDifference
                 = round((double)(staff->GetDrawingY() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine()))
                             - fi->GetZone()->GetUly()
                             - ((fi->GetZone()->GetUlx() - staff->GetZone()->GetUlx())
