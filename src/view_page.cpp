@@ -1036,7 +1036,8 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         DrawStaffLines(dc, staff, measure, system);
     }
 
-    DrawStaffDef(dc, staff, measure);
+    // This is for modern notation, not for neume notation (or we think so):
+    // DrawStaffDef(dc, staff, measure);
 
     if (staff->GetLedgerLinesAbove()) {
         DrawLedgerLines(dc, staff, staff->GetLedgerLinesAbove(), false, false);
