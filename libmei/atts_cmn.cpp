@@ -270,7 +270,7 @@ AttBeamSecondary::~AttBeamSecondary()
 
 void AttBeamSecondary::ResetBeamSecondary()
 {
-    m_breaksec = 0;
+    m_breaksec = VRV_UNSET;
 }
 
 bool AttBeamSecondary::ReadBeamSecondary(pugi::xml_node element)
@@ -296,7 +296,7 @@ bool AttBeamSecondary::WriteBeamSecondary(pugi::xml_node element)
 
 bool AttBeamSecondary::HasBreaksec() const
 {
-    return (m_breaksec != 0);
+    return (m_breaksec != VRV_UNSET);
 }
 
 /* include <attbreaksec> */
@@ -1217,7 +1217,7 @@ AttNumbered::~AttNumbered()
 
 void AttNumbered::ResetNumbered()
 {
-    m_num = 0;
+    m_num = VRV_UNSET;
 }
 
 bool AttNumbered::ReadNumbered(pugi::xml_node element)
@@ -1243,7 +1243,7 @@ bool AttNumbered::WriteNumbered(pugi::xml_node element)
 
 bool AttNumbered::HasNum() const
 {
-    return (m_num != 0);
+    return (m_num != VRV_UNSET);
 }
 
 /* include <attnum> */

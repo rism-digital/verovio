@@ -41,8 +41,8 @@ AttTabular::~AttTabular()
 
 void AttTabular::ResetTabular()
 {
-    m_colspan = 0;
-    m_rowspan = 0;
+    m_colspan = VRV_UNSET;
+    m_rowspan = VRV_UNSET;
 }
 
 bool AttTabular::ReadTabular(pugi::xml_node element)
@@ -77,12 +77,12 @@ bool AttTabular::WriteTabular(pugi::xml_node element)
 
 bool AttTabular::HasColspan() const
 {
-    return (m_colspan != 0);
+    return (m_colspan != VRV_UNSET);
 }
 
 bool AttTabular::HasRowspan() const
 {
-    return (m_rowspan != 0);
+    return (m_rowspan != VRV_UNSET);
 }
 
 /* include <attrowspan> */

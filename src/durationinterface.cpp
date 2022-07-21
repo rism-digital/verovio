@@ -84,7 +84,7 @@ double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) co
     double duration = DUR_MAX / pow(2.0, (double)(noteDur - 2.0)) * numBase / num;
 
     int noteDots = (this->HasDotsGes()) ? this->GetDotsGes() : this->GetDots();
-    if (noteDots != -1) {
+    if (noteDots != VRV_UNSET) {
         duration = 2 * duration - (duration / pow(2, noteDots));
     }
     // LogDebug("Duration %d; Dot %d; Alignment %f", noteDur, this->GetDots(), duration);
