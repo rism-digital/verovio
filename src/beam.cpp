@@ -2076,7 +2076,7 @@ int Beam::GetBeamPartDuration(int x, bool includeRests) const
     reverseIt = std::find_if(reverseIt, m_beamSegment.m_beamElementCoordRefs.rend(),
         [includeRests](BeamElementCoord *coord) { return (!coord->m_element->Is(REST) || includeRests); });
     if (reverseIt != m_beamSegment.m_beamElementCoordRefs.rend()) return std::min((*it)->m_dur, (*reverseIt)->m_dur);
-    return (*it)->m_dur;    
+    return (*it)->m_dur;
 }
 
 int Beam::GetBeamPartDuration(const Object *object, bool includeRests) const
