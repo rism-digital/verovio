@@ -1226,15 +1226,15 @@ int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
                 if (dot->HorizontalSelfOverlap(element, thirdUnit)
                     && dot->VerticalSelfOverlap(element, 2 * thirdUnit)) {
                     if (element->Is({ CHORD, NOTE })) {
-                        if (dynamic_cast<AttAugmentDots *>(element)->GetDots() <= 0) continue;
+                        if (dynamic_cast<AttAugmentDots *>(element)->GetDots() < 1) continue;
                         overlapElements.emplace(dot, element);
                     }
                     else if (Object *chord = element->GetFirstAncestor(CHORD, UNLIMITED_DEPTH); chord) {
-                        if (vrv_cast<Chord *>(chord)->GetDots() <= 0) continue;
+                        if (vrv_cast<Chord *>(chord)->GetDots() < 1) continue;
                         overlapElements.emplace(dot, vrv_cast<LayerElement *>(chord));
                     }
                     else if (Object *note = element->GetFirstAncestor(NOTE, UNLIMITED_DEPTH); note) {
-                        if (vrv_cast<Note *>(note)->GetDots() <= 0) continue;
+                        if (vrv_cast<Note *>(note)->GetDots() < 1) continue;
                         overlapElements.emplace(dot, vrv_cast<LayerElement *>(note));
                     }
                 }
