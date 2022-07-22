@@ -5459,20 +5459,20 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTransDiat(double transDiat_) { m_transDiat = transDiat_; }
-    double GetTransDiat() const { return m_transDiat; }
+    void SetTransDiat(int transDiat_) { m_transDiat = transDiat_; }
+    int GetTransDiat() const { return m_transDiat; }
     bool HasTransDiat() const;
     //
-    void SetTransSemi(double transSemi_) { m_transSemi = transSemi_; }
-    double GetTransSemi() const { return m_transSemi; }
+    void SetTransSemi(int transSemi_) { m_transSemi = transSemi_; }
+    int GetTransSemi() const { return m_transSemi; }
     bool HasTransSemi() const;
     ///@}
 
 private:
     /** Records the amount of diatonic pitch shift, **/
-    double m_transDiat;
+    int m_transDiat;
     /** Records the amount of pitch shift in semitones, **/
-    double m_transSemi;
+    int m_transSemi;
 
     /* include <atttrans.semi> */
 };
