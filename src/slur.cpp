@@ -1460,8 +1460,6 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
     bool isShortSlur = false;
     if (x2 - x1 < doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
 
-    const Beam *parentBeam = NULL;
-    const FTrem *parentFTrem = NULL;
     int yChordMax = 0, yChordMin = 0;
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) && !start->Is(TIMESTAMP_ATTR)) {
@@ -1501,9 +1499,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
                 }
             }
             // same but in beam - adjust the x too
-            else if (((parentBeam = start->GetAncestorBeam()) && !parentBeam->IsLastIn(parentBeam, start))
-                || ((parentFTrem = start->GetAncestorFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
-                || isGraceToNoteSlur || hasStartFlag) {
+            else if (this->StartsOnBeam() || isGraceToNoteSlur || hasStartFlag) {
                 y1 = start->GetDrawingTop(doc, staff->m_drawingStaffSize);
                 // Secondary endpoint for grace notes is further left
                 double weight = 1.0;
@@ -1566,9 +1562,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
                 }
             }
             // same but in beam
-            else if (((parentBeam = start->GetAncestorBeam()) && !parentBeam->IsLastIn(parentBeam, start))
-                || ((parentFTrem = start->GetAncestorFTrem()) && !parentFTrem->IsLastIn(parentFTrem, start))
-                || hasStartFlag) {
+            else if (this->StartsOnBeam() || hasStartFlag) {
                 y1 = start->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                 x1 -= startRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -1640,8 +1634,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
                 }
             }
             // same but in beam - adjust the x too
-            else if (((parentBeam = end->GetAncestorBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
-                || ((parentFTrem = end->GetAncestorFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
+            else if (this->EndsOnBeam()) {
                 y2 = end->GetDrawingTop(doc, staff->m_drawingStaffSize);
                 x2 += endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -1699,8 +1692,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
                 }
             }
             // same but in beam
-            else if (((parentBeam = end->GetAncestorBeam()) && !parentBeam->IsFirstIn(parentBeam, end))
-                || ((parentFTrem = end->GetAncestorFTrem()) && !parentFTrem->IsFirstIn(parentFTrem, end))) {
+            else if (this->EndsOnBeam()) {
                 y2 = end->GetDrawingBottom(doc, staff->m_drawingStaffSize);
                 x2 -= endRadius - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
@@ -1876,6 +1868,32 @@ PortatoSlurType Slur::IsPortatoSlur(const Doc *doc, const Note *startNote, const
         }
     }
     return type;
+}
+
+bool Slur::HasBoundaryOnBeam(bool isStart) const
+{
+    const LayerElement *boundary = isStart ? this->GetStart() : this->GetEnd();
+    // Check for Beam
+    if (const Beam *parentBeam = boundary->GetAncestorBeam(); parentBeam) {
+        if (isStart && !parentBeam->IsLastIn(parentBeam, boundary)) return true;
+        if (!isStart && !parentBeam->IsFirstIn(parentBeam, boundary)) return true;
+    }
+    // Check for FTrem
+    if (const FTrem *parentFTrem = boundary->GetAncestorFTrem(); parentFTrem) {
+        if (isStart && !parentFTrem->IsLastIn(parentFTrem, boundary)) return true;
+        if (!isStart && !parentFTrem->IsFirstIn(parentFTrem, boundary)) return true;
+    }
+    // Check for BeamSpan
+    if (boundary->GetIsInBeamSpan()) {
+        return true;
+    }
+    if (boundary->Is(NOTE)) {
+        const Chord *chord = vrv_cast<const Note *>(boundary)->IsChordTone();
+        if (chord && chord->GetIsInBeamSpan()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void Slur::CalcInitialCurve(const Doc *doc, FloatingCurvePositioner *curve, NearEndCollision *nearEndCollision)
