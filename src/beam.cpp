@@ -217,7 +217,7 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
 
             if (coord->m_beamRelativePlace == BEAMPLACE_below) {
                 y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
-                stemAdjust = -stemWidth - stemOffset;
+                stemAdjust = -(beamInterface->m_beamWidthBlack + stemOffset);
             }
             else {
                 y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
