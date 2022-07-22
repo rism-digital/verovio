@@ -7214,20 +7214,20 @@ AttTransposition::~AttTransposition()
 
 void AttTransposition::ResetTransposition()
 {
-    m_transDiat = 0.0;
-    m_transSemi = 0.0;
+    m_transDiat = VRV_UNSET;
+    m_transSemi = VRV_UNSET;
 }
 
 bool AttTransposition::ReadTransposition(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("trans.diat")) {
-        this->SetTransDiat(StrToDbl(element.attribute("trans.diat").value()));
+        this->SetTransDiat(StrToInt(element.attribute("trans.diat").value()));
         element.remove_attribute("trans.diat");
         hasAttribute = true;
     }
     if (element.attribute("trans.semi")) {
-        this->SetTransSemi(StrToDbl(element.attribute("trans.semi").value()));
+        this->SetTransSemi(StrToInt(element.attribute("trans.semi").value()));
         element.remove_attribute("trans.semi");
         hasAttribute = true;
     }
@@ -7238,11 +7238,11 @@ bool AttTransposition::WriteTransposition(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasTransDiat()) {
-        element.append_attribute("trans.diat") = DblToStr(this->GetTransDiat()).c_str();
+        element.append_attribute("trans.diat") = IntToStr(this->GetTransDiat()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTransSemi()) {
-        element.append_attribute("trans.semi") = DblToStr(this->GetTransSemi()).c_str();
+        element.append_attribute("trans.semi") = IntToStr(this->GetTransSemi()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -7250,12 +7250,12 @@ bool AttTransposition::WriteTransposition(pugi::xml_node element)
 
 bool AttTransposition::HasTransDiat() const
 {
-    return (m_transDiat != 0.0);
+    return (m_transDiat != VRV_UNSET);
 }
 
 bool AttTransposition::HasTransSemi() const
 {
-    return (m_transSemi != 0.0);
+    return (m_transSemi != VRV_UNSET);
 }
 
 /* include <atttrans.semi> */
@@ -9571,11 +9571,11 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttTransposition *att = dynamic_cast<AttTransposition *>(element);
         assert(att);
         if (attrType == "trans.diat") {
-            att->SetTransDiat(att->StrToDbl(attrValue));
+            att->SetTransDiat(att->StrToInt(attrValue));
             return true;
         }
         if (attrType == "trans.semi") {
-            att->SetTransSemi(att->StrToDbl(attrValue));
+            att->SetTransSemi(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -10925,10 +10925,10 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttTransposition *att = dynamic_cast<const AttTransposition *>(element);
         assert(att);
         if (att->HasTransDiat()) {
-            attributes->push_back({ "trans.diat", att->DblToStr(att->GetTransDiat()) });
+            attributes->push_back({ "trans.diat", att->IntToStr(att->GetTransDiat()) });
         }
         if (att->HasTransSemi()) {
-            attributes->push_back({ "trans.semi", att->DblToStr(att->GetTransSemi()) });
+            attributes->push_back({ "trans.semi", att->IntToStr(att->GetTransSemi()) });
         }
     }
     if (element->HasAttClass(ATT_TUPLETPRESENT)) {

@@ -225,7 +225,7 @@ int StaffDef::Transpose(FunctorParams *functorParams)
         // Determine and store the transposition interval (based on keySig)
         if (keySig && this->HasTransSemi() && this->HasN()) {
             const int fifths = keySig->GetFifthsInt();
-            int semitones = static_cast<int>(std::round(this->GetTransSemi()));
+            int semitones = this->GetTransSemi();
             // Factor out octave transpositions
             const int sign = (semitones >= 0) ? +1 : -1;
             semitones = sign * (std::abs(semitones) % 24);
