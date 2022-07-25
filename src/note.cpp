@@ -1118,6 +1118,9 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
         noteheadShift = params->m_diameter - diameter;
     }
 
+    // Nothing to do for notes that are not in a cluster and without base diameter for the chord
+    if (!params->m_diameter && !m_cluster) return FUNCTOR_SIBLINGS;
+
     /************** notehead direction **************/
 
     bool flippedNotehead = false;
