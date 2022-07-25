@@ -135,6 +135,7 @@ class Sic;
 class Slur;
 class Space;
 class Staff;
+class Stem;
 class Subst;
 class Supplied;
 class Surface;
