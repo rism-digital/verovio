@@ -1849,7 +1849,6 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                 if (!isPreviousCoord || isEdgeElement || isChordElement) {
                     if ((currentNote->GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
                         isInUnison = true;
-                        continue;
                     }
                     else if ((!currentNote->IsGraceNote() && !currentNote->GetDrawingCueSize())
                         && (previousNote->IsGraceNote() || previousNote->GetDrawingCueSize())
@@ -1866,7 +1865,13 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                     }
                     else if ((currentNote->GetDrawingDur() > DUR_2) && (previousDuration > DUR_2)) {
                         isInUnison = true;
+                    }
+                    if (currentNote->GetDots() == previousNote->GetDots()) {
                         continue;
+                    }
+                    else {
+                        isInUnison = false;
+                        horizontalMargin *= (currentNote->GetDots() > previousNote->GetDots()) ? 0 : -1;
                     }
                 }
                 else {
