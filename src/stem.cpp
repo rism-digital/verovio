@@ -30,11 +30,11 @@ namespace vrv {
 
 static const ClassRegistrar<Note> s_factory("stem", STEM);
 
-Stem::Stem() : LayerElement(STEM, "stem-"), AttGraced(), AttStems(), AttStemsCmn()
+Stem::Stem() : LayerElement(STEM, "stem-"), AttGraced(), AttStemVis(), AttVisibility()
 {
     this->RegisterAttClass(ATT_GRACED);
-    this->RegisterAttClass(ATT_STEMS);
-    this->RegisterAttClass(ATT_STEMSCMN);
+    this->RegisterAttClass(ATT_STEMVIS);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
 }
@@ -45,8 +45,8 @@ void Stem::Reset()
 {
     LayerElement::Reset();
     this->ResetGraced();
-    this->ResetStems();
-    this->ResetStemsCmn();
+    this->ResetStemVis();
+    this->ResetVisibility();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingStemLen = 0;
@@ -64,6 +64,25 @@ bool Stem::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+void Stem::FillAttributes(const AttStems &attSource)
+{
+    if (attSource.HasStemDir()) {
+        this->SetDir(attSource.GetStemDir());
+    }
+    if (attSource.HasStemLen()) {
+        this->SetLen(attSource.GetStemLen());
+    }
+    if (attSource.HasStemPos()) {
+        this->SetPos(attSource.GetStemPos());
+    }
+    if (attSource.HasStemMod()) {
+        this->SetDrawingStemMod(attSource.GetStemMod());
+    }
+    if (attSource.HasStemVisible()) {
+        this->SetVisible(attSource.GetStemVisible());
+    }
 }
 
 int Stem::CompareToElementPosition(const Doc *doc, const LayerElement *otherElement, int margin) const
@@ -157,7 +176,7 @@ void Stem::AdjustFlagPlacement(const Doc *doc, Flag *flag, int staffSize, int ve
 int Stem::AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) const
 {
     // if stem length is explicitly set - exit
-    if (this->HasStemLen()) return 0;
+    if (this->HasLen()) return 0;
 
     const int staffSize = staff->m_drawingStaffSize;
     const int unit = doc->GetDrawingUnit(staffSize);
@@ -166,7 +185,7 @@ int Stem::AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) cons
     if (bTrem) {
         stemMod = bTrem->GetDrawingStemMod();
     }
-    else if (this->HasStemMod() && (this->GetStemMod() < 8)) {
+    else if (this->HasDrawingStemMod() && (this->GetDrawingStemMod() < 8)) {
         stemMod = this->GetDrawingStemMod();
     }
     if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return 0;
@@ -227,8 +246,8 @@ int Stem::CalcStem(FunctorParams *functorParams)
     const int unit = params->m_doc->GetDrawingUnit(staffSize);
     int baseStem = 0;
     // Use the given one if any
-    if (this->HasStemLen()) {
-        baseStem = this->GetStemLen() * -unit;
+    if (this->HasLen()) {
+        baseStem = this->GetLen() * -unit;
     }
     // Do not adjust the baseStem for stem sameas notes (its length is in m_chordStemLength)
     else if (!params->m_isStemSameasSecondary) {
@@ -240,10 +259,10 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // Even if a stem length is given we add the length of the chord content (however only if not 0)
     // Also, the given stem length is understood as being measured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
-    if (!params->m_staff || !this->HasStemLen() || (this->GetStemLen() != 0)) {
+    if (!params->m_staff || !this->HasLen() || (this->GetLen() != 0)) {
         Point p;
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            if (this->GetStemPos() == STEMPOSITION_left) {
+            if (this->GetPos() == STEMPOSITION_left) {
                 p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
                 p.x += stemShift;
             }
@@ -255,7 +274,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
             this->SetDrawingStemLen(baseStem + params->m_chordStemLength + stemShotening);
         }
         else {
-            if (this->GetStemPos() == STEMPOSITION_right) {
+            if (this->GetPos() == STEMPOSITION_right) {
                 p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
                 p.x -= stemShift;
             }
@@ -294,11 +313,11 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     // Do not adjust the length with stem sameas notes or if given in the encoding
     // however, the stem will be extend with the SMuFL extension from 32th - this can be improved
-    if (params->m_isStemSameasSecondary || this->HasStemLen()) {
-        if ((this->GetStemLen() == 0) && flag) flag->m_drawingNbFlags = 0;
+    if (params->m_isStemSameasSecondary || this->HasLen()) {
+        if ((this->GetLen() == 0) && flag) flag->m_drawingNbFlags = 0;
         return FUNCTOR_CONTINUE;
     }
-    if ((this->GetStemVisible() == BOOLEAN_false) && flag) {
+    if ((this->GetVisible() == BOOLEAN_false) && flag) {
         flag->m_drawingNbFlags = 0;
         return FUNCTOR_CONTINUE;
     }
@@ -366,7 +385,7 @@ void Stem::CalculateStemModRelY(const Doc *doc, const Staff *staff)
     if (bTrem) {
         stemMod = bTrem->GetDrawingStemMod();
     }
-    else if (this->HasStemMod() && (this->GetStemMod() < 8)) {
+    else if (this->HasDrawingStemMod() && (this->GetDrawingStemMod() < 8)) {
         stemMod = this->GetDrawingStemMod();
     }
     if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return;

@@ -118,6 +118,7 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "stem.h"
 #include "subst.h"
 #include "supplied.h"
 #include "surface.h"
@@ -679,6 +680,12 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(SPACE)) {
         m_currentNode = m_currentNode.append_child("space");
         this->WriteSpace(m_currentNode, vrv_cast<Space *>(object));
+    }
+    else if (object->Is(STEM)) {
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("stem");
+            this->WriteStem(m_currentNode, vrv_cast<Stem *>(object));
+        }
     }
     else if (object->Is(SYL)) {
         m_currentNode = m_currentNode.append_child("syl");
@@ -2625,6 +2632,16 @@ void MEIOutput::WriteSpace(pugi::xml_node currentNode, Space *space)
     this->WriteDurationInterface(currentNode, space);
 }
 
+void MEIOutput::WriteStem(pugi::xml_node currentNode, Stem *stem)
+{
+    assert(stem);
+
+    this->WriteLayerElement(currentNode, stem);
+    stem->WriteGraced(currentNode);
+    stem->WriteStemVis(currentNode);
+    stem->WriteVisibility(currentNode);
+}
+
 void MEIOutput::WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym)
 {
     assert(tabDurSym);
@@ -3472,6 +3489,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "plica") {
+            return true;
+        }
+        else if (element == "stem") {
             return true;
         }
         else if (element == "syl") {
@@ -5802,6 +5822,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "space") {
             success = this->ReadSpace(parent, xmlElement);
         }
+        else if (elementName == "stem") {
+            success = this->ReadStem(parent, xmlElement);
+        }
         else if (elementName == "syl") {
             success = this->ReadSyl(parent, xmlElement);
         }
@@ -6428,6 +6451,20 @@ bool MEIInput::ReadSpace(Object *parent, pugi::xml_node space)
 
     parent->AddChild(vrvSpace);
     this->ReadUnsupportedAttr(space, vrvSpace);
+    return true;
+}
+
+bool MEIInput::ReadStem(Object *parent, pugi::xml_node stem)
+{
+    Stem *vrvStem = new Stem();
+    this->ReadLayerElement(stem, vrvStem);
+
+    vrvStem->ReadGraced(stem);
+    vrvStem->ReadStemVis(stem);
+    vrvStem->ReadVisibility(stem);
+
+    parent->AddChild(vrvStem);
+    this->ReadUnsupportedAttr(stem, vrvStem);
     return true;
 }
 

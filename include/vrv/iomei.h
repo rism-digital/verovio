@@ -401,6 +401,7 @@ private:
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
+    void WriteStem(pugi::xml_node currentNode, Stem *stem);
     void WriteSyllable(pugi::xml_node currentNode, Syllable *syllable);
     void WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym);
     void WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp);
@@ -700,6 +701,7 @@ private:
     bool ReadProport(Object *parent, pugi::xml_node proport);
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
+    bool ReadStem(Object *parent, pugi::xml_node stem);
     bool ReadSyl(Object *parent, pugi::xml_node syl);
     bool ReadSyllable(Object *parent, pugi::xml_node syllable);
     bool ReadTabDurSym(Object *parent, pugi::xml_node tabDurSym);
