@@ -344,6 +344,16 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
         assert(staff);
+
+        Object *parent = element->GetParent();
+        assert(parent);
+
+        bool isInsideSyllable = element->GetParent()->Is(SYLLABLE);
+        // If inside syllable, move outside
+        if (isInsideSyllable) {
+            this->MoveOutsideSyllable(elementId);
+        }
+
         // Note that y param is relative to initial position for clefs
         int initialClefLine = clef->GetLine();
         int clefLine = round(((double)y - x * tan(staff->GetDrawingRotate() * M_PI / 180.0))
@@ -544,6 +554,25 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                     (precedingClefAfter != NULL) ? precedingClefAfter : layer->GetCurrentClef(), clef);
             }
         }
+        // Check if new position is still inside syllable
+        if (isInsideSyllable) {
+            Syllable *syllable = dynamic_cast<Syllable *> (parent);
+            Object *fNc = syllable->GetFirst(NEUME)->GetFirst(NC);
+            Object *lNc = (syllable->GetChildCount(NEUME) == 1) 
+                ? syllable->GetFirst(NEUME)->GetLast()
+                : syllable->GetLast()->GetLast();
+
+            int syllableLeft = fNc->GetFacsimileInterface()->GetZone()->GetUlx();
+            int syllableRight = lNc->GetFacsimileInterface()->GetZone()->GetLrx();
+            int clefLeft = clef->GetFacsimileInterface()->GetZone()->GetUlx();
+            int clefRight = clef->GetFacsimileInterface()->GetZone()->GetLrx();
+
+            // If inside, move clef back into syllable
+            if (syllableLeft < clefLeft && clefRight < syllableRight) {
+                this->InsertToSyllable(elementId);
+            }
+        }
+
     }
     else if (element->Is(STAFF)) {
         Staff *staff = dynamic_cast<Staff *>(element);
