@@ -1871,7 +1871,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                     }
                     else {
                         isInUnison = false;
-                        if ((currentNote->GetDrawingDur() == DUR_1) || (previousNote->GetDrawingDur() == DUR_1)) {
+                        if ((currentNote->GetDrawingDur() <= DUR_1) || (previousNote->GetDrawingDur() <= DUR_1)) {
                             horizontalMargin *= -1;
                         }
                         else {
