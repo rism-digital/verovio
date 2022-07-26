@@ -204,6 +204,10 @@ int Clef::AdjustBeams(FunctorParams *functorParams)
     AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
     assert(params);
     if (!params->m_beam) return FUNCTOR_SIBLINGS;
+    // ignore elements that start before/after the beam
+    if (this->GetDrawingX() < params->m_x1) return FUNCTOR_CONTINUE;
+    const int beamRight = params->m_x1 + (params->m_y2 - params->m_y1) / params->m_beamSlope;
+    if (this->GetDrawingX() > beamRight) return FUNCTOR_CONTINUE;
 
     Staff *staff = this->GetAncestorStaff();
     // find number of beams at current position
