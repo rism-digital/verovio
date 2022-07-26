@@ -1833,10 +1833,10 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
             if (unison && currentNote->IsUnisonWith(previousNote, false)) {
                 int previousDuration = previousNote->GetDrawingDur();
                 assert(previousNote->GetParent());
-                const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
+                const bool isPreviousChord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;
                 data_STEMDIRECTION stemDir = currentNote->GetDrawingStemDir();
-                if (isPreviousCoord) {
+                if (isPreviousChord) {
                     Chord *parentChord = vrv_cast<Chord *>(previousNote->GetParent());
                     previousDuration = parentChord->GetDur();
                     isEdgeElement = ((STEMDIRECTION_down == stemDir) && (parentChord->GetBottomNote() == previousNote))
@@ -1846,7 +1846,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                 else if ((currentNote->GetDrawingDur() == DUR_1) && (previousDuration == DUR_1)) {
                     horizontalMargin = 0;
                 }
-                if (!isPreviousCoord || isEdgeElement || isChordElement) {
+                if (!isPreviousChord || isEdgeElement || isChordElement) {
                     if ((currentNote->GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
                         isInUnison = true;
                     }
