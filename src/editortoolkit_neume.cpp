@@ -286,12 +286,24 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // clef association is done at the syllable level because of MEI structure
         // also note this will initialize syllable as null in the case of custos
         // which is why all the references to syllable are ternary
-        Syllable *syllable = ((element->Is(SYLLABLE)) ? (dynamic_cast<Syllable *>(element))
-                                                      : dynamic_cast<Syllable *>(element->GetFirstAncestor(SYLLABLE)));
+        Syllable *syllable = ((element->Is(SYLLABLE)) 
+            ? (dynamic_cast<Syllable *>(element))
+            : dynamic_cast<Syllable *>(element->GetFirstAncestor(SYLLABLE)));
 
         ClassIdComparison ac(CLEF);
         InterfaceComparison facsIC(INTERFACE_FACSIMILE);
         InterfaceComparison pitchIC(INTERFACE_PITCH);
+
+        // Check for clefs in syllable
+        ListOfObjects clefs;
+        syllable->FindAllDescendantByComparison(&clefs, &ac);
+        bool containsClef = (clefs.size() != 0);
+        // Syllable contains clef: move clef out of syllable
+        if (containsClef) {
+            for (Object *clef : clefs) {
+                this->MoveOutsideSyllable(clef->GetUuid());
+            }
+        }
 
         FacsimileInterface *fi = element->GetFacsimileInterface();
         if (fi && fi->HasFacs()) {
@@ -327,6 +339,13 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             }
         }
 
+        // Syllable contains clef: drag clef seperately on the same staff line
+        if (containsClef) {
+            for (Object *clef : clefs) {
+                this->Drag(clef->GetUuid(), x, 0);
+            }
+        }
+
         layer->ReorderByXPos();
 
         if (element->Is(CUSTOS)) {
@@ -334,6 +353,13 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         }
         else {
             AdjustPitchFromPosition(syllable);
+        }
+
+        // Syllable contains clef: Insert clefs back into syllable
+        if (containsClef) {
+            for (Object *clef : clefs) {
+                this->InsertToSyllable(clef->GetUuid());
+            }
         }
     }
     else if (element->Is(CLEF)) {
