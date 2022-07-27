@@ -77,7 +77,7 @@ public:
      * Return the SMuFL str for the dynamic symbol.
      * Call IsSymbolOnly first to check.
      */
-    std::wstring GetSymbolStr() const;
+    std::wstring GetSymbolStr(const bool singleGlyphs) const;
 
     /**
      * See FloatingObject::IsExtenderElement
@@ -97,7 +97,7 @@ public:
 
     static bool IsSymbolOnly(const std::wstring &str);
 
-    static std::wstring GetSymbolStr(const std::wstring &str);
+    static std::wstring GetSymbolStr(const std::wstring &str, const bool singleGlyphs);
 
     //----------//
     // Functors //

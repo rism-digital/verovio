@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "hairpin.h"
@@ -97,9 +98,9 @@ bool Dynam::IsSymbolOnly() const
     return false;
 }
 
-std::wstring Dynam::GetSymbolStr() const
+std::wstring Dynam::GetSymbolStr(const bool singleGlyphs) const
 {
-    return Dynam::GetSymbolStr(m_symbolStr);
+    return Dynam::GetSymbolStr(m_symbolStr, singleGlyphs);
 }
 
 std::pair<wchar_t, wchar_t> Dynam::GetEnclosingGlyphs() const
@@ -174,69 +175,71 @@ bool Dynam::IsSymbolOnly(const std::wstring &str)
     return false;
 }
 
-std::wstring Dynam::GetSymbolStr(const std::wstring &str)
+std::wstring Dynam::GetSymbolStr(const std::wstring &str, const bool singleGlyphs)
 {
     std::wstring dynam;
-    if (str == L"p")
-        dynam.push_back(SMUFL_E520_dynamicPiano);
-    else if (str == L"m")
-        dynam.push_back(SMUFL_E521_dynamicMezzo);
-    else if (str == L"f")
-        dynam.push_back(SMUFL_E522_dynamicForte);
-    else if (str == L"r")
-        dynam.push_back(SMUFL_E523_dynamicRinforzando);
-    else if (str == L"s")
-        dynam.push_back(SMUFL_E524_dynamicSforzando);
-    else if (str == L"z")
-        dynam.push_back(SMUFL_E525_dynamicZ);
-    else if (str == L"n")
-        dynam.push_back(SMUFL_E526_dynamicNiente);
-    else if (str == L"pppppp")
-        dynam.push_back(SMUFL_E527_dynamicPPPPPP);
-    else if (str == L"ppppp")
-        dynam.push_back(SMUFL_E528_dynamicPPPPP);
-    else if (str == L"pppp")
-        dynam.push_back(SMUFL_E529_dynamicPPPP);
-    else if (str == L"ppp")
-        dynam.push_back(SMUFL_E52A_dynamicPPP);
-    else if (str == L"pp")
-        dynam.push_back(SMUFL_E52B_dynamicPP);
-    else if (str == L"mp")
-        dynam.push_back(SMUFL_E52C_dynamicMP);
-    else if (str == L"mf")
-        dynam.push_back(SMUFL_E52D_dynamicMF);
-    else if (str == L"pf")
-        dynam.push_back(SMUFL_E52E_dynamicPF);
-    else if (str == L"ff")
-        dynam.push_back(SMUFL_E52F_dynamicFF);
-    else if (str == L"fff")
-        dynam.push_back(SMUFL_E530_dynamicFFF);
-    else if (str == L"ffff")
-        dynam.push_back(SMUFL_E531_dynamicFFFF);
-    else if (str == L"fffff")
-        dynam.push_back(SMUFL_E532_dynamicFFFFF);
-    else if (str == L"ffffff")
-        dynam.push_back(SMUFL_E533_dynamicFFFFFF);
-    else if (str == L"fp")
-        dynam.push_back(SMUFL_E534_dynamicFortePiano);
-    else if (str == L"fz")
-        dynam.push_back(SMUFL_E535_dynamicForzando);
-    else if (str == L"sf")
-        dynam.push_back(SMUFL_E536_dynamicSforzando1);
-    else if (str == L"sfp")
-        dynam.push_back(SMUFL_E537_dynamicSforzandoPiano);
-    else if (str == L"sfpp")
-        dynam.push_back(SMUFL_E538_dynamicSforzandoPianissimo);
-    else if (str == L"sfz")
-        dynam.push_back(SMUFL_E539_dynamicSforzato);
-    else if (str == L"sfzp")
-        dynam.push_back(SMUFL_E53A_dynamicSforzatoPiano);
-    else if (str == L"sffz")
-        dynam.push_back(SMUFL_E53B_dynamicSforzatoFF);
-    else if (str == L"rf")
-        dynam.push_back(SMUFL_E53C_dynamicRinforzando1);
-    else if (str == L"rfz")
-        dynam.push_back(SMUFL_E53D_dynamicRinforzando2);
+    if (!singleGlyphs) {
+        if (str == L"p")
+            dynam.push_back(SMUFL_E520_dynamicPiano);
+        else if (str == L"m")
+            dynam.push_back(SMUFL_E521_dynamicMezzo);
+        else if (str == L"f")
+            dynam.push_back(SMUFL_E522_dynamicForte);
+        else if (str == L"r")
+            dynam.push_back(SMUFL_E523_dynamicRinforzando);
+        else if (str == L"s")
+            dynam.push_back(SMUFL_E524_dynamicSforzando);
+        else if (str == L"z")
+            dynam.push_back(SMUFL_E525_dynamicZ);
+        else if (str == L"n")
+            dynam.push_back(SMUFL_E526_dynamicNiente);
+        else if (str == L"pppppp")
+            dynam.push_back(SMUFL_E527_dynamicPPPPPP);
+        else if (str == L"ppppp")
+            dynam.push_back(SMUFL_E528_dynamicPPPPP);
+        else if (str == L"pppp")
+            dynam.push_back(SMUFL_E529_dynamicPPPP);
+        else if (str == L"ppp")
+            dynam.push_back(SMUFL_E52A_dynamicPPP);
+        else if (str == L"pp")
+            dynam.push_back(SMUFL_E52B_dynamicPP);
+        else if (str == L"mp")
+            dynam.push_back(SMUFL_E52C_dynamicMP);
+        else if (str == L"mf")
+            dynam.push_back(SMUFL_E52D_dynamicMF);
+        else if (str == L"pf")
+            dynam.push_back(SMUFL_E52E_dynamicPF);
+        else if (str == L"ff")
+            dynam.push_back(SMUFL_E52F_dynamicFF);
+        else if (str == L"fff")
+            dynam.push_back(SMUFL_E530_dynamicFFF);
+        else if (str == L"ffff")
+            dynam.push_back(SMUFL_E531_dynamicFFFF);
+        else if (str == L"fffff")
+            dynam.push_back(SMUFL_E532_dynamicFFFFF);
+        else if (str == L"ffffff")
+            dynam.push_back(SMUFL_E533_dynamicFFFFFF);
+        else if (str == L"fp")
+            dynam.push_back(SMUFL_E534_dynamicFortePiano);
+        else if (str == L"fz")
+            dynam.push_back(SMUFL_E535_dynamicForzando);
+        else if (str == L"sf")
+            dynam.push_back(SMUFL_E536_dynamicSforzando1);
+        else if (str == L"sfp")
+            dynam.push_back(SMUFL_E537_dynamicSforzandoPiano);
+        else if (str == L"sfpp")
+            dynam.push_back(SMUFL_E538_dynamicSforzandoPianissimo);
+        else if (str == L"sfz")
+            dynam.push_back(SMUFL_E539_dynamicSforzato);
+        else if (str == L"sfzp")
+            dynam.push_back(SMUFL_E53A_dynamicSforzatoPiano);
+        else if (str == L"sffz")
+            dynam.push_back(SMUFL_E53B_dynamicSforzatoFF);
+        else if (str == L"rf")
+            dynam.push_back(SMUFL_E53C_dynamicRinforzando1);
+        else if (str == L"rfz")
+            dynam.push_back(SMUFL_E53D_dynamicRinforzando2);
+    }
 
     if (!dynam.empty()) return dynam;
 
