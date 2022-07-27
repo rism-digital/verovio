@@ -208,6 +208,15 @@ bool MEIOutput::Export()
 
         // schema processing instruction
         std::string schema;
+        if (this->IsPageBasedMEI()) {
+            schema = "https://www.verovio.org/schema/dev/mei-verovio.rng";
+        }
+        else if (this->GetBasic()) {
+            schema = "https://music-encoding.org/schema/dev/mei-basic.rng";
+        }
+        else {
+            schema = "https://music-encoding.org/schema/dev/mei-all.rng";
+        }
 
         decl = meiDoc.append_child(pugi::node_declaration);
         decl.set_name("xml-model");
