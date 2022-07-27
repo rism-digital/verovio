@@ -2371,11 +2371,15 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                         if (ulx == -1) {
                             ulx = facsInter->GetDrawingX();
                         }
-                        if (facsInter->GetDrawingY() >= uly){
-                            lry = facsInter->GetHeight() + facsInter->GetDrawingY();
+                        else {
+                            lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
+                        }
+
+                        if (uly == -1){
+                            uly = facsInter->GetDrawingY();                        
                         }
                         else {
-                            uly = facsInter->GetDrawingY();
+                            lry = facsInter->GetHeight() + facsInter->GetDrawingY();
                         }  
                     }   
                 }            
