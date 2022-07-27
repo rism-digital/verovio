@@ -1189,6 +1189,15 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
         persName.append_attribute("role").set_value(creator.node().attribute("type").as_string());
     }
 
+    pugi::xpath_node_set dateSet = root.select_nodes("/score-partwise/identification/encoding/encoding-date");
+    for (pugi::xpath_node_set::const_iterator it = dateSet.begin(); it != dateSet.end(); ++it) {
+        pugi::xpath_node encodingDate = *it;
+        pugi::xml_node date = pubStmt.append_child("date");
+        date.text().set(encodingDate.node().text().as_string());
+        date.append_attribute("isodate").set_value(encodingDate.node().text().as_string());
+        date.append_attribute("type").set_value(encodingDate.node().name());
+    }
+
     // Convert rights into availability
     pugi::xpath_node_set rightsSet = root.select_nodes("/score-partwise/identification/rights");
     if (!rightsSet.empty()) {
@@ -1199,15 +1208,6 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
                 .append_child(pugi::node_pcdata)
                 .set_value(rights.node().text().as_string());
         }
-    }
-
-    pugi::xpath_node_set dateSet = root.select_nodes("/score-partwise/identification/encoding/encoding-date");
-    for (pugi::xpath_node_set::const_iterator it = dateSet.begin(); it != dateSet.end(); ++it) {
-        pugi::xpath_node encodingDate = *it;
-        pugi::xml_node date = pubStmt.append_child("date");
-        date.text().set(encodingDate.node().text().as_string());
-        date.append_attribute("isodate").set_value(encodingDate.node().text().as_string());
-        date.append_attribute("type").set_value(encodingDate.node().name());
     }
 
     pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
