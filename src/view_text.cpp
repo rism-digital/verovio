@@ -28,6 +28,7 @@
 #include "rend.h"
 #include "smufl.h"
 #include "svg.h"
+#include "symbol.h"
 #include "system.h"
 #include "text.h"
 #include "vrv.h"
@@ -448,4 +449,15 @@ void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params)
 
     dc->EndGraphic(svg, this);
 }
+
+void View::DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(symbol);
+
+    dc->StartGraphic(symbol, "", symbol->GetID());
+
+    dc->EndGraphic(symbol, this);
+}
+
 } // namespace vrv
