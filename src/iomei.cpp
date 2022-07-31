@@ -208,6 +208,15 @@ bool MEIOutput::Export()
 
         // schema processing instruction
         std::string schema;
+        if (this->IsPageBasedMEI()) {
+            schema = "https://www.verovio.org/schema/dev/mei-verovio.rng";
+        }
+        else if (this->GetBasic()) {
+            schema = "https://music-encoding.org/schema/dev/mei-basic.rng";
+        }
+        else {
+            schema = "https://music-encoding.org/schema/dev/mei-all.rng";
+        }
 
         decl = meiDoc.append_child(pugi::node_declaration);
         decl.set_name("xml-model");
@@ -1374,12 +1383,6 @@ bool MEIOutput::WriteDoc(Doc *doc)
         pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
         pugi::xml_node date = pubStmt.append_child("date");
 
-        pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
-        pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-        pugi::xml_node p1 = projectDesc.append_child("p");
-        p1.append_child(pugi::node_pcdata)
-            .set_value(StringFormat("Encoded with Verovio version %s", GetVersion().c_str()).c_str());
-
         // date
         time_t t = time(0); // get time now
         struct tm *now = localtime(&t);
@@ -1387,8 +1390,17 @@ bool MEIOutput::WriteDoc(Doc *doc)
             now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
         date.append_child(pugi::node_pcdata).set_value(dateStr.c_str());
 
-        // revisionDesc
-        if (!m_doc->GetOptions()->m_transpose.GetValue().empty()) this->WriteRevisionDesc(meiHead);
+        if (!this->GetBasic()) {
+            // encodingDesc
+            pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
+            pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
+            pugi::xml_node p1 = projectDesc.append_child("p");
+            p1.append_child(pugi::node_pcdata)
+                .set_value(StringFormat("Encoded with Verovio version %s", GetVersion().c_str()).c_str());
+
+            // revisionDesc
+            if (!m_doc->GetOptions()->m_transpose.GetValue().empty()) this->WriteRevisionDesc(meiHead);
+        }
     }
 
     // ---- music ----
