@@ -2647,7 +2647,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 }
             }
         }
-        if (el->Is(ACCID) || el->Is(DIVLINE)) {
+        if (el->Is(ACCID) || el->Is(DIVLINE) || el->Is(CLEF)) {
             fparent = el->GetFirstAncestor(SYLLABLE);
             sparent = el->GetFirstAncestor(LAYER);
             if (fparent && sparent) {
