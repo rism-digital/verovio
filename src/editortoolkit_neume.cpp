@@ -233,10 +233,11 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 
 bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 {
+    // LogMessage("%s", actions.get<jsonxx::Object>(0).json().c_str());
     bool status = true;
     jsonxx::Object results;
     for (int i = 0; i < (int)actions.size(); i++) {
-        if (!actions.has<jsonxx::Object>(i)) {
+        if (!actions.has<jsonxx::Object>(0)) {
             LogError("Action %d was not an object", i);
             m_infoObject.reset();
             m_infoObject.import("status", "FAILURE");
@@ -2111,23 +2112,60 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
 
         if (par->GetClassId() == SYLLABLE) {
-            // Check if it is part of a linked/split syllable and unlink
-            Syllable *li = dynamic_cast<Syllable *>(par);
-            assert(li);
+            // Check if it is part of a linked/split syllable
+            // unlink, group into two new syllables, and link resulting syllables
+            Syllable *parSyllable = dynamic_cast<Syllable *>(par);
+            assert(parSyllable);
             std::string linkedID;
-            if (li->HasPrecedes()) {
-                linkedID = li->GetPrecedes();
+            if (parSyllable->HasFollows()) {
+                linkedID = parSyllable->GetFollows();
                 if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
-                Set(li->GetUuid(),"precedes","");
-                Set(linkedID,"follows","");
-                SetText(linkedID,"");
-            } 
-            else if (li->HasFollows()) {
-                linkedID = li->GetFollows();
-                if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
-                Set(li->GetUuid(),"follows","");
+
+                // unlink
+                Set(parSyllable->GetUuid(),"follows","");
                 Set(linkedID,"precedes","");
-                SetText(li->GetUuid(),"");
+
+                // group into two new syllables
+                int idx = std::distance(elementIds.begin(), it);
+                std::string resultId0;
+                std::string resultId1;
+
+                // LogMessage("%s", chainArray.get<jsonxx::Object>(0).json().c_str());
+                // for_each(elementIds.begin(), elementIds.begin()+idx,[](std::string s){LogMessage("%s", s.c_str());});
+
+                std::vector<std::string> elementIds0 = {elementIds.begin(), elementIds.begin()+idx};
+                Group("neume", elementIds0);
+                if (m_infoObject.get<jsonxx::String>("status") == "FAILURE") {
+                    resultId0 = linkedID;
+                } else {
+                    resultId0 = m_infoObject.get<jsonxx::String>("uuid");
+                }
+
+                std::vector<std::string> elementIds1 = {elementIds.begin()+idx, elementIds.end()};
+                Group("neume", elementIds1);
+                if (m_infoObject.get<jsonxx::String>("status") == "FAILURE") {
+                    resultId1 = par->GetUuid();
+                } else {
+                    resultId1= m_infoObject.get<jsonxx::String>("uuid");
+                    par = m_doc->GetDrawingPage()->FindDescendantByUuid(resultId1);
+                }
+
+                // link resulting syllables
+                Set(resultId0,"precedes","#" + resultId1);
+                Set(resultId1, "follows", "#" + resultId0);
+                Object *resultSyl1 = dynamic_cast<Object *>(par->FindDescendantByType(SYL));
+                if (resultSyl1 != NULL) {
+                    Remove(resultSyl1->GetUuid());
+                }
+
+                jsonxx::Array uuidArray;
+                uuidArray << resultId0;
+                uuidArray << resultId1;
+
+                m_infoObject.import("uuid", uuidArray);
+                m_infoObject.import("status", status);
+                m_infoObject.import("message", message);
+                return true;
             }
         }
 
@@ -2383,13 +2421,16 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             std::wstring fullString = L"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
-                if (fullSyl == NULL && syl != NULL) {
-                    fullSyl = syl;
-                }
-                Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
-                if (text != NULL) {
-                    std::wstring currentString = text->GetText();
-                    fullString = fullString + currentString;
+                if (syl != NULL) {
+                    if (fullSyl == NULL) {
+                        fullSyl = syl;
+                    }
+                
+                    Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
+                    if (text != NULL) {
+                        std::wstring currentString = text->GetText();
+                        fullString = fullString + currentString;
+                    }
                 }
             }
             // find the new boundingbox comprising all of the text
@@ -2401,18 +2442,24 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 assert(descSyl);
                 // FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>
                 // ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
-                FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
-                if (facsInter != NULL) {
-                    if (ulx == -1) {
-                        ulx = facsInter->GetDrawingX();
-                    }
-                    if (facsInter->GetDrawingY() >= uly){
-                        lry = facsInter->GetHeight() + facsInter->GetDrawingY();
-                    }
-                    else {
-                        uly = facsInter->GetDrawingY();
-                    }  
-                }                
+                if (descSyl != NULL) {
+                    FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
+                    if (facsInter != NULL) {
+                        if (ulx == -1) {
+                            ulx = facsInter->GetDrawingX();
+                        }
+                        else {
+                            lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
+                        }
+
+                        if (uly == -1){
+                            uly = facsInter->GetDrawingY();                        
+                        }
+                        else {
+                            lry = facsInter->GetHeight() + facsInter->GetDrawingY();
+                        }  
+                    }   
+                }            
             }
             assert(fullSyl);
             Text *text = dynamic_cast<Text *>(fullSyl->FindDescendantByType(TEXT));
