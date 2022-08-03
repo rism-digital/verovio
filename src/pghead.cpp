@@ -51,7 +51,7 @@ int PgHead::GetTotalHeight(const Doc *doc) const
     return height;
 }
 
-bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
+bool PgHead::GenerateFromMEIHeader(const pugi::xml_document &header)
 {
     pugi::xpath_node node;
     pugi::xpath_node_set nodeSet;
