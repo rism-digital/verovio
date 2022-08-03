@@ -57,7 +57,7 @@ public:
     bool ToggleLigature(std::vector<std::string> elementIds);
     bool ChangeStaff(std::string elementId);
     bool ChangeStaffTo(std::string elementId, std::string staffId);
-    bool HandleClefMovement(Clef* clef, int x, int y);
+    bool ClefMovementHandler(Clef* clef, int x, int y);
     ///@}
 protected:
     /**

@@ -323,7 +323,7 @@ bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 // from some clef to the clef we're dragging, we need the line of this clef to be the one it is after
 // the drag action. Each of the clef->SetLine() calls are placed so as to accommodate this.
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-bool EditorToolkitNeume::HandleClefMovement(Clef *clef, int x, int y) {
+bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y) {
 
     Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
     if (!layer) return false;
@@ -510,7 +510,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // Check for clefs in syllable
         ListOfObjects clefs;
         syllable->FindAllDescendantByComparison(&clefs, &ac);
-        bool containsClef = (clefs.size() != 0);
+        bool hasClef = (clefs.size() != 0);
 
         FacsimileInterface *fi = element->GetFacsimileInterface();
         if (fi && fi->HasFacs()) {
@@ -548,10 +548,10 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             }
         }
 
-        if (containsClef) {
+        if (hasClef) {
             for (Object *obj : clefs) {
                 Clef *clef = dynamic_cast<Clef *>(obj);
-                HandleClefMovement(clef, x, 0);
+                ClefMovementHandler(clef, x, 0);
             }
         }
 
@@ -561,7 +561,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             AdjustPitchFromPosition(element);
         }
         // if syllable contains clef, adjust individual neumes
-        else if (containsClef) {
+        else if (hasClef) {
             ListOfObjects neumes;
             ClassIdComparison neumeCompare(NEUME);
             element->FindAllDescendantByComparison(&neumes, &neumeCompare);
@@ -576,7 +576,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     else if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
         assert(clef);
-        HandleClefMovement(clef, x, y);
+        ClefMovementHandler(clef, x, y);
     }
     else if (element->Is(STAFF)) {
         Staff *staff = dynamic_cast<Staff *>(element);
@@ -1332,11 +1332,11 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
         precedingClef = (precedingClef != NULL) ? precedingClef : layer->GetCurrentClef();
 
         // Get neumes in syllable after inserted clef
-        Object *nextElement = dynamic_cast<Object *>(m_doc->GetDrawingPage()->FindNextChild(&sc, syllable));
-        ListOfObjects elementsAfterClef;
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&elementsAfterClef, &ic, clef, nextElement);
+        Object *nextSyllable = dynamic_cast<Object *>(m_doc->GetDrawingPage()->FindNextChild(&sc, syllable));
+        ListOfObjects syllablesAfterClef;
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&syllablesAfterClef, &ic, clef, nextSyllable);
 
-        for (Object *iter : elementsAfterClef) {
+        for (Object *iter : syllablesAfterClef) {
             iter->GetPitchInterface()->AdjustPitchForNewClef(precedingClef, clef);
         }
     }
@@ -1408,11 +1408,11 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
         precedingClef = (precedingClef != NULL) ? precedingClef : layer->GetCurrentClef();
 
         // Get neumes in syllable after inserted clef
-        Object *nextElement = dynamic_cast<Object *>(m_doc->GetDrawingPage()->FindNextChild(&sc, parent));
-        ListOfObjects elementsAfterClef;
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&elementsAfterClef, &ic, clef, nextElement);
+        Object *nextSyllable = dynamic_cast<Object *>(m_doc->GetDrawingPage()->FindNextChild(&sc, parent));
+        ListOfObjects syllablesAfterClef;
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&syllablesAfterClef, &ic, clef, nextSyllable);
 
-        for (Object *iter : elementsAfterClef) {
+        for (Object *iter : syllablesAfterClef) {
             iter->GetPitchInterface()->AdjustPitchForNewClef(clef, precedingClef);
         }
     }
