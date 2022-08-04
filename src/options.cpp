@@ -1226,6 +1226,11 @@ Options::Options()
     m_engravingDefaultsFile.Init(JsonSource::FilePath, "");
     this->Register(&m_engravingDefaultsFile, "engravingDefaultsFile", &m_generalLayout);
 
+    m_extenderLineMinSpace.SetInfo(
+        "Extender line minimum space", "Minimum space required for extender line to be drawn");
+    m_extenderLineMinSpace.Init(1.5, 1.5, 10.0);
+    this->Register(&m_extenderLineMinSpace, "extenderLineMinSpace", &m_generalLayout);
+
     m_fingeringScale.SetInfo("Fingering scale", "The scale of fingering font compared to default font size");
     m_fingeringScale.Init(0.75, 0.25, 1);
     this->Register(&m_fingeringScale, "fingeringScale", &m_generalLayout);
