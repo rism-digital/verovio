@@ -36,14 +36,12 @@ public:
     std::string GetClassName() const override { return "PageMilestoneEnd"; }
     ///@}
 
-    // void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
-    // Measure *GetMeasure() { return m_drawingMeasure; }
-
     /**
      * @name Get the corresponding milestone start
      */
     ///@{
-    Object *GetStart() const { return m_start; }
+    Object *GetStart() { return m_start; }
+    const Object *GetStart() const { return m_start; }
     std::string GetStartClassName() const { return m_startClassName; }
     ///@}
 
@@ -121,7 +119,8 @@ public:
     ///@{
     void SetEnd(PageMilestoneEnd *end);
     PageMilestoneEnd *GetEnd() { return m_end; }
-    bool IsPageMilestone() { return (m_end != NULL); }
+    const PageMilestoneEnd *GetEnd() const { return m_end; }
+    bool IsPageMilestone() const { return (m_end != NULL); }
     ///@}
 
     /**
