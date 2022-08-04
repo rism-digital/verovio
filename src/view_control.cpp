@@ -1111,17 +1111,18 @@ void View::DrawControlElementConnector(
     const int width = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int y = element->GetDrawingY() + width / 2;
 
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // the length of the dash and the space between them - can be made a parameter
-    const int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
     const int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
-    const int halfDashLength = dashLength / 2;
+    const int minDashSpace = m_doc->GetOptions()->m_extenderLineMinSpace.GetValue() * unit;
+    const int halfDashLength = unit * 2 / 3;
 
     int dist = x2 - x1;
     int nbDashes = dist / dashSpace;
 
     int margin = dist / 2;
     // no dash if the distance is smaller than a dash length
-    if (dist < dashLength) {
+    if (dist < minDashSpace) {
         nbDashes = 0;
     }
     // at least one dash
