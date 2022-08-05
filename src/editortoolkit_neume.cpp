@@ -1723,26 +1723,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                         Zone *tempZone = vrv_cast<Zone *>(temp->GetZone());
                         assert(tempZone);
                         if (temp->HasFacs()) {
-                            if (syllableFi == NULL) {
-                                zone->SetUlx(tempZone->GetUlx());
-                                zone->SetUly(tempZone->GetUly());
-                                zone->SetLrx(tempZone->GetLrx());
-                                zone->SetLry(tempZone->GetLry());
-                            }
-                            else {
-                                if (tempZone->GetUlx() < zone->GetUlx()) {
-                                    zone->SetUlx(tempZone->GetUlx());
-                                }
-                                if (tempZone->GetUly() < zone->GetUly()) {
-                                    zone->SetUly(tempZone->GetUly());
-                                }
-                                if (tempZone->GetLrx() > zone->GetLrx()) {
-                                    zone->SetLrx(tempZone->GetLrx());
-                                }
-                                if (tempZone->GetLry() > zone->GetLry()) {
-                                    zone->SetLry(tempZone->GetLry());
-                                }
-                            }
+                            zone->SetUlx(tempZone->GetUlx());
+                            zone->SetUly(tempZone->GetUly());
+                            zone->SetLrx(tempZone->GetLrx());
+                            zone->SetLry(tempZone->GetLry());
                         }
                     }
                 }
