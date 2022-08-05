@@ -11,7 +11,7 @@
 
 #include <algorithm>
 #include <codecvt>
-#include <limits.h>
+#include <limits>
 #include <locale>
 #include <math.h>
 #include <set>
