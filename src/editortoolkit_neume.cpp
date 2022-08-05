@@ -1732,9 +1732,9 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 }
 
                 // make the bounding box a little bigger and lower so it's easier to edit
-                int offSetUly = 100;
-                int offSetLrx = 100;
-                int offSetLry = 200;
+                const int offSetUly = 100;
+                const int offSetLrx = 100;
+                const int offSetLry = 200;
 
                 zone->SetUly(zone->GetUly() + offSetUly);
                 zone->SetLrx(zone->GetLrx() + offSetLrx);
@@ -1820,10 +1820,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
                 if (facsInter != NULL) {
                     // Update bb to valid extremes
-                    int newUlx = facsInter->GetDrawingX();
-                    int newUly = facsInter->GetDrawingY();
-                    int newLrx = facsInter->GetWidth() + newUlx;
-                    int newLry = facsInter->GetHeight() + newUly;
+                    const int newUlx = facsInter->GetDrawingX();
+                    const int newUly = facsInter->GetDrawingY();
+                    const int newLrx = facsInter->GetWidth() + newUlx;
+                    const int newLry = facsInter->GetHeight() + newUly;
                     if ((ulx > newUlx) || (ulx < 0)) {
                         ulx = newUlx;
                     }
@@ -2267,10 +2267,10 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     if (isLigature == "true") {
         if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
-        int ligUlx = firstNc->GetZone()->GetUlx();
-        int ligUly = firstNc->GetZone()->GetUly();
-        int ligLrx = firstNc->GetZone()->GetLrx();
-        int ligLry = firstNc->GetZone()->GetLry();
+        const int ligUlx = firstNc->GetZone()->GetUlx();
+        const int ligUly = firstNc->GetZone()->GetUly();
+        const int ligLrx = firstNc->GetZone()->GetLrx();
+        const int ligLry = firstNc->GetZone()->GetLry();
 
         Staff *staff = firstNc->GetAncestorStaff();
 
@@ -2804,8 +2804,8 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         pi->SetOct(3);
 
         // glyphs in Verovio are actually not centered, but are in the top left corner of a giant box
-        int centerY = fi->GetZone()->GetUly();
-        int centerX = fi->GetZone()->GetUlx();
+        const int centerY = fi->GetZone()->GetUly();
+        const int centerX = fi->GetZone()->GetUlx();
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int pitchDifference = round(
@@ -2903,10 +2903,10 @@ bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
         return false;
     }
 
-    const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int yDiff = clef->GetZone()->GetUly() - staff->GetZone()->GetUly()
+    const double staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const double yDiff = clef->GetZone()->GetUly() - staff->GetZone()->GetUly()
         + (clef->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) * tan(staff->GetDrawingRotate() * M_PI / 180.0);
-    int clefLine = staff->m_drawingLines - round((double)yDiff / (double)staffSize);
+    const int clefLine = staff->m_drawingLines - round(yDiff / staffSize);
     clef->SetLine(clefLine);
     return true;
 }
