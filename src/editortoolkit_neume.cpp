@@ -10,7 +10,6 @@
 //--------------------------------------------------------------------------------
 
 #include <algorithm>
-#include <codecvt>
 #include <limits>
 #include <locale>
 #include <math.h>
@@ -1066,12 +1065,10 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
 }
 
 // Update the text of a TextElement by its syl
-bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
+bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
 {
     std::string status = "OK", message = "";
-    std::wstring wtext;
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
-    wtext = conv.from_bytes(text);
+    const std::wstring wtext = UTF8to16(text);
     if (!m_doc->GetDrawingPage()) {
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Could not find drawing page.");
