@@ -38,7 +38,11 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    virtual AreaPosInterface *GetAreaPosInterface() { return dynamic_cast<AreaPosInterface *>(this); }
+    AreaPosInterface *GetAreaPosInterface() override { return dynamic_cast<AreaPosInterface *>(this); }
+    const AreaPosInterface *GetAreaPosInterface() const override
+    {
+        return dynamic_cast<const AreaPosInterface *>(this);
+    }
     ///@}
 
     /**
