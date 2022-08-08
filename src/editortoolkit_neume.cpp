@@ -10,8 +10,7 @@
 //--------------------------------------------------------------------------------
 
 #include <algorithm>
-#include <codecvt>
-#include <limits.h>
+#include <limits>
 #include <locale>
 #include <math.h>
 #include <set>
@@ -1066,12 +1065,10 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
 }
 
 // Update the text of a TextElement by its syl
-bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
+bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
 {
     std::string status = "OK", message = "";
-    std::wstring wtext;
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
-    wtext = conv.from_bytes(text);
+    const std::wstring wtext = UTF8to16(text);
     if (!m_doc->GetDrawingPage()) {
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Could not find drawing page.");
@@ -1723,34 +1720,18 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                         Zone *tempZone = vrv_cast<Zone *>(temp->GetZone());
                         assert(tempZone);
                         if (temp->HasFacs()) {
-                            if (syllableFi == NULL) {
-                                zone->SetUlx(tempZone->GetUlx());
-                                zone->SetUly(tempZone->GetUly());
-                                zone->SetLrx(tempZone->GetLrx());
-                                zone->SetLry(tempZone->GetLry());
-                            }
-                            else {
-                                if (tempZone->GetUlx() < zone->GetUlx()) {
-                                    zone->SetUlx(tempZone->GetUlx());
-                                }
-                                if (tempZone->GetUly() < zone->GetUly()) {
-                                    zone->SetUly(tempZone->GetUly());
-                                }
-                                if (tempZone->GetLrx() > zone->GetLrx()) {
-                                    zone->SetLrx(tempZone->GetLrx());
-                                }
-                                if (tempZone->GetLry() > zone->GetLry()) {
-                                    zone->SetLry(tempZone->GetLry());
-                                }
-                            }
+                            zone->SetUlx(tempZone->GetUlx());
+                            zone->SetUly(tempZone->GetUly());
+                            zone->SetLrx(tempZone->GetLrx());
+                            zone->SetLry(tempZone->GetLry());
                         }
                     }
                 }
 
                 // make the bounding box a little bigger and lower so it's easier to edit
-                int offSetUly = 100;
-                int offSetLrx = 100;
-                int offSetLry = 200;
+                const int offSetUly = 100;
+                const int offSetLrx = 100;
+                const int offSetLry = 200;
 
                 zone->SetUly(zone->GetUly() + offSetUly);
                 zone->SetLrx(zone->GetLrx() + offSetLrx);
@@ -1836,10 +1817,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
                 if (facsInter != NULL) {
                     // Update bb to valid extremes
-                    int newUlx = facsInter->GetDrawingX();
-                    int newUly = facsInter->GetDrawingY();
-                    int newLrx = facsInter->GetWidth() + newUlx;
-                    int newLry = facsInter->GetHeight() + newUly;
+                    const int newUlx = facsInter->GetDrawingX();
+                    const int newUly = facsInter->GetDrawingY();
+                    const int newLrx = facsInter->GetWidth() + newUlx;
+                    const int newLry = facsInter->GetHeight() + newUly;
                     if ((ulx > newUlx) || (ulx < 0)) {
                         ulx = newUlx;
                     }
@@ -2283,10 +2264,10 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     if (isLigature == "true") {
         if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
-        int ligUlx = firstNc->GetZone()->GetUlx();
-        int ligUly = firstNc->GetZone()->GetUly();
-        int ligLrx = firstNc->GetZone()->GetLrx();
-        int ligLry = firstNc->GetZone()->GetLry();
+        const int ligUlx = firstNc->GetZone()->GetUlx();
+        const int ligUly = firstNc->GetZone()->GetUly();
+        const int ligLrx = firstNc->GetZone()->GetLrx();
+        const int ligLry = firstNc->GetZone()->GetLry();
 
         Staff *staff = firstNc->GetAncestorStaff();
 
@@ -2820,8 +2801,8 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         pi->SetOct(3);
 
         // glyphs in Verovio are actually not centered, but are in the top left corner of a giant box
-        int centerY = fi->GetZone()->GetUly();
-        int centerX = fi->GetZone()->GetUlx();
+        const int centerY = fi->GetZone()->GetUly();
+        const int centerX = fi->GetZone()->GetUlx();
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int pitchDifference = round(
@@ -2919,10 +2900,10 @@ bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
         return false;
     }
 
-    const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int yDiff = clef->GetZone()->GetUly() - staff->GetZone()->GetUly()
+    const double staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const double yDiff = clef->GetZone()->GetUly() - staff->GetZone()->GetUly()
         + (clef->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) * tan(staff->GetDrawingRotate() * M_PI / 180.0);
-    int clefLine = staff->m_drawingLines - round((double)yDiff / (double)staffSize);
+    const int clefLine = staff->m_drawingLines - round(yDiff / staffSize);
     clef->SetLine(clefLine);
     return true;
 }

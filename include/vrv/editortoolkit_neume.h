@@ -43,7 +43,7 @@ public:
         std::vector<std::pair<std::string, std::string>> attributes);
     bool Merge(std::vector<std::string> elementIds);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
-    bool SetText(std::string elementId, std::string text);
+    bool SetText(std::string elementId, const std::string &text);
     bool SetClef(std::string elementId, std::string shape);
     bool Split(std::string elementId, int x);
     bool Remove(std::string elementId);
