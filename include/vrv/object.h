@@ -23,6 +23,7 @@
 
 namespace vrv {
 
+class AreaPosInterface;
 class Doc;
 class DurationInterface;
 class EditorialElement;
