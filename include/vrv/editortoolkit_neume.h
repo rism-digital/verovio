@@ -43,6 +43,7 @@ public:
         std::vector<std::pair<std::string, std::string> > attributes);
     bool InsertToSyllable(std::string elementId);
     bool MoveOuttaSyllable(std::string elementId);
+    bool DisplaceClefOctave(std::string elementId, std::string direction);
     bool Merge(std::vector<std::string> elementIds);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     bool SetText(std::string elementId, std::string text);
@@ -69,6 +70,7 @@ protected:
         int *lrx, int *lry, std::vector<std::pair<std::string, std::string> > *attributes);
     bool ParseInsertToSyllableAction(jsonxx::Object param, std::string *elementId);
     bool ParseMoveOuttaSyllableAction(jsonxx::Object param, std::string *elementId);
+    bool ParseDisplaceClefAction(jsonxx::Object param, std::string *elementId, std::string *direction);
     bool ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     bool ParseSetTextAction(jsonxx::Object param, std::string *elementId, std::string *text);
