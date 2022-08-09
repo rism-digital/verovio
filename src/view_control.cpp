@@ -19,6 +19,7 @@
 #include "beamspan.h"
 #include "bracketspan.h"
 #include "breath.h"
+#include "caesura.h"
 #include "clef.h"
 #include "comparison.h"
 #include "devicecontext.h"
@@ -86,6 +87,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Breath *breath = vrv_cast<Breath *>(element);
         assert(breath);
         this->DrawBreath(dc, breath, measure, system);
+    }
+    else if (element->Is(CAESURA)) {
+        Caesura *caesura = vrv_cast<Caesura *>(element);
+        assert(caesura);
+        this->DrawCaesura(dc, caesura, measure, system);
     }
     else if (element->Is(DIR)) {
         Dir *dir = vrv_cast<Dir *>(element);
@@ -1508,6 +1514,40 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
     }
 
     dc->EndGraphic(breath, this);
+}
+
+void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(caesura);
+
+    // Cannot draw a caesura that has no start position
+    if (!caesura->GetStart()) return;
+
+    const bool drawingCueSize = false;
+
+    dc->StartGraphic(caesura, "", caesura->GetID());
+
+    const wchar_t code = SMUFL_E504_repeatBarSlash;
+    const int x = caesura->GetStart()->GetDrawingX() + caesura->GetStart()->GetDrawingRadius(m_doc);
+
+    std::vector<Staff *> staffList = caesura->GetTstampStaves(measure, caesura);
+    for (Staff *staff : staffList) {
+        if (!system->SetCurrentFloatingPositioner(staff->GetN(), caesura, caesura->GetStart(), staff)) {
+            continue;
+        }
+
+        const int y = (caesura->GetPlace() == STAFFREL_within) ? staff->GetDrawingY() : caesura->GetDrawingY();
+
+        const int adjustedStaffSize = 0.8 * staff->m_drawingStaffSize;
+        const int glyphWidth = m_doc->GetGlyphWidth(code, adjustedStaffSize, false);
+        this->DrawSmuflCode(dc, x - glyphWidth / 4, y, code, adjustedStaffSize, false);
+        this->DrawSmuflCode(dc, x + glyphWidth / 4, y, code, adjustedStaffSize, false);
+    }
+
+    dc->EndGraphic(caesura, this);
 }
 
 void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system)

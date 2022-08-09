@@ -18,6 +18,7 @@
 #include "beam.h"
 #include "bracketspan.h"
 #include "breath.h"
+#include "caesura.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -185,6 +186,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         assert(breath);
         // breath above by default
         m_place = (breath->GetPlace() != STAFFREL_NONE) ? breath->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is(CAESURA)) {
+        Caesura *caesura = vrv_cast<Caesura *>(object);
+        assert(caesura);
+        // caesura within by default
+        m_place = (caesura->GetPlace() != STAFFREL_NONE) ? caesura->GetPlace() : STAFFREL_within;
     }
     else if (object->Is(DIR)) {
         Dir *dir = vrv_cast<Dir *>(object);
