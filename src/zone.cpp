@@ -47,12 +47,12 @@ void Zone::ShiftByXY(int xDiff, int yDiff)
     this->SetLry(this->GetLry() + yDiff);
 }
 
-int Zone::GetLogicalUly()
+int Zone::GetLogicalUly() const
 {
     return (this->GetUly());
 }
 
-int Zone::GetLogicalLry()
+int Zone::GetLogicalLry() const
 {
     return (this->GetLry());
 }

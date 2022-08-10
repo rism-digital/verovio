@@ -23,6 +23,7 @@
 
 namespace vrv {
 
+class AreaPosInterface;
 class Doc;
 class DurationInterface;
 class EditorialElement;
@@ -127,6 +128,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    virtual AreaPosInterface *GetAreaPosInterface() { return NULL; }
+    virtual const AreaPosInterface *GetAreaPosInterface() const { return NULL; }
     virtual BeamDrawingInterface *GetBeamDrawingInterface() { return NULL; }
     virtual const BeamDrawingInterface *GetBeamDrawingInterface() const { return NULL; }
     virtual DurationInterface *GetDurationInterface() { return NULL; }

@@ -298,7 +298,7 @@ bool RunningElement::AdjustRunningElementYPos()
     return true;
 }
 
-int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v)
+int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const
 {
     int pos = 0;
     switch (h) {
@@ -316,7 +316,7 @@ int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALI
     return pos;
 }
 
-void RunningElement::SetCurrentPageNum(Page *currentPage)
+void RunningElement::SetCurrentPageNum(const Page *currentPage)
 {
     assert(currentPage);
 

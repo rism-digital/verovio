@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        expand.cpp
+// Name:        expan.cpp
 // Author:      Laurent Pugin
 // Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
