@@ -575,8 +575,46 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     }
     else if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
-        assert(clef);
-        ClefMovementHandler(clef, x, y);
+        if (!clef->HasFacs()) {
+            LogError("Clef dragging is only supported for clefs with facsimiles!");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Clef dragging is only supported for clefs with facsimiles.");
+            return false;
+        }
+        FacsimileInterface *fi = (*clef).GetFacsimileInterface();
+        assert(fi);       
+        
+        // if inside a syllable,
+        // check if it is still in the syllable zone (x range),
+        // if not, move it out
+        if (element->GetParent()->Is(SYLLABLE)) {
+            Object *parent = element->GetParent();
+            assert(parent);
+            
+            Object *fNc = parent->GetFirst(NEUME)->GetFirst(NC);
+            Object *lNc;
+            if (parent->GetChildCount(NEUME) == 1) {
+                lNc = parent->GetFirst(NEUME)->GetLast();
+            } else {
+                lNc = parent->GetLast()->GetLast();
+            }
+
+            int xLeft = fNc->GetFacsimileInterface()->GetZone()->GetUlx();
+            int xRight = lNc->GetFacsimileInterface()->GetZone()->GetLrx();
+
+            std::cout << std::to_string(xLeft) << " " << std::to_string(xRight) << "\n";
+            std::cout << std::to_string(fi->GetZone()->GetUlx()) << " " << std::to_string(fi->GetZone()->GetLrx()) << "\n";
+
+            if (fi->GetZone() != NULL) {
+                if (x < xLeft || xRight < x) {
+                    MoveOutsideSyllable(clef->GetUuid());
+                }
+                ClefMovementHandler(clef, x, y);
+            }
+        }
+        else {
+            ClefMovementHandler(clef, x, y);
+        }
     }
     else if (element->Is(STAFF)) {
         Staff *staff = dynamic_cast<Staff *>(element);
@@ -1315,8 +1353,9 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
     assert(syllable);
 
     // Find previous clef preceding following syllable (for is element is clef)
-    ClassIdComparison sc(SYLLABLE);
     ClassIdComparison cc(CLEF);
+    ClassIdComparison sc(SYLLABLE);
+
     Object *nextSyllable = m_doc->GetDrawingPage()->FindNextChild(&sc, syllable);
     Clef *clefPrecedingNextSyllableBefore = 
         (nextSyllable)
@@ -1329,17 +1368,16 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
     parent->ClearRelinquishedChildren();
     parent->ReorderByXPos();
 
-    // Adjust pitches of neumes following inserted clef inside syllable
+    // Adjust pitches of elements following inserted clef inside syllable
     if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
         Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
         assert(layer);
-
         InterfaceComparison ic(INTERFACE_PITCH);
 
-        // Get neumes after inserted clef until another inserted clef or end of syllable
-        Object *endElement;
+        // Get elements after inserted clef until another inserted clef or end of syllable
         Object *nextClef = m_doc->GetDrawingPage()->FindNextChild(&cc, clef);
+        Object *endElement;
         if ( (nextClef) && (nextClef->GetParent() == syllable) ) {
             endElement = nextClef;
         }
@@ -1349,14 +1387,14 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
         ListOfObjects targetedElements;
         m_doc->GetDrawingPage()->FindAllDescendantBetween(&targetedElements, &ic, clef, endElement);
 
-        // Adjust pitches for neumes in syllable affected by inserted clef
+        // Adjust pitches for elements in syllable affected by inserted clef
         Clef *precedingClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cc, clef));
         Clef *previousClef = (precedingClef) ? precedingClef : layer->GetCurrentClef();
         for (Object *iter : targetedElements) {
             iter->GetPitchInterface()->AdjustPitchForNewClef(previousClef, clef);
         }
 
-        // In the case of this clef moving before any clefs outsde the syllable in mei
+        // In the case of this clef moving before any clefs outside the syllable in mei
         if (nextSyllable) {
             Clef *clefPrecedingNextSyllableAfter = 
                 (nextSyllable)
@@ -1399,8 +1437,6 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
     assert(element);
     Object *parent = element->GetParent();
     assert(parent);
-    // Stop if parent is not syllable
-    if (!parent->Is(SYLLABLE)) return false;
 
     if (element == NULL) {
         LogError("No element exists with ID '%s'.", elementId.c_str());
@@ -1430,24 +1466,34 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
     Object *secondParent = parent->GetParent();
     assert(secondParent);
 
-    // restore pitches of neumes back to pitches in accordance with preceding clef
+    // Restore pitches of neumes affected by clef
     if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
+        Object *syllable = parent;
         Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
+        assert(layer);
 
-        ClassIdComparison cic(CLEF);
+        ClassIdComparison cc(CLEF);
         InterfaceComparison ic(INTERFACE_PITCH);
         ClassIdComparison sc(SYLLABLE);
 
-        Clef *precedingClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cic, clef));
+        // Get elements after inserted clef until another inserted clef or end of syllable
+        Object *nextSyllable = m_doc->GetDrawingPage()->FindNextChild(&sc, syllable);
+        Object *nextClef = m_doc->GetDrawingPage()->FindNextChild(&cc, clef);
+        Object *endElement;
+        if ( (nextClef) && (nextClef->GetParent() == syllable) ) {
+            endElement = nextClef;
+        }
+        else {
+            endElement = (nextSyllable) ? nextSyllable : m_doc->GetDrawingPage()->GetLast();
+        }
+        ListOfObjects targetedElements;
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&targetedElements, &ic, clef, endElement);
+
+        Clef *precedingClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cc, clef));
         precedingClef = (precedingClef != NULL) ? precedingClef : layer->GetCurrentClef();
 
-        // Get neumes in syllable after inserted clef
-        Object *nextSyllable = dynamic_cast<Object *>(m_doc->GetDrawingPage()->FindNextChild(&sc, parent));
-        ListOfObjects syllablesAfterClef;
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&syllablesAfterClef, &ic, clef, nextSyllable);
-
-        for (Object *iter : syllablesAfterClef) {
+        for (Object *iter : targetedElements) {
             iter->GetPitchInterface()->AdjustPitchForNewClef(clef, precedingClef);
         }
     }
