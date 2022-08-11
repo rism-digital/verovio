@@ -24,9 +24,12 @@ namespace vrv {
 
 static const ClassRegistrar<Symbol> s_factory("symbol", SYMBOL);
 
-Symbol::Symbol() : Object(SYMBOL, "symbol-")
+Symbol::Symbol() : Object(SYMBOL, "symbol-"), AttColor(), AttExtSym()
 {
     this->Reset();
+
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_EXTSYM);
 }
 
 Symbol::~Symbol() {}
@@ -34,6 +37,9 @@ Symbol::~Symbol() {}
 void Symbol::Reset()
 {
     Object::Reset();
+
+    this->ResetColor();
+    this->ResetExtSym();
 
     m_visibility = Visible;
 }

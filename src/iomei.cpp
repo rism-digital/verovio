@@ -2837,6 +2837,9 @@ void MEIOutput::WriteSymbol(pugi::xml_node currentNode, Symbol *symbol)
 {
     assert(symbol);
 
+    symbol->WriteColor(currentNode);
+    symbol->WriteExtSym(currentNode);
+
     this->WriteXmlId(currentNode, symbol);
 }
 
@@ -6756,6 +6759,9 @@ bool MEIInput::ReadSymbol(Object *parent, pugi::xml_node symbol)
             meiElementName.c_str());
         vrvSymbol->m_visibility = Hidden;
     }
+
+    vrvSymbol->ReadColor(symbol);
+    vrvSymbol->ReadExtSym(symbol);
 
     parent->AddChild(vrvSymbol);
     this->ReadUnsupportedAttr(symbol, vrvSymbol);

@@ -8,7 +8,9 @@
 #ifndef __VRV_SYMBOL_H__
 #define __VRV_SYMBOL_H__
 
+#include "atts_externalsymbols.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "object.h"
 
 namespace vrv {
@@ -20,7 +22,7 @@ namespace vrv {
 /**
  * This class models the MEI <symbol> element.
  */
-class Symbol : public Object {
+class Symbol : public Object, public AttColor, public AttExtSym {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
