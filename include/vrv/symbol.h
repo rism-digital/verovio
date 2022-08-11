@@ -42,7 +42,14 @@ public:
 private:
     //
 public:
-    //
+    /**
+     * Holds the visibility (hidden or visible) for an symbol element.
+     * By default, a symbo elements is visible but it is make invisible when with mixed content
+     * The reason is that we cannot render SVG <g> within <text>.
+     * Symbol with text is not supported by Verovio.
+     */
+    VisibilityType m_visibility;
+
 private:
 };
 

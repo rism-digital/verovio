@@ -34,6 +34,8 @@ Symbol::~Symbol() {}
 void Symbol::Reset()
 {
     Object::Reset();
+
+    m_visibility = Visible;
 }
 
 bool Symbol::IsSupportedChild(Object *child)
