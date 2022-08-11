@@ -13,8 +13,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "editorial.h"
 #include "functorparams.h"
+#include "symbol.h"
 #include "text.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -65,6 +67,9 @@ bool Dir::IsSupportedChild(Object *child)
     if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
+    else if (child->Is(SYMBOL)) {
+        assert(dynamic_cast<Symbol *>(child));
+    }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
@@ -72,6 +77,35 @@ bool Dir::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+void Dir::AddChild(Object *child)
+{
+    if (!this->IsSupportedChild(child)) {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        return;
+    }
+
+    child->SetParent(this);
+
+    ArrayOfObjects &children = this->GetChildrenForModification();
+
+    children.push_back(child);
+
+    ClassIdComparison symbol(SYMBOL);
+    symbol.ReverseComparison();
+    if (this->FindDescendantByComparison(&symbol)) {
+        for (const auto child : children) {
+            if (!child->Is(SYMBOL)) continue;
+            Symbol *symbol = vrv_cast<Symbol *>(child);
+            if (symbol->m_visibility != Hidden) {
+                LogWarning("Element <symbol> within <dir> can only be rendered if not mixed with other elements");
+                symbol->m_visibility = Hidden;
+            }
+        }
+    }
+
+    Modify();
 }
 
 bool Dir::AreChildrenAlignedTo(data_HORIZONTALALIGNMENT alignment) const
