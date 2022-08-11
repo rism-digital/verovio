@@ -6621,6 +6621,9 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
             success = this->ReadSvg(parent, xmlElement);
         }
         else if (elementName == "symbol") {
+            // There will be some additional checks when reading Symbol because of some additional limitations:
+            // * <symbol> is not supported with mixed text content or together with other text elements (e.g. <rend>)
+            // * <symbol> is not supported within editorial markup
             success = this->ReadSymbol(parent, xmlElement);
         }
         else if (xmlElement.text()) {
@@ -6745,6 +6748,14 @@ bool MEIInput::ReadSymbol(Object *parent, pugi::xml_node symbol)
 {
     Symbol *vrvSymbol = new Symbol();
     this->SetMeiID(symbol, vrvSymbol);
+
+    if (parent->IsEditorialElement()) {
+        std::string meiElementName = parent->GetClassName();
+        std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
+        LogWarning("Element <%s> within <%s> is not supported and will not be rendered", symbol.name(),
+            meiElementName.c_str());
+        vrvSymbol->m_visibility = Hidden;
+    }
 
     parent->AddChild(vrvSymbol);
     this->ReadUnsupportedAttr(symbol, vrvSymbol);
