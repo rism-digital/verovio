@@ -9,7 +9,7 @@
 #define __VRV_SYMBOL_H__
 
 #include "atts_shared.h"
-#include "textelement.h"
+#include "object.h"
 
 namespace vrv {
 
