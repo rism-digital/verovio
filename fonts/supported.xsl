@@ -1885,7 +1885,7 @@
             <!--<glyph glyph-code="E7E0" smufl-name="pictBeaterMetalHammer" />-->
             <!--<glyph glyph-code="E7E1" smufl-name="pictBeaterHammer" />-->
             <!--<glyph glyph-code="E7E2" smufl-name="pictBeaterKnittingNeedle" />-->
-            <!--<glyph glyph-code="E7E3" smufl-name="pictBeaterHand" />-->
+            <glyph glyph-code="E7E3" smufl-name="pictBeaterHand" />
             <!--<glyph glyph-code="E7E4" smufl-name="pictBeaterFinger" />-->
             <!--<glyph glyph-code="E7E5" smufl-name="pictBeaterFist" />-->
             <!--<glyph glyph-code="E7E6" smufl-name="pictBeaterFingernails" />-->

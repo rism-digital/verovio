@@ -1,0 +1,25 @@
+<a href="verovio-toolkit.html">verovio-toolkit.html</a>
+<a href="verovio-toolkit-wasm.html">verovio-toolkit-wasm.html</a>
+<a href="verovio-toolkit-hum.html">verovio-toolkit-hum.html</a>
+<a href="verovio-toolkit-light.html">verovio-toolkit-light.html</a>
+<a href="verovio-toolkit-wasm-current.html">verovio-toolkit-wasm-current.html</a>
+<hr>
+<div id="score"></div>
+<script src="./build/3.11.0/verovio-toolkit.js"></script>
+<script>
+    const mei = 'https://raw.githubusercontent.com/music-encoding/sample-encodings/main/MEI_4.0/Music/Encoding_alternatives/Mozart_Veilchen/Das_Veilchen_layout.mei';
+    const humdrum = 'https://raw.githubusercontent.com/WolfgangDrescher/lassus-geistliche-psalmen/master/kern/01-beatus-vir.krn';
+    var verovioToolkit = undefined;
+    console.log(verovio);
+    // Module.onRuntimeInitialized = function () {
+        fetch(mei).then(response => {
+            return response.text();
+        }).then(data => {
+            verovioToolkit = new verovio.toolkit();
+            console.log(verovioToolkit.getVersion());
+            verovioToolkit.loadData(data);
+            const svg = verovioToolkit.renderToSVG(1, {});
+            document.getElementById('score').innerHTML = svg;
+        });
+    // }
+</script>
