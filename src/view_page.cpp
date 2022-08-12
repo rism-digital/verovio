@@ -1696,6 +1696,9 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams
             // cast to EditorialElement check in DrawTextEditorialElement
             this->DrawTextEditorialElement(dc, dynamic_cast<EditorialElement *>(current), params);
         }
+        else if (current->Is(SYMBOL)) {
+            // assert(symbol->m_visibility == Hidden);
+        }
         else {
             assert(false);
         }
