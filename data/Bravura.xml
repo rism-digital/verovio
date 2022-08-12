@@ -569,6 +569,27 @@
   <g c="E655" x="0.0" y="0.0" w="450.0" h="450.0" h-a-x="450" n="keyboardPedalUp"/>
   <g c="E659" x="0.0" y="-15.0" w="1107.0" h="606.0" h-a-x="1107" n="keyboardPedalSost"/>
   <g c="E65A" x="0.0" y="-15.0" w="419.0" h="606.0" h-a-x="419" n="keyboardPedalS"/>
+  <g c="E770" x="0.0" y="-4.0" w="230.0" h="743.0" h-a-x="230" n="pictBeaterSoftXylophoneUp"/>
+  <g c="E771" x="0.0" y="-4.0" w="230.0" h="743.0" h-a-x="230" n="pictBeaterSoftXylophoneDown"/>
+  <g c="E772" x="0.0" y="-1.0" w="436.0" h="661.0" h-a-x="437" n="pictBeaterSoftXylophoneRight"/>
+  <g c="E773" x="0.0" y="-1.0" w="436.0" h="661.0" h-a-x="436" n="pictBeaterSoftXylophoneLeft"/>
+  <g c="E774" x="1.0" y="-1.0" w="230.0" h="743.0" h-a-x="234" n="pictBeaterMediumXylophoneUp"/>
+  <g c="E775" x="1.0" y="-1.0" w="230.0" h="743.0" h-a-x="234" n="pictBeaterMediumXylophoneDown"/>
+  <g c="E776" x="1.0" y="0.0" w="436.0" h="661.0" h-a-x="441" n="pictBeaterMediumXylophoneRight"/>
+  <g c="E777" x="1.0" y="0.0" w="436.0" h="661.0" h-a-x="437" n="pictBeaterMediumXylophoneLeft"/>
+  <g c="E778" x="0.0" y="-1.0" w="230.0" h="743.0" h-a-x="230" n="pictBeaterHardXylophoneUp"/>
+  <g c="E779" x="0.0" y="-1.0" w="230.0" h="743.0" h-a-x="230" n="pictBeaterHardXylophoneDown"/>
+  <g c="E77A" x="0.0" y="0.0" w="436.0" h="661.0" h-a-x="435" n="pictBeaterHardXylophoneRight"/>
+  <g c="E77B" x="-2.0" y="0.0" w="436.0" h="661.0" h-a-x="435" n="pictBeaterHardXylophoneLeft"/>
+  <g c="E77C" x="0.0" y="0.0" w="230.0" h="743.0" h-a-x="230" n="pictBeaterWoodXylophoneUp"/>
+  <g c="E77D" x="0.0" y="0.0" w="230.0" h="743.0" h-a-x="230" n="pictBeaterWoodXylophoneDown"/>
+  <g c="E77E" x="0.0" y="1.0" w="437.0" h="661.0" h-a-x="438" n="pictBeaterWoodXylophoneRight"/>
+  <g c="E77F" x="0.0" y="1.0" w="437.0" h="661.0" h-a-x="437" n="pictBeaterWoodXylophoneLeft"/>
+  <g c="E7D1" x="1.0" y="0.0" w="140.0" h="732.0" h-a-x="142" n="pictBeaterSnareSticksUp"/>
+  <g c="E7D2" x="1.0" y="0.0" w="140.0" h="732.0" h-a-x="142" n="pictBeaterSnareSticksDown"/>
+  <g c="E7E3" x="0.0" y="0.0" w="517.0" h="744.0" h-a-x="519" n="pictBeaterHand"/>
+  <g c="E7E4" x="0.0" y="0.0" w="517.0" h="710.0" h-a-x="519" n="pictBeaterFinger"/>
+  <g c="E7E5" x="0.0" y="0.0" w="509.0" h="430.0" h-a-x="511" n="pictBeaterFist"/>
   <g c="E880" x="-0.3" y="-8.0" w="318.58" h="383.0" h-a-x="319" n="tuplet0"/>
   <g c="E881" x="10.0" y="0.0" w="246.0" h="372.0" h-a-x="246" n="tuplet1"/>
   <g c="E882" x="10.0" y="-6.0" w="319.0" h="381.0" h-a-x="319" n="tuplet2"/>
@@ -682,6 +703,13 @@
   <g c="EAAF" x="-25.0" y="0.0" w="306.0" h="111.0" h-a-x="240" n="wiggleGlissando">
     <a n="repeatOffset" x="0.96" y="0.0"/>
   </g>
+  <g c="EB1C" x="0.0" y="0.0" w="468.0" h="536.0" h-a-x="468" n="elecPlay"/>
+  <g c="EB1D" x="0.0" y="0.0" w="534.0" h="536.0" h-a-x="534" n="elecStop"/>
+  <g c="EB1E" x="0.0" y="0.0" w="495.0" h="536.0" h-a-x="496" n="elecPause"/>
+  <g c="EB1F" x="0.0" y="0.0" w="900.0" h="536.0" h-a-x="901" n="elecFastForward"/>
+  <g c="EB20" x="0.0" y="0.0" w="900.0" h="536.0" h-a-x="901" n="elecRewind"/>
+  <g c="EB21" x="0.0" y="0.0" w="982.0" h="536.0" h-a-x="982" n="elecSkipForwards"/>
+  <g c="EB22" x="0.0" y="0.0" w="982.0" h="536.0" h-a-x="982" n="elecSkipBackwards"/>
   <g c="EBA7" x="0.0" y="0.0" w="36.0" h="790.0" h-a-x="36" n="luteDurationWhole"/>
   <g c="EBA8" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationHalf"/>
   <g c="EBA9" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationQuarter"/>

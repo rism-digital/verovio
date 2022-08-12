@@ -597,4 +597,32 @@
   <g c="E22F" x="0.0" y="0.0" w="396.0" h="96.0" h-a-x="396" n="tremoloDivisiDots3"/>
   <g c="E230" x="0.0" y="0.0" w="546.0" h="96.0" h-a-x="546" n="tremoloDivisiDots4"/>
   <g c="E231" x="0.0" y="0.0" w="396.0" h="246.0" h-a-x="396" n="tremoloDivisiDots6"/>
+  <g c="E7E3" x="0.0" y="0.0" w="468.0" h="752.0" h-a-x="469" n="pictBeaterHand"/>
+  <g c="E7E4" x="0.0" y="0.0" w="468.0" h="714.0" h-a-x="469" n="pictBeaterFinger"/>
+  <g c="E7E5" x="0.0" y="0.0" w="468.0" h="477.44" h-a-x="469" n="pictBeaterFist"/>
+  <g c="E770" x="0.0" y="0.0" w="230.0" h="739.0" h-a-x="230" n="pictBeaterSoftXylophoneUp"/>
+  <g c="E774" x="0.0" y="0.0" w="230.0" h="739.0" h-a-x="230" n="pictBeaterMediumXylophoneUp"/>
+  <g c="E778" x="0.0" y="0.0" w="230.0" h="739.0" h-a-x="230" n="pictBeaterHardXylophoneUp"/>
+  <g c="E771" x="0.0" y="0.0" w="230.0" h="739.0" h-a-x="230" n="pictBeaterSoftXylophoneDown"/>
+  <g c="E772" x="1.0" y="0.0" w="390.0" h="686.0" h-a-x="393" n="pictBeaterSoftXylophoneRight"/>
+  <g c="E773" x="0.0" y="0.0" w="391.0" h="686.0" h-a-x="393" n="pictBeaterSoftXylophoneLeft"/>
+  <g c="E775" x="0.0" y="0.0" w="230.0" h="739.0" h-a-x="230" n="pictBeaterMediumXylophoneDown"/>
+  <g c="E776" x="10.0" y="0.0" w="391.0" h="686.0" h-a-x="392" n="pictBeaterMediumXylophoneRight"/>
+  <g c="E779" x="0.0" y="0.0" w="230.0" h="739.0" h-a-x="230" n="pictBeaterHardXylophoneDown"/>
+  <g c="E777" x="-1.0" y="0.0" w="391.0" h="686.0" h-a-x="392" n="pictBeaterMediumXylophoneLeft"/>
+  <g c="E77B" x="0.0" y="-1.0" w="391.0" h="686.0" h-a-x="392" n="pictBeaterHardXylophoneLeft"/>
+  <g c="E77A" x="1.0" y="-1.0" w="390.0" h="686.0" h-a-x="392" n="pictBeaterHardXylophoneRight"/>
+  <g c="E77C" x="0.0" y="0.0" w="230.0" h="739.0" h-a-x="230" n="pictBeaterWoodXylophoneUp"/>
+  <g c="E77D" x="0.0" y="0.0" w="230.0" h="739.0" h-a-x="230" n="pictBeaterWoodXylophoneDown"/>
+  <g c="E77F" x="-1.0" y="1.0" w="391.0" h="686.0" h-a-x="388" n="pictBeaterWoodXylophoneLeft"/>
+  <g c="E77E" x="0.0" y="1.0" w="390.0" h="686.0" h-a-x="388" n="pictBeaterWoodXylophoneRight"/>
+  <g c="E7D1" x="0.0" y="0.0" w="142.0" h="763.0" h-a-x="142" n="pictBeaterSnareSticksUp"/>
+  <g c="E7D2" x="0.0" y="0.0" w="142.0" h="763.0" h-a-x="142" n="pictBeaterSnareSticksDown"/>
+  <g c="EB1C" x="0.0" y="0.0" w="372.0" h="480.0" h-a-x="372" n="elecPlay"/>
+  <g c="EB1D" x="0.0" y="0.0" w="480.0" h="480.0" h-a-x="480" n="elecStop"/>
+  <g c="EB1E" x="0.0" y="0.0" w="480.0" h="480.0" h-a-x="480" n="elecPause"/>
+  <g c="EB1F" x="0.0" y="0.0" w="736.0" h="480.0" h-a-x="737" n="elecFastForward"/>
+  <g c="EB20" x="0.0" y="0.0" w="739.0" h="480.0" h-a-x="739" n="elecRewind"/>
+  <g c="EB21" x="0.0" y="-1.0" w="834.0" h="481.0" h-a-x="834" n="elecSkipForwards"/>
+  <g c="EB22" x="0.0" y="-1.0" w="834.0" h="481.0" h-a-x="834" n="elecSkipBackwards"/>
 </bounding-boxes>
