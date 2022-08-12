@@ -27,7 +27,9 @@
 #include "options.h"
 #include "rend.h"
 #include "smufl.h"
+#include "staff.h"
 #include "svg.h"
+#include "symbol.h"
 #include "system.h"
 #include "text.h"
 #include "vrv.h"
@@ -448,4 +450,21 @@ void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params)
 
     dc->EndGraphic(svg, this);
 }
+
+void View::DrawSymbol(DeviceContext *dc, Staff *staff, Symbol *symbol, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(symbol);
+
+    dc->StartGraphic(symbol, "", symbol->GetID());
+
+    const wchar_t code = symbol->GetSymbolGlyph();
+
+    this->DrawSmuflCode(dc, params.m_x, params.m_y, code, staff->m_drawingStaffSize, false);
+
+    params.m_x += m_doc->GetGlyphAdvX(code, staff->m_drawingStaffSize, false);
+
+    dc->EndGraphic(symbol, this);
+}
+
 } // namespace vrv

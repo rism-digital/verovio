@@ -17,6 +17,7 @@
 #include "object.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "symbol.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -57,9 +58,13 @@ private:
 class ClassIdComparison : public Comparison {
 
 public:
-    ClassIdComparison(ClassId classId) { m_classId = classId; }
+    ClassIdComparison(ClassId classId)
+    {
+        m_classId = classId;
+        m_supportReverse = true;
+    }
 
-    bool operator()(const Object *object) override { return this->MatchesType(object); }
+    bool operator()(const Object *object) override { return Result(this->MatchesType(object)); }
 
     ClassId GetType() { return m_classId; }
 
@@ -530,6 +535,26 @@ public:
 
 protected:
     const Object *m_objectToExclude;
+};
+
+//----------------------------------------------------------------------------
+// VisibleSymbol
+//----------------------------------------------------------------------------
+/**
+ * This class evaluates if the object is a visible Symbol.
+ */
+class VisibleSymbol : public ClassIdComparison {
+
+public:
+    VisibleSymbol() : ClassIdComparison(SYMBOL) {}
+
+    bool operator()(const Object *object) override
+    {
+        if (!MatchesType(object)) return false;
+        const Symbol *symbol = vrv_cast<const Symbol *>(object);
+        assert(symbol);
+        return (symbol->m_visibility == Visible);
+    }
 };
 
 //----------------------------------------------------------------------------

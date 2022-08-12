@@ -142,6 +142,7 @@ class Surface;
 class Svg;
 class Syl;
 class Syllable;
+class Symbol;
 class System;
 class SystemElement;
 class SystemMilestoneEnd;
@@ -451,6 +452,7 @@ private:
     void WriteNum(pugi::xml_node currentNode, Num *num);
     void WriteRend(pugi::xml_node currentNode, Rend *rend);
     void WriteSvg(pugi::xml_node currentNode, Svg *svg);
+    void WriteSymbol(pugi::xml_node currentNode, Symbol *symbol);
     void WriteText(pugi::xml_node currentNode, Text *text);
     ///@}
 
@@ -752,6 +754,7 @@ private:
     bool ReadLb(Object *parent, pugi::xml_node lb);
     bool ReadRend(Object *parent, pugi::xml_node rend);
     bool ReadSvg(Object *parent, pugi::xml_node svg);
+    bool ReadSymbol(Object *parent, pugi::xml_node symbol);
     bool ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
     ///@}
 

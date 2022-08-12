@@ -1696,6 +1696,9 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams
             // cast to EditorialElement check in DrawTextEditorialElement
             this->DrawTextEditorialElement(dc, dynamic_cast<EditorialElement *>(current), params);
         }
+        else if (current->Is(SYMBOL)) {
+            // assert(symbol->m_visibility == Hidden);
+        }
         else {
             assert(false);
         }
@@ -1714,6 +1717,21 @@ void View::DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawLayerEditorialElement
             this->DrawFbEditorialElement(dc, dynamic_cast<EditorialElement *>(current), params);
+        }
+        else {
+            assert(false);
+        }
+    }
+}
+
+void View::DrawSymbolChildren(DeviceContext *dc, Object *parent, Staff *staff, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(parent);
+
+    for (auto current : parent->GetChildren()) {
+        if (current->Is(SYMBOL)) {
+            this->DrawSymbol(dc, staff, dynamic_cast<Symbol *>(current), params);
         }
         else {
             assert(false);

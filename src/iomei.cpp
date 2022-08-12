@@ -125,6 +125,7 @@
 #include "svg.h"
 #include "syl.h"
 #include "syllable.h"
+#include "symbol.h"
 #include "system.h"
 #include "systemmilestone.h"
 #include "tabdursym.h"
@@ -751,6 +752,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(SVG)) {
         m_currentNode = m_currentNode.append_child("svg");
         this->WriteSvg(m_currentNode, vrv_cast<Svg *>(object));
+    }
+    else if (object->Is(SYMBOL)) {
+        m_currentNode = m_currentNode.append_child("symbol");
+        this->WriteSymbol(m_currentNode, vrv_cast<Symbol *>(object));
     }
     else if (object->Is(TEXT)) {
         this->WriteText(m_currentNode, vrv_cast<Text *>(object));
@@ -2828,6 +2833,16 @@ void MEIOutput::WriteSvg(pugi::xml_node currentNode, Svg *svg)
     }
 }
 
+void MEIOutput::WriteSymbol(pugi::xml_node currentNode, Symbol *symbol)
+{
+    assert(symbol);
+
+    symbol->WriteColor(currentNode);
+    symbol->WriteExtSym(currentNode);
+
+    this->WriteXmlId(currentNode, symbol);
+}
+
 void MEIOutput::WriteText(pugi::xml_node element, Text *text)
 {
     if (!text->GetText().empty()) {
@@ -3245,6 +3260,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "rend") {
+            return true;
+        }
+        else if (element == "symbol") {
             return true;
         }
         else {
@@ -6605,6 +6623,12 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         else if (elementName == "svg") {
             success = this->ReadSvg(parent, xmlElement);
         }
+        else if (elementName == "symbol") {
+            // There will be some additional checks when reading Symbol because of some additional limitations:
+            // * <symbol> is not supported with mixed text content or together with other text elements (e.g. <rend>)
+            // * <symbol> is not supported within editorial markup
+            success = this->ReadSymbol(parent, xmlElement);
+        }
         else if (xmlElement.text()) {
             bool trimLeft = (i == 0);
             bool trimRight = (!xmlElement.next_sibling());
@@ -6720,6 +6744,27 @@ bool MEIInput::ReadSvg(Object *parent, pugi::xml_node svg)
 
     parent->AddChild(vrvSvg);
     this->ReadUnsupportedAttr(svg, vrvSvg);
+    return true;
+}
+
+bool MEIInput::ReadSymbol(Object *parent, pugi::xml_node symbol)
+{
+    Symbol *vrvSymbol = new Symbol();
+    this->SetMeiID(symbol, vrvSymbol);
+
+    if (parent->IsEditorialElement()) {
+        std::string meiElementName = parent->GetClassName();
+        std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
+        LogWarning("Element <%s> within <%s> is not supported and will not be rendered", symbol.name(),
+            meiElementName.c_str());
+        vrvSymbol->m_visibility = Hidden;
+    }
+
+    vrvSymbol->ReadColor(symbol);
+    vrvSymbol->ReadExtSym(symbol);
+
+    parent->AddChild(vrvSymbol);
+    this->ReadUnsupportedAttr(symbol, vrvSymbol);
     return true;
 }
 

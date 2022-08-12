@@ -22,6 +22,7 @@
 #include "scoredef.h"
 #include "section.h"
 #include "staff.h"
+#include "symbol.h"
 #include "system.h"
 #include "text.h"
 #include "textelement.h"
@@ -106,6 +107,9 @@ bool EditorialElement::IsSupportedChild(Object *child)
     }
     else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<Staff *>(child));
+    }
+    else if (child->Is(SYMBOL)) {
+        assert(dynamic_cast<Symbol *>(child));
     }
     else {
         return false;

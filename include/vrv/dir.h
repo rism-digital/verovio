@@ -69,6 +69,11 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
+     * Overwritten method for dir
+     */
+    void AddChild(Object *object) override;
+
+    /**
      * See FloatingObject::IsExtenderElement
      */
     bool IsExtenderElement() const override { return GetExtender() == BOOLEAN_true; }
