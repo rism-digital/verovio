@@ -1770,22 +1770,22 @@
         </miscellaneousPercussionInstrumentPictograms>
         <beatersPictograms>
             <description>Beaters pictograms</description>
-            <!--<glyph glyph-code="E770" smufl-name="pictBeaterSoftXylophoneUp" />-->
-            <!--<glyph glyph-code="E771" smufl-name="pictBeaterSoftXylophoneDown" />-->
-            <!--<glyph glyph-code="E772" smufl-name="pictBeaterSoftXylophoneRight" />-->
-            <!--<glyph glyph-code="E773" smufl-name="pictBeaterSoftXylophoneLeft" />-->
-            <!--<glyph glyph-code="E774" smufl-name="pictBeaterMediumXylophoneUp" />-->
-            <!--<glyph glyph-code="E775" smufl-name="pictBeaterMediumXylophoneDown" />-->
-            <!--<glyph glyph-code="E776" smufl-name="pictBeaterMediumXylophoneRight" />-->
-            <!--<glyph glyph-code="E777" smufl-name="pictBeaterMediumXylophoneLeft" />-->
-            <!--<glyph glyph-code="E778" smufl-name="pictBeaterHardXylophoneUp" />-->
-            <!--<glyph glyph-code="E779" smufl-name="pictBeaterHardXylophoneDown" />-->
-            <!--<glyph glyph-code="E77A" smufl-name="pictBeaterHardXylophoneRight" />-->
-            <!--<glyph glyph-code="E77B" smufl-name="pictBeaterHardXylophoneLeft" />-->
-            <!--<glyph glyph-code="E77C" smufl-name="pictBeaterWoodXylophoneUp" />-->
-            <!--<glyph glyph-code="E77D" smufl-name="pictBeaterWoodXylophoneDown" />-->
-            <!--<glyph glyph-code="E77E" smufl-name="pictBeaterWoodXylophoneRight" />-->
-            <!--<glyph glyph-code="E77F" smufl-name="pictBeaterWoodXylophoneLeft" />-->
+            <glyph glyph-code="E770" smufl-name="pictBeaterSoftXylophoneUp" />
+            <glyph glyph-code="E771" smufl-name="pictBeaterSoftXylophoneDown" />
+            <glyph glyph-code="E772" smufl-name="pictBeaterSoftXylophoneRight" />
+            <glyph glyph-code="E773" smufl-name="pictBeaterSoftXylophoneLeft" />
+            <glyph glyph-code="E774" smufl-name="pictBeaterMediumXylophoneUp" />
+            <glyph glyph-code="E775" smufl-name="pictBeaterMediumXylophoneDown" />
+            <glyph glyph-code="E776" smufl-name="pictBeaterMediumXylophoneRight" />
+            <glyph glyph-code="E777" smufl-name="pictBeaterMediumXylophoneLeft" />
+            <glyph glyph-code="E778" smufl-name="pictBeaterHardXylophoneUp" />
+            <glyph glyph-code="E779" smufl-name="pictBeaterHardXylophoneDown" />
+            <glyph glyph-code="E77A" smufl-name="pictBeaterHardXylophoneRight" />
+            <glyph glyph-code="E77B" smufl-name="pictBeaterHardXylophoneLeft" />
+            <glyph glyph-code="E77C" smufl-name="pictBeaterWoodXylophoneUp" />
+            <glyph glyph-code="E77D" smufl-name="pictBeaterWoodXylophoneDown" />
+            <glyph glyph-code="E77E" smufl-name="pictBeaterWoodXylophoneRight" />
+            <glyph glyph-code="E77F" smufl-name="pictBeaterWoodXylophoneLeft" />
             <!--<glyph glyph-code="E780" smufl-name="pictBeaterSoftGlockenspielUp" />-->
             <!--<glyph glyph-code="E781" smufl-name="pictBeaterSoftGlockenspielDown" />-->
             <!--<glyph glyph-code="E782" smufl-name="pictBeaterSoftGlockenspielRight" />-->
@@ -1867,8 +1867,8 @@
             <!--<glyph glyph-code="E7CE" smufl-name="pictBeaterHammerPlasticDown" />-->
             <!--<glyph glyph-code="E7CF" smufl-name="pictBeaterHammerMetalUp" />-->
             <!--<glyph glyph-code="E7D0" smufl-name="pictBeaterHammerMetalDown" />-->
-            <!--<glyph glyph-code="E7D1" smufl-name="pictBeaterSnareSticksUp" />-->
-            <!--<glyph glyph-code="E7D2" smufl-name="pictBeaterSnareSticksDown" />-->
+            <glyph glyph-code="E7D1" smufl-name="pictBeaterSnareSticksUp" />
+            <glyph glyph-code="E7D2" smufl-name="pictBeaterSnareSticksDown" />
             <!--<glyph glyph-code="E7D3" smufl-name="pictBeaterJazzSticksUp" />-->
             <!--<glyph glyph-code="E7D4" smufl-name="pictBeaterJazzSticksDown" />-->
             <!--<glyph glyph-code="E7D5" smufl-name="pictBeaterTriangleUp" />-->
@@ -1886,8 +1886,8 @@
             <!--<glyph glyph-code="E7E1" smufl-name="pictBeaterHammer" />-->
             <!--<glyph glyph-code="E7E2" smufl-name="pictBeaterKnittingNeedle" />-->
             <glyph glyph-code="E7E3" smufl-name="pictBeaterHand" />
-            <!--<glyph glyph-code="E7E4" smufl-name="pictBeaterFinger" />-->
-            <!--<glyph glyph-code="E7E5" smufl-name="pictBeaterFist" />-->
+            <glyph glyph-code="E7E4" smufl-name="pictBeaterFinger" />
+            <glyph glyph-code="E7E5" smufl-name="pictBeaterFist" />
             <!--<glyph glyph-code="E7E6" smufl-name="pictBeaterFingernails" />-->
             <!--<glyph glyph-code="E7E7" smufl-name="pictCoins" />-->
             <!--<glyph glyph-code="E7E8" smufl-name="pictDrumStick" />-->
@@ -2654,13 +2654,13 @@
             <!--<glyph glyph-code="EB19" smufl-name="elecProjector" />-->
             <!--<glyph glyph-code="EB1A" smufl-name="elecLoudspeaker" />-->
             <!--<glyph glyph-code="EB1B" smufl-name="elecCamera" />-->
-            <!--<glyph glyph-code="EB1C" smufl-name="elecPlay" />-->
-            <!--<glyph glyph-code="EB1D" smufl-name="elecStop" />-->
-            <!--<glyph glyph-code="EB1E" smufl-name="elecPause" />-->
-            <!--<glyph glyph-code="EB1F" smufl-name="elecFastForward" />-->
-            <!--<glyph glyph-code="EB20" smufl-name="elecRewind" />-->
-            <!--<glyph glyph-code="EB21" smufl-name="elecSkipForwards" />-->
-            <!--<glyph glyph-code="EB22" smufl-name="elecSkipBackwards" />-->
+            <glyph glyph-code="EB1C" smufl-name="elecPlay" />
+            <glyph glyph-code="EB1D" smufl-name="elecStop" />
+            <glyph glyph-code="EB1E" smufl-name="elecPause" />
+            <glyph glyph-code="EB1F" smufl-name="elecFastForward" />
+            <glyph glyph-code="EB20" smufl-name="elecRewind" />
+            <glyph glyph-code="EB21" smufl-name="elecSkipForwards" />
+            <glyph glyph-code="EB22" smufl-name="elecSkipBackwards" />
             <!--<glyph glyph-code="EB23" smufl-name="elecLoop" />-->
             <!--<glyph glyph-code="EB24" smufl-name="elecReplay" />-->
             <!--<glyph glyph-code="EB25" smufl-name="elecShuffle" />-->

@@ -328,7 +328,27 @@ enum {
     SMUFL_E655_keyboardPedalUp = 0xE655,
     SMUFL_E659_keyboardPedalSost = 0xE659,
     SMUFL_E65A_keyboardPedalS = 0xE65A,
+    SMUFL_E770_pictBeaterSoftXylophoneUp = 0xE770,
+    SMUFL_E771_pictBeaterSoftXylophoneDown = 0xE771,
+    SMUFL_E772_pictBeaterSoftXylophoneRight = 0xE772,
+    SMUFL_E773_pictBeaterSoftXylophoneLeft = 0xE773,
+    SMUFL_E774_pictBeaterMediumXylophoneUp = 0xE774,
+    SMUFL_E775_pictBeaterMediumXylophoneDown = 0xE775,
+    SMUFL_E776_pictBeaterMediumXylophoneRight = 0xE776,
+    SMUFL_E777_pictBeaterMediumXylophoneLeft = 0xE777,
+    SMUFL_E778_pictBeaterHardXylophoneUp = 0xE778,
+    SMUFL_E779_pictBeaterHardXylophoneDown = 0xE779,
+    SMUFL_E77A_pictBeaterHardXylophoneRight = 0xE77A,
+    SMUFL_E77B_pictBeaterHardXylophoneLeft = 0xE77B,
+    SMUFL_E77C_pictBeaterWoodXylophoneUp = 0xE77C,
+    SMUFL_E77D_pictBeaterWoodXylophoneDown = 0xE77D,
+    SMUFL_E77E_pictBeaterWoodXylophoneRight = 0xE77E,
+    SMUFL_E77F_pictBeaterWoodXylophoneLeft = 0xE77F,
+    SMUFL_E7D1_pictBeaterSnareSticksUp = 0xE7D1,
+    SMUFL_E7D2_pictBeaterSnareSticksDown = 0xE7D2,
     SMUFL_E7E3_pictBeaterHand = 0xE7E3,
+    SMUFL_E7E4_pictBeaterFinger = 0xE7E4,
+    SMUFL_E7E5_pictBeaterFist = 0xE7E5,
     SMUFL_E880_tuplet0 = 0xE880,
     SMUFL_E881_tuplet1 = 0xE881,
     SMUFL_E882_tuplet2 = 0xE882,
@@ -427,6 +447,13 @@ enum {
     SMUFL_EAAD_wiggleArpeggiatoUpArrow = 0xEAAD,
     SMUFL_EAAE_wiggleArpeggiatoDownArrow = 0xEAAE,
     SMUFL_EAAF_wiggleGlissando = 0xEAAF,
+    SMUFL_EB1C_elecPlay = 0xEB1C,
+    SMUFL_EB1D_elecStop = 0xEB1D,
+    SMUFL_EB1E_elecPause = 0xEB1E,
+    SMUFL_EB1F_elecFastForward = 0xEB1F,
+    SMUFL_EB20_elecRewind = 0xEB20,
+    SMUFL_EB21_elecSkipForwards = 0xEB21,
+    SMUFL_EB22_elecSkipBackwards = 0xEB22,
     SMUFL_EBA7_luteDurationWhole = 0xEBA7,
     SMUFL_EBA8_luteDurationHalf = 0xEBA8,
     SMUFL_EBA9_luteDurationQuarter = 0xEBA9,
@@ -468,7 +495,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 443
+#define SMUFL_COUNT 470
 
 } // namespace vrv
 
