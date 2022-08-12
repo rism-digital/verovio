@@ -1572,7 +1572,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
         VisibleSymbol visibleSymbol;
         if (dir->FindDescendantByComparison(&visibleSymbol)) {
-            // this->DrawDynamSymbolOnly(dc, *staffIter, dynam, dynamSymbol, alignment, params);
+            this->DrawSymbolChildren(dc, dir, *staffIter, params);
         }
         else {
             dc->SetBrush(m_currentColour, AxSOLID);
