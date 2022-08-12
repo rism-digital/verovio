@@ -1724,6 +1724,21 @@ void View::DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &
     }
 }
 
+void View::DrawSymbolChildren(DeviceContext *dc, Object *parent, Staff *staff, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(parent);
+
+    for (auto current : parent->GetChildren()) {
+        if (current->Is(SYMBOL)) {
+            this->DrawSymbol(dc, staff, dynamic_cast<Symbol *>(current), params);
+        }
+        else {
+            assert(false);
+        }
+    }
+}
+
 void View::DrawRunningChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params)
 {
     assert(dc);

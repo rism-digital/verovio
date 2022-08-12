@@ -258,6 +258,7 @@ protected:
     void DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure);
     void DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
     void DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
+    void DrawSymbolChildren(DeviceContext *dc, Object *parent, Staff *staff, TextDrawingParams &params);
     void DrawRunningChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
     ///@}
 
