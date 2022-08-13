@@ -462,7 +462,9 @@ void View::DrawSymbol(DeviceContext *dc, Staff *staff, Symbol *symbol, TextDrawi
 
     this->DrawSmuflCode(dc, params.m_x, params.m_y, code, staff->m_drawingStaffSize, false);
 
-    params.m_x += m_doc->GetGlyphAdvX(code, staff->m_drawingStaffSize, false);
+    if (code) {
+        params.m_x += m_doc->GetGlyphAdvX(code, staff->m_drawingStaffSize, false);
+    }
 
     dc->EndGraphic(symbol, this);
 }
