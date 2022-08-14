@@ -54,6 +54,9 @@ bool Syllable::IsSupportedChild(Object *child)
     else if (child->Is(ACCID)) {
         assert(dynamic_cast<Accid *>(child));
     }
+    else if (child->Is(CLEF)) {
+        assert(dynamic_cast<Clef *>(child));
+    }
     else {
         return false;
     }

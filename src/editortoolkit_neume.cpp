@@ -98,10 +98,10 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse the insert action");
     }
-    else if (action == "moveOuttaSyllable") {
+    else if (action == "moveOutsideSyllable") {
         std::string elementId;
-        if (this->ParseMoveOuttaSyllableAction(json.get<jsonxx::Object>("param"), &elementId)) {
-            return this->MoveOuttaSyllable(elementId);
+        if (this->ParseMoveOutsideSyllableAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->MoveOutsideSyllable(elementId);
         }
         LogWarning("Could not parse the insert action");
     }
@@ -251,6 +251,218 @@ bool EditorToolkitNeume::Chain(jsonxx::Array actions)
     return status;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// Author: jacob-hutnyk
+//
+// This function is dedicated to ensuring that pitched elements
+// retain their position on the staves by adjusting their pitch position to match their new clefs.
+// With the respect to to this goal there are two main cases. Throughout this comment "this clef"
+// refers to the clef being dragged.
+//
+//  Case 1:
+//      The clef you're dragging stays between the same two bounding clefs. In this case
+//      elements that are newly associated to this clef need to have their pitch changed from
+//      the clef preceding this clef (previousClef) to this clef. The elements that are associated
+//      with this clef before and after the drag need to have their pitch changed only if the line
+//      of the clef changed during the drag.
+//  Case 2:
+//      The clef you're dragging moves across other clefs. In other words the preceding and
+//      subsequent clefs are different before and after the drag. In this case elements that were
+//      associated with this clef before the drag need to be reassociated to the clef that preceded
+//      this clef before the drag. Elements that become newly associated with the clef after the drag
+//      need to be reassociated from the clef that preceeds this clef after the drag to this clef.
+//
+// Extracting the exact elements that need to have their pitch modified in each of these cases is
+// tricky, and required some dicey naming.
+//
+// The clefs we're interested are named precedingClefBefore
+// (meaning the clef that preceded this clef before the drag action), precedingClefAfter (meaning the
+// clef that preceded this clef after the drag action), nextClefBefore (meaning the clef that came
+// after this clef before the drag action), and nextClefAfter. And of course clef just refers to
+// this clef, the clef being dragged.
+//
+// There are also ListOfObjects which refer to which elements
+// were associated to different clefs at different times. with{ClefName} just refers to the pitched
+// elements that were associated to that clef at that time. For example withThisClefBefore refers
+// to the elements that were associated with this clef before the drag action took place.
+//
+// There are also some slightly trickier array names like withNewPrecedingClefBefore.
+// In this case the the before/after part refers to what elements were associated to
+// this clef at what time, while the new/old part refers to the time of the clef having the
+// preceding/next relationship to this clef. Let's take withNewPrecedingClefBefore as an example.
+// Let's say the order of the clefs before the drag is:
+//
+//          A B C D
+//
+// with C being the clef we're dragging. And after the drag action the order of the clefs is:
+//
+//          A C B D
+//
+// withNewPrecedingClefBefore would refer to the elements between A and B, since A is the
+// new preceding clef (it becomes the clef that precedes this clef after the drag action)
+// and before the drag action all the elements between A and B were associated with A.
+// By comparison, withPrecedingClefAfter (or withNewPrecedingClefAfter) would refer to only
+// the elements between A and C in the lower depiction.
+//
+// The final piece of the naming scheme is the naming of the arrays whose pitch values actually
+// need to be changed. These should be pretty clear. stillWithThisClef for example, refers to
+// the elements that were associated with this clef before and after the drag action, and thus whose
+// pitch values only needs to be changed if the line of this clef changed.
+//
+// The algorithm is implemented by finding all of the aforementioned clefs and the elements between
+// them, and then using std::set_difference to find the elements whose pitch values may need to change.
+// For example: in case 2 noLongerWithThisClef is found by taking the difference between
+// withOldPrecedingClefAfter and withPrecedingClefBefore, since that difference is the stuff that
+// became associated with the clef that used to preceed this clef, meaning the stuff that was associated
+// with clef, but no longer is.
+//
+// One other aspect that might seem confusing is exactly when clef->SetLine() gets called. The reason
+// that these calls are oddly placed is that AdjustPitchForNewClef() uses the line of the clef.
+// So if we're changing an element's pitch from this clef to something else, we need the line of
+// this clef to be what it was before the drag. On the other hand, if we're reassociating an element
+// from some clef to the clef we're dragging, we need the line of this clef to be the one it is after
+// the drag action. Each of the clef->SetLine() calls are placed so as to accommodate this.
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y) {
+
+    Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
+    if (!layer) return false;
+
+    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    // Note that y param is relative to initial position for clefs
+    int initialClefLine = clef->GetLine();
+    int clefLine = round(((double)y - x * tan(staff->GetDrawingRotate() * M_PI / 180.0))
+            / (double)m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
+        + initialClefLine);
+
+    int lineDiff = clefLine - initialClefLine;
+
+    ListOfObjects withThisClefBefore;
+    ListOfObjects withPrecedingClefBefore;
+
+    ClassIdComparison ac(CLEF); 
+    InterfaceComparison ic(INTERFACE_PITCH);
+
+    Clef *precedingClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
+    Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
+
+    m_doc->GetDrawingPage()->FindAllDescendantBetween(&withThisClefBefore, &ic, clef,
+        (nextClefBefore != layer->GetCurrentClef()) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
+    m_doc->GetDrawingPage()->FindAllDescendantBetween(&withPrecedingClefBefore, &ic, precedingClefBefore, clef);
+    
+    // Adjust facsimile for clef (if it exists)
+    if (clef->HasFacs()) {
+        Zone *zone = clef->GetZone();
+        assert(zone);
+        zone->ShiftByXY(x,
+            (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize
+                - x * tan(staff->GetDrawingRotate() * M_PI / 180.0));
+    }
+
+    layer->ReorderByXPos();
+
+    Clef *precedingClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
+    Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
+
+    // case 1
+    if (precedingClefAfter == precedingClefBefore && nextClefAfter == nextClefBefore) {
+        ListOfObjects withThisClefAfter;
+        ListOfObjects withPrecedingClefAfter;
+
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withThisClefAfter, &ic, clef,
+            (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withPrecedingClefAfter, &ic, precedingClefBefore, clef);
+
+        // moved left
+        if (withPrecedingClefBefore.size() > withPrecedingClefAfter.size()) {
+            ListOfObjects newlyWithThisClef;
+
+            clef->SetLine(clefLine);
+
+            std::set_difference(withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
+                withPrecedingClefAfter.begin(), withPrecedingClefAfter.end(),
+                std::inserter(newlyWithThisClef, newlyWithThisClef.begin()));
+
+            for (auto iter = newlyWithThisClef.begin(); iter != newlyWithThisClef.end(); ++iter) {
+                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                    (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef(), clef);
+            }
+            if (lineDiff != 0) {
+                for (auto iter = withThisClefBefore.begin(); iter != withThisClefBefore.end(); ++iter) {
+                    (*iter)->GetPitchInterface()->AdjustPitchByOffset(lineDiff * -2);
+                }
+            }
+        }
+        // moved right
+        else if (withPrecedingClefBefore.size() < withPrecedingClefAfter.size()) {
+            ListOfObjects noLongerWithThisClef;
+
+            std::set_difference(withPrecedingClefAfter.begin(), withPrecedingClefAfter.end(),
+                withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
+                std::inserter(noLongerWithThisClef, noLongerWithThisClef.begin()));
+
+            for (auto iter = noLongerWithThisClef.begin(); iter != noLongerWithThisClef.end(); ++iter) {
+                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                    clef, (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef());
+            }
+            if (lineDiff != 0) {
+                for (auto iter = withThisClefAfter.begin(); iter != withThisClefAfter.end(); ++iter) {
+                    (*iter)->GetPitchInterface()->AdjustPitchByOffset(lineDiff * -2);
+                }
+            }
+            clef->SetLine(clefLine);
+        }
+        else {
+            clef->SetLine(clefLine);
+            if (lineDiff != 0) {
+                for (auto iter = withThisClefBefore.begin(); iter != withThisClefBefore.end(); ++iter) {
+                    (*iter)->GetPitchInterface()->AdjustPitchByOffset(lineDiff * -2);
+                }
+            }
+        }
+    }
+    // case 2
+    else {
+        ListOfObjects withOldPrecedingClefAfter;
+        ListOfObjects withNewPrecedingClefBefore;
+        ListOfObjects withNewPrecedingClefAfter;
+        ListOfObjects noLongerWithThisClef;
+        ListOfObjects newlyWithThisClef;
+
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withOldPrecedingClefAfter, &ic, precedingClefBefore,
+            (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
+
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withNewPrecedingClefBefore, &ic, precedingClefAfter,
+            (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
+
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(
+            &withNewPrecedingClefAfter, &ic, precedingClefAfter, clef);
+
+        std::set_difference(withOldPrecedingClefAfter.begin(), withOldPrecedingClefAfter.end(),
+            withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
+            std::inserter(noLongerWithThisClef, noLongerWithThisClef.begin()));
+
+        std::set_difference(withNewPrecedingClefBefore.begin(), withNewPrecedingClefBefore.end(),
+            withNewPrecedingClefAfter.begin(), withNewPrecedingClefAfter.end(),
+            std::inserter(newlyWithThisClef, newlyWithThisClef.begin()));
+
+        for (auto iter = noLongerWithThisClef.begin(); iter != noLongerWithThisClef.end(); ++iter) {
+            (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                clef, (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef());
+        }
+
+        clef->SetLine(clefLine);
+
+        for (auto iter = newlyWithThisClef.begin(); iter != newlyWithThisClef.end(); ++iter) {
+            (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                (precedingClefAfter != NULL) ? precedingClefAfter : layer->GetCurrentClef(), clef);
+        }
+    }
+    return true;
+}
+
 bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 {
     std::string status = "OK", message = "";
@@ -287,12 +499,18 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // clef association is done at the syllable level because of MEI structure
         // also note this will initialize syllable as null in the case of custos
         // which is why all the references to syllable are ternary
-        Syllable *syllable = ((element->Is(SYLLABLE)) ? (dynamic_cast<Syllable *>(element))
-                                                      : dynamic_cast<Syllable *>(element->GetFirstAncestor(SYLLABLE)));
+        Syllable *syllable = ((element->Is(SYLLABLE)) 
+            ? (dynamic_cast<Syllable *>(element))
+            : dynamic_cast<Syllable *>(element->GetFirstAncestor(SYLLABLE)));
 
         ClassIdComparison ac(CLEF);
         InterfaceComparison facsIC(INTERFACE_FACSIMILE);
         InterfaceComparison pitchIC(INTERFACE_PITCH);
+
+        // Check for clefs in syllable
+        ListOfObjects clefs;
+        syllable->FindAllDescendantByComparison(&clefs, &ac);
+        bool hasClef = (clefs.size() != 0);
 
         FacsimileInterface *fi = element->GetFacsimileInterface();
         if (fi && fi->HasFacs()) {
@@ -320,11 +538,20 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             ListOfObjects facsChildren;
             element->FindAllDescendantByComparison(&facsChildren, &facsIC);
             for (auto it = facsChildren.begin(); it != facsChildren.end(); ++it) {
-                // dont change the text bbox position
-                if ((*it)->Is(SYL) || !(*it)->GetFacsimileInterface()->HasFacs()) {
+                // Don't change the text bbox position and skip clefs until later
+                if ((*it)->Is(SYL) || !(*it)->GetFacsimileInterface()->HasFacs() || (*it)->Is(CLEF)) {
                     continue;
                 }
-                (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, -y);
+                else {
+                    (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, -y);
+                }
+            }
+        }
+
+        if (hasClef) {
+            for (Object *obj : clefs) {
+                Clef *clef = dynamic_cast<Clef *>(obj);
+                ClefMovementHandler(clef, x, 0);
             }
         }
 
@@ -333,6 +560,15 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         if (element->Is(CUSTOS)) {
             AdjustPitchFromPosition(element);
         }
+        // if syllable contains clef, adjust individual neumes
+        else if (hasClef) {
+            ListOfObjects neumes;
+            ClassIdComparison neumeCompare(NEUME);
+            element->FindAllDescendantByComparison(&neumes, &neumeCompare);
+            for (auto neume = neumes.begin(); neume != neumes.end(); ++neume) {
+                AdjustPitchFromPosition(*neume);
+            }
+        }
         else {
             AdjustPitchFromPosition(syllable);
         }
@@ -340,211 +576,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     else if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
         assert(clef);
-        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
-        if (!layer) return false;
-
-        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
-        assert(staff);
-        // Note that y param is relative to initial position for clefs
-        int initialClefLine = clef->GetLine();
-        int clefLine = round(((double)y - x * tan(staff->GetDrawingRotate() * M_PI / 180.0))
-                / (double)m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
-            + initialClefLine);
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////
-        // The rest of this if branch (element->Is(CLEF)) is dedicated to ensuring that pitched elements
-        // retain their position on the staves by adjusting their pitch position to match their new clefs.
-        // With the respect to to this goal there are two main cases. Throughout this comment "this clef"
-        // refers to the clef being dragged.
-        //
-        //  Case 1:
-        //      The clef you're dragging stays between the same two bounding clefs. In this case
-        //      elements that are newly associated to this clef need to have their pitch changed from
-        //      the clef preceding this clef (previousClef) to this clef. The elements that are associated
-        //      with this clef before and after the drag need to have their pitch changed only if the line
-        //      of the clef changed during the drag.
-        //  Case 2:
-        //      The clef you're dragging moves across other clefs. In other words the preceding and
-        //      subsequent clefs are different before and after the drag. In this case elements that were
-        //      associated with this clef before the drag need to be reassociated to the clef that preceded
-        //      this clef before the drag. Elements that become newly associated with the clef after the drag
-        //      need to be reassociated from the clef that preceeds this clef after the drag to this clef.
-        //
-        // Extracting the exact elements that need to have their pitch modified in each of these cases is
-        // tricky, and required some dicey naming.
-        //
-        // The clefs we're interested are named precedingClefBefore
-        // (meaning the clef that preceded this clef before the drag action), precedingClefAfter (meaning the
-        // clef that preceded this clef after the drag action), nextClefBefore (meaning the clef that came
-        // after this clef before the drag action), and nextClefAfter. And of course clef just refers to
-        // this clef, the clef being dragged.
-        //
-        // There are also ListOfObjects which refer to which elements
-        // were associated to different clefs at different times. with{ClefName} just refers to the pitched
-        // elements that were associated to that clef at that time. For example withThisClefBefore refers
-        // to the elements that were associated with this clef before the drag action took place.
-        //
-        // There are also some slightly trickier array names like withNewPrecedingClefBefore.
-        // In this case the the before/after part refers to what elements were associated to
-        // this clef at what time, while the new/old part refers to the time of the clef having the
-        // preceding/next relationship to this clef. Let's take withNewPrecedingClefBefore as an example.
-        // Let's say the order of the clefs before the drag is:
-        //
-        //          A B C D
-        //
-        // with C being the clef we're dragging. And after the drag action the order of the clefs is:
-        //
-        //          A C B D
-        //
-        // withNewPrecedingClefBefore would refer to the elements between A and B, since A is the
-        // new preceding clef (it becomes the clef that precedes this clef after the drag action)
-        // and before the drag action all the elements between A and B were associated with A.
-        // By comparison, withPrecedingClefAfter (or withNewPrecedingClefAfter) would refer to only
-        // the elements between A and C in the lower depiction.
-        //
-        // The final piece of the naming scheme is the naming of the arrays whose pitch values actually
-        // need to be changed. These should be pretty clear. stillWithThisClef for example, refers to
-        // the elements that were associated with this clef before and after the drag action, and thus whose
-        // pitch values only needs to be changed if the line of this clef changed.
-        //
-        // The algorithm is implemented by finding all of the aforementioned clefs and the elements between
-        // them, and then using std::set_difference to find the elements whose pitch values may need to change.
-        // For example: in case 2 noLongerWithThisClef is found by taking the difference between
-        // withOldPrecedingClefAfter and withPrecedingClefBefore, since that difference is the stuff that
-        // became associated with the clef that used to preceed this clef, meaning the stuff that was associated
-        // with clef, but no longer is.
-        //
-        // One other aspect that might seem confusing is exactly when clef->SetLine() gets called. The reason
-        // that these calls are oddly placed is that AdjustPitchForNewClef() uses the line of the clef.
-        // So if we're changing an element's pitch from this clef to something else, we need the line of
-        // this clef to be what it was before the drag. On the other hand, if we're reassociating an element
-        // from some clef to the clef we're dragging, we need the line of this clef to be the one it is after
-        // the drag action. Each of the clef->SetLine() calls are placed so as to accommodate this.
-        //////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        int lineDiff = clefLine - initialClefLine;
-
-        ListOfObjects withThisClefBefore;
-        ListOfObjects withPrecedingClefBefore;
-
-        ClassIdComparison ac(CLEF);
-        InterfaceComparison ic(INTERFACE_PITCH);
-
-        Clef *precedingClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
-        Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
-
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withThisClefBefore, &ic, clef,
-            (nextClefBefore != layer->GetCurrentClef()) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
-
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withPrecedingClefBefore, &ic, precedingClefBefore, clef);
-
-        if (clef->HasFacs()) { // adjust facsimile for clef (if it exists)
-            Zone *zone = clef->GetZone();
-            assert(zone);
-            zone->ShiftByXY(x,
-                (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize
-                    - x * tan(staff->GetDrawingRotate() * M_PI / 180.0));
-        }
-
-        layer->ReorderByXPos();
-
-        Clef *precedingClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
-        Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
-
-        // case 1
-        if (precedingClefAfter == precedingClefBefore && nextClefAfter == nextClefBefore) {
-            ListOfObjects withThisClefAfter;
-            ListOfObjects withPrecedingClefAfter;
-
-            m_doc->GetDrawingPage()->FindAllDescendantBetween(&withThisClefAfter, &ic, clef,
-                (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
-            m_doc->GetDrawingPage()->FindAllDescendantBetween(&withPrecedingClefAfter, &ic, precedingClefBefore, clef);
-
-            if (withPrecedingClefBefore.size() > withPrecedingClefAfter.size()) {
-                ListOfObjects newlyWithThisClef;
-
-                clef->SetLine(clefLine);
-
-                std::set_difference(withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
-                    withPrecedingClefAfter.begin(), withPrecedingClefAfter.end(),
-                    std::inserter(newlyWithThisClef, newlyWithThisClef.begin()));
-
-                for (auto iter = newlyWithThisClef.begin(); iter != newlyWithThisClef.end(); ++iter) {
-                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
-                        (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef(), clef);
-                }
-
-                if (lineDiff != 0) {
-                    for (auto iter = withThisClefBefore.begin(); iter != withThisClefBefore.end(); ++iter) {
-                        (*iter)->GetPitchInterface()->AdjustPitchByOffset(lineDiff * -2);
-                    }
-                }
-            }
-            else if (withPrecedingClefBefore.size() < withPrecedingClefAfter.size()) {
-                ListOfObjects noLongerWithThisClef;
-
-                std::set_difference(withPrecedingClefAfter.begin(), withPrecedingClefAfter.end(),
-                    withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
-                    std::inserter(noLongerWithThisClef, noLongerWithThisClef.begin()));
-
-                for (auto iter = noLongerWithThisClef.begin(); iter != noLongerWithThisClef.end(); ++iter) {
-                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
-                        clef, (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef());
-                }
-
-                if (lineDiff != 0) {
-                    for (auto iter = withThisClefAfter.begin(); iter != withThisClefAfter.end(); ++iter) {
-                        (*iter)->GetPitchInterface()->AdjustPitchByOffset(lineDiff * -2);
-                    }
-                }
-                clef->SetLine(clefLine);
-            }
-            else {
-                clef->SetLine(clefLine);
-                if (lineDiff != 0) {
-                    for (auto iter = withThisClefBefore.begin(); iter != withThisClefBefore.end(); ++iter) {
-                        (*iter)->GetPitchInterface()->AdjustPitchByOffset(lineDiff * -2);
-                    }
-                }
-            }
-        }
-        // case 2
-        else {
-            ListOfObjects withOldPrecedingClefAfter;
-            ListOfObjects withNewPrecedingClefBefore;
-            ListOfObjects withNewPrecedingClefAfter;
-            ListOfObjects noLongerWithThisClef;
-            ListOfObjects newlyWithThisClef;
-
-            m_doc->GetDrawingPage()->FindAllDescendantBetween(&withOldPrecedingClefAfter, &ic, precedingClefBefore,
-                (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
-
-            m_doc->GetDrawingPage()->FindAllDescendantBetween(&withNewPrecedingClefBefore, &ic, precedingClefAfter,
-                (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
-
-            m_doc->GetDrawingPage()->FindAllDescendantBetween(
-                &withNewPrecedingClefAfter, &ic, precedingClefAfter, clef);
-
-            std::set_difference(withOldPrecedingClefAfter.begin(), withOldPrecedingClefAfter.end(),
-                withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
-                std::inserter(noLongerWithThisClef, noLongerWithThisClef.begin()));
-
-            std::set_difference(withNewPrecedingClefBefore.begin(), withNewPrecedingClefBefore.end(),
-                withNewPrecedingClefAfter.begin(), withNewPrecedingClefAfter.end(),
-                std::inserter(newlyWithThisClef, newlyWithThisClef.begin()));
-
-            for (auto iter = noLongerWithThisClef.begin(); iter != noLongerWithThisClef.end(); ++iter) {
-                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
-                    clef, (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef());
-            }
-
-            clef->SetLine(clefLine);
-
-            for (auto iter = newlyWithThisClef.begin(); iter != newlyWithThisClef.end(); ++iter) {
-                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
-                    (precedingClefAfter != NULL) ? precedingClefAfter : layer->GetCurrentClef(), clef);
-            }
-        }
+        ClefMovementHandler(clef, x, y);
     }
     else if (element->Is(STAFF)) {
         Staff *staff = dynamic_cast<Staff *>(element);
@@ -1220,13 +1252,13 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
         m_infoObject.import("message", "No element exists with ID" + elementId + ".");
         return false;
     }
-    if (!(element->Is(DIVLINE) || element->Is(ACCID))) {
+    if (!(element->Is(DIVLINE) || element->Is(ACCID) || element->Is(CLEF))) {
         LogError("Element is of type %s, but only Divlines and Accids can be inserted into syllables.",
             element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message",
             "Element is of type " + element->GetClassName()
-                + ", but only DivLines and Accids can be inserted into syllables.");
+                + ", but only DivLines, Accids, and Clefs can be inserted into syllables.");
         return false;
     }
     if (!parent->Is(LAYER)) {
@@ -1287,12 +1319,34 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
     parent->ClearRelinquishedChildren();
     parent->ReorderByXPos();
 
+    // Adjust pitches of neumes proceding inserted clef
+    if (element->Is(CLEF)) {
+        Clef *clef = dynamic_cast<Clef *>(element);
+        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
+
+        ClassIdComparison cic(CLEF);
+        InterfaceComparison ic(INTERFACE_PITCH);
+        ClassIdComparison sc(SYLLABLE);
+
+        Clef *precedingClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cic, clef));
+        precedingClef = (precedingClef != NULL) ? precedingClef : layer->GetCurrentClef();
+
+        // Get neumes in syllable after inserted clef
+        Object *nextSyllable = dynamic_cast<Object *>(m_doc->GetDrawingPage()->FindNextChild(&sc, syllable));
+        ListOfObjects syllablesAfterClef;
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&syllablesAfterClef, &ic, clef, nextSyllable);
+
+        for (Object *iter : syllablesAfterClef) {
+            iter->GetPitchInterface()->AdjustPitchForNewClef(precedingClef, clef);
+        }
+    }
+
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
     return true;   
 }
 
-bool EditorToolkitNeume::MoveOuttaSyllable(std::string elementId) {
+bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
         m_infoObject.import("status", "FAILURE");
@@ -1310,6 +1364,8 @@ bool EditorToolkitNeume::MoveOuttaSyllable(std::string elementId) {
     assert(element);
     Object *parent = element->GetParent();
     assert(parent);
+    // Stop if parent is not syllable
+    if (!parent->Is(SYLLABLE)) return false;
 
     if (element == NULL) {
         LogError("No element exists with ID '%s'.", elementId.c_str());
@@ -1317,8 +1373,8 @@ bool EditorToolkitNeume::MoveOuttaSyllable(std::string elementId) {
         m_infoObject.import("message", "No element exists with ID" + elementId + ".");
         return false;
     }
-    if (!(element->Is(DIVLINE) || element->Is(ACCID))) {
-        LogError("Element is of type %s, but only Divlines and Accids can be moved out of syllables.",
+    if (!(element->Is(DIVLINE) || element->Is(ACCID) || element->Is(CLEF))) {
+        LogError("Element is of type %s, but only Divlines, Accids, and Clefs can be moved out of syllables.",
             element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message",
@@ -1339,6 +1395,28 @@ bool EditorToolkitNeume::MoveOuttaSyllable(std::string elementId) {
     Object *secondParent = parent->GetParent();
     assert(secondParent);
 
+    // restore pitches of neumes back to pitches in accordance with preceding clef
+    if (element->Is(CLEF)) {
+        Clef *clef = dynamic_cast<Clef *>(element);
+        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
+
+        ClassIdComparison cic(CLEF);
+        InterfaceComparison ic(INTERFACE_PITCH);
+        ClassIdComparison sc(SYLLABLE);
+
+        Clef *precedingClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cic, clef));
+        precedingClef = (precedingClef != NULL) ? precedingClef : layer->GetCurrentClef();
+
+        // Get neumes in syllable after inserted clef
+        Object *nextSyllable = dynamic_cast<Object *>(m_doc->GetDrawingPage()->FindNextChild(&sc, parent));
+        ListOfObjects syllablesAfterClef;
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&syllablesAfterClef, &ic, clef, nextSyllable);
+
+        for (Object *iter : syllablesAfterClef) {
+            iter->GetPitchInterface()->AdjustPitchForNewClef(clef, precedingClef);
+        }
+    }
+
     element->MoveItselfTo(secondParent);
     secondParent->ReorderByXPos();
     parent->ClearRelinquishedChildren();
@@ -1348,7 +1426,6 @@ bool EditorToolkitNeume::MoveOuttaSyllable(std::string elementId) {
     m_infoObject.import("message", "");
     return true;   
 }
-
 
 bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 {
@@ -2570,7 +2647,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 }
             }
         }
-        if (el->Is(ACCID) || el->Is(DIVLINE)) {
+        if (el->Is(ACCID) || el->Is(DIVLINE) || el->Is(CLEF)) {
             fparent = el->GetFirstAncestor(SYLLABLE);
             sparent = el->GetFirstAncestor(LAYER);
             if (fparent && sparent) {
@@ -3499,7 +3576,7 @@ bool EditorToolkitNeume::ParseInsertToSyllableAction(jsonxx::Object param, std::
     return true;
 }
 
-bool EditorToolkitNeume::ParseMoveOuttaSyllableAction(jsonxx::Object param, std::string *elementId) {
+bool EditorToolkitNeume::ParseMoveOutsideSyllableAction(jsonxx::Object param, std::string *elementId) {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
     return true;
@@ -3710,9 +3787,7 @@ bool EditorToolkitNeume::ParseChangeStaffToAction(jsonxx::Object param, std::str
 bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 {
     // remember to reorderbyxpos! (not called in function so that it can be used in loops)
-    // clef re-association is done at the syllable level (not neume or nc)
-    // so this function should only be called on custos or syllables
-    // it should also only be called in cases where finding the old clef is not required
+    // this should only be called in cases where finding the old clef is not required
     // since doing it based only on clefs is much more efficient than based on position
     // also if you are calling this function in a loop you should always be passing a clef argument
     // since repeatedly finding the previous clef is very inneficient
@@ -3778,17 +3853,16 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         return true;
     }
 
-    else if (obj->Is(SYLLABLE)) {
-        Syllable *syl = dynamic_cast<Syllable *>(obj);
-        Staff *staff = dynamic_cast<Staff *>(syl->GetFirstAncestor(STAFF));
+    else if (obj->Is(SYLLABLE) || obj->Is(NEUME)) {
+        Staff *staff = dynamic_cast<Staff *>(obj->GetFirstAncestor(STAFF));
         assert(staff);
 
         ListOfObjects pitchedChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
-        syl->FindAllDescendantByComparison(&pitchedChildren, &ic);
+        obj->FindAllDescendantByComparison(&pitchedChildren, &ic);
 
         if (pitchedChildren.empty()) {
-            LogWarning("Syllable had no pitched children to reorder for syllable %s", obj->GetUuid().c_str());
+            LogWarning("Syllable/neume had no pitched children to reorder for syllable/neume %s", obj->GetUuid().c_str());
             return true;
         }
 
@@ -3830,11 +3904,6 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             assert(pi);
             pi->SetPname(pname);
             pi->SetOct(3);
-
-            /*int pitchDifference = round((double) (staff->GetZone()->GetUly() +
-                (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
-                fi->GetZone()->GetUly() - ((fi->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) *
-                tan(-staff->GetDrawingRotate() * M_PI / 180.0))) / (double) (staffSize));*/
 
             // Use the same pitchDifference equation for both syllables and custos
             const int pitchDifference
@@ -3879,4 +3948,4 @@ bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
     return true;
 }
 
-} // namespace vrv
+}

@@ -291,7 +291,7 @@ void Object::MoveItselfTo(Object *targetParent)
     assert(m_parent);
     assert(m_parent != targetParent);
 
-    Object *relinquishedObject = this->GetParent()->Relinquish(this->GetIdx());
+    Object *relinquishedObject = this->GetParent()->Relinquish(this->GetIdx());    
     assert(relinquishedObject && (relinquishedObject == this));
     targetParent->AddChild(relinquishedObject);
 }
@@ -487,8 +487,9 @@ void Object::ClearRelinquishedChildren()
         if ((*iter)->GetParent() != this) {
             iter = m_children.erase(iter);
         }
-        else
-            ++iter;
+        else {
+            ++iter; 
+        }
     }
 }
 
@@ -632,6 +633,7 @@ void Object::AddChild(Object *child)
 
     child->SetParent(this);
     m_children.push_back(child);
+
     Modify();
 }
 
@@ -872,6 +874,7 @@ void Object::ReorderByXPos()
 {
     ReorderByXPosParams params;
     Functor reorder(&Object::ReorderByXPos);
+
     this->Process(&reorder, &params);
 }
 
@@ -1747,6 +1750,7 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
 
     std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
     this->Modify();
+
     return FUNCTOR_CONTINUE;
 }
 
