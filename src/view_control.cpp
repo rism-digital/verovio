@@ -1526,12 +1526,10 @@ void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, Sy
     // Cannot draw a caesura that has no start position
     if (!caesura->GetStart()) return;
 
-    const bool drawingCueSize = false;
-
     dc->StartGraphic(caesura, "", caesura->GetID());
 
-    const wchar_t code = SMUFL_E504_repeatBarSlash;
-    const int x = caesura->GetStart()->GetDrawingX() + caesura->GetStart()->GetDrawingRadius(m_doc);
+    const wchar_t code = caesura->GetCaesuraGlyph();
+    const int x = caesura->GetStart()->GetDrawingX() + caesura->GetStart()->GetDrawingRadius(m_doc) * 3;
 
     std::vector<Staff *> staffList = caesura->GetTstampStaves(measure, caesura);
     for (Staff *staff : staffList) {
@@ -1539,12 +1537,12 @@ void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, Sy
             continue;
         }
 
-        const int y = (caesura->GetPlace() == STAFFREL_within) ? staff->GetDrawingY() : caesura->GetDrawingY();
+        const int glyphHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false);
+        const int y = (caesura->HasPlace() && (caesura->GetPlace() != STAFFREL_within))
+            ? caesura->GetDrawingY()
+            : staff->GetDrawingY() - glyphHeight / 2;
 
-        const int adjustedStaffSize = 0.8 * staff->m_drawingStaffSize;
-        const int glyphWidth = m_doc->GetGlyphWidth(code, adjustedStaffSize, false);
-        this->DrawSmuflCode(dc, x - glyphWidth / 4, y, code, adjustedStaffSize, false);
-        this->DrawSmuflCode(dc, x + glyphWidth / 4, y, code, adjustedStaffSize, false);
+        this->DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
     }
 
     dc->EndGraphic(caesura, this);

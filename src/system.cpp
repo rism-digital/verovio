@@ -1044,7 +1044,7 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 
     params->m_classId = REH;
     m_systemAligner.Process(params->m_functor, params);
-    
+
     params->m_classId = CAESURA;
     m_systemAligner.Process(params->m_functor, params);
 
