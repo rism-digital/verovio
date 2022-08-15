@@ -625,4 +625,9 @@
   <g c="EB20" x="0.0" y="0.0" w="739.0" h="480.0" h-a-x="739" n="elecRewind"/>
   <g c="EB21" x="0.0" y="-1.0" w="834.0" h="481.0" h-a-x="834" n="elecSkipForwards"/>
   <g c="EB22" x="0.0" y="-1.0" w="834.0" h="481.0" h-a-x="834" n="elecSkipBackwards"/>
+  <g c="E4D1" x="0.0" y="0.0" w="300.0" h="500.0" h-a-x="300" n="caesura"/>
+  <g c="E4D2" x="0.0" y="0.0" w="450.0" h="500.0" h-a-x="450" n="caesuraThick"/>
+  <g c="E4D3" x="0.0" y="0.0" w="150.0" h="500.0" h-a-x="150" n="caesuraShort"/>
+  <g c="E4D4" x="0.0" y="0.0" w="250.0" h="500.0" h-a-x="250" n="caesuraCurved"/>
+  <g c="E4D7" x="0.0" y="0.0" w="36.0" h="500.0" h-a-x="36" n="caesuraSingleStroke"/>
 </bounding-boxes>

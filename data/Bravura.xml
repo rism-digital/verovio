@@ -380,6 +380,10 @@
   <g c="E4C8" x="0.0" y="0.0" w="715.0" h="408.0" h-a-x="716" n="fermataVeryLongAbove"/>
   <g c="E4C9" x="0.0" y="-408.0" w="715.0" h="408.0" h-a-x="716" n="fermataVeryLongBelow"/>
   <g c="E4CE" x="1.0" y="2.0" w="151.0" h="249.0" h-a-x="153" n="breathMarkComma"/>
+  <g c="E4D1" x="0.0" y="-1.0" w="384.0" h="533.0" h-a-x="385" n="caesura"/>
+  <g c="E4D2" x="0.0" y="0.0" w="663.0" h="532.0" h-a-x="663" n="caesuraThick"/>
+  <g c="E4D3" x="0.0" y="0.0" w="186.0" h="533.0" h-a-x="185" n="caesuraShort"/>
+  <g c="E4D4" x="0.0" y="0.0" w="373.0" h="530.0" h-a-x="373" n="caesuraCurved"/>
   <g c="E4E0" x="0.0" y="-249.0" w="381.0" h="499.0" h-a-x="381" n="restMaxima"/>
   <g c="E4E1" x="0.0" y="-249.0" w="125.0" h="499.0" h-a-x="125" n="restLonga"/>
   <g c="E4E2" x="0.0" y="0.0" w="125.0" h="250.0" h-a-x="126" n="restDoubleWhole"/>
@@ -839,6 +843,7 @@
   <g c="F429" x="0.0" y="-349.0" w="261.0" h="700.0" h-a-x="261" n="accidentalSharpSmall"/>
   <g c="F42A" x="0.0" y="1.0" w="429.0" h="304.0" h-a-x="431" n="articAccentAboveLarge"/>
   <g c="F42B" x="0.0" y="-304.0" w="429.0" h="304.0" h-a-x="431" n="articAccentBelowLarge"/>
+  <g c="F42C" x="0.0" y="-1.0" w="224.0" h="533.0" h-a-x="224" n="caesuraSingleStroke"/>
   <g c="F432" x="0.0" y="0.0" w="200.0" h="300.0" h-a-x="200" n="pluckedSnapPizzicatoBelowGerman"/>
   <g c="F433" x="0.0" y="0.0" w="200.0" h="300.0" h-a-x="200" n="pluckedSnapPizzicatoAboveGerman"/>
   <g c="F434" x="0.0" y="-8.0" w="923.0" h="563.0" h-a-x="922" n="keyboardPedalPedNoDot"/>

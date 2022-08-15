@@ -1170,13 +1170,13 @@
             <glyph glyph-code="E4CE" smufl-name="breathMarkComma" />
             <!--<glyph glyph-code="E4CF" smufl-name="breathMarkTick" />-->
             <!--<glyph glyph-code="E4D0" smufl-name="breathMarkUpbow" />-->
-            <!--<glyph glyph-code="E4D1" smufl-name="caesura" />-->
-            <!--<glyph glyph-code="E4D2" smufl-name="caesuraThick" />-->
-            <!--<glyph glyph-code="E4D3" smufl-name="caesuraShort" />-->
-            <!--<glyph glyph-code="E4D4" smufl-name="caesuraCurved" />-->
+            <glyph glyph-code="E4D1" smufl-name="caesura" />
+            <glyph glyph-code="E4D2" smufl-name="caesuraThick" />
+            <glyph glyph-code="E4D3" smufl-name="caesuraShort" />
+            <glyph glyph-code="E4D4" smufl-name="caesuraCurved" />
             <!--<glyph glyph-code="E4D5" smufl-name="breathMarkSalzedo" />-->
             <!--<glyph glyph-code="E4D6" smufl-name="curlewSign" />-->
-            <!--<glyph glyph-code="E4D7" smufl-name="caesuraSingleStroke" />-->
+            -<glyph glyph-code="E4D7" smufl-name="caesuraSingleStroke" />
             <range_end>U+E4DF</range_end>
             <range_start>U+E4C0</range_start>
         </holdsAndPauses>

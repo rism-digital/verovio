@@ -296,6 +296,10 @@
   <g c="E4C8" x="0.0" y="-14.1" w="715.0" h="451.1" h-a-x="715" n="fermataVeryLongAbove"/>
   <g c="E4C9" x="-0.01" y="-427.0" w="686.46" h="457.0" h-a-x="686" n="fermataVeryLongBelow"/>
   <g c="E4CE" x="0.0" y="0.0" w="148.0" h="275.0" h-a-x="148" n="breathMarkComma"/>
+  <g c="E4D1" x="0.0" y="-0.09" w="565.58" h="562.54" h-a-x="566" n="caesura"/>
+  <g c="E4D2" x="0.0" y="1.7" w="708.08" h="740.3" h-a-x="708" n="caesuraThick"/>
+  <g c="E4D3" x="-0.04" y="-20.0" w="209.04" h="633.0" h-a-x="209" n="caesuraShort"/>
+  <g c="E4D4" x="0.0" y="-10.0" w="386.0" h="594.0" h-a-x="386" n="caesuraCurved"/>
   <g c="E650" x="0.0" y="-13.0" w="944.0" h="563.0" h-a-x="944" n="keyboardPedalPed"/>
   <g c="E651" x="0.0" y="0.0" w="314.0" h="549.0" h-a-x="314" n="keyboardPedalP"/>
   <g c="E655" x="0.0" y="0.0" w="436.6" h="461.0" h-a-x="437" n="keyboardPedalUp"/>
