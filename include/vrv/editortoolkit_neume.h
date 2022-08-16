@@ -38,13 +38,13 @@ public:
      */
     ///@{
     bool Chain(jsonxx::Array actions);
+    bool DisplaceClefOctave(std::string elementId, std::string direction);
     bool Drag(std::string elementId, int x, int y);
     bool Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
         std::vector<std::pair<std::string, std::string> > attributes);
     bool InsertToSyllable(std::string elementId);
-    bool MoveOuttaSyllable(std::string elementId);
-    bool DisplaceClefOctave(std::string elementId, std::string direction);
     bool Merge(std::vector<std::string> elementIds);
+    bool MoveOutsideSyllable(std::string elementId);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     bool SetText(std::string elementId, std::string text);
     bool SetClef(std::string elementId, std::string shape);
@@ -58,20 +58,21 @@ public:
     bool ToggleLigature(std::vector<std::string> elementIds);
     bool ChangeStaff(std::string elementId);
     bool ChangeStaffTo(std::string elementId, std::string staffId);
+    bool ClefMovementHandler(Clef* clef, int x, int y);
     ///@}
 protected:
     /**
      * Parse JSON instructions for experimental editor functions.
      */
     ///@{
+    bool ParseDisplaceClefAction(jsonxx::Object param, std::string *elementId, std::string *direction);
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
         int *lrx, int *lry, std::vector<std::pair<std::string, std::string> > *attributes);
     bool ParseInsertToSyllableAction(jsonxx::Object param, std::string *elementId);
-    bool ParseMoveOuttaSyllableAction(jsonxx::Object param, std::string *elementId);
-    bool ParseDisplaceClefAction(jsonxx::Object param, std::string *elementId, std::string *direction);
     bool ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds);
+    bool ParseMoveOutsideSyllableAction(jsonxx::Object param, std::string *elementId);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     bool ParseSetTextAction(jsonxx::Object param, std::string *elementId, std::string *text);
     bool ParseSetClefAction(jsonxx::Object param, std::string *elementId, std::string *shape);
