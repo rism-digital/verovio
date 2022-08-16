@@ -105,6 +105,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse the insert action");
     }
+    else if (action == "displaceClefOctave") {
+        std::string elementId, direction;
+        if (this->ParseDisplaceClefAction(json.get<jsonxx::Object>("param"), &elementId, &direction)) {
+            return this->DisplaceClefOctave(elementId, direction);
+        }
+        LogWarning("Could not parse the displace clef octave action");
+    }
     else if (action == "set") {
         std::string elementId, attrType, attrValue;
         if (this->ParseSetAction(json.get<jsonxx::Object>("param"), &elementId, &attrType, &attrValue)) {
@@ -1426,6 +1433,80 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
     m_infoObject.import("message", "");
     return true;   
 }
+
+
+bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string direction) {
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
+        return false;
+    }
+
+    if (direction != "above" && direction != "below") {
+        LogError("Direction can only be either \"above\" or \"below\".");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Direction can only be either \"above\" or \"below\".");
+        return false;
+    }
+
+    Page *page = m_doc->GetDrawingPage();
+    Object *obj = page->FindDescendantByUuid(elementId);
+    if (obj == NULL || !obj->Is(CLEF)) {
+        LogError("This action can only be done on clefs!");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "This action can only be done on clefs!");
+        return false;
+    }
+
+    // Calculate new octave displacement by converting @dis and @dis.place to
+    // an integer octave value.
+    // Increment or decrement that integer value, then from this new octave
+    // value, set @dis and @dis.place accordingly.
+    Clef *clef = dynamic_cast<Clef *>(obj);
+    int prevDirection = clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1;
+    int move = direction == "above" ? 1 : -1;
+    int octaveDis = prevDirection * (clef->GetDis() / 7) + move;
+
+    if (octaveDis > 3 || octaveDis < -3) {
+        LogError("Clefs can only be displaced 3 octaves.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Clefs can only be displaced 3 octaves.");
+        return false;
+    }
+
+    // Set clef's new octave
+    if (octaveDis == 0) {
+        clef->SetDis(OCTAVE_DIS_NONE);
+        clef->SetDisPlace(STAFFREL_basic_NONE);
+    } else {
+      data_OCTAVE_DIS displaced = OCTAVE_DIS_NONE;
+      if (octaveDis == 1 || octaveDis == -1) displaced = OCTAVE_DIS_8;
+      else if (octaveDis == 2 || octaveDis == -2) displaced = OCTAVE_DIS_15;
+      else if (octaveDis == 3 || octaveDis == -3) displaced = OCTAVE_DIS_22;
+
+      clef->SetDis(displaced);
+      clef->SetDisPlace(octaveDis > 0 ? STAFFREL_basic_above : STAFFREL_basic_below);
+    }
+
+    // Set new octaves for affected neume components
+    ClassIdComparison equalsClef(CLEF);
+    Clef *nextClef = dynamic_cast<Clef *>(page->FindNextChild(&equalsClef, clef));
+
+    ClassIdComparison equalsNcs(NC);
+    ListOfObjects ncs;
+    page->FindAllDescendantBetween(&ncs, &equalsNcs, clef, nextClef);
+
+    std::for_each(ncs.begin(), ncs.end(), [&](Object *ncObj) {
+        Nc *nc = dynamic_cast<Nc *>(ncObj);
+        nc->SetOct(nc->GetOct() + move);
+    });
+
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    return true;
+}
+
 
 bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 {
@@ -3582,6 +3663,14 @@ bool EditorToolkitNeume::ParseMoveOutsideSyllableAction(jsonxx::Object param, st
     return true;
 }
 
+bool EditorToolkitNeume::ParseDisplaceClefAction(jsonxx::Object param, std::string *elementId, std::string *direction) {
+    if (!param.has<jsonxx::String>("elementId") || !param.has<jsonxx::String>("direction")) return false;
+    *elementId = param.get<jsonxx::String>("elementId");
+    *direction = param.get<jsonxx::String>("direction");
+
+    return true;
+}
+
 bool EditorToolkitNeume::ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds)
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
@@ -3903,7 +3992,14 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             pi = (*it)->GetPitchInterface();
             assert(pi);
             pi->SetPname(pname);
-            pi->SetOct(3);
+
+            // The default octave = 3, but the actual octave is calculated by
+            // taking into account the displacement of the clef
+            int octave = 3;
+            if (clef->GetDis() && clef->GetDisPlace()) {
+                octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
+            }
+            pi->SetOct(octave);
 
             // Use the same pitchDifference equation for both syllables and custos
             const int pitchDifference
