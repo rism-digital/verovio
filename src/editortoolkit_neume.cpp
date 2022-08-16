@@ -1357,7 +1357,12 @@ bool EditorToolkitNeume::MoveOuttaSyllable(std::string elementId) {
 }
 
 bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string direction) {
-    if (!m_doc->GetDrawingPage()) return false;
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
+        return false;
+    }
 
     if (direction != "above" && direction != "below") {
         LogError("Direction can only be either \"above\" or \"below\".");
@@ -1418,6 +1423,8 @@ bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string d
         nc->SetOct(nc->GetOct() + move);
     });
 
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
     return true;
 }
 
