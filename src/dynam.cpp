@@ -14,7 +14,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "doc.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "hairpin.h"
