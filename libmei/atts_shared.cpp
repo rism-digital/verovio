@@ -378,7 +378,7 @@ AttBarLineLog::~AttBarLineLog()
 
 void AttBarLineLog::ResetBarLineLog()
 {
-    m_form = BARRENDITION_single;
+    m_form = BARRENDITION_NONE;
 }
 
 bool AttBarLineLog::ReadBarLineLog(pugi::xml_node element)
@@ -404,7 +404,7 @@ bool AttBarLineLog::WriteBarLineLog(pugi::xml_node element)
 
 bool AttBarLineLog::HasForm() const
 {
-    return (m_form != BARRENDITION_single);
+    return (m_form != BARRENDITION_NONE);
 }
 
 /* include <attform> */
