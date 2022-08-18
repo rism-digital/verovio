@@ -412,7 +412,7 @@ public:
      * Return true if the object has the child Object as descendant (reference of direct).
      * Processes in depth-first.
      */
-    bool HasDescendant(Object *child, int deepness = UNLIMITED_DEPTH) const;
+    bool HasDescendant(const Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
      * Look for a descendant with the specified id (returns NULL if not found)
@@ -747,7 +747,7 @@ public:
      * Retrieve the minimum left and maximum right for an alignment.
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
      */
-    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+    virtual int GetAlignmentLeftRight(FunctorParams *functorParams) const;
 
     /**
      * Go through all layer elements of the layer and return next/previous element relative to the specified

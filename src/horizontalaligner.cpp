@@ -238,7 +238,7 @@ void MeasureAligner::PushAlignmentsRight()
     }
 }
 
-void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int staffN)
+void MeasureAligner::AdjustGraceNoteSpacing(const Doc *doc, Alignment *alignment, int staffN)
 {
     assert(doc);
     assert(alignment);
@@ -380,19 +380,19 @@ void GraceAligner::AlignStack()
     m_graceStack.clear();
 }
 
-int GraceAligner::GetGraceGroupLeft(int staffN)
+int GraceAligner::GetGraceGroupLeft(int staffN) const
 {
     // First we need to get the left alignment with an alignment reference with staffN
-    Alignment *leftAlignment = NULL;
+    const Alignment *leftAlignment = NULL;
     if (staffN != VRV_UNSET) {
         AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-        Object *reference = this->FindDescendantByComparison(&matchStaff);
+        const Object *reference = this->FindDescendantByComparison(&matchStaff);
         if (!reference) return -VRV_UNSET;
         // The alignment is its parent
-        leftAlignment = dynamic_cast<Alignment *>(reference->GetParent());
+        leftAlignment = dynamic_cast<const Alignment *>(reference->GetParent());
     }
     else {
-        leftAlignment = dynamic_cast<Alignment *>(this->GetFirst());
+        leftAlignment = dynamic_cast<const Alignment *>(this->GetFirst());
     }
     // Return if nothing found
     if (!leftAlignment) return -VRV_UNSET;
@@ -403,12 +403,12 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
     return minLeft;
 }
 
-int GraceAligner::GetGraceGroupRight(int staffN)
+int GraceAligner::GetGraceGroupRight(int staffN) const
 {
     // See GraceAligner::GetGraceGroupLeft
     // We do not need to search of the alignment with staffN here because all grace note groups
     // Have their right note aligned, so getting the last is fine
-    Alignment *rightAlignment = dynamic_cast<Alignment *>(this->GetLast());
+    const Alignment *rightAlignment = dynamic_cast<const Alignment *>(this->GetLast());
     if (!rightAlignment) return VRV_UNSET;
 
     int minLeft, maxRight;
@@ -417,7 +417,7 @@ int GraceAligner::GetGraceGroupRight(int staffN)
     return maxRight;
 }
 
-void GraceAligner::SetGraceAligmentXPos(Doc *doc)
+void GraceAligner::SetGraceAlignmentXPos(const Doc *doc)
 {
     assert(doc);
 
@@ -482,18 +482,19 @@ bool Alignment::IsSupportedChild(Object *child)
     return true;
 }
 
-bool Alignment::HasAccidVerticalOverlap(Alignment *otherAlignment, int staffN)
+bool Alignment::HasAccidVerticalOverlap(const Alignment *otherAlignment, int staffN) const
 {
     if (!otherAlignment) return false;
 
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
     // get alignment references for both alignments
-    AlignmentReference *currentRef = vrv_cast<AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
-    AlignmentReference *otherRef
-        = vrv_cast<AlignmentReference *>(otherAlignment->FindDescendantByComparison(&matchStaff, 1));
+    const AlignmentReference *currentRef
+        = vrv_cast<const AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
+    const AlignmentReference *otherRef
+        = vrv_cast<const AlignmentReference *>(otherAlignment->FindDescendantByComparison(&matchStaff, 1));
     if (!currentRef || !otherRef) return false;
 
-    return otherRef->HasAccidVerticalOverlap(&currentRef->GetChildren());
+    return otherRef->HasAccidVerticalOverlap(currentRef->GetChildren());
 }
 
 bool Alignment::HasAlignmentReference(int staffN) const
@@ -580,7 +581,7 @@ bool Alignment::IsOfType(const std::vector<AlignmentType> &types) const
 }
 
 void Alignment::GetLeftRight(
-    const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes)
+    const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes) const
 {
     Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
     GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
@@ -596,7 +597,7 @@ void Alignment::GetLeftRight(
     }
 }
 
-void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes)
+void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes) const
 {
     Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
     GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
@@ -634,12 +635,17 @@ bool Alignment::PerformBoundingBoxAlignment() const
     return this->IsOfType({ ALIGNMENT_ACCID, ALIGNMENT_DOT, ALIGNMENT_DEFAULT });
 }
 
-AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, int staffN)
+AlignmentReference *Alignment::GetReferenceWithElement(const LayerElement *element, int staffN)
 {
-    AlignmentReference *reference = NULL;
+    return const_cast<AlignmentReference *>(std::as_const(*this).GetReferenceWithElement(element, staffN));
+}
+
+const AlignmentReference *Alignment::GetReferenceWithElement(const LayerElement *element, int staffN) const
+{
+    const AlignmentReference *reference = NULL;
 
     for (auto child : this->GetChildren()) {
-        reference = dynamic_cast<AlignmentReference *>(child);
+        reference = dynamic_cast<const AlignmentReference *>(child);
         if (reference->GetN() == staffN) {
             return reference;
         }
@@ -681,6 +687,16 @@ void Alignment::AddToAccidSpace(Accid *accid)
     AlignmentReference *reference = this->GetReferenceWithElement(accid);
     assert(reference);
     reference->AddToAccidSpace(accid);
+}
+
+int Alignment::HorizontalSpaceForDuration(
+    double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
+{
+    /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
+     that interval gets the space a semibreve would ordinarily get. */
+    if (maxActualDur < DUR_1) intervalTime /= pow(2.0, DUR_1 - maxActualDur);
+
+    return pow(intervalTime, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
 }
 
 //----------------------------------------------------------------------------
@@ -760,7 +776,7 @@ void AlignmentReference::AddToAccidSpace(Accid *accid)
 }
 
 void AlignmentReference::AdjustAccidWithAccidSpace(
-    Accid *accid, Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids)
+    Accid *accid, const Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids)
 {
     std::vector<Accid *> leftAccids;
     const ArrayOfObjects &children = this->GetChildren();
@@ -780,13 +796,13 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
         adjustedAccids.push_back(accid);
 }
 
-bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfObjects *objects)
+bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const
 {
     for (const auto child : this->GetChildren()) {
         if (!child->Is(ACCID)) continue;
-        Accid *accid = vrv_cast<Accid *>(child);
+        const Accid *accid = vrv_cast<const Accid *>(child);
         if (!accid->HasAccid()) continue;
-        for (const auto object : *objects) {
+        for (const auto object : objects) {
             if (accid->VerticalContentOverlap(object)) return true;
         }
     }
@@ -1263,17 +1279,6 @@ int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::HorizontalSpaceForDuration(
-    double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
-{
-    /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
-     that interval gets the space a semibreve would ordinarily get. */
-    if (maxActualDur < DUR_1) intervalTime /= pow(2.0, DUR_1 - maxActualDur);
-    int intervalXRel;
-    intervalXRel = pow(intervalTime, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
-    return intervalXRel;
-}
-
 int Alignment::CalcAlignmentXPos(FunctorParams *functorParams)
 {
     CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
@@ -1304,7 +1309,7 @@ int Alignment::CalcAlignmentXPos(FunctorParams *functorParams)
 
     MapOfIntGraceAligners::const_iterator iter;
     for (iter = m_graceAligners.begin(); iter != m_graceAligners.end(); ++iter) {
-        iter->second->SetGraceAligmentXPos(params->m_doc);
+        iter->second->SetGraceAlignmentXPos(params->m_doc);
     }
 
     this->SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR * params->m_estimatedJustificationRatio);
