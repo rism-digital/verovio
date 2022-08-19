@@ -1292,8 +1292,9 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
     Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&matchN, 1));
     if (!staff) return;
     Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
-    if (!layer || !layer->HasStaffDef()) return;
-    // Replace any element (clef, keysig, metersig, ...) by its current drawing element
+    if (!layer) return;
+
+    // Replace clef, keySig & mensur by its current drawing element
     if (layer->GetStaffDefClef()) {
         Object *clef = staffDef->GetChild(0, CLEF);
         if (clef) staffDef->DeleteChild(clef);
@@ -1309,6 +1310,8 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
         if (mensur) staffDef->DeleteChild(mensur);
         staffDef->AddChild(layer->GetStaffDefMensur()->Clone());
     }
+
+    // Replace meterSig & meterSigGrp by its current drawing element
     if (layer->GetStaffDefMeterSigGrp()) {
         Object *meterSigGrp = staffDef->GetChild(0, METERSIGGRP);
         if (meterSigGrp) {
@@ -1330,6 +1333,11 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
             if (meterSigGrp) staffDef->DeleteChild(meterSigGrp);
         }
         staffDef->AddChild(layer->GetStaffDefMeterSig()->Clone());
+    }
+    else if (!staffDef->FindDescendantByType(METERSIGGRP)) {
+        // Mark meter signatures invisible if no replacement was done
+        MeterSig *meterSig = vrv_cast<MeterSig *>(staffDef->GetChild(0, METERSIG));
+        if (meterSig) meterSig->SetForm(METERFORM_invis);
     }
 }
 
