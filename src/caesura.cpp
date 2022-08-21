@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
+#include "smufl.h"
 #include "verticalaligner.h"
 
 namespace vrv {
@@ -23,10 +25,12 @@ namespace vrv {
 
 static const ClassRegistrar<Caesura> s_factory("caesura", CAESURA);
 
-Caesura::Caesura() : ControlElement(CAESURA, "caesura-"), TimePointInterface(), AttColor(), AttPlacementRelStaff()
+Caesura::Caesura()
+    : ControlElement(CAESURA, "caesura-"), TimePointInterface(), AttColor(), AttExtSym(), AttPlacementRelStaff()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_EXTSYM);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
 
     this->Reset();
@@ -40,6 +44,26 @@ void Caesura::Reset()
     TimePointInterface::Reset();
     this->ResetColor();
     this->ResetPlacementRelStaff();
+}
+
+wchar_t Caesura::GetCaesuraGlyph() const
+{
+    const Resources *resources = this->GetDocResources();
+    if (!resources) return 0;
+
+    // If there is glyph.num, prioritize it
+    if (this->HasGlyphNum()) {
+        wchar_t code = this->GetGlyphNum();
+        if (NULL != resources->GetGlyph(code)) return code;
+    }
+    // If there is glyph.name (second priority)
+    else if (this->HasGlyphName()) {
+        wchar_t code = resources->GetGlyphCode(this->GetGlyphName());
+        if (NULL != resources->GetGlyph(code)) return code;
+    }
+
+    // return standard glyph
+    return SMUFL_E4D1_caesura;
 }
 
 } // namespace vrv

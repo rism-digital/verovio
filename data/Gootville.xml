@@ -334,6 +334,8 @@
   <g c="E4C8" x="0.0" y="0.0" w="572.0" h="416.0" h-a-x="572" n="fermataVeryLongAbove"/>
   <g c="E4C9" x="0.0" y="-416.0" w="572.0" h="416.0" h-a-x="572" n="fermataVeryLongBelow"/>
   <g c="E4CE" x="0.0" y="0.0" w="142.0" h="262.0" h-a-x="142" n="breathMarkComma"/>
+  <g c="E4D1" x="0.0" y="0.0" w="456.0" h="520.0" h-a-x="456" n="caesura"/>
+  <g c="E4D4" x="0.0" y="0.0" w="370.0" h="513.0" h-a-x="370" n="caesuraCurved"/>
   <g c="E4E1" x="0.0" y="-250.0" w="284.0" h="500.0" h-a-x="284" n="restLonga"/>
   <g c="E4E2" x="0.0" y="0.0" w="284.0" h="250.0" h-a-x="284" n="restDoubleWhole"/>
   <g c="E4E3" x="0.0" y="-125.0" w="330.0" h="125.0" h-a-x="330" n="restWhole"/>

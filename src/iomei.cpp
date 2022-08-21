@@ -1932,6 +1932,7 @@ void MEIOutput::WriteCaesura(pugi::xml_node currentNode, Caesura *caesura)
     this->WriteControlElement(currentNode, caesura);
     this->WriteTimePointInterface(currentNode, caesura);
     caesura->WriteColor(currentNode);
+    caesura->WriteExtSym(currentNode);
     caesura->WritePlacementRelStaff(currentNode);
 }
 
@@ -5275,6 +5276,7 @@ bool MEIInput::ReadCaesura(Object *parent, pugi::xml_node caesura)
 
     this->ReadTimePointInterface(caesura, vrvCaesura);
     vrvCaesura->ReadColor(caesura);
+    vrvCaesura->ReadExtSym(caesura);
     vrvCaesura->ReadPlacementRelStaff(caesura);
 
     parent->AddChild(vrvCaesura);

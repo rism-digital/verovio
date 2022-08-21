@@ -203,6 +203,11 @@ enum {
     SMUFL_E4C8_fermataVeryLongAbove = 0xE4C8,
     SMUFL_E4C9_fermataVeryLongBelow = 0xE4C9,
     SMUFL_E4CE_breathMarkComma = 0xE4CE,
+    SMUFL_E4D1_caesura = 0xE4D1,
+    SMUFL_E4D2_caesuraThick = 0xE4D2,
+    SMUFL_E4D3_caesuraShort = 0xE4D3,
+    SMUFL_E4D4_caesuraCurved = 0xE4D4,
+    SMUFL_E4D7_caesuraSingleStroke = 0xE4D7,
     SMUFL_E4E0_restMaxima = 0xE4E0,
     SMUFL_E4E1_restLonga = 0xE4E1,
     SMUFL_E4E2_restDoubleWhole = 0xE4E2,
@@ -495,7 +500,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 470
+#define SMUFL_COUNT 475
 
 } // namespace vrv
 

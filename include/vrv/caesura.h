@@ -9,6 +9,7 @@
 #define __VRV_CAESURA_H__
 
 #include "atts_cmn.h"
+#include "atts_externalsymbols.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
@@ -21,7 +22,11 @@ namespace vrv {
 /**
  * This class models the MEI <caesura> element.
  */
-class Caesura : public ControlElement, public TimePointInterface, public AttColor, public AttPlacementRelStaff {
+class Caesura : public ControlElement,
+                public TimePointInterface,
+                public AttColor,
+                public AttExtSym,
+                public AttPlacementRelStaff {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -44,6 +49,13 @@ public:
     {
         return vrv_cast<const TimePointInterface *>(this);
     }
+    ///@}
+
+    /**
+     * Get the SMuFL glyph.
+     */
+    ///@{
+    wchar_t GetCaesuraGlyph() const;
     ///@}
 
     //----------//

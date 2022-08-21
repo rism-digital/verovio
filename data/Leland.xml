@@ -370,6 +370,8 @@
   <g c="E4C7" x="0.0" y="-368.0" w="623.0" h="368.0" h-a-x="623" n="fermataLongBelow"/>
   <g c="E4C8" x="0.0" y="0.0" w="842.0" h="549.0" h-a-x="842" n="fermataVeryLongAbove"/>
   <g c="E4C9" x="0.0" y="-549.0" w="842.0" h="549.0" h-a-x="842" n="fermataVeryLongBelow"/>
+  <g c="E4D1" x="0.0" y="0.0" w="380.0" h="490.0" h-a-x="380" n="caesura"/>
+  <g c="E4D4" x="0.0" y="0.0" w="368.0" h="491.0" h-a-x="368" n="caesuraCurved"/>
   <g c="E4E0" x="0.0" y="-250.0" w="450.0" h="500.0" h-a-x="450" n="restMaxima"/>
   <g c="E4E1" x="0.0" y="-250.0" w="125.0" h="500.0" h-a-x="125" n="restLonga"/>
   <g c="E4E2" x="0.0" y="-11.0" w="125.0" h="273.0" h-a-x="125" n="restDoubleWhole"/>
@@ -537,6 +539,7 @@
   <g c="E4F6" x="0.0" y="-202.0" w="317.0" h="409.0" h-a-x="317" n="restQuarterZ"/>
   <g c="E06A" x="0.0" y="-438.0" w="304.0" h="877.0" h-a-x="304" n="unpitchedPercussionClef2"/>
   <g c="E4CE" x="0.0" y="0.0" w="191.0" h="321.0" h-a-x="191" n="breathMarkComma"/>
+  <g c="E4D3" x="0.0" y="-1.0" w="184.0" h="501.0" h-a-x="184" n="caesuraShort"/>
   <g c="E500" x="0.0" y="-250.0" w="481.0" h="500.0" h-a-x="481" n="repeat1Bar"/>
   <g c="E501" x="0.0" y="-250.0" w="735.0" h="500.0" h-a-x="735" n="repeat2Bars"/>
   <g c="E502" x="0.0" y="-250.0" w="1243.0" h="500.0" h-a-x="1243" n="repeat4Bars"/>
@@ -559,4 +562,5 @@
   <g c="E503" x="1.0" y="62.0" w="126.0" h="126.0" h-a-x="127" n="repeatBarUpperDot"/>
   <g c="E504" x="0.0" y="-250.0" w="481.0" h="500.0" h-a-x="481" n="repeatBarSlash"/>
   <g c="E505" x="1.0" y="-190.0" w="126.0" h="126.0" h-a-x="127" n="repeatBarLowerDot"/>
+  <g c="E4D7" x="0.0" y="-1.0" w="46.0" h="501.0" h-a-x="46" n="caesuraSingleStroke"/>
 </bounding-boxes>

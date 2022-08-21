@@ -19,6 +19,7 @@
 #include "beamspan.h"
 #include "bracketspan.h"
 #include "breath.h"
+#include "caesura.h"
 #include "clef.h"
 #include "comparison.h"
 #include "devicecontext.h"
@@ -86,6 +87,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Breath *breath = vrv_cast<Breath *>(element);
         assert(breath);
         this->DrawBreath(dc, breath, measure, system);
+    }
+    else if (element->Is(CAESURA)) {
+        Caesura *caesura = vrv_cast<Caesura *>(element);
+        assert(caesura);
+        this->DrawCaesura(dc, caesura, measure, system);
     }
     else if (element->Is(DIR)) {
         Dir *dir = vrv_cast<Dir *>(element);
@@ -1508,6 +1514,38 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
     }
 
     dc->EndGraphic(breath, this);
+}
+
+void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(caesura);
+
+    // Cannot draw a caesura that has no start position
+    if (!caesura->GetStart()) return;
+
+    dc->StartGraphic(caesura, "", caesura->GetID());
+
+    const wchar_t code = caesura->GetCaesuraGlyph();
+    const int x = caesura->GetStart()->GetDrawingX() + caesura->GetStart()->GetDrawingRadius(m_doc) * 3;
+
+    std::vector<Staff *> staffList = caesura->GetTstampStaves(measure, caesura);
+    for (Staff *staff : staffList) {
+        if (!system->SetCurrentFloatingPositioner(staff->GetN(), caesura, caesura->GetStart(), staff)) {
+            continue;
+        }
+
+        const int glyphHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false);
+        const int y = (caesura->HasPlace() && (caesura->GetPlace() != STAFFREL_within))
+            ? caesura->GetDrawingY()
+            : staff->GetDrawingY() - glyphHeight / 2;
+
+        this->DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
+    }
+
+    dc->EndGraphic(caesura, this);
 }
 
 void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system)
