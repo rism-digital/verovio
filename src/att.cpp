@@ -398,18 +398,19 @@ data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
 std::string Att::MetercountPairToStr(const data_METERCOUNT_pair &data) const
 {
     std::stringstream output;
-    for (const int count : data.first) {
-        output << count;
-        switch (data.second) {
-            case MeterCountSign::Slash: output << '\\'; break;
-            case MeterCountSign::Minus: output << '-'; break;
-            case MeterCountSign::Asterisk: output << '*'; break;
-            case MeterCountSign::Plus: output << '+'; break;
-            case MeterCountSign::None:
-            default: break;
+    for (auto iter = data.first.begin(); iter != data.first.end(); ++iter) {
+        output << *iter;
+        if (iter != std::prev(data.first.end())) {
+            switch (data.second) {
+                case MeterCountSign::Slash: output << '\\'; break;
+                case MeterCountSign::Minus: output << '-'; break;
+                case MeterCountSign::Asterisk: output << '*'; break;
+                case MeterCountSign::Plus: output << '+'; break;
+                case MeterCountSign::None:
+                default: break;
+            }
         }
     }
-
     return output.str();
 }
 
@@ -419,8 +420,8 @@ data_METERCOUNT_pair Att::StrToMetercountPair(const std::string &value) const
     std::sregex_token_iterator first{ value.begin(), value.end(), re, -1 }, last;
     std::vector<std::string> tokens{ first, last };
 
-    // Since there is currently no need for implementation of complex calculus within metersig, only one opperation will
-    // be supported in the meter count. Caclulation will be based on the first mathematical operator in the string
+    // Since there is currently no need for implementation of complex calculus within metersig, only one operation will
+    // be supported in the meter count. Calculation will be based on the first mathematical operator in the string
     MeterCountSign sign = MeterCountSign::None;
     const size_t pos = value.find_first_of("+-*/");
     if (pos != std::string::npos) {

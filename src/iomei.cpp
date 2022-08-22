@@ -1312,6 +1312,7 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
     }
 
     // Replace meterSig & meterSigGrp by its current drawing element
+    bool meterSigReplaced = false;
     if (layer->GetStaffDefMeterSigGrp()) {
         Object *meterSigGrp = staffDef->GetChild(0, METERSIGGRP);
         if (meterSigGrp) {
@@ -1322,6 +1323,7 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
             if (meterSig) staffDef->DeleteChild(meterSig);
         }
         staffDef->AddChild(layer->GetStaffDefMeterSigGrp()->Clone());
+        meterSigReplaced = true;
     }
     if (layer->GetStaffDefMeterSig()) {
         Object *meterSig = staffDef->GetChild(0, METERSIG);
@@ -1333,11 +1335,16 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
             if (meterSigGrp) staffDef->DeleteChild(meterSigGrp);
         }
         staffDef->AddChild(layer->GetStaffDefMeterSig()->Clone());
+        meterSigReplaced = true;
     }
-    else if (!staffDef->FindDescendantByType(METERSIGGRP)) {
-        // Mark meter signatures invisible if no replacement was done
-        MeterSig *meterSig = vrv_cast<MeterSig *>(staffDef->GetChild(0, METERSIG));
-        if (meterSig) meterSig->SetForm(METERFORM_invis);
+
+    // Mark meter signatures invisible if no replacement was done
+    if (!meterSigReplaced) {
+        ListOfObjects objects = staffDef->FindAllDescendantsByType(METERSIG);
+        for (Object *object : objects) {
+            MeterSig *meterSig = vrv_cast<MeterSig *>(object);
+            meterSig->SetForm(METERFORM_invis);
+        }
     }
 }
 
