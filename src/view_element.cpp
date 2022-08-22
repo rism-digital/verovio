@@ -560,7 +560,9 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     // hidden clef
     if (clef->GetVisible() == BOOLEAN_false) {
+        dc->StartGraphic(element, "", element->GetID());
         clef->SetEmptyBB();
+        dc->EndGraphic(element, this);
         return;
     }
 
@@ -892,7 +894,9 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // hidden key signature
     if (keySig->GetVisible() == BOOLEAN_false) {
+        dc->StartGraphic(element, "", element->GetID());
         keySig->SetEmptyBB();
+        dc->EndGraphic(element, this);
         return;
     }
 
@@ -975,6 +979,14 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     MeterSig *meterSig = vrv_cast<MeterSig *>(element);
     assert(meterSig);
 
+    // hidden time signature
+    if (meterSig->GetForm() == METERFORM_invis) {
+        dc->StartGraphic(element, "", element->GetID());
+        meterSig->SetEmptyBB();
+        dc->EndGraphic(element, this);
+        return;
+    }
+
     this->DrawMeterSig(dc, meterSig, staff, 0);
 }
 
@@ -997,8 +1009,6 @@ void View::DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Cle
 
 void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset)
 {
-    if (meterSig->GetForm() == METERFORM_invis) return;
-
     const bool hasSmallEnclosing = (meterSig->HasSym() || (meterSig->GetForm() == METERFORM_num));
     wchar_t enclosingFront, enclosingBack;
     std::tie(enclosingFront, enclosingBack) = meterSig->GetEnclosingGlyphs(hasSmallEnclosing);
