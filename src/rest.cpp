@@ -269,7 +269,7 @@ wchar_t Rest::GetRestGlyph(const int duration) const
             case DUR_1024: return SMUFL_E4ED_rest1024th; break;
         }
     }
-    
+
     return 0;
 }
 

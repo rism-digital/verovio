@@ -24,7 +24,6 @@
 #include "options.h"
 #include "plica.h"
 #include "proport.h"
-#include "rest.h"
 #include "smufl.h"
 #include "staff.h"
 #include "vrv.h"
@@ -85,38 +84,6 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     /************ Draw children (verse / syl) ************/
 
     this->DrawLayerChildren(dc, note, layer, staff, measure);
-}
-
-void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
-{
-    assert(dc);
-    assert(element);
-    assert(layer);
-    assert(staff);
-    assert(measure);
-
-    wchar_t charCode;
-
-    Rest *rest = vrv_cast<Rest *>(element);
-    assert(rest);
-
-    const bool drawingCueSize = rest->GetDrawingCueSize();
-    const int drawingDur = rest->GetActualDur();
-    const int x = element->GetDrawingX();
-    const int y = element->GetDrawingY();
-
-    switch (drawingDur) {
-        case DUR_MX: charCode = SMUFL_E9F0_mensuralRestMaxima; break;
-        case DUR_LG: charCode = SMUFL_E9F2_mensuralRestLongaImperfecta; break;
-        case DUR_BR: charCode = SMUFL_E9F3_mensuralRestBrevis; break;
-        case DUR_1: charCode = SMUFL_E9F4_mensuralRestSemibrevis; break;
-        case DUR_2: charCode = SMUFL_E9F5_mensuralRestMinima; break;
-        case DUR_4: charCode = SMUFL_E9F6_mensuralRestSemiminima; break;
-        case DUR_8: charCode = SMUFL_E9F7_mensuralRestFusa; break;
-        case DUR_16: charCode = SMUFL_E9F8_mensuralRestSemifusa; break;
-        default: charCode = 0; // This should never happen
-    }
-    this->DrawSmuflCode(dc, x, y, charCode, staff->m_drawingStaffSize, drawingCueSize);
 }
 
 void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
