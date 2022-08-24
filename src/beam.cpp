@@ -179,7 +179,6 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
         }
 
         int stemAdjust = 0;
-        
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             if (isStemSameas) {
                 // Move up according to the cut-outs
