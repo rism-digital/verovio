@@ -51,7 +51,6 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     const int yNote = element->GetDrawingY();
     const int xNote = element->GetDrawingX();
     const int drawingDur = note->GetDrawingDur();
-    const bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     /************** Noteheads: **************/
 
@@ -68,17 +67,6 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         dc->StartCustomGraphic("notehead");
         this->DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
         dc->EndCustomGraphic();
-        // For semibrevis with stem in black notation, encoded with an explicit stem direction
-        if (((drawingDur > DUR_1) || ((note->GetStemDir() != STEMDIRECTION_NONE) && mensural_black))
-            && note->GetStemVisible() != BOOLEAN_false) {
-            /************** Stem/notehead direction: **************/
-            const int radius = note->GetDrawingRadius(m_doc);
-            const int staffY = staff->GetDrawingY();
-            const int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
-            /************** Draw stem: **************/
-            this->DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
-        }
     }
 
     /************ Draw children (verse / syl) ************/
@@ -156,6 +144,7 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->EndGraphic(element, this);
 } // namespace vrv
+
 
 /* This function draws any flags as well as the stem. */
 

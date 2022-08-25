@@ -1500,6 +1500,24 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Stem *stem = vrv_cast<Stem *>(element);
     assert(stem);
 
+    // We check if this belongs to a mensural note
+    Note *parent = vrv_cast<Note *>(stem->GetFirstAncestor(NOTE));
+    if (parent && parent->IsMensuralDur()) {
+        if (((parent->GetDrawingDur() > DUR_1) || ((parent->GetStemDir() != STEMDIRECTION_NONE)))
+            && stem->GetVisible() != BOOLEAN_false) {
+            /************** Stem/notehead direction: **************/
+            const int staffY = staff->GetDrawingY();
+            const int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+            const data_STEMDIRECTION stemDir = (stem->HasDir()) ? stem->GetDir() : this->GetMensuralStemDirection(layer, parent, verticalCenter);
+            /************** Draw stem: **************/
+            dc->StartGraphic(element, "", element->GetID());
+            this->DrawMensuralStem(dc, parent, staff, stemDir, parent->GetDrawingRadius(m_doc), parent->GetDrawingX(), parent->GetDrawingY());
+            dc->EndGraphic(element, this);
+        }
+
+        return;
+    }
+
     // Do not draw virtual (e.g., whole note) stems
     if (stem->IsVirtual()) return;
 
