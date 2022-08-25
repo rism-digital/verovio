@@ -422,6 +422,14 @@ Object *Object::GetLast() const
     return m_children.back();
 }
 
+Object *Object::GetLast(const ClassId classId)
+{
+    m_iteratorElementType = classId;
+    m_reverse_iteratorEnd = m_children.rend();
+    m_reverse_iteratorCurrent = std::find_if(m_children.rbegin(), m_reverse_iteratorEnd, ObjectComparison(m_iteratorElementType));
+    return (m_reverse_iteratorCurrent == m_reverse_iteratorEnd) ? NULL : *m_reverse_iteratorCurrent;
+}
+
 int Object::GetIdx() const
 {
     assert(m_parent);

@@ -293,8 +293,12 @@ public:
 
     /**
      * Return the last child of the object (if any, NULL otherwise)
+     * GetLast returns the last element child of the specified type, if specified.
      */
+    ///@{
     Object *GetLast() const;
+    Object *GetLast(const ClassId classId = UNSPECIFIED);
+    ///@}
 
     /**
      * Get the parent of the Object
@@ -1221,6 +1225,7 @@ private:
      */
     ///@{
     ArrayOfObjects::iterator m_iteratorEnd, m_iteratorCurrent;
+    ArrayOfObjects::reverse_iterator m_reverse_iteratorEnd, m_reverse_iteratorCurrent;
     ClassId m_iteratorElementType;
     ///@}
 
