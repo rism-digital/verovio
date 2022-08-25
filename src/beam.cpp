@@ -151,8 +151,6 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
     assert(doc);
     assert(beamInterface);
 
-    int y1, y2;
-
     const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     for (auto coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
@@ -165,7 +163,8 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
 
         assert(coord->m_closestNote);
 
-        y1 = coord->m_yBeam;
+        int y1 = coord->m_yBeam;
+        int y2 = coord->m_closestNote->GetDrawingY();
         bool isStemSameas = false;
 
         // With stem.sameas the y is not the beam one but the one of the other note
@@ -180,7 +179,6 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
         }
 
         int stemAdjust = 0;
-        y2 = coord->m_closestNote->GetDrawingY();
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             if (isStemSameas) {
                 // Move up according to the cut-outs
@@ -205,6 +203,8 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
             int stemOffset = 0;
             if (coord->m_partialFlagPlace == coord->m_beamRelativePlace) {
                 stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth;
+                const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                if (stemOffset && m_firstNoteOrChord && (m_firstNoteOrChord->m_yBeam % unit)) stemOffset -= unit / 2;
             }
             // handle cross-staff fTrem cases
             const auto [beams, beamsFloat] = beamInterface->GetFloatingBeamCount();
