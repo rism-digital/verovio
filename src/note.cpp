@@ -1029,8 +1029,8 @@ int Note::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // We currently have no stem object with mensural notes
-    // We also have no stem  with tab because it belongs to tabDurSym in this case
+    // We do not need to calc stems for mensural notes
+    // We have no stem with tab because it belongs to tabDurSym in this case
     if (this->IsMensuralDur() || this->IsTabGrpNote()) {
         return FUNCTOR_SIBLINGS;
     }
@@ -1040,7 +1040,7 @@ int Note::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    // This now need should be NULL and the chord stem length will be 0
+    // This now should be NULL and the chord stem length will be 0
     params->m_interface = NULL;
     params->m_chordStemLength = 0;
 
