@@ -545,7 +545,7 @@ Object *Object::DetachChild(int idx)
     return child;
 }
 
-bool Object::HasDescendant(Object *child, int deepness) const
+bool Object::HasDescendant(const Object *child, int deepness) const
 {
     ArrayOfObjects::const_iterator iter;
 
@@ -2224,7 +2224,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
+int Object::GetAlignmentLeftRight(FunctorParams *functorParams) const
 {
     GetAlignmentLeftRightParams *params = vrv_params_cast<GetAlignmentLeftRightParams *>(functorParams);
     assert(params);

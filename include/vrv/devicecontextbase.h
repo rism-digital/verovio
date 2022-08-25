@@ -145,15 +145,15 @@ public:
     virtual ~FontInfo(){};
 
     // accessors and modifiers for the font elements
-    int GetPointSize() { return m_pointSize; }
-    data_FONTSTYLE GetStyle() { return m_style; }
-    data_FONTWEIGHT GetWeight() { return m_weight; }
-    bool GetUnderlined() { return m_underlined; }
-    bool GetSupSubScript() { return m_supSubScript; }
-    std::string GetFaceName() { return m_faceName; }
-    int GetFamily() { return m_family; }
-    int GetEncoding() { return m_encoding; }
-    float GetWidthToHeightRatio() { return m_widthToHeightRatio; }
+    int GetPointSize() const { return m_pointSize; }
+    data_FONTSTYLE GetStyle() const { return m_style; }
+    data_FONTWEIGHT GetWeight() const { return m_weight; }
+    bool GetUnderlined() const { return m_underlined; }
+    bool GetSupSubScript() const { return m_supSubScript; }
+    std::string GetFaceName() const { return m_faceName; }
+    int GetFamily() const { return m_family; }
+    int GetEncoding() const { return m_encoding; }
+    float GetWidthToHeightRatio() const { return m_widthToHeightRatio; }
 
     void SetPointSize(int pointSize) { m_pointSize = pointSize; }
     void SetStyle(data_FONTSTYLE style) { m_style = style; }

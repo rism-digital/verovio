@@ -66,15 +66,11 @@ public:
     void ClearSelectionPages();
 
     /**
-     * Refreshes the views from Doc.
-     */
-    virtual void Refresh();
-
-    /**
      * Getter for the options
      */
     ///@{
-    Options *GetOptions() const { return m_options; }
+    Options *GetOptions() { return m_options; }
+    const Options *GetOptions() const { return m_options; }
     void SetOptions(Options *options) { (*m_options) = *options; }
     ///@}
 
@@ -119,7 +115,7 @@ public:
     /**
      * Check if the document has a page with the specified value
      */
-    bool HasPage(int pageIdx);
+    bool HasPage(int pageIdx) const;
 
     /**
      * Get all the Score in the visible Mdiv.
@@ -183,12 +179,12 @@ public:
      * The staff size must already be taken into account in the FontInfo
      */
     ///@{
-    int GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const;
-    int GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const;
-    int GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const;
-    int GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const;
-    int GetTextLineHeight(FontInfo *font, bool graceSize) const;
-    int GetTextXHeight(FontInfo *font, bool graceSize) const;
+    int GetTextGlyphHeight(wchar_t code, const FontInfo *font, bool graceSize) const;
+    int GetTextGlyphWidth(wchar_t code, const FontInfo *font, bool graceSize) const;
+    int GetTextGlyphAdvX(wchar_t code, const FontInfo *font, bool graceSize) const;
+    int GetTextGlyphDescender(wchar_t code, const FontInfo *font, bool graceSize) const;
+    int GetTextLineHeight(const FontInfo *font, bool graceSize) const;
+    int GetTextXHeight(const FontInfo *font, bool graceSize) const;
     ///@}
 
     /**
@@ -207,9 +203,9 @@ public:
      */
     ///@{
     double GetLeftMargin(const ClassId classId) const;
-    double GetLeftMargin(Object *object) const;
+    double GetLeftMargin(const Object *object) const;
     double GetRightMargin(const ClassId classId) const;
-    double GetRightMargin(Object *object) const;
+    double GetRightMargin(const Object *object) const;
     double GetLeftPosition() const;
     double GetBottomMargin(const ClassId classId) const;
     double GetTopMargin(const ClassId classId) const;
@@ -355,11 +351,6 @@ public:
     void ExpandExpansions();
 
     /**
-     * To be implemented.
-     */
-    void RefreshViews(){};
-
-    /**
      * Set drawing values (page size, etc) when drawing a page.
      * By default, the page size of the document is taken.
      * If a page is given, the size of the page is taken.
@@ -377,9 +368,12 @@ public:
     /**
      * Getter to the drawPage. Normally, getting the page should
      * be done with Doc::SetDrawingPage. This is only a method for
-     * asserting that currently have the right page.
+     * asserting that we currently have the right page.
      */
-    Page *GetDrawingPage() const { return m_drawingPage; }
+    ///@{
+    Page *GetDrawingPage() { return m_drawingPage; }
+    const Page *GetDrawingPage() const { return m_drawingPage; }
+    ///@}
 
     /**
      * Return the width adjusted to the content of the current drawing page.
@@ -414,6 +408,7 @@ public:
     ///@{
     void SetFacsimile(Facsimile *facsimile) { m_facsimile = facsimile; }
     Facsimile *GetFacsimile() { return m_facsimile; }
+    const Facsimile *GetFacsimile() const { return m_facsimile; }
     bool HasFacsimile() const { return m_facsimile != NULL; }
     ///@}
 

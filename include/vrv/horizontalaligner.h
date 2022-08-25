@@ -129,9 +129,9 @@ public:
      * Returns (-)VRV_UNSET in nothing for the staff specified.
      * Uses Object::GetAlignmentLeftRight
      */
-    void GetLeftRight(
-        const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {});
-    void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {});
+    void GetLeftRight(const std::vector<int> &staffNs, int &minLeft, int &maxRight,
+        const std::vector<ClassId> &m_excludes = {}) const;
+    void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {}) const;
 
     /**
      * Returns the GraceAligner for the Alignment.
@@ -153,7 +153,10 @@ public:
      * Return the AlignmentReference holding the element.
      * If staffN is provided, uses the AlignmentReference->GetN() to accelerate the search.
      */
-    AlignmentReference *GetReferenceWithElement(LayerElement *element, int staffN = VRV_UNSET);
+    ///@{
+    AlignmentReference *GetReferenceWithElement(const LayerElement *element, int staffN = VRV_UNSET);
+    const AlignmentReference *GetReferenceWithElement(const LayerElement *element, int staffN = VRV_UNSET) const;
+    ///@}
 
     /**
      * Return pair of max and min Y value within alignment. Elements will be counted by alignment references.
@@ -165,6 +168,25 @@ public:
      * The Alignment has to have a AlignmentReference holding it.
      */
     void AddToAccidSpace(Accid *accid);
+
+    /**
+     * Return true if there is vertical overlap with accidentals from another alignment for specific staffN
+     */
+    bool HasAccidVerticalOverlap(const Alignment *otherAlignment, int staffN) const;
+
+    /**
+     * Return true if the alignment contains at least one reference with staffN
+     */
+    bool HasAlignmentReference(int staffN) const;
+
+    /**
+     * Return true if the alignment contains only references to timestamp attributes.
+     */
+    bool HasTimestampOnly() const;
+
+    //----------------//
+    // Static methods //
+    //----------------//
 
     /**
      * Compute "ideal" horizontal space to allow for a given time interval, ignoring the need
@@ -181,23 +203,8 @@ public:
      * flexible solution might be to get ideal spacing from a user-definable table, but using a
      * formula with parameters can come close and has other advantages.
      */
-    virtual int HorizontalSpaceForDuration(
+    static int HorizontalSpaceForDuration(
         double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
-
-    /**
-     * Return true if there is vertical overlap with accidentals from another alignment for specific staffN
-     */
-    bool HasAccidVerticalOverlap(Alignment *otherAlignment, int staffN);
-
-    /**
-     * Return true if the alignment contains at least one reference with staffN
-     */
-    bool HasAlignmentReference(int staffN) const;
-
-    /**
-     * Return true if the alignment contains only references to timestamp attributes.
-     */
-    bool HasTimestampOnly() const;
 
     //----------//
     // Functors //
@@ -324,12 +331,12 @@ public:
     /**
      * See Object::AjustAccidX
      */
-    void AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids);
+    void AdjustAccidWithAccidSpace(Accid *accid, const Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids);
 
     /**
      * Return true if one of objects overlaps with accidentals from current reference (i.e. if there are accidentals)
      */
-    bool HasAccidVerticalOverlap(const ArrayOfObjects *objects);
+    bool HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const;
 
     /**
      * Return true if the reference has elements from multiple layers.
@@ -502,16 +509,24 @@ public:
      * For each MeasureAligner, we keep and Alignment for the left position.
      * The Alignment time will be always -1.0 * DUR_MAX and will appear first in the list.
      */
-    Alignment *GetLeftAlignment() const { return m_leftAlignment; }
-    Alignment *GetLeftBarLineAlignment() const { return m_leftBarLineAlignment; }
+    ///@{
+    Alignment *GetLeftAlignment() { return m_leftAlignment; }
+    const Alignment *GetLeftAlignment() const { return m_leftAlignment; }
+    Alignment *GetLeftBarLineAlignment() { return m_leftBarLineAlignment; }
+    const Alignment *GetLeftBarLineAlignment() const { return m_leftBarLineAlignment; }
+    ///@}
 
     /**
      * Get right Alignment for the measure.
      * For each MeasureAligner, we keep and Alignment for the right position.
      * The Alignment time will be increased whenever necessary when values are added.
      */
-    Alignment *GetRightAlignment() const { return m_rightAlignment; }
-    Alignment *GetRightBarLineAlignment() const { return m_rightBarLineAlignment; }
+    ///@{
+    Alignment *GetRightAlignment() { return m_rightAlignment; }
+    const Alignment *GetRightAlignment() const { return m_rightAlignment; }
+    Alignment *GetRightBarLineAlignment() { return m_rightBarLineAlignment; }
+    const Alignment *GetRightBarLineAlignment() const { return m_rightBarLineAlignment; }
+    ///@}
 
     /**
      * Adjust the spacing of the measure looking at each tuple of start / end alignment and a distance.
@@ -530,7 +545,7 @@ public:
      * Adjust the spacing for the grace note group(s) of the alignment on staffN
      * The alignment need to be of ALIGNMENT_GRACENOTE type
      */
-    void AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int staffN);
+    void AdjustGraceNoteSpacing(const Doc *doc, Alignment *alignment, int staffN);
 
     //----------//
     // Functors //
@@ -630,15 +645,15 @@ public:
      * Setting staffN as VRV_UNSET will look for and align all staves.
      */
     ///@{
-    int GetGraceGroupLeft(int staffN);
-    int GetGraceGroupRight(int staffN);
+    int GetGraceGroupLeft(int staffN) const;
+    int GetGraceGroupRight(int staffN) const;
     ///@{
 
     /**
      * Set an linear defaut position for each grace note
      * This is called from the CalcAlignmentXPos Functor.
      */
-    void SetGraceAligmentXPos(Doc *doc);
+    void SetGraceAlignmentXPos(const Doc *doc);
 
     //----------//
     // Functors //
