@@ -212,7 +212,14 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     // Calculating proper y offset based on pname, clef, staff, and staff rotate
     int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset = 0;
-    int octaveOffset = (nc->GetOct() - 3) * ((staffSize / 2) * 7);
+
+    // The default octave = 3, but the actual octave is calculated by
+    // taking into account the displacement of the clef
+    int clefOctave = 3;
+    if (clef->GetDis() && clef->GetDisPlace()) {
+        clefOctave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
+    }
+    int octaveOffset = (nc->GetOct() - clefOctave) * ((staffSize / 2) * 7);
     int rotateOffset;
     if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
         double deg = staff->GetDrawingRotate();
