@@ -1190,7 +1190,7 @@ bool MEIOutput::ProcessScoreBasedFilter(Object *object)
         }
     }
 
-    if (this->IsTreeObject(object)) {
+    if (this->IsTreeObject(object) && !object->Is({ SYSTEM_MILESTONE_END, PAGE_MILESTONE_END })) {
         m_objectStack.push_back(object);
     }
 
@@ -1292,8 +1292,9 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
     Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&matchN, 1));
     if (!staff) return;
     Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
-    if (!layer || !layer->HasStaffDef()) return;
-    // Replace any element (clef, keysig, metersig, ...) by its current drawing element
+    if (!layer) return;
+
+    // Replace clef, keySig & mensur by its current drawing element
     if (layer->GetStaffDefClef()) {
         Object *clef = staffDef->GetChild(0, CLEF);
         if (clef) staffDef->DeleteChild(clef);
@@ -1309,6 +1310,9 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
         if (mensur) staffDef->DeleteChild(mensur);
         staffDef->AddChild(layer->GetStaffDefMensur()->Clone());
     }
+
+    // Replace meterSig & meterSigGrp by its current drawing element
+    bool meterSigReplaced = false;
     if (layer->GetStaffDefMeterSigGrp()) {
         Object *meterSigGrp = staffDef->GetChild(0, METERSIGGRP);
         if (meterSigGrp) {
@@ -1319,6 +1323,7 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
             if (meterSig) staffDef->DeleteChild(meterSig);
         }
         staffDef->AddChild(layer->GetStaffDefMeterSigGrp()->Clone());
+        meterSigReplaced = true;
     }
     if (layer->GetStaffDefMeterSig()) {
         Object *meterSig = staffDef->GetChild(0, METERSIG);
@@ -1330,6 +1335,16 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
             if (meterSigGrp) staffDef->DeleteChild(meterSigGrp);
         }
         staffDef->AddChild(layer->GetStaffDefMeterSig()->Clone());
+        meterSigReplaced = true;
+    }
+
+    // Mark meter signatures invisible if no replacement was done
+    if (!meterSigReplaced) {
+        ListOfObjects objects = staffDef->FindAllDescendantsByType(METERSIG);
+        for (Object *object : objects) {
+            MeterSig *meterSig = vrv_cast<MeterSig *>(object);
+            meterSig->SetForm(METERFORM_invis);
+        }
     }
 }
 

@@ -1083,7 +1083,16 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(staff);
 
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
-    const ListOfObjects &childList = meterSigGrp->GetList(meterSigGrp);
+    ListOfObjects childList = meterSigGrp->GetList(meterSigGrp);
+
+    // Ignore invisible meter signatures and those without count
+    childList.erase(std::remove_if(childList.begin(), childList.end(),
+                        [](Object *object) {
+                            MeterSig *meterSig = vrv_cast<MeterSig *>(object);
+                            assert(meterSig);
+                            return ((meterSig->GetForm() == METERFORM_invis) || !meterSig->HasCount());
+                        }),
+        childList.end());
 
     const int glyphSize = staff->GetDrawingStaffNotationSize();
 
@@ -1094,10 +1103,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     for (auto iter = childList.begin(); iter != childList.end(); ++iter) {
         MeterSig *meterSig = vrv_cast<MeterSig *>(*iter);
         assert(meterSig);
-
-        if (meterSig->HasCount()) {
-            this->DrawMeterSig(dc, meterSig, staff, offset);
-        }
+        this->DrawMeterSig(dc, meterSig, staff, offset);
 
         const int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
         const int x = meterSig->GetDrawingX() + offset;
