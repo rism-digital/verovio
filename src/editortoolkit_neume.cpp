@@ -582,36 +582,45 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             return false;
         }
         FacsimileInterface *fi = (*clef).GetFacsimileInterface();
-        assert(fi);       
-        
-        // if inside a syllable,
-        // check if it is still in the syllable zone (x range),
-        // if not, move it out
+        assert(fi);      
+        // If inside this syllable, moving a clef...
+        // Case 1: BEFORE preceeding syllable(s) -> clef becomes start of this syllable, this syllable reorders before preceeding syllable(s), preceeding and following syllables abide by this clef.
+        // Case 2: INSIDE this syllable -> following neumes and syllables abide by this clef.
+        // Case 3: AFTER this syllable -> clef becomes the end of this syllable, following syllables abide by this clef still.
         if (element->GetParent()->Is(SYLLABLE)) {
-            Object *parent = element->GetParent();
+            Object *parent = clef->GetParent();
             assert(parent);
-            
             Object *fNc = parent->GetFirst(NEUME)->GetFirst(NC);
             Object *lNc;
             if (parent->GetChildCount(NEUME) == 1) {
                 lNc = parent->GetFirst(NEUME)->GetLast();
             } else {
-                lNc = parent->GetLast()->GetLast();
+                lNc = parent->GetLast(NEUME)->GetLast();
             }
-
             int xLeft = fNc->GetFacsimileInterface()->GetZone()->GetUlx();
             int xRight = lNc->GetFacsimileInterface()->GetZone()->GetLrx();
+            int clefInitial = clef->GetFacsimileInterface()->GetZone()->GetLrx();
+            int clefTarget = clefInitial + x;
 
-            std::cout << std::to_string(xLeft) << " " << std::to_string(xRight) << "\n";
-            std::cout << std::to_string(fi->GetZone()->GetUlx()) << " " << std::to_string(fi->GetZone()->GetLrx()) << "\n";
-
-            if (fi->GetZone() != NULL) {
-                if (x < xLeft || xRight < x) {
-                    MoveOutsideSyllable(clef->GetUuid());
-                }
+            // Case 1 & 2
+            if (clefTarget < xRight) {
                 ClefMovementHandler(clef, x, y);
             }
+            // Case 3
+            // Move to end of syllable and then shift zone so mei position stays at end of syllable
+            else {
+                int distanceToSyllableEnd = xRight - clefInitial + 1;
+                int distanceRemaining = clefTarget - xRight - 1;
+
+                ClefMovementHandler(clef, distanceToSyllableEnd, y);
+                if (fi->GetZone() != NULL) {
+                    Zone *zone = fi->GetZone();
+                    assert(zone);
+                    zone->ShiftByXY(distanceRemaining, 0);
+                }
+            }
         }
+        // Not inside syllable
         else {
             ClefMovementHandler(clef, x, y);
         }
@@ -674,37 +683,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             assert(zone);
             zone->ShiftByXY(x, -y);
         }
-        
-        // if inside a syllable,
-        // check if it is still in the syllable zone (x range),
-        // if not, move it out
-        if (element->GetParent()->Is(SYLLABLE)) {
-            Object *parent = element->GetParent();
-            assert(parent);
-            Object *fNc = parent->GetFirst(NEUME)->GetFirst(NC);
-
-            Object *lNc;
-            if (parent->GetChildCount(NEUME) == 1) {
-                lNc = parent->GetFirst(NEUME)->GetLast();
-            } else {
-                lNc = parent->GetLast()->GetLast();
-            }
-
-            int xLeft = fNc->GetFacsimileInterface()->GetZone()->GetUlx();
-            int xRight = lNc->GetFacsimileInterface()->GetZone()->GetLrx();
-
-            if (fi->GetZone() != NULL) {
-                Zone *zone = fi->GetZone();
-                if (zone->GetUlx() < xLeft || zone->GetLrx() > xRight) {
-                    Object *sParent = parent->GetParent();
-                    assert(sParent);
-
-                    element->MoveItselfTo(sParent);
-                    parent->ClearRelinquishedChildren();
-                    sParent->ReorderByXPos();
-                }
-            }
-        }
     }
     else if (element->Is(DIVLINE)) {
         DivLine *divLine = dynamic_cast<DivLine *>(element);
@@ -720,37 +698,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             Zone *zone = fi->GetZone();
             assert(zone);
             zone->ShiftByXY(x, -y);
-        }
-
-        // if inside a syllable,
-        // check if it is still in the syllable zone (x range),
-        // if not, move it out
-        if (element->GetParent()->Is(SYLLABLE)) {
-            Object *parent = element->GetParent();
-            assert(parent);
-            Object *fNc = parent->GetFirst(NEUME)->GetFirst(NC);
-
-            Object *lNc;
-            if (parent->GetChildCount(NEUME) == 1) {
-                lNc = parent->GetFirst(NEUME)->GetLast();
-            } else {
-                lNc = parent->GetLast()->GetLast();
-            }
-
-            int xLeft = fNc->GetFacsimileInterface()->GetZone()->GetUlx();
-            int xRight = lNc->GetFacsimileInterface()->GetZone()->GetLrx();
-
-            if (fi->GetZone() != NULL) {
-                Zone *zone = fi->GetZone();
-                if (zone->GetUlx() < xLeft || zone->GetLrx() > xRight) {
-                    Object *sParent = parent->GetParent();
-                    assert(sParent);
-
-                    element->MoveItselfTo(sParent);
-                    parent->ClearRelinquishedChildren();
-                    sParent->ReorderByXPos();
-                }
-            }
         }
     }
     else {
