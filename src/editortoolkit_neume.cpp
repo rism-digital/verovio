@@ -2525,18 +2525,20 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 // ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
                 if (descSyl != NULL) {
                     FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
+                    
                     if (facsInter != NULL) {
-                        if (ulx == -1) {
+                        if (ulx == -1 || ulx > facsInter->GetDrawingX()) {
                             ulx = facsInter->GetDrawingX();
                         }
-                        else {
+
+                        if (lrx < facsInter->GetWidth() + facsInter->GetDrawingX()) {
                             lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
                         }
 
-                        if (uly == -1){
+                        if (uly == -1 || uly > facsInter->GetDrawingY()){
                             uly = facsInter->GetDrawingY();                        
                         }
-                        else {
+                        if (lry < facsInter->GetHeight() + facsInter->GetDrawingY()) {
                             lry = facsInter->GetHeight() + facsInter->GetDrawingY();
                         }  
                     }   
