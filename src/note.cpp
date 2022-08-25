@@ -1302,7 +1302,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Chord *chord = this->IsChordTone();
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
 
-    if (!this->IsChordTone() && !this->IsMensuralDur() && !this->IsTabGrpNote()) {
+    if (!this->IsChordTone() && !this->IsTabGrpNote()) {
         if (!currentStem) {
             currentStem = new Stem();
             currentStem->IsAttribute(true);
@@ -1324,8 +1324,11 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
         }
     }
 
+    // We don't care about flags or dots in mensural notes
+    if (this->IsMensuralDur()) return FUNCTOR_CONTINUE;
+
     if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->GetAncestorFTrem() && !this->IsChordTone()
-        && !this->IsMensuralDur() && !this->IsTabGrpNote()) {
+        && !this->IsTabGrpNote()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {
