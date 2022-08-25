@@ -83,7 +83,7 @@ public:
      */
     ///@{
     wchar_t GetRestGlyph() const;
-    wchar_t GetRestGlyph(int duration) const;
+    wchar_t GetRestGlyph(const int duration) const;
     ///@}
 
     /**

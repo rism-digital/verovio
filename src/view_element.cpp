@@ -1416,11 +1416,6 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Rest *rest = vrv_cast<Rest *>(element);
     assert(rest);
 
-    if (rest->IsMensuralDur()) {
-        this->DrawMensuralRest(dc, element, layer, staff, measure);
-        return;
-    }
-
     if (rest->m_crossStaff) staff = rest->m_crossStaff;
 
     const bool drawingCueSize = rest->GetDrawingCueSize();
