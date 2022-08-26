@@ -629,7 +629,7 @@ private:
     /**
      * Internal method to find stem direction for notes of mensural notation
      */
-    data_STEMDIRECTION GetMensuralStemDirection(Layer *layer, Note *note, int verticalCenter);
+    data_STEMDIRECTION GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter);
 
 public:
     /** Document */

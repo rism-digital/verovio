@@ -266,7 +266,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             if (note->IsMensuralDur()) {
                 if (accid->GetFunc() != accidLog_FUNC_edit) onStaff = (accid->GetOnstaff() != BOOLEAN_false);
                 const int verticalCenter = staffTop - (staff->m_drawingLines - 1) * unit;
-                const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
+                const data_STEMDIRECTION stemDir = this->GetMensuralStemDir(layer, note, verticalCenter);
                 if ((drawingDur > DUR_1) || (drawingDur < DUR_BR)) {
                     if (stemDir == STEMDIRECTION_up) {
                         noteTop = note->GetDrawingY() + unit * STANDARD_STEMLENGTH;
@@ -1508,7 +1508,8 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             /************** Stem/notehead direction: **************/
             const int staffY = staff->GetDrawingY();
             const int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            const data_STEMDIRECTION stemDir = (stem->HasDir()) ? stem->GetDir() : this->GetMensuralStemDirection(layer, parent, verticalCenter);
+            const data_STEMDIRECTION stemDir
+                = (stem->HasDir()) ? stem->GetDir() : this->GetMensuralStemDir(layer, parent, verticalCenter);
             /************** Draw stem: **************/
             dc->StartGraphic(element, "", element->GetID());
             this->DrawMensuralStem(dc, parent, staff, stemDir, parent->GetDrawingRadius(m_doc), parent->GetDrawingX(), parent->GetDrawingY());

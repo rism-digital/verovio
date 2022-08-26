@@ -691,7 +691,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
     }
 }
 
-data_STEMDIRECTION View::GetMensuralStemDirection(Layer *layer, Note *note, int verticalCenter)
+data_STEMDIRECTION View::GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter)
 {
     // constants
     const int drawingDur = note->GetDrawingDur();
