@@ -1506,10 +1506,10 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (((parent->GetDrawingDur() > DUR_1) || ((parent->GetStemDir() != STEMDIRECTION_NONE)))
             && stem->GetVisible() != BOOLEAN_false) {
             /************** Stem/notehead direction: **************/
-            const int staffY = staff->GetDrawingY();
-            const int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+            const int staffCenter
+                = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
             const data_STEMDIRECTION stemDir
-                = (stem->HasDir()) ? stem->GetDir() : this->GetMensuralStemDir(layer, parent, verticalCenter);
+                = (stem->HasDir()) ? stem->GetDir() : this->GetMensuralStemDir(layer, parent, staffCenter);
             /************** Draw stem: **************/
             dc->StartGraphic(element, "", element->GetID());
             this->DrawMensuralStem(dc, parent, staff, stemDir, parent->GetDrawingX(), parent->GetDrawingY());
