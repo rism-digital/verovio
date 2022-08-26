@@ -505,8 +505,7 @@ protected:
      * Defined in view_mensural.cpp
      */
     ///@{
-    void DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int radius, int xn,
-        int originY, int heightY = 0);
+    void DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int xn, int originY);
     void DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff);
     void DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     void DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);

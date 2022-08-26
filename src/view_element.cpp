@@ -1512,7 +1512,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 = (stem->HasDir()) ? stem->GetDir() : this->GetMensuralStemDir(layer, parent, verticalCenter);
             /************** Draw stem: **************/
             dc->StartGraphic(element, "", element->GetID());
-            this->DrawMensuralStem(dc, parent, staff, stemDir, parent->GetDrawingRadius(m_doc), parent->GetDrawingX(), parent->GetDrawingY());
+            this->DrawMensuralStem(dc, parent, staff, stemDir, parent->GetDrawingX(), parent->GetDrawingY());
             dc->EndGraphic(element, this);
         }
 

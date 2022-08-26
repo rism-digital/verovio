@@ -145,16 +145,15 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->EndGraphic(element, this);
 } // namespace vrv
 
-
 /* This function draws any flags as well as the stem. */
 
-void View::DrawMensuralStem(
-    DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY)
+void View::DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int xn, int originY)
 {
     assert(note);
 
     const int staffSize = staff->m_drawingStaffSize;
     const int drawingDur = note->GetDrawingDur();
+    const int radius = note->GetDrawingRadius(m_doc);
     // Cue size is currently disabled
     const bool drawingCueSize = false;
     const bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
