@@ -163,7 +163,7 @@ void View::DrawMensuralStem(
         In both cases, as in CWMN, each shorter duration gets one additional flag. */
     const int nbFlags = (mensural_black ? drawingDur - DUR_2 : drawingDur - DUR_4);
 
-    // SMuFL'S mensural stems are not centered
+    // SMuFL's mensural stems are not centered
     const int halfStemWidth
         = m_doc->GetGlyphWidth(SMUFL_E93E_mensuralCombStemUp, staff->m_drawingStaffSize, drawingCueSize) / 2;
     const int yOffset = m_doc->GetDrawingUnit(staffSize) - halfStemWidth;

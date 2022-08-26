@@ -227,7 +227,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     assert(params->m_staff);
     assert(params->m_layer);
     assert(params->m_interface);
-    
+
     const int staffSize = params->m_staff->m_drawingStaffSize;
     const int stemShift = params->m_doc->GetDrawingStemWidth(staffSize) / 2;
     const bool drawingCueSize = this->GetDrawingCueSize();
