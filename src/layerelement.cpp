@@ -2637,16 +2637,14 @@ int LayerElement::InitOnsetOffset(FunctorParams *functorParams)
         // note->GetNoteOrChordDur(element), note->GetDiatonicPitch(), *midiTrack);
         // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
 
-        Note *storeNote = note;
         // When we have a @sameas, do store the onset / offset values of the pointed note in the pointing note
-        if (this != element) {
-            storeNote = dynamic_cast<Note *>(this);
+        Note *storeNote = (this == element) ? note : dynamic_cast<Note *>(this);
+        if (storeNote) {
+            storeNote->SetScoreTimeOnset(params->m_currentScoreTime);
+            storeNote->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
+            storeNote->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
+            storeNote->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
         }
-        assert(storeNote);
-        storeNote->SetScoreTimeOnset(params->m_currentScoreTime);
-        storeNote->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
-        storeNote->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
-        storeNote->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
 
         // increase the currentTime accordingly, but only if not in a chord or tabGrp - checkit with note->IsChordTone()
         // or note->IsTabGrpNote()
