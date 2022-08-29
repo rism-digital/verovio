@@ -1907,6 +1907,12 @@ int Object::PrepareLinking(FunctorParams *functorParams)
     if (r2.first != params->m_sameasIDPairs.end()) {
         for (auto j = r2.first; j != r2.second; ++j) {
             j->second->SetSameasLink(this);
+            // Issue a warning if classes of object and sameas do not match
+            Object *owner = dynamic_cast<Object *>(j->second);
+            if (owner && (owner->GetClassId() != this->GetClassId())) {
+                LogWarning("%s with @xml:id %s has @sameas to an element of class %s.", owner->GetClassName().c_str(),
+                    owner->GetID().c_str(), this->GetClassName().c_str());
+            }
         }
         params->m_sameasIDPairs.erase(r2.first, r2.second);
     }
