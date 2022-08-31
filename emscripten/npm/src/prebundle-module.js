@@ -1,4 +1,4 @@
-import DefaultVerovioModule from "../../build/verovio.js"
+import DefaultVerovioModule from "../../build/verovio.js";
 import { VerovioToolkit } from "./verovio-toolkit.js";
 
 class VerovioToolkitDefaultModule extends VerovioToolkit {
