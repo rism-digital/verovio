@@ -5,7 +5,7 @@ class VerovioToolkitDefaultModule extends VerovioToolkit {
     constructor(VerovioModule = DefaultVerovioModule) {
         super(VerovioModule);
     }
-};
+}
 
 // Assign Module to window to prevent breaking changes.
 // Deprecated, use verovio.module instead.

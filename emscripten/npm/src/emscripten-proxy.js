@@ -127,4 +127,4 @@ function getToolkitFunction(VerovioModule, method) {
     mapping.validatePAE = VerovioModule.cwrap('vrvToolkit_validatePAE', 'string', ['number', 'string']);
 
     return mapping[method];
-};
+}
