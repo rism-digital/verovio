@@ -182,12 +182,12 @@ export class VerovioToolkit {
 
     validatePAE(data) {
         if (data instanceof Object) {
-            data = JSON.stringify(data)
+            data = JSON.stringify(data);
         }
         return JSON.parse(this.proxy.validatePAE(this.ptr, data));
     }
 
-};
+}
 
 // A pointer to the object - only one isnstance can be created for now
 VerovioToolkit.instances = [];
