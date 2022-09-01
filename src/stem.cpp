@@ -228,9 +228,9 @@ int Stem::CalcStem(FunctorParams *functorParams)
     assert(params->m_layer);
     assert(params->m_interface);
 
-    int staffSize = params->m_staff->m_drawingStaffSize;
-    int stemShift = params->m_doc->GetDrawingStemWidth(staffSize) / 2;
-    bool drawingCueSize = this->GetDrawingCueSize();
+    const int staffSize = params->m_staff->m_drawingStaffSize;
+    const int stemShift = params->m_doc->GetDrawingStemWidth(staffSize) / 2;
+    const bool drawingCueSize = this->GetDrawingCueSize();
 
     // For notes longer than half notes the stem is always 0
     if (params->m_dur < DUR_2) {
@@ -252,7 +252,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
     // Do not adjust the baseStem for stem sameas notes (its length is in m_chordStemLength)
     else if (!params->m_isStemSameasSecondary) {
-        int thirdUnit = unit / 3;
+        const int thirdUnit = unit / 3;
         const data_STEMDIRECTION stemDir = params->m_interface->GetDrawingStemDir();
         baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff, stemDir) * thirdUnit);
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);

@@ -1029,8 +1029,8 @@ int Note::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // We currently have no stem object with mensural notes
-    // We also have no stem  with tab because it belongs to tabDurSym in this case
+    // We do not need to calc stems for mensural notes
+    // We have no stem with tab because it belongs to tabDurSym in this case
     if (this->IsMensuralDur() || this->IsTabGrpNote()) {
         return FUNCTOR_SIBLINGS;
     }
@@ -1040,7 +1040,7 @@ int Note::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    // This now need should be NULL and the chord stem length will be 0
+    // This now should be NULL and the chord stem length will be 0
     params->m_interface = NULL;
     params->m_chordStemLength = 0;
 
@@ -1302,7 +1302,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Chord *chord = this->IsChordTone();
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
 
-    if (!this->IsChordTone() && !this->IsMensuralDur() && !this->IsTabGrpNote()) {
+    if (!this->IsChordTone() && !this->IsTabGrpNote()) {
         if (!currentStem) {
             currentStem = new Stem();
             currentStem->IsAttribute(true);
@@ -1324,8 +1324,11 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
         }
     }
 
+    // We don't care about flags or dots in mensural notes
+    if (this->IsMensuralDur()) return FUNCTOR_CONTINUE;
+
     if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->GetAncestorFTrem() && !this->IsChordTone()
-        && !this->IsMensuralDur() && !this->IsTabGrpNote()) {
+        && !this->IsTabGrpNote()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {

@@ -266,7 +266,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             if (note->IsMensuralDur()) {
                 if (accid->GetFunc() != accidLog_FUNC_edit) onStaff = (accid->GetOnstaff() != BOOLEAN_false);
                 const int verticalCenter = staffTop - (staff->m_drawingLines - 1) * unit;
-                const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
+                const data_STEMDIRECTION stemDir = this->GetMensuralStemDir(layer, note, verticalCenter);
                 if ((drawingDur > DUR_1) || (drawingDur < DUR_BR)) {
                     if (stemDir == STEMDIRECTION_up) {
                         noteTop = note->GetDrawingY() + unit * STANDARD_STEMLENGTH;
@@ -1499,6 +1499,25 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Stem *stem = vrv_cast<Stem *>(element);
     assert(stem);
+
+    // We check if this belongs to a mensural note
+    Note *parent = vrv_cast<Note *>(stem->GetFirstAncestor(NOTE));
+    if (parent && parent->IsMensuralDur()) {
+        if (((parent->GetDrawingDur() > DUR_1) || ((parent->GetStemDir() != STEMDIRECTION_NONE)))
+            && stem->GetVisible() != BOOLEAN_false) {
+            /************** Stem/notehead direction: **************/
+            const int staffCenter
+                = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
+            const data_STEMDIRECTION stemDir
+                = (stem->HasDir()) ? stem->GetDir() : this->GetMensuralStemDir(layer, parent, staffCenter);
+            /************** Draw stem: **************/
+            dc->StartGraphic(element, "", element->GetID());
+            this->DrawMensuralStem(dc, parent, staff, stemDir, parent->GetDrawingX(), parent->GetDrawingY());
+            dc->EndGraphic(element, this);
+        }
+
+        return;
+    }
 
     // Do not draw virtual (e.g., whole note) stems
     if (stem->IsVirtual()) return;
