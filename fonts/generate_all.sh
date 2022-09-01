@@ -3,7 +3,7 @@
 # Requires python
 # Requires svgpathtools and lxml python libraries (install with 'pip3 install %name%')
 
-PYTHON="python3.9"
+PYTHON="python3"
 
 echo "Generating C++ header file ..."
 $PYTHON generate-smufl-code.py
