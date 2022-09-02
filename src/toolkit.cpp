@@ -976,6 +976,15 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         }
     }
 
+    // Other base options
+    std::string scaleValue
+        = (defaultValues) ? m_options->m_scale.GetDefaultStrValue() : m_options->m_scale.GetStrValue();
+    o << "scale" << scaleValue;
+
+    std::string xmlIdSeedValue
+        = (defaultValues) ? m_options->m_xmlIdSeed.GetDefaultStrValue() : m_options->m_xmlIdSeed.GetStrValue();
+    o << "xmlIdSeed" << xmlIdSeedValue;
+
     return o.json();
 }
 
