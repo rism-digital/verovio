@@ -25,6 +25,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "featureextractor.h"
+#include "find.h"
 #include "functorparams.h"
 #include "io.h"
 #include "keysig.h"
@@ -637,25 +638,22 @@ const Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, 
 
 ListOfObjects Object::FindAllDescendantsByType(ClassId classId, bool continueDepthSearchForMatches, int deepness)
 {
+    ListOfConstObjects elements
+        = std::as_const(*this).FindAllDescendantsByType(classId, continueDepthSearchForMatches, deepness);
     ListOfObjects objects;
-    ClassIdComparison comparison(classId);
-    Functor findAllByComparison(&Object::FindAllByComparison);
-    FindAllByComparisonParams findAllByComparisonParams(&comparison, &objects);
-    findAllByComparisonParams.m_continueDepthSearchForMatches = continueDepthSearchForMatches;
-    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness);
+    std::transform(elements.begin(), elements.end(), std::back_inserter(objects),
+        [](const Object *obj) { return const_cast<Object *>(obj); });
     return objects;
 }
 
 ListOfConstObjects Object::FindAllDescendantsByType(
     ClassId classId, bool continueDepthSearchForMatches, int deepness) const
 {
-    ListOfConstObjects objects;
     ClassIdComparison comparison(classId);
-    Functor findAllConstByComparison(&Object::FindAllConstByComparison);
-    FindAllConstByComparisonParams findAllConstByComparisonParams(&comparison, &objects);
-    findAllConstByComparisonParams.m_continueDepthSearchForMatches = continueDepthSearchForMatches;
-    this->Process(&findAllConstByComparison, &findAllConstByComparisonParams, NULL, NULL, deepness);
-    return objects;
+    FindAllByComparison findAllByComparison(&comparison);
+    findAllByComparison.SetContinueDepthSearchForMatches(continueDepthSearchForMatches);
+    this->Process(findAllByComparison, deepness, true);
+    return findAllByComparison.GetElements();
 }
 
 void Object::FindAllDescendantsByComparison(
@@ -664,9 +662,13 @@ void Object::FindAllDescendantsByComparison(
     assert(objects);
     if (clear) objects->clear();
 
-    Functor findAllByComparison(&Object::FindAllByComparison);
-    FindAllByComparisonParams findAllByComparisonParams(comparison, objects);
-    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction, true);
+    FindAllByComparison findAllByComparison(comparison);
+    findAllByComparison.SetDirection(direction);
+    this->Process(findAllByComparison, deepness, true);
+
+    ListOfConstObjects elements = findAllByComparison.GetElements();
+    std::transform(elements.begin(), elements.end(), std::back_inserter(*objects),
+        [](const Object *obj) { return const_cast<Object *>(obj); });
 }
 
 void Object::FindAllDescendantsByComparison(
@@ -675,9 +677,12 @@ void Object::FindAllDescendantsByComparison(
     assert(objects);
     if (clear) objects->clear();
 
-    Functor findAllConstByComparison(&Object::FindAllConstByComparison);
-    FindAllConstByComparisonParams findAllConstByComparisonParams(comparison, objects);
-    this->Process(&findAllConstByComparison, &findAllConstByComparisonParams, NULL, NULL, deepness, direction, true);
+    FindAllByComparison findAllByComparison(comparison);
+    findAllByComparison.SetDirection(direction);
+    this->Process(findAllByComparison, deepness, true);
+
+    ListOfConstObjects elements = findAllByComparison.GetElements();
+    std::copy(elements.begin(), elements.end(), std::back_inserter(*objects));
 }
 
 void Object::FindAllDescendantsBetween(
@@ -1104,6 +1109,148 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
 }
 
+void Object::Process(MutableFunctor &functor, int deepness, bool skipFirst)
+{
+    if (functor.GetCode() == FUNCTOR_STOP) {
+        return;
+    }
+
+    // Update the current score stored in the document
+    this->UpdateDocumentScore(functor.GetDirection());
+
+    if (!skipFirst) {
+        this->Call(functor, false);
+    }
+
+    // do not go any deeper in this case
+    if (functor.GetCode() == FUNCTOR_SIBLINGS) {
+        functor.SetCode(FUNCTOR_CONTINUE);
+        return;
+    }
+    else if (this->IsEditorialElement()) {
+        // since editorial object doesn't count, we increase the deepness limit
+        ++deepness;
+    }
+    if (deepness == 0) {
+        // any need to change the functor m_returnCode?
+        return;
+    }
+    --deepness;
+
+    if (!this->SkipChildren(functor)) {
+        // We need a pointer to the array for the option to work on a reversed copy
+        ArrayOfObjects *children = &m_children;
+        Filters *filters = functor.GetFilters();
+        if (functor.GetDirection() == BACKWARD) {
+            for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
+                // we will end here if there is no filter at all or for the current child type
+                if (this->FiltersApply(filters, *iter)) {
+                    (*iter)->Process(functor, deepness);
+                }
+            }
+        }
+        else {
+            for (ArrayOfObjects::iterator iter = children->begin(); iter != children->end(); ++iter) {
+                // we will end here if there is no filter at all or for the current child type
+                if (this->FiltersApply(filters, *iter)) {
+                    (*iter)->Process(functor, deepness);
+                }
+            }
+        }
+    }
+
+    if (functor.ImplementsEndInterface() && !skipFirst) {
+        this->Call(functor, true);
+    }
+}
+
+void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
+{
+    if (functor.GetCode() == FUNCTOR_STOP) {
+        return;
+    }
+
+    // Update the current score stored in the document
+    const_cast<Object *>(this)->UpdateDocumentScore(functor.GetDirection());
+
+    if (!skipFirst) {
+        this->Call(functor, false);
+    }
+
+    // do not go any deeper in this case
+    if (functor.GetCode() == FUNCTOR_SIBLINGS) {
+        functor.SetCode(FUNCTOR_CONTINUE);
+        return;
+    }
+    else if (this->IsEditorialElement()) {
+        // since editorial object doesn't count, we increase the deepness limit
+        ++deepness;
+    }
+    if (deepness == 0) {
+        // any need to change the functor m_returnCode?
+        return;
+    }
+    --deepness;
+
+    if (!this->SkipChildren(functor)) {
+        // We need a pointer to the array for the option to work on a reversed copy
+        const ArrayOfObjects *children = &m_children;
+        Filters *filters = functor.GetFilters();
+        if (functor.GetDirection() == BACKWARD) {
+            for (ArrayOfObjects::const_reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
+                // we will end here if there is no filter at all or for the current child type
+                if (this->FiltersApply(filters, *iter)) {
+                    (*iter)->Process(functor, deepness);
+                }
+            }
+        }
+        else {
+            for (ArrayOfObjects::const_iterator iter = children->begin(); iter != children->end(); ++iter) {
+                // we will end here if there is no filter at all or for the current child type
+                if (this->FiltersApply(filters, *iter)) {
+                    (*iter)->Process(functor, deepness);
+                }
+            }
+        }
+    }
+
+    if (functor.ImplementsEndInterface() && !skipFirst) {
+        this->Call(functor, true);
+    }
+}
+
+FunctorCode Object::Visit(MutableFunctor &functor)
+{
+    return functor.VisitObject(this);
+}
+
+FunctorCode Object::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitObject(this);
+}
+
+FunctorCode Object::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitObjectEnd(this);
+}
+
+FunctorCode Object::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitObjectEnd(this);
+}
+
+void Object::Call(MutableFunctor &functor, bool isEnd)
+{
+    FunctorCode code = isEnd ? this->VisitEnd(functor) : this->Visit(functor);
+    functor.SetCode(code);
+}
+
+void Object::Call(ConstFunctor &functor, bool isEnd) const
+{
+    FunctorCode code = isEnd ? this->VisitEnd(functor) : this->Visit(functor);
+    functor.SetCode(code);
+}
+
 void Object::UpdateDocumentScore(bool direction)
 {
     // When we are starting a new score, we need to update the current score in the document
@@ -1127,6 +1274,34 @@ void Object::UpdateDocumentScore(bool direction)
 bool Object::SkipChildren(Functor *functor) const
 {
     if (functor->m_visibleOnly) {
+        if (this->IsEditorialElement()) {
+            const EditorialElement *editorialElement = vrv_cast<const EditorialElement *>(this);
+            assert(editorialElement);
+            if (editorialElement->m_visibility == Hidden) {
+                return true;
+            }
+        }
+        else if (this->Is(MDIV)) {
+            const Mdiv *mdiv = vrv_cast<const Mdiv *>(this);
+            assert(mdiv);
+            if (mdiv->m_visibility == Hidden) {
+                return true;
+            }
+        }
+        else if (this->IsSystemElement()) {
+            const SystemElement *systemElement = vrv_cast<const SystemElement *>(this);
+            assert(systemElement);
+            if (systemElement->m_visibility == Hidden) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Object::SkipChildren(const FunctorBase &functor) const
+{
+    if (functor.VisibleOnly()) {
         if (this->IsEditorialElement()) {
             const EditorialElement *editorialElement = vrv_cast<const EditorialElement *>(this);
             assert(editorialElement);
@@ -1689,38 +1864,6 @@ int Object::FindExtremeByComparison(FunctorParams *functorParams) const
     // evaluate by applying the Comparison operator()
     if ((*params->m_comparison)(this)) {
         params->m_element = this;
-    }
-    // continue until the end
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindAllByComparison(FunctorParams *functorParams)
-{
-    FindAllByComparisonParams *params = vrv_params_cast<FindAllByComparisonParams *>(functorParams);
-    assert(params);
-
-    // evaluate by applying the Comparison operator()
-    if ((*params->m_comparison)(this)) {
-        params->m_elements->push_back(this);
-        if (!params->m_continueDepthSearchForMatches) {
-            return FUNCTOR_SIBLINGS;
-        }
-    }
-    // continue until the end
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindAllConstByComparison(FunctorParams *functorParams) const
-{
-    FindAllConstByComparisonParams *params = vrv_params_cast<FindAllConstByComparisonParams *>(functorParams);
-    assert(params);
-
-    // evaluate by applying the Comparison operator()
-    if ((*params->m_comparison)(this)) {
-        params->m_elements->push_back(this);
-        if (!params->m_continueDepthSearchForMatches) {
-            return FUNCTOR_SIBLINGS;
-        }
     }
     // continue until the end
     return FUNCTOR_CONTINUE;

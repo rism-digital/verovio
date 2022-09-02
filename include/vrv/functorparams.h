@@ -1526,52 +1526,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindAllByComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the comparison object
- * member 1: an array of all matching objects
- * member 2: flag indicating whether descendants of matches should be searched as well
- **/
-
-class FindAllByComparisonParams : public FunctorParams {
-public:
-    FindAllByComparisonParams(Comparison *comparison, ListOfObjects *elements)
-    {
-        m_comparison = comparison;
-        m_elements = elements;
-        m_continueDepthSearchForMatches = true;
-    }
-    Comparison *m_comparison;
-    ListOfObjects *m_elements;
-    bool m_continueDepthSearchForMatches;
-};
-
-//----------------------------------------------------------------------------
-// FindAllConstByComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the comparison object
- * member 1: an array of all matching objects
- * member 2: flag indicating whether descendants of matches should be searched as well
- **/
-
-class FindAllConstByComparisonParams : public FunctorParams {
-public:
-    FindAllConstByComparisonParams(Comparison *comparison, ListOfConstObjects *elements)
-    {
-        m_comparison = comparison;
-        m_elements = elements;
-        m_continueDepthSearchForMatches = true;
-    }
-    Comparison *m_comparison;
-    ListOfConstObjects *m_elements;
-    bool m_continueDepthSearchForMatches;
-};
-
-//----------------------------------------------------------------------------
 // FindByComparisonParams
 //----------------------------------------------------------------------------
 

@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        findallbycomparison.h
+// Name:        find.h
 // Author:      David Bauer
 // Created:     2022
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_FIND_ALL_BY_COMPARISON_H__
-#define __VRV_FIND_ALL_BY_COMPARISON_H__
+#ifndef __VRV_FIND_H__
+#define __VRV_FIND_H__
 
 #include "functor.h"
 
@@ -71,4 +71,4 @@ private:
 
 } // namespace vrv
 
-#endif // __VRV_FIND_ALL_BY_COMPARISON_H__
+#endif // __VRV_FIND_H__

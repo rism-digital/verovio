@@ -31,6 +31,9 @@ class Output;
 class Filters;
 class Functor;
 class FunctorParams;
+class FunctorBase;
+class MutableFunctor;
+class ConstFunctor;
 class LinkingInterface;
 class FacsimileInterface;
 class PitchInterface;
@@ -637,6 +640,20 @@ public:
         int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false);
     void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
         int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false) const;
+    void Process(MutableFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false);
+    void Process(ConstFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false) const;
+    ///@}
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    virtual FunctorCode Visit(MutableFunctor &functor);
+    virtual FunctorCode Visit(ConstFunctor &functor) const;
+    virtual FunctorCode VisitEnd(MutableFunctor &functor);
+    virtual FunctorCode VisitEnd(ConstFunctor &functor) const;
+    void Call(MutableFunctor &functor, bool isEnd);
+    void Call(ConstFunctor &functor, bool isEnd) const;
     ///@}
 
     //----------------//
@@ -697,16 +714,6 @@ public:
      * Find a Object with the extreme value with a Comparison functor .
      */
     virtual int FindExtremeByComparison(FunctorParams *functorParams) const;
-
-    /**
-     * Find a all Object with an Comparison functor.
-     */
-    virtual int FindAllByComparison(FunctorParams *functorParams);
-
-    /**
-     * Const Functor for Object::FindAllByComparison
-     */
-    virtual int FindAllConstByComparison(FunctorParams *functorParams) const;
 
     /**
      * Find a all Object between a start and end Object and with an Comparison functor.
@@ -1555,6 +1562,7 @@ private:
     ///@{
     void UpdateDocumentScore(bool direction);
     bool SkipChildren(Functor *functor) const;
+    bool SkipChildren(const FunctorBase &functor) const;
     bool FiltersApply(const Filters *filters, Object *object) const;
     ///@}
 

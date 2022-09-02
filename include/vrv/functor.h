@@ -8,6 +8,7 @@
 #ifndef __VRV_FUNCTOR_H__
 #define __VRV_FUNCTOR_H__
 
+#include "comparison.h"
 #include "functorinterface.h"
 #include "vrvdef.h"
 
@@ -33,6 +34,26 @@ public:
     ///@}
 
     /**
+     * Getter/Setter for the functor code which controls traversal
+     */
+    ///@{
+    FunctorCode GetCode() const { return m_code; }
+    void SetCode(FunctorCode code) { m_code = code; }
+    ///@}
+
+    /**
+     * Getters/Setters for the properties
+     */
+    ///@{
+    Filters *GetFilters() { return m_filters; }
+    void SetFilters(Filters *filters) { m_filters = filters; }
+    bool VisibleOnly() const { return m_visibleOnly; }
+    void SetVisibleOnly(bool visibleOnly) { m_visibleOnly = visibleOnly; }
+    bool GetDirection() const { return m_direction; }
+    void SetDirection(bool direction) { m_direction = direction; }
+    ///@}
+
+    /**
      * Return true if the functor implements the end interface
      */
     virtual bool ImplementsEndInterface() = 0;
@@ -42,7 +63,14 @@ private:
 public:
     //
 private:
-    //
+    // The functor code
+    FunctorCode m_code = FUNCTOR_CONTINUE;
+    // The filters
+    Filters *m_filters = NULL;
+    // Visible only flag
+    bool m_visibleOnly = true;
+    // Direction
+    bool m_direction = FORWARD;
 };
 
 //----------------------------------------------------------------------------

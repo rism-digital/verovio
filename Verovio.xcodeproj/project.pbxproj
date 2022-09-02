@@ -1278,12 +1278,12 @@
 		BDEF9ECA26725234008A3A47 /* caesura.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEF9EC626725234008A3A47 /* caesura.cpp */; };
 		BDEF9ECC26725248008A3A47 /* caesura.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEF9ECB26725248008A3A47 /* caesura.h */; };
 		BDEF9ECD26725248008A3A47 /* caesura.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEF9ECB26725248008A3A47 /* caesura.h */; };
-		E74A806128BC9111005274E7 /* findallbycomparison.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* findallbycomparison.cpp */; };
-		E74A806228BC9111005274E7 /* findallbycomparison.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* findallbycomparison.cpp */; };
-		E74A806328BC911D005274E7 /* findallbycomparison.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* findallbycomparison.cpp */; };
-		E74A806428BC911E005274E7 /* findallbycomparison.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* findallbycomparison.cpp */; };
-		E74A806628BC97D5005274E7 /* findallbycomparison.h in Headers */ = {isa = PBXBuildFile; fileRef = E74A806528BC97D5005274E7 /* findallbycomparison.h */; };
-		E74A806728BC97D5005274E7 /* findallbycomparison.h in Headers */ = {isa = PBXBuildFile; fileRef = E74A806528BC97D5005274E7 /* findallbycomparison.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E74A806128BC9111005274E7 /* find.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* find.cpp */; };
+		E74A806228BC9111005274E7 /* find.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* find.cpp */; };
+		E74A806328BC911D005274E7 /* find.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* find.cpp */; };
+		E74A806428BC911E005274E7 /* find.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* find.cpp */; };
+		E74A806628BC97D5005274E7 /* find.h in Headers */ = {isa = PBXBuildFile; fileRef = E74A806528BC97D5005274E7 /* find.h */; };
+		E74A806728BC97D5005274E7 /* find.h in Headers */ = {isa = PBXBuildFile; fileRef = E74A806528BC97D5005274E7 /* find.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E74A806928BC9843005274E7 /* functorinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806828BC9842005274E7 /* functorinterface.cpp */; };
 		E74A806A28BC9843005274E7 /* functorinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806828BC9842005274E7 /* functorinterface.cpp */; };
 		E74A806B28BC98B1005274E7 /* functorinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806828BC9842005274E7 /* functorinterface.cpp */; };
@@ -1781,8 +1781,8 @@
 		BDC366C62576AF9300E4D826 /* grpsym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grpsym.h; path = include/vrv/grpsym.h; sourceTree = "<group>"; };
 		BDEF9EC626725234008A3A47 /* caesura.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = caesura.cpp; path = src/caesura.cpp; sourceTree = "<group>"; };
 		BDEF9ECB26725248008A3A47 /* caesura.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = caesura.h; path = include/vrv/caesura.h; sourceTree = "<group>"; };
-		E74A806028BC9111005274E7 /* findallbycomparison.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = findallbycomparison.cpp; path = src/findallbycomparison.cpp; sourceTree = "<group>"; };
-		E74A806528BC97D5005274E7 /* findallbycomparison.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = findallbycomparison.h; path = include/vrv/findallbycomparison.h; sourceTree = "<group>"; };
+		E74A806028BC9111005274E7 /* find.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = find.cpp; path = src/find.cpp; sourceTree = "<group>"; };
+		E74A806528BC97D5005274E7 /* find.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = find.h; path = include/vrv/find.h; sourceTree = "<group>"; };
 		E74A806828BC9842005274E7 /* functorinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = functorinterface.cpp; path = src/functorinterface.cpp; sourceTree = "<group>"; };
 		E765675828BBFBA400BC6490 /* functorinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functorinterface.h; path = include/vrv/functorinterface.h; sourceTree = "<group>"; };
 		E765675B28BC019F00BC6490 /* functor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functor.h; path = include/vrv/functor.h; sourceTree = "<group>"; };
@@ -2490,8 +2490,8 @@
 		E765675628BBF9CD00BC6490 /* functors */ = {
 			isa = PBXGroup;
 			children = (
-				E74A806028BC9111005274E7 /* findallbycomparison.cpp */,
-				E74A806528BC97D5005274E7 /* findallbycomparison.h */,
+				E74A806028BC9111005274E7 /* find.cpp */,
+				E74A806528BC97D5005274E7 /* find.h */,
 				E765675B28BC019F00BC6490 /* functor.h */,
 				E74A806828BC9842005274E7 /* functorinterface.cpp */,
 				E765675828BBFBA400BC6490 /* functorinterface.h */,
@@ -2607,7 +2607,7 @@
 				8F59294A18854BF800FE51AD /* note.h in Headers */,
 				8F59294B18854BF800FE51AD /* object.h in Headers */,
 				4D1BE7831C69434C0086DC0E /* MidiMessage.h in Headers */,
-				E74A806628BC97D5005274E7 /* findallbycomparison.h in Headers */,
+				E74A806628BC97D5005274E7 /* find.h in Headers */,
 				4DB3D8BF1F83D0DC00B5FC2B /* section.h in Headers */,
 				8F59294C18854BF800FE51AD /* page.h in Headers */,
 				BD87768727CE8A21005B97EA /* layerdef.h in Headers */,
@@ -2880,7 +2880,7 @@
 				BB4C4AC422A932B6001F6AF0 /* mdiv.h in Headers */,
 				BB4C4B4622A932D7001F6AF0 /* btrem.h in Headers */,
 				BB4C4A8922A93225001F6AF0 /* c_wrapper.h in Headers */,
-				E74A806728BC97D5005274E7 /* findallbycomparison.h in Headers */,
+				E74A806728BC97D5005274E7 /* find.h in Headers */,
 				402492BE232E6FCB0017BB75 /* gracegrp.h in Headers */,
 				BB4C4B7822A932D7001F6AF0 /* syllable.h in Headers */,
 				BB4C4B6A22A932D7001F6AF0 /* nc.h in Headers */,
@@ -3209,7 +3209,7 @@
 				4D1BD1B621908D6B000D35B2 /* halfmrpt.cpp in Sources */,
 				4D16941E1E3A44F300569BF4 /* note.cpp in Sources */,
 				4D27E13827F582BB00D64FBD /* docselection.cpp in Sources */,
-				E74A806328BC911D005274E7 /* findallbycomparison.cpp in Sources */,
+				E74A806328BC911D005274E7 /* find.cpp in Sources */,
 				4D16941F1E3A44F300569BF4 /* boundingbox.cpp in Sources */,
 				4D1694211E3A44F300569BF4 /* object.cpp in Sources */,
 				4D1694221E3A44F300569BF4 /* page.cpp in Sources */,
@@ -3463,7 +3463,7 @@
 				4D64137E2035F68600BB630E /* mdiv.cpp in Sources */,
 				4DE96E3B21C4373200CB85BE /* bracketspan.cpp in Sources */,
 				4DF092A52497711800239195 /* phrase.cpp in Sources */,
-				E74A806428BC911E005274E7 /* findallbycomparison.cpp in Sources */,
+				E74A806428BC911E005274E7 /* find.cpp in Sources */,
 				403BEFEE206C00B500D022D5 /* mrpt.cpp in Sources */,
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
 				4D1BE7711C688F5A0086DC0E /* MidiFile.cpp in Sources */,
@@ -3654,7 +3654,7 @@
 				8F3DD35018854B2E0051330C /* positioninterface.cpp in Sources */,
 				4DB3D8ED1F83D18C00B5FC2B /* space.cpp in Sources */,
 				4D27E13927F582BB00D64FBD /* docselection.cpp in Sources */,
-				E74A806128BC9111005274E7 /* findallbycomparison.cpp in Sources */,
+				E74A806128BC9111005274E7 /* find.cpp in Sources */,
 				8F3DD35218854B2E0051330C /* rest.cpp in Sources */,
 				4DEC4D9421C81E0B00D1D273 /* del.cpp in Sources */,
 				8F3DD35418854B2E0051330C /* slur.cpp in Sources */,
@@ -3877,7 +3877,7 @@
 				BB4C4ADD22A932BC001F6AF0 /* add.cpp in Sources */,
 				BB4C4B1122A932C8001F6AF0 /* expansion.cpp in Sources */,
 				4D27E13A27F582BB00D64FBD /* docselection.cpp in Sources */,
-				E74A806228BC9111005274E7 /* findallbycomparison.cpp in Sources */,
+				E74A806228BC9111005274E7 /* find.cpp in Sources */,
 				BB4C4B7D22A932D7001F6AF0 /* verse.cpp in Sources */,
 				BB4C4B5122A932D7001F6AF0 /* ftrem.cpp in Sources */,
 				BB4C4AEF22A932BC001F6AF0 /* lem.cpp in Sources */,
