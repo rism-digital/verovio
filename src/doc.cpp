@@ -1957,6 +1957,12 @@ Page *Doc::SetDrawingPage(int pageIdx)
         m_drawingPageMarginLeft = m_options->m_pageMarginLeft.GetValue();
         m_drawingPageMarginRight = m_options->m_pageMarginRight.GetValue();
         m_drawingPageMarginTop = m_options->m_pageMarginTop.GetValue();
+
+        if (m_options->m_scaleToPageSize.GetValue()) {
+            m_drawingPageHeight = m_drawingPageHeight * 100 / m_options->m_scale.GetValue();
+            m_drawingPageWidth = m_drawingPageWidth * 100 / m_options->m_scale.GetValue();
+            // Margins do remain the same
+        }
     }
 
     if (m_options->m_landscape.GetValue()) {
