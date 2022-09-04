@@ -1358,13 +1358,12 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
         std::swap(height, width);
     }
 
-    double userScale = m_view.GetPPUFactor() * 100 / m_options->m_scale.GetValue();
+    double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
     assert(userScale != 0.0);
 
     if (m_options->m_scaleToPageSize.GetValue()) {
-        height *= userScale;
-        width *= userScale;
-        userScale = 1.0 / userScale;
+        height *= (1.0 / userScale);
+        width *= (1.0 / userScale);
     }
 
     deviceContext->SetUserScale(userScale, userScale);
