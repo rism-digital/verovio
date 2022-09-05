@@ -1453,59 +1453,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindAllBetweenParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the comparison object
- * member 1: an array of all matching objects
- * member 2: the start object range
- * member 3: the end object range
- **/
-
-class FindAllBetweenParams : public FunctorParams {
-public:
-    FindAllBetweenParams(Comparison *comparison, ListOfObjects *elements, const Object *start, const Object *end)
-    {
-        m_comparison = comparison;
-        m_elements = elements;
-        m_start = start;
-        m_end = end;
-    }
-    Comparison *m_comparison;
-    ListOfObjects *m_elements;
-    const Object *m_start;
-    const Object *m_end;
-};
-
-//----------------------------------------------------------------------------
-// FindAllConstBetweenParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the comparison object
- * member 1: an array of all matching objects
- * member 2: the start object range
- * member 3: the end object range
- **/
-
-class FindAllConstBetweenParams : public FunctorParams {
-public:
-    FindAllConstBetweenParams(
-        Comparison *comparison, ListOfConstObjects *elements, const Object *start, const Object *end)
-    {
-        m_comparison = comparison;
-        m_elements = elements;
-        m_start = start;
-        m_end = end;
-    }
-    Comparison *m_comparison;
-    ListOfConstObjects *m_elements;
-    const Object *m_start;
-    const Object *m_end;
-};
-
-//----------------------------------------------------------------------------
 // FindAllReferencedObjectsParams
 //----------------------------------------------------------------------------
 

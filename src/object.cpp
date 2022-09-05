@@ -691,9 +691,12 @@ void Object::FindAllDescendantsBetween(
     assert(objects);
     if (clear) objects->clear();
 
-    Functor findAllBetween(&Object::FindAllBetween);
-    FindAllBetweenParams findAllBetweenParams(comparison, objects, start, end);
-    this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, depth, FORWARD, true);
+    FindAllBetween findAllBetween(comparison, start, end);
+    this->Process(findAllBetween, depth, true);
+
+    ListOfConstObjects elements = findAllBetween.GetElements();
+    std::transform(elements.begin(), elements.end(), std::back_inserter(*objects),
+        [](const Object *obj) { return const_cast<Object *>(obj); });
 }
 
 void Object::FindAllDescendantsBetween(ListOfConstObjects *objects, Comparison *comparison, const Object *start,
@@ -702,9 +705,11 @@ void Object::FindAllDescendantsBetween(ListOfConstObjects *objects, Comparison *
     assert(objects);
     if (clear) objects->clear();
 
-    Functor findAllConstBetween(&Object::FindAllConstBetween);
-    FindAllConstBetweenParams findAllConstBetweenParams(comparison, objects, start, end);
-    this->Process(&findAllConstBetween, &findAllConstBetweenParams, NULL, NULL, depth, FORWARD, true);
+    FindAllBetween findAllBetween(comparison, start, end);
+    this->Process(findAllBetween, depth, true);
+
+    ListOfConstObjects elements = findAllBetween.GetElements();
+    std::copy(elements.begin(), elements.end(), std::back_inserter(*objects));
 }
 
 Object *Object::GetChild(int idx)
@@ -1865,64 +1870,6 @@ int Object::FindExtremeByComparison(FunctorParams *functorParams) const
     if ((*params->m_comparison)(this)) {
         params->m_element = this;
     }
-    // continue until the end
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindAllBetween(FunctorParams *functorParams)
-{
-    FindAllBetweenParams *params = vrv_params_cast<FindAllBetweenParams *>(functorParams);
-    assert(params);
-
-    // We are reaching the start of the range
-    if (params->m_start == this) {
-        // Setting the start to NULL indicates that we are in the range
-        params->m_start = NULL;
-    }
-    // We have not reached the start yet
-    else if (params->m_start) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // evaluate by applying the Comparison operator()
-    if ((*params->m_comparison)(this)) {
-        params->m_elements->push_back(this);
-    }
-
-    // We have reached the end of the range
-    if (params->m_end == this) {
-        return FUNCTOR_STOP;
-    }
-
-    // continue until the end
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindAllConstBetween(FunctorParams *functorParams) const
-{
-    FindAllConstBetweenParams *params = vrv_params_cast<FindAllConstBetweenParams *>(functorParams);
-    assert(params);
-
-    // We are reaching the start of the range
-    if (params->m_start == this) {
-        // Setting the start to NULL indicates that we are in the range
-        params->m_start = NULL;
-    }
-    // We have not reached the start yet
-    else if (params->m_start) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // evaluate by applying the Comparison operator()
-    if ((*params->m_comparison)(this)) {
-        params->m_elements->push_back(this);
-    }
-
-    // We have reached the end of the range
-    if (params->m_end == this) {
-        return FUNCTOR_STOP;
-    }
-
     // continue until the end
     return FUNCTOR_CONTINUE;
 }

@@ -716,16 +716,6 @@ public:
     virtual int FindExtremeByComparison(FunctorParams *functorParams) const;
 
     /**
-     * Find a all Object between a start and end Object and with an Comparison functor.
-     */
-    virtual int FindAllBetween(FunctorParams *functorParams);
-
-    /**
-     * Const Functor for Object::FindAllBetween
-     */
-    virtual int FindAllConstBetween(FunctorParams *functorParams) const;
-
-    /**
      * Find a all Object to which another object points to in the data.
      */
     virtual int FindAllReferencedObjects(FunctorParams *functorParams);
