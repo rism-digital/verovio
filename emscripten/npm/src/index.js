@@ -1,4 +1,4 @@
-import { VerovioToolkit } from './verovio-toolkit.js';
+import { VerovioToolkit } from "./verovio-toolkit.js";
 
 export {
     VerovioToolkit,
