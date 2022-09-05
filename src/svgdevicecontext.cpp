@@ -427,6 +427,12 @@ void SvgDeviceContext::StartPage()
                                                         .c_str();
     }
 
+    // page rectangle - for debugging
+    // pugi::xml_node pageRect = m_currentNode.append_child("rect");
+    // pageRect.append_attribute("fill") = "pink";
+    // pageRect.append_attribute("height") = StringFormat("%d", this->GetHeight()* DEFINITION_FACTOR).c_str();
+    // pageRect.append_attribute("width") = StringFormat("%d", this->GetWidth() * DEFINITION_FACTOR).c_str();
+
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
@@ -434,12 +440,13 @@ void SvgDeviceContext::StartPage()
     m_currentNode.append_attribute("transform")
         = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
 
-    // margin rectangle for debugging
-    // pugi::xml_node rect = m_currentNode.append_child("rect");
-    // rect.append_attribute("fill") = "pink";
-    // rect.append_attribute("height") = StringFormat("%d", this->GetHeight() * DEFINITION_FACTOR - 2 *
-    // m_originY).c_str(); rect.append_attribute("width") = StringFormat("%d", this->GetWidth() * DEFINITION_FACTOR - 2
-    // * m_originX).c_str();
+    // margin rectangle - for debugging
+    // pugi::xml_node marginRect = m_currentNode.append_child("rect");
+    // marginRect.append_attribute("fill") = "yellow";
+    // marginRect.append_attribute("height") = StringFormat("%d", this->GetHeight() * DEFINITION_FACTOR - 2 *
+    // m_originY).c_str();
+    // marginRect.append_attribute("width") = StringFormat("%d", this->GetWidth() * DEFINITION_FACTOR - 2
+    //* m_originX).c_str();
 
     m_pageNode = m_currentNode;
 }

@@ -1355,16 +1355,20 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 
     // set dimensions
     if (m_options->m_landscape.GetValue()) {
-        deviceContext->SetWidth(height);
-        deviceContext->SetHeight(width);
-    }
-    else {
-        deviceContext->SetWidth(width);
-        deviceContext->SetHeight(height);
+        std::swap(height, width);
     }
 
     double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
+    assert(userScale != 0.0);
+
+    if (m_options->m_scaleToPageSize.GetValue()) {
+        height *= (1.0 / userScale);
+        width *= (1.0 / userScale);
+    }
+
     deviceContext->SetUserScale(userScale, userScale);
+    deviceContext->SetWidth(width);
+    deviceContext->SetHeight(height);
 
     if (m_doc.GetType() == Facs) {
         deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());

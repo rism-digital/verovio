@@ -625,6 +625,7 @@ public:
     OptionIntMap m_pedalStyle;
     OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
+    OptionBool m_scaleToPageSize;
     OptionBool m_showRuntime;
     OptionBool m_shrinkToFit;
     OptionBool m_staccatoCenter;
