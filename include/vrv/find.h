@@ -118,6 +118,53 @@ private:
     ListOfConstObjects m_elements;
 };
 
+//----------------------------------------------------------------------------
+// FindByComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class finds an element in the tree by comparison
+ */
+class FindByComparison : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindByComparison(Comparison *comparison);
+    virtual ~FindByComparison() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() override { return false; }
+
+    /*
+     * Retrieve the search result
+     */
+    const Object *GetElement() const { return m_element; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(const Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The comparison
+    Comparison *m_comparison;
+    // The search result
+    const Object *m_element;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FIND_H__

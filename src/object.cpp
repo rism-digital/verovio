@@ -616,10 +616,10 @@ Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness,
 
 const Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction) const
 {
-    Functor findByComparison(&Object::FindByComparison);
-    FindByComparisonParams findByComparisonParams(comparison);
-    this->Process(&findByComparison, &findByComparisonParams, NULL, NULL, deepness, direction, true);
-    return findByComparisonParams.m_element;
+    FindByComparison findByComparison(comparison);
+    findByComparison.SetDirection(direction);
+    this->Process(findByComparison, deepness, true);
+    return findByComparison.GetElement();
 }
 
 Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int deepness, bool direction)
@@ -1838,26 +1838,6 @@ int Object::FindByID(FunctorParams *functorParams) const
         return FUNCTOR_STOP;
     }
     // LogDebug("Still looking for id...");
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindByComparison(FunctorParams *functorParams) const
-{
-    FindByComparisonParams *params = vrv_params_cast<FindByComparisonParams *>(functorParams);
-    assert(params);
-
-    if (params->m_element) {
-        // this should not happen, but just in case
-        return FUNCTOR_STOP;
-    }
-
-    // evaluate by applying the Comparison operator()
-    if ((*params->m_comparison)(this)) {
-        params->m_element = this;
-        // LogDebug("Found it!");
-        return FUNCTOR_STOP;
-    }
-    // LogDebug("Still looking for the object matching the Comparison...");
     return FUNCTOR_CONTINUE;
 }
 

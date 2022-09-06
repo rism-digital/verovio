@@ -79,4 +79,29 @@ FunctorCode FindAllBetween::VisitObject(const Object *object)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// FindByComparison
+//----------------------------------------------------------------------------
+
+FindByComparison::FindByComparison(Comparison *comparison) : ConstFunctor()
+{
+    m_comparison = comparison;
+    m_element = NULL;
+}
+
+FunctorCode FindByComparison::VisitObject(const Object *object)
+{
+    if (m_element) {
+        // this should not happen, but just in case
+        return FUNCTOR_STOP;
+    }
+
+    // evaluate by applying the Comparison operator()
+    if ((*m_comparison)(object)) {
+        m_element = object;
+        return FUNCTOR_STOP;
+    }
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

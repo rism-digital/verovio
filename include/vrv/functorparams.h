@@ -1473,26 +1473,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindByComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the attComparision text
- * member 1: the pointer to pointer to the Object
- **/
-
-class FindByComparisonParams : public FunctorParams {
-public:
-    FindByComparisonParams(Comparison *comparison)
-    {
-        m_comparison = comparison;
-        m_element = NULL;
-    }
-    Comparison *m_comparison;
-    const Object *m_element;
-};
-
-//----------------------------------------------------------------------------
 // FindByIDParams
 //----------------------------------------------------------------------------
 

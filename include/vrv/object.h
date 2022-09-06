@@ -696,11 +696,6 @@ public:
     virtual int FindByID(FunctorParams *functorParams) const;
 
     /**
-     * Find a Object with a Comparison functor.
-     */
-    virtual int FindByComparison(FunctorParams *functorParams) const;
-
-    /**
      * Find the next child matching the Comparison object passed in the parameters
      */
     virtual int FindNextChildByComparison(FunctorParams *);
