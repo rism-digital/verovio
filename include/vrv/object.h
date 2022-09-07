@@ -691,11 +691,6 @@ public:
     ///@{
 
     /**
-     * Find a Object with a specified id.
-     */
-    virtual int FindByID(FunctorParams *functorParams) const;
-
-    /**
      * Find the next child matching the Comparison object passed in the parameters
      */
     virtual int FindNextChildByComparison(FunctorParams *);

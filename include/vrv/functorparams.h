@@ -1473,22 +1473,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindByIDParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the id we are looking for
- * member 1: the pointer to pointer to the Object
- **/
-
-class FindByIDParams : public FunctorParams {
-public:
-    FindByIDParams() { m_element = NULL; }
-    std::string m_id;
-    const Object *m_element;
-};
-
-//----------------------------------------------------------------------------
 // FindChildByComparisonParams
 //----------------------------------------------------------------------------
 

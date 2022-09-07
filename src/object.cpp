@@ -591,11 +591,10 @@ Object *Object::FindDescendantByID(const std::string &id, int deepness, bool dir
 
 const Object *Object::FindDescendantByID(const std::string &id, int deepness, bool direction) const
 {
-    Functor findByID(&Object::FindByID);
-    FindByIDParams findByIDParams;
-    findByIDParams.m_id = id;
-    this->Process(&findByID, &findByIDParams, NULL, NULL, deepness, direction, true);
-    return findByIDParams.m_element;
+    FindByID findByID(id);
+    findByID.SetDirection(direction);
+    this->Process(findByID, deepness, true);
+    return findByID.GetElement();
 }
 
 Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction)
@@ -1819,25 +1818,6 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams) const
     params->m_flatList->push_back(this);
     // LogDebug("List %d", params->m_flatList->size());
 
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindByID(FunctorParams *functorParams) const
-{
-    FindByIDParams *params = vrv_params_cast<FindByIDParams *>(functorParams);
-    assert(params);
-
-    if (params->m_element) {
-        // this should not happen, but just in case
-        return FUNCTOR_STOP;
-    }
-
-    if (params->m_id == this->GetID()) {
-        params->m_element = this;
-        // LogDebug("Found it!");
-        return FUNCTOR_STOP;
-    }
-    // LogDebug("Still looking for id...");
     return FUNCTOR_CONTINUE;
 }
 

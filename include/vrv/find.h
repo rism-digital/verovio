@@ -165,6 +165,53 @@ private:
     const Object *m_element;
 };
 
+//----------------------------------------------------------------------------
+// FindByID
+//----------------------------------------------------------------------------
+
+/**
+ * This class finds an element with a specified id.
+ */
+class FindByID : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindByID(const std::string &id);
+    virtual ~FindByID() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() override { return false; }
+
+    /*
+     * Retrieve the search result
+     */
+    const Object *GetElement() const { return m_element; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(const Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The id we are looking for
+    std::string m_id;
+    // The search result
+    const Object *m_element;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FIND_H__

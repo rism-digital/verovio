@@ -101,6 +101,32 @@ FunctorCode FindByComparison::VisitObject(const Object *object)
         m_element = object;
         return FUNCTOR_STOP;
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// FindByID
+//----------------------------------------------------------------------------
+
+FindByID::FindByID(const std::string &id)
+{
+    m_id = id;
+    m_element = NULL;
+}
+
+FunctorCode FindByID::VisitObject(const Object *object)
+{
+    if (m_element) {
+        // this should not happen, but just in case
+        return FUNCTOR_STOP;
+    }
+
+    if (m_id == object->GetID()) {
+        m_element = object;
+        return FUNCTOR_STOP;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
