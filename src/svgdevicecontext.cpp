@@ -111,7 +111,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     // add the woff VerovioText font if needed
     const Resources *resources = this->GetResources(true);
     if (m_vrvTextFont && resources) {
-        const std::string woffPath = resources->GetPath() + "/woff.xml";
+        const std::string woffPath = resources->GetPath() + "/Leipzig.woff2.xml";
         pugi::xml_document woffDoc;
         woffDoc.load_file(woffPath.c_str());
         m_svgNode.prepend_copy(woffDoc.first_child());
