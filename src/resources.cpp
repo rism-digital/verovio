@@ -55,13 +55,10 @@ bool Resources::InitFonts()
         bool m_isMandatory;
     };
 
-    static const TextFontInfo_type textFontInfos[] = { { k_defaultStyle, "Times", true },
-        { k_defaultStyle, "VerovioText-1.0", true }, { { FONTWEIGHT_bold, FONTSTYLE_normal }, "Times-bold", false },
-        { { FONTWEIGHT_bold, FONTSTYLE_normal }, "VerovioText-1.0", false },
-        { { FONTWEIGHT_bold, FONTSTYLE_italic }, "Times-bold-italic", false },
-        { { FONTWEIGHT_bold, FONTSTYLE_italic }, "VerovioText-1.0", false },
-        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "Times-italic", false },
-        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "VerovioText-1.0", false } };
+    static const TextFontInfo_type textFontInfos[]
+        = { { k_defaultStyle, "Times", true }, { { FONTWEIGHT_bold, FONTSTYLE_normal }, "Times-bold", false },
+              { { FONTWEIGHT_bold, FONTSTYLE_italic }, "Times-bold-italic", false },
+              { { FONTWEIGHT_normal, FONTSTYLE_italic }, "Times-italic", false } };
 
     for (const auto &textFontInfo : textFontInfos) {
         if (!InitTextFont(textFontInfo.m_fileName, textFontInfo.m_style) && textFontInfo.m_isMandatory) {
