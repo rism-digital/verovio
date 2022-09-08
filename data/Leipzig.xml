@@ -630,4 +630,41 @@
   <g c="E4D3" x="0.0" y="0.0" w="150.0" h="500.0" h-a-x="150" n="caesuraShort"/>
   <g c="E4D4" x="0.0" y="0.0" w="250.0" h="500.0" h-a-x="250" n="caesuraCurved"/>
   <g c="E4D7" x="0.0" y="0.0" w="36.0" h="500.0" h-a-x="36" n="caesuraSingleStroke"/>
+  <g c="E1D0" x="0.0" y="69.0" w="595.0" h="307.0" h-a-x="595" n="noteDoubleWhole"/>
+  <g c="E1D1" x="0.0" y="6.0" w="484.0" h="454.0" h-a-x="484" n="noteDoubleWholeSquare"/>
+  <g c="E1D2" x="0.0" y="119.0" w="417.0" h="248.0" h-a-x="417" n="noteWhole"/>
+  <g c="E1D3" x="0.0" y="101.0" w="310.0" h="971.0" h-a-x="310" n="noteHalfUp"/>
+  <g c="E1D5" x="0.0" y="104.0" w="302.0" h="968.0" h-a-x="302" n="noteQuarterUp"/>
+  <g c="E1D7" x="0.0" y="108.0" w="502.0" h="1003.0" h-a-x="502" n="note8thUp"/>
+  <g c="E1D9" x="0.0" y="108.0" w="516.0" h="1000.0" h-a-x="516" n="note16thUp"/>
+  <g c="E1DB" x="0.0" y="108.0" w="512.0" h="1177.0" h-a-x="512" n="note32ndUp"/>
+  <g c="E1DD" x="0.0" y="108.0" w="512.0" h="1358.0" h-a-x="512" n="note64thUp"/>
+  <g c="E1DF" x="0.0" y="108.0" w="512.0" h="1527.0" h-a-x="508" n="note128thUp"/>
+  <g c="E1E1" x="0.0" y="108.0" w="515.0" h="1675.0" h-a-x="517" n="note256thUp"/>
+  <g c="E1E3" x="0.0" y="108.0" w="516.0" h="1836.01" h-a-x="516" n="note512thUp"/>
+  <g c="E1E5" x="0.0" y="119.0" w="516.0" h="1951.0" h-a-x="515" n="note1024thUp"/>
+  <g c="E1E7" x="56.0" y="165.0" w="129.0" h="131.0" h-a-x="185" n="augmentationDot"/>
+  <g c="E550" x="-56.0" y="-155.0" w="325.0" h="111.0" h-a-x="222" n="lyricsElisionNarrow"/>
+  <g c="E551" x="-56.0" y="-155.0" w="455.0" h="111.0" h-a-x="342" n="lyricsElision"/>
+  <g c="E552" x="-56.0" y="-155.0" w="601.0" h="111.0" h-a-x="493" n="lyricsElisionWide"/>
+  <g c="EA50" x="22.0" y="-8.0" w="411.0" h="619.0" h-a-x="1024" n="figbass0"/>
+  <g c="EA51" x="101.0" y="0.0" w="256.0" h="610.0" h-a-x="1024" n="figbass1"/>
+  <g c="EA52" x="27.0" y="0.0" w="404.0" h="613.0" h-a-x="1024" n="figbass2"/>
+  <g c="EA53" x="27.0" y="-123.0" w="404.0" h="736.0" h-a-x="1024" n="figbass2Raised"/>
+  <g c="EA54" x="40.0" y="-7.0" w="353.0" h="622.0" h-a-x="1024" n="figbass3"/>
+  <g c="EA55" x="10.0" y="0.0" w="419.0" h="610.0" h-a-x="1024" n="figbass4"/>
+  <g c="EA56" x="10.0" y="0.0" w="498.0" h="610.0" h-a-x="1168" n="figbass4Raised"/>
+  <g c="EA57" x="29.0" y="-10.0" w="368.0" h="635.0" h-a-x="1024" n="figbass5"/>
+  <g c="EA58" x="29.0" y="-10.0" w="368.0" h="696.0" h-a-x="1024" n="figbass5Raised1"/>
+  <g c="EA59" x="29.0" y="-10.0" w="396.0" h="635.0" h-a-x="1024" n="figbass5Raised2"/>
+  <g c="EA5A" x="29.0" y="-69.0" w="368.0" h="753.0" h-a-x="1024" n="figbass5Raised3"/>
+  <g c="EA5B" x="31.0" y="-10.0" w="394.0" h="632.0" h-a-x="1024" n="figbass6"/>
+  <g c="EA5C" x="30.0" y="-10.0" w="395.0" h="632.0" h-a-x="1024" n="figbass6Raised"/>
+  <g c="EA5D" x="18.0" y="-8.0" w="390.0" h="610.0" h-a-x="1024" n="figbass7"/>
+  <g c="EA5E" x="18.0" y="-8.0" w="390.0" h="706.0" h-a-x="1024" n="figbass7Raised1"/>
+  <g c="EA5F" x="18.0" y="-8.0" w="404.0" h="610.0" h-a-x="1024" n="figbass7Raised2"/>
+  <g c="EA60" x="52.0" y="-10.0" w="353.0" h="622.0" h-a-x="1024" n="figbass8"/>
+  <g c="EA61" x="27.0" y="-21.0" w="392.0" h="633.0" h-a-x="1024" n="figbass9"/>
+  <g c="EA62" x="27.0" y="-21.0" w="399.0" h="633.0" h-a-x="1024" n="figbass9Raised"/>
+  <g c="ECC0" x="18.0" y="-8.0" w="407.0" h="610.0" h-a-x="1024" n="figbass7Diminished"/>
 </bounding-boxes>
