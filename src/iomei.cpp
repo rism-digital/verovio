@@ -6741,6 +6741,12 @@ bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
         vrvRend->SetHalign(HORIZONTALALIGNMENT_NONE);
         vrvRend->SetValign(VERTICALALIGNMENT_NONE);
     }
+    // Previously we would use @fontame="VerovioText"
+    // Now changeto @fontfam="smufl"
+    if (vrvRend->HasFontname() && vrvRend->GetFontname() == "VerovioText") {
+        vrvRend->SetFontfam("smufl");
+        vrvRend->SetFontname("");
+    }
 
     parent->AddChild(vrvRend);
     this->ReadUnsupportedAttr(rend, vrvRend);

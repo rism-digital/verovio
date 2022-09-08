@@ -334,9 +334,14 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     FontInfo rendFont;
     bool customFont = false;
-    if (rend->HasFontname() || rend->HasFontsize() || rend->HasFontstyle() || rend->HasFontweight()) {
+    if (rend->HasFontfam() || rend->HasFontname() || rend->HasFontsize() || rend->HasFontstyle()
+        || rend->HasFontweight()) {
         customFont = true;
         if (rend->HasFontname()) rendFont.SetFaceName(rend->GetFontname().c_str());
+        if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
+            rendFont.SetSmuflFont(true);
+            rendFont.SetFaceName("Leipzig");
+        }
         if (rend->HasFontsize()) {
             data_FONTSIZE *fs = rend->GetFontsizeAlternate();
             if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
