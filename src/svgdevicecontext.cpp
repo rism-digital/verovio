@@ -906,7 +906,7 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring &wte
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
         textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
         // Special case where we want to specifiy if the Leipzig woff2 font needs to be included in the output
-        if (fontFaceName == "Leipzig") this->VrvTextFont();
+        if (m_fontStack.top()->GetSmuflFont()) this->VrvTextFont();
     }
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();

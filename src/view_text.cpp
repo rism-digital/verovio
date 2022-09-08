@@ -102,6 +102,7 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
                 FontInfo vrvTxt;
                 vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
                 vrvTxt.SetFaceName("Leipzig");
+                vrvTxt.SetSmuflFont(true);
                 vrvTxt.SetStyle(FONTSTYLE_normal);
                 dc->SetFont(&vrvTxt);
                 this->DrawTextString(dc, smuflStr, params);
@@ -166,6 +167,7 @@ void View::DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams
             FontInfo vrvTxt;
             vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
             vrvTxt.SetFaceName("Leipzig");
+            vrvTxt.SetSmuflFont(true);
             dc->SetFont(&vrvTxt);
             // Once we have rendered the some text to not pass x / y anymore
             dc->DrawText(UTF16to8(smuflAccid), smuflAccid, toDcX, toDcY);
@@ -244,6 +246,7 @@ void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize, s
         FontInfo vrvTxt;
         vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
         vrvTxt.SetFaceName("Leipzig");
+        vrvTxt.SetSmuflFont(true);
         dc->SetFont(&vrvTxt);
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
