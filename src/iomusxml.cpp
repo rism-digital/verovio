@@ -2140,7 +2140,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         TextRendition(dynamics, dynam);
         if (defaultY == 0) defaultY = dynamics.first().node().attribute("default-y").as_int();
         // parse the default_y attribute and transform to vgrp value, to vertically align dynamics and directives
-        defaultY = (defaultY <= 0) ? std::abs(defaultY) : defaultY + 200;
+        defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
         dynam->SetVgrp(defaultY);
         m_controlElements.push_back({ measureNum, dynam });
         m_dynamStack.push_back(dynam);
