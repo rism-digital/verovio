@@ -481,30 +481,30 @@
         </shapeNoteNoteheads>
         <individualNotes>
             <description>Individual notes</description>
-            <!--<glyph glyph-code="E1D0" smufl-name="noteDoubleWhole" />-->
-            <!--<glyph glyph-code="E1D1" smufl-name="noteDoubleWholeSquare" />-->
-            <!--<glyph glyph-code="E1D2" smufl-name="noteWhole" />-->
-            <!--<glyph glyph-code="E1D3" smufl-name="noteHalfUp" />-->
+            <glyph glyph-code="E1D0" smufl-name="noteDoubleWhole" />
+            <glyph glyph-code="E1D1" smufl-name="noteDoubleWholeSquare" />
+            <glyph glyph-code="E1D2" smufl-name="noteWhole" />
+            <glyph glyph-code="E1D3" smufl-name="noteHalfUp" />
             <!--<glyph glyph-code="E1D4" smufl-name="noteHalfDown" />-->
-            <!--<glyph glyph-code="E1D5" smufl-name="noteQuarterUp" />-->
+            <glyph glyph-code="E1D5" smufl-name="noteQuarterUp" />
             <!--<glyph glyph-code="E1D6" smufl-name="noteQuarterDown" />-->
-            <!--<glyph glyph-code="E1D7" smufl-name="note8thUp" />-->
+            <glyph glyph-code="E1D7" smufl-name="note8thUp" />
             <!--<glyph glyph-code="E1D8" smufl-name="note8thDown" />-->
-            <!--<glyph glyph-code="E1D9" smufl-name="note16thUp" />-->
+            <glyph glyph-code="E1D9" smufl-name="note16thUp" />
             <!--<glyph glyph-code="E1DA" smufl-name="note16thDown" />-->
-            <!--<glyph glyph-code="E1DB" smufl-name="note32ndUp" />-->
+            <glyph glyph-code="E1DB" smufl-name="note32ndUp" />
             <!--<glyph glyph-code="E1DC" smufl-name="note32ndDown" />-->
-            <!--<glyph glyph-code="E1DD" smufl-name="note64thUp" />-->
+            <glyph glyph-code="E1DD" smufl-name="note64thUp" />
             <!--<glyph glyph-code="E1DE" smufl-name="note64thDown" />-->
-            <!--<glyph glyph-code="E1DF" smufl-name="note128thUp" />-->
+            <glyph glyph-code="E1DF" smufl-name="note128thUp" />
             <!--<glyph glyph-code="E1E0" smufl-name="note128thDown" />-->
-            <!--<glyph glyph-code="E1E1" smufl-name="note256thUp" />-->
+            <glyph glyph-code="E1E1" smufl-name="note256thUp" />
             <!--<glyph glyph-code="E1E2" smufl-name="note256thDown" />-->
-            <!--<glyph glyph-code="E1E3" smufl-name="note512thUp" />-->
+            <glyph glyph-code="E1E3" smufl-name="note512thUp" />
             <!--<glyph glyph-code="E1E4" smufl-name="note512thDown" />-->
-            <!--<glyph glyph-code="E1E5" smufl-name="note1024thUp" />-->
+            <glyph glyph-code="E1E5" smufl-name="note1024thUp" />
             <!--<glyph glyph-code="E1E6" smufl-name="note1024thDown" />-->
-            <!--<glyph glyph-code="E1E7" smufl-name="augmentationDot" />-->
+            <glyph glyph-code="E1E7" smufl-name="augmentationDot" />
             <range_end>U+E1EF</range_end>
             <range_start>U+E1D0</range_start>
         </individualNotes>
@@ -1281,9 +1281,9 @@
         </dynamics>
         <lyrics>
             <description>Lyrics</description>
-            <!--<glyph glyph-code="E550" smufl-name="lyricsElisionNarrow" />-->
-            <!--<glyph glyph-code="E551" smufl-name="lyricsElision" />-->
-            <!--<glyph glyph-code="E552" smufl-name="lyricsElisionWide" />-->
+            <glyph glyph-code="E550" smufl-name="lyricsElisionNarrow" />
+            <glyph glyph-code="E551" smufl-name="lyricsElision" />
+            <glyph glyph-code="E552" smufl-name="lyricsElisionWide" />
             <!--<glyph glyph-code="E553" smufl-name="lyricsHyphenBaseline" />-->
             <!--<glyph glyph-code="E554" smufl-name="lyricsHyphenBaselineNonBreaking" />-->
             <range_end>U+E55F</range_end>
@@ -2455,25 +2455,25 @@
         </daseianNotation>
         <figuredBass>
             <description>Figured bass</description>
-            <!--<glyph glyph-code="EA50" smufl-name="figbass0" />-->
-            <!--<glyph glyph-code="EA51" smufl-name="figbass1" />-->
-            <!--<glyph glyph-code="EA52" smufl-name="figbass2" />-->
-            <!--<glyph glyph-code="EA53" smufl-name="figbass2Raised" />-->
-            <!--<glyph glyph-code="EA54" smufl-name="figbass3" />-->
-            <!--<glyph glyph-code="EA55" smufl-name="figbass4" />-->
-            <!--<glyph glyph-code="EA56" smufl-name="figbass4Raised" />-->
-            <!--<glyph glyph-code="EA57" smufl-name="figbass5" />-->
-            <!--<glyph glyph-code="EA58" smufl-name="figbass5Raised1" />-->
-            <!--<glyph glyph-code="EA59" smufl-name="figbass5Raised2" />-->
-            <!--<glyph glyph-code="EA5A" smufl-name="figbass5Raised3" />-->
-            <!--<glyph glyph-code="EA5B" smufl-name="figbass6" />-->
-            <!--<glyph glyph-code="EA5C" smufl-name="figbass6Raised" />-->
-            <!--<glyph glyph-code="EA5D" smufl-name="figbass7" />-->
-            <!--<glyph glyph-code="EA5E" smufl-name="figbass7Raised1" />-->
-            <!--<glyph glyph-code="EA5F" smufl-name="figbass7Raised2" />-->
-            <!--<glyph glyph-code="EA60" smufl-name="figbass8" />-->
-            <!--<glyph glyph-code="EA61" smufl-name="figbass9" />-->
-            <!--<glyph glyph-code="EA62" smufl-name="figbass9Raised" />-->
+            <glyph glyph-code="EA50" smufl-name="figbass0" />
+            <glyph glyph-code="EA51" smufl-name="figbass1" />
+            <glyph glyph-code="EA52" smufl-name="figbass2" />
+            <glyph glyph-code="EA53" smufl-name="figbass2Raised" />
+            <glyph glyph-code="EA54" smufl-name="figbass3" />
+            <glyph glyph-code="EA55" smufl-name="figbass4" />
+            <glyph glyph-code="EA56" smufl-name="figbass4Raised" />
+            <glyph glyph-code="EA57" smufl-name="figbass5" />
+            <glyph glyph-code="EA58" smufl-name="figbass5Raised1" />
+            <glyph glyph-code="EA59" smufl-name="figbass5Raised2" />
+            <glyph glyph-code="EA5A" smufl-name="figbass5Raised3" />
+            <glyph glyph-code="EA5B" smufl-name="figbass6" />
+            <glyph glyph-code="EA5C" smufl-name="figbass6Raised" />
+            <glyph glyph-code="EA5D" smufl-name="figbass7" />
+            <glyph glyph-code="EA5E" smufl-name="figbass7Raised1" />
+            <glyph glyph-code="EA5F" smufl-name="figbass7Raised2" />
+            <glyph glyph-code="EA60" smufl-name="figbass8" />
+            <glyph glyph-code="EA61" smufl-name="figbass9" />
+            <glyph glyph-code="EA62" smufl-name="figbass9Raised" />
             <!--<glyph glyph-code="EA63" smufl-name="figbassDoubleFlat" />-->
             <!--<glyph glyph-code="EA64" smufl-name="figbassFlat" />-->
             <!--<glyph glyph-code="EA65" smufl-name="figbassNatural" />-->
@@ -2984,6 +2984,9 @@
             <range_end>U+EC9F</range_end>
             <range_start>U+EC90</range_start>
         </octavesSupplement>
+        <figuredBassSupplement>
+            <glyph glyph-code="ECC0" smufl-name="figbass7Diminished" />
+        </figuredBassSupplement>
         <timeSignaturesTurned>
             <description>Turned time signatures</description>
             <!--<glyph glyph-code="ECE0" smufl-name="timeSig0Turned" />-->
