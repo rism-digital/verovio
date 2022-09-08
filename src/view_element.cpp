@@ -1665,6 +1665,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         dc->ReactivateGraphic();
         dc->DeactivateGraphic();
         FontInfo vrvTxt;
+        vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
         vrvTxt.SetFaceName("Leipzig");
         dc->SetFont(&vrvTxt);
         std::wstring str;

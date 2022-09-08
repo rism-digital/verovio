@@ -100,6 +100,7 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
             if (token.second) {
                 std::wstring smuflStr = Dynam::GetSymbolStr(token.first, singleGlyphs);
                 FontInfo vrvTxt;
+                vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
                 vrvTxt.SetFaceName("Leipzig");
                 vrvTxt.SetStyle(FONTSTYLE_normal);
                 dc->SetFont(&vrvTxt);
@@ -163,6 +164,7 @@ void View::DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams
             }
 
             FontInfo vrvTxt;
+            vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
             vrvTxt.SetFaceName("Leipzig");
             dc->SetFont(&vrvTxt);
             // Once we have rendered the some text to not pass x / y anymore
@@ -240,6 +242,7 @@ void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize, s
         if (iss.eof()) break;
 
         FontInfo vrvTxt;
+        vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
         vrvTxt.SetFaceName("Leipzig");
         dc->SetFont(&vrvTxt);
         std::wstring str;

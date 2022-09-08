@@ -1782,6 +1782,11 @@ FontInfo *Doc::GetFingeringFont(int staffSize)
     return &m_fingeringFont;
 }
 
+double Doc::GetMusicToLyricFontSizeRatio() const
+{
+    return (m_drawingLyricFontSize == 0.0) ? 1.0 : (double)m_drawingSmuflFontSize / (double)m_drawingLyricFontSize;
+}
+
 double Doc::GetLeftMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_options->m_leftMarginAccid.GetValue();
