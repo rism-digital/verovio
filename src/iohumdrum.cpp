@@ -13504,7 +13504,7 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
         text->SetText(symbol);
         rend->AddChild(text);
         label->AddChild(rend);
-        rend->SetFontname("VerovioText");
+        rend->SetFontname("Leipzig");
         if (!poststring.empty()) {
             addTextElement(label, poststring);
         }
@@ -13540,7 +13540,7 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
     Rend *rend = new Rend();
     addTextElement(rend, second);
     tempo->AddChild(rend);
-    rend->SetFontname("VerovioText");
+    rend->SetFontname("Leipzig");
 
     // Forcing spaces around equals sign:
     third = "\xc2\xa0=\xc2\xa0" + third;
@@ -15326,7 +15326,7 @@ void HumdrumInput::insertTwoRhythmsAndTextBetween(
     Text *text1 = new Text();
     text1->SetText(UTF8to16(newnote1));
     rend1->AddChild(text1);
-    rend1->SetFontname("VerovioText");
+    rend1->SetFontname("Leipzig");
     element->AddChild(rend1);
 
     Text *middleText = new Text();
@@ -15337,7 +15337,7 @@ void HumdrumInput::insertTwoRhythmsAndTextBetween(
     Text *text2 = new Text();
     text2->SetText(UTF8to16(newnote2));
     rend2->AddChild(text2);
-    rend2->SetFontname("VerovioText");
+    rend2->SetFontname("Leipzig");
     element->AddChild(rend2);
 }
 
@@ -15358,7 +15358,7 @@ template <class ELEMENT> void HumdrumInput::addVerovioTextElement(ELEMENT *eleme
     text->SetText(UTF8to16(newtext));
     rend->AddChild(text);
     rend->SetFontstyle(FONTSTYLE_normal);
-    rend->SetFontname("VerovioText");
+    rend->SetFontname("Leipzig");
     if (musictext.find("smaller") != std::string::npos) {
         data_FONTSIZE fs;
         fs.SetTerm(FONTSIZETERM_x_small);

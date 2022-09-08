@@ -85559,7 +85559,7 @@ string Tool_mei2hum::cleanReferenceRecordText(const string& input) {
 //
 // Example:
 //   <tempo tstamp="1" place="above" staff="1">
-//      1 - Allegro con spirito <rend fontname="VerovioText">&#xE1D5;</rend> = 132
+//      1 - Allegro con spirito <rend fontname="Leipzig">&#xE1D5;</rend> = 132
 //   </tempo>
 //
 //
@@ -85621,7 +85621,7 @@ void Tool_mei2hum::parseTempo(xml_node tempo, HumNum starttime) {
 	if (!found) {
 		// search for free-form tempo marking.  Something like:
 		//   <tempo tstamp="1" place="above" staff="1">
-		//      1 - Allegro con spirito <rend fontname="VerovioText">&#xE1D5;</rend> = 132
+		//      1 - Allegro con spirito <rend fontname="Leipzig">&#xE1D5;</rend> = 132
 		//   </tempo>
 		//
 		// UTF-8 version in string "\ue1d5";

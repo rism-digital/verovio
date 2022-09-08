@@ -1665,7 +1665,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         dc->ReactivateGraphic();
         dc->DeactivateGraphic();
         FontInfo vrvTxt;
-        vrvTxt.SetFaceName("VerovioText");
+        vrvTxt.SetFaceName("Leipzig");
         dc->SetFont(&vrvTxt);
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
