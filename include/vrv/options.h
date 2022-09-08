@@ -660,6 +660,7 @@ public:
     OptionDbl m_dashedBarLineDashLength;
     OptionDbl m_dashedBarLineGapLength;
     OptionDbl m_dynamDist;
+    OptionBool m_dynamSingleGlyphs;
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;
     OptionDbl m_extenderLineMinSpace;

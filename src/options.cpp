@@ -1222,6 +1222,10 @@ Options::Options()
     m_dynamDist.Init(1.0, 0.5, 16.0);
     this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
 
+    m_dynamSingleGlyphs.SetInfo("Dynam single glyphs", "Don't use SMuFL's predefined dynamics glyph combinations");
+    m_dynamSingleGlyphs.Init(false);
+    this->Register(&m_dynamSingleGlyphs, "dynamSingleGlyphs", &m_generalLayout);
+
     m_engravingDefaults.SetInfo("Engraving defaults", "Json describing defaults for engraving SMuFL elements");
     m_engravingDefaults.Init(JsonSource::String, "{}");
     this->Register(&m_engravingDefaults, "engravingDefaults", &m_generalLayout);

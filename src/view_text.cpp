@@ -71,6 +71,8 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
 {
     assert(dc);
 
+    const bool singleGlyphs = m_doc->GetOptions()->m_dynamSingleGlyphs.GetValue();
+
     if (rend && rend->HasFontfam()) {
         this->DrawTextString(dc, str, params);
         return;
@@ -96,7 +98,7 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
             first = false;
 
             if (token.second) {
-                std::wstring smuflStr = Dynam::GetSymbolStr(token.first);
+                std::wstring smuflStr = Dynam::GetSymbolStr(token.first, singleGlyphs);
                 FontInfo vrvTxt;
                 vrvTxt.SetFaceName("VerovioText");
                 vrvTxt.SetStyle(FONTSTYLE_normal);
