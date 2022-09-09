@@ -6744,6 +6744,7 @@ bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
     // Previously we would use @fontame="VerovioText"
     // Now changeto @fontfam="smufl"
     if (vrvRend->HasFontname() && vrvRend->GetFontname() == "VerovioText") {
+        LogWarning("Using rend@fontname with 'VerovioText' is deprecated. Use 'rend@fontfam=\"smufl\"' instead");
         vrvRend->SetFontfam("smufl");
         vrvRend->SetFontname("");
     }
