@@ -151,14 +151,20 @@ void View::DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams
             // Then the accidental
             std::wstring accid = str.substr(pos, 1);
             std::wstring smuflAccid;
-            if (accid == L"\u266D") { // MUSIC FLAT SIGN
-                smuflAccid.push_back(SMUFL_E260_accidentalFlat);
+            if (accid == L"\u266D" || accid == L"\uE260") { // MUSIC or SMUFL FLAT SIGN
+                smuflAccid.push_back(SMUFL_EA64_figbassFlat);
             }
-            else if (accid == L"\u266E") { // MUSIC NATURAL SIGN
-                smuflAccid.push_back(SMUFL_E261_accidentalNatural);
+            else if (accid == L"\u266E" || accid == L"\uE261") { // MUSIC or SMUFL NATURAL SIGN
+                smuflAccid.push_back(SMUFL_EA65_figbassNatural);
             }
-            else if (accid == L"\u266F") { // MUSIC SHARP SIGN
-                smuflAccid.push_back(SMUFL_E262_accidentalSharp);
+            else if (accid == L"\u266F" || accid == L"\uE262") { // MUSIC or SMUFL SHARP SIGN
+                smuflAccid.push_back(SMUFL_EA66_figbassSharp);
+            }
+            else if (accid == L"\uE264") { // SMUFL DOUBLE FLAT SIGN
+                smuflAccid.push_back(SMUFL_EA63_figbassDoubleFlat);
+            }
+            else if (accid == L"\uE263") { // SMUFL DOUBLE SHARP SIGN
+                smuflAccid.push_back(SMUFL_EA67_figbassDoubleSharp);
             }
             else {
                 smuflAccid += accid;
