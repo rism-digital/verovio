@@ -3027,6 +3027,35 @@
             <range_end>U+ECFF</range_end>
             <range_start>U+ECF0</range_start>
         </timeSignaturesReversed>
+        <metronomMarks>
+            <description>Metronome marks</description>
+            <glyph glyph-code="ECA0" smufl-name="metNoteDoubleWhole" />
+            <glyph glyph-code="ECA1" smufl-name="metNoteDoubleWholeSquare" />
+            <glyph glyph-code="ECA2" smufl-name="metNoteWhole" />
+            <glyph glyph-code="ECA3" smufl-name="metNoteHalfUp" />
+            <!--<glyph glyph-code="ECA4" smufl-name="metNoteHalfDown" />-->
+            <glyph glyph-code="ECA5" smufl-name="metNoteQuarterUp" />
+            <!--<glyph glyph-code="ECA6" smufl-name="metNoteQuarterDown" />-->
+            <glyph glyph-code="ECA7" smufl-name="metNote8thUp" />
+            <!--<glyph glyph-code="ECA8" smufl-name="metNote8thDown" />-->
+            <glyph glyph-code="ECA9" smufl-name="metNote16thUp" />
+            <!--<glyph glyph-code="ECAA" smufl-name="metNote16thDown" />-->
+            <glyph glyph-code="ECAB" smufl-name="metNote32ndUp" />
+            <!--<glyph glyph-code="ECAC" smufl-name="metNote32ndDown" />-->
+            <glyph glyph-code="ECAD" smufl-name="metNote64thUp" />
+            <!--<glyph glyph-code="ECAE" smufl-name="metNote64thDown" />-->
+            <glyph glyph-code="ECAF" smufl-name="metNote128thUp" />
+            <!--<glyph glyph-code="ECB0" smufl-name="metNote128thDown" />-->
+            <glyph glyph-code="ECB1" smufl-name="metNote256thUp" />
+            <!--<glyph glyph-code="ECB2" smufl-name="metNote256thDown" />-->
+            <glyph glyph-code="ECB3" smufl-name="metNote512thUp" />
+            <!--<glyph glyph-code="ECB4" smufl-name="metNote512thDown" />-->
+            <glyph glyph-code="ECB5" smufl-name="metNote1024thUp" />
+            <!--<glyph glyph-code="ECB6" smufl-name="metNote1024thDown" />-->
+            <glyph glyph-code="ECB7" smufl-name="metAugmentationDot" />
+            <range_end>U+ECA0</range_end>
+            <range_start>U+ECBF</range_start>
+        </metronomMarks>
         <fingering>
             <description>Fingering</description>
             <!--<glyph glyph-code="ED10" smufl-name="fingering0" />-->

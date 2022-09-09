@@ -540,12 +540,26 @@ enum {
     SMUFL_EC85_timeSigCut2 = 0xEC85,
     SMUFL_EC86_timeSigCut3 = 0xEC86,
     SMUFL_ECC0_figbass7Diminished = 0xECC0,
+    SMUFL_ECA0_metNoteDoubleWhole = 0xECA0,
+    SMUFL_ECA1_metNoteDoubleWholeSquare = 0xECA1,
+    SMUFL_ECA2_metNoteWhole = 0xECA2,
+    SMUFL_ECA3_metNoteHalfUp = 0xECA3,
+    SMUFL_ECA5_metNoteQuarterUp = 0xECA5,
+    SMUFL_ECA7_metNote8thUp = 0xECA7,
+    SMUFL_ECA9_metNote16thUp = 0xECA9,
+    SMUFL_ECAB_metNote32ndUp = 0xECAB,
+    SMUFL_ECAD_metNote64thUp = 0xECAD,
+    SMUFL_ECAF_metNote128thUp = 0xECAF,
+    SMUFL_ECB1_metNote256thUp = 0xECB1,
+    SMUFL_ECB3_metNote512thUp = 0xECB3,
+    SMUFL_ECB5_metNote1024thUp = 0xECB5,
+    SMUFL_ECB7_metAugmentationDot = 0xECB7,
     SMUFL_ED40_articSoftAccentAbove = 0xED40,
     SMUFL_ED41_articSoftAccentBelow = 0xED41,
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 520
+#define SMUFL_COUNT 534
 
 } // namespace vrv
 

@@ -369,6 +369,22 @@
   <g c="E94A" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagSemiminima"/>
   <g c="E94B" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagFusa"/>
   <g c="E94C" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagFusa"/>
+  <g c="ECA0" x="-0.44" y="-223.03" w="614.63" h="446.03" h-a-x="614" n="metNoteDoubleWhole">
+    <a n="noteheadOrigin" x="0.4" y="0.0"/>
+  </g>
+  <g c="ECA1" x="0.0" y="-209.39" w="474.0" h="420.39" h-a-x="474" n="metNoteDoubleWholeSquare"/>
+  <g c="ECA2" x="0.0" y="-186.17" w="380.17" h="351.17" h-a-x="380" n="metNoteWhole"/>
+  <g c="ECA3" x="0.0" y="-147.0" w="311.0" h="699.0" h-a-x="311" n="metNoteHalfUp"/>
+  <g c="ECA5" x="0.0" y="-148.0" w="310.0" h="701.0" h-a-x="310" n="metNoteQuarterUp"/>
+  <g c="ECA7" x="-0.15" y="-144.86" w="482.26" h="723.61" h-a-x="482" n="metNote8thUp"/>
+  <g c="ECA9" x="0.0" y="-148.0" w="548.16" h="814.0" h-a-x="548" n="metNote16thUp"/>
+  <g c="ECAB" x="0.0" y="-140.0" w="578.0" h="1175.0" h-a-x="578" n="metNote32ndUp"/>
+  <g c="ECAD" x="0.0" y="-140.0" w="559.0" h="1352.0" h-a-x="559" n="metNote64thUp"/>
+  <g c="ECAF" x="0.0" y="-140.0" w="562.0" h="1523.0" h-a-x="562" n="metNote128thUp"/>
+  <g c="ECB1" x="0.0" y="-140.0" w="565.0" h="1694.0" h-a-x="565" n="metNote256thUp"/>
+  <g c="ECB3" x="0.0" y="-140.0" w="566.0" h="1875.0" h-a-x="566" n="metNote512thUp"/>
+  <g c="ECB5" x="0.41" y="-140.0" w="547.59" h="2021.0" h-a-x="548" n="metNote1024thUp"/>
+  <g c="ECB7" x="0.0" y="-57.0" w="96.0" h="114.0" h-a-x="96" n="metAugmentationDot"/>
   <g c="EAA4" x="-56.16" y="109.85" w="424.29" h="176.18" h-a-x="340" n="wiggleTrill">
     <a n="repeatOffset" x="1.36" y="0.0"/>
   </g>

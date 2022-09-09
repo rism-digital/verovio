@@ -794,6 +794,22 @@
   <g c="EC84" x="0.0" y="-517.0" w="327.0" h="1033.0" h-a-x="327" n="timeSigSlash"/>
   <g c="EC85" x="20.0" y="-362.0" w="406.0" h="723.0" h-a-x="446" n="timeSigCut2"/>
   <g c="EC86" x="17.0" y="-361.0" w="381.0" h="723.0" h-a-x="398" n="timeSigCut3"/>
+  <g c="ECA0" x="0.0" y="-168.0" w="655.0" h="338.0" h-a-x="655" n="metNoteDoubleWhole">
+    <a n="noteheadOrigin" x="0.4" y="0.0"/>
+  </g>
+  <g c="ECA1" x="0.0" y="-190.0" w="416.0" h="388.0" h-a-x="533" n="metNoteDoubleWholeSquare"/>
+  <g c="ECA2" x="0.0" y="-125.0" w="459.0" h="273.0" h-a-x="459" n="metNoteWhole"/>
+  <g c="ECA3" x="0.0" y="-141.0" w="341.0" h="829.0" h-a-x="341" n="metNoteHalfUp"/>
+  <g c="ECA5" x="0.0" y="-141.0" w="332.0" h="829.0" h-a-x="332" n="metNoteQuarterUp"/>
+  <g c="ECA7" x="0.0" y="-141.0" w="533.0" h="837.0" h-a-x="534" n="metNote8thUp"/>
+  <g c="ECA9" x="0.0" y="-141.0" w="521.0" h="841.0" h-a-x="522" n="metNote16thUp"/>
+  <g c="ECAB" x="0.0" y="-141.0" w="538.0" h="1064.0" h-a-x="538" n="metNote32ndUp"/>
+  <g c="ECAD" x="0.0" y="-141.0" w="537.0" h="1239.0" h-a-x="537" n="metNote64thUp"/>
+  <g c="ECAF" x="0.0" y="-141.0" w="537.0" h="1409.0" h-a-x="537" n="metNote128thUp"/>
+  <g c="ECB1" x="0.0" y="-141.0" w="540.0" h="1565.0" h-a-x="541" n="metNote256thUp"/>
+  <g c="ECB3" x="0.0" y="-141.0" w="542.0" h="1730.0" h-a-x="542" n="metNote512thUp"/>
+  <g c="ECB5" x="0.0" y="-141.0" w="541.0" h="1898.0" h-a-x="541" n="metNote1024thUp"/>
+  <g c="ECB7" x="0.0" y="-50.0" w="100.0" h="100.0" h-a-x="100" n="metAugmentationDot"/>
   <g c="ECC0" x="20.0" y="0.0" w="238.0" h="245.0" h-a-x="237" n="figbass7Diminished"/>
   <g c="ED40" x="0.0" y="1.0" w="708.0" h="244.0" h-a-x="708" n="articSoftAccentAbove"/>
   <g c="ED41" x="0.0" y="-245.0" w="708.0" h="244.0" h-a-x="708" n="articSoftAccentBelow"/>

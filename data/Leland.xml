@@ -496,6 +496,11 @@
   </g>
   <g c="EAAD" x="-24.0" y="-83.0" w="283.0" h="343.0" h-a-x="259" n="wiggleArpeggiatoUpArrow"/>
   <g c="EAAE" x="0.0" y="-84.0" w="283.0" h="343.0" h-a-x="259" n="wiggleArpeggiatoDownArrow"/>
+  <g c="ECA3" x="0.0" y="-172.0" w="425.0" h="1036.0" h-a-x="425" n="metNoteHalfUp"/>
+  <g c="ECA5" x="-1.0" y="-173.0" w="426.0" h="1036.0" h-a-x="425" n="metNoteQuarterUp"/>
+  <g c="ECA7" x="0.0" y="-172.0" w="711.0" h="1073.0" h-a-x="712" n="metNote8thUp"/>
+  <g c="ECA9" x="0.0" y="-172.0" w="711.0" h="1098.0" h-a-x="712" n="metNote16thUp"/>
+  <g c="ECB7" x="0.0" y="-78.0" w="155.0" h="156.0" h-a-x="155" n="metAugmentationDot"/>
   <g c="F400" x="0.0" y="5.0" w="90.0" h="990.0" h-a-x="90" n="braceSmall"/>
   <g c="F401" x="-1.0" y="4.59" w="52.0" h="990.41" h-a-x="51" n="braceLarge"/>
   <g c="F402" x="0.0" y="4.59" w="44.0" h="990.41" h-a-x="44" n="braceLarger"/>
@@ -550,6 +555,9 @@
   <g c="F426" x="0.0" y="-1125.0" w="306.0" h="1517.0" h-a-x="306" n="flag1024thDownStraight">
     <a n="stemDownSW" x="0.0" y="-4.46"/>
   </g>
+  <g c="ECAB" x="0.0" y="-173.0" w="711.0" h="1316.0" h-a-x="712" n="metNote32ndUp"/>
+  <g c="ECA2" x="0.0" y="-172.0" w="475.0" h="344.0" h-a-x="475" n="metNoteWhole"/>
+  <g c="ECA0" x="0.0" y="-222.0" w="672.0" h="446.0" h-a-x="672" n="metNoteDoubleWhole"/>
   <g c="E4F6" x="0.0" y="-202.0" w="317.0" h="409.0" h-a-x="317" n="restQuarterZ"/>
   <g c="E06A" x="0.0" y="-438.0" w="304.0" h="877.0" h-a-x="304" n="unpitchedPercussionClef2"/>
   <g c="E4CE" x="0.0" y="0.0" w="191.0" h="321.0" h-a-x="191" n="breathMarkComma"/>
