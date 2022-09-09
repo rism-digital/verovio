@@ -37,6 +37,16 @@ public:
     std::string GetClassName() const override { return "MRpt2"; }
     ///@}
 
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Visit(MutableFunctor &functor) override;
+    FunctorCode Visit(ConstFunctor &functor) const override;
+    FunctorCode VisitEnd(MutableFunctor &functor) override;
+    FunctorCode VisitEnd(ConstFunctor &functor) const override;
+    ///@}
+
 private:
     //
 public:

@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "scoredefinterface.h"
 #include "vrv.h"
@@ -67,6 +68,26 @@ void Mensur::Reset()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Mensur::Visit(MutableFunctor &functor)
+{
+    return functor.VisitMensur(this);
+}
+
+FunctorCode Mensur::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitMensur(this);
+}
+
+FunctorCode Mensur::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitMensurEnd(this);
+}
+
+FunctorCode Mensur::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMensurEnd(this);
+}
 
 int Mensur::LayerCountInTimeSpan(FunctorParams *functorParams) const
 {

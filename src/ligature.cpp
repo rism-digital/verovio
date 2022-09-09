@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 #include "staff.h"
@@ -118,6 +119,26 @@ int Ligature::GetDrawingNoteShape(const Note *note) const
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Ligature::Visit(MutableFunctor &functor)
+{
+    return functor.VisitLigature(this);
+}
+
+FunctorCode Ligature::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitLigature(this);
+}
+
+FunctorCode Ligature::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitLigatureEnd(this);
+}
+
+FunctorCode Ligature::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitLigatureEnd(this);
+}
 
 int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 {

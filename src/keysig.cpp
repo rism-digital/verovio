@@ -17,6 +17,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "keyaccid.h"
 #include "scoredefinterface.h"
@@ -358,6 +359,26 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, c
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode KeySig::Visit(MutableFunctor &functor)
+{
+    return functor.VisitKeySig(this);
+}
+
+FunctorCode KeySig::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitKeySig(this);
+}
+
+FunctorCode KeySig::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitKeySigEnd(this);
+}
+
+FunctorCode KeySig::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitKeySigEnd(this);
+}
 
 int KeySig::PrepareDataInitialization(FunctorParams *)
 {

@@ -80,6 +80,17 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Visit(MutableFunctor &functor) override;
+    FunctorCode Visit(ConstFunctor &functor) const override;
+    FunctorCode VisitEnd(MutableFunctor &functor) override;
+    FunctorCode VisitEnd(ConstFunctor &functor) const override;
+    ///@}
+
     /**
      * See Object::AlignHorizontally
      */

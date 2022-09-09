@@ -16,6 +16,7 @@
 
 #include "chord.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -48,6 +49,26 @@ void HalfmRpt::Reset()
 //----------------------------------------------------------------------------
 // HalfmRpt functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode HalfmRpt::Visit(MutableFunctor &functor)
+{
+    return functor.VisitHalfmRpt(this);
+}
+
+FunctorCode HalfmRpt::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitHalfmRpt(this);
+}
+
+FunctorCode HalfmRpt::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitHalfmRptEnd(this);
+}
+
+FunctorCode HalfmRpt::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitHalfmRptEnd(this);
+}
 
 int HalfmRpt::GenerateMIDI(FunctorParams *functorParams)
 {

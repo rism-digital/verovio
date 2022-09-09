@@ -16,6 +16,7 @@
 
 #include "chord.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -54,6 +55,26 @@ void MRpt::Reset()
 //----------------------------------------------------------------------------
 // MRpt functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode MRpt::Visit(MutableFunctor &functor)
+{
+    return functor.VisitMRpt(this);
+}
+
+FunctorCode MRpt::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitMRpt(this);
+}
+
+FunctorCode MRpt::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitMRptEnd(this);
+}
+
+FunctorCode MRpt::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMRptEnd(this);
+}
 
 int MRpt::GenerateMIDI(FunctorParams *functorParams)
 {
