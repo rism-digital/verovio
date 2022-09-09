@@ -252,7 +252,7 @@ const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *opt
     vrvToolkit_setOptions(tk, options);
     vrvToolkit_loadData(tk, data);
 
-    return vrvToolkit_renderToSVG(tk, 1, options);
+    return vrvToolkit_renderToSVG(tk, 1, false);
 }
 
 void vrvToolkit_resetOptions(void *tkPtr)

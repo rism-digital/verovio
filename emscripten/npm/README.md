@@ -41,7 +41,7 @@ createVerovioModule().then(VerovioModule => {
    const verovioToolkit = new VerovioToolkit(VerovioModule);
    const score = fs.readFileSync('hello.mei').toString();
    verovioToolkit.loadData(score);
-   const data = verovioToolkit.renderToSVG(1, {});
+   const data = verovioToolkit.renderToSVG(1);
    console.log(data);
 });
 ```
