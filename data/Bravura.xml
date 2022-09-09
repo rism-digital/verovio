@@ -728,6 +728,11 @@
   <g c="EA60" x="20.0" y="0.0" w="192.0" h="251.0" h-a-x="232" n="figbass8"/>
   <g c="EA61" x="20.0" y="0.0" w="196.0" h="250.0" h-a-x="236" n="figbass9"/>
   <g c="EA62" x="-12.0" y="0.0" w="268.0" h="250.0" h-a-x="237" n="figbass9Raised"/>
+  <g c="EA63" x="22.0" y="-0.36" w="225.0" h="309.36" h-a-x="273" n="figbassDoubleFlat"/>
+  <g c="EA64" x="21.0" y="-0.36" w="137.0" h="309.36" h-a-x="177" n="figbassFlat"/>
+  <g c="EA65" x="20.0" y="-50.0" w="93.0" h="313.0" h-a-x="134" n="figbassNatural"/>
+  <g c="EA66" x="19.0" y="-55.0" w="150.0" h="360.0" h-a-x="191" n="figbassSharp"/>
+  <g c="EA67" x="20.0" y="-5.0" w="197.0" h="202.0" h-a-x="238" n="figbassDoubleSharp"/>
   <g c="EAA4" x="-36.0" y="98.0" w="306.0" h="111.0" h-a-x="237" n="wiggleTrill">
     <a n="repeatOffset" x="0.95" y="0.0"/>
   </g>
@@ -1114,4 +1119,9 @@
   <g c="F528" x="0.0" y="-517.0" w="327.0" h="1033.0" h-a-x="327" n="timeSigSlashNarrow"/>
   <g c="F529" x="12.0" y="-362.0" w="244.0" h="723.0" h-a-x="256" n="timeSigCut2Narrow"/>
   <g c="F52A" x="10.0" y="-361.0" w="229.0" h="723.0" h-a-x="250" n="timeSigCut3Narrow"/>
+  <g c="F52B" x="-347.0" y="-2.0" w="320.0" h="477.0" h-a-x="0" n="figbassDoubleFlatLongerStem"/>
+  <g c="F52F" x="-279.0" y="-5.0" w="253.0" h="259.0" h-a-x="0" n="figbassDoubleSharpLongerStem"/>
+  <g c="F52C" x="-198.0" y="-3.0" w="174.0" h="470.0" h-a-x="0" n="figbassFlatLongerStem"/>
+  <g c="F52D" x="-143.0" y="-110.0" w="119.0" h="478.0" h-a-x="0" n="figbassNaturalLongerStem"/>
+  <g c="F52E" x="-220.0" y="-146.0" w="192.0" h="538.0" h-a-x="0" n="figbassSharpLongerStem"/>
 </bounding-boxes>

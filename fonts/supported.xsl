@@ -2480,11 +2480,11 @@
             <glyph glyph-code="EA60" smufl-name="figbass8" />
             <glyph glyph-code="EA61" smufl-name="figbass9" />
             <glyph glyph-code="EA62" smufl-name="figbass9Raised" />
-            <!--<glyph glyph-code="EA63" smufl-name="figbassDoubleFlat" />-->
-            <!--<glyph glyph-code="EA64" smufl-name="figbassFlat" />-->
-            <!--<glyph glyph-code="EA65" smufl-name="figbassNatural" />-->
-            <!--<glyph glyph-code="EA66" smufl-name="figbassSharp" />-->
-            <!--<glyph glyph-code="EA67" smufl-name="figbassDoubleSharp" />-->
+            <glyph glyph-code="EA63" smufl-name="figbassDoubleFlat" />
+            <glyph glyph-code="EA64" smufl-name="figbassFlat" />
+            <glyph glyph-code="EA65" smufl-name="figbassNatural" />
+            <glyph glyph-code="EA66" smufl-name="figbassSharp" />
+            <glyph glyph-code="EA67" smufl-name="figbassDoubleSharp" />
             <!--<glyph glyph-code="EA68" smufl-name="figbassBracketLeft" />-->
             <!--<glyph glyph-code="EA69" smufl-name="figbassBracketRight" />-->
             <!--<glyph glyph-code="EA6A" smufl-name="figbassParensLeft" />-->

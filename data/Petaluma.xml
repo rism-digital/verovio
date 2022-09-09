@@ -229,6 +229,11 @@
   <g c="EA60" x="20.0" y="-5.0" w="146.0" h="291.0" h-a-x="186" n="figbass8"/>
   <g c="EA61" x="20.0" y="-10.0" w="159.0" h="315.0" h-a-x="199" n="figbass9"/>
   <g c="EA62" x="20.0" y="-16.0" w="237.0" h="354.0" h-a-x="277" n="figbass9Raised"/>
+  <g c="EA63" x="20.0" y="0.0" w="199.0" h="370.0" h-a-x="239" n="figbassDoubleFlat"/>
+  <g c="EA64" x="20.0" y="0.0" w="114.0" h="370.0" h-a-x="154" n="figbassFlat"/>
+  <g c="EA65" x="20.0" y="-120.0" w="86.25" h="370.0" h-a-x="126" n="figbassNatural"/>
+  <g c="EA66" x="20.0" y="-100.0" w="226.0" h="420.0" h-a-x="266" n="figbassSharp"/>
+  <g c="EA67" x="20.0" y="0.0" w="181.0" h="200.0" h-a-x="221" n="figbassDoubleSharp"/>
   <g c="ECC0" x="15.11" y="1.87" w="245.33" h="264.59" h-a-x="275" n="figbass7Diminished"/>
   <g c="E240" x="0.0" y="-819.0" w="261.0" h="819.0" h-a-x="261" n="flag8thUp">
     <a n="graceNoteSlashNE" x="1.28" y="-0.8"/>

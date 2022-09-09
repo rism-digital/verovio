@@ -650,24 +650,29 @@
   <g c="E550" x="-56.0" y="-155.0" w="325.0" h="111.0" h-a-x="222" n="lyricsElisionNarrow"/>
   <g c="E551" x="-56.0" y="-155.0" w="455.0" h="111.0" h-a-x="342" n="lyricsElision"/>
   <g c="E552" x="-56.0" y="-155.0" w="601.0" h="111.0" h-a-x="493" n="lyricsElisionWide"/>
-  <g c="EA50" x="22.0" y="-8.0" w="411.0" h="619.0" h-a-x="1024" n="figbass0"/>
-  <g c="EA51" x="101.0" y="0.0" w="256.0" h="610.0" h-a-x="1024" n="figbass1"/>
-  <g c="EA52" x="27.0" y="0.0" w="404.0" h="613.0" h-a-x="1024" n="figbass2"/>
-  <g c="EA53" x="27.0" y="-123.0" w="404.0" h="736.0" h-a-x="1024" n="figbass2Raised"/>
-  <g c="EA54" x="40.0" y="-7.0" w="353.0" h="622.0" h-a-x="1024" n="figbass3"/>
-  <g c="EA55" x="10.0" y="0.0" w="419.0" h="610.0" h-a-x="1024" n="figbass4"/>
-  <g c="EA56" x="10.0" y="0.0" w="498.0" h="610.0" h-a-x="1168" n="figbass4Raised"/>
-  <g c="EA57" x="29.0" y="-10.0" w="368.0" h="635.0" h-a-x="1024" n="figbass5"/>
-  <g c="EA58" x="29.0" y="-10.0" w="368.0" h="696.0" h-a-x="1024" n="figbass5Raised1"/>
-  <g c="EA59" x="29.0" y="-10.0" w="396.0" h="635.0" h-a-x="1024" n="figbass5Raised2"/>
-  <g c="EA5A" x="29.0" y="-69.0" w="368.0" h="753.0" h-a-x="1024" n="figbass5Raised3"/>
-  <g c="EA5B" x="31.0" y="-10.0" w="394.0" h="632.0" h-a-x="1024" n="figbass6"/>
-  <g c="EA5C" x="30.0" y="-10.0" w="395.0" h="632.0" h-a-x="1024" n="figbass6Raised"/>
-  <g c="EA5D" x="18.0" y="-8.0" w="390.0" h="610.0" h-a-x="1024" n="figbass7"/>
-  <g c="EA5E" x="18.0" y="-8.0" w="390.0" h="706.0" h-a-x="1024" n="figbass7Raised1"/>
-  <g c="EA5F" x="18.0" y="-8.0" w="404.0" h="610.0" h-a-x="1024" n="figbass7Raised2"/>
-  <g c="EA60" x="52.0" y="-10.0" w="353.0" h="622.0" h-a-x="1024" n="figbass8"/>
-  <g c="EA61" x="27.0" y="-21.0" w="392.0" h="633.0" h-a-x="1024" n="figbass9"/>
-  <g c="EA62" x="27.0" y="-21.0" w="399.0" h="633.0" h-a-x="1024" n="figbass9Raised"/>
-  <g c="ECC0" x="18.0" y="-8.0" w="407.0" h="610.0" h-a-x="1024" n="figbass7Diminished"/>
+  <g c="EA50" x="12.76" y="-4.64" w="238.38" h="359.02" h-a-x="264" n="figbass0"/>
+  <g c="EA51" x="58.58" y="0.0" w="148.48" h="353.8" h-a-x="248" n="figbass1"/>
+  <g c="EA52" x="15.66" y="0.0" w="234.32" h="355.54" h-a-x="263" n="figbass2"/>
+  <g c="EA53" x="15.66" y="-71.34" w="234.32" h="426.88" h-a-x="266" n="figbass2Raised"/>
+  <g c="EA54" x="23.2" y="-4.06" w="204.74" h="360.76" h-a-x="246" n="figbass3"/>
+  <g c="EA55" x="5.8" y="0.0" w="243.02" h="353.8" h-a-x="263" n="figbass4"/>
+  <g c="EA56" x="5.8" y="0.0" w="288.84" h="353.8" h-a-x="305" n="figbass4Raised"/>
+  <g c="EA57" x="16.82" y="-5.8" w="213.44" h="368.3" h-a-x="248" n="figbass5"/>
+  <g c="EA58" x="16.82" y="-5.8" w="213.44" h="403.68" h-a-x="248" n="figbass5Raised1"/>
+  <g c="EA59" x="16.82" y="-5.8" w="229.68" h="368.3" h-a-x="261" n="figbass5Raised2"/>
+  <g c="EA5A" x="16.82" y="-40.02" w="213.44" h="436.74" h-a-x="248" n="figbass5Raised3"/>
+  <g c="EA5B" x="17.98" y="-5.8" w="228.52" h="366.56" h-a-x="264" n="figbass6"/>
+  <g c="EA5C" x="17.4" y="-5.8" w="229.1" h="366.56" h-a-x="264" n="figbass6Raised"/>
+  <g c="EA5D" x="10.44" y="-4.64" w="226.2" h="353.8" h-a-x="252" n="figbass7"/>
+  <g c="EA5E" x="10.44" y="-4.64" w="226.2" h="409.48" h-a-x="252" n="figbass7Raised1"/>
+  <g c="EA5F" x="10.44" y="-4.64" w="234.32" h="353.8" h-a-x="260" n="figbass7Raised2"/>
+  <g c="EA60" x="30.16" y="-5.8" w="204.74" h="360.76" h-a-x="257" n="figbass8"/>
+  <g c="EA61" x="15.66" y="-12.18" w="227.36" h="367.14" h-a-x="260" n="figbass9"/>
+  <g c="EA62" x="15.66" y="-12.18" w="231.42" h="367.14" h-a-x="264" n="figbass9Raised"/>
+  <g c="ECC0" x="10.44" y="-0.64" w="236.06" h="353.8" h-a-x="264" n="figbass7Diminished"/>
+  <g c="EA63" x="14.23" y="-0.62" w="240.08" h="398.48" h-a-x="267" n="figbassDoubleFlat"/>
+  <g c="EA64" x="12.99" y="0.0" w="122.51" h="398.48" h-a-x="149" n="figbassFlat"/>
+  <g c="EA65" x="12.0" y="-0.36" w="97.14" h="434.36" h-a-x="121" n="figbassNatural"/>
+  <g c="EA66" x="12.87" y="0.29" w="121.89" h="429.41" h-a-x="149" n="figbassSharp"/>
+  <g c="EA67" x="12.38" y="-0.0" w="159.02" h="148.5" h-a-x="182" n="figbassDoubleSharp"/>
 </bounding-boxes>

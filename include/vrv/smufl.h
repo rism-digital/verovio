@@ -485,6 +485,11 @@ enum {
     SMUFL_EA60_figbass8 = 0xEA60,
     SMUFL_EA61_figbass9 = 0xEA61,
     SMUFL_EA62_figbass9Raised = 0xEA62,
+    SMUFL_EA63_figbassDoubleFlat = 0xEA63,
+    SMUFL_EA64_figbassFlat = 0xEA64,
+    SMUFL_EA65_figbassNatural = 0xEA65,
+    SMUFL_EA66_figbassSharp = 0xEA66,
+    SMUFL_EA67_figbassDoubleSharp = 0xEA67,
     SMUFL_EAA4_wiggleTrill = 0xEAA4,
     SMUFL_EAA9_wiggleArpeggiatoUp = 0xEAA9,
     SMUFL_EAAA_wiggleArpeggiatoDown = 0xEAAA,
@@ -540,7 +545,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 515
+#define SMUFL_COUNT 520
 
 } // namespace vrv
 
