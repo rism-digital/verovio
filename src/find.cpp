@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        findallbycomparison.cpp
+// Name:        find.cpp
 // Author:      David Bauer
 // Created:     2022
 // Copyright (c) Authors and others. All rights reserved.
