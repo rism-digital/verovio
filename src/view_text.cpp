@@ -344,10 +344,6 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         || rend->HasFontweight()) {
         customFont = true;
         if (rend->HasFontname()) rendFont.SetFaceName(rend->GetFontname().c_str());
-        if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
-            rendFont.SetSmuflFont(true);
-            rendFont.SetFaceName("Leipzig");
-        }
         if (rend->HasFontsize()) {
             data_FONTSIZE *fs = rend->GetFontsizeAlternate();
             if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
@@ -360,6 +356,12 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
             else if (fs->GetType() == FONTSIZE_percent) {
                 rendFont.SetPointSize(params.m_pointSize * fs->GetPercent() / 100);
             }
+        }
+        if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
+            rendFont.SetSmuflFont(true);
+            rendFont.SetFaceName("Leipzig");
+            int pointSize = (rendFont.GetPointSize() != 0) ? rendFont.GetPointSize() : params.m_pointSize;
+            rendFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
         }
         if (rend->HasFontstyle()) rendFont.SetStyle(rend->GetFontstyle());
         if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
