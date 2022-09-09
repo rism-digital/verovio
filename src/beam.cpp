@@ -19,6 +19,7 @@
 #include "btrem.h"
 #include "doc.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "gracegrp.h"
 #include "layer.h"
@@ -1727,6 +1728,26 @@ const ArrayOfBeamElementCoords *Beam::GetElementCoords()
 bool Beam::IsTabBeam() const
 {
     return (this->FindDescendantByType(TABGRP));
+}
+
+FunctorCode Beam::Visit(MutableFunctor &functor)
+{
+    return functor.VisitBeam(this);
+}
+
+FunctorCode Beam::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitBeam(this);
+}
+
+FunctorCode Beam::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitBeamEnd(this);
+}
+
+FunctorCode Beam::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBeamEnd(this);
 }
 
 //----------------------------------------------------------------------------

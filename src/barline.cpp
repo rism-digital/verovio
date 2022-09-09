@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layer.h"
@@ -169,6 +170,26 @@ std::pair<bool, int> BarLine::GetPlace(const StaffDef *staffDef) const
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode BarLine::Visit(MutableFunctor &functor)
+{
+    return functor.VisitBarLine(this);
+}
+
+FunctorCode BarLine::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitBarLine(this);
+}
+
+FunctorCode BarLine::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitBarLineEnd(this);
+}
+
+FunctorCode BarLine::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBarLineEnd(this);
+}
 
 int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
 {

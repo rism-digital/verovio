@@ -17,6 +17,7 @@
 #include "chord.h"
 #include "comparison.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -70,6 +71,26 @@ bool BTrem::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+FunctorCode BTrem::Visit(MutableFunctor &functor)
+{
+    return functor.VisitBTrem(this);
+}
+
+FunctorCode BTrem::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitBTrem(this);
+}
+
+FunctorCode BTrem::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitBTremEnd(this);
+}
+
+FunctorCode BTrem::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBTremEnd(this);
 }
 
 int BTrem::GenerateMIDI(FunctorParams *functorParams)

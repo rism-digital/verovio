@@ -16,6 +16,7 @@
 #include "btrem.h"
 #include "chord.h"
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -275,6 +276,26 @@ void TupletNum::SetAlignedBracket(TupletBracket *alignedBracket)
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode Dots::Visit(MutableFunctor &functor)
+{
+    return functor.VisitDots(this);
+}
+
+FunctorCode Dots::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitDots(this);
+}
+
+FunctorCode Dots::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitDotsEnd(this);
+}
+
+FunctorCode Dots::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitDotsEnd(this);
+}
+
 int Dots::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
@@ -295,6 +316,26 @@ int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode Flag::Visit(MutableFunctor &functor)
+{
+    return functor.VisitFlag(this);
+}
+
+FunctorCode Flag::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitFlag(this);
+}
+
+FunctorCode Flag::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitFlagEnd(this);
+}
+
+FunctorCode Flag::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFlagEnd(this);
+}
+
 int Flag::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
@@ -303,6 +344,26 @@ int Flag::ResetData(FunctorParams *functorParams)
     m_drawingNbFlags = 0;
 
     return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TupletBracket::Visit(MutableFunctor &functor)
+{
+    return functor.VisitTupletBracket(this);
+}
+
+FunctorCode TupletBracket::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitTupletBracket(this);
+}
+
+FunctorCode TupletBracket::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitTupletBracketEnd(this);
+}
+
+FunctorCode TupletBracket::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTupletBracketEnd(this);
 }
 
 int TupletBracket::ResetHorizontalAlignment(FunctorParams *functorParams)
@@ -326,6 +387,26 @@ int TupletBracket::ResetVerticalAlignment(FunctorParams *functorParams)
     m_drawingYRelRight = 0;
 
     return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TupletNum::Visit(MutableFunctor &functor)
+{
+    return functor.VisitTupletNum(this);
+}
+
+FunctorCode TupletNum::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitTupletNum(this);
+}
+
+FunctorCode TupletNum::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitTupletNumEnd(this);
+}
+
+FunctorCode TupletNum::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTupletNumEnd(this);
 }
 
 int TupletNum::ResetHorizontalAlignment(FunctorParams *functorParams)

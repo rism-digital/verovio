@@ -23,6 +23,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "gracegrp.h"
 #include "horizontalaligner.h"
@@ -574,6 +575,26 @@ std::list<const Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Chord::Visit(MutableFunctor &functor)
+{
+    return functor.VisitChord(this);
+}
+
+FunctorCode Chord::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitChord(this);
+}
+
+FunctorCode Chord::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitChordEnd(this);
+}
+
+FunctorCode Chord::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitChordEnd(this);
+}
 
 int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
 {

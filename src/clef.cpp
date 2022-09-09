@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "scoredefinterface.h"
@@ -198,6 +199,26 @@ char32_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
 //----------------------------------------------------------------------------
 // Clef functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Clef::Visit(MutableFunctor &functor)
+{
+    return functor.VisitClef(this);
+}
+
+FunctorCode Clef::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitClef(this);
+}
+
+FunctorCode Clef::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitClefEnd(this);
+}
+
+FunctorCode Clef::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitClefEnd(this);
+}
 
 int Clef::AdjustBeams(FunctorParams *functorParams)
 {
