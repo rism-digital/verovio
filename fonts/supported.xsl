@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" exclude-result-prefixes="svg">
     <xsl:variable name="supported">
+        <standardUnicodePoints>
+            <description>Standard Unicode Points (added by hand)</description>
+            <glyph glyph-code="266D" smufl-name="musicFlatSign" />
+            <glyph glyph-code="266E" smufl-name="musicNaturalSign" />
+            <glyph glyph-code="266F" smufl-name="musicSharpSign" />
+        </standardUnicodePoints>
         <staffBracketsAndDividers>
             <description>Staff brackets and dividers</description>
             <glyph glyph-code="E000" smufl-name="brace" />

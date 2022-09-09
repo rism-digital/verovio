@@ -630,6 +630,9 @@
   <g c="E4D3" x="0.0" y="0.0" w="150.0" h="500.0" h-a-x="150" n="caesuraShort"/>
   <g c="E4D4" x="0.0" y="0.0" w="250.0" h="500.0" h-a-x="250" n="caesuraCurved"/>
   <g c="E4D7" x="0.0" y="0.0" w="36.0" h="500.0" h-a-x="36" n="caesuraSingleStroke"/>
+  <g c="266D" x="28.0" y="56.0" w="220.0" h="714.0" h-a-x="611" n="musicFlatSign"/>
+  <g c="266E" x="28.0" y="-140.0" w="174.0" h="779.0" h-a-x="507" n="musicNaturalSign"/>
+  <g c="266F" x="28.0" y="-127.0" w="218.0" h="771.0" h-a-x="612" n="musicSharpSign"/>
   <g c="E1D0" x="0.0" y="69.0" w="595.0" h="307.0" h-a-x="595" n="noteDoubleWhole"/>
   <g c="E1D1" x="0.0" y="6.0" w="484.0" h="454.0" h-a-x="484" n="noteDoubleWholeSquare"/>
   <g c="E1D2" x="0.0" y="119.0" w="417.0" h="248.0" h-a-x="417" n="noteWhole"/>

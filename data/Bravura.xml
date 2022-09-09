@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bounding-boxes font-family="Bravura" units-per-em="1000">
+  <g c="266D" x="0.0" y="-175.0" w="226.0" h="614.0" h-a-x="226" n="musicFlatSign"/>
+  <g c="266E" x="0.0" y="-335.0" w="168.0" h="676.0" h-a-x="169" n="musicNaturalSign"/>
+  <g c="266F" x="0.0" y="-348.0" w="249.0" h="698.0" h-a-x="249" n="musicSharpSign"/>
   <g c="E000" x="2.0" y="0.0" w="80.0" h="997.0" h-a-x="84" n="brace"/>
   <g c="E003" x="0.0" y="0.0" w="469.0" h="295.0" h-a-x="469" n="bracketTop"/>
   <g c="E004" x="0.0" y="-295.0" w="469.0" h="295.0" h-a-x="469" n="bracketBottom"/>
