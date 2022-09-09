@@ -7,7 +7,7 @@ woffFont=${font}.woff2
 woffFontXML=${woffFont}.xml
 w=$(base64 $woffFont)
 
-echo "<style type='text/css'>\n@font-face {\n\tfont-family: '$font';\n\tsrc: url(data:application/x-font-woff;charset=utf-8;base64,$w) format('woff');\n\tfont-weight: normal;\n\tfont-style: normal;\n}\n</style\n" > $woffFontXML
+echo "<style type='text/css'>\n@font-face {\n\tfont-family: '$font';\n\tsrc: url(data:application/font-woff2;charset=utf-8;base64,$w) format('woff2');\n\tfont-weight: normal;\n\tfont-style: normal;\n}\n</style\n" > $woffFontXML
 
 # move woff to data folder
 mv $woffFontXML ../data
