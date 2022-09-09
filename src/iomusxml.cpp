@@ -730,7 +730,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
                 }
                 if (!verovioText.empty()) {
                     Rend *rend = new Rend;
-                    rend->SetFontname("Leipzig");
+                    rend->SetFontfam("smufl");
                     Text *text = new Text();
                     text->SetText(verovioText);
                     rend->AddChild(text);
@@ -1969,7 +1969,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
         if (xmlCoda.attribute("id")) dir->SetID(xmlCoda.attribute("id").as_string());
         Rend *rend = new Rend;
-        rend->SetFontname("Leipzig");
+        rend->SetFontfam("smufl");
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
@@ -2395,7 +2395,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
         if (xmlSegno.attribute("id")) dir->SetID(xmlSegno.attribute("id").as_string());
         Rend *rend = new Rend;
-        rend->SetFontname("Leipzig");
+        rend->SetFontfam("smufl");
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
