@@ -114,7 +114,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         const std::string woffPath = resources->GetPath() + "/Leipzig.woff2.xml";
         pugi::xml_document woffDoc;
         woffDoc.load_file(woffPath.c_str());
-        m_svgNode.prepend_copy(woffDoc.first_child());
+        m_svgNode.append_copy(woffDoc.first_child());
     }
 
     // header
