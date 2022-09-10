@@ -21,6 +21,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "ftrem.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 #include "rest.h"
@@ -509,6 +510,26 @@ void Tuplet::GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *d
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Tuplet::Visit(MutableFunctor &functor)
+{
+    return functor.VisitTuplet(this);
+}
+
+FunctorCode Tuplet::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitTuplet(this);
+}
+
+FunctorCode Tuplet::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitTupletEnd(this);
+}
+
+FunctorCode Tuplet::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTupletEnd(this);
+}
 
 int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 {

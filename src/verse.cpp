@@ -16,6 +16,7 @@
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -105,6 +106,26 @@ int Verse::AdjustPosition(int &overlap, int freeSpace, const Doc *doc)
 //----------------------------------------------------------------------------
 // Verse functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Verse::Visit(MutableFunctor &functor)
+{
+    return functor.VisitVerse(this);
+}
+
+FunctorCode Verse::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitVerse(this);
+}
+
+FunctorCode Verse::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitVerseEnd(this);
+}
+
+FunctorCode Verse::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitVerseEnd(this);
+}
 
 int Verse::AlignVertically(FunctorParams *functorParams)
 {
