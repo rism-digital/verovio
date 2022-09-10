@@ -16,6 +16,7 @@
 
 #include "chord.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -42,6 +43,26 @@ void MultiRpt::Reset()
 {
     LayerElement::Reset();
     this->ResetNumbered();
+}
+
+FunctorCode MultiRpt::Visit(MutableFunctor &functor)
+{
+    return functor.VisitMultiRpt(this);
+}
+
+FunctorCode MultiRpt::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitMultiRpt(this);
+}
+
+FunctorCode MultiRpt::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitMultiRptEnd(this);
+}
+
+FunctorCode MultiRpt::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMultiRptEnd(this);
 }
 
 } // namespace vrv

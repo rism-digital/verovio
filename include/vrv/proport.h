@@ -37,6 +37,16 @@ public:
     /** Override the method since alignment is required */
     bool HasToBeAligned() const override { return true; }
 
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Visit(MutableFunctor &functor) override;
+    FunctorCode Visit(ConstFunctor &functor) const override;
+    FunctorCode VisitEnd(MutableFunctor &functor) override;
+    FunctorCode VisitEnd(ConstFunctor &functor) const override;
+    ///@}
+
 private:
     //
 public:

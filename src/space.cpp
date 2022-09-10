@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "vrv.h"
@@ -43,5 +44,25 @@ void Space::Reset()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Space::Visit(MutableFunctor &functor)
+{
+    return functor.VisitSpace(this);
+}
+
+FunctorCode Space::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitSpace(this);
+}
+
+FunctorCode Space::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitSpaceEnd(this);
+}
+
+FunctorCode Space::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSpaceEnd(this);
+}
 
 } // namespace vrv

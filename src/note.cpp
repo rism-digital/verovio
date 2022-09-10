@@ -20,6 +20,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "gracegrp.h"
@@ -910,6 +911,26 @@ int Note::PnameToPclass(data_PITCHNAME pitchName)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Note::Visit(MutableFunctor &functor)
+{
+    return functor.VisitNote(this);
+}
+
+FunctorCode Note::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitNote(this);
+}
+
+FunctorCode Note::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitNoteEnd(this);
+}
+
+FunctorCode Note::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitNoteEnd(this);
+}
 
 int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {

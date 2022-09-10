@@ -15,6 +15,7 @@
 
 #include "doc.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "note.h"
@@ -134,6 +135,26 @@ int Syl::GetDrawingHeight() const
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Syl::Visit(MutableFunctor &functor)
+{
+    return functor.VisitSyl(this);
+}
+
+FunctorCode Syl::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitSyl(this);
+}
+
+FunctorCode Syl::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitSylEnd(this);
+}
+
+FunctorCode Syl::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSylEnd(this);
+}
 
 int Syl::PrepareLyrics(FunctorParams *functorParams)
 {

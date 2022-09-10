@@ -18,6 +18,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "smufl.h"
@@ -531,6 +532,26 @@ int Rest::GetRestOffsetFromOptions(
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Rest::Visit(MutableFunctor &functor)
+{
+    return functor.VisitRest(this);
+}
+
+FunctorCode Rest::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitRest(this);
+}
+
+FunctorCode Rest::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitRestEnd(this);
+}
+
+FunctorCode Rest::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitRestEnd(this);
+}
 
 int Rest::AdjustBeams(FunctorParams *functorParams)
 {

@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -43,5 +44,25 @@ void Plica::Reset()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Plica::Visit(MutableFunctor &functor)
+{
+    return functor.VisitPlica(this);
+}
+
+FunctorCode Plica::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitPlica(this);
+}
+
+FunctorCode Plica::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitPlicaEnd(this);
+}
+
+FunctorCode Plica::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPlicaEnd(this);
+}
 
 } // namespace vrv

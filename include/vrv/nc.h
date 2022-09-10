@@ -60,6 +60,16 @@ public:
     const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
     ///@}
 
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Visit(MutableFunctor &functor) override;
+    FunctorCode Visit(ConstFunctor &functor) const override;
+    FunctorCode VisitEnd(MutableFunctor &functor) override;
+    FunctorCode VisitEnd(ConstFunctor &functor) const override;
+    ///@}
+
 private:
 };
 

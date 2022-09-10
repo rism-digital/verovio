@@ -88,6 +88,16 @@ public:
     PitchInterface *GetHighestPitch();
     PitchInterface *GetLowestPitch();
 
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Visit(MutableFunctor &functor) override;
+    FunctorCode Visit(ConstFunctor &functor) const override;
+    FunctorCode VisitEnd(MutableFunctor &functor) override;
+    FunctorCode VisitEnd(ConstFunctor &functor) const override;
+    ///@}
+
 private:
     int GetPosition(const LayerElement *element) const;
 

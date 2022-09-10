@@ -16,6 +16,7 @@
 #include "btrem.h"
 #include "chord.h"
 #include "elementpart.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 #include "smufl.h"
@@ -173,6 +174,26 @@ void Stem::AdjustFlagPlacement(const Doc *doc, Flag *flag, int staffSize, int ve
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Stem::Visit(MutableFunctor &functor)
+{
+    return functor.VisitStem(this);
+}
+
+FunctorCode Stem::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitStem(this);
+}
+
+FunctorCode Stem::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitStemEnd(this);
+}
+
+FunctorCode Stem::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitStemEnd(this);
+}
 
 int Stem::AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) const
 {
