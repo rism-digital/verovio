@@ -516,7 +516,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         // Check for clefs in syllable
         ListOfObjects clefs;
-        syllable->FindAllDescendantByComparison(&clefs, &ac);
+        element->FindAllDescendantByComparison(&clefs, &ac);
         bool hasClef = (clefs.size() != 0);
 
         FacsimileInterface *fi = element->GetFacsimileInterface();
@@ -554,21 +554,14 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 }
             }
         }
-
+        
         if (hasClef) {
             for (Object *obj : clefs) {
                 Clef *clef = dynamic_cast<Clef *>(obj);
                 ClefMovementHandler(clef, x, 0);
             }
-        }
-
-        layer->ReorderByXPos();
-
-        if (element->Is(CUSTOS)) {
-            AdjustPitchFromPosition(element);
-        }
-        // if syllable contains clef, adjust individual neumes
-        else if (hasClef) {
+            
+            // if syllable contains clef, adjust individual neumes
             ListOfObjects neumes;
             ClassIdComparison neumeCompare(NEUME);
             element->FindAllDescendantByComparison(&neumes, &neumeCompare);
@@ -576,9 +569,16 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 AdjustPitchFromPosition(*neume);
             }
         }
+
+        if (element->Is(CUSTOS)) {
+            AdjustPitchFromPosition(element);
+            ChangeStaff(elementId);
+        }
         else {
             AdjustPitchFromPosition(syllable);
         }
+
+        layer->ReorderByXPos();
     }
     else if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
@@ -688,6 +688,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             assert(zone);
             zone->ShiftByXY(x, -y);
         }
+        ChangeStaff(elementId);
     }
     else if (element->Is(DIVLINE)) {
         DivLine *divLine = dynamic_cast<DivLine *>(element);
@@ -704,6 +705,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             assert(zone);
             zone->ShiftByXY(x, -y);
         }
+        ChangeStaff(elementId);
     }
     else {
         LogWarning("Unsupported element for dragging.");
@@ -3497,6 +3499,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
 bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffId)
 {
+    LogMessage("verovio");
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page");
         m_infoObject.import("status", "FAILURE");
