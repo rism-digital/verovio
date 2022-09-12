@@ -538,26 +538,6 @@ protected:
 };
 
 //----------------------------------------------------------------------------
-// VisibleSymbol
-//----------------------------------------------------------------------------
-/**
- * This class evaluates if the object is a visible Symbol.
- */
-class VisibleSymbol : public ClassIdComparison {
-
-public:
-    VisibleSymbol() : ClassIdComparison(SYMBOL) {}
-
-    bool operator()(const Object *object) override
-    {
-        if (!MatchesType(object)) return false;
-        const Symbol *symbol = vrv_cast<const Symbol *>(object);
-        assert(symbol);
-        return (symbol->m_visibility == Visible);
-    }
-};
-
-//----------------------------------------------------------------------------
 // Filters class
 //----------------------------------------------------------------------------
 
