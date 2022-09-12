@@ -22,7 +22,7 @@ namespace vrv {
 /**
  * This class models the MEI <symbol> element.
  */
-class Symbol : public TextElement, public AttColor, public AttExtSym {
+class Symbol : public TextElement, public AttColor, public AttExtSym, public AttTypography {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
