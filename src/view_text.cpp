@@ -484,17 +484,41 @@ void View::DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &para
 
     dc->StartTextGraphic(symbol, "", symbol->GetID());
 
-    const wchar_t code = symbol->GetSymbolGlyph();
+    // This can happen after an <lb/>
+    if (params.m_explicitPosition) {
+        dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
+        params.m_explicitPosition = false;
+    }
+
     std::wstring str;
-    str.push_back(code);
+    str.push_back(symbol->GetSymbolGlyph());
 
     FontInfo symbolFont;
+
+    if (symbol->HasFontsize()) {
+        data_FONTSIZE *fs = symbol->GetFontsizeAlternate();
+        if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
+            symbolFont.SetPointSize(fs->GetFontSizeNumeric());
+        }
+        else if (fs->GetType() == FONTSIZE_term) {
+            const int percent = fs->GetPercentForTerm();
+            symbolFont.SetPointSize(params.m_pointSize * percent / 100);
+        }
+        else if (fs->GetType() == FONTSIZE_percent) {
+            symbolFont.SetPointSize(params.m_pointSize * fs->GetPercent() / 100);
+        }
+    }
+    if (symbol->HasFontstyle()) {
+        symbolFont.SetStyle(symbol->GetFontstyle());
+    }
+    else {
+        // By default explicitly render it as normal
+        symbolFont.SetStyle(FONTSTYLE_normal);
+    }
 
     if (symbol->HasGlyphAuth() && symbol->GetGlyphAuth() == "smufl") {
         symbolFont.SetSmuflFont(true);
         symbolFont.SetFaceName("Leipzig");
-        // By default explicitly render it as normal
-        symbolFont.SetStyle(FONTSTYLE_normal);
         int pointSize = (symbolFont.GetPointSize() != 0) ? symbolFont.GetPointSize() : params.m_pointSize;
         symbolFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
     }
