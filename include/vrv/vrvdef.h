@@ -111,7 +111,6 @@ enum ClassId : uint16_t {
     STAFFGRP,
     SURFACE,
     SVG,
-    SYMBOL,
     SYSTEM,
     SYSTEM_ALIGNER,
     SYSTEM_ALIGNMENT,
@@ -250,6 +249,7 @@ enum ClassId : uint16_t {
     LB,
     NUM,
     REND,
+    SYMBOL,
     TEXT,
     TEXT_ELEMENT_max,
     //

@@ -11,7 +11,7 @@
 #include "atts_externalsymbols.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
-#include "object.h"
+#include "textelement.h"
 
 namespace vrv {
 
@@ -22,7 +22,7 @@ namespace vrv {
 /**
  * This class models the MEI <symbol> element.
  */
-class Symbol : public Object, public AttColor, public AttExtSym {
+class Symbol : public TextElement, public AttColor, public AttExtSym {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -49,14 +49,6 @@ public:
 private:
     //
 public:
-    /**
-     * Holds the visibility (hidden or visible) for an symbol element.
-     * By default, a symbo elements is visible but it is make invisible when with mixed content
-     * The reason is that we cannot render SVG <g> within <text>.
-     * Symbol with text is not supported by Verovio.
-     */
-    VisibilityType m_visibility;
-
 private:
 };
 
