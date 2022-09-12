@@ -2179,8 +2179,6 @@ int Beam::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
-
     const ListOfObjects &beamChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
@@ -2198,6 +2196,8 @@ int Beam::CalcStem(FunctorParams *functorParams)
         const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
         this->InitCue(isCue);
     }
+
+    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
 
     m_beamSegment.InitCoordRefs(this->GetElementCoords());
 
