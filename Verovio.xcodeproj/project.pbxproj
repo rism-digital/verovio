@@ -1292,6 +1292,12 @@
 		E765675A28BBFBA400BC6490 /* functorinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = E765675828BBFBA400BC6490 /* functorinterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E765675C28BC01A000BC6490 /* functor.h in Headers */ = {isa = PBXBuildFile; fileRef = E765675B28BC019F00BC6490 /* functor.h */; };
 		E765675D28BC01A000BC6490 /* functor.h in Headers */ = {isa = PBXBuildFile; fileRef = E765675B28BC019F00BC6490 /* functor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E77C197D28CD317B00F5BADA /* calcdots.h in Headers */ = {isa = PBXBuildFile; fileRef = E77C197C28CD317B00F5BADA /* calcdots.h */; };
+		E77C197E28CD317B00F5BADA /* calcdots.h in Headers */ = {isa = PBXBuildFile; fileRef = E77C197C28CD317B00F5BADA /* calcdots.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E77C198028CD318B00F5BADA /* calcdots.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdots.cpp */; };
+		E77C198128CD318B00F5BADA /* calcdots.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdots.cpp */; };
+		E77C198228CD31AC00F5BADA /* calcdots.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdots.cpp */; };
+		E77C198328CD31AD00F5BADA /* calcdots.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdots.cpp */; };
 		E79ADDC426BD1AE900527E4B /* runtimeclock.h in Headers */ = {isa = PBXBuildFile; fileRef = E79ADDC326BD1AE900527E4B /* runtimeclock.h */; };
 		E79ADDC526BD1AE900527E4B /* runtimeclock.h in Headers */ = {isa = PBXBuildFile; fileRef = E79ADDC326BD1AE900527E4B /* runtimeclock.h */; };
 		E79ADDC726BD645B00527E4B /* runtimeclock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79ADDC626BD645B00527E4B /* runtimeclock.cpp */; };
@@ -1786,6 +1792,8 @@
 		E74A806828BC9842005274E7 /* functorinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = functorinterface.cpp; path = src/functorinterface.cpp; sourceTree = "<group>"; };
 		E765675828BBFBA400BC6490 /* functorinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functorinterface.h; path = include/vrv/functorinterface.h; sourceTree = "<group>"; };
 		E765675B28BC019F00BC6490 /* functor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functor.h; path = include/vrv/functor.h; sourceTree = "<group>"; };
+		E77C197C28CD317B00F5BADA /* calcdots.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcdots.h; path = include/vrv/calcdots.h; sourceTree = "<group>"; };
+		E77C197F28CD318B00F5BADA /* calcdots.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcdots.cpp; path = src/calcdots.cpp; sourceTree = "<group>"; };
 		E79ADDC326BD1AE900527E4B /* runtimeclock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = runtimeclock.h; path = include/vrv/runtimeclock.h; sourceTree = "<group>"; };
 		E79ADDC626BD645B00527E4B /* runtimeclock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = runtimeclock.cpp; path = src/runtimeclock.cpp; sourceTree = "<group>"; };
 		E79C87C1269440420098FE85 /* lv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lv.h; path = include/vrv/lv.h; sourceTree = "<group>"; };
@@ -2490,6 +2498,8 @@
 		E765675628BBF9CD00BC6490 /* functors */ = {
 			isa = PBXGroup;
 			children = (
+				E77C197F28CD318B00F5BADA /* calcdots.cpp */,
+				E77C197C28CD317B00F5BADA /* calcdots.h */,
 				E74A806028BC9111005274E7 /* find.cpp */,
 				E74A806528BC97D5005274E7 /* find.h */,
 				E765675B28BC019F00BC6490 /* functor.h */,
@@ -2583,6 +2593,7 @@
 				4DEC4DDE21C8295700D1D273 /* lem.h in Headers */,
 				4DC12A5D1F73F888000440E9 /* pghead2.h in Headers */,
 				8F59294518854BF800FE51AD /* layerelement.h in Headers */,
+				E77C197D28CD317B00F5BADA /* calcdots.h in Headers */,
 				4DB3D8AD1F83D04A00B5FC2B /* atts_mensural.h in Headers */,
 				4D4FCD0A1F5455F10009C455 /* staffgrp.h in Headers */,
 				4D674B3F255F40AC008AEF4C /* plica.h in Headers */,
@@ -2868,6 +2879,7 @@
 				BB4C4B2622A932CF001F6AF0 /* fermata.h in Headers */,
 				BB4C4B0022A932BC001F6AF0 /* supplied.h in Headers */,
 				BB4C4B8622A932DF001F6AF0 /* lb.h in Headers */,
+				E77C197E28CD317B00F5BADA /* calcdots.h in Headers */,
 				BD0562302518CD12004057EB /* beamspan.h in Headers */,
 				BB4C4AFE22A932BC001F6AF0 /* subst.h in Headers */,
 				BB4C4AFC22A932BC001F6AF0 /* sic.h in Headers */,
@@ -3186,6 +3198,7 @@
 				BD0562372518CD20004057EB /* beamspan.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
 				4DC12A7D1F740FB9000440E9 /* view_running.cpp in Sources */,
+				E77C198228CD31AC00F5BADA /* calcdots.cpp in Sources */,
 				BD87768427CE8A19005B97EA /* layerdef.cpp in Sources */,
 				4D15DE3B2411782300457C05 /* expansionmap.cpp in Sources */,
 				4D1694191E3A44F300569BF4 /* drawinginterface.cpp in Sources */,
@@ -3542,6 +3555,7 @@
 				4D7927D020ECCC6D0002A45D /* view_slur.cpp in Sources */,
 				4D81351E2322C41800F59C01 /* keyaccid.cpp in Sources */,
 				BD2E4D95287587FD00B04350 /* stem.cpp in Sources */,
+				E77C198328CD31AD00F5BADA /* calcdots.cpp in Sources */,
 				4DC34BAC19BC4A83006175CD /* dot.cpp in Sources */,
 				4DEC4DB221C826E000D1D273 /* supplied.cpp in Sources */,
 				4D20740A22A4FDFA00E0765F /* course.cpp in Sources */,
@@ -3631,6 +3645,7 @@
 				BD0562382518CD20004057EB /* beamspan.cpp in Sources */,
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				4D20740522A46BAA00E0765F /* atts_frettab.cpp in Sources */,
+				E77C198028CD318B00F5BADA /* calcdots.cpp in Sources */,
 				BD87768527CE8A1A005B97EA /* layerdef.cpp in Sources */,
 				8F3DD34818854B2E0051330C /* mensur.cpp in Sources */,
 				403BEFF8206C00FA00D022D5 /* multirpt.cpp in Sources */,
@@ -3854,6 +3869,7 @@
 				BB4C4A6622A9321F001F6AF0 /* atts_critapp.cpp in Sources */,
 				BD0562392518CD20004057EB /* beamspan.cpp in Sources */,
 				BB4C4B3D22A932D7001F6AF0 /* artic.cpp in Sources */,
+				E77C198128CD318B00F5BADA /* calcdots.cpp in Sources */,
 				BD87768627CE8A1A005B97EA /* layerdef.cpp in Sources */,
 				BB4C4A5D22A9321F001F6AF0 /* attconverter.cpp in Sources */,
 				BB4C4AF722A932BC001F6AF0 /* reg.cpp in Sources */,
