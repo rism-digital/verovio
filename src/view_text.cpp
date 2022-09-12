@@ -220,6 +220,11 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
         assert(rend);
         this->DrawRend(dc, rend, params);
     }
+    else if (element->Is(SYMBOL)) {
+        Symbol *symbol = vrv_cast<Symbol *>(element);
+        assert(symbol);
+        this->DrawSymbol(dc, symbol, params);
+    }
     else if (element->Is(TEXT)) {
         Text *text = vrv_cast<Text *>(element);
         assert(text);
@@ -472,22 +477,35 @@ void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params)
     dc->EndGraphic(svg, this);
 }
 
-void View::DrawSymbol(DeviceContext *dc, Staff *staff, Symbol *symbol, TextDrawingParams &params)
+void View::DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &params)
 {
     assert(dc);
     assert(symbol);
 
-    dc->StartGraphic(symbol, "", symbol->GetID());
+    dc->StartTextGraphic(symbol, "", symbol->GetID());
 
     const wchar_t code = symbol->GetSymbolGlyph();
+    std::wstring str;
+    str.push_back(code);
 
-    this->DrawSmuflCode(dc, params.m_x, params.m_y, code, staff->m_drawingStaffSize, false);
+    FontInfo symbolFont;
 
-    if (code) {
-        params.m_x += m_doc->GetGlyphAdvX(code, staff->m_drawingStaffSize, false);
+    if (symbol->HasGlyphAuth() && symbol->GetGlyphAuth() == "smufl") {
+        symbolFont.SetSmuflFont(true);
+        symbolFont.SetFaceName("Leipzig");
+        // By default explicitly render it as normal
+        symbolFont.SetStyle(FONTSTYLE_normal);
+        int pointSize = (symbolFont.GetPointSize() != 0) ? symbolFont.GetPointSize() : params.m_pointSize;
+        symbolFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
     }
 
-    dc->EndGraphic(symbol, this);
+    dc->SetFont(&symbolFont);
+
+    this->DrawTextString(dc, str, params);
+
+    dc->ResetFont();
+
+    dc->EndTextGraphic(symbol, this);
 }
 
 } // namespace vrv
