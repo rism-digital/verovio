@@ -833,37 +833,6 @@ MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary) const
     return dotLocs;
 }
 
-int Chord::CalcDots(FunctorParams *functorParams)
-{
-    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
-    assert(params);
-
-    // if the chord isn't visible, stop here
-    if (!this->IsVisible()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    // if there aren't dot, stop here but only if no note has a dot
-    if (this->GetDots() < 1) {
-        if (!this->HasNoteWithDots()) {
-            return FUNCTOR_SIBLINGS;
-        }
-        else {
-            return FUNCTOR_CONTINUE;
-        }
-    }
-
-    Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-    assert(dots);
-
-    params->m_chordDots = dots;
-    params->m_chordDrawingX = this->GetDrawingX();
-    params->m_chordStemDir = this->GetDrawingStemDir();
-
-    dots->SetMapOfDotLocs(this->CalcOptimalDotLocations());
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));

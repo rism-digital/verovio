@@ -331,11 +331,6 @@ public:
     int CalcChordNoteHeads(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcDots
-     */
-    int CalcDots(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcLedgerLines
      */
     int CalcLedgerLines(FunctorParams *functorParams) override;

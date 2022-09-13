@@ -220,11 +220,6 @@ public:
     int CalcChordNoteHeads(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcDots
-     */
-    int CalcDots(FunctorParams *functorParams) override;
-
-    /**
      * See Object::PrepareLayerElementParts
      */
     int PrepareLayerElementParts(FunctorParams *functorParams) override;

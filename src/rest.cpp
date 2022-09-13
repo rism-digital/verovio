@@ -655,60 +655,6 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Rest::CalcDots(FunctorParams *functorParams)
-{
-    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
-    assert(params);
-
-    // We currently have no dots object with mensural rests
-    if (this->IsMensuralDur()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Nothing to do
-    if ((this->GetDur() <= DUR_BR) || (this->GetDots() < 1)) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    const bool drawingCueSize = this->GetDrawingCueSize();
-    const int staffSize = staff->m_drawingStaffSize;
-
-    // For single rests we need here to set the dot loc
-    Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-    assert(dots);
-
-    std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
-    int loc = this->GetDrawingLoc();
-
-    // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
-    if ((loc % 2) == 0) {
-        loc += 1;
-    }
-
-    switch (this->GetActualDur()) {
-        case DUR_32:
-        case DUR_64: loc += 2; break;
-        case DUR_128:
-        case DUR_256: loc += 4; break;
-        case DUR_512: loc += 6; break;
-        case DUR_1024: loc += 8; break;
-        default: break;
-    }
-
-    dotLocs.insert(loc);
-
-    // HARDCODED
-    int xRel = params->m_doc->GetDrawingUnit(staffSize) * 2.5;
-    if (drawingCueSize) xRel = params->m_doc->GetCueSize(xRel);
-    if (this->GetDur() > DUR_2) {
-        xRel = params->m_doc->GetGlyphWidth(this->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
-    }
-    dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int Rest::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too

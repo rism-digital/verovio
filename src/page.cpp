@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "bboxdevicecontext.h"
+#include "calcdots.h"
 #include "comparison.h"
 #include "doc.h"
 #include "functorparams.h"
@@ -229,9 +230,8 @@ void Page::LayOutTranscription(bool force)
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
     this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
 
-    CalcDotsParams calcDotsParams(doc);
-    Functor calcDots(&Object::CalcDots);
-    this->Process(&calcDots, &calcDotsParams);
+    CalcDots calcDots(doc);
+    this->Process(calcDots);
 
     // Render it for filling the bounding box
     View view;
@@ -328,9 +328,8 @@ void Page::ResetAligners()
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
     this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
 
-    CalcDotsParams calcDotsParams(doc);
-    Functor calcDots(&Object::CalcDots);
-    this->Process(&calcDots, &calcDotsParams);
+    CalcDots calcDots(doc);
+    this->Process(calcDots);
 
     // Adjust the position of outside articulations
     CalcArticParams calcArticParams(doc);
