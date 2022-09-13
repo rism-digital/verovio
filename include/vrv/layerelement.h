@@ -301,6 +301,12 @@ public:
      */
     char32_t StemModToGlyph(data_STEMMODIFIER stemMod) const;
 
+    /**
+     * Calculate the optimal dot location for a note or chord
+     * Takes two layers into account in order to avoid collisions of dots between corresponding notes/chords
+     */
+    MapOfDotLocs CalcOptimalDotLocations();
+
     //----------//
     // Functors //
     //----------//
@@ -508,12 +514,6 @@ protected:
      * are placed within the duration of element
      */
     int CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2);
-
-    /**
-     * Calculate the optimal dot location for a note or chord
-     * Takes two layers into account in order to avoid collisions of dots between corresponding notes/chords
-     */
-    MapOfDotLocs CalcOptimalDotLocations();
 
     //----------------//
     // Static methods //

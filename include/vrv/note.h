@@ -269,6 +269,12 @@ public:
      */
     void CalcNoteHeadShiftForSameasNote(Note *stemSameas, data_STEMDIRECTION stemDir);
 
+    /**
+     * Return whether dots are overlapping with flag. Take into account flag height, its position as well
+     * as position of the note and position of the dots
+     */
+    bool IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const;
+
 public:
     //----------------//
     // Static methods //
@@ -391,12 +397,6 @@ private:
     TransPitch GetTransPitch() const;
 
     void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
-
-    /**
-     * Return whether dots are overlapping with flag. Take into account flag height, its position as well
-     * as position of the note and position of the dots
-     */
-    bool IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const;
 
     /**
      * Register deferred notes for MIDI

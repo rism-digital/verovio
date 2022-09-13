@@ -149,9 +149,12 @@ private:
     //
 public:
     //
-private:
+protected:
     //
     Doc *m_doc;
+
+private:
+    //
 };
 
 //----------------------------------------------------------------------------
@@ -180,9 +183,12 @@ private:
     //
 public:
     //
-private:
+protected:
     //
     const Doc *m_doc;
+
+private:
+    //
 };
 
 } // namespace vrv
