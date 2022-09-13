@@ -111,7 +111,7 @@ FunctorCode CalcDots::VisitNote(Note *note)
             flagShift += shift;
         }
         else if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && !note->IsInBeam() && (note->GetDrawingStemLen() < 3)
-            && (note->IsDotOverlappingWithFlag(m_doc, staffSize, dotLocShift))) {
+            && (this->IsDotOverlappingWithFlag(note, staffSize, dotLocShift))) {
             // HARDCODED
             const int shift = m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
             flagShift += shift;
@@ -174,6 +174,26 @@ FunctorCode CalcDots::VisitRest(Rest *rest)
     dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
 
     return FUNCTOR_SIBLINGS;
+}
+
+bool CalcDots::IsDotOverlappingWithFlag(const Note *note, const int staffSize, int dotLocShift) const
+{
+    const Object *stem = note->GetFirst(STEM);
+    if (!stem) return false;
+
+    const Flag *flag = dynamic_cast<const Flag *>(stem->GetFirst(FLAG));
+    if (!flag) return false;
+
+    // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
+    wchar_t flagGlyph = SMUFL_E242_flag16thUp;
+    data_DURATION dur = note->GetDur();
+    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(note->GetDrawingStemDir());
+    const int flagHeight = m_doc->GetGlyphHeight(flagGlyph, staffSize, note->GetDrawingCueSize());
+
+    const int dotMargin = flag->GetDrawingY() - note->GetDrawingY() - flagHeight - note->GetDrawingRadius(m_doc) / 2
+        - dotLocShift * m_doc->GetDrawingUnit(staffSize);
+
+    return dotMargin < 0;
 }
 
 } // namespace vrv

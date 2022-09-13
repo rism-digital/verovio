@@ -46,7 +46,12 @@ public:
 protected:
     //
 private:
-    //
+    /**
+     * Return whether dots are overlapping with flag. Take into account flag height, its position as well
+     * as position of the note and position of the dots
+     */
+    bool IsDotOverlappingWithFlag(const Note *note, const int staffSize, int dotLocShift) const;
+
 public:
     //
 private:
