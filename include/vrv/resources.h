@@ -81,6 +81,12 @@ public:
     const Glyph *GetTextGlyph(wchar_t code) const;
     ///@}
 
+    /**
+     * Static method that converts unicode music code points to SMuFL equivalent.
+     * Return the parameter char if nothing can be converted.
+     */
+    static wchar_t GetSmuflGlyphForUnicodeChar(const wchar_t unicodeChar);
+
 private:
     bool LoadFont(const std::string &fontName);
 
