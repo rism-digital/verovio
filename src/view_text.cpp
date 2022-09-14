@@ -67,6 +67,21 @@ void View::DrawTextString(DeviceContext *dc, std::wstring str, TextDrawingParams
     dc->DrawText(UTF16to8(str), str);
 }
 
+void View::DrawDirString(DeviceContext *dc, std::wstring str, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(dc->GetFont());
+
+    std::wstring adjustedStr = str;
+    // If the current font is a music font, we want to convert Music Unicode glyph to SMuFL
+    if (dc->GetFont()->GetSmuflFont()) {
+        for (int i = 0; i < adjustedStr.size(); i++) {
+            adjustedStr[i] = Resources::GetSmuflGlyphForUnicodeChar(str.at(i));
+        }
+    }
+    this->DrawTextString(dc, adjustedStr, params);
+}
+
 void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParams &params, Rend *rend)
 {
     assert(dc);
@@ -433,10 +448,14 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
         params.m_verticalShift = false;
     }
 
-    // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
-    if (text->GetFirstAncestor(DYNAM)) {
+    // special case where we want to replace some unicode music points to SMuFL
+    if (text->GetFirstAncestor(DIR)) {
+        this->DrawDirString(dc, text->GetText(), params);
+    }
+    else if (text->GetFirstAncestor(DYNAM)) {
         this->DrawDynamString(dc, text->GetText(), params, dynamic_cast<Rend *>(text->GetFirstAncestor(REND)));
     }
+    // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
     else if (text->GetFirstAncestor(HARM)) {
         this->DrawHarmString(dc, text->GetText(), params);
     }
