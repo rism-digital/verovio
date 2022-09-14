@@ -75,7 +75,7 @@ void View::DrawDirString(DeviceContext *dc, std::wstring str, TextDrawingParams 
     std::wstring adjustedStr = str;
     // If the current font is a music font, we want to convert Music Unicode glyph to SMuFL
     if (dc->GetFont()->GetSmuflFont()) {
-        for (int i = 0; i < adjustedStr.size(); i++) {
+        for (int i = 0; i < (int)adjustedStr.size(); i++) {
             adjustedStr[i] = Resources::GetSmuflGlyphForUnicodeChar(str.at(i));
         }
     }
