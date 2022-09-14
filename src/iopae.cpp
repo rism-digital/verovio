@@ -640,6 +640,24 @@ PAEInput::PAEInput(Doc *doc)
 
 PAEInput::~PAEInput() {}
 
+jsonxx::Object PAEInput::GetValidationLog()
+{
+    jsonxx::Object log;
+
+    log << "Using old PAE parser";
+    /*// If we have an input error, that is the only one to log
+    if (!m_inputLog.empty()) {
+        log = m_inputLog;
+        return log;
+    }
+    if (!m_keysigLog.empty()) log << "keysig" << m_keysigLog;
+    if (!m_clefLog.empty()) log << "clef" << m_clefLog;
+    if (!m_timesigLog.empty()) log << "timesig" << m_timesigLog;
+    if (!m_dataLog.empty()) log << "data" << m_dataLog;
+    // LogDebug("%s", log.json().c_str());*/
+    return log;
+}
+
 #ifndef NO_PAE_SUPPORT
 
 //////////////////////////////////////////////////////////////////////////

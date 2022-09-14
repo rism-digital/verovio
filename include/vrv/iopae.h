@@ -15,7 +15,7 @@
  */
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-//#define USE_PAE_OLD_PARSER
+#define USE_PAE_OLD_PARSER
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 
@@ -403,6 +403,13 @@ public:
     // constructors and destructors
     PAEInput(Doc *doc);
     virtual ~PAEInput();
+
+    /**
+     * Return a JSON object with the validation log
+     * It is a single object when an input error is encountered.
+     * Otherwise, validation log errors/warnings are listed in their respective JSON input keys
+     */
+    jsonxx::Object GetValidationLog();
 
 #ifndef NO_PAE_SUPPORT
     bool Import(const std::string &pae) override;
