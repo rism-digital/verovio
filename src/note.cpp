@@ -1063,7 +1063,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     params->m_isGraceNote = this->IsGraceNote();
     params->m_isStemSameasSecondary = false;
 
-    int staffSize = staff->m_drawingStaffSize;
+    const int staffSize = staff->m_drawingStaffSize;
 
     params->m_verticalCenter
         = staff->GetDrawingY() - params->m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
