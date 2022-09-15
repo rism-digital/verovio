@@ -117,9 +117,7 @@ endif()
 
 if(NO_PAE_SUPPORT)
     add_definitions(-DNO_PAE_SUPPORT)
-endif()
-
-if(USE_PAE_OLD_PARSER)
+elseif(USE_PAE_OLD_PARSER)
     add_definitions(-DUSE_PAE_OLD_PARSER)
 endif()
 

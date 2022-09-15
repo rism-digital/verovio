@@ -15,7 +15,7 @@
  */
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-#define USE_PAE_OLD_PARSER
+//#define USE_PAE_OLD_PARSER
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 
@@ -404,11 +404,7 @@ public:
     PAEInput(Doc *doc);
     virtual ~PAEInput();
 
-    /**
-     * Return a JSON object with the validation log
-     * It is a single object when an input error is encountered.
-     * Otherwise, validation log errors/warnings are listed in their respective JSON input keys
-     */
+    // dummy validation log
     jsonxx::Object GetValidationLog();
 
 #ifndef NO_PAE_SUPPORT
