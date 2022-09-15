@@ -2853,10 +2853,10 @@ void MEIOutput::WriteSymbol(pugi::xml_node currentNode, Symbol *symbol)
 {
     assert(symbol);
 
+    this->WriteTextElement(currentNode, symbol);
     symbol->WriteColor(currentNode);
     symbol->WriteExtSym(currentNode);
-
-    this->WriteXmlId(currentNode, symbol);
+    symbol->WriteTypography(currentNode);
 }
 
 void MEIOutput::WriteText(pugi::xml_node element, Text *text)
@@ -6774,18 +6774,11 @@ bool MEIInput::ReadSvg(Object *parent, pugi::xml_node svg)
 bool MEIInput::ReadSymbol(Object *parent, pugi::xml_node symbol)
 {
     Symbol *vrvSymbol = new Symbol();
-    this->SetMeiID(symbol, vrvSymbol);
-
-    if (parent->IsEditorialElement()) {
-        std::string meiElementName = parent->GetClassName();
-        std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
-        LogWarning("Element <%s> within <%s> is not supported and will not be rendered", symbol.name(),
-            meiElementName.c_str());
-        vrvSymbol->m_visibility = Hidden;
-    }
+    this->ReadTextElement(symbol, vrvSymbol);
 
     vrvSymbol->ReadColor(symbol);
     vrvSymbol->ReadExtSym(symbol);
+    vrvSymbol->ReadTypography(symbol);
 
     parent->AddChild(vrvSymbol);
     this->ReadUnsupportedAttr(symbol, vrvSymbol);

@@ -1608,21 +1608,16 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
             params.m_y -= m_doc->GetTextXHeight(&dirTxt, false) / 2;
         }
 
-        VisibleSymbol visibleSymbol;
-        if (dir->FindDescendantByComparison(&visibleSymbol)) {
-            this->DrawSymbolChildren(dc, dir, *staffIter, params);
-        }
-        else {
-            dc->SetBrush(m_currentColour, AxSOLID);
-            dc->SetFont(&dirTxt);
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&dirTxt);
 
-            dc->StartText(ToDeviceContextX(params.m_x - xAdjust), ToDeviceContextY(params.m_y), alignment);
-            DrawTextChildren(dc, dir, params);
-            dc->EndText();
+        dc->StartText(ToDeviceContextX(params.m_x - xAdjust), ToDeviceContextY(params.m_y), alignment);
+        DrawTextChildren(dc, dir, params);
+        dc->EndText();
 
-            dc->ResetFont();
-            dc->ResetBrush();
-        }
+        dc->ResetFont();
+        dc->ResetBrush();
+
         this->DrawTextEnclosure(dc, params, (*staffIter)->m_drawingStaffSize);
     }
 

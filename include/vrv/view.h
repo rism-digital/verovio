@@ -259,7 +259,6 @@ protected:
     void DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure);
     void DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
     void DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
-    void DrawSymbolChildren(DeviceContext *dc, Object *parent, Staff *staff, TextDrawingParams &params);
     void DrawRunningChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
     ///@}
 
@@ -386,7 +385,7 @@ protected:
     void DrawNum(DeviceContext *dc, Num *num, TextDrawingParams &params);
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
     void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params);
-    void DrawSymbol(DeviceContext *dc, Staff *staff, Symbol *symbol, TextDrawingParams &params);
+    void DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
     void DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params, int staffSize);
 
