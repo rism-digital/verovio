@@ -1200,17 +1200,17 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
 
     // We do not support more than three chars
-    const int num = std::min(multiRest->GetNum(), 999);
+    const int num = multiRest->HasNum() ? std::min(multiRest->GetNum(), 999) : 1;
 
-    const int mutliRestThickness
+    const int multiRestThickness
         = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_multiRestThickness.GetValue();
     // Position centered in staff
     int y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1)
-        - mutliRestThickness / 2;
+        - multiRestThickness / 2;
     if (multiRest->HasLoc()) {
         y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1 - multiRest->GetLoc());
     }
-    int y1 = y2 + mutliRestThickness;
+    int y1 = y2 + multiRestThickness;
 
     if (multiRest->UseBlockStyle(m_doc)) {
         // This is 1/2 the length of the black rectangle

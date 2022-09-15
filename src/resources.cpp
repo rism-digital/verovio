@@ -9,6 +9,12 @@
 
 //----------------------------------------------------------------------------
 
+#include <codecvt>
+#include <locale>
+#include <string>
+
+//----------------------------------------------------------------------------
+
 #include "smufl.h"
 #include "vrvdef.h"
 
@@ -120,6 +126,34 @@ const Glyph *Resources::GetTextGlyph(wchar_t code) const
     }
 
     return &currentTable.at(code);
+}
+
+wchar_t Resources::GetSmuflGlyphForUnicodeChar(const wchar_t unicodeChar)
+{
+    // unicode glyph above 0xFFFF cannot be represented as char constants
+    const std::string ds = u8"\U0001d109";
+    const std::string dc = u8"\U0001d10a";
+    const std::string segno = u8"\U0001d10b";
+    const std::string coda = u8"\U0001d10c";
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> strCnv;
+
+    wchar_t smuflChar = unicodeChar;
+    if (unicodeChar > 0xFFFF) {
+        std::string unicodeStr = strCnv.to_bytes(unicodeChar);
+        if (unicodeStr == ds) {
+            smuflChar = SMUFL_E045_dalSegno;
+        }
+        else if (unicodeStr == dc) {
+            smuflChar = SMUFL_E046_daCapo;
+        }
+        else if (unicodeStr == segno) {
+            smuflChar = SMUFL_E047_segno;
+        }
+        else if (unicodeStr == coda) {
+            smuflChar = SMUFL_E048_coda;
+        }
+    }
+    return smuflChar;
 }
 
 bool Resources::LoadFont(const std::string &fontName)

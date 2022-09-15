@@ -105,7 +105,7 @@ function getToolkitFunction(VerovioModule, method) {
     // char *renderToPAE(Toolkit *ic)
     mapping.renderToPAE = VerovioModule.cwrap("vrvToolkit_renderToPAE", "string");
 
-    // char *renderToSvg(Toolkit *ic, int pageNo, const char *rendering_options)
+    // char *renderToSvg(Toolkit *ic, int pageNo, int xmlDeclaration)
     mapping.renderToSVG = VerovioModule.cwrap("vrvToolkit_renderToSVG", "string", ["number", "number", "number"]);
 
     // char *renderToTimemap(Toolkit *ic)
