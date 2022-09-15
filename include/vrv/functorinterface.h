@@ -20,6 +20,7 @@ class BeatRpt;
 class BTrem;
 class Chord;
 class Clef;
+class Course;
 class Custos;
 class Dot;
 class Dots;
@@ -27,11 +28,18 @@ class Doc;
 class Flag;
 class FTrem;
 class GraceGrp;
+class GrpSym;
 class HalfmRpt;
+class InstrDef;
 class KeyAccid;
 class KeySig;
+class Label;
+class LabelAbbr;
+class Layer;
+class LayerDef;
 class LayerElement;
 class Ligature;
+class Measure;
 class Mensur;
 class MeterSig;
 class MeterSigGrp;
@@ -45,16 +53,27 @@ class Nc;
 class Neume;
 class Note;
 class Object;
+class Page;
+class Pages;
+class Pb;
 class Plica;
 class Proport;
 class Rest;
+class Sb;
+class ScoreDef;
+class ScoreDefElement;
 class Space;
+class Staff;
+class StaffDef;
+class StaffGrp;
 class Stem;
 class Syl;
 class Syllable;
+class System;
 class TabDurSym;
 class TabGrp;
 class TimestampAttr;
+class Tuning;
 class Tuplet;
 class TupletBracket;
 class TupletNum;
@@ -86,6 +105,51 @@ public:
     virtual FunctorCode VisitObjectEnd(Object *object) { return FUNCTOR_CONTINUE; }
     virtual FunctorCode VisitDoc(Doc *doc);
     virtual FunctorCode VisitDocEnd(Doc *doc);
+    ///@}
+
+    /**
+     * @name Visit container elements
+     */
+    ///@{
+    // TODO: Add system elements later
+    virtual FunctorCode VisitCourse(Course *course);
+    virtual FunctorCode VisitCourseEnd(Course *course);
+    virtual FunctorCode VisitGrpSym(GrpSym *grpSym);
+    virtual FunctorCode VisitGrpSymEnd(GrpSym *grpSym);
+    virtual FunctorCode VisitInstrDef(InstrDef *instrDef);
+    virtual FunctorCode VisitInstrDefEnd(InstrDef *instrDef);
+    virtual FunctorCode VisitLabel(Label *label);
+    virtual FunctorCode VisitLabelEnd(Label *label);
+    virtual FunctorCode VisitLabelAbbr(LabelAbbr *labelAbbr);
+    virtual FunctorCode VisitLabelAbbrEnd(LabelAbbr *labelAbbr);
+    virtual FunctorCode VisitLayer(Layer *layer);
+    virtual FunctorCode VisitLayerEnd(Layer *layer);
+    virtual FunctorCode VisitLayerDef(LayerDef *layerDef);
+    virtual FunctorCode VisitLayerDefEnd(LayerDef *layerDef);
+    virtual FunctorCode VisitMeasure(Measure *measure);
+    virtual FunctorCode VisitMeasureEnd(Measure *measure);
+    virtual FunctorCode VisitPage(Page *page);
+    virtual FunctorCode VisitPageEnd(Page *page);
+    virtual FunctorCode VisitPages(Pages *pages);
+    virtual FunctorCode VisitPagesEnd(Pages *pages);
+    // virtual FunctorCode VisitPb(Pb *pb);
+    // virtual FunctorCode VisitPbEnd(Pb *pb);
+    // virtual FunctorCode VisitSb(Sb *sb);
+    // virtual FunctorCode VisitSbEnd(Sb *sb);
+    virtual FunctorCode VisitScoreDef(ScoreDef *scoreDef);
+    virtual FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef);
+    virtual FunctorCode VisitScoreDefElement(ScoreDefElement *scoreDefElement);
+    virtual FunctorCode VisitScoreDefElementEnd(ScoreDefElement *scoreDefElement);
+    virtual FunctorCode VisitStaff(Staff *staff);
+    virtual FunctorCode VisitStaffEnd(Staff *staff);
+    virtual FunctorCode VisitStaffDef(StaffDef *staffDef);
+    virtual FunctorCode VisitStaffDefEnd(StaffDef *staffDef);
+    virtual FunctorCode VisitStaffGrp(StaffGrp *staffGrp);
+    virtual FunctorCode VisitStaffGrpEnd(StaffGrp *staffGrp);
+    virtual FunctorCode VisitSystem(System *system);
+    virtual FunctorCode VisitSystemEnd(System *system);
+    virtual FunctorCode VisitTuning(Tuning *tuning);
+    virtual FunctorCode VisitTuningEnd(Tuning *tuning);
     ///@}
 
     /**
@@ -217,6 +281,51 @@ public:
     virtual FunctorCode VisitObjectEnd(const Object *object) { return FUNCTOR_CONTINUE; }
     virtual FunctorCode VisitDoc(const Doc *doc);
     virtual FunctorCode VisitDocEnd(const Doc *doc);
+    ///@}
+
+    /**
+     * @name Visit container elements
+     */
+    ///@{
+    // TODO: Add system elements later
+    virtual FunctorCode VisitCourse(const Course *course);
+    virtual FunctorCode VisitCourseEnd(const Course *course);
+    virtual FunctorCode VisitGrpSym(const GrpSym *grpSym);
+    virtual FunctorCode VisitGrpSymEnd(const GrpSym *grpSym);
+    virtual FunctorCode VisitInstrDef(const InstrDef *instrDef);
+    virtual FunctorCode VisitInstrDefEnd(const InstrDef *instrDef);
+    virtual FunctorCode VisitLabel(const Label *label);
+    virtual FunctorCode VisitLabelEnd(const Label *label);
+    virtual FunctorCode VisitLabelAbbr(const LabelAbbr *labelAbbr);
+    virtual FunctorCode VisitLabelAbbrEnd(const LabelAbbr *labelAbbr);
+    virtual FunctorCode VisitLayer(const Layer *layer);
+    virtual FunctorCode VisitLayerEnd(const Layer *layer);
+    virtual FunctorCode VisitLayerDef(const LayerDef *layerDef);
+    virtual FunctorCode VisitLayerDefEnd(const LayerDef *layerDef);
+    virtual FunctorCode VisitMeasure(const Measure *measure);
+    virtual FunctorCode VisitMeasureEnd(const Measure *measure);
+    virtual FunctorCode VisitPage(const Page *page);
+    virtual FunctorCode VisitPageEnd(const Page *page);
+    virtual FunctorCode VisitPages(const Pages *pages);
+    virtual FunctorCode VisitPagesEnd(const Pages *pages);
+    // virtual FunctorCode VisitPb(const Pb *pb);
+    // virtual FunctorCode VisitPbEnd(const Pb *pb);
+    // virtual FunctorCode VisitSb(const Sb *sb);
+    // virtual FunctorCode VisitSbEnd(const Sb *sb);
+    virtual FunctorCode VisitScoreDef(const ScoreDef *scoreDef);
+    virtual FunctorCode VisitScoreDefEnd(const ScoreDef *scoreDef);
+    virtual FunctorCode VisitScoreDefElement(const ScoreDefElement *scoreDefElement);
+    virtual FunctorCode VisitScoreDefElementEnd(const ScoreDefElement *scoreDefElement);
+    virtual FunctorCode VisitStaff(const Staff *staff);
+    virtual FunctorCode VisitStaffEnd(const Staff *staff);
+    virtual FunctorCode VisitStaffDef(const StaffDef *staffDef);
+    virtual FunctorCode VisitStaffDefEnd(const StaffDef *staffDef);
+    virtual FunctorCode VisitStaffGrp(const StaffGrp *staffGrp);
+    virtual FunctorCode VisitStaffGrpEnd(const StaffGrp *staffGrp);
+    virtual FunctorCode VisitSystem(const System *system);
+    virtual FunctorCode VisitSystemEnd(const System *system);
+    virtual FunctorCode VisitTuning(const Tuning *tuning);
+    virtual FunctorCode VisitTuningEnd(const Tuning *tuning);
     ///@}
 
     /**

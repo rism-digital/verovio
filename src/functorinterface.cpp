@@ -17,17 +17,25 @@
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
+#include "course.h"
 #include "custos.h"
 #include "doc.h"
 #include "dot.h"
 #include "elementpart.h"
 #include "ftrem.h"
 #include "gracegrp.h"
+#include "grpsym.h"
 #include "halfmrpt.h"
+#include "instrdef.h"
 #include "keyaccid.h"
 #include "keysig.h"
+#include "label.h"
+#include "labelabbr.h"
+#include "layer.h"
+#include "layerdef.h"
 #include "layerelement.h"
 #include "ligature.h"
+#include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
@@ -40,16 +48,24 @@
 #include "nc.h"
 #include "neume.h"
 #include "note.h"
+#include "page.h"
+#include "pages.h"
 #include "plica.h"
 #include "proport.h"
 #include "rest.h"
+#include "scoredef.h"
 #include "space.h"
+#include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "stem.h"
 #include "syl.h"
 #include "syllable.h"
+#include "system.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
 #include "timestamp.h"
+#include "tuning.h"
 #include "tuplet.h"
 #include "verse.h"
 
@@ -67,6 +83,176 @@ FunctorCode FunctorInterface::VisitDoc(Doc *doc)
 FunctorCode FunctorInterface::VisitDocEnd(Doc *doc)
 {
     return this->VisitObjectEnd(doc);
+}
+
+FunctorCode FunctorInterface::VisitCourse(Course *course)
+{
+    return this->VisitObject(course);
+}
+
+FunctorCode FunctorInterface::VisitCourseEnd(Course *course)
+{
+    return this->VisitObjectEnd(course);
+}
+
+FunctorCode FunctorInterface::VisitGrpSym(GrpSym *grpSym)
+{
+    return this->VisitObject(grpSym);
+}
+
+FunctorCode FunctorInterface::VisitGrpSymEnd(GrpSym *grpSym)
+{
+    return this->VisitObjectEnd(grpSym);
+}
+
+FunctorCode FunctorInterface::VisitInstrDef(InstrDef *instrDef)
+{
+    return this->VisitObject(instrDef);
+}
+
+FunctorCode FunctorInterface::VisitInstrDefEnd(InstrDef *instrDef)
+{
+    return this->VisitObjectEnd(instrDef);
+}
+
+FunctorCode FunctorInterface::VisitLabel(Label *label)
+{
+    return this->VisitObject(label);
+}
+
+FunctorCode FunctorInterface::VisitLabelEnd(Label *label)
+{
+    return this->VisitObjectEnd(label);
+}
+
+FunctorCode FunctorInterface::VisitLabelAbbr(LabelAbbr *labelAbbr)
+{
+    return this->VisitObject(labelAbbr);
+}
+
+FunctorCode FunctorInterface::VisitLabelAbbrEnd(LabelAbbr *labelAbbr)
+{
+    return this->VisitObjectEnd(labelAbbr);
+}
+
+FunctorCode FunctorInterface::VisitLayer(Layer *layer)
+{
+    return this->VisitObject(layer);
+}
+
+FunctorCode FunctorInterface::VisitLayerEnd(Layer *layer)
+{
+    return this->VisitObjectEnd(layer);
+}
+
+FunctorCode FunctorInterface::VisitLayerDef(LayerDef *layerDef)
+{
+    return this->VisitObject(layerDef);
+}
+
+FunctorCode FunctorInterface::VisitLayerDefEnd(LayerDef *layerDef)
+{
+    return this->VisitObjectEnd(layerDef);
+}
+
+FunctorCode FunctorInterface::VisitMeasure(Measure *measure)
+{
+    return this->VisitObject(measure);
+}
+
+FunctorCode FunctorInterface::VisitMeasureEnd(Measure *measure)
+{
+    return this->VisitObjectEnd(measure);
+}
+
+FunctorCode FunctorInterface::VisitPage(Page *page)
+{
+    return this->VisitObject(page);
+}
+
+FunctorCode FunctorInterface::VisitPageEnd(Page *page)
+{
+    return this->VisitObjectEnd(page);
+}
+
+FunctorCode FunctorInterface::VisitPages(Pages *pages)
+{
+    return this->VisitObject(pages);
+}
+
+FunctorCode FunctorInterface::VisitPagesEnd(Pages *pages)
+{
+    return this->VisitObjectEnd(pages);
+}
+
+FunctorCode FunctorInterface::VisitScoreDef(ScoreDef *scoreDef)
+{
+    return this->VisitScoreDefElement(scoreDef);
+}
+
+FunctorCode FunctorInterface::VisitScoreDefEnd(ScoreDef *scoreDef)
+{
+    return this->VisitScoreDefElementEnd(scoreDef);
+}
+
+FunctorCode FunctorInterface::VisitScoreDefElement(ScoreDefElement *scoreDefElement)
+{
+    return this->VisitObject(scoreDefElement);
+}
+
+FunctorCode FunctorInterface::VisitScoreDefElementEnd(ScoreDefElement *scoreDefElement)
+{
+    return this->VisitObjectEnd(scoreDefElement);
+}
+
+FunctorCode FunctorInterface::VisitStaff(Staff *staff)
+{
+    return this->VisitObject(staff);
+}
+
+FunctorCode FunctorInterface::VisitStaffEnd(Staff *staff)
+{
+    return this->VisitObjectEnd(staff);
+}
+
+FunctorCode FunctorInterface::VisitStaffDef(StaffDef *staffDef)
+{
+    return this->VisitScoreDefElement(staffDef);
+}
+
+FunctorCode FunctorInterface::VisitStaffDefEnd(StaffDef *staffDef)
+{
+    return this->VisitScoreDefElementEnd(staffDef);
+}
+
+FunctorCode FunctorInterface::VisitStaffGrp(StaffGrp *staffGrp)
+{
+    return this->VisitObject(staffGrp);
+}
+
+FunctorCode FunctorInterface::VisitStaffGrpEnd(StaffGrp *staffGrp)
+{
+    return this->VisitObjectEnd(staffGrp);
+}
+
+FunctorCode FunctorInterface::VisitSystem(System *system)
+{
+    return this->VisitObject(system);
+}
+
+FunctorCode FunctorInterface::VisitSystemEnd(System *system)
+{
+    return this->VisitObjectEnd(system);
+}
+
+FunctorCode FunctorInterface::VisitTuning(Tuning *tuning)
+{
+    return this->VisitObject(tuning);
+}
+
+FunctorCode FunctorInterface::VisitTuningEnd(Tuning *tuning)
+{
+    return this->VisitObjectEnd(tuning);
 }
 
 FunctorCode FunctorInterface::VisitAccid(Accid *accid)
@@ -531,6 +717,176 @@ FunctorCode ConstFunctorInterface::VisitDoc(const Doc *doc)
 FunctorCode ConstFunctorInterface::VisitDocEnd(const Doc *doc)
 {
     return this->VisitObjectEnd(doc);
+}
+
+FunctorCode ConstFunctorInterface::VisitCourse(const Course *course)
+{
+    return this->VisitObject(course);
+}
+
+FunctorCode ConstFunctorInterface::VisitCourseEnd(const Course *course)
+{
+    return this->VisitObjectEnd(course);
+}
+
+FunctorCode ConstFunctorInterface::VisitGrpSym(const GrpSym *grpSym)
+{
+    return this->VisitObject(grpSym);
+}
+
+FunctorCode ConstFunctorInterface::VisitGrpSymEnd(const GrpSym *grpSym)
+{
+    return this->VisitObjectEnd(grpSym);
+}
+
+FunctorCode ConstFunctorInterface::VisitInstrDef(const InstrDef *instrDef)
+{
+    return this->VisitObject(instrDef);
+}
+
+FunctorCode ConstFunctorInterface::VisitInstrDefEnd(const InstrDef *instrDef)
+{
+    return this->VisitObjectEnd(instrDef);
+}
+
+FunctorCode ConstFunctorInterface::VisitLabel(const Label *label)
+{
+    return this->VisitObject(label);
+}
+
+FunctorCode ConstFunctorInterface::VisitLabelEnd(const Label *label)
+{
+    return this->VisitObjectEnd(label);
+}
+
+FunctorCode ConstFunctorInterface::VisitLabelAbbr(const LabelAbbr *labelAbbr)
+{
+    return this->VisitObject(labelAbbr);
+}
+
+FunctorCode ConstFunctorInterface::VisitLabelAbbrEnd(const LabelAbbr *labelAbbr)
+{
+    return this->VisitObjectEnd(labelAbbr);
+}
+
+FunctorCode ConstFunctorInterface::VisitLayer(const Layer *layer)
+{
+    return this->VisitObject(layer);
+}
+
+FunctorCode ConstFunctorInterface::VisitLayerEnd(const Layer *layer)
+{
+    return this->VisitObjectEnd(layer);
+}
+
+FunctorCode ConstFunctorInterface::VisitLayerDef(const LayerDef *layerDef)
+{
+    return this->VisitObject(layerDef);
+}
+
+FunctorCode ConstFunctorInterface::VisitLayerDefEnd(const LayerDef *layerDef)
+{
+    return this->VisitObjectEnd(layerDef);
+}
+
+FunctorCode ConstFunctorInterface::VisitMeasure(const Measure *measure)
+{
+    return this->VisitObject(measure);
+}
+
+FunctorCode ConstFunctorInterface::VisitMeasureEnd(const Measure *measure)
+{
+    return this->VisitObjectEnd(measure);
+}
+
+FunctorCode ConstFunctorInterface::VisitPage(const Page *page)
+{
+    return this->VisitObject(page);
+}
+
+FunctorCode ConstFunctorInterface::VisitPageEnd(const Page *page)
+{
+    return this->VisitObjectEnd(page);
+}
+
+FunctorCode ConstFunctorInterface::VisitPages(const Pages *pages)
+{
+    return this->VisitObject(pages);
+}
+
+FunctorCode ConstFunctorInterface::VisitPagesEnd(const Pages *pages)
+{
+    return this->VisitObjectEnd(pages);
+}
+
+FunctorCode ConstFunctorInterface::VisitScoreDef(const ScoreDef *scoreDef)
+{
+    return this->VisitScoreDefElement(scoreDef);
+}
+
+FunctorCode ConstFunctorInterface::VisitScoreDefEnd(const ScoreDef *scoreDef)
+{
+    return this->VisitScoreDefElementEnd(scoreDef);
+}
+
+FunctorCode ConstFunctorInterface::VisitScoreDefElement(const ScoreDefElement *scoreDefElement)
+{
+    return this->VisitObject(scoreDefElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitScoreDefElementEnd(const ScoreDefElement *scoreDefElement)
+{
+    return this->VisitObjectEnd(scoreDefElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitStaff(const Staff *staff)
+{
+    return this->VisitObject(staff);
+}
+
+FunctorCode ConstFunctorInterface::VisitStaffEnd(const Staff *staff)
+{
+    return this->VisitObjectEnd(staff);
+}
+
+FunctorCode ConstFunctorInterface::VisitStaffDef(const StaffDef *staffDef)
+{
+    return this->VisitScoreDefElement(staffDef);
+}
+
+FunctorCode ConstFunctorInterface::VisitStaffDefEnd(const StaffDef *staffDef)
+{
+    return this->VisitScoreDefElementEnd(staffDef);
+}
+
+FunctorCode ConstFunctorInterface::VisitStaffGrp(const StaffGrp *staffGrp)
+{
+    return this->VisitObject(staffGrp);
+}
+
+FunctorCode ConstFunctorInterface::VisitStaffGrpEnd(const StaffGrp *staffGrp)
+{
+    return this->VisitObjectEnd(staffGrp);
+}
+
+FunctorCode ConstFunctorInterface::VisitSystem(const System *system)
+{
+    return this->VisitObject(system);
+}
+
+FunctorCode ConstFunctorInterface::VisitSystemEnd(const System *system)
+{
+    return this->VisitObjectEnd(system);
+}
+
+FunctorCode ConstFunctorInterface::VisitTuning(const Tuning *tuning)
+{
+    return this->VisitObject(tuning);
+}
+
+FunctorCode ConstFunctorInterface::VisitTuningEnd(const Tuning *tuning)
+{
+    return this->VisitObjectEnd(tuning);
 }
 
 FunctorCode ConstFunctorInterface::VisitAccid(const Accid *accid)
