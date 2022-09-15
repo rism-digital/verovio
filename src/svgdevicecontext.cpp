@@ -753,9 +753,9 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffs
     if (currentBrush.GetOpacity() != 1.0)
         polygonChild.append_attribute("fill-opacity") = StringFormat("%f", currentBrush.GetOpacity()).c_str();
 
-    std::string pointsString;
-    for (int i = 0; i < n; ++i) {
-        pointsString += StringFormat("%d,%d ", points[i].x + xOffset, points[i].y + yOffset);
+    std::string pointsString = StringFormat("%d,%d", points[0].x + xOffset, points[0].y + yOffset);
+    for (int i = 1; i < n; ++i) {
+        pointsString += " " + StringFormat("%d,%d", points[i].x + xOffset, points[i].y + yOffset);
     }
     polygonChild.append_attribute("points") = pointsString.c_str();
 }
