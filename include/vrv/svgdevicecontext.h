@@ -255,7 +255,7 @@ private:
     void DrawSvgBoundingBoxRectangle(int x, int y, int width, int height);
 
     /**
-     * Change the flag for indicating the use of the VerovioText font
+     * Change the flag for indicating the use of the music font as text font
      */
     void VrvTextFont() { m_vrvTextFont = true; }
 
@@ -284,7 +284,7 @@ public:
     //
 private:
     /**
-     * Flag for indicating if the VerovioText font is currently used.
+     * Flag for indicating if the music font (Leipzig) is currently used as text font.
      * If used, it has to be initialized to false (e.g., in the overriden version of StartPage) and will be changed in
      * DeviceContext::VrvTextFont
      */

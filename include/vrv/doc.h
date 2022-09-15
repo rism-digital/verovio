@@ -198,6 +198,12 @@ public:
     ///@}
 
     /**
+     * Get the ratio between the lyric font size and the music font size.
+     * This is used when the music font is used within text.
+     */
+    double GetMusicToLyricFontSizeRatio() const;
+
+    /**
      * @name Getters for the object margins (left and right).
      * The margins are given in x * MEI UNIT
      */

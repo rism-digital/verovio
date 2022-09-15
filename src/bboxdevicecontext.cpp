@@ -340,7 +340,12 @@ void BBoxDeviceContext::DrawText(
         }
 
         TextExtend extend;
-        this->GetTextExtent(wtext, &extend, true);
+        if (m_fontStack.top()->GetSmuflFont()) {
+            this->GetSmuflTextExtent(wtext, &extend);
+        }
+        else {
+            this->GetTextExtent(wtext, &extend, true);
+        }
         m_textWidth += extend.m_width;
         // keep that maximum values for ascent and descent
         m_textAscent = std::max(m_textAscent, extend.m_ascent);

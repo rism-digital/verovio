@@ -108,13 +108,13 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         m_svgNode.prepend_attribute("width") = StringFormat(format, width).c_str();
     }
 
-    // add the woff VerovioText font if needed
+    // add the woff Leipzig font if needed
     const Resources *resources = this->GetResources(true);
     if (m_vrvTextFont && resources) {
-        const std::string woffPath = resources->GetPath() + "/woff.xml";
+        const std::string woffPath = resources->GetPath() + "/Leipzig.woff2.xml";
         pugi::xml_document woffDoc;
         woffDoc.load_file(woffPath.c_str());
-        m_svgNode.prepend_copy(woffDoc.first_child());
+        m_svgNode.append_copy(woffDoc.first_child());
     }
 
     // header
@@ -905,8 +905,8 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring &wte
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
         textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
-        // Special case where we want to specifiy if the VerovioText font (woff) needs to be included in the output
-        if (fontFaceName == "VerovioText") this->VrvTextFont();
+        // Special case where we want to specifiy if the Leipzig woff2 font needs to be included in the output
+        if (m_fontStack.top()->GetSmuflFont()) this->VrvTextFont();
     }
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();

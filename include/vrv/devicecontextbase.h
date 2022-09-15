@@ -141,6 +141,7 @@ public:
         m_faceName.clear();
         m_encoding = 0; // was wxFONTENCODING_DEFAULT;
         m_widthToHeightRatio = 1.0;
+        m_smuflFont = false;
     }
     virtual ~FontInfo(){};
 
@@ -154,6 +155,7 @@ public:
     int GetFamily() const { return m_family; }
     int GetEncoding() const { return m_encoding; }
     float GetWidthToHeightRatio() const { return m_widthToHeightRatio; }
+    bool GetSmuflFont() const { return m_smuflFont; }
 
     void SetPointSize(int pointSize) { m_pointSize = pointSize; }
     void SetStyle(data_FONTSTYLE style) { m_style = style; }
@@ -164,6 +166,7 @@ public:
     void SetFamily(int family) { m_family = family; }
     void SetEncoding(int encoding) { m_encoding = encoding; }
     void SetWidthToHeightRatio(float ratio) { m_widthToHeightRatio = ratio; }
+    void SetSmuflFont(bool smuflFont) { m_smuflFont = smuflFont; }
 
 private:
     int m_pointSize;
@@ -175,6 +178,7 @@ private:
     std::string m_faceName;
     int m_encoding;
     float m_widthToHeightRatio;
+    bool m_smuflFont;
 };
 
 // ---------------------------------------------------------------------------

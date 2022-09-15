@@ -97,8 +97,9 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
     }
     // Elision
     else if (con == sylLog_CON_b) {
-        FontInfo *fFont = doc->GetDrawingLyricFont(staffSize);
-        int elisionSpace = doc->GetTextGlyphAdvX(VRV_TEXT_E551, fFont, false);
+        // Because we use Leipzig for rendering (for now) this will not be the right value when another music font is
+        // used It will be fixed once we also use the music font within text and not always Leipzig
+        int elisionSpace = doc->GetGlyphAdvX(VRV_TEXT_E551, staffSize, false);
         // Adjust it proportionally to the lyric size
         elisionSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
         spacing = elisionSpace;

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bounding-boxes font-family="Petaluma" units-per-em="1000">
+  <g c="266D" x="-10.0" y="-231.0" w="208.0" h="680.0" h-a-x="198" n="musicFlatSign"/>
+  <g c="266E" x="0.0" y="-463.0" w="213.5" h="918.0" h-a-x="213" n="musicNaturalSign"/>
+  <g c="266F" x="-25.0" y="-356.0" w="412.0" h="767.0" h-a-x="377" n="musicSharpSign"/>
   <g c="E440" x="1.87" y="-248.0" w="285.13" h="680.47" h-a-x="287" n="accidentalBuyukMucennebFlat">
     <a n="cutOutSE" x="0.87" y="0.31"/>
     <a n="cutOutSW" x="0.32" y="1.46"/>
@@ -207,6 +210,31 @@
   <g c="E53D" x="-75.0" y="-155.39" w="1046.0" h="619.39" h-a-x="971" n="dynamicRinforzando2">
     <a n="opticalCenter" x="2.08" y="0.0"/>
   </g>
+  <g c="EA50" x="20.0" y="-1.0" w="180.23" h="252.0" h-a-x="220" n="figbass0"/>
+  <g c="EA51" x="19.8" y="0.0" w="147.2" h="247.0" h-a-x="187" n="figbass1"/>
+  <g c="EA52" x="20.0" y="0.94" w="188.19" h="237.06" h-a-x="228" n="figbass2"/>
+  <g c="EA53" x="20.0" y="-59.13" w="188.19" h="295.13" h-a-x="228" n="figbass2Raised"/>
+  <g c="EA54" x="20.0" y="0.0" w="182.0" h="251.52" h-a-x="222" n="figbass3"/>
+  <g c="EA55" x="19.61" y="-13.0" w="162.39" h="288.0" h-a-x="202" n="figbass4"/>
+  <g c="EA56" x="20.45" y="2.34" w="205.77" h="279.74" h-a-x="246" n="figbass4Raised"/>
+  <g c="EA57" x="20.0" y="0.0" w="187.0" h="260.0" h-a-x="227" n="figbass5"/>
+  <g c="EA58" x="20.0" y="0.0" w="187.0" h="312.0" h-a-x="227" n="figbass5Raised1"/>
+  <g c="EA59" x="20.0" y="0.0" w="191.0" h="295.75" h-a-x="231" n="figbass5Raised2"/>
+  <g c="EA5A" x="20.0" y="-56.31" w="187.0" h="372.86" h-a-x="227" n="figbass5Raised3"/>
+  <g c="EA5B" x="19.81" y="-7.01" w="185.32" h="260.75" h-a-x="225" n="figbass6"/>
+  <g c="EA5C" x="-47.25" y="-15.26" w="349.38" h="275.37" h-a-x="213" n="figbass6Raised"/>
+  <g c="EA5D" x="20.07" y="-7.85" w="170.93" h="235.1" h-a-x="211" n="figbass7"/>
+  <g c="EA5E" x="20.05" y="0.0" w="160.07" h="301.0" h-a-x="200" n="figbass7Raised1"/>
+  <g c="EA5F" x="20.37" y="5.91" w="180.48" h="229.45" h-a-x="221" n="figbass7Raised2"/>
+  <g c="EA60" x="20.0" y="-5.0" w="146.0" h="291.0" h-a-x="186" n="figbass8"/>
+  <g c="EA61" x="20.0" y="-10.0" w="159.0" h="315.0" h-a-x="199" n="figbass9"/>
+  <g c="EA62" x="20.0" y="-16.0" w="237.0" h="354.0" h-a-x="277" n="figbass9Raised"/>
+  <g c="EA63" x="20.0" y="0.0" w="199.0" h="370.0" h-a-x="239" n="figbassDoubleFlat"/>
+  <g c="EA64" x="20.0" y="0.0" w="114.0" h="370.0" h-a-x="154" n="figbassFlat"/>
+  <g c="EA65" x="20.0" y="-120.0" w="86.25" h="370.0" h-a-x="126" n="figbassNatural"/>
+  <g c="EA66" x="20.0" y="-100.0" w="226.0" h="420.0" h-a-x="266" n="figbassSharp"/>
+  <g c="EA67" x="20.0" y="0.0" w="181.0" h="200.0" h-a-x="221" n="figbassDoubleSharp"/>
+  <g c="ECC0" x="15.11" y="1.87" w="245.33" h="264.59" h-a-x="275" n="figbass7Diminished"/>
   <g c="E240" x="0.0" y="-819.0" w="261.0" h="819.0" h-a-x="261" n="flag8thUp">
     <a n="graceNoteSlashNE" x="1.28" y="-0.8"/>
     <a n="graceNoteSlashSW" x="-0.64" y="-2.46"/>
@@ -300,11 +328,28 @@
   <g c="E4D2" x="0.0" y="1.7" w="708.08" h="740.3" h-a-x="708" n="caesuraThick"/>
   <g c="E4D3" x="-0.04" y="-20.0" w="209.04" h="633.0" h-a-x="209" n="caesuraShort"/>
   <g c="E4D4" x="0.0" y="-10.0" w="386.0" h="594.0" h-a-x="386" n="caesuraCurved"/>
+  <g c="E1D0" x="-0.44" y="-223.03" w="614.63" h="446.03" h-a-x="614" n="noteDoubleWhole"/>
+  <g c="E1D1" x="0.0" y="-209.39" w="474.0" h="420.39" h-a-x="474" n="noteDoubleWholeSquare"/>
+  <g c="E1D2" x="0.0" y="-186.17" w="380.17" h="351.17" h-a-x="380" n="noteWhole"/>
+  <g c="E1D3" x="1.0" y="-140.0" w="325.0" h="991.0" h-a-x="326" n="noteHalfUp"/>
+  <g c="E1D5" x="0.0" y="-140.0" w="329.0" h="987.0" h-a-x="329" n="noteQuarterUp"/>
+  <g c="E1D7" x="0.0" y="-140.0" w="544.0" h="980.0" h-a-x="544" n="note8thUp"/>
+  <g c="E1D9" x="0.0" y="-140.0" w="586.0" h="995.0" h-a-x="586" n="note16thUp"/>
+  <g c="E1DB" x="0.0" y="-140.0" w="578.0" h="1175.0" h-a-x="578" n="note32ndUp"/>
+  <g c="E1DD" x="0.0" y="-140.0" w="559.0" h="1352.0" h-a-x="559" n="note64thUp"/>
+  <g c="E1DF" x="0.0" y="-140.0" w="562.0" h="1523.0" h-a-x="563" n="note128thUp"/>
+  <g c="E1E1" x="1.0" y="-140.0" w="565.0" h="1694.0" h-a-x="565" n="note256thUp"/>
+  <g c="E1E3" x="0.0" y="-140.0" w="566.0" h="1875.0" h-a-x="566" n="note512thUp"/>
+  <g c="E1E5" x="0.41" y="-140.0" w="547.59" h="2021.0" h-a-x="547" n="note1024thUp"/>
+  <g c="E1E7" x="0.0" y="-57.0" w="96.0" h="114.0" h-a-x="96" n="augmentationDot"/>
   <g c="E650" x="0.0" y="-13.0" w="944.0" h="563.0" h-a-x="944" n="keyboardPedalPed"/>
   <g c="E651" x="0.0" y="0.0" w="314.0" h="549.0" h-a-x="314" n="keyboardPedalP"/>
   <g c="E655" x="0.0" y="0.0" w="436.6" h="461.0" h-a-x="437" n="keyboardPedalUp"/>
   <g c="E659" x="0.0" y="0.0" w="1140.0" h="539.0" h-a-x="1140" n="keyboardPedalSost"/>
   <g c="E65A" x="0.0" y="0.0" w="324.0" h="538.0" h-a-x="324" n="keyboardPedalS"/>
+  <g c="E550" x="-40.0" y="-154.2" w="443.0" h="148.6" h-a-x="363" n="lyricsElisionNarrow"/>
+  <g c="E551" x="-79.92" y="-144.52" w="641.92" h="144.52" h-a-x="482" n="lyricsElision"/>
+  <g c="E552" x="-79.99" y="-136.0" w="867.99" h="133.13" h-a-x="708" n="lyricsElisionWide"/>
   <g c="E938" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralNoteheadSemibrevisBlack"/>
   <g c="E939" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralNoteheadSemibrevisVoid"/>
   <g c="E93C" x="-0.11" y="-249.0" w="484.11" h="498.0" h-a-x="484" n="mensuralNoteheadMinimaWhite"/>
@@ -324,6 +369,22 @@
   <g c="E94A" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagSemiminima"/>
   <g c="E94B" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagFusa"/>
   <g c="E94C" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagFusa"/>
+  <g c="ECA0" x="-0.44" y="-223.03" w="614.63" h="446.03" h-a-x="614" n="metNoteDoubleWhole">
+    <a n="noteheadOrigin" x="0.4" y="0.0"/>
+  </g>
+  <g c="ECA1" x="0.0" y="-209.39" w="474.0" h="420.39" h-a-x="474" n="metNoteDoubleWholeSquare"/>
+  <g c="ECA2" x="0.0" y="-186.17" w="380.17" h="351.17" h-a-x="380" n="metNoteWhole"/>
+  <g c="ECA3" x="0.0" y="-147.0" w="311.0" h="699.0" h-a-x="311" n="metNoteHalfUp"/>
+  <g c="ECA5" x="0.0" y="-148.0" w="310.0" h="701.0" h-a-x="310" n="metNoteQuarterUp"/>
+  <g c="ECA7" x="-0.15" y="-144.86" w="482.26" h="723.61" h-a-x="482" n="metNote8thUp"/>
+  <g c="ECA9" x="0.0" y="-148.0" w="548.16" h="814.0" h-a-x="548" n="metNote16thUp"/>
+  <g c="ECAB" x="0.0" y="-140.0" w="578.0" h="1175.0" h-a-x="578" n="metNote32ndUp"/>
+  <g c="ECAD" x="0.0" y="-140.0" w="559.0" h="1352.0" h-a-x="559" n="metNote64thUp"/>
+  <g c="ECAF" x="0.0" y="-140.0" w="562.0" h="1523.0" h-a-x="562" n="metNote128thUp"/>
+  <g c="ECB1" x="0.0" y="-140.0" w="565.0" h="1694.0" h-a-x="565" n="metNote256thUp"/>
+  <g c="ECB3" x="0.0" y="-140.0" w="566.0" h="1875.0" h-a-x="566" n="metNote512thUp"/>
+  <g c="ECB5" x="0.41" y="-140.0" w="547.59" h="2021.0" h-a-x="548" n="metNote1024thUp"/>
+  <g c="ECB7" x="0.0" y="-57.0" w="96.0" h="114.0" h-a-x="96" n="metAugmentationDot"/>
   <g c="EAA4" x="-56.16" y="109.85" w="424.29" h="176.18" h-a-x="340" n="wiggleTrill">
     <a n="repeatOffset" x="1.36" y="0.0"/>
   </g>

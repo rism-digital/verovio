@@ -67,6 +67,21 @@ void View::DrawTextString(DeviceContext *dc, std::wstring str, TextDrawingParams
     dc->DrawText(UTF16to8(str), str);
 }
 
+void View::DrawDirString(DeviceContext *dc, std::wstring str, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(dc->GetFont());
+
+    std::wstring adjustedStr = str;
+    // If the current font is a music font, we want to convert Music Unicode glyph to SMuFL
+    if (dc->GetFont()->GetSmuflFont()) {
+        for (int i = 0; i < (int)adjustedStr.size(); i++) {
+            adjustedStr[i] = Resources::GetSmuflGlyphForUnicodeChar(str.at(i));
+        }
+    }
+    this->DrawTextString(dc, adjustedStr, params);
+}
+
 void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParams &params, Rend *rend)
 {
     assert(dc);
@@ -100,7 +115,9 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
             if (token.second) {
                 std::wstring smuflStr = Dynam::GetSymbolStr(token.first, singleGlyphs);
                 FontInfo vrvTxt;
-                vrvTxt.SetFaceName("VerovioText");
+                vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
+                vrvTxt.SetFaceName("Leipzig");
+                vrvTxt.SetSmuflFont(true);
                 vrvTxt.SetStyle(FONTSTYLE_normal);
                 dc->SetFont(&vrvTxt);
                 this->DrawTextString(dc, smuflStr, params);
@@ -149,21 +166,29 @@ void View::DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams
             // Then the accidental
             std::wstring accid = str.substr(pos, 1);
             std::wstring smuflAccid;
-            if (accid == L"\u266D") { // MUSIC FLAT SIGN
-                smuflAccid.push_back(SMUFL_E260_accidentalFlat);
+            if (accid == L"\u266D" || accid == L"\uE260") { // MUSIC or SMUFL FLAT SIGN
+                smuflAccid.push_back(SMUFL_EA64_figbassFlat);
             }
-            else if (accid == L"\u266E") { // MUSIC NATURAL SIGN
-                smuflAccid.push_back(SMUFL_E261_accidentalNatural);
+            else if (accid == L"\u266E" || accid == L"\uE261") { // MUSIC or SMUFL NATURAL SIGN
+                smuflAccid.push_back(SMUFL_EA65_figbassNatural);
             }
-            else if (accid == L"\u266F") { // MUSIC SHARP SIGN
-                smuflAccid.push_back(SMUFL_E262_accidentalSharp);
+            else if (accid == L"\u266F" || accid == L"\uE262") { // MUSIC or SMUFL SHARP SIGN
+                smuflAccid.push_back(SMUFL_EA66_figbassSharp);
+            }
+            else if (accid == L"\uE264") { // SMUFL DOUBLE FLAT SIGN
+                smuflAccid.push_back(SMUFL_EA63_figbassDoubleFlat);
+            }
+            else if (accid == L"\uE263") { // SMUFL DOUBLE SHARP SIGN
+                smuflAccid.push_back(SMUFL_EA67_figbassDoubleSharp);
             }
             else {
                 smuflAccid += accid;
             }
 
             FontInfo vrvTxt;
-            vrvTxt.SetFaceName("VerovioText");
+            vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
+            vrvTxt.SetFaceName("Leipzig");
+            vrvTxt.SetSmuflFont(true);
             dc->SetFont(&vrvTxt);
             // Once we have rendered the some text to not pass x / y anymore
             dc->DrawText(UTF16to8(smuflAccid), smuflAccid, toDcX, toDcY);
@@ -240,7 +265,9 @@ void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize, s
         if (iss.eof()) break;
 
         FontInfo vrvTxt;
-        vrvTxt.SetFaceName("VerovioText");
+        vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
+        vrvTxt.SetFaceName("Leipzig");
+        vrvTxt.SetSmuflFont(true);
         dc->SetFont(&vrvTxt);
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
@@ -328,7 +355,8 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     FontInfo rendFont;
     bool customFont = false;
-    if (rend->HasFontname() || rend->HasFontsize() || rend->HasFontstyle() || rend->HasFontweight()) {
+    if (rend->HasFontfam() || rend->HasFontname() || rend->HasFontsize() || rend->HasFontstyle()
+        || rend->HasFontweight()) {
         customFont = true;
         if (rend->HasFontname()) rendFont.SetFaceName(rend->GetFontname().c_str());
         if (rend->HasFontsize()) {
@@ -343,6 +371,12 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
             else if (fs->GetType() == FONTSIZE_percent) {
                 rendFont.SetPointSize(params.m_pointSize * fs->GetPercent() / 100);
             }
+        }
+        if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
+            rendFont.SetSmuflFont(true);
+            rendFont.SetFaceName("Leipzig");
+            int pointSize = (rendFont.GetPointSize() != 0) ? rendFont.GetPointSize() : params.m_pointSize;
+            rendFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
         }
         if (rend->HasFontstyle()) rendFont.SetStyle(rend->GetFontstyle());
         if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
@@ -414,10 +448,14 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
         params.m_verticalShift = false;
     }
 
-    // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
-    if (text->GetFirstAncestor(DYNAM)) {
+    // special case where we want to replace some unicode music points to SMuFL
+    if (text->GetFirstAncestor(DIR)) {
+        this->DrawDirString(dc, text->GetText(), params);
+    }
+    else if (text->GetFirstAncestor(DYNAM)) {
         this->DrawDynamString(dc, text->GetText(), params, dynamic_cast<Rend *>(text->GetFirstAncestor(REND)));
     }
+    // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
     else if (text->GetFirstAncestor(HARM)) {
         this->DrawHarmString(dc, text->GetText(), params);
     }
