@@ -75,7 +75,7 @@ jobs:
       - name: Install the Leipzig font
         working-directory: ${{ github.workspace }}/${{ env.DEV_DIR }}/
         run: |
-          sudo cp ./fonts/Leizpig.ttf /usr/local/share/fonts
+          sudo cp ./fonts/Leipzig.ttf /usr/local/share/fonts
           sudo fc-cache -f -v
 
       - name: Build Python toolkit and run the tests for the dev branch
