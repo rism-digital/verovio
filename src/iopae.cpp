@@ -640,6 +640,13 @@ PAEInput::PAEInput(Doc *doc)
 
 PAEInput::~PAEInput() {}
 
+jsonxx::Object PAEInput::GetValidationLog()
+{
+    jsonxx::Object log;
+    log << "Using old PAE parser";
+    return log;
+}
+
 #ifndef NO_PAE_SUPPORT
 
 //////////////////////////////////////////////////////////////////////////

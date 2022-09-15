@@ -404,6 +404,9 @@ public:
     PAEInput(Doc *doc);
     virtual ~PAEInput();
 
+    // dummy validation log
+    jsonxx::Object GetValidationLog();
+
 #ifndef NO_PAE_SUPPORT
     bool Import(const std::string &pae) override;
 
