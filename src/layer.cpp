@@ -21,6 +21,7 @@
 #include "custos.h"
 #include "doc.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "measure.h"
@@ -586,6 +587,26 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 //----------------------------------------------------------------------------
 // Layer functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Layer::Visit(MutableFunctor &functor)
+{
+    return functor.VisitLayer(this);
+}
+
+FunctorCode Layer::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitLayer(this);
+}
+
+FunctorCode Layer::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitLayerEnd(this);
+}
+
+FunctorCode Layer::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitLayerEnd(this);
+}
 
 int Layer::ConvertMarkupArticEnd(FunctorParams *functorParams)
 {

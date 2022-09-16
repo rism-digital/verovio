@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -59,6 +60,26 @@ bool LayerDef::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+FunctorCode LayerDef::Visit(MutableFunctor &functor)
+{
+    return functor.VisitLayerDef(this);
+}
+
+FunctorCode LayerDef::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitLayerDef(this);
+}
+
+FunctorCode LayerDef::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitLayerDefEnd(this);
+}
+
+FunctorCode LayerDef::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitLayerDefEnd(this);
 }
 
 } // namespace vrv

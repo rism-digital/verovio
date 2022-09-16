@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -54,5 +55,25 @@ bool Label::IsSupportedChild(Object *child)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Label::Visit(MutableFunctor &functor)
+{
+    return functor.VisitLabel(this);
+}
+
+FunctorCode Label::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitLabel(this);
+}
+
+FunctorCode Label::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitLabelEnd(this);
+}
+
+FunctorCode Label::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitLabelEnd(this);
+}
 
 } // namespace vrv

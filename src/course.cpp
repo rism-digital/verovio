@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -51,5 +53,25 @@ bool Course::IsSupportedChild(Object *child)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Course::Visit(MutableFunctor &functor)
+{
+    return functor.VisitCourse(this);
+}
+
+FunctorCode Course::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitCourse(this);
+}
+
+FunctorCode Course::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitCourseEnd(this);
+}
+
+FunctorCode Course::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitCourseEnd(this);
+}
 
 } // namespace vrv

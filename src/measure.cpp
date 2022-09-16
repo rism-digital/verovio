@@ -21,6 +21,7 @@
 #include "editorial.h"
 #include "ending.h"
 #include "f.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
@@ -682,6 +683,26 @@ std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEn
 //----------------------------------------------------------------------------
 // Measure functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Measure::Visit(MutableFunctor &functor)
+{
+    return functor.VisitMeasure(this);
+}
+
+FunctorCode Measure::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitMeasure(this);
+}
+
+FunctorCode Measure::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitMeasureEnd(this);
+}
+
+FunctorCode Measure::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMeasureEnd(this);
+}
 
 int Measure::FindSpannedLayerElements(FunctorParams *functorParams) const
 {
