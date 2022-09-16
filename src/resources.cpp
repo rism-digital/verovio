@@ -129,7 +129,7 @@ const Glyph *Resources::GetTextGlyph(wchar_t code) const
 wchar_t Resources::GetSmuflGlyphForUnicodeChar(const wchar_t unicodeChar)
 {
     wchar_t smuflChar = unicodeChar;
-    switch (unicodeChar) {
+    switch ((char32_t)unicodeChar) {
         case L'\U0001d109': smuflChar = SMUFL_E045_dalSegno; break;
         case L'\U0001d10a': smuflChar = SMUFL_E046_daCapo; break;
         case L'\U0001d10b': smuflChar = SMUFL_E047_segno; break;
