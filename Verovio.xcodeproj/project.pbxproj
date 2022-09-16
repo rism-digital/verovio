@@ -1288,6 +1288,12 @@
 		E74A806A28BC9843005274E7 /* functorinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806828BC9842005274E7 /* functorinterface.cpp */; };
 		E74A806B28BC98B1005274E7 /* functorinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806828BC9842005274E7 /* functorinterface.cpp */; };
 		E74A806C28BC98B2005274E7 /* functorinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806828BC9842005274E7 /* functorinterface.cpp */; };
+		E76046BD28D4828200C36204 /* calcledgerlines.h in Headers */ = {isa = PBXBuildFile; fileRef = E76046BC28D4828200C36204 /* calcledgerlines.h */; };
+		E76046BE28D4828200C36204 /* calcledgerlines.h in Headers */ = {isa = PBXBuildFile; fileRef = E76046BC28D4828200C36204 /* calcledgerlines.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E76046C028D4829000C36204 /* calcledgerlines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76046BF28D4829000C36204 /* calcledgerlines.cpp */; };
+		E76046C128D4829000C36204 /* calcledgerlines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76046BF28D4829000C36204 /* calcledgerlines.cpp */; };
+		E76046C228D496B300C36204 /* calcledgerlines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76046BF28D4829000C36204 /* calcledgerlines.cpp */; };
+		E76046C328D496B400C36204 /* calcledgerlines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76046BF28D4829000C36204 /* calcledgerlines.cpp */; };
 		E765675928BBFBA400BC6490 /* functorinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = E765675828BBFBA400BC6490 /* functorinterface.h */; };
 		E765675A28BBFBA400BC6490 /* functorinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = E765675828BBFBA400BC6490 /* functorinterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E765675C28BC01A000BC6490 /* functor.h in Headers */ = {isa = PBXBuildFile; fileRef = E765675B28BC019F00BC6490 /* functor.h */; };
@@ -1790,6 +1796,8 @@
 		E74A806028BC9111005274E7 /* find.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = find.cpp; path = src/find.cpp; sourceTree = "<group>"; };
 		E74A806528BC97D5005274E7 /* find.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = find.h; path = include/vrv/find.h; sourceTree = "<group>"; };
 		E74A806828BC9842005274E7 /* functorinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = functorinterface.cpp; path = src/functorinterface.cpp; sourceTree = "<group>"; };
+		E76046BC28D4828200C36204 /* calcledgerlines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcledgerlines.h; path = include/vrv/calcledgerlines.h; sourceTree = "<group>"; };
+		E76046BF28D4829000C36204 /* calcledgerlines.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcledgerlines.cpp; path = src/calcledgerlines.cpp; sourceTree = "<group>"; };
 		E765675828BBFBA400BC6490 /* functorinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functorinterface.h; path = include/vrv/functorinterface.h; sourceTree = "<group>"; };
 		E765675B28BC019F00BC6490 /* functor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functor.h; path = include/vrv/functor.h; sourceTree = "<group>"; };
 		E77C197C28CD317B00F5BADA /* calcdots.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcdots.h; path = include/vrv/calcdots.h; sourceTree = "<group>"; };
@@ -2498,6 +2506,8 @@
 		E765675628BBF9CD00BC6490 /* functors */ = {
 			isa = PBXGroup;
 			children = (
+				E76046BF28D4829000C36204 /* calcledgerlines.cpp */,
+				E76046BC28D4828200C36204 /* calcledgerlines.h */,
 				E77C197F28CD318B00F5BADA /* calcdots.cpp */,
 				E77C197C28CD317B00F5BADA /* calcdots.h */,
 				E74A806028BC9111005274E7 /* find.cpp */,
@@ -2632,6 +2642,7 @@
 				403BEFF7206C00F800D022D5 /* multirpt.h in Headers */,
 				4DC12A751F73FF92000440E9 /* runningelement.h in Headers */,
 				4DB3D8DD1F83D14B00B5FC2B /* artic.h in Headers */,
+				E76046BD28D4828200C36204 /* calcledgerlines.h in Headers */,
 				E765675C28BC01A000BC6490 /* functor.h in Headers */,
 				4DF28A031A754DE400BA9F7D /* controlelement.h in Headers */,
 				4DB3D8F11F83D1AA00B5FC2B /* fig.h in Headers */,
@@ -2914,6 +2925,7 @@
 				BB4C4B4422A932D7001F6AF0 /* beatrpt.h in Headers */,
 				BB4C4AB022A932A6001F6AF0 /* ioabc.h in Headers */,
 				BB4C4AA422A9328F001F6AF0 /* vrv.h in Headers */,
+				E76046BE28D4828200C36204 /* calcledgerlines.h in Headers */,
 				BB4C4A6122A9321F001F6AF0 /* atts_analytical.h in Headers */,
 				BB4C4A6B22A9321F001F6AF0 /* atts_externalsymbols.h in Headers */,
 				BB4C4AD222A932B6001F6AF0 /* scoredef.h in Headers */,
@@ -3140,6 +3152,7 @@
 				4D766F0020ACAD6D006875D8 /* syllable.cpp in Sources */,
 				4D4335CD1ED421BA003BE1A9 /* atts_analytical.cpp in Sources */,
 				4D1693FC1E3A44F300569BF4 /* view_control.cpp in Sources */,
+				E76046C228D496B300C36204 /* calcledgerlines.cpp in Sources */,
 				4D766F0120ACAD6D006875D8 /* view_neume.cpp in Sources */,
 				4D1693FD1E3A44F300569BF4 /* score.cpp in Sources */,
 				4D1693FE1E3A44F300569BF4 /* doc.cpp in Sources */,
@@ -3532,6 +3545,7 @@
 				4D09D3ED1EA8AD8500A420E6 /* horizontalaligner.cpp in Sources */,
 				4DEC4DA221C81EB300D1D273 /* rdg.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
+				E76046C328D496B400C36204 /* calcledgerlines.cpp in Sources */,
 				4DF289FF1A7545E500BA9F7D /* timeinterface.cpp in Sources */,
 				4DF9D29A1C1B3F0A0069E8C8 /* attconverter.cpp in Sources */,
 				4D1D73401A1D08DC001E08F6 /* glyph.cpp in Sources */,
@@ -3587,6 +3601,7 @@
 				4D6122C01F77E1E000FC90A0 /* rend.cpp in Sources */,
 				8F3DD35E18854B390051330C /* view.cpp in Sources */,
 				4DDBBB5E1C7AE45900054AFF /* hairpin.cpp in Sources */,
+				E76046C028D4829000C36204 /* calcledgerlines.cpp in Sources */,
 				4DB3D8C21F83D0E600B5FC2B /* controlelement.cpp in Sources */,
 				4DB3D8DF1F83D15300B5FC2B /* btrem.cpp in Sources */,
 				4DC12A7A1F7400B9000440E9 /* runningelement.cpp in Sources */,
@@ -3811,6 +3826,7 @@
 				BB4C4B5D22A932D7001F6AF0 /* metersig.cpp in Sources */,
 				BB4C4BB622A932F6001F6AF0 /* jsonxx.cc in Sources */,
 				BB4C4A7622A9321F001F6AF0 /* atts_gestural.cpp in Sources */,
+				E76046C128D4829000C36204 /* calcledgerlines.cpp in Sources */,
 				BB4C4B0B22A932C3001F6AF0 /* pghead2.cpp in Sources */,
 				BB4C4BBA22A932FC001F6AF0 /* MidiEvent.cpp in Sources */,
 				BB4C4A7C22A9321F001F6AF0 /* atts_midi.cpp in Sources */,
