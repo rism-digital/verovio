@@ -17,6 +17,7 @@
 #include "calcdots.h"
 #include "comparison.h"
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "pageelement.h"
 #include "pages.h"
@@ -806,6 +807,26 @@ void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Page::Visit(MutableFunctor &functor)
+{
+    return functor.VisitPage(this);
+}
+
+FunctorCode Page::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitPage(this);
+}
+
+FunctorCode Page::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitPageEnd(this);
+}
+
+FunctorCode Page::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPageEnd(this);
+}
 
 int Page::ScoreDefSetCurrentPageEnd(FunctorParams *functorParams)
 {

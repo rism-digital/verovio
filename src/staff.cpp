@@ -17,6 +17,7 @@
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "keysig.h"
@@ -428,6 +429,26 @@ void LedgerLine::AddDash(int left, int right, int extension)
 //----------------------------------------------------------------------------
 // Staff functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Staff::Visit(MutableFunctor &functor)
+{
+    return functor.VisitStaff(this);
+}
+
+FunctorCode Staff::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitStaff(this);
+}
+
+FunctorCode Staff::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitStaffEnd(this);
+}
+
+FunctorCode Staff::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitStaffEnd(this);
+}
 
 int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
 {

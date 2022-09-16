@@ -17,6 +17,7 @@
 #include "comparison.h"
 #include "course.h"
 #include "editorial.h"
+#include "functor.h"
 
 namespace vrv {
 
@@ -201,5 +202,25 @@ int Tuning::CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Tuning::Visit(MutableFunctor &functor)
+{
+    return functor.VisitTuning(this);
+}
+
+FunctorCode Tuning::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitTuning(this);
+}
+
+FunctorCode Tuning::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitTuningEnd(this);
+}
+
+FunctorCode Tuning::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTuningEnd(this);
+}
 
 } // namespace vrv

@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "instrdef.h"
 #include "label.h"
@@ -252,6 +253,26 @@ void StaffGrp::SetEverythingVisible()
 //----------------------------------------------------------------------------
 // StaffGrp functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode StaffGrp::Visit(MutableFunctor &functor)
+{
+    return functor.VisitStaffGrp(this);
+}
+
+FunctorCode StaffGrp::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitStaffGrp(this);
+}
+
+FunctorCode StaffGrp::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitStaffGrpEnd(this);
+}
+
+FunctorCode StaffGrp::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitStaffGrpEnd(this);
+}
 
 int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *)
 {

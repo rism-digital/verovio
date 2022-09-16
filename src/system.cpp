@@ -20,6 +20,7 @@
 #include "dynam.h"
 #include "ending.h"
 #include "find.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -472,6 +473,26 @@ void System::ConvertToUnCastOffMensuralSystem()
 //----------------------------------------------------------------------------
 // System functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode System::Visit(MutableFunctor &functor)
+{
+    return functor.VisitSystem(this);
+}
+
+FunctorCode System::Visit(ConstFunctor &functor) const
+{
+    return functor.VisitSystem(this);
+}
+
+FunctorCode System::VisitEnd(MutableFunctor &functor)
+{
+    return functor.VisitSystemEnd(this);
+}
+
+FunctorCode System::VisitEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSystemEnd(this);
+}
 
 int System::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
