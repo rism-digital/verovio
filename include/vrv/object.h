@@ -1024,16 +1024,6 @@ public:
     virtual int CalcLigatureNotePos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Calculate the ledger lines
-     */
-    virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::CalcLedgerLines
-     */
-    virtual int CalcLedgerLinesEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Calculate the position of the outside articulations.
      */
     virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }

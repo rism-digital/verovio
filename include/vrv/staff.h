@@ -236,11 +236,6 @@ public:
     int AlignVertically(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcLedgerLinesEnd
-     */
-    int CalcLedgerLinesEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::PrepareStaffCurrentTimeSpanning
      */
     int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;

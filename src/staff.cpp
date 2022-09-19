@@ -607,20 +607,6 @@ int Staff::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::CalcLedgerLinesEnd(FunctorParams *functorParams)
-{
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
-    assert(params);
-
-    const int extension = params->m_doc->GetDrawingLedgerLineExtension(m_drawingStaffSize, false);
-    const int minExtension = params->m_doc->GetDrawingMinimalLedgerLineExtension(m_drawingStaffSize, false);
-    const double cueScaling = params->m_doc->GetCueScaling();
-    AdjustLedgerLines(m_ledgerLinesAbove, m_ledgerLinesAboveCue, cueScaling, extension, minExtension);
-    AdjustLedgerLines(m_ledgerLinesBelow, m_ledgerLinesBelowCue, cueScaling, extension, minExtension);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     PrepareStaffCurrentTimeSpanningParams *params

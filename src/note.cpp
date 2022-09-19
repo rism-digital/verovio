@@ -1206,46 +1206,6 @@ MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary) const
     return dotLocs;
 }
 
-int Note::CalcLedgerLines(FunctorParams *functorParams)
-{
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
-    assert(params);
-
-    if (this->GetVisible() == BOOLEAN_false) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    if (!this->IsVisible()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    const int staffSize = staff->m_drawingStaffSize;
-    const int staffX = staff->GetDrawingX();
-    const bool drawingCueSize = this->GetDrawingCueSize();
-    const int radius = this->GetDrawingRadius(params->m_doc);
-
-    /************** Ledger lines: **************/
-
-    int linesAbove = 0;
-    int linesBelow = 0;
-
-    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_SIBLINGS;
-
-    const int extension = params->m_doc->GetDrawingLedgerLineExtension(staffSize, drawingCueSize);
-    const int left = this->GetDrawingX() - extension - staffX;
-    int right = this->GetDrawingX() + 2 * radius + extension - staffX;
-
-    if (linesAbove > 0) {
-        staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize);
-    }
-    else {
-        staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));

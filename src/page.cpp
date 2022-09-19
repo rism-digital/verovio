@@ -15,6 +15,7 @@
 
 #include "bboxdevicecontext.h"
 #include "calcdots.h"
+#include "calcledgerlines.h"
 #include "comparison.h"
 #include "doc.h"
 #include "functor.h"
@@ -245,10 +246,8 @@ void Page::LayOutTranscription(bool force)
     Functor adjustXRelForTranscription(&Object::AdjustXRelForTranscription);
     this->Process(&adjustXRelForTranscription, NULL);
 
-    FunctorDocParams calcLedgerLinesParams(doc);
-    Functor calcLedgerLines(&Object::CalcLedgerLines);
-    Functor calcLedgerLinesEnd(&Object::CalcLedgerLinesEnd);
-    this->Process(&calcLedgerLines, &calcLedgerLinesParams, &calcLedgerLinesEnd);
+    CalcLedgerLines calcLedgerLines(doc);
+    this->Process(calcLedgerLines);
 
     m_layoutDone = true;
 }
@@ -495,10 +494,8 @@ void Page::LayOutVertically()
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
     this->Process(&resetVerticalAlignment, NULL);
 
-    FunctorDocParams calcLedgerLinesParams(doc);
-    Functor calcLedgerLines(&Object::CalcLedgerLines);
-    Functor calcLedgerLinesEnd(&Object::CalcLedgerLinesEnd);
-    this->Process(&calcLedgerLines, &calcLedgerLinesParams, &calcLedgerLinesEnd);
+    CalcLedgerLines calcLedgerLines(doc);
+    this->Process(calcLedgerLines);
 
     // Align the content of the page using system aligners
     // After this:
