@@ -240,12 +240,12 @@ int Staff::CalcPitchPosYRel(const Doc *doc, int loc) const
 
 void Staff::AddLedgerLineAbove(int count, int left, int right, int extension, bool cueSize)
 {
-    AddLedgerLines(cueSize ? m_ledgerLinesAboveCue : m_ledgerLinesAbove, count, left, right, extension);
+    this->AddLedgerLines(cueSize ? m_ledgerLinesAboveCue : m_ledgerLinesAbove, count, left, right, extension);
 }
 
 void Staff::AddLedgerLineBelow(int count, int left, int right, int extension, bool cueSize)
 {
-    AddLedgerLines(cueSize ? m_ledgerLinesBelowCue : m_ledgerLinesBelow, count, left, right, extension);
+    this->AddLedgerLines(cueSize ? m_ledgerLinesBelowCue : m_ledgerLinesBelow, count, left, right, extension);
 }
 
 void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension)
