@@ -45,7 +45,11 @@ public:
 protected:
     //
 private:
-    //
+    /**
+     * Shorten ledger lines which overlap with neighbors
+     */
+    void AdjustLedgerLines(
+        ArrayOfLedgerLines &lines, ArrayOfLedgerLines &cueLines, double cueScaling, int extension, int minExtension);
 
 public:
     //

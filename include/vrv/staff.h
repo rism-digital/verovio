@@ -162,12 +162,6 @@ public:
     ///@}
 
     /**
-     * Shorten ledger lines which overlap with neighbors
-     */
-    void AdjustLedgerLines(
-        ArrayOfLedgerLines &lines, ArrayOfLedgerLines &cueLines, double cueScaling, int extension, int minExtension);
-
-    /**
      * Used for calculating clustered information/dot position.
      * The *Doc is the parent doc but passed as param in order to avoid look-up
      */
