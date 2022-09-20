@@ -2854,7 +2854,7 @@ std::string HumdrumInput::getInstrumentName(StaffDef *sd)
         return "";
     }
     Text *text = (Text *)obj;
-    std::string name = UTF16to8(text->GetText());
+    std::string name = UTF32to8(text->GetText());
     if (name == "    ") {
         name = "";
     }
@@ -2877,7 +2877,7 @@ std::string HumdrumInput::getInstrumentAbbreviation(StaffDef *sd)
         return "";
     }
     Text *text = (Text *)obj;
-    std::string name = UTF16to8(text->GetText());
+    std::string name = UTF32to8(text->GetText());
     return name;
 }
 
@@ -5372,7 +5372,7 @@ void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const std::string
     name8 = std::regex_replace(name8, exp3, "$1\xe2\x99\xaf");
     name8 = std::regex_replace(name8, exp4, "$1\xe2\x99\xaf");
 
-    std::u32string name16 = UTF8to16(name8);
+    std::u32string name16 = UTF8to32(name8);
     text->SetText(name16);
     label->AddChild(text);
     label->SetParent(element);
@@ -7667,7 +7667,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 content = cleanHarmString3(*token);
             }
             else if (isCData) {
-                content = UTF8to16(*token);
+                content = UTF8to32(*token);
             }
             else {
                 content = cleanHarmString(*token);
@@ -8128,7 +8128,7 @@ std::u32string HumdrumInput::cleanHarmString2(const std::string &content)
         else {
             std::string tdee;
             tdee = content[i];
-            output += UTF8to16(tdee);
+            output += UTF8to32(tdee);
         }
     }
 
@@ -8160,7 +8160,7 @@ std::u32string HumdrumInput::cleanStringString(const std::string &content)
             default:
                 value.clear();
                 value.push_back(content[i]);
-                output += UTF8to16(value);
+                output += UTF8to32(value);
         }
     }
     return output;
@@ -8186,7 +8186,7 @@ std::u32string HumdrumInput::cleanHarmString(const std::string &content)
         if (foundspace && !foundslash) {
             std::string tdee;
             tdee = content[i];
-            kind += UTF8to16(tdee);
+            kind += UTF8to32(tdee);
             continue;
         }
         if (content[i] == ' ') {
@@ -8207,7 +8207,7 @@ std::u32string HumdrumInput::cleanHarmString(const std::string &content)
             else {
                 std::string tdee;
                 tdee = content[i];
-                root += UTF8to16(tdee);
+                root += UTF8to32(tdee);
             }
         }
         else if (foundslash) {
@@ -8220,7 +8220,7 @@ std::u32string HumdrumInput::cleanHarmString(const std::string &content)
             else {
                 std::string tdee;
                 tdee = content[i];
-                bass += UTF8to16(tdee);
+                bass += UTF8to32(tdee);
             }
         }
         else {
@@ -15324,18 +15324,18 @@ void HumdrumInput::insertTwoRhythmsAndTextBetween(
 
     Rend *rend1 = new Rend();
     Text *text1 = new Text();
-    text1->SetText(UTF8to16(newnote1));
+    text1->SetText(UTF8to32(newnote1));
     rend1->AddChild(text1);
     rend1->SetFontfam("smufl");
     element->AddChild(rend1);
 
     Text *middleText = new Text();
-    middleText->SetText(UTF8to16(text));
+    middleText->SetText(UTF8to32(text));
     element->AddChild(middleText);
 
     Rend *rend2 = new Rend();
     Text *text2 = new Text();
-    text2->SetText(UTF8to16(newnote2));
+    text2->SetText(UTF8to32(newnote2));
     rend2->AddChild(text2);
     rend2->SetFontfam("smufl");
     element->AddChild(rend2);
@@ -15355,7 +15355,7 @@ template <class ELEMENT> void HumdrumInput::addVerovioTextElement(ELEMENT *eleme
     Rend *rend = new Rend();
     Text *text = new Text();
     std::string newtext = unescapeHtmlEntities(smuflentities);
-    text->SetText(UTF8to16(newtext));
+    text->SetText(UTF8to32(newtext));
     rend->AddChild(text);
     rend->SetFontstyle(FONTSTYLE_normal);
     rend->SetFontfam("smufl");
@@ -15452,7 +15452,7 @@ void HumdrumInput::addTextElement(
             element->AddChild(rend);
 
             rend->AddChild(text);
-            text->SetText(UTF8to16(pretext));
+            text->SetText(UTF8to32(pretext));
             setFontStyle(rend, myfontstyle);
             // addTextElement(element, pretext, myfontstyle, addSpacer);
         }
@@ -15484,7 +15484,7 @@ void HumdrumInput::addTextElement(
 
     for (int i = 0; i < (int)pieces.size(); ++i) {
         data = pieces[i];
-        text->SetText(UTF8to16(data));
+        text->SetText(UTF8to32(data));
 
         if (myfontstyle.empty()) {
             if (text != NULL) {
@@ -21802,7 +21802,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             if (!verselabel.empty()) {
                 Label *label = new Label();
                 Text *text = new Text();
-                std::u32string wtext = UTF8to16(verselabel);
+                std::u32string wtext = UTF8to32(verselabel);
                 text->SetText(wtext);
                 verse->AddChild(label);
                 label->AddChild(text);
@@ -21810,7 +21810,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             if (!verseabbrlabel.empty()) {
                 LabelAbbr *labelabbr = new LabelAbbr();
                 Text *text = new Text();
-                std::u32string wtext = UTF8to16(verseabbrlabel);
+                std::u32string wtext = UTF8to32(verseabbrlabel);
                 text->SetText(wtext);
                 verse->AddChild(labelabbr);
                 labelabbr->AddChild(text);
@@ -24514,7 +24514,7 @@ void HumdrumInput::checkForRehearsal(int line)
         Reh *reh = new Reh();
         Rend *rend = new Rend();
         Text *text = new Text();
-        std::u32string wtext = UTF8to16(tvalue);
+        std::u32string wtext = UTF8to32(tvalue);
         text->SetText(wtext);
         reh->AddChild(rend);
         rend->AddChild(text);

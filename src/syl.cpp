@@ -198,7 +198,7 @@ int Syl::GenerateMIDI(FunctorParams *functorParams)
 
     const int startTime = params->m_totalTime + params->m_lastNote->GetScoreTimeOnset();
     Text *text = vrv_cast<Text *>(this->GetChild(0, TEXT));
-    const std::string sylText = UTF16to8(text->GetText());
+    const std::string sylText = UTF32to8(text->GetText());
 
     params->m_midiFile->addLyric(params->m_midiTrack, startTime * params->m_midiFile->getTPQ(), sylText);
 

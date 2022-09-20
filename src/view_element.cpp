@@ -1671,7 +1671,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         dc->SetFont(&vrvTxt);
         std::u32string str;
         str.push_back(VRV_TEXT_E551);
-        dc->DrawText(UTF16to8(str), str);
+        dc->DrawText(UTF32to8(str), str);
         dc->ResetFont();
         dc->ReactivateGraphic();
         dc->DeactivateGraphicY();

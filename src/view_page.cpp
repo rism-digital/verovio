@@ -1921,7 +1921,7 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextEl
 
     Annot *annot = vrv_cast<Annot *>(element);
     assert(annot);
-    dc->AddDescription(UTF16to8(annot->GetText(annot)));
+    dc->AddDescription(UTF32to8(annot->GetText(annot)));
 
     if (isTextElement) {
         dc->EndTextGraphic(element, this);

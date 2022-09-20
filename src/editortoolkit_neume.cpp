@@ -1068,7 +1068,7 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
 bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
 {
     std::string status = "OK", message = "";
-    const std::u32string wtext = UTF8to16(text);
+    const std::u32string wtext = UTF8to32(text);
     if (!m_doc->GetDrawingPage()) {
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Could not find drawing page.");

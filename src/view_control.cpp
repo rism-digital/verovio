@@ -2747,7 +2747,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
             Text text;
             text.SetParent(ending);
-            text.SetText(UTF8to16(strStream.str()));
+            text.SetText(UTF8to32(strStream.str()));
 
             int textX = x1;
             if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {

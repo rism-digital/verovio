@@ -164,7 +164,7 @@ std::u32string View::IntToSmuflFigures(unsigned short number, int offset)
 {
     std::ostringstream stream;
     stream << number;
-    std::u32string str = UTF8to16(stream.str());
+    std::u32string str = UTF8to32(stream.str());
 
     int i;
     for (i = 0; i < (int)str.size(); ++i) {

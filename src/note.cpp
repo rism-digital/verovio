@@ -329,7 +329,7 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType) const
     }
     else {
         std::string str = StringFormat("%d", this->GetTabFret());
-        return UTF8to16(str);
+        return UTF8to32(str);
     }
 }
 

@@ -64,7 +64,7 @@ void View::DrawTextString(DeviceContext *dc, std::u32string str, TextDrawingPara
 {
     assert(dc);
 
-    dc->DrawText(UTF16to8(str), str);
+    dc->DrawText(UTF32to8(str), str);
 }
 
 void View::DrawDirString(DeviceContext *dc, std::u32string str, TextDrawingParams &params)
@@ -155,7 +155,7 @@ void View::DrawHarmString(DeviceContext *dc, std::u32string str, TextDrawingPara
         // If pos is > than the previous, it is the substring to extract
         if (pos > prevPos) {
             std::u32string substr = str.substr(prevPos, pos - prevPos);
-            dc->DrawText(UTF16to8(substr), substr, toDcX, toDcY);
+            dc->DrawText(UTF32to8(substr), substr, toDcX, toDcY);
             // Once we have rendered the some text to not pass x / y anymore
             toDcX = VRV_UNSET;
             toDcY = VRV_UNSET;
@@ -191,7 +191,7 @@ void View::DrawHarmString(DeviceContext *dc, std::u32string str, TextDrawingPara
             vrvTxt.SetSmuflFont(true);
             dc->SetFont(&vrvTxt);
             // Once we have rendered the some text to not pass x / y anymore
-            dc->DrawText(UTF16to8(smuflAccid), smuflAccid, toDcX, toDcY);
+            dc->DrawText(UTF32to8(smuflAccid), smuflAccid, toDcX, toDcY);
             dc->ResetFont();
             toDcX = VRV_UNSET;
             toDcY = VRV_UNSET;
@@ -202,7 +202,7 @@ void View::DrawHarmString(DeviceContext *dc, std::u32string str, TextDrawingPara
     // Print the remainder of the string, or the full string if no accid
     if (prevPos < str.length()) {
         std::u32string substr = str.substr(prevPos, std::wstring::npos);
-        dc->DrawText(UTF16to8(substr), substr, toDcX, toDcY);
+        dc->DrawText(UTF32to8(substr), substr, toDcX, toDcY);
     }
 
     // Disable x for what is comming next as child of <f>
@@ -262,10 +262,10 @@ void View::DrawLyricString(
         auto index = str.find_first_of(U"_");
         syl = str.substr(0, index);
         if (params) {
-            dc->DrawText(UTF16to8(syl), syl, params->m_x, params->m_y, params->m_width, params->m_height);
+            dc->DrawText(UTF32to8(syl), syl, params->m_x, params->m_y, params->m_width, params->m_height);
         }
         else {
-            dc->DrawText(UTF16to8(syl), syl);
+            dc->DrawText(UTF32to8(syl), syl);
         }
 
         // no _
@@ -279,10 +279,10 @@ void View::DrawLyricString(
         std::u32string elision;
         elision.push_back(VRV_TEXT_E551);
         if (params) {
-            dc->DrawText(UTF16to8(elision), elision, params->m_x, params->m_y, params->m_width, params->m_height);
+            dc->DrawText(UTF32to8(elision), elision, params->m_x, params->m_y, params->m_width, params->m_height);
         }
         else {
-            dc->DrawText(UTF16to8(elision), elision);
+            dc->DrawText(UTF32to8(elision), elision);
         }
         dc->ResetFont();
 

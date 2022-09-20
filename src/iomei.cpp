@@ -2864,10 +2864,10 @@ void MEIOutput::WriteText(pugi::xml_node element, Text *text)
     if (!text->GetText().empty()) {
         pugi::xml_node nodechild = element.append_child(pugi::node_pcdata);
         if (m_doc->GetOptions()->m_outputSmuflXmlEntities.GetValue()) {
-            nodechild.text() = UTF16to8(EscapeSMuFL(text->GetText()).c_str()).c_str();
+            nodechild.text() = UTF32to8(EscapeSMuFL(text->GetText()).c_str()).c_str();
         }
         else {
-            nodechild.text() = UTF16to8(text->GetText()).c_str();
+            nodechild.text() = UTF32to8(text->GetText()).c_str();
         }
     }
 }
@@ -3170,7 +3170,7 @@ std::u32string MEIOutput::EscapeSMuFL(std::u32string data)
         else if (data[pos] > 0xE000) {
             std::ostringstream ss;
             ss << std::hex << (int)data[pos];
-            std::u32string smuflCode = UTF8to16(ss.str());
+            std::u32string smuflCode = UTF8to32(ss.str());
             buffer.append(U"&#x").append(smuflCode).append(U";");
         }
         else
@@ -6791,7 +6791,7 @@ bool MEIInput::ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool
     Text *vrvText = new Text();
 
     assert(text.text());
-    std::u32string str = UTF8to16(text.text().as_string());
+    std::u32string str = UTF8to32(text.text().as_string());
     if (trimLeft) str = this->LeftTrim(str);
     if (trimRight) str = this->RightTrim(str);
 
@@ -7814,7 +7814,7 @@ void MEIInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvSta
 {
     if (staffDef.attribute("label")) {
         Text *text = new Text();
-        text->SetText(UTF8to16(staffDef.attribute("label").value()));
+        text->SetText(UTF8to32(staffDef.attribute("label").value()));
         Label *label = new Label();
         label->AddChild(text);
         vrvStaffDef->AddChild(label);
@@ -7822,7 +7822,7 @@ void MEIInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvSta
     }
     if (staffDef.attribute("label.abbr")) {
         Text *text = new Text();
-        text->SetText(UTF8to16(staffDef.attribute("label.abbr").value()));
+        text->SetText(UTF8to32(staffDef.attribute("label.abbr").value()));
         LabelAbbr *labelAbbr = new LabelAbbr();
         labelAbbr->AddChild(text);
         vrvStaffDef->AddChild(labelAbbr);
@@ -7838,7 +7838,7 @@ void MEIInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvSta
     }
     if (staffGrp.attribute("label")) {
         Text *text = new Text();
-        text->SetText(UTF8to16(staffGrp.attribute("label").value()));
+        text->SetText(UTF8to32(staffGrp.attribute("label").value()));
         Label *label = new Label();
         label->AddChild(text);
         vrvStaffGrp->AddChild(label);
@@ -7846,7 +7846,7 @@ void MEIInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvSta
     }
     if (staffGrp.attribute("label.abbr")) {
         Text *text = new Text();
-        text->SetText(UTF8to16(staffGrp.attribute("label.abbr").value()));
+        text->SetText(UTF8to32(staffGrp.attribute("label.abbr").value()));
         LabelAbbr *labelAbbr = new LabelAbbr();
         labelAbbr->AddChild(text);
         vrvStaffGrp->AddChild(labelAbbr);
