@@ -206,6 +206,25 @@ bool vrvToolkit_loadZipDataBuffer(void *tkPtr, const unsigned char *data, int le
     return tk->LoadZipDataBuffer(data, length);
 }
 
+void vrvToolkit_redoLayout(void *tkPtr, const char *c_options)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->RedoLayout(c_options);
+}
+
+void vrvToolkit_redoPagePitchPosLayout(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->RedoPagePitchPosLayout();
+}
+
+const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *options)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RenderData(data, options));
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_renderToMIDI(void *tkPtr, const char *c_options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
@@ -232,27 +251,6 @@ const char *vrvToolkit_renderToTimemap(void *tkPtr, const char *c_options)
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     tk->SetCString(tk->RenderToTimemap(c_options));
     return tk->GetCString();
-}
-
-void vrvToolkit_redoLayout(void *tkPtr, const char *c_options)
-{
-    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->RedoLayout(c_options);
-}
-
-void vrvToolkit_redoPagePitchPosLayout(void *tkPtr)
-{
-    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->RedoPagePitchPosLayout();
-}
-
-const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *options)
-{
-    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    vrvToolkit_setOptions(tk, options);
-    vrvToolkit_loadData(tk, data);
-
-    return vrvToolkit_renderToSVG(tk, 1, false);
 }
 
 void vrvToolkit_resetOptions(void *tkPtr)
