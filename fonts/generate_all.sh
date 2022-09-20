@@ -9,18 +9,18 @@ echo "Generating C++ header file ..."
 $PYTHON generate-smufl-code.py
 
 echo "Generating Bravura files ..."
-$PYTHON extract-bounding-boxes.py Bravura.svg json/bravura_metadata.json ../data/Bravura.xml
+$PYTHON extract-bounding-boxes.py Bravura
 
 echo "Generating Leipzig files ..."
-$PYTHON extract-bounding-boxes.py Leipzig.svg json/leipzig_metadata.json ../data/Leipzig.xml
+$PYTHON extract-bounding-boxes.py Leipzig
 
 echo "Generating Gootville files ..."
-$PYTHON extract-bounding-boxes.py Gootville.svg json/gootville_metadata.json ../data/Gootville.xml
+$PYTHON extract-bounding-boxes.py Gootville
 
 echo "Generating Petaluma files ..."
-$PYTHON extract-bounding-boxes.py Petaluma.svg json/petaluma_metadata.json ../data/Petaluma.xml
+$PYTHON extract-bounding-boxes.py Petaluma
 
 echo "Generating Leland files ..."
-$PYTHON extract-bounding-boxes.py Leland.svg json/leland_metadata.json ../data/Leland.xml
+$PYTHON extract-bounding-boxes.py Leland
 
 echo "Done!"
