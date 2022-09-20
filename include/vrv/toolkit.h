@@ -132,7 +132,7 @@ public:
     std::string GetVersion();
 
     /**
-     * Reset the @xml:id seed
+     * Reset the seed used to generate MEI xml:id attribute values
      *
      * Passing 0 will seed the xml:id generator with a random (time-based) seed value.
      * This method will have no effect if the --xml-id-checksum option is set.
