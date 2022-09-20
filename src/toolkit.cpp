@@ -115,13 +115,6 @@ Toolkit::~Toolkit()
 #endif
 }
 
-std::string Toolkit::GetUuid()
-{
-    LogWarning("Toolkit function GetUuid() is deprecated; use GetID() instead.");
-
-    return this->GetID();
-}
-
 std::string Toolkit::GetResourcePath() const
 {
     return m_doc.GetResources().GetPath();
