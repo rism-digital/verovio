@@ -361,6 +361,18 @@ public:
     ///@{
 
     /**
+     * Render the first page of the data to SVG
+     *
+     * This method is a wrapper for setting options, loading data and rendering the first page.
+     * It will return an empty string if the options cannot be set or the data cannot be loaded.
+     *
+     * @param data A string with the data (e.g., MEI data) to be loaded
+     * @param jsonOptions A stringified JSON objects with the output options
+     * @return The SVG first page as a string
+     */
+    std::string RenderData(const std::string &data, const std::string &jsonOptions);
+    
+    /**
      * Render a page to SVG.
      *
      * @param pageNo The page to render (1-based)

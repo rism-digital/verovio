@@ -1383,6 +1383,14 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     return true;
 }
 
+std::string Toolkit::RenderData(const std::string &data, const std::string &jsonOptions)
+{
+    if (this->SetOptions(jsonOptions) && this->LoadData(data)) return this->RenderToSVG(1);
+    
+    // Otherwise just return an empty string.
+    return "";
+}
+
 std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 {
     this->ResetLogBuffer();
