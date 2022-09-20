@@ -89,12 +89,18 @@ public:
     /**
      * Return the ID of the Toolkit instance.
      *
+     * @ingroup nojs
+     *
      * @return The ID as as string
      */
     std::string GetID() { return m_doc.GetID(); }
 
     /**
      * Get the resource path for the Toolkit instance.
+     *
+     * @ingroup nojs
+     *
+     * @return A string with the resource path
      */
     std::string GetResourcePath() const;
 
@@ -103,6 +109,8 @@ public:
      *
      * This method needs to be called if the constructor had initFont=false or if the resource path
      * needs to be changed.
+     *
+     * @ingroup nojs
      *
      * @param path The path to the resource directory
      * @return True if the resources was successfully loaded
@@ -146,6 +154,8 @@ public:
      * Load a file from the file system.
      *
      * Previously convert UTF16 files to UTF8 or extract files from MusicXML compressed files.
+     *
+     * @ingroup nojs
      *
      * @param filename The filename to be loaded
      * @return True if the file was successfully loaded
@@ -252,6 +262,8 @@ public:
     /**
      * Get the value for an option
      *
+     * @ingroup nojs
+     *
      * @param option The name of the option
      * @param defaultValue True to get the default value of the option
      * @return The option value as a string
@@ -260,6 +272,8 @@ public:
 
     /**
      * Set the value for an option
+     *
+     * @ingroup nojs
      *
      * @param option The name of the option
      * @param value The option value as string
