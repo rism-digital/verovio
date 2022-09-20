@@ -107,11 +107,6 @@ public:
     bool SetResourcePath(const std::string &path);
 
     /**
-     * Set the font in the resources
-     */
-    bool SetFont(const std::string &fontName);
-
-    /**
      * Get the log content for the latest operation
      *
      * @return The log content as a string
@@ -752,6 +747,7 @@ protected:
     void ResetLogBuffer();
 
 private:
+    bool SetFont(const std::string &fontName);
     bool IsUTF16(const std::string &filename);
     bool LoadUTF16File(const std::string &filename);
     bool IsZip(const std::string &filename);

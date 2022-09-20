@@ -442,7 +442,7 @@ int main(int argc, char **argv)
     }
 
     // Load a specified font
-    if (!toolkit.SetFont(options->m_font.GetValue())) {
+    if (!toolkit.SetOption("font", options->m_font.GetValue())) {
         std::cerr << "Font '" << options->m_font.GetValue() << "' could not be loaded." << std::endl;
         exit(1);
     }
