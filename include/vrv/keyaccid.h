@@ -57,7 +57,7 @@ public:
      * Retrieve SMuFL string for the accidental.
      * This will include brackets
      */
-    std::wstring GetSymbolStr(data_NOTATIONTYPE notationType) const;
+    std::u32string GetSymbolStr(data_NOTATIONTYPE notationType) const;
 
     /**
      * Determine the staff location

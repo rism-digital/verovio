@@ -364,7 +364,7 @@ typedef std::map<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> MapOfPitchAccid;
 
 typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
-typedef std::vector<std::pair<std::wstring, bool>> ArrayOfStringDynamTypePairs;
+typedef std::vector<std::pair<std::u32string, bool>> ArrayOfStringDynamTypePairs;
 
 typedef std::map<std::string, std::function<Object *(void)>> MapOfStrConstructors;
 
@@ -473,11 +473,11 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
  */
 
 #define VRV_TEXT_HARM                                                                                                  \
-    L"\u266D\u266E\u266F"                                                                                              \
-    L"\uE260\uE261\uE262\uE263\uE264"                                                                                  \
-    L"\uEA50\uEA51\uEA52\uEA53\uEA54\uEA55\uEA56\uEA57\uEA58\uEA59\uEA5A\uEA5B\uEA5C\uEA5D\uEA5E"                      \
-    L"\uEA5F\uEA60\uEA61\uEA62\uEA63\uEA64\uEA65\uEA66\uEA67"                                                          \
-    L"\uECC0"
+    U"\u266D\u266E\u266F"                                                                                              \
+    U"\uE260\uE261\uE262\uE263\uE264"                                                                                  \
+    U"\uEA50\uEA51\uEA52\uEA53\uEA54\uEA55\uEA56\uEA57\uEA58\uEA59\uEA5A\uEA5B\uEA5C\uEA5D\uEA5E"                      \
+    U"\uEA5F\uEA60\uEA61\uEA62\uEA63\uEA64\uEA65\uEA66\uEA67"                                                          \
+    U"\uECC0"
 
 //----------------------------------------------------------------------------
 // data.LINEWIDTHTERM factors

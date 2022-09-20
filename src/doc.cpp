@@ -1504,7 +1504,7 @@ int Doc::GetPageCount() const
     return ((pages) ? pages->GetChildCount() : 0);
 }
 
-int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
@@ -1517,7 +1517,7 @@ int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const
     return h;
 }
 
-int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphWidth(char32_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
@@ -1530,7 +1530,7 @@ int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
     return w;
 }
 
-int Doc::GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphAdvX(char32_t code, int staffSize, bool graceSize) const
 {
     const Resources &resources = this->GetResources();
     const Glyph *glyph = resources.GetGlyph(code);
@@ -1560,7 +1560,7 @@ Point Doc::ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staf
     return point;
 }
 
-int Doc::GetGlyphLeft(wchar_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphLeft(char32_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
@@ -1573,12 +1573,12 @@ int Doc::GetGlyphLeft(wchar_t code, int staffSize, bool graceSize) const
     return x;
 }
 
-int Doc::GetGlyphRight(wchar_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphRight(char32_t code, int staffSize, bool graceSize) const
 {
     return this->GetGlyphLeft(code, staffSize, graceSize) + this->GetGlyphWidth(code, staffSize, graceSize);
 }
 
-int Doc::GetGlyphBottom(wchar_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphBottom(char32_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
@@ -1591,12 +1591,12 @@ int Doc::GetGlyphBottom(wchar_t code, int staffSize, bool graceSize) const
     return y;
 }
 
-int Doc::GetGlyphTop(wchar_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphTop(char32_t code, int staffSize, bool graceSize) const
 {
     return this->GetGlyphBottom(code, staffSize, graceSize) + this->GetGlyphHeight(code, staffSize, graceSize);
 }
 
-int Doc::GetTextGlyphHeight(wchar_t code, const FontInfo *font, bool graceSize) const
+int Doc::GetTextGlyphHeight(char32_t code, const FontInfo *font, bool graceSize) const
 {
     assert(font);
 
@@ -1610,7 +1610,7 @@ int Doc::GetTextGlyphHeight(wchar_t code, const FontInfo *font, bool graceSize) 
     return h;
 }
 
-int Doc::GetTextGlyphWidth(wchar_t code, const FontInfo *font, bool graceSize) const
+int Doc::GetTextGlyphWidth(char32_t code, const FontInfo *font, bool graceSize) const
 {
     assert(font);
 
@@ -1624,7 +1624,7 @@ int Doc::GetTextGlyphWidth(wchar_t code, const FontInfo *font, bool graceSize) c
     return w;
 }
 
-int Doc::GetTextGlyphAdvX(wchar_t code, const FontInfo *font, bool graceSize) const
+int Doc::GetTextGlyphAdvX(char32_t code, const FontInfo *font, bool graceSize) const
 {
     assert(font);
 
@@ -1637,7 +1637,7 @@ int Doc::GetTextGlyphAdvX(wchar_t code, const FontInfo *font, bool graceSize) co
     return advX;
 }
 
-int Doc::GetTextGlyphDescender(wchar_t code, const FontInfo *font, bool graceSize) const
+int Doc::GetTextGlyphDescender(char32_t code, const FontInfo *font, bool graceSize) const
 {
     assert(font);
 

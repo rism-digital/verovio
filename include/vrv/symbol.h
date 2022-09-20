@@ -44,7 +44,7 @@ public:
     /**
      * Get the SMuFL glyph for the symbol based on glyph.num or glyph.name
      */
-    wchar_t GetSymbolGlyph() const;
+    char32_t GetSymbolGlyph() const;
 
 private:
     //

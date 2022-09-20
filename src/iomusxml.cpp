@@ -713,14 +713,14 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
     for (auto iter = metronomeElements.begin(); iter != metronomeElements.end(); ++iter) {
         switch (iter->first) {
             case MetronomeElements::BEAT_UNIT: {
-                std::wstring verovioText = ConvertTypeToVerovioText(iter->second);
+                std::u32string verovioText = ConvertTypeToVerovioText(iter->second);
                 // find separator or use end() if there is no separator
                 const auto separator = std::find_if(iter, metronomeElements.end(),
                     [](const auto pair) { return pair.first == MetronomeElements::SEPARATOR; });
                 const short int dotCount = (short int)std::count_if(
                     iter, separator, [](const auto pair) { return pair.first == MetronomeElements::BEAT_UNIT_DOT; });
                 for (short int i = 0; i < dotCount; i++) {
-                    verovioText += L"\xE1E7"; // SMUFL augmentation dot
+                    verovioText += U"\xE1E7"; // SMUFL augmentation dot
                 }
                 // set @mmUnit and @mmDots attributes only based on the first beat-unit in the sequence
                 if (start) {
@@ -1973,7 +1973,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
-        std::wstring codaSign = UTF8to16("\xF0\x9D\x84\x8C");
+        std::u32string codaSign = UTF8to16("\xF0\x9D\x84\x8C");
         text->SetText(codaSign);
         rend->AddChild(text);
         dir->AddChild(rend);
@@ -2399,7 +2399,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
-        std::wstring segnoSign = UTF8to16("\xF0\x9D\x84\x8B");
+        std::u32string segnoSign = UTF8to16("\xF0\x9D\x84\x8B");
         text->SetText(segnoSign);
         rend->AddChild(text);
         dir->AddChild(rend);
@@ -4091,22 +4091,22 @@ data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(const std::string &value)
     return TEXTRENDITION_NONE;
 }
 
-std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
+std::u32string MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
 {
-    static const std::map<std::string, std::wstring> Type2VerovioText{
-        { "long", L"\xE1D0" }, // there is no matching glyph in this SMuFL range
-        { "breve", L"\xE1D1" }, //
-        { "whole", L"\xE1D2" }, //
-        { "half", L"\xE1D3" }, //
-        { "quarter", L"\xE1D5" }, //
-        { "eighth", L"\xE1D7" }, //
-        { "16th", L"\xE1D9" }, //
-        { "32nd", L"\xE1DB" }, //
-        { "64th", L"\xE1DD" }, //
-        { "128th", L"\xE1DF" }, //
-        { "256th", L"\xE1E1" }, //
-        { "512th", L"\xE1E3" }, //
-        { "1024th", L"\xE1E5" } //
+    static const std::map<std::string, std::u32string> Type2VerovioText{
+        { "long", U"\xE1D0" }, // there is no matching glyph in this SMuFL range
+        { "breve", U"\xE1D1" }, //
+        { "whole", U"\xE1D2" }, //
+        { "half", U"\xE1D3" }, //
+        { "quarter", U"\xE1D5" }, //
+        { "eighth", U"\xE1D7" }, //
+        { "16th", U"\xE1D9" }, //
+        { "32nd", U"\xE1DB" }, //
+        { "64th", U"\xE1DD" }, //
+        { "128th", U"\xE1DF" }, //
+        { "256th", U"\xE1E1" }, //
+        { "512th", U"\xE1E3" }, //
+        { "1024th", U"\xE1E5" } //
     };
 
     const auto result = Type2VerovioText.find(value);
@@ -4115,7 +4115,7 @@ std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
     }
 
     LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
-    return std::wstring();
+    return std::u32string();
 }
 
 data_HEADSHAPE MusicXmlInput::ConvertNotehead(const std::string &value)

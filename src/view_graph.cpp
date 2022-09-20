@@ -285,13 +285,13 @@ void View::DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, in
         horizontalThickness, verticalThickness);
 }
 
-void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph)
+void View::DrawSmuflCode(DeviceContext *dc, int x, int y, char32_t code, int staffSize, bool dimin, bool setBBGlyph)
 {
     assert(dc);
 
     if (code == 0) return;
 
-    std::wstring str;
+    std::u32string str;
     str.push_back(code);
 
     dc->SetBrush(m_currentColour, AxSOLID);
@@ -306,7 +306,7 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
 }
 
 void View::DrawSmuflLine(
-    DeviceContext *dc, Point orig, int length, int staffSize, bool dimin, wchar_t fill, wchar_t start, wchar_t end)
+    DeviceContext *dc, Point orig, int length, int staffSize, bool dimin, char32_t fill, char32_t start, char32_t end)
 {
     assert(dc);
 
@@ -324,7 +324,7 @@ void View::DrawSmuflLine(
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
-    std::wstring str;
+    std::u32string str;
 
     if (start != 0) {
         str.push_back(start);
@@ -344,7 +344,7 @@ void View::DrawSmuflLine(
     dc->ResetBrush();
 }
 
-void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data_HORIZONTALALIGNMENT alignment,
+void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::u32string s, data_HORIZONTALALIGNMENT alignment,
     int staffSize, bool dimin, bool setBBGlyph)
 {
     assert(dc);

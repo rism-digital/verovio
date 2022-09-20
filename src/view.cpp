@@ -150,21 +150,21 @@ Point View::ToLogical(Point p)
     return Point(ToLogicalX(p.x), ToLogicalY(p.y));
 }
 
-std::wstring View::IntToTupletFigures(unsigned short number)
+std::u32string View::IntToTupletFigures(unsigned short number)
 {
     return IntToSmuflFigures(number, 0xE880);
 }
 
-std::wstring View::IntToTimeSigFigures(unsigned short number)
+std::u32string View::IntToTimeSigFigures(unsigned short number)
 {
     return IntToSmuflFigures(number, 0xE080);
 }
 
-std::wstring View::IntToSmuflFigures(unsigned short number, int offset)
+std::u32string View::IntToSmuflFigures(unsigned short number, int offset)
 {
-    std::wostringstream stream;
+    std::ostringstream stream;
     stream << number;
-    std::wstring str = stream.str();
+    std::u32string str = UTF8to16(stream.str());
 
     int i;
     for (i = 0; i < (int)str.size(); ++i) {

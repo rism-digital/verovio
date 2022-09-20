@@ -62,7 +62,7 @@ public:
     data_ACCIDENTAL_GESTURAL GetAccidG() const;
     data_ACCIDENTAL_WRITTEN GetAccidW() const;
     data_PITCHNAME GetPitchName() const;
-    std::wstring GetPitchString() const;
+    std::u32string GetPitchString() const;
     std::string GetSimplePitchString() const;
     bool IsValid(int maxAccid);
     void SetPitch(int aPname, int anAccid, int anOct);

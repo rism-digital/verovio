@@ -65,12 +65,12 @@ public:
     /**
      * Get the SMuFL glyph for the fermata based on type, shape or glyph.num
      */
-    wchar_t GetFermataGlyph() const;
+    char32_t GetFermataGlyph() const;
 
     /**
      * Retrieve parentheses / brackets from the enclose attribute
      */
-    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs() const;
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
 
     //----------------//
     // Static methods //
@@ -79,7 +79,7 @@ public:
     /**
      * Retrieves the vertical alignment for the fermata SMuFL code
      */
-    static data_VERTICALALIGNMENT GetVerticalAlignment(wchar_t code);
+    static data_VERTICALALIGNMENT GetVerticalAlignment(char32_t code);
 
     //----------//
     // Functors //

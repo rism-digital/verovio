@@ -161,7 +161,7 @@ public:
      * @name Return the smufl string to use for a note give the notation type
      */
     ///@{
-    std::wstring GetTabFretString(data_NOTATIONTYPE notationType) const;
+    std::u32string GetTabFretString(data_NOTATIONTYPE notationType) const;
     ///@}
 
     /**
@@ -204,12 +204,12 @@ public:
     /**
      * Return the SMuFL code for a mensural note looking at the staff notation type, the coloration and the duration
      */
-    wchar_t GetMensuralNoteheadGlyph() const;
+    char32_t GetMensuralNoteheadGlyph() const;
 
     /**
      * Return a SMuFL code for the notehead
      */
-    wchar_t GetNoteheadGlyph(const int duration) const;
+    char32_t GetNoteheadGlyph(const int duration) const;
 
     /**
      * Check whether current note is enharmonic with another

@@ -1068,7 +1068,7 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
 bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
 {
     std::string status = "OK", message = "";
-    const std::wstring wtext = UTF8to16(text);
+    const std::u32string wtext = UTF8to16(text);
     if (!m_doc->GetDrawingPage()) {
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Could not find drawing page.");
@@ -1793,7 +1793,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             Syl *fullSyl = NULL;
 
             // construct concatenated string of all the syls
-            std::wstring fullString = L"";
+            std::u32string fullString = U"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
                 if (syl == NULL) continue;
@@ -1802,7 +1802,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 }
                 Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
                 if (text != NULL) {
-                    std::wstring currentString = text->GetText();
+                    std::u32string currentString = text->GetText();
                     fullString = fullString + currentString;
                 }
             }

@@ -60,19 +60,19 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
     dc->EndTextGraphic(f, this);
 }
 
-void View::DrawTextString(DeviceContext *dc, std::wstring str, TextDrawingParams &params)
+void View::DrawTextString(DeviceContext *dc, std::u32string str, TextDrawingParams &params)
 {
     assert(dc);
 
     dc->DrawText(UTF16to8(str), str);
 }
 
-void View::DrawDirString(DeviceContext *dc, std::wstring str, TextDrawingParams &params)
+void View::DrawDirString(DeviceContext *dc, std::u32string str, TextDrawingParams &params)
 {
     assert(dc);
     assert(dc->GetFont());
 
-    std::wstring adjustedStr = str;
+    std::u32string adjustedStr = str;
     // If the current font is a music font, we want to convert Music Unicode glyph to SMuFL
     if (dc->GetFont()->GetSmuflFont()) {
         for (int i = 0; i < (int)adjustedStr.size(); i++) {
@@ -82,7 +82,7 @@ void View::DrawDirString(DeviceContext *dc, std::wstring str, TextDrawingParams 
     this->DrawTextString(dc, adjustedStr, params);
 }
 
-void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParams &params, Rend *rend)
+void View::DrawDynamString(DeviceContext *dc, std::u32string str, TextDrawingParams &params, Rend *rend)
 {
     assert(dc);
 
@@ -94,7 +94,7 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
     }
 
     if (params.m_textEnclose != ENCLOSURE_NONE) {
-        std::wstring open;
+        std::u32string open;
         switch (params.m_textEnclose) {
             case ENCLOSURE_paren: open.push_back(L'('); break;
             case ENCLOSURE_brack: open.push_back(L'['); break;
@@ -108,12 +108,12 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
         int first = true;
         for (auto &token : tokens) {
             if (!first) {
-                // this->DrawTextString(dc, L" ", params);
+                // this->DrawTextString(dc, U" ", params);
             }
             first = false;
 
             if (token.second) {
-                std::wstring smuflStr = Dynam::GetSymbolStr(token.first, singleGlyphs);
+                std::u32string smuflStr = Dynam::GetSymbolStr(token.first, singleGlyphs);
                 FontInfo vrvTxt;
                 vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
                 vrvTxt.SetFaceName("Leipzig");
@@ -133,7 +133,7 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
     }
 
     if (params.m_textEnclose != ENCLOSURE_NONE) {
-        std::wstring close;
+        std::u32string close;
         switch (params.m_textEnclose) {
             case ENCLOSURE_paren: close.push_back(L')'); break;
             case ENCLOSURE_brack: close.push_back(L']'); break;
@@ -143,7 +143,7 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
     }
 }
 
-void View::DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams &params)
+void View::DrawHarmString(DeviceContext *dc, std::u32string str, TextDrawingParams &params)
 {
     assert(dc);
 
@@ -154,7 +154,7 @@ void View::DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams
     while ((pos = str.find_first_of(VRV_TEXT_HARM, prevPos)) != std::wstring::npos) {
         // If pos is > than the previous, it is the substring to extract
         if (pos > prevPos) {
-            std::wstring substr = str.substr(prevPos, pos - prevPos);
+            std::u32string substr = str.substr(prevPos, pos - prevPos);
             dc->DrawText(UTF16to8(substr), substr, toDcX, toDcY);
             // Once we have rendered the some text to not pass x / y anymore
             toDcX = VRV_UNSET;
@@ -164,21 +164,21 @@ void View::DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams
         // if it is the same or we still have space, it is the accidental
         if (pos == prevPos || pos < str.length()) {
             // Then the accidental
-            std::wstring accid = str.substr(pos, 1);
-            std::wstring smuflAccid;
-            if (accid == L"\u266D" || accid == L"\uE260") { // MUSIC or SMUFL FLAT SIGN
+            std::u32string accid = str.substr(pos, 1);
+            std::u32string smuflAccid;
+            if (accid == U"\u266D" || accid == U"\uE260") { // MUSIC or SMUFL FLAT SIGN
                 smuflAccid.push_back(SMUFL_EA64_figbassFlat);
             }
-            else if (accid == L"\u266E" || accid == L"\uE261") { // MUSIC or SMUFL NATURAL SIGN
+            else if (accid == U"\u266E" || accid == U"\uE261") { // MUSIC or SMUFL NATURAL SIGN
                 smuflAccid.push_back(SMUFL_EA65_figbassNatural);
             }
-            else if (accid == L"\u266F" || accid == L"\uE262") { // MUSIC or SMUFL SHARP SIGN
+            else if (accid == U"\u266F" || accid == U"\uE262") { // MUSIC or SMUFL SHARP SIGN
                 smuflAccid.push_back(SMUFL_EA66_figbassSharp);
             }
-            else if (accid == L"\uE264") { // SMUFL DOUBLE FLAT SIGN
+            else if (accid == U"\uE264") { // SMUFL DOUBLE FLAT SIGN
                 smuflAccid.push_back(SMUFL_EA63_figbassDoubleFlat);
             }
-            else if (accid == L"\uE263") { // SMUFL DOUBLE SHARP SIGN
+            else if (accid == U"\uE263") { // SMUFL DOUBLE SHARP SIGN
                 smuflAccid.push_back(SMUFL_EA67_figbassDoubleSharp);
             }
             else {
@@ -201,7 +201,7 @@ void View::DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams
     }
     // Print the remainder of the string, or the full string if no accid
     if (prevPos < str.length()) {
-        std::wstring substr = str.substr(prevPos, std::wstring::npos);
+        std::u32string substr = str.substr(prevPos, std::wstring::npos);
         dc->DrawText(UTF16to8(substr), substr, toDcX, toDcY);
     }
 
@@ -250,7 +250,8 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
     }
 }
 
-void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize, std::optional<TextDrawingParams> params)
+void View::DrawLyricString(
+    DeviceContext *dc, std::u32string str, int staffSize, std::optional<TextDrawingParams> params)
 {
     assert(dc);
 
@@ -288,7 +289,7 @@ void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize, s
     // This should only be called in facsimile mode where a zone is specified but there is
     // no text. This draws the bounds of the zone but leaves the space blank.
     if (!wroteText && params) {
-        dc->DrawText("", L"", params->m_x, params->m_y, params->m_width, params->m_height);
+        dc->DrawText("", U"", params->m_x, params->m_y, params->m_width, params->m_height);
     }
 }
 
@@ -509,7 +510,7 @@ void View::DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &para
         params.m_explicitPosition = false;
     }
 
-    std::wstring str;
+    std::u32string str;
     str.push_back(symbol->GetSymbolGlyph());
 
     FontInfo symbolFont;

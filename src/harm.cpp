@@ -80,19 +80,19 @@ bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos) const
 {
     const Text *textObject = dynamic_cast<const Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return false;
-    std::wstring text = textObject->GetText();
+    std::u32string text = textObject->GetText();
 
     if (text.length() > pos && text.at(pos) >= 'A' && text.at(pos) <= 'G') {
         int pname = (text.at(pos) - 'C' + 7) % 7;
         int accid = 0;
         for (pos++; pos < text.length(); pos++) {
-            if (text.at(pos) == L'𝄫')
+            if (text.at(pos) == U'𝄫')
                 accid -= 2;
-            else if (text.at(pos) == 'b' || text.at(pos) == L'♭')
+            else if (text.at(pos) == 'b' || text.at(pos) == U'♭')
                 accid--;
-            else if (text.at(pos) == '#' || text.at(pos) == L'♯')
+            else if (text.at(pos) == '#' || text.at(pos) == U'♯')
                 accid++;
-            else if (text.at(pos) == L'𝄪')
+            else if (text.at(pos) == U'𝄪')
                 accid += 2;
             else
                 break;
@@ -108,7 +108,7 @@ void Harm::SetRootPitch(const TransPitch &pitch, unsigned int endPos)
 {
     Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return;
-    std::wstring text = textObject->GetText();
+    std::u32string text = textObject->GetText();
 
     if (text.length() > endPos) {
         textObject->SetText(pitch.GetPitchString() + &text.at(endPos));
@@ -122,11 +122,11 @@ bool Harm::GetBassPitch(TransPitch &pitch) const
 {
     const Text *textObject = dynamic_cast<const Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return false;
-    std::wstring text = textObject->GetText();
+    std::u32string text = textObject->GetText();
     if (!text.length()) return false;
 
     for (unsigned int pos = 0; pos < text.length(); pos++) {
-        if (text.at(pos) == L'/') {
+        if (text.at(pos) == U'/') {
             pos++;
             return this->GetRootPitch(pitch, pos);
         }
@@ -138,15 +138,15 @@ void Harm::SetBassPitch(const TransPitch &pitch)
 {
     Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return;
-    std::wstring text = textObject->GetText();
+    std::u32string text = textObject->GetText();
     unsigned int pos;
     for (pos = 0; pos < text.length(); pos++) {
-        if (text.at(pos) == L'/') {
+        if (text.at(pos) == U'/') {
             break;
         }
     }
 
-    text = text.substr(0, pos) + L"/" + pitch.GetPitchString();
+    text = text.substr(0, pos) + U"/" + pitch.GetPitchString();
     textObject->SetText(text);
 }
 

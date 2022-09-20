@@ -34,7 +34,7 @@ Num::~Num() {}
 void Num::Reset()
 {
     m_currentText.SetParent(this);
-    m_currentText.SetText(L"");
+    m_currentText.SetText(U"");
 }
 
 bool Num::IsSupportedChild(Object *child)

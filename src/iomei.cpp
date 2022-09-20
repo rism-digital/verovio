@@ -3145,32 +3145,33 @@ void MEIOutput::WriteUnclear(pugi::xml_node currentNode, Unclear *unclear)
     unclear->WriteSource(currentNode);
 }
 
-std::wstring MEIOutput::EscapeSMuFL(std::wstring data)
+std::u32string MEIOutput::EscapeSMuFL(std::u32string data)
 {
-    std::wstring buffer;
+    std::u32string buffer;
     // approximate that we won't have a 1.1 longer string (for optimization)
     buffer.reserve(data.size() * 1.1);
     for (size_t pos = 0; pos != data.size(); ++pos) {
         if (data[pos] == '&') {
-            buffer.append(L"&amp;");
+            buffer.append(U"&amp;");
         }
         else if (data[pos] == '\"') {
-            buffer.append(L"&quot;");
+            buffer.append(U"&quot;");
         }
         else if (data[pos] == '\'') {
-            buffer.append(L"&apos;");
+            buffer.append(U"&apos;");
         }
         else if (data[pos] == '<') {
-            buffer.append(L"&lt;");
+            buffer.append(U"&lt;");
         }
         else if (data[pos] == '>') {
-            buffer.append(L"&gt;");
+            buffer.append(U"&gt;");
         }
-        // Unicode private area for SMuFL characters
-        else if ((data[pos] > 0xE000) && (data[pos] < 0xF8FF)) {
-            std::wostringstream ss;
+        // Unicode private area for SMuFL characters (and unicode music symbols)
+        else if (data[pos] > 0xE000) {
+            std::ostringstream ss;
             ss << std::hex << (int)data[pos];
-            buffer.append(L"&#x").append(ss.str()).append(L";");
+            std::u32string smuflCode = UTF8to16(ss.str());
+            buffer.append(U"&#x").append(smuflCode).append(U";");
         }
         else
             buffer.append(&data[pos], 1);
@@ -6790,7 +6791,7 @@ bool MEIInput::ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool
     Text *vrvText = new Text();
 
     assert(text.text());
-    std::wstring str = UTF8to16(text.text().as_string());
+    std::u32string str = UTF8to16(text.text().as_string());
     if (trimLeft) str = this->LeftTrim(str);
     if (trimRight) str = this->RightTrim(str);
 
@@ -7593,17 +7594,17 @@ DocType MEIInput::StrToDocType(std::string type)
     return Raw;
 }
 
-std::wstring MEIInput::LeftTrim(std::wstring str)
+std::u32string MEIInput::LeftTrim(std::u32string str)
 {
-    std::wstring::size_type pos = 0;
+    std::u32string::size_type pos = 0;
     while (pos < str.size() && iswspace(str[pos])) pos++;
     str.erase(0, pos);
     return str;
 }
 
-std::wstring MEIInput::RightTrim(std::wstring str)
+std::u32string MEIInput::RightTrim(std::u32string str)
 {
-    std::wstring::size_type pos = str.size();
+    std::u32string::size_type pos = str.size();
     while (pos > 0 && iswspace(str[pos - 1])) pos--;
     str.erase(pos);
     return str;

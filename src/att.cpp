@@ -249,7 +249,7 @@ data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
         LogWarning("Unable to parse glyph code '%s'", value.c_str());
         return 0;
     }
-    wchar_t wc = (wchar_t)strtol(value.c_str(), NULL, 16);
+    char32_t wc = (char32_t)strtol(value.c_str(), NULL, 16);
     // Check that the value is in a SMuFL private area range - this does not check that it is an
     // existing SMuFL glyph num or that it is supported by Verovio
     if ((wc >= 0xE000) && (wc <= 0xF8FF))

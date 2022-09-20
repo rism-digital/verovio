@@ -5330,7 +5330,7 @@ void HumdrumInput::setInstrumentName(ELEMENT *element, const std::string &name, 
     Label *label = new Label();
     if (name == "   ") {
         Text *text = new Text();
-        text->SetText(L"\u00a0\u00a0\u00a0");
+        text->SetText(U"\u00a0\u00a0\u00a0");
         label->AddChild(text);
     }
     else {
@@ -5372,7 +5372,7 @@ void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const std::string
     name8 = std::regex_replace(name8, exp3, "$1\xe2\x99\xaf");
     name8 = std::regex_replace(name8, exp4, "$1\xe2\x99\xaf");
 
-    std::wstring name16 = UTF8to16(name8);
+    std::u32string name16 = UTF8to16(name8);
     text->SetText(name16);
     label->AddChild(text);
     label->SetParent(element);
@@ -7092,7 +7092,7 @@ void HumdrumInput::checkForLineContinuations(hum::HTp token)
         if (pieces[i].find("_") != std::string::npos) {
             F *f = new F();
             Text *text = new Text();
-            std::wstring wtext = L"_";
+            std::u32string wtext = U"_";
             text->SetText(wtext);
             f->AddChild(text);
             fb->AddChild(f);
@@ -7269,7 +7269,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
             harm->AddChild(fb);
 
             std::vector<std::string> pieces = splitFBString(*token, " ");
-            std::vector<std::wstring> content = cleanFBString(pieces, token);
+            std::vector<std::u32string> content = cleanFBString(pieces, token);
             if (content.empty()) {
                 // do not include an empty fb see issue #1096
                 continue;
@@ -7285,7 +7285,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
                     auto pos = pieces[k].find(":");
                     if (pos != std::string::npos) {
                         std::vector<std::string> subpieces = splitFBString(pieces[k], ":");
-                        std::wstring newtext = cleanFBString2(subpieces, token);
+                        std::u32string newtext = cleanFBString2(subpieces, token);
                         text->SetText(newtext);
                     }
                     else {
@@ -7543,7 +7543,7 @@ void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
                 xstaffindex = (int)staffstarts.size() - 1;
                 setStaff(harm, xstaffindex + 1);
             }
-            std::wstring content;
+            std::u32string content;
             content = cleanStringString(*token);
             text->SetText(content);
             harm->AddChild(text);
@@ -7657,7 +7657,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 }
             }
 
-            std::wstring content;
+            std::u32string content;
             if (token->isDataType("**harm")) {
                 setPlaceRelStaff(harm, "below", false);
                 content = cleanHarmString2(*token);
@@ -7726,10 +7726,10 @@ std::vector<std::string> HumdrumInput::splitFBString(const std::string &content,
 // HumdrumInput::cleanFBString --
 //
 
-std::vector<std::wstring> HumdrumInput::cleanFBString(std::vector<std::string> &pieces, hum::HTp token)
+std::vector<std::u32string> HumdrumInput::cleanFBString(std::vector<std::string> &pieces, hum::HTp token)
 {
     std::vector<bool> todelete(pieces.size(), false);
-    std::vector<std::wstring> output(pieces.size());
+    std::vector<std::u32string> output(pieces.size());
     for (int i = 0; i < (int)pieces.size(); ++i) {
         output[i] = convertFBNumber(pieces[i], token);
         if ((pieces[i].find("K") != std::string::npos)
@@ -7754,16 +7754,16 @@ std::vector<std::wstring> HumdrumInput::cleanFBString(std::vector<std::string> &
 //   together with hyphens.
 //
 
-std::wstring HumdrumInput::cleanFBString2(std::vector<std::string> &pieces, hum::HTp token)
+std::u32string HumdrumInput::cleanFBString2(std::vector<std::string> &pieces, hum::HTp token)
 {
-    std::wstring output;
+    std::u32string output;
     for (int i = 0; i < (int)pieces.size(); ++i) {
         output += convertFBNumber(pieces[i], token);
         if (i < (int)pieces.size() - 1) {
             if (pieces[i + 1] == "") {
-                output += L" ";
+                output += U" ";
             }
-            output += L"-";
+            output += U"-";
         }
     }
     return output;
@@ -7774,9 +7774,9 @@ std::wstring HumdrumInput::cleanFBString2(std::vector<std::string> &pieces, hum:
 // HumdrumInput::convertFBNumber --
 //
 
-std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp token)
+std::u32string HumdrumInput::convertFBNumber(const std::string &input, hum::HTp token)
 {
-    std::wstring output;
+    std::u32string output;
 
     int track = token->getTrack();
     int reverse = m_reverse[track];
@@ -7872,12 +7872,12 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
 
     // accidental in front of number unless an "r" is present:
     if ((!slash) && (input.find("r") == std::string::npos) && (!reverse)) {
-        std::wstring accid = getVisualFBAccidental(accidental);
+        std::u32string accid = getVisualFBAccidental(accidental);
         if (accidental && (input.find("i") != std::string::npos)) {
-            accid = L"[" + accid + L"]";
+            accid = U"[" + accid + U"]";
         }
         else if (accidental && (input.find("j") != std::string::npos)) {
-            accid = L"(" + accid + L")";
+            accid = U"(" + accid + U")";
         }
         output += accid;
     }
@@ -7891,64 +7891,64 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
         // do not has slashes available).
         // See: https://www.smufl.org/version/latest/range/figuredBass
         switch (digit) {
-            case 0: output += L"\uEA50"; break; // draw without slash
-            case 1: output += L"\uEA51"; break; // draw without slash
-            case 2: output += L"\uEA53"; break;
-            case 3: output += L"\uEA54"; break; // draw without slash
-            case 4: output += L"\uEA56"; break; // only one style of slash
+            case 0: output += U"\uEA50"; break; // draw without slash
+            case 1: output += U"\uEA51"; break; // draw without slash
+            case 2: output += U"\uEA53"; break;
+            case 3: output += U"\uEA54"; break; // draw without slash
+            case 4: output += U"\uEA56"; break; // only one style of slash
             case 5:
                 switch (slash) {
-                    case 1: output += L"\uEA5A"; break; // 5/
-                    case 2: output += L"\uEA59"; break; // 5\ .
-                    case 3: output += L"\uEA58"; break; // 5|
-                    default: output += L"\uEA57"; break; // 5
+                    case 1: output += U"\uEA5A"; break; // 5/
+                    case 2: output += U"\uEA59"; break; // 5\ .
+                    case 3: output += U"\uEA58"; break; // 5|
+                    default: output += U"\uEA57"; break; // 5
                 }
                 break;
             case 6:
                 switch (slash) {
-                    case 1: output += L"\uEA5C"; break; // 6/
-                    case 2: output += L"\uEA5C"; break; // 6\ .
-                    case 3: output += L"\uEA5C"; break; // 6|
-                    default: output += L"\uEA5B"; break; // 6
+                    case 1: output += U"\uEA5C"; break; // 6/
+                    case 2: output += U"\uEA5C"; break; // 6\ .
+                    case 3: output += U"\uEA5C"; break; // 6|
+                    default: output += U"\uEA5B"; break; // 6
                 }
                 break;
             case 7:
                 switch (slash) {
-                    case 1: output += L"\uECC0"; break; // 7/
-                    case 2: output += L"\uEA5F"; break; // 7\ .
-                    case 3: output += L"\uEA5E"; break; // 7|
-                    default: output += L"\uEA5D"; break; // 7
+                    case 1: output += U"\uECC0"; break; // 7/
+                    case 2: output += U"\uEA5F"; break; // 7\ .
+                    case 3: output += U"\uEA5E"; break; // 7|
+                    default: output += U"\uEA5D"; break; // 7
                 }
                 break;
-            case 8: output += L"\uEA60"; break; // draw without slash
-            case 9: output += L"\uEA62"; break; // only one style of slash
+            case 8: output += U"\uEA60"; break; // draw without slash
+            case 9: output += U"\uEA62"; break; // only one style of slash
         }
     }
 
     // accidental after number if an "r" is present:
     if ((!slash) && ((input.find("r") != std::string::npos) || reverse)) {
-        std::wstring accid = getVisualFBAccidental(accidental);
+        std::u32string accid = getVisualFBAccidental(accidental);
         if (accidental && (input.find("i") != std::string::npos)) {
-            accid = L"[" + accid + L"]";
+            accid = U"[" + accid + U"]";
         }
         else if (accidental && (input.find("j") != std::string::npos)) {
-            accid = L"(" + accid + L")";
+            accid = U"(" + accid + U")";
         }
         output += accid;
     }
 
     if (input.find("J") != std::string::npos) {
-        output = L"(" + output + L")";
+        output = U"(" + output + U")";
     }
     else if (input.find("I") != std::string::npos) {
-        output = L"[" + output + L"]";
+        output = U"[" + output + U"]";
     }
     else if (slash) {
         if (input.find("j") != std::string::npos) {
-            output = L"(" + output + L")";
+            output = U"(" + output + U")";
         }
         else if (input.find("i") != std::string::npos) {
-            output = L"[" + output + L"]";
+            output = U"[" + output + U"]";
         }
     }
 
@@ -7956,14 +7956,14 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
     // so display an underscore after the figure to indicate
     // that one should be added in the future:
     if (input.find("_") != std::string::npos) {
-        output += L" _";
+        output += U" _";
     }
     // A "=" character indicates that there is a the figure (should be
     // centered between current figure and next one, but not available yet).
     // Technically this is a sort of extender, but f@extension is
     // boolean, so various styles cannot be encoded in it.
     if (input.find("=") != std::string::npos) {
-        output += L" -";
+        output += U" -";
     }
 
     /*
@@ -7980,25 +7980,25 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
 // HumdrumInput::convertNumberToWstring --
 //
 
-std::wstring HumdrumInput::convertNumberToWstring(int number)
+std::u32string HumdrumInput::convertNumberToWstring(int number)
 {
     if (number < 0) {
-        return L"";
+        return U"";
     }
     std::string value = to_string(number);
-    std::wstring output;
+    std::u32string output;
     for (int i = 0; i < (int)value.size(); ++i) {
         switch (value[i]) {
-            case '0': output += L"\uEA50"; break;
-            case '1': output += L"\uEA51"; break;
-            case '2': output += L"\uEA52"; break;
-            case '3': output += L"\uEA54"; break;
-            case '4': output += L"\uEA55"; break;
-            case '5': output += L"\uEA57"; break;
-            case '6': output += L"\uEA5B"; break;
-            case '7': output += L"\uEA5D"; break;
-            case '8': output += L"\uEA60"; break;
-            case '9': output += L"\uEA61"; break;
+            case '0': output += U"\uEA50"; break;
+            case '1': output += U"\uEA51"; break;
+            case '2': output += U"\uEA52"; break;
+            case '3': output += U"\uEA54"; break;
+            case '4': output += U"\uEA55"; break;
+            case '5': output += U"\uEA57"; break;
+            case '6': output += U"\uEA5B"; break;
+            case '7': output += U"\uEA5D"; break;
+            case '8': output += U"\uEA60"; break;
+            case '9': output += U"\uEA61"; break;
         }
     }
     return output;
@@ -8009,30 +8009,30 @@ std::wstring HumdrumInput::convertNumberToWstring(int number)
 // HumdrumInput::getVisualFBAccidental --
 //
 
-std::wstring HumdrumInput::getVisualFBAccidental(int accidental)
+std::u32string HumdrumInput::getVisualFBAccidental(int accidental)
 {
-    std::wstring output;
+    std::u32string output;
     switch (accidental) {
         case 1:
-            output = L"\uE264"; // SMUFL double-flat
+            output = U"\uE264"; // SMUFL double-flat
             break;
         case 2:
-            // output = L"\u266D"; // unicode flat
-            output = L"\uE260"; // SMUFL flat
+            // output = U"\u266D"; // unicode flat
+            output = U"\uE260"; // SMUFL flat
             break;
         case 3:
-            // output = L"\u266E"; // unicode natural
-            output = L"\uE261"; // SMUFL natural
+            // output = U"\u266E"; // unicode natural
+            output = U"\uE261"; // SMUFL natural
             break;
         case 4:
-            // output = L"\u266F"; // unicode sharp
-            output = L"\uE262"; // SMUFL sharp
+            // output = U"\u266F"; // unicode sharp
+            output = U"\uE262"; // SMUFL sharp
             break;
         case 5:
-            output = L"\uE263"; // SMUFL double-sharp
+            output = U"\uE263"; // SMUFL double-sharp
             break;
         case 6:
-            output = L"+"; // UTF-7 +
+            output = U"+"; // UTF-7 +
             break;
     }
     return output;
@@ -8047,17 +8047,17 @@ std::wstring HumdrumInput::getVisualFBAccidental(int accidental)
 //     will be suppressed.
 //
 
-std::wstring HumdrumInput::cleanHarmString3(const std::string &content)
+std::u32string HumdrumInput::cleanHarmString3(const std::string &content)
 {
     std::string temp;
 
     // hide **rhrm token if not a harmony "attack":
 
     if (content.find("_") != std::string::npos) {
-        return L"";
+        return U"";
     }
     if (content.find("]") != std::string::npos) {
-        return L"";
+        return U"";
     }
 
     // skip over **recip data:
@@ -8096,9 +8096,9 @@ std::wstring HumdrumInput::cleanHarmString3(const std::string &content)
 // HumdrumInput::cleanHarmString2 -- Adjust **harm text
 //
 
-std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
+std::u32string HumdrumInput::cleanHarmString2(const std::string &content)
 {
-    std::wstring output;
+    std::u32string output;
     bool nonrhythm = false;
     for (int i = 0; i < (int)content.size(); ++i) {
         if (!nonrhythm) {
@@ -8114,16 +8114,16 @@ std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
         }
         nonrhythm = true;
         if (content[i] == '-') {
-            output += L"\u266D"; // unicode flat
+            output += U"\u266D"; // unicode flat
         }
         else if (content[i] == '#') {
-            output += L"\u266F"; // unicode sharp
+            output += U"\u266F"; // unicode sharp
         }
         else if (content[i] == 'D') {
-            output += L"\u00F8"; // o-slash
+            output += U"\u00F8"; // o-slash
         }
         else if (content[i] == 'o') {
-            output += L"\u00B0"; // degree sign
+            output += U"\u00B0"; // degree sign
         }
         else {
             std::string tdee;
@@ -8141,22 +8141,22 @@ std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
 //    see: https://www.fileformat.info/info/unicode/block/enclosed_alphanumerics/utf8test.htm
 //
 
-std::wstring HumdrumInput::cleanStringString(const std::string &content)
+std::u32string HumdrumInput::cleanStringString(const std::string &content)
 {
-    std::wstring output;
+    std::u32string output;
     std::string value;
     for (int i = 0; i < (int)content.size(); ++i) {
         switch (content[i]) {
-            case '0': output += L"\u24ea"; break; // 0 in circle
-            case '1': output += L"\u2460"; break; // 1 in circle
-            case '2': output += L"\u2461"; break; // 2 in circle
-            case '3': output += L"\u2462"; break; // 3 in circle
-            case '4': output += L"\u2463"; break; // 4 in circle
-            case '5': output += L"\u2464"; break; // 5 in circle
-            case '6': output += L"\u2465"; break; // 6 in circle
-            case '7': output += L"\u2466"; break; // 7 in circle
-            case '8': output += L"\u2467"; break; // 8 in circle
-            case '9': output += L"\u2468"; break; // 9 in circle
+            case '0': output += U"\u24ea"; break; // 0 in circle
+            case '1': output += U"\u2460"; break; // 1 in circle
+            case '2': output += U"\u2461"; break; // 2 in circle
+            case '3': output += U"\u2462"; break; // 3 in circle
+            case '4': output += U"\u2463"; break; // 4 in circle
+            case '5': output += U"\u2464"; break; // 5 in circle
+            case '6': output += U"\u2465"; break; // 6 in circle
+            case '7': output += U"\u2466"; break; // 7 in circle
+            case '8': output += U"\u2467"; break; // 8 in circle
+            case '9': output += U"\u2468"; break; // 9 in circle
             default:
                 value.clear();
                 value.push_back(content[i]);
@@ -8171,11 +8171,11 @@ std::wstring HumdrumInput::cleanStringString(const std::string &content)
 // HumdrumInput::cleanHarmString --
 //
 
-std::wstring HumdrumInput::cleanHarmString(const std::string &content)
+std::u32string HumdrumInput::cleanHarmString(const std::string &content)
 {
-    std::wstring root;
-    std::wstring kind;
-    std::wstring bass;
+    std::u32string root;
+    std::u32string kind;
+    std::u32string bass;
 
     bool foundspace = false;
     bool foundslash = false;
@@ -8199,10 +8199,10 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
         }
         if (!foundspace) {
             if (content[i] == '-') {
-                root += L"\u266D"; // unicode flat
+                root += U"\u266D"; // unicode flat
             }
             else if (content[i] == '#') {
-                root += L"\u266F"; // unicode sharp
+                root += U"\u266F"; // unicode sharp
             }
             else {
                 std::string tdee;
@@ -8212,10 +8212,10 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
         }
         else if (foundslash) {
             if (content[i] == '-') {
-                bass += L"\u266D"; // unicode flat
+                bass += U"\u266D"; // unicode flat
             }
             else if (content[i] == '#') {
-                bass += L"\u266F"; // unicode sharp
+                bass += U"\u266F"; // unicode sharp
             }
             else {
                 std::string tdee;
@@ -8229,127 +8229,127 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
     }
 
     bool replacing = false;
-    if (kind == L"major-minor") {
-        kind = L"Mm7";
+    if (kind == U"major-minor") {
+        kind = U"Mm7";
         replacing = true;
     }
-    else if (kind == L"minor-major") {
-        kind = L"mM7";
-        replacing = true;
-    }
-
-    if (replace(kind, L"major-", L"maj")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"minor-", L"m")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"dominant-", L"dom")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"augmented-", L"+")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"suspended-", L"sus")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"diminished-", L"\u00B0")) { // degree sign
-        replacing = true;
-    }
-    if (replace(kind, L"seventh", L"7")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"ninth", L"9")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"11th", L"11")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"13th", L"13")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"second", L"2")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"fourth", L"4")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"sixth", L"6")) {
+    else if (kind == U"minor-major") {
+        kind = U"mM7";
         replacing = true;
     }
 
-    if (kind == L"major") {
-        kind = L"";
+    if (replace(kind, U"major-", U"maj")) {
         replacing = true;
     }
-    else if (kind == L"maj") {
-        kind = L"";
+    else if (replace(kind, U"minor-", U"m")) {
         replacing = true;
     }
-    else if (kind == L"ma") {
-        kind = L""; // degree sign
+    else if (replace(kind, U"dominant-", U"dom")) {
         replacing = true;
     }
-    else if (kind == L"minor") {
-        kind = L"m";
+    else if (replace(kind, U"augmented-", U"+")) {
         replacing = true;
     }
-    else if (kind == L"min") {
-        kind = L"m";
+    else if (replace(kind, U"suspended-", U"sus")) {
         replacing = true;
     }
-    else if (kind == L"augmented") {
-        kind = L"+";
+    else if (replace(kind, U"diminished-", U"\u00B0")) { // degree sign
         replacing = true;
     }
-    else if (kind == L"minor-seventh") {
-        kind = L"m7";
+    if (replace(kind, U"seventh", U"7")) {
         replacing = true;
     }
-    else if (kind == L"major-seventh") {
-        kind = L"maj7";
+    else if (replace(kind, U"ninth", U"9")) {
         replacing = true;
     }
-    else if (kind == L"dom11") {
-        kind = L"11";
+    else if (replace(kind, U"11th", U"11")) {
         replacing = true;
     }
-    else if (kind == L"dom13") {
-        kind = L"13";
+    else if (replace(kind, U"13th", U"13")) {
         replacing = true;
     }
-    else if (kind == L"dom9") {
-        kind = L"9";
+    else if (replace(kind, U"second", U"2")) {
         replacing = true;
     }
-    else if (kind == L"half-diminished") {
-        kind = L"\u00F8"; // o-slash
+    else if (replace(kind, U"fourth", U"4")) {
         replacing = true;
     }
-    else if (kind == L"diminished") {
-        kind = L"\u00B0"; // degree sign
+    else if (replace(kind, U"sixth", U"6")) {
         replacing = true;
     }
-    else if (kind == L"dominant") {
-        kind = L"7";
+
+    if (kind == U"major") {
+        kind = U"";
         replacing = true;
     }
-    else if (kind == L"power") {
-        kind = L"5";
+    else if (kind == U"maj") {
+        kind = U"";
         replacing = true;
     }
-    else if (kind == L"m7b5") {
+    else if (kind == U"ma") {
+        kind = U""; // degree sign
         replacing = true;
-        kind = L"m7\u266D"
-               L"5";
     }
-    if ((kind != L"") && !replacing) {
-        root += L' ';
+    else if (kind == U"minor") {
+        kind = U"m";
+        replacing = true;
     }
-    if (bass != L"") {
-        kind += L'/';
+    else if (kind == U"min") {
+        kind = U"m";
+        replacing = true;
     }
-    std::wstring output = root + kind + bass;
+    else if (kind == U"augmented") {
+        kind = U"+";
+        replacing = true;
+    }
+    else if (kind == U"minor-seventh") {
+        kind = U"m7";
+        replacing = true;
+    }
+    else if (kind == U"major-seventh") {
+        kind = U"maj7";
+        replacing = true;
+    }
+    else if (kind == U"dom11") {
+        kind = U"11";
+        replacing = true;
+    }
+    else if (kind == U"dom13") {
+        kind = U"13";
+        replacing = true;
+    }
+    else if (kind == U"dom9") {
+        kind = U"9";
+        replacing = true;
+    }
+    else if (kind == U"half-diminished") {
+        kind = U"\u00F8"; // o-slash
+        replacing = true;
+    }
+    else if (kind == U"diminished") {
+        kind = U"\u00B0"; // degree sign
+        replacing = true;
+    }
+    else if (kind == U"dominant") {
+        kind = U"7";
+        replacing = true;
+    }
+    else if (kind == U"power") {
+        kind = U"5";
+        replacing = true;
+    }
+    else if (kind == U"m7b5") {
+        replacing = true;
+        kind = U"m7\u266D"
+               U"5";
+    }
+    if ((kind != U"") && !replacing) {
+        root += U' ';
+    }
+    if (bass != U"") {
+        kind += U'/';
+    }
+    std::u32string output = root + kind + bass;
     return output;
 }
 
@@ -8371,9 +8371,9 @@ bool HumdrumInput::replace(string &str, const std::string &oldStr, const std::st
     return output;
 }
 
-bool HumdrumInput::replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr)
+bool HumdrumInput::replace(std::u32string &str, const std::u32string &oldStr, const std::u32string &newStr)
 {
-    std::wstring::size_type pos = 0u;
+    std::u32string::size_type pos = 0u;
     bool output = false;
     while ((pos = str.find(oldStr, pos)) != std::string::npos) {
         output = true;
@@ -9857,7 +9857,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                                     Clef *clef = insertClefElement(elements, pointers, tok, lastnote);
                                     setLocationId(clef, layerdata[i]);
                                     // Uncomment when clef->SetSameas() is available:
-                                    // std::string sameas = "#clef-L";
+                                    // std::string sameas = "#clef-U";
                                     // sameas += to_string(tok->getLineNumber());
                                     // sameas += "F";
                                     // sameas += to_string(tok->getFieldNumber());
@@ -10679,7 +10679,7 @@ void HumdrumInput::addSlur(FTrem *ftrem, hum::HTp start, hum::HTp ending)
     int endline = ending->getLineNumber();
     int endfield = ending->getFieldNumber();
     std::string lastid = "";
-    lastid += "-L" + to_string(endline);
+    lastid += "-U" + to_string(endline);
     lastid += "F" + to_string(endfield);
 
     std::string slurid = firstid;
@@ -11023,9 +11023,9 @@ void HumdrumInput::handleLigature(hum::HTp token)
     int stopline = ligend->getLineNumber();
     int stopfield = ligend->getFieldNumber();
     std::string id = "ligature";
-    id += "-L" + to_string(startline);
+    id += "-U" + to_string(startline);
     id += "F" + to_string(startfield);
-    id += "-L" + to_string(stopline);
+    id += "-U" + to_string(stopline);
     id += "F" + to_string(stopfield);
     ligature->SetID(id);
 
@@ -11091,9 +11091,9 @@ void HumdrumInput::handleColoration(hum::HTp token)
     int stopline = colend->getLineNumber();
     int stopfield = colend->getFieldNumber();
     std::string id = "coloration";
-    id += "-L" + to_string(startline);
+    id += "-U" + to_string(startline);
     id += "F" + to_string(startfield);
-    id += "-L" + to_string(stopline);
+    id += "-U" + to_string(stopline);
     id += "F" + to_string(stopfield);
     coloration->SetID(id);
 
@@ -13467,29 +13467,29 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
 {
     std::string name2 = name;
     std::string prestring;
-    std::wstring symbol;
+    std::u32string symbol;
     std::string poststring;
 
     hum::HumRegex hre;
     if (hre.search(name2, "(.*)-flat\\b(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE260"; // SMUFL flat
+        symbol = U"\uE260"; // SMUFL flat
     }
     else if (hre.search(name2, "(.*)-sharp\\b(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE262"; // SMUFL sharp
+        symbol = U"\uE262"; // SMUFL sharp
     }
     else if (hre.search(name2, "(.*\\b[A-G])b\\b(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE260"; // SMUFL flat
+        symbol = U"\uE260"; // SMUFL flat
     }
     else if (hre.search(name2, "(.*[A-G])\x23(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE262"; // SMUFL sharp
+        symbol = U"\uE262"; // SMUFL sharp
     }
 
     if (symbol.empty()) {
@@ -15584,10 +15584,10 @@ std::string HumdrumInput::generateSlurId(hum::HTp token, int count, int number)
 {
     std::string id;
     if (token->isChord()) {
-        id = "chord-L";
+        id = "chord-U";
     }
     else {
-        id = "note-L";
+        id = "note-U";
     }
     id += to_string(token->getLineNumber());
     id += "F";
@@ -16149,10 +16149,10 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
 
     if (startid == "") {
         if (phrasestart->isChord()) {
-            startid = "chord-L";
+            startid = "chord-U";
         }
         else {
-            startid = "note-L";
+            startid = "note-U";
         }
         startid += to_string(phrasestart->getLineNumber());
         startid += "F";
@@ -21802,7 +21802,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             if (!verselabel.empty()) {
                 Label *label = new Label();
                 Text *text = new Text();
-                std::wstring wtext = UTF8to16(verselabel);
+                std::u32string wtext = UTF8to16(verselabel);
                 text->SetText(wtext);
                 verse->AddChild(label);
                 label->AddChild(text);
@@ -21810,7 +21810,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             if (!verseabbrlabel.empty()) {
                 LabelAbbr *labelabbr = new LabelAbbr();
                 Text *text = new Text();
-                std::wstring wtext = UTF8to16(verseabbrlabel);
+                std::u32string wtext = UTF8to16(verseabbrlabel);
                 text->SetText(wtext);
                 verse->AddChild(labelabbr);
                 labelabbr->AddChild(text);
@@ -24514,7 +24514,7 @@ void HumdrumInput::checkForRehearsal(int line)
         Reh *reh = new Reh();
         Rend *rend = new Rend();
         Text *text = new Text();
-        std::wstring wtext = UTF8to16(tvalue);
+        std::u32string wtext = UTF8to16(tvalue);
         text->SetText(wtext);
         reh->AddChild(rend);
         rend->AddChild(text);
@@ -25245,7 +25245,7 @@ std::string HumdrumInput::getLocationId(Object *object, hum::HTp token, int subt
     int field = token->getFieldIndex() + 1;
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
-    id += "-L" + to_string(line);
+    id += "-U" + to_string(line);
     id += "F" + to_string(field);
     if (subtoken >= 0) {
         id += "S" + to_string(subtoken + 1);
@@ -25258,7 +25258,7 @@ std::string HumdrumInput::getLocationId(const std::string &prefix, hum::HTp toke
     int line = token->getLineIndex() + 1;
     int field = token->getFieldIndex() + 1;
     std::string id = prefix;
-    id += "-L" + to_string(line);
+    id += "-U" + to_string(line);
     id += "F" + to_string(field);
     if (subtoken >= 0) {
         id += "S" + to_string(subtoken + 1);
@@ -25274,7 +25274,7 @@ std::string HumdrumInput::getLocationId(Object *object, int lineindex, int field
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     if (line > 0) {
-        id += "-L" + to_string(line);
+        id += "-U" + to_string(line);
     }
     if (field > 0) {
         id += "F" + to_string(field);
@@ -25292,7 +25292,7 @@ std::string HumdrumInput::getLocationId(const std::string &prefix, int lineindex
     int subtoken = subtokenindex + 1;
     std::string id = prefix;
     if (line > 0) {
-        id += "-L" + to_string(line);
+        id += "-U" + to_string(line);
     }
     if (field > 0) {
         id += "F" + to_string(field);
@@ -25314,7 +25314,7 @@ void HumdrumInput::setLocationIdNSuffix(Object *object, hum::HTp token, int numb
     int field = token->getFieldIndex() + 1;
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
-    id += "-L" + to_string(line);
+    id += "-U" + to_string(line);
     id += "F" + to_string(field);
     id += "N" + to_string(number);
     object->SetID(id);
@@ -25401,7 +25401,7 @@ void HumdrumInput::setBeamLocationId(Object *object, const std::vector<humaux::H
 
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
-    id += "-L" + to_string(startline);
+    id += "-U" + to_string(startline);
     id += "F" + to_string(startfield);
 
     // int endnum = -1;
@@ -25418,7 +25418,7 @@ void HumdrumInput::setBeamLocationId(Object *object, const std::vector<humaux::H
         hum::HTp endtoken = layerdata[endindex];
         int endline = endtoken->getLineNumber();
         int endfield = endtoken->getFieldNumber();
-        id += "-L" + to_string(endline);
+        id += "-U" + to_string(endline);
         id += "F" + to_string(endfield);
     }
 
@@ -25440,7 +25440,7 @@ void HumdrumInput::setTupletLocationId(Object *object, const std::vector<humaux:
 
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
-    id += "-L" + to_string(startline);
+    id += "-U" + to_string(startline);
     id += "F" + to_string(startfield);
 
     // int endnum = -1;
@@ -25457,7 +25457,7 @@ void HumdrumInput::setTupletLocationId(Object *object, const std::vector<humaux:
         hum::HTp endtoken = layerdata[endindex];
         int endline = endtoken->getLineNumber();
         int endfield = endtoken->getFieldNumber();
-        id += "-L" + to_string(endline);
+        id += "-U" + to_string(endline);
         id += "F" + to_string(endfield);
     }
 
@@ -25489,13 +25489,13 @@ void HumdrumInput::setTieLocationId(Object *object, hum::HTp tiestart, int sinde
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
 
-    id += "-L" + to_string(startline);
+    id += "-U" + to_string(startline);
     id += "F" + to_string(startfield);
     if (sindex >= 0) {
         id += "S" + to_string(sindex + 1);
     }
 
-    id += "-L" + to_string(endline);
+    id += "-U" + to_string(endline);
     id += "F" + to_string(endfield);
     if (eindex >= 0) {
         id += "S" + to_string(eindex + 1);
@@ -25523,7 +25523,7 @@ void HumdrumInput::setSlurLocationId(
         id = prefix;
     }
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
-    id += "-L" + to_string(startline);
+    id += "-U" + to_string(startline);
     id += "F" + to_string(startfield);
     int startcount = slurstart->getValueInt("auto", "slurStartCount");
     int endcount = slurend->getValueInt("auto", "slurEndCount");
@@ -25542,7 +25542,7 @@ void HumdrumInput::setSlurLocationId(
     int endline = slurend->getLineNumber();
     int endfield = slurend->getFieldNumber();
 
-    id += "-L";
+    id += "-U";
     id += to_string(endline);
     id += "F";
     id += to_string(endfield);
