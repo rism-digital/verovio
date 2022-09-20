@@ -380,7 +380,7 @@ public:
      * @return The SVG first page as a string
      */
     std::string RenderData(const std::string &data, const std::string &jsonOptions);
-    
+
     /**
      * Render a page to SVG.
      *
