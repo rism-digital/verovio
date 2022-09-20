@@ -176,11 +176,11 @@ std::u32string TransPitch::GetPitchString() const
 {
     char32_t pitchLetter = (m_pname + ('C' - 'A')) % 7 + 'A';
     switch (m_accid) {
-        case -2: return std::u32string({ pitchLetter, U'𝄫' });
-        case -1: return std::u32string({ pitchLetter, U'♭' });
+        case -2: return std::u32string({ pitchLetter, U'\U0001D12B' });
+        case -1: return std::u32string({ pitchLetter, U'\u266D' });
         case 0: return std::u32string({ pitchLetter });
-        case 1: return std::u32string({ pitchLetter, U'♯' });
-        case 2: return std::u32string({ pitchLetter, U'♯', U'♯' });
+        case 1: return std::u32string({ pitchLetter, U'\u266F' });
+        case 2: return std::u32string({ pitchLetter, U'\U0001D12A' });
         default: LogError("Transposition: Could not get Accidental for %i", m_accid);
     }
     return U"";

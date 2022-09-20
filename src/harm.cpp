@@ -88,11 +88,11 @@ bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos) const
         for (pos++; pos < text.length(); pos++) {
             if (text.at(pos) == U'𝄫')
                 accid -= 2;
-            else if (text.at(pos) == 'b' || text.at(pos) == U'♭')
+            else if (text.at(pos) == 'b' || text.at(pos) == U'\u266D' || text.at(pos) == U'\u266F')
                 accid--;
-            else if (text.at(pos) == '#' || text.at(pos) == U'♯')
+            else if (text.at(pos) == '#' || text.at(pos) == U'\u266F' || text.at(pos) == U'\u266F')
                 accid++;
-            else if (text.at(pos) == U'𝄪')
+            else if (text.at(pos) == U'\U0001D12A')
                 accid += 2;
             else
                 break;
