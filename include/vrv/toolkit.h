@@ -48,6 +48,14 @@ void SetDefaultResourcePath(const std::string &path);
 void EnableLog(bool value);
 void EnableLogToBuffer(bool value);
 
+/**
+ * @defgroup nojs Methods not available in the JavaScript toolkit
+ */
+
+/**
+ * @defgroup nodoc Public methods that are not listed in the documentation
+ */
+
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------
@@ -180,7 +188,8 @@ public:
      * Validate the Plaine and Easie file from the file system.
      *
      * The method calls Toolkit::ValidatePAE.
-     * This methods is not available in the JavaScript version of the toolkit.
+     *
+     * @ingroup nojs
      *
      * @param filename The filename to be validated
      * @return A stringified JSON object with the validation warnings or errors
@@ -271,6 +280,8 @@ public:
     /**
      * Set the scale option
      *
+     * @ingroup nojs
+     *
      * @param scale the scale value as integer
      * @return True if the option was successfully set
      */
@@ -279,12 +290,16 @@ public:
     /**
      * Get the scale option
      *
+     * @ingroup nojs
+     *
      * @return the scale option as integer
      */
     int GetScale() { return m_options->m_scale.GetValue(); }
 
     /**
      * Set the input from option
+     *
+     * @ingroup nojs
      *
      * @param inputFrom the input from value as string
      * @return True if the option was successfully set
@@ -294,7 +309,9 @@ public:
     /**
      * Set the output to option
      *
-     * @param scale the output to value as string
+     * @ingroup nojs
+     *
+     * @param outputTo the output to value as string
      * @return True if the option was successfully set
      */
     bool SetOutputTo(std::string const &outputTo);
@@ -355,10 +372,10 @@ public:
     /**
      * Render a page to SVG and save it to the file.
      *
-     * This methods is not available in the JavaScript version of the toolkit.
+     * @ingroup nojs
      *
      * @param @filename The output filename
-     * @param pageNo The page to render (1-based)
+     * @param @pageNo The page to render (1-based)
      * @return True if the file was successfully written
      */
     bool RenderToSVGFile(const std::string &filename, int pageNo = 1);
@@ -373,7 +390,7 @@ public:
     /**
      * Render a document to MIDI and save it to the file.
      *
-     * This methods is not available in the JavaScript version of the toolkit.
+     * @ingroup nojs
      *
      * @param @filename The output filename
      * @return True if the file was successfully written
@@ -393,7 +410,8 @@ public:
      * Render a document to Plaine and Easie and save it to the file
      *
      * Only the top staff / layer is exported.
-     * This methods is not available in the JavaScript version of the toolkit.
+     *
+     * @ingroup nojs
      *
      * @param @filename The output filename
      * @return True if the file was successfully written
@@ -403,7 +421,7 @@ public:
     /**
      * Render a document to a timemap
      *
-     * @param jsonOptions A stringified JSON objects with the timemap options
+     * @param @jsonOptions A stringified JSON objects with the timemap options
      * @return The timemap as a string
      */
     std::string RenderToTimemap(const std::string &jsonOptions = "");
@@ -411,10 +429,10 @@ public:
     /**
      * Render a document to timemap and save it to the file
      *
-     * This methods is not available in the JavaScript version of the toolkit.
+     * @ingroup nojs
      *
      * @param @filename The output filename
-     * @param jsonOptions A stringified JSON objects with the timemap options
+     * @param @jsonOptions A stringified JSON objects with the timemap options
      * @return True if the file was successfully written
      */
     bool RenderToTimemapFile(const std::string &filename, const std::string &jsonOptions = "");
@@ -459,7 +477,7 @@ public:
     /**
      * Write the humdrum buffer to the file
      *
-     * This methods is not available in the JavaScript version of the toolkit.
+     * @ingroup nojs
      *
      * @param @filename The output filename
      * @return True if the file was successfully written
@@ -488,7 +506,7 @@ public:
     /**
      * Get the MEI and save it to the file
      *
-     * This methods is not available in the JavaScript version of the toolkit.
+     * @ingroup nojs
      *
      * @param filename The output filename
      * @param jsonOptions A stringified JSON object with the output options
@@ -621,10 +639,6 @@ public:
     //------------------------------------------------//
     // Public methods not listed in the documentation //
     //------------------------------------------------//
-
-    /**
-     * @defgroup nodoc
-     */
 
     /**
      * @name Public methods that are not listed in the documentation
