@@ -122,22 +122,21 @@ bool Dynam::GetSymbolsInStr(std::u32string str, ArrayOfStringDynamTypePairs &tok
 {
     tokens.clear();
 
-    std::wistringstream iss(str);
-    std::wstring token;
-    std::wstring text;
+    std::u32string token = U"";
     bool hasSymbols = false;
-    while (std::getline(iss, token, L' ')) {
-        // if (token.size() == 0) continue;
+    while (str.compare(token) != 0) {
+        auto index = str.find_first_of(U" ");
+        token = str.substr(0, index);
         if (Dynam::IsSymbolOnly(token)) {
             hasSymbols = true;
             if (tokens.size() > 0) {
                 // previous one is not a symbol, add a space to it
                 if (tokens.back().second == false) {
-                    tokens.back().first = tokens.back().first + L" ";
+                    tokens.back().first = tokens.back().first + U" ";
                 }
                 // previous one it also a symbol, add a space in between
                 else {
-                    tokens.push_back({ L" ", false });
+                    tokens.push_back({ U" ", false });
                 }
             }
             // Add it in all cases
@@ -147,11 +146,11 @@ bool Dynam::GetSymbolsInStr(std::u32string str, ArrayOfStringDynamTypePairs &tok
             if (tokens.size() > 0) {
                 // previous one is not a symbol, append token to it with a space
                 if (tokens.back().second == false) {
-                    tokens.back().first = tokens.back().first + L" " + token;
+                    tokens.back().first = tokens.back().first + U" " + token;
                 }
                 // previous one is not a symbol, add it separately but with a space
                 else {
-                    tokens.push_back({ L" " + token, false });
+                    tokens.push_back({ U" " + token, false });
                 }
             }
             // First one, just add it
@@ -159,6 +158,11 @@ bool Dynam::GetSymbolsInStr(std::u32string str, ArrayOfStringDynamTypePairs &tok
                 tokens.push_back({ token, false });
             }
         }
+        // no ' '
+        if (index == std::string::npos) break;
+        // next dynam token
+        token = U"";
+        str = str.substr(index + 1, str.length());
     }
 
     return hasSymbols;

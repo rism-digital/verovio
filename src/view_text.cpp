@@ -256,34 +256,39 @@ void View::DrawLyricString(
     assert(dc);
 
     bool wroteText = false;
-    std::wistringstream iss(str);
-    std::wstring token;
-    while (std::getline(iss, token, L'_')) {
+    std::u32string syl = U"";
+    while (str.compare(syl) != 0) {
         wroteText = true;
+        auto index = str.find_first_of(U"_");
+        syl = str.substr(0, index);
         if (params) {
-            dc->DrawText(UTF16to8(token), token, params->m_x, params->m_y, params->m_width, params->m_height);
+            dc->DrawText(UTF16to8(syl), syl, params->m_x, params->m_y, params->m_width, params->m_height);
         }
         else {
-            dc->DrawText(UTF16to8(token), token);
+            dc->DrawText(UTF16to8(syl), syl);
         }
 
         // no _
-        if (iss.eof()) break;
+        if (index == std::string::npos) break;
 
         FontInfo vrvTxt;
         vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
         vrvTxt.SetFaceName("Leipzig");
         vrvTxt.SetSmuflFont(true);
         dc->SetFont(&vrvTxt);
-        std::wstring str;
-        str.push_back(VRV_TEXT_E551);
+        std::u32string elision;
+        elision.push_back(VRV_TEXT_E551);
         if (params) {
-            dc->DrawText(UTF16to8(str), str, params->m_x, params->m_y, params->m_width, params->m_height);
+            dc->DrawText(UTF16to8(elision), elision, params->m_x, params->m_y, params->m_width, params->m_height);
         }
         else {
-            dc->DrawText(UTF16to8(str), str);
+            dc->DrawText(UTF16to8(elision), elision);
         }
         dc->ResetFont();
+
+        // next syllable
+        syl = U"";
+        str = str.substr(index + 1, str.length());
     }
 
     // This should only be called in facsimile mode where a zone is specified but there is
