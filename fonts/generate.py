@@ -218,7 +218,7 @@ def __fontforge_helper(opts: Namespace, format: str) -> bool:
 
     fontforge_cmd: list = [
         fontforge_path,
-        "-lang=py"
+        "-lang=py",
         "-"
     ]
     fontname: str = opts.fontname
