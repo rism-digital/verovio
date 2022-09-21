@@ -6,21 +6,22 @@
 PYTHON="python3"
 
 echo "Generating C++ header file ..."
-$PYTHON generate-smufl-code.py
+$PYTHON generate.py smufl
 
 echo "Generating Bravura files ..."
-$PYTHON extract-bounding-boxes.py Bravura
+$PYTHON generate.py extract Bravura
+echo $PYTHON generate.py extract Bravura
 
 echo "Generating Leipzig files ..."
-$PYTHON extract-bounding-boxes.py Leipzig
+$PYTHON generate.py extract Leipzig
 
 echo "Generating Gootville files ..."
-$PYTHON extract-bounding-boxes.py Gootville
+$PYTHON generate.py extract Gootville
 
 echo "Generating Petaluma files ..."
-$PYTHON extract-bounding-boxes.py Petaluma
+$PYTHON generate.py extract Petaluma
 
 echo "Generating Leland files ..."
-$PYTHON extract-bounding-boxes.py Leland
+$PYTHON generate.py extract Leland
 
 echo "Done!"
