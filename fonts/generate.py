@@ -354,7 +354,6 @@ def __get_alternate_glyphs(glyphs: dict, metadata: dict) -> dict:
     for name, alternates in glyph_alternates.items():
         code: Optional[str] = inverted_glyphs.get(name)
         if not code:
-            print(f"Could not find code for {name}")
             continue
 
         for alt in alternates["alternates"]:
