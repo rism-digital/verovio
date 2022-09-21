@@ -115,13 +115,6 @@ Toolkit::~Toolkit()
 #endif
 }
 
-std::string Toolkit::GetUuid()
-{
-    LogWarning("Toolkit function GetUuid() is deprecated; use GetID() instead.");
-
-    return this->GetID();
-}
-
 std::string Toolkit::GetResourcePath() const
 {
     return m_doc.GetResources().GetPath();
@@ -1104,9 +1097,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     m_options->Sync();
 
-    // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
-    // This needs to be fixed
-    this->SetFont(m_options->m_font.GetValue());
+    // Forcing font resource to be reset if the font is given in the options
+    if (json.has<jsonxx::String>("font")) this->SetFont(m_options->m_font.GetValue());
 
     return true;
 }
@@ -1130,7 +1122,10 @@ bool Toolkit::SetOption(const std::string &option, const std::string &value)
     }
     Option *opt = m_options->GetItems()->at(option);
     assert(opt);
-    return opt->SetValue(value);
+    const bool result = opt->SetValue(value);
+    // If the option is 'font' we need to reset the font resource explicitly
+    if (result && option == "font") this->SetFont(m_options->m_font.GetValue());
+    return result;
 }
 
 void Toolkit::ResetOptions()
@@ -1379,6 +1374,14 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     m_view.DrawCurrentPage(deviceContext, false);
 
     return true;
+}
+
+std::string Toolkit::RenderData(const std::string &data, const std::string &jsonOptions)
+{
+    if (this->SetOptions(jsonOptions) && this->LoadData(data)) return this->RenderToSVG(1);
+
+    // Otherwise just return an empty string.
+    return "";
 }
 
 std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)

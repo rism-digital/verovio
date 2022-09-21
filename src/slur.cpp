@@ -623,13 +623,20 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
             = (spannedElement->m_boundingBox->GetSelfLeft() + spannedElement->m_boundingBox->GetSelfRight()) / 2.0;
         const float distanceRatio = float(xMiddle - bezierCurve.p1.x) / float(dist);
 
-        // In case of cross-staff, ignore obstacles which completely lie on the other side of the slur near the
-        // endpoints
+        // Ignore obstacles in a different layer which completely lie on the other side of the slur near the endpoints
         const int elementHeight
             = std::abs(spannedElement->m_boundingBox->GetSelfTop() - spannedElement->m_boundingBox->GetSelfBottom());
-        if (curve->IsCrossStaff() && (intersection > elementHeight + 4 * margin)
-            && (std::abs(distanceRatio - 0.5) > 0.45)) {
-            spannedElement->m_discarded = true;
+        if (intersection > elementHeight + 4 * margin) {
+            const LayerElement *layerElement = dynamic_cast<const LayerElement *>(spannedElement->m_boundingBox);
+            if (distanceRatio < 0.05) {
+                spannedElement->m_discarded = layerElement
+                    ? (layerElement->GetOriginalLayerN() != this->GetStart()->GetOriginalLayerN())
+                    : true;
+            }
+            else if (distanceRatio > 0.95) {
+                spannedElement->m_discarded
+                    = layerElement ? (layerElement->GetOriginalLayerN() != this->GetEnd()->GetOriginalLayerN()) : true;
+            }
         }
     }
 }
