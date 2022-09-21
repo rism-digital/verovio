@@ -10,7 +10,6 @@ $PYTHON generate.py smufl
 
 echo "Generating Bravura files ..."
 $PYTHON generate.py extract Bravura
-echo $PYTHON generate.py extract Bravura
 
 echo "Generating Leipzig files ..."
 $PYTHON generate.py extract Leipzig
