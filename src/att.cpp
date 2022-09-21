@@ -231,7 +231,7 @@ std::string Att::HexnumToStr(data_HEXNUM data) const
 {
     char buf[5];
     memset(buf, 0, 5);
-    sprintf(buf, "%.4X", data);
+    sprintf(buf, "%.4X", (int)data);
     return StringFormat("U+%s", buf);
 }
 
