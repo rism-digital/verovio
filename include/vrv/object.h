@@ -652,8 +652,6 @@ public:
     virtual FunctorCode Visit(ConstFunctor &functor) const;
     virtual FunctorCode VisitEnd(MutableFunctor &functor);
     virtual FunctorCode VisitEnd(ConstFunctor &functor) const;
-    void Call(MutableFunctor &functor, bool isEnd);
-    void Call(ConstFunctor &functor, bool isEnd) const;
     ///@}
 
     //----------------//

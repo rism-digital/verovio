@@ -1123,7 +1123,8 @@ void Object::Process(MutableFunctor &functor, int deepness, bool skipFirst)
     this->UpdateDocumentScore(functor.GetDirection());
 
     if (!skipFirst) {
-        this->Call(functor, false);
+        FunctorCode code = this->Visit(functor);
+        functor.SetCode(code);
     }
 
     // do not go any deeper in this case
@@ -1164,7 +1165,8 @@ void Object::Process(MutableFunctor &functor, int deepness, bool skipFirst)
     }
 
     if (functor.ImplementsEndInterface() && !skipFirst) {
-        this->Call(functor, true);
+        FunctorCode code = this->VisitEnd(functor);
+        functor.SetCode(code);
     }
 }
 
@@ -1178,7 +1180,8 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
     const_cast<Object *>(this)->UpdateDocumentScore(functor.GetDirection());
 
     if (!skipFirst) {
-        this->Call(functor, false);
+        FunctorCode code = this->Visit(functor);
+        functor.SetCode(code);
     }
 
     // do not go any deeper in this case
@@ -1219,7 +1222,8 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
     }
 
     if (functor.ImplementsEndInterface() && !skipFirst) {
-        this->Call(functor, true);
+        FunctorCode code = this->VisitEnd(functor);
+        functor.SetCode(code);
     }
 }
 
@@ -1241,18 +1245,6 @@ FunctorCode Object::VisitEnd(MutableFunctor &functor)
 FunctorCode Object::VisitEnd(ConstFunctor &functor) const
 {
     return functor.VisitObjectEnd(this);
-}
-
-void Object::Call(MutableFunctor &functor, bool isEnd)
-{
-    FunctorCode code = isEnd ? this->VisitEnd(functor) : this->Visit(functor);
-    functor.SetCode(code);
-}
-
-void Object::Call(ConstFunctor &functor, bool isEnd) const
-{
-    FunctorCode code = isEnd ? this->VisitEnd(functor) : this->Visit(functor);
-    functor.SetCode(code);
 }
 
 void Object::UpdateDocumentScore(bool direction)
