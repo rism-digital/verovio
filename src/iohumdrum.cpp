@@ -7967,9 +7967,9 @@ std::u32string HumdrumInput::convertFBNumber(const std::string &input, hum::HTp 
     }
 
     /*
-                To convert a free-form std::string to UTF16:
+                To convert a free-form std::string to UTF32:
                 std::string tdee;
-                output.back() += UTF8to16(tdee);
+                output.back() += UTF8to32(tdee);
     */
 
     return output;
@@ -9857,7 +9857,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                                     Clef *clef = insertClefElement(elements, pointers, tok, lastnote);
                                     setLocationId(clef, layerdata[i]);
                                     // Uncomment when clef->SetSameas() is available:
-                                    // std::string sameas = "#clef-U";
+                                    // std::string sameas = "#clef-L";
                                     // sameas += to_string(tok->getLineNumber());
                                     // sameas += "F";
                                     // sameas += to_string(tok->getFieldNumber());
@@ -10679,7 +10679,7 @@ void HumdrumInput::addSlur(FTrem *ftrem, hum::HTp start, hum::HTp ending)
     int endline = ending->getLineNumber();
     int endfield = ending->getFieldNumber();
     std::string lastid = "";
-    lastid += "-U" + to_string(endline);
+    lastid += "-L" + to_string(endline);
     lastid += "F" + to_string(endfield);
 
     std::string slurid = firstid;
@@ -11023,9 +11023,9 @@ void HumdrumInput::handleLigature(hum::HTp token)
     int stopline = ligend->getLineNumber();
     int stopfield = ligend->getFieldNumber();
     std::string id = "ligature";
-    id += "-U" + to_string(startline);
+    id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);
-    id += "-U" + to_string(stopline);
+    id += "-L" + to_string(stopline);
     id += "F" + to_string(stopfield);
     ligature->SetID(id);
 
@@ -11091,9 +11091,9 @@ void HumdrumInput::handleColoration(hum::HTp token)
     int stopline = colend->getLineNumber();
     int stopfield = colend->getFieldNumber();
     std::string id = "coloration";
-    id += "-U" + to_string(startline);
+    id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);
-    id += "-U" + to_string(stopline);
+    id += "-L" + to_string(stopline);
     id += "F" + to_string(stopfield);
     coloration->SetID(id);
 
@@ -15584,10 +15584,10 @@ std::string HumdrumInput::generateSlurId(hum::HTp token, int count, int number)
 {
     std::string id;
     if (token->isChord()) {
-        id = "chord-U";
+        id = "chord-L";
     }
     else {
-        id = "note-U";
+        id = "note-L";
     }
     id += to_string(token->getLineNumber());
     id += "F";
@@ -16149,10 +16149,10 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
 
     if (startid == "") {
         if (phrasestart->isChord()) {
-            startid = "chord-U";
+            startid = "chord-L";
         }
         else {
-            startid = "note-U";
+            startid = "note-L";
         }
         startid += to_string(phrasestart->getLineNumber());
         startid += "F";
@@ -23023,8 +23023,8 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 //      LO:TURN:facc[=true] = flip upper and lower accidentals
 //      LO:TURN:uacc=[acc]  = upper [visible] accidental (or lower visual one if flip is active)
 //      LO:TURN:lacc=[acc]  = lower [visible] accidental (or upper visual one if flip is active)
-// 			[ul]acc = "none" = force the accidental not to show
-// 			[ul]acc = "true" = force the accidental not to show ("LO:TURN:[ul]acc" hide an accidental)
+//             [ul]acc = "none" = force the accidental not to show
+//             [ul]acc = "true" = force the accidental not to show ("LO:TURN:[ul]acc" hide an accidental)
 //
 // Deal with cases where the accidental should be hidden but different from sounding accidental.  This
 // can be done when MEI allows @accidlower.ges and @accidupper.ges.
@@ -24912,8 +24912,8 @@ int HumdrumInput::getMeasureNumber(int startline, int endline)
                 found = false;
                 linenum = -1;
                 // if (infile.hasPickup()) {
-                // 		// set the first implicit measure to 0
-                // 		return 0;
+                //         // set the first implicit measure to 0
+                //         return 0;
                 // }
                 break;
             }
@@ -25245,7 +25245,7 @@ std::string HumdrumInput::getLocationId(Object *object, hum::HTp token, int subt
     int field = token->getFieldIndex() + 1;
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
-    id += "-U" + to_string(line);
+    id += "-L" + to_string(line);
     id += "F" + to_string(field);
     if (subtoken >= 0) {
         id += "S" + to_string(subtoken + 1);
@@ -25258,7 +25258,7 @@ std::string HumdrumInput::getLocationId(const std::string &prefix, hum::HTp toke
     int line = token->getLineIndex() + 1;
     int field = token->getFieldIndex() + 1;
     std::string id = prefix;
-    id += "-U" + to_string(line);
+    id += "-L" + to_string(line);
     id += "F" + to_string(field);
     if (subtoken >= 0) {
         id += "S" + to_string(subtoken + 1);
@@ -25274,7 +25274,7 @@ std::string HumdrumInput::getLocationId(Object *object, int lineindex, int field
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     if (line > 0) {
-        id += "-U" + to_string(line);
+        id += "-L" + to_string(line);
     }
     if (field > 0) {
         id += "F" + to_string(field);
@@ -25292,7 +25292,7 @@ std::string HumdrumInput::getLocationId(const std::string &prefix, int lineindex
     int subtoken = subtokenindex + 1;
     std::string id = prefix;
     if (line > 0) {
-        id += "-U" + to_string(line);
+        id += "-L" + to_string(line);
     }
     if (field > 0) {
         id += "F" + to_string(field);
@@ -25314,7 +25314,7 @@ void HumdrumInput::setLocationIdNSuffix(Object *object, hum::HTp token, int numb
     int field = token->getFieldIndex() + 1;
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
-    id += "-U" + to_string(line);
+    id += "-L" + to_string(line);
     id += "F" + to_string(field);
     id += "N" + to_string(number);
     object->SetID(id);
@@ -25401,7 +25401,7 @@ void HumdrumInput::setBeamLocationId(Object *object, const std::vector<humaux::H
 
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
-    id += "-U" + to_string(startline);
+    id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);
 
     // int endnum = -1;
@@ -25418,7 +25418,7 @@ void HumdrumInput::setBeamLocationId(Object *object, const std::vector<humaux::H
         hum::HTp endtoken = layerdata[endindex];
         int endline = endtoken->getLineNumber();
         int endfield = endtoken->getFieldNumber();
-        id += "-U" + to_string(endline);
+        id += "-L" + to_string(endline);
         id += "F" + to_string(endfield);
     }
 
@@ -25440,7 +25440,7 @@ void HumdrumInput::setTupletLocationId(Object *object, const std::vector<humaux:
 
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
-    id += "-U" + to_string(startline);
+    id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);
 
     // int endnum = -1;
@@ -25457,7 +25457,7 @@ void HumdrumInput::setTupletLocationId(Object *object, const std::vector<humaux:
         hum::HTp endtoken = layerdata[endindex];
         int endline = endtoken->getLineNumber();
         int endfield = endtoken->getFieldNumber();
-        id += "-U" + to_string(endline);
+        id += "-L" + to_string(endline);
         id += "F" + to_string(endfield);
     }
 
@@ -25489,13 +25489,13 @@ void HumdrumInput::setTieLocationId(Object *object, hum::HTp tiestart, int sinde
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
 
-    id += "-U" + to_string(startline);
+    id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);
     if (sindex >= 0) {
         id += "S" + to_string(sindex + 1);
     }
 
-    id += "-U" + to_string(endline);
+    id += "-L" + to_string(endline);
     id += "F" + to_string(endfield);
     if (eindex >= 0) {
         id += "S" + to_string(eindex + 1);
@@ -25523,7 +25523,7 @@ void HumdrumInput::setSlurLocationId(
         id = prefix;
     }
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
-    id += "-U" + to_string(startline);
+    id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);
     int startcount = slurstart->getValueInt("auto", "slurStartCount");
     int endcount = slurend->getValueInt("auto", "slurEndCount");
@@ -25542,7 +25542,7 @@ void HumdrumInput::setSlurLocationId(
     int endline = slurend->getLineNumber();
     int endfield = slurend->getFieldNumber();
 
-    id += "-U";
+    id += "-L";
     id += to_string(endline);
     id += "F";
     id += to_string(endfield);
@@ -26070,34 +26070,34 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
     // Example analysis, with measure 4 staring a rest with num="6".
     // Measures 5-9 marked as whole-measure rests which will be merged into
     // the multi rest.
-    //	**kern	**kern	0
-    //	*M4/4	*M4/4	0
-    //	=1-	=1-	0
-    //	1c	1d	0
-    //	=2	=2	0
-    //	1d	1g	0
-    //	=3	=3	0
-    //	1r	1e	0
-    //	=4	=4	6
-    //	1r	1r	6
-    //	=5	=5	-1
-    //	1r	1r	-1
-    //	=6	=6	-1
-    //	1r	1r	-1
-    //	=7	=7	-1
-    //	1r	1r	-1
-    //	=8	=8	-1
-    //	1r	1r	-1
-    //	=9	=9	-1
-    //	1r	1r	-1
-    //	=10	=10	0
-    //	1f	1r	0
-    //	=11	=11	0
-    //	1g	1g	0
-    //	=12	=12	0
-    //	1a	1g	0
-    //	==	==	0
-    //	*-	*-	0
+    //    **kern    **kern    0
+    //    *M4/4    *M4/4    0
+    //    =1-    =1-    0
+    //    1c    1d    0
+    //    =2    =2    0
+    //    1d    1g    0
+    //    =3    =3    0
+    //    1r    1e    0
+    //    =4    =4    6
+    //    1r    1r    6
+    //    =5    =5    -1
+    //    1r    1r    -1
+    //    =6    =6    -1
+    //    1r    1r    -1
+    //    =7    =7    -1
+    //    1r    1r    -1
+    //    =8    =8    -1
+    //    1r    1r    -1
+    //    =9    =9    -1
+    //    1r    1r    -1
+    //    =10    =10    0
+    //    1f    1r    0
+    //    =11    =11    0
+    //    1g    1g    0
+    //    =12    =12    0
+    //    1a    1g    0
+    //    ==    ==    0
+    //    *-    *-    0
 
     if (!barindex.empty()) {
         int firstbar = barindex[0];
