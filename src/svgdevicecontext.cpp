@@ -111,7 +111,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     // add the woff2 font if needed
     const Resources *resources = this->GetResources(true);
     if (m_vrvTextFont && resources) {
-        const std::string woffPath = StringFormat("%s/%s.woff2.xml", resources->GetCurrentFontName().c_str());
+        const std::string woffPath
+            = StringFormat("%s/%s.woff2.xml", resources->GetPath().c_str(), resources->GetCurrentFontName().c_str());
         pugi::xml_document woffDoc;
         woffDoc.load_file(woffPath.c_str());
         if (!woffDoc.first_child()) {
