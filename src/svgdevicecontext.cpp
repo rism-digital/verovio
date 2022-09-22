@@ -111,15 +111,18 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     // add the woff2 font if needed
     const Resources *resources = this->GetResources(true);
     if (m_vrvTextFont && resources) {
-        const std::string woffPath
-            = StringFormat("%s/%s.woff2.xml", resources->GetPath().c_str(), resources->GetCurrentFontName().c_str());
-        pugi::xml_document woffDoc;
-        woffDoc.load_file(woffPath.c_str());
-        if (!woffDoc.first_child()) {
-            LogWarning("The web font (woff2) for '%s' could not be loaded and will not be embedded in the SVG");
+        const std::string cssFontPath
+            = StringFormat("%s/%s.css", resources->GetPath().c_str(), resources->GetCurrentFontName().c_str());
+        std::ifstream cssFontFile(cssFontPath);
+        if (!cssFontFile.is_open()) {
+            LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG");
         }
         else {
-            m_svgNode.append_copy(woffDoc.first_child());
+            std::stringstream cssFontStream;
+            cssFontStream << cssFontFile.rdbuf();
+            pugi::xml_node css = m_svgNode.append_child("style");
+            css.append_attribute("type") = "text/css";
+            css.append_child(pugi::node_pcdata).set_value(cssFontStream.str().c_str());
         }
     }
 
