@@ -114,7 +114,12 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         const std::string woffPath = StringFormat("%s/%s.woff2.xml", resources->GetCurrentFontName().c_str());
         pugi::xml_document woffDoc;
         woffDoc.load_file(woffPath.c_str());
-        m_svgNode.append_copy(woffDoc.first_child());
+        if (!woffDoc.first_child()) {
+            LogWarning("The web font (woff2) for '%s' could not be loaded and will not be embedded in the SVG");
+        }
+        else {
+            m_svgNode.append_copy(woffDoc.first_child());
+        }
     }
 
     // header
