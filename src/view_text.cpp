@@ -116,7 +116,7 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
                 std::wstring smuflStr = Dynam::GetSymbolStr(token.first, singleGlyphs);
                 FontInfo vrvTxt;
                 vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-                vrvTxt.SetFaceName("Leipzig");
+                vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
                 vrvTxt.SetSmuflFont(true);
                 vrvTxt.SetStyle(FONTSTYLE_normal);
                 dc->SetFont(&vrvTxt);
@@ -187,7 +187,7 @@ void View::DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams
 
             FontInfo vrvTxt;
             vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-            vrvTxt.SetFaceName("Leipzig");
+            vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
             vrvTxt.SetSmuflFont(true);
             dc->SetFont(&vrvTxt);
             // Once we have rendered the some text to not pass x / y anymore
@@ -271,7 +271,7 @@ void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize, s
 
         FontInfo vrvTxt;
         vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-        vrvTxt.SetFaceName("Leipzig");
+        vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
         vrvTxt.SetSmuflFont(true);
         dc->SetFont(&vrvTxt);
         std::wstring str;
@@ -379,7 +379,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         }
         if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
             rendFont.SetSmuflFont(true);
-            rendFont.SetFaceName("Leipzig");
+            rendFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
             int pointSize = (rendFont.GetPointSize() != 0) ? rendFont.GetPointSize() : params.m_pointSize;
             rendFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
         }
@@ -537,7 +537,7 @@ void View::DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &para
 
     if (symbol->HasGlyphAuth() && symbol->GetGlyphAuth() == "smufl") {
         symbolFont.SetSmuflFont(true);
-        symbolFont.SetFaceName("Leipzig");
+        symbolFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
         int pointSize = (symbolFont.GetPointSize() != 0) ? symbolFont.GetPointSize() : params.m_pointSize;
         symbolFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
     }

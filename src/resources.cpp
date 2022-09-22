@@ -207,6 +207,7 @@ bool Resources::LoadFont(const std::string &fontName)
         m_glyphNameTable[n_attribute.value()] = smuflCode;
     }
 
+    m_fontName = fontName;
     return true;
 }
 
