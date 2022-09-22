@@ -364,10 +364,21 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     std::streamsize wfileSize = (std::streamsize)fin.tellg();
     fin.clear();
     // Skip the BOM
-    fin.seekg(3, std::wios::beg);
+    fin.seekg(0, std::wios::beg);
 
     std::u16string u16data((wfileSize / 2) + 1, '\0');
     fin.read((char *)&u16data[0], wfileSize);
+
+    // order of the bytes have to be flipped
+    if (u16data.at(0) == u'\uFFFE') {
+        LogWarning("The file seems to have been loaded as little endian - trying to convert to big endian");
+        // convert to big endian (swap bytes)
+        std::transform(std::begin(u16data), std::end(u16data), std::begin(u16data), [](char16_t c) {
+            auto p = reinterpret_cast<char *>(&c);
+            std::swap(p[0], p[1]);
+            return c;
+        });
+    }
 
     std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
     std::string utf8line = convert.to_bytes(u16data);
