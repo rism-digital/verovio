@@ -369,7 +369,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     std::u16string u16data((wfileSize / 2) + 1, '\0');
     fin.read((char *)&u16data[0], wfileSize);
 
-    // order of the bytes have to be flipped
+    // order of the bytes has to be flipped
     if (u16data.at(0) == u'\uFFFE') {
         LogWarning("The file seems to have been loaded as little endian - trying to convert to big endian");
         // convert to big endian (swap bytes)
