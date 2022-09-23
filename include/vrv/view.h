@@ -550,10 +550,10 @@ protected:
     void DrawThickBezierCurve(
         DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, int penStyle = AxSOLID);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
-    void DrawTextString(DeviceContext *dc, std::u32string str, TextDrawingParams &params);
+    void DrawTextString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
     void DrawDirString(DeviceContext *dc, std::u32string str, TextDrawingParams &params);
-    void DrawDynamString(DeviceContext *dc, std::u32string str, TextDrawingParams &params, Rend *rend);
-    void DrawHarmString(DeviceContext *dc, std::u32string str, TextDrawingParams &params);
+    void DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params, Rend *rend);
+    void DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params);
     void DrawSmuflLine(DeviceContext *dc, Point orig, int length, int staffSize, bool dimin, char32_t fill,
         char32_t start = 0, char32_t end = 0);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::u32string s, data_HORIZONTALALIGNMENT alignment,

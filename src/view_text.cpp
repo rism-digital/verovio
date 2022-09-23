@@ -60,7 +60,7 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
     dc->EndTextGraphic(f, this);
 }
 
-void View::DrawTextString(DeviceContext *dc, std::u32string str, TextDrawingParams &params)
+void View::DrawTextString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params)
 {
     assert(dc);
 
@@ -72,17 +72,16 @@ void View::DrawDirString(DeviceContext *dc, std::u32string str, TextDrawingParam
     assert(dc);
     assert(dc->GetFont());
 
-    std::u32string adjustedStr = str;
     // If the current font is a music font, we want to convert Music Unicode glyph to SMuFL
     if (dc->GetFont()->GetSmuflFont()) {
-        for (int i = 0; i < (int)adjustedStr.size(); i++) {
-            adjustedStr[i] = Resources::GetSmuflGlyphForUnicodeChar(str.at(i));
+        for (int i = 0; i < (int)str.size(); i++) {
+            str[i] = Resources::GetSmuflGlyphForUnicodeChar(str.at(i));
         }
     }
-    this->DrawTextString(dc, adjustedStr, params);
+    this->DrawTextString(dc, str, params);
 }
 
-void View::DrawDynamString(DeviceContext *dc, std::u32string str, TextDrawingParams &params, Rend *rend)
+void View::DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params, Rend *rend)
 {
     assert(dc);
 
@@ -143,7 +142,7 @@ void View::DrawDynamString(DeviceContext *dc, std::u32string str, TextDrawingPar
     }
 }
 
-void View::DrawHarmString(DeviceContext *dc, std::u32string str, TextDrawingParams &params)
+void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params)
 {
     assert(dc);
 
