@@ -455,16 +455,6 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 //----------------------------------------------------------------------------
 
 /**
- * These are SMuFL codepoints for the VerovioText font used for embedding
- * SMuFL text glyph within text, as for example with <annot> or <syl>
- * Verovio uses a very small subset of glyph defined below (for now)
- */
-
-#define VRV_TEXT_E550 0xE550
-#define VRV_TEXT_E551 0xE551
-#define VRV_TEXT_E552 0xE552
-
-/**
  * SMUFL Symbols used in figured bass included in VerovioText
  * Text accidentals (266D to 266F)
  * SMuFL accidentals (E260 to E264)
