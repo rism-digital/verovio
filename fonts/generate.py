@@ -634,7 +634,7 @@ if __name__ == "__main__":
         help="Path to fontforge binary (default is to auto-detect on the path)",
         default=None,
     )
-    parser_woff2.set_defaults(func=generate_svg)
+    parser_woff2.set_defaults(func=generate_woff2)
 
     cmd_opts: Namespace = cli.parse_args()
 
