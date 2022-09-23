@@ -86,13 +86,13 @@ bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos) const
         int pname = (text.at(pos) - 'C' + 7) % 7;
         int accid = 0;
         for (pos++; pos < text.length(); pos++) {
-            if (text.at(pos) == U'\U0001D12B')
+            if (text.at(pos) == UNICODE_DOUBLE_FLAT)
                 accid -= 2;
-            else if (text.at(pos) == 'b' || text.at(pos) == U'\u266D')
+            else if (text.at(pos) == 'b' || text.at(pos) == UNICODE_FLAT)
                 accid--;
-            else if (text.at(pos) == '#' || text.at(pos) == U'\u266F')
+            else if (text.at(pos) == '#' || text.at(pos) == UNICODE_SHARP)
                 accid++;
-            else if (text.at(pos) == U'\U0001D12A')
+            else if (text.at(pos) == UNICODE_DOUBLE_SHARP)
                 accid += 2;
             else
                 break;

@@ -130,10 +130,10 @@ char32_t Resources::GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar)
 {
     char32_t smuflChar = unicodeChar;
     switch (unicodeChar) {
-        case U'\U0001d109': smuflChar = SMUFL_E045_dalSegno; break;
-        case U'\U0001d10a': smuflChar = SMUFL_E046_daCapo; break;
-        case U'\U0001d10b': smuflChar = SMUFL_E047_segno; break;
-        case U'\U0001d10c': smuflChar = SMUFL_E048_coda; break;
+        case UNICODE_DAL_SEGNO: smuflChar = SMUFL_E045_dalSegno; break;
+        case UNICODE_DA_CAPO: smuflChar = SMUFL_E046_daCapo; break;
+        case UNICODE_SEGNO: smuflChar = SMUFL_E047_segno; break;
+        case UNICODE_CODA: smuflChar = SMUFL_E048_coda; break;
         default: break;
     }
     return smuflChar;
