@@ -424,7 +424,6 @@ def __write_xml_glyphs(
     units_per_em: str,
     output: Path,
 ) -> None:
-
     log.debug("Writing individual glyph files to %s", output.resolve())
     for glyph in glyphs:
         glyph_name: Optional[str] = glyph.attrib.get("glyph-name")
@@ -461,7 +460,6 @@ def __write_xml_svg(
     metadata: dict,
     output: Path,
 ) -> None:
-
     log.debug("Writing Verovio SVG file for %s", family)
     root: Et.Element = Et.Element("bounding-boxes")
     root.set("font-family", family)
@@ -475,6 +473,9 @@ def __write_xml_svg(
             continue
 
         code: str = glyph_name[-4:]
+        if code not in supported_glyphs:
+            continue
+
         g_element: Et.Element = Et.SubElement(root, "g")
         g_element.set("c", code)
 
