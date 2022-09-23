@@ -152,8 +152,8 @@ public:
      */
     ///@{
     virtual void GetTextExtent(const std::string &string, TextExtend *extend, bool typeSize);
-    virtual void GetTextExtent(const std::wstring &string, TextExtend *extend, bool typeSize);
-    virtual void GetSmuflTextExtent(const std::wstring &string, TextExtend *extend);
+    virtual void GetTextExtent(const std::u32string &string, TextExtend *extend, bool typeSize);
+    virtual void GetSmuflTextExtent(const std::u32string &string, TextExtend *extend);
 
     /**
      * @name Getters
@@ -178,10 +178,10 @@ public:
     virtual void DrawRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius) = 0;
-    virtual void DrawText(const std::string &text, const std::wstring &wtext = L"", int x = VRV_UNSET,
+    virtual void DrawText(const std::string &text, const std::u32string &wtext = U"", int x = VRV_UNSET,
         int y = VRV_UNSET, int width = VRV_UNSET, int height = VRV_UNSET)
         = 0;
-    virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) = 0;
+    virtual void DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
     virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) = 0;
     virtual void DrawBackgroundImage(int x = 0, int y = 0) = 0;

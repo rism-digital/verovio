@@ -57,14 +57,14 @@ bool AreEqual(double dFirstVal, double dSecondVal);
 std::string ExtractIDFragment(std::string refID);
 
 /**
- * Utility for converting UTF16 (std::wstring) to UTF-8
+ * Utility for converting UTF32 (std::u32string) to UTF-8
  */
-std::string UTF16to8(const std::wstring &in);
+std::string UTF32to8(const std::u32string &in);
 
 /**
- * Utility for converting UTF-8 to UTF16 (std::wstring)
+ * Utility for converting UTF-8 to UTF32 (std::u32string)
  */
-std::wstring UTF8to16(const std::string &in);
+std::u32string UTF8to32(const std::string &in);
 
 /**
  * Format a string using vsnprintf.

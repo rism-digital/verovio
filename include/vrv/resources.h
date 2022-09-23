@@ -24,8 +24,8 @@ namespace vrv {
 class Resources {
 public:
     using StyleAttributes = std::pair<data_FONTWEIGHT, data_FONTSTYLE>;
-    using GlyphTable = std::unordered_map<wchar_t, Glyph>;
-    using GlyphNameTable = std::unordered_map<std::string, wchar_t>;
+    using GlyphTable = std::unordered_map<char32_t, Glyph>;
+    using GlyphNameTable = std::unordered_map<std::string, char32_t>;
     using GlyphTextMap = std::map<StyleAttributes, GlyphTable>;
 
     /**
@@ -65,11 +65,11 @@ public:
      */
     ///@{
     /** Returns the glyph (if exists) for a glyph code in the current SMuFL font */
-    const Glyph *GetGlyph(wchar_t smuflCode) const;
+    const Glyph *GetGlyph(char32_t smuflCode) const;
     /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
     const Glyph *GetGlyph(const std::string &smuflName) const;
     /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
-    wchar_t GetGlyphCode(const std::string &smuflName) const;
+    char32_t GetGlyphCode(const std::string &smuflName) const;
     ///@}
 
     /**
@@ -79,14 +79,14 @@ public:
     /** Set current text style*/
     void SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle) const;
     /** Returns the glyph (if exists) for the text font (bounding box and ASCII only) */
-    const Glyph *GetTextGlyph(wchar_t code) const;
+    const Glyph *GetTextGlyph(char32_t code) const;
     ///@}
 
     /**
      * Static method that converts unicode music code points to SMuFL equivalent.
      * Return the parameter char if nothing can be converted.
      */
-    static wchar_t GetSmuflGlyphForUnicodeChar(const wchar_t unicodeChar);
+    static char32_t GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar);
 
 private:
     bool LoadFont(const std::string &fontName);

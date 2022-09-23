@@ -531,8 +531,8 @@ void View::DrawLabels(
     LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
     Object *graphic = label;
 
-    std::wstring labelStr = (label) ? label->GetText(label) : L"";
-    std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
+    std::u32string labelStr = (label) ? label->GetText(label) : U"";
+    std::u32string labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : U"";
 
     if (abbreviations) {
         labelStr = labelAbbrStr;
@@ -575,7 +575,7 @@ void View::DrawLabels(
     // also store in the system the maximum width with abbreviations for justification
     if (labelAbbr && !abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
-        std::vector<std::wstring> lines;
+        std::vector<std::u32string> lines;
         labelAbbr->GetTextLines(labelAbbr, lines);
         int maxLength = 0;
         for (auto const &line : lines) {
@@ -1921,7 +1921,7 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextEl
 
     Annot *annot = vrv_cast<Annot *>(element);
     assert(annot);
-    dc->AddDescription(UTF16to8(annot->GetText(annot)));
+    dc->AddDescription(UTF32to8(annot->GetText(annot)));
 
     if (isTextElement) {
         dc->EndTextGraphic(element, this);

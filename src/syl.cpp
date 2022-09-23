@@ -18,6 +18,7 @@
 #include "functorparams.h"
 #include "measure.h"
 #include "note.h"
+#include "smufl.h"
 #include "staff.h"
 #include "text.h"
 #include "textelement.h"
@@ -98,7 +99,7 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
     // Elision
     else if (con == sylLog_CON_b) {
         // Calculate the elision space with the current music font
-        int elisionSpace = doc->GetGlyphAdvX(VRV_TEXT_E551, staffSize, false);
+        int elisionSpace = doc->GetGlyphAdvX(SMUFL_E551_lyricsElision, staffSize, false);
         // Adjust it proportionally to the lyric size
         elisionSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
         spacing = elisionSpace;
@@ -197,7 +198,7 @@ int Syl::GenerateMIDI(FunctorParams *functorParams)
 
     const int startTime = params->m_totalTime + params->m_lastNote->GetScoreTimeOnset();
     Text *text = vrv_cast<Text *>(this->GetChild(0, TEXT));
-    const std::string sylText = UTF16to8(text->GetText());
+    const std::string sylText = UTF32to8(text->GetText());
 
     params->m_midiFile->addLyric(params->m_midiTrack, startTime * params->m_midiFile->getTPQ(), sylText);
 

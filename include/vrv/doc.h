@@ -146,13 +146,13 @@ public:
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
      */
     ///@{
-    int GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const;
-    int GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const;
-    int GetGlyphLeft(wchar_t code, int staffSize, bool graceSize) const;
-    int GetGlyphRight(wchar_t code, int staffSize, bool graceSize) const;
-    int GetGlyphBottom(wchar_t code, int staffSize, bool graceSize) const;
-    int GetGlyphTop(wchar_t code, int staffSize, bool graceSize) const;
-    int GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const;
+    int GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const;
+    int GetGlyphWidth(char32_t code, int staffSize, bool graceSize) const;
+    int GetGlyphLeft(char32_t code, int staffSize, bool graceSize) const;
+    int GetGlyphRight(char32_t code, int staffSize, bool graceSize) const;
+    int GetGlyphBottom(char32_t code, int staffSize, bool graceSize) const;
+    int GetGlyphTop(char32_t code, int staffSize, bool graceSize) const;
+    int GetGlyphAdvX(char32_t code, int staffSize, bool graceSize) const;
     int GetDrawingUnit(int staffSize) const;
     int GetDrawingDoubleUnit(int staffSize) const;
     int GetDrawingStaffSize(int staffSize) const;
@@ -179,10 +179,10 @@ public:
      * The staff size must already be taken into account in the FontInfo
      */
     ///@{
-    int GetTextGlyphHeight(wchar_t code, const FontInfo *font, bool graceSize) const;
-    int GetTextGlyphWidth(wchar_t code, const FontInfo *font, bool graceSize) const;
-    int GetTextGlyphAdvX(wchar_t code, const FontInfo *font, bool graceSize) const;
-    int GetTextGlyphDescender(wchar_t code, const FontInfo *font, bool graceSize) const;
+    int GetTextGlyphHeight(char32_t code, const FontInfo *font, bool graceSize) const;
+    int GetTextGlyphWidth(char32_t code, const FontInfo *font, bool graceSize) const;
+    int GetTextGlyphAdvX(char32_t code, const FontInfo *font, bool graceSize) const;
+    int GetTextGlyphDescender(char32_t code, const FontInfo *font, bool graceSize) const;
     int GetTextLineHeight(const FontInfo *font, bool graceSize) const;
     int GetTextXHeight(const FontInfo *font, bool graceSize) const;
     ///@}

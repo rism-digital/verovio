@@ -326,12 +326,12 @@ void RunningElement::SetCurrentPageNum(const Page *currentPage)
     if (!num || (num->GetLabel() != "page")) return;
 
     Text *text = dynamic_cast<Text *>(num->FindDescendantByType(TEXT));
-    if (!text || (text->GetText() != L"#")) return;
+    if (!text || (text->GetText() != U"#")) return;
 
     Text *currentText = num->GetCurrentText();
     assert(currentText);
 
-    currentText->SetText(UTF8to16(StringFormat("%d", currentNum)));
+    currentText->SetText(UTF8to32(StringFormat("%d", currentNum)));
 }
 
 void RunningElement::LoadFooter(const Doc *doc)
@@ -359,13 +359,13 @@ void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALAL
     rend->SetHalign(halign);
     rend->SetValign(valign);
     Text *dash1 = new Text();
-    dash1->SetText(L"– ");
+    dash1->SetText(U"– ");
     Num *num = new Num();
     num->SetLabel("page");
     Text *text = new Text();
-    text->SetText(L"#");
+    text->SetText(U"#");
     Text *dash2 = new Text();
-    dash2->SetText(L" –");
+    dash2->SetText(U" –");
 
     num->AddChild(text);
     rend->AddChild(dash1);

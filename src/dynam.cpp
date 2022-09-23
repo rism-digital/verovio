@@ -26,8 +26,8 @@
 namespace vrv {
 
 #define DYNAM_CHARS 7
-const std::wstring dynamChars[] = { L"p", L"m", L"f", L"r", L"s", L"z", L"n" };
-const std::wstring dynamSmufl[] = { L"\uE520", L"\uE521", L"\uE522", L"\uE523", L"\uE524", L"\uE525", L"\uE526" };
+const std::u32string dynamChars[] = { U"p", U"m", U"f", U"r", U"s", U"z", U"n" };
+const std::u32string dynamSmufl[] = { U"\uE520", U"\uE521", U"\uE522", U"\uE523", U"\uE524", U"\uE525", U"\uE526" };
 
 //----------------------------------------------------------------------------
 // Dynam
@@ -88,8 +88,8 @@ bool Dynam::IsSupportedChild(Object *child)
 
 bool Dynam::IsSymbolOnly() const
 {
-    m_symbolStr = L"";
-    std::wstring str = this->GetText(this);
+    m_symbolStr = U"";
+    std::u32string str = this->GetText(this);
     if (Dynam::IsSymbolOnly(str)) {
         m_symbolStr = str;
         return true;
@@ -97,12 +97,12 @@ bool Dynam::IsSymbolOnly() const
     return false;
 }
 
-std::wstring Dynam::GetSymbolStr(const bool singleGlyphs) const
+std::u32string Dynam::GetSymbolStr(const bool singleGlyphs) const
 {
     return Dynam::GetSymbolStr(m_symbolStr, singleGlyphs);
 }
 
-std::pair<wchar_t, wchar_t> Dynam::GetEnclosingGlyphs() const
+std::pair<char32_t, char32_t> Dynam::GetEnclosingGlyphs() const
 {
     if (this->HasEnclose()) {
         switch (this->GetEnclose()) {
@@ -118,26 +118,25 @@ std::pair<wchar_t, wchar_t> Dynam::GetEnclosingGlyphs() const
 // Static methods for Dynam
 //----------------------------------------------------------------------------
 
-bool Dynam::GetSymbolsInStr(const std::wstring &str, ArrayOfStringDynamTypePairs &tokens)
+bool Dynam::GetSymbolsInStr(std::u32string str, ArrayOfStringDynamTypePairs &tokens)
 {
     tokens.clear();
 
-    std::wistringstream iss(str);
-    std::wstring token;
-    std::wstring text;
+    std::u32string token = U"";
     bool hasSymbols = false;
-    while (std::getline(iss, token, L' ')) {
-        // if (token.size() == 0) continue;
+    while (str.compare(token) != 0) {
+        auto index = str.find_first_of(U" ");
+        token = str.substr(0, index);
         if (Dynam::IsSymbolOnly(token)) {
             hasSymbols = true;
             if (tokens.size() > 0) {
                 // previous one is not a symbol, add a space to it
                 if (tokens.back().second == false) {
-                    tokens.back().first = tokens.back().first + L" ";
+                    tokens.back().first = tokens.back().first + U" ";
                 }
                 // previous one it also a symbol, add a space in between
                 else {
-                    tokens.push_back({ L" ", false });
+                    tokens.push_back({ U" ", false });
                 }
             }
             // Add it in all cases
@@ -147,11 +146,11 @@ bool Dynam::GetSymbolsInStr(const std::wstring &str, ArrayOfStringDynamTypePairs
             if (tokens.size() > 0) {
                 // previous one is not a symbol, append token to it with a space
                 if (tokens.back().second == false) {
-                    tokens.back().first = tokens.back().first + L" " + token;
+                    tokens.back().first = tokens.back().first + U" " + token;
                 }
                 // previous one is not a symbol, add it separately but with a space
                 else {
-                    tokens.push_back({ L" " + token, false });
+                    tokens.push_back({ U" " + token, false });
                 }
             }
             // First one, just add it
@@ -159,84 +158,89 @@ bool Dynam::GetSymbolsInStr(const std::wstring &str, ArrayOfStringDynamTypePairs
                 tokens.push_back({ token, false });
             }
         }
+        // no ' '
+        if (index == std::string::npos) break;
+        // next dynam token
+        token = U"";
+        str = str.substr(index + 1, str.length());
     }
 
     return hasSymbols;
 }
 
-bool Dynam::IsSymbolOnly(const std::wstring &str)
+bool Dynam::IsSymbolOnly(const std::u32string &str)
 {
     if (str.empty()) return false;
 
-    if (str.find_first_not_of(L"fpmrszn") == std::string::npos) {
+    if (str.find_first_not_of(U"fpmrszn") == std::string::npos) {
         return true;
     }
     return false;
 }
 
-std::wstring Dynam::GetSymbolStr(const std::wstring &str, const bool singleGlyphs)
+std::u32string Dynam::GetSymbolStr(const std::u32string &str, const bool singleGlyphs)
 {
-    std::wstring dynam;
+    std::u32string dynam;
     if (!singleGlyphs) {
-        if (str == L"p")
+        if (str == U"p")
             dynam.push_back(SMUFL_E520_dynamicPiano);
-        else if (str == L"m")
+        else if (str == U"m")
             dynam.push_back(SMUFL_E521_dynamicMezzo);
-        else if (str == L"f")
+        else if (str == U"f")
             dynam.push_back(SMUFL_E522_dynamicForte);
-        else if (str == L"r")
+        else if (str == U"r")
             dynam.push_back(SMUFL_E523_dynamicRinforzando);
-        else if (str == L"s")
+        else if (str == U"s")
             dynam.push_back(SMUFL_E524_dynamicSforzando);
-        else if (str == L"z")
+        else if (str == U"z")
             dynam.push_back(SMUFL_E525_dynamicZ);
-        else if (str == L"n")
+        else if (str == U"n")
             dynam.push_back(SMUFL_E526_dynamicNiente);
-        else if (str == L"pppppp")
+        else if (str == U"pppppp")
             dynam.push_back(SMUFL_E527_dynamicPPPPPP);
-        else if (str == L"ppppp")
+        else if (str == U"ppppp")
             dynam.push_back(SMUFL_E528_dynamicPPPPP);
-        else if (str == L"pppp")
+        else if (str == U"pppp")
             dynam.push_back(SMUFL_E529_dynamicPPPP);
-        else if (str == L"ppp")
+        else if (str == U"ppp")
             dynam.push_back(SMUFL_E52A_dynamicPPP);
-        else if (str == L"pp")
+        else if (str == U"pp")
             dynam.push_back(SMUFL_E52B_dynamicPP);
-        else if (str == L"mp")
+        else if (str == U"mp")
             dynam.push_back(SMUFL_E52C_dynamicMP);
-        else if (str == L"mf")
+        else if (str == U"mf")
             dynam.push_back(SMUFL_E52D_dynamicMF);
-        else if (str == L"pf")
+        else if (str == U"pf")
             dynam.push_back(SMUFL_E52E_dynamicPF);
-        else if (str == L"ff")
+        else if (str == U"ff")
             dynam.push_back(SMUFL_E52F_dynamicFF);
-        else if (str == L"fff")
+        else if (str == U"fff")
             dynam.push_back(SMUFL_E530_dynamicFFF);
-        else if (str == L"ffff")
+        else if (str == U"ffff")
             dynam.push_back(SMUFL_E531_dynamicFFFF);
-        else if (str == L"fffff")
+        else if (str == U"fffff")
             dynam.push_back(SMUFL_E532_dynamicFFFFF);
-        else if (str == L"ffffff")
+        else if (str == U"ffffff")
             dynam.push_back(SMUFL_E533_dynamicFFFFFF);
-        else if (str == L"fp")
+        else if (str == U"fp")
             dynam.push_back(SMUFL_E534_dynamicFortePiano);
-        else if (str == L"fz")
+        else if (str == U"fz")
             dynam.push_back(SMUFL_E535_dynamicForzando);
-        else if (str == L"sf")
+        else if (str == U"sf")
             dynam.push_back(SMUFL_E536_dynamicSforzando1);
-        else if (str == L"sfp")
+        else if (str == U"sfp")
             dynam.push_back(SMUFL_E537_dynamicSforzandoPiano);
-        else if (str == L"sfpp")
+        else if (str == U"sfpp")
             dynam.push_back(SMUFL_E538_dynamicSforzandoPianissimo);
-        else if (str == L"sfz")
+        else if (str == U"sfz")
             dynam.push_back(SMUFL_E539_dynamicSforzato);
-        else if (str == L"sfzp")
+        else if (str == U"sfzp")
             dynam.push_back(SMUFL_E53A_dynamicSforzatoPiano);
-        else if (str == L"sffz")
+        else if (str == U"sffz")
             dynam.push_back(SMUFL_E53B_dynamicSforzatoFF);
-        else if (str == L"rf")
+        else if (str == U"rf")
             dynam.push_back(SMUFL_E53C_dynamicRinforzando1);
-        else if (str == L"rfz")
+        else if (str == U"rfz")
             dynam.push_back(SMUFL_E53D_dynamicRinforzando2);
     }
 
@@ -245,7 +249,7 @@ std::wstring Dynam::GetSymbolStr(const std::wstring &str, const bool singleGlyph
     // Otherwise replace it letter by letter
     dynam = str;
     int i;
-    std::wstring from, to;
+    std::u32string from, to;
     for (i = 0; i < DYNAM_CHARS; ++i) {
         from = dynamChars[i];
         to = dynamSmufl[i];

@@ -229,15 +229,15 @@ std::string ExtractIDFragment(std::string refID)
     return refID;
 }
 
-std::string UTF16to8(const std::wstring &in)
+std::string UTF32to8(const std::u32string &in)
 {
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> strCnv;
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> strCnv;
     return strCnv.to_bytes(in);
 }
 
-std::wstring UTF8to16(const std::string &in)
+std::u32string UTF8to32(const std::string &in)
 {
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> strCnv;
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> strCnv;
     return strCnv.from_bytes(in);
 }
 

@@ -66,8 +66,8 @@ public:
      * Set and get the smuflGlyph / fontsize for a bounding box that is the one of a single SMuFL glyph.
      */
     ///@{
-    void SetBoundingBoxGlyph(wchar_t smuflGlyph, int fontSize);
-    wchar_t GetBoundingBoxGlyph() const { return m_smuflGlyph; }
+    void SetBoundingBoxGlyph(char32_t smuflGlyph, int fontSize);
+    char32_t GetBoundingBoxGlyph() const { return m_smuflGlyph; }
     int GetBoundingBoxGlyphFontSize() const { return m_smuflGlyphFontSize; }
     ///@}
 
@@ -313,7 +313,7 @@ private:
      * The SMuFL glyph when anchor bounding box calculation is desired.
      * Currently only one glyph is supported. Eventually, we could have start / end glyph
      */
-    wchar_t m_smuflGlyph;
+    char32_t m_smuflGlyph;
 
     /**
      * The font size for the smufl glyph used for calculating the bounding box rectangles.
