@@ -496,7 +496,8 @@ def __write_xml_svg(
         g_element.set("h-a-x", glyph.attrib.get("horiz-adv-x", default_hax))
 
         # Check if the value set for the "w" parameter can be converted to a float.
-        # If not, set it to a default value.
+        # If not, set it to a default value. Somewhat complicated by also trying
+        # to check if the element has an attribute of "w", or if it's None.
         try:
             wval: Optional[str] = g_element.get("w")
             if not wval:
