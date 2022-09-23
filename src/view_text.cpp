@@ -67,18 +67,19 @@ void View::DrawTextString(DeviceContext *dc, const std::u32string &str, TextDraw
     dc->DrawText(UTF32to8(str), str);
 }
 
-void View::DrawDirString(DeviceContext *dc, std::u32string str, TextDrawingParams &params)
+void View::DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params)
 {
     assert(dc);
     assert(dc->GetFont());
 
+    std::u32string convertedStr = str;
     // If the current font is a music font, we want to convert Music Unicode glyph to SMuFL
     if (dc->GetFont()->GetSmuflFont()) {
         for (int i = 0; i < (int)str.size(); i++) {
-            str[i] = Resources::GetSmuflGlyphForUnicodeChar(str.at(i));
+            convertedStr[i] = Resources::GetSmuflGlyphForUnicodeChar(str.at(i));
         }
     }
-    this->DrawTextString(dc, str, params);
+    this->DrawTextString(dc, convertedStr, params);
 }
 
 void View::DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params, Rend *rend)
@@ -250,16 +251,17 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
 }
 
 void View::DrawLyricString(
-    DeviceContext *dc, std::u32string str, int staffSize, std::optional<TextDrawingParams> params)
+    DeviceContext *dc, const std::u32string &str, int staffSize, std::optional<TextDrawingParams> params)
 {
     assert(dc);
 
     bool wroteText = false;
     std::u32string syl = U"";
-    while (str.compare(syl) != 0) {
+    std::u32string lyricStr = str;
+    while (lyricStr.compare(syl) != 0) {
         wroteText = true;
-        auto index = str.find_first_of(U"_");
-        syl = str.substr(0, index);
+        auto index = lyricStr.find_first_of(U"_");
+        syl = lyricStr.substr(0, index);
         if (params) {
             dc->DrawText(UTF32to8(syl), syl, params->m_x, params->m_y, params->m_width, params->m_height);
         }
@@ -287,7 +289,7 @@ void View::DrawLyricString(
 
         // next syllable
         syl = U"";
-        str = str.substr(index + 1, str.length());
+        lyricStr = lyricStr.substr(index + 1, lyricStr.length());
     }
 
     // This should only be called in facsimile mode where a zone is specified but there is
