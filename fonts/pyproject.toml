@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "verovio-fonts"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+svgpathtools = "^1.5.1"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.5.0"
+black = "^22.8.0"
+mypy = "^0.971"
+
+[tool.black]
+line-length = 99
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
