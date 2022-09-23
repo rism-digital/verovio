@@ -339,7 +339,7 @@ void ABCInput::AddAnnot(const std::string &remark)
     // remarks
     Annot *annot = new Annot();
     Text *text = new Text();
-    text->SetText(UTF8to16(remark));
+    text->SetText(UTF8to32(remark));
     annot->AddChild(text);
     // todo: add to correct place
     m_layer->AddChild(annot);
@@ -377,7 +377,7 @@ void ABCInput::AddDynamic(LayerElement *element)
         Dynam *dynam = new Dynam();
         dynam->SetStartid("#" + element->GetID());
         Text *text = new Text();
-        text->SetText(UTF8to16(*it));
+        text->SetText(UTF8to32(*it));
         dynam->AddChild(text);
         m_controlElements.push_back(std::make_pair(m_layer->GetID(), dynam));
     }
@@ -772,7 +772,7 @@ void ABCInput::parseTempo(const std::string &tempoString)
         tempoWord = tempoWord.substr(0, tempoWord.find('\"'));
         if (!tempoWord.empty()) {
             Text *text = new Text();
-            text->SetText(UTF8to16(tempoWord));
+            text->SetText(UTF8to32(tempoWord));
             tempo->AddChild(text);
         }
     }
@@ -820,7 +820,7 @@ void ABCInput::PrintInformationFields(Score *score)
             titleRend->SetFontsize(fontsize);
         }
         Text *text = new Text();
-        text->SetText(UTF8to16(it->first));
+        text->SetText(UTF8to32(it->first));
         titleRend->AddChild(text);
         pgHead->AddChild(titleRend);
     }
@@ -829,11 +829,11 @@ void ABCInput::PrintInformationFields(Score *score)
         compRend->SetHalign(HORIZONTALALIGNMENT_right);
         compRend->SetValign(VERTICALALIGNMENT_bottom);
         Text *composer = new Text();
-        composer->SetText(UTF8to16(it->first));
+        composer->SetText(UTF8to32(it->first));
         compRend->AddChild(composer);
         if (!m_origin.empty()) {
             Text *origin = new Text();
-            origin->SetText(UTF8to16(" (" + m_origin.front().first + ")"));
+            origin->SetText(UTF8to32(" (" + m_origin.front().first + ")"));
             compRend->AddChild(origin);
         }
         pgHead->AddChild(compRend);
@@ -843,7 +843,7 @@ void ABCInput::PrintInformationFields(Score *score)
         originRend->SetHalign(HORIZONTALALIGNMENT_right);
         originRend->SetValign(VERTICALALIGNMENT_bottom);
         Text *origin = new Text();
-        origin->SetText(UTF8to16("(" + m_origin.front().first + ")"));
+        origin->SetText(UTF8to32("(" + m_origin.front().first + ")"));
         originRend->AddChild(origin);
         pgHead->AddChild(originRend);
     }
@@ -1066,7 +1066,7 @@ void ABCInput::parseLyrics()
             syllable.end());
         if (!syllable.empty()) {
             Text *sylText = new Text();
-            sylText->SetText(UTF8to16(syllable));
+            sylText->SetText(UTF8to32(syllable));
             Syl *syl = new Syl();
             syl->AddChild(sylText);
             syl->SetCon(sylType);
@@ -1084,7 +1084,7 @@ void ABCInput::parseLyrics()
             std::string syllable = abcLine.substr(start);
             if (!syllable.empty() && syllable[syllable.size() - 1] == '\r') syllable.erase(syllable.size() - 1);
             Text *sylText = new Text();
-            sylText->SetText(UTF8to16(syllable));
+            sylText->SetText(UTF8to32(syllable));
             Syl *syl = new Syl();
             syl->AddChild(sylText);
             syl->SetCon(sylType);
@@ -1668,7 +1668,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             }
             Harm *harm = new Harm();
             Text *text = new Text();
-            text->SetText(UTF8to16(chordSymbol));
+            text->SetText(UTF8to32(chordSymbol));
             harm->AddChild(text);
             m_harmStack.push_back(harm);
             m_controlElements.push_back(std::make_pair(m_layer->GetID(), harm));

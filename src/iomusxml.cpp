@@ -654,7 +654,7 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
                 textParent->AddChild(new Lb());
             }
             Text *text = new Text();
-            text->SetText(UTF8to16(line));
+            text->SetText(UTF8to32(line));
             textParent->AddChild(text);
             firstLine = false;
         }
@@ -683,7 +683,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
     bool paren = false;
     if (metronome.attribute("parentheses").as_bool()) {
         Text *text = new Text();
-        text->SetText(UTF8to16("("));
+        text->SetText(UTF8to32("("));
         tempo->AddChild(text);
         paren = true;
     }
@@ -713,14 +713,14 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
     for (auto iter = metronomeElements.begin(); iter != metronomeElements.end(); ++iter) {
         switch (iter->first) {
             case MetronomeElements::BEAT_UNIT: {
-                std::wstring verovioText = ConvertTypeToVerovioText(iter->second);
+                std::u32string verovioText = ConvertTypeToVerovioText(iter->second);
                 // find separator or use end() if there is no separator
                 const auto separator = std::find_if(iter, metronomeElements.end(),
                     [](const auto pair) { return pair.first == MetronomeElements::SEPARATOR; });
                 const short int dotCount = (short int)std::count_if(
                     iter, separator, [](const auto pair) { return pair.first == MetronomeElements::BEAT_UNIT_DOT; });
                 for (short int i = 0; i < dotCount; i++) {
-                    verovioText += L"\xE1E7"; // SMUFL augmentation dot
+                    verovioText += U"\xE1E7"; // SMUFL augmentation dot
                 }
                 // set @mmUnit and @mmDots attributes only based on the first beat-unit in the sequence
                 if (start) {
@@ -752,14 +752,14 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
                 }
                 if (!iter->second.empty()) {
                     Text *text = new Text();
-                    text->SetText(UTF8to16(iter->second));
+                    text->SetText(UTF8to32(iter->second));
                     tempo->AddChild(text);
                 }
                 break;
             }
             case MetronomeElements::SEPARATOR: {
                 Text *text = new Text();
-                text->SetText(UTF8to16(iter->second));
+                text->SetText(UTF8to32(iter->second));
                 tempo->AddChild(text);
                 break;
             }
@@ -768,7 +768,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 
     if (paren) {
         Text *text = new Text();
-        text->SetText(UTF8to16(")"));
+        text->SetText(UTF8to32(")"));
         tempo->AddChild(text);
     }
 }
@@ -821,7 +821,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             pugi::xpath_node words = *it;
             Rend *rend = new Rend();
             Text *text = new Text();
-            text->SetText(UTF8to16(words.node().text().as_string()));
+            text->SetText(UTF8to32(words.node().text().as_string()));
             std::string lang = words.node().attribute("xml:lang").as_string();
             rend->SetColor(words.node().attribute("color").as_string());
             rend->SetHalign(
@@ -902,12 +902,12 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     if (xpathNode.node().select_node("group-name-display[not(@print-object='no')]")) {
                         const std::string name = StyleLabel(xpathNode.node().child("group-name-display"));
                         Text *text = new Text();
-                        text->SetText(UTF8to16(name));
+                        text->SetText(UTF8to32(name));
                         m_label->AddChild(text);
                     }
                     else {
                         Text *text = new Text();
-                        text->SetText(UTF8to16(groupName));
+                        text->SetText(UTF8to32(groupName));
                         m_label->AddChild(text);
                     }
                     staffGrp->AddChild(m_label);
@@ -918,12 +918,12 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     if (xpathNode.node().select_node("group-abbreviation-display[not(@print-object='no')]")) {
                         const std::string name = StyleLabel(xpathNode.node().child("group-abbreviation-display"));
                         Text *text = new Text();
-                        text->SetText(UTF8to16(name));
+                        text->SetText(UTF8to32(name));
                         m_labelAbbr->AddChild(text);
                     }
                     else {
                         Text *text = new Text();
-                        text->SetText(UTF8to16(groupAbbr));
+                        text->SetText(UTF8to32(groupAbbr));
                         m_labelAbbr->AddChild(text);
                     }
                     staffGrp->AddChild(m_labelAbbr);
@@ -958,7 +958,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 if (xpathNode.node().select_node("part-name-display[not(@print-object='no')]")) {
                     const std::string name = StyleLabel(xpathNode.node().child("part-name-display"));
                     Text *text = new Text();
-                    text->SetText(UTF8to16(name));
+                    text->SetText(UTF8to32(name));
                     m_label->AddChild(text);
                 }
                 else {
@@ -970,7 +970,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                             m_label->AddChild(new Lb());
                         }
                         Text *text = new Text();
-                        text->SetText(UTF8to16(line));
+                        text->SetText(UTF8to32(line));
                         m_label->AddChild(text);
                         firstLine = false;
                     }
@@ -981,7 +981,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 if (xpathNode.node().select_node("part-abbreviation-display[not(@print-object='no')]")) {
                     const std::string name = StyleLabel(xpathNode.node().child("part-abbreviation-display"));
                     Text *text = new Text();
-                    text->SetText(UTF8to16(name));
+                    text->SetText(UTF8to32(name));
                     m_labelAbbr->AddChild(text);
                 }
                 else {
@@ -993,7 +993,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                             m_labelAbbr->AddChild(new Lb());
                         }
                         Text *text = new Text();
-                        text->SetText(UTF8to16(line));
+                        text->SetText(UTF8to32(line));
                         m_labelAbbr->AddChild(text);
                         firstLine = false;
                     }
@@ -1973,7 +1973,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
-        std::wstring codaSign = UTF8to16("\xF0\x9D\x84\x8C");
+        std::u32string codaSign = UTF8to32("\xF0\x9D\x84\x8C");
         text->SetText(codaSign);
         rend->AddChild(text);
         dir->AddChild(rend);
@@ -2379,7 +2379,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         const std::string enclosure = rehearsal.attribute("enclosure").as_string();
         rend->SetRend(enclosure.empty() ? TEXTRENDITION_box : ConvertEnclosure(enclosure));
         Text *text = new Text();
-        text->SetText(UTF8to16(textStr));
+        text->SetText(UTF8to32(textStr));
         rend->AddChild(text);
         reh->AddChild(rend);
         m_controlElements.push_back({ measureNum, reh });
@@ -2399,7 +2399,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
-        std::wstring segnoSign = UTF8to16("\xF0\x9D\x84\x8B");
+        std::u32string segnoSign = UTF8to32("\xF0\x9D\x84\x8B");
         text->SetText(segnoSign);
         rend->AddChild(text);
         dir->AddChild(rend);
@@ -2462,7 +2462,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
             F *f = new F();
             if (figure.child("extend")) f->SetExtender(BOOLEAN_true);
             Text *text = new Text();
-            text->SetText(UTF8to16(textStr));
+            text->SetText(UTF8to32(textStr));
             f->AddChild(text);
             fb->AddChild(f);
         }
@@ -2519,7 +2519,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
     }
     Harm *harm = new Harm();
     Text *text = new Text();
-    text->SetText(UTF8to16(harmText));
+    text->SetText(UTF8to32(harmText));
     harm->SetPlace(harm->AttPlacementRelStaff::StrToStaffrel(node.attribute("placement").as_string()));
     harm->SetType(node.attribute("type").as_string());
     harm->AddChild(text);
@@ -2957,7 +2957,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                         Label *label = new Label();
 
                         Text *text = new Text();
-                        text->SetText(UTF8to16(labelSearchMatches[0]));
+                        text->SetText(UTF8to32(labelSearchMatches[0]));
                         label->AddChild(text);
                         verse->AddChild(label);
 
@@ -2970,7 +2970,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                         Label *label = new Label();
 
                         Text *text = new Text();
-                        text->SetText(UTF8to16(labelPrefixSearchMatches[0].str().erase(
+                        text->SetText(UTF8to32(labelPrefixSearchMatches[0].str().erase(
                             labelPrefixSearchMatches[0].str().find_last_not_of(" \f\n\r\t\v\u00A0") + 1)));
                         label->AddChild(text);
                         verse->AddChild(label);
@@ -3010,7 +3010,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                         syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
 
                     Text *text = new Text();
-                    text->SetText(UTF8to16(textStr));
+                    text->SetText(UTF8to32(textStr));
                     if (lineThrough) {
                         Rend *rend = new Rend();
                         rend->AddChild(text);
@@ -3230,7 +3230,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         Text *text = new Text();
-        text->SetText(UTF8to16(dynamStr));
+        text->SetText(UTF8to32(dynamStr));
         dynam->AddChild(text);
     }
 
@@ -3251,7 +3251,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         const std::string fingText = xmlFing.node().text().as_string();
         Fing *fing = new Fing();
         Text *text = new Text();
-        text->SetText(UTF8to16(fingText));
+        text->SetText(UTF8to32(fingText));
         m_controlElements.push_back({ measureNum, fing });
         const std::string startID = note ? ("#" + note->GetID()) : m_ID;
         fing->SetStartid(startID);
@@ -4091,22 +4091,22 @@ data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(const std::string &value)
     return TEXTRENDITION_NONE;
 }
 
-std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
+std::u32string MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
 {
-    static const std::map<std::string, std::wstring> Type2VerovioText{
-        { "long", L"\xE1D0" }, // there is no matching glyph in this SMuFL range
-        { "breve", L"\xE1D1" }, //
-        { "whole", L"\xE1D2" }, //
-        { "half", L"\xE1D3" }, //
-        { "quarter", L"\xE1D5" }, //
-        { "eighth", L"\xE1D7" }, //
-        { "16th", L"\xE1D9" }, //
-        { "32nd", L"\xE1DB" }, //
-        { "64th", L"\xE1DD" }, //
-        { "128th", L"\xE1DF" }, //
-        { "256th", L"\xE1E1" }, //
-        { "512th", L"\xE1E3" }, //
-        { "1024th", L"\xE1E5" } //
+    static const std::map<std::string, std::u32string> Type2VerovioText{
+        { "long", U"\xE1D0" }, // there is no matching glyph in this SMuFL range
+        { "breve", U"\xE1D1" }, //
+        { "whole", U"\xE1D2" }, //
+        { "half", U"\xE1D3" }, //
+        { "quarter", U"\xE1D5" }, //
+        { "eighth", U"\xE1D7" }, //
+        { "16th", U"\xE1D9" }, //
+        { "32nd", U"\xE1DB" }, //
+        { "64th", U"\xE1DD" }, //
+        { "128th", U"\xE1DF" }, //
+        { "256th", U"\xE1E1" }, //
+        { "512th", U"\xE1E3" }, //
+        { "1024th", U"\xE1E5" } //
     };
 
     const auto result = Type2VerovioText.find(value);
@@ -4115,7 +4115,7 @@ std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
     }
 
     LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
-    return std::wstring();
+    return std::u32string();
 }
 
 data_HEADSHAPE MusicXmlInput::ConvertNotehead(const std::string &value)

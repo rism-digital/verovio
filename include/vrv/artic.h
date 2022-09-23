@@ -75,12 +75,12 @@ public:
     /**
      * Retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
      */
-    wchar_t GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const;
+    char32_t GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const;
 
     /**
      * Retrieve parentheses / brackets from the enclose attribute
      */
-    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs() const;
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
 
     //----------------//
     // Static methods //
@@ -91,7 +91,7 @@ public:
      * The reason for this is that SMuFL sometimes has the glyph below the line, sometimes above.
      * See bow indications for an example where is is always above
      */
-    static bool VerticalCorr(wchar_t code, data_STAFFREL place);
+    static bool VerticalCorr(char32_t code, data_STAFFREL place);
 
     /**
      * Static method that returns true if the data_ARTICULATION has to be centered between staff lines

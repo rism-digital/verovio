@@ -314,7 +314,7 @@ void BBoxDeviceContext::MoveTextVerticallyTo(int y)
 }
 
 void BBoxDeviceContext::DrawText(
-    const std::string &text, const std::wstring &wtext, int x, int y, int width, int height)
+    const std::string &text, const std::u32string &wtext, int x, int y, int width, int height)
 {
     assert(m_fontStack.top());
 
@@ -366,7 +366,7 @@ void BBoxDeviceContext::DrawRotatedText(const std::string &text, int x, int y, d
     // TODO
 }
 
-void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
+void BBoxDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph)
 {
     assert(m_fontStack.top());
 
@@ -376,11 +376,11 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bo
     int g_x, g_y, g_w, g_h;
     int lastCharWidth = 0;
 
-    wchar_t smuflGlyph = 0;
+    char32_t smuflGlyph = 0;
     if (setSmuflGlyph && (text.length() == 1)) smuflGlyph = text.at(0);
 
     for (unsigned int i = 0; i < text.length(); i++) {
-        wchar_t c = text.at(i);
+        char32_t c = text.at(i);
         const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;
@@ -408,7 +408,7 @@ void BBoxDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::
     this->DrawRoundedRectangle(x, y, width, height, 0);
 }
 
-void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph)
+void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, char32_t glyph)
 {
     if (m_isDeactivatedX && m_isDeactivatedY) {
         return;

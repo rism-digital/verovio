@@ -98,7 +98,7 @@ int Stem::CompareToElementPosition(const Doc *doc, const LayerElement *otherElem
     int horizontalMargin = 2 * doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     const Flag *currentFlag = vrv_cast<const Flag *>(this->FindDescendantByType(FLAG, 1));
     if (currentFlag && currentFlag->m_drawingNbFlags) {
-        wchar_t flagGlyph = currentFlag->GetFlagGlyph(STEMDIRECTION_down);
+        char32_t flagGlyph = currentFlag->GetFlagGlyph(STEMDIRECTION_down);
         const int flagWidth = doc->GetGlyphWidth(flagGlyph, staff->m_drawingStaffSize, this->GetDrawingCueSize());
         horizontalMargin += flagWidth;
     }
@@ -121,7 +121,7 @@ void Stem::AdjustFlagPlacement(const Doc *doc, Flag *flag, int staffSize, int ve
 
     const data_STEMDIRECTION stemDirection = this->GetDrawingStemDir();
     // For overlapping purposes we don't care for flags shorter than 16th since they grow in opposite direction
-    wchar_t flagGlyph = SMUFL_E242_flag16thUp;
+    char32_t flagGlyph = SMUFL_E242_flag16thUp;
     if (duration < DURATION_16) flagGlyph = flag->GetFlagGlyph(stemDirection);
     const int glyphHeight = doc->GetGlyphHeight(flagGlyph, staffSize, this->GetDrawingCueSize());
 
@@ -191,7 +191,7 @@ int Stem::AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) cons
     }
     if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return 0;
 
-    const wchar_t code = this->StemModToGlyph(stemMod);
+    const char32_t code = this->StemModToGlyph(stemMod);
     // if there is no glyph - do nothing
     if (!code) return 0;
 
@@ -392,7 +392,7 @@ void Stem::CalculateStemModRelY(const Doc *doc, const Staff *staff)
     if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return;
 
     // calculate height offset for positioning of stem mod elements on the stem
-    const wchar_t code = this->StemModToGlyph(stemMod);
+    const char32_t code = this->StemModToGlyph(stemMod);
     if (!code) return;
 
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);

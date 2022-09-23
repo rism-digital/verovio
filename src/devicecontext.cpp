@@ -229,11 +229,11 @@ void DeviceContext::ReactivateGraphic()
 
 void DeviceContext::GetTextExtent(const std::string &string, TextExtend *extend, bool typeSize)
 {
-    std::wstring wtext(string.begin(), string.end());
+    std::u32string wtext(string.begin(), string.end());
     this->GetTextExtent(wtext, extend, typeSize);
 }
 
-void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend, bool typeSize)
+void DeviceContext::GetTextExtent(const std::u32string &string, TextExtend *extend, bool typeSize)
 {
     assert(m_fontStack.top());
     assert(extend);
@@ -253,7 +253,7 @@ void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend
     const Glyph *unknown = resources->GetTextGlyph(L'o');
 
     for (unsigned int i = 0; i < string.length(); ++i) {
-        wchar_t c = string[i];
+        char32_t c = string[i];
         const Glyph *glyph = resources->GetTextGlyph(c);
         if (!glyph) {
             glyph = resources->GetGlyph(c);
@@ -262,7 +262,7 @@ void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend
             // There is no glyph for space, and we would use 'o' to increase extend width. However 'o' is wider than
             // space, which led to incorrect rendering. For the time being, set width to that of '.' instead.
             // This will probably need to be improved to change with font size/style
-            if (c == L' ') {
+            if (c == U' ') {
                 glyph = resources->GetTextGlyph(L'.');
             }
             else {
@@ -273,7 +273,7 @@ void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend
     }
 }
 
-void DeviceContext::GetSmuflTextExtent(const std::wstring &string, TextExtend *extend)
+void DeviceContext::GetSmuflTextExtent(const std::u32string &string, TextExtend *extend)
 {
     assert(m_fontStack.top());
     assert(extend);
@@ -285,7 +285,7 @@ void DeviceContext::GetSmuflTextExtent(const std::wstring &string, TextExtend *e
     extend->m_height = 0;
 
     for (unsigned int i = 0; i < string.length(); ++i) {
-        wchar_t c = string[i];
+        char32_t c = string[i];
         const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;
