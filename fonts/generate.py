@@ -176,13 +176,9 @@ def extract_fonts(opts: Namespace) -> bool:
         len(glyphs),
     )
 
-    supported_glyphs: dict = __get_supported_glyph_codes(opts.supported)
+    supported_glyphs: dict = __combine_alternates_and_supported(opts)
+    metadata_pth: Path = Path(font_data_pth, f"{fontname.lower()}_metadata.json")
     metadata: dict = json.load(open(metadata_pth, "r"))
-    alternate_glyphs = __get_alternate_glyphs(supported_glyphs, metadata)
-
-    if alternate_glyphs:
-        log.debug("Updating supported glyphs with alternates")
-        supported_glyphs.update(alternate_glyphs)
 
     __write_xml_glyphs(glyphs, supported_glyphs, units, glyph_file_pth)
     __write_xml_svg(glyphs, supported_glyphs, family, units, hax, metadata, output_pth)
@@ -205,18 +201,10 @@ def generate_css(opts: Namespace) -> bool:
     source_dir: str = opts.source
     source_pth: Path = Path(source_dir)
     font_data_pth: Path = Path(source_pth, fontname)
-    metadata_pth: Path = Path(font_data_pth, f"{fontname.lower()}_metadata.json")
-
     font_pth: Path = Path(font_data_pth, f"{fontname}.svg")
     log.debug("Creating a subset SVG file from %s", font_pth.resolve())
-    supported_glyphs: dict = __get_supported_glyph_codes(opts.supported)
 
-    metadata: dict = json.load(open(metadata_pth, "r"))
-    alternate_glyphs = __get_alternate_glyphs(supported_glyphs, metadata)
-
-    if alternate_glyphs:
-        log.debug("Updating supported glyphs with alternates")
-        supported_glyphs.update(alternate_glyphs)
+    supported_glyphs: dict = __combine_alternates_and_supported(opts)
 
     log.debug("The resulting subset font will have %s glyphs", len(supported_glyphs.keys()))
 
@@ -298,6 +286,23 @@ def generate_woff2(opts: Namespace) -> bool:
 #########
 # Private implementation methods.
 #########
+def __combine_alternates_and_supported(opts) -> dict:
+    fontname: str = opts.fontname
+    source_dir: str = opts.source
+    source_pth: Path = Path(source_dir)
+    font_data_pth: Path = Path(source_pth, fontname)
+    metadata_pth: Path = Path(font_data_pth, f"{fontname.lower()}_metadata.json")
+
+    supported_glyphs: dict = __get_supported_glyph_codes(opts.supported)
+
+    metadata: dict = json.load(open(metadata_pth, "r"))
+    alternate_glyphs = __get_alternate_glyphs(supported_glyphs, metadata)
+
+    if alternate_glyphs:
+        log.debug("Updating supported glyphs with alternates")
+        supported_glyphs.update(alternate_glyphs)
+
+    return supported_glyphs
 
 
 def __check_fontforge(opts: Namespace) -> Optional[str]:
