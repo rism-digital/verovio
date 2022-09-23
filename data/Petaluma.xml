@@ -350,25 +350,25 @@
   <g c="E550" x="-40.0" y="-154.2" w="443.0" h="148.6" h-a-x="363" n="lyricsElisionNarrow" />
   <g c="E551" x="-79.92" y="-144.52" w="641.92" h="144.52" h-a-x="482" n="lyricsElision" />
   <g c="E552" x="-79.99" y="-136.0" w="867.99" h="133.13" h-a-x="708" n="lyricsElisionWide" />
-  <g c="E938" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralNoteheadSemibrevisBlack" />
-  <g c="E939" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralNoteheadSemibrevisVoid" />
+  <g c="E938" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralNoteheadSemibrevisBlack" />
+  <g c="E939" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralNoteheadSemibrevisVoid" />
   <g c="E93C" x="-0.11" y="-249.0" w="484.11" h="498.0" h-a-x="484" n="mensuralNoteheadMinimaWhite" />
-  <g c="E93D" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralNoteheadSemiminimaWhite" />
-  <g c="E93E" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemUp" />
-  <g c="E93F" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDown" />
-  <g c="E940" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDiagonal" />
-  <g c="E941" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagRight" />
-  <g c="E942" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagRight" />
-  <g c="E943" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagLeft" />
-  <g c="E944" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagLeft" />
-  <g c="E945" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagFlared" />
-  <g c="E946" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagFlared" />
-  <g c="E947" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagExtended" />
-  <g c="E948" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagExtended" />
-  <g c="E949" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagSemiminima" />
-  <g c="E94A" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagSemiminima" />
-  <g c="E94B" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagFusa" />
-  <g c="E94C" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagFusa" />
+  <g c="E93D" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralNoteheadSemiminimaWhite" />
+  <g c="E93E" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemUp" />
+  <g c="E93F" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemDown" />
+  <g c="E940" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemDiagonal" />
+  <g c="E941" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagRight" />
+  <g c="E942" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagRight" />
+  <g c="E943" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagLeft" />
+  <g c="E944" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagLeft" />
+  <g c="E945" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagFlared" />
+  <g c="E946" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagFlared" />
+  <g c="E947" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagExtended" />
+  <g c="E948" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagExtended" />
+  <g c="E949" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagSemiminima" />
+  <g c="E94A" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagSemiminima" />
+  <g c="E94B" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemUpFlagFusa" />
+  <g c="E94C" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="mensuralCombStemDownFlagFusa" />
   <g c="ECA0" x="-0.44" y="-223.03" w="614.63" h="446.03" h-a-x="614" n="metNoteDoubleWhole">
     <a n="noteheadOrigin" x="0.4" y="0.0" />
   </g>
@@ -599,7 +599,7 @@
     <a n="stemDownNW" x="0.0" y="-0.24" />
     <a n="stemUpSE" x="1.34" y="0.29" />
   </g>
-  <g c="E0A5" x="0.0" y="0.0" w="600" h="0.0" h-a-x="600" n="noteheadNull" />
+  <g c="E0A5" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="noteheadNull" />
   <g c="E0A9" x="0.0" y="-156.0" w="289.0" h="313.0" h-a-x="289" n="noteheadXBlack">
     <a n="stemDownNW" x="0.0" y="-0.6" />
     <a n="stemUpSE" x="1.12" y="0.56" />

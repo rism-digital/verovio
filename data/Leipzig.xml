@@ -574,7 +574,7 @@
   <g c="E049" x="0.0" y="-73.0" w="537.0" h="653.0" h-a-x="537" n="codaSquare" />
   <g c="E503" x="0.0" y="73.0" w="95.0" h="94.0" h-a-x="95" n="repeatBarUpperDot" />
   <g c="E505" x="0.0" y="-166.0" w="95.0" h="94.0" h-a-x="95" n="repeatBarLowerDot" />
-  <g c="E0A5" x="0.0" y="0.0" w="314" h="0.0" h-a-x="314" n="noteheadNull" />
+  <g c="E0A5" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="314" n="noteheadNull" />
   <g c="E940" x="-209.0" y="-209.0" w="418.0" h="418.0" h-a-x="0" n="mensuralCombStemDiagonal" />
   <g c="E905" x="0.0" y="-500.0" w="526.0" h="1000.0" h-a-x="526" n="mensuralCclef" />
   <g c="E941" x="0.0" y="0.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemUpFlagRight" />

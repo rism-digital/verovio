@@ -134,7 +134,7 @@
     <a n="stemDownNW" x="0.0" y="-0.17" />
     <a n="stemUpSE" x="1.3" y="0.16" />
   </g>
-  <g c="E0A5" x="0.0" y="0.0" w="325" h="0.0" h-a-x="325" n="noteheadNull" />
+  <g c="E0A5" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="325" n="noteheadNull" />
   <g c="E0A9" x="0.0" y="-132.0" w="325.0" h="264.0" h-a-x="325" n="noteheadXBlack">
     <a n="stemDownNW" x="0.0" y="-0.42" />
     <a n="stemUpSE" x="1.3" y="0.42" />

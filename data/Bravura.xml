@@ -90,7 +90,7 @@
     <a n="stemDownNW" x="0.0" y="-0.17" />
     <a n="stemUpSE" x="1.18" y="0.17" />
   </g>
-  <g c="E0A5" x="0.0" y="0.0" w="295" h="0.0" h-a-x="295" n="noteheadNull" />
+  <g c="E0A5" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="295" n="noteheadNull" />
   <g c="E0A9" x="0.0" y="-125.0" w="290.0" h="250.0" h-a-x="290" n="noteheadXBlack">
     <a n="stemDownNW" x="0.0" y="-0.44" />
     <a n="stemUpSE" x="1.16" y="0.44" />
