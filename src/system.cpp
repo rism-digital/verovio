@@ -219,9 +219,8 @@ bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElemen
     // otherwise look for a measures in between
     else {
         ClassIdComparison isMeasure(MEASURE);
-        FindAllBetween findAllBetween(&isMeasure, measureStart, measureEnd);
+        FindAllBetween findAllBetween(&isMeasure, &measures, measureStart, measureEnd);
         this->Process(findAllBetween, 1);
-        measures = findAllBetween.GetElements();
     }
 
     // Now we can look for chords and note

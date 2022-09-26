@@ -22,13 +22,13 @@ class Object;
 /**
  * This class finds all elements in the tree by comparison
  */
-class FindAllByComparison : public ConstFunctor {
+class FindAllByComparison : public MutableFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    FindAllByComparison(Comparison *comparison);
+    FindAllByComparison(Comparison *comparison, ListOfObjects *elements);
     virtual ~FindAllByComparison() = default;
     ///@}
 
@@ -43,9 +43,53 @@ public:
     void SetContinueDepthSearchForMatches(bool continueDepthSearchForMatches);
 
     /*
-     * Retrieve the search result
+     * Functor interface
      */
-    ListOfConstObjects GetElements() const { return m_elements; }
+    ///@{
+    FunctorCode VisitObject(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The comparison
+    Comparison *m_comparison;
+    // True if search should be continued for matches
+    bool m_continueDepthSearchForMatches;
+    // The element list where the search result is appended
+    ListOfObjects *m_elements;
+};
+
+//----------------------------------------------------------------------------
+// FindAllConstByComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class finds all elements in the tree by comparison
+ */
+class FindAllConstByComparison : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindAllConstByComparison(Comparison *comparison, ListOfConstObjects *elements);
+    virtual ~FindAllConstByComparison() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() override { return false; }
+
+    /*
+     * Configure depth search
+     */
+    void SetContinueDepthSearchForMatches(bool continueDepthSearchForMatches);
 
     /*
      * Functor interface
@@ -65,8 +109,8 @@ private:
     Comparison *m_comparison;
     // True if search should be continued for matches
     bool m_continueDepthSearchForMatches;
-    // The search result
-    ListOfConstObjects m_elements;
+    // The element list where the search result is appended
+    ListOfConstObjects *m_elements;
 };
 
 //----------------------------------------------------------------------------
@@ -82,7 +126,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    FindAllBetween(Comparison *comparison, const Object *start, const Object *end);
+    FindAllBetween(Comparison *comparison, ListOfConstObjects *elements, const Object *start, const Object *end);
     virtual ~FindAllBetween() = default;
     ///@}
 
@@ -90,11 +134,6 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() override { return false; }
-
-    /*
-     * Retrieve the search result
-     */
-    ListOfConstObjects GetElements() const { return m_elements; }
 
     /*
      * Functor interface
@@ -114,8 +153,8 @@ private:
     Comparison *m_comparison;
     // The start and end object
     const Object *m_start, *m_end;
-    // The search result
-    ListOfConstObjects m_elements;
+    // The element list where the search result is appended
+    ListOfConstObjects *m_elements;
 };
 
 //----------------------------------------------------------------------------

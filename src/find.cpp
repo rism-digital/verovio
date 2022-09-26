@@ -18,9 +18,10 @@ namespace vrv {
 // FindAllByComparison
 //----------------------------------------------------------------------------
 
-FindAllByComparison::FindAllByComparison(Comparison *comparison) : ConstFunctor()
+FindAllByComparison::FindAllByComparison(Comparison *comparison, ListOfObjects *elements) : MutableFunctor()
 {
     m_comparison = comparison;
+    m_elements = elements;
     m_continueDepthSearchForMatches = true;
 }
 
@@ -29,11 +30,41 @@ void FindAllByComparison::SetContinueDepthSearchForMatches(bool continueDepthSea
     m_continueDepthSearchForMatches = continueDepthSearchForMatches;
 }
 
-FunctorCode FindAllByComparison::VisitObject(const Object *object)
+FunctorCode FindAllByComparison::VisitObject(Object *object)
 {
     // evaluate by applying the Comparison operator()
     if ((*m_comparison)(object)) {
-        m_elements.push_back(object);
+        m_elements->push_back(object);
+        if (!m_continueDepthSearchForMatches) {
+            return FUNCTOR_SIBLINGS;
+        }
+    }
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// FindAllConstByComparison
+//----------------------------------------------------------------------------
+
+FindAllConstByComparison::FindAllConstByComparison(Comparison *comparison, ListOfConstObjects *elements)
+    : ConstFunctor()
+{
+    m_comparison = comparison;
+    m_elements = elements;
+    m_continueDepthSearchForMatches = true;
+}
+
+void FindAllConstByComparison::SetContinueDepthSearchForMatches(bool continueDepthSearchForMatches)
+{
+    m_continueDepthSearchForMatches = continueDepthSearchForMatches;
+}
+
+FunctorCode FindAllConstByComparison::VisitObject(const Object *object)
+{
+    // evaluate by applying the Comparison operator()
+    if ((*m_comparison)(object)) {
+        m_elements->push_back(object);
         if (!m_continueDepthSearchForMatches) {
             return FUNCTOR_SIBLINGS;
         }
@@ -46,9 +77,12 @@ FunctorCode FindAllByComparison::VisitObject(const Object *object)
 // FindAllBetween
 //----------------------------------------------------------------------------
 
-FindAllBetween::FindAllBetween(Comparison *comparison, const Object *start, const Object *end) : ConstFunctor()
+FindAllBetween::FindAllBetween(
+    Comparison *comparison, ListOfConstObjects *elements, const Object *start, const Object *end)
+    : ConstFunctor()
 {
     m_comparison = comparison;
+    m_elements = elements;
     m_start = start;
     m_end = end;
 }
@@ -67,7 +101,7 @@ FunctorCode FindAllBetween::VisitObject(const Object *object)
 
     // evaluate by applying the Comparison operator()
     if ((*m_comparison)(object)) {
-        m_elements.push_back(object);
+        m_elements->push_back(object);
     }
 
     // We have reached the end of the range
