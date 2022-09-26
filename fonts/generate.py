@@ -118,8 +118,9 @@ def generate_smufl(opts: Namespace) -> bool:
 
 def extract_fonts(opts: Namespace) -> bool:
     """
-    Takes a font file and extracts the necessary files for Verovio. Generates a glyph file for each glyph, and an SVG
-    glyph file containing only the supported SMuFL glyphs.
+    Takes a font file and extracts the necessary files for Verovio.
+    Generates a glyph file for each glyph,and an SVG glyph file
+    containing only the supported SMuFL glyphs.
 
     :param opts: A set of options from the argument parser sub-command.
     :return: True if successful, False otherwise.
@@ -173,7 +174,9 @@ def extract_fonts(opts: Namespace) -> bool:
 
     supported_glyphs: dict = __combine_alternates_and_supported(opts)
     metadata_pth: Path = Path(font_data_pth, f"{fontname.lower()}_metadata.json")
-    metadata: dict = json.load(open(metadata_pth, "r"))
+
+    with open(metadata_pth, "r") as jfile:
+        metadata: dict = json.load(jfile)
 
     __write_xml_glyphs(glyphs, supported_glyphs, units, glyph_file_pth)
     __write_xml_svg(glyphs, supported_glyphs, family, units, hax, metadata, output_pth)
@@ -184,10 +187,11 @@ def generate_css(opts: Namespace) -> bool:
     """
     Generates a CSS @font-face declaration for a given font.
 
-    Builds a custom SVG font based on the glyphs specified in the "supported.xml" file, and the full
-    SVG version of a given font.
+    Builds a custom SVG font based on the glyphs specified in the
+    "supported.xml" file, and the full SVG version of a given font.
 
-    Base64-encodes the resulting WOFF2 font, and embeds it in a @font-face declaration.
+    Base64-encodes the resulting WOFF2 font, and embeds it in a
+    @font-face declaration.
 
     :param opts: A set of options from the argument parser sub-command.
     :return: True if successful, False otherwise.
@@ -238,6 +242,7 @@ def generate_css(opts: Namespace) -> bool:
         return False
 
     css_filename: Path = Path(opts.data, f"{fontname}.css")
+
     with open(Path(tmpdir, f"{fontname}.woff2"), "rb") as woff2_content:
         b64_encoding: bytes = base64.urlsafe_b64encode(woff2_content.read())
         with open(css_filename, "w") as css_content:
@@ -261,6 +266,12 @@ def generate_css(opts: Namespace) -> bool:
 
 
 def generate_svg(opts: Namespace) -> bool:
+    """
+    Generates a SVG font file from an input file using Fontforge.
+
+    :param opts: A set of options from the argument parser sub-command.
+    :return: True if successful, False otherwise.
+    """
     convert_res: bool = __fontforge_convert(opts, "svg")
     if not convert_res:
         log.error("A problem happened with the fontforge conversion to SVG.")
@@ -270,6 +281,12 @@ def generate_svg(opts: Namespace) -> bool:
 
 
 def generate_woff2(opts: Namespace) -> bool:
+    """
+    Generates a WOFF2 file using Fontforge
+
+    :param opts: A set of options from the argument parser sub-command.
+    :return: True if successful, False otherwise.
+    """
     convert_res: bool = __fontforge_convert(opts, "woff2")
     if not convert_res:
         log.error("A problem happened with the fontforge conversion to WOFF2.")
@@ -286,10 +303,11 @@ def __combine_alternates_and_supported(opts) -> dict:
     source_pth: Path = Path(opts.source)
     font_data_pth: Path = Path(source_pth, fontname)
     metadata_pth: Path = Path(font_data_pth, f"{fontname.lower()}_metadata.json")
-
     supported_glyphs: dict = __get_supported_glyph_codes(opts.supported)
 
-    metadata: dict = json.load(open(metadata_pth, "r"))
+    with open(metadata_pth, "r") as jsonfile:
+        metadata: dict = json.load(jsonfile)
+
     alternate_glyphs = __get_alternate_glyphs(supported_glyphs, metadata)
 
     if alternate_glyphs:
@@ -338,9 +356,15 @@ def __fontforge_svg2woff(opts: Namespace, tmpdir: str) -> Optional[Path]:
 
     log.debug("Fontforge script: %s", str(ff_script))
 
-    proc: subprocess.CompletedProcess = subprocess.run(fontforge_cmd, input=ff_script)
-    if proc.returncode != 0:
-        log.error("Fontforge exited with an error.")
+    try:
+        _: subprocess.CompletedProcess = subprocess.run(fontforge_cmd, input=ff_script, check=True)
+    except subprocess.CalledProcessError as e:
+        log.error(
+            "Fontforge exited with an error. Command: %s, Code: %s, Output: %s",
+            e.cmd,
+            e.returncode,
+            e.output,
+        )
         return None
 
     log.debug("WOFF2 file generated at %s", tmp_woff2.resolve())
@@ -370,10 +394,16 @@ def __fontforge_convert(opts: Namespace, fmt: str) -> bool:
     ff_script: bytes = FONTFORGE_SCRIPT.format(
         input_fontpath=str(font_pth), output_fontpath=str(output_fontname)
     ).encode()
-    proc: subprocess.CompletedProcess = subprocess.run(fontforge_cmd, input=ff_script)
 
-    if proc.returncode != 0:
-        log.error("Fontforge exited with an error.")
+    try:
+        _: subprocess.CompletedProcess = subprocess.run(fontforge_cmd, input=ff_script, check=True)
+    except subprocess.CalledProcessError as e:
+        log.error(
+            "Fontforge exited with an error. Command: %s, Code: %s, Output: %s",
+            e.cmd,
+            e.returncode,
+            e.output,
+        )
         return False
 
     log.debug("Converted %s to %s", font_pth.resolve(), output_fontname.resolve())
@@ -402,7 +432,7 @@ def __read_svg_font_file(
     font_faces: list[Et.Element] = font_xml.findall(".//svg:font-face", SVG_NS)
     if len(font_faces) != 1:
         log.error("Error: the file %s should have a unique font-face element.", fontfile)
-        log.error("Please check that the svg has correct namespace: %s.", SVG_NS['svg'])
+        log.error("Please check that the svg has correct namespace: %s.", SVG_NS["svg"])
         return None
 
     font_family: str = font_faces[0].attrib.get("font-family", "")
