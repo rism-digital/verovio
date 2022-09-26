@@ -637,12 +637,12 @@ const Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, 
 
 ListOfObjects Object::FindAllDescendantsByType(ClassId classId, bool continueDepthSearchForMatches, int deepness)
 {
-    ListOfConstObjects elements
-        = std::as_const(*this).FindAllDescendantsByType(classId, continueDepthSearchForMatches, deepness);
-    ListOfObjects objects;
-    std::transform(elements.begin(), elements.end(), std::back_inserter(objects),
-        [](const Object *obj) { return const_cast<Object *>(obj); });
-    return objects;
+    ListOfObjects descendants;
+    ClassIdComparison comparison(classId);
+    FindAllByComparison findAllByComparison(&comparison, &descendants);
+    findAllByComparison.SetContinueDepthSearchForMatches(continueDepthSearchForMatches);
+    this->Process(findAllByComparison, deepness, true);
+    return descendants;
 }
 
 ListOfConstObjects Object::FindAllDescendantsByType(
