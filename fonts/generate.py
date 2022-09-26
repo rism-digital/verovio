@@ -83,20 +83,19 @@ def generate_smufl(opts: Namespace) -> bool:
     :return: True if successful, False otherwise.
     """
     supported_glyphs_fname: str = opts.supported
-    header_out_dir: str = opts.header_out
-    supported_path: Path = Path(supported_glyphs_fname)
-    header_out_path: Path = Path(header_out_dir)
-    header_file_path: Path = Path(header_out_path, "smufl.h")
+    supported_pth: Path = Path(supported_glyphs_fname)
+    header_out_pth: Path = Path(opts.header_out)
+    header_file_pth: Path = Path(header_out_pth, "smufl.h")
 
-    if not supported_path.is_file() or not os.access(supported_path, os.R_OK):
-        log.error(f"Could not find or read {supported_glyphs_fname} file.")
+    if not supported_pth.is_file() or not os.access(supported_pth, os.R_OK):
+        log.error("Could not find or read %s file.", supported_glyphs_fname)
         return False
 
-    if not os.access(header_out_path, os.W_OK):
-        log.error(f"Could not write to {header_out_dir}.")
+    if not os.access(header_out_pth, os.W_OK):
+        log.error("Could not write to %s.", header_out_pth)
         return False
 
-    log.debug("SMuFL header will be stored in %s", header_out_path)
+    log.debug("SMuFL header will be stored in %s", header_out_pth)
     supported_glyphs: dict = __get_supported_glyph_codes(supported_glyphs_fname)
 
     fmt_supported_glyphs: list = [
@@ -109,8 +108,8 @@ def generate_smufl(opts: Namespace) -> bool:
         smufl_glyph_list=fmt_glyph_list, len_smufl_codes=len(fmt_supported_glyphs)
     )
 
-    log.debug("Writing %s", header_file_path)
-    with open(header_file_path, "w") as header_inc:
+    log.debug("Writing %s", header_file_pth)
+    with open(header_file_pth, "w") as header_inc:
         header_inc.write(fmt_header)
 
     log.debug("Finished writing SMuFL header")
@@ -125,34 +124,32 @@ def extract_fonts(opts: Namespace) -> bool:
     :param opts: A set of options from the argument parser sub-command.
     :return: True if successful, False otherwise.
     """
-    source_dir: str = opts.source
     fontname: str = opts.fontname
-    data_dir: str = opts.data
 
-    source_pth: Path = Path(source_dir)
+    source_pth: Path = Path(opts.source)
     font_data_pth: Path = Path(source_pth, fontname)
     metadata_pth: Path = Path(font_data_pth, f"{fontname.lower()}_metadata.json")
     font_pth: Path = Path(source_pth, font_data_pth, f"{fontname}.svg")
-    data_pth: Path = Path(data_dir)
+    data_pth: Path = Path(opts.data)
     glyph_file_pth: Path = Path(data_pth, fontname)
     output_pth: Path = Path(data_pth, f"{fontname}.xml")
 
     log.debug("Extracting fonts for %s from %s", fontname, font_data_pth.resolve())
 
     if not font_data_pth.is_dir() or not os.access(font_data_pth, os.R_OK):
-        log.error(f"Could not read font information from {str(font_data_pth)}")
+        log.error("Could not read font information from %s", font_data_pth)
         return False
 
     if not os.access(metadata_pth, os.R_OK):
-        log.error(f"Could not read {str(metadata_pth)}. Does it exist?")
+        log.error("Could not read %s. Does it exist?", metadata_pth)
         return False
 
     if not os.access(font_pth, os.R_OK):
-        log.error(f"Could not read {str(font_pth)}. Does it exist?")
+        log.error("Could not read %s. Does it exist?", font_pth)
         return False
 
     if not os.access(output_pth, os.W_OK):
-        log.error(f"Could not write to {str(output_pth)}. Check permissions.")
+        log.error("Could not write to %s. Check permissions.", output_pth)
         return False
 
     if not glyph_file_pth.is_dir():
@@ -196,8 +193,8 @@ def generate_css(opts: Namespace) -> bool:
     :return: True if successful, False otherwise.
     """
     fontname: str = opts.fontname
-    source_dir: str = opts.source
-    source_pth: Path = Path(source_dir)
+
+    source_pth: Path = Path(opts.source)
     font_data_pth: Path = Path(source_pth, fontname)
     font_pth: Path = Path(font_data_pth, f"{fontname}.svg")
     log.debug("Creating a subset SVG file from %s", font_pth.resolve())
@@ -286,8 +283,7 @@ def generate_woff2(opts: Namespace) -> bool:
 #########
 def __combine_alternates_and_supported(opts) -> dict:
     fontname: str = opts.fontname
-    source_dir: str = opts.source
-    source_pth: Path = Path(source_dir)
+    source_pth: Path = Path(opts.source)
     font_data_pth: Path = Path(source_pth, fontname)
     metadata_pth: Path = Path(font_data_pth, f"{fontname.lower()}_metadata.json")
 
@@ -308,11 +304,11 @@ def __check_fontforge(opts: Namespace) -> Optional[str]:
         shutil.which("fontforge") if not opts.fontforge else opts.fontforge
     )
     if fontforge_path is None:
-        log.error(f"Could not find fontforge. It is required for this operation.")
+        log.error("Could not find fontforge. It is required for this operation.")
         return None
 
     if not os.access(fontforge_path, os.X_OK):
-        log.error(f"{fontforge_path} does not point to an executable.")
+        log.error("%s does not point to an executable.", fontforge_path)
         return None
 
     log.debug("Found fontforge at %s", fontforge_path)
@@ -344,7 +340,7 @@ def __fontforge_svg2woff(opts: Namespace, tmpdir: str) -> Optional[Path]:
 
     proc: subprocess.CompletedProcess = subprocess.run(fontforge_cmd, input=ff_script)
     if proc.returncode != 0:
-        log.error(f"Fontforge exited with an error.")
+        log.error("Fontforge exited with an error.")
         return None
 
     log.debug("WOFF2 file generated at %s", tmp_woff2.resolve())
@@ -353,7 +349,7 @@ def __fontforge_svg2woff(opts: Namespace, tmpdir: str) -> Optional[Path]:
 
 def __fontforge_convert(opts: Namespace, fmt: str) -> bool:
     if fmt not in ("svg", "woff2"):
-        log.error(f"Unknown conversion format {fmt}. Must be either 'svg' or 'woff2'.")
+        log.error("Unknown conversion format %s. Must be either 'svg' or 'woff2'.", fmt)
         return False
 
     fontforge_path: Optional[str] = __check_fontforge(opts)
@@ -361,11 +357,10 @@ def __fontforge_convert(opts: Namespace, fmt: str) -> bool:
         return False
 
     fontname: str = opts.fontname
-    font: str = opts.fontfile
-    font_pth: Path = Path(font)
+    font_pth: Path = Path(opts.fontfile)
 
     if not font_pth.is_file() or not os.access(font_pth, os.R_OK):
-        log.error(f"Could not find or read {str(font_pth)}.")
+        log.error("Could not find or read %s.", font_pth)
         return False
 
     fontforge_cmd: list = [fontforge_path, "-lang=py", "-"]
@@ -378,7 +373,7 @@ def __fontforge_convert(opts: Namespace, fmt: str) -> bool:
     proc: subprocess.CompletedProcess = subprocess.run(fontforge_cmd, input=ff_script)
 
     if proc.returncode != 0:
-        log.error(f"Fontforge exited with an error.")
+        log.error("Fontforge exited with an error.")
         return False
 
     log.debug("Converted %s to %s", font_pth.resolve(), output_fontname.resolve())
@@ -389,7 +384,7 @@ def __get_supported_glyph_codes(supported: str) -> dict:
     """Retrieve dictionary with supported SMuFL codepoints and name."""
     log.debug("Getting supported glyph codes from %s", supported)
     supported_xml = Et.parse(supported)
-    glyphs = supported_xml.findall(".//glyph")
+    glyphs: list[Et.Element] = supported_xml.findall(".//glyph")
 
     log.debug("Found %s supported glyphs", len(glyphs))
     return {g.attrib["glyph-code"]: g.attrib["smufl-name"] for g in glyphs}
@@ -401,19 +396,19 @@ def __read_svg_font_file(
     font_xml: Et.ElementTree = Et.parse(fontfile)
     font_el: Optional[Et.Element] = font_xml.find("svg:defs/svg:font", SVG_NS)
     if not font_el:
-        log.error(f"Could not find a font definition in {fontfile}.")
+        log.error("Could not find a font definition in %s.", fontfile)
         return None
 
     font_faces: list[Et.Element] = font_xml.findall(".//svg:font-face", SVG_NS)
     if len(font_faces) != 1:
-        log.error(f"Error: the file {fontfile} should have a unique font-face element.")
-        log.error(f"Please check that the svg has correct namespace: {SVG_NS['svg']}.")
+        log.error("Error: the file %s should have a unique font-face element.", fontfile)
+        log.error("Please check that the svg has correct namespace: %s.", SVG_NS['svg'])
         return None
 
     font_family: str = font_faces[0].attrib.get("font-family", "")
     units_per_em: str = font_faces[0].attrib.get("units-per-em", "")
     if not font_family or not units_per_em:
-        log.error(f"Error: Could not find a font family or units-per-em definition.")
+        log.error("Error: Could not find a font family or units-per-em definition.")
         return None
 
     default_hax = font_el.attrib.get("horiz-adv-x", "0")
@@ -529,6 +524,7 @@ def __get_alternate_glyphs(glyphs: dict, metadata: dict) -> dict:
     glyph_alternates: dict = metadata.get("glyphsWithAlternates", {})
     inverted_glyphs: dict = {v: k for k, v in glyphs.items()}
     additional_glyphs: dict = {}
+
     for name, alternates in glyph_alternates.items():
         code: Optional[str] = inverted_glyphs.get(name)
         if not code:
