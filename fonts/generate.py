@@ -248,7 +248,7 @@ def generate_css(opts: Namespace) -> bool:
             css_content.write(fmt_css)
 
     if opts.keep_intermediates:
-        intermediate_pth = Path(font_data_pth, "tmp")
+        intermediate_pth: Path = Path(font_data_pth, "tmp")
         log.debug("Keeping intermediate files in %s", intermediate_pth.resolve())
         intermediate_pth.mkdir(exist_ok=True)
         tmp_svg_font.replace(Path(intermediate_pth, f"{fontname}_subset.svg"))
