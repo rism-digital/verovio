@@ -57,6 +57,7 @@ public:
     bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
     /** Select a particular font */
     bool SetFont(const std::string &fontName);
+    std::string GetCurrentFontName() const { return m_fontName; }
     ///@}
 
     /**
@@ -91,6 +92,8 @@ private:
     bool LoadFont(const std::string &fontName);
 
 private:
+    /** The font name of the font that is currently loaded */
+    std::string m_fontName;
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
     std::string m_path;
     /** The loaded SMuFL font */

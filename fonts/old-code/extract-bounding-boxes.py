@@ -258,8 +258,11 @@ def extract_text_font(root, metadata_file):
 
 if __name__ == "__main__":
     # (1) Parse files
-    font_file = os.sys.argv[1]
-    metadata_file = os.sys.argv[2]
+    font_name = os.sys.argv[1]
+    font_file = f"{font_name}/{font_name}.svg"
+    metadata_file = f"{font_name}/{font_name.lower()}_metadata.json"
+    output_file = f"../data/{font_name}.xml"
+
     (font_family, units_per_em, default_hax,
      glyphs) = read_svg_font_file(font_file)
 
@@ -277,5 +280,4 @@ if __name__ == "__main__":
     xml_output_content += ET.tostring(root,
                                       encoding="unicode", pretty_print=True)
 
-    output_file = os.sys.argv[3]
     write_file_content(output_file, xml_output_content)
