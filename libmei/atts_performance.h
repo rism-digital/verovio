@@ -57,7 +57,7 @@ public:
 private:
     /**
      * Indicates the point of occurrence of this feature along a time line.
-     * Its value must be the ID of a
+     * Its value must be the ID of a when element elsewhere in the document.
      **/
     std::string m_when;
 
