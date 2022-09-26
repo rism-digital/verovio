@@ -1,4 +1,5 @@
 import base64
+import datetime
 import json
 import logging
 import os
@@ -207,6 +208,9 @@ def generate_css(opts: Namespace) -> bool:
 
     log.debug("The resulting subset font will have %s glyphs", len(supported_glyphs.keys()))
 
+    # Get the SVG source file's mtime for later...
+    svg_mtime: float = font_pth.stat().st_mtime
+
     Et.register_namespace("", SVG_NS["svg"])
     svg_font: Et.ElementTree = Et.parse(str(font_pth))
     font_el: Optional[Et.Element] = svg_font.find(".//svg:defs/svg:font", SVG_NS)
@@ -237,7 +241,7 @@ def generate_css(opts: Namespace) -> bool:
     log.debug("Writing SVG font %s", tmp_svg_font.resolve())
     svg_font.write(str(tmp_svg_font), encoding="UTF-8", xml_declaration=True)
 
-    tmp_woff2_pth: Optional[Path] = __fontforge_svg2woff(opts, tmpdir)
+    tmp_woff2_pth: Optional[Path] = __fontforge_svg2woff(opts, tmpdir, svg_mtime)
     if not tmp_woff2_pth:
         log.error("Could not create WOFF2")
         return False
@@ -334,7 +338,7 @@ def __check_fontforge(opts: Namespace) -> Optional[str]:
     return fontforge_path
 
 
-def __fontforge_svg2woff(opts: Namespace, tmpdir: str) -> Optional[Path]:
+def __fontforge_svg2woff(opts: Namespace, tmpdir: str, tstamp: float) -> Optional[Path]:
     fontforge_path: Optional[str] = __check_fontforge(opts)
     if not fontforge_path:
         return None
@@ -355,10 +359,15 @@ def __fontforge_svg2woff(opts: Namespace, tmpdir: str) -> Optional[Path]:
         input_fontpath=str(tmp_svg), output_fontpath=str(tmp_woff2)
     ).encode()
 
+    subprocess_environment: dict = os.environ.copy()
+    subprocess_environment["SOURCE_DATE_EPOCH"] = f"{tstamp}"
+
     log.debug("Fontforge script: %s", str(ff_script))
 
     try:
-        _: subprocess.CompletedProcess = subprocess.run(fontforge_cmd, input=ff_script, check=True)
+        _: subprocess.CompletedProcess = subprocess.run(
+            fontforge_cmd, input=ff_script, check=True, env=subprocess_environment
+        )
     except subprocess.CalledProcessError as e:
         log.error(
             "Fontforge exited with an error. Command: %s, Code: %s, Output: %s",
@@ -383,6 +392,10 @@ def __fontforge_convert(opts: Namespace, fmt: str) -> bool:
 
     fontname: str = opts.fontname
     font_pth: Path = Path(opts.fontfile)
+
+    font_mtime: float = font_pth.stat().st_mtime
+    subprocess_environment: dict = os.environ.copy()
+    subprocess_environment["SOURCE_DATE_EPOCH"] = font_mtime
 
     if not font_pth.is_file() or not os.access(font_pth, os.R_OK):
         log.error("Could not find or read %s.", font_pth)
