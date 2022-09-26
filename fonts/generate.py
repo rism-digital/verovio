@@ -159,7 +159,7 @@ def extract_fonts(opts: Namespace) -> bool:
 
     if not glyph_file_pth.is_dir():
         log.debug("Creating %s", glyph_file_pth)
-        os.makedirs(glyph_file_pth, exist_ok=True)
+        glyph_file_pth.mkdir(exist_ok=True)
 
     svg_data = __read_svg_font_file(str(font_pth))
     if not svg_data:
@@ -255,7 +255,7 @@ def generate_css(opts: Namespace) -> bool:
     if opts.keep_intermediates:
         intermediate_pth = Path(font_data_pth, "tmp")
         log.debug("Keeping intermediate files in %s", intermediate_pth.resolve())
-        os.makedirs(intermediate_pth, exist_ok=True)
+        intermediate_pth.mkdir(exist_ok=True)
         tmp_svg_font.replace(Path(intermediate_pth, f"{fontname}_subset.svg"))
         tmp_woff2_pth.replace(Path(intermediate_pth, f"{fontname}_subset.woff2"))
 
