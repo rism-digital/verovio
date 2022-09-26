@@ -208,7 +208,7 @@ def generate_css(opts: Namespace) -> bool:
     log.debug("The resulting subset font will have %s glyphs", len(supported_glyphs.keys()))
 
     Et.register_namespace("", SVG_NS["svg"])
-    svg_font = Et.parse(str(font_pth))
+    svg_font: Et.ElementTree = Et.parse(str(font_pth))
     font_el: Optional[Et.Element] = svg_font.find(".//svg:defs/svg:font", SVG_NS)
     if not font_el:
         log.error("Could not find a font element in %s", font_pth.resolve())
@@ -225,7 +225,8 @@ def generate_css(opts: Namespace) -> bool:
 
     log.debug("Shortening metadata entry to the essentials.")
     metadata_el: Optional[Et.Element] = svg_font.find(".//svg:metadata", SVG_NS)
-    if metadata_el:
+    if metadata_el is not None:
+        metadata_el.clear()
         metadata_el.text = B64_FONT_LICENSE.format(fontname=fontname)
 
     tmpdir = tempfile.mkdtemp()
@@ -244,7 +245,7 @@ def generate_css(opts: Namespace) -> bool:
     css_filename: Path = Path(opts.data, f"{fontname}.css")
 
     with open(Path(tmpdir, f"{fontname}.woff2"), "rb") as woff2_content:
-        b64_encoding: bytes = base64.urlsafe_b64encode(woff2_content.read())
+        b64_encoding: bytes = base64.b64encode(woff2_content.read())
         with open(css_filename, "w") as css_content:
             log.debug("Writing CSS file %s", css_filename.resolve())
             fmt_css: str = FONTFACE_WRAPPER.format(
