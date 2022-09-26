@@ -1524,8 +1524,7 @@ private:
      */
     ///@{
     void UpdateDocumentScore(bool direction);
-    bool SkipChildren(Functor *functor) const;
-    bool SkipChildren(const FunctorBase &functor) const;
+    bool SkipChildren(bool visibleOnly) const;
     bool FiltersApply(const Filters *filters, Object *object) const;
     ///@}
 

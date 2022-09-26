@@ -1023,7 +1023,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
     deepness--;
 
-    if (!this->SkipChildren(functor)) {
+    if (!this->SkipChildren(functor->m_visibleOnly)) {
         // We need a pointer to the array for the option to work on a reversed copy
         ArrayOfObjects *children = &m_children;
         if (direction == BACKWARD) {
@@ -1078,7 +1078,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
     deepness--;
 
-    if (!this->SkipChildren(functor)) {
+    if (!this->SkipChildren(functor->m_visibleOnly)) {
         // We need a pointer to the array for the option to work on a reversed copy
         const ArrayOfObjects *children = &m_children;
         if (direction == BACKWARD) {
@@ -1133,7 +1133,7 @@ void Object::Process(MutableFunctor &functor, int deepness, bool skipFirst)
     }
     --deepness;
 
-    if (!this->SkipChildren(functor)) {
+    if (!this->SkipChildren(functor.VisibleOnly())) {
         // We need a pointer to the array for the option to work on a reversed copy
         ArrayOfObjects *children = &m_children;
         Filters *filters = functor.GetFilters();
@@ -1190,7 +1190,7 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
     }
     --deepness;
 
-    if (!this->SkipChildren(functor)) {
+    if (!this->SkipChildren(functor.VisibleOnly())) {
         // We need a pointer to the array for the option to work on a reversed copy
         const ArrayOfObjects *children = &m_children;
         Filters *filters = functor.GetFilters();
@@ -1258,37 +1258,9 @@ void Object::UpdateDocumentScore(bool direction)
     }
 }
 
-bool Object::SkipChildren(Functor *functor) const
+bool Object::SkipChildren(bool visibleOnly) const
 {
-    if (functor->m_visibleOnly) {
-        if (this->IsEditorialElement()) {
-            const EditorialElement *editorialElement = vrv_cast<const EditorialElement *>(this);
-            assert(editorialElement);
-            if (editorialElement->m_visibility == Hidden) {
-                return true;
-            }
-        }
-        else if (this->Is(MDIV)) {
-            const Mdiv *mdiv = vrv_cast<const Mdiv *>(this);
-            assert(mdiv);
-            if (mdiv->m_visibility == Hidden) {
-                return true;
-            }
-        }
-        else if (this->IsSystemElement()) {
-            const SystemElement *systemElement = vrv_cast<const SystemElement *>(this);
-            assert(systemElement);
-            if (systemElement->m_visibility == Hidden) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool Object::SkipChildren(const FunctorBase &functor) const
-{
-    if (functor.VisibleOnly()) {
+    if (visibleOnly) {
         if (this->IsEditorialElement()) {
             const EditorialElement *editorialElement = vrv_cast<const EditorialElement *>(this);
             assert(editorialElement);
