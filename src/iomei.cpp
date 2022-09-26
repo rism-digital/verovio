@@ -55,6 +55,7 @@
 #include "functorparams.h"
 #include "gliss.h"
 #include "gracegrp.h"
+#include "graphic.h"
 #include "grpsym.h"
 #include "hairpin.h"
 #include "halfmrpt.h"
@@ -2754,6 +2755,15 @@ void MEIOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
     }
 }
 
+void MEIOutput::WriteGraphic(pugi::xml_node currentNode, Graphic *graphic)
+{
+    assert(graphic);
+    this->WriteXmlId(currentNode, graphic);
+    graphic->WritePointing(currentNode);
+    graphic->WriteWidth(currentNode);
+    graphic->WriteHeight(currentNode);
+}
+
 void MEIOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
 {
     assert(surface);
@@ -2762,7 +2772,11 @@ void MEIOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
     surface->WriteTyped(currentNode);
 
     for (Object *child = surface->GetFirst(); child != NULL; child = surface->GetNext()) {
-        if (child->GetClassId() == ZONE) {
+        if (child->GetClassId() == GRAPHIC) {
+            pugi::xml_node childNode = currentNode.append_child("graphic");
+            this->WriteGraphic(childNode, dynamic_cast<Graphic *>(child));
+        }
+        else if (child->GetClassId() == ZONE) {
             pugi::xml_node childNode = currentNode.append_child("zone");
             this->WriteZone(childNode, dynamic_cast<Zone *>(child));
         }
@@ -7899,6 +7913,18 @@ void MEIInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
     // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
+bool MEIInput::ReadGraphic(Surface *parent, pugi::xml_node graphic)
+{
+    assert(parent);
+    Graphic *vrvGraphic = new Graphic();
+    this->SetMeiID(graphic, vrvGraphic);
+    vrvGraphic->ReadPointing(graphic);
+    vrvGraphic->ReadWidth(graphic);
+    vrvGraphic->ReadHeight(graphic);
+    parent->AddChild(vrvGraphic);
+    return true;
+}
+
 bool MEIInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
 {
     assert(parent);
@@ -7908,7 +7934,10 @@ bool MEIInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
     vrvSurface->ReadTyped(surface);
 
     for (pugi::xml_node child = surface.first_child(); child; child = child.next_sibling()) {
-        if (strcmp(child.name(), "zone") == 0) {
+        if (strcmp(child.name(), "graphic") == 0) {
+            this->ReadGraphic(vrvSurface, child);
+        }
+        else if (strcmp(child.name(), "zone") == 0) {
             this->ReadZone(vrvSurface, child);
         }
         else {

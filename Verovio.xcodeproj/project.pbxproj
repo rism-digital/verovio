@@ -16,6 +16,7 @@
 		35FDEBD124B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
 		35FDEBD224B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
 		35FDEBD324B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
+		3673E5E628E1DF0C0048BAFA /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
 		36E0442C2347A9150054F141 /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
 		36E0442E2347A9290054F141 /* expansionmap.h in Headers */ = {isa = PBXBuildFile; fileRef = 36E0442D2347A9290054F141 /* expansionmap.h */; };
 		400FEDD3206FA743000D3233 /* gracegrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400FEDD2206FA743000D3233 /* gracegrp.cpp */; };
@@ -1328,6 +1329,8 @@
 		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; };
 		35FDEBCD24B6DBC100AC1696 /* fing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fing.h; path = include/vrv/fing.h; sourceTree = "<group>"; };
 		35FDEBD024B6DC5B00AC1696 /* fing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fing.cpp; path = src/fing.cpp; sourceTree = "<group>"; };
+		3673E5E428E1DF0C0048BAFA /* graphic.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = graphic.cpp; path = src/graphic.cpp; sourceTree = "<group>"; };
+		3673E5E528E1DF0C0048BAFA /* graphic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = graphic.h; path = src/graphic.h; sourceTree = "<group>"; };
 		36E0442B2347A9150054F141 /* expansionmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = expansionmap.cpp; path = src/expansionmap.cpp; sourceTree = "<group>"; };
 		36E0442D2347A9290054F141 /* expansionmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expansionmap.h; path = include/vrv/expansionmap.h; sourceTree = "<group>"; };
 		400FEDD1206FA742000D3233 /* gracegrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gracegrp.h; path = include/vrv/gracegrp.h; sourceTree = "<group>"; };
@@ -1959,6 +1962,8 @@
 				4DA0EAD522BB77AF00A7EBEB /* surface.h */,
 				4DA0EAC222BB779400A7EBEB /* zone.cpp */,
 				4DA0EAD222BB77AF00A7EBEB /* zone.h */,
+				3673E5E428E1DF0C0048BAFA /* graphic.cpp */,
+				3673E5E528E1DF0C0048BAFA /* graphic.h */,
 			);
 			name = facselements;
 			sourceTree = "<group>";
@@ -3492,6 +3497,7 @@
 				4DF28A051A754DF000BA9F7D /* floatingobject.cpp in Sources */,
 				4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */,
 				4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */,
+				3673E5E628E1DF0C0048BAFA /* graphic.cpp in Sources */,
 				4DEC4DB621C8270100D1D273 /* unclear.cpp in Sources */,
 				4D89F90E201771AE00A4D336 /* num.cpp in Sources */,
 				4DB351131C8040B1002DD057 /* anchoredtext.cpp in Sources */,
