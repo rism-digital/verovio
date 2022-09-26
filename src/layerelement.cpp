@@ -603,7 +603,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
 
     if (!this->Is({ CHORD, NOTE, REST })) return 0;
 
-    wchar_t code = 0;
+    char32_t code = 0;
     int dur = DUR_4;
     const Staff *staff = this->GetAncestorStaff();
     bool isMensuralDur = false;
@@ -998,7 +998,7 @@ data_STEMMODIFIER LayerElement::GetDrawingStemMod() const
     return stem->GetStemMod();
 }
 
-wchar_t LayerElement::StemModToGlyph(data_STEMMODIFIER stemMod) const
+char32_t LayerElement::StemModToGlyph(data_STEMMODIFIER stemMod) const
 {
     switch (stemMod) {
         case STEMMODIFIER_1slash: return SMUFL_E220_tremolo1;

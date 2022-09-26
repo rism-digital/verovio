@@ -73,7 +73,7 @@ void Accid::Reset()
     m_alignedWithSameLayer = false;
 }
 
-std::wstring Accid::GetSymbolStr(data_NOTATIONTYPE notationType) const
+std::u32string Accid::GetSymbolStr(data_NOTATIONTYPE notationType) const
 {
     return Accid::CreateSymbolStr(this->GetAccid(), this->GetEnclose(), notationType, this->GetDocResources(),
         this->GetGlyphNum(), this->GetGlyphName());
@@ -184,7 +184,7 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
 // Static methods for Accid
 //----------------------------------------------------------------------------
 
-wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
+char32_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
 {
     switch (accid) {
         case ACCIDENTAL_WRITTEN_s: return SMUFL_E262_accidentalSharp; break;
@@ -222,10 +222,10 @@ wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
     return 0;
 }
 
-std::wstring Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOSURE enclosure,
+std::u32string Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOSURE enclosure,
     data_NOTATIONTYPE notationType, const Resources *resources, data_HEXNUM glyphNum, std::string glyphName)
 {
-    wchar_t code = 0;
+    char32_t code = 0;
 
     if (resources) {
         // If there is glyph.num, prioritize it
@@ -241,7 +241,7 @@ std::wstring Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOSUR
     }
 
     if (!code) {
-        if (accid == ACCIDENTAL_WRITTEN_NONE) return L"";
+        if (accid == ACCIDENTAL_WRITTEN_NONE) return U"";
 
         switch (notationType) {
             case NOTATIONTYPE_mensural:
@@ -259,7 +259,7 @@ std::wstring Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOSUR
         }
     }
 
-    std::wstring symbolStr;
+    std::u32string symbolStr;
     switch (enclosure) {
         case ENCLOSURE_brack:
             symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);

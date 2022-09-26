@@ -187,7 +187,7 @@ bool BoundingBox::HasSelfVerticalBB() const
     return ((m_selfBB_y1 != -VRV_UNSET) && (m_selfBB_y2 != VRV_UNSET));
 }
 
-void BoundingBox::SetBoundingBoxGlyph(wchar_t smuflGlyph, int fontSize)
+void BoundingBox::SetBoundingBoxGlyph(char32_t smuflGlyph, int fontSize)
 {
     assert(smuflGlyph);
     m_smuflGlyph = smuflGlyph;

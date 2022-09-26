@@ -265,10 +265,10 @@ const TabGrp *Note::IsTabGrpNote() const
     return dynamic_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
-std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
+std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType) const
 {
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
-        std::wstring fretStr;
+        std::u32string fretStr;
         int fret = this->GetTabFret();
         // Maximum allowed would be 19 (always bindly addind 1 as first figure)
         if (fret > 9) fretStr.push_back(SMUFL_EBE1_luteItalianFret1);
@@ -288,7 +288,7 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
         return fretStr;
     }
     else if (notationType == NOTATIONTYPE_tab_lute_french) {
-        std::wstring fretStr;
+        std::u32string fretStr;
         const int fret = this->GetTabFret();
         const int course = this->GetTabCourse();
         if (course >= 11) {
@@ -303,10 +303,10 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
                 // TODO need SMUFL_xxxx_luteDiapasonSlash or 3 glyphs "/", "//", "///".
                 //      Temporary kludge, use SMUFL_E101_noteheadSlashHorizontalEnds, doesn't
                 //      look right but serves as a place holder.
-                fretStr = std::wstring(course - 7, SMUFL_E101_noteheadSlashHorizontalEnds);
+                fretStr = std::u32string(course - 7, SMUFL_E101_noteheadSlashHorizontalEnds);
             }
 
-            static const wchar_t letter[] = {
+            static const char32_t letter[] = {
                 SMUFL_EBC0_luteFrenchFretA,
                 SMUFL_EBC1_luteFrenchFretB,
                 SMUFL_EBC2_luteFrenchFretC,
@@ -329,7 +329,7 @@ std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType) const
     }
     else {
         std::string str = StringFormat("%d", this->GetTabFret());
-        return UTF8to16(str);
+        return UTF8to32(str);
     }
 }
 
@@ -355,7 +355,7 @@ Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
     Point p(defaultXShift, defaultYShift);
 
     // Here we should get the notehead value
-    wchar_t code = this->GetNoteheadGlyph(this->GetDrawingDur());
+    char32_t code = this->GetNoteheadGlyph(this->GetDrawingDur());
 
     // This is never called for now because mensural notes do not have stem/flag children
     // For changing this, change Note::CalcStem and Note::PrepareLayerElementParts
@@ -387,7 +387,7 @@ Point Note::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
     Point p(0, -defaultYShift);
 
     // Here we should get the notehead value
-    wchar_t code = this->GetNoteheadGlyph(this->GetDrawingDur());
+    char32_t code = this->GetNoteheadGlyph(this->GetDrawingDur());
 
     // This is never called for now because mensural notes do not have stem/flag children
     // See comment above
@@ -453,7 +453,7 @@ int Note::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir
     return baseStem;
 }
 
-wchar_t Note::GetMensuralNoteheadGlyph() const
+char32_t Note::GetMensuralNoteheadGlyph() const
 {
     assert(this->IsMensuralDur());
 
@@ -467,7 +467,7 @@ wchar_t Note::GetMensuralNoteheadGlyph() const
     const Staff *staff = this->GetAncestorStaff();
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
-    wchar_t code = 0;
+    char32_t code = 0;
     if (mensural_black) {
         code = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
     }
@@ -492,9 +492,9 @@ wchar_t Note::GetMensuralNoteheadGlyph() const
     return code;
 }
 
-wchar_t Note::GetNoteheadGlyph(const int duration) const
+char32_t Note::GetNoteheadGlyph(const int duration) const
 {
-    static std::map<std::string, wchar_t> additionalNoteheadSymbols
+    static std::map<std::string, char32_t> additionalNoteheadSymbols
         = { { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },
               { "noteheadDiamondWhiteWide", SMUFL_E0DE_noteheadDiamondWhiteWide },
               { "noteheadNull", SMUFL_E0A5_noteheadNull } };
@@ -771,7 +771,7 @@ bool Note::IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dot
     if (!flag) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
-    wchar_t flagGlyph = SMUFL_E242_flag16thUp;
+    char32_t flagGlyph = SMUFL_E242_flag16thUp;
     data_DURATION dur = this->GetDur();
     if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(this->GetDrawingStemDir());
     const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, this->GetDrawingCueSize());

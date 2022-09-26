@@ -48,7 +48,7 @@ void View::DrawTabClef(DeviceContext *dc, LayerElement *element, Layer *layer, S
     y = staff->GetDrawingY();
     x = element->GetDrawingX();
 
-    wchar_t sym = clef->GetClefGlyph(staff->m_drawingNotationType);
+    char32_t sym = clef->GetClefGlyph(staff->m_drawingNotationType);
 
     if (sym == 0) {
         clef->SetEmptyBB();
@@ -108,7 +108,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     if (staff->m_drawingNotationType == NOTATIONTYPE_tab_guitar) {
 
-        std::wstring fret = note->GetTabFretString(staff->m_drawingNotationType);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType);
 
         FontInfo fretTxt;
         fretTxt.SetFaceName("Times");
@@ -132,7 +132,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     else {
 
-        std::wstring fret = note->GetTabFretString(staff->m_drawingNotationType);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType);
         // Center for italian tablature
         if (staff->IsTabLuteItalian()) {
             y -= (m_doc->GetGlyphHeight(SMUFL_EBE0_luteItalianFret0, glyphSize, drawingCueSize) / 2);

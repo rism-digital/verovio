@@ -167,7 +167,7 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
 
     TextExtend extend;
-    std::wstring notes;
+    std::u32string notes;
 
     const bool drawingCueSize = tuplet->GetDrawingCueSize();
     const int glyphSize = staff->GetDrawingStaffNotationSize();

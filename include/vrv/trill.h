@@ -64,7 +64,7 @@ public:
     /**
      * Get the SMuFL glyph for the trill based on glyph.num
      */
-    wchar_t GetTrillGlyph() const;
+    char32_t GetTrillGlyph() const;
 
     //----------//
     // Functors //

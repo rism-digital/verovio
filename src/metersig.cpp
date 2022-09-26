@@ -91,9 +91,9 @@ int MeterSig::GetTotalCount() const
     return counts.front();
 }
 
-wchar_t MeterSig::GetSymbolGlyph() const
+char32_t MeterSig::GetSymbolGlyph() const
 {
-    wchar_t glyph = 0;
+    char32_t glyph = 0;
     switch (this->GetSym()) {
         case METERSIGN_common: glyph = SMUFL_E08A_timeSigCommon; break;
         case METERSIGN_cut: glyph = SMUFL_E08B_timeSigCutCommon; break;
@@ -102,7 +102,7 @@ wchar_t MeterSig::GetSymbolGlyph() const
     return glyph;
 }
 
-std::pair<wchar_t, wchar_t> MeterSig::GetEnclosingGlyphs(bool smallGlyph) const
+std::pair<char32_t, char32_t> MeterSig::GetEnclosingGlyphs(bool smallGlyph) const
 {
     if (this->GetEnclose() == ENCLOSURE_brack) {
         if (smallGlyph) {

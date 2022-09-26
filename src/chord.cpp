@@ -770,7 +770,7 @@ int Chord::CalcChordNoteHeads(FunctorParams *functorParams)
         }
         else {
             const Note *bottomNote = this->GetBottomNote();
-            const wchar_t code = bottomNote->GetNoteheadGlyph(this->GetActualDur());
+            const char32_t code = bottomNote->GetNoteheadGlyph(this->GetActualDur());
             params->m_diameter = params->m_doc->GetGlyphWidth(
                 code, staff->m_drawingStaffSize, this->GetDrawingCueSize() ? bottomNote->GetDrawingCueSize() : false);
         }

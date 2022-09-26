@@ -82,8 +82,8 @@ public:
      * This is valid only for CMN.
      */
     ///@{
-    wchar_t GetRestGlyph() const;
-    wchar_t GetRestGlyph(const int duration) const;
+    char32_t GetRestGlyph() const;
+    char32_t GetRestGlyph(const int duration) const;
     ///@}
 
     /**

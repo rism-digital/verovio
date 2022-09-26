@@ -76,7 +76,7 @@ bool PgHead::GenerateFromMEIHeader(const pugi::xml_document &header)
                 rend->SetFontsize(fs);
             }
             Text *text = new Text();
-            text->SetText(UTF8to16(titleNode.node().text().as_string()));
+            text->SetText(UTF8to32(titleNode.node().text().as_string()));
             rend->SetLang(titleNode.node().attribute("xml:lang").as_string());
             rend->AddChild(text);
             titleRend->AddChild(rend);
@@ -100,7 +100,7 @@ bool PgHead::GenerateFromMEIHeader(const pugi::xml_document &header)
         personRend->SetValign(VERTICALALIGNMENT_bottom);
         personRend->SetLabel(role);
         Text *personText = new Text();
-        personText->SetText(UTF8to16(node.node().text().as_string()));
+        personText->SetText(UTF8to32(node.node().text().as_string()));
         personRend->SetLang(node.node().attribute("xml:lang").as_string());
         personRend->AddChild(personText);
         this->AddChild(personRend);

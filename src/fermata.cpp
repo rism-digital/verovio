@@ -70,19 +70,19 @@ void Fermata::ConvertFromAnalyticalMarkup(
     params->m_controlEvents.push_back(this);
 }
 
-wchar_t Fermata::GetFermataGlyph() const
+char32_t Fermata::GetFermataGlyph() const
 {
     const Resources *resources = this->GetDocResources();
     if (!resources) return 0;
 
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
-        wchar_t code = this->GetGlyphNum();
+        char32_t code = this->GetGlyphNum();
         if (NULL != resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
-        wchar_t code = resources->GetGlyphCode(this->GetGlyphName());
+        char32_t code = resources->GetGlyphCode(this->GetGlyphName());
         if (NULL != resources->GetGlyph(code)) return code;
     }
 
@@ -107,9 +107,9 @@ wchar_t Fermata::GetFermataGlyph() const
     return SMUFL_E4C0_fermataAbove;
 }
 
-std::pair<wchar_t, wchar_t> Fermata::GetEnclosingGlyphs() const
+std::pair<char32_t, char32_t> Fermata::GetEnclosingGlyphs() const
 {
-    std::pair<wchar_t, wchar_t> glyphs(0, 0);
+    std::pair<char32_t, char32_t> glyphs(0, 0);
     if (this->HasEnclose()) {
         switch (this->GetEnclose()) {
             case ENCLOSURE_brack:
@@ -126,7 +126,7 @@ std::pair<wchar_t, wchar_t> Fermata::GetEnclosingGlyphs() const
 // Static methods
 //----------------------------------------------------------------------------
 
-data_VERTICALALIGNMENT Fermata::GetVerticalAlignment(wchar_t code)
+data_VERTICALALIGNMENT Fermata::GetVerticalAlignment(char32_t code)
 {
     switch (code) {
         case SMUFL_E4C0_fermataAbove:

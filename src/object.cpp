@@ -1472,10 +1472,10 @@ Object *ObjectListInterface::GetListNext(const Object *listElement)
 // TextListInterface
 //----------------------------------------------------------------------------
 
-std::wstring TextListInterface::GetText(const Object *node) const
+std::u32string TextListInterface::GetText(const Object *node) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
-    std::wstring concatText;
+    std::u32string concatText;
     const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
     for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
         if ((*it)->Is(LB)) {
@@ -1488,10 +1488,10 @@ std::wstring TextListInterface::GetText(const Object *node) const
     return concatText;
 }
 
-void TextListInterface::GetTextLines(const Object *node, std::vector<std::wstring> &lines) const
+void TextListInterface::GetTextLines(const Object *node, std::vector<std::u32string> &lines) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
-    std::wstring concatText;
+    std::u32string concatText;
     const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
     for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
         if ((*it)->Is(LB) && !concatText.empty()) {

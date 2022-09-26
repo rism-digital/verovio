@@ -364,7 +364,7 @@ typedef std::map<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> MapOfPitchAccid;
 
 typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
-typedef std::vector<std::pair<std::wstring, bool>> ArrayOfStringDynamTypePairs;
+typedef std::vector<std::pair<std::u32string, bool>> ArrayOfStringDynamTypePairs;
 
 typedef std::map<std::string, std::function<Object *(void)>> MapOfStrConstructors;
 
@@ -451,18 +451,24 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define MAX_NOTE_DEPTH -1
 
 //----------------------------------------------------------------------------
-// VerovioText codepoints
+// Unicode music codepoints
 //----------------------------------------------------------------------------
 
-/**
- * These are SMuFL codepoints for the VerovioText font used for embedding
- * SMuFL text glyph within text, as for example with <annot> or <syl>
- * Verovio uses a very small subset of glyph defined below (for now)
- */
+#define UNICODE_FLAT U'\u266D' // ♭
+#define UNICODE_NATURAL U'\u266E' // ♮
+#define UNICODE_SHARP U'\u266F' // ♯
 
-#define VRV_TEXT_E550 0xE550
-#define VRV_TEXT_E551 0xE551
-#define VRV_TEXT_E552 0xE552
+#define UNICODE_DAL_SEGNO U'\U0001D109' // 𝄉
+#define UNICODE_DA_CAPO U'\U0001D10A' // 𝄊
+#define UNICODE_SEGNO U'\U0001D10B' // 𝄋
+#define UNICODE_CODA U'\U0001D10C' // 𝄌
+
+#define UNICODE_DOUBLE_FLAT U'\U0001D12B' // 𝄫
+#define UNICODE_DOUBLE_SHARP U'\U0001D12A' // 𝄪
+
+//----------------------------------------------------------------------------
+// VerovioText codepoints
+//----------------------------------------------------------------------------
 
 /**
  * SMUFL Symbols used in figured bass included in VerovioText
@@ -473,11 +479,11 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
  */
 
 #define VRV_TEXT_HARM                                                                                                  \
-    L"\u266D\u266E\u266F"                                                                                              \
-    L"\uE260\uE261\uE262\uE263\uE264"                                                                                  \
-    L"\uEA50\uEA51\uEA52\uEA53\uEA54\uEA55\uEA56\uEA57\uEA58\uEA59\uEA5A\uEA5B\uEA5C\uEA5D\uEA5E"                      \
-    L"\uEA5F\uEA60\uEA61\uEA62\uEA63\uEA64\uEA65\uEA66\uEA67"                                                          \
-    L"\uECC0"
+    U"\u266D\u266E\u266F"                                                                                              \
+    U"\uE260\uE261\uE262\uE263\uE264"                                                                                  \
+    U"\uEA50\uEA51\uEA52\uEA53\uEA54\uEA55\uEA56\uEA57\uEA58\uEA59\uEA5A\uEA5B\uEA5C\uEA5D\uEA5E"                      \
+    U"\uEA5F\uEA60\uEA61\uEA62\uEA63\uEA64\uEA65\uEA66\uEA67"                                                          \
+    U"\uECC0"
 
 //----------------------------------------------------------------------------
 // data.LINEWIDTHTERM factors

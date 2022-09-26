@@ -63,7 +63,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     // Semibrevis and shorter
     else {
-        wchar_t code = note->GetMensuralNoteheadGlyph();
+        char32_t code = note->GetMensuralNoteheadGlyph();
         dc->StartCustomGraphic("notehead");
         this->DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
         dc->EndCustomGraphic();
@@ -169,7 +169,7 @@ void View::DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_ST
     originY = (dir == STEMDIRECTION_up) ? originY + yOffset : originY - yOffset;
 
     // draw the stems and the flags
-    wchar_t code;
+    char32_t code;
     if (dir == STEMDIRECTION_up) {
         switch (nbFlags) {
             case 1: code = SMUFL_E949_mensuralCombStemUpFlagSemiminima; break;
@@ -515,7 +515,7 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
 
     int ynum = 0, yden = 0;
     int textSize = staff->m_drawingStaffSize;
-    std::wstring wtext;
+    std::u32string wtext;
 
     if (numBase) {
         ynum = y + m_doc->GetDrawingDoubleUnit(textSize);

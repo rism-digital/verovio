@@ -2854,7 +2854,7 @@ std::string HumdrumInput::getInstrumentName(StaffDef *sd)
         return "";
     }
     Text *text = (Text *)obj;
-    std::string name = UTF16to8(text->GetText());
+    std::string name = UTF32to8(text->GetText());
     if (name == "    ") {
         name = "";
     }
@@ -2877,7 +2877,7 @@ std::string HumdrumInput::getInstrumentAbbreviation(StaffDef *sd)
         return "";
     }
     Text *text = (Text *)obj;
-    std::string name = UTF16to8(text->GetText());
+    std::string name = UTF32to8(text->GetText());
     return name;
 }
 
@@ -5330,7 +5330,7 @@ void HumdrumInput::setInstrumentName(ELEMENT *element, const std::string &name, 
     Label *label = new Label();
     if (name == "   ") {
         Text *text = new Text();
-        text->SetText(L"\u00a0\u00a0\u00a0");
+        text->SetText(U"\u00a0\u00a0\u00a0");
         label->AddChild(text);
     }
     else {
@@ -5372,7 +5372,7 @@ void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const std::string
     name8 = std::regex_replace(name8, exp3, "$1\xe2\x99\xaf");
     name8 = std::regex_replace(name8, exp4, "$1\xe2\x99\xaf");
 
-    std::wstring name16 = UTF8to16(name8);
+    std::u32string name16 = UTF8to32(name8);
     text->SetText(name16);
     label->AddChild(text);
     label->SetParent(element);
@@ -7092,7 +7092,7 @@ void HumdrumInput::checkForLineContinuations(hum::HTp token)
         if (pieces[i].find("_") != std::string::npos) {
             F *f = new F();
             Text *text = new Text();
-            std::wstring wtext = L"_";
+            std::u32string wtext = U"_";
             text->SetText(wtext);
             f->AddChild(text);
             fb->AddChild(f);
@@ -7269,7 +7269,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
             harm->AddChild(fb);
 
             std::vector<std::string> pieces = splitFBString(*token, " ");
-            std::vector<std::wstring> content = cleanFBString(pieces, token);
+            std::vector<std::u32string> content = cleanFBString(pieces, token);
             if (content.empty()) {
                 // do not include an empty fb see issue #1096
                 continue;
@@ -7285,7 +7285,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
                     auto pos = pieces[k].find(":");
                     if (pos != std::string::npos) {
                         std::vector<std::string> subpieces = splitFBString(pieces[k], ":");
-                        std::wstring newtext = cleanFBString2(subpieces, token);
+                        std::u32string newtext = cleanFBString2(subpieces, token);
                         text->SetText(newtext);
                     }
                     else {
@@ -7543,7 +7543,7 @@ void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
                 xstaffindex = (int)staffstarts.size() - 1;
                 setStaff(harm, xstaffindex + 1);
             }
-            std::wstring content;
+            std::u32string content;
             content = cleanStringString(*token);
             text->SetText(content);
             harm->AddChild(text);
@@ -7657,7 +7657,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 }
             }
 
-            std::wstring content;
+            std::u32string content;
             if (token->isDataType("**harm")) {
                 setPlaceRelStaff(harm, "below", false);
                 content = cleanHarmString2(*token);
@@ -7667,7 +7667,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 content = cleanHarmString3(*token);
             }
             else if (isCData) {
-                content = UTF8to16(*token);
+                content = UTF8to32(*token);
             }
             else {
                 content = cleanHarmString(*token);
@@ -7726,10 +7726,10 @@ std::vector<std::string> HumdrumInput::splitFBString(const std::string &content,
 // HumdrumInput::cleanFBString --
 //
 
-std::vector<std::wstring> HumdrumInput::cleanFBString(std::vector<std::string> &pieces, hum::HTp token)
+std::vector<std::u32string> HumdrumInput::cleanFBString(std::vector<std::string> &pieces, hum::HTp token)
 {
     std::vector<bool> todelete(pieces.size(), false);
-    std::vector<std::wstring> output(pieces.size());
+    std::vector<std::u32string> output(pieces.size());
     for (int i = 0; i < (int)pieces.size(); ++i) {
         output[i] = convertFBNumber(pieces[i], token);
         if ((pieces[i].find("K") != std::string::npos)
@@ -7754,16 +7754,16 @@ std::vector<std::wstring> HumdrumInput::cleanFBString(std::vector<std::string> &
 //   together with hyphens.
 //
 
-std::wstring HumdrumInput::cleanFBString2(std::vector<std::string> &pieces, hum::HTp token)
+std::u32string HumdrumInput::cleanFBString2(std::vector<std::string> &pieces, hum::HTp token)
 {
-    std::wstring output;
+    std::u32string output;
     for (int i = 0; i < (int)pieces.size(); ++i) {
         output += convertFBNumber(pieces[i], token);
         if (i < (int)pieces.size() - 1) {
             if (pieces[i + 1] == "") {
-                output += L" ";
+                output += U" ";
             }
-            output += L"-";
+            output += U"-";
         }
     }
     return output;
@@ -7774,9 +7774,9 @@ std::wstring HumdrumInput::cleanFBString2(std::vector<std::string> &pieces, hum:
 // HumdrumInput::convertFBNumber --
 //
 
-std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp token)
+std::u32string HumdrumInput::convertFBNumber(const std::string &input, hum::HTp token)
 {
-    std::wstring output;
+    std::u32string output;
 
     int track = token->getTrack();
     int reverse = m_reverse[track];
@@ -7872,12 +7872,12 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
 
     // accidental in front of number unless an "r" is present:
     if ((!slash) && (input.find("r") == std::string::npos) && (!reverse)) {
-        std::wstring accid = getVisualFBAccidental(accidental);
+        std::u32string accid = getVisualFBAccidental(accidental);
         if (accidental && (input.find("i") != std::string::npos)) {
-            accid = L"[" + accid + L"]";
+            accid = U"[" + accid + U"]";
         }
         else if (accidental && (input.find("j") != std::string::npos)) {
-            accid = L"(" + accid + L")";
+            accid = U"(" + accid + U")";
         }
         output += accid;
     }
@@ -7891,64 +7891,64 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
         // do not has slashes available).
         // See: https://www.smufl.org/version/latest/range/figuredBass
         switch (digit) {
-            case 0: output += L"\uEA50"; break; // draw without slash
-            case 1: output += L"\uEA51"; break; // draw without slash
-            case 2: output += L"\uEA53"; break;
-            case 3: output += L"\uEA54"; break; // draw without slash
-            case 4: output += L"\uEA56"; break; // only one style of slash
+            case 0: output += U"\uEA50"; break; // draw without slash
+            case 1: output += U"\uEA51"; break; // draw without slash
+            case 2: output += U"\uEA53"; break;
+            case 3: output += U"\uEA54"; break; // draw without slash
+            case 4: output += U"\uEA56"; break; // only one style of slash
             case 5:
                 switch (slash) {
-                    case 1: output += L"\uEA5A"; break; // 5/
-                    case 2: output += L"\uEA59"; break; // 5\ .
-                    case 3: output += L"\uEA58"; break; // 5|
-                    default: output += L"\uEA57"; break; // 5
+                    case 1: output += U"\uEA5A"; break; // 5/
+                    case 2: output += U"\uEA59"; break; // 5\ .
+                    case 3: output += U"\uEA58"; break; // 5|
+                    default: output += U"\uEA57"; break; // 5
                 }
                 break;
             case 6:
                 switch (slash) {
-                    case 1: output += L"\uEA5C"; break; // 6/
-                    case 2: output += L"\uEA5C"; break; // 6\ .
-                    case 3: output += L"\uEA5C"; break; // 6|
-                    default: output += L"\uEA5B"; break; // 6
+                    case 1: output += U"\uEA5C"; break; // 6/
+                    case 2: output += U"\uEA5C"; break; // 6\ .
+                    case 3: output += U"\uEA5C"; break; // 6|
+                    default: output += U"\uEA5B"; break; // 6
                 }
                 break;
             case 7:
                 switch (slash) {
-                    case 1: output += L"\uECC0"; break; // 7/
-                    case 2: output += L"\uEA5F"; break; // 7\ .
-                    case 3: output += L"\uEA5E"; break; // 7|
-                    default: output += L"\uEA5D"; break; // 7
+                    case 1: output += U"\uECC0"; break; // 7/
+                    case 2: output += U"\uEA5F"; break; // 7\ .
+                    case 3: output += U"\uEA5E"; break; // 7|
+                    default: output += U"\uEA5D"; break; // 7
                 }
                 break;
-            case 8: output += L"\uEA60"; break; // draw without slash
-            case 9: output += L"\uEA62"; break; // only one style of slash
+            case 8: output += U"\uEA60"; break; // draw without slash
+            case 9: output += U"\uEA62"; break; // only one style of slash
         }
     }
 
     // accidental after number if an "r" is present:
     if ((!slash) && ((input.find("r") != std::string::npos) || reverse)) {
-        std::wstring accid = getVisualFBAccidental(accidental);
+        std::u32string accid = getVisualFBAccidental(accidental);
         if (accidental && (input.find("i") != std::string::npos)) {
-            accid = L"[" + accid + L"]";
+            accid = U"[" + accid + U"]";
         }
         else if (accidental && (input.find("j") != std::string::npos)) {
-            accid = L"(" + accid + L")";
+            accid = U"(" + accid + U")";
         }
         output += accid;
     }
 
     if (input.find("J") != std::string::npos) {
-        output = L"(" + output + L")";
+        output = U"(" + output + U")";
     }
     else if (input.find("I") != std::string::npos) {
-        output = L"[" + output + L"]";
+        output = U"[" + output + U"]";
     }
     else if (slash) {
         if (input.find("j") != std::string::npos) {
-            output = L"(" + output + L")";
+            output = U"(" + output + U")";
         }
         else if (input.find("i") != std::string::npos) {
-            output = L"[" + output + L"]";
+            output = U"[" + output + U"]";
         }
     }
 
@@ -7956,20 +7956,20 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
     // so display an underscore after the figure to indicate
     // that one should be added in the future:
     if (input.find("_") != std::string::npos) {
-        output += L" _";
+        output += U" _";
     }
     // A "=" character indicates that there is a the figure (should be
     // centered between current figure and next one, but not available yet).
     // Technically this is a sort of extender, but f@extension is
     // boolean, so various styles cannot be encoded in it.
     if (input.find("=") != std::string::npos) {
-        output += L" -";
+        output += U" -";
     }
 
     /*
-                To convert a free-form std::string to UTF16:
+                To convert a free-form std::string to UTF32:
                 std::string tdee;
-                output.back() += UTF8to16(tdee);
+                output.back() += UTF8to32(tdee);
     */
 
     return output;
@@ -7980,25 +7980,25 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
 // HumdrumInput::convertNumberToWstring --
 //
 
-std::wstring HumdrumInput::convertNumberToWstring(int number)
+std::u32string HumdrumInput::convertNumberToWstring(int number)
 {
     if (number < 0) {
-        return L"";
+        return U"";
     }
     std::string value = to_string(number);
-    std::wstring output;
+    std::u32string output;
     for (int i = 0; i < (int)value.size(); ++i) {
         switch (value[i]) {
-            case '0': output += L"\uEA50"; break;
-            case '1': output += L"\uEA51"; break;
-            case '2': output += L"\uEA52"; break;
-            case '3': output += L"\uEA54"; break;
-            case '4': output += L"\uEA55"; break;
-            case '5': output += L"\uEA57"; break;
-            case '6': output += L"\uEA5B"; break;
-            case '7': output += L"\uEA5D"; break;
-            case '8': output += L"\uEA60"; break;
-            case '9': output += L"\uEA61"; break;
+            case '0': output += U"\uEA50"; break;
+            case '1': output += U"\uEA51"; break;
+            case '2': output += U"\uEA52"; break;
+            case '3': output += U"\uEA54"; break;
+            case '4': output += U"\uEA55"; break;
+            case '5': output += U"\uEA57"; break;
+            case '6': output += U"\uEA5B"; break;
+            case '7': output += U"\uEA5D"; break;
+            case '8': output += U"\uEA60"; break;
+            case '9': output += U"\uEA61"; break;
         }
     }
     return output;
@@ -8009,30 +8009,30 @@ std::wstring HumdrumInput::convertNumberToWstring(int number)
 // HumdrumInput::getVisualFBAccidental --
 //
 
-std::wstring HumdrumInput::getVisualFBAccidental(int accidental)
+std::u32string HumdrumInput::getVisualFBAccidental(int accidental)
 {
-    std::wstring output;
+    std::u32string output;
     switch (accidental) {
         case 1:
-            output = L"\uE264"; // SMUFL double-flat
+            output = U"\uE264"; // SMUFL double-flat
             break;
         case 2:
-            // output = L"\u266D"; // unicode flat
-            output = L"\uE260"; // SMUFL flat
+            // output = U"\u266D"; // unicode flat
+            output = U"\uE260"; // SMUFL flat
             break;
         case 3:
-            // output = L"\u266E"; // unicode natural
-            output = L"\uE261"; // SMUFL natural
+            // output = U"\u266E"; // unicode natural
+            output = U"\uE261"; // SMUFL natural
             break;
         case 4:
-            // output = L"\u266F"; // unicode sharp
-            output = L"\uE262"; // SMUFL sharp
+            // output = U"\u266F"; // unicode sharp
+            output = U"\uE262"; // SMUFL sharp
             break;
         case 5:
-            output = L"\uE263"; // SMUFL double-sharp
+            output = U"\uE263"; // SMUFL double-sharp
             break;
         case 6:
-            output = L"+"; // UTF-7 +
+            output = U"+"; // UTF-7 +
             break;
     }
     return output;
@@ -8047,17 +8047,17 @@ std::wstring HumdrumInput::getVisualFBAccidental(int accidental)
 //     will be suppressed.
 //
 
-std::wstring HumdrumInput::cleanHarmString3(const std::string &content)
+std::u32string HumdrumInput::cleanHarmString3(const std::string &content)
 {
     std::string temp;
 
     // hide **rhrm token if not a harmony "attack":
 
     if (content.find("_") != std::string::npos) {
-        return L"";
+        return U"";
     }
     if (content.find("]") != std::string::npos) {
-        return L"";
+        return U"";
     }
 
     // skip over **recip data:
@@ -8096,9 +8096,9 @@ std::wstring HumdrumInput::cleanHarmString3(const std::string &content)
 // HumdrumInput::cleanHarmString2 -- Adjust **harm text
 //
 
-std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
+std::u32string HumdrumInput::cleanHarmString2(const std::string &content)
 {
-    std::wstring output;
+    std::u32string output;
     bool nonrhythm = false;
     for (int i = 0; i < (int)content.size(); ++i) {
         if (!nonrhythm) {
@@ -8114,21 +8114,21 @@ std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
         }
         nonrhythm = true;
         if (content[i] == '-') {
-            output += L"\u266D"; // unicode flat
+            output += U"\u266D"; // unicode flat
         }
         else if (content[i] == '#') {
-            output += L"\u266F"; // unicode sharp
+            output += U"\u266F"; // unicode sharp
         }
         else if (content[i] == 'D') {
-            output += L"\u00F8"; // o-slash
+            output += U"\u00F8"; // o-slash
         }
         else if (content[i] == 'o') {
-            output += L"\u00B0"; // degree sign
+            output += U"\u00B0"; // degree sign
         }
         else {
             std::string tdee;
             tdee = content[i];
-            output += UTF8to16(tdee);
+            output += UTF8to32(tdee);
         }
     }
 
@@ -8141,26 +8141,26 @@ std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
 //    see: https://www.fileformat.info/info/unicode/block/enclosed_alphanumerics/utf8test.htm
 //
 
-std::wstring HumdrumInput::cleanStringString(const std::string &content)
+std::u32string HumdrumInput::cleanStringString(const std::string &content)
 {
-    std::wstring output;
+    std::u32string output;
     std::string value;
     for (int i = 0; i < (int)content.size(); ++i) {
         switch (content[i]) {
-            case '0': output += L"\u24ea"; break; // 0 in circle
-            case '1': output += L"\u2460"; break; // 1 in circle
-            case '2': output += L"\u2461"; break; // 2 in circle
-            case '3': output += L"\u2462"; break; // 3 in circle
-            case '4': output += L"\u2463"; break; // 4 in circle
-            case '5': output += L"\u2464"; break; // 5 in circle
-            case '6': output += L"\u2465"; break; // 6 in circle
-            case '7': output += L"\u2466"; break; // 7 in circle
-            case '8': output += L"\u2467"; break; // 8 in circle
-            case '9': output += L"\u2468"; break; // 9 in circle
+            case '0': output += U"\u24ea"; break; // 0 in circle
+            case '1': output += U"\u2460"; break; // 1 in circle
+            case '2': output += U"\u2461"; break; // 2 in circle
+            case '3': output += U"\u2462"; break; // 3 in circle
+            case '4': output += U"\u2463"; break; // 4 in circle
+            case '5': output += U"\u2464"; break; // 5 in circle
+            case '6': output += U"\u2465"; break; // 6 in circle
+            case '7': output += U"\u2466"; break; // 7 in circle
+            case '8': output += U"\u2467"; break; // 8 in circle
+            case '9': output += U"\u2468"; break; // 9 in circle
             default:
                 value.clear();
                 value.push_back(content[i]);
-                output += UTF8to16(value);
+                output += UTF8to32(value);
         }
     }
     return output;
@@ -8171,11 +8171,11 @@ std::wstring HumdrumInput::cleanStringString(const std::string &content)
 // HumdrumInput::cleanHarmString --
 //
 
-std::wstring HumdrumInput::cleanHarmString(const std::string &content)
+std::u32string HumdrumInput::cleanHarmString(const std::string &content)
 {
-    std::wstring root;
-    std::wstring kind;
-    std::wstring bass;
+    std::u32string root;
+    std::u32string kind;
+    std::u32string bass;
 
     bool foundspace = false;
     bool foundslash = false;
@@ -8186,7 +8186,7 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
         if (foundspace && !foundslash) {
             std::string tdee;
             tdee = content[i];
-            kind += UTF8to16(tdee);
+            kind += UTF8to32(tdee);
             continue;
         }
         if (content[i] == ' ') {
@@ -8199,28 +8199,28 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
         }
         if (!foundspace) {
             if (content[i] == '-') {
-                root += L"\u266D"; // unicode flat
+                root += U"\u266D"; // unicode flat
             }
             else if (content[i] == '#') {
-                root += L"\u266F"; // unicode sharp
+                root += U"\u266F"; // unicode sharp
             }
             else {
                 std::string tdee;
                 tdee = content[i];
-                root += UTF8to16(tdee);
+                root += UTF8to32(tdee);
             }
         }
         else if (foundslash) {
             if (content[i] == '-') {
-                bass += L"\u266D"; // unicode flat
+                bass += U"\u266D"; // unicode flat
             }
             else if (content[i] == '#') {
-                bass += L"\u266F"; // unicode sharp
+                bass += U"\u266F"; // unicode sharp
             }
             else {
                 std::string tdee;
                 tdee = content[i];
-                bass += UTF8to16(tdee);
+                bass += UTF8to32(tdee);
             }
         }
         else {
@@ -8229,127 +8229,127 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
     }
 
     bool replacing = false;
-    if (kind == L"major-minor") {
-        kind = L"Mm7";
+    if (kind == U"major-minor") {
+        kind = U"Mm7";
         replacing = true;
     }
-    else if (kind == L"minor-major") {
-        kind = L"mM7";
-        replacing = true;
-    }
-
-    if (replace(kind, L"major-", L"maj")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"minor-", L"m")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"dominant-", L"dom")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"augmented-", L"+")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"suspended-", L"sus")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"diminished-", L"\u00B0")) { // degree sign
-        replacing = true;
-    }
-    if (replace(kind, L"seventh", L"7")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"ninth", L"9")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"11th", L"11")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"13th", L"13")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"second", L"2")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"fourth", L"4")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"sixth", L"6")) {
+    else if (kind == U"minor-major") {
+        kind = U"mM7";
         replacing = true;
     }
 
-    if (kind == L"major") {
-        kind = L"";
+    if (replace(kind, U"major-", U"maj")) {
         replacing = true;
     }
-    else if (kind == L"maj") {
-        kind = L"";
+    else if (replace(kind, U"minor-", U"m")) {
         replacing = true;
     }
-    else if (kind == L"ma") {
-        kind = L""; // degree sign
+    else if (replace(kind, U"dominant-", U"dom")) {
         replacing = true;
     }
-    else if (kind == L"minor") {
-        kind = L"m";
+    else if (replace(kind, U"augmented-", U"+")) {
         replacing = true;
     }
-    else if (kind == L"min") {
-        kind = L"m";
+    else if (replace(kind, U"suspended-", U"sus")) {
         replacing = true;
     }
-    else if (kind == L"augmented") {
-        kind = L"+";
+    else if (replace(kind, U"diminished-", U"\u00B0")) { // degree sign
         replacing = true;
     }
-    else if (kind == L"minor-seventh") {
-        kind = L"m7";
+    if (replace(kind, U"seventh", U"7")) {
         replacing = true;
     }
-    else if (kind == L"major-seventh") {
-        kind = L"maj7";
+    else if (replace(kind, U"ninth", U"9")) {
         replacing = true;
     }
-    else if (kind == L"dom11") {
-        kind = L"11";
+    else if (replace(kind, U"11th", U"11")) {
         replacing = true;
     }
-    else if (kind == L"dom13") {
-        kind = L"13";
+    else if (replace(kind, U"13th", U"13")) {
         replacing = true;
     }
-    else if (kind == L"dom9") {
-        kind = L"9";
+    else if (replace(kind, U"second", U"2")) {
         replacing = true;
     }
-    else if (kind == L"half-diminished") {
-        kind = L"\u00F8"; // o-slash
+    else if (replace(kind, U"fourth", U"4")) {
         replacing = true;
     }
-    else if (kind == L"diminished") {
-        kind = L"\u00B0"; // degree sign
+    else if (replace(kind, U"sixth", U"6")) {
         replacing = true;
     }
-    else if (kind == L"dominant") {
-        kind = L"7";
+
+    if (kind == U"major") {
+        kind = U"";
         replacing = true;
     }
-    else if (kind == L"power") {
-        kind = L"5";
+    else if (kind == U"maj") {
+        kind = U"";
         replacing = true;
     }
-    else if (kind == L"m7b5") {
+    else if (kind == U"ma") {
+        kind = U""; // degree sign
         replacing = true;
-        kind = L"m7\u266D"
-               L"5";
     }
-    if ((kind != L"") && !replacing) {
-        root += L' ';
+    else if (kind == U"minor") {
+        kind = U"m";
+        replacing = true;
     }
-    if (bass != L"") {
-        kind += L'/';
+    else if (kind == U"min") {
+        kind = U"m";
+        replacing = true;
     }
-    std::wstring output = root + kind + bass;
+    else if (kind == U"augmented") {
+        kind = U"+";
+        replacing = true;
+    }
+    else if (kind == U"minor-seventh") {
+        kind = U"m7";
+        replacing = true;
+    }
+    else if (kind == U"major-seventh") {
+        kind = U"maj7";
+        replacing = true;
+    }
+    else if (kind == U"dom11") {
+        kind = U"11";
+        replacing = true;
+    }
+    else if (kind == U"dom13") {
+        kind = U"13";
+        replacing = true;
+    }
+    else if (kind == U"dom9") {
+        kind = U"9";
+        replacing = true;
+    }
+    else if (kind == U"half-diminished") {
+        kind = U"\u00F8"; // o-slash
+        replacing = true;
+    }
+    else if (kind == U"diminished") {
+        kind = U"\u00B0"; // degree sign
+        replacing = true;
+    }
+    else if (kind == U"dominant") {
+        kind = U"7";
+        replacing = true;
+    }
+    else if (kind == U"power") {
+        kind = U"5";
+        replacing = true;
+    }
+    else if (kind == U"m7b5") {
+        replacing = true;
+        kind = U"m7\u266D"
+               U"5";
+    }
+    if ((kind != U"") && !replacing) {
+        root += U' ';
+    }
+    if (bass != U"") {
+        kind += U'/';
+    }
+    std::u32string output = root + kind + bass;
     return output;
 }
 
@@ -8371,9 +8371,9 @@ bool HumdrumInput::replace(string &str, const std::string &oldStr, const std::st
     return output;
 }
 
-bool HumdrumInput::replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr)
+bool HumdrumInput::replace(std::u32string &str, const std::u32string &oldStr, const std::u32string &newStr)
 {
-    std::wstring::size_type pos = 0u;
+    std::u32string::size_type pos = 0u;
     bool output = false;
     while ((pos = str.find(oldStr, pos)) != std::string::npos) {
         output = true;
@@ -13467,29 +13467,29 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
 {
     std::string name2 = name;
     std::string prestring;
-    std::wstring symbol;
+    std::u32string symbol;
     std::string poststring;
 
     hum::HumRegex hre;
     if (hre.search(name2, "(.*)-flat\\b(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE260"; // SMUFL flat
+        symbol = U"\uE260"; // SMUFL flat
     }
     else if (hre.search(name2, "(.*)-sharp\\b(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE262"; // SMUFL sharp
+        symbol = U"\uE262"; // SMUFL sharp
     }
     else if (hre.search(name2, "(.*\\b[A-G])b\\b(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE260"; // SMUFL flat
+        symbol = U"\uE260"; // SMUFL flat
     }
     else if (hre.search(name2, "(.*[A-G])\x23(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE262"; // SMUFL sharp
+        symbol = U"\uE262"; // SMUFL sharp
     }
 
     if (symbol.empty()) {
@@ -15324,18 +15324,18 @@ void HumdrumInput::insertTwoRhythmsAndTextBetween(
 
     Rend *rend1 = new Rend();
     Text *text1 = new Text();
-    text1->SetText(UTF8to16(newnote1));
+    text1->SetText(UTF8to32(newnote1));
     rend1->AddChild(text1);
     rend1->SetFontfam("smufl");
     element->AddChild(rend1);
 
     Text *middleText = new Text();
-    middleText->SetText(UTF8to16(text));
+    middleText->SetText(UTF8to32(text));
     element->AddChild(middleText);
 
     Rend *rend2 = new Rend();
     Text *text2 = new Text();
-    text2->SetText(UTF8to16(newnote2));
+    text2->SetText(UTF8to32(newnote2));
     rend2->AddChild(text2);
     rend2->SetFontfam("smufl");
     element->AddChild(rend2);
@@ -15355,7 +15355,7 @@ template <class ELEMENT> void HumdrumInput::addVerovioTextElement(ELEMENT *eleme
     Rend *rend = new Rend();
     Text *text = new Text();
     std::string newtext = unescapeHtmlEntities(smuflentities);
-    text->SetText(UTF8to16(newtext));
+    text->SetText(UTF8to32(newtext));
     rend->AddChild(text);
     rend->SetFontstyle(FONTSTYLE_normal);
     rend->SetFontfam("smufl");
@@ -15452,7 +15452,7 @@ void HumdrumInput::addTextElement(
             element->AddChild(rend);
 
             rend->AddChild(text);
-            text->SetText(UTF8to16(pretext));
+            text->SetText(UTF8to32(pretext));
             setFontStyle(rend, myfontstyle);
             // addTextElement(element, pretext, myfontstyle, addSpacer);
         }
@@ -15484,7 +15484,7 @@ void HumdrumInput::addTextElement(
 
     for (int i = 0; i < (int)pieces.size(); ++i) {
         data = pieces[i];
-        text->SetText(UTF8to16(data));
+        text->SetText(UTF8to32(data));
 
         if (myfontstyle.empty()) {
             if (text != NULL) {
@@ -21802,7 +21802,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             if (!verselabel.empty()) {
                 Label *label = new Label();
                 Text *text = new Text();
-                std::wstring wtext = UTF8to16(verselabel);
+                std::u32string wtext = UTF8to32(verselabel);
                 text->SetText(wtext);
                 verse->AddChild(label);
                 label->AddChild(text);
@@ -21810,7 +21810,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             if (!verseabbrlabel.empty()) {
                 LabelAbbr *labelabbr = new LabelAbbr();
                 Text *text = new Text();
-                std::wstring wtext = UTF8to16(verseabbrlabel);
+                std::u32string wtext = UTF8to32(verseabbrlabel);
                 text->SetText(wtext);
                 verse->AddChild(labelabbr);
                 labelabbr->AddChild(text);
@@ -23023,8 +23023,8 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 //      LO:TURN:facc[=true] = flip upper and lower accidentals
 //      LO:TURN:uacc=[acc]  = upper [visible] accidental (or lower visual one if flip is active)
 //      LO:TURN:lacc=[acc]  = lower [visible] accidental (or upper visual one if flip is active)
-// 			[ul]acc = "none" = force the accidental not to show
-// 			[ul]acc = "true" = force the accidental not to show ("LO:TURN:[ul]acc" hide an accidental)
+//             [ul]acc = "none" = force the accidental not to show
+//             [ul]acc = "true" = force the accidental not to show ("LO:TURN:[ul]acc" hide an accidental)
 //
 // Deal with cases where the accidental should be hidden but different from sounding accidental.  This
 // can be done when MEI allows @accidlower.ges and @accidupper.ges.
@@ -24514,7 +24514,7 @@ void HumdrumInput::checkForRehearsal(int line)
         Reh *reh = new Reh();
         Rend *rend = new Rend();
         Text *text = new Text();
-        std::wstring wtext = UTF8to16(tvalue);
+        std::u32string wtext = UTF8to32(tvalue);
         text->SetText(wtext);
         reh->AddChild(rend);
         rend->AddChild(text);
@@ -24912,8 +24912,8 @@ int HumdrumInput::getMeasureNumber(int startline, int endline)
                 found = false;
                 linenum = -1;
                 // if (infile.hasPickup()) {
-                // 		// set the first implicit measure to 0
-                // 		return 0;
+                //         // set the first implicit measure to 0
+                //         return 0;
                 // }
                 break;
             }
@@ -26070,34 +26070,34 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
     // Example analysis, with measure 4 staring a rest with num="6".
     // Measures 5-9 marked as whole-measure rests which will be merged into
     // the multi rest.
-    //	**kern	**kern	0
-    //	*M4/4	*M4/4	0
-    //	=1-	=1-	0
-    //	1c	1d	0
-    //	=2	=2	0
-    //	1d	1g	0
-    //	=3	=3	0
-    //	1r	1e	0
-    //	=4	=4	6
-    //	1r	1r	6
-    //	=5	=5	-1
-    //	1r	1r	-1
-    //	=6	=6	-1
-    //	1r	1r	-1
-    //	=7	=7	-1
-    //	1r	1r	-1
-    //	=8	=8	-1
-    //	1r	1r	-1
-    //	=9	=9	-1
-    //	1r	1r	-1
-    //	=10	=10	0
-    //	1f	1r	0
-    //	=11	=11	0
-    //	1g	1g	0
-    //	=12	=12	0
-    //	1a	1g	0
-    //	==	==	0
-    //	*-	*-	0
+    //    **kern    **kern    0
+    //    *M4/4    *M4/4    0
+    //    =1-    =1-    0
+    //    1c    1d    0
+    //    =2    =2    0
+    //    1d    1g    0
+    //    =3    =3    0
+    //    1r    1e    0
+    //    =4    =4    6
+    //    1r    1r    6
+    //    =5    =5    -1
+    //    1r    1r    -1
+    //    =6    =6    -1
+    //    1r    1r    -1
+    //    =7    =7    -1
+    //    1r    1r    -1
+    //    =8    =8    -1
+    //    1r    1r    -1
+    //    =9    =9    -1
+    //    1r    1r    -1
+    //    =10    =10    0
+    //    1f    1r    0
+    //    =11    =11    0
+    //    1g    1g    0
+    //    =12    =12    0
+    //    1a    1g    0
+    //    ==    ==    0
+    //    *-    *-    0
 
     if (!barindex.empty()) {
         int firstbar = barindex[0];

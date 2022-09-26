@@ -81,7 +81,7 @@ void Flag::Reset()
     m_drawingNbFlags = 0;
 }
 
-wchar_t Flag::GetFlagGlyph(data_STEMDIRECTION stemDir) const
+char32_t Flag::GetFlagGlyph(data_STEMDIRECTION stemDir) const
 {
     if (stemDir == STEMDIRECTION_up) {
         switch (m_drawingNbFlags) {
@@ -113,14 +113,14 @@ wchar_t Flag::GetFlagGlyph(data_STEMDIRECTION stemDir) const
 
 Point Flag::GetStemUpSE(const Doc *doc, int staffSize, bool graceSize) const
 {
-    const wchar_t code = this->GetFlagGlyph(STEMDIRECTION_up);
+    const char32_t code = this->GetFlagGlyph(STEMDIRECTION_up);
 
     return Point(0, doc->GetGlyphTop(code, staffSize, graceSize));
 }
 
 Point Flag::GetStemDownNW(const Doc *doc, int staffSize, bool graceSize) const
 {
-    const wchar_t code = this->GetFlagGlyph(STEMDIRECTION_down);
+    const char32_t code = this->GetFlagGlyph(STEMDIRECTION_down);
 
     return Point(0, doc->GetGlyphBottom(code, staffSize, graceSize));
 }

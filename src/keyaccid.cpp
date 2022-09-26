@@ -62,7 +62,7 @@ void KeyAccid::Reset()
     this->ResetExtSym();
 }
 
-std::wstring KeyAccid::GetSymbolStr(data_NOTATIONTYPE notationType) const
+std::u32string KeyAccid::GetSymbolStr(data_NOTATIONTYPE notationType) const
 {
     return Accid::CreateSymbolStr(this->GetAccid(), this->GetEnclose(), notationType, this->GetDocResources(),
         this->GetGlyphNum(), this->GetGlyphName());

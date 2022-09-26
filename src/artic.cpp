@@ -173,19 +173,19 @@ void Artic::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
     }
 }
 
-wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
+char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
 {
     const Resources *resources = this->GetDocResources();
     if (!resources) return 0;
 
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
-        wchar_t code = this->GetGlyphNum();
+        char32_t code = this->GetGlyphNum();
         if (NULL != resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
-        wchar_t code = resources->GetGlyphCode(this->GetGlyphName());
+        char32_t code = resources->GetGlyphCode(this->GetGlyphName());
         if (NULL != resources->GetGlyph(code)) return code;
     }
 
@@ -264,9 +264,9 @@ wchar_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) const
         return 0;
 }
 
-std::pair<wchar_t, wchar_t> Artic::GetEnclosingGlyphs() const
+std::pair<char32_t, char32_t> Artic::GetEnclosingGlyphs() const
 {
-    std::pair<wchar_t, wchar_t> glyphs(0, 0);
+    std::pair<char32_t, char32_t> glyphs(0, 0);
     if (this->HasEnclose()) {
         switch (this->GetEnclose()) {
             case ENCLOSURE_brack:
@@ -283,7 +283,7 @@ std::pair<wchar_t, wchar_t> Artic::GetEnclosingGlyphs() const
 // Static methods for Artic
 //----------------------------------------------------------------------------
 
-bool Artic::VerticalCorr(wchar_t code, data_STAFFREL place)
+bool Artic::VerticalCorr(char32_t code, data_STAFFREL place)
 {
     if (place == STAFFREL_above)
         return false;

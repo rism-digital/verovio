@@ -55,7 +55,7 @@ public:
      * Get the SMuFL glyph.
      */
     ///@{
-    wchar_t GetCaesuraGlyph() const;
+    char32_t GetCaesuraGlyph() const;
     ///@}
 
     //----------//
