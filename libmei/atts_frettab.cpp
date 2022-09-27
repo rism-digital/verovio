@@ -180,4 +180,4 @@ void Att::GetFrettab(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

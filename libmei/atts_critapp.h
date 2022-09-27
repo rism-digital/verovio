@@ -64,6 +64,6 @@ private:
     /* include <attcause> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_CRITAPP_H__

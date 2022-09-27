@@ -2744,9 +2744,9 @@ bool AttLang::ReadLang(pugi::xml_node element)
         element.remove_attribute("xml:lang");
         hasAttribute = true;
     }
-    if (element.attribute("xml:translit")) {
-        this->SetTranslit(StrToStr(element.attribute("xml:translit").value()));
-        element.remove_attribute("xml:translit");
+    if (element.attribute("translit")) {
+        this->SetTranslit(StrToStr(element.attribute("translit").value()));
+        element.remove_attribute("translit");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -2760,7 +2760,7 @@ bool AttLang::WriteLang(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasTranslit()) {
-        element.append_attribute("xml:translit") = StrToStr(this->GetTranslit()).c_str();
+        element.append_attribute("translit") = StrToStr(this->GetTranslit()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5363,14 +5363,14 @@ bool AttPointing::ReadPointing(pugi::xml_node element)
         element.remove_attribute("xlink:show");
         hasAttribute = true;
     }
-    if (element.attribute("xlink:target")) {
-        this->SetTarget(StrToStr(element.attribute("xlink:target").value()));
-        element.remove_attribute("xlink:target");
+    if (element.attribute("target")) {
+        this->SetTarget(StrToStr(element.attribute("target").value()));
+        element.remove_attribute("target");
         hasAttribute = true;
     }
-    if (element.attribute("xlink:targettype")) {
-        this->SetTargettype(StrToStr(element.attribute("xlink:targettype").value()));
-        element.remove_attribute("xlink:targettype");
+    if (element.attribute("targettype")) {
+        this->SetTargettype(StrToStr(element.attribute("targettype").value()));
+        element.remove_attribute("targettype");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -5392,11 +5392,11 @@ bool AttPointing::WritePointing(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasTarget()) {
-        element.append_attribute("xlink:target") = StrToStr(this->GetTarget()).c_str();
+        element.append_attribute("target") = StrToStr(this->GetTarget()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTargettype()) {
-        element.append_attribute("xlink:targettype") = StrToStr(this->GetTargettype()).c_str();
+        element.append_attribute("targettype") = StrToStr(this->GetTargettype()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -8686,7 +8686,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             att->SetLang(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "xml:translit") {
+        if (attrType == "translit") {
             att->SetTranslit(att->StrToStr(attrValue));
             return true;
         }
@@ -9214,11 +9214,11 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             att->SetShow(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "xlink:target") {
+        if (attrType == "target") {
             att->SetTarget(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "xlink:targettype") {
+        if (attrType == "targettype") {
             att->SetTargettype(att->StrToStr(attrValue));
             return true;
         }
@@ -10190,7 +10190,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "xml:lang", att->StrToStr(att->GetLang()) });
         }
         if (att->HasTranslit()) {
-            attributes->push_back({ "xml:translit", att->StrToStr(att->GetTranslit()) });
+            attributes->push_back({ "translit", att->StrToStr(att->GetTranslit()) });
         }
     }
     if (element->HasAttClass(ATT_LAYERLOG)) {
@@ -10627,10 +10627,10 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "xlink:show", att->StrToStr(att->GetShow()) });
         }
         if (att->HasTarget()) {
-            attributes->push_back({ "xlink:target", att->StrToStr(att->GetTarget()) });
+            attributes->push_back({ "target", att->StrToStr(att->GetTarget()) });
         }
         if (att->HasTargettype()) {
-            attributes->push_back({ "xlink:targettype", att->StrToStr(att->GetTargettype()) });
+            attributes->push_back({ "targettype", att->StrToStr(att->GetTargettype()) });
         }
     }
     if (element->HasAttClass(ATT_QUANTITY)) {
@@ -11079,4 +11079,4 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

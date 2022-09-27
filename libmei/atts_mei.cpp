@@ -119,4 +119,4 @@ void Att::GetMei(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

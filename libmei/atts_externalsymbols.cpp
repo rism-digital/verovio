@@ -163,4 +163,4 @@ void Att::GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv
