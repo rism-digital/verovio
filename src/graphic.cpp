@@ -42,4 +42,3 @@ void Graphic::Reset()
 }
 
 } // namespace vrv
-

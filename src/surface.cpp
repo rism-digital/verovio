@@ -46,7 +46,8 @@ bool Surface::IsSupportedChild(Object *object)
 {
     if (object->Is(GRAPHIC)) {
         assert(dynamic_cast<Graphic *>(object));
-    } else if (object->Is(ZONE)) {
+    }
+    else if (object->Is(ZONE)) {
         assert(dynamic_cast<Zone *>(object));
     }
     else {
