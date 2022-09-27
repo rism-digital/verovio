@@ -1,0 +1,132 @@
+<svg width="1024px" height="69.2px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mei="http://www.music-encoding.org/ns/mei" overflow="visible">
+  <desc>Engraved by Verovio 3.3.0-e62c7d5</desc>
+  <defs>
+    <symbol id="E050" viewBox="0 0 1000 1000" overflow="inherit"><path
+      transform="scale(1,-1)"
+      d="M441 -245c-23 -4 -48 -6 -76 -6c-59 0 -102 7 -130 20c-88 42 -150 93 -187 154c-26 44 -43 103 -48 176c0 6 -1 13 -1 19c0 54 15 111 45 170c29 57 65 106 110 148s96 85 153 127c-3 16 -8 46 -13 92c-4 43 -5 73 -5 89c0 117 16 172 69 257c34 54 64 82 89 82 c21 0 43 -30 69 -92s39 -115 41 -159v-15c0 -109 -21 -162 -67 -241c-13 -20 -63 -90 -98 -118c-13 -9 -25 -19 -37 -29l31 -181c8 1 18 2 28 2c58 0 102 -12 133 -35c59 -43 92 -104 98 -184c1 -7 1 -15 1 -22c0 -123 -87 -209 -181 -248c8 -57 17 -110 25 -162 c5 -31 6 -58 6 -80c0 -30 -5 -53 -14 -70c-35 -64 -88 -99 -158 -103c-5 0 -11 -1 -16 -1c-37 0 -72 10 -108 27c-50 24 -77 59 -80 105v11c0 29 7 55 20 76c18 28 45 42 79 44h6c49 0 93 -42 97 -87v-9c0 -51 -34 -86 -105 -106c17 -24 51 -36 102 -36c62 0 116 43 140 85 c9 16 13 41 13 74c0 20 -1 42 -5 67c-8 53 -18 106 -26 159zM461 939c-95 0 -135 -175 -135 -286c0 -24 2 -48 5 -71c50 39 92 82 127 128c40 53 60 100 60 140v8c-4 53 -22 81 -55 81h-2zM406 119l54 -326c73 25 110 78 110 161c0 7 0 15 -1 23c-7 95 -57 142 -151 142h-12 zM382 117c-72 -2 -128 -47 -128 -120v-7c2 -46 43 -99 75 -115c-3 -2 -7 -5 -10 -10c-70 33 -116 88 -123 172v11c0 68 44 126 88 159c23 17 49 29 78 36l-29 170c-21 -13 -52 -37 -92 -73c-50 -44 -86 -84 -109 -119c-45 -69 -67 -130 -67 -182v-13c5 -68 35 -127 93 -176 s125 -73 203 -73c25 0 50 3 75 9c-19 111 -36 221 -54 331z"/></symbol>
+    <symbol id="E083" viewBox="0 0 1000 1000" overflow="inherit"><path
+      transform="scale(1,-1)"
+      d="M188 250c97 0 177 -52 177 -116c0 -69 -40 -111 -118 -125c56 -5 125 -44 125 -116c0 -31 -10 -57 -31 -78c-19 -21 -45 -38 -78 -49l-50 -11c-15 -3 -36 -7 -55 -7c-50 0 -86 16 -113 38c-16 10 -23 18 -34 34c-7 13 -11 25 -11 38c0 43 27 83 68 83l3 -2 c61 0 75 -42 75 -70c0 -19 -24 -42 -26 -57c7 -17 20 -25 37 -25c44 0 94 29 94 78c0 75 -34 125 -138 125v36c84 0 131 22 131 98c0 54 -37 88 -87 88c-26 0 -43 -7 -51 -22c15 -22 44 -16 44 -70c0 -37 -37 -62 -71 -62c-22 0 -69 15 -69 76c0 79 101 116 178 116z"/></symbol>
+    <symbol id="E084" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M0 -78c84 97 114 180 134 329h170c-13 -32 -82 -132 -99 -151l-84 -97c-33 -36 -59 -63 -80 -81h162v102l127 123v-225h57v-39h-57v-34c0 -43 19 -65 57 -65v-34h-244v36c48 0 60 26 60 70v27h-203v39z"/></symbol>
+    <symbol id="E0A4" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M0 -39c0 68 73 172 200 172c66 0 114 -37 114 -95c0 -84 -106 -171 -218 -171c-64 0 -96 30 -96 94z"/></symbol>
+    <symbol id="E262" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M136 186v169h17v-164l44 14v-91l-44 -14v-165l44 12v-91l-44 -13v-155h-17v150l-76 -22v-155h-17v149l-43 -13v90l43 14v167l-43 -14v92l43 13v169h17v-163zM60 73v-167l76 22v168z"/></symbol>
+    <symbol id="E4E2" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M0 10v230c0 8 2 10 10 10h105c8 0 10 -2 10 -10v-230c0 -8 -2 -10 -10 -10h-105c-8 0 -10 2 -10 10z"/></symbol>
+    <symbol id="E4E3" viewBox="0 0 1000 1000" overflow="inherit"><path transform="scale(1,-1)" d="M0 -115v105c0 9 1 10 10 10h280c9 0 10 -1 10 -10v-105c0 -9 -1 -10 -10 -10h-280c-9 0 -10 1 -10 10z"/></symbol>
+  </defs>
+  <style type="text/css">
+    g.page-margin {
+      font-family: Times;
+    }
+    g.reh,
+    g.tempo {
+      font-weight: bold;
+    }
+    g.dir,
+    g.dynam,
+    g.mNum {
+      font-style: italic;
+    }
+    g.label {
+      font-weight: normal;
+    }
+  </style>
+  <svg class="definition-scale" color="black" viewBox="0 0 25600 1730">
+    <g class="page-margin" transform="translate(100, 100)">
+      <g data-id="system-0000001965893758" data-class="system" class="system"><g data-id="section-0000001772794915" data-class="section" class="section boundaryStart"/>
+        <g data-id="measure-0000001859632396" data-class="measure" class="measure">
+          <g data-id="staff-0000000022598724" data-class="staff" class="staff"><path d="M0 450 L3045 450" stroke="currentColor" stroke-width="13"/><path d="M0 630 L3045 630" stroke="currentColor" stroke-width="13"/><path d="M0 810 L3045 810" stroke="currentColor" stroke-width="13"/><path d="M0 990 L3045 990" stroke="currentColor" stroke-width="13"/><path d="M0 1170 L3045 1170" stroke="currentColor" stroke-width="13"/>
+            <g data-id="clef-0000000652452684" data-class="clef" class="clef"><use href="#E050" x="90" y="990" height="720px" width="720px"/></g>
+            <g data-id="keysig-0000000720758406" data-class="keySig" class="keySig"><use href="#E262" x="735" y="450" height="720px" width="720px"/><use href="#E262" x="913" y="720" height="720px" width="720px"/></g>
+            <g data-id="msig-0000001978760562" data-class="meterSig" class="meterSig"><use href="#E083" x="1235" y="630" height="720px" width="720px"/><use href="#E084" x="1234" y="990" height="720px" width="720px"/></g>
+            <g data-id="layer-0000001675311014" data-class="layer" class="layer">
+              <g data-id="multirest-0000001294116481" data-class="multiRest" class="multiRest"><use href="#E4E2" x="2112" y="810" height="720px" width="720px"/><use href="#E4E3" x="2292" y="630" height="720px" width="720px"/><use href="#E083" x="2172" y="180" height="720px" width="720px"/></g>
+            </g>
+          </g>
+          <g data-id="bline-0000002125350795" data-class="barLineAttr" class="barLineAttr"><path d="M3032 1170 L3032 450" stroke="currentColor" stroke-width="27"/></g>
+        </g>
+        <g data-id="measure-0000001095985076" data-class="measure" class="measure">
+          <g data-id="staff-0000000501319351" data-class="staff" class="staff"><path d="M3045 450 L5308 450" stroke="currentColor" stroke-width="13"/><path d="M3045 630 L5308 630" stroke="currentColor" stroke-width="13"/><path d="M3045 810 L5308 810" stroke="currentColor" stroke-width="13"/><path d="M3045 990 L5308 990" stroke="currentColor" stroke-width="13"/><path d="M3045 1170 L5308 1170" stroke="currentColor" stroke-width="13"/>
+            <g data-id="layer-0000002098878014" data-class="layer" class="layer">
+              <g data-id="note-0000001276395676" data-class="note" class="note">
+                <g data-class="notehead" class="notehead"><use href="#E0A4" x="3225" y="630" height="720px" width="720px"/></g>
+                <g data-id="stem-0000000632087089" data-class="stem" class="stem"><rect x="3225" y="658" height="602" width="18"/></g>
+              </g>
+              <g data-id="note-0000001167976649" data-class="note" class="note">
+                <g data-class="notehead" class="notehead"><use href="#E0A4" x="3915" y="630" height="720px" width="720px"/></g>
+                <g data-id="stem-0000002033586761" data-class="stem" class="stem"><rect x="3915" y="658" height="602" width="18"/></g>
+              </g>
+              <g data-id="note-0000000035522516" data-class="note" class="note">
+                <g data-class="notehead" class="notehead"><use href="#E0A4" x="4605" y="630" height="720px" width="720px"/></g>
+                <g data-id="stem-0000001290450122" data-class="stem" class="stem"><rect x="4605" y="658" height="602" width="18"/></g>
+              </g>
+            </g>
+          </g>
+          <g data-id="bline-0000000667100822" data-class="barLineAttr" class="barLineAttr"><path d="M5295 1170 L5295 450" stroke="currentColor" stroke-width="27"/></g>
+        </g>
+        <g data-id="measure-0000000394965693" data-class="measure" class="measure">
+          <g data-id="staff-0000000026472546" data-class="staff" class="staff"><path d="M5308 450 L7781 450" stroke="currentColor" stroke-width="13"/><path d="M5308 630 L7781 630" stroke="currentColor" stroke-width="13"/><path d="M5308 810 L7781 810" stroke="currentColor" stroke-width="13"/><path d="M5308 990 L7781 990" stroke="currentColor" stroke-width="13"/><path d="M5308 1170 L7781 1170" stroke="currentColor" stroke-width="13"/>
+            <g data-id="layer-0000001468163214" data-class="layer" class="layer">
+              <g data-id="note-0000000832033668" data-class="note" class="note">
+                <g data-class="notehead" class="notehead"><use href="#E0A4" x="5488" y="630" height="720px" width="720px"/></g>
+                <g data-id="stem-0000001157849401" data-class="stem" class="stem"><rect x="5488" y="658" height="602" width="18"/></g>
+              </g>
+              <g data-id="beam-0000001688470415" data-class="beam" class="beam"><polygon points="6178,1440 6646,1485 6646,1395 6178,1350 "/>
+                <g data-id="note-0000001723832459" data-class="note" class="note">
+                  <g data-class="notehead" class="notehead"><use href="#E0A4" x="6178" y="720" height="720px" width="720px"/></g>
+                  <g data-id="stem-0000001625557140" data-class="stem" class="stem"><rect x="6178" y="748" height="674" width="18"/></g><g data-id="accid-0000000750256736" data-class="accid" class="accid"/></g>
+                <g data-id="note-0000001273353447" data-class="note" class="note">
+                  <g data-class="notehead" class="notehead"><use href="#E0A4" x="6628" y="810" height="720px" width="720px"/></g>
+                  <g data-id="stem-0000000451894846" data-class="stem" class="stem"><rect x="6628" y="838" height="629" width="18"/></g>
+                </g>
+              </g>
+              <g data-id="note-0000001576841374" data-class="note" class="note">
+                <g data-class="notehead" class="notehead"><use href="#E0A4" x="7078" y="720" height="720px" width="720px"/></g>
+                <g data-id="stem-0000001494500930" data-class="stem" class="stem"><rect x="7078" y="748" height="602" width="18"/></g><g data-id="accid-0000002024768838" data-class="accid" class="accid"/></g>
+            </g>
+          </g>
+          <g data-id="bline-0000000754076823" data-class="barLineAttr" class="barLineAttr"><path d="M7768 1170 L7768 450" stroke="currentColor" stroke-width="27"/></g>
+        </g>
+        <g data-id="measure-0000000970080404" data-class="measure" class="measure">
+          <g data-id="staff-0000001263989904" data-class="staff" class="staff"><path d="M7781 450 L10044 450" stroke="currentColor" stroke-width="13"/><path d="M7781 630 L10044 630" stroke="currentColor" stroke-width="13"/><path d="M7781 810 L10044 810" stroke="currentColor" stroke-width="13"/><path d="M7781 990 L10044 990" stroke="currentColor" stroke-width="13"/><path d="M7781 1170 L10044 1170" stroke="currentColor" stroke-width="13"/>
+            <g data-id="layer-0000001738879135" data-class="layer" class="layer">
+              <g data-id="note-0000000236669922" data-class="note" class="note">
+                <g data-class="notehead" class="notehead"><use href="#E0A4" x="7961" y="720" height="720px" width="720px"/></g>
+                <g data-id="stem-0000001108395198" data-class="stem" class="stem"><rect x="7961" y="748" height="602" width="18"/></g><g data-id="accid-0000000571664810" data-class="accid" class="accid"/></g>
+              <g data-id="note-0000000128624992" data-class="note" class="note">
+                <g data-class="notehead" class="notehead"><use href="#E0A4" x="8651" y="720" height="720px" width="720px"/></g>
+                <g data-id="stem-0000001524938708" data-class="stem" class="stem"><rect x="8651" y="748" height="602" width="18"/></g><g data-id="accid-0000001431691662" data-class="accid" class="accid"/></g>
+              <g data-id="note-0000002034982246" data-class="note" class="note">
+                <g data-class="notehead" class="notehead"><use href="#E0A4" x="9341" y="540" height="720px" width="720px"/></g>
+                <g data-id="stem-0000001575022058" data-class="stem" class="stem"><rect x="9341" y="568" height="602" width="18"/></g>
+              </g>
+            </g>
+          </g>
+          <g data-id="bline-0000001720058086" data-class="barLineAttr" class="barLineAttr"><path d="M10031 1170 L10031 450" stroke="currentColor" stroke-width="27"/></g>
+        </g>
+        <g data-id="measure-0000001179940493" data-class="measure" class="measure">
+          <g data-id="staff-0000001122046400" data-class="staff" class="staff"><path d="M10044 450 L12517 450" stroke="currentColor" stroke-width="13"/><path d="M10044 630 L12517 630" stroke="currentColor" stroke-width="13"/><path d="M10044 810 L12517 810" stroke="currentColor" stroke-width="13"/><path d="M10044 990 L12517 990" stroke="currentColor" stroke-width="13"/><path d="M10044 1170 L12517 1170" stroke="currentColor" stroke-width="13"/>
+            <g data-id="layer-0000002138851294" data-class="layer" class="layer">
+              <g data-id="note-0000000944931125" data-class="note" class="note">
+                <g data-class="notehead" class="notehead"><use href="#E0A4" x="10224" y="540" height="720px" width="720px"/></g>
+                <g data-id="stem-0000001512295884" data-class="stem" class="stem"><rect x="10224" y="568" height="602" width="18"/></g>
+              </g>
+              <g data-id="beam-0000000279460075" data-class="beam" class="beam"><polygon points="10914,1350 11382,1395 11382,1305 10914,1260 "/>
+                <g data-id="note-0000000815848310" data-class="note" class="note">
+                  <g data-class="notehead" class="notehead"><use href="#E0A4" x="10914" y="630" height="720px" width="720px"/></g>
+                  <g data-id="stem-0000001687960143" data-class="stem" class="stem"><rect x="10914" y="658" height="674" width="18"/></g>
+                </g>
+                <g data-id="note-0000000338744536" data-class="note" class="note">
+                  <g data-class="notehead" class="notehead"><use href="#E0A4" x="11364" y="720" height="720px" width="720px"/></g>
+                  <g data-id="stem-0000001287146531" data-class="stem" class="stem"><rect x="11364" y="748" height="629" width="18"/></g><g data-id="accid-0000000300268355" data-class="accid" class="accid"/></g>
+              </g>
+              <g data-id="note-0000000023672035" data-class="note" class="note">
+                <g data-class="notehead" class="notehead"><use href="#E0A4" x="11814" y="630" height="720px" width="720px"/></g>
+                <g data-id="stem-0000001468970286" data-class="stem" class="stem"><rect x="11814" y="658" height="602" width="18"/></g>
+              </g>
+            </g>
+          </g>
+          <g data-id="bline-0000001507339558" data-class="barLineAttr" class="barLineAttr"><path d="M12504 1170 L12504 450" stroke="currentColor" stroke-width="27"/></g>
+        </g><g data-id="bdend-0000000725789207" data-class="boundaryEnd" class="boundaryEnd section-0000001772794915"/></g>
+    </g>
+  </svg>
+</svg>
