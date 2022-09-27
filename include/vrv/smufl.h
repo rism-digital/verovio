@@ -439,18 +439,33 @@ enum {
     SMUFL_E94C_mensuralCombStemDownFlagFusa = 0xE94C,
     SMUFL_E990_chantPunctum = 0xE990,
     SMUFL_E991_chantPunctumInclinatum = 0xE991,
+    SMUFL_E992_chantPunctumInclinatumAuctum = 0xE992,
+    SMUFL_E993_chantPunctumInclinatumDeminutum = 0xE993,
+    SMUFL_E994_chantAuctumAsc = 0xE994,
+    SMUFL_E995_chantAuctumDesc = 0xE995,
     SMUFL_E996_chantPunctumVirga = 0xE996,
+    SMUFL_E997_chantPunctumVirgaReversed = 0xE997,
     SMUFL_E99B_chantQuilisma = 0xE99B,
     SMUFL_E99E_chantOriscusLiquescens = 0xE99E,
     SMUFL_E99F_chantStrophicus = 0xE99F,
+    SMUFL_E9B0_chantPodatusLower = 0xE9B0,
+    SMUFL_E9B1_chantPodatusUpper = 0xE9B1,
+    SMUFL_E9B2_chantDeminutumUpper = 0xE9B2,
+    SMUFL_E9B3_chantDeminutumLower = 0xE9B3,
     SMUFL_E9B4_chantEntryLineAsc2nd = 0xE9B4,
     SMUFL_E9B5_chantEntryLineAsc3rd = 0xE9B5,
     SMUFL_E9B6_chantEntryLineAsc4th = 0xE9B6,
     SMUFL_E9B7_chantEntryLineAsc5th = 0xE9B7,
+    SMUFL_E9B8_chantEntryLineAsc6th = 0xE9B8,
     SMUFL_E9B9_chantLigaturaDesc2nd = 0xE9B9,
     SMUFL_E9BA_chantLigaturaDesc3rd = 0xE9BA,
     SMUFL_E9BB_chantLigaturaDesc4th = 0xE9BB,
     SMUFL_E9BC_chantLigaturaDesc5th = 0xE9BC,
+    SMUFL_E9BD_chantConnectingLineAsc2nd = 0xE9BD,
+    SMUFL_E9BE_chantConnectingLineAsc3rd = 0xE9BE,
+    SMUFL_E9BF_chantConnectingLineAsc4th = 0xE9BF,
+    SMUFL_E9C0_chantConnectingLineAsc5th = 0xE9C0,
+    SMUFL_E9C1_chantConnectingLineAsc6th = 0xE9C1,
     SMUFL_E9E0_medRenFlatSoftB = 0xE9E0,
     SMUFL_E9E1_medRenFlatHardB = 0xE9E1,
     SMUFL_E9E2_medRenNatural = 0xE9E2,
@@ -559,7 +574,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 534
+#define SMUFL_COUNT 549
 
 } // namespace vrv
 
