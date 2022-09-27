@@ -284,9 +284,9 @@ public:
     //
 private:
     /**
-     * Flag for indicating if the music font (Leipzig) is currently used as text font.
+     * Flag for indicating if the music font is currently used as text font.
      * If used, it has to be initialized to false (e.g., in the overriden version of StartPage) and will be changed in
-     * DeviceContext::VrvTextFont
+     * DeviceContext::VrvTextFont. The font is included as woff2 in Commit()
      */
     bool m_vrvTextFont;
 
