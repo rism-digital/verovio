@@ -31,7 +31,6 @@ class Output;
 class Filters;
 class Functor;
 class FunctorParams;
-class FunctorBase;
 class MutableFunctor;
 class ConstFunctor;
 class LinkingInterface;
