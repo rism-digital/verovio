@@ -296,6 +296,6 @@ enum AttClassId {
     ATT_CLASS_max
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATT_CLASSES_H__

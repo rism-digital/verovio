@@ -334,4 +334,4 @@ void Att::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

@@ -1098,4 +1098,4 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

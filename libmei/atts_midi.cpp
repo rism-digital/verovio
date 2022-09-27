@@ -783,4 +783,4 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

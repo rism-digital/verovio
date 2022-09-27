@@ -477,6 +477,6 @@ public:
     whitespace_XMLSPACE StrToWhitespaceXmlspace(const std::string &value, bool logWarning = true) const;
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATT_CONVERTER_H__

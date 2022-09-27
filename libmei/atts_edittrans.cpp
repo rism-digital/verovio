@@ -158,4 +158,4 @@ void Att::GetEdittrans(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv
