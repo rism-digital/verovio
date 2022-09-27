@@ -763,26 +763,6 @@ void Note::UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig)
     }
 }
 
-bool Note::IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const
-{
-    const Object *stem = this->GetFirst(STEM);
-    if (!stem) return false;
-
-    const Flag *flag = dynamic_cast<const Flag *>(stem->GetFirst(FLAG));
-    if (!flag) return false;
-
-    // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
-    char32_t flagGlyph = SMUFL_E242_flag16thUp;
-    data_DURATION dur = this->GetDur();
-    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(this->GetDrawingStemDir());
-    const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, this->GetDrawingCueSize());
-
-    const int dotMargin = flag->GetDrawingY() - this->GetDrawingY() - flagHeight - this->GetDrawingRadius(doc) / 2
-        - dotLocShift * doc->GetDrawingUnit(staffSize);
-
-    return dotMargin < 0;
-}
-
 void Note::DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);

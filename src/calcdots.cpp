@@ -185,7 +185,7 @@ bool CalcDots::IsDotOverlappingWithFlag(const Note *note, const int staffSize, i
     if (!flag) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
-    wchar_t flagGlyph = SMUFL_E242_flag16thUp;
+    char32_t flagGlyph = SMUFL_E242_flag16thUp;
     data_DURATION dur = note->GetDur();
     if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(note->GetDrawingStemDir());
     const int flagHeight = m_doc->GetGlyphHeight(flagGlyph, staffSize, note->GetDrawingCueSize());
