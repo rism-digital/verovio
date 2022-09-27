@@ -27,7 +27,7 @@ namespace vrv {
  * in MEI
  */
 
-class Graphic : public Object, public AttPointing, public AttWidth, public AttHeight {
+class Graphic : public Object, public AttPointing, public AttWidth, public AttHeight, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset, and class name methods
