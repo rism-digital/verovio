@@ -162,7 +162,7 @@ public:
     void SetWeight(data_FONTWEIGHT weight) { m_weight = weight; }
     void SetUnderlined(bool underlined) { m_underlined = underlined; }
     void SetSupSubScript(bool supSubScript) { m_supSubScript = supSubScript; }
-    void SetFaceName(const char *faceName) { m_faceName = faceName; }
+    void SetFaceName(const std::string &faceName) { m_faceName = faceName; }
     void SetFamily(int family) { m_family = family; }
     void SetEncoding(int encoding) { m_encoding = encoding; }
     void SetWidthToHeightRatio(float ratio) { m_widthToHeightRatio = ratio; }
