@@ -97,4 +97,4 @@ void Att::GetFingering(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

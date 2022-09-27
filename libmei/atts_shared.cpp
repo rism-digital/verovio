@@ -2640,9 +2640,9 @@ bool AttLang::ReadLang(pugi::xml_node element)
         element.remove_attribute("xml:lang");
         hasAttribute = true;
     }
-    if (element.attribute("xml:translit")) {
-        this->SetTranslit(StrToStr(element.attribute("xml:translit").value()));
-        element.remove_attribute("xml:translit");
+    if (element.attribute("translit")) {
+        this->SetTranslit(StrToStr(element.attribute("translit").value()));
+        element.remove_attribute("translit");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -2656,7 +2656,7 @@ bool AttLang::WriteLang(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasTranslit()) {
-        element.append_attribute("xml:translit") = StrToStr(this->GetTranslit()).c_str();
+        element.append_attribute("translit") = StrToStr(this->GetTranslit()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -8404,7 +8404,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             att->SetLang(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "xml:translit") {
+        if (attrType == "translit") {
             att->SetTranslit(att->StrToStr(attrValue));
             return true;
         }
@@ -9908,7 +9908,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "xml:lang", att->StrToStr(att->GetLang()) });
         }
         if (att->HasTranslit()) {
-            attributes->push_back({ "xml:translit", att->StrToStr(att->GetTranslit()) });
+            attributes->push_back({ "translit", att->StrToStr(att->GetTranslit()) });
         }
     }
     if (element->HasAttClass(ATT_LAYERLOG)) {

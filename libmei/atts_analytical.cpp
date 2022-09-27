@@ -629,4 +629,4 @@ void Att::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv
