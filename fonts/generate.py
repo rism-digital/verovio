@@ -172,7 +172,6 @@ def extract_fonts(opts: Namespace) -> bool:
     )
 
     supported_glyphs: dict = __combine_alternates_and_supported(opts)
-    metadata_pth: Path = Path(font_data_pth, f"{fontname.lower()}_metadata.json")
 
     with open(metadata_pth, "r") as jfile:
         metadata: dict = json.load(jfile)
