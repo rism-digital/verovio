@@ -28,7 +28,7 @@ namespace vrv {
  * in MEI
  */
 
-class Facsimile : public Object {
+class Facsimile : public Object, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

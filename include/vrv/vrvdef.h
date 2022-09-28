@@ -94,6 +94,7 @@ enum ClassId : uint16_t {
     FB,
     GRPSYM,
     GRACE_ALIGNER,
+    GRAPHIC,
     INSTRDEF,
     KEYSIG_ATTR,
     LABEL,
