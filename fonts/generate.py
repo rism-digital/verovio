@@ -1,5 +1,4 @@
 import base64
-import datetime
 import json
 import logging
 import os
@@ -8,7 +7,7 @@ import subprocess
 import sys
 import tempfile
 import xml.etree.ElementTree as Et
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
 from typing import Optional
 
@@ -83,13 +82,12 @@ def generate_smufl(opts: Namespace) -> bool:
     :param opts: A set of options from the argument parser sub-command.
     :return: True if successful, False otherwise.
     """
-    supported_glyphs_fname: str = opts.supported
-    supported_pth: Path = Path(supported_glyphs_fname)
+    supported_pth: Path = Path(opts.supported)
     header_out_pth: Path = Path(opts.header_out)
     header_file_pth: Path = Path(header_out_pth, "smufl.h")
 
     if not supported_pth.is_file() or not os.access(supported_pth, os.R_OK):
-        log.error("Could not find or read %s file.", supported_glyphs_fname)
+        log.error("Could not find or read %s file.", supported_pth)
         return False
 
     if not os.access(header_out_pth, os.W_OK):
@@ -97,7 +95,7 @@ def generate_smufl(opts: Namespace) -> bool:
         return False
 
     log.debug("SMuFL header will be stored in %s", header_out_pth)
-    supported_glyphs: dict = __get_supported_glyph_codes(supported_glyphs_fname)
+    supported_glyphs: dict = __get_supported_glyph_codes(supported_pth)
 
     fmt_supported_glyphs: list = [
         f"    SMUFL_{gcode}_{gname} = 0x{gcode}," for gcode, gname in supported_glyphs.items()
@@ -300,6 +298,45 @@ def generate_woff2(opts: Namespace) -> bool:
     return True
 
 
+def check(opts: Namespace) -> bool:
+    """
+    Checks the glyphs of a font against the list of supported glyphs and identifies any glyphs
+    that are missing in the font.
+
+    :param opts: A set of options from the argument parser sub-command
+    :return: True if successful, False otherwise
+    """
+    fontname: str = opts.fontname
+
+    source_pth: Path = Path(opts.source)
+    font_data_pth: Path = Path(source_pth, fontname)
+    font_pth: Path = Path(font_data_pth, f"{fontname}.svg")
+
+    all_glyphs: dict = __combine_alternates_and_supported(opts)
+
+    Et.register_namespace("", SVG_NS["svg"])
+    svg_font: Et.ElementTree = Et.parse(str(font_pth))
+    glyphs: list[Et.Element] = svg_font.findall(".//svg:glyph", SVG_NS)
+    glyph_names: list[str] = []
+    for g in glyphs:
+        if g is not None and (gn := g.get("glyph-name")):
+            glyph_names.append(gn[-4:] if gn.startswith("uni") else gn)
+
+    supported_codes: set = set(all_glyphs.keys())
+    font_codes: set = set(glyph_names)
+
+    supported_codes_not_in_font: set = supported_codes.difference(font_codes)
+    font_codes_not_in_supported: set = font_codes.difference(supported_codes)
+
+    sc: list[str] = sorted(list(supported_codes_not_in_font))
+    fc: list[str] = sorted(list(font_codes_not_in_supported))
+    print(f"Verovio-supported glyphs not in {fontname}: ", ", ".join(sc))
+    if opts.show_unsupported:
+        print(f"{fontname} glyphs not supported by Verovio: ", ", ".join(fc))
+
+    return True
+
+
 #########
 # Private implementation methods.
 #########
@@ -313,7 +350,11 @@ def __combine_alternates_and_supported(opts) -> dict:
     with open(metadata_pth, "r") as jsonfile:
         metadata: dict = json.load(jsonfile)
 
-    alternate_glyphs = __get_alternate_glyphs(supported_glyphs, metadata)
+    if not os.access(metadata_pth, os.R_OK):
+        log.warning("No alternate glyphs file could be read at %s", metadata_pth)
+        return supported_glyphs
+
+    alternate_glyphs: dict = __get_alternate_glyphs(supported_glyphs, metadata)
 
     if alternate_glyphs:
         log.debug("Updating supported glyphs with alternates")
@@ -424,10 +465,10 @@ def __fontforge_convert(opts: Namespace, fmt: str) -> bool:
     return True
 
 
-def __get_supported_glyph_codes(supported: str) -> dict:
+def __get_supported_glyph_codes(supported: Path) -> dict:
     """Retrieve dictionary with supported SMuFL codepoints and name."""
     log.debug("Getting supported glyph codes from %s", supported)
-    supported_xml = Et.parse(supported)
+    supported_xml = Et.parse(str(supported))
     glyphs: list[Et.Element] = supported_xml.findall(".//glyph")
 
     log.debug("Found %s supported glyphs", len(glyphs))
@@ -585,13 +626,13 @@ if __name__ == "__main__":
     cli = ArgumentParser()
     cli.add_argument("--debug", help="Run the command with debug output.", action="store_true")
     subparsers = cli.add_subparsers(help="[sub-command] help")
-
+    supported_xml_help: str = "Path to a supported.xml file"
     smufl_description = """
     Extracts the supported glyphs from an SVG font file and creates the SMuFL header file for Verovio. 
     """
     parser_smufl = subparsers.add_parser("smufl", description=smufl_description)
     parser_smufl.add_argument(
-        "--supported", help="A supported.xml file", default="./supported.xml"
+        "--supported", help=supported_xml_help, default="./supported.xml"
     )
     parser_smufl.add_argument("--header-out", default="../include/vrv/")
     parser_smufl.set_defaults(func=generate_smufl)
@@ -603,7 +644,7 @@ if __name__ == "__main__":
     parser_extract = subparsers.add_parser("extract", description=extract_description)
     parser_extract.add_argument("fontname")
     parser_extract.add_argument(
-        "--supported", help="A supported.xml file", default="./supported.xml"
+        "--supported", help=supported_xml_help, default="./supported.xml"
     )
     parser_extract.add_argument(
         "--data", help="Path to the Verovio data directory", default="../data"
@@ -616,9 +657,7 @@ if __name__ == "__main__":
     in a CSS @font-face definition.
     """
 
-    fontname_help = """
-    The name of the font. Sets the font-family in the CSS @font-face description.
-    """
+    fontname_help = "The name of the font. Sets the font-family in the CSS @font-face description."
     keep_help = """
     Keeps the intermediate SVG and WOFF2 font files saved to a tmp directory in the source directory. 
     Useful for debugging.
@@ -626,7 +665,7 @@ if __name__ == "__main__":
     parser_css = subparsers.add_parser("css", description=css_description)
     parser_css.add_argument("fontname", help=fontname_help)
     parser_css.add_argument("--data", help="Path to the Verovio data directory", default="../data")
-    parser_css.add_argument("--supported", help="A supported.xml file", default="./supported.xml")
+    parser_css.add_argument("--supported", help=supported_xml_help, default="./supported.xml")
     parser_css.add_argument("--source", help="The font source parent directory", default="./")
     parser_css.add_argument(
         "--fontforge",
@@ -673,6 +712,26 @@ if __name__ == "__main__":
         default=None,
     )
     parser_woff2.set_defaults(func=generate_woff2)
+
+    check_description: str = """
+    Checks the supported.xml file against a specified font, and reports on the glyphs that are supported
+    by Verovio, but that are not in that font.
+    
+    Optionally, with the use of the `--show-unsupported` flag, will also show the list of glyphs that are in
+    the font that are not supported by Verovio.
+    """
+    unsupported_help: str = "Also show a list of glyphs in the font that are not supported by Verovio."
+    parser_check = subparsers.add_parser(
+        "check", description=check_description, formatter_class=RawTextHelpFormatter
+    )
+    parser_check.add_argument("fontname", help=fontname_help)
+    parser_check.add_argument(
+        "--supported", help=supported_xml_help, default="./supported.xml"
+    )
+    parser_check.add_argument("--source", help="The font source parent directory", default="./")
+    parser_check.add_argument("--show-unsupported", help=unsupported_help, action="store_true")
+
+    parser_check.set_defaults(func=check)
 
     cmd_opts: Namespace = cli.parse_args()
 
