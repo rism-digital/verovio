@@ -255,7 +255,7 @@ int main(int argc, char **argv)
     static struct option base_options[] = { //
         { "all-pages", no_argument, 0, 'a' }, //
         { "input-from", required_argument, 0, 'f' }, //
-        { "help", no_argument, 0, 'h' }, //
+        { "help", required_argument, 0, 'h' }, //
         { "outfile", required_argument, 0, 'o' }, //
         { "page", required_argument, 0, 'p' }, //
         { "resources", required_argument, 0, 'r' }, //
