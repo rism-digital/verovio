@@ -138,7 +138,7 @@ if ($chattyQ) {
 
 if (!$nohumdrum) {
 	print "Creating toolkit version with humdrum\n";
-	$FLAGS_NAME .= "-hum";
+	$FLAGS_NAME = "-hum";
 }
 
 if($modularizeQ) {
