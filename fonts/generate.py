@@ -350,7 +350,7 @@ def __combine_alternates_and_supported(opts) -> dict:
         metadata: dict = json.load(jsonfile)
 
     if not os.access(metadata_pth, os.R_OK):
-        log.warning("The metadata file could be read at %s", metadata_pth)
+        log.warning("The metadata file could not be read at %s", metadata_pth)
         return supported_glyphs
 
     alternate_glyphs: dict = __get_alternate_glyphs(supported_glyphs, metadata)
