@@ -630,9 +630,7 @@ if __name__ == "__main__":
     Extracts the supported glyphs from an SVG font file and creates the SMuFL header file for Verovio. 
     """
     parser_smufl = subparsers.add_parser("smufl", description=smufl_description)
-    parser_smufl.add_argument(
-        "--supported", help=supported_xml_help, default="./supported.xml"
-    )
+    parser_smufl.add_argument("--supported", help=supported_xml_help, default="./supported.xml")
     parser_smufl.add_argument("--header-out", default="../include/vrv/")
     parser_smufl.set_defaults(func=generate_smufl)
 
@@ -642,9 +640,7 @@ if __name__ == "__main__":
     """
     parser_extract = subparsers.add_parser("extract", description=extract_description)
     parser_extract.add_argument("fontname")
-    parser_extract.add_argument(
-        "--supported", help=supported_xml_help, default="./supported.xml"
-    )
+    parser_extract.add_argument("--supported", help=supported_xml_help, default="./supported.xml")
     parser_extract.add_argument(
         "--data", help="Path to the Verovio data directory", default="../data"
     )
@@ -719,14 +715,14 @@ if __name__ == "__main__":
     Optionally, with the use of the `--show-unsupported` flag, will also show the list of glyphs that are in
     the font that are not supported by Verovio.
     """
-    unsupported_help: str = "Also show a list of glyphs in the font that are not supported by Verovio."
+    unsupported_help: str = (
+        "Also show a list of glyphs in the font that are not supported by Verovio."
+    )
     parser_check = subparsers.add_parser(
         "check", description=check_description, formatter_class=RawTextHelpFormatter
     )
     parser_check.add_argument("fontname", help=fontname_help)
-    parser_check.add_argument(
-        "--supported", help=supported_xml_help, default="./supported.xml"
-    )
+    parser_check.add_argument("--supported", help=supported_xml_help, default="./supported.xml")
     parser_check.add_argument("--source", help="The font source parent directory", default="./")
     parser_check.add_argument("--show-unsupported", help=unsupported_help, action="store_true")
 
