@@ -1,6 +1,16 @@
 # Changelog
 
 ## [unreleased]
+* Support for `symbol` within text elements (with `@glyph.num` or `@glyph.name`)
+* Support for all music fonts within text using css webfont2 (with `rend@fontfam="smufl"`)
+* Support for `graphic` input and output (@wergo)
+* Support for `caesura` multiple stems (@eNote-GmBH)
+* Support for unicode music symbols (coda, segno, da capo, dal segno)
+* Support for mensural multiple stems (@eNote-GmBH)
+* Option --dynam-single-glyphs to use single glyphs for dynamics (@eNote-GmBH)
+* Option --scale-to-page-size for an output with a fix size independently from the scale factor
+* Replacement of VerovioText font with Leipzig (and other supported music fonts)
+* Compiling option to use the old Plaine and Easie parser (@carlolic)
 
 ## [3.11.00] - 2022-07-15
 * Support for MEI-basic output
