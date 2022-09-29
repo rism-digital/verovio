@@ -22,6 +22,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 enum {
+    SMUFL_0020_space = 0x0020,
     SMUFL_266D_musicFlatSign = 0x266D,
     SMUFL_266E_musicNaturalSign = 0x266E,
     SMUFL_266F_musicSharpSign = 0x266F,
@@ -574,7 +575,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 549
+#define SMUFL_COUNT 550
 
 } // namespace vrv
 

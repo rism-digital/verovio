@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <bounding-boxes font-family="Petaluma" units-per-em="1000">
+  <g c="0020" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="600" n="space" />
   <g c="266D" x="-10.0" y="-231.0" w="208.0" h="680.0" h-a-x="198" n="musicFlatSign" />
   <g c="266E" x="0.0" y="-463.0" w="213.5" h="918.0" h-a-x="213" n="musicNaturalSign" />
   <g c="266F" x="-25.0" y="-356.0" w="412.0" h="767.0" h-a-x="377" n="musicSharpSign" />
