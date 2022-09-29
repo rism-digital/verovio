@@ -319,6 +319,9 @@ def check(opts: Namespace) -> bool:
     glyph_names: list[str] = []
     for g in glyphs:
         if g is not None and (gn := g.get("glyph-name")):
+            # space is not given as octal in svg fonts
+            if gn == "space":
+                gn = "0020"
             glyph_names.append(gn[-4:] if gn.startswith("uni") else gn)
 
     supported_codes: set = set(all_glyphs.keys())
