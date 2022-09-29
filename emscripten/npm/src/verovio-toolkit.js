@@ -14,6 +14,10 @@ export class VerovioToolkit {
         VerovioToolkit.instances.push(this);
     }
 
+    get module() {
+        return this.VerovioModule;
+    }
+
     destroy() {
         VerovioToolkit.instances.splice(VerovioToolkit.instances.findIndex(i => i.ptr === this.ptr), 1);
         console.debug("Deleting toolkit instance");
@@ -119,10 +123,10 @@ export class VerovioToolkit {
         }
         var dataArray = new Uint8Array(data);
         var dataSize = dataArray.length * dataArray.BYTES_PER_ELEMENT;
-        var dataPtr = Module._malloc(dataSize);
-        Module.HEAPU8.set(dataArray, dataPtr);
+        var dataPtr = this.module._malloc(dataSize);
+        this.module.HEAPU8.set(dataArray, dataPtr);
         var res = this.proxy.loadZipDataBuffer(this.ptr, dataPtr, dataSize);
-        Module._free(dataPtr);
+        this.module._free(dataPtr);
         return res;
     }
 
