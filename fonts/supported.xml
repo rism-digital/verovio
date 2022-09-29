@@ -2,6 +2,7 @@
 <smufl>
     <standardUnicodePoints>
         <description>Standard Unicode Points (added by hand)</description>
+        <glyph glyph-code=" " smufl-name="space"/>
         <glyph glyph-code="266D" smufl-name="musicFlatSign"/>
         <glyph glyph-code="266E" smufl-name="musicNaturalSign"/>
         <glyph glyph-code="266F" smufl-name="musicSharpSign"/>
