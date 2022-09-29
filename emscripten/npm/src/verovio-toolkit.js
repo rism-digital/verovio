@@ -119,10 +119,10 @@ export class VerovioToolkit {
         }
         var dataArray = new Uint8Array(data);
         var dataSize = dataArray.length * dataArray.BYTES_PER_ELEMENT;
-        var dataPtr = Module._malloc(dataSize);
-        Module.HEAPU8.set(dataArray, dataPtr);
+        var dataPtr = this.VerovioModule._malloc(dataSize);
+        this.VerovioModule.HEAPU8.set(dataArray, dataPtr);
         var res = this.proxy.loadZipDataBuffer(this.ptr, dataPtr, dataSize);
-        Module._free(dataPtr);
+        this.VerovioModule._free(dataPtr);
         return res;
     }
 
