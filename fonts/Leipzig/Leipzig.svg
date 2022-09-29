@@ -2,11 +2,11 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20220308 at Tue Sep 27 14:16:38 2022
+Created by FontForge 20220308 at Wed Sep 28 10:28:26 2022
  By Laurent Pugin
 Created by Etienne Darbellay, Jean-Francois Marti, Laurent Pugin, and Klaus Rettinghaus.
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.79
+Version 5.2.80
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="624" >
@@ -379,12 +379,6 @@ c-4 10 -11 14 -23 14c-37 0 -67 -52 -88 -156h144c15 49 39 93 72 132c31 36 69 54 1
 c21 30 42 53 65 69s48 24 75 24c28 0 46 -14 51 -38l4 -16c0 -33 -1 -36 -13 -60c-3 -7 -17 -25 -31 -27c-3 0 -6 -1 -8 -1c-20 0 -25 14 -28 32c0 27 11 44 29 56l14 10c0 12 -11 16 -23 16c-11 0 -23 -4 -29 -8c-9 -7 -19 -21 -29 -43c-7 -18 -26 -86 -31 -105h148
 c7 21 13 36 18 47c20 48 53 89 87 113c23 16 48 24 75 24c9 0 17 -1 23 -3c11 -4 25 -22 28 -35l4 -16c0 -33 -1 -36 -13 -60c-3 -7 -17 -25 -31 -27c-3 0 -6 -1 -8 -1c-20 0 -25 14 -28 32c0 27 11 44 29 56l14 10c0 9 -6 14 -18 16h-6c-11 0 -20 -2 -28 -8
 c-9 -7 -19 -21 -29 -43c-7 -18 -26 -84 -31 -103h77v-40h-85c-19 -109 -60 -255 -103 -337c-24 -46 -64 -106 -117 -106c-45 0 -71 37 -71 83z" />
-    <glyph glyph-name="NameMe.58897" horiz-adv-x="322" 
-d="M0 -2v267h52v-191h218v191h52v-267h-322z" />
-    <glyph glyph-name="NameMe.58898" horiz-adv-x="263" 
-d="M0 418h36l94 -314l96 314h36l-132 -418z" />
-    <glyph glyph-name="NameMe.58899" horiz-adv-x="263" 
-d="M0 418h36l94 -314l96 314h36l-132 -418z" />
     <glyph glyph-name="uniE4A0" unicode="&#xe4a0;" horiz-adv-x="347" 
 d="M0 236l347 -119l-347 -117v33l252 84l-252 86v33z" />
     <glyph glyph-name="uniE4A1" unicode="&#xe4a1;" horiz-adv-x="347" 
