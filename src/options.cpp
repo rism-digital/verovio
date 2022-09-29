@@ -907,7 +907,7 @@ Options::Options()
     m_resourcePath.SetShortOption('r', true);
     m_baseOptions.AddOption(&m_resourcePath);
 
-    m_scale.SetInfo("Scale percent", "Scale of the output in percent");
+    m_scale.SetInfo("Scale percent", "Scale of the output in percent (100 is normal size)");
     m_scale.Init(DEFAULT_SCALE, MIN_SCALE, MAX_SCALE);
     m_scale.SetKey("scale");
     m_scale.SetShortOption('s', false);
