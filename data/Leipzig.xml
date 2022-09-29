@@ -689,6 +689,7 @@
   <g c="ECB3" x="2.0" y="-122.0" w="512.0" h="1601.0" h-a-x="516" n="metNote512thUp" />
   <g c="ECB5" x="2.0" y="-112.0" w="512.0" h="1767.0" h-a-x="515" n="metNote1024thUp" />
   <g c="ECB7" x="0.0" y="-49.0" w="97.0" h="98.0" h-a-x="97" n="metAugmentationDot" />
+  <g c="0020" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="100" n="space" />
   <g c="E990" x="0.0" y="-101.0" w="160.0" h="203.0" h-a-x="160" n="chantPunctum" />
   <g c="E9B0" x="0.0" y="0.0" w="139.0" h="164.0" h-a-x="125" n="chantPodatusLower" />
   <g c="E991" x="0.0" y="-112.0" w="150.0" h="224.0" h-a-x="150" n="chantPunctumInclinatum" />
