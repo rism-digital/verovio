@@ -118,7 +118,7 @@ public:
     /** Override the method since alignment is required */
     bool HasToBeAligned() const override { return true; }
 
-    wchar_t GetFlagGlyph(data_STEMDIRECTION stemDir) const;
+    char32_t GetFlagGlyph(data_STEMDIRECTION stemDir) const;
 
     Point GetStemUpSE(const Doc *doc, int staffSize, bool graceSize) const;
     Point GetStemDownNW(const Doc *doc, int staffSize, bool graceSize) const;

@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -22,7 +22,6 @@
 #include "comparison.h"
 #include "controlelement.h"
 #include "devicecontext.h"
-#include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "f.h"
@@ -47,9 +46,6 @@
 #include "reh.h"
 #include "smufl.h"
 #include "staff.h"
-#include "staffdef.h"
-#include "staffgrp.h"
-#include "syl.h"
 #include "system.h"
 #include "text.h"
 #include "tuplet.h"
@@ -535,8 +531,8 @@ void View::DrawLabels(
     LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
     Object *graphic = label;
 
-    std::wstring labelStr = (label) ? label->GetText(label) : L"";
-    std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
+    std::u32string labelStr = (label) ? label->GetText(label) : U"";
+    std::u32string labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : U"";
 
     if (abbreviations) {
         labelStr = labelAbbrStr;
@@ -579,7 +575,7 @@ void View::DrawLabels(
     // also store in the system the maximum width with abbreviations for justification
     if (labelAbbr && !abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
-        std::vector<std::wstring> lines;
+        std::vector<std::u32string> lines;
         labelAbbr->GetTextLines(labelAbbr, lines);
         int maxLength = 0;
         for (auto const &line : lines) {
@@ -1087,7 +1083,16 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(staff);
 
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
-    const ListOfObjects &childList = meterSigGrp->GetList(meterSigGrp);
+    ListOfObjects childList = meterSigGrp->GetList(meterSigGrp);
+
+    // Ignore invisible meter signatures and those without count
+    childList.erase(std::remove_if(childList.begin(), childList.end(),
+                        [](Object *object) {
+                            MeterSig *meterSig = vrv_cast<MeterSig *>(object);
+                            assert(meterSig);
+                            return ((meterSig->GetForm() == METERFORM_invis) || !meterSig->HasCount());
+                        }),
+        childList.end());
 
     const int glyphSize = staff->GetDrawingStaffNotationSize();
 
@@ -1098,10 +1103,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     for (auto iter = childList.begin(); iter != childList.end(); ++iter) {
         MeterSig *meterSig = vrv_cast<MeterSig *>(*iter);
         assert(meterSig);
-
-        if (meterSig->HasCount()) {
-            this->DrawMeterSig(dc, meterSig, staff, offset);
-        }
+        this->DrawMeterSig(dc, meterSig, staff, offset);
 
         const int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
         const int x = meterSig->GetDrawingX() + offset;
@@ -1919,7 +1921,7 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextEl
 
     Annot *annot = vrv_cast<Annot *>(element);
     assert(annot);
-    dc->AddDescription(UTF16to8(annot->GetText(annot)));
+    dc->AddDescription(UTF32to8(annot->GetText(annot)));
 
     if (isTextElement) {
         dc->EndTextGraphic(element, this);

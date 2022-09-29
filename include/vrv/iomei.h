@@ -64,6 +64,7 @@ class FloatingElement;
 class FTrem;
 class Gliss;
 class GraceGrp;
+class Graphic;
 class GrpSym;
 class Hairpin;
 class HalfmRpt;
@@ -135,12 +136,14 @@ class Sic;
 class Slur;
 class Space;
 class Staff;
+class Stem;
 class Subst;
 class Supplied;
 class Surface;
 class Svg;
 class Syl;
 class Syllable;
+class Symbol;
 class System;
 class SystemElement;
 class SystemMilestoneEnd;
@@ -401,6 +404,7 @@ private:
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
+    void WriteStem(pugi::xml_node currentNode, Stem *stem);
     void WriteSyllable(pugi::xml_node currentNode, Syllable *syllable);
     void WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym);
     void WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp);
@@ -449,6 +453,7 @@ private:
     void WriteNum(pugi::xml_node currentNode, Num *num);
     void WriteRend(pugi::xml_node currentNode, Rend *rend);
     void WriteSvg(pugi::xml_node currentNode, Svg *svg);
+    void WriteSymbol(pugi::xml_node currentNode, Symbol *symbol);
     void WriteText(pugi::xml_node currentNode, Text *text);
     ///@}
 
@@ -486,6 +491,7 @@ private:
     void WriteZone(pugi::xml_node currentNode, Zone *zone);
     void WriteSurface(pugi::xml_node currentNode, Surface *surface);
     void WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile);
+    void WriteGraphic(pugi::xml_node currentNode, Graphic *graphic);
     ///@}
 
     /**
@@ -524,7 +530,7 @@ private:
      * Must be used in conjunction with (pugi::format_default | pugi::format_no_escapes).
      * Unused for now (see WriteText) because of un-escaped entities in the header.
      */
-    std::wstring EscapeSMuFL(std::wstring data);
+    std::u32string EscapeSMuFL(std::u32string data);
 
     /** @name Methods for converting members into MEI attributes. */
     ///@{
@@ -700,6 +706,7 @@ private:
     bool ReadProport(Object *parent, pugi::xml_node proport);
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
+    bool ReadStem(Object *parent, pugi::xml_node stem);
     bool ReadSyl(Object *parent, pugi::xml_node syl);
     bool ReadSyllable(Object *parent, pugi::xml_node syllable);
     bool ReadTabDurSym(Object *parent, pugi::xml_node tabDurSym);
@@ -749,6 +756,7 @@ private:
     bool ReadLb(Object *parent, pugi::xml_node lb);
     bool ReadRend(Object *parent, pugi::xml_node rend);
     bool ReadSvg(Object *parent, pugi::xml_node svg);
+    bool ReadSymbol(Object *parent, pugi::xml_node symbol);
     bool ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
     ///@}
 
@@ -813,6 +821,7 @@ private:
      */
     ///@{
     bool ReadFacsimile(Doc *doc, pugi::xml_node facsimile);
+    bool ReadGraphic(Surface *parent, pugi::xml_node graphic);
     bool ReadSurface(Facsimile *parent, pugi::xml_node surface);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
     bool ReadZone(Surface *parent, pugi::xml_node zone);
@@ -846,8 +855,8 @@ private:
     ///@{
     void SetMeiID(pugi::xml_node element, Object *object);
     DocType StrToDocType(std::string type);
-    std::wstring LeftTrim(std::wstring str);
-    std::wstring RightTrim(std::wstring str);
+    std::u32string LeftTrim(std::u32string str);
+    std::u32string RightTrim(std::u32string str);
     bool ReadXMLComment(Object *object, pugi::xml_node element);
     ///@}
 
@@ -893,7 +902,7 @@ private:
     /**
      * The version of the file being read
      */
-    MEIVersion m_version;
+    meiVersion_MEIVERSION m_meiversion;
 
     /**
      * A flag indicating wheather we are reading page-based or score-based MEI

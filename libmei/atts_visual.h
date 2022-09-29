@@ -434,7 +434,7 @@ public:
 private:
     /** Indicates the number of beams present. **/
     int m_beams;
-    /** Captures the number of "floating" beams, **/
+    /** Captures the number of "floating" beams, i.e., those not attached to stems. **/
     int m_beamsFloat;
     /** Records the amount of separation between floating beams and stems. **/
     data_MEASUREMENTABS m_floatGap;
@@ -478,7 +478,7 @@ public:
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     fermataVis_FORM m_form;
-    /** Describes a clef's shape. **/
+    /** Describes a clef’s shape. **/
     fermataVis_SHAPE m_shape;
 
     /* include <attshape> */
@@ -1154,7 +1154,7 @@ public:
 private:
     /**
      * States the side of a leaf (as in a manuscript) on which the content following
-     * the
+     * the pb element occurs.
      **/
     pbVis_FOLIUM m_folium;
 
@@ -1411,7 +1411,10 @@ public:
     ///@}
 
 private:
-    /** Indicates whether a space is 'compressible', **/
+    /**
+     * Indicates whether a space is 'compressible', i.e., if it may be removed at the
+     * discretion of processing software.
+     **/
     data_BOOLEAN m_compressable;
 
     /* include <attcompressable> */
@@ -1467,17 +1470,16 @@ private:
     data_BOOLEAN m_gridShow;
     /** Indicates the number of layers and their stem directions. **/
     data_LAYERSCHEME m_layerscheme;
-    /**
-     * Captures the colors of the staff lines.
-     * The value is structured; that is, it should have the same number of space-
-     * separated RGB values as the number of lines indicated by the lines attribute. A
-     * line can be made invisible by assigning it the same RGB value as the background,
-     * usually white.
-     **/
+    /** Captures the colors of the staff lines. **/
     std::string m_linesColor;
     /** Records whether all staff lines are visible. **/
     data_BOOLEAN m_linesVisible;
-    /** Records the absolute distance (as opposed to the relative distances recorded in **/
+    /**
+     * Records the absolute distance (as opposed to the relative distances recorded in
+     * scoreDef elements) between this staff and the preceding one in the same system.
+     * This value is meaningless for the first staff in a system since the
+     * spacing.system attribute indicates the spacing between systems.
+     **/
     data_MEASUREMENTREL m_spacing;
 
     /* include <attspacing> */
@@ -1579,6 +1581,6 @@ private:
     /* include <attnum.format> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_VISUAL_H__

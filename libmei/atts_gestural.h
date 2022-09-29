@@ -196,11 +196,14 @@ private:
     int m_dotsGes;
     /** Duration as a count of units provided in the time signature denominator. **/
     double m_durMetrical;
-    /** Duration recorded as pulses-per-quarter note, **/
+    /**
+     * Duration recorded as pulses-per-quarter note, e.g., MIDI clicks or MusicXML
+     * divisions.
+     **/
     int m_durPpq;
-    /** Duration in seconds, **/
+    /** Duration in seconds, e.g., 1.732. **/
     double m_durReal;
-    /** Duration as an optionally dotted Humdrum *recip value. **/
+    /** Duration as an optionally dotted Humdrum **recip value. **/
     std::string m_durRecip;
 
     /* include <attdur.recip> */
@@ -387,7 +390,7 @@ public:
 private:
     /** Holds the pitch name of a tuning reference pitch. **/
     data_PITCHNAME m_tunePname;
-    /** Holds a value for cycles per second, **/
+    /** Holds a value for cycles per second, i.e., Hertz, for a tuning reference pitch. **/
     double m_tuneHz;
     /** Provides an indication of the tuning system, 'just', for example. **/
     data_TEMPERAMENT m_tuneTemper;
@@ -510,7 +513,10 @@ public:
     ///@}
 
 private:
-    /** Encodes the onset time in terms of musical time, **/
+    /**
+     * Encodes the onset time in terms of musical time, i.e., beats[.fractional beat
+     * part], as expressed in the written time signature.
+     **/
     double m_tstampGes;
     /** Records the onset time in terms of ISO time. **/
     std::string m_tstampReal;
@@ -552,7 +558,10 @@ public:
     ///@}
 
 private:
-    /** Encodes the ending point of an event, **/
+    /**
+     * Encodes the ending point of an event, i.e., a count of measures plus a beat
+     * location in the ending measure.
+     **/
     data_MEASUREBEAT m_tstamp2Ges;
     /** Records the ending point of an event in terms of ISO time. **/
     std::string m_tstamp2Real;
@@ -560,6 +569,6 @@ private:
     /* include <atttstamp2.real> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_GESTURAL_H__

@@ -8,7 +8,7 @@
 #ifndef __VRV_ZONE_H__
 #define __VRV_ZONE_H__
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -39,8 +39,8 @@ public:
     void Reset() override;
     ///@}
     void ShiftByXY(int xDiff, int yDiff);
-    int GetLogicalUly();
-    int GetLogicalLry();
+    int GetLogicalUly() const;
+    int GetLogicalLry() const;
 
 protected:
     //

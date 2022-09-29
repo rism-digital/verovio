@@ -16,7 +16,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -271,7 +271,7 @@ AttAugmentDots::~AttAugmentDots()
 
 void AttAugmentDots::ResetAugmentDots()
 {
-    m_dots = -1;
+    m_dots = VRV_UNSET;
 }
 
 bool AttAugmentDots::ReadAugmentDots(pugi::xml_node element)
@@ -297,7 +297,7 @@ bool AttAugmentDots::WriteAugmentDots(pugi::xml_node element)
 
 bool AttAugmentDots::HasDots() const
 {
-    return (m_dots != -1);
+    return (m_dots != VRV_UNSET);
 }
 
 /* include <attdots> */
@@ -378,7 +378,7 @@ AttBarLineLog::~AttBarLineLog()
 
 void AttBarLineLog::ResetBarLineLog()
 {
-    m_form = BARRENDITION_single;
+    m_form = BARRENDITION_NONE;
 }
 
 bool AttBarLineLog::ReadBarLineLog(pugi::xml_node element)
@@ -404,7 +404,7 @@ bool AttBarLineLog::WriteBarLineLog(pugi::xml_node element)
 
 bool AttBarLineLog::HasForm() const
 {
-    return (m_form != BARRENDITION_single);
+    return (m_form != BARRENDITION_NONE);
 }
 
 /* include <attform> */
@@ -426,7 +426,7 @@ void AttBarring::ResetBarring()
 {
     m_barLen = 0.0;
     m_barMethod = BARMETHOD_NONE;
-    m_barPlace = 0;
+    m_barPlace = VRV_UNSET;
 }
 
 bool AttBarring::ReadBarring(pugi::xml_node element)
@@ -480,7 +480,7 @@ bool AttBarring::HasBarMethod() const
 
 bool AttBarring::HasBarPlace() const
 {
-    return (m_barPlace != 0);
+    return (m_barPlace != VRV_UNSET);
 }
 
 /* include <attbar.place> */
@@ -1143,10 +1143,10 @@ AttCoordinated::~AttCoordinated()
 
 void AttCoordinated::ResetCoordinated()
 {
-    m_ulx = 0;
-    m_uly = 0;
-    m_lrx = 0;
-    m_lry = 0;
+    m_ulx = VRV_UNSET;
+    m_uly = VRV_UNSET;
+    m_lrx = VRV_UNSET;
+    m_lry = VRV_UNSET;
     m_rotate = 0.0;
 }
 
@@ -1209,22 +1209,22 @@ bool AttCoordinated::WriteCoordinated(pugi::xml_node element)
 
 bool AttCoordinated::HasUlx() const
 {
-    return (m_ulx != 0);
+    return (m_ulx != VRV_UNSET);
 }
 
 bool AttCoordinated::HasUly() const
 {
-    return (m_uly != 0);
+    return (m_uly != VRV_UNSET);
 }
 
 bool AttCoordinated::HasLrx() const
 {
-    return (m_lrx != 0);
+    return (m_lrx != VRV_UNSET);
 }
 
 bool AttCoordinated::HasLry() const
 {
-    return (m_lry != 0);
+    return (m_lry != VRV_UNSET);
 }
 
 bool AttCoordinated::HasRotate() const
@@ -1799,8 +1799,8 @@ AttDurationDefault::~AttDurationDefault()
 void AttDurationDefault::ResetDurationDefault()
 {
     m_durDefault = DURATION_NONE;
-    m_numDefault = 0;
-    m_numbaseDefault = 0;
+    m_numDefault = VRV_UNSET;
+    m_numbaseDefault = VRV_UNSET;
 }
 
 bool AttDurationDefault::ReadDurationDefault(pugi::xml_node element)
@@ -1849,12 +1849,12 @@ bool AttDurationDefault::HasDurDefault() const
 
 bool AttDurationDefault::HasNumDefault() const
 {
-    return (m_numDefault != 0);
+    return (m_numDefault != VRV_UNSET);
 }
 
 bool AttDurationDefault::HasNumbaseDefault() const
 {
-    return (m_numbaseDefault != 0);
+    return (m_numbaseDefault != VRV_UNSET);
 }
 
 /* include <attnumbase.default> */
@@ -1920,8 +1920,8 @@ AttDurationRatio::~AttDurationRatio()
 
 void AttDurationRatio::ResetDurationRatio()
 {
-    m_num = -1;
-    m_numbase = -1;
+    m_num = VRV_UNSET;
+    m_numbase = VRV_UNSET;
 }
 
 bool AttDurationRatio::ReadDurationRatio(pugi::xml_node element)
@@ -1956,12 +1956,12 @@ bool AttDurationRatio::WriteDurationRatio(pugi::xml_node element)
 
 bool AttDurationRatio::HasNum() const
 {
-    return (m_num != -1);
+    return (m_num != VRV_UNSET);
 }
 
 bool AttDurationRatio::HasNumbase() const
 {
-    return (m_numbase != -1);
+    return (m_numbase != VRV_UNSET);
 }
 
 /* include <attnumbase> */
@@ -2272,7 +2272,7 @@ AttFiling::~AttFiling()
 
 void AttFiling::ResetFiling()
 {
-    m_nonfiling = 0;
+    m_nonfiling = VRV_UNSET;
 }
 
 bool AttFiling::ReadFiling(pugi::xml_node element)
@@ -2298,7 +2298,7 @@ bool AttFiling::WriteFiling(pugi::xml_node element)
 
 bool AttFiling::HasNonfiling() const
 {
-    return (m_nonfiling != 0);
+    return (m_nonfiling != VRV_UNSET);
 }
 
 /* include <attnonfiling> */
@@ -2318,7 +2318,7 @@ AttGrpSymLog::~AttGrpSymLog()
 
 void AttGrpSymLog::ResetGrpSymLog()
 {
-    m_level = 0;
+    m_level = VRV_UNSET;
 }
 
 bool AttGrpSymLog::ReadGrpSymLog(pugi::xml_node element)
@@ -2344,7 +2344,7 @@ bool AttGrpSymLog::WriteGrpSymLog(pugi::xml_node element)
 
 bool AttGrpSymLog::HasLevel() const
 {
-    return (m_level != 0);
+    return (m_level != VRV_UNSET);
 }
 
 /* include <attlevel> */
@@ -2744,9 +2744,9 @@ bool AttLang::ReadLang(pugi::xml_node element)
         element.remove_attribute("xml:lang");
         hasAttribute = true;
     }
-    if (element.attribute("xml:translit")) {
-        this->SetTranslit(StrToStr(element.attribute("xml:translit").value()));
-        element.remove_attribute("xml:translit");
+    if (element.attribute("translit")) {
+        this->SetTranslit(StrToStr(element.attribute("translit").value()));
+        element.remove_attribute("translit");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -2760,7 +2760,7 @@ bool AttLang::WriteLang(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasTranslit()) {
-        element.append_attribute("xml:translit") = StrToStr(this->GetTranslit()).c_str();
+        element.append_attribute("translit") = StrToStr(this->GetTranslit()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2839,7 +2839,7 @@ AttLayerIdent::~AttLayerIdent()
 
 void AttLayerIdent::ResetLayerIdent()
 {
-    m_layer = 0;
+    m_layer = VRV_UNSET;
 }
 
 bool AttLayerIdent::ReadLayerIdent(pugi::xml_node element)
@@ -2865,7 +2865,7 @@ bool AttLayerIdent::WriteLayerIdent(pugi::xml_node element)
 
 bool AttLayerIdent::HasLayer() const
 {
-    return (m_layer != 0);
+    return (m_layer != VRV_UNSET);
 }
 
 /* include <attlayer> */
@@ -2932,9 +2932,9 @@ AttLineRend::~AttLineRend()
 void AttLineRend::ResetLineRend()
 {
     m_lendsym = LINESTARTENDSYMBOL_NONE;
-    m_lendsymSize = 0;
+    m_lendsymSize = VRV_UNSET;
     m_lstartsym = LINESTARTENDSYMBOL_NONE;
-    m_lstartsymSize = 0;
+    m_lstartsymSize = VRV_UNSET;
 }
 
 bool AttLineRend::ReadLineRend(pugi::xml_node element)
@@ -2992,7 +2992,7 @@ bool AttLineRend::HasLendsym() const
 
 bool AttLineRend::HasLendsymSize() const
 {
-    return (m_lendsymSize != 0);
+    return (m_lendsymSize != VRV_UNSET);
 }
 
 bool AttLineRend::HasLstartsym() const
@@ -3002,7 +3002,7 @@ bool AttLineRend::HasLstartsym() const
 
 bool AttLineRend::HasLstartsymSize() const
 {
-    return (m_lstartsymSize != 0);
+    return (m_lstartsymSize != VRV_UNSET);
 }
 
 /* include <attlstartsym.size> */
@@ -3023,7 +3023,7 @@ AttLineRendBase::~AttLineRendBase()
 void AttLineRendBase::ResetLineRendBase()
 {
     m_lform = LINEFORM_NONE;
-    m_lsegs = 0;
+    m_lsegs = VRV_UNSET;
     m_lwidth = data_LINEWIDTH();
 }
 
@@ -3073,7 +3073,7 @@ bool AttLineRendBase::HasLform() const
 
 bool AttLineRendBase::HasLsegs() const
 {
-    return (m_lsegs != 0);
+    return (m_lsegs != VRV_UNSET);
 }
 
 bool AttLineRendBase::HasLwidth() const
@@ -3785,7 +3785,7 @@ void AttMeterSigLog::ResetMeterSigLog()
 {
     m_count = std::pair<std::vector<int>, MeterCountSign>();
     m_sym = METERSIGN_NONE;
-    m_unit = 0;
+    m_unit = VRV_UNSET;
 }
 
 bool AttMeterSigLog::ReadMeterSigLog(pugi::xml_node element)
@@ -3839,7 +3839,7 @@ bool AttMeterSigLog::HasSym() const
 
 bool AttMeterSigLog::HasUnit() const
 {
-    return (m_unit != 0);
+    return (m_unit != VRV_UNSET);
 }
 
 /* include <attunit> */
@@ -3860,7 +3860,7 @@ AttMeterSigDefaultLog::~AttMeterSigDefaultLog()
 void AttMeterSigDefaultLog::ResetMeterSigDefaultLog()
 {
     m_meterCount = std::pair<std::vector<int>, MeterCountSign>();
-    m_meterUnit = 0;
+    m_meterUnit = VRV_UNSET;
     m_meterSym = METERSIGN_NONE;
 }
 
@@ -3910,7 +3910,7 @@ bool AttMeterSigDefaultLog::HasMeterCount() const
 
 bool AttMeterSigDefaultLog::HasMeterUnit() const
 {
-    return (m_meterUnit != 0);
+    return (m_meterUnit != VRV_UNSET);
 }
 
 bool AttMeterSigDefaultLog::HasMeterSym() const
@@ -3937,7 +3937,7 @@ void AttMmTempo::ResetMmTempo()
 {
     m_mm = 0.0;
     m_mmUnit = DURATION_NONE;
-    m_mmDots = 0;
+    m_mmDots = VRV_UNSET;
 }
 
 bool AttMmTempo::ReadMmTempo(pugi::xml_node element)
@@ -3991,7 +3991,7 @@ bool AttMmTempo::HasMmUnit() const
 
 bool AttMmTempo::HasMmDots() const
 {
-    return (m_mmDots != 0);
+    return (m_mmDots != VRV_UNSET);
 }
 
 /* include <attmm.dots> */
@@ -4057,7 +4057,7 @@ AttNInteger::~AttNInteger()
 
 void AttNInteger::ResetNInteger()
 {
-    m_n = -1;
+    m_n = VRV_UNSET;
 }
 
 bool AttNInteger::ReadNInteger(pugi::xml_node element)
@@ -4083,7 +4083,7 @@ bool AttNInteger::WriteNInteger(pugi::xml_node element)
 
 bool AttNInteger::HasN() const
 {
-    return (m_n != -1);
+    return (m_n != VRV_UNSET);
 }
 
 /* include <attn> */
@@ -5363,14 +5363,14 @@ bool AttPointing::ReadPointing(pugi::xml_node element)
         element.remove_attribute("xlink:show");
         hasAttribute = true;
     }
-    if (element.attribute("xlink:target")) {
-        this->SetTarget(StrToStr(element.attribute("xlink:target").value()));
-        element.remove_attribute("xlink:target");
+    if (element.attribute("target")) {
+        this->SetTarget(StrToStr(element.attribute("target").value()));
+        element.remove_attribute("target");
         hasAttribute = true;
     }
-    if (element.attribute("xlink:targettype")) {
-        this->SetTargettype(StrToStr(element.attribute("xlink:targettype").value()));
-        element.remove_attribute("xlink:targettype");
+    if (element.attribute("targettype")) {
+        this->SetTargettype(StrToStr(element.attribute("targettype").value()));
+        element.remove_attribute("targettype");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -5392,11 +5392,11 @@ bool AttPointing::WritePointing(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasTarget()) {
-        element.append_attribute("xlink:target") = StrToStr(this->GetTarget()).c_str();
+        element.append_attribute("target") = StrToStr(this->GetTarget()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTargettype()) {
-        element.append_attribute("xlink:targettype") = StrToStr(this->GetTargettype()).c_str();
+        element.append_attribute("targettype") = StrToStr(this->GetTargettype()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5734,7 +5734,7 @@ AttSequence::~AttSequence()
 
 void AttSequence::ResetSequence()
 {
-    m_seq = 0;
+    m_seq = VRV_UNSET;
 }
 
 bool AttSequence::ReadSequence(pugi::xml_node element)
@@ -5760,7 +5760,7 @@ bool AttSequence::WriteSequence(pugi::xml_node element)
 
 bool AttSequence::HasSeq() const
 {
-    return (m_seq != 0);
+    return (m_seq != VRV_UNSET);
 }
 
 /* include <attseq> */
@@ -6055,7 +6055,7 @@ AttStaffDefLog::~AttStaffDefLog()
 
 void AttStaffDefLog::ResetStaffDefLog()
 {
-    m_lines = 0;
+    m_lines = VRV_UNSET;
 }
 
 bool AttStaffDefLog::ReadStaffDefLog(pugi::xml_node element)
@@ -6081,7 +6081,7 @@ bool AttStaffDefLog::WriteStaffDefLog(pugi::xml_node element)
 
 bool AttStaffDefLog::HasLines() const
 {
-    return (m_lines != 0);
+    return (m_lines != VRV_UNSET);
 }
 
 /* include <attlines> */
@@ -6469,7 +6469,7 @@ AttStems::~AttStems()
 void AttStems::ResetStems()
 {
     m_stemDir = STEMDIRECTION_NONE;
-    m_stemLen = -1;
+    m_stemLen = -1.0;
     m_stemMod = STEMMODIFIER_NONE;
     m_stemPos = STEMPOSITION_NONE;
     m_stemSameas = "";
@@ -6569,7 +6569,7 @@ bool AttStems::HasStemDir() const
 
 bool AttStems::HasStemLen() const
 {
-    return (m_stemLen != -1);
+    return (m_stemLen != -1.0);
 }
 
 bool AttStems::HasStemMod() const
@@ -7222,12 +7222,12 @@ bool AttTransposition::ReadTransposition(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("trans.diat")) {
-        this->SetTransDiat(StrToDbl(element.attribute("trans.diat").value()));
+        this->SetTransDiat(StrToInt(element.attribute("trans.diat").value()));
         element.remove_attribute("trans.diat");
         hasAttribute = true;
     }
     if (element.attribute("trans.semi")) {
-        this->SetTransSemi(StrToDbl(element.attribute("trans.semi").value()));
+        this->SetTransSemi(StrToInt(element.attribute("trans.semi").value()));
         element.remove_attribute("trans.semi");
         hasAttribute = true;
     }
@@ -7238,11 +7238,11 @@ bool AttTransposition::WriteTransposition(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasTransDiat()) {
-        element.append_attribute("trans.diat") = DblToStr(this->GetTransDiat()).c_str();
+        element.append_attribute("trans.diat") = IntToStr(this->GetTransDiat()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTransSemi()) {
-        element.append_attribute("trans.semi") = DblToStr(this->GetTransSemi()).c_str();
+        element.append_attribute("trans.semi") = IntToStr(this->GetTransSemi()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -7519,7 +7519,7 @@ AttVerticalGroup::~AttVerticalGroup()
 
 void AttVerticalGroup::ResetVerticalGroup()
 {
-    m_vgrp = 0;
+    m_vgrp = VRV_UNSET;
 }
 
 bool AttVerticalGroup::ReadVerticalGroup(pugi::xml_node element)
@@ -7545,7 +7545,7 @@ bool AttVerticalGroup::WriteVerticalGroup(pugi::xml_node element)
 
 bool AttVerticalGroup::HasVgrp() const
 {
-    return (m_vgrp != 0);
+    return (m_vgrp != VRV_UNSET);
 }
 
 /* include <attvgrp> */
@@ -8686,7 +8686,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             att->SetLang(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "xml:translit") {
+        if (attrType == "translit") {
             att->SetTranslit(att->StrToStr(attrValue));
             return true;
         }
@@ -9214,11 +9214,11 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             att->SetShow(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "xlink:target") {
+        if (attrType == "target") {
             att->SetTarget(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "xlink:targettype") {
+        if (attrType == "targettype") {
             att->SetTargettype(att->StrToStr(attrValue));
             return true;
         }
@@ -9571,11 +9571,11 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         AttTransposition *att = dynamic_cast<AttTransposition *>(element);
         assert(att);
         if (attrType == "trans.diat") {
-            att->SetTransDiat(att->StrToDbl(attrValue));
+            att->SetTransDiat(att->StrToInt(attrValue));
             return true;
         }
         if (attrType == "trans.semi") {
-            att->SetTransSemi(att->StrToDbl(attrValue));
+            att->SetTransSemi(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -10190,7 +10190,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "xml:lang", att->StrToStr(att->GetLang()) });
         }
         if (att->HasTranslit()) {
-            attributes->push_back({ "xml:translit", att->StrToStr(att->GetTranslit()) });
+            attributes->push_back({ "translit", att->StrToStr(att->GetTranslit()) });
         }
     }
     if (element->HasAttClass(ATT_LAYERLOG)) {
@@ -10627,10 +10627,10 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "xlink:show", att->StrToStr(att->GetShow()) });
         }
         if (att->HasTarget()) {
-            attributes->push_back({ "xlink:target", att->StrToStr(att->GetTarget()) });
+            attributes->push_back({ "target", att->StrToStr(att->GetTarget()) });
         }
         if (att->HasTargettype()) {
-            attributes->push_back({ "xlink:targettype", att->StrToStr(att->GetTargettype()) });
+            attributes->push_back({ "targettype", att->StrToStr(att->GetTargettype()) });
         }
     }
     if (element->HasAttClass(ATT_QUANTITY)) {
@@ -10925,10 +10925,10 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttTransposition *att = dynamic_cast<const AttTransposition *>(element);
         assert(att);
         if (att->HasTransDiat()) {
-            attributes->push_back({ "trans.diat", att->DblToStr(att->GetTransDiat()) });
+            attributes->push_back({ "trans.diat", att->IntToStr(att->GetTransDiat()) });
         }
         if (att->HasTransSemi()) {
-            attributes->push_back({ "trans.semi", att->DblToStr(att->GetTransSemi()) });
+            attributes->push_back({ "trans.semi", att->IntToStr(att->GetTransSemi()) });
         }
     }
     if (element->HasAttClass(ATT_TUPLETPRESENT)) {
@@ -11079,4 +11079,4 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

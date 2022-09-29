@@ -257,6 +257,10 @@ private:
     std::pair<int, int> CalcBrokenLoc(const Staff *staff, int startLoc, int endLoc) const;
     // Check if the slur resembles portato
     PortatoSlurType IsPortatoSlur(const Doc *doc, const Note *startNote, const Chord *startChord) const;
+    // Check if the slur starts or ends on a beam
+    bool StartsOnBeam() const { return this->HasBoundaryOnBeam(true); }
+    bool EndsOnBeam() const { return this->HasBoundaryOnBeam(false); }
+    bool HasBoundaryOnBeam(bool isStart) const;
     ///@}
 
     /**

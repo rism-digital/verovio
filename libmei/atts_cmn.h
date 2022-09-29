@@ -536,7 +536,8 @@ public:
 private:
     /**
      * Indicates that this element participates in a glissando.
-     * If visual information about the glissando needs to be recorded, then a
+     * If visual information about the glissando needs to be recorded, then a gliss
+     * element should be employed instead.
      **/
     data_GLISSANDO m_gliss;
 
@@ -728,19 +729,19 @@ public:
     ///@}
 
 private:
-    /** Indicates the pedal setting for the harp's C strings. **/
+    /** Indicates the pedal setting for the harp’s C strings. **/
     harpPedalLog_C m_c;
-    /** Indicates the pedal setting for the harp's D strings. **/
+    /** Indicates the pedal setting for the harp’s D strings. **/
     harpPedalLog_D m_d;
-    /** Indicates the pedal setting for the harp's E strings. **/
+    /** Indicates the pedal setting for the harp’s E strings. **/
     harpPedalLog_E m_e;
-    /** Indicates the pedal setting for the harp's F strings. **/
+    /** Indicates the pedal setting for the harp’s F strings. **/
     harpPedalLog_F m_f;
-    /** Indicates the pedal setting for the harp's G strings. **/
+    /** Indicates the pedal setting for the harp’s G strings. **/
     harpPedalLog_G m_g;
-    /** Indicates the pedal setting for the harp's A strings. **/
+    /** Indicates the pedal setting for the harp’s A strings. **/
     harpPedalLog_A m_a;
-    /** Indicates the pedal setting for the harp's B strings. **/
+    /** Indicates the pedal setting for the harp’s B strings. **/
     harpPedalLog_B m_b;
 
     /* include <attb> */
@@ -977,7 +978,10 @@ public:
 private:
     /**
      * Indicates whether the octave displacement should be performed simultaneously
-     * with the written notes,
+     * with the written notes, i.e., "coll' ottava".
+     * Unlike other octave signs which are indicated by broken lines, coll' ottava
+     * typically uses an unbroken line or a series of longer broken lines, ending with
+     * a short vertical stroke. See Read, p. 47-48.
      **/
     octaveLog_COLL m_coll;
 
@@ -1298,6 +1302,6 @@ private:
     /* include <attunitdur> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_CMN_H__

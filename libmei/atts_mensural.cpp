@@ -16,7 +16,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -87,8 +87,8 @@ AttMensuralLog::~AttMensuralLog()
 
 void AttMensuralLog::ResetMensuralLog()
 {
-    m_proportNum = -1;
-    m_proportNumbase = -1;
+    m_proportNum = VRV_UNSET;
+    m_proportNumbase = VRV_UNSET;
 }
 
 bool AttMensuralLog::ReadMensuralLog(pugi::xml_node element)
@@ -123,12 +123,12 @@ bool AttMensuralLog::WriteMensuralLog(pugi::xml_node element)
 
 bool AttMensuralLog::HasProportNum() const
 {
-    return (m_proportNum != -1);
+    return (m_proportNum != VRV_UNSET);
 }
 
 bool AttMensuralLog::HasProportNumbase() const
 {
-    return (m_proportNumbase != -1);
+    return (m_proportNumbase != VRV_UNSET);
 }
 
 /* include <attproport.numbase> */
@@ -361,7 +361,7 @@ AttRestVisMensural::~AttRestVisMensural()
 
 void AttRestVisMensural::ResetRestVisMensural()
 {
-    m_spaces = 0;
+    m_spaces = VRV_UNSET;
 }
 
 bool AttRestVisMensural::ReadRestVisMensural(pugi::xml_node element)
@@ -387,7 +387,7 @@ bool AttRestVisMensural::WriteRestVisMensural(pugi::xml_node element)
 
 bool AttRestVisMensural::HasSpaces() const
 {
-    return (m_spaces != 0);
+    return (m_spaces != VRV_UNSET);
 }
 
 /* include <attspaces> */
@@ -408,7 +408,7 @@ AttStemVis::~AttStemVis()
 void AttStemVis::ResetStemVis()
 {
     m_pos = STEMPOSITION_NONE;
-    m_len = 0.0;
+    m_len = -1.0;
     m_form = STEMFORM_mensural_NONE;
     m_dir = STEMDIRECTION_NONE;
     m_flagPos = FLAGPOS_mensural_NONE;
@@ -488,7 +488,7 @@ bool AttStemVis::HasPos() const
 
 bool AttStemVis::HasLen() const
 {
-    return (m_len != 0.0);
+    return (m_len != -1.0);
 }
 
 bool AttStemVis::HasForm() const
@@ -766,4 +766,4 @@ void Att::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

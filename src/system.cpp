@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -18,7 +18,6 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
-#include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
 #include "layer.h"
@@ -1046,6 +1045,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     params->m_classId = REH;
     m_systemAligner.Process(params->m_functor, params);
 
+    params->m_classId = CAESURA;
+    m_systemAligner.Process(params->m_functor, params);
+
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;
     m_systemAligner.Process(params->m_functor, params);
@@ -1057,6 +1059,11 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     // The resulting layout order will correspond to the order in the encoding.
     params->m_classId = OBJECT;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(DYNAM);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_between;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     return FUNCTOR_SIBLINGS;
 }

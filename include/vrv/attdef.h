@@ -135,7 +135,7 @@ typedef double data_FONTSIZENUMERIC;
 /**
  * MEI data.HEXNUM
  */
-typedef wchar_t data_HEXNUM;
+typedef char32_t data_HEXNUM;
 
 /**
  * MEI data.KEYSIGNATURE

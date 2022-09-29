@@ -87,9 +87,9 @@ public:
     void DrawRectangle(int x, int y, int width, int height) override;
     void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
     void DrawRoundedRectangle(int x, int y, int width, int height, int radius) override;
-    void DrawText(const std::string &text, const std::wstring &wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET,
+    void DrawText(const std::string &text, const std::u32string &wtext = U"", int x = VRV_UNSET, int y = VRV_UNSET,
         int width = VRV_UNSET, int height = VRV_UNSET) override;
-    void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) override;
+    void DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph = false) override;
     void DrawSpline(int n, Point points[]) override;
     void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) override;
     void DrawBackgroundImage(int x = 0, int y = 0) override;
@@ -255,7 +255,7 @@ private:
     void DrawSvgBoundingBoxRectangle(int x, int y, int width, int height);
 
     /**
-     * Change the flag for indicating the use of the VerovioText font
+     * Change the flag for indicating the use of the music font as text font
      */
     void VrvTextFont() { m_vrvTextFont = true; }
 
@@ -284,9 +284,9 @@ public:
     //
 private:
     /**
-     * Flag for indicating if the VerovioText font is currently used.
+     * Flag for indicating if the music font is currently used as text font.
      * If used, it has to be initialized to false (e.g., in the overriden version of StartPage) and will be changed in
-     * DeviceContext::VrvTextFont
+     * DeviceContext::VrvTextFont. The font is included as woff2 in Commit()
      */
     bool m_vrvTextFont;
 

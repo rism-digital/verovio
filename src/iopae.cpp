@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <cctype>
 #include <fstream>
 #include <regex>
@@ -639,6 +639,13 @@ PAEInput::PAEInput(Doc *doc)
 }
 
 PAEInput::~PAEInput() {}
+
+jsonxx::Object PAEInput::GetValidationLog()
+{
+    jsonxx::Object log;
+    log << "Using old PAE parser";
+    return log;
+}
 
 #ifndef NO_PAE_SUPPORT
 
@@ -4162,17 +4169,17 @@ bool PAEInput::ConvertTie()
                 if (note->GetOct() != tokenNote->GetOct() || note->GetPname() != tokenNote->GetPname()) {
                     if (m_isMensural && tieToken) {
                         // This is probably a ligature - reset it back
-                        delete tie;
-                        tie = NULL;
-                        tieToken->m_object = NULL;
                         tieToken->m_char = '+';
-                        tieToken = NULL;
-                        note = NULL;
                     }
                     else {
                         LogPAE(ERR_037_TIE_PITCH, token);
                         if (m_pedanticMode) return false;
                     }
+                    delete tie;
+                    tie = NULL;
+                    tieToken->m_object = NULL;
+                    tieToken = NULL;
+                    note = NULL;
                 }
                 else {
                     tie->SetEndid("#" + tokenNote->GetID());

@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -32,6 +32,9 @@ Lb::Lb() : TextElement(LB, "lb-")
 
 Lb::~Lb() {}
 
-void Lb::Reset() {}
+void Lb::Reset()
+{
+    TextElement::Reset();
+}
 
 } // namespace vrv

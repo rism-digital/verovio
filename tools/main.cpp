@@ -5,7 +5,7 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include <assert.h>
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <regex>
@@ -255,7 +255,7 @@ int main(int argc, char **argv)
     static struct option base_options[] = { //
         { "all-pages", no_argument, 0, 'a' }, //
         { "input-from", required_argument, 0, 'f' }, //
-        { "help", no_argument, 0, 'h' }, //
+        { "help", required_argument, 0, 'h' }, //
         { "outfile", required_argument, 0, 'o' }, //
         { "page", required_argument, 0, 'p' }, //
         { "resources", required_argument, 0, 'r' }, //
@@ -442,7 +442,7 @@ int main(int argc, char **argv)
     }
 
     // Load a specified font
-    if (!toolkit.SetFont(options->m_font.GetValue())) {
+    if (!toolkit.SetOption("font", options->m_font.GetValue())) {
         std::cerr << "Font '" << options->m_font.GetValue() << "' could not be loaded." << std::endl;
         exit(1);
     }

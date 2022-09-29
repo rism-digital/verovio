@@ -2138,6 +2138,11 @@ enum measurement_UNIT {
  */
 enum meiVersion_MEIVERSION {
     meiVersion_MEIVERSION_NONE = 0,
+    meiVersion_MEIVERSION_2013,
+    meiVersion_MEIVERSION_3_0_0,
+    meiVersion_MEIVERSION_4_0_0,
+    meiVersion_MEIVERSION_4_0_1,
+    meiVersion_MEIVERSION_5_0_0_devplusbasic,
     meiVersion_MEIVERSION_5_0_0_dev,
     meiVersion_MEIVERSION_MAX
 };
@@ -2494,6 +2499,6 @@ enum whitespace_XMLSPACE {
 };
 
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATT_TYPES_H__

@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -108,13 +108,22 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         m_svgNode.prepend_attribute("width") = StringFormat(format, width).c_str();
     }
 
-    // add the woff VerovioText font if needed
+    // add the woff2 font if needed
     const Resources *resources = this->GetResources(true);
     if (m_vrvTextFont && resources) {
-        const std::string woffPath = resources->GetPath() + "/woff.xml";
-        pugi::xml_document woffDoc;
-        woffDoc.load_file(woffPath.c_str());
-        m_svgNode.prepend_copy(woffDoc.first_child());
+        const std::string cssFontPath
+            = StringFormat("%s/%s.css", resources->GetPath().c_str(), resources->GetCurrentFontName().c_str());
+        std::ifstream cssFontFile(cssFontPath);
+        if (!cssFontFile.is_open()) {
+            LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG");
+        }
+        else {
+            std::stringstream cssFontStream;
+            cssFontStream << cssFontFile.rdbuf();
+            pugi::xml_node css = m_svgNode.append_child("style");
+            css.append_attribute("type") = "text/css";
+            css.append_child(pugi::node_pcdata).set_value(cssFontStream.str().c_str());
+        }
     }
 
     // header
@@ -427,6 +436,12 @@ void SvgDeviceContext::StartPage()
                                                         .c_str();
     }
 
+    // page rectangle - for debugging
+    // pugi::xml_node pageRect = m_currentNode.append_child("rect");
+    // pageRect.append_attribute("fill") = "pink";
+    // pageRect.append_attribute("height") = StringFormat("%d", this->GetHeight()* DEFINITION_FACTOR).c_str();
+    // pageRect.append_attribute("width") = StringFormat("%d", this->GetWidth() * DEFINITION_FACTOR).c_str();
+
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
@@ -434,12 +449,13 @@ void SvgDeviceContext::StartPage()
     m_currentNode.append_attribute("transform")
         = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
 
-    // margin rectangle for debugging
-    // pugi::xml_node rect = m_currentNode.append_child("rect");
-    // rect.append_attribute("fill") = "pink";
-    // rect.append_attribute("height") = StringFormat("%d", this->GetHeight() * DEFINITION_FACTOR - 2 *
-    // m_originY).c_str(); rect.append_attribute("width") = StringFormat("%d", this->GetWidth() * DEFINITION_FACTOR - 2
-    // * m_originX).c_str();
+    // margin rectangle - for debugging
+    // pugi::xml_node marginRect = m_currentNode.append_child("rect");
+    // marginRect.append_attribute("fill") = "yellow";
+    // marginRect.append_attribute("height") = StringFormat("%d", this->GetHeight() * DEFINITION_FACTOR - 2 *
+    // m_originY).c_str();
+    // marginRect.append_attribute("width") = StringFormat("%d", this->GetWidth() * DEFINITION_FACTOR - 2
+    //* m_originX).c_str();
 
     m_pageNode = m_currentNode;
 }
@@ -746,9 +762,9 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffs
     if (currentBrush.GetOpacity() != 1.0)
         polygonChild.append_attribute("fill-opacity") = StringFormat("%f", currentBrush.GetOpacity()).c_str();
 
-    std::string pointsString;
-    for (int i = 0; i < n; ++i) {
-        pointsString += StringFormat("%d,%d ", points[i].x + xOffset, points[i].y + yOffset);
+    std::string pointsString = StringFormat("%d,%d", points[0].x + xOffset, points[0].y + yOffset);
+    for (int i = 1; i < n; ++i) {
+        pointsString += " " + StringFormat("%d,%d", points[i].x + xOffset, points[i].y + yOffset);
     }
     polygonChild.append_attribute("points") = pointsString.c_str();
 }
@@ -873,7 +889,8 @@ void SvgDeviceContext::EndText()
 
 // draw text element with optional parameters to specify the bounding box of the text
 // if the bounding box is specified then append a rect child
-void SvgDeviceContext::DrawText(const std::string &text, const std::wstring &wtext, int x, int y, int width, int height)
+void SvgDeviceContext::DrawText(
+    const std::string &text, const std::u32string &wtext, int x, int y, int width, int height)
 {
     assert(m_fontStack.top());
 
@@ -898,8 +915,8 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring &wte
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
         textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
-        // Special case where we want to specifiy if the VerovioText font (woff) needs to be included in the output
-        if (fontFaceName == "VerovioText") this->VrvTextFont();
+        // Special case where we want to specifiy if the woff2 font needs to be included in the output
+        if (m_fontStack.top()->GetSmuflFont()) this->VrvTextFont();
     }
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
@@ -940,7 +957,7 @@ void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, do
     // TODO
 }
 
-void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
+void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph)
 {
     assert(m_fontStack.top());
 
@@ -957,7 +974,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
 
     // print chars one by one
     for (unsigned int i = 0; i < text.length(); ++i) {
-        wchar_t c = text.at(i);
+        char32_t c = text.at(i);
         const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;

@@ -53,6 +53,7 @@
 #import <VerovioFramework/tie.h>
 #import <VerovioFramework/gracegrp.h>
 #import <VerovioFramework/ligature.h>
+#import <VerovioFramework/symbol.h>
 #import <VerovioFramework/metersig.h>
 #import <VerovioFramework/surface.h>
 #import <VerovioFramework/runningelement.h>

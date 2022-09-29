@@ -16,7 +16,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -393,7 +393,7 @@ AttPitchClass::~AttPitchClass()
 
 void AttPitchClass::ResetPitchClass()
 {
-    m_pclass = 0;
+    m_pclass = VRV_UNSET;
 }
 
 bool AttPitchClass::ReadPitchClass(pugi::xml_node element)
@@ -419,7 +419,7 @@ bool AttPitchClass::WritePitchClass(pugi::xml_node element)
 
 bool AttPitchClass::HasPclass() const
 {
-    return (m_pclass != 0);
+    return (m_pclass != VRV_UNSET);
 }
 
 /* include <attpclass> */
@@ -629,4 +629,4 @@ void Att::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

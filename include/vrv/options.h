@@ -625,6 +625,7 @@ public:
     OptionIntMap m_pedalStyle;
     OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
+    OptionBool m_scaleToPageSize;
     OptionBool m_showRuntime;
     OptionBool m_shrinkToFit;
     OptionBool m_staccatoCenter;
@@ -659,8 +660,10 @@ public:
     OptionDbl m_dashedBarLineDashLength;
     OptionDbl m_dashedBarLineGapLength;
     OptionDbl m_dynamDist;
+    OptionBool m_dynamSingleGlyphs;
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;
+    OptionDbl m_extenderLineMinSpace;
     OptionDbl m_fingeringScale;
     OptionString m_font;
     OptionDbl m_graceFactor;

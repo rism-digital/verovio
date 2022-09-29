@@ -132,7 +132,7 @@ private:
      * Articulations are normally encoded in order from the note head outward; that is,
      * away from the stem. See additional notes at att.vis.note. Only articulations
      * should be encoded in the artic attribute; for example, fingerings should be
-     * encoded using the
+     * encoded using the fing element.
      **/
     data_ARTICULATION_List m_artic;
 
@@ -374,7 +374,7 @@ private:
     /**
      * States the length of barlines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
-     * of staff lines - 1);
+     * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/
     double m_barLen;
     /** Records the method of barring. **/
@@ -535,7 +535,7 @@ private:
     /**
      * A value that represents or identifies other data.
      * Often, it is a primary key in the database or a unique value in the coded list
-     * identified by the
+     * identified by the auth or auth.uri attributes.
      **/
     std::string m_codedval;
 
@@ -650,7 +650,7 @@ public:
     ///@}
 
 private:
-    /** Describes a clef's shape. **/
+    /** Describes a clef’s shape. **/
     data_CLEFSHAPE m_shape;
 
     /* include <attshape> */
@@ -1045,7 +1045,7 @@ public:
 private:
     /**
      * Records the placement of Bezier control points as a series of pairs of space-
-     * separated values;
+     * separated values; e.g., 19 45 -32 118.
      **/
     std::string m_bezier;
     /**
@@ -1054,7 +1054,7 @@ private:
      * The first value captures a distance to the left (positive value) or right
      * (negative value) of the line, expressed in virtual units. The second value of
      * each pair represents a point along the line, expressed as a percentage of the
-     * line's length. N.B. An MEI virtual unit (vu) is half the distance between
+     * line’s length. N.B. An MEI virtual unit (vu) is half the distance between
      * adjacent staff lines where the interline space is measured from the middle of a
      * staff line.
      **/
@@ -1739,7 +1739,8 @@ public:
 private:
     /**
      * Indicates the attachment of a fermata to this element.
-     * If visual information about the fermata needs to be recorded, then a
+     * If visual information about the fermata needs to be recorded, then a fermata
+     * element should be employed instead.
      **/
     data_STAFFREL_basic m_fermata;
 
@@ -1853,7 +1854,7 @@ public:
 private:
     /**
      * Signifies the hand responsible for an action.
-     * The value must be the ID of a
+     * The value must be the ID of a hand element declared in the header.
      **/
     std::string m_hand;
 
@@ -2118,7 +2119,7 @@ public:
 
 private:
     /**
-     * Captures text to be used to generate a label for the element to which it's
+     * Captures text to be used to generate a label for the element to which it’s
      * attached, a "tool tip" or prefatory text, for example.
      * Should not be used to record document content.
      **/
@@ -2876,7 +2877,8 @@ private:
      * Indicates whether or not a bar line is "controlling"; that is, if it indicates a
      * point of alignment across all the parts.
      * Bar lines within a score are usually controlling; that is, they "line up". Bar
-     * lines within parts may or may not be controlling. When applied to
+     * lines within parts may or may not be controlling. When applied to measure, this
+     * attribute indicates the nature of the right barline but not the left.
      **/
     data_BOOLEAN m_control;
 
@@ -3034,7 +3036,7 @@ private:
     /**
      * Used to describe tempo in terms of beats (often the meter signature denominator)
      * per minute, ala M.M.
-     * (Maelzel's Metronome). Do not confuse this attribute with midi.bpm or midi.mspb.
+     * (Maelzel’s Metronome). Do not confuse this attribute with midi.bpm or midi.mspb.
      * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
      * time signature or the metronomic indication*.
      **/
@@ -3117,7 +3119,7 @@ public:
 
 private:
     /**
-     * Provides a numeric designation that indicates an element's position in a
+     * Provides a numeric designation that indicates an element’s position in a
      * sequence of similar elements.
      * Its value must be a non-negative integer.
      **/
@@ -3157,7 +3159,7 @@ public:
 
 private:
     /**
-     * Provides a numeric designation that indicates an element's position in a
+     * Provides a numeric designation that indicates an element’s position in a
      * sequence of similar elements.
      * Its value must be a non-negative integer.
      **/
@@ -3322,12 +3324,13 @@ public:
 private:
     /**
      * Provides a way of pointing to a user-defined symbol.
-     * It must contain a reference to an ID of a
+     * It must contain a reference to an ID of a symbolDef element elsewhere in the
+     * document.
      **/
     std::string m_headAltsym;
     /**
      * A name or label associated with the controlled vocabulary from which a numerical
-     * value of
+     * value of head.shape is taken.
      **/
     std::string m_headAuth;
     /** Captures the overall color of a notehead. **/
@@ -3703,9 +3706,16 @@ public:
     ///@}
 
 private:
-    /** Encodes the starting point of musical material in terms of musical time, **/
+    /**
+     * Encodes the starting point of musical material in terms of musical time, i.e., a
+     * (potentially negative) count of measures plus a beat location.
+     **/
     data_MEASUREBEAT m_originTstamp;
-    /** Encodes the ending point of musical material in terms of musical time, **/
+    /**
+     * Encodes the ending point of musical material in terms of musical time, i.e., a
+     * count of measures plus a beat location.
+     * The values are relative to the measure identified by origin.tstamp.
+     **/
     data_MEASUREBEAT m_originTstamp2;
 
     /* include <attorigin.tstamp2> */
@@ -4238,7 +4248,7 @@ public:
 
 private:
     /**
-     * Indicates the agent(s) responsible for some aspect of the text's transcription,
+     * Indicates the agent(s) responsible for some aspect of the text’s transcription,
      * editing, or encoding.
      * Its value must point to one or more identifiers declared in the document header.
      **/
@@ -4429,7 +4439,8 @@ public:
 private:
     /**
      * Indicates that this element participates in a slur.
-     * If visual information about the slur needs to be recorded, then a
+     * If visual information about the slur needs to be recorded, then a slur element
+     * should be employed.
      **/
     std::string m_slur;
 
@@ -4469,7 +4480,8 @@ private:
     /**
      * Contains a list of one or more pointers indicating the sources which attest to a
      * given reading.
-     * Each value should correspond to the ID of a
+     * Each value should correspond to the ID of a source or manifestationelement
+     * located in the document header.
      **/
     std::string m_source;
 
@@ -4518,7 +4530,7 @@ public:
     ///@}
 
 private:
-    /** Describes a note's spacing relative to its time value. **/
+    /** Describes a note’s spacing relative to its time value. **/
     double m_spacingPackexp;
     /** Describes the note spacing of output. **/
     double m_spacingPackfact;
@@ -4974,9 +4986,9 @@ private:
     std::string m_stemSameas;
     /** Determines whether a stem should be displayed. **/
     data_BOOLEAN m_stemVisible;
-    /** Records the output x coordinate of the stem's attachment point. **/
+    /** Records the output x coordinate of the stem’s attachment point. **/
     double m_stemX;
-    /** Records the output y coordinate of the stem's attachment point. **/
+    /** Records the output y coordinate of the stem’s attachment point. **/
     double m_stemY;
 
     /* include <attstem.y> */
@@ -5122,7 +5134,7 @@ private:
      **/
     data_MEASUREMENTABS m_systemRightmar;
     /**
-     * Describes the distance from page's top edge to the first system; used for first
+     * Describes the distance from page’s top edge to the first system; used for first
      * page only.
      **/
     data_MEASUREMENTABS m_systemTopmar;
@@ -5241,7 +5253,7 @@ public:
 private:
     /** Used to extend the values of the rend attribute. **/
     std::string m_altrend;
-    /** Captures the appearance of the element's contents using MEI-defined descriptors. **/
+    /** Captures the appearance of the element’s contents using MEI-defined descriptors. **/
     data_TEXTRENDITION m_rend;
 
     /* include <attrend> */
@@ -5356,7 +5368,8 @@ public:
 private:
     /**
      * Indicates that this element participates in a tie.
-     * If visual information about the tie needs to be recorded, then a
+     * If visual information about the tie needs to be recorded, then a tie element
+     * should be employed.
      **/
     data_TIE m_tie;
 
@@ -5393,7 +5406,10 @@ public:
     ///@}
 
 private:
-    /** Encodes the onset time in terms of musical time, **/
+    /**
+     * Encodes the onset time in terms of musical time, i.e., beats[.fractional beat
+     * part], as expressed in the written time signature.
+     **/
     double m_tstamp;
 
     /* include <atttstamp> */
@@ -5429,7 +5445,10 @@ public:
     ///@}
 
 private:
-    /** Encodes the ending point of an event, **/
+    /**
+     * Encodes the ending point of an event, i.e., a count of measures plus a beat
+     * location in the ending measure.
+     **/
     data_MEASUREBEAT m_tstamp2;
 
     /* include <atttstamp2> */
@@ -5459,20 +5478,26 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTransDiat(double transDiat_) { m_transDiat = transDiat_; }
-    double GetTransDiat() const { return m_transDiat; }
+    void SetTransDiat(int transDiat_) { m_transDiat = transDiat_; }
+    int GetTransDiat() const { return m_transDiat; }
     bool HasTransDiat() const;
     //
-    void SetTransSemi(double transSemi_) { m_transSemi = transSemi_; }
-    double GetTransSemi() const { return m_transSemi; }
+    void SetTransSemi(int transSemi_) { m_transSemi = transSemi_; }
+    int GetTransSemi() const { return m_transSemi; }
     bool HasTransSemi() const;
     ///@}
 
 private:
-    /** Records the amount of diatonic pitch shift, **/
-    double m_transDiat;
-    /** Records the amount of pitch shift in semitones, **/
-    double m_transSemi;
+    /**
+     * Records the amount of diatonic pitch shift, e.g., C to C♯ = 0, C to D♭ = 1,
+     * necessary to calculate the sounded pitch from the written one.
+     **/
+    int m_transDiat;
+    /**
+     * Records the amount of pitch shift in semitones, e.g., C to C♯ = 1, C to D♭ = 1,
+     * necessary to calculate the sounded pitch from the written one.
+     **/
+    int m_transSemi;
 
     /* include <atttrans.semi> */
 };
@@ -5509,7 +5534,8 @@ public:
 private:
     /**
      * Indicates that this feature participates in a tuplet.
-     * If visual information about the tuplet needs to be recorded, then a
+     * If visual information about the tuplet needs to be recorded, then a tuplet
+     * element should be employed.
      **/
     std::string m_tuplet;
 
@@ -5607,9 +5633,13 @@ private:
     std::string m_fontfam;
     /** Holds the name of a font. **/
     std::string m_fontname;
-    /** Indicates the size of a font expressed in printers' points, **/
+    /**
+     * Indicates the size of a font expressed in printers' points, i.e., 1/72nd of an
+     * inch, relative terms, e.g., small, larger, etc., or percentage values relative
+     * to normal size, e.g., 125%.
+     **/
     data_FONTSIZE m_fontsize;
-    /** Records the style of a font, i.e, italic, oblique, or normal. **/
+    /** Records the style of a font, i.e., italic, oblique, or normal. **/
     data_FONTSTYLE m_fontstyle;
     /** Used to indicate bold type. **/
     data_FONTWEIGHT m_fontweight;
@@ -5759,7 +5789,7 @@ public:
 
 private:
     /**
-     * Records a horizontal adjustment to a feature's programmatically-determined
+     * Records a horizontal adjustment to a feature’s programmatically-determined
      * location in terms of staff interline distance; that is, in units of 1/2 the
      * distance between adjacent staff lines.
      **/
@@ -5799,7 +5829,7 @@ public:
 
 private:
     /**
-     * Records a timestamp adjustment of a feature's programmatically-determined
+     * Records a timestamp adjustment of a feature’s programmatically-determined
      * location in terms of musical time; that is, beats.
      **/
     double m_to;
@@ -5838,7 +5868,7 @@ public:
 
 private:
     /**
-     * Records the vertical adjustment of a feature's programmatically-determined
+     * Records the vertical adjustment of a feature’s programmatically-determined
      * location in terms of staff interline distance; that is, in units of 1/2 the
      * distance between adjacent staff lines.
      **/
@@ -5882,12 +5912,12 @@ public:
 
 private:
     /**
-     * Records the horizontal adjustment of a feature's programmatically-determined
+     * Records the horizontal adjustment of a feature’s programmatically-determined
      * start point.
      **/
     data_MEASUREMENTREL m_startho;
     /**
-     * Records the horizontal adjustment of a feature's programmatically-determined end
+     * Records the horizontal adjustment of a feature’s programmatically-determined end
      * point.
      **/
     data_MEASUREMENTREL m_endho;
@@ -5930,12 +5960,12 @@ public:
 
 private:
     /**
-     * Records a timestamp adjustment of a feature's programmatically-determined start
+     * Records a timestamp adjustment of a feature’s programmatically-determined start
      * point.
      **/
     double m_startto;
     /**
-     * Records a timestamp adjustment of a feature's programmatically-determined end
+     * Records a timestamp adjustment of a feature’s programmatically-determined end
      * point.
      **/
     double m_endto;
@@ -5978,12 +6008,12 @@ public:
 
 private:
     /**
-     * Records a vertical adjustment of a feature's programmatically-determined start
+     * Records a vertical adjustment of a feature’s programmatically-determined start
      * point.
      **/
     data_MEASUREMENTREL m_startvo;
     /**
-     * Records a vertical adjustment of a feature's programmatically-determined end
+     * Records a vertical adjustment of a feature’s programmatically-determined end
      * point.
      **/
     data_MEASUREMENTREL m_endvo;
@@ -6191,6 +6221,6 @@ private:
     /* include <atty2> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_SHARED_H__

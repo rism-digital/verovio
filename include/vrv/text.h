@@ -36,12 +36,12 @@ public:
 
     /**
      * @name Set and get the text content.
-     * The text content is a std::wstring that needs to be converted to UTF16.
+     * The text content is a std::u32string that needs to be converted to UTF16.
      * See MEIInput::ReadText and MEIInput ::WriteText
      */
     ///@{
-    void SetText(const std::wstring &text) { m_text = text; }
-    std::wstring GetText() const { return m_text; }
+    void SetText(const std::u32string &text) { m_text = text; }
+    std::u32string GetText() const { return m_text; }
     ///@}
 
 private:
@@ -50,7 +50,7 @@ public:
     //
 protected:
     /** The text content */
-    std::wstring m_text;
+    std::u32string m_text;
 
 private:
 };

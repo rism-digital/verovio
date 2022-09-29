@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -23,7 +23,6 @@
 #include "pb.h"
 #include "runningelement.h"
 #include "sb.h"
-#include "scoredef.h"
 #include "section.h"
 #include "system.h"
 #include "vrv.h"

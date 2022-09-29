@@ -37,7 +37,7 @@ public:
      */
     int GetTotalHeight(const Doc *doc) const override;
 
-    bool GenerateFromMEIHeader(pugi::xml_document &header);
+    bool GenerateFromMEIHeader(const pugi::xml_document &header);
 
     //----------//
     // Functors //

@@ -67,13 +67,25 @@ public:
     ///@}
 
 private:
-    /** A reference to a **/
+    /**
+     * A reference to a surface element positioned on the outer recto side of a
+     * (folded) sheet.
+     **/
     std::string m_outerRecto;
-    /** A reference to a **/
+    /**
+     * A reference to a surface element positioned on the inner verso side of a
+     * (folded) sheet.
+     **/
     std::string m_innerVerso;
-    /** A reference to a **/
+    /**
+     * A reference to a surface element positioned on the inner recto side of a
+     * (folded) sheet.
+     **/
     std::string m_innerRecto;
-    /** A reference to a **/
+    /**
+     * A reference to a surface element positioned on the outer verso side of a
+     * (folded) sheet.
+     **/
     std::string m_outerVerso;
 
     /* include <attouter.verso> */
@@ -113,9 +125,9 @@ public:
     ///@}
 
 private:
-    /** A reference to a **/
+    /** A reference to a surface element positioned on the recto side of the sheet. **/
     std::string m_recto;
-    /** A reference to a **/
+    /** A reference to a surface element positioned on the verso side of the sheet. **/
     std::string m_verso;
 
     /* include <attverso> */
@@ -193,6 +205,6 @@ private:
     /* include <attmethod> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_HEADER_H__
