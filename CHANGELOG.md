@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [3.12.0] - 2022-09-29
 * Support for `symbol` within text elements (with `@glyph.num` or `@glyph.name`)
 * Support for all music fonts within text using css webfont2 (with `rend@fontfam="smufl"`)
 * Support for `graphic` input and output (@wergo)
