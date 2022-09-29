@@ -97,4 +97,4 @@ void Att::GetHarmony(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

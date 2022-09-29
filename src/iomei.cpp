@@ -2742,6 +2742,7 @@ void MEIOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
 {
     assert(facsimile);
     this->WriteXmlId(currentNode, facsimile);
+    facsimile->WriteTyped(currentNode);
 
     // Write Surface(s)
     for (Object *child = facsimile->GetFirst(); child != NULL; child = facsimile->GetNext()) {
@@ -2762,6 +2763,7 @@ void MEIOutput::WriteGraphic(pugi::xml_node currentNode, Graphic *graphic)
     graphic->WritePointing(currentNode);
     graphic->WriteWidth(currentNode);
     graphic->WriteHeight(currentNode);
+    graphic->WriteTyped(currentNode);
 }
 
 void MEIOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
@@ -7921,6 +7923,7 @@ bool MEIInput::ReadGraphic(Surface *parent, pugi::xml_node graphic)
     vrvGraphic->ReadPointing(graphic);
     vrvGraphic->ReadWidth(graphic);
     vrvGraphic->ReadHeight(graphic);
+    vrvGraphic->ReadTyped(graphic);
     parent->AddChild(vrvGraphic);
     return true;
 }
@@ -7965,6 +7968,7 @@ bool MEIInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
     Facsimile *vrvFacsimile = new Facsimile();
     // Read xmlId (if present)
     this->SetMeiID(facsimile, vrvFacsimile);
+    vrvFacsimile->ReadTyped(facsimile);
     // Read children
     for (pugi::xml_node child = facsimile.first_child(); child; child = child.next_sibling()) {
         if (strcmp(child.name(), "surface") == 0) {

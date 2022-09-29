@@ -689,4 +689,32 @@
   <g c="ECB3" x="2.0" y="-122.0" w="512.0" h="1601.0" h-a-x="516" n="metNote512thUp" />
   <g c="ECB5" x="2.0" y="-112.0" w="512.0" h="1767.0" h-a-x="515" n="metNote1024thUp" />
   <g c="ECB7" x="0.0" y="-49.0" w="97.0" h="98.0" h-a-x="97" n="metAugmentationDot" />
+  <g c="E990" x="0.0" y="-101.0" w="160.0" h="203.0" h-a-x="160" n="chantPunctum" />
+  <g c="E9B0" x="0.0" y="0.0" w="139.0" h="164.0" h-a-x="125" n="chantPodatusLower" />
+  <g c="E991" x="0.0" y="-112.0" w="150.0" h="224.0" h-a-x="150" n="chantPunctumInclinatum" />
+  <g c="E992" x="0.0" y="-121.0" w="147.0" h="205.0" h-a-x="147" n="chantPunctumInclinatumAuctum" />
+  <g c="E993" x="0.0" y="-76.0" w="101.0" h="151.0" h-a-x="101" n="chantPunctumInclinatumDeminutum" />
+  <g c="E994" x="0.0" y="-117.0" w="139.0" h="234.0" h-a-x="139" n="chantAuctumAsc" />
+  <g c="E995" x="0.0" y="-116.0" w="139.0" h="232.0" h-a-x="139" n="chantAuctumDesc" />
+  <g c="E996" x="0.0" y="-401.0" w="144.0" h="503.0" h-a-x="144" n="chantPunctumVirga" />
+  <g c="E997" x="0.0" y="-401.0" w="144.0" h="503.0" h-a-x="144" n="chantPunctumVirgaReversed" />
+  <g c="E99E" x="0.0" y="-250.0" w="145.0" h="364.0" h-a-x="145" n="chantOriscusLiquescens" />
+  <g c="E99B" x="0.0" y="-115.0" w="139.0" h="230.0" h-a-x="140" n="chantQuilisma" />
+  <g c="E9B1" x="-113.0" y="-3.0" w="127.0" h="198.0" h-a-x="14" n="chantPodatusUpper" />
+  <g c="E9B2" x="-56.0" y="-121.0" w="69.0" h="188.0" h-a-x="13" n="chantDeminutumUpper" />
+  <g c="E9B3" x="-56.0" y="-64.0" w="69.0" h="189.0" h-a-x="13" n="chantDeminutumLower" />
+  <g c="E9B4" x="0.0" y="-150.0" w="13.0" h="300.0" h-a-x="13" n="chantEntryLineAsc2nd" />
+  <g c="E9B5" x="0.0" y="-150.0" w="13.0" h="450.0" h-a-x="13" n="chantEntryLineAsc3rd" />
+  <g c="E9B6" x="0.0" y="-150.0" w="13.0" h="600.0" h-a-x="13" n="chantEntryLineAsc4th" />
+  <g c="E9B7" x="0.0" y="-150.0" w="13.0" h="750.0" h-a-x="13" n="chantEntryLineAsc5th" />
+  <g c="E9B8" x="0.0" y="-150.0" w="13.0" h="900.0" h-a-x="13" n="chantEntryLineAsc6th" />
+  <g c="E9B9" x="0.0" y="-228.0" w="418.0" h="332.0" h-a-x="418" n="chantLigaturaDesc2nd" />
+  <g c="E9BA" x="0.0" y="-400.0" w="521.0" h="504.0" h-a-x="521" n="chantLigaturaDesc3rd" />
+  <g c="E9BB" x="0.0" y="-553.0" w="521.0" h="657.0" h-a-x="521" n="chantLigaturaDesc4th" />
+  <g c="E9BC" x="0.0" y="-703.0" w="521.0" h="807.0" h-a-x="521" n="chantLigaturaDesc5th" />
+  <g c="E9BD" x="0.0" y="-150.0" w="13.0" h="300.0" h-a-x="13" n="chantConnectingLineAsc2nd" />
+  <g c="E9BE" x="0.0" y="-150.0" w="13.0" h="450.0" h-a-x="13" n="chantConnectingLineAsc3rd" />
+  <g c="E9BF" x="0.0" y="-150.0" w="13.0" h="600.0" h-a-x="13" n="chantConnectingLineAsc4th" />
+  <g c="E9C0" x="0.0" y="-150.0" w="13.0" h="750.0" h-a-x="13" n="chantConnectingLineAsc5th" />
+  <g c="E9C1" x="0.0" y="-150.0" w="13.0" h="900.0" h-a-x="13" n="chantConnectingLineAsc6th" />
 </bounding-boxes>

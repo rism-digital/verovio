@@ -5433,4 +5433,4 @@ whitespace_XMLSPACE AttConverter::StrToWhitespaceXmlspace(const std::string &val
     return whitespace_XMLSPACE_NONE;
 }
 
-} // vrv namespace
+} // namespace vrv
