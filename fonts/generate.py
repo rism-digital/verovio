@@ -221,7 +221,7 @@ def generate_css(opts: Namespace) -> bool:
 
     for glyph in font_el.findall(".//svg:glyph", SVG_NS):
         gname: Optional[str] = glyph.get("glyph-name")
-        if gname and gname[-4:] not in supported_glyphs:
+        if gname and gname != "space" and gname[-4:] not in supported_glyphs:
             font_el.remove(glyph)
 
     log.debug("Shortening metadata entry to the essentials.")
@@ -516,7 +516,8 @@ def __write_xml_glyphs(
             log.debug("Could not find a glyph name. Skipping")
             continue
 
-        code: str = glyph_name[-4:]
+        # special treatment for space
+        code: str = "0020" if glyph_name == "space" else glyph_name[-4:]
         if code not in supported_glyphs:
             log.debug("Glyph code %s is not supported. Skipping", code)
             continue
@@ -557,7 +558,8 @@ def __write_xml_svg(
             log.debug("Could not find a glyph name. Skipping")
             continue
 
-        code: str = glyph_name[-4:]
+        # special treatment for space
+        code: str = "0020" if glyph_name == "space" else glyph_name[-4:]
         if code not in supported_glyphs:
             continue
 
