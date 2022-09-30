@@ -2673,7 +2673,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
             doubleParent->DeleteChild(obj);
         }
-        else if (obj->GetChildCount() == (obj->GetChildCount(SYL) + obj->GetChildCount(DIVLINE) + obj->GetChildCount(ACCID))){
+        else if (obj->GetChildCount() == (obj->GetChildCount(SYL) + obj->GetChildCount(DIVLINE) + obj->GetChildCount(ACCID) + obj->GetChildCount(CLEF))){
             Object *leftover;
             while ((leftover = obj->FindDescendantByType(SYL)) != NULL) {
                 obj->DeleteChild(leftover);
@@ -2684,6 +2684,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 obj->ClearRelinquishedChildren();
             }
             while ((leftover = obj->FindDescendantByType(ACCID)) != NULL) {
+                leftover->MoveItselfTo(parent);
+                parent->ReorderByXPos();
+                obj->ClearRelinquishedChildren();
+            }
+            while ((leftover = obj->FindDescendantByType(CLEF)) != NULL) {
                 leftover->MoveItselfTo(parent);
                 parent->ReorderByXPos();
                 obj->ClearRelinquishedChildren();
