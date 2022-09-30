@@ -3504,7 +3504,6 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
 bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffId)
 {
-    LogMessage("verovio");
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page");
         m_infoObject.import("status", "FAILURE");
