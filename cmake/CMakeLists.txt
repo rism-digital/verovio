@@ -26,6 +26,13 @@ if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
     message(SEND_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
 endif()
 
+if (VEROVIO_RESOURCE_DIRECTORY)
+    MESSAGE("Custom resource directory")
+    add_compile_definitions(RESOURCE_DIR="${VEROVIO_RESOURCE_DIRECTORY}")
+else()
+    add_compile_definitions(RESOURCE_DIR="${CMAKE_INSTALL_PREFIX}/share/verovio")
+endif()
+
 include_directories(
     ../include
     ../include/crc
@@ -239,8 +246,7 @@ else()
 endif()
 
 install(
-    TARGETS verovio
-    DESTINATION /usr/local/bin
+    TARGETS verovio DESTINATION bin
 )
 install(
     DIRECTORY ../data/

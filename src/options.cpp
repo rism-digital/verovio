@@ -19,6 +19,12 @@
 #include "att.h"
 #include "vrv.h"
 
+#ifdef RESOURCE_DIR
+#define VRV_RESOURCE_DIR RESOURCE_DIR
+#else
+#define VRV_RESOURCE_DIR "/usr/local/share/verovio"
+#endif
+
 namespace vrv {
 
 const std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" },
@@ -902,7 +908,7 @@ Options::Options()
     m_baseOptions.AddOption(&m_page);
 
     m_resourcePath.SetInfo("Resource path", "Path to the directory with Verovio resources");
-    m_resourcePath.Init("/usr/local/share/verovio");
+    m_resourcePath.Init(VRV_RESOURCE_DIR);
     m_resourcePath.SetKey("resourcePath");
     m_resourcePath.SetShortOption('r', true);
     m_baseOptions.AddOption(&m_resourcePath);
