@@ -20,12 +20,6 @@
 
 #include "pugixml.hpp"
 
-#ifdef RESOURCE_DIR
-#define VRV_RESOURCE_DIR RESOURCE_DIR
-#else
-#define VRV_RESOURCE_DIR "/usr/local/share/verovio"
-#endif
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
