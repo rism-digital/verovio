@@ -19,7 +19,6 @@
 #include "att.h"
 #include "vrv.h"
 
-
 namespace vrv {
 
 const std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" },
