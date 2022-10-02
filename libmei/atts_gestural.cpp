@@ -499,82 +499,6 @@ bool AttNoteGes::HasPnum() const
 /* include <attpnum> */
 
 //----------------------------------------------------------------------------
-// AttScoreDefGes
-//----------------------------------------------------------------------------
-
-AttScoreDefGes::AttScoreDefGes() : Att()
-{
-    ResetScoreDefGes();
-}
-
-AttScoreDefGes::~AttScoreDefGes()
-{
-}
-
-void AttScoreDefGes::ResetScoreDefGes()
-{
-    m_tunePname = PITCHNAME_NONE;
-    m_tuneHz = 0.0;
-    m_tuneTemper = TEMPERAMENT_NONE;
-}
-
-bool AttScoreDefGes::ReadScoreDefGes(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("tune.pname")) {
-        this->SetTunePname(StrToPitchname(element.attribute("tune.pname").value()));
-        element.remove_attribute("tune.pname");
-        hasAttribute = true;
-    }
-    if (element.attribute("tune.Hz")) {
-        this->SetTuneHz(StrToDbl(element.attribute("tune.Hz").value()));
-        element.remove_attribute("tune.Hz");
-        hasAttribute = true;
-    }
-    if (element.attribute("tune.temper")) {
-        this->SetTuneTemper(StrToTemperament(element.attribute("tune.temper").value()));
-        element.remove_attribute("tune.temper");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttScoreDefGes::WriteScoreDefGes(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasTunePname()) {
-        element.append_attribute("tune.pname") = PitchnameToStr(this->GetTunePname()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasTuneHz()) {
-        element.append_attribute("tune.Hz") = DblToStr(this->GetTuneHz()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasTuneTemper()) {
-        element.append_attribute("tune.temper") = TemperamentToStr(this->GetTuneTemper()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttScoreDefGes::HasTunePname() const
-{
-    return (m_tunePname != PITCHNAME_NONE);
-}
-
-bool AttScoreDefGes::HasTuneHz() const
-{
-    return (m_tuneHz != 0.0);
-}
-
-bool AttScoreDefGes::HasTuneTemper() const
-{
-    return (m_tuneTemper != TEMPERAMENT_NONE);
-}
-
-/* include <atttune.temper> */
-
-//----------------------------------------------------------------------------
 // AttSectionGes
 //----------------------------------------------------------------------------
 
@@ -901,22 +825,6 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
             return true;
         }
     }
-    if (element->HasAttClass(ATT_SCOREDEFGES)) {
-        AttScoreDefGes *att = dynamic_cast<AttScoreDefGes *>(element);
-        assert(att);
-        if (attrType == "tune.pname") {
-            att->SetTunePname(att->StrToPitchname(attrValue));
-            return true;
-        }
-        if (attrType == "tune.Hz") {
-            att->SetTuneHz(att->StrToDbl(attrValue));
-            return true;
-        }
-        if (attrType == "tune.temper") {
-            att->SetTuneTemper(att->StrToTemperament(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_SECTIONGES)) {
         AttSectionGes *att = dynamic_cast<AttSectionGes *>(element);
         assert(att);
@@ -1044,19 +952,6 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasPnum()) {
             attributes->push_back({ "pnum", att->IntToStr(att->GetPnum()) });
-        }
-    }
-    if (element->HasAttClass(ATT_SCOREDEFGES)) {
-        const AttScoreDefGes *att = dynamic_cast<const AttScoreDefGes *>(element);
-        assert(att);
-        if (att->HasTunePname()) {
-            attributes->push_back({ "tune.pname", att->PitchnameToStr(att->GetTunePname()) });
-        }
-        if (att->HasTuneHz()) {
-            attributes->push_back({ "tune.Hz", att->DblToStr(att->GetTuneHz()) });
-        }
-        if (att->HasTuneTemper()) {
-            attributes->push_back({ "tune.temper", att->TemperamentToStr(att->GetTuneTemper()) });
         }
     }
     if (element->HasAttClass(ATT_SECTIONGES)) {

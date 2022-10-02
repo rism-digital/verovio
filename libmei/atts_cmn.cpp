@@ -316,14 +316,14 @@ AttBeamedWith::~AttBeamedWith()
 
 void AttBeamedWith::ResetBeamedWith()
 {
-    m_beamWith = OTHERSTAFF_NONE;
+    m_beamWith = NEIGHBORINGLAYER_NONE;
 }
 
 bool AttBeamedWith::ReadBeamedWith(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("beam.with")) {
-        this->SetBeamWith(StrToOtherstaff(element.attribute("beam.with").value()));
+        this->SetBeamWith(StrToNeighboringlayer(element.attribute("beam.with").value()));
         element.remove_attribute("beam.with");
         hasAttribute = true;
     }
@@ -334,7 +334,7 @@ bool AttBeamedWith::WriteBeamedWith(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasBeamWith()) {
-        element.append_attribute("beam.with") = OtherstaffToStr(this->GetBeamWith()).c_str();
+        element.append_attribute("beam.with") = NeighboringlayerToStr(this->GetBeamWith()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -342,7 +342,7 @@ bool AttBeamedWith::WriteBeamedWith(pugi::xml_node element)
 
 bool AttBeamedWith::HasBeamWith() const
 {
-    return (m_beamWith != OTHERSTAFF_NONE);
+    return (m_beamWith != NEIGHBORINGLAYER_NONE);
 }
 
 /* include <attbeam.with> */
@@ -1569,14 +1569,14 @@ AttStemsCmn::~AttStemsCmn()
 
 void AttStemsCmn::ResetStemsCmn()
 {
-    m_stemWith = OTHERSTAFF_NONE;
+    m_stemWith = NEIGHBORINGLAYER_NONE;
 }
 
 bool AttStemsCmn::ReadStemsCmn(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("stem.with")) {
-        this->SetStemWith(StrToOtherstaff(element.attribute("stem.with").value()));
+        this->SetStemWith(StrToNeighboringlayer(element.attribute("stem.with").value()));
         element.remove_attribute("stem.with");
         hasAttribute = true;
     }
@@ -1587,7 +1587,7 @@ bool AttStemsCmn::WriteStemsCmn(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasStemWith()) {
-        element.append_attribute("stem.with") = OtherstaffToStr(this->GetStemWith()).c_str();
+        element.append_attribute("stem.with") = NeighboringlayerToStr(this->GetStemWith()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1595,7 +1595,7 @@ bool AttStemsCmn::WriteStemsCmn(pugi::xml_node element)
 
 bool AttStemsCmn::HasStemWith() const
 {
-    return (m_stemWith != OTHERSTAFF_NONE);
+    return (m_stemWith != NEIGHBORINGLAYER_NONE);
 }
 
 /* include <attstem.with> */
@@ -1765,7 +1765,7 @@ bool Att::SetCmn(Object *element, const std::string &attrType, const std::string
         AttBeamedWith *att = dynamic_cast<AttBeamedWith *>(element);
         assert(att);
         if (attrType == "beam.with") {
-            att->SetBeamWith(att->StrToOtherstaff(attrValue));
+            att->SetBeamWith(att->StrToNeighboringlayer(attrValue));
             return true;
         }
     }
@@ -2001,7 +2001,7 @@ bool Att::SetCmn(Object *element, const std::string &attrType, const std::string
         AttStemsCmn *att = dynamic_cast<AttStemsCmn *>(element);
         assert(att);
         if (attrType == "stem.with") {
-            att->SetStemWith(att->StrToOtherstaff(attrValue));
+            att->SetStemWith(att->StrToNeighboringlayer(attrValue));
             return true;
         }
     }
@@ -2079,7 +2079,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         const AttBeamedWith *att = dynamic_cast<const AttBeamedWith *>(element);
         assert(att);
         if (att->HasBeamWith()) {
-            attributes->push_back({ "beam.with", att->OtherstaffToStr(att->GetBeamWith()) });
+            attributes->push_back({ "beam.with", att->NeighboringlayerToStr(att->GetBeamWith()) });
         }
     }
     if (element->HasAttClass(ATT_BEAMINGLOG)) {
@@ -2279,7 +2279,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         const AttStemsCmn *att = dynamic_cast<const AttStemsCmn *>(element);
         assert(att);
         if (att->HasStemWith()) {
-            attributes->push_back({ "stem.with", att->OtherstaffToStr(att->GetStemWith()) });
+            attributes->push_back({ "stem.with", att->NeighboringlayerToStr(att->GetStemWith()) });
         }
     }
     if (element->HasAttClass(ATT_TIEREND)) {

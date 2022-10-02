@@ -351,54 +351,6 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttScoreDefGes
-//----------------------------------------------------------------------------
-
-class AttScoreDefGes : public Att {
-public:
-    AttScoreDefGes();
-    virtual ~AttScoreDefGes();
-
-    /** Reset the default values for the attribute class **/
-    void ResetScoreDefGes();
-
-    /** Read the values for the attribute class **/
-    bool ReadScoreDefGes(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteScoreDefGes(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetTunePname(data_PITCHNAME tunePname_) { m_tunePname = tunePname_; }
-    data_PITCHNAME GetTunePname() const { return m_tunePname; }
-    bool HasTunePname() const;
-    //
-    void SetTuneHz(double tuneHz_) { m_tuneHz = tuneHz_; }
-    double GetTuneHz() const { return m_tuneHz; }
-    bool HasTuneHz() const;
-    //
-    void SetTuneTemper(data_TEMPERAMENT tuneTemper_) { m_tuneTemper = tuneTemper_; }
-    data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; }
-    bool HasTuneTemper() const;
-    ///@}
-
-private:
-    /** Holds the pitch name of a tuning reference pitch. **/
-    data_PITCHNAME m_tunePname;
-    /** Holds a value for cycles per second, i.e., Hertz, for a tuning reference pitch. **/
-    double m_tuneHz;
-    /** Provides an indication of the tuning system, 'just', for example. **/
-    data_TEMPERAMENT m_tuneTemper;
-
-    /* include <atttune.temper> */
-};
-
-//----------------------------------------------------------------------------
 // AttSectionGes
 //----------------------------------------------------------------------------
 

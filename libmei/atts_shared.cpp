@@ -7261,6 +7261,82 @@ bool AttTransposition::HasTransSemi() const
 /* include <atttrans.semi> */
 
 //----------------------------------------------------------------------------
+// AttTuning
+//----------------------------------------------------------------------------
+
+AttTuning::AttTuning() : Att()
+{
+    ResetTuning();
+}
+
+AttTuning::~AttTuning()
+{
+}
+
+void AttTuning::ResetTuning()
+{
+    m_tuneHz = 0.0;
+    m_tunePname = PITCHNAME_NONE;
+    m_tuneTemper = TEMPERAMENT_NONE;
+}
+
+bool AttTuning::ReadTuning(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("tune.Hz")) {
+        this->SetTuneHz(StrToDbl(element.attribute("tune.Hz").value()));
+        element.remove_attribute("tune.Hz");
+        hasAttribute = true;
+    }
+    if (element.attribute("tune.pname")) {
+        this->SetTunePname(StrToPitchname(element.attribute("tune.pname").value()));
+        element.remove_attribute("tune.pname");
+        hasAttribute = true;
+    }
+    if (element.attribute("tune.temper")) {
+        this->SetTuneTemper(StrToTemperament(element.attribute("tune.temper").value()));
+        element.remove_attribute("tune.temper");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttTuning::WriteTuning(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasTuneHz()) {
+        element.append_attribute("tune.Hz") = DblToStr(this->GetTuneHz()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasTunePname()) {
+        element.append_attribute("tune.pname") = PitchnameToStr(this->GetTunePname()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasTuneTemper()) {
+        element.append_attribute("tune.temper") = TemperamentToStr(this->GetTuneTemper()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttTuning::HasTuneHz() const
+{
+    return (m_tuneHz != 0.0);
+}
+
+bool AttTuning::HasTunePname() const
+{
+    return (m_tunePname != PITCHNAME_NONE);
+}
+
+bool AttTuning::HasTuneTemper() const
+{
+    return (m_tuneTemper != TEMPERAMENT_NONE);
+}
+
+/* include <atttune.temper> */
+
+//----------------------------------------------------------------------------
 // AttTupletPresent
 //----------------------------------------------------------------------------
 
@@ -9579,6 +9655,22 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
+    if (element->HasAttClass(ATT_TUNING)) {
+        AttTuning *att = dynamic_cast<AttTuning *>(element);
+        assert(att);
+        if (attrType == "tune.Hz") {
+            att->SetTuneHz(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "tune.pname") {
+            att->SetTunePname(att->StrToPitchname(attrValue));
+            return true;
+        }
+        if (attrType == "tune.temper") {
+            att->SetTuneTemper(att->StrToTemperament(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_TUPLETPRESENT)) {
         AttTupletPresent *att = dynamic_cast<AttTupletPresent *>(element);
         assert(att);
@@ -10929,6 +11021,19 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasTransSemi()) {
             attributes->push_back({ "trans.semi", att->IntToStr(att->GetTransSemi()) });
+        }
+    }
+    if (element->HasAttClass(ATT_TUNING)) {
+        const AttTuning *att = dynamic_cast<const AttTuning *>(element);
+        assert(att);
+        if (att->HasTuneHz()) {
+            attributes->push_back({ "tune.Hz", att->DblToStr(att->GetTuneHz()) });
+        }
+        if (att->HasTunePname()) {
+            attributes->push_back({ "tune.pname", att->PitchnameToStr(att->GetTunePname()) });
+        }
+        if (att->HasTuneTemper()) {
+            attributes->push_back({ "tune.temper", att->TemperamentToStr(att->GetTuneTemper()) });
         }
     }
     if (element->HasAttClass(ATT_TUPLETPRESENT)) {

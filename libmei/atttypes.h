@@ -1287,6 +1287,16 @@ enum data_MULTIBREVERESTS_mensural {
 };
 
 /**
+ * MEI data.NEIGHBORINGLAYER
+ */
+enum data_NEIGHBORINGLAYER {
+    NEIGHBORINGLAYER_NONE = 0,
+    NEIGHBORINGLAYER_above,
+    NEIGHBORINGLAYER_below,
+    NEIGHBORINGLAYER_MAX
+};
+
+/**
  * MEI data.NONSTAFFPLACE
  */
 enum data_NONSTAFFPLACE {
@@ -1359,16 +1369,6 @@ enum data_NOTEHEADMODIFIER_list {
     NOTEHEADMODIFIER_list_circle,
     NOTEHEADMODIFIER_list_dblwhole,
     NOTEHEADMODIFIER_list_MAX
-};
-
-/**
- * MEI data.OTHERSTAFF
- */
-enum data_OTHERSTAFF {
-    OTHERSTAFF_NONE = 0,
-    OTHERSTAFF_above,
-    OTHERSTAFF_below,
-    OTHERSTAFF_MAX
 };
 
 /**

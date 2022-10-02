@@ -2733,6 +2733,29 @@ data_MULTIBREVERESTS_mensural AttConverter::StrToMultibreverestsMensural(const s
     return MULTIBREVERESTS_mensural_NONE;
 }
 
+std::string AttConverter::NeighboringlayerToStr(data_NEIGHBORINGLAYER data) const
+{
+    std::string value;
+    switch (data) {
+        case NEIGHBORINGLAYER_above: value = "above"; break;
+        case NEIGHBORINGLAYER_below: value = "below"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.NEIGHBORINGLAYER", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_NEIGHBORINGLAYER AttConverter::StrToNeighboringlayer(const std::string &value, bool logWarning) const
+{
+    if (value == "above") return NEIGHBORINGLAYER_above;
+    if (value == "below") return NEIGHBORINGLAYER_below;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.NEIGHBORINGLAYER", value.c_str());
+    return NEIGHBORINGLAYER_NONE;
+}
+
 std::string AttConverter::NonstaffplaceToStr(data_NONSTAFFPLACE data) const
 {
     std::string value;
@@ -2893,29 +2916,6 @@ data_NOTEHEADMODIFIER_list AttConverter::StrToNoteheadmodifierList(const std::st
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.NOTEHEADMODIFIER.list", value.c_str());
     return NOTEHEADMODIFIER_list_NONE;
-}
-
-std::string AttConverter::OtherstaffToStr(data_OTHERSTAFF data) const
-{
-    std::string value;
-    switch (data) {
-        case OTHERSTAFF_above: value = "above"; break;
-        case OTHERSTAFF_below: value = "below"; break;
-        default:
-            LogWarning("Unknown value '%d' for data.OTHERSTAFF", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_OTHERSTAFF AttConverter::StrToOtherstaff(const std::string &value, bool logWarning) const
-{
-    if (value == "above") return OTHERSTAFF_above;
-    if (value == "below") return OTHERSTAFF_below;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for data.OTHERSTAFF", value.c_str());
-    return OTHERSTAFF_NONE;
 }
 
 std::string AttConverter::RelationshipToStr(data_RELATIONSHIP data) const

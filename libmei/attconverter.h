@@ -200,6 +200,9 @@ public:
     std::string MultibreverestsMensuralToStr(data_MULTIBREVERESTS_mensural data) const;
     data_MULTIBREVERESTS_mensural StrToMultibreverestsMensural(const std::string &value, bool logWarning = true) const;
 
+    std::string NeighboringlayerToStr(data_NEIGHBORINGLAYER data) const;
+    data_NEIGHBORINGLAYER StrToNeighboringlayer(const std::string &value, bool logWarning = true) const;
+
     std::string NonstaffplaceToStr(data_NONSTAFFPLACE data) const;
     data_NONSTAFFPLACE StrToNonstaffplace(const std::string &value, bool logWarning = true) const;
 
@@ -211,9 +214,6 @@ public:
 
     std::string NoteheadmodifierListToStr(data_NOTEHEADMODIFIER_list data) const;
     data_NOTEHEADMODIFIER_list StrToNoteheadmodifierList(const std::string &value, bool logWarning = true) const;
-
-    std::string OtherstaffToStr(data_OTHERSTAFF data) const;
-    data_OTHERSTAFF StrToOtherstaff(const std::string &value, bool logWarning = true) const;
 
     std::string RelationshipToStr(data_RELATIONSHIP data) const;
     data_RELATIONSHIP StrToRelationship(const std::string &value, bool logWarning = true) const;

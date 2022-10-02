@@ -5503,6 +5503,57 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttTuning
+//----------------------------------------------------------------------------
+
+class AttTuning : public Att {
+public:
+    AttTuning();
+    virtual ~AttTuning();
+
+    /** Reset the default values for the attribute class **/
+    void ResetTuning();
+
+    /** Read the values for the attribute class **/
+    bool ReadTuning(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteTuning(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetTuneHz(double tuneHz_) { m_tuneHz = tuneHz_; }
+    double GetTuneHz() const { return m_tuneHz; }
+    bool HasTuneHz() const;
+    //
+    void SetTunePname(data_PITCHNAME tunePname_) { m_tunePname = tunePname_; }
+    data_PITCHNAME GetTunePname() const { return m_tunePname; }
+    bool HasTunePname() const;
+    //
+    void SetTuneTemper(data_TEMPERAMENT tuneTemper_) { m_tuneTemper = tuneTemper_; }
+    data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; }
+    bool HasTuneTemper() const;
+    ///@}
+
+private:
+    /** Holds a value for cycles per second, i.e., Hertz, for a tuning reference pitch. **/
+    double m_tuneHz;
+    /**
+     * Holds the pitch name of a tuning reference pitch, i.e., the central tone of a
+     * tuning system.
+     **/
+    data_PITCHNAME m_tunePname;
+    /** Provides an indication of the tuning system, just, for example. **/
+    data_TEMPERAMENT m_tuneTemper;
+
+    /* include <atttune.temper> */
+};
+
+//----------------------------------------------------------------------------
 // AttTupletPresent
 //----------------------------------------------------------------------------
 
