@@ -590,7 +590,7 @@ bool AttFTremVis::ReadFTremVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("float.gap")) {
-        this->SetFloatGap(StrToMeasurementabs(element.attribute("float.gap").value()));
+        this->SetFloatGap(StrToMeasurementunsigned(element.attribute("float.gap").value()));
         element.remove_attribute("float.gap");
         hasAttribute = true;
     }
@@ -609,7 +609,7 @@ bool AttFTremVis::WriteFTremVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasFloatGap()) {
-        element.append_attribute("float.gap") = MeasurementabsToStr(this->GetFloatGap()).c_str();
+        element.append_attribute("float.gap") = MeasurementunsignedToStr(this->GetFloatGap()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -749,14 +749,20 @@ AttHairpinVis::~AttHairpinVis() {}
 void AttHairpinVis::ResetHairpinVis()
 {
     m_opening = VRV_UNSET;
+    m_closed = BOOLEAN_NONE;
 }
 
 bool AttHairpinVis::ReadHairpinVis(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("opening")) {
-        this->SetOpening(StrToMeasurementabs(element.attribute("opening").value()));
+        this->SetOpening(StrToMeasurementunsigned(element.attribute("opening").value()));
         element.remove_attribute("opening");
+        hasAttribute = true;
+    }
+    if (element.attribute("closed")) {
+        this->SetClosed(StrToBoolean(element.attribute("closed").value()));
+        element.remove_attribute("closed");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -766,7 +772,11 @@ bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOpening()) {
-        element.append_attribute("opening") = MeasurementabsToStr(this->GetOpening()).c_str();
+        element.append_attribute("opening") = MeasurementunsignedToStr(this->GetOpening()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasClosed()) {
+        element.append_attribute("closed") = BooleanToStr(this->GetClosed()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -777,7 +787,12 @@ bool AttHairpinVis::HasOpening() const
     return (m_opening != VRV_UNSET);
 }
 
-/* include <attopening> */
+bool AttHairpinVis::HasClosed() const
+{
+    return (m_closed != BOOLEAN_NONE);
+}
+
+/* include <attclosed> */
 
 //----------------------------------------------------------------------------
 // AttHarmVis
@@ -1988,7 +2003,7 @@ bool AttStaffDefVis::ReadStaffDefVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("spacing")) {
-        this->SetSpacing(StrToMeasurementrel(element.attribute("spacing").value()));
+        this->SetSpacing(StrToMeasurementsigned(element.attribute("spacing").value()));
         element.remove_attribute("spacing");
         hasAttribute = true;
     }
@@ -2015,7 +2030,7 @@ bool AttStaffDefVis::WriteStaffDefVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasSpacing()) {
-        element.append_attribute("spacing") = MeasurementrelToStr(this->GetSpacing()).c_str();
+        element.append_attribute("spacing") = MeasurementsignedToStr(this->GetSpacing()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2307,7 +2322,7 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
             return true;
         }
         if (attrType == "float.gap") {
-            att->SetFloatGap(att->StrToMeasurementabs(attrValue));
+            att->SetFloatGap(att->StrToMeasurementunsigned(attrValue));
             return true;
         }
     }
@@ -2335,7 +2350,11 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
         AttHairpinVis *att = dynamic_cast<AttHairpinVis *>(element);
         assert(att);
         if (attrType == "opening") {
-            att->SetOpening(att->StrToMeasurementabs(attrValue));
+            att->SetOpening(att->StrToMeasurementunsigned(attrValue));
+            return true;
+        }
+        if (attrType == "closed") {
+            att->SetClosed(att->StrToBoolean(attrValue));
             return true;
         }
     }
@@ -2595,7 +2614,7 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
             return true;
         }
         if (attrType == "spacing") {
-            att->SetSpacing(att->StrToMeasurementrel(attrValue));
+            att->SetSpacing(att->StrToMeasurementsigned(attrValue));
             return true;
         }
     }
@@ -2735,7 +2754,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "beams.float", att->IntToStr(att->GetBeamsFloat()) });
         }
         if (att->HasFloatGap()) {
-            attributes->push_back({ "float.gap", att->MeasurementabsToStr(att->GetFloatGap()) });
+            attributes->push_back({ "float.gap", att->MeasurementunsignedToStr(att->GetFloatGap()) });
         }
     }
     if (element->HasAttClass(ATT_FERMATAVIS)) {
@@ -2759,7 +2778,10 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         const AttHairpinVis *att = dynamic_cast<const AttHairpinVis *>(element);
         assert(att);
         if (att->HasOpening()) {
-            attributes->push_back({ "opening", att->MeasurementabsToStr(att->GetOpening()) });
+            attributes->push_back({ "opening", att->MeasurementunsignedToStr(att->GetOpening()) });
+        }
+        if (att->HasClosed()) {
+            attributes->push_back({ "closed", att->BooleanToStr(att->GetClosed()) });
         }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {
@@ -2975,7 +2997,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "lines.visible", att->BooleanToStr(att->GetLinesVisible()) });
         }
         if (att->HasSpacing()) {
-            attributes->push_back({ "spacing", att->MeasurementrelToStr(att->GetSpacing()) });
+            attributes->push_back({ "spacing", att->MeasurementsignedToStr(att->GetSpacing()) });
         }
     }
     if (element->HasAttClass(ATT_STAFFGRPVIS)) {

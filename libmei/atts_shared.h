@@ -1265,29 +1265,29 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDynamDist(data_MEASUREMENTREL dynamDist_) { m_dynamDist = dynamDist_; }
-    data_MEASUREMENTREL GetDynamDist() const { return m_dynamDist; }
+    void SetDynamDist(data_MEASUREMENTSIGNED dynamDist_) { m_dynamDist = dynamDist_; }
+    data_MEASUREMENTSIGNED GetDynamDist() const { return m_dynamDist; }
     bool HasDynamDist() const;
     //
-    void SetHarmDist(data_MEASUREMENTREL harmDist_) { m_harmDist = harmDist_; }
-    data_MEASUREMENTREL GetHarmDist() const { return m_harmDist; }
+    void SetHarmDist(data_MEASUREMENTSIGNED harmDist_) { m_harmDist = harmDist_; }
+    data_MEASUREMENTSIGNED GetHarmDist() const { return m_harmDist; }
     bool HasHarmDist() const;
     //
-    void SetTextDist(data_MEASUREMENTREL textDist_) { m_textDist = textDist_; }
-    data_MEASUREMENTREL GetTextDist() const { return m_textDist; }
+    void SetTextDist(data_MEASUREMENTSIGNED textDist_) { m_textDist = textDist_; }
+    data_MEASUREMENTSIGNED GetTextDist() const { return m_textDist; }
     bool HasTextDist() const;
     ///@}
 
 private:
     /** Records the default distance from the staff for dynamic marks. **/
-    data_MEASUREMENTREL m_dynamDist;
+    data_MEASUREMENTSIGNED m_dynamDist;
     /**
      * Records the default distance from the staff of harmonic indications, such as
      * guitar chord grids or functional labels.
      **/
-    data_MEASUREMENTREL m_harmDist;
+    data_MEASUREMENTSIGNED m_harmDist;
     /** Determines how far from the staff to render text elements. **/
-    data_MEASUREMENTREL m_textDist;
+    data_MEASUREMENTSIGNED m_textDist;
 
     /* include <atttext.dist> */
 };
@@ -1885,14 +1885,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetHeight(data_MEASUREMENTABS height_) { m_height = height_; }
-    data_MEASUREMENTABS GetHeight() const { return m_height; }
+    void SetHeight(data_MEASUREMENTUNSIGNED height_) { m_height = height_; }
+    data_MEASUREMENTUNSIGNED GetHeight() const { return m_height; }
     bool HasHeight() const;
     ///@}
 
 private:
     /** Measurement of the vertical dimension of an entity. **/
-    data_MEASUREMENTABS m_height;
+    data_MEASUREMENTUNSIGNED m_height;
 
     /* include <attheight> */
 };
@@ -2506,8 +2506,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLyricAlign(data_MEASUREMENTREL lyricAlign_) { m_lyricAlign = lyricAlign_; }
-    data_MEASUREMENTREL GetLyricAlign() const { return m_lyricAlign; }
+    void SetLyricAlign(data_MEASUREMENTSIGNED lyricAlign_) { m_lyricAlign = lyricAlign_; }
+    data_MEASUREMENTSIGNED GetLyricAlign() const { return m_lyricAlign; }
     bool HasLyricAlign() const;
     //
     void SetLyricFam(std::string lyricFam_) { m_lyricFam = lyricFam_; }
@@ -2535,7 +2535,7 @@ public:
 
 private:
     /** Describes the alignment of lyric syllables associated with a note or chord. **/
-    data_MEASUREMENTREL m_lyricAlign;
+    data_MEASUREMENTSIGNED m_lyricAlign;
     /** Sets the font family default value for lyrics. **/
     std::string m_lyricFam;
     /** Sets the font name default value for lyrics. **/
@@ -3745,28 +3745,28 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPageHeight(data_MEASUREMENTABS pageHeight_) { m_pageHeight = pageHeight_; }
-    data_MEASUREMENTABS GetPageHeight() const { return m_pageHeight; }
+    void SetPageHeight(data_MEASUREMENTUNSIGNED pageHeight_) { m_pageHeight = pageHeight_; }
+    data_MEASUREMENTUNSIGNED GetPageHeight() const { return m_pageHeight; }
     bool HasPageHeight() const;
     //
-    void SetPageWidth(data_MEASUREMENTABS pageWidth_) { m_pageWidth = pageWidth_; }
-    data_MEASUREMENTABS GetPageWidth() const { return m_pageWidth; }
+    void SetPageWidth(data_MEASUREMENTUNSIGNED pageWidth_) { m_pageWidth = pageWidth_; }
+    data_MEASUREMENTUNSIGNED GetPageWidth() const { return m_pageWidth; }
     bool HasPageWidth() const;
     //
-    void SetPageTopmar(data_MEASUREMENTABS pageTopmar_) { m_pageTopmar = pageTopmar_; }
-    data_MEASUREMENTABS GetPageTopmar() const { return m_pageTopmar; }
+    void SetPageTopmar(data_MEASUREMENTUNSIGNED pageTopmar_) { m_pageTopmar = pageTopmar_; }
+    data_MEASUREMENTUNSIGNED GetPageTopmar() const { return m_pageTopmar; }
     bool HasPageTopmar() const;
     //
-    void SetPageBotmar(data_MEASUREMENTABS pageBotmar_) { m_pageBotmar = pageBotmar_; }
-    data_MEASUREMENTABS GetPageBotmar() const { return m_pageBotmar; }
+    void SetPageBotmar(data_MEASUREMENTUNSIGNED pageBotmar_) { m_pageBotmar = pageBotmar_; }
+    data_MEASUREMENTUNSIGNED GetPageBotmar() const { return m_pageBotmar; }
     bool HasPageBotmar() const;
     //
-    void SetPageLeftmar(data_MEASUREMENTABS pageLeftmar_) { m_pageLeftmar = pageLeftmar_; }
-    data_MEASUREMENTABS GetPageLeftmar() const { return m_pageLeftmar; }
+    void SetPageLeftmar(data_MEASUREMENTUNSIGNED pageLeftmar_) { m_pageLeftmar = pageLeftmar_; }
+    data_MEASUREMENTUNSIGNED GetPageLeftmar() const { return m_pageLeftmar; }
     bool HasPageLeftmar() const;
     //
-    void SetPageRightmar(data_MEASUREMENTABS pageRightmar_) { m_pageRightmar = pageRightmar_; }
-    data_MEASUREMENTABS GetPageRightmar() const { return m_pageRightmar; }
+    void SetPageRightmar(data_MEASUREMENTUNSIGNED pageRightmar_) { m_pageRightmar = pageRightmar_; }
+    data_MEASUREMENTUNSIGNED GetPageRightmar() const { return m_pageRightmar; }
     bool HasPageRightmar() const;
     //
     void SetPagePanels(std::string pagePanels_) { m_pagePanels = pagePanels_; }
@@ -3783,20 +3783,20 @@ private:
      * Specifies the height of the page; may be expressed in real-world units or staff
      * steps.
      **/
-    data_MEASUREMENTABS m_pageHeight;
+    data_MEASUREMENTUNSIGNED m_pageHeight;
     /**
      * Describes the width of the page; may be expressed in real-world units or staff
      * steps.
      **/
-    data_MEASUREMENTABS m_pageWidth;
+    data_MEASUREMENTUNSIGNED m_pageWidth;
     /** Indicates the amount of whitespace at the top of a page. **/
-    data_MEASUREMENTABS m_pageTopmar;
+    data_MEASUREMENTUNSIGNED m_pageTopmar;
     /** Indicates the amount of whitespace at the bottom of a page. **/
-    data_MEASUREMENTABS m_pageBotmar;
+    data_MEASUREMENTUNSIGNED m_pageBotmar;
     /** Indicates the amount of whitespace at the left side of a page. **/
-    data_MEASUREMENTABS m_pageLeftmar;
+    data_MEASUREMENTUNSIGNED m_pageLeftmar;
     /** Indicates the amount of whitespace at the right side of a page. **/
-    data_MEASUREMENTABS m_pageRightmar;
+    data_MEASUREMENTUNSIGNED m_pageRightmar;
     /** Indicates the number of logical pages to be rendered on a single physical page. **/
     std::string m_pagePanels;
     /** Indicates how the page should be scaled when rendered. **/
@@ -4520,12 +4520,12 @@ public:
     double GetSpacingPackfact() const { return m_spacingPackfact; }
     bool HasSpacingPackfact() const;
     //
-    void SetSpacingStaff(data_MEASUREMENTREL spacingStaff_) { m_spacingStaff = spacingStaff_; }
-    data_MEASUREMENTREL GetSpacingStaff() const { return m_spacingStaff; }
+    void SetSpacingStaff(data_MEASUREMENTSIGNED spacingStaff_) { m_spacingStaff = spacingStaff_; }
+    data_MEASUREMENTSIGNED GetSpacingStaff() const { return m_spacingStaff; }
     bool HasSpacingStaff() const;
     //
-    void SetSpacingSystem(data_MEASUREMENTREL spacingSystem_) { m_spacingSystem = spacingSystem_; }
-    data_MEASUREMENTREL GetSpacingSystem() const { return m_spacingSystem; }
+    void SetSpacingSystem(data_MEASUREMENTSIGNED spacingSystem_) { m_spacingSystem = spacingSystem_; }
+    data_MEASUREMENTSIGNED GetSpacingSystem() const { return m_spacingSystem; }
     bool HasSpacingSystem() const;
     ///@}
 
@@ -4539,14 +4539,14 @@ private:
      * system; measured from the bottom line of the staff above to the top line of the
      * staff below.
      **/
-    data_MEASUREMENTREL m_spacingStaff;
+    data_MEASUREMENTSIGNED m_spacingStaff;
     /**
      * Describes the space between adjacent systems; a pair of space-separated values
      * (minimum and maximum, respectively) provides a range between which a rendering
      * system-supplied value may fall, while a single value indicates a fixed amount of
      * space; that is, the minimum and maximum values are equal.
      **/
-    data_MEASUREMENTREL m_spacingSystem;
+    data_MEASUREMENTSIGNED m_spacingSystem;
 
     /* include <attspacing.system> */
 };
@@ -5103,16 +5103,16 @@ public:
     data_BOOLEAN GetSystemLeftline() const { return m_systemLeftline; }
     bool HasSystemLeftline() const;
     //
-    void SetSystemLeftmar(data_MEASUREMENTABS systemLeftmar_) { m_systemLeftmar = systemLeftmar_; }
-    data_MEASUREMENTABS GetSystemLeftmar() const { return m_systemLeftmar; }
+    void SetSystemLeftmar(data_MEASUREMENTUNSIGNED systemLeftmar_) { m_systemLeftmar = systemLeftmar_; }
+    data_MEASUREMENTUNSIGNED GetSystemLeftmar() const { return m_systemLeftmar; }
     bool HasSystemLeftmar() const;
     //
-    void SetSystemRightmar(data_MEASUREMENTABS systemRightmar_) { m_systemRightmar = systemRightmar_; }
-    data_MEASUREMENTABS GetSystemRightmar() const { return m_systemRightmar; }
+    void SetSystemRightmar(data_MEASUREMENTUNSIGNED systemRightmar_) { m_systemRightmar = systemRightmar_; }
+    data_MEASUREMENTUNSIGNED GetSystemRightmar() const { return m_systemRightmar; }
     bool HasSystemRightmar() const;
     //
-    void SetSystemTopmar(data_MEASUREMENTABS systemTopmar_) { m_systemTopmar = systemTopmar_; }
-    data_MEASUREMENTABS GetSystemTopmar() const { return m_systemTopmar; }
+    void SetSystemTopmar(data_MEASUREMENTUNSIGNED systemTopmar_) { m_systemTopmar = systemTopmar_; }
+    data_MEASUREMENTUNSIGNED GetSystemTopmar() const { return m_systemTopmar; }
     bool HasSystemTopmar() const;
     ///@}
 
@@ -5127,17 +5127,17 @@ private:
      * Describes the amount of whitespace at the left system margin relative to
      * page.leftmar.
      **/
-    data_MEASUREMENTABS m_systemLeftmar;
+    data_MEASUREMENTUNSIGNED m_systemLeftmar;
     /**
      * Describes the amount of whitespace at the right system margin relative to
      * page.rightmar.
      **/
-    data_MEASUREMENTABS m_systemRightmar;
+    data_MEASUREMENTUNSIGNED m_systemRightmar;
     /**
      * Describes the distance from page’s top edge to the first system; used for first
      * page only.
      **/
-    data_MEASUREMENTABS m_systemTopmar;
+    data_MEASUREMENTUNSIGNED m_systemTopmar;
 
     /* include <attsystem.topmar> */
 };
@@ -5677,6 +5677,14 @@ public:
     void SetFontweight(data_FONTWEIGHT fontweight_) { m_fontweight = fontweight_; }
     data_FONTWEIGHT GetFontweight() const { return m_fontweight; }
     bool HasFontweight() const;
+    //
+    void SetLetterspacing(data_MEASUREMENTTYPOGRAPHYSIGNED letterspacing_) { m_letterspacing = letterspacing_; }
+    data_MEASUREMENTTYPOGRAPHYSIGNED GetLetterspacing() const { return m_letterspacing; }
+    bool HasLetterspacing() const;
+    //
+    void SetLineheight(std::string lineheight_) { m_lineheight = lineheight_; }
+    std::string GetLineheight() const { return m_lineheight; }
+    bool HasLineheight() const;
     ///@}
 
 private:
@@ -5694,8 +5702,15 @@ private:
     data_FONTSTYLE m_fontstyle;
     /** Used to indicate bold type. **/
     data_FONTWEIGHT m_fontweight;
+    /**
+     * Indicates letter spacing (aka tracking) in analogy to the CSS letter-spacing
+     * property.
+     **/
+    data_MEASUREMENTTYPOGRAPHYSIGNED m_letterspacing;
+    /** Indicates line height in analogy to the CSS line-height property. **/
+    std::string m_lineheight;
 
-    /* include <attfontweight> */
+    /* include <attlineheight> */
 };
 
 //----------------------------------------------------------------------------
@@ -5833,8 +5848,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetHo(data_MEASUREMENTREL ho_) { m_ho = ho_; }
-    data_MEASUREMENTREL GetHo() const { return m_ho; }
+    void SetHo(data_MEASUREMENTSIGNED ho_) { m_ho = ho_; }
+    data_MEASUREMENTSIGNED GetHo() const { return m_ho; }
     bool HasHo() const;
     ///@}
 
@@ -5844,7 +5859,7 @@ private:
      * location in terms of staff interline distance; that is, in units of 1/2 the
      * distance between adjacent staff lines.
      **/
-    data_MEASUREMENTREL m_ho;
+    data_MEASUREMENTSIGNED m_ho;
 
     /* include <attho> */
 };
@@ -5912,8 +5927,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetVo(data_MEASUREMENTREL vo_) { m_vo = vo_; }
-    data_MEASUREMENTREL GetVo() const { return m_vo; }
+    void SetVo(data_MEASUREMENTSIGNED vo_) { m_vo = vo_; }
+    data_MEASUREMENTSIGNED GetVo() const { return m_vo; }
     bool HasVo() const;
     ///@}
 
@@ -5923,7 +5938,7 @@ private:
      * location in terms of staff interline distance; that is, in units of 1/2 the
      * distance between adjacent staff lines.
      **/
-    data_MEASUREMENTREL m_vo;
+    data_MEASUREMENTSIGNED m_vo;
 
     /* include <attvo> */
 };
@@ -5952,12 +5967,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStartho(data_MEASUREMENTREL startho_) { m_startho = startho_; }
-    data_MEASUREMENTREL GetStartho() const { return m_startho; }
+    void SetStartho(data_MEASUREMENTSIGNED startho_) { m_startho = startho_; }
+    data_MEASUREMENTSIGNED GetStartho() const { return m_startho; }
     bool HasStartho() const;
     //
-    void SetEndho(data_MEASUREMENTREL endho_) { m_endho = endho_; }
-    data_MEASUREMENTREL GetEndho() const { return m_endho; }
+    void SetEndho(data_MEASUREMENTSIGNED endho_) { m_endho = endho_; }
+    data_MEASUREMENTSIGNED GetEndho() const { return m_endho; }
     bool HasEndho() const;
     ///@}
 
@@ -5966,12 +5981,12 @@ private:
      * Records the horizontal adjustment of a feature’s programmatically-determined
      * start point.
      **/
-    data_MEASUREMENTREL m_startho;
+    data_MEASUREMENTSIGNED m_startho;
     /**
      * Records the horizontal adjustment of a feature’s programmatically-determined end
      * point.
      **/
-    data_MEASUREMENTREL m_endho;
+    data_MEASUREMENTSIGNED m_endho;
 
     /* include <attendho> */
 };
@@ -6048,12 +6063,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStartvo(data_MEASUREMENTREL startvo_) { m_startvo = startvo_; }
-    data_MEASUREMENTREL GetStartvo() const { return m_startvo; }
+    void SetStartvo(data_MEASUREMENTSIGNED startvo_) { m_startvo = startvo_; }
+    data_MEASUREMENTSIGNED GetStartvo() const { return m_startvo; }
     bool HasStartvo() const;
     //
-    void SetEndvo(data_MEASUREMENTREL endvo_) { m_endvo = endvo_; }
-    data_MEASUREMENTREL GetEndvo() const { return m_endvo; }
+    void SetEndvo(data_MEASUREMENTSIGNED endvo_) { m_endvo = endvo_; }
+    data_MEASUREMENTSIGNED GetEndvo() const { return m_endvo; }
     bool HasEndvo() const;
     ///@}
 
@@ -6062,12 +6077,12 @@ private:
      * Records a vertical adjustment of a feature’s programmatically-determined start
      * point.
      **/
-    data_MEASUREMENTREL m_startvo;
+    data_MEASUREMENTSIGNED m_startvo;
     /**
      * Records a vertical adjustment of a feature’s programmatically-determined end
      * point.
      **/
-    data_MEASUREMENTREL m_endvo;
+    data_MEASUREMENTSIGNED m_endvo;
 
     /* include <attendvo> */
 };
@@ -6168,14 +6183,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetWidth(data_MEASUREMENTABS width_) { m_width = width_; }
-    data_MEASUREMENTABS GetWidth() const { return m_width; }
+    void SetWidth(data_MEASUREMENTUNSIGNED width_) { m_width = width_; }
+    data_MEASUREMENTUNSIGNED GetWidth() const { return m_width; }
     bool HasWidth() const;
     ///@}
 
 private:
     /** Measurement of the horizontal dimension of an entity. **/
-    data_MEASUREMENTABS m_width;
+    data_MEASUREMENTUNSIGNED m_width;
 
     /* include <attwidth> */
 };

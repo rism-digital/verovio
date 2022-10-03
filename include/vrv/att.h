@@ -151,7 +151,7 @@ public:
     data_MEASUREBEAT StrToMeasurebeat(std::string value, bool logWarning = true) const;
 
     std::string MeasurementabsToStr(data_MEASUREMENTABS data) const { return VUToStr(data); }
-    data_MEASUREMENTABS StrToMeasurementabs(const std::string &value, bool logWarning = true) const
+    data_MEASUREMENTUNSIGNED StrToMeasurementabs(const std::string &value, bool logWarning = true) const
     {
         return StrToVU(value, logWarning);
     }

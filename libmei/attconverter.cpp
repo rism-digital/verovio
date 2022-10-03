@@ -51,6 +51,8 @@ std::string AttConverter::AccidentalGesturalToStr(data_ACCIDENTAL_GESTURAL data)
         case ACCIDENTAL_GESTURAL_bf: value = "bf"; break;
         case ACCIDENTAL_GESTURAL_kmf: value = "kmf"; break;
         case ACCIDENTAL_GESTURAL_bmf: value = "bmf"; break;
+        case ACCIDENTAL_GESTURAL_koron: value = "koron"; break;
+        case ACCIDENTAL_GESTURAL_sori: value = "sori"; break;
         default:
             LogWarning("Unknown value '%d' for data.ACCIDENTAL.GESTURAL", data);
             value = "";
@@ -80,6 +82,8 @@ data_ACCIDENTAL_GESTURAL AttConverter::StrToAccidentalGestural(const std::string
     if (value == "bf") return ACCIDENTAL_GESTURAL_bf;
     if (value == "kmf") return ACCIDENTAL_GESTURAL_kmf;
     if (value == "bmf") return ACCIDENTAL_GESTURAL_bmf;
+    if (value == "koron") return ACCIDENTAL_GESTURAL_koron;
+    if (value == "sori") return ACCIDENTAL_GESTURAL_sori;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.ACCIDENTAL.GESTURAL", value.c_str());
     return ACCIDENTAL_GESTURAL_NONE;
@@ -339,6 +343,29 @@ data_ACCIDENTAL_aeu AttConverter::StrToAccidentalAeu(const std::string &value, b
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.ACCIDENTAL.aeu", value.c_str());
     return ACCIDENTAL_aeu_NONE;
+}
+
+std::string AttConverter::AccidentalPersianToStr(data_ACCIDENTAL_persian data) const
+{
+    std::string value;
+    switch (data) {
+        case ACCIDENTAL_persian_koron: value = "koron"; break;
+        case ACCIDENTAL_persian_sori: value = "sori"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.ACCIDENTAL.persian", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_ACCIDENTAL_persian AttConverter::StrToAccidentalPersian(const std::string &value, bool logWarning) const
+{
+    if (value == "koron") return ACCIDENTAL_persian_koron;
+    if (value == "sori") return ACCIDENTAL_persian_sori;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ACCIDENTAL.persian", value.c_str());
+    return ACCIDENTAL_persian_NONE;
 }
 
 std::string AttConverter::ArticulationToStr(data_ARTICULATION data) const

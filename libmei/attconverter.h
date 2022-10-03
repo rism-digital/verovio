@@ -50,6 +50,9 @@ public:
     std::string AccidentalAeuToStr(data_ACCIDENTAL_aeu data) const;
     data_ACCIDENTAL_aeu StrToAccidentalAeu(const std::string &value, bool logWarning = true) const;
 
+    std::string AccidentalPersianToStr(data_ACCIDENTAL_persian data) const;
+    data_ACCIDENTAL_persian StrToAccidentalPersian(const std::string &value, bool logWarning = true) const;
+
     std::string ArticulationToStr(data_ARTICULATION data) const;
     data_ARTICULATION StrToArticulation(const std::string &value, bool logWarning = true) const;
 

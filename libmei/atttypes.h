@@ -43,6 +43,8 @@ enum data_ACCIDENTAL_GESTURAL {
     ACCIDENTAL_GESTURAL_bf,
     ACCIDENTAL_GESTURAL_kmf,
     ACCIDENTAL_GESTURAL_bmf,
+    ACCIDENTAL_GESTURAL_koron,
+    ACCIDENTAL_GESTURAL_sori,
     ACCIDENTAL_GESTURAL_MAX
 };
 
@@ -163,6 +165,16 @@ enum data_ACCIDENTAL_aeu {
     ACCIDENTAL_aeu_kmf,
     ACCIDENTAL_aeu_bmf,
     ACCIDENTAL_aeu_MAX
+};
+
+/**
+ * MEI data.ACCIDENTAL.persian
+ */
+enum data_ACCIDENTAL_persian {
+    ACCIDENTAL_persian_NONE = 0,
+    ACCIDENTAL_persian_koron,
+    ACCIDENTAL_persian_sori,
+    ACCIDENTAL_persian_MAX
 };
 
 /**
@@ -2497,7 +2509,6 @@ enum whitespace_XMLSPACE {
     whitespace_XMLSPACE_preserve,
     whitespace_XMLSPACE_MAX
 };
-
 
 } // namespace vrv
 
