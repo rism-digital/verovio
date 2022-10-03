@@ -35,9 +35,7 @@ AttSurface::AttSurface() : Att()
     ResetSurface();
 }
 
-AttSurface::~AttSurface()
-{
-}
+AttSurface::~AttSurface() {}
 
 void AttSurface::ResetSurface()
 {

@@ -35,9 +35,7 @@ AttTabular::AttTabular() : Att()
     ResetTabular();
 }
 
-AttTabular::~AttTabular()
-{
-}
+AttTabular::~AttTabular() {}
 
 void AttTabular::ResetTabular()
 {

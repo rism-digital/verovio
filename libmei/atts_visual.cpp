@@ -35,9 +35,7 @@ AttAnnotVis::AttAnnotVis() : Att()
     ResetAnnotVis();
 }
 
-AttAnnotVis::~AttAnnotVis()
-{
-}
+AttAnnotVis::~AttAnnotVis() {}
 
 void AttAnnotVis::ResetAnnotVis()
 {
@@ -81,9 +79,7 @@ AttArpegVis::AttArpegVis() : Att()
     ResetArpegVis();
 }
 
-AttArpegVis::~AttArpegVis()
-{
-}
+AttArpegVis::~AttArpegVis() {}
 
 void AttArpegVis::ResetArpegVis()
 {
@@ -217,9 +213,7 @@ AttBarLineVis::AttBarLineVis() : Att()
     ResetBarLineVis();
 }
 
-AttBarLineVis::~AttBarLineVis()
-{
-}
+AttBarLineVis::~AttBarLineVis() {}
 
 void AttBarLineVis::ResetBarLineVis()
 {
@@ -293,9 +287,7 @@ AttBeamingVis::AttBeamingVis() : Att()
     ResetBeamingVis();
 }
 
-AttBeamingVis::~AttBeamingVis()
-{
-}
+AttBeamingVis::~AttBeamingVis() {}
 
 void AttBeamingVis::ResetBeamingVis()
 {
@@ -369,9 +361,7 @@ AttBeatRptVis::AttBeatRptVis() : Att()
     ResetBeatRptVis();
 }
 
-AttBeatRptVis::~AttBeatRptVis()
-{
-}
+AttBeatRptVis::~AttBeatRptVis() {}
 
 void AttBeatRptVis::ResetBeatRptVis()
 {
@@ -415,9 +405,7 @@ AttChordVis::AttChordVis() : Att()
     ResetChordVis();
 }
 
-AttChordVis::~AttChordVis()
-{
-}
+AttChordVis::~AttChordVis() {}
 
 void AttChordVis::ResetChordVis()
 {
@@ -461,9 +449,7 @@ AttCleffingVis::AttCleffingVis() : Att()
     ResetCleffingVis();
 }
 
-AttCleffingVis::~AttCleffingVis()
-{
-}
+AttCleffingVis::~AttCleffingVis() {}
 
 void AttCleffingVis::ResetCleffingVis()
 {
@@ -522,9 +508,7 @@ AttEpisemaVis::AttEpisemaVis() : Att()
     ResetEpisemaVis();
 }
 
-AttEpisemaVis::~AttEpisemaVis()
-{
-}
+AttEpisemaVis::~AttEpisemaVis() {}
 
 void AttEpisemaVis::ResetEpisemaVis()
 {
@@ -583,9 +567,7 @@ AttFTremVis::AttFTremVis() : Att()
     ResetFTremVis();
 }
 
-AttFTremVis::~AttFTremVis()
-{
-}
+AttFTremVis::~AttFTremVis() {}
 
 void AttFTremVis::ResetFTremVis()
 {
@@ -659,9 +641,7 @@ AttFermataVis::AttFermataVis() : Att()
     ResetFermataVis();
 }
 
-AttFermataVis::~AttFermataVis()
-{
-}
+AttFermataVis::~AttFermataVis() {}
 
 void AttFermataVis::ResetFermataVis()
 {
@@ -720,9 +700,7 @@ AttFingGrpVis::AttFingGrpVis() : Att()
     ResetFingGrpVis();
 }
 
-AttFingGrpVis::~AttFingGrpVis()
-{
-}
+AttFingGrpVis::~AttFingGrpVis() {}
 
 void AttFingGrpVis::ResetFingGrpVis()
 {
@@ -766,9 +744,7 @@ AttHairpinVis::AttHairpinVis() : Att()
     ResetHairpinVis();
 }
 
-AttHairpinVis::~AttHairpinVis()
-{
-}
+AttHairpinVis::~AttHairpinVis() {}
 
 void AttHairpinVis::ResetHairpinVis()
 {
@@ -812,9 +788,7 @@ AttHarmVis::AttHarmVis() : Att()
     ResetHarmVis();
 }
 
-AttHarmVis::~AttHarmVis()
-{
-}
+AttHarmVis::~AttHarmVis() {}
 
 void AttHarmVis::ResetHarmVis()
 {
@@ -858,9 +832,7 @@ AttHispanTickVis::AttHispanTickVis() : Att()
     ResetHispanTickVis();
 }
 
-AttHispanTickVis::~AttHispanTickVis()
-{
-}
+AttHispanTickVis::~AttHispanTickVis() {}
 
 void AttHispanTickVis::ResetHispanTickVis()
 {
@@ -919,9 +891,7 @@ AttKeySigVis::AttKeySigVis() : Att()
     ResetKeySigVis();
 }
 
-AttKeySigVis::~AttKeySigVis()
-{
-}
+AttKeySigVis::~AttKeySigVis() {}
 
 void AttKeySigVis::ResetKeySigVis()
 {
@@ -965,9 +935,7 @@ AttKeySigDefaultVis::AttKeySigDefaultVis() : Att()
     ResetKeySigDefaultVis();
 }
 
-AttKeySigDefaultVis::~AttKeySigDefaultVis()
-{
-}
+AttKeySigDefaultVis::~AttKeySigDefaultVis() {}
 
 void AttKeySigDefaultVis::ResetKeySigDefaultVis()
 {
@@ -1026,9 +994,7 @@ AttLigatureVis::AttLigatureVis() : Att()
     ResetLigatureVis();
 }
 
-AttLigatureVis::~AttLigatureVis()
-{
-}
+AttLigatureVis::~AttLigatureVis() {}
 
 void AttLigatureVis::ResetLigatureVis()
 {
@@ -1072,9 +1038,7 @@ AttLineVis::AttLineVis() : Att()
     ResetLineVis();
 }
 
-AttLineVis::~AttLineVis()
-{
-}
+AttLineVis::~AttLineVis() {}
 
 void AttLineVis::ResetLineVis()
 {
@@ -1193,9 +1157,7 @@ AttLiquescentVis::AttLiquescentVis() : Att()
     ResetLiquescentVis();
 }
 
-AttLiquescentVis::~AttLiquescentVis()
-{
-}
+AttLiquescentVis::~AttLiquescentVis() {}
 
 void AttLiquescentVis::ResetLiquescentVis()
 {
@@ -1254,9 +1216,7 @@ AttMensurVis::AttMensurVis() : Att()
     ResetMensurVis();
 }
 
-AttMensurVis::~AttMensurVis()
-{
-}
+AttMensurVis::~AttMensurVis() {}
 
 void AttMensurVis::ResetMensurVis()
 {
@@ -1345,9 +1305,7 @@ AttMensuralVis::AttMensuralVis() : Att()
     ResetMensuralVis();
 }
 
-AttMensuralVis::~AttMensuralVis()
-{
-}
+AttMensuralVis::~AttMensuralVis() {}
 
 void AttMensuralVis::ResetMensuralVis()
 {
@@ -1496,9 +1454,7 @@ AttMeterSigVis::AttMeterSigVis() : Att()
     ResetMeterSigVis();
 }
 
-AttMeterSigVis::~AttMeterSigVis()
-{
-}
+AttMeterSigVis::~AttMeterSigVis() {}
 
 void AttMeterSigVis::ResetMeterSigVis()
 {
@@ -1542,9 +1498,7 @@ AttMeterSigDefaultVis::AttMeterSigDefaultVis() : Att()
     ResetMeterSigDefaultVis();
 }
 
-AttMeterSigDefaultVis::~AttMeterSigDefaultVis()
-{
-}
+AttMeterSigDefaultVis::~AttMeterSigDefaultVis() {}
 
 void AttMeterSigDefaultVis::ResetMeterSigDefaultVis()
 {
@@ -1603,9 +1557,7 @@ AttMultiRestVis::AttMultiRestVis() : Att()
     ResetMultiRestVis();
 }
 
-AttMultiRestVis::~AttMultiRestVis()
-{
-}
+AttMultiRestVis::~AttMultiRestVis() {}
 
 void AttMultiRestVis::ResetMultiRestVis()
 {
@@ -1649,9 +1601,7 @@ AttPbVis::AttPbVis() : Att()
     ResetPbVis();
 }
 
-AttPbVis::~AttPbVis()
-{
-}
+AttPbVis::~AttPbVis() {}
 
 void AttPbVis::ResetPbVis()
 {
@@ -1695,9 +1645,7 @@ AttPedalVis::AttPedalVis() : Att()
     ResetPedalVis();
 }
 
-AttPedalVis::~AttPedalVis()
-{
-}
+AttPedalVis::~AttPedalVis() {}
 
 void AttPedalVis::ResetPedalVis()
 {
@@ -1741,9 +1689,7 @@ AttQuilismaVis::AttQuilismaVis() : Att()
     ResetQuilismaVis();
 }
 
-AttQuilismaVis::~AttQuilismaVis()
-{
-}
+AttQuilismaVis::~AttQuilismaVis() {}
 
 void AttQuilismaVis::ResetQuilismaVis()
 {
@@ -1787,9 +1733,7 @@ AttSbVis::AttSbVis() : Att()
     ResetSbVis();
 }
 
-AttSbVis::~AttSbVis()
-{
-}
+AttSbVis::~AttSbVis() {}
 
 void AttSbVis::ResetSbVis()
 {
@@ -1833,9 +1777,7 @@ AttScoreDefVis::AttScoreDefVis() : Att()
     ResetScoreDefVis();
 }
 
-AttScoreDefVis::~AttScoreDefVis()
-{
-}
+AttScoreDefVis::~AttScoreDefVis() {}
 
 void AttScoreDefVis::ResetScoreDefVis()
 {
@@ -1879,9 +1821,7 @@ AttSectionVis::AttSectionVis() : Att()
     ResetSectionVis();
 }
 
-AttSectionVis::~AttSectionVis()
-{
-}
+AttSectionVis::~AttSectionVis() {}
 
 void AttSectionVis::ResetSectionVis()
 {
@@ -1925,9 +1865,7 @@ AttSignifLetVis::AttSignifLetVis() : Att()
     ResetSignifLetVis();
 }
 
-AttSignifLetVis::~AttSignifLetVis()
-{
-}
+AttSignifLetVis::~AttSignifLetVis() {}
 
 void AttSignifLetVis::ResetSignifLetVis()
 {
@@ -1971,9 +1909,7 @@ AttSpaceVis::AttSpaceVis() : Att()
     ResetSpaceVis();
 }
 
-AttSpaceVis::~AttSpaceVis()
-{
-}
+AttSpaceVis::~AttSpaceVis() {}
 
 void AttSpaceVis::ResetSpaceVis()
 {
@@ -2017,9 +1953,7 @@ AttStaffDefVis::AttStaffDefVis() : Att()
     ResetStaffDefVis();
 }
 
-AttStaffDefVis::~AttStaffDefVis()
-{
-}
+AttStaffDefVis::~AttStaffDefVis() {}
 
 void AttStaffDefVis::ResetStaffDefVis()
 {
@@ -2123,9 +2057,7 @@ AttStaffGrpVis::AttStaffGrpVis() : Att()
     ResetStaffGrpVis();
 }
 
-AttStaffGrpVis::~AttStaffGrpVis()
-{
-}
+AttStaffGrpVis::~AttStaffGrpVis() {}
 
 void AttStaffGrpVis::ResetStaffGrpVis()
 {
@@ -2169,9 +2101,7 @@ AttTupletVis::AttTupletVis() : Att()
     ResetTupletVis();
 }
 
-AttTupletVis::~AttTupletVis()
-{
-}
+AttTupletVis::~AttTupletVis() {}
 
 void AttTupletVis::ResetTupletVis()
 {

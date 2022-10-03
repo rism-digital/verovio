@@ -35,9 +35,7 @@ AttCrit::AttCrit() : Att()
     ResetCrit();
 }
 
-AttCrit::~AttCrit()
-{
-}
+AttCrit::~AttCrit() {}
 
 void AttCrit::ResetCrit()
 {

@@ -35,9 +35,7 @@ AttExtSym::AttExtSym() : Att()
     ResetExtSym();
 }
 
-AttExtSym::~AttExtSym()
-{
-}
+AttExtSym::~AttExtSym() {}
 
 void AttExtSym::ResetExtSym()
 {

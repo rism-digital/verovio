@@ -35,9 +35,7 @@ AttFingGrpLog::AttFingGrpLog() : Att()
     ResetFingGrpLog();
 }
 
-AttFingGrpLog::~AttFingGrpLog()
-{
-}
+AttFingGrpLog::~AttFingGrpLog() {}
 
 void AttFingGrpLog::ResetFingGrpLog()
 {
