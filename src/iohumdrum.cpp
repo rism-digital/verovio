@@ -25379,10 +25379,10 @@ void HumdrumInput::checkBeamWith(
         // something strange happened
     }
     if (isAbove) {
-        beam->SetBeamWith(OTHERSTAFF_above);
+        beam->SetBeamWith(NEIGHBORINGLAYER_above);
     }
     if (isBelow) {
-        beam->SetBeamWith(OTHERSTAFF_below);
+        beam->SetBeamWith(NEIGHBORINGLAYER_below);
     }
 }
 
