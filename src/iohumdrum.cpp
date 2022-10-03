@@ -19583,7 +19583,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         if (ss[staffindex].pedal) {
             // already on, so turn off first
             pedal->SetDir(pedalLog_DIR_bounce);
-            pedal->SetForm(pedalVis_FORM_altpedstar);
+            pedal->SetForm(PEDALSTYLE_altpedstar);
         }
         ss[staffindex].pedal = true;
     }

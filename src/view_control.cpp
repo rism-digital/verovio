@@ -2229,13 +2229,13 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     dc->StartGraphic(pedal, "", pedal->GetID());
 
-    pedalVis_FORM form = pedal->GetPedalForm(m_doc, system);
+    data_PEDALSTYLE form = pedal->GetPedalForm(m_doc, system);
 
     // Draw a symbol, if it's not a line
-    if (form != pedalVis_FORM_line) {
+    if (form != PEDALSTYLE_line) {
 
         bool bounceStar = true;
-        if (form == pedalVis_FORM_altpedstar) bounceStar = false;
+        if (form == PEDALSTYLE_altpedstar) bounceStar = false;
 
         int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 

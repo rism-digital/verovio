@@ -2298,7 +2298,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             // pedal->SetN(xmlPedal.attribute("number").as_string());
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
             pedal->SetDir(ConvertPedalTypeToDir(pedalType));
-            if (pedalLine) pedal->SetForm(pedalVis_FORM_line);
+            if (pedalLine) pedal->SetForm(PEDALSTYLE_line);
             if (xmlPedal.attribute("abbreviated")) {
                 pedal->SetExternalsymbols(pedal, "glyph.auth", "smufl");
                 pedal->SetExternalsymbols(pedal, "glyph.num", "U+E651");
