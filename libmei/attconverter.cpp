@@ -493,11 +493,15 @@ std::string AttConverter::BarrenditionToStr(data_BARRENDITION data) const
         case BARRENDITION_dbl: value = "dbl"; break;
         case BARRENDITION_dbldashed: value = "dbldashed"; break;
         case BARRENDITION_dbldotted: value = "dbldotted"; break;
+        case BARRENDITION_dblheavy: value = "dblheavy"; break;
+        case BARRENDITION_dblsegno: value = "dblsegno"; break;
         case BARRENDITION_end: value = "end"; break;
+        case BARRENDITION_heavy: value = "heavy"; break;
         case BARRENDITION_invis: value = "invis"; break;
         case BARRENDITION_rptstart: value = "rptstart"; break;
         case BARRENDITION_rptboth: value = "rptboth"; break;
         case BARRENDITION_rptend: value = "rptend"; break;
+        case BARRENDITION_segno: value = "segno"; break;
         case BARRENDITION_single: value = "single"; break;
         default:
             LogWarning("Unknown value '%d' for data.BARRENDITION", data);
@@ -514,11 +518,15 @@ data_BARRENDITION AttConverter::StrToBarrendition(const std::string &value, bool
     if (value == "dbl") return BARRENDITION_dbl;
     if (value == "dbldashed") return BARRENDITION_dbldashed;
     if (value == "dbldotted") return BARRENDITION_dbldotted;
+    if (value == "dblheavy") return BARRENDITION_dblheavy;
+    if (value == "dblsegno") return BARRENDITION_dblsegno;
     if (value == "end") return BARRENDITION_end;
+    if (value == "heavy") return BARRENDITION_heavy;
     if (value == "invis") return BARRENDITION_invis;
     if (value == "rptstart") return BARRENDITION_rptstart;
     if (value == "rptboth") return BARRENDITION_rptboth;
     if (value == "rptend") return BARRENDITION_rptend;
+    if (value == "segno") return BARRENDITION_segno;
     if (value == "single") return BARRENDITION_single;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.BARRENDITION", value.c_str());
@@ -2945,6 +2953,33 @@ data_NOTEHEADMODIFIER_list AttConverter::StrToNoteheadmodifierList(const std::st
     return NOTEHEADMODIFIER_list_NONE;
 }
 
+std::string AttConverter::PedalstyleToStr(data_PEDALSTYLE data) const
+{
+    std::string value;
+    switch (data) {
+        case PEDALSTYLE_line: value = "line"; break;
+        case PEDALSTYLE_pedline: value = "pedline"; break;
+        case PEDALSTYLE_pedstar: value = "pedstar"; break;
+        case PEDALSTYLE_altpedstar: value = "altpedstar"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.PEDALSTYLE", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_PEDALSTYLE AttConverter::StrToPedalstyle(const std::string &value, bool logWarning) const
+{
+    if (value == "line") return PEDALSTYLE_line;
+    if (value == "pedline") return PEDALSTYLE_pedline;
+    if (value == "pedstar") return PEDALSTYLE_pedstar;
+    if (value == "altpedstar") return PEDALSTYLE_altpedstar;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.PEDALSTYLE", value.c_str());
+    return PEDALSTYLE_NONE;
+}
+
 std::string AttConverter::RelationshipToStr(data_RELATIONSHIP data) const
 {
     std::string value;
@@ -4995,56 +5030,6 @@ pedalLog_FUNC AttConverter::StrToPedalLogFunc(const std::string &value, bool log
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.pedal.log@func", value.c_str());
     return pedalLog_FUNC_NONE;
-}
-
-std::string AttConverter::PedalVisFormToStr(pedalVis_FORM data) const
-{
-    std::string value;
-    switch (data) {
-        case pedalVis_FORM_line: value = "line"; break;
-        case pedalVis_FORM_pedstar: value = "pedstar"; break;
-        case pedalVis_FORM_altpedstar: value = "altpedstar"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.pedal.vis@form", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-pedalVis_FORM AttConverter::StrToPedalVisForm(const std::string &value, bool logWarning) const
-{
-    if (value == "line") return pedalVis_FORM_line;
-    if (value == "pedstar") return pedalVis_FORM_pedstar;
-    if (value == "altpedstar") return pedalVis_FORM_altpedstar;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.pedal.vis@form", value.c_str());
-    return pedalVis_FORM_NONE;
-}
-
-std::string AttConverter::PianoPedalsPedalstyleToStr(pianoPedals_PEDALSTYLE data) const
-{
-    std::string value;
-    switch (data) {
-        case pianoPedals_PEDALSTYLE_line: value = "line"; break;
-        case pianoPedals_PEDALSTYLE_pedstar: value = "pedstar"; break;
-        case pianoPedals_PEDALSTYLE_altpedstar: value = "altpedstar"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.pianoPedals@pedal.style", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-pianoPedals_PEDALSTYLE AttConverter::StrToPianoPedalsPedalstyle(const std::string &value, bool logWarning) const
-{
-    if (value == "line") return pianoPedals_PEDALSTYLE_line;
-    if (value == "pedstar") return pianoPedals_PEDALSTYLE_pedstar;
-    if (value == "altpedstar") return pianoPedals_PEDALSTYLE_altpedstar;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.pianoPedals@pedal.style", value.c_str());
-    return pianoPedals_PEDALSTYLE_NONE;
 }
 
 std::string AttConverter::PointingXlinkactuateToStr(pointing_XLINKACTUATE data) const

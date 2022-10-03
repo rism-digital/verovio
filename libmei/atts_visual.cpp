@@ -1664,14 +1664,14 @@ AttPedalVis::~AttPedalVis() {}
 
 void AttPedalVis::ResetPedalVis()
 {
-    m_form = pedalVis_FORM_NONE;
+    m_form = PEDALSTYLE_NONE;
 }
 
 bool AttPedalVis::ReadPedalVis(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("form")) {
-        this->SetForm(StrToPedalVisForm(element.attribute("form").value()));
+        this->SetForm(StrToPedalstyle(element.attribute("form").value()));
         element.remove_attribute("form");
         hasAttribute = true;
     }
@@ -1682,7 +1682,7 @@ bool AttPedalVis::WritePedalVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasForm()) {
-        element.append_attribute("form") = PedalVisFormToStr(this->GetForm()).c_str();
+        element.append_attribute("form") = PedalstyleToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1690,7 +1690,7 @@ bool AttPedalVis::WritePedalVis(pugi::xml_node element)
 
 bool AttPedalVis::HasForm() const
 {
-    return (m_form != pedalVis_FORM_NONE);
+    return (m_form != PEDALSTYLE_NONE);
 }
 
 /* include <attform> */
@@ -2542,7 +2542,7 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
         AttPedalVis *att = dynamic_cast<AttPedalVis *>(element);
         assert(att);
         if (attrType == "form") {
-            att->SetForm(att->StrToPedalVisForm(attrValue));
+            att->SetForm(att->StrToPedalstyle(attrValue));
             return true;
         }
     }
@@ -2936,7 +2936,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         const AttPedalVis *att = dynamic_cast<const AttPedalVis *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back({ "form", att->PedalVisFormToStr(att->GetForm()) });
+            attributes->push_back({ "form", att->PedalstyleToStr(att->GetForm()) });
         }
     }
     if (element->HasAttClass(ATT_QUILISMAVIS)) {

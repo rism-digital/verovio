@@ -485,6 +485,65 @@ bool AttNoteGes::HasPnum() const
 /* include <attpnum> */
 
 //----------------------------------------------------------------------------
+// AttOrnamentAccidGes
+//----------------------------------------------------------------------------
+
+AttOrnamentAccidGes::AttOrnamentAccidGes() : Att()
+{
+    ResetOrnamentAccidGes();
+}
+
+AttOrnamentAccidGes::~AttOrnamentAccidGes() {}
+
+void AttOrnamentAccidGes::ResetOrnamentAccidGes()
+{
+    m_accidupperGes = ACCIDENTAL_GESTURAL_NONE;
+    m_accidlowerGes = ACCIDENTAL_GESTURAL_NONE;
+}
+
+bool AttOrnamentAccidGes::ReadOrnamentAccidGes(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("accidupper.ges")) {
+        this->SetAccidupperGes(StrToAccidentalGestural(element.attribute("accidupper.ges").value()));
+        element.remove_attribute("accidupper.ges");
+        hasAttribute = true;
+    }
+    if (element.attribute("accidlower.ges")) {
+        this->SetAccidlowerGes(StrToAccidentalGestural(element.attribute("accidlower.ges").value()));
+        element.remove_attribute("accidlower.ges");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttOrnamentAccidGes::WriteOrnamentAccidGes(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasAccidupperGes()) {
+        element.append_attribute("accidupper.ges") = AccidentalGesturalToStr(this->GetAccidupperGes()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasAccidlowerGes()) {
+        element.append_attribute("accidlower.ges") = AccidentalGesturalToStr(this->GetAccidlowerGes()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttOrnamentAccidGes::HasAccidupperGes() const
+{
+    return (m_accidupperGes != ACCIDENTAL_GESTURAL_NONE);
+}
+
+bool AttOrnamentAccidGes::HasAccidlowerGes() const
+{
+    return (m_accidlowerGes != ACCIDENTAL_GESTURAL_NONE);
+}
+
+/* include <attaccidlower.ges> */
+
+//----------------------------------------------------------------------------
 // AttSectionGes
 //----------------------------------------------------------------------------
 
@@ -803,6 +862,18 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
             return true;
         }
     }
+    if (element->HasAttClass(ATT_ORNAMENTACCIDGES)) {
+        AttOrnamentAccidGes *att = dynamic_cast<AttOrnamentAccidGes *>(element);
+        assert(att);
+        if (attrType == "accidupper.ges") {
+            att->SetAccidupperGes(att->StrToAccidentalGestural(attrValue));
+            return true;
+        }
+        if (attrType == "accidlower.ges") {
+            att->SetAccidlowerGes(att->StrToAccidentalGestural(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_SECTIONGES)) {
         AttSectionGes *att = dynamic_cast<AttSectionGes *>(element);
         assert(att);
@@ -930,6 +1001,16 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasPnum()) {
             attributes->push_back({ "pnum", att->IntToStr(att->GetPnum()) });
+        }
+    }
+    if (element->HasAttClass(ATT_ORNAMENTACCIDGES)) {
+        const AttOrnamentAccidGes *att = dynamic_cast<const AttOrnamentAccidGes *>(element);
+        assert(att);
+        if (att->HasAccidupperGes()) {
+            attributes->push_back({ "accidupper.ges", att->AccidentalGesturalToStr(att->GetAccidupperGes()) });
+        }
+        if (att->HasAccidlowerGes()) {
+            attributes->push_back({ "accidlower.ges", att->AccidentalGesturalToStr(att->GetAccidlowerGes()) });
         }
     }
     if (element->HasAttClass(ATT_SECTIONGES)) {

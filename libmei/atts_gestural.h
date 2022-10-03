@@ -351,6 +351,48 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttOrnamentAccidGes
+//----------------------------------------------------------------------------
+
+class AttOrnamentAccidGes : public Att {
+public:
+    AttOrnamentAccidGes();
+    virtual ~AttOrnamentAccidGes();
+
+    /** Reset the default values for the attribute class **/
+    void ResetOrnamentAccidGes();
+
+    /** Read the values for the attribute class **/
+    bool ReadOrnamentAccidGes(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteOrnamentAccidGes(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAccidupperGes(data_ACCIDENTAL_GESTURAL accidupperGes_) { m_accidupperGes = accidupperGes_; }
+    data_ACCIDENTAL_GESTURAL GetAccidupperGes() const { return m_accidupperGes; }
+    bool HasAccidupperGes() const;
+    //
+    void SetAccidlowerGes(data_ACCIDENTAL_GESTURAL accidlowerGes_) { m_accidlowerGes = accidlowerGes_; }
+    data_ACCIDENTAL_GESTURAL GetAccidlowerGes() const { return m_accidlowerGes; }
+    bool HasAccidlowerGes() const;
+    ///@}
+
+private:
+    /** Records the sounding accidental associated with an upper neighboring note. **/
+    data_ACCIDENTAL_GESTURAL m_accidupperGes;
+    /** Records the sounding accidental associated with a lower neighboring note. **/
+    data_ACCIDENTAL_GESTURAL m_accidlowerGes;
+
+    /* include <attaccidlower.ges> */
+};
+
+//----------------------------------------------------------------------------
 // AttSectionGes
 //----------------------------------------------------------------------------
 

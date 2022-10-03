@@ -5678,8 +5678,8 @@ public:
     data_FONTWEIGHT GetFontweight() const { return m_fontweight; }
     bool HasFontweight() const;
     //
-    void SetLetterspacing(data_MEASUREMENTTYPOGRAPHYSIGNED letterspacing_) { m_letterspacing = letterspacing_; }
-    data_MEASUREMENTTYPOGRAPHYSIGNED GetLetterspacing() const { return m_letterspacing; }
+    void SetLetterspacing(double letterspacing_) { m_letterspacing = letterspacing_; }
+    double GetLetterspacing() const { return m_letterspacing; }
     bool HasLetterspacing() const;
     //
     void SetLineheight(std::string lineheight_) { m_lineheight = lineheight_; }
@@ -5706,7 +5706,7 @@ private:
      * Indicates letter spacing (aka tracking) in analogy to the CSS letter-spacing
      * property.
      **/
-    data_MEASUREMENTTYPOGRAPHYSIGNED m_letterspacing;
+    double m_letterspacing;
     /** Indicates line height in analogy to the CSS line-height property. **/
     std::string m_lineheight;
 

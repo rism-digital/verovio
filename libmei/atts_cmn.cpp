@@ -1320,14 +1320,14 @@ AttPianoPedals::~AttPianoPedals() {}
 
 void AttPianoPedals::ResetPianoPedals()
 {
-    m_pedalStyle = pianoPedals_PEDALSTYLE_NONE;
+    m_pedalStyle = PEDALSTYLE_NONE;
 }
 
 bool AttPianoPedals::ReadPianoPedals(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("pedal.style")) {
-        this->SetPedalStyle(StrToPianoPedalsPedalstyle(element.attribute("pedal.style").value()));
+        this->SetPedalStyle(StrToPedalstyle(element.attribute("pedal.style").value()));
         element.remove_attribute("pedal.style");
         hasAttribute = true;
     }
@@ -1338,7 +1338,7 @@ bool AttPianoPedals::WritePianoPedals(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasPedalStyle()) {
-        element.append_attribute("pedal.style") = PianoPedalsPedalstyleToStr(this->GetPedalStyle()).c_str();
+        element.append_attribute("pedal.style") = PedalstyleToStr(this->GetPedalStyle()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1346,7 +1346,7 @@ bool AttPianoPedals::WritePianoPedals(pugi::xml_node element)
 
 bool AttPianoPedals::HasPedalStyle() const
 {
-    return (m_pedalStyle != pianoPedals_PEDALSTYLE_NONE);
+    return (m_pedalStyle != PEDALSTYLE_NONE);
 }
 
 /* include <attpedal.style> */
@@ -1903,7 +1903,7 @@ bool Att::SetCmn(Object *element, const std::string &attrType, const std::string
         AttPianoPedals *att = dynamic_cast<AttPianoPedals *>(element);
         assert(att);
         if (attrType == "pedal.style") {
-            att->SetPedalStyle(att->StrToPianoPedalsPedalstyle(attrValue));
+            att->SetPedalStyle(att->StrToPedalstyle(attrValue));
             return true;
         }
     }
@@ -2186,7 +2186,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         const AttPianoPedals *att = dynamic_cast<const AttPianoPedals *>(element);
         assert(att);
         if (att->HasPedalStyle()) {
-            attributes->push_back({ "pedal.style", att->PianoPedalsPedalstyleToStr(att->GetPedalStyle()) });
+            attributes->push_back({ "pedal.style", att->PedalstyleToStr(att->GetPedalStyle()) });
         }
     }
     if (element->HasAttClass(ATT_REHEARSAL)) {

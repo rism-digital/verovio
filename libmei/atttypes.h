@@ -242,11 +242,15 @@ enum data_BARRENDITION {
     BARRENDITION_dbl,
     BARRENDITION_dbldashed,
     BARRENDITION_dbldotted,
+    BARRENDITION_dblheavy,
+    BARRENDITION_dblsegno,
     BARRENDITION_end,
+    BARRENDITION_heavy,
     BARRENDITION_invis,
     BARRENDITION_rptstart,
     BARRENDITION_rptboth,
     BARRENDITION_rptend,
+    BARRENDITION_segno,
     BARRENDITION_single,
     BARRENDITION_MAX
 };
@@ -1384,6 +1388,18 @@ enum data_NOTEHEADMODIFIER_list {
 };
 
 /**
+ * MEI data.PEDALSTYLE
+ */
+enum data_PEDALSTYLE {
+    PEDALSTYLE_NONE = 0,
+    PEDALSTYLE_line,
+    PEDALSTYLE_pedline,
+    PEDALSTYLE_pedstar,
+    PEDALSTYLE_altpedstar,
+    PEDALSTYLE_MAX
+};
+
+/**
  * MEI data.RELATIONSHIP
  */
 enum data_RELATIONSHIP {
@@ -2302,28 +2318,6 @@ enum pedalLog_FUNC {
     pedalLog_FUNC_sostenuto,
     pedalLog_FUNC_silent,
     pedalLog_FUNC_MAX
-};
-
-/**
- * MEI att.pedal.vis@form
- */
-enum pedalVis_FORM {
-    pedalVis_FORM_NONE = 0,
-    pedalVis_FORM_line,
-    pedalVis_FORM_pedstar,
-    pedalVis_FORM_altpedstar,
-    pedalVis_FORM_MAX
-};
-
-/**
- * MEI att.pianoPedals@pedal.style
- */
-enum pianoPedals_PEDALSTYLE {
-    pianoPedals_PEDALSTYLE_NONE = 0,
-    pianoPedals_PEDALSTYLE_line,
-    pianoPedals_PEDALSTYLE_pedstar,
-    pianoPedals_PEDALSTYLE_altpedstar,
-    pianoPedals_PEDALSTYLE_MAX
 };
 
 /**

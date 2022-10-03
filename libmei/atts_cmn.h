@@ -1054,14 +1054,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPedalStyle(pianoPedals_PEDALSTYLE pedalStyle_) { m_pedalStyle = pedalStyle_; }
-    pianoPedals_PEDALSTYLE GetPedalStyle() const { return m_pedalStyle; }
+    void SetPedalStyle(data_PEDALSTYLE pedalStyle_) { m_pedalStyle = pedalStyle_; }
+    data_PEDALSTYLE GetPedalStyle() const { return m_pedalStyle; }
     bool HasPedalStyle() const;
     ///@}
 
 private:
     /** Determines whether piano pedal marks should be rendered as lines or as terms. **/
-    pianoPedals_PEDALSTYLE m_pedalStyle;
+    data_PEDALSTYLE m_pedalStyle;
 
     /* include <attpedal.style> */
 };

@@ -7192,7 +7192,7 @@ void AttTypography::ResetTypography()
     m_fontsize = data_FONTSIZE();
     m_fontstyle = FONTSTYLE_NONE;
     m_fontweight = FONTWEIGHT_NONE;
-    m_letterspacing = MEASUREMENTTYPOGRAPHYSIGNED_NONE;
+    m_letterspacing = 0.0;
     m_lineheight = "";
 }
 
@@ -7225,7 +7225,7 @@ bool AttTypography::ReadTypography(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("letterspacing")) {
-        this->SetLetterspacing(StrToMeasurementtypographysigned(element.attribute("letterspacing").value()));
+        this->SetLetterspacing(StrToDbl(element.attribute("letterspacing").value()));
         element.remove_attribute("letterspacing");
         hasAttribute = true;
     }
@@ -7261,7 +7261,7 @@ bool AttTypography::WriteTypography(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasLetterspacing()) {
-        element.append_attribute("letterspacing") = MeasurementtypographysignedToStr(this->GetLetterspacing()).c_str();
+        element.append_attribute("letterspacing") = DblToStr(this->GetLetterspacing()).c_str();
         wroteAttribute = true;
     }
     if (this->HasLineheight()) {
@@ -7298,7 +7298,7 @@ bool AttTypography::HasFontweight() const
 
 bool AttTypography::HasLetterspacing() const
 {
-    return (m_letterspacing != MEASUREMENTTYPOGRAPHYSIGNED_NONE);
+    return (m_letterspacing != 0.0);
 }
 
 bool AttTypography::HasLineheight() const
@@ -9457,7 +9457,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
         if (attrType == "letterspacing") {
-            att->SetLetterspacing(att->StrToMeasurementtypographysigned(attrValue));
+            att->SetLetterspacing(att->StrToDbl(attrValue));
             return true;
         }
         if (attrType == "lineheight") {
@@ -10823,7 +10823,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "fontweight", att->FontweightToStr(att->GetFontweight()) });
         }
         if (att->HasLetterspacing()) {
-            attributes->push_back({ "letterspacing", att->MeasurementtypographysignedToStr(att->GetLetterspacing()) });
+            attributes->push_back({ "letterspacing", att->DblToStr(att->GetLetterspacing()) });
         }
         if (att->HasLineheight()) {
             attributes->push_back({ "lineheight", att->StrToStr(att->GetLineheight()) });

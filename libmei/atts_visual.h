@@ -1194,14 +1194,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(pedalVis_FORM form_) { m_form = form_; }
-    pedalVis_FORM GetForm() const { return m_form; }
+    void SetForm(data_PEDALSTYLE form_) { m_form = form_; }
+    data_PEDALSTYLE GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
-    pedalVis_FORM m_form;
+    data_PEDALSTYLE m_form;
 
     /* include <attform> */
 };

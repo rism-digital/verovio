@@ -218,6 +218,9 @@ public:
     std::string NoteheadmodifierListToStr(data_NOTEHEADMODIFIER_list data) const;
     data_NOTEHEADMODIFIER_list StrToNoteheadmodifierList(const std::string &value, bool logWarning = true) const;
 
+    std::string PedalstyleToStr(data_PEDALSTYLE data) const;
+    data_PEDALSTYLE StrToPedalstyle(const std::string &value, bool logWarning = true) const;
+
     std::string RelationshipToStr(data_RELATIONSHIP data) const;
     data_RELATIONSHIP StrToRelationship(const std::string &value, bool logWarning = true) const;
 
@@ -427,12 +430,6 @@ public:
 
     std::string PedalLogFuncToStr(pedalLog_FUNC data) const;
     pedalLog_FUNC StrToPedalLogFunc(const std::string &value, bool logWarning = true) const;
-
-    std::string PedalVisFormToStr(pedalVis_FORM data) const;
-    pedalVis_FORM StrToPedalVisForm(const std::string &value, bool logWarning = true) const;
-
-    std::string PianoPedalsPedalstyleToStr(pianoPedals_PEDALSTYLE data) const;
-    pianoPedals_PEDALSTYLE StrToPianoPedalsPedalstyle(const std::string &value, bool logWarning = true) const;
 
     std::string PointingXlinkactuateToStr(pointing_XLINKACTUATE data) const;
     pointing_XLINKACTUATE StrToPointingXlinkactuate(const std::string &value, bool logWarning = true) const;
