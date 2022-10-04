@@ -4022,8 +4022,9 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(const std::string &value, co
     if (value == "dashed") return BARRENDITION_dashed;
     if (value == "dotted") return BARRENDITION_dotted;
     if (value == "light-light") return BARRENDITION_dbl;
-    // if (value == "heavy-heavy") return; // TODO: Support Double thick barlines.
+    if (value == "heavy-heavy") return BARRENDITION_dblheavy;
     if ((value == "light-heavy") && !repeat) return BARRENDITION_end;
+    if (value == "heavy") return BARRENDITION_heavy;
     if (value == "none") return BARRENDITION_invis;
     if ((value == "heavy-light") && repeat) return BARRENDITION_rptstart;
     // if (value == "") return BARRENDITION_rptboth;
