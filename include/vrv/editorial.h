@@ -61,6 +61,14 @@ public:
     //----------//
 
     /**
+     * See Object::Save
+     */
+    ///@{
+    int Save(FunctorParams *functorParams) override;
+    int SaveEnd(FunctorParams *functorParams) override;
+    ///@}
+
+    /**
      * See Object::ConvertToPageBased
      */
     int ConvertToPageBased(FunctorParams *functorParams) override;

@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -60,31 +60,31 @@ void Turn::Reset()
     m_drawingEndElement = NULL;
 }
 
-wchar_t Turn::GetTurnGlyph() const
+char32_t Turn::GetTurnGlyph() const
 {
     const Resources *resources = this->GetDocResources();
     if (!resources) return 0;
 
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
-        wchar_t code = this->GetGlyphNum();
+        char32_t code = this->GetGlyphNum();
         if (NULL != resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
-        wchar_t code = resources->GetGlyphCode(this->GetGlyphName());
+        char32_t code = resources->GetGlyphCode(this->GetGlyphName());
         if (NULL != resources->GetGlyph(code)) return code;
     }
 
     return (this->GetForm() == turnLog_FORM_lower) ? SMUFL_E568_ornamentTurnInverted : SMUFL_E567_ornamentTurn;
 }
 
-int Turn::GetTurnHeight(Doc *doc, int staffSize) const
+int Turn::GetTurnHeight(const Doc *doc, int staffSize) const
 {
     assert(doc);
 
-    wchar_t originalGlyph = this->GetTurnGlyph();
-    wchar_t referenceGlyph;
+    char32_t originalGlyph = this->GetTurnGlyph();
+    char32_t referenceGlyph;
     switch (originalGlyph) {
         case SMUFL_E569_ornamentTurnSlash: referenceGlyph = SMUFL_E567_ornamentTurn; break;
         case SMUFL_E56D_ornamentMordent: referenceGlyph = SMUFL_E56C_ornamentShortTrill; break;

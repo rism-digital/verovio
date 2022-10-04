@@ -95,9 +95,8 @@ private:
      * Captures scale degree information using Humdrum **deg syntax -- an optional
      * indicator of melodic approach (^ = ascending approach, v = descending approach),
      * a scale degree value (1 = tonic ...
-     * 7 = leading tone), and an optional indication of chromatic alteration, "1",
-     * "v7", "^1", or "v5+", for example. The amount of chromatic alternation is not
-     * indicated.
+     * 7 = leading tone), and an optional indication of chromatic alteration, 1, v7,
+     * ^1, or v5+, for example. The amount of chromatic alternation is not indicated.
      **/
     std::string m_deg;
 
@@ -255,11 +254,14 @@ public:
     ///@}
 
 private:
-    /** Contains an accidental for the tonic key, if one is required, **/
+    /**
+     * Contains an accidental for the tonic key, if one is required, e.g., if key.pname
+     * equals c and key.accid equals s, then a tonic of C# is indicated.
+     **/
     data_ACCIDENTAL_GESTURAL m_keyAccid;
     /** Indicates major, minor, or other tonality. **/
     data_MODE m_keyMode;
-    /** Holds the pitch name of the tonic key, **/
+    /** Holds the pitch name of the tonic key, e.g., c for the key of C. **/
     data_PITCHNAME m_keyPname;
 
     /* include <attkey.pname> */
@@ -367,12 +369,15 @@ public:
     ///@}
 
 private:
-    /** Contains sol-fa designation, **/
+    /**
+     * Contains sol-fa designation, e.g., do, re, mi, etc., in either a fixed or
+     * movable Do system.
+     **/
     std::string m_psolfa;
 
     /* include <attpsolfa> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_ANALYTICAL_H__

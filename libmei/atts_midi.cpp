@@ -16,7 +16,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -35,16 +35,14 @@ AttChannelized::AttChannelized() : Att()
     ResetChannelized();
 }
 
-AttChannelized::~AttChannelized()
-{
-}
+AttChannelized::~AttChannelized() {}
 
 void AttChannelized::ResetChannelized()
 {
     m_midiChannel = -1;
     m_midiDuty = -1.0;
     m_midiPort = data_MIDIVALUE_NAME();
-    m_midiTrack = 0;
+    m_midiTrack = VRV_UNSET;
 }
 
 bool AttChannelized::ReadChannelized(pugi::xml_node element)
@@ -112,7 +110,7 @@ bool AttChannelized::HasMidiPort() const
 
 bool AttChannelized::HasMidiTrack() const
 {
-    return (m_midiTrack != 0);
+    return (m_midiTrack != VRV_UNSET);
 }
 
 /* include <attmidi.track> */
@@ -126,9 +124,7 @@ AttInstrumentIdent::AttInstrumentIdent() : Att()
     ResetInstrumentIdent();
 }
 
-AttInstrumentIdent::~AttInstrumentIdent()
-{
-}
+AttInstrumentIdent::~AttInstrumentIdent() {}
 
 void AttInstrumentIdent::ResetInstrumentIdent()
 {
@@ -172,9 +168,7 @@ AttMidiInstrument::AttMidiInstrument() : Att()
     ResetMidiInstrument();
 }
 
-AttMidiInstrument::~AttMidiInstrument()
-{
-}
+AttMidiInstrument::~AttMidiInstrument() {}
 
 void AttMidiInstrument::ResetMidiInstrument()
 {
@@ -293,13 +287,11 @@ AttMidiNumber::AttMidiNumber() : Att()
     ResetMidiNumber();
 }
 
-AttMidiNumber::~AttMidiNumber()
-{
-}
+AttMidiNumber::~AttMidiNumber() {}
 
 void AttMidiNumber::ResetMidiNumber()
 {
-    m_num = 0;
+    m_num = VRV_UNSET;
 }
 
 bool AttMidiNumber::ReadMidiNumber(pugi::xml_node element)
@@ -325,7 +317,7 @@ bool AttMidiNumber::WriteMidiNumber(pugi::xml_node element)
 
 bool AttMidiNumber::HasNum() const
 {
-    return (m_num != 0);
+    return (m_num != VRV_UNSET);
 }
 
 /* include <attnum> */
@@ -339,9 +331,7 @@ AttMidiTempo::AttMidiTempo() : Att()
     ResetMidiTempo();
 }
 
-AttMidiTempo::~AttMidiTempo()
-{
-}
+AttMidiTempo::~AttMidiTempo() {}
 
 void AttMidiTempo::ResetMidiTempo()
 {
@@ -400,9 +390,7 @@ AttMidiValue::AttMidiValue() : Att()
     ResetMidiValue();
 }
 
-AttMidiValue::~AttMidiValue()
-{
-}
+AttMidiValue::~AttMidiValue() {}
 
 void AttMidiValue::ResetMidiValue()
 {
@@ -446,9 +434,7 @@ AttMidiValue2::AttMidiValue2() : Att()
     ResetMidiValue2();
 }
 
-AttMidiValue2::~AttMidiValue2()
-{
-}
+AttMidiValue2::~AttMidiValue2() {}
 
 void AttMidiValue2::ResetMidiValue2()
 {
@@ -492,9 +478,7 @@ AttMidiVelocity::AttMidiVelocity() : Att()
     ResetMidiVelocity();
 }
 
-AttMidiVelocity::~AttMidiVelocity()
-{
-}
+AttMidiVelocity::~AttMidiVelocity() {}
 
 void AttMidiVelocity::ResetMidiVelocity()
 {
@@ -538,13 +522,11 @@ AttTimeBase::AttTimeBase() : Att()
     ResetTimeBase();
 }
 
-AttTimeBase::~AttTimeBase()
-{
-}
+AttTimeBase::~AttTimeBase() {}
 
 void AttTimeBase::ResetTimeBase()
 {
-    m_ppq = 0;
+    m_ppq = VRV_UNSET;
 }
 
 bool AttTimeBase::ReadTimeBase(pugi::xml_node element)
@@ -570,7 +552,7 @@ bool AttTimeBase::WriteTimeBase(pugi::xml_node element)
 
 bool AttTimeBase::HasPpq() const
 {
-    return (m_ppq != 0);
+    return (m_ppq != VRV_UNSET);
 }
 
 /* include <attppq> */
@@ -783,4 +765,4 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

@@ -5,10 +5,12 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
+#include "layerelement.h"
+
 //----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <climits>
 #include <math.h>
 #include <numeric>
@@ -51,6 +53,7 @@
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
+#include "stem.h"
 #include "syl.h"
 #include "tabgrp.h"
 #include "tie.h"
@@ -600,7 +603,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
 
     if (!this->Is({ CHORD, NOTE, REST })) return 0;
 
-    wchar_t code = 0;
+    char32_t code = 0;
     int dur = DUR_4;
     const Staff *staff = this->GetAncestorStaff();
     bool isMensuralDur = false;
@@ -995,7 +998,7 @@ data_STEMMODIFIER LayerElement::GetDrawingStemMod() const
     return stem->GetStemMod();
 }
 
-wchar_t LayerElement::StemModToGlyph(data_STEMMODIFIER stemMod) const
+char32_t LayerElement::StemModToGlyph(data_STEMMODIFIER stemMod) const
 {
     switch (stemMod) {
         case STEMMODIFIER_1slash: return SMUFL_E220_tremolo1;
@@ -1830,10 +1833,10 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
             if (unison && currentNote->IsUnisonWith(previousNote, false)) {
                 int previousDuration = previousNote->GetDrawingDur();
                 assert(previousNote->GetParent());
-                const bool isPreviousCoord = previousNote->GetParent()->Is(CHORD);
+                const bool isPreviousChord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;
                 data_STEMDIRECTION stemDir = currentNote->GetDrawingStemDir();
-                if (isPreviousCoord) {
+                if (isPreviousChord) {
                     Chord *parentChord = vrv_cast<Chord *>(previousNote->GetParent());
                     previousDuration = parentChord->GetDur();
                     isEdgeElement = ((STEMDIRECTION_down == stemDir) && (parentChord->GetBottomNote() == previousNote))
@@ -1843,10 +1846,9 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                 else if ((currentNote->GetDrawingDur() == DUR_1) && (previousDuration == DUR_1)) {
                     horizontalMargin = 0;
                 }
-                if (!isPreviousCoord || isEdgeElement || isChordElement) {
+                if (!isPreviousChord || isEdgeElement || isChordElement) {
                     if ((currentNote->GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
                         isInUnison = true;
-                        continue;
                     }
                     else if ((!currentNote->IsGraceNote() && !currentNote->GetDrawingCueSize())
                         && (previousNote->IsGraceNote() || previousNote->GetDrawingCueSize())
@@ -1863,7 +1865,18 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                     }
                     else if ((currentNote->GetDrawingDur() > DUR_2) && (previousDuration > DUR_2)) {
                         isInUnison = true;
+                    }
+                    if (isInUnison && (currentNote->GetDots() == previousNote->GetDots())) {
                         continue;
+                    }
+                    else {
+                        isInUnison = false;
+                        if ((currentNote->GetDrawingDur() <= DUR_1) || (previousNote->GetDrawingDur() <= DUR_1)) {
+                            horizontalMargin *= -1;
+                        }
+                        else {
+                            horizontalMargin *= (currentNote->GetDots() >= previousNote->GetDots()) ? 0 : -1;
+                        }
                     }
                 }
                 else {
@@ -1926,7 +1939,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                 shift -= HorizontalRightOverlap(otherElements.at(i), doc, -shift, verticalMargin);
                 if (!isUnisonElement) shift -= horizontalMargin;
             }
-            else if ((horizontalMargin >= 0) || isChordElement) {
+            else if (isChordElement) {
                 shift += HorizontalLeftOverlap(otherElements.at(i), doc, horizontalMargin - shift, verticalMargin);
 
                 // Make additional adjustments for cross-staff and unison notes
@@ -2502,7 +2515,7 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams) const
     return this->Is(CHORD) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
-int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
+int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams) const
 {
     FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
@@ -2517,17 +2530,17 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         && (this->GetContentLeft() < params->m_maxPos)) {
 
         // We skip the start or end of the slur
-        LayerElement *start = params->m_interface->GetStart();
-        LayerElement *end = params->m_interface->GetEnd();
+        const LayerElement *start = params->m_interface->GetStart();
+        const LayerElement *end = params->m_interface->GetEnd();
         if ((this == start) || (this == end)) {
             return FUNCTOR_CONTINUE;
         }
 
         // Skip if neither parent staff nor cross staff matches the given staff number
         if (!params->m_staffNs.empty()) {
-            Staff *staff = this->GetAncestorStaff();
+            const Staff *staff = this->GetAncestorStaff();
             if (params->m_staffNs.find(staff->GetN()) == params->m_staffNs.end()) {
-                Layer *layer = NULL;
+                const Layer *layer = NULL;
                 staff = this->GetCrossStaff(layer);
                 if (!staff || (params->m_staffNs.find(staff->GetN()) == params->m_staffNs.end())) {
                     return FUNCTOR_CONTINUE;
@@ -2546,15 +2559,15 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 
         // Skip elements aligned at start/end, but on a different staff
         if ((this->GetAlignment() == start->GetAlignment()) && !start->Is(TIMESTAMP_ATTR)) {
-            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-            Staff *startStaff = start->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const Staff *startStaff = start->GetAncestorStaff(RESOLVE_CROSS_STAFF);
             if (staff->GetN() != startStaff->GetN()) {
                 return FUNCTOR_CONTINUE;
             }
         }
         if ((this->GetAlignment() == end->GetAlignment()) && !end->Is(TIMESTAMP_ATTR)) {
-            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-            Staff *endStaff = end->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const Staff *endStaff = end->GetAncestorStaff(RESOLVE_CROSS_STAFF);
             if (staff->GetN() != endStaff->GetN()) {
                 return FUNCTOR_CONTINUE;
             }
@@ -2624,16 +2637,14 @@ int LayerElement::InitOnsetOffset(FunctorParams *functorParams)
         // note->GetNoteOrChordDur(element), note->GetDiatonicPitch(), *midiTrack);
         // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
 
-        Note *storeNote = note;
         // When we have a @sameas, do store the onset / offset values of the pointed note in the pointing note
-        if (this != element) {
-            storeNote = dynamic_cast<Note *>(this);
+        Note *storeNote = (this == element) ? note : dynamic_cast<Note *>(this);
+        if (storeNote) {
+            storeNote->SetScoreTimeOnset(params->m_currentScoreTime);
+            storeNote->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
+            storeNote->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
+            storeNote->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
         }
-        assert(storeNote);
-        storeNote->SetScoreTimeOnset(params->m_currentScoreTime);
-        storeNote->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
-        storeNote->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
-        storeNote->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
 
         // increase the currentTime accordingly, but only if not in a chord or tabGrp - checkit with note->IsChordTone()
         // or note->IsTabGrpNote()

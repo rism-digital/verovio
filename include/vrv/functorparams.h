@@ -49,6 +49,7 @@ class Object;
 class Page;
 class Pedal;
 class ScoreDef;
+class ScoreDefElement;
 class Slur;
 class Staff;
 class StaffAlignment;
@@ -1130,6 +1131,27 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CalcChordNoteHeadsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the doc
+ * member 1: diameter of the anchoring note of the chord
+ **/
+
+class CalcChordNoteHeadsParams : public FunctorParams {
+public:
+    CalcChordNoteHeadsParams(Doc *doc)
+    {
+        m_doc = doc;
+        m_diameter = 0;
+    }
+
+    Doc *m_doc;
+    int m_diameter;
+};
+
+//----------------------------------------------------------------------------
 // CastOffEncodingParams
 //----------------------------------------------------------------------------
 
@@ -1311,6 +1333,32 @@ class ConvertMarkupArticParams : public FunctorParams {
 public:
     ConvertMarkupArticParams() {}
     std::vector<std::pair<Object *, Artic *>> m_articPairsToConvert;
+};
+
+//----------------------------------------------------------------------------
+// ConvertMarkupScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the scoreDef we are moving the content from
+ * member 1: the doc
+ * member 2: the functor
+ * member 3: the end functor
+ **/
+
+class ConvertMarkupScoreDefParams : public FunctorParams {
+public:
+    ConvertMarkupScoreDefParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    {
+        m_currentScoreDef = NULL;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+    ScoreDefElement *m_currentScoreDef;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -1618,7 +1666,7 @@ public:
 
 class FindSpannedLayerElementsParams : public FunctorParams {
 public:
-    FindSpannedLayerElementsParams(TimeSpanningInterface *interface)
+    FindSpannedLayerElementsParams(const TimeSpanningInterface *interface)
     {
         m_interface = interface;
         m_minPos = 0;
@@ -1626,13 +1674,13 @@ public:
         m_minLayerN = 0;
         m_maxLayerN = 0;
     }
-    std::vector<LayerElement *> m_elements;
+    std::vector<const LayerElement *> m_elements;
     int m_minPos;
     int m_maxPos;
     std::set<int> m_staffNs;
     int m_minLayerN;
     int m_maxLayerN;
-    TimeSpanningInterface *m_interface;
+    const TimeSpanningInterface *m_interface;
     std::vector<ClassId> m_classIds;
 };
 
@@ -1653,7 +1701,7 @@ public:
         m_object = NULL;
     }
 
-    Object *m_object;
+    const Object *m_object;
     std::string m_id;
 };
 
@@ -2452,12 +2500,18 @@ public:
 
 /**
  * member 0: output stream
+ * member 1: flag for MEI basic output for filtering out editorial markup
  **/
 
 class SaveParams : public FunctorParams {
 public:
-    SaveParams(Output *output) { m_output = output; }
+    SaveParams(Output *output, bool basic)
+    {
+        m_output = output;
+        m_basic = basic;
+    }
     Output *m_output;
+    bool m_basic;
 };
 
 //----------------------------------------------------------------------------

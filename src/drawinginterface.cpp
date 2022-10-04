@@ -9,16 +9,16 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "chord.h"
-#include "elementpart.h"
 #include "layerelement.h"
 #include "note.h"
 #include "object.h"
 #include "staff.h"
+#include "stem.h"
 
 namespace vrv {
 

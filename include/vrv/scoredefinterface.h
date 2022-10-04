@@ -28,6 +28,7 @@ namespace vrv {
  * It is not an abstract class but should not be instanciated directly.
  */
 class ScoreDefInterface : public Interface,
+                          public AttBarring,
                           public AttDurationDefault,
                           public AttLyricStyle,
                           public AttMeasureNumbers,

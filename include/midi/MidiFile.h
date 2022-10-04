@@ -216,6 +216,8 @@ class MidiFile {
 		                                           const std::string& text);
 		MidiEvent*         addTempo               (int aTrack, int aTick,
 		                                           double aTempo);
+		MidiEvent*         addKeySignature        (int aTrack, int aTick,
+		                                           int key, bool mode = 0);
 		MidiEvent*         addTimeSignature       (int aTrack, int aTick,
 		                                           int top, int bottom,
 		                                           int clocksPerClick = 24,
@@ -254,6 +256,7 @@ class MidiFile {
 		                                              double value);
 		static std::ostream& writeBigEndianDouble    (std::ostream& out,
 		                                              double value);
+		static std::string   getGMInstrumentName     (int patchIndex);
 
 	protected:
 		// m_events == Lists of MidiEvents for each MIDI file track.
@@ -308,8 +311,10 @@ class MidiFile {
 		double      linearSecondInterpolationAtTick (int ticktime);
 		std::string base64Encode                    (const std::string &input);
 		std::string base64Decode                    (const std::string &input);
+
 		static const std::string encodeLookup;
 		static const std::vector<int> decodeLookup;
+		static const char *GMinstrument[128];
 };
 
 } // end of namespace smf

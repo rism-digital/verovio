@@ -54,7 +54,10 @@ public:
      * Get bottom StaffAlignment for the system.
      * For each SystemAligner, we keep a StaffAlignment for the bottom position.
      */
-    StaffAlignment *GetBottomAlignment() const { return m_bottomAlignment; }
+    ///@{
+    StaffAlignment *GetBottomAlignment() { return m_bottomAlignment; }
+    const StaffAlignment *GetBottomAlignment() const { return m_bottomAlignment; }
+    ///@}
 
     /**
      * Get the StaffAlignment at index idx.
@@ -63,13 +66,16 @@ public:
      * If a staff is passed, it will be used for initializing m_staffN and m_staffSize of the aligner.
      * (no const since the bottom alignment is temporarily removed)
      */
-    StaffAlignment *GetStaffAlignment(int idx, Staff *staff, Doc *doc);
+    StaffAlignment *GetStaffAlignment(int idx, Staff *staff, const Doc *doc);
 
     /**
      * Get the StaffAlignment for the staffN.
      * Return NULL if not found.
      */
+    ///@{
     StaffAlignment *GetStaffAlignmentForStaffN(int staffN);
+    const StaffAlignment *GetStaffAlignmentForStaffN(int staffN) const;
+    ///@}
 
     /**
      * Get pointer to the parent system.
@@ -80,13 +86,13 @@ public:
     /**
      * Find all the positioners pointing to an object;
      */
-    void FindAllPositionerPointingTo(ArrayOfFloatingPositioners *positioners, FloatingObject *object);
+    void FindAllPositionerPointingTo(ArrayOfFloatingPositioners *positioners, const FloatingObject *object);
 
     /**
      * Find all the intersection points with a vertical line (top to bottom)
      */
     void FindAllIntersectionPoints(
-        SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin);
+        SegmentedLine &line, const BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin) const;
     /**
      * Get System Overflows
      */
@@ -108,7 +114,7 @@ private:
      * Return above spacing type for passed staff.
      * Calculates spacings if required.
      */
-    SpacingType GetAboveSpacingType(Staff *staff);
+    SpacingType GetAboveSpacingType(const Staff *staff);
     /**
      * Calculates above spacing type for staffDef
      */
@@ -178,7 +184,10 @@ public:
      * Look for the first FloatingPositioner corresponding to the FloatingObject of the ClassId.
      * Return NULL if not found and does not create anything.
      */
+    ///@{
     FloatingPositioner *FindFirstFloatingPositioner(ClassId classId);
+    const FloatingPositioner *FindFirstFloatingPositioner(ClassId classId) const;
+    ///@}
 
     /**
      * Find all FloatingPositioner corresponding to a FloatingObject with given ClassId.
@@ -189,23 +198,29 @@ public:
      * Look for the FloatingPositioner corresponding to the FloatingObject.
      * Return NULL if not found and does not create anything.
      */
-    FloatingPositioner *GetCorrespFloatingPositioner(FloatingObject *object);
+    ///@{
+    FloatingPositioner *GetCorrespFloatingPositioner(const FloatingObject *object);
+    const FloatingPositioner *GetCorrespFloatingPositioner(const FloatingObject *object) const;
+    ///@}
 
     /**
      * @name Setter and getter of the staff from which the alignment is created alignment.
      * Used for accessing the staff @n, the size, etc.
      */
     ///@{
-    Staff *GetStaff() const { return m_staff; }
-    void SetStaff(Staff *staff, Doc *doc, SystemAligner::SpacingType spacingType);
+    Staff *GetStaff() { return m_staff; }
+    const Staff *GetStaff() const { return m_staff; }
+    void SetStaff(Staff *staff, const Doc *doc, SystemAligner::SpacingType spacingType);
     ///@}
 
     /**
      * @name Setter and getter of the system pointer to which the Alignment is belong to.
      */
     ///@{
-    System *GetParentSystem() const { return m_system; }
+    System *GetParentSystem() { return m_system; }
+    const System *GetParentSystem() const { return m_system; }
     void SetParentSystem(System *system);
+    ///@}
 
     /**
      * Returns the staff size (100 if no staff object is refered to)
@@ -223,8 +238,8 @@ public:
      * value.
      */
     ///@{
-    int CalcOverflowAbove(BoundingBox *box);
-    int CalcOverflowBelow(BoundingBox *box);
+    int CalcOverflowAbove(const BoundingBox *box) const;
+    int CalcOverflowBelow(const BoundingBox *box) const;
     ///@}
 
     /**
@@ -249,6 +264,8 @@ public:
     int GetRequestedSpaceAbove() const { return m_requestedSpaceAbove; }
     void SetRequestedSpaceBelow(int space);
     int GetRequestedSpaceBelow() const { return m_requestedSpaceBelow; }
+    void SetRequestedSpacing(int spacing) { m_requestedSpacing = spacing; }
+    int GetRequestedSpacing() const { return m_requestedSpacing; }
     int GetStaffHeight() const { return m_staffHeight; }
     void SetScoreDefClefOverflowAbove(int overflowAbove) { m_scoreDefClefOverflowAbove = overflowAbove; }
     int GetScoreDefClefOverflowAbove() const { return m_scoreDefClefOverflowAbove; }
@@ -285,23 +302,15 @@ public:
      * Find all the intersection points with a vertical line (top to bottom)
      */
     void FindAllIntersectionPoints(
-        SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin);
+        SegmentedLine &line, const BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin) const;
 
     void ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrpsParams *params,
         const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel);
 
     /**
-     * @name Set/get for the beam adjust
-     */
-    ///@{
-    void SetBeamAdjust(int beamAdjust) { m_beamAdjust = beamAdjust; }
-    int GetBeamAdjust() const { return m_beamAdjust; }
-    ///@}
-
-    /**
      * Find overflow for the alignments taking bracket group elements into account
      */
-    void AdjustBracketGroupSpacing(Doc *doc, StaffAlignment *previous, int spacing);
+    void AdjustBracketGroupSpacing(const Doc *doc, const StaffAlignment *previous, int spacing);
 
     //----------//
     // Functors //
@@ -402,13 +411,11 @@ private:
     int m_overlap;
     int m_requestedSpaceAbove;
     int m_requestedSpaceBelow;
+    int m_requestedSpacing;
     int m_staffHeight;
     int m_scoreDefClefOverflowAbove;
     int m_scoreDefClefOverflowBelow;
     ///@}
-
-    // Value to store required beam adjustment for cross-staff beams
-    int m_beamAdjust = 0;
 
     /**
      * The list of overflowing bounding boxes (e.g, LayerElement or FloatingPositioner)

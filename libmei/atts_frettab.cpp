@@ -16,7 +16,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -35,9 +35,7 @@ AttCourseLog::AttCourseLog() : Att()
     ResetCourseLog();
 }
 
-AttCourseLog::~AttCourseLog()
-{
-}
+AttCourseLog::~AttCourseLog() {}
 
 void AttCourseLog::ResetCourseLog()
 {
@@ -81,13 +79,11 @@ AttNoteGesTab::AttNoteGesTab() : Att()
     ResetNoteGesTab();
 }
 
-AttNoteGesTab::~AttNoteGesTab()
-{
-}
+AttNoteGesTab::~AttNoteGesTab() {}
 
 void AttNoteGesTab::ResetNoteGesTab()
 {
-    m_tabCourse = 0;
+    m_tabCourse = VRV_UNSET;
     m_tabFret = -1;
 }
 
@@ -123,7 +119,7 @@ bool AttNoteGesTab::WriteNoteGesTab(pugi::xml_node element)
 
 bool AttNoteGesTab::HasTabCourse() const
 {
-    return (m_tabCourse != 0);
+    return (m_tabCourse != VRV_UNSET);
 }
 
 bool AttNoteGesTab::HasTabFret() const
@@ -180,4 +176,4 @@ void Att::GetFrettab(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

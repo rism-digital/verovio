@@ -729,6 +729,22 @@ int Binasc::readMidiEvent(std::ostream& out, std::istream& infile,
 		case 0xF0:    // various system bytes: variable bytes
 			switch (command) {
 				case 0xf0:
+					{
+					// A system exclusive message.   The first byte
+					// is 0xf0, then a VLV of the length of the message
+					// and then the message itself (which must end with 0xf7).
+					int length = getVLV(infile, trackbytes);
+					output << " v" << std::dec << length;
+					for (int b=0; b<length; b++) {
+						infile.read((char*)&ch, 1);
+						trackbytes++;
+						if (ch < 0x10) {
+						   output << " 0" << std::hex << (int)ch;
+						} else {
+						   output << " " << std::hex << (int)ch;
+						}
+					}
+					}
 					break;
 				case 0xf7:
 					// Read the first byte which is either 0xf0 or 0xf7.

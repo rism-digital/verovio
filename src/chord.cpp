@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <functional>
 #include <iostream>
 #include <numeric>
@@ -30,6 +30,7 @@
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
+#include "stem.h"
 #include "verse.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -550,16 +551,16 @@ int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElemen
     return 0;
 }
 
-std::list<Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc)
+std::list<const Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc) const
 {
-    const ListOfObjects &notes = this->GetList(this);
+    const ListOfConstObjects &notes = this->GetList(this);
 
-    std::list<Note *> adjacentNotes;
-    for (Object *obj : notes) {
-        Note *note = vrv_cast<Note *>(obj);
+    std::list<const Note *> adjacentNotes;
+    for (const Object *obj : notes) {
+        const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
 
-        Staff *noteStaff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+        const Staff *noteStaff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
         if (noteStaff != staff) continue;
 
         const int locDiff = note->GetDrawingLoc() - loc;
@@ -717,7 +718,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     params->m_staff = staff;
     params->m_layer = layer;
     params->m_interface = this;
-    params->m_dur = this->GetActualDur();
+    params->m_dur = this->GetNoteOrChordDur(this);
     params->m_isGraceNote = this->IsGraceNote();
     params->m_isStemSameasSecondary = false;
 
@@ -734,8 +735,8 @@ int Chord::CalcStem(FunctorParams *functorParams)
     data_STEMDIRECTION layerStemDir;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
-    if (stem->HasStemDir()) {
-        stemDir = stem->GetStemDir();
+    if (stem->HasDir()) {
+        stemDir = stem->GetDir();
     }
     else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
         stemDir = layerStemDir;
@@ -751,6 +752,29 @@ int Chord::CalcStem(FunctorParams *functorParams)
     // And to the top note when down
     else
         stem->SetDrawingYRel(yMax - this->GetDrawingY());
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::CalcChordNoteHeads(FunctorParams *functorParams)
+{
+    CalcChordNoteHeadsParams *params = vrv_params_cast<CalcChordNoteHeadsParams *>(functorParams);
+    assert(params);
+
+    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+
+    params->m_diameter = 0;
+    if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+        if (this->IsInBeam()) {
+            params->m_diameter = 2 * this->GetDrawingRadius(params->m_doc);
+        }
+        else {
+            const Note *bottomNote = this->GetBottomNote();
+            const char32_t code = bottomNote->GetNoteheadGlyph(this->GetActualDur());
+            params->m_diameter = params->m_doc->GetGlyphWidth(
+                code, staff->m_drawingStaffSize, this->GetDrawingCueSize() ? bottomNote->GetDrawingCueSize() : false);
+        }
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -827,16 +851,18 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     if (!currentStem) {
         currentStem = new Stem();
+        currentStem->IsAttribute(true);
         this->AddChild(currentStem);
     }
     currentStem->AttGraced::operator=(*this);
-    currentStem->AttStems::operator=(*this);
-    currentStem->AttStemsCmn::operator=(*this);
-    if (this->GetActualDur() < DUR_2 || (this->GetStemVisible() == BOOLEAN_false)) {
+    currentStem->FillAttributes(*this);
+
+    int duration = this->GetNoteOrChordDur(this);
+    if ((duration < DUR_2) || (this->GetStemVisible() == BOOLEAN_false)) {
         currentStem->IsVirtual(true);
     }
 
-    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->GetAncestorFTrem()) {
+    if ((duration > DUR_4) && !this->IsInBeam() && !this->GetAncestorFTrem()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {

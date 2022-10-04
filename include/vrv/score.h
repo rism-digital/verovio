@@ -49,7 +49,10 @@ public:
     /**
      * Getter for the score/scoreDef
      */
+    ///@{
     ScoreDef *GetScoreDef() { return &m_scoreDef; }
+    const ScoreDef *GetScoreDef() const { return &m_scoreDef; }
+    ///@}
 
     /**
      * Helper looking at the parent Doc and set its scoreDef as current one.
@@ -105,6 +108,11 @@ public:
     int ConvertToPageBased(FunctorParams *functorParams) override;
     int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
     ///@}
+
+    /**
+     * See Object::ConvertMarkupScoreDef
+     */
+    int ConvertMarkupScoreDef(FunctorParams *) override;
 
     /**
      * See Object::CastOffPages

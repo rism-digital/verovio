@@ -82,7 +82,7 @@ enum AttClassId {
     ATT_MDIVGES,
     ATT_NCGES,
     ATT_NOTEGES,
-    ATT_SCOREDEFGES,
+    ATT_ORNAMENTACCIDGES,
     ATT_SECTIONGES,
     ATT_SOUNDLOCATION,
     ATT_TIMESTAMPGESTURAL,
@@ -237,6 +237,7 @@ enum AttClassId {
     ATT_TIMESTAMPLOGICAL,
     ATT_TIMESTAMP2LOGICAL,
     ATT_TRANSPOSITION,
+    ATT_TUNING,
     ATT_TUPLETPRESENT,
     ATT_TYPED,
     ATT_TYPOGRAPHY,
@@ -296,6 +297,6 @@ enum AttClassId {
     ATT_CLASS_max
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATT_CLASSES_H__

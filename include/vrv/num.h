@@ -43,7 +43,10 @@ public:
     /**
      * Return a pointer to the current text object.
      */
+    ///@{
     Text *GetCurrentText() { return &m_currentText; }
+    const Text *GetCurrentText() const { return &m_currentText; }
+    ///@}
 
 private:
     //

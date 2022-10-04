@@ -9,9 +9,9 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
+#include <cstdlib>
 #include <math.h>
-#include <stdlib.h>
 
 //----------------------------------------------------------------------------
 
@@ -84,7 +84,7 @@ double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) co
     double duration = DUR_MAX / pow(2.0, (double)(noteDur - 2.0)) * numBase / num;
 
     int noteDots = (this->HasDotsGes()) ? this->GetDotsGes() : this->GetDots();
-    if (noteDots != -1) {
+    if (noteDots != VRV_UNSET) {
         duration = 2 * duration - (duration / pow(2, noteDots));
     }
     // LogDebug("Duration %d; Dot %d; Alignment %f", noteDur, this->GetDots(), duration);
@@ -198,7 +198,16 @@ int DurationInterface::CalcActualDur(data_DURATION dur) const
 int DurationInterface::GetNoteOrChordDur(const LayerElement *element) const
 {
     if (element->Is(CHORD)) {
-        return this->GetActualDur();
+        int duration = this->GetActualDur();
+        if (duration != DUR_NONE) return duration;
+
+        const Chord *chord = vrv_cast<const Chord *>(element);
+        for (const Note *note : { chord->GetTopNote(), chord->GetBottomNote() }) {
+            duration = note->GetActualDur();
+            if (duration != DUR_NONE) {
+                return duration;
+            }
+        }
     }
     else if (element->Is(NOTE)) {
         const Note *note = vrv_cast<const Note *>(element);

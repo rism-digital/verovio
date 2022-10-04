@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -18,7 +18,6 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
-#include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
 #include "layer.h"
@@ -198,18 +197,18 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
     m_drawingScoreDef->SetParent(this);
 }
 
-bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
+bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElement *end) const
 {
     assert(start);
     assert(end);
 
     // It is too inefficient to look for chord and notes over the entire system
     // We need first to get a list of measures
-    Object *measureStart = start->GetFirstAncestor(MEASURE);
+    const Object *measureStart = start->GetFirstAncestor(MEASURE);
     assert(measureStart);
-    Object *measureEnd = end->GetFirstAncestor(MEASURE);
+    const Object *measureEnd = end->GetFirstAncestor(MEASURE);
     assert(measureEnd);
-    ListOfObjects measures;
+    ListOfConstObjects measures;
 
     // start and end are in the same measure, this is the only one we need
     if (measureStart == measureEnd) {
@@ -218,34 +217,34 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
     // otherwise look for a measures in between
     else {
         ClassIdComparison isMeasure(MEASURE);
-        Functor findAllBetween(&Object::FindAllBetween);
-        FindAllBetweenParams findAllBetweenParams(&isMeasure, &measures, measureStart, measureEnd);
-        this->Process(&findAllBetween, &findAllBetweenParams, NULL, NULL, 1);
+        Functor findAllConstBetween(&Object::FindAllConstBetween);
+        FindAllConstBetweenParams findAllConstBetweenParams(&isMeasure, &measures, measureStart, measureEnd);
+        this->Process(&findAllConstBetween, &findAllConstBetweenParams, NULL, NULL, 1);
     }
 
     // Now we can look for chords and note
     ClassIdsComparison matchType({ CHORD, NOTE });
-    ListOfObjects children;
+    ListOfConstObjects children;
     for (auto &measure : measures) {
-        Object *curStart = (measure == measureStart) ? start : measure->GetFirst();
-        Object *curEnd = (measure == measureEnd) ? end : measure->GetLast();
+        const Object *curStart = (measure == measureStart) ? start : measure->GetFirst();
+        const Object *curEnd = (measure == measureEnd) ? end : measure->GetLast();
         measure->FindAllDescendantsBetween(&children, &matchType, curStart, curEnd, false);
     }
 
-    Layer *layerStart = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));
+    const Layer *layerStart = vrv_cast<const Layer *>(start->GetFirstAncestor(LAYER));
     assert(layerStart);
-    Staff *staffStart = vrv_cast<Staff *>(layerStart->GetFirstAncestor(STAFF));
+    const Staff *staffStart = vrv_cast<const Staff *>(layerStart->GetFirstAncestor(STAFF));
     assert(staffStart);
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     for (auto &child : children) {
-        Layer *layer = vrv_cast<Layer *>((child)->GetFirstAncestor(LAYER));
+        const Layer *layer = vrv_cast<const Layer *>((child)->GetFirstAncestor(LAYER));
         assert(layer);
-        Staff *staff = vrv_cast<Staff *>((child)->GetFirstAncestor(STAFF));
+        const Staff *staff = vrv_cast<const Staff *>((child)->GetFirstAncestor(STAFF));
         assert(staff);
 
-        // If the slur is spanning over several measure, the the children list will include note and chords
+        // If the slur is spanning over several measures, the children list will include notes and chords
         // from other staves and layers, so we need to skip them.
         // Alternatively we could process by staff / layer, but the current solution might be better
         // if we want to look for slurs starting / ending on different staff / layer
@@ -253,7 +252,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
             continue;
         }
 
-        StemmedDrawingInterface *interface = child->GetStemmedDrawingInterface();
+        const StemmedDrawingInterface *interface = child->GetStemmedDrawingInterface();
         assert(interface);
 
         // First pass
@@ -268,14 +267,15 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
     return false;
 }
 
-curvature_CURVEDIR System::GetPreferredCurveDirection(LayerElement *start, LayerElement *end, Slur *slur)
+curvature_CURVEDIR System::GetPreferredCurveDirection(
+    const LayerElement *start, const LayerElement *end, const Slur *slur) const
 {
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur);
     findSpannedLayerElementsParams.m_minPos = start->GetDrawingX();
     findSpannedLayerElementsParams.m_maxPos = end->GetDrawingX();
     findSpannedLayerElementsParams.m_classIds = { CHORD, NOTE };
 
-    Layer *layerStart = vrv_cast<Layer *>(start->GetFirstAncestor(LAYER));
+    const Layer *layerStart = vrv_cast<const Layer *>(start->GetFirstAncestor(LAYER));
     assert(layerStart);
 
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
@@ -283,7 +283,7 @@ curvature_CURVEDIR System::GetPreferredCurveDirection(LayerElement *start, Layer
 
     curvature_CURVEDIR preferredDirection = curvature_CURVEDIR_NONE;
     for (auto element : findSpannedLayerElementsParams.m_elements) {
-        Layer *layer = vrv_cast<Layer *>((element)->GetFirstAncestor(LAYER));
+        const Layer *layer = vrv_cast<const Layer *>((element)->GetFirstAncestor(LAYER));
         assert(layer);
         if (layer == layerStart) continue;
 
@@ -306,7 +306,7 @@ curvature_CURVEDIR System::GetPreferredCurveDirection(LayerElement *start, Layer
     return preferredDirection;
 }
 
-void System::AddToDrawingListIfNeccessary(Object *object)
+void System::AddToDrawingListIfNecessary(Object *object)
 {
     assert(object);
 
@@ -386,7 +386,7 @@ bool System::IsLastOfSelection() const
     return (page->IsLastOfSelection() && this->IsLastInPage());
 }
 
-double System::EstimateJustificationRatio(Doc *doc)
+double System::EstimateJustificationRatio(const Doc *doc) const
 {
     assert(doc);
 
@@ -494,6 +494,12 @@ int System::ScoreDefOptimize(FunctorParams *functorParams)
     if (params->m_firstScoreDef) {
         params->m_firstScoreDef = false;
         if (!params->m_doc->GetOptions()->m_condenseFirstPage.GetValue()) {
+            return FUNCTOR_SIBLINGS;
+        }
+    }
+
+    if (this->IsLastOfMdiv()) {
+        if (params->m_doc->GetOptions()->m_condenseNotLastSystem.GetValue()) {
             return FUNCTOR_SIBLINGS;
         }
     }
@@ -1039,6 +1045,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     params->m_classId = REH;
     m_systemAligner.Process(params->m_functor, params);
 
+    params->m_classId = CAESURA;
+    m_systemAligner.Process(params->m_functor, params);
+
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;
     m_systemAligner.Process(params->m_functor, params);
@@ -1050,6 +1059,11 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     // The resulting layout order will correspond to the order in the encoding.
     params->m_classId = OBJECT;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(DYNAM);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_between;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     return FUNCTOR_SIBLINGS;
 }

@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -285,12 +285,11 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
-int Measure::GetRightBarLineWidth(Doc *doc)
+int Measure::CalculateRightBarLineWidth(Doc *doc, int staffSize)
 {
     const BarLine *barline = this->GetRightBarLine();
     if (!barline) return 0;
 
-    const int staffSize = 100;
     const int barLineWidth = doc->GetDrawingBarLineWidth(staffSize);
     const int barLineThickWidth
         = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_thickBarlineThickness.GetValue();
@@ -300,16 +299,16 @@ int Measure::GetRightBarLineWidth(Doc *doc)
     switch (barline->GetForm()) {
         case BARRENDITION_dbl:
         case BARRENDITION_dbldashed: {
-            width = barLineSeparation + barLineWidth / 2;
+            width = barLineSeparation + barLineWidth;
             break;
         }
         case BARRENDITION_rptend:
         case BARRENDITION_end: {
-            width = barLineSeparation + barLineWidth + barLineThickWidth / 2;
+            width = barLineSeparation + barLineWidth + barLineThickWidth;
             break;
         }
         case BARRENDITION_rptboth: {
-            width = 2 * barLineSeparation + barLineWidth / 2 + barLineThickWidth;
+            width = 2 * barLineSeparation + barLineWidth + barLineThickWidth;
             break;
         }
         default: break;
@@ -366,13 +365,13 @@ int Measure::GetInnerCenterX() const
 
 int Measure::GetDrawingOverflow()
 {
-    Functor adjustXOverlfow(&Object::AdjustXOverflow);
-    Functor adjustXOverlfowEnd(&Object::AdjustXOverflowEnd);
+    Functor adjustXOverflow(&Object::AdjustXOverflow);
+    Functor adjustXOverflowEnd(&Object::AdjustXOverflowEnd);
     AdjustXOverflowParams adjustXOverflowParams(0);
     adjustXOverflowParams.m_currentSystem = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(adjustXOverflowParams.m_currentSystem);
     adjustXOverflowParams.m_lastMeasure = this;
-    this->Process(&adjustXOverlfow, &adjustXOverflowParams, &adjustXOverlfowEnd);
+    this->Process(&adjustXOverflow, &adjustXOverflowParams, &adjustXOverflowEnd);
     if (!adjustXOverflowParams.m_currentWidest) return 0;
 
     int measureRightX = this->GetDrawingX() + this->GetWidth();
@@ -380,7 +379,7 @@ int Measure::GetDrawingOverflow()
     return std::max(0, overflow);
 }
 
-int Measure::GetSectionRestartShift(Doc *doc) const
+int Measure::GetSectionRestartShift(const Doc *doc) const
 {
     if (this->IsFirstInSystem()) {
         return 0;
@@ -403,22 +402,21 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     assert(scoreDef);
 
     std::vector<Staff *> staves;
-    std::vector<int>::iterator iter;
-    std::vector<int> staffList;
+    std::set<int> staffList;
 
     // First get all the staffGrps
     ListOfObjects staffGrps = scoreDef->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
     for (auto &staffGrp : staffGrps) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>((staffGrp)->GetFirst(STAFFDEF));
-        if (staffDef) staffList.push_back(staffDef->GetN());
+        StaffDef *staffDef = vrv_cast<StaffDef *>((staffGrp)->FindDescendantByType(STAFFDEF));
+        if (staffDef && (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN)) staffList.insert(staffDef->GetN());
     }
 
     // Get the corresponding staves in the measure
-    for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
+    for (auto iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison matchN(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
+        Staff *staff = vrv_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
             continue;
@@ -431,10 +429,15 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 
 Staff *Measure::GetTopVisibleStaff()
 {
-    Staff *staff = NULL;
-    ListOfObjects staves = this->FindAllDescendantsByType(STAFF, false);
+    return const_cast<Staff *>(std::as_const(*this).GetTopVisibleStaff());
+}
+
+const Staff *Measure::GetTopVisibleStaff() const
+{
+    const Staff *staff = NULL;
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF, false);
     for (auto &child : staves) {
-        staff = vrv_cast<Staff *>(child);
+        staff = vrv_cast<const Staff *>(child);
         assert(staff);
         if (staff->DrawingIsVisible()) {
             break;
@@ -446,10 +449,15 @@ Staff *Measure::GetTopVisibleStaff()
 
 Staff *Measure::GetBottomVisibleStaff()
 {
-    Staff *bottomStaff = NULL;
-    ListOfObjects staves = this->FindAllDescendantsByType(STAFF, false);
+    return const_cast<Staff *>(std::as_const(*this).GetBottomVisibleStaff());
+}
+
+const Staff *Measure::GetBottomVisibleStaff() const
+{
+    const Staff *bottomStaff = NULL;
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF, false);
     for (const auto child : staves) {
-        Staff *staff = vrv_cast<Staff *>(child);
+        const Staff *staff = vrv_cast<const Staff *>(child);
         assert(staff);
         if (!staff->DrawingIsVisible()) {
             continue;
@@ -492,7 +500,7 @@ data_BARRENDITION Measure::GetDrawingRightBarLineByStaffN(int staffN) const
     return this->GetDrawingRightBarLine();
 }
 
-Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(Measure *previous)
+Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(const Measure *previous) const
 {
     // Barlines are stored in the map in the following format:
     // previous measure right -> current measure left -> expected barlines (previous, current)
@@ -675,7 +683,7 @@ std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEn
 // Measure functor methods
 //----------------------------------------------------------------------------
 
-int Measure::FindSpannedLayerElements(FunctorParams *functorParams)
+int Measure::FindSpannedLayerElements(FunctorParams *functorParams) const
 {
     FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);

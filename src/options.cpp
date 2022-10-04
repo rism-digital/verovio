@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <fstream>
 #include <functional>
 #include <sstream>
@@ -36,7 +36,7 @@ const std::map<int, std::string> Option::s_header
 const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
 
-const std::map<int, std::string> Option::s_pedalStyle = { { PEDALSTYLE_auto, "auto" }, { PEDALSTYLE_line, "line" },
+const std::map<int, std::string> Option::s_pedalStyle = { { PEDALSTYLE_NONE, "auto" }, { PEDALSTYLE_line, "line" },
     { PEDALSTYLE_pedstar, "pedstar" }, { PEDALSTYLE_altpedstar, "altpedstar" } };
 
 const std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" },
@@ -902,18 +902,19 @@ Options::Options()
     m_baseOptions.AddOption(&m_page);
 
     m_resourcePath.SetInfo("Resource path", "Path to the directory with Verovio resources");
-    m_resourcePath.Init("/usr/local/share/verovio");
+    m_resourcePath.Init(VRV_RESOURCE_DIR);
     m_resourcePath.SetKey("resourcePath");
     m_resourcePath.SetShortOption('r', true);
     m_baseOptions.AddOption(&m_resourcePath);
 
-    m_scale.SetInfo("Scale percent", "Scale of the output in percent");
+    m_scale.SetInfo("Scale percent", "Scale of the output in percent (100 is normal size)");
     m_scale.Init(DEFAULT_SCALE, MIN_SCALE, MAX_SCALE);
     m_scale.SetKey("scale");
     m_scale.SetShortOption('s', false);
     m_baseOptions.AddOption(&m_scale);
 
-    m_outputTo.SetInfo("Output to", "Select output format to: \"mei\", \"pb-mei\", \"svg\", or \"midi\"");
+    m_outputTo.SetInfo(
+        "Output to", "Select output format to: \"mei\", \"mei-pb\", \"mei-basic\", \"svg\", or \"midi\"");
     m_outputTo.Init("svg");
     m_outputTo.SetKey("outputTo");
     m_outputTo.SetShortOption('t', true);
@@ -961,6 +962,11 @@ Options::Options()
     m_condenseFirstPage.SetInfo("Condense first page", "When condensing a score also condense the first page");
     m_condenseFirstPage.Init(false);
     this->Register(&m_condenseFirstPage, "condenseFirstPage", &m_general);
+
+    m_condenseNotLastSystem.SetInfo(
+        "Condense not last system", "When condensing a score never condense the last system");
+    m_condenseNotLastSystem.Init(false);
+    this->Register(&m_condenseNotLastSystem, "condenseNotLastSystem", &m_general);
 
     m_condenseTempoPages.SetInfo(
         "Condense tempo pages", "When condensing a score also condense pages with a tempo change");
@@ -1011,6 +1017,11 @@ Options::Options()
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_general);
+
+    m_moveScoreDefinitionToStaff.SetInfo("Move score definition to staff",
+        "Move score definition (clef, keySig, meterSig, etc.) from scoreDef to staffDef");
+    m_moveScoreDefinitionToStaff.Init(false);
+    this->Register(&m_moveScoreDefinitionToStaff, "moveScoreDefinitionToStaff", &m_general);
 
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
@@ -1063,7 +1074,7 @@ Options::Options()
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
     m_pedalStyle.SetInfo("Pedal style", "The global pedal style");
-    m_pedalStyle.Init(PEDALSTYLE_auto, &Option::s_pedalStyle);
+    m_pedalStyle.Init(PEDALSTYLE_NONE, &Option::s_pedalStyle);
     this->Register(&m_pedalStyle, "pedalStyle", &m_general);
 
     m_preserveAnalyticalMarkup.SetInfo("Preserve analytical markup", "Preserves the analytical markup in MEI");
@@ -1073,6 +1084,11 @@ Options::Options()
     m_removeIds.SetInfo("Remove IDs in MEI", "Remove XML IDs in the MEI output that are not referenced");
     m_removeIds.Init(false);
     this->Register(&m_removeIds, "removeIds", &m_general);
+
+    m_scaleToPageSize.SetInfo(
+        "Scale to fit the page size", "Scale the content within the page instead of scaling the page itself");
+    m_scaleToPageSize.Init(false);
+    this->Register(&m_scaleToPageSize, "scaleToPageSize", &m_general);
 
     m_showRuntime.SetInfo("Show runtime on CLI", "Display the total runtime on command-line");
     m_showRuntime.Init(false);
@@ -1157,9 +1173,14 @@ Options::Options()
     m_barLineSeparation.Init(0.8, 0.5, 2.0);
     this->Register(&m_barLineSeparation, "barLineSeparation", &m_generalLayout);
 
-    m_barLineWidth.SetInfo("Barline width", "The barLine width");
+    m_barLineWidth.SetInfo("Barline width", "The barline width");
     m_barLineWidth.Init(0.30, 0.10, 0.80);
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
+
+    m_beamFrenchStyle.SetInfo(
+        "French style of beams", "For notes in beams, stems will stop at first outermost sub-beam without crossing it");
+    m_beamFrenchStyle.Init(false);
+    this->Register(&m_beamFrenchStyle, "beamFrenchStyle", &m_generalLayout);
 
     m_beamMaxSlope.SetInfo("Beam max slope", "The maximum beam slope");
     m_beamMaxSlope.Init(10, 0, 20);
@@ -1169,10 +1190,14 @@ Options::Options()
     m_beamMinSlope.Init(0, 0, 0);
     this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
 
-    m_beamFrenchStyle.SetInfo(
-        "French style of beams", "For notes in beams, stems will stop at first outermost sub-beam without crossing it");
-    m_beamFrenchStyle.Init(false);
-    this->Register(&m_beamFrenchStyle, "beamFrenchStyle", &m_generalLayout);
+    m_beamMixedPreserve.SetInfo("Preserve mixed beams", "Mixed beams will be drawn even if there is not enough space");
+    m_beamMixedPreserve.Init(false);
+    this->Register(&m_beamMixedPreserve, "beamMixedPreserve", &m_generalLayout);
+
+    m_beamMixedStemMin.SetInfo(
+        "Minimal stem length of mixed beams", "The minimal stem length in MEI units used to draw mixed beams");
+    m_beamMixedStemMin.Init(3.5, 1.0, 8.0);
+    this->Register(&m_beamMixedStemMin, "beamMixedStemMin", &m_generalLayout);
 
     m_bracketThickness.SetInfo("Bracket thickness", "The thickness of the system bracket");
     m_bracketThickness.Init(1.0, 0.5, 2.0);
@@ -1183,9 +1208,23 @@ Options::Options()
     m_breaksNoWidow.Init(false);
     this->Register(&m_breaksNoWidow, "breaksNoWidow", &m_generalLayout);
 
+    // Optimized for five line staves
+    constexpr double dashedBarLineLengthDefault = 8.0 / 7.0;
+    m_dashedBarLineDashLength.SetInfo("Dashed barline dash length", "The dash length of dashed barlines");
+    m_dashedBarLineDashLength.Init(dashedBarLineLengthDefault, 0.1, 5.0);
+    this->Register(&m_dashedBarLineDashLength, "dashedBarLineDashLength", &m_generalLayout);
+
+    m_dashedBarLineGapLength.SetInfo("Dashed barline gap length", "The gap length of dashed barlines");
+    m_dashedBarLineGapLength.Init(dashedBarLineLengthDefault, 0.1, 5.0);
+    this->Register(&m_dashedBarLineGapLength, "dashedBarLineGapLength", &m_generalLayout);
+
     m_dynamDist.SetInfo("Dynam dist", "The default distance from the staff for dynamic marks");
     m_dynamDist.Init(1.0, 0.5, 16.0);
     this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
+
+    m_dynamSingleGlyphs.SetInfo("Dynam single glyphs", "Don't use SMuFL's predefined dynamics glyph combinations");
+    m_dynamSingleGlyphs.Init(false);
+    this->Register(&m_dynamSingleGlyphs, "dynamSingleGlyphs", &m_generalLayout);
 
     m_engravingDefaults.SetInfo("Engraving defaults", "Json describing defaults for engraving SMuFL elements");
     m_engravingDefaults.Init(JsonSource::String, "{}");
@@ -1195,6 +1234,11 @@ Options::Options()
         "Engraving defaults file", "Path to json file describing defaults for engraving SMuFL elements");
     m_engravingDefaultsFile.Init(JsonSource::FilePath, "");
     this->Register(&m_engravingDefaultsFile, "engravingDefaultsFile", &m_generalLayout);
+
+    m_extenderLineMinSpace.SetInfo(
+        "Extender line minimum space", "Minimum space required for extender line to be drawn");
+    m_extenderLineMinSpace.Init(1.5, 1.5, 10.0);
+    this->Register(&m_extenderLineMinSpace, "extenderLineMinSpace", &m_generalLayout);
 
     m_fingeringScale.SetInfo("Fingering scale", "The scale of fingering font compared to default font size");
     m_fingeringScale.Init(0.75, 0.25, 1);
@@ -1769,6 +1813,8 @@ void Options::Sync()
         { "thickBarlineThickness", &m_thickBarlineThickness }, //
         { "barlineSeparation", &m_barLineSeparation }, //
         { "repeatBarlineDotSeparation", &m_repeatBarLineDotSeparation }, //
+        { "dashedBarlineDashLength", &m_dashedBarLineDashLength }, //
+        { "dashedBarlineGapLength", &m_dashedBarLineGapLength }, //
         { "bracketThickness", &m_bracketThickness }, //
         { "subBracketThickness", &m_subBracketThickness }, //
         { "hairpinThickness", &m_hairpinThickness }, //

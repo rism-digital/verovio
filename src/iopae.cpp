@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <cctype>
 #include <fstream>
 #include <regex>
@@ -25,6 +25,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "fermata.h"
+#include "functorparams.h"
 #include "gracegrp.h"
 #include "keyaccid.h"
 #include "keysig.h"
@@ -73,11 +74,12 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    m_doc->GetCurrentScoreDef()->Save(this);
+    SaveParams saveParams(this, false);
+    m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
 
     m_docScoreDef = false;
 
-    m_doc->Save(this);
+    m_doc->SaveObject(saveParams);
 
     output = m_streamStringOutput.str();
 
@@ -637,6 +639,13 @@ PAEInput::PAEInput(Doc *doc)
 }
 
 PAEInput::~PAEInput() {}
+
+jsonxx::Object PAEInput::GetValidationLog()
+{
+    jsonxx::Object log;
+    log << "Using old PAE parser";
+    return log;
+}
 
 #ifndef NO_PAE_SUPPORT
 
@@ -4160,17 +4169,17 @@ bool PAEInput::ConvertTie()
                 if (note->GetOct() != tokenNote->GetOct() || note->GetPname() != tokenNote->GetPname()) {
                     if (m_isMensural && tieToken) {
                         // This is probably a ligature - reset it back
-                        delete tie;
-                        tie = NULL;
-                        tieToken->m_object = NULL;
                         tieToken->m_char = '+';
-                        tieToken = NULL;
-                        note = NULL;
                     }
                     else {
                         LogPAE(ERR_037_TIE_PITCH, token);
                         if (m_pedanticMode) return false;
                     }
+                    delete tie;
+                    tie = NULL;
+                    tieToken->m_object = NULL;
+                    tieToken = NULL;
+                    note = NULL;
                 }
                 else {
                     tie->SetEndid("#" + tokenNote->GetID());
@@ -4483,9 +4492,9 @@ bool PAEInput::CheckContentPreBuild()
             ++token;
             continue;
         }
-
         // Check that the measure rest is at the beginning of a measure
-        if (token->Is(MULTIREST) && previousToken && !previousToken->Is(MEASURE)) {
+        if (token->Is(MULTIREST) && previousToken && !previousToken->Is(MEASURE) && !previousToken->Is(KEYSIG)
+            && !previousToken->Is(METERSIG) && !previousToken->Is(METERSIGGRP)) {
             LogPAE(ERR_065_MREST_INVALID_MEASURE, *token);
             if (m_pedanticMode) return false;
             Measure *measure = new Measure();

@@ -77,7 +77,13 @@ public:
     void ClearBeamSegments();
     ////@}
 
-    BeamSpanSegment *GetSegmentForSystem(System *system);
+    /**
+     * Access the beam segments
+     */
+    ///@{
+    BeamSpanSegment *GetSegmentForSystem(const System *system);
+    const BeamSpanSegment *GetSegmentForSystem(const System *system) const;
+    ///@}
 
     //----------//
     // Functors //
@@ -105,18 +111,22 @@ public:
 
 private:
     // Helper for breaking one big spanning beamSpan into smaller beamSpans
-    bool AddSpanningSegment(Doc *doc, const SpanIndexVector &elements, int index, bool newSegment = true);
+    bool AddSpanningSegment(const Doc *doc, const SpanIndexVector &elements, int index, bool newSegment = true);
 
     // Helper to get element list for the beamSpan - elements are acquired from all layerElements that are located
     // in between start and end of the beamSpan
-    ArrayOfObjects GetBeamSpanElementList(Layer *layer, Staff *staff);
+    ArrayOfObjects GetBeamSpanElementList(Layer *layer, const Staff *staff);
 
 public:
     //
-    std::vector<BeamSpanSegment *> m_beamSegments;
-
 private:
-    //
+    /**
+     * Array of beam segments
+     */
+    std::vector<BeamSpanSegment *> m_beamSegments;
+    /**
+     * Array of beamed elements
+     */
     ArrayOfObjects m_beamedElements;
 };
 

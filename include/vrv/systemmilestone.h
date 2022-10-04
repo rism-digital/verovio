@@ -21,7 +21,7 @@ class Object;
 //----------------------------------------------------------------------------
 
 /**
- * This class models an end milestone element milesoneEnd at the system level.
+ * This class models an end milestone element at the system level.
  */
 class SystemMilestoneEnd : public SystemElement {
 public:
@@ -38,12 +38,14 @@ public:
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
     Measure *GetMeasure() { return m_drawingMeasure; }
+    const Measure *GetMeasure() const { return m_drawingMeasure; }
 
     /**
      * @name Get the corresponding milestone start
      */
     ///@{
     Object *GetStart() { return m_start; }
+    const Object *GetStart() const { return m_start; }
     std::string GetStartClassName() const { return m_startClassName; }
     ///@}
 
@@ -113,6 +115,7 @@ public:
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
     Measure *GetMeasure() { return m_drawingMeasure; }
+    const Measure *GetMeasure() const { return m_drawingMeasure; }
 
     /**
      * @name Set and get the first LayerElement
@@ -121,7 +124,8 @@ public:
     ///@{
     void SetEnd(SystemMilestoneEnd *end);
     SystemMilestoneEnd *GetEnd() { return m_end; }
-    bool IsSystemMilestone() { return (m_end != NULL); }
+    const SystemMilestoneEnd *GetEnd() const { return m_end; }
+    bool IsSystemMilestone() const { return (m_end != NULL); }
     ///@}
 
     /**

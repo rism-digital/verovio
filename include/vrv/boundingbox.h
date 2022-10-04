@@ -20,6 +20,7 @@ class BeamDrawingInterface;
 class Doc;
 class FloatingCurvePositioner;
 class Glyph;
+class Resources;
 
 //----------------------------------------------------------------------------
 // BoundingBox
@@ -65,8 +66,8 @@ public:
      * Set and get the smuflGlyph / fontsize for a bounding box that is the one of a single SMuFL glyph.
      */
     ///@{
-    void SetBoundingBoxGlyph(wchar_t smuflGlyph, int fontSize);
-    wchar_t GetBoundingBoxGlyph() const { return m_smuflGlyph; }
+    void SetBoundingBoxGlyph(char32_t smuflGlyph, int fontSize);
+    char32_t GetBoundingBoxGlyph() const { return m_smuflGlyph; }
     int GetBoundingBoxGlyphFontSize() const { return m_smuflGlyphFontSize; }
     ///@}
 
@@ -152,6 +153,17 @@ public:
     ////}
 
     /**
+     * @name Return the left / right / top / bottom of the cut out rectangles (and use self bounding rect if there are
+     * none)
+     */
+    ///@{
+    int GetCutOutTop(const Resources &resources) const;
+    int GetCutOutBottom(const Resources &resources) const;
+    int GetCutOutLeft(const Resources &resources) const;
+    int GetCutOutRight(const Resources &resources) const;
+    ///@}
+
+    /**
      * Return true if the bounding box encloses the point.
      */
     bool Encloses(const Point point) const;
@@ -160,30 +172,18 @@ public:
      * Return intersection between the bounding box and the curve represented by the FloatingPositioner.
      * The Object pointed by the FloatingPositioner is expected to be a SLUR or a TIE
      */
-    int Intersects(FloatingCurvePositioner *curve, Accessor type, int margin = 0) const;
+    int Intersects(const FloatingCurvePositioner *curve, Accessor type, int margin = 0) const;
 
     /**
      * Return intersection between the bounding box and the beam represented by the BeamDrawingInterface.
      * A segment of the beam that matches horizontal position of the bounding box is taken to find whether there is
      * intersection.
      */
-    int Intersects(BeamDrawingInterface *beamInterface, Accessor type, int margin = 0) const;
+    int Intersects(const BeamDrawingInterface *beamInterface, Accessor type, int margin = 0) const;
 
     //----------------//
     // Static methods //
     //----------------//
-
-    /**
-     * Swap values.
-     * This is useful for example when switching to the device context world.
-     */
-    static void Swap(int &v1, int &v2);
-
-    /**
-     * Swap the points passed as reference.
-     * This is useful for example when calculating bezier positions.
-     */
-    static void SwapPoints(Point &p1, Point &p2);
 
     static std::pair<double, int> ApproximateBezierExtrema(
         const Point bezier[4], bool isMaxExtrema, int approximationSteps = BEZIER_APPROXIMATION);
@@ -272,8 +272,8 @@ private:
      * bounding box.
      * Return 1 with no smufl glyph or no anchor, 2 with on anchor point, and 3 with 2 anchor points.
      */
-    int GetRectangles(
-        const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2], const Doc *doc) const;
+    int GetRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2],
+        const Resources &resources) const;
 
     /**
      * Calculate the rectangles with 2 anchor points.
@@ -313,7 +313,7 @@ private:
      * The SMuFL glyph when anchor bounding box calculation is desired.
      * Currently only one glyph is supported. Eventually, we could have start / end glyph
      */
-    wchar_t m_smuflGlyph;
+    char32_t m_smuflGlyph;
 
     /**
      * The font size for the smufl glyph used for calculating the bounding box rectangles.
@@ -374,8 +374,14 @@ protected:
 private:
     /**
      * An vector of line segments
+     * They always have increasing order and orientation
      */
     ArrayOfIntPairs m_segments;
+
+    /**
+     * Flag indicating the orientation of the original line
+     */
+    bool m_increasing;
 };
 
 } // namespace vrv

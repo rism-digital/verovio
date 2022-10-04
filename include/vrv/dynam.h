@@ -71,13 +71,13 @@ public:
     /**
      * Return true if the dynam text is only composed of f, p, r, z, etc. letters (e.g. sfz)
      */
-    bool IsSymbolOnly();
+    bool IsSymbolOnly() const;
 
     /**
      * Return the SMuFL str for the dynamic symbol.
      * Call IsSymbolOnly first to check.
      */
-    std::wstring GetSymbolStr() const;
+    std::u32string GetSymbolStr(const bool singleGlyphs) const;
 
     /**
      * See FloatingObject::IsExtenderElement
@@ -87,17 +87,17 @@ public:
     /**
      * Retrieve parentheses / brackets from the enclose attribute
      */
-    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs() const;
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs() const;
 
     //----------------//
     // Static methods //
     //----------------//
 
-    static bool GetSymbolsInStr(std::wstring &str, ArrayOfStringDynamTypePairs &tokens);
+    static bool GetSymbolsInStr(std::u32string str, ArrayOfStringDynamTypePairs &tokens);
 
-    static bool IsSymbolOnly(const std::wstring &str);
+    static bool IsSymbolOnly(const std::u32string &str);
 
-    static std::wstring GetSymbolStr(const std::wstring &str);
+    static std::u32string GetSymbolStr(const std::u32string &str, const bool singleGlyphs);
 
     //----------//
     // Functors //
@@ -116,7 +116,7 @@ public:
     //
 private:
     /** A cached version of the symbol str instanciated by IsSymbolOnly() */
-    std::wstring m_symbolStr;
+    mutable std::u32string m_symbolStr;
 };
 
 } // namespace vrv

@@ -23,6 +23,7 @@
 
 namespace vrv {
 
+class AreaPosInterface;
 class Doc;
 class DurationInterface;
 class EditorialElement;
@@ -35,6 +36,7 @@ class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
 class Resources;
+class SaveParams;
 class ScoreDefInterface;
 class StemmedDrawingInterface;
 class TextDirInterface;
@@ -126,6 +128,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    virtual AreaPosInterface *GetAreaPosInterface() { return NULL; }
+    virtual const AreaPosInterface *GetAreaPosInterface() const { return NULL; }
     virtual BeamDrawingInterface *GetBeamDrawingInterface() { return NULL; }
     virtual const BeamDrawingInterface *GetBeamDrawingInterface() const { return NULL; }
     virtual DurationInterface *GetDurationInterface() { return NULL; }
@@ -408,7 +412,7 @@ public:
      * Return true if the object has the child Object as descendant (reference of direct).
      * Processes in depth-first.
      */
-    bool HasDescendant(Object *child, int deepness = UNLIMITED_DEPTH) const;
+    bool HasDescendant(const Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
      * Look for a descendant with the specified id (returns NULL if not found)
@@ -602,7 +606,7 @@ public:
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
-    virtual int Save(Output *output);
+    int SaveObject(SaveParams &saveParams);
 
     /**
      * Sort the child elements using std::stable_sort
@@ -732,7 +736,7 @@ public:
     /**
      * Retrieve the layer elements spanned by two points
      */
-    virtual int FindSpannedLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int FindSpannedLayerElements(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     /**
      * Look for element by ID in StaffDef elements (Clef, KeySig, etc.) of all layers within
@@ -743,7 +747,7 @@ public:
      * Retrieve the minimum left and maximum right for an alignment.
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
      */
-    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+    virtual int GetAlignmentLeftRight(FunctorParams *functorParams) const;
 
     /**
      * Go through all layer elements of the layer and return next/previous element relative to the specified
@@ -802,6 +806,17 @@ public:
      * End Functor for Object::ConvertMarkupArtic
      */
     virtual int ConvertMarkupArticEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Move scoreDef clef, keySig, meterSig and mensur to staffDef.
+     * When a staffDef already has one, it is not replaced.
+     */
+    virtual int ConvertMarkupScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * End Functor for Object::ConvertMarkupScoreDef
+     */
+    virtual int ConvertMarkupScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method.
@@ -1756,12 +1771,12 @@ public:
     /**
      * Returns a contatenated version of all the text children
      */
-    std::wstring GetText(const Object *node) const;
+    std::u32string GetText(const Object *node) const;
 
     /**
      * Fill an array of lines with concatenated content of each line
      */
-    void GetTextLines(const Object *node, std::vector<std::wstring> &lines) const;
+    void GetTextLines(const Object *node, std::vector<std::u32string> &lines) const;
 
 protected:
     /**

@@ -9,13 +9,12 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
 #include "functorparams.h"
-#include "staffdef.h"
 #include "staffgrp.h"
 #include "vrv.h"
 

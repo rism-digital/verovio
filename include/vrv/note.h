@@ -8,7 +8,7 @@
 #ifndef __VRV_NOTE_H__
 #define __VRV_NOTE_H__
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -161,7 +161,7 @@ public:
      * @name Return the smufl string to use for a note give the notation type
      */
     ///@{
-    std::wstring GetTabFretString(data_NOTATIONTYPE notationType) const;
+    std::u32string GetTabFretString(data_NOTATIONTYPE notationType) const;
     ///@}
 
     /**
@@ -204,12 +204,12 @@ public:
     /**
      * Return the SMuFL code for a mensural note looking at the staff notation type, the coloration and the duration
      */
-    wchar_t GetMensuralNoteheadGlyph() const;
+    char32_t GetMensuralNoteheadGlyph() const;
 
     /**
      * Return a SMuFL code for the notehead
      */
-    wchar_t GetNoteheadGlyph(const int duration) const;
+    char32_t GetNoteheadGlyph(const int duration) const;
 
     /**
      * Check whether current note is enharmonic with another
@@ -225,6 +225,11 @@ public:
      * MIDI pitch
      */
     int GetMIDIPitch(int shift = 0) const;
+
+    /**
+     * Get pitch class of the current note
+     */
+    int GetPitchClass() const;
 
     /**
      * @name Checker, getter and setter for a note with which the stem is shared
@@ -274,6 +279,11 @@ public:
      * Returns true if one note has a ledger line that collides (or is quite close) to the other note's stem
      */
     static bool HandleLedgerLineStemCollision(const Doc *doc, const Staff *staff, const Note *note1, const Note *note2);
+
+    /**
+     * Get pitch class based on the pitch name
+     */
+    static int PnameToPclass(data_PITCHNAME pitchName);
 
     //----------//
     // Functors //

@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -24,7 +24,6 @@
 #include "options.h"
 #include "plica.h"
 #include "proport.h"
-#include "rest.h"
 #include "smufl.h"
 #include "staff.h"
 #include "vrv.h"
@@ -52,7 +51,6 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     const int yNote = element->GetDrawingY();
     const int xNote = element->GetDrawingX();
     const int drawingDur = note->GetDrawingDur();
-    const bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     /************** Noteheads: **************/
 
@@ -65,58 +63,15 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     // Semibrevis and shorter
     else {
-        wchar_t code = note->GetMensuralNoteheadGlyph();
+        char32_t code = note->GetMensuralNoteheadGlyph();
         dc->StartCustomGraphic("notehead");
         this->DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
         dc->EndCustomGraphic();
-        // For semibrevis with stem in black notation, encoded with an explicit stem direction
-        if (((drawingDur > DUR_1) || ((note->GetStemDir() != STEMDIRECTION_NONE) && mensural_black))
-            && note->GetStemVisible() != BOOLEAN_false) {
-            /************** Stem/notehead direction: **************/
-            const int radius = note->GetDrawingRadius(m_doc);
-            const int staffY = staff->GetDrawingY();
-            const int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            const data_STEMDIRECTION stemDir = this->GetMensuralStemDirection(layer, note, verticalCenter);
-            /************** Draw stem: **************/
-            this->DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
-        }
     }
 
     /************ Draw children (verse / syl) ************/
 
     this->DrawLayerChildren(dc, note, layer, staff, measure);
-}
-
-void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
-{
-    assert(dc);
-    assert(element);
-    assert(layer);
-    assert(staff);
-    assert(measure);
-
-    wchar_t charCode;
-
-    Rest *rest = vrv_cast<Rest *>(element);
-    assert(rest);
-
-    const bool drawingCueSize = rest->GetDrawingCueSize();
-    const int drawingDur = rest->GetActualDur();
-    const int x = element->GetDrawingX();
-    const int y = element->GetDrawingY();
-
-    switch (drawingDur) {
-        case DUR_MX: charCode = SMUFL_E9F0_mensuralRestMaxima; break;
-        case DUR_LG: charCode = SMUFL_E9F2_mensuralRestLongaImperfecta; break;
-        case DUR_BR: charCode = SMUFL_E9F3_mensuralRestBrevis; break;
-        case DUR_1: charCode = SMUFL_E9F4_mensuralRestSemibrevis; break;
-        case DUR_2: charCode = SMUFL_E9F5_mensuralRestMinima; break;
-        case DUR_4: charCode = SMUFL_E9F6_mensuralRestSemiminima; break;
-        case DUR_8: charCode = SMUFL_E9F7_mensuralRestFusa; break;
-        case DUR_16: charCode = SMUFL_E9F8_mensuralRestSemifusa; break;
-        default: charCode = 0; // This should never happen
-    }
-    this->DrawSmuflCode(dc, x, y, charCode, staff->m_drawingStaffSize, drawingCueSize);
 }
 
 void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -192,13 +147,13 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 /* This function draws any flags as well as the stem. */
 
-void View::DrawMensuralStem(
-    DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY)
+void View::DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int xn, int originY)
 {
     assert(note);
 
     const int staffSize = staff->m_drawingStaffSize;
     const int drawingDur = note->GetDrawingDur();
+    const int radius = note->GetDrawingRadius(m_doc);
     // Cue size is currently disabled
     const bool drawingCueSize = false;
     const bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
@@ -207,18 +162,15 @@ void View::DrawMensuralStem(
         In both cases, as in CWMN, each shorter duration gets one additional flag. */
     const int nbFlags = (mensural_black ? drawingDur - DUR_2 : drawingDur - DUR_4);
 
+    // SMuFL's mensural stems are not centered
     const int halfStemWidth
         = m_doc->GetGlyphWidth(SMUFL_E93E_mensuralCombStemUp, staff->m_drawingStaffSize, drawingCueSize) / 2;
     const int yOffset = m_doc->GetDrawingUnit(staffSize) - halfStemWidth;
+    originY = (dir == STEMDIRECTION_up) ? originY + yOffset : originY - yOffset;
 
     // draw the stems and the flags
-
-    dc->StartCustomGraphic("stem");
-
-    wchar_t code;
+    char32_t code;
     if (dir == STEMDIRECTION_up) {
-        originY += yOffset;
-
         switch (nbFlags) {
             case 1: code = SMUFL_E949_mensuralCombStemUpFlagSemiminima; break;
             case 2: code = SMUFL_E94B_mensuralCombStemUpFlagFusa; break;
@@ -226,7 +178,6 @@ void View::DrawMensuralStem(
         }
     }
     else {
-        originY -= yOffset;
         switch (nbFlags) {
             case 1: code = SMUFL_E94A_mensuralCombStemDownFlagSemiminima; break;
             case 2: code = SMUFL_E94C_mensuralCombStemDownFlagFusa; break;
@@ -235,7 +186,6 @@ void View::DrawMensuralStem(
     }
 
     this->DrawSmuflCode(dc, xn + radius - halfStemWidth, originY, code, staff->m_drawingStaffSize, drawingCueSize);
-    dc->EndCustomGraphic();
 
     // Store the stem direction ?
     note->SetDrawingStemDir(dir);
@@ -565,7 +515,7 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
 
     int ynum = 0, yden = 0;
     int textSize = staff->m_drawingStaffSize;
-    std::wstring wtext;
+    std::u32string wtext;
 
     if (numBase) {
         ynum = y + m_doc->GetDrawingDoubleUnit(textSize);
@@ -740,7 +690,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
     }
 }
 
-data_STEMDIRECTION View::GetMensuralStemDirection(Layer *layer, Note *note, int verticalCenter)
+data_STEMDIRECTION View::GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter)
 {
     // constants
     const int drawingDur = note->GetDrawingDur();

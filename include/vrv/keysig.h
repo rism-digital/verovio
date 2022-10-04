@@ -88,6 +88,13 @@ public:
     ///@}
 
     /**
+     * Try to convert a keySig content (keyAccid) to a @sig value
+     * This can work only if the content represents a standard accidental series
+     * Return an empty @sig when the content cannot be converted
+     */
+    data_KEYSIGNATURE ConvertToSig() const;
+
+    /**
      * Fill the map of modified pitches
      */
     void FillMap(MapOfPitchAccid &mapOfPitchAccid) const;

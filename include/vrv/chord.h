@@ -170,7 +170,7 @@ public:
      * Diatonic step difference is take up to 2 points, so HasAdjacentNotesInStaff() needs to be called first, to make
      * sure there actually are adjacent notes.
      */
-    std::list<Note *> GetAdjacentNotesList(const Staff *staff, int loc);
+    std::list<const Note *> GetAdjacentNotesList(const Staff *staff, int loc) const;
 
     //----------//
     // Functors //
@@ -203,6 +203,11 @@ public:
      * See Object::CalcStem
      */
     int CalcStem(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::CalcChordNoteHeads
+     */
+    int CalcChordNoteHeads(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcDots

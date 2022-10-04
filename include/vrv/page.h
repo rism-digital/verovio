@@ -87,11 +87,6 @@ public:
     int GetPageIdx() const { return Object::GetIdx(); }
 
     /**
-     * Return the position of the staff on the page, from top to bottom
-     */
-    int GetStaffPosOnPage(Staff *staff) const;
-
-    /**
      * Do the layout of the page, which means aligning its content horizontally
      * and vertically, and justify horizontally and vertically if wanted.
      * This will be done only if m_layoutDone is false or force is true.
@@ -209,7 +204,7 @@ private:
     /**
      * Check whether vertical justification is required for the current page
      */
-    bool IsJustificationRequired(Doc *doc);
+    bool IsJustificationRequired(const Doc *doc);
 
     //
 public:

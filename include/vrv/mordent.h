@@ -57,7 +57,7 @@ public:
     /**
      * Get the SMuFL glyph for the mordent based on type, long attribute or glyph.num
      */
-    wchar_t GetMordentGlyph() const;
+    char32_t GetMordentGlyph() const;
 
     //----------//
     // Functors //

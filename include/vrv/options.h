@@ -66,8 +66,6 @@ enum option_MULTIRESTSTYLE {
     MULTIRESTSTYLE_symbols
 };
 
-enum option_PEDALSTYLE { PEDALSTYLE_auto = 0, PEDALSTYLE_line, PEDALSTYLE_pedstar, PEDALSTYLE_altpedstar };
-
 enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
 //----------------------------------------------------------------------------
@@ -596,6 +594,7 @@ public:
     OptionDbl m_breaksSmartSb;
     OptionIntMap m_condense;
     OptionBool m_condenseFirstPage;
+    OptionBool m_condenseNotLastSystem;
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionString m_expand;
@@ -608,6 +607,7 @@ public:
     OptionBool m_mensuralToMeasure;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
+    OptionBool m_moveScoreDefinitionToStaff;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
     OptionBool m_outputFormatRaw;
@@ -623,6 +623,7 @@ public:
     OptionIntMap m_pedalStyle;
     OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
+    OptionBool m_scaleToPageSize;
     OptionBool m_showRuntime;
     OptionBool m_shrinkToFit;
     OptionBool m_staccatoCenter;
@@ -647,14 +648,20 @@ public:
 
     OptionDbl m_barLineSeparation;
     OptionDbl m_barLineWidth;
+    OptionBool m_beamFrenchStyle;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
-    OptionBool m_beamFrenchStyle;
+    OptionBool m_beamMixedPreserve;
+    OptionDbl m_beamMixedStemMin;
     OptionDbl m_bracketThickness;
     OptionBool m_breaksNoWidow;
+    OptionDbl m_dashedBarLineDashLength;
+    OptionDbl m_dashedBarLineGapLength;
     OptionDbl m_dynamDist;
+    OptionBool m_dynamSingleGlyphs;
     OptionJson m_engravingDefaults;
     OptionJson m_engravingDefaultsFile;
+    OptionDbl m_extenderLineMinSpace;
     OptionDbl m_fingeringScale;
     OptionString m_font;
     OptionDbl m_graceFactor;

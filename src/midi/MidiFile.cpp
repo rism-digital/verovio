@@ -42,6 +42,32 @@ const std::vector<int> MidiFile::decodeLookup {
 };
 
 
+const char* MidiFile::GMinstrument[128] = {
+   	"acoustic grand piano",   "bright acoustic piano",  "electric grand piano",  "honky-tonk piano", "rhodes piano",   "chorused piano",
+   	"harpsichord",  "clavinet",  "celeste",   "glockenspiel",   "music box",  "vibraphone",
+   	"marimba",   "xylophone",  "tubular bells",  "dulcimer",    "hammond organ",   "percussive organ",
+   	"rock organ",   "church organ", "reed organ",   "accordion",   "harmonica", "tango accordion",
+   	"nylon guitar",  "steel guitar",  "jazz guitar",   "clean guitar",  "muted guitar",   "overdriven guitar",
+   	"distortion guitar",   "guitar harmonics",   "acoustic bass",    "fingered electric bass",  "picked electric bass",  "fretless bass",
+   	"slap bass 1",  "slap bass 2",  "synth bass 1",  "synth bass 2",  "violin",    "viola",
+   	"cello",     "contrabass",  "tremolo strings",   "pizzcato strings",  "orchestral harp",      "timpani",
+   	"string ensemble 1",   "string ensemble 2",   "synth strings 1",   "synth strings 1",   "choir aahs",     "voice oohs",
+   	"synth voices",    "orchestra hit",   "trumpet",   "trombone",  "tuba",      "muted trumpet",
+   	"frenc horn", "brass section",  "syn brass 1",  "synth brass 2",  "soprano sax",  "alto sax",
+   	"tenor sax",  "baritone sax",   "oboe",      "english horn",  "bassoon",   "clarinet",
+   	"piccolo",   "flute",     "recorder",  "pan flute",  "bottle blow",    "shakuhachi",
+   	"whistle",   "ocarina",   "square wave",   "saw wave",   "calliope lead",  "chiffer lead",
+   	"charang lead",   "voice lead",   "fifths lead",   "brass lead",  "newage pad",  "warm pad",
+   	"polysyn pad",   "choir pad",   "bowed pad",  "metallic pad",  "halo pad",   "sweep pad",
+   	"rain",    "soundtrack",  "crystal",   "atmosphere",  "brightness",  "goblins",
+   	"echoes",   "sci-fi",  "sitar",     "banjo",     "shamisen",  "koto",
+   	"kalimba",   "bagpipes",  "fiddle",    "shanai",   "tinkle bell",  "agogo",
+   	"steel drums", "woodblock", "taiko drum",     "melodoc tom",      "synth drum",    "reverse cymbal",
+   	"guitar fret noise",   "breath noise",   "seashore",  "bird tweet",    "telephone ring", "helicopter",
+   	"applause",  "gunshot"
+};
+
+
 
 //////////////////////////////
 //
@@ -1820,6 +1846,30 @@ MidiEvent* MidiFile::addTempo(int aTrack, int aTick, double aTempo) {
 
 //////////////////////////////
 //
+// MidiFile::addKeySignature -- Add a key signature meta message
+//      (meta #0x59).
+//
+// Default values:
+//      fifths ==  0 (C)
+//      mode   ==  0 (major)
+//
+// Key signature of b minor would be:
+//      fifths = 2
+//      mode   = 1
+//
+
+MidiEvent* MidiFile::addKeySignature (int aTrack, int aTick, int fifths, bool mode) {
+    MidiEvent* me = new MidiEvent;
+    me->makeKeySignature(fifths, mode);
+    me->tick = aTick;
+    m_events[aTrack]->push_back_no_copy(me);
+    return me;
+}
+
+
+
+//////////////////////////////
+//
 // MidiFile::addTimeSignature -- Add a time signature meta message
 //      (meta #0x58).  The "bottom" parameter must be a power of two;
 //      otherwise, it will be set to the next highest power of two.
@@ -3310,6 +3360,24 @@ std::ostream& MidiFile::writeLittleEndianDouble(std::ostream& out, double value)
 	out << data.bytes[6];
 	out << data.bytes[7];
 	return out;
+}
+
+
+
+////////////////////
+//
+// MidiFile::getGMInstrumentName -- return the General MIDI instrument name
+//    for the given patch change index (in the range from 0 to 127).
+//
+
+std::string MidiFile::getGMInstrumentName(int patchIndex) {
+	if (patchIndex < 0) {
+		return "";
+	}
+	if (patchIndex > 127) {
+		return "";
+	}
+	return GMinstrument[patchIndex];
 }
 
 

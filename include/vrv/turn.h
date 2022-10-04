@@ -57,12 +57,12 @@ public:
     /**
      * Get the SMuFL glyph for the turn based on form or glyph.num
      */
-    wchar_t GetTurnGlyph() const;
+    char32_t GetTurnGlyph() const;
 
     /**
      * Get the turn height ignoring slash
      */
-    int GetTurnHeight(Doc *doc, int staffSize) const;
+    int GetTurnHeight(const Doc *doc, int staffSize) const;
 
     //----------//
     // Functors //

@@ -57,7 +57,8 @@ public:
 private:
     /**
      * Provides a way of pointing to a user-defined symbol.
-     * It must contain a reference to an ID of a
+     * It must contain a reference to an ID of a symbolDef element elsewhere in the
+     * document.
      **/
     std::string m_altsym;
 
@@ -172,6 +173,6 @@ private:
     /* include <attfunc> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_USERSYMBOLS_H__
