@@ -314,6 +314,15 @@
     <a n="cutOutSE" x="1.05" y="-0.62" />
     <a n="cutOutSW" x="0.26" y="-0.96" />
   </g>
+  <g c="E460" x="0.0" y="-411.0" w="254.0" h="511.0" h-a-x="254" n="accidentalKoron">
+    <a n="cutOutSE" x="0.26" y="-0.67" />
+  </g>
+  <g c="E461" x="0.0" y="-291.0" w="370.0" h="582.0" h-a-x="370" n="accidentalSori">
+    <a n="cutOutNE" x="1.19" y="0.39" />
+    <a n="cutOutNW" x="0.26" y="0.83" />
+    <a n="cutOutSE" x="1.19" y="-0.4" />
+    <a n="cutOutSW" x="0.26" y="-0.82" />
+  </g>
   <g c="E4A0" x="0.0" y="0.0" w="442.0" h="254.0" h-a-x="442" n="articAccentAbove" />
   <g c="E4A1" x="0.0" y="-254.0" w="442.0" h="254.0" h-a-x="442" n="articAccentBelow" />
   <g c="E4A2" x="0.0" y="0.0" w="100.0" h="100.0" h-a-x="100" n="articStaccatoAbove" />

@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.80",
+    "fontVersion": "5.2.81",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -202,6 +202,16 @@
                 -1.356
             ]
         },
+        "accidentalKoron": {
+            "bBoxNE": [
+                1.176,
+                0.552
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.576
+            ]
+        },
         "accidentalKucukMucennebFlat": {
             "bBoxNE": [
                 0.792,
@@ -350,6 +360,16 @@
             "bBoxSW": [
                 0.0,
                 -1.356
+            ]
+        },
+        "accidentalSori": {
+            "bBoxNE": [
+                1.536,
+                0.968
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.972
             ]
         },
         "accidentalThreeQuarterTonesFlatArrowDown": {
@@ -1410,6 +1430,16 @@
             "bBoxSW": [
                 0.0,
                 -0.46
+            ]
+        },
+        "chantStrophicus": {
+            "bBoxNE": [
+                0.476,
+                0.324
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.324
             ]
         },
         "clef15": {
@@ -6618,6 +6648,12 @@
                 -0.812
             ]
         },
+        "accidentalKoron": {
+            "cutOutSE": [
+                0.156,
+                -0.552
+            ]
+        },
         "accidentalKucukMucennebFlat": {
             "cutOutNE": [
                 0.096,
@@ -6790,6 +6826,24 @@
             "cutOutSW": [
                 0.16,
                 -0.82
+            ]
+        },
+        "accidentalSori": {
+            "cutOutNE": [
+                0.88,
+                0.4
+            ],
+            "cutOutNW": [
+                0.26,
+                0.88
+            ],
+            "cutOutSE": [
+                0.88,
+                -0.36
+            ],
+            "cutOutSW": [
+                0.26,
+                -0.8
             ]
         },
         "accidentalThreeQuarterTonesFlatArrowDown": {
