@@ -351,22 +351,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttScoreDefGes
+// AttOrnamentAccidGes
 //----------------------------------------------------------------------------
 
-class AttScoreDefGes : public Att {
+class AttOrnamentAccidGes : public Att {
 public:
-    AttScoreDefGes();
-    virtual ~AttScoreDefGes();
+    AttOrnamentAccidGes();
+    virtual ~AttOrnamentAccidGes();
 
     /** Reset the default values for the attribute class **/
-    void ResetScoreDefGes();
+    void ResetOrnamentAccidGes();
 
     /** Read the values for the attribute class **/
-    bool ReadScoreDefGes(pugi::xml_node element);
+    bool ReadOrnamentAccidGes(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteScoreDefGes(pugi::xml_node element);
+    bool WriteOrnamentAccidGes(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -374,28 +374,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTunePname(data_PITCHNAME tunePname_) { m_tunePname = tunePname_; }
-    data_PITCHNAME GetTunePname() const { return m_tunePname; }
-    bool HasTunePname() const;
+    void SetAccidupperGes(data_ACCIDENTAL_GESTURAL accidupperGes_) { m_accidupperGes = accidupperGes_; }
+    data_ACCIDENTAL_GESTURAL GetAccidupperGes() const { return m_accidupperGes; }
+    bool HasAccidupperGes() const;
     //
-    void SetTuneHz(double tuneHz_) { m_tuneHz = tuneHz_; }
-    double GetTuneHz() const { return m_tuneHz; }
-    bool HasTuneHz() const;
-    //
-    void SetTuneTemper(data_TEMPERAMENT tuneTemper_) { m_tuneTemper = tuneTemper_; }
-    data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; }
-    bool HasTuneTemper() const;
+    void SetAccidlowerGes(data_ACCIDENTAL_GESTURAL accidlowerGes_) { m_accidlowerGes = accidlowerGes_; }
+    data_ACCIDENTAL_GESTURAL GetAccidlowerGes() const { return m_accidlowerGes; }
+    bool HasAccidlowerGes() const;
     ///@}
 
 private:
-    /** Holds the pitch name of a tuning reference pitch. **/
-    data_PITCHNAME m_tunePname;
-    /** Holds a value for cycles per second, i.e., Hertz, for a tuning reference pitch. **/
-    double m_tuneHz;
-    /** Provides an indication of the tuning system, 'just', for example. **/
-    data_TEMPERAMENT m_tuneTemper;
+    /** Records the sounding accidental associated with an upper neighboring note. **/
+    data_ACCIDENTAL_GESTURAL m_accidupperGes;
+    /** Records the sounding accidental associated with a lower neighboring note. **/
+    data_ACCIDENTAL_GESTURAL m_accidlowerGes;
 
-    /* include <atttune.temper> */
+    /* include <attaccidlower.ges> */
 };
 
 //----------------------------------------------------------------------------

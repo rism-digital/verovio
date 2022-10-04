@@ -35,9 +35,7 @@ AttCourseLog::AttCourseLog() : Att()
     ResetCourseLog();
 }
 
-AttCourseLog::~AttCourseLog()
-{
-}
+AttCourseLog::~AttCourseLog() {}
 
 void AttCourseLog::ResetCourseLog()
 {
@@ -81,9 +79,7 @@ AttNoteGesTab::AttNoteGesTab() : Att()
     ResetNoteGesTab();
 }
 
-AttNoteGesTab::~AttNoteGesTab()
-{
-}
+AttNoteGesTab::~AttNoteGesTab() {}
 
 void AttNoteGesTab::ResetNoteGesTab()
 {

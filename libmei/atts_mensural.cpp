@@ -35,9 +35,7 @@ AttDurationQuality::AttDurationQuality() : Att()
     ResetDurationQuality();
 }
 
-AttDurationQuality::~AttDurationQuality()
-{
-}
+AttDurationQuality::~AttDurationQuality() {}
 
 void AttDurationQuality::ResetDurationQuality()
 {
@@ -81,9 +79,7 @@ AttMensuralLog::AttMensuralLog() : Att()
     ResetMensuralLog();
 }
 
-AttMensuralLog::~AttMensuralLog()
-{
-}
+AttMensuralLog::~AttMensuralLog() {}
 
 void AttMensuralLog::ResetMensuralLog()
 {
@@ -142,9 +138,7 @@ AttMensuralShared::AttMensuralShared() : Att()
     ResetMensuralShared();
 }
 
-AttMensuralShared::~AttMensuralShared()
-{
-}
+AttMensuralShared::~AttMensuralShared() {}
 
 void AttMensuralShared::ResetMensuralShared()
 {
@@ -248,9 +242,7 @@ AttNoteVisMensural::AttNoteVisMensural() : Att()
     ResetNoteVisMensural();
 }
 
-AttNoteVisMensural::~AttNoteVisMensural()
-{
-}
+AttNoteVisMensural::~AttNoteVisMensural() {}
 
 void AttNoteVisMensural::ResetNoteVisMensural()
 {
@@ -294,9 +286,7 @@ AttPlicaVis::AttPlicaVis() : Att()
     ResetPlicaVis();
 }
 
-AttPlicaVis::~AttPlicaVis()
-{
-}
+AttPlicaVis::~AttPlicaVis() {}
 
 void AttPlicaVis::ResetPlicaVis()
 {
@@ -355,9 +345,7 @@ AttRestVisMensural::AttRestVisMensural() : Att()
     ResetRestVisMensural();
 }
 
-AttRestVisMensural::~AttRestVisMensural()
-{
-}
+AttRestVisMensural::~AttRestVisMensural() {}
 
 void AttRestVisMensural::ResetRestVisMensural()
 {
@@ -401,9 +389,7 @@ AttStemVis::AttStemVis() : Att()
     ResetStemVis();
 }
 
-AttStemVis::~AttStemVis()
-{
-}
+AttStemVis::~AttStemVis() {}
 
 void AttStemVis::ResetStemVis()
 {
@@ -522,9 +508,7 @@ AttStemsMensural::AttStemsMensural() : Att()
     ResetStemsMensural();
 }
 
-AttStemsMensural::~AttStemsMensural()
-{
-}
+AttStemsMensural::~AttStemsMensural() {}
 
 void AttStemsMensural::ResetStemsMensural()
 {

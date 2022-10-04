@@ -35,9 +35,7 @@ AttAlignment::AttAlignment() : Att()
     ResetAlignment();
 }
 
-AttAlignment::~AttAlignment()
-{
-}
+AttAlignment::~AttAlignment() {}
 
 void AttAlignment::ResetAlignment()
 {

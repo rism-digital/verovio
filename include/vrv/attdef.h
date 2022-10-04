@@ -150,14 +150,14 @@ typedef std::pair<int, data_ACCIDENTAL_WRITTEN> data_KEYSIGNATURE;
 typedef std::pair<int, double> data_MEASUREBEAT;
 
 /**
- * MEI data.MEASUREMENTABS
+ * MEI data.MEASUREMENTSIGNED
  */
-typedef data_VU data_MEASUREMENTABS;
+typedef data_VU data_MEASUREMENTSIGNED;
 
 /**
- * MEI data.MEASUREMENTREL
+ * MEI data.MEASUREMENTUNSIGNED
  */
-typedef data_VU data_MEASUREMENTREL;
+typedef data_VU data_MEASUREMENTUNSIGNED;
 
 /**
  * enum class for the signs used in meter counts

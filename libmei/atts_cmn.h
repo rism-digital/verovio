@@ -252,8 +252,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBeamWith(data_OTHERSTAFF beamWith_) { m_beamWith = beamWith_; }
-    data_OTHERSTAFF GetBeamWith() const { return m_beamWith; }
+    void SetBeamWith(data_NEIGHBORINGLAYER beamWith_) { m_beamWith = beamWith_; }
+    data_NEIGHBORINGLAYER GetBeamWith() const { return m_beamWith; }
     bool HasBeamWith() const;
     ///@}
 
@@ -263,7 +263,7 @@ private:
      * which staff the beam is connected to; that is, the staff above or the staff
      * below.
      **/
-    data_OTHERSTAFF m_beamWith;
+    data_NEIGHBORINGLAYER m_beamWith;
 
     /* include <attbeam.with> */
 };
@@ -1054,14 +1054,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPedalStyle(pianoPedals_PEDALSTYLE pedalStyle_) { m_pedalStyle = pedalStyle_; }
-    pianoPedals_PEDALSTYLE GetPedalStyle() const { return m_pedalStyle; }
+    void SetPedalStyle(data_PEDALSTYLE pedalStyle_) { m_pedalStyle = pedalStyle_; }
+    data_PEDALSTYLE GetPedalStyle() const { return m_pedalStyle; }
     bool HasPedalStyle() const;
     ///@}
 
 private:
     /** Determines whether piano pedal marks should be rendered as lines or as terms. **/
-    pianoPedals_PEDALSTYLE m_pedalStyle;
+    data_PEDALSTYLE m_pedalStyle;
 
     /* include <attpedal.style> */
 };
@@ -1206,8 +1206,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStemWith(data_OTHERSTAFF stemWith_) { m_stemWith = stemWith_; }
-    data_OTHERSTAFF GetStemWith() const { return m_stemWith; }
+    void SetStemWith(data_NEIGHBORINGLAYER stemWith_) { m_stemWith = stemWith_; }
+    data_NEIGHBORINGLAYER GetStemWith() const { return m_stemWith; }
     bool HasStemWith() const;
     ///@}
 
@@ -1217,7 +1217,7 @@ private:
      * the current staff should be visually placed on; that is, the one above or the
      * one below.
      **/
-    data_OTHERSTAFF m_stemWith;
+    data_NEIGHBORINGLAYER m_stemWith;
 
     /* include <attstem.with> */
 };

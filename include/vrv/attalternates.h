@@ -110,7 +110,7 @@ protected:
  * Since it can contain different subtype we need a dedicated class for it.
  */
 
-enum LinewidthType { LINEWIDTHTYPE_NONE = 0, LINEWIDTHTYPE_lineWidthTerm, LINEWIDTHTYPE_measurementAbs };
+enum LinewidthType { LINEWIDTHTYPE_NONE = 0, LINEWIDTHTYPE_lineWidthTerm, LINEWIDTHTYPE_measurementUnsigned };
 
 class data_LINEWIDTH {
 public:
@@ -121,7 +121,7 @@ public:
     {
         m_type = type;
         m_lineWidthTerm = LINEWIDTHTERM_NONE;
-        m_measurementAbs = VRV_UNSET;
+        m_measurementUnsigned = VRV_UNSET;
     }
 
     LinewidthType GetType() const { return m_type; }
@@ -133,17 +133,17 @@ public:
         m_lineWidthTerm = value;
     }
 
-    data_MEASUREMENTABS GetMeasurementAbs() const { return m_measurementAbs; }
-    void SetMeasurementAbs(data_MEASUREMENTABS value)
+    data_MEASUREMENTUNSIGNED GetMeasurementUnsigned() const { return m_measurementUnsigned; }
+    void SetMeasurementUnsigned(data_MEASUREMENTUNSIGNED value)
     {
-        Reset(LINEWIDTHTYPE_measurementAbs);
-        m_measurementAbs = value;
+        Reset(LINEWIDTHTYPE_measurementUnsigned);
+        m_measurementUnsigned = value;
     }
 
     bool HasValue() const
     {
         if (m_lineWidthTerm != LINEWIDTHTERM_NONE) return true;
-        if (m_measurementAbs != VRV_UNSET) return true;
+        if (m_measurementUnsigned != VRV_UNSET) return true;
         return false;
     }
 
@@ -152,7 +152,7 @@ public:
     {
         if (m_type != val.GetType()) return false;
         if (m_lineWidthTerm != val.GetLineWithTerm()) return false;
-        if (m_measurementAbs != val.GetMeasurementAbs()) return false;
+        if (m_measurementUnsigned != val.GetMeasurementUnsigned()) return false;
         return true;
     }
     bool operator!=(const data_LINEWIDTH &val) const { return !(*this == val); }
@@ -160,7 +160,7 @@ public:
 protected:
     LinewidthType m_type;
     data_LINEWIDTHTERM m_lineWidthTerm;
-    data_MEASUREMENTABS m_measurementAbs;
+    data_MEASUREMENTUNSIGNED m_measurementUnsigned;
 };
 
 /**

@@ -487,10 +487,10 @@ void View::DrawBracketSpan(
                 lineWidth *= LINEWIDTHTERM_factor_wide;
             }
         }
-        else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
-            if (bracketSpan->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
-                lineWidth
-                    = bracketSpan->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
+            if (bracketSpan->GetLwidth().GetMeasurementUnsigned() != VRV_UNSET) {
+                lineWidth = bracketSpan->GetLwidth().GetMeasurementUnsigned()
+                    * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
         }
     }
@@ -784,10 +784,10 @@ void View::DrawOctave(
                     lineWidth *= LINEWIDTHTERM_factor_wide;
                 }
             }
-            else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
-                if (octave->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
-                    lineWidth
-                        = octave->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
+                if (octave->GetLwidth().GetMeasurementUnsigned() != VRV_UNSET) {
+                    lineWidth = octave->GetLwidth().GetMeasurementUnsigned()
+                        * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
                 }
             }
         }
@@ -2001,10 +2001,10 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
                 lineWidth *= LINEWIDTHTERM_factor_wide;
             }
         }
-        else if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
-            if (gliss->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
-                lineWidth
-                    = gliss->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize * 2);
+        else if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
+            if (gliss->GetLwidth().GetMeasurementUnsigned() != VRV_UNSET) {
+                lineWidth = gliss->GetLwidth().GetMeasurementUnsigned()
+                    * m_doc->GetDrawingUnit(staff->m_drawingStaffSize * 2);
             }
         }
     }
@@ -2229,13 +2229,13 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     dc->StartGraphic(pedal, "", pedal->GetID());
 
-    pedalVis_FORM form = pedal->GetPedalForm(m_doc, system);
+    data_PEDALSTYLE form = pedal->GetPedalForm(m_doc, system);
 
     // Draw a symbol, if it's not a line
-    if (form != pedalVis_FORM_line) {
+    if (form != PEDALSTYLE_line) {
 
         bool bounceStar = true;
-        if (form == pedalVis_FORM_altpedstar) bounceStar = false;
+        if (form == PEDALSTYLE_altpedstar) bounceStar = false;
 
         int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 

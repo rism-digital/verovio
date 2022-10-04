@@ -134,8 +134,8 @@ class ScoreDef : public ScoreDefElement,
                  public AttDistances,
                  public AttEndings,
                  public AttOptimization,
-                 public AttScoreDefGes,
-                 public AttTimeBase {
+                 public AttTimeBase,
+                 public AttTuning {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

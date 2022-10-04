@@ -426,8 +426,8 @@ public:
     int GetBeamsFloat() const { return m_beamsFloat; }
     bool HasBeamsFloat() const;
     //
-    void SetFloatGap(data_MEASUREMENTABS floatGap_) { m_floatGap = floatGap_; }
-    data_MEASUREMENTABS GetFloatGap() const { return m_floatGap; }
+    void SetFloatGap(data_MEASUREMENTUNSIGNED floatGap_) { m_floatGap = floatGap_; }
+    data_MEASUREMENTUNSIGNED GetFloatGap() const { return m_floatGap; }
     bool HasFloatGap() const;
     ///@}
 
@@ -437,7 +437,7 @@ private:
     /** Captures the number of "floating" beams, i.e., those not attached to stems. **/
     int m_beamsFloat;
     /** Records the amount of separation between floating beams and stems. **/
-    data_MEASUREMENTABS m_floatGap;
+    data_MEASUREMENTUNSIGNED m_floatGap;
 
     /* include <attfloat.gap> */
 };
@@ -544,9 +544,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOpening(data_MEASUREMENTABS opening_) { m_opening = opening_; }
-    data_MEASUREMENTABS GetOpening() const { return m_opening; }
+    void SetOpening(data_MEASUREMENTUNSIGNED opening_) { m_opening = opening_; }
+    data_MEASUREMENTUNSIGNED GetOpening() const { return m_opening; }
     bool HasOpening() const;
+    //
+    void SetClosed(data_BOOLEAN closed_) { m_closed = closed_; }
+    data_BOOLEAN GetClosed() const { return m_closed; }
+    bool HasClosed() const;
     ///@}
 
 private:
@@ -554,9 +558,14 @@ private:
      * Specifies the distance between the lines at the open end of a hairpin dynamic
      * mark.
      **/
-    data_MEASUREMENTABS m_opening;
+    data_MEASUREMENTUNSIGNED m_opening;
+    /**
+     * Applies to a "Rossini" hairpin, i.e., one where the normally open side is closed
+     * by a connecting line.
+     **/
+    data_BOOLEAN m_closed;
 
-    /* include <attopening> */
+    /* include <attclosed> */
 };
 
 //----------------------------------------------------------------------------
@@ -1185,14 +1194,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(pedalVis_FORM form_) { m_form = form_; }
-    pedalVis_FORM GetForm() const { return m_form; }
+    void SetForm(data_PEDALSTYLE form_) { m_form = form_; }
+    data_PEDALSTYLE GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
-    pedalVis_FORM m_form;
+    data_PEDALSTYLE m_form;
 
     /* include <attform> */
 };
@@ -1460,8 +1469,8 @@ public:
     data_BOOLEAN GetLinesVisible() const { return m_linesVisible; }
     bool HasLinesVisible() const;
     //
-    void SetSpacing(data_MEASUREMENTREL spacing_) { m_spacing = spacing_; }
-    data_MEASUREMENTREL GetSpacing() const { return m_spacing; }
+    void SetSpacing(data_MEASUREMENTSIGNED spacing_) { m_spacing = spacing_; }
+    data_MEASUREMENTSIGNED GetSpacing() const { return m_spacing; }
     bool HasSpacing() const;
     ///@}
 
@@ -1480,7 +1489,7 @@ private:
      * This value is meaningless for the first staff in a system since the
      * spacing.system attribute indicates the spacing between systems.
      **/
-    data_MEASUREMENTREL m_spacing;
+    data_MEASUREMENTSIGNED m_spacing;
 
     /* include <attspacing> */
 };

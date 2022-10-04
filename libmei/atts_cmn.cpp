@@ -35,9 +35,7 @@ AttArpegLog::AttArpegLog() : Att()
     ResetArpegLog();
 }
 
-AttArpegLog::~AttArpegLog()
-{
-}
+AttArpegLog::~AttArpegLog() {}
 
 void AttArpegLog::ResetArpegLog()
 {
@@ -81,9 +79,7 @@ AttBTremLog::AttBTremLog() : Att()
     ResetBTremLog();
 }
 
-AttBTremLog::~AttBTremLog()
-{
-}
+AttBTremLog::~AttBTremLog() {}
 
 void AttBTremLog::ResetBTremLog()
 {
@@ -127,9 +123,7 @@ AttBeamPresent::AttBeamPresent() : Att()
     ResetBeamPresent();
 }
 
-AttBeamPresent::~AttBeamPresent()
-{
-}
+AttBeamPresent::~AttBeamPresent() {}
 
 void AttBeamPresent::ResetBeamPresent()
 {
@@ -173,9 +167,7 @@ AttBeamRend::AttBeamRend() : Att()
     ResetBeamRend();
 }
 
-AttBeamRend::~AttBeamRend()
-{
-}
+AttBeamRend::~AttBeamRend() {}
 
 void AttBeamRend::ResetBeamRend()
 {
@@ -264,9 +256,7 @@ AttBeamSecondary::AttBeamSecondary() : Att()
     ResetBeamSecondary();
 }
 
-AttBeamSecondary::~AttBeamSecondary()
-{
-}
+AttBeamSecondary::~AttBeamSecondary() {}
 
 void AttBeamSecondary::ResetBeamSecondary()
 {
@@ -310,20 +300,18 @@ AttBeamedWith::AttBeamedWith() : Att()
     ResetBeamedWith();
 }
 
-AttBeamedWith::~AttBeamedWith()
-{
-}
+AttBeamedWith::~AttBeamedWith() {}
 
 void AttBeamedWith::ResetBeamedWith()
 {
-    m_beamWith = OTHERSTAFF_NONE;
+    m_beamWith = NEIGHBORINGLAYER_NONE;
 }
 
 bool AttBeamedWith::ReadBeamedWith(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("beam.with")) {
-        this->SetBeamWith(StrToOtherstaff(element.attribute("beam.with").value()));
+        this->SetBeamWith(StrToNeighboringlayer(element.attribute("beam.with").value()));
         element.remove_attribute("beam.with");
         hasAttribute = true;
     }
@@ -334,7 +322,7 @@ bool AttBeamedWith::WriteBeamedWith(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasBeamWith()) {
-        element.append_attribute("beam.with") = OtherstaffToStr(this->GetBeamWith()).c_str();
+        element.append_attribute("beam.with") = NeighboringlayerToStr(this->GetBeamWith()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -342,7 +330,7 @@ bool AttBeamedWith::WriteBeamedWith(pugi::xml_node element)
 
 bool AttBeamedWith::HasBeamWith() const
 {
-    return (m_beamWith != OTHERSTAFF_NONE);
+    return (m_beamWith != NEIGHBORINGLAYER_NONE);
 }
 
 /* include <attbeam.with> */
@@ -356,9 +344,7 @@ AttBeamingLog::AttBeamingLog() : Att()
     ResetBeamingLog();
 }
 
-AttBeamingLog::~AttBeamingLog()
-{
-}
+AttBeamingLog::~AttBeamingLog() {}
 
 void AttBeamingLog::ResetBeamingLog()
 {
@@ -417,9 +403,7 @@ AttBeatRptLog::AttBeatRptLog() : Att()
     ResetBeatRptLog();
 }
 
-AttBeatRptLog::~AttBeatRptLog()
-{
-}
+AttBeatRptLog::~AttBeatRptLog() {}
 
 void AttBeatRptLog::ResetBeatRptLog()
 {
@@ -463,9 +447,7 @@ AttBracketSpanLog::AttBracketSpanLog() : Att()
     ResetBracketSpanLog();
 }
 
-AttBracketSpanLog::~AttBracketSpanLog()
-{
-}
+AttBracketSpanLog::~AttBracketSpanLog() {}
 
 void AttBracketSpanLog::ResetBracketSpanLog()
 {
@@ -509,9 +491,7 @@ AttCutout::AttCutout() : Att()
     ResetCutout();
 }
 
-AttCutout::~AttCutout()
-{
-}
+AttCutout::~AttCutout() {}
 
 void AttCutout::ResetCutout()
 {
@@ -555,9 +535,7 @@ AttExpandable::AttExpandable() : Att()
     ResetExpandable();
 }
 
-AttExpandable::~AttExpandable()
-{
-}
+AttExpandable::~AttExpandable() {}
 
 void AttExpandable::ResetExpandable()
 {
@@ -601,9 +579,7 @@ AttFTremLog::AttFTremLog() : Att()
     ResetFTremLog();
 }
 
-AttFTremLog::~AttFTremLog()
-{
-}
+AttFTremLog::~AttFTremLog() {}
 
 void AttFTremLog::ResetFTremLog()
 {
@@ -647,9 +623,7 @@ AttGlissPresent::AttGlissPresent() : Att()
     ResetGlissPresent();
 }
 
-AttGlissPresent::~AttGlissPresent()
-{
-}
+AttGlissPresent::~AttGlissPresent() {}
 
 void AttGlissPresent::ResetGlissPresent()
 {
@@ -693,9 +667,7 @@ AttGraceGrpLog::AttGraceGrpLog() : Att()
     ResetGraceGrpLog();
 }
 
-AttGraceGrpLog::~AttGraceGrpLog()
-{
-}
+AttGraceGrpLog::~AttGraceGrpLog() {}
 
 void AttGraceGrpLog::ResetGraceGrpLog()
 {
@@ -739,9 +711,7 @@ AttGraced::AttGraced() : Att()
     ResetGraced();
 }
 
-AttGraced::~AttGraced()
-{
-}
+AttGraced::~AttGraced() {}
 
 void AttGraced::ResetGraced()
 {
@@ -800,9 +770,7 @@ AttHairpinLog::AttHairpinLog() : Att()
     ResetHairpinLog();
 }
 
-AttHairpinLog::~AttHairpinLog()
-{
-}
+AttHairpinLog::~AttHairpinLog() {}
 
 void AttHairpinLog::ResetHairpinLog()
 {
@@ -861,9 +829,7 @@ AttHarpPedalLog::AttHarpPedalLog() : Att()
     ResetHarpPedalLog();
 }
 
-AttHarpPedalLog::~AttHarpPedalLog()
-{
-}
+AttHarpPedalLog::~AttHarpPedalLog() {}
 
 void AttHarpPedalLog::ResetHarpPedalLog()
 {
@@ -997,9 +963,7 @@ AttLvPresent::AttLvPresent() : Att()
     ResetLvPresent();
 }
 
-AttLvPresent::~AttLvPresent()
-{
-}
+AttLvPresent::~AttLvPresent() {}
 
 void AttLvPresent::ResetLvPresent()
 {
@@ -1043,9 +1007,7 @@ AttMeasureLog::AttMeasureLog() : Att()
     ResetMeasureLog();
 }
 
-AttMeasureLog::~AttMeasureLog()
-{
-}
+AttMeasureLog::~AttMeasureLog() {}
 
 void AttMeasureLog::ResetMeasureLog()
 {
@@ -1104,9 +1066,7 @@ AttMeterSigGrpLog::AttMeterSigGrpLog() : Att()
     ResetMeterSigGrpLog();
 }
 
-AttMeterSigGrpLog::~AttMeterSigGrpLog()
-{
-}
+AttMeterSigGrpLog::~AttMeterSigGrpLog() {}
 
 void AttMeterSigGrpLog::ResetMeterSigGrpLog()
 {
@@ -1150,9 +1110,7 @@ AttNumberPlacement::AttNumberPlacement() : Att()
     ResetNumberPlacement();
 }
 
-AttNumberPlacement::~AttNumberPlacement()
-{
-}
+AttNumberPlacement::~AttNumberPlacement() {}
 
 void AttNumberPlacement::ResetNumberPlacement()
 {
@@ -1211,9 +1169,7 @@ AttNumbered::AttNumbered() : Att()
     ResetNumbered();
 }
 
-AttNumbered::~AttNumbered()
-{
-}
+AttNumbered::~AttNumbered() {}
 
 void AttNumbered::ResetNumbered()
 {
@@ -1257,9 +1213,7 @@ AttOctaveLog::AttOctaveLog() : Att()
     ResetOctaveLog();
 }
 
-AttOctaveLog::~AttOctaveLog()
-{
-}
+AttOctaveLog::~AttOctaveLog() {}
 
 void AttOctaveLog::ResetOctaveLog()
 {
@@ -1303,9 +1257,7 @@ AttPedalLog::AttPedalLog() : Att()
     ResetPedalLog();
 }
 
-AttPedalLog::~AttPedalLog()
-{
-}
+AttPedalLog::~AttPedalLog() {}
 
 void AttPedalLog::ResetPedalLog()
 {
@@ -1364,20 +1316,18 @@ AttPianoPedals::AttPianoPedals() : Att()
     ResetPianoPedals();
 }
 
-AttPianoPedals::~AttPianoPedals()
-{
-}
+AttPianoPedals::~AttPianoPedals() {}
 
 void AttPianoPedals::ResetPianoPedals()
 {
-    m_pedalStyle = pianoPedals_PEDALSTYLE_NONE;
+    m_pedalStyle = PEDALSTYLE_NONE;
 }
 
 bool AttPianoPedals::ReadPianoPedals(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("pedal.style")) {
-        this->SetPedalStyle(StrToPianoPedalsPedalstyle(element.attribute("pedal.style").value()));
+        this->SetPedalStyle(StrToPedalstyle(element.attribute("pedal.style").value()));
         element.remove_attribute("pedal.style");
         hasAttribute = true;
     }
@@ -1388,7 +1338,7 @@ bool AttPianoPedals::WritePianoPedals(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasPedalStyle()) {
-        element.append_attribute("pedal.style") = PianoPedalsPedalstyleToStr(this->GetPedalStyle()).c_str();
+        element.append_attribute("pedal.style") = PedalstyleToStr(this->GetPedalStyle()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1396,7 +1346,7 @@ bool AttPianoPedals::WritePianoPedals(pugi::xml_node element)
 
 bool AttPianoPedals::HasPedalStyle() const
 {
-    return (m_pedalStyle != pianoPedals_PEDALSTYLE_NONE);
+    return (m_pedalStyle != PEDALSTYLE_NONE);
 }
 
 /* include <attpedal.style> */
@@ -1410,9 +1360,7 @@ AttRehearsal::AttRehearsal() : Att()
     ResetRehearsal();
 }
 
-AttRehearsal::~AttRehearsal()
-{
-}
+AttRehearsal::~AttRehearsal() {}
 
 void AttRehearsal::ResetRehearsal()
 {
@@ -1456,9 +1404,7 @@ AttScoreDefVisCmn::AttScoreDefVisCmn() : Att()
     ResetScoreDefVisCmn();
 }
 
-AttScoreDefVisCmn::~AttScoreDefVisCmn()
-{
-}
+AttScoreDefVisCmn::~AttScoreDefVisCmn() {}
 
 void AttScoreDefVisCmn::ResetScoreDefVisCmn()
 {
@@ -1502,9 +1448,7 @@ AttSlurRend::AttSlurRend() : Att()
     ResetSlurRend();
 }
 
-AttSlurRend::~AttSlurRend()
-{
-}
+AttSlurRend::~AttSlurRend() {}
 
 void AttSlurRend::ResetSlurRend()
 {
@@ -1563,20 +1507,18 @@ AttStemsCmn::AttStemsCmn() : Att()
     ResetStemsCmn();
 }
 
-AttStemsCmn::~AttStemsCmn()
-{
-}
+AttStemsCmn::~AttStemsCmn() {}
 
 void AttStemsCmn::ResetStemsCmn()
 {
-    m_stemWith = OTHERSTAFF_NONE;
+    m_stemWith = NEIGHBORINGLAYER_NONE;
 }
 
 bool AttStemsCmn::ReadStemsCmn(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("stem.with")) {
-        this->SetStemWith(StrToOtherstaff(element.attribute("stem.with").value()));
+        this->SetStemWith(StrToNeighboringlayer(element.attribute("stem.with").value()));
         element.remove_attribute("stem.with");
         hasAttribute = true;
     }
@@ -1587,7 +1529,7 @@ bool AttStemsCmn::WriteStemsCmn(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasStemWith()) {
-        element.append_attribute("stem.with") = OtherstaffToStr(this->GetStemWith()).c_str();
+        element.append_attribute("stem.with") = NeighboringlayerToStr(this->GetStemWith()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1595,7 +1537,7 @@ bool AttStemsCmn::WriteStemsCmn(pugi::xml_node element)
 
 bool AttStemsCmn::HasStemWith() const
 {
-    return (m_stemWith != OTHERSTAFF_NONE);
+    return (m_stemWith != NEIGHBORINGLAYER_NONE);
 }
 
 /* include <attstem.with> */
@@ -1609,9 +1551,7 @@ AttTieRend::AttTieRend() : Att()
     ResetTieRend();
 }
 
-AttTieRend::~AttTieRend()
-{
-}
+AttTieRend::~AttTieRend() {}
 
 void AttTieRend::ResetTieRend()
 {
@@ -1670,9 +1610,7 @@ AttTremMeasured::AttTremMeasured() : Att()
     ResetTremMeasured();
 }
 
-AttTremMeasured::~AttTremMeasured()
-{
-}
+AttTremMeasured::~AttTremMeasured() {}
 
 void AttTremMeasured::ResetTremMeasured()
 {
@@ -1765,7 +1703,7 @@ bool Att::SetCmn(Object *element, const std::string &attrType, const std::string
         AttBeamedWith *att = dynamic_cast<AttBeamedWith *>(element);
         assert(att);
         if (attrType == "beam.with") {
-            att->SetBeamWith(att->StrToOtherstaff(attrValue));
+            att->SetBeamWith(att->StrToNeighboringlayer(attrValue));
             return true;
         }
     }
@@ -1965,7 +1903,7 @@ bool Att::SetCmn(Object *element, const std::string &attrType, const std::string
         AttPianoPedals *att = dynamic_cast<AttPianoPedals *>(element);
         assert(att);
         if (attrType == "pedal.style") {
-            att->SetPedalStyle(att->StrToPianoPedalsPedalstyle(attrValue));
+            att->SetPedalStyle(att->StrToPedalstyle(attrValue));
             return true;
         }
     }
@@ -2001,7 +1939,7 @@ bool Att::SetCmn(Object *element, const std::string &attrType, const std::string
         AttStemsCmn *att = dynamic_cast<AttStemsCmn *>(element);
         assert(att);
         if (attrType == "stem.with") {
-            att->SetStemWith(att->StrToOtherstaff(attrValue));
+            att->SetStemWith(att->StrToNeighboringlayer(attrValue));
             return true;
         }
     }
@@ -2079,7 +2017,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         const AttBeamedWith *att = dynamic_cast<const AttBeamedWith *>(element);
         assert(att);
         if (att->HasBeamWith()) {
-            attributes->push_back({ "beam.with", att->OtherstaffToStr(att->GetBeamWith()) });
+            attributes->push_back({ "beam.with", att->NeighboringlayerToStr(att->GetBeamWith()) });
         }
     }
     if (element->HasAttClass(ATT_BEAMINGLOG)) {
@@ -2248,7 +2186,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         const AttPianoPedals *att = dynamic_cast<const AttPianoPedals *>(element);
         assert(att);
         if (att->HasPedalStyle()) {
-            attributes->push_back({ "pedal.style", att->PianoPedalsPedalstyleToStr(att->GetPedalStyle()) });
+            attributes->push_back({ "pedal.style", att->PedalstyleToStr(att->GetPedalStyle()) });
         }
     }
     if (element->HasAttClass(ATT_REHEARSAL)) {
@@ -2279,7 +2217,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         const AttStemsCmn *att = dynamic_cast<const AttStemsCmn *>(element);
         assert(att);
         if (att->HasStemWith()) {
-            attributes->push_back({ "stem.with", att->OtherstaffToStr(att->GetStemWith()) });
+            attributes->push_back({ "stem.with", att->NeighboringlayerToStr(att->GetStemWith()) });
         }
     }
     if (element->HasAttClass(ATT_TIEREND)) {
