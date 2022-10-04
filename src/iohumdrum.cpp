@@ -717,7 +717,7 @@ bool HumdrumInput::convertHumdrum()
     // Check if a mensural music score should be produced (and ignore **kerns,
     // since only mens or kern can be rendered by verovio at a time).
     m_mens = checkForMens(infile);
-    m_tempoScaling = getTempoScaling(infile);
+    m_globalTempoScaling = getGlobalTempoScaling(infile);
 
     bool hasScordatura = checkForScordatura(infile);
     if (hasScordatura) {
@@ -4624,7 +4624,7 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
                 if (::isdigit((*kernpart)[3])) {
                     int tempo = stoi(kernpart->substr(3));
                     // std::string tempostr = to_string(tempo);
-                    scoreDef->SetMidiBpm(tempo * m_tempoScaling);
+                    scoreDef->SetMidiBpm(tempo * m_globalTempoScaling * m_localTempoScaling.getFloat());
                     foundtempo = true;
                 }
             }
@@ -4649,7 +4649,7 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
         if (omd) {
             int guess = hum::Convert::tempoNameToMm(*omd, bot, top);
             if (guess > 0) {
-                scoreDef->SetMidiBpm(guess * m_tempoScaling);
+                scoreDef->SetMidiBpm(guess * m_globalTempoScaling * m_localTempoScaling.getFloat());
             }
             else {
                 addDefaultTempo(scoreDef);
@@ -4670,7 +4670,7 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
 void HumdrumInput::addDefaultTempo(ScoreDef *scoreDef)
 {
     if (m_mens) {
-        scoreDef->SetMidiBpm(400.0 * m_tempoScaling);
+        scoreDef->SetMidiBpm(400.0 * m_globalTempoScaling);
         return;
     }
     double sum = 0.0;
@@ -4685,10 +4685,10 @@ void HumdrumInput::addDefaultTempo(ScoreDef *scoreDef)
     }
     double avgdur = sum / count;
     if (avgdur > 2.0) {
-        scoreDef->SetMidiBpm(400.0 * m_tempoScaling);
+        scoreDef->SetMidiBpm(400.0 * m_globalTempoScaling);
     }
-    else if (m_tempoScaling != 1.0) {
-        scoreDef->SetMidiBpm(120.0 * m_tempoScaling);
+    else if (m_globalTempoScaling != 1.0) {
+        scoreDef->SetMidiBpm(120.0 * m_globalTempoScaling);
     }
 }
 
@@ -6720,13 +6720,15 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         if (timepos > 0) {
             double midibpm = getMmTempo(token);
             if (midibpm > 0) {
-                tempo->SetMidiBpm(midibpm * m_tempoScaling);
+                tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
+                m_midibpm = midibpm;
             }
             else {
                 // check for *MM marker before OMD
                 midibpm = getMmTempoForward(token);
                 if (midibpm > 0) {
-                    tempo->SetMidiBpm(midibpm * m_tempoScaling);
+                    tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
+                    m_midibpm = midibpm;
                 }
             }
         }
@@ -9635,7 +9637,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
                 else {
                     std::cerr << "Strange error for adding rest " << trest << std::endl;
-                    std::cerr << "LINE: " << trest->getLineNumber() << ", FIELD: " << trest->getFieldNumber() << std::endl;
+                    std::cerr << "LINE: " << trest->getLineNumber() << ", FIELD: " << trest->getFieldNumber()
+                              << std::endl;
                 }
             }
 
@@ -9730,6 +9733,38 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (*layerdata[i] == "*Xjoin") {
                 m_join = false;
                 continue;
+            }
+            if ((staffindex == 0) && (layerdata[i]->compare(0, 8, "*tscale:") == 0)) {
+                hum::HumRegex hree;
+                if (hree.search(layerdata[i], "^\\*tscale:(\\d+)/(\\d+)$")) {
+                    int valuetop = hree.getMatchInt(1);
+                    int valuebot = hree.getMatchInt(2);
+                    if ((valuetop > 0) && (valuebot > 0)) {
+                        hum::HumNum value = valuetop;
+                        value /= valuebot;
+                        m_localTempoScaling *= value;
+                        Tempo *tempo = new Tempo();
+                        tempo->SetMidiBpm(m_midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
+                        setLocationId(tempo, layerdata[i]);
+                        int staffindex = 0;
+                        hum::HumNum tstamp = getMeasureTstamp(layerdata[i], staffindex);
+                        tempo->SetTstamp(tstamp.getFloat());
+                        addChildMeasureOrSection(tempo);
+                    }
+                }
+                else if (hree.search(layerdata[i], "^\\*tscale:(\\d+)$")) {
+                    hum::HumNum value = hree.getMatchInt(1);
+                    if (value > 0) {
+                        m_localTempoScaling *= value;
+                        Tempo *tempo = new Tempo();
+                        tempo->SetMidiBpm(m_midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
+                        setLocationId(tempo, layerdata[i]);
+                        int staffindex = 0;
+                        hum::HumNum tstamp = getMeasureTstamp(layerdata[i], staffindex);
+                        tempo->SetTstamp(tstamp.getFloat());
+                        addChildMeasureOrSection(tempo);
+                    }
+                }
             }
 
             if (ss[staffindex].verse) {
@@ -10792,6 +10827,7 @@ void HumdrumInput::handleTempoChange(hum::HTp token)
     if (midibpm <= 0) {
         return;
     }
+    m_midibpm = midibpm;
 
     bool nearOmd = isNearOmd(token);
     if (nearOmd) {
@@ -10811,7 +10847,7 @@ void HumdrumInput::handleTempoChange(hum::HTp token)
     }
 
     Tempo *tempo = new Tempo();
-    tempo->SetMidiBpm(midibpm * m_tempoScaling);
+    tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
     setLocationId(tempo, token);
     int staffindex = 0;
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
@@ -12652,7 +12688,7 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
         Tempo *tempo = new Tempo();
         double midibpm = getMmTempo(token);
         if (midibpm > 0) {
-            tempo->SetMidiBpm(midibpm * m_tempoScaling);
+            tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
         }
         if (cparam) {
             setStaffBetween(tempo, m_currentstaff);
@@ -13146,7 +13182,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
         tempo = new Tempo();
         if (midibpm > 0) {
-            tempo->SetMidiBpm(midibpm * m_tempoScaling);
+            tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
         }
         if (placement == "between") {
             setStaffBetween(tempo, m_currentstaff);
@@ -13423,7 +13459,7 @@ bool HumdrumInput::addTempoDirection(const std::string &text, const std::string 
     Tempo *tempo = new Tempo();
     double midibpm = getMmTempo(token);
     if (midibpm > 0) {
-        tempo->SetMidiBpm(midibpm * m_tempoScaling);
+        tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
     }
     if (placement == "center") {
         setStaffBetween(tempo, m_currentstaff);
@@ -26670,10 +26706,10 @@ void HumdrumInput::analyzeVerseColor(hum::HTp &token)
 
 //////////////////////////////
 //
-// HumdrumInput::getTempoScaling --
+// HumdrumInput::getGlobalTempoScaling --
 //
 
-double HumdrumInput::getTempoScaling(hum::HumdrumFile &infile)
+double HumdrumInput::getGlobalTempoScaling(hum::HumdrumFile &infile)
 {
     double output = 1.0;
     hum::HumRegex hre;

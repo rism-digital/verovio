@@ -770,7 +770,7 @@ protected:
     void insertBeamSpan(hum::HTp token);
     std::string getDataTokenId(hum::HTp token);
     void checkForFingeredHarmonic(Chord *chord, hum::HTp token);
-    double getTempoScaling(hum::HumdrumFile &infile);
+    double getGlobalTempoScaling(hum::HumdrumFile &infile);
     bool isTacet(hum::HTp spinestart);
     void storeBeamSpansInStartingMeasure();
     hum::HTp getNextNonNullDataOrMeasureToken(hum::HTp tok);
@@ -1133,11 +1133,17 @@ private:
     // a beamSpan starting in current measure.
     std::vector<hum::HTp> m_beamSpanStartDatabase;
 
-    // m_tempoScaling == global adjustment of tempo markings
-    double m_tempoScaling = 1.0;
+    // m_globalTempoScaling == global adjustment of tempo markings
+    double m_globalTempoScaling = 1.0;
+
+    // m_localTempoScaling == global adjustment of tempo markings
+    hum::HumNum m_localTempoScaling = 1;
 
     // m_join == boolean for merging layers together.
     bool m_join = false;
+
+    // m_midibpm == current MIDI BPM
+    double m_midibpm = 120.0;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
