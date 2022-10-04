@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for persian accidentals (sori and koron)
 
 ## [3.12.00] - 2022-09-29
 * Support for `symbol` within text elements (with `@glyph.num` or `@glyph.name`)
