@@ -1082,8 +1082,8 @@
     </turkishFolkMusicAccidentals>
     <persianAccidentals>
         <description>Persian accidentals</description>
-        <!--<glyph glyph-code="E460" smufl-name="accidentalKoron" />-->
-        <!--<glyph glyph-code="E461" smufl-name="accidentalSori" />-->
+        <glyph glyph-code="E460" smufl-name="accidentalKoron" />
+        <glyph glyph-code="E461" smufl-name="accidentalSori" />
         <range_end>U+E46F</range_end>
         <range_start>U+E460</range_start>
     </persianAccidentals>
