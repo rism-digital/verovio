@@ -1984,6 +1984,14 @@ void HumdrumInput::createHeader()
             pugi::xml_node editor = pubRespStmt.append_child("persName");
             editor.append_attribute("xml:id") = StringFormat("persname-L%d", references[i]->getLineNumber()).c_str();
             editor.append_attribute("analog") = "humdrum:EED";
+            editor.append_attribute("role") = "digital editor";
+            editor.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+        }
+        else if (!refKey.compare(0, 3, "PED")) {
+            pugi::xml_node pubRespStmt = pubStmt.prepend_child("respStmt");
+            pugi::xml_node editor = pubRespStmt.append_child("persName");
+            editor.append_attribute("xml:id") = StringFormat("persname-L%d", references[i]->getLineNumber()).c_str();
+            editor.append_attribute("analog") = "humdrum:PED";
             editor.append_attribute("role") = "editor";
             editor.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
@@ -2289,9 +2297,9 @@ void HumdrumInput::getRespPeople(
     addPerson(respPeople, references, "ODE", "dedicatee"); // dte
     addPerson(respPeople, references, "OCO", "patron"); // commissioner, pat
     addPerson(respPeople, references, "OCL", "collector"); // col
-    // ENC and EED are handled separately
-    // addPerson(respPeople, references, "EED", "digital editor");
-    // addPerson(respPeople, references, "ENC", "encoder"); // mrk,
+    addPerson(respPeople, references, "PED", "editor");
+    addPerson(respPeople, references, "EED", "digital editor");
+    addPerson(respPeople, references, "ENC", "encoder"); // mrk,
     // Markup editor
 }
 
@@ -4260,9 +4268,9 @@ std::string HumdrumInput::automaticHeaderLeft(std::vector<std::pair<std::string,
 
     std::string person;
     if (count == 4) {
-        auto EED = refmap.find("EED");
-        if (EED != refmap.end()) {
-            person = EED->second;
+        auto PED = refmap.find("PED");
+        if (PED != refmap.end()) {
+            person = PED->second;
         }
     }
     else {
