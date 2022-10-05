@@ -3284,8 +3284,8 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
-    // filter for dir
-    else if (filterParent->Is(DIR)) {
+    // filter for dir or tempo
+    else if (filterParent->Is({ DIR, TEMPO })) {
         if (element == "") {
             return true;
         }
