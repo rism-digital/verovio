@@ -1,8 +1,11 @@
 # Changelog
 
-## [unreleased]
+## [3.12.1] - 2022-10-05
+* Fix bug when CSS font is not found
+* Fix cmake installation directory
+* Fix `symbol` not allowed in `tempo`
 
-## [3.12.00] - 2022-09-29
+## [3.12.0] - 2022-09-29
 * Support for `symbol` within text elements (with `@glyph.num` or `@glyph.name`)
 * Support for all music fonts within text using css webfont2 (with `rend@fontfam="smufl"`)
 * Support for `graphic` input and output (@wergo)
