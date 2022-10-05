@@ -902,7 +902,7 @@ Options::Options()
     m_baseOptions.AddOption(&m_page);
 
     m_resourcePath.SetInfo("Resource path", "Path to the directory with Verovio resources");
-    m_resourcePath.Init("/usr/local/share/verovio");
+    m_resourcePath.Init(VRV_RESOURCE_DIR);
     m_resourcePath.SetKey("resourcePath");
     m_resourcePath.SetShortOption('r', true);
     m_baseOptions.AddOption(&m_resourcePath);

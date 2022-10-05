@@ -26,7 +26,7 @@ namespace vrv {
 // Static members with some default values
 //----------------------------------------------------------------------------
 
-thread_local std::string Resources::s_defaultPath = "/usr/local/share/verovio";
+thread_local std::string Resources::s_defaultPath = VRV_RESOURCE_DIR;
 const Resources::StyleAttributes Resources::k_defaultStyle{ data_FONTWEIGHT::FONTWEIGHT_normal,
     data_FONTSTYLE::FONTSTYLE_normal };
 

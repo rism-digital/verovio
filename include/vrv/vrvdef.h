@@ -37,10 +37,19 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 12
+#define VERSION_MINOR 13
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV false
+
+//----------------------------------------------------------------------------
+// Resource directory
+//----------------------------------------------------------------------------
+#ifdef RESOURCE_DIR
+#define VRV_RESOURCE_DIR RESOURCE_DIR
+#else
+#define VRV_RESOURCE_DIR "/usr/local/share/verovio"
+#endif
 
 //----------------------------------------------------------------------------
 // Cast redefinition
