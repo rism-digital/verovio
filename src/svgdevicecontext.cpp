@@ -115,7 +115,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
             = StringFormat("%s/%s.css", resources->GetPath().c_str(), resources->GetCurrentFontName().c_str());
         std::ifstream cssFontFile(cssFontPath);
         if (!cssFontFile.is_open()) {
-            LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG");
+            LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG",
+                resources->GetCurrentFontName().c_str());
         }
         else {
             std::stringstream cssFontStream;
