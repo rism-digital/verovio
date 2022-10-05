@@ -17,7 +17,7 @@
 * Replacement of VerovioText font with Leipzig (and other supported music fonts)
 * Compiling option to use the old Plaine and Easie parser (@carlolic)
 
-## [3.11.00] - 2022-07-15
+## [3.11.0] - 2022-07-15
 * Support for MEI-basic output
 * Support for ES6 and improved npm package (@WolfgangDrescher)
 * Support for `@artic.ges` (@eNote-GmBH)
@@ -363,7 +363,7 @@
 * Support for dynamic silent staff hiding (implements `@optimize` on `<scoreDef>`)
 * Support for `<subst>` with child (`<add>`, `<del>` or `<subst>`) to be selected with `substXPathQuery`
 * Support for `<dir>` and `<dynam>` connectors (triggered with `@next` and `@extender`)
-* Sutomatic positioning of rests within beam (@CCInc)
+* Automatic positioning of rests within beam (@CCInc)
 * Fix for Plaine & Easie mensur changes in mensural notation
 * Use SMuFL glyphs for mensural signs (@rettinghaus)
 * Barline segmentation with text and dynamic indications overlapping measures
