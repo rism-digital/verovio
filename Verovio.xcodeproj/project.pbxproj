@@ -343,6 +343,11 @@
 		4D674B47255F40B7008AEF4C /* plica.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D674B45255F40B7008AEF4C /* plica.cpp */; };
 		4D674B48255F40B7008AEF4C /* plica.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D674B45255F40B7008AEF4C /* plica.cpp */; };
 		4D674B49255F40B7008AEF4C /* plica.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D674B45255F40B7008AEF4C /* plica.cpp */; };
+		4D6A629628ED93CE00F03F1E /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
+		4D6A629728ED93CE00F03F1E /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
+		4D6A629828ED93CF00F03F1E /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
+		4D6A629928ED93D800F03F1E /* graphic.h in Headers */ = {isa = PBXBuildFile; fileRef = 3673E5E528E1DF0C0048BAFA /* graphic.h */; };
+		4D6A629A28ED93D900F03F1E /* graphic.h in Headers */ = {isa = PBXBuildFile; fileRef = 3673E5E528E1DF0C0048BAFA /* graphic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D6DF9F520E1071F00C12BBD /* subst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DF9F420E1071E00C12BBD /* subst.cpp */; };
 		4D6DF9F720E1074100C12BBD /* subst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DF9F420E1071E00C12BBD /* subst.cpp */; };
 		4D6DF9F820E1074200C12BBD /* subst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6DF9F420E1071E00C12BBD /* subst.cpp */; };
@@ -2572,6 +2577,7 @@
 				4DA1448D1C2AB29400CB7CEE /* textelement.h in Headers */,
 				E7BCFFB8281297C60012513D /* resources.h in Headers */,
 				4DB787662022F0BF00394520 /* jsonxx.h in Headers */,
+				4D6A629928ED93D800F03F1E /* graphic.h in Headers */,
 				E79C87C7269440800098FE85 /* lv.h in Headers */,
 				E79ADDC426BD1AE900527E4B /* runtimeclock.h in Headers */,
 				4D88AD0A289673F40006D7DA /* symbol.h in Headers */,
@@ -2731,6 +2737,7 @@
 				BB4C4BA022A932E5001F6AF0 /* positioninterface.h in Headers */,
 				4D15DE3C2411782B00457C05 /* expansionmap.h in Headers */,
 				4DF092A32497706600239195 /* phrase.h in Headers */,
+				4D6A629A28ED93D900F03F1E /* graphic.h in Headers */,
 				BB4C4A6522A9321F001F6AF0 /* atts_cmnornaments.h in Headers */,
 				BB4C4B9622A932E5001F6AF0 /* drawinginterface.h in Headers */,
 				BB4C4A5E22A9321F001F6AF0 /* attconverter.h in Headers */,
@@ -3198,6 +3205,7 @@
 				4D16942B1E3A44F300569BF4 /* slur.cpp in Sources */,
 				4D16942C1E3A44F300569BF4 /* staff.cpp in Sources */,
 				4DB3D8E61F83D16A00B5FC2B /* ftrem.cpp in Sources */,
+				4D6A629628ED93CE00F03F1E /* graphic.cpp in Sources */,
 				4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */,
 				4DB3D8A81F828EA900B5FC2B /* areaposinterface.cpp in Sources */,
 				4D72A5DF208A37DC009DEC1E /* multirpt.cpp in Sources */,
@@ -3640,6 +3648,7 @@
 				8F3DD33018854B250051330C /* measure.cpp in Sources */,
 				8F3DD33218854B250051330C /* page.cpp in Sources */,
 				403BEFF6206C00F000D022D5 /* mrpt.cpp in Sources */,
+				4D6A629728ED93CE00F03F1E /* graphic.cpp in Sources */,
 				4DB3D8CC1F83D10E00B5FC2B /* harm.cpp in Sources */,
 				8F3DD33418854B250051330C /* scoredef.cpp in Sources */,
 				8F3DD33618854B250051330C /* staff.cpp in Sources */,
@@ -3861,6 +3870,7 @@
 				BB4C4B7522A932D7001F6AF0 /* syl.cpp in Sources */,
 				BB4C4B3122A932CF001F6AF0 /* slur.cpp in Sources */,
 				BB4C4AC722A932B6001F6AF0 /* page.cpp in Sources */,
+				4D6A629828ED93CF00F03F1E /* graphic.cpp in Sources */,
 				BB4C4AE322A932BC001F6AF0 /* choice.cpp in Sources */,
 				BB4C4B7722A932D7001F6AF0 /* syllable.cpp in Sources */,
 				BB4C4BB122A932EB001F6AF0 /* view_page.cpp in Sources */,

@@ -1,6 +1,7 @@
 # Changelog
 
 ## [3.12.1] - 2022-10-05
+* Fix `graphic` misssing in ios framework
 * Fix bug when CSS font is not found
 * Fix cmake installation directory
 * Fix `symbol` not allowed in `tempo`
