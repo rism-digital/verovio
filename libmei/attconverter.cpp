@@ -183,6 +183,8 @@ std::string AttConverter::AccidentalWrittenToStr(data_ACCIDENTAL_WRITTEN data) c
         case ACCIDENTAL_WRITTEN_bf: value = "bf"; break;
         case ACCIDENTAL_WRITTEN_kmf: value = "kmf"; break;
         case ACCIDENTAL_WRITTEN_bmf: value = "bmf"; break;
+        case ACCIDENTAL_WRITTEN_koron: value = "koron"; break;
+        case ACCIDENTAL_WRITTEN_sori: value = "sori"; break;
         default:
             LogWarning("Unknown value '%d' for data.ACCIDENTAL.WRITTEN", data);
             value = "";
@@ -223,6 +225,8 @@ data_ACCIDENTAL_WRITTEN AttConverter::StrToAccidentalWritten(const std::string &
     if (value == "bf") return ACCIDENTAL_WRITTEN_bf;
     if (value == "kmf") return ACCIDENTAL_WRITTEN_kmf;
     if (value == "bmf") return ACCIDENTAL_WRITTEN_bmf;
+    if (value == "koron") return ACCIDENTAL_WRITTEN_koron;
+    if (value == "sori") return ACCIDENTAL_WRITTEN_sori;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.ACCIDENTAL.WRITTEN", value.c_str());
     return ACCIDENTAL_WRITTEN_NONE;
