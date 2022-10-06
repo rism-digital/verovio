@@ -4425,6 +4425,7 @@ std::string HumdrumInput::automaticHeaderCenter(
         if (!PUBformat.empty()) {
             subtitle += "in ";
         }
+        std::string outputdate = processReferenceTemplate("@{PDT:y}", biblist, refmap);
         subtitle += "<rend fontstyle=\"italic\">";
         subtitle += PTL;
         subtitle += "</rend>";
@@ -4432,8 +4433,10 @@ std::string HumdrumInput::automaticHeaderCenter(
         subtitle += PPP;
         subtitle += ": ";
         subtitle += PPR;
-        subtitle += ", ";
-        subtitle += PDT;
+        if (!outputdate.empty()) {
+            subtitle += ", ";
+            subtitle += outputdate;
+        }
         subtitle += ")";
     }
 
