@@ -251,9 +251,11 @@ int Verse::InitProcessingLists(FunctorParams *functorParams)
 
 int Verse::GenerateMIDI(FunctorParams *)
 {
-    Note *note = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
-    assert(note);
-    Verse *previousVerse = vrv_cast<Verse *>(note->GetPrevious(this, VERSE));
+    LayerElement *parent = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
+    if (!parent) parent = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
+    assert(parent);
+
+    Verse *previousVerse = vrv_cast<Verse *>(parent->GetPrevious(this, VERSE));
 
     if (previousVerse) return FUNCTOR_SIBLINGS;
 

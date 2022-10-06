@@ -217,6 +217,8 @@ char32_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
         case ACCIDENTAL_WRITTEN_bf: return SMUFL_E442_accidentalBakiyeFlat; break;
         case ACCIDENTAL_WRITTEN_kmf: return SMUFL_E441_accidentalKucukMucennebFlat; break;
         case ACCIDENTAL_WRITTEN_bmf: return SMUFL_E440_accidentalBuyukMucennebFlat; break;
+        case ACCIDENTAL_WRITTEN_koron: return SMUFL_E460_accidentalKoron; break;
+        case ACCIDENTAL_WRITTEN_sori: return SMUFL_E461_accidentalSori; break;
         default: break;
     }
     return 0;

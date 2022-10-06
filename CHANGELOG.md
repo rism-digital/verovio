@@ -2,8 +2,15 @@
 
 ## [unreleased]
 * Support for persian accidentals (sori and koron)
+* Support for heavy barlines
 
-## [3.12.00] - 2022-09-29
+## [3.12.1] - 2022-10-06
+* Fix `graphic` misssing in ios framework
+* Fix bug when CSS font is not found
+* Fix cmake installation directory
+* Fix `symbol` not allowed in `tempo`
+
+## [3.12.0] - 2022-09-29
 * Support for `symbol` within text elements (with `@glyph.num` or `@glyph.name`)
 * Support for all music fonts within text using css webfont2 (with `rend@fontfam="smufl"`)
 * Support for `graphic` input and output (@wergo)
@@ -15,7 +22,7 @@
 * Replacement of VerovioText font with Leipzig (and other supported music fonts)
 * Compiling option to use the old Plaine and Easie parser (@carlolic)
 
-## [3.11.00] - 2022-07-15
+## [3.11.0] - 2022-07-15
 * Support for MEI-basic output
 * Support for ES6 and improved npm package (@WolfgangDrescher)
 * Support for `@artic.ges` (@eNote-GmBH)
@@ -361,7 +368,7 @@
 * Support for dynamic silent staff hiding (implements `@optimize` on `<scoreDef>`)
 * Support for `<subst>` with child (`<add>`, `<del>` or `<subst>`) to be selected with `substXPathQuery`
 * Support for `<dir>` and `<dynam>` connectors (triggered with `@next` and `@extender`)
-* Sutomatic positioning of rests within beam (@CCInc)
+* Automatic positioning of rests within beam (@CCInc)
 * Fix for Plaine & Easie mensur changes in mensural notation
 * Use SMuFL glyphs for mensural signs (@rettinghaus)
 * Barline segmentation with text and dynamic indications overlapping measures
