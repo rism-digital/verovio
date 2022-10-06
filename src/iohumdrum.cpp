@@ -1972,57 +1972,62 @@ void HumdrumInput::createHeader()
     }
 
     // <pubStmt> /////////////
+    pugi::xml_node pubRespStmt;
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pugi::xml_document availability;
     for (int i = 0; i < (int)references.size(); ++i) {
         std::string refKey = references[i]->getReferenceKey();
-        if (refKey.compare(0, 2, "YE") && refKey.compare(0, 3, "EED")) {
+        if (refKey.compare(0, 2, "YE") && refKey.compare(0, 3, "EED") && refKey.compare(0, 3, "PED")) {
             continue;
         }
-        else if (!refKey.compare(0, 3, "EED")) {
-            pugi::xml_node pubRespStmt = pubStmt.prepend_child("respStmt");
+        else if (refKey.compare(0, 3, "EED") == 0) {
+            if (!pubRespStmt) {
+                pubRespStmt = pubStmt.prepend_child("respStmt");
+            }
             pugi::xml_node editor = pubRespStmt.append_child("persName");
             editor.append_attribute("xml:id") = StringFormat("persname-L%d", references[i]->getLineNumber()).c_str();
             editor.append_attribute("analog") = "humdrum:EED";
             editor.append_attribute("role") = "digital editor";
             editor.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
-        else if (!refKey.compare(0, 3, "PED")) {
-            pugi::xml_node pubRespStmt = pubStmt.prepend_child("respStmt");
+        else if (refKey.compare(0, 3, "PED") == 0) {
+            if (!pubRespStmt) {
+                pubRespStmt = pubStmt.prepend_child("respStmt");
+            }
             pugi::xml_node editor = pubRespStmt.append_child("persName");
             editor.append_attribute("xml:id") = StringFormat("persname-L%d", references[i]->getLineNumber()).c_str();
             editor.append_attribute("analog") = "humdrum:PED";
-            editor.append_attribute("role") = "editor";
+            editor.append_attribute("role") = "source editor";
             editor.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
-        else if (!refKey.compare(2, 1, "C")) {
+        else if (refKey.compare(2, 1, "C") == 0) {
             pugi::xml_node useRestrict = availability.append_child("useRestrict");
             useRestrict.append_attribute("xml:id")
                 = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
             useRestrict.append_attribute("analog") = "humdrum:YEC";
             useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
-        else if (!refKey.compare(2, 1, "M")) {
+        else if (refKey.compare(2, 1, "M") == 0) {
             pugi::xml_node useRestrict = availability.append_child("useRestrict");
             useRestrict.append_attribute("xml:id")
                 = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
             useRestrict.append_attribute("analog") = "humdrum:YEM";
             useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
-        else if (!refKey.compare(2, 1, "N")) {
+        else if (refKey.compare(2, 1, "N") == 0) {
             pugi::xml_node pubPlace = pubStmt.append_child("pubPlace");
             pubPlace.append_attribute("xml:id") = StringFormat("pubplace-L%d", references[i]->getLineNumber()).c_str();
             pubPlace.append_attribute("analog") = "humdrum:YEN";
             pubPlace.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
-        else if (!refKey.compare(2, 1, "P")) {
+        else if (refKey.compare(2, 1, "P") == 0) {
             pugi::xml_node publisher = pubStmt.append_child("publisher");
             publisher.append_attribute("xml:id")
                 = StringFormat("publisher-L%d", references[i]->getLineNumber()).c_str();
             publisher.append_attribute("analog") = "humdrum:YEP";
             publisher.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
-        else if (!refKey.compare(2, 1, "R")) {
+        else if (refKey.compare(2, 1, "R") == 0) {
             pugi::xml_node pubDate = pubStmt.append_child("date");
             pubDate.append_attribute("xml:id") = StringFormat("date-L%d", references[i]->getLineNumber()).c_str();
             pubDate.append_attribute("analog") = "humdrum:YER";
@@ -2297,7 +2302,7 @@ void HumdrumInput::getRespPeople(
     addPerson(respPeople, references, "ODE", "dedicatee"); // dte
     addPerson(respPeople, references, "OCO", "patron"); // commissioner, pat
     addPerson(respPeople, references, "OCL", "collector"); // col
-    addPerson(respPeople, references, "PED", "editor");
+    addPerson(respPeople, references, "PED", "source editor");
     addPerson(respPeople, references, "EED", "digital editor");
     addPerson(respPeople, references, "ENC", "encoder"); // mrk,
     // Markup editor
