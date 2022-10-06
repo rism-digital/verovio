@@ -13594,6 +13594,10 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
     second = convertMusicSymbolNameToSmuflEntity(second);
 
     if (!first.empty()) {
+        if (first.back() == '(') {
+            // Add very thin spacer after opening parenthesis:
+            first += "&#x200A;";
+        }
         addTextElement(tempo, first);
     }
 
@@ -13601,12 +13605,27 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
     addTextElement(rend, second);
     tempo->AddChild(rend);
     rend->SetFontfam("smufl");
+    setFontsizePercent(rend, m_textNoteSize);
 
     // Forcing spaces around equals sign:
     third = "\xc2\xa0=\xc2\xa0" + third;
     addTextElement(tempo, third);
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setFontsizePercent --
+//
+
+void HumdrumInput::setFontsizePercent(Rend *rend, const std::string &percentage)
+{
+    data_PERCENT fontpercent;
+    fontpercent = ((vrv::AttTypography *)rend)->StrToPercent(percentage);
+    data_FONTSIZE fontsize;
+    fontsize.SetPercent(fontpercent);
+    rend->SetFontsize(fontsize);
 }
 
 //////////////////////////////
@@ -15387,6 +15406,7 @@ void HumdrumInput::insertTwoRhythmsAndTextBetween(
     text1->SetText(UTF8to32(newnote1));
     rend1->AddChild(text1);
     rend1->SetFontfam("smufl");
+    setFontsizePercent(rend1, m_textNoteSize);
     element->AddChild(rend1);
 
     Text *middleText = new Text();
@@ -15398,6 +15418,7 @@ void HumdrumInput::insertTwoRhythmsAndTextBetween(
     text2->SetText(UTF8to32(newnote2));
     rend2->AddChild(text2);
     rend2->SetFontfam("smufl");
+    setFontsizePercent(rend2, m_textNoteSize);
     element->AddChild(rend2);
 }
 

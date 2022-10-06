@@ -785,6 +785,7 @@ protected:
     void processInterpretationStuff(hum::HTp token, int staffindex);
     void insertGlissandos(std::vector<hum::HTp> &tokens);
     void createGlissando(hum::HTp glissStart, hum::HTp glissEnd);
+    void setFontsizePercent(Rend *rend, const std::string &percentage);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -1144,6 +1145,9 @@ private:
 
     // m_midibpm == current MIDI BPM
     double m_midibpm = 120.0;
+
+    // m_textNoteSize = Size of notes in text.
+    std::string m_textNoteSize = "65%";
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
