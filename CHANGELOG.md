@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.12.1] - 2022-10-05
+## [3.12.1] - 2022-10-06
 * Fix `graphic` misssing in ios framework
 * Fix bug when CSS font is not found
 * Fix cmake installation directory
