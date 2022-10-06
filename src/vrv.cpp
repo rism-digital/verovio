@@ -264,8 +264,8 @@ std::string GetFilename(std::string &fullpath)
 std::string GetVersion()
 {
     std::string dev;
-    if (VERSION_DEV) dev = "-dev";
-    return StringFormat("%d.%d.%d%s-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str(), GIT_COMMIT);
+    if (VERSION_DEV) dev = StringFormat("-dev-%s", GIT_COMMIT);
+    return StringFormat("%d.%d.%d%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str());
 }
 
 static const std::string base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
