@@ -17,6 +17,7 @@
 #include "functorparams.h"
 #include "lb.h"
 #include "num.h"
+#include "symbol.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -70,6 +71,9 @@ bool Rend::IsSupportedChild(Object *child)
     }
     else if (child->Is(REND)) {
         assert(dynamic_cast<Rend *>(child));
+    }
+    else if (child->Is(SYMBOL)) {
+        assert(dynamic_cast<Symbol *>(child));
     }
     else if (child->Is(TEXT)) {
         assert(dynamic_cast<Text *>(child));
