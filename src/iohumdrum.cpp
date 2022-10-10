@@ -17494,15 +17494,15 @@ void HumdrumInput::analyzeLayerBeams(
         cerr << endl;
     }
 
-    int beamstartindex = -1;
-    int beamendindex = -1;
+    // int beamstartindex = -1;
+    // int beamendindex = -1;
     if (beamstate.size() > 0) {
         if (beamstate.back() > 0) {
             // Extra beam start(s) at the end of the measure.  Remove all positive numbers at the back of the
             // beamstate list until a zero is found (for the end of an in-measure beam end).
             for (int i = (int)beamstate.size() - 1; i >= 0; i--) {
                 if (beamstate[i] == 0) {
-                    beamstartindex = i + 1;
+                    // beamstartindex = i + 1;
                     break;
                 }
                 beamstate[i] = 0;
@@ -17525,7 +17525,7 @@ void HumdrumInput::analyzeLayerBeams(
                             // complicated beamspan case that is not yet handled.
                             break;
                         }
-                        beamendindex = i;
+                        // beamendindex = i;
                     }
                 }
                 beamstate[i] -= beamstate.back();
