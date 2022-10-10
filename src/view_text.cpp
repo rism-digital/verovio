@@ -367,31 +367,40 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     FontInfo rendFont;
     bool customFont = false;
-    if (rend->HasFontfam() || rend->HasFontname() || rend->HasFontsize() || rend->HasFontstyle()
-        || rend->HasFontweight()) {
+    if (rend->HasFontname()) {
+        rendFont.SetFaceName(rend->GetFontname().c_str());
         customFont = true;
-        if (rend->HasFontname()) rendFont.SetFaceName(rend->GetFontname().c_str());
-        if (rend->HasFontsize()) {
-            data_FONTSIZE *fs = rend->GetFontsizeAlternate();
-            if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
-                rendFont.SetPointSize(fs->GetFontSizeNumeric());
-            }
-            else if (fs->GetType() == FONTSIZE_term) {
-                const int percent = fs->GetPercentForTerm();
-                rendFont.SetPointSize(params.m_pointSize * percent / 100);
-            }
-            else if (fs->GetType() == FONTSIZE_percent) {
-                rendFont.SetPointSize(params.m_pointSize * fs->GetPercent() / 100);
-            }
+    }
+    if (rend->HasFontsize()) {
+        data_FONTSIZE *fs = rend->GetFontsizeAlternate();
+        if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
+            rendFont.SetPointSize(fs->GetFontSizeNumeric());
         }
-        if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
-            rendFont.SetSmuflFont(true);
-            rendFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
-            int pointSize = (rendFont.GetPointSize() != 0) ? rendFont.GetPointSize() : params.m_pointSize;
-            rendFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
+        else if (fs->GetType() == FONTSIZE_term) {
+            const int percent = fs->GetPercentForTerm();
+            rendFont.SetPointSize(params.m_pointSize * percent / 100);
         }
-        if (rend->HasFontstyle()) rendFont.SetStyle(rend->GetFontstyle());
-        if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
+        else if (fs->GetType() == FONTSIZE_percent) {
+            rendFont.SetPointSize(params.m_pointSize * fs->GetPercent() / 100);
+        }
+        customFont = true;
+        // Also pass it to the children
+        params.m_pointSize = rendFont.GetPointSize();
+    }
+    if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
+        rendFont.SetSmuflFont(true);
+        rendFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+        int pointSize = (rendFont.GetPointSize() != 0) ? rendFont.GetPointSize() : params.m_pointSize;
+        rendFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
+        customFont = true;
+    }
+    if (rend->HasFontstyle()) {
+        rendFont.SetStyle(rend->GetFontstyle());
+        customFont = true;
+    }
+    if (rend->HasFontweight()) {
+        rendFont.SetWeight(rend->GetFontweight());
+        customFont = true;
     }
 
     if (customFont) dc->SetFont(&rendFont);

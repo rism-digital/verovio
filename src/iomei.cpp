@@ -3355,6 +3355,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "rend") {
             return true;
         }
+        else if (element == "symbol") {
+            return true;
+        }
         else {
             return false;
         }

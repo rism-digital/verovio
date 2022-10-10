@@ -424,6 +424,13 @@ void PAEOutput::WriteNote(Note *note)
 
     std::string oct;
 
+    if (note->GetOct() != m_currentOct) {
+        m_currentOct = note->GetOct();
+        char octSign = (m_currentOct > 3) ? '\'' : ',';
+        int signCount = (m_currentOct > 3) ? (m_currentOct - 3) : (4 - m_currentOct);
+        m_streamStringOutput << std::string(signCount, octSign);
+    }
+
     // For chords, only output the top note
     Chord *chord = note->IsChordTone();
     if (chord) {
@@ -432,13 +439,6 @@ void PAEOutput::WriteNote(Note *note)
     else {
         this->WriteDur(note);
         this->WriteGrace(note);
-    }
-
-    if (note->GetOct() != m_currentOct) {
-        m_currentOct = note->GetOct();
-        char octSign = (m_currentOct > 3) ? '\'' : ',';
-        int signCount = (m_currentOct > 3) ? (m_currentOct - 3) : (4 - m_currentOct);
-        m_streamStringOutput << std::string(signCount, octSign);
     }
 
     Accid *noteAccid = dynamic_cast<Accid *>(note->FindDescendantByType(ACCID));
