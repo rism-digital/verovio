@@ -34,6 +34,7 @@
 #include "runningelement.h"
 #include "section.h"
 #include "slur.h"
+#include "symbol.h"
 #include "tempo.h"
 #include "tie.h"
 #include "verse.h"
@@ -604,6 +605,7 @@ protected:
     bool setTempoContent(Tempo *tempo, const std::string &text);
     bool setLabelContent(Label *label, const std::string &text);
     std::string convertMusicSymbolNameToSmuflEntity(const std::string &text);
+    std::vector<std::string> convertMusicSymbolNameToSmuflName(const std::string &text);
     void processTerminalLong(hum::HTp token);
     void processTerminalBreve(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
@@ -785,7 +787,7 @@ protected:
     void processInterpretationStuff(hum::HTp token, int staffindex);
     void insertGlissandos(std::vector<hum::HTp> &tokens);
     void createGlissando(hum::HTp glissStart, hum::HTp glissEnd);
-    void setFontsizePercent(Rend *rend, const std::string &percentage);
+    void setSmuflContent(Symbol *symbol, const std::string &name);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -858,6 +860,7 @@ protected:
     template <class ELEMENT> void setWrittenAccidentalLower(ELEMENT element, const string &value);
     template <class ELEMENT> void attachToToken(ELEMENT *element, hum::HTp token);
     template <class ELEMENT> void setAttachmentType(ELEMENT *element, hum::HTp token);
+    template <class ELEMENT> void setFontsizePercent(ELEMENT *element, const std::string &percentage);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -1147,7 +1150,7 @@ private:
     double m_midibpm = 120.0;
 
     // m_textNoteSize = Size of notes in text.
-    std::string m_textNoteSize = "65%";
+    std::string m_textNoteSize = "70%";
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

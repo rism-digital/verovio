@@ -13591,23 +13591,39 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
     std::string first = hre.getMatch(1);
     std::string second = hre.getMatch(2);
     std::string third = hre.getMatch(3);
-    second = convertMusicSymbolNameToSmuflEntity(second);
+    std::vector<std::string> secondNames = convertMusicSymbolNameToSmuflName(second);
 
     if (!first.empty()) {
         if (first.back() == '(') {
-            // Add very thin spacer after opening parenthesis:
+            // Add very thin spacer after opening parenthesis
+            // to separate parenthesis and notehead:
             first += "&#x200A;";
         }
         addTextElement(tempo, first);
     }
 
-    Rend *rend = new Rend();
-    addTextElement(rend, second);
-    tempo->AddChild(rend);
-    rend->SetFontfam("smufl");
-    setFontsizePercent(rend, m_textNoteSize);
+    // Add the musical symbols, adding a space between them
+    std::string type;
+    std::string name;
+    int counter = 0;
+    for (int i = 0; i < (int)secondNames.size(); i++) {
+        if (secondNames.at(i).empty()) {
+            continue;
+        }
+        name = secondNames.at(i);
+        if (counter) {
+            // Add a space element between music symbols.
+            addTextElement(tempo, "\xc2\xa0");
+        }
+        ++counter;
 
-    // Forcing spaces around equals sign:
+        Symbol *symbol = new Symbol();
+        setSmuflContent(symbol, secondNames.at(i));
+        setFontsizePercent(symbol, m_textNoteSize);
+        tempo->AddChild(symbol);
+    }
+
+    // Force spaces around equals sign:
     third = "\xc2\xa0=\xc2\xa0" + third;
     addTextElement(tempo, third);
 
@@ -13616,22 +13632,325 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
 
 //////////////////////////////
 //
-// HumdrumInput::setFontsizePercent --
+// HumdrumInput::setSmuflContent -- Pull out any type parameter before inserting the name of the glyph.
 //
 
-void HumdrumInput::setFontsizePercent(Rend *rend, const std::string &percentage)
+void HumdrumInput::setSmuflContent(Symbol *symbol, const std::string &name)
+{
+    hum::HumRegex hre;
+    std::string type;
+    if (hre.search(name, "@type=\"(.*?)")) {
+        type = hre.getMatch(1);
+        std::string newname = hre.replaceCopy(name, "", "@.*");
+        symbol->SetGlyphName(newname);
+    }
+    else {
+        symbol->SetGlyphName(name);
+    }
+
+    symbol->SetGlyphAuth("smufl");
+
+    if (!type.empty()) {
+        symbol->SetType(type);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setFontsizePercent -- Set the fontsize of an element to a percentage.
+//
+
+template <class ELEMENT> void HumdrumInput::setFontsizePercent(ELEMENT *element, const std::string &percentage)
 {
     data_PERCENT fontpercent;
-    fontpercent = ((vrv::AttTypography *)rend)->StrToPercent(percentage);
+    fontpercent = ((vrv::AttTypography *)element)->StrToPercent(percentage);
     data_FONTSIZE fontsize;
     fontsize.SetPercent(fontpercent);
-    rend->SetFontsize(fontsize);
+    element->SetFontsize(fontsize);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::convertMusicSymbolNameToSmuflName --  Convert from
+//    text names for music symbols into SMuFL names for display with <symbol>
+//
+//    Symbol name   SMuFL name   Hex encoding    Notes
+// ===============================================================
+//
+// https://www.smufl.org/version/latest/range/repeats
+//
+//    https://www.smufl.org/version/1.2/glyph/segno
+//    segno         segno        E047
+//
+//    https://www.smufl.org/version/1.2/glyph/coda
+//    coda          coda         E048
+//
+// http://www.smufl.org/version/1.2/range/medievalAndRenaissanceMiscellany
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralSignumUp
+//    sc            mensuralSignumUp    EA00   (signum congruentiae up)
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralSignumDown
+//    sc-below      mensuralSignumDown   EA01  (signum congruentiae below the staff)
+//
+// https://www.smufl.org/version/latest/range/metronomeMarks
+//
+//    https://www.smufl.org/version/1.2/glyph/metNoteDoubleWholeSquare
+//    breve         metNoteDoubleWholeSquare   ECA1
+
+//    https://www.smufl.org/version/1.2/glyph/metNoteWhole
+//    whole         metNoteWhole       ECA2
+//
+//    https://www.smufl.org/version/1.2/glyph/metNoteHalfUp
+//    half          metNoteHalfUp      ECA3
+//
+//    https://www.smufl.org/version/1.2/glyph/metNoteQuarterUp
+//    quarter       metNoteQuarterUp   ECA5
+//
+//    https://www.smufl.org/version/1.2/glyph/metNote8thUp
+//    eighth        metNote8thUp       ECA7
+//
+//    https://www.smufl.org/version/1.2/glyph/metNote16thUp
+//    sixteenth     metNote16thUp      ECA9
+//
+//    https://www.smufl.org/version/1.2/glyph/metNote32ndUp
+//    32nd          metNote32ndUp      ECAB
+//
+//    https://www.smufl.org/version/1.2/glyph/metNote64thUp
+//    64th          metNote64thUp      ECAD
+//
+//    https://www.smufl.org/version/1.2/glyph/metNote128thUp
+//    128th         metNote128thUp     ECAF
+//
+//    https://www.smufl.org/version/1.2/glyph/metNote256thUp
+//    256th         metNote256thUp     ECB1
+//
+//    https://www.smufl.org/version/1.2/glyph/metNote512thUp
+//    512th         metNote512thUp     ECB3
+//
+//    https://www.smufl.org/version/1.2/glyph/metNote1024thUp
+//    1024th        metNote1024thUp    ECB5
+//
+//    https://www.smufl.org/version/1.2/glyph/metAugmentationDot
+//    -dot          metAugmentationDot ECB7
+//
+// http://www.smufl.org/version/1.2/range/medievalAndRenaissanceProlations
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProlation1
+//    circle-dot, O-dot, o-dot  mensuralProlation1   E910
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProlation2
+//    circle, O, o   mensuralProlation2 E911
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProlation3
+//    cut-circle, cut-o, cut-O  mensuralProlation3 E912
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProlation4
+//    cut-circle-dot, cut-o-dot, cut-O-dot   mensuralProlation4  E913
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProlation5
+//    c-dot, C-dot     mensuralProlation5     E914
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProlation6
+//    C     mensuralProlation6       E915
+//
+//    https://www.smufl.org/version/1.2/glyph/timeSigCommon
+//    c     timeSigCommon            E08A
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProlation7
+//    reverse-c, Cr, cr   mensuralProlation7   E916
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProlation8
+//    cut-c-dot, cut-C-dot   mensuralProlation8  E917
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProlation9
+//    cut-C      mensuralProlation9 E918
+//
+//    https://www.smufl.org/version/1.2/glyph/timeSigCutCommon
+//    cut-c      timeSigCutCommon   E08B
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProlation10
+//    reverse-cut-c, reverse-cut-C mensuralProlation10 E919
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProlation11/
+//    reverse-c-dot, reverse-C-dot  mensuralProlation11 E91A
+//
+//    https://www.smufl.org/version/1.2/glyph/mensuralProportionTempusPerfectum
+//    o-slash, O-slash  mensuralProportionTempusPerfectum E91B
+//
+
+std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const std::string &text)
+{
+    std::vector<std::string> output;
+
+    if (text.empty()) {
+        return output;
+    }
+
+    std::string second;
+    if ((text[0] == '[') && (text.back() == ']')) {
+        second = text.substr(1, text.size() - 2);
+    }
+    else {
+        second = text;
+    }
+
+    // Remove styling qualifiers:
+    size_t pos = second.find('|');
+    if (pos != std::string::npos) {
+        second = second.substr(0, pos);
+    }
+
+    hum::HumRegex hre;
+    // if (hre.search(second, "^(&#x[a-f0-9]{4};)+$", "i")) {
+    //     // Passing a raw SMuFL entity
+    //     return second;
+    // }
+
+    // https://www.smufl.org/version/latest/range/repeats
+    if (second == "segno") {
+        output.push_back("segno");
+        return output;
+    }
+    if (second == "coda") {
+        output.push_back("coda");
+        return output;
+    }
+
+    // http://www.smufl.org/version/1.2/range/medievalAndRenaissanceMiscellany
+    if (second == "sc") {
+        output.push_back("mensuralSignumUp");
+        return output;
+    }
+    if (second == "sc-below") {
+        output.push_back("mensuralSignumDown");
+        return output;
+    }
+
+    // http://www.smufl.org/version/1.2/range/medievalAndRenaissanceProlations
+    if ((second == "circle-dot") || (second == "o-dot") || (second == "O-dot")) {
+        output.push_back("mensuralProlation1@type=\"circle-dot\"");
+        return output;
+    }
+    if ((second == "circle") || (second == "O") || (second == "o")) {
+        output.push_back("mensuralProlation2@type=\"circle\"");
+        return output;
+    }
+    if ((second == "cut-circle") || (second == "cut-o") || (second == "cut-O")) {
+        output.push_back("mensuralProlation3@type=\"cut-circle\"");
+        return output;
+    }
+    if ((second == "cut-circle-dot") || (second == "cut-o-dot") || (second == "cut-O-dot") || (second == "O.!")) {
+        output.push_back("mensuralProlation4@type=\"cut-circle-dot\"");
+        return output;
+    }
+    if ((second == "c-dot") || (second == "C-dot")) {
+        output.push_back("mensuralProlation5@type=\"c-dot\"");
+        return output;
+    }
+    if (second == "C") {
+        output.push_back("mensuralProlation6@type=\"c\"");
+        return output;
+    }
+    if (second == "c") {
+        output.push_back("timeSigCommon");
+        return output;
+    }
+    if ((second == "reverse-c") || (second == "Cr") || (second == "cr")) {
+        output.push_back("mensuralProlation7@type=\"reverse-c\"");
+        return output;
+    }
+    if ((second == "cut-c-dot") || (second == "cut-C-dot")) {
+        output.push_back("mensuralProlation8@type=\"cut-c-dot\"");
+        return output;
+    }
+    if (second == "cut-C") {
+        output.push_back("mensuralProlation9@type=\"cut-c\"");
+        return output;
+    }
+    if (second == "cut-c") {
+        output.push_back("timeSigCutCommon");
+        return output;
+    }
+
+    if ((second == "reverse-cut-c") || (second == "reverse-cut-C") || (second == "cut-cr") || (second == "cut-Cr")) {
+        output.push_back("mensuralProlation10@type=\"reverse-cut-c\"");
+        return output;
+    }
+    if ((second == "reverse-c-dot") || (second == "reverse-C-dot") || (second == "cr-dot") || (second == "Cr-dot")) {
+        output.push_back("mensuralProlation11@type=\"reverse-c-dot\"");
+        return output;
+    }
+    if ((second == "circle-slash") || (second == "o-slash") || (second == "O/") || (second == "o/")) {
+        output.push_back("mensuralProportionTempusPerfectum");
+        return output;
+    }
+
+    // generating rhythmic note with optional "-dot" after it.
+    int dots = 0;
+    if (hre.search(second, "-dot$")) {
+        dots = 1;
+        if (hre.search(second, "-dot-dot$")) {
+            dots = 2;
+            if (hre.search(second, "-dot-dot-dot$")) {
+                dots = 3;
+            }
+        }
+    }
+
+    // remove any trailing -dots:
+    hre.replaceDestructive(second, "", "(-dot)+");
+
+    // https://www.smufl.org/version/latest/range/individualNotes
+    if ((second == "quarter") || (second == "4")) {
+        output.push_back("metNoteQuarterUp");
+    }
+    else if ((second == "half") || (second == "2")) {
+        output.push_back("metNoteHalfUp");
+    }
+    else if ((second == "whole") || (second == "1")) {
+        output.push_back("metNoteWholeUp");
+    }
+    else if ((second == "breve") || (second == "double-whole") || (second == "0")) {
+        output.push_back("metNoteSquareBreveUp");
+    }
+    else if ((second == "eighth") || (second == "8") || (second == "8th")) {
+        output.push_back("metNote8thUp");
+    }
+    else if ((second == "sixteenth") || (second == "16") || (second == "16th")) {
+        output.push_back("metNote16thUp");
+    }
+    else if ((second == "32") || (second == "32nd")) {
+        output.push_back("metNote32ndUp");
+    }
+    else if ((second == "64") || (second == "64th")) {
+        output.push_back("metNote64thUp");
+    }
+    else if ((second == "128") || (second == "128th")) {
+        output.push_back("metNote128thUp");
+    }
+    else if ((second == "256") || (second == "256th")) {
+        output.push_back("metNote256thUp");
+    }
+    else if ((second == "512") || (second == "512th")) {
+        output.push_back("metNote512thUp");
+    }
+    else if ((second == "1024") || (second == "1024th")) {
+        output.push_back("metNote1024thUp");
+    }
+
+    if (dots) {
+        for (int i = 0; i < dots; i++) {
+            output.push_back("metAugmentationDot");
+        }
+    }
+    return output;
 }
 
 //////////////////////////////
 //
 // HumdrumInput::convertMusicSymbolNameToSmuflEntity --  Convert from
-//    text names for music symbols into SMuFL codepoints for VerovioText font.
+//    text names for music symbols into SMuFL names for display with <symbol>
 //
 //      NAME (alternates)      HEX ENCODING    NOTES
 // ===============================================================
@@ -13672,7 +13991,6 @@ void HumdrumInput::setFontsizePercent(Rend *rend, const std::string &percentage)
 //      reverse-cut-c (C!r, c!r)   E919
 //      reverse-c-dot (C.r, c.r)   E91A
 //      o-slash (O/, o/)           E91B
-
 //
 // https://www.smufl.org/version/latest/range/metronomeMarks
 //      [not used (actually copied to E1D0 range)]
@@ -13705,7 +14023,7 @@ std::string HumdrumInput::convertMusicSymbolNameToSmuflEntity(const std::string 
         second = text;
     }
 
-    // remove syling qualifiers
+    // remove styling qualifiers
     size_t pos = second.find('|');
     if (pos != std::string::npos) {
         second = second.substr(0, pos);
