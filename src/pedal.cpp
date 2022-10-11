@@ -152,7 +152,7 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
     System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     data_PEDALSTYLE form = this->GetPedalForm(params->m_doc, system);
-    if (form == PEDALSTYLE_line) {
+    if (form == PEDALSTYLE_line || form == PEDALSTYLE_pedline) {
         params->m_pedalLines.push_back(this);
     }
 
