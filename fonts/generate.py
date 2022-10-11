@@ -118,7 +118,7 @@ def generate_smufl(opts: Namespace) -> bool:
 def extract_fonts(opts: Namespace) -> bool:
     """
     Takes a font file and extracts the necessary files for Verovio.
-    Generates a glyph file for each glyph, and an SVG glyph file
+    Generates a glyph file for each glyph and a bounding-boxes file
     containing only the supported SMuFL glyphs.
 
     :param opts: A set of options from the argument parser sub-command.
