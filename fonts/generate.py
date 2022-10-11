@@ -118,7 +118,7 @@ def generate_smufl(opts: Namespace) -> bool:
 def extract_fonts(opts: Namespace) -> bool:
     """
     Takes a font file and extracts the necessary files for Verovio.
-    Generates a glyph file for each glyph,and an SVG glyph file
+    Generates a glyph file for each glyph and a bounding-boxes file
     containing only the supported SMuFL glyphs.
 
     :param opts: A set of options from the argument parser sub-command.
@@ -177,7 +177,7 @@ def extract_fonts(opts: Namespace) -> bool:
         metadata: dict = json.load(jfile)
 
     __write_xml_glyphs(glyphs, supported_glyphs, units, glyph_file_pth)
-    __write_xml_svg(glyphs, supported_glyphs, family, units, hax, metadata, output_pth)
+    __write_bb_xml(glyphs, supported_glyphs, family, units, hax, metadata, output_pth)
     return True
 
 
@@ -537,7 +537,7 @@ def __write_xml_glyphs(
         tr.write(str(glyph_pth), encoding="UTF-8")
 
 
-def __write_xml_svg(
+def __write_bb_xml(
     glyphs: list[Et.Element],
     supported_glyphs: dict,
     family: str,
@@ -546,7 +546,7 @@ def __write_xml_svg(
     metadata: dict,
     output: Path,
 ) -> None:
-    log.debug("Writing Verovio SVG file for %s", family)
+    log.debug("Writing Verovio bounding-boxes file for %s", family)
     root: Et.Element = Et.Element("bounding-boxes")
     root.set("font-family", family)
     root.set("units-per-em", units_per_em)
