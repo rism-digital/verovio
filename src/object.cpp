@@ -25,7 +25,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "featureextractor.h"
-#include "find.h"
+#include "findfunctor.h"
 #include "functorparams.h"
 #include "io.h"
 #include "keysig.h"

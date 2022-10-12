@@ -14,8 +14,8 @@
 //----------------------------------------------------------------------------
 
 #include "bboxdevicecontext.h"
-#include "calcdots.h"
-#include "calcledgerlines.h"
+#include "calcdotsfunctor.h"
+#include "calcledgerlinesfunctor.h"
 #include "comparison.h"
 #include "doc.h"
 #include "functor.h"

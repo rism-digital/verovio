@@ -5,7 +5,7 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "calcledgerlines.h"
+#include "calcledgerlinesfunctor.h"
 
 //----------------------------------------------------------------------------
 
