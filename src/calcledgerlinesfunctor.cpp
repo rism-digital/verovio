@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        calcledgerlines.cpp
+// Name:        calcledgerlinesfunctor.cpp
 // Author:      David Bauer
 // Created:     2022
 // Copyright (c) Authors and others. All rights reserved.
@@ -16,12 +16,12 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// CalcLedgerLines
+// CalcLedgerLinesFunctor
 //----------------------------------------------------------------------------
 
-CalcLedgerLines::CalcLedgerLines(Doc *doc) : DocFunctor(doc) {}
+CalcLedgerLinesFunctor::CalcLedgerLinesFunctor(Doc *doc) : DocFunctor(doc) {}
 
-FunctorCode CalcLedgerLines::VisitNote(Note *note)
+FunctorCode CalcLedgerLinesFunctor::VisitNote(Note *note)
 {
     if (note->GetVisible() == BOOLEAN_false) {
         return FUNCTOR_SIBLINGS;
@@ -58,7 +58,7 @@ FunctorCode CalcLedgerLines::VisitNote(Note *note)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode CalcLedgerLines::VisitStaffEnd(Staff *staff)
+FunctorCode CalcLedgerLinesFunctor::VisitStaffEnd(Staff *staff)
 {
     const int extension = m_doc->GetDrawingLedgerLineExtension(staff->m_drawingStaffSize, false);
     const int minExtension = m_doc->GetDrawingMinimalLedgerLineExtension(staff->m_drawingStaffSize, false);
@@ -71,7 +71,7 @@ FunctorCode CalcLedgerLines::VisitStaffEnd(Staff *staff)
     return FUNCTOR_CONTINUE;
 }
 
-void CalcLedgerLines::AdjustLedgerLines(
+void CalcLedgerLinesFunctor::AdjustLedgerLines(
     ArrayOfLedgerLines &lines, ArrayOfLedgerLines &cueLines, double cueScaling, int extension, int minExtension)
 {
     assert(minExtension <= extension);

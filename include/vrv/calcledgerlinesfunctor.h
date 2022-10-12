@@ -1,32 +1,32 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        calcledgerlines.h
+// Name:        calcledgerlinesfunctor.h
 // Author:      David Bauer
 // Created:     2022
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_CALCLEDGERLINES_H__
-#define __VRV_CALCLEDGERLINES_H__
+#ifndef __VRV_CALCLEDGERLINESFUNCTOR_H__
+#define __VRV_CALCLEDGERLINESFUNCTOR_H__
 
 #include "functor.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// CalcLedgerLines
+// CalcLedgerLinesFunctor
 //----------------------------------------------------------------------------
 
 /**
  * This class calculates the ledger lines.
  */
-class CalcLedgerLines : public DocFunctor {
+class CalcLedgerLinesFunctor : public DocFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    CalcLedgerLines(Doc *doc);
-    virtual ~CalcLedgerLines() = default;
+    CalcLedgerLinesFunctor(Doc *doc);
+    virtual ~CalcLedgerLinesFunctor() = default;
     ///@}
 
     /*
@@ -59,4 +59,4 @@ private:
 
 } // namespace vrv
 
-#endif // __VRV_CALCLEDGERLINES_H__
+#endif // __VRV_CALCLEDGERLINESFUNCTOR_H__

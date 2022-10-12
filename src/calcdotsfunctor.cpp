@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        calcdots.cpp
+// Name:        calcdotsfunctor.cpp
 // Author:      David Bauer
 // Created:     2022
 // Copyright (c) Authors and others. All rights reserved.
@@ -20,17 +20,17 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// CalcDots
+// CalcDotsFunctor
 //----------------------------------------------------------------------------
 
-CalcDots::CalcDots(Doc *doc) : DocFunctor(doc)
+CalcDotsFunctor::CalcDotsFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_chordDots = NULL;
     m_chordDrawingX = 0;
     m_chordStemDir = STEMDIRECTION_NONE;
 }
 
-FunctorCode CalcDots::VisitChord(Chord *chord)
+FunctorCode CalcDotsFunctor::VisitChord(Chord *chord)
 {
     // if the chord isn't visible, stop here
     if (!chord->IsVisible()) {
@@ -58,7 +58,7 @@ FunctorCode CalcDots::VisitChord(Chord *chord)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode CalcDots::VisitNote(Note *note)
+FunctorCode CalcDotsFunctor::VisitNote(Note *note)
 {
     // We currently have no dots object with mensural notes
     if (note->IsMensuralDur()) {
@@ -125,7 +125,7 @@ FunctorCode CalcDots::VisitNote(Note *note)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode CalcDots::VisitRest(Rest *rest)
+FunctorCode CalcDotsFunctor::VisitRest(Rest *rest)
 {
     // We currently have no dots object with mensural rests
     if (rest->IsMensuralDur()) {
@@ -176,7 +176,7 @@ FunctorCode CalcDots::VisitRest(Rest *rest)
     return FUNCTOR_SIBLINGS;
 }
 
-bool CalcDots::IsDotOverlappingWithFlag(const Note *note, const int staffSize, int dotLocShift) const
+bool CalcDotsFunctor::IsDotOverlappingWithFlag(const Note *note, const int staffSize, int dotLocShift) const
 {
     const Object *stem = note->GetFirst(STEM);
     if (!stem) return false;

@@ -232,7 +232,7 @@ void Page::LayOutTranscription(bool force)
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
     this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
 
-    CalcDots calcDots(doc);
+    CalcDotsFunctor calcDots(doc);
     this->Process(calcDots);
 
     // Render it for filling the bounding box
@@ -246,7 +246,7 @@ void Page::LayOutTranscription(bool force)
     Functor adjustXRelForTranscription(&Object::AdjustXRelForTranscription);
     this->Process(&adjustXRelForTranscription, NULL);
 
-    CalcLedgerLines calcLedgerLines(doc);
+    CalcLedgerLinesFunctor calcLedgerLines(doc);
     this->Process(calcLedgerLines);
 
     m_layoutDone = true;
@@ -328,7 +328,7 @@ void Page::ResetAligners()
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
     this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
 
-    CalcDots calcDots(doc);
+    CalcDotsFunctor calcDots(doc);
     this->Process(calcDots);
 
     // Adjust the position of outside articulations
@@ -494,7 +494,7 @@ void Page::LayOutVertically()
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
     this->Process(&resetVerticalAlignment, NULL);
 
-    CalcLedgerLines calcLedgerLines(doc);
+    CalcLedgerLinesFunctor calcLedgerLines(doc);
     this->Process(calcLedgerLines);
 
     // Align the content of the page using system aligners

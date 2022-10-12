@@ -1,32 +1,32 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        calcdots.h
+// Name:        calcdotsfunctor.h
 // Author:      David Bauer
 // Created:     2022
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_CALCDOTS_H__
-#define __VRV_CALCDOTS_H__
+#ifndef __VRV_CALCDOTSFUNCTOR_H__
+#define __VRV_CALCDOTSFUNCTOR_H__
 
 #include "functor.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// CalcDots
+// CalcDotsFunctor
 //----------------------------------------------------------------------------
 
 /**
  * This class sets the drawing dot positions, including for chords.
  */
-class CalcDots : public DocFunctor {
+class CalcDotsFunctor : public DocFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    CalcDots(Doc *doc);
-    virtual ~CalcDots() = default;
+    CalcDotsFunctor(Doc *doc);
+    virtual ~CalcDotsFunctor() = default;
     ///@}
 
     /*
@@ -65,4 +65,4 @@ private:
 
 } // namespace vrv
 
-#endif // __VRV_CALCDOTS_H__
+#endif // __VRV_CALCDOTSFUNCTOR_H__

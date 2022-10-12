@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        find.cpp
+// Name:        findfunctor.cpp
 // Author:      David Bauer
 // Created:     2022
 // Copyright (c) Authors and others. All rights reserved.
@@ -15,22 +15,23 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// FindAllByComparison
+// FindAllByComparisonFunctor
 //----------------------------------------------------------------------------
 
-FindAllByComparison::FindAllByComparison(Comparison *comparison, ListOfObjects *elements) : MutableFunctor()
+FindAllByComparisonFunctor::FindAllByComparisonFunctor(Comparison *comparison, ListOfObjects *elements)
+    : MutableFunctor()
 {
     m_comparison = comparison;
     m_elements = elements;
     m_continueDepthSearchForMatches = true;
 }
 
-void FindAllByComparison::SetContinueDepthSearchForMatches(bool continueDepthSearchForMatches)
+void FindAllByComparisonFunctor::SetContinueDepthSearchForMatches(bool continueDepthSearchForMatches)
 {
     m_continueDepthSearchForMatches = continueDepthSearchForMatches;
 }
 
-FunctorCode FindAllByComparison::VisitObject(Object *object)
+FunctorCode FindAllByComparisonFunctor::VisitObject(Object *object)
 {
     // evaluate by applying the Comparison operator()
     if ((*m_comparison)(object)) {
@@ -44,10 +45,10 @@ FunctorCode FindAllByComparison::VisitObject(Object *object)
 }
 
 //----------------------------------------------------------------------------
-// FindAllConstByComparison
+// FindAllConstByComparisonFunctor
 //----------------------------------------------------------------------------
 
-FindAllConstByComparison::FindAllConstByComparison(Comparison *comparison, ListOfConstObjects *elements)
+FindAllConstByComparisonFunctor::FindAllConstByComparisonFunctor(Comparison *comparison, ListOfConstObjects *elements)
     : ConstFunctor()
 {
     m_comparison = comparison;
@@ -55,12 +56,12 @@ FindAllConstByComparison::FindAllConstByComparison(Comparison *comparison, ListO
     m_continueDepthSearchForMatches = true;
 }
 
-void FindAllConstByComparison::SetContinueDepthSearchForMatches(bool continueDepthSearchForMatches)
+void FindAllConstByComparisonFunctor::SetContinueDepthSearchForMatches(bool continueDepthSearchForMatches)
 {
     m_continueDepthSearchForMatches = continueDepthSearchForMatches;
 }
 
-FunctorCode FindAllConstByComparison::VisitObject(const Object *object)
+FunctorCode FindAllConstByComparisonFunctor::VisitObject(const Object *object)
 {
     // evaluate by applying the Comparison operator()
     if ((*m_comparison)(object)) {
@@ -74,10 +75,10 @@ FunctorCode FindAllConstByComparison::VisitObject(const Object *object)
 }
 
 //----------------------------------------------------------------------------
-// FindAllBetween
+// FindAllBetweenFunctor
 //----------------------------------------------------------------------------
 
-FindAllBetween::FindAllBetween(
+FindAllBetweenFunctor::FindAllBetweenFunctor(
     Comparison *comparison, ListOfConstObjects *elements, const Object *start, const Object *end)
     : ConstFunctor()
 {
@@ -87,7 +88,7 @@ FindAllBetween::FindAllBetween(
     m_end = end;
 }
 
-FunctorCode FindAllBetween::VisitObject(const Object *object)
+FunctorCode FindAllBetweenFunctor::VisitObject(const Object *object)
 {
     // We are reaching the start of the range
     if (m_start == object) {
@@ -114,16 +115,16 @@ FunctorCode FindAllBetween::VisitObject(const Object *object)
 }
 
 //----------------------------------------------------------------------------
-// FindByComparison
+// FindByComparisonFunctor
 //----------------------------------------------------------------------------
 
-FindByComparison::FindByComparison(Comparison *comparison) : ConstFunctor()
+FindByComparisonFunctor::FindByComparisonFunctor(Comparison *comparison) : ConstFunctor()
 {
     m_comparison = comparison;
     m_element = NULL;
 }
 
-FunctorCode FindByComparison::VisitObject(const Object *object)
+FunctorCode FindByComparisonFunctor::VisitObject(const Object *object)
 {
     if (m_element) {
         // this should not happen, but just in case
@@ -140,16 +141,16 @@ FunctorCode FindByComparison::VisitObject(const Object *object)
 }
 
 //----------------------------------------------------------------------------
-// FindByID
+// FindByIDFunctor
 //----------------------------------------------------------------------------
 
-FindByID::FindByID(const std::string &id)
+FindByIDFunctor::FindByIDFunctor(const std::string &id)
 {
     m_id = id;
     m_element = NULL;
 }
 
-FunctorCode FindByID::VisitObject(const Object *object)
+FunctorCode FindByIDFunctor::VisitObject(const Object *object)
 {
     if (m_element) {
         // this should not happen, but just in case

@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        find.h
+// Name:        findfunctor.h
 // Author:      David Bauer
 // Created:     2022
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_FIND_H__
-#define __VRV_FIND_H__
+#ifndef __VRV_FINDFUNCTOR_H__
+#define __VRV_FINDFUNCTOR_H__
 
 #include "functor.h"
 
@@ -16,20 +16,20 @@ class Comparison;
 class Object;
 
 //----------------------------------------------------------------------------
-// FindAllByComparison
+// FindAllByComparisonFunctor
 //----------------------------------------------------------------------------
 
 /**
  * This class finds all elements in the tree by comparison
  */
-class FindAllByComparison : public MutableFunctor {
+class FindAllByComparisonFunctor : public MutableFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    FindAllByComparison(Comparison *comparison, ListOfObjects *elements);
-    virtual ~FindAllByComparison() = default;
+    FindAllByComparisonFunctor(Comparison *comparison, ListOfObjects *elements);
+    virtual ~FindAllByComparisonFunctor() = default;
     ///@}
 
     /*
@@ -65,20 +65,20 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// FindAllConstByComparison
+// FindAllConstByComparisonFunctor
 //----------------------------------------------------------------------------
 
 /**
  * This class finds all elements in the tree by comparison
  */
-class FindAllConstByComparison : public ConstFunctor {
+class FindAllConstByComparisonFunctor : public ConstFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    FindAllConstByComparison(Comparison *comparison, ListOfConstObjects *elements);
-    virtual ~FindAllConstByComparison() = default;
+    FindAllConstByComparisonFunctor(Comparison *comparison, ListOfConstObjects *elements);
+    virtual ~FindAllConstByComparisonFunctor() = default;
     ///@}
 
     /*
@@ -114,20 +114,20 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// FindAllBetween
+// FindAllBetweenFunctor
 //----------------------------------------------------------------------------
 
 /**
  * This class finds all elements in the tree by comparison between start and end objects
  */
-class FindAllBetween : public ConstFunctor {
+class FindAllBetweenFunctor : public ConstFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    FindAllBetween(Comparison *comparison, ListOfConstObjects *elements, const Object *start, const Object *end);
-    virtual ~FindAllBetween() = default;
+    FindAllBetweenFunctor(Comparison *comparison, ListOfConstObjects *elements, const Object *start, const Object *end);
+    virtual ~FindAllBetweenFunctor() = default;
     ///@}
 
     /*
@@ -158,20 +158,20 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// FindByComparison
+// FindByComparisonFunctor
 //----------------------------------------------------------------------------
 
 /**
  * This class finds an element in the tree by comparison
  */
-class FindByComparison : public ConstFunctor {
+class FindByComparisonFunctor : public ConstFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    FindByComparison(Comparison *comparison);
-    virtual ~FindByComparison() = default;
+    FindByComparisonFunctor(Comparison *comparison);
+    virtual ~FindByComparisonFunctor() = default;
     ///@}
 
     /*
@@ -205,20 +205,20 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// FindByID
+// FindByIDFunctor
 //----------------------------------------------------------------------------
 
 /**
  * This class finds an element with a specified id.
  */
-class FindByID : public ConstFunctor {
+class FindByIDFunctor : public ConstFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    FindByID(const std::string &id);
-    virtual ~FindByID() = default;
+    FindByIDFunctor(const std::string &id);
+    virtual ~FindByIDFunctor() = default;
     ///@}
 
     /*
@@ -253,4 +253,4 @@ private:
 
 } // namespace vrv
 
-#endif // __VRV_FIND_H__
+#endif // __VRV_FINDFUNCTOR_H__

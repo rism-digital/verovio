@@ -591,7 +591,7 @@ Object *Object::FindDescendantByID(const std::string &id, int deepness, bool dir
 
 const Object *Object::FindDescendantByID(const std::string &id, int deepness, bool direction) const
 {
-    FindByID findByID(id);
+    FindByIDFunctor findByID(id);
     findByID.SetDirection(direction);
     this->Process(findByID, deepness, true);
     return findByID.GetElement();
@@ -615,7 +615,7 @@ Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness,
 
 const Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction) const
 {
-    FindByComparison findByComparison(comparison);
+    FindByComparisonFunctor findByComparison(comparison);
     findByComparison.SetDirection(direction);
     this->Process(findByComparison, deepness, true);
     return findByComparison.GetElement();
@@ -639,7 +639,7 @@ ListOfObjects Object::FindAllDescendantsByType(ClassId classId, bool continueDep
 {
     ListOfObjects descendants;
     ClassIdComparison comparison(classId);
-    FindAllByComparison findAllByComparison(&comparison, &descendants);
+    FindAllByComparisonFunctor findAllByComparison(&comparison, &descendants);
     findAllByComparison.SetContinueDepthSearchForMatches(continueDepthSearchForMatches);
     this->Process(findAllByComparison, deepness, true);
     return descendants;
@@ -650,7 +650,7 @@ ListOfConstObjects Object::FindAllDescendantsByType(
 {
     ListOfConstObjects descendants;
     ClassIdComparison comparison(classId);
-    FindAllConstByComparison findAllConstByComparison(&comparison, &descendants);
+    FindAllConstByComparisonFunctor findAllConstByComparison(&comparison, &descendants);
     findAllConstByComparison.SetContinueDepthSearchForMatches(continueDepthSearchForMatches);
     this->Process(findAllConstByComparison, deepness, true);
     return descendants;
@@ -662,7 +662,7 @@ void Object::FindAllDescendantsByComparison(
     assert(objects);
     if (clear) objects->clear();
 
-    FindAllByComparison findAllByComparison(comparison, objects);
+    FindAllByComparisonFunctor findAllByComparison(comparison, objects);
     findAllByComparison.SetDirection(direction);
     this->Process(findAllByComparison, deepness, true);
 }
@@ -673,7 +673,7 @@ void Object::FindAllDescendantsByComparison(
     assert(objects);
     if (clear) objects->clear();
 
-    FindAllConstByComparison findAllConstByComparison(comparison, objects);
+    FindAllConstByComparisonFunctor findAllConstByComparison(comparison, objects);
     findAllConstByComparison.SetDirection(direction);
     this->Process(findAllConstByComparison, deepness, true);
 }
@@ -685,7 +685,7 @@ void Object::FindAllDescendantsBetween(
     if (clear) objects->clear();
 
     ListOfConstObjects descendants;
-    FindAllBetween findAllBetween(comparison, &descendants, start, end);
+    FindAllBetweenFunctor findAllBetween(comparison, &descendants, start, end);
     this->Process(findAllBetween, depth, true);
 
     std::transform(descendants.begin(), descendants.end(), std::back_inserter(*objects),
@@ -698,7 +698,7 @@ void Object::FindAllDescendantsBetween(ListOfConstObjects *objects, Comparison *
     assert(objects);
     if (clear) objects->clear();
 
-    FindAllBetween findAllBetween(comparison, objects, start, end);
+    FindAllBetweenFunctor findAllBetween(comparison, objects, start, end);
     this->Process(findAllBetween, depth, true);
 }
 

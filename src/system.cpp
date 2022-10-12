@@ -218,7 +218,7 @@ bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElemen
     // otherwise look for a measures in between
     else {
         ClassIdComparison isMeasure(MEASURE);
-        FindAllBetween findAllBetween(&isMeasure, &measures, measureStart, measureEnd);
+        FindAllBetweenFunctor findAllBetween(&isMeasure, &measures, measureStart, measureEnd);
         this->Process(findAllBetween, 1);
     }
 
