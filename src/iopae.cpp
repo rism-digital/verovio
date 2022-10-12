@@ -539,9 +539,10 @@ void PAEOutput::WriteDur(DurationInterface *interface)
 {
     assert(interface);
 
-    if ((interface->GetDur() != m_currentDur) || (interface->GetDots() != m_currentDots)) {
+    int m_dots = (interface->HasDots()) ? interface->GetDots() : 0;
+    if ((interface->GetDur() != m_currentDur) || (m_dots != m_currentDots)) {
         m_currentDur = interface->GetDur();
-        m_currentDots = (interface->HasDots()) ? interface->GetDots() : 0;
+        m_currentDots = m_dots;
         std::string dur;
         switch (m_currentDur) {
             case (DURATION_long): dur = "0"; break;
