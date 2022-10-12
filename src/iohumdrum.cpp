@@ -13620,8 +13620,8 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
         ++counter;
 
         Symbol *symbol = new Symbol();
-        setSmuflContent(symbol, secondNames.at(i));
-        setFontsize(symbol, m_textNoteSize, "");
+        setSmuflContent(symbol, name);
+        setFontsize(symbol, name, "");
         tempo->AddChild(symbol);
     }
 
@@ -13663,7 +13663,7 @@ void HumdrumInput::setSmuflContent(Symbol *symbol, const std::string &name)
 //
 
 template <class ELEMENT>
-void HumdrumInput::setFontsize(ELEMENT *element, const std::string &percentage, const std::string &original)
+void HumdrumInput::setFontsize(ELEMENT *element, const std::string &smuflname, const std::string &original)
 {
     // Check for percentage override:
     hum::HumRegex hre;
@@ -13724,9 +13724,10 @@ void HumdrumInput::setFontsize(ELEMENT *element, const std::string &percentage, 
         return;
     }
 
-    if (!percentage.empty()) {
+    if (smuflname.compare(0, 3, "met") == 0) {
+        // If smuflname is for a metric note, then shrink the size to 70% by default.
         data_PERCENT fontpercent;
-        fontpercent = ((vrv::AttTypography *)element)->StrToPercent(percentage);
+        fontpercent = ((vrv::AttTypography *)element)->StrToPercent(m_textNoteSize);
         data_FONTSIZE fontsize;
         fontsize.SetPercent(fontpercent);
         element->SetFontsize(fontsize);
@@ -13739,109 +13740,41 @@ void HumdrumInput::setFontsize(ELEMENT *element, const std::string &percentage, 
 // HumdrumInput::convertMusicSymbolNameToSmuflName --  Convert from
 //    text names for music symbols into SMuFL names for display with <symbol>
 //
-//    Symbol name   SMuFL name   Hex encoding    Notes
+//    Humdrum name                 SMuFL name
 // ===============================================================
-//
-// https://www.smufl.org/version/latest/range/repeats
-//
-//    https://www.smufl.org/version/1.2/glyph/segno
-//    segno         segno        E047
-//
-//    https://www.smufl.org/version/1.2/glyph/coda
-//    coda          coda         E048
-//
-// http://www.smufl.org/version/1.2/range/medievalAndRenaissanceMiscellany
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralSignumUp
-//    sc            mensuralSignumUp    EA00   (signum congruentiae up)
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralSignumDown
-//    sc-below      mensuralSignumDown   EA01  (signum congruentiae below the staff)
-//
-// https://www.smufl.org/version/latest/range/metronomeMarks
-//
-//    https://www.smufl.org/version/1.2/glyph/metNoteDoubleWholeSquare
-//    breve         metNoteDoubleWholeSquare   ECA1
-
-//    https://www.smufl.org/version/1.2/glyph/metNoteWhole
-//    whole         metNoteWhole       ECA2
-//
-//    https://www.smufl.org/version/1.2/glyph/metNoteHalfUp
-//    half          metNoteHalfUp      ECA3
-//
-//    https://www.smufl.org/version/1.2/glyph/metNoteQuarterUp
-//    quarter       metNoteQuarterUp   ECA5
-//
-//    https://www.smufl.org/version/1.2/glyph/metNote8thUp
-//    eighth        metNote8thUp       ECA7
-//
-//    https://www.smufl.org/version/1.2/glyph/metNote16thUp
-//    sixteenth     metNote16thUp      ECA9
-//
-//    https://www.smufl.org/version/1.2/glyph/metNote32ndUp
-//    32nd          metNote32ndUp      ECAB
-//
-//    https://www.smufl.org/version/1.2/glyph/metNote64thUp
-//    64th          metNote64thUp      ECAD
-//
-//    https://www.smufl.org/version/1.2/glyph/metNote128thUp
-//    128th         metNote128thUp     ECAF
-//
-//    https://www.smufl.org/version/1.2/glyph/metNote256thUp
-//    256th         metNote256thUp     ECB1
-//
-//    https://www.smufl.org/version/1.2/glyph/metNote512thUp
-//    512th         metNote512thUp     ECB3
-//
-//    https://www.smufl.org/version/1.2/glyph/metNote1024thUp
-//    1024th        metNote1024thUp    ECB5
-//
-//    https://www.smufl.org/version/1.2/glyph/metAugmentationDot
-//    -dot          metAugmentationDot ECB7
-//
-// http://www.smufl.org/version/1.2/range/medievalAndRenaissanceProlations
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProlation1
-//    circle-dot, O-dot, o-dot  mensuralProlation1   E910
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProlation2
-//    circle, O, o   mensuralProlation2 E911
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProlation3
-//    cut-circle, cut-o, cut-O  mensuralProlation3 E912
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProlation4
-//    cut-circle-dot, cut-o-dot, cut-O-dot   mensuralProlation4  E913
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProlation5
-//    c-dot, C-dot     mensuralProlation5     E914
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProlation6
-//    C     mensuralProlation6       E915
-//
-//    https://www.smufl.org/version/1.2/glyph/timeSigCommon
-//    c     timeSigCommon            E08A
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProlation7
-//    reverse-c, Cr, cr   mensuralProlation7   E916
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProlation8
-//    cut-c-dot, cut-C-dot   mensuralProlation8  E917
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProlation9
-//    cut-C      mensuralProlation9 E918
-//
-//    https://www.smufl.org/version/1.2/glyph/timeSigCutCommon
-//    cut-c      timeSigCutCommon   E08B
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProlation10
-//    reverse-cut-c, reverse-cut-C mensuralProlation10 E919
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProlation11/
-//    reverse-c-dot, reverse-C-dot  mensuralProlation11 E91A
-//
-//    https://www.smufl.org/version/1.2/glyph/mensuralProportionTempusPerfectum
-//    o-slash, O-slash  mensuralProportionTempusPerfectum E91B
+//    segno                        segno
+//    coda                         coda
+//    [Pp]ed                       pianoPedalPed
+//    [Xx][Pp]ed                   pianoPedalPedUp
+//    sc                           mensuralSignumUp
+//    sc-below                     mensuralSignumDown
+//    breve                        metNoteDoubleWholeSquare
+//    whole                        metNoteWhole
+//    half                         metNoteHalfUp
+//    quarter                      metNoteQuarterUp
+//    eighth                       metNote8thUp
+//    sixteenth                    metNote16thUp
+//    32nd                         metNote32ndUp
+//    64th                         metNote64thUp
+//    128th                        metNote128thUp
+//    256th                        metNote256thUp
+//    512th                        metNote512thUp
+//    1024th                       metNote1024thUp
+//    -dot                         metAugmentationDot
+//    circle-dot, [Oo]-dot         mensuralProlation1
+//    circle, [Oo]                 mensuralProlation2
+//    cut-circle, cut-[Oo]         mensuralProlation3
+//    cut-circle-dot, cut-[Oo]-dot mensuralProlation4
+//    [Cc]-dot                     mensuralProlation5
+//    C                            mensuralProlation6
+//    c                            timeSigCommon
+//    reverse-[Cc], [Cc]r          mensuralProlation7
+//    cut-[Cc]-dot                 mensuralProlation8
+//    cut-C                        mensuralProlation9
+//    cut-c                        timeSigCutCommon
+//    reverse-cut-[Cc]c            mensuralProlation10
+//    reverse-[Cc]-dot             mensuralProlation11
+//    [Oo]-slash                   mensuralProportionTempusPerfectum
 //
 
 std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const std::string &text)
@@ -13866,6 +13799,7 @@ std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const s
     hre.replaceDestructive(finaltext, "", "[|@].*");
 
     // https://www.smufl.org/version/latest/range/repeats
+
     if (finaltext == "segno") {
         output.push_back("segno");
         return output;
@@ -13875,7 +13809,20 @@ std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const s
         return output;
     }
 
+    // https://www.smufl.org/version/1.2/range/keyboardTechniques
+
+    if ((finaltext == "Ped") || (finaltext == "ped")) {
+        output.push_back("keyboardPedalPed");
+        return output;
+    }
+
+    if ((finaltext == "XPed") || (finaltext == "xped")) {
+        output.push_back("keyboardPedalPedUp");
+        return output;
+    }
+
     // http://www.smufl.org/version/1.2/range/medievalAndRenaissanceMiscellany
+
     if (finaltext == "sc") {
         output.push_back("mensuralSignumUp");
         return output;
@@ -13886,6 +13833,7 @@ std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const s
     }
 
     // http://www.smufl.org/version/1.2/range/medievalAndRenaissanceProlations
+
     if ((finaltext == "circle-dot") || (finaltext == "o-dot") || (finaltext == "O-dot")) {
         output.push_back("mensuralProlation1@type=\"circle-dot\"");
         return output;
@@ -13947,7 +13895,9 @@ std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const s
         return output;
     }
 
-    // generating rhythmic note with optional "-dot" after it.
+    // https://www.smufl.org/version/1.2/range/metronomeMarks
+
+    // Count the number of augmentation dots on the note, and then remove them:
     int dots = 0;
     if (hre.search(finaltext, "-dot$")) {
         dots = 1;
@@ -13956,13 +13906,17 @@ std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const s
             if (hre.search(finaltext, "-dot-dot-dot$")) {
                 dots = 3;
             }
+            // Only allowing three augmentation dots.
         }
+        hre.replaceDestructive(finaltext, "", "(-dot)+");
+    }
+    // Check for "." used as an augmentation dot (typically used with numbers):
+    if (hre.search(finaltext, "(\\.+)$")) {
+        std::string dotstring = hre.getMatch(1);
+        dots += (int)dotstring.size();
+        hre.replaceDestructive(finaltext, "", "\\.+$");
     }
 
-    // remove any trailing -dots:
-    hre.replaceDestructive(finaltext, "", "(-dot)+");
-
-    // https://www.smufl.org/version/latest/range/individualNotes
     bool noteQ = false;
     if ((finaltext == "quarter") || (finaltext == "4")) {
         output.push_back("metNoteQuarterUp");
@@ -14023,7 +13977,13 @@ std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const s
         return output;
     }
 
-    // Cannot find a known Humdrum name, so treat as plain text by returning empty array.
+    // Getting here means that the symbol is unknown, and should be
+    // as plain text elsewhere.  If the form is [smufl=code], then treat
+    // this as an escape to display a particular SMuFL named glyph.
+    if (hre.search(finaltext, "smufl=(.*)")) {
+        output.push_back(hre.getMatch(1));
+    }
+
     return output;
 }
 
@@ -15592,7 +15552,6 @@ hum::HumNum HumdrumInput::getMeasureEndTstamp(int staffindex)
 
 template <class ELEMENT> void HumdrumInput::addMusicSymbol(ELEMENT *element, const std::string &musictext)
 {
-
     std::vector<std::string> smufltext = convertMusicSymbolNameToSmuflName(musictext);
     if (smufltext.empty()) {
         // nothing to do: treat as plain text and add in calling function.
@@ -15618,7 +15577,7 @@ template <class ELEMENT> void HumdrumInput::addMusicSymbol(ELEMENT *element, con
 
         Symbol *symbol = new Symbol();
         setSmuflContent(symbol, name);
-        setFontsize(symbol, m_textNoteSize, musictext);
+        setFontsize(symbol, name, musictext);
         element->AddChild(symbol);
     }
 }
