@@ -12735,6 +12735,10 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
             if (!italic) {
                 rend->SetFontstyle(FONTSTYLE_normal);
             }
+            else {
+                // Explicitly set italic fontstyle.
+                rend->SetFontstyle(FONTSTYLE_italic);
+            }
             if (bold) {
                 rend->SetFontweight(FONTWEIGHT_bold);
             }
@@ -12782,6 +12786,10 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
             addTextElement(rend, text);
             if (!italic) {
                 rend->SetFontstyle(FONTSTYLE_normal);
+            }
+            else {
+                // Explicitly set italic fontstyle.
+                rend->SetFontstyle(FONTSTYLE_italic);
             }
             if (bold) {
                 rend->SetFontweight(FONTWEIGHT_bold);
@@ -13297,13 +13305,13 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
 
     bool plain = !(italic || bold);
-    bool needrend = plain || bold || justification || color.size();
+    bool needrend = italic || plain || bold || justification || color.size();
     bool oldneedrend = false;
-    bool onlyverovio = false;
+    bool onlysmufl = false;
     if (hre.search(text, "^(\\[.*?\\])+$")) {
         oldneedrend = needrend;
         needrend = false;
-        onlyverovio = true;
+        onlysmufl = true;
     }
 
     if (needrend) {
@@ -13327,6 +13335,10 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         if (!italic) {
             rend->SetFontstyle(FONTSTYLE_normal);
         }
+        else {
+            // Explicitly set italic fontstyle.
+            rend->SetFontstyle(FONTSTYLE_italic);
+        }
         if (bold) {
             rend->SetFontweight(FONTWEIGHT_bold);
         }
@@ -13338,7 +13350,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
         if (tempoQ && tempo) {
             addTextElement(tempo, text);
-            if (onlyverovio && oldneedrend) {
+            if (onlysmufl && oldneedrend) {
                 int count = tempo->GetChildCount();
                 for (int j = 0; j < count; j++) {
                     Object *obj = tempo->GetChild(j);
@@ -13358,6 +13370,10 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                     if (!italic) {
                         item->SetFontstyle(FONTSTYLE_normal);
                     }
+                    else {
+                        // Explicitly set italic fontstyle.
+                        item->SetFontstyle(FONTSTYLE_italic);
+                    }
                     if (bold) {
                         item->SetFontweight(FONTWEIGHT_bold);
                     }
@@ -13368,9 +13384,8 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             }
         }
         else if (dir) {
-
             addTextElement(dir, text);
-            if (onlyverovio && oldneedrend) {
+            if (onlysmufl && oldneedrend) {
                 int count = dir->GetChildCount();
                 for (int j = 0; j < count; j++) {
                     Object *obj = dir->GetChild(j);
@@ -13389,6 +13404,10 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                     }
                     if (!italic) {
                         item->SetFontstyle(FONTSTYLE_normal);
+                    }
+                    else {
+                        // Explicitly set italic fontstyle.
+                        item->SetFontstyle(FONTSTYLE_italic);
                     }
                     if (bold) {
                         item->SetFontweight(FONTWEIGHT_bold);
@@ -14001,7 +14020,6 @@ std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const s
 void HumdrumInput::addDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
     hum::HTp token, int staffindex, int justification, const std::string &color, int vgroup)
 {
-
     hum::HumRegex hre;
     if (hre.search(text, "\\[[^=]*\\]\\s*=\\s*\\d+")) {
         int status = addTempoDirection(text, placement, bold, italic, token, staffindex, justification, color);
@@ -14085,6 +14103,10 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
         addTextElement(rend, text);
         if (!italic) {
             rend->SetFontstyle(FONTSTYLE_normal);
+        }
+        else {
+            // Explicitly set italic fontstyle.
+            rend->SetFontstyle(FONTSTYLE_italic);
         }
         if (bold) {
             rend->SetFontweight(FONTWEIGHT_bold);
