@@ -45,22 +45,22 @@ void Space::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Space::Visit(MutableFunctor &functor)
+FunctorCode Space::Accept(MutableFunctor &functor)
 {
     return functor.VisitSpace(this);
 }
 
-FunctorCode Space::Visit(ConstFunctor &functor) const
+FunctorCode Space::Accept(ConstFunctor &functor) const
 {
     return functor.VisitSpace(this);
 }
 
-FunctorCode Space::VisitEnd(MutableFunctor &functor)
+FunctorCode Space::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitSpaceEnd(this);
 }
 
-FunctorCode Space::VisitEnd(ConstFunctor &functor) const
+FunctorCode Space::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitSpaceEnd(this);
 }

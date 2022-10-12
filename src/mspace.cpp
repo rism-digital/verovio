@@ -39,22 +39,22 @@ void MSpace::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode MSpace::Visit(MutableFunctor &functor)
+FunctorCode MSpace::Accept(MutableFunctor &functor)
 {
     return functor.VisitMSpace(this);
 }
 
-FunctorCode MSpace::Visit(ConstFunctor &functor) const
+FunctorCode MSpace::Accept(ConstFunctor &functor) const
 {
     return functor.VisitMSpace(this);
 }
 
-FunctorCode MSpace::VisitEnd(MutableFunctor &functor)
+FunctorCode MSpace::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitMSpaceEnd(this);
 }
 
-FunctorCode MSpace::VisitEnd(ConstFunctor &functor) const
+FunctorCode MSpace::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMSpaceEnd(this);
 }

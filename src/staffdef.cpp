@@ -131,22 +131,22 @@ bool StaffDef::HasLayerDefWithLabel() const
 // StaffDef functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode StaffDef::Visit(MutableFunctor &functor)
+FunctorCode StaffDef::Accept(MutableFunctor &functor)
 {
     return functor.VisitStaffDef(this);
 }
 
-FunctorCode StaffDef::Visit(ConstFunctor &functor) const
+FunctorCode StaffDef::Accept(ConstFunctor &functor) const
 {
     return functor.VisitStaffDef(this);
 }
 
-FunctorCode StaffDef::VisitEnd(MutableFunctor &functor)
+FunctorCode StaffDef::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitStaffDefEnd(this);
 }
 
-FunctorCode StaffDef::VisitEnd(ConstFunctor &functor) const
+FunctorCode StaffDef::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitStaffDefEnd(this);
 }

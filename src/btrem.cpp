@@ -73,22 +73,22 @@ bool BTrem::IsSupportedChild(Object *child)
     return true;
 }
 
-FunctorCode BTrem::Visit(MutableFunctor &functor)
+FunctorCode BTrem::Accept(MutableFunctor &functor)
 {
     return functor.VisitBTrem(this);
 }
 
-FunctorCode BTrem::Visit(ConstFunctor &functor) const
+FunctorCode BTrem::Accept(ConstFunctor &functor) const
 {
     return functor.VisitBTrem(this);
 }
 
-FunctorCode BTrem::VisitEnd(MutableFunctor &functor)
+FunctorCode BTrem::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitBTremEnd(this);
 }
 
-FunctorCode BTrem::VisitEnd(ConstFunctor &functor) const
+FunctorCode BTrem::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitBTremEnd(this);
 }

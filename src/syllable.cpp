@@ -84,22 +84,22 @@ bool Syllable::MarkupAddSyl()
     return false;
 }
 
-FunctorCode Syllable::Visit(MutableFunctor &functor)
+FunctorCode Syllable::Accept(MutableFunctor &functor)
 {
     return functor.VisitSyllable(this);
 }
 
-FunctorCode Syllable::Visit(ConstFunctor &functor) const
+FunctorCode Syllable::Accept(ConstFunctor &functor) const
 {
     return functor.VisitSyllable(this);
 }
 
-FunctorCode Syllable::VisitEnd(MutableFunctor &functor)
+FunctorCode Syllable::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitSyllableEnd(this);
 }
 
-FunctorCode Syllable::VisitEnd(ConstFunctor &functor) const
+FunctorCode Syllable::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitSyllableEnd(this);
 }

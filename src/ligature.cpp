@@ -120,22 +120,22 @@ int Ligature::GetDrawingNoteShape(const Note *note) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Ligature::Visit(MutableFunctor &functor)
+FunctorCode Ligature::Accept(MutableFunctor &functor)
 {
     return functor.VisitLigature(this);
 }
 
-FunctorCode Ligature::Visit(ConstFunctor &functor) const
+FunctorCode Ligature::Accept(ConstFunctor &functor) const
 {
     return functor.VisitLigature(this);
 }
 
-FunctorCode Ligature::VisitEnd(MutableFunctor &functor)
+FunctorCode Ligature::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitLigatureEnd(this);
 }
 
-FunctorCode Ligature::VisitEnd(ConstFunctor &functor) const
+FunctorCode Ligature::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitLigatureEnd(this);
 }

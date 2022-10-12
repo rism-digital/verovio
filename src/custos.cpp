@@ -87,22 +87,22 @@ char32_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Custos::Visit(MutableFunctor &functor)
+FunctorCode Custos::Accept(MutableFunctor &functor)
 {
     return functor.VisitCustos(this);
 }
 
-FunctorCode Custos::Visit(ConstFunctor &functor) const
+FunctorCode Custos::Accept(ConstFunctor &functor) const
 {
     return functor.VisitCustos(this);
 }
 
-FunctorCode Custos::VisitEnd(MutableFunctor &functor)
+FunctorCode Custos::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitCustosEnd(this);
 }
 
-FunctorCode Custos::VisitEnd(ConstFunctor &functor) const
+FunctorCode Custos::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitCustosEnd(this);
 }

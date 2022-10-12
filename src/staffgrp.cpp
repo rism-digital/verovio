@@ -254,22 +254,22 @@ void StaffGrp::SetEverythingVisible()
 // StaffGrp functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode StaffGrp::Visit(MutableFunctor &functor)
+FunctorCode StaffGrp::Accept(MutableFunctor &functor)
 {
     return functor.VisitStaffGrp(this);
 }
 
-FunctorCode StaffGrp::Visit(ConstFunctor &functor) const
+FunctorCode StaffGrp::Accept(ConstFunctor &functor) const
 {
     return functor.VisitStaffGrp(this);
 }
 
-FunctorCode StaffGrp::VisitEnd(MutableFunctor &functor)
+FunctorCode StaffGrp::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitStaffGrpEnd(this);
 }
 
-FunctorCode StaffGrp::VisitEnd(ConstFunctor &functor) const
+FunctorCode StaffGrp::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitStaffGrpEnd(this);
 }

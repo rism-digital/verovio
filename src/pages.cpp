@@ -66,22 +66,22 @@ void Pages::ConvertFrom(Score *score)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Pages::Visit(MutableFunctor &functor)
+FunctorCode Pages::Accept(MutableFunctor &functor)
 {
     return functor.VisitPages(this);
 }
 
-FunctorCode Pages::Visit(ConstFunctor &functor) const
+FunctorCode Pages::Accept(ConstFunctor &functor) const
 {
     return functor.VisitPages(this);
 }
 
-FunctorCode Pages::VisitEnd(MutableFunctor &functor)
+FunctorCode Pages::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitPagesEnd(this);
 }
 
-FunctorCode Pages::VisitEnd(ConstFunctor &functor) const
+FunctorCode Pages::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitPagesEnd(this);
 }

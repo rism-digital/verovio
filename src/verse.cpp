@@ -107,22 +107,22 @@ int Verse::AdjustPosition(int &overlap, int freeSpace, const Doc *doc)
 // Verse functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Verse::Visit(MutableFunctor &functor)
+FunctorCode Verse::Accept(MutableFunctor &functor)
 {
     return functor.VisitVerse(this);
 }
 
-FunctorCode Verse::Visit(ConstFunctor &functor) const
+FunctorCode Verse::Accept(ConstFunctor &functor) const
 {
     return functor.VisitVerse(this);
 }
 
-FunctorCode Verse::VisitEnd(MutableFunctor &functor)
+FunctorCode Verse::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitVerseEnd(this);
 }
 
-FunctorCode Verse::VisitEnd(ConstFunctor &functor) const
+FunctorCode Verse::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitVerseEnd(this);
 }

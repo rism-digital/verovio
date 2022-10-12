@@ -58,22 +58,22 @@ void MRest::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode MRest::Visit(MutableFunctor &functor)
+FunctorCode MRest::Accept(MutableFunctor &functor)
 {
     return functor.VisitMRest(this);
 }
 
-FunctorCode MRest::Visit(ConstFunctor &functor) const
+FunctorCode MRest::Accept(ConstFunctor &functor) const
 {
     return functor.VisitMRest(this);
 }
 
-FunctorCode MRest::VisitEnd(MutableFunctor &functor)
+FunctorCode MRest::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitMRestEnd(this);
 }
 
-FunctorCode MRest::VisitEnd(ConstFunctor &functor) const
+FunctorCode MRest::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMRestEnd(this);
 }

@@ -276,22 +276,22 @@ void TupletNum::SetAlignedBracket(TupletBracket *alignedBracket)
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Dots::Visit(MutableFunctor &functor)
+FunctorCode Dots::Accept(MutableFunctor &functor)
 {
     return functor.VisitDots(this);
 }
 
-FunctorCode Dots::Visit(ConstFunctor &functor) const
+FunctorCode Dots::Accept(ConstFunctor &functor) const
 {
     return functor.VisitDots(this);
 }
 
-FunctorCode Dots::VisitEnd(MutableFunctor &functor)
+FunctorCode Dots::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitDotsEnd(this);
 }
 
-FunctorCode Dots::VisitEnd(ConstFunctor &functor) const
+FunctorCode Dots::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitDotsEnd(this);
 }
@@ -316,22 +316,22 @@ int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode Flag::Visit(MutableFunctor &functor)
+FunctorCode Flag::Accept(MutableFunctor &functor)
 {
     return functor.VisitFlag(this);
 }
 
-FunctorCode Flag::Visit(ConstFunctor &functor) const
+FunctorCode Flag::Accept(ConstFunctor &functor) const
 {
     return functor.VisitFlag(this);
 }
 
-FunctorCode Flag::VisitEnd(MutableFunctor &functor)
+FunctorCode Flag::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitFlagEnd(this);
 }
 
-FunctorCode Flag::VisitEnd(ConstFunctor &functor) const
+FunctorCode Flag::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitFlagEnd(this);
 }
@@ -346,22 +346,22 @@ int Flag::ResetData(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode TupletBracket::Visit(MutableFunctor &functor)
+FunctorCode TupletBracket::Accept(MutableFunctor &functor)
 {
     return functor.VisitTupletBracket(this);
 }
 
-FunctorCode TupletBracket::Visit(ConstFunctor &functor) const
+FunctorCode TupletBracket::Accept(ConstFunctor &functor) const
 {
     return functor.VisitTupletBracket(this);
 }
 
-FunctorCode TupletBracket::VisitEnd(MutableFunctor &functor)
+FunctorCode TupletBracket::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitTupletBracketEnd(this);
 }
 
-FunctorCode TupletBracket::VisitEnd(ConstFunctor &functor) const
+FunctorCode TupletBracket::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitTupletBracketEnd(this);
 }
@@ -389,22 +389,22 @@ int TupletBracket::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode TupletNum::Visit(MutableFunctor &functor)
+FunctorCode TupletNum::Accept(MutableFunctor &functor)
 {
     return functor.VisitTupletNum(this);
 }
 
-FunctorCode TupletNum::Visit(ConstFunctor &functor) const
+FunctorCode TupletNum::Accept(ConstFunctor &functor) const
 {
     return functor.VisitTupletNum(this);
 }
 
-FunctorCode TupletNum::VisitEnd(MutableFunctor &functor)
+FunctorCode TupletNum::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitTupletNumEnd(this);
 }
 
-FunctorCode TupletNum::VisitEnd(ConstFunctor &functor) const
+FunctorCode TupletNum::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitTupletNumEnd(this);
 }

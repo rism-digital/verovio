@@ -2062,22 +2062,22 @@ void Doc::SetCurrentScore(Score *score)
 // Doc functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Doc::Visit(MutableFunctor &functor)
+FunctorCode Doc::Accept(MutableFunctor &functor)
 {
     return functor.VisitDoc(this);
 }
 
-FunctorCode Doc::Visit(ConstFunctor &functor) const
+FunctorCode Doc::Accept(ConstFunctor &functor) const
 {
     return functor.VisitDoc(this);
 }
 
-FunctorCode Doc::VisitEnd(MutableFunctor &functor)
+FunctorCode Doc::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitDocEnd(this);
 }
 
-FunctorCode Doc::VisitEnd(ConstFunctor &functor) const
+FunctorCode Doc::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitDocEnd(this);
 }

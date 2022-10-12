@@ -1114,7 +1114,7 @@ void Object::Process(MutableFunctor &functor, int deepness, bool skipFirst)
     this->UpdateDocumentScore(functor.GetDirection());
 
     if (!skipFirst) {
-        FunctorCode code = this->Visit(functor);
+        FunctorCode code = this->Accept(functor);
         functor.SetCode(code);
     }
 
@@ -1156,7 +1156,7 @@ void Object::Process(MutableFunctor &functor, int deepness, bool skipFirst)
     }
 
     if (functor.ImplementsEndInterface() && !skipFirst) {
-        FunctorCode code = this->VisitEnd(functor);
+        FunctorCode code = this->AcceptEnd(functor);
         functor.SetCode(code);
     }
 }
@@ -1171,7 +1171,7 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
     const_cast<Object *>(this)->UpdateDocumentScore(functor.GetDirection());
 
     if (!skipFirst) {
-        FunctorCode code = this->Visit(functor);
+        FunctorCode code = this->Accept(functor);
         functor.SetCode(code);
     }
 
@@ -1213,27 +1213,27 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
     }
 
     if (functor.ImplementsEndInterface() && !skipFirst) {
-        FunctorCode code = this->VisitEnd(functor);
+        FunctorCode code = this->AcceptEnd(functor);
         functor.SetCode(code);
     }
 }
 
-FunctorCode Object::Visit(MutableFunctor &functor)
+FunctorCode Object::Accept(MutableFunctor &functor)
 {
     return functor.VisitObject(this);
 }
 
-FunctorCode Object::Visit(ConstFunctor &functor) const
+FunctorCode Object::Accept(ConstFunctor &functor) const
 {
     return functor.VisitObject(this);
 }
 
-FunctorCode Object::VisitEnd(MutableFunctor &functor)
+FunctorCode Object::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitObjectEnd(this);
 }
 
-FunctorCode Object::VisitEnd(ConstFunctor &functor) const
+FunctorCode Object::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitObjectEnd(this);
 }

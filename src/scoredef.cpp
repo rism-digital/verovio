@@ -648,22 +648,22 @@ bool ScoreDef::HasSystemStartLine() const
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode ScoreDefElement::Visit(MutableFunctor &functor)
+FunctorCode ScoreDefElement::Accept(MutableFunctor &functor)
 {
     return functor.VisitScoreDefElement(this);
 }
 
-FunctorCode ScoreDefElement::Visit(ConstFunctor &functor) const
+FunctorCode ScoreDefElement::Accept(ConstFunctor &functor) const
 {
     return functor.VisitScoreDefElement(this);
 }
 
-FunctorCode ScoreDefElement::VisitEnd(MutableFunctor &functor)
+FunctorCode ScoreDefElement::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitScoreDefElementEnd(this);
 }
 
-FunctorCode ScoreDefElement::VisitEnd(ConstFunctor &functor) const
+FunctorCode ScoreDefElement::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitScoreDefElementEnd(this);
 }
@@ -740,22 +740,22 @@ int ScoreDefElement::ConvertMarkupScoreDefEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoreDef::Visit(MutableFunctor &functor)
+FunctorCode ScoreDef::Accept(MutableFunctor &functor)
 {
     return functor.VisitScoreDef(this);
 }
 
-FunctorCode ScoreDef::Visit(ConstFunctor &functor) const
+FunctorCode ScoreDef::Accept(ConstFunctor &functor) const
 {
     return functor.VisitScoreDef(this);
 }
 
-FunctorCode ScoreDef::VisitEnd(MutableFunctor &functor)
+FunctorCode ScoreDef::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitScoreDefEnd(this);
 }
 
-FunctorCode ScoreDef::VisitEnd(ConstFunctor &functor) const
+FunctorCode ScoreDef::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitScoreDefEnd(this);
 }

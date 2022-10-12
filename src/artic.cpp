@@ -311,22 +311,22 @@ bool Artic::IsCentered(data_ARTICULATION artic)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Artic::Visit(MutableFunctor &functor)
+FunctorCode Artic::Accept(MutableFunctor &functor)
 {
     return functor.VisitArtic(this);
 }
 
-FunctorCode Artic::Visit(ConstFunctor &functor) const
+FunctorCode Artic::Accept(ConstFunctor &functor) const
 {
     return functor.VisitArtic(this);
 }
 
-FunctorCode Artic::VisitEnd(MutableFunctor &functor)
+FunctorCode Artic::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitArticEnd(this);
 }
 
-FunctorCode Artic::VisitEnd(ConstFunctor &functor) const
+FunctorCode Artic::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitArticEnd(this);
 }

@@ -200,22 +200,22 @@ char32_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
 // Clef functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Clef::Visit(MutableFunctor &functor)
+FunctorCode Clef::Accept(MutableFunctor &functor)
 {
     return functor.VisitClef(this);
 }
 
-FunctorCode Clef::Visit(ConstFunctor &functor) const
+FunctorCode Clef::Accept(ConstFunctor &functor) const
 {
     return functor.VisitClef(this);
 }
 
-FunctorCode Clef::VisitEnd(MutableFunctor &functor)
+FunctorCode Clef::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitClefEnd(this);
 }
 
-FunctorCode Clef::VisitEnd(ConstFunctor &functor) const
+FunctorCode Clef::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitClefEnd(this);
 }

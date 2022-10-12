@@ -123,22 +123,22 @@ void FTrem::SetElementShortening(int shortening)
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode FTrem::Visit(MutableFunctor &functor)
+FunctorCode FTrem::Accept(MutableFunctor &functor)
 {
     return functor.VisitFTrem(this);
 }
 
-FunctorCode FTrem::Visit(ConstFunctor &functor) const
+FunctorCode FTrem::Accept(ConstFunctor &functor) const
 {
     return functor.VisitFTrem(this);
 }
 
-FunctorCode FTrem::VisitEnd(MutableFunctor &functor)
+FunctorCode FTrem::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitFTremEnd(this);
 }
 
-FunctorCode FTrem::VisitEnd(ConstFunctor &functor) const
+FunctorCode FTrem::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitFTremEnd(this);
 }

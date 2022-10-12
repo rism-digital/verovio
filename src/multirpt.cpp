@@ -45,22 +45,22 @@ void MultiRpt::Reset()
     this->ResetNumbered();
 }
 
-FunctorCode MultiRpt::Visit(MutableFunctor &functor)
+FunctorCode MultiRpt::Accept(MutableFunctor &functor)
 {
     return functor.VisitMultiRpt(this);
 }
 
-FunctorCode MultiRpt::Visit(ConstFunctor &functor) const
+FunctorCode MultiRpt::Accept(ConstFunctor &functor) const
 {
     return functor.VisitMultiRpt(this);
 }
 
-FunctorCode MultiRpt::VisitEnd(MutableFunctor &functor)
+FunctorCode MultiRpt::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitMultiRptEnd(this);
 }
 
-FunctorCode MultiRpt::VisitEnd(ConstFunctor &functor) const
+FunctorCode MultiRpt::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMultiRptEnd(this);
 }

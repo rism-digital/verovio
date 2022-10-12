@@ -647,10 +647,10 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    virtual FunctorCode Visit(MutableFunctor &functor);
-    virtual FunctorCode Visit(ConstFunctor &functor) const;
-    virtual FunctorCode VisitEnd(MutableFunctor &functor);
-    virtual FunctorCode VisitEnd(ConstFunctor &functor) const;
+    virtual FunctorCode Accept(MutableFunctor &functor);
+    virtual FunctorCode Accept(ConstFunctor &functor) const;
+    virtual FunctorCode AcceptEnd(MutableFunctor &functor);
+    virtual FunctorCode AcceptEnd(ConstFunctor &functor) const;
     ///@}
 
     //----------------//

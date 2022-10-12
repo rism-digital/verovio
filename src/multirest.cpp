@@ -75,22 +75,22 @@ bool MultiRest::UseBlockStyle(const Doc *doc) const
     return useBlock;
 }
 
-FunctorCode MultiRest::Visit(MutableFunctor &functor)
+FunctorCode MultiRest::Accept(MutableFunctor &functor)
 {
     return functor.VisitMultiRest(this);
 }
 
-FunctorCode MultiRest::Visit(ConstFunctor &functor) const
+FunctorCode MultiRest::Accept(ConstFunctor &functor) const
 {
     return functor.VisitMultiRest(this);
 }
 
-FunctorCode MultiRest::VisitEnd(MutableFunctor &functor)
+FunctorCode MultiRest::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitMultiRestEnd(this);
 }
 
-FunctorCode MultiRest::VisitEnd(ConstFunctor &functor) const
+FunctorCode MultiRest::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMultiRestEnd(this);
 }

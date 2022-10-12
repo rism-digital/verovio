@@ -203,22 +203,22 @@ int Tuning::CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Tuning::Visit(MutableFunctor &functor)
+FunctorCode Tuning::Accept(MutableFunctor &functor)
 {
     return functor.VisitTuning(this);
 }
 
-FunctorCode Tuning::Visit(ConstFunctor &functor) const
+FunctorCode Tuning::Accept(ConstFunctor &functor) const
 {
     return functor.VisitTuning(this);
 }
 
-FunctorCode Tuning::VisitEnd(MutableFunctor &functor)
+FunctorCode Tuning::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitTuningEnd(this);
 }
 
-FunctorCode Tuning::VisitEnd(ConstFunctor &functor) const
+FunctorCode Tuning::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitTuningEnd(this);
 }

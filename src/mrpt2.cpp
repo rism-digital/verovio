@@ -46,22 +46,22 @@ void MRpt2::Reset()
     this->ResetColor();
 }
 
-FunctorCode MRpt2::Visit(MutableFunctor &functor)
+FunctorCode MRpt2::Accept(MutableFunctor &functor)
 {
     return functor.VisitMRpt2(this);
 }
 
-FunctorCode MRpt2::Visit(ConstFunctor &functor) const
+FunctorCode MRpt2::Accept(ConstFunctor &functor) const
 {
     return functor.VisitMRpt2(this);
 }
 
-FunctorCode MRpt2::VisitEnd(MutableFunctor &functor)
+FunctorCode MRpt2::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitMRpt2End(this);
 }
 
-FunctorCode MRpt2::VisitEnd(ConstFunctor &functor) const
+FunctorCode MRpt2::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMRpt2End(this);
 }

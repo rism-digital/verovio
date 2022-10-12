@@ -85,22 +85,22 @@ int KeyAccid::CalcStaffLoc(Clef *clef, int clefLocOffset) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode KeyAccid::Visit(MutableFunctor &functor)
+FunctorCode KeyAccid::Accept(MutableFunctor &functor)
 {
     return functor.VisitKeyAccid(this);
 }
 
-FunctorCode KeyAccid::Visit(ConstFunctor &functor) const
+FunctorCode KeyAccid::Accept(ConstFunctor &functor) const
 {
     return functor.VisitKeyAccid(this);
 }
 
-FunctorCode KeyAccid::VisitEnd(MutableFunctor &functor)
+FunctorCode KeyAccid::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitKeyAccidEnd(this);
 }
 
-FunctorCode KeyAccid::VisitEnd(ConstFunctor &functor) const
+FunctorCode KeyAccid::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitKeyAccidEnd(this);
 }

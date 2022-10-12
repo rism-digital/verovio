@@ -805,22 +805,22 @@ void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Page::Visit(MutableFunctor &functor)
+FunctorCode Page::Accept(MutableFunctor &functor)
 {
     return functor.VisitPage(this);
 }
 
-FunctorCode Page::Visit(ConstFunctor &functor) const
+FunctorCode Page::Accept(ConstFunctor &functor) const
 {
     return functor.VisitPage(this);
 }
 
-FunctorCode Page::VisitEnd(MutableFunctor &functor)
+FunctorCode Page::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitPageEnd(this);
 }
 
-FunctorCode Page::VisitEnd(ConstFunctor &functor) const
+FunctorCode Page::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitPageEnd(this);
 }

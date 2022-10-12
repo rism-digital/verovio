@@ -892,22 +892,22 @@ int Note::PnameToPclass(data_PITCHNAME pitchName)
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Note::Visit(MutableFunctor &functor)
+FunctorCode Note::Accept(MutableFunctor &functor)
 {
     return functor.VisitNote(this);
 }
 
-FunctorCode Note::Visit(ConstFunctor &functor) const
+FunctorCode Note::Accept(ConstFunctor &functor) const
 {
     return functor.VisitNote(this);
 }
 
-FunctorCode Note::VisitEnd(MutableFunctor &functor)
+FunctorCode Note::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitNoteEnd(this);
 }
 
-FunctorCode Note::VisitEnd(ConstFunctor &functor) const
+FunctorCode Note::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitNoteEnd(this);
 }

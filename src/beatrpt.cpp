@@ -76,22 +76,22 @@ double BeatRpt::GetScoreTimeOnset() const
 // BeatRpt functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode BeatRpt::Visit(MutableFunctor &functor)
+FunctorCode BeatRpt::Accept(MutableFunctor &functor)
 {
     return functor.VisitBeatRpt(this);
 }
 
-FunctorCode BeatRpt::Visit(ConstFunctor &functor) const
+FunctorCode BeatRpt::Accept(ConstFunctor &functor) const
 {
     return functor.VisitBeatRpt(this);
 }
 
-FunctorCode BeatRpt::VisitEnd(MutableFunctor &functor)
+FunctorCode BeatRpt::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitBeatRptEnd(this);
 }
 
-FunctorCode BeatRpt::VisitEnd(ConstFunctor &functor) const
+FunctorCode BeatRpt::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitBeatRptEnd(this);
 }

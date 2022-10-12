@@ -576,22 +576,22 @@ std::list<const Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc)
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Chord::Visit(MutableFunctor &functor)
+FunctorCode Chord::Accept(MutableFunctor &functor)
 {
     return functor.VisitChord(this);
 }
 
-FunctorCode Chord::Visit(ConstFunctor &functor) const
+FunctorCode Chord::Accept(ConstFunctor &functor) const
 {
     return functor.VisitChord(this);
 }
 
-FunctorCode Chord::VisitEnd(MutableFunctor &functor)
+FunctorCode Chord::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitChordEnd(this);
 }
 
-FunctorCode Chord::VisitEnd(ConstFunctor &functor) const
+FunctorCode Chord::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitChordEnd(this);
 }

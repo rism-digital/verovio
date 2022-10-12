@@ -172,22 +172,22 @@ void MeterSigGrp::SetMeasureBasedCount(const Measure *measure)
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode MeterSigGrp::Visit(MutableFunctor &functor)
+FunctorCode MeterSigGrp::Accept(MutableFunctor &functor)
 {
     return functor.VisitMeterSigGrp(this);
 }
 
-FunctorCode MeterSigGrp::Visit(ConstFunctor &functor) const
+FunctorCode MeterSigGrp::Accept(ConstFunctor &functor) const
 {
     return functor.VisitMeterSigGrp(this);
 }
 
-FunctorCode MeterSigGrp::VisitEnd(MutableFunctor &functor)
+FunctorCode MeterSigGrp::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitMeterSigGrpEnd(this);
 }
 
-FunctorCode MeterSigGrp::VisitEnd(ConstFunctor &functor) const
+FunctorCode MeterSigGrp::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMeterSigGrpEnd(this);
 }

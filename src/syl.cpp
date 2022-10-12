@@ -136,22 +136,22 @@ int Syl::GetDrawingHeight() const
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Syl::Visit(MutableFunctor &functor)
+FunctorCode Syl::Accept(MutableFunctor &functor)
 {
     return functor.VisitSyl(this);
 }
 
-FunctorCode Syl::Visit(ConstFunctor &functor) const
+FunctorCode Syl::Accept(ConstFunctor &functor) const
 {
     return functor.VisitSyl(this);
 }
 
-FunctorCode Syl::VisitEnd(MutableFunctor &functor)
+FunctorCode Syl::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitSylEnd(this);
 }
 
-FunctorCode Syl::VisitEnd(ConstFunctor &functor) const
+FunctorCode Syl::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitSylEnd(this);
 }

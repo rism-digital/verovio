@@ -472,22 +472,22 @@ void System::ConvertToUnCastOffMensuralSystem()
 // System functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode System::Visit(MutableFunctor &functor)
+FunctorCode System::Accept(MutableFunctor &functor)
 {
     return functor.VisitSystem(this);
 }
 
-FunctorCode System::Visit(ConstFunctor &functor) const
+FunctorCode System::Accept(ConstFunctor &functor) const
 {
     return functor.VisitSystem(this);
 }
 
-FunctorCode System::VisitEnd(MutableFunctor &functor)
+FunctorCode System::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitSystemEnd(this);
 }
 
-FunctorCode System::VisitEnd(ConstFunctor &functor) const
+FunctorCode System::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitSystemEnd(this);
 }

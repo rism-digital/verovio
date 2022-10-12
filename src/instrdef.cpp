@@ -51,22 +51,22 @@ void InstrDef::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode InstrDef::Visit(MutableFunctor &functor)
+FunctorCode InstrDef::Accept(MutableFunctor &functor)
 {
     return functor.VisitInstrDef(this);
 }
 
-FunctorCode InstrDef::Visit(ConstFunctor &functor) const
+FunctorCode InstrDef::Accept(ConstFunctor &functor) const
 {
     return functor.VisitInstrDef(this);
 }
 
-FunctorCode InstrDef::VisitEnd(MutableFunctor &functor)
+FunctorCode InstrDef::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitInstrDefEnd(this);
 }
 
-FunctorCode InstrDef::VisitEnd(ConstFunctor &functor) const
+FunctorCode InstrDef::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitInstrDefEnd(this);
 }

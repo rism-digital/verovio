@@ -34,22 +34,22 @@ void Proport::Reset()
     this->ResetDurationRatio();
 }
 
-FunctorCode Proport::Visit(MutableFunctor &functor)
+FunctorCode Proport::Accept(MutableFunctor &functor)
 {
     return functor.VisitProport(this);
 }
 
-FunctorCode Proport::Visit(ConstFunctor &functor) const
+FunctorCode Proport::Accept(ConstFunctor &functor) const
 {
     return functor.VisitProport(this);
 }
 
-FunctorCode Proport::VisitEnd(MutableFunctor &functor)
+FunctorCode Proport::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitProportEnd(this);
 }
 
-FunctorCode Proport::VisitEnd(ConstFunctor &functor) const
+FunctorCode Proport::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitProportEnd(this);
 }

@@ -219,22 +219,22 @@ PitchInterface *Neume::GetLowestPitch()
     return min;
 }
 
-FunctorCode Neume::Visit(MutableFunctor &functor)
+FunctorCode Neume::Accept(MutableFunctor &functor)
 {
     return functor.VisitNeume(this);
 }
 
-FunctorCode Neume::Visit(ConstFunctor &functor) const
+FunctorCode Neume::Accept(ConstFunctor &functor) const
 {
     return functor.VisitNeume(this);
 }
 
-FunctorCode Neume::VisitEnd(MutableFunctor &functor)
+FunctorCode Neume::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitNeumeEnd(this);
 }
 
-FunctorCode Neume::VisitEnd(ConstFunctor &functor) const
+FunctorCode Neume::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitNeumeEnd(this);
 }

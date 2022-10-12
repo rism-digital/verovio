@@ -54,22 +54,22 @@ bool Course::IsSupportedChild(Object *child)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Course::Visit(MutableFunctor &functor)
+FunctorCode Course::Accept(MutableFunctor &functor)
 {
     return functor.VisitCourse(this);
 }
 
-FunctorCode Course::Visit(ConstFunctor &functor) const
+FunctorCode Course::Accept(ConstFunctor &functor) const
 {
     return functor.VisitCourse(this);
 }
 
-FunctorCode Course::VisitEnd(MutableFunctor &functor)
+FunctorCode Course::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitCourseEnd(this);
 }
 
-FunctorCode Course::VisitEnd(ConstFunctor &functor) const
+FunctorCode Course::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitCourseEnd(this);
 }

@@ -56,22 +56,22 @@ bool Label::IsSupportedChild(Object *child)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Label::Visit(MutableFunctor &functor)
+FunctorCode Label::Accept(MutableFunctor &functor)
 {
     return functor.VisitLabel(this);
 }
 
-FunctorCode Label::Visit(ConstFunctor &functor) const
+FunctorCode Label::Accept(ConstFunctor &functor) const
 {
     return functor.VisitLabel(this);
 }
 
-FunctorCode Label::VisitEnd(MutableFunctor &functor)
+FunctorCode Label::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitLabelEnd(this);
 }
 
-FunctorCode Label::VisitEnd(ConstFunctor &functor) const
+FunctorCode Label::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitLabelEnd(this);
 }

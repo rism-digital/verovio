@@ -51,22 +51,22 @@ void Dot::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Dot::Visit(MutableFunctor &functor)
+FunctorCode Dot::Accept(MutableFunctor &functor)
 {
     return functor.VisitDot(this);
 }
 
-FunctorCode Dot::Visit(ConstFunctor &functor) const
+FunctorCode Dot::Accept(ConstFunctor &functor) const
 {
     return functor.VisitDot(this);
 }
 
-FunctorCode Dot::VisitEnd(MutableFunctor &functor)
+FunctorCode Dot::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitDotEnd(this);
 }
 
-FunctorCode Dot::VisitEnd(ConstFunctor &functor) const
+FunctorCode Dot::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitDotEnd(this);
 }

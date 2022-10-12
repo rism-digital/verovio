@@ -45,22 +45,22 @@ void Plica::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Plica::Visit(MutableFunctor &functor)
+FunctorCode Plica::Accept(MutableFunctor &functor)
 {
     return functor.VisitPlica(this);
 }
 
-FunctorCode Plica::Visit(ConstFunctor &functor) const
+FunctorCode Plica::Accept(ConstFunctor &functor) const
 {
     return functor.VisitPlica(this);
 }
 
-FunctorCode Plica::VisitEnd(MutableFunctor &functor)
+FunctorCode Plica::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitPlicaEnd(this);
 }
 
-FunctorCode Plica::VisitEnd(ConstFunctor &functor) const
+FunctorCode Plica::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitPlicaEnd(this);
 }

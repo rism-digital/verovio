@@ -62,22 +62,22 @@ bool LayerDef::IsSupportedChild(Object *child)
     return true;
 }
 
-FunctorCode LayerDef::Visit(MutableFunctor &functor)
+FunctorCode LayerDef::Accept(MutableFunctor &functor)
 {
     return functor.VisitLayerDef(this);
 }
 
-FunctorCode LayerDef::Visit(ConstFunctor &functor) const
+FunctorCode LayerDef::Accept(ConstFunctor &functor) const
 {
     return functor.VisitLayerDef(this);
 }
 
-FunctorCode LayerDef::VisitEnd(MutableFunctor &functor)
+FunctorCode LayerDef::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitLayerDefEnd(this);
 }
 
-FunctorCode LayerDef::VisitEnd(ConstFunctor &functor) const
+FunctorCode LayerDef::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitLayerDefEnd(this);
 }

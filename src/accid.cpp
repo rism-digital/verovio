@@ -281,22 +281,22 @@ std::u32string Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOS
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Accid::Visit(MutableFunctor &functor)
+FunctorCode Accid::Accept(MutableFunctor &functor)
 {
     return functor.VisitAccid(this);
 }
 
-FunctorCode Accid::Visit(ConstFunctor &functor) const
+FunctorCode Accid::Accept(ConstFunctor &functor) const
 {
     return functor.VisitAccid(this);
 }
 
-FunctorCode Accid::VisitEnd(MutableFunctor &functor)
+FunctorCode Accid::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitAccidEnd(this);
 }
 
-FunctorCode Accid::VisitEnd(ConstFunctor &functor) const
+FunctorCode Accid::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitAccidEnd(this);
 }

@@ -175,22 +175,22 @@ void Stem::AdjustFlagPlacement(const Doc *doc, Flag *flag, int staffSize, int ve
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Stem::Visit(MutableFunctor &functor)
+FunctorCode Stem::Accept(MutableFunctor &functor)
 {
     return functor.VisitStem(this);
 }
 
-FunctorCode Stem::Visit(ConstFunctor &functor) const
+FunctorCode Stem::Accept(ConstFunctor &functor) const
 {
     return functor.VisitStem(this);
 }
 
-FunctorCode Stem::VisitEnd(MutableFunctor &functor)
+FunctorCode Stem::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitStemEnd(this);
 }
 
-FunctorCode Stem::VisitEnd(ConstFunctor &functor) const
+FunctorCode Stem::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitStemEnd(this);
 }

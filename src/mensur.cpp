@@ -69,22 +69,22 @@ void Mensur::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Mensur::Visit(MutableFunctor &functor)
+FunctorCode Mensur::Accept(MutableFunctor &functor)
 {
     return functor.VisitMensur(this);
 }
 
-FunctorCode Mensur::Visit(ConstFunctor &functor) const
+FunctorCode Mensur::Accept(ConstFunctor &functor) const
 {
     return functor.VisitMensur(this);
 }
 
-FunctorCode Mensur::VisitEnd(MutableFunctor &functor)
+FunctorCode Mensur::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitMensurEnd(this);
 }
 
-FunctorCode Mensur::VisitEnd(ConstFunctor &functor) const
+FunctorCode Mensur::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMensurEnd(this);
 }

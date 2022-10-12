@@ -60,10 +60,10 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Visit(MutableFunctor &functor) override;
-    FunctorCode Visit(ConstFunctor &functor) const override;
-    FunctorCode VisitEnd(MutableFunctor &functor) override;
-    FunctorCode VisitEnd(ConstFunctor &functor) const override;
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
     /**

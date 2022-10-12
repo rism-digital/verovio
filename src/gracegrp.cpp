@@ -80,22 +80,22 @@ bool GraceGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-FunctorCode GraceGrp::Visit(MutableFunctor &functor)
+FunctorCode GraceGrp::Accept(MutableFunctor &functor)
 {
     return functor.VisitGraceGrp(this);
 }
 
-FunctorCode GraceGrp::Visit(ConstFunctor &functor) const
+FunctorCode GraceGrp::Accept(ConstFunctor &functor) const
 {
     return functor.VisitGraceGrp(this);
 }
 
-FunctorCode GraceGrp::VisitEnd(MutableFunctor &functor)
+FunctorCode GraceGrp::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitGraceGrpEnd(this);
 }
 
-FunctorCode GraceGrp::VisitEnd(ConstFunctor &functor) const
+FunctorCode GraceGrp::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitGraceGrpEnd(this);
 }

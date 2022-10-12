@@ -1141,22 +1141,22 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
 // LayerElement functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode LayerElement::Visit(MutableFunctor &functor)
+FunctorCode LayerElement::Accept(MutableFunctor &functor)
 {
     return functor.VisitLayerElement(this);
 }
 
-FunctorCode LayerElement::Visit(ConstFunctor &functor) const
+FunctorCode LayerElement::Accept(ConstFunctor &functor) const
 {
     return functor.VisitLayerElement(this);
 }
 
-FunctorCode LayerElement::VisitEnd(MutableFunctor &functor)
+FunctorCode LayerElement::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitLayerElementEnd(this);
 }
 
-FunctorCode LayerElement::VisitEnd(ConstFunctor &functor) const
+FunctorCode LayerElement::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitLayerElementEnd(this);
 }

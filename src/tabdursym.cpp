@@ -128,22 +128,22 @@ int TabDurSym::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION st
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode TabDurSym::Visit(MutableFunctor &functor)
+FunctorCode TabDurSym::Accept(MutableFunctor &functor)
 {
     return functor.VisitTabDurSym(this);
 }
 
-FunctorCode TabDurSym::Visit(ConstFunctor &functor) const
+FunctorCode TabDurSym::Accept(ConstFunctor &functor) const
 {
     return functor.VisitTabDurSym(this);
 }
 
-FunctorCode TabDurSym::VisitEnd(MutableFunctor &functor)
+FunctorCode TabDurSym::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitTabDurSymEnd(this);
 }
 
-FunctorCode TabDurSym::VisitEnd(ConstFunctor &functor) const
+FunctorCode TabDurSym::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitTabDurSymEnd(this);
 }

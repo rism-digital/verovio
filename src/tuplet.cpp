@@ -511,22 +511,22 @@ void Tuplet::GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *d
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Tuplet::Visit(MutableFunctor &functor)
+FunctorCode Tuplet::Accept(MutableFunctor &functor)
 {
     return functor.VisitTuplet(this);
 }
 
-FunctorCode Tuplet::Visit(ConstFunctor &functor) const
+FunctorCode Tuplet::Accept(ConstFunctor &functor) const
 {
     return functor.VisitTuplet(this);
 }
 
-FunctorCode Tuplet::VisitEnd(MutableFunctor &functor)
+FunctorCode Tuplet::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitTupletEnd(this);
 }
 
-FunctorCode Tuplet::VisitEnd(ConstFunctor &functor) const
+FunctorCode Tuplet::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitTupletEnd(this);
 }

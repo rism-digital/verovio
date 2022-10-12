@@ -61,22 +61,22 @@ void Nc::Reset()
     this->ResetNcForm();
 }
 
-FunctorCode Nc::Visit(MutableFunctor &functor)
+FunctorCode Nc::Accept(MutableFunctor &functor)
 {
     return functor.VisitNc(this);
 }
 
-FunctorCode Nc::Visit(ConstFunctor &functor) const
+FunctorCode Nc::Accept(ConstFunctor &functor) const
 {
     return functor.VisitNc(this);
 }
 
-FunctorCode Nc::VisitEnd(MutableFunctor &functor)
+FunctorCode Nc::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitNcEnd(this);
 }
 
-FunctorCode Nc::VisitEnd(ConstFunctor &functor) const
+FunctorCode Nc::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitNcEnd(this);
 }

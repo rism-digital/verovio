@@ -533,22 +533,22 @@ int Rest::GetRestOffsetFromOptions(
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Rest::Visit(MutableFunctor &functor)
+FunctorCode Rest::Accept(MutableFunctor &functor)
 {
     return functor.VisitRest(this);
 }
 
-FunctorCode Rest::Visit(ConstFunctor &functor) const
+FunctorCode Rest::Accept(ConstFunctor &functor) const
 {
     return functor.VisitRest(this);
 }
 
-FunctorCode Rest::VisitEnd(MutableFunctor &functor)
+FunctorCode Rest::AcceptEnd(MutableFunctor &functor)
 {
     return functor.VisitRestEnd(this);
 }
 
-FunctorCode Rest::VisitEnd(ConstFunctor &functor) const
+FunctorCode Rest::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitRestEnd(this);
 }
