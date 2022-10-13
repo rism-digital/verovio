@@ -99,7 +99,7 @@ function getToolkitFunction(VerovioModule, method) {
     // char *renderData(Toolkit *ic, const char *data, const char *options)
     mapping.renderData = VerovioModule.cwrap("vrvToolkit_renderData", "string", ["number", "string", "string"]);
 
-    // char *renderToMidi(Toolkit *ic, const char *rendering_options)
+    // char *renderToMIDI(Toolkit *ic, const char *rendering_options)
     mapping.renderToMIDI = VerovioModule.cwrap("vrvToolkit_renderToMIDI", "string", ["number", "string"]);
 
     // char *renderToPAE(Toolkit *ic)

@@ -138,17 +138,7 @@ export class VerovioToolkit {
         return this.proxy.renderData(this.ptr, data, JSON.stringify(options));
     }
 
-    renderPage(pageNo, options) {
-        console.warn("Method renderPage is deprecated; use renderToSVG instead");
-        return this.proxy.renderToSVG(this.ptr, pageNo, JSON.stringify(options));
-    }
-
     renderToMIDI(options) {
-        return this.proxy.renderToMIDI(this.ptr, JSON.stringify(options));
-    }
-
-    renderToMidi(options) {
-        console.warn("Method renderToMidi is deprecated; use renderToMIDI instead");
         return this.proxy.renderToMIDI(this.ptr, JSON.stringify(options));
     }
 
