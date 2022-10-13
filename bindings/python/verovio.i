@@ -25,16 +25,15 @@
 %}
 
 %feature("shadow") vrv::Toolkit::GetOptions %{
-def getOptions(*args):
-    if len(args) < 2: return {}
-    optionsStr = $action(args[0], args[1])
+def getOptions(toolkit, default_values):
+    optionsStr = $action(toolkit, defaut_values)
     return json.loads(optionsStr)
 %}
 
 
 %feature("shadow") vrv::Toolkit::SetOptions( const std::string & ) %{
-def setOptions(*args):
-    return $action(args[0], json.dumps(args[1]))
+def setOptions(toolkit, json_options):
+    return $action(toolkit, json.dumps(json_options))
 %}
 
 %module(package="verovio") verovio
