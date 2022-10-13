@@ -12820,12 +12820,15 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
         return;
     }
 
-    // maybe add center justification as an option later
     // justification == 0 means no explicit justification (mostly left justified)
     // justification == 1 means right justified
+    // justification == 2 means center justified
     int justification = 0;
     if (token->isDefined("LO", "TX", "rj")) {
         justification = 1;
+    }
+    else if (token->isDefined("LO", "TX", "cj")) {
+        justification = 2;
     }
 
     bool zparam = token->isDefined("LO", "TX", "Z");
@@ -13069,6 +13072,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
         if (key == "rj") {
             justification = 1;
+        }
+        if (key == "cj") {
+            justification = 2;
         }
         if (key == "color") {
             color = value;
@@ -13345,6 +13351,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         if (justification == 1) {
             rend->SetHalign(HORIZONTALALIGNMENT_right);
         }
+        else if (justification == 2) {
+            rend->SetHalign(HORIZONTALALIGNMENT_center);
+        }
     }
     else {
 
@@ -13380,6 +13389,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                     if (justification == 1) {
                         item->SetHalign(HORIZONTALALIGNMENT_right);
                     }
+                    else if (justification == 2) {
+                        item->SetHalign(HORIZONTALALIGNMENT_center);
+                    }
                 }
             }
         }
@@ -13414,6 +13426,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                     }
                     if (justification == 1) {
                         item->SetHalign(HORIZONTALALIGNMENT_right);
+                    }
+                    else if (justification == 2) {
+                        item->SetHalign(HORIZONTALALIGNMENT_center);
                     }
                 }
             }
@@ -13521,6 +13536,8 @@ bool HumdrumInput::addTempoDirection(const std::string &text, const std::string 
     else if (placement == "center") {
         setPlaceRelStaff(tempo, "between", false);
     }
+
+    // deal with rj and cj justification here
 
     bool status = setTempoContent(tempo, text);
     if (status) {
@@ -14114,6 +14131,9 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
         if (justification == 1) {
             rend->SetHalign(HORIZONTALALIGNMENT_right);
         }
+        else if (justification == 2) {
+            rend->SetHalign(HORIZONTALALIGNMENT_center);
+        }
     }
     else {
         addTextElement(dir, text);
@@ -14169,6 +14189,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     int justification = 0;
     if (token->getLayoutParameter("DY", "rj") == "true") {
         justification = 1;
+    }
+    if (token->getLayoutParameter("DY", "cj") == "true") {
+        justification = 2;
     }
 
     std::string dcolor = token->getLayoutParameter("DY", "color");
@@ -14272,6 +14295,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             }
             if (justification == 1) {
                 rend->SetHalign(HORIZONTALALIGNMENT_right);
+            }
+            else if (justification == 2) {
+                rend->SetHalign(HORIZONTALALIGNMENT_center);
             }
         }
         else {
@@ -14416,6 +14442,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             if (dyntok->getLayoutParameter("DY", "rj") == "true") {
                 justification = 1;
             }
+            else if (dyntok->getLayoutParameter("DY", "cj") == "true") {
+                justification = 2;
+            }
 
             bool editQ = false;
             bool brackQ = false;
@@ -14529,6 +14558,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 if (justification == 1) {
                     rend->SetHalign(HORIZONTALALIGNMENT_right);
+                }
+                else if (justification == 2) {
+                    rend->SetHalign(HORIZONTALALIGNMENT_center);
                 }
             }
             else {
