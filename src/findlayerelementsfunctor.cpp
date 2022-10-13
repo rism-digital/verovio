@@ -14,11 +14,10 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// LayerCountInTimeSpanFunctor
+// LayersInTimeSpanFunctor
 //----------------------------------------------------------------------------
 
-LayerCountInTimeSpanFunctor::LayerCountInTimeSpanFunctor(const MeterSig *meterSig, const Mensur *mensur)
-    : ConstFunctor()
+LayersInTimeSpanFunctor::LayersInTimeSpanFunctor(const MeterSig *meterSig, const Mensur *mensur) : ConstFunctor()
 {
     m_time = 0.0;
     m_duration = 0.0;
@@ -26,7 +25,13 @@ LayerCountInTimeSpanFunctor::LayerCountInTimeSpanFunctor(const MeterSig *meterSi
     m_mensur = mensur;
 }
 
-FunctorCode LayerCountInTimeSpanFunctor::VisitLayerElement(const LayerElement *layerElement)
+void LayersInTimeSpanFunctor::SetEvent(double time, double duration)
+{
+    m_time = time;
+    m_duration = duration;
+}
+
+FunctorCode LayersInTimeSpanFunctor::VisitLayerElement(const LayerElement *layerElement)
 {
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
@@ -62,14 +67,14 @@ FunctorCode LayerCountInTimeSpanFunctor::VisitLayerElement(const LayerElement *l
     return (layerElement->Is(CHORD)) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
-FunctorCode LayerCountInTimeSpanFunctor::VisitMensur(const Mensur *mensur)
+FunctorCode LayersInTimeSpanFunctor::VisitMensur(const Mensur *mensur)
 {
     m_mensur = mensur;
 
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode LayerCountInTimeSpanFunctor::VisitMeterSig(const MeterSig *meterSig)
+FunctorCode LayersInTimeSpanFunctor::VisitMeterSig(const MeterSig *meterSig)
 {
     m_meterSig = meterSig;
 

@@ -21,6 +21,7 @@
 #include "custos.h"
 #include "doc.h"
 #include "editorial.h"
+#include "findlayerelementsfunctor.h"
 #include "functor.h"
 #include "functorparams.h"
 #include "keysig.h"
@@ -366,19 +367,17 @@ std::set<int> Layer::GetLayersNInTimeSpan(double time, double duration, const Me
 {
     assert(measure);
 
-    Functor layerCountInTimeSpan(&Object::LayerCountInTimeSpan);
-    LayerCountInTimeSpanParams layerCountInTimeSpanParams(
-        this->GetCurrentMeterSig(), this->GetCurrentMensur(), &layerCountInTimeSpan);
-    layerCountInTimeSpanParams.m_time = time;
-    layerCountInTimeSpanParams.m_duration = duration;
+    LayersInTimeSpanFunctor layersInTimeSpan(this->GetCurrentMeterSig(), this->GetCurrentMensur());
+    layersInTimeSpan.SetEvent(time, duration);
 
     Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
     filters.Add(&matchStaff);
+    layersInTimeSpan.SetFilters(&filters);
 
-    measure->m_measureAligner.Process(&layerCountInTimeSpan, &layerCountInTimeSpanParams, NULL, &filters);
+    measure->m_measureAligner.Process(layersInTimeSpan);
 
-    return layerCountInTimeSpanParams.m_layers;
+    return layersInTimeSpan.GetLayers();
 }
 
 int Layer::GetLayerCountInTimeSpan(double time, double duration, const Measure *measure, int staff) const

@@ -13,26 +13,36 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// LayerCountInTimeSpanFunctor
+// LayersInTimeSpanFunctor
 //----------------------------------------------------------------------------
 
 /**
  * This class collects all layers which appear in the given time / duration
  */
-class LayerCountInTimeSpanFunctor : public ConstFunctor {
+class LayersInTimeSpanFunctor : public ConstFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    LayerCountInTimeSpanFunctor(const MeterSig *meterSig, const Mensur *mensur);
-    virtual ~LayerCountInTimeSpanFunctor() = default;
+    LayersInTimeSpanFunctor(const MeterSig *meterSig, const Mensur *mensur);
+    virtual ~LayersInTimeSpanFunctor() = default;
     ///@}
 
     /*
      * Abstract base implementation
      */
     bool ImplementsEndInterface() override { return false; }
+
+    /*
+     * Set the time and duration of the event
+     */
+    void SetEvent(double time, double duration);
+
+    /*
+     * Retrieve the search result
+     */
+    std::set<int> GetLayers() const { return m_layers; }
 
     /*
      * Functor interface

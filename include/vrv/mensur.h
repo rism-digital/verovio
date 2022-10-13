@@ -65,11 +65,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::LayerCountInTimeSpan
-     */
-    int LayerCountInTimeSpan(FunctorParams *functorParams) const override;
-
 private:
     //
 public:

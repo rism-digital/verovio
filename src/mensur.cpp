@@ -89,14 +89,4 @@ FunctorCode Mensur::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMensurEnd(this);
 }
 
-int Mensur::LayerCountInTimeSpan(FunctorParams *functorParams) const
-{
-    LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
-    assert(params);
-
-    params->m_mensur = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

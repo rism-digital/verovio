@@ -148,14 +148,4 @@ FunctorCode MeterSig::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMeterSigEnd(this);
 }
 
-int MeterSig::LayerCountInTimeSpan(FunctorParams *functorParams) const
-{
-    LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
-    assert(params);
-
-    params->m_meterSig = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

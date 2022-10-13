@@ -2466,44 +2466,6 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams) const
-{
-    LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    // For mRest we do not look at the time span
-    if (this->Is(MREST)) {
-        // Add the layerN to the list of layer elements occuring in this time frame
-        params->m_layers.insert(this->GetAlignmentLayerN());
-
-        return FUNCTOR_SIBLINGS;
-    }
-
-    if (!this->GetDurationInterface() || this->Is(MSPACE) || this->Is(SPACE) || this->HasSameasLink())
-        return FUNCTOR_CONTINUE;
-    if (this->Is(NOTE) && this->GetParent()->Is(CHORD)) return FUNCTOR_CONTINUE;
-
-    double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
-    double time = m_alignment->GetTime();
-
-    // The event is starting after the end of the element
-    if ((time + duration) <= params->m_time) {
-        return FUNCTOR_CONTINUE;
-    }
-    // The element is starting after the event end - we can stop here
-    else if (time >= (params->m_time + params->m_duration)) {
-        return FUNCTOR_STOP;
-    }
-
-    // Add the layerN to the list of layer elements occuring in this time frame
-    params->m_layers.insert(this->GetAlignmentLayerN());
-
-    // Not need to recurse for chords? Not quite sure about it.
-    return (this->Is(CHORD)) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
-}
-
 int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams) const
 {
     LayerElementsInTimeSpanParams *params = vrv_params_cast<LayerElementsInTimeSpanParams *>(functorParams);

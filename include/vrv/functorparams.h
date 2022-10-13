@@ -1900,37 +1900,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// LayerCountInTimeSpanParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the time of the event
- * member 1: the duration of the event
- * member 2: the list of layerN found
- * member 3: the current meter signature
- * member 4: the current mensur
- * member 5: the functor for redirection
- **/
-
-class LayerCountInTimeSpanParams : public FunctorParams {
-public:
-    LayerCountInTimeSpanParams(const MeterSig *meterSig, const Mensur *mensur, Functor *functor)
-    {
-        m_time = 0.0;
-        m_duration = 0.0;
-        m_meterSig = meterSig;
-        m_mensur = mensur;
-        m_functor = functor;
-    }
-    double m_time;
-    double m_duration;
-    std::set<int> m_layers;
-    const MeterSig *m_meterSig;
-    const Mensur *m_mensur;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // LayerElementsInTimeSpanParams
 //----------------------------------------------------------------------------
 
