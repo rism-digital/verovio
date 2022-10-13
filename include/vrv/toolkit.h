@@ -689,7 +689,7 @@ public:
      *
      * @ingroup nodoc
      */
-    Options *GetOptions() { return m_options; }
+    Options *GetOptionsObj() { return m_options; }
 
     /**
      * Copy the data to the cstring internal buffer

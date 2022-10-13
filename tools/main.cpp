@@ -270,7 +270,7 @@ int main(int argc, char **argv)
 
     int baseSize = sizeof(base_options) / sizeof(option);
 
-    vrv::Options *options = toolkit.GetOptions();
+    vrv::Options *options = toolkit.GetOptionsObj();
     const vrv::MapOfStrOptions *params = options->GetItems();
     int mapSize = (int)params->size();
 
