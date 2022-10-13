@@ -13312,12 +13312,10 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
     bool plain = !(italic || bold);
     bool needrend = italic || plain || bold || justification || color.size();
-    bool oldneedrend = false;
     bool onlysmufl = false;
     if (hre.search(text, "^(\\[.*?\\])+$")) {
-        oldneedrend = needrend;
-        needrend = false;
         onlysmufl = true;
+        needrend = justification || color.size();
     }
 
     if (needrend) {
@@ -13359,7 +13357,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
         if (tempoQ && tempo) {
             addTextElement(tempo, text);
-            if (onlysmufl && oldneedrend) {
+            if (onlysmufl && needrend) {
                 int count = tempo->GetChildCount();
                 for (int j = 0; j < count; j++) {
                     Object *obj = tempo->GetChild(j);
@@ -13396,41 +13394,38 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             }
         }
         else if (dir) {
-            addTextElement(dir, text);
-            if (onlysmufl && oldneedrend) {
-                int count = dir->GetChildCount();
-                for (int j = 0; j < count; j++) {
-                    Object *obj = dir->GetChild(j);
-                    if (obj->GetClassName() != "Rend") {
-                        continue;
-                    }
-                    Rend *item = (Rend *)obj;
-                    if (!color.empty()) {
-                        item->SetColor(color);
-                    }
-                    else if (problemQ) {
-                        item->SetColor("red");
-                    }
-                    else if (sicQ) {
-                        item->SetColor("limegreen");
-                    }
-                    if (!italic) {
-                        item->SetFontstyle(FONTSTYLE_normal);
-                    }
-                    else {
-                        // Explicitly set italic fontstyle.
-                        item->SetFontstyle(FONTSTYLE_italic);
-                    }
-                    if (bold) {
-                        item->SetFontweight(FONTWEIGHT_bold);
-                    }
-                    if (justification == 1) {
-                        item->SetHalign(HORIZONTALALIGNMENT_right);
-                    }
-                    else if (justification == 2) {
-                        item->SetHalign(HORIZONTALALIGNMENT_center);
-                    }
+            if (onlysmufl && needrend) {
+                Rend *rend = new Rend();
+                dir->AddChild(rend);
+                addTextElement(rend, text);
+                if (!color.empty()) {
+                    rend->SetColor(color);
                 }
+                else if (problemQ) {
+                    rend->SetColor("red");
+                }
+                else if (sicQ) {
+                    rend->SetColor("limegreen");
+                }
+                if (!italic) {
+                    rend->SetFontstyle(FONTSTYLE_normal);
+                }
+                else {
+                    // Explicitly set italic fontstyle.
+                    rend->SetFontstyle(FONTSTYLE_italic);
+                }
+                if (bold) {
+                    rend->SetFontweight(FONTWEIGHT_bold);
+                }
+                if (justification == 1) {
+                    rend->SetHalign(HORIZONTALALIGNMENT_right);
+                }
+                else if (justification == 2) {
+                    rend->SetHalign(HORIZONTALALIGNMENT_center);
+                }
+            }
+            else {
+                addTextElement(dir, text);
             }
         }
     }
