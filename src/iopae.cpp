@@ -538,7 +538,7 @@ void PAEOutput::WriteTupletEnd(Tuplet *tuplet)
 void PAEOutput::WriteDur(DurationInterface *interface)
 {
     assert(interface);
- 
+
     const int ndots = (interface->HasDots()) ? interface->GetDots() : 0;
     if ((interface->GetDur() != m_currentDur) || (ndots != m_currentDots)) {
         m_currentDur = interface->GetDur();
