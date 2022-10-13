@@ -1278,6 +1278,12 @@
 		BDEF9ECA26725234008A3A47 /* caesura.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEF9EC626725234008A3A47 /* caesura.cpp */; };
 		BDEF9ECC26725248008A3A47 /* caesura.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEF9ECB26725248008A3A47 /* caesura.h */; };
 		BDEF9ECD26725248008A3A47 /* caesura.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEF9ECB26725248008A3A47 /* caesura.h */; };
+		E722106328F8569F002CD6E9 /* findlayerelementsfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E722106228F8569F002CD6E9 /* findlayerelementsfunctor.h */; };
+		E722106428F8569F002CD6E9 /* findlayerelementsfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E722106228F8569F002CD6E9 /* findlayerelementsfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E722106628F856C4002CD6E9 /* findlayerelementsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */; };
+		E722106728F856C4002CD6E9 /* findlayerelementsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */; };
+		E722106828F85981002CD6E9 /* findlayerelementsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */; };
+		E722106928F85982002CD6E9 /* findlayerelementsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */; };
 		E74A806128BC9111005274E7 /* findfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* findfunctor.cpp */; };
 		E74A806228BC9111005274E7 /* findfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* findfunctor.cpp */; };
 		E74A806328BC911D005274E7 /* findfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* findfunctor.cpp */; };
@@ -1793,6 +1799,8 @@
 		BDC366C62576AF9300E4D826 /* grpsym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grpsym.h; path = include/vrv/grpsym.h; sourceTree = "<group>"; };
 		BDEF9EC626725234008A3A47 /* caesura.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = caesura.cpp; path = src/caesura.cpp; sourceTree = "<group>"; };
 		BDEF9ECB26725248008A3A47 /* caesura.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = caesura.h; path = include/vrv/caesura.h; sourceTree = "<group>"; };
+		E722106228F8569F002CD6E9 /* findlayerelementsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = findlayerelementsfunctor.h; path = include/vrv/findlayerelementsfunctor.h; sourceTree = "<group>"; };
+		E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = findlayerelementsfunctor.cpp; path = src/findlayerelementsfunctor.cpp; sourceTree = "<group>"; };
 		E74A806028BC9111005274E7 /* findfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = findfunctor.cpp; path = src/findfunctor.cpp; sourceTree = "<group>"; };
 		E74A806528BC97D5005274E7 /* findfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = findfunctor.h; path = include/vrv/findfunctor.h; sourceTree = "<group>"; };
 		E74A806828BC9842005274E7 /* functorinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = functorinterface.cpp; path = src/functorinterface.cpp; sourceTree = "<group>"; };
@@ -2512,6 +2520,8 @@
 				E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */,
 				E74A806028BC9111005274E7 /* findfunctor.cpp */,
 				E74A806528BC97D5005274E7 /* findfunctor.h */,
+				E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */,
+				E722106228F8569F002CD6E9 /* findlayerelementsfunctor.h */,
 				E765675B28BC019F00BC6490 /* functor.h */,
 				E74A806828BC9842005274E7 /* functorinterface.cpp */,
 				E765675828BBFBA400BC6490 /* functorinterface.h */,
@@ -2658,6 +2668,7 @@
 				36E0442E2347A9290054F141 /* expansionmap.h in Headers */,
 				8F59294D18854BF800FE51AD /* pitchinterface.h in Headers */,
 				4DF9D2851C18DC490069E8C8 /* atts_mei.h in Headers */,
+				E722106328F8569F002CD6E9 /* findlayerelementsfunctor.h in Headers */,
 				4DA0EAD722BB77AF00A7EBEB /* editortoolkit_cmn.h in Headers */,
 				4D1BE7781C6942930086DC0E /* pugiconfig.hpp in Headers */,
 				4DC12A891F74111E000440E9 /* pgfoot.h in Headers */,
@@ -2797,6 +2808,7 @@
 				BB4C4B6022A932D7001F6AF0 /* mrest.h in Headers */,
 				4D723AF525E8DB0B0062E0A2 /* zip_file.hpp in Headers */,
 				E765675A28BBFBA400BC6490 /* functorinterface.h in Headers */,
+				E722106428F8569F002CD6E9 /* findlayerelementsfunctor.h in Headers */,
 				BDC366DB2576AFA400E4D826 /* grpsym.h in Headers */,
 				BB4C4B0622A932C3001F6AF0 /* pgfoot.h in Headers */,
 				BB4C4AFA22A932BC001F6AF0 /* restore.h in Headers */,
@@ -3161,6 +3173,7 @@
 				4DB3D8BB1F83D0D100B5FC2B /* expansion.cpp in Sources */,
 				4D1694001E3A44F300569BF4 /* toolkit.cpp in Sources */,
 				4DEC4D9F21C81E9400D1D273 /* orig.cpp in Sources */,
+				E722106828F85981002CD6E9 /* findlayerelementsfunctor.cpp in Sources */,
 				4D1694011E3A44F300569BF4 /* MidiEvent.cpp in Sources */,
 				4DA0EAEF22BB77C300A7EBEB /* editortoolkit_cmn.cpp in Sources */,
 				4D1694021E3A44F300569BF4 /* io.cpp in Sources */,
@@ -3473,6 +3486,7 @@
 				8F086F00188539540037FD8E /* staff.cpp in Sources */,
 				40F910081E2799740081B7BB /* trill.cpp in Sources */,
 				4DA1448A1C2AB28700CB7CEE /* textelement.cpp in Sources */,
+				E722106928F85982002CD6E9 /* findlayerelementsfunctor.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
 				4DA80D961A6ACF5D0089802D /* options.cpp in Sources */,
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
@@ -3610,6 +3624,7 @@
 				8F3DD36218854B390051330C /* view_element.cpp in Sources */,
 				4DB3D8E11F83D15900B5FC2B /* chord.cpp in Sources */,
 				40C2E4252052A6FA0003625F /* sb.cpp in Sources */,
+				E722106628F856C4002CD6E9 /* findlayerelementsfunctor.cpp in Sources */,
 				4D4FCD0E1F5455FF0009C455 /* staffgrp.cpp in Sources */,
 				4DA0EAF022BB77C300A7EBEB /* editortoolkit_cmn.cpp in Sources */,
 				8F3DD36318854B390051330C /* view_graph.cpp in Sources */,
@@ -3835,6 +3850,7 @@
 				BB4C4BBC22A932FC001F6AF0 /* MidiEventList.cpp in Sources */,
 				BB4C4B9122A932DF001F6AF0 /* textelement.cpp in Sources */,
 				BB4C4B0922A932C3001F6AF0 /* pghead.cpp in Sources */,
+				E722106728F856C4002CD6E9 /* findlayerelementsfunctor.cpp in Sources */,
 				BB4C4B7922A932D7001F6AF0 /* timestamp.cpp in Sources */,
 				BB4C4B2922A932CF001F6AF0 /* harm.cpp in Sources */,
 				4DA0EAF122BB77C300A7EBEB /* editortoolkit_cmn.cpp in Sources */,
