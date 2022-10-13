@@ -1129,6 +1129,22 @@ bool Toolkit::SetOption(const std::string &option, const std::string &value)
     return result;
 }
 
+bool Toolkit::SetOption(const std::string &option, const bool value)
+{
+    // Set option value
+    if (m_options->GetItems()->count(option) == 0) {
+        LogError("Unsupported option '%s'", option.c_str());
+        return false;
+    }
+    OptionBool *optBool = dynamic_cast<OptionBool *>(m_options->GetItems()->at(option));
+    if (!optBool) {
+        LogError("Option '%s' is non-boolean", option.c_str());
+        return false;
+    }
+
+    return optBool->SetValueBool(value);
+}
+
 void Toolkit::ResetOptions()
 {
     std::for_each(m_options->GetItems()->begin(), m_options->GetItems()->end(),
