@@ -81,4 +81,30 @@ FunctorCode LayersInTimeSpanFunctor::VisitMeterSig(const MeterSig *meterSig)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// LayerElementsInTimeSpanFunctor
+//----------------------------------------------------------------------------
+
+LayerElementsInTimeSpanFunctor::LayerElementsInTimeSpanFunctor(
+    const MeterSig *meterSig, const Mensur *mensur, const Layer *layer)
+    : ConstFunctor()
+{
+    m_time = 0.0;
+    m_duration = 0.0;
+    m_meterSig = meterSig;
+    m_mensur = mensur;
+    m_layer = layer;
+}
+
+void LayerElementsInTimeSpanFunctor::SetEvent(double time, double duration)
+{
+    m_time = time;
+    m_duration = duration;
+}
+
+FunctorCode LayerElementsInTimeSpanFunctor::VisitLayerElement(const LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

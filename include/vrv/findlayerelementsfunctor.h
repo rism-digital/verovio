@@ -72,6 +72,66 @@ private:
     const Mensur *m_mensur;
 };
 
+//----------------------------------------------------------------------------
+// LayerElementsInTimeSpanFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class collects all layer elements which appear in the given time / duration
+ */
+class LayerElementsInTimeSpanFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    LayerElementsInTimeSpanFunctor(const MeterSig *meterSig, const Mensur *mensur, const Layer *layer);
+    virtual ~LayerElementsInTimeSpanFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() override { return false; }
+
+    /*
+     * Set the time and duration of the event
+     */
+    void SetEvent(double time, double duration);
+
+    /*
+     * Retrieve the search result
+     */
+    ListOfConstObjects GetElements() const { return m_elements; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayerElement(const LayerElement *layerElement) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The time of the event
+    double m_time;
+    // The duration of the event
+    double m_duration;
+    // The list of layer elements found
+    ListOfConstObjects m_elements;
+    // The current meter signature
+    const MeterSig *m_meterSig;
+    // The current mensur
+    const Mensur *m_mensur;
+    // The layer to consider
+    const Layer *m_layer;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FINDLAYERELEMENTSFUNCTOR_H__
