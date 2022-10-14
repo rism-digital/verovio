@@ -100,6 +100,11 @@ public:
     void SetEvent(double time, double duration);
 
     /*
+     * Consider all layers except the current one
+     */
+    void ConsiderAllLayersButCurrent() { m_allLayersButCurrent = true; }
+
+    /*
      * Retrieve the search result
      */
     ListOfConstObjects GetElements() const { return m_elements; }
@@ -130,6 +135,8 @@ private:
     const Mensur *m_mensur;
     // The layer to consider
     const Layer *m_layer;
+    // ... or to ignore
+    bool m_allLayersButCurrent;
 };
 
 } // namespace vrv

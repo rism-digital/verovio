@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "layer.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -94,6 +95,7 @@ LayerElementsInTimeSpanFunctor::LayerElementsInTimeSpanFunctor(
     m_meterSig = meterSig;
     m_mensur = mensur;
     m_layer = layer;
+    m_allLayersButCurrent = false;
 }
 
 void LayerElementsInTimeSpanFunctor::SetEvent(double time, double duration)
@@ -104,7 +106,30 @@ void LayerElementsInTimeSpanFunctor::SetEvent(double time, double duration)
 
 FunctorCode LayerElementsInTimeSpanFunctor::VisitLayerElement(const LayerElement *layerElement)
 {
-    return FUNCTOR_CONTINUE;
+    const Layer *currentLayer = vrv_cast<const Layer *>(layerElement->GetFirstAncestor(LAYER));
+    // Either get layer refernced by @m_layer or all layers but it, depending on the @m_allLayersButCurrent flag
+    if ((!m_allLayersButCurrent && (currentLayer != m_layer)) || (m_allLayersButCurrent && (currentLayer == m_layer))) {
+        return FUNCTOR_SIBLINGS;
+    }
+    if (!currentLayer || layerElement->IsScoreDefElement() || layerElement->Is(MREST)) return FUNCTOR_SIBLINGS;
+    if (!layerElement->GetDurationInterface() || layerElement->Is({ MSPACE, SPACE }) || layerElement->HasSameasLink())
+        return FUNCTOR_CONTINUE;
+
+    const double duration = !layerElement->GetFirstAncestor(CHORD)
+        ? layerElement->GetAlignmentDuration(m_mensur, m_meterSig)
+        : vrv_cast<const Chord *>(layerElement->GetFirstAncestor(CHORD))->GetAlignmentDuration(m_mensur, m_meterSig);
+
+    const double time = layerElement->GetAlignment()->GetTime();
+
+    // The event is starting after the end of the element
+    if ((time + duration) <= m_time) return FUNCTOR_CONTINUE;
+    // The element is starting after the event end - we can stop here
+    if (time >= (m_time + m_duration)) return FUNCTOR_STOP;
+
+    m_elements.push_back(layerElement);
+
+    // Not need to recurse for chords
+    return layerElement->Is(CHORD) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv
