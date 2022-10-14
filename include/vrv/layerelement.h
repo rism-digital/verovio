@@ -422,11 +422,6 @@ public:
     int FindSpannedLayerElements(FunctorParams *functorParams) const override;
 
     /**
-     * See Object::LayerElementsInTimeSpan
-     */
-    int LayerElementsInTimeSpan(FunctorParams *functorParams) const override;
-
-    /**
      * See Object::InitOnsetOffset
      */
     ///@{

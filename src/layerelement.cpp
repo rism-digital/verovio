@@ -2466,38 +2466,6 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams) const
-{
-    LayerElementsInTimeSpanParams *params = vrv_params_cast<LayerElementsInTimeSpanParams *>(functorParams);
-    assert(params);
-
-    const Layer *currentLayer = vrv_cast<const Layer *>(this->GetFirstAncestor(LAYER));
-    // Either get layer refernced by @m_layer or all layers but it, depending on the @m_allLayersButCurrent flag
-    if ((!params->m_allLayersButCurrent && (currentLayer != params->m_layer))
-        || (params->m_allLayersButCurrent && (currentLayer == params->m_layer))) {
-        return FUNCTOR_SIBLINGS;
-    }
-    if (!currentLayer || this->IsScoreDefElement() || this->Is(MREST)) return FUNCTOR_SIBLINGS;
-    if (!this->GetDurationInterface() || this->Is({ MSPACE, SPACE }) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
-
-    const double duration = !this->GetFirstAncestor(CHORD)
-        ? this->GetAlignmentDuration(params->m_mensur, params->m_meterSig)
-        : vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD))
-              ->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
-
-    const double time = m_alignment->GetTime();
-
-    // The event is starting after the end of the element
-    if ((time + duration) <= params->m_time) return FUNCTOR_CONTINUE;
-    // The element is starting after the event end - we can stop here
-    if (time >= (params->m_time + params->m_duration)) return FUNCTOR_STOP;
-
-    params->m_elements.push_back(this);
-
-    // Not need to recurse for chords
-    return this->Is(CHORD) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
-}
-
 int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams) const
 {
     FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);

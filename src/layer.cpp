@@ -448,20 +448,18 @@ ListOfConstObjects Layer::GetLayerElementsInTimeSpan(
 {
     assert(measure);
 
-    Functor layerElementsInTimeSpan(&Object::LayerElementsInTimeSpan);
-    LayerElementsInTimeSpanParams layerElementsInTimeSpanParams(
-        this->GetCurrentMeterSig(), this->GetCurrentMensur(), this);
-    layerElementsInTimeSpanParams.m_time = time;
-    layerElementsInTimeSpanParams.m_duration = duration;
-    layerElementsInTimeSpanParams.m_allLayersButCurrent = excludeCurrent;
+    LayerElementsInTimeSpanFunctor layerElementsInTimeSpan(this->GetCurrentMeterSig(), this->GetCurrentMensur(), this);
+    layerElementsInTimeSpan.SetEvent(time, duration);
+    if (excludeCurrent) layerElementsInTimeSpan.ConsiderAllLayersButCurrent();
 
     Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
     filters.Add(&matchStaff);
+    layerElementsInTimeSpan.SetFilters(&filters);
 
-    measure->m_measureAligner.Process(&layerElementsInTimeSpan, &layerElementsInTimeSpanParams, NULL, &filters);
+    measure->m_measureAligner.Process(layerElementsInTimeSpan);
 
-    return layerElementsInTimeSpanParams.m_elements;
+    return layerElementsInTimeSpan.GetElements();
 }
 
 Clef *Layer::GetCurrentClef()

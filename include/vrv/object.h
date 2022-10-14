@@ -708,11 +708,6 @@ public:
     virtual int FindAllReferencedObjects(FunctorParams *functorParams);
 
     /**
-     * Look for all the layer elements that overlap with the time / duration within certain layer passed as parameter.
-     */
-    virtual int LayerElementsInTimeSpan(FunctorParams *functorParams) const { return FUNCTOR_CONTINUE; }
-
-    /**
      * Retrieve the layer elements spanned by two points
      */
     virtual int FindSpannedLayerElements(FunctorParams *) const { return FUNCTOR_CONTINUE; }

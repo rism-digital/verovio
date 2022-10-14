@@ -1900,39 +1900,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// LayerElementsInTimeSpanParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the time of the event
- * member 1: the duration of the event
- * member 2: the list of layer elements found
- * member 3: the current meter signature
- * member 4: the current mensur
- * member 5: layer to process elements on
- **/
-
-class LayerElementsInTimeSpanParams : public FunctorParams {
-public:
-    LayerElementsInTimeSpanParams(const MeterSig *meterSig, const Mensur *mensur, const Layer *layer)
-    {
-        m_time = 0.0;
-        m_duration = 0.0;
-        m_allLayersButCurrent = false;
-        m_meterSig = meterSig;
-        m_mensur = mensur;
-        m_layer = layer;
-    }
-    double m_time;
-    double m_duration;
-    bool m_allLayersButCurrent;
-    ListOfConstObjects m_elements;
-    const MeterSig *m_meterSig;
-    const Mensur *m_mensur;
-    const Layer *m_layer;
-};
-
-//----------------------------------------------------------------------------
 // PrepareCrossStaffParams
 //----------------------------------------------------------------------------
 
