@@ -98,15 +98,15 @@ jobs:
             compiler: clang
             version: "12"
 
-          - os: macos-10.15
+          - os: macos-latest
             compiler: xcode
             version: "11.7"
 
-          - os: macos-10.15
+          - os: macos-latest
             compiler: xcode
-            version: "12.1"
+            version: "12.5.1"
 
-          - os: macos-10.15
+          - os: macos-latest
             compiler: g++
             version: "9"
 
