@@ -35,7 +35,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() override { return false; }
+    bool ImplementsEndInterface() const override { return false; }
 
     /*
      * Configure depth search
@@ -84,7 +84,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() override { return false; }
+    bool ImplementsEndInterface() const override { return false; }
 
     /*
      * Configure depth search
@@ -133,7 +133,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() override { return false; }
+    bool ImplementsEndInterface() const override { return false; }
 
     /*
      * Functor interface
@@ -177,7 +177,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() override { return false; }
+    bool ImplementsEndInterface() const override { return false; }
 
     /*
      * Retrieve the search result
@@ -224,7 +224,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() override { return false; }
+    bool ImplementsEndInterface() const override { return false; }
 
     /*
      * Retrieve the search result

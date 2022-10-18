@@ -32,7 +32,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() override { return false; }
+    bool ImplementsEndInterface() const override { return false; }
 
     /*
      * Set the time and duration of the event
@@ -92,7 +92,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() override { return false; }
+    bool ImplementsEndInterface() const override { return false; }
 
     /*
      * Set the time and duration of the event
@@ -159,7 +159,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() override { return false; }
+    bool ImplementsEndInterface() const override { return false; }
 
     /*
      * Set the horizontal boundary to search for

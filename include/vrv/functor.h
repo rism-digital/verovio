@@ -56,7 +56,7 @@ public:
     /**
      * Return true if the functor implements the end interface
      */
-    virtual bool ImplementsEndInterface() = 0;
+    virtual bool ImplementsEndInterface() const = 0;
 
 private:
     //
