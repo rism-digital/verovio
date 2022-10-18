@@ -132,4 +132,40 @@ FunctorCode LayerElementsInTimeSpanFunctor::VisitLayerElement(const LayerElement
     return layerElement->Is(CHORD) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// FindSpannedLayerElementsFunctor
+//----------------------------------------------------------------------------
+
+FindSpannedLayerElementsFunctor::FindSpannedLayerElementsFunctor(const TimeSpanningInterface *interface)
+    : ConstFunctor()
+{
+    m_interface = interface;
+    m_minPos = 0;
+    m_maxPos = 0;
+    m_minLayerN = 0;
+    m_maxLayerN = 0;
+}
+
+void FindSpannedLayerElementsFunctor::SetMinMaxPos(int minPos, int maxPos)
+{
+    m_minPos = minPos;
+    m_maxPos = maxPos;
+}
+
+void FindSpannedLayerElementsFunctor::SetMinMaxLayerN(int minLayerN, int maxLayerN)
+{
+    m_minLayerN = minLayerN;
+    m_maxLayerN = maxLayerN;
+}
+
+FunctorCode FindSpannedLayerElementsFunctor::VisitLayerElement(const LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode FindSpannedLayerElementsFunctor::VisitMeasure(const Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

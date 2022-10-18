@@ -139,6 +139,86 @@ private:
     bool m_allLayersButCurrent;
 };
 
+//----------------------------------------------------------------------------
+// FindSpannedLayerElementsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class retrieves all layer elements between two horizontal positions
+ */
+class FindSpannedLayerElementsFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindSpannedLayerElementsFunctor(const TimeSpanningInterface *interface);
+    virtual ~FindSpannedLayerElementsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() override { return false; }
+
+    /*
+     * Set the horizontal boundary to search for
+     */
+    void SetMinMaxPos(int minPos, int maxPos);
+
+    /*
+     * Set the minimal and maximal layerN to consider
+     */
+    void SetMinMaxLayerN(int minLayerN, int maxLayerN);
+
+    /*
+     * Set the staff numbers to consider
+     */
+    void SetStaffNs(const std::set<int> &staffNs) { m_staffNs = staffNs; }
+
+    /*
+     * Set the classes to search for
+     */
+    void SetClassIds(const std::vector<ClassId> &classIds) { m_classIds = classIds; }
+
+    /*
+     * Retrieve the search result
+     */
+    std::vector<const LayerElement *> GetElements() const { return m_elements; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayerElement(const LayerElement *layerElement) override;
+    FunctorCode VisitMeasure(const Measure *measure) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The minimal horizontal position
+    int m_minPos;
+    // The maximal horizontal position
+    int m_maxPos;
+    // The staff numbers to consider, any staff if empty
+    std::set<int> m_staffNs;
+    // The minimal layerN to consider, unbounded below if zero
+    int m_minLayerN;
+    // The maximal layerN to consider, unbounded above if zero
+    int m_maxLayerN;
+    // The time spanning interface
+    const TimeSpanningInterface *m_interface;
+    // The classes to keep
+    std::vector<ClassId> m_classIds;
+    // The list of layer elements found
+    std::vector<const LayerElement *> m_elements;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FINDLAYERELEMENTSFUNCTOR_H__
