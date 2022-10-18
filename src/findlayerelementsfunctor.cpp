@@ -11,6 +11,7 @@
 
 #include "layer.h"
 #include "layerelement.h"
+#include "staff.h"
 
 namespace vrv {
 
@@ -160,11 +161,71 @@ void FindSpannedLayerElementsFunctor::SetMinMaxLayerN(int minLayerN, int maxLaye
 
 FunctorCode FindSpannedLayerElementsFunctor::VisitLayerElement(const LayerElement *layerElement)
 {
+    if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    if (!layerElement->Is(m_classIds)) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (layerElement->HasContentBB() && !layerElement->HasEmptyBB() && (layerElement->GetContentRight() > m_minPos)
+        && (layerElement->GetContentLeft() < m_maxPos)) {
+
+        // We skip the start or end of the slur
+        const LayerElement *start = m_interface->GetStart();
+        const LayerElement *end = m_interface->GetEnd();
+        if ((layerElement == start) || (layerElement == end)) {
+            return FUNCTOR_CONTINUE;
+        }
+
+        // Skip if neither parent staff nor cross staff matches the given staff number
+        if (!m_staffNs.empty()) {
+            const Staff *staff = layerElement->GetAncestorStaff();
+            if (m_staffNs.find(staff->GetN()) == m_staffNs.end()) {
+                const Layer *layer = NULL;
+                staff = layerElement->GetCrossStaff(layer);
+                if (!staff || (m_staffNs.find(staff->GetN()) == m_staffNs.end())) {
+                    return FUNCTOR_CONTINUE;
+                }
+            }
+        }
+
+        // Skip if layer number is outside given bounds
+        const int layerN = layerElement->GetOriginalLayerN();
+        if (m_minLayerN && (m_minLayerN > layerN)) {
+            return FUNCTOR_CONTINUE;
+        }
+        if (m_maxLayerN && (m_maxLayerN < layerN)) {
+            return FUNCTOR_CONTINUE;
+        }
+
+        // Skip elements aligned at start/end, but on a different staff
+        if ((layerElement->GetAlignment() == start->GetAlignment()) && !start->Is(TIMESTAMP_ATTR)) {
+            const Staff *staff = layerElement->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const Staff *startStaff = start->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            if (staff->GetN() != startStaff->GetN()) {
+                return FUNCTOR_CONTINUE;
+            }
+        }
+        if ((layerElement->GetAlignment() == end->GetAlignment()) && !end->Is(TIMESTAMP_ATTR)) {
+            const Staff *staff = layerElement->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const Staff *endStaff = end->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            if (staff->GetN() != endStaff->GetN()) {
+                return FUNCTOR_CONTINUE;
+            }
+        }
+
+        m_elements.push_back(layerElement);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode FindSpannedLayerElementsFunctor::VisitMeasure(const Measure *measure)
 {
+    if (Object::IsPreOrdered(measure, m_interface->GetStartMeasure())) return FUNCTOR_SIBLINGS;
+
+    if (Object::IsPreOrdered(m_interface->GetEndMeasure(), measure)) return FUNCTOR_SIBLINGS;
+
     return FUNCTOR_CONTINUE;
 }
 

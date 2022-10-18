@@ -144,7 +144,8 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class retrieves all layer elements between two horizontal positions
+ * This class retrieves all layer elements between two horizontal positions.
+ * It is designed to find spanned elements, i.e. for ties and slurs.
  */
 class FindSpannedLayerElementsFunctor : public ConstFunctor {
 public:
