@@ -183,6 +183,11 @@ public:
     void SetClassIds(const std::vector<ClassId> &classIds) { m_classIds = classIds; }
 
     /*
+     * Clear the search result
+     */
+    void ClearElements() { m_elements.clear(); }
+
+    /*
      * Retrieve the search result
      */
     std::vector<const LayerElement *> GetElements() const { return m_elements; }

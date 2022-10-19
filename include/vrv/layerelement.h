@@ -417,11 +417,6 @@ public:
     int CalcAlignmentPitchPos(FunctorParams *functorParams) override;
 
     /**
-     * See Object::FindSpannedLayerElements
-     */
-    int FindSpannedLayerElements(FunctorParams *functorParams) const override;
-
-    /**
      * See Object::InitOnsetOffset
      */
     ///@{

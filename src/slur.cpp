@@ -19,6 +19,7 @@
 #include "chord.h"
 #include "comparison.h"
 #include "doc.h"
+#include "findlayerelementsfunctor.h"
 #include "ftrem.h"
 #include "functorparams.h"
 #include "layer.h"
@@ -216,11 +217,10 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
     // Decide whether we search the whole parent system or just one measure which is much faster
     const Object *container = this->IsSpanningMeasures() ? staff->GetFirstAncestor(SYSTEM) : this->GetStartMeasure();
 
-    FindSpannedLayerElementsParams findSpannedLayerElementsParams(this);
-    findSpannedLayerElementsParams.m_minPos = xMin;
-    findSpannedLayerElementsParams.m_maxPos = xMax;
-    findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC, CHORD, CLEF, FLAG, GLISS, NOTE, STEM, TUPLET_BRACKET,
-        TUPLET_NUM }; // Ties should be handled separately
+    FindSpannedLayerElementsFunctor findSpannedLayerElements(this);
+    findSpannedLayerElements.SetMinMaxPos(xMin, xMax);
+    findSpannedLayerElements.SetClassIds({ ACCID, ARTIC, CHORD, CLEF, FLAG, GLISS, NOTE, STEM, TUPLET_BRACKET,
+        TUPLET_NUM }); // Ties should be handled separately
 
     std::set<int> staffNumbers;
     staffNumbers.emplace(staff->GetN());
@@ -232,11 +232,10 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
     else if (endStaff && (endStaff != staff)) {
         staffNumbers.emplace(endStaff->GetN());
     }
-    findSpannedLayerElementsParams.m_staffNs = staffNumbers;
+    findSpannedLayerElements.SetStaffNs(staffNumbers);
 
     // Run the search without layer bounds
-    Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-    container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams);
+    container->Process(findSpannedLayerElements);
 
     // Now determine the minimal and maximal layer
     std::set<int> layersN;
@@ -253,8 +252,9 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
     const int maxLayerN = *layersN.rbegin();
 
     // Check whether outside layers exist
-    const bool hasOutsideLayers = std::any_of(findSpannedLayerElementsParams.m_elements.cbegin(),
-        findSpannedLayerElementsParams.m_elements.cend(), [minLayerN, maxLayerN](const LayerElement *element) {
+    std::vector<const LayerElement *> spannedElements = findSpannedLayerElements.GetElements();
+    const bool hasOutsideLayers = std::any_of(
+        spannedElements.cbegin(), spannedElements.cend(), [minLayerN, maxLayerN](const LayerElement *element) {
             const int layerN = element->GetOriginalLayerN();
             return ((layerN < minLayerN) || (layerN > maxLayerN));
         });
@@ -262,8 +262,7 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
     if (hasOutsideLayers) {
         // Filter all notes, also include the notes of the start and end of the slur
         ListOfConstObjects notes;
-        std::copy_if(findSpannedLayerElementsParams.m_elements.cbegin(),
-            findSpannedLayerElementsParams.m_elements.cend(), std::back_inserter(notes),
+        std::copy_if(spannedElements.cbegin(), spannedElements.cend(), std::back_inserter(notes),
             [](const LayerElement *element) { return element->Is(NOTE); });
         ClassIdComparison cmp(NOTE);
         if (this->GetStart()->Is(NOTE)) {
@@ -310,18 +309,18 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
 
         // For separated voices or prescribed layers rerun the search with layer bounds
         if (layersAreSeparated || this->HasLayer()) {
-            findSpannedLayerElementsParams.m_elements.clear();
-            findSpannedLayerElementsParams.m_minLayerN = minLayerN;
-            findSpannedLayerElementsParams.m_maxLayerN = maxLayerN;
-            container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams);
+            findSpannedLayerElements.ClearElements();
+            findSpannedLayerElements.SetMinMaxLayerN(minLayerN, maxLayerN);
+            container->Process(findSpannedLayerElements);
+            spannedElements = findSpannedLayerElements.GetElements();
         }
     }
 
     // Collect the layers used for collision avoidance
-    std::for_each(findSpannedLayerElementsParams.m_elements.cbegin(), findSpannedLayerElementsParams.m_elements.cend(),
+    std::for_each(spannedElements.cbegin(), spannedElements.cend(),
         [&layersN](const LayerElement *element) { layersN.insert(element->GetOriginalLayerN()); });
 
-    return { findSpannedLayerElementsParams.m_elements, layersN };
+    return { spannedElements, layersN };
 }
 
 void Slur::AddSpannedElements(

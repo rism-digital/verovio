@@ -294,11 +294,6 @@ public:
     ///@}
 
     /**
-     * See Object::FindSpannedLayerElements
-     */
-    int FindSpannedLayerElements(FunctorParams *functorParams) const override;
-
-    /**
      * See Object::ConvertMarkupAnalytical
      */
     int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams) override;
