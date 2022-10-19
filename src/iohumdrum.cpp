@@ -24813,13 +24813,13 @@ void HumdrumInput::storeOriginalClefMensurationKeyApp()
     }
 
     int kerncount = 0;
-    int menscount = 0;
+    // int menscount = 0;
     for (int i = 0; i < (int)m_oclef.size(); ++i) {
         if (m_oclef[i].second->isKernLike()) {
             kerncount++;
         }
         else if (m_oclef[i].second->isMensLike()) {
-            menscount++;
+            // menscount++;
         }
     }
 
