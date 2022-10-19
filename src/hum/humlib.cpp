@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 10 00:24:12 PDT 2022
+// Last Modified: Thu Oct 13 21:38:18 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -16359,6 +16359,32 @@ string& HumRegex::tr(string& input, const string& from, const string& to) {
 
 //////////////////////////////
 //
+// HumRegex::makeSafeCopy -- Escape all special characters in string to make them regular.
+//
+
+string HumRegex::makeSafeCopy(const std::string& input) {
+	string specialChars = R"([-[\]{}()*+?.,\^$|#\s])";
+	string output = replaceCopy(input, R"(\$&)", specialChars, "g");
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumRegex::makeSafeDestructive -- Escape all special characters in string to make them regular.
+//
+
+string& HumRegex::makeSafeDestructive(std::string& inout) {
+	string specialChars = R"([-[\]{}()*+?.,\^$|#\s])";
+	replaceDestructive(inout, R"(\$&)", specialChars, "g");
+	return inout;
+}
+
+
+
+//////////////////////////////
+//
 // HumRegex::split --
 //
 
@@ -21353,6 +21379,7 @@ bool HumdrumFileBase::adjustSpines(HumdrumLine& line, vector<string>& datatype,
 
 string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 		int extra) {
+
 	string output;
 	int len1;
 	int len2;
@@ -21380,6 +21407,7 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 	for (i=0; i<=extra; i++) {
 		newinfo.push_back(info.at(starti+i));
 	}
+
 	for (i=1; i<(int)newinfo.size(); i++) {
 		int len1 = (int)newinfo[i-1].size();
 		int len2 = (int)newinfo[i].size();
@@ -21391,6 +21419,7 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 			newinfo[i] = newinfo[i].substr(1, len2-3);
 		}
 	}
+
 	vector<string> newinfo2;
 	for (i=0; i<(int)newinfo.size(); i++) {
 		if (newinfo[i].empty()) {
@@ -21398,6 +21427,7 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 		}
 		newinfo2.push_back(newinfo[i]);
 	}
+
 	for (i=1; i<(int)newinfo2.size(); i++) {
 		int len1 = (int)newinfo2[i-1].size();
 		int len2 = (int)newinfo2[i].size();
@@ -21409,6 +21439,7 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 			newinfo2[i] = newinfo2[i].substr(1, len2-3);
 		}
 	}
+
 	newinfo.resize(0);
 	for (i=0; i<(int)newinfo2.size(); i++) {
 		if (newinfo2[i].empty()) {
@@ -21416,9 +21447,30 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 		}
 		newinfo.push_back(newinfo2[i]);
 	}
-	output = newinfo[0];
-	for (int i=1; i<(int)newinfo.size(); i++) {
-		output += " " + info.at(i);
+
+	for (i=1; i<(int)newinfo.size(); i++) {
+		int len1 = (int)newinfo[i-1].size();
+		int len2 = (int)newinfo[i].size();
+		if (len1 != len2) {
+			continue;
+		}
+		if (newinfo[i-1].compare(0, len1-1, newinfo[i], 0, len2-1) == 0) {
+			newinfo[i-1] = "";
+			newinfo[i] = newinfo[i].substr(1, len2-3);
+		}
+	}
+
+	newinfo2.resize(0);
+	for (i=0; i<(int)newinfo.size(); i++) {
+		if (newinfo[i].empty()) {
+			continue;
+		}
+		newinfo2.push_back(newinfo[i]);
+	}
+
+	output = newinfo2[0];
+	for (int i=1; i<(int)newinfo2.size(); i++) {
+		output += " " + newinfo2.at(i);
 	}
 	return output;
 }
@@ -42151,7 +42203,7 @@ int MuseRecord::getAttributeInt(char attribute) {
 
 	int output = E_unknown;
 	int ending = 0;
-	int index = 0;
+	// int index = 0;
 	int tempcol;
 	int column;
 	for (column=4; column <= getLength(); column++) {
@@ -42168,7 +42220,7 @@ int MuseRecord::getAttributeInt(char attribute) {
 					ending = 1;
 				}
 				tempcol++;
-				index++;
+				// index++;
 			}
 		}
 		if (ending) {
@@ -42208,7 +42260,7 @@ int MuseRecord::getAttributeField(string& value, const string& key) {
 
 	int returnValue = 0;
 	int ending = 0;
-	int index = 0;
+	// int index = 0;
 	int tempcol;
 	int column;
 	for (column=4; column <= getLength(); column++) {
@@ -42225,7 +42277,7 @@ int MuseRecord::getAttributeField(string& value, const string& key) {
 					ending = 1;
 				}
 				tempcol++;
-				index++;
+				// index++;
 			}
 		}
 		if (ending) {
@@ -46076,7 +46128,7 @@ string MxmlEvent::getPrefixNoteInfo(void) const {
 string MxmlEvent::getPostfixNoteInfo(bool primarynote, const string& recip) const {
 	int beamstarts   = 0;
 	int beamends     = 0;
-	int beamconts    = 0;
+	//int beamconts    = 0;
 	int hookbacks    = 0;
 	int hookforwards = 0;
 	int stem         = 0;
@@ -46100,7 +46152,7 @@ string MxmlEvent::getPostfixNoteInfo(bool primarynote, const string& recip) cons
 			} else if (strcmp(beaminfo, "end") == 0) {
 				beamends++;
 			} else if (strcmp(beaminfo, "continue") == 0) {
-				beamconts++;
+				// beamconts++;
 			} else if (strcmp(beaminfo, "forward hook") == 0) {
 				hookforwards++;
 			} else if (strcmp(beaminfo, "backward hook") == 0) {
@@ -48907,7 +48959,7 @@ bool NoteGrid::load(HumdrumFile& infile) {
 		grid[i].reserve(infile.getLineCount());
 	}
 
-	int attack = 0;
+	//int attack = 0;
 	int track, lasttrack;
 	vector<HTp> current;
 	HumRegex hre;
@@ -48935,7 +48987,7 @@ bool NoteGrid::load(HumdrumFile& infile) {
 			continue;
 		}
 		track = 0;
-		attack = 0;
+		//attack = 0;
 		current.clear();
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			lasttrack = track;
@@ -48950,7 +49002,7 @@ bool NoteGrid::load(HumdrumFile& infile) {
 			current.push_back(infile.token(i, j));
 			if (!(current.back()->isRest()
 					|| current.back()->isSecondaryTiedNote())) {
-				attack++;
+				//attack++;
 			}
 		}
 		if (current.size() != kernspines.size()) {
@@ -58810,6 +58862,22 @@ HumNum cmr_note_info::getStartTime(void) {
 
 /////////////////////////////
 //
+// cmr_note_info::getLineIndex --
+//
+
+int cmr_note_info::getLineIndex(void) {
+	HTp token = getToken();
+	if (token) {
+		return token->getLineIndex();
+	} else {
+		return -1;
+	}
+}
+
+
+
+/////////////////////////////
+//
 // cmr_note_info::getEndTime -- Return the ending time of the note in
 //    units of quarter notes since the start of the score.  Note that this
 //    is the ending duration of the last note in the tied group.
@@ -58984,12 +59052,19 @@ double cmr_note_info::getNoteStrength(void) {
 
 //////////////////////////////
 //
-// cmr_note_info::markNote --
+// cmr_note_info::markNote -- Only print the first note in a series
+//     of notes with the same pitch.
 //
 
 void cmr_note_info::markNote(const string& marker) {
 	for (int i=0; i<(int)m_tokens.size(); i++) {
 		HTp token = m_tokens[i];
+		if (i > 0) {
+			// don't color repeated secondary notes.
+			if (token->isNoteAttack()) {
+				break;
+			}
+		}
 		string text = *token;
 		if (text.find(marker) != string::npos) {
 			continue;
@@ -59294,6 +59369,7 @@ int cmr_group_info::getDirection(void) {
 }
 
 
+
 //////////////////////////////
 //
 // cmr_group_info::setDirectionUp --
@@ -59312,6 +59388,40 @@ void cmr_group_info::setDirectionUp(void) {
 
 void cmr_group_info::setDirectionDown(void) {
 	m_direction = -1;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getLeapCount --
+//
+
+int cmr_group_info::getLeapCount(void) {
+	int output = 0;
+	for (int i=0; i<(int)m_notes.size(); i++) {
+		if (m_notes.at(i).hasLeapBefore()) {
+			output++;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getSyncopationCount --
+//
+
+int cmr_group_info::getSyncopationCount(void) {
+	int output = 0;
+	for (int i=0; i<(int)m_notes.size(); i++) {
+		if (m_notes.at(i).hasSyncopation()) {
+			output++;
+		}
+	}
+	return output;
 }
 
 
@@ -59474,6 +59584,16 @@ bool cmr_group_info::mergeGroup(cmr_group_info& group) {
 		return false;
 	}
 
+	int dir1 = getDirection();
+	int dir2 = group.getDirection();
+	if (dir1 != dir2) {
+		return false;
+	}
+	if (dir1 == 0) {
+		cerr << "Error: unassigned direction for groups" << endl;
+		return false;
+	}
+
 	HumNum start1 = this->getStartTime();
 	HumNum start2 = group.getStartTime();
 	HumNum end1   = this->getEndTime();
@@ -59574,7 +59694,7 @@ string cmr_group_info::getPitch(void) {
 Tool_cmr::Tool_cmr(void) {
 	define("data|raw|raw-data=b",       "print analysis data");
 	define("m|mark-up|marker-up=s:+",   "symbol to mark peak cmr notes");
-	define("M|mark-down|marker-down=s:@", "symbol to mark anti-peak cmr notes");
+	define("M|mark-down|marker-down=s:|", "symbol to mark anti-peak cmr notes");
 	define("c|color|color-up=s:red",    "color of CMR peak notes");
 	define("C|color-down=s:orange",     "color of CMR anti-peak notes");
 	define("r|ignore-rest=d:1.0",       "ignore rests smaller than given value (in whole notes)");
@@ -59591,6 +59711,10 @@ Tool_cmr::Tool_cmr(void) {
 	define("L|only-local-peaks=b",      "mark local peaks only");
 	define("merge|merged|show-merged=b","print merged groups");
 	define("S|summary=b",               "summarize CMRs for multiple inputs");
+	define("v|vega=b",                  "output default Vega-lite plot");
+	define("V|no-html=b",               "output Vega-lite plot without HTML");
+	define("countplot=b",               "output Vega-lite plot for CMR count");
+	define("strengthplot=b",            "output Vega-lite plot with strength scores");
 	define("h|half=b",                  "durations given in half notes (mimims)");
 	define("D|debug=b",                 "print debug information");
 }
@@ -59649,16 +59773,20 @@ bool Tool_cmr::run(HumdrumFile& infile) {
 //
 
 void Tool_cmr::initialize(void) {
-	m_rawQ         = getBoolean("raw-data");
-	m_peaksQ       = getBoolean("peaks");
-	m_npeaksQ      = getBoolean("troughs");
-	m_naccentedQ   = getBoolean("not-accented");
-	m_localQ       = getBoolean("local-peaks");
-	m_localOnlyQ   = getBoolean("only-local-peaks");
-	m_showMergedQ  = getBoolean("show-merged");
-	m_summaryQ     = getBoolean("summary");
-	m_numberQ      = getBoolean("cmr-number");
-	m_debugQ       = getBoolean("debug");
+	m_rawQ          = getBoolean("raw-data");
+	m_peaksQ        = getBoolean("peaks");
+	m_npeaksQ       = getBoolean("troughs");
+	m_naccentedQ    = getBoolean("not-accented");
+	m_localQ        = getBoolean("local-peaks");
+	m_localOnlyQ    = getBoolean("only-local-peaks");
+	m_showMergedQ   = getBoolean("show-merged");
+	m_summaryQ      = getBoolean("summary");
+	m_vegaQ         = getBoolean("vega");
+	m_htmlQ         = getBoolean("no-html");
+	m_vegaCountQ    = getBoolean("countplot");
+	m_vegaStrengthQ = getBoolean("strengthplot");
+	m_numberQ       = getBoolean("cmr-number");
+	m_debugQ        = getBoolean("debug");
 	if (m_localOnlyQ) {
 		m_localQ = true;
 	}
@@ -59706,22 +59834,26 @@ void Tool_cmr::processFile(HumdrumFile& infile) {
 		getNoteList(m_notelist, starts.at(i));
 		getVocalRange(m_minPitch, m_maxPitch, m_notelist);
 		if (m_peaksQ) {
-			processSpine(starts[i]);
+			processSpine(starts[i], infile);
 		} else if (m_npeaksQ) {
-			processSpineFlipped(starts[i]);
+			processSpineFlipped(starts[i], infile);
 		} else {
-			processSpine(starts[i]);
-			processSpineFlipped(starts[i]);
+			processSpine(starts[i], infile);
+			processSpineFlipped(starts[i], infile);
 		}
 	}
 
 	mergeOverlappingPeaks();
 
-	if (!(m_rawQ || m_summaryQ)) {
+	if (m_vegaQ || m_vegaStrengthQ || m_vegaCountQ) {
+		m_free_text << " " << endl;
+	}
+
+	if (!(m_rawQ || m_summaryQ || m_vegaQ || m_vegaStrengthQ || m_vegaCountQ)) {
 		markNotesInScore();
 	}
 
-	if (!(m_rawQ || m_summaryQ)) {
+	if (!(m_rawQ || m_summaryQ || m_vegaQ || m_vegaStrengthQ || m_vegaCountQ)) {
 		if (m_numberQ) {
 			addGroupNumbersToScore(infile);
 		}
@@ -59746,22 +59878,14 @@ void Tool_cmr::processFile(HumdrumFile& infile) {
 				m_humdrum_text << endl;
 			}
 
-		}
-
-		if (m_local_count > 0) {
-			m_humdrum_text << "!!!RDF**kern: ";
-			m_humdrum_text << m_local_marker;
-			m_humdrum_text << " = marked note, color=";
-			m_humdrum_text << m_local_color;
-			m_humdrum_text << endl;
-		}
-
-		if (m_local_count_n > 0) {
-			m_humdrum_text << "!!!RDF**kern: ";
-			m_humdrum_text << m_local_marker_n;
-			m_humdrum_text << " = marked note, color=";
-			m_humdrum_text << m_local_color_n;
-			m_humdrum_text << endl;
+		} else {
+			if (m_local_count_n > 0) {
+				m_humdrum_text << "!!!RDF**kern: ";
+				m_humdrum_text << m_local_marker_n;
+				m_humdrum_text << " = marked note, color=";
+				m_humdrum_text << m_local_color_n;
+				m_humdrum_text << endl;
+			}
 		}
 
 	}
@@ -59769,6 +59893,8 @@ void Tool_cmr::processFile(HumdrumFile& infile) {
 	if (!m_localOnlyQ) {
 		if (m_summaryQ) {
 			printSummaryStatistics(infile);
+		} else if (m_vegaQ || m_vegaCountQ || m_vegaStrengthQ) {
+			storeVegaData(infile);
 		} else {
 			printStatistics(infile);
 		}
@@ -59788,7 +59914,7 @@ void Tool_cmr::processFile(HumdrumFile& infile) {
 //    on the staff will be processed (so only the top part if there is a divisi).
 //
 
-void Tool_cmr::processSpine(HTp startok) {
+void Tool_cmr::processSpine(HTp startok, HumdrumFile&  infile) {
 	// notelist is a two dimensional array of notes.   The
 	// first dimension is a list of the note attacks in time
 	// (plus rests), and the second dimension is for a list of the
@@ -59818,7 +59944,7 @@ void Tool_cmr::processSpine(HTp startok) {
 	}
 
 	for (int i=0; i<(int)m_notelist.size(); i++) {
-		checkForCmr(i, 1);
+		checkForCmr(i, 1, infile);
 	}
 
 	if (m_rawQ) {
@@ -59834,7 +59960,7 @@ void Tool_cmr::processSpine(HTp startok) {
 //    searches for minima CMRs rather than maxima CMRs.
 //
 
-void Tool_cmr::processSpineFlipped(HTp startok) {
+void Tool_cmr::processSpineFlipped(HTp startok, HumdrumFile& infile) {
 	// notelist is a two dimensional array of notes.   The
 	// first dimension is a list of the note attacks in time
 	// (plus rests), and the second dimension is for a list of the
@@ -59870,7 +59996,7 @@ void Tool_cmr::processSpineFlipped(HTp startok) {
 	}
 
 	for (int i=0; i<(int)m_notelist.size(); i++) {
-		checkForCmr(i, -1);
+		checkForCmr(i, -1, infile);
 	}
 }
 
@@ -59880,12 +60006,22 @@ void Tool_cmr::processSpineFlipped(HTp startok) {
 //
 // checkForCmr -- store CMR if identified.
 //
+// * Must have at least one sycopation or three leaps.
+// * Other CMR notes are on strong beats.
+// * Need three CMRs within window (6 whole notes) to count.
+// * Cannot have a note higher than a major/minor second between CMR notes.
+// * Can have a note a major/minor second above CMR notes, but only
+//   if the higher note is not on a strong beat.
+//
 
-void Tool_cmr::checkForCmr(int index, int direction) {
+void Tool_cmr::checkForCmr(int index, int direction, HumdrumFile& infile) {
+	// Change next condition: trigger on a syncopation, or three leaps
+	// before the same pitch.  Then later there will be a check for higher
+	// notes between the candidate CMR notes:
 	// Local peak must be present to trigger CMR
-	if (!m_localpeaks.at(index)) {
-		return;
-	}
+	//if (!m_localpeaks.at(index)) {
+	//	return;
+	//}
 
 	// The local peak note must have a leap before it (or a rest)
 	// and/or a syncopation to trigger a CMR search:
@@ -59954,7 +60090,7 @@ void Tool_cmr::checkForCmr(int index, int direction) {
 	}
 
 	if ((int)candidates.size() < m_cmrNum) {
-		// Not enough note to consider a CMR.
+		// Not enough notes to consider a CMR.
 		return;
 	}
 
@@ -59967,12 +60103,11 @@ void Tool_cmr::checkForCmr(int index, int direction) {
 		if (duration > m_cmrDur) {
 			continue;
 		}
-		if (hasHigher(pitch, 2, m_midinums, index1, index2)) {
+		if (hasHigher(pitch, 2, m_midinums, m_notelist, index1, index2)) {
 			continue;
 		}
 
-
-		// found a CMR (or piece of longer one that will be merged later)
+		// Found a CMR (or piece of longer one that will be merged later)
 		// so store it at the end of m_noteGroups:
 		m_noteGroups.resize(m_noteGroups.size() + 1);
 		for (int j=0; j<m_cmrNum; j++) {
@@ -59980,10 +60115,46 @@ void Tool_cmr::checkForCmr(int index, int direction) {
 			m_noteGroups.back().addNote(m_notelist.at(tindex), m_barNum);
 		}
 		m_noteGroups.back().setSerial((int)m_noteGroups.size() + 1);
+
 		if (direction < 0) {
 			m_noteGroups.back().setDirectionDown();
 		} else {
 			m_noteGroups.back().setDirectionUp();
+		}
+	}
+
+	int leapcount = m_noteGroups.back().getLeapCount();
+	int syncocount  = m_noteGroups.back().getSyncopationCount();
+	if (syncocount == 0) {
+		if (leapcount < 3) {
+			// Delete groups since it has less than three leaps and no syncopations
+			if (m_noteGroups.size() > 0) {
+				m_noteGroups.resize(m_noteGroups.size() - 1);
+			}
+		}
+	}
+
+	// Remove negative groups if they share a note with a positive group.
+	vector<bool> positive(infile.getLineCount(), false);
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		int dir = m_noteGroups.at(i).getDirection();
+		if (dir > 0) {
+			for (int j=0; j<m_noteGroups.at(i).getNoteCount(); j++) {
+				int line = m_noteGroups.at(i).getToken(j)->getLineIndex();
+				positive.at(line) = true;
+			}
+		} else if (dir < 0) {
+			bool valid = true;
+			for (int j=0; j<m_noteGroups.at(i).getNoteCount(); j++) {
+				int line = m_noteGroups.at(i).getToken(j)->getLineIndex();
+				if (positive.at(line)) {
+					valid = false;
+					break;
+				}
+			}
+			if (!valid) {
+				m_noteGroups.at(i).makeInvalid();
+			}
 		}
 	}
 }
@@ -59992,17 +60163,33 @@ void Tool_cmr::checkForCmr(int index, int direction) {
 
 //////////////////////////////
 //
-// Tool_cmr::hasHigher --
+// Tool_cmr::hasHigher -- There may be a note a step higher
+//     (or lower) between any two notes of the CMR provided
+//     that that higher note is not on a strong beat.
+//     True = invalid CMR case.
 //
 
-bool Tool_cmr::hasHigher(int pitch, int tolerance, vector<int> midinums, int index1, int index2) {
+bool Tool_cmr::hasHigher(int pitch, int tolerance, vector<int>& midinums, vector<vector<HTp>>& notelist, int index1, int index2) {
+
 	for (int i=index1; i<=index2; i++) {
+		// Only a step above (major or minor second) is allowed.
+		// Input tolerance is 2.
 		if (midinums.at(i) > pitch + tolerance) {
 			return true;
 		}
+
+		if (midinums.at(i) > pitch) {
+			// If the higher note is accented, then invalidate the cmr.
+			if (isOnStrongBeat(notelist.at(i).at(0))) {
+				return true;
+			}
+		}
+
 	}
+
 	return false;
 }
+
 
 
 //////////////////////////////
@@ -60041,6 +60228,25 @@ bool Tool_cmr::hasGroupDown(void) {
 
 
 
+//////////////////////////////
+//
+// Tool_cmr::getComposer-- Use regex to extract composer information from score filename
+//
+
+string Tool_cmr::getComposer(HumdrumFile& infile) {
+   HumRegex hre;
+
+	 string filename = infile.getFilename();
+	 // Remove any directory prefix:
+	 string code = "unknown";
+	 // Search for a capital letter followed by two small letters followed by four digits:
+	 if (hre.search(filename, "([A-Z][a-z][a-z])")) {
+			code = hre.getMatch(1);
+	 }
+	return code;
+}
+
+
 
 //////////////////////////////
 //
@@ -60049,16 +60255,144 @@ bool Tool_cmr::hasGroupDown(void) {
 
 void Tool_cmr::printSummaryStatistics(HumdrumFile& infile) {
 
-	// print summary data here (one line of the spreadsheet:
-	m_free_text << "SUMMARY FOR " << infile.getFilename() << " GOES HERE" << endl;
+	m_free_text << getGroupCount() << "	" << ((double)getGroupNoteCount() / countNotesInScore(infile)) * 1000.0 << "	" << infile.getFilename() << endl;
 
-	// CMR count (getGroupCount()     CMR note density      Filename
+	m_cmrCount.push_back(getGroupCount());
+	m_cmrNoteCount.push_back(getGroupNoteCount());
+	m_scoreNoteCount.push_back(countNotesInScore(infile));
+}
 
-	// store the results in these two variables for later averaging and SD (defined in tool-cmr.h)
-	//	std::vector<int>      m_cmrCount;       // number of CMRs in each input file
-	//	std::vector<int>      m_cmrNoteCount;   // number of CMRs in each input file
-	//	std::vector<int>      m_scoreNoteCount;   // number of notes in each input file
 
+
+//////////////////////////////
+//
+// Tool_cmr::storeVegaData --
+//
+
+void Tool_cmr::storeVegaData(HumdrumFile& infile) {
+
+	string composer = getComposer(infile);
+	m_vegaData << "{" << endl;
+	m_vegaData << "	\"Composers\": " << '"' << composer << '"' << "," << endl;
+	m_vegaData << "	\"Score\": \"" << infile.getFilename() << "\"," << endl;
+	m_vegaData << "	\"CMR note density permil\": " << ((double)getGroupNoteCount() / countNotesInScore(infile)) * 1000 << "," << endl;
+	if (getGroupCount() == 0) {
+		m_vegaData << "	\"Average CMR strength\": " << "0" << "," << endl;
+	} else {
+		m_vegaData << "	\"Average CMR strength\": " << ((double)getStrengthScore() / getGroupCount()) << "," << endl;
+	}
+	m_vegaData << "	\"CMR count\": " << getGroupCount() << endl;
+	m_vegaData << "}," << endl;
+
+}
+
+
+
+////////////////////////////
+//
+// Tool_cmr::printVegaPlot --
+//
+
+void Tool_cmr::printVegaPlot(void) {
+	string vegaDataHeader = R"(
+		{
+		  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+		  "description": "A vertical box plot showing median, min, and max CMR count in Josquin.",
+		  "data": {
+		    "values": [)";
+		cout << vegaDataHeader << endl;
+
+		cout << m_vegaData.str() << endl;
+
+		if (m_vegaCountQ) {
+			string vegaDataFooter = R"(
+			]},
+			 "mark": {
+				 "type": "boxplot",
+				 "extent": "min-max"
+			 },
+			 "encoding": {
+				 "x": {"field": "Composers", "type": "nominal"},
+				 "color": {"field": "Composers", "type": "nominal", "legend": null},
+				 "y": {
+					 "field": "CMR count",
+					 "type": "quantitative",
+					 "scale": {"zero": false}
+				 }
+			 }
+		 })";
+
+		 cout << vegaDataFooter << endl;
+	 } else	if (m_vegaStrengthQ) {
+	 			string vegaDataFooter = R"(
+	 			]},
+	 			 "mark": {
+	 				 "type": "boxplot",
+	 				 "extent": "min-max"
+	 			 },
+	 			 "encoding": {
+	 				 "x": {"field": "Composers", "type": "nominal"},
+	 				 "color": {"field": "Composers", "type": "nominal", "legend": null},
+	 				 "y": {
+	 					 "field": "Average CMR strength",
+	 					 "type": "quantitative",
+	 					 "scale": {"zero": false}
+	 				 }
+	 			 }
+	 		 })";
+
+		cout << vegaDataFooter << endl;
+	 	} else {
+			string vegaDataFooter = R"(
+		 ]},
+			"mark": {
+				"type": "boxplot",
+				"extent": "min-max"
+			},
+			"encoding": {
+				"x": {"field": "Composers", "type": "nominal"},
+				"color": {"field": "Composers", "type": "nominal", "legend": null},
+				"y": {
+					"field": "CMR note density permil",
+					"type": "quantitative",
+					"scale": {"zero": false}
+				}
+			}
+		})";
+			cout << vegaDataFooter << endl;
+	 }
+}
+
+
+
+////////////////////////////
+//
+// Tool_cmr::printHtmlPlot --
+//
+
+void Tool_cmr::printHtmlPlot(void) {
+
+	string header = R"(<!DOCTYPE html>
+<html>
+<head>
+<title>Sortcount output</title>
+<script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc12"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@3.29.1"></script>
+</head>
+<body>
+<div id="plotarea"></div>
+<script type="text/javascript">
+var mydata =)";
+	cout << header << endl;
+
+	printVegaPlot();
+
+	string footer = R"(vegaEmbed('#plotarea', mydata);
+</script>
+</body>
+</html>)";
+	cout << footer << endl;
 }
 
 
@@ -60069,15 +60403,29 @@ void Tool_cmr::printSummaryStatistics(HumdrumFile& infile) {
 //
 
 void Tool_cmr::finally(void) {
-	if (m_summaryQ) {
-		cout << "\nFUNCTION RUN AFTER ALL INPUT FILES HAVE BEEN PROCESSED" << endl;
-		// calculate the mean and standard deviation of CMR counts and CMR note densities
-		// that were stored in the printSummaryStatistics function above.
-		// There are two helper function that can be used here:
-		// Convert::mean(vector<int>) and Convert::standardDeviation(vector<int>).
-		// Examples:
-		// double meanCmr = Convert::mean(m_cmrCount);
+	//cerr << "\nFUNCTION RUN AFTER ALL INPUT FILES HAVE BEEN PROCESSED" << endl;
+	if ((m_vegaQ || m_vegaCountQ || m_vegaStrengthQ) && (m_htmlQ)) {
+		printVegaPlot();
+	} else if ((m_vegaQ || m_vegaCountQ || m_vegaStrengthQ) && !(m_htmlQ)) {
+		printHtmlPlot();
+	} else if (m_cmrCount.size() > 1) {
+		double meanCmrCount = Convert::mean(m_cmrCount);
+		double stdDevCmrCount = Convert::standardDeviation(m_cmrCount);
+
+		vector<double> cmrNoteDensities(m_cmrNoteCount.size());
+		for (int i=0; i < (int)cmrNoteDensities.size(); i++) {
+			cmrNoteDensities[i] = (double)m_cmrNoteCount[i] / m_scoreNoteCount[i];
+		}
+
+		double meanCmrNoteDen = Convert::mean(cmrNoteDensities);
+		double stdDevCmrNoteDen = Convert::standardDeviation(cmrNoteDensities);
+
+		cout << "CMR count mean: " << meanCmrCount << endl;
+		cout << "CMR count standard deviation: " << stdDevCmrCount << endl;
+		cout << "CMR note density mean: " << meanCmrNoteDen * 1000 << " permil " << endl;
+		cout << "CMR note density standard deviation: " << stdDevCmrNoteDen * 1000 << " permil " << endl;
 	}
+
 }
 
 
@@ -60224,7 +60572,7 @@ void Tool_cmr::getPartNames(vector<string>& partNames, HumdrumFile& infile) {
 //
 
 void Tool_cmr::prepareHtmlReport(void) {
-	string multiline_str = R"(!!@@BEGIN: PREHTML
+	string htmlReport = R"(!!@@BEGIN: PREHTML
 !!@CONTENT:
 !!<h1 class='cmr'>Conspicuous Melodic Repetition</h1>
 !!<table class='gcmr'>
@@ -60294,7 +60642,7 @@ void Tool_cmr::prepareHtmlReport(void) {
 !!}
 !!@@END: PREHTML)";
 
-	m_humdrum_text << multiline_str << endl;
+	m_humdrum_text << htmlReport << endl;
 }
 
 
@@ -60383,7 +60731,7 @@ bool Tool_cmr::checkGroupPairForMerger(cmr_group_info& group1, cmr_group_info& g
 
 	// Groups must have the same MIDI pitch:
 	int midi1 = group1.getMidiPitch();
-	int midi2 = group1.getMidiPitch();
+	int midi2 = group2.getMidiPitch();
 	if (midi1 != midi2) {
 		return false;
 	}
@@ -60787,7 +61135,9 @@ void Tool_cmr::getNoteList(vector<vector<HTp>>& notelist, HTp starting) {
 	notelist.clear();
 	notelist.reserve(2000);
 
-	HTp previous = NULL;
+	int lastpitch = -1;
+
+	// HTp previous = NULL;
 	HTp current = starting;
 	while (current) {
 		if (!current->isData()) {
@@ -60802,24 +61152,35 @@ void Tool_cmr::getNoteList(vector<vector<HTp>>& notelist, HTp starting) {
 			if (notelist.size() > 0) {
 				notelist.back().push_back(current);
 			}
-			previous = current;
+			// previous = current;
 			current = current->getNextToken();
 			continue;
 		}
 		if (current->isRest()) {
 			if ((!notelist.empty()) && notelist.back().at(0)->isRest()) {
 				notelist.back().push_back(current);
-				previous = current;
+				// previous = current;
 				current = current->getNextToken();
+				lastpitch = -1;
 				continue;
 			}
 		}
+		int pitch = current->getMidiPitch();
+		if (pitch == lastpitch) {
+			if (notelist.size() > 0) {
+				notelist.back().push_back(current);
+			}
+			// previous = current;
+			current = current->getNextToken();
+			continue;
+		}
+		lastpitch = pitch;
 		notelist.resize(notelist.size() + 1);
 		notelist.back().push_back(current);
 		if (!current->isRest()) {
 			m_noteCount++;
 		}
-		previous = current;
+		// previous = current;
 		current = current->getNextToken();
 	}
 
@@ -60863,7 +61224,7 @@ void  Tool_cmr::getDurations(vector<double>& durations, vector<vector<HTp>>& not
 // Tool_cmr::getBeat --
 //
 
-void  Tool_cmr::getBeat(vector<bool>& metpos, vector<vector<HTp>>& notelist) {
+void Tool_cmr::getBeat(vector<bool>& metpos, vector<vector<HTp>>& notelist) {
 	metpos.resize(notelist.size());
 	for (int i=0; i<(int)notelist.size(); i++) {
 		HumNum position = notelist.at(i).at(0)->getDurationFromBarline();
@@ -60874,6 +61235,25 @@ void  Tool_cmr::getBeat(vector<bool>& metpos, vector<vector<HTp>>& notelist) {
 		} else {
 			metpos.at(i) = false;
 		}
+
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::isOnStrongBeat --
+//
+
+bool Tool_cmr::isOnStrongBeat(HTp token) {
+	HumNum position = token->getDurationFromBarline();
+	if (position.getDenominator() != 1) {
+		return false;
+	} if (position.getNumerator() % 4 == 0) {
+		return true;
+	} else {
+		return false;
 	}
 }
 
@@ -60967,6 +61347,24 @@ int Tool_cmr::getGroupNoteCount(void) {
 	}
 	return output;
 }
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getStrengthScore -- Return the total strength score for all CMRs.
+//
+
+int Tool_cmr::getStrengthScore(void) {
+	int output = 0;
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		if (m_noteGroups[i].isValid()) {
+			output += m_noteGroups[i].getGroupStrength();
+		}
+	}
+	return output;
+}
+
 
 
 /////////////////////////////
@@ -67503,7 +67901,7 @@ void Tool_compositeold::removeAuxTremolosFromCompositeRhythm(HumdrumFile& infile
 
 bool Tool_compositeold::onlyAuxTremoloNotes(HumdrumFile& infile, int line) {
 	int attackcount = 0;
-	int sustaincount = 0;
+	// int sustaincount = 0;
 	int auxcount = 0;
 	for (int i=0; i<infile[line].getFieldCount(); i++) {
 		HTp token = infile.token(line, i);
@@ -67518,7 +67916,7 @@ bool Tool_compositeold::onlyAuxTremoloNotes(HumdrumFile& infile, int line) {
 		}
 		bool attack = token->isNoteAttack();
 		if (!attack) {
-			sustaincount++;
+			// sustaincount++;
 			continue;
 		}
 		attackcount++;
@@ -81275,6 +81673,7 @@ void Tool_humtr::convertGlobalLayoutText(HumdrumFile& infile) {
 
 void Tool_humtr::convertLocalLayoutText(HumdrumFile& infile) {
 	HumRegex hre;
+
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].isCommentLocal()) {
 			continue;
@@ -81291,6 +81690,7 @@ void Tool_humtr::convertLocalLayoutText(HumdrumFile& infile) {
 			string newcontents = transliterateText(oldcontents);
 			if (oldcontents != newcontents) {
 				string text = *token;
+				hre.makeSafeDestructive(oldcontents);
 				hre.replaceDestructive(text, ":t=" + newcontents, ":t=" + oldcontents);
 				token->setText(text);
 			}
@@ -87253,7 +87653,7 @@ string Tool_mei2hum::cleanReferenceRecordText(const string& input) {
 //
 // Example:
 //   <tempo tstamp="1" place="above" staff="1">
-//      1 - Allegro con spirito <rend fontname="Leipzig">&#xE1D5;</rend> = 132
+//      1 - Allegro con spirito <rend fontname="VerovioText">&#xE1D5;</rend> = 132
 //   </tempo>
 //
 //
@@ -87315,7 +87715,7 @@ void Tool_mei2hum::parseTempo(xml_node tempo, HumNum starttime) {
 	if (!found) {
 		// search for free-form tempo marking.  Something like:
 		//   <tempo tstamp="1" place="above" staff="1">
-		//      1 - Allegro con spirito <rend fontname="Leipzig">&#xE1D5;</rend> = 132
+		//      1 - Allegro con spirito <rend fontname="VerovioText">&#xE1D5;</rend> = 132
 		//   </tempo>
 		//
 		// UTF-8 version in string "\ue1d5";
