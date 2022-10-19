@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 10 00:24:12 PDT 2022
+// Last Modified: Thu Oct 13 21:38:18 PDT 2022
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -633,7 +633,9 @@ class HumRegex {
 		std::string      replaceCopy        (std::string* input, const std::string& replacement,
 		                                const std::string& exp,
 		                                const std::string& options);
-		std::string&      tr                 (std::string& input, const std::string& from,
+		std::string       makeSafeCopy  (const std::string& input);
+		std::string&      makeSafeDestructive(std::string& inout);
+		std::string&      tr            (std::string& input, const std::string& from,
 		                                const std::string& to);
 
 		// matching (full-string match)
@@ -5944,6 +5946,7 @@ class cmr_note_info {
 		int      getMidiPitch     (void);
 		string   getPitch         (void);
 		HTp      getToken         (void);
+		int      getLineIndex     (void);
 		double   getNoteStrength  (void);
 		bool     hasSyncopation   (void);
 		bool     hasLeapBefore    (void);
@@ -5989,6 +5992,7 @@ class cmr_group_info {
 		int     getMeasureEnd      (void);
 		int     getMidiPitch       (void);
 		HTp     getNote            (int index);
+		HTp     getToken           (int index) { return getNote(index); }
 		HTp     getFirstToken      (void);
 		int     getNoteCount       (void);
 		int     getTrack           (void);
@@ -6001,6 +6005,8 @@ class cmr_group_info {
 		int     getDirection       (void);
 		void    setDirectionUp     (void);
 		void    setDirectionDown   (void);
+		int     getLeapCount       (void);
+		int     getSyncopationCount(void);
 		void    makeInvalid        (void);
 		bool    isValid            (void);
 		string  getPitch           (void);
@@ -6035,8 +6041,8 @@ class Tool_cmr : public HumTool {
 		void             processFile             (HumdrumFile& infile);
 		void             initialize              (void);
 		void             processFile             (HumdrumFile& infile, Options& options);
-		void             processSpine            (HTp startok);
-		void             processSpineFlipped     (HTp startok);
+		void             processSpine            (HTp startok, HumdrumFile& infile);
+		void             processSpineFlipped     (HTp startok, HumdrumFile& infile);
 		void             identifyLocalPeaks      (std::vector<bool>& cmrnotes,
 		                                          std::vector<int>& notelist);
 		void             getDurations            (std::vector<double>& durations,
@@ -6070,14 +6076,20 @@ class Tool_cmr : public HumTool {
 		void             printAnalysisData       (void);
 		int              getGroupCount           (void);
 		int              getGroupNoteCount       (void);
+		int 						 getStrengthScore        (void);
 		void             printStatistics         (HumdrumFile& infile);
+		string           getComposer             (HumdrumFile& infile);
 		void             printSummaryStatistics  (HumdrumFile& infile);
+		void             storeVegaData           (HumdrumFile& infile);
+		void             printVegaPlot           (void);
+		void             printHtmlPlot           (void);
 		void             printGroupStatistics    (HumdrumFile& infile);
 		void             getPartNames            (std::vector<std::string>& partNames, HumdrumFile& infile);
-		void             checkForCmr             (int index, int direction);
+		void             checkForCmr             (int index, int direction, HumdrumFile& infile);
 		bool             hasHigher               (int pitch, int tolerance,
-		                                          std::vector<int> midinums, int index1,
-                                                int index2);
+		                                          std::vector<int>& midinums, 
+		                                          std::vector<std::vector<HTp>>& notelist,
+		                                          int index1, int index2);
 		bool             hasGroupUp              (void);
 		bool             hasGroupDown            (void);
 		void             getVocalRange           (std::vector<std::string>& minpitch,
@@ -6088,6 +6100,7 @@ class Tool_cmr : public HumTool {
 		void             addGroupNumberToScore   (HumdrumFile& infile, HTp note, int number, int dir);
 		void             adjustGroupSerials      (void);
 		std::string      getLocalLabelToken      (int number, int dir);
+		bool             isOnStrongBeat          (HTp token);
 
 	private:
 		// Command-line options:
@@ -6099,6 +6112,10 @@ class Tool_cmr : public HumTool {
 		bool        m_localQ      = false;       // used with -l option: mark all local peaks
 		bool        m_localOnlyQ  = false;       // used with -L option: only mark local peaks, then exit before CMR analysis.
 		bool        m_summaryQ    = false;       // used with -S option: summary statistics of multiple files
+		bool        m_vegaQ       = false;       // used with -v option: output Vega-lite plot directly
+		bool        m_htmlQ       = false;       // used with -V option: output Vega-lite plot in HTML file
+		bool        m_vegaCountQ  = false;       // used with -w option: output Vega-lite plot for CMR count
+		bool        m_vegaStrengthQ  = false;    // used with -W option: output Vega-lite plot with strength scores
 		bool        m_notelistQ   = false;       // used with --notelist option
 		bool        m_debugQ      = false;       // used with --debug option
 		bool        m_numberQ     = false;       // used with -N option
@@ -6162,6 +6179,7 @@ class Tool_cmr : public HumTool {
 		std::vector<int>         m_cmrNoteCount;   // number of CMR notes in each input file
 		std::vector<int>         m_scoreNoteCount; // number of note in each input file
 
+		std::stringstream        m_vegaData;       // stores all data for Vega plot from each processFile
 };
 
 
