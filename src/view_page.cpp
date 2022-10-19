@@ -738,6 +738,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         if (child->Is(STAFFGRP)) {
             StaffGrp *childStaffGrp = vrv_cast<StaffGrp *>(child);
             this->DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure, isLastSystem, yBottomPrevious);
+            if (!barlineThrough) yBottomPrevious = VRV_UNSET;
             continue;
         }
 
