@@ -19,7 +19,7 @@
 %ignore vrv::Toolkit::SetShowBoundingBoxes( bool );
 %ignore vrv::Toolkit::SetCString( const std::string & );
 
-// Because we transform the strings to dictionnaries, we need this module
+// Because we transform the strings to dictionaries, we need this module
 %pythonbegin %{
     import json
 %}
