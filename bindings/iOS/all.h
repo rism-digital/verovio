@@ -194,5 +194,6 @@
 #import <VerovioFramework/crc.h>
 #import <VerovioFramework/jsonxx.h>
 #import <VerovioFramework/humlib.h>
+#import <VerovioFramework/graphic.h>
 #endif /* all_h */
 
