@@ -229,4 +229,21 @@ FunctorCode FindSpannedLayerElementsFunctor::VisitMeasure(const Measure *measure
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// GetRelativeLayerElementFunctor
+//----------------------------------------------------------------------------
+
+GetRelativeLayerElementFunctor::GetRelativeLayerElementFunctor(int elementID, bool searchDirection, bool anotherLayer)
+{
+    m_relativeElement = NULL;
+    m_initialElementID = elementID;
+    m_searchDirection = searchDirection;
+    m_isInNeighboringLayer = anotherLayer;
+}
+
+FunctorCode GetRelativeLayerElementFunctor::VisitLayerElement(const LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

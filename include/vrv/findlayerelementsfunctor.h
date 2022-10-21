@@ -225,6 +225,60 @@ private:
     std::vector<const LayerElement *> m_elements;
 };
 
+//----------------------------------------------------------------------------
+// GetRelativeLayerElementFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class goes through all layer elements of the layer and returns the next/previous element
+ * relative to the specified layer element.
+ * It will search recursively through children elements until note, chord or ftrem is found.
+ * It can be used to look into neighboring layers as well, but only the first element will be checked.
+ */
+class GetRelativeLayerElementFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    GetRelativeLayerElementFunctor(int elementID, bool searchDirection, bool anotherLayer);
+    virtual ~GetRelativeLayerElementFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Retrieve the search result
+     */
+    const Object *GetRelativeElement() const { return m_relativeElement; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayerElement(const LayerElement *layerElement) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The next/previous relevant layer element
+    const Object *m_relativeElement;
+    // The ID of the layer element that is being compared to (starting point)
+    int m_initialElementID;
+    // The direction of search - BACKWARD is for previous element, FORWARD - next
+    bool m_searchDirection;
+    // The flag to indicate whether search is done in the same layer as the given element, or in neighboring one
+    bool m_isInNeighboringLayer;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FINDLAYERELEMENTSFUNCTOR_H__
