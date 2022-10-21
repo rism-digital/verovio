@@ -1255,6 +1255,11 @@
 		BD2E4D982875880600B04350 /* stem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD2E4D94287587FD00B04350 /* stem.cpp */; };
 		BD2E4D9A2875882100B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; };
 		BD2E4D9B2875882200B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; };
+		BD6E5C3D290007C90039B0F1 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
+		BD6E5C3E290007CA0039B0F1 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
+		BD6E5C3F290007CB0039B0F1 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
+		BD6E5C40290007CE0039B0F1 /* graphic.h in Headers */ = {isa = PBXBuildFile; fileRef = 3673E5E528E1DF0C0048BAFA /* graphic.h */; };
+		BD6E5C41290007CE0039B0F1 /* graphic.h in Headers */ = {isa = PBXBuildFile; fileRef = 3673E5E528E1DF0C0048BAFA /* graphic.h */; };
 		BD87768327CE8A11005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
 		BD87768427CE8A19005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
 		BD87768527CE8A1A005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
@@ -2507,6 +2512,7 @@
 				4DF9D29C1C1B3F0A0069E8C8 /* attconverter.h in Headers */,
 				8F59293918854BF800FE51AD /* clef.h in Headers */,
 				4DA0EADB22BB77AF00A7EBEB /* editortoolkit_neume.h in Headers */,
+				BD6E5C41290007CE0039B0F1 /* graphic.h in Headers */,
 				4DB3D89A1F7C326800B5FC2B /* fb.h in Headers */,
 				4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */,
 				4DB3D8C71F83D0FD00B5FC2B /* breath.h in Headers */,
@@ -2911,6 +2917,7 @@
 				BB4C4B4222A932D7001F6AF0 /* beam.h in Headers */,
 				BB4C4BA222A932E5001F6AF0 /* scoredefinterface.h in Headers */,
 				BB4C4AA922A932A0001F6AF0 /* devicecontext.h in Headers */,
+				BD6E5C40290007CE0039B0F1 /* graphic.h in Headers */,
 				BB4C4A9D22A9328F001F6AF0 /* options.h in Headers */,
 				BB4C4A6322A9321F001F6AF0 /* atts_cmn.h in Headers */,
 				BBC19FBF22B37CA000100F42 /* all.h in Headers */,
@@ -3151,6 +3158,7 @@
 				4D1694151E3A44F300569BF4 /* dynam.cpp in Sources */,
 				4D308105203DB6B500BC44F6 /* ref.cpp in Sources */,
 				4D1694161E3A44F300569BF4 /* pedal.cpp in Sources */,
+				BD6E5C3D290007C90039B0F1 /* graphic.cpp in Sources */,
 				4D1694171E3A44F300569BF4 /* mensur.cpp in Sources */,
 				BD0562372518CD20004057EB /* beamspan.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
@@ -3593,6 +3601,7 @@
 				4DB3D8B51F83D09100B5FC2B /* iohumdrum.cpp in Sources */,
 				4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				8F3DD34618854B2E0051330C /* layerelement.cpp in Sources */,
+				BD6E5C3E290007CA0039B0F1 /* graphic.cpp in Sources */,
 				4DB3D8CA1F83D10700B5FC2B /* fermata.cpp in Sources */,
 				BD0562382518CD20004057EB /* beamspan.cpp in Sources */,
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
@@ -3814,6 +3823,7 @@
 				BB4C4ACD22A932B6001F6AF0 /* sb.cpp in Sources */,
 				BB4C4AA822A932A0001F6AF0 /* devicecontext.cpp in Sources */,
 				BB4C4B7322A932D7001F6AF0 /* space.cpp in Sources */,
+				BD6E5C3F290007CB0039B0F1 /* graphic.cpp in Sources */,
 				402492BF232E70000017BB75 /* gracegrp.cpp in Sources */,
 				BB4C4A6622A9321F001F6AF0 /* atts_critapp.cpp in Sources */,
 				BD0562392518CD20004057EB /* beamspan.cpp in Sources */,
