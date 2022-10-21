@@ -233,16 +233,32 @@ FunctorCode FindSpannedLayerElementsFunctor::VisitMeasure(const Measure *measure
 // GetRelativeLayerElementFunctor
 //----------------------------------------------------------------------------
 
-GetRelativeLayerElementFunctor::GetRelativeLayerElementFunctor(int elementID, bool searchDirection, bool anotherLayer)
+GetRelativeLayerElementFunctor::GetRelativeLayerElementFunctor(
+    int elementIndex, bool searchDirection, bool anotherLayer)
 {
     m_relativeElement = NULL;
-    m_initialElementID = elementID;
+    m_initialElementIndex = elementIndex;
     m_searchDirection = searchDirection;
     m_isInNeighboringLayer = anotherLayer;
 }
 
 FunctorCode GetRelativeLayerElementFunctor::VisitLayerElement(const LayerElement *layerElement)
 {
+    // Do not check for index of the element if we're looking into neighboring layer or if nested element is being
+    // processed (e.g. ignore index children of beams, since they have their own indices irrelevant to the one that
+    // has been passed inside this functor)
+    if (!m_isInNeighboringLayer && layerElement->GetParent()->Is(LAYER)) {
+        if (m_searchDirection == FORWARD && (layerElement->GetIdx() < m_initialElementIndex)) return FUNCTOR_SIBLINGS;
+        if (m_searchDirection == BACKWARD && (layerElement->GetIdx() > m_initialElementIndex)) return FUNCTOR_SIBLINGS;
+    }
+
+    if (layerElement->Is({ NOTE, CHORD, FTREM })) {
+        m_relativeElement = layerElement;
+        return FUNCTOR_STOP;
+    }
+
+    if (layerElement->Is(REST)) return m_isInNeighboringLayer ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
+
     return FUNCTOR_CONTINUE;
 }
 

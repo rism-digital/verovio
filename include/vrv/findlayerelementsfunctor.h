@@ -241,7 +241,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    GetRelativeLayerElementFunctor(int elementID, bool searchDirection, bool anotherLayer);
+    GetRelativeLayerElementFunctor(int elementIndex, bool searchDirection, bool anotherLayer);
     virtual ~GetRelativeLayerElementFunctor() = default;
     ///@}
 
@@ -253,7 +253,7 @@ public:
     /*
      * Retrieve the search result
      */
-    const Object *GetRelativeElement() const { return m_relativeElement; }
+    const LayerElement *GetRelativeElement() const { return m_relativeElement; }
 
     /*
      * Functor interface
@@ -270,9 +270,9 @@ public:
     //
 private:
     // The next/previous relevant layer element
-    const Object *m_relativeElement;
-    // The ID of the layer element that is being compared to (starting point)
-    int m_initialElementID;
+    const LayerElement *m_relativeElement;
+    // The index of the layer element that is being compared to (starting point)
+    int m_initialElementIndex;
     // The direction of search - BACKWARD is for previous element, FORWARD - next
     bool m_searchDirection;
     // The flag to indicate whether search is done in the same layer as the given element, or in neighboring one
