@@ -1013,6 +1013,7 @@ enum data_METERFORM {
     METERFORM_num,
     METERFORM_denomsym,
     METERFORM_norm,
+    METERFORM_symplusnorm,
     METERFORM_invis,
     METERFORM_MAX
 };
@@ -1399,6 +1400,19 @@ enum data_PEDALSTYLE {
     PEDALSTYLE_pedstar,
     PEDALSTYLE_altpedstar,
     PEDALSTYLE_MAX
+};
+
+/**
+ * MEI data.PGFUNC
+ */
+enum data_PGFUNC {
+    PGFUNC_NONE = 0,
+    PGFUNC_all,
+    PGFUNC_first,
+    PGFUNC_last,
+    PGFUNC_alt1,
+    PGFUNC_alt2,
+    PGFUNC_MAX
 };
 
 /**
@@ -2216,6 +2230,7 @@ enum meterSigGrpLog_FUNC {
     meterSigGrpLog_FUNC_alternating,
     meterSigGrpLog_FUNC_interchanging,
     meterSigGrpLog_FUNC_mixed,
+    meterSigGrpLog_FUNC_other,
     meterSigGrpLog_FUNC_MAX
 };
 
