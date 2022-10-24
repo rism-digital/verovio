@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `@dir.dist` and `@tempo.dist` (@eNote-GmBH)
 * Support for persian accidentals (sori and koron)
 * Support for heavy barlines
 
