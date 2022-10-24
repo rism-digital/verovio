@@ -1879,7 +1879,19 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
 {
     double distance = 0.0;
     if (staffPosition == STAFFREL_above || staffPosition == STAFFREL_below) {
-        if (classId == DYNAM) {
+        if (classId == DIR) {
+            // Inspect the scoreDef attribute
+            if (this->GetCurrentScoreDef()->HasDirDist()) {
+                distance = this->GetCurrentScoreDef()->GetDirDist();
+            }
+
+            // Inspect the staffDef attributes
+            const StaffDef *staffDef = this->GetCurrentScoreDef()->GetStaffDef(staffIndex);
+            if (staffDef != NULL && staffDef->HasDirDist()) {
+                distance = staffDef->GetDirDist();
+            }
+        }
+        else if (classId == DYNAM) {
             distance = m_options->m_dynamDist.GetDefault();
 
             // Inspect the scoreDef attribute
@@ -1915,6 +1927,18 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
             // Apply CLI option if set
             if (m_options->m_harmDist.IsSet()) {
                 distance = m_options->m_harmDist.GetValue();
+            }
+        }
+        else if (classId == TEMPO) {
+            // Inspect the scoreDef attribute
+            if (this->GetCurrentScoreDef()->HasTempoDist()) {
+                distance = this->GetCurrentScoreDef()->GetTempoDist();
+            }
+
+            // Inspect the staffDef attributes
+            const StaffDef *staffDef = this->GetCurrentScoreDef()->GetStaffDef(staffIndex);
+            if (staffDef != NULL && staffDef->HasTempoDist()) {
+                distance = staffDef->GetTempoDist();
             }
         }
     }
