@@ -494,7 +494,17 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     }
     assert(element);
 
-    if (element->HasInterface(INTERFACE_PITCH) || element->Is(NEUME) || element->Is(SYLLABLE)) {
+    if (element->Is(CUSTOS)) {
+        FacsimileInterface *fi = element->GetFacsimileInterface();
+        assert(fi);
+        Zone *zone = fi->GetZone();
+        assert(zone);
+        zone->ShiftByXY(x, -y);
+
+        AdjustPitchFromPosition(element);
+        ChangeStaff(elementId);
+    }
+    else if (element->HasInterface(INTERFACE_PITCH) || element->Is(NEUME) || element->Is(SYLLABLE)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
         if (!layer) {
             LogError("Element does not have Layer parent. This should not happen.");
@@ -506,9 +516,10 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // clef association is done at the syllable level because of MEI structure
         // also note this will initialize syllable as null in the case of custos
         // which is why all the references to syllable are ternary
-        Syllable *syllable = ((element->Is(SYLLABLE)) 
-            ? (dynamic_cast<Syllable *>(element))
-            : dynamic_cast<Syllable *>(element->GetFirstAncestor(SYLLABLE)));
+        
+        Object *syllable = ((element->Is(SYLLABLE)
+            ? (element)
+            : element->GetFirstAncestor(SYLLABLE)));
 
         ClassIdComparison ac(CLEF);
         InterfaceComparison facsIC(INTERFACE_FACSIMILE);
@@ -516,7 +527,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         // Check for clefs in syllable
         ListOfObjects clefs;
-        element->FindAllDescendantByComparison(&clefs, &ac);
+        syllable->FindAllDescendantByComparison(&clefs, &ac);
         bool hasClef = (clefs.size() != 0);
 
         FacsimileInterface *fi = element->GetFacsimileInterface();
@@ -554,13 +565,13 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 }
             }
         }
-        
+
         if (hasClef) {
             for (Object *obj : clefs) {
                 Clef *clef = dynamic_cast<Clef *>(obj);
                 ClefMovementHandler(clef, x, 0);
             }
-            
+
             // if syllable contains clef, adjust individual neumes
             ListOfObjects neumes;
             ClassIdComparison neumeCompare(NEUME);
@@ -568,11 +579,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             for (auto neume = neumes.begin(); neume != neumes.end(); ++neume) {
                 AdjustPitchFromPosition(*neume);
             }
-        }
-
-        if (element->Is(CUSTOS)) {
-            AdjustPitchFromPosition(element);
-            ChangeStaff(elementId);
         }
         else {
             AdjustPitchFromPosition(syllable);
