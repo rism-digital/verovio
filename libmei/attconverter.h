@@ -221,6 +221,9 @@ public:
     std::string PedalstyleToStr(data_PEDALSTYLE data) const;
     data_PEDALSTYLE StrToPedalstyle(const std::string &value, bool logWarning = true) const;
 
+    std::string PgfuncToStr(data_PGFUNC data) const;
+    data_PGFUNC StrToPgfunc(const std::string &value, bool logWarning = true) const;
+
     std::string RelationshipToStr(data_RELATIONSHIP data) const;
     data_RELATIONSHIP StrToRelationship(const std::string &value, bool logWarning = true) const;
 

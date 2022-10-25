@@ -750,6 +750,8 @@ void AttHairpinVis::ResetHairpinVis()
 {
     m_opening = VRV_UNSET;
     m_closed = BOOLEAN_NONE;
+    m_openingVertical = BOOLEAN_NONE;
+    m_angleOptimize = BOOLEAN_NONE;
 }
 
 bool AttHairpinVis::ReadHairpinVis(pugi::xml_node element)
@@ -763,6 +765,16 @@ bool AttHairpinVis::ReadHairpinVis(pugi::xml_node element)
     if (element.attribute("closed")) {
         this->SetClosed(StrToBoolean(element.attribute("closed").value()));
         element.remove_attribute("closed");
+        hasAttribute = true;
+    }
+    if (element.attribute("opening.vertical")) {
+        this->SetOpeningVertical(StrToBoolean(element.attribute("opening.vertical").value()));
+        element.remove_attribute("opening.vertical");
+        hasAttribute = true;
+    }
+    if (element.attribute("angle.optimize")) {
+        this->SetAngleOptimize(StrToBoolean(element.attribute("angle.optimize").value()));
+        element.remove_attribute("angle.optimize");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -779,6 +791,14 @@ bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element)
         element.append_attribute("closed") = BooleanToStr(this->GetClosed()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasOpeningVertical()) {
+        element.append_attribute("opening.vertical") = BooleanToStr(this->GetOpeningVertical()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasAngleOptimize()) {
+        element.append_attribute("angle.optimize") = BooleanToStr(this->GetAngleOptimize()).c_str();
+        wroteAttribute = true;
+    }
     return wroteAttribute;
 }
 
@@ -792,7 +812,17 @@ bool AttHairpinVis::HasClosed() const
     return (m_closed != BOOLEAN_NONE);
 }
 
-/* include <attclosed> */
+bool AttHairpinVis::HasOpeningVertical() const
+{
+    return (m_openingVertical != BOOLEAN_NONE);
+}
+
+bool AttHairpinVis::HasAngleOptimize() const
+{
+    return (m_angleOptimize != BOOLEAN_NONE);
+}
+
+/* include <attangle.optimize> */
 
 //----------------------------------------------------------------------------
 // AttHarmVis
@@ -2357,6 +2387,14 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
             att->SetClosed(att->StrToBoolean(attrValue));
             return true;
         }
+        if (attrType == "opening.vertical") {
+            att->SetOpeningVertical(att->StrToBoolean(attrValue));
+            return true;
+        }
+        if (attrType == "angle.optimize") {
+            att->SetAngleOptimize(att->StrToBoolean(attrValue));
+            return true;
+        }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {
         AttHarmVis *att = dynamic_cast<AttHarmVis *>(element);
@@ -2782,6 +2820,12 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasClosed()) {
             attributes->push_back({ "closed", att->BooleanToStr(att->GetClosed()) });
+        }
+        if (att->HasOpeningVertical()) {
+            attributes->push_back({ "opening.vertical", att->BooleanToStr(att->GetOpeningVertical()) });
+        }
+        if (att->HasAngleOptimize()) {
+            attributes->push_back({ "angle.optimize", att->BooleanToStr(att->GetAngleOptimize()) });
         }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {

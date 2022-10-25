@@ -1570,14 +1570,21 @@ AttDistances::~AttDistances() {}
 
 void AttDistances::ResetDistances()
 {
+    m_dirDist = VRV_UNSET;
     m_dynamDist = VRV_UNSET;
     m_harmDist = VRV_UNSET;
-    m_textDist = VRV_UNSET;
+    m_rehDist = VRV_UNSET;
+    m_tempoDist = VRV_UNSET;
 }
 
 bool AttDistances::ReadDistances(pugi::xml_node element)
 {
     bool hasAttribute = false;
+    if (element.attribute("dir.dist")) {
+        this->SetDirDist(StrToMeasurementsigned(element.attribute("dir.dist").value()));
+        element.remove_attribute("dir.dist");
+        hasAttribute = true;
+    }
     if (element.attribute("dynam.dist")) {
         this->SetDynamDist(StrToMeasurementsigned(element.attribute("dynam.dist").value()));
         element.remove_attribute("dynam.dist");
@@ -1588,9 +1595,14 @@ bool AttDistances::ReadDistances(pugi::xml_node element)
         element.remove_attribute("harm.dist");
         hasAttribute = true;
     }
-    if (element.attribute("text.dist")) {
-        this->SetTextDist(StrToMeasurementsigned(element.attribute("text.dist").value()));
-        element.remove_attribute("text.dist");
+    if (element.attribute("reh.dist")) {
+        this->SetRehDist(StrToMeasurementsigned(element.attribute("reh.dist").value()));
+        element.remove_attribute("reh.dist");
+        hasAttribute = true;
+    }
+    if (element.attribute("tempo.dist")) {
+        this->SetTempoDist(StrToMeasurementsigned(element.attribute("tempo.dist").value()));
+        element.remove_attribute("tempo.dist");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1599,6 +1611,10 @@ bool AttDistances::ReadDistances(pugi::xml_node element)
 bool AttDistances::WriteDistances(pugi::xml_node element)
 {
     bool wroteAttribute = false;
+    if (this->HasDirDist()) {
+        element.append_attribute("dir.dist") = MeasurementsignedToStr(this->GetDirDist()).c_str();
+        wroteAttribute = true;
+    }
     if (this->HasDynamDist()) {
         element.append_attribute("dynam.dist") = MeasurementsignedToStr(this->GetDynamDist()).c_str();
         wroteAttribute = true;
@@ -1607,11 +1623,20 @@ bool AttDistances::WriteDistances(pugi::xml_node element)
         element.append_attribute("harm.dist") = MeasurementsignedToStr(this->GetHarmDist()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasTextDist()) {
-        element.append_attribute("text.dist") = MeasurementsignedToStr(this->GetTextDist()).c_str();
+    if (this->HasRehDist()) {
+        element.append_attribute("reh.dist") = MeasurementsignedToStr(this->GetRehDist()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasTempoDist()) {
+        element.append_attribute("tempo.dist") = MeasurementsignedToStr(this->GetTempoDist()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
+}
+
+bool AttDistances::HasDirDist() const
+{
+    return (m_dirDist != VRV_UNSET);
 }
 
 bool AttDistances::HasDynamDist() const
@@ -1624,12 +1649,17 @@ bool AttDistances::HasHarmDist() const
     return (m_harmDist != VRV_UNSET);
 }
 
-bool AttDistances::HasTextDist() const
+bool AttDistances::HasRehDist() const
 {
-    return (m_textDist != VRV_UNSET);
+    return (m_rehDist != VRV_UNSET);
 }
 
-/* include <atttext.dist> */
+bool AttDistances::HasTempoDist() const
+{
+    return (m_tempoDist != VRV_UNSET);
+}
+
+/* include <atttempo.dist> */
 
 //----------------------------------------------------------------------------
 // AttDotLog
@@ -8304,6 +8334,10 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
     if (element->HasAttClass(ATT_DISTANCES)) {
         AttDistances *att = dynamic_cast<AttDistances *>(element);
         assert(att);
+        if (attrType == "dir.dist") {
+            att->SetDirDist(att->StrToMeasurementsigned(attrValue));
+            return true;
+        }
         if (attrType == "dynam.dist") {
             att->SetDynamDist(att->StrToMeasurementsigned(attrValue));
             return true;
@@ -8312,8 +8346,12 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             att->SetHarmDist(att->StrToMeasurementsigned(attrValue));
             return true;
         }
-        if (attrType == "text.dist") {
-            att->SetTextDist(att->StrToMeasurementsigned(attrValue));
+        if (attrType == "reh.dist") {
+            att->SetRehDist(att->StrToMeasurementsigned(attrValue));
+            return true;
+        }
+        if (attrType == "tempo.dist") {
+            att->SetTempoDist(att->StrToMeasurementsigned(attrValue));
             return true;
         }
     }
@@ -9860,14 +9898,20 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_DISTANCES)) {
         const AttDistances *att = dynamic_cast<const AttDistances *>(element);
         assert(att);
+        if (att->HasDirDist()) {
+            attributes->push_back({ "dir.dist", att->MeasurementsignedToStr(att->GetDirDist()) });
+        }
         if (att->HasDynamDist()) {
             attributes->push_back({ "dynam.dist", att->MeasurementsignedToStr(att->GetDynamDist()) });
         }
         if (att->HasHarmDist()) {
             attributes->push_back({ "harm.dist", att->MeasurementsignedToStr(att->GetHarmDist()) });
         }
-        if (att->HasTextDist()) {
-            attributes->push_back({ "text.dist", att->MeasurementsignedToStr(att->GetTextDist()) });
+        if (att->HasRehDist()) {
+            attributes->push_back({ "reh.dist", att->MeasurementsignedToStr(att->GetRehDist()) });
+        }
+        if (att->HasTempoDist()) {
+            attributes->push_back({ "tempo.dist", att->MeasurementsignedToStr(att->GetTempoDist()) });
         }
     }
     if (element->HasAttClass(ATT_DOTLOG)) {

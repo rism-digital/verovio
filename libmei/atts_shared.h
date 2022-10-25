@@ -1265,6 +1265,10 @@ public:
      * to the default value)
      **/
     ///@{
+    void SetDirDist(data_MEASUREMENTSIGNED dirDist_) { m_dirDist = dirDist_; }
+    data_MEASUREMENTSIGNED GetDirDist() const { return m_dirDist; }
+    bool HasDirDist() const;
+    //
     void SetDynamDist(data_MEASUREMENTSIGNED dynamDist_) { m_dynamDist = dynamDist_; }
     data_MEASUREMENTSIGNED GetDynamDist() const { return m_dynamDist; }
     bool HasDynamDist() const;
@@ -1273,12 +1277,18 @@ public:
     data_MEASUREMENTSIGNED GetHarmDist() const { return m_harmDist; }
     bool HasHarmDist() const;
     //
-    void SetTextDist(data_MEASUREMENTSIGNED textDist_) { m_textDist = textDist_; }
-    data_MEASUREMENTSIGNED GetTextDist() const { return m_textDist; }
-    bool HasTextDist() const;
+    void SetRehDist(data_MEASUREMENTSIGNED rehDist_) { m_rehDist = rehDist_; }
+    data_MEASUREMENTSIGNED GetRehDist() const { return m_rehDist; }
+    bool HasRehDist() const;
+    //
+    void SetTempoDist(data_MEASUREMENTSIGNED tempoDist_) { m_tempoDist = tempoDist_; }
+    data_MEASUREMENTSIGNED GetTempoDist() const { return m_tempoDist; }
+    bool HasTempoDist() const;
     ///@}
 
 private:
+    /** Records the default distance from the staff for directives. **/
+    data_MEASUREMENTSIGNED m_dirDist;
     /** Records the default distance from the staff for dynamic marks. **/
     data_MEASUREMENTSIGNED m_dynamDist;
     /**
@@ -1286,10 +1296,12 @@ private:
      * guitar chord grids or functional labels.
      **/
     data_MEASUREMENTSIGNED m_harmDist;
-    /** Determines how far from the staff to render text elements. **/
-    data_MEASUREMENTSIGNED m_textDist;
+    /** Records the default distance from the staff for rehearsal marks. **/
+    data_MEASUREMENTSIGNED m_rehDist;
+    /** Records the default distance from the staff for tempo marks. **/
+    data_MEASUREMENTSIGNED m_tempoDist;
 
-    /* include <atttext.dist> */
+    /* include <atttempo.dist> */
 };
 
 //----------------------------------------------------------------------------

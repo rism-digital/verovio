@@ -551,6 +551,14 @@ public:
     void SetClosed(data_BOOLEAN closed_) { m_closed = closed_; }
     data_BOOLEAN GetClosed() const { return m_closed; }
     bool HasClosed() const;
+    //
+    void SetOpeningVertical(data_BOOLEAN openingVertical_) { m_openingVertical = openingVertical_; }
+    data_BOOLEAN GetOpeningVertical() const { return m_openingVertical; }
+    bool HasOpeningVertical() const;
+    //
+    void SetAngleOptimize(data_BOOLEAN angleOptimize_) { m_angleOptimize = angleOptimize_; }
+    data_BOOLEAN GetAngleOptimize() const { return m_angleOptimize; }
+    bool HasAngleOptimize() const;
     ///@}
 
 private:
@@ -564,8 +572,20 @@ private:
      * by a connecting line.
      **/
     data_BOOLEAN m_closed;
+    /**
+     * Indicates that the opening points are aligned with an imaginary line that is
+     * always 90° perpendicular to the horizontal plane, regardless of any angle or
+     * start/end adjustments, including when the hairpin is angled with @angle.optimize
+     * or through @endvo/@startvo adjustments.
+     **/
+    data_BOOLEAN m_openingVertical;
+    /**
+     * Indicates that the slope of the hairpin can be adjusted to follow the content in
+     * order to optimize spacing.
+     **/
+    data_BOOLEAN m_angleOptimize;
 
-    /* include <attclosed> */
+    /* include <attangle.optimize> */
 };
 
 //----------------------------------------------------------------------------

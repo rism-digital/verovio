@@ -2154,6 +2154,7 @@ std::string AttConverter::MeterformToStr(data_METERFORM data) const
         case METERFORM_num: value = "num"; break;
         case METERFORM_denomsym: value = "denomsym"; break;
         case METERFORM_norm: value = "norm"; break;
+        case METERFORM_symplusnorm: value = "sym+norm"; break;
         case METERFORM_invis: value = "invis"; break;
         default:
             LogWarning("Unknown value '%d' for data.METERFORM", data);
@@ -2168,6 +2169,7 @@ data_METERFORM AttConverter::StrToMeterform(const std::string &value, bool logWa
     if (value == "num") return METERFORM_num;
     if (value == "denomsym") return METERFORM_denomsym;
     if (value == "norm") return METERFORM_norm;
+    if (value == "sym+norm") return METERFORM_symplusnorm;
     if (value == "invis") return METERFORM_invis;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.METERFORM", value.c_str());
@@ -2982,6 +2984,35 @@ data_PEDALSTYLE AttConverter::StrToPedalstyle(const std::string &value, bool log
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.PEDALSTYLE", value.c_str());
     return PEDALSTYLE_NONE;
+}
+
+std::string AttConverter::PgfuncToStr(data_PGFUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case PGFUNC_all: value = "all"; break;
+        case PGFUNC_first: value = "first"; break;
+        case PGFUNC_last: value = "last"; break;
+        case PGFUNC_alt1: value = "alt1"; break;
+        case PGFUNC_alt2: value = "alt2"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.PGFUNC", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_PGFUNC AttConverter::StrToPgfunc(const std::string &value, bool logWarning) const
+{
+    if (value == "all") return PGFUNC_all;
+    if (value == "first") return PGFUNC_first;
+    if (value == "last") return PGFUNC_last;
+    if (value == "alt1") return PGFUNC_alt1;
+    if (value == "alt2") return PGFUNC_alt2;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.PGFUNC", value.c_str());
+    return PGFUNC_NONE;
 }
 
 std::string AttConverter::RelationshipToStr(data_RELATIONSHIP data) const
@@ -4782,6 +4813,7 @@ std::string AttConverter::MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) cons
         case meterSigGrpLog_FUNC_alternating: value = "alternating"; break;
         case meterSigGrpLog_FUNC_interchanging: value = "interchanging"; break;
         case meterSigGrpLog_FUNC_mixed: value = "mixed"; break;
+        case meterSigGrpLog_FUNC_other: value = "other"; break;
         default:
             LogWarning("Unknown value '%d' for att.meterSigGrp.log@func", data);
             value = "";
@@ -4795,6 +4827,7 @@ meterSigGrpLog_FUNC AttConverter::StrToMeterSigGrpLogFunc(const std::string &val
     if (value == "alternating") return meterSigGrpLog_FUNC_alternating;
     if (value == "interchanging") return meterSigGrpLog_FUNC_interchanging;
     if (value == "mixed") return meterSigGrpLog_FUNC_mixed;
+    if (value == "other") return meterSigGrpLog_FUNC_other;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.meterSigGrp.log@func", value.c_str());
     return meterSigGrpLog_FUNC_NONE;
