@@ -3933,6 +3933,10 @@ bool PAEInput::ConvertGrace()
             if (this->Was(token, pae::ACCIDENTAL_INTERNAL)) {
                 continue;
             }
+            // Having an octave is fine
+            if (this->Was(token, pae::OCTAVE)) {
+                continue;
+            }
             // Having a duration is fine for appogiatura
             if (this->Is(token, pae::DURATION)) {
                 // For acciaccature, not in pedantic mode
