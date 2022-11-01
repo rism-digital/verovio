@@ -291,14 +291,14 @@ AttMidiNumber::~AttMidiNumber() {}
 
 void AttMidiNumber::ResetMidiNumber()
 {
-    m_num = VRV_UNSET;
+    m_num = -1;
 }
 
 bool AttMidiNumber::ReadMidiNumber(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("num")) {
-        this->SetNum(StrToInt(element.attribute("num").value()));
+        this->SetNum(StrToMidivalue(element.attribute("num").value()));
         element.remove_attribute("num");
         hasAttribute = true;
     }
@@ -309,7 +309,7 @@ bool AttMidiNumber::WriteMidiNumber(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasNum()) {
-        element.append_attribute("num") = IntToStr(this->GetNum()).c_str();
+        element.append_attribute("num") = MidivalueToStr(this->GetNum()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -317,7 +317,7 @@ bool AttMidiNumber::WriteMidiNumber(pugi::xml_node element)
 
 bool AttMidiNumber::HasNum() const
 {
-    return (m_num != VRV_UNSET);
+    return (m_num != -1);
 }
 
 /* include <attnum> */
@@ -619,7 +619,7 @@ bool Att::SetMidi(Object *element, const std::string &attrType, const std::strin
         AttMidiNumber *att = dynamic_cast<AttMidiNumber *>(element);
         assert(att);
         if (attrType == "num") {
-            att->SetNum(att->StrToInt(attrValue));
+            att->SetNum(att->StrToMidivalue(attrValue));
             return true;
         }
     }
@@ -722,7 +722,7 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
         const AttMidiNumber *att = dynamic_cast<const AttMidiNumber *>(element);
         assert(att);
         if (att->HasNum()) {
-            attributes->push_back({ "num", att->IntToStr(att->GetNum()) });
+            attributes->push_back({ "num", att->MidivalueToStr(att->GetNum()) });
         }
     }
     if (element->HasAttClass(ATT_MIDITEMPO)) {
