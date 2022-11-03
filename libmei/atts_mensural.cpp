@@ -291,7 +291,7 @@ AttPlicaVis::~AttPlicaVis() {}
 void AttPlicaVis::ResetPlicaVis()
 {
     m_dir = STEMDIRECTION_basic_NONE;
-    m_len = 0.0;
+    m_len = -1.0;
 }
 
 bool AttPlicaVis::ReadPlicaVis(pugi::xml_node element)
@@ -331,7 +331,7 @@ bool AttPlicaVis::HasDir() const
 
 bool AttPlicaVis::HasLen() const
 {
-    return (m_len != 0.0);
+    return (m_len != -1.0);
 }
 
 /* include <attlen> */
