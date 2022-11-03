@@ -32,6 +32,10 @@ export class VerovioToolkit {
         return JSON.parse(this.proxy.getAvailableOptions(this.ptr));
     }
 
+    getDefaultOptions() {
+        return JSON.parse(this.proxy.getDefaultOptions(this.ptr));
+    }
+
     getDescriptiveFeatures(options) {
         return JSON.parse(this.proxy.getDescriptiveFeatures(this.ptr, JSON.stringify(options)));
     }
@@ -80,8 +84,8 @@ export class VerovioToolkit {
         return this.proxy.getNotatedIdForElement(this.ptr, xmlId);
     }
 
-    getOptions(defaultValues) {
-        return JSON.parse(this.proxy.getOptions(this.ptr, defaultValues));
+    getOptions() {
+        return JSON.parse(this.proxy.getOptions(this.ptr));
     }
 
     getPageCount() {
