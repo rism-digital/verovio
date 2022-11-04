@@ -1781,18 +1781,18 @@ int PAEInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
 
     // Natural in front of the note, remove it from the current list
     if (note->accidental == ACCIDENTAL_WRITTEN_n) {
-        if (m_currentAccids.count(note->pitch) != 0) {
-            m_currentAccids.erase(note->pitch);
+        if (m_currentAccids.count(note->pitch + note->octave * 7) != 0) {
+            m_currentAccids.erase(note->pitch + note->octave * 7);
         }
     }
     // Not a natural in front of the note, add it to the current list
     else if (note->accidental != ACCIDENTAL_WRITTEN_NONE) {
-        m_currentAccids[note->pitch] = note->accidental;
+        m_currentAccids[(note->pitch + note->octave * 7)] = note->accidental;
     }
 
     // Nothing in front of the note, but something in the list - make it an accid.ges
-    if ((note->accidental == ACCIDENTAL_WRITTEN_NONE) && (m_currentAccids.count(note->pitch) != 0)) {
-        note->accidental = m_currentAccids.at(note->pitch);
+    if ((note->accidental == ACCIDENTAL_WRITTEN_NONE) && (m_currentAccids.count(note->pitch + note->octave * 7) != 0)) {
+        note->accidental = m_currentAccids.at(note->pitch + note->octave * 7);
         note->accidGes = true;
     }
 
@@ -1811,7 +1811,7 @@ int PAEInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\+"))) {
         note->tie = true;
         if (note->accidental) {
-            m_tieAccid.first = note->pitch;
+            m_tieAccid.first = note->pitch + note->octave * 7;
             m_tieAccid.second = note->accidental;
         }
     }
@@ -4353,7 +4353,7 @@ bool PAEInput::ConvertAccidGes()
             Note *note = vrv_cast<Note *>(token.m_object);
             assert(note);
             Accid *accid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
-            int octavedPitch = note->GetPname() + note->GetOct() * 7;
+            const int octavedPitch = note->GetPname() + note->GetOct() * 7;
 
             std::string noteID = note->GetID();
             if (!accid) {
