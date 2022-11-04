@@ -84,8 +84,18 @@ export class VerovioToolkit {
         return this.proxy.getNotatedIdForElement(this.ptr, xmlId);
     }
 
-    getOptions() {
-        return JSON.parse(this.proxy.getOptions(this.ptr));
+    getOptions(defaultValues) {
+        if (defaultValues === true) {
+            console.warn( "This function (with 'true' parameter) is deprecated. Use getDefaultOptions() instead." );
+            return JSON.parse(this.proxy.getDefaultOptions(this.ptr));    
+        }
+        else if (defaultValues === false) {
+            console.warn( "This function (with 'false' parameter) is deprecated. Use getOptions() instead." );
+            return JSON.parse(this.proxy.getOptions(this.ptr));    
+        }
+        else {
+            return JSON.parse(this.proxy.getOptions(this.ptr));  
+        }
     }
 
     getPageCount() {
