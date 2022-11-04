@@ -103,6 +103,6 @@ private:
     /* include <atttab.fret> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_FRETTAB_H__

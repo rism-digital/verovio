@@ -1,24 +1,32 @@
 #!/bin/sh
 
 # Requires python
-# Requires svgpathtools and lxml python libraries (install with 'pip3 install %name%')
+# Requires svgpathtools python library (install with 'pip3 install svgpathtools')
+
+PYTHON="python3"
 
 echo "Generating C++ header file ..."
-python3 generate-smufl-code.py
+$PYTHON generate.py smufl
 
 echo "Generating Bravura files ..."
-python3 extract-bounding-boxes.py Bravura.svg json/bravura_metadata.json ../data/Bravura.xml
+$PYTHON generate.py extract Bravura
+$PYTHON generate.py css Bravura
 
 echo "Generating Leipzig files ..."
-python3 extract-bounding-boxes.py Leipzig.svg json/leipzig_metadata.json ../data/Leipzig.xml
+$PYTHON generate.py check Leipzig
+$PYTHON generate.py extract Leipzig
+$PYTHON generate.py css Leipzig
 
 echo "Generating Gootville files ..."
-python3 extract-bounding-boxes.py Gootville.svg json/gootville-1.2_metadata.json ../data/Gootville.xml
+$PYTHON generate.py extract Gootville
+$PYTHON generate.py css Gootville
 
 echo "Generating Petaluma files ..."
-python3 extract-bounding-boxes.py Petaluma.svg json/petaluma_metadata.json ../data/Petaluma.xml
+$PYTHON generate.py extract Petaluma
+$PYTHON generate.py css Petaluma
 
 echo "Generating Leland files ..."
-python3 extract-bounding-boxes.py Leland.svg json/leland_metadata.json ../data/Leland.xml
+$PYTHON generate.py extract Leland
+$PYTHON generate.py css Leland
 
 echo "Done!"

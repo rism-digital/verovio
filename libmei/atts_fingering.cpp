@@ -16,7 +16,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -35,9 +35,7 @@ AttFingGrpLog::AttFingGrpLog() : Att()
     ResetFingGrpLog();
 }
 
-AttFingGrpLog::~AttFingGrpLog()
-{
-}
+AttFingGrpLog::~AttFingGrpLog() {}
 
 void AttFingGrpLog::ResetFingGrpLog()
 {
@@ -97,4 +95,4 @@ void Att::GetFingering(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

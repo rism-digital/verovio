@@ -57,7 +57,8 @@ public:
 private:
     /**
      * Encodes the durational quality of a mensural note using the values provided by
-     * the data.DURQUALITY.mensural datatype (
+     * the data.DURQUALITY.mensural datatype (i.e., the perfect / imperfect / altered /
+     * major / minor / duplex quality of a note).
      **/
     data_DURQUALITY_mensural m_durQuality;
 
@@ -100,12 +101,14 @@ public:
 private:
     /**
      * Together, proport.num and proport.numbase specify a proportional change as a
-     * ratio,
+     * ratio, e.g., 1:3.
+     * Proport.num is for the first value in the ratio.
      **/
     int m_proportNum;
     /**
      * Together, proport.num and proport.numbase specify a proportional change as a
-     * ratio,
+     * ratio, e.g., 1:3.
+     * Proport.numbase is for the second value in the ratio.
      **/
     int m_proportNumbase;
 
@@ -202,7 +205,7 @@ public:
     ///@}
 
 private:
-    /** Indicates this element's participation in a ligature. **/
+    /** Indicates this element’s participation in a ligature. **/
     data_LIGATUREFORM m_lig;
 
     /* include <attlig> */
@@ -394,6 +397,6 @@ private:
     /* include <attstem.form> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_MENSURAL_H__

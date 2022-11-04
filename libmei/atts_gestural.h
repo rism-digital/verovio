@@ -196,11 +196,14 @@ private:
     int m_dotsGes;
     /** Duration as a count of units provided in the time signature denominator. **/
     double m_durMetrical;
-    /** Duration recorded as pulses-per-quarter note, **/
+    /**
+     * Duration recorded as pulses-per-quarter note, e.g., MIDI clicks or MusicXML
+     * divisions.
+     **/
     int m_durPpq;
-    /** Duration in seconds, **/
+    /** Duration in seconds, e.g., 1.732. **/
     double m_durReal;
-    /** Duration as an optionally dotted Humdrum *recip value. **/
+    /** Duration as an optionally dotted Humdrum **recip value. **/
     std::string m_durRecip;
 
     /* include <attdur.recip> */
@@ -348,22 +351,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttScoreDefGes
+// AttOrnamentAccidGes
 //----------------------------------------------------------------------------
 
-class AttScoreDefGes : public Att {
+class AttOrnamentAccidGes : public Att {
 public:
-    AttScoreDefGes();
-    virtual ~AttScoreDefGes();
+    AttOrnamentAccidGes();
+    virtual ~AttOrnamentAccidGes();
 
     /** Reset the default values for the attribute class **/
-    void ResetScoreDefGes();
+    void ResetOrnamentAccidGes();
 
     /** Read the values for the attribute class **/
-    bool ReadScoreDefGes(pugi::xml_node element);
+    bool ReadOrnamentAccidGes(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteScoreDefGes(pugi::xml_node element);
+    bool WriteOrnamentAccidGes(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -371,28 +374,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTunePname(data_PITCHNAME tunePname_) { m_tunePname = tunePname_; }
-    data_PITCHNAME GetTunePname() const { return m_tunePname; }
-    bool HasTunePname() const;
+    void SetAccidupperGes(data_ACCIDENTAL_GESTURAL accidupperGes_) { m_accidupperGes = accidupperGes_; }
+    data_ACCIDENTAL_GESTURAL GetAccidupperGes() const { return m_accidupperGes; }
+    bool HasAccidupperGes() const;
     //
-    void SetTuneHz(double tuneHz_) { m_tuneHz = tuneHz_; }
-    double GetTuneHz() const { return m_tuneHz; }
-    bool HasTuneHz() const;
-    //
-    void SetTuneTemper(data_TEMPERAMENT tuneTemper_) { m_tuneTemper = tuneTemper_; }
-    data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; }
-    bool HasTuneTemper() const;
+    void SetAccidlowerGes(data_ACCIDENTAL_GESTURAL accidlowerGes_) { m_accidlowerGes = accidlowerGes_; }
+    data_ACCIDENTAL_GESTURAL GetAccidlowerGes() const { return m_accidlowerGes; }
+    bool HasAccidlowerGes() const;
     ///@}
 
 private:
-    /** Holds the pitch name of a tuning reference pitch. **/
-    data_PITCHNAME m_tunePname;
-    /** Holds a value for cycles per second, **/
-    double m_tuneHz;
-    /** Provides an indication of the tuning system, 'just', for example. **/
-    data_TEMPERAMENT m_tuneTemper;
+    /** Records the sounding accidental associated with an upper neighboring note. **/
+    data_ACCIDENTAL_GESTURAL m_accidupperGes;
+    /** Records the sounding accidental associated with a lower neighboring note. **/
+    data_ACCIDENTAL_GESTURAL m_accidlowerGes;
 
-    /* include <atttune.temper> */
+    /* include <attaccidlower.ges> */
 };
 
 //----------------------------------------------------------------------------
@@ -510,7 +507,10 @@ public:
     ///@}
 
 private:
-    /** Encodes the onset time in terms of musical time, **/
+    /**
+     * Encodes the onset time in terms of musical time, i.e., beats[.fractional beat
+     * part], as expressed in the written time signature.
+     **/
     double m_tstampGes;
     /** Records the onset time in terms of ISO time. **/
     std::string m_tstampReal;
@@ -552,7 +552,10 @@ public:
     ///@}
 
 private:
-    /** Encodes the ending point of an event, **/
+    /**
+     * Encodes the ending point of an event, i.e., a count of measures plus a beat
+     * location in the ending measure.
+     **/
     data_MEASUREBEAT m_tstamp2Ges;
     /** Records the ending point of an event in terms of ISO time. **/
     std::string m_tstamp2Real;
@@ -560,6 +563,6 @@ private:
     /* include <atttstamp2.real> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_GESTURAL_H__

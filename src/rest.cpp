@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -219,42 +219,57 @@ void Rest::AddChild(Object *child)
     Modify();
 }
 
-wchar_t Rest::GetRestGlyph() const
+char32_t Rest::GetRestGlyph() const
 {
     return this->GetRestGlyph(this->GetActualDur());
 }
 
-wchar_t Rest::GetRestGlyph(const int duration) const
+char32_t Rest::GetRestGlyph(const int duration) const
 {
     const Resources *resources = this->GetDocResources();
     if (!resources) return 0;
 
     // If there is glyph.num, prioritize it
     if (this->HasGlyphNum()) {
-        wchar_t code = this->GetGlyphNum();
+        char32_t code = this->GetGlyphNum();
         if (NULL != resources->GetGlyph(code)) return code;
     }
     // If there is glyph.name (second priority)
     else if (this->HasGlyphName()) {
-        wchar_t code = resources->GetGlyphCode(this->GetGlyphName());
+        char32_t code = resources->GetGlyphCode(this->GetGlyphName());
         if (NULL != resources->GetGlyph(code)) return code;
     }
 
-    switch (duration) {
-        case DUR_LG: return SMUFL_E4E1_restLonga; break;
-        case DUR_BR: return SMUFL_E4E2_restDoubleWhole; break;
-        case DUR_1: return SMUFL_E4E3_restWhole; break;
-        case DUR_2: return SMUFL_E4E4_restHalf; break;
-        case DUR_4: return SMUFL_E4E5_restQuarter; break;
-        case DUR_8: return SMUFL_E4E6_rest8th; break;
-        case DUR_16: return SMUFL_E4E7_rest16th; break;
-        case DUR_32: return SMUFL_E4E8_rest32nd; break;
-        case DUR_64: return SMUFL_E4E9_rest64th; break;
-        case DUR_128: return SMUFL_E4EA_rest128th; break;
-        case DUR_256: return SMUFL_E4EB_rest256th; break;
-        case DUR_512: return SMUFL_E4EC_rest512th; break;
-        case DUR_1024: return SMUFL_E4ED_rest1024th; break;
+    if (this->IsMensuralDur()) {
+        switch (duration) {
+            case DUR_MX: return SMUFL_E9F0_mensuralRestMaxima; break;
+            case DUR_LG: return SMUFL_E9F2_mensuralRestLongaImperfecta; break;
+            case DUR_BR: return SMUFL_E9F3_mensuralRestBrevis; break;
+            case DUR_1: return SMUFL_E9F4_mensuralRestSemibrevis; break;
+            case DUR_2: return SMUFL_E9F5_mensuralRestMinima; break;
+            case DUR_4: return SMUFL_E9F6_mensuralRestSemiminima; break;
+            case DUR_8: return SMUFL_E9F7_mensuralRestFusa; break;
+            case DUR_16: return SMUFL_E9F8_mensuralRestSemifusa; break;
+        }
     }
+    else {
+        switch (duration) {
+            case DUR_LG: return SMUFL_E4E1_restLonga; break;
+            case DUR_BR: return SMUFL_E4E2_restDoubleWhole; break;
+            case DUR_1: return SMUFL_E4E3_restWhole; break;
+            case DUR_2: return SMUFL_E4E4_restHalf; break;
+            case DUR_4: return SMUFL_E4E5_restQuarter; break;
+            case DUR_8: return SMUFL_E4E6_rest8th; break;
+            case DUR_16: return SMUFL_E4E7_rest16th; break;
+            case DUR_32: return SMUFL_E4E8_rest32nd; break;
+            case DUR_64: return SMUFL_E4E9_rest64th; break;
+            case DUR_128: return SMUFL_E4EA_rest128th; break;
+            case DUR_256: return SMUFL_E4EB_rest256th; break;
+            case DUR_512: return SMUFL_E4EC_rest512th; break;
+            case DUR_1024: return SMUFL_E4ED_rest1024th; break;
+        }
+    }
+
     return 0;
 }
 
@@ -526,7 +541,7 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
 
     // Calculate possible overlap for the rest with beams
     int leftMargin = 0, rightMargin = 0;
-    const int beams = vrv_cast<Beam *>(params->m_beam)->GetBeamPartDuration(this) - DUR_4;
+    const int beams = vrv_cast<Beam *>(params->m_beam)->GetBeamPartDuration(this, false) - DUR_4;
     const int beamWidth = vrv_cast<Beam *>(params->m_beam)->m_beamWidth;
     if (params->m_directionBias > 0) {
         leftMargin = params->m_y1 - beams * beamWidth - this->GetSelfTop();
@@ -570,9 +585,12 @@ int Rest::AdjustBeams(FunctorParams *functorParams)
         }
     }
 
-    const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int unitChangeNumber = ((std::abs(overlapMargin)) / staffOffset - 1);
-    if (unitChangeNumber > 0) params->m_overlapMargin = unitChangeNumber * staffOffset * params->m_directionBias;
+    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int unitChangeNumber = ((std::abs(overlapMargin) + unit / 6) / unit);
+    if (unitChangeNumber > 0) {
+        const int adjust = unitChangeNumber * unit * params->m_directionBias;
+        if (std::abs(adjust) > std::abs(params->m_overlapMargin)) params->m_overlapMargin = adjust;
+    }
 
     return FUNCTOR_CONTINUE;
 }

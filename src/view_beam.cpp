@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 #include <math.h>
 
@@ -18,14 +18,11 @@
 
 #include "beam.h"
 #include "beamspan.h"
-#include "comparison.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "ftrem.h"
 #include "layer.h"
 #include "layerelement.h"
-#include "measure.h"
-#include "note.h"
 #include "options.h"
 #include "smufl.h"
 #include "staff.h"

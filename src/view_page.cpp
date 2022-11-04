@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -22,7 +22,6 @@
 #include "comparison.h"
 #include "controlelement.h"
 #include "devicecontext.h"
-#include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "f.h"
@@ -47,9 +46,6 @@
 #include "reh.h"
 #include "smufl.h"
 #include "staff.h"
-#include "staffdef.h"
-#include "staffgrp.h"
-#include "syl.h"
 #include "system.h"
 #include "text.h"
 #include "tuplet.h"
@@ -535,8 +531,8 @@ void View::DrawLabels(
     LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
     Object *graphic = label;
 
-    std::wstring labelStr = (label) ? label->GetText(label) : L"";
-    std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
+    std::u32string labelStr = (label) ? label->GetText(label) : U"";
+    std::u32string labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : U"";
 
     if (abbreviations) {
         labelStr = labelAbbrStr;
@@ -579,7 +575,7 @@ void View::DrawLabels(
     // also store in the system the maximum width with abbreviations for justification
     if (labelAbbr && !abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
-        std::vector<std::wstring> lines;
+        std::vector<std::u32string> lines;
         labelAbbr->GetTextLines(labelAbbr, lines);
         int maxLength = 0;
         for (auto const &line : lines) {
@@ -742,6 +738,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         if (child->Is(STAFFGRP)) {
             StaffGrp *childStaffGrp = vrv_cast<StaffGrp *>(child);
             this->DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure, isLastSystem, yBottomPrevious);
+            if (!barlineThrough) yBottomPrevious = VRV_UNSET;
             continue;
         }
 
@@ -893,6 +890,10 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             if ((form == BARRENDITION_rptend) || (form == BARRENDITION_end)) {
                 maxX = x2 + barLinesSum / 2;
             }
+            else if (form == BARRENDITION_heavy) {
+                minX = x - barLineThickWidth / 2;
+                maxX = x + barLineThickWidth / 2;
+            }
             else if (form == BARRENDITION_rptboth) {
                 maxX = x + barLinesSum + barLineSeparation * 2;
             }
@@ -904,11 +905,15 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
                 || (form == BARRENDITION_dbldotted)) {
                 maxX = x2 + barLineWidth / 2;
             }
+            else if (form == BARRENDITION_dblheavy) {
+                minX = x - barLineThickWidth / 2;
+                maxX = x2 + barLineThickWidth / 2;
+            }
             Object lines;
             lines.SetParent(system);
             lines.UpdateContentBBoxX(minX, maxX);
             lines.UpdateContentBBoxY(yTop, yBottom);
-            int margin = unit / 2;
+            const int margin = unit / 2;
             system->m_systemAligner.FindAllIntersectionPoints(line, lines, { DIR, DYNAM, TEMPO }, margin);
         }
     }
@@ -922,6 +927,9 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             break;
         case BARRENDITION_dotted: //
             this->DrawVerticalDots(dc, x, line, barLineWidth, 2 * unit);
+            break;
+        case BARRENDITION_heavy: //
+            this->DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
             break;
         case BARRENDITION_rptend:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
@@ -947,6 +955,10 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
         case BARRENDITION_dbl:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
             this->DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth);
+            break;
+        case BARRENDITION_dblheavy:
+            this->DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
+            this->DrawVerticalSegmentedLine(dc, x2 + barLineThickWidth, line, barLineThickWidth);
             break;
         case BARRENDITION_dbldashed:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength, gapLength);
@@ -1087,7 +1099,16 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(staff);
 
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
-    const ListOfObjects &childList = meterSigGrp->GetList(meterSigGrp);
+    ListOfObjects childList = meterSigGrp->GetList(meterSigGrp);
+
+    // Ignore invisible meter signatures and those without count
+    childList.erase(std::remove_if(childList.begin(), childList.end(),
+                        [](Object *object) {
+                            MeterSig *meterSig = vrv_cast<MeterSig *>(object);
+                            assert(meterSig);
+                            return ((meterSig->GetForm() == METERFORM_invis) || !meterSig->HasCount());
+                        }),
+        childList.end());
 
     const int glyphSize = staff->GetDrawingStaffNotationSize();
 
@@ -1098,10 +1119,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     for (auto iter = childList.begin(); iter != childList.end(); ++iter) {
         MeterSig *meterSig = vrv_cast<MeterSig *>(*iter);
         assert(meterSig);
-
-        if (meterSig->HasCount()) {
-            this->DrawMeterSig(dc, meterSig, staff, offset);
-        }
+        this->DrawMeterSig(dc, meterSig, staff, offset);
 
         const int y = staff->GetDrawingY() - unit * (staff->m_drawingLines - 1);
         const int x = meterSig->GetDrawingX() + offset;
@@ -1919,7 +1937,7 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextEl
 
     Annot *annot = vrv_cast<Annot *>(element);
     assert(annot);
-    dc->AddDescription(UTF16to8(annot->GetText(annot)));
+    dc->AddDescription(UTF32to8(annot->GetText(annot)));
 
     if (isTextElement) {
         dc->EndTextGraphic(element, this);

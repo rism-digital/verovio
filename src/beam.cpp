@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <array>
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -151,8 +151,6 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
     assert(doc);
     assert(beamInterface);
 
-    int y1, y2;
-
     const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     for (auto coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
@@ -165,7 +163,8 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
 
         assert(coord->m_closestNote);
 
-        y1 = coord->m_yBeam;
+        int y1 = coord->m_yBeam;
+        int y2 = coord->m_closestNote->GetDrawingY();
         bool isStemSameas = false;
 
         // With stem.sameas the y is not the beam one but the one of the other note
@@ -180,7 +179,6 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
         }
 
         int stemAdjust = 0;
-        y2 = coord->m_closestNote->GetDrawingY();
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             if (isStemSameas) {
                 // Move up according to the cut-outs
@@ -205,6 +203,8 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
             int stemOffset = 0;
             if (coord->m_partialFlagPlace == coord->m_beamRelativePlace) {
                 stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth;
+                const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                if (stemOffset && m_firstNoteOrChord && (m_firstNoteOrChord->m_yBeam % unit)) stemOffset -= unit / 2;
             }
             // handle cross-staff fTrem cases
             const auto [beams, beamsFloat] = beamInterface->GetFloatingBeamCount();
@@ -217,7 +217,7 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
 
             if (coord->m_beamRelativePlace == BEAMPLACE_below) {
                 y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
-                stemAdjust = -stemWidth - stemOffset;
+                stemAdjust = -(beamInterface->m_beamWidthBlack + stemOffset);
             }
             else {
                 y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
@@ -1807,7 +1807,7 @@ data_STEMDIRECTION BeamElementCoord::GetStemDir() const
     // m_stem is not necssary set, so we need to look at the Note / Chord original value
     // Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first note of the beam
     if (m_stem) {
-        return m_stem->GetStemDir();
+        return m_stem->GetDir();
     }
 
     if (!m_element) {
@@ -2057,23 +2057,31 @@ void Beam::SetElementShortening(int shortening)
         [shortening](BeamElementCoord *coord) { coord->m_maxShortening = shortening; });
 }
 
-int Beam::GetBeamPartDuration(int x) const
+int Beam::GetBeamPartDuration(int x, bool includeRests) const
 {
+    // find element with position closest to the specified coordinate
     const auto it = std::find_if(m_beamSegment.m_beamElementCoordRefs.begin(),
-        m_beamSegment.m_beamElementCoordRefs.end(), [x](BeamElementCoord *coord) { return x < coord->m_x; });
+        m_beamSegment.m_beamElementCoordRefs.end(), [x, includeRests](BeamElementCoord *coord) {
+            return (x < coord->m_x) && (!coord->m_element->Is(REST) || includeRests);
+        });
+    // handle cases when coordinate is outside of the beam
     if (it == m_beamSegment.m_beamElementCoordRefs.end()) {
         return DUR_8;
     }
     else if (it == m_beamSegment.m_beamElementCoordRefs.begin()) {
         return (*it)->m_dur;
     }
-
-    return std::min((*it)->m_dur, (*std::prev(it))->m_dur);
+    // Get previous relevant element (skipping over rests if needed)
+    auto reverseIt = std::make_reverse_iterator(it);
+    reverseIt = std::find_if(reverseIt, m_beamSegment.m_beamElementCoordRefs.rend(),
+        [includeRests](BeamElementCoord *coord) { return (!coord->m_element->Is(REST) || includeRests); });
+    if (reverseIt != m_beamSegment.m_beamElementCoordRefs.rend()) return std::min((*it)->m_dur, (*reverseIt)->m_dur);
+    return (*it)->m_dur;
 }
 
-int Beam::GetBeamPartDuration(const Object *object) const
+int Beam::GetBeamPartDuration(const Object *object, bool includeRests) const
 {
-    return this->GetBeamPartDuration(object->GetDrawingX());
+    return this->GetBeamPartDuration(object->GetDrawingX(), includeRests);
 }
 
 //----------------------------------------------------------------------------
@@ -2171,8 +2179,6 @@ int Beam::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
-
     const ListOfObjects &beamChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
@@ -2190,6 +2196,8 @@ int Beam::CalcStem(FunctorParams *functorParams)
         const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
         this->InitCue(isCue);
     }
+
+    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
 
     m_beamSegment.InitCoordRefs(this->GetElementCoords());
 

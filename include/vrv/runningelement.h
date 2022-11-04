@@ -76,6 +76,7 @@ public:
     ///@{
     void SetDrawingPage(Page *page);
     Page *GetDrawingPage() { return m_drawingPage; }
+    const Page *GetDrawingPage() const { return m_drawingPage; }
     ///@}
 
     /**
@@ -117,7 +118,7 @@ public:
     /**
      * Set the current page number by looking for a <num label="page">#</num> element.
      */
-    void SetCurrentPageNum(Page *currentPage);
+    void SetCurrentPageNum(const Page *currentPage);
 
     /**
      * Load the footer from the resources (footer.svg)
@@ -164,7 +165,7 @@ private:
     /**
      *
      */
-    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v);
+    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const;
 
 public:
     //

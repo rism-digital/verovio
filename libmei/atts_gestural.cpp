@@ -16,7 +16,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -35,9 +35,7 @@ AttAccidentalGestural::AttAccidentalGestural() : Att()
     ResetAccidentalGestural();
 }
 
-AttAccidentalGestural::~AttAccidentalGestural()
-{
-}
+AttAccidentalGestural::~AttAccidentalGestural() {}
 
 void AttAccidentalGestural::ResetAccidentalGestural()
 {
@@ -81,9 +79,7 @@ AttArticulationGestural::AttArticulationGestural() : Att()
     ResetArticulationGestural();
 }
 
-AttArticulationGestural::~AttArticulationGestural()
-{
-}
+AttArticulationGestural::~AttArticulationGestural() {}
 
 void AttArticulationGestural::ResetArticulationGestural()
 {
@@ -127,9 +123,7 @@ AttBendGes::AttBendGes() : Att()
     ResetBendGes();
 }
 
-AttBendGes::~AttBendGes()
-{
-}
+AttBendGes::~AttBendGes() {}
 
 void AttBendGes::ResetBendGes()
 {
@@ -173,16 +167,14 @@ AttDurationGestural::AttDurationGestural() : Att()
     ResetDurationGestural();
 }
 
-AttDurationGestural::~AttDurationGestural()
-{
-}
+AttDurationGestural::~AttDurationGestural() {}
 
 void AttDurationGestural::ResetDurationGestural()
 {
     m_durGes = DURATION_NONE;
-    m_dotsGes = -1;
+    m_dotsGes = VRV_UNSET;
     m_durMetrical = 0.0;
-    m_durPpq = 0;
+    m_durPpq = VRV_UNSET;
     m_durReal = 0.0;
     m_durRecip = "";
 }
@@ -260,7 +252,7 @@ bool AttDurationGestural::HasDurGes() const
 
 bool AttDurationGestural::HasDotsGes() const
 {
-    return (m_dotsGes != -1);
+    return (m_dotsGes != VRV_UNSET);
 }
 
 bool AttDurationGestural::HasDurMetrical() const
@@ -270,7 +262,7 @@ bool AttDurationGestural::HasDurMetrical() const
 
 bool AttDurationGestural::HasDurPpq() const
 {
-    return (m_durPpq != 0);
+    return (m_durPpq != VRV_UNSET);
 }
 
 bool AttDurationGestural::HasDurReal() const
@@ -294,9 +286,7 @@ AttMdivGes::AttMdivGes() : Att()
     ResetMdivGes();
 }
 
-AttMdivGes::~AttMdivGes()
-{
-}
+AttMdivGes::~AttMdivGes() {}
 
 void AttMdivGes::ResetMdivGes()
 {
@@ -340,15 +330,13 @@ AttNcGes::AttNcGes() : Att()
     ResetNcGes();
 }
 
-AttNcGes::~AttNcGes()
-{
-}
+AttNcGes::~AttNcGes() {}
 
 void AttNcGes::ResetNcGes()
 {
     m_octGes = -127;
     m_pnameGes = PITCHNAME_NONE;
-    m_pnum = 0;
+    m_pnum = VRV_UNSET;
 }
 
 bool AttNcGes::ReadNcGes(pugi::xml_node element)
@@ -402,7 +390,7 @@ bool AttNcGes::HasPnameGes() const
 
 bool AttNcGes::HasPnum() const
 {
-    return (m_pnum != 0);
+    return (m_pnum != VRV_UNSET);
 }
 
 /* include <attpnum> */
@@ -416,16 +404,14 @@ AttNoteGes::AttNoteGes() : Att()
     ResetNoteGes();
 }
 
-AttNoteGes::~AttNoteGes()
-{
-}
+AttNoteGes::~AttNoteGes() {}
 
 void AttNoteGes::ResetNoteGes()
 {
     m_extremis = noteGes_EXTREMIS_NONE;
     m_octGes = -127;
     m_pnameGes = PITCHNAME_NONE;
-    m_pnum = 0;
+    m_pnum = VRV_UNSET;
 }
 
 bool AttNoteGes::ReadNoteGes(pugi::xml_node element)
@@ -493,86 +479,69 @@ bool AttNoteGes::HasPnameGes() const
 
 bool AttNoteGes::HasPnum() const
 {
-    return (m_pnum != 0);
+    return (m_pnum != VRV_UNSET);
 }
 
 /* include <attpnum> */
 
 //----------------------------------------------------------------------------
-// AttScoreDefGes
+// AttOrnamentAccidGes
 //----------------------------------------------------------------------------
 
-AttScoreDefGes::AttScoreDefGes() : Att()
+AttOrnamentAccidGes::AttOrnamentAccidGes() : Att()
 {
-    ResetScoreDefGes();
+    ResetOrnamentAccidGes();
 }
 
-AttScoreDefGes::~AttScoreDefGes()
+AttOrnamentAccidGes::~AttOrnamentAccidGes() {}
+
+void AttOrnamentAccidGes::ResetOrnamentAccidGes()
 {
+    m_accidupperGes = ACCIDENTAL_GESTURAL_NONE;
+    m_accidlowerGes = ACCIDENTAL_GESTURAL_NONE;
 }
 
-void AttScoreDefGes::ResetScoreDefGes()
-{
-    m_tunePname = PITCHNAME_NONE;
-    m_tuneHz = 0.0;
-    m_tuneTemper = TEMPERAMENT_NONE;
-}
-
-bool AttScoreDefGes::ReadScoreDefGes(pugi::xml_node element)
+bool AttOrnamentAccidGes::ReadOrnamentAccidGes(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("tune.pname")) {
-        this->SetTunePname(StrToPitchname(element.attribute("tune.pname").value()));
-        element.remove_attribute("tune.pname");
+    if (element.attribute("accidupper.ges")) {
+        this->SetAccidupperGes(StrToAccidentalGestural(element.attribute("accidupper.ges").value()));
+        element.remove_attribute("accidupper.ges");
         hasAttribute = true;
     }
-    if (element.attribute("tune.Hz")) {
-        this->SetTuneHz(StrToDbl(element.attribute("tune.Hz").value()));
-        element.remove_attribute("tune.Hz");
-        hasAttribute = true;
-    }
-    if (element.attribute("tune.temper")) {
-        this->SetTuneTemper(StrToTemperament(element.attribute("tune.temper").value()));
-        element.remove_attribute("tune.temper");
+    if (element.attribute("accidlower.ges")) {
+        this->SetAccidlowerGes(StrToAccidentalGestural(element.attribute("accidlower.ges").value()));
+        element.remove_attribute("accidlower.ges");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttScoreDefGes::WriteScoreDefGes(pugi::xml_node element)
+bool AttOrnamentAccidGes::WriteOrnamentAccidGes(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasTunePname()) {
-        element.append_attribute("tune.pname") = PitchnameToStr(this->GetTunePname()).c_str();
+    if (this->HasAccidupperGes()) {
+        element.append_attribute("accidupper.ges") = AccidentalGesturalToStr(this->GetAccidupperGes()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasTuneHz()) {
-        element.append_attribute("tune.Hz") = DblToStr(this->GetTuneHz()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasTuneTemper()) {
-        element.append_attribute("tune.temper") = TemperamentToStr(this->GetTuneTemper()).c_str();
+    if (this->HasAccidlowerGes()) {
+        element.append_attribute("accidlower.ges") = AccidentalGesturalToStr(this->GetAccidlowerGes()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttScoreDefGes::HasTunePname() const
+bool AttOrnamentAccidGes::HasAccidupperGes() const
 {
-    return (m_tunePname != PITCHNAME_NONE);
+    return (m_accidupperGes != ACCIDENTAL_GESTURAL_NONE);
 }
 
-bool AttScoreDefGes::HasTuneHz() const
+bool AttOrnamentAccidGes::HasAccidlowerGes() const
 {
-    return (m_tuneHz != 0.0);
+    return (m_accidlowerGes != ACCIDENTAL_GESTURAL_NONE);
 }
 
-bool AttScoreDefGes::HasTuneTemper() const
-{
-    return (m_tuneTemper != TEMPERAMENT_NONE);
-}
-
-/* include <atttune.temper> */
+/* include <attaccidlower.ges> */
 
 //----------------------------------------------------------------------------
 // AttSectionGes
@@ -583,9 +552,7 @@ AttSectionGes::AttSectionGes() : Att()
     ResetSectionGes();
 }
 
-AttSectionGes::~AttSectionGes()
-{
-}
+AttSectionGes::~AttSectionGes() {}
 
 void AttSectionGes::ResetSectionGes()
 {
@@ -629,9 +596,7 @@ AttSoundLocation::AttSoundLocation() : Att()
     ResetSoundLocation();
 }
 
-AttSoundLocation::~AttSoundLocation()
-{
-}
+AttSoundLocation::~AttSoundLocation() {}
 
 void AttSoundLocation::ResetSoundLocation()
 {
@@ -690,9 +655,7 @@ AttTimestampGestural::AttTimestampGestural() : Att()
     ResetTimestampGestural();
 }
 
-AttTimestampGestural::~AttTimestampGestural()
-{
-}
+AttTimestampGestural::~AttTimestampGestural() {}
 
 void AttTimestampGestural::ResetTimestampGestural()
 {
@@ -751,9 +714,7 @@ AttTimestamp2Gestural::AttTimestamp2Gestural() : Att()
     ResetTimestamp2Gestural();
 }
 
-AttTimestamp2Gestural::~AttTimestamp2Gestural()
-{
-}
+AttTimestamp2Gestural::~AttTimestamp2Gestural() {}
 
 void AttTimestamp2Gestural::ResetTimestamp2Gestural()
 {
@@ -901,19 +862,15 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
             return true;
         }
     }
-    if (element->HasAttClass(ATT_SCOREDEFGES)) {
-        AttScoreDefGes *att = dynamic_cast<AttScoreDefGes *>(element);
+    if (element->HasAttClass(ATT_ORNAMENTACCIDGES)) {
+        AttOrnamentAccidGes *att = dynamic_cast<AttOrnamentAccidGes *>(element);
         assert(att);
-        if (attrType == "tune.pname") {
-            att->SetTunePname(att->StrToPitchname(attrValue));
+        if (attrType == "accidupper.ges") {
+            att->SetAccidupperGes(att->StrToAccidentalGestural(attrValue));
             return true;
         }
-        if (attrType == "tune.Hz") {
-            att->SetTuneHz(att->StrToDbl(attrValue));
-            return true;
-        }
-        if (attrType == "tune.temper") {
-            att->SetTuneTemper(att->StrToTemperament(attrValue));
+        if (attrType == "accidlower.ges") {
+            att->SetAccidlowerGes(att->StrToAccidentalGestural(attrValue));
             return true;
         }
     }
@@ -1046,17 +1003,14 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "pnum", att->IntToStr(att->GetPnum()) });
         }
     }
-    if (element->HasAttClass(ATT_SCOREDEFGES)) {
-        const AttScoreDefGes *att = dynamic_cast<const AttScoreDefGes *>(element);
+    if (element->HasAttClass(ATT_ORNAMENTACCIDGES)) {
+        const AttOrnamentAccidGes *att = dynamic_cast<const AttOrnamentAccidGes *>(element);
         assert(att);
-        if (att->HasTunePname()) {
-            attributes->push_back({ "tune.pname", att->PitchnameToStr(att->GetTunePname()) });
+        if (att->HasAccidupperGes()) {
+            attributes->push_back({ "accidupper.ges", att->AccidentalGesturalToStr(att->GetAccidupperGes()) });
         }
-        if (att->HasTuneHz()) {
-            attributes->push_back({ "tune.Hz", att->DblToStr(att->GetTuneHz()) });
-        }
-        if (att->HasTuneTemper()) {
-            attributes->push_back({ "tune.temper", att->TemperamentToStr(att->GetTuneTemper()) });
+        if (att->HasAccidlowerGes()) {
+            attributes->push_back({ "accidlower.ges", att->AccidentalGesturalToStr(att->GetAccidlowerGes()) });
         }
     }
     if (element->HasAttClass(ATT_SECTIONGES)) {
@@ -1098,4 +1052,4 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

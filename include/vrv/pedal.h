@@ -72,12 +72,12 @@ public:
     /**
      * Get the SMuFL glyph for the pedal based on function or glyph.num
      */
-    wchar_t GetPedalGlyph() const;
+    char32_t GetPedalGlyph() const;
 
     /**
      * Get the pedal form based on the options and corresponding attributes from <pedal> and <scoreDef>
      */
-    pedalVis_FORM GetPedalForm(const Doc *doc, const System *system) const;
+    data_PEDALSTYLE GetPedalForm(const Doc *doc, const System *system) const;
 
     //----------//
     // Functors //

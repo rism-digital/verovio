@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <codecvt>
 #include <locale>
 #include <regex>
@@ -113,13 +113,6 @@ Toolkit::~Toolkit()
         m_runtimeClock = NULL;
     }
 #endif
-}
-
-std::string Toolkit::GetUuid()
-{
-    LogWarning("Toolkit function GetUuid() is deprecated; use GetID() instead.");
-
-    return this->GetID();
 }
 
 std::string Toolkit::GetResourcePath() const
@@ -363,23 +356,24 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     fin.seekg(0, std::ios::end);
     std::streamsize wfileSize = (std::streamsize)fin.tellg();
     fin.clear();
+    // Skip the BOM
     fin.seekg(0, std::wios::beg);
 
     std::u16string u16data((wfileSize / 2) + 1, '\0');
     fin.read((char *)&u16data[0], wfileSize);
 
-    // std::vector<char16_t> ;
-    // utf16line.reserve(wfileSize / 2 + 1);
+    // order of the bytes has to be flipped
+    if (u16data.at(0) == u'\uFFFE') {
+        LogWarning("The file seems to have been loaded as little endian - trying to convert to big endian");
+        // convert to big endian (swap bytes)
+        std::transform(std::begin(u16data), std::end(u16data), std::begin(u16data), [](char16_t c) {
+            auto p = reinterpret_cast<char *>(&c);
+            std::swap(p[0], p[1]);
+            return c;
+        });
+    }
 
-    // unsigned short buffer;
-    // while (fin.read((char *)&buffer, sizeof(char16_t))) {
-    //     utf16line.push_back(buffer);
-    // }
-
-    // std::u16string u16_str; //( reinterpret_cast<const char16_t*>(data2) );
-    //  LogDebug("%d %d", wfileSize, utf8line.size());
-
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+    std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
     std::string utf8line = convert.to_bytes(u16data);
 
     return this->LoadData(utf8line);
@@ -976,6 +970,14 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         }
     }
 
+    // Other base options
+    int scaleValue = (defaultValues) ? m_options->m_scale.GetDefault() : m_options->m_scale.GetUnfactoredValue();
+    o << "scale" << scaleValue;
+
+    int xmlIdSeedValue
+        = (defaultValues) ? m_options->m_xmlIdSeed.GetDefault() : m_options->m_xmlIdSeed.GetUnfactoredValue();
+    o << "xmlIdSeed" << xmlIdSeedValue;
+
     return o.json();
 }
 
@@ -1049,19 +1051,6 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     Object::SeedID(m_options->m_xmlIdSeed.GetValue());
                 }
             }
-            // Deprecated option
-            /*
-            else if (iter->first == "tieThickness") {
-                vrv::LogWarning("Option tieThickness is deprecated; use tieMidpointThickness instead");
-                Option *opt = NULL;
-                if (json.has<jsonxx::Number>("tieThickness")) {
-                    double thickness = json.get<jsonxx::Number>("tieThickness");
-                    opt = m_options->GetItems()->at("tieMidpointThickness");
-                    assert(opt);
-                    opt->SetValueDbl(thickness);
-                }
-            }
-            */
             else {
                 LogError("Unsupported option '%s'", iter->first.c_str());
             }
@@ -1109,9 +1098,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     m_options->Sync();
 
-    // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
-    // This needs to be fixed
-    this->SetFont(m_options->m_font.GetValue());
+    // Forcing font resource to be reset if the font is given in the options
+    if (json.has<jsonxx::String>("font")) this->SetFont(m_options->m_font.GetValue());
 
     return true;
 }
@@ -1135,7 +1123,10 @@ bool Toolkit::SetOption(const std::string &option, const std::string &value)
     }
     Option *opt = m_options->GetItems()->at(option);
     assert(opt);
-    return opt->SetValue(value);
+    const bool result = opt->SetValue(value);
+    // If the option is 'font' we need to reset the font resource explicitly
+    if (result && option == "font") this->SetFont(m_options->m_font.GetValue());
+    return result;
 }
 
 void Toolkit::ResetOptions()
@@ -1360,16 +1351,20 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 
     // set dimensions
     if (m_options->m_landscape.GetValue()) {
-        deviceContext->SetWidth(height);
-        deviceContext->SetHeight(width);
-    }
-    else {
-        deviceContext->SetWidth(width);
-        deviceContext->SetHeight(height);
+        std::swap(height, width);
     }
 
     double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
+    assert(userScale != 0.0);
+
+    if (m_options->m_scaleToPageSize.GetValue()) {
+        height *= (1.0 / userScale);
+        width *= (1.0 / userScale);
+    }
+
     deviceContext->SetUserScale(userScale, userScale);
+    deviceContext->SetWidth(width);
+    deviceContext->SetHeight(height);
 
     if (m_doc.GetType() == Facs) {
         deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
@@ -1380,6 +1375,14 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     m_view.DrawCurrentPage(deviceContext, false);
 
     return true;
+}
+
+std::string Toolkit::RenderData(const std::string &data, const std::string &jsonOptions)
+{
+    if (this->SetOptions(jsonOptions) && this->LoadData(data)) return this->RenderToSVG(1);
+
+    // Otherwise just return an empty string.
+    return "";
 }
 
 std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)

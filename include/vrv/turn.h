@@ -57,7 +57,7 @@ public:
     /**
      * Get the SMuFL glyph for the turn based on form or glyph.num
      */
-    wchar_t GetTurnGlyph() const;
+    char32_t GetTurnGlyph() const;
 
     /**
      * Get the turn height ignoring slash

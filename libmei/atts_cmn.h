@@ -252,8 +252,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBeamWith(data_OTHERSTAFF beamWith_) { m_beamWith = beamWith_; }
-    data_OTHERSTAFF GetBeamWith() const { return m_beamWith; }
+    void SetBeamWith(data_NEIGHBORINGLAYER beamWith_) { m_beamWith = beamWith_; }
+    data_NEIGHBORINGLAYER GetBeamWith() const { return m_beamWith; }
     bool HasBeamWith() const;
     ///@}
 
@@ -263,7 +263,7 @@ private:
      * which staff the beam is connected to; that is, the staff above or the staff
      * below.
      **/
-    data_OTHERSTAFF m_beamWith;
+    data_NEIGHBORINGLAYER m_beamWith;
 
     /* include <attbeam.with> */
 };
@@ -536,7 +536,8 @@ public:
 private:
     /**
      * Indicates that this element participates in a glissando.
-     * If visual information about the glissando needs to be recorded, then a
+     * If visual information about the glissando needs to be recorded, then a gliss
+     * element should be employed instead.
      **/
     data_GLISSANDO m_gliss;
 
@@ -728,19 +729,19 @@ public:
     ///@}
 
 private:
-    /** Indicates the pedal setting for the harp's C strings. **/
+    /** Indicates the pedal setting for the harp’s C strings. **/
     harpPedalLog_C m_c;
-    /** Indicates the pedal setting for the harp's D strings. **/
+    /** Indicates the pedal setting for the harp’s D strings. **/
     harpPedalLog_D m_d;
-    /** Indicates the pedal setting for the harp's E strings. **/
+    /** Indicates the pedal setting for the harp’s E strings. **/
     harpPedalLog_E m_e;
-    /** Indicates the pedal setting for the harp's F strings. **/
+    /** Indicates the pedal setting for the harp’s F strings. **/
     harpPedalLog_F m_f;
-    /** Indicates the pedal setting for the harp's G strings. **/
+    /** Indicates the pedal setting for the harp’s G strings. **/
     harpPedalLog_G m_g;
-    /** Indicates the pedal setting for the harp's A strings. **/
+    /** Indicates the pedal setting for the harp’s A strings. **/
     harpPedalLog_A m_a;
-    /** Indicates the pedal setting for the harp's B strings. **/
+    /** Indicates the pedal setting for the harp’s B strings. **/
     harpPedalLog_B m_b;
 
     /* include <attb> */
@@ -977,7 +978,10 @@ public:
 private:
     /**
      * Indicates whether the octave displacement should be performed simultaneously
-     * with the written notes,
+     * with the written notes, i.e., "coll' ottava".
+     * Unlike other octave signs which are indicated by broken lines, coll' ottava
+     * typically uses an unbroken line or a series of longer broken lines, ending with
+     * a short vertical stroke. See Read, p. 47-48.
      **/
     octaveLog_COLL m_coll;
 
@@ -1050,14 +1054,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPedalStyle(pianoPedals_PEDALSTYLE pedalStyle_) { m_pedalStyle = pedalStyle_; }
-    pianoPedals_PEDALSTYLE GetPedalStyle() const { return m_pedalStyle; }
+    void SetPedalStyle(data_PEDALSTYLE pedalStyle_) { m_pedalStyle = pedalStyle_; }
+    data_PEDALSTYLE GetPedalStyle() const { return m_pedalStyle; }
     bool HasPedalStyle() const;
     ///@}
 
 private:
     /** Determines whether piano pedal marks should be rendered as lines or as terms. **/
-    pianoPedals_PEDALSTYLE m_pedalStyle;
+    data_PEDALSTYLE m_pedalStyle;
 
     /* include <attpedal.style> */
 };
@@ -1202,8 +1206,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStemWith(data_OTHERSTAFF stemWith_) { m_stemWith = stemWith_; }
-    data_OTHERSTAFF GetStemWith() const { return m_stemWith; }
+    void SetStemWith(data_NEIGHBORINGLAYER stemWith_) { m_stemWith = stemWith_; }
+    data_NEIGHBORINGLAYER GetStemWith() const { return m_stemWith; }
     bool HasStemWith() const;
     ///@}
 
@@ -1213,7 +1217,7 @@ private:
      * the current staff should be visually placed on; that is, the one above or the
      * one below.
      **/
-    data_OTHERSTAFF m_stemWith;
+    data_NEIGHBORINGLAYER m_stemWith;
 
     /* include <attstem.with> */
 };
@@ -1298,6 +1302,6 @@ private:
     /* include <attunitdur> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_CMN_H__

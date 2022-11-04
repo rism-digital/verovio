@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     assert(nc);
 
     struct drawingParams {
-        wchar_t fontNo = SMUFL_E990_chantPunctum;
+        char32_t fontNo = SMUFL_E990_chantPunctum;
         float xOffset = 0;
         float yOffset = 0;
     };

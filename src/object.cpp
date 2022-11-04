@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <climits>
 #include <iostream>
 #include <math.h>
@@ -545,7 +545,7 @@ Object *Object::DetachChild(int idx)
     return child;
 }
 
-bool Object::HasDescendant(Object *child, int deepness) const
+bool Object::HasDescendant(const Object *child, int deepness) const
 {
     ArrayOfObjects::const_iterator iter;
 
@@ -1472,10 +1472,10 @@ Object *ObjectListInterface::GetListNext(const Object *listElement)
 // TextListInterface
 //----------------------------------------------------------------------------
 
-std::wstring TextListInterface::GetText(const Object *node) const
+std::u32string TextListInterface::GetText(const Object *node) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
-    std::wstring concatText;
+    std::u32string concatText;
     const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
     for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
         if ((*it)->Is(LB)) {
@@ -1488,10 +1488,10 @@ std::wstring TextListInterface::GetText(const Object *node) const
     return concatText;
 }
 
-void TextListInterface::GetTextLines(const Object *node, std::vector<std::wstring> &lines) const
+void TextListInterface::GetTextLines(const Object *node, std::vector<std::u32string> &lines) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
-    std::wstring concatText;
+    std::u32string concatText;
     const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
     for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
         if ((*it)->Is(LB) && !concatText.empty()) {
@@ -1907,6 +1907,12 @@ int Object::PrepareLinking(FunctorParams *functorParams)
     if (r2.first != params->m_sameasIDPairs.end()) {
         for (auto j = r2.first; j != r2.second; ++j) {
             j->second->SetSameasLink(this);
+            // Issue a warning if classes of object and sameas do not match
+            Object *owner = dynamic_cast<Object *>(j->second);
+            if (owner && (owner->GetClassId() != this->GetClassId())) {
+                LogWarning("%s with @xml:id %s has @sameas to an element of class %s.", owner->GetClassName().c_str(),
+                    owner->GetID().c_str(), this->GetClassName().c_str());
+            }
         }
         params->m_sameasIDPairs.erase(r2.first, r2.second);
     }
@@ -2224,7 +2230,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
+int Object::GetAlignmentLeftRight(FunctorParams *functorParams) const
 {
     GetAlignmentLeftRightParams *params = vrv_params_cast<GetAlignmentLeftRightParams *>(functorParams);
     assert(params);

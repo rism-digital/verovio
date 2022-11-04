@@ -864,18 +864,18 @@ protected:
     static std::string getDateString();
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
-    static bool replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr);
-    std::wstring cleanHarmString(const std::string &content);
-    std::wstring cleanHarmString2(const std::string &content);
-    std::wstring cleanHarmString3(const std::string &content);
-    std::wstring cleanStringString(const std::string &content);
-    std::vector<std::wstring> cleanFBString(std::vector<std::string> &pieces, hum::HTp token);
-    std::wstring cleanFBString2(std::vector<std::string> &pieces, hum::HTp token);
+    static bool replace(std::u32string &str, const std::u32string &oldStr, const std::u32string &newStr);
+    std::u32string cleanHarmString(const std::string &content);
+    std::u32string cleanHarmString2(const std::string &content);
+    std::u32string cleanHarmString3(const std::string &content);
+    std::u32string cleanStringString(const std::string &content);
+    std::vector<std::u32string> cleanFBString(std::vector<std::string> &pieces, hum::HTp token);
+    std::u32string cleanFBString2(std::vector<std::string> &pieces, hum::HTp token);
     std::vector<std::string> splitFBString(const std::string &content, const std::string &separator = " ");
-    std::wstring getVisualFBAccidental(int accidental);
-    std::wstring convertFBNumber(const std::string &input, hum::HTp token);
+    std::u32string getVisualFBAccidental(int accidental);
+    std::u32string convertFBNumber(const std::string &input, hum::HTp token);
     void checkForLineContinuations(hum::HTp token);
-    std::wstring convertNumberToWstring(int number);
+    std::u32string convertNumberToWstring(int number);
 
 private:
     // m_filename == Filename to read/was read.

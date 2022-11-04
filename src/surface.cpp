@@ -9,13 +9,13 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
 #include "facsimile.h"
-#include "object.h"
+#include "graphic.h"
 #include "vrv.h"
 #include "zone.h"
 
@@ -44,8 +44,10 @@ void Surface::Reset()
 
 bool Surface::IsSupportedChild(Object *object)
 {
-    // TODO Add support for graphic tag
-    if (object->Is(ZONE)) {
+    if (object->Is(GRAPHIC)) {
+        assert(dynamic_cast<Graphic *>(object));
+    }
+    else if (object->Is(ZONE)) {
         assert(dynamic_cast<Zone *>(object));
     }
     else {

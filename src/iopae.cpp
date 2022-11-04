@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <cctype>
 #include <fstream>
 #include <regex>
@@ -424,6 +424,13 @@ void PAEOutput::WriteNote(Note *note)
 
     std::string oct;
 
+    if (note->GetOct() != m_currentOct) {
+        m_currentOct = note->GetOct();
+        char octSign = (m_currentOct > 3) ? '\'' : ',';
+        int signCount = (m_currentOct > 3) ? (m_currentOct - 3) : (4 - m_currentOct);
+        m_streamStringOutput << std::string(signCount, octSign);
+    }
+
     // For chords, only output the top note
     Chord *chord = note->IsChordTone();
     if (chord) {
@@ -432,13 +439,6 @@ void PAEOutput::WriteNote(Note *note)
     else {
         this->WriteDur(note);
         this->WriteGrace(note);
-    }
-
-    if (note->GetOct() != m_currentOct) {
-        m_currentOct = note->GetOct();
-        char octSign = (m_currentOct > 3) ? '\'' : ',';
-        int signCount = (m_currentOct > 3) ? (m_currentOct - 3) : (4 - m_currentOct);
-        m_streamStringOutput << std::string(signCount, octSign);
     }
 
     Accid *noteAccid = dynamic_cast<Accid *>(note->FindDescendantByType(ACCID));
@@ -539,9 +539,10 @@ void PAEOutput::WriteDur(DurationInterface *interface)
 {
     assert(interface);
 
-    if ((interface->GetDur() != m_currentDur) || (interface->GetDots() != m_currentDots)) {
+    const int ndots = (interface->HasDots()) ? interface->GetDots() : 0;
+    if ((interface->GetDur() != m_currentDur) || (ndots != m_currentDots)) {
         m_currentDur = interface->GetDur();
-        m_currentDots = (interface->HasDots()) ? interface->GetDots() : 0;
+        m_currentDots = ndots;
         std::string dur;
         switch (m_currentDur) {
             case (DURATION_long): dur = "0"; break;
@@ -639,6 +640,13 @@ PAEInput::PAEInput(Doc *doc)
 }
 
 PAEInput::~PAEInput() {}
+
+jsonxx::Object PAEInput::GetValidationLog()
+{
+    jsonxx::Object log;
+    log << "Using old PAE parser";
+    return log;
+}
 
 #ifndef NO_PAE_SUPPORT
 
@@ -3925,6 +3933,10 @@ bool PAEInput::ConvertGrace()
             if (this->Was(token, pae::ACCIDENTAL_INTERNAL)) {
                 continue;
             }
+            // Having an octave is fine
+            if (this->Was(token, pae::OCTAVE)) {
+                continue;
+            }
             // Having a duration is fine for appogiatura
             if (this->Is(token, pae::DURATION)) {
                 // For acciaccature, not in pedantic mode
@@ -4162,17 +4174,17 @@ bool PAEInput::ConvertTie()
                 if (note->GetOct() != tokenNote->GetOct() || note->GetPname() != tokenNote->GetPname()) {
                     if (m_isMensural && tieToken) {
                         // This is probably a ligature - reset it back
-                        delete tie;
-                        tie = NULL;
-                        tieToken->m_object = NULL;
                         tieToken->m_char = '+';
-                        tieToken = NULL;
-                        note = NULL;
                     }
                     else {
                         LogPAE(ERR_037_TIE_PITCH, token);
                         if (m_pedanticMode) return false;
                     }
+                    delete tie;
+                    tie = NULL;
+                    tieToken->m_object = NULL;
+                    tieToken = NULL;
+                    note = NULL;
                 }
                 else {
                     tie->SetEndid("#" + tokenNote->GetID());

@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <functional>
 #include <iostream>
 #include <numeric>
@@ -735,8 +735,8 @@ int Chord::CalcStem(FunctorParams *functorParams)
     data_STEMDIRECTION layerStemDir;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
-    if (stem->HasStemDir()) {
-        stemDir = stem->GetStemDir();
+    if (stem->HasDir()) {
+        stemDir = stem->GetDir();
     }
     else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
         stemDir = layerStemDir;
@@ -770,7 +770,7 @@ int Chord::CalcChordNoteHeads(FunctorParams *functorParams)
         }
         else {
             const Note *bottomNote = this->GetBottomNote();
-            const wchar_t code = bottomNote->GetNoteheadGlyph(this->GetActualDur());
+            const char32_t code = bottomNote->GetNoteheadGlyph(this->GetActualDur());
             params->m_diameter = params->m_doc->GetGlyphWidth(
                 code, staff->m_drawingStaffSize, this->GetDrawingCueSize() ? bottomNote->GetDrawingCueSize() : false);
         }
@@ -851,11 +851,12 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     if (!currentStem) {
         currentStem = new Stem();
+        currentStem->IsAttribute(true);
         this->AddChild(currentStem);
     }
     currentStem->AttGraced::operator=(*this);
-    currentStem->AttStems::operator=(*this);
-    currentStem->AttStemsCmn::operator=(*this);
+    currentStem->FillAttributes(*this);
+
     int duration = this->GetNoteOrChordDur(this);
     if ((duration < DUR_2) || (this->GetStemVisible() == BOOLEAN_false)) {
         currentStem->IsVirtual(true);

@@ -8,7 +8,7 @@
 #ifndef __VRV_FACSIMILE_H__
 #define __VRV_FACSIMILE_H__
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ namespace vrv {
  * in MEI
  */
 
-class Facsimile : public Object {
+class Facsimile : public Object, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -43,9 +43,10 @@ public:
     ///@}
     bool IsSupportedChild(Object *object) override;
 
-    Zone *FindZoneByID(std::string zoneId);
-    int GetMaxY();
-    int GetMaxX();
+    Zone *FindZoneByID(const std::string &zoneId);
+    const Zone *FindZoneByID(const std::string &zoneId) const;
+    int GetMaxX() const;
+    int GetMaxY() const;
 };
 
 } // namespace vrv

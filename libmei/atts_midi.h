@@ -69,7 +69,7 @@ public:
 private:
     /** Records a MIDI channel value. **/
     data_MIDICHANNEL m_midiChannel;
-    /** Specifies the 'on' part of the duty cycle as a percentage of a note's duration. **/
+    /** Specifies the 'on' part of the duty cycle as a percentage of a note’s duration. **/
     data_PERCENT_LIMITED m_midiDuty;
     /** Sets the MIDI port value. **/
     data_MIDIVALUE_NAME m_midiPort;
@@ -111,7 +111,7 @@ public:
 private:
     /**
      * Provides a way of pointing to a MIDI instrument definition.
-     * It must contain the ID of an
+     * It must contain the ID of an instrDef element elsewhere in the document.
      **/
     std::string m_instr;
 
@@ -177,7 +177,7 @@ private:
     /** Provides a General MIDI label for the MIDI instrument. **/
     data_MIDINAMES m_midiInstrname;
     /**
-     * Sets the instrument's position in a stereo field.
+     * Sets the instrument’s position in a stereo field.
      * MIDI values of 0 and 1 both pan left, 127 or 128 pans right, and 63 or 64 pans
      * to the center. Positve percentage values pan to the right, negative ones to the
      * left. 0% is centered.
@@ -187,7 +187,7 @@ private:
     std::string m_midiPatchname;
     /** Records a non-General MIDI patch/instrument number. **/
     data_MIDIVALUE m_midiPatchnum;
-    /** Sets the instrument's volume. **/
+    /** Sets the instrument’s volume. **/
     data_PERCENT m_midiVolume;
 
     /* include <attmidi.volume> */
@@ -217,14 +217,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNum(int num_) { m_num = num_; }
-    int GetNum() const { return m_num; }
+    void SetNum(data_MIDIVALUE num_) { m_num = num_; }
+    data_MIDIVALUE GetNum() const { return m_num; }
     bool HasNum() const;
     ///@}
 
 private:
     /** Records a number or count accompanying a notational feature. **/
-    int m_num;
+    data_MIDIVALUE m_num;
 
     /* include <attnum> */
 };
@@ -428,6 +428,6 @@ private:
     /* include <attppq> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_MIDI_H__
