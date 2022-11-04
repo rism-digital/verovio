@@ -4377,7 +4377,7 @@ bool PAEInput::ConvertAccidGes()
                 // Natural in front of the note, remove it from the current list
                 if (noteAccid == ACCIDENTAL_WRITTEN_n) {
                     if (currentAccids.count(octavedPitch) != 0) {
-                        currentAccids.erase(octavedPitch);
+                        currentAccids[octavedPitch] = ACCIDENTAL_WRITTEN_n;
                     }
                 }
                 // Not a natural in front of the note, add it to the current list
