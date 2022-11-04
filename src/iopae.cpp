@@ -4334,9 +4334,9 @@ bool PAEInput::ConvertLigature()
 
 bool PAEInput::ConvertAccidGes()
 {
-    MapOfPitchAccid currentAccids;
+    MapOfOctavedPitchAccid currentAccids;
     m_keySig.FillMap(currentAccids);
-    MapOfPitchAccid currentKeySigAccids = currentAccids;
+    MapOfOctavedPitchAccid currentKeySigAccids = currentAccids;
     Note *lastNote = NULL;
     std::map<std::string, data_ACCIDENTAL_WRITTEN> ties;
 

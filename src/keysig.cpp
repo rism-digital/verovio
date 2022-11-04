@@ -188,7 +188,7 @@ void KeySig::GenerateKeyAccidAttribChildren()
     }
 }
 
-void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
+void KeySig::FillMap(MapOfOctavedPitchAccid &mapOfPitchAccid) const
 {
     mapOfPitchAccid.clear();
 
