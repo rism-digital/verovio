@@ -370,7 +370,7 @@ typedef std::map<const Staff *, std::set<int>> MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;
 
-typedef std::map<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> MapOfPitchAccid;
+typedef std::map<int, data_ACCIDENTAL_WRITTEN> MapOfPitchAccid;
 
 typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 

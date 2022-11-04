@@ -4336,6 +4336,7 @@ bool PAEInput::ConvertAccidGes()
 {
     MapOfPitchAccid currentAccids;
     m_keySig.FillMap(currentAccids);
+    MapOfPitchAccid currentKeySigAccids = currentAccids;
     Note *lastNote = NULL;
     std::map<std::string, data_ACCIDENTAL_WRITTEN> ties;
 
@@ -4346,15 +4347,17 @@ bool PAEInput::ConvertAccidGes()
             KeySig *keySig = vrv_cast<KeySig *>(token.m_object);
             assert(keySig);
             keySig->FillMap(currentAccids);
+            currentKeySigAccids = currentAccids;
         }
         else if (token.Is(NOTE)) {
             Note *note = vrv_cast<Note *>(token.m_object);
             assert(note);
             Accid *accid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
+            int octavedPitch = note->GetPname() + note->GetOct() * 7;
 
             std::string noteID = note->GetID();
             if (!accid) {
-                // Enc tied note with a prevous note with an accidental
+                // Tied note with a previous note with an accidental
                 if (ties.count(noteID)) {
                     Accid *tieAccid = new Accid();
                     note->AddChild(tieAccid);
@@ -4362,10 +4365,10 @@ bool PAEInput::ConvertAccidGes()
                     ties.erase(noteID);
                 }
                 // Nothing in front of the note, but something in the list - make it an accid.ges
-                else if ((currentAccids.count(note->GetPname()) != 0)) {
+                else if ((currentAccids.count(octavedPitch) != 0)) {
                     Accid *gesAccid = new Accid();
                     note->AddChild(gesAccid);
-                    data_ACCIDENTAL_WRITTEN accidWritten = currentAccids.at(note->GetPname());
+                    data_ACCIDENTAL_WRITTEN accidWritten = currentAccids.at(octavedPitch);
                     gesAccid->SetAccidGes(Att::AccidentalWrittenToGestural(accidWritten));
                 }
             }
@@ -4373,13 +4376,13 @@ bool PAEInput::ConvertAccidGes()
                 data_ACCIDENTAL_WRITTEN noteAccid = accid->GetAccid();
                 // Natural in front of the note, remove it from the current list
                 if (noteAccid == ACCIDENTAL_WRITTEN_n) {
-                    if (currentAccids.count(note->GetPname()) != 0) {
-                        currentAccids.erase(note->GetPname());
+                    if (currentAccids.count(octavedPitch) != 0) {
+                        currentAccids.erase(octavedPitch);
                     }
                 }
                 // Not a natural in front of the note, add it to the current list
                 else if (noteAccid != ACCIDENTAL_WRITTEN_NONE) {
-                    currentAccids[note->GetPname()] = noteAccid;
+                    currentAccids[octavedPitch] = noteAccid;
                 }
             }
             lastNote = note;
@@ -4399,6 +4402,9 @@ bool PAEInput::ConvertAccidGes()
         // Reset the last note unless we have a fermata or a trill
         else if (!token.Is(FERMATA) && !token.Is(TRILL)) {
             lastNote = NULL;
+            if (token.Is(MEASURE)) {
+                currentAccids = currentKeySigAccids;
+            }
         }
     }
 
