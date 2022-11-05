@@ -780,7 +780,6 @@ bool Toolkit::LoadData(const std::string &data)
             // LogElapsedTimeEnd("cast-off");
         }
     }
-    LogMessage(this->GetDescriptiveFeatures("").c_str());
 
     delete input;
     m_view.SetDoc(&m_doc);
