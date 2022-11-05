@@ -3742,7 +3742,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     back = music.child("back");
     if (!back.empty()) {
         m_doc->m_back.reset();
-        // copy the complete front into the master document
+        // copy the complete back into the master document
         m_doc->m_back.append_copy(back);
     }
 
