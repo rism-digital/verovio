@@ -1138,8 +1138,8 @@ int Measure::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
     params->m_previousMeasure = this;
 
     // Adjust the postion of the alignment according to what we have collected for this harm gpr
-    m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
-    params->m_overlapingHarm.clear();
+    m_measureAligner.AdjustProportionally(params->m_overlappingHarm);
+    params->m_overlappingHarm.clear();
 
     return FUNCTOR_CONTINUE;
 }

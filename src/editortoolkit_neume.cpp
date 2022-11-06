@@ -376,7 +376,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // them, and then using std::set_difference to find the elements whose pitch values may need to change.
         // For example: in case 2 noLongerWithThisClef is found by taking the difference between
         // withOldPrecedingClefAfter and withPrecedingClefBefore, since that difference is the stuff that
-        // became associated with the clef that used to preceed this clef, meaning the stuff that was associated
+        // became associated with the clef that used to precede this clef, meaning the stuff that was associated
         // with clef, but no longer is.
         //
         // One other aspect that might seem confusing is exactly when clef->SetLine() gets called. The reason
@@ -2746,7 +2746,7 @@ bool EditorToolkitNeume::ParseChangeStaffAction(jsonxx::Object param, std::strin
 
 bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 {
-    // remember to reorderbyxpos! (not called in function so that it can be used in loops)
+    // remember to ReorderByXPos! (not called in function so that it can be used in loops)
     // clef re-association is done at the syllable level (not neume or nc)
     // so this function should only be called on custos or syllables
     // it should also only be called in cases where finding the old clef is not required

@@ -76,7 +76,7 @@ public:
     ///@}
 
     /**
-     * Helper to adjust overlaping layers for stems
+     * Helper to adjust overlapping layers for stems
      */
     int CompareToElementPosition(const Doc *doc, const LayerElement *otherElement, int margin) const;
 

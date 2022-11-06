@@ -664,7 +664,7 @@ int System::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
 
     // reset it, but not the current grpId!
     params->m_currentSystem = this;
-    params->m_overlapingHarm.clear();
+    params->m_overlappingHarm.clear();
     params->m_previousHarmPositioner = NULL;
     params->m_previousHarmStart = NULL;
     params->m_previousMeasure = NULL;
@@ -704,15 +704,15 @@ int System::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
                 - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
 
             if (overlap > 0) {
-                params->m_overlapingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
+                params->m_overlappingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
                     params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
             }
         }
     }
 
     // Ajust the postion of the alignment according to what we have collected for this harm group id
-    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
-    params->m_overlapingHarm.clear();
+    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlappingHarm);
+    params->m_overlappingHarm.clear();
 
     return FUNCTOR_CONTINUE;
 }
