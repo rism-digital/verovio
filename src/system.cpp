@@ -723,7 +723,7 @@ int System::AdjustSylSpacing(FunctorParams *functorParams)
     assert(params);
 
     // reset it
-    params->m_overlapingSyl.clear();
+    params->m_overlappingSyl.clear();
     params->m_previousVerse = NULL;
     params->m_previousMeasure = NULL;
     params->m_freeSpace = 0;
@@ -748,14 +748,14 @@ int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
         params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
 
         if (overlap > 0) {
-            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousVerse->GetAlignment(),
+            params->m_overlappingSyl.push_back(std::make_tuple(params->m_previousVerse->GetAlignment(),
                 params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
         }
     }
 
     // Ajust the postion of the alignment according to what we have collected for this harm grp
-    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
-    params->m_overlapingSyl.clear();
+    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlappingSyl);
+    params->m_overlappingSyl.clear();
 
     return FUNCTOR_CONTINUE;
 }
