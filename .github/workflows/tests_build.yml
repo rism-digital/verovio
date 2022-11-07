@@ -142,7 +142,7 @@ jobs:
           body="$link\n$(cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md)"
           body="${body//'%'/'%25'}"
           body="${body//$'\n'/'\r\n'}"
-          echo ::set-output name=body::$body
+          echo "{body}={$body}" >> $GITHUB_OUTPUT
 
       - name: Add comment with link
         if: steps.check_files.outputs.files_exists == 'true' && steps.check_permission.outputs.has-permission
