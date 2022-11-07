@@ -122,7 +122,7 @@ jobs:
 
       - name: Check user permission to add a comment
         id: check_permission
-        uses: scherermichael-oss/action-has-permission@master
+        uses: scherermichael-oss/action-has-permission@v1
         with:
           required-permission: write
         env:
