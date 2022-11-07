@@ -33,6 +33,8 @@ jobs:
   build_python:
     name: Build the test suite
     runs-on: ubuntu-22.04
+    permission:
+      pull-requests: write
 
     steps:
       - uses: FranzDiebold/github-env-vars-action@v2.7.0
@@ -120,23 +122,9 @@ jobs:
         with:
           files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md"
 
-      - name: Check user permission to add a comment
-        id: check_permission
-        uses: scherermichael-oss/action-has-permission@1.0.6
-        with:
-          required-permission: write
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run only if user has NOT sufficient permissions
-        if: steps.check_files.outputs.files_exists == 'true' && !steps.check_permission.outputs.has-permission
-        run: |
-          echo "Sorry! Your permissions are insufficient to list the results as a comment."
-          cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
-
       - name: Generate comment content
         id: get-comment-body
-        if: steps.check_files.outputs.files_exists == 'true' && steps.check_permission.outputs.has-permission
+        if: steps.check_files.outputs.files_exists == 'true'
         run: |
           link="Results for the run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
           body="$link\n$(cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md)"
@@ -145,7 +133,7 @@ jobs:
           echo "{body}={$body}" >> $GITHUB_OUTPUT
 
       - name: Add comment with link
-        if: steps.check_files.outputs.files_exists == 'true' && steps.check_permission.outputs.has-permission
+        if: steps.check_files.outputs.files_exists == 'true'
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
