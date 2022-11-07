@@ -33,7 +33,7 @@ jobs:
   build_python:
     name: Build the test suite
     runs-on: ubuntu-22.04
-    permission:
+    permissions:
       pull-requests: write
 
     steps:
