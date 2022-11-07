@@ -44,8 +44,8 @@ public:
     /** Check if the object has a facsimile */
     bool HasFacsimile() const { return this->HasFacs(); }
 
-    /** Set the zone */
-    void SetZone(Zone *zone);
+    /** Link to the zone */
+    void AttachZone(Zone *zone);
 
     int GetSurfaceY() const;
 

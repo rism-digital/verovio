@@ -426,7 +426,7 @@ public:
     }
     std::vector<int> m_grpIds;
     int m_currentGrp;
-    ArrayOfAdjustmentTuples m_overlapingHarm;
+    ArrayOfAdjustmentTuples m_overlappingHarm;
     FloatingPositioner *m_previousHarmPositioner;
     LayerElement *m_previousHarmStart;
     Measure *m_previousMeasure;
@@ -548,7 +548,7 @@ public:
         m_staffSize = 100;
         m_doc = doc;
     }
-    ArrayOfAdjustmentTuples m_overlapingSyl;
+    ArrayOfAdjustmentTuples m_overlappingSyl;
     Verse *m_previousVerse;
     Syl *m_lastSyl;
     Measure *m_previousMeasure;

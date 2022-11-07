@@ -611,7 +611,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
 
     m_numAlignedBeam = m_bracketAlignedBeam;
 
-    // Cancel alignment of the bracket with the beam if position and stemdirection are not concordant
+    // Cancel alignment of the bracket with the beam if position and stem direction are not concordant
     if (m_bracketAlignedBeam && (m_bracketAlignedBeam->m_drawingPlace == BEAMPLACE_above)
         && (m_drawingBracketPos == STAFFREL_basic_below)) {
         m_bracketAlignedBeam = NULL;
@@ -622,7 +622,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
         m_bracketAlignedBeam = NULL;
     }
 
-    // Cancel alignment of the num with the beam if position and stemdirection are not concordant
+    // Cancel alignment of the num with the beam if position and stem direction are not concordant
     if (m_numAlignedBeam && (m_numAlignedBeam->m_drawingPlace == BEAMPLACE_above)
         && (m_drawingNumPos == STAFFREL_basic_below)) {
         m_numAlignedBeam = NULL;

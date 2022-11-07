@@ -351,7 +351,7 @@ void Staff::SetFromFacsimile(Doc *doc)
         assert(doc);
         Zone *zone = doc->GetFacsimile()->FindZoneByID(this->GetFacs());
         assert(zone);
-        this->SetZone(zone);
+        this->AttachZone(zone);
     }
     this->AdjustDrawingStaffSize();
 }

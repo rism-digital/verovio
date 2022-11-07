@@ -248,7 +248,7 @@ int BeamSpan::PrepareBeamSpanElements(FunctorParams *functorParams)
 
     if (m_beamedElements.empty()) return FUNCTOR_SIBLINGS;
 
-    // set current beamSpan as referencedElement for all beamed elements (for thesake of figuring if corresponding
+    // set current beamSpan as referencedElement for all beamed elements (for the sake of figuring if corresponding
     // element is in beamSpan)
     for (const auto element : m_beamedElements) {
         LayerElement *layerElem = vrv_cast<LayerElement *>(element);
@@ -300,7 +300,7 @@ int BeamSpan::CalcSpanningBeamSpans(FunctorParams *functorParams)
     elements.push_back({ m_beamedElements.end(), NULL });
 
     // Iterator for the elements are based on the initial order of the elements, so skip current system when
-    // found and process it separatelly in the end
+    // found and process it separately in the end
     Object *currentSystem = this->GetFirstAncestor(SYSTEM);
     int currentSystemIndex = 0;
     for (int i = 0; i < (int)elements.size() - 1; ++i) {

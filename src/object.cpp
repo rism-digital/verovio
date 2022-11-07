@@ -1861,7 +1861,7 @@ int Object::PrepareFacsimile(FunctorParams *functorParams)
                                                                                : interface->GetFacs());
             Zone *zone = params->m_facsimile->FindZoneByID(facsID);
             if (zone != NULL) {
-                interface->SetZone(zone);
+                interface->AttachZone(zone);
             }
         }
         // Zoneless syl

@@ -225,7 +225,7 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
         params->m_targetLayer->CloneReset();
         params->m_targetStaff->AddChild(params->m_targetLayer);
     }
-    // Second case: retrieve the approrpiate segment
+    // Second case: retrieve the appropriate segment
     else {
         params->m_targetMeasure = dynamic_cast<Measure *>(params->m_targetSubSystem->GetChild(params->m_segmentIdx));
         // It must be there

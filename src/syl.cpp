@@ -258,7 +258,7 @@ bool Syl::CreateDefaultZone(Doc *doc)
     Object *surface = doc->GetFacsimile()->FindDescendantByType(SURFACE);
     assert(surface);
     surface->AddChild(zone);
-    this->SetZone(zone);
+    this->AttachZone(zone);
     return true;
 }
 

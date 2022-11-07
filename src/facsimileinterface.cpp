@@ -35,7 +35,7 @@ FacsimileInterface::~FacsimileInterface() {}
 void FacsimileInterface::Reset()
 {
     this->ResetFacsimile();
-    this->SetZone(NULL);
+    this->AttachZone(NULL);
 }
 
 int FacsimileInterface::GetDrawingX() const
@@ -88,7 +88,7 @@ int FacsimileInterface::GetSurfaceY() const
     }
 }
 
-void FacsimileInterface::SetZone(Zone *zone)
+void FacsimileInterface::AttachZone(Zone *zone)
 {
     if (m_zone != NULL) {
         Object *parent = m_zone->GetParent();

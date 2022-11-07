@@ -398,7 +398,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
     Stem *stem = vrv_cast<Stem *>(params->m_parent->FindDescendantByType(STEM));
     Flag *flag = vrv_cast<Flag *>(params->m_parent->FindDescendantByType(FLAG));
-    // Avoid in artic to be in legder lines
+    // Avoid in artic to be in ledger lines
     if (this->GetDrawingPlace() == STAFFREL_above) {
         int yAboveStem
             = params->m_parent->GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY();
