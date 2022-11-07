@@ -27,6 +27,9 @@ function getToolkitFunction(VerovioModule, method) {
     // char *getAvailableOptions(Toolkit *ic)
     mapping.getAvailableOptions = VerovioModule.cwrap("vrvToolkit_getAvailableOptions", "string", ["number"]);
 
+    // char *getDefaultOptions(Toolkit *ic)
+    mapping.getDefaultOptions = VerovioModule.cwrap("vrvToolkit_getDefaultOptions", "string", ["number"]);
+
     // char *getDescriptiveFeatures(Toolkit *ic, const char *options)
     mapping.getDescriptiveFeatures = VerovioModule.cwrap("vrvToolkit_getDescriptiveFeatures", "string", ["number", "string"]);
 
@@ -60,8 +63,8 @@ function getToolkitFunction(VerovioModule, method) {
     // char *vrvToolkit_getNotatedIdForElement(Toolkit *tk, const char *xmlId);
     mapping.getNotatedIdForElement = VerovioModule.cwrap("vrvToolkit_getNotatedIdForElement", "string", ["number", "string"]);
 
-    // char *getOptions(Toolkit *ic, int defaultValues)
-    mapping.getOptions = VerovioModule.cwrap("vrvToolkit_getOptions", "string", ["number", "number"]);
+    // char *getOptions(Toolkit *ic)
+    mapping.getOptions = VerovioModule.cwrap("vrvToolkit_getOptions", "string", ["number"]);
 
     // int getPageCount(Toolkit *ic)
     mapping.getPageCount = VerovioModule.cwrap("vrvToolkit_getPageCount", "number", ["number"]);

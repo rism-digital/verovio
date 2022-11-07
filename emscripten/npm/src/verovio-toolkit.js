@@ -32,6 +32,10 @@ export class VerovioToolkit {
         return JSON.parse(this.proxy.getAvailableOptions(this.ptr));
     }
 
+    getDefaultOptions() {
+        return JSON.parse(this.proxy.getDefaultOptions(this.ptr));
+    }
+
     getDescriptiveFeatures(options) {
         return JSON.parse(this.proxy.getDescriptiveFeatures(this.ptr, JSON.stringify(options)));
     }
@@ -81,7 +85,17 @@ export class VerovioToolkit {
     }
 
     getOptions(defaultValues) {
-        return JSON.parse(this.proxy.getOptions(this.ptr, defaultValues));
+        if (defaultValues === true) {
+            console.warn( "This function (with 'true' parameter) is deprecated. Use getDefaultOptions() instead." );
+            return JSON.parse(this.proxy.getDefaultOptions(this.ptr));    
+        }
+        else if (defaultValues === false) {
+            console.warn( "This function (with 'false' parameter) is deprecated. Use getOptions() instead." );
+            return JSON.parse(this.proxy.getOptions(this.ptr));    
+        }
+        else {
+            return JSON.parse(this.proxy.getOptions(this.ptr));  
+        }
     }
 
     getPageCount() {

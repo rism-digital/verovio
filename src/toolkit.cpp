@@ -921,6 +921,16 @@ bool Toolkit::SaveFile(const std::string &filename, const std::string &jsonOptio
     return true;
 }
 
+std::string Toolkit::GetOptions() const
+{
+    return this->GetOptions(false);
+}
+
+std::string Toolkit::GetDefaultOptions() const
+{
+    return this->GetOptions(true);
+}
+
 std::string Toolkit::GetOptions(bool defaultValues) const
 {
     jsonxx::Object o;

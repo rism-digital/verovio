@@ -63,6 +63,13 @@ const char *vrvToolkit_getAvailableOptions(void *tkPtr)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_getDefaultOptions(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->GetDefaultOptions());
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_getDescriptiveFeatures(void *tkPtr, const char *options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
@@ -149,10 +156,10 @@ const char *vrvToolkit_getNotatedIdForElement(void *tkPtr, const char *xmlId)
     return tk->GetCString();
 }
 
-const char *vrvToolkit_getOptions(void *tkPtr, bool default_values)
+const char *vrvToolkit_getOptions(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->SetCString(tk->GetOptions(default_values));
+    tk->SetCString(tk->GetOptions());
     return tk->GetCString();
 }
 

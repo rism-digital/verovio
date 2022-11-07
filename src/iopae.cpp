@@ -1542,7 +1542,7 @@ int PAEInput::getWholeRest(const char *incipit, int *wholerest, int index)
         sscanf(&(incipit[i + 1]), "%d", wholerest);
         char buf[10];
         memset(buf, 0, 10);
-        sprintf(buf, "%d", *wholerest);
+        snprintf(buf, 10, "%d", *wholerest);
         i += strlen(buf);
     }
     return i - index;
