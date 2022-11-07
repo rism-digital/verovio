@@ -233,12 +233,18 @@ public:
     ///@{
 
     /**
-     * Return a dictionary of all the options
+     * Return a dictionary of all the options with their current value
      *
-     * @param defaultValues True for getting the default values and false for the current values
      * @return A stringified JSON object
      */
-    std::string GetOptions(bool defaultValues) const;
+    std::string GetOptions() const;
+
+    /**
+     * Return a dictionary of all the options with their default value
+     *
+     * @return A stringified JSON object
+     */
+    std::string GetDefaultOptions() const;
 
     /**
      * Return all available options grouped by category
@@ -789,6 +795,14 @@ private:
     bool LoadZipFile(const std::string &filename);
     bool LoadZipData(const std::vector<unsigned char> &bytes);
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
+
+    /**
+     * Return a dictionary of all the options
+     *
+     * @param defaultValues True for getting the default values and false for the current values
+     * @return A stringified JSON object
+     */
+    std::string GetOptions(bool defaultValues) const;
 
 public:
     //
