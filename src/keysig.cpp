@@ -188,7 +188,7 @@ void KeySig::GenerateKeyAccidAttribChildren()
     }
 }
 
-void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
+void KeySig::FillMap(MapOfOctavedPitchAccid &mapOfPitchAccid) const
 {
     mapOfPitchAccid.clear();
 
@@ -197,14 +197,18 @@ void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid) const
         for (auto &child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
             assert(keyAccid);
-            mapOfPitchAccid[keyAccid->GetPname()] = keyAccid->GetAccid();
+            for (int oct = 0; oct < 10; ++oct) {
+                mapOfPitchAccid[(keyAccid->GetPname() + oct * 7)] = keyAccid->GetAccid();
+            }
         }
         return;
     }
 
     data_ACCIDENTAL_WRITTEN accidType = this->GetAccidType();
     for (int i = 0; i < this->GetAccidCount(true); ++i) {
-        mapOfPitchAccid[KeySig::GetAccidPnameAt(accidType, i)] = accidType;
+        for (int oct = 0; oct < 10; ++oct) {
+            mapOfPitchAccid[(KeySig::GetAccidPnameAt(accidType, i) + oct * 7)] = accidType;
+        }
     }
 }
 

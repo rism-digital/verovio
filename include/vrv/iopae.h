@@ -15,7 +15,7 @@
  */
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-//#define USE_PAE_OLD_PARSER
+// #define USE_PAE_OLD_PARSER
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 
@@ -455,9 +455,9 @@ private:
     bool m_is_in_chord;
     bool m_is_mensural;
 
-    MapOfPitchAccid m_currentAccids;
+    MapOfOctavedPitchAccid m_currentAccids;
     KeySig *m_currentKeySig;
-    std::pair<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> m_tieAccid;
+    std::pair<int, data_ACCIDENTAL_WRITTEN> m_tieAccid;
 
     std::vector<LayerElement *> m_nested_objects;
 };

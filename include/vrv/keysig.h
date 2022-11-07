@@ -97,7 +97,7 @@ public:
     /**
      * Fill the map of modified pitches
      */
-    void FillMap(MapOfPitchAccid &mapOfPitchAccid) const;
+    void FillMap(MapOfOctavedPitchAccid &mapOfPitchAccid) const;
 
     int GetFifthsInt() const;
 
