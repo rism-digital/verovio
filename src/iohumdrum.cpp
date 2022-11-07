@@ -120,7 +120,7 @@ using namespace std;
 #include "turn.h"
 #include "verse.h"
 #include "vrv.h"
-//#include "attcomparison.h"
+// #include "attcomparison.h"
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
