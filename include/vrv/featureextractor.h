@@ -61,6 +61,8 @@ public:
 
     jsonxx::Array m_intervalsChromatic;
     jsonxx::Array m_intervalsDiatonic;
+    jsonxx::Array m_intervalGrossContour;
+    jsonxx::Array m_intervalRefinedContour;
     jsonxx::Array m_intervalsIds;
 
 private:
