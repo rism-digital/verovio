@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_mensural.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {

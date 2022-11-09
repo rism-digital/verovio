@@ -43,14 +43,14 @@ static const ClassRegistrar<Artic> s_factory("artic", ARTIC);
 Artic::Artic()
     : LayerElement(ARTIC, "artic-")
     , AttArticulation()
-    , AttArticulationGestural()
+    , AttArticulationGes()
     , AttColor()
     , AttEnclosingChars()
     , AttExtSym()
     , AttPlacementRelEvent()
 {
     this->RegisterAttClass(ATT_ARTICULATION);
-    this->RegisterAttClass(ATT_ARTICULATIONGESTURAL);
+    this->RegisterAttClass(ATT_ARTICULATIONGES);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYM);
@@ -65,7 +65,7 @@ void Artic::Reset()
 {
     LayerElement::Reset();
     this->ResetArticulation();
-    this->ResetArticulationGestural();
+    this->ResetArticulationGes();
     this->ResetColor();
     this->ResetEnclosingChars();
     this->ResetExtSym();

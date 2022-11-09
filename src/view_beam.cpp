@@ -140,7 +140,7 @@ void View::DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem)
     BeamElementCoord *secondElement = beamElementCoords->at(1);
 
     // We look only at the first one for the duration since both are expected to be the same
-    AttDurationLogical *durationElement = dynamic_cast<AttDurationLogical *>(firstElement->m_element);
+    AttDurationLog *durationElement = dynamic_cast<AttDurationLog *>(firstElement->m_element);
     if (!durationElement) return;
     const int dur = durationElement->GetDur();
 

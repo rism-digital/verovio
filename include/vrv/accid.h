@@ -27,7 +27,7 @@ class AlignmentReference;
 class Accid : public LayerElement,
               public PositionInterface,
               public AttAccidental,
-              public AttAccidentalGestural,
+              public AttAccidentalGes,
               public AttAccidLog,
               public AttColor,
               public AttEnclosingChars,

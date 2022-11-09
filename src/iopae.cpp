@@ -2046,7 +2046,7 @@ void PAEInput::parseNote(pae::Note *note)
             m_is_in_chord = true;
         }
         mnote->ResetAugmentDots();
-        mnote->ResetDurationLogical();
+        mnote->ResetDurationLog();
     }
 
     // Add the note to the current container
@@ -2074,7 +2074,7 @@ void PAEInput::parseNote(pae::Note *note)
         Note *mnote = dynamic_cast<Note *>(element);
         if (mnote) {
             mnote->ResetAugmentDots();
-            mnote->ResetDurationLogical();
+            mnote->ResetDurationLog();
         }
         popContainer();
         m_is_in_chord = false;
