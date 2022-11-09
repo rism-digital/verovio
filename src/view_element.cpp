@@ -1670,7 +1670,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         vrvTxt.SetSmuflFont(true);
         dc->SetFont(&vrvTxt);
         std::u32string str;
-        str.push_back(SMUFL_E551_lyricsElision);
+        str.push_back(m_doc->GetOptions()->m_lyricElision.GetValue());
         dc->DrawText(UTF32to8(str), str);
         dc->ResetFont();
         dc->ReactivateGraphic();

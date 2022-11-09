@@ -99,7 +99,7 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
     // Elision
     else if (con == sylLog_CON_b) {
         // Calculate the elision space with the current music font
-        int elisionSpace = doc->GetGlyphAdvX(SMUFL_E551_lyricsElision, staffSize, false);
+        int elisionSpace = doc->GetGlyphAdvX(doc->GetOptions()->m_lyricElision.GetValue(), staffSize, false);
         // Adjust it proportionally to the lyric size
         elisionSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
         spacing = elisionSpace;

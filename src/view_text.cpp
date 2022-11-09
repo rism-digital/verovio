@@ -278,7 +278,7 @@ void View::DrawLyricString(
         vrvTxt.SetSmuflFont(true);
         dc->SetFont(&vrvTxt);
         std::u32string elision;
-        elision.push_back(SMUFL_E551_lyricsElision);
+        elision.push_back(m_doc->GetOptions()->m_lyricElision.GetValue());
         if (params) {
             dc->DrawText(UTF32to8(elision), elision, params->m_x, params->m_y, params->m_width, params->m_height);
         }

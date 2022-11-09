@@ -27,6 +27,9 @@ const std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, {
 const std::map<int, std::string> Option::s_condense
     = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
 
+const std::map<int, std::string> Option::s_elision
+    = { { ELISION_regular, "regular" }, { ELISION_narrow, "narrow" }, { ELISION_wide, "wide" } };
+
 const std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
@@ -1308,6 +1311,10 @@ Options::Options()
         "Ledger line extension", "The amount by which a ledger line should extend either side of a notehead");
     m_ledgerLineExtension.Init(0.54, 0.20, 1.00);
     this->Register(&m_ledgerLineExtension, "ledgerLineExtension", &m_generalLayout);
+
+    m_lyricElision.SetInfo("Lyric elision", "The lyric elision width");
+    m_lyricElision.Init(ELISION_regular, &Option::s_elision);
+    this->Register(&m_lyricElision, "lyricElision", &m_generalLayout);
 
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
