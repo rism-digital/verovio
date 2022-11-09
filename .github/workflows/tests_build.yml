@@ -33,8 +33,6 @@ jobs:
   build_python:
     name: Build the test suite
     runs-on: ubuntu-22.04
-    permissions:
-      pull-requests: write
 
     steps:
       - uses: FranzDiebold/github-env-vars-action@v2.7.0
@@ -122,25 +120,8 @@ jobs:
         with:
           files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md"
 
-      - name: Generate comment content
-        id: get-comment-body
+      - name: Show the list of changes detected
         if: steps.check_files.outputs.files_exists == 'true'
         run: |
-          link="Results for the run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-          body="$link\n$(cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md)"
-          body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'\r\n'}"
-          echo "{body}={$body}" >> $GITHUB_OUTPUT
-
-      - name: Add comment with link
-        if: steps.check_files.outputs.files_exists == 'true'
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "${{ steps.get-comment-body.outputs.body }}"
-            })
+          echo "This is the list of tests for which a change has been detected:"
+          cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
