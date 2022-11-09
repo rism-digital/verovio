@@ -246,7 +246,7 @@ int TabDurSym::CalcStem(FunctorParams *functorParams)
 
     stem->SetDrawingStemLen(stemSize);
 
-    // Flag currently used only for gitar tablature because it is included in the glyphs for lute tab
+    // Flag currently used only for guitar tablature because it is included in the glyphs for lute tab
     if (params->m_staff->IsTabGuitar()) {
         Flag *flag = vrv_cast<Flag *>(stem->GetFirst(FLAG));
         if (flag) {

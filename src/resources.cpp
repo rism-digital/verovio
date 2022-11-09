@@ -151,7 +151,7 @@ bool Resources::LoadFont(const std::string &fontName)
     }
     pugi::xml_node root = doc.first_child();
     if (!root.attribute("units-per-em")) {
-        LogError("No units-per-em attribute in bouding box file");
+        LogError("No units-per-em attribute in bounding box file");
         return false;
     }
 

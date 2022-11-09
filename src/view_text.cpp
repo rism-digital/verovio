@@ -205,7 +205,7 @@ void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDraw
         dc->DrawText(UTF32to8(substr), substr, toDcX, toDcY);
     }
 
-    // Disable x for what is comming next as child of <f>
+    // Disable x for what is coming next as child of <f>
     // The value is reset in DrawFb
     params.m_x = VRV_UNSET;
 }

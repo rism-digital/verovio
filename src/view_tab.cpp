@@ -79,7 +79,7 @@ void View::DrawTabGrp(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->StartGraphic(tabGrp, "", tabGrp->GetID());
 
-    // Draw children (rhyhtm, notes)
+    // Draw children (rhythm, notes)
     this->DrawLayerChildren(dc, tabGrp, layer, staff, measure);
 
     dc->EndGraphic(tabGrp, this);
