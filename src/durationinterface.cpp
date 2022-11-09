@@ -32,8 +32,8 @@ DurationInterface::DurationInterface()
     : Interface()
     , AttAugmentDots()
     , AttBeamSecondary()
-    , AttDurationGestural()
-    , AttDurationLogical()
+    , AttDurationGes()
+    , AttDurationLog()
     , AttDurationQuality()
     , AttDurationRatio()
     , AttFermataPresent()
@@ -41,8 +41,8 @@ DurationInterface::DurationInterface()
 {
     this->RegisterInterfaceAttClass(ATT_AUGMENTDOTS);
     this->RegisterInterfaceAttClass(ATT_BEAMSECONDARY);
-    this->RegisterInterfaceAttClass(ATT_DURATIONGESTURAL);
-    this->RegisterInterfaceAttClass(ATT_DURATIONLOGICAL);
+    this->RegisterInterfaceAttClass(ATT_DURATIONGES);
+    this->RegisterInterfaceAttClass(ATT_DURATIONLOG);
     this->RegisterInterfaceAttClass(ATT_DURATIONQUALITY);
     this->RegisterInterfaceAttClass(ATT_DURATIONRATIO);
     this->RegisterInterfaceAttClass(ATT_FERMATAPRESENT);
@@ -57,8 +57,8 @@ void DurationInterface::Reset()
 {
     this->ResetAugmentDots();
     this->ResetBeamSecondary();
-    this->ResetDurationGestural();
-    this->ResetDurationLogical();
+    this->ResetDurationGes();
+    this->ResetDurationLog();
     this->ResetDurationQuality();
     this->ResetDurationRatio();
     this->ResetFermataPresent();

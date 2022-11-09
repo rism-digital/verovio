@@ -1726,6 +1726,65 @@ bool AttPedalVis::HasForm() const
 /* include <attform> */
 
 //----------------------------------------------------------------------------
+// AttPlicaVis
+//----------------------------------------------------------------------------
+
+AttPlicaVis::AttPlicaVis() : Att()
+{
+    ResetPlicaVis();
+}
+
+AttPlicaVis::~AttPlicaVis() {}
+
+void AttPlicaVis::ResetPlicaVis()
+{
+    m_dir = STEMDIRECTION_basic_NONE;
+    m_len = VRV_UNSET;
+}
+
+bool AttPlicaVis::ReadPlicaVis(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("dir")) {
+        this->SetDir(StrToStemdirectionBasic(element.attribute("dir").value()));
+        element.remove_attribute("dir");
+        hasAttribute = true;
+    }
+    if (element.attribute("len")) {
+        this->SetLen(StrToMeasurementunsigned(element.attribute("len").value()));
+        element.remove_attribute("len");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttPlicaVis::WritePlicaVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasDir()) {
+        element.append_attribute("dir") = StemdirectionBasicToStr(this->GetDir()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLen()) {
+        element.append_attribute("len") = MeasurementunsignedToStr(this->GetLen()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttPlicaVis::HasDir() const
+{
+    return (m_dir != STEMDIRECTION_basic_NONE);
+}
+
+bool AttPlicaVis::HasLen() const
+{
+    return (m_len != VRV_UNSET);
+}
+
+/* include <attlen> */
+
+//----------------------------------------------------------------------------
 // AttQuilismaVis
 //----------------------------------------------------------------------------
 
@@ -2136,6 +2195,125 @@ bool AttStaffGrpVis::HasBarThru() const
 }
 
 /* include <attbar.thru> */
+
+//----------------------------------------------------------------------------
+// AttStemVis
+//----------------------------------------------------------------------------
+
+AttStemVis::AttStemVis() : Att()
+{
+    ResetStemVis();
+}
+
+AttStemVis::~AttStemVis() {}
+
+void AttStemVis::ResetStemVis()
+{
+    m_pos = STEMPOSITION_NONE;
+    m_len = VRV_UNSET;
+    m_form = STEMFORM_mensural_NONE;
+    m_dir = STEMDIRECTION_NONE;
+    m_flagPos = FLAGPOS_mensural_NONE;
+    m_flagForm = FLAGFORM_mensural_NONE;
+}
+
+bool AttStemVis::ReadStemVis(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("pos")) {
+        this->SetPos(StrToStemposition(element.attribute("pos").value()));
+        element.remove_attribute("pos");
+        hasAttribute = true;
+    }
+    if (element.attribute("len")) {
+        this->SetLen(StrToMeasurementunsigned(element.attribute("len").value()));
+        element.remove_attribute("len");
+        hasAttribute = true;
+    }
+    if (element.attribute("form")) {
+        this->SetForm(StrToStemformMensural(element.attribute("form").value()));
+        element.remove_attribute("form");
+        hasAttribute = true;
+    }
+    if (element.attribute("dir")) {
+        this->SetDir(StrToStemdirection(element.attribute("dir").value()));
+        element.remove_attribute("dir");
+        hasAttribute = true;
+    }
+    if (element.attribute("flag.pos")) {
+        this->SetFlagPos(StrToFlagposMensural(element.attribute("flag.pos").value()));
+        element.remove_attribute("flag.pos");
+        hasAttribute = true;
+    }
+    if (element.attribute("flag.form")) {
+        this->SetFlagForm(StrToFlagformMensural(element.attribute("flag.form").value()));
+        element.remove_attribute("flag.form");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttStemVis::WriteStemVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasPos()) {
+        element.append_attribute("pos") = StempositionToStr(this->GetPos()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLen()) {
+        element.append_attribute("len") = MeasurementunsignedToStr(this->GetLen()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasForm()) {
+        element.append_attribute("form") = StemformMensuralToStr(this->GetForm()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasDir()) {
+        element.append_attribute("dir") = StemdirectionToStr(this->GetDir()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasFlagPos()) {
+        element.append_attribute("flag.pos") = FlagposMensuralToStr(this->GetFlagPos()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasFlagForm()) {
+        element.append_attribute("flag.form") = FlagformMensuralToStr(this->GetFlagForm()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttStemVis::HasPos() const
+{
+    return (m_pos != STEMPOSITION_NONE);
+}
+
+bool AttStemVis::HasLen() const
+{
+    return (m_len != VRV_UNSET);
+}
+
+bool AttStemVis::HasForm() const
+{
+    return (m_form != STEMFORM_mensural_NONE);
+}
+
+bool AttStemVis::HasDir() const
+{
+    return (m_dir != STEMDIRECTION_NONE);
+}
+
+bool AttStemVis::HasFlagPos() const
+{
+    return (m_flagPos != FLAGPOS_mensural_NONE);
+}
+
+bool AttStemVis::HasFlagForm() const
+{
+    return (m_flagForm != FLAGFORM_mensural_NONE);
+}
+
+/* include <attflag.form> */
 
 //----------------------------------------------------------------------------
 // AttTupletVis
@@ -2584,6 +2762,18 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
+    if (element->HasAttClass(ATT_PLICAVIS)) {
+        AttPlicaVis *att = dynamic_cast<AttPlicaVis *>(element);
+        assert(att);
+        if (attrType == "dir") {
+            att->SetDir(att->StrToStemdirectionBasic(attrValue));
+            return true;
+        }
+        if (attrType == "len") {
+            att->SetLen(att->StrToMeasurementunsigned(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_QUILISMAVIS)) {
         AttQuilismaVis *att = dynamic_cast<AttQuilismaVis *>(element);
         assert(att);
@@ -2661,6 +2851,34 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
         assert(att);
         if (attrType == "bar.thru") {
             att->SetBarThru(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_STEMVIS)) {
+        AttStemVis *att = dynamic_cast<AttStemVis *>(element);
+        assert(att);
+        if (attrType == "pos") {
+            att->SetPos(att->StrToStemposition(attrValue));
+            return true;
+        }
+        if (attrType == "len") {
+            att->SetLen(att->StrToMeasurementunsigned(attrValue));
+            return true;
+        }
+        if (attrType == "form") {
+            att->SetForm(att->StrToStemformMensural(attrValue));
+            return true;
+        }
+        if (attrType == "dir") {
+            att->SetDir(att->StrToStemdirection(attrValue));
+            return true;
+        }
+        if (attrType == "flag.pos") {
+            att->SetFlagPos(att->StrToFlagposMensural(attrValue));
+            return true;
+        }
+        if (attrType == "flag.form") {
+            att->SetFlagForm(att->StrToFlagformMensural(attrValue));
             return true;
         }
     }
@@ -2983,6 +3201,16 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "form", att->PedalstyleToStr(att->GetForm()) });
         }
     }
+    if (element->HasAttClass(ATT_PLICAVIS)) {
+        const AttPlicaVis *att = dynamic_cast<const AttPlicaVis *>(element);
+        assert(att);
+        if (att->HasDir()) {
+            attributes->push_back({ "dir", att->StemdirectionBasicToStr(att->GetDir()) });
+        }
+        if (att->HasLen()) {
+            attributes->push_back({ "len", att->MeasurementunsignedToStr(att->GetLen()) });
+        }
+    }
     if (element->HasAttClass(ATT_QUILISMAVIS)) {
         const AttQuilismaVis *att = dynamic_cast<const AttQuilismaVis *>(element);
         assert(att);
@@ -3049,6 +3277,28 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasBarThru()) {
             attributes->push_back({ "bar.thru", att->BooleanToStr(att->GetBarThru()) });
+        }
+    }
+    if (element->HasAttClass(ATT_STEMVIS)) {
+        const AttStemVis *att = dynamic_cast<const AttStemVis *>(element);
+        assert(att);
+        if (att->HasPos()) {
+            attributes->push_back({ "pos", att->StempositionToStr(att->GetPos()) });
+        }
+        if (att->HasLen()) {
+            attributes->push_back({ "len", att->MeasurementunsignedToStr(att->GetLen()) });
+        }
+        if (att->HasForm()) {
+            attributes->push_back({ "form", att->StemformMensuralToStr(att->GetForm()) });
+        }
+        if (att->HasDir()) {
+            attributes->push_back({ "dir", att->StemdirectionToStr(att->GetDir()) });
+        }
+        if (att->HasFlagPos()) {
+            attributes->push_back({ "flag.pos", att->FlagposMensuralToStr(att->GetFlagPos()) });
+        }
+        if (att->HasFlagForm()) {
+            attributes->push_back({ "flag.form", att->FlagformMensuralToStr(att->GetFlagForm()) });
         }
     }
     if (element->HasAttClass(ATT_TUPLETVIS)) {

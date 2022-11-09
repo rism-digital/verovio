@@ -1461,7 +1461,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 for (; m_broken != 0; --m_broken) dur = dur * 2;
             }
             data_DURATION meiDur
-                = (dur == 0) ? DURATION_breve : note->AttDurationLogical::StrToDuration(std::to_string(dur));
+                = (dur == 0) ? DURATION_breve : note->AttDurationLog::StrToDuration(std::to_string(dur));
 
             if (chord) {
                 chord->AddChild(note);
@@ -1554,7 +1554,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 for (; m_broken != 0; --m_broken) dur = dur * 2;
             }
             data_DURATION meiDur
-                = (dur == 0) ? DURATION_breve : space->AttDurationLogical::StrToDuration(std::to_string(dur));
+                = (dur == 0) ? DURATION_breve : space->AttDurationLog::StrToDuration(std::to_string(dur));
 
             if (dots > 0) space->SetDots(dots);
             space->SetDur(meiDur);
@@ -1631,7 +1631,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 for (; m_broken != 0; --m_broken) dur = dur * 2;
             }
             data_DURATION meiDur
-                = (dur == 0) ? DURATION_breve : rest->AttDurationLogical::StrToDuration(std::to_string(dur));
+                = (dur == 0) ? DURATION_breve : rest->AttDurationLog::StrToDuration(std::to_string(dur));
 
             if (dots > 0) rest->SetDots(dots);
             rest->SetDur(meiDur);

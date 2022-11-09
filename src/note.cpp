@@ -742,7 +742,7 @@ void Note::UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig)
 
     // Without key signature prefer written accidentals
     if (!hasKeySig && transposeGesturalAccid) {
-        accid->ResetAccidentalGestural();
+        accid->ResetAccidentalGes();
         transposeGesturalAccid = false;
         if (tp.m_accid != 0) transposeWrittenAccid = true;
     }

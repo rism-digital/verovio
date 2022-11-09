@@ -502,7 +502,7 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
         durStr = std::to_string(int(4 / quarters));
 
         Space *space = new Space();
-        space->SetDur(space->AttDurationLogical::StrToDuration(durStr));
+        space->SetDur(space->AttDurationLog::StrToDuration(durStr));
         space->SetDurPpq(m_ppq * quarters);
         if (m_elementStackMap.at(layer).empty())
             layer->AddChild(space);
