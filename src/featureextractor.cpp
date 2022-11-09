@@ -112,12 +112,23 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
 
         // We have a previous note (or more with tied notes), so we can calculate an interval
         if (!m_previousNotes.empty()) {
-            std::string intervalChromatic
-                = StringFormat("%d", note->GetMIDIPitch() - m_previousNotes.front()->GetMIDIPitch());
-            m_intervalsChromatic << intervalChromatic;
-            std::string intervalDiatonic
+            const int intervalChromatic = note->GetMIDIPitch() - m_previousNotes.front()->GetMIDIPitch();
+            if (intervalChromatic == 0) {
+                m_intervalGrossContour << "s";
+                m_intervalRefinedContour << "s";
+            }
+            else if (intervalChromatic < 0) {
+                m_intervalGrossContour << "D";
+                m_intervalRefinedContour << ((intervalChromatic < -2) ? "D" : "d");
+            }
+            else {
+                m_intervalGrossContour << "U";
+                m_intervalRefinedContour << ((intervalChromatic > 2) ? "U" : "u");
+            }
+            m_intervalsChromatic << StringFormat("%d", intervalChromatic);
+            std::string intervalDiatonicStr
                 = StringFormat("%d", note->GetDiatonicPitch() - m_previousNotes.front()->GetDiatonicPitch());
-            m_intervalsDiatonic << intervalDiatonic;
+            m_intervalsDiatonic << intervalDiatonicStr;
             jsonxx::Array intervalsIds;
             for (auto previousNote : m_previousNotes) intervalsIds << previousNote->GetID();
             intervalsIds << note->GetID();
@@ -138,6 +149,8 @@ void FeatureExtractor::ToJson(std::string &output)
 
     o << "intervalsChromatic" << m_intervalsChromatic;
     o << "intervalsDiatonic" << m_intervalsDiatonic;
+    o << "intervalGrossContour" << m_intervalGrossContour;
+    o << "intervalRefinedContour" << m_intervalRefinedContour;
     o << "intervalsIds" << m_intervalsIds;
 
     output = o.json();
