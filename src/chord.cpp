@@ -23,6 +23,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "gracegrp.h"
 #include "horizontalaligner.h"
@@ -575,6 +576,26 @@ std::list<const Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc)
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode Chord::Accept(MutableFunctor &functor)
+{
+    return functor.VisitChord(this);
+}
+
+FunctorCode Chord::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitChord(this);
+}
+
+FunctorCode Chord::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitChordEnd(this);
+}
+
+FunctorCode Chord::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitChordEnd(this);
+}
+
 int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
 {
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
@@ -810,37 +831,6 @@ MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary) const
             dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.begin(), mapEntry.second.end(), false);
     }
     return dotLocs;
-}
-
-int Chord::CalcDots(FunctorParams *functorParams)
-{
-    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
-    assert(params);
-
-    // if the chord isn't visible, stop here
-    if (!this->IsVisible()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    // if there aren't dot, stop here but only if no note has a dot
-    if (this->GetDots() < 1) {
-        if (!this->HasNoteWithDots()) {
-            return FUNCTOR_SIBLINGS;
-        }
-        else {
-            return FUNCTOR_CONTINUE;
-        }
-    }
-
-    Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-    assert(dots);
-
-    params->m_chordDots = dots;
-    params->m_chordDrawingX = this->GetDrawingX();
-    params->m_chordStemDir = this->GetDrawingStemDir();
-
-    dots->SetMapOfDotLocs(this->CalcOptimalDotLocations());
-
-    return FUNCTOR_CONTINUE;
 }
 
 int Chord::PrepareLayerElementParts(FunctorParams *functorParams)

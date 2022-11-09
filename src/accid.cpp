@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 #include "smufl.h"
@@ -279,6 +280,26 @@ std::u32string Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOS
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Accid::Accept(MutableFunctor &functor)
+{
+    return functor.VisitAccid(this);
+}
+
+FunctorCode Accid::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitAccid(this);
+}
+
+FunctorCode Accid::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitAccidEnd(this);
+}
+
+FunctorCode Accid::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitAccidEnd(this);
+}
 
 int Accid::ResetData(FunctorParams *functorParams)
 {

@@ -16,6 +16,7 @@
 #include "btrem.h"
 #include "chord.h"
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -275,6 +276,26 @@ void TupletNum::SetAlignedBracket(TupletBracket *alignedBracket)
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode Dots::Accept(MutableFunctor &functor)
+{
+    return functor.VisitDots(this);
+}
+
+FunctorCode Dots::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitDots(this);
+}
+
+FunctorCode Dots::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitDotsEnd(this);
+}
+
+FunctorCode Dots::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitDotsEnd(this);
+}
+
 int Dots::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
@@ -295,6 +316,26 @@ int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode Flag::Accept(MutableFunctor &functor)
+{
+    return functor.VisitFlag(this);
+}
+
+FunctorCode Flag::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitFlag(this);
+}
+
+FunctorCode Flag::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitFlagEnd(this);
+}
+
+FunctorCode Flag::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFlagEnd(this);
+}
+
 int Flag::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
@@ -303,6 +344,26 @@ int Flag::ResetData(FunctorParams *functorParams)
     m_drawingNbFlags = 0;
 
     return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TupletBracket::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTupletBracket(this);
+}
+
+FunctorCode TupletBracket::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTupletBracket(this);
+}
+
+FunctorCode TupletBracket::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTupletBracketEnd(this);
+}
+
+FunctorCode TupletBracket::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTupletBracketEnd(this);
 }
 
 int TupletBracket::ResetHorizontalAlignment(FunctorParams *functorParams)
@@ -326,6 +387,26 @@ int TupletBracket::ResetVerticalAlignment(FunctorParams *functorParams)
     m_drawingYRelRight = 0;
 
     return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TupletNum::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTupletNum(this);
+}
+
+FunctorCode TupletNum::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTupletNum(this);
+}
+
+FunctorCode TupletNum::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTupletNumEnd(this);
+}
+
+FunctorCode TupletNum::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTupletNumEnd(this);
 }
 
 int TupletNum::ResetHorizontalAlignment(FunctorParams *functorParams)

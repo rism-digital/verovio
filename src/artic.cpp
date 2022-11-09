@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "elementpart.h"
 #include "floatingobject.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "smufl.h"
@@ -309,6 +310,26 @@ bool Artic::IsCentered(data_ARTICULATION artic)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Artic::Accept(MutableFunctor &functor)
+{
+    return functor.VisitArtic(this);
+}
+
+FunctorCode Artic::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitArtic(this);
+}
+
+FunctorCode Artic::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitArticEnd(this);
+}
+
+FunctorCode Artic::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitArticEnd(this);
+}
 
 int Artic::ConvertMarkupArtic(FunctorParams *functorParams)
 {

@@ -1037,30 +1037,6 @@ public:
 // Use FunctorDocParams
 
 //----------------------------------------------------------------------------
-// CalcDotsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the chord dots object when processing chord notes
- * member 7: the doc
- **/
-
-class CalcDotsParams : public FunctorParams {
-public:
-    CalcDotsParams(Doc *doc)
-    {
-        m_chordDots = NULL;
-        m_chordDrawingX = 0;
-        m_chordStemDir = STEMDIRECTION_NONE;
-        m_doc = doc;
-    }
-    Dots *m_chordDots;
-    int m_chordDrawingX;
-    data_STEMDIRECTION m_chordStemDir;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // CalcLedgerLine
 //----------------------------------------------------------------------------
 
@@ -1453,59 +1429,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindAllBetweenParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the comparison object
- * member 1: an array of all matching objects
- * member 2: the start object range
- * member 3: the end object range
- **/
-
-class FindAllBetweenParams : public FunctorParams {
-public:
-    FindAllBetweenParams(Comparison *comparison, ListOfObjects *elements, const Object *start, const Object *end)
-    {
-        m_comparison = comparison;
-        m_elements = elements;
-        m_start = start;
-        m_end = end;
-    }
-    Comparison *m_comparison;
-    ListOfObjects *m_elements;
-    const Object *m_start;
-    const Object *m_end;
-};
-
-//----------------------------------------------------------------------------
-// FindAllConstBetweenParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the comparison object
- * member 1: an array of all matching objects
- * member 2: the start object range
- * member 3: the end object range
- **/
-
-class FindAllConstBetweenParams : public FunctorParams {
-public:
-    FindAllConstBetweenParams(
-        Comparison *comparison, ListOfConstObjects *elements, const Object *start, const Object *end)
-    {
-        m_comparison = comparison;
-        m_elements = elements;
-        m_start = start;
-        m_end = end;
-    }
-    Comparison *m_comparison;
-    ListOfConstObjects *m_elements;
-    const Object *m_start;
-    const Object *m_end;
-};
-
-//----------------------------------------------------------------------------
 // FindAllReferencedObjectsParams
 //----------------------------------------------------------------------------
 
@@ -1523,88 +1446,6 @@ public:
     }
     ListOfObjects *m_elements;
     bool m_milestoneReferences;
-};
-
-//----------------------------------------------------------------------------
-// FindAllByComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the comparison object
- * member 1: an array of all matching objects
- * member 2: flag indicating whether descendants of matches should be searched as well
- **/
-
-class FindAllByComparisonParams : public FunctorParams {
-public:
-    FindAllByComparisonParams(Comparison *comparison, ListOfObjects *elements)
-    {
-        m_comparison = comparison;
-        m_elements = elements;
-        m_continueDepthSearchForMatches = true;
-    }
-    Comparison *m_comparison;
-    ListOfObjects *m_elements;
-    bool m_continueDepthSearchForMatches;
-};
-
-//----------------------------------------------------------------------------
-// FindAllConstByComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the comparison object
- * member 1: an array of all matching objects
- * member 2: flag indicating whether descendants of matches should be searched as well
- **/
-
-class FindAllConstByComparisonParams : public FunctorParams {
-public:
-    FindAllConstByComparisonParams(Comparison *comparison, ListOfConstObjects *elements)
-    {
-        m_comparison = comparison;
-        m_elements = elements;
-        m_continueDepthSearchForMatches = true;
-    }
-    Comparison *m_comparison;
-    ListOfConstObjects *m_elements;
-    bool m_continueDepthSearchForMatches;
-};
-
-//----------------------------------------------------------------------------
-// FindByComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the attComparision text
- * member 1: the pointer to pointer to the Object
- **/
-
-class FindByComparisonParams : public FunctorParams {
-public:
-    FindByComparisonParams(Comparison *comparison)
-    {
-        m_comparison = comparison;
-        m_element = NULL;
-    }
-    Comparison *m_comparison;
-    const Object *m_element;
-};
-
-//----------------------------------------------------------------------------
-// FindByIDParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the id we are looking for
- * member 1: the pointer to pointer to the Object
- **/
-
-class FindByIDParams : public FunctorParams {
-public:
-    FindByIDParams() { m_element = NULL; }
-    std::string m_id;
-    const Object *m_element;
 };
 
 //----------------------------------------------------------------------------

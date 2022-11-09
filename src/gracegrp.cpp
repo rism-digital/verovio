@@ -16,6 +16,7 @@
 #include "beam.h"
 #include "chord.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 #include "rest.h"
@@ -77,6 +78,26 @@ bool GraceGrp::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+FunctorCode GraceGrp::Accept(MutableFunctor &functor)
+{
+    return functor.VisitGraceGrp(this);
+}
+
+FunctorCode GraceGrp::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitGraceGrp(this);
+}
+
+FunctorCode GraceGrp::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitGraceGrpEnd(this);
+}
+
+FunctorCode GraceGrp::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitGraceGrpEnd(this);
 }
 
 int GraceGrp::GenerateMIDIEnd(FunctorParams *functorParams)

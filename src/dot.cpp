@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 
@@ -49,6 +50,26 @@ void Dot::Reset()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Dot::Accept(MutableFunctor &functor)
+{
+    return functor.VisitDot(this);
+}
+
+FunctorCode Dot::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitDot(this);
+}
+
+FunctorCode Dot::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitDotEnd(this);
+}
+
+FunctorCode Dot::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitDotEnd(this);
+}
 
 int Dot::PreparePointersByLayer(FunctorParams *functorParams)
 {

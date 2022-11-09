@@ -7,6 +7,10 @@
 
 #include "proport.h"
 
+//----------------------------------------------------------------------------
+
+#include "functor.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -28,6 +32,26 @@ void Proport::Reset()
 {
     LayerElement::Reset();
     this->ResetDurationRatio();
+}
+
+FunctorCode Proport::Accept(MutableFunctor &functor)
+{
+    return functor.VisitProport(this);
+}
+
+FunctorCode Proport::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitProport(this);
+}
+
+FunctorCode Proport::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitProportEnd(this);
+}
+
+FunctorCode Proport::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitProportEnd(this);
 }
 
 } // namespace vrv

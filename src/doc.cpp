@@ -21,6 +21,7 @@
 #include "docselection.h"
 #include "expansion.h"
 #include "featureextractor.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "instrdef.h"
@@ -2060,6 +2061,26 @@ void Doc::SetCurrentScore(Score *score)
 //----------------------------------------------------------------------------
 // Doc functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Doc::Accept(MutableFunctor &functor)
+{
+    return functor.VisitDoc(this);
+}
+
+FunctorCode Doc::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitDoc(this);
+}
+
+FunctorCode Doc::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitDocEnd(this);
+}
+
+FunctorCode Doc::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitDocEnd(this);
+}
 
 int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
 {

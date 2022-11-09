@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "instrdef.h"
 #include "label.h"
@@ -129,6 +130,26 @@ bool StaffDef::HasLayerDefWithLabel() const
 //----------------------------------------------------------------------------
 // StaffDef functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode StaffDef::Accept(MutableFunctor &functor)
+{
+    return functor.VisitStaffDef(this);
+}
+
+FunctorCode StaffDef::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitStaffDef(this);
+}
+
+FunctorCode StaffDef::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitStaffDefEnd(this);
+}
+
+FunctorCode StaffDef::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitStaffDefEnd(this);
+}
 
 int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
 {

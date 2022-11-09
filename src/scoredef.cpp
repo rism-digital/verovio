@@ -16,6 +16,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "grpsym.h"
 #include "keysig.h"
@@ -647,6 +648,26 @@ bool ScoreDef::HasSystemStartLine() const
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode ScoreDefElement::Accept(MutableFunctor &functor)
+{
+    return functor.VisitScoreDefElement(this);
+}
+
+FunctorCode ScoreDefElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitScoreDefElement(this);
+}
+
+FunctorCode ScoreDefElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitScoreDefElementEnd(this);
+}
+
+FunctorCode ScoreDefElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitScoreDefElementEnd(this);
+}
+
 int ScoreDefElement::ConvertMarkupScoreDef(FunctorParams *functorParams)
 {
     ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
@@ -717,6 +738,26 @@ int ScoreDefElement::ConvertMarkupScoreDefEnd(FunctorParams *functorParams)
     params->m_currentScoreDef = NULL;
 
     return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDef::Accept(MutableFunctor &functor)
+{
+    return functor.VisitScoreDef(this);
+}
+
+FunctorCode ScoreDef::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitScoreDef(this);
+}
+
+FunctorCode ScoreDef::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitScoreDefEnd(this);
+}
+
+FunctorCode ScoreDef::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitScoreDefEnd(this);
 }
 
 int ScoreDef::ResetHorizontalAlignment(FunctorParams *functorParams)

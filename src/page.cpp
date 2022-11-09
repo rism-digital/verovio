@@ -14,8 +14,11 @@
 //----------------------------------------------------------------------------
 
 #include "bboxdevicecontext.h"
+#include "calcdotsfunctor.h"
+#include "calcledgerlinesfunctor.h"
 #include "comparison.h"
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "pageelement.h"
 #include "pages.h"
@@ -229,9 +232,8 @@ void Page::LayOutTranscription(bool force)
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
     this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
 
-    CalcDotsParams calcDotsParams(doc);
-    Functor calcDots(&Object::CalcDots);
-    this->Process(&calcDots, &calcDotsParams);
+    CalcDotsFunctor calcDots(doc);
+    this->Process(calcDots);
 
     // Render it for filling the bounding box
     View view;
@@ -244,10 +246,8 @@ void Page::LayOutTranscription(bool force)
     Functor adjustXRelForTranscription(&Object::AdjustXRelForTranscription);
     this->Process(&adjustXRelForTranscription, NULL);
 
-    FunctorDocParams calcLedgerLinesParams(doc);
-    Functor calcLedgerLines(&Object::CalcLedgerLines);
-    Functor calcLedgerLinesEnd(&Object::CalcLedgerLinesEnd);
-    this->Process(&calcLedgerLines, &calcLedgerLinesParams, &calcLedgerLinesEnd);
+    CalcLedgerLinesFunctor calcLedgerLines(doc);
+    this->Process(calcLedgerLines);
 
     m_layoutDone = true;
 }
@@ -328,9 +328,8 @@ void Page::ResetAligners()
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
     this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
 
-    CalcDotsParams calcDotsParams(doc);
-    Functor calcDots(&Object::CalcDots);
-    this->Process(&calcDots, &calcDotsParams);
+    CalcDotsFunctor calcDots(doc);
+    this->Process(calcDots);
 
     // Adjust the position of outside articulations
     CalcArticParams calcArticParams(doc);
@@ -495,10 +494,8 @@ void Page::LayOutVertically()
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
     this->Process(&resetVerticalAlignment, NULL);
 
-    FunctorDocParams calcLedgerLinesParams(doc);
-    Functor calcLedgerLines(&Object::CalcLedgerLines);
-    Functor calcLedgerLinesEnd(&Object::CalcLedgerLinesEnd);
-    this->Process(&calcLedgerLines, &calcLedgerLinesParams, &calcLedgerLinesEnd);
+    CalcLedgerLinesFunctor calcLedgerLines(doc);
+    this->Process(calcLedgerLines);
 
     // Align the content of the page using system aligners
     // After this:
@@ -807,6 +804,26 @@ void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Page::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPage(this);
+}
+
+FunctorCode Page::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPage(this);
+}
+
+FunctorCode Page::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPageEnd(this);
+}
+
+FunctorCode Page::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPageEnd(this);
+}
 
 int Page::ScoreDefSetCurrentPageEnd(FunctorParams *functorParams)
 {

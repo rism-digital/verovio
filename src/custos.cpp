@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "functor.h"
 #include "smufl.h"
 
 namespace vrv {
@@ -85,6 +86,26 @@ char32_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Custos::Accept(MutableFunctor &functor)
+{
+    return functor.VisitCustos(this);
+}
+
+FunctorCode Custos::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitCustos(this);
+}
+
+FunctorCode Custos::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitCustosEnd(this);
+}
+
+FunctorCode Custos::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitCustosEnd(this);
+}
 
 int Custos::ResetData(FunctorParams *functorParams)
 {

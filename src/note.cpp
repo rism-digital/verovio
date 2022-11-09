@@ -20,6 +20,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "gracegrp.h"
@@ -762,26 +763,6 @@ void Note::UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig)
     }
 }
 
-bool Note::IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const
-{
-    const Object *stem = this->GetFirst(STEM);
-    if (!stem) return false;
-
-    const Flag *flag = dynamic_cast<const Flag *>(stem->GetFirst(FLAG));
-    if (!flag) return false;
-
-    // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
-    char32_t flagGlyph = SMUFL_E242_flag16thUp;
-    data_DURATION dur = this->GetDur();
-    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(this->GetDrawingStemDir());
-    const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, this->GetDrawingCueSize());
-
-    const int dotMargin = flag->GetDrawingY() - this->GetDrawingY() - flagHeight - this->GetDrawingRadius(doc) / 2
-        - dotLocShift * doc->GetDrawingUnit(staffSize);
-
-    return dotMargin < 0;
-}
-
 void Note::DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
@@ -910,6 +891,26 @@ int Note::PnameToPclass(data_PITCHNAME pitchName)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Note::Accept(MutableFunctor &functor)
+{
+    return functor.VisitNote(this);
+}
+
+FunctorCode Note::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitNote(this);
+}
+
+FunctorCode Note::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitNoteEnd(this);
+}
+
+FunctorCode Note::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitNoteEnd(this);
+}
 
 int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
@@ -1183,116 +1184,6 @@ MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary) const
     if (loc % 2 == 0) loc += (shiftUpwards ? 1 : -1);
     dotLocs[staff] = { loc };
     return dotLocs;
-}
-
-int Note::CalcDots(FunctorParams *functorParams)
-{
-    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
-    assert(params);
-
-    // We currently have no dots object with mensural notes
-    if (this->IsMensuralDur()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    if (!this->IsVisible()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    const int staffSize = staff->m_drawingStaffSize;
-    const bool drawingCueSize = this->GetDrawingCueSize();
-
-    Dots *dots = NULL;
-    Chord *chord = this->IsChordTone();
-
-    // The shift to the left when a stem flag requires it
-    int flagShift = 0;
-    int radius = this->GetDrawingRadius(params->m_doc);
-
-    if (chord && (chord->GetDots() > 0)) {
-        dots = params->m_chordDots;
-        assert(dots);
-
-        // Stem up, shorter than 4th and not in beam
-        if ((this->GetDots() > 0) && (params->m_chordStemDir == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4)
-            && !this->IsInBeam()) {
-            // Shift according to the flag width if the top note is not flipped
-            if ((this == chord->GetTopNote()) && !this->GetFlippedNotehead()) {
-                // HARDCODED
-                flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
-            }
-        }
-
-        int xRel = this->GetDrawingX() - params->m_chordDrawingX + 2 * radius + flagShift;
-        dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
-    }
-    if (this->GetDots() > 0) {
-        // For single notes we need here to set the dot loc
-        dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-        assert(dots);
-
-        MapOfDotLocs dotLocs = this->CalcOptimalDotLocations();
-        dots->SetMapOfDotLocs(dotLocs);
-
-        const int dotLocShift = *(dotLocs.cbegin()->second.rbegin()) - this->GetDrawingLoc();
-
-        // Stem up, shorter than 4th and not in beam
-        if (const int shift = dots->GetFlagShift(); shift) {
-            flagShift += shift;
-        }
-        else if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && !this->IsInBeam() && (this->GetDrawingStemLen() < 3)
-            && (this->IsDotOverlappingWithFlag(params->m_doc, staffSize, dotLocShift))) {
-            // HARDCODED
-            const int shift = params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
-            flagShift += shift;
-            dots->SetFlagShift(shift);
-        }
-
-        int xRel = 2 * radius + flagShift;
-        dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Note::CalcLedgerLines(FunctorParams *functorParams)
-{
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
-    assert(params);
-
-    if (this->GetVisible() == BOOLEAN_false) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    if (!this->IsVisible()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    const int staffSize = staff->m_drawingStaffSize;
-    const int staffX = staff->GetDrawingX();
-    const bool drawingCueSize = this->GetDrawingCueSize();
-    const int radius = this->GetDrawingRadius(params->m_doc);
-
-    /************** Ledger lines: **************/
-
-    int linesAbove = 0;
-    int linesBelow = 0;
-
-    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_SIBLINGS;
-
-    const int extension = params->m_doc->GetDrawingLedgerLineExtension(staffSize, drawingCueSize);
-    const int left = this->GetDrawingX() - extension - staffX;
-    int right = this->GetDrawingX() + 2 * radius + extension - staffX;
-
-    if (linesAbove > 0) {
-        staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize);
-    }
-    else {
-        staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize);
-    }
-
-    return FUNCTOR_SIBLINGS;
 }
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)

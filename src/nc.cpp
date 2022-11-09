@@ -16,6 +16,7 @@
 #include "comparison.h"
 #include "doc.h"
 #include "elementpart.h"
+#include "functor.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -58,6 +59,26 @@ void Nc::Reset()
     this->ResetColor();
     this->ResetIntervalMelodic();
     this->ResetNcForm();
+}
+
+FunctorCode Nc::Accept(MutableFunctor &functor)
+{
+    return functor.VisitNc(this);
+}
+
+FunctorCode Nc::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitNc(this);
+}
+
+FunctorCode Nc::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitNcEnd(this);
+}
+
+FunctorCode Nc::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitNcEnd(this);
 }
 
 } // namespace vrv

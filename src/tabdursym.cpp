@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "elementpart.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -126,6 +127,26 @@ int TabDurSym::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION st
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode TabDurSym::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTabDurSym(this);
+}
+
+FunctorCode TabDurSym::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTabDurSym(this);
+}
+
+FunctorCode TabDurSym::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTabDurSymEnd(this);
+}
+
+FunctorCode TabDurSym::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTabDurSymEnd(this);
+}
 
 int TabDurSym::PrepareLayerElementParts(FunctorParams *functorParams)
 {

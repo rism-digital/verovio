@@ -31,6 +31,8 @@ class Output;
 class Filters;
 class Functor;
 class FunctorParams;
+class MutableFunctor;
+class ConstFunctor;
 class LinkingInterface;
 class FacsimileInterface;
 class PitchInterface;
@@ -637,6 +639,18 @@ public:
         int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false);
     void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
         int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false) const;
+    void Process(MutableFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false);
+    void Process(ConstFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false) const;
+    ///@}
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    virtual FunctorCode Accept(MutableFunctor &functor);
+    virtual FunctorCode Accept(ConstFunctor &functor) const;
+    virtual FunctorCode AcceptEnd(MutableFunctor &functor);
+    virtual FunctorCode AcceptEnd(ConstFunctor &functor) const;
     ///@}
 
     //----------------//
@@ -674,16 +688,6 @@ public:
     ///@{
 
     /**
-     * Find a Object with a specified id.
-     */
-    virtual int FindByID(FunctorParams *functorParams) const;
-
-    /**
-     * Find a Object with a Comparison functor.
-     */
-    virtual int FindByComparison(FunctorParams *functorParams) const;
-
-    /**
      * Find the next child matching the Comparison object passed in the parameters
      */
     virtual int FindNextChildByComparison(FunctorParams *);
@@ -697,26 +701,6 @@ public:
      * Find a Object with the extreme value with a Comparison functor .
      */
     virtual int FindExtremeByComparison(FunctorParams *functorParams) const;
-
-    /**
-     * Find a all Object with an Comparison functor.
-     */
-    virtual int FindAllByComparison(FunctorParams *functorParams);
-
-    /**
-     * Const Functor for Object::FindAllByComparison
-     */
-    virtual int FindAllConstByComparison(FunctorParams *functorParams) const;
-
-    /**
-     * Find a all Object between a start and end Object and with an Comparison functor.
-     */
-    virtual int FindAllBetween(FunctorParams *functorParams);
-
-    /**
-     * Const Functor for Object::FindAllBetween
-     */
-    virtual int FindAllConstBetween(FunctorParams *functorParams) const;
 
     /**
      * Find a all Object to which another object points to in the data.
@@ -886,11 +870,6 @@ public:
     virtual int CalcChordNoteHeads(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the drawing dot positions, including for chords.
-     */
-    virtual int CalcDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Resolve spanning beamspans by breaking it into separate parts, each belonging to the corresponding
      * system/measure. BeamSpans get elements reassigned, so that each beamSpan can be drawn as control
      * element. This allows free placement of beamSpan in the MEI tree and ensures that beamSpan will be
@@ -1040,16 +1019,6 @@ public:
      * Set the note position for each note in ligature
      */
     virtual int CalcLigatureNotePos(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Calculate the ledger lines
-     */
-    virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::CalcLedgerLines
-     */
-    virtual int CalcLedgerLinesEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Calculate the position of the outside articulations.
@@ -1554,7 +1523,7 @@ private:
      */
     ///@{
     void UpdateDocumentScore(bool direction);
-    bool SkipChildren(Functor *functor) const;
+    bool SkipChildren(bool visibleOnly) const;
     bool FiltersApply(const Filters *filters, Object *object) const;
     ///@}
 

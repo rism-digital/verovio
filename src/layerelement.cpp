@@ -31,6 +31,7 @@
 #include "dot.h"
 #include "elementpart.h"
 #include "ftrem.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "keysig.h"
@@ -1139,6 +1140,26 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
 //----------------------------------------------------------------------------
 // LayerElement functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode LayerElement::Accept(MutableFunctor &functor)
+{
+    return functor.VisitLayerElement(this);
+}
+
+FunctorCode LayerElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitLayerElement(this);
+}
+
+FunctorCode LayerElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitLayerElementEnd(this);
+}
+
+FunctorCode LayerElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitLayerElementEnd(this);
+}
 
 int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

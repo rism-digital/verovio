@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "fermata.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "pitchinterface.h"
@@ -56,6 +57,26 @@ void MRest::Reset()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode MRest::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMRest(this);
+}
+
+FunctorCode MRest::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMRest(this);
+}
+
+FunctorCode MRest::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMRestEnd(this);
+}
+
+FunctorCode MRest::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMRestEnd(this);
+}
 
 int MRest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {

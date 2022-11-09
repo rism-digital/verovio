@@ -16,6 +16,7 @@
 
 #include "chord.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -121,6 +122,26 @@ void FTrem::SetElementShortening(int shortening)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode FTrem::Accept(MutableFunctor &functor)
+{
+    return functor.VisitFTrem(this);
+}
+
+FunctorCode FTrem::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitFTrem(this);
+}
+
+FunctorCode FTrem::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitFTremEnd(this);
+}
+
+FunctorCode FTrem::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFTremEnd(this);
+}
 
 int FTrem::AdjustBeams(FunctorParams *functorParams)
 {

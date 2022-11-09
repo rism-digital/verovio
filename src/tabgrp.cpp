@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 #include "tabdursym.h"
@@ -115,6 +116,26 @@ const Note *TabGrp::GetBottomNote() const
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode TabGrp::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTabGrp(this);
+}
+
+FunctorCode TabGrp::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTabGrp(this);
+}
+
+FunctorCode TabGrp::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTabGrpEnd(this);
+}
+
+FunctorCode TabGrp::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTabGrpEnd(this);
+}
 
 int TabGrp::InitOnsetOffsetEnd(FunctorParams *functorParams)
 {

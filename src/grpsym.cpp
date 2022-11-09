@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "staffgrp.h"
 #include "vrv.h"
@@ -78,6 +79,26 @@ int GrpSym::GetDrawingY() const
 //----------------------------------------------------------------------------
 // GrpSym functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode GrpSym::Accept(MutableFunctor &functor)
+{
+    return functor.VisitGrpSym(this);
+}
+
+FunctorCode GrpSym::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitGrpSym(this);
+}
+
+FunctorCode GrpSym::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitGrpSymEnd(this);
+}
+
+FunctorCode GrpSym::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitGrpSymEnd(this);
+}
 
 int GrpSym::ScoreDefSetGrpSym(FunctorParams *)
 {

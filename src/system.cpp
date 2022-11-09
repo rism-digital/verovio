@@ -19,6 +19,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "ending.h"
+#include "findfunctor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -217,9 +218,8 @@ bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElemen
     // otherwise look for a measures in between
     else {
         ClassIdComparison isMeasure(MEASURE);
-        Functor findAllConstBetween(&Object::FindAllConstBetween);
-        FindAllConstBetweenParams findAllConstBetweenParams(&isMeasure, &measures, measureStart, measureEnd);
-        this->Process(&findAllConstBetween, &findAllConstBetweenParams, NULL, NULL, 1);
+        FindAllBetweenFunctor findAllBetween(&isMeasure, &measures, measureStart, measureEnd);
+        this->Process(findAllBetween, 1);
     }
 
     // Now we can look for chords and note
@@ -471,6 +471,26 @@ void System::ConvertToUnCastOffMensuralSystem()
 //----------------------------------------------------------------------------
 // System functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode System::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSystem(this);
+}
+
+FunctorCode System::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSystem(this);
+}
+
+FunctorCode System::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSystemEnd(this);
+}
+
+FunctorCode System::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSystemEnd(this);
+}
 
 int System::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {

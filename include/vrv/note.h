@@ -290,6 +290,16 @@ public:
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * See Object::AdjustArtic
      */
     int AdjustArtic(FunctorParams *functorParams) override;
@@ -313,16 +323,6 @@ public:
      * See Object::CalcChordNoteHeads
      */
     int CalcChordNoteHeads(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcDots
-     */
-    int CalcDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcLedgerLines
-     */
-    int CalcLedgerLines(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareLayerElementParts
@@ -381,12 +381,6 @@ private:
     TransPitch GetTransPitch() const;
 
     void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
-
-    /**
-     * Return whether dots are overlapping with flag. Take into account flag height, its position as well
-     * as position of the note and position of the dots
-     */
-    bool IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const;
 
     /**
      * Register deferred notes for MIDI

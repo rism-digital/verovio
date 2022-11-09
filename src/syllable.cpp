@@ -16,6 +16,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "neume.h"
 #include "syl.h"
 #include "text.h"
@@ -81,6 +82,26 @@ bool Syllable::MarkupAddSyl()
         return true;
     }
     return false;
+}
+
+FunctorCode Syllable::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSyllable(this);
+}
+
+FunctorCode Syllable::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSyllable(this);
+}
+
+FunctorCode Syllable::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSyllableEnd(this);
+}
+
+FunctorCode Syllable::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSyllableEnd(this);
 }
 
 } // namespace vrv
