@@ -1174,7 +1174,7 @@ Options::Options()
     this->Register(&m_barLineSeparation, "barLineSeparation", &m_generalLayout);
 
     m_barLineWidth.SetInfo("Barline width", "The barline width");
-    m_barLineWidth.Init(0.30, 0.10, 0.80);
+    m_barLineWidth.Init(0.70, 0.10, 0.80);
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
 
     m_beamFrenchStyle.SetInfo(
