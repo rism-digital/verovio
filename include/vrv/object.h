@@ -718,14 +718,6 @@ public:
      */
     virtual int GetAlignmentLeftRight(FunctorParams *functorParams) const;
 
-    /**
-     * Go through all layer elements of the layer and return next/previous element relative to the specified
-     * layer element.
-     * It will search recursively through children elements until note, chord or ftrem is found.
-     * It can be used to look in neighboring layers for the similar search, but only first element will be checked.
-     */
-    virtual int GetRelativeLayerElement(FunctorParams *) const { return FUNCTOR_CONTINUE; }
-
     ///@}
 
     /**

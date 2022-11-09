@@ -453,11 +453,6 @@ public:
     int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::GetRelativeLayerElement
-     */
-    int GetRelativeLayerElement(FunctorParams *functorParams) const override;
-
-    /**
      * See Object::CalcSlurDirection
      */
     int CalcSlurDirection(FunctorParams *functorParams) override;
