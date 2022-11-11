@@ -1824,22 +1824,22 @@ bool AttDurationDefault::HasNumbaseDefault() const
 /* include <attnumbase.default> */
 
 //----------------------------------------------------------------------------
-// AttDurationLogical
+// AttDurationLog
 //----------------------------------------------------------------------------
 
-AttDurationLogical::AttDurationLogical() : Att()
+AttDurationLog::AttDurationLog() : Att()
 {
-    ResetDurationLogical();
+    ResetDurationLog();
 }
 
-AttDurationLogical::~AttDurationLogical() {}
+AttDurationLog::~AttDurationLog() {}
 
-void AttDurationLogical::ResetDurationLogical()
+void AttDurationLog::ResetDurationLog()
 {
     m_dur = DURATION_NONE;
 }
 
-bool AttDurationLogical::ReadDurationLogical(pugi::xml_node element)
+bool AttDurationLog::ReadDurationLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("dur")) {
@@ -1850,7 +1850,7 @@ bool AttDurationLogical::ReadDurationLogical(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttDurationLogical::WriteDurationLogical(pugi::xml_node element)
+bool AttDurationLog::WriteDurationLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasDur()) {
@@ -1860,7 +1860,7 @@ bool AttDurationLogical::WriteDurationLogical(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttDurationLogical::HasDur() const
+bool AttDurationLog::HasDur() const
 {
     return (m_dur != DURATION_NONE);
 }
@@ -4683,23 +4683,23 @@ bool AttOriginStartEndId::HasOriginEndid() const
 /* include <attorigin.endid> */
 
 //----------------------------------------------------------------------------
-// AttOriginTimestampLogical
+// AttOriginTimestampLog
 //----------------------------------------------------------------------------
 
-AttOriginTimestampLogical::AttOriginTimestampLogical() : Att()
+AttOriginTimestampLog::AttOriginTimestampLog() : Att()
 {
-    ResetOriginTimestampLogical();
+    ResetOriginTimestampLog();
 }
 
-AttOriginTimestampLogical::~AttOriginTimestampLogical() {}
+AttOriginTimestampLog::~AttOriginTimestampLog() {}
 
-void AttOriginTimestampLogical::ResetOriginTimestampLogical()
+void AttOriginTimestampLog::ResetOriginTimestampLog()
 {
     m_originTstamp = std::make_pair(-1, -1.0);
     m_originTstamp2 = std::make_pair(-1, -1.0);
 }
 
-bool AttOriginTimestampLogical::ReadOriginTimestampLogical(pugi::xml_node element)
+bool AttOriginTimestampLog::ReadOriginTimestampLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("origin.tstamp")) {
@@ -4715,7 +4715,7 @@ bool AttOriginTimestampLogical::ReadOriginTimestampLogical(pugi::xml_node elemen
     return hasAttribute;
 }
 
-bool AttOriginTimestampLogical::WriteOriginTimestampLogical(pugi::xml_node element)
+bool AttOriginTimestampLog::WriteOriginTimestampLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOriginTstamp()) {
@@ -4729,12 +4729,12 @@ bool AttOriginTimestampLogical::WriteOriginTimestampLogical(pugi::xml_node eleme
     return wroteAttribute;
 }
 
-bool AttOriginTimestampLogical::HasOriginTstamp() const
+bool AttOriginTimestampLog::HasOriginTstamp() const
 {
     return (m_originTstamp != std::make_pair(-1, -1.0));
 }
 
-bool AttOriginTimestampLogical::HasOriginTstamp2() const
+bool AttOriginTimestampLog::HasOriginTstamp2() const
 {
     return (m_originTstamp2 != std::make_pair(-1, -1.0));
 }
@@ -5466,22 +5466,22 @@ bool AttResponsibility::HasResp() const
 /* include <attresp> */
 
 //----------------------------------------------------------------------------
-// AttRestdurationLogical
+// AttRestdurationLog
 //----------------------------------------------------------------------------
 
-AttRestdurationLogical::AttRestdurationLogical() : Att()
+AttRestdurationLog::AttRestdurationLog() : Att()
 {
-    ResetRestdurationLogical();
+    ResetRestdurationLog();
 }
 
-AttRestdurationLogical::~AttRestdurationLogical() {}
+AttRestdurationLog::~AttRestdurationLog() {}
 
-void AttRestdurationLogical::ResetRestdurationLogical()
+void AttRestdurationLog::ResetRestdurationLog()
 {
     m_dur = DURATIONRESTS_NONE;
 }
 
-bool AttRestdurationLogical::ReadRestdurationLogical(pugi::xml_node element)
+bool AttRestdurationLog::ReadRestdurationLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("dur")) {
@@ -5492,7 +5492,7 @@ bool AttRestdurationLogical::ReadRestdurationLogical(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttRestdurationLogical::WriteRestdurationLogical(pugi::xml_node element)
+bool AttRestdurationLog::WriteRestdurationLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasDur()) {
@@ -5502,7 +5502,7 @@ bool AttRestdurationLogical::WriteRestdurationLogical(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttRestdurationLogical::HasDur() const
+bool AttRestdurationLog::HasDur() const
 {
     return (m_dur != DURATIONRESTS_NONE);
 }
@@ -6896,22 +6896,22 @@ bool AttTiePresent::HasTie() const
 /* include <atttie> */
 
 //----------------------------------------------------------------------------
-// AttTimestampLogical
+// AttTimestampLog
 //----------------------------------------------------------------------------
 
-AttTimestampLogical::AttTimestampLogical() : Att()
+AttTimestampLog::AttTimestampLog() : Att()
 {
-    ResetTimestampLogical();
+    ResetTimestampLog();
 }
 
-AttTimestampLogical::~AttTimestampLogical() {}
+AttTimestampLog::~AttTimestampLog() {}
 
-void AttTimestampLogical::ResetTimestampLogical()
+void AttTimestampLog::ResetTimestampLog()
 {
-    m_tstamp = -1.0;
+    m_tstamp = 0.0;
 }
 
-bool AttTimestampLogical::ReadTimestampLogical(pugi::xml_node element)
+bool AttTimestampLog::ReadTimestampLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("tstamp")) {
@@ -6922,7 +6922,7 @@ bool AttTimestampLogical::ReadTimestampLogical(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttTimestampLogical::WriteTimestampLogical(pugi::xml_node element)
+bool AttTimestampLog::WriteTimestampLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasTstamp()) {
@@ -6932,30 +6932,30 @@ bool AttTimestampLogical::WriteTimestampLogical(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttTimestampLogical::HasTstamp() const
+bool AttTimestampLog::HasTstamp() const
 {
-    return (m_tstamp != -1.0);
+    return (m_tstamp != 0.0);
 }
 
 /* include <atttstamp> */
 
 //----------------------------------------------------------------------------
-// AttTimestamp2Logical
+// AttTimestamp2Log
 //----------------------------------------------------------------------------
 
-AttTimestamp2Logical::AttTimestamp2Logical() : Att()
+AttTimestamp2Log::AttTimestamp2Log() : Att()
 {
-    ResetTimestamp2Logical();
+    ResetTimestamp2Log();
 }
 
-AttTimestamp2Logical::~AttTimestamp2Logical() {}
+AttTimestamp2Log::~AttTimestamp2Log() {}
 
-void AttTimestamp2Logical::ResetTimestamp2Logical()
+void AttTimestamp2Log::ResetTimestamp2Log()
 {
     m_tstamp2 = std::make_pair(-1, -1.0);
 }
 
-bool AttTimestamp2Logical::ReadTimestamp2Logical(pugi::xml_node element)
+bool AttTimestamp2Log::ReadTimestamp2Log(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("tstamp2")) {
@@ -6966,7 +6966,7 @@ bool AttTimestamp2Logical::ReadTimestamp2Logical(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttTimestamp2Logical::WriteTimestamp2Logical(pugi::xml_node element)
+bool AttTimestamp2Log::WriteTimestamp2Log(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasTstamp2()) {
@@ -6976,7 +6976,7 @@ bool AttTimestamp2Logical::WriteTimestamp2Logical(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttTimestamp2Logical::HasTstamp2() const
+bool AttTimestamp2Log::HasTstamp2() const
 {
     return (m_tstamp2 != std::make_pair(-1, -1.0));
 }
@@ -8387,8 +8387,8 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
-    if (element->HasAttClass(ATT_DURATIONLOGICAL)) {
-        AttDurationLogical *att = dynamic_cast<AttDurationLogical *>(element);
+    if (element->HasAttClass(ATT_DURATIONLOG)) {
+        AttDurationLog *att = dynamic_cast<AttDurationLog *>(element);
         assert(att);
         if (attrType == "dur") {
             att->SetDur(att->StrToDuration(attrValue));
@@ -8959,8 +8959,8 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
-    if (element->HasAttClass(ATT_ORIGINTIMESTAMPLOGICAL)) {
-        AttOriginTimestampLogical *att = dynamic_cast<AttOriginTimestampLogical *>(element);
+    if (element->HasAttClass(ATT_ORIGINTIMESTAMPLOG)) {
+        AttOriginTimestampLog *att = dynamic_cast<AttOriginTimestampLog *>(element);
         assert(att);
         if (attrType == "origin.tstamp") {
             att->SetOriginTstamp(att->StrToMeasurebeat(attrValue));
@@ -9123,8 +9123,8 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
-    if (element->HasAttClass(ATT_RESTDURATIONLOGICAL)) {
-        AttRestdurationLogical *att = dynamic_cast<AttRestdurationLogical *>(element);
+    if (element->HasAttClass(ATT_RESTDURATIONLOG)) {
+        AttRestdurationLog *att = dynamic_cast<AttRestdurationLog *>(element);
         assert(att);
         if (attrType == "dur") {
             att->SetDur(att->StrToDurationrests(attrValue));
@@ -9411,16 +9411,16 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
-    if (element->HasAttClass(ATT_TIMESTAMPLOGICAL)) {
-        AttTimestampLogical *att = dynamic_cast<AttTimestampLogical *>(element);
+    if (element->HasAttClass(ATT_TIMESTAMPLOG)) {
+        AttTimestampLog *att = dynamic_cast<AttTimestampLog *>(element);
         assert(att);
         if (attrType == "tstamp") {
             att->SetTstamp(att->StrToDbl(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass(ATT_TIMESTAMP2LOGICAL)) {
-        AttTimestamp2Logical *att = dynamic_cast<AttTimestamp2Logical *>(element);
+    if (element->HasAttClass(ATT_TIMESTAMP2LOG)) {
+        AttTimestamp2Log *att = dynamic_cast<AttTimestamp2Log *>(element);
         assert(att);
         if (attrType == "tstamp2") {
             att->SetTstamp2(att->StrToMeasurebeat(attrValue));
@@ -9941,8 +9941,8 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "numbase.default", att->IntToStr(att->GetNumbaseDefault()) });
         }
     }
-    if (element->HasAttClass(ATT_DURATIONLOGICAL)) {
-        const AttDurationLogical *att = dynamic_cast<const AttDurationLogical *>(element);
+    if (element->HasAttClass(ATT_DURATIONLOG)) {
+        const AttDurationLog *att = dynamic_cast<const AttDurationLog *>(element);
         assert(att);
         if (att->HasDur()) {
             attributes->push_back({ "dur", att->DurationToStr(att->GetDur()) });
@@ -10421,8 +10421,8 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "origin.endid", att->StrToStr(att->GetOriginEndid()) });
         }
     }
-    if (element->HasAttClass(ATT_ORIGINTIMESTAMPLOGICAL)) {
-        const AttOriginTimestampLogical *att = dynamic_cast<const AttOriginTimestampLogical *>(element);
+    if (element->HasAttClass(ATT_ORIGINTIMESTAMPLOG)) {
+        const AttOriginTimestampLog *att = dynamic_cast<const AttOriginTimestampLog *>(element);
         assert(att);
         if (att->HasOriginTstamp()) {
             attributes->push_back({ "origin.tstamp", att->MeasurebeatToStr(att->GetOriginTstamp()) });
@@ -10556,8 +10556,8 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "resp", att->StrToStr(att->GetResp()) });
         }
     }
-    if (element->HasAttClass(ATT_RESTDURATIONLOGICAL)) {
-        const AttRestdurationLogical *att = dynamic_cast<const AttRestdurationLogical *>(element);
+    if (element->HasAttClass(ATT_RESTDURATIONLOG)) {
+        const AttRestdurationLog *att = dynamic_cast<const AttRestdurationLog *>(element);
         assert(att);
         if (att->HasDur()) {
             attributes->push_back({ "dur", att->DurationrestsToStr(att->GetDur()) });
@@ -10797,15 +10797,15 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "tie", att->TieToStr(att->GetTie()) });
         }
     }
-    if (element->HasAttClass(ATT_TIMESTAMPLOGICAL)) {
-        const AttTimestampLogical *att = dynamic_cast<const AttTimestampLogical *>(element);
+    if (element->HasAttClass(ATT_TIMESTAMPLOG)) {
+        const AttTimestampLog *att = dynamic_cast<const AttTimestampLog *>(element);
         assert(att);
         if (att->HasTstamp()) {
             attributes->push_back({ "tstamp", att->DblToStr(att->GetTstamp()) });
         }
     }
-    if (element->HasAttClass(ATT_TIMESTAMP2LOGICAL)) {
-        const AttTimestamp2Logical *att = dynamic_cast<const AttTimestamp2Logical *>(element);
+    if (element->HasAttClass(ATT_TIMESTAMP2LOG)) {
+        const AttTimestamp2Log *att = dynamic_cast<const AttTimestamp2Log *>(element);
         assert(att);
         if (att->HasTstamp2()) {
             attributes->push_back({ "tstamp2", att->MeasurebeatToStr(att->GetTstamp2()) });

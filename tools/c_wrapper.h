@@ -50,7 +50,7 @@ const char *vrvToolkit_renderToTimemap(void *tkPtr, const char *c_options);
 void vrvToolkit_resetOptions(void *tkPtr);
 void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed);
 bool vrvToolkit_select(void *tkPtr, const char *selection);
-void vrvToolkit_setOptions(void *tkPtr, const char *options);
+bool vrvToolkit_setOptions(void *tkPtr, const char *options);
 const char *vrvToolkit_validatePAE(void *tkPtr, const char *data);
 
 #ifdef __cplusplus

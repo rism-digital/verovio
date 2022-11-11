@@ -278,12 +278,10 @@ bool vrvToolkit_select(void *tkPtr, const char *selection)
     return tk->Select(selection);
 }
 
-void vrvToolkit_setOptions(void *tkPtr, const char *options)
+bool vrvToolkit_setOptions(void *tkPtr, const char *options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    if (!tk->SetOptions(options)) {
-        LogError("Could not load JSON options.");
-    }
+    return tk->SetOptions(options);
 }
 
 const char *vrvToolkit_validatePAE(void *tkPtr, const char *data)
