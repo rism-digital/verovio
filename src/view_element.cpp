@@ -1664,16 +1664,22 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     if (syl->GetCon() == sylLog_CON_b) {
         dc->ReactivateGraphic();
         dc->DeactivateGraphic();
-        FontInfo vrvTxt;
-        vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-        vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
-        std::u32string str;
-        str.push_back(m_doc->GetOptions()->m_lyricElision.GetValue());
-        bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(str);
-        vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
-        dc->SetFont(&vrvTxt);
-        dc->DrawText(UTF32to8(str), str);
-        dc->ResetFont();
+        if (m_doc->GetOptions()->m_lyricElision.GetValue() == ELISION_unicode) {
+            std::u32string str = U"‿";
+            dc->DrawText(UTF32to8(str), str);
+        }
+        else {
+            FontInfo vrvTxt;
+            vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
+            vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+            std::u32string str;
+            str.push_back(m_doc->GetOptions()->m_lyricElision.GetValue());
+            bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(str);
+            vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
+            dc->SetFont(&vrvTxt);
+            dc->DrawText(UTF32to8(str), str);
+            dc->ResetFont();
+        }
         dc->ReactivateGraphic();
         dc->DeactivateGraphicY();
     }

@@ -27,8 +27,8 @@ const std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, {
 const std::map<int, std::string> Option::s_condense
     = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
 
-const std::map<int, std::string> Option::s_elision
-    = { { ELISION_regular, "regular" }, { ELISION_narrow, "narrow" }, { ELISION_wide, "wide" } };
+const std::map<int, std::string> Option::s_elision = { { ELISION_regular, "regular" }, { ELISION_narrow, "narrow" },
+    { ELISION_wide, "wide" }, { ELISION_unicode, "unicode" } };
 
 const std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
