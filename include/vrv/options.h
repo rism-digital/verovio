@@ -63,7 +63,7 @@ enum option_ELISION {
     ELISION_regular = SMUFL_E551_lyricsElision,
     ELISION_narrow = SMUFL_E550_lyricsElisionNarrow,
     ELISION_wide = SMUFL_E552_lyricsElisionWide,
-    ELISION_unicode = 0x230F
+    ELISION_unicode = UNICODE_UNDERTIE
 };
 
 enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always };

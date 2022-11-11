@@ -267,7 +267,7 @@ void View::DrawLyricString(
     const int height = (params) ? params->m_height : VRV_UNSET;
 
     if (m_doc->GetOptions()->m_lyricElision.GetValue() == ELISION_unicode) {
-        std::replace(lyricStr.begin(), lyricStr.end(), U'_', U'‿');
+        std::replace(lyricStr.begin(), lyricStr.end(), U'_', UNICODE_UNDERTIE);
         dc->DrawText(UTF32to8(lyricStr), lyricStr, x, y, width, height);
     }
     else {

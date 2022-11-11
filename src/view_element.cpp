@@ -1665,7 +1665,8 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         dc->ReactivateGraphic();
         dc->DeactivateGraphic();
         if (m_doc->GetOptions()->m_lyricElision.GetValue() == ELISION_unicode) {
-            std::u32string str = U"‿";
+            std::u32string str;
+            str.push_back(UNICODE_UNDERTIE);
             dc->DrawText(UTF32to8(str), str);
         }
         else {
