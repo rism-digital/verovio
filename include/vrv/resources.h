@@ -89,7 +89,7 @@ public:
     static char32_t GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar);
 
 private:
-    bool LoadFont(const std::string &fontName);
+    bool LoadFont(const std::string &fontName, bool withFallback = true);
 
 private:
     /** The font name of the font that is currently loaded */
