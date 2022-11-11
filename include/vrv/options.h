@@ -68,6 +68,8 @@ enum option_MULTIRESTSTYLE {
 
 enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
+enum option_SMUFLTEXTFONT { SMUFLTEXTFONT_embedded = 0, SMUFLTEXTFONT_linked, SMUFLTEXTFONT_none };
+
 //----------------------------------------------------------------------------
 // Option
 //----------------------------------------------------------------------------
@@ -129,6 +131,7 @@ public:
     static const std::map<int, std::string> s_multiRestStyle;
     static const std::map<int, std::string> s_pedalStyle;
     static const std::map<int, std::string> s_systemDivider;
+    static const std::map<int, std::string> s_smuflTextFont;
 
 protected:
     std::string m_title;
@@ -626,6 +629,7 @@ public:
     OptionBool m_scaleToPageSize;
     OptionBool m_showRuntime;
     OptionBool m_shrinkToFit;
+    OptionIntMap m_smuflTextFont;
     OptionBool m_staccatoCenter;
     OptionBool m_svgBoundingBoxes;
     OptionString m_svgCss;

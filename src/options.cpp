@@ -42,6 +42,9 @@ const std::map<int, std::string> Option::s_pedalStyle = { { PEDALSTYLE_NONE, "au
 const std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" },
     { SYSTEMDIVIDER_auto, "auto" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
+const std::map<int, std::string> Option::s_smuflTextFont
+    = { { SMUFLTEXTFONT_embedded, "embedded" }, { SMUFLTEXTFONT_linked, "linked" }, { SMUFLTEXTFONT_none, "none" } };
+
 //----------------------------------------------------------------------------
 // Option
 //----------------------------------------------------------------------------
@@ -1097,6 +1100,10 @@ Options::Options()
     m_shrinkToFit.SetInfo("Shrink content to fit page", "Scale down page content to fit the page height if needed");
     m_shrinkToFit.Init(false);
     this->Register(&m_shrinkToFit, "shrinkToFit", &m_general);
+
+    m_smuflTextFont.SetInfo("Smufl text font", "Specify if the smufl text font is embedded, linked, or ignored");
+    m_smuflTextFont.Init(SMUFLTEXTFONT_embedded, &Option::s_smuflTextFont);
+    this->Register(&m_smuflTextFont, "smuflTextFont", &m_general);
 
     m_staccatoCenter.SetInfo(
         "Center staccato", "Align staccato and staccatissimo articulations with center of the note");
