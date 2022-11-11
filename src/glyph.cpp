@@ -36,6 +36,7 @@ Glyph::Glyph()
     m_unitsPerEm = 20480;
     m_codeStr = "[unset]";
     m_path = "[unset]";
+    m_isFallback = false;
 }
 
 Glyph::Glyph(std::string path, std::string codeStr)
@@ -47,6 +48,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
     m_horizAdvX = 0;
     m_unitsPerEm = 20480;
     m_codeStr = codeStr;
+    m_isFallback = false;
 
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(path.c_str());

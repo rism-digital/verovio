@@ -260,6 +260,11 @@ private:
     void VrvTextFont() { m_vrvTextFont = true; }
 
     /**
+     * Change the flag for indicating the use of the fallback music font as text font
+     */
+    void VrvTextFontFallback() { m_vrvTextFontFallback = true; }
+
+    /**
      * Flush the data to the internal buffer.
      * Adds the xml tag if necessary and the <defs> from m_smuflGlyphs
      */
@@ -289,6 +294,11 @@ private:
      * DeviceContext::VrvTextFont. The font is included as woff2 in Commit()
      */
     bool m_vrvTextFont;
+
+    /**
+     * Flag indicating we need a fallback font for the music Glyphs
+     */
+    bool m_vrvTextFontFallback;
 
     // we use a std::stringstream because we want to prepend the <defs> which will know only when we reach the end of
     // the page

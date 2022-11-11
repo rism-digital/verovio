@@ -117,7 +117,8 @@ void View::DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDra
                 FontInfo vrvTxt;
                 vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
                 vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
-                vrvTxt.SetSmuflFont(true);
+                bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(smuflStr);
+                vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
                 vrvTxt.SetStyle(FONTSTYLE_normal);
                 dc->SetFont(&vrvTxt);
                 this->DrawTextString(dc, smuflStr, params);
@@ -188,7 +189,8 @@ void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDraw
             FontInfo vrvTxt;
             vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
             vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
-            vrvTxt.SetSmuflFont(true);
+            bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(smuflAccid);
+            vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
             dc->SetFont(&vrvTxt);
             // Once we have rendered the some text to not pass x / y anymore
             dc->DrawText(UTF32to8(smuflAccid), smuflAccid, toDcX, toDcY);
@@ -275,10 +277,11 @@ void View::DrawLyricString(
         FontInfo vrvTxt;
         vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
         vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
-        vrvTxt.SetSmuflFont(true);
-        dc->SetFont(&vrvTxt);
         std::u32string elision;
         elision.push_back(SMUFL_E551_lyricsElision);
+        bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(elision);
+        vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
+        dc->SetFont(&vrvTxt);
         if (params) {
             dc->DrawText(UTF32to8(elision), elision, params->m_x, params->m_y, params->m_width, params->m_height);
         }
@@ -388,7 +391,9 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         params.m_pointSize = rendFont.GetPointSize();
     }
     if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
-        rendFont.SetSmuflFont(true);
+        // Because we do not have the string at this stage we rely only on the selected font
+        // This means fallback will not work for missing glyphs within <rend>
+        rendFont.SetSmuflWithFallback(SMUFL_FONT_SELECTED);
         rendFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
         int pointSize = (rendFont.GetPointSize() != 0) ? rendFont.GetPointSize() : params.m_pointSize;
         rendFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
@@ -552,7 +557,8 @@ void View::DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &para
     }
 
     if (symbol->HasGlyphAuth() && symbol->GetGlyphAuth() == "smufl") {
-        symbolFont.SetSmuflFont(true);
+        bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(str);
+        symbolFont.SetSmuflWithFallback(isFallbackNeeded);
         symbolFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
         int pointSize = (symbolFont.GetPointSize() != 0) ? symbolFont.GetPointSize() : params.m_pointSize;
         symbolFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
