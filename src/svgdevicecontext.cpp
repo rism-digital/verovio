@@ -84,6 +84,37 @@ bool SvgDeviceContext::CopyFileToStream(const std::string &filename, std::ostrea
     return true;
 }
 
+void SvgDeviceContext::IncludeTextFont(const std::string &fontname, const Resources *resources)
+{
+    assert(resources);
+
+    std::string cssContent;
+
+    if (m_smuflTextFont == SMUFLTEXTFONT_embedded) {
+        const std::string cssFontPath = StringFormat("%s/%s.css", resources->GetPath().c_str(), fontname.c_str());
+        std::ifstream cssFontFile(cssFontPath);
+        if (!cssFontFile.is_open()) {
+            LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG",
+                resources->GetCurrentFontName().c_str());
+        }
+        else {
+            std::stringstream cssFontStream;
+            cssFontStream << cssFontFile.rdbuf();
+            cssContent = cssFontStream.str();
+        }
+    }
+    else {
+        std::string versionPath
+            = (VERSION_DEV) ? "develop" : StringFormat("%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
+        cssContent = StringFormat("@import url(\"https://www.verovio.org/javascript/%s/data/%s.css\");",
+            versionPath.c_str(), fontname.c_str());
+    }
+
+    pugi::xml_node css = m_svgNode.append_child("style");
+    css.append_attribute("type") = "text/css";
+    css.append_child(pugi::node_pcdata).set_value(cssContent.c_str());
+}
+
 void SvgDeviceContext::Commit(bool xml_declaration)
 {
     if (m_committed) {
@@ -110,38 +141,15 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     }
 
     // add the woff2 font if needed
-    const Resources *resources = this->GetResources(true);
-    // include the selected font
-    if (m_vrvTextFont && resources) {
-        const std::string cssFontPath
-            = StringFormat("%s/%s.css", resources->GetPath().c_str(), resources->GetCurrentFontName().c_str());
-        std::ifstream cssFontFile(cssFontPath);
-        if (!cssFontFile.is_open()) {
-            LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG",
-                resources->GetCurrentFontName().c_str());
+    if (m_smuflTextFont != SMUFLTEXTFONT_none) {
+        const Resources *resources = this->GetResources(true);
+        // include the selected font
+        if (m_vrvTextFont && resources) {
+            this->IncludeTextFont(resources->GetCurrentFontName(), resources);
         }
-        else {
-            std::stringstream cssFontStream;
-            cssFontStream << cssFontFile.rdbuf();
-            pugi::xml_node css = m_svgNode.append_child("style");
-            css.append_attribute("type") = "text/css";
-            css.append_child(pugi::node_pcdata).set_value(cssFontStream.str().c_str());
-        }
-    }
-    // include the Leipzig fallback font
-    if (m_vrvTextFontFallback && resources) {
-        const std::string cssFontPath = StringFormat("%s/%s.css", resources->GetPath().c_str(), "Leipzig");
-        std::ifstream cssFontFile(cssFontPath);
-        if (!cssFontFile.is_open()) {
-            LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG",
-                resources->GetCurrentFontName().c_str());
-        }
-        else {
-            std::stringstream cssFontStream;
-            cssFontStream << cssFontFile.rdbuf();
-            pugi::xml_node css = m_svgNode.append_child("style");
-            css.append_attribute("type") = "text/css";
-            css.append_child(pugi::node_pcdata).set_value(cssFontStream.str().c_str());
+        // include the Leipzig fallback font
+        if (m_vrvTextFontFallback && resources) {
+            this->IncludeTextFont("Leipzig", resources);
         }
     }
 
@@ -938,7 +946,7 @@ void SvgDeviceContext::DrawText(
         if (m_fontStack.top()->GetSmuflFont() != SMUFL_NONE) {
             if (m_fontStack.top()->GetSmuflFont() == SMUFL_FONT_FALLBACK) {
                 this->VrvTextFontFallback();
-                textChild.append_attribute("font-family") = "Leipzi";
+                textChild.append_attribute("font-family") = "Leipzig";
             }
             else {
                 this->VrvTextFont();

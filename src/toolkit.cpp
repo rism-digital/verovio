@@ -1434,6 +1434,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
     svg.SetFormatRaw(m_options->m_svgFormatRaw.GetValue());
     svg.SetRemoveXlink(m_options->m_svgRemoveXlink.GetValue());
     svg.SetAdditionalAttributes(m_options->m_svgAdditionalAttribute.GetValue());
+    svg.SetSmuflTextFont((option_SMUFLTEXTFONT)m_options->m_smuflTextFont.GetValue());
 
     // render the page
     this->RenderToDeviceContext(pageNo, &svg);
