@@ -181,7 +181,7 @@ export class VerovioToolkit {
     }
 
     setOptions(options) {
-        this.proxy.setOptions(this.ptr, JSON.stringify(options));
+        return this.proxy.setOptions(this.ptr, JSON.stringify(options));
     }
 
     validatePAE(data) {
