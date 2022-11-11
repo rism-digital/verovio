@@ -391,6 +391,8 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         params.m_pointSize = rendFont.GetPointSize();
     }
     if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
+        // Because we do not have the string at this stage we rely only on the selected font
+        // This means fallback will not work for missing glyphs within <rend>
         rendFont.SetSmuflWithFallback(SMUFL_FONT_SELECTED);
         rendFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
         int pointSize = (rendFont.GetPointSize() != 0) ? rendFont.GetPointSize() : params.m_pointSize;
