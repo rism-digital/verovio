@@ -20,6 +20,10 @@
 
 #include "attalternates.h"
 #include "atttypes.h"
+#include "smufl.h"
+
+//----------------------------------------------------------------------------
+
 #include "jsonxx.h"
 
 //----------------------------------------------------------------------------
@@ -54,6 +58,13 @@ class OptionGrp;
 enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_line, BREAKS_smart, BREAKS_encoded };
 
 enum option_CONDENSE { CONDENSE_none = 0, CONDENSE_auto, CONDENSE_all, CONDENSE_encoded };
+
+enum option_ELISION {
+    ELISION_regular = SMUFL_E551_lyricsElision,
+    ELISION_narrow = SMUFL_E550_lyricsElisionNarrow,
+    ELISION_wide = SMUFL_E552_lyricsElisionWide,
+    ELISION_unicode = UNICODE_UNDERTIE
+};
 
 enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always };
 
@@ -124,6 +135,7 @@ public:
      */
     static const std::map<int, std::string> s_breaks;
     static const std::map<int, std::string> s_condense;
+    static const std::map<int, std::string> s_elision;
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
     static const std::map<int, std::string> s_multiRestStyle;
@@ -678,6 +690,7 @@ public:
     OptionDbl m_justificationMaxVertical;
     OptionDbl m_ledgerLineThickness;
     OptionDbl m_ledgerLineExtension;
+    OptionIntMap m_lyricElision;
     OptionDbl m_lyricHyphenLength;
     OptionDbl m_lyricLineThickness;
     OptionBool m_lyricNoStartHyphen;
