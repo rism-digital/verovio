@@ -468,6 +468,8 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define UNICODE_NATURAL U'\u266E' // ♮
 #define UNICODE_SHARP U'\u266F' // ♯
 
+#define UNICODE_UNDERTIE U'\u203F' // ‿
+
 #define UNICODE_DAL_SEGNO U'\U0001D109' // 𝄉
 #define UNICODE_DA_CAPO U'\U0001D10A' // 𝄊
 #define UNICODE_SEGNO U'\U0001D10B' // 𝄋

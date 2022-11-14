@@ -260,39 +260,41 @@ void View::DrawLyricString(
     bool wroteText = false;
     std::u32string syl = U"";
     std::u32string lyricStr = str;
-    while (lyricStr.compare(syl) != 0) {
-        wroteText = true;
-        auto index = lyricStr.find_first_of(U"_");
-        syl = lyricStr.substr(0, index);
-        if (params) {
-            dc->DrawText(UTF32to8(syl), syl, params->m_x, params->m_y, params->m_width, params->m_height);
-        }
-        else {
-            dc->DrawText(UTF32to8(syl), syl);
-        }
 
-        // no _
-        if (index == std::string::npos) break;
+    const int x = (params) ? params->m_x : VRV_UNSET;
+    const int y = (params) ? params->m_y : VRV_UNSET;
+    const int width = (params) ? params->m_width : VRV_UNSET;
+    const int height = (params) ? params->m_height : VRV_UNSET;
 
-        FontInfo vrvTxt;
-        vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-        vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
-        std::u32string elision;
-        elision.push_back(SMUFL_E551_lyricsElision);
-        bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(elision);
-        vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
-        dc->SetFont(&vrvTxt);
-        if (params) {
-            dc->DrawText(UTF32to8(elision), elision, params->m_x, params->m_y, params->m_width, params->m_height);
-        }
-        else {
-            dc->DrawText(UTF32to8(elision), elision);
-        }
-        dc->ResetFont();
+    if (m_doc->GetOptions()->m_lyricElision.GetValue() == ELISION_unicode) {
+        std::replace(lyricStr.begin(), lyricStr.end(), U'_', UNICODE_UNDERTIE);
+        dc->DrawText(UTF32to8(lyricStr), lyricStr, x, y, width, height);
+    }
+    else {
+        while (lyricStr.compare(syl) != 0) {
+            wroteText = true;
+            auto index = lyricStr.find_first_of(U"_");
+            syl = lyricStr.substr(0, index);
+            dc->DrawText(UTF32to8(syl), syl, x, y, width, height);
 
-        // next syllable
-        syl = U"";
-        lyricStr = lyricStr.substr(index + 1, lyricStr.length());
+            // no _
+            if (index == std::string::npos) break;
+
+            FontInfo vrvTxt;
+            vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
+            vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+            std::u32string elision;
+            elision.push_back(m_doc->GetOptions()->m_lyricElision.GetValue());
+            bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(elision);
+            vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
+            dc->SetFont(&vrvTxt);
+            dc->DrawText(UTF32to8(elision), elision, x, y, width, height);
+            dc->ResetFont();
+
+            // next syllable
+            syl = U"";
+            lyricStr = lyricStr.substr(index + 1, lyricStr.length());
+        }
     }
 
     // This should only be called in facsimile mode where a zone is specified but there is
