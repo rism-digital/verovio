@@ -373,7 +373,7 @@ jobs:
 
       - name: Copy artifacts to gh-pages
         run: |
-          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
+          cp -r artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Check git status before commit
         working-directory: ${{ env.GH_PAGES_DIR }}
