@@ -3106,7 +3106,7 @@ string Convert::base40ToIntervalAbbr(int base40interval) {
 	// Add base-7 number
 	char buffer2[32] = {0};
 	int diatonic = Convert::base40IntervalToDiatonic(base40interval)+1;
-	sprintf(buffer2, "%d", diatonic);
+	snprintf(buffer2, 32, "%d", diatonic);
 	output += buffer2;
 
 	return output;
@@ -58575,7 +58575,7 @@ void Tool_cint::getNames(vector<string>& names, vector<int>& reverselookup,
 
 	for (i=0; i<(int)names.size(); i++) {
 		value = (int)reverselookup.size() - i;
-		sprintf(buffer, "%d", value);
+		snprintf(buffer,1024,  "%d", value);
 		names[i] = buffer;
 	}
 
@@ -74345,25 +74345,25 @@ void Tool_extract::removeDollarsFromString(string& buffer, int maxtrack) {
 	int value2;
 
 	if (hre.search(buffer, "\\$$")) {
-		sprintf(buf2, "%d", maxtrack);
+		snprintf(buf2, 128, "%d", maxtrack);
 		hre.replaceDestructive(buffer, buf2, "\\$$");
 	}
 
 	if (hre.search(buffer, "\\$(?![\\d-])")) {
 		// don't know how this case could happen, however...
-		sprintf(buf2, "%d", maxtrack);
+		snprintf(buf2, 128, "%d", maxtrack);
 		hre.replaceDestructive(buffer, buf2, "\\$(?![\\d-])", "g");
 	}
 
 	if (hre.search(buffer, "\\$0")) {
 		// replace $0 with maxtrack (used for reverse orderings)
-		sprintf(buf2, "%d", maxtrack);
+		snprintf(buf2, 128, "%d", maxtrack);
 		hre.replaceDestructive(buffer, buf2, "\\$0", "g");
 	}
 
 	while (hre.search(buffer, "\\$(-?\\d+)")) {
 		value2 = maxtrack - abs(hre.getMatchInt(1));
-		sprintf(buf2, "%d", value2);
+		snprintf(buf2, 128, "%d", value2);
 		hre.replaceDestructive(buffer, buf2, "\\$-?\\d+");
 	}
 }
@@ -112527,7 +112527,7 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 		case 2:
 			{
 				char buffer[128] = {0};
-				sprintf(buffer, "d%dc%d", getInt("d"), getInt("c"));
+				snprintf(buffer, 128, "d%dc%d", getInt("d"), getInt("c"));
 				transval = Convert::transToBase40(buffer);
 			}
 			break;
