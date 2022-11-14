@@ -1491,41 +1491,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindSpannedLayerElementsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the vector of LayerElement pointer to fill
- * member 1: the minimum position
- * member 2: the maximum position
- * member 3: the staff numbers to consider, any staff if empty
- * member 4: the minimal layerN to consider, unbounded below if zero
- * member 5: the maximal layerN to consider, unbounded above if zero
- * member 6: the timespanning interface
- * member 7: the class ids to keep
- **/
-
-class FindSpannedLayerElementsParams : public FunctorParams {
-public:
-    FindSpannedLayerElementsParams(const TimeSpanningInterface *interface)
-    {
-        m_interface = interface;
-        m_minPos = 0;
-        m_maxPos = 0;
-        m_minLayerN = 0;
-        m_maxLayerN = 0;
-    }
-    std::vector<const LayerElement *> m_elements;
-    int m_minPos;
-    int m_maxPos;
-    std::set<int> m_staffNs;
-    int m_minLayerN;
-    int m_maxLayerN;
-    const TimeSpanningInterface *m_interface;
-    std::vector<ClassId> m_classIds;
-};
-
-//----------------------------------------------------------------------------
 // FindLayerIDWithinStaffDefParams
 //----------------------------------------------------------------------------
 
@@ -1705,32 +1670,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// GetRelativeLayerElementParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the next/previous relevant layer element
- * member 1: Id of the layer element that is being compared to (starting point)
- * member 2: direction of search - BACKWARD is for previous element, FORWARD - next
- * member 3: flag to indicate whether search is done in the same layer as element Id, or in neighboring one
- **/
-
-class GetRelativeLayerElementParams : public FunctorParams {
-public:
-    GetRelativeLayerElementParams(const int elementId, bool searchDirection, bool anotherLayer)
-    {
-        m_relativeElement = NULL;
-        m_initialElementId = elementId;
-        m_searchDirection = searchDirection;
-        m_isInNeighboringLayer = anotherLayer;
-    }
-    const Object *m_relativeElement;
-    int m_initialElementId;
-    bool m_searchDirection;
-    bool m_isInNeighboringLayer;
-};
-
-//----------------------------------------------------------------------------
 // InitMaxMeasureDurationParams
 //----------------------------------------------------------------------------
 
@@ -1897,70 +1836,6 @@ public:
 
     std::map<StaffAlignment *, int> m_shiftForStaff;
     Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
-// LayerCountInTimeSpanParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the time of the event
- * member 1: the duration of the event
- * member 2: the list of layerN found
- * member 3: the current meter signature
- * member 4: the current mensur
- * member 5: the functor for redirection
- **/
-
-class LayerCountInTimeSpanParams : public FunctorParams {
-public:
-    LayerCountInTimeSpanParams(const MeterSig *meterSig, const Mensur *mensur, Functor *functor)
-    {
-        m_time = 0.0;
-        m_duration = 0.0;
-        m_meterSig = meterSig;
-        m_mensur = mensur;
-        m_functor = functor;
-    }
-    double m_time;
-    double m_duration;
-    std::set<int> m_layers;
-    const MeterSig *m_meterSig;
-    const Mensur *m_mensur;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// LayerElementsInTimeSpanParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the time of the event
- * member 1: the duration of the event
- * member 2: the list of layer elements found
- * member 3: the current meter signature
- * member 4: the current mensur
- * member 5: layer to process elements on
- **/
-
-class LayerElementsInTimeSpanParams : public FunctorParams {
-public:
-    LayerElementsInTimeSpanParams(const MeterSig *meterSig, const Mensur *mensur, const Layer *layer)
-    {
-        m_time = 0.0;
-        m_duration = 0.0;
-        m_allLayersButCurrent = false;
-        m_meterSig = meterSig;
-        m_mensur = mensur;
-        m_layer = layer;
-    }
-    double m_time;
-    double m_duration;
-    bool m_allLayersButCurrent;
-    ListOfConstObjects m_elements;
-    const MeterSig *m_meterSig;
-    const Mensur *m_mensur;
-    const Layer *m_layer;
 };
 
 //----------------------------------------------------------------------------

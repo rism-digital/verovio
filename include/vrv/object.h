@@ -708,21 +708,6 @@ public:
     virtual int FindAllReferencedObjects(FunctorParams *functorParams);
 
     /**
-     * Look if the time / duration passed as parameter overlap with a space in the alignment references.
-     */
-    virtual int LayerCountInTimeSpan(FunctorParams *) const { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Look for all the layer elements that overlap with the time / duration within certain layer passed as parameter.
-     */
-    virtual int LayerElementsInTimeSpan(FunctorParams *functorParams) const { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Retrieve the layer elements spanned by two points
-     */
-    virtual int FindSpannedLayerElements(FunctorParams *) const { return FUNCTOR_CONTINUE; }
-
-    /**
      * Look for element by ID in StaffDef elements (Clef, KeySig, etc.) of all layers within
      */
     virtual int FindElementInLayerStaffDefsByID(FunctorParams *) const { return FUNCTOR_CONTINUE; }
@@ -732,14 +717,6 @@ public:
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
      */
     virtual int GetAlignmentLeftRight(FunctorParams *functorParams) const;
-
-    /**
-     * Go through all layer elements of the layer and return next/previous element relative to the specified
-     * layer element.
-     * It will search recursively through children elements until note, chord or ftrem is found.
-     * It can be used to look in neighboring layers for the similar search, but only first element will be checked.
-     */
-    virtual int GetRelativeLayerElement(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     ///@}
 

@@ -704,18 +704,6 @@ FunctorCode Measure::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMeasureEnd(this);
 }
 
-int Measure::FindSpannedLayerElements(FunctorParams *functorParams) const
-{
-    FindSpannedLayerElementsParams *params = vrv_params_cast<FindSpannedLayerElementsParams *>(functorParams);
-    assert(params);
-
-    if (Object::IsPreOrdered(this, params->m_interface->GetStartMeasure())) return FUNCTOR_SIBLINGS;
-
-    if (Object::IsPreOrdered(params->m_interface->GetEndMeasure(), this)) return FUNCTOR_SIBLINGS;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
     ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);

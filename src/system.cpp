@@ -20,6 +20,7 @@
 #include "dynam.h"
 #include "ending.h"
 #include "findfunctor.h"
+#include "findlayerelementsfunctor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -270,19 +271,17 @@ bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElemen
 curvature_CURVEDIR System::GetPreferredCurveDirection(
     const LayerElement *start, const LayerElement *end, const Slur *slur) const
 {
-    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur);
-    findSpannedLayerElementsParams.m_minPos = start->GetDrawingX();
-    findSpannedLayerElementsParams.m_maxPos = end->GetDrawingX();
-    findSpannedLayerElementsParams.m_classIds = { CHORD, NOTE };
+    FindSpannedLayerElementsFunctor findSpannedLayerElements(slur);
+    findSpannedLayerElements.SetMinMaxPos(start->GetDrawingX(), end->GetDrawingX());
+    findSpannedLayerElements.SetClassIds({ CHORD, NOTE });
 
     const Layer *layerStart = vrv_cast<const Layer *>(start->GetFirstAncestor(LAYER));
     assert(layerStart);
 
-    Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-    this->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams);
+    this->Process(findSpannedLayerElements);
 
     curvature_CURVEDIR preferredDirection = curvature_CURVEDIR_NONE;
-    for (auto element : findSpannedLayerElementsParams.m_elements) {
+    for (auto element : findSpannedLayerElements.GetElements()) {
         const Layer *layer = vrv_cast<const Layer *>((element)->GetFirstAncestor(LAYER));
         assert(layer);
         if (layer == layerStart) continue;

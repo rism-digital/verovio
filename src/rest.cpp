@@ -18,7 +18,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
-#include "functor.h"
+#include "findlayerelementsfunctor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "smufl.h"
@@ -373,23 +373,19 @@ int Rest::GetLocationRelativeToCurrentLayer(const Staff *currentStaff, const Lay
 {
     if (!currentStaff || !currentLayer) return VRV_UNSET;
 
-    Functor getRelativeLayerElement(&Object::GetRelativeLayerElement);
-    GetRelativeLayerElementParams getRelativeLayerElementParams(this->GetIdx(), BACKWARD, false);
-
     const Object *previousElement = NULL;
     const Object *nextElement = NULL;
     // Get previous and next elements from the current layer
     if (currentLayer->GetFirstChildNot(REST)) {
-        currentLayer->Process(
-            &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
-        previousElement = getRelativeLayerElementParams.m_relativeElement;
-        // reset and search in other direction
-        getRelativeLayerElementParams.m_relativeElement = NULL;
-        getRelativeLayerElementParams.m_searchDirection = FORWARD;
-        getRelativeLayerElement.m_returnCode = FUNCTOR_CONTINUE;
-        currentLayer->Process(
-            &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD);
-        nextElement = getRelativeLayerElementParams.m_relativeElement;
+        GetRelativeLayerElementFunctor getRelativeLayerElementBackwards(this->GetIdx(), BACKWARD, false);
+        getRelativeLayerElementBackwards.SetDirection(BACKWARD);
+        currentLayer->Process(getRelativeLayerElementBackwards);
+        previousElement = getRelativeLayerElementBackwards.GetRelativeElement();
+
+        // search in other direction
+        GetRelativeLayerElementFunctor getRelativeLayerElementForwards(this->GetIdx(), FORWARD, false);
+        currentLayer->Process(getRelativeLayerElementForwards);
+        nextElement = getRelativeLayerElementForwards.GetRelativeElement();
     }
 
     // For chords we want to get the closest element to opposite layer, hence we pass negative 'isTopLayer' value
@@ -453,12 +449,11 @@ int Rest::GetFirstRelativeElementLocation(
     if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == layers.end())) return VRV_UNSET;
 
     // Get last element if it's previous layer, get first one otherwise
-    Functor getRelativeLayerElement(&Object::GetRelativeLayerElement);
-    GetRelativeLayerElementParams getRelativeLayerElementParams(this->GetIdx(), !isPrevious, true);
-    (*layerIter)
-        ->Process(&getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, !isPrevious);
+    GetRelativeLayerElementFunctor getRelativeLayerElement(this->GetIdx(), !isPrevious, true);
+    getRelativeLayerElement.SetDirection(!isPrevious);
+    (*layerIter)->Process(getRelativeLayerElement);
 
-    const Object *lastLayerElement = getRelativeLayerElementParams.m_relativeElement;
+    const Object *lastLayerElement = getRelativeLayerElement.GetRelativeElement();
     if (lastLayerElement && lastLayerElement->Is({ NOTE, CHORD, FTREM })) {
         return this->GetElementLocation(lastLayerElement, vrv_cast<const Layer *>(*layerIter), !isTopLayer).first;
     }

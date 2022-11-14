@@ -417,21 +417,6 @@ public:
     int CalcAlignmentPitchPos(FunctorParams *functorParams) override;
 
     /**
-     * See Object::FindSpannedLayerElements
-     */
-    int FindSpannedLayerElements(FunctorParams *functorParams) const override;
-
-    /**
-     * See Object::LayerCountInTimeSpan
-     */
-    int LayerCountInTimeSpan(FunctorParams *functorParams) const override;
-
-    /**
-     * See Object::LayerElementsInTimeSpan
-     */
-    int LayerElementsInTimeSpan(FunctorParams *functorParams) const override;
-
-    /**
      * See Object::InitOnsetOffset
      */
     ///@{
@@ -466,11 +451,6 @@ public:
      * See Object::ResetData
      */
     int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GetRelativeLayerElement
-     */
-    int GetRelativeLayerElement(FunctorParams *functorParams) const override;
 
     /**
      * See Object::CalcSlurDirection
