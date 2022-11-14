@@ -281,6 +281,31 @@ jobs:
           name: ${{ env.TOOLKIT_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
 
+
+  ############################
+  # Copy the font CSS files  #
+  ############################
+  copy_font_files:
+    name: Copy the font files
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v3
+
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
+        run: mkdir -p $TEMP_DIR/data
+
+      - name: Copy build into TEMP_DIR
+        run: cp data/*.css $GITHUB_WORKSPACE/$TEMP_DIR/data/
+
+      - name: Upload font data artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.TOOLKIT_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/data
+
   ##################################
   # Check settings for deployment  #
   ##################################
