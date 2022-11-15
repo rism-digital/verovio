@@ -919,6 +919,8 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     }
 
     switch (form) {
+        case BARRENDITION_NONE: //
+            [[fallthrough]];
         case BARRENDITION_single: //
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
             break;
