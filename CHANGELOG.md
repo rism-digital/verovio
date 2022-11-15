@@ -1,9 +1,10 @@
 # Changelog
 
 ## [unreleased]
+* Support for `dblserpent` barlines (@eNote-GmBH)
 * Support for `@dir.dist` and `@tempo.dist` (@eNote-GmBH)
 * Support for persian accidentals (sori and koron)
-* Support for heavy barlines
+* Support for heavy barlines (@eNote-GmBH)
 
 ## [3.12.1] - 2022-10-06
 * Fix `graphic` misssing in ios framework
