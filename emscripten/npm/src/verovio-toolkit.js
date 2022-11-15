@@ -10,13 +10,11 @@ export class VerovioToolkit {
         }
         this.proxy = createEmscriptenProxy(this.VerovioModule);
         this.ptr = this.proxy.constructor();
-        console.debug("Creating toolkit instance");
         VerovioToolkit.instances.push(this);
     }
 
     destroy() {
         VerovioToolkit.instances.splice(VerovioToolkit.instances.findIndex(i => i.ptr === this.ptr), 1);
-        console.debug("Deleting toolkit instance");
         this.proxy.destructor(this.ptr);
     }
 
@@ -193,7 +191,7 @@ export class VerovioToolkit {
 
 }
 
-// A pointer to the object - only one isnstance can be created for now
+// A pointer to the object - only one instance can be created for now
 VerovioToolkit.instances = [];
 
 
