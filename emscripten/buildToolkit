@@ -183,6 +183,8 @@ my $embed   = "--embed-file $DATA_DIR/";
 my $output  = "-o $BUILD_DIR/verovio.js";
 
 my $exports = "-s EXPORTED_FUNCTIONS=\"[";
+$exports .= "'_enableLog',";
+$exports .= "'_enableLogToBuffer',";
 $exports .= "'_vrvToolkit_constructor',";
 $exports .= "'_vrvToolkit_destructor',";
 $exports .= "'_vrvToolkit_edit',";
