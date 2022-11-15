@@ -879,6 +879,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
         yTop -= dashLength;
         yBottom += dashLength;
     }
+    const int serpentWidth = m_doc->GetGlyphWidth(SMUFL_E04A_segnoSerpent1, staffSize, false);
 
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
@@ -961,6 +962,12 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
         case BARRENDITION_dblheavy:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
             this->DrawVerticalSegmentedLine(dc, x2 + barLineThickWidth, line, barLineThickWidth);
+            break;
+        case BARRENDITION_dblsegno:
+            this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            this->DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth);
+            this->DrawSmuflCode(dc, (x + (barLineSeparation + barLineWidth - serpentWidth) / 2), yBottom,
+                SMUFL_E04A_segnoSerpent1, staffSize, false);
             break;
         case BARRENDITION_dbldashed:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength, gapLength);
