@@ -13,6 +13,9 @@ extern "C" {
  * Methods exported a functions to use the Toolkit class
  ****************************************************************/
 
+void enableLog(bool value);
+void enableLogToBuffer(bool value);
+
 void *vrvToolkit_constructor();
 void *vrvToolkit_constructorResourcePath(const char *resourcePath);
 
