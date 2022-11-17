@@ -23,6 +23,7 @@
 #endif
 
 #include "atttypes.h"
+#include "toolkitdef.h"
 
 namespace vrv {
 
@@ -41,10 +42,9 @@ void LogWarning(const char *fmt, ...);
 /**
  * Member and functions specific to loging that uses a vector of string to buffer the logs.
  */
-enum consoleLogLevel { CONSOLE_LOG = 0, CONSOLE_INFO, CONSOLE_WARN, CONSOLE_ERROR, CONSOLE_DEBUG };
 extern std::vector<std::string> logBuffer;
 bool LogBufferContains(const std::string &s);
-void LogString(std::string message, consoleLogLevel level);
+void LogString(std::string message, LogLevel level);
 
 /**
  * Utility for comparing doubles
@@ -99,7 +99,7 @@ std::string BaseEncodeInt(unsigned int value, unsigned int base);
 /**
  *
  */
-extern bool logging;
+extern LogLevel logLevel;
 extern bool loggingToBuffer;
 
 /**

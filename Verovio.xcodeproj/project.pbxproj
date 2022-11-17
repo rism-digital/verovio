@@ -295,6 +295,8 @@
 		4D4335D31ED4567F003BE1A9 /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
 		4D4335D41ED45680003BE1A9 /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
 		4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */; };
+		4D49924F2926B4E9007E3431 /* toolkitdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D49924E2926B4DD007E3431 /* toolkitdef.h */; };
+		4D4992502926B4E9007E3431 /* toolkitdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D49924E2926B4DD007E3431 /* toolkitdef.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D4C26ED1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
 		4D4C26EE1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
 		4D4C26EF1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
@@ -1442,6 +1444,7 @@
 		4D4335C51ECF2310003BE1A9 /* atts_visual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_visual.h; path = libmei/atts_visual.h; sourceTree = "<group>"; };
 		4D4335CC1ED2BACB003BE1A9 /* attalternates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attalternates.h; path = include/vrv/attalternates.h; sourceTree = "<group>"; };
 		4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_mensural.cpp; path = src/view_mensural.cpp; sourceTree = "<group>"; };
+		4D49924E2926B4DD007E3431 /* toolkitdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = toolkitdef.h; path = include/vrv/toolkitdef.h; sourceTree = "<group>"; };
 		4D4C26EB1EF7E73000681770 /* label.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = label.h; path = include/vrv/label.h; sourceTree = "<group>"; };
 		4D4C26EC1EF7E75400681770 /* label.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = label.cpp; path = src/label.cpp; sourceTree = "<group>"; };
 		4D4FCD091F5455F10009C455 /* staffgrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = staffgrp.h; path = include/vrv/staffgrp.h; sourceTree = "<group>"; };
@@ -2262,6 +2265,7 @@
 				4DD7C0FE27A55CFD00B9C017 /* timemap.h */,
 				8F086EBF188539540037FD8E /* toolkit.cpp */,
 				8F59291618854BF800FE51AD /* toolkit.h */,
+				4D49924E2926B4DD007E3431 /* toolkitdef.h */,
 				4DC3B9E4239E2ABE007F185E /* transposition.cpp */,
 				4DC3B9E6239E2AD9007F185E /* transposition.h */,
 				8F086EB6188539540037FD8E /* verticalaligner.cpp */,
@@ -2594,6 +2598,7 @@
 				4D72A5E2208A37F4009DEC1E /* mnum.h in Headers */,
 				4DB3D8FB1F83D1F700B5FC2B /* floatingobject.h in Headers */,
 				4DB3D8B21F83D06100B5FC2B /* atts_visual.h in Headers */,
+				4D49924F2926B4E9007E3431 /* toolkitdef.h in Headers */,
 				4D94721D20CA701000C780C8 /* linkinginterface.h in Headers */,
 				403BEFF7206C00F800D022D5 /* multirpt.h in Headers */,
 				4DC12A751F73FF92000440E9 /* runningelement.h in Headers */,
@@ -2874,6 +2879,7 @@
 				BB4C4B7C22A932D7001F6AF0 /* tuplet.h in Headers */,
 				BB4C4B4422A932D7001F6AF0 /* beatrpt.h in Headers */,
 				BB4C4AB022A932A6001F6AF0 /* ioabc.h in Headers */,
+				4D4992502926B4E9007E3431 /* toolkitdef.h in Headers */,
 				BB4C4AA422A9328F001F6AF0 /* vrv.h in Headers */,
 				BB4C4A6122A9321F001F6AF0 /* atts_analytical.h in Headers */,
 				BB4C4A6B22A9321F001F6AF0 /* atts_externalsymbols.h in Headers */,

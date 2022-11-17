@@ -32,6 +32,15 @@ const Resources::StyleAttributes Resources::k_defaultStyle{ data_FONTWEIGHT::FON
     data_FONTSTYLE::FONTSTYLE_normal };
 
 //----------------------------------------------------------------------------
+// Function defined in toolkitdef.h
+//----------------------------------------------------------------------------
+
+void SetDefaultResourcePath(const std::string &path)
+{
+    Resources::SetDefaultPath(path);
+}
+
+//----------------------------------------------------------------------------
 // Resources
 //----------------------------------------------------------------------------
 

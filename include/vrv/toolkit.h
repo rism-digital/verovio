@@ -14,6 +14,7 @@
 
 #include "doc.h"
 #include "docselection.h"
+#include "toolkitdef.h"
 #include "view.h"
 
 //----------------------------------------------------------------------------
@@ -22,31 +23,6 @@ namespace vrv {
 
 class EditorToolkit;
 class RuntimeClock;
-
-enum FileFormat {
-    UNKNOWN = 0,
-    AUTO,
-    MEI,
-    HUMDRUM,
-    HUMMEI,
-    HUMMIDI,
-    PAE,
-    ABC,
-    DARMS,
-    MUSICXML,
-    MUSICXMLHUM,
-    MEIHUM,
-    MUSEDATAHUM,
-    ESAC,
-    MIDI,
-    TIMEMAP
-};
-
-void SetDefaultResourcePath(const std::string &path);
-
-// Implementation in vrv.cpp but defined here to be available in SWIG bindings
-void EnableLog(bool value);
-void EnableLogToBuffer(bool value);
 
 /**
  * @defgroup nodoc Public methods that are not listed in the documentation
