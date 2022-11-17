@@ -11,12 +11,6 @@ export const createEmscriptenProxy = (VerovioModule) => {
 function getToolkitFunction(VerovioModule, method) {
     const mapping = {};
 
-    // Enable log
-    mapping.enableLog = VerovioModule.cwrap("enableLog", null, ["number"]);
-
-    // Enable log to buffer
-    mapping.enableLogToBuffer = VerovioModule.cwrap("enableLogToBuffer", null, ["number"]);
-
     // Constructor and destructor
     // Toolkit *constructor()
     mapping.constructor = VerovioModule.cwrap("vrvToolkit_constructor", "number", []);
