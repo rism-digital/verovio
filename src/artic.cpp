@@ -448,16 +448,15 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     int y = this->GetDrawingY();
     int yShift = 0;
 
-    const int bottomMargin = staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     if (this->IsInsideArtic()) {
         // If we are above the top of the  staff, just pile them up
         if ((this->GetDrawingPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) {
             yShift += spacingBottom;
         }
         // If we are below the bottom, just pile the down
-        else if ((this->GetDrawingPlace() == STAFFREL_below) && (y < bottomMargin)) {
-            if (y > bottomMargin - unit) {
-                yShift = (bottomMargin - unit) - y;
+        else if ((this->GetDrawingPlace() == STAFFREL_below) && (y < staffYBottom)) {
+            if (y > staffYBottom - unit) {
+                yShift = (staffYBottom - unit) - y;
                 if (std::abs(yShift) < spacingTop) yShift = -spacingTop;
             }
             else {
