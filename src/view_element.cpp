@@ -902,7 +902,9 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // C major (0) key sig and no cancellation
     else if ((keySig->GetAccidCount() == 0) && (keySig->m_drawingCancelAccidCount == 0)) {
+        dc->StartGraphic(element, "", element->GetID());
         keySig->SetEmptyBB();
+        dc->EndGraphic(element, this);
         return;
     }
 
