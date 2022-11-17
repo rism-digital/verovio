@@ -26,9 +26,9 @@
 
 namespace vrv {
 
-const std::vector<data_ARTICULATION> Artic::s_outStaffArtic
-    = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm,
-          ARTICULATION_snap, ARTICULATION_damp, ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
+const std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_acc_soft,
+    ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp,
+    ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
 
 const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic
     = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap,
