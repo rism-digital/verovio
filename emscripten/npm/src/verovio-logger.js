@@ -8,7 +8,7 @@ export const logLevel = {
     error: 4,
 };
 
-export function enableLog(level, VerovioModule) {
+export function enableLog(level = logLevel.debug, VerovioModule) {
     const proxy = createEmscriptenProxy(VerovioModule);
     const ptr = proxy.constructor();
     proxy.enableLog(ptr, level);
