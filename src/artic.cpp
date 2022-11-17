@@ -285,18 +285,19 @@ std::pair<char32_t, char32_t> Artic::GetEnclosingGlyphs() const
 
 bool Artic::VerticalCorr(char32_t code, data_STAFFREL place)
 {
-    if (place == STAFFREL_above)
-        return false;
-    else if (code == SMUFL_E611_stringsDownBowTurned)
-        return true;
-    else if (code == SMUFL_E613_stringsUpBowTurned)
-        return true;
-    else if (code == SMUFL_E630_pluckedSnapPizzicatoBelow)
-        return true;
-    else if (code == SMUFL_E614_stringsHarmonic)
-        return true;
-    else
-        return false;
+    if (place == STAFFREL_above) return false;
+
+    switch (code) {
+        case SMUFL_E5E5_brassMuteClosed: return true;
+        case SMUFL_E5E6_brassMuteHalfClosed: return true;
+        case SMUFL_E5E7_brassMuteOpen: return true;
+        case SMUFL_E611_stringsDownBowTurned: return true;
+        case SMUFL_E613_stringsUpBowTurned: return true;
+        case SMUFL_E614_stringsHarmonic: return true;
+        case SMUFL_E630_pluckedSnapPizzicatoBelow: return true;
+        case SMUFL_E633_pluckedLeftHandPizzicato: return true;
+        default: return false;
+    }
 }
 
 bool Artic::IsCentered(data_ARTICULATION artic)
@@ -394,7 +395,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
     Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
-    int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+    int staffYBottom = -params->m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
 
     Stem *stem = vrv_cast<Stem *>(params->m_parent->FindDescendantByType(STEM));
     Flag *flag = vrv_cast<Flag *>(params->m_parent->FindDescendantByType(FLAG));
