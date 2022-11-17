@@ -20,6 +20,7 @@
 #include "staff.h"
 #include "stem.h"
 #include "tabgrp.h"
+#include "vrv.h"
 
 namespace vrv {
 
