@@ -445,6 +445,7 @@ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
 
 int StaffAlignment::CalcOverflowAbove(const BoundingBox *box) const
 {
+    if (!box->HasContentVerticalBB()) return 0;
     if (box->Is(FLOATING_POSITIONER)) {
         const FloatingPositioner *positioner = vrv_cast<const FloatingPositioner *>(box);
         assert(positioner);
@@ -455,6 +456,7 @@ int StaffAlignment::CalcOverflowAbove(const BoundingBox *box) const
 
 int StaffAlignment::CalcOverflowBelow(const BoundingBox *box) const
 {
+    if (!box->HasContentVerticalBB()) return 0;
     if (box->Is(FLOATING_POSITIONER)) {
         const FloatingPositioner *positioner = vrv_cast<const FloatingPositioner *>(box);
         assert(positioner);
