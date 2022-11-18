@@ -9,7 +9,7 @@ class VerovioToolkitDefaultModule extends VerovioToolkit {
 }
 
 function enableLogDefaultModule(level = logLevel.debug, VerovioModule = DefaultVerovioModule) {
-    enableLog(level, VerovioModule);
+    return enableLog(level, VerovioModule);
 }
 
 // Assign Module to window to prevent breaking changes.
