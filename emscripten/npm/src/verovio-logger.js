@@ -9,3 +9,7 @@ export const logLevel = {
 export function enableLog(level = logLevel.debug, VerovioModule) {
     return VerovioModule.cwrap("enableLog", null, ["number"])(level);
 }
+
+export function enableLogToBuffer(level = logLevel.debug, VerovioModule) {
+    return VerovioModule.cwrap("enableLogToBuffer", null, ["number"])(level);
+}

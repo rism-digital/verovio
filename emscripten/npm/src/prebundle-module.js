@@ -1,6 +1,6 @@
 import DefaultVerovioModule from "../../build/verovio.js";
 import { VerovioToolkit } from "./verovio-toolkit.js";
-import { logLevel, enableLog } from "./verovio-logger.js";
+import { logLevel, enableLog, enableLogToBuffer } from "./verovio-logger.js";
 
 class VerovioToolkitDefaultModule extends VerovioToolkit {
     constructor(VerovioModule = DefaultVerovioModule) {
@@ -10,6 +10,10 @@ class VerovioToolkitDefaultModule extends VerovioToolkit {
 
 function enableLogDefaultModule(level = logLevel.debug, VerovioModule = DefaultVerovioModule) {
     return enableLog(level, VerovioModule);
+}
+
+function enableLogToBufferDefaultModule(level = logLevel.debug, VerovioModule = DefaultVerovioModule) {
+    return enableLogToBuffer(level, VerovioModule);
 }
 
 // Assign Module to window to prevent breaking changes.
@@ -23,4 +27,5 @@ export default {
     toolkit: VerovioToolkitDefaultModule,
     logLevel,
     enableLog: enableLogDefaultModule,
+    enableLogToBuffer: enableLogToBufferDefaultModule,
 };
