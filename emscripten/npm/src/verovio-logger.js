@@ -1,5 +1,3 @@
-import { createEmscriptenProxy } from "./emscripten-proxy.js";
-
 export const logLevel = {
     off: 0,
     debug: 1,
@@ -9,7 +7,5 @@ export const logLevel = {
 };
 
 export function enableLog(level = logLevel.debug, VerovioModule) {
-    const proxy = createEmscriptenProxy(VerovioModule);
-    const ptr = proxy.constructor();
-    proxy.enableLog(ptr, level);
+    return VerovioModule.cwrap("enableLog", null, ["number"])(level);
 }
