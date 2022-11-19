@@ -52,6 +52,7 @@ else()
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         message(STATUS "Enabling debug information")
         add_definitions(-g)
+        add_definitions(-DDEBUG)
     endif()
 
     # jsonxx raises -Wdollar-in-identifier-extension
