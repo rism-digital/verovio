@@ -29,7 +29,9 @@ enum FileFormat {
     TIMEMAP
 };
 
-enum LogLevel { LOG_OFF = 0, LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR };
+enum { LOG_OFF = 0, LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR };
+
+typedef int LogLevel;
 
 /**
  * Functions defined here to be available in SWIG bindings
