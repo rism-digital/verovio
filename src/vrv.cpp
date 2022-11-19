@@ -64,8 +64,8 @@ namespace vrv {
 /** Global for LogElapsedTimeXXX functions (debugging purposes) */
 struct timeval start;
 
-/** For controlling the log level - all enabled by default */
-LogLevel logLevel = LOG_INFO;
+/** For controlling the log level - warning level enabled by default */
+LogLevel logLevel = LOG_WARNING;
 
 /** By default log to stderr or JS console */
 bool loggingToBuffer = false;
@@ -89,7 +89,7 @@ void LogElapsedTimeEnd(const char *msg)
 
 void LogDebug(const char *fmt, ...)
 {
-    if (!logLevel) return;
+    if (logLevel < LOG_DEBUG) return;
 
 #if defined(DEBUG)
     std::string s;

@@ -29,7 +29,7 @@ enum FileFormat {
     TIMEMAP
 };
 
-enum { LOG_OFF = 0, LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR };
+enum { LOG_OFF = 0, LOG_ERROR, LOG_WARNING, LOG_INFO, LOG_DEBUG };
 
 typedef int LogLevel;
 
