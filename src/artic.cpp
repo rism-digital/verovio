@@ -26,9 +26,9 @@
 
 namespace vrv {
 
-const std::vector<data_ARTICULATION> Artic::s_outStaffArtic
-    = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm,
-          ARTICULATION_snap, ARTICULATION_damp, ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
+const std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_acc_soft,
+    ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp,
+    ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
 
 const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic
     = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap,
@@ -285,18 +285,19 @@ std::pair<char32_t, char32_t> Artic::GetEnclosingGlyphs() const
 
 bool Artic::VerticalCorr(char32_t code, data_STAFFREL place)
 {
-    if (place == STAFFREL_above)
-        return false;
-    else if (code == SMUFL_E611_stringsDownBowTurned)
-        return true;
-    else if (code == SMUFL_E613_stringsUpBowTurned)
-        return true;
-    else if (code == SMUFL_E630_pluckedSnapPizzicatoBelow)
-        return true;
-    else if (code == SMUFL_E614_stringsHarmonic)
-        return true;
-    else
-        return false;
+    if (place == STAFFREL_above) return false;
+
+    switch (code) {
+        case SMUFL_E5E5_brassMuteClosed: return true;
+        case SMUFL_E5E6_brassMuteHalfClosed: return true;
+        case SMUFL_E5E7_brassMuteOpen: return true;
+        case SMUFL_E611_stringsDownBowTurned: return true;
+        case SMUFL_E613_stringsUpBowTurned: return true;
+        case SMUFL_E614_stringsHarmonic: return true;
+        case SMUFL_E630_pluckedSnapPizzicatoBelow: return true;
+        case SMUFL_E633_pluckedLeftHandPizzicato: return true;
+        default: return false;
+    }
 }
 
 bool Artic::IsCentered(data_ARTICULATION artic)
@@ -394,7 +395,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
     Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
-    int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+    int staffYBottom = -params->m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
 
     Stem *stem = vrv_cast<Stem *>(params->m_parent->FindDescendantByType(STEM));
     Flag *flag = vrv_cast<Flag *>(params->m_parent->FindDescendantByType(FLAG));
@@ -447,16 +448,15 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     int y = this->GetDrawingY();
     int yShift = 0;
 
-    const int bottomMargin = staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     if (this->IsInsideArtic()) {
         // If we are above the top of the  staff, just pile them up
         if ((this->GetDrawingPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) {
             yShift += spacingBottom;
         }
         // If we are below the bottom, just pile the down
-        else if ((this->GetDrawingPlace() == STAFFREL_below) && (y < bottomMargin)) {
-            if (y > bottomMargin - unit) {
-                yShift = (bottomMargin - unit) - y;
+        else if ((this->GetDrawingPlace() == STAFFREL_below) && (y < staffYBottom)) {
+            if (y > staffYBottom - unit) {
+                yShift = (staffYBottom - unit) - y;
                 if (std::abs(yShift) < spacingTop) yShift = -spacingTop;
             }
             else {
