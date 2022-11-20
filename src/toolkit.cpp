@@ -58,11 +58,6 @@ const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
 const char *ZIP_SIGNATURE = "\x50\x4B\x03\x04";
 
-void SetDefaultResourcePath(const std::string &path)
-{
-    Resources::SetDefaultPath(path);
-}
-
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------

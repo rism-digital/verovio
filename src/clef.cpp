@@ -20,6 +20,7 @@
 #include "scoredefinterface.h"
 #include "smufl.h"
 #include "staff.h"
+#include "vrv.h"
 
 namespace vrv {
 

@@ -22,12 +22,12 @@
 %module verovio
 %include "std_string.i"
 %include "../../include/vrv/toolkit.h"
-
+%include "../../include/vrv/toolkitdef.h"
 
 %{
     #include "../../include/vrv/toolkit.h"
+    #include "../../include/vrv/toolkitdef.h"
     
     using namespace vrv;
     using namespace std;
 %}
-

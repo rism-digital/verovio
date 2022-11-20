@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "smufl.h"
+#include "vrv.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -29,6 +30,15 @@ namespace vrv {
 thread_local std::string Resources::s_defaultPath = VRV_RESOURCE_DIR;
 const Resources::StyleAttributes Resources::k_defaultStyle{ data_FONTWEIGHT::FONTWEIGHT_normal,
     data_FONTSTYLE::FONTSTYLE_normal };
+
+//----------------------------------------------------------------------------
+// Function defined in toolkitdef.h
+//----------------------------------------------------------------------------
+
+void SetDefaultResourcePath(const std::string &path)
+{
+    Resources::SetDefaultPath(path);
+}
 
 //----------------------------------------------------------------------------
 // Resources

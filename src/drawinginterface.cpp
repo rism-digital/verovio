@@ -19,6 +19,7 @@
 #include "object.h"
 #include "staff.h"
 #include "stem.h"
+#include "vrv.h"
 
 namespace vrv {
 

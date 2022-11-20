@@ -64,8 +64,8 @@ namespace vrv {
 /** Global for LogElapsedTimeXXX functions (debugging purposes) */
 struct timeval start;
 
-/** For disabling log */
-bool logging = true;
+/** For controlling the log level - warning level enabled by default */
+LogLevel logLevel = LOG_WARNING;
 
 /** By default log to stderr or JS console */
 bool loggingToBuffer = false;
@@ -89,65 +89,55 @@ void LogElapsedTimeEnd(const char *msg)
 
 void LogDebug(const char *fmt, ...)
 {
-    if (!logging) return;
+    if (logLevel < LOG_DEBUG) return;
 
 #if defined(DEBUG)
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, CONSOLE_DEBUG);
+    LogString(s, LOG_DEBUG);
     va_end(args);
 #endif
 }
 
 void LogError(const char *fmt, ...)
 {
-    if (!logging) return;
+    if (logLevel < LOG_ERROR) return;
 
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Error] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, CONSOLE_ERROR);
+    LogString(s, LOG_ERROR);
     va_end(args);
 }
 
 void LogMessage(const char *fmt, ...)
 {
-    if (!logging) return;
+    if (logLevel < LOG_INFO) return;
 
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Message] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, CONSOLE_INFO);
+    LogString(s, LOG_INFO);
     va_end(args);
 }
 
 void LogWarning(const char *fmt, ...)
 {
-    if (!logging) return;
+    if (logLevel < LOG_WARNING) return;
 
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Warning] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, CONSOLE_WARN);
+    LogString(s, LOG_WARNING);
     va_end(args);
 }
 
-void EnableLog(bool value)
-{
-    logging = value;
-}
-
-void EnableLogToBuffer(bool value)
-{
-    loggingToBuffer = value;
-}
-
-void LogString(std::string message, consoleLogLevel level)
+void LogString(std::string message, LogLevel level)
 {
     if (loggingToBuffer) {
         if (LogBufferContains(message)) return;
@@ -156,18 +146,18 @@ void LogString(std::string message, consoleLogLevel level)
     else {
 #ifdef __EMSCRIPTEN__
         switch (level) {
-            case CONSOLE_DEBUG: EM_ASM_ARGS({ console.debug(UTF8ToString($0)); }, message.c_str()); break;
-            case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(UTF8ToString($0)); }, message.c_str()); break;
-            case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(UTF8ToString($0)); }, message.c_str()); break;
-            case CONSOLE_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
+            case LOG_DEBUG: EM_ASM_ARGS({ console.debug(UTF8ToString($0)); }, message.c_str()); break;
+            case LOG_ERROR: EM_ASM_ARGS({ console.error(UTF8ToString($0)); }, message.c_str()); break;
+            case LOG_WARNING: EM_ASM_ARGS({ console.warn(UTF8ToString($0)); }, message.c_str()); break;
+            case LOG_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
             default: EM_ASM_ARGS({ console.log(UTF8ToString($0)); }, message.c_str()); break;
         }
 #elif defined ANDROID
         switch (level) {
-            case CONSOLE_DEBUG: android_log_puts(ANDROID_LOG_DEBUG, message.c_str()); break;
-            case CONSOLE_ERROR: android_log_puts(ANDROID_LOG_ERROR, message.c_str()); break;
-            case CONSOLE_WARN: android_log_puts(ANDROID_LOG_WARN, message.c_str()); break;
-            case CONSOLE_INFO:
+            case LOG_DEBUG: android_log_puts(ANDROID_LOG_DEBUG, message.c_str()); break;
+            case LOG_ERROR: android_log_puts(ANDROID_LOG_ERROR, message.c_str()); break;
+            case LOG_WARNING: android_log_puts(ANDROID_LOG_WARN, message.c_str()); break;
+            case LOG_INFO:
             default: android_log_puts(ANDROID_LOG_INFO, message.c_str()); break;
         }
 #else
@@ -190,6 +180,20 @@ bool Check(Object *object)
 {
     assert(object);
     return (object != NULL);
+}
+
+//----------------------------------------------------------------------------
+// Function defined in toolkitdef.h
+//----------------------------------------------------------------------------
+
+void EnableLog(LogLevel level)
+{
+    logLevel = level;
+}
+
+void EnableLogToBuffer(bool value)
+{
+    loggingToBuffer = value;
 }
 
 //----------------------------------------------------------------------------
