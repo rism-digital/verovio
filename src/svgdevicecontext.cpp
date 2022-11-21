@@ -132,8 +132,15 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         format = "%gmm";
     }
     else {
-        height = std::ceil(height);
-        width = std::ceil(width);
+        const auto [baseWidth, baseHeight] = this->GetBaseSize();
+        if (baseWidth && baseHeight) {
+            height = baseHeight;
+            width = baseWidth;
+        }
+        else {
+            height = std::ceil(height);
+            width = std::ceil(width);
+        }
     }
 
     if (m_svgViewBox) {
