@@ -4,7 +4,7 @@ export const LOG_WARNING = 2;
 export const LOG_INFO = 3;
 export const LOG_DEBUG = 4;
 
-export function enableLog(level = LOG_DEBUG, VerovioModule) {
+export function enableLog(level = LOG_WARNING, VerovioModule) {
     return VerovioModule.cwrap("enableLog", null, ["number"])(level);
 }
 
