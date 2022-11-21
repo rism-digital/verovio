@@ -1,10 +1,27 @@
 import DefaultVerovioModule from "../../build/verovio.js";
 import { VerovioToolkit } from "./verovio-toolkit.js";
+import {
+    LOG_OFF,
+    LOG_ERROR,
+    LOG_WARNING,
+    LOG_INFO,
+    LOG_DEBUG,
+    enableLog,
+    enableLogToBuffer
+} from "./verovio-logger.js";
 
 class VerovioToolkitDefaultModule extends VerovioToolkit {
     constructor(VerovioModule = DefaultVerovioModule) {
         super(VerovioModule);
     }
+}
+
+function enableLogDefaultModule(level, VerovioModule = DefaultVerovioModule) {
+    return enableLog(level, VerovioModule);
+}
+
+function enableLogToBufferDefaultModule(value, VerovioModule = DefaultVerovioModule) {
+    return enableLogToBuffer(value, VerovioModule);
 }
 
 // Assign Module to window to prevent breaking changes.
@@ -13,18 +30,14 @@ if (typeof window !== "undefined") {
     window.Module = DefaultVerovioModule;
 }
 
-const logLevel = {
-    off: 0, // or none
-    debug: 1,
-    info: 2,
-    warning: 3,
-    error: 4,
- };
-
 export default {
     module: DefaultVerovioModule,
-    logLevel: logLevel,
-    enableLog: DefaultVerovioModule.cwrap( "enableLog", null, ["number"] ),
-    enableLogToBuffer: DefaultVerovioModule.cwrap("enableLogToBuffer", null, ["number"]),
     toolkit: VerovioToolkitDefaultModule,
+    LOG_OFF,
+    LOG_ERROR,
+    LOG_WARNING,
+    LOG_INFO,
+    LOG_DEBUG,
+    enableLog: enableLogDefaultModule,
+    enableLogToBuffer: enableLogToBufferDefaultModule,
 };
