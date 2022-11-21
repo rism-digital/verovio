@@ -1,5 +1,5 @@
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from .verovio import *
 
-verovio.setDefaultResourcePath(resource_filename('verovio', 'data'))
+verovio.setDefaultResourcePath(files("verovio") / "data")
