@@ -8,6 +8,8 @@
 * Support for `@dir.dist` and `@tempo.dist` (@eNote-GmBH)
 * Support for persian accidentals (sori and koron)
 * Support for heavy barlines (@eNote-GmBH)
+* Support for log level selection (warning by default)
+* Support for controlling log in the JS toolkit (@WolfgangDrescher)
 * Option --smuflTextFont for for controlling text font embedding or linking CSS fonts
 * Option --lyricElision for selecting elision glyph (regular, wide, narrow or unicde)
 * Method getOption(bool) split as getOptions() and getDefaultOptions()
