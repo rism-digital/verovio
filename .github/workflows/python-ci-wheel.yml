@@ -67,7 +67,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install twine
+          python -m pip install importlib_resources twine
 
       #===============================================#
       # Prepare identifier
