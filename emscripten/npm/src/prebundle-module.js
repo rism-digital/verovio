@@ -16,11 +16,11 @@ class VerovioToolkitDefaultModule extends VerovioToolkit {
     }
 }
 
-function enableLogDefaultModule(level = logLevel.debug, VerovioModule = DefaultVerovioModule) {
+function enableLogDefaultModule(level = LOG_WARNING, VerovioModule = DefaultVerovioModule) {
     return enableLog(level, VerovioModule);
 }
 
-function enableLogToBufferDefaultModule(level = logLevel.debug, VerovioModule = DefaultVerovioModule) {
+function enableLogToBufferDefaultModule(level = LOG_WARNING, VerovioModule = DefaultVerovioModule) {
     return enableLogToBuffer(level, VerovioModule);
 }
 
