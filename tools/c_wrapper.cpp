@@ -14,6 +14,16 @@ using namespace vrv;
 
 extern "C" {
 
+void enableLog(bool value)
+{
+    EnableLog(value);
+}
+
+void enableLogToBuffer(bool value)
+{
+    EnableLogToBuffer(value);
+}
+
 /****************************************************************
  * Methods exported to use the Toolkit class
  ****************************************************************/
