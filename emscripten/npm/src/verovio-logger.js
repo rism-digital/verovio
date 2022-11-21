@@ -1,15 +1,13 @@
-export const logLevel = {
-    off: 0,
-    debug: 1,
-    info: 2,
-    warning: 3,
-    error: 4,
-};
+export const LOG_OFF = 0;
+export const LOG_ERROR = 1;
+export const LOG_WARNING = 2;
+export const LOG_INFO = 3;
+export const LOG_DEBUG = 4;
 
-export function enableLog(level = logLevel.debug, VerovioModule) {
+export function enableLog(level = LOG_DEBUG, VerovioModule) {
     return VerovioModule.cwrap("enableLog", null, ["number"])(level);
 }
 
-export function enableLogToBuffer(level = logLevel.debug, VerovioModule) {
-    return VerovioModule.cwrap("enableLogToBuffer", null, ["number"])(level);
+export function enableLogToBuffer(value, VerovioModule) {
+    return VerovioModule.cwrap("enableLogToBuffer", null, ["number"])(value);
 }
