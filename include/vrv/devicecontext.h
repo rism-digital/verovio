@@ -71,6 +71,8 @@ public:
         m_contentHeight = 0;
         m_userScaleX = 1.0;
         m_userScaleY = 1.0;
+        m_baseWidth = 0;
+        m_baseHeight = 0;
     }
     DeviceContext(ClassId classId)
     {
@@ -83,6 +85,8 @@ public:
         m_contentHeight = 0;
         m_userScaleX = 1.0;
         m_userScaleY = 1.0;
+        m_baseWidth = 0;
+        m_baseHeight = 0;
     }
     virtual ~DeviceContext(){};
     ClassId GetClassId() const { return m_classId; }
@@ -338,8 +342,8 @@ private:
     int m_height;
 
     /** stores base width and height of the device context before application of scale */
-    int m_baseWidth = 0;
-    int m_baseHeight = 0;
+    int m_baseWidth;
+    int m_baseHeight;
 
     /** stores the height of graphic content */
     int m_contentHeight;
