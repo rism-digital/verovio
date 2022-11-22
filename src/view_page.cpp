@@ -462,7 +462,8 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
     switch (groupSymbol->GetSymbol()) {
         case staffGroupingSym_SYMBOL_line: {
             const int lineWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
-            this->DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * lineWidth, lineWidth);
+            const int yOffset = m_doc->GetDrawingUnit(staffSize) * m_options->m_staffLineWidth.GetValue() / 2;
+            this->DrawVerticalLine(dc, yTop + yOffset, yBottom - yOffset, x - 1.5 * lineWidth, lineWidth);
             x -= 2 * lineWidth;
             break;
         }
