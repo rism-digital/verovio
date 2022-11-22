@@ -84,7 +84,7 @@ void LogElapsedTimeEnd(const char *msg)
     gettimeofday(&end, NULL);
     elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
     elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0; // us to ms
-    LogMessage("Elapsed time (%s): %.3fs", msg, elapsedTime / 1000);
+    LogInfo("Elapsed time (%s): %.3fs", msg, elapsedTime / 1000);
 }
 
 void LogDebug(const char *fmt, ...)
@@ -113,7 +113,7 @@ void LogError(const char *fmt, ...)
     va_end(args);
 }
 
-void LogMessage(const char *fmt, ...)
+void LogInfo(const char *fmt, ...)
 {
     if (logLevel < LOG_INFO) return;
 

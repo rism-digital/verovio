@@ -45,7 +45,7 @@ void *vrvToolkit_constructorResourcePath(const char *resourcePath)
 void vrvToolkit_destructor(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    LogMessage("Deleting toolkit");
+    LogInfo("Deleting toolkit");
     delete tk;
 }
 

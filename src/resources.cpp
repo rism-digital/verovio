@@ -231,7 +231,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
     if (!result) {
         // File not found, default bounding boxes will be used
-        LogMessage("Cannot load bounding boxes for text font '%s'", filename.c_str());
+        LogInfo("Cannot load bounding boxes for text font '%s'", filename.c_str());
         return false;
     }
     pugi::xml_node root = doc.first_child();

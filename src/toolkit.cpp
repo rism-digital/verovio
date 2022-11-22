@@ -435,7 +435,7 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
     }
 
     if (!filename.empty()) {
-        LogMessage("Loading file '%s' in the archive", filename.c_str());
+        LogInfo("Loading file '%s' in the archive", filename.c_str());
         return this->LoadData(file.read(filename));
     }
     else {
@@ -505,7 +505,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
-        // LogMessage("Importing Humdrum data");
+        // LogInfo("Importing Humdrum data");
 
         // HumdrumInput *input = new HumdrumInput(&m_doc);
         input = new HumdrumInput(&m_doc);
@@ -531,7 +531,7 @@ bool Toolkit::LoadData(const std::string &data)
     else if (inputFormat == HUMMEI) {
         // convert first to MEI and then load MEI data via MEIInput.  This
         // allows using XPath processing.
-        // LogMessage("Importing Humdrum data via MEI");
+        // LogInfo("Importing Humdrum data via MEI");
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
         HumdrumInput *tempinput = new HumdrumInput(&tempdoc);
@@ -677,7 +677,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 #endif
     else {
-        LogMessage("Unsupported format");
+        LogInfo("Unsupported format");
         return false;
     }
 
@@ -1069,15 +1069,15 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
         if (json.has<jsonxx::Number>(iter->first)) {
             opt->SetValueDbl(json.get<jsonxx::Number>(iter->first));
-            // LogMessage("Double: %f", json.get<jsonxx::Number>(iter->first));
+            // LogInfo("Double: %f", json.get<jsonxx::Number>(iter->first));
         }
         else if (json.has<jsonxx::Boolean>(iter->first)) {
             opt->SetValueBool(json.get<jsonxx::Boolean>(iter->first));
-            // LogMessage("Bool: %d", json.get<jsonxx::Boolean>(iter->first));
+            // LogInfo("Bool: %d", json.get<jsonxx::Boolean>(iter->first));
         }
         else if (json.has<jsonxx::String>(iter->first)) {
             opt->SetValue(json.get<jsonxx::String>(iter->first));
-            // LogMessage("String: %s", json.get<jsonxx::String>(iter->first).c_str());
+            // LogInfo("String: %s", json.get<jsonxx::String>(iter->first).c_str());
         }
         else if (json.has<jsonxx::Array>(iter->first)) {
             jsonxx::Array values = json.get<jsonxx::Array>(iter->first);
@@ -1191,7 +1191,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found at all
     if (!element) {
-        LogMessage("Element with id '%s' could not be found", xmlId.c_str());
+        LogInfo("Element with id '%s' could not be found", xmlId.c_str());
         return o.json();
     }
 
@@ -1203,7 +1203,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     ArrayOfStrAttr::iterator iter;
     for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
         o << (*iter).first << (*iter).second;
-        // LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
+        // LogInfo("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
     }
     return o.json();
 }
@@ -2008,10 +2008,10 @@ void Toolkit::LogRuntime() const
         const int minutes = seconds / 60.0;
         if (minutes > 0) {
             seconds -= 60.0 * minutes;
-            LogMessage("Total runtime is %d min %.3f s.", minutes, seconds);
+            LogInfo("Total runtime is %d min %.3f s.", minutes, seconds);
         }
         else {
-            LogMessage("Total runtime is %.3f s.", seconds);
+            LogInfo("Total runtime is %.3f s.", seconds);
         }
     }
     else {

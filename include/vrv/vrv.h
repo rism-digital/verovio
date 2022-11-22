@@ -36,7 +36,7 @@ class Object;
 
 void LogDebug(const char *fmt, ...);
 void LogError(const char *fmt, ...);
-void LogMessage(const char *fmt, ...);
+void LogInfo(const char *fmt, ...);
 void LogWarning(const char *fmt, ...);
 
 /**
