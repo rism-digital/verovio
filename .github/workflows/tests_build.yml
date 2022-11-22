@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: FranzDiebold/github-env-vars-action@v2.4.0
+      - uses: FranzDiebold/github-env-vars-action@v2.7.0
       - name: Get Short SHA
         run: |
           echo "SHORT_SHA=`echo ${{ github.event.pull_request.head.sha }} | cut -c1-7`" >> $GITHUB_ENV
@@ -45,7 +45,7 @@ jobs:
           echo "OUTPUT_DIR=${{ github.event.pull_request.number }}/${{ env.SHORT_SHA }}" >> $GITHUB_ENV
 
       - name: Checkout GH_PAGES_BRANCH into GH_PAGES_DIR
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ env.GH_PAGES_REPO }}
           ref: ${{ env.GH_PAGES_BRANCH }}
@@ -67,7 +67,7 @@ jobs:
           python3 -m pip install diffimg jsondiff lxml xmldiff cairosvg
 
       - name: Checkout the dev branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: develop
           path: ${{ env.DEV_DIR }}/
@@ -88,7 +88,7 @@ jobs:
           python3 ../../doc/test-suite.py ${{ github.workspace }}/${{env.GH_PAGES_DIR}}/musicxmlTestSuite ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ env.DEV_DIR }}/
 
       - name: Checkout the PR
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           path: ${{ env.PR_DIR }}/
@@ -109,50 +109,19 @@ jobs:
           ls -al
 
       - name: Upload results as artefacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: test-suite-diff
           path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
 
       - name: Check existence of the log.md file
         id: check_files
-        uses: andstor/file-existence-action@v1
+        uses: andstor/file-existence-action@v2
         with:
           files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md"
 
-      - name: Check user permission to add a comment
-        id: check_permission
-        uses: scherermichael-oss/action-has-permission@master
-        with:
-          required-permission: write
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run only if user has NOT sufficient permissions
-        if: steps.check_files.outputs.files_exists == 'true' && !steps.check_permission.outputs.has-permission
+      - name: Show the list of changes detected
+        if: steps.check_files.outputs.files_exists == 'true'
         run: |
-          echo "Sorry! Your permissions are insufficient to list the results as a comment."
+          echo "This is the list of tests for which a change has been detected:"
           cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
-
-      - name: Generate comment content
-        id: get-comment-body
-        if: steps.check_files.outputs.files_exists == 'true' && steps.check_permission.outputs.has-permission
-        run: |
-          link="Results for the run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-          body="$link\n$(cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md)"
-          body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'\r\n'}"
-          echo ::set-output name=body::$body
-
-      - name: Add comment with link
-        if: steps.check_files.outputs.files_exists == 'true' && steps.check_permission.outputs.has-permission
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "${{ steps.get-comment-body.outputs.body }}"
-            })

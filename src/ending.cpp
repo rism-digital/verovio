@@ -157,7 +157,7 @@ int Ending::PrepareFloatingGrps(FunctorParams *functorParams)
     if (params->m_previousEnding) {
         // We need to group the previous and this ending - the previous one should have a grpId
         if (params->m_previousEnding->GetDrawingGrpId() == 0) {
-            LogDebug("Something went wrong with the gouping of the endings");
+            LogDebug("Something went wrong with the grouping of the endings");
         }
         this->SetDrawingGrpId(params->m_previousEnding->GetDrawingGrpId());
         // Also set the previous ending to NULL to the grpId is _not_ incremented at the next measure

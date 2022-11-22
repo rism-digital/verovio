@@ -35,9 +35,7 @@ AttNotationType::AttNotationType() : Att()
     ResetNotationType();
 }
 
-AttNotationType::~AttNotationType()
-{
-}
+AttNotationType::~AttNotationType() {}
 
 void AttNotationType::ResetNotationType()
 {
@@ -119,4 +117,4 @@ void Att::GetMei(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

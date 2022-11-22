@@ -20,6 +20,10 @@
 
 #include "attalternates.h"
 #include "atttypes.h"
+#include "smufl.h"
+
+//----------------------------------------------------------------------------
+
 #include "jsonxx.h"
 
 //----------------------------------------------------------------------------
@@ -55,6 +59,13 @@ enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_line, BREAKS_smart, BR
 
 enum option_CONDENSE { CONDENSE_none = 0, CONDENSE_auto, CONDENSE_all, CONDENSE_encoded };
 
+enum option_ELISION {
+    ELISION_regular = SMUFL_E551_lyricsElision,
+    ELISION_narrow = SMUFL_E550_lyricsElisionNarrow,
+    ELISION_wide = SMUFL_E552_lyricsElisionWide,
+    ELISION_unicode = UNICODE_UNDERTIE
+};
+
 enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always };
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
@@ -66,9 +77,9 @@ enum option_MULTIRESTSTYLE {
     MULTIRESTSTYLE_symbols
 };
 
-enum option_PEDALSTYLE { PEDALSTYLE_auto = 0, PEDALSTYLE_line, PEDALSTYLE_pedstar, PEDALSTYLE_altpedstar };
-
 enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_auto, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
+
+enum option_SMUFLTEXTFONT { SMUFLTEXTFONT_embedded = 0, SMUFLTEXTFONT_linked, SMUFLTEXTFONT_none };
 
 //----------------------------------------------------------------------------
 // Option
@@ -126,11 +137,13 @@ public:
      */
     static const std::map<int, std::string> s_breaks;
     static const std::map<int, std::string> s_condense;
+    static const std::map<int, std::string> s_elision;
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
     static const std::map<int, std::string> s_multiRestStyle;
     static const std::map<int, std::string> s_pedalStyle;
     static const std::map<int, std::string> s_systemDivider;
+    static const std::map<int, std::string> s_smuflTextFont;
 
 protected:
     std::string m_title;
@@ -577,6 +590,7 @@ public:
     OptionBool m_help;
     OptionBool m_allPages;
     OptionString m_inputFrom;
+    OptionString m_logLevel;
     OptionString m_outfile;
     OptionInt m_page;
     OptionString m_resourcePath;
@@ -628,6 +642,7 @@ public:
     OptionBool m_scaleToPageSize;
     OptionBool m_showRuntime;
     OptionBool m_shrinkToFit;
+    OptionIntMap m_smuflTextFont;
     OptionBool m_staccatoCenter;
     OptionBool m_svgBoundingBoxes;
     OptionString m_svgCss;
@@ -680,6 +695,7 @@ public:
     OptionDbl m_justificationMaxVertical;
     OptionDbl m_ledgerLineThickness;
     OptionDbl m_ledgerLineExtension;
+    OptionIntMap m_lyricElision;
     OptionDbl m_lyricHyphenLength;
     OptionDbl m_lyricLineThickness;
     OptionBool m_lyricNoStartHyphen;

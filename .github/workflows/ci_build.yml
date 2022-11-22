@@ -44,7 +44,7 @@ env:
   # emscripten
   EM_VERSION: latest
   EM_CACHE_FOLDER: "emsdk-cache"
-  EM_CACHE_ID: 1
+  EM_CACHE_ID: 2
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works from rism-digital and from forks
@@ -98,21 +98,21 @@ jobs:
             compiler: clang
             version: "12"
 
-          - os: macos-10.15
+          - os: macos-latest
             compiler: xcode
             version: "11.7"
 
-          - os: macos-10.15
+          - os: macos-latest
             compiler: xcode
-            version: "12.1"
+            version: "12.5.1"
 
-          - os: macos-10.15
+          - os: macos-latest
             compiler: g++
             version: "9"
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Installation step for Ubuntu
       - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
@@ -190,7 +190,7 @@ jobs:
 
     steps:
       - name: Set up cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cache
         with:
           # path for cache
@@ -239,7 +239,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -248,7 +248,7 @@ jobs:
       # Restore system libraries from cache
       - name: Restore cache
         id: restore_cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           # path for cache
           path: ${{ env.EM_CACHE_FOLDER }}
@@ -276,10 +276,35 @@ jobs:
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
         if: ${{ matrix.toolkit.upload == true }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.TOOLKIT_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
+
+
+  ############################
+  # Copy the font CSS files  #
+  ############################
+  copy_font_files:
+    name: Copy the font files
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v3
+
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
+        run: mkdir -p $TEMP_DIR/data
+
+      - name: Copy build into TEMP_DIR
+        run: cp data/*.css $GITHUB_WORKSPACE/$TEMP_DIR/data/
+
+      - name: Upload font data artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.TOOLKIT_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
 
   ##################################
   # Check settings for deployment  #
@@ -328,7 +353,7 @@ jobs:
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
@@ -341,14 +366,14 @@ jobs:
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download TOOLKIT_BUILD artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ env.TOOLKIT_BUILD }}
           path: artifacts/${{ env.TOOLKIT_BUILD }}
 
       - name: Copy artifacts to gh-pages
         run: |
-          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
+          cp -r artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Check git status before commit
         working-directory: ${{ env.GH_PAGES_DIR }}
@@ -410,7 +435,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install doxygen
         run: |
@@ -430,7 +455,7 @@ jobs:
         run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
 
       - name: Upload doxygen build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.DOC_BUILD }}
           path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
@@ -447,7 +472,7 @@ jobs:
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}
@@ -460,7 +485,7 @@ jobs:
           path: ${{ env.DOXYGEN_DIR }}
 
       - name: Download DOC_BUILD artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ env.DOC_BUILD }}
           path: artifacts/${{ env.DOC_BUILD }}

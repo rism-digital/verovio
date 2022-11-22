@@ -21,7 +21,7 @@ namespace vrv {
 
 class Artic : public LayerElement,
               public AttArticulation,
-              public AttArticulationGestural,
+              public AttArticulationGes,
               public AttColor,
               public AttEnclosingChars,
               public AttExtSym,

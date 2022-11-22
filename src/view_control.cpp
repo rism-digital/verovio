@@ -487,10 +487,10 @@ void View::DrawBracketSpan(
                 lineWidth *= LINEWIDTHTERM_factor_wide;
             }
         }
-        else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
-            if (bracketSpan->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
-                lineWidth
-                    = bracketSpan->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
+            if (bracketSpan->GetLwidth().GetMeasurementUnsigned() != VRV_UNSET) {
+                lineWidth = bracketSpan->GetLwidth().GetMeasurementUnsigned()
+                    * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
         }
     }
@@ -784,10 +784,10 @@ void View::DrawOctave(
                     lineWidth *= LINEWIDTHTERM_factor_wide;
                 }
             }
-            else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
-                if (octave->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
-                    lineWidth
-                        = octave->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
+                if (octave->GetLwidth().GetMeasurementUnsigned() != VRV_UNSET) {
+                    lineWidth = octave->GetLwidth().GetMeasurementUnsigned()
+                        * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
                 }
             }
         }
@@ -995,21 +995,17 @@ void View::DrawPedalLine(
         endRadius = pedal->GetEnd()->GetDrawingRadius(m_doc);
     }
 
-    // The both correspond to the current system, which means no system break in-between (simple case)
-    if (spanningType == SPANNING_START_END) {
+    // Adjust the start if necessary
+    if (spanningType == SPANNING_START_END || spanningType == SPANNING_START) {
         x1 -= startRadius;
+        // With pedline we need to take into account the initial symbol
+        if (pedal->GetForm() == PEDALSTYLE_pedline) {
+            x1 += m_doc->GetGlyphWidth(SMUFL_E650_keyboardPedalPed, staff->m_drawingStaffSize, false);
+        }
+    }
+    // Adjust the end if necessary
+    if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
         x2 -= endRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    }
-    // Only the first parent is the same, this means that the syl is "open" at the end of the system
-    else if (spanningType == SPANNING_START) {
-        x1 -= startRadius;
-    }
-    // We are in the system of the last note - draw the connector from the beginning of the system
-    else if (spanningType == SPANNING_END) {
-        x2 -= endRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    }
-    else {
-        // nothing to adjust
     }
 
     if (graphic) {
@@ -1022,10 +1018,12 @@ void View::DrawPedalLine(
     const int bracketSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     const int lineWidth = m_options->m_pedalLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-    // Opening bracket
+    // Opening bracket - but only if not a pedline value
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        this->DrawFilledRectangle(dc, x1, y, x1 + bracketSize / 2, y + lineWidth);
-        this->DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y + bracketSize);
+        if (pedal->GetForm() != PEDALSTYLE_pedline) {
+            this->DrawFilledRectangle(dc, x1, y, x1 + bracketSize / 2, y + lineWidth);
+            this->DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y + bracketSize);
+        }
     }
     // Closing bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
@@ -2001,10 +1999,10 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
                 lineWidth *= LINEWIDTHTERM_factor_wide;
             }
         }
-        else if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
-            if (gliss->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
-                lineWidth
-                    = gliss->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize * 2);
+        else if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
+            if (gliss->GetLwidth().GetMeasurementUnsigned() != VRV_UNSET) {
+                lineWidth = gliss->GetLwidth().GetMeasurementUnsigned()
+                    * m_doc->GetDrawingUnit(staff->m_drawingStaffSize * 2);
             }
         }
     }
@@ -2229,13 +2227,16 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     dc->StartGraphic(pedal, "", pedal->GetID());
 
-    pedalVis_FORM form = pedal->GetPedalForm(m_doc, system);
+    data_PEDALSTYLE form = pedal->GetPedalForm(m_doc, system);
+
+    bool drawSymbol = (form != PEDALSTYLE_line);
+    if (pedal->GetDir() == pedalLog_DIR_up && form == PEDALSTYLE_pedline) drawSymbol = false;
 
     // Draw a symbol, if it's not a line
-    if (form != pedalVis_FORM_line) {
+    if (drawSymbol) {
 
         bool bounceStar = true;
-        if (form == pedalVis_FORM_altpedstar) bounceStar = false;
+        if (form == PEDALSTYLE_altpedstar) bounceStar = false;
 
         int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 

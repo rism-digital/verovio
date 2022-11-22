@@ -266,15 +266,15 @@ int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
     if (overlap > 0) {
         // We are adjusting syl in two different measures - move only the to right barline of the first measure
         if (params->m_previousMeasure) {
-            params->m_overlapingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
+            params->m_overlappingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
                 params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
             // Do it now
-            params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
-            params->m_overlapingHarm.clear();
+            params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlappingHarm);
+            params->m_overlappingHarm.clear();
         }
         else {
             // Normal case, both in the same measure
-            params->m_overlapingHarm.push_back(std::make_tuple(
+            params->m_overlappingHarm.push_back(std::make_tuple(
                 params->m_previousHarmStart->GetAlignment(), this->GetStart()->GetAlignment(), overlap));
         }
     }

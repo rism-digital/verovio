@@ -34,6 +34,7 @@
 #include "runningelement.h"
 #include "section.h"
 #include "slur.h"
+#include "symbol.h"
 #include "tempo.h"
 #include "tie.h"
 #include "verse.h"
@@ -347,6 +348,9 @@ namespace humaux {
 
         // join layers into chords or shared notes.
         bool join = false;
+
+        // glissando start tokens
+        std::vector<hum::HTp> glissStarts;
     };
 } // namespace humaux
 
@@ -600,7 +604,7 @@ protected:
         hum::HTp token, int staffindex, int justification, const std::string &color);
     bool setTempoContent(Tempo *tempo, const std::string &text);
     bool setLabelContent(Label *label, const std::string &text);
-    std::string convertMusicSymbolNameToSmuflEntity(const std::string &text);
+    std::vector<std::string> convertMusicSymbolNameToSmuflName(const std::string &text);
     void processTerminalLong(hum::HTp token);
     void processTerminalBreve(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
@@ -767,7 +771,7 @@ protected:
     void insertBeamSpan(hum::HTp token);
     std::string getDataTokenId(hum::HTp token);
     void checkForFingeredHarmonic(Chord *chord, hum::HTp token);
-    double getTempoScaling(hum::HumdrumFile &infile);
+    double getGlobalTempoScaling(hum::HumdrumFile &infile);
     bool isTacet(hum::HTp spinestart);
     void storeBeamSpansInStartingMeasure();
     hum::HTp getNextNonNullDataOrMeasureToken(hum::HTp tok);
@@ -780,6 +784,9 @@ protected:
     bool checkForBeamSameas(Beam *beam, std::vector<hum::HTp> &layerdata, int layerindex);
     bool checkForBeamStemSameas(std::vector<hum::HTp> &layerdata, int layerindex);
     void processInterpretationStuff(hum::HTp token, int staffindex);
+    void insertGlissandos(std::vector<hum::HTp> &tokens);
+    void createGlissando(hum::HTp glissStart, hum::HTp glissEnd);
+    void setSmuflContent(Symbol *symbol, const std::string &name);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -828,7 +835,7 @@ protected:
     template <class ELEMENT>
     void addTextElement(
         ELEMENT *element, const std::string &content, const std::string &fontstyle = "", bool addSpacer = true);
-    template <class ELEMENT> void addVerovioTextElement(ELEMENT *element, const std::string &musictext);
+    template <class ELEMENT> void addMusicSymbol(ELEMENT *element, const std::string &musictext);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
     template <class ELEMENT> void setPlaceRelStaff(ELEMENT *element, const std::string &place, bool showplace = false);
@@ -842,9 +849,6 @@ protected:
     void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
     template <class ELEMENT>
     void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name, hum::HTp abbrtok);
-    template <class ELEMENT>
-    void insertTwoRhythmsAndTextBetween(
-        ELEMENT *element, const std::string &note1, const std::string &text, const std::string &note2);
     template <class ELEMENT> void addDurRecip(ELEMENT element, const std::string &ttoken);
     template <class ELEMENT> void addFermata(ELEMENT *rest, const std::string &tstring);
     template <class ELEMENT> void storeExpansionList(ELEMENT *parent, hum::HTp etok);
@@ -852,6 +856,8 @@ protected:
     template <class ELEMENT> void setWrittenAccidentalLower(ELEMENT element, const string &value);
     template <class ELEMENT> void attachToToken(ELEMENT *element, hum::HTp token);
     template <class ELEMENT> void setAttachmentType(ELEMENT *element, hum::HTp token);
+    template <class ELEMENT>
+    void setFontsize(ELEMENT *element, const std::string &percentage, const std::string &original);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -1128,11 +1134,28 @@ private:
     // a beamSpan starting in current measure.
     std::vector<hum::HTp> m_beamSpanStartDatabase;
 
-    // m_tempoScaling == global adjustment of tempo markings
-    double m_tempoScaling = 1.0;
+    // m_globalTempoScaling == global adjustment of tempo markings
+    double m_globalTempoScaling = 1.0;
+
+    // m_localTempoScaling == global adjustment of tempo markings
+    hum::HumNum m_localTempoScaling = 1;
 
     // m_join == boolean for merging layers together.
     bool m_join = false;
+
+    // m_midibpm == current MIDI BPM
+    double m_midibpm = 120.0;
+
+    // m_textNoteSize = Size of notes in text.
+    std::string m_textNoteSize = "70%";
+
+    // m_textAugmentationDotSpace = space to give before augmentation dot
+    // in text (tempo markings).
+    std::string m_textAugmentationDotSpacer = "\xe2\x80\x89";
+
+    // m_textSmuflSpace = space to give between SMuFL characters
+    // (excluding augmentation dots).
+    std::string m_textSmuflSpacer = "\xc2\xa0";
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

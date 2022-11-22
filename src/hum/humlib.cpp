@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun May 22 07:44:40 PDT 2022
+// Last Modified: Thu Oct 13 21:38:18 PDT 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -256,7 +256,7 @@ vector<int> Convert::harmToBase40(const string& harm, int keyroot, int keymode) 
 	}
 
 	int rootdeg = -1; // chord root scale degree in key
-	int degalt = 0;   // degree alteration
+	// int degalt = 0;   // degree alteration
 
 	vector<char> chars(256, 0);
 	for (auto ch : cbase) {
@@ -264,7 +264,7 @@ vector<int> Convert::harmToBase40(const string& harm, int keyroot, int keymode) 
 	}
 
 	rootdeg = -1; // invalid scale degree
-	degalt = chars['#'] - chars['-'];
+	// degalt = chars['#'] - chars['-'];
 
 	int vcount = chars['V'] + chars['v'];
 	int icount = chars['I'] + chars['i'];
@@ -289,16 +289,16 @@ vector<int> Convert::harmToBase40(const string& harm, int keyroot, int keymode) 
 				if (chars['N']) {
 					// Neapolitan (flat-second scale degree)
 					rootdeg = 1; // -II
-					degalt += -1; // -II
+					// degalt += -1; // -II
 				} else if (chars['L'] || chars['F'] || chars['G']) {
 					// augmented 6th chord on -VII
 					rootdeg = 5;
 					// fixed to -VI of major scale:
 					if (newkeymode == 0) { // major
-						degalt += -1;
+						// degalt += -1;
 					} else { // minor
 						// already at -VI in minor
-						degalt += 0;
+						// degalt += 0;
 					}
 				}
 				break;
@@ -1085,6 +1085,21 @@ double Convert::standardDeviation(const vector<double>& x) {
 }
 
 
+double Convert::standardDeviation(const vector<int>& x) {
+	double sum = 0.0;
+	for (int i=0; i<(int)x.size(); i++) {
+		sum += x[i];
+	}
+	double mean = sum / x.size();
+	double variance = 0.0;
+	for (int i=0; i<(int)x.size(); i++) {
+		variance += pow(x[i] - mean, 2);
+	}
+	variance = variance / x.size();
+	return sqrt(variance);
+}
+
+
 
 //////////////////////////////
 //
@@ -1107,6 +1122,21 @@ double Convert::standardDeviationSample(const vector<double>& x) {
 }
 
 
+double Convert::standardDeviationSample(const vector<int>& x) {
+	double sum = 0.0;
+	for (int i=0; i<(int)x.size(); i++) {
+		sum += x[i];
+	}
+	double mean = sum / x.size();
+	double variance = 0.0;
+	for (int i=0; i<(int)x.size(); i++) {
+		variance += pow(x[i] - mean, 2);
+	}
+	variance = variance / ((int)x.size()-1);
+	return sqrt(variance);
+}
+
+
 
 //////////////////////////////
 //
@@ -1114,6 +1144,15 @@ double Convert::standardDeviationSample(const vector<double>& x) {
 //
 
 double Convert::mean(const std::vector<double>& x) {
+	double output = 0.0;
+	for (int i=0; i<(int)x.size(); i++) {
+		output += x[i];
+	}
+	return output / (int)x.size();
+}
+
+
+double Convert::mean(const std::vector<int>& x) {
 	double output = 0.0;
 	for (int i=0; i<(int)x.size(); i++) {
 		output += x[i];
@@ -3067,7 +3106,7 @@ string Convert::base40ToIntervalAbbr(int base40interval) {
 	// Add base-7 number
 	char buffer2[32] = {0};
 	int diatonic = Convert::base40IntervalToDiatonic(base40interval)+1;
-	sprintf(buffer2, "%d", diatonic);
+	snprintf(buffer2, 32, "%d", diatonic);
 	output += buffer2;
 
 	return output;
@@ -16320,6 +16359,32 @@ string& HumRegex::tr(string& input, const string& from, const string& to) {
 
 //////////////////////////////
 //
+// HumRegex::makeSafeCopy -- Escape all special characters in string to make them regular.
+//
+
+string HumRegex::makeSafeCopy(const std::string& input) {
+	string specialChars = R"([-[\]{}()*+?.,\^$|#\s])";
+	string output = replaceCopy(input, R"(\$&)", specialChars, "g");
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumRegex::makeSafeDestructive -- Escape all special characters in string to make them regular.
+//
+
+string& HumRegex::makeSafeDestructive(std::string& inout) {
+	string specialChars = R"([-[\]{}()*+?.,\^$|#\s])";
+	replaceDestructive(inout, R"(\$&)", specialChars, "g");
+	return inout;
+}
+
+
+
+//////////////////////////////
+//
 // HumRegex::split --
 //
 
@@ -21314,6 +21379,7 @@ bool HumdrumFileBase::adjustSpines(HumdrumLine& line, vector<string>& datatype,
 
 string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 		int extra) {
+
 	string output;
 	int len1;
 	int len2;
@@ -21341,6 +21407,7 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 	for (i=0; i<=extra; i++) {
 		newinfo.push_back(info.at(starti+i));
 	}
+
 	for (i=1; i<(int)newinfo.size(); i++) {
 		int len1 = (int)newinfo[i-1].size();
 		int len2 = (int)newinfo[i].size();
@@ -21352,6 +21419,7 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 			newinfo[i] = newinfo[i].substr(1, len2-3);
 		}
 	}
+
 	vector<string> newinfo2;
 	for (i=0; i<(int)newinfo.size(); i++) {
 		if (newinfo[i].empty()) {
@@ -21359,6 +21427,7 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 		}
 		newinfo2.push_back(newinfo[i]);
 	}
+
 	for (i=1; i<(int)newinfo2.size(); i++) {
 		int len1 = (int)newinfo2[i-1].size();
 		int len2 = (int)newinfo2[i].size();
@@ -21370,6 +21439,7 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 			newinfo2[i] = newinfo2[i].substr(1, len2-3);
 		}
 	}
+
 	newinfo.resize(0);
 	for (i=0; i<(int)newinfo2.size(); i++) {
 		if (newinfo2[i].empty()) {
@@ -21377,9 +21447,30 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 		}
 		newinfo.push_back(newinfo2[i]);
 	}
-	output = newinfo[0];
-	for (int i=1; i<(int)newinfo.size(); i++) {
-		output += " " + info.at(i);
+
+	for (i=1; i<(int)newinfo.size(); i++) {
+		int len1 = (int)newinfo[i-1].size();
+		int len2 = (int)newinfo[i].size();
+		if (len1 != len2) {
+			continue;
+		}
+		if (newinfo[i-1].compare(0, len1-1, newinfo[i], 0, len2-1) == 0) {
+			newinfo[i-1] = "";
+			newinfo[i] = newinfo[i].substr(1, len2-3);
+		}
+	}
+
+	newinfo2.resize(0);
+	for (i=0; i<(int)newinfo.size(); i++) {
+		if (newinfo[i].empty()) {
+			continue;
+		}
+		newinfo2.push_back(newinfo[i]);
+	}
+
+	output = newinfo2[0];
+	for (int i=1; i<(int)newinfo2.size(); i++) {
+		output += " " + newinfo2.at(i);
 	}
 	return output;
 }
@@ -31285,7 +31376,7 @@ bool HumdrumLine::allSameBarlineStyle(void) {
 //
 
 bool HumdrumLine::hasDataStraddle(void) {
-	return this->getValueInt("auto", "straddlingData");
+	return (this->getValueInt("auto", "straddlingData") ? true : false);
 }
 
 
@@ -33386,11 +33477,28 @@ bool HumdrumToken::isMensurationSymbol(void) {
 
 //////////////////////////////
 //
-// HumdrumToken::isOriginalMensurationSymbol -- True if a **kern mensuration Symbol.
+// HumdrumToken::isOriginalMensurationSymbol -- True if a **kern mensuration symbol, original form.
 //
 
 bool HumdrumToken::isOriginalMensurationSymbol(void) {
 	if (this->compare(0, 6, "*omet(") != 0) {
+		return false;
+	}
+	if ((*this)[this->size()-1] != ')') {
+		return false;
+	}
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isModernMensurationSymbol -- True if a **kern mensuration symbol, modern form.
+//
+
+bool HumdrumToken::isModernMensurationSymbol(void) {
+	if (this->compare(0, 6, "*mmet(") != 0) {
 		return false;
 	}
 	if ((*this)[this->size()-1] != ')') {
@@ -33441,11 +33549,71 @@ bool HumdrumToken::isInstrumentName(void) {
 
 //////////////////////////////
 //
+// HumdrumToken::isModernInstrumentName -- True if a modern instrument name token.
+//
+
+bool HumdrumToken::isModernInstrumentName(void) {
+	if (this->compare(0, 4, "*mI\"") != 0) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isOriginalInstrumentName -- True if an original instrument name token.
+//
+
+bool HumdrumToken::isOriginalInstrumentName(void) {
+	if (this->compare(0, 4, "*oI\"") != 0) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumToken::isInstrumentAbbreviation -- True if an instrument abbreviation token.
 //
 
 bool HumdrumToken::isInstrumentAbbreviation(void) {
 	if (this->compare(0, 3, "*I'") != 0) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isModernInstrumentAbbreviation -- True if a modern instrument abbreviation token.
+//
+
+bool HumdrumToken::isModernInstrumentAbbreviation(void) {
+	if (this->compare(0, 4, "*mI'") != 0) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isOriginalInstrumentAbbreviation -- True if a original instrument abbreviation token.
+//
+
+bool HumdrumToken::isOriginalInstrumentAbbreviation(void) {
+	if (this->compare(0, 4, "*oI'") != 0) {
 		return false;
 	} else {
 		return true;
@@ -42035,7 +42203,7 @@ int MuseRecord::getAttributeInt(char attribute) {
 
 	int output = E_unknown;
 	int ending = 0;
-	int index = 0;
+	// int index = 0;
 	int tempcol;
 	int column;
 	for (column=4; column <= getLength(); column++) {
@@ -42052,7 +42220,7 @@ int MuseRecord::getAttributeInt(char attribute) {
 					ending = 1;
 				}
 				tempcol++;
-				index++;
+				// index++;
 			}
 		}
 		if (ending) {
@@ -42092,7 +42260,7 @@ int MuseRecord::getAttributeField(string& value, const string& key) {
 
 	int returnValue = 0;
 	int ending = 0;
-	int index = 0;
+	// int index = 0;
 	int tempcol;
 	int column;
 	for (column=4; column <= getLength(); column++) {
@@ -42109,7 +42277,7 @@ int MuseRecord::getAttributeField(string& value, const string& key) {
 					ending = 1;
 				}
 				tempcol++;
-				index++;
+				// index++;
 			}
 		}
 		if (ending) {
@@ -45960,7 +46128,7 @@ string MxmlEvent::getPrefixNoteInfo(void) const {
 string MxmlEvent::getPostfixNoteInfo(bool primarynote, const string& recip) const {
 	int beamstarts   = 0;
 	int beamends     = 0;
-	int beamconts    = 0;
+	//int beamconts    = 0;
 	int hookbacks    = 0;
 	int hookforwards = 0;
 	int stem         = 0;
@@ -45984,7 +46152,7 @@ string MxmlEvent::getPostfixNoteInfo(bool primarynote, const string& recip) cons
 			} else if (strcmp(beaminfo, "end") == 0) {
 				beamends++;
 			} else if (strcmp(beaminfo, "continue") == 0) {
-				beamconts++;
+				// beamconts++;
 			} else if (strcmp(beaminfo, "forward hook") == 0) {
 				hookforwards++;
 			} else if (strcmp(beaminfo, "backward hook") == 0) {
@@ -48791,7 +48959,7 @@ bool NoteGrid::load(HumdrumFile& infile) {
 		grid[i].reserve(infile.getLineCount());
 	}
 
-	int attack = 0;
+	//int attack = 0;
 	int track, lasttrack;
 	vector<HTp> current;
 	HumRegex hre;
@@ -48819,7 +48987,7 @@ bool NoteGrid::load(HumdrumFile& infile) {
 			continue;
 		}
 		track = 0;
-		attack = 0;
+		//attack = 0;
 		current.clear();
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			lasttrack = track;
@@ -48834,7 +49002,7 @@ bool NoteGrid::load(HumdrumFile& infile) {
 			current.push_back(infile.token(i, j));
 			if (!(current.back()->isRest()
 					|| current.back()->isSecondaryTiedNote())) {
-				attack++;
+				//attack++;
 			}
 		}
 		if (current.size() != kernspines.size()) {
@@ -58407,7 +58575,7 @@ void Tool_cint::getNames(vector<string>& names, vector<int>& reverselookup,
 
 	for (i=0; i<(int)names.size(); i++) {
 		value = (int)reverselookup.size() - i;
-		sprintf(buffer, "%d", value);
+		snprintf(buffer,1024,  "%d", value);
 		names[i] = buffer;
 	}
 
@@ -58590,25 +58758,965 @@ void Tool_cint::usage(const string& command) {
 
 
 
+double cmr_note_info::m_syncopationWeight = 1.0;
+double cmr_note_info::m_leapWeight = 0.5;
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// cmr_note_info -- Helper class describing a conspicuous repetition note.
+//    The cmr_group_info contains a vector of cmr_note_info objects.
+//
+
+//////////////////////////////
+//
+// cmr_note_info::cmr_note_info -- Constructor.
+//
+
+cmr_note_info::cmr_note_info(void) {
+	clear();
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::clear -- Clear or initialized the contents.
+//
+
+void cmr_note_info::clear(void) {
+	m_tokens.clear();
+	m_measureBegin   = -1;
+	m_measureEnd     = -1;
+	m_hasSyncopation = -1;
+	m_hasLeapBefore  = -1;
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::getMeasureBegin -- Get the measure number that
+//    the note starts in.
+//
+
+int cmr_note_info::getMeasureBegin(void) {
+	return m_measureBegin;
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::getMeasureEnd -- Get the measure number that the
+//    note ends in (including consideration of the duration of the
+//    note or tied groups that follow the notes).
+//
+
+int cmr_note_info::getMeasureEnd(void) {
+	return m_measureEnd;
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::setMeasureBegin -- Get the measure number that
+//    the note starts in.
+//
+
+void cmr_note_info::setMeasureBegin(int measure) {
+	m_measureBegin = measure;
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::setMeasureEnd -- Set the measure number that the
+//    note ends in (including consideration of the duration of the note
+//    or tied group of notes that follow it).
+//
+
+void cmr_note_info::setMeasureEnd(int measure) {
+	m_measureEnd = measure;
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::getStartTime -- Return the starting time of the note
+//    in units of quarter notes since the start of the score.
+//
+
+HumNum cmr_note_info::getStartTime(void) {
+	if (m_tokens.empty()) {
+		return -1;
+	} else {
+		return m_tokens[0]->getDurationFromStart();
+	}
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::getLineIndex --
+//
+
+int cmr_note_info::getLineIndex(void) {
+	HTp token = getToken();
+	if (token) {
+		return token->getLineIndex();
+	} else {
+		return -1;
+	}
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::getEndTime -- Return the ending time of the note in
+//    units of quarter notes since the start of the score.  Note that this
+//    is the ending duration of the last note in the tied group.
+//
+
+HumNum cmr_note_info::getEndTime(void) {
+	if (m_tokens.empty()) {
+		return -1;
+	} else {
+		HumNum noteDur = m_tokens.back()->getTiedDuration();
+		return m_tokens.back()->getDurationFromStart() + noteDur;
+	}
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::getMidiPitch -- Return the MIDI pitch of the note or -1 if invalid.
+//
+int cmr_note_info::getMidiPitch(void) {
+	if (m_tokens.empty()) {
+		return -1;
+	} else {
+		return m_tokens[0]->getMidiPitch();
+	}
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::hasSyncopation -- True if the note is syncopated.
+//
+
+bool cmr_note_info::hasSyncopation(void) {
+	if (m_hasSyncopation >= 0) {
+		return (bool)m_hasSyncopation;
+	} else if (m_tokens.empty()) {
+		m_hasSyncopation = 0;
+		return false;
+	} else {
+		m_hasSyncopation = (int)cmr_note_info::isSyncopated(m_tokens[0]);
+		return (bool)m_hasSyncopation;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_note_info::isSyncopated -- Return true if the note is syncopated,which
+//   means that the note is longer than the metric position that it is one; however,
+//   this analysis is chopped off for notes longer than a beat (whole note).
+//   Static function.
+//
+
+bool cmr_note_info::isSyncopated(HTp token) {
+	if (token == NULL) {
+		return false;
+	}
+	HumNum dur = token->getTiedDuration();
+	double logDur = log2(dur.getFloat());
+	int metlev = cmr_note_info::getMetricLevel(token);
+	if (metlev >= 2) { // no syncopations occuring on whole-note level or higher
+		return false;
+	} else if (logDur > metlev) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::hasLeapBefore -- True if there is a melodic leap before the note.
+//
+
+bool cmr_note_info::hasLeapBefore(void) {
+	if (m_hasLeapBefore >= 0) {
+		return (bool)m_hasLeapBefore;
+	} else if (m_tokens.empty()) {
+		m_hasLeapBefore = 0;
+		return false;
+	} else {
+		m_hasLeapBefore = cmr_note_info::isLeapBefore(m_tokens[0]);
+		return (bool)m_hasLeapBefore;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_note_info::isLeapBefore -- Return true if the note is syncopated, which
+//   means that the note is longer than the metric position that it is one; however,
+//   this analysis is chopped off for notes longer than a beat (whole note).
+//   Static function.
+//
+
+bool cmr_note_info::isLeapBefore(HTp token) {
+	HTp current = token->getPreviousToken();
+	int startNote = token->getMidiPitch();
+	while (current) {
+		if (!current->isData()) {
+			current = current->getPreviousToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getPreviousToken();
+			continue;
+		}
+		if (current->isRest()) {
+			return false;
+			// current = current->getPreviousToken();
+			// continue;
+		}
+		int testNote = current->getMidiPitch();
+		int interval = startNote - testNote;
+		return interval > 2;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_note_info::getMetricLevel -- Return the metric level of the note:
+//    whole note:   2
+//    half note:    1
+//    quarter note: 0
+//    less than quarter note: -1
+//
+
+double cmr_note_info::getMetricLevel(HTp token) {
+	HumNum beat = token->getDurationFromBarline();
+	if (!beat.isInteger()) { // anything less than quarter note level
+		return -1;
+	} else if (beat.getNumerator() % 4 == 0) { // whole note level
+		return 2;
+	} else if (beat.getNumerator() % 2 == 0) { // half note level
+		return 1;
+	} else { // quarter note level
+		return 0;
+	}
+}
+
+
+
+/////////////////////////////
+//
+// cmr_note_info::getNoteStrength -- Calculate a strength value for the
+//     note.  This is based on if the note is syncopated and/or if it
+//     is preceded by a melodic leap.
+//
+
+double cmr_note_info::getNoteStrength(void) {
+	double output = 1.0;
+	if (hasSyncopation()) {
+		output += m_syncopationWeight;
+	}
+	if (hasLeapBefore()) {
+		output += m_leapWeight;
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_note_info::markNote -- Only print the first note in a series
+//     of notes with the same pitch.
+//
+
+void cmr_note_info::markNote(const string& marker) {
+	for (int i=0; i<(int)m_tokens.size(); i++) {
+		HTp token = m_tokens[i];
+		if (i > 0) {
+			// don't color repeated secondary notes.
+			if (token->isNoteAttack()) {
+				break;
+			}
+		}
+		string text = *token;
+		if (text.find(marker) != string::npos) {
+			continue;
+		}
+		text += marker;
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_note_info::printNote --
+//    Default values:
+//       output = std::cerr
+//       marker = ""
+// If marker is not empty, then the marker string will be removed from the
+// output.
+//
+
+ostream& cmr_note_info::printNote(ostream& output, const string& marker) {
+	string newmarker = marker;
+	if (marker == "+") {
+		newmarker = "\\+";
+	} else if (marker == "|") {
+		newmarker = "\\|";
+	} else if (marker == "?") {
+		newmarker = "\\?";
+	}
+
+	string contents;
+	for (int i=0; i<(int)m_tokens.size(); i++) {
+		contents +=  *m_tokens[i];
+		if (i < (int)m_tokens.size() - 1) {
+			contents += ",";
+		}
+	}
+	contents += "(";
+	if (hasSyncopation()) {
+		contents += "S";
+	}
+	if (hasLeapBefore()) {
+		contents += "L";
+	}
+	contents += to_string(m_tokens[0]->getLineNumber());
+	contents += ")";
+	if (!newmarker.empty()) {
+		HumRegex hre;
+		hre.replaceDestructive(contents, "", newmarker, "g");
+	}
+	output << contents;
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_note_info::getPitch -- Return scientific pitch name.
+//
+
+string cmr_note_info::getPitch(void) {
+	if (m_tokens.empty()) {
+		return "R";
+	} else {
+		int octave = Convert::kernToOctaveNumber(m_tokens.at(0));
+		int accidentals = Convert::kernToAccidentalCount(m_tokens.at(0));
+		int dpc = Convert::kernToDiatonicPC(m_tokens.at(0));
+		string output;
+		switch (dpc) {
+			case 0: output += "C"; break;
+			case 1: output += "D"; break;
+			case 2: output += "E"; break;
+			case 3: output += "F"; break;
+			case 4: output += "G"; break;
+			case 5: output += "A"; break;
+			case 6: output += "B"; break;
+		}
+		for (int i=0; i<abs(accidentals); i++) {
+			if (accidentals < 0) {
+				output += "b";
+			} else {
+				output += "#";
+			}
+		}
+		output += to_string(octave);
+		return output;
+	}
+}
+
+
+
+///////////////////////////////
+//
+// cmr_note_info::getToken --
+//
+
+HTp cmr_note_info::getToken(void) {
+	if (m_tokens.empty()) {
+		return NULL;
+	} else {
+		return m_tokens.at(0);
+	}
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// cmr_group_info -- helper class describing a conspicuous repetition groups.
+//    This class is used to store a conspicuous melodic repetition (which will
+//    be merged with adjacent CMRs later if they overlap.
+//
+
+//////////////////////////////
+//
+// cmr_group_info::cmr_group_info -- Constructor.
+//
+
+cmr_group_info::cmr_group_info(void) {
+	clear();
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::clear -- Clear or initialize object.
+//
+
+void cmr_group_info::clear(void) {
+	m_serial    = -1;
+	m_direction =  0;
+	m_notes.clear();
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getNoteCount -- Return the number of notes in the group.
+//
+
+int cmr_group_info::getNoteCount(void) {
+	if (m_serial < 0) {
+		return 0;
+	} else {
+		return (int)m_notes.size();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getGroupDuration -- Return the duration of the group, which
+//     is the duration beetween the first and last note attack.
+//
+
+HumNum cmr_group_info::getGroupDuration(void) {
+	if (m_notes.empty()) {
+		return -1;
+	} else {
+		HumNum startPos = m_notes[0].m_tokens[0]->getDurationFromStart();
+		HumNum endPos   = m_notes.back().m_tokens[0]->getDurationFromStart();
+		return endPos - startPos;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::addNote -- Add a note to the list. The input is a list of
+//     notes tied together.
+//
+
+void cmr_group_info::addNote(vector<HTp>& tiednotes, vector<int>& barnums) {
+	if (tiednotes.empty()) {
+		cerr << "Strange problem in cmr_group_info::addNote" << endl;
+	}
+	m_notes.resize(m_notes.size() + 1);
+	m_notes.back().m_tokens = tiednotes;
+
+	int line = m_notes.back().m_tokens.at(0)->getLineIndex();
+	int mstart = barnums.at(line);
+	m_notes.back().setMeasureBegin(mstart);
+
+	line = m_notes.back().m_tokens.back()->getLineIndex();
+	int mend = barnums.at(line);
+	m_notes.back().setMeasureEnd(mend);
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getMeasureBegin --
+//
+
+int cmr_group_info::getMeasureBegin(void) {
+	if (m_notes.empty()) {
+		return -1;
+	} else {
+		return m_notes[0].getMeasureBegin();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getMeasureEnd -- Return the starting measure of the last note in the group.
+//
+
+int cmr_group_info::getMeasureEnd(void) {
+	if (m_notes.empty()) {
+		return -1;
+	}
+	return m_notes.back().getMeasureEnd();
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getStartTime -- Return the starting time of the first
+//     note in the CMR in units of quarter notes since the start of the music.
+//
+
+HumNum cmr_group_info::getStartTime(void) {
+	if (m_notes.empty()) {
+		return -1;
+	} else {
+		return m_notes[0].getStartTime();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getEndTime -- Return the starting time of the last note
+//     in the CMR group in units of quarter notes since the start of the music.
+//
+
+HumNum cmr_group_info::getEndTime(void) {
+	if (m_notes.empty()) {
+		return -1;
+	} else {
+		return m_notes.back().getStartTime();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getMidiPitch -- Return the MIDI pitch of the group's note.
+//
+
+int cmr_group_info::getMidiPitch(void) {
+	if (m_notes.empty()) {
+		return -1;
+	} else {
+		return m_notes[0].getMidiPitch();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getSerial --
+//
+
+int cmr_group_info::getSerial(void) {
+	return m_serial;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::setSerial --
+//
+
+void cmr_group_info::setSerial(int serial) {
+	m_serial = serial;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getDirection --
+//
+
+int cmr_group_info::getDirection(void) {
+	return m_direction;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::setDirectionUp --
+//
+
+void cmr_group_info::setDirectionUp(void) {
+	m_direction = +1;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::setDirectionDown --
+//
+
+void cmr_group_info::setDirectionDown(void) {
+	m_direction = -1;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getLeapCount --
+//
+
+int cmr_group_info::getLeapCount(void) {
+	int output = 0;
+	for (int i=0; i<(int)m_notes.size(); i++) {
+		if (m_notes.at(i).hasLeapBefore()) {
+			output++;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getSyncopationCount --
+//
+
+int cmr_group_info::getSyncopationCount(void) {
+	int output = 0;
+	for (int i=0; i<(int)m_notes.size(); i++) {
+		if (m_notes.at(i).hasSyncopation()) {
+			output++;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::makeInvalid --
+//
+
+void cmr_group_info::makeInvalid(void) {
+	if (m_serial > 0) {
+		m_serial *= -1;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getTrack --
+//
+
+int cmr_group_info::getTrack(void) {
+	if (getNoteCount() <= 0) {
+		return -1;
+	} else {
+		HTp token = getNote(0);
+		if (token) {
+			return token->getTrack();
+		} else {
+			return -1;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getStartLineNumber --
+//
+
+int cmr_group_info::getStartLineNumber(void) {
+	if (m_notes.empty()) {
+		return -1;
+	} else {
+		return m_notes[0].m_tokens[0]->getLineNumber();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getStartLineNumber --
+//
+
+int cmr_group_info::getStartFieldNumber(void) {
+	if (m_notes.empty()) {
+		return -1;
+	} else {
+		return m_notes[0].m_tokens[0]->getFieldNumber();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getGroupStrength -- Return the strength value for the CMR.
+//
+
+double cmr_group_info::getGroupStrength(void) {
+	double output = 0.0;
+	for (int i=0; i<(int)m_notes.size(); i++) {
+		output += m_notes[i].getNoteStrength();
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getNote -- return the note attack at the given index.
+//    Return NULL if out of range.
+//
+
+HTp cmr_group_info::getNote(int index) {
+	if (index < 0) {
+		return NULL;
+	} else if (index >= getNoteCount()) {
+		return NULL;
+	} else {
+		return m_notes[index].m_tokens[0];
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::getStartNote -- return attack note of first note in group, or
+//    return NULL if out of range.
+//
+
+HTp cmr_group_info::getFirstToken(void) {
+	if (m_notes.empty()) {
+		return NULL;
+	} else {
+		return m_notes[0].getToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::isValid -- Group that is not merged
+//
+
+bool cmr_group_info::isValid(void) {
+	if (m_serial >= 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::markNotes --
+//
+
+void cmr_group_info::markNotes(const string& marker) {
+	for (int i=0; i<(int)m_notes.size(); i++) {
+		m_notes[i].markNote(marker);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::mergeGroup -- Merges overlapping groups into a single
+//     larger group and invalidates the second group after merging.
+//
+
+bool cmr_group_info::mergeGroup(cmr_group_info& group) {
+	if (this == &group) {
+		// Same group.
+		return false;
+	}
+	if (!this->isValid()) {
+		return false;
+	}
+	if (!group.isValid()) {
+		return false;
+	}
+
+	int dir1 = getDirection();
+	int dir2 = group.getDirection();
+	if (dir1 != dir2) {
+		return false;
+	}
+	if (dir1 == 0) {
+		cerr << "Error: unassigned direction for groups" << endl;
+		return false;
+	}
+
+	HumNum start1 = this->getStartTime();
+	HumNum start2 = group.getStartTime();
+	HumNum end1   = this->getEndTime();
+	HumNum end2   = group.getEndTime();
+
+	if (start2 > end1) {
+		// nothing to merge
+		return false;
+	}
+
+	int duplicates = 0;
+
+	// Identify duplicate notes shared between groups:
+	vector<bool> duplicateNote(group.getNoteCount(), false);
+	for (int i=0; i<group.getNoteCount(); i++) {
+		for (int j=0; j<(int)getNoteCount(); j++) {
+			HTp token1 = getNote(j);
+			HTp token2 = group.getNote(i);
+			if (duplicateNote[i]) {
+				continue;
+			}
+			if (token1 == token2) {
+				duplicateNote[i] = true;
+				duplicates++;
+			}
+		}
+	}
+
+	if (duplicates == group.getNoteCount()) {
+		// group is a subset of this.
+		group.makeInvalid();
+		return "true";
+	}
+
+	// Copy unshared notes into first group:
+	for (int i=0; i<group.getNoteCount(); i++) {
+		if (duplicateNote[i]) {
+			continue;
+		}
+		m_notes.push_back(group.m_notes[i]);
+	}
+
+	// Deactivate group being merged:
+	if (group.getSerial() > 0) {
+		group.makeInvalid();
+	} else {
+		cerr << "Strange problem merging group" << endl;
+		return false;
+	}
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// cmr_group_info::printNotes --
+//    Default values:
+//       output = std::cerr
+//       marker = ""
+// If marker is not empty, then the marker string will be removed from the
+// output.
+//
+
+ostream& cmr_group_info::printNotes(ostream& output, const string& marker) {
+	for (int i=0; i<(int)m_notes.size(); i++) {
+		m_notes[i].printNote(output, marker);
+		if (i < (int)m_notes.size() - 1) {
+			output << " ";
+		}
+	}
+	return output;
+}
+
+
+//////////////////////////////
+//
+// cmr_group_info::getPitch -- Return scientific pitch name.
+//
+
+string cmr_group_info::getPitch(void) {
+	if (m_notes.empty()) {
+		return "R";
+	} else {
+		return m_notes.at(0).getPitch();
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////
 //
-// Tool_cmr::Tool_cmr -- Set the recognized options for the tool.
+// Tool_cmr::Tool_cmr -- Constructor: set the recognized options for the tool.
 //
 
 Tool_cmr::Tool_cmr(void) {
-	define("data|raw|raw-data=b",  "print analysis data");
-	define("m|mark|marker=s:@",    "symbol to mark cmr notes");
-	define("c|color=s:red",        "color of marked notes");
-	define("r|ignore-rest=d:1.0",  "ignore rests smaller than given value (in whole notes)");
-	define("n|number=i:3",         "number of high notes in a row");
-	define("d|dur|duration=d:6.0", "maximum duration between cmr note attacks in whole notes");
-	define("i|info=b",             "print cmr info");
-	define("p|cmrs=b",             "detect only positive cmrs");
-	define("t|troughs=b",          "detect only negative cmrs");
-	define("A|not-accented=b",     "counts only cmrs that do not have melodic accentation");
-	define("l|local-peaks=b",      "mark local peaks");
-	define("L|only-local-peaks=b", "mark local peaks only");
+	define("data|raw|raw-data=b",       "print analysis data");
+	define("m|mark-up|marker-up=s:+",   "symbol to mark peak cmr notes");
+	define("M|mark-down|marker-down=s:|", "symbol to mark anti-peak cmr notes");
+	define("c|color|color-up=s:red",    "color of CMR peak notes");
+	define("C|color-down=s:orange",     "color of CMR anti-peak notes");
+	define("r|ignore-rest=d:1.0",       "ignore rests smaller than given value (in whole notes)");
+	define("n|number=i:3",              "number of high notes in a row");
+	define("N|cmr-number=b",            "show enumeration number of CMR above/below starting note");
+	define("d|dur|duration=d:6.0",      "maximum duration between cmr note attacks in whole notes");
+	define("i|info=b",                  "print cmr info");
+	define("p|peaks=b",                 "detect only positive cmrs");
+	define("t|troughs=b",               "detect only negative cmrs");
+	define("A|not-accented=b",          "counts only cmrs that do not have melodic accentation");
+	define("s|syncopation-weight=d:1.0","weight for syncopated notes");
+	define("leap|leap-weight=d:0.5",    "weight for leapng notes");
+	define("l|local-peaks=b",           "mark local peaks");
+	define("L|only-local-peaks=b",      "mark local peaks only");
+	define("merge|merged|show-merged=b","print merged groups");
+	define("S|summary=b",               "summarize CMRs for multiple inputs");
+	define("v|vega=b",                  "output default Vega-lite plot");
+	define("V|no-html=b",               "output Vega-lite plot without HTML");
+	define("countplot=b",               "output Vega-lite plot for CMR count");
+	define("strengthplot=b",            "output Vega-lite plot with strength scores");
+	define("h|half=b",                  "durations given in half notes (mimims)");
+	define("D|debug=b",                 "print debug information");
 }
 
 
@@ -58665,87 +59773,182 @@ bool Tool_cmr::run(HumdrumFile& infile) {
 //
 
 void Tool_cmr::initialize(void) {
-	m_rawQ         = getBoolean("raw-data");
-	m_cmrQ         = getBoolean("cmrs");
-	m_ncmrQ        = getBoolean("troughs");
-	m_naccentedQ   = getBoolean("not-accented");
-	m_localQ       = getBoolean("local-peaks");
-	m_localOnlyQ   = getBoolean("only-local-peaks");
+	m_rawQ          = getBoolean("raw-data");
+	m_peaksQ        = getBoolean("peaks");
+	m_npeaksQ       = getBoolean("troughs");
+	m_naccentedQ    = getBoolean("not-accented");
+	m_localQ        = getBoolean("local-peaks");
+	m_localOnlyQ    = getBoolean("only-local-peaks");
+	m_showMergedQ   = getBoolean("show-merged");
+	m_summaryQ      = getBoolean("summary");
+	m_vegaQ         = getBoolean("vega");
+	m_htmlQ         = getBoolean("no-html");
+	m_vegaCountQ    = getBoolean("countplot");
+	m_vegaStrengthQ = getBoolean("strengthplot");
+	m_numberQ       = getBoolean("cmr-number");
+	m_debugQ        = getBoolean("debug");
 	if (m_localOnlyQ) {
 		m_localQ = true;
 	}
 
-	m_marker       = getString("marker");
-	m_color        = getString("color");
+	m_markerUp     = getString("marker-up");
+	m_markerDown   = getString("marker-down");
+	m_colorUp      = getString("color-up");
+	m_colorDown    = getString("color-down");
 
 	m_smallRest    = getDouble("ignore-rest") * 4.0;  // convert from whole notes to quarter notes
 	m_cmrNum       = getInteger("number");
 	m_cmrDur       = getInteger("duration") * 4.0;    // convert from whole notes to quarter notes
 	m_infoQ        = getBoolean("info");
-	m_count        = 0;
+	m_halfQ        = getBoolean("half");
+
+	cmr_note_info::m_syncopationWeight = getDouble("syncopation-weight");
+	cmr_note_info::m_leapWeight        = getDouble("leap-weight");
+
+	m_noteGroups.clear();
 }
 
 
 
 //////////////////////////////
 //
-// Tool_cmr::processFile --
+// Tool_cmr::processFile -- Do CMR analysis on score.
 //
 
 void Tool_cmr::processFile(HumdrumFile& infile) {
-	// get list of music spines (columns):
 	vector<HTp> starts = infile.getKernSpineStartList();
+	m_minPitch.clear();
+	m_maxPitch.clear();
+	m_minPitch.resize(infile.getMaxTrack() + 1);
+	m_maxPitch.resize(infile.getMaxTrack() + 1);
 
 	m_local_count = 0;
 
 	m_barNum = infile.getMeasureNumbers();
 
-	// The first "spine" is the lowest part on the system.
-	// The last "spine" is the highest part on the system.
-	for (int i=0; i<(int)starts.size(); i++) {
-		if (m_cmrQ) {
-			processSpine(starts[i]);
-		} else if (m_ncmrQ) {
-			processSpineFlipped(starts[i]);
+	// print information about each note group:
+	getPartNames(m_partNames, infile);
+
+	// Analyze CMR for each part, starting with the highest part:
+	for (int i=(int)starts.size()-1; i>=0; i--) {
+		getNoteList(m_notelist, starts.at(i));
+		getVocalRange(m_minPitch, m_maxPitch, m_notelist);
+		if (m_peaksQ) {
+			processSpine(starts[i], infile);
+		} else if (m_npeaksQ) {
+			processSpineFlipped(starts[i], infile);
 		} else {
-			processSpine(starts[i]);
-			processSpineFlipped(starts[i]);
+			processSpine(starts[i], infile);
+			processSpineFlipped(starts[i], infile);
 		}
 	}
 
-	infile.createLinesFromTokens();
+	mergeOverlappingPeaks();
 
-	if (!m_rawQ) {
+	if (m_vegaQ || m_vegaStrengthQ || m_vegaCountQ) {
+		m_free_text << " " << endl;
+	}
+
+	if (!(m_rawQ || m_summaryQ || m_vegaQ || m_vegaStrengthQ || m_vegaCountQ)) {
+		markNotesInScore();
+	}
+
+	if (!(m_rawQ || m_summaryQ || m_vegaQ || m_vegaStrengthQ || m_vegaCountQ)) {
+		if (m_numberQ) {
+			addGroupNumbersToScore(infile);
+		}
+		infile.createLinesFromTokens();
 		m_humdrum_text << infile;
 
 		if (!m_localOnlyQ) {
-			m_humdrum_text << "!!!RDF**kern: ";
-			m_humdrum_text << m_marker;
-			m_humdrum_text << " = marked note, color=";
-			m_humdrum_text << m_color;
-			m_humdrum_text << endl;
-		}
 
-		if (m_local_count > 0) {
-			m_humdrum_text << "!!!RDF**kern: ";
-			m_humdrum_text << m_local_marker;
-			m_humdrum_text << " = marked note, color=";
-			m_humdrum_text << m_local_color;
-			m_humdrum_text << endl;
-		}
+			if (hasGroupUp()) {
+				m_humdrum_text << "!!!RDF**kern: ";
+				m_humdrum_text << m_markerUp;
+				m_humdrum_text << " = marked note (up), color=";
+				m_humdrum_text << m_colorUp;
+				m_humdrum_text << endl;
+			}
 
-		if (m_local_count_n > 0) {
-			m_humdrum_text << "!!!RDF**kern: ";
-			m_humdrum_text << m_local_marker_n;
-			m_humdrum_text << " = marked note, color=";
-			m_humdrum_text << m_local_color_n;
-			m_humdrum_text << endl;
+			if (hasGroupDown()) {
+				m_humdrum_text << "!!!RDF**kern: ";
+				m_humdrum_text << m_markerDown;
+				m_humdrum_text << " = marked note (down), color=";
+				m_humdrum_text << m_colorDown;
+				m_humdrum_text << endl;
+			}
+
+		} else {
+			if (m_local_count_n > 0) {
+				m_humdrum_text << "!!!RDF**kern: ";
+				m_humdrum_text << m_local_marker_n;
+				m_humdrum_text << " = marked note, color=";
+				m_humdrum_text << m_local_color_n;
+				m_humdrum_text << endl;
+			}
 		}
 
 	}
 
 	if (!m_localOnlyQ) {
-		postProcessAnalysis(infile);
+		if (m_summaryQ) {
+			printSummaryStatistics(infile);
+		} else if (m_vegaQ || m_vegaCountQ || m_vegaStrengthQ) {
+			storeVegaData(infile);
+		} else {
+			printStatistics(infile);
+		}
+	}
+
+	if (m_infoQ && !m_summaryQ) {
+		prepareHtmlReport();
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::processSpine -- Process one part.  Only the first voice/layer
+//    on the staff will be processed (so only the top part if there is a divisi).
+//
+
+void Tool_cmr::processSpine(HTp startok, HumdrumFile&  infile) {
+	// notelist is a two dimensional array of notes.   The
+	// first dimension is a list of the note attacks in time
+	// (plus rests), and the second dimension is for a list of the
+	// tied notes after the first one (this is so that we can
+	// highlight both the starting note and any tied notes to that
+	// starting note later).
+	if (m_notelist.empty()) {
+		m_midinums.clear();
+		m_metlevs.clear();
+		m_syncopation.clear();
+		m_leapbefore.clear();
+		return;
+	}
+
+	m_track = m_notelist.at(0).at(0)->getTrack();
+	getMidiNumbers(m_midinums, m_notelist);
+	identifyLocalPeaks(m_localpeaks, m_midinums);
+	getMetlev(m_metlevs, m_notelist);
+	getSyncopation(m_syncopation, m_notelist);
+	getLeapBefore(m_leapbefore, m_midinums);
+
+	if (m_localQ) {
+		markNotes(m_notelist, m_localpeaks, m_local_marker);
+	}
+	if (m_localOnlyQ) {
+		return;
+	}
+
+	for (int i=0; i<(int)m_notelist.size(); i++) {
+		checkForCmr(i, 1, infile);
+	}
+
+	if (m_rawQ) {
+		printAnalysisData();
 	}
 }
 
@@ -58753,50 +59956,556 @@ void Tool_cmr::processFile(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_cmr::postProcessAnalysis --
+// Tool_cmr::processSpineFlipped -- Similar to processSpine(), but
+//    searches for minima CMRs rather than maxima CMRs.
 //
 
-void Tool_cmr::postProcessAnalysis(HumdrumFile& infile) {
-	mergeOverlappingPeaks();
+void Tool_cmr::processSpineFlipped(HTp startok, HumdrumFile& infile) {
+	// notelist is a two dimensional array of notes.   The
+	// first dimension is a list of the note attacks in time
+	// (plus rests), and the second dimension is for a list of the
+	// tied notes after the first one (this is so that we can
+	// highlight both the starting note and any tied notes to that
+	// starting note later).
+	if (m_notelist.empty()) {
+		m_midinums.clear();
+		m_metlevs.clear();
+		m_syncopation.clear();
+		m_leapbefore.clear();
+		return;
+	}
 
+	m_track = m_notelist.at(0).at(0)->getTrack();
+	getMidiNumbers(m_midinums, m_notelist);
+	flipMidiNumbers(m_midinums);
+	identifyLocalPeaks(m_localpeaks, m_midinums);
+	getMetlev(m_metlevs, m_notelist);
+	getSyncopation(m_syncopation, m_notelist);
+	getLeapBefore(m_leapbefore, m_midinums);
+
+
+	if (m_rawQ) {
+		printAnalysisData();
+	}
+
+	if (m_localQ) {
+		markNotes(m_notelist, m_localpeaks, m_local_marker_n);
+	}
+	if (m_localOnlyQ) {
+		return;
+	}
+
+	for (int i=0; i<(int)m_notelist.size(); i++) {
+		checkForCmr(i, -1, infile);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// checkForCmr -- store CMR if identified.
+//
+// * Must have at least one sycopation or three leaps.
+// * Other CMR notes are on strong beats.
+// * Need three CMRs within window (6 whole notes) to count.
+// * Cannot have a note higher than a major/minor second between CMR notes.
+// * Can have a note a major/minor second above CMR notes, but only
+//   if the higher note is not on a strong beat.
+//
+
+void Tool_cmr::checkForCmr(int index, int direction, HumdrumFile& infile) {
+	// Change next condition: trigger on a syncopation, or three leaps
+	// before the same pitch.  Then later there will be a check for higher
+	// notes between the candidate CMR notes:
+	// Local peak must be present to trigger CMR
+	//if (!m_localpeaks.at(index)) {
+	//	return;
+	//}
+
+	// The local peak note must have a leap before it (or a rest)
+	// and/or a syncopation to trigger a CMR search:
+	if (!(m_syncopation.at(index) || m_leapbefore.at(index))) {
+		return;
+	}
+
+	int pitch = m_midinums.at(index);
+
+	// Create list of notes with same pitch within target duration after target note.
+	vector<int> candidates;
+	candidates.push_back(index);
+
+	int i = index+1;
+	HumNum duration = 0;
+	if (i < (int)m_notelist.size()) {
+		duration = m_notelist.at(i).at(0)->getDurationFromStart() - m_notelist.at(index).at(0)->getDurationFromStart();
+	}
+
+	// Check for matching peaks after target note:
+	while ((i < (int)m_notelist.size()) && (duration.getFloat() <= m_cmrDur)) {
+		if (m_midinums.at(i) > pitch + 2) {
+			// Cannot exceed a major second above peak note
+			// maybe check if adjacent to a peak note
+			break;
+		}
+		if (m_midinums.at(i) == pitch) {
+			double metlev = m_metlevs.at(i);
+			if (metlev > 1) { // has to be on whole-note level (metlev == 2)
+				candidates.push_back(i);
+			} else if (isMelodicallyAccented(i)) {
+				candidates.push_back(i);
+			}
+		}
+		i++;
+		if (i < (int)m_notelist.size()) {
+			duration = m_notelist.at(i).at(0)->getDurationFromStart() - m_notelist.at(index).at(0)->getDurationFromStart();
+		}
+	}
+
+	i = index-1;
+	duration = 0;
+	if (i < (int)m_notelist.size()) {
+		duration = m_notelist.at(index).at(0)->getDurationFromStart() - m_notelist.at(i).at(0)->getDurationFromStart();
+	}
+
+	// Check for matching peaks before target note:
+	while ((i >= 0) && (duration.getFloat() <= m_cmrDur)) {
+		if (m_midinums.at(i) > pitch + 2) {
+			// Cannot exceed a major second above peak note
+			// maybe check if adjacent to a peak note
+			break;
+		}
+		if (m_midinums.at(i) == pitch) {
+			double metlev = m_metlevs.at(i);
+			if (metlev > 1) { // has to be on whole-note level (metlev == 2)
+				candidates.insert(candidates.begin(), i);
+			} else if (isMelodicallyAccented(i)) {
+				candidates.insert(candidates.begin(), i);
+			}
+		}
+		i--;
+		if (i >= 0) {
+			duration = m_notelist.at(index).at(0)->getDurationFromStart() - m_notelist.at(i).at(0)->getDurationFromStart();
+		}
+	}
+
+	if ((int)candidates.size() < m_cmrNum) {
+		// Not enough notes to consider a CMR.
+		return;
+	}
+
+	for (int i=0; i<=(int)candidates.size() - m_cmrNum; i++) {
+		int index1 = candidates.at(i);
+		int index2 = candidates.at(i+m_cmrNum-1);
+		HumNum dur1 = m_notelist.at(index1).at(0)->getDurationFromStart();
+		HumNum dur2 = m_notelist.at(index2).at(0)->getDurationFromStart();
+		HumNum duration = dur2 - dur1;
+		if (duration > m_cmrDur) {
+			continue;
+		}
+		if (hasHigher(pitch, 2, m_midinums, m_notelist, index1, index2)) {
+			continue;
+		}
+
+		// Found a CMR (or piece of longer one that will be merged later)
+		// so store it at the end of m_noteGroups:
+		m_noteGroups.resize(m_noteGroups.size() + 1);
+		for (int j=0; j<m_cmrNum; j++) {
+			int tindex = candidates.at(i+j);
+			m_noteGroups.back().addNote(m_notelist.at(tindex), m_barNum);
+		}
+		m_noteGroups.back().setSerial((int)m_noteGroups.size() + 1);
+
+		if (direction < 0) {
+			m_noteGroups.back().setDirectionDown();
+		} else {
+			m_noteGroups.back().setDirectionUp();
+		}
+	}
+
+	int leapcount = m_noteGroups.back().getLeapCount();
+	int syncocount  = m_noteGroups.back().getSyncopationCount();
+	if (syncocount == 0) {
+		if (leapcount < 3) {
+			// Delete groups since it has less than three leaps and no syncopations
+			if (m_noteGroups.size() > 0) {
+				m_noteGroups.resize(m_noteGroups.size() - 1);
+			}
+		}
+	}
+
+	// Remove negative groups if they share a note with a positive group.
+	vector<bool> positive(infile.getLineCount(), false);
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		int dir = m_noteGroups.at(i).getDirection();
+		if (dir > 0) {
+			for (int j=0; j<m_noteGroups.at(i).getNoteCount(); j++) {
+				int line = m_noteGroups.at(i).getToken(j)->getLineIndex();
+				positive.at(line) = true;
+			}
+		} else if (dir < 0) {
+			bool valid = true;
+			for (int j=0; j<m_noteGroups.at(i).getNoteCount(); j++) {
+				int line = m_noteGroups.at(i).getToken(j)->getLineIndex();
+				if (positive.at(line)) {
+					valid = false;
+					break;
+				}
+			}
+			if (!valid) {
+				m_noteGroups.at(i).makeInvalid();
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::hasHigher -- There may be a note a step higher
+//     (or lower) between any two notes of the CMR provided
+//     that that higher note is not on a strong beat.
+//     True = invalid CMR case.
+//
+
+bool Tool_cmr::hasHigher(int pitch, int tolerance, vector<int>& midinums, vector<vector<HTp>>& notelist, int index1, int index2) {
+
+	for (int i=index1; i<=index2; i++) {
+		// Only a step above (major or minor second) is allowed.
+		// Input tolerance is 2.
+		if (midinums.at(i) > pitch + tolerance) {
+			return true;
+		}
+
+		if (midinums.at(i) > pitch) {
+			// If the higher note is accented, then invalidate the cmr.
+			if (isOnStrongBeat(notelist.at(i).at(0))) {
+				return true;
+			}
+		}
+
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::hasGroupUp -- True if there is at least one CMR that contains a peak note.
+//
+
+bool Tool_cmr::hasGroupUp(void) {
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		if (m_noteGroups.at(i).isValid()) {
+			if (m_noteGroups.at(i).getDirection() == +1) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::hasGroupDown -- True if there is at least one CMR that contains an antipeak note.
+//
+
+bool Tool_cmr::hasGroupDown(void) {
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		if (m_noteGroups.at(i).isValid()) {
+			if (m_noteGroups.at(i).getDirection() == -1) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getComposer-- Use regex to extract composer information from score filename
+//
+
+string Tool_cmr::getComposer(HumdrumFile& infile) {
+   HumRegex hre;
+
+	 string filename = infile.getFilename();
+	 // Remove any directory prefix:
+	 string code = "unknown";
+	 // Search for a capital letter followed by two small letters followed by four digits:
+	 if (hre.search(filename, "([A-Z][a-z][a-z])")) {
+			code = hre.getMatch(1);
+	 }
+	return code;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::printSummaryStatistics --
+//
+
+void Tool_cmr::printSummaryStatistics(HumdrumFile& infile) {
+
+	m_free_text << getGroupCount() << "	" << ((double)getGroupNoteCount() / countNotesInScore(infile)) * 1000.0 << "	" << infile.getFilename() << endl;
+
+	m_cmrCount.push_back(getGroupCount());
+	m_cmrNoteCount.push_back(getGroupNoteCount());
+	m_scoreNoteCount.push_back(countNotesInScore(infile));
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::storeVegaData --
+//
+
+void Tool_cmr::storeVegaData(HumdrumFile& infile) {
+
+	string composer = getComposer(infile);
+	m_vegaData << "{" << endl;
+	m_vegaData << "	\"Composers\": " << '"' << composer << '"' << "," << endl;
+	m_vegaData << "	\"Score\": \"" << infile.getFilename() << "\"," << endl;
+	m_vegaData << "	\"CMR note density permil\": " << ((double)getGroupNoteCount() / countNotesInScore(infile)) * 1000 << "," << endl;
+	if (getGroupCount() == 0) {
+		m_vegaData << "	\"Average CMR strength\": " << "0" << "," << endl;
+	} else {
+		m_vegaData << "	\"Average CMR strength\": " << ((double)getStrengthScore() / getGroupCount()) << "," << endl;
+	}
+	m_vegaData << "	\"CMR count\": " << getGroupCount() << endl;
+	m_vegaData << "}," << endl;
+
+}
+
+
+
+////////////////////////////
+//
+// Tool_cmr::printVegaPlot --
+//
+
+void Tool_cmr::printVegaPlot(void) {
+	string vegaDataHeader = R"(
+		{
+		  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+		  "description": "A vertical box plot showing median, min, and max CMR count in Josquin.",
+		  "data": {
+		    "values": [)";
+		cout << vegaDataHeader << endl;
+
+		cout << m_vegaData.str() << endl;
+
+		if (m_vegaCountQ) {
+			string vegaDataFooter = R"(
+			]},
+			 "mark": {
+				 "type": "boxplot",
+				 "extent": "min-max"
+			 },
+			 "encoding": {
+				 "x": {"field": "Composers", "type": "nominal"},
+				 "color": {"field": "Composers", "type": "nominal", "legend": null},
+				 "y": {
+					 "field": "CMR count",
+					 "type": "quantitative",
+					 "scale": {"zero": false}
+				 }
+			 }
+		 })";
+
+		 cout << vegaDataFooter << endl;
+	 } else	if (m_vegaStrengthQ) {
+	 			string vegaDataFooter = R"(
+	 			]},
+	 			 "mark": {
+	 				 "type": "boxplot",
+	 				 "extent": "min-max"
+	 			 },
+	 			 "encoding": {
+	 				 "x": {"field": "Composers", "type": "nominal"},
+	 				 "color": {"field": "Composers", "type": "nominal", "legend": null},
+	 				 "y": {
+	 					 "field": "Average CMR strength",
+	 					 "type": "quantitative",
+	 					 "scale": {"zero": false}
+	 				 }
+	 			 }
+	 		 })";
+
+		cout << vegaDataFooter << endl;
+	 	} else {
+			string vegaDataFooter = R"(
+		 ]},
+			"mark": {
+				"type": "boxplot",
+				"extent": "min-max"
+			},
+			"encoding": {
+				"x": {"field": "Composers", "type": "nominal"},
+				"color": {"field": "Composers", "type": "nominal", "legend": null},
+				"y": {
+					"field": "CMR note density permil",
+					"type": "quantitative",
+					"scale": {"zero": false}
+				}
+			}
+		})";
+			cout << vegaDataFooter << endl;
+	 }
+}
+
+
+
+////////////////////////////
+//
+// Tool_cmr::printHtmlPlot --
+//
+
+void Tool_cmr::printHtmlPlot(void) {
+
+	string header = R"(<!DOCTYPE html>
+<html>
+<head>
+<title>Sortcount output</title>
+<script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc12"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@3.29.1"></script>
+</head>
+<body>
+<div id="plotarea"></div>
+<script type="text/javascript">
+var mydata =)";
+	cout << header << endl;
+
+	printVegaPlot();
+
+	string footer = R"(vegaEmbed('#plotarea', mydata);
+</script>
+</body>
+</html>)";
+	cout << footer << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::finally --
+//
+
+void Tool_cmr::finally(void) {
+	//cerr << "\nFUNCTION RUN AFTER ALL INPUT FILES HAVE BEEN PROCESSED" << endl;
+	if ((m_vegaQ || m_vegaCountQ || m_vegaStrengthQ) && (m_htmlQ)) {
+		printVegaPlot();
+	} else if ((m_vegaQ || m_vegaCountQ || m_vegaStrengthQ) && !(m_htmlQ)) {
+		printHtmlPlot();
+	} else if (m_cmrCount.size() > 1) {
+		double meanCmrCount = Convert::mean(m_cmrCount);
+		double stdDevCmrCount = Convert::standardDeviation(m_cmrCount);
+
+		vector<double> cmrNoteDensities(m_cmrNoteCount.size());
+		for (int i=0; i < (int)cmrNoteDensities.size(); i++) {
+			cmrNoteDensities[i] = (double)m_cmrNoteCount[i] / m_scoreNoteCount[i];
+		}
+
+		double meanCmrNoteDen = Convert::mean(cmrNoteDensities);
+		double stdDevCmrNoteDen = Convert::standardDeviation(cmrNoteDensities);
+
+		cout << "CMR count mean: " << meanCmrCount << endl;
+		cout << "CMR count standard deviation: " << stdDevCmrCount << endl;
+		cout << "CMR note density mean: " << meanCmrNoteDen * 1000 << " permil " << endl;
+		cout << "CMR note density standard deviation: " << stdDevCmrNoteDen * 1000 << " permil " << endl;
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::printStatistics --
+//
+
+void Tool_cmr::printStatistics(HumdrumFile& infile) {
 	int all_note_count = countNotesInScore(infile);
 
-	int cmr_note_count = 0;
-	for (int i=0; i<(int)m_cmrIndex.size(); i++) {
-		if (m_cmrIndex[i] < 0) {
-			continue;
-		}
-		cmr_note_count += m_cmrPeakCount[i];
-	}
-	//print all statistics for cmr groups
+	m_humdrum_text << "!!!!!!!!!! CMR INFO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!"  << endl;
 
-	// if (m_infoQ) {
-	m_humdrum_text << "!!!cmr_groups: " << m_count << endl;
-	m_humdrum_text << "!!!cmr_notes: "  << cmr_note_count << endl;
-	m_humdrum_text << "!!!score_notes: " << all_note_count << endl;
-	// print density information for cmrs per mille
-	m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"  << endl;
-	m_humdrum_text << "!!!cmr_note_density: " << ((double)cmr_note_count / all_note_count) * 1000 << " permil" << endl;
-	m_humdrum_text << "!!!cmr_group_density: " << ((double)m_count / all_note_count) * 1000 << " permil" << endl;
+	m_humdrum_text << "!!!cmr_groups: "  << getGroupCount()     << endl;
+	m_humdrum_text << "!!!cmr_notes: "   << getGroupNoteCount() << endl;
+	m_humdrum_text << "!!!score_notes: " << all_note_count      << endl;
 
+	double groupDensity = ((double)getGroupCount() / all_note_count);
+	double groupNoteDensity = ((double)getGroupNoteCount() / all_note_count);
+
+	m_humdrum_text << "!!!cmr_group_density: " << groupDensity * 1000.0 << " permil" << endl;
+	m_humdrum_text << "!!!cmr_note_density: "  << groupNoteDensity * 1000.0 << " permil" << endl;
+
+	printGroupStatistics(infile);
+
+	m_humdrum_text << "!!!!!!!!!! END CMR INFO !!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+}
+
+
+
+/////////////////////////////
+//
+// printGroupStatistics -- Print information about individual CMR groups.
+//
+
+void Tool_cmr::printGroupStatistics(HumdrumFile& infile) {
 	int pcounter = 1;
-	for (int i=0; i<(int)m_cmrIndex.size(); i++) {
-		if (m_cmrIndex[i] < 0) {
-			// This group has been merged into a larger one.
-			continue;
+	int ncounter = -1;
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		if (!m_showMergedQ) {
+			if (!m_noteGroups[i].isValid()) {
+				continue;
+			}
 		}
-		m_humdrum_text << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"  << endl;
-		m_humdrum_text << "!!!cmr_group: "     << pcounter++            << endl;
-		m_humdrum_text << "!!!start_measure: "  << m_cmrMeasureBegin[i] << endl;
-		m_humdrum_text << "!!!end_measure: "    << m_cmrMeasureEnd[i]   << endl;
-		m_humdrum_text << "!!!group_duration: " << m_cmrDuration[i].getFloat()/4.0 << endl;
-		m_humdrum_text << "!!!group_pitches:";
-		for (int j=0; j<(int)m_cmrPitch[i].size(); j++) {
-			m_humdrum_text << " " << m_cmrPitch[i][j];
-			m_humdrum_text << "(" << m_cmrPitch[i][j]->getLineIndex() << ")";
+		double groupDuration = m_noteGroups[i].getGroupDuration().getFloat() / 4.0;
+		if (m_halfQ) {
+			groupDuration *= 2;
+		}
+		int track = m_noteGroups[i].getTrack();
+
+		m_humdrum_text << "!!!!!!!!!! CMR GROUP INFO !!!!!!!!!!!!!!!!!!!!!!!"               << endl;
+		if (m_noteGroups.at(i).isValid()) {
+			m_humdrum_text << "!!!cmr_group_num: "  << pcounter++                            << endl;
+		} else {
+			m_humdrum_text << "!!!cmr_merge_num: "  << ncounter--                            << endl;
+		}
+		if (track > 0) {
+			m_humdrum_text << "!!!cmr_track: "      << track                                 << endl;
+			m_humdrum_text << "!!!cmr_part: "       << m_partNames.at(track)                 << endl;
+			m_humdrum_text << "!!!voice_pitch_min: "<< m_minPitch.at(track)                  << endl;
+			m_humdrum_text << "!!!voice_pitch_max: "<< m_maxPitch.at(track)                  << endl;
+		}
+		m_humdrum_text << "!!!cmr_start_line: "    << m_noteGroups[i].getStartLineNumber()  << endl;
+		m_humdrum_text << "!!!cmr_start_field: "   << m_noteGroups[i].getStartFieldNumber() << endl;
+		m_humdrum_text << "!!!cmr_start_measure: " << m_noteGroups[i].getMeasureBegin()     << endl;
+		m_humdrum_text << "!!!cmr_end_measure: "   << m_noteGroups[i].getMeasureEnd()       << endl;
+		// Durations are in units of whole notes (semibreves):
+		m_humdrum_text << "!!!cmr_duration: "      << groupDuration << m_durUnit            << endl;
+		m_humdrum_text << "!!!cmr_strength: "      << m_noteGroups[i].getGroupStrength()    << endl;
+		m_humdrum_text << "!!!cmr_direction: "     << m_noteGroups[i].getDirection()        << endl;
+		m_humdrum_text << "!!!cmr_note_count: "    << m_noteGroups[i].getNoteCount()        << endl;
+		m_humdrum_text << "!!!cmr_pitch: "         << m_noteGroups[i].getPitch()            << endl;
+		m_humdrum_text << "!!!cmr_pitches: ";
+		if (m_noteGroups.at(i).getDirection() == -1) {
+			m_noteGroups.at(i).printNotes(m_humdrum_text, m_markerDown);
+		} else {
+			m_noteGroups.at(i).printNotes(m_humdrum_text, m_markerUp);
 		}
 		m_humdrum_text << endl;
-		m_humdrum_text << "!!!group_cmrcount: " << m_cmrPeakCount[i]    << endl;
 	}
 }
 
@@ -58804,7 +60513,143 @@ void Tool_cmr::postProcessAnalysis(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// mergeOverlappingPeaks -- Merge overlapping cmr groups.
+// Tool_cmr::getPartNames -- partNames is indexed by track.
+//
+
+void Tool_cmr::getPartNames(vector<string>& partNames, HumdrumFile& infile) {
+	partNames.clear();
+	partNames.resize(infile.getMaxTrack() + 1);
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isData()) {
+			break;
+		}
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			int track = token->getTrack();
+			if (!partNames[track].empty()) {
+				continue;
+			}
+			if (token->isInstrumentAbbreviation()) {
+				if (token->size() > 3) {
+					partNames[track] = token->substr(3);
+				}
+			}
+		}
+	}
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isData()) {
+			break;
+		}
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			int track = token->getTrack();
+			if (!partNames[track].empty()) {
+				continue;
+			}
+			if (token->isInstrumentName()) {
+				if (token->size() > 3) {
+					partNames[track] = token->substr(3);
+				}
+			}
+		}
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::prepareHtmlReport -- Create HTML template for displaying CMR analysis data.
+//
+
+void Tool_cmr::prepareHtmlReport(void) {
+	string htmlReport = R"(!!@@BEGIN: PREHTML
+!!@CONTENT:
+!!<h1 class='cmr'>Conspicuous Melodic Repetition</h1>
+!!<table class='gcmr'>
+!!   <tr><td>Group density</td><td>@{cmr_group_density}</td></tr>
+!!   <tr><td>Group note density</td><td>@{cmr_note_density}</td></tr>
+!!</table>
+!! <br/>
+!! @{printTable:}
+!!<style>
+!!   h1.cmr { font-size: 24px; }
+!!   table.cmr tr:not(:first-child):hover { background: #ff000011; }
+!!   table.cmr { max-width: 500px; }
+!!   table.gcmr td:nth-child(2) { width:100%; }
+!!   table.gcmr td:first-child {white-space: pre; text-align: right; padding-right: 10px; font-weight: bold; }
+!!   table.gcmr td:first-child::after { content: ':'; }
+!!</style>
+!!@JAVASCRIPT:
+!!function printTable(refs1, refs2, language) {
+!!   let numbers = refs2.cmr_group_num;
+!!   let durations = refs2.cmr_duration;
+!!   let pitches = refs2.cmr_pitch;
+!!   let minpitch = refs2.voice_pitch_min;
+!!   let maxpitch = refs2.voice_pitch_max;
+!!   let strengths = refs2.cmr_strength;
+!!   let count = refs2.cmr_note_count;
+!!   let directions = refs2.cmr_direction;
+!!   let parts = refs2.cmr_part;
+!!   let smeasure = refs2.cmr_start_measure;
+!!   let emeasure = refs2.cmr_end_measure;
+!!   let output = '';
+!!   output += `<table class='cmr'>`;
+!!   output += '<tr>';
+!!   output += '<th>CMR</th>';
+!!   output += '<th>Notes</th>';
+!!   output += '<th>Pitch</th>';
+!!   output += '<th>Range</th>';
+!!   output += '<th>Duration</th>';
+!!   output += '<th>Strength</th>';
+!!   output += '<th>Measure(s)</th>';
+!!   output += '</tr>';
+!!   for (let i=0; i<numbers.length; i++) {
+!!      let direction = parseInt(directions[i].value) == 1 ? "+" : "-";;
+!!      output += '<tr>';
+!!      output += `<td>${numbers[i].value}</td>`;
+!!      output += `<td>${count[i].value}</td>`;
+!!      output += `<td>${direction}${pitches[i].value}</td>`;
+!!      output += `<td>${minpitch[i].value}&ndash;${maxpitch[i].value}</td>`;
+!!      output += `<td>${durations[i].value}</td>`;
+!!      output += `<td>${strengths[i].value}</td>`;
+!!      let location = '';
+!!      let part = parts[i].value;
+!!      let startm = parseInt(smeasure[i].value);
+!!      let endm   = parseInt(emeasure[i].value);
+!!      if (startm !== endm) {
+!!         location = `${startm}&ndash;${endm}`;
+!!      } else {
+!!         location = `${startm}`;
+!!      }
+!!      if (part) {
+!!         location = `${part}: ${location}`;
+!!      }
+!!      output += `<td>${location}</td>`;
+!!      output += '</tr>';
+!!   }
+!!   output += '</table>';
+!!   return output;
+!!}
+!!@@END: PREHTML)";
+
+	m_humdrum_text << htmlReport << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::mergeOverlappingPeaks -- Merge overlapping cmr groups.
 //    Groups that need to be merged:
 //    * Have the same track number (same staff)
 //    * Have the same MIDI pitch
@@ -58818,12 +60663,14 @@ void Tool_cmr::mergeOverlappingPeaks(void) {
 	// This algorithm does not handle multiple groups that
 	// need merging, so redo the overlap identification
 	// several more times to enture multiple groups are
-	// merged.
+	// merged (that is what the for-loop is for, which
+	// keeps merging until there are no mergers left).
+
 	for (int k=0; k<100; k++) {
 		bool mergers = false;
-		for (int i=0; i<(int)m_cmrIndex.size(); i++) {
-			for (int j=i+1; j<(int)m_cmrIndex.size(); j++) {
-				mergers |= checkGroupPairForMerger(i, j);
+		for (int i=0; i<(int)m_noteGroups.size(); i++) {
+			for (int j=i+1; j<(int)m_noteGroups.size(); j++) {
+				mergers |= checkGroupPairForMerger(m_noteGroups.at(i), m_noteGroups.at(j));
 			}
 		}
 		if (!mergers) {
@@ -58831,14 +60678,28 @@ void Tool_cmr::mergeOverlappingPeaks(void) {
 		}
 	}
 
-	// re-calculate m_count (number of cmr groups):
-	m_count = 0;
-	for (int i=0; i<(int)m_cmrIndex.size(); i++) {
-		if (m_cmrIndex[i] >= 0) {
-			m_count++;
+	adjustGroupSerials();
+}
+
+
+
+//////////////////////////////
+//
+// adjustGroupSerials -- Renumber groups after mergers.
+//
+
+void Tool_cmr::adjustGroupSerials(void) {
+	int pcounter = 1;
+	int ncounter = -1;
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		if (m_noteGroups.at(i).getSerial() > 0) {
+			m_noteGroups.at(i).setSerial(pcounter++);
+		} else {
+			m_noteGroups.at(i).setSerial(ncounter--);
 		}
 	}
 }
+
 
 
 //////////////////////////////
@@ -58851,155 +60712,79 @@ void Tool_cmr::mergeOverlappingPeaks(void) {
 // Return value is true if there was a merger; otherwise, returns false.
 //
 
-bool Tool_cmr::checkGroupPairForMerger(int index1, int index2) {
-
-	// Groups must not have been merged already:
-	if (m_cmrIndex[index1] < 0) {
+bool Tool_cmr::checkGroupPairForMerger(cmr_group_info& group1, cmr_group_info& group2) {
+	if (!group1.isValid()) {
 		return false;
 	}
-	if (m_cmrIndex[index2] < 0) {
+	if (!group2.isValid()) {
+		return false;
+	}
+	if (&group1 == &group2) {
+		// Same group.
 		return false;
 	}
 
 	// Groups must have the same track number (i.e., the same staff/part):
-	if (m_cmrTrack[index1] != m_cmrTrack[index2]) {
+	if (group1.getTrack() != group2.getTrack()) {
 		return false;
 	}
 
 	// Groups must have the same MIDI pitch:
-	if (m_cmrPitch[index1].empty()) {
-		return false;
-	}
-	if (m_cmrPitch[index2].empty()) {
-		return false;
-	}
-	int midi1 = m_cmrPitch[index1][0]->getMidiPitch();
-	int midi2 = m_cmrPitch[index2][0]->getMidiPitch();
+	int midi1 = group1.getMidiPitch();
+	int midi2 = group2.getMidiPitch();
 	if (midi1 != midi2) {
 		return false;
 	}
 
 	// Check if they overlap:
-	HumNum start1 = m_startTime[index1];
-	HumNum start2 = m_startTime[index2];
-	HumNum end1   = m_endTime[index1];
-	HumNum end2   = m_endTime[index2];
+	HumNum start1 = group1.getStartTime();
+	HumNum start2 = group2.getStartTime();
+	// HumNum end1   = group1.getEndTime();
+	// HumNum end2   = group2.getEndTime();
 
-	bool mergeQ = false;
-	bool flipQ  = false;
-	if (start1 < start2) {
-		if (start2 <= end1) {
-			mergeQ = true;
+	if (start1 == start2) {
+		if (group1.getNoteCount() > group2.getNoteCount()) {
+			return group1.mergeGroup(group2);
+		} else {
+			return group2.mergeGroup(group1);
 		}
+	} else if (start1 < start2) {
+		return group1.mergeGroup(group2);
 	} else {
-		if (start1 <= end2) {
-			flipQ = true;
-			mergeQ = true;
-		}
+		return group2.mergeGroup(group1);
 	}
-
-	if (mergeQ == false) {
-		return false;
-	}
-
-	// merge the two groups:
-	if (flipQ) {
-		int tempi = index1;
-		index1 = index2;
-		index2 = tempi;
-	}
-
-	// Deactivate the second group by setting a negative index:
-	m_cmrIndex[index2] *= -1;
-
-	// Set the endtime of the first group to the end of the second group:
-	m_endTime[index1] = m_endTime[index2];
-
-	// Likewise, merge the ending measure numbers:
-	m_cmrMeasureEnd[index1] = m_cmrMeasureEnd[index2];
-
-	// Update the duration of the merged cmr group:
-	m_cmrDuration[index1] = m_endTime[index2] - m_startTime[index1];
-
-	// merge the notes/counts:
-	for (int i=0; i<(int)m_cmrPitch[index2].size(); i++) {
-		vector<HTp> newtoks;
-		newtoks.clear();
-		for (int j=0; j<(int)m_cmrPitch[index1].size(); j++) {
-			HTp token1 = m_cmrPitch[index1][j];
-			HTp token2 = m_cmrPitch[index2][i];
-			if (token2 == NULL) {
-				continue;
-			}
-			if (token1 == token2) {
-				m_cmrPitch[index2][i] = NULL;
-			}
-		}
-	}
-
-	for (int k=0; k<(int)m_cmrPitch[index2].size(); k++) {
-		HTp token = m_cmrPitch[index2][k];
-		if (!token) {
-			continue;
-		}
-		m_cmrPitch[index1].push_back(token);
-	}
-
-	m_cmrPeakCount[index1] = m_cmrPitch[index1].size();
-
-	return true;
 }
 
 
 
 //////////////////////////////
 //
-// Tool_cmr::processSpine -- Process one part.  Only the first voice/layer
-//    on the staff will be processed (so only the top part if there is a divisi).
+// Tool_cmr::printAnalysisData -- For debugging.
 //
 
-void Tool_cmr::processSpine(HTp startok) {
-	// notelist is a two dimensional array of notes.   The
-	// first dimension is a list of the note attacks in time
-	// (plus rests), and the second dimension is for a list of the
-	// tied notes after the first one (this is so that we can
-	// highlight both the starting note and any tied notes to that
-	// starting note later).
-	vector<vector<HTp>> notelist = getNoteList(startok);
-
-	// midinums: MIDI note numbers for each note (with rests being 0).
-	vector<int> midinums = getMidiNumbers(notelist);
-
-	// cmrnotesQ: True = the note is a local high pitch.
-	vector<bool> cmrnotesQ(midinums.size(), false);
-	identifyLocalPeaks(cmrnotesQ, midinums);
-
-	if (m_localQ) {
-		markNotes(notelist, cmrnotesQ, m_local_marker);
+void Tool_cmr::printAnalysisData(void) {
+	string partname = m_partNames.at(m_track);
+	cerr << "NOTELIST FOR " << partname << " ===================================" << endl;
+	cerr << "BAR\tMIDI\tLPEAK\tMETLEV\tSYNC\tLEAP\tNOTES\n";
+	for (int i=0; i<(int)m_notelist.size(); i++) {
+		cerr << m_barNum.at(m_notelist.at(i).at(0)->getLineIndex());
+		cerr << "\t";
+		cerr << m_midinums.at(i);
+		cerr << "\t";
+		cerr << m_localpeaks.at(i);
+		cerr << "\t";
+		cerr << m_metlevs.at(i);
+		cerr << "\t";
+		cerr << m_syncopation.at(i);
+		cerr << "\t";
+		cerr << m_leapbefore.at(i);
+		cerr << "\t";
+		for (int j=0; j<(int)m_notelist.at(i).size(); j++) {
+			cerr << m_notelist.at(i).at(j) << " ";
+		}
+		cerr << endl;
 	}
-	if (m_localOnlyQ) {
-		return;
-	}
-
-	// cmrnotelist: Only the local cmr notes which will be extracted
-	// from all note list in the getLocalPeakNotes() function.
-	vector<vector<HTp>> cmrnotelist;
-	getLocalPeakNotes(cmrnotelist, notelist, cmrnotesQ);
-
-	// cmrmidinums: MIDI note numbers for cmrnotelist notes.
-	vector<int> cmrmidinums = getMidiNumbers(cmrnotelist);
-
-	// globalcmrnotes: boolean list that indicates if a local
-	// cmr note is part of a longer sequence of cmr notes.
-	// This variable will be filled in by identifyPeakSequence().
-	vector<bool> globalcmrnotes(cmrnotelist.size(), false);
-	identifyPeakSequence(globalcmrnotes, cmrmidinums, cmrnotelist);
-
-	if (m_rawQ) {
-		printData(notelist, midinums, cmrnotesQ);
-	} else {
-		markNotesInScore(cmrnotelist, globalcmrnotes);
-	}
+	cerr << "==================================================" << endl;
 }
 
 
@@ -59010,14 +60795,13 @@ void Tool_cmr::processSpine(HTp startok) {
 //     with given marker.
 //
 
-void Tool_cmr::markNotes(vector<vector<HTp>>& notelist,
-		vector<bool>& cmrnotesQ, const string& marker) {
+void Tool_cmr::markNotes(vector<vector<HTp>>& notelist, vector<bool> localpeaks, const string& marker) {
 	bool negative = false;
 	if (marker == m_local_marker_n) {
 		negative = true;
 	}
-	for (int i=0; i<(int)cmrnotesQ.size(); i++) {
-		if (!cmrnotesQ[i]) {
+	for (int i=0; i<(int)localpeaks.size(); i++) {
+		if (!localpeaks[i]) {
 			continue;
 		}
 		for (int j=0; j<(int)notelist.at(i).size(); j++) {
@@ -59026,9 +60810,9 @@ void Tool_cmr::markNotes(vector<vector<HTp>>& notelist,
 				text += marker;
 				notelist[i][j]->setText(text);
 				if (negative) {
-            	m_local_count_n++;
+					m_local_count_n++;
 				} else {
-            	m_local_count++;
+					m_local_count++;
 				}
 			}
 		}
@@ -59039,57 +60823,10 @@ void Tool_cmr::markNotes(vector<vector<HTp>>& notelist,
 
 //////////////////////////////
 //
-// Tool_cmr::processSpineFlipped -- Similar to processSpine(), but
-//    searches for minima CMRs rather than maxima CMRs.
+// Tool_cmr::flipMidiNumbers -- Invert midi numbers to search for minima rather than maxima.
 //
 
-void Tool_cmr::processSpineFlipped(HTp startok) {
-	// notelist is a two dimensional array of notes.   The
-	// first dimension is a list of the note attacks in time
-	// (plus rests), and the second dimension is for a list of the
-	// tied notes after the first one (this is so that we can
-	// highlight both the starting note and any tied notes to that
-	// starting note later).
-	vector<vector<HTp>> notelist = getNoteList(startok);
-
-	// midinums: MIDI note numbers for each note (with rests being 0).
-	vector<int> midinums = getMidiNumbers(notelist);
-	midinums = flipMidiNumbers(midinums);
-
-	// cmrnotesQ: True = the note is a local high pitch.
-	vector<bool> cmrnotesQ(midinums.size(), false);
-	identifyLocalPeaks(cmrnotesQ, midinums);
-
-	if (m_localQ) {
-		markNotes(notelist, cmrnotesQ, m_local_marker_n);
-	}
-	if (m_localOnlyQ) {
-		return;
-	}
-
-	// cmrnotelist: Only the local cmr notes which will be extracted
-	// from all note list in the getLocalPeakNotes() function.
-	vector<vector<HTp>> cmrnotelist;
-	getLocalPeakNotes(cmrnotelist, notelist, cmrnotesQ);
-
-	// cmrmidinums: MIDI note numbers for cmrnotelist notes.
-	vector<int> cmrmidinums = getMidiNumbers(cmrnotelist);
-
-	// globalcmrnotes: boolean list that indicates if a local
-	// cmr note is part of a longer sequence of cmr notes.
-	// This variable will be filled in by identifyPeakSequence().
-	vector<bool> globalcmrnotes(cmrnotelist.size(), false);
-	identifyPeakSequence(globalcmrnotes, cmrmidinums, cmrnotelist);
-
-	if (m_rawQ) {
-		printData(notelist, midinums, cmrnotesQ);
-	} else {
-		markNotesInScore(cmrnotelist, globalcmrnotes);
-	}
-}
-
-
-vector<int> Tool_cmr::flipMidiNumbers(vector<int>& midinums) {
+void Tool_cmr::flipMidiNumbers(vector<int>& midinums) {
 	for (int i=0; i<(int)midinums.size(); i++) {
 		if (midinums[i] == 0) {
 			continue;
@@ -59097,23 +60834,23 @@ vector<int> Tool_cmr::flipMidiNumbers(vector<int>& midinums) {
 		int flippedMidiNum = (midinums[i] * -1) + 128;
 		midinums[i] = flippedMidiNum;
 	}
-	return midinums;
 }
+
+
 
 //////////////////////////////
 //
-// Tool_cmr::markNotesInScore --
+// Tool_cmr::markNotesInScore -- Mark all valid CMR notes.
 //
 
-void Tool_cmr::markNotesInScore(vector<vector<HTp>>& cmrnotelist, vector<bool>& iscmr) {
-	for (int i=0; i<(int)cmrnotelist.size(); i++) {
-		if (!iscmr[i]) {
-			continue;
-		}
-		for (int j=0; j<(int)cmrnotelist[i].size(); j++) {
-			string text = *(cmrnotelist[i][j]);
-			text += m_marker;
-			cmrnotelist[i][j]->setText(text);
+void Tool_cmr::markNotesInScore(void) {
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		if (m_noteGroups.at(i).isValid()) {
+			if (m_noteGroups.at(i).getDirection() == -1) {
+				m_noteGroups.at(i).markNotes(m_markerDown);
+			} else {
+				m_noteGroups.at(i).markNotes(m_markerUp);
+			}
 		}
 	}
 }
@@ -59126,7 +60863,7 @@ void Tool_cmr::markNotesInScore(vector<vector<HTp>>& cmrnotelist, vector<bool>& 
 //
 
 void Tool_cmr::getLocalPeakNotes(vector<vector<HTp>>& newnotelist,
-		vector<vector<HTp>>& oldnotelist, vector<bool>& cmrnotesQ) {
+		vector<vector<HTp>>& oldnotelist, vector<bool>& localpeaks) {
 
 	// durations == duration of notes in quarter-note units
 	vector<double> durations;
@@ -59147,11 +60884,11 @@ void Tool_cmr::getLocalPeakNotes(vector<vector<HTp>>& newnotelist,
 	////////////////////////////
 
 	newnotelist.clear();
-	for (int i=0; i<(int)cmrnotesQ.size(); i++) {
+	for (int i=0; i<(int)localpeaks.size(); i++) {
 		if ((durations[i] <= 2) && (strongbeat[i] == false)) {
 			continue;
 		}
-		if (cmrnotesQ[i]) {
+		if (localpeaks[i]) {
 			newnotelist.push_back(oldnotelist[i]);
 		}
 	}
@@ -59163,28 +60900,45 @@ void Tool_cmr::getLocalPeakNotes(vector<vector<HTp>>& newnotelist,
 //////////////////////////////
 //
 // Tool_cmr::identifyLocalPeaks -- Identify notes that are higher than their
-//    adjacent neighbors.  The midinumbs are MIDI note numbers (integers)
+//    adjacent neighbors.  The midinums are MIDI note numbers (integers)
 //    for the pitch, with higher number meaning higher pitches.  Rests are
 //    the value 0.  Do not assign a note as a cmr note if one of the
 //    adjacent notes is a rest. (This could be refined later, such as ignoring
 //    short rests).
 //
 
-void Tool_cmr::identifyLocalPeaks(vector<bool>& cmrnotesQ, vector<int>& midinums) { //changed to midinums from 'notelist'
-	for (int i=1; i<(int)midinums.size() - 1; i++) {
-		if ((midinums[i - 1] <= 0) && (midinums[i + 1] <= 0)) { //not sandwiched by rests
+void Tool_cmr::identifyLocalPeaks(vector<bool>& localpeaks, vector<int>& midinums) {
+	localpeaks.resize(midinums.size());
+	fill(localpeaks.begin(), localpeaks.end(), false);
+
+	if (midinums.size() < 3) {
+		// Avoid silly cases.
+		return;
+	}
+
+	for (int i=0; i<(int)midinums.size() - 1; i++) {
+		if ((i > 0) && (midinums.at(i-1) <= 0) && (midinums.at(i+1) <= 0)) {
+			// Ignore notes that have rests on both sides.
 			continue;
-		} else if (midinums[i] <= 0) {
+		} else if (midinums.at(i) <= 0) {
+			// Ignore rests.
 			continue;
 		}
-		if ((midinums[i] > midinums[i - 1]) && (midinums[i + 1] == 0)) { //allow rest after note
-			cmrnotesQ[i] = 1;
-		}
-		if ((midinums[i - 1] == 0) && (midinums[i] > midinums[i + 1])) { //allow rest before note
-			cmrnotesQ[i] = 1;
-		}
-		if ((midinums[i] > midinums[i - 1]) && (midinums[i] > midinums[i + 1])) { //check neighboring notes
-			cmrnotesQ[i] = 1;
+		if ((i == 0) && (midinums.at(i) > 0) && (midinums.at(i) > midinums.at(i+1))) {
+			// Allow for peak at start of music
+			localpeaks.at(i) = true;
+		} else if ((i == (int)midinums.size() - 1) && (midinums.back() > 0) && (midinums.back() > midinums.at((int)midinums.size() - 2))) {
+			// Allow for peak at end of music
+			localpeaks.at(i) = true;
+		} else if ((i > 0) && (midinums.at(i) > midinums.at(i-1)) && (midinums.at(i+1) == 0)) {
+			// Allow rest after peak note.
+			localpeaks.at(i) = true;
+		} else if ((i > 0) && (midinums.at(i-1) == 0) && (midinums.at(i) > midinums.at(i+1))) {
+			// Allow rest before peak note.
+			localpeaks.at(i) = true;
+		} else if ((i > 0) && (midinums.at(i) > midinums.at(i-1)) && (midinums.at(i) > midinums.at(i+1))) {
+			// Check neighboring notes.
+			localpeaks.at(i) = true;
 		}
 	}
 }
@@ -59217,14 +60971,15 @@ void Tool_cmr::identifyPeakSequence(vector<bool>& globalcmrnotes, vector<int>& c
 	// Set initial positions of globalcmrnotes to false:
 	globalcmrnotes.resize(cmrmidinums.size());
 	fill(globalcmrnotes.begin(), globalcmrnotes.end(), false);
-	// The code below (under Algorithms) will set notes identified as a "global cmr" to true
-	// in this vector.
 
-	// Get the timestamps of all local cmr notes:
+	// Get the timestamps of all local peak notes:
 	vector<double> timestamps(notes.size(), 0.0);
 	for (int i=0; i<(int)notes.size(); i++) {
 		timestamps[i] = notes[i][0]->getDurationFromStart().getFloat();
 	}
+
+	// The code below (under Algorithms) will set notes identified as a "global cmr" to true
+	// in this vector.
 
 	///////////////////////////////////////////
 	//
@@ -59246,10 +61001,10 @@ void Tool_cmr::identifyPeakSequence(vector<bool>& globalcmrnotes, vector<int>& c
 
 	for (int i=0; i<(int)cmrmidinums.size() - m_cmrNum; i++) {
 		bool match = true;
-		bool accented = isMelodicallyAccented(notes[i][0]);
+		bool accented = isMelodicallyAccented(i);
 		for (int j=1; j<m_cmrNum; j++) {
-			accented |= isMelodicallyAccented(notes[i+j][0]);
-			if (cmrmidinums[i+j] != cmrmidinums[i+j-1]) {
+			accented |= isMelodicallyAccented(i+j);
+			if (cmrmidinums.at(i+j) != cmrmidinums.at(i+j-1)) {
 				match = false;
 				break;
 			}
@@ -59264,33 +61019,19 @@ void Tool_cmr::identifyPeakSequence(vector<bool>& globalcmrnotes, vector<int>& c
 			continue;
 		}
 
-		HumNum duration = timestamps[i + m_cmrNum - 1] - timestamps[i];
+		HumNum duration = timestamps.at(i + m_cmrNum - 1) - timestamps.at(i);
 		if (duration.getFloat() > m_cmrDur) {
 			continue;
 		}
-		//data for every sub-sequeunce
-		m_count += 1;
-		int line = notes[i][0]->getLineIndex();
-		int line2 = notes[i + m_cmrNum - 1].back()->getLineIndex();
 
-		m_cmrDuration.push_back(duration.getFloat()/4.0);
-		m_cmrMeasureBegin.push_back(m_barNum[line]);
-		m_cmrMeasureEnd.push_back(m_barNum[line2]);
-		vector<HTp> pnotes;
+		// Store the (potential) CMR:
+		m_noteGroups.resize(m_noteGroups.size() + 1);
 		for (int j=0; j<m_cmrNum; j++) {
-			pnotes.push_back(notes.at(i+j).at(0));
+			m_noteGroups.back().addNote(notes.at(i+j), m_barNum);
 		}
-		m_cmrPitch.push_back(pnotes);
-		m_cmrPeakCount.push_back((int)pnotes.size());
 
 		// variables to do cmr group mergers later:
-		int track = notes[i][0]->getTrack();
-		m_cmrTrack.push_back(track);
-		m_cmrIndex.push_back(m_cmrIndex.size());
-		HumNum starttime = notes[i][0]->getDurationFromStart();
-		HumNum endtime   = notes[i+m_cmrNum-1].back()->getDurationFromStart();
-		m_startTime.push_back(starttime);
-		m_endTime.push_back(endtime);
+		m_noteGroups.back().setSerial(i+1);
 
 		for (int j=0; j<m_cmrNum; j++) {
 			globalcmrnotes[i+j] = true;
@@ -59302,42 +61043,80 @@ void Tool_cmr::identifyPeakSequence(vector<bool>& globalcmrnotes, vector<int>& c
 
 //////////////////////////////
 //
-// Tool_cmr::printData -- Print input and output data.  First column is the MIDI note
-//      number, second one is the cmr analysis (true=local maximum note)
+// Tool_cmr::getMidiNumbers -- convert note tokens into MIDI note numbers.
+//    60 = middle C (C4), 62 = D4, 72 = C5, 48 = C3.
 //
 
-void Tool_cmr::printData(vector<vector<HTp>>& notelist, vector<int>& midinums, vector<bool>& cmrnotes) {
-	m_free_text << "MIDI\tPEAK\tKERN" << endl;
+void Tool_cmr::getMidiNumbers(vector<int>& midinums, vector<vector<HTp>>& notelist) {
+
+	midinums.resize(notelist.size());
+
+	fill(midinums.begin(), midinums.end(), 0); // fill with rests by default
 	for (int i=0; i<(int)notelist.size(); i++) {
-		m_free_text << midinums.at(i) << "\t";
-		m_free_text << cmrnotes.at(i);
-		for (int j=0; j<(int)notelist[i].size(); j++) {
-			m_free_text << "\t" << notelist[i][j];
+		midinums.at(i) = Convert::kernToMidiNoteNumber(notelist.at(i).at(0));
+		if (midinums.at(i) < 0) {
+			// Set rests to be 0
+			midinums.at(i) = 0;
 		}
-		m_free_text << endl;
 	}
-	m_free_text << "******************************************" << endl;
-	m_free_text << endl;
 }
 
 
 
 //////////////////////////////
 //
-// Tool_cmr::getMidiNumbers -- convert note tokens into MIDI note numbers.
-//    60 = middle C (C4), 62 = D4, 72 = C5, 48 = C3.
+// Tool_cmr::getSyncopation -- Identify if notes are syncopated or not.
 //
 
-vector<int> Tool_cmr::getMidiNumbers(vector<vector<HTp>>& notelist) {
-	vector<int> output(notelist.size(), 0);  // fill with rests by default
-	for (int i=0; i<(int)notelist.size(); i++) {
-		output[i] = Convert::kernToMidiNoteNumber(notelist.at(i).at(0));
-		if (output[i] < 0) {
-			// Set rests to be 0
-			output[i] = 0;
+void Tool_cmr::getSyncopation(std::vector<bool>& synco, std::vector<std::vector<HTp>>& notelist) {
+	synco.resize(notelist.size());
+	for (int i=0; i<(int)synco.size(); i++) {
+		synco.at(i) = isSyncopated(notelist.at(i).at(0));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getLeapBefore -- Identify if notes have melodic leaps up before them.
+//
+
+void Tool_cmr::getLeapBefore(std::vector<bool>& leap, std::vector<int>& midinums) {
+	leap.resize(midinums.size());
+	fill(leap.begin(), leap.end(), false);
+	for (int i=1; i<(int)leap.size(); i++) {
+		int note1 = midinums.at(i);
+		if (note1 <= 0) {
+			continue;
+		}
+		int note2 = midinums.at(i-1);
+		// Consider duration of rests here.
+		if ((note2 <= 0) && (i >= 2)) {
+			note2 = midinums.at(i-2);
+		}
+		if (note2 <= 0) {
+			continue;
+		}
+		int interval = note1 - note2;
+		if (interval > 2) {
+			leap.at(i) = true;
 		}
 	}
-	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getMetlev -- convert note tokens into Metric levels.
+//
+
+void Tool_cmr::getMetlev(std::vector<double>& metlevs, std::vector<std::vector<HTp>>& notelist) {
+	metlevs.resize(notelist.size());
+	for (int i=0; i<(int)metlevs.size(); i++) {
+		metlevs.at(i) = cmr_note_info::getMetricLevel(notelist.at(i).at(0));
+	}
 }
 
 
@@ -59352,66 +61131,75 @@ vector<int> Tool_cmr::getMidiNumbers(vector<vector<HTp>>& notelist) {
 //     so that they can be marked and highlighted in the score.
 //
 
-vector<vector<HTp>> Tool_cmr::getNoteList(HTp starting) {
-	vector<vector<HTp>> tempout;
-	tempout.reserve(2000);
+void Tool_cmr::getNoteList(vector<vector<HTp>>& notelist, HTp starting) {
+	notelist.clear();
+	notelist.reserve(2000);
 
-	HTp previous = starting;
+	int lastpitch = -1;
+
+	// HTp previous = NULL;
 	HTp current = starting;
 	while (current) {
 		if (!current->isData()) {
-			previous = current;
 			current = current->getNextToken();
 			continue;
 		}
 		if (current->isNull()) {
-			previous = current;
 			current = current->getNextToken();
 			continue;
 		}
 		if (current->isNoteSustain()) {
-			if (tempout.size() > 0) {
-				tempout.back().push_back(current);
+			if (notelist.size() > 0) {
+				notelist.back().push_back(current);
 			}
-			previous = current;
+			// previous = current;
 			current = current->getNextToken();
 			continue;
 		}
 		if (current->isRest()) {
-			if (previous->isRest()) {
-				// do not store previous rest
-				previous = current;
+			if ((!notelist.empty()) && notelist.back().at(0)->isRest()) {
+				notelist.back().push_back(current);
+				// previous = current;
 				current = current->getNextToken();
+				lastpitch = -1;
 				continue;
 			}
 		}
-		tempout.resize(tempout.size() + 1);
-		tempout.back().push_back(current);
+		int pitch = current->getMidiPitch();
+		if (pitch == lastpitch) {
+			if (notelist.size() > 0) {
+				notelist.back().push_back(current);
+			}
+			// previous = current;
+			current = current->getNextToken();
+			continue;
+		}
+		lastpitch = pitch;
+		notelist.resize(notelist.size() + 1);
+		notelist.back().push_back(current);
 		if (!current->isRest()) {
 			m_noteCount++;
 		}
-		previous = current;
+		// previous = current;
 		current = current->getNextToken();
 	}
 
 	// Remove any rests that are shorter or equal to m_shortRest:
 	vector<vector<HTp>> output;
-	output.reserve(tempout.size());
-	for (int i=0; i<(int)tempout.size() - 1; i++) {
-		if (!tempout[i][0]->isRest()) {
-			output.push_back(tempout[i]);
+	output.reserve(notelist.size());
+	for (int i=0; i<(int)notelist.size() - 1; i++) {
+		if (!notelist.at(i).at(0)->isRest()) {
+			output.push_back(notelist.at(i));
 			continue;
 		}
 		// get the duration of the (multi-rest):
-		HumNum restStart = tempout[i][0]->getDurationFromStart();
-		HumNum noteStart = tempout[i+1][0]->getDurationFromStart();
+		HumNum restStart = notelist.at(i).at(0)->getDurationFromStart();
+		HumNum noteStart = notelist.at(i+1).at(0)->getDurationFromStart();
 		HumNum duration = noteStart - restStart;
 		if (duration.getFloat() > m_smallRest) {
-			output.push_back(tempout[i]);
+			output.push_back(notelist.at(i));
 		}
 	}
-
-	return output;
 }
 
 
@@ -59424,8 +61212,8 @@ vector<vector<HTp>> Tool_cmr::getNoteList(HTp starting) {
 void  Tool_cmr::getDurations(vector<double>& durations, vector<vector<HTp>>& notelist) {
 	durations.resize(notelist.size());
 	for (int i=0; i<(int)notelist.size(); i++) {
-		HumNum duration = notelist[i][0]->getTiedDuration();
-		durations[i] = duration.getFloat();
+		HumNum duration = notelist.at(i).at(0)->getTiedDuration();
+		durations.at(i) = duration.getFloat();
 	}
 }
 
@@ -59436,17 +61224,18 @@ void  Tool_cmr::getDurations(vector<double>& durations, vector<vector<HTp>>& not
 // Tool_cmr::getBeat --
 //
 
-void  Tool_cmr::getBeat(vector<bool>& metpos, vector<vector<HTp>>& notelist) {
+void Tool_cmr::getBeat(vector<bool>& metpos, vector<vector<HTp>>& notelist) {
 	metpos.resize(notelist.size());
 	for (int i=0; i<(int)notelist.size(); i++) {
-		HumNum position = notelist[i][0]->getDurationFromBarline();
+		HumNum position = notelist.at(i).at(0)->getDurationFromBarline();
 		if (position.getDenominator() != 1) {
-			metpos[i] = false;
+			metpos.at(i) = false;
 		} if (position.getNumerator() % 4 == 0) {
-			metpos[i] = true;
+			metpos.at(i) = true;
 		} else {
-			metpos[i] = false;
+			metpos.at(i) = false;
 		}
+
 	}
 }
 
@@ -59454,79 +61243,14 @@ void  Tool_cmr::getBeat(vector<bool>& metpos, vector<vector<HTp>>& notelist) {
 
 //////////////////////////////
 //
-// Tool_cmr::getMetricLevel --
+// Tool_cmr::isOnStrongBeat --
 //
 
-int  Tool_cmr::getMetricLevel(HTp token) {
-	HumNum beat = token->getDurationFromBarline();
-	if (!beat.isInteger()) { // anything less than quarter note level
-		return -1;
-	}
-	if (beat.getNumerator() % 4 == 0) { // whole note level
-		return 2;
-	}
-	if (beat.getNumerator() % 2 == 0) { // half note level
-		return 1;
-	} else { // quarter note level
-		return 0;
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_cmr::isMelodicallyAccented --
-//
-
-bool  Tool_cmr::isMelodicallyAccented(HTp token) {
-	return hasLeapBefore(token) || isSyncopated(token);
-}
-
-
-//////////////////////////////
-//
-// Tool_cmr::hasLeapBefore --
-//
-
-bool  Tool_cmr::hasLeapBefore(HTp token) {
-	HTp current = token->getPreviousToken();
-	int startNote = token->getMidiPitch();
-	while (current) {
-		if (!current->isData()) {
-			current = current->getPreviousToken();
-			continue;
-		}
-		if (current->isNull()) {
-			current = current->getPreviousToken();
-			continue;
-		}
-		if (current->isRest()) {
-			current = current->getPreviousToken();
-			continue;
-		}
-		int testNote = current->getMidiPitch();
-		int interval = startNote - testNote;
-		return interval > 2;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// Tool_cmr::isSyncopated --
-//
-
-bool  Tool_cmr::isSyncopated(HTp token) {
-	HumNum dur = token->getTiedDuration();
-	double logDur = log2(dur.getFloat());
-	int metLev = getMetricLevel(token);
-	if (metLev >= 2) { // no syncopations occuring on whole-note level or higher
+bool Tool_cmr::isOnStrongBeat(HTp token) {
+	HumNum position = token->getDurationFromBarline();
+	if (position.getDenominator() != 1) {
 		return false;
-	}
-	if (logDur > metLev) {
+	} if (position.getNumerator() % 4 == 0) {
 		return true;
 	} else {
 		return false;
@@ -59537,7 +61261,30 @@ bool  Tool_cmr::isSyncopated(HTp token) {
 
 //////////////////////////////
 //
-// Tool_cmr::countNotesInScore --
+// Tool_cmr::isMelodicallyAccented --
+//
+
+bool Tool_cmr::isMelodicallyAccented(int index) {
+	return m_leapbefore.at(index) || m_syncopation.at(index);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::isSyncopated --
+//
+
+bool Tool_cmr::isSyncopated(HTp token) {
+	return cmr_note_info::isSyncopated(token);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::countNotesInScore -- Count the number of notes in a score,
+//     ignoring tied notes that are not attacks, and treating chords as a single note.
 //
 
 int Tool_cmr::countNotesInScore(HumdrumFile& infile) {
@@ -59557,7 +61304,7 @@ int Tool_cmr::countNotesInScore(HumdrumFile& infile) {
 			if (token->isRest()) {
 				continue;
 			}
-		  if (token->isSecondaryTiedNote()) {
+			if (token->isSecondaryTiedNote()) {
 				continue;
 			}
 			counter++;
@@ -59565,6 +61312,229 @@ int Tool_cmr::countNotesInScore(HumdrumFile& infile) {
 		}
 	}
 	return counter;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getGroupCount -- Return the number of groups.
+//
+
+int Tool_cmr::getGroupCount(void) {
+	int output = 0;
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		if (m_noteGroups[i].isValid()) {
+			output++;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getGroupNoteCount -- Return the number notes in all groups.
+//
+
+int Tool_cmr::getGroupNoteCount(void) {
+	int output = 0;
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		if (m_noteGroups[i].isValid()) {
+			output += m_noteGroups[i].getNoteCount();
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getStrengthScore -- Return the total strength score for all CMRs.
+//
+
+int Tool_cmr::getStrengthScore(void) {
+	int output = 0;
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		if (m_noteGroups[i].isValid()) {
+			output += m_noteGroups[i].getGroupStrength();
+		}
+	}
+	return output;
+}
+
+
+
+/////////////////////////////
+//
+// Tool_cmr::getVocalRange --
+//
+
+void Tool_cmr::getVocalRange(vector<string>& minpitch, vector<string>& maxpitch, vector<vector<HTp>>& notelist) {
+	if (notelist.empty()) {
+		return;
+	}
+	int track = notelist.at(0).at(0)->getTrack();
+	HTp mintok = NULL;
+	HTp maxtok = NULL;
+	int minb40 = -1;
+	int maxb40 = -1;
+
+	for (int i=0; i<(int)notelist.size(); i++) {
+		if (notelist.at(i).at(0)->isRest()) {
+			continue;
+		}
+
+		if (mintok == NULL) {
+			mintok = notelist.at(i).at(0);
+			minb40 = Convert::kernToBase40(mintok);
+		} else {
+			int b40 = Convert::kernToBase40(notelist.at(i).at(0));
+			if (b40 < minb40) {
+				minb40 = b40;
+				mintok = notelist.at(i).at(0);
+			}
+		}
+
+		if (maxtok == NULL) {
+			maxtok = notelist.at(i).at(0);
+			maxb40 = Convert::kernToBase40(maxtok);
+		} else {
+			int b40 = Convert::kernToBase40(notelist.at(i).at(0));
+			if (b40 > maxb40) {
+				maxb40 = b40;
+				maxtok = notelist.at(i).at(0);
+			}
+		}
+	}
+
+	minpitch.at(track) = getPitch(mintok);
+	maxpitch.at(track) = getPitch(maxtok);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getPitch -- Return scientific pitch name.
+//
+
+string Tool_cmr::getPitch(HTp token) {
+	if (!token) {
+		return "";
+	}
+	if (token->isRest()) {
+		return "R";
+	} else {
+		int octave = Convert::kernToOctaveNumber(token);
+		int accidentals = Convert::kernToAccidentalCount(token);
+		int dpc = Convert::kernToDiatonicPC(token);
+		string output;
+		switch (dpc) {
+			case 0: output += "C"; break;
+			case 1: output += "D"; break;
+			case 2: output += "E"; break;
+			case 3: output += "F"; break;
+			case 4: output += "G"; break;
+			case 5: output += "A"; break;
+			case 6: output += "B"; break;
+		}
+		for (int i=0; i<abs(accidentals); i++) {
+			if (accidentals < 0) {
+				output += "b";
+			} else {
+				output += "#";
+			}
+		}
+		output += to_string(octave);
+		return output;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::addGroupNumbersToScore --
+//
+
+void Tool_cmr::addGroupNumbersToScore(HumdrumFile& infile) {
+	for (int i=0; i<(int)m_noteGroups.size(); i++) {
+		if (m_noteGroups.at(i).getSerial() <= 0) {
+			continue;
+		}
+		HTp token = m_noteGroups.at(i).getFirstToken();
+		if (!token) {
+			continue;
+		}
+		int serial = m_noteGroups.at(i).getSerial();
+		int direction = m_noteGroups.at(i).getDirection();
+		addGroupNumberToScore(infile, token, serial, direction);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::addGroupNumberToScore
+//
+
+void Tool_cmr::addGroupNumberToScore(HumdrumFile& infile, HTp note, int number, int dir) {
+	if (!note) {
+		return;
+	}
+
+	int index = note->getLineIndex();
+	int field = note->getFieldIndex();
+
+	if (index > 0) {
+		if (infile[index-1].isCommentLocal()) {
+			HTp token = infile.token(index-1, field);
+			if (*token == "!") {
+				string output = getLocalLabelToken(number, dir);
+				token->setText(output);
+				return;
+			}
+		} else {
+			string newline;
+			for (int i=0; i<infile[index].getFieldCount(); i++) {
+				if (i == field) {
+					string newtoken = getLocalLabelToken(number, dir);
+					newline += newtoken;
+				} else {
+					newline += "!";
+				}
+				if (i < infile[index].getFieldCount() - 1) {
+					newline += "\t";
+				}
+			}
+			infile.insertLine(index, newline);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_cmr::getLocalLabelToken --
+//
+
+string Tool_cmr::getLocalLabelToken(int number, int dir) {
+	string output = "!LO:TX:";
+	if (dir > 0) {
+		output += "a:color=";
+		output += m_colorUp;
+	} else {
+		output += "b:color=";
+		output += m_colorDown;
+	}
+	output += ":t=";
+	output += to_string(number);
+	return output;
 }
 
 
@@ -60182,6 +62152,10 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 		return;
 	}
 
+	if (m_groupsQ) {
+		checkForAutomaticGrouping(infile);
+	}
+
 	if (m_coincidenceQ) {
 		analyzeCoincidenceRhythms(infile);
 	}
@@ -60193,6 +62167,120 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 		doNumericAnalyses(infile);
 	}
 	prepareOutput(infile);
+}
+
+
+
+//////////////////////////////
+//
+// checkForAutomaticGrouping --
+//
+
+void Tool_composite::checkForAutomaticGrouping(HumdrumFile& infile) {
+
+	bool hasGroups = false;
+	int interpline = -1;
+	int manipline = -1;
+	int dataline = -1;
+	int barline = -1;
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		if ((barline < 0) && infile[i].isBarline()) {
+			barline = i;
+		}
+		if ((dataline < 0) && infile[i].isData()) {
+			dataline = i;
+		}
+		if ((manipline < 0) && infile[i].isManipulator()) {
+			HTp token = infile.token(i, 0);
+			if ((!token->isExclusiveInterpretation()) && (!token->isTerminator())) {
+				manipline = i;
+			}
+			continue;
+		}
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		if ((dataline < 0) && (barline < 0) && (manipline < 0)) {
+			// Put below last interp line
+			HTp current = infile.token(i, 0);
+			current = current->getNextToken();
+			if (current) {
+				interpline = current->getLineIndex();
+			} else {
+				interpline = i;
+			}
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->compare(0, 5, "*grp:") == 0) {
+				hasGroups = 1;
+				break;
+			}
+		}
+		if (hasGroups) {
+			break;
+		}
+	}
+	if (hasGroups) {
+		return;
+	}
+
+	// No Groupings found in score, so add *grp:A to the first kern spine
+	// and *grp:B to the second kern spine (from left-to-right). 
+	
+	vector<HTp> sstarts;
+	infile.getSpineStartList(sstarts, "**kern");
+	if (sstarts.size() != 2) {
+		return;
+	}
+
+	// Add a new interpretation line before the first data line, but also before
+	// the first barline and also before the first manipline.
+	int addline = dataline;
+	if (addline < 0) {
+		// no data?
+		return;
+	}
+	if ((addline > barline) && (barline > 0)) {
+		addline = barline;
+	}
+	if ((addline > manipline) && (manipline > 0)) {
+		addline = manipline;
+	}
+	if ((addline > interpline) && (interpline > 0)) {
+		addline = interpline;
+	}
+
+	if (addline < 0) {
+		// something strange
+		return;
+	}
+	
+	infile.insertNullInterpretationLineAboveIndex(addline);
+	for (int i=0; i< (int)sstarts.size(); i++) {
+		int track = sstarts[i]->getTrack();
+		for (int j=0; j<infile[addline].getFieldCount(); j++) {
+			HTp token = infile.token(addline, j);
+			int jtrack = token->getTrack();
+			if (track != jtrack) {
+				continue;
+			}
+			if (i == 0) {
+				token->setText("*grp:A");
+			} else if (i == 1) {
+				token->setText("*grp:B");
+			}
+			break;
+		}
+	}
+	infile[addline].createLineFromTokens();
 }
 
 
@@ -60289,7 +62377,6 @@ void Tool_composite::prepareOutput(HumdrumFile& infile) {
 
 	HumdrumFile output;
 	output.readString(analysis.str());
-
 	stringstream tempout;
 
 	addStaffInfo(output, infile);
@@ -60300,13 +62387,17 @@ void Tool_composite::prepareOutput(HumdrumFile& infile) {
 		output[i].createLineFromTokens();
 	}
 
+	HumRegex hre;
+
 	for (int i=0; i<infile.getLineCount(); i++) {
 
 		if (m_verseLabelIndex && (m_verseLabelIndex == -i)) {
 			string labelLine = generateVerseLabelLine(output, infile, i);
 			if (!labelLine.empty()) {
-				tempout << labelLine;
-				tempout << endl;
+				if (!hre.search(labelLine, "^[*\t]+$")) {
+					tempout << labelLine;
+					tempout << endl;
+				}
 			}
 		}
 
@@ -65810,7 +67901,7 @@ void Tool_compositeold::removeAuxTremolosFromCompositeRhythm(HumdrumFile& infile
 
 bool Tool_compositeold::onlyAuxTremoloNotes(HumdrumFile& infile, int line) {
 	int attackcount = 0;
-	int sustaincount = 0;
+	// int sustaincount = 0;
 	int auxcount = 0;
 	for (int i=0; i<infile[line].getFieldCount(); i++) {
 		HTp token = infile.token(line, i);
@@ -65825,7 +67916,7 @@ bool Tool_compositeold::onlyAuxTremoloNotes(HumdrumFile& infile, int line) {
 		}
 		bool attack = token->isNoteAttack();
 		if (!attack) {
-			sustaincount++;
+			// sustaincount++;
 			continue;
 		}
 		attackcount++;
@@ -72254,25 +74345,25 @@ void Tool_extract::removeDollarsFromString(string& buffer, int maxtrack) {
 	int value2;
 
 	if (hre.search(buffer, "\\$$")) {
-		sprintf(buf2, "%d", maxtrack);
+		snprintf(buf2, 128, "%d", maxtrack);
 		hre.replaceDestructive(buffer, buf2, "\\$$");
 	}
 
 	if (hre.search(buffer, "\\$(?![\\d-])")) {
 		// don't know how this case could happen, however...
-		sprintf(buf2, "%d", maxtrack);
+		snprintf(buf2, 128, "%d", maxtrack);
 		hre.replaceDestructive(buffer, buf2, "\\$(?![\\d-])", "g");
 	}
 
 	if (hre.search(buffer, "\\$0")) {
 		// replace $0 with maxtrack (used for reverse orderings)
-		sprintf(buf2, "%d", maxtrack);
+		snprintf(buf2, 128, "%d", maxtrack);
 		hre.replaceDestructive(buffer, buf2, "\\$0", "g");
 	}
 
 	while (hre.search(buffer, "\\$(-?\\d+)")) {
 		value2 = maxtrack - abs(hre.getMatchInt(1));
-		sprintf(buf2, "%d", value2);
+		snprintf(buf2, 128, "%d", value2);
 		hre.replaceDestructive(buffer, buf2, "\\$-?\\d+");
 	}
 }
@@ -74344,6 +76435,7 @@ void Tool_filter::getUniversalCommandList(vector<pair<string, string> >& command
 		}
 	}
 }
+
 
 
 //////////////////////////////
@@ -79581,6 +81673,7 @@ void Tool_humtr::convertGlobalLayoutText(HumdrumFile& infile) {
 
 void Tool_humtr::convertLocalLayoutText(HumdrumFile& infile) {
 	HumRegex hre;
+
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].isCommentLocal()) {
 			continue;
@@ -79597,6 +81690,7 @@ void Tool_humtr::convertLocalLayoutText(HumdrumFile& infile) {
 			string newcontents = transliterateText(oldcontents);
 			if (oldcontents != newcontents) {
 				string text = *token;
+				hre.makeSafeDestructive(oldcontents);
 				hre.replaceDestructive(text, ":t=" + newcontents, ":t=" + oldcontents);
 				token->setText(text);
 			}
@@ -85559,7 +87653,7 @@ string Tool_mei2hum::cleanReferenceRecordText(const string& input) {
 //
 // Example:
 //   <tempo tstamp="1" place="above" staff="1">
-//      1 - Allegro con spirito <rend fontname="Leipzig">&#xE1D5;</rend> = 132
+//      1 - Allegro con spirito <rend fontname="VerovioText">&#xE1D5;</rend> = 132
 //   </tempo>
 //
 //
@@ -85621,7 +87715,7 @@ void Tool_mei2hum::parseTempo(xml_node tempo, HumNum starttime) {
 	if (!found) {
 		// search for free-form tempo marking.  Something like:
 		//   <tempo tstamp="1" place="above" staff="1">
-		//      1 - Allegro con spirito <rend fontname="Leipzig">&#xE1D5;</rend> = 132
+		//      1 - Allegro con spirito <rend fontname="VerovioText">&#xE1D5;</rend> = 132
 		//   </tempo>
 		//
 		// UTF-8 version in string "\ue1d5";
@@ -87276,7 +89370,8 @@ Tool_modori::Tool_modori(void) {
 	define("m|modern=b",    "prepare score for modern style");
 	define("o|original=b", "prepare score for original style");
 	define("d|info=b", "display key/clef/mensuration information");
-
+	define("I|no-instrument-name|no-instrument-names=b", "Do not change part labels");
+	define("A|no-instrument-abbreviation|no-instrument-abbreviations=b", "Do not change part label abbreviations");
 	define("C|no-clef|no-clefs=b", "Do not change clefs");
 	define("K|no-key|no-keys=b", "Do not change key signatures");
 	define("L|no-lyrics=b", "Do not change **text exclusive interpretations");
@@ -87352,6 +89447,8 @@ void Tool_modori::initialize(void) {
 	m_nolyricsQ      = getBoolean("no-lyrics");
 	m_norefsQ        = getBoolean("no-references");
 	m_nomensurationQ = getBoolean("no-mensuration");
+	m_nolabelsQ      = getBoolean("no-instrument-names");
+	m_nolabelAbbrsQ  = getBoolean("no-instrument-abbreviations");
 }
 
 
@@ -87363,6 +89460,8 @@ void Tool_modori::initialize(void) {
 
 void Tool_modori::processFile(HumdrumFile& infile) {
 	m_keys.clear();
+	m_labels.clear();
+	m_labelAbbrs.clear();
 	m_clefs.clear();
 	m_mensurations.clear();
 	m_references.clear();
@@ -87371,6 +89470,8 @@ void Tool_modori::processFile(HumdrumFile& infile) {
 
 	int maxtrack = infile.getMaxTrack();
 	m_keys.resize(maxtrack+1);
+	m_labels.resize(maxtrack+1);
+	m_labelAbbrs.resize(maxtrack+1);
 	m_clefs.resize(maxtrack+1);
 	m_mensurations.resize(maxtrack+1);
 	m_references.reserve(1000);
@@ -87420,15 +89521,33 @@ void Tool_modori::processFile(HumdrumFile& infile) {
 				m_keys[track][timeval].push_back(token);
 			} else if (token->isModernKeySignature()) {
 				m_keys[track][timeval].push_back(token);
+
+			} else if (token->isInstrumentName()) {
+				m_labels[track][timeval].push_back(token);
+			} else if (token->isOriginalInstrumentName()) {
+				m_labels[track][timeval].push_back(token);
+			} else if (token->isModernInstrumentName()) {
+				m_labels[track][timeval].push_back(token);
+
+			} else if (token->isInstrumentAbbreviation()) {
+				m_labelAbbrs[track][timeval].push_back(token);
+			} else if (token->isOriginalInstrumentAbbreviation()) {
+				m_labelAbbrs[track][timeval].push_back(token);
+			} else if (token->isModernInstrumentAbbreviation()) {
+				m_labelAbbrs[track][timeval].push_back(token);
+
 			} else if (token->isClef()) {
 				m_clefs[track][timeval].push_back(token);
 			} else if (token->isOriginalClef()) {
 				m_clefs[track][timeval].push_back(token);
 			} else if (token->isModernClef()) {
 				m_clefs[track][timeval].push_back(token);
+
 			} else if (token->isMensuration()) {
 				m_mensurations[track][timeval].push_back(token);
 			} else if (token->isOriginalMensuration()) {
+				m_mensurations[track][timeval].push_back(token);
+			} else if (token->isModernMensuration()) {
 				m_mensurations[track][timeval].push_back(token);
 			}
 		}
@@ -87755,13 +89874,30 @@ void Tool_modori::switchModernOriginal(HumdrumFile& infile) {
 		}
 	}
 
-	if (!m_noclefQ) {
-		for (int t=1; t<(int)m_clefs.size(); ++t) {
-			for (auto it = m_clefs.at(t).begin(); it != m_clefs.at(t).end(); ++it) {
+	if (!m_nolabelsQ) {
+		for (int t=1; t<(int)m_labels.size(); ++t) {
+			for (auto it = m_labels.at(t).begin(); it != m_labels.at(t).end(); ++it) {
 				if (it->second.size() != 2) {
 					continue;
 				}
-				bool status = swapClefStyle(it->second.at(0), it->second.at(1));
+				bool status = swapInstrumentNameStyle(it->second.at(0), it->second.at(1));
+				if (status) {
+					int line = it->second.at(0)->getLineIndex();
+					changed.insert(line);
+					line = it->second.at(1)->getLineIndex();
+					changed.insert(line);
+				}
+			}
+		}
+	}
+
+	if (!m_nolabelAbbrsQ) {
+		for (int t=1; t<(int)m_labelAbbrs.size(); ++t) {
+			for (auto it = m_labelAbbrs.at(t).begin(); it != m_labelAbbrs.at(t).end(); ++it) {
+				if (it->second.size() != 2) {
+					continue;
+				}
+				bool status = swapInstrumentAbbreviationStyle(it->second.at(0), it->second.at(1));
 				if (status) {
 					int line = it->second.at(0)->getLineIndex();
 					changed.insert(line);
@@ -87865,12 +90001,38 @@ void Tool_modori::switchModernOriginal(HumdrumFile& infile) {
 	if (!m_nomensurationQ) {
 		for (int t=1; t<(int)m_mensurations.size(); ++t) {
 			for (auto it = m_mensurations.at(t).begin(); it != m_mensurations.at(t).end(); ++it) {
-				if (it->second.size() != 1) {
+				if (it->second.size() == 1) {
+					// swap omet to met, or met to omet:
+					bool status = flipMensurationStyle(it->second.at(0));
+					if (status) {
+						int line = it->second.at(0)->getLineIndex();
+						changed.insert(line);
+					}
+				} else if (it->second.size() == 2) {
+					// swap omet/met or mmet/met:
+					bool status = swapMensurationStyle(it->second.at(0), it->second.at(1));
+					if (status) {
+						int line = it->second.at(0)->getLineIndex();
+						changed.insert(line);
+						line = it->second.at(1)->getLineIndex();
+						changed.insert(line);
+					}
+				}
+			}
+		}
+	}
+
+	if (!m_noclefQ) {
+		for (int t=1; t<(int)m_clefs.size(); ++t) {
+			for (auto it = m_clefs.at(t).begin(); it != m_clefs.at(t).end(); ++it) {
+				if (it->second.size() != 2) {
 					continue;
 				}
-				bool status = flipMensurationStyle(it->second.at(0));
+				bool status = swapClefStyle(it->second.at(0), it->second.at(1));
 				if (status) {
 					int line = it->second.at(0)->getLineIndex();
+					changed.insert(line);
+					line = it->second.at(1)->getLineIndex();
 					changed.insert(line);
 				}
 			}
@@ -88159,6 +90321,182 @@ bool Tool_modori::swapKeyStyle(HTp one, HTp two) {
 
 //////////////////////////////
 //
+// Tool_modori::swapInstrumentNameStyle -- Returns true if swapped.
+//
+
+bool Tool_modori::swapInstrumentNameStyle(HTp one, HTp two) {
+	bool mtype1 = false;
+	bool mtype2 = false;
+	bool otype1 = false;
+	bool otype2 = false;
+	bool ktype1 = false;
+	bool ktype2 = false;
+	bool output = false;
+
+	if (one->isInstrumentName()) {
+		ktype1 = true;
+	} else if (one->isModernInstrumentName()) {
+		mtype1 = true;
+	} else if (one->isOriginalInstrumentName()) {
+		otype1 = true;
+	}
+
+	if (two->isInstrumentName()) {
+		ktype2 = true;
+	} else if (two->isModernInstrumentName()) {
+		mtype2 = true;
+	} else if (two->isOriginalInstrumentName()) {
+		otype2 = true;
+	}
+
+	if (m_modernQ) {
+		// Show the modern instrument name.  If one name is *mI" and the
+		// other is *I" then change *mI" to *I" and *I" to *oI" respectively.
+		if (ktype1 && mtype2) {
+			convertInstrumentNameToOriginal(one);
+			convertInstrumentNameToRegular(two);
+			output = true;
+		} else if (mtype1 && ktype2) {
+			convertInstrumentNameToRegular(one);
+			convertInstrumentNameToOriginal(two);
+			output = true;
+		}
+	} else if (m_originalQ) {
+		// Show the original key.  If one key is *ok and the
+		// other is *k then change *ok to *k and *k to *mk respectively.
+		if (ktype1 && otype2) {
+			convertInstrumentNameToModern(one);
+			convertInstrumentNameToRegular(two);
+			output = true;
+		} else if (otype1 && ktype2) {
+			convertInstrumentNameToRegular(one);
+			convertInstrumentNameToModern(two);
+			output = true;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::swapInstrumentAbbreviationStyle -- Returns true if swapped.
+//
+
+bool Tool_modori::swapInstrumentAbbreviationStyle(HTp one, HTp two) {
+	bool mtype1 = false;
+	bool mtype2 = false;
+	bool otype1 = false;
+	bool otype2 = false;
+	bool ktype1 = false;
+	bool ktype2 = false;
+	bool output = false;
+
+	if (one->isInstrumentAbbreviation()) {
+		ktype1 = true;
+	} else if (one->isModernInstrumentAbbreviation()) {
+		mtype1 = true;
+	} else if (one->isOriginalInstrumentAbbreviation()) {
+		otype1 = true;
+	}
+
+	if (two->isInstrumentAbbreviation()) {
+		ktype2 = true;
+	} else if (two->isModernInstrumentAbbreviation()) {
+		mtype2 = true;
+	} else if (two->isOriginalInstrumentAbbreviation()) {
+		otype2 = true;
+	}
+
+	if (m_modernQ) {
+		// Show the modern instrument name.  If one name is *mI" and the
+		// other is *I" then change *mI" to *I" and *I" to *oI" respectively.
+		if (ktype1 && mtype2) {
+			convertInstrumentAbbreviationToOriginal(one);
+			convertInstrumentAbbreviationToRegular(two);
+			output = true;
+		} else if (mtype1 && ktype2) {
+			convertInstrumentAbbreviationToRegular(one);
+			convertInstrumentAbbreviationToOriginal(two);
+			output = true;
+		}
+	} else if (m_originalQ) {
+		// Show the original key.  If one key is *ok and the
+		// other is *k then change *ok to *k and *k to *mk respectively.
+		if (ktype1 && otype2) {
+			convertInstrumentAbbreviationToModern(one);
+			convertInstrumentAbbreviationToRegular(two);
+			output = true;
+		} else if (otype1 && ktype2) {
+			convertInstrumentAbbreviationToRegular(one);
+			convertInstrumentAbbreviationToModern(two);
+			output = true;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::swapMensurationStyle -- Returns true if swapped.
+//
+
+bool Tool_modori::swapMensurationStyle(HTp one, HTp two) {
+	bool mtype1 = false;
+	bool mtype2 = false;
+	bool otype1 = false;
+	bool otype2 = false;
+	bool ktype1 = false;
+	bool ktype2 = false;
+	bool output = false;
+
+	if (one->isMensuration()) {
+		ktype1 = true;
+	} else if (one->isModernMensuration()) {
+		mtype1 = true;
+	} else if (one->isOriginalMensuration()) {
+		otype1 = true;
+	}
+
+	if (two->isMensuration()) {
+		ktype2 = true;
+	} else if (two->isModernMensuration()) {
+		mtype2 = true;
+	} else if (two->isOriginalMensuration()) {
+		otype2 = true;
+	}
+
+	if (m_modernQ) {
+		if (ktype1 && mtype2) {
+			convertMensurationToOriginal(one);
+			convertMensurationToRegular(two);
+			output = true;
+		} else if (mtype1 && ktype2) {
+			convertMensurationToRegular(one);
+			convertMensurationToOriginal(two);
+			output = true;
+		}
+	} else if (m_originalQ) {
+		if (ktype1 && otype2) {
+			convertMensurationToModern(one);
+			convertMensurationToRegular(two);
+			output = true;
+		} else if (otype1 && ktype2) {
+			convertMensurationToRegular(one);
+			convertMensurationToModern(two);
+			output = true;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
 // Tool_modori::swapClefStyle -- Returns true if swapped.
 //
 
@@ -88235,6 +90573,38 @@ void Tool_modori::convertKeySignatureToModern(HTp token) {
 
 //////////////////////////////
 //
+// Tool_modori::convertInstrumentNameToModern --
+//
+
+void Tool_modori::convertInstrumentNameToModern(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?I\"(.*)")) {
+		string text = "*mI\"";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertInstrumentAbbreviationToModern --
+//
+
+void Tool_modori::convertInstrumentAbbreviationToModern(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?I'(.*)")) {
+		string text = "*mI'";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
 // Tool_modori::convertKeySignatureToOriginal --
 //
 
@@ -88251,6 +90621,38 @@ void Tool_modori::convertKeySignatureToOriginal(HTp token) {
 
 //////////////////////////////
 //
+// Tool_modori::convertInstrumentNameToOriginal --
+//
+
+void Tool_modori::convertInstrumentNameToOriginal(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?I\"(.*)")) {
+		string text = "*oI\"";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertInstrumentAbbreviationToOriginal --
+//
+
+void Tool_modori::convertInstrumentAbbreviationToOriginal(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?I'(.*)")) {
+		string text = "*oI'";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
 // Tool_modori::convertKeySignatureToRegular --
 //
 
@@ -88258,6 +90660,38 @@ void Tool_modori::convertKeySignatureToRegular(HTp token) {
 	HumRegex hre;
 	if (hre.search(token, "^\\*[mo]?k(.*)")) {
 		string text = "*k";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertInstrumentNameToRegular --
+//
+
+void Tool_modori::convertInstrumentNameToRegular(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?I\"(.*)")) {
+		string text = "*I\"";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertInstrumentAbbreviationToRegular --
+//
+
+void Tool_modori::convertInstrumentAbbreviationToRegular(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?I'(.*)")) {
+		string text = "*I'";
 		text += hre.getMatch(1);
 		token->setText(text);
 	}
@@ -88306,6 +90740,54 @@ void Tool_modori::convertClefToRegular(HTp token) {
 	HumRegex hre;
 	if (hre.search(token, "^\\*[mo]?clef(.*)")) {
 		string text = "*clef";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertMensurationToModern --
+//
+
+void Tool_modori::convertMensurationToModern(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?met\\((.*)")) {
+		string text = "*mmet(";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertMensurationToOriginal --
+//
+
+void Tool_modori::convertMensurationToOriginal(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?met\\((.*)")) {
+		string text = "*omet(";
+		text += hre.getMatch(1);
+		token->setText(text);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_modori::convertMensurationToRegular --
+//
+
+void Tool_modori::convertMensurationToRegular(HTp token) {
+	HumRegex hre;
+	if (hre.search(token, "^\\*[mo]?met\\((.*)")) {
+		string text = "*met(";
 		text += hre.getMatch(1);
 		token->setText(text);
 	}
@@ -110045,7 +112527,7 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 		case 2:
 			{
 				char buffer[128] = {0};
-				sprintf(buffer, "d%dc%d", getInt("d"), getInt("c"));
+				snprintf(buffer, 128, "d%dc%d", getInt("d"), getInt("c"));
 				transval = Convert::transToBase40(buffer);
 			}
 			break;

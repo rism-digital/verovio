@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.78",
+    "fontVersion": "5.2.81",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -202,6 +202,16 @@
                 -1.356
             ]
         },
+        "accidentalKoron": {
+            "bBoxNE": [
+                1.176,
+                0.552
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.576
+            ]
+        },
         "accidentalKucukMucennebFlat": {
             "bBoxNE": [
                 0.792,
@@ -350,6 +360,16 @@
             "bBoxSW": [
                 0.0,
                 -1.356
+            ]
+        },
+        "accidentalSori": {
+            "bBoxNE": [
+                1.536,
+                0.968
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.972
             ]
         },
         "accidentalThreeQuarterTonesFlatArrowDown": {
@@ -1032,6 +1052,26 @@
                 0.0
             ]
         },
+        "chantAuctumAsc": {
+            "bBoxNE": [
+                0.556,
+                0.468
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.468
+            ]
+        },
+        "chantAuctumDesc": {
+            "bBoxNE": [
+                0.556,
+                0.464
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.464
+            ]
+        },
         "chantCclef": {
             "bBoxNE": [
                 0.724,
@@ -1040,6 +1080,56 @@
             "bBoxSW": [
                 -0.004,
                 -0.808
+            ]
+        },
+        "chantConnectingLineAsc2nd": {
+            "bBoxNE": [
+                0.052,
+                0.6
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "chantConnectingLineAsc3rd": {
+            "bBoxNE": [
+                0.052,
+                1.2
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "chantConnectingLineAsc4th": {
+            "bBoxNE": [
+                0.052,
+                1.8
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "chantConnectingLineAsc5th": {
+            "bBoxNE": [
+                0.052,
+                2.4
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "chantConnectingLineAsc6th": {
+            "bBoxNE": [
+                0.052,
+                3.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
             ]
         },
         "chantCustosStemDownPosHigh": {
@@ -1102,6 +1192,76 @@
                 -0.384
             ]
         },
+        "chantDeminutumLower": {
+            "bBoxNE": [
+                0.052,
+                0.5
+            ],
+            "bBoxSW": [
+                -0.224,
+                -0.256
+            ]
+        },
+        "chantDeminutumUpper": {
+            "bBoxNE": [
+                0.052,
+                0.268
+            ],
+            "bBoxSW": [
+                -0.224,
+                -0.484
+            ]
+        },
+        "chantEntryLineAsc2nd": {
+            "bBoxNE": [
+                0.052,
+                0.6
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "chantEntryLineAsc3rd": {
+            "bBoxNE": [
+                0.052,
+                1.2
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "chantEntryLineAsc4th": {
+            "bBoxNE": [
+                0.052,
+                1.8
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "chantEntryLineAsc5th": {
+            "bBoxNE": [
+                0.052,
+                2.4
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "chantEntryLineAsc6th": {
+            "bBoxNE": [
+                0.052,
+                3.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
         "chantFclef": {
             "bBoxNE": [
                 0.724,
@@ -1110,6 +1270,176 @@
             "bBoxSW": [
                 -0.756,
                 -1.072
+            ]
+        },
+        "chantLigaturaDesc2nd": {
+            "bBoxNE": [
+                1.672,
+                0.416
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.912
+            ]
+        },
+        "chantLigaturaDesc3rd": {
+            "bBoxNE": [
+                2.084,
+                0.416
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.6
+            ]
+        },
+        "chantLigaturaDesc4th": {
+            "bBoxNE": [
+                2.084,
+                0.416
+            ],
+            "bBoxSW": [
+                0.0,
+                -2.212
+            ]
+        },
+        "chantLigaturaDesc5th": {
+            "bBoxNE": [
+                2.084,
+                0.416
+            ],
+            "bBoxSW": [
+                0.0,
+                -2.812
+            ]
+        },
+        "chantOriscusDescending": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "chantOriscusLiquescens": {
+            "bBoxNE": [
+                0.58,
+                0.456
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "chantPodatusLower": {
+            "bBoxNE": [
+                0.556,
+                0.656
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "chantPodatusUpper": {
+            "bBoxNE": [
+                0.056,
+                0.78
+            ],
+            "bBoxSW": [
+                -0.452,
+                -0.012
+            ]
+        },
+        "chantPunctum": {
+            "bBoxNE": [
+                0.64,
+                0.408
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.404
+            ]
+        },
+        "chantPunctumDeminutum": {
+            "bBoxNE": [
+                0.5,
+                0.352
+            ],
+            "bBoxSW": [
+                0.012,
+                -0.348
+            ]
+        },
+        "chantPunctumInclinatum": {
+            "bBoxNE": [
+                0.6,
+                0.448
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.448
+            ]
+        },
+        "chantPunctumInclinatumAuctum": {
+            "bBoxNE": [
+                0.588,
+                0.336
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.484
+            ]
+        },
+        "chantPunctumInclinatumDeminutum": {
+            "bBoxNE": [
+                0.404,
+                0.3
+            ],
+            "bBoxSW": [
+                -0.0,
+                -0.304
+            ]
+        },
+        "chantPunctumVirga": {
+            "bBoxNE": [
+                0.576,
+                0.408
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.604
+            ]
+        },
+        "chantPunctumVirgaReversed": {
+            "bBoxNE": [
+                0.576,
+                0.408
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.604
+            ]
+        },
+        "chantQuilisma": {
+            "bBoxNE": [
+                0.556,
+                0.46
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.46
+            ]
+        },
+        "chantStrophicus": {
+            "bBoxNE": [
+                0.476,
+                0.324
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.324
             ]
         },
         "clef15": {
@@ -6318,6 +6648,12 @@
                 -0.812
             ]
         },
+        "accidentalKoron": {
+            "cutOutSE": [
+                0.156,
+                -0.552
+            ]
+        },
         "accidentalKucukMucennebFlat": {
             "cutOutNE": [
                 0.096,
@@ -6490,6 +6826,24 @@
             "cutOutSW": [
                 0.16,
                 -0.82
+            ]
+        },
+        "accidentalSori": {
+            "cutOutNE": [
+                0.88,
+                0.4
+            ],
+            "cutOutNW": [
+                0.26,
+                0.88
+            ],
+            "cutOutSE": [
+                0.88,
+                -0.36
+            ],
+            "cutOutSW": [
+                0.26,
+                -0.8
             ]
         },
         "accidentalThreeQuarterTonesFlatArrowDown": {

@@ -8,7 +8,7 @@
 #ifndef __VRV_PLICA_H__
 #define __VRV_PLICA_H__
 
-#include "atts_mensural.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {

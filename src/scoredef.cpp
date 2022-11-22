@@ -227,14 +227,14 @@ ScoreDef::ScoreDef()
     , AttDistances()
     , AttEndings()
     , AttOptimization()
-    , AttScoreDefGes()
     , AttTimeBase()
+    , AttTuning()
 {
     this->RegisterAttClass(ATT_DISTANCES);
     this->RegisterAttClass(ATT_ENDINGS);
     this->RegisterAttClass(ATT_OPTIMIZATION);
-    this->RegisterAttClass(ATT_SCOREDEFGES);
     this->RegisterAttClass(ATT_TIMEBASE);
+    this->RegisterAttClass(ATT_TUNING);
 
     this->Reset();
 }
@@ -247,7 +247,8 @@ void ScoreDef::Reset()
     this->ResetDistances();
     this->ResetEndings();
     this->ResetOptimization();
-    this->ResetScoreDefGes();
+    this->ResetTimeBase();
+    this->ResetTuning();
 
     m_drawLabels = false;
     m_drawingWidth = 0;

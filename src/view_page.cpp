@@ -462,7 +462,8 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
     switch (groupSymbol->GetSymbol()) {
         case staffGroupingSym_SYMBOL_line: {
             const int lineWidth = m_doc->GetDrawingUnit(staffSize) * m_options->m_bracketThickness.GetValue();
-            this->DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * lineWidth, lineWidth);
+            const int yOffset = m_doc->GetDrawingUnit(staffSize) * m_options->m_staffLineWidth.GetValue() / 2;
+            this->DrawVerticalLine(dc, yTop + yOffset, yBottom - yOffset, x - 1.5 * lineWidth, lineWidth);
             x -= 2 * lineWidth;
             break;
         }
@@ -738,6 +739,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         if (child->Is(STAFFGRP)) {
             StaffGrp *childStaffGrp = vrv_cast<StaffGrp *>(child);
             this->DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure, isLastSystem, yBottomPrevious);
+            if (!barlineThrough) yBottomPrevious = VRV_UNSET;
             continue;
         }
 
@@ -878,6 +880,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
         yTop -= dashLength;
         yBottom += dashLength;
     }
+    const int serpentWidth = m_doc->GetGlyphWidth(SMUFL_E04A_segnoSerpent1, staffSize, false);
 
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
@@ -888,6 +891,10 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             int maxX = x + barLineWidth / 2;
             if ((form == BARRENDITION_rptend) || (form == BARRENDITION_end)) {
                 maxX = x2 + barLinesSum / 2;
+            }
+            else if (form == BARRENDITION_heavy) {
+                minX = x - barLineThickWidth / 2;
+                maxX = x + barLineThickWidth / 2;
             }
             else if (form == BARRENDITION_rptboth) {
                 maxX = x + barLinesSum + barLineSeparation * 2;
@@ -900,16 +907,22 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
                 || (form == BARRENDITION_dbldotted)) {
                 maxX = x2 + barLineWidth / 2;
             }
+            else if (form == BARRENDITION_dblheavy) {
+                minX = x - barLineThickWidth / 2;
+                maxX = x2 + barLineThickWidth / 2;
+            }
             Object lines;
             lines.SetParent(system);
             lines.UpdateContentBBoxX(minX, maxX);
             lines.UpdateContentBBoxY(yTop, yBottom);
-            int margin = unit / 2;
+            const int margin = unit / 2;
             system->m_systemAligner.FindAllIntersectionPoints(line, lines, { DIR, DYNAM, TEMPO }, margin);
         }
     }
 
     switch (form) {
+        case BARRENDITION_NONE: //
+            [[fallthrough]];
         case BARRENDITION_single: //
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
             break;
@@ -918,6 +931,9 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             break;
         case BARRENDITION_dotted: //
             this->DrawVerticalDots(dc, x, line, barLineWidth, 2 * unit);
+            break;
+        case BARRENDITION_heavy: //
+            this->DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
             break;
         case BARRENDITION_rptend:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
@@ -943,6 +959,16 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
         case BARRENDITION_dbl:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
             this->DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth);
+            break;
+        case BARRENDITION_dblheavy:
+            this->DrawVerticalSegmentedLine(dc, x, line, barLineThickWidth);
+            this->DrawVerticalSegmentedLine(dc, x2 + barLineThickWidth, line, barLineThickWidth);
+            break;
+        case BARRENDITION_dblsegno:
+            this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth);
+            this->DrawVerticalSegmentedLine(dc, x2 + barLineWidth, line, barLineWidth);
+            this->DrawSmuflCode(dc, (x + (barLineSeparation + barLineWidth - serpentWidth) / 2), yBottom,
+                SMUFL_E04A_segnoSerpent1, staffSize, false);
             break;
         case BARRENDITION_dbldashed:
             this->DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength, gapLength);

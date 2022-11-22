@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_mensural.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -76,7 +77,7 @@ public:
     ///@}
 
     /**
-     * Helper to adjust overlaping layers for stems
+     * Helper to adjust overlapping layers for stems
      */
     int CompareToElementPosition(const Doc *doc, const LayerElement *otherElement, int margin) const;
 

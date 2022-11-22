@@ -56,7 +56,7 @@ void Tempo::Reset()
 
 bool Tempo::IsSupportedChild(Object *child)
 {
-    if (child->Is({ LB, REND, TEXT })) {
+    if (child->Is({ LB, REND, SYMBOL, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {

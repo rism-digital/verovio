@@ -13,6 +13,7 @@ $PYTHON generate.py extract Bravura
 $PYTHON generate.py css Bravura
 
 echo "Generating Leipzig files ..."
+$PYTHON generate.py check Leipzig
 $PYTHON generate.py extract Leipzig
 $PYTHON generate.py css Leipzig
 

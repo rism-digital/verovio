@@ -64,6 +64,7 @@ class FloatingElement;
 class FTrem;
 class Gliss;
 class GraceGrp;
+class Graphic;
 class GrpSym;
 class Hairpin;
 class HalfmRpt;
@@ -490,6 +491,7 @@ private:
     void WriteZone(pugi::xml_node currentNode, Zone *zone);
     void WriteSurface(pugi::xml_node currentNode, Surface *surface);
     void WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile);
+    void WriteGraphic(pugi::xml_node currentNode, Graphic *graphic);
     ///@}
 
     /**
@@ -819,6 +821,7 @@ private:
      */
     ///@{
     bool ReadFacsimile(Doc *doc, pugi::xml_node facsimile);
+    bool ReadGraphic(Surface *parent, pugi::xml_node graphic);
     bool ReadSurface(Facsimile *parent, pugi::xml_node surface);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
     bool ReadZone(Surface *parent, pugi::xml_node zone);

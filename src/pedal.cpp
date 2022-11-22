@@ -88,26 +88,17 @@ char32_t Pedal::GetPedalGlyph() const
     return (this->GetFunc() == "sostenuto") ? SMUFL_E659_keyboardPedalSost : SMUFL_E650_keyboardPedalPed;
 }
 
-pedalVis_FORM Pedal::GetPedalForm(const Doc *doc, const System *system) const
+data_PEDALSTYLE Pedal::GetPedalForm(const Doc *doc, const System *system) const
 {
-    const std::map<option_PEDALSTYLE, pedalVis_FORM> option2PedalVis = { { PEDALSTYLE_line, pedalVis_FORM_line },
-        { PEDALSTYLE_pedstar, pedalVis_FORM_pedstar }, { PEDALSTYLE_altpedstar, pedalVis_FORM_altpedstar } };
-    const std::map<pianoPedals_PEDALSTYLE, pedalVis_FORM> pianoPedals2PedalVis
-        = { { pianoPedals_PEDALSTYLE_line, pedalVis_FORM_line },
-              { pianoPedals_PEDALSTYLE_pedstar, pedalVis_FORM_pedstar },
-              { pianoPedals_PEDALSTYLE_altpedstar, pedalVis_FORM_altpedstar } };
-
-    pedalVis_FORM style = pedalVis_FORM_NONE;
-    if (option_PEDALSTYLE option = static_cast<option_PEDALSTYLE>(doc->GetOptions()->m_pedalStyle.GetValue());
-        option != PEDALSTYLE_auto) {
-        style = option2PedalVis.at(option);
+    data_PEDALSTYLE style = static_cast<data_PEDALSTYLE>(doc->GetOptions()->m_pedalStyle.GetValue());
+    if (style != PEDALSTYLE_NONE) {
+        return style;
     }
     else if (this->HasForm()) {
         style = this->GetForm();
     }
     else if (const ScoreDef *scoreDef = system->GetDrawingScoreDef(); scoreDef && scoreDef->HasPedalStyle()) {
-        pianoPedals_PEDALSTYLE scoreDefStyle = scoreDef->GetPedalStyle();
-        style = pianoPedals2PedalVis.at(scoreDefStyle);
+        style = scoreDef->GetPedalStyle();
     }
 
     return style;
@@ -160,8 +151,8 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
 
     System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
-    pedalVis_FORM form = this->GetPedalForm(params->m_doc, system);
-    if (form == pedalVis_FORM_line) {
+    data_PEDALSTYLE form = this->GetPedalForm(params->m_doc, system);
+    if (form == PEDALSTYLE_line || form == PEDALSTYLE_pedline) {
         params->m_pedalLines.push_back(this);
     }
 

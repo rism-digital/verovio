@@ -13,12 +13,16 @@ extern "C" {
  * Methods exported a functions to use the Toolkit class
  ****************************************************************/
 
+void enableLog(bool value);
+void enableLogToBuffer(bool value);
+
 void *vrvToolkit_constructor();
 void *vrvToolkit_constructorResourcePath(const char *resourcePath);
 
 void vrvToolkit_destructor(void *tkPtr);
 bool vrvToolkit_edit(void *tkPtr, const char *editorAction);
 const char *vrvToolkit_getAvailableOptions(void *tkPtr);
+const char *vrvToolkit_getDefaultOptions(void *tkPtr);
 const char *vrvToolkit_getDescriptiveFeatures(void *tkPtr, const char *options);
 const char *vrvToolkit_getElementAttr(void *tkPtr, const char *xmlId);
 const char *vrvToolkit_getElementsAtTime(void *tkPtr, int millisec);
@@ -31,7 +35,7 @@ const char *vrvToolkit_getLog(void *tkPtr);
 const char *vrvToolkit_getMEI(void *tkPtr, const char *options);
 const char *vrvToolkit_getMIDIValuesForElement(void *tkPtr, const char *xmlId);
 const char *vrvToolkit_getNotatedIdForElement(void *tkPtr, const char *xmlId);
-const char *vrvToolkit_getOptions(void *tkPtr, bool default_values);
+const char *vrvToolkit_getOptions(void *tkPtr);
 int vrvToolkit_getPageCount(void *tkPtr);
 int vrvToolkit_getPageWithElement(void *tkPtr, const char *xmlId);
 double vrvToolkit_getTimeForElement(void *tkPtr, const char *xmlId);
@@ -49,7 +53,7 @@ const char *vrvToolkit_renderToTimemap(void *tkPtr, const char *c_options);
 void vrvToolkit_resetOptions(void *tkPtr);
 void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed);
 bool vrvToolkit_select(void *tkPtr, const char *selection);
-void vrvToolkit_setOptions(void *tkPtr, const char *options);
+bool vrvToolkit_setOptions(void *tkPtr, const char *options);
 const char *vrvToolkit_validatePAE(void *tkPtr, const char *data);
 
 #ifdef __cplusplus

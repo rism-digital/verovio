@@ -35,9 +35,7 @@ AttMordentLog::AttMordentLog() : Att()
     ResetMordentLog();
 }
 
-AttMordentLog::~AttMordentLog()
-{
-}
+AttMordentLog::~AttMordentLog() {}
 
 void AttMordentLog::ResetMordentLog()
 {
@@ -96,9 +94,7 @@ AttOrnamPresent::AttOrnamPresent() : Att()
     ResetOrnamPresent();
 }
 
-AttOrnamPresent::~AttOrnamPresent()
-{
-}
+AttOrnamPresent::~AttOrnamPresent() {}
 
 void AttOrnamPresent::ResetOrnamPresent()
 {
@@ -142,9 +138,7 @@ AttOrnamentAccid::AttOrnamentAccid() : Att()
     ResetOrnamentAccid();
 }
 
-AttOrnamentAccid::~AttOrnamentAccid()
-{
-}
+AttOrnamentAccid::~AttOrnamentAccid() {}
 
 void AttOrnamentAccid::ResetOrnamentAccid()
 {
@@ -203,9 +197,7 @@ AttTurnLog::AttTurnLog() : Att()
     ResetTurnLog();
 }
 
-AttTurnLog::~AttTurnLog()
-{
-}
+AttTurnLog::~AttTurnLog() {}
 
 void AttTurnLog::ResetTurnLog()
 {
@@ -346,4 +338,4 @@ void Att::GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

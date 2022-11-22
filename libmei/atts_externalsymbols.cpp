@@ -35,9 +35,7 @@ AttExtSym::AttExtSym() : Att()
     ResetExtSym();
 }
 
-AttExtSym::~AttExtSym()
-{
-}
+AttExtSym::~AttExtSym() {}
 
 void AttExtSym::ResetExtSym()
 {
@@ -163,4 +161,4 @@ void Att::GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

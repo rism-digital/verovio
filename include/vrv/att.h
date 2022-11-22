@@ -150,14 +150,14 @@ public:
     std::string MeasurebeatToStr(data_MEASUREBEAT data) const;
     data_MEASUREBEAT StrToMeasurebeat(std::string value, bool logWarning = true) const;
 
-    std::string MeasurementabsToStr(data_MEASUREMENTABS data) const { return VUToStr(data); }
-    data_MEASUREMENTABS StrToMeasurementabs(const std::string &value, bool logWarning = true) const
+    std::string MeasurementsignedToStr(data_MEASUREMENTSIGNED data) const { return VUToStr(data); }
+    data_MEASUREMENTSIGNED StrToMeasurementsigned(const std::string &value, bool logWarning = true) const
     {
         return StrToVU(value, logWarning);
     }
 
-    std::string MeasurementrelToStr(data_MEASUREMENTREL data) const { return VUToStr(data); }
-    data_MEASUREMENTREL StrToMeasurementrel(const std::string &value, bool logWarning = true) const
+    std::string MeasurementunsignedToStr(data_MEASUREMENTUNSIGNED data) const { return VUToStr(data); }
+    data_MEASUREMENTUNSIGNED StrToMeasurementunsigned(const std::string &value, bool logWarning = true) const
     {
         return StrToVU(value, logWarning);
     }

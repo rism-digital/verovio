@@ -231,7 +231,7 @@ std::string Att::HexnumToStr(data_HEXNUM data) const
 {
     char buf[5];
     memset(buf, 0, 5);
-    sprintf(buf, "%.4X", (int)data);
+    snprintf(buf, 5, "%.4X", (int)data);
     return StringFormat("U+%s", buf);
 }
 
@@ -292,8 +292,8 @@ std::string Att::LinewidthToStr(data_LINEWIDTH data) const
     std::string value;
     if (data.GetType() == LINEWIDTHTYPE_lineWidthTerm)
         value = data.GetLineWithTerm();
-    else if (data.GetType() == LINEWIDTHTYPE_measurementAbs)
-        value = VUToStr(data.GetMeasurementAbs());
+    else if (data.GetType() == LINEWIDTHTYPE_measurementUnsigned)
+        value = VUToStr(data.GetMeasurementUnsigned());
 
     return value;
 }
@@ -303,7 +303,7 @@ data_LINEWIDTH Att::StrToLinewidth(const std::string &value, bool logWarning) co
     data_LINEWIDTH data;
     data.SetLineWidthTerm(StrToLinewidthterm(value, false));
     if (data.HasValue()) return data;
-    data.SetMeasurementAbs(StrToVU(value));
+    data.SetMeasurementUnsigned(StrToVU(value));
     if (data.HasValue()) return data;
 
     if (logWarning && !value.empty()) LogWarning("Unsupported data.LINEWIDTH '%s'", value.c_str());

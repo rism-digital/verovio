@@ -35,9 +35,7 @@ AttBifoliumSurfaces::AttBifoliumSurfaces() : Att()
     ResetBifoliumSurfaces();
 }
 
-AttBifoliumSurfaces::~AttBifoliumSurfaces()
-{
-}
+AttBifoliumSurfaces::~AttBifoliumSurfaces() {}
 
 void AttBifoliumSurfaces::ResetBifoliumSurfaces()
 {
@@ -126,9 +124,7 @@ AttFoliumSurfaces::AttFoliumSurfaces() : Att()
     ResetFoliumSurfaces();
 }
 
-AttFoliumSurfaces::~AttFoliumSurfaces()
-{
-}
+AttFoliumSurfaces::~AttFoliumSurfaces() {}
 
 void AttFoliumSurfaces::ResetFoliumSurfaces()
 {
@@ -187,9 +183,7 @@ AttRecordType::AttRecordType() : Att()
     ResetRecordType();
 }
 
-AttRecordType::~AttRecordType()
-{
-}
+AttRecordType::~AttRecordType() {}
 
 void AttRecordType::ResetRecordType()
 {
@@ -233,9 +227,7 @@ AttRegularMethod::AttRegularMethod() : Att()
     ResetRegularMethod();
 }
 
-AttRegularMethod::~AttRegularMethod()
-{
-}
+AttRegularMethod::~AttRegularMethod() {}
 
 void AttRegularMethod::ResetRegularMethod()
 {
@@ -368,4 +360,4 @@ void Att::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // vrv namespace
+} // namespace vrv

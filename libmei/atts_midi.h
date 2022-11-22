@@ -217,14 +217,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNum(int num_) { m_num = num_; }
-    int GetNum() const { return m_num; }
+    void SetNum(data_MIDIVALUE num_) { m_num = num_; }
+    data_MIDIVALUE GetNum() const { return m_num; }
     bool HasNum() const;
     ///@}
 
 private:
     /** Records a number or count accompanying a notational feature. **/
-    int m_num;
+    data_MIDIVALUE m_num;
 
     /* include <attnum> */
 };
@@ -428,6 +428,6 @@ private:
     /* include <attppq> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_MIDI_H__

@@ -55,6 +55,7 @@
 #include "functorparams.h"
 #include "gliss.h"
 #include "gracegrp.h"
+#include "graphic.h"
 #include "grpsym.h"
 #include "hairpin.h"
 #include "halfmrpt.h"
@@ -1691,8 +1692,8 @@ void MEIOutput::WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
     scoreDef->WriteDistances(currentNode);
     scoreDef->WriteEndings(currentNode);
     scoreDef->WriteOptimization(currentNode);
-    scoreDef->WriteScoreDefGes(currentNode);
     scoreDef->WriteTimeBase(currentNode);
+    scoreDef->WriteTuning(currentNode);
 }
 
 void MEIOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *runningElement)
@@ -2242,14 +2243,14 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     // Execption for MEI basic
     if (!this->IsTreeObject(accid)) {
         accid->WriteAccidental(currentNode);
-        accid->WriteAccidentalGestural(currentNode);
+        accid->WriteAccidentalGes(currentNode);
         return;
     }
 
     this->WriteLayerElement(currentNode, accid);
     this->WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
-    accid->WriteAccidentalGestural(currentNode);
+    accid->WriteAccidentalGes(currentNode);
     accid->WriteAccidLog(currentNode);
     accid->WriteColor(currentNode);
     accid->WriteEnclosingChars(currentNode);
@@ -2271,7 +2272,7 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
 
     this->WriteLayerElement(currentNode, artic);
     artic->WriteArticulation(currentNode);
-    artic->WriteArticulationGestural(currentNode);
+    artic->WriteArticulationGes(currentNode);
     artic->WriteColor(currentNode);
     artic->WriteEnclosingChars(currentNode);
     artic->WriteExtSym(currentNode);
@@ -2741,6 +2742,7 @@ void MEIOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
 {
     assert(facsimile);
     this->WriteXmlId(currentNode, facsimile);
+    facsimile->WriteTyped(currentNode);
 
     // Write Surface(s)
     for (Object *child = facsimile->GetFirst(); child != NULL; child = facsimile->GetNext()) {
@@ -2754,6 +2756,16 @@ void MEIOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
     }
 }
 
+void MEIOutput::WriteGraphic(pugi::xml_node currentNode, Graphic *graphic)
+{
+    assert(graphic);
+    this->WriteXmlId(currentNode, graphic);
+    graphic->WritePointing(currentNode);
+    graphic->WriteWidth(currentNode);
+    graphic->WriteHeight(currentNode);
+    graphic->WriteTyped(currentNode);
+}
+
 void MEIOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
 {
     assert(surface);
@@ -2762,7 +2774,11 @@ void MEIOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
     surface->WriteTyped(currentNode);
 
     for (Object *child = surface->GetFirst(); child != NULL; child = surface->GetNext()) {
-        if (child->GetClassId() == ZONE) {
+        if (child->GetClassId() == GRAPHIC) {
+            pugi::xml_node childNode = currentNode.append_child("graphic");
+            this->WriteGraphic(childNode, dynamic_cast<Graphic *>(child));
+        }
+        else if (child->GetClassId() == ZONE) {
             pugi::xml_node childNode = currentNode.append_child("zone");
             this->WriteZone(childNode, dynamic_cast<Zone *>(child));
         }
@@ -2886,8 +2902,8 @@ void MEIOutput::WriteDurationInterface(pugi::xml_node element, DurationInterface
 
     interface->WriteAugmentDots(element);
     interface->WriteBeamSecondary(element);
-    interface->WriteDurationGestural(element);
-    interface->WriteDurationLogical(element);
+    interface->WriteDurationGes(element);
+    interface->WriteDurationLog(element);
     interface->WriteDurationQuality(element);
     interface->WriteDurationRatio(element);
     interface->WriteFermataPresent(element);
@@ -2957,7 +2973,7 @@ void MEIOutput::WriteTimePointInterface(pugi::xml_node element, TimePointInterfa
 
     interface->WriteStaffIdent(element);
     interface->WriteStartId(element);
-    interface->WriteTimestampLogical(element);
+    interface->WriteTimestampLog(element);
 }
 
 void MEIOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface)
@@ -2966,7 +2982,7 @@ void MEIOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningI
 
     this->WriteTimePointInterface(element, interface);
     interface->WriteStartEndId(element);
-    interface->WriteTimestamp2Logical(element);
+    interface->WriteTimestamp2Log(element);
 }
 
 void MEIOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
@@ -3268,8 +3284,8 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
-    // filter for dir
-    else if (filterParent->Is(DIR)) {
+    // filter for dir or tempo
+    else if (filterParent->Is({ DIR, TEMPO })) {
         if (element == "") {
             return true;
         }
@@ -3337,6 +3353,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "rend") {
+            return true;
+        }
+        else if (element == "symbol") {
             return true;
         }
         else {
@@ -3711,6 +3730,9 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
             m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
             m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
         }
+        if (facsimile.next_sibling("facsimile")) {
+            LogWarning("Only first <facsimile> is processed");
+        }
     }
 
     front = music.child("front");
@@ -3723,7 +3745,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     back = music.child("back");
     if (!back.empty()) {
         m_doc->m_back.reset();
-        // copy the complete front into the master document
+        // copy the complete back into the master document
         m_doc->m_back.append_copy(back);
     }
 
@@ -4530,8 +4552,8 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     vrvScoreDef->ReadDistances(scoreDef);
     vrvScoreDef->ReadEndings(scoreDef);
     vrvScoreDef->ReadOptimization(scoreDef);
-    vrvScoreDef->ReadScoreDefGes(scoreDef);
     vrvScoreDef->ReadTimeBase(scoreDef);
+    vrvScoreDef->ReadTuning(scoreDef);
 
     this->ReadUnsupportedAttr(scoreDef, vrvScoreDef);
     return this->ReadScoreDefChildren(vrvScoreDef, scoreDef);
@@ -5933,7 +5955,7 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
 
     this->ReadPositionInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
-    vrvAccid->ReadAccidentalGestural(accid);
+    vrvAccid->ReadAccidentalGes(accid);
     vrvAccid->ReadAccidLog(accid);
     vrvAccid->ReadColor(accid);
     vrvAccid->ReadEnclosingChars(accid);
@@ -5952,7 +5974,7 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
     this->ReadLayerElement(artic, vrvArtic);
 
     vrvArtic->ReadArticulation(artic);
-    vrvArtic->ReadArticulationGestural(artic);
+    vrvArtic->ReadArticulationGes(artic);
     vrvArtic->ReadColor(artic);
     vrvArtic->ReadEnclosingChars(artic);
     vrvArtic->ReadExtSym(artic);
@@ -6093,8 +6115,8 @@ void MEIInput::ReadAccidAttr(pugi::xml_node node, Object *object)
 {
     AttAccidental accidental;
     accidental.ReadAccidental(node);
-    AttAccidentalGestural accidentalGestural;
-    accidentalGestural.ReadAccidentalGestural(node);
+    AttAccidentalGes accidentalGestural;
+    accidentalGestural.ReadAccidentalGes(node);
     if (accidental.HasAccid() || accidentalGestural.HasAccidGes()) {
         Accid *vrvAccid = new Accid();
         vrvAccid->IsAttribute(true);
@@ -6816,8 +6838,8 @@ bool MEIInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
 
     interface->ReadAugmentDots(element);
     interface->ReadBeamSecondary(element);
-    interface->ReadDurationGestural(element);
-    interface->ReadDurationLogical(element);
+    interface->ReadDurationGes(element);
+    interface->ReadDurationLog(element);
     interface->ReadDurationQuality(element);
     interface->ReadDurationRatio(element);
     interface->ReadFermataPresent(element);
@@ -6884,7 +6906,7 @@ bool MEIInput::ReadTimePointInterface(pugi::xml_node element, TimePointInterface
 {
     interface->ReadStaffIdent(element);
     interface->ReadStartId(element);
-    interface->ReadTimestampLogical(element);
+    interface->ReadTimestampLog(element);
     return true;
 }
 
@@ -6892,7 +6914,7 @@ bool MEIInput::ReadTimeSpanningInterface(pugi::xml_node element, TimeSpanningInt
 {
     this->ReadTimePointInterface(element, interface);
     interface->ReadStartEndId(element);
-    interface->ReadTimestamp2Logical(element);
+    interface->ReadTimestamp2Log(element);
     return true;
 }
 
@@ -7899,6 +7921,19 @@ void MEIInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
     // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
+bool MEIInput::ReadGraphic(Surface *parent, pugi::xml_node graphic)
+{
+    assert(parent);
+    Graphic *vrvGraphic = new Graphic();
+    this->SetMeiID(graphic, vrvGraphic);
+    vrvGraphic->ReadPointing(graphic);
+    vrvGraphic->ReadWidth(graphic);
+    vrvGraphic->ReadHeight(graphic);
+    vrvGraphic->ReadTyped(graphic);
+    parent->AddChild(vrvGraphic);
+    return true;
+}
+
 bool MEIInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
 {
     assert(parent);
@@ -7908,7 +7943,10 @@ bool MEIInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
     vrvSurface->ReadTyped(surface);
 
     for (pugi::xml_node child = surface.first_child(); child; child = child.next_sibling()) {
-        if (strcmp(child.name(), "zone") == 0) {
+        if (strcmp(child.name(), "graphic") == 0) {
+            this->ReadGraphic(vrvSurface, child);
+        }
+        else if (strcmp(child.name(), "zone") == 0) {
             this->ReadZone(vrvSurface, child);
         }
         else {
@@ -7936,6 +7974,7 @@ bool MEIInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
     Facsimile *vrvFacsimile = new Facsimile();
     // Read xmlId (if present)
     this->SetMeiID(facsimile, vrvFacsimile);
+    vrvFacsimile->ReadTyped(facsimile);
     // Read children
     for (pugi::xml_node child = facsimile.first_child(); child; child = child.next_sibling()) {
         if (strcmp(child.name(), "surface") == 0) {

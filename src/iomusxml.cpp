@@ -502,7 +502,7 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
         durStr = std::to_string(int(4 / quarters));
 
         Space *space = new Space();
-        space->SetDur(space->AttDurationLogical::StrToDuration(durStr));
+        space->SetDur(space->AttDurationLog::StrToDuration(durStr));
         space->SetDurPpq(m_ppq * quarters);
         if (m_elementStackMap.at(layer).empty())
             layer->AddChild(space);
@@ -533,7 +533,7 @@ void MusicXmlInput::CloseTie(Note *note)
 {
     // add all notes with identical pitch/oct to m_tieStopStack
     for (auto iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
-        if (note->GetPname() == iter->second->GetPname() && note->GetOct() == iter->second->GetOct()) {
+        if (note->IsEnharmonicWith(iter->second)) {
             m_tieStopStack.push_back(note);
         }
     }
@@ -1854,7 +1854,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
         std::string endingNumber = ending.attribute("number").as_string();
         std::string endingType = ending.attribute("type").as_string();
         std::string endingText = ending.text().as_string();
-        // LogMessage("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(),
+        // LogInfo("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(),
         // endingText.c_str());
         if (endingType == "start") {
             // check for corresponding stop points
@@ -2041,7 +2041,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 m_openDashesStack.push_back({ controlElement, openDashes });
             }
             else {
-                LogMessage("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure %s.",
+                LogInfo("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure %s.",
                     measureNum.c_str());
             }
         }
@@ -2298,7 +2298,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             // pedal->SetN(xmlPedal.attribute("number").as_string());
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
             pedal->SetDir(ConvertPedalTypeToDir(pedalType));
-            if (pedalLine) pedal->SetForm(pedalVis_FORM_line);
+            if (pedalLine) pedal->SetForm(PEDALSTYLE_line);
             if (xmlPedal.attribute("abbreviated")) {
                 pedal->SetExternalsymbols(pedal, "glyph.auth", "smufl");
                 pedal->SetExternalsymbols(pedal, "glyph.num", "U+E651");
@@ -3722,52 +3722,52 @@ void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi
 void MusicXmlInput::ReadMusicXmlTies(
     const pugi::xml_node &node, Layer *layer, Note *note, const std::string &measureNum)
 {
-    pugi::xpath_node xmlTie = node.select_node("tied");
-    if (!xmlTie) return;
+    for (pugi::xml_node xmlTie : node.children("tied")) {
+        std::string tieType = xmlTie.attribute("type").as_string();
 
-    const std::string tieType = xmlTie.node().attribute("type").as_string();
-    if ("stop" == tieType) { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
-        if (!m_tieStack.empty() && note->IsEnharmonicWith(m_tieStack.back().second)) {
-            m_tieStack.back().first->SetEndid("#" + note->GetID());
-            m_tieStack.pop_back();
+        if (tieType.empty()) {
+            continue;
         }
-        else {
-            m_tieStopStack.push_back(note);
+        else if (tieType == "stop") { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
+            if (!m_tieStack.empty() && note->IsEnharmonicWith(m_tieStack.back().second)) {
+                m_tieStack.back().first->SetEndid("#" + note->GetID());
+                m_tieStack.pop_back();
+            }
+            else {
+                CloseTie(note);
+            }
         }
-    }
-    else if (m_tieStack.empty()) {
-        CloseTie(note);
-    }
-    // if we have start attribute - start new tie
-    if ("start" == tieType) {
-        Tie *tie = new Tie();
-        // color
-        tie->SetColor(xmlTie.node().attribute("color").as_string());
-        // placement and orientation
-        tie->SetCurvedir(InferCurvedir(xmlTie.node()));
-        tie->SetLform(tie->AttCurveRend::StrToLineform(xmlTie.node().attribute("line-type").as_string()));
-        if (xmlTie.node().attribute("id")) tie->SetID(xmlTie.node().attribute("id").as_string());
-        // add it to the stack
-        m_controlElements.push_back({ measureNum, tie });
-        OpenTie(note, tie);
-    }
-    // or add lv element if let-ring attribute present
-    else if ("let-ring" == tieType) {
-        Lv *lv = new Lv();
-        // color
-        lv->SetColor(xmlTie.node().attribute("color").as_string());
-        // placement and orientation
-        lv->SetCurvedir(InferCurvedir(xmlTie.node()));
-        lv->SetLform(lv->AttCurveRend::StrToLineform(xmlTie.node().attribute("line-type").as_string()));
-        if (xmlTie.node().attribute("id")) lv->SetID(xmlTie.node().attribute("id").as_string());
-        // add it to the stack
-        m_controlElements.push_back({ measureNum, lv });
-        // set startid to the current note and set second timestamp (endpoint) right away, since we're going to link
-        // <lv> not to another element, but to timestamp
-        lv->SetStartid("#" + note->GetID());
-        double tstamp = std::min(static_cast<double>(m_layerEndTimes[layer]), m_durTotal + 2.0);
-        tstamp = std::max(tstamp, m_durTotal + 1.25);
-        lv->SetTstamp2({ 0, tstamp * (double)m_meterUnit / (4.0 * m_ppq) + 1 });
+        // if we have start attribute - start new tie
+        else if (tieType == "start") {
+            Tie *tie = new Tie();
+            // color
+            tie->SetColor(xmlTie.attribute("color").as_string());
+            // placement and orientation
+            tie->SetCurvedir(InferCurvedir(xmlTie));
+            tie->SetLform(tie->AttCurveRend::StrToLineform(xmlTie.attribute("line-type").as_string()));
+            if (xmlTie.attribute("id")) tie->SetID(xmlTie.attribute("id").as_string());
+            // add it to the stack
+            m_controlElements.push_back({ measureNum, tie });
+            OpenTie(note, tie);
+        }
+        // or add lv element if let-ring attribute present
+        else if (tieType == "let-ring") {
+            Lv *lv = new Lv();
+            // color
+            lv->SetColor(xmlTie.attribute("color").as_string());
+            // placement and orientation
+            lv->SetCurvedir(InferCurvedir(xmlTie));
+            lv->SetLform(lv->AttCurveRend::StrToLineform(xmlTie.attribute("line-type").as_string()));
+            if (xmlTie.attribute("id")) lv->SetID(xmlTie.attribute("id").as_string());
+            // add it to the stack
+            m_controlElements.push_back({ measureNum, lv });
+            // set startid to the current note and set second timestamp (endpoint) right away, since we're going to link
+            // <lv> not to another element, but to timestamp
+            lv->SetStartid("#" + note->GetID());
+            double tstamp = std::min(static_cast<double>(m_layerEndTimes[layer]), m_durTotal + 2.0);
+            tstamp = std::max(tstamp, m_durTotal + 1.25);
+            lv->SetTstamp2({ 0, tstamp * (double)m_meterUnit / (4.0 * m_ppq) + 1 });
+        }
     }
 }
 
@@ -4022,8 +4022,9 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(const std::string &value, co
     if (value == "dashed") return BARRENDITION_dashed;
     if (value == "dotted") return BARRENDITION_dotted;
     if (value == "light-light") return BARRENDITION_dbl;
-    // if (value == "heavy-heavy") return; // TODO: Support Double thick barlines.
+    if (value == "heavy-heavy") return BARRENDITION_dblheavy;
     if ((value == "light-heavy") && !repeat) return BARRENDITION_end;
+    if (value == "heavy") return BARRENDITION_heavy;
     if (value == "none") return BARRENDITION_invis;
     if ((value == "heavy-light") && repeat) return BARRENDITION_rptstart;
     // if (value == "") return BARRENDITION_rptboth;

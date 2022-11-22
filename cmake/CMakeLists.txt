@@ -26,6 +26,9 @@ if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
     message(SEND_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
 endif()
 
+# Sets the compile-time value for the RESOURCE_DIR macro in the source code.
+add_compile_definitions(RESOURCE_DIR="${CMAKE_INSTALL_PREFIX}/share/verovio")
+
 include_directories(
     ../include
     ../include/crc
@@ -49,6 +52,7 @@ else()
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         message(STATUS "Enabling debug information")
         add_definitions(-g)
+        add_definitions(-DDEBUG)
     endif()
 
     # jsonxx raises -Wdollar-in-identifier-extension
@@ -239,11 +243,10 @@ else()
 endif()
 
 install(
-    TARGETS verovio
-    DESTINATION /usr/local/bin
+    TARGETS verovio DESTINATION bin
 )
 install(
     DIRECTORY ../data/
     DESTINATION share/verovio
-    FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg"
+    FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg" PATTERN "*.css"
 )

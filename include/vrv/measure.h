@@ -116,7 +116,7 @@ public:
 
     /**
      * @name Set and get the left and right barline types
-     * This somehow conflicts with AttMeasureLog, which is transfered from and to the
+     * This somehow conflicts with AttMeasureLog, which is transferred from and to the
      * Barline object when reading and writing MEI. See MEIInput::ReadMeasure and
      * MEIOutput::WriteMeasure
      * Alternatively, we could keep them in sync here:
@@ -151,7 +151,7 @@ public:
 
     /**
      * Create mapping of original barline values to staves in the measure that are neighbored by invisible staves. This
-     * will allow to draw proper barline when invisible staff hides overlaping barline
+     * will allow to draw proper barline when invisible staff hides overlapping barline
      */
     void SetInvisibleStaffBarlines(
         Measure *previous, ListOfObjects &currentInvisible, ListOfObjects &previousInvisible, int barlineDrawingFlags);
@@ -207,7 +207,7 @@ public:
     int GetInnerCenterX() const;
 
     /**
-     * Return the right overlow of the control events in the measure.
+     * Return the right overflow of the control events in the measure.
      * Takes into account Dir, Dynam, and Tempo.
      */
     int GetDrawingOverflow();
@@ -250,7 +250,7 @@ public:
     ///@}
 
     /**
-     * Return the botoom (last) visible staff in the measure (if any).
+     * Return the bottom (last) visible staff in the measure (if any).
      * Takes into account system optimization
      */
     ///@{

@@ -445,6 +445,7 @@ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
 
 int StaffAlignment::CalcOverflowAbove(const BoundingBox *box) const
 {
+    if (!box->HasContentVerticalBB()) return 0;
     if (box->Is(FLOATING_POSITIONER)) {
         const FloatingPositioner *positioner = vrv_cast<const FloatingPositioner *>(box);
         assert(positioner);
@@ -455,6 +456,7 @@ int StaffAlignment::CalcOverflowAbove(const BoundingBox *box) const
 
 int StaffAlignment::CalcOverflowBelow(const BoundingBox *box) const
 {
+    if (!box->HasContentVerticalBB()) return 0;
     if (box->Is(FLOATING_POSITIONER)) {
         const FloatingPositioner *positioner = vrv_cast<const FloatingPositioner *>(box);
         assert(positioner);
@@ -795,7 +797,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             int overflowAbove = 0;
             if (!skipAbove) overflowAbove = this->CalcOverflowAbove(*iter);
             if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-                // LogMessage("%sparams->m_doc top overflow: %d", this->GetID().c_str(), overflowAbove);
+                // LogInfo("%sparams->m_doc top overflow: %d", this->GetID().c_str(), overflowAbove);
                 this->SetOverflowAbove(overflowAbove);
                 m_overflowAboveBBoxes.push_back(*iter);
             }
@@ -803,7 +805,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             int overflowBelow = 0;
             if (!skipBelow) overflowBelow = this->CalcOverflowBelow(*iter);
             if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-                // LogMessage("%s bottom overflow: %d", this->GetID().c_str(), overflowBelow);
+                // LogInfo("%s bottom overflow: %d", this->GetID().c_str(), overflowBelow);
                 this->SetOverflowBelow(overflowBelow);
                 m_overflowBelowBBoxes.push_back(*iter);
             }
