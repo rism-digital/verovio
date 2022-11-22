@@ -895,6 +895,12 @@ Options::Options()
     m_inputFrom.SetShortOption('f', false);
     m_baseOptions.AddOption(&m_inputFrom);
 
+    m_logLevel.SetInfo("Log level", "Set the log level: \"off\", \"error\", \"warning\", \"info\", or \"debug\"");
+    m_logLevel.Init("warning");
+    m_logLevel.SetKey("log-level");
+    m_logLevel.SetShortOption('l', true);
+    m_baseOptions.AddOption(&m_logLevel);
+
     m_outfile.SetInfo("Output file", "Output file name (use \"-\" as file name for standard output)");
     m_outfile.Init("svg");
     m_outfile.SetKey("outfile");

@@ -166,6 +166,18 @@ void LogString(std::string message, LogLevel level)
     }
 }
 
+LogLevel StrToLogLevel(const std::string &level)
+{
+    if (level == "off") return LOG_OFF;
+    if (level == "error") return LOG_ERROR;
+    if (level == "warning") return LOG_WARNING;
+    if (level == "info") return LOG_INFO;
+    if (level == "debug") return LOG_DEBUG;
+
+    LogWarning("Unkown log level '%s' (warning is default)", level.c_str());
+    return LOG_WARNING;
+}
+
 bool LogBufferContains(const std::string &s)
 {
     std::vector<std::string>::iterator iter = logBuffer.begin();

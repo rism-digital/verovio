@@ -47,6 +47,11 @@ bool LogBufferContains(const std::string &s);
 void LogString(std::string message, LogLevel level);
 
 /**
+ * Convert a string to a logLevel
+ */
+LogLevel StrToLogLevel(const std::string &level);
+
+/**
  * Utility for comparing doubles
  */
 bool AreEqual(double dFirstVal, double dSecondVal);
