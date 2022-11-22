@@ -36,7 +36,7 @@ class Object;
 
 void LogDebug(const char *fmt, ...);
 void LogError(const char *fmt, ...);
-void LogMessage(const char *fmt, ...);
+void LogInfo(const char *fmt, ...);
 void LogWarning(const char *fmt, ...);
 
 /**
@@ -45,6 +45,11 @@ void LogWarning(const char *fmt, ...);
 extern std::vector<std::string> logBuffer;
 bool LogBufferContains(const std::string &s);
 void LogString(std::string message, LogLevel level);
+
+/**
+ * Convert a string to a logLevel
+ */
+LogLevel StrToLogLevel(const std::string &level);
 
 /**
  * Utility for comparing doubles

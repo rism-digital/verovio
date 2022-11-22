@@ -126,7 +126,7 @@ void Artic::SplitMultival(Object *parent)
     // Multiple valued attributes cannot be preserved as such
     if (this->IsAttribute()) {
         this->IsAttribute(false);
-        LogMessage("Multiple valued attribute @artic on '%s' permanently converted to <artic> elements",
+        LogInfo("Multiple valued attribute @artic on '%s' permanently converted to <artic> elements",
             parent->GetID().c_str());
     }
 }

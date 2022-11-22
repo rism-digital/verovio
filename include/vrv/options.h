@@ -590,6 +590,7 @@ public:
     OptionBool m_help;
     OptionBool m_allPages;
     OptionString m_inputFrom;
+    OptionString m_logLevel;
     OptionString m_outfile;
     OptionInt m_page;
     OptionString m_resourcePath;
