@@ -1363,6 +1363,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     assert(userScale != 0.0);
 
     if (m_options->m_scaleToPageSize.GetValue()) {
+        deviceContext->SetBaseSize(width, height);
         height *= (1.0 / userScale);
         width *= (1.0 / userScale);
     }

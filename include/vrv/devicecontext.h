@@ -71,6 +71,8 @@ public:
         m_contentHeight = 0;
         m_userScaleX = 1.0;
         m_userScaleY = 1.0;
+        m_baseWidth = 0;
+        m_baseHeight = 0;
     }
     DeviceContext(ClassId classId)
     {
@@ -83,6 +85,8 @@ public:
         m_contentHeight = 0;
         m_userScaleX = 1.0;
         m_userScaleY = 1.0;
+        m_baseWidth = 0;
+        m_baseHeight = 0;
     }
     virtual ~DeviceContext(){};
     ClassId GetClassId() const { return m_classId; }
@@ -113,11 +117,17 @@ public:
         m_userScaleX = scaleX;
         m_userScaleY = scaleY;
     }
+    void SetBaseSize(int width, int height)
+    {
+        m_baseWidth = width;
+        m_baseHeight = height;
+    }
     int GetWidth() const { return m_width; }
     int GetHeight() const { return m_height; }
     int GetContentHeight() const { return m_contentHeight; }
     double GetUserScaleX() { return m_userScaleX; }
     double GetUserScaleY() { return m_userScaleY; }
+    std::pair<int, int> GetBaseSize() const { return std::make_pair(m_baseWidth, m_baseHeight); }
     ///@}
 
     /**
@@ -330,6 +340,10 @@ private:
     /** stores the width and height of the device context */
     int m_width;
     int m_height;
+
+    /** stores base width and height of the device context before application of scale */
+    int m_baseWidth;
+    int m_baseHeight;
 
     /** stores the height of graphic content */
     int m_contentHeight;
