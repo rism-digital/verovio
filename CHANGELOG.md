@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [3.13.0] - 2022-11-23
 * Refactoring of the JSON parameters and returned values as dictionaries for the Python binding
 * Support for text font fallback when a glyph is missing in the selected font
 * Support for Plaine and Easie gross and refined contour feature extraction
