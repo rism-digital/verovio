@@ -10,8 +10,9 @@
 * Support for heavy barlines (@eNote-GmBH)
 * Support for log level selection (warning by default)
 * Support for controlling log in the JS toolkit (@WolfgangDrescher)
-* Option --smuflTextFont for for controlling text font embedding or linking CSS fonts
+* Option --smuflTextFont for controlling text font embedding or linking CSS fonts
 * Option --lyricElision for selecting elision glyph (regular, wide, narrow or unicde)
+* Option --log-level (-l) for controlling the log level from the command-line tool
 * Method getOption(bool) split as getOptions() and getDefaultOptions()
 * Fixes in the PAE importer (@carlolic)
 
