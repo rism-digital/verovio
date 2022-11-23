@@ -674,7 +674,7 @@ double LayerElement::GetAlignmentDuration(
         const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
         if (tuplet) {
             ListOfConstObjects objects;
-            ClassIdsComparison ids({ CHORD, NOTE, REST });
+            ClassIdsComparison ids({ CHORD, NOTE, REST, SPACE });
             tuplet->FindAllDescendantsByComparison(&objects, &ids);
             if (objects.size() > 1) {
                 num = tuplet->GetNum();
@@ -2108,7 +2108,9 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     int selfRight = this->GetAlignment()->GetXRel();
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
-        selfRight = this->GetAlignment()->GetXRel() + params->m_doc->GetRightMargin(this) * drawingUnit;
+        selfRight = this->GetAlignment()->GetXRel();
+        // Still add the right margin for the barlines
+        if (this->Is(BARLINE)) selfRight += params->m_doc->GetRightMargin(this) * drawingUnit;
     }
     else {
         selfRight = this->GetSelfRight() + params->m_doc->GetRightMargin(this) * drawingUnit;

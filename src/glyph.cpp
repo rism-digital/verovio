@@ -36,6 +36,7 @@ Glyph::Glyph()
     m_unitsPerEm = 20480;
     m_codeStr = "[unset]";
     m_path = "[unset]";
+    m_isFallback = false;
 }
 
 Glyph::Glyph(std::string path, std::string codeStr)
@@ -47,6 +48,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
     m_horizAdvX = 0;
     m_unitsPerEm = 20480;
     m_codeStr = codeStr;
+    m_isFallback = false;
 
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(path.c_str());
@@ -58,7 +60,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
 
     // look at the viewBox attribute for getting the units per em
     if (!root.attribute("viewBox")) {
-        LogMessage("Font file '%s' does not contain a viewBox attribute", path.c_str());
+        LogInfo("Font file '%s' does not contain a viewBox attribute", path.c_str());
         return;
     }
 
@@ -66,7 +68,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
     // the viewBox attribute is expected to contain four coordinates: "0 0 2048 2048"
     // we are looking for the last value
     if (std::count(viewBox.begin(), viewBox.end(), ' ') < 3) {
-        LogMessage("Font file viewBox attribute '%s' is not valid", viewBox.c_str());
+        LogInfo("Font file viewBox attribute '%s' is not valid", viewBox.c_str());
         return;
     }
 

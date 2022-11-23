@@ -20,10 +20,12 @@
 
 #include "devicecontext.h"
 #include "object.h"
+#include "options.h"
 
 //----------------------------------------------------------------------------
 
 class Glyph;
+class Resources;
 
 namespace vrv {
 
@@ -237,6 +239,11 @@ public:
         }
     }
 
+    /**
+     * Setter for a the smufl text font option
+     */
+    void SetSmuflTextFont(option_SMUFLTEXTFONT smuflTextFont) { m_smuflTextFont = smuflTextFont; }
+
 private:
     /**
      * Copy the content of a file to the output stream.
@@ -258,6 +265,16 @@ private:
      * Change the flag for indicating the use of the music font as text font
      */
     void VrvTextFont() { m_vrvTextFont = true; }
+
+    /**
+     * Change the flag for indicating the use of the fallback music font as text font
+     */
+    void VrvTextFontFallback() { m_vrvTextFontFallback = true; }
+
+    /**
+     * Include the smufl text font either embedded or linked depending on m_smuflTextFont
+     */
+    void IncludeTextFont(const std::string &fontname, const Resources *resources);
 
     /**
      * Flush the data to the internal buffer.
@@ -289,6 +306,11 @@ private:
      * DeviceContext::VrvTextFont. The font is included as woff2 in Commit()
      */
     bool m_vrvTextFont;
+
+    /**
+     * Flag indicating we need a fallback font for the music Glyphs
+     */
+    bool m_vrvTextFontFallback;
 
     // we use a std::stringstream because we want to prepend the <defs> which will know only when we reach the end of
     // the page
@@ -331,6 +353,8 @@ private:
     int m_indent;
     // prefix to be added to font glyphs
     std::string m_glyphPostfixId;
+    // embedding of the smufl text font
+    option_SMUFLTEXTFONT m_smuflTextFont;
 };
 
 } // namespace vrv

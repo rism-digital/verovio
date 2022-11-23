@@ -14,6 +14,16 @@ using namespace vrv;
 
 extern "C" {
 
+void enableLog(bool value)
+{
+    EnableLog(value);
+}
+
+void enableLogToBuffer(bool value)
+{
+    EnableLogToBuffer(value);
+}
+
 /****************************************************************
  * Methods exported to use the Toolkit class
  ****************************************************************/
@@ -35,7 +45,7 @@ void *vrvToolkit_constructorResourcePath(const char *resourcePath)
 void vrvToolkit_destructor(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    LogMessage("Deleting toolkit");
+    LogInfo("Deleting toolkit");
     delete tk;
 }
 
@@ -278,12 +288,10 @@ bool vrvToolkit_select(void *tkPtr, const char *selection)
     return tk->Select(selection);
 }
 
-void vrvToolkit_setOptions(void *tkPtr, const char *options)
+bool vrvToolkit_setOptions(void *tkPtr, const char *options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    if (!tk->SetOptions(options)) {
-        LogError("Could not load JSON options.");
-    }
+    return tk->SetOptions(options);
 }
 
 const char *vrvToolkit_validatePAE(void *tkPtr, const char *data)

@@ -36,6 +36,7 @@ enum {
     SMUFL_E047_segno = 0xE047,
     SMUFL_E048_coda = 0xE048,
     SMUFL_E049_codaSquare = 0xE049,
+    SMUFL_E04A_segnoSerpent1 = 0xE04A,
     SMUFL_E04B_segnoSerpent2 = 0xE04B,
     SMUFL_E050_gClef = 0xE050,
     SMUFL_E051_gClef15mb = 0xE051,
@@ -577,7 +578,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 552
+#define SMUFL_COUNT 553
 
 } // namespace vrv
 

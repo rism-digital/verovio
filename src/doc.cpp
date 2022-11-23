@@ -196,7 +196,7 @@ bool Doc::GenerateDocumentScoreDef()
     }
     this->GetCurrentScoreDef()->AddChild(staffGrp);
 
-    LogMessage("ScoreDef generated");
+    LogInfo("ScoreDef generated");
 
     return true;
 }
@@ -1316,13 +1316,13 @@ void Doc::ConvertMarkupDoc(bool permanent)
 {
     if (m_markup == MARKUP_DEFAULT) return;
 
-    LogMessage("Converting markup...");
+    LogInfo("Converting markup...");
 
     if (m_markup & MARKUP_GRACE_ATTRIBUTE) {
     }
 
     if (m_markup & MARKUP_ARTIC_MULTIVAL) {
-        LogMessage("Converting artic markup...");
+        LogInfo("Converting artic markup...");
         ConvertMarkupArticParams convertMarkupArticParams;
         Functor convertMarkupArtic(&Object::ConvertMarkupArtic);
         Functor convertMarkupArticEnd(&Object::ConvertMarkupArticEnd);
@@ -1330,7 +1330,7 @@ void Doc::ConvertMarkupDoc(bool permanent)
     }
 
     if ((m_markup & MARKUP_ANALYTICAL_FERMATA) || (m_markup & MARKUP_ANALYTICAL_TIE)) {
-        LogMessage("Converting analytical markup...");
+        LogInfo("Converting analytical markup...");
         /************ Prepare processing by staff/layer/verse ************/
 
         // We need to populate processing lists for processing the document by Layer (for matching @tie) and
@@ -1379,7 +1379,7 @@ void Doc::ConvertMarkupDoc(bool permanent)
     }
 
     if (m_markup & MARKUP_SCOREDEF_DEFINITIONS) {
-        LogMessage("Converting scoreDef markup...");
+        LogInfo("Converting scoreDef markup...");
         Functor convertMarkupScoreDef(&Object::ConvertMarkupScoreDef);
         Functor convertMarkupScoreDefEnd(&Object::ConvertMarkupScoreDefEnd);
         ConvertMarkupScoreDefParams convertMarkupScoreDefParams(
@@ -1438,7 +1438,7 @@ void Doc::ExpandExpansions()
 
     Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
     if (start == NULL) {
-        LogMessage("Import MEI: expansion ID \"%s\" not found.", expansionId.c_str());
+        LogInfo("Import MEI: expansion ID \"%s\" not found.", expansionId.c_str());
         return;
     }
 

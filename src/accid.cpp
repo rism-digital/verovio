@@ -32,7 +32,7 @@ Accid::Accid()
     : LayerElement(ACCID, "accid-")
     , PositionInterface()
     , AttAccidental()
-    , AttAccidentalGestural()
+    , AttAccidentalGes()
     , AttAccidLog()
     , AttColor()
     , AttEnclosingChars()
@@ -43,7 +43,7 @@ Accid::Accid()
 
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_ACCIDENTAL);
-    this->RegisterAttClass(ATT_ACCIDENTALGESTURAL);
+    this->RegisterAttClass(ATT_ACCIDENTALGES);
     this->RegisterAttClass(ATT_ACCIDLOG);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
@@ -61,7 +61,7 @@ void Accid::Reset()
     LayerElement::Reset();
     PositionInterface::Reset();
     this->ResetAccidental();
-    this->ResetAccidentalGestural();
+    this->ResetAccidentalGes();
     this->ResetAccidLog();
     this->ResetColor();
     this->ResetEnclosingChars();

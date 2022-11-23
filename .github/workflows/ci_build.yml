@@ -44,7 +44,7 @@ env:
   # emscripten
   EM_VERSION: latest
   EM_CACHE_FOLDER: "emsdk-cache"
-  EM_CACHE_ID: 1
+  EM_CACHE_ID: 2
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works from rism-digital and from forks
@@ -281,6 +281,31 @@ jobs:
           name: ${{ env.TOOLKIT_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
 
+
+  ############################
+  # Copy the font CSS files  #
+  ############################
+  copy_font_files:
+    name: Copy the font files
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v3
+
+      - name: Create TEMP_DIR
+        working-directory: ${{ github.workspace }}
+        run: mkdir -p $TEMP_DIR/data
+
+      - name: Copy build into TEMP_DIR
+        run: cp data/*.css $GITHUB_WORKSPACE/$TEMP_DIR/data/
+
+      - name: Upload font data artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.TOOLKIT_BUILD }}
+          path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
+
   ##################################
   # Check settings for deployment  #
   ##################################
@@ -348,7 +373,7 @@ jobs:
 
       - name: Copy artifacts to gh-pages
         run: |
-          cp artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
+          cp -r artifacts/$TOOLKIT_BUILD/* $GH_PAGES_DIR/javascript/develop/
 
       - name: Check git status before commit
         working-directory: ${{ env.GH_PAGES_DIR }}

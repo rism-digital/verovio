@@ -37,7 +37,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 13
+#define VERSION_MINOR 14
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -468,6 +468,8 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define UNICODE_NATURAL U'\u266E' // ♮
 #define UNICODE_SHARP U'\u266F' // ♯
 
+#define UNICODE_UNDERTIE U'\u203F' // ‿
+
 #define UNICODE_DAL_SEGNO U'\U0001D109' // 𝄉
 #define UNICODE_DA_CAPO U'\U0001D10A' // 𝄊
 #define UNICODE_SEGNO U'\U0001D10B' // 𝄋
@@ -636,6 +638,12 @@ enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
 //----------------------------------------------------------------------------
 
 enum StemSameasDrawingRole { SAMEAS_NONE = 0, SAMEAS_UNSET, SAMEAS_PRIMARY, SAMEAS_SECONDARY };
+
+//----------------------------------------------------------------------------
+// Smufl text font (selected font or fallback)
+//----------------------------------------------------------------------------
+
+enum SmuflTextFont { SMUFL_NONE = 0, SMUFL_FONT_SELECTED, SMUFL_FONT_FALLBACK };
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

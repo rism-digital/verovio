@@ -26,22 +26,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttSurface
+// AttMargins
 //----------------------------------------------------------------------------
 
-class AttSurface : public Att {
+class AttMargins : public Att {
 public:
-    AttSurface();
-    virtual ~AttSurface();
+    AttMargins();
+    virtual ~AttMargins();
 
     /** Reset the default values for the attribute class **/
-    void ResetSurface();
+    void ResetMargins();
 
     /** Read the values for the attribute class **/
-    bool ReadSurface(pugi::xml_node element);
+    bool ReadMargins(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteSurface(pugi::xml_node element);
+    bool WriteMargins(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -49,16 +49,34 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSurface(std::string surface_) { m_surface = surface_; }
-    std::string GetSurface() const { return m_surface; }
-    bool HasSurface() const;
+    void SetTopmar(data_MEASUREMENTUNSIGNED topmar_) { m_topmar = topmar_; }
+    data_MEASUREMENTUNSIGNED GetTopmar() const { return m_topmar; }
+    bool HasTopmar() const;
+    //
+    void SetBotmar(data_MEASUREMENTUNSIGNED botmar_) { m_botmar = botmar_; }
+    data_MEASUREMENTUNSIGNED GetBotmar() const { return m_botmar; }
+    bool HasBotmar() const;
+    //
+    void SetLeftmar(data_MEASUREMENTUNSIGNED leftmar_) { m_leftmar = leftmar_; }
+    data_MEASUREMENTUNSIGNED GetLeftmar() const { return m_leftmar; }
+    bool HasLeftmar() const;
+    //
+    void SetRightmar(data_MEASUREMENTUNSIGNED rightmar_) { m_rightmar = rightmar_; }
+    data_MEASUREMENTUNSIGNED GetRightmar() const { return m_rightmar; }
+    bool HasRightmar() const;
     ///@}
 
 private:
-    /** Contains a reference to a surface element **/
-    std::string m_surface;
+    /** Indicates the amount of whitespace at the top of a page. **/
+    data_MEASUREMENTUNSIGNED m_topmar;
+    /** Indicates the amount of whitespace at the bottom of a page. **/
+    data_MEASUREMENTUNSIGNED m_botmar;
+    /** Indicates the amount of whitespace at the left side of a page. **/
+    data_MEASUREMENTUNSIGNED m_leftmar;
+    /** Indicates the amount of whitespace at the right side of a page. **/
+    data_MEASUREMENTUNSIGNED m_rightmar;
 
-    /* include <attsurface> */
+    /* include <attrightmar> */
 };
 
 } // namespace vrv
