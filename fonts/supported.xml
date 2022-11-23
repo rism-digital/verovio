@@ -79,7 +79,7 @@
         <glyph glyph-code="E047" smufl-name="segno"/>
         <glyph glyph-code="E048" smufl-name="coda"/>
         <glyph glyph-code="E049" smufl-name="codaSquare"/>
-        <!--<glyph glyph-code="E04A" smufl-name="segnoSerpent1" />-->
+        <glyph glyph-code="E04A" smufl-name="segnoSerpent1" />
         <glyph glyph-code="E04B" smufl-name="segnoSerpent2"/>
         <!--<glyph glyph-code="E04C" smufl-name="leftRepeatSmall" />-->
         <!--<glyph glyph-code="E04D" smufl-name="rightRepeatSmall" />-->
@@ -1082,8 +1082,8 @@
     </turkishFolkMusicAccidentals>
     <persianAccidentals>
         <description>Persian accidentals</description>
-        <!--<glyph glyph-code="E460" smufl-name="accidentalKoron" />-->
-        <!--<glyph glyph-code="E461" smufl-name="accidentalSori" />-->
+        <glyph glyph-code="E460" smufl-name="accidentalKoron" />
+        <glyph glyph-code="E461" smufl-name="accidentalSori" />
         <range_end>U+E46F</range_end>
         <range_start>U+E460</range_start>
     </persianAccidentals>

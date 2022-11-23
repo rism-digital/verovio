@@ -473,7 +473,7 @@ private:
     int CalcMusicFontSize();
 
 public:
-    Page *m_selectionPreceeding;
+    Page *m_selectionPreceding;
     Page *m_selectionFollowing;
     std::string m_selectionStart;
     std::string m_selectionEnd;
@@ -484,12 +484,12 @@ public:
     pugi::xml_document m_header;
 
     /**
-     * A copy of the header tree stored as pugi::xml_document
+     * A copy of the front tree stored as pugi::xml_document
      */
     pugi::xml_document m_front;
 
     /**
-     * A copy of the header tree stored as pugi::xml_document
+     * A copy of the back tree stored as pugi::xml_document
      */
     pugi::xml_document m_back;
 

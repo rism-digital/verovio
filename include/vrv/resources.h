@@ -8,6 +8,10 @@
 #ifndef __VRV_RESOURCES_H__
 #define __VRV_RESOURCES_H__
 
+#include <unordered_map>
+
+//----------------------------------------------------------------------------
+
 #include "glyph.h"
 
 namespace vrv {
@@ -73,6 +77,11 @@ public:
     ///@}
 
     /**
+     * Check if the text has any charachter that needs the smufl fallback font
+     */
+    bool IsSmuflFallbackNeeded(const std::u32string &text) const;
+
+    /**
      * Text fonts
      */
     ///@{
@@ -89,7 +98,7 @@ public:
     static char32_t GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar);
 
 private:
-    bool LoadFont(const std::string &fontName);
+    bool LoadFont(const std::string &fontName, bool withFallback = true);
 
 private:
     /** The font name of the font that is currently loaded */

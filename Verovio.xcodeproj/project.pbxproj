@@ -295,6 +295,8 @@
 		4D4335D31ED4567F003BE1A9 /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
 		4D4335D41ED45680003BE1A9 /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
 		4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */; };
+		4D49924F2926B4E9007E3431 /* toolkitdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D49924E2926B4DD007E3431 /* toolkitdef.h */; };
+		4D4992502926B4E9007E3431 /* toolkitdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D49924E2926B4DD007E3431 /* toolkitdef.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D4C26ED1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
 		4D4C26EE1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
 		4D4C26EF1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
@@ -1260,6 +1262,11 @@
 		BD2E4D982875880600B04350 /* stem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD2E4D94287587FD00B04350 /* stem.cpp */; };
 		BD2E4D9A2875882100B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; };
 		BD2E4D9B2875882200B04350 /* stem.h in Headers */ = {isa = PBXBuildFile; fileRef = BD2E4D992875881B00B04350 /* stem.h */; };
+		BD6E5C3D290007C90039B0F1 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
+		BD6E5C3E290007CA0039B0F1 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
+		BD6E5C3F290007CB0039B0F1 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
+		BD6E5C40290007CE0039B0F1 /* graphic.h in Headers */ = {isa = PBXBuildFile; fileRef = 3673E5E528E1DF0C0048BAFA /* graphic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BD6E5C41290007CE0039B0F1 /* graphic.h in Headers */ = {isa = PBXBuildFile; fileRef = 3673E5E528E1DF0C0048BAFA /* graphic.h */; };
 		BD87768327CE8A11005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
 		BD87768427CE8A19005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
 		BD87768527CE8A1A005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
@@ -1335,7 +1342,7 @@
 		35FDEBCD24B6DBC100AC1696 /* fing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fing.h; path = include/vrv/fing.h; sourceTree = "<group>"; };
 		35FDEBD024B6DC5B00AC1696 /* fing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fing.cpp; path = src/fing.cpp; sourceTree = "<group>"; };
 		3673E5E428E1DF0C0048BAFA /* graphic.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = graphic.cpp; path = src/graphic.cpp; sourceTree = "<group>"; };
-		3673E5E528E1DF0C0048BAFA /* graphic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = graphic.h; path = src/graphic.h; sourceTree = "<group>"; };
+		3673E5E528E1DF0C0048BAFA /* graphic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = graphic.h; path = include/vrv/graphic.h; sourceTree = "<group>"; };
 		36E0442B2347A9150054F141 /* expansionmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = expansionmap.cpp; path = src/expansionmap.cpp; sourceTree = "<group>"; };
 		36E0442D2347A9290054F141 /* expansionmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expansionmap.h; path = include/vrv/expansionmap.h; sourceTree = "<group>"; };
 		400FEDD1206FA742000D3233 /* gracegrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gracegrp.h; path = include/vrv/gracegrp.h; sourceTree = "<group>"; };
@@ -1442,6 +1449,7 @@
 		4D4335C51ECF2310003BE1A9 /* atts_visual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_visual.h; path = libmei/atts_visual.h; sourceTree = "<group>"; };
 		4D4335CC1ED2BACB003BE1A9 /* attalternates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attalternates.h; path = include/vrv/attalternates.h; sourceTree = "<group>"; };
 		4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_mensural.cpp; path = src/view_mensural.cpp; sourceTree = "<group>"; };
+		4D49924E2926B4DD007E3431 /* toolkitdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = toolkitdef.h; path = include/vrv/toolkitdef.h; sourceTree = "<group>"; };
 		4D4C26EB1EF7E73000681770 /* label.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = label.h; path = include/vrv/label.h; sourceTree = "<group>"; };
 		4D4C26EC1EF7E75400681770 /* label.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = label.cpp; path = src/label.cpp; sourceTree = "<group>"; };
 		4D4FCD091F5455F10009C455 /* staffgrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = staffgrp.h; path = include/vrv/staffgrp.h; sourceTree = "<group>"; };
@@ -1963,12 +1971,12 @@
 			children = (
 				4DA0EAC122BB779300A7EBEB /* facsimile.cpp */,
 				4DA0EAD022BB77AF00A7EBEB /* facsimile.h */,
+				3673E5E428E1DF0C0048BAFA /* graphic.cpp */,
+				3673E5E528E1DF0C0048BAFA /* graphic.h */,
 				4DA0EAC022BB779300A7EBEB /* surface.cpp */,
 				4DA0EAD522BB77AF00A7EBEB /* surface.h */,
 				4DA0EAC222BB779400A7EBEB /* zone.cpp */,
 				4DA0EAD222BB77AF00A7EBEB /* zone.h */,
-				3673E5E428E1DF0C0048BAFA /* graphic.cpp */,
-				3673E5E528E1DF0C0048BAFA /* graphic.h */,
 			);
 			name = facselements;
 			sourceTree = "<group>";
@@ -2262,6 +2270,7 @@
 				4DD7C0FE27A55CFD00B9C017 /* timemap.h */,
 				8F086EBF188539540037FD8E /* toolkit.cpp */,
 				8F59291618854BF800FE51AD /* toolkit.h */,
+				4D49924E2926B4DD007E3431 /* toolkitdef.h */,
 				4DC3B9E4239E2ABE007F185E /* transposition.cpp */,
 				4DC3B9E6239E2AD9007F185E /* transposition.h */,
 				8F086EB6188539540037FD8E /* verticalaligner.cpp */,
@@ -2512,6 +2521,7 @@
 				4DF9D29C1C1B3F0A0069E8C8 /* attconverter.h in Headers */,
 				8F59293918854BF800FE51AD /* clef.h in Headers */,
 				4DA0EADB22BB77AF00A7EBEB /* editortoolkit_neume.h in Headers */,
+				BD6E5C41290007CE0039B0F1 /* graphic.h in Headers */,
 				4DB3D89A1F7C326800B5FC2B /* fb.h in Headers */,
 				4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */,
 				4DB3D8C71F83D0FD00B5FC2B /* breath.h in Headers */,
@@ -2594,6 +2604,7 @@
 				4D72A5E2208A37F4009DEC1E /* mnum.h in Headers */,
 				4DB3D8FB1F83D1F700B5FC2B /* floatingobject.h in Headers */,
 				4DB3D8B21F83D06100B5FC2B /* atts_visual.h in Headers */,
+				4D49924F2926B4E9007E3431 /* toolkitdef.h in Headers */,
 				4D94721D20CA701000C780C8 /* linkinginterface.h in Headers */,
 				403BEFF7206C00F800D022D5 /* multirpt.h in Headers */,
 				4DC12A751F73FF92000440E9 /* runningelement.h in Headers */,
@@ -2875,6 +2886,7 @@
 				BB4C4B7C22A932D7001F6AF0 /* tuplet.h in Headers */,
 				BB4C4B4422A932D7001F6AF0 /* beatrpt.h in Headers */,
 				BB4C4AB022A932A6001F6AF0 /* ioabc.h in Headers */,
+				4D4992502926B4E9007E3431 /* toolkitdef.h in Headers */,
 				BB4C4AA422A9328F001F6AF0 /* vrv.h in Headers */,
 				BB4C4A6122A9321F001F6AF0 /* atts_analytical.h in Headers */,
 				BB4C4A6B22A9321F001F6AF0 /* atts_externalsymbols.h in Headers */,
@@ -2918,6 +2930,7 @@
 				BB4C4B4222A932D7001F6AF0 /* beam.h in Headers */,
 				BB4C4BA222A932E5001F6AF0 /* scoredefinterface.h in Headers */,
 				BB4C4AA922A932A0001F6AF0 /* devicecontext.h in Headers */,
+				BD6E5C40290007CE0039B0F1 /* graphic.h in Headers */,
 				BB4C4A9D22A9328F001F6AF0 /* options.h in Headers */,
 				BB4C4A6322A9321F001F6AF0 /* atts_cmn.h in Headers */,
 				BBC19FBF22B37CA000100F42 /* all.h in Headers */,
@@ -3009,7 +3022,7 @@
 		8F086EA0188534680037FD8E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1400;
+				LastUpgradeCheck = 1410;
 				TargetAttributes = {
 					BB4C4A5122A930A3001F6AF0 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -3158,6 +3171,7 @@
 				4D1694151E3A44F300569BF4 /* dynam.cpp in Sources */,
 				4D308105203DB6B500BC44F6 /* ref.cpp in Sources */,
 				4D1694161E3A44F300569BF4 /* pedal.cpp in Sources */,
+				BD6E5C3D290007C90039B0F1 /* graphic.cpp in Sources */,
 				4D1694171E3A44F300569BF4 /* mensur.cpp in Sources */,
 				BD0562372518CD20004057EB /* beamspan.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
@@ -3601,6 +3615,7 @@
 				4DB3D8B51F83D09100B5FC2B /* iohumdrum.cpp in Sources */,
 				4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				8F3DD34618854B2E0051330C /* layerelement.cpp in Sources */,
+				BD6E5C3E290007CA0039B0F1 /* graphic.cpp in Sources */,
 				4DB3D8CA1F83D10700B5FC2B /* fermata.cpp in Sources */,
 				BD0562382518CD20004057EB /* beamspan.cpp in Sources */,
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
@@ -3823,6 +3838,7 @@
 				BB4C4ACD22A932B6001F6AF0 /* sb.cpp in Sources */,
 				BB4C4AA822A932A0001F6AF0 /* devicecontext.cpp in Sources */,
 				BB4C4B7322A932D7001F6AF0 /* space.cpp in Sources */,
+				BD6E5C3F290007CB0039B0F1 /* graphic.cpp in Sources */,
 				402492BF232E70000017BB75 /* gracegrp.cpp in Sources */,
 				BB4C4A6622A9321F001F6AF0 /* atts_critapp.cpp in Sources */,
 				BD0562392518CD20004057EB /* beamspan.cpp in Sources */,
@@ -3977,6 +3993,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -3987,6 +4004,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -4112,6 +4130,7 @@
 					"$(inherited)",
 					NO_HUMDRUM_SUPPORT,
 				);
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -4123,6 +4142,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = NO_HUMDRUM_SUPPORT;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -4136,6 +4156,7 @@
 				EXECUTABLE_PREFIX = lib;
 				HEADER_SEARCH_PATHS = "";
 				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
@@ -4149,6 +4170,7 @@
 				EXECUTABLE_PREFIX = lib;
 				HEADER_SEARCH_PATHS = "";
 				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
@@ -4195,6 +4217,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rism.VerovioFramework;
@@ -4247,6 +4270,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rism.VerovioFramework;

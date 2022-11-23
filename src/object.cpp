@@ -1267,10 +1267,10 @@ bool Object::sortByUlx(Object *a, Object *b)
 
     if (fa == NULL || fb == NULL) {
         if (fa == NULL) {
-            LogMessage("No available facsimile interface for %s", a->GetID().c_str());
+            LogInfo("No available facsimile interface for %s", a->GetID().c_str());
         }
         if (fb == NULL) {
-            LogMessage("No available facsimile interface for %s", b->GetID().c_str());
+            LogInfo("No available facsimile interface for %s", b->GetID().c_str());
         }
         return false;
     }
@@ -1861,7 +1861,7 @@ int Object::PrepareFacsimile(FunctorParams *functorParams)
                                                                                : interface->GetFacs());
             Zone *zone = params->m_facsimile->FindZoneByID(facsID);
             if (zone != NULL) {
-                interface->SetZone(zone);
+                interface->AttachZone(zone);
             }
         }
         // Zoneless syl
@@ -2359,7 +2359,7 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
         int overflowAbove = above->CalcOverflowAbove(current);
         int staffSize = above->GetStaffSize();
         if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-            // LogMessage("%s top overflow: %d", current->GetID().c_str(), overflowAbove);
+            // LogInfo("%s top overflow: %d", current->GetID().c_str(), overflowAbove);
             if (isScoreDefClef) {
                 above->SetScoreDefClefOverflowAbove(overflowAbove);
             }
@@ -2374,7 +2374,7 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
         int overflowBelow = below->CalcOverflowBelow(current);
         int staffSize = below->GetStaffSize();
         if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-            // LogMessage("%s bottom overflow: %d", current->GetID().c_str(), overflowBelow);
+            // LogInfo("%s bottom overflow: %d", current->GetID().c_str(), overflowBelow);
             if (isScoreDefClef) {
                 below->SetScoreDefClefOverflowBelow(overflowBelow);
             }

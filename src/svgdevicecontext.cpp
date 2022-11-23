@@ -45,6 +45,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
 
     m_committed = false;
     m_vrvTextFont = false;
+    m_vrvTextFontFallback = false;
 
     m_mmOutput = false;
     m_svgBoundingBoxes = false;
@@ -83,6 +84,37 @@ bool SvgDeviceContext::CopyFileToStream(const std::string &filename, std::ostrea
     return true;
 }
 
+void SvgDeviceContext::IncludeTextFont(const std::string &fontname, const Resources *resources)
+{
+    assert(resources);
+
+    std::string cssContent;
+
+    if (m_smuflTextFont == SMUFLTEXTFONT_embedded) {
+        const std::string cssFontPath = StringFormat("%s/%s.css", resources->GetPath().c_str(), fontname.c_str());
+        std::ifstream cssFontFile(cssFontPath);
+        if (!cssFontFile.is_open()) {
+            LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG",
+                resources->GetCurrentFontName().c_str());
+        }
+        else {
+            std::stringstream cssFontStream;
+            cssFontStream << cssFontFile.rdbuf();
+            cssContent = cssFontStream.str();
+        }
+    }
+    else {
+        std::string versionPath
+            = (VERSION_DEV) ? "develop" : StringFormat("%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
+        cssContent = StringFormat("@import url(\"https://www.verovio.org/javascript/%s/data/%s.css\");",
+            versionPath.c_str(), fontname.c_str());
+    }
+
+    pugi::xml_node css = m_svgNode.append_child("style");
+    css.append_attribute("type") = "text/css";
+    css.append_child(pugi::node_pcdata).set_value(cssContent.c_str());
+}
+
 void SvgDeviceContext::Commit(bool xml_declaration)
 {
     if (m_committed) {
@@ -99,6 +131,17 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         width /= 10;
         format = "%gmm";
     }
+    else {
+        const auto [baseWidth, baseHeight] = this->GetBaseSize();
+        if (baseWidth && baseHeight) {
+            height = baseHeight;
+            width = baseWidth;
+        }
+        else {
+            height = std::ceil(height);
+            width = std::ceil(width);
+        }
+    }
 
     if (m_svgViewBox) {
         m_svgNode.prepend_attribute("viewBox") = StringFormat("0 0 %g %g", width, height).c_str();
@@ -109,21 +152,15 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     }
 
     // add the woff2 font if needed
-    const Resources *resources = this->GetResources(true);
-    if (m_vrvTextFont && resources) {
-        const std::string cssFontPath
-            = StringFormat("%s/%s.css", resources->GetPath().c_str(), resources->GetCurrentFontName().c_str());
-        std::ifstream cssFontFile(cssFontPath);
-        if (!cssFontFile.is_open()) {
-            LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG",
-                resources->GetCurrentFontName().c_str());
+    if (m_smuflTextFont != SMUFLTEXTFONT_none) {
+        const Resources *resources = this->GetResources(true);
+        // include the selected font
+        if (m_vrvTextFont && resources) {
+            this->IncludeTextFont(resources->GetCurrentFontName(), resources);
         }
-        else {
-            std::stringstream cssFontStream;
-            cssFontStream << cssFontFile.rdbuf();
-            pugi::xml_node css = m_svgNode.append_child("style");
-            css.append_attribute("type") = "text/css";
-            css.append_child(pugi::node_pcdata).set_value(cssFontStream.str().c_str());
+        // include the Leipzig fallback font
+        if (m_vrvTextFontFallback && resources) {
+            this->IncludeTextFont("Leipzig", resources);
         }
     }
 
@@ -400,6 +437,7 @@ void SvgDeviceContext::StartPage()
 {
     // Initialize the flag to false because we want to know if the font needs to be included in the SVG
     m_vrvTextFont = false;
+    m_vrvTextFontFallback = false;
 
     // default styles
     if (this->UseGlobalStyling()) {
@@ -915,9 +953,20 @@ void SvgDeviceContext::DrawText(
     // textChild.append_attribute("xml:space") = "preserve";
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
-        textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
         // Special case where we want to specifiy if the woff2 font needs to be included in the output
-        if (m_fontStack.top()->GetSmuflFont()) this->VrvTextFont();
+        if (m_fontStack.top()->GetSmuflFont() != SMUFL_NONE) {
+            if (m_fontStack.top()->GetSmuflFont() == SMUFL_FONT_FALLBACK) {
+                this->VrvTextFontFallback();
+                textChild.append_attribute("font-family") = "Leipzig";
+            }
+            else {
+                this->VrvTextFont();
+                textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
+            }
+        }
+        else {
+            textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
+        }
     }
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();

@@ -502,7 +502,7 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
         durStr = std::to_string(int(4 / quarters));
 
         Space *space = new Space();
-        space->SetDur(space->AttDurationLogical::StrToDuration(durStr));
+        space->SetDur(space->AttDurationLog::StrToDuration(durStr));
         space->SetDurPpq(m_ppq * quarters);
         if (m_elementStackMap.at(layer).empty())
             layer->AddChild(space);
@@ -1854,7 +1854,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
         std::string endingNumber = ending.attribute("number").as_string();
         std::string endingType = ending.attribute("type").as_string();
         std::string endingText = ending.text().as_string();
-        // LogMessage("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(),
+        // LogInfo("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(),
         // endingText.c_str());
         if (endingType == "start") {
             // check for corresponding stop points
@@ -2041,7 +2041,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 m_openDashesStack.push_back({ controlElement, openDashes });
             }
             else {
-                LogMessage("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure %s.",
+                LogInfo("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure %s.",
                     measureNum.c_str());
             }
         }
@@ -2298,7 +2298,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             // pedal->SetN(xmlPedal.attribute("number").as_string());
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacementRelStaff::StrToStaffrel(placeStr.c_str()));
             pedal->SetDir(ConvertPedalTypeToDir(pedalType));
-            if (pedalLine) pedal->SetForm(pedalVis_FORM_line);
+            if (pedalLine) pedal->SetForm(PEDALSTYLE_line);
             if (xmlPedal.attribute("abbreviated")) {
                 pedal->SetExternalsymbols(pedal, "glyph.auth", "smufl");
                 pedal->SetExternalsymbols(pedal, "glyph.num", "U+E651");
@@ -4022,8 +4022,9 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(const std::string &value, co
     if (value == "dashed") return BARRENDITION_dashed;
     if (value == "dotted") return BARRENDITION_dotted;
     if (value == "light-light") return BARRENDITION_dbl;
-    // if (value == "heavy-heavy") return; // TODO: Support Double thick barlines.
+    if (value == "heavy-heavy") return BARRENDITION_dblheavy;
     if ((value == "light-heavy") && !repeat) return BARRENDITION_end;
+    if (value == "heavy") return BARRENDITION_heavy;
     if (value == "none") return BARRENDITION_invis;
     if ((value == "heavy-light") && repeat) return BARRENDITION_rptstart;
     // if (value == "") return BARRENDITION_rptboth;

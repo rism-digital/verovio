@@ -175,7 +175,11 @@ public:
     ///@}
 
 private:
-    /** Encodes the stem length. **/
+    /**
+     * States the length of barlines in virtual units.
+     * The value must be greater than 0 and is typically equal to 2 times (the number
+     * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
+     **/
     double m_len;
     /** Indicates the method employed to mark corrections and normalizations. **/
     data_BARMETHOD m_method;
@@ -426,8 +430,8 @@ public:
     int GetBeamsFloat() const { return m_beamsFloat; }
     bool HasBeamsFloat() const;
     //
-    void SetFloatGap(data_MEASUREMENTABS floatGap_) { m_floatGap = floatGap_; }
-    data_MEASUREMENTABS GetFloatGap() const { return m_floatGap; }
+    void SetFloatGap(data_MEASUREMENTUNSIGNED floatGap_) { m_floatGap = floatGap_; }
+    data_MEASUREMENTUNSIGNED GetFloatGap() const { return m_floatGap; }
     bool HasFloatGap() const;
     ///@}
 
@@ -437,7 +441,7 @@ private:
     /** Captures the number of "floating" beams, i.e., those not attached to stems. **/
     int m_beamsFloat;
     /** Records the amount of separation between floating beams and stems. **/
-    data_MEASUREMENTABS m_floatGap;
+    data_MEASUREMENTUNSIGNED m_floatGap;
 
     /* include <attfloat.gap> */
 };
@@ -544,9 +548,21 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOpening(data_MEASUREMENTABS opening_) { m_opening = opening_; }
-    data_MEASUREMENTABS GetOpening() const { return m_opening; }
+    void SetOpening(data_MEASUREMENTUNSIGNED opening_) { m_opening = opening_; }
+    data_MEASUREMENTUNSIGNED GetOpening() const { return m_opening; }
     bool HasOpening() const;
+    //
+    void SetClosed(data_BOOLEAN closed_) { m_closed = closed_; }
+    data_BOOLEAN GetClosed() const { return m_closed; }
+    bool HasClosed() const;
+    //
+    void SetOpeningVertical(data_BOOLEAN openingVertical_) { m_openingVertical = openingVertical_; }
+    data_BOOLEAN GetOpeningVertical() const { return m_openingVertical; }
+    bool HasOpeningVertical() const;
+    //
+    void SetAngleOptimize(data_BOOLEAN angleOptimize_) { m_angleOptimize = angleOptimize_; }
+    data_BOOLEAN GetAngleOptimize() const { return m_angleOptimize; }
+    bool HasAngleOptimize() const;
     ///@}
 
 private:
@@ -554,9 +570,26 @@ private:
      * Specifies the distance between the lines at the open end of a hairpin dynamic
      * mark.
      **/
-    data_MEASUREMENTABS m_opening;
+    data_MEASUREMENTUNSIGNED m_opening;
+    /**
+     * Applies to a "Rossini" hairpin, i.e., one where the normally open side is closed
+     * by a connecting line.
+     **/
+    data_BOOLEAN m_closed;
+    /**
+     * Indicates that the opening points are aligned with an imaginary line that is
+     * always 90° perpendicular to the horizontal plane, regardless of any angle or
+     * start/end adjustments, including when the hairpin is angled with @angle.optimize
+     * or through @endvo/@startvo adjustments.
+     **/
+    data_BOOLEAN m_openingVertical;
+    /**
+     * Indicates that the slope of the hairpin can be adjusted to follow the content in
+     * order to optimize spacing.
+     **/
+    data_BOOLEAN m_angleOptimize;
 
-    /* include <attopening> */
+    /* include <attangle.optimize> */
 };
 
 //----------------------------------------------------------------------------
@@ -1185,16 +1218,62 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(pedalVis_FORM form_) { m_form = form_; }
-    pedalVis_FORM GetForm() const { return m_form; }
+    void SetForm(data_PEDALSTYLE form_) { m_form = form_; }
+    data_PEDALSTYLE GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
-    pedalVis_FORM m_form;
+    data_PEDALSTYLE m_form;
 
     /* include <attform> */
+};
+
+//----------------------------------------------------------------------------
+// AttPlicaVis
+//----------------------------------------------------------------------------
+
+class AttPlicaVis : public Att {
+public:
+    AttPlicaVis();
+    virtual ~AttPlicaVis();
+
+    /** Reset the default values for the attribute class **/
+    void ResetPlicaVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadPlicaVis(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WritePlicaVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetDir(data_STEMDIRECTION_basic dir_) { m_dir = dir_; }
+    data_STEMDIRECTION_basic GetDir() const { return m_dir; }
+    bool HasDir() const;
+    //
+    void SetLen(data_MEASUREMENTUNSIGNED len_) { m_len = len_; }
+    data_MEASUREMENTUNSIGNED GetLen() const { return m_len; }
+    bool HasLen() const;
+    ///@}
+
+private:
+    /** Records the position of the piano damper pedal. **/
+    data_STEMDIRECTION_basic m_dir;
+    /**
+     * States the length of barlines in virtual units.
+     * The value must be greater than 0 and is typically equal to 2 times (the number
+     * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
+     **/
+    data_MEASUREMENTUNSIGNED m_len;
+
+    /* include <attlen> */
 };
 
 //----------------------------------------------------------------------------
@@ -1460,8 +1539,8 @@ public:
     data_BOOLEAN GetLinesVisible() const { return m_linesVisible; }
     bool HasLinesVisible() const;
     //
-    void SetSpacing(data_MEASUREMENTREL spacing_) { m_spacing = spacing_; }
-    data_MEASUREMENTREL GetSpacing() const { return m_spacing; }
+    void SetSpacing(data_MEASUREMENTSIGNED spacing_) { m_spacing = spacing_; }
+    data_MEASUREMENTSIGNED GetSpacing() const { return m_spacing; }
     bool HasSpacing() const;
     ///@}
 
@@ -1480,7 +1559,7 @@ private:
      * This value is meaningless for the first staff in a system since the
      * spacing.system attribute indicates the spacing between systems.
      **/
-    data_MEASUREMENTREL m_spacing;
+    data_MEASUREMENTSIGNED m_spacing;
 
     /* include <attspacing> */
 };
@@ -1522,6 +1601,82 @@ private:
     data_BOOLEAN m_barThru;
 
     /* include <attbar.thru> */
+};
+
+//----------------------------------------------------------------------------
+// AttStemVis
+//----------------------------------------------------------------------------
+
+class AttStemVis : public Att {
+public:
+    AttStemVis();
+    virtual ~AttStemVis();
+
+    /** Reset the default values for the attribute class **/
+    void ResetStemVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadStemVis(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteStemVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPos(data_STEMPOSITION pos_) { m_pos = pos_; }
+    data_STEMPOSITION GetPos() const { return m_pos; }
+    bool HasPos() const;
+    //
+    void SetLen(data_MEASUREMENTUNSIGNED len_) { m_len = len_; }
+    data_MEASUREMENTUNSIGNED GetLen() const { return m_len; }
+    bool HasLen() const;
+    //
+    void SetForm(data_STEMFORM_mensural form_) { m_form = form_; }
+    data_STEMFORM_mensural GetForm() const { return m_form; }
+    bool HasForm() const;
+    //
+    void SetDir(data_STEMDIRECTION dir_) { m_dir = dir_; }
+    data_STEMDIRECTION GetDir() const { return m_dir; }
+    bool HasDir() const;
+    //
+    void SetFlagPos(data_FLAGPOS_mensural flagPos_) { m_flagPos = flagPos_; }
+    data_FLAGPOS_mensural GetFlagPos() const { return m_flagPos; }
+    bool HasFlagPos() const;
+    //
+    void SetFlagForm(data_FLAGFORM_mensural flagForm_) { m_flagForm = flagForm_; }
+    data_FLAGFORM_mensural GetFlagForm() const { return m_flagForm; }
+    bool HasFlagForm() const;
+    ///@}
+
+private:
+    /** Records the position of the stem in relation to the note head(s). **/
+    data_STEMPOSITION m_pos;
+    /**
+     * States the length of barlines in virtual units.
+     * The value must be greater than 0 and is typically equal to 2 times (the number
+     * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
+     **/
+    data_MEASUREMENTUNSIGNED m_len;
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
+    data_STEMFORM_mensural m_form;
+    /** Records the position of the piano damper pedal. **/
+    data_STEMDIRECTION m_dir;
+    /**
+     * Records the position of the flag using the values provided by the
+     * data.FLAGPOS.mensural datatype.
+     **/
+    data_FLAGPOS_mensural m_flagPos;
+    /**
+     * Encodes the form of the flag using the values provided by the
+     * data.FLAGFORM.mensural datatype.
+     **/
+    data_FLAGFORM_mensural m_flagForm;
+
+    /* include <attflag.form> */
 };
 
 //----------------------------------------------------------------------------

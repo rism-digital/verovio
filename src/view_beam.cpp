@@ -111,7 +111,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     fTrem->m_beamSegment.CalcBeam(layer, fTrem->m_beamStaff, m_doc, fTrem);
 
     /******************************************************************/
-    // Start the grahic
+    // Start the graphic
 
     dc->StartGraphic(element, "", element->GetID());
 
@@ -140,7 +140,7 @@ void View::DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem)
     BeamElementCoord *secondElement = beamElementCoords->at(1);
 
     // We look only at the first one for the duration since both are expected to be the same
-    AttDurationLogical *durationElement = dynamic_cast<AttDurationLogical *>(firstElement->m_element);
+    AttDurationLog *durationElement = dynamic_cast<AttDurationLog *>(firstElement->m_element);
     if (!durationElement) return;
     const int dur = durationElement->GetDur();
 
@@ -168,7 +168,7 @@ void View::DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem)
     const double dy2 = shiftY;
 
     int space = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, fTrem->m_cueSize);
-    // for non-stem notes the bar should be shortenend
+    // for non-stem notes the bar should be shortened
     if (dur < DUR_2) {
         x1 += 2 * space;
         y1 += 2 * space * fTrem->m_beamSegment.m_beamSlope;

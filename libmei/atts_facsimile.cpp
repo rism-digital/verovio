@@ -35,9 +35,7 @@ AttFacsimile::AttFacsimile() : Att()
     ResetFacsimile();
 }
 
-AttFacsimile::~AttFacsimile()
-{
-}
+AttFacsimile::~AttFacsimile() {}
 
 void AttFacsimile::ResetFacsimile()
 {

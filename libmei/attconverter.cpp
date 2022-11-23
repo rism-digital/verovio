@@ -51,6 +51,8 @@ std::string AttConverter::AccidentalGesturalToStr(data_ACCIDENTAL_GESTURAL data)
         case ACCIDENTAL_GESTURAL_bf: value = "bf"; break;
         case ACCIDENTAL_GESTURAL_kmf: value = "kmf"; break;
         case ACCIDENTAL_GESTURAL_bmf: value = "bmf"; break;
+        case ACCIDENTAL_GESTURAL_koron: value = "koron"; break;
+        case ACCIDENTAL_GESTURAL_sori: value = "sori"; break;
         default:
             LogWarning("Unknown value '%d' for data.ACCIDENTAL.GESTURAL", data);
             value = "";
@@ -80,6 +82,8 @@ data_ACCIDENTAL_GESTURAL AttConverter::StrToAccidentalGestural(const std::string
     if (value == "bf") return ACCIDENTAL_GESTURAL_bf;
     if (value == "kmf") return ACCIDENTAL_GESTURAL_kmf;
     if (value == "bmf") return ACCIDENTAL_GESTURAL_bmf;
+    if (value == "koron") return ACCIDENTAL_GESTURAL_koron;
+    if (value == "sori") return ACCIDENTAL_GESTURAL_sori;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.ACCIDENTAL.GESTURAL", value.c_str());
     return ACCIDENTAL_GESTURAL_NONE;
@@ -179,6 +183,8 @@ std::string AttConverter::AccidentalWrittenToStr(data_ACCIDENTAL_WRITTEN data) c
         case ACCIDENTAL_WRITTEN_bf: value = "bf"; break;
         case ACCIDENTAL_WRITTEN_kmf: value = "kmf"; break;
         case ACCIDENTAL_WRITTEN_bmf: value = "bmf"; break;
+        case ACCIDENTAL_WRITTEN_koron: value = "koron"; break;
+        case ACCIDENTAL_WRITTEN_sori: value = "sori"; break;
         default:
             LogWarning("Unknown value '%d' for data.ACCIDENTAL.WRITTEN", data);
             value = "";
@@ -219,6 +225,8 @@ data_ACCIDENTAL_WRITTEN AttConverter::StrToAccidentalWritten(const std::string &
     if (value == "bf") return ACCIDENTAL_WRITTEN_bf;
     if (value == "kmf") return ACCIDENTAL_WRITTEN_kmf;
     if (value == "bmf") return ACCIDENTAL_WRITTEN_bmf;
+    if (value == "koron") return ACCIDENTAL_WRITTEN_koron;
+    if (value == "sori") return ACCIDENTAL_WRITTEN_sori;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.ACCIDENTAL.WRITTEN", value.c_str());
     return ACCIDENTAL_WRITTEN_NONE;
@@ -339,6 +347,29 @@ data_ACCIDENTAL_aeu AttConverter::StrToAccidentalAeu(const std::string &value, b
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.ACCIDENTAL.aeu", value.c_str());
     return ACCIDENTAL_aeu_NONE;
+}
+
+std::string AttConverter::AccidentalPersianToStr(data_ACCIDENTAL_persian data) const
+{
+    std::string value;
+    switch (data) {
+        case ACCIDENTAL_persian_koron: value = "koron"; break;
+        case ACCIDENTAL_persian_sori: value = "sori"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.ACCIDENTAL.persian", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_ACCIDENTAL_persian AttConverter::StrToAccidentalPersian(const std::string &value, bool logWarning) const
+{
+    if (value == "koron") return ACCIDENTAL_persian_koron;
+    if (value == "sori") return ACCIDENTAL_persian_sori;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ACCIDENTAL.persian", value.c_str());
+    return ACCIDENTAL_persian_NONE;
 }
 
 std::string AttConverter::ArticulationToStr(data_ARTICULATION data) const
@@ -466,11 +497,15 @@ std::string AttConverter::BarrenditionToStr(data_BARRENDITION data) const
         case BARRENDITION_dbl: value = "dbl"; break;
         case BARRENDITION_dbldashed: value = "dbldashed"; break;
         case BARRENDITION_dbldotted: value = "dbldotted"; break;
+        case BARRENDITION_dblheavy: value = "dblheavy"; break;
+        case BARRENDITION_dblsegno: value = "dblsegno"; break;
         case BARRENDITION_end: value = "end"; break;
+        case BARRENDITION_heavy: value = "heavy"; break;
         case BARRENDITION_invis: value = "invis"; break;
         case BARRENDITION_rptstart: value = "rptstart"; break;
         case BARRENDITION_rptboth: value = "rptboth"; break;
         case BARRENDITION_rptend: value = "rptend"; break;
+        case BARRENDITION_segno: value = "segno"; break;
         case BARRENDITION_single: value = "single"; break;
         default:
             LogWarning("Unknown value '%d' for data.BARRENDITION", data);
@@ -487,11 +522,15 @@ data_BARRENDITION AttConverter::StrToBarrendition(const std::string &value, bool
     if (value == "dbl") return BARRENDITION_dbl;
     if (value == "dbldashed") return BARRENDITION_dbldashed;
     if (value == "dbldotted") return BARRENDITION_dbldotted;
+    if (value == "dblheavy") return BARRENDITION_dblheavy;
+    if (value == "dblsegno") return BARRENDITION_dblsegno;
     if (value == "end") return BARRENDITION_end;
+    if (value == "heavy") return BARRENDITION_heavy;
     if (value == "invis") return BARRENDITION_invis;
     if (value == "rptstart") return BARRENDITION_rptstart;
     if (value == "rptboth") return BARRENDITION_rptboth;
     if (value == "rptend") return BARRENDITION_rptend;
+    if (value == "segno") return BARRENDITION_segno;
     if (value == "single") return BARRENDITION_single;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.BARRENDITION", value.c_str());
@@ -2115,6 +2154,7 @@ std::string AttConverter::MeterformToStr(data_METERFORM data) const
         case METERFORM_num: value = "num"; break;
         case METERFORM_denomsym: value = "denomsym"; break;
         case METERFORM_norm: value = "norm"; break;
+        case METERFORM_symplusnorm: value = "sym+norm"; break;
         case METERFORM_invis: value = "invis"; break;
         default:
             LogWarning("Unknown value '%d' for data.METERFORM", data);
@@ -2129,6 +2169,7 @@ data_METERFORM AttConverter::StrToMeterform(const std::string &value, bool logWa
     if (value == "num") return METERFORM_num;
     if (value == "denomsym") return METERFORM_denomsym;
     if (value == "norm") return METERFORM_norm;
+    if (value == "sym+norm") return METERFORM_symplusnorm;
     if (value == "invis") return METERFORM_invis;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.METERFORM", value.c_str());
@@ -2733,6 +2774,29 @@ data_MULTIBREVERESTS_mensural AttConverter::StrToMultibreverestsMensural(const s
     return MULTIBREVERESTS_mensural_NONE;
 }
 
+std::string AttConverter::NeighboringlayerToStr(data_NEIGHBORINGLAYER data) const
+{
+    std::string value;
+    switch (data) {
+        case NEIGHBORINGLAYER_above: value = "above"; break;
+        case NEIGHBORINGLAYER_below: value = "below"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.NEIGHBORINGLAYER", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_NEIGHBORINGLAYER AttConverter::StrToNeighboringlayer(const std::string &value, bool logWarning) const
+{
+    if (value == "above") return NEIGHBORINGLAYER_above;
+    if (value == "below") return NEIGHBORINGLAYER_below;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.NEIGHBORINGLAYER", value.c_str());
+    return NEIGHBORINGLAYER_NONE;
+}
+
 std::string AttConverter::NonstaffplaceToStr(data_NONSTAFFPLACE data) const
 {
     std::string value;
@@ -2895,27 +2959,60 @@ data_NOTEHEADMODIFIER_list AttConverter::StrToNoteheadmodifierList(const std::st
     return NOTEHEADMODIFIER_list_NONE;
 }
 
-std::string AttConverter::OtherstaffToStr(data_OTHERSTAFF data) const
+std::string AttConverter::PedalstyleToStr(data_PEDALSTYLE data) const
 {
     std::string value;
     switch (data) {
-        case OTHERSTAFF_above: value = "above"; break;
-        case OTHERSTAFF_below: value = "below"; break;
+        case PEDALSTYLE_line: value = "line"; break;
+        case PEDALSTYLE_pedline: value = "pedline"; break;
+        case PEDALSTYLE_pedstar: value = "pedstar"; break;
+        case PEDALSTYLE_altpedstar: value = "altpedstar"; break;
         default:
-            LogWarning("Unknown value '%d' for data.OTHERSTAFF", data);
+            LogWarning("Unknown value '%d' for data.PEDALSTYLE", data);
             value = "";
             break;
     }
     return value;
 }
 
-data_OTHERSTAFF AttConverter::StrToOtherstaff(const std::string &value, bool logWarning) const
+data_PEDALSTYLE AttConverter::StrToPedalstyle(const std::string &value, bool logWarning) const
 {
-    if (value == "above") return OTHERSTAFF_above;
-    if (value == "below") return OTHERSTAFF_below;
+    if (value == "line") return PEDALSTYLE_line;
+    if (value == "pedline") return PEDALSTYLE_pedline;
+    if (value == "pedstar") return PEDALSTYLE_pedstar;
+    if (value == "altpedstar") return PEDALSTYLE_altpedstar;
     if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for data.OTHERSTAFF", value.c_str());
-    return OTHERSTAFF_NONE;
+        LogWarning("Unsupported value '%s' for data.PEDALSTYLE", value.c_str());
+    return PEDALSTYLE_NONE;
+}
+
+std::string AttConverter::PgfuncToStr(data_PGFUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case PGFUNC_all: value = "all"; break;
+        case PGFUNC_first: value = "first"; break;
+        case PGFUNC_last: value = "last"; break;
+        case PGFUNC_alt1: value = "alt1"; break;
+        case PGFUNC_alt2: value = "alt2"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.PGFUNC", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_PGFUNC AttConverter::StrToPgfunc(const std::string &value, bool logWarning) const
+{
+    if (value == "all") return PGFUNC_all;
+    if (value == "first") return PGFUNC_first;
+    if (value == "last") return PGFUNC_last;
+    if (value == "alt1") return PGFUNC_alt1;
+    if (value == "alt2") return PGFUNC_alt2;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.PGFUNC", value.c_str());
+    return PGFUNC_NONE;
 }
 
 std::string AttConverter::RelationshipToStr(data_RELATIONSHIP data) const
@@ -4716,6 +4813,7 @@ std::string AttConverter::MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) cons
         case meterSigGrpLog_FUNC_alternating: value = "alternating"; break;
         case meterSigGrpLog_FUNC_interchanging: value = "interchanging"; break;
         case meterSigGrpLog_FUNC_mixed: value = "mixed"; break;
+        case meterSigGrpLog_FUNC_other: value = "other"; break;
         default:
             LogWarning("Unknown value '%d' for att.meterSigGrp.log@func", data);
             value = "";
@@ -4729,6 +4827,7 @@ meterSigGrpLog_FUNC AttConverter::StrToMeterSigGrpLogFunc(const std::string &val
     if (value == "alternating") return meterSigGrpLog_FUNC_alternating;
     if (value == "interchanging") return meterSigGrpLog_FUNC_interchanging;
     if (value == "mixed") return meterSigGrpLog_FUNC_mixed;
+    if (value == "other") return meterSigGrpLog_FUNC_other;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.meterSigGrp.log@func", value.c_str());
     return meterSigGrpLog_FUNC_NONE;
@@ -4968,56 +5067,6 @@ pedalLog_FUNC AttConverter::StrToPedalLogFunc(const std::string &value, bool log
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.pedal.log@func", value.c_str());
     return pedalLog_FUNC_NONE;
-}
-
-std::string AttConverter::PedalVisFormToStr(pedalVis_FORM data) const
-{
-    std::string value;
-    switch (data) {
-        case pedalVis_FORM_line: value = "line"; break;
-        case pedalVis_FORM_pedstar: value = "pedstar"; break;
-        case pedalVis_FORM_altpedstar: value = "altpedstar"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.pedal.vis@form", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-pedalVis_FORM AttConverter::StrToPedalVisForm(const std::string &value, bool logWarning) const
-{
-    if (value == "line") return pedalVis_FORM_line;
-    if (value == "pedstar") return pedalVis_FORM_pedstar;
-    if (value == "altpedstar") return pedalVis_FORM_altpedstar;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.pedal.vis@form", value.c_str());
-    return pedalVis_FORM_NONE;
-}
-
-std::string AttConverter::PianoPedalsPedalstyleToStr(pianoPedals_PEDALSTYLE data) const
-{
-    std::string value;
-    switch (data) {
-        case pianoPedals_PEDALSTYLE_line: value = "line"; break;
-        case pianoPedals_PEDALSTYLE_pedstar: value = "pedstar"; break;
-        case pianoPedals_PEDALSTYLE_altpedstar: value = "altpedstar"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.pianoPedals@pedal.style", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-pianoPedals_PEDALSTYLE AttConverter::StrToPianoPedalsPedalstyle(const std::string &value, bool logWarning) const
-{
-    if (value == "line") return pianoPedals_PEDALSTYLE_line;
-    if (value == "pedstar") return pianoPedals_PEDALSTYLE_pedstar;
-    if (value == "altpedstar") return pianoPedals_PEDALSTYLE_altpedstar;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.pianoPedals@pedal.style", value.c_str());
-    return pianoPedals_PEDALSTYLE_NONE;
 }
 
 std::string AttConverter::PointingXlinkactuateToStr(pointing_XLINKACTUATE data) const

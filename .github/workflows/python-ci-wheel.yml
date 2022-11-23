@@ -21,10 +21,10 @@ jobs:
     strategy:
       # Ensure that a wheel builder finishes even if another fails
       fail-fast: false
-      # Build the wheels for Linux, Windows and macOS for Python 3.10
+      # Build the wheels for Linux, Windows and macOS
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         architecture: [x86, x64]
         include:
           - os: macos-latest
@@ -48,7 +48,7 @@ jobs:
     steps:
       #===============================================#
       # Set up
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -57,7 +57,7 @@ jobs:
           nuget-version: "latest"
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
@@ -82,7 +82,7 @@ jobs:
       #===============================================#
       # wheels
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.3.1
+        uses: pypa/cibuildwheel@v2.11.1
         with:
           output-dir: wheelhouse
         env:
@@ -132,7 +132,7 @@ jobs:
 
       #===============================================#
       # Upload artifacts
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: cibuildwheel-${{ runner.os }}-python-${{ matrix.python-version }}
           path: ./wheelhouse/*.whl
@@ -147,12 +147,12 @@ jobs:
     steps:
       #===============================================#
       # Set up
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
 
@@ -208,7 +208,7 @@ jobs:
 
       #===============================================#
       # Upload artifact
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: sdist-${{ runner.os }}-python-3.9
           path: dist/*.tar.gz
@@ -224,10 +224,10 @@ jobs:
     steps:
       #===============================================#
       # Set up
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
           architecture: "x64"
@@ -242,7 +242,7 @@ jobs:
       #===============================================#
       # Prepare artifacts
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: bindings/python/artifacts/
 

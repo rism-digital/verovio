@@ -510,7 +510,7 @@ bool DarmsInput::Import(const std::string &data_str)
         }
         else {
             // if (!isspace(c))
-            // LogMessage("Other %c", c);
+            // LogInfo("Other %c", c);
         }
 
         pos++;

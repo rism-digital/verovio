@@ -35,9 +35,7 @@ AttAnnotVis::AttAnnotVis() : Att()
     ResetAnnotVis();
 }
 
-AttAnnotVis::~AttAnnotVis()
-{
-}
+AttAnnotVis::~AttAnnotVis() {}
 
 void AttAnnotVis::ResetAnnotVis()
 {
@@ -81,9 +79,7 @@ AttArpegVis::AttArpegVis() : Att()
     ResetArpegVis();
 }
 
-AttArpegVis::~AttArpegVis()
-{
-}
+AttArpegVis::~AttArpegVis() {}
 
 void AttArpegVis::ResetArpegVis()
 {
@@ -217,9 +213,7 @@ AttBarLineVis::AttBarLineVis() : Att()
     ResetBarLineVis();
 }
 
-AttBarLineVis::~AttBarLineVis()
-{
-}
+AttBarLineVis::~AttBarLineVis() {}
 
 void AttBarLineVis::ResetBarLineVis()
 {
@@ -293,9 +287,7 @@ AttBeamingVis::AttBeamingVis() : Att()
     ResetBeamingVis();
 }
 
-AttBeamingVis::~AttBeamingVis()
-{
-}
+AttBeamingVis::~AttBeamingVis() {}
 
 void AttBeamingVis::ResetBeamingVis()
 {
@@ -369,9 +361,7 @@ AttBeatRptVis::AttBeatRptVis() : Att()
     ResetBeatRptVis();
 }
 
-AttBeatRptVis::~AttBeatRptVis()
-{
-}
+AttBeatRptVis::~AttBeatRptVis() {}
 
 void AttBeatRptVis::ResetBeatRptVis()
 {
@@ -415,9 +405,7 @@ AttChordVis::AttChordVis() : Att()
     ResetChordVis();
 }
 
-AttChordVis::~AttChordVis()
-{
-}
+AttChordVis::~AttChordVis() {}
 
 void AttChordVis::ResetChordVis()
 {
@@ -461,9 +449,7 @@ AttCleffingVis::AttCleffingVis() : Att()
     ResetCleffingVis();
 }
 
-AttCleffingVis::~AttCleffingVis()
-{
-}
+AttCleffingVis::~AttCleffingVis() {}
 
 void AttCleffingVis::ResetCleffingVis()
 {
@@ -522,9 +508,7 @@ AttEpisemaVis::AttEpisemaVis() : Att()
     ResetEpisemaVis();
 }
 
-AttEpisemaVis::~AttEpisemaVis()
-{
-}
+AttEpisemaVis::~AttEpisemaVis() {}
 
 void AttEpisemaVis::ResetEpisemaVis()
 {
@@ -583,9 +567,7 @@ AttFTremVis::AttFTremVis() : Att()
     ResetFTremVis();
 }
 
-AttFTremVis::~AttFTremVis()
-{
-}
+AttFTremVis::~AttFTremVis() {}
 
 void AttFTremVis::ResetFTremVis()
 {
@@ -608,7 +590,7 @@ bool AttFTremVis::ReadFTremVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("float.gap")) {
-        this->SetFloatGap(StrToMeasurementabs(element.attribute("float.gap").value()));
+        this->SetFloatGap(StrToMeasurementunsigned(element.attribute("float.gap").value()));
         element.remove_attribute("float.gap");
         hasAttribute = true;
     }
@@ -627,7 +609,7 @@ bool AttFTremVis::WriteFTremVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasFloatGap()) {
-        element.append_attribute("float.gap") = MeasurementabsToStr(this->GetFloatGap()).c_str();
+        element.append_attribute("float.gap") = MeasurementunsignedToStr(this->GetFloatGap()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -659,9 +641,7 @@ AttFermataVis::AttFermataVis() : Att()
     ResetFermataVis();
 }
 
-AttFermataVis::~AttFermataVis()
-{
-}
+AttFermataVis::~AttFermataVis() {}
 
 void AttFermataVis::ResetFermataVis()
 {
@@ -720,9 +700,7 @@ AttFingGrpVis::AttFingGrpVis() : Att()
     ResetFingGrpVis();
 }
 
-AttFingGrpVis::~AttFingGrpVis()
-{
-}
+AttFingGrpVis::~AttFingGrpVis() {}
 
 void AttFingGrpVis::ResetFingGrpVis()
 {
@@ -766,21 +744,37 @@ AttHairpinVis::AttHairpinVis() : Att()
     ResetHairpinVis();
 }
 
-AttHairpinVis::~AttHairpinVis()
-{
-}
+AttHairpinVis::~AttHairpinVis() {}
 
 void AttHairpinVis::ResetHairpinVis()
 {
     m_opening = VRV_UNSET;
+    m_closed = BOOLEAN_NONE;
+    m_openingVertical = BOOLEAN_NONE;
+    m_angleOptimize = BOOLEAN_NONE;
 }
 
 bool AttHairpinVis::ReadHairpinVis(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("opening")) {
-        this->SetOpening(StrToMeasurementabs(element.attribute("opening").value()));
+        this->SetOpening(StrToMeasurementunsigned(element.attribute("opening").value()));
         element.remove_attribute("opening");
+        hasAttribute = true;
+    }
+    if (element.attribute("closed")) {
+        this->SetClosed(StrToBoolean(element.attribute("closed").value()));
+        element.remove_attribute("closed");
+        hasAttribute = true;
+    }
+    if (element.attribute("opening.vertical")) {
+        this->SetOpeningVertical(StrToBoolean(element.attribute("opening.vertical").value()));
+        element.remove_attribute("opening.vertical");
+        hasAttribute = true;
+    }
+    if (element.attribute("angle.optimize")) {
+        this->SetAngleOptimize(StrToBoolean(element.attribute("angle.optimize").value()));
+        element.remove_attribute("angle.optimize");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -790,7 +784,19 @@ bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOpening()) {
-        element.append_attribute("opening") = MeasurementabsToStr(this->GetOpening()).c_str();
+        element.append_attribute("opening") = MeasurementunsignedToStr(this->GetOpening()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasClosed()) {
+        element.append_attribute("closed") = BooleanToStr(this->GetClosed()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasOpeningVertical()) {
+        element.append_attribute("opening.vertical") = BooleanToStr(this->GetOpeningVertical()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasAngleOptimize()) {
+        element.append_attribute("angle.optimize") = BooleanToStr(this->GetAngleOptimize()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -801,7 +807,22 @@ bool AttHairpinVis::HasOpening() const
     return (m_opening != VRV_UNSET);
 }
 
-/* include <attopening> */
+bool AttHairpinVis::HasClosed() const
+{
+    return (m_closed != BOOLEAN_NONE);
+}
+
+bool AttHairpinVis::HasOpeningVertical() const
+{
+    return (m_openingVertical != BOOLEAN_NONE);
+}
+
+bool AttHairpinVis::HasAngleOptimize() const
+{
+    return (m_angleOptimize != BOOLEAN_NONE);
+}
+
+/* include <attangle.optimize> */
 
 //----------------------------------------------------------------------------
 // AttHarmVis
@@ -812,9 +833,7 @@ AttHarmVis::AttHarmVis() : Att()
     ResetHarmVis();
 }
 
-AttHarmVis::~AttHarmVis()
-{
-}
+AttHarmVis::~AttHarmVis() {}
 
 void AttHarmVis::ResetHarmVis()
 {
@@ -858,9 +877,7 @@ AttHispanTickVis::AttHispanTickVis() : Att()
     ResetHispanTickVis();
 }
 
-AttHispanTickVis::~AttHispanTickVis()
-{
-}
+AttHispanTickVis::~AttHispanTickVis() {}
 
 void AttHispanTickVis::ResetHispanTickVis()
 {
@@ -919,9 +936,7 @@ AttKeySigVis::AttKeySigVis() : Att()
     ResetKeySigVis();
 }
 
-AttKeySigVis::~AttKeySigVis()
-{
-}
+AttKeySigVis::~AttKeySigVis() {}
 
 void AttKeySigVis::ResetKeySigVis()
 {
@@ -965,9 +980,7 @@ AttKeySigDefaultVis::AttKeySigDefaultVis() : Att()
     ResetKeySigDefaultVis();
 }
 
-AttKeySigDefaultVis::~AttKeySigDefaultVis()
-{
-}
+AttKeySigDefaultVis::~AttKeySigDefaultVis() {}
 
 void AttKeySigDefaultVis::ResetKeySigDefaultVis()
 {
@@ -1026,9 +1039,7 @@ AttLigatureVis::AttLigatureVis() : Att()
     ResetLigatureVis();
 }
 
-AttLigatureVis::~AttLigatureVis()
-{
-}
+AttLigatureVis::~AttLigatureVis() {}
 
 void AttLigatureVis::ResetLigatureVis()
 {
@@ -1072,9 +1083,7 @@ AttLineVis::AttLineVis() : Att()
     ResetLineVis();
 }
 
-AttLineVis::~AttLineVis()
-{
-}
+AttLineVis::~AttLineVis() {}
 
 void AttLineVis::ResetLineVis()
 {
@@ -1193,9 +1202,7 @@ AttLiquescentVis::AttLiquescentVis() : Att()
     ResetLiquescentVis();
 }
 
-AttLiquescentVis::~AttLiquescentVis()
-{
-}
+AttLiquescentVis::~AttLiquescentVis() {}
 
 void AttLiquescentVis::ResetLiquescentVis()
 {
@@ -1254,9 +1261,7 @@ AttMensurVis::AttMensurVis() : Att()
     ResetMensurVis();
 }
 
-AttMensurVis::~AttMensurVis()
-{
-}
+AttMensurVis::~AttMensurVis() {}
 
 void AttMensurVis::ResetMensurVis()
 {
@@ -1345,9 +1350,7 @@ AttMensuralVis::AttMensuralVis() : Att()
     ResetMensuralVis();
 }
 
-AttMensuralVis::~AttMensuralVis()
-{
-}
+AttMensuralVis::~AttMensuralVis() {}
 
 void AttMensuralVis::ResetMensuralVis()
 {
@@ -1496,9 +1499,7 @@ AttMeterSigVis::AttMeterSigVis() : Att()
     ResetMeterSigVis();
 }
 
-AttMeterSigVis::~AttMeterSigVis()
-{
-}
+AttMeterSigVis::~AttMeterSigVis() {}
 
 void AttMeterSigVis::ResetMeterSigVis()
 {
@@ -1542,9 +1543,7 @@ AttMeterSigDefaultVis::AttMeterSigDefaultVis() : Att()
     ResetMeterSigDefaultVis();
 }
 
-AttMeterSigDefaultVis::~AttMeterSigDefaultVis()
-{
-}
+AttMeterSigDefaultVis::~AttMeterSigDefaultVis() {}
 
 void AttMeterSigDefaultVis::ResetMeterSigDefaultVis()
 {
@@ -1603,9 +1602,7 @@ AttMultiRestVis::AttMultiRestVis() : Att()
     ResetMultiRestVis();
 }
 
-AttMultiRestVis::~AttMultiRestVis()
-{
-}
+AttMultiRestVis::~AttMultiRestVis() {}
 
 void AttMultiRestVis::ResetMultiRestVis()
 {
@@ -1649,9 +1646,7 @@ AttPbVis::AttPbVis() : Att()
     ResetPbVis();
 }
 
-AttPbVis::~AttPbVis()
-{
-}
+AttPbVis::~AttPbVis() {}
 
 void AttPbVis::ResetPbVis()
 {
@@ -1695,20 +1690,18 @@ AttPedalVis::AttPedalVis() : Att()
     ResetPedalVis();
 }
 
-AttPedalVis::~AttPedalVis()
-{
-}
+AttPedalVis::~AttPedalVis() {}
 
 void AttPedalVis::ResetPedalVis()
 {
-    m_form = pedalVis_FORM_NONE;
+    m_form = PEDALSTYLE_NONE;
 }
 
 bool AttPedalVis::ReadPedalVis(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("form")) {
-        this->SetForm(StrToPedalVisForm(element.attribute("form").value()));
+        this->SetForm(StrToPedalstyle(element.attribute("form").value()));
         element.remove_attribute("form");
         hasAttribute = true;
     }
@@ -1719,7 +1712,7 @@ bool AttPedalVis::WritePedalVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasForm()) {
-        element.append_attribute("form") = PedalVisFormToStr(this->GetForm()).c_str();
+        element.append_attribute("form") = PedalstyleToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1727,10 +1720,69 @@ bool AttPedalVis::WritePedalVis(pugi::xml_node element)
 
 bool AttPedalVis::HasForm() const
 {
-    return (m_form != pedalVis_FORM_NONE);
+    return (m_form != PEDALSTYLE_NONE);
 }
 
 /* include <attform> */
+
+//----------------------------------------------------------------------------
+// AttPlicaVis
+//----------------------------------------------------------------------------
+
+AttPlicaVis::AttPlicaVis() : Att()
+{
+    ResetPlicaVis();
+}
+
+AttPlicaVis::~AttPlicaVis() {}
+
+void AttPlicaVis::ResetPlicaVis()
+{
+    m_dir = STEMDIRECTION_basic_NONE;
+    m_len = VRV_UNSET;
+}
+
+bool AttPlicaVis::ReadPlicaVis(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("dir")) {
+        this->SetDir(StrToStemdirectionBasic(element.attribute("dir").value()));
+        element.remove_attribute("dir");
+        hasAttribute = true;
+    }
+    if (element.attribute("len")) {
+        this->SetLen(StrToMeasurementunsigned(element.attribute("len").value()));
+        element.remove_attribute("len");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttPlicaVis::WritePlicaVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasDir()) {
+        element.append_attribute("dir") = StemdirectionBasicToStr(this->GetDir()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLen()) {
+        element.append_attribute("len") = MeasurementunsignedToStr(this->GetLen()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttPlicaVis::HasDir() const
+{
+    return (m_dir != STEMDIRECTION_basic_NONE);
+}
+
+bool AttPlicaVis::HasLen() const
+{
+    return (m_len != VRV_UNSET);
+}
+
+/* include <attlen> */
 
 //----------------------------------------------------------------------------
 // AttQuilismaVis
@@ -1741,9 +1793,7 @@ AttQuilismaVis::AttQuilismaVis() : Att()
     ResetQuilismaVis();
 }
 
-AttQuilismaVis::~AttQuilismaVis()
-{
-}
+AttQuilismaVis::~AttQuilismaVis() {}
 
 void AttQuilismaVis::ResetQuilismaVis()
 {
@@ -1787,9 +1837,7 @@ AttSbVis::AttSbVis() : Att()
     ResetSbVis();
 }
 
-AttSbVis::~AttSbVis()
-{
-}
+AttSbVis::~AttSbVis() {}
 
 void AttSbVis::ResetSbVis()
 {
@@ -1833,9 +1881,7 @@ AttScoreDefVis::AttScoreDefVis() : Att()
     ResetScoreDefVis();
 }
 
-AttScoreDefVis::~AttScoreDefVis()
-{
-}
+AttScoreDefVis::~AttScoreDefVis() {}
 
 void AttScoreDefVis::ResetScoreDefVis()
 {
@@ -1879,9 +1925,7 @@ AttSectionVis::AttSectionVis() : Att()
     ResetSectionVis();
 }
 
-AttSectionVis::~AttSectionVis()
-{
-}
+AttSectionVis::~AttSectionVis() {}
 
 void AttSectionVis::ResetSectionVis()
 {
@@ -1925,9 +1969,7 @@ AttSignifLetVis::AttSignifLetVis() : Att()
     ResetSignifLetVis();
 }
 
-AttSignifLetVis::~AttSignifLetVis()
-{
-}
+AttSignifLetVis::~AttSignifLetVis() {}
 
 void AttSignifLetVis::ResetSignifLetVis()
 {
@@ -1971,9 +2013,7 @@ AttSpaceVis::AttSpaceVis() : Att()
     ResetSpaceVis();
 }
 
-AttSpaceVis::~AttSpaceVis()
-{
-}
+AttSpaceVis::~AttSpaceVis() {}
 
 void AttSpaceVis::ResetSpaceVis()
 {
@@ -2017,9 +2057,7 @@ AttStaffDefVis::AttStaffDefVis() : Att()
     ResetStaffDefVis();
 }
 
-AttStaffDefVis::~AttStaffDefVis()
-{
-}
+AttStaffDefVis::~AttStaffDefVis() {}
 
 void AttStaffDefVis::ResetStaffDefVis()
 {
@@ -2054,7 +2092,7 @@ bool AttStaffDefVis::ReadStaffDefVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("spacing")) {
-        this->SetSpacing(StrToMeasurementrel(element.attribute("spacing").value()));
+        this->SetSpacing(StrToMeasurementsigned(element.attribute("spacing").value()));
         element.remove_attribute("spacing");
         hasAttribute = true;
     }
@@ -2081,7 +2119,7 @@ bool AttStaffDefVis::WriteStaffDefVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasSpacing()) {
-        element.append_attribute("spacing") = MeasurementrelToStr(this->GetSpacing()).c_str();
+        element.append_attribute("spacing") = MeasurementsignedToStr(this->GetSpacing()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2123,9 +2161,7 @@ AttStaffGrpVis::AttStaffGrpVis() : Att()
     ResetStaffGrpVis();
 }
 
-AttStaffGrpVis::~AttStaffGrpVis()
-{
-}
+AttStaffGrpVis::~AttStaffGrpVis() {}
 
 void AttStaffGrpVis::ResetStaffGrpVis()
 {
@@ -2161,6 +2197,125 @@ bool AttStaffGrpVis::HasBarThru() const
 /* include <attbar.thru> */
 
 //----------------------------------------------------------------------------
+// AttStemVis
+//----------------------------------------------------------------------------
+
+AttStemVis::AttStemVis() : Att()
+{
+    ResetStemVis();
+}
+
+AttStemVis::~AttStemVis() {}
+
+void AttStemVis::ResetStemVis()
+{
+    m_pos = STEMPOSITION_NONE;
+    m_len = VRV_UNSET;
+    m_form = STEMFORM_mensural_NONE;
+    m_dir = STEMDIRECTION_NONE;
+    m_flagPos = FLAGPOS_mensural_NONE;
+    m_flagForm = FLAGFORM_mensural_NONE;
+}
+
+bool AttStemVis::ReadStemVis(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("pos")) {
+        this->SetPos(StrToStemposition(element.attribute("pos").value()));
+        element.remove_attribute("pos");
+        hasAttribute = true;
+    }
+    if (element.attribute("len")) {
+        this->SetLen(StrToMeasurementunsigned(element.attribute("len").value()));
+        element.remove_attribute("len");
+        hasAttribute = true;
+    }
+    if (element.attribute("form")) {
+        this->SetForm(StrToStemformMensural(element.attribute("form").value()));
+        element.remove_attribute("form");
+        hasAttribute = true;
+    }
+    if (element.attribute("dir")) {
+        this->SetDir(StrToStemdirection(element.attribute("dir").value()));
+        element.remove_attribute("dir");
+        hasAttribute = true;
+    }
+    if (element.attribute("flag.pos")) {
+        this->SetFlagPos(StrToFlagposMensural(element.attribute("flag.pos").value()));
+        element.remove_attribute("flag.pos");
+        hasAttribute = true;
+    }
+    if (element.attribute("flag.form")) {
+        this->SetFlagForm(StrToFlagformMensural(element.attribute("flag.form").value()));
+        element.remove_attribute("flag.form");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttStemVis::WriteStemVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasPos()) {
+        element.append_attribute("pos") = StempositionToStr(this->GetPos()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLen()) {
+        element.append_attribute("len") = MeasurementunsignedToStr(this->GetLen()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasForm()) {
+        element.append_attribute("form") = StemformMensuralToStr(this->GetForm()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasDir()) {
+        element.append_attribute("dir") = StemdirectionToStr(this->GetDir()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasFlagPos()) {
+        element.append_attribute("flag.pos") = FlagposMensuralToStr(this->GetFlagPos()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasFlagForm()) {
+        element.append_attribute("flag.form") = FlagformMensuralToStr(this->GetFlagForm()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttStemVis::HasPos() const
+{
+    return (m_pos != STEMPOSITION_NONE);
+}
+
+bool AttStemVis::HasLen() const
+{
+    return (m_len != VRV_UNSET);
+}
+
+bool AttStemVis::HasForm() const
+{
+    return (m_form != STEMFORM_mensural_NONE);
+}
+
+bool AttStemVis::HasDir() const
+{
+    return (m_dir != STEMDIRECTION_NONE);
+}
+
+bool AttStemVis::HasFlagPos() const
+{
+    return (m_flagPos != FLAGPOS_mensural_NONE);
+}
+
+bool AttStemVis::HasFlagForm() const
+{
+    return (m_flagForm != FLAGFORM_mensural_NONE);
+}
+
+/* include <attflag.form> */
+
+//----------------------------------------------------------------------------
 // AttTupletVis
 //----------------------------------------------------------------------------
 
@@ -2169,9 +2324,7 @@ AttTupletVis::AttTupletVis() : Att()
     ResetTupletVis();
 }
 
-AttTupletVis::~AttTupletVis()
-{
-}
+AttTupletVis::~AttTupletVis() {}
 
 void AttTupletVis::ResetTupletVis()
 {
@@ -2377,7 +2530,7 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
             return true;
         }
         if (attrType == "float.gap") {
-            att->SetFloatGap(att->StrToMeasurementabs(attrValue));
+            att->SetFloatGap(att->StrToMeasurementunsigned(attrValue));
             return true;
         }
     }
@@ -2405,7 +2558,19 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
         AttHairpinVis *att = dynamic_cast<AttHairpinVis *>(element);
         assert(att);
         if (attrType == "opening") {
-            att->SetOpening(att->StrToMeasurementabs(attrValue));
+            att->SetOpening(att->StrToMeasurementunsigned(attrValue));
+            return true;
+        }
+        if (attrType == "closed") {
+            att->SetClosed(att->StrToBoolean(attrValue));
+            return true;
+        }
+        if (attrType == "opening.vertical") {
+            att->SetOpeningVertical(att->StrToBoolean(attrValue));
+            return true;
+        }
+        if (attrType == "angle.optimize") {
+            att->SetAngleOptimize(att->StrToBoolean(attrValue));
             return true;
         }
     }
@@ -2593,7 +2758,19 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
         AttPedalVis *att = dynamic_cast<AttPedalVis *>(element);
         assert(att);
         if (attrType == "form") {
-            att->SetForm(att->StrToPedalVisForm(attrValue));
+            att->SetForm(att->StrToPedalstyle(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_PLICAVIS)) {
+        AttPlicaVis *att = dynamic_cast<AttPlicaVis *>(element);
+        assert(att);
+        if (attrType == "dir") {
+            att->SetDir(att->StrToStemdirectionBasic(attrValue));
+            return true;
+        }
+        if (attrType == "len") {
+            att->SetLen(att->StrToMeasurementunsigned(attrValue));
             return true;
         }
     }
@@ -2665,7 +2842,7 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
             return true;
         }
         if (attrType == "spacing") {
-            att->SetSpacing(att->StrToMeasurementrel(attrValue));
+            att->SetSpacing(att->StrToMeasurementsigned(attrValue));
             return true;
         }
     }
@@ -2674,6 +2851,34 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
         assert(att);
         if (attrType == "bar.thru") {
             att->SetBarThru(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_STEMVIS)) {
+        AttStemVis *att = dynamic_cast<AttStemVis *>(element);
+        assert(att);
+        if (attrType == "pos") {
+            att->SetPos(att->StrToStemposition(attrValue));
+            return true;
+        }
+        if (attrType == "len") {
+            att->SetLen(att->StrToMeasurementunsigned(attrValue));
+            return true;
+        }
+        if (attrType == "form") {
+            att->SetForm(att->StrToStemformMensural(attrValue));
+            return true;
+        }
+        if (attrType == "dir") {
+            att->SetDir(att->StrToStemdirection(attrValue));
+            return true;
+        }
+        if (attrType == "flag.pos") {
+            att->SetFlagPos(att->StrToFlagposMensural(attrValue));
+            return true;
+        }
+        if (attrType == "flag.form") {
+            att->SetFlagForm(att->StrToFlagformMensural(attrValue));
             return true;
         }
     }
@@ -2805,7 +3010,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "beams.float", att->IntToStr(att->GetBeamsFloat()) });
         }
         if (att->HasFloatGap()) {
-            attributes->push_back({ "float.gap", att->MeasurementabsToStr(att->GetFloatGap()) });
+            attributes->push_back({ "float.gap", att->MeasurementunsignedToStr(att->GetFloatGap()) });
         }
     }
     if (element->HasAttClass(ATT_FERMATAVIS)) {
@@ -2829,7 +3034,16 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         const AttHairpinVis *att = dynamic_cast<const AttHairpinVis *>(element);
         assert(att);
         if (att->HasOpening()) {
-            attributes->push_back({ "opening", att->MeasurementabsToStr(att->GetOpening()) });
+            attributes->push_back({ "opening", att->MeasurementunsignedToStr(att->GetOpening()) });
+        }
+        if (att->HasClosed()) {
+            attributes->push_back({ "closed", att->BooleanToStr(att->GetClosed()) });
+        }
+        if (att->HasOpeningVertical()) {
+            attributes->push_back({ "opening.vertical", att->BooleanToStr(att->GetOpeningVertical()) });
+        }
+        if (att->HasAngleOptimize()) {
+            attributes->push_back({ "angle.optimize", att->BooleanToStr(att->GetAngleOptimize()) });
         }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {
@@ -2984,7 +3198,17 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         const AttPedalVis *att = dynamic_cast<const AttPedalVis *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back({ "form", att->PedalVisFormToStr(att->GetForm()) });
+            attributes->push_back({ "form", att->PedalstyleToStr(att->GetForm()) });
+        }
+    }
+    if (element->HasAttClass(ATT_PLICAVIS)) {
+        const AttPlicaVis *att = dynamic_cast<const AttPlicaVis *>(element);
+        assert(att);
+        if (att->HasDir()) {
+            attributes->push_back({ "dir", att->StemdirectionBasicToStr(att->GetDir()) });
+        }
+        if (att->HasLen()) {
+            attributes->push_back({ "len", att->MeasurementunsignedToStr(att->GetLen()) });
         }
     }
     if (element->HasAttClass(ATT_QUILISMAVIS)) {
@@ -3045,7 +3269,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "lines.visible", att->BooleanToStr(att->GetLinesVisible()) });
         }
         if (att->HasSpacing()) {
-            attributes->push_back({ "spacing", att->MeasurementrelToStr(att->GetSpacing()) });
+            attributes->push_back({ "spacing", att->MeasurementsignedToStr(att->GetSpacing()) });
         }
     }
     if (element->HasAttClass(ATT_STAFFGRPVIS)) {
@@ -3053,6 +3277,28 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasBarThru()) {
             attributes->push_back({ "bar.thru", att->BooleanToStr(att->GetBarThru()) });
+        }
+    }
+    if (element->HasAttClass(ATT_STEMVIS)) {
+        const AttStemVis *att = dynamic_cast<const AttStemVis *>(element);
+        assert(att);
+        if (att->HasPos()) {
+            attributes->push_back({ "pos", att->StempositionToStr(att->GetPos()) });
+        }
+        if (att->HasLen()) {
+            attributes->push_back({ "len", att->MeasurementunsignedToStr(att->GetLen()) });
+        }
+        if (att->HasForm()) {
+            attributes->push_back({ "form", att->StemformMensuralToStr(att->GetForm()) });
+        }
+        if (att->HasDir()) {
+            attributes->push_back({ "dir", att->StemdirectionToStr(att->GetDir()) });
+        }
+        if (att->HasFlagPos()) {
+            attributes->push_back({ "flag.pos", att->FlagposMensuralToStr(att->GetFlagPos()) });
+        }
+        if (att->HasFlagForm()) {
+            attributes->push_back({ "flag.form", att->FlagformMensuralToStr(att->GetFlagForm()) });
         }
     }
     if (element->HasAttClass(ATT_TUPLETVIS)) {

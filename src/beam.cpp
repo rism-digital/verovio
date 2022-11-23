@@ -104,7 +104,7 @@ void BeamSegment::CalcBeam(const Layer *layer, Staff *staff, const Doc *doc, Bea
         int glyphSize = staff->GetDrawingStaffNotationSize();
         beamInterface->m_fractionSize = glyphSize * 2 / 3;
 
-        // Alwyas horizontal when outside the staff and not when inside the staff
+        // Always horizontal when outside the staff and not when inside the staff
         // Eventually we will need to look at the content to pre-determine if horizontal for inside beams
         horizontal = staff->IsTabWithStemsOutside();
         this->CalcBeamPlaceTab(layer, staff, doc, beamInterface, place);
@@ -1010,7 +1010,7 @@ void BeamSegment::CalcAdjustSlope(const Staff *staff, const Doc *doc, BeamDrawin
             }
         }
     }
-    // We need to legthen the stems
+    // We need to lengthen the stems
     if (lengthen) {
         // First if the slope step is 4 units (or more?) reduce it to 2 units and try again (recursive call)
         if (step >= 4 * unit) {
@@ -1404,7 +1404,7 @@ void BeamSegment::CalcMixedBeamPlace(const Staff *staff)
 
 void BeamSegment::CalcPartialFlagPlace()
 {
-    // Start from note that is shorter than DUR_8 - we do not care otherwise, since those do not have addiitonal beams
+    // Start from note that is shorter than DUR_8 - we do not care otherwise, since those do not have additional beams
     auto start = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
         [](BeamElementCoord *coord) { return coord->m_dur >= DUR_16; });
     if (m_beamElementCoordRefs.end() == start) return;
@@ -1507,7 +1507,7 @@ void BeamSegment::UpdateSameasRoles(data_BEAMPLACE place)
 {
     if (!m_stemSameasReverseRole || !this->StemSameasIsUnset()) return;
 
-    // Because m_stemSameasReverseRole is instanciated, then it means we are in
+    // Because m_stemSameasReverseRole is instantiated, then it means we are in
     // the first of the beams sharing the stems.
     // The beam is placed above, this one is primary, the other secondary.
     if (place == BEAMPLACE_above) {
@@ -1531,7 +1531,7 @@ void BeamSegment::CalcNoteHeadShiftForStemSameas(Beam *sameasBeam, data_BEAMPLAC
     const ArrayOfBeamElementCoords *sameasCoords = &sameasBeam->m_beamSegment.m_beamElementCoordRefs;
     data_STEMDIRECTION stemDir = (place == BEAMPLACE_above) ? STEMDIRECTION_up : STEMDIRECTION_down;
 
-    // Loop throught both list of elements and calculate the note head shift
+    // Loop through both list of elements and calculate the note head shift
     const int sameasSize = (int)sameasCoords->size();
     for (int i = 0; i < int(m_beamElementCoordRefs.size()) && i < sameasSize; ++i) {
         if (!m_beamElementCoordRefs.at(i)->m_element || !sameasCoords->at(i)->m_element) continue;
@@ -1787,7 +1787,7 @@ void BeamSpanSegment::AppendSpanningCoordinates(const Measure *measure)
             offset = (back->m_x - front->m_x) / divideBy;
         }
         else {
-            // 1.5 * unit offset in this case (harcoded for the time being)
+            // 1.5 * unit offset in this case (hardcoded for the time being)
             offset = 270;
         }
         left->m_x -= offset;
@@ -1804,7 +1804,7 @@ BeamElementCoord::~BeamElementCoord() {}
 
 data_STEMDIRECTION BeamElementCoord::GetStemDir() const
 {
-    // m_stem is not necssary set, so we need to look at the Note / Chord original value
+    // m_stem is not necessary set, so we need to look at the Note / Chord original value
     // Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first note of the beam
     if (m_stem) {
         return m_stem->GetDir();
@@ -2105,9 +2105,10 @@ int Beam::AdjustBeams(FunctorParams *functorParams)
         }
         else {
             params->m_beam = this;
-            params->m_y1 = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam;
+            params->m_y1 = m_beamSegment.m_beamElementCoordRefs.front()->m_yBeam;
             params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
             params->m_x1 = m_beamSegment.m_beamElementCoordRefs.front()->m_x;
+            params->m_x2 = m_beamSegment.m_beamElementCoordRefs.back()->m_x;
             params->m_beamSlope = m_beamSegment.m_beamSlope;
             params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
             params->m_overlapMargin

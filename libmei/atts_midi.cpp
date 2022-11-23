@@ -35,9 +35,7 @@ AttChannelized::AttChannelized() : Att()
     ResetChannelized();
 }
 
-AttChannelized::~AttChannelized()
-{
-}
+AttChannelized::~AttChannelized() {}
 
 void AttChannelized::ResetChannelized()
 {
@@ -126,9 +124,7 @@ AttInstrumentIdent::AttInstrumentIdent() : Att()
     ResetInstrumentIdent();
 }
 
-AttInstrumentIdent::~AttInstrumentIdent()
-{
-}
+AttInstrumentIdent::~AttInstrumentIdent() {}
 
 void AttInstrumentIdent::ResetInstrumentIdent()
 {
@@ -172,9 +168,7 @@ AttMidiInstrument::AttMidiInstrument() : Att()
     ResetMidiInstrument();
 }
 
-AttMidiInstrument::~AttMidiInstrument()
-{
-}
+AttMidiInstrument::~AttMidiInstrument() {}
 
 void AttMidiInstrument::ResetMidiInstrument()
 {
@@ -293,20 +287,18 @@ AttMidiNumber::AttMidiNumber() : Att()
     ResetMidiNumber();
 }
 
-AttMidiNumber::~AttMidiNumber()
-{
-}
+AttMidiNumber::~AttMidiNumber() {}
 
 void AttMidiNumber::ResetMidiNumber()
 {
-    m_num = VRV_UNSET;
+    m_num = -1;
 }
 
 bool AttMidiNumber::ReadMidiNumber(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("num")) {
-        this->SetNum(StrToInt(element.attribute("num").value()));
+        this->SetNum(StrToMidivalue(element.attribute("num").value()));
         element.remove_attribute("num");
         hasAttribute = true;
     }
@@ -317,7 +309,7 @@ bool AttMidiNumber::WriteMidiNumber(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasNum()) {
-        element.append_attribute("num") = IntToStr(this->GetNum()).c_str();
+        element.append_attribute("num") = MidivalueToStr(this->GetNum()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -325,7 +317,7 @@ bool AttMidiNumber::WriteMidiNumber(pugi::xml_node element)
 
 bool AttMidiNumber::HasNum() const
 {
-    return (m_num != VRV_UNSET);
+    return (m_num != -1);
 }
 
 /* include <attnum> */
@@ -339,9 +331,7 @@ AttMidiTempo::AttMidiTempo() : Att()
     ResetMidiTempo();
 }
 
-AttMidiTempo::~AttMidiTempo()
-{
-}
+AttMidiTempo::~AttMidiTempo() {}
 
 void AttMidiTempo::ResetMidiTempo()
 {
@@ -400,9 +390,7 @@ AttMidiValue::AttMidiValue() : Att()
     ResetMidiValue();
 }
 
-AttMidiValue::~AttMidiValue()
-{
-}
+AttMidiValue::~AttMidiValue() {}
 
 void AttMidiValue::ResetMidiValue()
 {
@@ -446,9 +434,7 @@ AttMidiValue2::AttMidiValue2() : Att()
     ResetMidiValue2();
 }
 
-AttMidiValue2::~AttMidiValue2()
-{
-}
+AttMidiValue2::~AttMidiValue2() {}
 
 void AttMidiValue2::ResetMidiValue2()
 {
@@ -492,9 +478,7 @@ AttMidiVelocity::AttMidiVelocity() : Att()
     ResetMidiVelocity();
 }
 
-AttMidiVelocity::~AttMidiVelocity()
-{
-}
+AttMidiVelocity::~AttMidiVelocity() {}
 
 void AttMidiVelocity::ResetMidiVelocity()
 {
@@ -538,9 +522,7 @@ AttTimeBase::AttTimeBase() : Att()
     ResetTimeBase();
 }
 
-AttTimeBase::~AttTimeBase()
-{
-}
+AttTimeBase::~AttTimeBase() {}
 
 void AttTimeBase::ResetTimeBase()
 {
@@ -637,7 +619,7 @@ bool Att::SetMidi(Object *element, const std::string &attrType, const std::strin
         AttMidiNumber *att = dynamic_cast<AttMidiNumber *>(element);
         assert(att);
         if (attrType == "num") {
-            att->SetNum(att->StrToInt(attrValue));
+            att->SetNum(att->StrToMidivalue(attrValue));
             return true;
         }
     }
@@ -740,7 +722,7 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
         const AttMidiNumber *att = dynamic_cast<const AttMidiNumber *>(element);
         assert(att);
         if (att->HasNum()) {
-            attributes->push_back({ "num", att->IntToStr(att->GetNum()) });
+            attributes->push_back({ "num", att->MidivalueToStr(att->GetNum()) });
         }
     }
     if (element->HasAttClass(ATT_MIDITEMPO)) {

@@ -80,6 +80,7 @@
   <g c="E047" x="0.0" y="-348.0" w="486.0" h="696.0" h-a-x="486" n="segno" />
   <g c="E048" x="0.0" y="-316.0" w="464.0" h="632.0" h-a-x="464" n="coda" />
   <g c="E049" x="0.0" y="-316.0" w="464.0" h="632.0" h-a-x="464" n="codaSquare" />
+  <g c="E04A" x="-157.0" y="-302.0" w="314.0" h="1004.0" h-a-x="157" n="segnoSerpent1" />
   <g c="E050" x="0.0" y="-633.0" w="626.0" h="1713.0" h-a-x="626" n="gClef" />
   <g c="E051" x="0.0" y="-877.0" w="626.0" h="1957.0" h-a-x="626" n="gClef15mb" />
   <g c="E052" x="0.0" y="-877.0" w="626.0" h="1957.0" h-a-x="626" n="gClef8vb" />
@@ -313,6 +314,15 @@
     <a n="cutOutNW" x="0.26" y="0.63" />
     <a n="cutOutSE" x="1.05" y="-0.62" />
     <a n="cutOutSW" x="0.26" y="-0.96" />
+  </g>
+  <g c="E460" x="0.0" y="-411.0" w="254.0" h="511.0" h-a-x="254" n="accidentalKoron">
+    <a n="cutOutSE" x="0.26" y="-0.67" />
+  </g>
+  <g c="E461" x="0.0" y="-291.0" w="370.0" h="582.0" h-a-x="370" n="accidentalSori">
+    <a n="cutOutNE" x="1.19" y="0.39" />
+    <a n="cutOutNW" x="0.26" y="0.83" />
+    <a n="cutOutSE" x="1.19" y="-0.4" />
+    <a n="cutOutSW" x="0.26" y="-0.82" />
   </g>
   <g c="E4A0" x="0.0" y="0.0" w="442.0" h="254.0" h-a-x="442" n="articAccentAbove" />
   <g c="E4A1" x="0.0" y="-254.0" w="442.0" h="254.0" h-a-x="442" n="articAccentBelow" />

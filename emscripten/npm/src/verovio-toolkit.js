@@ -10,13 +10,11 @@ export class VerovioToolkit {
         }
         this.proxy = createEmscriptenProxy(this.VerovioModule);
         this.ptr = this.proxy.constructor();
-        console.debug("Creating toolkit instance");
         VerovioToolkit.instances.push(this);
     }
 
     destroy() {
         VerovioToolkit.instances.splice(VerovioToolkit.instances.findIndex(i => i.ptr === this.ptr), 1);
-        console.debug("Deleting toolkit instance");
         this.proxy.destructor(this.ptr);
     }
 
@@ -30,6 +28,10 @@ export class VerovioToolkit {
 
     getAvailableOptions() {
         return JSON.parse(this.proxy.getAvailableOptions(this.ptr));
+    }
+
+    getDefaultOptions() {
+        return JSON.parse(this.proxy.getDefaultOptions(this.ptr));
     }
 
     getDescriptiveFeatures(options) {
@@ -81,7 +83,17 @@ export class VerovioToolkit {
     }
 
     getOptions(defaultValues) {
-        return JSON.parse(this.proxy.getOptions(this.ptr, defaultValues));
+        if (defaultValues === true) {
+            console.warn( "This function (with 'true' parameter) is deprecated. Use getDefaultOptions() instead." );
+            return JSON.parse(this.proxy.getDefaultOptions(this.ptr));    
+        }
+        else if (defaultValues === false) {
+            console.warn( "This function (with 'false' parameter) is deprecated. Use getOptions() instead." );
+            return JSON.parse(this.proxy.getOptions(this.ptr));    
+        }
+        else {
+            return JSON.parse(this.proxy.getOptions(this.ptr));  
+        }
     }
 
     getPageCount() {
@@ -138,17 +150,7 @@ export class VerovioToolkit {
         return this.proxy.renderData(this.ptr, data, JSON.stringify(options));
     }
 
-    renderPage(pageNo, options) {
-        console.warn("Method renderPage is deprecated; use renderToSVG instead");
-        return this.proxy.renderToSVG(this.ptr, pageNo, JSON.stringify(options));
-    }
-
     renderToMIDI(options) {
-        return this.proxy.renderToMIDI(this.ptr, JSON.stringify(options));
-    }
-
-    renderToMidi(options) {
-        console.warn("Method renderToMidi is deprecated; use renderToMIDI instead");
         return this.proxy.renderToMIDI(this.ptr, JSON.stringify(options));
     }
 
@@ -177,7 +179,7 @@ export class VerovioToolkit {
     }
 
     setOptions(options) {
-        this.proxy.setOptions(this.ptr, JSON.stringify(options));
+        return this.proxy.setOptions(this.ptr, JSON.stringify(options));
     }
 
     validatePAE(data) {
@@ -189,7 +191,7 @@ export class VerovioToolkit {
 
 }
 
-// A pointer to the object - only one isnstance can be created for now
+// A pointer to the object - only one instance can be created for now
 VerovioToolkit.instances = [];
 
 

@@ -98,11 +98,17 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
     }
     // Elision
     else if (con == sylLog_CON_b) {
-        // Calculate the elision space with the current music font
-        int elisionSpace = doc->GetGlyphAdvX(SMUFL_E551_lyricsElision, staffSize, false);
-        // Adjust it proportionally to the lyric size
-        elisionSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
-        spacing = elisionSpace;
+        if (doc->GetOptions()->m_lyricElision.GetValue() == ELISION_unicode) {
+            // Equivalent spacing with 0x230F
+            spacing += doc->GetDrawingUnit(staffSize) * 2.2;
+        }
+        else {
+            // Calculate the elision space with the current music font
+            int elisionSpace = doc->GetGlyphAdvX(doc->GetOptions()->m_lyricElision.GetValue(), staffSize, false);
+            // Adjust it proportionally to the lyric size
+            elisionSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
+            spacing = elisionSpace;
+        }
     }
     // Spacing of words as set in the staff according to the staff and font sizes
     else {
@@ -258,7 +264,7 @@ bool Syl::CreateDefaultZone(Doc *doc)
     Object *surface = doc->GetFacsimile()->FindDescendantByType(SURFACE);
     assert(surface);
     surface->AddChild(zone);
-    this->SetZone(zone);
+    this->AttachZone(zone);
     return true;
 }
 

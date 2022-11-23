@@ -27,24 +27,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttAccidentalGestural
+// AttAccidentalGes
 //----------------------------------------------------------------------------
 
-AttAccidentalGestural::AttAccidentalGestural() : Att()
+AttAccidentalGes::AttAccidentalGes() : Att()
 {
-    ResetAccidentalGestural();
+    ResetAccidentalGes();
 }
 
-AttAccidentalGestural::~AttAccidentalGestural()
-{
-}
+AttAccidentalGes::~AttAccidentalGes() {}
 
-void AttAccidentalGestural::ResetAccidentalGestural()
+void AttAccidentalGes::ResetAccidentalGes()
 {
     m_accidGes = ACCIDENTAL_GESTURAL_NONE;
 }
 
-bool AttAccidentalGestural::ReadAccidentalGestural(pugi::xml_node element)
+bool AttAccidentalGes::ReadAccidentalGes(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("accid.ges")) {
@@ -55,7 +53,7 @@ bool AttAccidentalGestural::ReadAccidentalGestural(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttAccidentalGestural::WriteAccidentalGestural(pugi::xml_node element)
+bool AttAccidentalGes::WriteAccidentalGes(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasAccidGes()) {
@@ -65,7 +63,7 @@ bool AttAccidentalGestural::WriteAccidentalGestural(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttAccidentalGestural::HasAccidGes() const
+bool AttAccidentalGes::HasAccidGes() const
 {
     return (m_accidGes != ACCIDENTAL_GESTURAL_NONE);
 }
@@ -73,47 +71,45 @@ bool AttAccidentalGestural::HasAccidGes() const
 /* include <attaccid.ges> */
 
 //----------------------------------------------------------------------------
-// AttArticulationGestural
+// AttArticulationGes
 //----------------------------------------------------------------------------
 
-AttArticulationGestural::AttArticulationGestural() : Att()
+AttArticulationGes::AttArticulationGes() : Att()
 {
-    ResetArticulationGestural();
+    ResetArticulationGes();
 }
 
-AttArticulationGestural::~AttArticulationGestural()
+AttArticulationGes::~AttArticulationGes() {}
+
+void AttArticulationGes::ResetArticulationGes()
 {
+    m_articGes = ARTICULATION_NONE;
 }
 
-void AttArticulationGestural::ResetArticulationGestural()
-{
-    m_articGes = std::vector<data_ARTICULATION>();
-}
-
-bool AttArticulationGestural::ReadArticulationGestural(pugi::xml_node element)
+bool AttArticulationGes::ReadArticulationGes(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("artic.ges")) {
-        this->SetArticGes(StrToArticulationList(element.attribute("artic.ges").value()));
+        this->SetArticGes(StrToArticulation(element.attribute("artic.ges").value()));
         element.remove_attribute("artic.ges");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttArticulationGestural::WriteArticulationGestural(pugi::xml_node element)
+bool AttArticulationGes::WriteArticulationGes(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasArticGes()) {
-        element.append_attribute("artic.ges") = ArticulationListToStr(this->GetArticGes()).c_str();
+        element.append_attribute("artic.ges") = ArticulationToStr(this->GetArticGes()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttArticulationGestural::HasArticGes() const
+bool AttArticulationGes::HasArticGes() const
 {
-    return (m_articGes != std::vector<data_ARTICULATION>());
+    return (m_articGes != ARTICULATION_NONE);
 }
 
 /* include <attartic.ges> */
@@ -127,9 +123,7 @@ AttBendGes::AttBendGes() : Att()
     ResetBendGes();
 }
 
-AttBendGes::~AttBendGes()
-{
-}
+AttBendGes::~AttBendGes() {}
 
 void AttBendGes::ResetBendGes()
 {
@@ -165,19 +159,17 @@ bool AttBendGes::HasAmount() const
 /* include <attamount> */
 
 //----------------------------------------------------------------------------
-// AttDurationGestural
+// AttDurationGes
 //----------------------------------------------------------------------------
 
-AttDurationGestural::AttDurationGestural() : Att()
+AttDurationGes::AttDurationGes() : Att()
 {
-    ResetDurationGestural();
+    ResetDurationGes();
 }
 
-AttDurationGestural::~AttDurationGestural()
-{
-}
+AttDurationGes::~AttDurationGes() {}
 
-void AttDurationGestural::ResetDurationGestural()
+void AttDurationGes::ResetDurationGes()
 {
     m_durGes = DURATION_NONE;
     m_dotsGes = VRV_UNSET;
@@ -187,7 +179,7 @@ void AttDurationGestural::ResetDurationGestural()
     m_durRecip = "";
 }
 
-bool AttDurationGestural::ReadDurationGestural(pugi::xml_node element)
+bool AttDurationGes::ReadDurationGes(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("dur.ges")) {
@@ -223,7 +215,7 @@ bool AttDurationGestural::ReadDurationGestural(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttDurationGestural::WriteDurationGestural(pugi::xml_node element)
+bool AttDurationGes::WriteDurationGes(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasDurGes()) {
@@ -253,32 +245,32 @@ bool AttDurationGestural::WriteDurationGestural(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttDurationGestural::HasDurGes() const
+bool AttDurationGes::HasDurGes() const
 {
     return (m_durGes != DURATION_NONE);
 }
 
-bool AttDurationGestural::HasDotsGes() const
+bool AttDurationGes::HasDotsGes() const
 {
     return (m_dotsGes != VRV_UNSET);
 }
 
-bool AttDurationGestural::HasDurMetrical() const
+bool AttDurationGes::HasDurMetrical() const
 {
     return (m_durMetrical != 0.0);
 }
 
-bool AttDurationGestural::HasDurPpq() const
+bool AttDurationGes::HasDurPpq() const
 {
     return (m_durPpq != VRV_UNSET);
 }
 
-bool AttDurationGestural::HasDurReal() const
+bool AttDurationGes::HasDurReal() const
 {
     return (m_durReal != 0.0);
 }
 
-bool AttDurationGestural::HasDurRecip() const
+bool AttDurationGes::HasDurRecip() const
 {
     return (m_durRecip != "");
 }
@@ -294,9 +286,7 @@ AttMdivGes::AttMdivGes() : Att()
     ResetMdivGes();
 }
 
-AttMdivGes::~AttMdivGes()
-{
-}
+AttMdivGes::~AttMdivGes() {}
 
 void AttMdivGes::ResetMdivGes()
 {
@@ -340,9 +330,7 @@ AttNcGes::AttNcGes() : Att()
     ResetNcGes();
 }
 
-AttNcGes::~AttNcGes()
-{
-}
+AttNcGes::~AttNcGes() {}
 
 void AttNcGes::ResetNcGes()
 {
@@ -416,9 +404,7 @@ AttNoteGes::AttNoteGes() : Att()
     ResetNoteGes();
 }
 
-AttNoteGes::~AttNoteGes()
-{
-}
+AttNoteGes::~AttNoteGes() {}
 
 void AttNoteGes::ResetNoteGes()
 {
@@ -499,80 +485,63 @@ bool AttNoteGes::HasPnum() const
 /* include <attpnum> */
 
 //----------------------------------------------------------------------------
-// AttScoreDefGes
+// AttOrnamentAccidGes
 //----------------------------------------------------------------------------
 
-AttScoreDefGes::AttScoreDefGes() : Att()
+AttOrnamentAccidGes::AttOrnamentAccidGes() : Att()
 {
-    ResetScoreDefGes();
+    ResetOrnamentAccidGes();
 }
 
-AttScoreDefGes::~AttScoreDefGes()
+AttOrnamentAccidGes::~AttOrnamentAccidGes() {}
+
+void AttOrnamentAccidGes::ResetOrnamentAccidGes()
 {
+    m_accidupperGes = ACCIDENTAL_GESTURAL_NONE;
+    m_accidlowerGes = ACCIDENTAL_GESTURAL_NONE;
 }
 
-void AttScoreDefGes::ResetScoreDefGes()
-{
-    m_tunePname = PITCHNAME_NONE;
-    m_tuneHz = 0.0;
-    m_tuneTemper = TEMPERAMENT_NONE;
-}
-
-bool AttScoreDefGes::ReadScoreDefGes(pugi::xml_node element)
+bool AttOrnamentAccidGes::ReadOrnamentAccidGes(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("tune.pname")) {
-        this->SetTunePname(StrToPitchname(element.attribute("tune.pname").value()));
-        element.remove_attribute("tune.pname");
+    if (element.attribute("accidupper.ges")) {
+        this->SetAccidupperGes(StrToAccidentalGestural(element.attribute("accidupper.ges").value()));
+        element.remove_attribute("accidupper.ges");
         hasAttribute = true;
     }
-    if (element.attribute("tune.Hz")) {
-        this->SetTuneHz(StrToDbl(element.attribute("tune.Hz").value()));
-        element.remove_attribute("tune.Hz");
-        hasAttribute = true;
-    }
-    if (element.attribute("tune.temper")) {
-        this->SetTuneTemper(StrToTemperament(element.attribute("tune.temper").value()));
-        element.remove_attribute("tune.temper");
+    if (element.attribute("accidlower.ges")) {
+        this->SetAccidlowerGes(StrToAccidentalGestural(element.attribute("accidlower.ges").value()));
+        element.remove_attribute("accidlower.ges");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttScoreDefGes::WriteScoreDefGes(pugi::xml_node element)
+bool AttOrnamentAccidGes::WriteOrnamentAccidGes(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasTunePname()) {
-        element.append_attribute("tune.pname") = PitchnameToStr(this->GetTunePname()).c_str();
+    if (this->HasAccidupperGes()) {
+        element.append_attribute("accidupper.ges") = AccidentalGesturalToStr(this->GetAccidupperGes()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasTuneHz()) {
-        element.append_attribute("tune.Hz") = DblToStr(this->GetTuneHz()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasTuneTemper()) {
-        element.append_attribute("tune.temper") = TemperamentToStr(this->GetTuneTemper()).c_str();
+    if (this->HasAccidlowerGes()) {
+        element.append_attribute("accidlower.ges") = AccidentalGesturalToStr(this->GetAccidlowerGes()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttScoreDefGes::HasTunePname() const
+bool AttOrnamentAccidGes::HasAccidupperGes() const
 {
-    return (m_tunePname != PITCHNAME_NONE);
+    return (m_accidupperGes != ACCIDENTAL_GESTURAL_NONE);
 }
 
-bool AttScoreDefGes::HasTuneHz() const
+bool AttOrnamentAccidGes::HasAccidlowerGes() const
 {
-    return (m_tuneHz != 0.0);
+    return (m_accidlowerGes != ACCIDENTAL_GESTURAL_NONE);
 }
 
-bool AttScoreDefGes::HasTuneTemper() const
-{
-    return (m_tuneTemper != TEMPERAMENT_NONE);
-}
-
-/* include <atttune.temper> */
+/* include <attaccidlower.ges> */
 
 //----------------------------------------------------------------------------
 // AttSectionGes
@@ -583,9 +552,7 @@ AttSectionGes::AttSectionGes() : Att()
     ResetSectionGes();
 }
 
-AttSectionGes::~AttSectionGes()
-{
-}
+AttSectionGes::~AttSectionGes() {}
 
 void AttSectionGes::ResetSectionGes()
 {
@@ -629,9 +596,7 @@ AttSoundLocation::AttSoundLocation() : Att()
     ResetSoundLocation();
 }
 
-AttSoundLocation::~AttSoundLocation()
-{
-}
+AttSoundLocation::~AttSoundLocation() {}
 
 void AttSoundLocation::ResetSoundLocation()
 {
@@ -682,25 +647,23 @@ bool AttSoundLocation::HasElevation() const
 /* include <attelevation> */
 
 //----------------------------------------------------------------------------
-// AttTimestampGestural
+// AttTimestampGes
 //----------------------------------------------------------------------------
 
-AttTimestampGestural::AttTimestampGestural() : Att()
+AttTimestampGes::AttTimestampGes() : Att()
 {
-    ResetTimestampGestural();
+    ResetTimestampGes();
 }
 
-AttTimestampGestural::~AttTimestampGestural()
-{
-}
+AttTimestampGes::~AttTimestampGes() {}
 
-void AttTimestampGestural::ResetTimestampGestural()
+void AttTimestampGes::ResetTimestampGes()
 {
     m_tstampGes = 0.0;
     m_tstampReal = "";
 }
 
-bool AttTimestampGestural::ReadTimestampGestural(pugi::xml_node element)
+bool AttTimestampGes::ReadTimestampGes(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("tstamp.ges")) {
@@ -716,7 +679,7 @@ bool AttTimestampGestural::ReadTimestampGestural(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttTimestampGestural::WriteTimestampGestural(pugi::xml_node element)
+bool AttTimestampGes::WriteTimestampGes(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasTstampGes()) {
@@ -730,12 +693,12 @@ bool AttTimestampGestural::WriteTimestampGestural(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttTimestampGestural::HasTstampGes() const
+bool AttTimestampGes::HasTstampGes() const
 {
     return (m_tstampGes != 0.0);
 }
 
-bool AttTimestampGestural::HasTstampReal() const
+bool AttTimestampGes::HasTstampReal() const
 {
     return (m_tstampReal != "");
 }
@@ -743,25 +706,23 @@ bool AttTimestampGestural::HasTstampReal() const
 /* include <atttstamp.real> */
 
 //----------------------------------------------------------------------------
-// AttTimestamp2Gestural
+// AttTimestamp2Ges
 //----------------------------------------------------------------------------
 
-AttTimestamp2Gestural::AttTimestamp2Gestural() : Att()
+AttTimestamp2Ges::AttTimestamp2Ges() : Att()
 {
-    ResetTimestamp2Gestural();
+    ResetTimestamp2Ges();
 }
 
-AttTimestamp2Gestural::~AttTimestamp2Gestural()
-{
-}
+AttTimestamp2Ges::~AttTimestamp2Ges() {}
 
-void AttTimestamp2Gestural::ResetTimestamp2Gestural()
+void AttTimestamp2Ges::ResetTimestamp2Ges()
 {
     m_tstamp2Ges = std::make_pair(-1, -1.0);
     m_tstamp2Real = "";
 }
 
-bool AttTimestamp2Gestural::ReadTimestamp2Gestural(pugi::xml_node element)
+bool AttTimestamp2Ges::ReadTimestamp2Ges(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("tstamp2.ges")) {
@@ -777,7 +738,7 @@ bool AttTimestamp2Gestural::ReadTimestamp2Gestural(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttTimestamp2Gestural::WriteTimestamp2Gestural(pugi::xml_node element)
+bool AttTimestamp2Ges::WriteTimestamp2Ges(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasTstamp2Ges()) {
@@ -791,12 +752,12 @@ bool AttTimestamp2Gestural::WriteTimestamp2Gestural(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttTimestamp2Gestural::HasTstamp2Ges() const
+bool AttTimestamp2Ges::HasTstamp2Ges() const
 {
     return (m_tstamp2Ges != std::make_pair(-1, -1.0));
 }
 
-bool AttTimestamp2Gestural::HasTstamp2Real() const
+bool AttTimestamp2Ges::HasTstamp2Real() const
 {
     return (m_tstamp2Real != "");
 }
@@ -805,19 +766,19 @@ bool AttTimestamp2Gestural::HasTstamp2Real() const
 
 bool Att::SetGestural(Object *element, const std::string &attrType, const std::string &attrValue)
 {
-    if (element->HasAttClass(ATT_ACCIDENTALGESTURAL)) {
-        AttAccidentalGestural *att = dynamic_cast<AttAccidentalGestural *>(element);
+    if (element->HasAttClass(ATT_ACCIDENTALGES)) {
+        AttAccidentalGes *att = dynamic_cast<AttAccidentalGes *>(element);
         assert(att);
         if (attrType == "accid.ges") {
             att->SetAccidGes(att->StrToAccidentalGestural(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass(ATT_ARTICULATIONGESTURAL)) {
-        AttArticulationGestural *att = dynamic_cast<AttArticulationGestural *>(element);
+    if (element->HasAttClass(ATT_ARTICULATIONGES)) {
+        AttArticulationGes *att = dynamic_cast<AttArticulationGes *>(element);
         assert(att);
         if (attrType == "artic.ges") {
-            att->SetArticGes(att->StrToArticulationList(attrValue));
+            att->SetArticGes(att->StrToArticulation(attrValue));
             return true;
         }
     }
@@ -829,8 +790,8 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
             return true;
         }
     }
-    if (element->HasAttClass(ATT_DURATIONGESTURAL)) {
-        AttDurationGestural *att = dynamic_cast<AttDurationGestural *>(element);
+    if (element->HasAttClass(ATT_DURATIONGES)) {
+        AttDurationGes *att = dynamic_cast<AttDurationGes *>(element);
         assert(att);
         if (attrType == "dur.ges") {
             att->SetDurGes(att->StrToDuration(attrValue));
@@ -901,19 +862,15 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
             return true;
         }
     }
-    if (element->HasAttClass(ATT_SCOREDEFGES)) {
-        AttScoreDefGes *att = dynamic_cast<AttScoreDefGes *>(element);
+    if (element->HasAttClass(ATT_ORNAMENTACCIDGES)) {
+        AttOrnamentAccidGes *att = dynamic_cast<AttOrnamentAccidGes *>(element);
         assert(att);
-        if (attrType == "tune.pname") {
-            att->SetTunePname(att->StrToPitchname(attrValue));
+        if (attrType == "accidupper.ges") {
+            att->SetAccidupperGes(att->StrToAccidentalGestural(attrValue));
             return true;
         }
-        if (attrType == "tune.Hz") {
-            att->SetTuneHz(att->StrToDbl(attrValue));
-            return true;
-        }
-        if (attrType == "tune.temper") {
-            att->SetTuneTemper(att->StrToTemperament(attrValue));
+        if (attrType == "accidlower.ges") {
+            att->SetAccidlowerGes(att->StrToAccidentalGestural(attrValue));
             return true;
         }
     }
@@ -937,8 +894,8 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
             return true;
         }
     }
-    if (element->HasAttClass(ATT_TIMESTAMPGESTURAL)) {
-        AttTimestampGestural *att = dynamic_cast<AttTimestampGestural *>(element);
+    if (element->HasAttClass(ATT_TIMESTAMPGES)) {
+        AttTimestampGes *att = dynamic_cast<AttTimestampGes *>(element);
         assert(att);
         if (attrType == "tstamp.ges") {
             att->SetTstampGes(att->StrToDbl(attrValue));
@@ -949,8 +906,8 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
             return true;
         }
     }
-    if (element->HasAttClass(ATT_TIMESTAMP2GESTURAL)) {
-        AttTimestamp2Gestural *att = dynamic_cast<AttTimestamp2Gestural *>(element);
+    if (element->HasAttClass(ATT_TIMESTAMP2GES)) {
+        AttTimestamp2Ges *att = dynamic_cast<AttTimestamp2Ges *>(element);
         assert(att);
         if (attrType == "tstamp2.ges") {
             att->SetTstamp2Ges(att->StrToMeasurebeat(attrValue));
@@ -967,18 +924,18 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
 
 void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
 {
-    if (element->HasAttClass(ATT_ACCIDENTALGESTURAL)) {
-        const AttAccidentalGestural *att = dynamic_cast<const AttAccidentalGestural *>(element);
+    if (element->HasAttClass(ATT_ACCIDENTALGES)) {
+        const AttAccidentalGes *att = dynamic_cast<const AttAccidentalGes *>(element);
         assert(att);
         if (att->HasAccidGes()) {
             attributes->push_back({ "accid.ges", att->AccidentalGesturalToStr(att->GetAccidGes()) });
         }
     }
-    if (element->HasAttClass(ATT_ARTICULATIONGESTURAL)) {
-        const AttArticulationGestural *att = dynamic_cast<const AttArticulationGestural *>(element);
+    if (element->HasAttClass(ATT_ARTICULATIONGES)) {
+        const AttArticulationGes *att = dynamic_cast<const AttArticulationGes *>(element);
         assert(att);
         if (att->HasArticGes()) {
-            attributes->push_back({ "artic.ges", att->ArticulationListToStr(att->GetArticGes()) });
+            attributes->push_back({ "artic.ges", att->ArticulationToStr(att->GetArticGes()) });
         }
     }
     if (element->HasAttClass(ATT_BENDGES)) {
@@ -988,8 +945,8 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "amount", att->DblToStr(att->GetAmount()) });
         }
     }
-    if (element->HasAttClass(ATT_DURATIONGESTURAL)) {
-        const AttDurationGestural *att = dynamic_cast<const AttDurationGestural *>(element);
+    if (element->HasAttClass(ATT_DURATIONGES)) {
+        const AttDurationGes *att = dynamic_cast<const AttDurationGes *>(element);
         assert(att);
         if (att->HasDurGes()) {
             attributes->push_back({ "dur.ges", att->DurationToStr(att->GetDurGes()) });
@@ -1046,17 +1003,14 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "pnum", att->IntToStr(att->GetPnum()) });
         }
     }
-    if (element->HasAttClass(ATT_SCOREDEFGES)) {
-        const AttScoreDefGes *att = dynamic_cast<const AttScoreDefGes *>(element);
+    if (element->HasAttClass(ATT_ORNAMENTACCIDGES)) {
+        const AttOrnamentAccidGes *att = dynamic_cast<const AttOrnamentAccidGes *>(element);
         assert(att);
-        if (att->HasTunePname()) {
-            attributes->push_back({ "tune.pname", att->PitchnameToStr(att->GetTunePname()) });
+        if (att->HasAccidupperGes()) {
+            attributes->push_back({ "accidupper.ges", att->AccidentalGesturalToStr(att->GetAccidupperGes()) });
         }
-        if (att->HasTuneHz()) {
-            attributes->push_back({ "tune.Hz", att->DblToStr(att->GetTuneHz()) });
-        }
-        if (att->HasTuneTemper()) {
-            attributes->push_back({ "tune.temper", att->TemperamentToStr(att->GetTuneTemper()) });
+        if (att->HasAccidlowerGes()) {
+            attributes->push_back({ "accidlower.ges", att->AccidentalGesturalToStr(att->GetAccidlowerGes()) });
         }
     }
     if (element->HasAttClass(ATT_SECTIONGES)) {
@@ -1076,8 +1030,8 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "elevation", att->DblToStr(att->GetElevation()) });
         }
     }
-    if (element->HasAttClass(ATT_TIMESTAMPGESTURAL)) {
-        const AttTimestampGestural *att = dynamic_cast<const AttTimestampGestural *>(element);
+    if (element->HasAttClass(ATT_TIMESTAMPGES)) {
+        const AttTimestampGes *att = dynamic_cast<const AttTimestampGes *>(element);
         assert(att);
         if (att->HasTstampGes()) {
             attributes->push_back({ "tstamp.ges", att->DblToStr(att->GetTstampGes()) });
@@ -1086,8 +1040,8 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "tstamp.real", att->StrToStr(att->GetTstampReal()) });
         }
     }
-    if (element->HasAttClass(ATT_TIMESTAMP2GESTURAL)) {
-        const AttTimestamp2Gestural *att = dynamic_cast<const AttTimestamp2Gestural *>(element);
+    if (element->HasAttClass(ATT_TIMESTAMP2GES)) {
+        const AttTimestamp2Ges *att = dynamic_cast<const AttTimestamp2Ges *>(element);
         assert(att);
         if (att->HasTstamp2Ges()) {
             attributes->push_back({ "tstamp2.ges", att->MeasurebeatToStr(att->GetTstamp2Ges()) });

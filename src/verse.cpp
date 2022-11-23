@@ -87,7 +87,7 @@ int Verse::AdjustPosition(int &overlap, int freeSpace, const Doc *doc)
         if (freeSpace > overlap) {
             this->SetDrawingXRel(this->GetDrawingXRel() - overlap);
             // The space is set to 0. This means that consecutive overlaps will not be recursively absorbed.
-            // Only the first preceeding syl will be moved.
+            // Only the first preceding syl will be moved.
             overlap = 0;
         }
         else if (freeSpace > 0) {
@@ -211,15 +211,15 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     if (overlap > 0) {
         // We are adjusting syl in two different measures - move only the to right barline of the first measure
         if (params->m_previousMeasure) {
-            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousVerse->GetAlignment(),
+            params->m_overlappingSyl.push_back(std::make_tuple(params->m_previousVerse->GetAlignment(),
                 params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
             // Do it now
-            params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
-            params->m_overlapingSyl.clear();
+            params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlappingSyl);
+            params->m_overlappingSyl.clear();
         }
         else {
             // Normal case, both in the same measure
-            params->m_overlapingSyl.push_back(
+            params->m_overlappingSyl.push_back(
                 std::make_tuple(params->m_previousVerse->GetAlignment(), this->GetAlignment(), overlap));
         }
     }
@@ -251,9 +251,11 @@ int Verse::InitProcessingLists(FunctorParams *functorParams)
 
 int Verse::GenerateMIDI(FunctorParams *)
 {
-    Note *note = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
-    assert(note);
-    Verse *previousVerse = vrv_cast<Verse *>(note->GetPrevious(this, VERSE));
+    LayerElement *parent = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
+    if (!parent) parent = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
+    assert(parent);
+
+    Verse *previousVerse = vrv_cast<Verse *>(parent->GetPrevious(this, VERSE));
 
     if (previousVerse) return FUNCTOR_SIBLINGS;
 

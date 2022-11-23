@@ -14,6 +14,7 @@
 
 #include "doc.h"
 #include "docselection.h"
+#include "toolkitdef.h"
 #include "view.h"
 
 //----------------------------------------------------------------------------
@@ -22,35 +23,6 @@ namespace vrv {
 
 class EditorToolkit;
 class RuntimeClock;
-
-enum FileFormat {
-    UNKNOWN = 0,
-    AUTO,
-    MEI,
-    HUMDRUM,
-    HUMMEI,
-    HUMMIDI,
-    PAE,
-    ABC,
-    DARMS,
-    MUSICXML,
-    MUSICXMLHUM,
-    MEIHUM,
-    MUSEDATAHUM,
-    ESAC,
-    MIDI,
-    TIMEMAP
-};
-
-void SetDefaultResourcePath(const std::string &path);
-
-// Implementation in vrv.cpp but defined here to be available in SWIG bindings
-void EnableLog(bool value);
-void EnableLogToBuffer(bool value);
-
-/**
- * @defgroup nojs Methods not available in the JavaScript toolkit
- */
 
 /**
  * @defgroup nodoc Public methods that are not listed in the documentation
@@ -89,7 +61,7 @@ public:
     /**
      * Return the ID of the Toolkit instance.
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @return The ID as as string
      */
@@ -98,7 +70,7 @@ public:
     /**
      * Get the resource path for the Toolkit instance.
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @return A string with the resource path
      */
@@ -110,7 +82,7 @@ public:
      * This method needs to be called if the constructor had initFont=false or if the resource path
      * needs to be changed.
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param path The path to the resource directory
      * @return True if the resources was successfully loaded
@@ -155,7 +127,7 @@ public:
      *
      * Previously convert UTF16 files to UTF8 or extract files from MusicXML compressed files.
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param filename The filename to be loaded
      * @return True if the file was successfully loaded
@@ -194,7 +166,7 @@ public:
      *
      * The method calls Toolkit::ValidatePAE.
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param filename The filename to be validated
      * @return A stringified JSON object with the validation warnings or errors
@@ -233,12 +205,18 @@ public:
     ///@{
 
     /**
-     * Return a dictionary of all the options
+     * Return a dictionary of all the options with their current value
      *
-     * @param defaultValues True for getting the default values and false for the current values
      * @return A stringified JSON object
      */
-    std::string GetOptions(bool defaultValues) const;
+    std::string GetOptions() const;
+
+    /**
+     * Return a dictionary of all the options with their default value
+     *
+     * @return A stringified JSON object
+     */
+    std::string GetDefaultOptions() const;
 
     /**
      * Return all available options grouped by category
@@ -262,7 +240,7 @@ public:
     /**
      * Get the value for an option
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param option The name of the option
      * @param defaultValue True to get the default value of the option
@@ -273,7 +251,7 @@ public:
     /**
      * Set the value for an option
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param option The name of the option
      * @param value The option value as string
@@ -289,7 +267,7 @@ public:
     /**
      * Set the scale option
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param scale the scale value as integer
      * @return True if the option was successfully set
@@ -299,7 +277,7 @@ public:
     /**
      * Get the scale option
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @return the scale option as integer
      */
@@ -308,7 +286,7 @@ public:
     /**
      * Set the input from option
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param inputFrom the input from value as string
      * @return True if the option was successfully set
@@ -318,7 +296,7 @@ public:
     /**
      * Set the output to option
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param outputTo the output to value as string
      * @return True if the option was successfully set
@@ -393,7 +371,7 @@ public:
     /**
      * Render a page to SVG and save it to the file.
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param @filename The output filename
      * @param @pageNo The page to render (1-based)
@@ -411,7 +389,7 @@ public:
     /**
      * Render a document to MIDI and save it to the file.
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param @filename The output filename
      * @return True if the file was successfully written
@@ -432,7 +410,7 @@ public:
      *
      * Only the top staff / layer is exported.
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param @filename The output filename
      * @return True if the file was successfully written
@@ -450,7 +428,7 @@ public:
     /**
      * Render a document to timemap and save it to the file
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param @filename The output filename
      * @param @jsonOptions A stringified JSON objects with the timemap options
@@ -498,7 +476,7 @@ public:
     /**
      * Write the humdrum buffer to the file
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param @filename The output filename
      * @return True if the file was successfully written
@@ -527,7 +505,7 @@ public:
     /**
      * Get the MEI and save it to the file
      *
-     * @ingroup nojs
+     * @remark nojs
      *
      * @param filename The output filename
      * @param jsonOptions A stringified JSON object with the output options
@@ -689,7 +667,7 @@ public:
      *
      * @ingroup nodoc
      */
-    Options *GetOptions() { return m_options; }
+    Options *GetOptionsObj() { return m_options; }
 
     /**
      * Copy the data to the cstring internal buffer
@@ -789,6 +767,14 @@ private:
     bool LoadZipFile(const std::string &filename);
     bool LoadZipData(const std::vector<unsigned char> &bytes);
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
+
+    /**
+     * Return a dictionary of all the options
+     *
+     * @param defaultValues True for getting the default values and false for the current values
+     * @return A stringified JSON object
+     */
+    std::string GetOptions(bool defaultValues) const;
 
 public:
     //

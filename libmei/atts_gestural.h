@@ -26,22 +26,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttAccidentalGestural
+// AttAccidentalGes
 //----------------------------------------------------------------------------
 
-class AttAccidentalGestural : public Att {
+class AttAccidentalGes : public Att {
 public:
-    AttAccidentalGestural();
-    virtual ~AttAccidentalGestural();
+    AttAccidentalGes();
+    virtual ~AttAccidentalGes();
 
     /** Reset the default values for the attribute class **/
-    void ResetAccidentalGestural();
+    void ResetAccidentalGes();
 
     /** Read the values for the attribute class **/
-    bool ReadAccidentalGestural(pugi::xml_node element);
+    bool ReadAccidentalGes(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteAccidentalGestural(pugi::xml_node element);
+    bool WriteAccidentalGes(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -62,22 +62,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttArticulationGestural
+// AttArticulationGes
 //----------------------------------------------------------------------------
 
-class AttArticulationGestural : public Att {
+class AttArticulationGes : public Att {
 public:
-    AttArticulationGestural();
-    virtual ~AttArticulationGestural();
+    AttArticulationGes();
+    virtual ~AttArticulationGes();
 
     /** Reset the default values for the attribute class **/
-    void ResetArticulationGestural();
+    void ResetArticulationGes();
 
     /** Read the values for the attribute class **/
-    bool ReadArticulationGestural(pugi::xml_node element);
+    bool ReadArticulationGes(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteArticulationGestural(pugi::xml_node element);
+    bool WriteArticulationGes(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -85,14 +85,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetArticGes(data_ARTICULATION_List articGes_) { m_articGes = articGes_; }
-    data_ARTICULATION_List GetArticGes() const { return m_articGes; }
+    void SetArticGes(data_ARTICULATION articGes_) { m_articGes = articGes_; }
+    data_ARTICULATION GetArticGes() const { return m_articGes; }
     bool HasArticGes() const;
     ///@}
 
 private:
     /** Records performed articulation that differs from the written value. **/
-    data_ARTICULATION_List m_articGes;
+    data_ARTICULATION m_articGes;
 
     /* include <attartic.ges> */
 };
@@ -138,22 +138,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttDurationGestural
+// AttDurationGes
 //----------------------------------------------------------------------------
 
-class AttDurationGestural : public Att {
+class AttDurationGes : public Att {
 public:
-    AttDurationGestural();
-    virtual ~AttDurationGestural();
+    AttDurationGes();
+    virtual ~AttDurationGes();
 
     /** Reset the default values for the attribute class **/
-    void ResetDurationGestural();
+    void ResetDurationGes();
 
     /** Read the values for the attribute class **/
-    bool ReadDurationGestural(pugi::xml_node element);
+    bool ReadDurationGes(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteDurationGestural(pugi::xml_node element);
+    bool WriteDurationGes(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -351,22 +351,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttScoreDefGes
+// AttOrnamentAccidGes
 //----------------------------------------------------------------------------
 
-class AttScoreDefGes : public Att {
+class AttOrnamentAccidGes : public Att {
 public:
-    AttScoreDefGes();
-    virtual ~AttScoreDefGes();
+    AttOrnamentAccidGes();
+    virtual ~AttOrnamentAccidGes();
 
     /** Reset the default values for the attribute class **/
-    void ResetScoreDefGes();
+    void ResetOrnamentAccidGes();
 
     /** Read the values for the attribute class **/
-    bool ReadScoreDefGes(pugi::xml_node element);
+    bool ReadOrnamentAccidGes(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteScoreDefGes(pugi::xml_node element);
+    bool WriteOrnamentAccidGes(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -374,28 +374,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTunePname(data_PITCHNAME tunePname_) { m_tunePname = tunePname_; }
-    data_PITCHNAME GetTunePname() const { return m_tunePname; }
-    bool HasTunePname() const;
+    void SetAccidupperGes(data_ACCIDENTAL_GESTURAL accidupperGes_) { m_accidupperGes = accidupperGes_; }
+    data_ACCIDENTAL_GESTURAL GetAccidupperGes() const { return m_accidupperGes; }
+    bool HasAccidupperGes() const;
     //
-    void SetTuneHz(double tuneHz_) { m_tuneHz = tuneHz_; }
-    double GetTuneHz() const { return m_tuneHz; }
-    bool HasTuneHz() const;
-    //
-    void SetTuneTemper(data_TEMPERAMENT tuneTemper_) { m_tuneTemper = tuneTemper_; }
-    data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; }
-    bool HasTuneTemper() const;
+    void SetAccidlowerGes(data_ACCIDENTAL_GESTURAL accidlowerGes_) { m_accidlowerGes = accidlowerGes_; }
+    data_ACCIDENTAL_GESTURAL GetAccidlowerGes() const { return m_accidlowerGes; }
+    bool HasAccidlowerGes() const;
     ///@}
 
 private:
-    /** Holds the pitch name of a tuning reference pitch. **/
-    data_PITCHNAME m_tunePname;
-    /** Holds a value for cycles per second, i.e., Hertz, for a tuning reference pitch. **/
-    double m_tuneHz;
-    /** Provides an indication of the tuning system, 'just', for example. **/
-    data_TEMPERAMENT m_tuneTemper;
+    /** Records the sounding accidental associated with an upper neighboring note. **/
+    data_ACCIDENTAL_GESTURAL m_accidupperGes;
+    /** Records the sounding accidental associated with a lower neighboring note. **/
+    data_ACCIDENTAL_GESTURAL m_accidlowerGes;
 
-    /* include <atttune.temper> */
+    /* include <attaccidlower.ges> */
 };
 
 //----------------------------------------------------------------------------
@@ -480,22 +474,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttTimestampGestural
+// AttTimestampGes
 //----------------------------------------------------------------------------
 
-class AttTimestampGestural : public Att {
+class AttTimestampGes : public Att {
 public:
-    AttTimestampGestural();
-    virtual ~AttTimestampGestural();
+    AttTimestampGes();
+    virtual ~AttTimestampGes();
 
     /** Reset the default values for the attribute class **/
-    void ResetTimestampGestural();
+    void ResetTimestampGes();
 
     /** Read the values for the attribute class **/
-    bool ReadTimestampGestural(pugi::xml_node element);
+    bool ReadTimestampGes(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteTimestampGestural(pugi::xml_node element);
+    bool WriteTimestampGes(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -525,22 +519,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttTimestamp2Gestural
+// AttTimestamp2Ges
 //----------------------------------------------------------------------------
 
-class AttTimestamp2Gestural : public Att {
+class AttTimestamp2Ges : public Att {
 public:
-    AttTimestamp2Gestural();
-    virtual ~AttTimestamp2Gestural();
+    AttTimestamp2Ges();
+    virtual ~AttTimestamp2Ges();
 
     /** Reset the default values for the attribute class **/
-    void ResetTimestamp2Gestural();
+    void ResetTimestamp2Ges();
 
     /** Read the values for the attribute class **/
-    bool ReadTimestamp2Gestural(pugi::xml_node element);
+    bool ReadTimestamp2Ges(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteTimestamp2Gestural(pugi::xml_node element);
+    bool WriteTimestamp2Ges(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.

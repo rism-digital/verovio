@@ -27,58 +27,113 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttSurface
+// AttMargins
 //----------------------------------------------------------------------------
 
-AttSurface::AttSurface() : Att()
+AttMargins::AttMargins() : Att()
 {
-    ResetSurface();
+    ResetMargins();
 }
 
-AttSurface::~AttSurface()
+AttMargins::~AttMargins() {}
+
+void AttMargins::ResetMargins()
 {
+    m_topmar = VRV_UNSET;
+    m_botmar = VRV_UNSET;
+    m_leftmar = VRV_UNSET;
+    m_rightmar = VRV_UNSET;
 }
 
-void AttSurface::ResetSurface()
-{
-    m_surface = "";
-}
-
-bool AttSurface::ReadSurface(pugi::xml_node element)
+bool AttMargins::ReadMargins(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("surface")) {
-        this->SetSurface(StrToStr(element.attribute("surface").value()));
-        element.remove_attribute("surface");
+    if (element.attribute("topmar")) {
+        this->SetTopmar(StrToMeasurementunsigned(element.attribute("topmar").value()));
+        element.remove_attribute("topmar");
+        hasAttribute = true;
+    }
+    if (element.attribute("botmar")) {
+        this->SetBotmar(StrToMeasurementunsigned(element.attribute("botmar").value()));
+        element.remove_attribute("botmar");
+        hasAttribute = true;
+    }
+    if (element.attribute("leftmar")) {
+        this->SetLeftmar(StrToMeasurementunsigned(element.attribute("leftmar").value()));
+        element.remove_attribute("leftmar");
+        hasAttribute = true;
+    }
+    if (element.attribute("rightmar")) {
+        this->SetRightmar(StrToMeasurementunsigned(element.attribute("rightmar").value()));
+        element.remove_attribute("rightmar");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttSurface::WriteSurface(pugi::xml_node element)
+bool AttMargins::WriteMargins(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasSurface()) {
-        element.append_attribute("surface") = StrToStr(this->GetSurface()).c_str();
+    if (this->HasTopmar()) {
+        element.append_attribute("topmar") = MeasurementunsignedToStr(this->GetTopmar()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasBotmar()) {
+        element.append_attribute("botmar") = MeasurementunsignedToStr(this->GetBotmar()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLeftmar()) {
+        element.append_attribute("leftmar") = MeasurementunsignedToStr(this->GetLeftmar()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasRightmar()) {
+        element.append_attribute("rightmar") = MeasurementunsignedToStr(this->GetRightmar()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttSurface::HasSurface() const
+bool AttMargins::HasTopmar() const
 {
-    return (m_surface != "");
+    return (m_topmar != VRV_UNSET);
 }
 
-/* include <attsurface> */
+bool AttMargins::HasBotmar() const
+{
+    return (m_botmar != VRV_UNSET);
+}
+
+bool AttMargins::HasLeftmar() const
+{
+    return (m_leftmar != VRV_UNSET);
+}
+
+bool AttMargins::HasRightmar() const
+{
+    return (m_rightmar != VRV_UNSET);
+}
+
+/* include <attrightmar> */
 
 bool Att::SetPagebased(Object *element, const std::string &attrType, const std::string &attrValue)
 {
-    if (element->HasAttClass(ATT_SURFACE)) {
-        AttSurface *att = dynamic_cast<AttSurface *>(element);
+    if (element->HasAttClass(ATT_MARGINS)) {
+        AttMargins *att = dynamic_cast<AttMargins *>(element);
         assert(att);
-        if (attrType == "surface") {
-            att->SetSurface(att->StrToStr(attrValue));
+        if (attrType == "topmar") {
+            att->SetTopmar(att->StrToMeasurementunsigned(attrValue));
+            return true;
+        }
+        if (attrType == "botmar") {
+            att->SetBotmar(att->StrToMeasurementunsigned(attrValue));
+            return true;
+        }
+        if (attrType == "leftmar") {
+            att->SetLeftmar(att->StrToMeasurementunsigned(attrValue));
+            return true;
+        }
+        if (attrType == "rightmar") {
+            att->SetRightmar(att->StrToMeasurementunsigned(attrValue));
             return true;
         }
     }
@@ -88,11 +143,20 @@ bool Att::SetPagebased(Object *element, const std::string &attrType, const std::
 
 void Att::GetPagebased(const Object *element, ArrayOfStrAttr *attributes)
 {
-    if (element->HasAttClass(ATT_SURFACE)) {
-        const AttSurface *att = dynamic_cast<const AttSurface *>(element);
+    if (element->HasAttClass(ATT_MARGINS)) {
+        const AttMargins *att = dynamic_cast<const AttMargins *>(element);
         assert(att);
-        if (att->HasSurface()) {
-            attributes->push_back({ "surface", att->StrToStr(att->GetSurface()) });
+        if (att->HasTopmar()) {
+            attributes->push_back({ "topmar", att->MeasurementunsignedToStr(att->GetTopmar()) });
+        }
+        if (att->HasBotmar()) {
+            attributes->push_back({ "botmar", att->MeasurementunsignedToStr(att->GetBotmar()) });
+        }
+        if (att->HasLeftmar()) {
+            attributes->push_back({ "leftmar", att->MeasurementunsignedToStr(att->GetLeftmar()) });
+        }
+        if (att->HasRightmar()) {
+            attributes->push_back({ "rightmar", att->MeasurementunsignedToStr(att->GetRightmar()) });
         }
     }
 }

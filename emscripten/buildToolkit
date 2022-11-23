@@ -77,7 +77,7 @@ GetOptions (
 );
 
 # Default compiling uses ASM and large file support.
-# Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
+# Memory is increased (STACK_SIZE) for processing large files (tested up to 7MB)
 # Empirically, the memory amount required is roughly 5 times the file size.
 # This can be disabled in the light version, which uses the default memory settings.
 my $FLAGS = "-O3";
@@ -86,7 +86,7 @@ $FLAGS .= " -std=c++$cpp";
 
 my $LFLAGS =  " -s ASM_JS=1";
 $LFLAGS .= " -s INITIAL_MEMORY=256MB";
-$LFLAGS .= " -s TOTAL_STACK=128MB";
+$LFLAGS .= " -s STACK_SIZE=128MB";
 $LFLAGS .= " -s WASM=0";
 $LFLAGS .= " --memory-init-file 0";
 
@@ -120,7 +120,7 @@ if ($wasmQ) {
 	# Linker flags
 	$LFLAGS = " -s WASM=1";
 	$LFLAGS .= " -s INITIAL_MEMORY=512MB";
-	$LFLAGS .= " -s TOTAL_STACK=256MB";
+	$LFLAGS .= " -s STACK_SIZE=256MB";
 	$LFLAGS .= " -s SINGLE_FILE=1";
 	$FLAGS_NAME = "-wasm";
 }
@@ -183,11 +183,14 @@ my $embed   = "--embed-file $DATA_DIR/";
 my $output  = "-o $BUILD_DIR/verovio.js";
 
 my $exports = "-s EXPORTED_FUNCTIONS=\"[";
+$exports .= "'_enableLog',";
+$exports .= "'_enableLogToBuffer',";
 $exports .= "'_vrvToolkit_constructor',";
 $exports .= "'_vrvToolkit_destructor',";
 $exports .= "'_vrvToolkit_edit',";
 $exports .= "'_vrvToolkit_editInfo',";
 $exports .= "'_vrvToolkit_getAvailableOptions',";
+$exports .= "'_vrvToolkit_getDefaultOptions',";
 $exports .= "'_vrvToolkit_getDescriptiveFeatures',";
 $exports .= "'_vrvToolkit_getElementAttr',";
 $exports .= "'_vrvToolkit_getElementsAtTime',";

@@ -718,4 +718,15 @@
   <g c="E9BF" x="0.0" y="-150.0" w="13.0" h="600.0" h-a-x="13" n="chantConnectingLineAsc4th" />
   <g c="E9C0" x="0.0" y="-150.0" w="13.0" h="750.0" h-a-x="13" n="chantConnectingLineAsc5th" />
   <g c="E9C1" x="0.0" y="-150.0" w="13.0" h="900.0" h-a-x="13" n="chantConnectingLineAsc6th" />
+  <g c="E460" x="0.0" y="-394.0" w="294.0" h="532.0" h-a-x="294" n="accidentalKoron">
+    <a n="cutOutSE" x="0.16" y="-0.55" />
+  </g>
+  <g c="E461" x="0.0" y="-243.0" w="384.0" h="485.0" h-a-x="384" n="accidentalSori">
+    <a n="cutOutNE" x="0.88" y="0.4" />
+    <a n="cutOutNW" x="0.26" y="0.88" />
+    <a n="cutOutSE" x="0.88" y="-0.36" />
+    <a n="cutOutSW" x="0.26" y="-0.8" />
+  </g>
+  <g c="E99F" x="0.0" y="-81.0" w="119.0" h="162.0" h-a-x="119" n="chantStrophicus" />
+  <g c="E04A" x="1.0" y="-95.0" w="448.0" h="1191.0" h-a-x="450" n="segnoSerpent1" />
 </bounding-boxes>

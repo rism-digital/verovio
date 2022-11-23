@@ -28,11 +28,11 @@ namespace vrv {
 // TimePointInterface
 //----------------------------------------------------------------------------
 
-TimePointInterface::TimePointInterface() : Interface(), AttStaffIdent(), AttStartId(), AttTimestampLogical()
+TimePointInterface::TimePointInterface() : Interface(), AttStaffIdent(), AttStartId(), AttTimestampLog()
 {
     this->RegisterInterfaceAttClass(ATT_STAFFIDENT);
     this->RegisterInterfaceAttClass(ATT_STARTID);
-    this->RegisterInterfaceAttClass(ATT_TIMESTAMPLOGICAL);
+    this->RegisterInterfaceAttClass(ATT_TIMESTAMPLOG);
 
     this->Reset();
 }
@@ -43,7 +43,7 @@ void TimePointInterface::Reset()
 {
     this->ResetStaffIdent();
     this->ResetStartId();
-    this->ResetTimestampLogical();
+    this->ResetTimestampLog();
 
     m_start = NULL;
     m_startID = "";
@@ -181,10 +181,10 @@ bool TimePointInterface::VerifyMeasure(const Object *owner) const
 // TimeSpanningInterface
 //----------------------------------------------------------------------------
 
-TimeSpanningInterface::TimeSpanningInterface() : TimePointInterface(), AttStartEndId(), AttTimestamp2Logical()
+TimeSpanningInterface::TimeSpanningInterface() : TimePointInterface(), AttStartEndId(), AttTimestamp2Log()
 {
     this->RegisterInterfaceAttClass(ATT_STARTENDID);
-    this->RegisterInterfaceAttClass(ATT_TIMESTAMP2LOGICAL);
+    this->RegisterInterfaceAttClass(ATT_TIMESTAMP2LOG);
 
     this->Reset();
 }
@@ -195,7 +195,7 @@ void TimeSpanningInterface::Reset()
 {
     TimePointInterface::Reset();
     this->ResetStartEndId();
-    this->ResetTimestamp2Logical();
+    this->ResetTimestamp2Log();
 
     m_end = NULL;
     m_endID = "";

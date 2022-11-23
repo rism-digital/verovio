@@ -32,7 +32,7 @@ Accid::Accid()
     : LayerElement(ACCID, "accid-")
     , PositionInterface()
     , AttAccidental()
-    , AttAccidentalGestural()
+    , AttAccidentalGes()
     , AttAccidLog()
     , AttColor()
     , AttEnclosingChars()
@@ -43,7 +43,7 @@ Accid::Accid()
 
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_ACCIDENTAL);
-    this->RegisterAttClass(ATT_ACCIDENTALGESTURAL);
+    this->RegisterAttClass(ATT_ACCIDENTALGES);
     this->RegisterAttClass(ATT_ACCIDLOG);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
@@ -61,7 +61,7 @@ void Accid::Reset()
     LayerElement::Reset();
     PositionInterface::Reset();
     this->ResetAccidental();
-    this->ResetAccidentalGestural();
+    this->ResetAccidentalGes();
     this->ResetAccidLog();
     this->ResetColor();
     this->ResetEnclosingChars();
@@ -217,6 +217,8 @@ char32_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
         case ACCIDENTAL_WRITTEN_bf: return SMUFL_E442_accidentalBakiyeFlat; break;
         case ACCIDENTAL_WRITTEN_kmf: return SMUFL_E441_accidentalKucukMucennebFlat; break;
         case ACCIDENTAL_WRITTEN_bmf: return SMUFL_E440_accidentalBuyukMucennebFlat; break;
+        case ACCIDENTAL_WRITTEN_koron: return SMUFL_E460_accidentalKoron; break;
+        case ACCIDENTAL_WRITTEN_sori: return SMUFL_E461_accidentalSori; break;
         default: break;
     }
     return 0;

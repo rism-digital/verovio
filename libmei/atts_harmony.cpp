@@ -35,9 +35,7 @@ AttHarmLog::AttHarmLog() : Att()
     ResetHarmLog();
 }
 
-AttHarmLog::~AttHarmLog()
-{
-}
+AttHarmLog::~AttHarmLog() {}
 
 void AttHarmLog::ResetHarmLog()
 {

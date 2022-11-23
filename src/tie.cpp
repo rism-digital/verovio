@@ -24,6 +24,7 @@
 #include "slur.h"
 #include "staff.h"
 #include "stem.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -517,7 +518,7 @@ void Tie::UpdateTiePositioning(const FloatingCurvePositioner *curve, Point bezie
     for (auto object : objects) {
         if (!object->HasSelfBB()) continue;
         // if we have possible overlap with dots, we need to move tie up/down to avoid it. This happens only for the
-        // outter ties, so there should be no issue of inner tie moving up and colliding with other elements
+        // outer ties, so there should be no issue of inner tie moving up and colliding with other elements
         if (object->Is(DOTS)) {
             bool discard = false;
             // initial margin is non-zero to make sure that we adjust ties that are very close to the dots, but don't
@@ -531,9 +532,9 @@ void Tie::UpdateTiePositioning(const FloatingCurvePositioner *curve, Point bezie
             dotsPosition = object->GetDrawingX()
                 + (1 + dynamic_cast<const AttAugmentDots *>(durElement)->GetDots()) * drawingUnit;
             if (durElement->Is(CHORD)) {
-                // If this is chord, we need to make sure that ties is compared agains relative dot. Since all dots have
-                // one BB and this action is done for outer ties only, we can safely take height of the BB to determine
-                // margin for adjustment calculation
+                // If this is chord, we need to make sure that ties are compared against relative dot. Since all dots
+                // have one BB and this action is done for outer ties only, we can safely take height of the BB to
+                // determine margin for adjustment calculation
                 const Chord *parentChord = vrv_cast<const Chord *>(durElement);
                 int offset = (object->GetSelfRight() - object->GetSelfLeft()) / parentChord->GetDots();
                 if ((drawingCurveDir == curvature_CURVEDIR_above) && (startNote != parentChord->GetTopNote())) {

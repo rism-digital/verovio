@@ -79,7 +79,7 @@ Doc::Doc() : Object(DOC, "doc-")
     m_options = new Options();
 
     // owned pointers need to be set to NULL;
-    m_selectionPreceeding = NULL;
+    m_selectionPreceding = NULL;
     m_selectionFollowing = NULL;
 
     this->Reset();
@@ -137,9 +137,9 @@ void Doc::Reset()
 
 void Doc::ClearSelectionPages()
 {
-    if (m_selectionPreceeding) {
-        delete m_selectionPreceeding;
-        m_selectionPreceeding = NULL;
+    if (m_selectionPreceding) {
+        delete m_selectionPreceding;
+        m_selectionPreceding = NULL;
     }
     if (m_selectionFollowing) {
         delete m_selectionFollowing;
@@ -196,7 +196,7 @@ bool Doc::GenerateDocumentScoreDef()
     }
     this->GetCurrentScoreDef()->AddChild(staffGrp);
 
-    LogMessage("ScoreDef generated");
+    LogInfo("ScoreDef generated");
 
     return true;
 }
@@ -1118,7 +1118,7 @@ void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
 
     if (!this->HasSelection()) return;
 
-    assert(!m_selectionPreceeding && !m_selectionFollowing);
+    assert(!m_selectionPreceding && !m_selectionFollowing);
 
     if (this->IsCastOff()) this->UnCastOffDoc();
 
@@ -1166,7 +1166,7 @@ void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
 
 void Doc::ResetSelectionDoc(bool resetCache)
 {
-    assert(m_selectionPreceeding && m_selectionFollowing);
+    assert(m_selectionPreceding && m_selectionFollowing);
 
     m_selectionStart = "";
     m_selectionEnd = "";
@@ -1197,11 +1197,11 @@ void Doc::DeactiveateSelection()
     if (selectionScore->GetLabel() != "[selectionScore]") LogError("Deleting wrong score element. Something is wrong");
     selectionPage->DeleteChild(selectionScore);
 
-    m_selectionPreceeding->SetParent(pages);
-    pages->InsertChild(m_selectionPreceeding, 0);
+    m_selectionPreceding->SetParent(pages);
+    pages->InsertChild(m_selectionPreceding, 0);
     pages->AddChild(m_selectionFollowing);
 
-    m_selectionPreceeding = NULL;
+    m_selectionPreceding = NULL;
     m_selectionFollowing = NULL;
 }
 
@@ -1224,11 +1224,11 @@ void Doc::ReactivateSelection(bool resetAligners)
     selectionScore->SetParent(selectionPage);
     selectionPage->InsertChild(selectionScore, 0);
 
-    m_selectionPreceeding = vrv_cast<Page *>(pages->GetChild(0));
+    m_selectionPreceding = vrv_cast<Page *>(pages->GetChild(0));
     // Reset the aligners because data will be accessed when rendering control events outside the selection
-    if (resetAligners && m_selectionPreceeding->FindDescendantByType(MEASURE)) {
+    if (resetAligners && m_selectionPreceding->FindDescendantByType(MEASURE)) {
         this->SetDrawingPage(0);
-        m_selectionPreceeding->ResetAligners();
+        m_selectionPreceding->ResetAligners();
     }
 
     m_selectionFollowing = vrv_cast<Page *>(pages->GetChild(lastPage));
@@ -1238,7 +1238,7 @@ void Doc::ReactivateSelection(bool resetAligners)
         m_selectionFollowing->ResetAligners();
     }
 
-    // Detach the preceeding and following page
+    // Detach the preceding and following page
     pages->DetachChild(lastPage);
     pages->DetachChild(0);
     // Make sure we do not point to page moved out of the selection
@@ -1316,13 +1316,13 @@ void Doc::ConvertMarkupDoc(bool permanent)
 {
     if (m_markup == MARKUP_DEFAULT) return;
 
-    LogMessage("Converting markup...");
+    LogInfo("Converting markup...");
 
     if (m_markup & MARKUP_GRACE_ATTRIBUTE) {
     }
 
     if (m_markup & MARKUP_ARTIC_MULTIVAL) {
-        LogMessage("Converting artic markup...");
+        LogInfo("Converting artic markup...");
         ConvertMarkupArticParams convertMarkupArticParams;
         Functor convertMarkupArtic(&Object::ConvertMarkupArtic);
         Functor convertMarkupArticEnd(&Object::ConvertMarkupArticEnd);
@@ -1330,7 +1330,7 @@ void Doc::ConvertMarkupDoc(bool permanent)
     }
 
     if ((m_markup & MARKUP_ANALYTICAL_FERMATA) || (m_markup & MARKUP_ANALYTICAL_TIE)) {
-        LogMessage("Converting analytical markup...");
+        LogInfo("Converting analytical markup...");
         /************ Prepare processing by staff/layer/verse ************/
 
         // We need to populate processing lists for processing the document by Layer (for matching @tie) and
@@ -1379,7 +1379,7 @@ void Doc::ConvertMarkupDoc(bool permanent)
     }
 
     if (m_markup & MARKUP_SCOREDEF_DEFINITIONS) {
-        LogMessage("Converting scoreDef markup...");
+        LogInfo("Converting scoreDef markup...");
         Functor convertMarkupScoreDef(&Object::ConvertMarkupScoreDef);
         Functor convertMarkupScoreDefEnd(&Object::ConvertMarkupScoreDefEnd);
         ConvertMarkupScoreDefParams convertMarkupScoreDefParams(
@@ -1438,7 +1438,7 @@ void Doc::ExpandExpansions()
 
     Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
     if (start == NULL) {
-        LogMessage("Import MEI: expansion ID \"%s\" not found.", expansionId.c_str());
+        LogInfo("Import MEI: expansion ID \"%s\" not found.", expansionId.c_str());
         return;
     }
 
@@ -1879,7 +1879,19 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
 {
     double distance = 0.0;
     if (staffPosition == STAFFREL_above || staffPosition == STAFFREL_below) {
-        if (classId == DYNAM) {
+        if (classId == DIR) {
+            // Inspect the scoreDef attribute
+            if (this->GetCurrentScoreDef()->HasDirDist()) {
+                distance = this->GetCurrentScoreDef()->GetDirDist();
+            }
+
+            // Inspect the staffDef attributes
+            const StaffDef *staffDef = this->GetCurrentScoreDef()->GetStaffDef(staffIndex);
+            if (staffDef != NULL && staffDef->HasDirDist()) {
+                distance = staffDef->GetDirDist();
+            }
+        }
+        else if (classId == DYNAM) {
             distance = m_options->m_dynamDist.GetDefault();
 
             // Inspect the scoreDef attribute
@@ -1915,6 +1927,18 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
             // Apply CLI option if set
             if (m_options->m_harmDist.IsSet()) {
                 distance = m_options->m_harmDist.GetValue();
+            }
+        }
+        else if (classId == TEMPO) {
+            // Inspect the scoreDef attribute
+            if (this->GetCurrentScoreDef()->HasTempoDist()) {
+                distance = this->GetCurrentScoreDef()->GetTempoDist();
+            }
+
+            // Inspect the staffDef attributes
+            const StaffDef *staffDef = this->GetCurrentScoreDef()->GetStaffDef(staffIndex);
+            if (staffDef != NULL && staffDef->HasTempoDist()) {
+                distance = staffDef->GetTempoDist();
             }
         }
     }

@@ -43,6 +43,8 @@ enum data_ACCIDENTAL_GESTURAL {
     ACCIDENTAL_GESTURAL_bf,
     ACCIDENTAL_GESTURAL_kmf,
     ACCIDENTAL_GESTURAL_bmf,
+    ACCIDENTAL_GESTURAL_koron,
+    ACCIDENTAL_GESTURAL_sori,
     ACCIDENTAL_GESTURAL_MAX
 };
 
@@ -108,6 +110,8 @@ enum data_ACCIDENTAL_WRITTEN {
     ACCIDENTAL_WRITTEN_bf,
     ACCIDENTAL_WRITTEN_kmf,
     ACCIDENTAL_WRITTEN_bmf,
+    ACCIDENTAL_WRITTEN_koron,
+    ACCIDENTAL_WRITTEN_sori,
     ACCIDENTAL_WRITTEN_MAX
 };
 
@@ -163,6 +167,16 @@ enum data_ACCIDENTAL_aeu {
     ACCIDENTAL_aeu_kmf,
     ACCIDENTAL_aeu_bmf,
     ACCIDENTAL_aeu_MAX
+};
+
+/**
+ * MEI data.ACCIDENTAL.persian
+ */
+enum data_ACCIDENTAL_persian {
+    ACCIDENTAL_persian_NONE = 0,
+    ACCIDENTAL_persian_koron,
+    ACCIDENTAL_persian_sori,
+    ACCIDENTAL_persian_MAX
 };
 
 /**
@@ -230,11 +244,15 @@ enum data_BARRENDITION {
     BARRENDITION_dbl,
     BARRENDITION_dbldashed,
     BARRENDITION_dbldotted,
+    BARRENDITION_dblheavy,
+    BARRENDITION_dblsegno,
     BARRENDITION_end,
+    BARRENDITION_heavy,
     BARRENDITION_invis,
     BARRENDITION_rptstart,
     BARRENDITION_rptboth,
     BARRENDITION_rptend,
+    BARRENDITION_segno,
     BARRENDITION_single,
     BARRENDITION_MAX
 };
@@ -995,6 +1013,7 @@ enum data_METERFORM {
     METERFORM_num,
     METERFORM_denomsym,
     METERFORM_norm,
+    METERFORM_symplusnorm,
     METERFORM_invis,
     METERFORM_MAX
 };
@@ -1287,6 +1306,16 @@ enum data_MULTIBREVERESTS_mensural {
 };
 
 /**
+ * MEI data.NEIGHBORINGLAYER
+ */
+enum data_NEIGHBORINGLAYER {
+    NEIGHBORINGLAYER_NONE = 0,
+    NEIGHBORINGLAYER_above,
+    NEIGHBORINGLAYER_below,
+    NEIGHBORINGLAYER_MAX
+};
+
+/**
  * MEI data.NONSTAFFPLACE
  */
 enum data_NONSTAFFPLACE {
@@ -1362,13 +1391,28 @@ enum data_NOTEHEADMODIFIER_list {
 };
 
 /**
- * MEI data.OTHERSTAFF
+ * MEI data.PEDALSTYLE
  */
-enum data_OTHERSTAFF {
-    OTHERSTAFF_NONE = 0,
-    OTHERSTAFF_above,
-    OTHERSTAFF_below,
-    OTHERSTAFF_MAX
+enum data_PEDALSTYLE {
+    PEDALSTYLE_NONE = 0,
+    PEDALSTYLE_line,
+    PEDALSTYLE_pedline,
+    PEDALSTYLE_pedstar,
+    PEDALSTYLE_altpedstar,
+    PEDALSTYLE_MAX
+};
+
+/**
+ * MEI data.PGFUNC
+ */
+enum data_PGFUNC {
+    PGFUNC_NONE = 0,
+    PGFUNC_all,
+    PGFUNC_first,
+    PGFUNC_last,
+    PGFUNC_alt1,
+    PGFUNC_alt2,
+    PGFUNC_MAX
 };
 
 /**
@@ -2186,6 +2230,7 @@ enum meterSigGrpLog_FUNC {
     meterSigGrpLog_FUNC_alternating,
     meterSigGrpLog_FUNC_interchanging,
     meterSigGrpLog_FUNC_mixed,
+    meterSigGrpLog_FUNC_other,
     meterSigGrpLog_FUNC_MAX
 };
 
@@ -2290,28 +2335,6 @@ enum pedalLog_FUNC {
     pedalLog_FUNC_sostenuto,
     pedalLog_FUNC_silent,
     pedalLog_FUNC_MAX
-};
-
-/**
- * MEI att.pedal.vis@form
- */
-enum pedalVis_FORM {
-    pedalVis_FORM_NONE = 0,
-    pedalVis_FORM_line,
-    pedalVis_FORM_pedstar,
-    pedalVis_FORM_altpedstar,
-    pedalVis_FORM_MAX
-};
-
-/**
- * MEI att.pianoPedals@pedal.style
- */
-enum pianoPedals_PEDALSTYLE {
-    pianoPedals_PEDALSTYLE_NONE = 0,
-    pianoPedals_PEDALSTYLE_line,
-    pianoPedals_PEDALSTYLE_pedstar,
-    pianoPedals_PEDALSTYLE_altpedstar,
-    pianoPedals_PEDALSTYLE_MAX
 };
 
 /**
@@ -2497,7 +2520,6 @@ enum whitespace_XMLSPACE {
     whitespace_XMLSPACE_preserve,
     whitespace_XMLSPACE_MAX
 };
-
 
 } // namespace vrv
 

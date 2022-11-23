@@ -370,7 +370,7 @@ typedef std::map<const Staff *, std::set<int>> MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;
 
-typedef std::map<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> MapOfPitchAccid;
+typedef std::map<int, data_ACCIDENTAL_WRITTEN> MapOfOctavedPitchAccid;
 
 typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
@@ -467,6 +467,8 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define UNICODE_FLAT U'\u266D' // ♭
 #define UNICODE_NATURAL U'\u266E' // ♮
 #define UNICODE_SHARP U'\u266F' // ♯
+
+#define UNICODE_UNDERTIE U'\u203F' // ‿
 
 #define UNICODE_DAL_SEGNO U'\U0001D109' // 𝄉
 #define UNICODE_DA_CAPO U'\U0001D10A' // 𝄊
@@ -636,6 +638,12 @@ enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
 //----------------------------------------------------------------------------
 
 enum StemSameasDrawingRole { SAMEAS_NONE = 0, SAMEAS_UNSET, SAMEAS_PRIMARY, SAMEAS_SECONDARY };
+
+//----------------------------------------------------------------------------
+// Smufl text font (selected font or fallback)
+//----------------------------------------------------------------------------
+
+enum SmuflTextFont { SMUFL_NONE = 0, SMUFL_FONT_SELECTED, SMUFL_FONT_FALLBACK };
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

@@ -50,6 +50,9 @@ public:
     std::string AccidentalAeuToStr(data_ACCIDENTAL_aeu data) const;
     data_ACCIDENTAL_aeu StrToAccidentalAeu(const std::string &value, bool logWarning = true) const;
 
+    std::string AccidentalPersianToStr(data_ACCIDENTAL_persian data) const;
+    data_ACCIDENTAL_persian StrToAccidentalPersian(const std::string &value, bool logWarning = true) const;
+
     std::string ArticulationToStr(data_ARTICULATION data) const;
     data_ARTICULATION StrToArticulation(const std::string &value, bool logWarning = true) const;
 
@@ -200,6 +203,9 @@ public:
     std::string MultibreverestsMensuralToStr(data_MULTIBREVERESTS_mensural data) const;
     data_MULTIBREVERESTS_mensural StrToMultibreverestsMensural(const std::string &value, bool logWarning = true) const;
 
+    std::string NeighboringlayerToStr(data_NEIGHBORINGLAYER data) const;
+    data_NEIGHBORINGLAYER StrToNeighboringlayer(const std::string &value, bool logWarning = true) const;
+
     std::string NonstaffplaceToStr(data_NONSTAFFPLACE data) const;
     data_NONSTAFFPLACE StrToNonstaffplace(const std::string &value, bool logWarning = true) const;
 
@@ -212,8 +218,11 @@ public:
     std::string NoteheadmodifierListToStr(data_NOTEHEADMODIFIER_list data) const;
     data_NOTEHEADMODIFIER_list StrToNoteheadmodifierList(const std::string &value, bool logWarning = true) const;
 
-    std::string OtherstaffToStr(data_OTHERSTAFF data) const;
-    data_OTHERSTAFF StrToOtherstaff(const std::string &value, bool logWarning = true) const;
+    std::string PedalstyleToStr(data_PEDALSTYLE data) const;
+    data_PEDALSTYLE StrToPedalstyle(const std::string &value, bool logWarning = true) const;
+
+    std::string PgfuncToStr(data_PGFUNC data) const;
+    data_PGFUNC StrToPgfunc(const std::string &value, bool logWarning = true) const;
 
     std::string RelationshipToStr(data_RELATIONSHIP data) const;
     data_RELATIONSHIP StrToRelationship(const std::string &value, bool logWarning = true) const;
@@ -424,12 +433,6 @@ public:
 
     std::string PedalLogFuncToStr(pedalLog_FUNC data) const;
     pedalLog_FUNC StrToPedalLogFunc(const std::string &value, bool logWarning = true) const;
-
-    std::string PedalVisFormToStr(pedalVis_FORM data) const;
-    pedalVis_FORM StrToPedalVisForm(const std::string &value, bool logWarning = true) const;
-
-    std::string PianoPedalsPedalstyleToStr(pianoPedals_PEDALSTYLE data) const;
-    pianoPedals_PEDALSTYLE StrToPianoPedalsPedalstyle(const std::string &value, bool logWarning = true) const;
 
     std::string PointingXlinkactuateToStr(pointing_XLINKACTUATE data) const;
     pointing_XLINKACTUATE StrToPointingXlinkactuate(const std::string &value, bool logWarning = true) const;
