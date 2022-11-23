@@ -503,6 +503,8 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 
     params.m_actualWidth = text->GetContentRight();
 
+    resources->SelectTextFont(FONTWEIGHT_NONE, FONTSTYLE_NONE);
+
     dc->EndTextGraphic(text, this);
 }
 
