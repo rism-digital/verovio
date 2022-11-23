@@ -25,7 +25,7 @@ using namespace std;
 #ifndef NO_HUMDRUM_SUPPORT
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <cctype>
 #include <cmath>
 #include <locale>
@@ -68,6 +68,7 @@ using namespace std;
 #include "fermata.h"
 #include "fig.h"
 #include "ftrem.h"
+#include "gliss.h"
 #include "hairpin.h"
 #include "halfmrpt.h"
 #include "harm.h"
@@ -120,7 +121,7 @@ using namespace std;
 #include "turn.h"
 #include "verse.h"
 #include "vrv.h"
-//#include "attcomparison.h"
+// #include "attcomparison.h"
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
@@ -484,6 +485,7 @@ namespace humaux {
         mensuration_type = 0;
 
         join = false;
+        glissStarts.clear();
     }
 
     ostream &StaffStateVariables::print(ostream &out, const std::string &prefix)
@@ -715,7 +717,7 @@ bool HumdrumInput::convertHumdrum()
     // Check if a mensural music score should be produced (and ignore **kerns,
     // since only mens or kern can be rendered by verovio at a time).
     m_mens = checkForMens(infile);
-    m_tempoScaling = getTempoScaling(infile);
+    m_globalTempoScaling = getGlobalTempoScaling(infile);
 
     bool hasScordatura = checkForScordatura(infile);
     if (hasScordatura) {
@@ -1970,49 +1972,62 @@ void HumdrumInput::createHeader()
     }
 
     // <pubStmt> /////////////
+    pugi::xml_node pubRespStmt;
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pugi::xml_document availability;
     for (int i = 0; i < (int)references.size(); ++i) {
         std::string refKey = references[i]->getReferenceKey();
-        if (refKey.compare(0, 2, "YE") && refKey.compare(0, 3, "EED")) {
+        if (refKey.compare(0, 2, "YE") && refKey.compare(0, 3, "EED") && refKey.compare(0, 3, "PED")) {
             continue;
         }
-        else if (!refKey.compare(0, 3, "EED")) {
-            pugi::xml_node pubRespStmt = pubStmt.prepend_child("respStmt");
+        else if (refKey.compare(0, 3, "EED") == 0) {
+            if (!pubRespStmt) {
+                pubRespStmt = pubStmt.prepend_child("respStmt");
+            }
             pugi::xml_node editor = pubRespStmt.append_child("persName");
             editor.append_attribute("xml:id") = StringFormat("persname-L%d", references[i]->getLineNumber()).c_str();
             editor.append_attribute("analog") = "humdrum:EED";
-            editor.append_attribute("role") = "editor";
+            editor.append_attribute("role") = "digital editor";
             editor.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
-        else if (!refKey.compare(2, 1, "C")) {
+        else if (refKey.compare(0, 3, "PED") == 0) {
+            if (!pubRespStmt) {
+                pubRespStmt = pubStmt.prepend_child("respStmt");
+            }
+            pugi::xml_node editor = pubRespStmt.append_child("persName");
+            editor.append_attribute("xml:id") = StringFormat("persname-L%d", references[i]->getLineNumber()).c_str();
+            editor.append_attribute("analog") = "humdrum:PED";
+            editor.append_attribute("role") = "source editor";
+            editor.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+        }
+        else if (refKey.compare(2, 1, "C") == 0) {
             pugi::xml_node useRestrict = availability.append_child("useRestrict");
             useRestrict.append_attribute("xml:id")
                 = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
             useRestrict.append_attribute("analog") = "humdrum:YEC";
             useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
-        else if (!refKey.compare(2, 1, "M")) {
+        else if (refKey.compare(2, 1, "M") == 0) {
             pugi::xml_node useRestrict = availability.append_child("useRestrict");
             useRestrict.append_attribute("xml:id")
                 = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
             useRestrict.append_attribute("analog") = "humdrum:YEM";
             useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
-        else if (!refKey.compare(2, 1, "N")) {
+        else if (refKey.compare(2, 1, "N") == 0) {
             pugi::xml_node pubPlace = pubStmt.append_child("pubPlace");
             pubPlace.append_attribute("xml:id") = StringFormat("pubplace-L%d", references[i]->getLineNumber()).c_str();
             pubPlace.append_attribute("analog") = "humdrum:YEN";
             pubPlace.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
-        else if (!refKey.compare(2, 1, "P")) {
+        else if (refKey.compare(2, 1, "P") == 0) {
             pugi::xml_node publisher = pubStmt.append_child("publisher");
             publisher.append_attribute("xml:id")
                 = StringFormat("publisher-L%d", references[i]->getLineNumber()).c_str();
             publisher.append_attribute("analog") = "humdrum:YEP";
             publisher.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
-        else if (!refKey.compare(2, 1, "R")) {
+        else if (refKey.compare(2, 1, "R") == 0) {
             pugi::xml_node pubDate = pubStmt.append_child("date");
             pubDate.append_attribute("xml:id") = StringFormat("date-L%d", references[i]->getLineNumber()).c_str();
             pubDate.append_attribute("analog") = "humdrum:YER";
@@ -2287,9 +2302,9 @@ void HumdrumInput::getRespPeople(
     addPerson(respPeople, references, "ODE", "dedicatee"); // dte
     addPerson(respPeople, references, "OCO", "patron"); // commissioner, pat
     addPerson(respPeople, references, "OCL", "collector"); // col
-    // ENC and EED are handled separately
-    // addPerson(respPeople, references, "EED", "digital editor");
-    // addPerson(respPeople, references, "ENC", "encoder"); // mrk,
+    addPerson(respPeople, references, "PED", "source editor");
+    addPerson(respPeople, references, "EED", "digital editor");
+    addPerson(respPeople, references, "ENC", "encoder"); // mrk,
     // Markup editor
 }
 
@@ -2854,7 +2869,7 @@ std::string HumdrumInput::getInstrumentName(StaffDef *sd)
         return "";
     }
     Text *text = (Text *)obj;
-    std::string name = UTF16to8(text->GetText());
+    std::string name = UTF32to8(text->GetText());
     if (name == "    ") {
         name = "";
     }
@@ -2877,7 +2892,7 @@ std::string HumdrumInput::getInstrumentAbbreviation(StaffDef *sd)
         return "";
     }
     Text *text = (Text *)obj;
-    std::string name = UTF16to8(text->GetText());
+    std::string name = UTF32to8(text->GetText());
     return name;
 }
 
@@ -4258,9 +4273,9 @@ std::string HumdrumInput::automaticHeaderLeft(std::vector<std::pair<std::string,
 
     std::string person;
     if (count == 4) {
-        auto EED = refmap.find("EED");
-        if (EED != refmap.end()) {
-            person = EED->second;
+        auto PED = refmap.find("PED");
+        if (PED != refmap.end()) {
+            person = PED->second;
         }
     }
     else {
@@ -4410,6 +4425,7 @@ std::string HumdrumInput::automaticHeaderCenter(
         if (!PUBformat.empty()) {
             subtitle += "in ";
         }
+        std::string outputdate = processReferenceTemplate("@{PDT:y}", biblist, refmap);
         subtitle += "<rend fontstyle=\"italic\">";
         subtitle += PTL;
         subtitle += "</rend>";
@@ -4417,8 +4433,10 @@ std::string HumdrumInput::automaticHeaderCenter(
         subtitle += PPP;
         subtitle += ": ";
         subtitle += PPR;
-        subtitle += ", ";
-        subtitle += PDT;
+        if (!outputdate.empty()) {
+            subtitle += ", ";
+            subtitle += outputdate;
+        }
         subtitle += ")";
     }
 
@@ -4622,7 +4640,7 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
                 if (::isdigit((*kernpart)[3])) {
                     int tempo = stoi(kernpart->substr(3));
                     // std::string tempostr = to_string(tempo);
-                    scoreDef->SetMidiBpm(tempo * m_tempoScaling);
+                    scoreDef->SetMidiBpm(tempo * m_globalTempoScaling * m_localTempoScaling.getFloat());
                     foundtempo = true;
                 }
             }
@@ -4647,7 +4665,7 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
         if (omd) {
             int guess = hum::Convert::tempoNameToMm(*omd, bot, top);
             if (guess > 0) {
-                scoreDef->SetMidiBpm(guess * m_tempoScaling);
+                scoreDef->SetMidiBpm(guess * m_globalTempoScaling * m_localTempoScaling.getFloat());
             }
             else {
                 addDefaultTempo(scoreDef);
@@ -4668,7 +4686,7 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
 void HumdrumInput::addDefaultTempo(ScoreDef *scoreDef)
 {
     if (m_mens) {
-        scoreDef->SetMidiBpm(400.0 * m_tempoScaling);
+        scoreDef->SetMidiBpm(400.0 * m_globalTempoScaling);
         return;
     }
     double sum = 0.0;
@@ -4683,10 +4701,10 @@ void HumdrumInput::addDefaultTempo(ScoreDef *scoreDef)
     }
     double avgdur = sum / count;
     if (avgdur > 2.0) {
-        scoreDef->SetMidiBpm(400.0 * m_tempoScaling);
+        scoreDef->SetMidiBpm(400.0 * m_globalTempoScaling);
     }
-    else if (m_tempoScaling != 1.0) {
-        scoreDef->SetMidiBpm(120.0 * m_tempoScaling);
+    else if (m_globalTempoScaling != 1.0) {
+        scoreDef->SetMidiBpm(120.0 * m_globalTempoScaling);
     }
 }
 
@@ -5325,12 +5343,10 @@ void HumdrumInput::setInstrumentName(ELEMENT *element, const std::string &name, 
         // no instrument name to display
         return;
     }
-    // hum::HumRegex hre;
-    // "\xc2\xa0" is a non-breaking space
     Label *label = new Label();
     if (name == "   ") {
         Text *text = new Text();
-        text->SetText(L"\u00a0\u00a0\u00a0");
+        text->SetText(U"\u00a0\u00a0\u00a0");
         label->AddChild(text);
     }
     else {
@@ -5372,7 +5388,7 @@ void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const std::string
     name8 = std::regex_replace(name8, exp3, "$1\xe2\x99\xaf");
     name8 = std::regex_replace(name8, exp4, "$1\xe2\x99\xaf");
 
-    std::wstring name16 = UTF8to16(name8);
+    std::u32string name16 = UTF8to32(name8);
     text->SetText(name16);
     label->AddChild(text);
     label->SetParent(element);
@@ -5992,6 +6008,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
     int count = -1;
     int unit = -1;
     if (timesigtok && regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)%(\\d+)"))) {
+        count = stoi(matches[1]);
         // int top = stoi(matches[1]);
         int bot = stoi(matches[2]);
         int bot2 = stoi(matches[3]);
@@ -6004,6 +6021,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
         }
     }
     else if (timesigtok && regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
+        count = stoi(matches[1]);
         if (!metersigtok) {
             unit = stoi(matches[2]);
             MeterSig *vrvmetersig = getMeterSig(element);
@@ -6716,13 +6734,15 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         if (timepos > 0) {
             double midibpm = getMmTempo(token);
             if (midibpm > 0) {
-                tempo->SetMidiBpm(midibpm * m_tempoScaling);
+                tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
+                m_midibpm = midibpm;
             }
             else {
                 // check for *MM marker before OMD
                 midibpm = getMmTempoForward(token);
                 if (midibpm > 0) {
-                    tempo->SetMidiBpm(midibpm * m_tempoScaling);
+                    tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
+                    m_midibpm = midibpm;
                 }
             }
         }
@@ -7092,7 +7112,7 @@ void HumdrumInput::checkForLineContinuations(hum::HTp token)
         if (pieces[i].find("_") != std::string::npos) {
             F *f = new F();
             Text *text = new Text();
-            std::wstring wtext = L"_";
+            std::u32string wtext = U"_";
             text->SetText(wtext);
             f->AddChild(text);
             fb->AddChild(f);
@@ -7269,7 +7289,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
             harm->AddChild(fb);
 
             std::vector<std::string> pieces = splitFBString(*token, " ");
-            std::vector<std::wstring> content = cleanFBString(pieces, token);
+            std::vector<std::u32string> content = cleanFBString(pieces, token);
             if (content.empty()) {
                 // do not include an empty fb see issue #1096
                 continue;
@@ -7285,7 +7305,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
                     auto pos = pieces[k].find(":");
                     if (pos != std::string::npos) {
                         std::vector<std::string> subpieces = splitFBString(pieces[k], ":");
-                        std::wstring newtext = cleanFBString2(subpieces, token);
+                        std::u32string newtext = cleanFBString2(subpieces, token);
                         text->SetText(newtext);
                     }
                     else {
@@ -7543,7 +7563,7 @@ void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
                 xstaffindex = (int)staffstarts.size() - 1;
                 setStaff(harm, xstaffindex + 1);
             }
-            std::wstring content;
+            std::u32string content;
             content = cleanStringString(*token);
             text->SetText(content);
             harm->AddChild(text);
@@ -7657,7 +7677,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 }
             }
 
-            std::wstring content;
+            std::u32string content;
             if (token->isDataType("**harm")) {
                 setPlaceRelStaff(harm, "below", false);
                 content = cleanHarmString2(*token);
@@ -7667,7 +7687,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 content = cleanHarmString3(*token);
             }
             else if (isCData) {
-                content = UTF8to16(*token);
+                content = UTF8to32(*token);
             }
             else {
                 content = cleanHarmString(*token);
@@ -7726,10 +7746,10 @@ std::vector<std::string> HumdrumInput::splitFBString(const std::string &content,
 // HumdrumInput::cleanFBString --
 //
 
-std::vector<std::wstring> HumdrumInput::cleanFBString(std::vector<std::string> &pieces, hum::HTp token)
+std::vector<std::u32string> HumdrumInput::cleanFBString(std::vector<std::string> &pieces, hum::HTp token)
 {
     std::vector<bool> todelete(pieces.size(), false);
-    std::vector<std::wstring> output(pieces.size());
+    std::vector<std::u32string> output(pieces.size());
     for (int i = 0; i < (int)pieces.size(); ++i) {
         output[i] = convertFBNumber(pieces[i], token);
         if ((pieces[i].find("K") != std::string::npos)
@@ -7754,16 +7774,16 @@ std::vector<std::wstring> HumdrumInput::cleanFBString(std::vector<std::string> &
 //   together with hyphens.
 //
 
-std::wstring HumdrumInput::cleanFBString2(std::vector<std::string> &pieces, hum::HTp token)
+std::u32string HumdrumInput::cleanFBString2(std::vector<std::string> &pieces, hum::HTp token)
 {
-    std::wstring output;
+    std::u32string output;
     for (int i = 0; i < (int)pieces.size(); ++i) {
         output += convertFBNumber(pieces[i], token);
         if (i < (int)pieces.size() - 1) {
             if (pieces[i + 1] == "") {
-                output += L" ";
+                output += U" ";
             }
-            output += L"-";
+            output += U"-";
         }
     }
     return output;
@@ -7774,9 +7794,9 @@ std::wstring HumdrumInput::cleanFBString2(std::vector<std::string> &pieces, hum:
 // HumdrumInput::convertFBNumber --
 //
 
-std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp token)
+std::u32string HumdrumInput::convertFBNumber(const std::string &input, hum::HTp token)
 {
-    std::wstring output;
+    std::u32string output;
 
     int track = token->getTrack();
     int reverse = m_reverse[track];
@@ -7872,12 +7892,12 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
 
     // accidental in front of number unless an "r" is present:
     if ((!slash) && (input.find("r") == std::string::npos) && (!reverse)) {
-        std::wstring accid = getVisualFBAccidental(accidental);
+        std::u32string accid = getVisualFBAccidental(accidental);
         if (accidental && (input.find("i") != std::string::npos)) {
-            accid = L"[" + accid + L"]";
+            accid = U"[" + accid + U"]";
         }
         else if (accidental && (input.find("j") != std::string::npos)) {
-            accid = L"(" + accid + L")";
+            accid = U"(" + accid + U")";
         }
         output += accid;
     }
@@ -7891,64 +7911,64 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
         // do not has slashes available).
         // See: https://www.smufl.org/version/latest/range/figuredBass
         switch (digit) {
-            case 0: output += L"\uEA50"; break; // draw without slash
-            case 1: output += L"\uEA51"; break; // draw without slash
-            case 2: output += L"\uEA53"; break;
-            case 3: output += L"\uEA54"; break; // draw without slash
-            case 4: output += L"\uEA56"; break; // only one style of slash
+            case 0: output += U"\uEA50"; break; // draw without slash
+            case 1: output += U"\uEA51"; break; // draw without slash
+            case 2: output += U"\uEA53"; break;
+            case 3: output += U"\uEA54"; break; // draw without slash
+            case 4: output += U"\uEA56"; break; // only one style of slash
             case 5:
                 switch (slash) {
-                    case 1: output += L"\uEA5A"; break; // 5/
-                    case 2: output += L"\uEA59"; break; // 5\ .
-                    case 3: output += L"\uEA58"; break; // 5|
-                    default: output += L"\uEA57"; break; // 5
+                    case 1: output += U"\uEA5A"; break; // 5/
+                    case 2: output += U"\uEA59"; break; // 5\ .
+                    case 3: output += U"\uEA58"; break; // 5|
+                    default: output += U"\uEA57"; break; // 5
                 }
                 break;
             case 6:
                 switch (slash) {
-                    case 1: output += L"\uEA5C"; break; // 6/
-                    case 2: output += L"\uEA5C"; break; // 6\ .
-                    case 3: output += L"\uEA5C"; break; // 6|
-                    default: output += L"\uEA5B"; break; // 6
+                    case 1: output += U"\uEA5C"; break; // 6/
+                    case 2: output += U"\uEA5C"; break; // 6\ .
+                    case 3: output += U"\uEA5C"; break; // 6|
+                    default: output += U"\uEA5B"; break; // 6
                 }
                 break;
             case 7:
                 switch (slash) {
-                    case 1: output += L"\uECC0"; break; // 7/
-                    case 2: output += L"\uEA5F"; break; // 7\ .
-                    case 3: output += L"\uEA5E"; break; // 7|
-                    default: output += L"\uEA5D"; break; // 7
+                    case 1: output += U"\uECC0"; break; // 7/
+                    case 2: output += U"\uEA5F"; break; // 7\ .
+                    case 3: output += U"\uEA5E"; break; // 7|
+                    default: output += U"\uEA5D"; break; // 7
                 }
                 break;
-            case 8: output += L"\uEA60"; break; // draw without slash
-            case 9: output += L"\uEA62"; break; // only one style of slash
+            case 8: output += U"\uEA60"; break; // draw without slash
+            case 9: output += U"\uEA62"; break; // only one style of slash
         }
     }
 
     // accidental after number if an "r" is present:
     if ((!slash) && ((input.find("r") != std::string::npos) || reverse)) {
-        std::wstring accid = getVisualFBAccidental(accidental);
+        std::u32string accid = getVisualFBAccidental(accidental);
         if (accidental && (input.find("i") != std::string::npos)) {
-            accid = L"[" + accid + L"]";
+            accid = U"[" + accid + U"]";
         }
         else if (accidental && (input.find("j") != std::string::npos)) {
-            accid = L"(" + accid + L")";
+            accid = U"(" + accid + U")";
         }
         output += accid;
     }
 
     if (input.find("J") != std::string::npos) {
-        output = L"(" + output + L")";
+        output = U"(" + output + U")";
     }
     else if (input.find("I") != std::string::npos) {
-        output = L"[" + output + L"]";
+        output = U"[" + output + U"]";
     }
     else if (slash) {
         if (input.find("j") != std::string::npos) {
-            output = L"(" + output + L")";
+            output = U"(" + output + U")";
         }
         else if (input.find("i") != std::string::npos) {
-            output = L"[" + output + L"]";
+            output = U"[" + output + U"]";
         }
     }
 
@@ -7956,20 +7976,20 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
     // so display an underscore after the figure to indicate
     // that one should be added in the future:
     if (input.find("_") != std::string::npos) {
-        output += L" _";
+        output += U" _";
     }
     // A "=" character indicates that there is a the figure (should be
     // centered between current figure and next one, but not available yet).
     // Technically this is a sort of extender, but f@extension is
     // boolean, so various styles cannot be encoded in it.
     if (input.find("=") != std::string::npos) {
-        output += L" -";
+        output += U" -";
     }
 
     /*
-                To convert a free-form std::string to UTF16:
+                To convert a free-form std::string to UTF32:
                 std::string tdee;
-                output.back() += UTF8to16(tdee);
+                output.back() += UTF8to32(tdee);
     */
 
     return output;
@@ -7980,25 +8000,25 @@ std::wstring HumdrumInput::convertFBNumber(const std::string &input, hum::HTp to
 // HumdrumInput::convertNumberToWstring --
 //
 
-std::wstring HumdrumInput::convertNumberToWstring(int number)
+std::u32string HumdrumInput::convertNumberToWstring(int number)
 {
     if (number < 0) {
-        return L"";
+        return U"";
     }
     std::string value = to_string(number);
-    std::wstring output;
+    std::u32string output;
     for (int i = 0; i < (int)value.size(); ++i) {
         switch (value[i]) {
-            case '0': output += L"\uEA50"; break;
-            case '1': output += L"\uEA51"; break;
-            case '2': output += L"\uEA52"; break;
-            case '3': output += L"\uEA54"; break;
-            case '4': output += L"\uEA55"; break;
-            case '5': output += L"\uEA57"; break;
-            case '6': output += L"\uEA5B"; break;
-            case '7': output += L"\uEA5D"; break;
-            case '8': output += L"\uEA60"; break;
-            case '9': output += L"\uEA61"; break;
+            case '0': output += U"\uEA50"; break;
+            case '1': output += U"\uEA51"; break;
+            case '2': output += U"\uEA52"; break;
+            case '3': output += U"\uEA54"; break;
+            case '4': output += U"\uEA55"; break;
+            case '5': output += U"\uEA57"; break;
+            case '6': output += U"\uEA5B"; break;
+            case '7': output += U"\uEA5D"; break;
+            case '8': output += U"\uEA60"; break;
+            case '9': output += U"\uEA61"; break;
         }
     }
     return output;
@@ -8009,30 +8029,30 @@ std::wstring HumdrumInput::convertNumberToWstring(int number)
 // HumdrumInput::getVisualFBAccidental --
 //
 
-std::wstring HumdrumInput::getVisualFBAccidental(int accidental)
+std::u32string HumdrumInput::getVisualFBAccidental(int accidental)
 {
-    std::wstring output;
+    std::u32string output;
     switch (accidental) {
         case 1:
-            output = L"\uE264"; // SMUFL double-flat
+            output = U"\uE264"; // SMUFL double-flat
             break;
         case 2:
-            // output = L"\u266D"; // unicode flat
-            output = L"\uE260"; // SMUFL flat
+            // output = U"\u266D"; // unicode flat
+            output = U"\uE260"; // SMUFL flat
             break;
         case 3:
-            // output = L"\u266E"; // unicode natural
-            output = L"\uE261"; // SMUFL natural
+            // output = U"\u266E"; // unicode natural
+            output = U"\uE261"; // SMUFL natural
             break;
         case 4:
-            // output = L"\u266F"; // unicode sharp
-            output = L"\uE262"; // SMUFL sharp
+            // output = U"\u266F"; // unicode sharp
+            output = U"\uE262"; // SMUFL sharp
             break;
         case 5:
-            output = L"\uE263"; // SMUFL double-sharp
+            output = U"\uE263"; // SMUFL double-sharp
             break;
         case 6:
-            output = L"+"; // UTF-7 +
+            output = U"+"; // UTF-7 +
             break;
     }
     return output;
@@ -8047,17 +8067,17 @@ std::wstring HumdrumInput::getVisualFBAccidental(int accidental)
 //     will be suppressed.
 //
 
-std::wstring HumdrumInput::cleanHarmString3(const std::string &content)
+std::u32string HumdrumInput::cleanHarmString3(const std::string &content)
 {
     std::string temp;
 
     // hide **rhrm token if not a harmony "attack":
 
     if (content.find("_") != std::string::npos) {
-        return L"";
+        return U"";
     }
     if (content.find("]") != std::string::npos) {
-        return L"";
+        return U"";
     }
 
     // skip over **recip data:
@@ -8096,9 +8116,9 @@ std::wstring HumdrumInput::cleanHarmString3(const std::string &content)
 // HumdrumInput::cleanHarmString2 -- Adjust **harm text
 //
 
-std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
+std::u32string HumdrumInput::cleanHarmString2(const std::string &content)
 {
-    std::wstring output;
+    std::u32string output;
     bool nonrhythm = false;
     for (int i = 0; i < (int)content.size(); ++i) {
         if (!nonrhythm) {
@@ -8114,21 +8134,21 @@ std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
         }
         nonrhythm = true;
         if (content[i] == '-') {
-            output += L"\u266D"; // unicode flat
+            output += U"\u266D"; // unicode flat
         }
         else if (content[i] == '#') {
-            output += L"\u266F"; // unicode sharp
+            output += U"\u266F"; // unicode sharp
         }
         else if (content[i] == 'D') {
-            output += L"\u00F8"; // o-slash
+            output += U"\u00F8"; // o-slash
         }
         else if (content[i] == 'o') {
-            output += L"\u00B0"; // degree sign
+            output += U"\u00B0"; // degree sign
         }
         else {
             std::string tdee;
             tdee = content[i];
-            output += UTF8to16(tdee);
+            output += UTF8to32(tdee);
         }
     }
 
@@ -8141,26 +8161,26 @@ std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
 //    see: https://www.fileformat.info/info/unicode/block/enclosed_alphanumerics/utf8test.htm
 //
 
-std::wstring HumdrumInput::cleanStringString(const std::string &content)
+std::u32string HumdrumInput::cleanStringString(const std::string &content)
 {
-    std::wstring output;
+    std::u32string output;
     std::string value;
     for (int i = 0; i < (int)content.size(); ++i) {
         switch (content[i]) {
-            case '0': output += L"\u24ea"; break; // 0 in circle
-            case '1': output += L"\u2460"; break; // 1 in circle
-            case '2': output += L"\u2461"; break; // 2 in circle
-            case '3': output += L"\u2462"; break; // 3 in circle
-            case '4': output += L"\u2463"; break; // 4 in circle
-            case '5': output += L"\u2464"; break; // 5 in circle
-            case '6': output += L"\u2465"; break; // 6 in circle
-            case '7': output += L"\u2466"; break; // 7 in circle
-            case '8': output += L"\u2467"; break; // 8 in circle
-            case '9': output += L"\u2468"; break; // 9 in circle
+            case '0': output += U"\u24ea"; break; // 0 in circle
+            case '1': output += U"\u2460"; break; // 1 in circle
+            case '2': output += U"\u2461"; break; // 2 in circle
+            case '3': output += U"\u2462"; break; // 3 in circle
+            case '4': output += U"\u2463"; break; // 4 in circle
+            case '5': output += U"\u2464"; break; // 5 in circle
+            case '6': output += U"\u2465"; break; // 6 in circle
+            case '7': output += U"\u2466"; break; // 7 in circle
+            case '8': output += U"\u2467"; break; // 8 in circle
+            case '9': output += U"\u2468"; break; // 9 in circle
             default:
                 value.clear();
                 value.push_back(content[i]);
-                output += UTF8to16(value);
+                output += UTF8to32(value);
         }
     }
     return output;
@@ -8171,11 +8191,11 @@ std::wstring HumdrumInput::cleanStringString(const std::string &content)
 // HumdrumInput::cleanHarmString --
 //
 
-std::wstring HumdrumInput::cleanHarmString(const std::string &content)
+std::u32string HumdrumInput::cleanHarmString(const std::string &content)
 {
-    std::wstring root;
-    std::wstring kind;
-    std::wstring bass;
+    std::u32string root;
+    std::u32string kind;
+    std::u32string bass;
 
     bool foundspace = false;
     bool foundslash = false;
@@ -8186,7 +8206,7 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
         if (foundspace && !foundslash) {
             std::string tdee;
             tdee = content[i];
-            kind += UTF8to16(tdee);
+            kind += UTF8to32(tdee);
             continue;
         }
         if (content[i] == ' ') {
@@ -8199,28 +8219,28 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
         }
         if (!foundspace) {
             if (content[i] == '-') {
-                root += L"\u266D"; // unicode flat
+                root += U"\u266D"; // unicode flat
             }
             else if (content[i] == '#') {
-                root += L"\u266F"; // unicode sharp
+                root += U"\u266F"; // unicode sharp
             }
             else {
                 std::string tdee;
                 tdee = content[i];
-                root += UTF8to16(tdee);
+                root += UTF8to32(tdee);
             }
         }
         else if (foundslash) {
             if (content[i] == '-') {
-                bass += L"\u266D"; // unicode flat
+                bass += U"\u266D"; // unicode flat
             }
             else if (content[i] == '#') {
-                bass += L"\u266F"; // unicode sharp
+                bass += U"\u266F"; // unicode sharp
             }
             else {
                 std::string tdee;
                 tdee = content[i];
-                bass += UTF8to16(tdee);
+                bass += UTF8to32(tdee);
             }
         }
         else {
@@ -8229,127 +8249,127 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
     }
 
     bool replacing = false;
-    if (kind == L"major-minor") {
-        kind = L"Mm7";
+    if (kind == U"major-minor") {
+        kind = U"Mm7";
         replacing = true;
     }
-    else if (kind == L"minor-major") {
-        kind = L"mM7";
-        replacing = true;
-    }
-
-    if (replace(kind, L"major-", L"maj")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"minor-", L"m")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"dominant-", L"dom")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"augmented-", L"+")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"suspended-", L"sus")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"diminished-", L"\u00B0")) { // degree sign
-        replacing = true;
-    }
-    if (replace(kind, L"seventh", L"7")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"ninth", L"9")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"11th", L"11")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"13th", L"13")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"second", L"2")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"fourth", L"4")) {
-        replacing = true;
-    }
-    else if (replace(kind, L"sixth", L"6")) {
+    else if (kind == U"minor-major") {
+        kind = U"mM7";
         replacing = true;
     }
 
-    if (kind == L"major") {
-        kind = L"";
+    if (replace(kind, U"major-", U"maj")) {
         replacing = true;
     }
-    else if (kind == L"maj") {
-        kind = L"";
+    else if (replace(kind, U"minor-", U"m")) {
         replacing = true;
     }
-    else if (kind == L"ma") {
-        kind = L""; // degree sign
+    else if (replace(kind, U"dominant-", U"dom")) {
         replacing = true;
     }
-    else if (kind == L"minor") {
-        kind = L"m";
+    else if (replace(kind, U"augmented-", U"+")) {
         replacing = true;
     }
-    else if (kind == L"min") {
-        kind = L"m";
+    else if (replace(kind, U"suspended-", U"sus")) {
         replacing = true;
     }
-    else if (kind == L"augmented") {
-        kind = L"+";
+    else if (replace(kind, U"diminished-", U"\u00B0")) { // degree sign
         replacing = true;
     }
-    else if (kind == L"minor-seventh") {
-        kind = L"m7";
+    if (replace(kind, U"seventh", U"7")) {
         replacing = true;
     }
-    else if (kind == L"major-seventh") {
-        kind = L"maj7";
+    else if (replace(kind, U"ninth", U"9")) {
         replacing = true;
     }
-    else if (kind == L"dom11") {
-        kind = L"11";
+    else if (replace(kind, U"11th", U"11")) {
         replacing = true;
     }
-    else if (kind == L"dom13") {
-        kind = L"13";
+    else if (replace(kind, U"13th", U"13")) {
         replacing = true;
     }
-    else if (kind == L"dom9") {
-        kind = L"9";
+    else if (replace(kind, U"second", U"2")) {
         replacing = true;
     }
-    else if (kind == L"half-diminished") {
-        kind = L"\u00F8"; // o-slash
+    else if (replace(kind, U"fourth", U"4")) {
         replacing = true;
     }
-    else if (kind == L"diminished") {
-        kind = L"\u00B0"; // degree sign
+    else if (replace(kind, U"sixth", U"6")) {
         replacing = true;
     }
-    else if (kind == L"dominant") {
-        kind = L"7";
+
+    if (kind == U"major") {
+        kind = U"";
         replacing = true;
     }
-    else if (kind == L"power") {
-        kind = L"5";
+    else if (kind == U"maj") {
+        kind = U"";
         replacing = true;
     }
-    else if (kind == L"m7b5") {
+    else if (kind == U"ma") {
+        kind = U""; // degree sign
         replacing = true;
-        kind = L"m7\u266D"
-               L"5";
     }
-    if ((kind != L"") && !replacing) {
-        root += L' ';
+    else if (kind == U"minor") {
+        kind = U"m";
+        replacing = true;
     }
-    if (bass != L"") {
-        kind += L'/';
+    else if (kind == U"min") {
+        kind = U"m";
+        replacing = true;
     }
-    std::wstring output = root + kind + bass;
+    else if (kind == U"augmented") {
+        kind = U"+";
+        replacing = true;
+    }
+    else if (kind == U"minor-seventh") {
+        kind = U"m7";
+        replacing = true;
+    }
+    else if (kind == U"major-seventh") {
+        kind = U"maj7";
+        replacing = true;
+    }
+    else if (kind == U"dom11") {
+        kind = U"11";
+        replacing = true;
+    }
+    else if (kind == U"dom13") {
+        kind = U"13";
+        replacing = true;
+    }
+    else if (kind == U"dom9") {
+        kind = U"9";
+        replacing = true;
+    }
+    else if (kind == U"half-diminished") {
+        kind = U"\u00F8"; // o-slash
+        replacing = true;
+    }
+    else if (kind == U"diminished") {
+        kind = U"\u00B0"; // degree sign
+        replacing = true;
+    }
+    else if (kind == U"dominant") {
+        kind = U"7";
+        replacing = true;
+    }
+    else if (kind == U"power") {
+        kind = U"5";
+        replacing = true;
+    }
+    else if (kind == U"m7b5") {
+        replacing = true;
+        kind = U"m7\u266D"
+               U"5";
+    }
+    if ((kind != U"") && !replacing) {
+        root += U' ';
+    }
+    if (bass != U"") {
+        kind += U'/';
+    }
+    std::u32string output = root + kind + bass;
     return output;
 }
 
@@ -8371,9 +8391,9 @@ bool HumdrumInput::replace(string &str, const std::string &oldStr, const std::st
     return output;
 }
 
-bool HumdrumInput::replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr)
+bool HumdrumInput::replace(std::u32string &str, const std::u32string &oldStr, const std::u32string &newStr)
 {
-    std::wstring::size_type pos = 0u;
+    std::u32string::size_type pos = 0u;
     bool output = false;
     while ((pos = str.find(oldStr, pos)) != std::string::npos) {
         output = true;
@@ -8403,6 +8423,9 @@ bool HumdrumInput::convertMeasureStaff(int track, int startline, int endline, in
         if (!status) {
             break;
         }
+    }
+    if (ss.at(staffindex).glissStarts.size() > 0) {
+        insertGlissandos(ss.at(staffindex).glissStarts);
     }
     ss.at(staffindex).join = m_join;
     checkClefBufferForSameAs();
@@ -9628,6 +9651,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
                 else {
                     std::cerr << "Strange error for adding rest " << trest << std::endl;
+                    std::cerr << "LINE: " << trest->getLineNumber() << ", FIELD: " << trest->getFieldNumber()
+                              << std::endl;
                 }
             }
 
@@ -9722,6 +9747,38 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (*layerdata[i] == "*Xjoin") {
                 m_join = false;
                 continue;
+            }
+            if ((staffindex == 0) && (layerdata[i]->compare(0, 8, "*tscale:") == 0)) {
+                hum::HumRegex hree;
+                if (hree.search(layerdata[i], "^\\*tscale:(\\d+)/(\\d+)$")) {
+                    int valuetop = hree.getMatchInt(1);
+                    int valuebot = hree.getMatchInt(2);
+                    if ((valuetop > 0) && (valuebot > 0)) {
+                        hum::HumNum value = valuetop;
+                        value /= valuebot;
+                        m_localTempoScaling *= value;
+                        Tempo *tempo = new Tempo();
+                        tempo->SetMidiBpm(m_midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
+                        setLocationId(tempo, layerdata[i]);
+                        int staffindex = 0;
+                        hum::HumNum tstamp = getMeasureTstamp(layerdata[i], staffindex);
+                        tempo->SetTstamp(tstamp.getFloat());
+                        addChildMeasureOrSection(tempo);
+                    }
+                }
+                else if (hree.search(layerdata[i], "^\\*tscale:(\\d+)$")) {
+                    hum::HumNum value = hree.getMatchInt(1);
+                    if (value > 0) {
+                        m_localTempoScaling *= value;
+                        Tempo *tempo = new Tempo();
+                        tempo->SetMidiBpm(m_midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
+                        setLocationId(tempo, layerdata[i]);
+                        int staffindex = 0;
+                        hum::HumNum tstamp = getMeasureTstamp(layerdata[i], staffindex);
+                        tempo->SetTstamp(tstamp.getFloat());
+                        addChildMeasureOrSection(tempo);
+                    }
+                }
             }
 
             if (ss[staffindex].verse) {
@@ -10784,6 +10841,7 @@ void HumdrumInput::handleTempoChange(hum::HTp token)
     if (midibpm <= 0) {
         return;
     }
+    m_midibpm = midibpm;
 
     bool nearOmd = isNearOmd(token);
     if (nearOmd) {
@@ -10803,7 +10861,7 @@ void HumdrumInput::handleTempoChange(hum::HTp token)
     }
 
     Tempo *tempo = new Tempo();
-    tempo->SetMidiBpm(midibpm * m_tempoScaling);
+    tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
     setLocationId(tempo, token);
     int staffindex = 0;
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
@@ -12644,7 +12702,7 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
         Tempo *tempo = new Tempo();
         double midibpm = getMmTempo(token);
         if (midibpm > 0) {
-            tempo->SetMidiBpm(midibpm * m_tempoScaling);
+            tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
         }
         if (cparam) {
             setStaffBetween(tempo, m_currentstaff);
@@ -12676,6 +12734,10 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
             addTextElement(rend, text);
             if (!italic) {
                 rend->SetFontstyle(FONTSTYLE_normal);
+            }
+            else {
+                // Explicitly set italic fontstyle.
+                rend->SetFontstyle(FONTSTYLE_italic);
             }
             if (bold) {
                 rend->SetFontweight(FONTWEIGHT_bold);
@@ -12725,6 +12787,10 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
             if (!italic) {
                 rend->SetFontstyle(FONTSTYLE_normal);
             }
+            else {
+                // Explicitly set italic fontstyle.
+                rend->SetFontstyle(FONTSTYLE_italic);
+            }
             if (bold) {
                 rend->SetFontweight(FONTWEIGHT_bold);
             }
@@ -12754,12 +12820,15 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
         return;
     }
 
-    // maybe add center justification as an option later
     // justification == 0 means no explicit justification (mostly left justified)
     // justification == 1 means right justified
+    // justification == 2 means center justified
     int justification = 0;
     if (token->isDefined("LO", "TX", "rj")) {
         justification = 1;
+    }
+    else if (token->isDefined("LO", "TX", "cj")) {
+        justification = 2;
     }
 
     bool zparam = token->isDefined("LO", "TX", "Z");
@@ -13004,6 +13073,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         if (key == "rj") {
             justification = 1;
         }
+        if (key == "cj") {
+            justification = 2;
+        }
         if (key == "color") {
             color = value;
         }
@@ -13138,7 +13210,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
         tempo = new Tempo();
         if (midibpm > 0) {
-            tempo->SetMidiBpm(midibpm * m_tempoScaling);
+            tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
         }
         if (placement == "between") {
             setStaffBetween(tempo, m_currentstaff);
@@ -13239,13 +13311,11 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
 
     bool plain = !(italic || bold);
-    bool needrend = plain || bold || justification || color.size();
-    bool oldneedrend = false;
-    bool onlyverovio = false;
+    bool needrend = italic || plain || bold || justification || color.size();
+    bool onlysmufl = false;
     if (hre.search(text, "^(\\[.*?\\])+$")) {
-        oldneedrend = needrend;
-        needrend = false;
-        onlyverovio = true;
+        onlysmufl = true;
+        needrend = justification || color.size();
     }
 
     if (needrend) {
@@ -13269,18 +13339,25 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         if (!italic) {
             rend->SetFontstyle(FONTSTYLE_normal);
         }
+        else {
+            // Explicitly set italic fontstyle.
+            rend->SetFontstyle(FONTSTYLE_italic);
+        }
         if (bold) {
             rend->SetFontweight(FONTWEIGHT_bold);
         }
         if (justification == 1) {
             rend->SetHalign(HORIZONTALALIGNMENT_right);
         }
+        else if (justification == 2) {
+            rend->SetHalign(HORIZONTALALIGNMENT_center);
+        }
     }
     else {
 
         if (tempoQ && tempo) {
             addTextElement(tempo, text);
-            if (onlyverovio && oldneedrend) {
+            if (onlysmufl && needrend) {
                 int count = tempo->GetChildCount();
                 for (int j = 0; j < count; j++) {
                     Object *obj = tempo->GetChild(j);
@@ -13300,45 +13377,55 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
                     if (!italic) {
                         item->SetFontstyle(FONTSTYLE_normal);
                     }
+                    else {
+                        // Explicitly set italic fontstyle.
+                        item->SetFontstyle(FONTSTYLE_italic);
+                    }
                     if (bold) {
                         item->SetFontweight(FONTWEIGHT_bold);
                     }
                     if (justification == 1) {
                         item->SetHalign(HORIZONTALALIGNMENT_right);
+                    }
+                    else if (justification == 2) {
+                        item->SetHalign(HORIZONTALALIGNMENT_center);
                     }
                 }
             }
         }
         else if (dir) {
-
-            addTextElement(dir, text);
-            if (onlyverovio && oldneedrend) {
-                int count = dir->GetChildCount();
-                for (int j = 0; j < count; j++) {
-                    Object *obj = dir->GetChild(j);
-                    if (obj->GetClassName() != "Rend") {
-                        continue;
-                    }
-                    Rend *item = (Rend *)obj;
-                    if (!color.empty()) {
-                        item->SetColor(color);
-                    }
-                    else if (problemQ) {
-                        item->SetColor("red");
-                    }
-                    else if (sicQ) {
-                        item->SetColor("limegreen");
-                    }
-                    if (!italic) {
-                        item->SetFontstyle(FONTSTYLE_normal);
-                    }
-                    if (bold) {
-                        item->SetFontweight(FONTWEIGHT_bold);
-                    }
-                    if (justification == 1) {
-                        item->SetHalign(HORIZONTALALIGNMENT_right);
-                    }
+            if (onlysmufl && needrend) {
+                Rend *rend = new Rend();
+                dir->AddChild(rend);
+                addTextElement(rend, text);
+                if (!color.empty()) {
+                    rend->SetColor(color);
                 }
+                else if (problemQ) {
+                    rend->SetColor("red");
+                }
+                else if (sicQ) {
+                    rend->SetColor("limegreen");
+                }
+                if (!italic) {
+                    rend->SetFontstyle(FONTSTYLE_normal);
+                }
+                else {
+                    // Explicitly set italic fontstyle.
+                    rend->SetFontstyle(FONTSTYLE_italic);
+                }
+                if (bold) {
+                    rend->SetFontweight(FONTWEIGHT_bold);
+                }
+                if (justification == 1) {
+                    rend->SetHalign(HORIZONTALALIGNMENT_right);
+                }
+                else if (justification == 2) {
+                    rend->SetHalign(HORIZONTALALIGNMENT_center);
+                }
+            }
+            else {
+                addTextElement(dir, text);
             }
         }
     }
@@ -13415,7 +13502,7 @@ bool HumdrumInput::addTempoDirection(const std::string &text, const std::string 
     Tempo *tempo = new Tempo();
     double midibpm = getMmTempo(token);
     if (midibpm > 0) {
-        tempo->SetMidiBpm(midibpm * m_tempoScaling);
+        tempo->SetMidiBpm(midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
     }
     if (placement == "center") {
         setStaffBetween(tempo, m_currentstaff);
@@ -13445,6 +13532,8 @@ bool HumdrumInput::addTempoDirection(const std::string &text, const std::string 
         setPlaceRelStaff(tempo, "between", false);
     }
 
+    // deal with rj and cj justification here
+
     bool status = setTempoContent(tempo, text);
     if (status) {
         addChildMeasureOrSection(tempo);
@@ -13467,29 +13556,29 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
 {
     std::string name2 = name;
     std::string prestring;
-    std::wstring symbol;
+    std::u32string symbol;
     std::string poststring;
 
     hum::HumRegex hre;
     if (hre.search(name2, "(.*)-flat\\b(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE260"; // SMUFL flat
+        symbol = U"\uE260"; // SMUFL flat
     }
     else if (hre.search(name2, "(.*)-sharp\\b(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE262"; // SMUFL sharp
+        symbol = U"\uE262"; // SMUFL sharp
     }
     else if (hre.search(name2, "(.*\\b[A-G])b\\b(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE260"; // SMUFL flat
+        symbol = U"\uE260"; // SMUFL flat
     }
     else if (hre.search(name2, "(.*[A-G])\x23(.*)")) {
         prestring = hre.getMatch(1);
         poststring = hre.getMatch(2);
-        symbol = L"\uE262"; // SMUFL sharp
+        symbol = U"\uE262"; // SMUFL sharp
     }
 
     if (symbol.empty()) {
@@ -13504,7 +13593,7 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
         text->SetText(symbol);
         rend->AddChild(text);
         label->AddChild(rend);
-        rend->SetFontname("VerovioText");
+        rend->SetFontfam("smufl");
         if (!poststring.empty()) {
             addTextElement(label, poststring);
         }
@@ -13531,19 +13620,44 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
     std::string first = hre.getMatch(1);
     std::string second = hre.getMatch(2);
     std::string third = hre.getMatch(3);
-    second = convertMusicSymbolNameToSmuflEntity(second);
+    std::vector<std::string> secondNames = convertMusicSymbolNameToSmuflName(second);
 
     if (!first.empty()) {
+        if (first.back() == '(') {
+            // Add very thin spacer after opening parenthesis
+            // to separate parenthesis and notehead:
+            first += "&#x200A;";
+        }
         addTextElement(tempo, first);
     }
 
-    Rend *rend = new Rend();
-    addTextElement(rend, second);
-    tempo->AddChild(rend);
-    rend->SetFontname("VerovioText");
+    // Add the musical symbols, adding a space between them
+    std::string name;
+    int counter = 0;
+    for (int i = 0; i < (int)secondNames.size(); i++) {
+        if (secondNames.at(i).empty()) {
+            continue;
+        }
+        name = secondNames.at(i);
+        if (counter) {
+            // Add a space element between music symbols.
+            if (name == "metAugmentationDot") {
+                addTextElement(tempo, m_textAugmentationDotSpacer);
+            }
+            else {
+                addTextElement(tempo, m_textSmuflSpacer);
+            }
+        }
+        ++counter;
 
-    // Forcing spaces around equals sign:
-    third = "\xc2\xa0=\xc2\xa0" + third;
+        Symbol *symbol = new Symbol();
+        setSmuflContent(symbol, name);
+        setFontsize(symbol, name, "");
+        tempo->AddChild(symbol);
+    }
+
+    // Force spaces around equals sign:
+    third = m_textSmuflSpacer + "=" + m_textSmuflSpacer + third;
     addTextElement(tempo, third);
 
     return true;
@@ -13551,200 +13665,356 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
 
 //////////////////////////////
 //
-// HumdrumInput::convertMusicSymbolNameToSmuflEntity --  Convert from
-//    text names for music symbols into SMuFL codepoints for VerovioText font.
-//
-//      NAME (alternates)      HEX ENCODING    NOTES
-// ===============================================================
-//
-// https://www.smufl.org/version/latest/range/repeats
-//      segno                      E047
-//      coda                       E048
-//
-// http://www.smufl.org/version/1.2/range/medievalAndRenaissanceMiscellany
-//      sc                         EA00   (signum congruentiae up)
-//      sc-below                   EA01   (signum congruentiae below the staff)
-//
-// https://www.smufl.org/version/latest/range/individualNotes
-//      breve                      E1D1
-//      whole                      E1D2
-//      half                       E1D3   (half-up)
-//      quarter                    E1D5   (quarter-up)
-//      eighth                     E1D7   (eighth-up)
-//      sixteenth                  E1D9   (sixteenth-up) (or 16th)
-//      32nd                       E1DB   (32nd-up)
-//      64th                       E1DD   (64th-up)
-//      128th                      E1DF   (128th-up)
-//      256th                      E1E1   (256th-up)
-//      512th                      E1E3   (512th-up)
-//      1024th                     E1E5   (1024th-up)
-//      -dot                       E1E7   (1024th-up)
-//
-// http://www.smufl.org/version/1.2/range/medievalAndRenaissanceProlations
-//      circle-dot (O., o.)        E910   (also O-dot, and o-dot)
-//      circle (O, o)              E911
-//      cut-circle (O!, o!)        E912   (also cut-o, and cut-O)
-//      cut-circle-dot (O.!, o.!)) E913   (also cut-o-dot, and cut-O-dot)
-//      c-dot (C., c.)             E914
-//      c (C)                      E915
-//      reverse-c (Cr, cr)         E916
-//      cut-c-dot (C.!, c.!)       E917
-//      cut-c (C!, c!)             E918
-//      reverse-cut-c (C!r, c!r)   E919
-//      reverse-c-dot (C.r, c.r)   E91A
-//      o-slash (O/, o/)           E91B
-
-//
-// https://www.smufl.org/version/latest/range/metronomeMarks
-//      [not used (actually copied to E1D0 range)]
-//      breve                      ECA1
-//      whole                      ECA2
-//      half                       ECA3   (half-up)
-//      quarter                    ECA5   (quarter-up)
-//      eighth                     ECA7   (eighth-up)
-//      sixteenth                  ECA9   (sixteenth-up) (or 16th)
-//      32nd                       ECAB   (32nd-up)
-//      64th                       ECAD   (64th-up)
-//      128th                      ECAF   (128th-up)
-//      256th                      ECB1   (256th-up)
-//      512th                      ECB3   (512th-up)
-//      1024th                     ECB5   (1024th-up)
-//      -dot                       ECB7   (1024th-up)
+// HumdrumInput::setSmuflContent -- Pull out any type parameter before inserting the name of the glyph.
 //
 
-std::string HumdrumInput::convertMusicSymbolNameToSmuflEntity(const std::string &text)
+void HumdrumInput::setSmuflContent(Symbol *symbol, const std::string &name)
 {
-
-    if (text.empty()) {
-        return "";
-    }
-    std::string second;
-    if ((text[0] == '[') && (text.back() == ']')) {
-        second = text.substr(1, text.size() - 2);
+    hum::HumRegex hre;
+    std::string mytype;
+    if (hre.search(name, "@type=\"(.*?)\"")) {
+        mytype = hre.getMatch(1);
+        std::string newname = hre.replaceCopy(name, "", "@.*");
+        symbol->SetGlyphName(newname);
     }
     else {
-        second = text;
+        symbol->SetGlyphName(name);
     }
 
-    // remove syling qualifiers
-    size_t pos = second.find('|');
-    if (pos != std::string::npos) {
-        second = second.substr(0, pos);
-    }
+    symbol->SetGlyphAuth("smufl");
 
+    if (!mytype.empty()) {
+        symbol->SetType(mytype);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setFontsize -- Set the fontsize of an element to a percentage or absolute size.
+//
+
+template <class ELEMENT>
+void HumdrumInput::setFontsize(ELEMENT *element, const std::string &smuflname, const std::string &original)
+{
+    // Check for percentage override:
     hum::HumRegex hre;
-    if (hre.search(second, "^(&#x[a-f0-9]{4};)+$", "i")) {
-        // Passing a raw SMuFL entity
-        return second;
+    if (hre.search(original, "(\\d+\\.?\\d*%)")) {
+        std::string perc = hre.getMatch(1);
+        data_PERCENT fontpercent;
+        fontpercent = ((vrv::AttTypography *)element)->StrToPercent(perc);
+        data_FONTSIZE fontsize;
+        fontsize.SetPercent(fontpercent);
+        element->SetFontsize(fontsize);
+        return;
     }
+
+    // Check for explicit size override.  Verovio mappings to percent:
+    //   xx_large => 200
+    //   x_large  => 150
+    //   large    => 110
+    //   larger   => 110
+    //   small    => 80
+    //   smaller  => 80
+    //   x_small  => 60
+    //   xx_small => 50
+
+    if (original.find("smaller") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_x_small);
+        element->SetFontsize(fs);
+        return;
+    }
+    else if (original.find("smallest") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_xx_small);
+        element->SetFontsize(fs);
+        return;
+    }
+    else if (original.find("small") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_small);
+        element->SetFontsize(fs);
+        return;
+    }
+    else if (original.find("larger") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_x_large);
+        element->SetFontsize(fs);
+        return;
+    }
+    else if (original.find("largest") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_xx_large);
+        element->SetFontsize(fs);
+        return;
+    }
+    else if (original.find("large") != std::string::npos) {
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_large);
+        element->SetFontsize(fs);
+        return;
+    }
+
+    if (smuflname.compare(0, 3, "met") == 0) {
+        // If smuflname is for a metric note, then shrink the size to 70% by default.
+        data_PERCENT fontpercent;
+        fontpercent = ((vrv::AttTypography *)element)->StrToPercent(m_textNoteSize);
+        data_FONTSIZE fontsize;
+        fontsize.SetPercent(fontpercent);
+        element->SetFontsize(fontsize);
+        return;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::convertMusicSymbolNameToSmuflName --  Convert from
+//    text names for music symbols into SMuFL names for display with <symbol>
+//
+//    Humdrum name                 SMuFL name
+// ===============================================================
+//    segno                        segno
+//    coda                         coda
+//    [Pp]ed                       pianoPedalPed
+//    [Xx][Pp]ed                   pianoPedalPedUp
+//    sc                           mensuralSignumUp
+//    sc-below                     mensuralSignumDown
+//    breve                        metNoteDoubleWholeSquare
+//    whole                        metNoteWhole
+//    half                         metNoteHalfUp
+//    quarter                      metNoteQuarterUp
+//    eighth                       metNote8thUp
+//    sixteenth                    metNote16thUp
+//    32nd                         metNote32ndUp
+//    64th                         metNote64thUp
+//    128th                        metNote128thUp
+//    256th                        metNote256thUp
+//    512th                        metNote512thUp
+//    1024th                       metNote1024thUp
+//    -dot                         metAugmentationDot
+//    circle-dot, [Oo]-dot         mensuralProlation1
+//    circle, [Oo]                 mensuralProlation2
+//    cut-circle, cut-[Oo]         mensuralProlation3
+//    cut-circle-dot, cut-[Oo]-dot mensuralProlation4
+//    [Cc]-dot                     mensuralProlation5
+//    C                            mensuralProlation6
+//    c                            timeSigCommon
+//    reverse-[Cc], [Cc]r          mensuralProlation7
+//    cut-[Cc]-dot                 mensuralProlation8
+//    cut-C                        mensuralProlation9
+//    cut-c                        timeSigCutCommon
+//    reverse-cut-[Cc]c            mensuralProlation10
+//    reverse-[Cc]-dot             mensuralProlation11
+//    [Oo]-slash                   mensuralProportionTempusPerfectum
+//
+
+std::vector<std::string> HumdrumInput::convertMusicSymbolNameToSmuflName(const std::string &text)
+{
+    std::vector<std::string> output;
+
+    if (text.empty()) {
+        return output;
+    }
+
+    std::string newtext;
+    if ((text[0] == '[') && (text.back() == ']')) {
+        newtext = text.substr(1, text.size() - 2);
+    }
+    else {
+        newtext = text;
+    }
+
+    // Remove styling qualifiers:
+    hum::HumRegex hre;
+    std::string finaltext = newtext;
+    hre.replaceDestructive(finaltext, "", "[|@].*");
 
     // https://www.smufl.org/version/latest/range/repeats
-    if (second == "segno") {
-        return "&#xE047;";
+
+    if (finaltext == "segno") {
+        output.push_back("segno");
+        return output;
     }
-    if (second == "coda") {
-        return "&#xE048;";
+    if (finaltext == "coda") {
+        output.push_back("coda");
+        return output;
+    }
+
+    // https://www.smufl.org/version/1.2/range/keyboardTechniques
+
+    if ((finaltext == "Ped") || (finaltext == "ped")) {
+        output.push_back("keyboardPedalPed");
+        return output;
+    }
+
+    if ((finaltext == "XPed") || (finaltext == "xped")) {
+        output.push_back("keyboardPedalPedUp");
+        return output;
     }
 
     // http://www.smufl.org/version/1.2/range/medievalAndRenaissanceMiscellany
-    if (second == "sc") {
-        return "&#xEA00;";
+
+    if (finaltext == "sc") {
+        output.push_back("mensuralSignumUp");
+        return output;
     }
-    if (second == "sc-below") {
-        return "&#xEA01;";
+    if (finaltext == "sc-below") {
+        output.push_back("mensuralSignumDown");
+        return output;
     }
 
     // http://www.smufl.org/version/1.2/range/medievalAndRenaissanceProlations
-    if ((second == "circle-dot") || (second == "o-dot") || (second == "O-dot") || (second == "O.")
-        || (second == "o.")) {
-        return "&#xE910;";
+
+    if ((finaltext == "circle-dot") || (finaltext == "o-dot") || (finaltext == "O-dot")) {
+        output.push_back("mensuralProlation1@type=\"circle-dot\"");
+        return output;
     }
-    if ((second == "circle") || (second == "O") || (second == "o")) {
-        return "&#xE911;";
+    if ((finaltext == "circle") || (finaltext == "O") || (finaltext == "o")) {
+        output.push_back("mensuralProlation2@type=\"circle\"");
+        return output;
     }
-    if ((second == "cut-circle") || (second == "cut-o") || (second == "cut-O") || (second == "O!")
-        || (second == "o!")) {
-        return "&#xE912;";
+    if ((finaltext == "cut-circle") || (finaltext == "cut-o") || (finaltext == "cut-O")) {
+        output.push_back("mensuralProlation3@type=\"cut-circle\"");
+        return output;
     }
-    if ((second == "cut-circle-dot") || (second == "cut-o-dot") || (second == "cut-O-dot") || (second == "O.!")
-        || (second == "o.!")) {
-        return "&#xE913;";
+    if ((finaltext == "cut-circle-dot") || (finaltext == "cut-o-dot") || (finaltext == "cut-O-dot")
+        || (finaltext == "O.!")) {
+        output.push_back("mensuralProlation4@type=\"cut-circle-dot\"");
+        return output;
     }
-    if ((second == "c-dot") || (second == "C.") || (second == "c.")) {
-        return "&#xE914;";
+    if ((finaltext == "c-dot") || (finaltext == "C-dot")) {
+        output.push_back("mensuralProlation5@type=\"c-dot\"");
+        return output;
     }
-    if ((second == "c") || (second == "C")) {
-        return "&#xE915;";
+    if (finaltext == "C") {
+        output.push_back("mensuralProlation6@type=\"c\"");
+        return output;
     }
-    if ((second == "reverse-c") || (second == "Cr") || (second == "cr")) {
-        return "&#xE916;";
+    if (finaltext == "c") {
+        output.push_back("timeSigCommon");
+        return output;
     }
-    if ((second == "cut-c-dot") || (second == "C.!") || (second == "c.!")) {
-        return "&#xE917;";
+    if ((finaltext == "reverse-c") || (finaltext == "Cr") || (finaltext == "cr")) {
+        output.push_back("mensuralProlation7@type=\"reverse-c\"");
+        return output;
     }
-    if ((second == "cut-c") || (second == "C!") || (second == "c!")) {
-        return "&#xE918;";
+    if ((finaltext == "cut-c-dot") || (finaltext == "cut-C-dot")) {
+        output.push_back("mensuralProlation8@type=\"cut-c-dot\"");
+        return output;
     }
-    if ((second == "reverse-cut-c") || (second == "C!r") || (second == "c!r")) {
-        return "&#xE919;";
+    if (finaltext == "cut-C") {
+        output.push_back("mensuralProlation9@type=\"cut-c\"");
+        return output;
     }
-    if ((second == "reverse-c-dot") || (second == "C.r") || (second == "c.r")) {
-        return "&#xE91A;";
-    }
-    if ((second == "circle-slash") || (second == "o-slash") || (second == "O/") || (second == "o/")) {
-        return "&#xE91B;";
+    if (finaltext == "cut-c") {
+        output.push_back("timeSigCutCommon");
+        return output;
     }
 
-    // generating rhythmic note with optional "-dot" after it.
-    bool dot = false;
-    if (hre.search(second, "-dot$")) {
-        dot = true;
-        second.resize((int)second.size() - 4);
+    if ((finaltext == "reverse-cut-c") || (finaltext == "reverse-cut-C") || (finaltext == "cut-cr")
+        || (finaltext == "cut-Cr")) {
+        output.push_back("mensuralProlation10@type=\"reverse-cut-c\"");
+        return output;
+    }
+    if ((finaltext == "reverse-c-dot") || (finaltext == "reverse-C-dot") || (finaltext == "cr-dot")
+        || (finaltext == "Cr-dot")) {
+        output.push_back("mensuralProlation11@type=\"reverse-c-dot\"");
+        return output;
+    }
+    if ((finaltext == "circle-slash") || (finaltext == "o-slash") || (finaltext == "O/") || (finaltext == "o/")) {
+        output.push_back("mensuralProportionTempusPerfectum");
+        return output;
     }
 
-    std::string output;
+    // https://www.smufl.org/version/1.2/range/metronomeMarks
 
-    // https://www.smufl.org/version/latest/range/individualNotes
-    if ((second == "quarter") || (second == "4")) {
-        output += "&#xE1D5;";
+    // Count the number of augmentation dots on the note, and then remove them:
+    int dots = 0;
+    if (hre.search(finaltext, "-dot$")) {
+        dots = 1;
+        if (hre.search(finaltext, "-dot-dot$")) {
+            dots = 2;
+            if (hre.search(finaltext, "-dot-dot-dot$")) {
+                dots = 3;
+            }
+            // Only allowing three augmentation dots.
+        }
+        hre.replaceDestructive(finaltext, "", "(-dot)+");
     }
-    else if ((second == "half") || (second == "2")) {
-        output += "&#xE1D3;";
-    }
-    else if ((second == "whole") || (second == "1")) {
-        output += "&#xE1D2;";
-    }
-    else if ((second == "breve") || (second == "double-whole") || (second == "0")) {
-        output += "&#xE1D1;";
-    }
-    else if ((second == "eighth") || (second == "8") || (second == "8th")) {
-        output += "&#xE1D7;";
-    }
-    else if ((second == "sixteenth") || (second == "16") || (second == "16th")) {
-        output += "&#xE1D9;";
-    }
-    else if ((second == "32") || (second == "32nd")) {
-        output += "&#xE1DB;";
-    }
-    else if ((second == "64") || (second == "64th")) {
-        output += "&#xE1DD;";
-    }
-    else if ((second == "128") || (second == "128th")) {
-        output += "&#xE1DF;";
-    }
-    else if ((second == "256") || (second == "256th")) {
-        output += "&#xE1E1;";
-    }
-    else if ((second == "512") || (second == "512th")) {
-        output += "&#xE1E3;";
-    }
-    else if ((second == "1024") || (second == "1024th")) {
-        output += "&#xE1E5;";
+    // Check for "." used as an augmentation dot (typically used with numbers):
+    if (hre.search(finaltext, "(\\.+)$")) {
+        std::string dotstring = hre.getMatch(1);
+        dots += (int)dotstring.size();
+        hre.replaceDestructive(finaltext, "", "\\.+$");
     }
 
-    if (dot) {
-        output += "&#xE1E7;";
+    bool noteQ = false;
+    if ((finaltext == "quarter") || (finaltext == "4")) {
+        output.push_back("metNoteQuarterUp");
+        noteQ = true;
     }
+    else if ((finaltext == "half") || (finaltext == "2")) {
+        output.push_back("metNoteHalfUp");
+        noteQ = true;
+    }
+    else if ((finaltext == "whole") || (finaltext == "1")) {
+        output.push_back("metNoteWhole");
+        noteQ = true;
+    }
+    else if ((finaltext == "breve") || (finaltext == "double-whole") || (finaltext == "0")) {
+        output.push_back("metNoteSquareBreve");
+        noteQ = true;
+    }
+    else if ((finaltext == "eighth") || (finaltext == "8") || (finaltext == "8th")) {
+        output.push_back("metNote8thUp");
+        noteQ = true;
+    }
+    else if ((finaltext == "sixteenth") || (finaltext == "16") || (finaltext == "16th")) {
+        output.push_back("metNote16thUp");
+        noteQ = true;
+    }
+    else if ((finaltext == "32") || (finaltext == "32nd")) {
+        output.push_back("metNote32ndUp");
+        noteQ = true;
+    }
+    else if ((finaltext == "64") || (finaltext == "64th")) {
+        output.push_back("metNote64thUp");
+        noteQ = true;
+    }
+    else if ((finaltext == "128") || (finaltext == "128th")) {
+        output.push_back("metNote128thUp");
+        noteQ = true;
+    }
+    else if ((finaltext == "256") || (finaltext == "256th")) {
+        output.push_back("metNote256thUp");
+        noteQ = true;
+    }
+    else if ((finaltext == "512") || (finaltext == "512th")) {
+        output.push_back("metNote512thUp");
+        noteQ = true;
+    }
+    else if ((finaltext == "1024") || (finaltext == "1024th")) {
+        output.push_back("metNote1024thUp");
+        noteQ = true;
+    }
+
+    if (dots) {
+        for (int i = 0; i < dots; i++) {
+            output.push_back("metAugmentationDot");
+        }
+    }
+
+    if (noteQ) {
+        return output;
+    }
+
+    // Getting here means that the symbol is unknown, and should be
+    // as plain text elsewhere.  If the form is [smufl=code], then treat
+    // this as an escape to display a particular SMuFL named glyph.
+    if (hre.search(finaltext, "smufl=(.*)")) {
+        output.push_back(hre.getMatch(1));
+    }
+
     return output;
 }
 
@@ -13762,7 +14032,6 @@ std::string HumdrumInput::convertMusicSymbolNameToSmuflEntity(const std::string 
 void HumdrumInput::addDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
     hum::HTp token, int staffindex, int justification, const std::string &color, int vgroup)
 {
-
     hum::HumRegex hre;
     if (hre.search(text, "\\[[^=]*\\]\\s*=\\s*\\d+")) {
         int status = addTempoDirection(text, placement, bold, italic, token, staffindex, justification, color);
@@ -13847,11 +14116,18 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
         if (!italic) {
             rend->SetFontstyle(FONTSTYLE_normal);
         }
+        else {
+            // Explicitly set italic fontstyle.
+            rend->SetFontstyle(FONTSTYLE_italic);
+        }
         if (bold) {
             rend->SetFontweight(FONTWEIGHT_bold);
         }
         if (justification == 1) {
             rend->SetHalign(HORIZONTALALIGNMENT_right);
+        }
+        else if (justification == 2) {
+            rend->SetHalign(HORIZONTALALIGNMENT_center);
         }
     }
     else {
@@ -13908,6 +14184,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     int justification = 0;
     if (token->getLayoutParameter("DY", "rj") == "true") {
         justification = 1;
+    }
+    if (token->getLayoutParameter("DY", "cj") == "true") {
+        justification = 2;
     }
 
     std::string dcolor = token->getLayoutParameter("DY", "color");
@@ -14011,6 +14290,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             }
             if (justification == 1) {
                 rend->SetHalign(HORIZONTALALIGNMENT_right);
+            }
+            else if (justification == 2) {
+                rend->SetHalign(HORIZONTALALIGNMENT_center);
             }
         }
         else {
@@ -14155,6 +14437,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             if (dyntok->getLayoutParameter("DY", "rj") == "true") {
                 justification = 1;
             }
+            else if (dyntok->getLayoutParameter("DY", "cj") == "true") {
+                justification = 2;
+            }
 
             bool editQ = false;
             bool brackQ = false;
@@ -14268,6 +14553,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 if (justification == 1) {
                     rend->SetHalign(HORIZONTALALIGNMENT_right);
+                }
+                else if (justification == 2) {
+                    rend->SetHalign(HORIZONTALALIGNMENT_center);
                 }
             }
             else {
@@ -15305,91 +15593,42 @@ hum::HumNum HumdrumInput::getMeasureEndTstamp(int staffindex)
     return ss[staffindex].meter_top + 1;
 }
 
-//////////////////////////////
-//
-// HumdrumInput::insertTowRhythmsAndTextBetween -- used for display of tempo
-//    changes.  Non-generalized subcase for addTextElement().
-//    Example:
-//       [quarter] = [half]
-//
-
-template <class ELEMENT>
-void HumdrumInput::insertTwoRhythmsAndTextBetween(
-    ELEMENT *element, const std::string &note1, const std::string &text, const std::string &note2)
-{
-    std::string newnote1 = convertMusicSymbolNameToSmuflEntity(note1);
-    std::string newnote2 = convertMusicSymbolNameToSmuflEntity(note2);
-    newnote1 = unescapeHtmlEntities(newnote1);
-    newnote2 = unescapeHtmlEntities(newnote2);
-
-    Rend *rend1 = new Rend();
-    Text *text1 = new Text();
-    text1->SetText(UTF8to16(newnote1));
-    rend1->AddChild(text1);
-    rend1->SetFontname("VerovioText");
-    element->AddChild(rend1);
-
-    Text *middleText = new Text();
-    middleText->SetText(UTF8to16(text));
-    element->AddChild(middleText);
-
-    Rend *rend2 = new Rend();
-    Text *text2 = new Text();
-    text2->SetText(UTF8to16(newnote2));
-    rend2->AddChild(text2);
-    rend2->SetFontname("VerovioText");
-    element->AddChild(rend2);
-}
-
 /////////////////////////////
 //
-// HumdrumInput::addVerovioTextElement -- Add a VerovioText symbol to some
-//      text-based element.  SMuFL code points encoded as entities are assumed
-//      as input, such as "&#xE047;" for a segno sign.
-//      See convertMusicSymbolNameToSmuflEntity() for converting from [ASCII] into
-//      SMuFL entities.
+// HumdrumInput::addSmuflSymbol -- Add a SMuFL symbol to some
+//      text-based element (such as <rend>).  Humdrum music symbol names assumed
+//      as input, such as "sc" for segnum contruentiae..
 
-template <class ELEMENT> void HumdrumInput::addVerovioTextElement(ELEMENT *element, const std::string &musictext)
+template <class ELEMENT> void HumdrumInput::addMusicSymbol(ELEMENT *element, const std::string &musictext)
 {
-    std::string smuflentities = convertMusicSymbolNameToSmuflEntity(musictext);
-    Rend *rend = new Rend();
-    Text *text = new Text();
-    std::string newtext = unescapeHtmlEntities(smuflentities);
-    text->SetText(UTF8to16(newtext));
-    rend->AddChild(text);
-    rend->SetFontstyle(FONTSTYLE_normal);
-    rend->SetFontname("VerovioText");
-    if (musictext.find("smaller") != std::string::npos) {
-        data_FONTSIZE fs;
-        fs.SetTerm(FONTSIZETERM_x_small);
-        rend->SetFontsize(fs);
+    std::vector<std::string> smufltext = convertMusicSymbolNameToSmuflName(musictext);
+    if (smufltext.empty()) {
+        // nothing to do: treat as plain text and add in calling function.
+        return;
     }
-    else if (musictext.find("smallest") != std::string::npos) {
-        data_FONTSIZE fs;
-        fs.SetTerm(FONTSIZETERM_xx_small);
-        rend->SetFontsize(fs);
+
+    int counter = 0;
+    for (int i = 0; i < (int)smufltext.size(); i++) {
+        if (smufltext.at(i).empty()) {
+            continue;
+        }
+        std::string name = smufltext.at(i);
+        if (counter) {
+            // Add a space element between music symbols.
+            if (smufltext.at(i) == "metAugmentationDot") {
+                addTextElement(element, m_textAugmentationDotSpacer);
+            }
+            else {
+                addTextElement(element, m_textSmuflSpacer);
+            }
+        }
+        ++counter;
+
+        Symbol *symbol = new Symbol();
+        setSmuflContent(symbol, name);
+        setFontsize(symbol, name, musictext);
+        element->AddChild(symbol);
     }
-    else if (musictext.find("small") != std::string::npos) {
-        data_FONTSIZE fs;
-        fs.SetTerm(FONTSIZETERM_small);
-        rend->SetFontsize(fs);
-    }
-    else if (musictext.find("larger") != std::string::npos) {
-        data_FONTSIZE fs;
-        fs.SetTerm(FONTSIZETERM_x_large);
-        rend->SetFontsize(fs);
-    }
-    else if (musictext.find("largest") != std::string::npos) {
-        data_FONTSIZE fs;
-        fs.SetTerm(FONTSIZETERM_xx_large);
-        rend->SetFontsize(fs);
-    }
-    else if (musictext.find("large") != std::string::npos) {
-        data_FONTSIZE fs;
-        fs.SetTerm(FONTSIZETERM_large);
-        rend->SetFontsize(fs);
-    }
-    element->AddChild(rend);
 }
 
 /////////////////////////////
@@ -15429,7 +15668,7 @@ void HumdrumInput::addTextElement(
     if (hre.search(data, "^(.*?)(\\[.*?\\])(.*)$")) {
         std::string pretext = hre.getMatch(1);
         std::string rawmusictext = hre.getMatch(2);
-        std::string musictext = convertMusicSymbolNameToSmuflEntity(rawmusictext);
+        std::vector<std::string> musictext = convertMusicSymbolNameToSmuflName(rawmusictext);
         std::string posttext = hre.getMatch(3);
         if (pretext == "\\n") {
             Lb *lb = new Lb();
@@ -15452,12 +15691,12 @@ void HumdrumInput::addTextElement(
             element->AddChild(rend);
 
             rend->AddChild(text);
-            text->SetText(UTF8to16(pretext));
+            text->SetText(UTF8to32(pretext));
             setFontStyle(rend, myfontstyle);
             // addTextElement(element, pretext, myfontstyle, addSpacer);
         }
         if (!musictext.empty()) {
-            addVerovioTextElement(element, rawmusictext);
+            addMusicSymbol(element, rawmusictext);
         }
         if (!posttext.empty()) {
             addTextElement(element, posttext, myfontstyle, addSpacer);
@@ -15471,20 +15710,12 @@ void HumdrumInput::addTextElement(
     data = escapeFreeAmpersand(data);
     data = unescapeHtmlEntities(data);
 
-    if (hre.search(data, "^\\s*\\[(.*?)\\]([^\\[]*)\\[(.*?)\\]\\s*$")) {
-        std::string note1 = hre.getMatch(1);
-        std::string text1 = hre.getMatch(2);
-        std::string note2 = hre.getMatch(3);
-        insertTwoRhythmsAndTextBetween(element, note1, text1, note2);
-        return;
-    }
-
     std::vector<std::string> pieces;
     hre.split(pieces, data, "\\\\n");
 
     for (int i = 0; i < (int)pieces.size(); ++i) {
         data = pieces[i];
-        text->SetText(UTF8to16(data));
+        text->SetText(UTF8to32(data));
 
         if (myfontstyle.empty()) {
             if (text != NULL) {
@@ -17413,15 +17644,15 @@ void HumdrumInput::analyzeLayerBeams(
         cerr << endl;
     }
 
-    int beamstartindex = -1;
-    int beamendindex = -1;
+    // int beamstartindex = -1;
+    // int beamendindex = -1;
     if (beamstate.size() > 0) {
         if (beamstate.back() > 0) {
             // Extra beam start(s) at the end of the measure.  Remove all positive numbers at the back of the
             // beamstate list until a zero is found (for the end of an in-measure beam end).
             for (int i = (int)beamstate.size() - 1; i >= 0; i--) {
                 if (beamstate[i] == 0) {
-                    beamstartindex = i + 1;
+                    // beamstartindex = i + 1;
                     break;
                 }
                 beamstate[i] = 0;
@@ -17444,7 +17675,7 @@ void HumdrumInput::analyzeLayerBeams(
                             // complicated beamspan case that is not yet handled.
                             break;
                         }
-                        beamendindex = i;
+                        // beamendindex = i;
                     }
                 }
                 beamstate[i] -= beamstate.back();
@@ -17887,7 +18118,6 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     std::vector<int> beamnum;
     std::vector<int> gbeamnum;
     analyzeLayerBeams(beamnum, gbeamnum, layerdata);
-
     tgs.clear();
 
     // duritems == a list of items in the layer which have duration.
@@ -18756,7 +18986,7 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
                 scaleadj.at(j) = 2;
                 break;
             }
-            cerr << "SOMETHING STANGE HAPPENED HERE2" << endl;
+            cerr << "SOMETHING STRANGE HAPPENED HERE2" << endl;
         }
 
         newtg.at(i)->tupletend = 0;
@@ -19583,7 +19813,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         if (ss[staffindex].pedal) {
             // already on, so turn off first
             pedal->SetDir(pedalLog_DIR_bounce);
-            pedal->SetForm(pedalVis_FORM_altpedstar);
+            pedal->SetForm(PEDALSTYLE_altpedstar);
         }
         ss[staffindex].pedal = true;
     }
@@ -20499,6 +20729,12 @@ void HumdrumInput::setStemLength(Note *note, hum::HTp token)
 void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int staffindex, int subtoken)
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+
+    if (subtoken <= 0) {
+        if (token->find('H') != std::string::npos) {
+            ss[staffindex].glissStarts.push_back(token);
+        }
+    }
 
     std::string tstring;
     int stindex = 0;
@@ -21802,7 +22038,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             if (!verselabel.empty()) {
                 Label *label = new Label();
                 Text *text = new Text();
-                std::wstring wtext = UTF8to16(verselabel);
+                std::u32string wtext = UTF8to32(verselabel);
                 text->SetText(wtext);
                 verse->AddChild(label);
                 label->AddChild(text);
@@ -21810,7 +22046,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             if (!verseabbrlabel.empty()) {
                 LabelAbbr *labelabbr = new LabelAbbr();
                 Text *text = new Text();
-                std::wstring wtext = UTF8to16(verseabbrlabel);
+                std::u32string wtext = UTF8to32(verseabbrlabel);
                 text->SetText(wtext);
                 verse->AddChild(labelabbr);
                 labelabbr->AddChild(text);
@@ -23023,8 +23259,8 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 //      LO:TURN:facc[=true] = flip upper and lower accidentals
 //      LO:TURN:uacc=[acc]  = upper [visible] accidental (or lower visual one if flip is active)
 //      LO:TURN:lacc=[acc]  = lower [visible] accidental (or upper visual one if flip is active)
-// 			[ul]acc = "none" = force the accidental not to show
-// 			[ul]acc = "true" = force the accidental not to show ("LO:TURN:[ul]acc" hide an accidental)
+//             [ul]acc = "none" = force the accidental not to show
+//             [ul]acc = "true" = force the accidental not to show ("LO:TURN:[ul]acc" hide an accidental)
 //
 // Deal with cases where the accidental should be hidden but different from sounding accidental.  This
 // can be done when MEI allows @accidlower.ges and @accidupper.ges.
@@ -24514,7 +24750,7 @@ void HumdrumInput::checkForRehearsal(int line)
         Reh *reh = new Reh();
         Rend *rend = new Rend();
         Text *text = new Text();
-        std::wstring wtext = UTF8to16(tvalue);
+        std::u32string wtext = UTF8to32(tvalue);
         text->SetText(wtext);
         reh->AddChild(rend);
         rend->AddChild(text);
@@ -24577,13 +24813,13 @@ void HumdrumInput::storeOriginalClefMensurationKeyApp()
     }
 
     int kerncount = 0;
-    int menscount = 0;
+    // int menscount = 0;
     for (int i = 0; i < (int)m_oclef.size(); ++i) {
         if (m_oclef[i].second->isKernLike()) {
             kerncount++;
         }
         else if (m_oclef[i].second->isMensLike()) {
-            menscount++;
+            // menscount++;
         }
     }
 
@@ -24912,8 +25148,8 @@ int HumdrumInput::getMeasureNumber(int startline, int endline)
                 found = false;
                 linenum = -1;
                 // if (infile.hasPickup()) {
-                // 		// set the first implicit measure to 0
-                // 		return 0;
+                //         // set the first implicit measure to 0
+                //         return 0;
                 // }
                 break;
             }
@@ -25379,10 +25615,10 @@ void HumdrumInput::checkBeamWith(
         // something strange happened
     }
     if (isAbove) {
-        beam->SetBeamWith(OTHERSTAFF_above);
+        beam->SetBeamWith(NEIGHBORINGLAYER_above);
     }
     if (isBelow) {
-        beam->SetBeamWith(OTHERSTAFF_below);
+        beam->SetBeamWith(NEIGHBORINGLAYER_below);
     }
 }
 
@@ -26070,34 +26306,34 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
     // Example analysis, with measure 4 staring a rest with num="6".
     // Measures 5-9 marked as whole-measure rests which will be merged into
     // the multi rest.
-    //	**kern	**kern	0
-    //	*M4/4	*M4/4	0
-    //	=1-	=1-	0
-    //	1c	1d	0
-    //	=2	=2	0
-    //	1d	1g	0
-    //	=3	=3	0
-    //	1r	1e	0
-    //	=4	=4	6
-    //	1r	1r	6
-    //	=5	=5	-1
-    //	1r	1r	-1
-    //	=6	=6	-1
-    //	1r	1r	-1
-    //	=7	=7	-1
-    //	1r	1r	-1
-    //	=8	=8	-1
-    //	1r	1r	-1
-    //	=9	=9	-1
-    //	1r	1r	-1
-    //	=10	=10	0
-    //	1f	1r	0
-    //	=11	=11	0
-    //	1g	1g	0
-    //	=12	=12	0
-    //	1a	1g	0
-    //	==	==	0
-    //	*-	*-	0
+    //    **kern    **kern    0
+    //    *M4/4    *M4/4    0
+    //    =1-    =1-    0
+    //    1c    1d    0
+    //    =2    =2    0
+    //    1d    1g    0
+    //    =3    =3    0
+    //    1r    1e    0
+    //    =4    =4    6
+    //    1r    1r    6
+    //    =5    =5    -1
+    //    1r    1r    -1
+    //    =6    =6    -1
+    //    1r    1r    -1
+    //    =7    =7    -1
+    //    1r    1r    -1
+    //    =8    =8    -1
+    //    1r    1r    -1
+    //    =9    =9    -1
+    //    1r    1r    -1
+    //    =10    =10    0
+    //    1f    1r    0
+    //    =11    =11    0
+    //    1g    1g    0
+    //    =12    =12    0
+    //    1a    1g    0
+    //    ==    ==    0
+    //    *-    *-    0
 
     if (!barindex.empty()) {
         int firstbar = barindex[0];
@@ -26657,10 +26893,10 @@ void HumdrumInput::analyzeVerseColor(hum::HTp &token)
 
 //////////////////////////////
 //
-// HumdrumInput::getTempoScaling --
+// HumdrumInput::getGlobalTempoScaling --
 //
 
-double HumdrumInput::getTempoScaling(hum::HumdrumFile &infile)
+double HumdrumInput::getGlobalTempoScaling(hum::HumdrumFile &infile)
 {
     double output = 1.0;
     hum::HumRegex hre;
@@ -26712,6 +26948,116 @@ bool HumdrumInput::isTacet(hum::HTp spinestart)
         current = current->getNextToken();
     }
     return false;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertGlissandos --
+//
+
+void HumdrumInput::insertGlissandos(std::vector<hum::HTp> &tokens)
+{
+    for (int i = 0; i < (int)tokens.size(); i++) {
+        hum::HTp nexttok = NULL;
+        hum::HTp current = tokens[i]->getNextToken();
+        while (current) {
+            if (!current->isData()) {
+                current = current->getNextToken();
+                continue;
+            }
+            if (current->isNull()) {
+                current = current->getNextToken();
+                continue;
+            }
+            nexttok = current;
+            break;
+        }
+        if (!nexttok) {
+            continue;
+        }
+        createGlissando(tokens[i], nexttok);
+    }
+    tokens.clear();
+}
+
+//////////////////////////////
+//
+// HumdrumInput::createGlissando --
+//
+
+void HumdrumInput::createGlissando(hum::HTp glissStart, hum::HTp glissEnd)
+{
+    if (glissEnd->find('h') == std::string::npos) {
+        return;
+    }
+    int staffnumber = m_currentstaff;
+
+    std::vector<int> gstarts;
+    std::vector<int> gends;
+    std::vector<std::string> stoks = glissStart->getSubtokens();
+    std::vector<std::string> etoks = glissEnd->getSubtokens();
+
+    if (!glissStart->isChord()) {
+        gstarts.push_back(0);
+    }
+    else {
+        for (int i = 0; i < (int)stoks.size(); i++) {
+            if (stoks[i].find("H") != std::string::npos) {
+                gstarts.push_back(i);
+            }
+        }
+    }
+
+    if (!glissEnd->isChord()) {
+        gends.push_back(0);
+    }
+    else {
+        for (int i = 0; i < (int)etoks.size(); i++) {
+            if (etoks[i].find("h") != std::string::npos) {
+                gends.push_back(i);
+            }
+        }
+    }
+
+    int minsize = (int)gstarts.size();
+    if (minsize > (int)gends.size()) {
+        minsize = (int)gends.size();
+    }
+
+    for (int i = 0; i < minsize; i++) {
+        std::string stok = stoks[gstarts[i]];
+        std::string etok = etoks[gends[i]];
+
+        Gliss *gliss = new Gliss();
+        setStaff(gliss, staffnumber);
+        if (stok.find("HH") != std::string::npos) {
+            gliss->SetLform(LINEFORM_wavy);
+        }
+        std::string startid = getLocationId("note", glissStart);
+        if (glissStart->isChord()) {
+            startid += "S";
+            startid += to_string(gstarts[i] + 1);
+        }
+
+        std::string endid = getLocationId("note", glissEnd);
+        if (glissEnd->isChord()) {
+            endid += "S";
+            endid += to_string(gends[i] + 1);
+        }
+
+        gliss->SetStartid("#" + startid);
+        gliss->SetEndid("#" + endid);
+        std::string glissId = "gliss-L";
+        glissId += to_string(glissStart->getLineNumber());
+        glissId += "F";
+        glissId += to_string(glissStart->getFieldNumber());
+        if (glissStart->isChord()) {
+            glissId += "S";
+            glissId += to_string(i + 1);
+        }
+        gliss->SetID(glissId);
+        m_measure->AddChild(gliss);
+    }
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */

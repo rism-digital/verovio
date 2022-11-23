@@ -14,6 +14,16 @@ using namespace vrv;
 
 extern "C" {
 
+void enableLog(bool value)
+{
+    EnableLog(value);
+}
+
+void enableLogToBuffer(bool value)
+{
+    EnableLogToBuffer(value);
+}
+
 /****************************************************************
  * Methods exported to use the Toolkit class
  ****************************************************************/
@@ -35,7 +45,7 @@ void *vrvToolkit_constructorResourcePath(const char *resourcePath)
 void vrvToolkit_destructor(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    LogMessage("Deleting toolkit");
+    LogInfo("Deleting toolkit");
     delete tk;
 }
 
@@ -60,6 +70,13 @@ const char *vrvToolkit_getAvailableOptions(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     tk->SetCString(tk->GetAvailableOptions());
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_getDefaultOptions(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->GetDefaultOptions());
     return tk->GetCString();
 }
 
@@ -149,10 +166,10 @@ const char *vrvToolkit_getNotatedIdForElement(void *tkPtr, const char *xmlId)
     return tk->GetCString();
 }
 
-const char *vrvToolkit_getOptions(void *tkPtr, bool default_values)
+const char *vrvToolkit_getOptions(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->SetCString(tk->GetOptions(default_values));
+    tk->SetCString(tk->GetOptions());
     return tk->GetCString();
 }
 
@@ -206,6 +223,25 @@ bool vrvToolkit_loadZipDataBuffer(void *tkPtr, const unsigned char *data, int le
     return tk->LoadZipDataBuffer(data, length);
 }
 
+void vrvToolkit_redoLayout(void *tkPtr, const char *c_options)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->RedoLayout(c_options);
+}
+
+void vrvToolkit_redoPagePitchPosLayout(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->RedoPagePitchPosLayout();
+}
+
+const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *options)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RenderData(data, options));
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_renderToMIDI(void *tkPtr, const char *c_options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
@@ -234,27 +270,6 @@ const char *vrvToolkit_renderToTimemap(void *tkPtr, const char *c_options)
     return tk->GetCString();
 }
 
-void vrvToolkit_redoLayout(void *tkPtr, const char *c_options)
-{
-    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->RedoLayout(c_options);
-}
-
-void vrvToolkit_redoPagePitchPosLayout(void *tkPtr)
-{
-    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    tk->RedoPagePitchPosLayout();
-}
-
-const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *options)
-{
-    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    vrvToolkit_setOptions(tk, options);
-    vrvToolkit_loadData(tk, data);
-
-    return vrvToolkit_renderToSVG(tk, 1, options);
-}
-
 void vrvToolkit_resetOptions(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
@@ -273,12 +288,10 @@ bool vrvToolkit_select(void *tkPtr, const char *selection)
     return tk->Select(selection);
 }
 
-void vrvToolkit_setOptions(void *tkPtr, const char *options)
+bool vrvToolkit_setOptions(void *tkPtr, const char *options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
-    if (!tk->SetOptions(options)) {
-        LogError("Could not load JSON options.");
-    }
+    return tk->SetOptions(options);
 }
 
 const char *vrvToolkit_validatePAE(void *tkPtr, const char *data)

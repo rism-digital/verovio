@@ -83,6 +83,14 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter for the fallback falg
+     */
+    ///@{
+    bool GetFallback() const { return m_isFallback; }
+    void SetFallback(bool isFallback) { m_isFallback = isFallback; }
+    ///@}
+
+    /**
      * Add an anchor for the glyph.
      * The string is turn into a SMuFLGlyphAnchor ("cutOutNE" => SMUFL_cutOutNE)
      */
@@ -118,6 +126,8 @@ private:
     std::string m_path;
     /** A map of the available anchors */
     std::map<SMuFLGlyphAnchor, Point> m_anchors;
+    /** A flag indicating it is a fallback */
+    bool m_isFallback;
 };
 
 } // namespace vrv

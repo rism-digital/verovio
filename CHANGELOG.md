@@ -2,7 +2,41 @@
 
 ## [unreleased]
 
-## [3.11.00] - 2022-07-15
+## [3.13.0] - 2022-11-23
+* Refactoring of the JSON parameters and returned values as dictionaries for the Python binding
+* Support for text font fallback when a glyph is missing in the selected font
+* Support for Plaine and Easie gross and refined contour feature extraction
+* Support for `dblserpent` barlines (@eNote-GmBH)
+* Support for `@dir.dist` and `@tempo.dist` (@eNote-GmBH)
+* Support for persian accidentals (sori and koron)
+* Support for heavy barlines (@eNote-GmBH)
+* Support for log level selection (warning by default)
+* Support for controlling log in the JS toolkit (@WolfgangDrescher)
+* Option --smuflTextFont for controlling text font embedding or linking CSS fonts
+* Option --lyricElision for selecting elision glyph (regular, wide, narrow or unicde)
+* Option --log-level (-l) for controlling the log level from the command-line tool
+* Method getOption(bool) split as getOptions() and getDefaultOptions()
+* Fixes in the PAE importer (@carlolic)
+
+## [3.12.1] - 2022-10-06
+* Fix `graphic` misssing in ios framework
+* Fix bug when CSS font is not found
+* Fix cmake installation directory
+* Fix `symbol` not allowed in `tempo`
+
+## [3.12.0] - 2022-09-29
+* Support for `symbol` within text elements (with `@glyph.num` or `@glyph.name`)
+* Support for all music fonts within text using css webfont2 (with `rend@fontfam="smufl"`)
+* Support for `graphic` input and output (@wergo)
+* Support for `caesura` (@eNote-GmBH)
+* Support for unicode music symbols (coda, segno, da capo, dal segno)
+* Support for mensural multiple stems (@eNote-GmBH)
+* Option --dynam-single-glyphs to use single glyphs for dynamics (@eNote-GmBH)
+* Option --scale-to-page-size for an output with a fix size independently from the scale factor
+* Replacement of VerovioText font with Leipzig (and other supported music fonts)
+* Compiling option to use the old Plaine and Easie parser (@carlolic)
+
+## [3.11.0] - 2022-07-15
 * Support for MEI-basic output
 * Support for ES6 and improved npm package (@WolfgangDrescher)
 * Support for `@artic.ges` (@eNote-GmBH)
@@ -348,7 +382,7 @@
 * Support for dynamic silent staff hiding (implements `@optimize` on `<scoreDef>`)
 * Support for `<subst>` with child (`<add>`, `<del>` or `<subst>`) to be selected with `substXPathQuery`
 * Support for `<dir>` and `<dynam>` connectors (triggered with `@next` and `@extender`)
-* Sutomatic positioning of rests within beam (@CCInc)
+* Automatic positioning of rests within beam (@CCInc)
 * Fix for Plaine & Easie mensur changes in mensural notation
 * Use SMuFL glyphs for mensural signs (@rettinghaus)
 * Barline segmentation with text and dynamic indications overlapping measures

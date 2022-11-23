@@ -57,7 +57,8 @@ public:
 private:
     /**
      * Encodes the durational quality of a mensural note using the values provided by
-     * the data.DURQUALITY.mensural datatype (
+     * the data.DURQUALITY.mensural datatype (i.e., the perfect / imperfect / altered /
+     * major / minor / duplex quality of a note).
      **/
     data_DURQUALITY_mensural m_durQuality;
 
@@ -100,12 +101,14 @@ public:
 private:
     /**
      * Together, proport.num and proport.numbase specify a proportional change as a
-     * ratio,
+     * ratio, e.g., 1:3.
+     * Proport.num is for the first value in the ratio.
      **/
     int m_proportNum;
     /**
      * Together, proport.num and proport.numbase specify a proportional change as a
-     * ratio,
+     * ratio, e.g., 1:3.
+     * Proport.numbase is for the second value in the ratio.
      **/
     int m_proportNumbase;
 
@@ -202,52 +205,10 @@ public:
     ///@}
 
 private:
-    /** Indicates this element's participation in a ligature. **/
+    /** Indicates this element’s participation in a ligature. **/
     data_LIGATUREFORM m_lig;
 
     /* include <attlig> */
-};
-
-//----------------------------------------------------------------------------
-// AttPlicaVis
-//----------------------------------------------------------------------------
-
-class AttPlicaVis : public Att {
-public:
-    AttPlicaVis();
-    virtual ~AttPlicaVis();
-
-    /** Reset the default values for the attribute class **/
-    void ResetPlicaVis();
-
-    /** Read the values for the attribute class **/
-    bool ReadPlicaVis(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WritePlicaVis(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetDir(data_STEMDIRECTION_basic dir_) { m_dir = dir_; }
-    data_STEMDIRECTION_basic GetDir() const { return m_dir; }
-    bool HasDir() const;
-    //
-    void SetLen(double len_) { m_len = len_; }
-    double GetLen() const { return m_len; }
-    bool HasLen() const;
-    ///@}
-
-private:
-    /** Records the position of the piano damper pedal. **/
-    data_STEMDIRECTION_basic m_dir;
-    /** Encodes the stem length. **/
-    double m_len;
-
-    /* include <attlen> */
 };
 
 //----------------------------------------------------------------------------
@@ -287,78 +248,6 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttStemVis
-//----------------------------------------------------------------------------
-
-class AttStemVis : public Att {
-public:
-    AttStemVis();
-    virtual ~AttStemVis();
-
-    /** Reset the default values for the attribute class **/
-    void ResetStemVis();
-
-    /** Read the values for the attribute class **/
-    bool ReadStemVis(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteStemVis(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetPos(data_STEMPOSITION pos_) { m_pos = pos_; }
-    data_STEMPOSITION GetPos() const { return m_pos; }
-    bool HasPos() const;
-    //
-    void SetLen(double len_) { m_len = len_; }
-    double GetLen() const { return m_len; }
-    bool HasLen() const;
-    //
-    void SetForm(data_STEMFORM_mensural form_) { m_form = form_; }
-    data_STEMFORM_mensural GetForm() const { return m_form; }
-    bool HasForm() const;
-    //
-    void SetDir(data_STEMDIRECTION dir_) { m_dir = dir_; }
-    data_STEMDIRECTION GetDir() const { return m_dir; }
-    bool HasDir() const;
-    //
-    void SetFlagPos(data_FLAGPOS_mensural flagPos_) { m_flagPos = flagPos_; }
-    data_FLAGPOS_mensural GetFlagPos() const { return m_flagPos; }
-    bool HasFlagPos() const;
-    //
-    void SetFlagForm(data_FLAGFORM_mensural flagForm_) { m_flagForm = flagForm_; }
-    data_FLAGFORM_mensural GetFlagForm() const { return m_flagForm; }
-    bool HasFlagForm() const;
-    ///@}
-
-private:
-    /** Records the position of the stem in relation to the note head(s). **/
-    data_STEMPOSITION m_pos;
-    /** Encodes the stem length. **/
-    double m_len;
-    /** Indicates to what degree the harmonic label is supported by the notation. **/
-    data_STEMFORM_mensural m_form;
-    /** Records the position of the piano damper pedal. **/
-    data_STEMDIRECTION m_dir;
-    /**
-     * Records the position of the flag using the values provided by the
-     * data.FLAGPOS.mensural datatype.
-     **/
-    data_FLAGPOS_mensural m_flagPos;
-    /**
-     * Encodes the form of the flag using the values provided by the
-     * data.FLAGFORM.mensural datatype.
-     **/
-    data_FLAGFORM_mensural m_flagForm;
-
-    /* include <attflag.form> */
-};
-
-//----------------------------------------------------------------------------
 // AttStemsMensural
 //----------------------------------------------------------------------------
 
@@ -394,6 +283,6 @@ private:
     /* include <attstem.form> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_MENSURAL_H__

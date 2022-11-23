@@ -17,6 +17,7 @@
 #include "object.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "symbol.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -57,9 +58,13 @@ private:
 class ClassIdComparison : public Comparison {
 
 public:
-    ClassIdComparison(ClassId classId) { m_classId = classId; }
+    ClassIdComparison(ClassId classId)
+    {
+        m_classId = classId;
+        m_supportReverse = true;
+    }
 
-    bool operator()(const Object *object) override { return this->MatchesType(object); }
+    bool operator()(const Object *object) override { return Result(this->MatchesType(object)); }
 
     ClassId GetType() { return m_classId; }
 

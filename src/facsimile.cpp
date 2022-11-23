@@ -9,12 +9,11 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "object.h"
 #include "surface.h"
 #include "vrv.h"
 #include "zone.h"
@@ -27,7 +26,7 @@ namespace vrv {
 
 static const ClassRegistrar<Facsimile> s_factory("facsimile", FACSIMILE);
 
-Facsimile::Facsimile() : Object(FACSIMILE, "facsimile-") {}
+Facsimile::Facsimile() : Object(FACSIMILE, "facsimile-"), AttTyped() {}
 
 Facsimile::~Facsimile() {}
 
@@ -45,31 +44,36 @@ bool Facsimile::IsSupportedChild(Object *object)
     return true;
 }
 
-Zone *Facsimile::FindZoneByID(std::string zoneId)
+Zone *Facsimile::FindZoneByID(const std::string &zoneId)
 {
     return dynamic_cast<Zone *>(this->FindDescendantByID(zoneId));
 }
 
-int Facsimile::GetMaxX()
+const Zone *Facsimile::FindZoneByID(const std::string &zoneId) const
 {
-    ListOfObjects surfaces = this->FindAllDescendantsByType(SURFACE);
+    return dynamic_cast<const Zone *>(this->FindDescendantByID(zoneId));
+}
+
+int Facsimile::GetMaxX() const
+{
+    ListOfConstObjects surfaces = this->FindAllDescendantsByType(SURFACE);
 
     int max = 0;
     for (auto iter = surfaces.begin(); iter != surfaces.end(); ++iter) {
-        Surface *surface = vrv_cast<Surface *>(*iter);
+        const Surface *surface = vrv_cast<const Surface *>(*iter);
         assert(surface);
         max = (surface->GetMaxX() > max) ? surface->GetMaxX() : max;
     }
     return max;
 }
 
-int Facsimile::GetMaxY()
+int Facsimile::GetMaxY() const
 {
-    ListOfObjects surfaces = this->FindAllDescendantsByType(SURFACE);
+    ListOfConstObjects surfaces = this->FindAllDescendantsByType(SURFACE);
 
     int max = 0;
     for (auto iter = surfaces.begin(); iter != surfaces.end(); ++iter) {
-        Surface *surface = vrv_cast<Surface *>(*iter);
+        const Surface *surface = vrv_cast<const Surface *>(*iter);
         assert(surface);
         max = (surface->GetMaxY() > max) ? surface->GetMaxY() : max;
     }

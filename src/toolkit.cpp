@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <codecvt>
 #include <locale>
 #include <regex>
@@ -57,11 +57,6 @@ namespace vrv {
 const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
 const char *ZIP_SIGNATURE = "\x50\x4B\x03\x04";
-
-void SetDefaultResourcePath(const std::string &path)
-{
-    Resources::SetDefaultPath(path);
-}
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -113,13 +108,6 @@ Toolkit::~Toolkit()
         m_runtimeClock = NULL;
     }
 #endif
-}
-
-std::string Toolkit::GetUuid()
-{
-    LogWarning("Toolkit function GetUuid() is deprecated; use GetID() instead.");
-
-    return this->GetID();
 }
 
 std::string Toolkit::GetResourcePath() const
@@ -363,23 +351,24 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     fin.seekg(0, std::ios::end);
     std::streamsize wfileSize = (std::streamsize)fin.tellg();
     fin.clear();
+    // Skip the BOM
     fin.seekg(0, std::wios::beg);
 
     std::u16string u16data((wfileSize / 2) + 1, '\0');
     fin.read((char *)&u16data[0], wfileSize);
 
-    // std::vector<char16_t> ;
-    // utf16line.reserve(wfileSize / 2 + 1);
+    // order of the bytes has to be flipped
+    if (u16data.at(0) == u'\uFFFE') {
+        LogWarning("The file seems to have been loaded as little endian - trying to convert to big endian");
+        // convert to big endian (swap bytes)
+        std::transform(std::begin(u16data), std::end(u16data), std::begin(u16data), [](char16_t c) {
+            auto p = reinterpret_cast<char *>(&c);
+            std::swap(p[0], p[1]);
+            return c;
+        });
+    }
 
-    // unsigned short buffer;
-    // while (fin.read((char *)&buffer, sizeof(char16_t))) {
-    //     utf16line.push_back(buffer);
-    // }
-
-    // std::u16string u16_str; //( reinterpret_cast<const char16_t*>(data2) );
-    //  LogDebug("%d %d", wfileSize, utf8line.size());
-
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+    std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
     std::string utf8line = convert.to_bytes(u16data);
 
     return this->LoadData(utf8line);
@@ -446,7 +435,7 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
     }
 
     if (!filename.empty()) {
-        LogMessage("Loading file '%s' in the archive", filename.c_str());
+        LogInfo("Loading file '%s' in the archive", filename.c_str());
         return this->LoadData(file.read(filename));
     }
     else {
@@ -516,7 +505,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
-        // LogMessage("Importing Humdrum data");
+        // LogInfo("Importing Humdrum data");
 
         // HumdrumInput *input = new HumdrumInput(&m_doc);
         input = new HumdrumInput(&m_doc);
@@ -542,7 +531,7 @@ bool Toolkit::LoadData(const std::string &data)
     else if (inputFormat == HUMMEI) {
         // convert first to MEI and then load MEI data via MEIInput.  This
         // allows using XPath processing.
-        // LogMessage("Importing Humdrum data via MEI");
+        // LogInfo("Importing Humdrum data via MEI");
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
         HumdrumInput *tempinput = new HumdrumInput(&tempdoc);
@@ -688,7 +677,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 #endif
     else {
-        LogMessage("Unsupported format");
+        LogInfo("Unsupported format");
         return false;
     }
 
@@ -927,6 +916,16 @@ bool Toolkit::SaveFile(const std::string &filename, const std::string &jsonOptio
     return true;
 }
 
+std::string Toolkit::GetOptions() const
+{
+    return this->GetOptions(false);
+}
+
+std::string Toolkit::GetDefaultOptions() const
+{
+    return this->GetOptions(true);
+}
+
 std::string Toolkit::GetOptions(bool defaultValues) const
 {
     jsonxx::Object o;
@@ -975,6 +974,14 @@ std::string Toolkit::GetOptions(bool defaultValues) const
             o << iter->first << stringValue;
         }
     }
+
+    // Other base options
+    int scaleValue = (defaultValues) ? m_options->m_scale.GetDefault() : m_options->m_scale.GetUnfactoredValue();
+    o << "scale" << scaleValue;
+
+    int xmlIdSeedValue
+        = (defaultValues) ? m_options->m_xmlIdSeed.GetDefault() : m_options->m_xmlIdSeed.GetUnfactoredValue();
+    o << "xmlIdSeed" << xmlIdSeedValue;
 
     return o.json();
 }
@@ -1049,19 +1056,6 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
                     Object::SeedID(m_options->m_xmlIdSeed.GetValue());
                 }
             }
-            // Deprecated option
-            /*
-            else if (iter->first == "tieThickness") {
-                vrv::LogWarning("Option tieThickness is deprecated; use tieMidpointThickness instead");
-                Option *opt = NULL;
-                if (json.has<jsonxx::Number>("tieThickness")) {
-                    double thickness = json.get<jsonxx::Number>("tieThickness");
-                    opt = m_options->GetItems()->at("tieMidpointThickness");
-                    assert(opt);
-                    opt->SetValueDbl(thickness);
-                }
-            }
-            */
             else {
                 LogError("Unsupported option '%s'", iter->first.c_str());
             }
@@ -1075,15 +1069,15 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
         if (json.has<jsonxx::Number>(iter->first)) {
             opt->SetValueDbl(json.get<jsonxx::Number>(iter->first));
-            // LogMessage("Double: %f", json.get<jsonxx::Number>(iter->first));
+            // LogInfo("Double: %f", json.get<jsonxx::Number>(iter->first));
         }
         else if (json.has<jsonxx::Boolean>(iter->first)) {
             opt->SetValueBool(json.get<jsonxx::Boolean>(iter->first));
-            // LogMessage("Bool: %d", json.get<jsonxx::Boolean>(iter->first));
+            // LogInfo("Bool: %d", json.get<jsonxx::Boolean>(iter->first));
         }
         else if (json.has<jsonxx::String>(iter->first)) {
             opt->SetValue(json.get<jsonxx::String>(iter->first));
-            // LogMessage("String: %s", json.get<jsonxx::String>(iter->first).c_str());
+            // LogInfo("String: %s", json.get<jsonxx::String>(iter->first).c_str());
         }
         else if (json.has<jsonxx::Array>(iter->first)) {
             jsonxx::Array values = json.get<jsonxx::Array>(iter->first);
@@ -1109,9 +1103,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     m_options->Sync();
 
-    // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
-    // This needs to be fixed
-    this->SetFont(m_options->m_font.GetValue());
+    // Forcing font resource to be reset if the font is given in the options
+    if (json.has<jsonxx::String>("font")) this->SetFont(m_options->m_font.GetValue());
 
     return true;
 }
@@ -1135,7 +1128,10 @@ bool Toolkit::SetOption(const std::string &option, const std::string &value)
     }
     Option *opt = m_options->GetItems()->at(option);
     assert(opt);
-    return opt->SetValue(value);
+    const bool result = opt->SetValue(value);
+    // If the option is 'font' we need to reset the font resource explicitly
+    if (result && option == "font") this->SetFont(m_options->m_font.GetValue());
+    return result;
 }
 
 void Toolkit::ResetOptions()
@@ -1195,7 +1191,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found at all
     if (!element) {
-        LogMessage("Element with id '%s' could not be found", xmlId.c_str());
+        LogInfo("Element with id '%s' could not be found", xmlId.c_str());
         return o.json();
     }
 
@@ -1207,7 +1203,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     ArrayOfStrAttr::iterator iter;
     for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
         o << (*iter).first << (*iter).second;
-        // LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
+        // LogInfo("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
     }
     return o.json();
 }
@@ -1360,16 +1356,21 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 
     // set dimensions
     if (m_options->m_landscape.GetValue()) {
-        deviceContext->SetWidth(height);
-        deviceContext->SetHeight(width);
-    }
-    else {
-        deviceContext->SetWidth(width);
-        deviceContext->SetHeight(height);
+        std::swap(height, width);
     }
 
     double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
+    assert(userScale != 0.0);
+
+    if (m_options->m_scaleToPageSize.GetValue()) {
+        deviceContext->SetBaseSize(width, height);
+        height *= (1.0 / userScale);
+        width *= (1.0 / userScale);
+    }
+
     deviceContext->SetUserScale(userScale, userScale);
+    deviceContext->SetWidth(width);
+    deviceContext->SetHeight(height);
 
     if (m_doc.GetType() == Facs) {
         deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
@@ -1380,6 +1381,14 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     m_view.DrawCurrentPage(deviceContext, false);
 
     return true;
+}
+
+std::string Toolkit::RenderData(const std::string &data, const std::string &jsonOptions)
+{
+    if (this->SetOptions(jsonOptions) && this->LoadData(data)) return this->RenderToSVG(1);
+
+    // Otherwise just return an empty string.
+    return "";
 }
 
 std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
@@ -1421,6 +1430,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
     svg.SetFormatRaw(m_options->m_svgFormatRaw.GetValue());
     svg.SetRemoveXlink(m_options->m_svgRemoveXlink.GetValue());
     svg.SetAdditionalAttributes(m_options->m_svgAdditionalAttribute.GetValue());
+    svg.SetSmuflTextFont((option_SMUFLTEXTFONT)m_options->m_smuflTextFont.GetValue());
 
     // render the page
     this->RenderToDeviceContext(pageNo, &svg);
@@ -1999,10 +2009,10 @@ void Toolkit::LogRuntime() const
         const int minutes = seconds / 60.0;
         if (minutes > 0) {
             seconds -= 60.0 * minutes;
-            LogMessage("Total runtime is %d min %.3f s.", minutes, seconds);
+            LogInfo("Total runtime is %d min %.3f s.", minutes, seconds);
         }
         else {
-            LogMessage("Total runtime is %.3f s.", seconds);
+            LogInfo("Total runtime is %.3f s.", seconds);
         }
     }
     else {

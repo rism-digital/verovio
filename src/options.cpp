@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <fstream>
 #include <functional>
 #include <sstream>
@@ -27,6 +27,9 @@ const std::map<int, std::string> Option::s_breaks = { { BREAKS_none, "none" }, {
 const std::map<int, std::string> Option::s_condense
     = { { CONDENSE_none, "none" }, { CONDENSE_auto, "auto" }, { CONDENSE_encoded, "encoded" } };
 
+const std::map<int, std::string> Option::s_elision = { { ELISION_regular, "regular" }, { ELISION_narrow, "narrow" },
+    { ELISION_wide, "wide" }, { ELISION_unicode, "unicode" } };
+
 const std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
@@ -36,11 +39,14 @@ const std::map<int, std::string> Option::s_header
 const std::map<int, std::string> Option::s_multiRestStyle = { { MULTIRESTSTYLE_auto, "auto" },
     { MULTIRESTSTYLE_default, "default" }, { MULTIRESTSTYLE_block, "block" }, { MULTIRESTSTYLE_symbols, "symbols" } };
 
-const std::map<int, std::string> Option::s_pedalStyle = { { PEDALSTYLE_auto, "auto" }, { PEDALSTYLE_line, "line" },
+const std::map<int, std::string> Option::s_pedalStyle = { { PEDALSTYLE_NONE, "auto" }, { PEDALSTYLE_line, "line" },
     { PEDALSTYLE_pedstar, "pedstar" }, { PEDALSTYLE_altpedstar, "altpedstar" } };
 
 const std::map<int, std::string> Option::s_systemDivider = { { SYSTEMDIVIDER_none, "none" },
     { SYSTEMDIVIDER_auto, "auto" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
+
+const std::map<int, std::string> Option::s_smuflTextFont
+    = { { SMUFLTEXTFONT_embedded, "embedded" }, { SMUFLTEXTFONT_linked, "linked" }, { SMUFLTEXTFONT_none, "none" } };
 
 //----------------------------------------------------------------------------
 // Option
@@ -889,6 +895,12 @@ Options::Options()
     m_inputFrom.SetShortOption('f', false);
     m_baseOptions.AddOption(&m_inputFrom);
 
+    m_logLevel.SetInfo("Log level", "Set the log level: \"off\", \"error\", \"warning\", \"info\", or \"debug\"");
+    m_logLevel.Init("warning");
+    m_logLevel.SetKey("log-level");
+    m_logLevel.SetShortOption('l', true);
+    m_baseOptions.AddOption(&m_logLevel);
+
     m_outfile.SetInfo("Output file", "Output file name (use \"-\" as file name for standard output)");
     m_outfile.Init("svg");
     m_outfile.SetKey("outfile");
@@ -902,12 +914,12 @@ Options::Options()
     m_baseOptions.AddOption(&m_page);
 
     m_resourcePath.SetInfo("Resource path", "Path to the directory with Verovio resources");
-    m_resourcePath.Init("/usr/local/share/verovio");
+    m_resourcePath.Init(VRV_RESOURCE_DIR);
     m_resourcePath.SetKey("resourcePath");
     m_resourcePath.SetShortOption('r', true);
     m_baseOptions.AddOption(&m_resourcePath);
 
-    m_scale.SetInfo("Scale percent", "Scale of the output in percent");
+    m_scale.SetInfo("Scale percent", "Scale of the output in percent (100 is normal size)");
     m_scale.Init(DEFAULT_SCALE, MIN_SCALE, MAX_SCALE);
     m_scale.SetKey("scale");
     m_scale.SetShortOption('s', false);
@@ -1074,7 +1086,7 @@ Options::Options()
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
     m_pedalStyle.SetInfo("Pedal style", "The global pedal style");
-    m_pedalStyle.Init(PEDALSTYLE_auto, &Option::s_pedalStyle);
+    m_pedalStyle.Init(PEDALSTYLE_NONE, &Option::s_pedalStyle);
     this->Register(&m_pedalStyle, "pedalStyle", &m_general);
 
     m_preserveAnalyticalMarkup.SetInfo("Preserve analytical markup", "Preserves the analytical markup in MEI");
@@ -1085,6 +1097,11 @@ Options::Options()
     m_removeIds.Init(false);
     this->Register(&m_removeIds, "removeIds", &m_general);
 
+    m_scaleToPageSize.SetInfo(
+        "Scale to fit the page size", "Scale the content within the page instead of scaling the page itself");
+    m_scaleToPageSize.Init(false);
+    this->Register(&m_scaleToPageSize, "scaleToPageSize", &m_general);
+
     m_showRuntime.SetInfo("Show runtime on CLI", "Display the total runtime on command-line");
     m_showRuntime.Init(false);
     this->Register(&m_showRuntime, "showRuntime", &m_general);
@@ -1092,6 +1109,10 @@ Options::Options()
     m_shrinkToFit.SetInfo("Shrink content to fit page", "Scale down page content to fit the page height if needed");
     m_shrinkToFit.Init(false);
     this->Register(&m_shrinkToFit, "shrinkToFit", &m_general);
+
+    m_smuflTextFont.SetInfo("Smufl text font", "Specify if the smufl text font is embedded, linked, or ignored");
+    m_smuflTextFont.Init(SMUFLTEXTFONT_embedded, &Option::s_smuflTextFont);
+    this->Register(&m_smuflTextFont, "smuflTextFont", &m_general);
 
     m_staccatoCenter.SetInfo(
         "Center staccato", "Align staccato and staccatissimo articulations with center of the note");
@@ -1217,6 +1238,10 @@ Options::Options()
     m_dynamDist.Init(1.0, 0.5, 16.0);
     this->Register(&m_dynamDist, "dynamDist", &m_generalLayout);
 
+    m_dynamSingleGlyphs.SetInfo("Dynam single glyphs", "Don't use SMuFL's predefined dynamics glyph combinations");
+    m_dynamSingleGlyphs.Init(false);
+    this->Register(&m_dynamSingleGlyphs, "dynamSingleGlyphs", &m_generalLayout);
+
     m_engravingDefaults.SetInfo("Engraving defaults", "Json describing defaults for engraving SMuFL elements");
     m_engravingDefaults.Init(JsonSource::String, "{}");
     this->Register(&m_engravingDefaults, "engravingDefaults", &m_generalLayout);
@@ -1225,6 +1250,11 @@ Options::Options()
         "Engraving defaults file", "Path to json file describing defaults for engraving SMuFL elements");
     m_engravingDefaultsFile.Init(JsonSource::FilePath, "");
     this->Register(&m_engravingDefaultsFile, "engravingDefaultsFile", &m_generalLayout);
+
+    m_extenderLineMinSpace.SetInfo(
+        "Extender line minimum space", "Minimum space required for extender line to be drawn");
+    m_extenderLineMinSpace.Init(1.5, 1.5, 10.0);
+    this->Register(&m_extenderLineMinSpace, "extenderLineMinSpace", &m_generalLayout);
 
     m_fingeringScale.SetInfo("Fingering scale", "The scale of fingering font compared to default font size");
     m_fingeringScale.Init(0.75, 0.25, 1);
@@ -1294,6 +1324,10 @@ Options::Options()
         "Ledger line extension", "The amount by which a ledger line should extend either side of a notehead");
     m_ledgerLineExtension.Init(0.54, 0.20, 1.00);
     this->Register(&m_ledgerLineExtension, "ledgerLineExtension", &m_generalLayout);
+
+    m_lyricElision.SetInfo("Lyric elision", "The lyric elision width");
+    m_lyricElision.Init(ELISION_regular, &Option::s_elision);
+    this->Register(&m_lyricElision, "lyricElision", &m_generalLayout);
 
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);

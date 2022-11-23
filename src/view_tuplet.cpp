@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -17,7 +17,6 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "elementpart.h"
-#include "note.h"
 #include "options.h"
 #include "smufl.h"
 #include "staff.h"
@@ -168,7 +167,7 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
 
     TextExtend extend;
-    std::wstring notes;
+    std::u32string notes;
 
     const bool drawingCueSize = tuplet->GetDrawingCueSize();
     const int glyphSize = staff->GetDrawingStaffNotationSize();

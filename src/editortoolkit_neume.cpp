@@ -10,8 +10,7 @@
 //--------------------------------------------------------------------------------
 
 #include <algorithm>
-#include <codecvt>
-#include <limits.h>
+#include <limits>
 #include <locale>
 #include <math.h>
 #include <set>
@@ -35,8 +34,6 @@
 #include "vrv.h"
 
 //--------------------------------------------------------------------------------
-
-#include "jsonxx.h"
 
 namespace vrv {
 
@@ -379,7 +376,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // them, and then using std::set_difference to find the elements whose pitch values may need to change.
         // For example: in case 2 noLongerWithThisClef is found by taking the difference between
         // withOldPrecedingClefAfter and withPrecedingClefBefore, since that difference is the stuff that
-        // became associated with the clef that used to preceed this clef, meaning the stuff that was associated
+        // became associated with the clef that used to precede this clef, meaning the stuff that was associated
         // with clef, but no longer is.
         //
         // One other aspect that might seem confusing is exactly when clef->SetLine() gets called. The reason
@@ -644,7 +641,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Surface *surface = vrv_cast<Surface *>(m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
         assert(surface);
         surface->AddChild(zone);
-        newStaff->SetZone(zone);
+        newStaff->AttachZone(zone);
         Layer *newLayer = new Layer();
         newStaff->AddChild(newLayer);
 
@@ -694,7 +691,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Neume *neume = new Neume();
         Nc *nc = new Nc();
         std::string contour = "";
-        nc->SetZone(zone);
+        nc->AttachZone(zone);
 
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
         surface->AddChild(zone);
@@ -724,7 +721,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             sylZone->SetLrx(ulx + offSetLrx);
             sylZone->SetLry(uly + offSetLry);
             surface->AddChild(sylZone);
-            fi->SetZone(sylZone);
+            fi->AttachZone(sylZone);
         }
 
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
@@ -805,7 +802,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 newZone->SetLrx(newUlx + noteWidth);
                 newZone->SetLry(newUly + noteHeight);
 
-                newNc->SetZone(newZone);
+                newNc->AttachZone(newZone);
 
                 assert(surface);
                 surface->AddChild(newZone);
@@ -863,7 +860,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetUly(uly);
         zone->SetLrx(ulx + staffSize / 1.4);
         zone->SetLry(uly + staffSize / 2);
-        clef->SetZone(zone);
+        clef->AttachZone(zone);
         Surface *surface = vrv_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
         assert(surface);
         surface->AddChild(zone);
@@ -900,7 +897,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetUlx(ulx);
         Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
-        custos->SetZone(zone);
+        custos->AttachZone(zone);
         layer->AddChild(custos);
 
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
@@ -1068,12 +1065,10 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
 }
 
 // Update the text of a TextElement by its syl
-bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
+bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
 {
     std::string status = "OK", message = "";
-    std::wstring wtext;
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
-    wtext = conv.from_bytes(text);
+    const std::u32string wtext = UTF8to32(text);
     if (!m_doc->GetDrawingPage()) {
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Could not find drawing page.");
@@ -1140,7 +1135,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
                     zone->SetLry(lry);
                     Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
                     surface->AddChild(zone);
-                    syl->SetZone(zone);
+                    syl->AttachZone(zone);
                 }
                 else {
                     LogWarning("Could not create bounding box for syl.");
@@ -1346,12 +1341,12 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     obj->FindAllDescendantsByComparison(&fiChildren, &ic);
     FacsimileInterface *fi = obj->GetFacsimileInterface();
     if (fi != NULL && fi->HasFacs()) {
-        fi->SetZone(NULL);
+        fi->AttachZone(NULL);
     }
     for (auto it = fiChildren.begin(); it != fiChildren.end(); ++it) {
         fi = (*it)->GetFacsimileInterface();
         if (fi != NULL && fi->HasFacs()) {
-            fi->SetZone(NULL);
+            fi->AttachZone(NULL);
         }
     }
     if (isClef) {
@@ -1725,34 +1720,18 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                         Zone *tempZone = vrv_cast<Zone *>(temp->GetZone());
                         assert(tempZone);
                         if (temp->HasFacs()) {
-                            if (syllableFi == NULL) {
-                                zone->SetUlx(tempZone->GetUlx());
-                                zone->SetUly(tempZone->GetUly());
-                                zone->SetLrx(tempZone->GetLrx());
-                                zone->SetLry(tempZone->GetLry());
-                            }
-                            else {
-                                if (tempZone->GetUlx() < zone->GetUlx()) {
-                                    zone->SetUlx(tempZone->GetUlx());
-                                }
-                                if (tempZone->GetUly() < zone->GetUly()) {
-                                    zone->SetUly(tempZone->GetUly());
-                                }
-                                if (tempZone->GetLrx() > zone->GetLrx()) {
-                                    zone->SetLrx(tempZone->GetLrx());
-                                }
-                                if (tempZone->GetLry() > zone->GetLry()) {
-                                    zone->SetLry(tempZone->GetLry());
-                                }
-                            }
+                            zone->SetUlx(tempZone->GetUlx());
+                            zone->SetUly(tempZone->GetUly());
+                            zone->SetLrx(tempZone->GetLrx());
+                            zone->SetLry(tempZone->GetLry());
                         }
                     }
                 }
 
                 // make the bounding box a little bigger and lower so it's easier to edit
-                int offSetUly = 100;
-                int offSetLrx = 100;
-                int offSetLry = 200;
+                const int offSetUly = 100;
+                const int offSetLrx = 100;
+                const int offSetLry = 200;
 
                 zone->SetUly(zone->GetUly() + offSetUly);
                 zone->SetLrx(zone->GetLrx() + offSetLrx);
@@ -1762,7 +1741,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
                 FacsimileInterface *fi = vrv_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
                 assert(fi);
-                fi->SetZone(zone);
+                fi->AttachZone(zone);
 
                 // syl->ResetFacsimile();
                 // syl->SetFacs(zone->GetID());
@@ -1814,7 +1793,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             Syl *fullSyl = NULL;
 
             // construct concatenated string of all the syls
-            std::wstring fullString = L"";
+            std::u32string fullString = U"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
                 if (syl == NULL) continue;
@@ -1823,7 +1802,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 }
                 Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
                 if (text != NULL) {
-                    std::wstring currentString = text->GetText();
+                    std::u32string currentString = text->GetText();
                     fullString = fullString + currentString;
                 }
             }
@@ -1838,10 +1817,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
                 if (facsInter != NULL) {
                     // Update bb to valid extremes
-                    int newUlx = facsInter->GetDrawingX();
-                    int newUly = facsInter->GetDrawingY();
-                    int newLrx = facsInter->GetWidth() + newUlx;
-                    int newLry = facsInter->GetHeight() + newUly;
+                    const int newUlx = facsInter->GetDrawingX();
+                    const int newUly = facsInter->GetDrawingY();
+                    const int newLrx = facsInter->GetWidth() + newUlx;
+                    const int newLry = facsInter->GetHeight() + newUly;
                     if ((ulx > newUlx) || (ulx < 0)) {
                         ulx = newUlx;
                     }
@@ -2061,7 +2040,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     Object *surface = m_doc->GetFacsimile()->FindDescendantByType(SURFACE);
                     if (surface != NULL) {
                         surface->AddChild(zone);
-                        fi->SetZone(zone);
+                        fi->AttachZone(zone);
                     }
                     else {
                         delete zone;
@@ -2237,7 +2216,7 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         zone->SetLrx(newLrx);
         zone->SetLry(newLry);
 
-        newNc->SetZone(zone);
+        newNc->AttachZone(zone);
 
         Surface *surface = vrv_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
         assert(surface);
@@ -2285,10 +2264,10 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     if (isLigature == "true") {
         if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
-        int ligUlx = firstNc->GetZone()->GetUlx();
-        int ligUly = firstNc->GetZone()->GetUly();
-        int ligLrx = firstNc->GetZone()->GetLrx();
-        int ligLry = firstNc->GetZone()->GetLry();
+        const int ligUlx = firstNc->GetZone()->GetUlx();
+        const int ligUly = firstNc->GetZone()->GetUly();
+        const int ligLrx = firstNc->GetZone()->GetLrx();
+        const int ligLry = firstNc->GetZone()->GetLry();
 
         Staff *staff = firstNc->GetAncestorStaff();
 
@@ -2300,7 +2279,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         zone->SetLrx(ligLrx + noteWidth);
         zone->SetLry(ligLry + noteHeight);
 
-        secondNc->SetZone(zone);
+        secondNc->AttachZone(zone);
 
         if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
     }
@@ -2313,7 +2292,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         zone->SetLrx(firstNc->GetZone()->GetLrx());
         zone->SetLry(firstNc->GetZone()->GetLry());
 
-        secondNc->SetZone(zone);
+        secondNc->AttachZone(zone);
 
         if (Att::SetNeumes(secondNc, "ligated", "true")) success2 = true;
     }
@@ -2767,7 +2746,7 @@ bool EditorToolkitNeume::ParseChangeStaffAction(jsonxx::Object param, std::strin
 
 bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 {
-    // remember to reorderbyxpos! (not called in function so that it can be used in loops)
+    // remember to ReorderByXPos! (not called in function so that it can be used in loops)
     // clef re-association is done at the syllable level (not neume or nc)
     // so this function should only be called on custos or syllables
     // it should also only be called in cases where finding the old clef is not required
@@ -2822,8 +2801,8 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         pi->SetOct(3);
 
         // glyphs in Verovio are actually not centered, but are in the top left corner of a giant box
-        int centerY = fi->GetZone()->GetUly();
-        int centerX = fi->GetZone()->GetUlx();
+        const int centerY = fi->GetZone()->GetUly();
+        const int centerX = fi->GetZone()->GetUlx();
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int pitchDifference = round(
@@ -2921,10 +2900,10 @@ bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
         return false;
     }
 
-    const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int yDiff = clef->GetZone()->GetUly() - staff->GetZone()->GetUly()
+    const double staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    const double yDiff = clef->GetZone()->GetUly() - staff->GetZone()->GetUly()
         + (clef->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) * tan(staff->GetDrawingRotate() * M_PI / 180.0);
-    int clefLine = staff->m_drawingLines - round((double)yDiff / (double)staffSize);
+    const int clefLine = staff->m_drawingLines - round(yDiff / staffSize);
     clef->SetLine(clefLine);
     return true;
 }

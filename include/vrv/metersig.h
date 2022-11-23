@@ -47,10 +47,10 @@ public:
     int GetTotalCount() const;
 
     /** Retrieves the symbol glyph */
-    wchar_t GetSymbolGlyph() const;
+    char32_t GetSymbolGlyph() const;
 
     /** Retrieve parentheses from the enclose attribute */
-    std::pair<wchar_t, wchar_t> GetEnclosingGlyphs(bool smallGlpyh) const;
+    std::pair<char32_t, char32_t> GetEnclosingGlyphs(bool smallGlpyh) const;
 
     //----------//
     // Functors //

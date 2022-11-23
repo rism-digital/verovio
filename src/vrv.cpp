@@ -9,15 +9,15 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <cmath>
 #include <codecvt>
+#include <cstdlib>
 #include <iostream>
 #include <locale>
 #include <sstream>
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <vector>
 
 #ifndef _WIN32
@@ -64,8 +64,8 @@ namespace vrv {
 /** Global for LogElapsedTimeXXX functions (debugging purposes) */
 struct timeval start;
 
-/** For disabling log */
-bool logging = true;
+/** For controlling the log level - warning level enabled by default */
+LogLevel logLevel = LOG_WARNING;
 
 /** By default log to stderr or JS console */
 bool loggingToBuffer = false;
@@ -84,70 +84,60 @@ void LogElapsedTimeEnd(const char *msg)
     gettimeofday(&end, NULL);
     elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
     elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0; // us to ms
-    LogMessage("Elapsed time (%s): %.3fs", msg, elapsedTime / 1000);
+    LogInfo("Elapsed time (%s): %.3fs", msg, elapsedTime / 1000);
 }
 
 void LogDebug(const char *fmt, ...)
 {
-    if (!logging) return;
+    if (logLevel < LOG_DEBUG) return;
 
 #if defined(DEBUG)
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, CONSOLE_DEBUG);
+    LogString(s, LOG_DEBUG);
     va_end(args);
 #endif
 }
 
 void LogError(const char *fmt, ...)
 {
-    if (!logging) return;
+    if (logLevel < LOG_ERROR) return;
 
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Error] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, CONSOLE_ERROR);
+    LogString(s, LOG_ERROR);
     va_end(args);
 }
 
-void LogMessage(const char *fmt, ...)
+void LogInfo(const char *fmt, ...)
 {
-    if (!logging) return;
+    if (logLevel < LOG_INFO) return;
 
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Message] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, CONSOLE_INFO);
+    LogString(s, LOG_INFO);
     va_end(args);
 }
 
 void LogWarning(const char *fmt, ...)
 {
-    if (!logging) return;
+    if (logLevel < LOG_WARNING) return;
 
     std::string s;
     va_list args;
     va_start(args, fmt);
     s = "[Warning] " + StringFormatVariable(fmt, args) + "\n";
-    LogString(s, CONSOLE_WARN);
+    LogString(s, LOG_WARNING);
     va_end(args);
 }
 
-void EnableLog(bool value)
-{
-    logging = value;
-}
-
-void EnableLogToBuffer(bool value)
-{
-    loggingToBuffer = value;
-}
-
-void LogString(std::string message, consoleLogLevel level)
+void LogString(std::string message, LogLevel level)
 {
     if (loggingToBuffer) {
         if (LogBufferContains(message)) return;
@@ -156,24 +146,36 @@ void LogString(std::string message, consoleLogLevel level)
     else {
 #ifdef __EMSCRIPTEN__
         switch (level) {
-            case CONSOLE_DEBUG: EM_ASM_ARGS({ console.debug(UTF8ToString($0)); }, message.c_str()); break;
-            case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(UTF8ToString($0)); }, message.c_str()); break;
-            case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(UTF8ToString($0)); }, message.c_str()); break;
-            case CONSOLE_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
+            case LOG_DEBUG: EM_ASM_ARGS({ console.debug(UTF8ToString($0)); }, message.c_str()); break;
+            case LOG_ERROR: EM_ASM_ARGS({ console.error(UTF8ToString($0)); }, message.c_str()); break;
+            case LOG_WARNING: EM_ASM_ARGS({ console.warn(UTF8ToString($0)); }, message.c_str()); break;
+            case LOG_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
             default: EM_ASM_ARGS({ console.log(UTF8ToString($0)); }, message.c_str()); break;
         }
 #elif defined ANDROID
         switch (level) {
-            case CONSOLE_DEBUG: android_log_puts(ANDROID_LOG_DEBUG, message.c_str()); break;
-            case CONSOLE_ERROR: android_log_puts(ANDROID_LOG_ERROR, message.c_str()); break;
-            case CONSOLE_WARN: android_log_puts(ANDROID_LOG_WARN, message.c_str()); break;
-            case CONSOLE_INFO:
+            case LOG_DEBUG: android_log_puts(ANDROID_LOG_DEBUG, message.c_str()); break;
+            case LOG_ERROR: android_log_puts(ANDROID_LOG_ERROR, message.c_str()); break;
+            case LOG_WARNING: android_log_puts(ANDROID_LOG_WARN, message.c_str()); break;
+            case LOG_INFO:
             default: android_log_puts(ANDROID_LOG_INFO, message.c_str()); break;
         }
 #else
         fputs(message.c_str(), stderr);
 #endif
     }
+}
+
+LogLevel StrToLogLevel(const std::string &level)
+{
+    if (level == "off") return LOG_OFF;
+    if (level == "error") return LOG_ERROR;
+    if (level == "warning") return LOG_WARNING;
+    if (level == "info") return LOG_INFO;
+    if (level == "debug") return LOG_DEBUG;
+
+    LogWarning("Unkown log level '%s' (warning is default)", level.c_str());
+    return LOG_WARNING;
 }
 
 bool LogBufferContains(const std::string &s)
@@ -190,6 +192,20 @@ bool Check(Object *object)
 {
     assert(object);
     return (object != NULL);
+}
+
+//----------------------------------------------------------------------------
+// Function defined in toolkitdef.h
+//----------------------------------------------------------------------------
+
+void EnableLog(LogLevel level)
+{
+    logLevel = level;
+}
+
+void EnableLogToBuffer(bool value)
+{
+    loggingToBuffer = value;
 }
 
 //----------------------------------------------------------------------------
@@ -229,15 +245,15 @@ std::string ExtractIDFragment(std::string refID)
     return refID;
 }
 
-std::string UTF16to8(const std::wstring &in)
+std::string UTF32to8(const std::u32string &in)
 {
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> strCnv;
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> strCnv;
     return strCnv.to_bytes(in);
 }
 
-std::wstring UTF8to16(const std::string &in)
+std::u32string UTF8to32(const std::string &in)
 {
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> strCnv;
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> strCnv;
     return strCnv.from_bytes(in);
 }
 
@@ -265,7 +281,7 @@ std::string GetVersion()
 {
     std::string dev;
     if (VERSION_DEV) dev = "-dev";
-    return StringFormat("%d.%d.%d%s-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str(), GIT_COMMIT);
+    return StringFormat("%d.%d.%d%s%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str(), GIT_COMMIT);
 }
 
 static const std::string base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

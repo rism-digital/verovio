@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -18,7 +18,6 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
-#include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
 #include "layer.h"
@@ -665,7 +664,7 @@ int System::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
 
     // reset it, but not the current grpId!
     params->m_currentSystem = this;
-    params->m_overlapingHarm.clear();
+    params->m_overlappingHarm.clear();
     params->m_previousHarmPositioner = NULL;
     params->m_previousHarmStart = NULL;
     params->m_previousMeasure = NULL;
@@ -705,15 +704,15 @@ int System::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
                 - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
 
             if (overlap > 0) {
-                params->m_overlapingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
+                params->m_overlappingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
                     params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
             }
         }
     }
 
     // Ajust the postion of the alignment according to what we have collected for this harm group id
-    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
-    params->m_overlapingHarm.clear();
+    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlappingHarm);
+    params->m_overlappingHarm.clear();
 
     return FUNCTOR_CONTINUE;
 }
@@ -724,7 +723,7 @@ int System::AdjustSylSpacing(FunctorParams *functorParams)
     assert(params);
 
     // reset it
-    params->m_overlapingSyl.clear();
+    params->m_overlappingSyl.clear();
     params->m_previousVerse = NULL;
     params->m_previousMeasure = NULL;
     params->m_freeSpace = 0;
@@ -749,14 +748,14 @@ int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
         params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
 
         if (overlap > 0) {
-            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousVerse->GetAlignment(),
+            params->m_overlappingSyl.push_back(std::make_tuple(params->m_previousVerse->GetAlignment(),
                 params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
         }
     }
 
     // Ajust the postion of the alignment according to what we have collected for this harm grp
-    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
-    params->m_overlapingSyl.clear();
+    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlappingSyl);
+    params->m_overlappingSyl.clear();
 
     return FUNCTOR_CONTINUE;
 }
@@ -1046,6 +1045,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     params->m_classId = REH;
     m_systemAligner.Process(params->m_functor, params);
 
+    params->m_classId = CAESURA;
+    m_systemAligner.Process(params->m_functor, params);
+
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;
     m_systemAligner.Process(params->m_functor, params);
@@ -1057,6 +1059,11 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     // The resulting layout order will correspond to the order in the encoding.
     params->m_classId = OBJECT;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(DYNAM);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_between;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     return FUNCTOR_SIBLINGS;
 }

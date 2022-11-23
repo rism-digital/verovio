@@ -69,19 +69,25 @@ public:
 private:
     /**
      * A name or label associated with the controlled vocabulary from which the value
-     * of
+     * of glyph.name or glyph.num is taken.
      **/
     std::string m_glyphAuth;
     /** Glyph name. **/
     std::string m_glyphName;
-    /** Numeric glyph reference in hexadecimal notation, **/
+    /**
+     * Numeric glyph reference in hexadecimal notation, e.g., "#xE000" or "U+E000".
+     * N.B. SMuFL version 1.18 uses the range U+E000 - U+ECBF.
+     **/
     data_HEXNUM m_glyphNum;
-    /** The web-accessible location of the controlled vocabulary from which the value of **/
+    /**
+     * The web-accessible location of the controlled vocabulary from which the value of
+     * glyph.name or glyph.num is taken.
+     **/
     std::string m_glyphUri;
 
     /* include <attglyph.uri> */
 };
 
-} // vrv namespace
+} // namespace vrv
 
 #endif // __VRV_ATTS_EXTERNALSYMBOLS_H__

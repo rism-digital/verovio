@@ -9,7 +9,12 @@
 
 //----------------------------------------------------------------------------
 
+#include <string>
+
+//----------------------------------------------------------------------------
+
 #include "smufl.h"
+#include "vrv.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -22,9 +27,18 @@ namespace vrv {
 // Static members with some default values
 //----------------------------------------------------------------------------
 
-thread_local std::string Resources::s_defaultPath = "/usr/local/share/verovio";
+thread_local std::string Resources::s_defaultPath = VRV_RESOURCE_DIR;
 const Resources::StyleAttributes Resources::k_defaultStyle{ data_FONTWEIGHT::FONTWEIGHT_normal,
     data_FONTSTYLE::FONTSTYLE_normal };
+
+//----------------------------------------------------------------------------
+// Function defined in toolkitdef.h
+//----------------------------------------------------------------------------
+
+void SetDefaultResourcePath(const std::string &path)
+{
+    Resources::SetDefaultPath(path);
+}
 
 //----------------------------------------------------------------------------
 // Resources
@@ -40,9 +54,9 @@ bool Resources::InitFonts()
 {
     // We will need to rethink this for adding the option to add custom fonts
     // Font Bravura first since it is expected to have always all symbols
-    if (!LoadFont("Bravura")) LogError("Bravura font could not be loaded.");
+    if (!LoadFont("Bravura", false)) LogError("Bravura font could not be loaded.");
     // The Leipzig as the default font
-    if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded.");
+    if (!LoadFont("Leipzig", false)) LogError("Leipzig font could not be loaded.");
 
     if (m_fontGlyphTable.size() < SMUFL_COUNT) {
         LogError("Expected %d default SMuFL glyphs but could load only %d.", SMUFL_COUNT, m_fontGlyphTable.size());
@@ -55,13 +69,10 @@ bool Resources::InitFonts()
         bool m_isMandatory;
     };
 
-    static const TextFontInfo_type textFontInfos[] = { { k_defaultStyle, "Times", true },
-        { k_defaultStyle, "VerovioText-1.0", true }, { { FONTWEIGHT_bold, FONTSTYLE_normal }, "Times-bold", false },
-        { { FONTWEIGHT_bold, FONTSTYLE_normal }, "VerovioText-1.0", false },
-        { { FONTWEIGHT_bold, FONTSTYLE_italic }, "Times-bold-italic", false },
-        { { FONTWEIGHT_bold, FONTSTYLE_italic }, "VerovioText-1.0", false },
-        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "Times-italic", false },
-        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "VerovioText-1.0", false } };
+    static const TextFontInfo_type textFontInfos[]
+        = { { k_defaultStyle, "Times", true }, { { FONTWEIGHT_bold, FONTSTYLE_normal }, "Times-bold", false },
+              { { FONTWEIGHT_bold, FONTSTYLE_italic }, "Times-bold-italic", false },
+              { { FONTWEIGHT_normal, FONTSTYLE_italic }, "Times-italic", false } };
 
     for (const auto &textFontInfo : textFontInfos) {
         if (!InitTextFont(textFontInfo.m_fileName, textFontInfo.m_style) && textFontInfo.m_isMandatory) {
@@ -80,7 +91,7 @@ bool Resources::SetFont(const std::string &fontName)
     return LoadFont(fontName);
 }
 
-const Glyph *Resources::GetGlyph(wchar_t smuflCode) const
+const Glyph *Resources::GetGlyph(char32_t smuflCode) const
 {
     return m_fontGlyphTable.count(smuflCode) ? &m_fontGlyphTable.at(smuflCode) : NULL;
 }
@@ -90,9 +101,19 @@ const Glyph *Resources::GetGlyph(const std::string &smuflName) const
     return m_glyphNameTable.count(smuflName) ? &m_fontGlyphTable.at(m_glyphNameTable.at(smuflName)) : NULL;
 }
 
-wchar_t Resources::GetGlyphCode(const std::string &smuflName) const
+char32_t Resources::GetGlyphCode(const std::string &smuflName) const
 {
     return m_glyphNameTable.count(smuflName) ? m_glyphNameTable.at(smuflName) : 0;
+}
+
+bool Resources::IsSmuflFallbackNeeded(const std::u32string &text) const
+{
+    for (int i = 0; i < (int)text.length(); ++i) {
+        char32_t c = text.at(i);
+        const Glyph *glyph = this->GetGlyph(c);
+        if (glyph && glyph->GetFallback()) return true;
+    }
+    return false;
 }
 
 void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle) const
@@ -112,7 +133,7 @@ void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontSt
     }
 }
 
-const Glyph *Resources::GetTextGlyph(wchar_t code) const
+const Glyph *Resources::GetTextGlyph(char32_t code) const
 {
     const StyleAttributes style = (m_textFont.count(m_currentStyle) != 0) ? m_currentStyle : k_defaultStyle;
     if (m_textFont.count(style) == 0) return NULL;
@@ -125,7 +146,20 @@ const Glyph *Resources::GetTextGlyph(wchar_t code) const
     return &currentTable.at(code);
 }
 
-bool Resources::LoadFont(const std::string &fontName)
+char32_t Resources::GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar)
+{
+    char32_t smuflChar = unicodeChar;
+    switch (unicodeChar) {
+        case UNICODE_DAL_SEGNO: smuflChar = SMUFL_E045_dalSegno; break;
+        case UNICODE_DA_CAPO: smuflChar = SMUFL_E046_daCapo; break;
+        case UNICODE_SEGNO: smuflChar = SMUFL_E047_segno; break;
+        case UNICODE_CODA: smuflChar = SMUFL_E048_coda; break;
+        default: break;
+    }
+    return smuflChar;
+}
+
+bool Resources::LoadFont(const std::string &fontName, bool withFallback)
 {
     pugi::xml_document doc;
     const std::string filename = Resources::GetPath() + "/" + fontName + ".xml";
@@ -137,8 +171,14 @@ bool Resources::LoadFont(const std::string &fontName)
     }
     pugi::xml_node root = doc.first_child();
     if (!root.attribute("units-per-em")) {
-        LogError("No units-per-em attribute in bouding box file");
+        LogError("No units-per-em attribute in bounding box file");
         return false;
+    }
+
+    if (withFallback) {
+        for (auto &glyph : m_fontGlyphTable) {
+            glyph.second.SetFallback(true);
+        }
     }
 
     const int unitsPerEm = atoi(root.attribute("units-per-em").value());
@@ -171,11 +211,13 @@ bool Resources::LoadFont(const std::string &fontName)
             }
         }
 
-        const wchar_t smuflCode = (wchar_t)strtol(c_attribute.value(), NULL, 16);
+        const char32_t smuflCode = (char32_t)strtol(c_attribute.value(), NULL, 16);
+        glyph.SetFallback(false);
         m_fontGlyphTable[smuflCode] = glyph;
         m_glyphNameTable[n_attribute.value()] = smuflCode;
     }
 
+    m_fontName = fontName;
     return true;
 }
 
@@ -189,7 +231,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
     if (!result) {
         // File not found, default bounding boxes will be used
-        LogMessage("Cannot load bounding boxes for text font '%s'", filename.c_str());
+        LogInfo("Cannot load bounding boxes for text font '%s'", filename.c_str());
         return false;
     }
     pugi::xml_node root = doc.first_child();
@@ -205,7 +247,7 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
     GlyphTable &currentTable = m_textFont.at(style);
     for (current = root.child("g"); current; current = current.next_sibling("g")) {
         if (current.attribute("c")) {
-            wchar_t code = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);
+            char32_t code = (char32_t)strtol(current.attribute("c").value(), NULL, 16);
             // We create a glyph with only the units per em which is the only info we need for
             // the bounding boxes; path and codeStr will remain [unset]
             Glyph glyph(unitsPerEm);

@@ -190,10 +190,11 @@ public:
  * member 1: y coordinate of the beam left side
  * member 2: y coordinate of the beam right side
  * member 3: x coordinate of the beam left side (starting point)
- * member 4: slope of the beam
- * member 5: overlap margin that beam needs to be displaced by
- * member 6: the Doc
- * member 7: the flag indicating whether element from different layer is being processed
+ * member 4: x coordinate of the beam right side (end point)
+ * member 5: slope of the beam
+ * member 6: overlap margin that beam needs to be displaced by
+ * member 7: the Doc
+ * member 8: the flag indicating whether element from different layer is being processed
  **/
 
 class AdjustBeamParams : public FunctorParams {
@@ -204,6 +205,7 @@ public:
         m_y1 = 0;
         m_y2 = 0;
         m_x1 = 0;
+        m_x2 = 0;
         m_beamSlope = 0.0;
         m_directionBias = 0;
         m_overlapMargin = 0;
@@ -215,6 +217,7 @@ public:
     int m_y1;
     int m_y2;
     int m_x1;
+    int m_x2;
     double m_beamSlope;
     int m_directionBias;
     int m_overlapMargin;
@@ -426,7 +429,7 @@ public:
     }
     std::vector<int> m_grpIds;
     int m_currentGrp;
-    ArrayOfAdjustmentTuples m_overlapingHarm;
+    ArrayOfAdjustmentTuples m_overlappingHarm;
     FloatingPositioner *m_previousHarmPositioner;
     LayerElement *m_previousHarmStart;
     Measure *m_previousMeasure;
@@ -548,7 +551,7 @@ public:
         m_staffSize = 100;
         m_doc = doc;
     }
-    ArrayOfAdjustmentTuples m_overlapingSyl;
+    ArrayOfAdjustmentTuples m_overlappingSyl;
     Verse *m_previousVerse;
     Syl *m_lastSyl;
     Measure *m_previousMeasure;

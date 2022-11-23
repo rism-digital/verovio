@@ -23,6 +23,7 @@
 
 namespace vrv {
 
+class AreaPosInterface;
 class Doc;
 class DurationInterface;
 class EditorialElement;
@@ -127,6 +128,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    virtual AreaPosInterface *GetAreaPosInterface() { return NULL; }
+    virtual const AreaPosInterface *GetAreaPosInterface() const { return NULL; }
     virtual BeamDrawingInterface *GetBeamDrawingInterface() { return NULL; }
     virtual const BeamDrawingInterface *GetBeamDrawingInterface() const { return NULL; }
     virtual DurationInterface *GetDurationInterface() { return NULL; }
@@ -409,7 +412,7 @@ public:
      * Return true if the object has the child Object as descendant (reference of direct).
      * Processes in depth-first.
      */
-    bool HasDescendant(Object *child, int deepness = UNLIMITED_DEPTH) const;
+    bool HasDescendant(const Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
      * Look for a descendant with the specified id (returns NULL if not found)
@@ -744,7 +747,7 @@ public:
      * Retrieve the minimum left and maximum right for an alignment.
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
      */
-    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+    virtual int GetAlignmentLeftRight(FunctorParams *functorParams) const;
 
     /**
      * Go through all layer elements of the layer and return next/previous element relative to the specified
@@ -1768,12 +1771,12 @@ public:
     /**
      * Returns a contatenated version of all the text children
      */
-    std::wstring GetText(const Object *node) const;
+    std::u32string GetText(const Object *node) const;
 
     /**
      * Fill an array of lines with concatenated content of each line
      */
-    void GetTextLines(const Object *node, std::vector<std::wstring> &lines) const;
+    void GetTextLines(const Object *node, std::vector<std::u32string> &lines) const;
 
 protected:
     /**

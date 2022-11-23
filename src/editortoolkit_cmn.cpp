@@ -34,10 +34,6 @@
 
 //--------------------------------------------------------------------------------
 
-#include "jsonxx.h"
-
-//--------------------------------------------------------------------------------
-
 #define CHAINED_ID "[chained-id]"
 
 namespace vrv {
@@ -273,16 +269,16 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     Object *end = m_doc->GetDrawingPage()->FindDescendantByID(endid);
     // Check if both start and end elements exist
     if (!start || !end) {
-        LogMessage("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
+        LogInfo("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
         return false;
     }
     // Check if it is a LayerElement
     if (!dynamic_cast<LayerElement *>(start)) {
-        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
+        LogInfo("Element '%s' is not supported as start element", start->GetClassName().c_str());
         return false;
     }
     if (!dynamic_cast<LayerElement *>(end)) {
-        LogMessage("Element '%s' is not supported as end element", start->GetClassName().c_str());
+        LogInfo("Element '%s' is not supported as end element", start->GetClassName().c_str());
         return false;
     }
 
@@ -300,7 +296,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         element = new Hairpin();
     }
     else {
-        LogMessage("Inserting control event '%s' is not supported", elementType.c_str());
+        LogInfo("Inserting control event '%s' is not supported", elementType.c_str());
         return false;
     }
 
@@ -324,7 +320,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     Object *start = m_doc->GetDrawingPage()->FindDescendantByID(startid);
     // Check if both start and end elements exist
     if (!start) {
-        LogMessage("Element start id '%s' could not be found", startid.c_str());
+        LogInfo("Element start id '%s' could not be found", startid.c_str());
         return false;
     }
     if (elementType == "note") {
@@ -332,7 +328,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     }
     // Check if it is a LayerElement
     if (!dynamic_cast<LayerElement *>(start)) {
-        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
+        LogInfo("Element '%s' is not supported as start element", start->GetClassName().c_str());
         return false;
     }
 
@@ -347,7 +343,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         element = new Dynam();
     }
     else {
-        LogMessage("Inserting control event '%s' is not supported", elementType.c_str());
+        LogInfo("Inserting control event '%s' is not supported", elementType.c_str());
         return false;
     }
 
@@ -431,7 +427,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
     assert(object);
 
     if (!object->Is({ CHORD, NOTE, REST })) {
-        LogMessage("Inserting a note is possible only in a chord, note or rest");
+        LogInfo("Inserting a note is possible only in a chord, note or rest");
         return false;
     }
 
@@ -456,7 +452,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         }
 
         if (currentNote->HasEditorialContent()) {
-            LogMessage("Inserting a note where a note has editorial content is not possible");
+            LogInfo("Inserting a note where a note has editorial content is not possible");
             return false;
         }
 
@@ -464,7 +460,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         ClassIdsComparison lyricsComparison({ VERSE, SYL });
         currentNote->FindAllDescendantsByComparison(&lyric, &lyricsComparison);
         if (!lyric.empty()) {
-            LogMessage("Inserting a note where a note has lyric content is not possible");
+            LogInfo("Inserting a note where a note has lyric content is not possible");
             return false;
         }
         Chord *chord = new Chord();
@@ -519,7 +515,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
 
     if (chord) {
         if (chord->HasEditorialContent()) {
-            LogMessage("Deleting a note in a chord that has editorial content is not possible");
+            LogInfo("Deleting a note in a chord that has editorial content is not possible");
             return false;
         }
         int count = chord->GetChildCount(NOTE, UNLIMITED_DEPTH);

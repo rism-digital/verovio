@@ -8,7 +8,7 @@
 #ifndef __VRV_SURFACE_H__
 #define __VRV_SURFACE_H__
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 

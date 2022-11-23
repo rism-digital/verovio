@@ -9,11 +9,10 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
-#include "controlelement.h"
 #include "editorial.h"
 #include "text.h"
 #include "vrv.h"

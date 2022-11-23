@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -20,6 +20,7 @@
 #include "staff.h"
 #include "stem.h"
 #include "tabgrp.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -135,6 +136,7 @@ int TabDurSym::PrepareLayerElementParts(FunctorParams *functorParams)
 
     if (!currentStem) {
         currentStem = new Stem();
+        currentStem->IsAttribute(true);
         this->AddChild(currentStem);
     }
     this->SetDrawingStem(currentStem);
@@ -203,8 +205,8 @@ int TabDurSym::CalcStem(FunctorParams *functorParams)
     // Up by default with tablature
     data_STEMDIRECTION stemDir = STEMDIRECTION_up;
 
-    if (stem->HasStemDir()) {
-        stemDir = stem->GetStemDir();
+    if (stem->HasDir()) {
+        stemDir = stem->GetDir();
     }
     else if ((layerStemDir = params->m_layer->GetDrawingStemDir()) != STEMDIRECTION_NONE) {
         stemDir = layerStemDir;
@@ -245,7 +247,7 @@ int TabDurSym::CalcStem(FunctorParams *functorParams)
 
     stem->SetDrawingStemLen(stemSize);
 
-    // Flag currently used only for gitar tablature because it is included in the glyphs for lute tab
+    // Flag currently used only for guitar tablature because it is included in the glyphs for lute tab
     if (params->m_staff->IsTabGuitar()) {
         Flag *flag = vrv_cast<Flag *>(stem->GetFirst(FLAG));
         if (flag) {

@@ -9,14 +9,13 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
 #include "editorial.h"
 #include "functorparams.h"
-#include "grpsym.h"
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
