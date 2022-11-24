@@ -445,7 +445,7 @@ int main(int argc, char **argv)
     }
 
     // Load a specified font
-    if (!toolkit.SetOption("font", options->m_font.GetValue())) {
+    if (!toolkit.SetOptions(vrv::StringFormat("{\"font\": \"%s\" }", options->m_font.GetValue().c_str()))) {
         std::cerr << "Font '" << options->m_font.GetValue() << "' could not be loaded." << std::endl;
         exit(1);
     }

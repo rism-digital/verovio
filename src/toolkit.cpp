@@ -1109,31 +1109,6 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     return true;
 }
 
-std::string Toolkit::GetOption(const std::string &option, bool defaultValue) const
-{
-    if (m_options->GetItems()->count(option) == 0) {
-        LogError("Unsupported option '%s'", option.c_str());
-        return "[unspecified]";
-    }
-    Option *opt = m_options->GetItems()->at(option);
-    assert(opt);
-    return (defaultValue) ? opt->GetDefaultStrValue() : opt->GetStrValue();
-}
-
-bool Toolkit::SetOption(const std::string &option, const std::string &value)
-{
-    if (m_options->GetItems()->count(option) == 0) {
-        LogError("Unsupported option '%s'", option.c_str());
-        return false;
-    }
-    Option *opt = m_options->GetItems()->at(option);
-    assert(opt);
-    const bool result = opt->SetValue(value);
-    // If the option is 'font' we need to reset the font resource explicitly
-    if (result && option == "font") this->SetFont(m_options->m_font.GetValue());
-    return result;
-}
-
 void Toolkit::ResetOptions()
 {
     std::for_each(m_options->GetItems()->begin(), m_options->GetItems()->end(),
