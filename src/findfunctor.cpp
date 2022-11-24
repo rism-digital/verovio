@@ -211,6 +211,17 @@ FindPreviousChildByComparisonFunctor::FindPreviousChildByComparisonFunctor(Compa
 
 FunctorCode FindPreviousChildByComparisonFunctor::VisitObject(const Object *object)
 {
+    // this guy works by going from the start and replacing the return element with every nearer element
+    // until you get to the 'start' element
+    if (m_start == object) {
+        // we've reached the end element, so stop
+        return FUNCTOR_STOP;
+    }
+
+    if ((*m_comparison)(object)) {
+        m_element = object;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
