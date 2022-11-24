@@ -251,6 +251,55 @@ private:
     const Object *m_element;
 };
 
+//----------------------------------------------------------------------------
+// FindNextChildByComparisonFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class finds the next child matching the comparison object.
+ */
+class FindNextChildByComparisonFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindNextChildByComparisonFunctor(const Comparison *comparison, const Object *start);
+    virtual ~FindNextChildByComparisonFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Retrieve the search result
+     */
+    const Object *GetElement() const { return m_element; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(const Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The comparison
+    const Comparison *m_comparison;
+    // The object to start with
+    const Object *m_start;
+    // The search result
+    const Object *m_element;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FINDFUNCTOR_H__
