@@ -169,7 +169,7 @@ FunctorCode FindByIDFunctor::VisitObject(const Object *object)
 // FindNextChildByComparisonFunctor
 //----------------------------------------------------------------------------
 
-FindNextChildByComparisonFunctor::FindNextChildByComparisonFunctor(const Comparison *comparison, const Object *start)
+FindNextChildByComparisonFunctor::FindNextChildByComparisonFunctor(Comparison *comparison, const Object *start)
 {
     m_comparison = comparison;
     m_start = start;
@@ -178,6 +178,23 @@ FindNextChildByComparisonFunctor::FindNextChildByComparisonFunctor(const Compari
 
 FunctorCode FindNextChildByComparisonFunctor::VisitObject(const Object *object)
 {
+    // we are reaching the start of the range
+    if (m_start == object) {
+        // setting m_start to be null tells us that we're in the range
+        m_start = NULL;
+        return FUNCTOR_CONTINUE;
+    }
+
+    else if (m_start) {
+        // we're not yet in the range
+        return FUNCTOR_CONTINUE;
+    }
+
+    if ((*m_comparison)(object)) {
+        m_element = object;
+        return FUNCTOR_STOP;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

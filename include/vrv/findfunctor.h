@@ -264,7 +264,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    FindNextChildByComparisonFunctor(const Comparison *comparison, const Object *start);
+    FindNextChildByComparisonFunctor(Comparison *comparison, const Object *start);
     virtual ~FindNextChildByComparisonFunctor() = default;
     ///@}
 
@@ -293,7 +293,7 @@ public:
     //
 private:
     // The comparison
-    const Comparison *m_comparison;
+    Comparison *m_comparison;
     // The object to start with
     const Object *m_start;
     // The search result
