@@ -688,11 +688,6 @@ public:
     ///@{
 
     /**
-     * Find the previous child matching the Comparison object passed in the parameters
-     */
-    virtual int FindPreviousChildByComparison(FunctorParams *);
-
-    /**
      * Find a Object with the extreme value with a Comparison functor .
      */
     virtual int FindExtremeByComparison(FunctorParams *functorParams) const;

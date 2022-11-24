@@ -1452,28 +1452,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindChildByComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the comparison
- * member 1: the start object
- */
-
-class FindChildByComparisonParams : public FunctorParams {
-public:
-    FindChildByComparisonParams(Comparison *comparison, Object *start)
-    {
-        m_comparison = comparison;
-        m_element = NULL;
-        m_start = start;
-    }
-    Comparison *m_comparison;
-    Object *m_element;
-    Object *m_start;
-};
-
-//----------------------------------------------------------------------------
 // FindExtremeByComparisonParams
 //----------------------------------------------------------------------------
 

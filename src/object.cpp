@@ -1318,10 +1318,9 @@ Object *Object::FindNextChild(Comparison *comp, Object *start)
 
 Object *Object::FindPreviousChild(Comparison *comp, Object *start)
 {
-    Functor findPreviousChildByComparison(&Object::FindPreviousChildByComparison);
-    FindChildByComparisonParams params(comp, start);
-    this->Process(&findPreviousChildByComparison, &params);
-    return params.m_element;
+    FindPreviousChildByComparisonFunctor findPreviousChildByComparison(comp, start);
+    this->Process(findPreviousChildByComparison);
+    return const_cast<Object *>(findPreviousChildByComparison.GetElement());
 }
 
 //----------------------------------------------------------------------------
@@ -2460,24 +2459,6 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
 
     std::stable_sort(m_children.begin(), m_children.end(), sortByUlx);
     this->Modify();
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindPreviousChildByComparison(FunctorParams *functorparams)
-{
-    FindChildByComparisonParams *params = vrv_cast<FindChildByComparisonParams *>(functorparams);
-    assert(params);
-    // this guy works by going from the start and replacing the return element with every nearer element
-    // until you get to the 'start' element
-    if (params->m_start == this) {
-        // we've reached the end element, so stop
-        return FUNCTOR_STOP;
-    }
-
-    if ((*params->m_comparison)(this)) {
-        params->m_element = this;
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
