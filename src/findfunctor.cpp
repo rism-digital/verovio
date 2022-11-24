@@ -198,4 +198,20 @@ FunctorCode FindNextChildByComparisonFunctor::VisitObject(const Object *object)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// FindPreviousChildByComparisonFunctor
+//----------------------------------------------------------------------------
+
+FindPreviousChildByComparisonFunctor::FindPreviousChildByComparisonFunctor(Comparison *comparison, const Object *start)
+{
+    m_comparison = comparison;
+    m_start = start;
+    m_element = NULL;
+}
+
+FunctorCode FindPreviousChildByComparisonFunctor::VisitObject(const Object *object)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
