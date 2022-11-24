@@ -688,11 +688,6 @@ public:
     ///@{
 
     /**
-     * Find the next child matching the Comparison object passed in the parameters
-     */
-    virtual int FindNextChildByComparison(FunctorParams *);
-
-    /**
      * Find the previous child matching the Comparison object passed in the parameters
      */
     virtual int FindPreviousChildByComparison(FunctorParams *);

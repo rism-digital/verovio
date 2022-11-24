@@ -1311,10 +1311,9 @@ void Object::ReorderByXPos()
 
 Object *Object::FindNextChild(Comparison *comp, Object *start)
 {
-    Functor findNextChildByComparison(&Object::FindNextChildByComparison);
-    FindChildByComparisonParams params(comp, start);
-    this->Process(&findNextChildByComparison, &params);
-    return params.m_element;
+    FindNextChildByComparisonFunctor findNextChildByComparison(comp, start);
+    this->Process(findNextChildByComparison);
+    return const_cast<Object *>(findNextChildByComparison.GetElement());
 }
 
 Object *Object::FindPreviousChild(Comparison *comp, Object *start)
@@ -2461,31 +2460,6 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
 
     std::stable_sort(m_children.begin(), m_children.end(), sortByUlx);
     this->Modify();
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindNextChildByComparison(FunctorParams *functorparams)
-{
-    FindChildByComparisonParams *params = vrv_cast<FindChildByComparisonParams *>(functorparams);
-    assert(params);
-
-    // we are reaching the start of the range
-    if (params->m_start == this) {
-        // setting m_start to be null tells us that we're in the range
-        params->m_start = NULL;
-        return FUNCTOR_CONTINUE;
-    }
-
-    else if (params->m_start) {
-        // we're not yet in the range
-        return FUNCTOR_CONTINUE;
-    }
-
-    if ((*params->m_comparison)(this)) {
-        params->m_element = this;
-        return FUNCTOR_STOP;
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
