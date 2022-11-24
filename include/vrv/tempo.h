@@ -26,7 +26,8 @@ class TextElement;
  */
 class Tempo : public ControlElement,
               public TextDirInterface,
-              public TimePointInterface,
+              public TimeSpanningInterface,
+              public AttExtender,
               public AttLang,
               public AttMidiTempo,
               public AttMmTempo {
@@ -53,6 +54,11 @@ public:
     const TimePointInterface *GetTimePointInterface() const override
     {
         return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
     }
     ///@}
 
