@@ -120,7 +120,7 @@ void LogInfo(const char *fmt, ...)
     std::string s;
     va_list args;
     va_start(args, fmt);
-    s = "[Message] " + StringFormatVariable(fmt, args) + "\n";
+    s = "[Info] " + StringFormatVariable(fmt, args) + "\n";
     LogString(s, LOG_INFO);
     va_end(args);
 }
