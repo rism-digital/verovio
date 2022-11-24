@@ -225,4 +225,24 @@ FunctorCode FindPreviousChildByComparisonFunctor::VisitObject(const Object *obje
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// FindExtremeByComparisonFunctor
+//----------------------------------------------------------------------------
+
+FindExtremeByComparisonFunctor::FindExtremeByComparisonFunctor(Comparison *comparison)
+{
+    m_comparison = comparison;
+    m_element = NULL;
+}
+
+FunctorCode FindExtremeByComparisonFunctor::VisitObject(const Object *object)
+{
+    // evaluate by applying the Comparison operator()
+    if ((*m_comparison)(object)) {
+        m_element = object;
+    }
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

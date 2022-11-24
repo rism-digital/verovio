@@ -349,6 +349,53 @@ private:
     const Object *m_element;
 };
 
+//----------------------------------------------------------------------------
+// FindExtremeByComparisonFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class finds the last object matching the comparison.
+ */
+class FindExtremeByComparisonFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindExtremeByComparisonFunctor(Comparison *comparison);
+    virtual ~FindExtremeByComparisonFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Retrieve the search result
+     */
+    const Object *GetElement() const { return m_element; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(const Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The comparison
+    Comparison *m_comparison;
+    // The search result
+    const Object *m_element;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FINDFUNCTOR_H__
