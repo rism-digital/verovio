@@ -453,7 +453,13 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         params.m_enclose = rend->GetRend();
     }
 
-    if (customFont) dc->ResetFont();
+    if (customFont) {
+        dc->ResetFont();
+        // Reset the point size not to have it cummulated
+        assert(dc->HasFont());
+        params.m_pointSize = dc->GetFont()->GetPointSize();
+        // Possilbe corner case: maybe we also need to reset text enclosure here?
+    }
 
     dc->EndTextGraphic(rend, this);
 }
