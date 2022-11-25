@@ -688,11 +688,6 @@ public:
     ///@{
 
     /**
-     * Find a all Object to which another object points to in the data.
-     */
-    virtual int FindAllReferencedObjects(FunctorParams *functorParams);
-
-    /**
      * Look for element by ID in StaffDef elements (Clef, KeySig, etc.) of all layers within
      */
     virtual int FindElementInLayerStaffDefsByID(FunctorParams *) const { return FUNCTOR_CONTINUE; }

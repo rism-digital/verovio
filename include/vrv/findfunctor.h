@@ -401,7 +401,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class finds all objects to which another object points to.
+ * This class finds all objects to which another object refers to.
  */
 class FindAllReferencedObjectsFunctor : public MutableFunctor {
 public:
@@ -417,6 +417,11 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Include milestone references?
+     */
+    void IncludeMilestoneReferences(bool included) { m_milestoneReferences = included; }
 
     /*
      * Functor interface
