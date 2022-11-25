@@ -11,6 +11,7 @@
 
 #include "comparison.h"
 #include "object.h"
+#include "plistinterface.h"
 
 namespace vrv {
 
@@ -257,6 +258,44 @@ FindAllReferencedObjectsFunctor::FindAllReferencedObjectsFunctor(ListOfObjects *
 
 FunctorCode FindAllReferencedObjectsFunctor::VisitObject(Object *object)
 {
+    if (object->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *interface = object->GetLinkingInterface();
+        assert(interface);
+        if (interface->GetNextLink()) m_elements->push_back(interface->GetNextLink());
+        if (interface->GetSameasLink()) m_elements->push_back(interface->GetSameasLink());
+    }
+    if (object->HasInterface(INTERFACE_PLIST)) {
+        PlistInterface *interface = object->GetPlistInterface();
+        assert(interface);
+        for (auto &object : interface->GetRefs()) {
+            m_elements->push_back(object);
+        }
+    }
+    if (object->HasInterface(INTERFACE_TIME_POINT) || object->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimePointInterface *interface = object->GetTimePointInterface();
+        assert(interface);
+        if (interface->GetStart() && !interface->GetStart()->Is(TIMESTAMP_ATTR))
+            m_elements->push_back(interface->GetStart());
+    }
+    if (object->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimeSpanningInterface *interface = object->GetTimeSpanningInterface();
+        assert(interface);
+        if (interface->GetEnd() && !interface->GetEnd()->Is(TIMESTAMP_ATTR)) m_elements->push_back(interface->GetEnd());
+    }
+    if (object->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(object);
+        assert(note);
+        // The note has a stem.sameas that was resolved the a note, then that one is referenced
+        if (note->HasStemSameas() && note->HasStemSameasNote()) {
+            m_elements->push_back(note->GetStemSameasNote());
+        }
+    }
+    // These will also be referred to as milestones in page-based MEI
+    if (m_milestoneReferences && object->IsMilestoneElement()) {
+        m_elements->push_back(object);
+    }
+
+    // continue until the end
     return FUNCTOR_CONTINUE;
 }
 
