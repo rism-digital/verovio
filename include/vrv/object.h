@@ -688,11 +688,6 @@ public:
     ///@{
 
     /**
-     * Find a Object with the extreme value with a Comparison functor .
-     */
-    virtual int FindExtremeByComparison(FunctorParams *functorParams) const;
-
-    /**
      * Find a all Object to which another object points to in the data.
      */
     virtual int FindAllReferencedObjects(FunctorParams *functorParams);

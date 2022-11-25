@@ -1452,26 +1452,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindExtremeByComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the attComparision text
- * member 1: the pointer to pointer to the Object
- **/
-
-class FindExtremeByComparisonParams : public FunctorParams {
-public:
-    FindExtremeByComparisonParams(Comparison *comparison)
-    {
-        m_comparison = comparison;
-        m_element = NULL;
-    }
-    Comparison *m_comparison;
-    const Object *m_element;
-};
-
-//----------------------------------------------------------------------------
 // FindLayerIDWithinStaffDefParams
 //----------------------------------------------------------------------------
 

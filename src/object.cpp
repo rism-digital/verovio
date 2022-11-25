@@ -629,10 +629,10 @@ Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int de
 
 const Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int deepness, bool direction) const
 {
-    Functor findExtremeByComparison(&Object::FindExtremeByComparison);
-    FindExtremeByComparisonParams findExtremeByComparisonParams(comparison);
-    this->Process(&findExtremeByComparison, &findExtremeByComparisonParams, NULL, NULL, deepness, direction, true);
-    return findExtremeByComparisonParams.m_element;
+    FindExtremeByComparisonFunctor findExtremeByComparison(comparison);
+    findExtremeByComparison.SetDirection(direction);
+    this->Process(findExtremeByComparison, deepness, true);
+    return findExtremeByComparison.GetElement();
 }
 
 ListOfObjects Object::FindAllDescendantsByType(ClassId classId, bool continueDepthSearchForMatches, int deepness)
@@ -1771,19 +1771,6 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams) const
     params->m_flatList->push_back(this);
     // LogDebug("List %d", params->m_flatList->size());
 
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindExtremeByComparison(FunctorParams *functorParams) const
-{
-    FindExtremeByComparisonParams *params = vrv_params_cast<FindExtremeByComparisonParams *>(functorParams);
-    assert(params);
-
-    // evaluate by applying the Comparison operator()
-    if ((*params->m_comparison)(this)) {
-        params->m_element = this;
-    }
-    // continue until the end
     return FUNCTOR_CONTINUE;
 }
 
