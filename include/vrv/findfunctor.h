@@ -396,6 +396,48 @@ private:
     const Object *m_element;
 };
 
+//----------------------------------------------------------------------------
+// FindAllReferencedObjectsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class finds all objects to which another object points to.
+ */
+class FindAllReferencedObjectsFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindAllReferencedObjectsFunctor(ListOfObjects *elements);
+    virtual ~FindAllReferencedObjectsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The array of all matching objects
+    ListOfObjects *m_elements;
+    // A flag indicating if milestone references should be included as well
+    bool m_milestoneReferences;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FINDFUNCTOR_H__

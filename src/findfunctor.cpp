@@ -245,4 +245,19 @@ FunctorCode FindExtremeByComparisonFunctor::VisitObject(const Object *object)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// FindAllReferencedObjectsFunctor
+//----------------------------------------------------------------------------
+
+FindAllReferencedObjectsFunctor::FindAllReferencedObjectsFunctor(ListOfObjects *elements)
+{
+    m_elements = elements;
+    m_milestoneReferences = false;
+}
+
+FunctorCode FindAllReferencedObjectsFunctor::VisitObject(Object *object)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
