@@ -1,6 +1,9 @@
 # Changelog
 
-## [unreleased]
+## [3.13.1] - 2022-11-28
+* Fix text music font always falling back to Leipzig
+* Fix missing JSON handling for some methods in the Python binding
+* Fix text size percent not being reset in sibling text elements
 
 ## [3.13.0] - 2022-11-23
 * Refactoring of the JSON parameters and returned values as dictionaries for the Python binding
