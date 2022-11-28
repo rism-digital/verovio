@@ -696,8 +696,7 @@ public:
     /**
      * @ingroup nodoc
      */
-    void SetInputFrom(FileFormat format) { m_inputFrom = format; }
-
+    void SetInputFrom(FileFormat format);
     /**
      * Get the input format.
      *

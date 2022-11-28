@@ -1859,6 +1859,12 @@ void Toolkit::ClearHumdrumBuffer()
 #endif
 }
 
+void Toolkit::SetInputFrom(FileFormat format)
+{
+    LogWarning("This method is deprecated. Use SetInputFormat(std::string) instead.");
+    m_inputFrom = format;
+}
+
 std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
 {
 #ifndef NO_HUMDRUM_SUPPORT
