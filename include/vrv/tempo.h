@@ -74,6 +74,11 @@ public:
     ///@{
     int GetDrawingXRelativeToStaff(int staffN) const;
 
+    /**
+     * See FloatingObject::IsExtenderElement
+     */
+    bool IsExtenderElement() const override { return GetExtender() == BOOLEAN_true; }
+
     //----------//
     // Functors //
     //----------//
