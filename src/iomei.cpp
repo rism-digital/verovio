@@ -61,6 +61,7 @@
 #include "halfmrpt.h"
 #include "harm.h"
 #include "instrdef.h"
+#include "iopae.h"
 #include "keyaccid.h"
 #include "keysig.h"
 #include "label.h"
@@ -3843,19 +3844,41 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
 bool MEIInput::ReadIncipits(pugi::xml_node root)
 {
-    pugi::xpath_node_set incipits = root.select_nodes(".//incip");
-    if (incipits.size() == 0) {
+    pugi::xpath_node_set incips = root.select_nodes(".//incip");
+    if (incips.size() == 0) {
         LogError("No <incip> element found in the MEI data");
         return false;
     }
 
     bool success = true;
 
-    for (auto incipit : incipits) {
-        Mdiv *mdiv = new Mdiv();
-        mdiv->MakeVisible();
-        m_doc->AddChild(mdiv);
-        this->ReadMdivChildren(mdiv, incipit.node(), true);
+    for (auto incip : incips) {
+        pugi::xml_node incipCode = incip.node().child("incipCode");
+        if (incipCode) {
+            if (!incipCode.attribute("form") || std::string(incipCode.attribute("form").value()) != "plaineAndEasie") {
+                LogWarning("Incipit in <incipCode> not in a supported form skipped.");
+                continue;
+            }
+            Doc incipitDoc;
+            PAEInput paeInput(&incipitDoc);
+            paeInput.SetScoreBased(true);
+            std::string paeCode = incipCode.text().as_string();
+            paeCode.erase(paeCode.begin(),
+                std::find_if(paeCode.begin(), paeCode.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+            paeInput.Import(paeCode);
+            Mdiv *mdiv = vrv_cast<Mdiv *>(incipitDoc.DetachChild(0));
+            if (!mdiv) {
+                LogError("Reading the Plaine and Easie incipit failed.");
+                continue;
+            }
+            m_doc->AddChild(mdiv);
+        }
+        else {
+            Mdiv *mdiv = new Mdiv();
+            mdiv->MakeVisible();
+            m_doc->AddChild(mdiv);
+            this->ReadMdivChildren(mdiv, incip.node(), true);
+        }
     }
 
     if (success) {
