@@ -1004,7 +1004,7 @@ Options::Options()
     m_humType.SetInfo("Humdrum type", "Include type attributes when importing from Humdrum");
     m_humType.Init(false);
     this->Register(&m_humType, "humType", &m_general);
-    
+
     m_incip.SetInfo("Incip", "Read <incip> elements as data input");
     m_incip.Init(false);
     this->Register(&m_incip, "incip", &m_general);
