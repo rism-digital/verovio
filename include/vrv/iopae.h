@@ -523,6 +523,11 @@ public:
 #ifndef NO_PAE_SUPPORT
     bool Import(const std::string &input) override;
 
+    /**
+     * Setter for m_scoreBased (false by default).
+     */
+    void SetScoreBased(bool scoreBased) { m_scoreBased = scoreBased; }
+
 private:
     /**
      * Convert the old-style @clef:... @keysig:... @data:... to a JSON input
@@ -692,6 +697,11 @@ private:
      * A flag indicating we had errors when parsing the incipit in non pedantic mode.
      */
     bool m_hasErrors;
+
+    /**
+     * A flag indicating the document should be kept as score-based.
+     */
+    bool m_scoreBased;
 
     /**
      * @name The scoreDef clef, keysig and timesig.

@@ -2437,7 +2437,10 @@ namespace pae {
 
 } // namespace pae
 
-PAEInput::PAEInput(Doc *doc) : Input(doc) {}
+PAEInput::PAEInput(Doc *doc) : Input(doc)
+{
+    m_scoreBased = false;
+}
 
 PAEInput::~PAEInput()
 {
@@ -3056,7 +3059,7 @@ bool PAEInput::Parse()
     // We should have no object left, just in case they need to be delete.
     this->ClearTokenObjects();
 
-    m_doc->ConvertToPageBasedDoc();
+    if (!m_scoreBased) m_doc->ConvertToPageBasedDoc();
 
     return success;
 }
