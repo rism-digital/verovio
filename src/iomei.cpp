@@ -3711,6 +3711,10 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     pugi::xml_node pages;
     pugi::xml_node back;
 
+    if (m_doc->GetOptions()->m_incip.GetValue()) {
+        return ReadIncipits(root);
+    }
+
     if (std::string(root.name()) == "music") {
         music = root;
     }
@@ -3835,6 +3839,31 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     }
 
     return success;
+}
+
+bool MEIInput::ReadIncipits(pugi::xml_node root)
+{
+    pugi::xpath_node_set incipits = root.select_nodes(".//incip");
+    if (incipits.size() == 0) {
+        LogError("No <incip> element found in the MEI data");
+        return false;
+    }
+
+    bool success = true;
+
+    for (auto incipit : incipits) {
+        Mdiv *mdiv = new Mdiv();
+        mdiv->MakeVisible();
+        m_doc->AddChild(mdiv);
+        this->ReadMdivChildren(mdiv, incipit.node(), true);
+    }
+
+    if (success) {
+        m_doc->ConvertToPageBasedDoc();
+        m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
+    }
+
+    return true;
 }
 
 bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
