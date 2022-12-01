@@ -2707,8 +2707,8 @@ jsonxx::Object PAEInput::SingleLineToJson(const std::string &singleLine)
     std::string data(scoreDefEnd + 1, singleLine.end());
 
     jsonInput << "clef" << clef;
-    jsonInput << "timesig" << timesig.erase(timesig.find_last_not_of(" ") + 1);
-    jsonInput << "keysig" << keysig.erase(keysig.find_last_not_of(" ") + 1);
+    jsonInput << "timesig" << timesig.erase(timesig.find_last_not_of(' ') + 1);
+    jsonInput << "keysig" << keysig.erase(keysig.find_last_not_of(' ') + 1);
     jsonInput << "data" << data;
 
     return jsonInput;
