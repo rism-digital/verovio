@@ -182,7 +182,7 @@ void DeviceContext::SetFont(FontInfo *font)
 
 FontInfo *DeviceContext::GetFont()
 {
-    assert(m_fontStack.top());
+    assert(!m_fontStack.empty());
     return m_fontStack.top();
 }
 

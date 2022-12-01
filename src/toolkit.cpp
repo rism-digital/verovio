@@ -154,10 +154,6 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
     else if (outputTo == "mei-pb") {
         m_outputTo = MEI;
     }
-    else if (outputTo == "pb-mei") {
-        LogWarning("Output to 'pb-mei' is deprecated, use 'mei-pb' instead.");
-        m_outputTo = MEI;
-    }
     else if (outputTo == "midi") {
         m_outputTo = MIDI;
     }
@@ -1857,6 +1853,12 @@ void Toolkit::ClearHumdrumBuffer()
         m_humdrumBuffer = NULL;
     }
 #endif
+}
+
+void Toolkit::SetInputFrom(FileFormat format)
+{
+    LogWarning("This method is deprecated. Use SetInputFormat(std::string) instead.");
+    m_inputFrom = format;
 }
 
 std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
