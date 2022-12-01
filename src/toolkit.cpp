@@ -21,6 +21,7 @@
 #include "editortoolkit_cmn.h"
 #include "editortoolkit_mensural.h"
 #include "editortoolkit_neume.h"
+#include "findfunctor.h"
 #include "functorparams.h"
 #include "ioabc.h"
 #include "iodarms.h"
@@ -1159,16 +1160,15 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found again, try looking in the layer staffdefs
     if (!element) {
-        Functor findByID(&Object::FindElementInLayerStaffDefsByID);
-        FindLayerIDWithinStaffDefParams params(xmlId);
+        FindElementInLayerStaffDefFunctor findElementInLayerStaffDef(xmlId);
         // Check drawing page elements first
         if (m_doc.GetDrawingPage()) {
-            m_doc.GetDrawingPage()->Process(&findByID, &params);
-            element = params.m_object;
+            m_doc.GetDrawingPage()->Process(findElementInLayerStaffDef);
+            element = findElementInLayerStaffDef.GetElement();
         }
         if (!element) {
-            m_doc.Process(&findByID, &params);
-            element = params.m_object;
+            m_doc.Process(findElementInLayerStaffDef);
+            element = findElementInLayerStaffDef.GetElement();
         }
         // If element is found within layer staffdef - check for the linking interface @corresp attribute to find
         // original ID of the element

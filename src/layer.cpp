@@ -821,32 +821,6 @@ int Layer::InitOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::FindElementInLayerStaffDefsByID(FunctorParams *functorParams) const
-{
-    FindLayerIDWithinStaffDefParams *params = vrv_params_cast<FindLayerIDWithinStaffDefParams *>(functorParams);
-    assert(params);
-
-    if (!this->HasStaffDef()) return FUNCTOR_SIBLINGS;
-    // Get corresponding elements from the layer
-    if (this->GetStaffDefClef() && (this->GetStaffDefClef()->GetID() == params->m_id)) {
-        params->m_object = this->GetStaffDefClef();
-    }
-    else if (this->GetStaffDefKeySig() && (this->GetStaffDefKeySig()->GetID() == params->m_id)) {
-        params->m_object = this->GetStaffDefKeySig();
-    }
-    else if (this->GetStaffDefMensur() && (this->GetStaffDefMensur()->GetID() == params->m_id)) {
-        params->m_object = this->GetStaffDefMensur();
-    }
-    else if (this->GetStaffDefMeterSig() && (this->GetStaffDefMeterSig()->GetID() == params->m_id)) {
-        params->m_object = this->GetStaffDefMeterSig();
-    }
-    else if (this->GetStaffDefMeterSigGrp() && (this->GetStaffDefMeterSigGrp()->GetID() == params->m_id)) {
-        params->m_object = this->GetStaffDefMeterSigGrp();
-    }
-
-    return params->m_object ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
-}
-
 int Layer::ResetData(FunctorParams *functorParams)
 {
     m_crossStaffFromBelow = false;

@@ -688,11 +688,6 @@ public:
     ///@{
 
     /**
-     * Look for element by ID in StaffDef elements (Clef, KeySig, etc.) of all layers within
-     */
-    virtual int FindElementInLayerStaffDefsByID(FunctorParams *) const { return FUNCTOR_CONTINUE; }
-
-    /**
      * Retrieve the minimum left and maximum right for an alignment.
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
      */
