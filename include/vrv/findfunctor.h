@@ -443,6 +443,53 @@ private:
     bool m_milestoneReferences;
 };
 
+//----------------------------------------------------------------------------
+// FindElementInLayerStaffDefFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class looks for an element with given ID in StaffDef elements (Clef, KeySig, etc.)
+ */
+class FindElementInLayerStaffDefFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindElementInLayerStaffDefFunctor(const std::string &xmlId);
+    virtual ~FindElementInLayerStaffDefFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Retrieve the search result
+     */
+    const Object *GetElement() const { return m_element; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayer(const Layer *layer) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The search result
+    const Object *m_element;
+    // ID of the element to be found
+    std::string m_id;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FINDFUNCTOR_H__

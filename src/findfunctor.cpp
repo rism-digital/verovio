@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
+#include "layer.h"
 #include "object.h"
 #include "plistinterface.h"
 
@@ -297,6 +298,39 @@ FunctorCode FindAllReferencedObjectsFunctor::VisitObject(Object *object)
 
     // continue until the end
     return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// FindElementInLayerStaffDefFunctor
+//----------------------------------------------------------------------------
+
+FindElementInLayerStaffDefFunctor::FindElementInLayerStaffDefFunctor(const std::string &xmlId)
+{
+    m_id = xmlId;
+    m_element = NULL;
+}
+
+FunctorCode FindElementInLayerStaffDefFunctor::VisitLayer(const Layer *layer)
+{
+    if (!layer->HasStaffDef()) return FUNCTOR_SIBLINGS;
+    // Get corresponding elements from the layer
+    if (layer->GetStaffDefClef() && (layer->GetStaffDefClef()->GetID() == m_id)) {
+        m_element = layer->GetStaffDefClef();
+    }
+    else if (layer->GetStaffDefKeySig() && (layer->GetStaffDefKeySig()->GetID() == m_id)) {
+        m_element = layer->GetStaffDefKeySig();
+    }
+    else if (layer->GetStaffDefMensur() && (layer->GetStaffDefMensur()->GetID() == m_id)) {
+        m_element = layer->GetStaffDefMensur();
+    }
+    else if (layer->GetStaffDefMeterSig() && (layer->GetStaffDefMeterSig()->GetID() == m_id)) {
+        m_element = layer->GetStaffDefMeterSig();
+    }
+    else if (layer->GetStaffDefMeterSigGrp() && (layer->GetStaffDefMeterSigGrp()->GetID() == m_id)) {
+        m_element = layer->GetStaffDefMeterSigGrp();
+    }
+
+    return m_element ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
