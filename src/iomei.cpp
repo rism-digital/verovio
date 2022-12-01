@@ -3713,7 +3713,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     pugi::xml_node back;
 
     if (m_doc->GetOptions()->m_incip.GetValue()) {
-        return ReadIncipits(root);
+        return ReadIncipits(m_doc->m_header);
     }
 
     if (std::string(root.name()) == "music") {
@@ -3850,13 +3850,17 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
         return false;
     }
 
+    int incipCount = 0;
     bool success = true;
 
-    for (auto incip : incips) {
+    for (auto &incip : incips) {
+        if (!success) break;
         pugi::xml_node incipCode = incip.node().child("incipCode");
         if (incipCode) {
             if (!incipCode.attribute("form") || std::string(incipCode.attribute("form").value()) != "plaineAndEasie") {
+                // We do not consider it an error if the format is not supported
                 LogWarning("Incipit in <incipCode> not in a supported form skipped.");
+                // The incipit will not be removed from the header
                 continue;
             }
             Doc incipitDoc;
@@ -3868,7 +3872,9 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
             paeInput.Import(paeCode);
             Mdiv *mdiv = vrv_cast<Mdiv *>(incipitDoc.DetachChild(0));
             if (!mdiv) {
+                // We do consider it an error if reading the PAE failed
                 LogError("Reading the Plaine and Easie incipit failed.");
+                success = false;
                 continue;
             }
             m_doc->AddChild(mdiv);
@@ -3877,16 +3883,23 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
             Mdiv *mdiv = new Mdiv();
             mdiv->MakeVisible();
             m_doc->AddChild(mdiv);
-            this->ReadMdivChildren(mdiv, incip.node(), true);
+            success = this->ReadMdivChildren(mdiv, incip.node(), true);
+        }
+        // Remove it from the header
+        if (success) {
+            incipCount++;
+            incip.node().parent().remove_child(incip.node());
         }
     }
+    // If no incipit has been read, then the input fails
+    if (incipCount == 0) success = false;
 
     if (success) {
         m_doc->ConvertToPageBasedDoc();
         m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
     }
 
-    return true;
+    return success;
 }
 
 bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
