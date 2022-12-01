@@ -535,6 +535,11 @@ private:
     jsonxx::Object InputKeysToJson(const std::string &inputKeys);
 
     /**
+     * Convert single-line incipits with $clef@timesig%keysig data to JSON input
+     */
+    jsonxx::Object SingleLineToJson(const std::string &singleLine);
+
+    /**
      * Helper to add a token to the list.
      * Performs re-expansion of internal characters (e.g., Q back to qq in the inputChar)
      * Re-expansion of internal characters inserts void tokens ignored during parsing.

@@ -2660,6 +2660,58 @@ jsonxx::Object PAEInput::InputKeysToJson(const std::string &inputKeys)
     return jsonInput;
 }
 
+jsonxx::Object PAEInput::SingleLineToJson(const std::string &singleLine)
+{
+    jsonxx::Object jsonInput;
+
+    std::string scoreDef = singleLine.substr(0, singleLine.find(' '));
+
+    // We need at least a clef - something is missing
+    if (scoreDef.size() < 4) return jsonInput;
+
+    // First detect the end of the scoreDef. Because we can have spaces between scoreDef element,
+    // we look for the first character after a space that is not a scoreDef element delimiter
+    std::string::const_iterator start = singleLine.begin();
+    std::string::const_iterator scoreDefEnd;
+    while ((scoreDefEnd = std::find(start, singleLine.end(), ' ')) != singleLine.end()) {
+        if (*(scoreDefEnd + 1) != '@' || *(scoreDefEnd + 1) != '$') break;
+        start = scoreDefEnd + 1;
+    }
+
+    // Extract the beginning of each scoreDef element and add flags indicating existence
+    std::string::const_iterator clefStart = singleLine.begin();
+    std::string::const_iterator keysigStart = std::find(singleLine.begin(), scoreDefEnd, '$');
+    const bool hasKeysig = (keysigStart != scoreDefEnd);
+    std::string::const_iterator timesigStart = std::find(singleLine.begin(), scoreDefEnd, '@');
+    const bool hasTimesig = (timesigStart != scoreDefEnd);
+
+    std::string::const_iterator clefEnd = singleLine.begin() + 4;
+    std::string clef = std::string(clefStart + 1, clefEnd);
+
+    std::string keysig;
+    if (hasKeysig) {
+        std::string::const_iterator keysigEnd
+            = (hasTimesig && timesigStart > keysigStart) ? timesigStart : std::find(keysigStart, singleLine.end(), ' ');
+        keysig = std::string(keysigStart + 1, keysigEnd);
+    }
+
+    std::string timesig;
+    if (hasTimesig) {
+        std::string::const_iterator timesigEnd
+            = (hasKeysig && keysigStart > timesigStart) ? keysigStart : std::find(timesigStart, singleLine.end(), ' ');
+        timesig = std::string(timesigStart + 1, timesigEnd);
+    }
+
+    std::string data(scoreDefEnd + 1, singleLine.end());
+
+    jsonInput << "clef" << clef;
+    jsonInput << "timesig" << timesig.erase(timesig.find_last_not_of(" ") + 1);
+    jsonInput << "keysig" << keysig.erase(keysig.find_last_not_of(" ") + 1);
+    jsonInput << "data" << data;
+
+    return jsonInput;
+}
+
 bool PAEInput::CheckPAEChars(const std::string &input, std::string &invalidChars, const std::string &validChars)
 {
     invalidChars = "";
@@ -2705,6 +2757,9 @@ bool PAEInput::Import(const std::string &input)
             LogPAE(ERR_002_JSON_PARSE, inputToken);
             return false;
         }
+    }
+    else if (input.at(0) == '%') {
+        jsonInput = this->SingleLineToJson(input);
     }
     else {
         jsonInput = this->InputKeysToJson(input);
