@@ -3856,8 +3856,9 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
     for (auto &incip : incips) {
         if (!success) break;
         pugi::xml_node incipCode = incip.node().child("incipCode");
-        if (incipCode) {
-            if (!incipCode.attribute("form") || std::string(incipCode.attribute("form").value()) != "plaineAndEasie") {
+        if (!incipCode.empty()) {
+            std::string form = incipCode.attribute("form") ? incipCode.attribute("form").value() : "";
+            if (form != "plaineAndEasie" && form != "pae") {
                 // We do not consider it an error if the format is not supported
                 LogWarning("Incipit in <incipCode> not in a supported form skipped.");
                 // The incipit will not be removed from the header
