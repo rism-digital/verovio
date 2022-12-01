@@ -524,7 +524,7 @@ public:
     bool Import(const std::string &input) override;
 
     /**
-     * Setter for m_scoreBased (false by default).
+     * Setter for scoreBased flag (false by default).
      */
     void SetScoreBased(bool scoreBased) { m_scoreBased = scoreBased; }
 
