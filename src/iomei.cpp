@@ -3881,6 +3881,11 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
             }
             m_doc->AddChild(mdiv);
         }
+        else if (std::string(incip.first_child().name()) != "score") {
+            LogWarning("Only <incip> with a <score> first child can be read.");
+            // The incipit will not be removed from the header
+            continue;
+        }
         else {
             Mdiv *mdiv = new Mdiv();
             mdiv->MakeVisible();
