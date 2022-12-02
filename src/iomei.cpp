@@ -127,6 +127,8 @@
 #include "syl.h"
 #include "syllable.h"
 #include "symbol.h"
+#include "symboldef.h"
+#include "symboltable.h"
 #include "system.h"
 #include "systemmilestone.h"
 #include "tabdursym.h"
@@ -1837,6 +1839,13 @@ void MEIOutput::WriteCourse(pugi::xml_node currentNode, Course *course)
     course->WritePitch(currentNode);
 }
 
+void MEIOutput::WriteSymbolTable(pugi::xml_node currentNode, SymbolTable *symbolTable)
+{
+    assert(symbolTable);
+
+    this->WriteXmlId(currentNode, symbolTable);
+}
+
 void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
 {
     assert(measure);
@@ -2873,6 +2882,13 @@ void MEIOutput::WriteSymbol(pugi::xml_node currentNode, Symbol *symbol)
     symbol->WriteColor(currentNode);
     symbol->WriteExtSym(currentNode);
     symbol->WriteTypography(currentNode);
+}
+
+void MEIOutput::WriteSymbolDef(pugi::xml_node currentNode, SymbolDef *symbolDef)
+{
+    assert(symbolDef);
+
+    this->WriteXmlId(currentNode, symbolDef);
 }
 
 void MEIOutput::WriteText(pugi::xml_node element, Text *text)
@@ -4954,6 +4970,35 @@ bool MEIInput::ReadCourse(Object *parent, pugi::xml_node course)
     return true;
 }
 
+bool MEIInput::ReadSymbolTable(Object *parent, pugi::xml_node symbolTable)
+{
+    SymbolTable *vrvSymbolTable = new SymbolTable();
+    this->SetMeiID(symbolTable, vrvSymbolTable);
+
+    parent->AddChild(vrvSymbolTable);
+
+    bool success = true;
+    // No need to have ReadSymboleTableChildren for this...
+    pugi::xml_node current;
+    for (current = symbolTable.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        // symbolDef
+        if (std::string(current.name()) == "symbolDef") {
+            success = this->ReadSymbolDef(vrvSymbolTable, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = this->ReadXMLComment(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <symbolTable>", current.name());
+        }
+    }
+
+    this->ReadUnsupportedAttr(symbolTable, vrvSymbolTable);
+    return success;
+}
+
 bool MEIInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
 {
     InstrDef *vrvInstrDef = new InstrDef();
@@ -6805,6 +6850,16 @@ bool MEIInput::ReadSymbol(Object *parent, pugi::xml_node symbol)
 
     parent->AddChild(vrvSymbol);
     this->ReadUnsupportedAttr(symbol, vrvSymbol);
+    return true;
+}
+
+bool MEIInput::ReadSymbolDef(Object *parent, pugi::xml_node symbolDef)
+{
+    SymbolDef *vrvSymbolDef = new SymbolDef();
+    this->SetMeiID(symbolDef, vrvSymbolDef);
+
+    parent->AddChild(vrvSymbolDef);
+    this->ReadUnsupportedAttr(symbolDef, vrvSymbolDef);
     return true;
 }
 
