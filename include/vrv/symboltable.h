@@ -30,6 +30,19 @@ public:
     std::string GetClassName() const override { return "SymbolTable"; }
     ///@}
 
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
+    bool IsSupportedChild(Object *object) override;
+    ///@}
+
+    /**
+     * Disable cloning of the symboleTable (for now?).
+     * It does not make sense you carry copying the symbol table across the systems.
+     */
+    Object *Clone() const override { return NULL; }
+
 private:
     //
 public:

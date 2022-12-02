@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "symboldef.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -33,6 +34,17 @@ SymbolTable::~SymbolTable() {}
 void SymbolTable::Reset()
 {
     Object::Reset();
+}
+
+bool SymbolTable::IsSupportedChild(Object *child)
+{
+    if (child->Is(SYMBOLDEF)) {
+        assert(dynamic_cast<SymbolDef *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
 }
 
 } // namespace vrv

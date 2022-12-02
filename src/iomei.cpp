@@ -439,6 +439,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child("course");
         this->WriteCourse(m_currentNode, vrv_cast<Course *>(object));
     }
+    else if (object->Is(SYMBOLTABLE)) {
+        m_currentNode = m_currentNode.append_child("symbolTable");
+        this->WriteSymbolTable(m_currentNode, vrv_cast<SymbolTable *>(object));
+    }
     else if (object->Is(MEASURE)) {
         m_currentNode = m_currentNode.append_child("measure");
         this->WriteMeasure(m_currentNode, vrv_cast<Measure *>(object));
@@ -759,6 +763,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(SYMBOL)) {
         m_currentNode = m_currentNode.append_child("symbol");
         this->WriteSymbol(m_currentNode, vrv_cast<Symbol *>(object));
+    }
+    else if (object->Is(SYMBOLDEF)) {
+        m_currentNode = m_currentNode.append_child("symbolDef");
+        this->WriteSymbolDef(m_currentNode, vrv_cast<SymbolDef *>(object));
     }
     else if (object->Is(TEXT)) {
         this->WriteText(m_currentNode, vrv_cast<Text *>(object));
@@ -4619,6 +4627,10 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "pgHead2") {
             success = this->ReadPgHead2(parent, current);
+        }
+        // symbolTable
+        else if (std::string(current.name()) == "symbolTable") {
+            success = this->ReadSymbolTable(parent, current);
         }
         // content
         else if (std::string(current.name()) == "staffGrp") {
