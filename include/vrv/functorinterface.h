@@ -39,6 +39,7 @@ class Layer;
 class LayerDef;
 class LayerElement;
 class Ligature;
+class Mdiv;
 class Measure;
 class Mensur;
 class MeterSig;
@@ -54,12 +55,15 @@ class Neume;
 class Note;
 class Object;
 class Page;
+class PageElement;
+class PageMilestoneEnd;
 class Pages;
 class Pb;
 class Plica;
 class Proport;
 class Rest;
 class Sb;
+class Score;
 class ScoreDef;
 class ScoreDefElement;
 class Space;
@@ -150,6 +154,20 @@ public:
     virtual FunctorCode VisitSystemEnd(System *system);
     virtual FunctorCode VisitTuning(Tuning *tuning);
     virtual FunctorCode VisitTuningEnd(Tuning *tuning);
+    ///@}
+
+    /**
+     * @name Visit page elements
+     */
+    ///@{
+    virtual FunctorCode VisitMdiv(Mdiv *mdiv);
+    virtual FunctorCode VisitMdivEnd(Mdiv *mdiv);
+    virtual FunctorCode VisitPageElement(PageElement *pageElement);
+    virtual FunctorCode VisitPageElementEnd(PageElement *pageElement);
+    virtual FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd);
+    virtual FunctorCode VisitPageMilestoneEnd(PageMilestoneEnd *pageMilestoneEnd);
+    virtual FunctorCode VisitScore(Score *score);
+    virtual FunctorCode VisitScoreEnd(Score *score);
     ///@}
 
     /**
@@ -326,6 +344,20 @@ public:
     virtual FunctorCode VisitSystemEnd(const System *system);
     virtual FunctorCode VisitTuning(const Tuning *tuning);
     virtual FunctorCode VisitTuningEnd(const Tuning *tuning);
+    ///@}
+
+    /**
+     * @name Visit page elements
+     */
+    ///@{
+    virtual FunctorCode VisitMdiv(const Mdiv *mdiv);
+    virtual FunctorCode VisitMdivEnd(const Mdiv *mdiv);
+    virtual FunctorCode VisitPageElement(const PageElement *pageElement);
+    virtual FunctorCode VisitPageElementEnd(const PageElement *pageElement);
+    virtual FunctorCode VisitPageMilestone(const PageMilestoneEnd *pageMilestoneEnd);
+    virtual FunctorCode VisitPageMilestoneEnd(const PageMilestoneEnd *pageMilestoneEnd);
+    virtual FunctorCode VisitScore(const Score *score);
+    virtual FunctorCode VisitScoreEnd(const Score *score);
     ///@}
 
     /**

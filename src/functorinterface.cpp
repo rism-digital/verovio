@@ -35,6 +35,7 @@
 #include "layerdef.h"
 #include "layerelement.h"
 #include "ligature.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -49,10 +50,13 @@
 #include "neume.h"
 #include "note.h"
 #include "page.h"
+#include "pageelement.h"
+#include "pagemilestone.h"
 #include "pages.h"
 #include "plica.h"
 #include "proport.h"
 #include "rest.h"
+#include "score.h"
 #include "scoredef.h"
 #include "space.h"
 #include "staff.h"
@@ -253,6 +257,46 @@ FunctorCode FunctorInterface::VisitTuning(Tuning *tuning)
 FunctorCode FunctorInterface::VisitTuningEnd(Tuning *tuning)
 {
     return this->VisitObjectEnd(tuning);
+}
+
+FunctorCode FunctorInterface::VisitMdiv(Mdiv *mdiv)
+{
+    return this->VisitPageElement(mdiv);
+}
+
+FunctorCode FunctorInterface::VisitMdivEnd(Mdiv *mdiv)
+{
+    return this->VisitPageElementEnd(mdiv);
+}
+
+FunctorCode FunctorInterface::VisitPageElement(PageElement *pageElement)
+{
+    return this->VisitObject(pageElement);
+}
+
+FunctorCode FunctorInterface::VisitPageElementEnd(PageElement *pageElement)
+{
+    return this->VisitObjectEnd(pageElement);
+}
+
+FunctorCode FunctorInterface::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
+{
+    return this->VisitPageElement(pageMilestoneEnd);
+}
+
+FunctorCode FunctorInterface::VisitPageMilestoneEnd(PageMilestoneEnd *pageMilestoneEnd)
+{
+    return this->VisitPageElementEnd(pageMilestoneEnd);
+}
+
+FunctorCode FunctorInterface::VisitScore(Score *score)
+{
+    return this->VisitPageElement(score);
+}
+
+FunctorCode FunctorInterface::VisitScoreEnd(Score *score)
+{
+    return this->VisitPageElementEnd(score);
 }
 
 FunctorCode FunctorInterface::VisitAccid(Accid *accid)
@@ -887,6 +931,46 @@ FunctorCode ConstFunctorInterface::VisitTuning(const Tuning *tuning)
 FunctorCode ConstFunctorInterface::VisitTuningEnd(const Tuning *tuning)
 {
     return this->VisitObjectEnd(tuning);
+}
+
+FunctorCode ConstFunctorInterface::VisitMdiv(const Mdiv *mdiv)
+{
+    return this->VisitPageElement(mdiv);
+}
+
+FunctorCode ConstFunctorInterface::VisitMdivEnd(const Mdiv *mdiv)
+{
+    return this->VisitPageElementEnd(mdiv);
+}
+
+FunctorCode ConstFunctorInterface::VisitPageElement(const PageElement *pageElement)
+{
+    return this->VisitObject(pageElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitPageElementEnd(const PageElement *pageElement)
+{
+    return this->VisitObjectEnd(pageElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitPageMilestone(const PageMilestoneEnd *pageMilestoneEnd)
+{
+    return this->VisitPageElement(pageMilestoneEnd);
+}
+
+FunctorCode ConstFunctorInterface::VisitPageMilestoneEnd(const PageMilestoneEnd *pageMilestoneEnd)
+{
+    return this->VisitPageElementEnd(pageMilestoneEnd);
+}
+
+FunctorCode ConstFunctorInterface::VisitScore(const Score *score)
+{
+    return this->VisitPageElement(score);
+}
+
+FunctorCode ConstFunctorInterface::VisitScoreEnd(const Score *score)
+{
+    return this->VisitPageElementEnd(score);
 }
 
 FunctorCode ConstFunctorInterface::VisitAccid(const Accid *accid)
