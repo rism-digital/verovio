@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `@extender` lines on `tempo` (@eNote-GmBH)
 
 ## [3.13.1] - 2022-11-28
 * Fix text music font always falling back to Leipzig
