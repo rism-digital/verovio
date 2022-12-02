@@ -3844,8 +3844,8 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
 bool MEIInput::ReadIncipits(pugi::xml_node root)
 {
-    pugi::xpath_node_set incips = root.select_nodes(".//incip");
-    if (incips.size() == 0) {
+    pugi::xpath_node_set incipSet = root.select_nodes(".//incip");
+    if (incipSet.size() == 0) {
         LogError("No <incip> element found in the MEI data");
         return false;
     }
@@ -3853,9 +3853,10 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
     int incipCount = 0;
     bool success = true;
 
-    for (auto &incip : incips) {
+    for (auto &incipItem : incipSet) {
         if (!success) break;
-        pugi::xml_node incipCode = incip.node().child("incipCode");
+        pugi::xml_node incip = incipItem.node();
+        pugi::xml_node incipCode = incip.child("incipCode");
         if (!incipCode.empty()) {
             std::string form = incipCode.attribute("form") ? incipCode.attribute("form").value() : "";
             if (form != "plaineAndEasie" && form != "pae") {
@@ -3884,12 +3885,12 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
             Mdiv *mdiv = new Mdiv();
             mdiv->MakeVisible();
             m_doc->AddChild(mdiv);
-            success = this->ReadMdivChildren(mdiv, incip.node(), true);
+            success = this->ReadMdivChildren(mdiv, incip, true);
         }
         // Remove it from the header
         if (success) {
             incipCount++;
-            incip.node().parent().remove_child(incip.node());
+            incip.parent().remove_child(incip);
         }
     }
     // If no incipit has been read, then the input fails
