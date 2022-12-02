@@ -50,6 +50,7 @@
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"
+#include "findfunctor.h"
 #include "fing.h"
 #include "ftrem.h"
 #include "functorparams.h"
@@ -171,11 +172,10 @@ bool MEIOutput::Export()
 {
 
     if (m_removeIds) {
-        FindAllReferencedObjectsParams findAllReferencedObjectsParams(&m_referredObjects);
+        FindAllReferencedObjectsFunctor findAllReferencedObjects(&m_referredObjects);
         // When saving page-based MEI we also want to keep IDs for milestone elements
-        findAllReferencedObjectsParams.m_milestoneReferences = this->IsPageBasedMEI();
-        Functor findAllReferencedObjects(&Object::FindAllReferencedObjects);
-        m_doc->Process(&findAllReferencedObjects, &findAllReferencedObjectsParams);
+        findAllReferencedObjects.IncludeMilestoneReferences(this->IsPageBasedMEI());
+        m_doc->Process(findAllReferencedObjects);
         m_referredObjects.unique();
     }
 

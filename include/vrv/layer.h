@@ -304,11 +304,6 @@ public:
     int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::FindElementInLayerStaffDefsByID
-     */
-    int FindElementInLayerStaffDefsByID(FunctorParams *) const override;
-
-    /**
      * @name See Object::GenerateMIDI
      */
     ///@{

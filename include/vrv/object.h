@@ -688,31 +688,6 @@ public:
     ///@{
 
     /**
-     * Find the next child matching the Comparison object passed in the parameters
-     */
-    virtual int FindNextChildByComparison(FunctorParams *);
-
-    /**
-     * Find the previous child matching the Comparison object passed in the parameters
-     */
-    virtual int FindPreviousChildByComparison(FunctorParams *);
-
-    /**
-     * Find a Object with the extreme value with a Comparison functor .
-     */
-    virtual int FindExtremeByComparison(FunctorParams *functorParams) const;
-
-    /**
-     * Find a all Object to which another object points to in the data.
-     */
-    virtual int FindAllReferencedObjects(FunctorParams *functorParams);
-
-    /**
-     * Look for element by ID in StaffDef elements (Clef, KeySig, etc.) of all layers within
-     */
-    virtual int FindElementInLayerStaffDefsByID(FunctorParams *) const { return FUNCTOR_CONTINUE; }
-
-    /**
      * Retrieve the minimum left and maximum right for an alignment.
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
      */

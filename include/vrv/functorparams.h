@@ -1432,68 +1432,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindAllReferencedObjectsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: an array of all matching objects
- * member 1: a flag indicating if milestone references should be included as well
- **/
-
-class FindAllReferencedObjectsParams : public FunctorParams {
-public:
-    FindAllReferencedObjectsParams(ListOfObjects *elements)
-    {
-        m_elements = elements;
-        m_milestoneReferences = false;
-    }
-    ListOfObjects *m_elements;
-    bool m_milestoneReferences;
-};
-
-//----------------------------------------------------------------------------
-// FindChildByComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the comparison
- * member 1: the start object
- */
-
-class FindChildByComparisonParams : public FunctorParams {
-public:
-    FindChildByComparisonParams(Comparison *comparison, Object *start)
-    {
-        m_comparison = comparison;
-        m_element = NULL;
-        m_start = start;
-    }
-    Comparison *m_comparison;
-    Object *m_element;
-    Object *m_start;
-};
-
-//----------------------------------------------------------------------------
-// FindExtremeByComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the attComparision text
- * member 1: the pointer to pointer to the Object
- **/
-
-class FindExtremeByComparisonParams : public FunctorParams {
-public:
-    FindExtremeByComparisonParams(Comparison *comparison)
-    {
-        m_comparison = comparison;
-        m_element = NULL;
-    }
-    Comparison *m_comparison;
-    const Object *m_element;
-};
-
-//----------------------------------------------------------------------------
 // FindLayerIDWithinStaffDefParams
 //----------------------------------------------------------------------------
 

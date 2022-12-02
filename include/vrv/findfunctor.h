@@ -251,6 +251,245 @@ private:
     const Object *m_element;
 };
 
+//----------------------------------------------------------------------------
+// FindNextChildByComparisonFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class finds the next child matching the comparison object.
+ */
+class FindNextChildByComparisonFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindNextChildByComparisonFunctor(Comparison *comparison, const Object *start);
+    virtual ~FindNextChildByComparisonFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Retrieve the search result
+     */
+    const Object *GetElement() const { return m_element; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(const Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The comparison
+    Comparison *m_comparison;
+    // The object to start with
+    const Object *m_start;
+    // The search result
+    const Object *m_element;
+};
+
+//----------------------------------------------------------------------------
+// FindPreviousChildByComparisonFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class finds the previous child matching the comparison object.
+ */
+class FindPreviousChildByComparisonFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindPreviousChildByComparisonFunctor(Comparison *comparison, const Object *start);
+    virtual ~FindPreviousChildByComparisonFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Retrieve the search result
+     */
+    const Object *GetElement() const { return m_element; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(const Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The comparison
+    Comparison *m_comparison;
+    // The object to start with
+    const Object *m_start;
+    // The search result
+    const Object *m_element;
+};
+
+//----------------------------------------------------------------------------
+// FindExtremeByComparisonFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class finds the last object matching the comparison.
+ */
+class FindExtremeByComparisonFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindExtremeByComparisonFunctor(Comparison *comparison);
+    virtual ~FindExtremeByComparisonFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Retrieve the search result
+     */
+    const Object *GetElement() const { return m_element; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(const Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The comparison
+    Comparison *m_comparison;
+    // The search result
+    const Object *m_element;
+};
+
+//----------------------------------------------------------------------------
+// FindAllReferencedObjectsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class finds all objects to which another object refers to.
+ */
+class FindAllReferencedObjectsFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindAllReferencedObjectsFunctor(ListOfObjects *elements);
+    virtual ~FindAllReferencedObjectsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Include milestone references?
+     */
+    void IncludeMilestoneReferences(bool included) { m_milestoneReferences = included; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The array of all matching objects
+    ListOfObjects *m_elements;
+    // A flag indicating if milestone references should be included as well
+    bool m_milestoneReferences;
+};
+
+//----------------------------------------------------------------------------
+// FindElementInLayerStaffDefFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class looks for an element with given ID in StaffDef elements (Clef, KeySig, etc.)
+ */
+class FindElementInLayerStaffDefFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    FindElementInLayerStaffDefFunctor(const std::string &xmlId);
+    virtual ~FindElementInLayerStaffDefFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Retrieve the search result
+     */
+    const Object *GetElement() const { return m_element; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayer(const Layer *layer) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The search result
+    const Object *m_element;
+    // ID of the element to be found
+    std::string m_id;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FINDFUNCTOR_H__

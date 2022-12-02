@@ -629,10 +629,10 @@ Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int de
 
 const Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int deepness, bool direction) const
 {
-    Functor findExtremeByComparison(&Object::FindExtremeByComparison);
-    FindExtremeByComparisonParams findExtremeByComparisonParams(comparison);
-    this->Process(&findExtremeByComparison, &findExtremeByComparisonParams, NULL, NULL, deepness, direction, true);
-    return findExtremeByComparisonParams.m_element;
+    FindExtremeByComparisonFunctor findExtremeByComparison(comparison);
+    findExtremeByComparison.SetDirection(direction);
+    this->Process(findExtremeByComparison, deepness, true);
+    return findExtremeByComparison.GetElement();
 }
 
 ListOfObjects Object::FindAllDescendantsByType(ClassId classId, bool continueDepthSearchForMatches, int deepness)
@@ -1311,18 +1311,16 @@ void Object::ReorderByXPos()
 
 Object *Object::FindNextChild(Comparison *comp, Object *start)
 {
-    Functor findNextChildByComparison(&Object::FindNextChildByComparison);
-    FindChildByComparisonParams params(comp, start);
-    this->Process(&findNextChildByComparison, &params);
-    return params.m_element;
+    FindNextChildByComparisonFunctor findNextChildByComparison(comp, start);
+    this->Process(findNextChildByComparison);
+    return const_cast<Object *>(findNextChildByComparison.GetElement());
 }
 
 Object *Object::FindPreviousChild(Comparison *comp, Object *start)
 {
-    Functor findPreviousChildByComparison(&Object::FindPreviousChildByComparison);
-    FindChildByComparisonParams params(comp, start);
-    this->Process(&findPreviousChildByComparison, &params);
-    return params.m_element;
+    FindPreviousChildByComparisonFunctor findPreviousChildByComparison(comp, start);
+    this->Process(findPreviousChildByComparison);
+    return const_cast<Object *>(findPreviousChildByComparison.GetElement());
 }
 
 //----------------------------------------------------------------------------
@@ -1773,66 +1771,6 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams) const
     params->m_flatList->push_back(this);
     // LogDebug("List %d", params->m_flatList->size());
 
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindExtremeByComparison(FunctorParams *functorParams) const
-{
-    FindExtremeByComparisonParams *params = vrv_params_cast<FindExtremeByComparisonParams *>(functorParams);
-    assert(params);
-
-    // evaluate by applying the Comparison operator()
-    if ((*params->m_comparison)(this)) {
-        params->m_element = this;
-    }
-    // continue until the end
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindAllReferencedObjects(FunctorParams *functorParams)
-{
-    FindAllReferencedObjectsParams *params = vrv_params_cast<FindAllReferencedObjectsParams *>(functorParams);
-    assert(params);
-
-    if (this->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = this->GetLinkingInterface();
-        assert(interface);
-        if (interface->GetNextLink()) params->m_elements->push_back(interface->GetNextLink());
-        if (interface->GetSameasLink()) params->m_elements->push_back(interface->GetSameasLink());
-    }
-    if (this->HasInterface(INTERFACE_PLIST)) {
-        PlistInterface *interface = this->GetPlistInterface();
-        assert(interface);
-        for (auto &object : interface->GetRefs()) {
-            params->m_elements->push_back(object);
-        }
-    }
-    if (this->HasInterface(INTERFACE_TIME_POINT) || this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimePointInterface *interface = this->GetTimePointInterface();
-        assert(interface);
-        if (interface->GetStart() && !interface->GetStart()->Is(TIMESTAMP_ATTR))
-            params->m_elements->push_back(interface->GetStart());
-    }
-    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        if (interface->GetEnd() && !interface->GetEnd()->Is(TIMESTAMP_ATTR))
-            params->m_elements->push_back(interface->GetEnd());
-    }
-    if (this->Is(NOTE)) {
-        Note *note = vrv_cast<Note *>(this);
-        assert(note);
-        // The note has a stem.sameas that was resolved the a note, then that one is referenced
-        if (note->HasStemSameas() && note->HasStemSameasNote()) {
-            params->m_elements->push_back(note->GetStemSameasNote());
-        }
-    }
-    // These will also be referred to as milestones in page-based MEI
-    if (params->m_milestoneReferences && this->IsMilestoneElement()) {
-        params->m_elements->push_back(this);
-    }
-
-    // continue until the end
     return FUNCTOR_CONTINUE;
 }
 
@@ -2461,49 +2399,6 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
 
     std::stable_sort(m_children.begin(), m_children.end(), sortByUlx);
     this->Modify();
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindNextChildByComparison(FunctorParams *functorparams)
-{
-    FindChildByComparisonParams *params = vrv_cast<FindChildByComparisonParams *>(functorparams);
-    assert(params);
-
-    // we are reaching the start of the range
-    if (params->m_start == this) {
-        // setting m_start to be null tells us that we're in the range
-        params->m_start = NULL;
-        return FUNCTOR_CONTINUE;
-    }
-
-    else if (params->m_start) {
-        // we're not yet in the range
-        return FUNCTOR_CONTINUE;
-    }
-
-    if ((*params->m_comparison)(this)) {
-        params->m_element = this;
-        return FUNCTOR_STOP;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::FindPreviousChildByComparison(FunctorParams *functorparams)
-{
-    FindChildByComparisonParams *params = vrv_cast<FindChildByComparisonParams *>(functorparams);
-    assert(params);
-    // this guy works by going from the start and replacing the return element with every nearer element
-    // until you get to the 'start' element
-    if (params->m_start == this) {
-        // we've reached the end element, so stop
-        return FUNCTOR_STOP;
-    }
-
-    if ((*params->m_comparison)(this)) {
-        params->m_element = this;
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
