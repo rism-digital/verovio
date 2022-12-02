@@ -121,6 +121,8 @@ enum ClassId : uint16_t {
     STAFFGRP,
     SURFACE,
     SVG,
+    SYMBOLDEF,
+    SYMBOLTABLE,
     SYSTEM,
     SYSTEM_ALIGNER,
     SYSTEM_ALIGNMENT,

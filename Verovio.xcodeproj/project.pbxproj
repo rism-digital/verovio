@@ -611,6 +611,18 @@
 		4DB787642022F0BB00394520 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4DB787622022F0B700394520 /* jsonxx.cc */; };
 		4DB787652022F0BC00394520 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4DB787622022F0B700394520 /* jsonxx.cc */; };
 		4DB787662022F0BF00394520 /* jsonxx.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB787612022F0AD00394520 /* jsonxx.h */; };
+		4DBDD6712939E1AE009EC466 /* symboltable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DBDD66F2939E1AE009EC466 /* symboltable.cpp */; };
+		4DBDD6722939E1AE009EC466 /* symboldef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DBDD6702939E1AE009EC466 /* symboldef.cpp */; };
+		4DBDD6732939E1BC009EC466 /* symboldef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DBDD6702939E1AE009EC466 /* symboldef.cpp */; };
+		4DBDD6742939E1BD009EC466 /* symboldef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DBDD6702939E1AE009EC466 /* symboldef.cpp */; };
+		4DBDD6752939E1BD009EC466 /* symboldef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DBDD6702939E1AE009EC466 /* symboldef.cpp */; };
+		4DBDD6762939E1CA009EC466 /* symboltable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DBDD66F2939E1AE009EC466 /* symboltable.cpp */; };
+		4DBDD6772939E1CB009EC466 /* symboltable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DBDD66F2939E1AE009EC466 /* symboltable.cpp */; };
+		4DBDD6782939E1CC009EC466 /* symboltable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DBDD66F2939E1AE009EC466 /* symboltable.cpp */; };
+		4DBDD6792939E1D1009EC466 /* symboldef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBDD66E2939E19A009EC466 /* symboldef.h */; };
+		4DBDD67A2939E1D1009EC466 /* symboldef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBDD66E2939E19A009EC466 /* symboldef.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DBDD67B2939E1D7009EC466 /* symboltable.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBDD66D2939E19A009EC466 /* symboltable.h */; };
+		4DBDD67C2939E1D8009EC466 /* symboltable.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBDD66D2939E19A009EC466 /* symboltable.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DC12A571F716E1C000440E9 /* pghead.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC12A561F716E1C000440E9 /* pghead.h */; };
 		4DC12A591F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
 		4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
@@ -1566,6 +1578,10 @@
 		4DB726C71B8BB0F30040231B /* text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = text.h; path = include/vrv/text.h; sourceTree = "<group>"; };
 		4DB787612022F0AD00394520 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = include/json/jsonxx.h; sourceTree = "<group>"; };
 		4DB787622022F0B700394520 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = src/json/jsonxx.cc; sourceTree = "<group>"; };
+		4DBDD66D2939E19A009EC466 /* symboltable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = symboltable.h; path = include/vrv/symboltable.h; sourceTree = "<group>"; };
+		4DBDD66E2939E19A009EC466 /* symboldef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = symboldef.h; path = include/vrv/symboldef.h; sourceTree = "<group>"; };
+		4DBDD66F2939E1AE009EC466 /* symboltable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = symboltable.cpp; path = src/symboltable.cpp; sourceTree = "<group>"; };
+		4DBDD6702939E1AE009EC466 /* symboldef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = symboldef.cpp; path = src/symboldef.cpp; sourceTree = "<group>"; };
 		4DC12A561F716E1C000440E9 /* pghead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pghead.h; path = include/vrv/pghead.h; sourceTree = "<group>"; };
 		4DC12A581F716E27000440E9 /* pghead.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pghead.cpp; path = src/pghead.cpp; sourceTree = "<group>"; };
 		4DC12A5C1F73F888000440E9 /* pghead2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pghead2.h; path = include/vrv/pghead2.h; sourceTree = "<group>"; };
@@ -2027,6 +2043,17 @@
 			name = json;
 			sourceTree = "<group>";
 		};
+		4DBDD66C2939DEC4009EC466 /* symbolelements */ = {
+			isa = PBXGroup;
+			children = (
+				4DBDD6702939E1AE009EC466 /* symboldef.cpp */,
+				4DBDD66E2939E19A009EC466 /* symboldef.h */,
+				4DBDD66F2939E1AE009EC466 /* symboltable.cpp */,
+				4DBDD66D2939E19A009EC466 /* symboltable.h */,
+			);
+			name = symbolelements;
+			sourceTree = "<group>";
+		};
 		4DC12A761F740089000440E9 /* runningelements */ = {
 			isa = PBXGroup;
 			children = (
@@ -2228,6 +2255,7 @@
 				4D79641626C151250026288B /* pageelements */,
 				4DF28A011A754DAA00BA9F7D /* controlelements */,
 				8F086F3A18853A540037FD8E /* layerelements */,
+				4DBDD66C2939DEC4009EC466 /* symbolelements */,
 				4DA144881C2AB24400CB7CEE /* textelements */,
 				4DC34B9E19BC33A0006175CD /* interfaces */,
 				8F086F3918853A190037FD8E /* view */,
@@ -2544,6 +2572,7 @@
 				4DA0EADF22BB77AF00A7EBEB /* facsimileinterface.h in Headers */,
 				4DC12A8A1F74111E000440E9 /* pgfoot2.h in Headers */,
 				8F59294018854BF800FE51AD /* iomei.h in Headers */,
+				4DBDD6792939E1D1009EC466 /* symboldef.h in Headers */,
 				4D4335CF1ED421D2003BE1A9 /* atts_analytical.h in Headers */,
 				4DB3D8AA1F83D02A00B5FC2B /* atts_cmn.h in Headers */,
 				35FDEBCE24B6DBC100AC1696 /* fing.h in Headers */,
@@ -2605,6 +2634,7 @@
 				4DB3D8DD1F83D14B00B5FC2B /* artic.h in Headers */,
 				4DF28A031A754DE400BA9F7D /* controlelement.h in Headers */,
 				4DB3D8F11F83D1AA00B5FC2B /* fig.h in Headers */,
+				4DBDD67B2939E1D7009EC466 /* symboltable.h in Headers */,
 				4D89F90C201771A700A4D336 /* num.h in Headers */,
 				4DA0EAE322BB77AF00A7EBEB /* surface.h in Headers */,
 				4DB3D8FE1F83D20100B5FC2B /* horizontalaligner.h in Headers */,
@@ -2785,6 +2815,7 @@
 				BB4C4AE622A932BC001F6AF0 /* corr.h in Headers */,
 				BB4C4B5422A932D7001F6AF0 /* halfmrpt.h in Headers */,
 				BB4C4B4E22A932D7001F6AF0 /* dot.h in Headers */,
+				4DBDD67C2939E1D8009EC466 /* symboltable.h in Headers */,
 				BB4C4B1A22A932CF001F6AF0 /* anchoredtext.h in Headers */,
 				BB4C4AF422A932BC001F6AF0 /* rdg.h in Headers */,
 				BB4C4A7F22A9321F001F6AF0 /* atts_pagebased.h in Headers */,
@@ -2802,6 +2833,7 @@
 				BB4C4A9722A9328F001F6AF0 /* functorparams.h in Headers */,
 				BB4C4B0222A932BC001F6AF0 /* unclear.h in Headers */,
 				BB4C4B2C22A932CF001F6AF0 /* mordent.h in Headers */,
+				4DBDD67A2939E1D1009EC466 /* symboldef.h in Headers */,
 				BB4C4B7A22A932D7001F6AF0 /* timestamp.h in Headers */,
 				BB4C4B6C22A932D7001F6AF0 /* neume.h in Headers */,
 				BB4C4B2E22A932CF001F6AF0 /* octave.h in Headers */,
@@ -3101,6 +3133,7 @@
 				4D1693F81E3A44F300569BF4 /* beam.cpp in Sources */,
 				4D4FCD131F54570E0009C455 /* staffdef.cpp in Sources */,
 				4D4335D31ED4567F003BE1A9 /* atts_externalsymbols.cpp in Sources */,
+				4DBDD6762939E1CA009EC466 /* symboltable.cpp in Sources */,
 				4D1693F91E3A44F300569BF4 /* artic.cpp in Sources */,
 				4DEC4DB321C826E000D1D273 /* supplied.cpp in Sources */,
 				4DC12A851F741110000440E9 /* pgfoot2.cpp in Sources */,
@@ -3207,6 +3240,7 @@
 				4D1694271E3A44F300569BF4 /* iohumdrum.cpp in Sources */,
 				4D1694281E3A44F300569BF4 /* rest.cpp in Sources */,
 				4D1694291E3A44F300569BF4 /* scoredef.cpp in Sources */,
+				4DBDD6732939E1BC009EC466 /* symboldef.cpp in Sources */,
 				BDEF9EC826725234008A3A47 /* caesura.cpp in Sources */,
 				4D16942A1E3A44F300569BF4 /* octave.cpp in Sources */,
 				4D16942B1E3A44F300569BF4 /* slur.cpp in Sources */,
@@ -3429,6 +3463,7 @@
 				40F910081E2799740081B7BB /* trill.cpp in Sources */,
 				4DA1448A1C2AB28700CB7CEE /* textelement.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
+				4DBDD6722939E1AE009EC466 /* symboldef.cpp in Sources */,
 				4DA80D961A6ACF5D0089802D /* options.cpp in Sources */,
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
 				4D20B5EC1B873A1300EA9EC3 /* scoredefinterface.cpp in Sources */,
@@ -3507,6 +3542,7 @@
 				4D4335C91ECF2310003BE1A9 /* atts_visual.cpp in Sources */,
 				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
 				40ACDEA924079F9000F82B8C /* reh.cpp in Sources */,
+				4DBDD6712939E1AE009EC466 /* symboltable.cpp in Sources */,
 				40BD9390206B95060037BF8E /* annot.cpp in Sources */,
 				4DC12A591F716E27000440E9 /* pghead.cpp in Sources */,
 				BDA81C24268B38A10065B802 /* metersiggrp.cpp in Sources */,
@@ -3544,6 +3580,7 @@
 				4DC12A651F73F898000440E9 /* pghead2.cpp in Sources */,
 				4DB3D8C81F83D10000B5FC2B /* dir.cpp in Sources */,
 				8F3DD36818854B410051330C /* doc.cpp in Sources */,
+				4DBDD6772939E1CB009EC466 /* symboltable.cpp in Sources */,
 				4DB3D8D11F83D11D00B5FC2B /* octave.cpp in Sources */,
 				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
 				4D4C26EF1EF7E75400681770 /* label.cpp in Sources */,
@@ -3650,6 +3687,7 @@
 				4DA0EAC922BB779400A7EBEB /* facsimile.cpp in Sources */,
 				4DEC4DAC21C81EEC00D1D273 /* restore.cpp in Sources */,
 				8F3DD35A18854B2E0051330C /* tuplet.cpp in Sources */,
+				4DBDD6742939E1BD009EC466 /* symboldef.cpp in Sources */,
 				BDEF9EC926725234008A3A47 /* caesura.cpp in Sources */,
 				8F3DD32E18854B250051330C /* layer.cpp in Sources */,
 				8F3DD33018854B250051330C /* measure.cpp in Sources */,
@@ -3766,6 +3804,7 @@
 				BB4C4B4922A932D7001F6AF0 /* clef.cpp in Sources */,
 				BB4C4AC922A932B6001F6AF0 /* pages.cpp in Sources */,
 				BB4C4B6F22A932D7001F6AF0 /* proport.cpp in Sources */,
+				4DBDD6782939E1CC009EC466 /* symboltable.cpp in Sources */,
 				BB4C4AE522A932BC001F6AF0 /* corr.cpp in Sources */,
 				BB4C4AFF22A932BC001F6AF0 /* supplied.cpp in Sources */,
 				BB4C4BB522A932EB001F6AF0 /* view_tuplet.cpp in Sources */,
@@ -3872,6 +3911,7 @@
 				BB4C4B4B22A932D7001F6AF0 /* custos.cpp in Sources */,
 				BB4C4BB822A932FC001F6AF0 /* Binasc.cpp in Sources */,
 				BB4C4B7B22A932D7001F6AF0 /* tuplet.cpp in Sources */,
+				4DBDD6752939E1BD009EC466 /* symboldef.cpp in Sources */,
 				BDEF9ECA26725234008A3A47 /* caesura.cpp in Sources */,
 				BB4C4BA522A932E5001F6AF0 /* timeinterface.cpp in Sources */,
 				BB4C4B7522A932D7001F6AF0 /* syl.cpp in Sources */,
