@@ -2165,7 +2165,8 @@ void MEIOutput::WriteTempo(pugi::xml_node currentNode, Tempo *tempo)
 
     this->WriteControlElement(currentNode, tempo);
     this->WriteTextDirInterface(currentNode, tempo);
-    this->WriteTimePointInterface(currentNode, tempo);
+    this->WriteTimeSpanningInterface(currentNode, tempo);
+    tempo->WriteExtender(currentNode);
     tempo->WriteLang(currentNode);
     tempo->WriteMidiTempo(currentNode);
     tempo->WriteMmTempo(currentNode);
@@ -5590,7 +5591,8 @@ bool MEIInput::ReadTempo(Object *parent, pugi::xml_node tempo)
     this->ReadControlElement(tempo, vrvTempo);
 
     this->ReadTextDirInterface(tempo, vrvTempo);
-    this->ReadTimePointInterface(tempo, vrvTempo);
+    this->ReadTimeSpanningInterface(tempo, vrvTempo);
+    vrvTempo->ReadExtender(tempo);
     vrvTempo->ReadLang(tempo);
     vrvTempo->ReadMidiTempo(tempo);
     vrvTempo->ReadMmTempo(tempo);

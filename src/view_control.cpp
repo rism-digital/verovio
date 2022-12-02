@@ -140,6 +140,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Tempo *tempo = vrv_cast<Tempo *>(element);
         assert(tempo);
         this->DrawTempo(dc, tempo, measure, system);
+        system->AddToDrawingListIfNecessary(tempo);
     }
     else if (element->Is(TRILL)) {
         Trill *trill = vrv_cast<Trill *>(element);
@@ -378,6 +379,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             x2 += endRadius;
             // cast to Syl check in DrawSylConnector
             this->DrawSylConnector(dc, dynamic_cast<Syl *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is(TEMPO)) {
+            // cast to Tempo check in DrawControlElementConnector
+            this->DrawControlElementConnector(
+                dc, dynamic_cast<Tempo *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(TIE)) {
             // For ties we limit support to one value in @staff

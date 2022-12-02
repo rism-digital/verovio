@@ -1151,7 +1151,7 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
             i = std::find_if(i, end, [iter, drawingUnit](BoundingBox *elem) {
                 if ((*iter)->Is(FLOATING_POSITIONER)) {
                     FloatingPositioner *fp = vrv_cast<FloatingPositioner *>(*iter);
-                    if (fp->GetObject()->Is({ DIR, DYNAM }) && fp->GetObject()->IsExtenderElement()) {
+                    if (fp->GetObject()->Is({ DIR, DYNAM, TEMPO }) && fp->GetObject()->IsExtenderElement()) {
                         return (*iter)->HorizontalContentOverlap(elem, drawingUnit * 4)
                             || (*iter)->VerticalContentOverlap(elem);
                     }
