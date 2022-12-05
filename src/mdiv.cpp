@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "iomei.h"
 #include "page.h"
@@ -74,6 +75,26 @@ void Mdiv::MakeVisible()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Mdiv::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMdiv(this);
+}
+
+FunctorCode Mdiv::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMdiv(this);
+}
+
+FunctorCode Mdiv::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMdivEnd(this);
+}
+
+FunctorCode Mdiv::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMdivEnd(this);
+}
 
 int Mdiv::Save(FunctorParams *functorParams)
 {

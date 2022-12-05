@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "page.h"
 #include "pages.h"
@@ -152,6 +153,26 @@ bool Score::ScoreDefNeedsOptimization(int optionCondense) const
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Score::Accept(MutableFunctor &functor)
+{
+    return functor.VisitScore(this);
+}
+
+FunctorCode Score::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitScore(this);
+}
+
+FunctorCode Score::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitScoreEnd(this);
+}
+
+FunctorCode Score::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitScoreEnd(this);
+}
 
 int Score::PrepareDataInitialization(FunctorParams *functorParams)
 {
