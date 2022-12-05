@@ -1336,6 +1336,12 @@
 		E7BCFFB9281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; };
 		E7BCFFBA281298620012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFBB281298630012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
+		E7D3389A293E057100C40B81 /* setscoredeffunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7D33899293E057100C40B81 /* setscoredeffunctor.h */; };
+		E7D3389B293E057100C40B81 /* setscoredeffunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7D33899293E057100C40B81 /* setscoredeffunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7D3389D293E05A800C40B81 /* setscoredeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */; };
+		E7D3389E293E05A800C40B81 /* setscoredeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */; };
+		E7D3389F293E05F200C40B81 /* setscoredeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */; };
+		E7D338A0293E05F300C40B81 /* setscoredeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1827,6 +1833,8 @@
 		E79C87C2269440570098FE85 /* lv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lv.cpp; path = src/lv.cpp; sourceTree = "<group>"; };
 		E7BCFFB4281297980012513D /* resources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resources.cpp; path = src/resources.cpp; sourceTree = "<group>"; };
 		E7BCFFB7281297C60012513D /* resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resources.h; path = include/vrv/resources.h; sourceTree = "<group>"; };
+		E7D33899293E057100C40B81 /* setscoredeffunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = setscoredeffunctor.h; path = include/vrv/setscoredeffunctor.h; sourceTree = "<group>"; };
+		E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = setscoredeffunctor.cpp; path = src/setscoredeffunctor.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2539,6 +2547,8 @@
 				E765675B28BC019F00BC6490 /* functor.h */,
 				E74A806828BC9842005274E7 /* functorinterface.cpp */,
 				E765675828BBFBA400BC6490 /* functorinterface.h */,
+				E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */,
+				E7D33899293E057100C40B81 /* setscoredeffunctor.h */,
 			);
 			name = functors;
 			sourceTree = "<group>";
@@ -2616,6 +2626,7 @@
 				4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */,
 				40C2E4202052A6E90003625F /* sb.h in Headers */,
 				4DB3D8B61F83D09700B5FC2B /* iohumdrum.h in Headers */,
+				E7D3389A293E057100C40B81 /* setscoredeffunctor.h in Headers */,
 				4DB3D8DB1F83D13F00B5FC2B /* turn.h in Headers */,
 				8F59294118854BF800FE51AD /* iomusxml.h in Headers */,
 				8F59294218854BF800FE51AD /* iopae.h in Headers */,
@@ -2794,6 +2805,7 @@
 				BB4C4A8722A9321F001F6AF0 /* atts_visual.h in Headers */,
 				BBC19FC922B39AC400100F42 /* git_commit.h in Headers */,
 				BB4C4A8F22A9328F001F6AF0 /* attdef.h in Headers */,
+				E7D3389B293E057100C40B81 /* setscoredeffunctor.h in Headers */,
 				BB4C4AA022A9328F001F6AF0 /* toolkit.h in Headers */,
 				BB4C4BA622A932E5001F6AF0 /* timeinterface.h in Headers */,
 				BB4C4B9022A932DF001F6AF0 /* text.h in Headers */,
@@ -3266,6 +3278,7 @@
 				4D16941C1E3A44F300569BF4 /* ending.cpp in Sources */,
 				4DEC4DB721C8270100D1D273 /* unclear.cpp in Sources */,
 				4D16941D1E3A44F300569BF4 /* dir.cpp in Sources */,
+				E7D3389F293E05F200C40B81 /* setscoredeffunctor.cpp in Sources */,
 				4DEC4D8F21C81DEE00D1D273 /* damage.cpp in Sources */,
 				4D1BD1B621908D6B000D35B2 /* halfmrpt.cpp in Sources */,
 				4D16941E1E3A44F300569BF4 /* note.cpp in Sources */,
@@ -3532,6 +3545,7 @@
 				4D89F9122018A93300A4D336 /* svg.cpp in Sources */,
 				8F086F05188539540037FD8E /* tuplet.cpp in Sources */,
 				4D1BE7851C6A40A80086DC0E /* pugixml.cpp in Sources */,
+				E7D338A0293E05F300C40B81 /* setscoredeffunctor.cpp in Sources */,
 				4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				4D79642126C167100026288B /* pagemilestone.cpp in Sources */,
 				4D2073FB22A3BCE000E0765F /* tabgrp.cpp in Sources */,
@@ -3719,6 +3733,7 @@
 				4DA0EAF822BB78E200A7EBEB /* atts_facsimile.cpp in Sources */,
 				8F3DD34E18854B2E0051330C /* pitchinterface.cpp in Sources */,
 				4DC12A861F741110000440E9 /* pgfoot2.cpp in Sources */,
+				E7D3389D293E05A800C40B81 /* setscoredeffunctor.cpp in Sources */,
 				4DA1448B1C2AB28700CB7CEE /* textelement.cpp in Sources */,
 				8F3DD35018854B2E0051330C /* positioninterface.cpp in Sources */,
 				4DB3D8ED1F83D18C00B5FC2B /* space.cpp in Sources */,
@@ -3946,6 +3961,7 @@
 				BB4C4A9A22A9328F001F6AF0 /* object.cpp in Sources */,
 				BB4C4B4722A932D7001F6AF0 /* chord.cpp in Sources */,
 				BB4C4A7822A9321F001F6AF0 /* atts_mei.cpp in Sources */,
+				E7D3389E293E05A800C40B81 /* setscoredeffunctor.cpp in Sources */,
 				BB4C4AF122A932BC001F6AF0 /* orig.cpp in Sources */,
 				BB4C4ADD22A932BC001F6AF0 /* add.cpp in Sources */,
 				BB4C4B1122A932C8001F6AF0 /* expansion.cpp in Sources */,
