@@ -655,7 +655,7 @@ public:
     OptionBool m_svgFormatRaw;
     OptionBool m_svgRemoveXlink;
     OptionArray m_svgAdditionalAttribute;
-    OptionInt m_unit;
+    OptionDbl m_unit;
     OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;
     OptionBool m_usePgHeaderForAll;
