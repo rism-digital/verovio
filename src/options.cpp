@@ -239,12 +239,13 @@ void OptionDbl::CopyTo(Option *option)
     *child = *this;
 }
 
-void OptionDbl::Init(double defaultValue, double minValue, double maxValue)
+void OptionDbl::Init(double defaultValue, double minValue, double maxValue, bool definitionFactor)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
     m_minValue = minValue;
     m_maxValue = maxValue;
+    m_definitionFactor = definitionFactor;
 }
 
 bool OptionDbl::SetValue(const std::string &value)
@@ -265,6 +266,16 @@ std::string OptionDbl::GetDefaultStrValue() const
 bool OptionDbl::SetValueDbl(double value)
 {
     return this->SetValue(value);
+}
+
+double OptionDbl::GetValue() const
+{
+    return (m_definitionFactor) ? m_value * DEFINITION_FACTOR : m_value;
+}
+
+double OptionDbl::GetUnfactoredValue() const
+{
+    return m_value;
 }
 
 bool OptionDbl::SetValue(double value)
@@ -1153,7 +1164,7 @@ Options::Options()
     this->Register(&m_svgAdditionalAttribute, "svgAdditionalAttribute", &m_general);
 
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
-    m_unit.Init(9, 6, 20, true);
+    m_unit.Init(9.0, 4.5, 12.0, true);
     this->Register(&m_unit, "unit", &m_general);
 
     m_useBraceGlyph.SetInfo("Use Brace Glyph", "Use brace glyph from current font");
