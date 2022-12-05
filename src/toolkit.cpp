@@ -936,7 +936,7 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         const OptionJson *optJson = dynamic_cast<const OptionJson *>(iter->second);
 
         if (optDbl) {
-            double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetValue();
+            double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetUnfactoredValue();
             jsonxx::Value value(dblValue);
             value.precision_ = 2;
             o << iter->first << value;
