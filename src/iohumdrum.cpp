@@ -11597,7 +11597,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         else if ((ch == '\'') && (posch == '\'')) {
             // staccatissimo alternate (eventually remove)
             ch = '`';
-			intch = (unsigned char)ch;
+            intch = (unsigned char)ch;
             posch = i < tsize - 2 ? nohidden.at(i + 2) : 'g';
             i++;
         }
