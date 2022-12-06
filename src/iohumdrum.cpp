@@ -22960,7 +22960,7 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
         arpeg->AddRef("#" + firstid);
 
         for (auto it = arpTokens.begin() ; it != arpTokens.end(); ++it) {
-			hum::HTp earp = *it;
+            hum::HTp earp = *it;
             std::string nextid;
             if (earp->find(" ") != std::string::npos) {
                 nextid = getLocationId("chord", earp);
@@ -23048,19 +23048,19 @@ bool HumdrumInput::isLeftmostStaffArpeggio(hum::HTp token)
 
 std::vector<hum::HTp> HumdrumInput::getSystemArpeggioTokens(hum::HTp token)
 {
-	std::vector<hum::HTp> output;
-	token = token->getNextFieldToken();
-	while (token != NULL) {
-		if (!token->isKernLike()) {
-			token = token->getNextFieldToken();
-			continue;
-		}
-		if (token->find("::") != std::string::npos) {
-			output.push_back(token);
-		}
-		token = token->getNextFieldToken();
-	}
-	return output;
+    std::vector<hum::HTp> output;
+    token = token->getNextFieldToken();
+    while (token != NULL) {
+        if (!token->isKernLike()) {
+            token = token->getNextFieldToken();
+            continue;
+        }
+        if (token->find("::") != std::string::npos) {
+            output.push_back(token);
+        }
+        token = token->getNextFieldToken();
+    }
+    return output;
 }
 
 //////////////////////////////
@@ -23074,18 +23074,18 @@ std::vector<hum::HTp> HumdrumInput::getSystemArpeggioTokens(hum::HTp token)
 
 bool HumdrumInput::isLeftmostSystemArpeggio(hum::HTp token)
 {
-	token = token->getPreviousFieldToken();
-	while (token != NULL) {
-		if (!token->isKernLike()) {
-			token = token->getPreviousFieldToken();
-			continue;
-		}
-		if (token->find("::") != std::string::npos) {
-			return false;
-		}
-		token = token->getPreviousFieldToken();
-	}
-	return true;
+    token = token->getPreviousFieldToken();
+    while (token != NULL) {
+        if (!token->isKernLike()) {
+            token = token->getPreviousFieldToken();
+            continue;
+        }
+        if (token->find("::") != std::string::npos) {
+            return false;
+        }
+        token = token->getPreviousFieldToken();
+    }
+    return true;
 }
 
 //////////////////////////////
