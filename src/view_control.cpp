@@ -2313,7 +2313,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
     // Number of units above the staff - 3 by default, 5 when above a clef
     int yMargin = 3;
-    
+
     params.m_x = reh->GetStart()->GetDrawingX();
     const bool adjustPosition = ((reh->HasTstamp() && (reh->GetTstamp() == 0.0))
         || (reh->GetStart()->Is(BARLINE)
