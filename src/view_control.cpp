@@ -2311,6 +2311,9 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
     TextDrawingParams params;
 
+    // Number of units above the staff - 3 by default, 5 when above a clef
+    int yMargin = 3;
+    
     params.m_x = reh->GetStart()->GetDrawingX();
     const bool adjustPosition = ((reh->HasTstamp() && (reh->GetTstamp() == 0.0))
         || (reh->GetStart()->Is(BARLINE)
@@ -2322,6 +2325,8 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         if (!system->IsFirstOfMdiv()) {
             if (Clef *clef = layer->GetStaffDefClef(); clef) {
                 params.m_x = clef->GetDrawingX() + (clef->GetContentRight() - clef->GetContentLeft()) / 2;
+                // Increase the margin when above the clef
+                yMargin = 5;
             }
         }
         else {
@@ -2343,7 +2348,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         }
 
         params.m_enclosedRend.clear();
-        params.m_y = reh->GetDrawingY() + 3 * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
+        params.m_y = reh->GetDrawingY() + yMargin * m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize);
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
         rehTxt.SetPointSize(params.m_pointSize);
@@ -2810,12 +2815,13 @@ void View::DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params,
 {
     assert(dc);
     const int lineThickness = m_options->m_textEnclosureThickness.GetValue() * staffSize;
+    const int margin = m_doc->GetDrawingUnit(staffSize);
 
     for (const auto rend : params.m_enclosedRend) {
-        int x1 = rend->GetContentLeft() - staffSize;
-        int x2 = rend->GetContentRight() + staffSize;
-        int y1 = rend->GetContentBottom() - staffSize / 2;
-        int y2 = rend->GetContentTop() + staffSize;
+        int x1 = rend->GetContentLeft() - margin;
+        int x2 = rend->GetContentRight() + margin;
+        int y1 = rend->GetContentBottom() - margin / 2;
+        int y2 = rend->GetContentTop() + margin;
 
         if (params.m_enclose == TEXTRENDITION_box) {
             this->DrawNotFilledRectangle(dc, x1, y1, x2, y2, lineThickness, 0);
