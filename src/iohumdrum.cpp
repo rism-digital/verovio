@@ -6024,8 +6024,12 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
         count = stoi(matches[1]);
         if (!metersigtok) {
             unit = stoi(matches[2]);
+            if (unit == 0) {
+                count *= 2;
+                unit = 1;
+            }
             MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetCount({ { std::stoi(matches[1]) }, MeterCountSign::None });
+            vrvmetersig->SetCount({ { count }, MeterCountSign::None });
             vrvmetersig->SetUnit(unit);
             checkMeterSigParameters(vrvmetersig, timesigtok);
         }
