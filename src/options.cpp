@@ -908,7 +908,7 @@ Options::Options()
 
     m_logLevel.SetInfo("Log level", "Set the log level: \"off\", \"error\", \"warning\", \"info\", or \"debug\"");
     m_logLevel.Init("warning");
-    m_logLevel.SetKey("log-level");
+    m_logLevel.SetKey("logLevel");
     m_logLevel.SetShortOption('l', true);
     m_baseOptions.AddOption(&m_logLevel);
 
