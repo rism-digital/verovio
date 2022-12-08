@@ -2870,7 +2870,8 @@ void MEIOutput::WriteSvg(pugi::xml_node currentNode, Svg *svg)
 {
     assert(svg);
 
-    this->WriteXmlId(currentNode, svg);
+    // <svg> uses @id and not @xml:id
+    if (!m_removeIds) currentNode.append_attribute("id") = IDToMeiStr(svg).c_str();
 
     pugi::xml_node svgNode = svg->Get();
     for (pugi::xml_attribute attr : svgNode.attributes()) {
@@ -6834,7 +6835,14 @@ bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
 bool MEIInput::ReadSvg(Object *parent, pugi::xml_node svg)
 {
     Svg *vrvSvg = new Svg();
+    // Still read the @xml:id for handling the comments
     this->SetMeiID(svg, vrvSvg);
+
+    // Read the @id by hand
+    if (svg.attribute("id")) {
+        vrvSvg->SetID(svg.attribute("id").value());
+        svg.remove_attribute("id");
+    }
 
     if (std::string(svg.name()) == "svg") {
         vrvSvg->Set(svg);
