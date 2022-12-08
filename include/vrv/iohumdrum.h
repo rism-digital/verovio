@@ -596,8 +596,8 @@ protected:
     int getChordNoteCount(hum::HTp token);
     bool isLeftmostSystemArpeggio(hum::HTp token);
     bool isLeftmostStaffArpeggio(hum::HTp token);
-	std::vector<hum::HTp> getSystemArpeggioTokens(hum::HTp token);
-	std::vector<hum::HTp> getStaffArpeggioTokens(hum::HTp token);
+    std::vector<hum::HTp> getSystemArpeggioTokens(hum::HTp token);
+    std::vector<hum::HTp> getStaffArpeggioTokens(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
         int staffindex, int justification = 0, const std::string &color = "", int vgroup = -1);
     bool addTempoDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
