@@ -6746,6 +6746,42 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
     return success;
 }
 
+bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, Object *filter)
+{
+    bool success = true;
+    pugi::xml_node xmlElement;
+    std::string elementName;
+    int i = 0;
+    for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
+        if (!success) {
+            break;
+        }
+        this->NormalizeAttributes(xmlElement);
+        elementName = std::string(xmlElement.name());
+        if (filter && !this->IsAllowed(elementName, filter)) {
+            std::string meiElementName = filter->GetClassName();
+            std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
+            LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
+                meiElementName.c_str());
+            continue;
+        }
+        // svg
+        else if (elementName == "svg") {
+            success = this->ReadSvg(parent, xmlElement);
+        }
+        // xml comment
+        else if (elementName == "") {
+            success = this->ReadXMLComment(parent, xmlElement);
+        }
+        // unknown
+        else {
+            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
+        }
+        i++;
+    }
+    return success;
+}
+
 bool MEIInput::ReadTextElement(pugi::xml_node element, TextElement *object)
 {
     this->SetMeiID(element, object);
@@ -6877,7 +6913,7 @@ bool MEIInput::ReadSymbolDef(Object *parent, pugi::xml_node symbolDef)
 
     parent->AddChild(vrvSymbolDef);
     this->ReadUnsupportedAttr(symbolDef, vrvSymbolDef);
-    return true;
+    return ReadSymbolDefChildren(vrvSymbolDef, symbolDef);
 }
 
 bool MEIInput::ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight)

@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "svg.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -33,6 +34,17 @@ SymbolDef::~SymbolDef() {}
 void SymbolDef::Reset()
 {
     Object::Reset();
+}
+
+bool SymbolDef::IsSupportedChild(Object *child)
+{
+    if (child->Is(SVG)) {
+        assert(dynamic_cast<Svg *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
 }
 
 } // namespace vrv

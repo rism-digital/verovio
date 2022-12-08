@@ -674,6 +674,7 @@ private:
     bool ReadLayerDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
     bool ReadTextChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
+    bool ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
     ///@}
 
     /**

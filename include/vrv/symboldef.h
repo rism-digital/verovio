@@ -30,6 +30,13 @@ public:
     std::string GetClassName() const override { return "SymbolDef"; }
     ///@}
 
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
+    bool IsSupportedChild(Object *object) override;
+    ///@}
+
 private:
     //
 public:
