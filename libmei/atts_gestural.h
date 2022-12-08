@@ -85,14 +85,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetArticGes(data_ARTICULATION articGes_) { m_articGes = articGes_; }
-    data_ARTICULATION GetArticGes() const { return m_articGes; }
+    void SetArticGes(data_ARTICULATION_List articGes_) { m_articGes = articGes_; }
+    data_ARTICULATION_List GetArticGes() const { return m_articGes; }
     bool HasArticGes() const;
     ///@}
 
 private:
     /** Records performed articulation that differs from the written value. **/
-    data_ARTICULATION m_articGes;
+    data_ARTICULATION_List m_articGes;
 
     /* include <attartic.ges> */
 };
