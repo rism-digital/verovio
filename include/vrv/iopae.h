@@ -407,6 +407,9 @@ public:
     // dummy validation log
     jsonxx::Object GetValidationLog();
 
+    // dummy setter
+    void SetScoreBased(bool scoreBased) {}
+
 #ifndef NO_PAE_SUPPORT
     bool Import(const std::string &pae) override;
 
@@ -520,13 +523,13 @@ public:
      */
     jsonxx::Object GetValidationLog();
 
-#ifndef NO_PAE_SUPPORT
-    bool Import(const std::string &input) override;
-
     /**
      * Setter for scoreBased flag (false by default).
      */
     void SetScoreBased(bool scoreBased) { m_scoreBased = scoreBased; }
+
+#ifndef NO_PAE_SUPPORT
+    bool Import(const std::string &input) override;
 
 private:
     /**
