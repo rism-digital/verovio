@@ -22963,7 +22963,7 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
         std::string firstid = object->GetID();
         arpeg->AddRef("#" + firstid);
 
-        for (auto it = arpTokens.begin() ; it != arpTokens.end(); ++it) {
+        for (auto it = arpTokens.begin(); it != arpTokens.end(); ++it) {
             hum::HTp earp = *it;
             std::string nextid;
             if (earp->find(" ") != std::string::npos) {
