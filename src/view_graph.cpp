@@ -17,6 +17,8 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "options.h"
+#include "svg.h"
+#include "symboldef.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -402,6 +404,29 @@ void View::DrawThickBezierCurve(
         dc->DrawCubicBezierPath(bez1);
     }
     dc->ResetPen();
+}
+
+void View::DrawSymbolDef(
+    DeviceContext *dc, Object *parent, SymbolDef *symbolDef, int x, int y, int staffSize, bool dimin)
+{
+    assert(dc);
+    assert(symbolDef);
+
+    TextDrawingParams params;
+    params.m_x = x;
+    params.m_y = y;
+
+    for (auto current : symbolDef->GetChildren()) {
+        if (current->Is(SVG)) {
+            Svg *svg = dynamic_cast<Svg *>(current);
+            assert(svg);
+            // Because thg Svg is a child of symbolDef we need to temporarily change the parent for the bounding boxes
+            // to be properly propagated in the device context
+            svg->ReplaceParentTemporarily(parent);
+            this->DrawSvg(dc, svg, params);
+            svg->ReplaceParentTemporarily(symbolDef);
+        }
+    }
 }
 
 } // namespace vrv

@@ -24,6 +24,7 @@
 #include "runningelement.h"
 #include "sb.h"
 #include "section.h"
+#include "symboldef.h"
 #include "system.h"
 #include "vrv.h"
 
@@ -147,6 +148,14 @@ bool Score::ScoreDefNeedsOptimization(int optionCondense) const
     }
 
     return optimize;
+}
+
+SymbolDef *Score::FindSymbol(const std::string &glyphUri)
+{
+    std::string id = ExtractIDFragment(glyphUri);
+    Object *symbolDef = m_scoreDef.FindDescendantByID(id);
+    if (!symbolDef || !symbolDef->Is(SYMBOLDEF)) return NULL;
+    return vrv_cast<SymbolDef *>(symbolDef);
 }
 
 //----------------------------------------------------------------------------

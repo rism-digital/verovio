@@ -16,6 +16,8 @@
 
 namespace vrv {
 
+class SymbolDef;
+
 //----------------------------------------------------------------------------
 // Score
 //----------------------------------------------------------------------------
@@ -71,6 +73,13 @@ public:
      * Check whether we need to optimize score based on the condense option
      */
     bool ScoreDefNeedsOptimization(int optionCondense) const;
+
+    /**
+     * Find in the scoreDef/scoreDefTable of the score a symbolDef with the corresponding glyphUri.
+     * The glyphUri must be the `#xml:id` of the symbolDef.
+     * Return NULL if nothing found.
+     */
+    SymbolDef *FindSymbol(const std::string &glyphUri);
 
     //----------//
     // Functors //

@@ -45,10 +45,12 @@
 #include "pitchinflection.h"
 #include "reh.h"
 #include "rend.h"
+#include "score.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
 #include "syl.h"
+#include "symboldef.h"
 #include "system.h"
 #include "tempo.h"
 #include "text.h"
@@ -1808,6 +1810,11 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
 
     dc->StartGraphic(fermata, "", fermata->GetID());
 
+    SymbolDef *symbolDef = NULL;
+    if (fermata->HasGlyphUri()) {
+        symbolDef = m_doc->GetCurrentScore()->FindSymbol(fermata->GetGlyphUri());
+    }
+
     const char32_t code = fermata->GetFermataGlyph();
     char32_t enclosingFront, enclosingBack;
     std::tie(enclosingFront, enclosingBack) = fermata->GetEnclosingGlyphs();
@@ -1854,7 +1861,12 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
                 staff->m_drawingStaffSize, drawingCueSize);
         }
 
-        this->DrawSmuflCode(dc, x - xCorr, y, code, staff->m_drawingStaffSize, drawingCueSize);
+        if (symbolDef) {
+            this->DrawSymbolDef(dc, fermata, symbolDef, x, y, staff->m_drawingStaffSize, drawingCueSize);
+        }
+        else {
+            this->DrawSmuflCode(dc, x - xCorr, y, code, staff->m_drawingStaffSize, drawingCueSize);
+        }
 
         if (enclosingBack) {
             const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3;

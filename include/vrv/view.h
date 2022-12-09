@@ -72,6 +72,7 @@ class Svg;
 class Syl;
 class Syllable;
 class Symbol;
+class SymbolDef;
 class System;
 class SystemElement;
 class Tempo;
@@ -572,6 +573,8 @@ protected:
     void DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, int width, int offset, int bracketWidth,
         int horizontalThickness, int verticalThickness);
     void DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int barlineWidth, int interval);
+    void DrawSymbolDef(
+        DeviceContext *dc, Object *parent, SymbolDef *symbolDef, int x, int y, int staffSize, bool dimin);
     ///@}
 
     /**
