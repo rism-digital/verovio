@@ -621,6 +621,7 @@ public:
     OptionIntMap m_footer;
     OptionIntMap m_header;
     OptionBool m_humType;
+    OptionBool m_incip;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
     OptionBool m_ligatureAsBracket;

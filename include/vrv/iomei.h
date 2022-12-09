@@ -596,6 +596,7 @@ public:
 
 private:
     bool ReadDoc(pugi::xml_node root);
+    bool ReadIncipits(pugi::xml_node root);
 
     ///@{
     bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);

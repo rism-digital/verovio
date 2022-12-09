@@ -248,8 +248,11 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
     if (data[0] == '*' || data[0] == '!') {
         return HUMDRUM;
     }
-    if (data[0] == 'X' || data[0] == '%') {
+    if (data[0] == 'X') {
         return ABC;
+    }
+    if (data[0] == '%' && data.size() > 1) {
+        return (data[1] == 'a') ? ABC : PAE;
     }
     if ((unsigned char)data[0] == 0xff || (unsigned char)data[0] == 0xfe) {
         // Handle UTF-16 content here later.

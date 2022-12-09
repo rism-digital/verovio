@@ -1016,6 +1016,10 @@ Options::Options()
     m_humType.Init(false);
     this->Register(&m_humType, "humType", &m_general);
 
+    m_incip.SetInfo("Incip", "Read <incip> elements as data input");
+    m_incip.Init(false);
+    this->Register(&m_incip, "incip", &m_general);
+
     m_justifyVertically.SetInfo("Justify vertically", "Justify spacing vertically to fill the page");
     m_justifyVertically.Init(false);
     this->Register(&m_justifyVertically, "justifyVertically", &m_general);
