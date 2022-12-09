@@ -1,7 +1,10 @@
 # Changelog
 
 ## [unreleased]
+* Support for `incip` with MEI and PAE format (with --incip option)
+* Support for single-line Plaine and Easie input
 * Support for `@extender` lines on `tempo` (@eNote-GmBH)
+* Option --unit changed to double
 
 ## [3.13.1] - 2022-11-28
 * Fix text music font always falling back to Leipzig
