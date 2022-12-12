@@ -403,7 +403,7 @@ void BBoxDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, 
 
 void BBoxDeviceContext::DrawSpline(int n, Point points[]) {}
 
-void BBoxDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg)
+void BBoxDeviceContext::DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg)
 {
     this->DrawRoundedRectangle(x, y, width, height, 0);
 }

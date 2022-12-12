@@ -424,7 +424,7 @@ void View::DrawSymbolDef(
         if (current->Is(SVG)) {
             Svg *svg = dynamic_cast<Svg *>(current);
             assert(svg);
-            this->DrawSvg(dc, svg, params);
+            this->DrawSvg(dc, svg, params, staffSize, dimin);
         }
     }
 

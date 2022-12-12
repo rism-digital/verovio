@@ -85,7 +85,7 @@ public:
         int width = VRV_UNSET, int height = VRV_UNSET) override;
     void DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph = false) override;
     void DrawSpline(int n, Point points[]) override;
-    void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) override;
+    void DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg) override;
     void DrawBackgroundImage(int x = 0, int y = 0) override{};
     ///@}
 

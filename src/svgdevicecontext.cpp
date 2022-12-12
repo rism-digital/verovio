@@ -1059,10 +1059,11 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
 
 void SvgDeviceContext::DrawSpline(int n, Point points[]) {}
 
-void SvgDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg)
+void SvgDeviceContext::DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg)
 {
     m_currentNode.append_attribute("transform")
-        = StringFormat("translate(%d, %d) scale(%d, %d)", x, y, DEFINITION_FACTOR, DEFINITION_FACTOR).c_str();
+        = StringFormat("translate(%d, %d) scale(%f, %f)", x, y, scale * DEFINITION_FACTOR, scale * DEFINITION_FACTOR)
+              .c_str();
 
     for (pugi::xml_node child : svg.children()) {
         m_currentNode.append_copy(child);

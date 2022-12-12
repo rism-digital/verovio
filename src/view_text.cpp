@@ -352,7 +352,7 @@ void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)
     if (svg) {
         params.m_x = fig->GetDrawingX();
         params.m_y = fig->GetDrawingY();
-        this->DrawSvg(dc, svg, params);
+        this->DrawSvg(dc, svg, params, 100, false);
     }
 
     dc->EndGraphic(fig, this);
@@ -518,15 +518,29 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     dc->EndTextGraphic(text, this);
 }
 
-void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params)
+void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params, int staffSize, bool dimin)
 {
     assert(dc);
     assert(svg);
 
     dc->StartGraphic(svg, "", svg->GetID());
 
-    dc->DrawSvgShape(
-        ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), svg->GetWidth(), svg->GetHeight(), svg->Get());
+    int width = svg->GetWidth();
+    int height = svg->GetHeight();
+    double scale = 1.0;
+
+    if (staffSize != 100) {
+        width = width * staffSize / 100;
+        height = height * staffSize / 100;
+        scale = scale * staffSize / 100;
+    }
+    if (dimin) {
+        width = width * m_options->m_graceFactor.GetValue();
+        height = height * m_options->m_graceFactor.GetValue();
+        scale = scale * m_options->m_graceFactor.GetValue();
+    }
+
+    dc->DrawSvgShape(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), width, height, scale, svg->Get());
 
     dc->EndGraphic(svg, this);
 }
