@@ -751,6 +751,18 @@
 		4DEC4DDC21C8295700D1D273 /* choice.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEC4DCF21C8295700D1D273 /* choice.h */; };
 		4DEC4DDD21C8295700D1D273 /* corr.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEC4DD021C8295700D1D273 /* corr.h */; };
 		4DEC4DDE21C8295700D1D273 /* lem.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEC4DD121C8295700D1D273 /* lem.h */; };
+		4DED4F17294733140073E504 /* altsyminterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DED4F16294733140073E504 /* altsyminterface.cpp */; };
+		4DED4F18294733140073E504 /* altsyminterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DED4F16294733140073E504 /* altsyminterface.cpp */; };
+		4DED4F19294733140073E504 /* altsyminterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DED4F16294733140073E504 /* altsyminterface.cpp */; };
+		4DED4F1A294733140073E504 /* altsyminterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DED4F16294733140073E504 /* altsyminterface.cpp */; };
+		4DED4F1C294733280073E504 /* altsyminterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DED4F1B294733280073E504 /* altsyminterface.h */; };
+		4DED4F1D294733280073E504 /* altsyminterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DED4F1B294733280073E504 /* altsyminterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DED4F1E29473B800073E504 /* atts_usersymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2881C18DE270069E8C8 /* atts_usersymbols.cpp */; };
+		4DED4F1F29473B810073E504 /* atts_usersymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2881C18DE270069E8C8 /* atts_usersymbols.cpp */; };
+		4DED4F2029473B820073E504 /* atts_usersymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2881C18DE270069E8C8 /* atts_usersymbols.cpp */; };
+		4DED4F2129473B820073E504 /* atts_usersymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2881C18DE270069E8C8 /* atts_usersymbols.cpp */; };
+		4DED4F2229473B860073E504 /* atts_usersymbols.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9D2891C18DE270069E8C8 /* atts_usersymbols.h */; };
+		4DED4F2329473B870073E504 /* atts_usersymbols.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9D2891C18DE270069E8C8 /* atts_usersymbols.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
 		4DEEDE641E617C930087E8BC /* elementpart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEEDE631E617C930087E8BC /* elementpart.cpp */; };
 		4DEF8A6221B7AACC0093A76B /* f.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEF8A6121B7AACC0093A76B /* f.h */; };
@@ -1649,6 +1661,8 @@
 		4DEC4DCF21C8295700D1D273 /* choice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = choice.h; path = include/vrv/choice.h; sourceTree = "<group>"; };
 		4DEC4DD021C8295700D1D273 /* corr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = corr.h; path = include/vrv/corr.h; sourceTree = "<group>"; };
 		4DEC4DD121C8295700D1D273 /* lem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lem.h; path = include/vrv/lem.h; sourceTree = "<group>"; };
+		4DED4F16294733140073E504 /* altsyminterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = altsyminterface.cpp; path = src/altsyminterface.cpp; sourceTree = "<group>"; };
+		4DED4F1B294733280073E504 /* altsyminterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = altsyminterface.h; path = include/vrv/altsyminterface.h; sourceTree = "<group>"; };
 		4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_cmn.cpp; path = libmei/atts_cmn.cpp; sourceTree = "<group>"; };
 		4DEE28F01940BCC100C76319 /* atts_cmn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_cmn.h; path = libmei/atts_cmn.h; sourceTree = "<group>"; };
 		4DEE28F11940BCC100C76319 /* atts_cmnornaments.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_cmnornaments.cpp; path = libmei/atts_cmnornaments.cpp; sourceTree = "<group>"; };
@@ -2074,6 +2088,8 @@
 		4DC34B9E19BC33A0006175CD /* interfaces */ = {
 			isa = PBXGroup;
 			children = (
+				4DED4F16294733140073E504 /* altsyminterface.cpp */,
+				4DED4F1B294733280073E504 /* altsyminterface.h */,
 				4DB3D8A61F828EA900B5FC2B /* areaposinterface.cpp */,
 				4DB3D8A41F828E9100B5FC2B /* areaposinterface.h */,
 				4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */,
@@ -2537,6 +2553,7 @@
 				4D50B53A1C1B40C90081D56E /* atttypes.h in Headers */,
 				8F59293718854BF800FE51AD /* bboxdevicecontext.h in Headers */,
 				8F59293818854BF800FE51AD /* beam.h in Headers */,
+				4DED4F2229473B860073E504 /* atts_usersymbols.h in Headers */,
 				4D6331F31F46D2B400A0D6BF /* arpeg.h in Headers */,
 				4DB3D8D81F83D13900B5FC2B /* trill.h in Headers */,
 				4D1BE7801C69434C0086DC0E /* MidiEvent.h in Headers */,
@@ -2578,6 +2595,7 @@
 				35FDEBCE24B6DBC100AC1696 /* fing.h in Headers */,
 				4DEC4DDB21C8295700D1D273 /* sic.h in Headers */,
 				4DB3D8D41F83D12600B5FC2B /* pedal.h in Headers */,
+				4DED4F1C294733280073E504 /* altsyminterface.h in Headers */,
 				4DB3D8BA1F83D0CA00B5FC2B /* systemmilestone.h in Headers */,
 				4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */,
 				40C2E4202052A6E90003625F /* sb.h in Headers */,
@@ -2945,6 +2963,7 @@
 				4DA0EABE22BB772C00A7EBEB /* atts_neumes.h in Headers */,
 				BB4C4B2222A932CF001F6AF0 /* dir.h in Headers */,
 				BB4C4B3C22A932D7001F6AF0 /* accid.h in Headers */,
+				4DED4F2329473B870073E504 /* atts_usersymbols.h in Headers */,
 				BB4C4B5622A932D7001F6AF0 /* keysig.h in Headers */,
 				BB4C4B1022A932C8001F6AF0 /* ending.h in Headers */,
 				BB4C4BBD22A932FC001F6AF0 /* MidiEventList.h in Headers */,
@@ -2956,6 +2975,7 @@
 				BB4C4BA222A932E5001F6AF0 /* scoredefinterface.h in Headers */,
 				BB4C4AA922A932A0001F6AF0 /* devicecontext.h in Headers */,
 				BD6E5C40290007CE0039B0F1 /* graphic.h in Headers */,
+				4DED4F1D294733280073E504 /* altsyminterface.h in Headers */,
 				BB4C4A9D22A9328F001F6AF0 /* options.h in Headers */,
 				BB4C4A6322A9321F001F6AF0 /* atts_cmn.h in Headers */,
 				BBC19FBF22B37CA000100F42 /* all.h in Headers */,
@@ -3177,6 +3197,7 @@
 				4D1694091E3A44F300569BF4 /* atts_critapp.cpp in Sources */,
 				4D16940A1E3A44F300569BF4 /* fermata.cpp in Sources */,
 				4DB3D8981F7C325C00B5FC2B /* lb.cpp in Sources */,
+				4DED4F18294733140073E504 /* altsyminterface.cpp in Sources */,
 				4DEF8A6521B7AAF90093A76B /* f.cpp in Sources */,
 				4D2073F922A3BCE000E0765F /* tabdursym.cpp in Sources */,
 				4D16940B1E3A44F300569BF4 /* keysig.cpp in Sources */,
@@ -3219,6 +3240,7 @@
 				4DEC4D9321C81E0B00D1D273 /* del.cpp in Sources */,
 				4D508C3126D4E64C00020F35 /* crc.cpp in Sources */,
 				4D16941C1E3A44F300569BF4 /* ending.cpp in Sources */,
+				4DED4F1F29473B810073E504 /* atts_usersymbols.cpp in Sources */,
 				4DEC4DB721C8270100D1D273 /* unclear.cpp in Sources */,
 				4D16941D1E3A44F300569BF4 /* dir.cpp in Sources */,
 				4DEC4D8F21C81DEE00D1D273 /* damage.cpp in Sources */,
@@ -3407,6 +3429,7 @@
 				4DEC4D9A21C81E6600D1D273 /* lem.cpp in Sources */,
 				1579B3431B15033100B16F5C /* proport.cpp in Sources */,
 				8F086EF3188539540037FD8E /* layerelement.cpp in Sources */,
+				4DED4F17294733140073E504 /* altsyminterface.cpp in Sources */,
 				402197941F2E09DA00182DF1 /* ioabc.cpp in Sources */,
 				4D6331F51F46D2CB00A0D6BF /* arpeg.cpp in Sources */,
 				4DF4407D1D511D0200152B7E /* systemmilestone.cpp in Sources */,
@@ -3427,6 +3450,7 @@
 				4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				4D6122BE1F77E1E000FC90A0 /* rend.cpp in Sources */,
+				4DED4F1E29473B800073E504 /* atts_usersymbols.cpp in Sources */,
 				403BEFF0206C00B500D022D5 /* multirpt.cpp in Sources */,
 				4D766EFA20ACAD63006875D8 /* syllable.cpp in Sources */,
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
@@ -3624,6 +3648,7 @@
 				4DB3D8D51F83D12B00B5FC2B /* tempo.cpp in Sources */,
 				4DEC4DA021C81E9400D1D273 /* orig.cpp in Sources */,
 				8F3DD33E18854B2E0051330C /* beam.cpp in Sources */,
+				4DED4F19294733140073E504 /* altsyminterface.cpp in Sources */,
 				4D4C26F01EF7E75E00681770 /* score.cpp in Sources */,
 				8F3DD34018854B2E0051330C /* clef.cpp in Sources */,
 				8F3DD34218854B2E0051330C /* durationinterface.cpp in Sources */,
@@ -3666,6 +3691,7 @@
 				403BEFF2206C00D700D022D5 /* mrpt2.cpp in Sources */,
 				4D508C3226D4E64C00020F35 /* crc.cpp in Sources */,
 				4DA0EAF822BB78E200A7EBEB /* atts_facsimile.cpp in Sources */,
+				4DED4F2029473B820073E504 /* atts_usersymbols.cpp in Sources */,
 				8F3DD34E18854B2E0051330C /* pitchinterface.cpp in Sources */,
 				4DC12A861F741110000440E9 /* pgfoot2.cpp in Sources */,
 				4DA1448B1C2AB28700CB7CEE /* textelement.cpp in Sources */,
@@ -3848,6 +3874,7 @@
 				BB4C4B6522A932D7001F6AF0 /* multirest.cpp in Sources */,
 				BB4C4AB322A932A6001F6AF0 /* iohumdrum.cpp in Sources */,
 				BB4C4AD722A932B6001F6AF0 /* staff.cpp in Sources */,
+				4DED4F1A294733140073E504 /* altsyminterface.cpp in Sources */,
 				BB4C4B9F22A932E5001F6AF0 /* positioninterface.cpp in Sources */,
 				BB4C4A6422A9321F001F6AF0 /* atts_cmnornaments.cpp in Sources */,
 				BB4C4B5322A932D7001F6AF0 /* halfmrpt.cpp in Sources */,
@@ -3890,6 +3917,7 @@
 				4DA0EAF922BB78E200A7EBEB /* atts_facsimile.cpp in Sources */,
 				4D508C3326D4E64C00020F35 /* crc.cpp in Sources */,
 				BB4C4A9A22A9328F001F6AF0 /* object.cpp in Sources */,
+				4DED4F2129473B820073E504 /* atts_usersymbols.cpp in Sources */,
 				BB4C4B4722A932D7001F6AF0 /* chord.cpp in Sources */,
 				BB4C4A7822A9321F001F6AF0 /* atts_mei.cpp in Sources */,
 				BB4C4AF122A932BC001F6AF0 /* orig.cpp in Sources */,

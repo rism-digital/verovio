@@ -66,7 +66,7 @@ public:
     static bool SetPagebased(Object *element, const std::string &attrType, const std::string &attrValue);
     // static bool SetPerformance(Object *element, const std::string &attrType, const std::string &attrValue);
     static bool SetShared(Object *element, const std::string &attrType, const std::string &attrValue);
-    // static bool SetUsersymbols(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetUsersymbols(Object *element, const std::string &attrType, const std::string &attrValue);
     static bool SetVisual(Object *element, const std::string &attrType, const std::string &attrValue);
 
     /**
@@ -92,7 +92,7 @@ public:
     static void GetPagebased(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetPerformance(const Object *element, ArrayOfStrAttr *attributes);
     static void GetShared(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes);
     static void GetVisual(const Object *element, ArrayOfStrAttr *attributes);
     ///@}
 

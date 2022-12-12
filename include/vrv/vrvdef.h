@@ -278,6 +278,7 @@ enum ClassId : uint16_t {
  */
 enum InterfaceId {
     INTERFACE,
+    INTERFACE_ALT_SYM,
     INTERFACE_AREA_POS,
     INTERFACE_BOUNDARY,
     INTERFACE_DURATION,
