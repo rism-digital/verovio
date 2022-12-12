@@ -72,6 +72,12 @@ def getExpansionIdsForElement(toolkit, xml_id):
     return json.loads($action(toolkit, xml_id))
 %}
 
+// Toolkit::GetMEI
+%feature("shadow") vrv::Toolkit::GetMEI(const std::string & = "") %{
+def getMEI(toolkit, options = ""):
+    return $action(toolkit, json.dumps(options))
+%}
+
 // Toolkit::GetMIDIValuesForElement
 %feature("shadow") vrv::Toolkit::GetMIDIValuesForElement(const std::string &) %{
 def getMIDIValuesForElement(toolkit, xml_id):
@@ -97,8 +103,8 @@ def getTimesForElement(toolkit, xml_id):
 %}
 
 // Toolkit::RedoLayout
-%feature("shadow") vrv::Toolkit::RedoLayout(const std::string &) %{
-def redoLayout(toolkit, options = {}):
+%feature("shadow") vrv::Toolkit::RedoLayout(const std::string & = "") %{
+def redoLayout(toolkit, options = ""):
     return $action(toolkit, json.dumps(options))
 %}
 
@@ -115,9 +121,21 @@ def renderToMIDI(toolkit, options):
 %}
 
 // Toolkit::RenderToTimemap
-%feature("shadow") vrv::Toolkit::RenderToTimemap(const std::string &) %{
-def renderToTimemap(toolkit, options = {}):
+%feature("shadow") vrv::Toolkit::RenderToTimemap(const std::string & = "") %{
+def renderToTimemap(toolkit, options = ""):
     return json.loads($action(toolkit, json.dumps(options)))
+%}
+
+// Toolkit::RenderToTimemapFile
+%feature("shadow") vrv::Toolkit::RenderToTimemapFile(const std::string &, const std::string & = "") %{
+def renderToTimemapFile(toolkit, filename, options = ""):
+    return json.loads($action(toolkit, filename, json.dumps(options)))
+%}
+
+// Toolkit::SaveFile
+%feature("shadow") vrv::Toolkit::SaveFile(const std::string &, const std::string & = "") %{
+def saveFile(toolkit, filename, options = ""):
+    return json.loads($action(toolkit, filename, json.dumps(options)))
 %}
 
 // Toolkit::Select

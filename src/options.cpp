@@ -239,12 +239,13 @@ void OptionDbl::CopyTo(Option *option)
     *child = *this;
 }
 
-void OptionDbl::Init(double defaultValue, double minValue, double maxValue)
+void OptionDbl::Init(double defaultValue, double minValue, double maxValue, bool definitionFactor)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
     m_minValue = minValue;
     m_maxValue = maxValue;
+    m_definitionFactor = definitionFactor;
 }
 
 bool OptionDbl::SetValue(const std::string &value)
@@ -265,6 +266,16 @@ std::string OptionDbl::GetDefaultStrValue() const
 bool OptionDbl::SetValueDbl(double value)
 {
     return this->SetValue(value);
+}
+
+double OptionDbl::GetValue() const
+{
+    return (m_definitionFactor) ? m_value * DEFINITION_FACTOR : m_value;
+}
+
+double OptionDbl::GetUnfactoredValue() const
+{
+    return m_value;
 }
 
 bool OptionDbl::SetValue(double value)
@@ -897,7 +908,7 @@ Options::Options()
 
     m_logLevel.SetInfo("Log level", "Set the log level: \"off\", \"error\", \"warning\", \"info\", or \"debug\"");
     m_logLevel.Init("warning");
-    m_logLevel.SetKey("log-level");
+    m_logLevel.SetKey("logLevel");
     m_logLevel.SetShortOption('l', true);
     m_baseOptions.AddOption(&m_logLevel);
 
@@ -1004,6 +1015,10 @@ Options::Options()
     m_humType.SetInfo("Humdrum type", "Include type attributes when importing from Humdrum");
     m_humType.Init(false);
     this->Register(&m_humType, "humType", &m_general);
+
+    m_incip.SetInfo("Incip", "Read <incip> elements as data input");
+    m_incip.Init(false);
+    this->Register(&m_incip, "incip", &m_general);
 
     m_justifyVertically.SetInfo("Justify vertically", "Justify spacing vertically to fill the page");
     m_justifyVertically.Init(false);
@@ -1153,7 +1168,7 @@ Options::Options()
     this->Register(&m_svgAdditionalAttribute, "svgAdditionalAttribute", &m_general);
 
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
-    m_unit.Init(9, 6, 20, true);
+    m_unit.Init(9.0, 4.5, 12.0, true);
     this->Register(&m_unit, "unit", &m_general);
 
     m_useBraceGlyph.SetInfo("Use Brace Glyph", "Use brace glyph from current font");

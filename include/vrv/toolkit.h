@@ -238,28 +238,6 @@ public:
     bool SetOptions(const std::string &jsonOptions);
 
     /**
-     * Get the value for an option
-     *
-     * @remark nojs
-     *
-     * @param option The name of the option
-     * @param defaultValue True to get the default value of the option
-     * @return The option value as a string
-     */
-    std::string GetOption(const std::string &option, bool defaultValue = false) const;
-
-    /**
-     * Set the value for an option
-     *
-     * @remark nojs
-     *
-     * @param option The name of the option
-     * @param value The option value as string
-     * @return True if the option was successfully set
-     */
-    bool SetOption(const std::string &option, const std::string &value);
-
-    /**
      * Reset all options to default values
      */
     void ResetOptions();
@@ -718,8 +696,7 @@ public:
     /**
      * @ingroup nodoc
      */
-    void SetInputFrom(FileFormat format) { m_inputFrom = format; }
-
+    void SetInputFrom(FileFormat format);
     /**
      * Get the input format.
      *

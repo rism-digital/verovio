@@ -6908,7 +6908,7 @@ AttTimestampLog::~AttTimestampLog() {}
 
 void AttTimestampLog::ResetTimestampLog()
 {
-    m_tstamp = 0.0;
+    m_tstamp = -1.0;
 }
 
 bool AttTimestampLog::ReadTimestampLog(pugi::xml_node element)
@@ -6934,7 +6934,7 @@ bool AttTimestampLog::WriteTimestampLog(pugi::xml_node element)
 
 bool AttTimestampLog::HasTstamp() const
 {
-    return (m_tstamp != 0.0);
+    return (m_tstamp != -1.0);
 }
 
 /* include <atttstamp> */

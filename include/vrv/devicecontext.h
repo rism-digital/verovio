@@ -155,6 +155,7 @@ public:
      */
     ///@{
     FontInfo *GetFont();
+    bool HasFont() const { return !m_fontStack.empty(); }
     ///@}
 
     /**

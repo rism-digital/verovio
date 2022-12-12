@@ -30,6 +30,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "systemmilestone.h"
+#include "tempo.h"
 #include "trill.h"
 #include "verse.h"
 #include "vrv.h"
@@ -335,6 +336,13 @@ void System::AddToDrawingListIfNecessary(Object *object)
         assert(pedal);
         if (pedal->GetEnd()) {
             this->AddToDrawingList(pedal);
+        }
+    }
+    else if (object->Is(TEMPO)) {
+        Tempo *tempo = vrv_cast<Tempo *>(object);
+        assert(tempo);
+        if (tempo->GetEnd() && (tempo->GetExtender() == BOOLEAN_true)) {
+            this->AddToDrawingList(tempo);
         }
     }
     else if (object->Is(TRILL)) {

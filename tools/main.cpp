@@ -330,15 +330,6 @@ int main(int argc, char **argv)
                     continue;
                 }
 
-                // Handle deprecated options
-                /*
-                if (key == "condense-encoded") {
-                    vrv::LogWarning("Option --condense-encoded is deprecated; use --condense encoded instead");
-                    options->m_condense.SetValue("encoded");
-                    break;
-                }
-                */
-
                 if (optBool) {
                     optBool->SetValue(true);
                 }
@@ -445,15 +436,11 @@ int main(int argc, char **argv)
     }
 
     // Load a specified font
-    if (!toolkit.SetOption("font", options->m_font.GetValue())) {
+    if (!toolkit.SetOptions(vrv::StringFormat("{\"font\": \"%s\" }", options->m_font.GetValue().c_str()))) {
         std::cerr << "Font '" << options->m_font.GetValue() << "' could not be loaded." << std::endl;
         exit(1);
     }
 
-    if (outformat == "pb-mei") {
-        outformat = "mei-pb";
-        vrv::LogWarning("Output to 'pb-mei' is deprecated, use 'mei-pb' instead.");
-    }
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "mei-basic") && (outformat != "mei-pb")
         && (outformat != "midi") && (outformat != "timemap") && (outformat != "humdrum") && (outformat != "hum")
         && (outformat != "pae")) {
