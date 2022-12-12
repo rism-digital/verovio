@@ -8,6 +8,7 @@
 #ifndef __VRV_ALTSYM_INTERFACE_H__
 #define __VRV_ALTSYM_INTERFACE_H__
 
+#include "att.h"
 #include "atts_usersymbols.h"
 #include "vrvdef.h"
 

@@ -15,6 +15,7 @@
 
 #include "functorparams.h"
 #include "symboldef.h"
+#include "symboltable.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -59,18 +60,20 @@ void AltSymInterface::SetIDStr()
 
 int AltSymInterface::InterfacePrepareAltSym(FunctorParams *functorParams, Object *object)
 {
-    PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
+    PrepareAltSymParams *params = vrv_params_cast<PrepareAltSymParams *>(functorParams);
     assert(params);
-
-    // This should not happen?
-    if (params->m_fillList == false) {
-        return FUNCTOR_CONTINUE;
-    }
 
     this->SetIDStr();
 
     if (!m_symbolDefID.empty()) {
-        // TODO
+        Object *symbolDef = NULL;
+        if (params->m_symbolTable) symbolDef = params->m_symbolTable->FindDescendantByID(m_symbolDefID);
+
+        if (!symbolDef || !symbolDef->Is(SYMBOLDEF)) {
+            LogWarning("Reference to the symbolDef `%s` could not be resovled", m_symbolDefID.c_str());
+            return FUNCTOR_CONTINUE;
+        }
+        this->m_symbolDef = vrv_cast<SymbolDef *>(symbolDef);
     }
 
     return FUNCTOR_CONTINUE;
