@@ -25,6 +25,7 @@ namespace vrv {
 class Abbr;
 class Accid;
 class Add;
+class AltSymInterface;
 class AnchoredText;
 class Annot;
 class App;
@@ -516,6 +517,7 @@ private:
     void WriteSystemElement(pugi::xml_node element, SystemElement *object);
     void WriteTextElement(pugi::xml_node element, TextElement *object);
     //
+    void WriteAltSymInterface(pugi::xml_node currentNode, AltSymInterface *interface);
     void WriteAreaPosInterface(pugi::xml_node currentNode, AreaPosInterface *interface);
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
     void WriteLinkingInterface(pugi::xml_node currentNode, LinkingInterface *interface);
@@ -810,6 +812,7 @@ private:
     bool ReadSystemElement(pugi::xml_node element, SystemElement *object);
     bool ReadTextElement(pugi::xml_node element, TextElement *object);
 
+    bool ReadAltSymInterface(pugi::xml_node element, AltSymInterface *interface);
     bool ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface);
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface);

@@ -8,6 +8,7 @@
 #ifndef __VRV_FERMATA_H__
 #define __VRV_FERMATA_H__
 
+#include "altsyminterface.h"
 #include "atts_cmn.h"
 #include "atts_externalsymbols.h"
 #include "atts_visual.h"
@@ -26,6 +27,7 @@ class ConvertMarkupAnalyticalParams;
  * This class models the MEI <fermata> element.
  */
 class Fermata : public ControlElement,
+                public AltSymInterface,
                 public TimePointInterface,
                 public AttColor,
                 public AttEnclosingChars,
@@ -49,6 +51,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    AltSymInterface *GetAltSymInterface() override { return vrv_cast<AltSymInterface *>(this); }
+    const AltSymInterface *GetAltSymInterface() const override { return vrv_cast<const AltSymInterface *>(this); }
     TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
     const TimePointInterface *GetTimePointInterface() const override
     {

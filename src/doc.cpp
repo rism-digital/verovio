@@ -785,6 +785,13 @@ void Doc::PrepareData()
     Functor prepareCueSize(&Object::PrepareCueSize);
     this->Process(&prepareCueSize, NULL);
 
+    /************ Resolve @altsym ************/
+
+    // Try to match all pointing elements using @next, @sameas and @stem.sameas
+    PrepareAltSymParams prepareAltSymParams;
+    Functor prepareAltSym(&Object::PrepareAltSym);
+    this->Process(&prepareAltSym, &prepareAltSymParams);
+
     /************ Instanciate LayerElement parts (stemp, flag, dots, etc) ************/
 
     Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);

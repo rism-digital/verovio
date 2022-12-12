@@ -17,6 +17,7 @@
 #include "abbr.h"
 #include "accid.h"
 #include "add.h"
+#include "altsyminterface.h"
 #include "anchoredtext.h"
 #include "annot.h"
 #include "app.h"
@@ -2002,6 +2003,7 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     assert(fermata);
 
     this->WriteControlElement(currentNode, fermata);
+    this->WriteAltSymInterface(currentNode, fermata);
     this->WriteTimePointInterface(currentNode, fermata);
     fermata->WriteColor(currentNode);
     fermata->WriteEnclosingChars(currentNode);
@@ -2911,6 +2913,13 @@ void MEIOutput::WriteText(pugi::xml_node element, Text *text)
             nodechild.text() = UTF32to8(text->GetText()).c_str();
         }
     }
+}
+
+void MEIOutput::WriteAltSymInterface(pugi::xml_node element, AltSymInterface *interface)
+{
+    assert(interface);
+
+    interface->WriteAltSym(element);
 }
 
 void MEIOutput::WriteAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface)
@@ -5421,6 +5430,7 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
     Fermata *vrvFermata = new Fermata();
     this->ReadControlElement(fermata, vrvFermata);
 
+    this->ReadAltSymInterface(fermata, vrvFermata);
     this->ReadTimePointInterface(fermata, vrvFermata);
     vrvFermata->ReadColor(fermata);
     vrvFermata->ReadEnclosingChars(fermata);
@@ -6928,6 +6938,12 @@ bool MEIInput::ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool
     vrvText->SetText(str);
 
     parent->AddChild(vrvText);
+    return true;
+}
+
+bool MEIInput::ReadAltSymInterface(pugi::xml_node element, AltSymInterface *interface)
+{
+    interface->ReadAltSym(element);
     return true;
 }
 
