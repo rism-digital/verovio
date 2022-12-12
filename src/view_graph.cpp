@@ -416,17 +416,19 @@ void View::DrawSymbolDef(
     params.m_x = x;
     params.m_y = y;
 
+    // Because thg Svg is a child of symbolDef we need to temporarily change the parent for the bounding boxes
+    // to be properly propagated in the device context
+    symbolDef->SetTemporaryParent(parent);
+
     for (auto current : symbolDef->GetChildren()) {
         if (current->Is(SVG)) {
             Svg *svg = dynamic_cast<Svg *>(current);
             assert(svg);
-            // Because thg Svg is a child of symbolDef we need to temporarily change the parent for the bounding boxes
-            // to be properly propagated in the device context
-            svg->ReplaceParentTemporarily(parent);
             this->DrawSvg(dc, svg, params);
-            svg->ReplaceParentTemporarily(symbolDef);
         }
     }
+
+    symbolDef->ResetTemporaryParent();
 }
 
 } // namespace vrv

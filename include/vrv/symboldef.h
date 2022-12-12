@@ -36,13 +36,25 @@ public:
     ///@{
     bool IsSupportedChild(Object *object) override;
     ///@}
+    ///
+
+    /**
+     * @name Set or reset a temporary parent for the SymbolDef.
+     * This should be used only in very specific temporary operations because the ownership is not changed.
+     * It means that the parent must be replaced back.
+     */
+    ///@{
+    void SetTemporaryParent(Object *parent);
+    void ResetTemporaryParent();
+    ///@}
 
 private:
     //
 public:
     //
 private:
-    //
+    /** The original parent for when a temporary parent is set */
+    Object *m_originalParent;
 };
 
 } // namespace vrv

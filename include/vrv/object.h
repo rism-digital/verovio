@@ -351,14 +351,6 @@ public:
     void SetParent(Object *parent);
 
     /**
-     * Replace the parent of the Object.
-     * The current parent is expected not to be NULL.
-     * This should be used only in very specific temporary operations because the ownership is not changed.
-     * It means that the parent must be replaced back.
-     */
-    void ReplaceParentTemporarily(Object *parent);
-
-    /**
      * Reset the parent of the Object.
      * The current parent is not expected to be NULL.
      */

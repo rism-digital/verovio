@@ -789,12 +789,6 @@ void Object::SetParent(Object *parent)
     m_parent = parent;
 }
 
-void Object::ReplaceParentTemporarily(Object *parent)
-{
-    assert(m_parent);
-    m_parent = parent;
-}
-
 bool Object::IsSupportedChild(Object *child)
 {
     // This should never happen because the method should be overridden

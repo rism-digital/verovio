@@ -34,6 +34,8 @@ SymbolDef::~SymbolDef() {}
 void SymbolDef::Reset()
 {
     Object::Reset();
+
+    m_originalParent = NULL;
 }
 
 bool SymbolDef::IsSupportedChild(Object *child)
@@ -45,6 +47,22 @@ bool SymbolDef::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+void SymbolDef::SetTemporaryParent(Object *parent)
+{
+    assert(GetParent() && !m_originalParent);
+    m_originalParent = this->GetParent();
+    this->ResetParent();
+    this->SetParent(parent);
+}
+
+void SymbolDef::ResetTemporaryParent()
+{
+    assert(GetParent() && m_originalParent);
+    this->ResetParent();
+    this->SetParent(m_originalParent);
+    m_originalParent = NULL;
 }
 
 } // namespace vrv
