@@ -1811,8 +1811,8 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     dc->StartGraphic(fermata, "", fermata->GetID());
 
     SymbolDef *symbolDef = NULL;
-    if (fermata->HasGlyphUri()) {
-        symbolDef = m_doc->GetCurrentScore()->FindSymbol(fermata->GetGlyphUri());
+    if (fermata->HasAltsym() && fermata->HasAltSymbolDef()) {
+        symbolDef = fermata->GetAltSymbolDef();
     }
 
     const char32_t code = fermata->GetFermataGlyph();
