@@ -72,6 +72,12 @@ def getExpansionIdsForElement(toolkit, xml_id):
     return json.loads($action(toolkit, xml_id))
 %}
 
+// Toolkit::GetMEI
+%feature("shadow") vrv::Toolkit::GetMEI(const std::string & = "") %{
+def getMEI(toolkit, options = ""):
+    return $action(toolkit, json.dumps(options))
+%}
+
 // Toolkit::GetMIDIValuesForElement
 %feature("shadow") vrv::Toolkit::GetMIDIValuesForElement(const std::string &) %{
 def getMIDIValuesForElement(toolkit, xml_id):
