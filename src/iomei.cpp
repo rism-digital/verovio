@@ -1906,6 +1906,7 @@ void MEIOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *
     assert(controlElement);
 
     this->WriteXmlId(currentNode, controlElement);
+    this->WriteAltSymInterface(currentNode, controlElement);
     this->WriteLinkingInterface(currentNode, controlElement);
     controlElement->WriteLabelled(currentNode);
     controlElement->WriteTyped(currentNode);
@@ -2010,7 +2011,6 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     assert(fermata);
 
     this->WriteControlElement(currentNode, fermata);
-    this->WriteAltSymInterface(currentNode, fermata);
     this->WriteTimePointInterface(currentNode, fermata);
     fermata->WriteColor(currentNode);
     fermata->WriteEnclosingChars(currentNode);
@@ -5371,6 +5371,7 @@ bool MEIInput::ReadMeterSigGrpChildren(Object *parent, pugi::xml_node parentNode
 bool MEIInput::ReadControlElement(pugi::xml_node element, ControlElement *object)
 {
     this->SetMeiID(element, object);
+    this->ReadAltSymInterface(element, object);
     this->ReadLinkingInterface(element, object);
     object->ReadLabelled(element);
     object->ReadTyped(element);
@@ -5509,7 +5510,6 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
     Fermata *vrvFermata = new Fermata();
     this->ReadControlElement(fermata, vrvFermata);
 
-    this->ReadAltSymInterface(fermata, vrvFermata);
     this->ReadTimePointInterface(fermata, vrvFermata);
     vrvFermata->ReadColor(fermata);
     vrvFermata->ReadEnclosingChars(fermata);
