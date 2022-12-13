@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
+#include "graphic.h"
 #include "svg.h"
 #include "vrv.h"
 
@@ -40,7 +42,10 @@ void SymbolDef::Reset()
 
 bool SymbolDef::IsSupportedChild(Object *child)
 {
-    if (child->Is(SVG)) {
+    if (child->Is(GRAPHIC)) {
+        assert(dynamic_cast<Graphic *>(child));
+    }
+    else if (child->Is(SVG)) {
         assert(dynamic_cast<Svg *>(child));
     }
     else {
