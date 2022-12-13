@@ -417,7 +417,7 @@ data_MEASUREMENTSIGNED Att::StrToMeasurementsigned(const std::string &value, boo
         data.SetPx(atoi(value.substr(0, value.find("px")).c_str()) * DEFINITION_FACTOR);
     }
     else {
-        data.SetVu(atoi(value.c_str()));
+        data.SetVu(atof(value.c_str()));
     }
 
     if (logWarning && !value.empty() && !data.HasValue())
