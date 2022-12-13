@@ -176,6 +176,7 @@ set(all_SRC
     ../libmei/atts_neumes.cpp
     ../libmei/atts_pagebased.cpp
     ../libmei/atts_shared.cpp
+    ../libmei/atts_usersymbols.cpp
     ../libmei/atts_visual.cpp
 )
 
