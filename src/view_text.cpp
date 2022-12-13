@@ -22,6 +22,7 @@
 #include "f.h"
 #include "fb.h"
 #include "fig.h"
+#include "graphic.h"
 #include "lb.h"
 #include "num.h"
 #include "options.h"
@@ -516,6 +517,26 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     resources->SelectTextFont(FONTWEIGHT_NONE, FONTSTYLE_NONE);
 
     dc->EndTextGraphic(text, this);
+}
+
+void View::DrawGraphic(DeviceContext *dc, Graphic *graphic, TextDrawingParams &params, int staffSize, bool dimin)
+{
+    assert(dc);
+    assert(graphic);
+
+    dc->StartGraphic(graphic, "", graphic->GetID());
+
+    int width = graphic->GetDrawingWidth(m_doc->GetDrawingUnit(staffSize));
+    int height = graphic->GetDrawingHeight(m_doc->GetDrawingUnit(staffSize));
+
+    if (dimin) {
+        width = width * m_options->m_graceFactor.GetValue();
+        height = height * m_options->m_graceFactor.GetValue();
+    }
+
+    dc->DrawGraphicUri(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), width, height, graphic->GetTarget());
+
+    dc->EndGraphic(graphic, this);
 }
 
 void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params, int staffSize, bool dimin)

@@ -1059,6 +1059,16 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
 
 void SvgDeviceContext::DrawSpline(int n, Point points[]) {}
 
+void SvgDeviceContext::DrawGraphicUri(int x, int y, int width, int height, const std::string &uri)
+{
+    pugi::xml_node image = m_currentNode.append_child("image");
+    image.append_attribute("xlink:href") = uri.c_str();
+    image.append_attribute("x") = StringFormat("%d", x).c_str();
+    image.append_attribute("y") = StringFormat("%d", y).c_str();
+    image.append_attribute("width") = StringFormat("%d", width).c_str();
+    image.append_attribute("height") = StringFormat("%d", height).c_str();
+}
+
 void SvgDeviceContext::DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg)
 {
     m_currentNode.append_attribute("transform")

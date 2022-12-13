@@ -194,6 +194,7 @@ public:
         = 0;
     virtual void DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
+    virtual void DrawGraphicUri(int x, int y, int width, int height, const std::string &uri) = 0;
     virtual void DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg) = 0;
     virtual void DrawBackgroundImage(int x = 0, int y = 0) = 0;
     ///@}

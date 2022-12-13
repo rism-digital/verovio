@@ -16,6 +16,7 @@
 
 #include "devicecontext.h"
 #include "doc.h"
+#include "graphic.h"
 #include "options.h"
 #include "svg.h"
 #include "symboldef.h"
@@ -416,13 +417,21 @@ void View::DrawSymbolDef(
     params.m_x = x;
     params.m_y = y;
 
+    // Because image y coordinates are inverted we need to adjust the y position
+    params.m_y += symbolDef->GetSymbolHeight(m_doc, staffSize, dimin);
+
     // Because thg Svg is a child of symbolDef we need to temporarily change the parent for the bounding boxes
     // to be properly propagated in the device context
     symbolDef->SetTemporaryParent(parent);
 
     for (auto current : symbolDef->GetChildren()) {
+        if (current->Is(GRAPHIC)) {
+            Graphic *graphic = vrv_cast<Graphic *>(current);
+            assert(graphic);
+            this->DrawGraphic(dc, graphic, params, staffSize, dimin);
+        }
         if (current->Is(SVG)) {
-            Svg *svg = dynamic_cast<Svg *>(current);
+            Svg *svg = vrv_cast<Svg *>(current);
             assert(svg);
             this->DrawSvg(dc, svg, params, staffSize, dimin);
         }

@@ -41,6 +41,7 @@ class Fing;
 class FloatingCurvePositioner;
 class Fermata;
 class Gliss;
+class Graphic;
 class Hairpin;
 class Harm;
 class KeyAccid;
@@ -385,6 +386,7 @@ protected:
     void DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params);
     void DrawNum(DeviceContext *dc, Num *num, TextDrawingParams &params);
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
+    void DrawGraphic(DeviceContext *dc, Graphic *graphic, TextDrawingParams &params, int staffSize, bool dimin);
     void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params, int staffSize, bool dimin);
     void DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
