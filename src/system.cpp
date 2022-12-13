@@ -146,7 +146,12 @@ int System::GetMinimumSystemSpacing(const Doc *doc) const
     if (!spacingSystem.IsSet()) {
         assert(m_drawingScoreDef);
         if (m_drawingScoreDef->HasSpacingSystem()) {
-            return m_drawingScoreDef->GetSpacingSystem() * doc->GetDrawingUnit(100);
+            if (m_drawingScoreDef->GetSpacingSystem().GetType() == MEASUREMENTTYPE_px) {
+                return m_drawingScoreDef->GetSpacingSystem().GetPx();
+            }
+            else {
+                return m_drawingScoreDef->GetSpacingSystem().GetVu() * doc->GetDrawingUnit(100);
+            }
         }
     }
 

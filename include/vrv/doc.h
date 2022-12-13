@@ -221,7 +221,7 @@ public:
      * Get the default distance from the staff for the object
      * The distance is given in x * MEI UNIT
      */
-    double GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition);
+    data_MEASUREMENTSIGNED GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition);
 
     /**
      * Prepare the timemap for MIDI and timemap file export.

@@ -374,8 +374,20 @@ bool FloatingPositioner::CalcDrawingYRel(
     if (horizOverlapingBBox == NULL) {
         // Apply element margin and enforce minimal staff distance
         int staffIndex = staffAlignment->GetStaff()->GetN();
-        int minStaffDistance
-            = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place) * doc->GetDrawingUnit(staffSize);
+
+        int minStaffDistance = 0.0;
+        data_MEASUREMENTSIGNED minStaffDistanceMesurement
+            = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place);
+
+        if (minStaffDistanceMesurement.HasValue()) {
+            if (minStaffDistanceMesurement.GetType() == MEASUREMENTTYPE_px) {
+                minStaffDistance = minStaffDistanceMesurement.GetPx();
+            }
+            else {
+                minStaffDistance = minStaffDistanceMesurement.GetVu() * doc->GetDrawingUnit(staffSize);
+            }
+        }
+
         if (this->GetObject()->Is(FERMATA) && (staffAlignment->GetStaff()->m_drawingLines == 1)) {
             minStaffDistance = 2.5 * doc->GetDrawingUnit(staffSize);
         }

@@ -1217,8 +1217,9 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     if (multiRest->UseBlockStyle(m_doc)) {
         // This is 1/2 the length of the black rectangle
         int width = measureWidth - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        if (multiRest->HasWidth()) {
-            const int fixedWidth = multiRest->AttWidth::GetWidth() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        if (multiRest->HasWidth() && multiRest->AttWidth::GetWidth().GetType() == MEASUREMENTTYPE_vu) {
+            const int fixedWidth
+                = multiRest->AttWidth::GetWidth().GetVu() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             width = (width > fixedWidth) ? fixedWidth : width;
         }
         if (width > m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 4) {

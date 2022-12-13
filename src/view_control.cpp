@@ -490,8 +490,11 @@ void View::DrawBracketSpan(
             }
         }
         else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
-            if (bracketSpan->GetLwidth().GetMeasurementUnsigned() != VRV_UNSET) {
-                lineWidth = bracketSpan->GetLwidth().GetMeasurementUnsigned()
+            if (bracketSpan->GetLwidth().GetMeasurementUnsigned().GetType() == MEASUREMENTTYPE_px) {
+                lineWidth = bracketSpan->GetLwidth().GetMeasurementUnsigned().GetPx();
+            }
+            else {
+                lineWidth = bracketSpan->GetLwidth().GetMeasurementUnsigned().GetVu()
                     * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
         }
@@ -787,8 +790,11 @@ void View::DrawOctave(
                 }
             }
             else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
-                if (octave->GetLwidth().GetMeasurementUnsigned() != VRV_UNSET) {
-                    lineWidth = octave->GetLwidth().GetMeasurementUnsigned()
+                if (octave->GetLwidth().GetMeasurementUnsigned().GetType() == MEASUREMENTTYPE_px) {
+                    lineWidth = octave->GetLwidth().GetMeasurementUnsigned().GetPx();
+                }
+                else {
+                    lineWidth = octave->GetLwidth().GetMeasurementUnsigned().GetVu()
                         * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
                 }
             }
@@ -2018,9 +2024,12 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
             }
         }
         else if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
-            if (gliss->GetLwidth().GetMeasurementUnsigned() != VRV_UNSET) {
-                lineWidth = gliss->GetLwidth().GetMeasurementUnsigned()
-                    * m_doc->GetDrawingUnit(staff->m_drawingStaffSize * 2);
+            if (gliss->GetLwidth().GetMeasurementUnsigned().GetType() == MEASUREMENTTYPE_px) {
+                lineWidth = gliss->GetLwidth().GetMeasurementUnsigned().GetPx();
+            }
+            else {
+                lineWidth = gliss->GetLwidth().GetMeasurementUnsigned().GetVu()
+                    * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
         }
     }

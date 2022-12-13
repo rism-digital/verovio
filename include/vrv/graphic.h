@@ -41,11 +41,10 @@ public:
 
     /**
      * @name Getters for the drawing width and height.
-     * When the size is in MEI unit (only unit supported for now), calculate the drawing size.
      */
     ///@{
-    int GetDrawingWidth(int unit) const;
-    int GetDrawingHeight(int unit) const;
+    int GetDrawingWidth(int unit, int staffSize) const;
+    int GetDrawingHeight(int unit, int staffSize) const;
     ///@}
 
 protected:

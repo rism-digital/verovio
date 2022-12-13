@@ -67,7 +67,6 @@ int SymbolDef::GetSymbolHeight(Doc *doc, int staffSize, bool dimin) const
 std::pair<int, int> SymbolDef::GetSymbolSize(Doc *doc, int staffSize, bool dimin) const
 {
     assert(doc);
-    assert(staffSize != 0);
 
     const int unit = doc->GetDrawingUnit(staffSize);
 
@@ -78,14 +77,14 @@ std::pair<int, int> SymbolDef::GetSymbolSize(Doc *doc, int staffSize, bool dimin
         if (child->Is(SVG)) {
             const Svg *svg = vrv_cast<const Svg *>(child);
             assert(svg);
-            height = std::max(height, svg->GetHeight() * 100 / staffSize);
-            width = std::max(width, svg->GetWidth() * 100 / staffSize);
+            height = std::max(height, svg->GetHeight() * staffSize / 100);
+            width = std::max(width, svg->GetWidth() * staffSize / 100);
         }
         else if (child->Is(GRAPHIC)) {
             const Graphic *graphic = vrv_cast<const Graphic *>(child);
             assert(graphic);
-            height = std::max(height, graphic->GetDrawingHeight(unit));
-            width = std::max(width, graphic->GetDrawingWidth(unit));
+            height = std::max(height, graphic->GetDrawingHeight(unit, staffSize));
+            width = std::max(width, graphic->GetDrawingWidth(unit, staffSize));
         }
     }
 

@@ -526,8 +526,8 @@ void View::DrawGraphic(DeviceContext *dc, Graphic *graphic, TextDrawingParams &p
 
     dc->StartGraphic(graphic, "", graphic->GetID());
 
-    int width = graphic->GetDrawingWidth(m_doc->GetDrawingUnit(staffSize));
-    int height = graphic->GetDrawingHeight(m_doc->GetDrawingUnit(staffSize));
+    int width = graphic->GetDrawingWidth(m_doc->GetDrawingUnit(staffSize), staffSize);
+    int height = graphic->GetDrawingHeight(m_doc->GetDrawingUnit(staffSize), staffSize);
 
     if (dimin) {
         width = width * m_options->m_graceFactor.GetValue();
