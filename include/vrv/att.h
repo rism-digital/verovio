@@ -150,16 +150,13 @@ public:
     std::string MeasurebeatToStr(data_MEASUREBEAT data) const;
     data_MEASUREBEAT StrToMeasurebeat(std::string value, bool logWarning = true) const;
 
-    std::string MeasurementsignedToStr(data_MEASUREMENTSIGNED data) const { return VUToStr(data); }
-    data_MEASUREMENTSIGNED StrToMeasurementsigned(const std::string &value, bool logWarning = true) const
-    {
-        return StrToVU(value, logWarning);
-    }
+    std::string MeasurementsignedToStr(data_MEASUREMENTSIGNED data) const;
+    data_MEASUREMENTSIGNED StrToMeasurementsigned(const std::string &value, bool logWarning = true) const;
 
-    std::string MeasurementunsignedToStr(data_MEASUREMENTUNSIGNED data) const { return VUToStr(data); }
+    std::string MeasurementunsignedToStr(data_MEASUREMENTUNSIGNED data) const { return MeasurementsignedToStr(data); }
     data_MEASUREMENTUNSIGNED StrToMeasurementunsigned(const std::string &value, bool logWarning = true) const
     {
-        return StrToVU(value, logWarning);
+        return StrToMeasurementsigned(value, logWarning);
     }
 
     std::string MetercountPairToStr(const data_METERCOUNT_pair &data) const;
