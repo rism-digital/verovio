@@ -422,7 +422,7 @@ bool FloatingPositioner::CalcDrawingYRel(
             assert(curve->m_object);
         }
         int margin = doc->GetBottomMargin(m_object->GetClassId()) * unit;
-        const bool isExtender = m_object->Is({ DIR, DYNAM }) && m_object->IsExtenderElement();
+        const bool isExtender = m_object->Is({ DIR, DYNAM, TEMPO }) && m_object->IsExtenderElement();
 
         if (m_place == STAFFREL_above) {
             if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {

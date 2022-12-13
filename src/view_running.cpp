@@ -55,6 +55,9 @@ void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
     dc->StartGraphic(pgHeader, "", pgHeader->GetID());
 
     FontInfo pgHeadTxt;
+    if (!dc->UseGlobalStyling()) {
+        pgHeadTxt.SetFaceName("Times");
+    }
 
     TextDrawingParams params;
 

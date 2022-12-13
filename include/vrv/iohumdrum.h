@@ -594,10 +594,10 @@ protected:
     void splitSyllableBySpaces(vector<std::string> &vtext, char spacer = ' ');
     void addDefaultTempo(ScoreDef *scoreDef);
     int getChordNoteCount(hum::HTp token);
-    bool isLowestSystemArpeggio(hum::HTp token);
-    bool leftmostStaffArpeggio(hum::HTp token);
-    hum::HTp getHighestSystemArpeggio(hum::HTp token);
-    hum::HTp getRightmostStaffArpeggio(hum::HTp token);
+    bool isLeftmostSystemArpeggio(hum::HTp token);
+    bool isLeftmostStaffArpeggio(hum::HTp token);
+    std::vector<hum::HTp> getSystemArpeggioTokens(hum::HTp token);
+    std::vector<hum::HTp> getStaffArpeggioTokens(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
         int staffindex, int justification = 0, const std::string &color = "", int vgroup = -1);
     bool addTempoDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
@@ -724,8 +724,6 @@ protected:
     void markOtherClefsAsChange(hum::HTp clef);
     int getCurrentLayerCount(hum::HTp token);
     void checkForBreak(hum::HumdrumFile &infile, int line);
-    int getLowestDiatonicPitch(hum::HTp token, const string &requirement);
-    int getHighestDiatonicPitch(hum::HTp token, const string &requirement);
     bool hasMensuralStaff(hum::HLp line);
     int getNextBarlineIndex(hum::HumdrumFile &infile, int startline);
     std::string escapeFreeAmpersand(const std::string &value);

@@ -209,10 +209,11 @@ public:
         m_defaultValue = 0.0;
         m_minValue = 0.0;
         m_maxValue = 0.0;
+        m_definitionFactor = false;
     }
     virtual ~OptionDbl() {}
     void CopyTo(Option *option) override;
-    void Init(double defaultValue, double minValue, double maxValue);
+    void Init(double defaultValue, double minValue, double maxValue, bool definitionFactor = false);
 
     bool SetValueDbl(double value) override;
     bool SetValue(const std::string &value) override;
@@ -222,7 +223,8 @@ public:
     void Reset() override;
     bool IsSet() const override;
 
-    double GetValue() const { return m_value; }
+    double GetValue() const;
+    double GetUnfactoredValue() const;
     double GetDefault() const { return m_defaultValue; }
     double GetMin() const { return m_minValue; }
     double GetMax() const { return m_maxValue; }
@@ -237,6 +239,7 @@ private:
     double m_defaultValue;
     double m_minValue;
     double m_maxValue;
+    bool m_definitionFactor;
 };
 
 //----------------------------------------------------------------------------
@@ -254,6 +257,7 @@ public:
         m_defaultValue = 0;
         m_minValue = 0;
         m_maxValue = 0;
+        m_definitionFactor = false;
     }
     virtual ~OptionInt() {}
     void CopyTo(Option *option) override;
@@ -617,6 +621,7 @@ public:
     OptionIntMap m_footer;
     OptionIntMap m_header;
     OptionBool m_humType;
+    OptionBool m_incip;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
     OptionBool m_ligatureAsBracket;
@@ -651,7 +656,7 @@ public:
     OptionBool m_svgFormatRaw;
     OptionBool m_svgRemoveXlink;
     OptionArray m_svgAdditionalAttribute;
-    OptionInt m_unit;
+    OptionDbl m_unit;
     OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;
     OptionBool m_usePgHeaderForAll;

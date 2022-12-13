@@ -248,8 +248,11 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
     if (data[0] == '*' || data[0] == '!') {
         return HUMDRUM;
     }
-    if (data[0] == 'X' || data[0] == '%') {
+    if (data[0] == 'X') {
         return ABC;
+    }
+    if (data[0] == '%' && data.size() > 1) {
+        return (data[1] == 'a') ? ABC : PAE;
     }
     if ((unsigned char)data[0] == 0xff || (unsigned char)data[0] == 0xfe) {
         // Handle UTF-16 content here later.
@@ -936,7 +939,7 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         const OptionJson *optJson = dynamic_cast<const OptionJson *>(iter->second);
 
         if (optDbl) {
-            double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetValue();
+            double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetUnfactoredValue();
             jsonxx::Value value(dblValue);
             value.precision_ = 2;
             o << iter->first << value;

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		152886C51C9CA86100B515BB /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
+		17A1FD9D290DC3060005E311 /* graphic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3673E5E428E1DF0C0048BAFA /* graphic.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
 		35F6580F24F92B6100C99A2D /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
 		35FDEBCE24B6DBC100AC1696 /* fing.h in Headers */ = {isa = PBXBuildFile; fileRef = 35FDEBCD24B6DBC100AC1696 /* fing.h */; };
@@ -3268,6 +3269,7 @@
 				4D16942B1E3A44F300569BF4 /* slur.cpp in Sources */,
 				4D16942C1E3A44F300569BF4 /* staff.cpp in Sources */,
 				4DB3D8E61F83D16A00B5FC2B /* ftrem.cpp in Sources */,
+				17A1FD9D290DC3060005E311 /* graphic.cpp in Sources */,
 				4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */,
 				4DB3D8A81F828EA900B5FC2B /* areaposinterface.cpp in Sources */,
 				4D72A5DF208A37DC009DEC1E /* multirpt.cpp in Sources */,

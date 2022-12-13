@@ -407,6 +407,9 @@ public:
     // dummy validation log
     jsonxx::Object GetValidationLog();
 
+    // dummy setter
+    void SetScoreBased(bool scoreBased) {}
+
 #ifndef NO_PAE_SUPPORT
     bool Import(const std::string &pae) override;
 
@@ -520,6 +523,11 @@ public:
      */
     jsonxx::Object GetValidationLog();
 
+    /**
+     * Setter for scoreBased flag (false by default).
+     */
+    void SetScoreBased(bool scoreBased) { m_scoreBased = scoreBased; }
+
 #ifndef NO_PAE_SUPPORT
     bool Import(const std::string &input) override;
 
@@ -528,6 +536,11 @@ private:
      * Convert the old-style @clef:... @keysig:... @data:... to a JSON input
      */
     jsonxx::Object InputKeysToJson(const std::string &inputKeys);
+
+    /**
+     * Convert single-line incipits with $clef@timesig%keysig data to JSON input
+     */
+    jsonxx::Object SingleLineToJson(const std::string &singleLine);
 
     /**
      * Helper to add a token to the list.
@@ -692,6 +705,11 @@ private:
      * A flag indicating we had errors when parsing the incipit in non pedantic mode.
      */
     bool m_hasErrors;
+
+    /**
+     * A flag indicating the document should be kept as score-based.
+     */
+    bool m_scoreBased;
 
     /**
      * @name The scoreDef clef, keysig and timesig.
