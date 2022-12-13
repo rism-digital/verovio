@@ -1827,12 +1827,18 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
             continue;
         }
 
+        const int staffSize = staff->m_drawingStaffSize;
         const int y = fermata->GetDrawingY();
 
+        const int width = (symbolDef) ? symbolDef->GetSymbolWidth(m_doc, staffSize, drawingCueSize)
+                                      : m_doc->GetGlyphWidth(code, staffSize, drawingCueSize);
+        const int height = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, drawingCueSize)
+                                       : m_doc->GetGlyphHeight(code, staffSize, drawingCueSize);
+
         // The correction for centering the glyph
-        const int xCorr = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
+        const int xCorr = width / 2;
         int yCorr = 0;
-        const int height = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
+
         const data_VERTICALALIGNMENT yAlignment = Fermata::GetVerticalAlignment(code);
         int enclosureYCorr = 0;
         if (yAlignment == VERTICALALIGNMENT_top) {
@@ -1842,7 +1848,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
             yCorr = -height / 2;
         }
         else {
-            const int glyphBottomY = m_doc->GetGlyphBottom(code, staff->m_drawingStaffSize, false);
+            const int glyphBottomY = m_doc->GetGlyphBottom(code, staffSize, false);
             if (fermata->GetPlace() == STAFFREL_above) {
                 yCorr = height / 2 + glyphBottomY;
             }
@@ -1852,26 +1858,26 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
         }
 
         // Draw glyph including possible enclosing brackets
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, drawingCueSize));
 
         if (enclosingFront) {
-            const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3
-                + m_doc->GetGlyphWidth(enclosingFront, staff->m_drawingStaffSize, drawingCueSize);
-            this->DrawSmuflCode(dc, x - xCorrEncl, y + enclosureYCorr + yCorr, enclosingFront,
-                staff->m_drawingStaffSize, drawingCueSize);
+            const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staffSize) / 3
+                + m_doc->GetGlyphWidth(enclosingFront, staffSize, drawingCueSize);
+            this->DrawSmuflCode(
+                dc, x - xCorrEncl, y + enclosureYCorr + yCorr, enclosingFront, staffSize, drawingCueSize);
         }
 
         if (symbolDef) {
-            this->DrawSymbolDef(dc, fermata, symbolDef, x, y, staff->m_drawingStaffSize, drawingCueSize);
+            this->DrawSymbolDef(dc, fermata, symbolDef, x - xCorr, y, staffSize, drawingCueSize);
         }
         else {
-            this->DrawSmuflCode(dc, x - xCorr, y, code, staff->m_drawingStaffSize, drawingCueSize);
+            this->DrawSmuflCode(dc, x - xCorr, y, code, staffSize, drawingCueSize);
         }
 
         if (enclosingBack) {
-            const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3;
-            this->DrawSmuflCode(dc, x + xCorrEncl, y + enclosureYCorr + yCorr, enclosingBack, staff->m_drawingStaffSize,
-                drawingCueSize);
+            const int xCorrEncl = xCorr + m_doc->GetDrawingUnit(staffSize) / 3;
+            this->DrawSmuflCode(
+                dc, x + xCorrEncl, y + enclosureYCorr + yCorr, enclosingBack, staffSize, drawingCueSize);
         }
 
         dc->ResetFont();
