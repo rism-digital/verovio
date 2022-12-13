@@ -878,6 +878,12 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         }
     }
 
+    // Facsimile and graphic elements
+    else if (object->Is(GRAPHIC)) {
+        m_currentNode = m_currentNode.append_child("graphic");
+        this->WriteGraphic(m_currentNode, vrv_cast<Graphic *>(object));
+    }
+
     else {
         // Missing output method for the class
         LogError("Output method missing for '%s'", object->GetClassName().c_str());
@@ -6775,7 +6781,10 @@ bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, 
                 meiElementName.c_str());
             continue;
         }
-        // svg
+        // content
+        else if (elementName == "graphic") {
+            success = this->ReadGraphic(parent, xmlElement);
+        }
         else if (elementName == "svg") {
             success = this->ReadSvg(parent, xmlElement);
         }
@@ -8045,7 +8054,7 @@ void MEIInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
     // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
-bool MEIInput::ReadGraphic(Surface *parent, pugi::xml_node graphic)
+bool MEIInput::ReadGraphic(Object *parent, pugi::xml_node graphic)
 {
     assert(parent);
     Graphic *vrvGraphic = new Graphic();
