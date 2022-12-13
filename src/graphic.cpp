@@ -43,4 +43,14 @@ void Graphic::Reset()
     this->ResetTyped();
 }
 
+int Graphic::GetDrawingWidth(int unit) const
+{
+    return (this->GetWidth() * unit);
+}
+
+int Graphic::GetDrawingHeight(int unit) const
+{
+    return (this->GetHeight() * unit);
+}
+
 } // namespace vrv

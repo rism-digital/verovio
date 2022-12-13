@@ -36,7 +36,14 @@ public:
     ///@{
     bool IsSupportedChild(Object *object) override;
     ///@}
-    ///
+
+    /**
+     * @name Getters for the drawing width and height of the symbolDef content.
+     */
+    ///@{
+    int GetSymbolWidth(Doc *doc, int staffSize, bool dimin) const;
+    int GetSymbolHeight(Doc *doc, int staffSize, bool dimin) const;
+    ///@}
 
     /**
      * @name Set or reset a temporary parent for the SymbolDef.
@@ -49,7 +56,9 @@ public:
     ///@}
 
 private:
-    //
+    /** Calculate the size of the symbolDef content by iterating through the children */
+    std::pair<int, int> GetSymbolSize(Doc *doc, int staffSize, bool dimin) const;
+
 public:
     //
 private:

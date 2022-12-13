@@ -54,6 +54,49 @@ bool SymbolDef::IsSupportedChild(Object *child)
     return true;
 }
 
+int SymbolDef::GetSymbolWidth(Doc *doc, int staffSize, bool dimin) const
+{
+    return this->GetSymbolSize(doc, staffSize, dimin).first;
+}
+
+int SymbolDef::GetSymbolHeight(Doc *doc, int staffSize, bool dimin) const
+{
+    return this->GetSymbolSize(doc, staffSize, dimin).second;
+}
+
+std::pair<int, int> SymbolDef::GetSymbolSize(Doc *doc, int staffSize, bool dimin) const
+{
+    assert(doc);
+    assert(staffSize != 0);
+
+    const int unit = doc->GetDrawingUnit(staffSize);
+
+    int height = 0;
+    int width = 0;
+
+    for (auto child : this->GetChildren()) {
+        if (child->Is(SVG)) {
+            const Svg *svg = vrv_cast<const Svg *>(child);
+            assert(svg);
+            height = std::max(height, svg->GetHeight() * 100 / staffSize);
+            width = std::max(width, svg->GetWidth() * 100 / staffSize);
+        }
+        else if (child->Is(GRAPHIC)) {
+            const Graphic *graphic = vrv_cast<const Graphic *>(child);
+            assert(graphic);
+            height = std::max(height, graphic->GetDrawingHeight(unit));
+            width = std::max(width, graphic->GetDrawingWidth(unit));
+        }
+    }
+
+    if (dimin) {
+        height = height * doc->GetOptions()->m_graceFactor.GetValue();
+        width = width * doc->GetOptions()->m_graceFactor.GetValue();
+    }
+
+    return { width, height };
+}
+
 void SymbolDef::SetTemporaryParent(Object *parent)
 {
     assert(GetParent() && !m_originalParent);
