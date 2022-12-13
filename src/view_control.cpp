@@ -1540,6 +1540,11 @@ void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, Sy
 
     dc->StartGraphic(caesura, "", caesura->GetID());
 
+    SymbolDef *symbolDef = NULL;
+    if (caesura->HasAltsym() && caesura->HasAltSymbolDef()) {
+        symbolDef = caesura->GetAltSymbolDef();
+    }
+
     const char32_t code = caesura->GetCaesuraGlyph();
     const int x = caesura->GetStart()->GetDrawingX() + caesura->GetStart()->GetDrawingRadius(m_doc) * 3;
 
@@ -1549,12 +1554,19 @@ void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, Sy
             continue;
         }
 
-        const int glyphHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, false);
+        const int staffSize = staff->m_drawingStaffSize;
+        const int glyphHeight = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, false)
+                                            : m_doc->GetGlyphHeight(code, staffSize, false);
         const int y = (caesura->HasPlace() && (caesura->GetPlace() != STAFFREL_within))
             ? caesura->GetDrawingY()
             : staff->GetDrawingY() - glyphHeight / 2;
 
-        this->DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
+        if (symbolDef) {
+            this->DrawSymbolDef(dc, caesura, symbolDef, x, y, staffSize, false);
+        }
+        else {
+            this->DrawSmuflCode(dc, x, y, code, staffSize, false);
+        }
     }
 
     dc->EndGraphic(caesura, this);
