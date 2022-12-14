@@ -30,6 +30,7 @@
 #include "pghead.h"
 #include "pghead2.h"
 #include "section.h"
+#include "setscoredeffunctor.h"
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "system.h"
@@ -328,10 +329,8 @@ void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
         meterSig = newScoreDef->GetMeterSigCopy();
     }
 
-    ReplaceDrawingValuesInStaffDefParams replaceDrawingValuesInStaffDefParams(
-        clef, keySig, mensur, meterSig, meterSigGrp);
-    Functor replaceDrawingValuesInScoreDef(&Object::ReplaceDrawingValuesInStaffDef);
-    this->Process(&replaceDrawingValuesInScoreDef, &replaceDrawingValuesInStaffDefParams);
+    ReplaceDrawingValuesInStaffDefFunctor replaceDrawingValuesInStaffDef(clef, keySig, mensur, meterSig, meterSigGrp);
+    this->Process(replaceDrawingValuesInStaffDef);
 
     if (mensur) delete mensur;
     if (meterSig) delete meterSig;

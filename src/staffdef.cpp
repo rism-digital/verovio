@@ -151,31 +151,6 @@ FunctorCode StaffDef::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitStaffDefEnd(this);
 }
 
-int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
-{
-    ReplaceDrawingValuesInStaffDefParams *params
-        = vrv_params_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
-    assert(params);
-
-    if (params->m_clef) {
-        this->SetCurrentClef(params->m_clef);
-    }
-    if (params->m_keySig) {
-        this->SetCurrentKeySig(params->m_keySig);
-    }
-    if (params->m_mensur) {
-        this->SetCurrentMensur(params->m_mensur);
-    }
-    if (params->m_meterSig) {
-        this->SetCurrentMeterSig(params->m_meterSig);
-    }
-    if (params->m_meterSigGrp) {
-        this->SetCurrentMeterSigGrp(params->m_meterSigGrp);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
 {
     SetStaffDefRedrawFlagsParams *params = vrv_params_cast<SetStaffDefRedrawFlagsParams *>(functorParams);

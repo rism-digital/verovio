@@ -1088,13 +1088,6 @@ public:
     ///@{
 
     /**
-     * Replace the drawing values a staffDef.
-     * Set the current / drawing clef, key signature, etc. to the StaffDef
-     * Called form ScoreDef::ReplaceDrawingValues.
-     */
-    virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Set the Page::m_score and Page::m_scoreEnd pointers
      * Always set a the end of Page (both in BACKWARD and FORWARD directions)
      */

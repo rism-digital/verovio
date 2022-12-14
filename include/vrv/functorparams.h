@@ -2123,35 +2123,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// ReplaceDrawingValuesInStaffDefParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: Clef pointer (NULL if none)
- * member 1: KeySig pointer (NULL if none)
- * member 2: Mensur pointer (NULL if none)
- * member 3: MeterSig pointer (NULL if none)
- **/
-
-class ReplaceDrawingValuesInStaffDefParams : public FunctorParams {
-public:
-    ReplaceDrawingValuesInStaffDefParams(Clef const *clef, KeySig const *keySig, Mensur const *mensur,
-        MeterSig const *meterSig, MeterSigGrp const *meterSigGrp)
-    {
-        m_clef = clef;
-        m_keySig = keySig;
-        m_mensur = mensur;
-        m_meterSig = meterSig;
-        m_meterSigGrp = meterSigGrp;
-    }
-    Clef const *m_clef;
-    KeySig const *m_keySig;
-    Mensur const *m_mensur;
-    MeterSig const *m_meterSig;
-    MeterSigGrp const *m_meterSigGrp;
-};
-
-//----------------------------------------------------------------------------
 // SaveParams
 //----------------------------------------------------------------------------
 
