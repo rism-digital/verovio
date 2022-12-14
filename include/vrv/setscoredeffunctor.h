@@ -61,6 +61,45 @@ private:
     const MeterSigGrp *m_meterSigGrp;
 };
 
+//----------------------------------------------------------------------------
+// ScoreDefSetCurrentPageFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class sets the Page::m_score and Page::m_scoreEnd pointers
+ */
+class ScoreDefSetCurrentPageFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ScoreDefSetCurrentPageFunctor(Doc *doc);
+    virtual ~ScoreDefSetCurrentPageFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitPageEnd(Page *page) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_SETSCOREDEFFUNCTOR_H__

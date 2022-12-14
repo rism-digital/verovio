@@ -9,6 +9,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
+#include "page.h"
+
+//----------------------------------------------------------------------------
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -41,6 +46,24 @@ FunctorCode ReplaceDrawingValuesInStaffDefFunctor::VisitStaffDef(StaffDef *staff
     }
     if (m_meterSigGrp) {
         staffDef->SetCurrentMeterSigGrp(m_meterSigGrp);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// ScoreDefSetCurrentPageFunctor
+//----------------------------------------------------------------------------
+
+ScoreDefSetCurrentPageFunctor::ScoreDefSetCurrentPageFunctor(Doc *doc) : DocFunctor(doc) {}
+
+FunctorCode ScoreDefSetCurrentPageFunctor::VisitPageEnd(Page *page)
+{
+    if (!page->m_score) {
+        page->m_score = m_doc->GetCurrentScore();
+    }
+    else {
+        page->m_scoreEnd = m_doc->GetCurrentScore();
     }
 
     return FUNCTOR_CONTINUE;
