@@ -10199,6 +10199,30 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         restSplitToken = layerdata[i];
                         remainingSplitDur = ndur;
                     }
+                    else {
+                        hum::HumNum restDur = hum::Convert::recipToDuration(layerdata[i]);
+                        if ((restDur == duration) && (restDur == timesigdurs[startline])) {
+                            // whole-measure rest with something else also in
+                            // measure (such as grace notes).
+                            MRest *mrest = new MRest();
+                            setLocationId(mrest, layerdata[i]);
+                            appendElement(elements, pointers, mrest);
+                            // colorRest(mrest, *layerdata[i], line, field);
+                            verticalRest(mrest, *layerdata[i]);
+                        }
+                        else {
+                            Rest *rest = new Rest();
+                            setLocationId(rest, layerdata[i]);
+                            appendElement(elements, pointers, rest);
+                            convertRest(rest, layerdata[i], -1, staffindex);
+                            colorRest(rest, *layerdata[i], line, field);
+                            verticalRest(rest, *layerdata[i]);
+                        }
+                        processSlurs(layerdata[i]);
+                        processPhrases(layerdata[i]);
+                        processDynamics(layerdata[i], staffindex);
+                        processDirections(layerdata[i], staffindex);
+                    }
                 }
                 else {
                     hum::HumNum restDur = hum::Convert::recipToDuration(layerdata[i]);
