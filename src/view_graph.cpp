@@ -407,8 +407,8 @@ void View::DrawThickBezierCurve(
     dc->ResetPen();
 }
 
-void View::DrawSymbolDef(
-    DeviceContext *dc, Object *parent, SymbolDef *symbolDef, int x, int y, int staffSize, bool dimin)
+void View::DrawSymbolDef(DeviceContext *dc, Object *parent, SymbolDef *symbolDef, int x, int y, int staffSize,
+    bool dimin, data_HORIZONTALALIGNMENT alignment)
 {
     assert(dc);
     assert(symbolDef);
@@ -419,6 +419,11 @@ void View::DrawSymbolDef(
 
     // Because image y coordinates are inverted we need to adjust the y position
     params.m_y += symbolDef->GetSymbolHeight(m_doc, staffSize, dimin);
+
+    if (alignment != HORIZONTALALIGNMENT_left) {
+        const int width = symbolDef->GetSymbolWidth(m_doc, staffSize, dimin);
+        params.m_x -= (alignment == HORIZONTALALIGNMENT_center) ? (width / 2) : width;
+    }
 
     // Because thg Svg is a child of symbolDef we need to temporarily change the parent for the bounding boxes
     // to be properly propagated in the device context

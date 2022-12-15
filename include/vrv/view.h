@@ -575,8 +575,8 @@ protected:
     void DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, int width, int offset, int bracketWidth,
         int horizontalThickness, int verticalThickness);
     void DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int barlineWidth, int interval);
-    void DrawSymbolDef(
-        DeviceContext *dc, Object *parent, SymbolDef *symbolDef, int x, int y, int staffSize, bool dimin);
+    void DrawSymbolDef(DeviceContext *dc, Object *parent, SymbolDef *symbolDef, int x, int y, int staffSize, bool dimin,
+        data_HORIZONTALALIGNMENT alignement = HORIZONTALALIGNMENT_left);
     ///@}
 
     /**
