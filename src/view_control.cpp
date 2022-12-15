@@ -1498,6 +1498,11 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
 
     dc->StartGraphic(breath, "", breath->GetID());
 
+    SymbolDef *symbolDef = NULL;
+    if (breath->HasAltsym() && breath->HasAltSymbolDef()) {
+        symbolDef = breath->GetAltSymbolDef();
+    }
+
     int x = breath->GetStart()->GetDrawingX() + breath->GetStart()->GetDrawingRadius(m_doc);
 
     // use breath mark comma glyph
@@ -1521,9 +1526,14 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
         const int staffSize = (*staffIter)->m_drawingStaffSize;
         const int y = breath->GetDrawingY();
 
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
-        this->DrawSmuflString(dc, x, y, str, alignment, staffSize);
-        dc->ResetFont();
+        if (symbolDef) {
+            this->DrawSymbolDef(dc, breath, symbolDef, x, y, staffSize, false, alignment);
+        }
+        else {
+            dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
+            this->DrawSmuflString(dc, x, y, str, alignment, staffSize);
+            dc->ResetFont();
+        }
     }
 
     dc->EndGraphic(breath, this);
