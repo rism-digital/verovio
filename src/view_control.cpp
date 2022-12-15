@@ -2180,7 +2180,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
 
     dc->StartGraphic(mordent, "", mordent->GetID());
 
-    const int x = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
+    int x = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
 
     // set mordent glyph
     const int code = mordent->GetMordentGlyph();
@@ -2190,7 +2190,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = mordent->GetTstampStaves(measure, mordent);
-    double xShift = 0.0;
+
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, mordent->GetStart(), *staffIter)) {
             continue;
@@ -2198,13 +2198,18 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
         const int staffSize = (*staffIter)->m_drawingStaffSize;
         int y = mordent->GetDrawingY();
 
+        const int mordentHeight = m_doc->GetGlyphHeight(code, staffSize, false);
+        const int mordentWidth = m_doc->GetGlyphWidth(code, staffSize, false);
+        x -= (mordentWidth / 2);
+
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
+
         if (mordent->HasAccidlower()) {
             char32_t accid = Accid::GetAccidGlyph(mordent->GetAccidlower());
             std::u32string accidStr;
             accidStr.push_back(accid);
-            dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
-            this->DrawSmuflString(dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
             // Adjust the y position
+            double xShift = 0.0;
             double factor = 1.0;
             data_ACCIDENTAL_WRITTEN meiaccid = mordent->GetAccidlower();
             // optimized vertical kerning for Leipzig font:
@@ -2226,16 +2231,17 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             else if (meiaccid == ACCIDENTAL_WRITTEN_x) {
                 factor = 2.00;
             }
-            y += factor * m_doc->GetGlyphHeight(accid, staffSize, true) / 2;
+
+            int accidX = x + (1 + xShift) * mordentWidth / 2;
+            int accidY = y - factor * m_doc->GetGlyphHeight(accid, staffSize, true) / 2;
+            this->DrawSmuflString(dc, accidX, accidY, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
         }
         else if (mordent->HasAccidupper()) {
-            double mordentHeight = m_doc->GetGlyphHeight(code, staffSize, false);
             char32_t accid = Accid::GetAccidGlyph(mordent->GetAccidupper());
             std::u32string accidStr;
             accidStr.push_back(accid);
-            dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
-            this->DrawSmuflString(dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
             // Adjust the y position
+            double xShift = 0.0;
             double factor = 1.75;
             data_ACCIDENTAL_WRITTEN meiaccid = mordent->GetAccidupper();
             // optimized vertical kerning for Leipzig font:
@@ -2257,14 +2263,14 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
                 factor = 1.35;
                 xShift = -0.08;
             }
-            y -= factor * mordentHeight;
+
+            int accidX = x + (1 + xShift) * mordentWidth / 2;
+            int accidY = y + factor * mordentHeight;
+            this->DrawSmuflString(dc, accidX, accidY, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
         }
 
-        // Adjust the x position
-        int drawingX = x - (1 + xShift) * m_doc->GetGlyphWidth(code, staffSize, false) / 2;
+        this->DrawSmuflString(dc, x, y, str, HORIZONTALALIGNMENT_left, staffSize);
 
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
-        this->DrawSmuflString(dc, drawingX, y, str, HORIZONTALALIGNMENT_left, staffSize);
         dc->ResetFont();
     }
 
