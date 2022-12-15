@@ -825,21 +825,6 @@ FunctorCode Page::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitPageEnd(this);
 }
 
-int Page::ScoreDefSetCurrentPageEnd(FunctorParams *functorParams)
-{
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
-    assert(params);
-
-    if (!this->m_score) {
-        this->m_score = params->m_doc->GetCurrentScore();
-    }
-    else {
-        this->m_scoreEnd = params->m_doc->GetCurrentScore();
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Page::ScoreDefUnsetCurrent(FunctorParams *functorParams)
 {
     m_score = NULL;

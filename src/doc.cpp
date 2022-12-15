@@ -48,6 +48,7 @@
 #include "pghead2.h"
 #include "runningelement.h"
 #include "score.h"
+#include "setscoredeffunctor.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -861,15 +862,12 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
 
     // First we need to set Page::m_score and Page::m_scoreEnd
     // We do it by going BACKWARD, with a depth limit of 3 (we want to hit the Score elements)
-    // The Doc::m_currentScore is set by Object::Process
-    // The Page::m_score in Page::ScoreDefSetCurrentPageEnd
-    Functor scoreDefSetCurrentPage(&Object::ScoreDefSetCurrentPage);
-    Functor scoreDefSetCurrentPageEnd(&Object::ScoreDefSetCurrentPageEnd);
-    FunctorDocParams scoreDefSetCurrentPageParams(this);
-    this->Process(
-        &scoreDefSetCurrentPage, &scoreDefSetCurrentPageParams, &scoreDefSetCurrentPageEnd, NULL, 3, BACKWARD);
+    ScoreDefSetCurrentPageFunctor scoreDefSetCurrentPage(this);
+    scoreDefSetCurrentPage.SetDirection(BACKWARD);
+    this->Process(scoreDefSetCurrentPage, 3);
     // Do it again FORWARD to set Page::m_scoreEnd - relies on Page::m_score not being NULL
-    this->Process(&scoreDefSetCurrentPage, &scoreDefSetCurrentPageParams, &scoreDefSetCurrentPageEnd, NULL, 3, FORWARD);
+    scoreDefSetCurrentPage.SetDirection(FORWARD);
+    this->Process(scoreDefSetCurrentPage, 3);
 
     // ScoreDef upcomingScoreDef;
     Functor scoreDefSetCurrent(&Object::ScoreDefSetCurrent);

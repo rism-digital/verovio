@@ -1930,8 +1930,8 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
     if (this->Is(PAGE)) {
         Page *page = vrv_cast<Page *>(this);
         assert(page);
-        // This will be reach before we reach the begining of a first Score.
-        // However, page->m_score has already been set by Page::ScoreDefSetCurrentPage
+        // This will be reached before we reach the beginning of a first Score.
+        // However, page->m_score has already been set by ScoreDefSetCurrentPageFunctor
         // This must be the first page or a new score is starting on this page
         assert(page->m_score);
         if (!params->m_currentScore || (params->m_currentScore != page->m_score)) {

@@ -166,11 +166,6 @@ public:
     ///@}
 
     /**
-     * See Object::ScoreDefSetCurrentPage
-     */
-    int ScoreDefSetCurrentPageEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::UnscoreDefSetCurrent
      */
     int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
@@ -246,7 +241,7 @@ public:
 
     /**
      * @name Pointers to the score at the beginning and end of the page
-     * Set in Page::ScoreDefSetCurrentPageEnd
+     * Set in ScoreDefSetCurrentPageFunctor
      */
     ///@{
     Score *m_score;

@@ -1088,17 +1088,6 @@ public:
     ///@{
 
     /**
-     * Set the Page::m_score and Page::m_scoreEnd pointers
-     * Always set a the end of Page (both in BACKWARD and FORWARD directions)
-     */
-    virtual int ScoreDefSetCurrentPage(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ScoreDefSetCurrentPage
-     */
-    virtual int ScoreDefSetCurrentPageEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Set the current scoreDef wherever need.
      * This is include a scoreDef for each system.
      * It also includes a scoreDef for each measure where a change occured before.
