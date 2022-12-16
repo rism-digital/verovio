@@ -125,9 +125,9 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
         bracketLeft[1] = { ToDeviceContextX(xLeft), ToDeviceContextY(yLeft) };
         bracketLeft[2] = { ToDeviceContextX(xNumLeft), ToDeviceContextY(yNumLeft) };
         Point bracketRight[3];
-        bracketRight[0] = { ToDeviceContextX(xNumRight + lineWidth), ToDeviceContextY(yNumRight) };
+        bracketRight[0] = { ToDeviceContextX(xRight), ToDeviceContextY(yRight + bracketHeight) };
         bracketRight[1] = { ToDeviceContextX(xRight), ToDeviceContextY(yRight) };
-        bracketRight[2] = { ToDeviceContextX(xRight), ToDeviceContextY(yRight + bracketHeight) };
+        bracketRight[2] = { ToDeviceContextX(xNumRight), ToDeviceContextY(yNumRight) };
 
         dc->DrawPolyline(3, bracketLeft);
         dc->DrawPolyline(3, bracketRight);
