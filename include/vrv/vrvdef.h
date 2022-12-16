@@ -189,6 +189,7 @@ enum ClassId : uint16_t {
     LV,
     MORDENT,
     MNUM,
+    ORNAM,
     OCTAVE,
     PEDAL,
     PHRASE,

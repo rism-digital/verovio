@@ -275,6 +275,12 @@
 		4D308104203DB6B500BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D308103203DB6B500BC44F6 /* ref.cpp */; };
 		4D308105203DB6B500BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D308103203DB6B500BC44F6 /* ref.cpp */; };
 		4D308106203DB6B500BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D308103203DB6B500BC44F6 /* ref.cpp */; };
+		4D3C3F0C294B89AF009993E6 /* ornam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3C3F0B294B89AF009993E6 /* ornam.cpp */; };
+		4D3C3F0D294B89AF009993E6 /* ornam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3C3F0B294B89AF009993E6 /* ornam.cpp */; };
+		4D3C3F0E294B89AF009993E6 /* ornam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3C3F0B294B89AF009993E6 /* ornam.cpp */; };
+		4D3C3F0F294B89AF009993E6 /* ornam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3C3F0B294B89AF009993E6 /* ornam.cpp */; };
+		4D3C3F11294B89C9009993E6 /* ornam.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D3C3F10294B89C9009993E6 /* ornam.h */; };
+		4D3C3F12294B89C9009993E6 /* ornam.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D3C3F10294B89C9009993E6 /* ornam.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */; };
 		4D422101199805E400963292 /* att.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4220FF199805E400963292 /* att.h */; };
 		4D422102199805E400963292 /* attdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D422100199805E400963292 /* attdef.h */; };
@@ -1430,6 +1436,8 @@
 		4D308100203DB69C00BC44F6 /* ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref.h; path = include/vrv/ref.h; sourceTree = "<group>"; };
 		4D308103203DB6B500BC44F6 /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ref.cpp; path = src/ref.cpp; sourceTree = "<group>"; };
 		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
+		4D3C3F0B294B89AF009993E6 /* ornam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ornam.cpp; path = src/ornam.cpp; sourceTree = "<group>"; };
+		4D3C3F10294B89C9009993E6 /* ornam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ornam.h; path = include/vrv/ornam.h; sourceTree = "<group>"; };
 		4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_pagebased.cpp; path = libmei/atts_pagebased.cpp; sourceTree = "<group>"; };
 		4D3FF8DA19BADD7A00B105B5 /* atts_pagebased.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_pagebased.h; path = libmei/atts_pagebased.h; sourceTree = "<group>"; };
 		4D4220FF199805E400963292 /* att.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = att.h; path = include/vrv/att.h; sourceTree = "<group>"; };
@@ -2166,6 +2174,8 @@
 				40910FEB1E42734C00DB1FA5 /* mordent.h */,
 				4D55723F1CF3F32A008D06A0 /* octave.cpp */,
 				4D5572411CF3F33C008D06A0 /* octave.h */,
+				4D3C3F0B294B89AF009993E6 /* ornam.cpp */,
+				4D3C3F10294B89C9009993E6 /* ornam.h */,
 				4D5572431CF57B5C008D06A0 /* pedal.cpp */,
 				4D5572421CF57B4C008D06A0 /* pedal.h */,
 				4DF092A42497711800239195 /* phrase.cpp */,
@@ -2681,6 +2691,7 @@
 				4DC3B9EA239E2B22007F185E /* transposition.h in Headers */,
 				4D1BE7821C69434C0086DC0E /* MidiFile.h in Headers */,
 				4DEC4DD221C8295700D1D273 /* supplied.h in Headers */,
+				4D3C3F11294B89C9009993E6 /* ornam.h in Headers */,
 				4DD7C0FF27A55CFD00B9C017 /* timemap.h in Headers */,
 				4D1BD1B921908D78000D35B2 /* halfmrpt.h in Headers */,
 				4DF4407A1D3D085600152B7E /* functorparams.h in Headers */,
@@ -2770,6 +2781,7 @@
 				BB4C4AA722A932A0001F6AF0 /* bboxdevicecontext.h in Headers */,
 				BB4C4AF822A932BC001F6AF0 /* reg.h in Headers */,
 				BB4C4AF022A932BC001F6AF0 /* lem.h in Headers */,
+				4D3C3F12294B89C9009993E6 /* ornam.h in Headers */,
 				BB4C4AE022A932BC001F6AF0 /* annot.h in Headers */,
 				4D79642726C167200026288B /* pagemilestone.h in Headers */,
 				BD87768827CE8A21005B97EA /* layerdef.h in Headers */,
@@ -3248,6 +3260,7 @@
 				403BEFF5206C00E900D022D5 /* multirest.cpp in Sources */,
 				4DA0EAEB22BB77C300A7EBEB /* editortoolkit_neume.cpp in Sources */,
 				4D16943B1E3A44F300569BF4 /* Binasc.cpp in Sources */,
+				4D3C3F0D294B89AF009993E6 /* ornam.cpp in Sources */,
 				4D16943C1E3A44F300569BF4 /* view_beam.cpp in Sources */,
 				E7BCFFBA281298620012513D /* resources.cpp in Sources */,
 				40D45EC3204EEAFE009C1EC9 /* instrdef.cpp in Sources */,
@@ -3423,6 +3436,7 @@
 				4D766EFC20ACAD63006875D8 /* view_neume.cpp in Sources */,
 				4D6413782035F58200BB630E /* pages.cpp in Sources */,
 				8F086EFE188539540037FD8E /* scoredef.cpp in Sources */,
+				4D3C3F0C294B89AF009993E6 /* ornam.cpp in Sources */,
 				4D5572401CF3F32A008D06A0 /* octave.cpp in Sources */,
 				8F086EFF188539540037FD8E /* slur.cpp in Sources */,
 				4DEC4DAA21C81EEC00D1D273 /* restore.cpp in Sources */,
@@ -3544,6 +3558,7 @@
 				4DA0EABB22BB772C00A7EBEB /* atts_neumes.cpp in Sources */,
 				4DEC4D9821C81E3B00D1D273 /* expan.cpp in Sources */,
 				4DC12A651F73F898000440E9 /* pghead2.cpp in Sources */,
+				4D3C3F0E294B89AF009993E6 /* ornam.cpp in Sources */,
 				4DB3D8C81F83D10000B5FC2B /* dir.cpp in Sources */,
 				8F3DD36818854B410051330C /* doc.cpp in Sources */,
 				4DB3D8D11F83D11D00B5FC2B /* octave.cpp in Sources */,
@@ -3766,6 +3781,7 @@
 				4DA0EABC22BB772C00A7EBEB /* atts_neumes.cpp in Sources */,
 				4D2E759222BC2B80004C51F0 /* tuning.cpp in Sources */,
 				BB4C4B4922A932D7001F6AF0 /* clef.cpp in Sources */,
+				4D3C3F0F294B89AF009993E6 /* ornam.cpp in Sources */,
 				BB4C4AC922A932B6001F6AF0 /* pages.cpp in Sources */,
 				BB4C4B6F22A932D7001F6AF0 /* proport.cpp in Sources */,
 				BB4C4AE522A932BC001F6AF0 /* corr.cpp in Sources */,
