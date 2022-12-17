@@ -12,6 +12,7 @@
 #include "atts_cmnornaments.h"
 #include "atts_externalsymbols.h"
 #include "controlelement.h"
+#include "textdirinterface.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -24,11 +25,12 @@ namespace vrv {
  * This class models the MEI <turn> element.
  */
 class Ornam : public ControlElement,
+              public TextListInterface,
+              public TextDirInterface,
               public TimePointInterface,
               public AttColor,
               public AttExtSym,
-              public AttOrnamentAccid,
-              public AttPlacementRelStaff {
+              public AttOrnamentAccid {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -46,12 +48,20 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    TextDirInterface *GetTextDirInterface() override { return vrv_cast<TextDirInterface *>(this); }
+    const TextDirInterface *GetTextDirInterface() const override { return vrv_cast<const TextDirInterface *>(this); }
     TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
     const TimePointInterface *GetTimePointInterface() const override
     {
         return vrv_cast<const TimePointInterface *>(this);
     }
     ///@}
+
+    /**
+     * Add an element (text, rend. etc.) to a ornam.
+     * Only supported elements will be actually added to the child list.
+     */
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Get the SMuFL glyph for the ornam based glyph.num

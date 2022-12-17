@@ -13,10 +13,12 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "editorial.h"
 #include "layerelement.h"
+#include "resources.h"
 #include "smufl.h"
-#include "verticalaligner.h"
+#include "symbol.h"
+#include "text.h"
 
 namespace vrv {
 
@@ -28,17 +30,18 @@ static const ClassRegistrar<Ornam> s_factory("ornam", ORNAM);
 
 Ornam::Ornam()
     : ControlElement(ORNAM, "ornam-")
+    , TextListInterface()
+    , TextDirInterface()
     , TimePointInterface()
     , AttColor()
     , AttExtSym()
     , AttOrnamentAccid()
-    , AttPlacementRelStaff()
 {
+    this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_EXTSYM);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
-    this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
 
     this->Reset();
 }
@@ -48,11 +51,26 @@ Ornam::~Ornam() {}
 void Ornam::Reset()
 {
     ControlElement::Reset();
+    TextDirInterface::Reset();
     TimePointInterface::Reset();
     this->ResetColor();
     this->ResetExtSym();
     this->ResetOrnamentAccid();
     this->ResetPlacementRelStaff();
+}
+
+bool Ornam::IsSupportedChild(Object *child)
+{
+    if (child->Is({ LB, REND, SYMBOL, TEXT })) {
+        assert(dynamic_cast<TextElement *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
 }
 
 char32_t Ornam::GetOrnamGlyph() const
