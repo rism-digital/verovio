@@ -1113,7 +1113,8 @@ void SvgDeviceContext::AppendIdAndClass(
     }
 
     if (graphicID != PRIMARY) {
-        baseClass.append(" spanning id-" + gId);
+        std::string addClass = (graphicID == SPANNING) ? " spanning" : " symbol-ref";
+        baseClass.append(" id-" + gId + addClass);
     }
     if (!addedClasses.empty()) {
         baseClass.append(" " + addedClasses);
