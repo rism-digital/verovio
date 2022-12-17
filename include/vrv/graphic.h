@@ -37,6 +37,7 @@ public:
     virtual ~Graphic();
     Object *Clone() const override { return new Graphic(*this); }
     void Reset() override;
+    std::string GetClassName() const override { return "Graphic"; }
     ///@}
 
     /**
