@@ -40,6 +40,7 @@
 #include "note.h"
 #include "octave.h"
 #include "options.h"
+#include "ornam.h"
 #include "page.h"
 #include "pedal.h"
 #include "pitchinflection.h"
@@ -96,7 +97,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     else if (element->Is(DIR)) {
         Dir *dir = vrv_cast<Dir *>(element);
         assert(dir);
-        this->DrawDir(dc, dir, measure, system);
+        this->DrawDirOrOrnam(dc, dir, measure, system);
         system->AddToDrawingListIfNecessary(dir);
     }
     else if (element->Is(DYNAM)) {
@@ -124,6 +125,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Mordent *mordent = vrv_cast<Mordent *>(element);
         assert(mordent);
         this->DrawMordent(dc, mordent, measure, system);
+    }
+    else if (element->Is(ORNAM)) {
+        Ornam *ornam = vrv_cast<Ornam *>(element);
+        assert(ornam);
+        this->DrawDirOrOrnam(dc, ornam, measure, system);
     }
     else if (element->Is(PEDAL)) {
         Pedal *pedal = vrv_cast<Pedal *>(element);
@@ -1552,17 +1558,25 @@ void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, Sy
     dc->EndGraphic(caesura, this);
 }
 
-void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system)
+void View::DrawDirOrOrnam(DeviceContext *dc, ControlElement *element, Measure *measure, System *system)
 {
     assert(dc);
     assert(system);
     assert(measure);
-    assert(dir);
+    assert(element);
 
     // Cannot draw a dir that has no start position
-    if (!dir->GetStart()) return;
+    TimePointInterface *interface = element->GetTimePointInterface();
+    assert(interface);
+    TextDirInterface *interfaceTextDir = element->GetTextDirInterface();
+    assert(interfaceTextDir);
 
-    dc->StartGraphic(dir, "", dir->GetID());
+    LayerElement *start = interface->GetStart();
+    if (!start) return;
+
+    dc->StartGraphic(element, "", element->GetID());
+
+    const data_STAFFREL place = interfaceTextDir->GetPlace();
 
     FontInfo dirTxt;
     if (!dc->UseGlobalStyling()) {
@@ -1572,40 +1586,40 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
     TextDrawingParams params;
 
-    const int lineCount = dir->GetNumberOfLines(dir);
+    const int lineCount = interfaceTextDir->GetNumberOfLines(element);
 
     // If we have not timestamp
-    params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
+    params.m_x = start->GetDrawingX() + start->GetDrawingRadius(m_doc);
 
-    data_HORIZONTALALIGNMENT alignment = dir->GetChildRendAlignment();
+    data_HORIZONTALALIGNMENT alignment = element->GetChildRendAlignment();
     // dir are left aligned by default (with both @tstamp and @startid)
     if (alignment == HORIZONTALALIGNMENT_NONE) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = dir->GetTstampStaves(measure, dir);
+    std::vector<Staff *> staffList = interface->GetTstampStaves(measure, element);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
-        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter)) {
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), element, start, *staffIter)) {
             continue;
         }
 
         params.m_enclosedRend.clear();
-        params.m_y = dir->GetDrawingY();
+        params.m_y = element->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
         int xAdjust = 0;
-        const bool isBetweenStaves = (dir->GetPlace() == STAFFREL_between)
-            || ((dir->GetPlace() == STAFFREL_below) && (*staffIter != measure->GetLast(STAFF)))
-            || ((dir->GetPlace() == STAFFREL_above) && (*staffIter != measure->GetFirst(STAFF)));
+        const bool isBetweenStaves = (place == STAFFREL_between)
+            || ((place == STAFFREL_below) && (*staffIter != measure->GetLast(STAFF)))
+            || ((place == STAFFREL_above) && (*staffIter != measure->GetFirst(STAFF)));
         if (isBetweenStaves
-            && (dir->GetStart()->GetAlignment()->GetTime()
+            && (interface->GetStart()->GetAlignment()->GetTime()
                 == measure->m_measureAligner.GetRightBarLineAlignment()->GetTime())
-            && dir->AreChildrenAlignedTo(HORIZONTALALIGNMENT_right)) {
+            && interfaceTextDir->AreChildrenAlignedTo(element, HORIZONTALALIGNMENT_right)) {
             xAdjust = m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) / 2;
         }
 
         dirTxt.SetPointSize(params.m_pointSize);
 
-        if ((dir->GetPlace() == STAFFREL_between) || (dir->GetPlace() == STAFFREL_within)) {
+        if ((place == STAFFREL_between) || (place == STAFFREL_within)) {
             if (lineCount > 1) {
                 params.m_y += (m_doc->GetTextLineHeight(&dirTxt, false) * (lineCount - 1) / 2);
             }
@@ -1616,7 +1630,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dc->SetFont(&dirTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x - xAdjust), ToDeviceContextY(params.m_y), alignment);
-        DrawTextChildren(dc, dir, params);
+        DrawTextChildren(dc, element, params);
         dc->EndText();
 
         dc->ResetFont();
@@ -1625,7 +1639,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         this->DrawTextEnclosure(dc, params, (*staffIter)->m_drawingStaffSize);
     }
 
-    dc->EndGraphic(dir, this);
+    dc->EndGraphic(element, this);
 }
 
 void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system)
