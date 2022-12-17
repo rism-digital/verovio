@@ -429,7 +429,7 @@ void View::DrawBeamSpan(DeviceContext *dc, BeamSpan *beamSpan, System *system, O
         dc->ResumeGraphic(graphic, graphic->GetID());
     }
     else {
-        dc->StartGraphic(beamSpan, "", beamSpan->GetID(), false);
+        dc->StartGraphic(beamSpan, "", beamSpan->GetID(), SPANNING);
     }
 
     BeamSpanSegment *segment = beamSpan->GetSegmentForSystem(system);

@@ -524,7 +524,7 @@ void View::DrawGraphic(DeviceContext *dc, Graphic *graphic, TextDrawingParams &p
     assert(dc);
     assert(graphic);
 
-    dc->StartGraphic(graphic, "", graphic->GetID());
+    dc->StartGraphic(graphic, "", graphic->GetID(), SYMBOLREF);
 
     int width = graphic->GetDrawingWidth(m_doc->GetDrawingUnit(staffSize), staffSize);
     int height = graphic->GetDrawingHeight(m_doc->GetDrawingUnit(staffSize), staffSize);

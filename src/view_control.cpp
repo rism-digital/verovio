@@ -477,7 +477,7 @@ void View::DrawBracketSpan(
         dc->ResumeGraphic(graphic, graphic->GetID());
     }
     else {
-        dc->StartGraphic(bracketSpan, "", bracketSpan->GetID(), false);
+        dc->StartGraphic(bracketSpan, "", bracketSpan->GetID(), SPANNING);
     }
 
     int bracketSize = 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -654,7 +654,7 @@ void View::DrawHairpin(
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetID());
     else
-        dc->StartGraphic(hairpin, "", hairpin->GetID(), false);
+        dc->StartGraphic(hairpin, "", hairpin->GetID(), SPANNING);
     // dc->DeactivateGraphic();
 
     const double hairpinThickness
@@ -729,7 +729,7 @@ void View::DrawOctave(
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetID());
     else
-        dc->StartGraphic(octave, "", octave->GetID(), false);
+        dc->StartGraphic(octave, "", octave->GetID(), SPANNING);
 
     const bool altSymbols = m_doc->GetOptions()->m_octaveAlternativeSymbols.GetValue();
     int code = SMUFL_E511_ottavaAlta;
@@ -971,7 +971,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetID());
     else
-        dc->StartGraphic(tie, "", tie->GetID(), false);
+        dc->StartGraphic(tie, "", tie->GetID(), SPANNING);
 
     // set pen width and calculate tie thickness coefficient to adjust tie width in according to it
     const int thickness
@@ -1026,7 +1026,7 @@ void View::DrawPedalLine(
         dc->ResumeGraphic(graphic, graphic->GetID());
     }
     else {
-        dc->StartGraphic(pedal, "", pedal->GetID(), false);
+        dc->StartGraphic(pedal, "", pedal->GetID(), SPANNING);
     }
 
     const int bracketSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -1086,7 +1086,7 @@ void View::DrawTrillExtension(
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetID());
     else
-        dc->StartGraphic(trill, "", trill->GetID(), false);
+        dc->StartGraphic(trill, "", trill->GetID(), SPANNING);
 
     this->DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, false, SMUFL_E59D_ornamentZigZagLineNoRightEnd, 0,
         SMUFL_E59E_ornamentZigZagLineWithRightEnd);
@@ -1157,7 +1157,7 @@ void View::DrawControlElementConnector(
         dc->ResumeGraphic(graphic, graphic->GetID());
     }
     else {
-        dc->StartGraphic(element, "", element->GetID(), false);
+        dc->StartGraphic(element, "", element->GetID(), SPANNING);
     }
 
     bool deactivate = true;
@@ -1224,7 +1224,7 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
         dc->ResumeGraphic(graphic, graphic->GetID());
     }
     else
-        dc->StartGraphic(&fConnector, "", f->GetID(), false);
+        dc->StartGraphic(&fConnector, "", f->GetID(), SPANNING);
 
     dc->DeactivateGraphic();
 
@@ -1298,7 +1298,7 @@ void View::DrawSylConnector(
         dc->ResumeGraphic(graphic, graphic->GetID());
     }
     else
-        dc->StartGraphic(&sylConnector, "", syl->GetID(), false);
+        dc->StartGraphic(&sylConnector, "", syl->GetID(), SPANNING);
 
     dc->DeactivateGraphic();
 
@@ -2070,7 +2070,7 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         dc->ResumeGraphic(graphic, graphic->GetID());
     }
     else {
-        dc->StartGraphic(gliss, "", gliss->GetID(), false);
+        dc->StartGraphic(gliss, "", gliss->GetID(), SPANNING);
     }
 
     switch (gliss->GetLform()) {
@@ -2771,7 +2771,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START))
         dc->ResumeGraphic(ending, ending->GetID());
     else
-        dc->StartGraphic(ending, "", ending->GetID(), false);
+        dc->StartGraphic(ending, "", ending->GetID(), SPANNING);
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList;

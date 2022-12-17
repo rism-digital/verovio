@@ -117,8 +117,8 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    void StartGraphic(
-        Object *object, std::string gClass, std::string gId, bool primary = true, bool prepend = false) override;
+    void StartGraphic(Object *object, std::string gClass, std::string gId, GraphicID graphicID = PRIMARY,
+        bool prepend = false) override;
     void EndGraphic(Object *object, View *view) override;
     ///@}
 
@@ -171,7 +171,8 @@ public:
     /**
      * Add id, data-id and class attributes
      */
-    void AppendIdAndClass(std::string gId, std::string baseClass, std::string addedClasses, bool primary = true);
+    void AppendIdAndClass(
+        std::string gId, std::string baseClass, std::string addedClasses, GraphicID graphicID = PRIMARY);
 
     /**
      * Append additional attributes, as given in m_svgAdditionalAttributes

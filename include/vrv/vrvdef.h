@@ -649,6 +649,12 @@ enum StemSameasDrawingRole { SAMEAS_NONE = 0, SAMEAS_UNSET, SAMEAS_PRIMARY, SAME
 enum SmuflTextFont { SMUFL_NONE = 0, SMUFL_FONT_SELECTED, SMUFL_FONT_FALLBACK };
 
 //----------------------------------------------------------------------------
+// Graphic ID type
+//----------------------------------------------------------------------------
+
+enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
+
+//----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
 

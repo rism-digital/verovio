@@ -211,7 +211,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     m_committed = true;
 }
 
-void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId, bool primary, bool prepend)
+void SvgDeviceContext::StartGraphic(
+    Object *object, std::string gClass, std::string gId, GraphicID graphicID, bool prepend)
 {
     if (object->HasAttClass(ATT_TYPED)) {
         AttTyped *att = dynamic_cast<AttTyped *>(object);
@@ -228,7 +229,7 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         m_currentNode = m_currentNode.append_child("g");
     }
     m_svgNodeStack.push_back(m_currentNode);
-    AppendIdAndClass(gId, object->GetClassName(), gClass, primary);
+    AppendIdAndClass(gId, object->GetClassName(), gClass, graphicID);
     AppendAdditionalAttributes(object);
 
     // this sets staffDef styles for lyrics
@@ -1088,7 +1089,8 @@ void SvgDeviceContext::AddDescription(const std::string &text)
     desc.append_child(pugi::node_pcdata).set_value(text.c_str());
 }
 
-void SvgDeviceContext::AppendIdAndClass(std::string gId, std::string baseClass, std::string addedClasses, bool primary)
+void SvgDeviceContext::AppendIdAndClass(
+    std::string gId, std::string baseClass, std::string addedClasses, GraphicID graphicID)
 {
     std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
 
@@ -1096,7 +1098,7 @@ void SvgDeviceContext::AppendIdAndClass(std::string gId, std::string baseClass, 
         if (m_html5) {
             m_currentNode.append_attribute("data-id") = gId.c_str();
         }
-        else if (primary) {
+        else if (graphicID == PRIMARY) {
             // Don't write ids for HTML5 to avoid id clashes when embedding into
             // an HTML document.
             m_currentNode.append_attribute("id") = gId.c_str();
@@ -1107,7 +1109,7 @@ void SvgDeviceContext::AppendIdAndClass(std::string gId, std::string baseClass, 
         m_currentNode.append_attribute("data-class") = baseClass.c_str();
     }
 
-    if (!primary) {
+    if (graphicID != PRIMARY) {
         baseClass.append(" spanning id-" + gId);
     }
     if (!addedClasses.empty()) {
@@ -1211,7 +1213,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             m_currentNode = m_pageNode;
         }
 
-        StartGraphic(object, "bounding-box", "bbox-" + object->GetID(), true, true);
+        StartGraphic(object, "bounding-box", "bbox-" + object->GetID(), PRIMARY, true);
 
         if (box->HasSelfBB()) {
             this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
@@ -1262,7 +1264,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 
         if (drawContentBB) {
             if (object->HasContentBB()) {
-                StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetID(), true, true);
+                StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetID(), PRIMARY, true);
                 if (object->HasContentBB()) {
                     this->DrawSvgBoundingBoxRectangle(
                         view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
