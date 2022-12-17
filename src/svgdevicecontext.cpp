@@ -1076,6 +1076,9 @@ void SvgDeviceContext::DrawSvgShape(int x, int y, int width, int height, double 
         = StringFormat("translate(%d, %d) scale(%f, %f)", x, y, scale * DEFINITION_FACTOR, scale * DEFINITION_FACTOR)
               .c_str();
 
+    // Remove the ID in the SVG because it might be duplicated and that will not be valid
+    m_currentNode.remove_attribute("id");
+
     for (pugi::xml_node child : svg.children()) {
         m_currentNode.append_copy(child);
     }
