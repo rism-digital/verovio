@@ -73,11 +73,6 @@ public:
      */
     bool IsExtenderElement() const override { return GetExtender() == BOOLEAN_true; }
 
-    /**
-     * Check whether one of the children has hAlign attribute set to `alignment` value
-     */
-    bool AreChildrenAlignedTo(data_HORIZONTALALIGNMENT alignment) const;
-
     //----------//
     // Functors //
     //----------//

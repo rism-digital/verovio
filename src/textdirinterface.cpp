@@ -43,4 +43,14 @@ int TextDirInterface::GetNumberOfLines(const Object *object) const
     return object->GetDescendantCount(LB) + 1;
 }
 
+bool TextDirInterface::AreChildrenAlignedTo(const Object *object, data_HORIZONTALALIGNMENT alignment) const
+{
+    ArrayOfConstObjects children = object->GetChildren();
+    bool hasHalign = std::any_of(children.begin(), children.end(), [&alignment](const Object *child) {
+        const AttHorizontalAlign *hAlign = dynamic_cast<const AttHorizontalAlign *>(child);
+        return (hAlign && (hAlign->GetHalign() == alignment));
+    });
+    return hasHalign;
+}
+
 } // namespace vrv
