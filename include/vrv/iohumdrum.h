@@ -785,6 +785,9 @@ protected:
     void insertGlissandos(std::vector<hum::HTp> &tokens);
     void createGlissando(hum::HTp glissStart, hum::HTp glissEnd);
     void setSmuflContent(Symbol *symbol, const std::string &name);
+    data_DURATION oneOverDenominatorToDur(int denominator);
+    bool isExpressibleDuration(hum::HumNum duration);
+    pair<data_DURATION, int> getDurAndDots(hum::HumNum duration);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -806,7 +809,6 @@ protected:
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
     template <class ELEMENT> void setRhythmFromDuration(ELEMENT element, hum::HumNum dur);
-    template <class ELEMENT> void setGesturalRhythmFromDuration(ELEMENT element, hum::HumNum dur);
     template <class ELEMENT> void setVisualAndGesturalRhythmFromDuration(ELEMENT element, hum::HumNum visdur, hum::HumNum gesdur);
     template <class ELEMENT> hum::HumNum convertMensuralRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
