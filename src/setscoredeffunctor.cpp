@@ -69,4 +69,26 @@ FunctorCode ScoreDefSetCurrentPageFunctor::VisitPageEnd(Page *page)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// ScoreDefSetCurrentFunctor
+//----------------------------------------------------------------------------
+
+ScoreDefSetCurrentFunctor::ScoreDefSetCurrentFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_currentScore = NULL;
+    m_currentScoreDef = NULL;
+    m_currentStaffDef = NULL;
+    m_upcomingScoreDef.Reset();
+    m_previousMeasure = NULL;
+    m_currentSystem = NULL;
+    m_drawLabels = false;
+    m_restart = false;
+    m_hasMeasure = false;
+}
+
+FunctorCode ScoreDefSetCurrentFunctor::VisitObject(Object *object)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
