@@ -869,10 +869,8 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     scoreDefSetCurrentPage.SetDirection(FORWARD);
     this->Process(scoreDefSetCurrentPage, 3);
 
-    // ScoreDef upcomingScoreDef;
-    Functor scoreDefSetCurrent(&Object::ScoreDefSetCurrent);
-    ScoreDefSetCurrentParams scoreDefSetCurrentParams(this, &scoreDefSetCurrent);
-    this->Process(&scoreDefSetCurrent, &scoreDefSetCurrentParams);
+    ScoreDefSetCurrentFunctor scoreDefSetCurrent(this);
+    this->Process(scoreDefSetCurrent);
 
     this->ScoreDefSetGrpSymDoc();
 

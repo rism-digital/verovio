@@ -1088,14 +1088,6 @@ public:
     ///@{
 
     /**
-     * Set the current scoreDef wherever need.
-     * This is include a scoreDef for each system.
-     * It also includes a scoreDef for each measure where a change occured before.
-     * A change can be either a scoreDef before or a clef, meterSig, etc. within the previous measure.
-     */
-    virtual int ScoreDefSetCurrent(FunctorParams *functorParams);
-
-    /**
      * Optimize the scoreDef for each system.
      * For automatic breaks, looks for staves with only mRests.
      */

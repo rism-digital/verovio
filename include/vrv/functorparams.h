@@ -2197,53 +2197,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// ScoreDefSetCurrentParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current score
- * member 1: the current scoreDef
- * member 2: the current staffDef
- * member 3: the upcoming scoreDef
- * member 4: the previous measure (for setting cautionary scoreDef)
- * member 5: the current system (for setting the system scoreDef)
- * member 6: the flag indicating whereas full labels have to be drawn
- * member 7: the flag indicating that the scoreDef restarts (draw brace and label)
- * member 8: the flag indicating is we already have a measure in the system
- * member 9: the doc
- * member 10: the functor to be redirected from Score
- **/
-
-class ScoreDefSetCurrentParams : public FunctorParams {
-public:
-    ScoreDefSetCurrentParams(Doc *doc, Functor *functor)
-    {
-        m_currentScore = NULL;
-        m_currentScoreDef = NULL;
-        m_currentStaffDef = NULL;
-        m_upcomingScoreDef.Reset();
-        m_previousMeasure = NULL;
-        m_currentSystem = NULL;
-        m_drawLabels = false;
-        m_restart = false;
-        m_hasMeasure = false;
-        m_doc = doc;
-        m_functor = functor;
-    }
-    Score *m_currentScore;
-    ScoreDef *m_currentScoreDef;
-    StaffDef *m_currentStaffDef;
-    ScoreDef m_upcomingScoreDef;
-    Measure *m_previousMeasure;
-    System *m_currentSystem;
-    bool m_drawLabels;
-    bool m_restart;
-    bool m_hasMeasure;
-    Doc *m_doc;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // ScoreDefSetGrpSymParams
 //----------------------------------------------------------------------------
 

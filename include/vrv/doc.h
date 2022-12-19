@@ -598,7 +598,7 @@ private:
 
     /**
      * A flag to indicate whether the currentScoreDef has been set or not.
-     * If yes, ScoreDefSetCurrent will not parse the document (again) unless
+     * If yes, ScoreDefSetCurrentDoc will not parse the document (again) unless
      * the force parameter is set.
      */
     bool m_currentScoreDefDone;
