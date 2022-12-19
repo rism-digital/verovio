@@ -1525,8 +1525,10 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (stem->IsVirtual()) return;
 
     dc->StartGraphic(element, "", element->GetID());
-    
-    DrawVerticalLine(dc, stem->GetDrawingY(), stem->GetDrawingY() - (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()), stem->GetDrawingX(), m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+
+    DrawVerticalLine(dc, stem->GetDrawingY(),
+        stem->GetDrawingY() - (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()), stem->GetDrawingX(),
+        m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
 
     this->DrawStemMod(dc, element, staff);
 
