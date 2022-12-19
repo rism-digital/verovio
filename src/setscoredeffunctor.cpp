@@ -342,4 +342,47 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitObject(Object *object)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// ScoreDefOptimizeFunctor
+//----------------------------------------------------------------------------
+
+ScoreDefOptimizeFunctor::ScoreDefOptimizeFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_currentScoreDef = NULL;
+    m_encoded = false;
+    m_firstScoreDef = true;
+    m_hasFermata = false;
+    m_hasTempo = false;
+}
+
+FunctorCode ScoreDefOptimizeFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefOptimizeFunctor::VisitScore(Score *score)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefOptimizeFunctor::VisitStaff(Staff *staff)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefOptimizeFunctor::VisitStaffGrpEnd(StaffGrp *staffGrp)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefOptimizeFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefOptimizeFunctor::VisitSystemEnd(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

@@ -158,6 +158,61 @@ private:
     bool m_hasMeasure;
 };
 
+//----------------------------------------------------------------------------
+// ScoreDefOptimizeFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class optimizes the scoreDef for each system.
+ * For automatic breaks, it looks for staves with only mRests.
+ */
+
+class ScoreDefOptimizeFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ScoreDefOptimizeFunctor(Doc *doc);
+    virtual ~ScoreDefOptimizeFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitStaffGrpEnd(StaffGrp *staffGrp) override;
+    FunctorCode VisitSystem(System *system) override;
+    FunctorCode VisitSystemEnd(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current scoreDef
+    ScoreDef *m_currentScoreDef;
+    // Flag indicating if we are optimizing encoded layout
+    bool m_encoded;
+    // Flag indicating if we consider the first scoreDef
+    bool m_firstScoreDef;
+    // Flag indicating if a Fermata element is present
+    bool m_hasFermata;
+    // Flag indicating if a Tempo element is present
+    bool m_hasTempo;
+};
+
 } // namespace vrv
 
 #endif // __VRV_SETSCOREDEFFUNCTOR_H__
