@@ -166,7 +166,6 @@ private:
  * This class optimizes the scoreDef for each system.
  * For automatic breaks, it looks for staves with only mRests.
  */
-
 class ScoreDefOptimizeFunctor : public DocFunctor {
 public:
     /**
@@ -211,6 +210,48 @@ private:
     bool m_hasFermata;
     // Flag indicating if a Tempo element is present
     bool m_hasTempo;
+};
+
+//----------------------------------------------------------------------------
+// SetCautionaryScoreDefFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class sets the cautionary scoreDef wherever needed.
+ */
+class SetCautionaryScoreDefFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    SetCautionaryScoreDefFunctor(ScoreDef *currentScoreDef);
+    virtual ~SetCautionaryScoreDefFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current scoreDef
+    ScoreDef *m_currentScoreDef;
+    // The current staffDef
+    StaffDef *m_currentStaffDef;
 };
 
 } // namespace vrv
