@@ -1088,17 +1088,6 @@ public:
     ///@{
 
     /**
-     * Optimize the scoreDef for each system.
-     * For automatic breaks, looks for staves with only mRests.
-     */
-    virtual int ScoreDefOptimize(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ScoreDefOptimize
-     */
-    virtual int ScoreDefOptimizeEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Set the cautionnary scoreDef wherever need.
      */
     virtual int SetCautionaryScoreDef(FunctorParams *functorParams);

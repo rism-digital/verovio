@@ -831,21 +831,6 @@ int Measure::ScoreDefUnsetCurrent(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::ScoreDefOptimize(FunctorParams *functorParams)
-{
-    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_doc->GetOptions()->m_condenseTempoPages.GetValue()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    params->m_hasFermata = (this->FindDescendantByType(FERMATA));
-    params->m_hasTempo = (this->FindDescendantByType(TEMPO));
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     this->SetDrawingXRel(0);

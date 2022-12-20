@@ -2163,40 +2163,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// ScoreDefOptimizeParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current scoreDef
- * member 1: the current staffDef
- * member 2: the flag indicating if we are optimizing encoded layout
- * member 3: the doc
- **/
-
-class ScoreDefOptimizeParams : public FunctorParams {
-public:
-    ScoreDefOptimizeParams(Doc *doc, Functor *functor, Functor *functorEnd)
-    {
-        m_currentScoreDef = NULL;
-        m_encoded = false;
-        m_firstScoreDef = true;
-        m_hasFermata = false;
-        m_hasTempo = false;
-        m_doc = doc;
-        m_functor = functor;
-        m_functorEnd = functorEnd;
-    }
-    ScoreDef *m_currentScoreDef;
-    bool m_encoded;
-    bool m_firstScoreDef;
-    bool m_hasFermata;
-    bool m_hasTempo;
-    Doc *m_doc;
-    Functor *m_functor;
-    Functor *m_functorEnd;
-};
-
-//----------------------------------------------------------------------------
 // ScoreDefSetGrpSymParams
 //----------------------------------------------------------------------------
 

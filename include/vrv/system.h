@@ -183,14 +183,6 @@ public:
     int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
 
     /**
-     * @name See Object::ScoreDefOptimize
-     */
-    ///@{
-    int ScoreDefOptimize(FunctorParams *functorParams) override;
-    int ScoreDefOptimizeEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::ScoreDefSetGrpSym
      */
     int ScoreDefSetGrpSym(FunctorParams *functorParams) override;

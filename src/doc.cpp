@@ -879,11 +879,8 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
 
 void Doc::ScoreDefOptimizeDoc()
 {
-    Functor scoreDefOptimize(&Object::ScoreDefOptimize);
-    Functor scoreDefOptimizeEnd(&Object::ScoreDefOptimizeEnd);
-    ScoreDefOptimizeParams scoreDefOptimizeParams(this, &scoreDefOptimize, &scoreDefOptimizeEnd);
-
-    this->Process(&scoreDefOptimize, &scoreDefOptimizeParams, &scoreDefOptimizeEnd);
+    ScoreDefOptimizeFunctor scoreDefOptimize(this);
+    this->Process(scoreDefOptimize);
 
     this->ScoreDefSetGrpSymDoc();
 }

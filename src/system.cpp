@@ -503,43 +503,6 @@ int System::ScoreDefUnsetCurrent(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::ScoreDefOptimize(FunctorParams *functorParams)
-{
-    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
-    assert(params);
-
-    this->IsDrawingOptimized(true);
-
-    if (params->m_firstScoreDef) {
-        params->m_firstScoreDef = false;
-        if (!params->m_doc->GetOptions()->m_condenseFirstPage.GetValue()) {
-            return FUNCTOR_SIBLINGS;
-        }
-    }
-
-    if (this->IsLastOfMdiv()) {
-        if (params->m_doc->GetOptions()->m_condenseNotLastSystem.GetValue()) {
-            return FUNCTOR_SIBLINGS;
-        }
-    }
-
-    params->m_currentScoreDef = this->GetDrawingScoreDef();
-    assert(params->m_currentScoreDef);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::ScoreDefOptimizeEnd(FunctorParams *functorParams)
-{
-    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
-    assert(params);
-
-    params->m_currentScoreDef->Process(params->m_functor, params, params->m_functorEnd);
-    m_systemAligner.SetSpacing(params->m_currentScoreDef);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
 {
     ScoreDefSetGrpSymParams *params = vrv_params_cast<ScoreDefSetGrpSymParams *>(functorParams);

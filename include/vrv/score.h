@@ -135,11 +135,6 @@ public:
     int UnCastOff(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ScoreDefOptimize
-     */
-    int ScoreDefOptimize(FunctorParams *functorParams) override;
-
-    /**
      * See Object::PrepareDuration
      */
     int PrepareDuration(FunctorParams *functorParams) override;

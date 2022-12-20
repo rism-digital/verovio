@@ -388,53 +388,6 @@ int Staff::ScoreDefUnsetCurrent(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::ScoreDefOptimize(FunctorParams *functorParams)
-{
-    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentScoreDef);
-    StaffDef *staffDef = params->m_currentScoreDef->GetStaffDef(this->GetN());
-
-    if (!staffDef) {
-        LogDebug(
-            "Could not find staffDef for staff (%d) when optimizing scoreDef in Staff::ScoreDefOptimize", this->GetN());
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Always show staves with a clef change
-    if (this->FindDescendantByType(CLEF)) {
-        staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
-    }
-
-    // Always show all staves when there is a fermata or a tempo
-    // (without checking if the fermata is actually on that staff)
-    if (params->m_hasFermata || params->m_hasTempo) {
-        staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
-    }
-
-    if (staffDef->GetDrawingVisibility() == OPTIMIZATION_SHOW) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    staffDef->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
-
-    // Ignore layers that are empty (or with @sameas)
-    ListOfObjects layers;
-    IsEmptyComparison matchTypeLayer(LAYER);
-    matchTypeLayer.ReverseComparison();
-    this->FindAllDescendantsByComparison(&layers, &matchTypeLayer);
-
-    Object *note = this->FindDescendantByType(NOTE);
-
-    // Show the staff only if there are any notes
-    if (note) {
-        staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_staffAlignment = NULL;

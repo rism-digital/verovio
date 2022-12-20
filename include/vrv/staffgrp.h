@@ -128,11 +128,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::ScoreDefOptimize
-     */
-    int ScoreDefOptimizeEnd(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Filter the flat list and keep only StaffDef elements.

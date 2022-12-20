@@ -327,11 +327,6 @@ public:
     int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ScoreDefOptimize
-     */
-    int ScoreDefOptimize(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ResetHorizontalAlignment
      */
     int ResetHorizontalAlignment(FunctorParams *functorParams) override;
