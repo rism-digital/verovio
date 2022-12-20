@@ -19,6 +19,8 @@
 %ignore vrv::Toolkit::SetShowBoundingBoxes( bool );
 %ignore vrv::Toolkit::SetCString( const std::string & );
 
+%feature("autodoc", "1");
+
 // Because we transform the strings to dictionaries, we need this module
 %pythonbegin %{
     import json
