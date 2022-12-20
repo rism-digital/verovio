@@ -70,7 +70,7 @@ int AltSymInterface::InterfacePrepareAltSym(FunctorParams *functorParams, Object
         if (params->m_symbolTable) symbolDef = params->m_symbolTable->FindDescendantByID(m_symbolDefID);
 
         if (!symbolDef || !symbolDef->Is(SYMBOLDEF)) {
-            LogWarning("Reference to the symbolDef `%s` could not be resovled", m_symbolDefID.c_str());
+            LogWarning("Reference to the symbolDef `%s` could not be resolved", m_symbolDefID.c_str());
             return FUNCTOR_CONTINUE;
         }
         this->m_symbolDef = vrv_cast<SymbolDef *>(symbolDef);
