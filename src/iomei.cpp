@@ -5079,7 +5079,7 @@ bool MEIInput::ReadSymbolTable(Object *parent, pugi::xml_node symbolTable)
     parent->AddChild(vrvSymbolTable);
 
     bool success = true;
-    // No need to have ReadSymboleTableChildren for this...
+    // No need to have ReadSymbolTableChildren for this...
     pugi::xml_node current;
     for (current = symbolTable.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
