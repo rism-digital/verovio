@@ -96,9 +96,9 @@ def getMIDIValuesForElement(toolkit, xml_id: str) -> dict:
 
 // Toolkit::GetNotatedIdForElement
 %feature("shadow") vrv::Toolkit::GetNotatedIdForElement(const std::string &) %{
-def getNotatedIdForElement(toolkit, xml_id: str) -> dict:
+def getNotatedIdForElement(toolkit, xml_id: str) -> str:
     """Return the ID string of the notated (the original) element."""
-    return json.loads($action(toolkit, xml_id))
+    return $action(toolkit, xml_id)
 %}
 
 // Toolkit::GetOptions
