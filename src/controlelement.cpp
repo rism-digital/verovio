@@ -27,8 +27,10 @@ namespace vrv {
 // ControlElement
 //----------------------------------------------------------------------------
 
-ControlElement::ControlElement() : FloatingObject(CONTROL_ELEMENT, "ce"), LinkingInterface(), AttLabelled(), AttTyped()
+ControlElement::ControlElement()
+    : FloatingObject(CONTROL_ELEMENT, "ce"), AltSymInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
@@ -37,8 +39,9 @@ ControlElement::ControlElement() : FloatingObject(CONTROL_ELEMENT, "ce"), Linkin
 }
 
 ControlElement::ControlElement(ClassId classId)
-    : FloatingObject(classId, "ce"), LinkingInterface(), AttLabelled(), AttTyped()
+    : FloatingObject(classId, "ce"), AltSymInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
@@ -47,8 +50,9 @@ ControlElement::ControlElement(ClassId classId)
 }
 
 ControlElement::ControlElement(ClassId classId, const std::string &classIdStr)
-    : FloatingObject(classId, classIdStr), LinkingInterface(), AttLabelled(), AttTyped()
+    : FloatingObject(classId, classIdStr), AltSymInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_TYPED);
@@ -61,6 +65,7 @@ ControlElement::~ControlElement() {}
 void ControlElement::Reset()
 {
     FloatingObject::Reset();
+    AltSymInterface::Reset();
     LinkingInterface::Reset();
     this->ResetLabelled();
     this->ResetTyped();
@@ -149,6 +154,11 @@ int ControlElement::ResetData(FunctorParams *functorParams)
     FloatingObject::ResetData(functorParams);
 
     // Pass it to the pseudo functor of the interface
+    if (this->HasInterface(INTERFACE_ALT_SYM)) {
+        AltSymInterface *interface = this->GetAltSymInterface();
+        assert(interface);
+        return interface->InterfaceResetData(functorParams, this);
+    }
     if (this->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = this->GetLinkingInterface();
         assert(interface);

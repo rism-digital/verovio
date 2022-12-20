@@ -43,4 +43,20 @@ void Graphic::Reset()
     this->ResetTyped();
 }
 
+int Graphic::GetDrawingWidth(int unit, int staffSize) const
+{
+    if (!this->HasWidth() || staffSize == 0) return 0;
+    if (this->GetWidth().GetType() == MEASUREMENTTYPE_px) return (this->GetWidth().GetPx() * staffSize / 100);
+    // The staffSize is already taken into account in the unit
+    return (this->GetWidth().GetVu() * unit);
+}
+
+int Graphic::GetDrawingHeight(int unit, int staffSize) const
+{
+    if (!this->HasHeight()) return 0;
+    if (this->GetHeight().GetType() == MEASUREMENTTYPE_px) return (this->GetHeight().GetPx() * staffSize / 100);
+    // The staffSize is already taken into account in the unit
+    return (this->GetHeight().GetVu() * unit);
+}
+
 } // namespace vrv
