@@ -117,14 +117,14 @@ def getTimesForElement(toolkit, xml_id: str) -> dict:
 
 // Toolkit::RedoLayout
 %feature("shadow") vrv::Toolkit::RedoLayout(const std::string & = "") %{
-def redoLayout(toolkit, options:dict = {}):
+def redoLayout(toolkit, options:dict = {}) -> None:
     """Redo the layout of the loaded data."""
     return $action(toolkit, json.dumps(options))
 %}
 
 // Toolkit::RenderData
 %feature("shadow") vrv::Toolkit::RenderData(const std::string &, const std::string &) %{
-def renderData(toolkit, data, options: dict):
+def renderData(toolkit, data, options: dict) -> str:
     """Render the first page of the data to SVG."""
     return $action(toolkit, data, json.dumps(options))
 %}
@@ -159,7 +159,7 @@ def saveFile(toolkit, filename: str, options: dict = {}) -> None:
 
 // Toolkit::Select
 %feature("shadow") vrv::Toolkit::Select(const std::string &) %{
-def select(toolkit, selection):
+def select(toolkit, selection: dict) -> bool:
     """Set the value for a selection."""
     return $action(toolkit, json.dumps(selection))
 %}
