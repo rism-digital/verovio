@@ -94,13 +94,6 @@ def getMIDIValuesForElement(toolkit, xml_id: str) -> dict:
     return json.loads($action(toolkit, xml_id))
 %}
 
-// Toolkit::GetNotatedIdForElement
-%feature("shadow") vrv::Toolkit::GetNotatedIdForElement(const std::string &) %{
-def getNotatedIdForElement(toolkit, xml_id: str) -> str:
-    """Return the ID string of the notated (the original) element."""
-    return $action(toolkit, xml_id)
-%}
-
 // Toolkit::GetOptions
 %feature("shadow") vrv::Toolkit::GetOptions() const %{
 def getOptions(toolkit) -> dict:
@@ -127,13 +120,6 @@ def redoLayout(toolkit, options:dict = {}) -> None:
 def renderData(toolkit, data, options: dict) -> str:
     """Render the first page of the data to SVG."""
     return $action(toolkit, data, json.dumps(options))
-%}
-
-// Toolkit::RenderToMIDI
-%feature("shadow") vrv::Toolkit::RenderToMIDI(const std::string &) %{
-def renderToMIDI(toolkit, options) -> dict:
-    """Render the document to MIDI."""
-    return json.loads($action(toolkit, json.dumps(options)))
 %}
 
 // Toolkit::RenderToTimemap
