@@ -292,8 +292,8 @@ std::string Att::LinewidthToStr(data_LINEWIDTH data) const
     std::string value;
     if (data.GetType() == LINEWIDTHTYPE_lineWidthTerm)
         value = data.GetLineWithTerm();
-    else if (data.GetType() == LINEWIDTHTYPE_measurementUnsigned)
-        value = MeasurementunsignedToStr(data.GetMeasurementUnsigned());
+    else if (data.GetType() == LINEWIDTHTYPE_measurementunsigned)
+        value = MeasurementunsignedToStr(data.GetMeasurementunsigned());
 
     return value;
 }
@@ -303,7 +303,7 @@ data_LINEWIDTH Att::StrToLinewidth(const std::string &value, bool logWarning) co
     data_LINEWIDTH data;
     data.SetLineWidthTerm(StrToLinewidthterm(value, false));
     if (data.HasValue()) return data;
-    data.SetMeasurementUnsigned(StrToMeasurementunsigned(value));
+    data.SetMeasurementunsigned(StrToMeasurementunsigned(value));
     if (data.HasValue()) return data;
 
     if (logWarning && !value.empty()) LogWarning("Unsupported data.LINEWIDTH '%s'", value.c_str());

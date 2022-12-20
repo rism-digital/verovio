@@ -495,12 +495,12 @@ void View::DrawBracketSpan(
                 lineWidth *= LINEWIDTHTERM_factor_wide;
             }
         }
-        else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
-            if (bracketSpan->GetLwidth().GetMeasurementUnsigned().GetType() == MEASUREMENTTYPE_px) {
-                lineWidth = bracketSpan->GetLwidth().GetMeasurementUnsigned().GetPx();
+        else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementunsigned) {
+            if (bracketSpan->GetLwidth().GetMeasurementunsigned().GetType() == MEASUREMENTTYPE_px) {
+                lineWidth = bracketSpan->GetLwidth().GetMeasurementunsigned().GetPx();
             }
             else {
-                lineWidth = bracketSpan->GetLwidth().GetMeasurementUnsigned().GetVu()
+                lineWidth = bracketSpan->GetLwidth().GetMeasurementunsigned().GetVu()
                     * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
         }
@@ -795,12 +795,12 @@ void View::DrawOctave(
                     lineWidth *= LINEWIDTHTERM_factor_wide;
                 }
             }
-            else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
-                if (octave->GetLwidth().GetMeasurementUnsigned().GetType() == MEASUREMENTTYPE_px) {
-                    lineWidth = octave->GetLwidth().GetMeasurementUnsigned().GetPx();
+            else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementunsigned) {
+                if (octave->GetLwidth().GetMeasurementunsigned().GetType() == MEASUREMENTTYPE_px) {
+                    lineWidth = octave->GetLwidth().GetMeasurementunsigned().GetPx();
                 }
                 else {
-                    lineWidth = octave->GetLwidth().GetMeasurementUnsigned().GetVu()
+                    lineWidth = octave->GetLwidth().GetMeasurementunsigned().GetVu()
                         * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
                 }
             }
@@ -2055,12 +2055,12 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
                 lineWidth *= LINEWIDTHTERM_factor_wide;
             }
         }
-        else if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_measurementUnsigned) {
-            if (gliss->GetLwidth().GetMeasurementUnsigned().GetType() == MEASUREMENTTYPE_px) {
-                lineWidth = gliss->GetLwidth().GetMeasurementUnsigned().GetPx();
+        else if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_measurementunsigned) {
+            if (gliss->GetLwidth().GetMeasurementunsigned().GetType() == MEASUREMENTTYPE_px) {
+                lineWidth = gliss->GetLwidth().GetMeasurementunsigned().GetPx();
             }
             else {
-                lineWidth = gliss->GetLwidth().GetMeasurementUnsigned().GetVu()
+                lineWidth = gliss->GetLwidth().GetMeasurementunsigned().GetVu()
                     * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
         }
