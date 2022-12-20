@@ -376,15 +376,15 @@ bool FloatingPositioner::CalcDrawingYRel(
         int staffIndex = staffAlignment->GetStaff()->GetN();
 
         int minStaffDistance = 0.0;
-        data_MEASUREMENTSIGNED minStaffDistanceMesurement
+        data_MEASUREMENTSIGNED minStaffDistanceMeasurement
             = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place);
 
-        if (minStaffDistanceMesurement.HasValue()) {
-            if (minStaffDistanceMesurement.GetType() == MEASUREMENTTYPE_px) {
-                minStaffDistance = minStaffDistanceMesurement.GetPx();
+        if (minStaffDistanceMeasurement.HasValue()) {
+            if (minStaffDistanceMeasurement.GetType() == MEASUREMENTTYPE_px) {
+                minStaffDistance = minStaffDistanceMeasurement.GetPx();
             }
             else {
-                minStaffDistance = minStaffDistanceMesurement.GetVu() * doc->GetDrawingUnit(staffSize);
+                minStaffDistance = minStaffDistanceMeasurement.GetVu() * doc->GetDrawingUnit(staffSize);
             }
         }
 
