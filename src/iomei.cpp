@@ -3916,7 +3916,7 @@ bool MEIInput::ReadIncipits(pugi::xml_node root)
             Mdiv *mdiv = vrv_cast<Mdiv *>(incipitDoc.DetachChild(0));
             if (!mdiv) {
                 // We do consider it an error if reading the PAE failed
-                LogError("Reading the Plaine and Easie incipit failed.");
+                LogError("Reading the Plaine & Easie incipit failed.");
                 success = false;
                 continue;
             }
