@@ -161,9 +161,8 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitObject(Object *object)
             // The cautionary scoreDef for restart is already done when hitting the scoreDef
             if (m_upcomingScoreDef.m_setAsDrawing && m_previousMeasure && !m_restart) {
                 ScoreDef cautionaryScoreDef = m_upcomingScoreDef;
-                SetCautionaryScoreDefParams setCautionaryScoreDefParams(&cautionaryScoreDef);
-                Functor setCautionaryScoreDef(&Object::SetCautionaryScoreDef);
-                m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
+                SetCautionaryScoreDefFunctor setCautionaryScoreDef(&cautionaryScoreDef);
+                m_previousMeasure->Process(setCautionaryScoreDef);
             }
             // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
             m_upcomingScoreDef.SetRedrawFlags(StaffDefRedrawFlags::REDRAW_CLEF | StaffDefRedrawFlags::REDRAW_KEYSIG);
@@ -233,9 +232,8 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitObject(Object *object)
             // presence of a system break
             if (m_previousMeasure) {
                 ScoreDef cautionaryScoreDef = m_upcomingScoreDef;
-                SetCautionaryScoreDefParams setCautionaryScoreDefParams(&cautionaryScoreDef);
-                Functor setCautionaryScoreDef(&Object::SetCautionaryScoreDef);
-                m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
+                SetCautionaryScoreDefFunctor setCautionaryScoreDef(&cautionaryScoreDef);
+                m_previousMeasure->Process(setCautionaryScoreDef);
             }
         }
     }

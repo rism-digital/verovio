@@ -1088,11 +1088,6 @@ public:
     ///@{
 
     /**
-     * Set the cautionnary scoreDef wherever need.
-     */
-    virtual int SetCautionaryScoreDef(FunctorParams *functorParams);
-
-    /**
      * Unset the initial scoreDef of each system and measure
      */
     virtual int ScoreDefUnsetCurrent(FunctorParams *) { return FUNCTOR_CONTINUE; }

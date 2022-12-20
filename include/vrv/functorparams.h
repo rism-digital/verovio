@@ -2143,26 +2143,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// SetCautionaryScoreDefParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current scoreDef
- * member 1: the current staffDef
- **/
-
-class SetCautionaryScoreDefParams : public FunctorParams {
-public:
-    SetCautionaryScoreDefParams(ScoreDef *currentScoreDef)
-    {
-        m_currentScoreDef = currentScoreDef;
-        m_currentStaffDef = NULL;
-    }
-    ScoreDef *m_currentScoreDef;
-    StaffDef *m_currentStaffDef;
-};
-
-//----------------------------------------------------------------------------
 // ScoreDefSetGrpSymParams
 //----------------------------------------------------------------------------
 

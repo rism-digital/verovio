@@ -1893,32 +1893,6 @@ int Object::PrepareProcessPlist(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
-{
-    SetCautionaryScoreDefParams *params = vrv_params_cast<SetCautionaryScoreDefParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentScoreDef);
-
-    // starting a new staff
-    if (this->Is(STAFF)) {
-        Staff *staff = vrv_cast<Staff *>(this);
-        assert(staff);
-        params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
-        return FUNCTOR_CONTINUE;
-    }
-
-    // starting a new layer
-    if (this->Is(LAYER)) {
-        Layer *layer = vrv_cast<Layer *>(this);
-        assert(layer);
-        layer->SetDrawingCautionValues(params->m_currentStaffDef);
-        return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Object::GetAlignmentLeftRight(FunctorParams *functorParams) const
 {
     GetAlignmentLeftRightParams *params = vrv_params_cast<GetAlignmentLeftRightParams *>(functorParams);
