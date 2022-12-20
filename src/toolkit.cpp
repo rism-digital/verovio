@@ -1165,7 +1165,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found at all
     if (!element) {
-        LogInfo("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '%s' not found", xmlId.c_str());
         return o.json();
     }
 
@@ -1705,7 +1705,7 @@ std::string Toolkit::GetTimesForElement(const std::string &xmlId)
     jsonxx::Object o;
 
     if (!element) {
-        LogInfo("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '%s' not found", xmlId.c_str());
         return o.json();
     }
 
@@ -1759,7 +1759,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
     jsonxx::Object o;
 
     if (!element) {
-        LogInfo("Element '%s' not found", xmlId.c_str());
+        LogWarning("Element '%s' not found", xmlId.c_str());
         return o.json();
     }
 
