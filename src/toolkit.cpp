@@ -839,7 +839,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     if (this->GetPageCount() == 0) {
         LogWarning("No data loaded");
-        return {};
+        return "";
     }
 
     int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
@@ -848,7 +848,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     if (m_doc.HasSelection()) {
         if (!scoreBased) {
             LogError("Page-based MEI output is not possible when a selection is set.");
-            return {};
+            return "";
         }
         hadSelection = true;
         m_doc.DeactiveateSelection();
@@ -1362,7 +1362,7 @@ std::string Toolkit::RenderData(const std::string &data, const std::string &json
     if (this->SetOptions(jsonOptions) && this->LoadData(data)) return this->RenderToSVG(1);
 
     // Otherwise just return an empty string.
-    return {};
+    return "";
 }
 
 std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
@@ -1481,7 +1481,7 @@ std::string Toolkit::RenderToPAE()
 
     if (this->GetPageCount() == 0) {
         LogWarning("No data loaded");
-        return {};
+        return "";
     }
 
     std::string output;
@@ -1879,7 +1879,7 @@ std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
     this->SetHumdrumBuffer(conversion.str().c_str());
     return conversion.str();
 #else
-    return {};
+    return "";
 #endif
 }
 
@@ -1892,11 +1892,11 @@ std::string Toolkit::ConvertHumdrumToHumdrum(const std::string &humdrumData)
     bool result = infiles.readString(humdrumData);
     if (!result) {
         this->SetHumdrumBuffer("");
-        return {};
+        return "";
     }
     if (infiles.getCount() == 0) {
         this->SetHumdrumBuffer("");
-        return {};
+        return "";
     }
 
     // Apply Humdrum tools if there are any filters in the file.
@@ -1928,7 +1928,7 @@ std::string Toolkit::ConvertHumdrumToHumdrum(const std::string &humdrumData)
     this->SetHumdrumBuffer(humout.str().c_str());
     return humout.str();
 #else
-    return {};
+    return "";
 #endif
 }
 
