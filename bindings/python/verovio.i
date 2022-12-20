@@ -24,6 +24,7 @@
 // Because we transform the strings to dictionaries, we need this module
 %pythonbegin %{
     import json
+    from typing import Optional
 %}
 
 // Toolkit::Edit
@@ -56,8 +57,10 @@ def getDefaultOptions(toolkit) -> dict:
 
 // Toolkit::GetDescriptiveFeatures
 %feature("shadow") vrv::Toolkit::GetDescriptiveFeatures(const std::string &) %{
-def getDescriptiveFeatures(toolkit, options: dict = {}) -> dict:
+def getDescriptiveFeatures(toolkit, options: Optional[dict] = None) -> dict:
     """Return descriptive features as dictionary."""
+    if options is None:
+        options = {}
     return json.loads($action(toolkit, json.dumps(options)))
 %}
 
@@ -84,8 +87,10 @@ def getExpansionIdsForElement(toolkit, xml_id: str) -> dict:
 
 // Toolkit::GetMEI
 %feature("shadow") vrv::Toolkit::GetMEI(const std::string & = "") %{
-def getMEI(toolkit, options: dict = {}) -> str:
+def getMEI(toolkit, options: Optional[dict] = None) -> str:
     """Get the MEI as a string."""
+    if options is None:
+        options = {}
     return $action(toolkit, json.dumps(options))
 %}
 
@@ -112,8 +117,10 @@ def getTimesForElement(toolkit, xml_id: str) -> dict:
 
 // Toolkit::RedoLayout
 %feature("shadow") vrv::Toolkit::RedoLayout(const std::string & = "") %{
-def redoLayout(toolkit, options:dict = {}) -> None:
+def redoLayout(toolkit, options: Optional[dict] = None) -> None:
     """Redo the layout of the loaded data."""
+    if options is None:
+        options = {}
     return $action(toolkit, json.dumps(options))
 %}
 
@@ -126,22 +133,28 @@ def renderData(toolkit, data, options: dict) -> str:
 
 // Toolkit::RenderToTimemap
 %feature("shadow") vrv::Toolkit::RenderToTimemap(const std::string & = "") %{
-def renderToTimemap(toolkit, options: dict = {}) -> list:
+def renderToTimemap(toolkit, options: Optional[dict] = None) -> list:
     """Render a document to a timemap."""
+    if options is None:
+        options = {}
     return json.loads($action(toolkit, json.dumps(options)))
 %}
 
 // Toolkit::RenderToTimemapFile
 %feature("shadow") vrv::Toolkit::RenderToTimemapFile(const std::string &, const std::string & = "") %{
-def renderToTimemapFile(toolkit, filename: str, options: dict = {}) -> None:
+def renderToTimemapFile(toolkit, filename: str, options: Optional[dict] = None) -> None:
     """Render a document to timemap and save it to the file."""
+    if options is None:
+        options = {}
     return $action(toolkit, str(filename), json.dumps(options))
 %}
 
 // Toolkit::SaveFile
 %feature("shadow") vrv::Toolkit::SaveFile(const std::string &, const std::string & = "") %{
-def saveFile(toolkit, filename: str, options: dict = {}) -> None:
+def saveFile(toolkit, filename: str, options: Optional[dict] = None) -> None:
     """Get the MEI and save it to the file."""
+    if options is None:
+        options = {}
     return json.loads($action(toolkit, str(filename), json.dumps(options)))
 %}
 
