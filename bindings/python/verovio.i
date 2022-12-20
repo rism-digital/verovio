@@ -133,14 +133,14 @@ def renderToTimemap(toolkit, options: dict = {}) -> list:
 %feature("shadow") vrv::Toolkit::RenderToTimemapFile(const std::string &, const std::string & = "") %{
 def renderToTimemapFile(toolkit, filename: str, options: dict = {}) -> None:
     """Render a document to timemap and save it to the file."""
-    return $action(toolkit, filename, json.dumps(options))
+    return $action(toolkit, str(filename), json.dumps(options))
 %}
 
 // Toolkit::SaveFile
 %feature("shadow") vrv::Toolkit::SaveFile(const std::string &, const std::string & = "") %{
 def saveFile(toolkit, filename: str, options: dict = {}) -> None:
     """Get the MEI and save it to the file."""
-    return json.loads($action(toolkit, filename, json.dumps(options)))
+    return json.loads($action(toolkit, str(filename), json.dumps(options)))
 %}
 
 // Toolkit::Select
