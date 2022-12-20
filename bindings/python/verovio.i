@@ -124,7 +124,7 @@ def renderData(toolkit, data, options: dict) -> str:
 
 // Toolkit::RenderToTimemap
 %feature("shadow") vrv::Toolkit::RenderToTimemap(const std::string & = "") %{
-def renderToTimemap(toolkit, options: dict = {}) -> dict:
+def renderToTimemap(toolkit, options: dict = {}) -> list:
     """Render a document to a timemap."""
     return json.loads($action(toolkit, json.dumps(options)))
 %}
