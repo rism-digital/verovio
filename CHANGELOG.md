@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+* Support for user defined symbols in `symbolTable/symbolDef` with `svg` or `graphic`
+* Support for `@altsym` for `breath`, `ceasura`, `fermata`, `mordent`, `trill` and `turn`
 * Support for `incip` with MEI and PAE format (with --incip option)
 * Support for single-line Plaine and Easie input
 * Support for `@extender` lines on `tempo` (@eNote-GmBH)
