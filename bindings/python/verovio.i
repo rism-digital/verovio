@@ -155,14 +155,14 @@ def select(toolkit, selection: dict) -> bool:
 // Toolkit::SetOptions
 %feature("shadow") vrv::Toolkit::SetOptions(const std::string &) %{
 def setOptions(toolkit, json_options: dict) -> bool:
-    """Set options."""
+    """Set option values."""
     return $action(toolkit, json.dumps(json_options))
 %}
 
 // Toolkit::ValidatePAE
 %feature("shadow") vrv::Toolkit::ValidatePAE(const std::string &) %{
 def validatePAE(toolkit, data: str) -> dict:
-    """Validate Plaine & Easie Code."""
+    """Validate the Plaine and Easie code passed in the string data."""
     if isinstance(data, dict):
         data = json.dumps(data);
     return json.loads($action(toolkit, data))
