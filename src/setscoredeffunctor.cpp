@@ -521,4 +521,20 @@ FunctorCode SetCautionaryScoreDefFunctor::VisitObject(Object *object)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// ScoreDefSetGrpSymFunctor
+//----------------------------------------------------------------------------
+
+ScoreDefSetGrpSymFunctor::ScoreDefSetGrpSymFunctor() {}
+
+FunctorCode ScoreDefSetGrpSymFunctor::VisitGrpSym(GrpSym *grpSym)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetGrpSymFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

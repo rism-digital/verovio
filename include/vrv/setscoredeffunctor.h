@@ -254,6 +254,46 @@ private:
     StaffDef *m_currentStaffDef;
 };
 
+//----------------------------------------------------------------------------
+// ScoreDefSetGrpSymFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class prepares the group symbol starting and ending staffDefs for drawing.
+ */
+class ScoreDefSetGrpSymFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ScoreDefSetGrpSymFunctor();
+    virtual ~ScoreDefSetGrpSymFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitGrpSym(GrpSym *grpSym) override;
+    FunctorCode VisitSystem(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_SETSCOREDEFFUNCTOR_H__
