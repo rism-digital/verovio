@@ -17,6 +17,7 @@
 #include "staff.h"
 #include "system.h"
 #include "tuning.h"
+#include "vrv.h"
 
 //----------------------------------------------------------------------------
 
@@ -357,31 +358,135 @@ ScoreDefOptimizeFunctor::ScoreDefOptimizeFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode ScoreDefOptimizeFunctor::VisitMeasure(Measure *measure)
 {
+    if (!m_doc->GetOptions()->m_condenseTempoPages.GetValue()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    m_hasFermata = (measure->FindDescendantByType(FERMATA));
+    m_hasTempo = (measure->FindDescendantByType(TEMPO));
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefOptimizeFunctor::VisitScore(Score *score)
 {
+    m_currentScoreDef = NULL;
+    m_encoded = false;
+    m_firstScoreDef = true;
+    m_hasFermata = false;
+    m_hasTempo = false;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefOptimizeFunctor::VisitStaff(Staff *staff)
 {
-    return FUNCTOR_CONTINUE;
+    assert(m_currentScoreDef);
+    StaffDef *staffDef = m_currentScoreDef->GetStaffDef(staff->GetN());
+
+    if (!staffDef) {
+        LogDebug("Could not find staffDef for staff (%d) when optimizing scoreDef", staff->GetN());
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // Always show staves with a clef change
+    if (staff->FindDescendantByType(CLEF)) {
+        staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
+    }
+
+    // Always show all staves when there is a fermata or a tempo
+    // (without checking if the fermata is actually on that staff)
+    if (m_hasFermata || m_hasTempo) {
+        staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
+    }
+
+    if (staffDef->GetDrawingVisibility() == OPTIMIZATION_SHOW) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    staffDef->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
+
+    // Ignore layers that are empty (or with @sameas)
+    ListOfObjects layers;
+    IsEmptyComparison matchTypeLayer(LAYER);
+    matchTypeLayer.ReverseComparison();
+    staff->FindAllDescendantsByComparison(&layers, &matchTypeLayer);
+
+    Object *note = staff->FindDescendantByType(NOTE);
+
+    // Show the staff only if there are any notes
+    if (note) {
+        staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode ScoreDefOptimizeFunctor::VisitStaffGrpEnd(StaffGrp *staffGrp)
 {
+    staffGrp->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
+
+    const Object *instrDef = staffGrp->FindDescendantByType(INSTRDEF, 1);
+    if (instrDef) {
+        VisibleStaffDefOrGrpObject visibleStaves;
+        const Object *firstVisible = staffGrp->FindDescendantByComparison(&visibleStaves, 1);
+        if (firstVisible) {
+            staffGrp->SetEverythingVisible();
+        }
+
+        return FUNCTOR_CONTINUE;
+    }
+
+    for (auto child : staffGrp->GetChildren()) {
+        if (child->Is(STAFFDEF)) {
+            StaffDef *staffDef = vrv_cast<StaffDef *>(child);
+            assert(staffDef);
+            if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+                staffGrp->SetDrawingVisibility(OPTIMIZATION_SHOW);
+                break;
+            }
+        }
+        else if (child->Is(STAFFGRP)) {
+            StaffGrp *staffGrpChild = vrv_cast<StaffGrp *>(child);
+            assert(staffGrpChild);
+            if (staffGrpChild->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+                staffGrp->SetDrawingVisibility(OPTIMIZATION_SHOW);
+                break;
+            }
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefOptimizeFunctor::VisitSystem(System *system)
 {
+    system->IsDrawingOptimized(true);
+
+    if (m_firstScoreDef) {
+        m_firstScoreDef = false;
+        if (!m_doc->GetOptions()->m_condenseFirstPage.GetValue()) {
+            return FUNCTOR_SIBLINGS;
+        }
+    }
+
+    if (system->IsLastOfMdiv()) {
+        if (m_doc->GetOptions()->m_condenseNotLastSystem.GetValue()) {
+            return FUNCTOR_SIBLINGS;
+        }
+    }
+
+    m_currentScoreDef = system->GetDrawingScoreDef();
+    assert(m_currentScoreDef);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefOptimizeFunctor::VisitSystemEnd(System *system)
 {
+    m_currentScoreDef->Process(*this);
+    system->m_systemAligner.SetSpacing(m_currentScoreDef);
+
     return FUNCTOR_CONTINUE;
 }
 
