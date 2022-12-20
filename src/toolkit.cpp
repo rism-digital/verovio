@@ -1754,14 +1754,15 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
     this->ResetLogBuffer();
 
+    jsonxx::Object o;
+
     Object *element = m_doc.FindDescendantByID(xmlId);
 
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());
-        return {};
+        return o.json();
     }
 
-    jsonxx::Object o;
     if (element->Is(NOTE)) {
         if (!m_doc.HasTimemap()) {
             // generate MIDI timemap before progressing
