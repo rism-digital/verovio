@@ -543,7 +543,7 @@ public:
      * Return the ID string of the notated (the original) element.
      *
      * @param xmlId the ID (xml:id) of the element being looked for
-     * @return A stringified JSON object with all IDs
+     * @return An ID string
      */
     std::string GetNotatedIdForElement(const std::string &xmlId);
 
