@@ -529,11 +529,62 @@ ScoreDefSetGrpSymFunctor::ScoreDefSetGrpSymFunctor() {}
 
 FunctorCode ScoreDefSetGrpSymFunctor::VisitGrpSym(GrpSym *grpSym)
 {
+    // For the grpSym that is encoded in the scope of the staffGrp just get first and last staffDefs and set then as
+    // starting and ending points
+    if (grpSym->GetParent()->Is(STAFFGRP)) {
+        StaffGrp *staffGrp = vrv_cast<StaffGrp *>(grpSym->GetParent());
+        assert(staffGrp);
+        auto [firstDef, lastDef] = staffGrp->GetFirstLastStaffDef();
+        if (firstDef && lastDef) {
+            grpSym->SetStartDef(firstDef);
+            grpSym->SetEndDef(lastDef);
+            staffGrp->SetGroupSymbol(grpSym);
+        }
+    }
+    // For the grpSym that is encoded in the scope of the scoreDef we need to find corresponding staffDefs with matching
+    // @startid and @endid. We also need to make sure that @level attribute is adhered to, hence we limit search depth.
+    // Finally, we need to make sure that both starting and ending elements have the same parent (since we cannot draw
+    // cross-group grpSym)
+    else if (grpSym->GetParent()->Is(SCOREDEF)) {
+        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(grpSym->GetParent());
+        assert(scoreDef);
+
+        const std::string startId = ExtractIDFragment(grpSym->GetStartid());
+        const std::string endId = ExtractIDFragment(grpSym->GetEndid());
+        const int level = grpSym->GetLevel();
+
+        IDComparison compare(STAFFDEF, startId);
+        StaffDef *start = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&compare, level));
+        compare.SetID(endId);
+        StaffDef *end = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&compare, level));
+
+        if (!start || !end) {
+            LogWarning("Could not find startid/endid on level %d for <'%s'>", level, grpSym->GetID().c_str());
+            return FUNCTOR_CONTINUE;
+        }
+
+        if (start->GetParent() != end->GetParent()) {
+            LogWarning("<'%s'> has mismatching parents for startid:<'%s'> and endid:<'%s'>", grpSym->GetID().c_str(),
+                startId.c_str(), endId.c_str());
+            return FUNCTOR_CONTINUE;
+        }
+
+        grpSym->SetStartDef(start);
+        grpSym->SetEndDef(end);
+        // dynamic_cast because we never check parent type
+        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(start->GetParent());
+        assert(staffGrp);
+        staffGrp->SetGroupSymbol(grpSym);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefSetGrpSymFunctor::VisitSystem(System *system)
 {
+    ScoreDef *drawingScoreDef = system->GetDrawingScoreDef();
+    if (drawingScoreDef) drawingScoreDef->Process(*this);
+
     return FUNCTOR_CONTINUE;
 }
 
