@@ -1758,7 +1758,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());
-        return 0;
+        return {};
     }
 
     jsonxx::Object o;
