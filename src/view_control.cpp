@@ -2215,64 +2215,79 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             char32_t accid = Accid::GetAccidGlyph(mordent->GetAccidlower());
             std::u32string accidStr;
             accidStr.push_back(accid);
-            // Adjust the y position
-            double xShift = 0.0;
-            double factor = 1.0;
-            data_ACCIDENTAL_WRITTEN meiaccid = mordent->GetAccidlower();
-            // optimized vertical kerning for Leipzig font:
-            if (meiaccid == ACCIDENTAL_WRITTEN_ff) {
-                factor = 1.20;
-                xShift = 0.14;
+            int accidY = y;
+            int accidX = x;
+            if (!symbolDef) {
+                // Adjust the y position
+                double xShift = 0.0;
+                double factor = 1.0;
+                data_ACCIDENTAL_WRITTEN meiaccid = mordent->GetAccidlower();
+                // optimized vertical kerning for Leipzig font:
+                if (meiaccid == ACCIDENTAL_WRITTEN_ff) {
+                    factor = 1.20;
+                    xShift = 0.14;
+                }
+                else if (meiaccid == ACCIDENTAL_WRITTEN_f) {
+                    factor = 1.20;
+                    xShift = -0.02;
+                }
+                else if (meiaccid == ACCIDENTAL_WRITTEN_n) {
+                    factor = 0.90;
+                    xShift = -0.04;
+                }
+                else if (meiaccid == ACCIDENTAL_WRITTEN_s) {
+                    factor = 1.15;
+                }
+                else if (meiaccid == ACCIDENTAL_WRITTEN_x) {
+                    factor = 2.00;
+                }
+                accidX += (1 + xShift) * mordentWidth / 2;
+                accidY -= factor * m_doc->GetGlyphHeight(accid, staffSize, true) / 2;
             }
-            else if (meiaccid == ACCIDENTAL_WRITTEN_f) {
-                factor = 1.20;
-                xShift = -0.02;
+            else {
+                accidX += mordentWidth / 2;
+                accidY -= (m_doc->GetGlyphTop(accid, staffSize / 2, true) + m_doc->GetDrawingUnit(staffSize * 2 / 3));
             }
-            else if (meiaccid == ACCIDENTAL_WRITTEN_n) {
-                factor = 0.90;
-                xShift = -0.04;
-            }
-            else if (meiaccid == ACCIDENTAL_WRITTEN_s) {
-                factor = 1.15;
-            }
-            else if (meiaccid == ACCIDENTAL_WRITTEN_x) {
-                factor = 2.00;
-            }
-
-            int accidX = x + (1 + xShift) * mordentWidth / 2;
-            int accidY = y - factor * m_doc->GetGlyphHeight(accid, staffSize, true) / 2;
             this->DrawSmuflString(dc, accidX, accidY, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
         }
         else if (mordent->HasAccidupper()) {
             char32_t accid = Accid::GetAccidGlyph(mordent->GetAccidupper());
             std::u32string accidStr;
             accidStr.push_back(accid);
+            int accidY = y;
+            int accidX = x;
             // Adjust the y position
-            double xShift = 0.0;
-            double factor = 1.75;
-            data_ACCIDENTAL_WRITTEN meiaccid = mordent->GetAccidupper();
-            // optimized vertical kerning for Leipzig font:
-            if (meiaccid == ACCIDENTAL_WRITTEN_ff) {
-                factor = 1.40;
+            if (!symbolDef) {
+                double xShift = 0.0;
+                double factor = 1.75;
+                data_ACCIDENTAL_WRITTEN meiaccid = mordent->GetAccidupper();
+                // optimized vertical kerning for Leipzig font:
+                if (meiaccid == ACCIDENTAL_WRITTEN_ff) {
+                    factor = 1.40;
+                }
+                else if (meiaccid == ACCIDENTAL_WRITTEN_f) {
+                    factor = 1.25;
+                }
+                else if (meiaccid == ACCIDENTAL_WRITTEN_n) {
+                    factor = 1.60;
+                    xShift = -0.10;
+                }
+                else if (meiaccid == ACCIDENTAL_WRITTEN_s) {
+                    factor = 1.60;
+                    xShift = -0.06;
+                }
+                else if (meiaccid == ACCIDENTAL_WRITTEN_x) {
+                    factor = 1.35;
+                    xShift = -0.08;
+                }
+                accidX += (1 + xShift) * mordentWidth / 2;
+                accidY += factor * mordentHeight;
             }
-            else if (meiaccid == ACCIDENTAL_WRITTEN_f) {
-                factor = 1.25;
+            else {
+                accidX += mordentWidth / 2;
+                accidY += (mordentHeight - m_doc->GetGlyphBottom(accid, staffSize / 2, true)
+                    + m_doc->GetDrawingUnit(staffSize * 2 / 3));
             }
-            else if (meiaccid == ACCIDENTAL_WRITTEN_n) {
-                factor = 1.60;
-                xShift = -0.10;
-            }
-            else if (meiaccid == ACCIDENTAL_WRITTEN_s) {
-                factor = 1.60;
-                xShift = -0.06;
-            }
-            else if (meiaccid == ACCIDENTAL_WRITTEN_x) {
-                factor = 1.35;
-                xShift = -0.08;
-            }
-
-            int accidX = x + (1 + xShift) * mordentWidth / 2;
-            int accidY = y + factor * mordentHeight;
             this->DrawSmuflString(dc, accidX, accidY, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
         }
 
