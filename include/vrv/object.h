@@ -1128,12 +1128,6 @@ public:
     virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Prepare group symbol starting and ending staffDefs for drawing
-     * TODO called outside Doc::PrepareData - should maybe be moved to ScoreDef related functors
-     */
-    virtual int ScoreDefSetGrpSym(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Associate LayerElement with @facs to the appropriate zone
      */
     virtual int PrepareFacsimile(FunctorParams *functorParams);

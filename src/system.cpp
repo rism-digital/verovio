@@ -503,16 +503,6 @@ int System::ScoreDefUnsetCurrent(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
-{
-    ScoreDefSetGrpSymParams *params = vrv_params_cast<ScoreDefSetGrpSymParams *>(functorParams);
-    assert(params);
-
-    if (m_drawingScoreDef) m_drawingScoreDef->Process(params->m_functor, functorParams);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     this->SetDrawingXRel(0);

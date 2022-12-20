@@ -2143,20 +2143,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// ScoreDefSetGrpSymParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the functor to be redirected to the System::m_currentScoreDef
- **/
-
-class ScoreDefSetGrpSymParams : public FunctorParams {
-public:
-    ScoreDefSetGrpSymParams(Functor *functor) { m_functor = functor; }
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // ScoreDefUnsetCurrentParams
 //----------------------------------------------------------------------------
 

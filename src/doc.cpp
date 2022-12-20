@@ -840,8 +840,8 @@ void Doc::PrepareData()
         }
     }
 
-    Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
-    this->GetCurrentScoreDef()->Process(&scoreDefSetGrpSym, NULL);
+    ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
+    this->GetCurrentScoreDef()->Process(scoreDefSetGrpSym);
 
     // LogElapsedTimeEnd ("Preparing drawing");
 
@@ -889,10 +889,9 @@ void Doc::ScoreDefSetGrpSymDoc()
 {
     // Group symbols need to be resolved using scoreDef, since there might be @starid/@endid attributes that determine
     // their positioning
-    Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
-    // this->GetCurrentScoreDef()->Process(&scoreDefSetGrpSym, NULL);
-    ScoreDefSetGrpSymParams scoreDefSetGrpSymParams(&scoreDefSetGrpSym);
-    this->Process(&scoreDefSetGrpSym, &scoreDefSetGrpSymParams);
+    ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
+    // this->GetCurrentScoreDef()->Process(scoreDefSetGrpSym);
+    this->Process(scoreDefSetGrpSym);
 }
 
 void Doc::CastOffDoc()
