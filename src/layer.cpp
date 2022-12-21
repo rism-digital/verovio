@@ -651,13 +651,6 @@ int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Layer::ScoreDefUnsetCurrent(FunctorParams *functorParams)
-{
-    this->ResetStaffDefObjects();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Layer::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     if (this->GetStaffDefClef()) {

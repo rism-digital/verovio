@@ -1088,11 +1088,6 @@ public:
     ///@{
 
     /**
-     * Unset the initial scoreDef of each system and measure
-     */
-    virtual int ScoreDefUnsetCurrent(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
      * to be redrawn.
      * This typically occurs when a new System or a new  ScoreDef is encountered.

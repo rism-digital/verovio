@@ -394,11 +394,6 @@ public:
      */
     int AdjustAccidX(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
 private:
     //
 public:

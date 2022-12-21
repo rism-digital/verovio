@@ -855,9 +855,8 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     }
 
     if (m_currentScoreDefDone) {
-        Functor scoreDefUnsetCurrent(&Object::ScoreDefUnsetCurrent);
-        ScoreDefUnsetCurrentParams scoreDefUnsetCurrentParams(&scoreDefUnsetCurrent);
-        this->Process(&scoreDefUnsetCurrent, &scoreDefUnsetCurrentParams);
+        ScoreDefUnsetCurrentFunctor scoreDefUnsetCurrent;
+        this->Process(scoreDefUnsetCurrent);
     }
 
     // First we need to set Page::m_score and Page::m_scoreEnd

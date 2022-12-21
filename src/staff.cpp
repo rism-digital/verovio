@@ -380,14 +380,6 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::ScoreDefUnsetCurrent(FunctorParams *functorParams)
-{
-    m_drawingStaffDef = NULL;
-    m_drawingTuning = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_staffAlignment = NULL;

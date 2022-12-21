@@ -166,11 +166,6 @@ public:
     ///@}
 
     /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
-    /**
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
     int ApplyPPUFactor(FunctorParams *functorParams) override;

@@ -820,22 +820,6 @@ int Measure::SaveEnd(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
 }
 
-int Measure::ScoreDefUnsetCurrent(FunctorParams *functorParams)
-{
-    ScoreDefUnsetCurrentParams *params = vrv_params_cast<ScoreDefUnsetCurrentParams *>(functorParams);
-    assert(params);
-
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
-
-    // We also need to remove scoreDef elements in the AlignmentReference objects
-    m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     this->SetDrawingXRel(0);

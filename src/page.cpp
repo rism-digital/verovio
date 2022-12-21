@@ -825,14 +825,6 @@ FunctorCode Page::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitPageEnd(this);
 }
 
-int Page::ScoreDefUnsetCurrent(FunctorParams *functorParams)
-{
-    m_score = NULL;
-    m_scoreEnd = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Page::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);

@@ -2143,20 +2143,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// ScoreDefUnsetCurrentParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the functor to be redirected to Aligner
- **/
-
-class ScoreDefUnsetCurrentParams : public FunctorParams {
-public:
-    ScoreDefUnsetCurrentParams(Functor *functor) { m_functor = functor; }
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // SetStaffDefRedrawFlagsParams
 //----------------------------------------------------------------------------
 

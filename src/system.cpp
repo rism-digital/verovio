@@ -496,18 +496,6 @@ FunctorCode System::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSystemEnd(this);
 }
 
-int System::ScoreDefUnsetCurrent(FunctorParams *functorParams)
-{
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
-
-    m_drawingIsOptimized = false;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     this->SetDrawingXRel(0);
