@@ -351,8 +351,8 @@ public:
      *
      * @remark nojs
      *
-     * @param @filename The output filename
-     * @param @pageNo The page to render (1-based)
+     * @param filename The output filename
+     * @param pageNo The page to render (1-based)
      * @return True if the file was successfully written
      */
     bool RenderToSVGFile(const std::string &filename, int pageNo = 1);
@@ -369,7 +369,7 @@ public:
      *
      * @remark nojs
      *
-     * @param @filename The output filename
+     * @param filename The output filename
      * @return True if the file was successfully written
      */
     bool RenderToMIDIFile(const std::string &filename);
@@ -390,7 +390,7 @@ public:
      *
      * @remark nojs
      *
-     * @param @filename The output filename
+     * @param filename The output filename
      * @return True if the file was successfully written
      */
     bool RenderToPAEFile(const std::string &filename);
@@ -398,7 +398,7 @@ public:
     /**
      * Render a document to a timemap
      *
-     * @param @jsonOptions A stringified JSON objects with the timemap options
+     * @param jsonOptions A stringified JSON objects with the timemap options
      * @return The timemap as a string
      */
     std::string RenderToTimemap(const std::string &jsonOptions = "");
@@ -408,8 +408,8 @@ public:
      *
      * @remark nojs
      *
-     * @param @filename The output filename
-     * @param @jsonOptions A stringified JSON objects with the timemap options
+     * @param filename The output filename
+     * @param jsonOptions A stringified JSON objects with the timemap options
      * @return True if the file was successfully written
      */
     bool RenderToTimemapFile(const std::string &filename, const std::string &jsonOptions = "");
@@ -456,7 +456,7 @@ public:
      *
      * @remark nojs
      *
-     * @param @filename The output filename
+     * @param filename The output filename
      * @return True if the file was successfully written
      */
     bool GetHumdrumFile(const std::string &filename);
