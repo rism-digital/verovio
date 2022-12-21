@@ -92,6 +92,7 @@
 #include "num.h"
 #include "octave.h"
 #include "orig.h"
+#include "ornam.h"
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
@@ -524,6 +525,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(OCTAVE)) {
         m_currentNode = m_currentNode.append_child("octave");
         this->WriteOctave(m_currentNode, vrv_cast<Octave *>(object));
+    }
+    else if (object->Is(ORNAM)) {
+        m_currentNode = m_currentNode.append_child("ornam");
+        this->WriteOrnam(m_currentNode, vrv_cast<Ornam *>(object));
     }
     else if (object->Is(PEDAL)) {
         m_currentNode = m_currentNode.append_child("pedal");
@@ -2115,6 +2120,18 @@ void MEIOutput::WriteOctave(pugi::xml_node currentNode, Octave *octave)
     octave->WriteOctaveDisplacement(currentNode);
 }
 
+void MEIOutput::WriteOrnam(pugi::xml_node currentNode, Ornam *ornam)
+{
+    assert(ornam);
+
+    this->WriteControlElement(currentNode, ornam);
+    this->WriteTextDirInterface(currentNode, ornam);
+    this->WriteTimePointInterface(currentNode, ornam);
+    ornam->WriteColor(currentNode);
+    ornam->WriteExtSym(currentNode);
+    ornam->WriteOrnamentAccid(currentNode);
+}
+
 void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
 {
     assert(pedal);
@@ -3327,7 +3344,7 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for dir or tempo
-    else if (filterParent->Is({ DIR, TEMPO })) {
+    else if (filterParent->Is({ DIR, ORNAM, TEMPO })) {
         if (element == "") {
             return true;
         }
@@ -5282,6 +5299,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "octave") {
             success = this->ReadOctave(parent, current);
         }
+        else if (currentName == "ornam") {
+            success = this->ReadOrnam(parent, current);
+        }
         else if (currentName == "pedal") {
             success = this->ReadPedal(parent, current);
         }
@@ -5651,6 +5671,22 @@ bool MEIInput::ReadOctave(Object *parent, pugi::xml_node octave)
     parent->AddChild(vrvOctave);
     this->ReadUnsupportedAttr(octave, vrvOctave);
     return true;
+}
+
+bool MEIInput::ReadOrnam(Object *parent, pugi::xml_node ornam)
+{
+    Ornam *vrvOrnam = new Ornam();
+    this->ReadControlElement(ornam, vrvOrnam);
+
+    this->ReadTextDirInterface(ornam, vrvOrnam);
+    this->ReadTimePointInterface(ornam, vrvOrnam);
+    vrvOrnam->ReadColor(ornam);
+    vrvOrnam->ReadExtSym(ornam);
+    vrvOrnam->ReadOrnamentAccid(ornam);
+
+    parent->AddChild(vrvOrnam);
+    this->ReadUnsupportedAttr(ornam, vrvOrnam);
+    return this->ReadTextChildren(vrvOrnam, ornam, vrvOrnam);
 }
 
 bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)

@@ -983,6 +983,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
 
+    params->m_classId = ORNAM;
+    m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = FING;
     m_systemAligner.Process(params->m_functor, params);
 

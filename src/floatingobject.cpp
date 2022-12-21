@@ -28,6 +28,7 @@
 #include "harm.h"
 #include "mordent.h"
 #include "octave.h"
+#include "ornam.h"
 #include "pedal.h"
 #include "pitchinflection.h"
 #include "reh.h"
@@ -249,6 +250,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         assert(octave);
         // octave below by default (won't draw without @dis.place anyway);
         m_place = (octave->GetDisPlace() == STAFFREL_basic_above) ? STAFFREL_above : STAFFREL_below;
+    }
+    else if (object->Is(ORNAM)) {
+        Ornam *ornam = vrv_cast<Ornam *>(object);
+        assert(ornam);
+        // ornam above by default
+        m_place = (ornam->GetPlace() != STAFFREL_NONE) ? ornam->GetPlace() : ornam->GetLayerPlace(STAFFREL_above);
     }
     else if (object->Is(PITCHINFLECTION)) {
         // PitchInflection *pitchInflection = vrv_cast<PitchInflection *>(object);

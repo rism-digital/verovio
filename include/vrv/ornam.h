@@ -1,47 +1,47 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dir.h
+// Name:        ornam.h
 // Author:      Laurent Pugin
-// Created:     2016
+// Created:     2022
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_DIR_H__
-#define __VRV_DIR_H__
+#ifndef __VRV_ORNAM_H__
+#define __VRV_ORNAM_H__
 
+#include "atts_cmn.h"
+#include "atts_cmnornaments.h"
+#include "atts_externalsymbols.h"
 #include "controlelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
 
 namespace vrv {
 
-class TextElement;
-
 //----------------------------------------------------------------------------
-// Dir (directive)
+// Ornam
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <dir> element.
+ * This class models the MEI <turn> element.
  */
-class Dir : public ControlElement,
-            public TextListInterface,
-            public TextDirInterface,
-            public TimeSpanningInterface,
-            public AttExtender,
-            public AttLang,
-            public AttLineRendBase,
-            public AttVerticalGroup {
+class Ornam : public ControlElement,
+              public TextListInterface,
+              public TextDirInterface,
+              public TimePointInterface,
+              public AttColor,
+              public AttExtSym,
+              public AttOrnamentAccid {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method reset all attribute classes
      */
     ///@{
-    Dir();
-    virtual ~Dir();
-    Object *Clone() const override { return new Dir(*this); }
+    Ornam();
+    virtual ~Ornam();
+    Object *Clone() const override { return new Ornam(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Dir"; }
+    std::string GetClassName() const override { return "Ornam"; }
     ///@}
 
     /**
@@ -55,32 +55,22 @@ public:
     {
         return vrv_cast<const TimePointInterface *>(this);
     }
-    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
-    const TimeSpanningInterface *GetTimeSpanningInterface() const override
-    {
-        return vrv_cast<const TimeSpanningInterface *>(this);
-    }
     ///@}
 
     /**
-     * Add an element (text, rend. etc.) to a dir.
+     * Add an element (text, rend. etc.) to a ornam.
      * Only supported elements will be actually added to the child list.
      */
     bool IsSupportedChild(Object *object) override;
 
     /**
-     * See FloatingObject::IsExtenderElement
+     * Get the SMuFL glyph for the ornam based glyph.num
      */
-    bool IsExtenderElement() const override { return GetExtender() == BOOLEAN_true; }
+    char32_t GetOrnamGlyph() const;
 
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * See Object::PrepareFloatingGrps
-     */
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
 protected:
     //

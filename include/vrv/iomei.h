@@ -102,6 +102,7 @@ class Note;
 class Num;
 class Octave;
 class Orig;
+class Ornam;
 class Page;
 class PageElement;
 class PageMilestoneEnd;
@@ -436,6 +437,7 @@ private:
     void WriteMNum(pugi::xml_node currentNode, MNum *mnum);
     void WriteMordent(pugi::xml_node currentNode, Mordent *mordent);
     void WriteOctave(pugi::xml_node currentNode, Octave *octave);
+    void WriteOrnam(pugi::xml_node currentNode, Ornam *ornam);
     void WritePedal(pugi::xml_node currentNode, Pedal *pedal);
     void WritePhrase(pugi::xml_node currentNode, Phrase *phrase);
     void WritePitchInflection(pugi::xml_node currentNode, PitchInflection *pitchInflection);
@@ -745,6 +747,7 @@ private:
     bool ReadMNum(Object *parent, pugi::xml_node mnum);
     bool ReadMordent(Object *parent, pugi::xml_node mordent);
     bool ReadOctave(Object *parent, pugi::xml_node octave);
+    bool ReadOrnam(Object *parent, pugi::xml_node ornam);
     bool ReadPedal(Object *parent, pugi::xml_node pedal);
     bool ReadPhrase(Object *parent, pugi::xml_node phrase);
     bool ReadPitchInflection(Object *parent, pugi::xml_node pitchInflection);
