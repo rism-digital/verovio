@@ -67,10 +67,7 @@ void System::Reset()
     DrawingListInterface::Reset();
     this->ResetTyped();
 
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
+    this->ResetDrawingScoreDef();
 
     m_systemLeftMar = 0;
     m_systemRightMar = 0;
@@ -192,11 +189,19 @@ bool System::SetCurrentFloatingPositioner(
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    assert(!m_drawingScoreDef); // We should always call UnscoreDefSetCurrent before
+    assert(!m_drawingScoreDef); // We should always call ResetDrawingScoreDef before
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
     m_drawingScoreDef->SetParent(this);
+}
+
+void System::ResetDrawingScoreDef()
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
 }
 
 bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElement *end) const

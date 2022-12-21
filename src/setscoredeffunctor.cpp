@@ -596,31 +596,62 @@ ScoreDefUnsetCurrentFunctor::ScoreDefUnsetCurrentFunctor() {}
 
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitAlignmentReference(AlignmentReference *alignmentReference)
 {
-    return FUNCTOR_CONTINUE;
+    Alignment *alignment = vrv_cast<Alignment *>(alignmentReference->GetParent());
+    assert(alignment);
+
+    switch (alignment->GetType()) {
+        case ALIGNMENT_SCOREDEF_CLEF:
+        case ALIGNMENT_SCOREDEF_KEYSIG:
+        case ALIGNMENT_SCOREDEF_MENSUR:
+        case ALIGNMENT_SCOREDEF_METERSIG:
+        case ALIGNMENT_SCOREDEF_CAUTION_CLEF:
+        case ALIGNMENT_SCOREDEF_CAUTION_KEYSIG:
+        case ALIGNMENT_SCOREDEF_CAUTION_MENSUR:
+        case ALIGNMENT_SCOREDEF_CAUTION_METERSIG: alignmentReference->ClearChildren(); break;
+        default: break;
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitLayer(Layer *layer)
 {
+    layer->ResetStaffDefObjects();
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitMeasure(Measure *measure)
 {
+    measure->ResetDrawingScoreDef();
+
+    // We also need to remove scoreDef elements in the AlignmentReference objects
+    measure->m_measureAligner.Process(*this);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitPage(Page *page)
 {
+    page->m_score = NULL;
+    page->m_scoreEnd = NULL;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitStaff(Staff *staff)
 {
+    staff->m_drawingStaffDef = NULL;
+    staff->m_drawingTuning = NULL;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitSystem(System *system)
 {
+    system->ResetDrawingScoreDef();
+    system->IsDrawingOptimized(false);
+
     return FUNCTOR_CONTINUE;
 }
 

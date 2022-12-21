@@ -128,10 +128,7 @@ void Measure::Reset()
     this->ResetPointing();
     this->ResetTyped();
 
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
+    this->ResetDrawingScoreDef();
 
     m_timestampAligner.Reset();
     m_xAbs = VRV_UNSET;
@@ -392,10 +389,18 @@ int Measure::GetSectionRestartShift(const Doc *doc) const
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    assert(!m_drawingScoreDef); // We should always call UnscoreDefSetCurrent before
+    assert(!m_drawingScoreDef); // We should always call ResetDrawingScoreDef before
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
+}
+
+void Measure::ResetDrawingScoreDef()
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
 }
 
 std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
