@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e -o pipefail
 
 # clean dist folder and reinstall node modules
 rm -rf ./npm/dist
