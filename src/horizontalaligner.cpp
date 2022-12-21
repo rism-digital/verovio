@@ -19,6 +19,7 @@
 #include "doc.h"
 #include "elementpart.h"
 #include "floatingobject.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -92,6 +93,26 @@ void HorizontalAligner::AddAlignment(Alignment *alignment, int idx)
     else {
         InsertChild(alignment, idx);
     }
+}
+
+FunctorCode HorizontalAligner::Accept(MutableFunctor &functor)
+{
+    return functor.VisitHorizontalAligner(this);
+}
+
+FunctorCode HorizontalAligner::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitHorizontalAligner(this);
+}
+
+FunctorCode HorizontalAligner::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitHorizontalAlignerEnd(this);
+}
+
+FunctorCode HorizontalAligner::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitHorizontalAlignerEnd(this);
 }
 
 //----------------------------------------------------------------------------
@@ -300,6 +321,26 @@ void MeasureAligner::AdjustGraceNoteSpacing(const Doc *doc, Alignment *alignment
     }
 }
 
+FunctorCode MeasureAligner::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMeasureAligner(this);
+}
+
+FunctorCode MeasureAligner::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMeasureAligner(this);
+}
+
+FunctorCode MeasureAligner::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMeasureAlignerEnd(this);
+}
+
+FunctorCode MeasureAligner::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMeasureAlignerEnd(this);
+}
+
 //----------------------------------------------------------------------------
 // GraceAligner
 //----------------------------------------------------------------------------
@@ -433,6 +474,26 @@ void GraceAligner::SetGraceAlignmentXPos(const Doc *doc)
         alignment->SetXRel(-i * doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, 100, false));
         i++;
     }
+}
+
+FunctorCode GraceAligner::Accept(MutableFunctor &functor)
+{
+    return functor.VisitGraceAligner(this);
+}
+
+FunctorCode GraceAligner::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitGraceAligner(this);
+}
+
+FunctorCode GraceAligner::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitGraceAlignerEnd(this);
+}
+
+FunctorCode GraceAligner::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitGraceAlignerEnd(this);
 }
 
 //----------------------------------------------------------------------------
@@ -699,6 +760,26 @@ int Alignment::HorizontalSpaceForDuration(
     return pow(intervalTime, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
 }
 
+FunctorCode Alignment::Accept(MutableFunctor &functor)
+{
+    return functor.VisitAlignment(this);
+}
+
+FunctorCode Alignment::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitAlignment(this);
+}
+
+FunctorCode Alignment::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitAlignmentEnd(this);
+}
+
+FunctorCode Alignment::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitAlignmentEnd(this);
+}
+
 //----------------------------------------------------------------------------
 // AlignmentReference
 //----------------------------------------------------------------------------
@@ -855,6 +936,26 @@ void AlignmentReference::SetAccidLayerAlignment()
     }
 }
 
+FunctorCode AlignmentReference::Accept(MutableFunctor &functor)
+{
+    return functor.VisitAlignmentReference(this);
+}
+
+FunctorCode AlignmentReference::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitAlignmentReference(this);
+}
+
+FunctorCode AlignmentReference::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitAlignmentReferenceEnd(this);
+}
+
+FunctorCode AlignmentReference::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitAlignmentReferenceEnd(this);
+}
+
 //----------------------------------------------------------------------------
 // TimestampAligner
 //----------------------------------------------------------------------------
@@ -907,6 +1008,26 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
         InsertChild(timestampAttr, idx);
     }
     return timestampAttr;
+}
+
+FunctorCode TimestampAligner::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTimestampAligner(this);
+}
+
+FunctorCode TimestampAligner::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTimestampAligner(this);
+}
+
+FunctorCode TimestampAligner::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTimestampAlignerEnd(this);
+}
+
+FunctorCode TimestampAligner::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTimestampAlignerEnd(this);
 }
 
 //----------------------------------------------------------------------------
