@@ -73,12 +73,14 @@ class ScoreDef;
 class ScoreDefElement;
 class Space;
 class Staff;
+class StaffAlignment;
 class StaffDef;
 class StaffGrp;
 class Stem;
 class Syl;
 class Syllable;
 class System;
+class SystemAligner;
 class TabDurSym;
 class TabGrp;
 class TimestampAligner;
@@ -290,6 +292,16 @@ public:
     virtual FunctorCode VisitTimestampAlignerEnd(TimestampAligner *timestampAligner);
     ///@}
 
+    /**
+     * @name Visit vertical aligners
+     */
+    ///@{
+    virtual FunctorCode VisitSystemAligner(SystemAligner *systemAligner);
+    virtual FunctorCode VisitSystemAlignerEnd(SystemAligner *systemAligner);
+    virtual FunctorCode VisitStaffAlignment(StaffAlignment *staffAlignment);
+    virtual FunctorCode VisitStaffAlignmentEnd(StaffAlignment *staffAlignment);
+    ///@}
+
 private:
     //
 public:
@@ -496,6 +508,16 @@ public:
     virtual FunctorCode VisitGraceAlignerEnd(const GraceAligner *graceAligner);
     virtual FunctorCode VisitTimestampAligner(const TimestampAligner *timestampAligner);
     virtual FunctorCode VisitTimestampAlignerEnd(const TimestampAligner *timestampAligner);
+    ///@}
+
+    /**
+     * @name Visit vertical aligners
+     */
+    ///@{
+    virtual FunctorCode VisitSystemAligner(const SystemAligner *systemAligner);
+    virtual FunctorCode VisitSystemAlignerEnd(const SystemAligner *systemAligner);
+    virtual FunctorCode VisitStaffAlignment(const StaffAlignment *staffAlignment);
+    virtual FunctorCode VisitStaffAlignmentEnd(const StaffAlignment *staffAlignment);
     ///@}
 
 private:

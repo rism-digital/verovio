@@ -809,6 +809,26 @@ FunctorCode FunctorInterface::VisitTimestampAlignerEnd(TimestampAligner *timesta
     return this->VisitObjectEnd(timestampAligner);
 }
 
+FunctorCode FunctorInterface::VisitSystemAligner(SystemAligner *systemAligner)
+{
+    return this->VisitObject(systemAligner);
+}
+
+FunctorCode FunctorInterface::VisitSystemAlignerEnd(SystemAligner *systemAligner)
+{
+    return this->VisitObjectEnd(systemAligner);
+}
+
+FunctorCode FunctorInterface::VisitStaffAlignment(StaffAlignment *staffAlignment)
+{
+    return this->VisitObject(staffAlignment);
+}
+
+FunctorCode FunctorInterface::VisitStaffAlignmentEnd(StaffAlignment *staffAlignment)
+{
+    return this->VisitObjectEnd(staffAlignment);
+}
+
 //----------------------------------------------------------------------------
 // ConstFunctorInterface
 //----------------------------------------------------------------------------
@@ -1541,6 +1561,26 @@ FunctorCode ConstFunctorInterface::VisitTimestampAligner(const TimestampAligner 
 FunctorCode ConstFunctorInterface::VisitTimestampAlignerEnd(const TimestampAligner *timestampAligner)
 {
     return this->VisitObjectEnd(timestampAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitSystemAligner(const SystemAligner *systemAligner)
+{
+    return this->VisitObject(systemAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitSystemAlignerEnd(const SystemAligner *systemAligner)
+{
+    return this->VisitObjectEnd(systemAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitStaffAlignment(const StaffAlignment *staffAlignment)
+{
+    return this->VisitObject(staffAlignment);
+}
+
+FunctorCode ConstFunctorInterface::VisitStaffAlignmentEnd(const StaffAlignment *staffAlignment)
+{
+    return this->VisitObjectEnd(staffAlignment);
 }
 
 } // namespace vrv
