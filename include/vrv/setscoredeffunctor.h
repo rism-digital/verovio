@@ -294,6 +294,50 @@ private:
     //
 };
 
+//----------------------------------------------------------------------------
+// ScoreDefUnsetCurrentFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class unsets the initial scoreDef for each system and measure.
+ */
+class ScoreDefUnsetCurrentFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ScoreDefUnsetCurrentFunctor();
+    virtual ~ScoreDefUnsetCurrentFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitAlignmentReference(AlignmentReference *alignmentReference) override;
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitPage(Page *page) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSystem(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_SETSCOREDEFFUNCTOR_H__

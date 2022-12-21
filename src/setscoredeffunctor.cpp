@@ -588,4 +588,40 @@ FunctorCode ScoreDefSetGrpSymFunctor::VisitSystem(System *system)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// ScoreDefUnsetCurrentFunctor
+//----------------------------------------------------------------------------
+
+ScoreDefUnsetCurrentFunctor::ScoreDefUnsetCurrentFunctor() {}
+
+FunctorCode ScoreDefUnsetCurrentFunctor::VisitAlignmentReference(AlignmentReference *alignmentReference)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefUnsetCurrentFunctor::VisitLayer(Layer *layer)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefUnsetCurrentFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefUnsetCurrentFunctor::VisitPage(Page *page)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefUnsetCurrentFunctor::VisitStaff(Staff *staff)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefUnsetCurrentFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
