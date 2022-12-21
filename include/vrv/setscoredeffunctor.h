@@ -338,6 +338,47 @@ private:
     //
 };
 
+//----------------------------------------------------------------------------
+// SetStaffDefRedrawFlagsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class sets drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
+ * to be redrawn. This typically occurs when a new System or a new ScoreDef is encountered.
+ */
+class SetStaffDefRedrawFlagsFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    SetStaffDefRedrawFlagsFunctor(int redrawFlags);
+    virtual ~SetStaffDefRedrawFlagsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitStaffDef(StaffDef *staffDef) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The staffDef redraw flags
+    int m_redrawFlags;
+};
+
 } // namespace vrv
 
 #endif // __VRV_SETSCOREDEFFUNCTOR_H__

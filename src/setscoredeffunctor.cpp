@@ -655,4 +655,40 @@ FunctorCode ScoreDefUnsetCurrentFunctor::VisitSystem(System *system)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// SetStaffDefRedrawFlagsFunctor
+//----------------------------------------------------------------------------
+
+SetStaffDefRedrawFlagsFunctor::SetStaffDefRedrawFlagsFunctor(int redrawFlags)
+{
+    m_redrawFlags = redrawFlags;
+}
+
+FunctorCode SetStaffDefRedrawFlagsFunctor::VisitStaffDef(StaffDef *staffDef)
+{
+    const bool forceRedraw = m_redrawFlags & StaffDefRedrawFlags::FORCE_REDRAW;
+    const bool redrawClef = m_redrawFlags & StaffDefRedrawFlags::REDRAW_CLEF;
+    if (redrawClef || forceRedraw) {
+        staffDef->SetDrawClef(redrawClef);
+    }
+    const bool redrawKeySig = m_redrawFlags & StaffDefRedrawFlags::REDRAW_KEYSIG;
+    if (redrawKeySig || forceRedraw) {
+        staffDef->SetDrawKeySig(redrawKeySig);
+    }
+    const bool redrawMensur = m_redrawFlags & StaffDefRedrawFlags::REDRAW_MENSUR;
+    if (redrawMensur || forceRedraw) {
+        staffDef->SetDrawMensur(redrawMensur);
+    }
+    const bool redrawMeterSig = m_redrawFlags & StaffDefRedrawFlags::REDRAW_METERSIG;
+    if (redrawMeterSig || forceRedraw) {
+        staffDef->SetDrawMeterSig(redrawMeterSig);
+    }
+    const bool redrawMeterSigGrp = m_redrawFlags & StaffDefRedrawFlags::REDRAW_METERSIGGRP;
+    if (redrawMeterSigGrp || forceRedraw) {
+        staffDef->SetDrawMeterSigGrp(redrawMeterSigGrp);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
