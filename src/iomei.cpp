@@ -6841,7 +6841,6 @@ bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, 
     bool success = true;
     pugi::xml_node xmlElement;
     std::string elementName;
-    int i = 0;
     for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
         if (!success) {
             break;
@@ -6870,7 +6869,6 @@ bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, 
         else {
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
-        i++;
     }
     return success;
 }
