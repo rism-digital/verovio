@@ -817,6 +817,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcRequestedStaffSpace(const Staff
 int FloatingObject::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
+    m_maxDrawingYRel = VRV_UNSET;
 
     return FUNCTOR_CONTINUE;
 }
@@ -824,6 +825,15 @@ int FloatingObject::ResetHorizontalAlignment(FunctorParams *functorParams)
 int FloatingObject::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
+    m_maxDrawingYRel = VRV_UNSET;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int FloatingObject::PrepareDataInitialization(FunctorParams *functorParams)
+{
+    // Clear all
+    FloatingObject::s_drawingObjectIds.clear();
 
     return FUNCTOR_CONTINUE;
 }
@@ -884,10 +894,8 @@ int FloatingObject::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams
 
 int FloatingObject::ResetData(FunctorParams *functorParams)
 {
-    // Clear all
-    FloatingObject::s_drawingObjectIds.clear();
-
     m_currentPositioner = NULL;
+    m_maxDrawingYRel = VRV_UNSET;
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
