@@ -13,6 +13,8 @@
 namespace vrv {
 
 class Accid;
+class Alignment;
+class AlignmentReference;
 class Artic;
 class BarLine;
 class Beam;
@@ -27,9 +29,11 @@ class Dots;
 class Doc;
 class Flag;
 class FTrem;
+class GraceAligner;
 class GraceGrp;
 class GrpSym;
 class HalfmRpt;
+class HorizontalAligner;
 class InstrDef;
 class KeyAccid;
 class KeySig;
@@ -41,6 +45,7 @@ class LayerElement;
 class Ligature;
 class Mdiv;
 class Measure;
+class MeasureAligner;
 class Mensur;
 class MeterSig;
 class MeterSigGrp;
@@ -76,6 +81,7 @@ class Syllable;
 class System;
 class TabDurSym;
 class TabGrp;
+class TimestampAligner;
 class TimestampAttr;
 class Tuning;
 class Tuplet;
@@ -266,6 +272,24 @@ public:
     virtual FunctorCode VisitVerseEnd(Verse *verse);
     ///@}
 
+    /**
+     * @name Visit horizontal aligners
+     */
+    ///@{
+    virtual FunctorCode VisitAlignment(Alignment *alignment);
+    virtual FunctorCode VisitAlignmentEnd(Alignment *alignment);
+    virtual FunctorCode VisitAlignmentReference(AlignmentReference *alignmentReference);
+    virtual FunctorCode VisitAlignmentReferenceEnd(AlignmentReference *alignmentReference);
+    virtual FunctorCode VisitHorizontalAligner(HorizontalAligner *horizontalAligner);
+    virtual FunctorCode VisitHorizontalAlignerEnd(HorizontalAligner *horizontalAligner);
+    virtual FunctorCode VisitMeasureAligner(MeasureAligner *measureAligner);
+    virtual FunctorCode VisitMeasureAlignerEnd(MeasureAligner *measureAligner);
+    virtual FunctorCode VisitGraceAligner(GraceAligner *graceAligner);
+    virtual FunctorCode VisitGraceAlignerEnd(GraceAligner *graceAligner);
+    virtual FunctorCode VisitTimestampAligner(TimestampAligner *timestampAligner);
+    virtual FunctorCode VisitTimestampAlignerEnd(TimestampAligner *timestampAligner);
+    ///@}
+
 private:
     //
 public:
@@ -454,6 +478,24 @@ public:
     virtual FunctorCode VisitTupletNumEnd(const TupletNum *tupletNum);
     virtual FunctorCode VisitVerse(const Verse *verse);
     virtual FunctorCode VisitVerseEnd(const Verse *verse);
+    ///@}
+
+    /**
+     * @name Visit horizontal aligners
+     */
+    ///@{
+    virtual FunctorCode VisitAlignment(const Alignment *alignment);
+    virtual FunctorCode VisitAlignmentEnd(const Alignment *alignment);
+    virtual FunctorCode VisitAlignmentReference(const AlignmentReference *alignmentReference);
+    virtual FunctorCode VisitAlignmentReferenceEnd(const AlignmentReference *alignmentReference);
+    virtual FunctorCode VisitHorizontalAligner(const HorizontalAligner *horizontalAligner);
+    virtual FunctorCode VisitHorizontalAlignerEnd(const HorizontalAligner *horizontalAligner);
+    virtual FunctorCode VisitMeasureAligner(const MeasureAligner *measureAligner);
+    virtual FunctorCode VisitMeasureAlignerEnd(const MeasureAligner *measureAligner);
+    virtual FunctorCode VisitGraceAligner(const GraceAligner *graceAligner);
+    virtual FunctorCode VisitGraceAlignerEnd(const GraceAligner *graceAligner);
+    virtual FunctorCode VisitTimestampAligner(const TimestampAligner *timestampAligner);
+    virtual FunctorCode VisitTimestampAlignerEnd(const TimestampAligner *timestampAligner);
     ///@}
 
 private:

@@ -749,6 +749,66 @@ FunctorCode FunctorInterface::VisitVerseEnd(Verse *verse)
     return this->VisitLayerElementEnd(verse);
 }
 
+FunctorCode FunctorInterface::VisitAlignment(Alignment *alignment)
+{
+    return this->VisitObject(alignment);
+}
+
+FunctorCode FunctorInterface::VisitAlignmentEnd(Alignment *alignment)
+{
+    return this->VisitObjectEnd(alignment);
+}
+
+FunctorCode FunctorInterface::VisitAlignmentReference(AlignmentReference *alignmentReference)
+{
+    return this->VisitObject(alignmentReference);
+}
+
+FunctorCode FunctorInterface::VisitAlignmentReferenceEnd(AlignmentReference *alignmentReference)
+{
+    return this->VisitObjectEnd(alignmentReference);
+}
+
+FunctorCode FunctorInterface::VisitHorizontalAligner(HorizontalAligner *horizontalAligner)
+{
+    return this->VisitObject(horizontalAligner);
+}
+
+FunctorCode FunctorInterface::VisitHorizontalAlignerEnd(HorizontalAligner *horizontalAligner)
+{
+    return this->VisitObjectEnd(horizontalAligner);
+}
+
+FunctorCode FunctorInterface::VisitMeasureAligner(MeasureAligner *measureAligner)
+{
+    return this->VisitHorizontalAligner(measureAligner);
+}
+
+FunctorCode FunctorInterface::VisitMeasureAlignerEnd(MeasureAligner *measureAligner)
+{
+    return this->VisitHorizontalAlignerEnd(measureAligner);
+}
+
+FunctorCode FunctorInterface::VisitGraceAligner(GraceAligner *graceAligner)
+{
+    return this->VisitHorizontalAligner(graceAligner);
+}
+
+FunctorCode FunctorInterface::VisitGraceAlignerEnd(GraceAligner *graceAligner)
+{
+    return this->VisitHorizontalAlignerEnd(graceAligner);
+}
+
+FunctorCode FunctorInterface::VisitTimestampAligner(TimestampAligner *timestampAligner)
+{
+    return this->VisitObject(timestampAligner);
+}
+
+FunctorCode FunctorInterface::VisitTimestampAlignerEnd(TimestampAligner *timestampAligner)
+{
+    return this->VisitObjectEnd(timestampAligner);
+}
+
 //----------------------------------------------------------------------------
 // ConstFunctorInterface
 //----------------------------------------------------------------------------
@@ -1421,6 +1481,66 @@ FunctorCode ConstFunctorInterface::VisitVerse(const Verse *verse)
 FunctorCode ConstFunctorInterface::VisitVerseEnd(const Verse *verse)
 {
     return this->VisitLayerElementEnd(verse);
+}
+
+FunctorCode ConstFunctorInterface::VisitAlignment(const Alignment *alignment)
+{
+    return this->VisitObject(alignment);
+}
+
+FunctorCode ConstFunctorInterface::VisitAlignmentEnd(const Alignment *alignment)
+{
+    return this->VisitObjectEnd(alignment);
+}
+
+FunctorCode ConstFunctorInterface::VisitAlignmentReference(const AlignmentReference *alignmentReference)
+{
+    return this->VisitObject(alignmentReference);
+}
+
+FunctorCode ConstFunctorInterface::VisitAlignmentReferenceEnd(const AlignmentReference *alignmentReference)
+{
+    return this->VisitObjectEnd(alignmentReference);
+}
+
+FunctorCode ConstFunctorInterface::VisitHorizontalAligner(const HorizontalAligner *horizontalAligner)
+{
+    return this->VisitObject(horizontalAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitHorizontalAlignerEnd(const HorizontalAligner *horizontalAligner)
+{
+    return this->VisitObjectEnd(horizontalAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitMeasureAligner(const MeasureAligner *measureAligner)
+{
+    return this->VisitHorizontalAligner(measureAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitMeasureAlignerEnd(const MeasureAligner *measureAligner)
+{
+    return this->VisitHorizontalAlignerEnd(measureAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitGraceAligner(const GraceAligner *graceAligner)
+{
+    return this->VisitHorizontalAligner(graceAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitGraceAlignerEnd(const GraceAligner *graceAligner)
+{
+    return this->VisitHorizontalAlignerEnd(graceAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitTimestampAligner(const TimestampAligner *timestampAligner)
+{
+    return this->VisitObject(timestampAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitTimestampAlignerEnd(const TimestampAligner *timestampAligner)
+{
+    return this->VisitObjectEnd(timestampAligner);
 }
 
 } // namespace vrv
