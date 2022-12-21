@@ -2181,7 +2181,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
                         riter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp - 0.5));
                     }
                     if (wedge->node().attribute("spread")) {
-                        riter->first->SetOpening(wedge->node().attribute("spread").as_double() / 5);
+                        data_MEASUREMENTSIGNED opening;
+                        opening.SetVu(wedge->node().attribute("spread").as_double() / 5);
+                        riter->first->SetOpening(opening);
                     }
                     m_hairpinStack.erase(std::next(riter).base());
                     return;

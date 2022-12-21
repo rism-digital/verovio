@@ -39,10 +39,10 @@ AttMargins::~AttMargins() {}
 
 void AttMargins::ResetMargins()
 {
-    m_topmar = VRV_UNSET;
-    m_botmar = VRV_UNSET;
-    m_leftmar = VRV_UNSET;
-    m_rightmar = VRV_UNSET;
+    m_topmar = data_MEASUREMENTUNSIGNED();
+    m_botmar = data_MEASUREMENTUNSIGNED();
+    m_leftmar = data_MEASUREMENTUNSIGNED();
+    m_rightmar = data_MEASUREMENTUNSIGNED();
 }
 
 bool AttMargins::ReadMargins(pugi::xml_node element)
@@ -95,22 +95,22 @@ bool AttMargins::WriteMargins(pugi::xml_node element)
 
 bool AttMargins::HasTopmar() const
 {
-    return (m_topmar != VRV_UNSET);
+    return (m_topmar != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttMargins::HasBotmar() const
 {
-    return (m_botmar != VRV_UNSET);
+    return (m_botmar != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttMargins::HasLeftmar() const
 {
-    return (m_leftmar != VRV_UNSET);
+    return (m_leftmar != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttMargins::HasRightmar() const
 {
-    return (m_rightmar != VRV_UNSET);
+    return (m_rightmar != data_MEASUREMENTUNSIGNED());
 }
 
 /* include <attrightmar> */

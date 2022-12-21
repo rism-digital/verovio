@@ -121,6 +121,8 @@ enum ClassId : uint16_t {
     STAFFGRP,
     SURFACE,
     SVG,
+    SYMBOLDEF,
+    SYMBOLTABLE,
     SYSTEM,
     SYSTEM_ALIGNER,
     SYSTEM_ALIGNMENT,
@@ -277,6 +279,7 @@ enum ClassId : uint16_t {
  */
 enum InterfaceId {
     INTERFACE,
+    INTERFACE_ALT_SYM,
     INTERFACE_AREA_POS,
     INTERFACE_BOUNDARY,
     INTERFACE_DURATION,
@@ -645,6 +648,12 @@ enum StemSameasDrawingRole { SAMEAS_NONE = 0, SAMEAS_UNSET, SAMEAS_PRIMARY, SAME
 //----------------------------------------------------------------------------
 
 enum SmuflTextFont { SMUFL_NONE = 0, SMUFL_FONT_SELECTED, SMUFL_FONT_FALLBACK };
+
+//----------------------------------------------------------------------------
+// Graphic ID type
+//----------------------------------------------------------------------------
+
+enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

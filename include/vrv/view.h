@@ -41,6 +41,7 @@ class Fing;
 class FloatingCurvePositioner;
 class Fermata;
 class Gliss;
+class Graphic;
 class Hairpin;
 class Harm;
 class KeyAccid;
@@ -73,6 +74,7 @@ class Svg;
 class Syl;
 class Syllable;
 class Symbol;
+class SymbolDef;
 class System;
 class SystemElement;
 class Tempo;
@@ -385,7 +387,8 @@ protected:
     void DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params);
     void DrawNum(DeviceContext *dc, Num *num, TextDrawingParams &params);
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
-    void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params);
+    void DrawGraphic(DeviceContext *dc, Graphic *graphic, TextDrawingParams &params, int staffSize, bool dimin);
+    void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params, int staffSize, bool dimin);
     void DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
     void DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params, int staffSize);
@@ -573,6 +576,8 @@ protected:
     void DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, int width, int offset, int bracketWidth,
         int horizontalThickness, int verticalThickness);
     void DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int barlineWidth, int interval);
+    void DrawSymbolDef(DeviceContext *dc, Object *parent, SymbolDef *symbolDef, int x, int y, int staffSize, bool dimin,
+        data_HORIZONTALALIGNMENT alignement = HORIZONTALALIGNMENT_left);
     ///@}
 
     /**

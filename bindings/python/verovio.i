@@ -145,7 +145,7 @@ def renderToTimemapFile(toolkit, filename, options = None):
 def saveFile(toolkit, filename, options = None):
     if options == None:
         options = {}
-    return json.loads($action(toolkit, filename, json.dumps(options)))
+    return $action(toolkit, filename, json.dumps(options))
 %}
 
 // Toolkit::Select

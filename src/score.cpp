@@ -24,6 +24,7 @@
 #include "runningelement.h"
 #include "sb.h"
 #include "section.h"
+#include "symboldef.h"
 #include "system.h"
 #include "vrv.h"
 

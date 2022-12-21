@@ -25,6 +25,7 @@ namespace vrv {
 class Abbr;
 class Accid;
 class Add;
+class AltSymInterface;
 class AnchoredText;
 class Annot;
 class App;
@@ -145,6 +146,8 @@ class Svg;
 class Syl;
 class Syllable;
 class Symbol;
+class SymbolDef;
+class SymbolTable;
 class System;
 class SystemElement;
 class SystemMilestoneEnd;
@@ -362,6 +365,7 @@ private:
     void WriteLayerDef(pugi::xml_node currentNode, LayerDef *layerDef);
     void WriteTuning(pugi::xml_node currentNode, Tuning *tuning);
     void WriteCourse(pugi::xml_node currentNode, Course *course);
+    void WriteSymbolTable(pugi::xml_node currentNode, SymbolTable *symbolTable);
     void WriteMeasure(pugi::xml_node currentNode, Measure *measure);
     void WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterSigGrp);
     void WriteFb(pugi::xml_node currentNode, Fb *fb);
@@ -456,6 +460,7 @@ private:
     void WriteRend(pugi::xml_node currentNode, Rend *rend);
     void WriteSvg(pugi::xml_node currentNode, Svg *svg);
     void WriteSymbol(pugi::xml_node currentNode, Symbol *symbol);
+    void WriteSymbolDef(pugi::xml_node currentNode, SymbolDef *symbolDef);
     void WriteText(pugi::xml_node currentNode, Text *text);
     ///@}
 
@@ -514,6 +519,7 @@ private:
     void WriteSystemElement(pugi::xml_node element, SystemElement *object);
     void WriteTextElement(pugi::xml_node element, TextElement *object);
     //
+    void WriteAltSymInterface(pugi::xml_node currentNode, AltSymInterface *interface);
     void WriteAreaPosInterface(pugi::xml_node currentNode, AreaPosInterface *interface);
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
     void WriteLinkingInterface(pugi::xml_node currentNode, LinkingInterface *interface);
@@ -658,6 +664,7 @@ private:
     bool ReadTuning(Object *parent, pugi::xml_node tuning);
     bool ReadTuningChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadCourse(Object *parent, pugi::xml_node course);
+    bool ReadSymbolTable(Object *parent, pugi::xml_node parentNode);
     bool ReadMeasure(Object *parent, pugi::xml_node measure);
     bool ReadMeasureChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeterSigGrp(Object *parent, pugi::xml_node meterSigGrp);
@@ -672,6 +679,7 @@ private:
     bool ReadLayerDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
     bool ReadTextChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
+    bool ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
     ///@}
 
     /**
@@ -761,6 +769,7 @@ private:
     bool ReadRend(Object *parent, pugi::xml_node rend);
     bool ReadSvg(Object *parent, pugi::xml_node svg);
     bool ReadSymbol(Object *parent, pugi::xml_node symbol);
+    bool ReadSymbolDef(Object *parent, pugi::xml_node symbolDef);
     bool ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
     ///@}
 
@@ -807,6 +816,7 @@ private:
     bool ReadSystemElement(pugi::xml_node element, SystemElement *object);
     bool ReadTextElement(pugi::xml_node element, TextElement *object);
 
+    bool ReadAltSymInterface(pugi::xml_node element, AltSymInterface *interface);
     bool ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface);
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface);
@@ -825,7 +835,7 @@ private:
      */
     ///@{
     bool ReadFacsimile(Doc *doc, pugi::xml_node facsimile);
-    bool ReadGraphic(Surface *parent, pugi::xml_node graphic);
+    bool ReadGraphic(Object *parent, pugi::xml_node graphic);
     bool ReadSurface(Facsimile *parent, pugi::xml_node surface);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
     bool ReadZone(Surface *parent, pugi::xml_node zone);
