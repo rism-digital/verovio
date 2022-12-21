@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "page.h"
 #include "score.h"

@@ -342,6 +342,18 @@ private:
 // SetStaffDefRedrawFlagsFunctor
 //----------------------------------------------------------------------------
 
+enum StaffDefRedrawFlags {
+    REDRAW_CLEF = 0x1,
+    REDRAW_KEYSIG = 0x2,
+    REDRAW_MENSUR = 0x4,
+    REDRAW_METERSIG = 0x8,
+    REDRAW_METERSIGGRP = 0x10,
+    // all flags
+    REDRAW_ALL = REDRAW_CLEF | REDRAW_KEYSIG | REDRAW_MENSUR | REDRAW_METERSIG | REDRAW_METERSIGGRP,
+    //
+    FORCE_REDRAW = 0x100
+};
+
 /**
  * This class sets drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
  * to be redrawn. This typically occurs when a new System or a new ScoreDef is encountered.

@@ -557,10 +557,8 @@ std::vector<int> ScoreDef::GetStaffNs() const
 void ScoreDef::SetRedrawFlags(int redrawFlags)
 {
     m_setAsDrawing = true;
-    SetStaffDefRedrawFlagsParams setStaffDefRedrawFlagsParams;
-    setStaffDefRedrawFlagsParams.m_redrawFlags = redrawFlags;
-    Functor setStaffDefDraw(&Object::SetStaffDefRedrawFlags);
-    this->Process(&setStaffDefDraw, &setStaffDefRedrawFlagsParams);
+    SetStaffDefRedrawFlagsFunctor setStaffDefRedrawFlags(redrawFlags);
+    this->Process(setStaffDefRedrawFlags);
 }
 
 void ScoreDef::SetDrawingWidth(int drawingWidth)

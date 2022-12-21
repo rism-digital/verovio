@@ -151,36 +151,6 @@ FunctorCode StaffDef::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitStaffDefEnd(this);
 }
 
-int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
-{
-    SetStaffDefRedrawFlagsParams *params = vrv_params_cast<SetStaffDefRedrawFlagsParams *>(functorParams);
-    assert(params);
-
-    const bool forceRedraw = params->m_redrawFlags & StaffDefRedrawFlags::FORCE_REDRAW;
-    const bool redrawClef = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_CLEF;
-    if (redrawClef || forceRedraw) {
-        this->SetDrawClef(redrawClef);
-    }
-    const bool redrawKeySig = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_KEYSIG;
-    if (redrawKeySig || forceRedraw) {
-        this->SetDrawKeySig(redrawKeySig);
-    }
-    const bool redrawMensur = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_MENSUR;
-    if (redrawMensur || forceRedraw) {
-        this->SetDrawMensur(redrawMensur);
-    }
-    const bool redrawMeterSig = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_METERSIG;
-    if (redrawMeterSig || forceRedraw) {
-        this->SetDrawMeterSig(redrawMeterSig);
-    }
-    const bool redrawMeterSigGrp = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_METERSIGGRP;
-    if (redrawMeterSigGrp || forceRedraw) {
-        this->SetDrawMeterSigGrp(redrawMeterSigGrp);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int StaffDef::PrepareDuration(FunctorParams *functorParams)
 {
     PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);

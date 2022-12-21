@@ -2143,36 +2143,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// SetStaffDefRedrawFlagsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: bool clef flag
- * member 1: bool keysig flag
- * member 2: bool mensur flag
- * member 3: bool meterSig flag
- * member 4: bool the flag for indicating if apply to all or not
- **/
-
-enum StaffDefRedrawFlags {
-    REDRAW_CLEF = 0x1,
-    REDRAW_KEYSIG = 0x2,
-    REDRAW_MENSUR = 0x4,
-    REDRAW_METERSIG = 0x8,
-    REDRAW_METERSIGGRP = 0x10,
-    // all flags
-    REDRAW_ALL = REDRAW_CLEF | REDRAW_KEYSIG | REDRAW_MENSUR | REDRAW_METERSIG | REDRAW_METERSIGGRP,
-    //
-    FORCE_REDRAW = 0x100
-};
-
-class SetStaffDefRedrawFlagsParams : public FunctorParams {
-public:
-    SetStaffDefRedrawFlagsParams() { m_redrawFlags = 0; }
-    int m_redrawFlags;
-};
-
-//----------------------------------------------------------------------------
 // TransposeParams
 //----------------------------------------------------------------------------
 

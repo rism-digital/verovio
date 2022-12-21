@@ -1083,21 +1083,6 @@ public:
     ///@}
 
     /**
-     * @name Functors setting the current scoreDef.
-     */
-    ///@{
-
-    /**
-     * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
-     * to be redrawn.
-     * This typically occurs when a new System or a new  ScoreDef is encountered.
-     * See implementation and Object::SetStaffDefRedrawFlags for the parameters.
-     */
-    virtual int SetStaffDefRedrawFlags(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    ///@}
-
-    /**
      * @name Functors for preparing the data.
      */
     ///@{
