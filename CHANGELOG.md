@@ -6,6 +6,7 @@
 * Support for `incip` with MEI and PAE format (with --incip option)
 * Support for single-line Plaine & Easie input
 * Support for `@extender` lines on `tempo` (@eNote-GmBH)
+* Support for `ornam` with text content rendering
 * Option --unit changed to double
 
 ## [3.13.1] - 2022-11-28
