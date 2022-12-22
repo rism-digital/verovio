@@ -1366,6 +1366,12 @@
 		E7BCFFB9281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; };
 		E7BCFFBA281298620012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFBB281298630012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
+		E7C3AED629550190002DE5AB /* preparedatafunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7C3AED52955018F002DE5AB /* preparedatafunctor.h */; };
+		E7C3AED729550190002DE5AB /* preparedatafunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7C3AED52955018F002DE5AB /* preparedatafunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7C3AED9295501A5002DE5AB /* preparedatafunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */; };
+		E7C3AEDA295501A5002DE5AB /* preparedatafunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */; };
+		E7C3AEDB295501C9002DE5AB /* preparedatafunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */; };
+		E7C3AEDC295501CA002DE5AB /* preparedatafunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */; };
 		E7D3389A293E057100C40B81 /* setscoredeffunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7D33899293E057100C40B81 /* setscoredeffunctor.h */; };
 		E7D3389B293E057100C40B81 /* setscoredeffunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7D33899293E057100C40B81 /* setscoredeffunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7D3389D293E05A800C40B81 /* setscoredeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */; };
@@ -1871,6 +1877,8 @@
 		E79C87C2269440570098FE85 /* lv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lv.cpp; path = src/lv.cpp; sourceTree = "<group>"; };
 		E7BCFFB4281297980012513D /* resources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resources.cpp; path = src/resources.cpp; sourceTree = "<group>"; };
 		E7BCFFB7281297C60012513D /* resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resources.h; path = include/vrv/resources.h; sourceTree = "<group>"; };
+		E7C3AED52955018F002DE5AB /* preparedatafunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = preparedatafunctor.h; path = include/vrv/preparedatafunctor.h; sourceTree = "<group>"; };
+		E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = preparedatafunctor.cpp; path = src/preparedatafunctor.cpp; sourceTree = "<group>"; };
 		E7D33899293E057100C40B81 /* setscoredeffunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = setscoredeffunctor.h; path = include/vrv/setscoredeffunctor.h; sourceTree = "<group>"; };
 		E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = setscoredeffunctor.cpp; path = src/setscoredeffunctor.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2601,6 +2609,8 @@
 				E765675B28BC019F00BC6490 /* functor.h */,
 				E74A806828BC9842005274E7 /* functorinterface.cpp */,
 				E765675828BBFBA400BC6490 /* functorinterface.h */,
+				E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */,
+				E7C3AED52955018F002DE5AB /* preparedatafunctor.h */,
 				E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */,
 				E7D33899293E057100C40B81 /* setscoredeffunctor.h */,
 			);
@@ -2803,6 +2813,7 @@
 				4DEC4D5A21C800A000D1D273 /* abbr.h in Headers */,
 				4DB0B0191C4412A400DBDCC3 /* timestamp.h in Headers */,
 				4DB3D8F71F83D1E500B5FC2B /* attalternates.h in Headers */,
+				E7C3AED629550190002DE5AB /* preparedatafunctor.h in Headers */,
 				4D6122BC1F77E1B900FC90A0 /* rend.h in Headers */,
 				4DB3D8F81F83D1E800B5FC2B /* comparison.h in Headers */,
 				4D4FCD101F5457020009C455 /* staffdef.h in Headers */,
@@ -2957,6 +2968,7 @@
 				403B0515244F3E4D00EE4F71 /* gliss.h in Headers */,
 				BB4C4B0A22A932C3001F6AF0 /* pghead.h in Headers */,
 				4DFB3E8B23ABDFDA00D688C7 /* pitchinflection.h in Headers */,
+				E7C3AED729550190002DE5AB /* preparedatafunctor.h in Headers */,
 				BB4C4B8A22A932DF001F6AF0 /* mnum.h in Headers */,
 				BB4C4AD422A932B6001F6AF0 /* staffdef.h in Headers */,
 				BB4C4B1E22A932CF001F6AF0 /* bracketspan.h in Headers */,
@@ -3339,6 +3351,7 @@
 				E79C87C4269440790098FE85 /* lv.cpp in Sources */,
 				4D72A5DE208A37D5009DEC1E /* mrpt2.cpp in Sources */,
 				4DA0EAF722BB78E100A7EBEB /* atts_facsimile.cpp in Sources */,
+				E7C3AEDB295501C9002DE5AB /* preparedatafunctor.cpp in Sources */,
 				4DEC4D9321C81E0B00D1D273 /* del.cpp in Sources */,
 				4D508C3126D4E64C00020F35 /* crc.cpp in Sources */,
 				4D16941C1E3A44F300569BF4 /* ending.cpp in Sources */,
@@ -3594,6 +3607,7 @@
 				40F910081E2799740081B7BB /* trill.cpp in Sources */,
 				4DA1448A1C2AB28700CB7CEE /* textelement.cpp in Sources */,
 				E722106928F85982002CD6E9 /* findlayerelementsfunctor.cpp in Sources */,
+				E7C3AEDC295501CA002DE5AB /* preparedatafunctor.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
 				4DBDD6722939E1AE009EC466 /* symboldef.cpp in Sources */,
 				4DA80D961A6ACF5D0089802D /* options.cpp in Sources */,
@@ -3805,6 +3819,7 @@
 				E79C87C52694407A0098FE85 /* lv.cpp in Sources */,
 				4DB3D8FD1F83D1FD00B5FC2B /* horizontalaligner.cpp in Sources */,
 				4D8CD8A71B4E927300F0756F /* atts_critapp.cpp in Sources */,
+				E7C3AED9295501A5002DE5AB /* preparedatafunctor.cpp in Sources */,
 				403BEFF2206C00D700D022D5 /* mrpt2.cpp in Sources */,
 				4D508C3226D4E64C00020F35 /* crc.cpp in Sources */,
 				4DA0EAF822BB78E200A7EBEB /* atts_facsimile.cpp in Sources */,
@@ -4038,6 +4053,7 @@
 				E79C87C62694407B0098FE85 /* lv.cpp in Sources */,
 				BB4C4AD322A932B6001F6AF0 /* staffdef.cpp in Sources */,
 				BB4C4B6722A932D7001F6AF0 /* multirpt.cpp in Sources */,
+				E7C3AEDA295501A5002DE5AB /* preparedatafunctor.cpp in Sources */,
 				4DA0EAF922BB78E200A7EBEB /* atts_facsimile.cpp in Sources */,
 				4D508C3326D4E64C00020F35 /* crc.cpp in Sources */,
 				BB4C4A9A22A9328F001F6AF0 /* object.cpp in Sources */,
