@@ -28,6 +28,7 @@ class Dot;
 class Dots;
 class Doc;
 class Flag;
+class FloatingObject;
 class FTrem;
 class GraceAligner;
 class GraceGrp;
@@ -302,11 +303,20 @@ public:
     virtual FunctorCode VisitStaffAlignmentEnd(StaffAlignment *staffAlignment);
     ///@}
 
+    /**
+     * @name Visit floating objects
+     */
+    ///@{
+    virtual FunctorCode VisitFloatingObject(FloatingObject *floatingObject);
+    virtual FunctorCode VisitFloatingObjectEnd(FloatingObject *floatingObject);
+    ///@}
+
 private:
     //
 public:
     //
 private:
+    //
 };
 
 //----------------------------------------------------------------------------
@@ -520,11 +530,20 @@ public:
     virtual FunctorCode VisitStaffAlignmentEnd(const StaffAlignment *staffAlignment);
     ///@}
 
+    /**
+     * @name Visit floating objects
+     */
+    ///@{
+    virtual FunctorCode VisitFloatingObject(const FloatingObject *floatingObject);
+    virtual FunctorCode VisitFloatingObjectEnd(const FloatingObject *floatingObject);
+    ///@}
+
 private:
     //
 public:
     //
 private:
+    //
 };
 
 } // namespace vrv

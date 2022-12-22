@@ -829,6 +829,16 @@ FunctorCode FunctorInterface::VisitStaffAlignmentEnd(StaffAlignment *staffAlignm
     return this->VisitObjectEnd(staffAlignment);
 }
 
+FunctorCode FunctorInterface::VisitFloatingObject(FloatingObject *floatingObject)
+{
+    return this->VisitObject(floatingObject);
+}
+
+FunctorCode FunctorInterface::VisitFloatingObjectEnd(FloatingObject *floatingObject)
+{
+    return this->VisitObjectEnd(floatingObject);
+}
+
 //----------------------------------------------------------------------------
 // ConstFunctorInterface
 //----------------------------------------------------------------------------
@@ -1581,6 +1591,16 @@ FunctorCode ConstFunctorInterface::VisitStaffAlignment(const StaffAlignment *sta
 FunctorCode ConstFunctorInterface::VisitStaffAlignmentEnd(const StaffAlignment *staffAlignment)
 {
     return this->VisitObjectEnd(staffAlignment);
+}
+
+FunctorCode ConstFunctorInterface::VisitFloatingObject(const FloatingObject *floatingObject)
+{
+    return this->VisitObject(floatingObject);
+}
+
+FunctorCode ConstFunctorInterface::VisitFloatingObjectEnd(const FloatingObject *floatingObject)
+{
+    return this->VisitObjectEnd(floatingObject);
 }
 
 } // namespace vrv

@@ -24,6 +24,7 @@
 #include "dynam.h"
 #include "fermata.h"
 #include "fing.h"
+#include "functor.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "mordent.h"
@@ -163,6 +164,26 @@ int FloatingObject::SetDrawingGrpObject(void *drawingGrpObject)
     }
     m_drawingGrpId = idx + 1000;
     return m_drawingGrpId;
+}
+
+FunctorCode FloatingObject::Accept(MutableFunctor &functor)
+{
+    return functor.VisitFloatingObject(this);
+}
+
+FunctorCode FloatingObject::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitFloatingObject(this);
+}
+
+FunctorCode FloatingObject::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitFloatingObjectEnd(this);
+}
+
+FunctorCode FloatingObject::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFloatingObjectEnd(this);
 }
 
 //----------------------------------------------------------------------------
