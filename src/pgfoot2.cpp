@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "functor.h"
 
 namespace vrv {
 
@@ -50,5 +51,25 @@ int PgFoot2::GetTotalHeight(const Doc *doc) const
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode PgFoot2::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPgFoot2(this);
+}
+
+FunctorCode PgFoot2::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPgFoot2(this);
+}
+
+FunctorCode PgFoot2::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPgFoot2End(this);
+}
+
+FunctorCode PgFoot2::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPgFoot2End(this);
+}
 
 } // namespace vrv
