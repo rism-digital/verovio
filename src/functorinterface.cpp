@@ -33,7 +33,6 @@
 #include "labelabbr.h"
 #include "layer.h"
 #include "layerdef.h"
-#include "layerelement.h"
 #include "ligature.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -50,9 +49,12 @@
 #include "neume.h"
 #include "note.h"
 #include "page.h"
-#include "pageelement.h"
 #include "pagemilestone.h"
 #include "pages.h"
+#include "pgfoot.h"
+#include "pgfoot2.h"
+#include "pghead.h"
+#include "pghead2.h"
 #include "plica.h"
 #include "proport.h"
 #include "rest.h"
@@ -257,6 +259,56 @@ FunctorCode FunctorInterface::VisitTuning(Tuning *tuning)
 FunctorCode FunctorInterface::VisitTuningEnd(Tuning *tuning)
 {
     return this->VisitObjectEnd(tuning);
+}
+
+FunctorCode FunctorInterface::VisitRunningElement(RunningElement *runningElement)
+{
+    return this->VisitObject(runningElement);
+}
+
+FunctorCode FunctorInterface::VisitRunningElementEnd(RunningElement *runningElement)
+{
+    return this->VisitObjectEnd(runningElement);
+}
+
+FunctorCode FunctorInterface::VisitPgHead(PgHead *pgHead)
+{
+    return this->VisitRunningElement(pgHead);
+}
+
+FunctorCode FunctorInterface::VisitPgHeadEnd(PgHead *pgHead)
+{
+    return this->VisitRunningElementEnd(pgHead);
+}
+
+FunctorCode FunctorInterface::VisitPgHead2(PgHead2 *pgHead2)
+{
+    return this->VisitRunningElement(pgHead2);
+}
+
+FunctorCode FunctorInterface::VisitPgHead2End(PgHead2 *pgHead2)
+{
+    return this->VisitRunningElementEnd(pgHead2);
+}
+
+FunctorCode FunctorInterface::VisitPgFoot(PgFoot *pgFoot)
+{
+    return this->VisitRunningElement(pgFoot);
+}
+
+FunctorCode FunctorInterface::VisitPgFootEnd(PgFoot *pgFoot)
+{
+    return this->VisitRunningElementEnd(pgFoot);
+}
+
+FunctorCode FunctorInterface::VisitPgFoot2(PgFoot2 *pgFoot2)
+{
+    return this->VisitRunningElement(pgFoot2);
+}
+
+FunctorCode FunctorInterface::VisitPgFoot2End(PgFoot2 *pgFoot2)
+{
+    return this->VisitRunningElementEnd(pgFoot2);
 }
 
 FunctorCode FunctorInterface::VisitMdiv(Mdiv *mdiv)
@@ -1021,6 +1073,56 @@ FunctorCode ConstFunctorInterface::VisitTuning(const Tuning *tuning)
 FunctorCode ConstFunctorInterface::VisitTuningEnd(const Tuning *tuning)
 {
     return this->VisitObjectEnd(tuning);
+}
+
+FunctorCode ConstFunctorInterface::VisitRunningElement(const RunningElement *runningElement)
+{
+    return this->VisitObject(runningElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitRunningElementEnd(const RunningElement *runningElement)
+{
+    return this->VisitObjectEnd(runningElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitPgHead(const PgHead *pgHead)
+{
+    return this->VisitRunningElement(pgHead);
+}
+
+FunctorCode ConstFunctorInterface::VisitPgHeadEnd(const PgHead *pgHead)
+{
+    return this->VisitRunningElementEnd(pgHead);
+}
+
+FunctorCode ConstFunctorInterface::VisitPgHead2(const PgHead2 *pgHead2)
+{
+    return this->VisitRunningElement(pgHead2);
+}
+
+FunctorCode ConstFunctorInterface::VisitPgHead2End(const PgHead2 *pgHead2)
+{
+    return this->VisitRunningElementEnd(pgHead2);
+}
+
+FunctorCode ConstFunctorInterface::VisitPgFoot(const PgFoot *pgFoot)
+{
+    return this->VisitRunningElement(pgFoot);
+}
+
+FunctorCode ConstFunctorInterface::VisitPgFootEnd(const PgFoot *pgFoot)
+{
+    return this->VisitRunningElementEnd(pgFoot);
+}
+
+FunctorCode ConstFunctorInterface::VisitPgFoot2(const PgFoot2 *pgFoot2)
+{
+    return this->VisitRunningElement(pgFoot2);
+}
+
+FunctorCode ConstFunctorInterface::VisitPgFoot2End(const PgFoot2 *pgFoot2)
+{
+    return this->VisitRunningElementEnd(pgFoot2);
 }
 
 FunctorCode ConstFunctorInterface::VisitMdiv(const Mdiv *mdiv)

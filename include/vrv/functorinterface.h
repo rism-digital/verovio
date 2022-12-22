@@ -65,9 +65,14 @@ class PageElement;
 class PageMilestoneEnd;
 class Pages;
 class Pb;
+class PgFoot;
+class PgFoot2;
+class PgHead;
+class PgHead2;
 class Plica;
 class Proport;
 class Rest;
+class RunningElement;
 class Sb;
 class Score;
 class ScoreDef;
@@ -163,6 +168,22 @@ public:
     virtual FunctorCode VisitSystemEnd(System *system);
     virtual FunctorCode VisitTuning(Tuning *tuning);
     virtual FunctorCode VisitTuningEnd(Tuning *tuning);
+    ///@}
+
+    /**
+     * @name Visit running elements
+     */
+    ///@{
+    virtual FunctorCode VisitRunningElement(RunningElement *runningElement);
+    virtual FunctorCode VisitRunningElementEnd(RunningElement *runningElement);
+    virtual FunctorCode VisitPgFoot(PgFoot *pgFoot);
+    virtual FunctorCode VisitPgFootEnd(PgFoot *pgFoot);
+    virtual FunctorCode VisitPgFoot2(PgFoot2 *pgFoot2);
+    virtual FunctorCode VisitPgFoot2End(PgFoot2 *pgFoot2);
+    virtual FunctorCode VisitPgHead(PgHead *pgHead);
+    virtual FunctorCode VisitPgHeadEnd(PgHead *pgHead);
+    virtual FunctorCode VisitPgHead2(PgHead2 *pgHead2);
+    virtual FunctorCode VisitPgHead2End(PgHead2 *pgHead2);
     ///@}
 
     /**
@@ -390,6 +411,22 @@ public:
     virtual FunctorCode VisitSystemEnd(const System *system);
     virtual FunctorCode VisitTuning(const Tuning *tuning);
     virtual FunctorCode VisitTuningEnd(const Tuning *tuning);
+    ///@}
+
+    /**
+     * @name Visit running elements
+     */
+    ///@{
+    virtual FunctorCode VisitRunningElement(const RunningElement *runningElement);
+    virtual FunctorCode VisitRunningElementEnd(const RunningElement *runningElement);
+    virtual FunctorCode VisitPgFoot(const PgFoot *pgFoot);
+    virtual FunctorCode VisitPgFootEnd(const PgFoot *pgFoot);
+    virtual FunctorCode VisitPgFoot2(const PgFoot2 *pgFoot2);
+    virtual FunctorCode VisitPgFoot2End(const PgFoot2 *pgFoot2);
+    virtual FunctorCode VisitPgHead(const PgHead *pgHead);
+    virtual FunctorCode VisitPgHeadEnd(const PgHead *pgHead);
+    virtual FunctorCode VisitPgHead2(const PgHead2 *pgHead2);
+    virtual FunctorCode VisitPgHead2End(const PgHead2 *pgHead2);
     ///@}
 
     /**
