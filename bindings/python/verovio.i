@@ -86,12 +86,6 @@ def getMIDIValuesForElement(toolkit, xml_id):
     return json.loads($action(toolkit, xml_id))
 %}
 
-// Toolkit::GetNotatedIdForElement
-%feature("shadow") vrv::Toolkit::GetNotatedIdForElement(const std::string &) %{
-def getNotatedIdForElement(toolkit, xml_id):
-    return json.loads($action(toolkit, xml_id))
-%}
-
 // Toolkit::GetOptions
 %feature("shadow") vrv::Toolkit::GetOptions() const %{
 def getOptions(toolkit):
