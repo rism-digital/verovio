@@ -217,6 +217,7 @@ FunctorCode PrepareCrossStaffFunctor::VisitLayerElement(LayerElement *layerEleme
         LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
             crossElement->GetStaff().at(0), layerElement->GetID().c_str());
         layerElement->m_crossStaff = NULL;
+        return FUNCTOR_CONTINUE;
     }
 
     if (direction == FORWARD) {
