@@ -9725,8 +9725,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     Note *note = NULL;
 
-    // Used for splitting an invisible rest across a clef:
-    hum::HTp spaceSplitToken = NULL;
+    // Used for splitting a rest across a clef:
+    hum::HTp restSplitToken = NULL;
     hum::HumNum remainingSplitDur;
 
     hum::HumRegex hre;
@@ -9884,25 +9884,26 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                             id += letter;
                             clef->SetID(id);
                         }
-                        if (spaceSplitToken != NULL) {
-                            // Add the second part of a split invisible rest:
+                        if (restSplitToken != NULL) {
+                            // Add the second part of a split invisible rest (or
+                            // the invisible second part of a split visible rest):
                             Space *irest = new Space();
                             if (m_doc->GetOptions()->m_humType.GetValue()) {
-                                embedQstampInClass(irest, spaceSplitToken, *spaceSplitToken);
+                                embedQstampInClass(irest, restSplitToken, *restSplitToken);
                             }
-                            setLocationId(irest, spaceSplitToken);
+                            setLocationId(irest, restSplitToken);
                             std::string id = irest->GetID();
                             id += "b";
                             irest->SetID(id);
                             appendElement(elements, pointers, irest);
-                            // convertRhythm(irest, spaceSplitToken);
+                            // convertRhythm(irest, restSplitToken);
                             setRhythmFromDuration(irest, remainingSplitDur);
-                            // processSlurs(spaceSplitToken);
-                            // processPhrases(spaceSplitToken);
-                            // processDynamics(spaceSplitToken, staffindex);
-                            // processDirections(spaceSplitToken, staffindex);
+                            // processSlurs(restSplitToken);
+                            // processPhrases(restSplitToken);
+                            // processDynamics(restSplitToken, staffindex);
+                            // processDirections(restSplitToken, staffindex);
                             // Store rest here to complete the split after the clef change.
-                            spaceSplitToken = NULL;
+                            restSplitToken = NULL;
                             remainingSplitDur = 0;
                         }
                     }
@@ -10114,12 +10115,14 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 if ((i < (int)layerdata.size() - 1) && layerdata[i + 1]->isClef()) {
                     hum::HumNum dur = layerdata[i]->getDuration();
                     hum::HumNum ndur = layerdata[i + 1]->getDurationFromStart() - layerdata[i]->getDurationFromStart();
+                    hum::HumNum remainingDur = dur - ndur;
 
-                    if (ndur < dur) {
+                    if ((ndur < dur)
+                            && isExpressibleDuration(ndur)
+                            && isExpressibleDuration(remainingDur)) {
                         // create a split invisible rest so that an intervening clef
                         // can be positioned properly.
                         // split the space into two pieces, this is the firsthalf.
-                        hum::HumNum splitdur = dur - ndur;
                         Space *irest = new Space();
                         if (m_doc->GetOptions()->m_humType.GetValue()) {
                             embedQstampInClass(irest, layerdata[i], *layerdata[i]);
@@ -10127,14 +10130,14 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         setLocationId(irest, layerdata[i]);
                         appendElement(elements, pointers, irest);
                         // convertRhythm(irest, layerdata[i]);
-                        setRhythmFromDuration(irest, splitdur);
+                        setRhythmFromDuration(irest, ndur);
                         processSlurs(layerdata[i]);
                         processPhrases(layerdata[i]);
                         processDynamics(layerdata[i], staffindex);
                         processDirections(layerdata[i], staffindex);
                         // Store rest here to complete the split after the clef change.
-                        spaceSplitToken = layerdata[i];
-                        remainingSplitDur = ndur;
+                        restSplitToken = layerdata[i];
+                        remainingSplitDur = remainingDur;
                     }
                     else {
                         // normal space
@@ -10169,28 +10172,87 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 int line = layerdata[i]->getLineIndex();
                 int field = layerdata[i]->getFieldIndex();
 
-                hum::HumNum restDur = hum::Convert::recipToDuration(layerdata[i]);
-                if ((restDur == duration) && (restDur == timesigdurs[startline])) {
-                    // whole-measure rest with something else also in
-                    // measure (such as grace notes).
-                    MRest *mrest = new MRest();
-                    setLocationId(mrest, layerdata[i]);
-                    appendElement(elements, pointers, mrest);
-                    // colorRest(mrest, *layerdata[i], line, field);
-                    verticalRest(mrest, *layerdata[i]);
+                if ((i < (int)layerdata.size() - 1) && layerdata[i + 1]->isClef()) {
+                    hum::HumNum dur = layerdata[i]->getDuration();
+                    hum::HumNum ndur = layerdata[i + 1]->getDurationFromStart() - layerdata[i]->getDurationFromStart();
+                    hum::HumNum remainingDur = dur - ndur;
+
+                    if ((ndur < dur)
+                            && isExpressibleDuration(ndur)
+                            && isExpressibleDuration(remainingDur)) {
+                        // Create a split rest so that an intervening clef
+                        // can be positioned properly.  There will be two
+                        // pieces: first: this original rest, with the visual
+                        // duration unchanged, but with a gestural duration that
+                        // is the "pre-clef" duration, and second: an invisible
+                        // rest (space) that has the post-clef duration.
+                        // Here we emit the original rest, and save off what
+                        // the second rest should be.
+                        Rest *rest1 = new Rest();
+                        if (m_doc->GetOptions()->m_humType.GetValue()) {
+                            embedQstampInClass(rest1, layerdata[i], *layerdata[i]);
+                        }
+                        setLocationId(rest1, layerdata[i]);
+                        appendElement(elements, pointers, rest1);
+                        // convertRhythm(irest, layerdata[i]);
+                        setVisualAndGesturalRhythmFromDuration(rest1, dur, ndur);
+                        processSlurs(layerdata[i]);
+                        processPhrases(layerdata[i]);
+                        processDynamics(layerdata[i], staffindex);
+                        processDirections(layerdata[i], staffindex);
+                        // Store rest here to complete the split after the clef change.
+                        restSplitToken = layerdata[i];
+                        remainingSplitDur = remainingDur;
+                    }
+                    else {
+                        hum::HumNum restDur = hum::Convert::recipToDuration(layerdata[i]);
+                        if ((restDur == duration) && (restDur == timesigdurs[startline])) {
+                            // whole-measure rest with something else also in
+                            // measure (such as grace notes).
+                            MRest *mrest = new MRest();
+                            setLocationId(mrest, layerdata[i]);
+                            appendElement(elements, pointers, mrest);
+                            // colorRest(mrest, *layerdata[i], line, field);
+                            verticalRest(mrest, *layerdata[i]);
+                        }
+                        else {
+                            Rest *rest = new Rest();
+                            setLocationId(rest, layerdata[i]);
+                            appendElement(elements, pointers, rest);
+                            convertRest(rest, layerdata[i], -1, staffindex);
+                            colorRest(rest, *layerdata[i], line, field);
+                            verticalRest(rest, *layerdata[i]);
+                        }
+                        processSlurs(layerdata[i]);
+                        processPhrases(layerdata[i]);
+                        processDynamics(layerdata[i], staffindex);
+                        processDirections(layerdata[i], staffindex);
+                    }
                 }
                 else {
-                    Rest *rest = new Rest();
-                    setLocationId(rest, layerdata[i]);
-                    appendElement(elements, pointers, rest);
-                    convertRest(rest, layerdata[i], -1, staffindex);
-                    colorRest(rest, *layerdata[i], line, field);
-                    verticalRest(rest, *layerdata[i]);
+                    hum::HumNum restDur = hum::Convert::recipToDuration(layerdata[i]);
+                    if ((restDur == duration) && (restDur == timesigdurs[startline])) {
+                        // whole-measure rest with something else also in
+                        // measure (such as grace notes).
+                        MRest *mrest = new MRest();
+                        setLocationId(mrest, layerdata[i]);
+                        appendElement(elements, pointers, mrest);
+                        // colorRest(mrest, *layerdata[i], line, field);
+                        verticalRest(mrest, *layerdata[i]);
+                    }
+                    else {
+                        Rest *rest = new Rest();
+                        setLocationId(rest, layerdata[i]);
+                        appendElement(elements, pointers, rest);
+                        convertRest(rest, layerdata[i], -1, staffindex);
+                        colorRest(rest, *layerdata[i], line, field);
+                        verticalRest(rest, *layerdata[i]);
+                    }
+                    processSlurs(layerdata[i]);
+                    processPhrases(layerdata[i]);
+                    processDynamics(layerdata[i], staffindex);
+                    processDirections(layerdata[i], staffindex);
                 }
-                processSlurs(layerdata[i]);
-                processPhrases(layerdata[i]);
-                processDynamics(layerdata[i], staffindex);
-                processDirections(layerdata[i], staffindex);
             }
         }
         else if (!layerdata[i]->isNote()) {
@@ -10390,6 +10452,180 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::isExpressibleDuration -- returns whether or not this
+//      duration can be expressed as MEI @dur/@dots attributes. We limit
+//      ourselves to three dots, and take into account the current tuplet
+//      scaling.
+//
+
+bool HumdrumInput::isExpressibleDuration(hum::HumNum duration)
+{
+    // convert to whole note units
+    hum::HumNum dur = duration / 4;
+    // take into account current tuplet scaling
+    dur *= m_tupletscaling;
+
+    if (dur.getDenominator() == 1) {
+        if (dur.getNumerator() == 2) {
+            return true;  // breve
+        } else if (dur.getNumerator() == 3) {
+            return true; // dotted breve
+        } else if (dur.getNumerator() == 4) {
+            return true;  // long
+        } else if (dur.getNumerator() == 6) {
+            return true; // dotted long
+        } else if (dur.getNumerator() == 8) {
+            return true;  // maxima
+        } else if (dur.getNumerator() == 12) {
+            return true; // dotted maxima
+        }
+    }
+
+    // decide if the rhythm can be represented as 1/2**n with no dots.
+    if (dur.getNumerator() == 1) {
+        if (hum::Convert::isPowerOfTwo(dur.getDenominator())) {
+            return true;
+        }
+    }
+
+    // now decide if the rhythm can be represented as 1/2**n with one dot.
+    hum::HumNum test1dot = (dur * 2) / 3;
+    if (test1dot.getNumerator() == 1) {
+        if (hum::Convert::isPowerOfTwo(test1dot.getDenominator())) {
+            return true;
+        }
+    }
+
+    // now decide if the rhythm can be represented as 1/2**n with two dots.
+    hum::HumNum test2dot = (dur * 4) / 7;
+    if (test2dot.getNumerator() == 1) {
+        if (hum::Convert::isPowerOfTwo(test2dot.getDenominator())) {
+            return true;
+        }
+    }
+
+    // now decide if the rhythm can be represented as 1/2**n with three dots.
+    hum::HumNum test3dot = (dur * 8) / 15;
+    if (test3dot.getNumerator() == 1) {
+        if (hum::Convert::isPowerOfTwo(test3dot.getDenominator())) {
+            return true;
+        }
+    }
+
+    // duration required more than three dots or is not 1/2**n at all.
+    return false;
+
+}
+
+data_DURATION HumdrumInput::oneOverDenominatorToDur(int denominator) {
+    switch (denominator) {
+        case 1: return DURATION_1;
+        case 2: return DURATION_2;
+        case 4: return DURATION_4;
+        case 8: return DURATION_8;
+        case 16: return DURATION_16;
+        case 32: return DURATION_32;
+        case 64: return DURATION_64;
+        case 128: return DURATION_128;
+        case 256: return DURATION_256;
+        case 512: return DURATION_512;
+        case 1024: return DURATION_1024;
+        case 2048: return DURATION_2048;
+    }
+    return DURATION_NONE;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::isExpressibleDuration -- returns MEI @dur/@dots attributes
+//      for a duration.
+//
+
+pair<data_DURATION, int> HumdrumInput::getDurAndDots(hum::HumNum duration)
+{
+    pair<data_DURATION, int> output;
+
+    // convert to whole note units
+    hum::HumNum dur = duration / 4;
+    // take into account current tuplet scaling
+    dur *= m_tupletscaling;
+
+    if (dur.getDenominator() == 1) {
+        if (dur.getNumerator() == 2) {
+            output.first = DURATION_breve;
+            output.second = 0;
+            return output; // breve
+        } else if (dur.getNumerator() == 3) {
+            output.first = DURATION_breve;
+            output.second = 1;
+            return output; // dotted breve
+        } else if (dur.getNumerator() == 4) {
+            output.first = DURATION_long;
+            output.second = 0;
+            return output;  // long
+        } else if (dur.getNumerator() == 6) {
+            output.first = DURATION_long;
+            output.second = 1;
+            return output; // dotted long
+        } else if (dur.getNumerator() == 8) {
+            output.first = DURATION_maxima;
+            output.second = 0;
+            return output;  // maxima
+        } else if (dur.getNumerator() == 12) {
+            output.first = DURATION_maxima;
+            output.second = 1;
+            return output; // dotted maxima
+        }
+    }
+
+    // decide if the rhythm can be represented as 1/2**n with no dots.
+    if (dur.getNumerator() == 1) {
+        if (hum::Convert::isPowerOfTwo(dur.getDenominator())) {
+            output.first = oneOverDenominatorToDur(dur.getDenominator());
+            output.second = 0;
+            return output;
+        }
+    }
+
+    // now decide if the rhythm can be represented as 1/2**n with one dot.
+    hum::HumNum test1dot = (dur * 2) / 3;
+    if (test1dot.getNumerator() == 1) {
+        if (hum::Convert::isPowerOfTwo(test1dot.getDenominator())) {
+            output.first = oneOverDenominatorToDur(test1dot.getDenominator());
+            output.second = 1;
+            return output;
+        }
+    }
+
+    // now decide if the rhythm can be represented as 1/2**n with two dots.
+    hum::HumNum test2dot = (dur * 4) / 7;
+    if (test2dot.getNumerator() == 1) {
+        if (hum::Convert::isPowerOfTwo(test2dot.getDenominator())) {
+            output.first = oneOverDenominatorToDur(test2dot.getDenominator());
+            output.second = 2;
+            return output;
+        }
+    }
+
+    // now decide if the rhythm can be represented as 1/2**n with three dots.
+    hum::HumNum test3dot = (dur * 8) / 15;
+    if (test3dot.getNumerator() == 1) {
+        if (hum::Convert::isPowerOfTwo(test3dot.getDenominator())) {
+            output.first = oneOverDenominatorToDur(test3dot.getDenominator());
+            output.second = 3;
+            return output;
+        }
+    }
+
+    // duration required more than three dots or is not 1/2**n at all.
+    output.first = DURATION_NONE;
+    output.second = 0;
+    return output;
+
 }
 
 //////////////////////////////
@@ -20333,17 +20569,6 @@ void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std:
         if (layerdata.at(i)->isData()) {
             dataindex.push_back(i);
         }
-        else if (layerdata.at(i)->isInterpretation()) {
-            if (layerdata.at(i)->isClef()) {
-                dataindex.push_back(i);
-            }
-            else if (*layerdata.at(i) == "*") {
-                std::string ctext = layerdata.at(i)->getValue("auto", "clef");
-                if (ctext.compare(0, 5, "*clef") == 0) {
-                    dataindex.push_back(i);
-                }
-            }
-        }
     }
 
     std::vector<hum::HumNum> startdur(dataindex.size(), 0);
@@ -22439,37 +22664,36 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertMensuralRhythm(ELEMENT
 
 //////////////////////////////
 //
-// HumdrumInput::setRhythmFromDuration -- Used for splitting invisible rests across
-//    clef changes, so a simple algorithm.  Currently does not allow for tuplets or
-//    dotted rhythms.
+// HumdrumInput::setRhythmFromDuration --
 //
 
-template <class ELEMENT> void HumdrumInput::setRhythmFromDuration(ELEMENT element, hum::HumNum dur)
+template <class ELEMENT> void HumdrumInput::setRhythmFromDuration(ELEMENT element, hum::HumNum duration)
 {
-    dur /= 4; // convert to whole-note units
-
-    if (dur.isInteger()) {
-        switch (dur.getNumerator()) {
-            case 1: element->SetDur(DURATION_1); break;
-            case 2: element->SetDur(DURATION_breve); break;
-            case 4: element->SetDur(DURATION_long); break;
-            case 8: element->SetDur(DURATION_maxima); break;
-        }
+    pair<data_DURATION, int> durAndDots = getDurAndDots(duration);
+    element->SetDur(durAndDots.first);
+    if (durAndDots.second != 0) {
+        element->SetDots(durAndDots.second);
     }
-    else if (dur.getNumerator() == 1) {
-        switch (dur.getDenominator()) {
-            case 2: element->SetDur(DURATION_2); break;
-            case 4: element->SetDur(DURATION_4); break;
-            case 8: element->SetDur(DURATION_8); break;
-            case 16: element->SetDur(DURATION_16); break;
-            case 32: element->SetDur(DURATION_32); break;
-            case 64: element->SetDur(DURATION_64); break;
-            case 128: element->SetDur(DURATION_128); break;
-            case 256: element->SetDur(DURATION_256); break;
-            case 512: element->SetDur(DURATION_512); break;
-            case 1024: element->SetDur(DURATION_1024); break;
-            case 2048: element->SetDur(DURATION_2048); break;
-        }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setVisualAndGesturalRhythmFromDuration --
+//
+
+template <class ELEMENT> void HumdrumInput::setVisualAndGesturalRhythmFromDuration(ELEMENT element, hum::HumNum visdur, hum::HumNum gesdur)
+{
+    pair<data_DURATION, int> visDurAndDots = getDurAndDots(visdur);
+    element->SetDur(visDurAndDots.first);
+    if (visDurAndDots.second != 0) {
+        element->SetDots(visDurAndDots.second);
+    }
+    pair<data_DURATION, int> gesDurAndDots = getDurAndDots(gesdur);
+    if (gesDurAndDots.first != visDurAndDots.first) {
+        element->SetDurGes(gesDurAndDots.first);
+    }
+    if (gesDurAndDots.second != visDurAndDots.second) {
+        element->SetDotsGes(gesDurAndDots.second);
     }
 }
 
