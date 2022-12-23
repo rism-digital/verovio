@@ -3669,8 +3669,7 @@ bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
             = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), nextTupletStart.node()));
         bool isTupletEndInBeam = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), tupletEnd));
         // in case if there is only start/end of the tuplet in the beam, then we need to use beamSpan instead
-        if ((tupletEnd != beamEnd)
-            && ((isTupletStartInBeam && !isTupletEndInBeam) || (!isTupletStartInBeam && isTupletEndInBeam))) {
+        if ((tupletEnd != beamEnd) && (isTupletStartInBeam != isTupletEndInBeam)) {
             // TODO: same call as in else-case is intentional. Proper beamSpan support will need to be implemented
             // before this case can be handled correctly
             ReadMusicXmlBeamStart(node, beamStart.node(), layer);
