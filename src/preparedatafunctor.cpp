@@ -144,4 +144,30 @@ FunctorCode PrepareCueSizeFunctor::VisitLayerElement(LayerElement *layerElement)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareCrossStaffFunctor
+//----------------------------------------------------------------------------
+
+PrepareCrossStaffFunctor::PrepareCrossStaffFunctor()
+{
+    m_currentMeasure = NULL;
+    m_currentCrossStaff = NULL;
+    m_currentCrossLayer = NULL;
+}
+
+FunctorCode PrepareCrossStaffFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareCrossStaffFunctor::VisitLayerElementEnd(LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareCrossStaffFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

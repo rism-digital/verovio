@@ -94,6 +94,52 @@ private:
     //
 };
 
+//----------------------------------------------------------------------------
+// PrepareCrossStaffFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class sets the cross staff and cross layer pointers on layer elements.
+ */
+class PrepareCrossStaffFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareCrossStaffFunctor();
+    virtual ~PrepareCrossStaffFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitLayerElementEnd(LayerElement *layerElement) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current measure
+    Measure *m_currentMeasure;
+    // The current cross staff
+    Staff *m_currentCrossStaff;
+    // The current cross layer
+    Layer *m_currentCrossLayer;
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__
