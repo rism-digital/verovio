@@ -30,6 +30,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "systemmilestone.h"
+#include "tempo.h"
 #include "trill.h"
 #include "verse.h"
 #include "vrv.h"
@@ -146,7 +147,12 @@ int System::GetMinimumSystemSpacing(const Doc *doc) const
     if (!spacingSystem.IsSet()) {
         assert(m_drawingScoreDef);
         if (m_drawingScoreDef->HasSpacingSystem()) {
-            return m_drawingScoreDef->GetSpacingSystem() * doc->GetDrawingUnit(100);
+            if (m_drawingScoreDef->GetSpacingSystem().GetType() == MEASUREMENTTYPE_px) {
+                return m_drawingScoreDef->GetSpacingSystem().GetPx();
+            }
+            else {
+                return m_drawingScoreDef->GetSpacingSystem().GetVu() * doc->GetDrawingUnit(100);
+            }
         }
     }
 
@@ -335,6 +341,13 @@ void System::AddToDrawingListIfNecessary(Object *object)
         assert(pedal);
         if (pedal->GetEnd()) {
             this->AddToDrawingList(pedal);
+        }
+    }
+    else if (object->Is(TEMPO)) {
+        Tempo *tempo = vrv_cast<Tempo *>(object);
+        assert(tempo);
+        if (tempo->GetEnd() && (tempo->GetExtender() == BOOLEAN_true)) {
+            this->AddToDrawingList(tempo);
         }
     }
     else if (object->Is(TRILL)) {
@@ -968,6 +981,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = TRILL;
+    m_systemAligner.Process(params->m_functor, params);
+
+    params->m_classId = ORNAM;
     m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = FING;

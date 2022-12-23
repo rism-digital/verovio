@@ -471,7 +471,12 @@ int StaffAlignment::GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *att
     int spacing = option.GetValue() * doc->GetDrawingUnit(this->GetStaffSize());
 
     if (!option.IsSet() && attSpacing->HasSpacingStaff()) {
-        spacing = attSpacing->GetSpacingStaff() * doc->GetDrawingUnit(100);
+        if (attSpacing->GetSpacingStaff().GetType() == MEASUREMENTTYPE_px) {
+            spacing = attSpacing->GetSpacingStaff().GetPx();
+        }
+        else {
+            spacing = attSpacing->GetSpacingStaff().GetVu() * doc->GetDrawingUnit(100);
+        }
     }
     return spacing;
 }
@@ -487,7 +492,12 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
     if (m_staff && m_staff->m_drawingStaffDef) {
         // Default or staffDef spacing
         if (m_staff->m_drawingStaffDef->HasSpacing()) {
-            spacing = m_staff->m_drawingStaffDef->GetSpacing() * doc->GetDrawingUnit(100);
+            if (m_staff->m_drawingStaffDef->GetSpacingStaff().GetType() == MEASUREMENTTYPE_px) {
+                spacing = m_staff->m_drawingStaffDef->GetSpacingStaff().GetPx();
+            }
+            else {
+                spacing = m_staff->m_drawingStaffDef->GetSpacingStaff().GetVu() * doc->GetDrawingUnit(100);
+            }
         }
         else {
             switch (m_spacingType) {
@@ -1151,7 +1161,7 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
             i = std::find_if(i, end, [iter, drawingUnit](BoundingBox *elem) {
                 if ((*iter)->Is(FLOATING_POSITIONER)) {
                     FloatingPositioner *fp = vrv_cast<FloatingPositioner *>(*iter);
-                    if (fp->GetObject()->Is({ DIR, DYNAM }) && fp->GetObject()->IsExtenderElement()) {
+                    if (fp->GetObject()->Is({ DIR, DYNAM, TEMPO }) && fp->GetObject()->IsExtenderElement()) {
                         return (*iter)->HorizontalContentOverlap(elem, drawingUnit * 4)
                             || (*iter)->VerticalContentOverlap(elem);
                     }

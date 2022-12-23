@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        svg.cpp
+// Name:        symboltable.cpp
 // Author:      Laurent Pugin
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "svg.h"
+#include "symboltable.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,49 +13,38 @@
 
 //----------------------------------------------------------------------------
 
-#include "fig.h"
+#include "symboldef.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Svg
+// SymbolTable
 //----------------------------------------------------------------------------
 
-static const ClassRegistrar<Svg> s_factory("svg", SVG);
+static const ClassRegistrar<SymbolTable> s_factory("symbolTable", SYMBOLTABLE);
 
-Svg::Svg() : Object(SVG, "svg-")
+SymbolTable::SymbolTable() : Object(SYMBOLTABLE, "symtable-")
 {
     this->Reset();
 }
 
-Svg::~Svg() {}
+SymbolTable::~SymbolTable() {}
 
-void Svg::Reset()
+void SymbolTable::Reset()
 {
     Object::Reset();
 }
 
-void Svg::Set(pugi::xml_node svg)
+bool SymbolTable::IsSupportedChild(Object *child)
 {
-    m_svg.reset();
-    m_svg.append_copy(svg);
-}
-
-int Svg::GetWidth() const
-{
-    if (m_svg && m_svg.first_child() && m_svg.first_child().attribute("width")) {
-        return atoi(m_svg.first_child().attribute("width").value()) * DEFINITION_FACTOR;
+    if (child->Is(SYMBOLDEF)) {
+        assert(dynamic_cast<SymbolDef *>(child));
     }
-    return 0;
-}
-
-int Svg::GetHeight() const
-{
-    if (m_svg && m_svg.first_child() && m_svg.first_child().attribute("height")) {
-        return atoi(m_svg.first_child().attribute("height").value()) * DEFINITION_FACTOR;
+    else {
+        return false;
     }
-    return 0;
+    return true;
 }
 
 } // namespace vrv

@@ -216,8 +216,10 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     this->DrawSystemList(dc, system, LV);
     this->DrawSystemList(dc, system, PHRASE);
     this->DrawSystemList(dc, system, OCTAVE);
+    this->DrawSystemList(dc, system, ORNAM);
     this->DrawSystemList(dc, system, PEDAL);
     this->DrawSystemList(dc, system, PITCHINFLECTION);
+    this->DrawSystemList(dc, system, TEMPO);
     this->DrawSystemList(dc, system, TIE);
     this->DrawSystemList(dc, system, SLUR);
     this->DrawSystemList(dc, system, ENDING);
@@ -264,6 +266,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         if ((*iter)->Is(classId) && (classId == OCTAVE)) {
             this->DrawTimeSpanningElement(dc, *iter, system);
         }
+        if ((*iter)->Is(classId) && (classId == ORNAM)) {
+            this->DrawTimeSpanningElement(dc, *iter, system);
+        }
         if ((*iter)->Is(classId) && (classId == PEDAL)) {
             this->DrawTimeSpanningElement(dc, *iter, system);
         }
@@ -271,6 +276,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
             this->DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == SYL)) {
+            this->DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if ((*iter)->Is(classId) && (classId == TEMPO)) {
             this->DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == TIE)) {

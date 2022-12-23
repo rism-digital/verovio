@@ -1570,11 +1570,11 @@ AttDistances::~AttDistances() {}
 
 void AttDistances::ResetDistances()
 {
-    m_dirDist = VRV_UNSET;
-    m_dynamDist = VRV_UNSET;
-    m_harmDist = VRV_UNSET;
-    m_rehDist = VRV_UNSET;
-    m_tempoDist = VRV_UNSET;
+    m_dirDist = data_MEASUREMENTSIGNED();
+    m_dynamDist = data_MEASUREMENTSIGNED();
+    m_harmDist = data_MEASUREMENTSIGNED();
+    m_rehDist = data_MEASUREMENTSIGNED();
+    m_tempoDist = data_MEASUREMENTSIGNED();
 }
 
 bool AttDistances::ReadDistances(pugi::xml_node element)
@@ -1636,27 +1636,27 @@ bool AttDistances::WriteDistances(pugi::xml_node element)
 
 bool AttDistances::HasDirDist() const
 {
-    return (m_dirDist != VRV_UNSET);
+    return (m_dirDist != data_MEASUREMENTSIGNED());
 }
 
 bool AttDistances::HasDynamDist() const
 {
-    return (m_dynamDist != VRV_UNSET);
+    return (m_dynamDist != data_MEASUREMENTSIGNED());
 }
 
 bool AttDistances::HasHarmDist() const
 {
-    return (m_harmDist != VRV_UNSET);
+    return (m_harmDist != data_MEASUREMENTSIGNED());
 }
 
 bool AttDistances::HasRehDist() const
 {
-    return (m_rehDist != VRV_UNSET);
+    return (m_rehDist != data_MEASUREMENTSIGNED());
 }
 
 bool AttDistances::HasTempoDist() const
 {
-    return (m_tempoDist != VRV_UNSET);
+    return (m_tempoDist != data_MEASUREMENTSIGNED());
 }
 
 /* include <atttempo.dist> */
@@ -2350,7 +2350,7 @@ AttHeight::~AttHeight() {}
 
 void AttHeight::ResetHeight()
 {
-    m_height = VRV_UNSET;
+    m_height = data_MEASUREMENTUNSIGNED();
 }
 
 bool AttHeight::ReadHeight(pugi::xml_node element)
@@ -2376,7 +2376,7 @@ bool AttHeight::WriteHeight(pugi::xml_node element)
 
 bool AttHeight::HasHeight() const
 {
-    return (m_height != VRV_UNSET);
+    return (m_height != data_MEASUREMENTUNSIGNED());
 }
 
 /* include <attheight> */
@@ -3161,7 +3161,7 @@ AttLyricStyle::~AttLyricStyle() {}
 
 void AttLyricStyle::ResetLyricStyle()
 {
-    m_lyricAlign = VRV_UNSET;
+    m_lyricAlign = data_MEASUREMENTSIGNED();
     m_lyricFam = "";
     m_lyricName = "";
     m_lyricSize = data_FONTSIZE();
@@ -3237,7 +3237,7 @@ bool AttLyricStyle::WriteLyricStyle(pugi::xml_node element)
 
 bool AttLyricStyle::HasLyricAlign() const
 {
-    return (m_lyricAlign != VRV_UNSET);
+    return (m_lyricAlign != data_MEASUREMENTSIGNED());
 }
 
 bool AttLyricStyle::HasLyricFam() const
@@ -4754,12 +4754,12 @@ AttPages::~AttPages() {}
 
 void AttPages::ResetPages()
 {
-    m_pageHeight = VRV_UNSET;
-    m_pageWidth = VRV_UNSET;
-    m_pageTopmar = VRV_UNSET;
-    m_pageBotmar = VRV_UNSET;
-    m_pageLeftmar = VRV_UNSET;
-    m_pageRightmar = VRV_UNSET;
+    m_pageHeight = data_MEASUREMENTUNSIGNED();
+    m_pageWidth = data_MEASUREMENTUNSIGNED();
+    m_pageTopmar = data_MEASUREMENTUNSIGNED();
+    m_pageBotmar = data_MEASUREMENTUNSIGNED();
+    m_pageLeftmar = data_MEASUREMENTUNSIGNED();
+    m_pageRightmar = data_MEASUREMENTUNSIGNED();
     m_pagePanels = "";
     m_pageScale = "";
 }
@@ -4850,32 +4850,32 @@ bool AttPages::WritePages(pugi::xml_node element)
 
 bool AttPages::HasPageHeight() const
 {
-    return (m_pageHeight != VRV_UNSET);
+    return (m_pageHeight != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttPages::HasPageWidth() const
 {
-    return (m_pageWidth != VRV_UNSET);
+    return (m_pageWidth != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttPages::HasPageTopmar() const
 {
-    return (m_pageTopmar != VRV_UNSET);
+    return (m_pageTopmar != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttPages::HasPageBotmar() const
 {
-    return (m_pageBotmar != VRV_UNSET);
+    return (m_pageBotmar != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttPages::HasPageLeftmar() const
 {
-    return (m_pageLeftmar != VRV_UNSET);
+    return (m_pageLeftmar != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttPages::HasPageRightmar() const
 {
-    return (m_pageRightmar != VRV_UNSET);
+    return (m_pageRightmar != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttPages::HasPagePanels() const
@@ -5744,8 +5744,8 @@ void AttSpacing::ResetSpacing()
 {
     m_spacingPackexp = 0.0;
     m_spacingPackfact = 0.0;
-    m_spacingStaff = VRV_UNSET;
-    m_spacingSystem = VRV_UNSET;
+    m_spacingStaff = data_MEASUREMENTSIGNED();
+    m_spacingSystem = data_MEASUREMENTSIGNED();
 }
 
 bool AttSpacing::ReadSpacing(pugi::xml_node element)
@@ -5808,12 +5808,12 @@ bool AttSpacing::HasSpacingPackfact() const
 
 bool AttSpacing::HasSpacingStaff() const
 {
-    return (m_spacingStaff != VRV_UNSET);
+    return (m_spacingStaff != data_MEASUREMENTSIGNED());
 }
 
 bool AttSpacing::HasSpacingSystem() const
 {
-    return (m_spacingSystem != VRV_UNSET);
+    return (m_spacingSystem != data_MEASUREMENTSIGNED());
 }
 
 /* include <attspacing.system> */
@@ -6525,9 +6525,9 @@ AttSystems::~AttSystems() {}
 void AttSystems::ResetSystems()
 {
     m_systemLeftline = BOOLEAN_NONE;
-    m_systemLeftmar = VRV_UNSET;
-    m_systemRightmar = VRV_UNSET;
-    m_systemTopmar = VRV_UNSET;
+    m_systemLeftmar = data_MEASUREMENTUNSIGNED();
+    m_systemRightmar = data_MEASUREMENTUNSIGNED();
+    m_systemTopmar = data_MEASUREMENTUNSIGNED();
 }
 
 bool AttSystems::ReadSystems(pugi::xml_node element)
@@ -6585,17 +6585,17 @@ bool AttSystems::HasSystemLeftline() const
 
 bool AttSystems::HasSystemLeftmar() const
 {
-    return (m_systemLeftmar != VRV_UNSET);
+    return (m_systemLeftmar != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttSystems::HasSystemRightmar() const
 {
-    return (m_systemRightmar != VRV_UNSET);
+    return (m_systemRightmar != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttSystems::HasSystemTopmar() const
 {
-    return (m_systemTopmar != VRV_UNSET);
+    return (m_systemTopmar != data_MEASUREMENTUNSIGNED());
 }
 
 /* include <attsystem.topmar> */
@@ -6908,7 +6908,7 @@ AttTimestampLog::~AttTimestampLog() {}
 
 void AttTimestampLog::ResetTimestampLog()
 {
-    m_tstamp = 0.0;
+    m_tstamp = -1.0;
 }
 
 bool AttTimestampLog::ReadTimestampLog(pugi::xml_node element)
@@ -6934,7 +6934,7 @@ bool AttTimestampLog::WriteTimestampLog(pugi::xml_node element)
 
 bool AttTimestampLog::HasTstamp() const
 {
-    return (m_tstamp != 0.0);
+    return (m_tstamp != -1.0);
 }
 
 /* include <atttstamp> */
@@ -7483,7 +7483,7 @@ AttVisualOffsetHo::~AttVisualOffsetHo() {}
 
 void AttVisualOffsetHo::ResetVisualOffsetHo()
 {
-    m_ho = VRV_UNSET;
+    m_ho = data_MEASUREMENTSIGNED();
 }
 
 bool AttVisualOffsetHo::ReadVisualOffsetHo(pugi::xml_node element)
@@ -7509,7 +7509,7 @@ bool AttVisualOffsetHo::WriteVisualOffsetHo(pugi::xml_node element)
 
 bool AttVisualOffsetHo::HasHo() const
 {
-    return (m_ho != VRV_UNSET);
+    return (m_ho != data_MEASUREMENTSIGNED());
 }
 
 /* include <attho> */
@@ -7571,7 +7571,7 @@ AttVisualOffsetVo::~AttVisualOffsetVo() {}
 
 void AttVisualOffsetVo::ResetVisualOffsetVo()
 {
-    m_vo = VRV_UNSET;
+    m_vo = data_MEASUREMENTSIGNED();
 }
 
 bool AttVisualOffsetVo::ReadVisualOffsetVo(pugi::xml_node element)
@@ -7597,7 +7597,7 @@ bool AttVisualOffsetVo::WriteVisualOffsetVo(pugi::xml_node element)
 
 bool AttVisualOffsetVo::HasVo() const
 {
-    return (m_vo != VRV_UNSET);
+    return (m_vo != data_MEASUREMENTSIGNED());
 }
 
 /* include <attvo> */
@@ -7615,8 +7615,8 @@ AttVisualOffset2Ho::~AttVisualOffset2Ho() {}
 
 void AttVisualOffset2Ho::ResetVisualOffset2Ho()
 {
-    m_startho = VRV_UNSET;
-    m_endho = VRV_UNSET;
+    m_startho = data_MEASUREMENTSIGNED();
+    m_endho = data_MEASUREMENTSIGNED();
 }
 
 bool AttVisualOffset2Ho::ReadVisualOffset2Ho(pugi::xml_node element)
@@ -7651,12 +7651,12 @@ bool AttVisualOffset2Ho::WriteVisualOffset2Ho(pugi::xml_node element)
 
 bool AttVisualOffset2Ho::HasStartho() const
 {
-    return (m_startho != VRV_UNSET);
+    return (m_startho != data_MEASUREMENTSIGNED());
 }
 
 bool AttVisualOffset2Ho::HasEndho() const
 {
-    return (m_endho != VRV_UNSET);
+    return (m_endho != data_MEASUREMENTSIGNED());
 }
 
 /* include <attendho> */
@@ -7733,8 +7733,8 @@ AttVisualOffset2Vo::~AttVisualOffset2Vo() {}
 
 void AttVisualOffset2Vo::ResetVisualOffset2Vo()
 {
-    m_startvo = VRV_UNSET;
-    m_endvo = VRV_UNSET;
+    m_startvo = data_MEASUREMENTSIGNED();
+    m_endvo = data_MEASUREMENTSIGNED();
 }
 
 bool AttVisualOffset2Vo::ReadVisualOffset2Vo(pugi::xml_node element)
@@ -7769,12 +7769,12 @@ bool AttVisualOffset2Vo::WriteVisualOffset2Vo(pugi::xml_node element)
 
 bool AttVisualOffset2Vo::HasStartvo() const
 {
-    return (m_startvo != VRV_UNSET);
+    return (m_startvo != data_MEASUREMENTSIGNED());
 }
 
 bool AttVisualOffset2Vo::HasEndvo() const
 {
-    return (m_endvo != VRV_UNSET);
+    return (m_endvo != data_MEASUREMENTSIGNED());
 }
 
 /* include <attendvo> */
@@ -7880,7 +7880,7 @@ AttWidth::~AttWidth() {}
 
 void AttWidth::ResetWidth()
 {
-    m_width = VRV_UNSET;
+    m_width = data_MEASUREMENTUNSIGNED();
 }
 
 bool AttWidth::ReadWidth(pugi::xml_node element)
@@ -7906,7 +7906,7 @@ bool AttWidth::WriteWidth(pugi::xml_node element)
 
 bool AttWidth::HasWidth() const
 {
-    return (m_width != VRV_UNSET);
+    return (m_width != data_MEASUREMENTUNSIGNED());
 }
 
 /* include <attwidth> */

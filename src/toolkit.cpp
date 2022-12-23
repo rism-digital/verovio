@@ -154,10 +154,6 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
     else if (outputTo == "mei-pb") {
         m_outputTo = MEI;
     }
-    else if (outputTo == "pb-mei") {
-        LogWarning("Output to 'pb-mei' is deprecated, use 'mei-pb' instead.");
-        m_outputTo = MEI;
-    }
     else if (outputTo == "midi") {
         m_outputTo = MIDI;
     }
@@ -252,8 +248,11 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
     if (data[0] == '*' || data[0] == '!') {
         return HUMDRUM;
     }
-    if (data[0] == 'X' || data[0] == '%') {
+    if (data[0] == 'X') {
         return ABC;
+    }
+    if (data[0] == '%' && data.size() > 1) {
+        return (data[1] == 'a') ? ABC : PAE;
     }
     if ((unsigned char)data[0] == 0xff || (unsigned char)data[0] == 0xfe) {
         // Handle UTF-16 content here later.
@@ -940,7 +939,7 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         const OptionJson *optJson = dynamic_cast<const OptionJson *>(iter->second);
 
         if (optDbl) {
-            double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetValue();
+            double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetUnfactoredValue();
             jsonxx::Value value(dblValue);
             value.precision_ = 2;
             o << iter->first << value;
@@ -1857,6 +1856,12 @@ void Toolkit::ClearHumdrumBuffer()
         m_humdrumBuffer = NULL;
     }
 #endif
+}
+
+void Toolkit::SetInputFrom(FileFormat format)
+{
+    LogWarning("This method is deprecated. Use SetInputFormat(std::string) instead.");
+    m_inputFrom = format;
 }
 
 std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)

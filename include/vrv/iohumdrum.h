@@ -594,10 +594,10 @@ protected:
     void splitSyllableBySpaces(vector<std::string> &vtext, char spacer = ' ');
     void addDefaultTempo(ScoreDef *scoreDef);
     int getChordNoteCount(hum::HTp token);
-    bool isLowestSystemArpeggio(hum::HTp token);
-    bool leftmostStaffArpeggio(hum::HTp token);
-    hum::HTp getHighestSystemArpeggio(hum::HTp token);
-    hum::HTp getRightmostStaffArpeggio(hum::HTp token);
+    bool isLeftmostSystemArpeggio(hum::HTp token);
+    bool isLeftmostStaffArpeggio(hum::HTp token);
+    std::vector<hum::HTp> getSystemArpeggioTokens(hum::HTp token);
+    std::vector<hum::HTp> getStaffArpeggioTokens(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
         int staffindex, int justification = 0, const std::string &color = "", int vgroup = -1);
     bool addTempoDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
@@ -724,8 +724,6 @@ protected:
     void markOtherClefsAsChange(hum::HTp clef);
     int getCurrentLayerCount(hum::HTp token);
     void checkForBreak(hum::HumdrumFile &infile, int line);
-    int getLowestDiatonicPitch(hum::HTp token, const string &requirement);
-    int getHighestDiatonicPitch(hum::HTp token, const string &requirement);
     bool hasMensuralStaff(hum::HLp line);
     int getNextBarlineIndex(hum::HumdrumFile &infile, int startline);
     std::string escapeFreeAmpersand(const std::string &value);
@@ -787,6 +785,9 @@ protected:
     void insertGlissandos(std::vector<hum::HTp> &tokens);
     void createGlissando(hum::HTp glissStart, hum::HTp glissEnd);
     void setSmuflContent(Symbol *symbol, const std::string &name);
+    data_DURATION oneOverDenominatorToDur(int denominator);
+    bool isExpressibleDuration(hum::HumNum duration);
+    pair<data_DURATION, int> getDurAndDots(hum::HumNum duration);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -808,6 +809,8 @@ protected:
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
     template <class ELEMENT> void setRhythmFromDuration(ELEMENT element, hum::HumNum dur);
+    template <class ELEMENT>
+    void setVisualAndGesturalRhythmFromDuration(ELEMENT element, hum::HumNum visdur, hum::HumNum gesdur);
     template <class ELEMENT> hum::HumNum convertMensuralRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);

@@ -40,6 +40,11 @@ public:
      */
     int GetNumberOfLines(const Object *object) const;
 
+    /**
+     * Check whether one of the children has hAlign attribute set to `alignment` value
+     */
+    bool AreChildrenAlignedTo(const Object *object, data_HORIZONTALALIGNMENT alignment) const;
+
 private:
     //
 public:

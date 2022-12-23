@@ -111,7 +111,9 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
         std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType);
 
         FontInfo fretTxt;
-        fretTxt.SetFaceName("Times");
+        if (!dc->UseGlobalStyling()) {
+            fretTxt.SetFaceName("Times");
+        }
 
         TextDrawingParams params;
         params.m_x = x;

@@ -26,7 +26,8 @@ class TextElement;
  */
 class Tempo : public ControlElement,
               public TextDirInterface,
-              public TimePointInterface,
+              public TimeSpanningInterface,
+              public AttExtender,
               public AttLang,
               public AttMidiTempo,
               public AttMmTempo {
@@ -54,6 +55,11 @@ public:
     {
         return vrv_cast<const TimePointInterface *>(this);
     }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
 
     /**
@@ -67,6 +73,11 @@ public:
      */
     ///@{
     int GetDrawingXRelativeToStaff(int staffN) const;
+
+    /**
+     * See FloatingObject::IsExtenderElement
+     */
+    bool IsExtenderElement() const override { return GetExtender() == BOOLEAN_true; }
 
     //----------//
     // Functors //

@@ -106,11 +106,71 @@ protected:
 };
 
 /**
+ * MEI data.MEASUREMENTSIGNED
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum MeasurementType { MEASUREMENTTYPE_NONE = 0, MEASUREMENTTYPE_vu, MEASUREMENTTYPE_px };
+
+class data_MEASUREMENTSIGNED {
+public:
+    data_MEASUREMENTSIGNED() { Reset(MEASUREMENTTYPE_NONE); }
+    virtual ~data_MEASUREMENTSIGNED() {}
+
+    void Reset(MeasurementType type)
+    {
+        m_type = type;
+        m_px = VRV_UNSET;
+        m_vu = VRV_UNSET;
+    }
+
+    MeasurementType GetType() const { return m_type; }
+
+    int GetPx() const { return m_px; }
+    void SetPx(int px)
+    {
+        Reset(MEASUREMENTTYPE_px);
+        m_px = px;
+    }
+
+    double GetVu() const { return m_vu; }
+    void SetVu(double vu)
+    {
+        Reset(MEASUREMENTTYPE_vu);
+        m_vu = vu;
+    }
+
+    bool HasValue() const
+    {
+        if (m_px != VRV_UNSET) return true;
+        if (m_vu != VRV_UNSET) return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_MEASUREMENTSIGNED &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_px != val.GetPx()) return false;
+        if (m_vu != val.GetVu()) return false;
+        return true;
+    }
+    bool operator!=(const data_MEASUREMENTSIGNED &val) const { return !(*this == val); }
+
+protected:
+    MeasurementType m_type;
+    int m_px;
+    double m_vu;
+};
+
+typedef data_MEASUREMENTSIGNED data_MEASUREMENTUNSIGNED;
+
+/**
  * MEI data.LINEWIDTH
  * Since it can contain different subtype we need a dedicated class for it.
  */
 
-enum LinewidthType { LINEWIDTHTYPE_NONE = 0, LINEWIDTHTYPE_lineWidthTerm, LINEWIDTHTYPE_measurementUnsigned };
+enum LinewidthType { LINEWIDTHTYPE_NONE = 0, LINEWIDTHTYPE_lineWidthTerm, LINEWIDTHTYPE_measurementunsigned };
 
 class data_LINEWIDTH {
 public:
@@ -121,7 +181,7 @@ public:
     {
         m_type = type;
         m_lineWidthTerm = LINEWIDTHTERM_NONE;
-        m_measurementUnsigned = VRV_UNSET;
+        m_measurementunsigned = data_MEASUREMENTUNSIGNED();
     }
 
     LinewidthType GetType() const { return m_type; }
@@ -133,17 +193,17 @@ public:
         m_lineWidthTerm = value;
     }
 
-    data_MEASUREMENTUNSIGNED GetMeasurementUnsigned() const { return m_measurementUnsigned; }
-    void SetMeasurementUnsigned(data_MEASUREMENTUNSIGNED value)
+    data_MEASUREMENTUNSIGNED GetMeasurementunsigned() const { return m_measurementunsigned; }
+    void SetMeasurementunsigned(data_MEASUREMENTUNSIGNED value)
     {
-        Reset(LINEWIDTHTYPE_measurementUnsigned);
-        m_measurementUnsigned = value;
+        Reset(LINEWIDTHTYPE_measurementunsigned);
+        m_measurementunsigned = value;
     }
 
     bool HasValue() const
     {
         if (m_lineWidthTerm != LINEWIDTHTERM_NONE) return true;
-        if (m_measurementUnsigned != VRV_UNSET) return true;
+        if (m_measurementunsigned != data_MEASUREMENTUNSIGNED()) return true;
         return false;
     }
 
@@ -152,7 +212,7 @@ public:
     {
         if (m_type != val.GetType()) return false;
         if (m_lineWidthTerm != val.GetLineWithTerm()) return false;
-        if (m_measurementUnsigned != val.GetMeasurementUnsigned()) return false;
+        if (m_measurementunsigned != val.GetMeasurementunsigned()) return false;
         return true;
     }
     bool operator!=(const data_LINEWIDTH &val) const { return !(*this == val); }
@@ -160,7 +220,7 @@ public:
 protected:
     LinewidthType m_type;
     data_LINEWIDTHTERM m_lineWidthTerm;
-    data_MEASUREMENTUNSIGNED m_measurementUnsigned;
+    data_MEASUREMENTUNSIGNED m_measurementunsigned;
 };
 
 /**

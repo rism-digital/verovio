@@ -73,7 +73,9 @@ void Stem::FillAttributes(const AttStems &attSource)
         this->SetDir(attSource.GetStemDir());
     }
     if (attSource.HasStemLen()) {
-        this->SetLen(attSource.GetStemLen());
+        data_MEASUREMENTSIGNED stemLen;
+        stemLen.SetVu(attSource.GetStemLen());
+        this->SetLen(stemLen);
     }
     if (attSource.HasStemPos()) {
         this->SetPos(attSource.GetStemPos());
@@ -247,8 +249,8 @@ int Stem::CalcStem(FunctorParams *functorParams)
     const int unit = params->m_doc->GetDrawingUnit(staffSize);
     int baseStem = 0;
     // Use the given one if any
-    if (this->HasLen()) {
-        baseStem = this->GetLen() * -unit;
+    if (this->HasLen() && this->GetLen().GetType() == MEASUREMENTTYPE_vu) {
+        baseStem = this->GetLen().GetVu() * -unit;
     }
     // Do not adjust the baseStem for stem sameas notes (its length is in m_chordStemLength)
     else if (!params->m_isStemSameasSecondary) {
@@ -260,7 +262,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // Even if a stem length is given we add the length of the chord content (however only if not 0)
     // Also, the given stem length is understood as being measured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
-    if (!params->m_staff || !this->HasLen() || (this->GetLen() != 0)) {
+    if (!params->m_staff || !this->HasLen() || (this->GetLen().GetVu() != 0)) {
         Point p;
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             if (this->GetPos() == STEMPOSITION_left) {
@@ -315,7 +317,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // Do not adjust the length with stem sameas notes or if given in the encoding
     // however, the stem will be extend with the SMuFL extension from 32th - this can be improved
     if (params->m_isStemSameasSecondary || this->HasLen()) {
-        if ((this->GetLen() == 0) && flag) flag->m_drawingNbFlags = 0;
+        if ((this->GetLen().GetVu() == 0) && flag) flag->m_drawingNbFlags = 0;
         return FUNCTOR_CONTINUE;
     }
     if ((this->GetVisible() == BOOLEAN_false) && flag) {
