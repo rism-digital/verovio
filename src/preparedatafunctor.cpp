@@ -11,6 +11,7 @@
 
 #include "areaposinterface.h"
 #include "doc.h"
+#include "layer.h"
 #include "runningelement.h"
 #include "score.h"
 #include "vrv.h"
@@ -75,6 +76,70 @@ FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
 {
     // Evaluate functor on scoreDef
     score->GetScoreDef()->Process(*this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// PrepareCueSizeFunctor
+//----------------------------------------------------------------------------
+
+PrepareCueSizeFunctor::PrepareCueSizeFunctor() {}
+
+FunctorCode PrepareCueSizeFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    Layer *currentLayer = vrv_cast<Layer *>(layerElement->GetFirstAncestor(LAYER));
+    assert(currentLayer);
+    if (currentLayer->GetCue() == BOOLEAN_true) {
+        layerElement->SetDrawingCueSize(true);
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (layerElement->IsGraceNote()) {
+        layerElement->SetDrawingCueSize(true);
+    }
+    // This covers the case when the @size is given on the element
+    else if (layerElement->HasAttClass(ATT_CUE)) {
+        AttCue *att = dynamic_cast<AttCue *>(layerElement);
+        assert(att);
+        if (att->HasCue()) layerElement->SetDrawingCueSize(att->GetCue() == BOOLEAN_true);
+    }
+    // For note, we also need to look at the parent chord
+    else if (layerElement->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(layerElement);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord) note->SetDrawingCueSize(chord->GetDrawingCueSize());
+    }
+    // For tuplet, we also need to look at the first note or chord
+    else if (layerElement->Is(TUPLET)) {
+        ClassIdsComparison matchType({ NOTE, CHORD });
+        ArrayOfObjects children;
+        LayerElement *child = dynamic_cast<LayerElement *>(layerElement->FindDescendantByComparison(&matchType));
+        if (child) layerElement->SetDrawingCueSize(child->GetDrawingCueSize());
+    }
+    // For accid, look at the parent if @func="edit" or otherwise to the parent note
+    else if (layerElement->Is(ACCID)) {
+        Accid *accid = vrv_cast<Accid *>(layerElement);
+        assert(accid);
+        if (accid->GetFunc() == accidLog_FUNC_edit)
+            accid->SetDrawingCueSize(true);
+        else {
+            Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
+            if (note) accid->SetDrawingCueSize(note->GetDrawingCueSize());
+        }
+    }
+    else if (layerElement->Is({ ARTIC, DOTS, FLAG, STEM })) {
+        Note *note = dynamic_cast<Note *>(layerElement->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
+        if (note)
+            layerElement->SetDrawingCueSize(note->GetDrawingCueSize());
+        else {
+            Chord *chord = dynamic_cast<Chord *>(layerElement->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+            if (chord) layerElement->SetDrawingCueSize(chord->GetDrawingCueSize());
+        }
+    }
 
     return FUNCTOR_CONTINUE;
 }

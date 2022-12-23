@@ -206,11 +206,6 @@ bool LayerElement::IsGraceNote() const
     return false;
 }
 
-bool LayerElement::GetDrawingCueSize() const
-{
-    return m_drawingCueSize;
-}
-
 bool LayerElement::IsInLigature() const
 {
     if (!this->Is(NOTE)) return false;

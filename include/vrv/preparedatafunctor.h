@@ -55,6 +55,45 @@ private:
     //
 };
 
+//----------------------------------------------------------------------------
+// PrepareCueSizeFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class sets the drawing cue size for all layer elements.
+ */
+class PrepareCueSizeFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareCueSizeFunctor();
+    virtual ~PrepareCueSizeFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__

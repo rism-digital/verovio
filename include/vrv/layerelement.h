@@ -119,8 +119,6 @@ public:
     ///@{
     /** Return true if the element is a grace note */
     bool IsGraceNote() const;
-    /** Return true if the element is has to be rederred as cue sized */
-    bool GetDrawingCueSize() const;
     /** Return true if the element is a note within a ligature */
     bool IsInLigature() const;
     /** Return the FTrem parten if the element is a note or a chord within a fTrem */
@@ -135,6 +133,14 @@ public:
     Beam *GetAncestorBeam();
     const Beam *GetAncestorBeam() const;
     bool IsInBeam() const;
+    ///@}
+
+    /**
+     * @name Setter and getter for the drawingCueSize flag
+     */
+    ///@{
+    void SetDrawingCueSize(bool drawingCueSize) { m_drawingCueSize = drawingCueSize; }
+    bool GetDrawingCueSize() const { return m_drawingCueSize; }
     ///@}
 
     /**
