@@ -23,6 +23,7 @@
 
 namespace vrv {
 
+class AltSymInterface;
 class AreaPosInterface;
 class Doc;
 class DurationInterface;
@@ -130,6 +131,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    virtual AltSymInterface *GetAltSymInterface() { return NULL; }
+    virtual const AltSymInterface *GetAltSymInterface() const { return NULL; }
     virtual AreaPosInterface *GetAreaPosInterface() { return NULL; }
     virtual const AreaPosInterface *GetAreaPosInterface() const { return NULL; }
     virtual BeamDrawingInterface *GetBeamDrawingInterface() { return NULL; }
@@ -1106,6 +1109,11 @@ public:
      * End Functor for Object::PrepareCrossStaff
      */
     virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Match @altsym element to the corresponding symbolDef.
+     */
+    virtual int PrepareAltSym(FunctorParams *functorParams);
 
     /**
      * Associate LayerElement with @facs to the appropriate zone

@@ -37,6 +37,15 @@ public:
     virtual ~Graphic();
     Object *Clone() const override { return new Graphic(*this); }
     void Reset() override;
+    std::string GetClassName() const override { return "Graphic"; }
+    ///@}
+
+    /**
+     * @name Getters for the drawing width and height.
+     */
+    ///@{
+    int GetDrawingWidth(int unit, int staffSize) const;
+    int GetDrawingHeight(int unit, int staffSize) const;
     ///@}
 
 protected:

@@ -85,7 +85,8 @@ public:
         int width = VRV_UNSET, int height = VRV_UNSET) override;
     void DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph = false) override;
     void DrawSpline(int n, Point points[]) override;
-    void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) override;
+    void DrawGraphicUri(int x, int y, int width, int height, const std::string &uri) override;
+    void DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg) override;
     void DrawBackgroundImage(int x = 0, int y = 0) override{};
     ///@}
 
@@ -114,8 +115,8 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    void StartGraphic(
-        Object *object, std::string gClass, std::string gId, bool primary = true, bool prepend = false) override;
+    void StartGraphic(Object *object, std::string gClass, std::string gId, GraphicID graphicID = PRIMARY,
+        bool prepend = false) override;
     void EndGraphic(Object *object, View *view) override;
     ///@}
 

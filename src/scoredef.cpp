@@ -33,6 +33,7 @@
 #include "setscoredeffunctor.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "symboltable.h"
 #include "system.h"
 #include "vrv.h"
 
@@ -285,6 +286,9 @@ bool ScoreDef::IsSupportedChild(Object *child)
     }
     else if (child->IsRunningElement()) {
         assert(dynamic_cast<RunningElement *>(child));
+    }
+    else if (child->Is(SYMBOLTABLE)) {
+        assert(dynamic_cast<SymbolTable *>(child));
     }
     else {
         return false;

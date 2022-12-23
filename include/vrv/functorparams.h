@@ -56,6 +56,7 @@ class StaffAlignment;
 class StaffDef;
 class StemmedDrawingInterface;
 class Syl;
+class SymbolTable;
 class System;
 class SystemAligner;
 class Timemap;
@@ -1777,6 +1778,20 @@ public:
 
     std::map<StaffAlignment *, int> m_shiftForStaff;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// PrepareAltSymParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the SymbolTable in the current score scoreDef
+ **/
+
+class PrepareAltSymParams : public FunctorParams {
+public:
+    PrepareAltSymParams() { m_symbolTable = NULL; }
+    SymbolTable *m_symbolTable;
 };
 
 //----------------------------------------------------------------------------

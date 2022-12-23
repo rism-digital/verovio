@@ -47,7 +47,8 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
 
 BBoxDeviceContext::~BBoxDeviceContext() {}
 
-void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId, bool primary, bool prepend)
+void BBoxDeviceContext::StartGraphic(
+    Object *object, std::string gClass, std::string gId, GraphicID graphicID, bool prepend)
 {
     // add the object object
     object->BoundingBox::ResetBoundingBox();
@@ -403,7 +404,12 @@ void BBoxDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, 
 
 void BBoxDeviceContext::DrawSpline(int n, Point points[]) {}
 
-void BBoxDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg)
+void BBoxDeviceContext::DrawGraphicUri(int x, int y, int width, int height, const std::string &uri)
+{
+    this->DrawRoundedRectangle(x, y, width, height, 0);
+}
+
+void BBoxDeviceContext::DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg)
 {
     this->DrawRoundedRectangle(x, y, width, height, 0);
 }

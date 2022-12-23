@@ -9,8 +9,8 @@
       "import": "./dist/verovio.mjs",
       "require": "./dist/verovio.cjs"
     },
-    "./wasm": "./dist/verovio-module.js",
-    "./wasm-hum": "./dist/verovio-module-hum.js"
+    "./wasm": "./dist/verovio-module.mjs",
+    "./wasm-hum": "./dist/verovio-module-hum.mjs"
   },
   "files": [
     "dist"

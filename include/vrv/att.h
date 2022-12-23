@@ -66,7 +66,7 @@ public:
     static bool SetPagebased(Object *element, const std::string &attrType, const std::string &attrValue);
     // static bool SetPerformance(Object *element, const std::string &attrType, const std::string &attrValue);
     static bool SetShared(Object *element, const std::string &attrType, const std::string &attrValue);
-    // static bool SetUsersymbols(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetUsersymbols(Object *element, const std::string &attrType, const std::string &attrValue);
     static bool SetVisual(Object *element, const std::string &attrType, const std::string &attrValue);
 
     /**
@@ -92,7 +92,7 @@ public:
     static void GetPagebased(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetPerformance(const Object *element, ArrayOfStrAttr *attributes);
     static void GetShared(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes);
     static void GetVisual(const Object *element, ArrayOfStrAttr *attributes);
     ///@}
 
@@ -150,16 +150,13 @@ public:
     std::string MeasurebeatToStr(data_MEASUREBEAT data) const;
     data_MEASUREBEAT StrToMeasurebeat(std::string value, bool logWarning = true) const;
 
-    std::string MeasurementsignedToStr(data_MEASUREMENTSIGNED data) const { return VUToStr(data); }
-    data_MEASUREMENTSIGNED StrToMeasurementsigned(const std::string &value, bool logWarning = true) const
-    {
-        return StrToVU(value, logWarning);
-    }
+    std::string MeasurementsignedToStr(data_MEASUREMENTSIGNED data) const;
+    data_MEASUREMENTSIGNED StrToMeasurementsigned(const std::string &value, bool logWarning = true) const;
 
-    std::string MeasurementunsignedToStr(data_MEASUREMENTUNSIGNED data) const { return VUToStr(data); }
+    std::string MeasurementunsignedToStr(data_MEASUREMENTUNSIGNED data) const { return MeasurementsignedToStr(data); }
     data_MEASUREMENTUNSIGNED StrToMeasurementunsigned(const std::string &value, bool logWarning = true) const
     {
-        return StrToVU(value, logWarning);
+        return StrToMeasurementsigned(value, logWarning);
     }
 
     std::string MetercountPairToStr(const data_METERCOUNT_pair &data) const;

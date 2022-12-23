@@ -490,8 +490,11 @@ jobs:
           name: ${{ env.DOC_BUILD }}
           path: artifacts/${{ env.DOC_BUILD }}
 
-      - name: Copy build artifacts to DOXYGEN_DIR
-        run: cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
+      - name: Remove old doc and copy build artifacts to DOXYGEN_DIR
+        run: |
+          rm -rf $DOXYGEN_DIR/html/*
+          rm -rf $DOXYGEN_DIR/xml/*
+          cp -a artifacts/$DOC_BUILD/* $DOXYGEN_DIR/
 
       - name: Check git status before commit
         working-directory: ${{ env.DOXYGEN_DIR }}

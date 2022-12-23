@@ -492,7 +492,12 @@ int StaffAlignment::GetMinimumStaffSpacing(const Doc *doc, const AttSpacing *att
     int spacing = option.GetValue() * doc->GetDrawingUnit(this->GetStaffSize());
 
     if (!option.IsSet() && attSpacing->HasSpacingStaff()) {
-        spacing = attSpacing->GetSpacingStaff() * doc->GetDrawingUnit(100);
+        if (attSpacing->GetSpacingStaff().GetType() == MEASUREMENTTYPE_px) {
+            spacing = attSpacing->GetSpacingStaff().GetPx();
+        }
+        else {
+            spacing = attSpacing->GetSpacingStaff().GetVu() * doc->GetDrawingUnit(100);
+        }
     }
     return spacing;
 }
@@ -508,7 +513,12 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
     if (m_staff && m_staff->m_drawingStaffDef) {
         // Default or staffDef spacing
         if (m_staff->m_drawingStaffDef->HasSpacing()) {
-            spacing = m_staff->m_drawingStaffDef->GetSpacing() * doc->GetDrawingUnit(100);
+            if (m_staff->m_drawingStaffDef->GetSpacingStaff().GetType() == MEASUREMENTTYPE_px) {
+                spacing = m_staff->m_drawingStaffDef->GetSpacingStaff().GetPx();
+            }
+            else {
+                spacing = m_staff->m_drawingStaffDef->GetSpacingStaff().GetVu() * doc->GetDrawingUnit(100);
+            }
         }
         else {
             switch (m_spacingType) {
