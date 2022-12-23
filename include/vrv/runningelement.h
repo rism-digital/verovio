@@ -88,6 +88,21 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter for the text element cells
+     */
+    ///@{
+    void ResetCells();
+    void AppendTextToCell(int index, TextElement *text);
+    ///@}
+
+    /**
+     * @name Setter and getter for the drawing scaling
+     */
+    ///@{
+    void ResetDrawingScaling();
+    ///@}
+
+    /**
      * @name Get the size of row, cols or cells
      */
     ///@{
@@ -124,6 +139,11 @@ public:
      * Load the footer from the resources (footer.svg)
      */
     void LoadFooter(const Doc *doc);
+
+    /**
+     * Calculate the cell position
+     */
+    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const;
 
     /**
      * Add page numbering to the running element.
@@ -172,10 +192,7 @@ protected:
     void FilterList(ListOfConstObjects &childList) const override;
 
 private:
-    /**
-     *
-     */
-    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const;
+    //
 
 public:
     //

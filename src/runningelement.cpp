@@ -72,10 +72,7 @@ void RunningElement::Reset()
     m_drawingPage = NULL;
     m_drawingYRel = 0;
 
-    int i;
-    for (i = 0; i < 3; ++i) {
-        m_drawingScalingPercent[i] = 100;
-    }
+    this->ResetDrawingScaling();
 }
 
 bool RunningElement::IsSupportedChild(Object *child)
@@ -165,6 +162,26 @@ void RunningElement::SetDrawingPage(Page *page)
 
     if (page) {
         this->SetCurrentPageNum(page);
+    }
+}
+
+void RunningElement::ResetCells()
+{
+    for (int i = 0; i < 9; ++i) {
+        m_cells[i].clear();
+    }
+}
+
+void RunningElement::AppendTextToCell(int index, TextElement *text)
+{
+    assert((index >= 0) && (index < 9));
+    m_cells[index].push_back(text);
+}
+
+void RunningElement::ResetDrawingScaling()
+{
+    for (int i = 0; i < 3; ++i) {
+        m_drawingScalingPercent[i] = 100;
     }
 }
 
