@@ -75,7 +75,12 @@ int Hairpin::CalcHeight(const Doc *doc, int staffSize, char spanningType, const 
     int endY = doc->GetDrawingHairpinSize(staffSize, false);
 
     if (this->HasOpening()) {
-        endY = this->GetOpening() * doc->GetDrawingUnit(staffSize);
+        if (this->GetOpening().GetType() == MEASUREMENTTYPE_px) {
+            endY = this->GetOpening().GetPx();
+        }
+        else {
+            endY = this->GetOpening().GetVu() * doc->GetDrawingUnit(staffSize);
+        }
     }
 
     // Something is probably wrong before...

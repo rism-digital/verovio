@@ -17,6 +17,7 @@
 #include "abbr.h"
 #include "accid.h"
 #include "add.h"
+#include "altsyminterface.h"
 #include "anchoredtext.h"
 #include "annot.h"
 #include "app.h"
@@ -61,6 +62,7 @@
 #include "halfmrpt.h"
 #include "harm.h"
 #include "instrdef.h"
+#include "iopae.h"
 #include "keyaccid.h"
 #include "keysig.h"
 #include "label.h"
@@ -90,6 +92,7 @@
 #include "num.h"
 #include "octave.h"
 #include "orig.h"
+#include "ornam.h"
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
@@ -127,6 +130,8 @@
 #include "syl.h"
 #include "syllable.h"
 #include "symbol.h"
+#include "symboldef.h"
+#include "symboltable.h"
 #include "system.h"
 #include "systemmilestone.h"
 #include "tabdursym.h"
@@ -437,6 +442,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child("course");
         this->WriteCourse(m_currentNode, vrv_cast<Course *>(object));
     }
+    else if (object->Is(SYMBOLTABLE)) {
+        m_currentNode = m_currentNode.append_child("symbolTable");
+        this->WriteSymbolTable(m_currentNode, vrv_cast<SymbolTable *>(object));
+    }
     else if (object->Is(MEASURE)) {
         m_currentNode = m_currentNode.append_child("measure");
         this->WriteMeasure(m_currentNode, vrv_cast<Measure *>(object));
@@ -516,6 +525,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(OCTAVE)) {
         m_currentNode = m_currentNode.append_child("octave");
         this->WriteOctave(m_currentNode, vrv_cast<Octave *>(object));
+    }
+    else if (object->Is(ORNAM)) {
+        m_currentNode = m_currentNode.append_child("ornam");
+        this->WriteOrnam(m_currentNode, vrv_cast<Ornam *>(object));
     }
     else if (object->Is(PEDAL)) {
         m_currentNode = m_currentNode.append_child("pedal");
@@ -758,6 +771,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child("symbol");
         this->WriteSymbol(m_currentNode, vrv_cast<Symbol *>(object));
     }
+    else if (object->Is(SYMBOLDEF)) {
+        m_currentNode = m_currentNode.append_child("symbolDef");
+        this->WriteSymbolDef(m_currentNode, vrv_cast<SymbolDef *>(object));
+    }
     else if (object->Is(TEXT)) {
         this->WriteText(m_currentNode, vrv_cast<Text *>(object));
     }
@@ -865,6 +882,12 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else {
             return true;
         }
+    }
+
+    // Facsimile and graphic elements
+    else if (object->Is(GRAPHIC)) {
+        m_currentNode = m_currentNode.append_child("graphic");
+        this->WriteGraphic(m_currentNode, vrv_cast<Graphic *>(object));
     }
 
     else {
@@ -1837,6 +1860,13 @@ void MEIOutput::WriteCourse(pugi::xml_node currentNode, Course *course)
     course->WritePitch(currentNode);
 }
 
+void MEIOutput::WriteSymbolTable(pugi::xml_node currentNode, SymbolTable *symbolTable)
+{
+    assert(symbolTable);
+
+    this->WriteXmlId(currentNode, symbolTable);
+}
+
 void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
 {
     assert(measure);
@@ -1881,6 +1911,7 @@ void MEIOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *
     assert(controlElement);
 
     this->WriteXmlId(currentNode, controlElement);
+    this->WriteAltSymInterface(currentNode, controlElement);
     this->WriteLinkingInterface(currentNode, controlElement);
     controlElement->WriteLabelled(currentNode);
     controlElement->WriteTyped(currentNode);
@@ -2089,6 +2120,18 @@ void MEIOutput::WriteOctave(pugi::xml_node currentNode, Octave *octave)
     octave->WriteOctaveDisplacement(currentNode);
 }
 
+void MEIOutput::WriteOrnam(pugi::xml_node currentNode, Ornam *ornam)
+{
+    assert(ornam);
+
+    this->WriteControlElement(currentNode, ornam);
+    this->WriteTextDirInterface(currentNode, ornam);
+    this->WriteTimePointInterface(currentNode, ornam);
+    ornam->WriteColor(currentNode);
+    ornam->WriteExtSym(currentNode);
+    ornam->WriteOrnamentAccid(currentNode);
+}
+
 void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
 {
     assert(pedal);
@@ -2165,7 +2208,8 @@ void MEIOutput::WriteTempo(pugi::xml_node currentNode, Tempo *tempo)
 
     this->WriteControlElement(currentNode, tempo);
     this->WriteTextDirInterface(currentNode, tempo);
-    this->WriteTimePointInterface(currentNode, tempo);
+    this->WriteTimeSpanningInterface(currentNode, tempo);
+    tempo->WriteExtender(currentNode);
     tempo->WriteLang(currentNode);
     tempo->WriteMidiTempo(currentNode);
     tempo->WriteMmTempo(currentNode);
@@ -2853,7 +2897,8 @@ void MEIOutput::WriteSvg(pugi::xml_node currentNode, Svg *svg)
 {
     assert(svg);
 
-    this->WriteXmlId(currentNode, svg);
+    // <svg> uses @id and not @xml:id
+    if (!m_removeIds) currentNode.append_attribute("id") = IDToMeiStr(svg).c_str();
 
     pugi::xml_node svgNode = svg->Get();
     for (pugi::xml_attribute attr : svgNode.attributes()) {
@@ -2875,6 +2920,13 @@ void MEIOutput::WriteSymbol(pugi::xml_node currentNode, Symbol *symbol)
     symbol->WriteTypography(currentNode);
 }
 
+void MEIOutput::WriteSymbolDef(pugi::xml_node currentNode, SymbolDef *symbolDef)
+{
+    assert(symbolDef);
+
+    this->WriteXmlId(currentNode, symbolDef);
+}
+
 void MEIOutput::WriteText(pugi::xml_node element, Text *text)
 {
     if (!text->GetText().empty()) {
@@ -2886,6 +2938,13 @@ void MEIOutput::WriteText(pugi::xml_node element, Text *text)
             nodechild.text() = UTF32to8(text->GetText()).c_str();
         }
     }
+}
+
+void MEIOutput::WriteAltSymInterface(pugi::xml_node element, AltSymInterface *interface)
+{
+    assert(interface);
+
+    interface->WriteAltSym(element);
 }
 
 void MEIOutput::WriteAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface)
@@ -3285,7 +3344,7 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for dir or tempo
-    else if (filterParent->Is({ DIR, TEMPO })) {
+    else if (filterParent->Is({ DIR, ORNAM, TEMPO })) {
         if (element == "") {
             return true;
         }
@@ -3711,6 +3770,10 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     pugi::xml_node pages;
     pugi::xml_node back;
 
+    if (m_doc->GetOptions()->m_incip.GetValue()) {
+        return ReadIncipits(m_doc->m_header);
+    }
+
     if (std::string(root.name()) == "music") {
         music = root;
     }
@@ -3832,6 +3895,73 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
             LogWarning("No scoreDef provided, trying to generate one...");
             success = m_doc->GenerateDocumentScoreDef();
         }
+    }
+
+    return success;
+}
+
+bool MEIInput::ReadIncipits(pugi::xml_node root)
+{
+    pugi::xpath_node_set incipSet = root.select_nodes(".//incip");
+    if (incipSet.size() == 0) {
+        LogError("No <incip> element found in the MEI data");
+        return false;
+    }
+
+    int incipCount = 0;
+    bool success = true;
+
+    for (auto &incipItem : incipSet) {
+        if (!success) break;
+        pugi::xml_node incip = incipItem.node();
+        pugi::xml_node incipCode = incip.child("incipCode");
+        if (!incipCode.empty()) {
+            std::string form = incipCode.attribute("form") ? incipCode.attribute("form").value() : "";
+            if (form != "plaineAndEasie" && form != "pae") {
+                // We do not consider it an error if the format is not supported
+                LogWarning("Incipit format in <incipCode> is not a supported format and will be skipped.");
+                // The incipit will not be removed from the header
+                continue;
+            }
+            Doc incipitDoc;
+            PAEInput paeInput(&incipitDoc);
+            paeInput.SetScoreBased(true);
+            std::string paeCode = incipCode.text().as_string();
+            paeCode.erase(paeCode.begin(),
+                std::find_if(paeCode.begin(), paeCode.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+            paeInput.Import(paeCode);
+            Mdiv *mdiv = vrv_cast<Mdiv *>(incipitDoc.DetachChild(0));
+            if (!mdiv) {
+                // We do consider it an error if reading the PAE failed
+                LogError("Reading the Plaine & Easie incipit failed.");
+                success = false;
+                continue;
+            }
+            m_doc->AddChild(mdiv);
+        }
+        else if (std::string(incip.first_child().name()) != "score") {
+            LogWarning("Only <incip> with a <score> first child can be read.");
+            // The incipit will not be removed from the header
+            continue;
+        }
+        else {
+            Mdiv *mdiv = new Mdiv();
+            mdiv->MakeVisible();
+            m_doc->AddChild(mdiv);
+            success = this->ReadMdivChildren(mdiv, incip, true);
+        }
+        // Remove it from the header
+        if (success) {
+            incipCount++;
+            incip.parent().remove_child(incip);
+        }
+    }
+    // If no incipit has been read, then the input fails
+    if (incipCount == 0) success = false;
+
+    if (success) {
+        m_doc->ConvertToPageBasedDoc();
+        m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
     }
 
     return success;
@@ -4604,6 +4734,10 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "pgHead2") {
             success = this->ReadPgHead2(parent, current);
         }
+        // symbolTable
+        else if (std::string(current.name()) == "symbolTable") {
+            success = this->ReadSymbolTable(parent, current);
+        }
         // content
         else if (std::string(current.name()) == "staffGrp") {
             success = this->ReadStaffGrp(parent, current);
@@ -4954,6 +5088,35 @@ bool MEIInput::ReadCourse(Object *parent, pugi::xml_node course)
     return true;
 }
 
+bool MEIInput::ReadSymbolTable(Object *parent, pugi::xml_node symbolTable)
+{
+    SymbolTable *vrvSymbolTable = new SymbolTable();
+    this->SetMeiID(symbolTable, vrvSymbolTable);
+
+    parent->AddChild(vrvSymbolTable);
+
+    bool success = true;
+    // No need to have ReadSymbolTableChildren for this...
+    pugi::xml_node current;
+    for (current = symbolTable.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        // symbolDef
+        if (std::string(current.name()) == "symbolDef") {
+            success = this->ReadSymbolDef(vrvSymbolTable, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = this->ReadXMLComment(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <symbolTable>", current.name());
+        }
+    }
+
+    this->ReadUnsupportedAttr(symbolTable, vrvSymbolTable);
+    return success;
+}
+
 bool MEIInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
 {
     InstrDef *vrvInstrDef = new InstrDef();
@@ -5136,6 +5299,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "octave") {
             success = this->ReadOctave(parent, current);
         }
+        else if (currentName == "ornam") {
+            success = this->ReadOrnam(parent, current);
+        }
         else if (currentName == "pedal") {
             success = this->ReadPedal(parent, current);
         }
@@ -5225,6 +5391,7 @@ bool MEIInput::ReadMeterSigGrpChildren(Object *parent, pugi::xml_node parentNode
 bool MEIInput::ReadControlElement(pugi::xml_node element, ControlElement *object)
 {
     this->SetMeiID(element, object);
+    this->ReadAltSymInterface(element, object);
     this->ReadLinkingInterface(element, object);
     object->ReadLabelled(element);
     object->ReadTyped(element);
@@ -5506,6 +5673,22 @@ bool MEIInput::ReadOctave(Object *parent, pugi::xml_node octave)
     return true;
 }
 
+bool MEIInput::ReadOrnam(Object *parent, pugi::xml_node ornam)
+{
+    Ornam *vrvOrnam = new Ornam();
+    this->ReadControlElement(ornam, vrvOrnam);
+
+    this->ReadTextDirInterface(ornam, vrvOrnam);
+    this->ReadTimePointInterface(ornam, vrvOrnam);
+    vrvOrnam->ReadColor(ornam);
+    vrvOrnam->ReadExtSym(ornam);
+    vrvOrnam->ReadOrnamentAccid(ornam);
+
+    parent->AddChild(vrvOrnam);
+    this->ReadUnsupportedAttr(ornam, vrvOrnam);
+    return this->ReadTextChildren(vrvOrnam, ornam, vrvOrnam);
+}
+
 bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
 {
     Pedal *vrvPedal = new Pedal();
@@ -5590,7 +5773,8 @@ bool MEIInput::ReadTempo(Object *parent, pugi::xml_node tempo)
     this->ReadControlElement(tempo, vrvTempo);
 
     this->ReadTextDirInterface(tempo, vrvTempo);
-    this->ReadTimePointInterface(tempo, vrvTempo);
+    this->ReadTimeSpanningInterface(tempo, vrvTempo);
+    vrvTempo->ReadExtender(tempo);
     vrvTempo->ReadLang(tempo);
     vrvTempo->ReadMidiTempo(tempo);
     vrvTempo->ReadMmTempo(tempo);
@@ -6664,9 +6848,6 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
             success = this->ReadSvg(parent, xmlElement);
         }
         else if (elementName == "symbol") {
-            // There will be some additional checks when reading Symbol because of some additional limitations:
-            // * <symbol> is not supported with mixed text content or together with other text elements (e.g. <rend>)
-            // * <symbol> is not supported within editorial markup
             success = this->ReadSymbol(parent, xmlElement);
         }
         else if (xmlElement.text()) {
@@ -6687,6 +6868,43 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
         i++;
+    }
+    return success;
+}
+
+bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, Object *filter)
+{
+    bool success = true;
+    pugi::xml_node xmlElement;
+    std::string elementName;
+    for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
+        if (!success) {
+            break;
+        }
+        this->NormalizeAttributes(xmlElement);
+        elementName = std::string(xmlElement.name());
+        if (filter && !this->IsAllowed(elementName, filter)) {
+            std::string meiElementName = filter->GetClassName();
+            std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
+            LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
+                meiElementName.c_str());
+            continue;
+        }
+        // content
+        else if (elementName == "graphic") {
+            success = this->ReadGraphic(parent, xmlElement);
+        }
+        else if (elementName == "svg") {
+            success = this->ReadSvg(parent, xmlElement);
+        }
+        // xml comment
+        else if (elementName == "") {
+            success = this->ReadXMLComment(parent, xmlElement);
+        }
+        // unknown
+        else {
+            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
+        }
     }
     return success;
 }
@@ -6780,7 +6998,14 @@ bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
 bool MEIInput::ReadSvg(Object *parent, pugi::xml_node svg)
 {
     Svg *vrvSvg = new Svg();
+    // Still read the @xml:id for handling the comments
     this->SetMeiID(svg, vrvSvg);
+
+    // Read the @id by hand
+    if (svg.attribute("id")) {
+        vrvSvg->SetID(svg.attribute("id").value());
+        svg.remove_attribute("id");
+    }
 
     if (std::string(svg.name()) == "svg") {
         vrvSvg->Set(svg);
@@ -6808,6 +7033,16 @@ bool MEIInput::ReadSymbol(Object *parent, pugi::xml_node symbol)
     return true;
 }
 
+bool MEIInput::ReadSymbolDef(Object *parent, pugi::xml_node symbolDef)
+{
+    SymbolDef *vrvSymbolDef = new SymbolDef();
+    this->SetMeiID(symbolDef, vrvSymbolDef);
+
+    parent->AddChild(vrvSymbolDef);
+    this->ReadUnsupportedAttr(symbolDef, vrvSymbolDef);
+    return ReadSymbolDefChildren(vrvSymbolDef, symbolDef);
+}
+
 bool MEIInput::ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight)
 {
     Text *vrvText = new Text();
@@ -6820,6 +7055,12 @@ bool MEIInput::ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool
     vrvText->SetText(str);
 
     parent->AddChild(vrvText);
+    return true;
+}
+
+bool MEIInput::ReadAltSymInterface(pugi::xml_node element, AltSymInterface *interface)
+{
+    interface->ReadAltSym(element);
     return true;
 }
 
@@ -7921,7 +8162,7 @@ void MEIInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
     // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
-bool MEIInput::ReadGraphic(Surface *parent, pugi::xml_node graphic)
+bool MEIInput::ReadGraphic(Object *parent, pugi::xml_node graphic)
 {
     assert(parent);
     Graphic *vrvGraphic = new Graphic();

@@ -31,10 +31,17 @@ namespace vrv {
 static const ClassRegistrar<Tempo> s_factory("tempo", TEMPO);
 
 Tempo::Tempo()
-    : ControlElement(TEMPO, "tempo-"), TextDirInterface(), TimePointInterface(), AttLang(), AttMidiTempo(), AttMmTempo()
+    : ControlElement(TEMPO, "tempo-")
+    , TextDirInterface()
+    , TimeSpanningInterface()
+    , AttExtender()
+    , AttLang()
+    , AttMidiTempo()
+    , AttMmTempo()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_EXTENDER);
     this->RegisterAttClass(ATT_LANG);
     this->RegisterAttClass(ATT_MIDITEMPO);
     this->RegisterAttClass(ATT_MMTEMPO);
@@ -48,7 +55,8 @@ void Tempo::Reset()
 {
     ControlElement::Reset();
     TextDirInterface::Reset();
-    TimePointInterface::Reset();
+    TimeSpanningInterface::Reset();
+    this->ResetExtender();
     this->ResetLang();
     this->ResetMidiTempo();
     this->ResetMmTempo();

@@ -48,6 +48,7 @@ Fermata::~Fermata() {}
 void Fermata::Reset()
 {
     ControlElement::Reset();
+    AltSymInterface::Reset();
     TimePointInterface::Reset();
     this->ResetColor();
     this->ResetEnclosingChars();

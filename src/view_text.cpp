@@ -22,6 +22,7 @@
 #include "f.h"
 #include "fb.h"
 #include "fig.h"
+#include "graphic.h"
 #include "lb.h"
 #include "num.h"
 #include "options.h"
@@ -70,7 +71,7 @@ void View::DrawTextString(DeviceContext *dc, const std::u32string &str, TextDraw
 void View::DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params)
 {
     assert(dc);
-    assert(dc->GetFont());
+    assert(dc->HasFont());
 
     std::u32string convertedStr = str;
     // If the current font is a music font, we want to convert Music Unicode glyph to SMuFL
@@ -85,6 +86,7 @@ void View::DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawi
 void View::DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params, Rend *rend)
 {
     assert(dc);
+    assert(dc->HasFont());
 
     const bool singleGlyphs = m_doc->GetOptions()->m_dynamSingleGlyphs.GetValue();
 
@@ -147,6 +149,7 @@ void View::DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDra
 void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params)
 {
     assert(dc);
+    assert(dc->HasFont());
 
     int toDcX = ToDeviceContextX(params.m_x);
     int toDcY = ToDeviceContextY(params.m_y);
@@ -256,6 +259,7 @@ void View::DrawLyricString(
     DeviceContext *dc, const std::u32string &str, int staffSize, std::optional<TextDrawingParams> params)
 {
     assert(dc);
+    assert(dc->HasFont());
 
     bool wroteText = false;
     std::u32string syl = U"";
@@ -307,6 +311,7 @@ void View::DrawLyricString(
 void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
 {
     assert(dc);
+    assert(dc->HasFont());
     assert(lb);
 
     dc->StartTextGraphic(lb, "", lb->GetID());
@@ -348,7 +353,7 @@ void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)
     if (svg) {
         params.m_x = fig->GetDrawingX();
         params.m_y = fig->GetDrawingY();
-        this->DrawSvg(dc, svg, params);
+        this->DrawSvg(dc, svg, params, 100, false);
     }
 
     dc->EndGraphic(fig, this);
@@ -395,7 +400,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
     if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
         // Because we do not have the string at this stage we rely only on the selected font
         // This means fallback will not work for missing glyphs within <rend>
-        rendFont.SetSmuflWithFallback(SMUFL_FONT_SELECTED);
+        rendFont.SetSmuflWithFallback(false);
         rendFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
         int pointSize = (rendFont.GetPointSize() != 0) ? rendFont.GetPointSize() : params.m_pointSize;
         rendFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
@@ -414,7 +419,6 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     int yShift = 0;
     if ((rend->GetRend() == TEXTRENDITION_sup) || (rend->GetRend() == TEXTRENDITION_sub)) {
-        assert(dc->GetFont());
         int MHeight = m_doc->GetTextGlyphHeight('M', dc->GetFont(), false);
         if (rend->GetRend() == TEXTRENDITION_sup) {
             yShift += m_doc->GetTextGlyphHeight('o', dc->GetFont(), false);
@@ -443,14 +447,23 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() / SUPER_SCRIPT_FACTOR);
     }
 
-    if ((rend->GetRend() == TEXTRENDITION_box) || (rend->GetRend() == TEXTRENDITION_circle)) {
-        params.m_enclosedRend.push_back(rend);
-        params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
-        params.m_explicitPosition = true;
-        params.m_enclose = rend->GetRend();
+    // Do not render the box or circle if the content is empty
+    if (rend->HasContentBB()) {
+        if ((rend->GetRend() == TEXTRENDITION_box) || (rend->GetRend() == TEXTRENDITION_circle)) {
+            params.m_enclosedRend.push_back(rend);
+            params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
+            params.m_explicitPosition = true;
+            params.m_enclose = rend->GetRend();
+        }
     }
 
-    if (customFont) dc->ResetFont();
+    if (customFont) {
+        dc->ResetFont();
+        // Reset the point size not to have it cummulated
+        assert(dc->HasFont());
+        params.m_pointSize = dc->GetFont()->GetPointSize();
+        // Possilbe corner case: maybe we also need to reset text enclosure here?
+    }
 
     dc->EndTextGraphic(rend, this);
 }
@@ -458,6 +471,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 {
     assert(dc);
+    assert(dc->HasFont());
     assert(text);
 
     const Resources *resources = dc->GetResources();
@@ -477,7 +491,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     }
 
     // special case where we want to replace some unicode music points to SMuFL
-    if (text->GetFirstAncestor(DIR)) {
+    if (text->GetFirstAncestor(DIR) || text->GetFirstAncestor(ORNAM)) {
         this->DrawDirString(dc, text->GetText(), params);
     }
     else if (text->GetFirstAncestor(DYNAM)) {
@@ -508,15 +522,49 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     dc->EndTextGraphic(text, this);
 }
 
-void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params)
+void View::DrawGraphic(DeviceContext *dc, Graphic *graphic, TextDrawingParams &params, int staffSize, bool dimin)
+{
+    assert(dc);
+    assert(graphic);
+
+    dc->StartGraphic(graphic, "", graphic->GetID(), SYMBOLREF);
+
+    int width = graphic->GetDrawingWidth(m_doc->GetDrawingUnit(staffSize), staffSize);
+    int height = graphic->GetDrawingHeight(m_doc->GetDrawingUnit(staffSize), staffSize);
+
+    if (dimin) {
+        width = width * m_options->m_graceFactor.GetValue();
+        height = height * m_options->m_graceFactor.GetValue();
+    }
+
+    dc->DrawGraphicUri(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), width, height, graphic->GetTarget());
+
+    dc->EndGraphic(graphic, this);
+}
+
+void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params, int staffSize, bool dimin)
 {
     assert(dc);
     assert(svg);
 
     dc->StartGraphic(svg, "", svg->GetID());
 
-    dc->DrawSvgShape(
-        ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), svg->GetWidth(), svg->GetHeight(), svg->Get());
+    int width = svg->GetWidth();
+    int height = svg->GetHeight();
+    double scale = 1.0;
+
+    if (staffSize != 100) {
+        width = width * staffSize / 100;
+        height = height * staffSize / 100;
+        scale = scale * staffSize / 100;
+    }
+    if (dimin) {
+        width = width * m_options->m_graceFactor.GetValue();
+        height = height * m_options->m_graceFactor.GetValue();
+        scale = scale * m_options->m_graceFactor.GetValue();
+    }
+
+    dc->DrawSvgShape(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), width, height, scale, svg->Get());
 
     dc->EndGraphic(svg, this);
 }

@@ -155,6 +155,7 @@ public:
      */
     ///@{
     FontInfo *GetFont();
+    bool HasFont() const { return !m_fontStack.empty(); }
     ///@}
 
     /**
@@ -193,7 +194,8 @@ public:
         = 0;
     virtual void DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
-    virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) = 0;
+    virtual void DrawGraphicUri(int x, int y, int width, int height, const std::string &uri) = 0;
+    virtual void DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg) = 0;
     virtual void DrawBackgroundImage(int x = 0, int y = 0) = 0;
     ///@}
 
@@ -242,7 +244,7 @@ public:
      */
     ///@{
     virtual void StartGraphic(
-        Object *object, std::string gClass, std::string gId, bool primary = true, bool preprend = false)
+        Object *object, std::string gClass, std::string gId, GraphicID graphicID = PRIMARY, bool preprend = false)
         = 0;
     virtual void EndGraphic(Object *object, View *view) = 0;
     ///@}

@@ -43,7 +43,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetID());
     else
-        dc->StartGraphic(slur, "", slur->GetID(), false);
+        dc->StartGraphic(slur, "", slur->GetID(), SPANNING);
 
     int penStyle = AxSOLID;
     switch (slur->GetLform()) {

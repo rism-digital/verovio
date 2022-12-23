@@ -1217,8 +1217,9 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     if (multiRest->UseBlockStyle(m_doc)) {
         // This is 1/2 the length of the black rectangle
         int width = measureWidth - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        if (multiRest->HasWidth()) {
-            const int fixedWidth = multiRest->AttWidth::GetWidth() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        if (multiRest->HasWidth() && multiRest->AttWidth::GetWidth().GetType() == MEASUREMENTTYPE_vu) {
+            const int fixedWidth
+                = multiRest->AttWidth::GetWidth().GetVu() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             width = (width > fixedWidth) ? fixedWidth : width;
         }
         if (width > m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 4) {
@@ -1526,9 +1527,9 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetID());
 
-    this->DrawFilledRectangle(dc, stem->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
-        stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
-        stem->GetDrawingY() - (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()));
+    DrawVerticalLine(dc, stem->GetDrawingY(),
+        stem->GetDrawingY() - (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()), stem->GetDrawingX(),
+        m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
 
     this->DrawStemMod(dc, element, staff);
 
@@ -1657,7 +1658,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         params.m_width = syl->GetDrawingWidth();
         params.m_height = syl->GetDrawingHeight();
     }
-    assert(dc->GetFont());
+    assert(dc->HasFont());
     params.m_pointSize = dc->GetFont()->GetPointSize();
 
     dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
@@ -1673,6 +1674,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         }
         else {
             FontInfo vrvTxt;
+            assert(dc->HasFont());
             vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
             vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
             std::u32string str;
@@ -1879,6 +1881,7 @@ int View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSi
         int yDen = y - m_doc->GetDrawingDoubleUnit(glyphSize);
         // In case when one of the handwritten fonts is used, we need to make sure that meterSig is displayed properly
         // for it, based on the height of corresponding glyphs
+        assert(dc->HasFont());
         FontInfo *fontInfo = dc->GetFont();
         std::vector<std::string> handwrittenFonts = m_doc->GetOptions()->m_handwrittenFont.GetValue();
         if (const auto it = std::find(handwrittenFonts.begin(), handwrittenFonts.end(), fontInfo->GetFaceName());

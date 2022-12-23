@@ -230,7 +230,7 @@ $exports .= "]\"";
 
 my $extra_exports = "-s EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
 
-my $modularize = $modularizeQ ? "-s MODULARIZE=1 -s EXPORT_NAME=\"'createVerovioModule'\"" : "";
+my $modularize = $modularizeQ ? "-s MODULARIZE=1 -s EXPORT_ES6=1 -s EXPORT_NAME=\"'createVerovioModule'\"" : "";
 
 if ($makeQ) {
 	system("rm -rf CMakeFiles/");
@@ -239,7 +239,7 @@ if ($makeQ) {
 
 print "*************\nBuilding makefile...\n";
 my $cmakeCmd = "$EMCMAKE cmake ../cmake $cmake -DCMAKE_CXX_FLAGS=\"$FLAGS\"";
-system($cmakeCmd);
+system($cmakeCmd) == 0 or die "system $cmakeCmd failed: $?";
 
 print "*************\nCompiling...\n";
 my $makeCmd = "$EMMAKE make -j 8";

@@ -28,6 +28,7 @@
 #include "harm.h"
 #include "mordent.h"
 #include "octave.h"
+#include "ornam.h"
 #include "pedal.h"
 #include "pitchinflection.h"
 #include "reh.h"
@@ -250,6 +251,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         // octave below by default (won't draw without @dis.place anyway);
         m_place = (octave->GetDisPlace() == STAFFREL_basic_above) ? STAFFREL_above : STAFFREL_below;
     }
+    else if (object->Is(ORNAM)) {
+        Ornam *ornam = vrv_cast<Ornam *>(object);
+        assert(ornam);
+        // ornam above by default
+        m_place = (ornam->GetPlace() != STAFFREL_NONE) ? ornam->GetPlace() : ornam->GetLayerPlace(STAFFREL_above);
+    }
     else if (object->Is(PITCHINFLECTION)) {
         // PitchInflection *pitchInflection = vrv_cast<PitchInflection *>(object);
         // assert(pitchInflection);
@@ -374,8 +381,20 @@ bool FloatingPositioner::CalcDrawingYRel(
     if (horizOverlapingBBox == NULL) {
         // Apply element margin and enforce minimal staff distance
         int staffIndex = staffAlignment->GetStaff()->GetN();
-        int minStaffDistance
-            = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place) * doc->GetDrawingUnit(staffSize);
+
+        int minStaffDistance = 0.0;
+        data_MEASUREMENTSIGNED minStaffDistanceMeasurement
+            = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place);
+
+        if (minStaffDistanceMeasurement.HasValue()) {
+            if (minStaffDistanceMeasurement.GetType() == MEASUREMENTTYPE_px) {
+                minStaffDistance = minStaffDistanceMeasurement.GetPx();
+            }
+            else {
+                minStaffDistance = minStaffDistanceMeasurement.GetVu() * doc->GetDrawingUnit(staffSize);
+            }
+        }
+
         if (this->GetObject()->Is(FERMATA) && (staffAlignment->GetStaff()->m_drawingLines == 1)) {
             minStaffDistance = 2.5 * doc->GetDrawingUnit(staffSize);
         }
@@ -410,7 +429,7 @@ bool FloatingPositioner::CalcDrawingYRel(
             assert(curve->m_object);
         }
         int margin = doc->GetBottomMargin(m_object->GetClassId()) * unit;
-        const bool isExtender = m_object->Is({ DIR, DYNAM }) && m_object->IsExtenderElement();
+        const bool isExtender = m_object->Is({ DIR, DYNAM, TEMPO }) && m_object->IsExtenderElement();
 
         if (m_place == STAFFREL_above) {
             if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
@@ -805,6 +824,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcRequestedStaffSpace(const Staff
 int FloatingObject::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
+    m_maxDrawingYRel = VRV_UNSET;
 
     return FUNCTOR_CONTINUE;
 }
@@ -812,6 +832,15 @@ int FloatingObject::ResetHorizontalAlignment(FunctorParams *functorParams)
 int FloatingObject::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
+    m_maxDrawingYRel = VRV_UNSET;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int FloatingObject::PrepareDataInitialization(FunctorParams *functorParams)
+{
+    // Clear all
+    FloatingObject::s_drawingObjectIds.clear();
 
     return FUNCTOR_CONTINUE;
 }
@@ -872,10 +901,8 @@ int FloatingObject::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams
 
 int FloatingObject::ResetData(FunctorParams *functorParams)
 {
-    // Clear all
-    FloatingObject::s_drawingObjectIds.clear();
-
     m_currentPositioner = NULL;
+    m_maxDrawingYRel = VRV_UNSET;
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();

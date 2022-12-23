@@ -2,10 +2,25 @@
 
 ## [unreleased]
 
+## [3.14.0] - 2022-12-23
+* Support for user defined symbols in `symbolTable/symbolDef` with `svg` or `graphic`
+* Support for `@altsym` for `breath`, `ceasura`, `fermata`, `mordent`, `trill` and `turn`
+* Support for `incip` with MEI and PAE format (with --incip option)
+* Support for single-line Plaine & Easie input
+* Support for `@extender` lines on `tempo` (@eNote-GmBH)
+* Support for `ornam` with text content rendering
+* Improvements to the humdrum importer (@gregchapman-dev)
+* Option --unit changed to decimal
+
+## [3.13.1] - 2022-11-28
+* Fix text music font always falling back to Leipzig
+* Fix missing JSON handling for some methods in the Python binding
+* Fix text size percent not being reset in sibling text elements
+
 ## [3.13.0] - 2022-11-23
 * Refactoring of the JSON parameters and returned values as dictionaries for the Python binding
 * Support for text font fallback when a glyph is missing in the selected font
-* Support for Plaine and Easie gross and refined contour feature extraction
+* Support for Plaine & Easie gross and refined contour feature extraction
 * Support for `dblserpent` barlines (@eNote-GmBH)
 * Support for `@dir.dist` and `@tempo.dist` (@eNote-GmBH)
 * Support for persian accidentals (sori and koron)
@@ -34,7 +49,7 @@
 * Option --dynam-single-glyphs to use single glyphs for dynamics (@eNote-GmBH)
 * Option --scale-to-page-size for an output with a fix size independently from the scale factor
 * Replacement of VerovioText font with Leipzig (and other supported music fonts)
-* Compiling option to use the old Plaine and Easie parser (@carlolic)
+* Compiling option to use the old Plaine & Easie parser (@carlolic)
 
 ## [3.11.0] - 2022-07-15
 * Support for MEI-basic output
@@ -54,11 +69,11 @@
 * Support for `mRpt@num` and `mRpt@num.place` (@eNote-GmBH)
 * Support for `mixed` croff-staff slurs (@eNote-GmBH)
 * Support for `non-arp` arpeggios (@eNote-GmBH)
-* Support for ligatures in Plaine and Easie
+* Support for ligatures in Plaine & Easie
 * Function select for specifying a portion of a score for rendering
 * Improved rendering with diamond and slash shaped noteheads (@eNote-GmBH)
 * Improved rendering of slurs (@eNote-GmBH)
-* Improved Plaine and Easie validation
+* Improved Plaine & Easie validation
 * Option --beam-french-style for french beam style (@eNote-GmBH)
 * Option --transpose-mdiv for individual transposition of mdivs (@eNote-GmBH)
 * Option --transpose-to-sounding-pitch for transposing to sounding pitches using `@trans.semi`
@@ -94,12 +109,12 @@
 * Improved page-based MEI output with validation with a customized MEI Schema
 * Improved layout with beams and control events (ornaments, fingering, etc.) (@eNote-GmBH)
 * Improve enharmonic tie overlap with accidentals (@eNote-GmBH)
-* Improved Plaine and Easie validation output with error codes and values
+* Improved Plaine & Easie validation output with error codes and values
 * Additional parameters to the getMEI method for exporting selected content (@eNote-GmBH)
 * Option --multi-rest-thickness to control the thickness of measure rests (@eNote-GmBH)
 
 ## [3.7.0] - 2021-11-22
-* Complete refactoring of the Plaine and Easie parser
+* Complete refactoring of the Plaine & Easie parser
 * Support for `multiRest@num.place` (@eNote-GmBH)
 * Support for `meterSig@enclose`, `clef@enclose` and `arpeg@enclose` (@eNote-GmBH)
 * Support for `accid@loc` and `accid@oloc`/`accid@ploc` (@eNote-GmBH)
@@ -262,7 +277,7 @@
 * Fix tremolo beaming (@rettinghaus)
 
 ## [2.6.0] - 2020-03-11
-* Support for Plaine and Easie output (limited features)
+* Support for Plaine & Easie output (limited features)
 * Support for lyrics on chords (@rettinghaus)
 * Support for `scoreDef@system.leftline` (@rettinghaus)
 * Support for reh elements (@rettinghaus)

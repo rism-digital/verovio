@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e -o pipefail
 
 # clean dist folder and reinstall node modules
 rm -rf ./npm/dist
@@ -12,11 +13,11 @@ npm --prefix npm run prebundle
 
 # build modularized emscripten module with humdrum
 ./buildToolkit -c -w -M -m
-cp ./build/verovio.js ./npm/dist/verovio-module-hum.js
+cp ./build/verovio.js ./npm/dist/verovio-module-hum.mjs
 
 # build modularized emscripten module without humdrum
 ./buildToolkit -c -w -M -H -m
-cp ./build/verovio.js ./npm/dist/verovio-module.js
+cp ./build/verovio.js ./npm/dist/verovio-module.mjs
 
 # build CommonJS and ESM code for verovio toolkit
 npm --prefix npm run build

@@ -148,13 +148,13 @@ def extract_fonts(opts: Namespace) -> bool:
         log.error("Could not read %s. Does it exist?", font_pth)
         return False
 
-    if not os.access(output_pth, os.W_OK):
-        log.error("Could not write to %s. Check permissions.", output_pth)
+    if not os.access(data_pth, os.W_OK):
+        log.error("Could not write to %s. Check permissions.", data_pth)
         return False
 
     if not glyph_file_pth.is_dir():
         log.debug("Creating %s", glyph_file_pth)
-        glyph_file_pth.mkdir(exist_ok=True)
+        glyph_file_pth.mkdir(parents=True)
 
     svg_data = __read_svg_font_file(str(font_pth))
     if not svg_data:

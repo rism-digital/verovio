@@ -785,6 +785,13 @@ void Doc::PrepareData()
     Functor prepareCueSize(&Object::PrepareCueSize);
     this->Process(&prepareCueSize, NULL);
 
+    /************ Resolve @altsym ************/
+
+    // Try to match all pointing elements using @next, @sameas and @stem.sameas
+    PrepareAltSymParams prepareAltSymParams;
+    Functor prepareAltSym(&Object::PrepareAltSym);
+    this->Process(&prepareAltSym, &prepareAltSymParams);
+
     /************ Instanciate LayerElement parts (stemp, flag, dots, etc) ************/
 
     Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
@@ -1875,9 +1882,9 @@ double Doc::GetTopMargin(const ClassId classId) const
     return m_options->m_defaultTopMargin.GetValue();
 }
 
-double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition)
+data_MEASUREMENTSIGNED Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition)
 {
-    double distance = 0.0;
+    data_MEASUREMENTSIGNED distance;
     if (staffPosition == STAFFREL_above || staffPosition == STAFFREL_below) {
         if (classId == DIR) {
             // Inspect the scoreDef attribute
@@ -1892,7 +1899,7 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
             }
         }
         else if (classId == DYNAM) {
-            distance = m_options->m_dynamDist.GetDefault();
+            distance.SetVu(m_options->m_dynamDist.GetDefault());
 
             // Inspect the scoreDef attribute
             if (this->GetCurrentScoreDef()->HasDynamDist()) {
@@ -1907,11 +1914,11 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
 
             // Apply CLI option if set
             if (m_options->m_dynamDist.IsSet()) {
-                distance = m_options->m_dynamDist.GetValue();
+                distance.SetVu(m_options->m_dynamDist.GetValue());
             }
         }
         else if (classId == HARM) {
-            distance = m_options->m_harmDist.GetDefault();
+            distance.SetVu(m_options->m_harmDist.GetDefault());
 
             // Inspect the scoreDef attribute
             if (this->GetCurrentScoreDef()->HasHarmDist()) {
@@ -1926,7 +1933,7 @@ double Doc::GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFRE
 
             // Apply CLI option if set
             if (m_options->m_harmDist.IsSet()) {
-                distance = m_options->m_harmDist.GetValue();
+                distance.SetVu(m_options->m_harmDist.GetValue());
             }
         }
         else if (classId == TEMPO) {
