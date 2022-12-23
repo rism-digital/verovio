@@ -126,7 +126,7 @@ public:
     int GetStaffIdx() const { return Object::GetIdx(); }
 
     /**
-     * Calculate the yRel for the staff given a @loc value
+     * Calculate the yRel for the staff given a \@loc value
      */
     int CalcPitchPosYRel(const Doc *doc, int loc) const;
 

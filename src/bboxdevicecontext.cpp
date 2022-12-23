@@ -210,7 +210,7 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     int p2 = p1;
     // how odd line width is handled might depend on the implementation of the device context.
     // however, we expect the actually width to be shifted on the left/top
-    // e.g. with 7, 4 on the left and 3 on the right
+    // e.g., with 7, 4 on the left and 3 on the right
     if (penWidth % 2) {
         p1++;
     }

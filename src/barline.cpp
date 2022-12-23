@@ -207,7 +207,7 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
     }
 
     // Make a segment break
-    // First case: new need to add a new measure segment (e.g, first pass)
+    // First case: new need to add a new measure segment (e.g., first pass)
     if (params->m_targetSubSystem->GetChildCount() <= params->m_segmentIdx) {
         params->m_targetMeasure = new Measure(convertToMeasured);
         if (convertToMeasured) {

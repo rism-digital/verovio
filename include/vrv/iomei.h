@@ -318,7 +318,7 @@ private:
     void WriteRevisionDesc(pugi::xml_node meiHead);
 
     /**
-     * Write the @xml:id to the currentNode
+     * Write the \@xml:id to the currentNode
      */
     void WriteXmlId(pugi::xml_node currentNode, Object *object);
 

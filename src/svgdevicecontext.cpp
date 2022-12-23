@@ -948,7 +948,7 @@ void SvgDeviceContext::DrawText(
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
 
     pugi::xml_node textChild = AppendChild("tspan");
-    // We still add @xml::space (No: this seems to create problems with Safari)
+    // We still add @xml:space (No: this seems to create problems with Safari)
     // textChild.append_attribute("xml:space") = "preserve";
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
