@@ -29,6 +29,7 @@
 #include "horizontalaligner.h"
 #include "layer.h"
 #include "note.h"
+#include "preparedatafunctor.h"
 #include "smufl.h"
 #include "staff.h"
 #include "stem.h"
@@ -900,8 +901,8 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ Prepare the drawing cue size ************/
 
-    Functor prepareCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareCueSize, NULL);
+    PrepareCueSizeFunctor prepareCueSize;
+    this->Process(prepareCueSize);
 
     return FUNCTOR_CONTINUE;
 }

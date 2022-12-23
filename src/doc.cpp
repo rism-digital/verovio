@@ -784,8 +784,8 @@ void Doc::PrepareData()
     /************ Resolve cue size ************/
 
     // Prepare the drawing cue size
-    Functor prepareCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareCueSize, NULL);
+    PrepareCueSizeFunctor prepareCueSize;
+    this->Process(prepareCueSize);
 
     /************ Resolve @altsym ************/
 

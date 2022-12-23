@@ -24,6 +24,7 @@
 #include "functor.h"
 #include "functorparams.h"
 #include "note.h"
+#include "preparedatafunctor.h"
 #include "rest.h"
 #include "space.h"
 #include "staff.h"
@@ -581,8 +582,8 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ Prepare the drawing cue size ************/
 
-    Functor prepareCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareCueSize, NULL);
+    PrepareCueSizeFunctor prepareCueSize;
+    this->Process(prepareCueSize);
 
     /*********** Get the left and right element ***********/
 

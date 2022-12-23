@@ -2183,64 +2183,6 @@ int LayerElement::AdjustXRelForTranscription(FunctorParams *)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::PrepareCueSize(FunctorParams *functorParams)
-{
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    Layer *currentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(currentLayer);
-    if (currentLayer->GetCue() == BOOLEAN_true) {
-        m_drawingCueSize = true;
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (this->IsGraceNote()) {
-        m_drawingCueSize = true;
-    }
-    // This cover the case when the @size is given on the element
-    else if (this->HasAttClass(ATT_CUE)) {
-        AttCue *att = dynamic_cast<AttCue *>(this);
-        assert(att);
-        if (att->HasCue()) m_drawingCueSize = (att->GetCue() == BOOLEAN_true);
-    }
-    // For note, we also need to look at the parent chord
-    else if (this->Is(NOTE)) {
-        Note *note = vrv_cast<Note *>(this);
-        assert(note);
-        Chord *chord = note->IsChordTone();
-        if (chord) m_drawingCueSize = chord->GetDrawingCueSize();
-    }
-    // For tuplet, we also need to look at the first note or chord
-    else if (this->Is(TUPLET)) {
-        ClassIdsComparison matchType({ NOTE, CHORD });
-        ArrayOfObjects children;
-        LayerElement *child = dynamic_cast<LayerElement *>(this->FindDescendantByComparison(&matchType));
-        if (child) m_drawingCueSize = child->GetDrawingCueSize();
-    }
-    // For accid, look at the parent if @func="edit" or otherwise to the parent note
-    else if (this->Is(ACCID)) {
-        Accid *accid = vrv_cast<Accid *>(this);
-        assert(accid);
-        if (accid->GetFunc() == accidLog_FUNC_edit)
-            m_drawingCueSize = true;
-        else {
-            Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
-            if (note) m_drawingCueSize = note->GetDrawingCueSize();
-        }
-    }
-    else if (this->Is({ ARTIC, DOTS, FLAG, STEM })) {
-        Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
-        if (note)
-            m_drawingCueSize = note->GetDrawingCueSize();
-        else {
-            Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
-            if (chord) m_drawingCueSize = chord->GetDrawingCueSize();
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
 {
     PrepareCrossStaffParams *params = vrv_params_cast<PrepareCrossStaffParams *>(functorParams);

@@ -27,6 +27,7 @@
 #include "layer.h"
 #include "ligature.h"
 #include "plica.h"
+#include "preparedatafunctor.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -1259,8 +1260,8 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ Prepare the drawing cue size ************/
 
-    Functor prepareCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareCueSize, NULL);
+    PrepareCueSizeFunctor prepareCueSize;
+    this->Process(prepareCueSize);
 
     return FUNCTOR_CONTINUE;
 }

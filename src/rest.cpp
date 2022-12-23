@@ -21,6 +21,7 @@
 #include "findlayerelementsfunctor.h"
 #include "functorparams.h"
 #include "layer.h"
+#include "preparedatafunctor.h"
 #include "smufl.h"
 #include "staff.h"
 #include "system.h"
@@ -644,8 +645,8 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ Prepare the drawing cue size ************/
 
-    Functor prepareCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareCueSize, NULL);
+    PrepareCueSizeFunctor prepareCueSize;
+    this->Process(prepareCueSize);
 
     return FUNCTOR_CONTINUE;
 }
