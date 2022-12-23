@@ -46,6 +46,7 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
+#include "preparedatafunctor.h"
 #include "runningelement.h"
 #include "score.h"
 #include "setscoredeffunctor.h"
@@ -505,9 +506,8 @@ void Doc::PrepareData()
         Functor resetData(&Object::ResetData);
         this->Process(&resetData, NULL);
     }
-    Functor prepareDataInitialization(&Object::PrepareDataInitialization);
-    PrepareDataInitializationParams prepareDataInitializationParams(&prepareDataInitialization, this);
-    this->Process(&prepareDataInitialization, &prepareDataInitializationParams);
+    PrepareDataInitializationFunctor prepareDataInitialization(this);
+    this->Process(prepareDataInitialization);
 
     /************ Store default durations ************/
 

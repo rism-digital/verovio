@@ -129,6 +129,11 @@ void FloatingObject::SetMaxDrawingYRel(int maxDrawingYRel)
     }
 }
 
+void FloatingObject::ResetDrawingObjectIDs()
+{
+    FloatingObject::s_drawingObjectIds.clear();
+}
+
 void FloatingObject::SetCurrentFloatingPositioner(FloatingPositioner *boundingBox)
 {
     m_currentPositioner = boundingBox;
@@ -854,14 +859,6 @@ int FloatingObject::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
     m_maxDrawingYRel = VRV_UNSET;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::PrepareDataInitialization(FunctorParams *functorParams)
-{
-    // Clear all
-    FloatingObject::s_drawingObjectIds.clear();
 
     return FUNCTOR_CONTINUE;
 }

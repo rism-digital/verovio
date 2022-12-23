@@ -126,11 +126,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareDataInitialization
-     */
-    int PrepareDataInitialization(FunctorParams *) override;
-
-    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;

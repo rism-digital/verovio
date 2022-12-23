@@ -165,11 +165,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareDataInitialization
-     */
-    int PrepareDataInitialization(FunctorParams *) override;
-
-    /**
      * See Object::Save
      */
     ///@{

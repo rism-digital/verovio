@@ -240,11 +240,6 @@ public:
     int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareDataInitialization
-     */
-    int PrepareDataInitialization(FunctorParams *) override;
-
-    /**
      * See Object::JustifyYAdjustCrossStaff
      */
     int JustifyYAdjustCrossStaff(FunctorParams *functorParams) override;

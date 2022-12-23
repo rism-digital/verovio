@@ -175,17 +175,6 @@ FunctorCode Score::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitScoreEnd(this);
 }
 
-int Score::PrepareDataInitialization(FunctorParams *functorParams)
-{
-    PrepareDataInitializationParams *params = vrv_params_cast<PrepareDataInitializationParams *>(functorParams);
-    assert(params);
-
-    // Evaluate functor on scoreDef
-    this->GetScoreDef()->Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Score::AdjustDots(FunctorParams *functorParams)
 {
     AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);

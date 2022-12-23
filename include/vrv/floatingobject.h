@@ -90,6 +90,13 @@ public:
     ///@}
 
     /**
+     * @name Get and set the drawing object IDs
+     */
+    ///@{
+    void ResetDrawingObjectIDs();
+    ///@}
+
+    /**
      * Check whether current object represents initial element or extender lines
      */
     virtual bool IsExtenderElement() const { return false; }
@@ -122,11 +129,6 @@ public:
      * See Object::ResetVerticalAlignment
      */
     int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDataInitialization
-     */
-    int PrepareDataInitialization(FunctorParams *) override;
 
     /**
      * See Object::PrepareStaffCurrentTimeSpanning

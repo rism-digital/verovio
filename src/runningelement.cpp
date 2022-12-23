@@ -416,30 +416,6 @@ FunctorCode RunningElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitRunningElementEnd(this);
 }
 
-int RunningElement::PrepareDataInitialization(FunctorParams *)
-{
-    int i;
-    for (i = 0; i < 9; ++i) {
-        m_cells[i].clear();
-    }
-    for (i = 0; i < 3; ++i) {
-        m_drawingScalingPercent[i] = 100;
-    }
-
-    const ListOfObjects &childList = this->GetList(this);
-    for (ListOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
-        int pos = 0;
-        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
-        assert(interface);
-        pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
-        TextElement *text = vrv_cast<TextElement *>(*iter);
-        assert(text);
-        m_cells[pos].push_back(text);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int RunningElement::Save(FunctorParams *functorParams)
 {
     if (this->IsGenerated()) {

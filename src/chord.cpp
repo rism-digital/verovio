@@ -945,18 +945,6 @@ int Chord::ResetData(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::PrepareDataInitialization(FunctorParams *)
-{
-    if (this->HasEmptyList(this)) {
-        LogWarning("Chord '%s' has no child note - a default note is added", this->GetID().c_str());
-        Note *rescueNote = new Note();
-        this->AddChild(rescueNote);
-    }
-    this->Modify();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Chord::JustifyYAdjustCrossStaff(FunctorParams *functorParams)
 {
     JustifyYAdjustCrossStaffParams *params = vrv_params_cast<JustifyYAdjustCrossStaffParams *>(functorParams);

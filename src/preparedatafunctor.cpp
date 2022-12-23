@@ -37,6 +37,13 @@ FunctorCode PrepareDataInitializationFunctor::VisitChord(Chord *chord)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode PrepareDataInitializationFunctor::VisitFloatingObject(FloatingObject *floatingObject)
+{
+    floatingObject->ResetDrawingObjectIDs();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
 {
     // Clear and regenerate attribute children
