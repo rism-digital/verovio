@@ -13,6 +13,8 @@
 namespace vrv {
 
 class Accid;
+class Alignment;
+class AlignmentReference;
 class Artic;
 class BarLine;
 class Beam;
@@ -27,9 +29,11 @@ class Dots;
 class Doc;
 class Flag;
 class FTrem;
+class GraceAligner;
 class GraceGrp;
 class GrpSym;
 class HalfmRpt;
+class HorizontalAligner;
 class InstrDef;
 class KeyAccid;
 class KeySig;
@@ -39,7 +43,9 @@ class Layer;
 class LayerDef;
 class LayerElement;
 class Ligature;
+class Mdiv;
 class Measure;
+class MeasureAligner;
 class Mensur;
 class MeterSig;
 class MeterSigGrp;
@@ -54,24 +60,30 @@ class Neume;
 class Note;
 class Object;
 class Page;
+class PageElement;
+class PageMilestoneEnd;
 class Pages;
 class Pb;
 class Plica;
 class Proport;
 class Rest;
 class Sb;
+class Score;
 class ScoreDef;
 class ScoreDefElement;
 class Space;
 class Staff;
+class StaffAlignment;
 class StaffDef;
 class StaffGrp;
 class Stem;
 class Syl;
 class Syllable;
 class System;
+class SystemAligner;
 class TabDurSym;
 class TabGrp;
+class TimestampAligner;
 class TimestampAttr;
 class Tuning;
 class Tuplet;
@@ -150,6 +162,20 @@ public:
     virtual FunctorCode VisitSystemEnd(System *system);
     virtual FunctorCode VisitTuning(Tuning *tuning);
     virtual FunctorCode VisitTuningEnd(Tuning *tuning);
+    ///@}
+
+    /**
+     * @name Visit page elements
+     */
+    ///@{
+    virtual FunctorCode VisitMdiv(Mdiv *mdiv);
+    virtual FunctorCode VisitMdivEnd(Mdiv *mdiv);
+    virtual FunctorCode VisitPageElement(PageElement *pageElement);
+    virtual FunctorCode VisitPageElementEnd(PageElement *pageElement);
+    virtual FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd);
+    virtual FunctorCode VisitPageMilestoneEnd(PageMilestoneEnd *pageMilestoneEnd);
+    virtual FunctorCode VisitScore(Score *score);
+    virtual FunctorCode VisitScoreEnd(Score *score);
     ///@}
 
     /**
@@ -248,6 +274,34 @@ public:
     virtual FunctorCode VisitVerseEnd(Verse *verse);
     ///@}
 
+    /**
+     * @name Visit horizontal aligners
+     */
+    ///@{
+    virtual FunctorCode VisitAlignment(Alignment *alignment);
+    virtual FunctorCode VisitAlignmentEnd(Alignment *alignment);
+    virtual FunctorCode VisitAlignmentReference(AlignmentReference *alignmentReference);
+    virtual FunctorCode VisitAlignmentReferenceEnd(AlignmentReference *alignmentReference);
+    virtual FunctorCode VisitHorizontalAligner(HorizontalAligner *horizontalAligner);
+    virtual FunctorCode VisitHorizontalAlignerEnd(HorizontalAligner *horizontalAligner);
+    virtual FunctorCode VisitMeasureAligner(MeasureAligner *measureAligner);
+    virtual FunctorCode VisitMeasureAlignerEnd(MeasureAligner *measureAligner);
+    virtual FunctorCode VisitGraceAligner(GraceAligner *graceAligner);
+    virtual FunctorCode VisitGraceAlignerEnd(GraceAligner *graceAligner);
+    virtual FunctorCode VisitTimestampAligner(TimestampAligner *timestampAligner);
+    virtual FunctorCode VisitTimestampAlignerEnd(TimestampAligner *timestampAligner);
+    ///@}
+
+    /**
+     * @name Visit vertical aligners
+     */
+    ///@{
+    virtual FunctorCode VisitSystemAligner(SystemAligner *systemAligner);
+    virtual FunctorCode VisitSystemAlignerEnd(SystemAligner *systemAligner);
+    virtual FunctorCode VisitStaffAlignment(StaffAlignment *staffAlignment);
+    virtual FunctorCode VisitStaffAlignmentEnd(StaffAlignment *staffAlignment);
+    ///@}
+
 private:
     //
 public:
@@ -326,6 +380,20 @@ public:
     virtual FunctorCode VisitSystemEnd(const System *system);
     virtual FunctorCode VisitTuning(const Tuning *tuning);
     virtual FunctorCode VisitTuningEnd(const Tuning *tuning);
+    ///@}
+
+    /**
+     * @name Visit page elements
+     */
+    ///@{
+    virtual FunctorCode VisitMdiv(const Mdiv *mdiv);
+    virtual FunctorCode VisitMdivEnd(const Mdiv *mdiv);
+    virtual FunctorCode VisitPageElement(const PageElement *pageElement);
+    virtual FunctorCode VisitPageElementEnd(const PageElement *pageElement);
+    virtual FunctorCode VisitPageMilestone(const PageMilestoneEnd *pageMilestoneEnd);
+    virtual FunctorCode VisitPageMilestoneEnd(const PageMilestoneEnd *pageMilestoneEnd);
+    virtual FunctorCode VisitScore(const Score *score);
+    virtual FunctorCode VisitScoreEnd(const Score *score);
     ///@}
 
     /**
@@ -422,6 +490,34 @@ public:
     virtual FunctorCode VisitTupletNumEnd(const TupletNum *tupletNum);
     virtual FunctorCode VisitVerse(const Verse *verse);
     virtual FunctorCode VisitVerseEnd(const Verse *verse);
+    ///@}
+
+    /**
+     * @name Visit horizontal aligners
+     */
+    ///@{
+    virtual FunctorCode VisitAlignment(const Alignment *alignment);
+    virtual FunctorCode VisitAlignmentEnd(const Alignment *alignment);
+    virtual FunctorCode VisitAlignmentReference(const AlignmentReference *alignmentReference);
+    virtual FunctorCode VisitAlignmentReferenceEnd(const AlignmentReference *alignmentReference);
+    virtual FunctorCode VisitHorizontalAligner(const HorizontalAligner *horizontalAligner);
+    virtual FunctorCode VisitHorizontalAlignerEnd(const HorizontalAligner *horizontalAligner);
+    virtual FunctorCode VisitMeasureAligner(const MeasureAligner *measureAligner);
+    virtual FunctorCode VisitMeasureAlignerEnd(const MeasureAligner *measureAligner);
+    virtual FunctorCode VisitGraceAligner(const GraceAligner *graceAligner);
+    virtual FunctorCode VisitGraceAlignerEnd(const GraceAligner *graceAligner);
+    virtual FunctorCode VisitTimestampAligner(const TimestampAligner *timestampAligner);
+    virtual FunctorCode VisitTimestampAlignerEnd(const TimestampAligner *timestampAligner);
+    ///@}
+
+    /**
+     * @name Visit vertical aligners
+     */
+    ///@{
+    virtual FunctorCode VisitSystemAligner(const SystemAligner *systemAligner);
+    virtual FunctorCode VisitSystemAlignerEnd(const SystemAligner *systemAligner);
+    virtual FunctorCode VisitStaffAlignment(const StaffAlignment *staffAlignment);
+    virtual FunctorCode VisitStaffAlignmentEnd(const StaffAlignment *staffAlignment);
     ///@}
 
 private:

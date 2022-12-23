@@ -166,16 +166,6 @@ public:
     ///@}
 
     /**
-     * See Object::ScoreDefSetCurrentPage
-     */
-    int ScoreDefSetCurrentPageEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
-    /**
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
     int ApplyPPUFactor(FunctorParams *functorParams) override;
@@ -240,13 +230,13 @@ public:
      * Hold the top scoreDef of the page.
      * The value must be initialized by going through the whole score for finding
      * all the clef or key changes that might occur within the text.
-     * The value is initialized by the Object::ScoreDefSetCurrent functor.
+     * The value is initialized by the ScoreDefSetCurrentFunctor.
      */
     ScoreDef m_drawingScoreDef;
 
     /**
      * @name Pointers to the score at the beginning and end of the page
-     * Set in Page::ScoreDefSetCurrentPageEnd
+     * Set in ScoreDefSetCurrentPageFunctor
      */
     ///@{
     Score *m_score;

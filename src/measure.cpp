@@ -128,10 +128,7 @@ void Measure::Reset()
     this->ResetPointing();
     this->ResetTyped();
 
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
+    this->ResetDrawingScoreDef();
 
     m_timestampAligner.Reset();
     m_xAbs = VRV_UNSET;
@@ -392,10 +389,18 @@ int Measure::GetSectionRestartShift(const Doc *doc) const
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    assert(!m_drawingScoreDef); // We should always call UnscoreDefSetCurrent before
+    assert(!m_drawingScoreDef); // We should always call ResetDrawingScoreDef before
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
+}
+
+void Measure::ResetDrawingScoreDef()
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
 }
 
 std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
@@ -813,37 +818,6 @@ int Measure::SaveEnd(FunctorParams *functorParams)
         return Object::SaveEnd(functorParams);
     else
         return FUNCTOR_CONTINUE;
-}
-
-int Measure::ScoreDefUnsetCurrent(FunctorParams *functorParams)
-{
-    ScoreDefUnsetCurrentParams *params = vrv_params_cast<ScoreDefUnsetCurrentParams *>(functorParams);
-    assert(params);
-
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
-
-    // We also need to remove scoreDef elements in the AlignmentReference objects
-    m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::ScoreDefOptimize(FunctorParams *functorParams)
-{
-    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_doc->GetOptions()->m_condenseTempoPages.GetValue()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    params->m_hasFermata = (this->FindDescendantByType(FERMATA));
-    params->m_hasTempo = (this->FindDescendantByType(TEMPO));
-
-    return FUNCTOR_CONTINUE;
 }
 
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)

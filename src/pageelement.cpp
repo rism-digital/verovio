@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "page.h"
 
@@ -54,6 +55,26 @@ void PageElement::Reset()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode PageElement::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPageElement(this);
+}
+
+FunctorCode PageElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPageElement(this);
+}
+
+FunctorCode PageElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPageElementEnd(this);
+}
+
+FunctorCode PageElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPageElementEnd(this);
+}
 
 int PageElement::CastOffSystems(FunctorParams *functorParams)
 {

@@ -80,16 +80,6 @@ public:
     ///@}
 
     /**
-     * See Object::ReplaceDrawingValuesInStaffDef
-     */
-    int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::SetStaffDefRedrawFlags
-     */
-    int SetStaffDefRedrawFlags(FunctorParams *functorParams) override;
-
-    /**
      * See Object::PrepareDuration
      */
     int PrepareDuration(FunctorParams *functorParams) override;

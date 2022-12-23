@@ -224,6 +224,7 @@ public:
     ScoreDef *GetDrawingScoreDef() { return m_drawingScoreDef; }
     const ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
+    void ResetDrawingScoreDef();
     ///@}
 
     /**
@@ -320,16 +321,6 @@ public:
     int Save(FunctorParams *functorParams) override;
     int SaveEnd(FunctorParams *functorParams) override;
     ///@}
-
-    /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ScoreDefOptimize
-     */
-    int ScoreDefOptimize(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetHorizontalAlignment

@@ -200,16 +200,6 @@ public:
     int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
     /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ScoreDefOptimize
-     */
-    int ScoreDefOptimize(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ResetVerticalAlignment
      */
     int ResetVerticalAlignment(FunctorParams *functorParams) override;

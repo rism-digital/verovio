@@ -48,6 +48,7 @@
 #include "pghead2.h"
 #include "runningelement.h"
 #include "score.h"
+#include "setscoredeffunctor.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -839,8 +840,8 @@ void Doc::PrepareData()
         }
     }
 
-    Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
-    this->GetCurrentScoreDef()->Process(&scoreDefSetGrpSym, NULL);
+    ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
+    this->GetCurrentScoreDef()->Process(scoreDefSetGrpSym);
 
     // LogElapsedTimeEnd ("Preparing drawing");
 
@@ -854,27 +855,21 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     }
 
     if (m_currentScoreDefDone) {
-        Functor scoreDefUnsetCurrent(&Object::ScoreDefUnsetCurrent);
-        ScoreDefUnsetCurrentParams scoreDefUnsetCurrentParams(&scoreDefUnsetCurrent);
-        this->Process(&scoreDefUnsetCurrent, &scoreDefUnsetCurrentParams);
+        ScoreDefUnsetCurrentFunctor scoreDefUnsetCurrent;
+        this->Process(scoreDefUnsetCurrent);
     }
 
     // First we need to set Page::m_score and Page::m_scoreEnd
     // We do it by going BACKWARD, with a depth limit of 3 (we want to hit the Score elements)
-    // The Doc::m_currentScore is set by Object::Process
-    // The Page::m_score in Page::ScoreDefSetCurrentPageEnd
-    Functor scoreDefSetCurrentPage(&Object::ScoreDefSetCurrentPage);
-    Functor scoreDefSetCurrentPageEnd(&Object::ScoreDefSetCurrentPageEnd);
-    FunctorDocParams scoreDefSetCurrentPageParams(this);
-    this->Process(
-        &scoreDefSetCurrentPage, &scoreDefSetCurrentPageParams, &scoreDefSetCurrentPageEnd, NULL, 3, BACKWARD);
+    ScoreDefSetCurrentPageFunctor scoreDefSetCurrentPage(this);
+    scoreDefSetCurrentPage.SetDirection(BACKWARD);
+    this->Process(scoreDefSetCurrentPage, 3);
     // Do it again FORWARD to set Page::m_scoreEnd - relies on Page::m_score not being NULL
-    this->Process(&scoreDefSetCurrentPage, &scoreDefSetCurrentPageParams, &scoreDefSetCurrentPageEnd, NULL, 3, FORWARD);
+    scoreDefSetCurrentPage.SetDirection(FORWARD);
+    this->Process(scoreDefSetCurrentPage, 3);
 
-    // ScoreDef upcomingScoreDef;
-    Functor scoreDefSetCurrent(&Object::ScoreDefSetCurrent);
-    ScoreDefSetCurrentParams scoreDefSetCurrentParams(this, &scoreDefSetCurrent);
-    this->Process(&scoreDefSetCurrent, &scoreDefSetCurrentParams);
+    ScoreDefSetCurrentFunctor scoreDefSetCurrent(this);
+    this->Process(scoreDefSetCurrent);
 
     this->ScoreDefSetGrpSymDoc();
 
@@ -883,11 +878,8 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
 
 void Doc::ScoreDefOptimizeDoc()
 {
-    Functor scoreDefOptimize(&Object::ScoreDefOptimize);
-    Functor scoreDefOptimizeEnd(&Object::ScoreDefOptimizeEnd);
-    ScoreDefOptimizeParams scoreDefOptimizeParams(this, &scoreDefOptimize, &scoreDefOptimizeEnd);
-
-    this->Process(&scoreDefOptimize, &scoreDefOptimizeParams, &scoreDefOptimizeEnd);
+    ScoreDefOptimizeFunctor scoreDefOptimize(this);
+    this->Process(scoreDefOptimize);
 
     this->ScoreDefSetGrpSymDoc();
 }
@@ -896,10 +888,9 @@ void Doc::ScoreDefSetGrpSymDoc()
 {
     // Group symbols need to be resolved using scoreDef, since there might be @starid/@endid attributes that determine
     // their positioning
-    Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
-    // this->GetCurrentScoreDef()->Process(&scoreDefSetGrpSym, NULL);
-    ScoreDefSetGrpSymParams scoreDefSetGrpSymParams(&scoreDefSetGrpSym);
-    this->Process(&scoreDefSetGrpSym, &scoreDefSetGrpSymParams);
+    ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
+    // this->GetCurrentScoreDef()->Process(scoreDefSetGrpSym);
+    this->Process(scoreDefSetGrpSym);
 }
 
 void Doc::CastOffDoc()

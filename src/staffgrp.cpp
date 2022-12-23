@@ -274,41 +274,4 @@ FunctorCode StaffGrp::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitStaffGrpEnd(this);
 }
 
-int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *)
-{
-    this->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
-
-    const Object *instrDef = this->FindDescendantByType(INSTRDEF, 1);
-    if (instrDef) {
-        VisibleStaffDefOrGrpObject visibleStaves;
-        const Object *firstVisible = this->FindDescendantByComparison(&visibleStaves, 1);
-        if (firstVisible) {
-            this->SetEverythingVisible();
-        }
-
-        return FUNCTOR_CONTINUE;
-    }
-
-    for (auto child : this->GetChildren()) {
-        if (child->Is(STAFFDEF)) {
-            StaffDef *staffDef = vrv_cast<StaffDef *>(child);
-            assert(staffDef);
-            if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
-                this->SetDrawingVisibility(OPTIMIZATION_SHOW);
-                break;
-            }
-        }
-        else if (child->Is(STAFFGRP)) {
-            StaffGrp *staffGrp = vrv_cast<StaffGrp *>(child);
-            assert(staffGrp);
-            if (staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
-                this->SetDrawingVisibility(OPTIMIZATION_SHOW);
-                break;
-            }
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

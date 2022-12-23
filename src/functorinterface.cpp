@@ -35,6 +35,7 @@
 #include "layerdef.h"
 #include "layerelement.h"
 #include "ligature.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -49,10 +50,13 @@
 #include "neume.h"
 #include "note.h"
 #include "page.h"
+#include "pageelement.h"
+#include "pagemilestone.h"
 #include "pages.h"
 #include "plica.h"
 #include "proport.h"
 #include "rest.h"
+#include "score.h"
 #include "scoredef.h"
 #include "space.h"
 #include "staff.h"
@@ -253,6 +257,46 @@ FunctorCode FunctorInterface::VisitTuning(Tuning *tuning)
 FunctorCode FunctorInterface::VisitTuningEnd(Tuning *tuning)
 {
     return this->VisitObjectEnd(tuning);
+}
+
+FunctorCode FunctorInterface::VisitMdiv(Mdiv *mdiv)
+{
+    return this->VisitPageElement(mdiv);
+}
+
+FunctorCode FunctorInterface::VisitMdivEnd(Mdiv *mdiv)
+{
+    return this->VisitPageElementEnd(mdiv);
+}
+
+FunctorCode FunctorInterface::VisitPageElement(PageElement *pageElement)
+{
+    return this->VisitObject(pageElement);
+}
+
+FunctorCode FunctorInterface::VisitPageElementEnd(PageElement *pageElement)
+{
+    return this->VisitObjectEnd(pageElement);
+}
+
+FunctorCode FunctorInterface::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
+{
+    return this->VisitPageElement(pageMilestoneEnd);
+}
+
+FunctorCode FunctorInterface::VisitPageMilestoneEnd(PageMilestoneEnd *pageMilestoneEnd)
+{
+    return this->VisitPageElementEnd(pageMilestoneEnd);
+}
+
+FunctorCode FunctorInterface::VisitScore(Score *score)
+{
+    return this->VisitPageElement(score);
+}
+
+FunctorCode FunctorInterface::VisitScoreEnd(Score *score)
+{
+    return this->VisitPageElementEnd(score);
 }
 
 FunctorCode FunctorInterface::VisitAccid(Accid *accid)
@@ -705,6 +749,86 @@ FunctorCode FunctorInterface::VisitVerseEnd(Verse *verse)
     return this->VisitLayerElementEnd(verse);
 }
 
+FunctorCode FunctorInterface::VisitAlignment(Alignment *alignment)
+{
+    return this->VisitObject(alignment);
+}
+
+FunctorCode FunctorInterface::VisitAlignmentEnd(Alignment *alignment)
+{
+    return this->VisitObjectEnd(alignment);
+}
+
+FunctorCode FunctorInterface::VisitAlignmentReference(AlignmentReference *alignmentReference)
+{
+    return this->VisitObject(alignmentReference);
+}
+
+FunctorCode FunctorInterface::VisitAlignmentReferenceEnd(AlignmentReference *alignmentReference)
+{
+    return this->VisitObjectEnd(alignmentReference);
+}
+
+FunctorCode FunctorInterface::VisitHorizontalAligner(HorizontalAligner *horizontalAligner)
+{
+    return this->VisitObject(horizontalAligner);
+}
+
+FunctorCode FunctorInterface::VisitHorizontalAlignerEnd(HorizontalAligner *horizontalAligner)
+{
+    return this->VisitObjectEnd(horizontalAligner);
+}
+
+FunctorCode FunctorInterface::VisitMeasureAligner(MeasureAligner *measureAligner)
+{
+    return this->VisitHorizontalAligner(measureAligner);
+}
+
+FunctorCode FunctorInterface::VisitMeasureAlignerEnd(MeasureAligner *measureAligner)
+{
+    return this->VisitHorizontalAlignerEnd(measureAligner);
+}
+
+FunctorCode FunctorInterface::VisitGraceAligner(GraceAligner *graceAligner)
+{
+    return this->VisitHorizontalAligner(graceAligner);
+}
+
+FunctorCode FunctorInterface::VisitGraceAlignerEnd(GraceAligner *graceAligner)
+{
+    return this->VisitHorizontalAlignerEnd(graceAligner);
+}
+
+FunctorCode FunctorInterface::VisitTimestampAligner(TimestampAligner *timestampAligner)
+{
+    return this->VisitObject(timestampAligner);
+}
+
+FunctorCode FunctorInterface::VisitTimestampAlignerEnd(TimestampAligner *timestampAligner)
+{
+    return this->VisitObjectEnd(timestampAligner);
+}
+
+FunctorCode FunctorInterface::VisitSystemAligner(SystemAligner *systemAligner)
+{
+    return this->VisitObject(systemAligner);
+}
+
+FunctorCode FunctorInterface::VisitSystemAlignerEnd(SystemAligner *systemAligner)
+{
+    return this->VisitObjectEnd(systemAligner);
+}
+
+FunctorCode FunctorInterface::VisitStaffAlignment(StaffAlignment *staffAlignment)
+{
+    return this->VisitObject(staffAlignment);
+}
+
+FunctorCode FunctorInterface::VisitStaffAlignmentEnd(StaffAlignment *staffAlignment)
+{
+    return this->VisitObjectEnd(staffAlignment);
+}
+
 //----------------------------------------------------------------------------
 // ConstFunctorInterface
 //----------------------------------------------------------------------------
@@ -887,6 +1011,46 @@ FunctorCode ConstFunctorInterface::VisitTuning(const Tuning *tuning)
 FunctorCode ConstFunctorInterface::VisitTuningEnd(const Tuning *tuning)
 {
     return this->VisitObjectEnd(tuning);
+}
+
+FunctorCode ConstFunctorInterface::VisitMdiv(const Mdiv *mdiv)
+{
+    return this->VisitPageElement(mdiv);
+}
+
+FunctorCode ConstFunctorInterface::VisitMdivEnd(const Mdiv *mdiv)
+{
+    return this->VisitPageElementEnd(mdiv);
+}
+
+FunctorCode ConstFunctorInterface::VisitPageElement(const PageElement *pageElement)
+{
+    return this->VisitObject(pageElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitPageElementEnd(const PageElement *pageElement)
+{
+    return this->VisitObjectEnd(pageElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitPageMilestone(const PageMilestoneEnd *pageMilestoneEnd)
+{
+    return this->VisitPageElement(pageMilestoneEnd);
+}
+
+FunctorCode ConstFunctorInterface::VisitPageMilestoneEnd(const PageMilestoneEnd *pageMilestoneEnd)
+{
+    return this->VisitPageElementEnd(pageMilestoneEnd);
+}
+
+FunctorCode ConstFunctorInterface::VisitScore(const Score *score)
+{
+    return this->VisitPageElement(score);
+}
+
+FunctorCode ConstFunctorInterface::VisitScoreEnd(const Score *score)
+{
+    return this->VisitPageElementEnd(score);
 }
 
 FunctorCode ConstFunctorInterface::VisitAccid(const Accid *accid)
@@ -1337,6 +1501,86 @@ FunctorCode ConstFunctorInterface::VisitVerse(const Verse *verse)
 FunctorCode ConstFunctorInterface::VisitVerseEnd(const Verse *verse)
 {
     return this->VisitLayerElementEnd(verse);
+}
+
+FunctorCode ConstFunctorInterface::VisitAlignment(const Alignment *alignment)
+{
+    return this->VisitObject(alignment);
+}
+
+FunctorCode ConstFunctorInterface::VisitAlignmentEnd(const Alignment *alignment)
+{
+    return this->VisitObjectEnd(alignment);
+}
+
+FunctorCode ConstFunctorInterface::VisitAlignmentReference(const AlignmentReference *alignmentReference)
+{
+    return this->VisitObject(alignmentReference);
+}
+
+FunctorCode ConstFunctorInterface::VisitAlignmentReferenceEnd(const AlignmentReference *alignmentReference)
+{
+    return this->VisitObjectEnd(alignmentReference);
+}
+
+FunctorCode ConstFunctorInterface::VisitHorizontalAligner(const HorizontalAligner *horizontalAligner)
+{
+    return this->VisitObject(horizontalAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitHorizontalAlignerEnd(const HorizontalAligner *horizontalAligner)
+{
+    return this->VisitObjectEnd(horizontalAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitMeasureAligner(const MeasureAligner *measureAligner)
+{
+    return this->VisitHorizontalAligner(measureAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitMeasureAlignerEnd(const MeasureAligner *measureAligner)
+{
+    return this->VisitHorizontalAlignerEnd(measureAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitGraceAligner(const GraceAligner *graceAligner)
+{
+    return this->VisitHorizontalAligner(graceAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitGraceAlignerEnd(const GraceAligner *graceAligner)
+{
+    return this->VisitHorizontalAlignerEnd(graceAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitTimestampAligner(const TimestampAligner *timestampAligner)
+{
+    return this->VisitObject(timestampAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitTimestampAlignerEnd(const TimestampAligner *timestampAligner)
+{
+    return this->VisitObjectEnd(timestampAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitSystemAligner(const SystemAligner *systemAligner)
+{
+    return this->VisitObject(systemAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitSystemAlignerEnd(const SystemAligner *systemAligner)
+{
+    return this->VisitObjectEnd(systemAligner);
+}
+
+FunctorCode ConstFunctorInterface::VisitStaffAlignment(const StaffAlignment *staffAlignment)
+{
+    return this->VisitObject(staffAlignment);
+}
+
+FunctorCode ConstFunctorInterface::VisitStaffAlignmentEnd(const StaffAlignment *staffAlignment)
+{
+    return this->VisitObjectEnd(staffAlignment);
 }
 
 } // namespace vrv

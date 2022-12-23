@@ -67,10 +67,7 @@ void System::Reset()
     DrawingListInterface::Reset();
     this->ResetTyped();
 
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
+    this->ResetDrawingScoreDef();
 
     m_systemLeftMar = 0;
     m_systemRightMar = 0;
@@ -192,11 +189,19 @@ bool System::SetCurrentFloatingPositioner(
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    assert(!m_drawingScoreDef); // We should always call UnscoreDefSetCurrent before
+    assert(!m_drawingScoreDef); // We should always call ResetDrawingScoreDef before
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
     m_drawingScoreDef->SetParent(this);
+}
+
+void System::ResetDrawingScoreDef()
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
 }
 
 bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElement *end) const
@@ -489,65 +494,6 @@ FunctorCode System::AcceptEnd(MutableFunctor &functor)
 FunctorCode System::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitSystemEnd(this);
-}
-
-int System::ScoreDefUnsetCurrent(FunctorParams *functorParams)
-{
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
-
-    m_drawingIsOptimized = false;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::ScoreDefOptimize(FunctorParams *functorParams)
-{
-    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
-    assert(params);
-
-    this->IsDrawingOptimized(true);
-
-    if (params->m_firstScoreDef) {
-        params->m_firstScoreDef = false;
-        if (!params->m_doc->GetOptions()->m_condenseFirstPage.GetValue()) {
-            return FUNCTOR_SIBLINGS;
-        }
-    }
-
-    if (this->IsLastOfMdiv()) {
-        if (params->m_doc->GetOptions()->m_condenseNotLastSystem.GetValue()) {
-            return FUNCTOR_SIBLINGS;
-        }
-    }
-
-    params->m_currentScoreDef = this->GetDrawingScoreDef();
-    assert(params->m_currentScoreDef);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::ScoreDefOptimizeEnd(FunctorParams *functorParams)
-{
-    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
-    assert(params);
-
-    params->m_currentScoreDef->Process(params->m_functor, params, params->m_functorEnd);
-    m_systemAligner.SetSpacing(params->m_currentScoreDef);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
-{
-    ScoreDefSetGrpSymParams *params = vrv_params_cast<ScoreDefSetGrpSymParams *>(functorParams);
-    assert(params);
-
-    if (m_drawingScoreDef) m_drawingScoreDef->Process(params->m_functor, functorParams);
-
-    return FUNCTOR_CONTINUE;
 }
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)

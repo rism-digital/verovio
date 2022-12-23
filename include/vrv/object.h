@@ -1083,68 +1083,6 @@ public:
     ///@}
 
     /**
-     * @name Functors setting the current scoreDef.
-     */
-    ///@{
-
-    /**
-     * Replace the drawing values a staffDef.
-     * Set the current / drawing clef, key signature, etc. to the StaffDef
-     * Called form ScoreDef::ReplaceDrawingValues.
-     */
-    virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Set the Page::m_score and Page::m_scoreEnd pointers
-     * Always set a the end of Page (both in BACKWARD and FORWARD directions)
-     */
-    virtual int ScoreDefSetCurrentPage(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ScoreDefSetCurrentPage
-     */
-    virtual int ScoreDefSetCurrentPageEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Set the current scoreDef wherever need.
-     * This is include a scoreDef for each system.
-     * It also includes a scoreDef for each measure where a change occured before.
-     * A change can be either a scoreDef before or a clef, meterSig, etc. within the previous measure.
-     */
-    virtual int ScoreDefSetCurrent(FunctorParams *functorParams);
-
-    /**
-     * Optimize the scoreDef for each system.
-     * For automatic breaks, looks for staves with only mRests.
-     */
-    virtual int ScoreDefOptimize(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ScoreDefOptimize
-     */
-    virtual int ScoreDefOptimizeEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Set the cautionnary scoreDef wherever need.
-     */
-    virtual int SetCautionaryScoreDef(FunctorParams *functorParams);
-
-    /**
-     * Unset the initial scoreDef of each system and measure
-     */
-    virtual int ScoreDefUnsetCurrent(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
-     * to be redrawn.
-     * This typically occurs when a new System or a new  ScoreDef is encountered.
-     * See implementation and Object::SetStaffDefRedrawFlags for the parameters.
-     */
-    virtual int SetStaffDefRedrawFlags(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    ///@}
-
-    /**
      * @name Functors for preparing the data.
      */
     ///@{
@@ -1168,12 +1106,6 @@ public:
      * End Functor for Object::PrepareCrossStaff
      */
     virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Prepare group symbol starting and ending staffDefs for drawing
-     * TODO called outside Doc::PrepareData - should maybe be moved to ScoreDef related functors
-     */
-    virtual int ScoreDefSetGrpSym(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Associate LayerElement with @facs to the appropriate zone
