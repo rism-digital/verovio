@@ -201,7 +201,7 @@ public:
 
     /**
      * Special method for forcing bounding boxes to be updated
-     * Used for invisible elements (e.g. <space>) that needs to be take into account in spacing
+     * Used for invisible elements (e.g., <space>) that needs to be take into account in spacing
      */
     virtual void DrawPlaceholder(int x, int y){};
 

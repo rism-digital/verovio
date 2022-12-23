@@ -164,7 +164,7 @@ public:
     /**
      * @name Methods for managing verse count with / without the collapse option
      * When setting a value of 0, then 1 is assumed. This occurs
-     * Typically with one single verse and no @n in <verse>
+     * Typically with one single verse and no \@n in <verse>
      * Without the collapse option, the count is the greatest @n
      * With the collapse option, the count is number of verses.
      * The position is calculated from the bottom.
@@ -205,7 +205,7 @@ public:
 
     /**
      * @name Setter and getter of the staff from which the alignment is created alignment.
-     * Used for accessing the staff @n, the size, etc.
+     * Used for accessing the staff \@n, the size, etc.
      */
     ///@{
     Staff *GetStaff() { return m_staff; }
@@ -418,7 +418,7 @@ private:
     ///@}
 
     /**
-     * The list of overflowing bounding boxes (e.g, LayerElement or FloatingPositioner)
+     * The list of overflowing bounding boxes (e.g., LayerElement or FloatingPositioner)
      */
     std::vector<BoundingBox *> m_overflowAboveBBoxes;
     std::vector<BoundingBox *> m_overflowBelowBBoxes;
