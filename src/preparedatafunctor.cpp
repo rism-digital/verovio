@@ -14,6 +14,7 @@
 #include "layer.h"
 #include "runningelement.h"
 #include "score.h"
+#include "staff.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -157,16 +158,129 @@ PrepareCrossStaffFunctor::PrepareCrossStaffFunctor()
 
 FunctorCode PrepareCrossStaffFunctor::VisitLayerElement(LayerElement *layerElement)
 {
+    if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    layerElement->m_crossStaff = NULL;
+    layerElement->m_crossLayer = NULL;
+
+    // Look for cross-staff situations
+    // If we have one, make it available in m_crossStaff
+    AttStaffIdent *crossElement = dynamic_cast<AttStaffIdent *>(layerElement);
+    if (!crossElement) return FUNCTOR_CONTINUE;
+
+    // If we have not @staff, set to what we had before (quite likely NULL for all non cross staff cases)
+    if (!crossElement->HasStaff()) {
+        layerElement->m_crossStaff = m_currentCrossStaff;
+        layerElement->m_crossLayer = m_currentCrossLayer;
+        return FUNCTOR_CONTINUE;
+    }
+
+    // We have a @staff, set the current pointers to NULL before assigning them
+    m_currentCrossStaff = NULL;
+    m_currentCrossLayer = NULL;
+
+    AttNIntegerComparison comparisonFirst(STAFF, crossElement->GetStaff().at(0));
+    layerElement->m_crossStaff
+        = dynamic_cast<Staff *>(m_currentMeasure->FindDescendantByComparison(&comparisonFirst, 1));
+    if (!layerElement->m_crossStaff) {
+        LogWarning("Could not get the cross staff reference '%d' for element '%s'", crossElement->GetStaff().at(0),
+            layerElement->GetID().c_str());
+        return FUNCTOR_CONTINUE;
+    }
+
+    Staff *parentStaff = layerElement->GetAncestorStaff();
+    // Check if we have a cross-staff to itself...
+    if (layerElement->m_crossStaff == parentStaff) {
+        LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff",
+            crossElement->GetStaff().at(0), layerElement->GetID().c_str());
+        layerElement->m_crossStaff = NULL;
+        return FUNCTOR_CONTINUE;
+    }
+
+    Layer *parentLayer = vrv_cast<Layer *>(layerElement->GetFirstAncestor(LAYER));
+    assert(parentLayer);
+    // Now try to get the corresponding layer - for now look for the same layer @n
+    int layerN = parentLayer->GetN();
+    // When we will have allowed @layer in <note>, we will have to do:
+    // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
+    AttNIntegerComparison comparisonFirstLayer(LAYER, layerN);
+    bool direction = (parentStaff->GetN() < layerElement->m_crossStaff->GetN()) ? FORWARD : BACKWARD;
+    layerElement->m_crossLayer
+        = dynamic_cast<Layer *>(layerElement->m_crossStaff->FindDescendantByComparison(&comparisonFirstLayer, 1));
+    if (!layerElement->m_crossLayer) {
+        // Just try to pick the first one... (i.e., last one when crossing above)
+        layerElement->m_crossLayer
+            = dynamic_cast<Layer *>(layerElement->m_crossStaff->FindDescendantByType(LAYER, UNSPECIFIED, direction));
+    }
+    if (!layerElement->m_crossLayer) {
+        // Nothing we can do
+        LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
+            crossElement->GetStaff().at(0), layerElement->GetID().c_str());
+        layerElement->m_crossStaff = NULL;
+    }
+
+    if (direction == FORWARD) {
+        layerElement->m_crossLayer->SetCrossStaffFromAbove(true);
+    }
+    else {
+        layerElement->m_crossLayer->SetCrossStaffFromBelow(true);
+    }
+
+    m_currentCrossStaff = layerElement->m_crossStaff;
+    m_currentCrossLayer = layerElement->m_crossLayer;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareCrossStaffFunctor::VisitLayerElementEnd(LayerElement *layerElement)
 {
+    if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    DurationInterface *durInterface = layerElement->GetDurationInterface();
+    if (durInterface) {
+        // If we have @staff, reset it to NULL - this can be problematic if we have different @staff attributes
+        // in the children of one element. We do not consider this now because it seems over the top
+        // We would need to look at the @n attribute and to have a stack to handle this properly
+        if (durInterface->HasStaff()) {
+            m_currentCrossStaff = NULL;
+            m_currentCrossLayer = NULL;
+        }
+    }
+    else if (layerElement->Is({ BEAM, BTREM, FTREM, TUPLET })) {
+        // For other elements (e.g., beams, tuplets) check if all their child duration elements are cross-staff
+        // If yes, make them cross-staff themselves.
+        ListOfObjects durations;
+        InterfaceComparison hasInterface(INTERFACE_DURATION);
+        layerElement->FindAllDescendantsByComparison(&durations, &hasInterface);
+        Staff *crossStaff = NULL;
+        Layer *crossLayer = NULL;
+        for (auto object : durations) {
+            LayerElement *durElement = vrv_cast<LayerElement *>(object);
+            assert(durElement);
+            // The duration element is not cross-staff or the cross-staff is not the same staff (very rare)
+            if (!durElement->m_crossStaff || (crossStaff && (durElement->m_crossStaff != crossStaff))) {
+                crossStaff = NULL;
+                // We can stop here
+                break;
+            }
+            else {
+                crossStaff = durElement->m_crossStaff;
+                crossLayer = durElement->m_crossLayer;
+            }
+        }
+        if (crossStaff) {
+            layerElement->m_crossStaff = crossStaff;
+            layerElement->m_crossLayer = crossLayer;
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareCrossStaffFunctor::VisitMeasure(Measure *measure)
 {
+    m_currentMeasure = measure;
+
     return FUNCTOR_CONTINUE;
 }
 
