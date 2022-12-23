@@ -1374,16 +1374,6 @@ int Measure::PrepareMilestones(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareCrossStaff(FunctorParams *functorParams)
-{
-    PrepareCrossStaffParams *params = vrv_params_cast<PrepareCrossStaffParams *>(functorParams);
-    assert(params);
-
-    params->m_currentMeasure = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::PrepareFloatingGrps(FunctorParams *functorParams)
 {
     PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);

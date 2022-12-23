@@ -434,11 +434,6 @@ public:
     int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareCrossStaff
-     */
-    int PrepareCrossStaff(FunctorParams *functorParams) override;
-
-    /**
      * @name See Object::PrepareFloatingGrps
      */
     ///@{

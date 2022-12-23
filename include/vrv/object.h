@@ -1091,16 +1091,6 @@ public:
     ///@{
 
     /**
-     * See cross-staff / layer pointers on LayerElement
-     */
-    virtual int PrepareCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::PrepareCrossStaff
-     */
-    virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Match @altsym element to the corresponding symbolDef.
      */
     virtual int PrepareAltSym(FunctorParams *functorParams);

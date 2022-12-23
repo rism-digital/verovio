@@ -385,14 +385,6 @@ public:
     int AdjustXRelForTranscription(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareCrossStaff
-     */
-    ///@{
-    int PrepareCrossStaff(FunctorParams *functorParams) override;
-    int PrepareCrossStaffEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::PreparePointersByLayer
      */
     int PreparePointersByLayer(FunctorParams *functorParams) override;
@@ -529,7 +521,7 @@ public:
     int m_xAbs;
     /**
      * This stores a pointer to the cross-staff (if any) and the appropriate layer
-     * See Object::PrepareCrossStaff
+     * See PrepareCrossStaffFunctor
      */
     Staff *m_crossStaff;
     Layer *m_crossLayer;

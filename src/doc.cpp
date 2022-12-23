@@ -625,10 +625,8 @@ void Doc::PrepareData()
     /************ Resolve cross staff ************/
 
     // Prepare the cross-staff pointers
-    PrepareCrossStaffParams prepareCrossStaffParams;
-    Functor prepareCrossStaff(&Object::PrepareCrossStaff);
-    Functor prepareCrossStaffEnd(&Object::PrepareCrossStaffEnd);
-    this->Process(&prepareCrossStaff, &prepareCrossStaffParams, &prepareCrossStaffEnd);
+    PrepareCrossStaffFunctor prepareCrossStaff;
+    this->Process(prepareCrossStaff);
 
     /************ Resolve beamspan elements ***********/
 
