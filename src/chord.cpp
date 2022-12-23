@@ -607,6 +607,7 @@ int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
     if (this->HasFermata()) {
         Fermata *fermata = new Fermata();
         fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
+        delete fermata;
     }
 
     return FUNCTOR_CONTINUE;
