@@ -10117,9 +10117,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     hum::HumNum ndur = layerdata[i + 1]->getDurationFromStart() - layerdata[i]->getDurationFromStart();
                     hum::HumNum remainingDur = dur - ndur;
 
-                    if ((ndur < dur)
-                            && isExpressibleDuration(ndur)
-                            && isExpressibleDuration(remainingDur)) {
+                    if ((ndur < dur) && isExpressibleDuration(ndur) && isExpressibleDuration(remainingDur)) {
                         // create a split invisible rest so that an intervening clef
                         // can be positioned properly.
                         // split the space into two pieces, this is the firsthalf.
@@ -10177,9 +10175,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     hum::HumNum ndur = layerdata[i + 1]->getDurationFromStart() - layerdata[i]->getDurationFromStart();
                     hum::HumNum remainingDur = dur - ndur;
 
-                    if ((ndur < dur)
-                            && isExpressibleDuration(ndur)
-                            && isExpressibleDuration(remainingDur)) {
+                    if ((ndur < dur) && isExpressibleDuration(ndur) && isExpressibleDuration(remainingDur)) {
                         // Create a split rest so that an intervening clef
                         // can be positioned properly.  There will be two
                         // pieces: first: this original rest, with the visual
@@ -10471,16 +10467,21 @@ bool HumdrumInput::isExpressibleDuration(hum::HumNum duration)
 
     if (dur.getDenominator() == 1) {
         if (dur.getNumerator() == 2) {
-            return true;  // breve
-        } else if (dur.getNumerator() == 3) {
+            return true; // breve
+        }
+        else if (dur.getNumerator() == 3) {
             return true; // dotted breve
-        } else if (dur.getNumerator() == 4) {
-            return true;  // long
-        } else if (dur.getNumerator() == 6) {
+        }
+        else if (dur.getNumerator() == 4) {
+            return true; // long
+        }
+        else if (dur.getNumerator() == 6) {
             return true; // dotted long
-        } else if (dur.getNumerator() == 8) {
-            return true;  // maxima
-        } else if (dur.getNumerator() == 12) {
+        }
+        else if (dur.getNumerator() == 8) {
+            return true; // maxima
+        }
+        else if (dur.getNumerator() == 12) {
             return true; // dotted maxima
         }
     }
@@ -10518,10 +10519,10 @@ bool HumdrumInput::isExpressibleDuration(hum::HumNum duration)
 
     // duration required more than three dots or is not 1/2**n at all.
     return false;
-
 }
 
-data_DURATION HumdrumInput::oneOverDenominatorToDur(int denominator) {
+data_DURATION HumdrumInput::oneOverDenominatorToDur(int denominator)
+{
     switch (denominator) {
         case 1: return DURATION_1;
         case 2: return DURATION_2;
@@ -10559,23 +10560,28 @@ pair<data_DURATION, int> HumdrumInput::getDurAndDots(hum::HumNum duration)
             output.first = DURATION_breve;
             output.second = 0;
             return output; // breve
-        } else if (dur.getNumerator() == 3) {
+        }
+        else if (dur.getNumerator() == 3) {
             output.first = DURATION_breve;
             output.second = 1;
             return output; // dotted breve
-        } else if (dur.getNumerator() == 4) {
+        }
+        else if (dur.getNumerator() == 4) {
             output.first = DURATION_long;
             output.second = 0;
-            return output;  // long
-        } else if (dur.getNumerator() == 6) {
+            return output; // long
+        }
+        else if (dur.getNumerator() == 6) {
             output.first = DURATION_long;
             output.second = 1;
             return output; // dotted long
-        } else if (dur.getNumerator() == 8) {
+        }
+        else if (dur.getNumerator() == 8) {
             output.first = DURATION_maxima;
             output.second = 0;
-            return output;  // maxima
-        } else if (dur.getNumerator() == 12) {
+            return output; // maxima
+        }
+        else if (dur.getNumerator() == 12) {
             output.first = DURATION_maxima;
             output.second = 1;
             return output; // dotted maxima
@@ -10625,7 +10631,6 @@ pair<data_DURATION, int> HumdrumInput::getDurAndDots(hum::HumNum duration)
     output.first = DURATION_NONE;
     output.second = 0;
     return output;
-
 }
 
 //////////////////////////////
@@ -22681,7 +22686,8 @@ template <class ELEMENT> void HumdrumInput::setRhythmFromDuration(ELEMENT elemen
 // HumdrumInput::setVisualAndGesturalRhythmFromDuration --
 //
 
-template <class ELEMENT> void HumdrumInput::setVisualAndGesturalRhythmFromDuration(ELEMENT element, hum::HumNum visdur, hum::HumNum gesdur)
+template <class ELEMENT>
+void HumdrumInput::setVisualAndGesturalRhythmFromDuration(ELEMENT element, hum::HumNum visdur, hum::HumNum gesdur)
 {
     pair<data_DURATION, int> visDurAndDots = getDurAndDots(visdur);
     element->SetDur(visDurAndDots.first);

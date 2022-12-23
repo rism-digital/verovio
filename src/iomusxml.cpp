@@ -1868,9 +1868,14 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
             }
         }
         else if (endingType == "stop" || endingType == "discontinue") {
-            m_endingStack.back().second.m_endingType = endingType;
-            if (NotInEndingStack(measure->GetN())) {
-                m_endingStack.back().first.push_back(measure);
+            if (m_endingStack.empty()) {
+                LogWarning("MusicXML import: Dangling ending tag skipped");
+            }
+            else {
+                m_endingStack.back().second.m_endingType = endingType;
+                if (NotInEndingStack(measure->GetN())) {
+                    m_endingStack.back().first.push_back(measure);
+                }
             }
         }
     }
