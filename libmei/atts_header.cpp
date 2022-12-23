@@ -27,6 +27,50 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AttAdlibitum
+//----------------------------------------------------------------------------
+
+AttAdlibitum::AttAdlibitum() : Att()
+{
+    ResetAdlibitum();
+}
+
+AttAdlibitum::~AttAdlibitum() {}
+
+void AttAdlibitum::ResetAdlibitum()
+{
+    m_adlib = BOOLEAN_NONE;
+}
+
+bool AttAdlibitum::ReadAdlibitum(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("adlib")) {
+        this->SetAdlib(StrToBoolean(element.attribute("adlib").value()));
+        element.remove_attribute("adlib");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttAdlibitum::WriteAdlibitum(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasAdlib()) {
+        element.append_attribute("adlib") = BooleanToStr(this->GetAdlib()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttAdlibitum::HasAdlib() const
+{
+    return (m_adlib != BOOLEAN_NONE);
+}
+
+/* include <attadlib> */
+
+//----------------------------------------------------------------------------
 // AttBifoliumSurfaces
 //----------------------------------------------------------------------------
 
@@ -175,6 +219,94 @@ bool AttFoliumSurfaces::HasVerso() const
 /* include <attverso> */
 
 //----------------------------------------------------------------------------
+// AttPerfRes
+//----------------------------------------------------------------------------
+
+AttPerfRes::AttPerfRes() : Att()
+{
+    ResetPerfRes();
+}
+
+AttPerfRes::~AttPerfRes() {}
+
+void AttPerfRes::ResetPerfRes()
+{
+    m_solo = BOOLEAN_NONE;
+}
+
+bool AttPerfRes::ReadPerfRes(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("solo")) {
+        this->SetSolo(StrToBoolean(element.attribute("solo").value()));
+        element.remove_attribute("solo");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttPerfRes::WritePerfRes(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasSolo()) {
+        element.append_attribute("solo") = BooleanToStr(this->GetSolo()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttPerfRes::HasSolo() const
+{
+    return (m_solo != BOOLEAN_NONE);
+}
+
+/* include <attsolo> */
+
+//----------------------------------------------------------------------------
+// AttPerfResBasic
+//----------------------------------------------------------------------------
+
+AttPerfResBasic::AttPerfResBasic() : Att()
+{
+    ResetPerfResBasic();
+}
+
+AttPerfResBasic::~AttPerfResBasic() {}
+
+void AttPerfResBasic::ResetPerfResBasic()
+{
+    m_count = VRV_UNSET;
+}
+
+bool AttPerfResBasic::ReadPerfResBasic(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("count")) {
+        this->SetCount(StrToInt(element.attribute("count").value()));
+        element.remove_attribute("count");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttPerfResBasic::WritePerfResBasic(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasCount()) {
+        element.append_attribute("count") = IntToStr(this->GetCount()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttPerfResBasic::HasCount() const
+{
+    return (m_count != VRV_UNSET);
+}
+
+/* include <attcount> */
+
+//----------------------------------------------------------------------------
 // AttRecordType
 //----------------------------------------------------------------------------
 
@@ -264,6 +396,14 @@ bool AttRegularMethod::HasMethod() const
 
 bool Att::SetHeader(Object *element, const std::string &attrType, const std::string &attrValue)
 {
+    if (element->HasAttClass(ATT_ADLIBITUM)) {
+        AttAdlibitum *att = dynamic_cast<AttAdlibitum *>(element);
+        assert(att);
+        if (attrType == "adlib") {
+            att->SetAdlib(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_BIFOLIUMSURFACES)) {
         AttBifoliumSurfaces *att = dynamic_cast<AttBifoliumSurfaces *>(element);
         assert(att);
@@ -296,6 +436,22 @@ bool Att::SetHeader(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
+    if (element->HasAttClass(ATT_PERFRES)) {
+        AttPerfRes *att = dynamic_cast<AttPerfRes *>(element);
+        assert(att);
+        if (attrType == "solo") {
+            att->SetSolo(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_PERFRESBASIC)) {
+        AttPerfResBasic *att = dynamic_cast<AttPerfResBasic *>(element);
+        assert(att);
+        if (attrType == "count") {
+            att->SetCount(att->StrToInt(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_RECORDTYPE)) {
         AttRecordType *att = dynamic_cast<AttRecordType *>(element);
         assert(att);
@@ -318,6 +474,13 @@ bool Att::SetHeader(Object *element, const std::string &attrType, const std::str
 
 void Att::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
 {
+    if (element->HasAttClass(ATT_ADLIBITUM)) {
+        const AttAdlibitum *att = dynamic_cast<const AttAdlibitum *>(element);
+        assert(att);
+        if (att->HasAdlib()) {
+            attributes->push_back({ "adlib", att->BooleanToStr(att->GetAdlib()) });
+        }
+    }
     if (element->HasAttClass(ATT_BIFOLIUMSURFACES)) {
         const AttBifoliumSurfaces *att = dynamic_cast<const AttBifoliumSurfaces *>(element);
         assert(att);
@@ -342,6 +505,20 @@ void Att::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasVerso()) {
             attributes->push_back({ "verso", att->StrToStr(att->GetVerso()) });
+        }
+    }
+    if (element->HasAttClass(ATT_PERFRES)) {
+        const AttPerfRes *att = dynamic_cast<const AttPerfRes *>(element);
+        assert(att);
+        if (att->HasSolo()) {
+            attributes->push_back({ "solo", att->BooleanToStr(att->GetSolo()) });
+        }
+    }
+    if (element->HasAttClass(ATT_PERFRESBASIC)) {
+        const AttPerfResBasic *att = dynamic_cast<const AttPerfResBasic *>(element);
+        assert(att);
+        if (att->HasCount()) {
+            attributes->push_back({ "count", att->IntToStr(att->GetCount()) });
         }
     }
     if (element->HasAttClass(ATT_RECORDTYPE)) {
