@@ -1,6 +1,7 @@
 #ifndef all_h
 #define all_h
 #import <VerovioFramework/beam.h>
+#import <VerovioFramework/altsyminterface.h>
 #import <VerovioFramework/timeinterface.h>
 #import <VerovioFramework/chord.h>
 #import <VerovioFramework/pghead2.h>
@@ -45,6 +46,7 @@
 #import <VerovioFramework/text.h>
 #import <VerovioFramework/space.h>
 #import <VerovioFramework/vrv.h>
+#import <VerovioFramework/ornam.h>
 #import <VerovioFramework/sb.h>
 #import <VerovioFramework/clef.h>
 #import <VerovioFramework/layerdef.h>
@@ -108,6 +110,8 @@
 #import <VerovioFramework/facsimileinterface.h>
 #import <VerovioFramework/layerelement.h>
 #import <VerovioFramework/accid.h>
+#import <VerovioFramework/symboltable.h>
+#import <VerovioFramework/symboldef.h>
 #import <VerovioFramework/controlelement.h>
 #import <VerovioFramework/octave.h>
 #import <VerovioFramework/iomusxml.h>
