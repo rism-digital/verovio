@@ -1,6 +1,17 @@
 # Changelog
 
 ## [unreleased]
+* Support for `incip` with MEI and PAE format (with --incip option)
+* Support for single-line Plaine and Easie input
+* Support for `@extender` lines on `tempo` (@eNote-GmBH)
+* Option --unit changed to double
+
+## [3.13.1] - 2022-11-28
+* Fix text music font always falling back to Leipzig
+* Fix missing JSON handling for some methods in the Python binding
+* Fix text size percent not being reset in sibling text elements
+
+## [3.13.0] - 2022-11-23
 * Refactoring of the JSON parameters and returned values as dictionaries for the Python binding
 * Support for text font fallback when a glyph is missing in the selected font
 * Support for Plaine and Easie gross and refined contour feature extraction
@@ -10,8 +21,9 @@
 * Support for heavy barlines (@eNote-GmBH)
 * Support for log level selection (warning by default)
 * Support for controlling log in the JS toolkit (@WolfgangDrescher)
-* Option --smuflTextFont for for controlling text font embedding or linking CSS fonts
+* Option --smuflTextFont for controlling text font embedding or linking CSS fonts
 * Option --lyricElision for selecting elision glyph (regular, wide, narrow or unicde)
+* Option --log-level (-l) for controlling the log level from the command-line tool
 * Method getOption(bool) split as getOptions() and getDefaultOptions()
 * Fixes in the PAE importer (@carlolic)
 

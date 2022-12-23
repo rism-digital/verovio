@@ -70,7 +70,7 @@ void View::DrawTextString(DeviceContext *dc, const std::u32string &str, TextDraw
 void View::DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params)
 {
     assert(dc);
-    assert(dc->GetFont());
+    assert(dc->HasFont());
 
     std::u32string convertedStr = str;
     // If the current font is a music font, we want to convert Music Unicode glyph to SMuFL
@@ -85,6 +85,7 @@ void View::DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawi
 void View::DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params, Rend *rend)
 {
     assert(dc);
+    assert(dc->HasFont());
 
     const bool singleGlyphs = m_doc->GetOptions()->m_dynamSingleGlyphs.GetValue();
 
@@ -147,6 +148,7 @@ void View::DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDra
 void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDrawingParams &params)
 {
     assert(dc);
+    assert(dc->HasFont());
 
     int toDcX = ToDeviceContextX(params.m_x);
     int toDcY = ToDeviceContextY(params.m_y);
@@ -256,6 +258,7 @@ void View::DrawLyricString(
     DeviceContext *dc, const std::u32string &str, int staffSize, std::optional<TextDrawingParams> params)
 {
     assert(dc);
+    assert(dc->HasFont());
 
     bool wroteText = false;
     std::u32string syl = U"";
@@ -307,6 +310,7 @@ void View::DrawLyricString(
 void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
 {
     assert(dc);
+    assert(dc->HasFont());
     assert(lb);
 
     dc->StartTextGraphic(lb, "", lb->GetID());
@@ -395,7 +399,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
     if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
         // Because we do not have the string at this stage we rely only on the selected font
         // This means fallback will not work for missing glyphs within <rend>
-        rendFont.SetSmuflWithFallback(SMUFL_FONT_SELECTED);
+        rendFont.SetSmuflWithFallback(false);
         rendFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
         int pointSize = (rendFont.GetPointSize() != 0) ? rendFont.GetPointSize() : params.m_pointSize;
         rendFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
@@ -414,7 +418,6 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     int yShift = 0;
     if ((rend->GetRend() == TEXTRENDITION_sup) || (rend->GetRend() == TEXTRENDITION_sub)) {
-        assert(dc->GetFont());
         int MHeight = m_doc->GetTextGlyphHeight('M', dc->GetFont(), false);
         if (rend->GetRend() == TEXTRENDITION_sup) {
             yShift += m_doc->GetTextGlyphHeight('o', dc->GetFont(), false);
@@ -450,7 +453,13 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         params.m_enclose = rend->GetRend();
     }
 
-    if (customFont) dc->ResetFont();
+    if (customFont) {
+        dc->ResetFont();
+        // Reset the point size not to have it cummulated
+        assert(dc->HasFont());
+        params.m_pointSize = dc->GetFont()->GetPointSize();
+        // Possilbe corner case: maybe we also need to reset text enclosure here?
+    }
 
     dc->EndTextGraphic(rend, this);
 }
@@ -458,6 +467,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 {
     assert(dc);
+    assert(dc->HasFont());
     assert(text);
 
     const Resources *resources = dc->GetResources();
@@ -502,6 +512,8 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     }
 
     params.m_actualWidth = text->GetContentRight();
+
+    resources->SelectTextFont(FONTWEIGHT_NONE, FONTSTYLE_NONE);
 
     dc->EndTextGraphic(text, this);
 }

@@ -62,6 +62,7 @@
 #include "halfmrpt.h"
 #include "harm.h"
 #include "instrdef.h"
+#include "iopae.h"
 #include "keyaccid.h"
 #include "keysig.h"
 #include "label.h"
@@ -2165,7 +2166,8 @@ void MEIOutput::WriteTempo(pugi::xml_node currentNode, Tempo *tempo)
 
     this->WriteControlElement(currentNode, tempo);
     this->WriteTextDirInterface(currentNode, tempo);
-    this->WriteTimePointInterface(currentNode, tempo);
+    this->WriteTimeSpanningInterface(currentNode, tempo);
+    tempo->WriteExtender(currentNode);
     tempo->WriteLang(currentNode);
     tempo->WriteMidiTempo(currentNode);
     tempo->WriteMmTempo(currentNode);
@@ -3711,6 +3713,10 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     pugi::xml_node pages;
     pugi::xml_node back;
 
+    if (m_doc->GetOptions()->m_incip.GetValue()) {
+        return ReadIncipits(m_doc->m_header);
+    }
+
     if (std::string(root.name()) == "music") {
         music = root;
     }
@@ -3832,6 +3838,73 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
             LogWarning("No scoreDef provided, trying to generate one...");
             success = m_doc->GenerateDocumentScoreDef();
         }
+    }
+
+    return success;
+}
+
+bool MEIInput::ReadIncipits(pugi::xml_node root)
+{
+    pugi::xpath_node_set incipSet = root.select_nodes(".//incip");
+    if (incipSet.size() == 0) {
+        LogError("No <incip> element found in the MEI data");
+        return false;
+    }
+
+    int incipCount = 0;
+    bool success = true;
+
+    for (auto &incipItem : incipSet) {
+        if (!success) break;
+        pugi::xml_node incip = incipItem.node();
+        pugi::xml_node incipCode = incip.child("incipCode");
+        if (!incipCode.empty()) {
+            std::string form = incipCode.attribute("form") ? incipCode.attribute("form").value() : "";
+            if (form != "plaineAndEasie" && form != "pae") {
+                // We do not consider it an error if the format is not supported
+                LogWarning("Incipit format in <incipCode> is not a supported format and will be skipped.");
+                // The incipit will not be removed from the header
+                continue;
+            }
+            Doc incipitDoc;
+            PAEInput paeInput(&incipitDoc);
+            paeInput.SetScoreBased(true);
+            std::string paeCode = incipCode.text().as_string();
+            paeCode.erase(paeCode.begin(),
+                std::find_if(paeCode.begin(), paeCode.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+            paeInput.Import(paeCode);
+            Mdiv *mdiv = vrv_cast<Mdiv *>(incipitDoc.DetachChild(0));
+            if (!mdiv) {
+                // We do consider it an error if reading the PAE failed
+                LogError("Reading the Plaine and Easie incipit failed.");
+                success = false;
+                continue;
+            }
+            m_doc->AddChild(mdiv);
+        }
+        else if (std::string(incip.first_child().name()) != "score") {
+            LogWarning("Only <incip> with a <score> first child can be read.");
+            // The incipit will not be removed from the header
+            continue;
+        }
+        else {
+            Mdiv *mdiv = new Mdiv();
+            mdiv->MakeVisible();
+            m_doc->AddChild(mdiv);
+            success = this->ReadMdivChildren(mdiv, incip, true);
+        }
+        // Remove it from the header
+        if (success) {
+            incipCount++;
+            incip.parent().remove_child(incip);
+        }
+    }
+    // If no incipit has been read, then the input fails
+    if (incipCount == 0) success = false;
+
+    if (success) {
+        m_doc->ConvertToPageBasedDoc();
+        m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
     }
 
     return success;
@@ -5590,7 +5663,8 @@ bool MEIInput::ReadTempo(Object *parent, pugi::xml_node tempo)
     this->ReadControlElement(tempo, vrvTempo);
 
     this->ReadTextDirInterface(tempo, vrvTempo);
-    this->ReadTimePointInterface(tempo, vrvTempo);
+    this->ReadTimeSpanningInterface(tempo, vrvTempo);
+    vrvTempo->ReadExtender(tempo);
     vrvTempo->ReadLang(tempo);
     vrvTempo->ReadMidiTempo(tempo);
     vrvTempo->ReadMmTempo(tempo);
