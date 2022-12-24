@@ -12,6 +12,8 @@
 
 namespace vrv {
 
+class SymbolTable;
+
 //----------------------------------------------------------------------------
 // PrepareDataInitializationFunctor
 //----------------------------------------------------------------------------
@@ -138,6 +140,46 @@ private:
     Staff *m_currentCrossStaff;
     // The current cross layer
     Layer *m_currentCrossLayer;
+};
+
+//----------------------------------------------------------------------------
+// PrepareAltSymFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class matches the @altsym element to the corresponding symbolDef.
+ */
+class PrepareAltSymFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareAltSymFunctor();
+    virtual ~PrepareAltSymFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The SymbolTable in the current scoreDef
+    SymbolTable *m_symbolTable;
 };
 
 } // namespace vrv

@@ -285,4 +285,18 @@ FunctorCode PrepareCrossStaffFunctor::VisitMeasure(Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareAltSymFunctor
+//----------------------------------------------------------------------------
+
+PrepareAltSymFunctor::PrepareAltSymFunctor()
+{
+    m_symbolTable = NULL;
+}
+
+FunctorCode PrepareAltSymFunctor::VisitObject(Object *object)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
