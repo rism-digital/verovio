@@ -6499,6 +6499,13 @@ void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cl
         vrvclef->SetDis(OCTAVE_DIS_8);
         vrvclef->SetDisPlace(STAFFREL_basic_above);
     }
+
+    checkForClefStyling(cleftok, vrvclef);
+
+    // dummy hierarchy tracking variables:
+    std::vector<std::string> elements;
+    std::vector<void *> pointers;
+    setClefColorOrEditorial(cleftok, vrvclef, elements, pointers, false);
 }
 
 //////////////////////////////
@@ -17600,8 +17607,6 @@ void HumdrumInput::setRepeatSlashes(BeatRpt *repeat, std::vector<hum::HTp> &toke
 Clef *HumdrumInput::insertClefElement(
     std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HTp token, hum::HTp lastnote)
 {
-    bool iseditorial = getBooleanParameter(token, "CL", "ed");
-    std::string color = getStringParameter(token, "CL", "color");
     Clef *clef = new Clef();
 
     bool sameas = false;
@@ -17624,24 +17629,7 @@ Clef *HumdrumInput::insertClefElement(
         // appendTypeTag(clef, "sameas");
     }
 
-    if (iseditorial) {
-        Supplied *supplied = new Supplied();
-        appendElement(supplied, clef);
-        appendElement(elements, pointers, supplied);
-        if (color.empty()) {
-            clef->SetColor("#aaa"); // hard-code to gray by default for now
-        }
-        else {
-            clef->SetColor(color);
-        }
-        appendTypeTag(clef, "editorial");
-    }
-    else {
-        appendElement(elements, pointers, clef);
-        if (!color.empty()) {
-            clef->SetColor(color);
-        }
-    }
+    setClefColorOrEditorial(token, clef, elements, pointers);
 
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     ss.at(m_currentstaff - 1).last_clef = *token;
@@ -17689,7 +17677,155 @@ Clef *HumdrumInput::insertClefElement(
         clef->SetDisPlace(STAFFREL_basic_above);
     }
 
+    checkForClefStyling(token, clef);
     return clef;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setClefColorOrEditorial --
+//
+
+void HumdrumInput::setClefColorOrEditorial(
+    hum::HTp token, Clef *clef, std::vector<std::string> &elements, std::vector<void *> &pointers, bool append)
+{
+    if (!token) {
+        return;
+    }
+    if (!clef) {
+        return;
+    }
+
+    bool iseditorial = getBooleanParameter(token, "CL", "ed");
+    std::string color = getStringParameter(token, "CL", "color");
+
+    if (iseditorial) {
+        if (append) {
+            // Initial clef cannot yet be supplied.
+            Supplied *supplied = new Supplied();
+            appendElement(supplied, clef);
+            appendElement(elements, pointers, supplied);
+            if (color.empty()) {
+                clef->SetColor("#aaa"); // hard-code to gray by default for now
+            }
+            else {
+                clef->SetColor(color);
+            }
+            appendTypeTag(clef, "editorial");
+        }
+    }
+    else {
+        if (append) {
+            appendElement(elements, pointers, clef);
+        }
+        if (!color.empty()) {
+            clef->SetColor(color);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForClefStyling --
+//
+
+void HumdrumInput::checkForClefStyling(hum::HTp token, Clef *clef)
+{
+    if (!clef) {
+        return;
+    }
+    if (!token) {
+        return;
+    }
+
+    bool gg = getBooleanParameter(token, "CL", "gg");
+    if (gg) {
+        clef->SetGlyphName("gClef8vbOld");
+        clef->SetGlyphAuth("smufl");
+        return;
+    }
+
+    std::string smufl = getStringParameter(token, "CL", "smufl");
+
+    if ((smufl != "") && (smufl != "true") && (smufl != "false")) {
+        // Use a non-default glyph from SMuFL:
+        clef->SetGlyphName(smufl);
+        clef->SetGlyphAuth("smufl");
+        return;
+    }
+
+    // Check for displaying clef in mensural or chant style:
+    bool mens = getBooleanParameter(token, "CL", "mens");
+
+    if (mens) {
+        // Use a (Petrucci) mensural shape (in modern notation)
+        if (token->compare(0, 6, "*clefG") == 0) {
+            clef->SetGlyphName("mensuralGclefPetrucci");
+            clef->SetGlyphAuth("smufl");
+        }
+        else if (token->compare(0, 6, "*clefF") == 0) {
+            clef->SetGlyphName("mensuralFclefPetrucci");
+            clef->SetGlyphAuth("smufl");
+        }
+        else if (*token == "*clefC1") {
+            clef->SetGlyphName("mensuralCclefPetrucciPosLowest");
+            clef->SetGlyphAuth("smufl");
+        }
+        else if (*token == "*clefC2") {
+            clef->SetGlyphName("mensuralCclefPetrucciPosLow");
+            clef->SetGlyphAuth("smufl");
+        }
+        else if (*token == "*clefC3") {
+            clef->SetGlyphName("mensuralCclefPetrucciPosMiddle");
+            clef->SetGlyphAuth("smufl");
+        }
+        else if (*token == "*clefC4") {
+            clef->SetGlyphName("mensuralCclefPetrucciPosHigh");
+            clef->SetGlyphAuth("smufl");
+        }
+        else if (*token == "*clefC5") {
+            clef->SetGlyphName("mensuralCclefPetrucciPosHighest");
+            clef->SetGlyphAuth("smufl");
+        }
+        return;
+    }
+
+    bool chant = getBooleanParameter(token, "CL", "chant");
+    if (chant) {
+        // Use a chant-style clef (in modern notation)
+        if (token->compare(0, 6, "*clefC") == 0) {
+            clef->SetGlyphName("chantCclef");
+            clef->SetGlyphAuth("smufl");
+        }
+        else if (token->compare(0, 6, "*clefF") == 0) {
+            clef->SetGlyphName("chantFclef");
+            clef->SetGlyphAuth("smufl");
+        }
+        else if (token->compare(0, 6, "*clefG") == 0) {
+            clef->SetGlyphName("mensuralGclef");
+            clef->SetGlyphAuth("smufl");
+        }
+        return;
+    }
+
+    // Check for display of modern clefs (in **mens music typically)
+    bool cmn = getBooleanParameter(token, "CL", "cmn");
+    if (cmn) {
+        // Use a chant-style clef (in modern notation)
+        if (token->compare(0, 6, "*clefC") == 0) {
+            clef->SetGlyphName("cClef");
+            clef->SetGlyphAuth("smufl");
+        }
+        else if (token->compare(0, 6, "*clefF") == 0) {
+            clef->SetGlyphName("fClef");
+            clef->SetGlyphAuth("smufl");
+        }
+        else if (token->compare(0, 6, "*clefG") == 0) {
+            clef->SetGlyphName("gClef");
+            clef->SetGlyphAuth("smufl");
+        }
+        return;
+    }
 }
 
 //////////////////////////////
