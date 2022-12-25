@@ -9,12 +9,14 @@
 
 //----------------------------------------------------------------------------
 
+#include "altsyminterface.h"
 #include "areaposinterface.h"
 #include "doc.h"
 #include "layer.h"
 #include "runningelement.h"
 #include "score.h"
 #include "staff.h"
+#include "symboltable.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -296,6 +298,18 @@ PrepareAltSymFunctor::PrepareAltSymFunctor()
 
 FunctorCode PrepareAltSymFunctor::VisitObject(Object *object)
 {
+    if (object->Is(SCORE)) {
+        Score *score = vrv_cast<Score *>(object);
+        assert(score);
+        m_symbolTable = vrv_cast<SymbolTable *>(score->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
+    }
+
+    if (object->HasInterface(INTERFACE_ALT_SYM)) {
+        AltSymInterface *interface = object->GetAltSymInterface();
+        assert(interface);
+        interface->InterfacePrepareAltSym(*this, object);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

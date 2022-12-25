@@ -165,6 +165,11 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Getter for the symbol table
+     */
+    SymbolTable *GetSymbolTable() const { return m_symbolTable; }
+
+    /*
      * Functor interface
      */
     ///@{

@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
+#include "preparedatafunctor.h"
 #include "symboldef.h"
 #include "symboltable.h"
 #include "vrv.h"
@@ -68,6 +69,24 @@ int AltSymInterface::InterfacePrepareAltSym(FunctorParams *functorParams, Object
     if (!m_symbolDefID.empty()) {
         Object *symbolDef = NULL;
         if (params->m_symbolTable) symbolDef = params->m_symbolTable->FindDescendantByID(m_symbolDefID);
+
+        if (!symbolDef || !symbolDef->Is(SYMBOLDEF)) {
+            LogWarning("Reference to the symbolDef `%s` could not be resolved", m_symbolDefID.c_str());
+            return FUNCTOR_CONTINUE;
+        }
+        this->m_symbolDef = vrv_cast<SymbolDef *>(symbolDef);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AltSymInterface::InterfacePrepareAltSym(PrepareAltSymFunctor &functor, Object *object)
+{
+    this->SetIDStr();
+
+    if (!m_symbolDefID.empty()) {
+        Object *symbolDef = NULL;
+        if (functor.GetSymbolTable()) symbolDef = functor.GetSymbolTable()->FindDescendantByID(m_symbolDefID);
 
         if (!symbolDef || !symbolDef->Is(SYMBOLDEF)) {
             LogWarning("Reference to the symbolDef `%s` could not be resolved", m_symbolDefID.c_str());

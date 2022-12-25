@@ -15,6 +15,7 @@
 namespace vrv {
 
 class FunctorParams;
+class PrepareAltSymFunctor;
 class SymbolDef;
 
 //----------------------------------------------------------------------------
@@ -67,9 +68,10 @@ public:
      */
 
     /**
-     * See Object::PrepareAltSym
+     * See PrepareAltSymFunctor
      */
     virtual int InterfacePrepareAltSym(FunctorParams *functorParams, Object *object);
+    FunctorCode InterfacePrepareAltSym(PrepareAltSymFunctor &functor, Object *object);
 
     /**
      * See Object::ResetData
