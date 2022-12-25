@@ -1091,11 +1091,6 @@ public:
     ///@{
 
     /**
-     * Match @altsym element to the corresponding symbolDef.
-     */
-    virtual int PrepareAltSym(FunctorParams *functorParams);
-
-    /**
      * Associate LayerElement with @facs to the appropriate zone
      */
     virtual int PrepareFacsimile(FunctorParams *functorParams);

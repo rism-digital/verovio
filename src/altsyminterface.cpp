@@ -59,27 +59,6 @@ void AltSymInterface::SetIDStr()
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int AltSymInterface::InterfacePrepareAltSym(FunctorParams *functorParams, Object *object)
-{
-    PrepareAltSymParams *params = vrv_params_cast<PrepareAltSymParams *>(functorParams);
-    assert(params);
-
-    this->SetIDStr();
-
-    if (!m_symbolDefID.empty()) {
-        Object *symbolDef = NULL;
-        if (params->m_symbolTable) symbolDef = params->m_symbolTable->FindDescendantByID(m_symbolDefID);
-
-        if (!symbolDef || !symbolDef->Is(SYMBOLDEF)) {
-            LogWarning("Reference to the symbolDef `%s` could not be resolved", m_symbolDefID.c_str());
-            return FUNCTOR_CONTINUE;
-        }
-        this->m_symbolDef = vrv_cast<SymbolDef *>(symbolDef);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 FunctorCode AltSymInterface::InterfacePrepareAltSym(PrepareAltSymFunctor &functor, Object *object)
 {
     this->SetIDStr();

@@ -1781,20 +1781,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareAltSymParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the SymbolTable in the current score scoreDef
- **/
-
-class PrepareAltSymParams : public FunctorParams {
-public:
-    PrepareAltSymParams() { m_symbolTable = NULL; }
-    SymbolTable *m_symbolTable;
-};
-
-//----------------------------------------------------------------------------
 // PrepareDelayedTurnsParams
 //----------------------------------------------------------------------------
 

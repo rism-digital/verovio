@@ -788,11 +788,10 @@ void Doc::PrepareData()
     /************ Resolve @altsym ************/
 
     // Try to match all pointing elements using @next, @sameas and @stem.sameas
-    PrepareAltSymParams prepareAltSymParams;
-    Functor prepareAltSym(&Object::PrepareAltSym);
-    this->Process(&prepareAltSym, &prepareAltSymParams);
+    PrepareAltSymFunctor prepareAltSym;
+    this->Process(prepareAltSym);
 
-    /************ Instanciate LayerElement parts (stemp, flag, dots, etc) ************/
+    /************ Instanciate LayerElement parts (stem, flag, dots, etc) ************/
 
     Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
     this->Process(&prepareLayerElementParts, NULL);
