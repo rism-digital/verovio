@@ -788,9 +788,12 @@ protected:
     data_DURATION oneOverDenominatorToDur(int denominator);
     bool isExpressibleDuration(hum::HumNum duration);
     pair<data_DURATION, int> getDurAndDots(hum::HumNum duration);
-    void checkForClefStyling(hum::HTp token, Clef *clef);
+    void checkForClefStyling(Clef *clef, hum::HTp token);
     void setClefColorOrEditorial(hum::HTp token, Clef *clef, std::vector<std::string> &elements,
         std::vector<void *> &pointers, bool append = true);
+    void setClefOctaveDisplacement(Clef *clef, hum::HTp token);
+    void setClefBasicShape(Clef *clef, hum::HTp token);
+    void setClefStaffLine(Clef *clef, hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

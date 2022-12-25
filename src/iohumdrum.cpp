@@ -6467,45 +6467,46 @@ void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cl
         }
     }
 
-    if (clef.find("2") != std::string::npos) {
-        vrvclef->SetLine(2);
-    }
-    else if (clef.find("4") != std::string::npos) {
-        vrvclef->SetLine(4);
-    }
-    else if (clef.find("3") != std::string::npos) {
-        vrvclef->SetLine(3);
-    }
-    else if (clef.find("5") != std::string::npos) {
-        vrvclef->SetLine(5);
-    }
-    else if (clef.find("1") != std::string::npos) {
-        vrvclef->SetLine(1);
-    }
-
-    if (clef.find("vv") != std::string::npos) {
-        vrvclef->SetDis(OCTAVE_DIS_15);
-        vrvclef->SetDisPlace(STAFFREL_basic_below);
-    }
-    else if (clef.find("v") != std::string::npos) {
-        vrvclef->SetDis(OCTAVE_DIS_8);
-        vrvclef->SetDisPlace(STAFFREL_basic_below);
-    }
-    else if (clef.find("^^") != std::string::npos) {
-        vrvclef->SetDis(OCTAVE_DIS_15);
-        vrvclef->SetDisPlace(STAFFREL_basic_above);
-    }
-    else if (clef.find("^") != std::string::npos) {
-        vrvclef->SetDis(OCTAVE_DIS_8);
-        vrvclef->SetDisPlace(STAFFREL_basic_above);
-    }
-
-    checkForClefStyling(cleftok, vrvclef);
+    setClefBasicShape(vrvclef, cleftok);
+    setClefStaffLine(vrvclef, cleftok);
+    setClefOctaveDisplacement(vrvclef, cleftok);
+    checkForClefStyling(vrvclef, cleftok);
 
     // dummy hierarchy tracking variables:
     std::vector<std::string> elements;
     std::vector<void *> pointers;
     setClefColorOrEditorial(cleftok, vrvclef, elements, pointers, false);
+    setLocationId(vrvclef, cleftok);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setClefStaffLine -- Set the staff line that the clef
+//    is attached.
+//    *clefC1 == bottom line of staff
+//    *clefC2 == 2nd line from bottom of staff
+//    *clefC3 == 3rd line from bottom of staff
+//    *clefC4 == 4th line from bottom of staff
+//    *clefC5 == 5th line from bottom of staff
+//
+
+void HumdrumInput::setClefStaffLine(Clef *clef, hum::HTp token)
+{
+    if (token->find("2") != std::string::npos) {
+        clef->SetLine(2);
+    }
+    else if (token->find("4") != std::string::npos) {
+        clef->SetLine(4);
+    }
+    else if (token->find("3") != std::string::npos) {
+        clef->SetLine(3);
+    }
+    else if (token->find("5") != std::string::npos) {
+        clef->SetLine(5);
+    }
+    else if (token->find("1") != std::string::npos) {
+        clef->SetLine(1);
+    }
 }
 
 //////////////////////////////
@@ -17630,10 +17631,28 @@ Clef *HumdrumInput::insertClefElement(
     }
 
     setClefColorOrEditorial(token, clef, elements, pointers);
+    setLocationId(clef, token);
 
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     ss.at(m_currentstaff - 1).last_clef = *token;
 
+    setClefBasicShape(clef, token);
+    setClefStaffLine(clef, token);
+    setClefOctaveDisplacement(clef, token);
+    checkForClefStyling(clef, token);
+    return clef;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setClefBasicShape --
+//     *clefG = G clef
+//     *clefF = F clef
+//     *clefC = C clef
+//     *clefX = percussion clef
+
+void HumdrumInput::setClefBasicShape(Clef *clef, hum::HTp token)
+{
     if (token->find("clefG") != std::string::npos) {
         clef->SetShape(CLEFSHAPE_G);
     }
@@ -17643,22 +17662,19 @@ Clef *HumdrumInput::insertClefElement(
     else if (token->find("clefC") != std::string::npos) {
         clef->SetShape(CLEFSHAPE_C);
     }
+}
 
-    if (token->find("2") != std::string::npos) {
-        clef->SetLine(2);
-    }
-    else if (token->find("4") != std::string::npos) {
-        clef->SetLine(4);
-    }
-    else if (token->find("3") != std::string::npos) {
-        clef->SetLine(3);
-    }
-    else if (token->find("5") != std::string::npos) {
-        clef->SetLine(5);
-    }
-    else if (token->find("1") != std::string::npos) {
-        clef->SetLine(1);
-    }
+//////////////////////////////
+//
+// HumdrumInput::setClefOctaveDisplacement -- Add 8 or 15 above/below clef.
+//    *clefGv2 == v means play one octave lower than written
+//    *clefG^2 == ^ means play one octave higher than written
+//    *clefGvv2 == vv means play two octaves lower than written
+//    *clefG^^2 == ^^ means play two octaves higher than written
+//
+
+void HumdrumInput::setClefOctaveDisplacement(Clef *clef, hum::HTp token)
+{
 
     if (token->find("vv") != std::string::npos) {
         clef->SetDis(OCTAVE_DIS_15);
@@ -17676,9 +17692,6 @@ Clef *HumdrumInput::insertClefElement(
         clef->SetDis(OCTAVE_DIS_8);
         clef->SetDisPlace(STAFFREL_basic_above);
     }
-
-    checkForClefStyling(token, clef);
-    return clef;
 }
 
 //////////////////////////////
@@ -17729,7 +17742,7 @@ void HumdrumInput::setClefColorOrEditorial(
 // HumdrumInput::checkForClefStyling --
 //
 
-void HumdrumInput::checkForClefStyling(hum::HTp token, Clef *clef)
+void HumdrumInput::checkForClefStyling(Clef *clef, hum::HTp token)
 {
     if (!clef) {
         return;
