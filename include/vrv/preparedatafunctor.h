@@ -213,7 +213,7 @@ public:
     /*
      * Getter for the zoneless syllables
      */
-    const ListOfObjects &GetZonelessSyllables() const { return m_zonelessSyls; }
+    const ListOfObjects &GetZonelessSyls() const { return m_zonelessSyls; }
 
     /*
      * Functor interface

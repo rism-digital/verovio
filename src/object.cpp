@@ -1793,31 +1793,6 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::PrepareFacsimile(FunctorParams *functorParams)
-{
-    PrepareFacsimileParams *params = vrv_params_cast<PrepareFacsimileParams *>(functorParams);
-    assert(params);
-
-    if (this->HasInterface(INTERFACE_FACSIMILE)) {
-        FacsimileInterface *interface = this->GetFacsimileInterface();
-        assert(interface);
-        if (interface->HasFacs()) {
-            std::string facsID = (interface->GetFacs().compare(0, 1, "#") == 0 ? interface->GetFacs().substr(1)
-                                                                               : interface->GetFacs());
-            Zone *zone = params->m_facsimile->FindZoneByID(facsID);
-            if (zone != NULL) {
-                interface->AttachZone(zone);
-            }
-        }
-        // Zoneless syl
-        else if (this->Is(SYL)) {
-            params->m_zonelessSyls.push_back(this);
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Object::PrepareLinking(FunctorParams *functorParams)
 {
     PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);

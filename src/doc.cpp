@@ -832,12 +832,11 @@ void Doc::PrepareData()
     /************ Resolve @facs ************/
     if (this->GetType() == Facs) {
         // Associate zones with elements
-        PrepareFacsimileParams prepareFacsimileParams(this->GetFacsimile());
-        Functor prepareFacsimile(&Object::PrepareFacsimile);
-        this->Process(&prepareFacsimile, &prepareFacsimileParams);
+        PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
+        this->Process(prepareFacsimile);
 
         // Add default syl zone if one is not present.
-        for (auto &it : prepareFacsimileParams.m_zonelessSyls) {
+        for (auto &it : prepareFacsimile.GetZonelessSyls()) {
             Syl *syl = vrv_cast<Syl *>(it);
             assert(syl);
             syl->CreateDefaultZone(this);

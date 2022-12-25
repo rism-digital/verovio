@@ -1828,21 +1828,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareFacsimileParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the doc
- */
-
-class PrepareFacsimileParams : public FunctorParams {
-public:
-    PrepareFacsimileParams(Facsimile *facsimile) { m_facsimile = facsimile; }
-    Facsimile *m_facsimile;
-    ListOfObjects m_zonelessSyls;
-};
-
-//----------------------------------------------------------------------------
 // PrepareFloatingGrpsParams
 //----------------------------------------------------------------------------
 
