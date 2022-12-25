@@ -235,6 +235,52 @@ private:
     ListOfObjects m_zonelessSyls;
 };
 
+//----------------------------------------------------------------------------
+// PrepareLinkingFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class matches linking elements (e.g, @next).
+ */
+class PrepareLinkingFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareLinkingFunctor();
+    virtual ~PrepareLinkingFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // Holds the interface / id pairs to match for links
+    MapOfLinkingInterfaceIDPairs m_nextIDPairs;
+    // Holds the interface / id pairs to match for sameas
+    MapOfLinkingInterfaceIDPairs m_sameasIDPairs;
+    // Holds the note / id pairs to match for stem.sameas
+    MapOfNoteIDPairs m_stemSameasIDPairs;
+    // Indicates whether the pairs have to be stacked or not
+    bool m_fillList;
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__

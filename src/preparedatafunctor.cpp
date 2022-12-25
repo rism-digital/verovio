@@ -344,4 +344,18 @@ FunctorCode PrepareFacsimileFunctor::VisitObject(Object *object)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareLinkingFunctor
+//----------------------------------------------------------------------------
+
+PrepareLinkingFunctor::PrepareLinkingFunctor()
+{
+    m_fillList = true;
+}
+
+FunctorCode PrepareLinkingFunctor::VisitObject(Object *object)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
