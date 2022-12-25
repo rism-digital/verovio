@@ -12,6 +12,7 @@
 
 namespace vrv {
 
+class Facsimile;
 class SymbolTable;
 
 //----------------------------------------------------------------------------
@@ -185,6 +186,53 @@ public:
 private:
     // The SymbolTable in the current scoreDef
     SymbolTable *m_symbolTable;
+};
+
+//----------------------------------------------------------------------------
+// PrepareFacsimileFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class associates layer elements with @facs to the appropriate zone.
+ */
+class PrepareFacsimileFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareFacsimileFunctor(Facsimile *facsimile);
+    virtual ~PrepareFacsimileFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Getter for the zoneless syllables
+     */
+    const ListOfObjects &GetZonelessSyllables() const { return m_zonelessSyls; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The facsimile
+    Facsimile *m_facsimile;
+    // List of zoneless syllables
+    ListOfObjects m_zonelessSyls;
 };
 
 } // namespace vrv

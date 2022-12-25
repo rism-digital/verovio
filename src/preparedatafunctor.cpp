@@ -313,4 +313,35 @@ FunctorCode PrepareAltSymFunctor::VisitObject(Object *object)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareFacsimileFunctor
+//----------------------------------------------------------------------------
+
+PrepareFacsimileFunctor::PrepareFacsimileFunctor(Facsimile *facsimile)
+{
+    m_facsimile = facsimile;
+}
+
+FunctorCode PrepareFacsimileFunctor::VisitObject(Object *object)
+{
+    if (object->HasInterface(INTERFACE_FACSIMILE)) {
+        FacsimileInterface *interface = object->GetFacsimileInterface();
+        assert(interface);
+        if (interface->HasFacs()) {
+            std::string facsID = ((interface->GetFacs().compare(0, 1, "#") == 0) ? interface->GetFacs().substr(1)
+                                                                                 : interface->GetFacs());
+            Zone *zone = m_facsimile->FindZoneByID(facsID);
+            if (zone != NULL) {
+                interface->AttachZone(zone);
+            }
+        }
+        // Zoneless syl
+        else if (object->Is(SYL)) {
+            m_zonelessSyls.push_back(object);
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
