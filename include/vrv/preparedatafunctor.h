@@ -264,7 +264,7 @@ public:
     bool FillList() const { return m_fillList; }
     void FillList(bool fillList) { m_fillList = fillList; }
     ///@}
-    
+
     /*
      * Getter for the interface / id pairs
      */
@@ -273,7 +273,7 @@ public:
     const MapOfLinkingInterfaceIDPairs &GetSameasIDPairs() const { return m_sameasIDPairs; }
     const MapOfNoteIDPairs &GetStemSameasIDPairs() const { return m_stemSameasIDPairs; }
     ///@}
-    
+
     /*
      * Insert interface / id pairs
      */
@@ -309,7 +309,66 @@ private:
     MapOfLinkingInterfaceIDPairs m_sameasIDPairs;
     // Holds the note / id pairs to match for stem.sameas
     MapOfNoteIDPairs m_stemSameasIDPairs;
-    // Indicates whether the pairs have to be stacked or not
+    // Indicates the current mode: fill vs process
+    bool m_fillList;
+};
+
+//----------------------------------------------------------------------------
+// PreparePlistFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class prepares list of elements in the @plist.
+ */
+class PreparePlistFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PreparePlistFunctor();
+    virtual ~PreparePlistFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Getter and setter for the fill list flag
+     */
+    ///@{
+    bool FillList() const { return m_fillList; }
+    void FillList(bool fillList) { m_fillList = fillList; }
+    ///@}
+
+    /*
+     * Getter and modifier for the interface / id tuples
+     */
+    ///@{
+    const ArrayOfPlistInterfaceIDTuples &GetInterfaceIDTuples() const { return m_interfaceIDTuples; }
+    ArrayOfPlistInterfaceIDTuples &GetInterfaceIDTuplesForModification() { return m_interfaceIDTuples; }
+    void ClearInterfaceIDTuples() { m_interfaceIDTuples.clear(); }
+    ///@}
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // Holds the interface / id tuples to match
+    ArrayOfPlistInterfaceIDTuples m_interfaceIDTuples;
+    // Indicates the current mode: fill vs process
     bool m_fillList;
 };
 

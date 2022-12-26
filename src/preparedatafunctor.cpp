@@ -443,4 +443,18 @@ void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
     }
 }
 
+//----------------------------------------------------------------------------
+// PreparePlistFunctor
+//----------------------------------------------------------------------------
+
+PreparePlistFunctor::PreparePlistFunctor()
+{
+    m_fillList = true;
+}
+
+FunctorCode PreparePlistFunctor::VisitObject(Object *object)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
