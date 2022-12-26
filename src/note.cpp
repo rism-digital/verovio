@@ -565,47 +565,6 @@ bool Note::IsVisible() const
     return true;
 }
 
-void Note::ResolveStemSameas(PrepareLinkingParams *params)
-{
-    assert(params);
-
-    // First pass we fill m_stemSameasIDPairs
-    if (params->m_fillList) {
-        if (this->HasStemSameas()) {
-            std::string idTarget = ExtractIDFragment(this->GetStemSameas());
-            params->m_stemSameasIDPairs[idTarget] = this;
-        }
-    }
-    // Second pass we resolve links
-    else {
-        const std::string id = this->GetID();
-        if (params->m_stemSameasIDPairs.count(id)) {
-            Note *noteStemSameas = params->m_stemSameasIDPairs.at(id);
-            // Instanciate the bi-directional references and mark the roles as unset
-            this->SetStemSameasNote(noteStemSameas);
-            this->m_stemSameasRole = SAMEAS_UNSET;
-            noteStemSameas->SetStemSameasNote(this);
-            noteStemSameas->m_stemSameasRole = SAMEAS_UNSET;
-            // Also resovle beams and instanciate the bi-directional references
-            Beam *beamStemSameas = noteStemSameas->GetAncestorBeam();
-            if (beamStemSameas) {
-                Beam *thisBeam = this->GetAncestorBeam();
-                if (!thisBeam) {
-                    // This is one thing that can go wrong. We can have many others here...
-                    // E.g., not the same number of notes, conflicting durations, not all notes sharing stems, ...
-                    // Not sure everything could be checked here.
-                    LogError("Notes with @stem.sameas in a beam should refer only to a note also in beam.");
-                }
-                else {
-                    thisBeam->SetStemSameasBeam(beamStemSameas);
-                    beamStemSameas->SetStemSameasBeam(thisBeam);
-                }
-            }
-            params->m_stemSameasIDPairs.erase(id);
-        }
-    }
-}
-
 data_STEMDIRECTION Note::CalcStemDirForSameasNote(int verticalCenter)
 {
     assert(m_stemSameas);

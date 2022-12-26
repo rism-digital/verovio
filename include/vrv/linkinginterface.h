@@ -92,11 +92,6 @@ public:
     virtual int InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
 
     /**
-     * See Object::PrepareLinking
-     */
-    virtual int InterfacePrepareLinking(FunctorParams *functorParams, Object *object);
-
-    /**
      * See Object::ResetData
      */
     virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);

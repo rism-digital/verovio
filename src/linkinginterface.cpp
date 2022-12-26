@@ -109,28 +109,6 @@ FunctorCode LinkingInterface::InterfacePrepareLinking(PrepareLinkingFunctor &fun
     return FUNCTOR_CONTINUE;
 }
 
-int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Object *object)
-{
-    PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
-    assert(params);
-
-    // This should not happen?
-    if (params->m_fillList == false) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    this->SetIDStr();
-
-    if (!m_nextID.empty()) {
-        params->m_nextIDPairs.insert({ m_nextID, this });
-    }
-    if (!m_sameasID.empty()) {
-        params->m_sameasIDPairs.insert({ m_sameasID, this });
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
 {
     PrepareStaffCurrentTimeSpanningParams *params

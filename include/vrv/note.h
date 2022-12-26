@@ -30,7 +30,6 @@ namespace vrv {
 class Accid;
 class Chord;
 class Note;
-class PrepareLinkingParams;
 class Slur;
 class TabGrp;
 class Tie;
@@ -248,14 +247,6 @@ public:
     StemSameasDrawingRole GetStemSameasRole() const { return m_stemSameasRole; }
     void SetStemSameasRole(StemSameasDrawingRole stemSameasRole) { m_stemSameasRole = stemSameasRole; }
     ///@}
-
-    /**
-     * Resovle @stem.sameas links by instanciating Note::m_stemSameas (*Note).
-     * Called twice from Object::PrepareLinks. Once to fill id / note pairs,
-     * and once to resolve the link. The link is bi-directional, which means
-     * that both notes have their m_stemSameas pointer instanciated.
-     */
-    void ResolveStemSameas(PrepareLinkingParams *params);
 
     /**
      * Calculate the stem direction of the pair of notes.

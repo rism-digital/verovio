@@ -575,26 +575,26 @@ void Doc::PrepareData()
     /************ Resolve linking (@next) ************/
 
     // Try to match all pointing elements using @next, @sameas and @stem.sameas
-    PrepareLinkingParams prepareLinkingParams;
-    Functor prepareLinking(&Object::PrepareLinking);
-    this->Process(&prepareLinking, &prepareLinkingParams);
+    PrepareLinkingFunctor prepareLinking;
+    this->Process(prepareLinking);
 
     // If we have some left process again backward
-    if (!prepareLinkingParams.m_sameasIDPairs.empty() || !prepareLinkingParams.m_stemSameasIDPairs.empty()) {
-        prepareLinkingParams.m_fillList = false;
-        this->Process(&prepareLinking, &prepareLinkingParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    if (!prepareLinking.GetSameasIDPairs().empty() || !prepareLinking.GetStemSameasIDPairs().empty()) {
+        prepareLinking.FillList(false);
+        prepareLinking.SetDirection(BACKWARD);
+        this->Process(prepareLinking);
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!prepareLinkingParams.m_nextIDPairs.empty()) {
-        LogWarning("%d element(s) with a @next could match the target", prepareLinkingParams.m_nextIDPairs.size());
+    if (!prepareLinking.GetNextIDPairs().empty()) {
+        LogWarning("%d element(s) with a @next could match the target", prepareLinking.GetNextIDPairs().size());
     }
-    if (!prepareLinkingParams.m_sameasIDPairs.empty()) {
-        LogWarning("%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasIDPairs.size());
+    if (!prepareLinking.GetSameasIDPairs().empty()) {
+        LogWarning("%d element(s) with a @sameas could match the target", prepareLinking.GetSameasIDPairs().size());
     }
-    if (!prepareLinkingParams.m_stemSameasIDPairs.empty()) {
-        LogWarning("%d element(s) with a @stem.sameas could match the target",
-            prepareLinkingParams.m_stemSameasIDPairs.size());
+    if (!prepareLinking.GetStemSameasIDPairs().empty()) {
+        LogWarning(
+            "%d element(s) with a @stem.sameas could match the target", prepareLinking.GetStemSameasIDPairs().size());
     }
 
     /************ Resolve @plist ************/

@@ -1091,11 +1091,6 @@ public:
     ///@{
 
     /**
-     * Match linking element (e.g, @next).
-     */
-    virtual int PrepareLinking(FunctorParams *functorParams);
-
-    /**
      * Prepare list of elements in the @plist.
      */
     virtual int PreparePlist(FunctorParams *functorParams);

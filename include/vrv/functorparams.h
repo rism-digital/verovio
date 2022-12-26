@@ -1879,27 +1879,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareLinkingParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: MapOfLinkingInterfaceIDPairs holds the interface / id pairs to match for links
- * member 1: MapOfLinkingInterfaceIDPairs holds the interface / id pairs to match for sameas
- * member 2: MapOfNoteIDPairs holds the note / id pairs to match for stem.sameas
- * member 3: bool* fillList for indicating whether the pairs have to be stacked or not
- *
- **/
-
-class PrepareLinkingParams : public FunctorParams {
-public:
-    PrepareLinkingParams() { m_fillList = true; }
-    MapOfLinkingInterfaceIDPairs m_nextIDPairs;
-    MapOfLinkingInterfaceIDPairs m_sameasIDPairs;
-    MapOfNoteIDPairs m_stemSameasIDPairs;
-    bool m_fillList;
-};
-
-//----------------------------------------------------------------------------
 // InitMIDIParams
 //----------------------------------------------------------------------------
 

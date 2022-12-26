@@ -1793,52 +1793,6 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::PrepareLinking(FunctorParams *functorParams)
-{
-    PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
-    assert(params);
-
-    if (params->m_fillList && this->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = this->GetLinkingInterface();
-        assert(interface);
-        interface->InterfacePrepareLinking(functorParams, this);
-    }
-
-    if (this->Is(NOTE)) {
-        Note *note = vrv_cast<Note *>(this);
-        assert(note);
-        PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
-        assert(params);
-        note->ResolveStemSameas(params);
-    }
-
-    // @next
-    std::string id = this->GetID();
-    auto r1 = params->m_nextIDPairs.equal_range(id);
-    if (r1.first != params->m_nextIDPairs.end()) {
-        for (auto i = r1.first; i != r1.second; ++i) {
-            i->second->SetNextLink(this);
-        }
-        params->m_nextIDPairs.erase(r1.first, r1.second);
-    }
-
-    // @sameas
-    auto r2 = params->m_sameasIDPairs.equal_range(id);
-    if (r2.first != params->m_sameasIDPairs.end()) {
-        for (auto j = r2.first; j != r2.second; ++j) {
-            j->second->SetSameasLink(this);
-            // Issue a warning if classes of object and sameas do not match
-            Object *owner = dynamic_cast<Object *>(j->second);
-            if (owner && (owner->GetClassId() != this->GetClassId())) {
-                LogWarning("%s with @xml:id %s has @sameas to an element of class %s.", owner->GetClassName().c_str(),
-                    owner->GetID().c_str(), this->GetClassName().c_str());
-            }
-        }
-        params->m_sameasIDPairs.erase(r2.first, r2.second);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
 int Object::PreparePlist(FunctorParams *functorParams)
 {
     PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);

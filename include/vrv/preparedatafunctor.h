@@ -258,10 +258,22 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
-     * Getter for the fill list flag
+     * Getter and setter for the fill list flag
      */
+    ///@{
     bool FillList() const { return m_fillList; }
-
+    void FillList(bool fillList) { m_fillList = fillList; }
+    ///@}
+    
+    /*
+     * Getter for the interface / id pairs
+     */
+    ///@{
+    const MapOfLinkingInterfaceIDPairs &GetNextIDPairs() const { return m_nextIDPairs; }
+    const MapOfLinkingInterfaceIDPairs &GetSameasIDPairs() const { return m_sameasIDPairs; }
+    const MapOfNoteIDPairs &GetStemSameasIDPairs() const { return m_stemSameasIDPairs; }
+    ///@}
+    
     /*
      * Insert interface / id pairs
      */
