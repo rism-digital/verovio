@@ -353,9 +353,94 @@ PrepareLinkingFunctor::PrepareLinkingFunctor()
     m_fillList = true;
 }
 
+void PrepareLinkingFunctor::InsertNextIDPair(const std::string &nextID, LinkingInterface *interface)
+{
+    m_nextIDPairs.insert({ nextID, interface });
+}
+
+void PrepareLinkingFunctor::InsertSameasIDPair(const std::string &sameasID, LinkingInterface *interface)
+{
+    m_sameasIDPairs.insert({ sameasID, interface });
+}
+
 FunctorCode PrepareLinkingFunctor::VisitObject(Object *object)
 {
+    if (m_fillList && object->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *interface = object->GetLinkingInterface();
+        assert(interface);
+        interface->InterfacePrepareLinking(*this, object);
+    }
+
+    if (object->Is(NOTE)) {
+        Note *note = vrv_cast<Note *>(object);
+        assert(note);
+        this->ResolveStemSameas(note);
+    }
+
+    // @next
+    std::string id = object->GetID();
+    auto r1 = m_nextIDPairs.equal_range(id);
+    if (r1.first != m_nextIDPairs.end()) {
+        for (auto i = r1.first; i != r1.second; ++i) {
+            i->second->SetNextLink(object);
+        }
+        m_nextIDPairs.erase(r1.first, r1.second);
+    }
+
+    // @sameas
+    auto r2 = m_sameasIDPairs.equal_range(id);
+    if (r2.first != m_sameasIDPairs.end()) {
+        for (auto j = r2.first; j != r2.second; ++j) {
+            j->second->SetSameasLink(object);
+            // Issue a warning if classes of object and sameas do not match
+            Object *owner = dynamic_cast<Object *>(j->second);
+            if (owner && (owner->GetClassId() != object->GetClassId())) {
+                LogWarning("%s with @xml:id %s has @sameas to an element of class %s.", owner->GetClassName().c_str(),
+                    owner->GetID().c_str(), object->GetClassName().c_str());
+            }
+        }
+        m_sameasIDPairs.erase(r2.first, r2.second);
+    }
     return FUNCTOR_CONTINUE;
+}
+
+void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
+{
+    // First pass we fill m_stemSameasIDPairs
+    if (m_fillList) {
+        if (note->HasStemSameas()) {
+            std::string idTarget = ExtractIDFragment(note->GetStemSameas());
+            m_stemSameasIDPairs[idTarget] = note;
+        }
+    }
+    // Second pass we resolve links
+    else {
+        const std::string id = note->GetID();
+        if (m_stemSameasIDPairs.count(id)) {
+            Note *noteStemSameas = m_stemSameasIDPairs.at(id);
+            // Instanciate the bi-directional references and mark the roles as unset
+            note->SetStemSameasNote(noteStemSameas);
+            note->SetStemSameasRole(SAMEAS_UNSET);
+            noteStemSameas->SetStemSameasNote(note);
+            noteStemSameas->SetStemSameasRole(SAMEAS_UNSET);
+            // Also resolve beams and instanciate the bi-directional references
+            Beam *beamStemSameas = noteStemSameas->GetAncestorBeam();
+            if (beamStemSameas) {
+                Beam *beam = note->GetAncestorBeam();
+                if (!beam) {
+                    // This is one thing that can go wrong. We can have many others here...
+                    // E.g., not the same number of notes, conflicting durations, not all notes sharing stems, ...
+                    // Not sure everything could be checked here.
+                    LogError("Notes with @stem.sameas in a beam should refer only to a note also in beam.");
+                }
+                else {
+                    beam->SetStemSameasBeam(beamStemSameas);
+                    beamStemSameas->SetStemSameasBeam(beam);
+                }
+            }
+            m_stemSameasIDPairs.erase(id);
+        }
+    }
 }
 
 } // namespace vrv

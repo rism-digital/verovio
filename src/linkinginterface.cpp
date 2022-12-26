@@ -15,6 +15,7 @@
 
 #include "functorparams.h"
 #include "measure.h"
+#include "preparedatafunctor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -88,6 +89,25 @@ void LinkingInterface::AddBackLink(const Object *object)
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
+
+FunctorCode LinkingInterface::InterfacePrepareLinking(PrepareLinkingFunctor &functor, Object *object)
+{
+    // This should not happen?
+    if (!functor.FillList()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    this->SetIDStr();
+
+    if (!m_nextID.empty()) {
+        functor.InsertNextIDPair(m_nextID, this);
+    }
+    if (!m_sameasID.empty()) {
+        functor.InsertSameasIDPair(m_sameasID, this);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Object *object)
 {

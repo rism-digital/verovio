@@ -258,6 +258,19 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Getter for the fill list flag
+     */
+    bool FillList() const { return m_fillList; }
+
+    /*
+     * Insert interface / id pairs
+     */
+    ///@{
+    void InsertNextIDPair(const std::string &nextID, LinkingInterface *interface);
+    void InsertSameasIDPair(const std::string &sameasID, LinkingInterface *interface);
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{
@@ -267,7 +280,14 @@ public:
 protected:
     //
 private:
-    //
+    /**
+     * Resolve @stem.sameas links by instanciating Note::m_stemSameas (*Note).
+     * Called twice - once to fill id / note pairs and once to resolve the link.
+     * The link is bi-directional, which means that both notes have
+     * their m_stemSameas pointer instanciated.
+     */
+    void ResolveStemSameas(Note *note);
+
 public:
     //
 private:

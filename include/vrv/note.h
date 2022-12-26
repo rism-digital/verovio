@@ -242,9 +242,12 @@ public:
     ///@}
 
     /**
-     * Getter for stem sameas role
+     * Getter and setter for stem sameas role
      */
+    ///@{
     StemSameasDrawingRole GetStemSameasRole() const { return m_stemSameasRole; }
+    void SetStemSameasRole(StemSameasDrawingRole stemSameasRole) { m_stemSameasRole = stemSameasRole; }
+    ///@}
 
     /**
      * Resovle @stem.sameas links by instanciating Note::m_stemSameas (*Note).
