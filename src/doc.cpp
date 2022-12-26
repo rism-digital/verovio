@@ -587,14 +587,14 @@ void Doc::PrepareData()
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareLinking.GetNextIDPairs().empty()) {
-        LogWarning("%d element(s) with a @next could match the target", prepareLinking.GetNextIDPairs().size());
+        LogWarning("%d element(s) with a @next could not match the target", prepareLinking.GetNextIDPairs().size());
     }
     if (!prepareLinking.GetSameasIDPairs().empty()) {
-        LogWarning("%d element(s) with a @sameas could match the target", prepareLinking.GetSameasIDPairs().size());
+        LogWarning("%d element(s) with a @sameas could not match the target", prepareLinking.GetSameasIDPairs().size());
     }
     if (!prepareLinking.GetStemSameasIDPairs().empty()) {
-        LogWarning(
-            "%d element(s) with a @stem.sameas could match the target", prepareLinking.GetStemSameasIDPairs().size());
+        LogWarning("%d element(s) with a @stem.sameas could not match the target",
+            prepareLinking.GetStemSameasIDPairs().size());
     }
 
     /************ Resolve @plist ************/
