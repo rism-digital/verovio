@@ -824,12 +824,15 @@ bool HumdrumInput::convertHumdrum()
             m_mens = true;
         }
         else if (it->isDataType("**harm")) {
+            analyzeKeyLabels(it);
             m_harm = true;
         }
         else if (it->isDataType("**deg")) {
+            analyzeKeyLabels(it);
             m_degree = true;
         }
         else if (it->isDataType("**degree")) {
+            analyzeKeyLabels(it);
             m_degree = true;
         }
         else if (it->isDataType("**rhrm")) { // **recip + **harm
@@ -918,6 +921,47 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeKeyLabels --
+//
+
+void HumdrumInput::analyzeKeyLabels(hum::HTp starttok)
+{
+    hum::HTp current = starttok;
+    while (current) {
+        current = current->getNextToken();
+        if (!current) {
+            break;
+        }
+        if (!current->isInterpretation()) {
+            continue;
+        }
+        if (!current->isKeyDesignation()) {
+            continue;
+        }
+        hum::HTp keydesig = current;
+        while (current) {
+            current = current->getNextToken();
+            if (!current) {
+                break;
+            }
+            if (current->isKeyDesignation()) {
+                keydesig = current;
+                continue;
+            }
+            if (!current->isData()) {
+                continue;
+            }
+            if (current->isNull()) {
+                continue;
+            }
+            current->setValue("auto", "meilabel", keydesig->substr(1));
+            break;
+        }
+    }
 }
 
 //////////////////////////////
@@ -7729,10 +7773,24 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 
             hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
             harm->SetTstamp(tstamp.getFloat());
+            std::string meilabel = token->getValue("auto", "meilabel");
+            if (!meilabel.empty()) {
+                addHarmLabel(harm, meilabel);
+            }
 
             setLocationId(harm, token);
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addHarmLabel --
+//
+
+void HumdrumInput::addHarmLabel(Harm *harm, const std::string &label)
+{
+    cerr << "ADD HARM LABEL " << label << " HERE" << endl;
 }
 
 //////////////////////////////

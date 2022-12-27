@@ -23,6 +23,7 @@
 #include "dir.h"
 #include "ending.h"
 #include "ftrem.h"
+#include "harm.h"
 #include "io.h"
 #include "keysig.h"
 #include "label.h"
@@ -795,6 +796,8 @@ protected:
     void setClefBasicShape(Clef *clef, hum::HTp token);
     void setClefStaffLine(Clef *clef, hum::HTp token);
     std::u32string cleanDegreeString(hum::HTp token);
+    void analyzeKeyLabels(hum::HTp starttok);
+    void addHarmLabel(Harm *harm, const std::string &label);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
