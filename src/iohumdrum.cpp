@@ -824,15 +824,15 @@ bool HumdrumInput::convertHumdrum()
             m_mens = true;
         }
         else if (it->isDataType("**harm")) {
-            analyzeKeyLabels(it);
+            analyzeHarmInterpretations(it);
             m_harm = true;
         }
         else if (it->isDataType("**deg")) {
-            analyzeKeyLabels(it);
+            analyzeDegInterpretations(it);
             m_degree = true;
         }
         else if (it->isDataType("**degree")) {
-            analyzeKeyLabels(it);
+            analyzeDegInterpretations(it);
             m_degree = true;
         }
         else if (it->isDataType("**rhrm")) { // **recip + **harm
@@ -925,10 +925,12 @@ bool HumdrumInput::convertHumdrum()
 
 //////////////////////////////
 //
-// HumdrumInput::analyzeKeyLabels --
+// HumdrumInput::analyzeHarmInterpretations --
+//   Known interpretations that affect **harm:
+//      *[A-Ga-g][#-]*:(dor|phr|lyd|mix|aeo|loc|ion)? == Key designation
 //
 
-void HumdrumInput::analyzeKeyLabels(hum::HTp starttok)
+void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
 {
     hum::HTp current = starttok;
     while (current) {
@@ -960,6 +962,61 @@ void HumdrumInput::analyzeKeyLabels(hum::HTp starttok)
             }
             current->setValue("auto", "meilabel", keydesig->substr(1));
             break;
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeDegInterpretations --
+//   Known interpretations that affect **harm:
+//      *[A-Ga-g][#-]*:(dor|phr|lyd|mix|aeo|loc|ion)? == Key designation
+//      *hat == add a hat above the scale degrees
+//      *Xhat == don't add a hat (default)
+//      *circle == add a circle around the scale degrees
+//      *Xcircle == don't add a circle (default)
+//
+
+void HumdrumInput::analyzeDegInterpretations(hum::HTp starttok)
+{
+    bool hatQ = false;
+    bool circleQ = false;
+    hum::HTp keydesig = NULL;
+    hum::HTp current = starttok;
+    while (current) {
+        current = current->getNextToken();
+        if (!current) {
+            break;
+        }
+        if (current->isData() && !current->isNull()) {
+            if (hatQ) {
+                current->setValue("auto", "hat", 1);
+            }
+            if (circleQ) {
+                current->setValue("auto", "circle", 1);
+            }
+            if (keydesig) {
+                current->setValue("auto", "meilabel", keydesig->substr(1));
+                keydesig = NULL;
+            }
+        }
+        if (!current->isInterpretation()) {
+            continue;
+        }
+        if (*current == "*hat") {
+            hatQ = true;
+        }
+        if (*current == "*Xhat") {
+            hatQ = false;
+        }
+        if (*current == "*circle") {
+            circleQ = true;
+        }
+        if (*current == "*Xcircle") {
+            circleQ = false;
+        }
+        if (current->isKeyDesignation()) {
+            keydesig = current;
         }
     }
 }
@@ -7715,10 +7772,22 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 rend->SetColor(ccolor);
                 harm->AddChild(rend);
                 rend->AddChild(text);
+                if (token->getValueInt("auto", "circle")) {
+                    rend->SetRend(TEXTRENDITION_circle);
+                }
             }
             else {
-                harm->AddChild(text);
+                if (token->getValueInt("auto", "circle")) {
+                    Rend *rend = new Rend();
+                    rend->SetRend(TEXTRENDITION_circle);
+                    harm->AddChild(rend);
+                    harm->AddChild(text);
+                }
+                else {
+                    harm->AddChild(text);
+                }
             }
+
             std::string tracktext = getTrackText(token);
             harm->SetN(tracktext);
 
@@ -8163,15 +8232,18 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token)
     if (hre.search(token, "(\\d+)")) {
         int degree = hre.getMatchInt(1);
         switch (degree) {
-            case 1: output = U"1\u0302"; break;
-            case 2: output = U"2\u0302"; break;
-            case 3: output = U"3\u0302"; break;
-            case 4: output = U"4\u0302"; break;
-            case 5: output = U"5\u0302"; break;
-            case 6: output = U"6\u0302"; break;
-            case 7: output = U"7\u0302"; break;
-            case 8: output = U"8\u0302"; break;
-            case 9: output = U"9\u0302"; break;
+            case 1: output = U"1"; break;
+            case 2: output = U"2"; break;
+            case 3: output = U"3"; break;
+            case 4: output = U"4"; break;
+            case 5: output = U"5"; break;
+            case 6: output = U"6"; break;
+            case 7: output = U"7"; break;
+            case 8: output = U"8"; break;
+            case 9: output = U"9"; break;
+        }
+        if (token->getValueInt("auto", "hat")) {
+            output += U"\u0302";
         }
     }
 

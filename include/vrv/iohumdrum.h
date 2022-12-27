@@ -796,7 +796,8 @@ protected:
     void setClefBasicShape(Clef *clef, hum::HTp token);
     void setClefStaffLine(Clef *clef, hum::HTp token);
     std::u32string cleanDegreeString(hum::HTp token);
-    void analyzeKeyLabels(hum::HTp starttok);
+    void analyzeHarmInterpretations(hum::HTp starttok);
+    void analyzeDegInterpretations(hum::HTp starttok);
     void addHarmLabel(Harm *harm, const std::string &label);
 
     // header related functions: ///////////////////////////////////////////
