@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Oct 13 21:38:18 PDT 2022
+// Last Modified: Wed Dec 14 14:43:56 PST 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3106,7 +3106,7 @@ string Convert::base40ToIntervalAbbr(int base40interval) {
 	// Add base-7 number
 	char buffer2[32] = {0};
 	int diatonic = Convert::base40IntervalToDiatonic(base40interval)+1;
-	snprintf(buffer2, 32, "%d", diatonic);
+	sprintf(buffer2, "%d", diatonic);
 	output += buffer2;
 
 	return output;
@@ -12127,8 +12127,9 @@ void HumGrid::transferNonDataSlices(GridMeasure* output, GridMeasure* input) {
 			continue;
 		}
 		output->push_front(slice);
-		input->erase(it);
+		auto it2 = it;
 		it--;
+		input->erase(it2);
 	}
 }
 
@@ -28824,7 +28825,9 @@ void HumdrumFileStructure::analyzeSpineStrands(vector<TokenPair>& ends,
 		tok = tok->getNextToken();
 	}
 
-	cerr << "Should not get here in analyzeSpineStrands()\n";
+	cerr << "!!WARNING: spine " << starttok->getSpineInfo() << " is not terminated by *-" << endl;
+	// Maybe set last to null, but then programs would have to also
+	// check for null for end of track.
 	ends[index].last = lasttok;
 }
 
@@ -53154,7 +53157,7 @@ void Tool_autobeam::processMeasure(vector<HTp>& measure) {
 
 	// close the last beam
 	if ((beamstart >= 0) && ((int)measure.size() - beamstart > 1)) {
-		addBeam(measure[beamstart], measure[measure.size()-1]);
+		addBeam(measure[beamstart], measure[(int)measure.size()-1]);
 		beamstart = INVALID;
 	}
 }
@@ -53217,6 +53220,10 @@ void Tool_autobeam::removeEdgeRests(HTp& startnote, HTp& endnote) {
 				return;
 			}
 			current = current->getNextNNDT();
+		}
+		if (!current) {
+			// Handle problem when spine is not terminated.
+			return;
 		}
 
 		if (current->getLineIndex() >= endindex) {
@@ -58575,7 +58582,7 @@ void Tool_cint::getNames(vector<string>& names, vector<int>& reverselookup,
 
 	for (i=0; i<(int)names.size(); i++) {
 		value = (int)reverselookup.size() - i;
-		snprintf(buffer,1024,  "%d", value);
+		sprintf(buffer, "%d", value);
 		names[i] = buffer;
 	}
 
@@ -74345,25 +74352,25 @@ void Tool_extract::removeDollarsFromString(string& buffer, int maxtrack) {
 	int value2;
 
 	if (hre.search(buffer, "\\$$")) {
-		snprintf(buf2, 128, "%d", maxtrack);
+		sprintf(buf2, "%d", maxtrack);
 		hre.replaceDestructive(buffer, buf2, "\\$$");
 	}
 
 	if (hre.search(buffer, "\\$(?![\\d-])")) {
 		// don't know how this case could happen, however...
-		snprintf(buf2, 128, "%d", maxtrack);
+		sprintf(buf2, "%d", maxtrack);
 		hre.replaceDestructive(buffer, buf2, "\\$(?![\\d-])", "g");
 	}
 
 	if (hre.search(buffer, "\\$0")) {
 		// replace $0 with maxtrack (used for reverse orderings)
-		snprintf(buf2, 128, "%d", maxtrack);
+		sprintf(buf2, "%d", maxtrack);
 		hre.replaceDestructive(buffer, buf2, "\\$0", "g");
 	}
 
 	while (hre.search(buffer, "\\$(-?\\d+)")) {
 		value2 = maxtrack - abs(hre.getMatchInt(1));
-		snprintf(buf2, 128, "%d", value2);
+		sprintf(buf2, "%d", value2);
 		hre.replaceDestructive(buffer, buf2, "\\$-?\\d+");
 	}
 }
@@ -112527,7 +112534,7 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 		case 2:
 			{
 				char buffer[128] = {0};
-				snprintf(buffer, 128, "d%dc%d", getInt("d"), getInt("c"));
+				sprintf(buffer, "d%dc%d", getInt("d"), getInt("c"));
 				transval = Convert::transToBase40(buffer);
 			}
 			break;
