@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Dec 14 14:43:56 PST 2022
+// Last Modified: Tue Dec 27 01:18:41 PST 2022
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -33384,18 +33384,35 @@ bool HumdrumToken::isKeyDesignation(void) {
 	if (this->size() < 3) {
 		return false;
 	}
-	if (this->find(":") == string::npos) {
+	size_t pos = this->find(":");
+	if (pos == string::npos) {
 		return false;
 	}
-	char diatonic = (*this)[1];
+	if (pos > 4) {
+		return false;
+	}
+	if (pos < 2) {
+		return false;
+	}
+	char diatonic = tolower((*this)[1]);
 
-	if ((diatonic >= 'A') && (diatonic <= 'G')) {
-		return true;
+	if (!((diatonic >= 'a') && (diatonic <= 'g'))) {
+		return false;
 	}
-	if ((diatonic >= 'a') && (diatonic <= 'g')) {
-		return true;
+	if (pos >= 3) {
+		char accidental1 = (*this)[2];
+		if (!((accidental1 == '#') || (accidental1 == '-') || (accidental1 == 'n'))) {
+			return false;
+		}
 	}
-	return false;
+	if (pos >= 4) {
+		char accidental2 = (*this)[3];
+		if (!((accidental2 == '#') || (accidental2 == '-') || (accidental2 == 'n'))) {
+			return false;
+		}
+	}
+	// maybe check for modal cases here
+	return true;
 }
 
 
