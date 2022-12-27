@@ -826,6 +826,12 @@ bool HumdrumInput::convertHumdrum()
         else if (it->isDataType("**harm")) {
             m_harm = true;
         }
+        else if (it->isDataType("**deg")) {
+            m_degree = true;
+        }
+        else if (it->isDataType("**degree")) {
+            m_degree = true;
+        }
         else if (it->isDataType("**rhrm")) { // **recip + **harm
             m_harm = true;
         }
@@ -7063,7 +7069,7 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
         }
     }
 
-    if (m_harm) {
+    if (m_harm || m_degree) {
         addHarmFloatsForMeasure(startline, endline);
     }
 
@@ -7647,8 +7653,9 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 continue;
             }
             bool isCData = token->getDataType().compare(0, 7, "**cdata") == 0;
-            if (!(token->isDataType("**mxhm") || token->isDataType("**harm") || token->isDataType("**rhrm")
-                    || isCData)) {
+            bool isDegree = (token->getDataType() == "**deg") || (token->getDataType() == "**degree");
+            if (!(token->isDataType("**mxhm") || token->isDataType("**harm") || token->isDataType("**rhrm") || isCData
+                    || isDegree)) {
                 continue;
             }
             Harm *harm = new Harm();
@@ -7692,15 +7699,25 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                     appendTypeTag(harm, subdatatype);
                 }
             }
+            else if (datatype.compare(0, 5, "**deg") == 0) {
+                std::string subdatatype = datatype.substr(2);
+                if (!subdatatype.empty()) {
+                    appendTypeTag(harm, subdatatype);
+                }
+            }
 
             std::u32string content;
-            if (token->isDataType("**harm")) {
+            if (datatype == "**harm") {
                 setPlaceRelStaff(harm, "below", false);
                 content = cleanHarmString2(*token);
             }
-            else if (token->isDataType("**rhrm")) {
+            else if (datatype == "**rhrm") {
                 setPlaceRelStaff(harm, "below", false);
                 content = cleanHarmString3(*token);
+            }
+            else if (isDegree) {
+                setPlaceRelStaff(harm, "below", false);
+                content = cleanDegreeString(token);
             }
             else if (isCData) {
                 content = UTF8to32(*token);
@@ -8071,6 +8088,35 @@ std::u32string HumdrumInput::getVisualFBAccidental(int accidental)
             output = U"+"; // UTF-7 +
             break;
     }
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::cleanDegreeString --
+//
+
+std::u32string HumdrumInput::cleanDegreeString(hum::HTp token)
+{
+    std::string temp = *token;
+    std::u32string output;
+
+    hum::HumRegex hre;
+    if (hre.search(token, "(\\d+)")) {
+        int degree = hre.getMatchInt(1);
+        switch (degree) {
+            case 1: output = U"1\u0302"; break;
+            case 2: output = U"2\u0302"; break;
+            case 3: output = U"3\u0302"; break;
+            case 4: output = U"4\u0302"; break;
+            case 5: output = U"5\u0302"; break;
+            case 6: output = U"6\u0302"; break;
+            case 7: output = U"7\u0302"; break;
+            case 8: output = U"8\u0302"; break;
+            case 9: output = U"9\u0302"; break;
+        }
+    }
+
     return output;
 }
 

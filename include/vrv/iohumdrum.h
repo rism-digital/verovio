@@ -794,6 +794,7 @@ protected:
     void setClefOctaveDisplacement(Clef *clef, hum::HTp token);
     void setClefBasicShape(Clef *clef, hum::HTp token);
     void setClefStaffLine(Clef *clef, hum::HTp token);
+    std::u32string cleanDegreeString(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -984,9 +985,14 @@ private:
     int m_measureIndex;
 
     // m_harm == state variable for keeping track of whether or not
-    // the file to convert contains **mxhm spines that should be
+    // the file to convert contains **mxhm or **harm spines that should be
     // converted into <harm> element in the MEI conversion.
     bool m_harm = false;
+
+    // m_degree == state variable for keeping track of whether or not
+    // the file to convert contains **deg or **degree spines that should be
+    // converted into <harm> element in the MEI conversion.
+    bool m_degree = false;
 
     // m_fing == state variable for keeping track of whether or not
     // the file to convert contains **fing spines that should be
