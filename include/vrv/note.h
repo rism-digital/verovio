@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "atts_analytical.h"
 #include "atts_externalsymbols.h"
 #include "atts_frettab.h"
 #include "atts_mensural.h"
@@ -54,6 +55,7 @@ class Note : public LayerElement,
              public AttCue,
              public AttExtSym,
              public AttGraced,
+             public AttHarmonicFunction,
              public AttMidiVelocity,
              public AttNoteGesTab,
              public AttNoteHeads,
