@@ -7759,6 +7759,10 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                     || isDegree)) {
                 continue;
             }
+            if (isDegree && (token->find('r') != std::string::npos)) {
+                // Don't add rest marker data.
+                continue;
+            }
             Harm *harm = new Harm();
             Text *text = new Text();
             Rend *rend = NULL;
@@ -7783,10 +7787,18 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                     rend = new Rend();
                     rend->SetRend(TEXTRENDITION_circle);
                     harm->AddChild(rend);
-                    harm->AddChild(text);
+                    rend->AddChild(text);
                 }
                 else {
-                    harm->AddChild(text);
+                    if (token->getValueInt("auto", "circle")) {
+                        rend = new Rend();
+                        rend->SetRend(TEXTRENDITION_circle);
+                        harm->AddChild(rend);
+                        rend->AddChild(rend);
+                    }
+                    else {
+                        harm->AddChild(text);
+                    }
                 }
             }
 
@@ -8265,12 +8277,21 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
     int flat = 0;
     for (int i = 0; i < (int)temp.size(); i++) {
         switch (temp[i]) {
-            case '#': sharp++; break;
+            case '#': sharp++; break; // Alias for +
+            case '+': sharp++; break;
             case '-': flat++; break;
         }
     }
 
     std::u32string output;
+
+    if (temp.find('^') != std::string::npos) {
+        output += U"\u2191"; // up arrow
+    }
+    else if (temp.find('v') != std::string::npos) {
+        output += U"\u2193"; // down arrow
+    }
+
     if (sharp > 0) {
         if (sharp == 1) {
             output += U"\u266F";
