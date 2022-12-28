@@ -795,7 +795,7 @@ protected:
     void setClefOctaveDisplacement(Clef *clef, hum::HTp token);
     void setClefBasicShape(Clef *clef, hum::HTp token);
     void setClefStaffLine(Clef *clef, hum::HTp token);
-    std::u32string cleanDegreeString(hum::HTp token);
+    std::u32string cleanDegreeString(hum::HTp token, int n = 0);
     void analyzeHarmInterpretations(hum::HTp starttok);
     void analyzeDegInterpretations(hum::HTp starttok);
     void addHarmLabel(Harm *harm, const std::string &label);

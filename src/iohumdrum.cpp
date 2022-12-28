@@ -7761,14 +7761,16 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             }
             Harm *harm = new Harm();
             Text *text = new Text();
+            Rend *rend = NULL;
 
             addChildMeasureOrSection(harm);
 
             int line = token->getLineIndex();
             int field = token->getFieldIndex();
+
             std::string ccolor = getSpineColor(line, field);
             if (!ccolor.empty()) {
-                Rend *rend = new Rend();
+                rend = new Rend();
                 rend->SetColor(ccolor);
                 harm->AddChild(rend);
                 rend->AddChild(text);
@@ -7778,13 +7780,37 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             }
             else {
                 if (token->getValueInt("auto", "circle")) {
-                    Rend *rend = new Rend();
+                    rend = new Rend();
                     rend->SetRend(TEXTRENDITION_circle);
                     harm->AddChild(rend);
                     harm->AddChild(text);
                 }
                 else {
                     harm->AddChild(text);
+                }
+            }
+
+            std::string octave;
+            if (token->isDataType("**degree")) {
+                hum::HumRegex hre2;
+                if (hre2.search(token, "/(\\d+)")) {
+                    octave = hre2.getMatch(1);
+                }
+            }
+
+            if (!octave.empty()) {
+                Rend *subrend = new Rend();
+                Text *subtext = new Text();
+                subrend->AddChild(subtext);
+                subrend->SetRend(TEXTRENDITION_sub);
+                subrend->SetType("octave");
+                std::u32string subcontent = UTF8to32(octave);
+                subtext->SetText(subcontent);
+                if (rend) {
+                    rend->AddChild(subrend);
+                }
+                else {
+                    harm->AddChild(subrend);
                 }
             }
 
@@ -8221,26 +8247,102 @@ std::u32string HumdrumInput::getVisualFBAccidental(int accidental)
 //////////////////////////////
 //
 // HumdrumInput::cleanDegreeString --
+//    n = 0 : the entire degree chord (default: currently mapped to n = 1)
+//    n = 1 : the first degree in a chord
+//    n = 2 : the second degree in a chord
+//    n = 3 : the third degree in a chord
+//    etc.
 //
 
-std::u32string HumdrumInput::cleanDegreeString(hum::HTp token)
+std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
 {
     std::string temp = *token;
+    size_t spacepos = temp.find(" ");
+    if (spacepos != std::string::npos) {
+        temp.resize(spacepos + 1);
+    }
+    int sharp = 0;
+    int flat = 0;
+    for (int i = 0; i < (int)temp.size(); i++) {
+        switch (temp[i]) {
+            case '#': sharp++; break;
+            case '-': flat++; break;
+        }
+    }
+
     std::u32string output;
+    if (sharp > 0) {
+        if (sharp == 1) {
+            output += U"\u266F";
+        }
+        else if (sharp == 2) {
+            output += U"\u266F\u266F";
+            // output += U"\u1D12A";  // double sharp
+        }
+        else if (sharp == 3) {
+            output += U"\u266F\u266F\u266F";
+            // output += U"\u1D12A\u266F";
+        }
+        else if (sharp == 4) {
+            output += U"\u266F\u266F\u266F\u266F";
+            // output += U"\u1D12A\u1D12A";
+        }
+        else if (sharp == 5) {
+            output += U"\u266F\u266F\u266F\u266F\u266F";
+            // output += U"\u1D12A\u1D12A\u266F";
+        }
+        else if (sharp == 6) {
+            output += U"\u266F\u266F\u266F\u266F\u266F\u266F";
+            // output += U"\u1D12A\u1D12A\u1D12A";
+        }
+        else {
+            // excessive number of sharps
+            output += U"?";
+        }
+    }
+    else if (flat > 0) {
+        if (flat == 1) {
+            output += U"\u266D";
+        }
+        else if (flat == 2) {
+            output += U"\u266D\u266D";
+            // output += U"\u1D12B"; // double flat
+        }
+        else if (flat == 3) {
+            output += U"\u266D\u266D\u266D";
+            // output += U"\u1D12B\u266D";
+        }
+        else if (flat == 4) {
+            output += U"\u266D\u266D\u266D\u266D";
+            // output += U"\u1D12B\u1D12B";
+        }
+        else if (flat == 5) {
+            output += U"\u266D\u266D\u266D\u266D\u266D";
+            // output += U"\u1D12B\u1D12B\u266D";
+        }
+        else if (flat == 6) {
+            output += U"\u266D\u266D\u266D\u266D\u266D\u266D";
+            // output += U"\u1D12B\u1D12B\u1D12B";
+        }
+        else {
+            // excessive number of flats
+            output += U"?";
+        }
+    }
 
     hum::HumRegex hre;
-    if (hre.search(token, "(\\d+)")) {
+    if (hre.search(temp, "(\\d+)")) {
         int degree = hre.getMatchInt(1);
         switch (degree) {
-            case 1: output = U"1"; break;
-            case 2: output = U"2"; break;
-            case 3: output = U"3"; break;
-            case 4: output = U"4"; break;
-            case 5: output = U"5"; break;
-            case 6: output = U"6"; break;
-            case 7: output = U"7"; break;
-            case 8: output = U"8"; break;
-            case 9: output = U"9"; break;
+            case 1: output += U"1"; break;
+            case 2: output += U"2"; break;
+            case 3: output += U"3"; break;
+            case 4: output += U"4"; break;
+            case 5: output += U"5"; break;
+            case 6: output += U"6"; break;
+            case 7: output += U"7"; break;
+            case 8: output += U"8"; break;
+            case 9: output += U"9"; break;
         }
         if (token->getValueInt("auto", "hat")) {
             output += U"\u0302";
