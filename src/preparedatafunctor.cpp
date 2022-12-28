@@ -13,6 +13,7 @@
 #include "areaposinterface.h"
 #include "doc.h"
 #include "layer.h"
+#include "plistinterface.h"
 #include "runningelement.h"
 #include "score.h"
 #include "staff.h"
@@ -452,8 +453,31 @@ PreparePlistFunctor::PreparePlistFunctor()
     m_fillList = true;
 }
 
+void PreparePlistFunctor::InsertInterfaceIDTuple(const std::string &elementID, PlistInterface *interface)
+{
+    m_interfaceIDTuples.push_back(std::make_tuple(interface, elementID, (Object *)NULL));
+}
+
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
 {
+    if (m_fillList) {
+        if (object->HasInterface(INTERFACE_PLIST)) {
+            PlistInterface *interface = object->GetPlistInterface();
+            assert(interface);
+            return interface->InterfacePreparePlist(*this, object);
+        }
+    }
+    else {
+        if (!object->IsLayerElement()) return FUNCTOR_CONTINUE;
+
+        std::string id = object->GetID();
+        auto i = std::find_if(m_interfaceIDTuples.begin(), m_interfaceIDTuples.end(),
+            [&id](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == id); });
+        if (i != m_interfaceIDTuples.end()) {
+            std::get<2>(*i) = object;
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

@@ -17,6 +17,7 @@
 #include "functorparams.h"
 #include "layerelement.h"
 #include "measure.h"
+#include "preparedatafunctor.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -95,6 +96,23 @@ void PlistInterface::SetIDStrs()
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
+
+FunctorCode PlistInterface::InterfacePreparePlist(PreparePlistFunctor &functor, Object *object)
+{
+    // This should not happen?
+    if (!functor.FillList()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    this->SetIDStrs();
+
+    std::vector<std::string>::iterator iter;
+    for (iter = m_ids.begin(); iter != m_ids.end(); ++iter) {
+        functor.InsertInterfaceIDTuple(*iter, this);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *object)
 {
