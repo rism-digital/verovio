@@ -986,6 +986,7 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
     bool minorQ = false;
     bool solfQ = false;
     bool dirQ = true;
+    bool aboveQ = false;
     hum::HTp keydesig = NULL;
     hum::HTp current = starttok;
     while (current) {
@@ -994,6 +995,9 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
             break;
         }
         if (current->isData() && !current->isNull()) {
+            if (aboveQ) {
+                current->setValue("auto", "above", 1);
+            }
             if (minorQ) {
                 current->setValue("auto", "minor", 1);
             }
@@ -1016,6 +1020,12 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         }
         if (!current->isInterpretation()) {
             continue;
+        }
+        if (*current == "*above") {
+            aboveQ = true;
+        }
+        if (*current == "*below") {
+            aboveQ = false;
         }
         if (*current == "*hat") {
             hatQ = true;
@@ -6611,16 +6621,27 @@ void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cl
         }
     }
 
-    setClefBasicShape(vrvclef, cleftok);
-    setClefStaffLine(vrvclef, cleftok);
-    setClefOctaveDisplacement(vrvclef, cleftok);
-    checkForClefStyling(vrvclef, cleftok);
+    std::string tok;
+    if (cleftok) {
+        tok = *cleftok;
+    }
+    else {
+        tok = clef;
+    }
+    setClefBasicShape(vrvclef, tok);
+    setClefStaffLine(vrvclef, tok);
+    setClefOctaveDisplacement(vrvclef, tok);
+    if (cleftok) {
+        checkForClefStyling(vrvclef, cleftok);
+    }
 
     // dummy hierarchy tracking variables:
     std::vector<std::string> elements;
     std::vector<void *> pointers;
-    setClefColorOrEditorial(cleftok, vrvclef, elements, pointers, false);
-    setLocationId(vrvclef, cleftok);
+    if (cleftok) {
+        setClefColorOrEditorial(cleftok, vrvclef, elements, pointers, false);
+        setLocationId(vrvclef, cleftok);
+    }
 }
 
 //////////////////////////////
@@ -6634,21 +6655,21 @@ void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cl
 //    *clefC5 == 5th line from bottom of staff
 //
 
-void HumdrumInput::setClefStaffLine(Clef *clef, hum::HTp token)
+void HumdrumInput::setClefStaffLine(Clef *clef, const std::string &tok)
 {
-    if (token->find("2") != std::string::npos) {
+    if (tok.find("2") != std::string::npos) {
         clef->SetLine(2);
     }
-    else if (token->find("4") != std::string::npos) {
+    else if (tok.find("4") != std::string::npos) {
         clef->SetLine(4);
     }
-    else if (token->find("3") != std::string::npos) {
+    else if (tok.find("3") != std::string::npos) {
         clef->SetLine(3);
     }
-    else if (token->find("5") != std::string::npos) {
+    else if (tok.find("5") != std::string::npos) {
         clef->SetLine(5);
     }
-    else if (token->find("1") != std::string::npos) {
+    else if (tok.find("1") != std::string::npos) {
         clef->SetLine(1);
     }
 }
@@ -7920,6 +7941,14 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             std::string meilabel = token->getValue("auto", "meilabel");
             if (!meilabel.empty()) {
                 addHarmLabel(harm, meilabel);
+            }
+
+            int aboveQ = token->getValueInt("auto", "above");
+            if (aboveQ) {
+                setPlaceRelStaff(harm, "above", false);
+            }
+            else {
+                setPlaceRelStaff(harm, "below", false);
             }
 
             setLocationId(harm, token);
@@ -13400,7 +13429,6 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     }
 
     if (tempo) {
-
         Tempo *tempo = new Tempo();
         double midibpm = getMmTempo(token);
         if (midibpm > 0) {
@@ -18080,9 +18108,9 @@ Clef *HumdrumInput::insertClefElement(
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     ss.at(m_currentstaff - 1).last_clef = *token;
 
-    setClefBasicShape(clef, token);
-    setClefStaffLine(clef, token);
-    setClefOctaveDisplacement(clef, token);
+    setClefBasicShape(clef, *token);
+    setClefStaffLine(clef, *token);
+    setClefOctaveDisplacement(clef, *token);
     checkForClefStyling(clef, token);
     return clef;
 }
@@ -18095,15 +18123,15 @@ Clef *HumdrumInput::insertClefElement(
 //     *clefC = C clef
 //     *clefX = percussion clef
 
-void HumdrumInput::setClefBasicShape(Clef *clef, hum::HTp token)
+void HumdrumInput::setClefBasicShape(Clef *clef, const std::string &tok)
 {
-    if (token->find("clefG") != std::string::npos) {
+    if (tok.find("clefG") != std::string::npos) {
         clef->SetShape(CLEFSHAPE_G);
     }
-    else if (token->find("clefF") != std::string::npos) {
+    else if (tok.find("clefF") != std::string::npos) {
         clef->SetShape(CLEFSHAPE_F);
     }
-    else if (token->find("clefC") != std::string::npos) {
+    else if (tok.find("clefC") != std::string::npos) {
         clef->SetShape(CLEFSHAPE_C);
     }
 }
@@ -18117,22 +18145,22 @@ void HumdrumInput::setClefBasicShape(Clef *clef, hum::HTp token)
 //    *clefG^^2 == ^^ means play two octaves higher than written
 //
 
-void HumdrumInput::setClefOctaveDisplacement(Clef *clef, hum::HTp token)
+void HumdrumInput::setClefOctaveDisplacement(Clef *clef, const std::string &tok)
 {
 
-    if (token->find("vv") != std::string::npos) {
+    if (tok.find("vv") != std::string::npos) {
         clef->SetDis(OCTAVE_DIS_15);
         clef->SetDisPlace(STAFFREL_basic_below);
     }
-    else if (token->find("v") != std::string::npos) {
+    else if (tok.find("v") != std::string::npos) {
         clef->SetDis(OCTAVE_DIS_8);
         clef->SetDisPlace(STAFFREL_basic_below);
     }
-    else if (token->find("^^") != std::string::npos) {
+    else if (tok.find("^^") != std::string::npos) {
         clef->SetDis(OCTAVE_DIS_15);
         clef->SetDisPlace(STAFFREL_basic_above);
     }
-    else if (token->find("^") != std::string::npos) {
+    else if (tok.find("^") != std::string::npos) {
         clef->SetDis(OCTAVE_DIS_8);
         clef->SetDisPlace(STAFFREL_basic_above);
     }

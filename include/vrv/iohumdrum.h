@@ -792,9 +792,9 @@ protected:
     void checkForClefStyling(Clef *clef, hum::HTp token);
     void setClefColorOrEditorial(hum::HTp token, Clef *clef, std::vector<std::string> &elements,
         std::vector<void *> &pointers, bool append = true);
-    void setClefOctaveDisplacement(Clef *clef, hum::HTp token);
-    void setClefBasicShape(Clef *clef, hum::HTp token);
-    void setClefStaffLine(Clef *clef, hum::HTp token);
+    void setClefOctaveDisplacement(Clef *clef, const std::string &token);
+    void setClefBasicShape(Clef *clef, const std::string &tok);
+    void setClefStaffLine(Clef *clef, const std::string &tok);
     std::u32string cleanDegreeString(hum::HTp token, int n = 0);
     void analyzeHarmInterpretations(hum::HTp starttok);
     void analyzeDegreeInterpretations(hum::HTp starttok);
