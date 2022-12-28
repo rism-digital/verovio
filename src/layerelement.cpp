@@ -2447,26 +2447,6 @@ int LayerElement::CalcSlurDirection(FunctorParams *)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::PrepareDuration(FunctorParams *functorParams)
-{
-    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
-    assert(params);
-
-    DurationInterface *durInterface = this->GetDurationInterface();
-    if (durInterface) {
-        durInterface->SetDurDefault(params->m_durDefault);
-        // Check if there is a duration default for the staff
-        if (!params->m_durDefaultForStaffN.empty()) {
-            Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-            if (params->m_durDefaultForStaffN.count(staff->GetN()) > 0) {
-                durInterface->SetDurDefault(params->m_durDefaultForStaffN.at(staff->GetN()));
-            }
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::CacheHorizontalLayout(FunctorParams *functorParams)
 {
     CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);

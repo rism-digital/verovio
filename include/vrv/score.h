@@ -132,11 +132,6 @@ public:
     int UnCastOff(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareDuration
-     */
-    int PrepareDuration(FunctorParams *functorParams) override;
-
-    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;

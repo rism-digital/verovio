@@ -933,17 +933,6 @@ int ScoreDef::JustifyX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int ScoreDef::PrepareDuration(FunctorParams *functorParams)
-{
-    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
-    assert(params);
-
-    params->m_durDefaultForStaffN.clear();
-    params->m_durDefault = this->GetDurDefault();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int ScoreDef::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

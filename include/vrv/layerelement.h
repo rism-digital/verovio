@@ -451,11 +451,6 @@ public:
     int CalcSlurDirection(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareDuration
-     */
-    int PrepareDuration(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CacheHorizontalLayout
      */
     int CacheHorizontalLayout(FunctorParams *functorParams) override;

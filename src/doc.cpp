@@ -511,9 +511,8 @@ void Doc::PrepareData()
 
     /************ Store default durations ************/
 
-    Functor prepareDuration(&Object::PrepareDuration);
-    PrepareDurationParams prepareDurationParams(&prepareDuration);
-    this->Process(&prepareDuration, &prepareDurationParams);
+    PrepareDurationFunctor prepareDuration;
+    this->Process(prepareDuration);
 
     /************ Resolve @startid / @endid ************/
 
