@@ -481,4 +481,33 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareDurationFunctor
+//----------------------------------------------------------------------------
+
+PrepareDurationFunctor::PrepareDurationFunctor()
+{
+    m_durDefault = DURATION_NONE;
+}
+
+FunctorCode PrepareDurationFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareDurationFunctor::VisitScore(Score *score)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareDurationFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareDurationFunctor::VisitStaffDef(StaffDef *staffDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

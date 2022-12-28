@@ -372,6 +372,51 @@ private:
     bool m_fillList;
 };
 
+//----------------------------------------------------------------------------
+// PrepareDurationFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class extracts the default duration from scoredef/staffdef.
+ */
+class PrepareDurationFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareDurationFunctor();
+    virtual ~PrepareDurationFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitStaffDef(StaffDef *staffDef) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current scoreDef default duration
+    data_DURATION m_durDefault;
+    // The current staffDef default durations
+    std::map<int, data_DURATION> m_durDefaultForStaffN;
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__
