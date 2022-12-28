@@ -1916,22 +1916,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PreparePlistParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: ArrayOfInterfaceIDPairs holds the interface / id pairs to match
- * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
- **/
-
-class PreparePlistParams : public FunctorParams {
-public:
-    PreparePlistParams() { m_fillList = true; }
-    ArrayOfPlistInterfaceIDTuples m_interfaceIDTuples;
-    bool m_fillList;
-};
-
-//----------------------------------------------------------------------------
 // PreparePointersByLayerParams
 //----------------------------------------------------------------------------
 

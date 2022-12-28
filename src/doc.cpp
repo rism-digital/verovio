@@ -600,26 +600,24 @@ void Doc::PrepareData()
     /************ Resolve @plist ************/
 
     // Try to match all pointing elements using @plist
-    PreparePlistParams preparePlistParams;
-    Functor preparePlist(&Object::PreparePlist);
-    this->Process(&preparePlist, &preparePlistParams);
+    PreparePlistFunctor preparePlist;
+    this->Process(preparePlist);
 
-    // Process plist after all pairs has been collected
-    if (!preparePlistParams.m_interfaceIDTuples.empty()) {
-        preparePlistParams.m_fillList = false;
-        Functor processPlist(&Object::PrepareProcessPlist);
-        this->Process(&processPlist, &preparePlistParams);
+    // Process plist after all pairs have been collected
+    if (!preparePlist.GetInterfaceIDTuples().empty()) {
+        preparePlist.FillList(false);
+        this->Process(preparePlist);
 
-        for (const auto &[plistInterface, id, objectReference] : preparePlistParams.m_interfaceIDTuples) {
+        for (const auto &[plistInterface, id, objectReference] : preparePlist.GetInterfaceIDTuples()) {
             plistInterface->SetRef(objectReference);
         }
-        preparePlistParams.m_interfaceIDTuples.clear();
+        preparePlist.ClearInterfaceIDTuples();
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!preparePlistParams.m_interfaceIDTuples.empty()) {
+    if (!preparePlist.GetInterfaceIDTuples().empty()) {
         LogWarning(
-            "%d element(s) with a @plist could not match the target", preparePlistParams.m_interfaceIDTuples.size());
+            "%d element(s) with a @plist could not match the target", preparePlist.GetInterfaceIDTuples().size());
     }
 
     /************ Resolve cross staff ************/

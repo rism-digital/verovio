@@ -114,26 +114,6 @@ FunctorCode PlistInterface::InterfacePreparePlist(PreparePlistFunctor &functor, 
     return FUNCTOR_CONTINUE;
 }
 
-int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *object)
-{
-    PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
-    assert(params);
-
-    // This should not happen?
-    if (params->m_fillList == false) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    this->SetIDStrs();
-
-    std::vector<std::string>::iterator iter;
-    for (iter = m_ids.begin(); iter != m_ids.end(); ++iter) {
-        params->m_interfaceIDTuples.push_back(std::make_tuple(this, *iter, (Object *)NULL));
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int PlistInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_ids.clear();

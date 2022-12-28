@@ -76,11 +76,6 @@ public:
     ///@}
 
     /**
-     * See Object::PreparePlist
-     */
-    virtual int InterfacePreparePlist(FunctorParams *functorParams, Object *object);
-
-    /**
      * See Object::ResetData
      */
     virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);

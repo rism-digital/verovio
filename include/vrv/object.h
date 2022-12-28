@@ -1091,16 +1091,6 @@ public:
     ///@{
 
     /**
-     * Prepare list of elements in the @plist.
-     */
-    virtual int PreparePlist(FunctorParams *functorParams);
-
-    /**
-     * Match elements of @plist
-     */
-    virtual int PrepareProcessPlist(FunctorParams *functorParams);
-
-    /**
      * Extract default duration from scoredef/staffdef
      */
     virtual int PrepareDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }

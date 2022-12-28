@@ -1793,37 +1793,6 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::PreparePlist(FunctorParams *functorParams)
-{
-    PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
-    assert(params);
-
-    if (params->m_fillList && this->HasInterface(INTERFACE_PLIST)) {
-        PlistInterface *interface = this->GetPlistInterface();
-        assert(interface);
-        return interface->InterfacePreparePlist(functorParams, this);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::PrepareProcessPlist(FunctorParams *functorParams)
-{
-    PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
-    assert(params);
-
-    if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
-
-    std::string id = this->GetID();
-    auto i = std::find_if(params->m_interfaceIDTuples.begin(), params->m_interfaceIDTuples.end(),
-        [&id](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == id); });
-    if (i != params->m_interfaceIDTuples.end()) {
-        std::get<2>(*i) = this;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Object::GetAlignmentLeftRight(FunctorParams *functorParams) const
 {
     GetAlignmentLeftRightParams *params = vrv_params_cast<GetAlignmentLeftRightParams *>(functorParams);

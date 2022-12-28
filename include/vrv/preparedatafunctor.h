@@ -318,7 +318,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class prepares list of elements in the @plist.
+ * This class matches elements of @plist.
  */
 class PreparePlistFunctor : public MutableFunctor {
 public:
