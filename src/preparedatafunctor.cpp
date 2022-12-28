@@ -492,21 +492,45 @@ PrepareDurationFunctor::PrepareDurationFunctor()
 
 FunctorCode PrepareDurationFunctor::VisitLayerElement(LayerElement *layerElement)
 {
+    DurationInterface *durInterface = layerElement->GetDurationInterface();
+    if (durInterface) {
+        durInterface->SetDurDefault(m_durDefault);
+        // Check if there is a duration default for the staff
+        if (!m_durDefaultForStaffN.empty()) {
+            Staff *staff = layerElement->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            if (m_durDefaultForStaffN.count(staff->GetN()) > 0) {
+                durInterface->SetDurDefault(m_durDefaultForStaffN.at(staff->GetN()));
+            }
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareDurationFunctor::VisitScore(Score *score)
 {
+    ScoreDef *scoreDef = score->GetScoreDef();
+    if (scoreDef) {
+        scoreDef->Process(*this);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareDurationFunctor::VisitScoreDef(ScoreDef *scoreDef)
 {
+    m_durDefaultForStaffN.clear();
+    m_durDefault = scoreDef->GetDurDefault();
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareDurationFunctor::VisitStaffDef(StaffDef *staffDef)
 {
+    if (staffDef->HasDurDefault() && staffDef->HasN()) {
+        m_durDefaultForStaffN[staffDef->GetN()] = staffDef->GetDurDefault();
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
