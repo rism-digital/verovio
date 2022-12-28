@@ -797,8 +797,9 @@ protected:
     void setClefStaffLine(Clef *clef, hum::HTp token);
     std::u32string cleanDegreeString(hum::HTp token, int n = 0);
     void analyzeHarmInterpretations(hum::HTp starttok);
-    void analyzeDegInterpretations(hum::HTp starttok);
+    void analyzeDegreeInterpretations(hum::HTp starttok);
     void addHarmLabel(Harm *harm, const std::string &label);
+    std::u32string getMoveableDoName(int degree, int semitones, int minorQ);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

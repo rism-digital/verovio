@@ -828,11 +828,11 @@ bool HumdrumInput::convertHumdrum()
             m_harm = true;
         }
         else if (it->isDataType("**deg")) {
-            analyzeDegInterpretations(it);
+            analyzeDegreeInterpretations(it);
             m_degree = true;
         }
         else if (it->isDataType("**degree")) {
-            analyzeDegInterpretations(it);
+            analyzeDegreeInterpretations(it);
             m_degree = true;
         }
         else if (it->isDataType("**rhrm")) { // **recip + **harm
@@ -968,19 +968,24 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
 
 //////////////////////////////
 //
-// HumdrumInput::analyzeDegInterpretations --
+// HumdrumInput::analyzeDegreeInterpretations --
 //   Known interpretations that affect **harm:
 //      *[A-Ga-g][#-]*:(dor|phr|lyd|mix|aeo|loc|ion)? == Key designation
 //      *hat == add a hat above the scale degrees
 //      *Xhat == don't add a hat (default)
 //      *circle == add a circle around the scale degrees
 //      *Xcircle == don't add a circle (default)
+//      *solf == display in moveable do
+//      *Xsolf == do not display in moveable do
 //
 
-void HumdrumInput::analyzeDegInterpretations(hum::HTp starttok)
+void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
 {
     bool hatQ = false;
     bool circleQ = false;
+    bool minorQ = false;
+    bool solfQ = false;
+    bool dirQ = true;
     hum::HTp keydesig = NULL;
     hum::HTp current = starttok;
     while (current) {
@@ -989,11 +994,20 @@ void HumdrumInput::analyzeDegInterpretations(hum::HTp starttok)
             break;
         }
         if (current->isData() && !current->isNull()) {
+            if (minorQ) {
+                current->setValue("auto", "minor", 1);
+            }
+            if (solfQ) {
+                current->setValue("auto", "solf", 1);
+            }
             if (hatQ) {
                 current->setValue("auto", "hat", 1);
             }
             if (circleQ) {
                 current->setValue("auto", "circle", 1);
+            }
+            if (!dirQ) {
+                current->setValue("auto", "Xdir", 1);
             }
             if (keydesig) {
                 current->setValue("auto", "meilabel", keydesig->substr(1));
@@ -1015,8 +1029,31 @@ void HumdrumInput::analyzeDegInterpretations(hum::HTp starttok)
         if (*current == "*Xcircle") {
             circleQ = false;
         }
+        if (*current == "*solf") {
+            solfQ = true;
+        }
+        if (*current == "*Xsolf") {
+            solfQ = false;
+        }
+        if (*current == "*dir") {
+            dirQ = true;
+        }
+        if (*current == "*Xdir") {
+            dirQ = false;
+        }
         if (current->isKeyDesignation()) {
             keydesig = current;
+            char letter = current->at(1);
+            if ((letter == 'X') || (letter == 'x')) {
+                // Perhaps a marker for an unknown or no key in the future
+                minorQ = false;
+            }
+            else if (std::islower(letter)) {
+                minorQ = true;
+            }
+            else {
+                minorQ = false;
+            }
         }
     }
 }
@@ -8273,46 +8310,55 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
     if (spacepos != std::string::npos) {
         temp.resize(spacepos + 1);
     }
-    int sharp = 0;
-    int flat = 0;
+    int sharps = 0;
+    int flats = 0;
     for (int i = 0; i < (int)temp.size(); i++) {
         switch (temp[i]) {
-            case '#': sharp++; break; // Alias for +
-            case '+': sharp++; break;
-            case '-': flat++; break;
+            case '#': sharps++; break; // Alias for +
+            case '+': sharps++; break;
+            case '-': flats++; break;
         }
     }
 
     std::u32string output;
 
-    if (temp.find('^') != std::string::npos) {
-        output += U"\u2191"; // up arrow
-    }
-    else if (temp.find('v') != std::string::npos) {
-        output += U"\u2193"; // down arrow
+    int dirQ = !token->getValueInt("auto", "Xdir");
+
+    if (dirQ) {
+        if (temp.find('^') != std::string::npos) {
+            output += U"\u2191"; // up arrow
+        }
+        else if (temp.find('v') != std::string::npos) {
+            output += U"\u2193"; // down arrow
+        }
     }
 
-    if (sharp > 0) {
-        if (sharp == 1) {
+    bool solfege = token->getValueInt("auto", "solf");
+
+    if (solfege) {
+        // do nothing
+    }
+    else if (sharps > 0) {
+        if (sharps == 1) {
             output += U"\u266F";
         }
-        else if (sharp == 2) {
+        else if (sharps == 2) {
             output += U"\u266F\u266F";
             // output += U"\u1D12A";  // double sharp
         }
-        else if (sharp == 3) {
+        else if (sharps == 3) {
             output += U"\u266F\u266F\u266F";
             // output += U"\u1D12A\u266F";
         }
-        else if (sharp == 4) {
+        else if (sharps == 4) {
             output += U"\u266F\u266F\u266F\u266F";
             // output += U"\u1D12A\u1D12A";
         }
-        else if (sharp == 5) {
+        else if (sharps == 5) {
             output += U"\u266F\u266F\u266F\u266F\u266F";
             // output += U"\u1D12A\u1D12A\u266F";
         }
-        else if (sharp == 6) {
+        else if (sharps == 6) {
             output += U"\u266F\u266F\u266F\u266F\u266F\u266F";
             // output += U"\u1D12A\u1D12A\u1D12A";
         }
@@ -8321,27 +8367,27 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
             output += U"?";
         }
     }
-    else if (flat > 0) {
-        if (flat == 1) {
+    else if (flats > 0) {
+        if (flats == 1) {
             output += U"\u266D";
         }
-        else if (flat == 2) {
+        else if (flats == 2) {
             output += U"\u266D\u266D";
             // output += U"\u1D12B"; // double flat
         }
-        else if (flat == 3) {
+        else if (flats == 3) {
             output += U"\u266D\u266D\u266D";
             // output += U"\u1D12B\u266D";
         }
-        else if (flat == 4) {
+        else if (flats == 4) {
             output += U"\u266D\u266D\u266D\u266D";
             // output += U"\u1D12B\u1D12B";
         }
-        else if (flat == 5) {
+        else if (flats == 5) {
             output += U"\u266D\u266D\u266D\u266D\u266D";
             // output += U"\u1D12B\u1D12B\u266D";
         }
-        else if (flat == 6) {
+        else if (flats == 6) {
             output += U"\u266D\u266D\u266D\u266D\u266D\u266D";
             // output += U"\u1D12B\u1D12B\u1D12B";
         }
@@ -8354,23 +8400,122 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
     hum::HumRegex hre;
     if (hre.search(temp, "(\\d+)")) {
         int degree = hre.getMatchInt(1);
-        switch (degree) {
-            case 1: output += U"1"; break;
-            case 2: output += U"2"; break;
-            case 3: output += U"3"; break;
-            case 4: output += U"4"; break;
-            case 5: output += U"5"; break;
-            case 6: output += U"6"; break;
-            case 7: output += U"7"; break;
-            case 8: output += U"8"; break;
-            case 9: output += U"9"; break;
+        int minor = token->getValueInt("auto", "solf");
+        int semitones = sharps;
+        if (flats) {
+            semitones = -flats;
         }
-        if (token->getValueInt("auto", "hat")) {
-            output += U"\u0302";
+        if (solfege) {
+            output += getMoveableDoName(degree, semitones, minor);
+        }
+        else {
+            switch (degree) {
+                case 1: output += U"1"; break;
+                case 2: output += U"2"; break;
+                case 3: output += U"3"; break;
+                case 4: output += U"4"; break;
+                case 5: output += U"5"; break;
+                case 6: output += U"6"; break;
+                case 7: output += U"7"; break;
+                case 8: output += U"8"; break;
+                case 9: output += U"9"; break;
+            }
+            if (token->getValueInt("auto", "hat")) {
+                output += U"\u0302";
+            }
         }
     }
 
     return output;
+}
+
+/////////////////////////////
+//
+// HumdrumInput::getMoveableDoName --  Up to +/- 2 semitone alteration.
+//
+
+std::u32string HumdrumInput::getMoveableDoName(int degree, int semitones, int minorQ)
+{
+    if (minorQ && ((degree == 3) || (degree == 6))) {
+        // Convert to major scale
+        semitones--;
+    }
+
+    int deg = (degree - 1) % 7; // zero-index degree and limit to an octave
+
+    switch (deg) {
+        case 0: // do
+            switch (semitones) {
+                case 0: return U"do";
+                case +1: return U"di";
+                case +2: return U"re";
+                case -1: return U"ti";
+                case -2: return U"te";
+            }
+            break;
+
+        case 1: // re
+            switch (semitones) {
+                case 0: return U"re";
+                case +1: return U"ri";
+                case +2: return U"mi";
+                case -1: return U"ra";
+                case -2: return U"do";
+            }
+            break;
+
+        case 2: // mi
+            switch (semitones) {
+                case 0: return U"mi";
+                case +1: return U"fa";
+                case +2: return U"fe";
+                case -1: return U"me";
+                case -2: return U"re";
+            }
+            break;
+
+        case 3: // fa
+            switch (semitones) {
+                case 0: return U"fa";
+                case +1: return U"fi";
+                case +2: return U"so";
+                case -1: return U"mi";
+                case -2: return U"me";
+            }
+            break;
+
+        case 4: // sol
+            switch (semitones) {
+                case 0: return U"so";
+                case +1: return U"si";
+                case +2: return U"la";
+                case -1: return U"se";
+                case -2: return U"fa";
+            }
+            break;
+
+        case 5: // la
+            switch (semitones) {
+                case 0: return U"la";
+                case +1: return U"li";
+                case +2: return U"ti";
+                case -1: return U"le";
+                case -2: return U"so";
+            }
+            break;
+
+        case 6: // ti
+            switch (semitones) {
+                case 0: return U"ti";
+                case +1: return U"do";
+                case +2: return U"di";
+                case -1: return U"te";
+                case -2: return U"la";
+            }
+            break;
+    }
+
+    return U"?";
 }
 
 //////////////////////////////
