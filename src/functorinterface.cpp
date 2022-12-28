@@ -22,6 +22,9 @@
 #include "doc.h"
 #include "dot.h"
 #include "elementpart.h"
+#include "f.h"
+#include "fb.h"
+#include "fig.h"
 #include "ftrem.h"
 #include "gracegrp.h"
 #include "grpsym.h"
@@ -33,6 +36,7 @@
 #include "labelabbr.h"
 #include "layer.h"
 #include "layerdef.h"
+#include "lb.h"
 #include "ligature.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -48,6 +52,7 @@
 #include "nc.h"
 #include "neume.h"
 #include "note.h"
+#include "num.h"
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
@@ -57,6 +62,7 @@
 #include "pghead2.h"
 #include "plica.h"
 #include "proport.h"
+#include "rend.h"
 #include "rest.h"
 #include "score.h"
 #include "scoredef.h"
@@ -65,11 +71,14 @@
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "stem.h"
+#include "svg.h"
 #include "syl.h"
 #include "syllable.h"
+#include "symbol.h"
 #include "system.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
+#include "text.h"
 #include "timestamp.h"
 #include "tuning.h"
 #include "tuplet.h"
@@ -799,6 +808,106 @@ FunctorCode FunctorInterface::VisitVerse(Verse *verse)
 FunctorCode FunctorInterface::VisitVerseEnd(Verse *verse)
 {
     return this->VisitLayerElementEnd(verse);
+}
+
+FunctorCode FunctorInterface::VisitF(F *f)
+{
+    return this->VisitTextElement(f);
+}
+
+FunctorCode FunctorInterface::VisitFEnd(F *f)
+{
+    return this->VisitTextElementEnd(f);
+}
+
+FunctorCode FunctorInterface::VisitFb(Fb *fb)
+{
+    return this->VisitObject(fb);
+}
+
+FunctorCode FunctorInterface::VisitFbEnd(Fb *fb)
+{
+    return this->VisitObjectEnd(fb);
+}
+
+FunctorCode FunctorInterface::VisitFig(Fig *fig)
+{
+    return this->VisitTextElement(fig);
+}
+
+FunctorCode FunctorInterface::VisitFigEnd(Fig *fig)
+{
+    return this->VisitTextElementEnd(fig);
+}
+
+FunctorCode FunctorInterface::VisitLb(Lb *lb)
+{
+    return this->VisitTextElement(lb);
+}
+
+FunctorCode FunctorInterface::VisitLbEnd(Lb *lb)
+{
+    return this->VisitTextElementEnd(lb);
+}
+
+FunctorCode FunctorInterface::VisitNum(Num *num)
+{
+    return this->VisitTextElement(num);
+}
+
+FunctorCode FunctorInterface::VisitNumEnd(Num *num)
+{
+    return this->VisitTextElementEnd(num);
+}
+
+FunctorCode FunctorInterface::VisitRend(Rend *rend)
+{
+    return this->VisitTextElement(rend);
+}
+
+FunctorCode FunctorInterface::VisitRendEnd(Rend *rend)
+{
+    return this->VisitTextElementEnd(rend);
+}
+
+FunctorCode FunctorInterface::VisitSvg(Svg *svg)
+{
+    return this->VisitObject(svg);
+}
+
+FunctorCode FunctorInterface::VisitSvgEnd(Svg *svg)
+{
+    return this->VisitObjectEnd(svg);
+}
+
+FunctorCode FunctorInterface::VisitSymbol(Symbol *symbol)
+{
+    return this->VisitTextElement(symbol);
+}
+
+FunctorCode FunctorInterface::VisitSymbolEnd(Symbol *symbol)
+{
+    return this->VisitTextElementEnd(symbol);
+}
+
+FunctorCode FunctorInterface::VisitText(Text *text)
+{
+    return this->VisitTextElement(text);
+}
+
+FunctorCode FunctorInterface::VisitTextEnd(Text *text)
+{
+    return this->VisitTextElementEnd(text);
+}
+
+FunctorCode FunctorInterface::VisitTextElement(TextElement *textElement)
+{
+    return this->VisitObject(textElement);
+}
+
+FunctorCode FunctorInterface::VisitTextElementEnd(TextElement *textElement)
+{
+    return this->VisitObjectEnd(textElement);
 }
 
 FunctorCode FunctorInterface::VisitAlignment(Alignment *alignment)
@@ -1613,6 +1722,106 @@ FunctorCode ConstFunctorInterface::VisitVerse(const Verse *verse)
 FunctorCode ConstFunctorInterface::VisitVerseEnd(const Verse *verse)
 {
     return this->VisitLayerElementEnd(verse);
+}
+
+FunctorCode ConstFunctorInterface::VisitF(const F *f)
+{
+    return this->VisitTextElement(f);
+}
+
+FunctorCode ConstFunctorInterface::VisitFEnd(const F *f)
+{
+    return this->VisitTextElementEnd(f);
+}
+
+FunctorCode ConstFunctorInterface::VisitFb(const Fb *fb)
+{
+    return this->VisitObject(fb);
+}
+
+FunctorCode ConstFunctorInterface::VisitFbEnd(const Fb *fb)
+{
+    return this->VisitObjectEnd(fb);
+}
+
+FunctorCode ConstFunctorInterface::VisitFig(const Fig *fig)
+{
+    return this->VisitTextElement(fig);
+}
+
+FunctorCode ConstFunctorInterface::VisitFigEnd(const Fig *fig)
+{
+    return this->VisitTextElementEnd(fig);
+}
+
+FunctorCode ConstFunctorInterface::VisitLb(const Lb *lb)
+{
+    return this->VisitTextElement(lb);
+}
+
+FunctorCode ConstFunctorInterface::VisitLbEnd(const Lb *lb)
+{
+    return this->VisitTextElementEnd(lb);
+}
+
+FunctorCode ConstFunctorInterface::VisitNum(const Num *num)
+{
+    return this->VisitTextElement(num);
+}
+
+FunctorCode ConstFunctorInterface::VisitNumEnd(const Num *num)
+{
+    return this->VisitTextElementEnd(num);
+}
+
+FunctorCode ConstFunctorInterface::VisitRend(const Rend *rend)
+{
+    return this->VisitTextElement(rend);
+}
+
+FunctorCode ConstFunctorInterface::VisitRendEnd(const Rend *rend)
+{
+    return this->VisitTextElementEnd(rend);
+}
+
+FunctorCode ConstFunctorInterface::VisitSvg(const Svg *svg)
+{
+    return this->VisitObject(svg);
+}
+
+FunctorCode ConstFunctorInterface::VisitSvgEnd(const Svg *svg)
+{
+    return this->VisitObjectEnd(svg);
+}
+
+FunctorCode ConstFunctorInterface::VisitSymbol(const Symbol *symbol)
+{
+    return this->VisitTextElement(symbol);
+}
+
+FunctorCode ConstFunctorInterface::VisitSymbolEnd(const Symbol *symbol)
+{
+    return this->VisitTextElementEnd(symbol);
+}
+
+FunctorCode ConstFunctorInterface::VisitText(const Text *text)
+{
+    return this->VisitTextElement(text);
+}
+
+FunctorCode ConstFunctorInterface::VisitTextEnd(const Text *text)
+{
+    return this->VisitTextElementEnd(text);
+}
+
+FunctorCode ConstFunctorInterface::VisitTextElement(const TextElement *textElement)
+{
+    return this->VisitObject(textElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitTextElementEnd(const TextElement *textElement)
+{
+    return this->VisitObjectEnd(textElement);
 }
 
 FunctorCode ConstFunctorInterface::VisitAlignment(const Alignment *alignment)

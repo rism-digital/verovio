@@ -27,6 +27,9 @@ class Custos;
 class Dot;
 class Dots;
 class Doc;
+class F;
+class Fb;
+class Fig;
 class Flag;
 class FloatingObject;
 class FTrem;
@@ -43,6 +46,7 @@ class LabelAbbr;
 class Layer;
 class LayerDef;
 class LayerElement;
+class Lb;
 class Ligature;
 class Mdiv;
 class Measure;
@@ -50,6 +54,7 @@ class MeasureAligner;
 class Mensur;
 class MeterSig;
 class MeterSigGrp;
+class MNum;
 class MRest;
 class MRpt;
 class MRpt2;
@@ -59,6 +64,7 @@ class MultiRpt;
 class Nc;
 class Neume;
 class Note;
+class Num;
 class Object;
 class Page;
 class PageElement;
@@ -71,6 +77,7 @@ class PgHead;
 class PgHead2;
 class Plica;
 class Proport;
+class Rend;
 class Rest;
 class RunningElement;
 class Sb;
@@ -83,12 +90,16 @@ class StaffAlignment;
 class StaffDef;
 class StaffGrp;
 class Stem;
+class Svg;
 class Syl;
 class Syllable;
+class Symbol;
 class System;
 class SystemAligner;
 class TabDurSym;
 class TabGrp;
+class Text;
+class TextElement;
 class TimestampAligner;
 class TimestampAttr;
 class Tuning;
@@ -294,6 +305,35 @@ public:
     virtual FunctorCode VisitTupletNumEnd(TupletNum *tupletNum);
     virtual FunctorCode VisitVerse(Verse *verse);
     virtual FunctorCode VisitVerseEnd(Verse *verse);
+    ///@}
+
+    /**
+     * @name Visit text elements
+     */
+    ///@{
+    // TODO: Add control elements later
+    virtual FunctorCode VisitF(F *f);
+    virtual FunctorCode VisitFEnd(F *f);
+    virtual FunctorCode VisitFb(Fb *fb);
+    virtual FunctorCode VisitFbEnd(Fb *fb);
+    virtual FunctorCode VisitFig(Fig *fig);
+    virtual FunctorCode VisitFigEnd(Fig *fig);
+    virtual FunctorCode VisitLb(Lb *lb);
+    virtual FunctorCode VisitLbEnd(Lb *lb);
+    // virtual FunctorCode VisitMNum(MNum *mNum);
+    // virtual FunctorCode VisitMNumEnd(MNum *mNum);
+    virtual FunctorCode VisitNum(Num *num);
+    virtual FunctorCode VisitNumEnd(Num *num);
+    virtual FunctorCode VisitRend(Rend *rend);
+    virtual FunctorCode VisitRendEnd(Rend *rend);
+    virtual FunctorCode VisitSvg(Svg *svg);
+    virtual FunctorCode VisitSvgEnd(Svg *svg);
+    virtual FunctorCode VisitSymbol(Symbol *symbol);
+    virtual FunctorCode VisitSymbolEnd(Symbol *symbol);
+    virtual FunctorCode VisitText(Text *text);
+    virtual FunctorCode VisitTextEnd(Text *text);
+    virtual FunctorCode VisitTextElement(TextElement *textElement);
+    virtual FunctorCode VisitTextElementEnd(TextElement *textElement);
     ///@}
 
     /**
@@ -537,6 +577,35 @@ public:
     virtual FunctorCode VisitTupletNumEnd(const TupletNum *tupletNum);
     virtual FunctorCode VisitVerse(const Verse *verse);
     virtual FunctorCode VisitVerseEnd(const Verse *verse);
+    ///@}
+
+    /**
+     * @name Visit text elements
+     */
+    ///@{
+    // TODO: Add control elements later
+    virtual FunctorCode VisitF(const F *f);
+    virtual FunctorCode VisitFEnd(const F *f);
+    virtual FunctorCode VisitFb(const Fb *fb);
+    virtual FunctorCode VisitFbEnd(const Fb *fb);
+    virtual FunctorCode VisitFig(const Fig *fig);
+    virtual FunctorCode VisitFigEnd(const Fig *fig);
+    virtual FunctorCode VisitLb(const Lb *lb);
+    virtual FunctorCode VisitLbEnd(const Lb *lb);
+    // virtual FunctorCode VisitMNum(const MNum *mNum);
+    // virtual FunctorCode VisitMNumEnd(const MNum *mNum);
+    virtual FunctorCode VisitNum(const Num *num);
+    virtual FunctorCode VisitNumEnd(const Num *num);
+    virtual FunctorCode VisitRend(const Rend *rend);
+    virtual FunctorCode VisitRendEnd(const Rend *rend);
+    virtual FunctorCode VisitSvg(const Svg *svg);
+    virtual FunctorCode VisitSvgEnd(const Svg *svg);
+    virtual FunctorCode VisitSymbol(const Symbol *symbol);
+    virtual FunctorCode VisitSymbolEnd(const Symbol *symbol);
+    virtual FunctorCode VisitText(const Text *text);
+    virtual FunctorCode VisitTextEnd(const Text *text);
+    virtual FunctorCode VisitTextElement(const TextElement *textElement);
+    virtual FunctorCode VisitTextElementEnd(const TextElement *textElement);
     ///@}
 
     /**
