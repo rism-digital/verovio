@@ -8410,13 +8410,29 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
             // do nothing
         }
         else if (sharps > 0) {
-            for (int i = 0; i < sharps; i++) {
+            if (sharps == 1) {
                 output += U"\u2191"; // up arrow
+            }
+            else if (sharps == 2) {
+                output += U"\u21D1"; // double up arrow
+            }
+            else {
+                for (int i = 0; i < sharps; i++) {
+                    output += U"\u2191"; // up arrow
+                }
             }
         }
         else if (flats > 0) {
-            for (int i = 0; i < flats; i++) {
+            if (flats == 1) {
                 output += U"\u2193"; // down arrow
+            }
+            else if (flats == 2) {
+                output += U"\u21D3"; // double down arrow
+            }
+            else {
+                for (int i = 0; i < flats; i++) {
+                    output += U"\u2193"; // down arrow
+                }
             }
         }
     }
