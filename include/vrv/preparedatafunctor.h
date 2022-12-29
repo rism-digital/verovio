@@ -467,6 +467,68 @@ private:
     ListOfPointingInterClassIdPairs m_timePointingInterfaces;
 };
 
+//----------------------------------------------------------------------------
+// PrepareTimeSpanningFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class matches start and end for TimeSpanningInterface elements (such as tie or slur).
+ * If fillList is set to false, only the remaining elements will be matched.
+ * This is used when processing a second time in the other direction.
+ */
+class PrepareTimeSpanningFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareTimeSpanningFunctor();
+    virtual ~PrepareTimeSpanningFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Getter and setter for the fill list flag
+     */
+    ///@{
+    bool FillList() const { return m_fillList; }
+    void FillList(bool fillList) { m_fillList = fillList; }
+    ///@}
+
+    /*
+     * Getter and modifier for the interface / owner tuples
+     */
+    ///@{
+    void InsertInterfaceOwnerTuple(Object *owner, TimeSpanningInterface *interface);
+    ///@}
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitF(F *f) override;
+    FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The interface list that holds the current elements to match
+    ListOfSpanningInterOwnerPairs m_timeSpanningInterfaces;
+    // Indicates the current mode: fill vs process
+    bool m_fillList;
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__

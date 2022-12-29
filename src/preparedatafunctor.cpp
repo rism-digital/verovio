@@ -605,4 +605,38 @@ FunctorCode PrepareTimePointingFunctor::VisitMeasureEnd(Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareTimeSpanningFunctor
+//----------------------------------------------------------------------------
+
+PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor()
+{
+    m_fillList = true;
+}
+
+void PrepareTimeSpanningFunctor::InsertInterfaceOwnerTuple(Object *owner, TimeSpanningInterface *interface)
+{
+    m_timeSpanningInterfaces.push_back({ interface, owner });
+}
+
+FunctorCode PrepareTimeSpanningFunctor::VisitF(F *f)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimeSpanningFunctor::VisitFloatingObject(FloatingObject *floatingObject)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimeSpanningFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
