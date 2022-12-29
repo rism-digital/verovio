@@ -382,19 +382,6 @@ int TimePointInterface::InterfaceResetData(FunctorParams *functorParams, Object 
     return FUNCTOR_CONTINUE;
 }
 
-int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object)
-{
-    PrepareTimePointingParams *params = vrv_params_cast<PrepareTimePointingParams *>(functorParams);
-    assert(params);
-
-    if (!this->HasStartid()) return FUNCTOR_CONTINUE;
-
-    this->SetIDStr();
-    params->m_timePointingInterfaces.push_back({ this, object->GetClassId() });
-
-    return FUNCTOR_CONTINUE;
-}
-
 int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object)
 {
     PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);

@@ -81,18 +81,6 @@ FunctorCode F::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitFEnd(this);
 }
 
-int F::PrepareTimePointing(FunctorParams *functorParams)
-{
-    // At this stage we require <f> to have a @startid - eventually we can
-    // modify this method and set as start the parent <harm> so @startid would not be
-    // required anymore
-
-    // Pass it to the pseudo functor of the interface
-    TimePointInterface *interface = this->GetTimePointInterface();
-    assert(interface);
-    return interface->InterfacePrepareTimePointing(functorParams, this);
-}
-
 int F::PrepareTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface

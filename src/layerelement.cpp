@@ -2231,30 +2231,6 @@ int LayerElement::PrepareDelayedTurns(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
-{
-    PrepareTimePointingParams *params = vrv_params_cast<PrepareTimePointingParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    // Do not look for tstamp pointing to these
-    if (this->Is({ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
-
-    ListOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
-    while (iter != params->m_timePointingInterfaces.end()) {
-        if (iter->first->SetStartOnly(this)) {
-            // We have both the start and the end that are matched
-            iter = params->m_timePointingInterfaces.erase(iter);
-        }
-        else {
-            ++iter;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
 {
     PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);

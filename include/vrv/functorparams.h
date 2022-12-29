@@ -1951,20 +1951,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareTimePointingParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: interface list that holds the current elements to match
- **/
-
-class PrepareTimePointingParams : public FunctorParams {
-public:
-    PrepareTimePointingParams() {}
-    ListOfPointingInterClassIdPairs m_timePointingInterfaces;
-};
-
-//----------------------------------------------------------------------------
 // PrepareTimeSpanningParams
 //----------------------------------------------------------------------------
 

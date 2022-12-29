@@ -105,11 +105,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareTimeSpanning
-     */
-    virtual int InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object);
-
-    /**
      * See Object::PrepareTimestamps
      */
     virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);

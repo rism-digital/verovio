@@ -1436,24 +1436,6 @@ int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareTimePointingEnd(FunctorParams *functorParams)
-{
-    PrepareTimePointingParams *params = vrv_params_cast<PrepareTimePointingParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_timePointingInterfaces.empty()) {
-        LogWarning("%d time pointing element(s) could not be matched in measure %s",
-            params->m_timePointingInterfaces.size(), this->GetID().c_str());
-    }
-
-    ListOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
-    while (iter != params->m_timePointingInterfaces.end()) {
-        iter = params->m_timePointingInterfaces.erase(iter);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
 {
     PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);

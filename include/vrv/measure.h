@@ -442,11 +442,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareTimePointingEnd
-     */
-    int PrepareTimePointingEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::PrepareTimeSpanningEnd
      */
     int PrepareTimeSpanningEnd(FunctorParams *functorParams) override;

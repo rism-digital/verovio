@@ -551,11 +551,9 @@ void Doc::PrepareData()
     this->Process(&prepareRehPosition, NULL);
 
     // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
-    PrepareTimePointingParams prepareTimePointingParams;
-    Functor prepareTimePointing(&Object::PrepareTimePointing);
-    Functor prepareTimePointingEnd(&Object::PrepareTimePointingEnd);
-    this->Process(
-        &prepareTimePointing, &prepareTimePointingParams, &prepareTimePointingEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
+    PrepareTimePointingFunctor prepareTimePointing;
+    prepareTimePointing.SetDirection(BACKWARD);
+    this->Process(prepareTimePointing);
 
     /************ Resolve @tstamp / tstamp2 ************/
 

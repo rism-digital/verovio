@@ -1091,16 +1091,6 @@ public:
     ///@{
 
     /**
-     * Match start for TimePointingInterface elements (such as fermata or harm).
-     */
-    virtual int PrepareTimePointing(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::PrepareTimePointing
-     */
-    virtual int PrepareTimePointingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Match start and end for TimeSpanningInterface elements (such as tie or slur).
      * If fillList is set to false, only the remaining elements will be matched.
      * This is used when processing a second time in the other direction

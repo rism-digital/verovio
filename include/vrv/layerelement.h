@@ -395,11 +395,6 @@ public:
     int PrepareDelayedTurns(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareTimePointing
-     */
-    int PrepareTimePointing(FunctorParams *functorParams) override;
-
-    /**
      * See Object::PrepareTimeSpanning
      */
     int PrepareTimeSpanning(FunctorParams *functorParams) override;
