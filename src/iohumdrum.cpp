@@ -7926,6 +7926,9 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             }
 
             std::u32string content;
+            std::u32string precontent;
+            bool updirQ = false;
+            bool downdirQ = false;
             if (datatype == "**harm") {
                 setPlaceRelStaff(harm, "below", false);
                 content = cleanHarmString2(*token);
@@ -7937,6 +7940,22 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             else if (isDegree) {
                 setPlaceRelStaff(harm, "below", false);
                 content = cleanDegreeString(token);
+                int dirQ = !token->getValueInt("auto", "Xdir");
+                if (dirQ) {
+                    // note: token is presumend to not be a chord.
+                    if (token->find('^') != std::string::npos) {
+                        // precontent = U"\u2191"; // up arrow
+                        precontent = U"\u21D7"; // double up diagonal arrow
+                        // precontent = U"\u2B08"; // thick up diagonal arrow
+                        updirQ = true;
+                    }
+                    else if (token->find('v') != std::string::npos) {
+                        // precontent = U"\u2193"; // down arrow
+                        precontent = U"\u21D8"; // double down arrow
+                        // precontent = U"\u2B0A"; // thick down diagonal arrow
+                        downdirQ = true;
+                    }
+                }
             }
             else if (isCData) {
                 content = UTF8to32(*token);
@@ -7944,7 +7963,28 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             else {
                 content = cleanHarmString(*token);
             }
+
             text->SetText(content);
+            if (isDegree && (updirQ || downdirQ) && !precontent.empty()) {
+                Rend *prerend = new Rend();
+                Text *pretext = new Text();
+                prerend->AddChild(pretext);
+                pretext->SetText(precontent);
+                if (updirQ) {
+                    prerend->SetRend(TEXTRENDITION_sub);
+                }
+                else if (downdirQ) {
+                    prerend->SetRend(TEXTRENDITION_sup);
+                }
+                if (rend) {
+                    rend->InsertChild(prerend, 0);
+                    prerend->SetParent(rend);
+                }
+                else {
+                    harm->InsertChild(prerend, 0);
+                    prerend->SetParent(harm);
+                }
+            }
 
             hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
             harm->SetTstamp(tstamp.getFloat());
@@ -8360,18 +8400,7 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
 
     std::u32string output;
 
-    int dirQ = !token->getValueInt("auto", "Xdir");
-
-    if (dirQ) {
-        if (temp.find('^') != std::string::npos) {
-            output += U"\u2191"; // up arrow
-        }
-        else if (temp.find('v') != std::string::npos) {
-            output += U"\u2193"; // down arrow
-        }
-    }
-
-    bool solfege = token->getValueInt("auto", "solf");
+    bool solfegeQ = token->getValueInt("auto", "solf");
 
     hum::HumRegex hre;
     if (hre.search(temp, "(\\d+)")) {
@@ -8381,7 +8410,7 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
         if (flats) {
             semitones = -flats;
         }
-        if (solfege) {
+        if (solfegeQ) {
             output += getMoveableDoName(degree, semitones, minor);
         }
         else {
@@ -8405,16 +8434,14 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
     int accidQ = !token->getValueInt("auto", "nodegacc");
 
     // Add semitone adjustments
-    if (accidQ) {
-        if (solfege) {
-            // do nothing
-        }
-        else if (sharps > 0) {
+    if (accidQ && !solfegeQ) {
+        if (sharps > 0) {
             if (sharps == 1) {
                 output += U"\u2191"; // up arrow
             }
             else if (sharps == 2) {
                 output += U"\u21D1"; // double up arrow
+                // output += U"\u21C8"; // double up arrow
             }
             else {
                 for (int i = 0; i < sharps; i++) {
@@ -8428,6 +8455,7 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
             }
             else if (flats == 2) {
                 output += U"\u21D3"; // double down arrow
+                // output += U"\u21CA"; // double down arrow
             }
             else {
                 for (int i = 0; i < flats; i++) {
