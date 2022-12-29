@@ -256,7 +256,7 @@ public:
     BezierCurve() {}
     BezierCurve(const Point &p1, const Point &c1, const Point &c2, const Point &p2) : p1(p1), c1(c1), c2(c2), p2(p2) {}
 
-    // Helper to rotate all points within bezier curve around @rotationPoint by @angle
+    // Helper to rotate all points within bezier curve around \@rotationPoint by \@angle
     void Rotate(float angle, const Point &rotationPoint);
 
     /**

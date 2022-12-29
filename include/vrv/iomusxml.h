@@ -278,7 +278,7 @@ private:
     Layer *SelectLayer(short int staffNb, Measure *measure);
 
     /*
-     * Returns the layer with @n=layerNb on the staff.
+     * Returns the layer with \@n=layerNb on the staff.
      * Creates the layer if not found.
      */
     Layer *SelectLayer(short int layerNb, Staff *staff);
@@ -404,7 +404,7 @@ private:
     ///@}
 
     /*
-     * @name Helper method for setting @staff attribute for chords
+     * @name Helper method for setting \@staff attribute for chords
      */
     ///@{
     void SetChordStaff(Layer *layer);

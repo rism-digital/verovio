@@ -1,6 +1,6 @@
 {
   "name": "verovio",
-  "version": "3.9.0",
+  "version": "3.15.0-alpha",
   "description": "This is the stable version of the verovio package",
   "main": "dist/verovio-toolkit-wasm.js",
   "exports": {
@@ -9,8 +9,8 @@
       "import": "./dist/verovio.mjs",
       "require": "./dist/verovio.cjs"
     },
-    "./wasm": "./dist/verovio-module.js",
-    "./wasm-hum": "./dist/verovio-module-hum.js"
+    "./wasm": "./dist/verovio-module.mjs",
+    "./wasm-hum": "./dist/verovio-module-hum.mjs"
   },
   "files": [
     "dist"

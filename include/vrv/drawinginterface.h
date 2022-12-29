@@ -96,7 +96,7 @@ public:
     /**
      * Return information about the position in the beam.
      * (no const since the cached list is updated)
-     * Object * is a pointer to the object implementing the interface (e.g, Beam, fTrem)
+     * Object * is a pointer to the object implementing the interface (e.g., Beam, fTrem)
      */
     ///@{
     bool IsFirstIn(const Object *object, const LayerElement *element) const;

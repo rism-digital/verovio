@@ -521,6 +521,7 @@ bool Toolkit::LoadData(const std::string &data)
         if (this->GetOutputTo() == HUMDRUM) {
             // Humdrum data will be output (post-filtering data),
             // So not continuing converting to SVG.
+            delete input;
             return true;
         }
 
@@ -547,6 +548,7 @@ bool Toolkit::LoadData(const std::string &data)
         this->SetHumdrumBuffer(tempinput->GetHumdrumString().c_str());
 
         if (this->GetOutputTo() == HUMDRUM) {
+            delete tempinput;
             return true;
         }
 

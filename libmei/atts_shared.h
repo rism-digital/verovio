@@ -372,7 +372,7 @@ public:
 
 private:
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/
@@ -2890,7 +2890,7 @@ private:
      * point of alignment across all the parts.
      * Bar lines within a score are usually controlling; that is, they "line up". Bar
      * lines within parts may or may not be controlling. When applied to measure, this
-     * attribute indicates the nature of the right barline but not the left.
+     * attribute indicates the nature of the right bar line but not the left.
      **/
     data_BOOLEAN m_control;
 

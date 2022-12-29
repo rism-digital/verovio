@@ -17,6 +17,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "altsyminterface.h"
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
@@ -44,6 +45,7 @@
 #include "surface.h"
 #include "syl.h"
 #include "syllable.h"
+#include "symboltable.h"
 #include "system.h"
 #include "systemmilestone.h"
 #include "tempo.h"
@@ -1868,6 +1870,26 @@ int Object::PrepareFacsimile(FunctorParams *functorParams)
         else if (this->Is(SYL)) {
             params->m_zonelessSyls.push_back(this);
         }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::PrepareAltSym(FunctorParams *functorParams)
+{
+    PrepareAltSymParams *params = vrv_params_cast<PrepareAltSymParams *>(functorParams);
+    assert(params);
+
+    if (this->Is(SCORE)) {
+        Score *score = vrv_cast<Score *>(this);
+        assert(score);
+        params->m_symbolTable = vrv_cast<SymbolTable *>(score->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
+    }
+
+    if (this->HasInterface(INTERFACE_ALT_SYM)) {
+        AltSymInterface *interface = this->GetAltSymInterface();
+        assert(interface);
+        interface->InterfacePrepareAltSym(functorParams, this);
     }
 
     return FUNCTOR_CONTINUE;

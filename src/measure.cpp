@@ -1102,8 +1102,8 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         const int unit = params->m_doc->GetDrawingUnit(params->m_staffSize);
         MultiRest *multiRest = vrv_cast<MultiRest *>(this->FindDescendantByType(MULTIREST));
         const int num = multiRest->GetNum();
-        if (multiRest->HasWidth()) {
-            const int fixedWidth = multiRest->AttWidth::GetWidth() * (unit + 4);
+        if (multiRest->HasWidth() && multiRest->AttWidth::GetWidth().GetType() == MEASUREMENTTYPE_vu) {
+            const int fixedWidth = multiRest->AttWidth::GetWidth().GetVu() * (unit + 4);
             if (minMeasureWidth < fixedWidth) minMeasureWidth = fixedWidth;
         }
         else if (num > 10) {

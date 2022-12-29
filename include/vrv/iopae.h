@@ -9,7 +9,7 @@
 #define __VRV_IOPAE_H__
 
 /*
- * There are two implementation of the Plaine and Easie parser.
+ * There are two implementation of the Plaine & Easie parser.
  * The new one was introduced in Verovio 3.7.
  * In order to build with the old parser, the following define needs to be uncommented
  */
@@ -177,8 +177,8 @@ private:
     bool m_docScoreDef; // Indicates that we are writing the document scoreDef
     bool m_mensural; // Indicates that the incipit is mensural (initial staffDef)
     bool m_skip; // Processing a staff or a layer to skip
-    int m_layerN; // The @n of the first layer within the first staff
-    int m_staffN; // The @n of the first staff (initial staffDef)
+    int m_layerN; // The \@n of the first layer within the first staff
+    int m_staffN; // The \@n of the first staff (initial staffDef)
     int m_currentOct; // The current octave
     int m_currentDur; // The current duration
     int m_currentDots;
@@ -193,7 +193,7 @@ private:
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-// namespace for local Plain and Easy classes
+// namespace for local Plaine & Easie classes
 //----------------------------------------------------------------------------
 
 namespace pae {
@@ -533,7 +533,7 @@ public:
 
 private:
     /**
-     * Convert the old-style @clef:... @keysig:... @data:... to a JSON input
+     * Convert the old-style \@clef:... \@keysig:... \@data:... to a JSON input
      */
     jsonxx::Object InputKeysToJson(const std::string &inputKeys);
 
@@ -690,7 +690,7 @@ private:
 
     /**
      * A flag indicating the incipit is mensural.
-     * Based on the @clef of the input.
+     * Based on the \@clef of the input.
      */
     bool m_isMensural;
 
