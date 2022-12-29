@@ -987,6 +987,7 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
     bool solfQ = false;
     bool dirQ = true;
     bool aboveQ = false;
+    bool degaccQ = true;
     hum::HTp keydesig = NULL;
     hum::HTp current = starttok;
     while (current) {
@@ -1006,6 +1007,9 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
             }
             if (hatQ) {
                 current->setValue("auto", "hat", 1);
+            }
+            if (!degaccQ) {
+                current->setValue("auto", "nodegacc", 1);
             }
             if (circleQ) {
                 current->setValue("auto", "circle", 1);
@@ -1038,6 +1042,12 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         }
         if (*current == "*Xcircle") {
             circleQ = false;
+        }
+        if (*current == "*acc") {
+            degaccQ = true;
+        }
+        if (*current == "*Xacc") {
+            degaccQ = false;
         }
         if (*current == "*solf") {
             solfQ = true;
@@ -8343,7 +8353,6 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
     int flats = 0;
     for (int i = 0; i < (int)temp.size(); i++) {
         switch (temp[i]) {
-            case '#': sharps++; break; // Alias for +
             case '+': sharps++; break;
             case '-': flats++; break;
         }
@@ -8363,68 +8372,6 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
     }
 
     bool solfege = token->getValueInt("auto", "solf");
-
-    if (solfege) {
-        // do nothing
-    }
-    else if (sharps > 0) {
-        if (sharps == 1) {
-            output += U"\u266F";
-        }
-        else if (sharps == 2) {
-            output += U"\u266F\u266F";
-            // output += U"\u1D12A";  // double sharp
-        }
-        else if (sharps == 3) {
-            output += U"\u266F\u266F\u266F";
-            // output += U"\u1D12A\u266F";
-        }
-        else if (sharps == 4) {
-            output += U"\u266F\u266F\u266F\u266F";
-            // output += U"\u1D12A\u1D12A";
-        }
-        else if (sharps == 5) {
-            output += U"\u266F\u266F\u266F\u266F\u266F";
-            // output += U"\u1D12A\u1D12A\u266F";
-        }
-        else if (sharps == 6) {
-            output += U"\u266F\u266F\u266F\u266F\u266F\u266F";
-            // output += U"\u1D12A\u1D12A\u1D12A";
-        }
-        else {
-            // excessive number of sharps
-            output += U"?";
-        }
-    }
-    else if (flats > 0) {
-        if (flats == 1) {
-            output += U"\u266D";
-        }
-        else if (flats == 2) {
-            output += U"\u266D\u266D";
-            // output += U"\u1D12B"; // double flat
-        }
-        else if (flats == 3) {
-            output += U"\u266D\u266D\u266D";
-            // output += U"\u1D12B\u266D";
-        }
-        else if (flats == 4) {
-            output += U"\u266D\u266D\u266D\u266D";
-            // output += U"\u1D12B\u1D12B";
-        }
-        else if (flats == 5) {
-            output += U"\u266D\u266D\u266D\u266D\u266D";
-            // output += U"\u1D12B\u1D12B\u266D";
-        }
-        else if (flats == 6) {
-            output += U"\u266D\u266D\u266D\u266D\u266D\u266D";
-            // output += U"\u1D12B\u1D12B\u1D12B";
-        }
-        else {
-            // excessive number of flats
-            output += U"?";
-        }
-    }
 
     hum::HumRegex hre;
     if (hre.search(temp, "(\\d+)")) {
@@ -8451,6 +8398,25 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
             }
             if (token->getValueInt("auto", "hat")) {
                 output += U"\u0302";
+            }
+        }
+    }
+
+    int accidQ = !token->getValueInt("auto", "nodegacc");
+
+    // Add semitone adjustments
+    if (accidQ) {
+        if (solfege) {
+            // do nothing
+        }
+        else if (sharps > 0) {
+            for (int i = 0; i < sharps; i++) {
+                output += U"\u2191"; // up arrow
+            }
+        }
+        else if (flats > 0) {
+            for (int i = 0; i < flats; i++) {
+                output += U"\u2193"; // down arrow
             }
         }
     }
