@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -59,6 +60,26 @@ bool F::IsSupportedChild(Object *child)
 //----------------------------------------------------------------------------
 // F functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode F::Accept(MutableFunctor &functor)
+{
+    return functor.VisitF(this);
+}
+
+FunctorCode F::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitF(this);
+}
+
+FunctorCode F::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitFEnd(this);
+}
+
+FunctorCode F::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFEnd(this);
+}
 
 int F::PrepareTimePointing(FunctorParams *functorParams)
 {
