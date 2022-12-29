@@ -932,36 +932,34 @@ bool HumdrumInput::convertHumdrum()
 
 void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
 {
+    bool aboveQ = false;
+    hum::HTp keydesig = NULL;
     hum::HTp current = starttok;
     while (current) {
         current = current->getNextToken();
         if (!current) {
             break;
         }
+        if (current->isData() && !current->isNull()) {
+            if (aboveQ) {
+                current->setValue("auto", "above", 1);
+            }
+            else if (keydesig) {
+                current->setValue("auto", "meilabel", keydesig->substr(1));
+                keydesig = NULL;
+            }
+        }
         if (!current->isInterpretation()) {
             continue;
         }
-        if (!current->isKeyDesignation()) {
-            continue;
+        if (*current == "*above") {
+            aboveQ = true;
         }
-        hum::HTp keydesig = current;
-        while (current) {
-            current = current->getNextToken();
-            if (!current) {
-                break;
-            }
-            if (current->isKeyDesignation()) {
-                keydesig = current;
-                continue;
-            }
-            if (!current->isData()) {
-                continue;
-            }
-            if (current->isNull()) {
-                continue;
-            }
-            current->setValue("auto", "meilabel", keydesig->substr(1));
-            break;
+        else if (*current == "*below") {
+            aboveQ = false;
+        }
+        else if (current->isKeyDesignation()) {
+            keydesig = current;
         }
     }
 }
@@ -1028,40 +1026,40 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         if (*current == "*above") {
             aboveQ = true;
         }
-        if (*current == "*below") {
+        else if (*current == "*below") {
             aboveQ = false;
         }
-        if (*current == "*hat") {
+        else if (*current == "*hat") {
             hatQ = true;
         }
-        if (*current == "*Xhat") {
+        else if (*current == "*Xhat") {
             hatQ = false;
         }
-        if (*current == "*circle") {
+        else if (*current == "*circle") {
             circleQ = true;
         }
-        if (*current == "*Xcircle") {
+        else if (*current == "*Xcircle") {
             circleQ = false;
         }
-        if (*current == "*acc") {
+        else if (*current == "*acc") {
             degaccQ = true;
         }
-        if (*current == "*Xacc") {
+        else if (*current == "*Xacc") {
             degaccQ = false;
         }
-        if (*current == "*solf") {
+        else if (*current == "*solf") {
             solfQ = true;
         }
-        if (*current == "*Xsolf") {
+        else if (*current == "*Xsolf") {
             solfQ = false;
         }
-        if (*current == "*dir") {
+        else if (*current == "*dir") {
             dirQ = true;
         }
-        if (*current == "*Xdir") {
+        else if (*current == "*Xdir") {
             dirQ = false;
         }
-        if (current->isKeyDesignation()) {
+        else if (current->isKeyDesignation()) {
             keydesig = current;
             char letter = current->at(1);
             if ((letter == 'X') || (letter == 'x')) {
@@ -7930,16 +7928,14 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             bool updirQ = false;
             bool downdirQ = false;
             if (datatype == "**harm") {
-                setPlaceRelStaff(harm, "below", false);
                 content = cleanHarmString2(*token);
             }
             else if (datatype == "**rhrm") {
-                setPlaceRelStaff(harm, "below", false);
                 content = cleanHarmString3(*token);
             }
             else if (isDegree) {
-                setPlaceRelStaff(harm, "below", false);
                 content = cleanDegreeString(token);
+                // *dir/*Xdir: do/do_not show melodic approaches (directions)
                 int dirQ = !token->getValueInt("auto", "Xdir");
                 if (dirQ) {
                     // note: token is presumend to not be a chord.
