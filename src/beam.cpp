@@ -204,7 +204,6 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
             const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
             if (coord->m_partialFlagPlace == coord->m_beamRelativePlace) {
                 stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth;
-                if (stemOffset && m_firstNoteOrChord && (m_firstNoteOrChord->m_yBeam % unit)) stemOffset -= unit / 2;
             }
             else if (el->GetIsInBeamSpan() && (coord->m_partialFlagPlace != BEAMPLACE_above)
                 && (coord->m_stem->GetDrawingStemDir() == STEMDIRECTION_up)) {
