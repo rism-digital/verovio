@@ -12,6 +12,7 @@
 #include "altsyminterface.h"
 #include "areaposinterface.h"
 #include "doc.h"
+#include "f.h"
 #include "layer.h"
 #include "plistinterface.h"
 #include "runningelement.h"
@@ -540,23 +541,67 @@ FunctorCode PrepareDurationFunctor::VisitStaffDef(StaffDef *staffDef)
 
 PrepareTimePointingFunctor::PrepareTimePointingFunctor() {}
 
+void PrepareTimePointingFunctor::InsertInterfaceIDTuple(ClassId classID, TimePointInterface *interface)
+{
+    m_timePointingInterfaces.push_back({ interface, classID });
+}
+
 FunctorCode PrepareTimePointingFunctor::VisitF(F *f)
 {
-    return FUNCTOR_CONTINUE;
+    // At this stage we require <f> to have a @startid - eventually we can
+    // modify this method and set as start the parent <harm> so @startid would not be
+    // required anymore
+
+    // Pass it to the pseudo functor of the interface
+    TimePointInterface *interface = f->GetTimePointInterface();
+    assert(interface);
+    return interface->InterfacePrepareTimePointing(*this, f);
 }
 
 FunctorCode PrepareTimePointingFunctor::VisitFloatingObject(FloatingObject *floatingObject)
 {
+    // Pass it to the pseudo functor of the interface
+    if (floatingObject->HasInterface(INTERFACE_TIME_POINT)) {
+        TimePointInterface *interface = floatingObject->GetTimePointInterface();
+        assert(interface);
+        return interface->InterfacePrepareTimePointing(*this, floatingObject);
+    }
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareTimePointingFunctor::VisitLayerElement(LayerElement *layerElement)
 {
+    if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    // Do not look for tstamp pointing to these
+    if (layerElement->Is({ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
+
+    ListOfPointingInterClassIdPairs::iterator iter = m_timePointingInterfaces.begin();
+    while (iter != m_timePointingInterfaces.end()) {
+        if (iter->first->SetStartOnly(layerElement)) {
+            // We have both the start and the end that are matched
+            iter = m_timePointingInterfaces.erase(iter);
+        }
+        else {
+            ++iter;
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareTimePointingFunctor::VisitMeasureEnd(Measure *measure)
 {
+    if (!m_timePointingInterfaces.empty()) {
+        LogWarning("%d time pointing element(s) could not be matched in measure %s", m_timePointingInterfaces.size(),
+            measure->GetID().c_str());
+    }
+
+    ListOfPointingInterClassIdPairs::iterator iter = m_timePointingInterfaces.begin();
+    while (iter != m_timePointingInterfaces.end()) {
+        iter = m_timePointingInterfaces.erase(iter);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

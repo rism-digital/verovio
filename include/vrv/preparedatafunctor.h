@@ -440,6 +440,13 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Getter and modifier for the interface / id tuples
+     */
+    ///@{
+    void InsertInterfaceIDTuple(ClassId classID, TimePointInterface *interface);
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{

@@ -18,6 +18,7 @@
 #include "harm.h"
 #include "layerelement.h"
 #include "measure.h"
+#include "preparedatafunctor.h"
 #include "staff.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -341,6 +342,16 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
+
+FunctorCode TimePointInterface::InterfacePrepareTimePointing(PrepareTimePointingFunctor &functor, Object *object)
+{
+    if (!this->HasStartid()) return FUNCTOR_CONTINUE;
+
+    this->SetIDStr();
+    functor.InsertInterfaceIDTuple(object->GetClassId(), this);
+
+    return FUNCTOR_CONTINUE;
+}
 
 int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
 {
