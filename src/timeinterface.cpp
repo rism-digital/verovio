@@ -382,6 +382,22 @@ int TimePointInterface::InterfaceResetData(FunctorParams *functorParams, Object 
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode TimeSpanningInterface::InterfacePrepareTimeSpanning(PrepareTimeSpanningFunctor &functor, Object *object)
+{
+    if (!this->HasStartid() && !this->HasEndid()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (!functor.FillList()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    this->SetIDStr();
+    functor.InsertInterfaceOwnerTuple(object, this);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object)
 {
     PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);

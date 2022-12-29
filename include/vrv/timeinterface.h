@@ -18,6 +18,7 @@ class FunctorParams;
 class LayerElement;
 class Measure;
 class PrepareTimePointingFunctor;
+class PrepareTimeSpanningFunctor;
 class StaffAlignment;
 
 //----------------------------------------------------------------------------
@@ -212,11 +213,13 @@ public:
     //-----------------//
 
     /**
-     * We have functors in the interface for avoiding code duplication in each implementation class.
-     * Since we are in an interface, we need to pass the  Object (implementation) to
-     * the functor methods. These are not called by the Process/Call loop but by the implementation
-     * classes explicitely. See FloatingObject::PrepareStaffCurrentTimeSpanning for an example.
+     * We have functor code in the interface for avoiding code duplication in each implementation class.
+     * Since we are in an interface, we need to pass the object (implementation) to
+     * the pseudo functor method.
      */
+    ///@{
+    FunctorCode InterfacePrepareTimeSpanning(PrepareTimeSpanningFunctor &functor, Object *object);
+    ///@}
 
     /**
      * See Object::PrepareStaffCurrentTimeSpanning

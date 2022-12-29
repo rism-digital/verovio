@@ -621,21 +621,61 @@ void PrepareTimeSpanningFunctor::InsertInterfaceOwnerTuple(Object *owner, TimeSp
 
 FunctorCode PrepareTimeSpanningFunctor::VisitF(F *f)
 {
-    return FUNCTOR_CONTINUE;
+    // Pass it to the pseudo functor of the interface
+    TimeSpanningInterface *interface = f->GetTimeSpanningInterface();
+    assert(interface);
+    return interface->InterfacePrepareTimeSpanning(*this, f);
 }
 
 FunctorCode PrepareTimeSpanningFunctor::VisitFloatingObject(FloatingObject *floatingObject)
 {
+    // Pass it to the pseudo functor of the interface
+    if (floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimeSpanningInterface *interface = floatingObject->GetTimeSpanningInterface();
+        assert(interface);
+        return interface->InterfacePrepareTimeSpanning(*this, floatingObject);
+    }
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareTimeSpanningFunctor::VisitLayerElement(LayerElement *layerElement)
 {
+    if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    // Do not look for tstamp pointing to these
+    if (layerElement->Is({ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
+
+    ListOfSpanningInterOwnerPairs::iterator iter = m_timeSpanningInterfaces.begin();
+    while (iter != m_timeSpanningInterfaces.end()) {
+        if (iter->first->SetStartAndEnd(layerElement)) {
+            // Verify that the interface owner is encoded in the measure of its start
+            iter->first->VerifyMeasure(iter->second);
+            // We have both the start and the end that are matched
+            iter = m_timeSpanningInterfaces.erase(iter);
+        }
+        else {
+            ++iter;
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
 {
+    ListOfSpanningInterOwnerPairs::iterator iter = m_timeSpanningInterfaces.begin();
+    while (iter != m_timeSpanningInterfaces.end()) {
+        // At the end of the measure (going backward) we remove elements for which we do not need to match the end (for
+        // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
+        // midi output
+        if (iter->second->GetClassId() == HARM) {
+            iter = m_timeSpanningInterfaces.erase(iter);
+        }
+        else {
+            ++iter;
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
