@@ -534,4 +534,30 @@ FunctorCode PrepareDurationFunctor::VisitStaffDef(StaffDef *staffDef)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareTimePointingFunctor
+//----------------------------------------------------------------------------
+
+PrepareTimePointingFunctor::PrepareTimePointingFunctor() {}
+
+FunctorCode PrepareTimePointingFunctor::VisitF(F *f)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimePointingFunctor::VisitFloatingObject(FloatingObject *floatingObject)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimePointingFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimePointingFunctor::VisitMeasureEnd(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

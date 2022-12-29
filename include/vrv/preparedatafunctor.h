@@ -417,6 +417,49 @@ private:
     std::map<int, data_DURATION> m_durDefaultForStaffN;
 };
 
+//----------------------------------------------------------------------------
+// PrepareTimePointingFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class matches the start for TimePointingInterface elements (such as fermata or harm).
+ */
+class PrepareTimePointingFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareTimePointingFunctor();
+    virtual ~PrepareTimePointingFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitF(F *f) override;
+    FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The interface list that holds the current elements to match
+    ListOfPointingInterClassIdPairs m_timePointingInterfaces;
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__
