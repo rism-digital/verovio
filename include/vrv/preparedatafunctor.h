@@ -530,6 +530,60 @@ private:
     bool m_fillList;
 };
 
+//----------------------------------------------------------------------------
+// PrepareTimestampsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class matches start and end for TimeSpanningInterface elements with tstamp(2) attributes.
+ * It is performed only on TimeSpanningInterface elements without @startid (or @endid).
+ * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.
+ */
+class PrepareTimestampsFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareTimestampsFunctor();
+    virtual ~PrepareTimestampsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Getter and modifier for the interface / object lists
+     */
+    ///@{
+    void InsertInterfaceIDPair(ClassId classID, TimeSpanningInterface *interface);
+    void InsertObjectBeatPair(Object *object, const data_MEASUREBEAT &beat);
+    ///@}
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitF(F *f) override;
+    FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The interface list that holds the current elements to match
+    ListOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
+    // The list of tstamp2 elements to attach at the measure end
+    ListOfObjectBeatPairs m_tstamps;
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__

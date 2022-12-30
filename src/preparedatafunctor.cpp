@@ -683,4 +683,35 @@ FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareTimestampsFunctor
+//----------------------------------------------------------------------------
+
+PrepareTimestampsFunctor::PrepareTimestampsFunctor() {}
+
+void PrepareTimestampsFunctor::InsertInterfaceIDPair(ClassId classID, TimeSpanningInterface *interface)
+{
+    m_timeSpanningInterfaces.push_back({ interface, classID });
+}
+
+void PrepareTimestampsFunctor::InsertObjectBeatPair(Object *object, const data_MEASUREBEAT &beat)
+{
+    m_tstamps.push_back({ object, beat });
+}
+
+FunctorCode PrepareTimestampsFunctor::VisitF(F *f)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimestampsFunctor::VisitFloatingObject(FloatingObject *floatingObject)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimestampsFunctor::VisitMeasureEnd(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
