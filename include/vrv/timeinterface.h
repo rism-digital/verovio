@@ -227,11 +227,6 @@ public:
     virtual int InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
 
     /**
-     * See Object::PrepareTimeSpanning
-     */
-    virtual int InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object);
-
-    /**
      * See Object::PrepareTimestamps
      */
     int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object) override;

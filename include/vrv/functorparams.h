@@ -1951,22 +1951,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareTimeSpanningParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: interface list that holds the current elements to match
- * member 1: bool fillList for indicating whether the elements have to be stacked or not
- **/
-
-class PrepareTimeSpanningParams : public FunctorParams {
-public:
-    PrepareTimeSpanningParams() { m_fillList = true; }
-    ListOfSpanningInterOwnerPairs m_timeSpanningInterfaces;
-    bool m_fillList;
-};
-
-//----------------------------------------------------------------------------
 // PrepareTimestampsParams
 //----------------------------------------------------------------------------
 

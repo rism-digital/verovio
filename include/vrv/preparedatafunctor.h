@@ -500,10 +500,11 @@ public:
     ///@}
 
     /*
-     * Getter and modifier for the interface / owner tuples
+     * Getter and modifier for the interface / owner pairs
      */
     ///@{
-    void InsertInterfaceOwnerTuple(Object *owner, TimeSpanningInterface *interface);
+    const ListOfSpanningInterOwnerPairs &GetInterfaceOwnerPairs() const { return m_timeSpanningInterfaces; }
+    void InsertInterfaceOwnerPair(Object *owner, TimeSpanningInterface *interface);
     ///@}
 
     /*

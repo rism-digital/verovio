@@ -81,14 +81,6 @@ FunctorCode F::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitFEnd(this);
 }
 
-int F::PrepareTimeSpanning(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-    assert(interface);
-    return interface->InterfacePrepareTimeSpanning(functorParams, this);
-}
-
 int F::PrepareTimestamps(FunctorParams *functorParams)
 {
     // Using @tstamp on <f> will work only if @staff is also given on <f>

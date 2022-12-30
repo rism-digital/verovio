@@ -1091,18 +1091,6 @@ public:
     ///@{
 
     /**
-     * Match start and end for TimeSpanningInterface elements (such as tie or slur).
-     * If fillList is set to false, only the remaining elements will be matched.
-     * This is used when processing a second time in the other direction
-     */
-    virtual int PrepareTimeSpanning(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::PrepareTimeSpanning
-     */
-    virtual int PrepareTimeSpanningEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Match start and end for TimeSpanningInterface elements with tstamp(2) attributes.
      * It is performed only on TimeSpanningInterface elements withouth @startid (or @endid).
      * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.

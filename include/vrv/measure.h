@@ -442,11 +442,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareTimeSpanningEnd
-     */
-    int PrepareTimeSpanningEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::PrepareMilestones
      */
     int PrepareMilestones(FunctorParams *functorParams) override;

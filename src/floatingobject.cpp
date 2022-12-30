@@ -863,17 +863,6 @@ int FloatingObject::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingObject::PrepareTimeSpanning(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        return interface->InterfacePrepareTimeSpanning(functorParams, this);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
 int FloatingObject::PrepareTimestamps(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface

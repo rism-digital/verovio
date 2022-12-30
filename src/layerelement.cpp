@@ -2231,32 +2231,6 @@ int LayerElement::PrepareDelayedTurns(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
-{
-    PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    // Do not look for tstamp pointing to these
-    if (this->Is({ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
-
-    ListOfSpanningInterOwnerPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
-    while (iter != params->m_timeSpanningInterfaces.end()) {
-        if (iter->first->SetStartAndEnd(this)) {
-            // Verify that the interface owner is encoded in the measure of its start
-            iter->first->VerifyMeasure(iter->second);
-            // We have both the start and the end that are matched
-            iter = params->m_timeSpanningInterfaces.erase(iter);
-        }
-        else {
-            ++iter;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::InitOnsetOffset(FunctorParams *functorParams)
 {
     InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);

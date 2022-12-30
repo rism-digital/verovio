@@ -393,26 +393,7 @@ FunctorCode TimeSpanningInterface::InterfacePrepareTimeSpanning(PrepareTimeSpann
     }
 
     this->SetIDStr();
-    functor.InsertInterfaceOwnerTuple(object, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object)
-{
-    PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);
-    assert(params);
-
-    if (!this->HasStartid() && !this->HasEndid()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (params->m_fillList == false) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    this->SetIDStr();
-    params->m_timeSpanningInterfaces.push_back({ this, object });
+    functor.InsertInterfaceOwnerPair(object, this);
 
     return FUNCTOR_CONTINUE;
 }

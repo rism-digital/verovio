@@ -614,7 +614,7 @@ PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor()
     m_fillList = true;
 }
 
-void PrepareTimeSpanningFunctor::InsertInterfaceOwnerTuple(Object *owner, TimeSpanningInterface *interface)
+void PrepareTimeSpanningFunctor::InsertInterfaceOwnerPair(Object *owner, TimeSpanningInterface *interface)
 {
     m_timeSpanningInterfaces.push_back({ interface, owner });
 }
@@ -663,6 +663,10 @@ FunctorCode PrepareTimeSpanningFunctor::VisitLayerElement(LayerElement *layerEle
 
 FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
 {
+    if (!m_fillList) {
+        return FUNCTOR_CONTINUE;
+    }
+
     ListOfSpanningInterOwnerPairs::iterator iter = m_timeSpanningInterfaces.begin();
     while (iter != m_timeSpanningInterfaces.end()) {
         // At the end of the measure (going backward) we remove elements for which we do not need to match the end (for

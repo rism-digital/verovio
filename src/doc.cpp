@@ -517,25 +517,24 @@ void Doc::PrepareData()
     /************ Resolve @startid / @endid ************/
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
-    PrepareTimeSpanningParams prepareTimeSpanningParams;
-    Functor prepareTimeSpanning(&Object::PrepareTimeSpanning);
-    Functor prepareTimeSpanningEnd(&Object::PrepareTimeSpanningEnd);
-    this->Process(
-        &prepareTimeSpanning, &prepareTimeSpanningParams, &prepareTimeSpanningEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
+    PrepareTimeSpanningFunctor prepareTimeSpanning;
+    prepareTimeSpanning.SetDirection(BACKWARD);
+    this->Process(prepareTimeSpanning);
 
     // First we try backwards because normally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
     // in the encoding. For these, the previous iteration will not have resolved the link and
     // the spanning elements will remain in the timeSpanningElements array. We try again forwards
     // but this time without filling the list (that is only will the remaining elements)
-    if (!prepareTimeSpanningParams.m_timeSpanningInterfaces.empty()) {
-        prepareTimeSpanningParams.m_fillList = false;
-        this->Process(&prepareTimeSpanning, &prepareTimeSpanningParams);
+    const ListOfSpanningInterOwnerPairs &interfaceOwnerPairs = prepareTimeSpanning.GetInterfaceOwnerPairs();
+    if (!interfaceOwnerPairs.empty()) {
+        prepareTimeSpanning.FillList(false);
+        prepareTimeSpanning.SetDirection(FORWARD);
+        this->Process(prepareTimeSpanning);
     }
 
     // Display warning if some elements were not matched
-    const size_t unmatchedElements = std::count_if(prepareTimeSpanningParams.m_timeSpanningInterfaces.cbegin(),
-        prepareTimeSpanningParams.m_timeSpanningInterfaces.cend(),
+    const size_t unmatchedElements = std::count_if(interfaceOwnerPairs.cbegin(), interfaceOwnerPairs.cend(),
         [](const ListOfSpanningInterOwnerPairs::value_type &entry) {
             return (entry.first->HasStartid() && entry.first->HasEndid());
         });

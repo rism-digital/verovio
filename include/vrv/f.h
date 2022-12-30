@@ -80,11 +80,6 @@ public:
     int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareTimeSpanning
-     */
-    int PrepareTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
      * See Object::PrepareTimestamps
      */
     int PrepareTimestamps(FunctorParams *functorParams) override;
