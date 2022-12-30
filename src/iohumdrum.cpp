@@ -986,6 +986,7 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
     bool dirQ = true;
     bool aboveQ = false;
     bool degaccQ = true;
+    std::string fontsize;
     hum::HTp keydesig = NULL;
     hum::HTp current = starttok;
     while (current) {
@@ -1014,6 +1015,9 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
             }
             if (!dirQ) {
                 current->setValue("auto", "Xdir", 1);
+            }
+            if (!fontsize.empty()) {
+                current->setValue("auto", "fontsize", fontsize);
             }
             if (keydesig) {
                 current->setValue("auto", "meilabel", keydesig->substr(1));
@@ -1058,6 +1062,12 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         }
         else if (*current == "*Xdir") {
             dirQ = false;
+        }
+        else if (current->compare(0, 4, "*fs:") == 0) {
+            fontsize = current->substr(4);
+            if (fontsize == "normal") {
+                fontsize.clear();
+            }
         }
         else if (current->isKeyDesignation()) {
             keydesig = current;
@@ -7997,9 +8007,80 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 setPlaceRelStaff(harm, "below", false);
             }
 
+            std::string fontsize = token->getValue("auto", "fontsize");
+            if ((!fontsize.empty()) && (fontsize != "true") && (fontsize != "false")) {
+                setFontsizeForHarm(harm, fontsize);
+            }
+
             setLocationId(harm, token);
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setFontsizeForHarm -- Add rend@fontsize to harm data.  If there is more than
+//     one child for the harm, wrap all of them in a rend to set the fontsize.  If there
+//     is no rend as the sole child of the harm, then wrap the text content of harm in
+//     a rend to set fontsize.  May be made a template in the future.  Also would be
+//     useful to validate the input fontsize string.
+//
+
+void HumdrumInput::setFontsizeForHarm(Harm *harm, const std::string &fontsize)
+{
+    int childcount = harm->GetChildCount();
+    Object *child = NULL;
+    bool makeRendQ = false;
+    if (childcount == 0) {
+        return;
+    }
+    else if (childcount != 1) {
+        makeRendQ = true;
+    }
+    else {
+        // If the only child is a rend, then check if the fontsize is set.
+        // If it is set, then insert a new rend that will adopt the child; otherwise,
+        // do not create a new rend, and set the existing rend's fontsize.
+        // If the only child is not a rend, then create a rend and have it
+        // adopt the child.
+        child = harm->GetChild(0);
+        if (!child) {
+            return;
+        }
+        std::string childname = child->GetClassName();
+        if (childname == "Rend") {
+            bool emptyfontstyle = child->HasAttribute("fontstyle", "");
+            if (emptyfontstyle) {
+                setFontsize((Rend *)child, "", fontsize);
+                return;
+            }
+            else {
+                makeRendQ = true;
+            }
+        }
+        else {
+            makeRendQ = true;
+        }
+    }
+
+    if (!makeRendQ) {
+        return;
+    }
+
+    // Create a new rend to insert between harm and its children,
+    // and then set the fontsize for the new rend.
+    Rend *newrend = new Rend();
+
+    // Transfer the children of harm to newrend:
+    for (int i = 0; i < (int)childcount; i++) {
+        Object *obj = harm->Relinquish(i);
+        if (obj) {
+            newrend->AddChild(obj);
+        }
+    }
+    harm->ClearRelinquishedChildren();
+    harm->AddChild(newrend);
+    setFontsize(newrend, "", fontsize);
 }
 
 //////////////////////////////
@@ -14448,9 +14529,9 @@ void HumdrumInput::setFontsize(ELEMENT *element, const std::string &smuflname, c
     //   xx_large => 200
     //   x_large  => 150
     //   large    => 110
-    //   larger   => 110
+    //   larger   => 110 (not used since same as large)
     //   small    => 80
-    //   smaller  => 80
+    //   smaller  => 80 (not used since same as small)
     //   x_small  => 60
     //   xx_small => 50
 

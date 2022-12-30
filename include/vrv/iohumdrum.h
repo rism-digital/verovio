@@ -800,6 +800,7 @@ protected:
     void analyzeDegreeInterpretations(hum::HTp starttok);
     void addHarmLabel(Harm *harm, const std::string &label);
     std::u32string getMoveableDoName(int degree, int semitones, int minorQ);
+    void setFontsizeForHarm(Harm *harm, const std::string &fontsize);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
