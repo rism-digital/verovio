@@ -353,6 +353,25 @@ FunctorCode TimePointInterface::InterfacePrepareTimePointing(PrepareTimePointing
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode TimePointInterface::InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object)
+{
+    // First we check if the object has already a mapped @startid (it should not)
+    if (this->HasStart()) {
+        if (this->HasTstamp())
+            LogWarning("%s with @xml:id %s has both a @startid and an @tstamp; @tstamp is ignored",
+                object->GetClassName().c_str(), object->GetID().c_str());
+        return FUNCTOR_CONTINUE;
+    }
+    else if (!this->HasTstamp()) {
+        return FUNCTOR_CONTINUE; // This file is quite likely invalid?
+    }
+
+    // We set -1 to the data_MEASUREBEAT for @tstamp
+    functor.InsertObjectBeatPair(object, data_MEASUREBEAT(-1, this->GetTstamp()));
+
+    return FUNCTOR_CONTINUE;
+}
+
 int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
 {
     PrepareTimestampsParams *params = vrv_params_cast<PrepareTimestampsParams *>(functorParams);
@@ -396,6 +415,31 @@ FunctorCode TimeSpanningInterface::InterfacePrepareTimeSpanning(PrepareTimeSpann
     functor.InsertInterfaceOwnerPair(object, this);
 
     return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TimeSpanningInterface::InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object)
+{
+    // First we check if the object has already a mapped @endid (it should not)
+    if (this->HasEndid()) {
+        if (this->HasTstamp2())
+            LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
+                object->GetClassName().c_str(), object->GetID().c_str());
+        if ((this->GetStartid() == this->GetEndid()) && !object->Is(OCTAVE)) {
+            LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid",
+                object->GetClassName().c_str(), object->GetID().c_str());
+        }
+        return TimePointInterface::InterfacePrepareTimestamps(functor, object);
+    }
+    else if (!this->HasTstamp2()) {
+        // We won't be able to do anything, just try to prepare the tstamp (start)
+        return TimePointInterface::InterfacePrepareTimestamps(functor, object);
+    }
+
+    // We can now add the pair to our stack
+    functor.InsertInterfaceIDPair(object->GetClassId(), this);
+    functor.InsertObjectBeatPair(object, data_MEASUREBEAT(this->GetTstamp2()));
+
+    return TimePointInterface::InterfacePrepareTimestamps(functor, object);
 }
 
 int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)

@@ -13,12 +13,14 @@
 #include "areaposinterface.h"
 #include "doc.h"
 #include "f.h"
+#include "harm.h"
 #include "layer.h"
 #include "plistinterface.h"
 #include "runningelement.h"
 #include "score.h"
 #include "staff.h"
 #include "symboltable.h"
+#include "timestamp.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -701,16 +703,110 @@ void PrepareTimestampsFunctor::InsertObjectBeatPair(Object *object, const data_M
 
 FunctorCode PrepareTimestampsFunctor::VisitF(F *f)
 {
-    return FUNCTOR_CONTINUE;
+    // Using @tstamp on <f> will work only if @staff is also given on <f>
+
+    // Pass it to the pseudo functor of the interface
+    TimeSpanningInterface *interface = f->GetTimeSpanningInterface();
+    assert(interface);
+    return interface->InterfacePrepareTimestamps(*this, f);
 }
 
 FunctorCode PrepareTimestampsFunctor::VisitFloatingObject(FloatingObject *floatingObject)
 {
+    // Pass it to the pseudo functor of the interface
+    if (floatingObject->HasInterface(INTERFACE_TIME_POINT)) {
+        TimePointInterface *interface = floatingObject->GetTimePointInterface();
+        assert(interface);
+        return interface->InterfacePrepareTimestamps(*this, floatingObject);
+    }
+    else if (floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimeSpanningInterface *interface = floatingObject->GetTimeSpanningInterface();
+        assert(interface);
+        return interface->InterfacePrepareTimestamps(*this, floatingObject);
+    }
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareTimestampsFunctor::VisitMeasureEnd(Measure *measure)
 {
+    ListOfObjectBeatPairs::iterator iter = m_tstamps.begin();
+    // Loop through the object/beat pairs and create the TimestampAttr when necessary
+    while (iter != m_tstamps.end()) {
+        // -1 means that we have a @tstamp (start) to add to the current measure
+        if ((*iter).second.first == -1) {
+            TimePointInterface *interface = ((*iter).first)->GetTimePointInterface();
+            assert(interface);
+            TimestampAttr *timestampAttr = measure->m_timestampAligner.GetTimestampAtTime((*iter).second.second);
+            interface->SetStart(timestampAttr);
+            // purge the list of unmatched elements if this is a TimeSpanningInterface element
+            if ((*iter).first->HasInterface(INTERFACE_TIME_SPANNING)) {
+                TimeSpanningInterface *tsInterface = ((*iter).first)->GetTimeSpanningInterface();
+                assert(tsInterface);
+                if (tsInterface->HasStartAndEnd()) {
+                    auto item = std::find_if(m_timeSpanningInterfaces.begin(), m_timeSpanningInterfaces.end(),
+                        [tsInterface](
+                            std::pair<TimeSpanningInterface *, ClassId> pair) { return (pair.first == tsInterface); });
+                    if (item != m_timeSpanningInterfaces.end()) {
+                        // LogDebug("Found it!");
+                        m_timeSpanningInterfaces.erase(item);
+                    }
+                }
+            }
+            // remove it
+            iter = m_tstamps.erase(iter);
+        }
+        // 0 means that we have a @tstamp2 (end) to add to the current measure
+        else if ((*iter).second.first == 0) {
+            TimeSpanningInterface *interface = ((*iter).first)->GetTimeSpanningInterface();
+            assert(interface);
+            TimestampAttr *timestampAttr = measure->m_timestampAligner.GetTimestampAtTime((*iter).second.second);
+            interface->SetEnd(timestampAttr);
+            // We can check if the interface is now fully mapped (start / end) and purge the list of unmatched
+            // elements
+            if (interface->HasStartAndEnd()) {
+                auto item = std::find_if(m_timeSpanningInterfaces.begin(), m_timeSpanningInterfaces.end(),
+                    [interface](
+                        std::pair<TimeSpanningInterface *, ClassId> pair) { return (pair.first == interface); });
+                if (item != m_timeSpanningInterfaces.end()) {
+                    // LogDebug("Found it!");
+                    m_timeSpanningInterfaces.erase(item);
+                }
+            }
+            iter = m_tstamps.erase(iter);
+        }
+        // we have not reached the correct end measure yet
+        else {
+            (*iter).second.first--;
+            ++iter;
+        }
+    }
+
+    // Here we can also set the start for F within Harm that have no @startid or @tstamp but might have an extender
+    // In the future, we can do something similar to handle Dir within other types of control events
+    // Basically, a child control event should use the start (and end) of its parent.
+    // In the case of F, we still expect the @tstamp2 to be given in F, but this could be changed
+    // Eventually, this could be done in another functor if it becomes a more common way to set start / end because it
+    // is a bit weird to iterate over F objects here.
+    ListOfObjects fs = measure->FindAllDescendantsByType(FIGURE);
+    for (auto &object : fs) {
+        F *f = vrv_cast<F *>(object);
+        assert(f);
+        // Nothing to do if the f has a start or has no end
+        if (f->GetStart() || !f->GetEnd()) continue;
+
+        Harm *harm = vrv_cast<Harm *>(f->GetFirstAncestor(HARM));
+        if (harm) {
+            f->SetStart(harm->GetStart());
+            // We should also remove the f from the list because we can consider it as being mapped now
+            auto item = std::find_if(m_timeSpanningInterfaces.begin(), m_timeSpanningInterfaces.end(),
+                [f](std::pair<TimeSpanningInterface *, ClassId> pair) { return (pair.first == f); });
+            if (item != m_timeSpanningInterfaces.end()) {
+                // LogDebug("Found it!");
+                m_timeSpanningInterfaces.erase(item);
+            }
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

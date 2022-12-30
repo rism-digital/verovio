@@ -19,6 +19,7 @@ class LayerElement;
 class Measure;
 class PrepareTimePointingFunctor;
 class PrepareTimeSpanningFunctor;
+class PrepareTimestampsFunctor;
 class StaffAlignment;
 
 //----------------------------------------------------------------------------
@@ -103,6 +104,7 @@ public:
      */
     ///@{
     FunctorCode InterfacePrepareTimePointing(PrepareTimePointingFunctor &functor, Object *object);
+    virtual FunctorCode InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object);
     ///@}
 
     /**
@@ -219,6 +221,7 @@ public:
      */
     ///@{
     FunctorCode InterfacePrepareTimeSpanning(PrepareTimeSpanningFunctor &functor, Object *object);
+    FunctorCode InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object) override;
     ///@}
 
     /**
