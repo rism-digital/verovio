@@ -558,7 +558,7 @@ public:
      * Getter and modifier for the interface / object lists
      */
     ///@{
-    const ListOfSpanningInterClassIdPairs& GetInterfaceIDPairs() const { return m_timeSpanningInterfaces; }
+    const ListOfSpanningInterClassIdPairs &GetInterfaceIDPairs() const { return m_timeSpanningInterfaces; }
     void InsertInterfaceIDPair(ClassId classID, TimeSpanningInterface *interface);
     void InsertObjectBeatPair(Object *object, const data_MEASUREBEAT &beat);
     ///@}
