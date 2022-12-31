@@ -701,6 +701,28 @@ void PrepareTimestampsFunctor::InsertObjectBeatPair(Object *object, const data_M
     m_tstamps.push_back({ object, beat });
 }
 
+FunctorCode PrepareTimestampsFunctor::VisitDocEnd(Doc *doc)
+{
+    if (!doc->GetOptions()->m_openControlEvents.GetValue() || m_timeSpanningInterfaces.empty()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    Measure *lastMeasure = dynamic_cast<Measure *>(doc->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+    if (!lastMeasure) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    for (auto &pair : m_timeSpanningInterfaces) {
+        TimeSpanningInterface *interface = pair.first;
+        assert(interface);
+        if (!interface->GetEnd()) {
+            interface->SetEnd(lastMeasure->GetRightBarLine());
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode PrepareTimestampsFunctor::VisitF(F *f)
 {
     // Using @tstamp on <f> will work only if @staff is also given on <f>

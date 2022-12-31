@@ -1091,18 +1091,6 @@ public:
     ///@{
 
     /**
-     * Match start and end for TimeSpanningInterface elements with tstamp(2) attributes.
-     * It is performed only on TimeSpanningInterface elements withouth @startid (or @endid).
-     * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.
-     */
-    virtual int PrepareTimestamps(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::PrepareTimestamps
-     */
-    virtual int PrepareTimestampsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Process by Layer and set drawing pointers.
      * Set Dot::m_drawingNote for Dot elements in mensural mode
      */

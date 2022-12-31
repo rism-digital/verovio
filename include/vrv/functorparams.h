@@ -1951,22 +1951,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareTimestampsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: interface list that holds the current elements to match
- * member 1: ListOfObjectBeatPairs that holds the tstamp2 elements for attach to the end measure
- **/
-
-class PrepareTimestampsParams : public FunctorParams {
-public:
-    PrepareTimestampsParams() {}
-    ListOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
-    ListOfObjectBeatPairs m_tstamps;
-};
-
-//----------------------------------------------------------------------------
 // ReorderByXPosParams
 //----------------------------------------------------------------------------
 

@@ -372,28 +372,6 @@ FunctorCode TimePointInterface::InterfacePrepareTimestamps(PrepareTimestampsFunc
     return FUNCTOR_CONTINUE;
 }
 
-int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
-{
-    PrepareTimestampsParams *params = vrv_params_cast<PrepareTimestampsParams *>(functorParams);
-    assert(params);
-
-    // First we check if the object has already a mapped @startid (it should not)
-    if (this->HasStart()) {
-        if (this->HasTstamp())
-            LogWarning("%s with @xml:id %s has both a @startid and an @tstamp; @tstamp is ignored",
-                object->GetClassName().c_str(), object->GetID().c_str());
-        return FUNCTOR_CONTINUE;
-    }
-    else if (!this->HasTstamp()) {
-        return FUNCTOR_CONTINUE; // This file is quite likely invalid?
-    }
-
-    // We set -1 to the data_MEASUREBEAT for @tstamp
-    params->m_tstamps.push_back({ object, data_MEASUREBEAT(-1, this->GetTstamp()) });
-
-    return FUNCTOR_CONTINUE;
-}
-
 int TimePointInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_start = NULL;
@@ -440,34 +418,6 @@ FunctorCode TimeSpanningInterface::InterfacePrepareTimestamps(PrepareTimestampsF
     functor.InsertObjectBeatPair(object, data_MEASUREBEAT(this->GetTstamp2()));
 
     return TimePointInterface::InterfacePrepareTimestamps(functor, object);
-}
-
-int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
-{
-    PrepareTimestampsParams *params = vrv_params_cast<PrepareTimestampsParams *>(functorParams);
-    assert(params);
-
-    // First we check if the object has already a mapped @endid (it should not)
-    if (this->HasEndid()) {
-        if (this->HasTstamp2())
-            LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
-                object->GetClassName().c_str(), object->GetID().c_str());
-        if ((this->GetStartid() == this->GetEndid()) && !object->Is(OCTAVE)) {
-            LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid",
-                object->GetClassName().c_str(), object->GetID().c_str());
-        }
-        return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
-    }
-    else if (!this->HasTstamp2()) {
-        // We won't be able to do anything, just try to prepare the tstamp (start)
-        return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
-    }
-
-    // We can now add the pair to our stack
-    params->m_timeSpanningInterfaces.push_back({ this, object->GetClassId() });
-    params->m_tstamps.push_back({ object, data_MEASUREBEAT(this->GetTstamp2()) });
-
-    return TimePointInterface::InterfacePrepareTimestamps(params, object);
 }
 
 int TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)

@@ -557,15 +557,13 @@ void Doc::PrepareData()
     /************ Resolve @tstamp / tstamp2 ************/
 
     // Now try to match the @tstamp and @tstamp2 attributes.
-    PrepareTimestampsParams prepareTimestampsParams;
-    Functor prepareTimestamps(&Object::PrepareTimestamps);
-    Functor prepareTimestampsEnd(&Object::PrepareTimestampsEnd);
-    this->Process(&prepareTimestamps, &prepareTimestampsParams, &prepareTimestampsEnd);
+    PrepareTimestampsFunctor prepareTimestamps;
+    this->Process(prepareTimestamps);
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!prepareTimestampsParams.m_timeSpanningInterfaces.empty()) {
+    if (!prepareTimestamps.GetInterfaceIDPairs().empty()) {
         LogWarning("%d time spanning element(s) with timestamps could not be matched.",
-            prepareTimestampsParams.m_timeSpanningInterfaces.size());
+            prepareTimestamps.GetInterfaceIDPairs().size());
     }
 
     /************ Resolve linking (@next) ************/
@@ -2114,31 +2112,6 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     }
 
     return FUNCTOR_STOP;
-}
-
-int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
-{
-    PrepareTimestampsParams *params = vrv_params_cast<PrepareTimestampsParams *>(functorParams);
-    assert(params);
-
-    if (!m_options->m_openControlEvents.GetValue() || params->m_timeSpanningInterfaces.empty()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    Measure *lastMeasure = dynamic_cast<Measure *>(this->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
-    if (!lastMeasure) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    for (auto &pair : params->m_timeSpanningInterfaces) {
-        TimeSpanningInterface *interface = pair.first;
-        assert(interface);
-        if (!interface->GetEnd()) {
-            interface->SetEnd(lastMeasure->GetRightBarLine());
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

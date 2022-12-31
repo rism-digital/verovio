@@ -471,11 +471,6 @@ public:
      */
     int PrepareLyricsEnd(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::PrepareTimestampsEnd
-     */
-    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
-
 private:
     /**
      * Calculates the music font size according to the m_interlDefin reference value.

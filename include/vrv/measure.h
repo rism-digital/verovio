@@ -475,11 +475,6 @@ public:
     int InitOnsetOffset(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareTimestamps
-     */
-    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::UnCastOff
      */
     int UnCastOff(FunctorParams *functorParams) override;

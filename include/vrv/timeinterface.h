@@ -108,11 +108,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareTimestamps
-     */
-    virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
-
-    /**
      * See Object::ResetData
      */
     virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
@@ -228,11 +223,6 @@ public:
      * See Object::PrepareStaffCurrentTimeSpanning
      */
     virtual int InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
-
-    /**
-     * See Object::PrepareTimestamps
-     */
-    int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object) override;
 
     /**
      * See Object::ResetData
