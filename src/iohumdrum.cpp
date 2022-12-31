@@ -980,7 +980,7 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
 void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
 {
     bool aboveQ = false;
-    bool arrowQ = true;
+    bool arrowQ = false;
     bool boldQ = false;
     bool italicQ = false;
     bool circleQ = false;
@@ -8640,31 +8640,62 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
 
     // Add semitone adjustments
     if (accidQ && !solfegeQ) {
+        int arrowQ = token->getValueInt("auto", "arrow");
         if (sharps > 0) {
             if (sharps == 1) {
-                output += U"\u2191"; // up arrow
+                if (arrowQ) {
+                    output += U"\u2191"; // up arrow
+                }
+                else {
+                    output += U"\u266f"; // sharp
+                }
             }
             else if (sharps == 2) {
-                output += U"\u21D1"; // double up arrow
-                // output += U"\u21C8"; // double up arrow
+                if (arrowQ) {
+                    output += U"\u21D1"; // double up arrow
+                    // output += U"\u21C8"; // double up arrow
+                }
+                else {
+                    output += U"\u266f\u266f"; // two sharps
+                }
             }
             else {
                 for (int i = 0; i < sharps; i++) {
-                    output += U"\u2191"; // up arrow
+                    if (arrowQ) {
+                        output += U"\u2191"; // up arrow
+                    }
+                    else {
+                        output += U"\u266f"; // sharp
+                    }
                 }
             }
         }
         else if (flats > 0) {
             if (flats == 1) {
-                output += U"\u2193"; // down arrow
+                if (arrowQ) {
+                    output += U"\u2193"; // down arrow
+                }
+                else {
+                    output += U"\u266d"; // flat
+                }
             }
             else if (flats == 2) {
-                output += U"\u21D3"; // double down arrow
-                // output += U"\u21CA"; // double down arrow
+                if (arrowQ) {
+                    output += U"\u21D3"; // double down arrow
+                    // output += U"\u21CA"; // double down arrow
+                }
+                else {
+                    output += U"\u266d\u266d"; // two flats
+                }
             }
             else {
                 for (int i = 0; i < flats; i++) {
-                    output += U"\u2193"; // down arrow
+                    if (arrowQ) {
+                        output += U"\u2193"; // down arrow
+                    }
+                    else {
+                        output += U"\u266d"; // flat
+                    }
                 }
             }
         }
