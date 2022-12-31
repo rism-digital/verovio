@@ -741,6 +741,7 @@ protected:
     void addPlicaDown(Note *note);
     void setLayoutSlurDirection(Slur *slur, hum::HTp token);
     void setFontStyle(Rend *rend, const string &fontstyle);
+    void setFontWeight(Rend *rend, const std::string &fontweight);
     void importVerovioOptions(Doc *doc);
     void adjustChordNoteDurations(Chord *chord, std::vector<Note *> &notes, std::vector<string> &tstrings);
     void adjustChordNoteDuration(Note *note, hum::HumNum hdur, int dur, int dots, hum::HumNum chorddur,
@@ -801,6 +802,7 @@ protected:
     void addHarmLabel(Harm *harm, const std::string &label);
     std::u32string getMoveableDoName(int degree, int semitones, int minorQ);
     void setFontsizeForHarm(Harm *harm, const std::string &fontsize);
+    void setFontStyleForHarm(Harm *harm, const std::string &style);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

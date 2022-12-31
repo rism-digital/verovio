@@ -979,14 +979,18 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
 
 void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
 {
-    bool hatQ = false;
+    bool aboveQ = false;
+    bool arrowQ = true;
+    bool boldQ = false;
+    bool italicQ = false;
     bool circleQ = false;
+    bool degaccQ = true;
+    bool dirQ = true;
+    bool hatQ = false;
     bool minorQ = false;
     bool solfQ = false;
-    bool dirQ = true;
-    bool aboveQ = false;
-    bool degaccQ = true;
     std::string fontsize;
+
     hum::HTp keydesig = NULL;
     hum::HTp current = starttok;
     while (current) {
@@ -996,32 +1000,58 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         }
         if (current->isData() && !current->isNull()) {
             if (aboveQ) {
+                // display scale degrees above the staff
                 current->setValue("auto", "above", 1);
             }
-            if (minorQ) {
-                current->setValue("auto", "minor", 1);
+            if (arrowQ) {
+                // display chromatic alterations as up/down arrows,
+                // but only inform tokens that contain an alteration
+                if ((current->find('+') != std::string::npos) || (current->find('-') != std::string::npos)
+                    || (current->find('n') != std::string::npos)) {
+                    current->setValue("auto", "arrow", 1);
+                }
             }
-            if (solfQ) {
-                current->setValue("auto", "solf", 1);
-            }
-            if (hatQ) {
-                current->setValue("auto", "hat", 1);
-            }
-            if (!degaccQ) {
-                current->setValue("auto", "nodegacc", 1);
+            if (boldQ) {
+                // show scale degree in a bold style
+                current->setValue("auto", "bold", 1);
             }
             if (circleQ) {
+                // show scale degree inside of a circle
                 current->setValue("auto", "circle", 1);
             }
+            if (!degaccQ) {
+                // hide chromatic alterations
+                current->setValue("auto", "nodegacc", 1);
+            }
             if (!dirQ) {
+                // do not show the melodic approach direction
                 current->setValue("auto", "Xdir", 1);
             }
             if (!fontsize.empty()) {
+                // set the size of the scale degree
                 current->setValue("auto", "fontsize", fontsize);
             }
+            if (hatQ) {
+                // display a hat on top of the scale degrees
+                current->setValue("auto", "hat", 1);
+            }
+            if (italicQ) {
+                // show scale degree in an italic style
+                current->setValue("auto", "italic", 1);
+            }
             if (keydesig) {
+                // add key designation as a label on the next
+                // scale degree found in the data
                 current->setValue("auto", "meilabel", keydesig->substr(1));
                 keydesig = NULL;
+            }
+            if (minorQ) {
+                // scale degrees are for a minor key
+                current->setValue("auto", "minor", 1);
+            }
+            if (solfQ) {
+                // display scale degrees as moveable do
+                current->setValue("auto", "solf", 1);
             }
         }
         if (!current->isInterpretation()) {
@@ -1030,14 +1060,26 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         if (*current == "*above") {
             aboveQ = true;
         }
+        else if (*current == "*acc") {
+            degaccQ = true;
+        }
+        else if (*current == "*Xacc") {
+            degaccQ = false;
+        }
+        else if (*current == "*arrow") {
+            arrowQ = true;
+        }
+        else if (*current == "*Xarrow") {
+            arrowQ = false;
+        }
         else if (*current == "*below") {
             aboveQ = false;
         }
-        else if (*current == "*hat") {
-            hatQ = true;
+        else if (*current == "*bold") {
+            boldQ = true;
         }
-        else if (*current == "*Xhat") {
-            hatQ = false;
+        else if (*current == "*Xbold") {
+            boldQ = false;
         }
         else if (*current == "*circle") {
             circleQ = true;
@@ -1045,29 +1087,23 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         else if (*current == "*Xcircle") {
             circleQ = false;
         }
-        else if (*current == "*acc") {
-            degaccQ = true;
-        }
-        else if (*current == "*Xacc") {
-            degaccQ = false;
-        }
-        else if (*current == "*solf") {
-            solfQ = true;
-        }
-        else if (*current == "*Xsolf") {
-            solfQ = false;
-        }
-        else if (*current == "*dir") {
-            dirQ = true;
-        }
-        else if (*current == "*Xdir") {
-            dirQ = false;
-        }
         else if (current->compare(0, 4, "*fs:") == 0) {
             fontsize = current->substr(4);
             if (fontsize == "normal") {
                 fontsize.clear();
             }
+        }
+        else if (*current == "*hat") {
+            hatQ = true;
+        }
+        else if (*current == "*Xhat") {
+            hatQ = false;
+        }
+        else if (*current == "*italic") {
+            italicQ = true;
+        }
+        else if (*current == "*Xitalic") {
+            italicQ = false;
         }
         else if (current->isKeyDesignation()) {
             keydesig = current;
@@ -1082,6 +1118,12 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
             else {
                 minorQ = false;
             }
+        }
+        else if (*current == "*solf") {
+            solfQ = true;
+        }
+        else if (*current == "*Xsolf") {
+            solfQ = false;
         }
     }
 }
@@ -7777,7 +7819,7 @@ void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
 
 //////////////////////////////
 //
-// HumdrumInput::addHarmFloatsForMeasure --
+// HumdrumInput::addHarmFloatsForMeasure -- Does not handle chords in **deg yet.
 //
 
 void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
@@ -8012,9 +8054,95 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 setFontsizeForHarm(harm, fontsize);
             }
 
+            int boldQ = token->getValueInt("auto", "bold");
+            if (boldQ) {
+                setFontStyleForHarm(harm, "bold");
+            }
+            int italicQ = token->getValueInt("auto", "italic");
+            if (italicQ) {
+                setFontStyleForHarm(harm, "italic");
+            }
+
             setLocationId(harm, token);
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setFontStyleFormHarm -- Add italic and/or bold font styling to harm data.
+//     If there is more than one child, wrap all of them in a new rend with the font
+//     style.  Also do this if the only child is not a rend.  If there is a single
+//     rend, then apply the styling directly to that rend.
+//
+
+void HumdrumInput::setFontStyleForHarm(Harm *harm, const std::string &style)
+{
+    int childcount = harm->GetChildCount();
+    Object *child = NULL;
+    bool makeRendQ = false;
+    if (childcount == 0) {
+        return;
+    }
+    else if (childcount != 1) {
+        makeRendQ = true;
+    }
+    else {
+        // If the only child is a rend, then set the style of that rend.
+        // If the only child is not a rend, then create a new rend and
+        // have it adopt the child.
+        child = harm->GetChild(0);
+        if (!child) {
+            return;
+        }
+        std::string childname = child->GetClassName();
+        if (childname == "Rend") {
+            if (style == "bold") {
+                setFontWeight((Rend *)child, style);
+            }
+            else if (style == "italic") {
+                setFontStyle((Rend *)child, style);
+            }
+            return;
+        }
+        else {
+            makeRendQ = true;
+        }
+    }
+
+    if (!makeRendQ) {
+        return;
+    }
+
+    // Create a new rend to insert between harm and its children,
+    // and then set the fontsize for the new rend.
+    Rend *newrend = new Rend();
+
+    // Transfer the children of harm to newrend:
+    for (int i = 0; i < (int)childcount; i++) {
+        Object *obj = harm->Relinquish(i);
+        if (obj) {
+            newrend->AddChild(obj);
+        }
+    }
+    harm->ClearRelinquishedChildren();
+    harm->AddChild(newrend);
+    if (style == "bold") {
+        setFontWeight(newrend, style);
+    }
+    else if (style == "italic") {
+        setFontStyle(newrend, style);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setFontWeight --
+//
+
+void HumdrumInput::setFontWeight(Rend *rend, const std::string &fontweight)
+{
+    rend->SetFontweight(rend->AttTypography::StrToFontweight(fontweight));
 }
 
 //////////////////////////////
