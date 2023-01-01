@@ -871,4 +871,35 @@ FunctorCode PreparePointersByLayerFunctor::VisitLayerElement(LayerElement *layer
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareLyricsFunctor
+//----------------------------------------------------------------------------
+
+PrepareLyricsFunctor::PrepareLyricsFunctor()
+{
+    m_currentSyl = NULL;
+    m_lastNoteOrChord = NULL;
+    m_penultimateNoteOrChord = NULL;
+}
+
+FunctorCode PrepareLyricsFunctor::VisitChord(Chord *chord)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareLyricsFunctor::VisitDocEnd(Doc *doc)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareLyricsFunctor::VisitNote(Note *note)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

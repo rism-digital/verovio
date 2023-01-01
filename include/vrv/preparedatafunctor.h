@@ -630,6 +630,55 @@ private:
     Dot *m_lastDot;
 };
 
+//----------------------------------------------------------------------------
+// PrepareLyricsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class sets wordpos and connector ends.
+ * The functor is processed by staff/layer/verse using a Filters class.
+ * At the end, the functor closes opened syl in VisitDocEnd.
+ */
+class PrepareLyricsFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareLyricsFunctor();
+    virtual ~PrepareLyricsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitChord(Chord *chord) override;
+    FunctorCode VisitDocEnd(Doc *doc) override;
+    FunctorCode VisitNote(Note *note) override;
+    FunctorCode VisitSyl(Syl *syl) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current Syl
+    Syl *m_currentSyl;
+    // The last Note or Chord
+    LayerElement *m_lastNoteOrChord;
+    // The penultimate Note or Chord
+    LayerElement *m_penultimateNoteOrChord;
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__
