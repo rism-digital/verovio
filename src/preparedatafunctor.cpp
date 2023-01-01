@@ -12,6 +12,7 @@
 #include "altsyminterface.h"
 #include "areaposinterface.h"
 #include "doc.h"
+#include "dot.h"
 #include "f.h"
 #include "harm.h"
 #include "layer.h"
@@ -827,6 +828,44 @@ FunctorCode PrepareTimestampsFunctor::VisitMeasureEnd(Measure *measure)
                 m_timeSpanningInterfaces.erase(item);
             }
         }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// PreparePointersByLayerFunctor
+//----------------------------------------------------------------------------
+
+PreparePointersByLayerFunctor::PreparePointersByLayerFunctor()
+{
+    m_currentElement = NULL;
+    m_lastDot = NULL;
+}
+
+FunctorCode PreparePointersByLayerFunctor::VisitDot(Dot *dot)
+{
+    dot->m_drawingPreviousElement = m_currentElement;
+    m_lastDot = dot;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PreparePointersByLayerFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    // Skip ligatures because we want it attached to the first note in it
+    if (m_lastDot && !layerElement->Is(LIGATURE)) {
+        m_lastDot->m_drawingNextElement = layerElement;
+        m_lastDot = NULL;
+    }
+    if (layerElement->Is(BARLINE)) {
+        // Do not attach a note when a barline is passed
+        m_currentElement = NULL;
+    }
+    else if (layerElement->Is({ NOTE, REST })) {
+        m_currentElement = layerElement;
     }
 
     return FUNCTOR_CONTINUE;

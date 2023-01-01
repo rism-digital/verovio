@@ -586,6 +586,50 @@ private:
     ListOfObjectBeatPairs m_tstamps;
 };
 
+//----------------------------------------------------------------------------
+// PreparePointersByLayerFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class processes by layer and sets drawing pointers.
+ * Set Dot::m_drawingNote for Dot elements in mensural mode
+ */
+class PreparePointersByLayerFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PreparePointersByLayerFunctor();
+    virtual ~PreparePointersByLayerFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitDot(Dot *dot) override;
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current note, rest etc.
+    LayerElement *m_currentElement;
+    // The last dot
+    Dot *m_lastDot;
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__
