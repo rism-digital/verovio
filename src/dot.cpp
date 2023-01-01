@@ -71,17 +71,6 @@ FunctorCode Dot::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitDotEnd(this);
 }
 
-int Dot::PreparePointersByLayer(FunctorParams *functorParams)
-{
-    PreparePointersByLayerParams *params = vrv_params_cast<PreparePointersByLayerParams *>(functorParams);
-    assert(params);
-
-    m_drawingPreviousElement = params->m_currentElement;
-    params->m_lastDot = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Dot::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too

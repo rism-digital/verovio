@@ -2183,29 +2183,6 @@ int LayerElement::AdjustXRelForTranscription(FunctorParams *)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
-{
-    PreparePointersByLayerParams *params = vrv_params_cast<PreparePointersByLayerParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    // Skip ligatures because we want it attached to the first note in it
-    if (params->m_lastDot && !this->Is(LIGATURE)) {
-        params->m_lastDot->m_drawingNextElement = this;
-        params->m_lastDot = NULL;
-    }
-    if (this->Is(BARLINE)) {
-        // Do not attach a note when a barline is passed
-        params->m_currentElement = NULL;
-    }
-    else if (this->Is({ NOTE, REST })) {
-        params->m_currentElement = this;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::PrepareDelayedTurns(FunctorParams *functorParams)
 {
     PrepareDelayedTurnsParams *params = vrv_params_cast<PrepareDelayedTurnsParams *>(functorParams);

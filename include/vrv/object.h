@@ -1091,12 +1091,6 @@ public:
     ///@{
 
     /**
-     * Process by Layer and set drawing pointers.
-     * Set Dot::m_drawingNote for Dot elements in mensural mode
-     */
-    virtual int PreparePointersByLayer(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Set wordpos and connector ends
      * The functor is processed by staff/layer/verse using an Filters class.
      * At the end, the functor is processed by doc at the end of a document of closing opened syl.

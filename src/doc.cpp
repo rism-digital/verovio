@@ -661,9 +661,9 @@ void Doc::PrepareData()
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
 
-            PreparePointersByLayerParams preparePointersByLayerParams;
-            Functor preparePointersByLayer(&Object::PreparePointersByLayer);
-            this->Process(&preparePointersByLayer, &preparePointersByLayerParams, NULL, &filters);
+            PreparePointersByLayerFunctor preparePointersByLayer;
+            preparePointersByLayer.SetFilters(&filters);
+            this->Process(preparePointersByLayer);
         }
     }
 

@@ -1894,26 +1894,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PreparePointersByLayerParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current Note
- * member 1: the last Dot
- **/
-
-class PreparePointersByLayerParams : public FunctorParams {
-public:
-    PreparePointersByLayerParams()
-    {
-        m_currentElement = NULL;
-        m_lastDot = NULL;
-    }
-    LayerElement *m_currentElement;
-    Dot *m_lastDot;
-};
-
-//----------------------------------------------------------------------------
 // PrepareRptParams
 //----------------------------------------------------------------------------
 
