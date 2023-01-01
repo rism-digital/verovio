@@ -7977,6 +7977,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 
             std::u32string content;
             std::u32string precontent;
+            bool leapQ = false;
             bool updirQ = false;
             bool downdirQ = false;
             if (datatype == "**harm") {
@@ -7991,17 +7992,37 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 int dirQ = !token->getValueInt("auto", "Xdir");
                 if (dirQ) {
                     // note: token is presumend to not be a chord.
-                    if (token->find('^') != std::string::npos) {
+                    int upcount = 0;
+                    int downcount = 0;
+                    for (int m = 0; m < (int)token->size(); m++) {
+                        if (token->at(m) == '^') {
+                            upcount++;
+                        }
+                        else if (token->at(m) == 'v') {
+                            downcount++;
+                        }
+                    }
+                    if (upcount == 1) {
+                        precontent = U"\u2197"; // single up diagonal arrow
                         // precontent = U"\u2191"; // up arrow
-                        precontent = U"\u21D7"; // double up diagonal arrow
-                        // precontent = U"\u2B08"; // thick up diagonal arrow
                         updirQ = true;
                     }
-                    else if (token->find('v') != std::string::npos) {
+                    else if (upcount >= 2) {
+                        // precontent = U"\u21d7"; // double up diagonal arrow
+                        precontent = U"\u2b08"; // thick up diagonal arrow
+                        updirQ = true;
+                        leapQ = true;
+                    }
+                    else if (downcount == 1) {
+                        precontent = U"\u2198"; // single up diagonal arrow
                         // precontent = U"\u2193"; // down arrow
-                        precontent = U"\u21D8"; // double down arrow
-                        // precontent = U"\u2B0A"; // thick down diagonal arrow
                         downdirQ = true;
+                    }
+                    else if (downcount >= 2) {
+                        // precontent = U"\u21d8"; // double down arrow
+                        precontent = U"\u2b0a"; // thick down diagonal arrow
+                        downdirQ = true;
+                        leapQ = true;
                     }
                 }
             }
@@ -8020,9 +8041,23 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 pretext->SetText(precontent);
                 if (updirQ) {
                     prerend->SetRend(TEXTRENDITION_sub);
+                    if (leapQ) {
+                        setFontsize(prerend, "", "120%");
+                        prerend->SetType("approach-leap-up");
+                    }
+                    else {
+                        prerend->SetType("approach-step-up");
+                    }
                 }
                 else if (downdirQ) {
                     prerend->SetRend(TEXTRENDITION_sup);
+                    if (leapQ) {
+                        setFontsize(prerend, "", "120%");
+                        prerend->SetType("approach-leap-down");
+                    }
+                    else {
+                        prerend->SetType("approach-step-down");
+                    }
                 }
                 if (rend) {
                     rend->InsertChild(prerend, 0);
