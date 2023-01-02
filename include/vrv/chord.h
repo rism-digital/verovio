@@ -172,6 +172,11 @@ public:
      */
     std::list<const Note *> GetAdjacentNotesList(const Staff *staff, int loc) const;
 
+    /**
+     * Recalculate the m_clusters vector
+     */
+    void CalculateClusters();
+
     //----------//
     // Functors //
     //----------//
@@ -267,11 +272,6 @@ protected:
      * Clear the m_clusters vector and delete all the objects.
      */
     void ClearClusters() const;
-
-    /**
-     * Recalculate the m_clusters vector
-     */
-    void CalculateClusters();
 
     /**
      * Filter the flat list and keep only Note elements.

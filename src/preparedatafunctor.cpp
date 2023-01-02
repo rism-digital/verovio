@@ -13,16 +13,22 @@
 #include "areaposinterface.h"
 #include "doc.h"
 #include "dot.h"
+#include "elementpart.h"
 #include "f.h"
 #include "harm.h"
 #include "layer.h"
 #include "plistinterface.h"
+#include "rest.h"
 #include "runningelement.h"
 #include "score.h"
 #include "staff.h"
+#include "stem.h"
 #include "syl.h"
 #include "symboltable.h"
+#include "tabdursym.h"
+#include "tabgrp.h"
 #include "timestamp.h"
+#include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -976,26 +982,278 @@ PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor() {}
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
 {
+    Stem *currentStem = dynamic_cast<Stem *>(chord->FindDescendantByType(STEM, 1));
+    Flag *currentFlag = NULL;
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
+
+    if (!currentStem) {
+        currentStem = new Stem();
+        currentStem->IsAttribute(true);
+        chord->AddChild(currentStem);
+    }
+    currentStem->AttGraced::operator=(*chord);
+    currentStem->FillAttributes(*chord);
+
+    int duration = chord->GetNoteOrChordDur(chord);
+    if ((duration < DUR_2) || (chord->GetStemVisible() == BOOLEAN_false)) {
+        currentStem->IsVirtual(true);
+    }
+
+    if ((duration > DUR_4) && !chord->IsInBeam() && !chord->GetAncestorFTrem()) {
+        // We should have a stem at this stage
+        assert(currentStem);
+        if (!currentFlag) {
+            currentFlag = new Flag();
+            currentStem->AddChild(currentFlag);
+        }
+    }
+    // This will happen only if the duration has changed (no flag required anymore)
+    else if (currentFlag) {
+        assert(currentStem);
+        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
+    }
+
+    chord->SetDrawingStem(currentStem);
+
+    // Calculate chord clusters
+    chord->CalculateClusters();
+
+    // Also set the drawing stem object (or NULL) to all child notes
+    const ListOfObjects &childList = chord->GetList(chord);
+    for (ListOfObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
+        assert((*it)->Is(NOTE));
+        Note *note = vrv_cast<Note *>(*it);
+        assert(note);
+        note->SetDrawingStem(currentStem);
+    }
+
+    /************ dots ***********/
+
+    Dots *currentDots = dynamic_cast<Dots *>(chord->FindDescendantByType(DOTS, 1));
+
+    if (chord->GetDots() > 0) {
+        if (!currentDots) {
+            currentDots = new Dots();
+            chord->AddChild(currentDots);
+        }
+        currentDots->AttAugmentDots::operator=(*chord);
+    }
+    // This will happen only if the duration has changed
+    else if (currentDots) {
+        if (chord->DeleteChild(currentDots)) {
+            currentDots = NULL;
+        }
+    }
+
+    /************ Prepare the drawing cue size ************/
+
+    PrepareCueSizeFunctor prepareCueSize;
+    chord->Process(prepareCueSize);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
 {
+    Stem *currentStem = dynamic_cast<Stem *>(note->FindDescendantByType(STEM, 1));
+    Flag *currentFlag = NULL;
+    Chord *chord = note->IsChordTone();
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
+
+    if (!note->IsChordTone() && !note->IsTabGrpNote()) {
+        if (!currentStem) {
+            currentStem = new Stem();
+            currentStem->IsAttribute(true);
+            note->AddChild(currentStem);
+        }
+        currentStem->AttGraced::operator=(*note);
+        currentStem->FillAttributes(*note);
+
+        if (note->GetActualDur() < DUR_2 || (note->GetStemVisible() == BOOLEAN_false)) {
+            currentStem->IsVirtual(true);
+        }
+    }
+    // This will happen only if the duration has changed
+    else if (currentStem) {
+        if (note->DeleteChild(currentStem)) {
+            currentStem = NULL;
+            // The currentFlag (if any) will have been deleted above
+            currentFlag = NULL;
+        }
+    }
+
+    // We don't care about flags or dots in mensural notes
+    if (note->IsMensuralDur()) return FUNCTOR_CONTINUE;
+
+    if ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem() && !note->IsChordTone()
+        && !note->IsTabGrpNote()) {
+        // We should have a stem at this stage
+        assert(currentStem);
+        if (!currentFlag) {
+            currentFlag = new Flag();
+            currentStem->AddChild(currentFlag);
+        }
+    }
+    // This will happen only if the duration has changed (no flag required anymore)
+    else if (currentFlag) {
+        assert(currentStem);
+        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
+    }
+
+    if (!chord) note->SetDrawingStem(currentStem);
+
+    /************ dots ***********/
+
+    Dots *currentDots = dynamic_cast<Dots *>(note->FindDescendantByType(DOTS, 1));
+
+    if (note->GetDots() > 0) {
+        if (chord && (chord->GetDots() == note->GetDots())) {
+            LogWarning(
+                "Note '%s' with a @dots attribute with the same value as its chord parent", note->GetID().c_str());
+        }
+        if (!currentDots) {
+            currentDots = new Dots();
+            note->AddChild(currentDots);
+        }
+        currentDots->AttAugmentDots::operator=(*note);
+    }
+    // This will happen only if the duration has changed
+    else if (currentDots) {
+        if (note->DeleteChild(currentDots)) {
+            currentDots = NULL;
+        }
+    }
+
+    /************ Prepare the drawing cue size ************/
+
+    PrepareCueSizeFunctor prepareCueSize;
+    note->Process(prepareCueSize);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitRest(Rest *rest)
 {
+    Dots *currentDots = dynamic_cast<Dots *>(rest->FindDescendantByType(DOTS, 1));
+
+    if ((rest->GetDur() > DUR_BR) && (rest->GetDots() > 0)) {
+        if (!currentDots) {
+            currentDots = new Dots();
+            rest->AddChild(currentDots);
+        }
+        currentDots->AttAugmentDots::operator=(*rest);
+    }
+    // This will happen only if the duration has changed
+    else if (currentDots) {
+        if (rest->DeleteChild(currentDots)) {
+            currentDots = NULL;
+        }
+    }
+
+    /************ Prepare the drawing cue size ************/
+
+    PrepareCueSizeFunctor prepareCueSize;
+    rest->Process(prepareCueSize);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitTabDurSym(TabDurSym *tabDurSym)
 {
-    return FUNCTOR_CONTINUE;
+    Stem *currentStem = vrv_cast<Stem *>(tabDurSym->FindDescendantByType(STEM, 1));
+    Flag *currentFlag = NULL;
+    if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
+
+    if (!currentStem) {
+        currentStem = new Stem();
+        currentStem->IsAttribute(true);
+        tabDurSym->AddChild(currentStem);
+    }
+    tabDurSym->SetDrawingStem(currentStem);
+
+    /************ flags ***********/
+
+    TabGrp *tabGrp = vrv_cast<TabGrp *>(tabDurSym->GetFirstAncestor(TABGRP));
+    assert(tabGrp);
+
+    // No flag within beam for durations longer than 8th notes
+    if (!tabDurSym->IsInBeam() && tabGrp->GetActualDur() > DUR_4) {
+        // We must have a stem at this stage
+        assert(currentStem);
+        if (!currentFlag) {
+            currentFlag = new Flag();
+            currentStem->AddChild(currentFlag);
+        }
+    }
+    // This will happen only if the duration has changed (no flag required anymore)
+    else if (currentFlag) {
+        assert(currentStem);
+        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
 {
+    TupletBracket *currentBracket = dynamic_cast<TupletBracket *>(tuplet->FindDescendantByType(TUPLET_BRACKET, 1));
+    TupletNum *currentNum = dynamic_cast<TupletNum *>(tuplet->FindDescendantByType(TUPLET_NUM, 1));
+
+    bool beamed = false;
+    // Are we contained in a beam?
+    if (tuplet->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH)) {
+        // is only the tuplet beamed? (will not work with nested tuplets)
+        Beam *currentBeam = dynamic_cast<Beam *>(tuplet->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
+        if (currentBeam->GetChildCount() == 1) {
+            beamed = true;
+        }
+    }
+    // Is a beam or bTrem the only child? (will not work with editorial elements)
+    if (tuplet->GetChildCount() == 1) {
+        if ((tuplet->GetChildCount(BEAM) == 1) || (tuplet->GetChildCount(BTREM) == 1)) beamed = true;
+    }
+
+    if ((!tuplet->HasBracketVisible() && !beamed) || (tuplet->GetBracketVisible() == BOOLEAN_true)) {
+        if (!currentBracket) {
+            currentBracket = new TupletBracket();
+            tuplet->AddChild(currentBracket);
+        }
+        currentBracket->AttTupletVis::operator=(*tuplet);
+    }
+    // This will happen only if the @bracket.visible value has changed
+    else if (currentBracket) {
+        if (tuplet->DeleteChild(currentBracket)) {
+            currentBracket = NULL;
+        }
+    }
+
+    if (tuplet->HasNum() && (!tuplet->HasNumVisible() || (tuplet->GetNumVisible() == BOOLEAN_true))) {
+        if (!currentNum) {
+            currentNum = new TupletNum();
+            tuplet->AddChild(currentNum);
+        }
+        currentNum->AttNumberPlacement::operator=(*tuplet);
+        currentNum->AttTupletVis::operator=(*tuplet);
+    }
+    // This will happen only if the @num.visible value has changed
+    else if (currentNum) {
+        if (tuplet->DeleteChild(currentNum)) {
+            currentNum = NULL;
+        }
+    }
+
+    /************ Prepare the drawing cue size ************/
+
+    PrepareCueSizeFunctor prepareCueSize;
+    tuplet->Process(prepareCueSize);
+
+    /*********** Set the left and right element ***********/
+
+    ClassIdsComparison comparison({ CHORD, NOTE, REST });
+    tuplet->SetDrawingLeft(dynamic_cast<LayerElement *>(tuplet->FindDescendantByComparison(&comparison)));
+    tuplet->SetDrawingRight(
+        dynamic_cast<LayerElement *>(tuplet->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD)));
+
     return FUNCTOR_CONTINUE;
 }
 
