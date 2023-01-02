@@ -8067,20 +8067,20 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                     prerend->SetRend(TEXTRENDITION_sub);
                     if (leapQ) {
                         setFontsize(prerend, "", "120%");
-                        prerend->SetType("approach-leap-up");
+                        prerend->SetType("approach-up-leap");
                     }
                     else {
-                        prerend->SetType("approach-step-up");
+                        prerend->SetType("approach-up-step");
                     }
                 }
                 else if (downdirQ) {
                     prerend->SetRend(TEXTRENDITION_sup);
                     if (leapQ) {
                         setFontsize(prerend, "", "120%");
-                        prerend->SetType("approach-leap-down");
+                        prerend->SetType("approach-down-leap");
                     }
                     else {
-                        prerend->SetType("approach-step-down");
+                        prerend->SetType("approach-down-step");
                     }
                 }
                 if (rend) {
