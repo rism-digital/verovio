@@ -987,6 +987,7 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
     bool degaccQ = true;
     bool dirQ = true;
     bool hatQ = false;
+    bool hideQ = false;
     bool minorQ = false;
     bool solfQ = false;
     std::string fontsize;
@@ -999,6 +1000,10 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
             break;
         }
         if (current->isData() && !current->isNull()) {
+            if (hideQ) {
+                current->setValue("auto", "hidden", 1);
+                continue;
+            }
             if (aboveQ) {
                 // display scale degrees above the staff
                 current->setValue("auto", "above", 1);
@@ -1034,6 +1039,10 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
             if (hatQ) {
                 // display a hat on top of the scale degrees
                 current->setValue("auto", "hat", 1);
+            }
+            if (hideQ) {
+                // do not display the scale degree in music notation
+                current->setValue("auto", "hide", 1);
             }
             if (italicQ) {
                 // show scale degree in an italic style
@@ -1104,6 +1113,12 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         }
         else if (*current == "*Xhat") {
             hatQ = false;
+        }
+        else if (*current == "*hide") {
+            hideQ = true;
+        }
+        else if (*current == "*Xhide") {
+            hideQ = false;
         }
         else if (*current == "*italic") {
             italicQ = true;
@@ -7870,6 +7885,9 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             if (token->isDataType("**kern")) {
                 track = token->getTrack();
                 active = true;
+            }
+            if (token->getValueInt("auto", "hidden")) {
+                continue;
             }
             if (!active) {
                 continue;
