@@ -712,10 +712,9 @@ void Doc::PrepareData()
 
                 // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
                 // m_drawingLastNote is set only if the syl has a forward connector
-                PrepareLyricsParams prepareLyricsParams;
-                Functor prepareLyrics(&Object::PrepareLyrics);
-                Functor prepareLyricsEnd(&Object::PrepareLyricsEnd);
-                this->Process(&prepareLyrics, &prepareLyricsParams, &prepareLyricsEnd, &filters);
+                PrepareLyricsFunctor prepareLyrics;
+                prepareLyrics.SetFilters(&filters);
+                this->Process(prepareLyrics);
             }
         }
     }
@@ -806,9 +805,9 @@ void Doc::PrepareData()
                 filters.push_back(&matchLayer);
                 filters.push_back(&matchVerse);
 
-                FunctorParams paramsLyrics;
-                Functor prepareLyrics(&Object::PrepareLyrics);
-                this->Process(&prepareLyrics, paramsLyrics, NULL, &filters);
+                PrepareLyricsFunctor prepareLyrics;
+                prepareLyrics.SetFilters(&filters);
+                this->Process(prepareLyrics);
             }
         }
     }
@@ -2090,28 +2089,6 @@ FunctorCode Doc::AcceptEnd(MutableFunctor &functor)
 FunctorCode Doc::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitDocEnd(this);
-}
-
-int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
-{
-    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
-    assert(params);
-    if (!params->m_currentSyl) {
-        return FUNCTOR_STOP; // early return
-    }
-    if (params->m_lastNoteOrChord && (params->m_currentSyl->GetStart() != params->m_lastNoteOrChord)) {
-        params->m_currentSyl->SetEnd(params->m_lastNoteOrChord);
-    }
-    else if (m_options->m_openControlEvents.GetValue()) {
-        sylLog_WORDPOS wordpos = params->m_currentSyl->GetWordpos();
-        if ((wordpos == sylLog_WORDPOS_i) || (wordpos == sylLog_WORDPOS_m)) {
-            Measure *lastMeasure = vrv_cast<Measure *>(this->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
-            assert(lastMeasure);
-            params->m_currentSyl->SetEnd(lastMeasure->GetRightBarLine());
-        }
-    }
-
-    return FUNCTOR_STOP;
 }
 
 } // namespace vrv

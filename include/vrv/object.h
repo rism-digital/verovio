@@ -1091,18 +1091,6 @@ public:
     ///@{
 
     /**
-     * Set wordpos and connector ends
-     * The functor is processed by staff/layer/verse using an Filters class.
-     * At the end, the functor is processed by doc at the end of a document of closing opened syl.
-     */
-    virtual int PrepareLyrics(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::PrepareLyrics
-     */
-    virtual int PrepareLyricsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Functor for setting the artic parts.
      * Splits the artic content into different artic parts if necessary
      */

@@ -466,11 +466,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::PrepareLyricsEnd
-     */
-    int PrepareLyricsEnd(FunctorParams *functorParams) override;
-
 private:
     /**
      * Calculates the music font size according to the m_interlDefin reference value.

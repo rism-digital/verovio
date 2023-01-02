@@ -1834,29 +1834,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareLyricsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current Syl
- * member 1: the last Note or Chord
- * member 2: the penultimate Note or Chord
- **/
-
-class PrepareLyricsParams : public FunctorParams {
-public:
-    PrepareLyricsParams()
-    {
-        m_currentSyl = NULL;
-        m_lastNoteOrChord = NULL;
-        m_penultimateNoteOrChord = NULL;
-    }
-    Syl *m_currentSyl;
-    LayerElement *m_lastNoteOrChord;
-    LayerElement *m_penultimateNoteOrChord;
-};
-
-//----------------------------------------------------------------------------
 // InitMIDIParams
 //----------------------------------------------------------------------------
 

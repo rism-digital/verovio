@@ -1225,19 +1225,6 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Note::PrepareLyrics(FunctorParams *functorParams)
-{
-    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
-    assert(params);
-
-    if (!this->IsChordTone()) {
-        params->m_penultimateNoteOrChord = params->m_lastNoteOrChord;
-        params->m_lastNoteOrChord = this;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Note::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too

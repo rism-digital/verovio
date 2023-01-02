@@ -907,17 +907,6 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::PrepareLyrics(FunctorParams *functorParams)
-{
-    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
-    assert(params);
-
-    params->m_penultimateNoteOrChord = params->m_lastNoteOrChord;
-    params->m_lastNoteOrChord = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
 {
     InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);

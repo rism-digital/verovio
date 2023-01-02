@@ -225,11 +225,6 @@ public:
     int PrepareLayerElementParts(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareLyrics
-     */
-    int PrepareLyrics(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitOnsetOffsetEnd
      */
     int InitOnsetOffsetEnd(FunctorParams *functorParams) override;

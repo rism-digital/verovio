@@ -26,7 +26,7 @@ class TextElement;
 /**
  * Syl is a TimeSpanningInterface for managing syllable connectors. This means
  * that TimeSpanningInterface attributes will not be read from the MEI but
- * pointers will be populated in Object::PrepareLyrics and Object::PrepareLyricsEnd
+ * pointers will be populated in the PrepareLyricsFunctor.
  */
 
 class Syl : public LayerElement,
@@ -94,11 +94,6 @@ public:
     FunctorCode AcceptEnd(MutableFunctor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::PrepareLyrics
-     */
-    int PrepareLyrics(FunctorParams *functorParams) override;
 
     /**
      * See Object::PrepareStaffCurrentTimeSpanning
