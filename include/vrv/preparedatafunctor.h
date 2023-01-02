@@ -679,6 +679,49 @@ private:
     LayerElement *m_penultimateNoteOrChord;
 };
 
+//----------------------------------------------------------------------------
+// PrepareLayerElementPartsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adds LayerElement parts (stem, flag, dots, etc).
+ */
+class PrepareLayerElementPartsFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareLayerElementPartsFunctor();
+    virtual ~PrepareLayerElementPartsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitChord(Chord *chord) override;
+    FunctorCode VisitNote(Note *note) override;
+    FunctorCode VisitRest(Rest *rest) override;
+    FunctorCode VisitTabDurSym(TabDurSym *tabDurSym) override;
+    FunctorCode VisitTuplet(Tuplet *tuplet) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__

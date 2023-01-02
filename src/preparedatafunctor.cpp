@@ -968,4 +968,35 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareLayerElementPartsFunctor
+//----------------------------------------------------------------------------
+
+PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor() {}
+
+FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareLayerElementPartsFunctor::VisitRest(Rest *rest)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareLayerElementPartsFunctor::VisitTabDurSym(TabDurSym *tabDurSym)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
