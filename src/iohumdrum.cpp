@@ -1087,6 +1087,12 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         else if (*current == "*Xcircle") {
             circleQ = false;
         }
+        else if (*current == "*dir") {
+            dirQ = true;
+        }
+        else if (*current == "*Xdir") {
+            dirQ = false;
+        }
         else if (current->compare(0, 4, "*fs:") == 0) {
             fontsize = current->substr(4);
             if (fontsize == "normal") {
