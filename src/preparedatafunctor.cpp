@@ -20,8 +20,10 @@
 #include "runningelement.h"
 #include "score.h"
 #include "staff.h"
+#include "syl.h"
 #include "symboltable.h"
 #include "timestamp.h"
+#include "verse.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -884,21 +886,85 @@ PrepareLyricsFunctor::PrepareLyricsFunctor()
 
 FunctorCode PrepareLyricsFunctor::VisitChord(Chord *chord)
 {
+    m_penultimateNoteOrChord = m_lastNoteOrChord;
+    m_lastNoteOrChord = chord;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareLyricsFunctor::VisitDocEnd(Doc *doc)
 {
-    return FUNCTOR_CONTINUE;
+    if (!m_currentSyl) {
+        return FUNCTOR_STOP; // early return
+    }
+    if (m_lastNoteOrChord && (m_currentSyl->GetStart() != m_lastNoteOrChord)) {
+        m_currentSyl->SetEnd(m_lastNoteOrChord);
+    }
+    else if (doc->GetOptions()->m_openControlEvents.GetValue()) {
+        sylLog_WORDPOS wordpos = m_currentSyl->GetWordpos();
+        if ((wordpos == sylLog_WORDPOS_i) || (wordpos == sylLog_WORDPOS_m)) {
+            Measure *lastMeasure = vrv_cast<Measure *>(doc->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+            assert(lastMeasure);
+            m_currentSyl->SetEnd(lastMeasure->GetRightBarLine());
+        }
+    }
+
+    return FUNCTOR_STOP;
 }
 
 FunctorCode PrepareLyricsFunctor::VisitNote(Note *note)
 {
+    if (!note->IsChordTone()) {
+        m_penultimateNoteOrChord = m_lastNoteOrChord;
+        m_lastNoteOrChord = note;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
 {
+    Verse *verse = dynamic_cast<Verse *>(syl->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
+    if (verse) {
+        syl->m_drawingVerse = std::max(verse->GetN(), 1);
+    }
+
+    syl->SetStart(dynamic_cast<LayerElement *>(syl->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
+    // If there isn't an ancestor note, it should be a chord
+    if (!syl->GetStart()) {
+        syl->SetStart(dynamic_cast<LayerElement *>(syl->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH)));
+    }
+
+    // At this stage currentSyl is actually the previous one that is ending here
+    if (m_currentSyl) {
+        // The previous syl was an initial or median -> The note we just parsed is the end
+        if ((m_currentSyl->GetWordpos() == sylLog_WORDPOS_i) || (m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
+            m_currentSyl->SetEnd(m_lastNoteOrChord);
+            m_currentSyl->m_nextWordSyl = syl;
+        }
+        // The previous syl was a underscore -> the previous but one was the end
+        else if (m_currentSyl->GetCon() == sylLog_CON_u) {
+            if (m_currentSyl->GetStart() == m_penultimateNoteOrChord)
+                LogWarning("Syllable with underline extender under one single note '%s'",
+                    m_currentSyl->GetStart()->GetID().c_str());
+            else
+                m_currentSyl->SetEnd(m_penultimateNoteOrChord);
+        }
+    }
+
+    // Now decide what to do with the starting syl and check if it has a forward connector
+    if ((syl->GetWordpos() == sylLog_WORDPOS_i) || (syl->GetWordpos() == sylLog_WORDPOS_m)) {
+        m_currentSyl = syl;
+        return FUNCTOR_CONTINUE;
+    }
+    else if (syl->GetCon() == sylLog_CON_u) {
+        m_currentSyl = syl;
+        return FUNCTOR_CONTINUE;
+    }
+    else {
+        m_currentSyl = NULL;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
