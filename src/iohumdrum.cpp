@@ -426,6 +426,7 @@ namespace humaux {
     {
         cue_size.resize(100);
         stem_type.resize(100);
+        stem_visible.resize(100);
         clear();
     }
 
@@ -481,6 +482,7 @@ namespace humaux {
 
         std::fill(cue_size.begin(), cue_size.end(), false);
         std::fill(stem_type.begin(), stem_type.end(), 'X');
+        std::fill(stem_visible.begin(), stem_visible.end(), true);
 
         mensuration_type = 0;
 
@@ -498,6 +500,7 @@ namespace humaux {
         out << prefix << "tremolo                  =  " << tremolo << endl;
         // std::vector<bool> cue_size;
         // std::vector<char> stem_type;
+        // std::vector<char> stem_visible;
         out << prefix << "ligature_recta           =  " << ligature_recta << endl;
         out << prefix << "ligature_obliqua         =  " << ligature_obliqua << endl;
         out << prefix << "last_clef                =  " << last_clef << endl;
@@ -5127,7 +5130,10 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
             storeAcclev(*part, staffindex);
         }
         else if (part->compare(0, 5, "*stem") == 0) {
-            storeStemInterpretation(*part, staffindex, 1);
+            storeStemInterpretation(*part, staffindex, part->getSubtrack());
+        }
+        else if (part->compare(0, 6, "*Xstem") == 0) {
+            storeStemInterpretation(*part, staffindex, part->getSubtrack());
         }
 
         hum::HumdrumFile *hf = part->getOwner()->getOwner();
@@ -12228,7 +12234,9 @@ void HumdrumInput::handleColoration(hum::HTp token)
 
 template <class ELEMENT> void HumdrumInput::assignAutomaticStem(ELEMENT element, hum::HTp tok, int staffindex)
 {
-    char value = m_staffstates.at(staffindex).stem_type.at(m_currentlayer);
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+
+    char value = ss.at(staffindex).stem_type.at(m_currentlayer);
     if (value != 'X') {
         char hasstem = tok->hasStemDirection();
         if (!hasstem) {
@@ -12238,6 +12246,10 @@ template <class ELEMENT> void HumdrumInput::assignAutomaticStem(ELEMENT element,
                 case 'x': element->SetStemVisible(BOOLEAN_false); break; // force no stem
             }
         }
+    }
+    bool visible = ss.at(staffindex).stem_visible.at(m_currentlayer);
+    if (!visible) {
+        element->SetStemVisible(BOOLEAN_false);
     }
 }
 
@@ -20467,7 +20479,10 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     }
 
     else if (value.substr(0, 5) == "*stem") {
-        storeStemInterpretation(value, staffindex, m_currentlayer);
+        storeStemInterpretation(value, staffindex, token->getSubtrack());
+    }
+    else if (value.substr(0, 6) == "*Xstem") {
+        storeStemInterpretation(value, staffindex, token->getSubtrack());
     }
 
     else if (value.find("acclev") != std::string::npos) {
@@ -20518,18 +20533,40 @@ void HumdrumInput::storeStemInterpretation(const std::string &value, int staffin
 
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
-    std::string ending = value.substr(6);
-    if (ending == "x") {
-        ss[staffindex].stem_type.at(layernumber) = 'x';
+    if ((value.size() >= 7) && (value.compare(0, 6, "*stem:") == 0)) {
+        std::string ending = value.substr(6);
+        if (ending == "x") {
+            ss[staffindex].stem_type.at(layernumber) = 'x';
+        }
+        else if (ending == "/") {
+            // force notes to have stem up starting here
+            ss[staffindex].stem_type.at(layernumber) = '/';
+        }
+        else if (ending == "\\") {
+            // force notes to have stem down starting here
+            ss[staffindex].stem_type.at(layernumber) = '\\';
+        }
+        else {
+            ss[staffindex].stem_type.at(layernumber) = 'X';
+        }
     }
-    else if (ending == "/") {
-        ss[staffindex].stem_type.at(layernumber) = '/';
+    else if (value == "*stem") {
+        // show stems (default behavior)
+        if (layernumber == 0) {
+            std::fill(ss[staffindex].stem_visible.begin(), ss[staffindex].stem_visible.end(), true);
+        }
+        else {
+            ss[staffindex].stem_visible.at(layernumber) = true;
+        }
     }
-    else if (ending == "\\") {
-        ss[staffindex].stem_type.at(layernumber) = '\\';
-    }
-    else {
-        ss[staffindex].stem_type.at(layernumber) = 'X';
+    else if (value == "*Xstem") {
+        // hide stems
+        if (layernumber == 0) {
+            std::fill(ss[staffindex].stem_visible.begin(), ss[staffindex].stem_visible.end(), false);
+        }
+        else {
+            ss[staffindex].stem_visible.at(layernumber) = false;
+        }
     }
 }
 

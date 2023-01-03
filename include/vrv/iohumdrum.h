@@ -223,9 +223,14 @@ namespace humaux {
         // add to a note/chord.  The states are:
         // '\' == down stem
         // '/' == up stem
-        // 'x' == no stem
-        // 'X' == no automatic assignments (assignment will be done automatically by verovio).
+        // 'x' == no stem (better to use *Xstem instead)
+        // 'X' == no automatic assignments (assignment will be done automatically by verovio) (better to use *stem
+        // instead to cancel *Xstem)
         std::vector<char> stem_type;
+
+        // stem_visible == keeps track of whether the stem should be made
+        // invisible or not for a staff.
+        std::vector<bool> stem_visible;
 
         // ligature_recta == true if in a recta ligature
         bool ligature_recta = false;
