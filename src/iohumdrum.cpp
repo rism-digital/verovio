@@ -8011,9 +8011,13 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 
             std::u32string content;
             std::u32string precontent;
-            bool leapQ = false;
-            bool updirQ = false;
-            bool downdirQ = false;
+            std::u32string postcontent;
+            bool preleapQ = false;
+            bool preupdirQ = false;
+            bool predowndirQ = false;
+            bool postleapQ = false;
+            bool postupdirQ = false;
+            bool postdowndirQ = false;
             if (datatype == "**harm") {
                 content = cleanHarmString2(*token);
             }
@@ -8022,10 +8026,14 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             }
             else if (isDegree) {
                 content = cleanDegreeString(token);
+
                 // *dir/*Xdir: do/do_not show melodic approaches (directions)
                 int dirQ = !token->getValueInt("auto", "Xdir");
+
                 if (dirQ) {
                     // note: token is presumend to not be a chord.
+
+                    // process melodic departure information
                     int upcount = 0;
                     int downcount = 0;
                     for (int m = 0; m < (int)token->size(); m++) {
@@ -8035,31 +8043,82 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                         else if (token->at(m) == 'v') {
                             downcount++;
                         }
+                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == '^')) {
+                            upcount = 0;
+                        }
+                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == 'v')) {
+                            downcount = 0;
+                        }
                     }
                     if (upcount == 1) {
                         precontent = U"\u2197"; // single up diagonal arrow
                         // precontent = U"\u2191"; // up arrow
-                        updirQ = true;
+                        preupdirQ = true;
                     }
                     else if (upcount >= 2) {
                         // precontent = U"\u21d7"; // double up diagonal arrow
                         precontent = U"\u2b08"; // thick up diagonal arrow
-                        updirQ = true;
-                        leapQ = true;
+                        preupdirQ = true;
+                        preleapQ = true;
                     }
                     else if (downcount == 1) {
                         precontent = U"\u2198"; // single up diagonal arrow
                         // precontent = U"\u2193"; // down arrow
-                        downdirQ = true;
+                        predowndirQ = true;
                     }
                     else if (downcount >= 2) {
                         // precontent = U"\u21d8"; // double down arrow
                         precontent = U"\u2b0a"; // thick down diagonal arrow
-                        downdirQ = true;
-                        leapQ = true;
+                        predowndirQ = true;
+                        preleapQ = true;
+                    }
+                }
+
+                if (dirQ) {
+                    // note: token is presumend to not be a chord.
+
+                    // process melodic departure information
+                    int upcount = 0;
+                    int downcount = 0;
+                    for (int m = 0; m < (int)token->size(); m++) {
+                        if (token->at(m) == '/') {
+                            upcount++;
+                        }
+                        else if (token->at(m) == '\\') {
+                            downcount++;
+                        }
+                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == '/')) {
+                            upcount = 0;
+                        }
+                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == '\\')) {
+                            downcount = 0;
+                        }
+                    }
+                    if (upcount == 1) {
+                        postcontent = U"\u2197"; // single up diagonal arrow
+                        // postcontent = U"\u2191"; // up arrow
+                        postupdirQ = true;
+                    }
+                    else if (upcount >= 2) {
+                        // postcontent = U"\u21d7"; // double up diagonal arrow
+                        postcontent = U"\u2b08"; // thick up diagonal arrow
+                        postupdirQ = true;
+                        postleapQ = true;
+                    }
+                    else if (downcount == 1) {
+                        postcontent = U"\u2198"; // single up diagonal arrow
+                        // postcontent = U"\u2193"; // down arrow
+                        postdowndirQ = true;
+                    }
+                    else if (downcount >= 2) {
+                        // postcontent = U"\u21d8"; // double down arrow
+                        postcontent = U"\u2b0a"; // thick down diagonal arrow
+                        postdowndirQ = true;
+                        postleapQ = true;
                     }
                 }
             }
+
             else if (isCData) {
                 content = UTF8to32(*token);
             }
@@ -8068,14 +8127,15 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             }
 
             text->SetText(content);
-            if (isDegree && (updirQ || downdirQ) && !precontent.empty()) {
+
+            if (isDegree && (preupdirQ || predowndirQ) && !precontent.empty()) {
                 Rend *prerend = new Rend();
                 Text *pretext = new Text();
                 prerend->AddChild(pretext);
                 pretext->SetText(precontent);
-                if (updirQ) {
+                if (preupdirQ) {
                     prerend->SetRend(TEXTRENDITION_sub);
-                    if (leapQ) {
+                    if (preleapQ) {
                         setFontsize(prerend, "", "120%");
                         prerend->SetType("approach-up-leap");
                     }
@@ -8083,9 +8143,9 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                         prerend->SetType("approach-up-step");
                     }
                 }
-                else if (downdirQ) {
+                else if (predowndirQ) {
                     prerend->SetRend(TEXTRENDITION_sup);
-                    if (leapQ) {
+                    if (preleapQ) {
                         setFontsize(prerend, "", "120%");
                         prerend->SetType("approach-down-leap");
                     }
@@ -8100,6 +8160,40 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 else {
                     harm->InsertChild(prerend, 0);
                     prerend->SetParent(harm);
+                }
+            }
+
+            if (isDegree && (postupdirQ || postdowndirQ) && !postcontent.empty()) {
+                Rend *postrend = new Rend();
+                Text *posttext = new Text();
+                postrend->AddChild(posttext);
+                posttext->SetText(postcontent);
+                if (postupdirQ) {
+                    postrend->SetRend(TEXTRENDITION_sup);
+                    if (postleapQ) {
+                        setFontsize(postrend, "", "120%");
+                        postrend->SetType("departure-up-leap");
+                    }
+                    else {
+                        postrend->SetType("departure-up-step");
+                    }
+                }
+                else if (postdowndirQ) {
+                    postrend->SetRend(TEXTRENDITION_sub);
+                    if (postleapQ) {
+                        setFontsize(postrend, "", "120%");
+                        postrend->SetType("departure-down-leap");
+                    }
+                    else {
+                        postrend->SetType("departure-down-step");
+                    }
+                }
+
+                if (rend) {
+                    rend->AddChild(postrend);
+                }
+                else {
+                    harm->AddChild(postrend);
                 }
             }
 
