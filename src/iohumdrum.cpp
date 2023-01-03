@@ -6708,6 +6708,10 @@ void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cl
         }
     }
 
+    if (clef.find("yy") != std::string::npos) {
+        vrvclef->SetVisible(BOOLEAN_false);
+    }
+
     std::string tok;
     if (cleftok) {
         tok = *cleftok;
@@ -10667,6 +10671,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
 
                     if (clef) {
+                        if (layerdata[i]->find("yy") != std::string::npos) {
+                            clef->SetVisible(BOOLEAN_false);
+                        }
                         setLocationId(clef, layerdata[i]);
                         int diff = layerindex - subtrack;
                         if (diff > 0) {
