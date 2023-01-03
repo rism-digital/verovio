@@ -8081,16 +8081,16 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                     int upcount = 0;
                     int downcount = 0;
                     for (int m = 0; m < (int)token->size(); m++) {
-                        if (token->at(m) == '/') {
+                        if (token->at(m) == '\'') {
                             upcount++;
                         }
-                        else if (token->at(m) == '\\') {
+                        else if (token->at(m) == ',') {
                             downcount++;
                         }
-                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == '/')) {
+                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == '\'')) {
                             upcount = 0;
                         }
-                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == '\\')) {
+                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == ',')) {
                             downcount = 0;
                         }
                     }
