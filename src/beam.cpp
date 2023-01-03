@@ -1826,7 +1826,8 @@ BeamElementCoord::~BeamElementCoord() {}
 data_STEMDIRECTION BeamElementCoord::GetStemDir() const
 {
     // m_stem is not necessary set, so we need to look at the Note / Chord original value
-    // Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first note of the beam
+    // Example: IsInBeam called in PrepareLayerElementPartsFunctor::VisitNote when reaching
+    // the first note of the beam
     if (m_stem) {
         return m_stem->GetDir();
     }

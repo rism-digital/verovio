@@ -784,8 +784,8 @@ void Doc::PrepareData()
 
     /************ Instanciate LayerElement parts (stem, flag, dots, etc) ************/
 
-    Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
-    this->Process(&prepareLayerElementParts, NULL);
+    PrepareLayerElementPartsFunctor prepareLayerElementParts;
+    this->Process(prepareLayerElementParts);
 
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t

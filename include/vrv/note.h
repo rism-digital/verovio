@@ -319,11 +319,6 @@ public:
     int CalcChordNoteHeads(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareLayerElementParts
-     */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ResetData
      */
     int ResetData(FunctorParams *functorParams) override;

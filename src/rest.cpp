@@ -21,7 +21,6 @@
 #include "findlayerelementsfunctor.h"
 #include "functorparams.h"
 #include "layer.h"
-#include "preparedatafunctor.h"
 #include "smufl.h"
 #include "staff.h"
 #include "system.h"
@@ -621,32 +620,6 @@ int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
         Fermata *fermata = new Fermata();
         fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
-{
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-
-    if ((this->GetDur() > DUR_BR) && (this->GetDots() > 0)) {
-        if (!currentDots) {
-            currentDots = new Dots();
-            this->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*this);
-    }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (this->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
-
-    /************ Prepare the drawing cue size ************/
-
-    PrepareCueSizeFunctor prepareCueSize;
-    this->Process(prepareCueSize);
 
     return FUNCTOR_CONTINUE;
 }

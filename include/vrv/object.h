@@ -1091,12 +1091,6 @@ public:
     ///@{
 
     /**
-     * Functor for setting the artic parts.
-     * Splits the artic content into different artic parts if necessary
-     */
-    virtual int PrepareLayerElementParts(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Functor for setting mRpt drawing numbers (if required)
      * The functor is processed by staff/layer using Filters class.
      */

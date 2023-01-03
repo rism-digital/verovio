@@ -27,7 +27,6 @@
 #include "layer.h"
 #include "ligature.h"
 #include "plica.h"
-#include "preparedatafunctor.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -1144,85 +1143,6 @@ MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary) const
     if (loc % 2 == 0) loc += (shiftUpwards ? 1 : -1);
     dotLocs[staff] = { loc };
     return dotLocs;
-}
-
-int Note::PrepareLayerElementParts(FunctorParams *functorParams)
-{
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
-    Flag *currentFlag = NULL;
-    Chord *chord = this->IsChordTone();
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
-
-    if (!this->IsChordTone() && !this->IsTabGrpNote()) {
-        if (!currentStem) {
-            currentStem = new Stem();
-            currentStem->IsAttribute(true);
-            this->AddChild(currentStem);
-        }
-        currentStem->AttGraced::operator=(*this);
-        currentStem->FillAttributes(*this);
-
-        if (this->GetActualDur() < DUR_2 || (this->GetStemVisible() == BOOLEAN_false)) {
-            currentStem->IsVirtual(true);
-        }
-    }
-    // This will happen only if the duration has changed
-    else if (currentStem) {
-        if (this->DeleteChild(currentStem)) {
-            currentStem = NULL;
-            // The currentFlag (if any) will have been deleted above
-            currentFlag = NULL;
-        }
-    }
-
-    // We don't care about flags or dots in mensural notes
-    if (this->IsMensuralDur()) return FUNCTOR_CONTINUE;
-
-    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->GetAncestorFTrem() && !this->IsChordTone()
-        && !this->IsTabGrpNote()) {
-        // We should have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
-
-    if (!chord) this->SetDrawingStem(currentStem);
-
-    /************ dots ***********/
-
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-
-    if (this->GetDots() > 0) {
-        if (chord && (chord->GetDots() == this->GetDots())) {
-            LogWarning(
-                "Note '%s' with a @dots attribute with the same value as its chord parent", this->GetID().c_str());
-        }
-        if (!currentDots) {
-            currentDots = new Dots();
-            this->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*this);
-    }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (this->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
-
-    /************ Prepare the drawing cue size ************/
-
-    PrepareCueSizeFunctor prepareCueSize;
-    this->Process(prepareCueSize);
-
-    return FUNCTOR_CONTINUE;
 }
 
 int Note::ResetData(FunctorParams *functorParams)

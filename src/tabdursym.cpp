@@ -149,42 +149,6 @@ FunctorCode TabDurSym::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitTabDurSymEnd(this);
 }
 
-int TabDurSym::PrepareLayerElementParts(FunctorParams *functorParams)
-{
-    Stem *currentStem = vrv_cast<Stem *>(this->FindDescendantByType(STEM, 1));
-    Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
-
-    if (!currentStem) {
-        currentStem = new Stem();
-        currentStem->IsAttribute(true);
-        this->AddChild(currentStem);
-    }
-    this->SetDrawingStem(currentStem);
-
-    /************ flags ***********/
-
-    TabGrp *tabGrp = vrv_cast<TabGrp *>(this->GetFirstAncestor(TABGRP));
-    assert(tabGrp);
-
-    // No flag within beam of for durations longer than 8th notes
-    if (!this->IsInBeam() && tabGrp->GetActualDur() > DUR_4) {
-        // We must have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int TabDurSym::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);

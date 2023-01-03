@@ -24,7 +24,6 @@
 #include "functor.h"
 #include "functorparams.h"
 #include "note.h"
-#include "preparedatafunctor.h"
 #include "rest.h"
 #include "space.h"
 #include "staff.h"
@@ -530,69 +529,6 @@ FunctorCode Tuplet::AcceptEnd(MutableFunctor &functor)
 FunctorCode Tuplet::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitTupletEnd(this);
-}
-
-int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
-{
-    TupletBracket *currentBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET, 1));
-    TupletNum *currentNum = dynamic_cast<TupletNum *>(this->FindDescendantByType(TUPLET_NUM, 1));
-
-    bool beamed = false;
-    // Are we contained in a beam?
-    if (this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH)) {
-        // is only the tuplet beamed? (will not work with nested tuplets)
-        Beam *currentBeam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
-        if (currentBeam->GetChildCount() == 1) {
-            beamed = true;
-        }
-    }
-    // Is a beam or bTrem the only child? (will not work with editorial elements)
-    if (this->GetChildCount() == 1) {
-        if ((this->GetChildCount(BEAM) == 1) || (this->GetChildCount(BTREM) == 1)) beamed = true;
-    }
-
-    if ((!this->HasBracketVisible() && !beamed) || (this->GetBracketVisible() == BOOLEAN_true)) {
-        if (!currentBracket) {
-            currentBracket = new TupletBracket();
-            this->AddChild(currentBracket);
-        }
-        currentBracket->AttTupletVis::operator=(*this);
-    }
-    // This will happen only if the @bracket.visible value has changed
-    else if (currentBracket) {
-        if (this->DeleteChild(currentBracket)) {
-            currentBracket = NULL;
-        }
-    }
-
-    if (this->HasNum() && (!this->HasNumVisible() || (this->GetNumVisible() == BOOLEAN_true))) {
-        if (!currentNum) {
-            currentNum = new TupletNum();
-            this->AddChild(currentNum);
-        }
-        currentNum->AttNumberPlacement::operator=(*this);
-        currentNum->AttTupletVis::operator=(*this);
-    }
-    // This will happen only if the @num.visible value has changed
-    else if (currentNum) {
-        if (this->DeleteChild(currentNum)) {
-            currentNum = NULL;
-        }
-    }
-
-    /************ Prepare the drawing cue size ************/
-
-    PrepareCueSizeFunctor prepareCueSize;
-    this->Process(prepareCueSize);
-
-    /*********** Get the left and right element ***********/
-
-    ClassIdsComparison comparison({ CHORD, NOTE, REST });
-    m_drawingLeft = dynamic_cast<LayerElement *>(this->FindDescendantByComparison(&comparison));
-    m_drawingRight
-        = dynamic_cast<LayerElement *>(this->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD));
-
-    return FUNCTOR_CONTINUE;
 }
 
 int Tuplet::AdjustTupletsX(FunctorParams *functorParams)

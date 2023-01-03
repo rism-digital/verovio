@@ -103,11 +103,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareLayerElementParts
-     */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustTupletsX
      */
     int AdjustTupletsX(FunctorParams *functorParams) override;

@@ -29,7 +29,6 @@
 #include "horizontalaligner.h"
 #include "layer.h"
 #include "note.h"
-#include "preparedatafunctor.h"
 #include "smufl.h"
 #include "staff.h"
 #include "stem.h"
@@ -832,79 +831,6 @@ MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary) const
             dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.begin(), mapEntry.second.end(), false);
     }
     return dotLocs;
-}
-
-int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
-{
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
-    Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
-
-    if (!currentStem) {
-        currentStem = new Stem();
-        currentStem->IsAttribute(true);
-        this->AddChild(currentStem);
-    }
-    currentStem->AttGraced::operator=(*this);
-    currentStem->FillAttributes(*this);
-
-    int duration = this->GetNoteOrChordDur(this);
-    if ((duration < DUR_2) || (this->GetStemVisible() == BOOLEAN_false)) {
-        currentStem->IsVirtual(true);
-    }
-
-    if ((duration > DUR_4) && !this->IsInBeam() && !this->GetAncestorFTrem()) {
-        // We should have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
-
-    this->SetDrawingStem(currentStem);
-
-    // Calculate chord clusters
-    this->CalculateClusters();
-
-    // Also set the drawing stem object (or NULL) to all child notes
-    const ListOfObjects &childList = this->GetList(this);
-    for (ListOfObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
-        assert((*it)->Is(NOTE));
-        Note *note = vrv_cast<Note *>(*it);
-        assert(note);
-        note->SetDrawingStem(currentStem);
-    }
-
-    /************ dots ***********/
-
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-
-    if (this->GetDots() > 0) {
-        if (!currentDots) {
-            currentDots = new Dots();
-            this->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*this);
-    }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (this->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
-
-    /************ Prepare the drawing cue size ************/
-
-    PrepareCueSizeFunctor prepareCueSize;
-    this->Process(prepareCueSize);
-
-    return FUNCTOR_CONTINUE;
 }
 
 int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
