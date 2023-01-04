@@ -985,14 +985,17 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
     bool aboveQ = false;
     bool arrowQ = false;
     bool boldQ = false;
-    bool italicQ = false;
+    bool boxQ = false;
     bool circleQ = false;
     bool degaccQ = true;
     bool dirQ = true;
     bool hatQ = false;
     bool hideQ = false;
+    bool italicQ = false;
     bool minorQ = false;
     bool solfQ = false;
+    int circleline = 0;
+    int boxline = 0;
     std::string fontsize;
     std::string minmode = "harm";
 
@@ -1027,9 +1030,17 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
                 // show scale degree in a bold style
                 current->setValue("auto", "bold", 1);
             }
+            if (boxQ) {
+                if (circleline < boxline) {
+                    // show scale degree inside of a box
+                    current->setValue("auto", "box", 1);
+                }
+            }
             if (circleQ) {
-                // show scale degree inside of a circle
-                current->setValue("auto", "circle", 1);
+                if (boxline < circleline) {
+                    // show scale degree inside of a circle
+                    current->setValue("auto", "circle", 1);
+                }
             }
             if (!degaccQ) {
                 // hide chromatic alterations
@@ -1102,11 +1113,21 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         else if (*current == "*Xbold") {
             boldQ = false;
         }
+        else if (*current == "*box") {
+            boxQ = true;
+            boxline = current->getLineIndex();
+        }
+        else if (*current == "*Xbox") {
+            boxQ = false;
+            boxline = 0;
+        }
         else if (*current == "*circle") {
             circleQ = true;
+            circleline = current->getLineIndex();
         }
         else if (*current == "*Xcircle") {
             circleQ = false;
+            circleline = 0;
         }
         else if (*current == "*dir") {
             dirQ = true;
@@ -7948,6 +7969,9 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 if (token->getValueInt("auto", "circle")) {
                     rend->SetRend(TEXTRENDITION_circle);
                 }
+                else if (token->getValueInt("auto", "box")) {
+                    rend->SetRend(TEXTRENDITION_box);
+                }
             }
             else {
                 if (token->getValueInt("auto", "circle")) {
@@ -7956,10 +7980,22 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                     harm->AddChild(rend);
                     rend->AddChild(text);
                 }
+                else if (token->getValueInt("auto", "box")) {
+                    rend = new Rend();
+                    rend->SetRend(TEXTRENDITION_box);
+                    harm->AddChild(rend);
+                    rend->AddChild(text);
+                }
                 else {
                     if (token->getValueInt("auto", "circle")) {
                         rend = new Rend();
                         rend->SetRend(TEXTRENDITION_circle);
+                        harm->AddChild(rend);
+                        rend->AddChild(rend);
+                    }
+                    else if (token->getValueInt("auto", "box")) {
+                        rend = new Rend();
+                        rend->SetRend(TEXTRENDITION_box);
                         harm->AddChild(rend);
                         rend->AddChild(rend);
                     }
