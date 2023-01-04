@@ -636,7 +636,7 @@ private:
 
 /**
  * This class sets wordpos and connector ends.
- * The functor is processed by staff/layer/verse using a Filters class.
+ * The functor is processed by staff/layer/verse using Filters.
  * At the end, the functor closes opened syl in VisitDocEnd.
  */
 class PrepareLyricsFunctor : public MutableFunctor {
@@ -720,6 +720,51 @@ public:
     //
 private:
     //
+};
+
+//----------------------------------------------------------------------------
+// PrepareRptFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class sets mRpt drawing numbers (if required).
+ * The functor is processed by staff/layer using Filters.
+ */
+class PrepareRptFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareRptFunctor(Doc *doc);
+    virtual ~PrepareRptFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitMRpt(MRpt *mRpt) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current MRpt
+    MRpt *m_currentMRpt;
+    // The data_BOOLEAN indicating if multiNumber
+    data_BOOLEAN m_multiNumber;
 };
 
 } // namespace vrv

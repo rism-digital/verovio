@@ -1257,4 +1257,29 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareRptFunctor
+//----------------------------------------------------------------------------
+
+PrepareRptFunctor::PrepareRptFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_currentMRpt = NULL;
+    m_multiNumber = BOOLEAN_NONE;
+}
+
+FunctorCode PrepareRptFunctor::VisitLayer(Layer *layer)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareRptFunctor::VisitMRpt(MRpt *mRpt)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
