@@ -994,6 +994,7 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
     bool minorQ = false;
     bool solfQ = false;
     std::string fontsize;
+    std::string minmode = "harm";
 
     hum::HTp keydesig = NULL;
     hum::HTp current = starttok;
@@ -1016,6 +1017,9 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
                 // but only inform tokens that contain an alteration
                 if ((current->find('+') != std::string::npos) || (current->find('-') != std::string::npos)
                     || (current->find('n') != std::string::npos)) {
+                    current->setValue("auto", "arrow", 1);
+                }
+                if ((minmode == "minnat") && (current->find("7") != std::string::npos)) {
                     current->setValue("auto", "arrow", 1);
                 }
             }
@@ -1060,6 +1064,11 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
             if (minorQ) {
                 // scale degrees are for a minor key
                 current->setValue("auto", "minor", 1);
+            }
+            if (minorQ && current->find("7") != std::string::npos) {
+                if (minmode == "minnat") {
+                    current->setValue("auto", "minnat", 1);
+                }
             }
             if (solfQ) {
                 // display scale degrees as moveable do
@@ -1142,6 +1151,12 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
             else {
                 minorQ = false;
             }
+        }
+        else if (*current == "*minnat") {
+            minmode = "minnat";
+        }
+        else if (*current == "*minhar") {
+            minmode = "minhar";
         }
         else if (*current == "*solf") {
             solfQ = true;
@@ -8031,12 +8046,20 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 int dirQ = !token->getValueInt("auto", "Xdir");
 
                 if (dirQ) {
-                    // note: token is presumend to not be a chord.
+                    // note: token is presumend to not be a chord
 
                     // process melodic departure information
                     int upcount = 0;
                     int downcount = 0;
+                    std::string firstnote;
                     for (int m = 0; m < (int)token->size(); m++) {
+                        if (token->at(m) == ' ') {
+                            // currently only processing first note of chords
+                            break;
+                        }
+                        else {
+                            firstnote.push_back(token->at(m));
+                        }
                         if (token->at(m) == '^') {
                             upcount++;
                         }
@@ -8050,6 +8073,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                             downcount = 0;
                         }
                     }
+
                     if (upcount == 1) {
                         precontent = U"\u2197"; // single up diagonal arrow
                         // precontent = U"\u2191"; // up arrow
@@ -8081,6 +8105,10 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                     int upcount = 0;
                     int downcount = 0;
                     for (int m = 0; m < (int)token->size(); m++) {
+                        if (token->at(m) == ' ') {
+                            // only process first note of chord for now
+                            break;
+                        }
                         if (token->at(m) == '\'') {
                             upcount++;
                         }
@@ -8752,17 +8780,47 @@ std::u32string HumdrumInput::getVisualFBAccidental(int accidental)
 
 std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
 {
-    std::string temp = *token;
-    size_t spacepos = temp.find(" ");
+    std::string firstnote = *token;
+    size_t spacepos = firstnote.find(" ");
     if (spacepos != std::string::npos) {
-        temp.resize(spacepos + 1);
+        firstnote.resize(spacepos + 1);
     }
     int sharps = 0;
     int flats = 0;
-    for (int i = 0; i < (int)temp.size(); i++) {
-        switch (temp[i]) {
+    for (int i = 0; i < (int)firstnote.size(); i++) {
+        switch (firstnote[i]) {
             case '+': sharps++; break;
             case '-': flats++; break;
+        }
+    }
+
+    // Adjust the 7th scale degree in minor keys according
+    // to if harmonic minor or natural minor is the display system.
+    int minor = token->getValueInt("auto", "minor");
+    if (minor && (firstnote.find("7") != std::string::npos)) {
+        int minnat = token->getValueInt("auto", "minnat");
+        int hQ = firstnote.find("h") != std::string::npos ? 1 : 0;
+        int nQ = firstnote.find("n") != std::string::npos ? 1 : 0;
+        if (minnat) {
+            if (hQ) {
+                if (flats) {
+                    flats--;
+                }
+                else {
+                    sharps++;
+                }
+            }
+        }
+        else {
+            // displaying in harmonic minor mode (default)
+            if (nQ) {
+                if (sharps) {
+                    sharps--;
+                }
+                else {
+                    flats++;
+                }
+            }
         }
     }
 
@@ -8771,7 +8829,7 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
     bool solfegeQ = token->getValueInt("auto", "solf");
 
     hum::HumRegex hre;
-    if (hre.search(temp, "(\\d+)")) {
+    if (hre.search(firstnote, "(\\d+)")) {
         int degree = hre.getMatchInt(1);
         int minor = token->getValueInt("auto", "solf");
         int semitones = sharps;
@@ -13778,6 +13836,9 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     if (hline->isDefined("LO", "TX", "vgrp")) { // italic
         vgroup = hline->getValueInt("LO", "TX", "vgrp");
     }
+    else if (hline->isDefined("LO", "TX", "vg")) {
+        vgroup = hline->getValueInt("LO", "TX", "vg");
+    }
 
     if (hline->isDefined("LO", "TX", "i")) { // italic
         italic = true;
@@ -13999,6 +14060,9 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
     int vgroup = -1;
     if (token->isDefined("LO", "TX", "vgrp")) { // italic
         vgroup = token->getValueInt("LO", "TX", "vgrp");
+    }
+    else if (token->isDefined("LO", "TX", "vg")) { // italic
+        vgroup = token->getValueInt("LO", "TX", "vg");
     }
 
     if (token->isDefined("LO", "TX", "i")) { // italic
@@ -14247,6 +14311,11 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             tempoQ = true;
         }
         if (key == "vgrp") {
+            if ((!value.empty()) && std::isdigit(value[0])) {
+                vgroup = std::stoi(value);
+            }
+        }
+        else if (key == "vg") {
             if ((!value.empty()) && std::isdigit(value[0])) {
                 vgroup = std::stoi(value);
             }
