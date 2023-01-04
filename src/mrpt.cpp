@@ -86,26 +86,4 @@ int MRpt::GenerateMIDI(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int MRpt::PrepareRpt(FunctorParams *functorParams)
-{
-    PrepareRptParams *params = vrv_params_cast<PrepareRptParams *>(functorParams);
-    assert(params);
-
-    // If multiNumber is not true, nothing needs to be done
-    if (params->m_multiNumber != BOOLEAN_true) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // If this is the first one, number has to be 2
-    if (params->m_currentMRpt == NULL) {
-        m_drawingMeasureCount = 2;
-    }
-    // Otherwise increment it
-    else {
-        m_drawingMeasureCount = params->m_currentMRpt->m_drawingMeasureCount + 1;
-    }
-    params->m_currentMRpt = this;
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

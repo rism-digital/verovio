@@ -749,9 +749,9 @@ void Doc::PrepareData()
             filters.Add(&matchLayer);
 
             // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
-            PrepareRptParams prepareRptParams(this);
-            Functor prepareRpt(&Object::PrepareRpt);
-            this->Process(&prepareRpt, &prepareRptParams, NULL, &filters);
+            PrepareRptFunctor prepareRpt(this);
+            prepareRpt.SetFilters(&filters);
+            this->Process(prepareRpt);
         }
     }
 

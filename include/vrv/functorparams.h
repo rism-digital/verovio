@@ -1871,29 +1871,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareRptParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the current MRpt pointer
- * member 1: a pointer to the data_BOOLEAN indicating if multiNumber
- * member 2: a pointer to the doc scoreDef
- **/
-
-class PrepareRptParams : public FunctorParams {
-public:
-    PrepareRptParams(Doc *doc)
-    {
-        m_currentMRpt = NULL;
-        m_multiNumber = BOOLEAN_NONE;
-        m_doc = doc;
-    }
-    MRpt *m_currentMRpt;
-    data_BOOLEAN m_multiNumber;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // PrepareStaffCurrentTimeSpanningParams
 //----------------------------------------------------------------------------
 

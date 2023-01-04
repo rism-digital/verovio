@@ -80,12 +80,4 @@ int HalfmRpt::GenerateMIDI(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int HalfmRpt::PrepareRpt(FunctorParams *functorParams)
-{
-    // PrepareRptParams *params = vrv_params_cast<PrepareRptParams *>(functorParams);
-    // assert(params);
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

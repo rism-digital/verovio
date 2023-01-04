@@ -61,11 +61,6 @@ public:
     int GenerateMIDI(FunctorParams *functorParams) override;
     ///@}
 
-    /**
-     * See Object::PrepareRpt
-     */
-    int PrepareRpt(FunctorParams *functorParams) override;
-
 private:
     //
 public:

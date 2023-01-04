@@ -1091,12 +1091,6 @@ public:
     ///@{
 
     /**
-     * Functor for setting mRpt drawing numbers (if required)
-     * The functor is processed by staff/layer using Filters class.
-     */
-    virtual int PrepareRpt(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Functor for setting Turn::m_drawingEndNote for delayed turns
      * Need a first pass to fill the map with m_initMap to true
      * Processed by staff/layer after that

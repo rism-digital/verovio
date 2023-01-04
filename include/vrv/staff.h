@@ -235,11 +235,6 @@ public:
     int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareRpt
-     */
-    int PrepareRpt(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitOnsetOffset
      */
     ///@{
