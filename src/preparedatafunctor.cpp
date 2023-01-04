@@ -17,6 +17,7 @@
 #include "f.h"
 #include "harm.h"
 #include "layer.h"
+#include "mrpt.h"
 #include "plistinterface.h"
 #include "rest.h"
 #include "runningelement.h"
@@ -1269,16 +1270,52 @@ PrepareRptFunctor::PrepareRptFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode PrepareRptFunctor::VisitLayer(Layer *layer)
 {
+    // If we have encountered a mRpt before and there is none in this layer, reset it to NULL
+    if (m_currentMRpt && !layer->FindDescendantByType(MRPT)) {
+        m_currentMRpt = NULL;
+    }
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareRptFunctor::VisitMRpt(MRpt *mRpt)
 {
+    // If multiNumber is not true, nothing needs to be done
+    if (m_multiNumber != BOOLEAN_true) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // If this is the first one, number has to be 2
+    if (m_currentMRpt == NULL) {
+        mRpt->m_drawingMeasureCount = 2;
+    }
+    // Otherwise increment it
+    else {
+        mRpt->m_drawingMeasureCount = m_currentMRpt->m_drawingMeasureCount + 1;
+    }
+    m_currentMRpt = mRpt;
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
 {
+    // If multiNumber is set, we already know that nothing needs to be done
+    // Furthermore, if @multi.number is false, the functor should have stopped (see below)
+    if (m_multiNumber != BOOLEAN_NONE) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // This is happening only for the first staff element of the staff @n
+    if (StaffDef *staffDef = m_doc->GetCurrentScoreDef()->GetStaffDef(staff->GetN())) {
+        const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)
+            || ((staffDef->GetMultiNumber() != BOOLEAN_true)
+                && (m_doc->GetCurrentScoreDef()->GetMultiNumber() == BOOLEAN_false));
+        if (hideNumber) {
+            // Set it just in case, but stopping the functor should do it for this staff @n
+            m_multiNumber = BOOLEAN_false;
+            return FUNCTOR_STOP;
+        }
+    }
+    m_multiNumber = BOOLEAN_true;
     return FUNCTOR_CONTINUE;
 }
 
