@@ -60,6 +60,14 @@ public:
     ///@}
 
     /**
+     * Store the horizontal extender line coordinates
+     */
+    ///@{
+    void ResetDrawingExtenderX();
+    void SetDrawingExtenderX(int left, int right);
+    ///@}
+
+    /**
      * Get the SMuFL glyph.
      */
     char32_t GetOctaveGlyph(bool withAltaBassa) const;
@@ -73,6 +81,11 @@ public:
     // Functors //
     //----------//
 
+    /**
+     * See Object::ResetVerticalAlignment
+     */
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
+
 protected:
     //
 private:
@@ -80,7 +93,13 @@ private:
 public:
     //
 private:
-    //
+    /**
+     * The X coordinates of the drawn horizontal extender line
+     */
+    ///@{
+    int m_drawingExtenderLeft;
+    int m_drawingExtenderRight;
+    ///@}
 };
 
 } // namespace vrv

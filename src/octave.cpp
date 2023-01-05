@@ -58,6 +58,20 @@ void Octave::Reset()
     this->ResetLineRendBase();
     this->ResetNNumberLike();
     this->ResetOctaveDisplacement();
+
+    this->ResetDrawingExtenderX();
+}
+
+void Octave::ResetDrawingExtenderX()
+{
+    m_drawingExtenderLeft = VRV_UNSET;
+    m_drawingExtenderRight = VRV_UNSET;
+}
+
+void Octave::SetDrawingExtenderX(int left, int right)
+{
+    m_drawingExtenderLeft = left;
+    m_drawingExtenderRight = right;
 }
 
 char32_t Octave::GetOctaveGlyph(bool withAltaBassa) const
@@ -128,5 +142,14 @@ int Octave::GetLineWidth(const Doc *doc, int unit) const
 //----------------------------------------------------------------------------
 // Octave functor methods
 //----------------------------------------------------------------------------
+
+int Octave::ResetVerticalAlignment(FunctorParams *functorParams)
+{
+    FloatingObject::ResetVerticalAlignment(functorParams);
+
+    this->ResetDrawingExtenderX();
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

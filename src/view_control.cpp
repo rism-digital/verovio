@@ -779,6 +779,7 @@ void View::DrawOctave(
         }
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1 + lineShift), ToDeviceContextX(x2),
             ToDeviceContextY(y1 + lineShift));
+        octave->SetDrawingExtenderX(x1, x2);
 
         if (octave->GetLendsym() != LINESTARTENDSYMBOL_none) {
             x2 += lineWidth / 2;
