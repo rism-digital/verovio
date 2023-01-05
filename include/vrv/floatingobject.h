@@ -232,10 +232,10 @@ public:
      */
     char GetSpanningType() const { return m_spanningType; }
 
-    bool CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox);
+    bool CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
 
     int GetSpaceBelow(
-        const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox) const;
+        const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox) const;
 
     data_STAFFREL GetDrawingPlace() const { return m_place; }
 

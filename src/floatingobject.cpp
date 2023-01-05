@@ -368,7 +368,7 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel, bool force)
 }
 
 bool FloatingPositioner::CalcDrawingYRel(
-    Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox)
+    Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox)
 {
     assert(doc);
     assert(staffAlignment);
@@ -378,7 +378,7 @@ bool FloatingPositioner::CalcDrawingYRel(
     int yRel;
 
     const int unit = doc->GetDrawingUnit(staffSize);
-    if (horizOverlapingBBox == NULL) {
+    if (horizOverlappingBBox == NULL) {
         // Apply element margin and enforce minimal staff distance
         int staffIndex = staffAlignment->GetStaff()->GetN();
 
@@ -424,7 +424,7 @@ bool FloatingPositioner::CalcDrawingYRel(
         }
     }
     else {
-        const FloatingCurvePositioner *curve = dynamic_cast<const FloatingCurvePositioner *>(horizOverlapingBBox);
+        const FloatingCurvePositioner *curve = dynamic_cast<const FloatingCurvePositioner *>(horizOverlappingBBox);
         if (curve) {
             assert(curve->m_object);
         }
@@ -439,16 +439,16 @@ bool FloatingPositioner::CalcDrawingYRel(
                 }
                 return true;
             }
-            else if (horizOverlapingBBox->Is(BEAM) && !isExtender) {
-                const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
+            else if (horizOverlappingBBox->Is(BEAM) && !isExtender) {
+                const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlappingBBox), CONTENT, unit / 2);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }
                 return true;
             }
-            yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + this->GetContentY1() - margin;
+            yRel = -staffAlignment->CalcOverflowAbove(horizOverlappingBBox) + this->GetContentY1() - margin;
 
-            const Object *object = dynamic_cast<const Object *>(horizOverlapingBBox);
+            const Object *object = dynamic_cast<const Object *>(horizOverlappingBBox);
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
             if (isExtender) {
@@ -460,7 +460,7 @@ bool FloatingPositioner::CalcDrawingYRel(
                 if (yRel < 0) this->SetDrawingYRel(yRel);
             }
             // Otherwise only if there is a vertical overlap
-            else if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
+            else if (this->VerticalContentOverlap(horizOverlappingBBox, margin)) {
                 this->SetDrawingYRel(yRel);
             }
         }
@@ -472,17 +472,17 @@ bool FloatingPositioner::CalcDrawingYRel(
                 }
                 return true;
             }
-            else if (horizOverlapingBBox->Is(BEAM) && !isExtender) {
-                const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlapingBBox), CONTENT, unit / 2);
+            else if (horizOverlappingBBox->Is(BEAM) && !isExtender) {
+                const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlappingBBox), CONTENT, unit / 2);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }
                 return true;
             }
-            yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
+            yRel = staffAlignment->CalcOverflowBelow(horizOverlappingBBox) + staffAlignment->GetStaffHeight()
                 + this->GetContentY2() + margin;
 
-            const Object *object = dynamic_cast<const Object *>(horizOverlapingBBox);
+            const Object *object = dynamic_cast<const Object *>(horizOverlappingBBox);
             // For elements, that can have extender lines, we need to make sure that they continue in next system on the
             // same height, as they were before (even if there are no overlapping elements in subsequent measures)
             if (isExtender) {
@@ -494,7 +494,7 @@ bool FloatingPositioner::CalcDrawingYRel(
                 if (yRel > 0) this->SetDrawingYRel(yRel);
             }
             // Otherwise only if there is a vertical overlap
-            else if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
+            else if (this->VerticalContentOverlap(horizOverlappingBBox, margin)) {
                 this->SetDrawingYRel(yRel);
             }
         }
@@ -503,13 +503,13 @@ bool FloatingPositioner::CalcDrawingYRel(
 }
 
 int FloatingPositioner::GetSpaceBelow(
-    const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox) const
+    const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox) const
 {
     if (m_place != STAFFREL_between) return VRV_UNSET;
 
     int staffSize = staffAlignment->GetStaffSize();
 
-    const FloatingCurvePositioner *curve = dynamic_cast<const FloatingCurvePositioner *>(horizOverlapingBBox);
+    const FloatingCurvePositioner *curve = dynamic_cast<const FloatingCurvePositioner *>(horizOverlappingBBox);
     if (curve) {
         assert(curve->m_object);
     }
@@ -520,7 +520,7 @@ int FloatingPositioner::GetSpaceBelow(
         return 0;
     }
 
-    return this->GetContentBottom() - horizOverlapingBBox->GetSelfTop() - margin;
+    return this->GetContentBottom() - horizOverlappingBBox->GetSelfTop() - margin;
 }
 
 //----------------------------------------------------------------------------
