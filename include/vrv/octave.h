@@ -59,6 +59,11 @@ public:
     }
     ///@}
 
+    /**
+     * Get the SMuFL glyph.
+     */
+    char32_t GetOctaveGlyph(bool withAltaBassa) const;
+
     //----------//
     // Functors //
     //----------//

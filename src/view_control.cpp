@@ -710,8 +710,7 @@ void View::DrawOctave(
         return;
     }
 
-    data_OCTAVE_DIS dis = octave->GetDis();
-    data_STAFFREL_basic disPlace = octave->GetDisPlace();
+    const data_STAFFREL_basic disPlace = octave->GetDisPlace();
 
     int y1 = octave->GetDrawingY();
     int y2 = y1;
@@ -738,43 +737,7 @@ void View::DrawOctave(
         dc->StartGraphic(octave, "", octave->GetID(), SPANNING);
 
     const bool altSymbols = m_doc->GetOptions()->m_octaveAlternativeSymbols.GetValue();
-    int code = SMUFL_E511_ottavaAlta;
-    if (disPlace == STAFFREL_basic_above) {
-        switch (dis) {
-            // here we could use other glyphs depending on the style
-            case OCTAVE_DIS_8: {
-                code = altSymbols ? SMUFL_E511_ottavaAlta : SMUFL_E510_ottava;
-                break;
-            }
-            case OCTAVE_DIS_15: {
-                code = altSymbols ? SMUFL_E515_quindicesimaAlta : SMUFL_E514_quindicesima;
-                break;
-            }
-            case OCTAVE_DIS_22: {
-                code = altSymbols ? SMUFL_E518_ventiduesimaAlta : SMUFL_E517_ventiduesima;
-                break;
-            }
-            default: break;
-        }
-    }
-    else {
-        switch (dis) {
-            // ditto
-            case OCTAVE_DIS_8: {
-                code = altSymbols ? SMUFL_E51C_ottavaBassaVb : SMUFL_E510_ottava;
-                break;
-            }
-            case OCTAVE_DIS_15: {
-                code = altSymbols ? SMUFL_E51D_quindicesimaBassaMb : SMUFL_E514_quindicesima;
-                break;
-            }
-            case OCTAVE_DIS_22: {
-                code = altSymbols ? SMUFL_E51E_ventiduesimaBassaMb : SMUFL_E517_ventiduesima;
-                break;
-            }
-            default: break;
-        }
-    }
+    const char32_t code = octave->GetOctaveGlyph(altSymbols);
     std::u32string str;
     str.push_back(code);
 
