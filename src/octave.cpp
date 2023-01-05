@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "smufl.h"
 #include "verticalaligner.h"
 
@@ -98,6 +99,30 @@ char32_t Octave::GetOctaveGlyph(bool withAltaBassa) const
         }
     }
     return code;
+}
+
+int Octave::GetLineWidth(const Doc *doc, int unit) const
+{
+    int lineWidth = doc->GetOptions()->m_octaveLineThickness.GetValue() * unit;
+    if (this->HasLwidth()) {
+        if (this->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
+            switch (this->GetLwidth().GetLineWithTerm()) {
+                case LINEWIDTHTERM_narrow: lineWidth *= LINEWIDTHTERM_factor_narrow; break;
+                case LINEWIDTHTERM_medium: lineWidth *= LINEWIDTHTERM_factor_medium; break;
+                case LINEWIDTHTERM_wide: lineWidth *= LINEWIDTHTERM_factor_wide; break;
+                default: break;
+            }
+        }
+        else if (this->GetLwidth().GetType() == LINEWIDTHTYPE_measurementunsigned) {
+            if (this->GetLwidth().GetMeasurementunsigned().GetType() == MEASUREMENTTYPE_px) {
+                lineWidth = this->GetLwidth().GetMeasurementunsigned().GetPx();
+            }
+            else {
+                lineWidth = this->GetLwidth().GetMeasurementunsigned().GetVu() * unit;
+            }
+        }
+    }
+    return lineWidth;
 }
 
 //----------------------------------------------------------------------------

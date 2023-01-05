@@ -64,6 +64,11 @@ public:
      */
     char32_t GetOctaveGlyph(bool withAltaBassa) const;
 
+    /**
+     * Calculate the octave line width.
+     */
+    int GetLineWidth(const Doc *doc, int unit) const;
+
     //----------//
     // Functors //
     //----------//

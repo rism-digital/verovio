@@ -750,30 +750,7 @@ void View::DrawOctave(
     dc->ResetFont();
 
     if (octave->GetExtender() != BOOLEAN_false) {
-        int lineWidth
-            = m_doc->GetOptions()->m_octaveLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        if (octave->HasLwidth()) {
-            if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
-                if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
-                    lineWidth *= LINEWIDTHTERM_factor_narrow;
-                }
-                else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
-                    lineWidth *= LINEWIDTHTERM_factor_medium;
-                }
-                else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
-                    lineWidth *= LINEWIDTHTERM_factor_wide;
-                }
-            }
-            else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementunsigned) {
-                if (octave->GetLwidth().GetMeasurementunsigned().GetType() == MEASUREMENTTYPE_px) {
-                    lineWidth = octave->GetLwidth().GetMeasurementunsigned().GetPx();
-                }
-                else {
-                    lineWidth = octave->GetLwidth().GetMeasurementunsigned().GetVu()
-                        * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-                }
-            }
-        }
+        const int lineWidth = octave->GetLineWidth(m_doc, m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
         // adjust is to avoid the figure to touch the line
         x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
