@@ -10,25 +10,38 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "anchoredtext.h"
+#include "arpeg.h"
 #include "artic.h"
 #include "barline.h"
 #include "beam.h"
+#include "beamspan.h"
 #include "beatrpt.h"
+#include "bracketspan.h"
+#include "breath.h"
 #include "btrem.h"
+#include "caesura.h"
 #include "chord.h"
 #include "clef.h"
 #include "course.h"
 #include "custos.h"
+#include "dir.h"
 #include "doc.h"
 #include "dot.h"
+#include "dynam.h"
 #include "elementpart.h"
 #include "f.h"
 #include "fb.h"
+#include "fermata.h"
 #include "fig.h"
+#include "fing.h"
 #include "ftrem.h"
+#include "gliss.h"
 #include "gracegrp.h"
 #include "grpsym.h"
+#include "hairpin.h"
 #include "halfmrpt.h"
+#include "harm.h"
 #include "instrdef.h"
 #include "keyaccid.h"
 #include "keysig.h"
@@ -38,11 +51,14 @@
 #include "layerdef.h"
 #include "lb.h"
 #include "ligature.h"
+#include "lv.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
+#include "mnum.h"
+#include "mordent.h"
 #include "mrest.h"
 #include "mrpt.h"
 #include "mrpt2.h"
@@ -53,19 +69,26 @@
 #include "neume.h"
 #include "note.h"
 #include "num.h"
+#include "octave.h"
+#include "ornam.h"
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
+#include "pedal.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
+#include "phrase.h"
+#include "pitchinflection.h"
 #include "plica.h"
 #include "proport.h"
+#include "reh.h"
 #include "rend.h"
 #include "rest.h"
 #include "score.h"
 #include "scoredef.h"
+#include "slur.h"
 #include "space.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -78,10 +101,14 @@
 #include "system.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
+#include "tempo.h"
 #include "text.h"
+#include "tie.h"
 #include "timestamp.h"
+#include "trill.h"
 #include "tuning.h"
 #include "tuplet.h"
+#include "turn.h"
 #include "verse.h"
 
 namespace vrv {
@@ -358,6 +385,276 @@ FunctorCode FunctorInterface::VisitScore(Score *score)
 FunctorCode FunctorInterface::VisitScoreEnd(Score *score)
 {
     return this->VisitPageElementEnd(score);
+}
+
+FunctorCode FunctorInterface::VisitAnchoredText(AnchoredText *anchoredText)
+{
+    return this->VisitControlElement(anchoredText);
+}
+
+FunctorCode FunctorInterface::VisitAnchoredTextEnd(AnchoredText *anchoredText)
+{
+    return this->VisitControlElementEnd(anchoredText);
+}
+
+FunctorCode FunctorInterface::VisitArpeg(Arpeg *arpeg)
+{
+    return this->VisitControlElement(arpeg);
+}
+
+FunctorCode FunctorInterface::VisitArpegEnd(Arpeg *arpeg)
+{
+    return this->VisitControlElementEnd(arpeg);
+}
+
+FunctorCode FunctorInterface::VisitBeamSpan(BeamSpan *beamSpan)
+{
+    return this->VisitControlElement(beamSpan);
+}
+
+FunctorCode FunctorInterface::VisitBeamSpanEnd(BeamSpan *beamSpan)
+{
+    return this->VisitControlElementEnd(beamSpan);
+}
+
+FunctorCode FunctorInterface::VisitBracketSpan(BracketSpan *bracketSpan)
+{
+    return this->VisitControlElement(bracketSpan);
+}
+
+FunctorCode FunctorInterface::VisitBracketSpanEnd(BracketSpan *bracketSpan)
+{
+    return this->VisitControlElementEnd(bracketSpan);
+}
+
+FunctorCode FunctorInterface::VisitBreath(Breath *breath)
+{
+    return this->VisitControlElement(breath);
+}
+
+FunctorCode FunctorInterface::VisitBreathEnd(Breath *breath)
+{
+    return this->VisitControlElementEnd(breath);
+}
+
+FunctorCode FunctorInterface::VisitCaesura(Caesura *caesura)
+{
+    return this->VisitControlElement(caesura);
+}
+
+FunctorCode FunctorInterface::VisitCaesuraEnd(Caesura *caesura)
+{
+    return this->VisitControlElementEnd(caesura);
+}
+
+FunctorCode FunctorInterface::VisitControlElement(ControlElement *controlElement)
+{
+    return this->VisitFloatingObject(controlElement);
+}
+
+FunctorCode FunctorInterface::VisitControlElementEnd(ControlElement *controlElement)
+{
+    return this->VisitFloatingObjectEnd(controlElement);
+}
+
+FunctorCode FunctorInterface::VisitDir(Dir *dir)
+{
+    return this->VisitControlElement(dir);
+}
+
+FunctorCode FunctorInterface::VisitDirEnd(Dir *dir)
+{
+    return this->VisitControlElementEnd(dir);
+}
+
+FunctorCode FunctorInterface::VisitDynam(Dynam *dynam)
+{
+    return this->VisitControlElement(dynam);
+}
+
+FunctorCode FunctorInterface::VisitDynamEnd(Dynam *dynam)
+{
+    return this->VisitControlElementEnd(dynam);
+}
+
+FunctorCode FunctorInterface::VisitFermata(Fermata *fermata)
+{
+    return this->VisitControlElement(fermata);
+}
+
+FunctorCode FunctorInterface::VisitFermataEnd(Fermata *fermata)
+{
+    return this->VisitControlElementEnd(fermata);
+}
+
+FunctorCode FunctorInterface::VisitFing(Fing *fing)
+{
+    return this->VisitControlElement(fing);
+}
+
+FunctorCode FunctorInterface::VisitFingEnd(Fing *fing)
+{
+    return this->VisitControlElementEnd(fing);
+}
+
+FunctorCode FunctorInterface::VisitGliss(Gliss *gliss)
+{
+    return this->VisitControlElement(gliss);
+}
+
+FunctorCode FunctorInterface::VisitGlissEnd(Gliss *gliss)
+{
+    return this->VisitControlElementEnd(gliss);
+}
+
+FunctorCode FunctorInterface::VisitHairpin(Hairpin *hairpin)
+{
+    return this->VisitControlElement(hairpin);
+}
+
+FunctorCode FunctorInterface::VisitHairpinEnd(Hairpin *hairpin)
+{
+    return this->VisitControlElementEnd(hairpin);
+}
+
+FunctorCode FunctorInterface::VisitHarm(Harm *harm)
+{
+    return this->VisitControlElement(harm);
+}
+
+FunctorCode FunctorInterface::VisitHarmEnd(Harm *harm)
+{
+    return this->VisitControlElementEnd(harm);
+}
+
+FunctorCode FunctorInterface::VisitLv(Lv *lv)
+{
+    return this->VisitTie(lv);
+}
+
+FunctorCode FunctorInterface::VisitLvEnd(Lv *lv)
+{
+    return this->VisitTieEnd(lv);
+}
+
+FunctorCode FunctorInterface::VisitMordent(Mordent *mordent)
+{
+    return this->VisitControlElement(mordent);
+}
+
+FunctorCode FunctorInterface::VisitMordentEnd(Mordent *mordent)
+{
+    return this->VisitControlElementEnd(mordent);
+}
+
+FunctorCode FunctorInterface::VisitOctave(Octave *octave)
+{
+    return this->VisitControlElement(octave);
+}
+
+FunctorCode FunctorInterface::VisitOctaveEnd(Octave *octave)
+{
+    return this->VisitControlElementEnd(octave);
+}
+
+FunctorCode FunctorInterface::VisitOrnam(Ornam *ornam)
+{
+    return this->VisitControlElement(ornam);
+}
+
+FunctorCode FunctorInterface::VisitOrnamEnd(Ornam *ornam)
+{
+    return this->VisitControlElementEnd(ornam);
+}
+
+FunctorCode FunctorInterface::VisitPedal(Pedal *pedal)
+{
+    return this->VisitControlElement(pedal);
+}
+
+FunctorCode FunctorInterface::VisitPedalEnd(Pedal *pedal)
+{
+    return this->VisitControlElementEnd(pedal);
+}
+
+FunctorCode FunctorInterface::VisitPhrase(Phrase *phrase)
+{
+    return this->VisitSlur(phrase);
+}
+
+FunctorCode FunctorInterface::VisitPhraseEnd(Phrase *phrase)
+{
+    return this->VisitSlurEnd(phrase);
+}
+
+FunctorCode FunctorInterface::VisitPitchInflection(PitchInflection *pitchInflection)
+{
+    return this->VisitControlElement(pitchInflection);
+}
+
+FunctorCode FunctorInterface::VisitPitchInflectionEnd(PitchInflection *pitchInflection)
+{
+    return this->VisitControlElementEnd(pitchInflection);
+}
+
+FunctorCode FunctorInterface::VisitReh(Reh *reh)
+{
+    return this->VisitControlElement(reh);
+}
+
+FunctorCode FunctorInterface::VisitRehEnd(Reh *reh)
+{
+    return this->VisitControlElementEnd(reh);
+}
+
+FunctorCode FunctorInterface::VisitSlur(Slur *slur)
+{
+    return this->VisitControlElement(slur);
+}
+
+FunctorCode FunctorInterface::VisitSlurEnd(Slur *slur)
+{
+    return this->VisitControlElementEnd(slur);
+}
+
+FunctorCode FunctorInterface::VisitTempo(Tempo *tempo)
+{
+    return this->VisitControlElement(tempo);
+}
+
+FunctorCode FunctorInterface::VisitTempoEnd(Tempo *tempo)
+{
+    return this->VisitControlElementEnd(tempo);
+}
+
+FunctorCode FunctorInterface::VisitTie(Tie *tie)
+{
+    return this->VisitControlElement(tie);
+}
+
+FunctorCode FunctorInterface::VisitTieEnd(Tie *tie)
+{
+    return this->VisitControlElementEnd(tie);
+}
+
+FunctorCode FunctorInterface::VisitTrill(Trill *trill)
+{
+    return this->VisitControlElement(trill);
+}
+
+FunctorCode FunctorInterface::VisitTrillEnd(Trill *trill)
+{
+    return this->VisitControlElementEnd(trill);
+}
+
+FunctorCode FunctorInterface::VisitTurn(Turn *turn)
+{
+    return this->VisitControlElement(turn);
+}
+
+FunctorCode FunctorInterface::VisitTurnEnd(Turn *turn)
+{
+    return this->VisitControlElementEnd(turn);
 }
 
 FunctorCode FunctorInterface::VisitAccid(Accid *accid)
@@ -850,6 +1147,16 @@ FunctorCode FunctorInterface::VisitLbEnd(Lb *lb)
     return this->VisitTextElementEnd(lb);
 }
 
+FunctorCode FunctorInterface::VisitMNum(MNum *mNum)
+{
+    return this->VisitControlElement(mNum);
+}
+
+FunctorCode FunctorInterface::VisitMNumEnd(MNum *mNum)
+{
+    return this->VisitControlElementEnd(mNum);
+}
+
 FunctorCode FunctorInterface::VisitNum(Num *num)
 {
     return this->VisitTextElement(num);
@@ -1272,6 +1579,276 @@ FunctorCode ConstFunctorInterface::VisitScore(const Score *score)
 FunctorCode ConstFunctorInterface::VisitScoreEnd(const Score *score)
 {
     return this->VisitPageElementEnd(score);
+}
+
+FunctorCode ConstFunctorInterface::VisitAnchoredText(const AnchoredText *anchoredText)
+{
+    return this->VisitControlElement(anchoredText);
+}
+
+FunctorCode ConstFunctorInterface::VisitAnchoredTextEnd(const AnchoredText *anchoredText)
+{
+    return this->VisitControlElementEnd(anchoredText);
+}
+
+FunctorCode ConstFunctorInterface::VisitArpeg(const Arpeg *arpeg)
+{
+    return this->VisitControlElement(arpeg);
+}
+
+FunctorCode ConstFunctorInterface::VisitArpegEnd(const Arpeg *arpeg)
+{
+    return this->VisitControlElementEnd(arpeg);
+}
+
+FunctorCode ConstFunctorInterface::VisitBeamSpan(const BeamSpan *beamSpan)
+{
+    return this->VisitControlElement(beamSpan);
+}
+
+FunctorCode ConstFunctorInterface::VisitBeamSpanEnd(const BeamSpan *beamSpan)
+{
+    return this->VisitControlElementEnd(beamSpan);
+}
+
+FunctorCode ConstFunctorInterface::VisitBracketSpan(const BracketSpan *bracketSpan)
+{
+    return this->VisitControlElement(bracketSpan);
+}
+
+FunctorCode ConstFunctorInterface::VisitBracketSpanEnd(const BracketSpan *bracketSpan)
+{
+    return this->VisitControlElementEnd(bracketSpan);
+}
+
+FunctorCode ConstFunctorInterface::VisitBreath(const Breath *breath)
+{
+    return this->VisitControlElement(breath);
+}
+
+FunctorCode ConstFunctorInterface::VisitBreathEnd(const Breath *breath)
+{
+    return this->VisitControlElementEnd(breath);
+}
+
+FunctorCode ConstFunctorInterface::VisitCaesura(const Caesura *caesura)
+{
+    return this->VisitControlElement(caesura);
+}
+
+FunctorCode ConstFunctorInterface::VisitCaesuraEnd(const Caesura *caesura)
+{
+    return this->VisitControlElementEnd(caesura);
+}
+
+FunctorCode ConstFunctorInterface::VisitControlElement(const ControlElement *controlElement)
+{
+    return this->VisitFloatingObject(controlElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitControlElementEnd(const ControlElement *controlElement)
+{
+    return this->VisitFloatingObjectEnd(controlElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitDir(const Dir *dir)
+{
+    return this->VisitControlElement(dir);
+}
+
+FunctorCode ConstFunctorInterface::VisitDirEnd(const Dir *dir)
+{
+    return this->VisitControlElementEnd(dir);
+}
+
+FunctorCode ConstFunctorInterface::VisitDynam(const Dynam *dynam)
+{
+    return this->VisitControlElement(dynam);
+}
+
+FunctorCode ConstFunctorInterface::VisitDynamEnd(const Dynam *dynam)
+{
+    return this->VisitControlElementEnd(dynam);
+}
+
+FunctorCode ConstFunctorInterface::VisitFermata(const Fermata *fermata)
+{
+    return this->VisitControlElement(fermata);
+}
+
+FunctorCode ConstFunctorInterface::VisitFermataEnd(const Fermata *fermata)
+{
+    return this->VisitControlElementEnd(fermata);
+}
+
+FunctorCode ConstFunctorInterface::VisitFing(const Fing *fing)
+{
+    return this->VisitControlElement(fing);
+}
+
+FunctorCode ConstFunctorInterface::VisitFingEnd(const Fing *fing)
+{
+    return this->VisitControlElementEnd(fing);
+}
+
+FunctorCode ConstFunctorInterface::VisitGliss(const Gliss *gliss)
+{
+    return this->VisitControlElement(gliss);
+}
+
+FunctorCode ConstFunctorInterface::VisitGlissEnd(const Gliss *gliss)
+{
+    return this->VisitControlElementEnd(gliss);
+}
+
+FunctorCode ConstFunctorInterface::VisitHairpin(const Hairpin *hairpin)
+{
+    return this->VisitControlElement(hairpin);
+}
+
+FunctorCode ConstFunctorInterface::VisitHairpinEnd(const Hairpin *hairpin)
+{
+    return this->VisitControlElementEnd(hairpin);
+}
+
+FunctorCode ConstFunctorInterface::VisitHarm(const Harm *harm)
+{
+    return this->VisitControlElement(harm);
+}
+
+FunctorCode ConstFunctorInterface::VisitHarmEnd(const Harm *harm)
+{
+    return this->VisitControlElementEnd(harm);
+}
+
+FunctorCode ConstFunctorInterface::VisitLv(const Lv *lv)
+{
+    return this->VisitTie(lv);
+}
+
+FunctorCode ConstFunctorInterface::VisitLvEnd(const Lv *lv)
+{
+    return this->VisitTieEnd(lv);
+}
+
+FunctorCode ConstFunctorInterface::VisitMordent(const Mordent *mordent)
+{
+    return this->VisitControlElement(mordent);
+}
+
+FunctorCode ConstFunctorInterface::VisitMordentEnd(const Mordent *mordent)
+{
+    return this->VisitControlElementEnd(mordent);
+}
+
+FunctorCode ConstFunctorInterface::VisitOctave(const Octave *octave)
+{
+    return this->VisitControlElement(octave);
+}
+
+FunctorCode ConstFunctorInterface::VisitOctaveEnd(const Octave *octave)
+{
+    return this->VisitControlElementEnd(octave);
+}
+
+FunctorCode ConstFunctorInterface::VisitOrnam(const Ornam *ornam)
+{
+    return this->VisitControlElement(ornam);
+}
+
+FunctorCode ConstFunctorInterface::VisitOrnamEnd(const Ornam *ornam)
+{
+    return this->VisitControlElementEnd(ornam);
+}
+
+FunctorCode ConstFunctorInterface::VisitPedal(const Pedal *pedal)
+{
+    return this->VisitControlElement(pedal);
+}
+
+FunctorCode ConstFunctorInterface::VisitPedalEnd(const Pedal *pedal)
+{
+    return this->VisitControlElementEnd(pedal);
+}
+
+FunctorCode ConstFunctorInterface::VisitPhrase(const Phrase *phrase)
+{
+    return this->VisitSlur(phrase);
+}
+
+FunctorCode ConstFunctorInterface::VisitPhraseEnd(const Phrase *phrase)
+{
+    return this->VisitSlurEnd(phrase);
+}
+
+FunctorCode ConstFunctorInterface::VisitPitchInflection(const PitchInflection *pitchInflection)
+{
+    return this->VisitControlElement(pitchInflection);
+}
+
+FunctorCode ConstFunctorInterface::VisitPitchInflectionEnd(const PitchInflection *pitchInflection)
+{
+    return this->VisitControlElementEnd(pitchInflection);
+}
+
+FunctorCode ConstFunctorInterface::VisitReh(const Reh *reh)
+{
+    return this->VisitControlElement(reh);
+}
+
+FunctorCode ConstFunctorInterface::VisitRehEnd(const Reh *reh)
+{
+    return this->VisitControlElementEnd(reh);
+}
+
+FunctorCode ConstFunctorInterface::VisitSlur(const Slur *slur)
+{
+    return this->VisitControlElement(slur);
+}
+
+FunctorCode ConstFunctorInterface::VisitSlurEnd(const Slur *slur)
+{
+    return this->VisitControlElementEnd(slur);
+}
+
+FunctorCode ConstFunctorInterface::VisitTempo(const Tempo *tempo)
+{
+    return this->VisitControlElement(tempo);
+}
+
+FunctorCode ConstFunctorInterface::VisitTempoEnd(const Tempo *tempo)
+{
+    return this->VisitControlElementEnd(tempo);
+}
+
+FunctorCode ConstFunctorInterface::VisitTie(const Tie *tie)
+{
+    return this->VisitControlElement(tie);
+}
+
+FunctorCode ConstFunctorInterface::VisitTieEnd(const Tie *tie)
+{
+    return this->VisitControlElementEnd(tie);
+}
+
+FunctorCode ConstFunctorInterface::VisitTrill(const Trill *trill)
+{
+    return this->VisitControlElement(trill);
+}
+
+FunctorCode ConstFunctorInterface::VisitTrillEnd(const Trill *trill)
+{
+    return this->VisitControlElementEnd(trill);
+}
+
+FunctorCode ConstFunctorInterface::VisitTurn(const Turn *turn)
+{
+    return this->VisitControlElement(turn);
+}
+
+FunctorCode ConstFunctorInterface::VisitTurnEnd(const Turn *turn)
+{
+    return this->VisitControlElementEnd(turn);
 }
 
 FunctorCode ConstFunctorInterface::VisitAccid(const Accid *accid)
@@ -1762,6 +2339,16 @@ FunctorCode ConstFunctorInterface::VisitLb(const Lb *lb)
 FunctorCode ConstFunctorInterface::VisitLbEnd(const Lb *lb)
 {
     return this->VisitTextElementEnd(lb);
+}
+
+FunctorCode ConstFunctorInterface::VisitMNum(const MNum *mNum)
+{
+    return this->VisitControlElement(mNum);
+}
+
+FunctorCode ConstFunctorInterface::VisitMNumEnd(const MNum *mNum)
+{
+    return this->VisitControlElementEnd(mNum);
 }
 
 FunctorCode ConstFunctorInterface::VisitNum(const Num *num)
