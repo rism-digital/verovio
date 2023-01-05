@@ -7948,8 +7948,10 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 continue;
             }
             if (isDegree && (token->find('r') != std::string::npos)) {
-                // Don't add rest marker data.
-                continue;
+                if (token->find('0') == std::string::npos) {
+                    // Don't add rest marker data (otherwise it will be labeled as the "0" scale degree).
+                    continue;
+                }
             }
             Harm *harm = new Harm();
             Text *text = new Text();
@@ -8877,6 +8879,7 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
         }
         else {
             switch (degree) {
+                case 0: output += U"0"; break;
                 case 1: output += U"1"; break;
                 case 2: output += U"2"; break;
                 case 3: output += U"3"; break;
