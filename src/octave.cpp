@@ -140,12 +140,14 @@ int Octave::GetLineWidth(const Doc *doc, int unit) const
     return lineWidth;
 }
 
-std::pair<int, bool> Octave::GetStaffSideContentBoundary(const Doc *doc, const StaffAlignment *staffAlignment,
-    const BoundingBox *horizOverlappingBBox, data_STAFFREL drawingPlace) const
+std::pair<int, bool> Octave::GetVerticalContentBoundary(const Doc *doc, const FloatingPositioner *positioner,
+    const BoundingBox *horizOverlappingBBox, bool contentTop) const
 {
+    assert(positioner);
+
     // Check if we use the extender line for refined vertical layout
     bool useExtenderLine = true;
-    const FloatingPositioner *positioner = staffAlignment->GetCorrespFloatingPositioner(this);
+    const StaffAlignment *staffAlignment = positioner->GetAlignment();
     if (m_drawingExtenderX.find(positioner) == m_drawingExtenderX.end()) {
         useExtenderLine = false;
     }
@@ -161,12 +163,12 @@ std::pair<int, bool> Octave::GetStaffSideContentBoundary(const Doc *doc, const S
         // Calculate the content boundary based on the extender line
         const int unit = doc->GetDrawingUnit(staffAlignment->GetStaffSize());
         const int lineWidth = this->GetLineWidth(doc, unit);
-        const int contentBoundary = (drawingPlace == STAFFREL_above) ? -lineWidth : lineWidth;
+        const int contentBoundary = contentTop ? lineWidth : -lineWidth;
         return { contentBoundary, true };
     }
     else {
         // Calculate the content boundary based on the full bounding box (as usual)
-        return FloatingObject::GetStaffSideContentBoundary(doc, staffAlignment, horizOverlappingBBox, drawingPlace);
+        return FloatingObject::GetVerticalContentBoundary(doc, positioner, horizOverlappingBBox, contentTop);
     }
 }
 

@@ -78,12 +78,12 @@ public:
     int GetLineWidth(const Doc *doc, int unit) const;
 
     /**
-     * Determine the vertical content boundary closest to the staff.
+     * Determine the vertical content boundary.
      * For refined layout this can take the overlapping bbox into account.
      * Returns a pair consisting of the boundary and a flag indicating whether refined layout was used.
      */
-    std::pair<int, bool> GetStaffSideContentBoundary(const Doc *doc, const StaffAlignment *staffAlignment,
-        const BoundingBox *horizOverlappingBBox, data_STAFFREL drawingPlace) const override;
+    std::pair<int, bool> GetVerticalContentBoundary(const Doc *doc, const FloatingPositioner *positioner,
+        const BoundingBox *horizOverlappingBBox, bool contentTop) const override;
 
     //----------//
     // Functors //

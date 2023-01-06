@@ -165,17 +165,13 @@ int FloatingObject::SetDrawingGrpObject(void *drawingGrpObject)
     return m_drawingGrpId;
 }
 
-std::pair<int, bool> FloatingObject::GetStaffSideContentBoundary(const Doc *doc, const StaffAlignment *staffAlignment,
-    const BoundingBox *horizOverlappingBBox, data_STAFFREL drawingPlace) const
+std::pair<int, bool> FloatingObject::GetVerticalContentBoundary(const Doc *doc, const FloatingPositioner *positioner,
+    const BoundingBox *horizOverlappingBBox, bool contentTop) const
 {
-    if (!m_currentPositioner) return { 0, false };
+    assert(positioner);
 
-    if (drawingPlace == STAFFREL_above) {
-        return { m_currentPositioner->GetContentY1(), false };
-    }
-    else {
-        return { m_currentPositioner->GetContentY2(), false };
-    }
+    const int boundary = contentTop ? positioner->GetContentY2() : positioner->GetContentY1();
+    return { boundary, false };
 }
 
 //----------------------------------------------------------------------------
@@ -447,7 +443,7 @@ void FloatingPositioner::CalcDrawingYRel(
         int staffSideContentBoundary = 0;
         bool hasRefinedContentBoundary = false;
         std::tie(staffSideContentBoundary, hasRefinedContentBoundary)
-            = m_object->GetStaffSideContentBoundary(doc, staffAlignment, horizOverlappingBBox, m_place);
+            = this->GetVerticalContentBoundary(doc, horizOverlappingBBox, (m_place != STAFFREL_above));
 
         if (!hasRefinedContentBoundary) {
             // Employ special collision detection for beams and slurs/ties
@@ -528,6 +524,12 @@ int FloatingPositioner::GetSpaceBelow(
     }
 
     return this->GetContentBottom() - horizOverlappingBBox->GetSelfTop() - margin;
+}
+
+std::pair<int, bool> FloatingPositioner::GetVerticalContentBoundary(
+    const Doc *doc, const BoundingBox *horizOverlappingBBox, bool contentTop) const
+{
+    return m_object->GetVerticalContentBoundary(doc, this, horizOverlappingBBox, contentTop);
 }
 
 //----------------------------------------------------------------------------

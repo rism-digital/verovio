@@ -100,12 +100,12 @@ public:
     virtual bool IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const { return false; }
 
     /**
-     * Determine the vertical content boundary closest to the staff.
+     * Determine the vertical content boundary.
      * For refined layout this can take the overlapping bbox into account.
      * Returns a pair consisting of the boundary and a flag indicating whether refined layout was used.
      */
-    virtual std::pair<int, bool> GetStaffSideContentBoundary(const Doc *doc, const StaffAlignment *staffAlignment,
-        const BoundingBox *horizOverlappingBBox, data_STAFFREL drawingPlace) const;
+    virtual std::pair<int, bool> GetVerticalContentBoundary(const Doc *doc, const FloatingPositioner *positioner,
+        const BoundingBox *horizOverlappingBBox, bool contentTop) const;
 
     //----------//
     // Functors //
@@ -240,14 +240,6 @@ public:
      */
     char GetSpanningType() const { return m_spanningType; }
 
-    /**
-     * Update the Y drawing relative position based on collision detection with the overlapping bounding box
-     */
-    void CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
-
-    int GetSpaceBelow(
-        const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox) const;
-
     data_STAFFREL GetDrawingPlace() const { return m_place; }
 
     /**
@@ -260,6 +252,22 @@ public:
     int GetDrawingXRel() const { return m_drawingXRel; }
     virtual void SetDrawingXRel(int drawingXRel);
     ///@}
+
+    /**
+     * Update the Y drawing relative position based on collision detection with the overlapping bounding box
+     */
+    void CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
+
+    int GetSpaceBelow(
+        const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox) const;
+
+    /**
+     * Determine the vertical content boundary.
+     * For refined layout this can take the overlapping bbox into account.
+     * Returns a pair consisting of the boundary and a flag indicating whether refined layout was used.
+     */
+    std::pair<int, bool> GetVerticalContentBoundary(
+        const Doc *doc, const BoundingBox *horizOverlappingBBox, bool contentTop) const;
 
 private:
     Object *m_objectX;
