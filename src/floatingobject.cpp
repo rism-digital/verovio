@@ -441,7 +441,7 @@ void FloatingPositioner::CalcDrawingYRel(
         if (curve) {
             assert(curve->m_object);
         }
-        int margin = doc->GetBottomMargin(m_object->GetClassId()) * unit;
+        const int margin = doc->GetBottomMargin(m_object->GetClassId()) * unit;
         const bool isExtender = m_object->Is({ DIR, DYNAM, TEMPO }) && m_object->IsExtenderElement();
 
         int staffSideContentBoundary = 0;
@@ -452,14 +452,14 @@ void FloatingPositioner::CalcDrawingYRel(
         if (!hasRefinedContentBoundary) {
             // Employ special collision detection for beams and slurs/ties
             if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
-                const int shift = this->Intersects(curve, CONTENT, unit);
+                const int shift = this->Intersects(curve, CONTENT, margin);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }
                 return;
             }
             else if (horizOverlappingBBox->Is(BEAM) && !isExtender) {
-                const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlappingBBox), CONTENT, unit / 2);
+                const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlappingBBox), CONTENT, margin);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }

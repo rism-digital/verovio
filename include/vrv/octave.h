@@ -102,11 +102,10 @@ public:
     //
 private:
     /**
-     * The X coordinates of the drawn horizontal extender line
+     * The left and right X coordinates of the drawn horizontal extender line
      */
     ///@{
-    int m_drawingExtenderLeft;
-    int m_drawingExtenderRight;
+    std::map<const FloatingPositioner *, std::pair<int, int>> m_drawingExtenderX;
     ///@}
 };
 

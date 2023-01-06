@@ -64,14 +64,15 @@ void Octave::Reset()
 
 void Octave::ResetDrawingExtenderX()
 {
-    m_drawingExtenderLeft = VRV_UNSET;
-    m_drawingExtenderRight = VRV_UNSET;
+    m_drawingExtenderX.clear();
 }
 
 void Octave::SetDrawingExtenderX(int left, int right)
 {
-    m_drawingExtenderLeft = left;
-    m_drawingExtenderRight = right;
+    const FloatingPositioner *positioner = this->GetCurrentFloatingPositioner();
+    if (positioner) {
+        m_drawingExtenderX[positioner] = { left, right };
+    }
 }
 
 char32_t Octave::GetOctaveGlyph(bool withAltaBassa) const
@@ -144,12 +145,16 @@ std::pair<int, bool> Octave::GetStaffSideContentBoundary(const Doc *doc, const S
 {
     // Check if we use the extender line for refined vertical layout
     bool useExtenderLine = true;
-    if ((m_drawingExtenderLeft == VRV_UNSET) || (m_drawingExtenderRight == VRV_UNSET)) {
+    const FloatingPositioner *positioner = staffAlignment->GetCorrespFloatingPositioner(this);
+    if (m_drawingExtenderX.find(positioner) == m_drawingExtenderX.end()) {
         useExtenderLine = false;
     }
-    if ((horizOverlappingBBox->GetContentLeft() < m_drawingExtenderLeft)
-        || (horizOverlappingBBox->GetContentRight() > m_drawingExtenderRight)) {
-        useExtenderLine = false;
+    else {
+        const std::pair<int, int> extenderX = m_drawingExtenderX.at(positioner);
+        if ((horizOverlappingBBox->GetContentLeft() < extenderX.first)
+            || (horizOverlappingBBox->GetContentRight() > extenderX.second)) {
+            useExtenderLine = false;
+        }
     }
 
     if (useExtenderLine) {
