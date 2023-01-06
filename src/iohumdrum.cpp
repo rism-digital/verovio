@@ -8859,10 +8859,10 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
     int minor = token->getValueInt("auto", "minor");
     if (minor && (firstnote.find("7") != std::string::npos)) {
         int minnat = token->getValueInt("auto", "minnat");
-        int hQ = firstnote.find("h") != std::string::npos ? 1 : 0;
-        int nQ = firstnote.find("n") != std::string::npos ? 1 : 0;
+        int HQ = firstnote.find("H") != std::string::npos ? 1 : 0;
+        int NQ = firstnote.find("N") != std::string::npos ? 1 : 0;
         if (minnat) {
-            if (hQ) {
+            if (HQ) {
                 if (flats) {
                     flats--;
                 }
@@ -8873,7 +8873,7 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
         }
         else {
             // displaying in harmonic minor mode (default)
-            if (nQ) {
+            if (NQ) {
                 if (sharps) {
                     sharps--;
                 }
@@ -8999,10 +8999,10 @@ std::u32string HumdrumInput::getMoveableDoName(hum::HTp token, int degree, int a
     }
     int minnat = token->getValueInt("auto", "minnat");
     if (minnat) {
-        if (token->find("7n") != std::string::npos) {
+        if (token->find("7N") != std::string::npos) {
             alteration--;
         }
-        else if (token->find("7h") != std::string::npos) {
+        else if (token->find("7H") != std::string::npos) {
             // do nothing
         }
         else if (token->find("7") != std::string::npos) {
