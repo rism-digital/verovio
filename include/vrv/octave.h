@@ -104,9 +104,7 @@ private:
     /**
      * The left and right X coordinates of the drawn horizontal extender line
      */
-    ///@{
     std::map<const FloatingPositioner *, std::pair<int, int>> m_drawingExtenderX;
-    ///@}
 };
 
 } // namespace vrv
