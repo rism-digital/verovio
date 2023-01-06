@@ -972,12 +972,16 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
 // HumdrumInput::analyzeDegreeInterpretations --
 //   Known interpretations that affect **harm:
 //      *[A-Ga-g][#-]*:(dor|phr|lyd|mix|aeo|loc|ion)? == Key designation
-//      *hat == add a hat above the scale degrees
-//      *Xhat == don't add a hat (default)
-//      *circle == add a circle around the scale degrees
+//      *above   == place scale degree above staff
+//      *below   == place scale degree below staff (default)
+//      *bold    == scale degree displayed in bold
+//      *Xbold   == stop displaying scale degrees in bold
+//      *circle  == add a circle around the scale degrees
 //      *Xcircle == don't add a circle (default)
-//      *solf == display in moveable do
-//      *Xsolf == do not display in moveable do
+//      *hat     == add a hat above the scale degrees
+//      *Xhat    == don't add a hat (default)
+//      *solf    == display in moveable do
+//      *Xsolf   == do not display in moveable do
 //
 
 void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
@@ -993,6 +997,7 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
     bool hideQ = false;
     bool italicQ = false;
     bool minorQ = false;
+    bool octaveQ = true;
     bool solfQ = false;
     int circleline = 0;
     int boxline = 0;
@@ -1080,6 +1085,10 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
                 if (minmode == "minnat") {
                     current->setValue("auto", "minnat", 1);
                 }
+            }
+            if (!octaveQ) {
+                // suppress display of octave information in **degree data
+                current->setValue("auto", "Xoctave", 1);
             }
             if (solfQ) {
                 // display scale degrees as moveable do
@@ -1178,6 +1187,12 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         }
         else if (*current == "*minhar") {
             minmode = "minhar";
+        }
+        else if (*current == "*octave") {
+            octaveQ = true;
+        }
+        else if (*current == "*Xoctave") {
+            octaveQ = false;
         }
         else if (*current == "*solf") {
             solfQ = true;
@@ -7947,6 +7962,10 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                     || isDegree)) {
                 continue;
             }
+            if (token->find("yy") != std::string::npos) {
+                // skip displaying the scale degree
+                continue;
+            }
             if (isDegree && (token->find('r') != std::string::npos)) {
                 if (token->find('0') == std::string::npos) {
                     // Don't add rest marker data (otherwise it will be labeled as the "0" scale degree).
@@ -8009,9 +8028,12 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 
             std::string octave;
             if (token->isDataType("**degree")) {
-                hum::HumRegex hre2;
-                if (hre2.search(token, "/(\\d+)")) {
-                    octave = hre2.getMatch(1);
+                int octaveQ = !token->getValueInt("auto", "Xoctave");
+                if (octaveQ) {
+                    hum::HumRegex hre2;
+                    if (hre2.search(token, "/(\\d+)")) {
+                        octave = hre2.getMatch(1);
+                    }
                 }
             }
 
