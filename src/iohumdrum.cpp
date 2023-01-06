@@ -8869,13 +8869,12 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
     hum::HumRegex hre;
     if (hre.search(firstnote, "(\\d+)")) {
         int degree = hre.getMatchInt(1);
-        int minor = token->getValueInt("auto", "solf");
         int semitones = sharps;
         if (flats) {
             semitones = -flats;
         }
         if (solfegeQ) {
-            output += getMoveableDoName(degree, semitones, minor);
+            output += getMoveableDoName(token, degree, semitones);
         }
         else {
             switch (degree) {
@@ -8969,83 +8968,96 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
 // HumdrumInput::getMoveableDoName --  Up to +/- 2 semitone alteration.
 //
 
-std::u32string HumdrumInput::getMoveableDoName(int degree, int semitones, int minorQ)
+std::u32string HumdrumInput::getMoveableDoName(hum::HTp token, int degree, int alteration)
 {
+    int minorQ = token->getValueInt("auto", "minor");
     if (minorQ && ((degree == 3) || (degree == 6))) {
-        // Convert to major scale
-        semitones--;
+        // adjust to major scale since solfege is absolute pitch
+        alteration--;
+    }
+    int minnat = token->getValueInt("auto", "minnat");
+    if (minnat) {
+        if (token->find("7n") != std::string::npos) {
+            alteration--;
+        }
+        else if (token->find("7h") != std::string::npos) {
+            // do nothing
+        }
+        else if (token->find("7") != std::string::npos) {
+            alteration--;
+        }
     }
 
-    int deg = (degree - 1) % 7; // zero-index degree and limit to an octave
+    int deg = (degree + 700 - 1) % 7; // zero-index degree and limit to an octave
 
     switch (deg) {
         case 0: // do
-            switch (semitones) {
+            switch (alteration) {
+                case -2: return U"te";
+                case -1: return U"ti";
                 case 0: return U"do";
                 case +1: return U"di";
                 case +2: return U"re";
-                case -1: return U"ti";
-                case -2: return U"te";
             }
             break;
 
         case 1: // re
-            switch (semitones) {
+            switch (alteration) {
+                case -2: return U"do";
+                case -1: return U"ra";
                 case 0: return U"re";
                 case +1: return U"ri";
                 case +2: return U"mi";
-                case -1: return U"ra";
-                case -2: return U"do";
             }
             break;
 
         case 2: // mi
-            switch (semitones) {
+            switch (alteration) {
+                case -2: return U"re";
+                case -1: return U"me";
                 case 0: return U"mi";
                 case +1: return U"fa";
                 case +2: return U"fe";
-                case -1: return U"me";
-                case -2: return U"re";
             }
             break;
 
         case 3: // fa
-            switch (semitones) {
+            switch (alteration) {
+                case -2: return U"me";
+                case -1: return U"mi";
                 case 0: return U"fa";
                 case +1: return U"fi";
                 case +2: return U"so";
-                case -1: return U"mi";
-                case -2: return U"me";
             }
             break;
 
         case 4: // sol
-            switch (semitones) {
+            switch (alteration) {
+                case -2: return U"fa";
+                case -1: return U"se";
                 case 0: return U"so";
                 case +1: return U"si";
                 case +2: return U"la";
-                case -1: return U"se";
-                case -2: return U"fa";
             }
             break;
 
         case 5: // la
-            switch (semitones) {
+            switch (alteration) {
+                case -2: return U"so";
+                case -1: return U"le";
                 case 0: return U"la";
                 case +1: return U"li";
                 case +2: return U"ti";
-                case -1: return U"le";
-                case -2: return U"so";
             }
             break;
 
         case 6: // ti
-            switch (semitones) {
+            switch (alteration) {
+                case -2: return U"la";
+                case -1: return U"te";
                 case 0: return U"ti";
                 case +1: return U"do";
                 case +2: return U"di";
-                case -1: return U"te";
-                case -2: return U"la";
             }
             break;
     }
