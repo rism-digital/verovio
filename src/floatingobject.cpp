@@ -449,23 +449,25 @@ void FloatingPositioner::CalcDrawingYRel(
         std::tie(staffSideContentBoundary, hasRefinedContentBoundary)
             = m_object->GetStaffSideContentBoundary(doc, staffAlignment, horizOverlappingBBox, m_place);
 
-        if (m_place == STAFFREL_above) {
-            if (!hasRefinedContentBoundary) {
-                if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
-                    const int shift = this->Intersects(curve, CONTENT, unit);
-                    if (shift != 0) {
-                        this->SetDrawingYRel(this->GetDrawingYRel() - shift);
-                    }
-                    return;
+        if (!hasRefinedContentBoundary) {
+            // Employ special collision detection for beams and slurs/ties
+            if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
+                const int shift = this->Intersects(curve, CONTENT, unit);
+                if (shift != 0) {
+                    this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                 }
-                else if (horizOverlappingBBox->Is(BEAM) && !isExtender) {
-                    const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlappingBBox), CONTENT, unit / 2);
-                    if (shift != 0) {
-                        this->SetDrawingYRel(this->GetDrawingYRel() - shift);
-                    }
-                    return;
-                }
+                return;
             }
+            else if (horizOverlappingBBox->Is(BEAM) && !isExtender) {
+                const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlappingBBox), CONTENT, unit / 2);
+                if (shift != 0) {
+                    this->SetDrawingYRel(this->GetDrawingYRel() - shift);
+                }
+                return;
+            }
+        }
+
+        if (m_place == STAFFREL_above) {
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlappingBBox) + staffSideContentBoundary - margin;
 
             const Object *object = dynamic_cast<const Object *>(horizOverlappingBBox);
@@ -485,22 +487,6 @@ void FloatingPositioner::CalcDrawingYRel(
             }
         }
         else {
-            if (!hasRefinedContentBoundary) {
-                if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
-                    const int shift = this->Intersects(curve, CONTENT, unit);
-                    if (shift != 0) {
-                        this->SetDrawingYRel(this->GetDrawingYRel() - shift);
-                    }
-                    return;
-                }
-                else if (horizOverlappingBBox->Is(BEAM) && !isExtender) {
-                    const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlappingBBox), CONTENT, unit / 2);
-                    if (shift != 0) {
-                        this->SetDrawingYRel(this->GetDrawingYRel() - shift);
-                    }
-                    return;
-                }
-            }
             yRel = staffAlignment->CalcOverflowBelow(horizOverlappingBBox) + staffAlignment->GetStaffHeight()
                 + staffSideContentBoundary + margin;
 
