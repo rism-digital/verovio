@@ -240,7 +240,10 @@ public:
      */
     char GetSpanningType() const { return m_spanningType; }
 
-    bool CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
+    /**
+     * Update the Y drawing relative position based on collision detection with the overlapping bounding box
+     */
+    void CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
 
     int GetSpaceBelow(
         const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox) const;

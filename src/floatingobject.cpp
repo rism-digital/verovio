@@ -380,7 +380,7 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel, bool force)
     }
 }
 
-bool FloatingPositioner::CalcDrawingYRel(
+void FloatingPositioner::CalcDrawingYRel(
     Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox)
 {
     assert(doc);
@@ -456,14 +456,14 @@ bool FloatingPositioner::CalcDrawingYRel(
                     if (shift != 0) {
                         this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                     }
-                    return true;
+                    return;
                 }
                 else if (horizOverlappingBBox->Is(BEAM) && !isExtender) {
                     const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlappingBBox), CONTENT, unit / 2);
                     if (shift != 0) {
                         this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                     }
-                    return true;
+                    return;
                 }
             }
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlappingBBox) + staffSideContentBoundary - margin;
@@ -491,14 +491,14 @@ bool FloatingPositioner::CalcDrawingYRel(
                     if (shift != 0) {
                         this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                     }
-                    return true;
+                    return;
                 }
                 else if (horizOverlappingBBox->Is(BEAM) && !isExtender) {
                     const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlappingBBox), CONTENT, unit / 2);
                     if (shift != 0) {
                         this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                     }
-                    return true;
+                    return;
                 }
             }
             yRel = staffAlignment->CalcOverflowBelow(horizOverlappingBBox) + staffAlignment->GetStaffHeight()
@@ -521,7 +521,6 @@ bool FloatingPositioner::CalcDrawingYRel(
             }
         }
     }
-    return true;
 }
 
 int FloatingPositioner::GetSpaceBelow(
