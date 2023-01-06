@@ -139,6 +139,32 @@ int Octave::GetLineWidth(const Doc *doc, int unit) const
     return lineWidth;
 }
 
+std::pair<int, bool> Octave::GetStaffSideContentBoundary(const Doc *doc, const StaffAlignment *staffAlignment,
+    const BoundingBox *horizOverlappingBBox, data_STAFFREL drawingPlace) const
+{
+    // Check if we use the extender line for refined vertical layout
+    bool useExtenderLine = true;
+    if ((m_drawingExtenderLeft == VRV_UNSET) || (m_drawingExtenderRight == VRV_UNSET)) {
+        useExtenderLine = false;
+    }
+    if ((horizOverlappingBBox->GetContentLeft() < m_drawingExtenderLeft)
+        || (horizOverlappingBBox->GetContentRight() > m_drawingExtenderRight)) {
+        useExtenderLine = false;
+    }
+
+    if (useExtenderLine) {
+        // Calculate the content boundary based on the extender line
+        const int unit = doc->GetDrawingUnit(staffAlignment->GetStaffSize());
+        const int lineWidth = this->GetLineWidth(doc, unit);
+        const int contentBoundary = (drawingPlace == STAFFREL_above) ? -lineWidth : lineWidth;
+        return { contentBoundary, true };
+    }
+    else {
+        // Calculate the content boundary based on the full bounding box (as usual)
+        return FloatingObject::GetStaffSideContentBoundary(doc, staffAlignment, horizOverlappingBBox, drawingPlace);
+    }
+}
+
 //----------------------------------------------------------------------------
 // Octave functor methods
 //----------------------------------------------------------------------------

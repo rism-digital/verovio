@@ -99,6 +99,14 @@ public:
      */
     virtual bool IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const { return false; }
 
+    /**
+     * Determine the vertical content boundary closest to the staff.
+     * For refined layout this can take the overlapping bbox into account.
+     * Returns a pair consisting of the boundary and a flag indicating whether refined layout was used.
+     */
+    virtual std::pair<int, bool> GetStaffSideContentBoundary(const Doc *doc, const StaffAlignment *staffAlignment,
+        const BoundingBox *horizOverlappingBBox, data_STAFFREL drawingPlace) const;
+
     //----------//
     // Functors //
     //----------//
