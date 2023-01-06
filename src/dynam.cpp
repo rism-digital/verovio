@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "rend.h"
@@ -262,6 +263,26 @@ std::u32string Dynam::GetSymbolStr(const std::u32string &str, const bool singleG
 //----------------------------------------------------------------------------
 // Dynam functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Dynam::Accept(MutableFunctor &functor)
+{
+    return functor.VisitDynam(this);
+}
+
+FunctorCode Dynam::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitDynam(this);
+}
+
+FunctorCode Dynam::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitDynamEnd(this);
+}
+
+FunctorCode Dynam::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitDynamEnd(this);
+}
 
 int Dynam::PrepareFloatingGrps(FunctorParams *functorParams)
 {

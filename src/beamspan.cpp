@@ -15,6 +15,7 @@
 
 #include "barline.h"
 #include "comparison.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -202,6 +203,26 @@ bool BeamSpan::AddSpanningSegment(const Doc *doc, const SpanIndexVector &element
 //----------//
 // Functors //
 //----------//
+
+FunctorCode BeamSpan::Accept(MutableFunctor &functor)
+{
+    return functor.VisitBeamSpan(this);
+}
+
+FunctorCode BeamSpan::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitBeamSpan(this);
+}
+
+FunctorCode BeamSpan::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitBeamSpanEnd(this);
+}
+
+FunctorCode BeamSpan::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBeamSpanEnd(this);
+}
 
 int BeamSpan::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "rend.h"
@@ -110,6 +111,26 @@ data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue) const
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode ControlElement::Accept(MutableFunctor &functor)
+{
+    return functor.VisitControlElement(this);
+}
+
+FunctorCode ControlElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitControlElement(this);
+}
+
+FunctorCode ControlElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitControlElementEnd(this);
+}
+
+FunctorCode ControlElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitControlElementEnd(this);
+}
 
 int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
 {

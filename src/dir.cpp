@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "symbol.h"
 #include "text.h"
@@ -79,6 +80,26 @@ bool Dir::IsSupportedChild(Object *child)
 //----------------------------------------------------------------------------
 // Dir functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Dir::Accept(MutableFunctor &functor)
+{
+    return functor.VisitDir(this);
+}
+
+FunctorCode Dir::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitDir(this);
+}
+
+FunctorCode Dir::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitDirEnd(this);
+}
+
+FunctorCode Dir::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitDirEnd(this);
+}
 
 int Dir::PrepareFloatingGrps(FunctorParams *)
 {

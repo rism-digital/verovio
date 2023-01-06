@@ -15,6 +15,7 @@
 
 #include "chord.h"
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "note.h"
@@ -182,6 +183,26 @@ const Staff *Arpeg::GetCrossStaff() const
 //----------------------------------------------------------------------------
 // Arpeg functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Arpeg::Accept(MutableFunctor &functor)
+{
+    return functor.VisitArpeg(this);
+}
+
+FunctorCode Arpeg::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitArpeg(this);
+}
+
+FunctorCode Arpeg::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitArpegEnd(this);
+}
+
+FunctorCode Arpeg::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitArpegEnd(this);
+}
 
 int Arpeg::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
