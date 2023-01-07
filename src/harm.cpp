@@ -17,6 +17,7 @@
 #include "editorial.h"
 #include "f.h"
 #include "fb.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "system.h"
@@ -153,6 +154,26 @@ void Harm::SetBassPitch(const TransPitch &pitch)
 //----------------------------------------------------------------------------
 // Harm functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Harm::Accept(MutableFunctor &functor)
+{
+    return functor.VisitHarm(this);
+}
+
+FunctorCode Harm::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitHarm(this);
+}
+
+FunctorCode Harm::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitHarmEnd(this);
+}
+
+FunctorCode Harm::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitHarmEnd(this);
+}
 
 int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
 {

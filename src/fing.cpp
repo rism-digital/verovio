@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "layerelement.h"
 #include "text.h"
 
@@ -71,6 +72,26 @@ bool Fing::IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawin
     else {
         return false;
     }
+}
+
+FunctorCode Fing::Accept(MutableFunctor &functor)
+{
+    return functor.VisitFing(this);
+}
+
+FunctorCode Fing::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitFing(this);
+}
+
+FunctorCode Fing::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitFingEnd(this);
+}
+
+FunctorCode Fing::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFingEnd(this);
 }
 
 } // namespace vrv

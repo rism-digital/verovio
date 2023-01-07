@@ -17,6 +17,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "dynam.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "system.h"
@@ -216,6 +217,26 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
 //----------------------------------------------------------------------------
 // Hairpin functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Hairpin::Accept(MutableFunctor &functor)
+{
+    return functor.VisitHairpin(this);
+}
+
+FunctorCode Hairpin::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitHairpin(this);
+}
+
+FunctorCode Hairpin::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitHairpinEnd(this);
+}
+
+FunctorCode Hairpin::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitHairpinEnd(this);
+}
 
 int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
 {

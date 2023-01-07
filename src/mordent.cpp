@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "horizontalaligner.h"
 #include "resources.h"
 #include "smufl.h"
@@ -84,5 +85,25 @@ char32_t Mordent::GetMordentGlyph() const
 //----------------------------------------------------------------------------
 // Mordent functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Mordent::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMordent(this);
+}
+
+FunctorCode Mordent::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMordent(this);
+}
+
+FunctorCode Mordent::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMordentEnd(this);
+}
+
+FunctorCode Mordent::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMordentEnd(this);
+}
 
 } // namespace vrv

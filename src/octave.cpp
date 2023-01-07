@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "verticalaligner.h"
 
 namespace vrv {
@@ -61,5 +62,25 @@ void Octave::Reset()
 //----------------------------------------------------------------------------
 // Octave functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Octave::Accept(MutableFunctor &functor)
+{
+    return functor.VisitOctave(this);
+}
+
+FunctorCode Octave::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitOctave(this);
+}
+
+FunctorCode Octave::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitOctaveEnd(this);
+}
+
+FunctorCode Octave::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitOctaveEnd(this);
+}
 
 } // namespace vrv

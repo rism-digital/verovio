@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "layerelement.h"
 #include "resources.h"
 #include "smufl.h"
@@ -95,5 +96,25 @@ char32_t Ornam::GetOrnamGlyph() const
 //----------------------------------------------------------------------------
 // Ornam functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Ornam::Accept(MutableFunctor &functor)
+{
+    return functor.VisitOrnam(this);
+}
+
+FunctorCode Ornam::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitOrnam(this);
+}
+
+FunctorCode Ornam::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitOrnamEnd(this);
+}
+
+FunctorCode Ornam::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitOrnamEnd(this);
+}
 
 } // namespace vrv
