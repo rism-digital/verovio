@@ -1506,8 +1506,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // We check if this belongs to a mensural note
     Note *parent = vrv_cast<Note *>(stem->GetFirstAncestor(NOTE));
     if (parent && parent->IsMensuralDur()) {
-        if (((parent->GetDrawingDur() > DUR_1) || ((parent->GetStemDir() != STEMDIRECTION_NONE)))
-            && stem->GetVisible() != BOOLEAN_false) {
+        if (parent->GetDrawingDur() > DUR_1) {
             /************** Stem/notehead direction: **************/
             const int staffCenter
                 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
