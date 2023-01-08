@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "layerelement.h"
 #include "smufl.h"
@@ -96,6 +97,26 @@ int Turn::GetTurnHeight(const Doc *doc, int staffSize) const
 //----------------------------------------------------------------------------
 // Turn functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Turn::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTurn(this);
+}
+
+FunctorCode Turn::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTurn(this);
+}
+
+FunctorCode Turn::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTurnEnd(this);
+}
+
+FunctorCode Turn::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTurnEnd(this);
+}
 
 int Turn::PrepareDelayedTurns(FunctorParams *functorParams)
 {

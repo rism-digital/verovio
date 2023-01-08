@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "measure.h"
 #include "text.h"
 #include "verticalaligner.h"
@@ -68,6 +69,26 @@ bool Reh::IsSupportedChild(Object *child)
 //----------------------------------------------------------------------------
 // Reh functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Reh::Accept(MutableFunctor &functor)
+{
+    return functor.VisitReh(this);
+}
+
+FunctorCode Reh::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitReh(this);
+}
+
+FunctorCode Reh::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitRehEnd(this);
+}
+
+FunctorCode Reh::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitRehEnd(this);
+}
 
 int Reh::PrepareRehPosition(FunctorParams *)
 {

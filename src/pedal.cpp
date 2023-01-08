@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layerelement.h"
@@ -107,6 +108,26 @@ data_PEDALSTYLE Pedal::GetPedalForm(const Doc *doc, const System *system) const
 //----------------------------------------------------------------------------
 // Pedal functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Pedal::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPedal(this);
+}
+
+FunctorCode Pedal::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPedal(this);
+}
+
+FunctorCode Pedal::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPedalEnd(this);
+}
+
+FunctorCode Pedal::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPedalEnd(this);
+}
 
 int Pedal::GenerateMIDI(FunctorParams *functorParams)
 {

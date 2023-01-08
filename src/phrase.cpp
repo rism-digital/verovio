@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -38,5 +39,25 @@ void Phrase::Reset()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Phrase::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPhrase(this);
+}
+
+FunctorCode Phrase::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPhrase(this);
+}
+
+FunctorCode Phrase::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPhraseEnd(this);
+}
+
+FunctorCode Phrase::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPhraseEnd(this);
+}
 
 } // namespace vrv

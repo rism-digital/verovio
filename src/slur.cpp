@@ -21,6 +21,7 @@
 #include "doc.h"
 #include "findlayerelementsfunctor.h"
 #include "ftrem.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "layerelement.h"
@@ -1963,6 +1964,26 @@ void Slur::CalcInitialCurve(const Doc *doc, FloatingCurvePositioner *curve, Near
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Slur::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSlur(this);
+}
+
+FunctorCode Slur::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSlur(this);
+}
+
+FunctorCode Slur::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSlurEnd(this);
+}
+
+FunctorCode Slur::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSlurEnd(this);
+}
 
 int Slur::ResetData(FunctorParams *functorParams)
 {
