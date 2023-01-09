@@ -1902,8 +1902,8 @@ public:
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
 
 public:
-    MapOfStrConstructors s_ctorsRegistry;
-    MapOfStrClassIds s_classIdsRegistry;
+    static thread_local MapOfStrConstructors s_ctorsRegistry;
+    static thread_local MapOfStrClassIds s_classIdsRegistry;
 };
 
 //----------------------------------------------------------------------------
