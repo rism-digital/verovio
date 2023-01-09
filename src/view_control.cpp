@@ -479,11 +479,13 @@ void View::DrawBracketSpan(
                 lineWidth = bracketSpan->GetLwidth().GetMeasurementunsigned().GetPx();
             }
             else {
-                lineWidth = bracketSpan->GetLwidth().GetMeasurementunsigned().GetVu()
-                    * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                lineWidth = bracketSpan->GetLwidth().GetMeasurementunsigned().GetVu() * unit;
             }
         }
     }
+
+    x1 += lineWidth / 2;
+    x2 -= lineWidth / 2;
 
     dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
     dc->SetBrush(m_currentColour, AxSOLID);
@@ -495,9 +497,9 @@ void View::DrawBracketSpan(
         if (bracketSpan->GetLstartsym() != LINESTARTENDSYMBOL_none) {
             // Left hook
             Point hookLeft[3];
-            hookLeft[0] = { ToDeviceContextX(x1 + lineWidth / 2), ToDeviceContextY(y - unit * 2) };
-            hookLeft[1] = { ToDeviceContextX(x1 + lineWidth / 2), ToDeviceContextY(y) };
-            hookLeft[2] = { ToDeviceContextX(x1 + lineWidth + unit), ToDeviceContextY(y) };
+            hookLeft[0] = { ToDeviceContextX(x1), ToDeviceContextY(y - unit * 2) };
+            hookLeft[1] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
+            hookLeft[2] = { ToDeviceContextX(x1 + lineWidth / 2 + unit), ToDeviceContextY(y) };
             dc->DrawPolyline(3, hookLeft);
         }
     }
@@ -508,22 +510,22 @@ void View::DrawBracketSpan(
         if (bracketSpan->GetLendsym() != LINESTARTENDSYMBOL_none) {
             // Right hook
             Point hookRight[3];
-            hookRight[0] = { ToDeviceContextX(x2 - lineWidth / 2), ToDeviceContextY(y - unit * 2) };
-            hookRight[1] = { ToDeviceContextX(x2 - lineWidth / 2), ToDeviceContextY(y) };
-            hookRight[2] = { ToDeviceContextX(x2 - lineWidth - unit), ToDeviceContextY(y) };
+            hookRight[0] = { ToDeviceContextX(x2), ToDeviceContextY(y - unit * 2) };
+            hookRight[1] = { ToDeviceContextX(x2), ToDeviceContextY(y) };
+            hookRight[2] = { ToDeviceContextX(x2 - lineWidth / 2 - unit), ToDeviceContextY(y) };
             dc->DrawPolyline(3, hookRight);
         }
     }
     // We have a @lform - draw a full line
     if (bracketSpan->HasLform()) {
         if (bracketSpan->GetLform() == LINEFORM_dashed) {
-            dc->SetPen(m_currentColour, lineWidth, AxLONG_DASH, 0, 0, AxCAP_BUTT, AxJOIN_ARCS);
+            dc->SetPen(m_currentColour, lineWidth, AxLONG_DASH, 0, 0, AxCAP_SQUARE, AxJOIN_ARCS);
         }
         else if (bracketSpan->GetLform() == LINEFORM_dotted) {
             dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND, AxJOIN_ARCS);
             // Adjust start and end
             x1 += unit * 2;
-            x2 -= unit;
+            x2 -= unit + lineWidth;
         }
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
     }
