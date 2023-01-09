@@ -100,15 +100,15 @@ jobs:
 
           - os: macos-latest
             compiler: xcode
-            version: "11.7"
+            version: "13.1"
 
           - os: macos-latest
             compiler: xcode
-            version: "12.5.1"
+            version: "14.2"
 
           - os: macos-latest
             compiler: g++
-            version: "9"
+            version: "11"
 
     steps:
       - name: Checkout main repo
