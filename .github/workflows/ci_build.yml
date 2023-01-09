@@ -108,7 +108,7 @@ jobs:
 
           - os: macos-latest
             compiler: g++
-            version: "11"
+            version: "12"
 
     steps:
       - name: Checkout main repo
