@@ -1574,6 +1574,9 @@ void Functor::Call(const Object *ptr, FunctorParams *functorParams)
 // ObjectFactory methods
 //----------------------------------------------------------------------------
 
+thread_local MapOfStrConstructors ObjectFactory::s_ctorsRegistry;
+thread_local MapOfStrClassIds ObjectFactory::s_classIdsRegistry;
+
 ObjectFactory *ObjectFactory::GetInstance()
 {
     static thread_local ObjectFactory factory;
