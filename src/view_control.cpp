@@ -2098,13 +2098,26 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
             const int height = m_doc->GetGlyphHeight(glissGlyph, staff->m_drawingStaffSize, false);
             const Point orig(x1, y1 - height / 2);
             this->DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, false, glissGlyph);
-
             break;
         }
-        case LINEFORM_solid:
+        case LINEFORM_dashed:
+            dc->SetPen(m_currentColour, lineWidth, AxSHORT_DASH, 0, 0, AxCAP_ROUND, AxJOIN_ARCS);
+            dc->SetBrush(m_currentColour, AxSOLID);
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+            dc->ResetPen();
+            break;
+        case LINEFORM_dotted:
+            dc->SetPen(m_currentColour, lineWidth * 3 / 2, AxDOT, 0, 0, AxCAP_ROUND, AxJOIN_ARCS);
+            dc->SetBrush(m_currentColour, AxSOLID);
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+            dc->ResetPen();
+            break;
+        case LINEFORM_solid: [[fallthrough]];
         default: {
-            // only solid lines for now
-            this->DrawRoundedLine(dc, x1, y1, x2, y2, lineWidth);
+            dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_ROUND, AxJOIN_ARCS);
+            dc->SetBrush(m_currentColour, AxSOLID);
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+            dc->ResetPen();
             break;
         }
     }
