@@ -106,7 +106,7 @@ jobs:
             compiler: xcode
             version: "14.2"
 
-          - os: macos-12
+          - os: macos-11
             compiler: g++
             version: "12"
 
