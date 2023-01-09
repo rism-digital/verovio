@@ -528,7 +528,7 @@ void Doc::PrepareData()
     // but this time without filling the list (that is only will the remaining elements)
     const ListOfSpanningInterOwnerPairs &interfaceOwnerPairs = prepareTimeSpanning.GetInterfaceOwnerPairs();
     if (!interfaceOwnerPairs.empty()) {
-        prepareTimeSpanning.FillList(false);
+        prepareTimeSpanning.FillMode(false);
         prepareTimeSpanning.SetDirection(FORWARD);
         this->Process(prepareTimeSpanning);
     }
@@ -574,7 +574,7 @@ void Doc::PrepareData()
 
     // If we have some left process again backward
     if (!prepareLinking.GetSameasIDPairs().empty() || !prepareLinking.GetStemSameasIDPairs().empty()) {
-        prepareLinking.FillList(false);
+        prepareLinking.FillMode(false);
         prepareLinking.SetDirection(BACKWARD);
         this->Process(prepareLinking);
     }
@@ -599,7 +599,7 @@ void Doc::PrepareData()
 
     // Process plist after all pairs have been collected
     if (!preparePlist.GetInterfaceIDTuples().empty()) {
-        preparePlist.FillList(false);
+        preparePlist.FillMode(false);
         this->Process(preparePlist);
 
         for (const auto &[plistInterface, id, objectReference] : preparePlist.GetInterfaceIDTuples()) {

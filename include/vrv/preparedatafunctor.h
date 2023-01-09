@@ -258,11 +258,11 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
-     * Getter and setter for the fill list flag
+     * Getter and setter for the fill mode flag
      */
     ///@{
-    bool FillList() const { return m_fillList; }
-    void FillList(bool fillList) { m_fillList = fillList; }
+    bool FillMode() const { return m_fillMode; }
+    void FillMode(bool fillMode) { m_fillMode = fillMode; }
     ///@}
 
     /*
@@ -310,7 +310,7 @@ private:
     // Holds the note / id pairs to match for stem.sameas
     MapOfNoteIDPairs m_stemSameasIDPairs;
     // Indicates the current mode: fill vs process
-    bool m_fillList;
+    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------
@@ -336,11 +336,11 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
-     * Getter and setter for the fill list flag
+     * Getter and setter for the fill mode flag
      */
     ///@{
-    bool FillList() const { return m_fillList; }
-    void FillList(bool fillList) { m_fillList = fillList; }
+    bool FillMode() const { return m_fillMode; }
+    void FillMode(bool fillMode) { m_fillMode = fillMode; }
     ///@}
 
     /*
@@ -369,7 +369,7 @@ private:
     // Holds the interface / id tuples to match
     ArrayOfPlistInterfaceIDTuples m_interfaceIDTuples;
     // Indicates the current mode: fill vs process
-    bool m_fillList;
+    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------
@@ -473,7 +473,7 @@ private:
 
 /**
  * This class matches start and end for TimeSpanningInterface elements (such as tie or slur).
- * If fillList is set to false, only the remaining elements will be matched.
+ * If fillMode is set to false, only the remaining elements will be matched.
  * This is used when processing a second time in the other direction.
  */
 class PrepareTimeSpanningFunctor : public MutableFunctor {
@@ -492,11 +492,11 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
-     * Getter and setter for the fill list flag
+     * Getter and setter for the fill mode flag
      */
     ///@{
-    bool FillList() const { return m_fillList; }
-    void FillList(bool fillList) { m_fillList = fillList; }
+    bool FillMode() const { return m_fillMode; }
+    void FillMode(bool fillMode) { m_fillMode = fillMode; }
     ///@}
 
     /*
@@ -527,7 +527,7 @@ private:
     // The interface list that holds the current elements to match
     ListOfSpanningInterOwnerPairs m_timeSpanningInterfaces;
     // Indicates the current mode: fill vs process
-    bool m_fillList;
+    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------
@@ -765,6 +765,72 @@ private:
     MRpt *m_currentMRpt;
     // The data_BOOLEAN indicating if multiNumber
     data_BOOLEAN m_multiNumber;
+};
+
+//----------------------------------------------------------------------------
+// PrepareDelayedTurnsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class sets Turn::m_drawingEndNote for delayed turns.
+ * Needs a first pass to fill the map, processed by staff/layer after that.
+ */
+class PrepareDelayedTurnsFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareDelayedTurnsFunctor();
+    virtual ~PrepareDelayedTurnsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Getter and setter for the fill mode flag
+     */
+    ///@{
+    bool FillMode() const { return m_fillMode; }
+    void FillMode(bool fillMode) { m_fillMode = fillMode; }
+    ///@}
+
+    /*
+     * Getter for the map of delayed turns
+     */
+    const std::map<LayerElement *, Turn *> &GetDelayedTurns() const { return m_delayedTurns; }
+
+    /*
+     * Reset the current turn and element
+     */
+    void ResetCurrent();
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitTurn(Turn *turn) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The element to which a turn is pointing to
+    LayerElement *m_previousElement;
+    // The turn to which we want to set a m_drawingEndElement
+    Turn *m_currentTurn;
+    // A map of the delayed turns and the layer elements they point to
+    std::map<LayerElement *, Turn *> m_delayedTurns;
+    // Indicates the current mode: fill vs process
+    bool m_fillMode;
 };
 
 } // namespace vrv

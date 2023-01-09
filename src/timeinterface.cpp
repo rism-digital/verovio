@@ -385,7 +385,7 @@ FunctorCode TimeSpanningInterface::InterfacePrepareTimeSpanning(PrepareTimeSpann
         return FUNCTOR_CONTINUE;
     }
 
-    if (!functor.FillList()) {
+    if (!functor.FillMode()) {
         return FUNCTOR_CONTINUE;
     }
 

@@ -93,7 +93,7 @@ void LinkingInterface::AddBackLink(const Object *object)
 FunctorCode LinkingInterface::InterfacePrepareLinking(PrepareLinkingFunctor &functor, Object *object)
 {
     // This should not happen?
-    if (!functor.FillList()) {
+    if (!functor.FillMode()) {
         return FUNCTOR_CONTINUE;
     }
 
