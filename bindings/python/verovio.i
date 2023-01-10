@@ -29,14 +29,14 @@
 
 // Toolkit::Edit
 %feature("shadow") vrv::Toolkit::Edit( const std::string & ) %{
-def edit(toolkit, editor_action):
+def edit(toolkit, editor_action: dict) -> bool:
     """Edit the MEI data."""
     return $action(toolkit, json.dumps(editor_action))
 %}
 
 // Toolkit::EditInfo
 %feature("shadow") vrv::Toolkit::EditInfo() %{
-def editInfo(toolkit):
+def editInfo(toolkit) -> dict:
     """Return the editor status."""
     return json.loads($action(toolkit))
 %}
@@ -151,11 +151,11 @@ def renderToTimemapFile(toolkit, filename: str, options: Optional[dict] = None) 
 
 // Toolkit::SaveFile
 %feature("shadow") vrv::Toolkit::SaveFile(const std::string &, const std::string & = "") %{
-def saveFile(toolkit, filename: str, options: Optional[dict] = None) -> None:
+def saveFile(toolkit, filename: str, options: Optional[dict] = None) -> bool:
     """Get the MEI and save it to the file."""
     if options is None:
         options = {}
-    return json.loads($action(toolkit, filename, json.dumps(options)))
+    return $action(toolkit, filename, json.dumps(options))
 %}
 
 // Toolkit::Select
