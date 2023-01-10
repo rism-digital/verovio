@@ -1167,7 +1167,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found at all
     if (!element) {
-        LogInfo("Element with id '%s' could not be found", xmlId.c_str());
+        LogWarning("Element '%s' not found", xmlId.c_str());
         return o.json();
     }
 
@@ -1641,6 +1641,7 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindDescendantByID(xmlId);
     if (!element) {
+        LogWarning("Element '%s' not found", xmlId.c_str());
         return 0;
     }
     Page *page = dynamic_cast<Page *>(element->GetFirstAncestor(PAGE));
@@ -1757,13 +1758,13 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
     this->ResetLogBuffer();
 
     Object *element = m_doc.FindDescendantByID(xmlId);
+    jsonxx::Object o;
 
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());
-        return 0;
+        return o.json();
     }
 
-    jsonxx::Object o;
     if (element->Is(NOTE)) {
         if (!m_doc.HasTimemap()) {
             // generate MIDI timemap before progressing
