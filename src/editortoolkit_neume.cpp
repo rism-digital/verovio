@@ -10,6 +10,7 @@
 //--------------------------------------------------------------------------------
 
 #include <algorithm>
+#include <iterator>
 #include <limits>
 #include <locale>
 #include <math.h>
