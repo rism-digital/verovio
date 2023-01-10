@@ -174,7 +174,7 @@ def setOptions(toolkit, json_options: dict) -> bool:
 
 // Toolkit::ValidatePAE
 %feature("shadow") vrv::Toolkit::ValidatePAE(const std::string &) %{
-def validatePAE(toolkit, data: str) -> dict:
+def validatePAE(toolkit, data: Union[str, dict]) -> dict:
     """Validate the Plaine and Easie code passed in the string data."""
     if isinstance(data, dict):
         data = json.dumps(data);
