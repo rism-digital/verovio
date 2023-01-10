@@ -17,6 +17,7 @@
 #include "annot.h"
 #include "app.h"
 #include "beam.h"
+#include "beamspan.h"
 #include "choice.h"
 #include "clef.h"
 #include "comparison.h"
@@ -1647,6 +1648,15 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     assert(parent);
     assert(measure);
     assert(system);
+
+    ListOfObjects objects = parent->FindAllDescendantsByType(BEAMSPAN, false);
+    for (auto element : objects) {
+        BeamSpan *beamSpan = vrv_cast<BeamSpan *>(element);
+        BeamSpanSegment *segment = beamSpan->GetSegmentForSystem(system);
+        if (segment) {
+            segment->CalcBeam(segment->GetLayer(), segment->GetStaff(), m_doc, beamSpan, beamSpan->m_drawingPlace);
+        }
+    }
 
     for (auto current : parent->GetChildren()) {
         if (current->Is(STAFF)) {
