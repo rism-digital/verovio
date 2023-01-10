@@ -142,7 +142,7 @@ def renderToTimemap(toolkit, options: Optional[dict] = None) -> list:
 
 // Toolkit::RenderToTimemapFile
 %feature("shadow") vrv::Toolkit::RenderToTimemapFile(const std::string &, const std::string & = "") %{
-def renderToTimemapFile(toolkit, filename: str, options: Optional[dict] = None) -> None:
+def renderToTimemapFile(toolkit, filename: str, options: Optional[dict] = None) -> bool:
     """Render a document to timemap and save it to the file."""
     if options is None:
         options = {}
