@@ -24,7 +24,7 @@
 // Because we transform the strings to dictionaries, we need this module
 %pythonbegin %{
     import json
-    from typing import Optional
+    from typing import Optional, Union
 %}
 
 // Toolkit::Edit
