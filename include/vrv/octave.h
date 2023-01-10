@@ -80,9 +80,10 @@ public:
     /**
      * Determine the vertical content boundary.
      * For refined layout this can take the overlapping bbox into account.
-     * Returns a pair consisting of the boundary and a flag indicating whether refined layout was used.
+     * Returns a pair consisting of the boundary (relative to the object position)
+     * and a flag indicating whether refined layout was used.
      */
-    std::pair<int, bool> GetVerticalContentBoundary(const Doc *doc, const FloatingPositioner *positioner,
+    std::pair<int, bool> GetVerticalContentBoundaryRel(const Doc *doc, const FloatingPositioner *positioner,
         const BoundingBox *horizOverlappingBBox, bool contentTop) const override;
 
     //----------//

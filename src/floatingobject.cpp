@@ -165,7 +165,7 @@ int FloatingObject::SetDrawingGrpObject(void *drawingGrpObject)
     return m_drawingGrpId;
 }
 
-std::pair<int, bool> FloatingObject::GetVerticalContentBoundary(const Doc *doc, const FloatingPositioner *positioner,
+std::pair<int, bool> FloatingObject::GetVerticalContentBoundaryRel(const Doc *doc, const FloatingPositioner *positioner,
     const BoundingBox *horizOverlappingBBox, bool contentTop) const
 {
     assert(positioner);
@@ -443,7 +443,7 @@ void FloatingPositioner::CalcDrawingYRel(
         int staffSideContentBoundary = 0;
         bool hasRefinedContentBoundary = false;
         std::tie(staffSideContentBoundary, hasRefinedContentBoundary)
-            = this->GetVerticalContentBoundary(doc, horizOverlappingBBox, (m_place != STAFFREL_above));
+            = this->GetVerticalContentBoundaryRel(doc, horizOverlappingBBox, (m_place != STAFFREL_above));
 
         if (!hasRefinedContentBoundary) {
             // Employ special collision detection for beams and slurs/ties
@@ -478,7 +478,7 @@ void FloatingPositioner::CalcDrawingYRel(
                 if (yRel < 0) this->SetDrawingYRel(yRel);
             }
             // Otherwise only if there is a vertical overlap
-            else if (this->VerticalContentOverlap(horizOverlappingBBox, margin)) {
+            else if (this->HasVerticalContentOverlap(doc, horizOverlappingBBox, margin)) {
                 this->SetDrawingYRel(yRel);
             }
         }
@@ -498,7 +498,7 @@ void FloatingPositioner::CalcDrawingYRel(
                 if (yRel > 0) this->SetDrawingYRel(yRel);
             }
             // Otherwise only if there is a vertical overlap
-            else if (this->VerticalContentOverlap(horizOverlappingBBox, margin)) {
+            else if (this->HasVerticalContentOverlap(doc, horizOverlappingBBox, margin)) {
                 this->SetDrawingYRel(yRel);
             }
         }
@@ -526,10 +526,46 @@ int FloatingPositioner::GetSpaceBelow(
     return this->GetContentBottom() - horizOverlappingBBox->GetSelfTop() - margin;
 }
 
-std::pair<int, bool> FloatingPositioner::GetVerticalContentBoundary(
+std::pair<int, bool> FloatingPositioner::GetVerticalContentBoundaryRel(
     const Doc *doc, const BoundingBox *horizOverlappingBBox, bool contentTop) const
 {
-    return m_object->GetVerticalContentBoundary(doc, this, horizOverlappingBBox, contentTop);
+    return m_object->GetVerticalContentBoundaryRel(doc, this, horizOverlappingBBox, contentTop);
+}
+
+int FloatingPositioner::GetVerticalContentBoundary(
+    const Doc *doc, const BoundingBox *horizOverlappingBBox, bool contentTop) const
+{
+    return this->GetDrawingY() + this->GetVerticalContentBoundaryRel(doc, horizOverlappingBBox, contentTop).first;
+}
+
+bool FloatingPositioner::HasVerticalContentOverlap(
+    const Doc *doc, const BoundingBox *horizOverlappingBBox, int margin) const
+{
+    assert(horizOverlappingBBox);
+
+    if (!this->HasContentBB() || !horizOverlappingBBox->HasContentBB()) return false;
+
+    // Determine top/bottom for current object
+    const int top = this->GetVerticalContentBoundary(doc, horizOverlappingBBox, true);
+    const int bottom = this->GetVerticalContentBoundary(doc, horizOverlappingBBox, false);
+
+    // Determine top/bottom for other (bbox) object
+    int otherTop = VRV_UNSET;
+    int otherBottom = VRV_UNSET;
+    const FloatingPositioner *positioner = dynamic_cast<const FloatingPositioner *>(horizOverlappingBBox);
+    if (positioner) {
+        otherTop = positioner->GetVerticalContentBoundary(doc, this, true);
+        otherBottom = positioner->GetVerticalContentBoundary(doc, this, false);
+    }
+    else {
+        otherTop = horizOverlappingBBox->GetContentTop();
+        otherBottom = horizOverlappingBBox->GetContentBottom();
+    }
+
+    // Check for vertical overlap
+    if (top <= otherBottom - margin) return false;
+    if (bottom >= otherTop + margin) return false;
+    return true;
 }
 
 //----------------------------------------------------------------------------

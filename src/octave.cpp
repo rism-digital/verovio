@@ -140,7 +140,7 @@ int Octave::GetLineWidth(const Doc *doc, int unit) const
     return lineWidth;
 }
 
-std::pair<int, bool> Octave::GetVerticalContentBoundary(const Doc *doc, const FloatingPositioner *positioner,
+std::pair<int, bool> Octave::GetVerticalContentBoundaryRel(const Doc *doc, const FloatingPositioner *positioner,
     const BoundingBox *horizOverlappingBBox, bool contentTop) const
 {
     assert(positioner);
@@ -168,7 +168,7 @@ std::pair<int, bool> Octave::GetVerticalContentBoundary(const Doc *doc, const Fl
     }
     else {
         // Calculate the content boundary based on the full bounding box (as usual)
-        return FloatingObject::GetVerticalContentBoundary(doc, positioner, horizOverlappingBBox, contentTop);
+        return FloatingObject::GetVerticalContentBoundaryRel(doc, positioner, horizOverlappingBBox, contentTop);
     }
 }
 
