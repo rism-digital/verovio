@@ -146,7 +146,7 @@ def renderToTimemapFile(toolkit, filename: str, options: Optional[dict] = None) 
     """Render a document to timemap and save it to the file."""
     if options is None:
         options = {}
-    return $action(toolkit, str(filename), json.dumps(options))
+    return $action(toolkit, filename, json.dumps(options))
 %}
 
 // Toolkit::SaveFile
@@ -155,7 +155,7 @@ def saveFile(toolkit, filename: str, options: Optional[dict] = None) -> None:
     """Get the MEI and save it to the file."""
     if options is None:
         options = {}
-    return json.loads($action(toolkit, str(filename), json.dumps(options)))
+    return json.loads($action(toolkit, filename, json.dumps(options)))
 %}
 
 // Toolkit::Select
