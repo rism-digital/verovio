@@ -1135,7 +1135,6 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
     if (!f->GetStart() || !f->GetEnd()) return;
 
     const int y = this->GetFYRel(f, staff);
-    TextExtend extend;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
