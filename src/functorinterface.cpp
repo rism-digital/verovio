@@ -29,6 +29,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "dynam.h"
+#include "editorial.h"
 #include "elementpart.h"
 #include "f.h"
 #include "fb.h"
@@ -295,6 +296,16 @@ FunctorCode FunctorInterface::VisitTuning(Tuning *tuning)
 FunctorCode FunctorInterface::VisitTuningEnd(Tuning *tuning)
 {
     return this->VisitObjectEnd(tuning);
+}
+
+FunctorCode FunctorInterface::VisitEditorialElement(EditorialElement *editorialElement)
+{
+    return this->VisitObject(editorialElement);
+}
+
+FunctorCode FunctorInterface::VisitEditorialElementEnd(EditorialElement *editorialElement)
+{
+    return this->VisitObjectEnd(editorialElement);
 }
 
 FunctorCode FunctorInterface::VisitRunningElement(RunningElement *runningElement)
@@ -1489,6 +1500,16 @@ FunctorCode ConstFunctorInterface::VisitTuning(const Tuning *tuning)
 FunctorCode ConstFunctorInterface::VisitTuningEnd(const Tuning *tuning)
 {
     return this->VisitObjectEnd(tuning);
+}
+
+FunctorCode ConstFunctorInterface::VisitEditorialElement(const EditorialElement *editorialElement)
+{
+    return this->VisitObject(editorialElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitEditorialElementEnd(const EditorialElement *editorialElement)
+{
+    return this->VisitObjectEnd(editorialElement);
 }
 
 FunctorCode ConstFunctorInterface::VisitRunningElement(const RunningElement *runningElement)

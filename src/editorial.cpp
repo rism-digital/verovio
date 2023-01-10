@@ -16,6 +16,7 @@
 #include "artic.h"
 #include "controlelement.h"
 #include "fig.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -120,6 +121,26 @@ bool EditorialElement::IsSupportedChild(Object *child)
 //----------------------------------------------------------------------------
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode EditorialElement::Accept(MutableFunctor &functor)
+{
+    return functor.VisitEditorialElement(this);
+}
+
+FunctorCode EditorialElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitEditorialElement(this);
+}
+
+FunctorCode EditorialElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitEditorialElementEnd(this);
+}
+
+FunctorCode EditorialElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitEditorialElementEnd(this);
+}
 
 int EditorialElement::Save(FunctorParams *functorParams)
 {

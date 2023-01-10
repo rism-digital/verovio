@@ -36,6 +36,7 @@ class Dot;
 class Dots;
 class Doc;
 class Dynam;
+class EditorialElement;
 class F;
 class Fb;
 class Fermata;
@@ -206,6 +207,15 @@ public:
     virtual FunctorCode VisitSystemEnd(System *system);
     virtual FunctorCode VisitTuning(Tuning *tuning);
     virtual FunctorCode VisitTuningEnd(Tuning *tuning);
+    ///@}
+
+    /**
+     * @name Visit editorial elements
+     * Limited to EditorialElement for now, can be extended later
+     */
+    ///@{
+    virtual FunctorCode VisitEditorialElement(EditorialElement *editorialElement);
+    virtual FunctorCode VisitEditorialElementEnd(EditorialElement *editorialElement);
     ///@}
 
     /**
@@ -537,6 +547,15 @@ public:
     virtual FunctorCode VisitSystemEnd(const System *system);
     virtual FunctorCode VisitTuning(const Tuning *tuning);
     virtual FunctorCode VisitTuningEnd(const Tuning *tuning);
+    ///@}
+
+    /**
+     * @name Visit editorial elements
+     * Limited to EditorialElement for now, can be extended later
+     */
+    ///@{
+    virtual FunctorCode VisitEditorialElement(const EditorialElement *editorialElement);
+    virtual FunctorCode VisitEditorialElementEnd(const EditorialElement *editorialElement);
     ///@}
 
     /**
