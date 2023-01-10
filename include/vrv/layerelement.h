@@ -385,11 +385,6 @@ public:
     int AdjustXRelForTranscription(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareDelayedTurns
-     */
-    int PrepareDelayedTurns(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcAlignmentPitchPos
      */
     int CalcAlignmentPitchPos(FunctorParams *functorParams) override;

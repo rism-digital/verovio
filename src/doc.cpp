@@ -669,12 +669,11 @@ void Doc::PrepareData()
 
     /************ Resolve delayed turns ************/
 
-    PrepareDelayedTurnsParams prepareDelayedTurnsParams;
-    Functor prepareDelayedTurns(&Object::PrepareDelayedTurns);
-    this->Process(&prepareDelayedTurns, &prepareDelayedTurnsParams);
+    PrepareDelayedTurnsFunctor prepareDelayedTurns;
+    this->Process(prepareDelayedTurns);
 
-    if (!prepareDelayedTurnsParams.m_delayedTurns.empty()) {
-        prepareDelayedTurnsParams.m_initMap = false;
+    if (!prepareDelayedTurns.GetDelayedTurns().empty()) {
+        prepareDelayedTurns.FillMode(false);
         for (staves = initProcessingListsParams.m_layerTree.child.begin();
              staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
@@ -685,10 +684,9 @@ void Doc::PrepareData()
                 filters.Add(&matchStaff);
                 filters.Add(&matchLayer);
 
-                prepareDelayedTurnsParams.m_currentTurn = NULL;
-                prepareDelayedTurnsParams.m_previousElement = NULL;
-
-                this->Process(&prepareDelayedTurns, &prepareDelayedTurnsParams, NULL, &filters);
+                prepareDelayedTurns.SetFilters(&filters);
+                prepareDelayedTurns.ResetCurrent();
+                this->Process(prepareDelayedTurns);
             }
         }
     }

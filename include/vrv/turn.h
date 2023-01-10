@@ -79,11 +79,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareDelayedTurns
-     */
-    int PrepareDelayedTurns(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ResetData
      */
     int ResetData(FunctorParams *functorParams) override;
