@@ -2480,8 +2480,8 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
     if (!figures.empty()) {
         Harm *harm = new Harm();
         Fb *fb = new Fb();
-        for (auto iter = figures.begin(); iter != figures.end(); ++iter) {
-            fb->AddChild(*iter);
+        for (auto &fig : figures) {
+            fb->AddChild(fig);
         }
         harm->AddChild(fb);
         harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
@@ -3557,36 +3557,39 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // add StartIDs to dir, dynam, and pedal
     if (!m_dirStack.empty()) {
-        for (auto iter = m_dirStack.begin(); iter != m_dirStack.end(); ++iter) {
-            if (!(*iter)->HasStaff())
-                (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        for (auto &dir : m_dirStack) {
+            if (!dir->HasStaff()) {
+                dir->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            }
         }
         m_dirStack.clear();
     }
     if (!m_dynamStack.empty()) {
-        for (auto iter = m_dynamStack.begin(); iter != m_dynamStack.end(); ++iter) {
-            if (!(*iter)->HasStaff())
-                (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        for (auto &dynam : m_dynamStack) {
+            if (!dynam->HasStaff()) {
+                dynam->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            }
         }
         m_dynamStack.clear();
     }
     if (!m_harmStack.empty()) {
-        for (auto iter = m_harmStack.begin(); iter != m_harmStack.end(); ++iter) {
-            (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        for (auto &harm : m_harmStack) {
+            harm->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_harmStack.clear();
     }
     if (!m_octaveStack.empty()) {
-        for (auto iter = m_octaveStack.begin(); iter != m_octaveStack.end(); ++iter) {
-            (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            (*iter)->SetStartid(m_ID);
+        for (auto &oct : m_octaveStack) {
+            oct->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            oct->SetStartid(m_ID);
         }
         m_octaveStack.clear();
     }
     if (!m_pedalStack.empty()) {
-        for (auto iter = m_pedalStack.begin(); iter != m_pedalStack.end(); ++iter) {
-            if (!(*iter)->HasStaff())
-                (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        for (auto &ped : m_pedalStack) {
+            if (!ped->HasStaff()) {
+                ped->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            }
         }
         m_pedalStack.clear();
     }
