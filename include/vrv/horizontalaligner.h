@@ -473,7 +473,7 @@ public:
      * Override the method of adding AlignmentReference children
      */
     bool IsSupportedChild(Object *object) override;
-    
+
     /**
      * Retrieve the alignmnet of the type at that time.
      * The alignment object is added if not found.
@@ -705,7 +705,7 @@ public:
      * Override the method of adding TimestampAttr children
      */
     bool IsSupportedChild(Object *object) override;
-    
+
     /**
      * Look for an existing TimestampAttr at a certain time.
      * Creates it if not found

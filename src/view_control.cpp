@@ -1225,7 +1225,7 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
 
     // Because <f> is a TextElement the extendor is placed in the parent <fb>
     Fb *fb = (graphic) ? vrv_cast<Fb *>(graphic->GetFirstAncestor(FB)) : NULL;
-    
+
     if (fb) {
         dc->ResumeGraphic(fb, fb->GetID());
     }
