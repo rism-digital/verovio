@@ -2477,19 +2477,19 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
         f->AddChild(text);
         figures.push_back(f);
     }
-    if (!figures.empty()) {
-        Harm *harm = new Harm();
-        Fb *fb = new Fb();
-        for (auto &fig : figures) {
-            fb->AddChild(fig);
-        }
-        harm->AddChild(fb);
-        harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
-        m_durFb += node.child("duration").text().as_int();
-        m_controlElements.push_back({ measureNum, harm });
-        m_harmStack.push_back(harm);
-        figures.clear();
+    if (figures.empty()) return;
+
+    Harm *harm = new Harm();
+    Fb *fb = new Fb();
+    for (auto &fig : figures) {
+        fb->AddChild(fig);
     }
+    harm->AddChild(fb);
+    harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+    m_durFb += node.child("duration").text().as_int();
+    m_controlElements.push_back({ measureNum, harm });
+    m_harmStack.push_back(harm);
+    figures.clear();
 }
 
 void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, const std::string &measureNum)
