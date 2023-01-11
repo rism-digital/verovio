@@ -1223,14 +1223,15 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
         // nothing to adjust
     }
 
-    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instantiate a
-    // temporary object in order not to reset the Syl bounding box.
-    F fConnector;
-    if (graphic) {
-        dc->ResumeGraphic(graphic, graphic->GetID());
+    // Because <f> is a TextElement the extendor is placed in the parent <fb>
+    Fb *fb = (graphic) ? vrv_cast<Fb *>(graphic->GetFirstAncestor(FB)) : NULL;
+    
+    if (fb) {
+        dc->ResumeGraphic(fb, fb->GetID());
     }
-    else
-        dc->StartGraphic(&fConnector, "", f->GetID(), SPANNING);
+    else {
+        dc->StartGraphic(graphic, "", f->GetID(), SPANNING);
+    }
 
     dc->DeactivateGraphic();
 
@@ -1241,11 +1242,12 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
 
     dc->ReactivateGraphic();
 
-    if (graphic) {
-        dc->EndResumedGraphic(graphic, this);
+    if (fb) {
+        dc->EndResumedGraphic(fb, this);
     }
-    else
-        dc->EndGraphic(&fConnector, this);
+    else {
+        dc->EndGraphic(graphic, this);
+    }
 }
 
 void View::DrawSylConnector(
