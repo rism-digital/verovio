@@ -1168,7 +1168,7 @@ void View::DrawControlElementConnector(
 
     bool deactivate = true;
     // If there is no end link and we are not starting the control element, then do not deactivate the element.
-    // The vertical spacing will not be consistent but a least is does not leave the connector un-laidout
+    // The vertical spacing will not be consistent but at least is does not leave the connector un-laidout
     if (!element->GetNextLink() && (spanningType != SPANNING_START_END) && (spanningType != SPANNING_START)) {
         deactivate = false;
     }
