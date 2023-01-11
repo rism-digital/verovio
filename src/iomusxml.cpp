@@ -2450,35 +2450,40 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
     assert(node);
     assert(measure);
 
-    if (!HasAttributeWithValue(node, "print-object", "no")) {
-        Harm *harm = new Harm();
-        Fb *fb = new Fb();
+    if (HasAttributeWithValue(node, "print-object", "no")) return;
 
-        const bool paren = node.attribute("parentheses").as_bool();
+    Harm *harm = new Harm();
+    Fb *fb = new Fb();
 
-        // std::string textColor = node.attribute("color").as_string();
-        // std::string textStyle = node.attribute("font-style").as_string();
-        // std::string textWeight = node.attribute("font-weight").as_string();
-        for (pugi::xml_node figure : node.children("figure")) {
-            std::string textStr;
-            if (paren) textStr.append("(");
-            textStr.append(ConvertFigureGlyph(figure.child("prefix").text().as_string()));
-            textStr.append(figure.child("figure-number").text().as_string());
-            textStr.append(ConvertFigureGlyph(figure.child("suffix").text().as_string()));
-            if (paren) textStr.append(")");
-            F *f = new F();
-            if (figure.child("extend")) f->SetExtender(BOOLEAN_true);
-            Text *text = new Text();
-            text->SetText(UTF8to32(textStr));
-            f->AddChild(text);
-            fb->AddChild(f);
+    const bool paren = node.attribute("parentheses").as_bool();
+
+    // std::string textColor = node.attribute("color").as_string();
+    // std::string textStyle = node.attribute("font-style").as_string();
+    // std::string textWeight = node.attribute("font-weight").as_string();
+    for (pugi::xml_node figure : node.children("figure")) {
+        std::string textStr;
+        if (paren) textStr.append("(");
+        textStr.append(ConvertFigureGlyph(figure.child("prefix").text().as_string()));
+        textStr.append(figure.child("figure-number").text().as_string());
+        textStr.append(ConvertFigureGlyph(figure.child("suffix").text().as_string()));
+        if (paren) textStr.append(")");
+        if (textStr.empty()) continue;
+        F *f = new F();
+        pugi::xml_node extend = figure.child("extend");
+        if (extend && !HasAttributeWithValue(extend, "type", "stop")) {
+            f->SetExtender(BOOLEAN_true);
         }
-        harm->AddChild(fb);
-        harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
-        m_durFb += node.child("duration").text().as_int();
-        m_controlElements.push_back({ measureNum, harm });
-        m_harmStack.push_back(harm);
+        Text *text = new Text();
+        text->SetText(UTF8to32(textStr));
+        f->AddChild(text);
+        fb->AddChild(f);
     }
+    if (!fb->GetFirst()) return;
+    harm->AddChild(fb);
+    harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+    m_durFb += node.child("duration").text().as_int();
+    m_controlElements.push_back({ measureNum, harm });
+    m_harmStack.push_back(harm);
 }
 
 void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, const std::string &measureNum)
