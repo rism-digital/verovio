@@ -176,6 +176,7 @@ set(all_SRC
     ../libmei/atts_neumes.cpp
     ../libmei/atts_pagebased.cpp
     ../libmei/atts_shared.cpp
+    ../libmei/atts_usersymbols.cpp
     ../libmei/atts_visual.cpp
 )
 
@@ -192,6 +193,9 @@ if (BUILD_AS_LIBRARY)
 ###########
 
 elseif (BUILD_AS_WASM)
+    if (EMSCRIPTEN_VERSION VERSION_LESS "3.1.27")
+        message(FATAL_ERROR "You need em++ 3.1.27 or greater")
+    endif()
     message(STATUS "***** Building Verovio as WASM BC *****")
     add_library(verovio STATIC ../tools/c_wrapper.cpp ${all_SRC})
 
@@ -213,8 +217,10 @@ elseif (BUILD_AS_PYTHON)
     set(PYTHON_VERSION "3" CACHE STRING "Python Version to use")
     find_package(Python EXACT ${PYTHON_VERSION} MODULE REQUIRED)
 
-    if(PYTHON_VERSION VERSION_GREATER_EQUAL 3)
-      list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
+    if(${SWIG_VERSION} VERSION_GREATER_EQUAL "4.1.0")
+        list(APPEND CMAKE_SWIG_FLAGS "-doxygen")
+    else()
+        list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
     endif()
 
     set_source_files_properties(../bindings/python/verovio.i PROPERTIES CPLUSPLUS ON)

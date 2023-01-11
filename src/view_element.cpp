@@ -1217,8 +1217,9 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     if (multiRest->UseBlockStyle(m_doc)) {
         // This is 1/2 the length of the black rectangle
         int width = measureWidth - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        if (multiRest->HasWidth()) {
-            const int fixedWidth = multiRest->AttWidth::GetWidth() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        if (multiRest->HasWidth() && multiRest->AttWidth::GetWidth().GetType() == MEASUREMENTTYPE_vu) {
+            const int fixedWidth
+                = multiRest->AttWidth::GetWidth().GetVu() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             width = (width > fixedWidth) ? fixedWidth : width;
         }
         if (width > m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 4) {
@@ -1505,8 +1506,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // We check if this belongs to a mensural note
     Note *parent = vrv_cast<Note *>(stem->GetFirstAncestor(NOTE));
     if (parent && parent->IsMensuralDur()) {
-        if (((parent->GetDrawingDur() > DUR_1) || ((parent->GetStemDir() != STEMDIRECTION_NONE)))
-            && stem->GetVisible() != BOOLEAN_false) {
+        if (parent->GetDrawingDur() > DUR_1) {
             /************** Stem/notehead direction: **************/
             const int staffCenter
                 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
@@ -1526,9 +1526,9 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetID());
 
-    this->DrawFilledRectangle(dc, stem->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
-        stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
-        stem->GetDrawingY() - (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()));
+    DrawVerticalLine(dc, stem->GetDrawingY(),
+        stem->GetDrawingY() - (stem->GetDrawingStemLen() + stem->GetDrawingStemAdjust()), stem->GetDrawingX(),
+        m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
 
     this->DrawStemMod(dc, element, staff);
 

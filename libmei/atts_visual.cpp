@@ -573,7 +573,7 @@ void AttFTremVis::ResetFTremVis()
 {
     m_beams = VRV_UNSET;
     m_beamsFloat = VRV_UNSET;
-    m_floatGap = VRV_UNSET;
+    m_floatGap = data_MEASUREMENTUNSIGNED();
 }
 
 bool AttFTremVis::ReadFTremVis(pugi::xml_node element)
@@ -627,7 +627,7 @@ bool AttFTremVis::HasBeamsFloat() const
 
 bool AttFTremVis::HasFloatGap() const
 {
-    return (m_floatGap != VRV_UNSET);
+    return (m_floatGap != data_MEASUREMENTUNSIGNED());
 }
 
 /* include <attfloat.gap> */
@@ -748,7 +748,7 @@ AttHairpinVis::~AttHairpinVis() {}
 
 void AttHairpinVis::ResetHairpinVis()
 {
-    m_opening = VRV_UNSET;
+    m_opening = data_MEASUREMENTUNSIGNED();
     m_closed = BOOLEAN_NONE;
     m_openingVertical = BOOLEAN_NONE;
     m_angleOptimize = BOOLEAN_NONE;
@@ -804,7 +804,7 @@ bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element)
 
 bool AttHairpinVis::HasOpening() const
 {
-    return (m_opening != VRV_UNSET);
+    return (m_opening != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttHairpinVis::HasClosed() const
@@ -1739,7 +1739,7 @@ AttPlicaVis::~AttPlicaVis() {}
 void AttPlicaVis::ResetPlicaVis()
 {
     m_dir = STEMDIRECTION_basic_NONE;
-    m_len = VRV_UNSET;
+    m_len = data_MEASUREMENTUNSIGNED();
 }
 
 bool AttPlicaVis::ReadPlicaVis(pugi::xml_node element)
@@ -1779,7 +1779,7 @@ bool AttPlicaVis::HasDir() const
 
 bool AttPlicaVis::HasLen() const
 {
-    return (m_len != VRV_UNSET);
+    return (m_len != data_MEASUREMENTUNSIGNED());
 }
 
 /* include <attlen> */
@@ -2065,7 +2065,7 @@ void AttStaffDefVis::ResetStaffDefVis()
     m_layerscheme = LAYERSCHEME_NONE;
     m_linesColor = "";
     m_linesVisible = BOOLEAN_NONE;
-    m_spacing = VRV_UNSET;
+    m_spacing = data_MEASUREMENTSIGNED();
 }
 
 bool AttStaffDefVis::ReadStaffDefVis(pugi::xml_node element)
@@ -2147,7 +2147,7 @@ bool AttStaffDefVis::HasLinesVisible() const
 
 bool AttStaffDefVis::HasSpacing() const
 {
-    return (m_spacing != VRV_UNSET);
+    return (m_spacing != data_MEASUREMENTSIGNED());
 }
 
 /* include <attspacing> */
@@ -2210,7 +2210,7 @@ AttStemVis::~AttStemVis() {}
 void AttStemVis::ResetStemVis()
 {
     m_pos = STEMPOSITION_NONE;
-    m_len = VRV_UNSET;
+    m_len = data_MEASUREMENTUNSIGNED();
     m_form = STEMFORM_mensural_NONE;
     m_dir = STEMDIRECTION_NONE;
     m_flagPos = FLAGPOS_mensural_NONE;
@@ -2290,7 +2290,7 @@ bool AttStemVis::HasPos() const
 
 bool AttStemVis::HasLen() const
 {
-    return (m_len != VRV_UNSET);
+    return (m_len != data_MEASUREMENTUNSIGNED());
 }
 
 bool AttStemVis::HasForm() const

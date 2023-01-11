@@ -77,7 +77,7 @@ public:
      * @name Get a copy of the clef, keysig, mensur and meterSig.
      * These methods create new objects (heap) that will need to be deleted.
      * They also convert attribute value objects to an object. For example,
-     * if a staffDef has a @key.sig, the copy will be a KeySig object.
+     * if a staffDef has a \@key.sig, the copy will be a KeySig object.
      * The conversion from attribute to element is performed in the appropriate
      * constructor of each corresponding class (Clef, KeySig, etc.)
      */
@@ -192,7 +192,7 @@ public:
     ///@}
 
     /**
-     * Return all the @n values of the staffDef in a scoreDef
+     * Return all the \@n values of the staffDef in a scoreDef
      */
     std::vector<int> GetStaffNs() const;
 

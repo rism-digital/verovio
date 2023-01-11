@@ -41,6 +41,7 @@ class Fing;
 class FloatingCurvePositioner;
 class Fermata;
 class Gliss;
+class Graphic;
 class Hairpin;
 class Harm;
 class KeyAccid;
@@ -55,6 +56,7 @@ class Neume;
 class Num;
 class Octave;
 class Options;
+class Ornam;
 class Page;
 class PageElement;
 class Pedal;
@@ -72,6 +74,7 @@ class Svg;
 class Syl;
 class Syllable;
 class Symbol;
+class SymbolDef;
 class System;
 class SystemElement;
 class Tempo;
@@ -384,7 +387,8 @@ protected:
     void DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params);
     void DrawNum(DeviceContext *dc, Num *num, TextDrawingParams &params);
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
-    void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params);
+    void DrawGraphic(DeviceContext *dc, Graphic *graphic, TextDrawingParams &params, int staffSize, bool dimin);
+    void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params, int staffSize, bool dimin);
     void DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
     void DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params, int staffSize);
@@ -422,7 +426,7 @@ protected:
         char32_t endGlyph, int x, int y, int height, bool cueSize);
     void DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system);
     void DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, System *system);
-    void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
+    void DrawDirOrOrnam(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
     void DrawDynamSymbolOnly(DeviceContext *dc, Staff *staff, Dynam *dynam, const std::u32string &dynamSymbol,
         data_HORIZONTALALIGNMENT alignment, TextDrawingParams &params);
@@ -540,7 +544,6 @@ protected:
     void DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width, int dashLength = 0, int gapLength = 0);
     void DrawHorizontalLine(
         DeviceContext *dc, int x1, int x2, int y1, int width, int dashLength = 0, int gapLength = 0);
-    void DrawRoundedLine(DeviceContext *dc, int x1, int y1, int x2, int y2, int width);
     void DrawVerticalSegmentedLine(
         DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength = 0, int gapLength = 0);
     void DrawHorizontalSegmentedLine(
@@ -572,6 +575,8 @@ protected:
     void DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, int width, int offset, int bracketWidth,
         int horizontalThickness, int verticalThickness);
     void DrawVerticalDots(DeviceContext *dc, int x, const SegmentedLine &line, int barlineWidth, int interval);
+    void DrawSymbolDef(DeviceContext *dc, Object *parent, SymbolDef *symbolDef, int x, int y, int staffSize, bool dimin,
+        data_HORIZONTALALIGNMENT alignement = HORIZONTALALIGNMENT_left);
     ///@}
 
     /**

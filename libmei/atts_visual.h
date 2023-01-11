@@ -176,7 +176,7 @@ public:
 
 private:
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/
@@ -1267,7 +1267,7 @@ private:
     /** Records the position of the piano damper pedal. **/
     data_STEMDIRECTION_basic m_dir;
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/
@@ -1656,7 +1656,7 @@ private:
     /** Records the position of the stem in relation to the note head(s). **/
     data_STEMPOSITION m_pos;
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/

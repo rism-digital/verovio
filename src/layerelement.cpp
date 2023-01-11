@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cassert>
 #include <climits>
+#include <iterator>
 #include <math.h>
 #include <numeric>
 

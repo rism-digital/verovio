@@ -194,13 +194,14 @@ public:
         = 0;
     virtual void DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
-    virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) = 0;
+    virtual void DrawGraphicUri(int x, int y, int width, int height, const std::string &uri) = 0;
+    virtual void DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg) = 0;
     virtual void DrawBackgroundImage(int x = 0, int y = 0) = 0;
     ///@}
 
     /**
      * Special method for forcing bounding boxes to be updated
-     * Used for invisible elements (e.g. <space>) that needs to be take into account in spacing
+     * Used for invisible elements (e.g., <space>) that needs to be take into account in spacing
      */
     virtual void DrawPlaceholder(int x, int y){};
 
@@ -243,7 +244,7 @@ public:
      */
     ///@{
     virtual void StartGraphic(
-        Object *object, std::string gClass, std::string gId, bool primary = true, bool preprend = false)
+        Object *object, std::string gClass, std::string gId, GraphicID graphicID = PRIMARY, bool preprend = false)
         = 0;
     virtual void EndGraphic(Object *object, View *view) = 0;
     ///@}

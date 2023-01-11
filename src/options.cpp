@@ -12,6 +12,7 @@
 #include <cassert>
 #include <fstream>
 #include <functional>
+#include <iterator>
 #include <sstream>
 
 //----------------------------------------------------------------------------

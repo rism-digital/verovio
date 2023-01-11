@@ -8,6 +8,7 @@
 #ifndef __VRV_CONTROL_ELEMENT_H__
 #define __VRV_CONTROL_ELEMENT_H__
 
+#include "altsyminterface.h"
 #include "atts_shared.h"
 #include "devicecontextbase.h"
 #include "floatingobject.h"
@@ -23,7 +24,11 @@ namespace vrv {
  * This class represents elements appearing within a measure.
  * It is not an abstract class but should not be instanciated directly.
  */
-class ControlElement : public FloatingObject, public LinkingInterface, public AttLabelled, public AttTyped {
+class ControlElement : public FloatingObject,
+                       public AltSymInterface,
+                       public LinkingInterface,
+                       public AttLabelled,
+                       public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -41,6 +46,8 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    AltSymInterface *GetAltSymInterface() override { return vrv_cast<AltSymInterface *>(this); }
+    const AltSymInterface *GetAltSymInterface() const override { return vrv_cast<const AltSymInterface *>(this); }
     LinkingInterface *GetLinkingInterface() override { return vrv_cast<LinkingInterface *>(this); }
     const LinkingInterface *GetLinkingInterface() const override { return vrv_cast<const LinkingInterface *>(this); }
     ///@}

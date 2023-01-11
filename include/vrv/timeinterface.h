@@ -118,7 +118,7 @@ public:
 
 protected:
     /**
-     * Extract the fragment of the start or end @xml:id if given
+     * Extract the fragment of the start or end \@xml:id if given
      */
     void SetIDStr();
 

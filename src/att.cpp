@@ -292,8 +292,8 @@ std::string Att::LinewidthToStr(data_LINEWIDTH data) const
     std::string value;
     if (data.GetType() == LINEWIDTHTYPE_lineWidthTerm)
         value = data.GetLineWithTerm();
-    else if (data.GetType() == LINEWIDTHTYPE_measurementUnsigned)
-        value = VUToStr(data.GetMeasurementUnsigned());
+    else if (data.GetType() == LINEWIDTHTYPE_measurementunsigned)
+        value = MeasurementunsignedToStr(data.GetMeasurementunsigned());
 
     return value;
 }
@@ -303,7 +303,7 @@ data_LINEWIDTH Att::StrToLinewidth(const std::string &value, bool logWarning) co
     data_LINEWIDTH data;
     data.SetLineWidthTerm(StrToLinewidthterm(value, false));
     if (data.HasValue()) return data;
-    data.SetMeasurementUnsigned(StrToVU(value));
+    data.SetMeasurementunsigned(StrToMeasurementunsigned(value));
     if (data.HasValue()) return data;
 
     if (logWarning && !value.empty()) LogWarning("Unsupported data.LINEWIDTH '%s'", value.c_str());
@@ -393,6 +393,37 @@ data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
         timePoint = atof(value.c_str());
     }
     return { measure, timePoint };
+}
+
+std::string Att::MeasurementsignedToStr(data_MEASUREMENTSIGNED data) const
+{
+    std::string value;
+    if (data.GetType() == MEASUREMENTTYPE_px) {
+        value = StringFormat("%dpx", data.GetPx() / DEFINITION_FACTOR);
+    }
+    else if (data.GetType() == MEASUREMENTTYPE_vu) {
+        value = StringFormat("%.4fvu", data.GetVu());
+    }
+
+    return value;
+}
+
+data_MEASUREMENTSIGNED Att::StrToMeasurementsigned(const std::string &value, bool logWarning) const
+{
+    data_MEASUREMENTSIGNED data;
+
+    std::regex px(".*px$");
+    if (std::regex_match(value, px)) {
+        data.SetPx(atoi(value.substr(0, value.find("px")).c_str()) * DEFINITION_FACTOR);
+    }
+    else {
+        data.SetVu(atof(value.c_str()));
+    }
+
+    if (logWarning && !value.empty() && !data.HasValue())
+        LogWarning("Unsupported data.MEASUREMENTSIGNED '%s'", value.c_str());
+
+    return data;
 }
 
 std::string Att::MetercountPairToStr(const data_METERCOUNT_pair &data) const
