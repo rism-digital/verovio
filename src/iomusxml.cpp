@@ -2452,8 +2452,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
 
     if (HasAttributeWithValue(node, "print-object", "no")) return;
 
-    Harm *harm = new Harm();
-    Fb *fb = new Fb();
+    std::vector<F *> figures;
 
     const bool paren = node.attribute("parentheses").as_bool();
 
@@ -2476,14 +2475,21 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
         Text *text = new Text();
         text->SetText(UTF8to32(textStr));
         f->AddChild(text);
-        fb->AddChild(f);
+        figures.push_back(f);
     }
-    if (!fb->GetFirst()) return;
-    harm->AddChild(fb);
-    harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
-    m_durFb += node.child("duration").text().as_int();
-    m_controlElements.push_back({ measureNum, harm });
-    m_harmStack.push_back(harm);
+    if (!figures.empty()) {
+        Harm *harm = new Harm();
+        Fb *fb = new Fb();
+        for (auto iter = figures.begin(); iter != figures.end(); ++iter) {
+            fb->AddChild(*iter);
+        }
+        harm->AddChild(fb);
+        harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        m_durFb += node.child("duration").text().as_int();
+        m_controlElements.push_back({ measureNum, harm });
+        m_harmStack.push_back(harm);
+        figures.clear();
+    }
 }
 
 void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, const std::string &measureNum)
