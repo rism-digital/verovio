@@ -1377,7 +1377,7 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
     }
 
     // find the end of time signature
-    i++; // the time signature length is a least 1
+    i++; // the time signature length is at least 1
     while (i < length) {
         if (!isdigit(incipit[i]) && (incipit[i] != '/') && (incipit[i] != '.')) {
             break;

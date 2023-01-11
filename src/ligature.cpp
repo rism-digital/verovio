@@ -267,7 +267,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
         // With mensural black notation, stack longa going up
         if (isLastNote && isMensuralBlack && (dur2 == DUR_LG) && up) {
-            // Stack only if a least a third
+            // Stack only if at least a third
             int stackThreshold = 1;
             // If the previous was going down, adjust the threshold
             if ((n1 > 0) && !previousUp) {
