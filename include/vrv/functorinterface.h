@@ -37,6 +37,8 @@ class Dots;
 class Doc;
 class Dynam;
 class EditorialElement;
+class Ending;
+class Expansion;
 class F;
 class Fb;
 class Fermata;
@@ -107,6 +109,7 @@ class Sb;
 class Score;
 class ScoreDef;
 class ScoreDefElement;
+class Section;
 class Slur;
 class Space;
 class Staff;
@@ -120,6 +123,8 @@ class Syllable;
 class Symbol;
 class System;
 class SystemAligner;
+class SystemElement;
+class SystemMilestoneEnd;
 class TabDurSym;
 class TabGrp;
 class Tempo;
@@ -168,7 +173,6 @@ public:
      * @name Visit container elements
      */
     ///@{
-    // TODO: Add system elements later
     virtual FunctorCode VisitCourse(Course *course);
     virtual FunctorCode VisitCourseEnd(Course *course);
     virtual FunctorCode VisitGrpSym(GrpSym *grpSym);
@@ -189,10 +193,10 @@ public:
     virtual FunctorCode VisitPageEnd(Page *page);
     virtual FunctorCode VisitPages(Pages *pages);
     virtual FunctorCode VisitPagesEnd(Pages *pages);
-    // virtual FunctorCode VisitPb(Pb *pb);
-    // virtual FunctorCode VisitPbEnd(Pb *pb);
-    // virtual FunctorCode VisitSb(Sb *sb);
-    // virtual FunctorCode VisitSbEnd(Sb *sb);
+    virtual FunctorCode VisitPb(Pb *pb);
+    virtual FunctorCode VisitPbEnd(Pb *pb);
+    virtual FunctorCode VisitSb(Sb *sb);
+    virtual FunctorCode VisitSbEnd(Sb *sb);
     virtual FunctorCode VisitScoreDef(ScoreDef *scoreDef);
     virtual FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef);
     virtual FunctorCode VisitScoreDefElement(ScoreDefElement *scoreDefElement);
@@ -232,6 +236,22 @@ public:
     virtual FunctorCode VisitPgHeadEnd(PgHead *pgHead);
     virtual FunctorCode VisitPgHead2(PgHead2 *pgHead2);
     virtual FunctorCode VisitPgHead2End(PgHead2 *pgHead2);
+    ///@}
+
+    /**
+     * @name Visit system elements
+     */
+    ///@{
+    virtual FunctorCode VisitEnding(Ending *ending);
+    virtual FunctorCode VisitEndingEnd(Ending *ending);
+    virtual FunctorCode VisitExpansion(Expansion *expansion);
+    virtual FunctorCode VisitExpansionEnd(Expansion *expansion);
+    virtual FunctorCode VisitSection(Section *section);
+    virtual FunctorCode VisitSectionEnd(Section *section);
+    virtual FunctorCode VisitSystemElement(SystemElement *systemElement);
+    virtual FunctorCode VisitSystemElementEnd(SystemElement *systemElement);
+    virtual FunctorCode VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd);
+    virtual FunctorCode VisitSystemMilestoneEnd(SystemMilestoneEnd *systemMilestoneEnd);
     ///@}
 
     /**
@@ -508,7 +528,6 @@ public:
      * @name Visit container elements
      */
     ///@{
-    // TODO: Add system elements later
     virtual FunctorCode VisitCourse(const Course *course);
     virtual FunctorCode VisitCourseEnd(const Course *course);
     virtual FunctorCode VisitGrpSym(const GrpSym *grpSym);
@@ -529,10 +548,10 @@ public:
     virtual FunctorCode VisitPageEnd(const Page *page);
     virtual FunctorCode VisitPages(const Pages *pages);
     virtual FunctorCode VisitPagesEnd(const Pages *pages);
-    // virtual FunctorCode VisitPb(const Pb *pb);
-    // virtual FunctorCode VisitPbEnd(const Pb *pb);
-    // virtual FunctorCode VisitSb(const Sb *sb);
-    // virtual FunctorCode VisitSbEnd(const Sb *sb);
+    virtual FunctorCode VisitPb(const Pb *pb);
+    virtual FunctorCode VisitPbEnd(const Pb *pb);
+    virtual FunctorCode VisitSb(const Sb *sb);
+    virtual FunctorCode VisitSbEnd(const Sb *sb);
     virtual FunctorCode VisitScoreDef(const ScoreDef *scoreDef);
     virtual FunctorCode VisitScoreDefEnd(const ScoreDef *scoreDef);
     virtual FunctorCode VisitScoreDefElement(const ScoreDefElement *scoreDefElement);
@@ -572,6 +591,22 @@ public:
     virtual FunctorCode VisitPgHeadEnd(const PgHead *pgHead);
     virtual FunctorCode VisitPgHead2(const PgHead2 *pgHead2);
     virtual FunctorCode VisitPgHead2End(const PgHead2 *pgHead2);
+    ///@}
+
+    /**
+     * @name Visit system elements
+     */
+    ///@{
+    virtual FunctorCode VisitEnding(const Ending *ending);
+    virtual FunctorCode VisitEndingEnd(const Ending *ending);
+    virtual FunctorCode VisitExpansion(const Expansion *expansion);
+    virtual FunctorCode VisitExpansionEnd(const Expansion *expansion);
+    virtual FunctorCode VisitSection(const Section *section);
+    virtual FunctorCode VisitSectionEnd(const Section *section);
+    virtual FunctorCode VisitSystemElement(const SystemElement *systemElement);
+    virtual FunctorCode VisitSystemElementEnd(const SystemElement *systemElement);
+    virtual FunctorCode VisitSystemMilestone(const SystemMilestoneEnd *systemMilestoneEnd);
+    virtual FunctorCode VisitSystemMilestoneEnd(const SystemMilestoneEnd *systemMilestoneEnd);
     ///@}
 
     /**

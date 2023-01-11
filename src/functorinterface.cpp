@@ -31,6 +31,8 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "ending.h"
+#include "expansion.h"
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
@@ -75,6 +77,7 @@
 #include "page.h"
 #include "pagemilestone.h"
 #include "pages.h"
+#include "pb.h"
 #include "pedal.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
@@ -87,8 +90,10 @@
 #include "reh.h"
 #include "rend.h"
 #include "rest.h"
+#include "sb.h"
 #include "score.h"
 #include "scoredef.h"
+#include "section.h"
 #include "slur.h"
 #include "space.h"
 #include "staff.h"
@@ -100,6 +105,7 @@
 #include "syllable.h"
 #include "symbol.h"
 #include "system.h"
+#include "systemmilestone.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
 #include "tempo.h"
@@ -226,6 +232,26 @@ FunctorCode FunctorInterface::VisitPages(Pages *pages)
 FunctorCode FunctorInterface::VisitPagesEnd(Pages *pages)
 {
     return this->VisitObjectEnd(pages);
+}
+
+FunctorCode FunctorInterface::VisitPb(Pb *pb)
+{
+    return this->VisitSystemElement(pb);
+}
+
+FunctorCode FunctorInterface::VisitPbEnd(Pb *pb)
+{
+    return this->VisitSystemElementEnd(pb);
+}
+
+FunctorCode FunctorInterface::VisitSb(Sb *sb)
+{
+    return this->VisitSystemElement(sb);
+}
+
+FunctorCode FunctorInterface::VisitSbEnd(Sb *sb)
+{
+    return this->VisitSystemElementEnd(sb);
 }
 
 FunctorCode FunctorInterface::VisitScoreDef(ScoreDef *scoreDef)
@@ -356,6 +382,56 @@ FunctorCode FunctorInterface::VisitPgFoot2(PgFoot2 *pgFoot2)
 FunctorCode FunctorInterface::VisitPgFoot2End(PgFoot2 *pgFoot2)
 {
     return this->VisitRunningElementEnd(pgFoot2);
+}
+
+FunctorCode FunctorInterface::VisitEnding(Ending *ending)
+{
+    return this->VisitSystemElement(ending);
+}
+
+FunctorCode FunctorInterface::VisitEndingEnd(Ending *ending)
+{
+    return this->VisitSystemElementEnd(ending);
+}
+
+FunctorCode FunctorInterface::VisitExpansion(Expansion *expansion)
+{
+    return this->VisitSystemElement(expansion);
+}
+
+FunctorCode FunctorInterface::VisitExpansionEnd(Expansion *expansion)
+{
+    return this->VisitSystemElementEnd(expansion);
+}
+
+FunctorCode FunctorInterface::VisitSection(Section *section)
+{
+    return this->VisitSystemElement(section);
+}
+
+FunctorCode FunctorInterface::VisitSectionEnd(Section *section)
+{
+    return this->VisitSystemElementEnd(section);
+}
+
+FunctorCode FunctorInterface::VisitSystemElement(SystemElement *systemElement)
+{
+    return this->VisitFloatingObject(systemElement);
+}
+
+FunctorCode FunctorInterface::VisitSystemElementEnd(SystemElement *systemElement)
+{
+    return this->VisitFloatingObjectEnd(systemElement);
+}
+
+FunctorCode FunctorInterface::VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd)
+{
+    return this->VisitSystemElement(systemMilestoneEnd);
+}
+
+FunctorCode FunctorInterface::VisitSystemMilestoneEnd(SystemMilestoneEnd *systemMilestoneEnd)
+{
+    return this->VisitSystemElementEnd(systemMilestoneEnd);
 }
 
 FunctorCode FunctorInterface::VisitMdiv(Mdiv *mdiv)
@@ -1432,6 +1508,26 @@ FunctorCode ConstFunctorInterface::VisitPagesEnd(const Pages *pages)
     return this->VisitObjectEnd(pages);
 }
 
+FunctorCode ConstFunctorInterface::VisitPb(const Pb *pb)
+{
+    return this->VisitSystemElement(pb);
+}
+
+FunctorCode ConstFunctorInterface::VisitPbEnd(const Pb *pb)
+{
+    return this->VisitSystemElementEnd(pb);
+}
+
+FunctorCode ConstFunctorInterface::VisitSb(const Sb *sb)
+{
+    return this->VisitSystemElement(sb);
+}
+
+FunctorCode ConstFunctorInterface::VisitSbEnd(const Sb *sb)
+{
+    return this->VisitSystemElementEnd(sb);
+}
+
 FunctorCode ConstFunctorInterface::VisitScoreDef(const ScoreDef *scoreDef)
 {
     return this->VisitScoreDefElement(scoreDef);
@@ -1560,6 +1656,56 @@ FunctorCode ConstFunctorInterface::VisitPgFoot2(const PgFoot2 *pgFoot2)
 FunctorCode ConstFunctorInterface::VisitPgFoot2End(const PgFoot2 *pgFoot2)
 {
     return this->VisitRunningElementEnd(pgFoot2);
+}
+
+FunctorCode ConstFunctorInterface::VisitEnding(const Ending *ending)
+{
+    return this->VisitSystemElement(ending);
+}
+
+FunctorCode ConstFunctorInterface::VisitEndingEnd(const Ending *ending)
+{
+    return this->VisitSystemElementEnd(ending);
+}
+
+FunctorCode ConstFunctorInterface::VisitExpansion(const Expansion *expansion)
+{
+    return this->VisitSystemElement(expansion);
+}
+
+FunctorCode ConstFunctorInterface::VisitExpansionEnd(const Expansion *expansion)
+{
+    return this->VisitSystemElementEnd(expansion);
+}
+
+FunctorCode ConstFunctorInterface::VisitSection(const Section *section)
+{
+    return this->VisitSystemElement(section);
+}
+
+FunctorCode ConstFunctorInterface::VisitSectionEnd(const Section *section)
+{
+    return this->VisitSystemElementEnd(section);
+}
+
+FunctorCode ConstFunctorInterface::VisitSystemElement(const SystemElement *systemElement)
+{
+    return this->VisitFloatingObject(systemElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitSystemElementEnd(const SystemElement *systemElement)
+{
+    return this->VisitFloatingObjectEnd(systemElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitSystemMilestone(const SystemMilestoneEnd *systemMilestoneEnd)
+{
+    return this->VisitSystemElement(systemMilestoneEnd);
+}
+
+FunctorCode ConstFunctorInterface::VisitSystemMilestoneEnd(const SystemMilestoneEnd *systemMilestoneEnd)
+{
+    return this->VisitSystemElementEnd(systemMilestoneEnd);
 }
 
 FunctorCode ConstFunctorInterface::VisitMdiv(const Mdiv *mdiv)
