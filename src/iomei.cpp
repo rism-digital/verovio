@@ -7826,7 +7826,6 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
         LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
         if (element) tuplet->AddChild(element);
     }
-    tuplet->SetParent(parentLayer);
     parentLayer->InsertChild(tuplet, startIdx);
 
     return true;
@@ -7916,14 +7915,12 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
     // Works only for single page files
 
     Score *score = new Score();
-    score->SetParent(page);
     page->InsertChild(score, 0);
 
     PageMilestoneEnd *scoreEnd = new PageMilestoneEnd(score);
     page->AddChild(scoreEnd);
 
     Mdiv *mdiv = new Mdiv();
-    mdiv->SetParent(page);
     page->InsertChild(mdiv, 0);
 
     PageMilestoneEnd *mdivEnd = new PageMilestoneEnd(mdiv);

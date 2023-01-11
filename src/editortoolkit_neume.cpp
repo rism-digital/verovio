@@ -654,7 +654,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         std::stable_sort(stavesVector.begin(), stavesVector.end(), staffSort);
         for (int i = 0; i < (int)staves.size(); i++) {
             if (stavesVector.at(i) == newStaff) {
-                newStaff->SetParent(parent);
                 parent->InsertChild(newStaff, i);
                 parent->Modify();
 

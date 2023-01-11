@@ -84,10 +84,8 @@ const Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, Alignment
 
 void HorizontalAligner::AddAlignment(Alignment *alignment, int idx)
 {
-    alignment->SetParent(this);
-    ArrayOfObjects &children = this->GetChildrenForModification();
     if (idx == -1) {
-        children.push_back(alignment);
+        AddChild(alignment);
     }
     else {
         InsertChild(alignment, idx);
@@ -124,6 +122,12 @@ void MeasureAligner::Reset()
     AddAlignment(m_rightAlignment);
 
     m_initialTstampDur = -DUR_MAX;
+}
+
+bool MeasureAligner::IsSupportedChild(Object *child)
+{
+    assert(dynamic_cast<Alignment *>(child));
+    return true;
 }
 
 Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
@@ -871,6 +875,12 @@ void TimestampAligner::Reset()
     Object::Reset();
 }
 
+bool TimestampAligner::IsSupportedChild(Object *child)
+{
+    assert(dynamic_cast<TimestampAttr *>(child));
+    return true;
+}
+
 TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 {
     int i;
@@ -899,9 +909,8 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     // nothing found
     timestampAttr = new TimestampAttr();
     timestampAttr->SetDrawingPos(time);
-    timestampAttr->SetParent(this);
     if (idx == -1) {
-        children.push_back(timestampAttr);
+        AddChild(timestampAttr);
     }
     else {
         InsertChild(timestampAttr, idx);

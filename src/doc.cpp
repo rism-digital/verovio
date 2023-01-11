@@ -1204,7 +1204,6 @@ void Doc::DeactiveateSelection()
     if (selectionScore->GetLabel() != "[selectionScore]") LogError("Deleting wrong score element. Something is wrong");
     selectionPage->DeleteChild(selectionScore);
 
-    m_selectionPreceding->SetParent(pages);
     pages->InsertChild(m_selectionPreceding, 0);
     pages->AddChild(m_selectionFollowing);
 
@@ -1228,7 +1227,6 @@ void Doc::ReactivateSelection(bool resetAligners)
     *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
     // Use the drawing values as actual scoreDef
     selectionScore->GetScoreDef()->ResetFromDrawingValues();
-    selectionScore->SetParent(selectionPage);
     selectionPage->InsertChild(selectionScore, 0);
 
     m_selectionPreceding = vrv_cast<Page *>(pages->GetChild(0));

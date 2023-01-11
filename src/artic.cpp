@@ -115,7 +115,6 @@ void Artic::SplitMultival(Object *parent)
         artic->AttEnclosingChars::operator=(*this);
         artic->AttExtSym::operator=(*this);
         artic->AttPlacementRelEvent::operator=(*this);
-        artic->SetParent(parent);
         parent->InsertChild(artic, idx);
         idx++;
     }

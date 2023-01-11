@@ -291,13 +291,12 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
     int i;
     for (i = 0; i < (int)sourceParent->m_children.size(); ++i) {
         Object *child = sourceParent->Relinquish(i);
-        child->SetParent(this);
         if (idx != -1) {
             this->InsertChild(child, idx);
             idx++;
         }
         else {
-            m_children.push_back(child);
+            AddChild(child);
         }
     }
 }
@@ -320,7 +319,6 @@ void Object::InsertBefore(Object *child, Object *newChild)
     assert(this->GetChildIndex(newChild) == -1);
 
     int idx = this->GetChildIndex(child);
-    newChild->SetParent(this);
     this->InsertChild(newChild, idx);
 
     this->Modify();
@@ -332,7 +330,6 @@ void Object::InsertAfter(Object *child, Object *newChild)
     assert(this->GetChildIndex(newChild) == -1);
 
     int idx = this->GetChildIndex(child);
-    newChild->SetParent(this);
     this->InsertChild(newChild, idx + 1);
 
     this->Modify();
@@ -524,8 +521,9 @@ int Object::GetIdx() const
 
 void Object::InsertChild(Object *element, int idx)
 {
-    // With this method we require the parent to be set before
-    assert(element->GetParent() == this);
+    // With this method we require the parent to be NULL
+    assert(!element->GetParent());
+    element->SetParent(this);
 
     if (idx >= (int)m_children.size()) {
         m_children.push_back(element);
