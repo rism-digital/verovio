@@ -710,8 +710,7 @@ void View::DrawOctave(
         return;
     }
 
-    data_OCTAVE_DIS dis = octave->GetDis();
-    data_STAFFREL_basic disPlace = octave->GetDisPlace();
+    const data_STAFFREL_basic disPlace = octave->GetDisPlace();
 
     int y1 = octave->GetDrawingY();
     int y2 = y1;
@@ -738,43 +737,7 @@ void View::DrawOctave(
         dc->StartGraphic(octave, "", octave->GetID(), SPANNING);
 
     const bool altSymbols = m_doc->GetOptions()->m_octaveAlternativeSymbols.GetValue();
-    int code = SMUFL_E511_ottavaAlta;
-    if (disPlace == STAFFREL_basic_above) {
-        switch (dis) {
-            // here we could use other glyphs depending on the style
-            case OCTAVE_DIS_8: {
-                code = altSymbols ? SMUFL_E511_ottavaAlta : SMUFL_E510_ottava;
-                break;
-            }
-            case OCTAVE_DIS_15: {
-                code = altSymbols ? SMUFL_E515_quindicesimaAlta : SMUFL_E514_quindicesima;
-                break;
-            }
-            case OCTAVE_DIS_22: {
-                code = altSymbols ? SMUFL_E518_ventiduesimaAlta : SMUFL_E517_ventiduesima;
-                break;
-            }
-            default: break;
-        }
-    }
-    else {
-        switch (dis) {
-            // ditto
-            case OCTAVE_DIS_8: {
-                code = altSymbols ? SMUFL_E51C_ottavaBassaVb : SMUFL_E510_ottava;
-                break;
-            }
-            case OCTAVE_DIS_15: {
-                code = altSymbols ? SMUFL_E51D_quindicesimaBassaMb : SMUFL_E514_quindicesima;
-                break;
-            }
-            case OCTAVE_DIS_22: {
-                code = altSymbols ? SMUFL_E51E_ventiduesimaBassaMb : SMUFL_E517_ventiduesima;
-                break;
-            }
-            default: break;
-        }
-    }
+    const char32_t code = octave->GetOctaveGlyph(altSymbols);
     std::u32string str;
     str.push_back(code);
 
@@ -787,30 +750,7 @@ void View::DrawOctave(
     dc->ResetFont();
 
     if (octave->GetExtender() != BOOLEAN_false) {
-        int lineWidth
-            = m_doc->GetOptions()->m_octaveLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        if (octave->HasLwidth()) {
-            if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
-                if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
-                    lineWidth *= LINEWIDTHTERM_factor_narrow;
-                }
-                else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
-                    lineWidth *= LINEWIDTHTERM_factor_medium;
-                }
-                else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
-                    lineWidth *= LINEWIDTHTERM_factor_wide;
-                }
-            }
-            else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementunsigned) {
-                if (octave->GetLwidth().GetMeasurementunsigned().GetType() == MEASUREMENTTYPE_px) {
-                    lineWidth = octave->GetLwidth().GetMeasurementunsigned().GetPx();
-                }
-                else {
-                    lineWidth = octave->GetLwidth().GetMeasurementunsigned().GetVu()
-                        * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-                }
-            }
-        }
+        const int lineWidth = octave->GetLineWidth(m_doc, m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
         // adjust is to avoid the figure to touch the line
         x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
@@ -839,6 +779,7 @@ void View::DrawOctave(
         }
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1 + lineShift), ToDeviceContextX(x2),
             ToDeviceContextY(y1 + lineShift));
+        octave->SetDrawingExtenderX(x1, x2);
 
         if (octave->GetLendsym() != LINESTARTENDSYMBOL_none) {
             x2 += lineWidth / 2;

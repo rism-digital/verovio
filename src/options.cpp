@@ -1602,6 +1602,10 @@ Options::Options()
     m_bottomMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
 
+    m_bottomMarginOctave.SetInfo("Bottom margin octave", "The margin for octave in MEI units");
+    m_bottomMarginOctave.Init(1.0, 0.0, 10.0);
+    this->Register(&m_bottomMarginOctave, "bottomMarginOctave", &m_elementMargins);
+
     m_bottomMarginPgHead.SetInfo("Bottom margin header", "The margin for header in MEI units");
     m_bottomMarginPgHead.Init(2.0, 0.0, 24.0);
     this->Register(&m_bottomMarginPgHead, "bottomMarginHeader", &m_elementMargins);

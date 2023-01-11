@@ -1870,6 +1870,7 @@ double Doc::GetBottomMargin(const ClassId classId) const
 {
     if (classId == ARTIC) return m_options->m_bottomMarginArtic.GetValue();
     if (classId == HARM) return m_options->m_bottomMarginHarm.GetValue();
+    if (classId == OCTAVE) return m_options->m_bottomMarginOctave.GetValue();
     return m_options->m_defaultBottomMargin.GetValue();
 }
 
