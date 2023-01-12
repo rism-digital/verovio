@@ -687,12 +687,7 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
     params->m_time = DUR_MAX * -1.0;
 
-    if (params->m_isFirstMeasure) {
-        params->m_scoreDefRole = SCOREDEF_SYSTEM;
-    }
-    else {
-        params->m_scoreDefRole = SCOREDEF_INTERMEDIATE;
-    }
+    params->m_scoreDefRole = (params->m_isFirstMeasure) ? SCOREDEF_SYSTEM : SCOREDEF_INTERMEDIATE;
 
     if (this->GetStaffDefClef()) {
         if (this->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {

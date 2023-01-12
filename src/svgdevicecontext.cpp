@@ -545,12 +545,7 @@ Point SvgDeviceContext::GetLogicalOrigin()
 pugi::xml_node SvgDeviceContext::AppendChild(std::string name)
 {
     pugi::xml_node g = m_currentNode.child("g");
-    if (g) {
-        return m_currentNode.insert_child_before(name.c_str(), g);
-    }
-    else {
-        return m_currentNode.append_child(name.c_str());
-    }
+    return (g) ? m_currentNode.insert_child_before(name.c_str(), g) : m_currentNode.append_child(name.c_str());
 }
 
 void SvgDeviceContext::AppendStrokeLineCap(pugi::xml_node node, const Pen &pen)
@@ -708,22 +703,10 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     double theta1 = atan2(ys - yc, xs - xc);
     double theta2 = atan2(ye - yc, xe - xc);
 
-    int fArc;
     // flag for large or small arc 0 means less than 180 degrees
-    if ((theta2 - theta1) > 0) {
-        fArc = 1;
-    }
-    else {
-        fArc = 0;
-    }
+    int fArc = ((theta2 - theta1) > 0) ? 1 : 0;
 
-    int fSweep;
-    if (fabs(theta2 - theta1) > M_PI) {
-        fSweep = 1;
-    }
-    else {
-        fSweep = 0;
-    }
+    int fSweep = (fabs(theta2 - theta1) > M_PI) ? 1 : 0;
 
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat(

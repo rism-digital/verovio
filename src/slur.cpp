@@ -1531,12 +1531,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
                 else {
                     // Primary endpoint on the side, move it right
                     x1 += unit * 2;
-                    if (startChord) {
-                        y1 = yChordMax + unit * 3;
-                    }
-                    else {
-                        y1 = start->GetDrawingY() + unit * 3;
-                    }
+                    y1 = (startChord) ? (yChordMax + unit * 3) : (start->GetDrawingY() + unit * 3);
                 }
             }
         }

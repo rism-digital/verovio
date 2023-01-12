@@ -1445,12 +1445,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             // measure style
             pugi::xpath_node measureSlash = it->select_node("measure-style/slash");
             if (measureSlash) {
-                if (HasAttributeWithValue(measureSlash.node(), "type", "start")) {
-                    m_slash = true;
-                }
-                else {
-                    m_slash = false;
-                }
+                m_slash = (HasAttributeWithValue(measureSlash.node(), "type", "start")) ? true : false;
             }
         }
     }
@@ -1783,20 +1778,10 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     pugi::xpath_node measureRepeat = node.select_node("measure-style/measure-repeat");
     pugi::xpath_node measureSlash = node.select_node("measure-style/slash");
     if (measureRepeat) {
-        if (HasAttributeWithValue(measureRepeat.node(), "type", "start")) {
-            m_mRpt = true;
-        }
-        else {
-            m_mRpt = false;
-        }
+        m_mRpt = (HasAttributeWithValue(measureRepeat.node(), "type", "start")) ? true : false;
     }
     if (measureSlash) {
-        if (HasAttributeWithValue(measureSlash.node(), "type", "start")) {
-            m_slash = true;
-        }
-        else {
-            m_slash = false;
-        }
+        m_slash = (HasAttributeWithValue(measureSlash.node(), "type", "start")) ? true : false;
     }
 }
 

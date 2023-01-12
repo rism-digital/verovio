@@ -824,12 +824,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         // beaming starts
         else if (incipit[i] == '{') {
             // current_note.beam = 1;
-            if (current_note.tuplet_note > 0) {
-                current_note.beam = BEAM_TUPLET;
-            }
-            else {
-                current_note.beam = BEAM_INITIAL;
-            }
+            current_note.beam = (current_note.tuplet_note > 0) ? BEAM_TUPLET : BEAM_INITIAL;
             in_beam++;
         }
 

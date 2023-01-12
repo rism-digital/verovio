@@ -178,12 +178,7 @@ bool LayerElement::IsGraceNote() const
         const Note *note = vrv_cast<const Note *>(this);
         assert(note);
         const Chord *chord = note->IsChordTone();
-        if (chord) {
-            return chord->HasGrace();
-        }
-        else {
-            return (note->HasGrace());
-        }
+        return (chord) ? chord->HasGrace() : (note->HasGrace());
     }
     else if (this->Is(CHORD)) {
         const Chord *chord = vrv_cast<const Chord *>(this);
