@@ -2450,35 +2450,46 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, c
     assert(node);
     assert(measure);
 
-    if (!HasAttributeWithValue(node, "print-object", "no")) {
-        Harm *harm = new Harm();
-        Fb *fb = new Fb();
+    if (HasAttributeWithValue(node, "print-object", "no")) return;
 
-        const bool paren = node.attribute("parentheses").as_bool();
+    std::vector<F *> figures;
 
-        // std::string textColor = node.attribute("color").as_string();
-        // std::string textStyle = node.attribute("font-style").as_string();
-        // std::string textWeight = node.attribute("font-weight").as_string();
-        for (pugi::xml_node figure : node.children("figure")) {
-            std::string textStr;
-            if (paren) textStr.append("(");
-            textStr.append(ConvertFigureGlyph(figure.child("prefix").text().as_string()));
-            textStr.append(figure.child("figure-number").text().as_string());
-            textStr.append(ConvertFigureGlyph(figure.child("suffix").text().as_string()));
-            if (paren) textStr.append(")");
-            F *f = new F();
-            if (figure.child("extend")) f->SetExtender(BOOLEAN_true);
-            Text *text = new Text();
-            text->SetText(UTF8to32(textStr));
-            f->AddChild(text);
-            fb->AddChild(f);
+    const bool paren = node.attribute("parentheses").as_bool();
+
+    // std::string textColor = node.attribute("color").as_string();
+    // std::string textStyle = node.attribute("font-style").as_string();
+    // std::string textWeight = node.attribute("font-weight").as_string();
+    for (pugi::xml_node figure : node.children("figure")) {
+        std::string textStr;
+        if (paren) textStr.append("(");
+        textStr.append(ConvertFigureGlyph(figure.child("prefix").text().as_string()));
+        textStr.append(figure.child("figure-number").text().as_string());
+        textStr.append(ConvertFigureGlyph(figure.child("suffix").text().as_string()));
+        if (paren) textStr.append(")");
+        if (textStr.empty()) continue;
+        F *f = new F();
+        pugi::xml_node extend = figure.child("extend");
+        if (extend && !HasAttributeWithValue(extend, "type", "stop")) {
+            f->SetExtender(BOOLEAN_true);
         }
-        harm->AddChild(fb);
-        harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
-        m_durFb += node.child("duration").text().as_int();
-        m_controlElements.push_back({ measureNum, harm });
-        m_harmStack.push_back(harm);
+        Text *text = new Text();
+        text->SetText(UTF8to32(textStr));
+        f->AddChild(text);
+        figures.push_back(f);
     }
+    if (figures.empty()) return;
+
+    Harm *harm = new Harm();
+    Fb *fb = new Fb();
+    for (auto &fig : figures) {
+        fb->AddChild(fig);
+    }
+    harm->AddChild(fb);
+    harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+    m_durFb += node.child("duration").text().as_int();
+    m_controlElements.push_back({ measureNum, harm });
+    m_harmStack.push_back(harm);
+    figures.clear();
 }
 
 void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, const std::string &measureNum)
@@ -3546,36 +3557,39 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // add StartIDs to dir, dynam, and pedal
     if (!m_dirStack.empty()) {
-        for (auto iter = m_dirStack.begin(); iter != m_dirStack.end(); ++iter) {
-            if (!(*iter)->HasStaff())
-                (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        for (auto &dir : m_dirStack) {
+            if (!dir->HasStaff()) {
+                dir->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            }
         }
         m_dirStack.clear();
     }
     if (!m_dynamStack.empty()) {
-        for (auto iter = m_dynamStack.begin(); iter != m_dynamStack.end(); ++iter) {
-            if (!(*iter)->HasStaff())
-                (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        for (auto &dynam : m_dynamStack) {
+            if (!dynam->HasStaff()) {
+                dynam->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            }
         }
         m_dynamStack.clear();
     }
     if (!m_harmStack.empty()) {
-        for (auto iter = m_harmStack.begin(); iter != m_harmStack.end(); ++iter) {
-            (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        for (auto &harm : m_harmStack) {
+            harm->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_harmStack.clear();
     }
     if (!m_octaveStack.empty()) {
-        for (auto iter = m_octaveStack.begin(); iter != m_octaveStack.end(); ++iter) {
-            (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            (*iter)->SetStartid(m_ID);
+        for (auto &oct : m_octaveStack) {
+            oct->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            oct->SetStartid(m_ID);
         }
         m_octaveStack.clear();
     }
     if (!m_pedalStack.empty()) {
-        for (auto iter = m_pedalStack.begin(); iter != m_pedalStack.end(); ++iter) {
-            if (!(*iter)->HasStaff())
-                (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        for (auto &ped : m_pedalStack) {
+            if (!ped->HasStaff()) {
+                ped->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            }
         }
         m_pedalStack.clear();
     }
