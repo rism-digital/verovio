@@ -127,15 +127,6 @@ int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Section::PrepareMilestones(FunctorParams *functorParams)
-{
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Section::ResetData(FunctorParams *functorParams)
 {
     FloatingObject::ResetData(functorParams);

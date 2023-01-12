@@ -1352,28 +1352,6 @@ int Measure::PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareMilestones(FunctorParams *functorParams)
-{
-    PrepareMilestonesParams *params = vrv_params_cast<PrepareMilestonesParams *>(functorParams);
-    assert(params);
-
-    std::vector<SystemMilestoneInterface *>::iterator iter;
-    for (iter = params->m_startMilestones.begin(); iter != params->m_startMilestones.end(); ++iter) {
-        (*iter)->SetMeasure(this);
-    }
-    params->m_startMilestones.clear();
-
-    if (params->m_currentEnding) {
-        // Set the ending to each measure in between
-        m_drawingEnding = params->m_currentEnding;
-    }
-
-    // Keep a pointer to the measure for when we are reaching the end (see SystemMilestoneEnd::PrepareMilestones)
-    params->m_lastMeasure = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::PrepareFloatingGrps(FunctorParams *functorParams)
 {
     PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);

@@ -755,10 +755,9 @@ void Doc::PrepareData()
 
     /************ Resolve endings ************/
 
-    // Prepare the endings (pointers to the measure after and before the boundaries
-    PrepareMilestonesParams prepareEndingsParams;
-    Functor prepareEndings(&Object::PrepareMilestones);
-    this->Process(&prepareEndings, &prepareEndingsParams);
+    // Prepare the endings (pointers to the measure after and before the boundaries)
+    PrepareMilestonesFunctor prepareMilestones;
+    this->Process(prepareMilestones);
 
     /************ Resolve floating groups for vertical alignment ************/
 

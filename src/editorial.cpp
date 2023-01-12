@@ -191,15 +191,6 @@ int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int EditorialElement::PrepareMilestones(FunctorParams *functorParams)
-{
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int EditorialElement::ResetData(FunctorParams *functorParams)
 {
     if (this->IsSystemMilestone()) {

@@ -442,11 +442,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareMilestones
-     */
-    int PrepareMilestones(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitMIDI
      */
     int InitMIDI(FunctorParams *functorParams) override;
@@ -547,9 +542,8 @@ private:
     ScoreDef *m_drawingScoreDef;
 
     /**
-     * A pointer to the ending to which the measure belongs. Set by PrepareMilestones and passed to the System drawing
-     * list
-     * in DrawMeasure
+     * A pointer to the ending to which the measure belongs. Set by PrepareMilestonesFunctor
+     * and passed to the System drawing list in DrawMeasure
      */
     Ending *m_drawingEnding;
 

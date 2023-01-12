@@ -102,27 +102,6 @@ FunctorCode SystemMilestoneEnd::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSystemMilestoneEnd(this);
 }
 
-int SystemMilestoneEnd::PrepareMilestones(FunctorParams *functorParams)
-{
-    PrepareMilestonesParams *params = vrv_params_cast<PrepareMilestonesParams *>(functorParams);
-    assert(params);
-
-    // We set its pointer to the last measure we have encountered - this can be NULL in case no measure exists before
-    // the end milestone
-    // This can happen with a editorial container around a scoreDef at the beginning
-    this->SetMeasure(params->m_lastMeasure);
-
-    // Endings are also set as Measure::m_drawingEnding for all measures in between - when we reach the end milestone of
-    // an ending, we need to set the m_currentEnding to NULL
-    if (params->m_currentEnding && this->GetStart()->Is(ENDING)) {
-        params->m_currentEnding = NULL;
-        // With ending we need the drawing measure - this will crash with en empty ending at the beginning of a score...
-        assert(m_drawingMeasure);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int SystemMilestoneEnd::ResetData(FunctorParams *functorParams)
 {
     FloatingObject::ResetData(functorParams);
@@ -199,19 +178,6 @@ FunctorCode SystemMilestoneInterface::InterfacePrepareMilestones(PrepareMileston
     assert(m_end);
 
     functor.InsertStartMilestone(this);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int SystemMilestoneInterface::InterfacePrepareMilestones(FunctorParams *functorParams)
-{
-    PrepareMilestonesParams *params = vrv_params_cast<PrepareMilestonesParams *>(functorParams);
-    assert(params);
-
-    // We have to be in a milestone start element
-    assert(m_end);
-
-    params->m_startMilestones.push_back(this);
 
     return FUNCTOR_CONTINUE;
 }

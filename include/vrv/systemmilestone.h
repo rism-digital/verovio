@@ -65,11 +65,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareMilestones
-     */
-    int PrepareMilestones(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ResetData
      */
     int ResetData(FunctorParams *functorParams) override;
@@ -154,12 +149,6 @@ public:
     ///@{
     FunctorCode InterfacePrepareMilestones(PrepareMilestonesFunctor &functor);
     ///@}
-
-    /**
-     * See Object::PrepareMilestones
-     * Called from Ending::PrepareMilestones and EditorialElement::PrepareMilestones
-     */
-    virtual int InterfacePrepareMilestones(FunctorParams *functorParams);
 
     /**
      * Reset the drawing values before calling PrepareData after changes.

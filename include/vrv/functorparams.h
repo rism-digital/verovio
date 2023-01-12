@@ -1825,27 +1825,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareMilestonesParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the last measure
- * member 1: the current milestone
- **/
-
-class PrepareMilestonesParams : public FunctorParams {
-public:
-    PrepareMilestonesParams()
-    {
-        m_lastMeasure = NULL;
-        m_currentEnding = NULL;
-    }
-    Measure *m_lastMeasure;
-    Ending *m_currentEnding;
-    std::vector<SystemMilestoneInterface *> m_startMilestones;
-};
-
-//----------------------------------------------------------------------------
 // PrepareStaffCurrentTimeSpanningParams
 //----------------------------------------------------------------------------
 

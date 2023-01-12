@@ -117,21 +117,6 @@ int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Ending::PrepareMilestones(FunctorParams *functorParams)
-{
-    PrepareMilestonesParams *params = vrv_params_cast<PrepareMilestonesParams *>(functorParams);
-    assert(params);
-
-    // Endings should always have an SystemMilestoneEnd
-    assert(this->IsSystemMilestone());
-
-    this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
-
-    params->m_currentEnding = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Ending::ResetData(FunctorParams *functorParams)
 {
     FloatingObject::ResetData(functorParams);

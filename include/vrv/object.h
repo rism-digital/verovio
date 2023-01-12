@@ -1091,11 +1091,6 @@ public:
     ///@{
 
     /**
-     * Functor for setting Measure of Ending
-     */
-    virtual int PrepareMilestones(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Functor for grouping FloatingObject by drawingGrpId.
      * Also chains the Dynam and Hairpin
      */
