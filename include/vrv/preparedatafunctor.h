@@ -13,6 +13,7 @@
 namespace vrv {
 
 class Facsimile;
+class SystemMilestoneInterface;
 class SymbolTable;
 
 //----------------------------------------------------------------------------
@@ -831,6 +832,62 @@ private:
     std::map<LayerElement *, Turn *> m_delayedTurns;
     // Indicates the current mode: fill vs process
     bool m_fillMode;
+};
+
+//----------------------------------------------------------------------------
+// PrepareMilestonesFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class sets the Measure of Ending.
+ */
+class PrepareMilestonesFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareMilestonesFunctor();
+    virtual ~PrepareMilestonesFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Getter and modifier for the interface list
+     */
+    ///@{
+    const std::vector<SystemMilestoneInterface *> &GetStartMilestones() const { return m_startMilestones; }
+    void InsertStartMilestone(SystemMilestoneInterface *interface);
+    ///@}
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
+    FunctorCode VisitEnding(Ending *ending) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitSection(Section *section) override;
+    FunctorCode VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The last measure
+    Measure *m_lastMeasure;
+    // The current ending
+    Ending *m_currentEnding;
+    // The list of start milestones
+    std::vector<SystemMilestoneInterface *> m_startMilestones;
 };
 
 } // namespace vrv

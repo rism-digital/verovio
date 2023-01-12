@@ -1373,4 +1373,44 @@ FunctorCode PrepareDelayedTurnsFunctor::VisitTurn(Turn *turn)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareMilestonesFunctor
+//----------------------------------------------------------------------------
+
+PrepareMilestonesFunctor::PrepareMilestonesFunctor()
+{
+    m_lastMeasure = NULL;
+    m_currentEnding = NULL;
+}
+
+void PrepareMilestonesFunctor::InsertStartMilestone(SystemMilestoneInterface *interface)
+{
+    m_startMilestones.push_back(interface);
+}
+
+FunctorCode PrepareMilestonesFunctor::VisitEditorialElement(EditorialElement *editorialElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareMilestonesFunctor::VisitEnding(Ending *ending)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareMilestonesFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareMilestonesFunctor::VisitSection(Section *section)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareMilestonesFunctor::VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
