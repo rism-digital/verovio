@@ -15,6 +15,7 @@
 
 #include "doc.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "page.h"
 #include "pages.h"
@@ -47,6 +48,26 @@ void Pb::Reset()
 //----------------------------------------------------------------------------
 // Pb functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Pb::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPb(this);
+}
+
+FunctorCode Pb::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPb(this);
+}
+
+FunctorCode Pb::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPbEnd(this);
+}
+
+FunctorCode Pb::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPbEnd(this);
+}
 
 int Pb::CastOffEncoding(FunctorParams *functorParams)
 {

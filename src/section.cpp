@@ -16,6 +16,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "page.h"
@@ -73,6 +74,26 @@ bool Section::IsSupportedChild(Object *child)
 //----------------------------------------------------------------------------
 // Section functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Section::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSection(this);
+}
+
+FunctorCode Section::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSection(this);
+}
+
+FunctorCode Section::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSectionEnd(this);
+}
+
+FunctorCode Section::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSectionEnd(this);
+}
 
 int Section::ConvertToPageBased(FunctorParams *functorParams)
 {
