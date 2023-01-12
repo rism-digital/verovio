@@ -521,8 +521,9 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
         ynum = y + m_doc->GetDrawingDoubleUnit(textSize);
         yden = y - m_doc->GetDrawingDoubleUnit(textSize);
     }
-    else
+    else {
         ynum = y;
+    }
 
     if (numBase > 9 || num > 9) {
         x += m_doc->GetDrawingUnit(textSize) * 2;

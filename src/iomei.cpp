@@ -3248,8 +3248,9 @@ std::u32string MEIOutput::EscapeSMuFL(std::u32string data)
             std::u32string smuflCode = UTF8to32(ss.str());
             buffer.append(U"&#x").append(smuflCode).append(U";");
         }
-        else
+        else {
             buffer.append(&data[pos], 1);
+        }
     }
     return buffer;
 }
@@ -7696,10 +7697,12 @@ bool MEIInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
     assert(dynamic_cast<EditorialElement *>(parent));
 
     if (level == EDITORIAL_TOPLEVEL) {
-        if (m_readingScoreBased)
+        if (m_readingScoreBased) {
             return this->ReadSectionChildren(parent, parentNode);
-        else
+        }
+        else {
             return this->ReadSystemChildren(parent, parentNode);
+        }
     }
     else if (level == EDITORIAL_SCOREDEF) {
         return this->ReadScoreDefChildren(parent, parentNode);

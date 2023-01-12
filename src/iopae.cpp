@@ -742,10 +742,12 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
     if (strlen(c_clef)) {
         Clef *c = new Clef;
         getClefInfo(c_clef, c); // do we need to put a default clef?
-        if (!staffDefClef)
+        if (!staffDefClef) {
             staffDefClef = c;
-        else
+        }
+        else {
             current_measure.clef = c;
+        }
     }
 
     if (strlen(c_keysig)) {
@@ -822,10 +824,12 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         // beaming starts
         else if (incipit[i] == '{') {
             // current_note.beam = 1;
-            if (current_note.tuplet_note > 0)
+            if (current_note.tuplet_note > 0) {
                 current_note.beam = BEAM_TUPLET;
-            else
+            }
+            else {
                 current_note.beam = BEAM_INITIAL;
+            }
             in_beam++;
         }
 

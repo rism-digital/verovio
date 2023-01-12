@@ -657,11 +657,12 @@ void View::DrawHairpin(
 
     /************** draw it **************/
 
-    if (graphic)
+    if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetID());
-    else
+    }
+    else {
         dc->StartGraphic(hairpin, "", hairpin->GetID(), SPANNING);
-    // dc->DeactivateGraphic();
+    }
 
     const double hairpinThickness
         = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_hairpinThickness.GetValue();
@@ -691,11 +692,12 @@ void View::DrawHairpin(
     }
     dc->ResetPen();
 
-    // dc->ReactivateGraphic();
-    if (graphic)
+    if (graphic) {
         dc->EndResumedGraphic(graphic, this);
-    else
+    }
+    else {
         dc->EndGraphic(hairpin, this);
+    }
 }
 
 void View::DrawOctave(
@@ -731,10 +733,12 @@ void View::DrawOctave(
 
     /************** draw it **************/
 
-    if (graphic)
+    if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetID());
-    else
+    }
+    else {
         dc->StartGraphic(octave, "", octave->GetID(), SPANNING);
+    }
 
     const bool altSymbols = m_doc->GetOptions()->m_octaveAlternativeSymbols.GetValue();
     const char32_t code = octave->GetOctaveGlyph(altSymbols);
@@ -791,10 +795,12 @@ void View::DrawOctave(
         }
     }
 
-    if (graphic)
+    if (graphic) {
         dc->EndResumedGraphic(graphic, this);
-    else
+    }
+    else {
         dc->EndGraphic(octave, this);
+    }
 }
 
 void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflection, int x1, int x2, Staff *staff,
@@ -915,10 +921,12 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         default: break;
     }
 
-    if (graphic)
+    if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetID());
-    else
+    }
+    else {
         dc->StartGraphic(tie, "", tie->GetID(), SPANNING);
+    }
 
     // set pen width and calculate tie thickness coefficient to adjust tie width in according to it
     const int thickness
@@ -928,10 +936,13 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     const double thicknessCoefficient = BoundingBox::GetBezierThicknessCoefficient(bezier, thickness, penWidth);
     this->DrawThickBezierCurve(
         dc, bezier, thicknessCoefficient * thickness, staff->m_drawingStaffSize, penWidth, penStyle);
-    if (graphic)
+
+    if (graphic) {
         dc->EndResumedGraphic(graphic, this);
-    else
+    }
+    else {
         dc->EndGraphic(tie, this);
+    }
 }
 
 void View::DrawPedalLine(
@@ -1030,18 +1041,22 @@ void View::DrawTrillExtension(
 
     /************** draw it **************/
 
-    if (graphic)
+    if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetID());
-    else
+    }
+    else {
         dc->StartGraphic(trill, "", trill->GetID(), SPANNING);
+    }
 
     this->DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, false, SMUFL_E59D_ornamentZigZagLineNoRightEnd, 0,
         SMUFL_E59E_ornamentZigZagLineWithRightEnd);
 
-    if (graphic)
+    if (graphic) {
         dc->EndResumedGraphic(graphic, this);
-    else
+    }
+    else {
         dc->EndGraphic(trill, this);
+    }
 }
 
 void View::DrawControlElementConnector(
@@ -1246,8 +1261,9 @@ void View::DrawSylConnector(
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetID());
     }
-    else
+    else {
         dc->StartGraphic(&sylConnector, "", syl->GetID(), SPANNING);
+    }
 
     dc->DeactivateGraphic();
 
@@ -1258,8 +1274,9 @@ void View::DrawSylConnector(
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
     }
-    else
+    else {
         dc->EndGraphic(&sylConnector, this);
+    }
 }
 
 void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff)
@@ -2793,10 +2810,12 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         spanningType = SPANNING_MIDDLE;
     }
 
-    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START))
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         dc->ResumeGraphic(ending, ending->GetID());
-    else
+    }
+    else {
         dc->StartGraphic(ending, "", ending->GetID(), SPANNING);
+    }
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList;
@@ -2890,10 +2909,12 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         dc->EndCustomGraphic();
     }
 
-    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START))
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         dc->EndResumedGraphic(ending, this);
-    else
+    }
+    else {
         dc->EndGraphic(ending, this);
+    }
 }
 
 void View::DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params, int staffSize)

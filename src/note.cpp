@@ -249,10 +249,12 @@ bool Note::IsClusterExtreme() const
 {
     ChordCluster *cluster = m_cluster;
     if (this == cluster->at(0)) return true;
-    if (this == cluster->at(cluster->size() - 1))
+    if (this == cluster->at(cluster->size() - 1)) {
         return true;
-    else
+    }
+    else {
         return false;
+    }
 }
 
 TabGrp *Note::IsTabGrpNote()

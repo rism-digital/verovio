@@ -578,8 +578,9 @@ void Object::ClearRelinquishedChildren()
         if ((*iter)->GetParent() != this) {
             iter = m_children.erase(iter);
         }
-        else
+        else {
             ++iter;
+        }
     }
 }
 

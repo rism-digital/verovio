@@ -259,8 +259,9 @@ char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) cons
             default: return 0;
         }
     }
-    else
+    else {
         return 0;
+    }
 }
 
 std::pair<char32_t, char32_t> Artic::GetEnclosingGlyphs() const

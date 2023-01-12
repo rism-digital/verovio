@@ -219,10 +219,12 @@ void Chord::FilterList(ListOfConstObjects &childList) const
     ListOfConstObjects::iterator iter = childList.begin();
 
     while (iter != childList.end()) {
-        if ((*iter)->Is(NOTE))
+        if ((*iter)->Is(NOTE)) {
             ++iter;
-        else
+        }
+        else {
             iter = childList.erase(iter);
+        }
     }
 
     childList.sort(DiatonicSort());
@@ -748,10 +750,13 @@ int Chord::CalcStem(FunctorParams *functorParams)
     this->SetDrawingStemDir(stemDir);
 
     // Position the stem to the bottom note when up
-    if (stemDir == STEMDIRECTION_up) stem->SetDrawingYRel(yMin - this->GetDrawingY());
+    if (stemDir == STEMDIRECTION_up) {
+        stem->SetDrawingYRel(yMin - this->GetDrawingY());
+    }
     // And to the top note when down
-    else
+    else {
         stem->SetDrawingYRel(yMax - this->GetDrawingY());
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -804,10 +809,12 @@ MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary) const
     MapOfNoteLocs noteLocs = this->CalcNoteLocations([](const Note *note) { return !note->HasDots(); });
     MapOfDotLocs dotLocs;
     for (const auto &mapEntry : noteLocs) {
-        if (useReverseOrder)
+        if (useReverseOrder) {
             dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.rbegin(), mapEntry.second.rend(), true);
-        else
+        }
+        else {
             dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.begin(), mapEntry.second.end(), false);
+        }
     }
     return dotLocs;
 }

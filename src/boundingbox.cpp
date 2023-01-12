@@ -605,13 +605,16 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
             leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetLeftBy(type)) + margin;
             rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetRightBy(type)) + margin;
             // The box is above the summit of the curve
-            if ((this->GetLeftBy(type) < (p1.x + xMaxY)) && (this->GetRightBy(type) > (p1.x + xMaxY)))
+            if ((this->GetLeftBy(type) < (p1.x + xMaxY)) && (this->GetRightBy(type) > (p1.x + xMaxY))) {
                 return (curve->GetTopBy(type) - this->GetBottomBy(type) + margin);
+            }
             // The content is on the left
-            if (this->GetRightBy(type) < (p1.x + xMaxY))
+            if (this->GetRightBy(type) < (p1.x + xMaxY)) {
                 return (rightY - this->GetBottomBy(type));
-            else
+            }
+            else {
                 return (leftY - this->GetBottomBy(type));
+            }
         }
         else {
             // The curve is already above the content
@@ -625,13 +628,16 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
             leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetLeftBy(type)) - margin;
             rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetRightBy(type)) - margin;
             // The box is above the summit of the curve
-            if ((this->GetLeftBy(type) < (p1.x + xMinY)) && (this->GetRightBy(type) > (p1.x + xMinY)))
+            if ((this->GetLeftBy(type) < (p1.x + xMinY)) && (this->GetRightBy(type) > (p1.x + xMinY))) {
                 return (curve->GetBottomBy(type) - this->GetTopBy(type) - margin);
+            }
             // The content is on the left
-            if (this->GetRightBy(type) < (p1.x + xMinY))
+            if (this->GetRightBy(type) < (p1.x + xMinY)) {
                 return (rightY - this->GetTopBy(type));
-            else
+            }
+            else {
                 return (leftY - this->GetTopBy(type));
+            }
         }
     }
     // The curve overflows on the left

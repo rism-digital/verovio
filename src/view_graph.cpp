@@ -192,10 +192,12 @@ void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width,
     Point p[4];
 
     dc->SetPen(m_currentColour, linewidth, AxSOLID);
-    if (fill)
+    if (fill) {
         dc->SetBrush(m_currentColour, AxSOLID);
-    else
+    }
+    else {
         dc->SetBrush(m_currentColour, AxTRANSPARENT);
+    }
 
     int dHeight = ToDeviceContextX(height);
     int dWidth = ToDeviceContextX(width);

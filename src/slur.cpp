@@ -1322,17 +1322,21 @@ float Slur::GetAdjustedSlurAngle(const Doc *doc, Point &p1, Point &p2, curvature
     if (fabs(slurAngle) > maxAngle) {
         int side = (p2.x - p1.x) * tan(maxAngle);
         if (p2.y > p1.y) {
-            if (curveDir == curvature_CURVEDIR_above)
+            if (curveDir == curvature_CURVEDIR_above) {
                 p1.y = p2.y - side;
-            else
+            }
+            else {
                 p2.y = p1.y + side;
+            }
             slurAngle = maxAngle;
         }
         else {
-            if (curveDir == curvature_CURVEDIR_above)
+            if (curveDir == curvature_CURVEDIR_above) {
                 p2.y = p1.y - side;
-            else
+            }
+            else {
                 p1.y = p2.y + side;
+            }
             slurAngle = -maxAngle;
         }
     }
@@ -1527,10 +1531,12 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
                 else {
                     // Primary endpoint on the side, move it right
                     x1 += unit * 2;
-                    if (startChord)
+                    if (startChord) {
                         y1 = yChordMax + unit * 3;
-                    else
+                    }
+                    else {
                         y1 = start->GetDrawingY() + unit * 3;
+                    }
                 }
             }
         }

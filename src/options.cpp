@@ -1878,8 +1878,9 @@ void Options::Sync()
         else if (m_engravingDefaults.HasValue({ pair.first })) {
             jsonValue = m_engravingDefaults.GetDblValue({ pair.first });
         }
-        else
+        else {
             continue;
+        }
 
         if (!pair.second->IsSet()) {
             pair.second->SetValueDbl(jsonValue * 2.0); // convert from staff spaces to MEI units

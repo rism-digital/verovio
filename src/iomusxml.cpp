@@ -504,10 +504,12 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
         Space *space = new Space();
         space->SetDur(space->AttDurationLog::StrToDuration(durStr));
         space->SetDurPpq(m_ppq * quarters);
-        if (m_elementStackMap.at(layer).empty())
+        if (m_elementStackMap.at(layer).empty()) {
             layer->AddChild(space);
-        else
+        }
+        else {
             m_elementStackMap.at(layer).back()->AddChild(space);
+        }
         m_layerTimes[layer].emplace(dur, space);
         dur -= m_ppq * quarters;
     }
@@ -1443,10 +1445,12 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             // measure style
             pugi::xpath_node measureSlash = it->select_node("measure-style/slash");
             if (measureSlash) {
-                if (HasAttributeWithValue(measureSlash.node(), "type", "start"))
+                if (HasAttributeWithValue(measureSlash.node(), "type", "start")) {
                     m_slash = true;
-                else
+                }
+                else {
                     m_slash = false;
+                }
             }
         }
     }
@@ -1779,16 +1783,20 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     pugi::xpath_node measureRepeat = node.select_node("measure-style/measure-repeat");
     pugi::xpath_node measureSlash = node.select_node("measure-style/slash");
     if (measureRepeat) {
-        if (HasAttributeWithValue(measureRepeat.node(), "type", "start"))
+        if (HasAttributeWithValue(measureRepeat.node(), "type", "start")) {
             m_mRpt = true;
-        else
+        }
+        else {
             m_mRpt = false;
+        }
     }
     if (measureSlash) {
-        if (HasAttributeWithValue(measureSlash.node(), "type", "start"))
+        if (HasAttributeWithValue(measureSlash.node(), "type", "start")) {
             m_slash = true;
-        else
+        }
+        else {
             m_slash = false;
+        }
     }
 }
 
@@ -1828,11 +1836,13 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
             measure->SetRight(barRendition);
             if (barStyle == "short" || barStyle == "tick") {
                 measure->SetBarLen(4);
-                if (barStyle == "short")
+                if (barStyle == "short") {
                     measure->SetBarPlace(2);
-                else
+                }
+                else {
                     // bar.place counts in note order (high values are vertically higher).
                     measure->SetBarPlace(6);
+                }
             }
         }
     }
@@ -2287,8 +2297,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 octave->SetDisPlace(STAFFREL_basic_below);
                 m_octDis[staffNum] *= -1;
             }
-            else
+            else {
                 octave->SetDisPlace(STAFFREL_basic_above);
+            }
             m_controlElements.push_back({ measureNum, octave });
             m_octaveStack.push_back(octave);
         }
@@ -3853,12 +3864,15 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
     if (key.child("fifths")) {
         short int fifths = key.child("fifths").text().as_int();
         std::string keySigStr;
-        if (fifths < 0)
+        if (fifths < 0) {
             keySigStr = StringFormat("%df", abs(fifths));
-        else if (fifths > 0)
+        }
+        else if (fifths > 0) {
             keySigStr = StringFormat("%ds", fifths);
-        else
+        }
+        else {
             keySigStr = "0";
+        }
         keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
 
         if (key.child("cancel")) {

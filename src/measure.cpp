@@ -792,18 +792,22 @@ int Measure::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 
 int Measure::Save(FunctorParams *functorParams)
 {
-    if (this->IsMeasuredMusic())
+    if (this->IsMeasuredMusic()) {
         return Object::Save(functorParams);
-    else
+    }
+    else {
         return FUNCTOR_CONTINUE;
+    }
 }
 
 int Measure::SaveEnd(FunctorParams *functorParams)
 {
-    if (this->IsMeasuredMusic())
+    if (this->IsMeasuredMusic()) {
         return Object::SaveEnd(functorParams);
-    else
+    }
+    else {
         return FUNCTOR_CONTINUE;
+    }
 }
 
 int Measure::ScoreDefUnsetCurrent(FunctorParams *functorParams)

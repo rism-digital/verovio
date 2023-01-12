@@ -167,11 +167,13 @@ int Syl::PrepareLyrics(FunctorParams *functorParams)
         }
         // The previous syl was a underscore -> the previous but one was the end
         else if (params->m_currentSyl->GetCon() == sylLog_CON_u) {
-            if (params->m_currentSyl->GetStart() == params->m_penultimateNoteOrChord)
+            if (params->m_currentSyl->GetStart() == params->m_penultimateNoteOrChord) {
                 LogWarning("Syllable with underline extender under one single note '%s'",
                     params->m_currentSyl->GetStart()->GetID().c_str());
-            else
+            }
+            else {
                 params->m_currentSyl->SetEnd(params->m_penultimateNoteOrChord);
+            }
         }
     }
 

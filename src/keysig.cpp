@@ -114,10 +114,12 @@ void KeySig::FilterList(ListOfConstObjects &childList) const
 {
     ListOfConstObjects::iterator iter = childList.begin();
     while (iter != childList.end()) {
-        if ((*iter)->Is(KEYACCID))
+        if ((*iter)->Is(KEYACCID)) {
             ++iter;
-        else
+        }
+        else {
             iter = childList.erase(iter);
+        }
     }
 }
 

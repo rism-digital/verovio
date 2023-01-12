@@ -178,10 +178,12 @@ bool LayerElement::IsGraceNote() const
         const Note *note = vrv_cast<const Note *>(this);
         assert(note);
         const Chord *chord = note->IsChordTone();
-        if (chord)
+        if (chord) {
             return chord->HasGrace();
-        else
+        }
+        else {
             return (note->HasGrace());
+        }
     }
     else if (this->Is(CHORD)) {
         const Chord *chord = vrv_cast<const Chord *>(this);
@@ -625,14 +627,18 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
         assert(chord);
         dur = chord->GetActualDur();
         isMensuralDur = chord->IsMensuralDur();
-        if (dur == DUR_BR)
+        if (dur == DUR_BR) {
             code = SMUFL_E0A1_noteheadDoubleWholeSquare;
-        else if (dur == DUR_1)
+        }
+        else if (dur == DUR_1) {
             code = SMUFL_E0A2_noteheadWhole;
-        else if (dur == DUR_2)
+        }
+        else if (dur == DUR_2) {
             code = SMUFL_E0A3_noteheadHalf;
-        else
+        }
+        else {
             code = SMUFL_E0A4_noteheadBlack;
+        }
     }
     else if (this->Is(REST)) {
         code = SMUFL_E0A4_noteheadBlack;
@@ -1409,10 +1415,12 @@ int LayerElement::CalcAlignmentPitchPos(FunctorParams *functorParams)
         // We should probably also avoid to add editorial accidentals to the accid space
         // However, since they are placed above by View::DrawNote it works without avoiding it
         if (note) {
-            if (note->HasGraceAlignment())
+            if (note->HasGraceAlignment()) {
                 note->GetGraceAlignment()->AddToAccidSpace(accid);
-            else
+            }
+            else {
                 m_alignment->AddToAccidSpace(accid);
+            }
         }
         else if (this->GetFirstAncestor(CUSTOS)) {
             m_alignment->AddToAccidSpace(
@@ -1627,10 +1635,12 @@ int LayerElement::CalcAlignmentPitchPos(FunctorParams *functorParams)
                 if (loc % 2 != 0) {
                     // if it's above the staff, offset downwards
                     // if below the staff, offset upwards
-                    if (loc > 4)
+                    if (loc > 4) {
                         loc--;
-                    else
+                    }
+                    else {
                         loc++;
+                    }
                 }
             }
 

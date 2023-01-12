@@ -558,8 +558,9 @@ void Tie::UpdateTiePositioning(const FloatingCurvePositioner *curve, Point bezie
             else if (oppositeOverlap) {
                 intersection = (oppositeOverlap / step) * step * 0.5;
             }
-            else
+            else {
                 continue;
+            }
 
             if (std::abs(intersection) > std::abs(adjust)) adjust = intersection;
         }

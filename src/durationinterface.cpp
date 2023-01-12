@@ -213,10 +213,12 @@ int DurationInterface::GetNoteOrChordDur(const LayerElement *element) const
         const Note *note = vrv_cast<const Note *>(element);
         assert(note);
         const Chord *chord = note->IsChordTone();
-        if (chord && !this->HasDur())
+        if (chord && !this->HasDur()) {
             return chord->GetActualDur();
-        else
+        }
+        else {
             return this->GetActualDur();
+        }
     }
     return this->GetActualDur();
 }
