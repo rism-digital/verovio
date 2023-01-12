@@ -159,6 +159,11 @@ private:
      */
     void ResetGraphicRotation();
 
+    /**
+     * Get the overlap due to pen width on the left/right
+     */
+    std::pair<int, int> GetPenWidthOverlap() const;
+
 public:
     //
 private:
