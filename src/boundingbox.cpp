@@ -609,7 +609,8 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
                 return (curve->GetTopBy(type) - this->GetBottomBy(type) + margin);
             }
             // The content is on the left
-            return (this->GetRightBy(type) < (p1.x + xMaxY)) ? (rightY - this->GetBottomBy(type)) : (leftY - this->GetBottomBy(type));
+            return (this->GetRightBy(type) < (p1.x + xMaxY)) ? (rightY - this->GetBottomBy(type))
+                                                             : (leftY - this->GetBottomBy(type));
         }
         else {
             // The curve is already above the content
@@ -627,7 +628,8 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
                 return (curve->GetBottomBy(type) - this->GetTopBy(type) - margin);
             }
             // The content is on the left
-            return (this->GetRightBy(type) < (p1.x + xMinY)) ? (rightY - this->GetTopBy(type)) : (leftY - this->GetTopBy(type));
+            return (this->GetRightBy(type) < (p1.x + xMinY)) ? (rightY - this->GetTopBy(type))
+                                                             : (leftY - this->GetTopBy(type));
         }
     }
     // The curve overflows on the left
