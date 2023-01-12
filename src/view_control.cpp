@@ -1171,7 +1171,7 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
         dc->ResumeGraphic(fb, fb->GetID());
     }
     else {
-        dc->StartGraphic(graphic, "", f->GetID(), SPANNING);
+        dc->StartGraphic(f, "", f->GetID(), SPANNING);
     }
 
     dc->DeactivateGraphic();
@@ -1187,7 +1187,7 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
         dc->EndResumedGraphic(fb, this);
     }
     else {
-        dc->EndGraphic(graphic, this);
+        dc->EndGraphic(f, this);
     }
 }
 
