@@ -15,6 +15,7 @@ namespace vrv {
 
 class Measure;
 class Object;
+class PrepareMilestonesFunctor;
 
 //----------------------------------------------------------------------------
 // SystemMilestoneEnd
@@ -146,6 +147,13 @@ public:
     //-----------------//
     // Pseudo functors //
     //-----------------//
+
+    /**
+     * We have functor code in the interface for avoiding code duplication in each implementation class.
+     */
+    ///@{
+    FunctorCode InterfacePrepareMilestones(PrepareMilestonesFunctor &functor);
+    ///@}
 
     /**
      * See Object::PrepareMilestones

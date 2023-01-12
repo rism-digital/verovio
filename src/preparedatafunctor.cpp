@@ -13,7 +13,9 @@
 #include "areaposinterface.h"
 #include "doc.h"
 #include "dot.h"
+#include "editorial.h"
 #include "elementpart.h"
+#include "ending.h"
 #include "f.h"
 #include "harm.h"
 #include "layer.h"
@@ -22,6 +24,7 @@
 #include "rest.h"
 #include "runningelement.h"
 #include "score.h"
+#include "section.h"
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
@@ -1390,26 +1393,68 @@ void PrepareMilestonesFunctor::InsertStartMilestone(SystemMilestoneInterface *in
 
 FunctorCode PrepareMilestonesFunctor::VisitEditorialElement(EditorialElement *editorialElement)
 {
+    if (editorialElement->IsSystemMilestone()) {
+        editorialElement->InterfacePrepareMilestones(*this);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareMilestonesFunctor::VisitEnding(Ending *ending)
 {
+    // Endings should always have an SystemMilestoneEnd
+    assert(ending->IsSystemMilestone());
+
+    ending->InterfacePrepareMilestones(*this);
+
+    m_currentEnding = ending;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareMilestonesFunctor::VisitMeasure(Measure *measure)
 {
+    std::vector<SystemMilestoneInterface *>::iterator iter;
+    for (iter = m_startMilestones.begin(); iter != m_startMilestones.end(); ++iter) {
+        (*iter)->SetMeasure(measure);
+    }
+    m_startMilestones.clear();
+
+    if (m_currentEnding) {
+        // Set the ending to each measure in between
+        measure->SetDrawingEnding(m_currentEnding);
+    }
+
+    // Keep a pointer to the measure for when we are reaching the end (see VisitSystemMilestone)
+    m_lastMeasure = measure;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareMilestonesFunctor::VisitSection(Section *section)
 {
+    if (section->IsSystemMilestone()) {
+        section->InterfacePrepareMilestones(*this);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareMilestonesFunctor::VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd)
 {
+    // We set its pointer to the last measure we have encountered - this can be NULL in case no measure exists before
+    // the end milestone
+    // This can happen with a editorial container around a scoreDef at the beginning
+    systemMilestoneEnd->SetMeasure(m_lastMeasure);
+
+    // Endings are also set as Measure::m_drawingEnding for all measures in between - when we reach the end milestone of
+    // an ending, we need to set the m_currentEnding to NULL
+    if (m_currentEnding && systemMilestoneEnd->GetStart()->Is(ENDING)) {
+        m_currentEnding = NULL;
+        // With ending we need the drawing measure - this will crash with en empty ending at the beginning of a score...
+        assert(systemMilestoneEnd->GetMeasure());
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

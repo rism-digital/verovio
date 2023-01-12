@@ -16,6 +16,7 @@
 #include "ending.h"
 #include "functor.h"
 #include "functorparams.h"
+#include "preparedatafunctor.h"
 #include "system.h"
 #include "vrv.h"
 
@@ -191,6 +192,16 @@ int SystemMilestoneEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
+
+FunctorCode SystemMilestoneInterface::InterfacePrepareMilestones(PrepareMilestonesFunctor &functor)
+{
+    // We have to be in a milestone start element
+    assert(m_end);
+
+    functor.InsertStartMilestone(this);
+
+    return FUNCTOR_CONTINUE;
+}
 
 int SystemMilestoneInterface::InterfacePrepareMilestones(FunctorParams *functorParams)
 {
