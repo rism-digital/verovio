@@ -1458,4 +1458,58 @@ FunctorCode PrepareMilestonesFunctor::VisitSystemMilestone(SystemMilestoneEnd *s
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareFloatingGrpsFunctor
+//----------------------------------------------------------------------------
+
+PrepareFloatingGrpsFunctor::PrepareFloatingGrpsFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_previousEnding = NULL;
+}
+
+FunctorCode PrepareFloatingGrpsFunctor::VisitDir(Dir *dir)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareFloatingGrpsFunctor::VisitDynam(Dynam *dynam)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareFloatingGrpsFunctor::VisitEnding(Ending *ending)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareFloatingGrpsFunctor::VisitHairpin(Hairpin *hairpin)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareFloatingGrpsFunctor::VisitHarm(Harm *harm)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareFloatingGrpsFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareFloatingGrpsFunctor::VisitMeasureEnd(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareFloatingGrpsFunctor::VisitPedal(Pedal *pedal)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareFloatingGrpsFunctor::VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

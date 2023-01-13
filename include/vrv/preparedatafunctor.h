@@ -890,6 +890,63 @@ private:
     std::vector<SystemMilestoneInterface *> m_startMilestones;
 };
 
+//----------------------------------------------------------------------------
+// PrepareFloatingGrpsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class groups FloatingObjects by drawingGrpId.
+ * Also chains the Dynam and Hairpin.
+ */
+class PrepareFloatingGrpsFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareFloatingGrpsFunctor(Doc *doc);
+    virtual ~PrepareFloatingGrpsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitDir(Dir *dir) override;
+    FunctorCode VisitDynam(Dynam *dynam) override;
+    FunctorCode VisitEnding(Ending *ending) override;
+    FunctorCode VisitHairpin(Hairpin *hairpin) override;
+    FunctorCode VisitHarm(Harm *harm) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
+    FunctorCode VisitPedal(Pedal *pedal) override;
+    FunctorCode VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The previous ending
+    Ending *m_previousEnding;
+    // The dynams in the current measure
+    std::vector<Dynam *> m_dynams;
+    // The current hairpins to be linked / grouped
+    std::vector<Hairpin *> m_hairpins;
+    // The map of existing harms (based on @n)
+    std::map<std::string, Harm *> m_harms;
+    // The current pedals to be linked / grouped
+    std::list<Pedal *> m_pedalLines;
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__
