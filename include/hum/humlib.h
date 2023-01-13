@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jan  9 10:19:01 PST 2023
+// Last Modified: Fri Jan 13 11:30:13 PST 2023
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -6613,7 +6613,7 @@ class Tool_deg : public HumTool {
 				int             getSubtokenCount         (void) const;
 
 				// output options:
-				static void     setShowTies              (bool state);
+				static void     setShowTies (bool state) { m_showTiesQ = state; }
 
 			protected:
 				std::string     generateDegDataToken     (void) const;
@@ -6665,7 +6665,7 @@ class Tool_deg : public HumTool {
 				ScaleDegree* m_prevRest = NULL;
 				ScaleDegree* m_nextRest = NULL;
 
-				// Rendering options:
+				// ScaleDegree rendering options:
 				static bool m_showTiesQ;
 		};
 
@@ -6689,9 +6689,13 @@ class Tool_deg : public HumTool {
 		void            initialize               (void);
 
 		void            prepareDegSpine          (vector<vector<ScaleDegree>>& degspine, HTp kernstart, HumdrumFile& infil);
-		void            printDegScore            (void);
+		void            printDegScore            (HumdrumFile& infile);
 		void            printDegScoreInterleavedWithInputScore(HumdrumFile& infile);
-		std::string     createOutputHumdrumLine(HumdrumFile& infile, std::vector<int> insertTracks, int lineIndex);
+		std::string     createOutputHumdrumLine  (HumdrumFile& infile, std::vector<int>& insertTracks, int lineIndex);
+      std::string     prepareMergerLine        (const std::string& input, std::vector<int>& tracks, std::vector<string>& tokens, bool inputMerger, bool outputMerger);
+		void            calculateManipulatorOutputForSpine(std::vector<std::string>& lineout, std::vector<std::string>& linein);
+		std::string     createRecipInterpretation(const std::string& starttok, int refLine);
+		std::string     createDegInterpretation(const string& degtok, int refLine, bool addPreSpine);
 
 	private:
 
@@ -6706,8 +6710,15 @@ class Tool_deg : public HumTool {
 		//    handled by Tool_deg::ScaleDegree class).
 		std::vector<std::vector<std::vector<ScaleDegree>>> m_degSpines;
 
-		bool m_degOnlyQ = false;  // used with -I option
-		bool m_degTiesQ = false;  // used with -t option
+		bool m_arrowQ          = false;   // used with --arrow option
+		bool m_degOnlyQ        = false;   // used with -I option
+		bool m_recipQ          = false;   // used with -r option
+		bool m_kernQ           = false;   // used with --kern option
+		bool m_degTiesQ        = false;   // used with -t option
+		bool m_forceKeyQ       = false;   // used with -K option
+
+		std::string m_defaultKey = "";    // used with -k option
+		std::string m_kernSuffix = "dR/"; // used with --kern option
 
 };
 
