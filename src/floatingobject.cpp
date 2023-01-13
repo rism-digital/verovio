@@ -376,6 +376,26 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel, bool force)
     }
 }
 
+int FloatingPositioner::GetAdmissibleHorizOverlapMargin(const BoundingBox *bbox, int unit) const
+{
+    const LayerElement *element = dynamic_cast<const LayerElement *>(bbox);
+    if (element) {
+        if ((this->GetObject()->Is(DYNAM)) && element->GetFirstAncestor(BEAM)) {
+            return 2 * unit;
+        }
+    }
+
+    if (bbox->Is(FLOATING_POSITIONER)) {
+        const FloatingPositioner *positioner = vrv_cast<const FloatingPositioner *>(bbox);
+        // Endings are allowed to slightly overlap
+        if (this->GetObject()->Is(ENDING) && positioner->GetObject()->Is(ENDING)) {
+            return -2 * unit;
+        }
+    }
+
+    return 0;
+}
+
 void FloatingPositioner::CalcDrawingYRel(
     Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox)
 {

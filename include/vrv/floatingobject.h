@@ -255,6 +255,12 @@ public:
     ///@}
 
     /**
+     * Return the horizontal margin for overlap with another element
+     * This can be negative, if elements are allowed to slightly overlap
+     */
+    int GetAdmissibleHorizOverlapMargin(const BoundingBox *bbox, int unit) const;
+
+    /**
      * Update the Y drawing relative position based on collision detection with the overlapping bounding box
      */
     void CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
