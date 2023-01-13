@@ -11,15 +11,19 @@
 
 #include "altsyminterface.h"
 #include "areaposinterface.h"
+#include "dir.h"
 #include "doc.h"
 #include "dot.h"
+#include "dynam.h"
 #include "editorial.h"
 #include "elementpart.h"
 #include "ending.h"
 #include "f.h"
+#include "hairpin.h"
 #include "harm.h"
 #include "layer.h"
 #include "mrpt.h"
+#include "pedal.h"
 #include "plistinterface.h"
 #include "rest.h"
 #include "runningelement.h"
@@ -29,6 +33,7 @@
 #include "stem.h"
 #include "syl.h"
 #include "symboltable.h"
+#include "system.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
 #include "timestamp.h"
@@ -1469,46 +1474,192 @@ PrepareFloatingGrpsFunctor::PrepareFloatingGrpsFunctor(Doc *doc) : DocFunctor(do
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitDir(Dir *dir)
 {
+    if (dir->HasVgrp()) {
+        dir->SetDrawingGrpId(-dir->GetVgrp());
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitDynam(Dynam *dynam)
 {
+    if (dynam->HasVgrp()) {
+        dynam->SetDrawingGrpId(-dynam->GetVgrp());
+    }
+
+    // Keep it for linking only if start is resolved
+    if (!dynam->GetStart()) return FUNCTOR_CONTINUE;
+
+    m_dynams.push_back(dynam);
+
+    for (auto hairpin : m_hairpins) {
+        if ((hairpin->GetEnd() == dynam->GetStart()) && (hairpin->GetStaff() == dynam->GetStaff())) {
+            if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitEnding(Ending *ending)
 {
+    if (m_previousEnding) {
+        // We need to group the previous and this ending - the previous one should have a grpId
+        if (m_previousEnding->GetDrawingGrpId() == 0) {
+            LogDebug("Something went wrong with the grouping of the endings");
+        }
+        ending->SetDrawingGrpId(m_previousEnding->GetDrawingGrpId());
+        // Also set the previous ending to NULL
+        // We need this because three or more endings might have to be grouped together
+        m_previousEnding = NULL;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitHairpin(Hairpin *hairpin)
 {
+    if (hairpin->HasVgrp()) {
+        hairpin->SetDrawingGrpId(-hairpin->GetVgrp());
+    }
+
+    // Only try to link them if start and end are resolved
+    if (!hairpin->GetStart() || !hairpin->GetEnd()) return FUNCTOR_CONTINUE;
+
+    for (auto dynam : m_dynams) {
+        if ((dynam->GetStart() == hairpin->GetStart()) && (dynam->GetStaff() == hairpin->GetStaff())) {
+            if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(dynam);
+        }
+        else if ((dynam->GetStart() == hairpin->GetEnd()) && (dynam->GetStaff() == hairpin->GetStaff())) {
+            if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
+        }
+    }
+
+    for (auto otherHairpin : m_hairpins) {
+        if ((otherHairpin->GetEnd() == hairpin->GetStart()) && (otherHairpin->GetStaff() == hairpin->GetStaff())) {
+            if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(otherHairpin);
+            if (!otherHairpin->GetRightLink()) otherHairpin->SetRightLink(hairpin);
+        }
+        if ((otherHairpin->GetStart() == hairpin->GetEnd()) && (otherHairpin->GetStaff() == hairpin->GetStaff())) {
+            if (!otherHairpin->GetLeftLink()) otherHairpin->SetLeftLink(hairpin);
+            if (!hairpin->GetRightLink()) hairpin->SetRightLink(otherHairpin);
+        }
+    }
+
+    m_hairpins.push_back(hairpin);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitHarm(Harm *harm)
 {
+    std::string n = harm->GetN();
+    // If there is no @n on harm we use the first @staff value as negative
+    // This will not work if @staff has more than one staff id, but this is probably not going to be used
+    if (n == "" && harm->HasStaff()) {
+        n = StringFormat("%d", harm->GetStaff().at(0) * -1);
+    }
+
+    for (auto &kv : m_harms) {
+        if (kv.first == n) {
+            harm->SetDrawingGrpId(kv.second->GetDrawingGrpId());
+            return FUNCTOR_CONTINUE;
+        }
+    }
+
+    // first harm@n, create a new group
+    harm->SetDrawingGrpObject(harm);
+    m_harms.insert({ n, harm });
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitMeasure(Measure *measure)
 {
+    if (m_previousEnding) {
+        // We have a measure in between endings and the previous one was group, just reset pointer to NULL
+        m_previousEnding = NULL;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitMeasureEnd(Measure *measure)
 {
+    m_dynams.clear();
+
+    std::vector<Hairpin *>::iterator iter = m_hairpins.begin();
+    while (iter != m_hairpins.end()) {
+        assert((*iter)->GetEnd());
+        Measure *measureEnd = dynamic_cast<Measure *>((*iter)->GetEnd()->GetFirstAncestor(MEASURE));
+        if (measureEnd == measure) {
+            iter = m_hairpins.erase(iter);
+        }
+        else {
+            ++iter;
+        }
+    }
+
+    // Match down and up pedal lines
+    using pedalIter = std::list<Pedal *>::iterator;
+    pedalIter pIter = m_pedalLines.begin();
+    while (pIter != m_pedalLines.end()) {
+        if ((*pIter)->GetDir() != pedalLog_DIR_down) {
+            ++pIter;
+            continue;
+        }
+        pedalIter up = std::find_if(m_pedalLines.begin(), m_pedalLines.end(), [&pIter](Pedal *pedal) {
+            return (((*pIter)->GetStaff() == pedal->GetStaff()) && (pedal->GetDir() != pedalLog_DIR_down));
+        });
+        if (up != m_pedalLines.end()) {
+            (*pIter)->SetEnd((*up)->GetStart());
+            if ((*up)->GetDir() == pedalLog_DIR_bounce) {
+                (*pIter)->EndsWithBounce(true);
+            }
+            m_pedalLines.erase(up);
+            pIter = m_pedalLines.erase(pIter);
+        }
+        else {
+            ++pIter;
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitPedal(Pedal *pedal)
 {
+    if (pedal->HasVgrp()) {
+        pedal->SetDrawingGrpId(-pedal->GetVgrp());
+    }
+
+    if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
+
+    System *system = vrv_cast<System *>(pedal->GetFirstAncestor(SYSTEM));
+    assert(system);
+    data_PEDALSTYLE form = pedal->GetPedalForm(m_doc, system);
+    if (form == PEDALSTYLE_line || form == PEDALSTYLE_pedline) {
+        m_pedalLines.push_back(pedal);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd)
 {
+    assert(systemMilestoneEnd->GetStart());
+
+    // We are reaching the end of an ending - store it and it will be grouped with the next one if there is
+    // no measure in between
+    if (systemMilestoneEnd->GetStart()->Is(ENDING)) {
+        m_previousEnding = vrv_cast<Ending *>(systemMilestoneEnd->GetStart());
+        assert(m_previousEnding);
+        // This is the end of the first ending - generate a grpId
+        if (m_previousEnding->GetDrawingGrpId() == 0) {
+            m_previousEnding->SetDrawingGrpObject(m_previousEnding);
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
