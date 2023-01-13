@@ -8665,6 +8665,13 @@ std::u32string HumdrumInput::convertFBNumber(const std::string &input, hum::HTp 
         output += '-';
     }
 
+    /*
+    if (input.find("^") != std::string::npos) {
+        // display plus sign for positive numbers if "^" signifier is present
+        output += '+';
+    }
+    */
+
     // accidental in front of number unless an "r" is present:
     if ((!slash) && (input.find("r") == std::string::npos) && (!reverse)) {
         std::u32string accid = getVisualFBAccidental(accidental);
