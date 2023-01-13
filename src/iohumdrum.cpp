@@ -8660,6 +8660,11 @@ std::u32string HumdrumInput::convertFBNumber(const std::string &input, hum::HTp 
         accidental = 0;
     }
 
+    if (input.find("~") != std::string::npos) {
+        // display minus sign for negative numbers if "~" signifier is present
+        output += '-';
+    }
+
     // accidental in front of number unless an "r" is present:
     if ((!slash) && (input.find("r") == std::string::npos) && (!reverse)) {
         std::u32string accid = getVisualFBAccidental(accidental);
