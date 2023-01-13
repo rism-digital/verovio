@@ -8660,8 +8660,8 @@ std::u32string HumdrumInput::convertFBNumber(const std::string &input, hum::HTp 
         accidental = 0;
     }
 
-    if (input.find("m") != std::string::npos) {
-        // display minus for negative numbers if "m" signifier is present
+    if (input.find("v") != std::string::npos) {
+        // display minus sign for negative numbers if "v" signifier is present
         output += '-';
     }
 
