@@ -24676,6 +24676,7 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
         duration /= 2;
         tstamp += duration;
         turn->SetTstamp(tstamp.getFloat());
+        turn->SetDelayed(BOOLEAN_true);
     }
     else if (!linked) {
         turn->SetTstamp(tstamp.getFloat());
