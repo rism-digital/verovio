@@ -1676,27 +1676,85 @@ void PrepareStaffCurrentTimeSpanningFunctor::InsertTimeSpanningElement(Object *e
 
 FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitF(F *f)
 {
-    return FUNCTOR_CONTINUE;
+    TimeSpanningInterface *interface = f->GetTimeSpanningInterface();
+    assert(interface);
+    return interface->InterfacePrepareStaffCurrentTimeSpanning(*this, f);
 }
 
 FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitFloatingObject(FloatingObject *floatingObject)
 {
+    // Pass it to the pseudo functor of the interface
+    if (floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimeSpanningInterface *interface = floatingObject->GetTimeSpanningInterface();
+        assert(interface);
+        interface->InterfacePrepareStaffCurrentTimeSpanning(*this, floatingObject);
+    }
+    if (floatingObject->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *interface = floatingObject->GetLinkingInterface();
+        assert(interface);
+        interface->InterfacePrepareStaffCurrentTimeSpanning(*this, floatingObject);
+    }
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
 {
+    ArrayOfObjects::iterator iter = m_timeSpanningElements.begin();
+    while (iter != m_timeSpanningElements.end()) {
+        Measure *endParent = NULL;
+        if ((*iter)->HasInterface(INTERFACE_TIME_SPANNING)) {
+            TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
+            assert(interface);
+            if (interface->GetEnd()) {
+                endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstAncestor(MEASURE));
+            }
+        }
+        if (!endParent && (*iter)->HasInterface(INTERFACE_LINKING)) {
+            LinkingInterface *interface = (*iter)->GetLinkingInterface();
+            assert(interface);
+            if (interface->GetNextLink()) {
+                // We should have one because we allow only control events (dir and dynam) to be linked as target
+                TimePointInterface *nextInterface = interface->GetNextLink()->GetTimePointInterface();
+                assert(nextInterface);
+                endParent = dynamic_cast<Measure *>(nextInterface->GetStart()->GetFirstAncestor(MEASURE));
+            }
+        }
+        assert(endParent);
+        // We have reached the end of the spanning - remove it from the list of running elements
+        if (endParent == measure) {
+            iter = m_timeSpanningElements.erase(iter);
+        }
+        else {
+            ++iter;
+        }
+    }
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitStaff(Staff *staff)
 {
+    ArrayOfObjects::iterator iter = m_timeSpanningElements.begin();
+    while (iter != m_timeSpanningElements.end()) {
+        TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
+        assert(interface);
+        Measure *currentMeasure = vrv_cast<Measure *>(staff->GetFirstAncestor(MEASURE));
+        assert(currentMeasure);
+        // We need to make sure we are in the next measure (and not just a staff below because of some cross staff
+        // notation
+        if ((interface->GetStartMeasure() != currentMeasure) && (interface->IsOnStaff(staff->GetN()))) {
+            m_timeSpanningElements.push_back(*iter);
+        }
+        ++iter;
+    }
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitSyl(Syl *syl)
 {
-    return FUNCTOR_CONTINUE;
+    // Pass it to the pseudo functor of the interface
+    TimeSpanningInterface *interface = syl->GetTimeSpanningInterface();
+    assert(interface);
+    return interface->InterfacePrepareStaffCurrentTimeSpanning(*this, syl);
 }
 
 } // namespace vrv

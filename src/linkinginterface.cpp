@@ -109,6 +109,31 @@ FunctorCode LinkingInterface::InterfacePrepareLinking(PrepareLinkingFunctor &fun
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(
+    PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object)
+{
+    // Only dir and dynam can be spanning with @next (extender)
+    if (!object->Is({ DIR, DYNAM })) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Only target control events are supported
+    if (!this->GetNextLink() || !this->GetNextLink()->IsControlElement()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // if @extender is available, the explicit "true" is required
+    if (object->HasAttClass(ATT_EXTENDER)) {
+        AttExtender *att = dynamic_cast<AttExtender *>(object);
+        assert(att);
+        if (att->GetExtender() != BOOLEAN_true) return FUNCTOR_CONTINUE;
+    }
+
+    functor.InsertTimeSpanningElement(object);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
 {
     PrepareStaffCurrentTimeSpanningParams *params

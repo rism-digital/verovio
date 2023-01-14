@@ -17,6 +17,7 @@ class Object;
 class FunctorParams;
 class LayerElement;
 class Measure;
+class PrepareStaffCurrentTimeSpanningFunctor;
 class PrepareTimePointingFunctor;
 class PrepareTimeSpanningFunctor;
 class PrepareTimestampsFunctor;
@@ -217,6 +218,8 @@ public:
     ///@{
     FunctorCode InterfacePrepareTimeSpanning(PrepareTimeSpanningFunctor &functor, Object *object);
     FunctorCode InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object) override;
+    FunctorCode InterfacePrepareStaffCurrentTimeSpanning(
+        PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object);
     ///@}
 
     /**

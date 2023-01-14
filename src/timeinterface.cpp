@@ -420,6 +420,15 @@ FunctorCode TimeSpanningInterface::InterfacePrepareTimestamps(PrepareTimestampsF
     return TimePointInterface::InterfacePrepareTimestamps(functor, object);
 }
 
+FunctorCode TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(
+    PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object)
+{
+    if (this->IsSpanningMeasures()) {
+        functor.InsertTimeSpanningElement(object);
+    }
+    return FUNCTOR_CONTINUE;
+}
+
 int TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
 {
     PrepareStaffCurrentTimeSpanningParams *params
