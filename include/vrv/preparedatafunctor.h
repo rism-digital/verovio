@@ -947,6 +947,60 @@ private:
     std::list<Pedal *> m_pedalLines;
 };
 
+//----------------------------------------------------------------------------
+// PrepareStaffCurrentTimeSpanningFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class goes through all the TimeSpanningInterface elements and sets them as running
+ * for each staff that is covered. At the end, it removes the TimeSpanningInterface element
+ * from the list when the last measure is reached.
+ */
+class PrepareStaffCurrentTimeSpanningFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareStaffCurrentTimeSpanningFunctor();
+    virtual ~PrepareStaffCurrentTimeSpanningFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Getter and modifier for the interface list
+     */
+    ///@{
+    const ArrayOfObjects &GetTimeSpanningElements() const { return m_timeSpanningElements; }
+    void InsertTimeSpanningElement(Object *element);
+    ///@}
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitF(F *f) override;
+    FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSyl(Syl *syl) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The currently running TimeSpanningInterface elements
+    ArrayOfObjects m_timeSpanningElements;
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__

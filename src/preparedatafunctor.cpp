@@ -1663,4 +1663,40 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitSystemMilestone(SystemMilestoneEnd 
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// PrepareStaffCurrentTimeSpanningFunctor
+//----------------------------------------------------------------------------
+
+PrepareStaffCurrentTimeSpanningFunctor::PrepareStaffCurrentTimeSpanningFunctor() {}
+
+void PrepareStaffCurrentTimeSpanningFunctor::InsertTimeSpanningElement(Object *element)
+{
+    m_timeSpanningElements.push_back(element);
+}
+
+FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitF(F *f)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitFloatingObject(FloatingObject *floatingObject)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitStaff(Staff *staff)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitSyl(Syl *syl)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
