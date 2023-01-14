@@ -101,13 +101,4 @@ FunctorCode Dir::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitDirEnd(this);
 }
 
-int Dir::PrepareFloatingGrps(FunctorParams *)
-{
-    if (this->HasVgrp()) {
-        this->SetDrawingGrpId(-this->GetVgrp());
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

@@ -75,11 +75,6 @@ public:
     int CastOffSystems(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareFloatingGrps
-     */
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CastOffToSelection
      */
     int CastOffToSelection(FunctorParams *) override;

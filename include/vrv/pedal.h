@@ -94,11 +94,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareFloatingGrps
-     */
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
-
-    /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;

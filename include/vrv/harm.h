@@ -90,11 +90,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareFloatingGrps
-     */
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustHarmGrpsSpacing
      */
     int AdjustHarmGrpsSpacing(FunctorParams *functorParams) override;

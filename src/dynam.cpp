@@ -284,27 +284,4 @@ FunctorCode Dynam::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitDynamEnd(this);
 }
 
-int Dynam::PrepareFloatingGrps(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    if (this->HasVgrp()) {
-        this->SetDrawingGrpId(-this->GetVgrp());
-    }
-
-    // Keep it for linking only if start is resolved
-    if (!this->GetStart()) return FUNCTOR_CONTINUE;
-
-    params->m_dynams.push_back(this);
-
-    for (auto &hairpin : params->m_hairpins) {
-        if ((hairpin->GetEnd() == this->GetStart()) && (hairpin->GetStaff() == this->GetStaff())) {
-            if (!hairpin->GetRightLink()) hairpin->SetRightLink(this);
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

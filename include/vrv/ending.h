@@ -81,11 +81,6 @@ public:
      */
     int CastOffEncoding(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::PrepareFloatingGrps
-     */
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
-
 private:
     //
 public:

@@ -1781,34 +1781,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareFloatingGrpsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the previous ending
- * member 1: the current grpId
- * member 2: the dynam in the current measure
- * member 3: the current hairpins to be linked / grouped
- * member 4: the map of existing harms (based on @n)
- * member 5: a pointer to the doc scoreDef
- **/
-
-class PrepareFloatingGrpsParams : public FunctorParams {
-public:
-    PrepareFloatingGrpsParams(Doc *doc)
-    {
-        m_previousEnding = NULL;
-        m_doc = doc;
-    }
-    Ending *m_previousEnding;
-    std::list<Pedal *> m_pedalLines;
-    std::vector<Dynam *> m_dynams;
-    std::vector<Hairpin *> m_hairpins;
-    std::map<std::string, Harm *> m_harms;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // InitMIDIParams
 //----------------------------------------------------------------------------
 

@@ -103,11 +103,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareFloatingGrps
-     */
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ResetData
      */
     int ResetData(FunctorParams *functorParams) override;

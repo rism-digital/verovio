@@ -1352,68 +1352,6 @@ int Measure::PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareFloatingGrps(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    if (params->m_previousEnding) {
-        // We have a measure in between endings and the previous one was group, just reset pointer to NULL
-        params->m_previousEnding = NULL;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    params->m_dynams.clear();
-
-    std::vector<Hairpin *>::iterator iter = params->m_hairpins.begin();
-    while (iter != params->m_hairpins.end()) {
-        assert((*iter)->GetEnd());
-        Measure *measureEnd = dynamic_cast<Measure *>((*iter)->GetEnd()->GetFirstAncestor(MEASURE));
-        if (measureEnd == this) {
-            iter = params->m_hairpins.erase(iter);
-        }
-        else {
-            ++iter;
-        }
-    }
-
-    // Match down and up pedal lines
-    using pedalIter = std::list<Pedal *>::iterator;
-    pedalIter pIter = params->m_pedalLines.begin();
-    while (pIter != params->m_pedalLines.end()) {
-        if ((*pIter)->GetDir() != pedalLog_DIR_down) {
-            ++pIter;
-            continue;
-        }
-        pedalIter up = std::find_if(params->m_pedalLines.begin(), params->m_pedalLines.end(), [&pIter](Pedal *pedal) {
-            if (((*pIter)->GetStaff() == pedal->GetStaff()) && (pedal->GetDir() != pedalLog_DIR_down)) {
-                return true;
-            }
-            return false;
-        });
-        if (up != params->m_pedalLines.end()) {
-            (*pIter)->SetEnd((*up)->GetStart());
-            if ((*up)->GetDir() == pedalLog_DIR_bounce) {
-                (*pIter)->EndsWithBounce(true);
-            }
-            params->m_pedalLines.erase(up);
-            pIter = params->m_pedalLines.erase(pIter);
-        }
-        else {
-            ++pIter;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::InitMIDI(FunctorParams *functorParams)
 {
     InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);

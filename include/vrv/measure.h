@@ -434,14 +434,6 @@ public:
     int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
 
     /**
-     * @name See Object::PrepareFloatingGrps
-     */
-    ///@{
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
-    int PrepareFloatingGrpsEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::InitMIDI
      */
     int InitMIDI(FunctorParams *functorParams) override;

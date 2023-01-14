@@ -147,27 +147,6 @@ int SystemMilestoneEnd::CastOffToSelection(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int SystemMilestoneEnd::PrepareFloatingGrps(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    assert(this->GetStart());
-
-    // We are reaching the end of an ending - put it to the param and it will be grouped with the next one if there is
-    // not measure in between
-    if (this->GetStart()->Is(ENDING)) {
-        params->m_previousEnding = vrv_cast<Ending *>(this->GetStart());
-        assert(params->m_previousEnding);
-        // This is the end of the first ending - generate a grpId
-        if (params->m_previousEnding->GetDrawingGrpId() == 0) {
-            params->m_previousEnding->SetDrawingGrpObject(params->m_previousEnding);
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------

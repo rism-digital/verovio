@@ -1091,17 +1091,6 @@ public:
     ///@{
 
     /**
-     * Functor for grouping FloatingObject by drawingGrpId.
-     * Also chains the Dynam and Hairpin
-     */
-    virtual int PrepareFloatingGrps(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::PrepareFloatingGrps
-     */
-    virtual int PrepareFloatingGrpsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Go through all the TimeSpanningInterface elements and set them a current to each staff
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
      * At the end, remove the TimeSpanningInterface element from the list when the last measure is reached.

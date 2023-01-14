@@ -159,25 +159,4 @@ int Pedal::GenerateMIDI(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    if (this->HasVgrp()) {
-        this->SetDrawingGrpId(-this->GetVgrp());
-    }
-
-    if (!this->HasDir()) return FUNCTOR_CONTINUE;
-
-    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
-    assert(system);
-    data_PEDALSTYLE form = this->GetPedalForm(params->m_doc, system);
-    if (form == PEDALSTYLE_line || form == PEDALSTYLE_pedline) {
-        params->m_pedalLines.push_back(this);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

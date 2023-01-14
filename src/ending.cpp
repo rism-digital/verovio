@@ -155,23 +155,4 @@ int Ending::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Ending::PrepareFloatingGrps(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    if (params->m_previousEnding) {
-        // We need to group the previous and this ending - the previous one should have a grpId
-        if (params->m_previousEnding->GetDrawingGrpId() == 0) {
-            LogDebug("Something went wrong with the grouping of the endings");
-        }
-        this->SetDrawingGrpId(params->m_previousEnding->GetDrawingGrpId());
-        // Also set the previous ending to NULL to the grpId is _not_ incremented at the next measure
-        // We need this because three or more endings might have to be grouped together
-        params->m_previousEnding = NULL;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv
