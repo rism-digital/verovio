@@ -24574,7 +24574,7 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
     }
 
     if (chartable['T'] || chartable['t']) {
-        addTrill(token);
+        addTrill(object, token);
     }
     if (chartable[';']) {
         addFermata(token, object);
@@ -24665,24 +24665,27 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     setStaff(turn, staff);
 
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-    if (delayedQ) {
-        hum::HumNum duration = token->getDuration();
-        // if (ss[staffindex].meter_bottom == 0) {
-        //    duration /= 2;
-        // } else {
-        duration *= ss[staffindex].meter_bottom;
-        // }
-        duration /= 4;
-        duration /= 2;
-        tstamp += duration;
-        turn->SetTstamp(tstamp.getFloat());
-        turn->SetDelayed(BOOLEAN_true);
-    }
-    else if (!linked) {
-        turn->SetTstamp(tstamp.getFloat());
+    if (linked) {
+        if (delayedQ) {
+            turn->SetDelayed(BOOLEAN_true);
+        }
+        turn->SetStartid("#" + linked->GetID());
     }
     else {
-        turn->SetStartid("#" + linked->GetID());
+        if (delayedQ) {
+            hum::HumNum duration = token->getDuration();
+            // if (ss[staffindex].meter_bottom == 0) {
+            //    duration /= 2;
+            // } else {
+            duration *= ss[staffindex].meter_bottom;
+            // }
+            duration /= 4;
+            duration /= 2;
+            tstamp += duration;
+
+            turn->SetDelayed(BOOLEAN_true);
+        }
+        turn->SetTstamp(tstamp.getFloat());
     }
 
     if (invertedQ) {
@@ -25032,7 +25035,7 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         if (mindex.size() == 1) {
             subtok = -1;
         }
-        mordent->SetStartid("#" + getLocationId("note", token, subtok));
+        mordent->SetStartid("#" + linked->GetID());
         setLocationId(mordent, token, subtok);
 
         if (lowerQ) {
@@ -25141,7 +25144,7 @@ int HumdrumInput::getNoteStaff(hum::HTp token, int homestaff)
 // HumdrumInput::addTrill -- Add trill for note.
 //
 
-void HumdrumInput::addTrill(hum::HTp token)
+void HumdrumInput::addTrill(Object *linked, hum::HTp token)
 {
     int subtok = 0;
     size_t tpos = std::string::npos;
@@ -25194,7 +25197,7 @@ void HumdrumInput::addTrill(hum::HTp token)
         setPlaceRelStaff(trill, "below", false);
     }
 
-    trill->SetStartid("#" + getLocationId("note", token, subtok));
+    trill->SetStartid("#" + linked->GetID());
     // Setting trill@tstamp:
     // hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
     // trill->SetTstamp(tstamp.getFloat());
