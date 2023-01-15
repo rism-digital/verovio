@@ -1040,6 +1040,46 @@ private:
     //
 };
 
+//----------------------------------------------------------------------------
+// PrepareBeamSpanElementsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class gets the list of referenced elements for the BeamSpan and marks referenced
+ * objects as contained in a BeamSpan.
+ */
+class PrepareBeamSpanElementsFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareBeamSpanElementsFunctor();
+    virtual ~PrepareBeamSpanElementsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitBeamSpan(BeamSpan *beamSpan) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__

@@ -1774,4 +1774,15 @@ FunctorCode PrepareRehPositionFunctor::VisitReh(Reh *reh)
     return FUNCTOR_SIBLINGS;
 }
 
+//----------------------------------------------------------------------------
+// PrepareBeamSpanElementsFunctor
+//----------------------------------------------------------------------------
+
+PrepareBeamSpanElementsFunctor::PrepareBeamSpanElementsFunctor() {}
+
+FunctorCode PrepareBeamSpanElementsFunctor::VisitBeamSpan(BeamSpan *beamSpan)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
