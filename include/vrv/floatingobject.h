@@ -131,11 +131,6 @@ public:
     int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareStaffCurrentTimeSpanning
-     */
-    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ResetData
      */
     int ResetData(FunctorParams *functorParams) override;

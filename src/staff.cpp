@@ -466,28 +466,6 @@ int Staff::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
-{
-    PrepareStaffCurrentTimeSpanningParams *params
-        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
-    assert(params);
-
-    std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
-    while (iter != params->m_timeSpanningElements.end()) {
-        TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
-        assert(interface);
-        Measure *currentMeasure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-        assert(currentMeasure);
-        // We need to make sure we are in the next measure (and not just a staff below because of some cross staff
-        // notation
-        if ((interface->GetStartMeasure() != currentMeasure) && (interface->IsOnStaff(this->GetN()))) {
-            m_timeSpanningElements.push_back(*iter);
-        }
-        ++iter;
-    }
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::CastOffEncoding(FunctorParams *functorParams)
 {
     // Staff alignments must be reset, otherwise they would dangle whenever they belong to a deleted system

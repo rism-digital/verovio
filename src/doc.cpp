@@ -721,16 +721,14 @@ void Doc::PrepareData()
 
     // Once <slur>, <ties> and @ties are matched but also syl connectors, we need to set them as running
     // TimeSpanningInterface to each staff they are extended. This does not need to be done staff by staff because we
-    // can just check the staff->GetN to see where we are (see Staff::PrepareStaffCurrentTimeSpanning)
-    PrepareStaffCurrentTimeSpanningParams fillStaffCurrentTimeSpanningParams;
-    Functor fillStaffCurrentTimeSpanning(&Object::PrepareStaffCurrentTimeSpanning);
-    Functor fillStaffCurrentTimeSpanningEnd(&Object::PrepareStaffCurrentTimeSpanningEnd);
-    this->Process(&fillStaffCurrentTimeSpanning, &fillStaffCurrentTimeSpanningParams, &fillStaffCurrentTimeSpanningEnd);
+    // can just check the staff->GetN to see where we are (see PrepareStaffCurrentTimeSpanningFunctor::VisitStaff)
+    PrepareStaffCurrentTimeSpanningFunctor prepareStaffCurrentTimeSpanning;
+    this->Process(prepareStaffCurrentTimeSpanning);
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
-    if (!fillStaffCurrentTimeSpanningParams.m_timeSpanningElements.empty()) {
+    if (!prepareStaffCurrentTimeSpanning.GetTimeSpanningElements().empty()) {
         LogDebug("%d time spanning elements could not be set as running",
-            fillStaffCurrentTimeSpanningParams.m_timeSpanningElements.size());
+            prepareStaffCurrentTimeSpanning.GetTimeSpanningElements().size());
     }
 
     /************ Resolve mRpt ************/

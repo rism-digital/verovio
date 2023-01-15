@@ -429,11 +429,6 @@ public:
     int ResetData(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareStaffCurrentTimeSpanningEnd
-     */
-    int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitMIDI
      */
     int InitMIDI(FunctorParams *functorParams) override;

@@ -1797,20 +1797,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareStaffCurrentTimeSpanningParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: std::vector< Object * >* of the current running TimeSpanningInterface elements
- **/
-
-class PrepareStaffCurrentTimeSpanningParams : public FunctorParams {
-public:
-    PrepareStaffCurrentTimeSpanningParams() {}
-    std::vector<Object *> m_timeSpanningElements;
-};
-
-//----------------------------------------------------------------------------
 // ReorderByXPosParams
 //----------------------------------------------------------------------------
 

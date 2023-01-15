@@ -162,12 +162,6 @@ FunctorCode Syl::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSylEnd(this);
 }
 
-int Syl::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
-}
-
 int Syl::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);

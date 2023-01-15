@@ -1314,44 +1314,6 @@ int Measure::CastOffToSelection(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
-{
-    PrepareStaffCurrentTimeSpanningParams *params
-        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
-    assert(params);
-
-    std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
-    while (iter != params->m_timeSpanningElements.end()) {
-        Measure *endParent = NULL;
-        if ((*iter)->HasInterface(INTERFACE_TIME_SPANNING)) {
-            TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
-            assert(interface);
-            if (interface->GetEnd()) {
-                endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstAncestor(MEASURE));
-            }
-        }
-        if (!endParent && (*iter)->HasInterface(INTERFACE_LINKING)) {
-            LinkingInterface *interface = (*iter)->GetLinkingInterface();
-            assert(interface);
-            if (interface->GetNextLink()) {
-                // We should have one because we allow only control Event (dir and dynam) to be linked as target
-                TimePointInterface *nextInterface = interface->GetNextLink()->GetTimePointInterface();
-                assert(nextInterface);
-                endParent = dynamic_cast<Measure *>(nextInterface->GetStart()->GetFirstAncestor(MEASURE));
-            }
-        }
-        assert(endParent);
-        // We have reached the end of the spanning - remove it from the list of running elements
-        if (endParent == this) {
-            iter = params->m_timeSpanningElements.erase(iter);
-        }
-        else {
-            ++iter;
-        }
-    }
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::InitMIDI(FunctorParams *functorParams)
 {
     InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);

@@ -134,34 +134,6 @@ FunctorCode LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(
     return FUNCTOR_CONTINUE;
 }
 
-int LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
-{
-    PrepareStaffCurrentTimeSpanningParams *params
-        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
-    assert(params);
-
-    // Only dir and dynam can be spanning with @next (extender)
-    if (!object->Is({ DIR, DYNAM })) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Only target control events are supported
-    if (!this->GetNextLink() || !this->GetNextLink()->IsControlElement()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // if @extender is available, the explicit "true" is required
-    if (object->HasAttClass(ATT_EXTENDER)) {
-        AttExtender *att = dynamic_cast<AttExtender *>(object);
-        assert(att);
-        if (att->GetExtender() != BOOLEAN_true) return FUNCTOR_CONTINUE;
-    }
-
-    params->m_timeSpanningElements.push_back(object);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LinkingInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_next = NULL;

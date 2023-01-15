@@ -81,13 +81,6 @@ FunctorCode F::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitFEnd(this);
 }
 
-int F::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
-{
-    TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-    assert(interface);
-    return interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
-}
-
 int F::ResetData(FunctorParams *functorParams)
 {
     TextElement::ResetData(functorParams);

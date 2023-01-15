@@ -1742,7 +1742,7 @@ FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitStaff(Staff *staff)
         // We need to make sure we are in the next measure (and not just a staff below because of some cross staff
         // notation
         if ((interface->GetStartMeasure() != currentMeasure) && (interface->IsOnStaff(staff->GetN()))) {
-            m_timeSpanningElements.push_back(*iter);
+            staff->m_timeSpanningElements.push_back(*iter);
         }
         ++iter;
     }

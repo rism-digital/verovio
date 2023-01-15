@@ -71,14 +71,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    // Because F is a TextElement and not a ControlElement, these methods need to be implemented because
-    // TextElement does not inherit from FloatingObject.
-
-    /**
-     * See Object::PrepareStaffCurrentTimeSpanning
-     */
-    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
-
     /**
      * See Object::ResetData
      */

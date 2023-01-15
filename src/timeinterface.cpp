@@ -429,18 +429,6 @@ FunctorCode TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
-{
-    PrepareStaffCurrentTimeSpanningParams *params
-        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
-    assert(params);
-
-    if (this->IsSpanningMeasures()) {
-        params->m_timeSpanningElements.push_back(object);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
 int TimeSpanningInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_end = NULL;

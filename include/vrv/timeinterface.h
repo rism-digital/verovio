@@ -223,11 +223,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareStaffCurrentTimeSpanning
-     */
-    virtual int InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
-
-    /**
      * See Object::ResetData
      */
     int InterfaceResetData(FunctorParams *functorParams, Object *object) override;

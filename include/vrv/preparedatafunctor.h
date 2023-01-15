@@ -952,8 +952,8 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class goes through all the TimeSpanningInterface elements and sets them as running
- * for each staff that is covered. At the end, it removes the TimeSpanningInterface element
+ * This class goes through all the TimeSpanningInterface elements and sets them for each staff
+ * that is covered. At the end, it removes the TimeSpanningInterface element
  * from the list when the last measure is reached.
  */
 class PrepareStaffCurrentTimeSpanningFunctor : public MutableFunctor {

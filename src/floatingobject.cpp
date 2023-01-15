@@ -863,22 +863,6 @@ int FloatingObject::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingObject::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
-    }
-    if (this->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = this->GetLinkingInterface();
-        assert(interface);
-        interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
 int FloatingObject::ResetData(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
