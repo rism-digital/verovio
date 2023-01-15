@@ -1107,10 +1107,10 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         else if (*current == "*Xacc") {
             degaccQ = false;
         }
-        else if (*current == "*arrow") {
+        else if (*current == "*arr") {
             arrowQ = true;
         }
-        else if (*current == "*Xarrow") {
+        else if (*current == "*Xarr") {
             arrowQ = false;
         }
         else if (*current == "*below") {
