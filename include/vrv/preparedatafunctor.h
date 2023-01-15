@@ -1001,6 +1001,45 @@ private:
     ArrayOfObjects m_timeSpanningElements;
 };
 
+//----------------------------------------------------------------------------
+// PrepareRehPositionFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class resolves the Reh time pointing position in case none is set.
+ */
+class PrepareRehPositionFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PrepareRehPositionFunctor();
+    virtual ~PrepareRehPositionFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitReh(Reh *reh) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_PREPAREDATAFUNCTOR_H__

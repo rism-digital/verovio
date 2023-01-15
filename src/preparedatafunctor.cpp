@@ -25,6 +25,7 @@
 #include "mrpt.h"
 #include "pedal.h"
 #include "plistinterface.h"
+#include "reh.h"
 #include "rest.h"
 #include "runningelement.h"
 #include "score.h"
@@ -1755,6 +1756,22 @@ FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitSyl(Syl *syl)
     TimeSpanningInterface *interface = syl->GetTimeSpanningInterface();
     assert(interface);
     return interface->InterfacePrepareStaffCurrentTimeSpanning(*this, syl);
+}
+
+//----------------------------------------------------------------------------
+// PrepareRehPositionFunctor
+//----------------------------------------------------------------------------
+
+PrepareRehPositionFunctor::PrepareRehPositionFunctor() {}
+
+FunctorCode PrepareRehPositionFunctor::VisitReh(Reh *reh)
+{
+    if (!reh->HasStart() && !reh->HasTstamp()) {
+        Measure *measure = vrv_cast<Measure *>(reh->GetFirstAncestor(MEASURE));
+        if (measure->GetLeftBarLine()) reh->SetStart(measure->GetLeftBarLine());
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
