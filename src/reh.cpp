@@ -90,14 +90,4 @@ FunctorCode Reh::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitRehEnd(this);
 }
 
-int Reh::PrepareRehPosition(FunctorParams *)
-{
-    if (!this->HasStart() && !this->HasTstamp()) {
-        Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-        if (measure->GetLeftBarLine()) this->SetStart(measure->GetLeftBarLine());
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 } // namespace vrv

@@ -75,11 +75,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::PrepareRehPosition
-     */
-    int PrepareRehPosition(FunctorParams *functorParams) override;
-
 protected:
     //
 private:

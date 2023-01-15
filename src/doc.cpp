@@ -546,8 +546,8 @@ void Doc::PrepareData()
 
     // Resolve <reh> elements first, since they can be encoded without @startid or @tstamp, but we need one internally
     // for placement
-    Functor prepareRehPosition(&Object::PrepareRehPosition);
-    this->Process(&prepareRehPosition, NULL);
+    PrepareRehPositionFunctor prepareRehPosition;
+    this->Process(prepareRehPosition);
 
     // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
     PrepareTimePointingFunctor prepareTimePointing;
