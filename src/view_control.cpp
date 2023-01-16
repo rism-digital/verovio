@@ -2422,6 +2422,10 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
         }
         const int staffSize = (*staffIter)->m_drawingStaffSize;
 
+        if ((system->GetFirst(MEASURE) != measure) && adjustPosition) {
+            params.m_x = (*staffIter)->GetDrawingX();
+        }
+
         params.m_enclosedRend.clear();
         params.m_y = reh->GetDrawingY() + yMargin * m_doc->GetDrawingUnit(staffSize);
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
