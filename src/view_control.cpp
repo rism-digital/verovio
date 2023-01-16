@@ -1163,18 +1163,13 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
     const int y = this->GetFYRel(f, staff);
     TextExtend extend;
 
-    // We need to use the Harm floating positioner for the bounding box
-    // This mean that all connectors will start from the most righthand position of all <f> if more than one
-    Harm *parentHarm = vrv_cast<Harm *>(f->GetFirstAncestor(HARM));
-    FloatingPositioner *positioner = (parentHarm) ? parentHarm->GetCurrentFloatingPositioner() : NULL;
-
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
-        if (positioner) x1 = positioner->GetContentRight();
+        x1 = f->GetContentRight();
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else if (spanningType == SPANNING_START) {
-        if (positioner) x1 = positioner->GetContentRight();
+        x1 = f->GetContentRight();
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
@@ -1187,11 +1182,13 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
     // Because <f> is a TextElement the extendor is placed in the parent <fb>
     Fb *fb = (graphic) ? vrv_cast<Fb *>(graphic->GetFirstAncestor(FB)) : NULL;
 
+    // temporary object in order not to reset the F bounding box.
+    F fConnector;
     if (fb) {
         dc->ResumeGraphic(fb, fb->GetID());
     }
     else {
-        dc->StartGraphic(f, "", f->GetID(), SPANNING);
+        dc->StartGraphic(&fConnector, "", f->GetID(), SPANNING);
     }
 
     dc->DeactivateGraphic();
@@ -1207,7 +1204,7 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
         dc->EndResumedGraphic(fb, this);
     }
     else {
-        dc->EndGraphic(f, this);
+        dc->EndGraphic(&fConnector, this);
     }
 }
 
