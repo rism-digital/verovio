@@ -1186,10 +1186,12 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 
 std::string Toolkit::GetNotatedIdForElement(const std::string &xmlId)
 {
-    if (m_doc.m_expansionMap.HasExpansionMap())
+    if (m_doc.m_expansionMap.HasExpansionMap()) {
         return m_doc.m_expansionMap.GetExpansionIDsForElement(xmlId).front();
-    else
+    }
+    else {
         return xmlId;
+    }
 }
 
 std::string Toolkit::GetExpansionIdsForElement(const std::string &xmlId)
