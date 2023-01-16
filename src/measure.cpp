@@ -285,7 +285,7 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
-int Measure::CalculateRightBarLineWidth(Doc *doc, int staffSize)
+int Measure::CalculateRightBarLineWidth(const Doc *doc, int staffSize) const
 {
     const BarLine *barline = this->GetRightBarLine();
     if (!barline) return 0;
