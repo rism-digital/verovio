@@ -1163,13 +1163,18 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
     const int y = this->GetFYRel(f, staff);
     TextExtend extend;
 
+    // We need to use the Harm floating positioner for the bounding box
+    // This mean that all connectors will start from the most righthand position of all <f> if more than one
+    Harm *parentHarm = vrv_cast<Harm *>(f->GetFirstAncestor(HARM));
+    FloatingPositioner *positioner = (parentHarm) ? parentHarm->GetCurrentFloatingPositioner() : NULL;
+
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
-        x1 = f->GetContentRight();
+        if (positioner) x1 = positioner->GetContentRight();
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else if (spanningType == SPANNING_START) {
-        x1 = f->GetContentRight();
+        if (positioner) x1 = positioner->GetContentRight();
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
