@@ -298,7 +298,8 @@ int Measure::CalculateRightBarLineWidth(const Doc *doc, int staffSize) const
     int width = 0;
     switch (barline->GetForm()) {
         case BARRENDITION_dbl:
-        case BARRENDITION_dbldashed: {
+        case BARRENDITION_dbldashed:
+        case BARRENDITION_dbldotted: {
             width = barLineSeparation + barLineWidth;
             break;
         }
