@@ -519,10 +519,10 @@ void View::DrawBracketSpan(
     // We have a @lform - draw a full line
     if (bracketSpan->HasLform()) {
         if (bracketSpan->GetLform() == LINEFORM_dashed) {
-            dc->SetPen(m_currentColour, lineWidth, AxLONG_DASH, 0, 0, AxCAP_SQUARE, AxJOIN_ARCS);
+            dc->SetPen(m_currentColour, lineWidth, AxLONG_DASH, 0, 0, AxCAP_SQUARE);
         }
         else if (bracketSpan->GetLform() == LINEFORM_dotted) {
-            dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND, AxJOIN_ARCS);
+            dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND);
             // Adjust start and end
             x1 += unit * 2;
             x2 -= unit + lineWidth;
@@ -2878,7 +2878,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             endX -= std::max(lineWidth + unit / 2 - rightBarLineWidth, 0);
         }
 
-        dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_ARCS);
+        dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_MITER);
         Point p[4];
         p[0] = { ToDeviceContextX(startX), ToDeviceContextY(y1) };
         p[1] = { ToDeviceContextX(startX), ToDeviceContextY(y2) };
